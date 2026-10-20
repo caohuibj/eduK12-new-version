@@ -1,0 +1,18 @@
+
+PostgreSQL stand-alone backend 16.15
+backend> 	 1: id	(typeid = 25, len = -1, typmod = -1, byval = f)
+	 2: status	(typeid = 25, len = -1, typmod = -1, byval = f)
+	----
+	 1: id = "test-measurement"	(typeid = 25, len = -1, typmod = -1, byval = f)
+	 2: status = "REVOKED"	(typeid = 25, len = -1, typmod = -1, byval = f)
+	----
+backend> 	 1: successful_reviews	(typeid = 20, len = 8, typmod = -1, byval = t)
+	----
+	 1: successful_reviews = "2"	(typeid = 20, len = 8, typmod = -1, byval = t)
+	----
+backend> 	 1: migrated_tables	(typeid = 20, len = 8, typmod = -1, byval = t)
+	----
+	 1: migrated_tables = "220"	(typeid = 20, len = 8, typmod = -1, byval = t)
+	----
+backend> 2026-10-20 12:22:19.062 JST [7] LOG:  checkpoint starting: shutdown immediate
+2026-10-20 12:22:19.068 JST [7] LOG:  checkpoint complete: wrote 34 buffers (0.2%); 0 WAL file(s) added, 0 removed, 0 recycled; write=0.002 s, sync=0.003 s, total=0.007 s; sync files=10, longest=0.001 s, average=0.001 s; distance=71 kB, estimate=71 kB; lsn=0/3EFAE38, redo lsn=0/3EFAE38

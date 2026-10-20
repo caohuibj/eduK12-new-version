@@ -16,6 +16,8 @@
 | R09 | 候选 entry 身份摘要 | reference-candidate.ts 在 entry map 中计算一次，样本过滤只比较缓存 key | 内部候选助手，无公开路由 | 纯合同验证调用数等于 entry 数；未做性能对比 | 相同 entry 的 canonical/SHA 不应随样本数重复 | V06 准备修正 | spy 合同计数及人口组语义 | 已通过 | 不缓存当前授权；sample membership 仍逐成员核对 |
 | R10 | 既有运行时共享/一次计分 | Training shared-scale-runtime/shared-control-records、whole-questionnaire reference preload；Survey final.service 幂等先于 compute | 生产 effective flags 未取证 | 源码盘点 | 复用现有共享记录和父子认知事实引用，避免重新复制大包或计分 | V08–V09 | 接入后核调用次数与持久化引用 | 待接入验收 | 旧 main 行为不等于新版本链路已完成 |
 
+| R11 | 集中真实 PG SQL 边界 | evidence/20261020-validation.md；182 migration SQL、16拒绝及2合法审核 | single-user；无网络/socket服务，无应用flags启用 | 实测隔离目录69MiB、空闲8.5GiB；不是per-answer容量 | 复用现有16.15二进制，独立目录不复制旧实例；不用重型构建 | V02–V07已有数据库部分 | SQL约束；Prisma deploy/并发仍待验 | SQL已通过 | 目录预算≤2GiB且空闲≥4GiB；禁止借此宣称应用权限/并发已验收 |
+
 ## 参数化存储模型
 
 令 D 为不同共享发布定义数，A 为去重资产数，N 为答案数，R 为初始报告数，I 为显式新解释数，E(t) 为保留期 t 内导出数。

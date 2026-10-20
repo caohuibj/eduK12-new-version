@@ -181,3 +181,5 @@ V06 后续内部准备：经验治理去掉固定总 N/每段 N 门槛，允许�
 V06 内部审核发布助手从数据库读取指定 candidate/review，不接受客户端 approval JSON；重新验证当前 scoped reader 的样本资格后构造 scope 派生 key，再交共享发布事务。真实服务仍必须从 authenticated actor 与当前授权派生 actor/authorizedFacts，不能将请求 body 直接传入这些信任参数。新增 repository 合同验证实际 scoring identity 不符拒绝、失权拒绝及数据库 REJECTED 不发布。entryKey 现每 entry 只 canonical/hash 一次，样本循环复用 key；调用次数合同覆盖，未扩算法或做性能实验。相关 8 项纯/mock 合同通过，真实数据库验收仍待集中运行。
 
 V06/V08 冻结匹配内部准备：新增有界 EXACT_POPULATION_PRIORITY_V1 选择器，只接受已冻结的精确 release/hash/entry 集合及显式 priority，复用 ReferenceCore 人口匹配。相同 metric/referenceKind 的同优先级多匹配降为 AMBIGUOUS；缺人口字段只可回退到集合中真正适用的条目，不按“总体”名字猜测。已冻结集合正常 SUPERSEDED 仍可选；REVOKED slot 降级、RETIRED 不新增选择。结果仅保存精确引用及不可用原因，不复制参考统计、扫描样本、取 latest 或调用 scorer。3 项匹配合同及定向 strict TypeScript 通过。实际投放/Wave 冻结写入与 START 调用仍待 V05 接口稳定后的服务接入，不能将此纯函数当作完成的 V08。
+
+集中数据库部分验收见 [20261020-validation.md](evidence/20261020-validation.md)：隔离 PG16.15 single-user 实际执行182份 SQL迁移和16项数据库拒绝合同，另验证2种合法审核。socket/Prisma deploy/并发等未覆盖项明确保留，不把本次证据扩大为完整上线验收。

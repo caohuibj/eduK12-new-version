@@ -1,0 +1,912 @@
+[
+  {
+    "migration": "20260203162242_init",
+    "sha256": "95c9b5edfcd4e65bd687ce8d8d40bbe8ce462db24515dceb794f9c7fe5ba5eb5",
+    "passed": true
+  },
+  {
+    "migration": "20260203171249_add_teacher_code_relation",
+    "sha256": "5f49e8604c726ce3b70cf276c40884fa3820ba548c4b0453bef9cfecf9e87b56",
+    "passed": true
+  },
+  {
+    "migration": "20260204000229_add_user_expires_at",
+    "sha256": "ae3ea2a3faf72e1093f77fcb254c9e8d2e3583e20891b96e5f2d9690215dd5d8",
+    "passed": true
+  },
+  {
+    "migration": "20260204003550_add_student_account_features",
+    "sha256": "d2b7631fe7e4c8dd456aba2f7d949668a7570ada5b810c26874751897bac835c",
+    "passed": true
+  },
+  {
+    "migration": "20260205044439_add_is_recruiting",
+    "sha256": "76414fb64c2b6aa1e6609e94b33a41240ee64145c16847a08ce3aa7a43960d19",
+    "passed": true
+  },
+  {
+    "migration": "20260205053441_add_video_tags_and_checkin_content",
+    "sha256": "8121cba6810a902a4082be48289e7b13c2e2df4e23f5f6a30a532331bfcd3521",
+    "passed": true
+  },
+  {
+    "migration": "20260205133259_add_assignment_content_images",
+    "sha256": "4ee29ef5763fd434226b46524f2ece73242d621fc6a1ddc53f88ccebd0a75829",
+    "passed": true
+  },
+  {
+    "migration": "20260206034044_add_checkin_fields",
+    "sha256": "1d64d3bbc69d1cc620f42b9740b7a562513a4f917642f6d5253ac654d3a7d6d0",
+    "passed": true
+  },
+  {
+    "migration": "20260227092513_add_submission_history",
+    "sha256": "8bf1bf787fca96fab891fc8f91d9c2ed64b82b8e603fb5a6ec5aabbfe94c805f",
+    "passed": true
+  },
+  {
+    "migration": "20260818000000_fix_missing_module_tables",
+    "sha256": "30e950929cf755f46df86bdb797de1a7850bb50186f2fcda513d1dbe2b75312a",
+    "passed": true
+  },
+  {
+    "migration": "20260818010000_sync_schema_drift",
+    "sha256": "2f9e714b83c6b4623b17fb480e4891ff385573cd0c631b742f78180b0bfde2a9",
+    "passed": true
+  },
+  {
+    "migration": "20260819132001_add_cognitive_core_foundation",
+    "sha256": "7d03baab15fa08192b4e69b45239f0aec497ac987625cb709350941b377dd08c",
+    "passed": true
+  },
+  {
+    "migration": "20260819134700_cognitive_session_constraints",
+    "sha256": "c5aa0a2f0dc259a2121d85556c792f000763582faeddef3a34221a02ade63a31",
+    "passed": true
+  },
+  {
+    "migration": "20260821090000_add_composite_assessment",
+    "sha256": "d464896db0141cc1f45e086c0c7f3b118583a6a30cdab5e8469f4b8e67e1625b",
+    "passed": true
+  },
+  {
+    "migration": "20260821120000_fix_composite_draft_answers_and_attempt_uniqueness",
+    "sha256": "2bf6d8a73bf991b6ab3893f4ac63a2928791d51c4af068536ee3df18b4e1231e",
+    "passed": true
+  },
+  {
+    "migration": "20260822090000_add_teacher_approved",
+    "sha256": "17353e28e47f436540aa41e1ada30757a794b4b479c7fd54e4f411cbde136076",
+    "passed": true
+  },
+  {
+    "migration": "20260822100000_add_library_copy_and_wrappers",
+    "sha256": "d3071bab6000f0658a4467b63e36c7e161d4d221790615dd9eef5c7fbc0fb705",
+    "passed": true
+  },
+  {
+    "migration": "20260823100000_add_material_grants",
+    "sha256": "1c1cbbf3db324761a28a414a382496d7060ce7509aa002e2006718d3e70ea995",
+    "passed": true
+  },
+  {
+    "migration": "20260823120000_add_assignment_profile_freeze",
+    "sha256": "08af91f214f52c9fbf2433d8c97db360b8c20bb3c73bd7e08235ae7d7440f5ca",
+    "passed": true
+  },
+  {
+    "migration": "20260823130000_add_assignment_report_freeze",
+    "sha256": "5982fba329c92d9d085fb001dd005c26398cddcc5990c843f9eeda3bde07c23b",
+    "passed": true
+  },
+  {
+    "migration": "20260824070000_add_composite_analysis_protocol_freeze",
+    "sha256": "2ae43b6ee6598fd04fe639a02f4286a0801d1b2daedefbc10bc0f76cbed25abf",
+    "passed": true
+  },
+  {
+    "migration": "20260824120000_add_report_package_resources",
+    "sha256": "099af217897aea22345a08d8f4895aafdd83851113682f5751509b08e9cf524f",
+    "passed": true
+  },
+  {
+    "migration": "20260824130000_add_composite_analysis_snapshots",
+    "sha256": "4654fa83c265586a8c218bbb6460fe9e8abeef210c582fb8f60b3ab3087c5777",
+    "passed": true
+  },
+  {
+    "migration": "20260826100000_add_security_credentials",
+    "sha256": "d79246f17072b879a59cb301e93ef9492feaeb3dc52100ef90cda2603fa503f1",
+    "passed": true
+  },
+  {
+    "migration": "20260826110000_add_password_reset_state",
+    "sha256": "2fa7c53270cc251b0f8e47b5262e5a11d788ae14c4c6322f72db11a7b6a0a342",
+    "passed": true
+  },
+  {
+    "migration": "20260826120000_add_stored_assets",
+    "sha256": "c3cd4b5004139333c15565f92ff1795c782a0c77e03061c39dd227403e48a10c",
+    "passed": true
+  },
+  {
+    "migration": "20260826130000_allow_asset_dedup",
+    "sha256": "4ebb52ec81fd28fa7db7a73ac21e8251abff8e86c9f885825d9afeb2fb3a0ac1",
+    "passed": true
+  },
+  {
+    "migration": "20260827100000_scale_assessment_v2_foundation",
+    "sha256": "d1bbc73d655843159a40ee9ee926693e97008325666bda665927de9bbcad2e4d",
+    "passed": true
+  },
+  {
+    "migration": "20260827110000_add_assessment_context",
+    "sha256": "e5962a458ebd6baa01cf37db9a2db8f640f0841c3360edc8428270e8dce8f9e7",
+    "passed": true
+  },
+  {
+    "migration": "20260827120000_cognitive_v2_result_snapshot",
+    "sha256": "0d284c1a9f3ff69f97ecee5fc91c296196e9b5aade191cbabd252333a4580bcb",
+    "passed": true
+  },
+  {
+    "migration": "20260828100000_pr24_security_boundaries",
+    "sha256": "5e975810bb9a0ec34ef567e5e2df1e1c68c6ac742f60dbc9276832703f8233c2",
+    "passed": true
+  },
+  {
+    "migration": "20260828200000_pr25_runtime_consistency",
+    "sha256": "c3e2cd77cb9bc05797ddf4b056a55dc585cee782037347bf78e0f7c8f68fd462",
+    "passed": true
+  },
+  {
+    "migration": "20260828210000_video_processing_recovery",
+    "sha256": "4ffd7ceed88285f54578679655bb29aa99153760f8877144789ca57650493c1f",
+    "passed": true
+  },
+  {
+    "migration": "20260828220000_checkin_token_protection",
+    "sha256": "36077ed46316945c41278c16aecd3f88809687197303170c985f7cfa0c637df6",
+    "passed": true
+  },
+  {
+    "migration": "20260829100000_submission_history_version_unique",
+    "sha256": "87c249ef046b1664bbd97afc40807d6ae87f3801bdcfd4c9ea1b35e58551458f",
+    "passed": true
+  },
+  {
+    "migration": "20260829110000_submission_idempotency_keys",
+    "sha256": "688a5c8db661a85da38920bebb945f7ab0e029bdc08a0b1c406fe1b07c123f32",
+    "passed": true
+  },
+  {
+    "migration": "20260829120000_forbid_plaintext_checkin_tokens",
+    "sha256": "2a9e12278ae1d7491454cf7d001f3f86f24ef1213f8f09315abf21745ce5a20e",
+    "passed": true
+  },
+  {
+    "migration": "20260829130000_submission_idempotency_payload_hashes",
+    "sha256": "4328fd863caacddcd49480200865bddd101e34de47cb0658eff5dbc4cad5c598",
+    "passed": true
+  },
+  {
+    "migration": "20260829140000_checkin_token_integrity",
+    "sha256": "ef1b8579e2cc4edd1b1fece1ff1e55bdc647b543e27345eb41f038d78df54df9",
+    "passed": true
+  },
+  {
+    "migration": "20260829150000_submission_idempotency_receipts",
+    "sha256": "eaff0ac8c8c537bdd649d2908b7ddc7c59ec595c95d42d7d0a82b38f078058f3",
+    "passed": true
+  },
+  {
+    "migration": "20260829160000_submission_revision",
+    "sha256": "a9221743702509ccdadcbdd1ddeed2c835527cdac6201c609fe3d85be1ac8111",
+    "passed": true
+  },
+  {
+    "migration": "20260830100000_protect_public_access_tokens",
+    "sha256": "d77e5c82b023fe42b8ef43745df91ab4ec893787040831cdc71f7887d9ef6040",
+    "passed": true
+  },
+  {
+    "migration": "20260830120000_persistence_checkpoint_occ",
+    "sha256": "df6ce6cca1a1132b8368e4af795398a6ea277b99a37c553e0d0f92cd023ac977",
+    "passed": true
+  },
+  {
+    "migration": "20260831150000_instrument_final_submit_indexeddb",
+    "sha256": "40cef991f33f83993385caff451d98a846da8d49cc0da0711768137d1a38f833",
+    "passed": true
+  },
+  {
+    "migration": "20260901090000_unified_runtime_v32_unit",
+    "sha256": "9c51a8310ac6a68690fc7503bb71f8956674b9b232ee1879a19bff0f3783ba16",
+    "passed": true
+  },
+  {
+    "migration": "20260901100000_unified_runtime_v32_aggregate",
+    "sha256": "4c28a588304f529e68003f246ec5483453570a5ace76c831c04175a8201d1159",
+    "passed": true
+  },
+  {
+    "migration": "20260902120000_unified_runtime_v32_admission",
+    "sha256": "9a24c69b244aa98df9f4dd836fb9a19145031328d3a40d7ca752b8fe621d68ed",
+    "passed": true
+  },
+  {
+    "migration": "20260902130000_unified_runtime_v32_unit_admission",
+    "sha256": "b70c6ef2dddaf47e736ef4482110649829ea33282b5f5e95493d68661fb9e2fb",
+    "passed": true
+  },
+  {
+    "migration": "20260903210000_instrument_authorization_overlay",
+    "sha256": "4eaa5725619809ac2d8acedca655254c51d02e9903d8b8ce37206482a511f2d6",
+    "passed": true
+  },
+  {
+    "migration": "20260903220000_episode_parent_invite_consent",
+    "sha256": "00d36d8595af0b2e1f7f63cf4da8c30de331e046ff3a7d1aaf7f5ac575b28def",
+    "passed": true
+  },
+  {
+    "migration": "20260903230000_identity_restrict_fks",
+    "sha256": "a371996f91f3d370d9a7e9b4951bc48d69f58e3ca4428a19f9b905d9952088ec",
+    "passed": true
+  },
+  {
+    "migration": "20260903240000_safety_case",
+    "sha256": "b94c95da952084ffc7c43305326270ccaf7273e9dd704d9599c20f168c013f45",
+    "passed": true
+  },
+  {
+    "migration": "20260903250000_safety_case_prep_151",
+    "sha256": "2819bc8e5718480834d26fd1c2f16b5cd8afa23f8b9d0e7d4a9f07caa070ad80",
+    "passed": true
+  },
+  {
+    "migration": "20260904010000_safety_wakeup_prep_171",
+    "sha256": "43a6d4aa5df41ce9ed5b481ab3228f5b5867ff83a8a7f83e97f7507756e711b5",
+    "passed": true
+  },
+  {
+    "migration": "20260908100000_situational_standalone_runtime",
+    "sha256": "7e24e5994d1a78784f267c9e94ed989256dd84cdfaf843e79ae5375da1cacc60",
+    "passed": true
+  },
+  {
+    "migration": "20260909100000_situational_bundle_integration",
+    "sha256": "816427ec86b1fbb77fa7eb4037eca8ac68b5bb4b725990280c066eeca7fa8589",
+    "passed": true
+  },
+  {
+    "migration": "20260917020000_relational_assignment_persistence",
+    "sha256": "988137c0e602210e109b1a6569ec1b0db410b77dd0dc0bf072775c6071d28810",
+    "passed": true
+  },
+  {
+    "migration": "20260917030000_relational_analysis_snapshots",
+    "sha256": "8436015e9aade1d2d15ae166db27011b3b2eb9b0ac0e6cb040983923c35056ba",
+    "passed": true
+  },
+  {
+    "migration": "20260917040000_relational_contract_hardening",
+    "sha256": "cabfa7e646e5e6e27c1ad9702da46aad79eef862df1090913da159a3b37d376f",
+    "passed": true
+  },
+  {
+    "migration": "20260919000100_platform_role",
+    "sha256": "3005d024b54503fe2f4c4180d4dbd232ff8c48be9d233f239eb4bb27bdf24e0c",
+    "passed": true
+  },
+  {
+    "migration": "20260919000200_organization_membership",
+    "sha256": "13a2ad96c929a3a2afe9d3ec61aded2057c8adb59e44f8ebfd376ed8d75b9622",
+    "passed": true
+  },
+  {
+    "migration": "20260919000300_org_grants_audit",
+    "sha256": "455e5c0f039d65504b084209f741c52c66e6134ccf3441128939dba032f1f1d9",
+    "passed": true
+  },
+  {
+    "migration": "20260919000400_org_unit_hierarchy",
+    "sha256": "5880da85201a64ccc01322410b17d1b3e2cd3fe757c7df8d85a83f5faa8b52ff",
+    "passed": true
+  },
+  {
+    "migration": "20260919000500_org_class_relationships",
+    "sha256": "e58355825cb4ef1b28a6f76d6ff3108ad3b16380cdfe21e4062cba4db87f4e08",
+    "passed": true
+  },
+  {
+    "migration": "20260919000600_org_classification_professional",
+    "sha256": "8f48ca3589197e4d70b65c4d924f4a941d992d57828a6e521b8e5c820bca7cda",
+    "passed": true
+  },
+  {
+    "migration": "20260919000700_assessment_run_graph",
+    "sha256": "2de4bde2ed78ddc176b3afb51c2d77795c1afb019f38cfc12527a898d1e463f4",
+    "passed": true
+  },
+  {
+    "migration": "20260919000800_organization_episode_allocation",
+    "sha256": "a7b845a3431cd3ad85efcdca3ab6efc7d8c451b372b897a4c86f7190051afc87",
+    "passed": true
+  },
+  {
+    "migration": "20260919000900_relational_organization_domains",
+    "sha256": "a6fc1e1abf77cca695a07eedb21c146e6122a84b1b2c5fdf9ddcfd51e4e130db",
+    "passed": true
+  },
+  {
+    "migration": "20260919001000_run_start_claims",
+    "sha256": "57d854df02e1c20b22730b854201d1bce055ec71e0bfe9ae83db35fd4b80b87e",
+    "passed": true
+  },
+  {
+    "migration": "20260919001100_run_scientific_provenance",
+    "sha256": "4d0b96c264fa7abac94f0683973e1ae00dc0cdde8d5b89a4f4104bd979eac41a",
+    "passed": true
+  },
+  {
+    "migration": "20260919001200_run_lifecycle_arbitration",
+    "sha256": "3487917b47df31b07500da802b9d49269483984a0b88a018f2a1b18e7fe8dcec",
+    "passed": true
+  },
+  {
+    "migration": "20260919115500_freeze_run_start_attempt_identity",
+    "sha256": "dd8c2e5e74e2ba9686552631721ca1866e3b6f2b1374e9f9dbe46f9cea945106",
+    "passed": true
+  },
+  {
+    "migration": "20260919121000_reporting_core",
+    "sha256": "dce435c57eb864f6831cfa95480acf7f83654c2638fa4425bd139063601b6e33",
+    "passed": true
+  },
+  {
+    "migration": "20260919155500_reporting_series_wave_bindings",
+    "sha256": "8dc20cca71448531338d728fe736c172c7c02881780797697aad59d8da2b6bff",
+    "passed": true
+  },
+  {
+    "migration": "20260919161000_reporting_pr4_artifact_bindings",
+    "sha256": "392c57f40f5f97b022f06d5edd4af5bc9c627ca77ffba476024504aae6211c66",
+    "passed": true
+  },
+  {
+    "migration": "20260919190000_reporting_export_tickets",
+    "sha256": "57ad849265644db56e957c4a10588fec97e67f65c551f116e82067d8661d44b0",
+    "passed": true
+  },
+  {
+    "migration": "20260921145500_add_scale_deployment_policy",
+    "sha256": "18bb7d9def9c9fd1563d47808674c500a967ed1b84aca63a589b2dcd471e256b",
+    "passed": true
+  },
+  {
+    "migration": "20260922010000_scale_publication_audit",
+    "sha256": "1d82333564bce050bbafcbc3e7f0ff0dbd29b98f0ef0fc6baba2e044f9194ac2",
+    "passed": true
+  },
+  {
+    "migration": "20260922120000_questionnaire_products",
+    "sha256": "a4a7f7991a92b29a8af329170bb1f5a30412c1b1fdb7115fb4bcf52ce838b9dc",
+    "passed": true
+  },
+  {
+    "migration": "20260922140000_bundle_v3_production",
+    "sha256": "05582910b5045471d0d392837cf2ed5dda138fe41f05e2ebfc2196a1c0f9f5d7",
+    "passed": true
+  },
+  {
+    "migration": "20260923010000_bundle_package_releases",
+    "sha256": "e04d9d6f20a7bfc0dcff2ea0649577e0f02a2ea46bd8d2706c0e2b97e376201c",
+    "passed": true
+  },
+  {
+    "migration": "20260926010000_reporting_cohort_selection",
+    "sha256": "3cf456aa975464dc7280748b26bef70fb6ff2bca9b55ce93f2e1e2afebbdd3b4",
+    "passed": true
+  },
+  {
+    "migration": "20260926093000_reporting_individual_longitudinal",
+    "sha256": "5ff9d4e1715055da060a6712744fbfb6cf429124ab6b14abddee4021bc0cb795",
+    "passed": true
+  },
+  {
+    "migration": "20260927210000_export_batch_recovery",
+    "sha256": "04a895051285a5e9dc1e1dee0f405ac88f0a627e79ccc3267a7afb25400be51f",
+    "passed": true
+  },
+  {
+    "migration": "20260927223000_video_processing_generation",
+    "sha256": "bd89e2d5b3712dd5ac126525e8752130c50e31a959559f67a4e5f15a74d54f9e",
+    "passed": true
+  },
+  {
+    "migration": "20260930000000_export_artifact_provenance",
+    "sha256": "d9a1b01e33445b49349765d94af07dd18995385ad975506251e5eedf2e1b9db8",
+    "passed": true
+  },
+  {
+    "migration": "20260930000100_assessment_delivery_grants",
+    "sha256": "e7c71db237ea653d0739dcadce5bcc883560271ebc6338326da0f41b42d0818d",
+    "passed": true
+  },
+  {
+    "migration": "20260930000200_delivery_policy_windows",
+    "sha256": "2a1d8a3358fbd1c682aa0227a7665415f86905a266e14ef1a93a54199cf55782",
+    "passed": true
+  },
+  {
+    "migration": "20261001000100_anonymous_study_waves",
+    "sha256": "dc990a65009212c3b5bd573bedaf8a6d3125d0ed6d7dede6ee5987e28e49d238",
+    "passed": true
+  },
+  {
+    "migration": "20261001030000_scale_reference_lifecycle",
+    "sha256": "1c4b64e1dd8c0e8fd8e03a5d9c1f9732767bde044ba24a3d0155b6cd80464e9b",
+    "passed": true
+  },
+  {
+    "migration": "20261001040000_scale_axis_snapshots",
+    "sha256": "fdc3b9d5e4ca5831d18330100c00886d2f5c73921e899651c9b2161b8e768475",
+    "passed": true
+  },
+  {
+    "migration": "20261001090000_sjt_author_uploads",
+    "sha256": "7f5aa69f441dddc2caa7265c8d305f257985108430dca86ee2496e69ef172316",
+    "passed": true
+  },
+  {
+    "migration": "20261002120000_parent_portal_disclosure",
+    "sha256": "bd63ad7b817d206f2baad923ccce1277bbe98b0af9289e2e3f1a5b03eb6ec94b",
+    "passed": true
+  },
+  {
+    "migration": "20261002121000_parent_portal_binding_guards",
+    "sha256": "d4a0a91c029d3b78e4d6f9cb44c428169dc8d6324900f8966cddf1ac12785f66",
+    "passed": true
+  },
+  {
+    "migration": "20261002140000_parent_tool_disclosure_ceiling",
+    "sha256": "67e8d507e5465954ee130482097ffea36bbb523757c0ea1e4712298325f6cbb6",
+    "passed": true
+  },
+  {
+    "migration": "20261002150000_legacy_import_tables",
+    "sha256": "5d4d8420b7fe72a5bc8d66a3d40ae276ee76ab33237b2564f9a9b4cdc464129b",
+    "passed": true
+  },
+  {
+    "migration": "20261002160000_parent_report_publications",
+    "sha256": "cc85aab49066ed0e65402b9471aff9cbf59be4dd24e61354de9ea91ccb0cfea6",
+    "passed": true
+  },
+  {
+    "migration": "20261004000100_parent_relationship_episodes",
+    "sha256": "c0f5ee48e823cb68c00606259af4d2e29e8a537ca48ee60a1eeae86d4155cac8",
+    "passed": true
+  },
+  {
+    "migration": "20261004000200_organization_member_invitations",
+    "sha256": "39bd9f22285ff41e3178930a986d596e69086d6dcc043a66de74c2cfbfc1258a",
+    "passed": true
+  },
+  {
+    "migration": "20261005000100_registered_descriptive_resources",
+    "sha256": "01c44efbbc82270d32eaa5295e619e353e02a3709bba0fceec9440b668c88c7c",
+    "passed": true
+  },
+  {
+    "migration": "20261007010000_cognitive_quota_lineage",
+    "sha256": "73afe811b92820aeb34ca9dad129a49f22dc89c80dbe4097131af760ad71cb35",
+    "passed": true
+  },
+  {
+    "migration": "20261007020000_assessment_workbench",
+    "sha256": "73a7e720870e080ae67d871c26e6d65b8dfef78613ace9fd09e6aad0e5a939f0",
+    "passed": true
+  },
+  {
+    "migration": "20261010010000_campus_account_domains",
+    "sha256": "186cbab7138f7927f3b79a52e8c2baeba48199832bac95b7b6d9807cab8ea863",
+    "passed": true
+  },
+  {
+    "migration": "20261010020000_campus_class_admission",
+    "sha256": "33e00914eda543a5ab0cc993b6b58599eb70f8f6bfed05a4bf25d7486c89d260",
+    "passed": true
+  },
+  {
+    "migration": "20261010030000_campus_totp",
+    "sha256": "278ae5477355fc970a664cd95178879684120bcddb52dccaa4ec0682502680c7",
+    "passed": true
+  },
+  {
+    "migration": "20261010040000_campus_staff_invitations",
+    "sha256": "ead953707b8dca6ded3405580bf71b0baed543a6377e7e5c2cdf0277af133ed9",
+    "passed": true
+  },
+  {
+    "migration": "20261010050000_campus_recovery",
+    "sha256": "d028aaa6e1e8cc8dc4496a6276829eb862c67627cf8a8761c24a262ae2bd3233",
+    "passed": true
+  },
+  {
+    "migration": "20261010060000_campus_scope_constraints",
+    "sha256": "947681594f2d96c846bba92fd88e77ff4333a6fef02c8f0bbd08eedaa418f1c7",
+    "passed": true
+  },
+  {
+    "migration": "20261010070000_campus_realm_immutability",
+    "sha256": "75082c8afa01203148d89cc98a9edf0a3d4e452f7caf171cf1c54ccaadc2aabc",
+    "passed": true
+  },
+  {
+    "migration": "20261010080000_campus_quarantine_readmission",
+    "sha256": "9b3d872887accf79a7a87276dadff749be8df4b0701d08b541ab7684844103aa",
+    "passed": true
+  },
+  {
+    "migration": "20261010100000_campus_activity_course_type",
+    "sha256": "8c07dd1fc1e7e2b43753582346f7e7f42f886298254e00567eadeb8b2142e862",
+    "passed": true
+  },
+  {
+    "migration": "20261010110000_campus_activity_lifecycle",
+    "sha256": "0a26e828c4d032c53db89c4081cd3fc260fa4a0d3b0f8b3a7d8f2056b136644c",
+    "passed": true
+  },
+  {
+    "migration": "20261010120000_campus_task_submission_guard",
+    "sha256": "d572d461a7589d9f96b01aaa8effa3d7d5f53ec83bd82e8bd5777f2829f8db4e",
+    "passed": true
+  },
+  {
+    "migration": "20261010130000_campus_parent_registration",
+    "sha256": "422821639344405b19db008e2134e6710c381ecab85bd8f304260ce37cb175e2",
+    "passed": true
+  },
+  {
+    "migration": "20261010140000_campus_peer_consent_allocation",
+    "sha256": "a1420a4a0bc9b34ed48cd153ffb2b4d5f3a7764d9a766e6ce0c27a1c8a2cc063",
+    "passed": true
+  },
+  {
+    "migration": "20261010150000_campus_peer_relationship_kind",
+    "sha256": "5207eee6c6d59eeb24ec65b64b0ba74243b5955d6c8353938dd80a1dc993bc6f",
+    "passed": true
+  },
+  {
+    "migration": "20261011110000_survey_researcher_realm",
+    "sha256": "1b8533a64c685d40fb203d1da5e5b0e336381a45042ca5b2eff766cbbdae0518",
+    "passed": true
+  },
+  {
+    "migration": "20261011120000_survey_research_instruments",
+    "sha256": "c1cef3a7a599105d21b29fc0b7f7713aaa55d8ba5fc1854d9d09ecac37af20ff",
+    "passed": true
+  },
+  {
+    "migration": "20261011130000_survey_research_waves",
+    "sha256": "6c6327bc3e114aec702e9fa808183411c81a0d2c845aeb461cc268feb827b5d9",
+    "passed": true
+  },
+  {
+    "migration": "20261011131000_survey_final_adapter",
+    "sha256": "3b45be7313c2221789341f92750fb8875569d43f87366995d3159550f28d8085",
+    "passed": true
+  },
+  {
+    "migration": "20261011132000_survey_scoped_exports",
+    "sha256": "280b063646f96da54f6b2589e26eab3826cbe3ff1b8d8ef499a542ff4fdb25ed",
+    "passed": true
+  },
+  {
+    "migration": "20261011133000_survey_linkage_disclosure",
+    "sha256": "6ebc5c620cf403022591e5811c056132b59bf762476088074276476947ac5770",
+    "passed": true
+  },
+  {
+    "migration": "20261011193000_survey_sample_quality",
+    "sha256": "30490ce1fc0492a3bbd36e186797bd1e6c514550f5c0d992f8b5c354db340b0e",
+    "passed": true
+  },
+  {
+    "migration": "20261011233000_survey_flow_experiment",
+    "sha256": "dcc0f16c15ae6bb6d968e5055ad559bb7a0826b326deb498499378b2a981c731",
+    "passed": true
+  },
+  {
+    "migration": "20261011234000_survey_research_operations",
+    "sha256": "67e56effd2a6788739bc0265d8256fb555403ffc39bde73ce92fc6cf9b2d50dd",
+    "passed": true
+  },
+  {
+    "migration": "20261012000000_education_product_entitlements",
+    "sha256": "4599eef791b29b54071d3ae85abd8d283ec2fb266967c48fca37839ab30c4655",
+    "passed": true
+  },
+  {
+    "migration": "20261012000100_education_teacher_staff_invitations",
+    "sha256": "7816ebe657e6eb6e08228dda0e09b0692f1a5c8fb998d98f5b1df6b25cd42c9b",
+    "passed": true
+  },
+  {
+    "migration": "20261012000200_education_teacher_student_invitations",
+    "sha256": "850e4e2aaac036732acd4b7c312ddad275ad8d2edc3e3839a504f7ff6bcc56af",
+    "passed": true
+  },
+  {
+    "migration": "20261012000300_huiteacher_evaluation_targets_events",
+    "sha256": "c7ebb059e0f021e153dfa37946cf66e06b24cfcb93637ca0c13c408d6a65a88b",
+    "passed": true
+  },
+  {
+    "migration": "20261012000400_huiteacher_form_instruments",
+    "sha256": "9744f07c66e44e4e276c0a67e51bd1940b4d4abad35414d068af21c79fdcc10e",
+    "passed": true
+  },
+  {
+    "migration": "20261012000500_huischool_admin_product_grant_backfill",
+    "sha256": "7df4a4631b8175b8956cbce5a184dcf95995e99773bb619c104769d7139c411c",
+    "passed": true
+  },
+  {
+    "migration": "20261012000600_huiteacher_run_binding",
+    "sha256": "935d7c80a303224f7373254080759b07ca6cf5f550d231618ae9234766585dc2",
+    "passed": true
+  },
+  {
+    "migration": "20261012000700_huiteacher_form_runtime_final",
+    "sha256": "d0a9e159b0ed71ec7d6620df2985e655c706e134e93d13f9105dee71aba3dca8",
+    "passed": true
+  },
+  {
+    "migration": "20261012000800_education_teacher_scale_licenses",
+    "sha256": "baa73212c05ad2f1a0a222aba780fa3f47078b5b07e5317cdfb982d672378932",
+    "passed": true
+  },
+  {
+    "migration": "20261012000900_huiteacher_personal_scale_entitlement",
+    "sha256": "85ae9fef809c70a69411d5c3e43261481f4b027ce0935b0d5e640e3547315747",
+    "passed": true
+  },
+  {
+    "migration": "20261012001000_huiteacher_group_disclosure_ledger",
+    "sha256": "debeb485d6284f74a14df9c3da8b6f0ae690e79998021f62d4d5f3dbd09e1ebf",
+    "passed": true
+  },
+  {
+    "migration": "20261012001100_huiteacher_observer_evidence",
+    "sha256": "8bd6f942526f78a314a1beac10444af6e2f10b7e256498c0a52d22625d071830",
+    "passed": true
+  },
+  {
+    "migration": "20261012001200_huiteacher_field_consensus",
+    "sha256": "d91380badf485cee1552e0fef0de66692b95206f7574346e7a874402ebd65d0c",
+    "passed": true
+  },
+  {
+    "migration": "20261012001300_huiteacher_consensus_approvals",
+    "sha256": "655ee182da84ef8f4c3c2ee47082d1f6b5472d1b208782be79e9ddc71ae8f540",
+    "passed": true
+  },
+  {
+    "migration": "20261012001400_huiteacher_structured_field_form",
+    "sha256": "842292a8b6a029c1355de421cfcf6f56f94b01cbd6c7dec65d3103b3cf0662dc",
+    "passed": true
+  },
+  {
+    "migration": "20261012001500_huiteacher_field_form_binding_guard",
+    "sha256": "e943fb93de99e42b387c6cc59deec84efd55d4d9f2612f78029900ed0c3a548b",
+    "passed": true
+  },
+  {
+    "migration": "20261012001600_huiteacher_external_expert_identity",
+    "sha256": "6a1fb3dc9d5e09c9ab0d887abd9b11bb2db12c3224566bb2c8f9809e1967bae7",
+    "passed": true
+  },
+  {
+    "migration": "20261012001700_huiteacher_field_feedback_disclosure",
+    "sha256": "f0eefbfc79a2a59f40b1cd0902654815447bde05eb50fdd71db4cfa6c2553d8d",
+    "passed": true
+  },
+  {
+    "migration": "20261012001800_huiteacher_student_eval_config",
+    "sha256": "439e981252f0da765d23c96850e2ea9d16bb3780e08bda903a594ccc9b414fd0",
+    "passed": true
+  },
+  {
+    "migration": "20261012001900_huiteacher_student_feedback_disclosure",
+    "sha256": "235cd0a41713984b27a244b146db0b4bcdfa8efe995fc240f73b717f0e30d20d",
+    "passed": true
+  },
+  {
+    "migration": "20261012002000_huiteacher_cross_class_disclosure",
+    "sha256": "1154de6f16e2cf3c0fa94a47d04f83728b3aee5187e619fcccb3152a2d146f3a",
+    "passed": true
+  },
+  {
+    "migration": "20261012002100_huiteacher_improvement_actions",
+    "sha256": "ceeaaf9fd8817c2daeee21efef80d14d823aede961891d0787688c91fa90cb6b",
+    "passed": true
+  },
+  {
+    "migration": "20261012002200_huiteacher_improvement_reassessment",
+    "sha256": "dfe204a01c367ccf534ee8720dce09dd93deed20755a00d8a29f7e4683ce299c",
+    "passed": true
+  },
+  {
+    "migration": "20261012002300_huiteacher_improvement_source_guard",
+    "sha256": "9bdcbbd5dbd6d0c4fe9c818aff8a3a809276840bfda192f4a34bc6e8ce9c1ad7",
+    "passed": true
+  },
+  {
+    "migration": "20261012190000_report_privacy_preferences",
+    "sha256": "b660e3083cb5062314de19c71f23ac40dcd9c90d177c49e50889bd06fb4c4c53",
+    "passed": true
+  },
+  {
+    "migration": "20261012203000_teacher_privacy_v2_release_projection",
+    "sha256": "5395f0be3b8193a69cab83bf48286ef8aca9aa6044f92c4003e69cb7594ee6c8",
+    "passed": true
+  },
+  {
+    "migration": "20261015010000_composite_report_outbox",
+    "sha256": "98c4ad856899265eaf4540bd336558dd44ad12d66845f81f9f3fe99f92b45e2c",
+    "passed": true
+  },
+  {
+    "migration": "20261015020000_whole_questionnaire_receipt",
+    "sha256": "e05f73edaf45300a281519bd137024d5db141cb6b42c427fe31eb57f05220984",
+    "passed": true
+  },
+  {
+    "migration": "20261015030000_whole_validation_manifest",
+    "sha256": "a0dcacc90a438ffbe9a8086c01b5921440f0acadebf070c61f9999f01cf946f6",
+    "passed": true
+  },
+  {
+    "migration": "20261016010000_detached_whole_receipt_budget",
+    "sha256": "1f9863f75d4bb2523654606d474b6b35d15c61d0dacb656e6697cb2bd134e93a",
+    "passed": true
+  },
+  {
+    "migration": "20261016090000_shared_scale_runtime_artifacts",
+    "sha256": "a9831daa742d4b73389673785bd1282db47bd3a211815ee2e7c0021cce77d9bf",
+    "passed": true
+  },
+  {
+    "migration": "20261016130000_compact_assessment_public_templates",
+    "sha256": "25fc3d8ac658c5462bc7624f0ac26c23449f7e218aad8dd8c3ccec6894e7f539",
+    "passed": true
+  },
+  {
+    "migration": "20261016143000_index_compact_raw_receipts",
+    "sha256": "83995f106ebe36a509ef630670b43132c85a49d337d7c6a617c39010dc93075e",
+    "passed": true
+  },
+  {
+    "migration": "20261016160000_shared_control_bindings",
+    "sha256": "63f2926aaf8bc5e57bb608742beedf8fc1a625e6f69aee3b2dbb018d25d8efb2",
+    "passed": true
+  },
+  {
+    "migration": "20261016170000_shared_cognitive_runtime",
+    "sha256": "329b702f63cc7410ece232015353fc8a20eb1e1b0b939a03cf291a30f14447d6",
+    "passed": true
+  },
+  {
+    "migration": "20261017010000_shared_asset_storage",
+    "sha256": "95af98243b6747537c5c1e3b33005620d37e6fc7f028e8f281f87b1255d97ddf",
+    "passed": true
+  },
+  {
+    "migration": "20261017020000_asset_upload_deduplication",
+    "sha256": "b05b17a733e57ef33a8685b38473d231074e36b5f5b08256f6d2f3a7ef63ca50",
+    "passed": true
+  },
+  {
+    "migration": "20261017050000_survey_cognitive_units",
+    "sha256": "2c63916289623fe5702c976bd865413ef36e542f00c801d43ec749516182f58f",
+    "passed": true
+  },
+  {
+    "migration": "20261017060000_survey_tool_grants",
+    "sha256": "396c84264b19dedcfeada6c4160445780e20f23ab241b299e83626668c42ee0d",
+    "passed": true
+  },
+  {
+    "migration": "20261017070000_survey_group_ip_window",
+    "sha256": "eb40c9a9e762385dcf9ccbd0721c3d58f0dedfbb91fc4284395a6253fbe859a6",
+    "passed": true
+  },
+  {
+    "migration": "20261018020000_scale_copy_source",
+    "sha256": "1058a1718de00514084e30ef3b94f47c5b4dc83834bff14ca9c39810c59dfb68",
+    "passed": true
+  },
+  {
+    "migration": "20261018080000_composite_typed_form_definition",
+    "sha256": "12cac41f2a5debb9ba3e1820ebbd883a4e2b4befc4d909cada88e9df375c6fd6",
+    "passed": true
+  },
+  {
+    "migration": "20261018090000_training_form_v3_policy",
+    "sha256": "52432787c116aeccd2a20ad1a209d80d366702ab78e2ee47a72f48c3287e7bca",
+    "passed": true
+  },
+  {
+    "migration": "20261018094700_training_scale_timing",
+    "sha256": "cc6a78e830dcdc0dcab48695fa49ec78285fe4a706dfcbc597e38048c4a44262",
+    "passed": true
+  },
+  {
+    "migration": "20261018110000_sjt_course_grants",
+    "sha256": "2930f278fa422a51fff46afd2d79ab97ff519a2e3af79871201561bcc6cbed2c",
+    "passed": true
+  },
+  {
+    "migration": "20261018120000_training_weighted_variants",
+    "sha256": "f0ac16a92275e113931435726949c809362fbcf695b4d058fa8257c733997ff7",
+    "passed": true
+  },
+  {
+    "migration": "20261018130000_training_analysis_quality",
+    "sha256": "43cd2f3859699ff32622703eaab3f54cfe5f4d45431e6531c752f344d7d26cb4",
+    "passed": true
+  },
+  {
+    "migration": "20261018143000_anonymous_study_governance",
+    "sha256": "a081df77cdd380ff0e7cf22897bf18bcb0f738954e9bd9f8816cd3f173ddc74d",
+    "passed": true
+  },
+  {
+    "migration": "20261018153000_training_conditional_flow",
+    "sha256": "d31d031fb08404902e7d6bf2c4cb5332ba8ff6215ea76794b9a4dfe40ce5bcbf",
+    "passed": true
+  },
+  {
+    "migration": "20261018160000_training_material_allocation",
+    "sha256": "503d4ce6dce0fe6235975d9b3b712515c0b5148a8499e08abb80fafd92a5c43b",
+    "passed": true
+  },
+  {
+    "migration": "20261019040000_training_public_rounds",
+    "sha256": "4d8a8a322cbec2222c18221c2417441edb8155295510fc77da3ce7fe9c244f6f",
+    "passed": true
+  },
+  {
+    "migration": "20261019050000_training_persistence",
+    "sha256": "604b7798192fbb94c640ee638adefeebc3bd41efb781c125cf9392a0049dada5",
+    "passed": true
+  },
+  {
+    "migration": "20261019060000_training_feedback_release",
+    "sha256": "c14fbc1105a2e21f8479fb632547d13af30f3e507ef38470e5379f7908c899e6",
+    "passed": true
+  },
+  {
+    "migration": "20261020020000_measurement_content_releases",
+    "sha256": "da5ef430dfe7fab46cad9e06e655d4fa270956311c324c0bee99ff336c91b68e",
+    "passed": true
+  },
+  {
+    "migration": "20261020021000_scale_measurement_release",
+    "sha256": "43244901c3027aed086bc6a2f17e6d108dc965954d77b5b5abb09fed80408549",
+    "passed": true
+  },
+  {
+    "migration": "20261020023000_cognitive_sjt_measurement_release",
+    "sha256": "d66021f0eff6ba86646b83b15e5ce7eb6aa8b2785bdc82a1abbee2c0f2d825a6",
+    "passed": true
+  },
+  {
+    "migration": "20261020025000_reference_candidate_reviews",
+    "sha256": "8242472539caa540e369ffbbc859d056653ac73ff0af0fe19e8ce3aa9aac7c22",
+    "passed": true
+  }
+]
