@@ -567,3 +567,5 @@ Composite 发布以真实已挂载 Scale、Cognitive effective profile、已解�
 系统根授权增加固定 TRAINING/COURSE/report.edit、report.publish，目标必须为当前真实教师、获准非库 Training 课程作者及精确所属 composite。管理角色不代替业务教师身份。签发/撤销仍复用统一系统强认证、审计、版本 CAS、实时父授权；管理 UI 保留未知请求原 UUID。
 
 真实 questionnaire-products 路由接报告草稿/list/get/revision-CAS edit/synthetic preview/private publish；每次受当前 course-owner、teacher eligibility、精确 capability 交集保护。创建原请求 hash 独立保存，编辑后创建重试不换身份。报告绑定实际挂载测量，复用请求内已验证 release cache；固定历史解释用途允许正常退休测量，REVOKED 拒绝。报告私有 scope 为本人/composite，与平台目录批准分离。首批只 teacher/researcher 受众、空资产列表；不额外披露被试报告、不读取样本预览。模板与已发布内容 immutable；SQL/HTTP/真实并发仍待集中验收。
+
+Training 报告编制 UI 已挂真实 QuestionnaireProductEdit，课程只能选已保存关联与 Training 课程目录的交集。复用声明式报告编辑器，使用 Training session/CSRF，显式 report grant；仅 teacher/researcher、空资产。未知创建请求按 actor/composite/course/grant 保存原 UUID 与输入，busy/pending 不可离开，dirty 明确确认，父组合操作与报告编辑互斥。已通过组件/页面定向测试及前端类型检查；真实浏览器/HTTP 尚未验收。此 UI 不代表 Training FINAL/report selection 已完成。

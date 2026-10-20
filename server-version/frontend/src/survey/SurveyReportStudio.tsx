@@ -50,8 +50,10 @@ function PreviewBlock({value}:{value:unknown}){
   return null
 }
 
-export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,onLeaveRiskChange}:{projectId:string;projectStatus?:string;active?:boolean;onLeaveRiskChange?:(risk:ReportLeaveRisk)=>void}){
-  const base='/projects/'+encodeURIComponent(projectId)+'/report-drafts'
+export type ReportTransport=<T>(path:string,method?:string,body?:unknown)=>Promise<T>
+export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,onLeaveRiskChange,transport=reportApi,basePath,nativePublishing=true,audiences=['researcher','student','parent','teacher'],recoveryKey}:{projectId:string;projectStatus?:string;active?:boolean;onLeaveRiskChange?:(risk:ReportLeaveRisk)=>void;transport?:ReportTransport;basePath?:string;nativePublishing?:boolean;audiences?:Payload['audience'][];recoveryKey?:string}){
+  const base=basePath??('/projects/'+encodeURIComponent(projectId)+'/report-drafts')
+  const reportApi=transport
   const [measurements,setMeasurements]=useState<Measurement[]>([]),[list,setList]=useState<Summary[]>([])
   const [nativeInstruments,setNativeInstruments]=useState<NativeInstrument[]>([]),[nativeId,setNativeId]=useState(''),[nativePage,setNativePage]=useState(1),[nativeCount,setNativeCount]=useState(0),[showNative,setShowNative]=useState(false)
   const [page,setPage]=useState(1),[selected,setSelected]=useState<Draft|null>(null),[dirty,setDirty]=useState(false)
@@ -59,7 +61,14 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
   const [copyVersion,setCopyVersion]=useState(''),[publicationNote,setPublicationNote]=useState('')
   const [scenario,setScenario]=useState<Scenario>('INTERPRETABLE'),[preview,setPreview]=useState<Preview|null>(null)
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[listError,setListError]=useState('')
-  const [pendingCreate,setPendingCreate]=useState<Create|null>(null)
+  const [pendingCreate,setPendingCreateState]=useState<Create|null>(()=>{
+    if(!recoveryKey)return null
+    try{const raw=sessionStorage.getItem(recoveryKey);if(!raw)return null;const saved=JSON.parse(raw);return saved.scope===recoveryKey&&saved.request?.requestId&&saved.request?.payload?saved.request:null}catch{return null}
+  })
+  const setPendingCreate=(request:Create|null)=>{
+    if(recoveryKey){if(request)sessionStorage.setItem(recoveryKey,JSON.stringify({scope:recoveryKey,request}));else sessionStorage.removeItem(recoveryKey)}
+    setPendingCreateState(request)
+  }
   useEffect(()=>{onLeaveRiskChange?.({dirty,pending:!!pendingCreate,busy})},[dirty,pendingCreate,busy,onLeaveRiskChange])
   useEffect(()=>()=>onLeaveRiskChange?.({dirty:false,pending:false,busy:false}),[onLeaveRiskChange])
   useEffect(()=>{
@@ -76,17 +85,17 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
   const loadList=useCallback(async(nextPage:number)=>{
     try{const rows=await reportApi<Summary[]>(base+'?page='+nextPage);setList(rows);setPage(nextPage);setListError('')}
     catch(e){setListError(errorMessage(e));throw e}
-  },[base])
+  },[base,reportApi])
   const loadNative=useCallback(async(nextPage:number)=>{
     const result=await reportApi<{list:NativeInstrument[]}>('/projects/'+encodeURIComponent(projectId)+'/instruments?page='+nextPage)
     const native=result.list.filter(row=>row.kind!=='FORM'&&row.status!=='ARCHIVED'&&!row.catalogGrantId&&!row.readOnly)
     setNativeInstruments(native);setNativeCount(result.list.length);setNativePage(nextPage);setNativeId(native[0]?.id||'')
-  },[projectId])
+  },[projectId,reportApi])
   const load=useCallback(()=>run(async()=>{
     const choices=await reportApi<Measurement[]>(base+'/measurements');setMeasurements(choices)
     setMeasurementId(current=>current||choices[0]?.id||'');await loadList(1)
-    if(!choices.length){await loadNative(1);setShowNative(true)}
-  }),[base,loadList,loadNative,run])
+    if(nativePublishing&&!choices.length){await loadNative(1);setShowNative(true)}
+  }),[base,loadList,loadNative,run,nativePublishing,reportApi])
   useEffect(()=>{if(active&&!initialRequested.current){initialRequested.current=true;void load()}},[active,load]) // Project-keyed workspace retains edits while switching tabs.
   const publishMeasurement=()=>void run(async()=>{
     const source=nativeInstruments.find(row=>row.id===nativeId);if(!source)throw new Error('请选择本项目原生测量草稿')
@@ -146,13 +155,13 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
     <fieldset disabled={busy||!!pendingCreate} className="border rounded p-3 space-y-3"><legend>创建报告草稿</legend>
       <label className="block">测量发布版本<select className="input block w-full" value={measurementId} onChange={e=>setMeasurementId(e.target.value)}>
         <option value="">请选择</option>{measurements.map(m=><option key={m.id} value={m.id}>{m.key} · {m.version} · {m.family} · {m.status}</option>)}</select></label>
-      {!measurements.length&&<p>暂无本项目获准的测量发布版本。可在下方显式发布原生草稿；目录原版来源不在此改写。</p>}
+      {!measurements.length&&<p>暂无本项目获准的测量发布版本。{nativePublishing?'可在下方显式发布原生草稿；目录原版来源不在此改写。':'请先在测量编制入口完成发布并核对内容授权。'}</p>}
       <label>报告系列标识<input className="input block" maxLength={168} value={reportKey} onChange={e=>setReportKey(e.target.value)}/></label>
       <label>报告版本<input className="input block" maxLength={240} value={version} onChange={e=>setVersion(e.target.value)}/></label>
       <button type="button" className="btn-primary" disabled={!measurementId||!reportKey.trim()||!version.trim()} onClick={startCreate}>创建报告草稿</button>
     </fieldset>
-    <button type="button" className="btn-secondary" disabled={busy} onClick={()=>{if(showNative)setShowNative(false);else void run(async()=>{await loadNative(1);setShowNative(true)})}}>{showNative?'收起原生测量发布':'发布或更新原生测量'}</button>
-    {showNative&&<fieldset disabled={busy||!measurementWritable||!!pendingCreate} className="border rounded p-3 space-y-2"><legend>发布本项目原生测量</legend>
+    {nativePublishing&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>{if(showNative)setShowNative(false);else void run(async()=>{await loadNative(1);setShowNative(true)})}}>{showNative?'收起原生测量发布':'发布或更新原生测量'}</button>}
+    {nativePublishing&&showNative&&<fieldset disabled={busy||!measurementWritable||!!pendingCreate} className="border rounded p-3 space-y-2"><legend>发布本项目原生测量</legend>
       {!measurementWritable&&<p>项目采集已关闭或归档，不能发布新的测量；仍可修订历史报告。</p>}
       <p>仅发布测量内容版本，不创建波次或启动真实采集。Form 与目录原版来源不进入本列表。</p>
       <label>原生测量草稿<select className="input block w-full" value={nativeId} onChange={e=>setNativeId(e.target.value)}><option value="">请选择</option>{nativeInstruments.map(row=><option key={row.id} value={row.id}>{row.title} · {row.kind} · 修订 {row.revision}</option>)}</select></label>
@@ -175,7 +184,7 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
         <fieldset disabled={busy||readOnly||!!pendingCreate} className="space-y-3 min-w-0"><legend>报告内容</legend>
           <label className="block">报告标题<input className="input block w-full" value={selected.payload.template.title||''} onChange={e=>change({...selected.payload,template:{...selected.payload.template,title:e.target.value||undefined}})}/></label>
           <label className="block">受众<select className="input block" value={selected.payload.audience} onChange={e=>change({...selected.payload,audience:e.target.value as Payload['audience']})}>
-            <option value="researcher">研究者</option><option value="student">学生</option><option value="parent">家长</option><option value="teacher">教师</option></select></label>
+            {audiences.map(audience=><option key={audience} value={audience}>{{researcher:'研究者',student:'学生',parent:'家长',teacher:'教师'}[audience]}</option>)}</select></label>
           <label className="block">语言<input className="input block" maxLength={240} value={selected.payload.language} onChange={e=>change({...selected.payload,language:e.target.value})}/></label>
           <p>可引用指标：{selected.payload.metricKeys.join('、')}。测量身份与指标集合随此草稿固定。</p>
           {selected.payload.template.blocks.map((block,index)=><article key={index} className="border rounded p-3 space-y-2" aria-label={'报告区块 '+(index+1)}>

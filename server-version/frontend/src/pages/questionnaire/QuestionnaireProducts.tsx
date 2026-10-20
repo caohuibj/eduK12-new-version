@@ -1,3 +1,4 @@
+import { TrainingReportStudio } from './TrainingReportStudio'
 import { TypedFormExportActions } from '../../modules/composite/TypedFormExportActions'
 import { StructuredFormConstraints } from '../../modules/assessment-core/form/StructuredFormConstraints'
 import { BasicFormConstraints } from '../../modules/assessment-core/form/BasicFormConstraints'
@@ -237,6 +238,8 @@ export function QuestionnaireProductEdit() {
   const [required, setRequired] = useState(true)
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const reportRisk = useRef({dirty:false,pending:false,busy:false})
+  const reportRiskChanged = React.useCallback((risk: {dirty:boolean;pending:boolean;busy:boolean}) => { reportRisk.current = risk }, [])
   const actionInFlight = useRef(false)
   const [preflight, setPreflight] = useState<{ revision: number; ok: boolean; checks: Array<{ key: string; label: string; status: string; message: string; targetId?: string }> } | null>(null)
   const [nameError, setNameError] = useState('')
@@ -302,6 +305,7 @@ export function QuestionnaireProductEdit() {
     return () => { active = false }
   }, [id, preselectedScaleId, preselectedCourseId, user?.id])
   const action = async (fn: () => Promise<void>) => {
+    if (reportRisk.current.dirty || reportRisk.current.pending || reportRisk.current.busy) { setError('请先保存报告修改或核对未确认的报告请求，再修改组合测评。'); return }
     if (actionInFlight.current) return
     actionInFlight.current = true
     setBusy(true)
@@ -775,6 +779,7 @@ export function QuestionnaireProductEdit() {
             </ProductButton>}
           </fieldset>
           {id === 'new' && deliverySettings}
+          {detail && user?.id && detail.questionnaireType === 'COURSE' && (detail.questionnaireCourses || []).some((link: any) => catalog.courses.some((course: any) => course.id === link.courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)) && <TrainingReportStudio disabled={busy} onLeaveRiskChange={reportRiskChanged} actorId={user.id} compositeId={detail.id} courses={(detail.questionnaireCourses || []).flatMap((link: any) => { const course = catalog.courses.find((row: any) => row.id === link.courseId && row.courseType === 'TRAINING_COURSE' && !row.isLibrary); return course ? [{id:course.id,title:course.title}] : [] })}/>}
           {detail && (
             <>
               {dirty && (
