@@ -85,7 +85,7 @@ export const authController = {
       if (!currentPrincipal) return failedLogin()
       if (needsAdminKey(currentPrincipal)) {
         if (expectedRole || res.locals?.trainingEntrance) return error(res, '请使用独立管理员入口和安全密钥登录', -1, 403)
-        return success(res, await beginAdminLogin(req, res, user.id))
+        return success(res, await beginAdminLogin(req, res, user.id, undefined, currentPrincipal))
       }
 
       // This flag is set only by the dedicated server-side training entrance.

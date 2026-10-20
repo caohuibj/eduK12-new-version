@@ -3,7 +3,7 @@ import type { Request, Response } from 'express'
 import { generateRegistrationOptions, verifyRegistrationResponse, generateAuthenticationOptions,
   verifyAuthenticationResponse, type RegistrationResponseJSON, type AuthenticationResponseJSON, type AuthenticatorTransport } from '@simplewebauthn/server'
 import { prisma } from '../../config/database'
-import { loadCurrentPrincipal } from '../organization/principal'
+import { loadCurrentPrincipal, type CurrentPrincipal } from '../organization/principal'
 import { inactiveAccountMessage } from '../../utils/accountStatus'
 import { generateToken } from '../../utils/jwt'
 import { getCookie, setSessionCookie } from '../../utils/authCookies'
@@ -45,10 +45,10 @@ async function rememberChallenge(req: Request, res: Response, input: {
   setChallengeCookie(req, res, secret)
 }
 
-export async function beginAdminLogin(req: Request, res: Response, userId: string, sessionId?: string) {
+export async function beginAdminLogin(req: Request, res: Response, userId: string, sessionId?: string, authenticatedPrincipal?: CurrentPrincipal) {
   const { rpID } = adminWebAuthnConfig()
-  const principal = await loadCurrentPrincipal(userId)
-  if (!principal || inactiveAccountMessage(principal) || !['LEGACY', 'TRAINING'].includes(principal.accountDomain) || !needsAdminKey(principal))
+  const principal = authenticatedPrincipal ?? await loadCurrentPrincipal(userId)
+  if (!principal || principal.userId!==userId || inactiveAccountMessage(principal) || !['LEGACY', 'TRAINING'].includes(principal.accountDomain) || !needsAdminKey(principal))
     throw new AdminPermissionError(403, '管理账号不可用')
   const keys = await prisma.adminSecurityKey.findMany({ where: { userId } })
   if (!keys.length) throw new AdminPermissionError(403, '请先通过受控后台登记安全密钥')

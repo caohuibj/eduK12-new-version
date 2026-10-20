@@ -7,5 +7,5 @@ export default function AdminStepUp(){
     try{await reauthenticateAdmin();setMessage('安全密钥验证完成，五分钟内可执行敏感操作。')}
     catch(e){setMessage(e instanceof Error?e.message:'安全密钥验证未完成')}
     finally{setBusy(false)}
-  }}>{busy?'正在验证…':'重新验证安全密钥'}</button><p role="status">{message}</p></div>
+  }}>{busy?'正在验证…':'重新验证安全密钥'}</button>{message&&<p role="status">{message}</p>}</div>
 }

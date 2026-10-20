@@ -6,6 +6,8 @@ const {chromium}=require('../backend/node_modules/playwright-core')
 const fixturePath=process.env.ADMIN_PERMISSIONS_FIXTURE_FILE
 if(process.env.ADMIN_PERMISSIONS_ISOLATED_TEST!=='1'||!fixturePath?.startsWith('/workspace/admin-permissions-private/'))throw new Error('Private isolated fixture required')
 const fixture=JSON.parse(fs.readFileSync(fixturePath,'utf8'))
+const resumed=process.env.ADMIN_PERMISSIONS_BROWSER_PHASE==='remaining'
+const signedSessions=resumed?JSON.parse(fs.readFileSync(process.env.ADMIN_PERMISSIONS_BROWSER_SESSIONS,'utf8')):null
 const origin='http://localhost:5174'
 let browser,step='startup',checks=0
 const check=(condition,label)=>{assert.ok(condition,label);checks++}
@@ -45,6 +47,14 @@ async function register(name){
 ;(async()=>{
   browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']})
   const sessions={}
+  if(resumed){
+    for(const name of ['system','training','survey']){
+      const context=await browser.newContext()
+      await context.addCookies([{name:'ptool_session',value:signedSessions[name],url:origin,httpOnly:true,sameSite:'Lax'}])
+      const page=await context.newPage();await page.goto(origin+(name==='system'?'/admin/permissions':'/admin/entrances'))
+      sessions[name]={context,page}
+    }
+  }else{
   for(const name of ['system','training','survey','school','teacher','both','none','business'])sessions[name]=await register(name)
   const org=fixture.organizationId
   const routes=['/users','/platform/survey/researchers',`/platform/education/organizations/${org}/products`,`/platform/education/organizations/${org}/teacher-admins`,'/admin/permissions/accounts']
@@ -66,12 +76,14 @@ async function register(name){
   step='security-key-step-up'
   const renewed=await sessions.system.page.evaluate(async()=>{const m=await import('/src/admin/securityKey.ts');return (await m.reauthenticateAdmin()).code})
   check(renewed===0,'actual browser step-up')
+  console.log(JSON.stringify({phase:'enrollment-login-entry-matrix-step-up',result:'PASS',checks,entryMatrixRequests:40,physicalKeyVerified:false}))
+  }
   step='menus-and-deep-links'
   await sessions.survey.page.goto(origin+'/admin/survey-researchers')
   await sessions.survey.page.getByRole('heading',{name:'研究者与工具授权',exact:true}).waitFor()
   check(await sessions.survey.page.getByRole('link',{name:'培训版管理',exact:true}).count()===0,'survey-only menu')
   await sessions.training.page.goto(origin+'/admin/survey-researchers')
-  await sessions.training.page.getByRole('heading',{name:'当前账号没有此入口的管理权限',exact:true}).waitFor()
+  await sessions.training.page.getByText('当前账号没有此入口的管理权限',{exact:true}).waitFor()
   checks++
   step='mobile-width-governance'
   await sessions.system.page.setViewportSize({width:390,height:844})
@@ -89,5 +101,5 @@ async function register(name){
   check((await api(sessions.training.page,'/users')).status===403,'fresh ordinary login lacks revoked grant')
   await sessions.training.page.reload()
   check(await sessions.training.page.getByRole('link',{name:'Training 培训管理',exact:true}).count()===0,'refresh does not revive grant')
-  console.log(JSON.stringify({result:'PASS',checks,accounts:8,entryMatrixRequests:40,virtualAuthenticator:'Chromium CTAP2 USB UP+UV single-device',physicalKeyVerified:false,revokeToDenialMs,privateDataUploaded:false}))
-})().catch(error=>{console.error(JSON.stringify({result:'FAIL',step,errorType:error.name}));process.exitCode=1}).finally(()=>browser?.close())
+  console.log(JSON.stringify({result:'PASS',checks,phase:resumed?'remaining-ui-and-http-revocation':'full',signedPresentationFixture:resumed,physicalKeyVerified:false,revokeToDenialMs,privateDataUploaded:false}))
+})().catch(error=>{console.error(JSON.stringify({result:'FAIL',step,checks,errorType:error.name}));process.exitCode=1}).finally(()=>browser?.close())

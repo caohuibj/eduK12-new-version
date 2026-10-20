@@ -47,8 +47,24 @@ suite('explicit entry grants, real PostgreSQL', () => {
     expect(await db.user.findUniqueOrThrow({ where: { id: teacherId } })).toMatchObject({ tokenVersion: 3 })
   })
   it('stale racing re-grants cannot undo committed revocation', async () => {
-    const result = await Promise.allSettled([change('SURVEY', false, 1), change('SURVEY', true, 0)])
+    let revoke!:ReturnType<typeof change>,stale!:ReturnType<typeof change>
+    const blocked=async(count:number)=>{
+      for(let attempt=0;attempt<100;attempt++){
+        const [row]=await db.$queryRaw<Array<{count:number}>>`SELECT count(*)::int AS count FROM pg_stat_activity WHERE datname=current_database() AND wait_event_type='Lock' AND query LIKE '%"platform_role"::text AS "platformRole"%'`
+        if(row.count>=count)return
+        await new Promise(resolve=>setTimeout(resolve,10))
+      }
+      throw new Error('Expected permission mutation did not reach its actual row lock')
+    }
+    await db.$transaction(async blocker=>{
+      await blocker.$queryRaw`SELECT "id" FROM "users" WHERE "id"=${systemId} FOR UPDATE`
+      revoke=change('SURVEY',false,1);await blocked(1)
+      stale=change('SURVEY',true,0);await blocked(2)
+    })
+    const result = await Promise.allSettled([revoke,stale])
     expect(result[0].status).toBe('fulfilled')
+    expect(result[1].status).toBe('rejected')
+    expect((result[1] as PromiseRejectedResult).reason).toMatchObject({statusCode:409})
     await expect(service.assertEntryAdmin(db, teacherId, 'SURVEY')).rejects.toMatchObject({ statusCode: 403 })
     expect((await db.adminEntryGrant.findUniqueOrThrow({ where: { userId_entry: { userId: teacherId, entry: 'SURVEY' } } })).version).toBe(2)
   })
@@ -57,5 +73,27 @@ suite('explicit entry grants, real PostgreSQL', () => {
     const event = await db.adminAuthorizationAudit.findFirstOrThrow({ where: { targetUserId: teacherId } })
     await expect(db.adminAuthorizationAudit.update({ where: { id: event.id }, data: { reason: 'tampered' } })).rejects.toThrow()
     await expect(db.adminAuthorizationAudit.delete({ where: { id: event.id } })).rejects.toThrow()
+    await expect(db.$executeRawUnsafe('TRUNCATE TABLE "admin_authorization_audits"')).rejects.toThrow()
+  })
+  it('an audit insertion failure rolls back the grant and token version',async()=>{
+    const before=await db.user.findUniqueOrThrow({where:{id:teacherId}})
+    await db.$executeRawUnsafe(`CREATE OR REPLACE FUNCTION admin_test_reject_audit() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN IF NEW.reason='synthetic audit failure' THEN RAISE EXCEPTION 'synthetic audit failure'; END IF; RETURN NEW; END $$`)
+    await db.$executeRawUnsafe('CREATE TRIGGER admin_test_reject_audit BEFORE INSERT ON admin_authorization_audits FOR EACH ROW EXECUTE FUNCTION admin_test_reject_audit()')
+    try{
+      await expect(service.changeEntryGrant({actorUserId:systemId,actorSession:{tokenVersion:0,adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID()},targetUserId:teacherId,entry:'TRAINING',active:true,expectedVersion:2,reason:'synthetic audit failure'})).rejects.toThrow()
+      expect((await db.user.findUniqueOrThrow({where:{id:teacherId}})).tokenVersion).toBe(before.tokenVersion)
+      await expect(service.assertEntryAdmin(db,teacherId,'TRAINING')).rejects.toMatchObject({statusCode:403})
+      expect((await db.adminEntryGrant.findUniqueOrThrow({where:{userId_entry:{userId:teacherId,entry:'TRAINING'}}})).version).toBe(2)
+    }finally{
+      await db.$executeRawUnsafe('DROP TRIGGER admin_test_reject_audit ON admin_authorization_audits')
+      await db.$executeRawUnsafe('DROP FUNCTION admin_test_reject_audit()')
+    }
+  })
+  it('requires recent key proof and current system status together',async()=>{
+    const input={actorUserId:systemId,targetUserId:teacherId,entry:'TRAINING' as const,active:true,expectedVersion:2,reason:'synthetic strong auth'}
+    await expect(service.changeEntryGrant({...input,actorSession:{tokenVersion:0}})).rejects.toMatchObject({statusCode:403})
+    await db.user.update({where:{id:systemId},data:{platformRole:'STANDARD'}})
+    await expect(change('TRAINING',true,2)).rejects.toMatchObject({statusCode:403})
+    expect(await db.adminEntryGrant.count({where:{userId:teacherId,revokedAt:null}})).toBe(0)
   })
 })

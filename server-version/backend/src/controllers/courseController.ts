@@ -17,6 +17,7 @@ import {
 import { attachAssetReference, discardUnreferencedAsset, getSignedAssetUrl, getSignedAssetUrls, signKnownAsset, storeAsset } from '../services/assetStorage'
 import { resetPasswordForPlatformAdmin } from './platformAccountController'
 import { resetPasswordForCourseTeacher } from './courseStudentPasswordController'
+import { courseCredentialProtectedIds } from '../services/courseStudentPasswordResetService'
 import { CourseNotJoinableError, courseJoinabilityMessage, isCourseJoinable } from '../utils/courseEnrollment'
 
 const createCourseSchema = z.object({
@@ -759,6 +760,7 @@ export const courseController = {
         }
       })
 
+      const credentialProtected=await courseCredentialProtectedIds(students.map(s=>s.student.id))
       return success(res, {
         list: students.map(s => ({
           id: s.student.id,
@@ -767,6 +769,7 @@ export const courseController = {
           avatarUrl: s.student.avatarUrl,
           isFrozen: s.student.isFrozen,
           enrollmentStatus: s.status,
+          credentialManagementProtected:credentialProtected.has(s.student.id),
           joinedAt: s.joinedAt,
         })),
         total: students.length,
@@ -876,6 +879,7 @@ export const courseController = {
         }
       })
 
+      const credentialProtected=await courseCredentialProtectedIds(courseStudents.map(cs=>cs.student.id))
       // 按课程ID分组
       const groupedByCourse: Record<string, any[]> = {}
       allowedCourseIds.forEach(id => {
@@ -891,6 +895,7 @@ export const courseController = {
             avatarUrl: cs.student.avatarUrl,
             isFrozen: cs.student.isFrozen,
             enrollmentStatus: cs.status,
+            credentialManagementProtected:credentialProtected.has(cs.student.id),
             joinedAt: cs.joinedAt,
           })
         }

@@ -118,6 +118,7 @@ describe('authenticate account status and current authority', () => {
       platformRole: activePrincipal.platformRole,
       tokenVersion: activePrincipal.tokenVersion,
       mustChangePassword: false,
+      businessRole:UserRole.STUDENT,entryGrants:[],adminVerifiedAt:undefined,adminSessionId:undefined,
     })
     expect(next).toHaveBeenCalledOnce()
   })

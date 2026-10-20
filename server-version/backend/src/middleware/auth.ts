@@ -94,8 +94,8 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
     // session. Sensitive governance writes cannot fall back to password-only.
     if (management && !['GET','HEAD','OPTIONS'].includes(req.method)
       && !req.originalUrl.startsWith('/api/admin/security/')
-      && !req.originalUrl.startsWith('/api/auth/')
-      && (principal!.platformRole === 'SYSTEM_ADMIN' || /^\/api\/(platform\/|users(?:\/|$)|admin\/permissions(?:\/|$))/.test(req.originalUrl))
+      && req.originalUrl.split('?')[0]!=='/api/auth/logout'
+      && (principal!.platformRole === 'SYSTEM_ADMIN' || /^\/api\/(platform\/|users(?:\/|$)|admin\/permissions(?:\/|$)|auth\/(change-password|extend-account))/.test(req.originalUrl))
       && !validAdminProof(payload, ADMIN_STEP_UP_SECONDS)) {
       return res.status(403).json({ code: 'ADMIN_KEY_STEP_UP_REQUIRED', message: '敏感操作需要重新验证安全密钥' })
     }
@@ -106,6 +106,8 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
       '/api/users/change-password',
       '/api/auth/logout',
       '/api/auth/csrf',
+      '/api/admin/security/step-up/options',
+      '/api/admin/security/step-up/verify',
       '/api/campus/auth/me',
       '/api/campus/auth/logout',
       '/api/huiteacher/auth/me',

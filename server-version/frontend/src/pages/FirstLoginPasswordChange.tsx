@@ -5,6 +5,7 @@ import AuthShell, { type AuthTone } from '../components/auth/AuthShell'
 import { authApi } from '../api/auth'
 import { useAuth } from '../contexts/AuthContext'
 import { isValidPassword, passwordPolicyMessage } from '../utils/password'
+import AdminStepUp from '../admin/AdminStepUp'
 
 const authToneForRole = (role?: string): AuthTone => {
   if (role === 'STUDENT') return 'student'
@@ -65,7 +66,8 @@ const FirstLoginPasswordChange: React.FC = () => {
       const target = `${location.pathname}${location.search}${location.hash}`
       prepareReauthentication(target)
       setUser(null)
-      navigate(loginUrl(user?.role, target), { replace: true })
+      const management=user?.platformRole==='SYSTEM_ADMIN'||Boolean(user?.entryGrants?.length)
+      navigate(management?'/admin/login?returnTo='+encodeURIComponent(target):loginUrl(user?.role, target), { replace: true })
     } catch (error) {
       if (current())
         setFeedback(error instanceof Error ? error.message : '密码修改失败')
@@ -82,7 +84,7 @@ const FirstLoginPasswordChange: React.FC = () => {
 
   return (
     <AuthShell
-      tone={authToneForRole(user?.role)}
+      tone={user?.platformRole==='SYSTEM_ADMIN'||user?.entryGrants?.length?'admin':authToneForRole(user?.role)}
       title="首次登录需要修改密码"
       description="临时密码只能用于首次登录。设置新密码后，需要重新登录才能继续使用系统。"
       backLabel="退出"
@@ -105,6 +107,7 @@ const FirstLoginPasswordChange: React.FC = () => {
         </div>
       ) : null}
 
+      {(user?.platformRole==='SYSTEM_ADMIN'||Boolean(user?.entryGrants?.length))&&<AdminStepUp/>}
       <form onSubmit={submit} noValidate>
         <div>
           <label htmlFor="change-old-password">临时密码</label>
