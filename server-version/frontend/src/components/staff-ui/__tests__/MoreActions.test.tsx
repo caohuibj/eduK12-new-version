@@ -3,6 +3,16 @@ import { describe, expect, it, vi } from 'vitest'
 import MoreActions from '../MoreActions'
 
 describe('more actions outside clipping ancestors', () => {
+  it('carries only its own Training teacher skin into the portalled menu', () => {
+    render(<div className="training-teacher-visual"><MoreActions label="教师操作"><button>编辑</button></MoreActions></div>)
+    fireEvent.click(screen.getByRole('button', { name: '教师操作' }))
+    expect(screen.getByRole('group', { name: '教师操作菜单' })).toHaveAttribute('data-training-teacher', 'true')
+  })
+  it('does not apply the teacher skin to an ordinary menu', () => {
+    render(<MoreActions label="普通操作"><button>编辑</button></MoreActions>)
+    fireEvent.click(screen.getByRole('button', { name: '普通操作' }))
+    expect(screen.getByRole('group', { name: '普通操作菜单' })).not.toHaveAttribute('data-training-teacher')
+  })
   it('opens labelled actions outside the table and restores focus with Escape', () => {
     render(<div data-testid="clipping-table" style={{ overflow: 'hidden' }}><MoreActions label="合成作业操作"><button>编辑作业</button></MoreActions></div>)
     const trigger = screen.getByRole('button', { name: '合成作业操作' })
