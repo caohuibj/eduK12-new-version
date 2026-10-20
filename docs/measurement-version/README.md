@@ -452,3 +452,14 @@ item-dictionary reader uses the same lock-then-clock rule. No additional source
 read was added. 53 focused source/dictionary contracts passed, including simulated
 expiry while either fence waits; real two-connection lock/expiry tests remain in
 V10. The report index is live bounded browsing, not a frozen pagination snapshot.
+
+### Restricted system content-grant management UI
+
+The unified management screen now issues only the supported Survey reference/data
+root scopes, reads exact grant metadata and revokes the actual read version.
+Mutations use existing security-key step-up and explicit confirmation. Uncertain
+issuance preserves the identical UUID/body in same-actor session storage; another
+actor cannot restore it. Corrupt/unavailable storage is reported and pending
+requests register a beforeunload warning. Eight actual component contracts passed;
+real browser transport/storage behavior remains for V10. The current feature and
+acceptance boundaries are tracked in acceptance-matrix.md.

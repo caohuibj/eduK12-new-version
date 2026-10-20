@@ -3,9 +3,12 @@ import api from '../api/client'
 import {ProductPage} from '../components/product-ui'
 import {entryLabels,type AdminEntry} from './authority'
 import AdminStepUp from './AdminStepUp'
+import AdminContentPermissions from './AdminContentPermissions'
+import {useAuth} from '../contexts/AuthContext'
 type Account={id:string;username:string;platformRole:string;entries:Array<{entry:AdminEntry;active:boolean;version:number}>}
 type Audit={id:string;action:string;entry:AdminEntry|null;version:number|null;reason:string;createdAt:string}
 export default function AdminPermissions(){
+  const {user}=useAuth()
   const [accounts,setAccounts]=useState<Account[]>([]),[page,setPage]=useState(1),[keyword,setKeyword]=useState(''),[search,setSearch]=useState('')
   const [reason,setReason]=useState(''),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
   const [audit,setAudit]=useState<Audit[]>([])
@@ -30,5 +33,6 @@ export default function AdminPermissions(){
         <td><button className="btn-secondary" onClick={()=>{void api.get<Audit[]>('/admin/permissions/audit?targetUserId='+account.id).then(r=>setAudit(r.data!)).catch(e=>setError(e.message))}}>查看 {account.username} 审计</button></td></tr>)}</tbody></table></div>
     <button className="btn-secondary" disabled={page===1||busy||loading} onClick={()=>setPage(p=>p-1)}>上一页</button><span> 第 {page} 页 </span><button className="btn-secondary" disabled={accounts.length<25||busy||loading} onClick={()=>setPage(p=>p+1)}>下一页</button>
     <h2>最近授权审计</h2><ul>{audit.map(row=><li key={row.id}>{new Date(row.createdAt).toLocaleString()} · {row.action} · {row.entry||'系统'} · {row.reason}</li>)}</ul>
+    {user&&<AdminContentPermissions key={user.id} actorId={user.id}/>}
   </ProductPage>
 }
