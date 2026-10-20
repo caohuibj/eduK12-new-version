@@ -1,6 +1,6 @@
 # Training 隔离测试启动记录（2026-10-20）
 
-最新状态：`STOPPED_PREPARATION_16GIB_PENDING_PARENT_DECISION`。8GiB停止后，父对话批准同起点16GiB准备预算；attempt005复用npm/Prisma层，在连续COPY阶段再次触发预算停止。已核Docker驱动为vfs，准备估计此前遗漏其逐层完整复制开销。这不是产品性能结果；尚无应用镜像、迁移、fixture或单份结果。PG/Redis保持独立healthy。下文保留各阶段原始状态与被覆盖的建议，最新状态见最后续记；300份仍未获准启动。
+最新状态：`STATIC_NATIVE_PLAN_READY_NOT_EXECUTED`。父对话停止扩大Docker预算，批准同节点native API/标准consumer＋现有容器PG/Redis，并要求先给静态路径及回收范围。当前仅完成该预检与方案；未回收cache、导出依赖、构建原生应用或运行单份。原VFS两次预算停止和PG/Redis均保留，300份仍未获准启动。
 
 ## 冻结基线和边界
 
@@ -96,3 +96,12 @@
 - `docker info`实际返回`vfs`。本次六份COPY源文件合计24,702B，却伴随约8.12GiB的额外workspace占用；逻辑BuildKit cache统计约972MB不能代表节点物理准备开销。[Docker官方说明](https://docs.docker.com/engine/storage/drivers/vfs-driver/)确认VFS没有COW，每创建一层会深复制前层，因而多层Dockerfile放大磁盘使用。此前16GiB建议遗漏该环境特性，属于准备预算误估，不能归为业务性能问题。
 - 原始引用：`evidence/preparation-budget16-stop.json`、`build/attempt-005-budget16/summary.json`及该目录ops.log。停止后未清缓存、删除失败记录、改Dockerfile COPY组合、变更storage driver、切换构建路径或继续发起构建；没有产品优化任务。
 - 需父对话决定可承受当前Dockerfile的构建资源或具体获准环境适配范围。当前成品镜像/实际应用配置/单份CPU、RSS、SQL、业务存储增量均未测，保持unknown或未开始，不填0或冒称通过。原CA及单次临时导出consumer授权仍有效。
+
+## 同节点原生方案静态核查
+
+- 已装Node24.19.0/npm11.9.0，Node不满足backend要求`>=24.21.0 <25`；其他标准安装路径未找到合格Node。当前宿主为Debian13/glibc2.41，ldconfig可见canvas需要的cairo/pango/jpeg/gif/rsvg等共享库；原生addon实际load/ldd仍待导出后验证。
+- 可复用本任务官方Node24.21.0基础层（原digest已保留）及成功npm ci缓存。最短路径是原Dockerfile的`deps` target仅作CACHED文件导出，stream tar选择Node、配套npm及node_modules，不生成/运行Docker应用镜像，不重跑npm install，不建立新构建体系。出现cache miss/RUN应停报。随后对同main backend运行已有本地Prisma generate（仅必要时）与`npm run build`。
+- 已列8条本任务COPY中间层，全部private/reclaimable、创建于本任务构建时间，可用精确cache id逐条、叶子优先回收；保留成功npm、Prisma及其父层。日志/summary/原起点/峰值/PG和Redis卷/其他任务对象均不回收。精确ID、保留ID和时序在`evidence/native-plan.json`。当前没有执行任何prune或导出，回收物理字节仍unknown，不能拿逻辑cache大小冒充可释放空间。
+- 静态估算：选择导出的Node/npm/依赖与dist约0.6–1.0GiB，暂给2GiB新增准备上限（含临时余量）；构建工作内存估计1–3GiB。均需实际测量。先回收后量原起点增量，只有仍满足总准备16GiB、数据2GiB及磁盘4GiB停止线才继续，不重设起点。
+- 业务开关/admission/pool/Node heap沿main Compose：async/whole false、配置600/2/50ms、API池20/heap640MiB、单次导出consumer池4/old192MiB/semi16MiB。仅PG/Redis地址改为本任务当前bridge IP，上传/导出/交接目录改为本任务native目录；不新增系统信任，host不跑npm install，构建子进程不继承临时BuildKit CA变量。
+- 重要限制：宿主cgroup不可写、用户systemd offline，native API/consumer无法在现有权限下复现Compose的独立硬CPU/内存限额；只能沿既有Node heap参数、过程RSS停止线和宿主4核/16GiB总限额。PG1CPU/1GiB、Redis0.25CPU/256MiB仍真实受限。必须将其称作native API＋容器数据服务profile，候选比较用同profile，不能声称是成品Compose镜像容量。原生准备和业务测量尚未开始。
