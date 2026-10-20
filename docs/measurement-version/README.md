@@ -258,3 +258,13 @@ Survey 项目授权把原有 owner/账户/grant/MFA 的 FOR SHARE 行集合放�
 此路径只支持原生 Survey 私有 descriptive_sample/local_pilot。作者自用复核仍需独立 review 能力，不自动取得正式 norm 复核资格；正式跨入口 norm 的分析者与复核者必须为不同 User。未新增 HTTP、根授权签发或正式 norm 工作台。create/review/publish 共享同一质量与事实投影，未重计分。
 
 验证：服务、候选与 repository 三个目标文件共 51 项通过，定向 strict TypeScript、diff 检查通过。包含数据库 review 仓库实际逻辑的假 review ID、REJECTED、陈旧 hash 等负例，但数据库访问仍为 mock，不代表真实 HTTP、锁等待或并发验证。
+
+### V08 Survey prepare 显式参考/报告选择
+
+现有 prepare 请求可携带 contentSelections：按 instrumentId 指定 reportReleaseId，以及明确的 reference releaseId/entryKey/priority 候选集合。只接受当前作者、当前 Survey 项目的 PRIVATE 已发布内容，且其 family 与 measurement releaseId/contentHash 必须精确匹配。此处不隐含共享/平台内容使用权限。每工具最多 100 个参考候选、最多 30 个工具；重复工具/条目与未知工具拒绝。报告暂限单测量精确绑定。
+
+冻结 unit 仅保存 referencePolicy 的 EXACT_POPULATION_PRIORITY_V1、候选精确指针/优先级，以及 report releaseId/contentHash；不复制模板、统计数组或样本 manifest。请求内复用同一 release 的已锁定验证结果，无全局权限缓存。未指定时不自动选择默认或 latest。当前是投放冻结接口接入，选择 UI、START 一次匹配和 FINAL 消费仍在实施，不能据此宣称报告已经生成或向被试开放。
+
+Wave freeze 原有单条项目查询同时锁定 project、User、researcher grant 和 MFA 行，MATERIALIZED 锁后投影 clock_timestamp，再检查 expiry，避免锁等待期间失效的资格继续冻结。没有追加第二套授权查询；保持 Project→Wave 的既有锁顺序。
+
+验证：内容选择、精确 release admission、参考选择器三个目标文件共 20 项通过，strict TypeScript 通过。包含缺省不隐选、精确指针、请求内复用、跨项目/owner/测量拒绝、全部非 PUBLISHED 状态拒绝，以及模拟锁后过期。仍非真实锁等待/HTTP 验证。

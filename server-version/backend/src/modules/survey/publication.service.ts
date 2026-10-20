@@ -1,3 +1,4 @@
+import {freezeSurveyContentSelections,type SurveyContentSelection,type FrozenSurveyContentSelection} from './content-selection'
 import {ContentReleaseError} from '../measurement-content/release'
 import { cognitiveMeasurementRelease } from '../measurement-content/cognitive'
 import { sjtMeasurementRelease } from '../measurement-content/sjt'
@@ -29,6 +30,7 @@ import { freezeGroupIpPolicy,resolveGroupIpOpenWindow,type FrozenGroupIpPolicy }
  * publication. The Survey FINAL admission adapter is separate from legacy catalog.
  */
 export interface ResearchFrozenUnit {
+  contentSelection?:FrozenSurveyContentSelection
   measurementRelease?: { releaseId: string; contentHash: string; measurementHash: string }
   sourceProvenance?:Record<string,unknown>
   sourceAnswerMapping?:SourceAnswerMapping
@@ -131,12 +133,13 @@ export function compileFrozenResearchUnit(draft:{
  * authenticated action and remains fail-closed behind SURVEY_PUBLICATION_ENABLED.
  */
 export async function freezeResearchWaveDraft(input:{
-  actorUserId:string;projectId:string;waveId:string;revision:number
+  actorUserId:string;projectId:string;waveId:string;revision:number;contentSelections?:SurveyContentSelection[]
 }):Promise<{publicationId:string;version:number;digest:string;waveId:string;runtimeReady:true}> {
   return prisma.$transaction(async tx=>{
     // Lock project first so concurrent freezes share one exact publication sequence.
-    const locked=await tx.$queryRaw<Array<{id:string;status:string;collectionMode:string}>>`
-      SELECT p.id,p.status,p.collection_mode AS "collectionMode"
+    const locked=await tx.$queryRaw<Array<{id:string;status:string;collectionMode:string;expires_at:Date|null;checked_at:Date}>>`
+      WITH locked AS MATERIALIZED (
+      SELECT p.id,p.status,p.collection_mode AS "collectionMode",u.expires_at
       FROM "survey_projects" p
       JOIN "users" u ON u.id=p.owner_user_id
       JOIN "survey_researcher_grants" g ON g.user_id=u.id
@@ -145,10 +148,11 @@ export async function freezeResearchWaveDraft(input:{
         AND u.account_domain='SURVEY' AND u.is_active AND NOT u.is_frozen
         AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
         AND g.status='ACTIVE' AND m.enabled=TRUE
-      FOR UPDATE OF p
+      FOR UPDATE OF p FOR SHARE OF u,g,m
+      ) SELECT locked.*,clock_timestamp() AS checked_at FROM locked
     `
     const project=locked[0]
-    if(!project)stop('该研究不属于当前研究者')
+    if(!project||(project.expires_at&&project.expires_at<=project.checked_at))stop('该研究不属于当前研究者')
     if(!['DRAFT','ACTIVE'].includes(project.status))stop('项目状态不允许冻结新的研究内容')
     const lockedWave=await tx.$queryRaw<Array<{id:string}>>`
       SELECT "id" FROM "survey_waves"
@@ -195,6 +199,7 @@ export async function freezeResearchWaveDraft(input:{
       unit.measurementRelease = { releaseId: release.releaseId, contentHash: release.contentHash,
         measurementHash: release.content.measurementHash }
     }
+    await freezeSurveyContentSelections(tx,input.actorUserId,input.projectId,units,input.contentSelections??[])
     // Initial bounded research safety limit, not a measured capacity claim.
     if(units.filter(unit=>unit.kind==='COGNITIVE').length>4)
       stop('一个波次最多包含 4 个受控认知任务（480 个正式试次）')

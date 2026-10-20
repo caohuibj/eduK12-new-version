@@ -1,3 +1,4 @@
+import {surveyContentSelectionsSchema} from './content-selection'
 import {SurveyGovernanceError} from './governance.service'
 import {CatalogSourceError} from './catalog.sources'
 import { Router, type Request, type Response, type NextFunction } from 'express'
@@ -66,9 +67,10 @@ for(const [name,action] of [['rotate','ROTATE'],['revoke','REVOKE']] as const){
       revision:revision.parse(req.body).revision,action,
     })))
 }
-surveyWavesRouter.post('/:pid/waves/:wid/prepare',handle(req=>
-  publish.prepareWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid),
-    revision.parse(req.body).revision)))
+surveyWavesRouter.post('/:pid/waves/:wid/prepare',handle(req=>{
+  const input=revision.extend({contentSelections:surveyContentSelectionsSchema.optional()}).parse(req.body)
+  return publish.prepareWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid),input.revision,input.contentSelections)
+}))
 surveyWavesRouter.post('/:pid/waves/:wid/open',handle(req=>
   publish.openWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid),
     revision.parse(req.body).revision)))
