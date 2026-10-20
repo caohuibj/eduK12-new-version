@@ -98,6 +98,28 @@ class ArchiveContracts(unittest.TestCase):
         for entries in bad:
             with self.subTest(entries=entries), self.assertRaises(ValueError): self.extract(entries)
 
+    def test_official_esbuild_internal_hardlink_to_prior_regular_file_is_supported(self):
+        target = 'node_modules/@esbuild/linux-x64/bin/esbuild'
+        link = 'node_modules/esbuild/bin/esbuild'
+        result = self.extract([(target, 'file', ''), (link, 'hard', target)])
+        self.assertIn(link, result)
+
+    def test_hardlink_escape_chain_forward_missing_and_cross_root_targets_rejected(self):
+        target = 'node_modules/pkg/bin'
+        link = 'node_modules/.bin/pkg'
+        cases = [
+            [(target, 'file', ''), (link, 'hard', '/etc/passwd')],
+            [(target, 'file', ''), (link, 'hard', '../../etc/passwd')],
+            [(target, 'file', ''), (link, 'hard', 'node_modules/missing')],
+            [(link, 'hard', target), (target, 'file', '')],
+            [(target, 'file', ''), (link, 'hard', target), ('node_modules/chain', 'hard', link)],
+            [('node_modules/sym', 'link', 'pkg/bin'), (link, 'hard', 'node_modules/sym')],
+            [('dist/index.js', 'file', ''), (link, 'hard', 'dist/index.js')],
+            [(target, 'file', ''), (link, 'hard', target), (link + '/child', 'file', '')],
+        ]
+        for entries in cases:
+            with self.subTest(entries=entries), self.assertRaises(ValueError): self.extract(entries)
+
     def test_external_and_write_through_symlinks_rejected(self):
         for entries in [[('node_modules/out', 'link', '/etc')], [('node_modules/out', 'link', '../../etc')], [('node_modules/out', 'link', 'pkg'), ('node_modules/out/file', 'file', '')]]:
             with self.subTest(entries=entries), self.assertRaises(ValueError): self.extract(entries)
@@ -303,6 +325,18 @@ class CleanupAndLoggingContracts(unittest.TestCase):
         self.assertIn('TimeoutExpired', stderr.getvalue())
         self.assertNotIn('DATABASE_URL', stderr.getvalue())
         self.assertNotIn('private', stderr.getvalue())
+
+    def test_safe_error_location_identifies_guard_without_exception_text(self):
+        try:
+            M.validate_receipt('private-user-value', {}, b'secret connection text')
+        except KeyError as error:
+            result = M.safe_error_details(error)
+        self.assertEqual(result['errorType'], 'KeyError')
+        self.assertEqual(result['errorLocation']['helper'], 'validate_receipt')
+        self.assertIsInstance(result['errorLocation']['line'], int)
+        self.assertNotIn('private-user-value', json.dumps(result))
+        self.assertNotIn('secret connection', json.dumps(result))
+        self.assertNotIn('receiptSha256', json.dumps(result))
 
     def test_dump_preserves_acl_and_verifies_ownership_privileges(self):
         source = PATH.read_text()

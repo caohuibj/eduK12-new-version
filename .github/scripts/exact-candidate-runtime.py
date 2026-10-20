@@ -31,6 +31,18 @@ def require(condition, message):
         raise ValueError(message)
 
 
+def safe_error_details(error):
+    """Expose only fixed source location, never exception text or command args."""
+    result = {'errorType': type(error).__name__}
+    trace = error.__traceback__
+    while trace:
+        code = trace.tb_frame.f_code
+        if Path(code.co_filename).resolve() == Path(__file__).resolve() and code.co_name != 'require':
+            result['errorLocation'] = {'helper': code.co_name, 'line': trace.tb_lineno}
+        trace = trace.tb_next
+    return result
+
+
 def digest(data):
     return hashlib.sha256(data).hexdigest()
 
@@ -115,11 +127,11 @@ def validate_receipt(component, pin, raw):
 
 
 def safe_extract(archive, destination, allowed_roots=None):
-    """Reject traversal, devices, hardlinks, duplicates and external symlinks."""
+    """Reject traversal/devices; allow only prior regular-file internal hardlinks."""
     destination = Path(destination).resolve()
     destination.mkdir(parents=True, exist_ok=True)
     with tarfile.open(archive, 'r:*') as tar:
-        members, names, links = tar.getmembers(), set(), set()
+        members, names, links, regular = tar.getmembers(), set(), set(), set()
         require(len(members) <= 150000, 'Oversized archive inventory')
         require(sum(m.size for m in members) <= 4 * 1024**3, 'Oversized expanded archive')
         for member in members:
@@ -128,8 +140,16 @@ def safe_extract(archive, destination, allowed_roots=None):
             names.add(str(path))
             if allowed_roots:
                 require(path.parts[0] in allowed_roots, 'Unexpected compiled archive root')
-            require(member.isfile() or member.isdir() or member.issym(), 'Unexpected archive entry type')
+            require(member.isfile() or member.isdir() or member.issym() or member.islnk(), 'Unexpected archive entry type')
             require(not (member.mode & 0o6000), 'Privileged archive mode')
+            if member.islnk():
+                target = PurePosixPath(member.linkname)
+                require(not target.is_absolute() and '..' not in target.parts and target.parts and target.parts[0] == path.parts[0], 'Unsafe archive hardlink target')
+                require(str(target) in regular, 'Hardlink target must be a prior regular archive file')
+                require((destination / str(target)).resolve().is_relative_to(destination), 'Escaping archive hardlink')
+                links.add(str(path))
+            elif member.isfile():
+                regular.add(str(path))
             if member.issym():
                 require(not os.path.isabs(member.linkname), 'Absolute archive symlink')
                 target = (destination / str(path.parent) / member.linkname).resolve()
@@ -262,7 +282,7 @@ class Qualification:
             row['details'] = action()
             row['status'] = 'success'
         except BaseException as error:
-            row.update(status='failure', errorType=type(error).__name__)
+            row.update(status='failure', **safe_error_details(error))
             self.state['status'] = 'failure'
             raise
         finally:
@@ -569,7 +589,7 @@ def main():
     except Exception as error:
         # TimeoutExpired/CalledProcessError include command arguments. Never let
         # their raw traceback reveal even disposable connection strings.
-        print('Exact runtime qualification failed: ' + type(error).__name__, file=sys.stderr)
+        print('Exact runtime qualification failed: ' + json.dumps(safe_error_details(error), sort_keys=True), file=sys.stderr)
         raise SystemExit(1) from None
 
 
