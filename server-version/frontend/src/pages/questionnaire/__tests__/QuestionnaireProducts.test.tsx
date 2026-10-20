@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
+import { render, screen, fireEvent, act, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route, Link } from 'react-router-dom'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -185,6 +185,87 @@ describe('questionnaire draft feedback', () => {
     expect(api.post).toHaveBeenCalledWith('/questionnaire-products/saved/items', { revision: 7, item: expect.objectContaining({ type: 'FORM', required: false, contextKey: null, formLabel: '选填意见' }) })
   })
 
+})
+
+describe('Training guided delivery settings', () => {
+  let row: any
+  const course = { id: 'training-course', title: '培训课程', courseType: 'TRAINING_COURSE', isLibrary: false }
+  beforeEach(() => {
+    trainingPresentation.enabled = true
+    vi.resetAllMocks()
+    row = { id: 'delivery', name: '投放演示', status: 'DRAFT', productKind: 'QUESTIONNAIRE', revision: 7, questionnaireType: 'COURSE', questionnaireCourses: [{ courseId: course.id }], publicEnabled: false, items: [{ id: 'scale', type: 'SCALE', position: 0, scale: { name: '课堂反馈量表' } }], formSections: [], trainingFeedbackPolicy: { schemaVersion: 1, mode: 'IMMEDIATE' } }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [course] } : row }))
+    api.put.mockImplementation(async (_path, body) => ({ code: 0, data: { ...row, ...body, revision: 8 } }))
+    api.post.mockImplementation(async (_path, body) => ({ code: 0, data: { ...row, revision: 9, trainingVariantDraft: body.config } }))
+  })
+  const open = async () => {
+    mount('delivery', '#questionnaire-delivery')
+    await screen.findByRole('checkbox', { name: '培训课程' })
+  }
+  const disclosure = (title: string) => screen.getByText(title, { selector: 'strong' }).closest('details')!
+  it('explains the three base steps and keeps optional features off without writing any settings', async () => {
+    await open()
+    expect(screen.getByRole('group', { name: '01 · 谁来作答' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '02 · 何时开放作答' })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: '03 · 学员何时看报告' })).toBeInTheDocument()
+    expect(disclosure('进度保存与作答时间')).not.toHaveAttribute('open')
+    expect(disclosure('分组与条件路径')).not.toHaveAttribute('open')
+    expect(screen.getByLabelText('启用服务器草稿')).not.toBeChecked()
+    expect(screen.getByLabelText('启用认知任务本机草稿到期清理')).not.toBeChecked()
+    expect(api.put).not.toHaveBeenCalled(); expect(api.post).not.toHaveBeenCalled()
+  })
+  it('keeps server retention separate from local cleanup and sends the unchanged policy shape on save', async () => {
+    await open()
+    fireEvent.click(disclosure('进度保存与作答时间').querySelector('summary')!)
+    fireEvent.click(screen.getByLabelText('启用服务器草稿'))
+    expect(screen.getByLabelText('服务器草稿保留小时数')).toHaveValue(24)
+    expect(screen.queryByLabelText('认知本机草稿保留小时数')).not.toBeInTheDocument()
+    const permission = screen.getByLabelText('允许教师查看及导出计时')
+    expect(permission).toBeDisabled()
+    expect(screen.getByText('请先保存其他修改，再调整这项权限。')).toBeInTheDocument()
+    expect(api.post).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: '保存全部修改' }))
+    await waitFor(() => expect(api.put).toHaveBeenCalledWith('/questionnaire-products/delivery', expect.objectContaining({ trainingPersistencePolicy: { schemaVersion: 1, checkpoint: { enabled: true, ttlHours: 24 }, localCognitive: null } })))
+  })
+  it('shows editable group probabilities and explains the incompatible flow without changing saved groups', async () => {
+    await open()
+    fireEvent.click(disclosure('分组与条件路径').querySelector('summary')!)
+    fireEvent.click(screen.getByRole('checkbox', { name: '启用按权重随机分组' }))
+    const region = screen.getByRole('region', { name: '按权重随机分组' })
+    expect(within(region).getAllByText('50%', { selector: 'strong' })).toHaveLength(2)
+    fireEvent.change(screen.getByLabelText('分组 2 权重'), { target: { value: '3' } })
+    expect(within(region).getByText('25%', { selector: 'strong' })).toBeInTheDocument()
+    expect(within(region).getByText('75%', { selector: 'strong' })).toBeInTheDocument()
+    expect(screen.getByRole('checkbox', { name: '启用跨工具条件流程' })).toBeDisabled()
+    expect(screen.getByText(/已启用随机分组时，请先关闭并保存后再使用条件流程/)).toBeInTheDocument()
+    expect(api.post).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: '保存分组设置' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/questionnaire-products/delivery/training-variants', expect.objectContaining({ revision: 7, config: expect.objectContaining({ groups: expect.arrayContaining([expect.objectContaining({ weight: 3 })]) }) })))
+  })
+  it('opens nested flow rules and focuses invalid JSON when saving', async () => {
+    await open()
+    fireEvent.click(disclosure('分组与条件路径').querySelector('summary')!)
+    fireEvent.click(screen.getByRole('checkbox', { name: '启用跨工具条件流程' }))
+    const input = screen.getByLabelText('流程 JSON（高级编辑）')
+    expect(input.closest('details')).not.toHaveAttribute('open')
+    fireEvent.change(input, { target: { value: '{broken' } })
+    fireEvent.click(screen.getByRole('button', { name: '保存流程设置' }))
+    await waitFor(() => expect(input).toHaveFocus())
+    expect(input.closest('details')).toHaveAttribute('open')
+    expect(disclosure('分组与条件路径')).toHaveAttribute('open')
+    expect(api.post).not.toHaveBeenCalled()
+  })
+  it('keeps published retention and collection read-only while disclosure permissions remain independently controlled', async () => {
+    row.status = 'PUBLISHED'
+    row.trainingPersistencePolicy = { schemaVersion: 1, checkpoint: { enabled: true, ttlHours: 48 }, localCognitive: { enabled: true, ttlHours: 1 } }
+    row.trainingTimingPolicy = { schemaVersion: 1 }
+    await open()
+    expect(screen.getByLabelText('启用服务器草稿')).toBeDisabled()
+    expect(screen.getByLabelText('服务器草稿保留小时数')).toHaveValue(48)
+    expect(screen.getByLabelText('认知本机草稿保留小时数')).toBeDisabled()
+    expect(screen.getByLabelText('记录量表的有效前台时间')).toBeDisabled()
+    expect(screen.getByLabelText('允许教师查看及导出计时')).toBeEnabled()
+  })
 })
 
 describe('C04 typed authoring', () => {

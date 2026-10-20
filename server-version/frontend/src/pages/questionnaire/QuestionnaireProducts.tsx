@@ -1,3 +1,4 @@
+import { DeliveryOptionCard } from './DeliveryOptionCard'
 import { FormChoiceEditor } from './FormChoiceEditor'
 import { choiceError, emptyChoices, filledChoices, type ChoiceDraft } from './formChoices'
 import { TypedFormExportActions } from '../../modules/composite/TypedFormExportActions'
@@ -19,7 +20,7 @@ import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
 import LocalDateTimeInput, { localDateTimeValue, parseLocalDateTime } from '../../components/LocalDateTimeInput'
 import './questionnaire-products.css'
 import './questionnaire-training-editor.css'
-import { ArrowLeft, ArrowRight, BookOpen, Brain, Check, ClipboardList, Layers, ListChecks, Route, Save } from 'lucide-react'
+import { ArrowLeft, ArrowRight, BookOpen, Brain, Check, ClipboardList, Layers, ListChecks, Route, Save, Clock3, HardDrive, ShieldCheck, Shuffle } from 'lucide-react'
 import { TrainingVariantEditor } from './TrainingVariantEditor'
 import { TrainingFlowEditor, trainingFlowEditorId } from './TrainingFlowEditor'
 import { formatTrainingFlow, isMaterialFlowText, trainingFlowRequest, parseTrainingFlow, type TrainingFlowConfig } from './trainingFlow'
@@ -382,8 +383,8 @@ export function QuestionnaireProductEdit() {
     navigate(`${location.pathname}${location.search}#${stepKey}`, { replace: true })
     requestAnimationFrame(() => {
       const field = document.getElementById(fieldId)
-      const disclosure = field?.closest('details')
-      if (disclosure) disclosure.open = true
+      let disclosure = field?.closest('details')
+      while (disclosure) { disclosure.open = true; disclosure = disclosure.parentElement?.closest('details') }
       field?.focus()
     })
   }
@@ -640,7 +641,33 @@ export function QuestionnaireProductEdit() {
   const localDate = (v: string) => {
     return localDateTimeValue(v)
   }
-  const persistenceSettings = <>
+  const persistenceSettings = trainingDesign ? <div className="qt-option-grid">
+    <DeliveryOptionCard icon={Save} title="中途保存与继续作答" description="适合内容较长、学员可能分多次完成的测评。" enabled={checkpointEnabled}>
+      <fieldset disabled={kind !== 'COURSE' || !draft || busy} className="qt-option-controls">
+        <legend className="sr-only">服务器草稿设置</legend>
+        <label className="qt-toggle-line"><input type="checkbox" checked={checkpointEnabled} onChange={e => setCheckpointEnabled(e.target.checked)} />启用服务器草稿</label>
+        <p className="qt-option-help">开启后，支持保存的作答进度可在保留时间内继续；关闭时不启用这项服务器保存策略。</p>
+        {checkpointEnabled && <label className="qt-duration">服务器草稿保留小时数（1–48）<span><input aria-label="服务器草稿保留小时数" type="number" min={1} max={48} step={1} required value={checkpointHours} onChange={e => setCheckpointHours(Number(e.target.value))} /><small>小时</small></span></label>}
+      </fieldset>
+      <details className="qt-rule-details"><summary>保留范围与限制</summary><p>发布后策略固定。适用于本次新发布的登录学员和匿名作答；公开投放须绑定唯一 Training 课程。最多成功保存 100 次，清除不重置；保留时间不会延长课程或任务截止时间。</p></details>
+    </DeliveryOptionCard>
+    <DeliveryOptionCard icon={HardDrive} title="认知测验本机草稿清理" description="为认知任务的浏览器本机草稿设置到期清理时间。" enabled={localCognitiveEnabled}>
+      <fieldset disabled={kind !== 'COURSE' || !draft || busy} className="qt-option-controls">
+        <legend className="sr-only">认知本机草稿设置</legend>
+        <label className="qt-toggle-line"><input type="checkbox" checked={localCognitiveEnabled} onChange={e => setLocalCognitiveEnabled(e.target.checked)} />启用认知任务本机草稿到期清理</label>
+        <p className="qt-option-help">只控制认知任务的本机草稿清理，与上方服务器草稿分别设置。</p>
+        {localCognitiveEnabled && <label className="qt-duration">认知本机草稿保留小时数（1–48）<span><input aria-label="认知本机草稿保留小时数" type="number" min={1} max={48} step={1} required value={localCognitiveHours} onChange={e => setLocalCognitiveHours(Number(e.target.value))} /><small>小时</small></span></label>}
+      </fieldset>
+      <details className="qt-rule-details"><summary>哪些草稿会受到保护？</summary><p>正在进行、已封存和等待确认提交的认知草稿会受到保护。发布后策略固定；公开投放须绑定唯一 Training 课程，保留时间不会延长课程或任务截止时间。</p></details>
+    </DeliveryOptionCard>
+    <DeliveryOptionCard icon={Clock3} title="量表作答时间记录" description="想了解学员实际在量表页面停留多久时使用。" enabled={timingEnabled}>
+      <fieldset disabled={kind !== 'COURSE' || !draft || busy} className="qt-option-controls"><legend className="sr-only">量表时间采集设置</legend>
+        <label className="qt-toggle-line"><input type="checkbox" checked={timingEnabled} onChange={e => setTimingEnabled(e.target.checked)} />记录量表的有效前台时间</label>
+        <p className="qt-option-help">只统计量表页面在浏览器前台且未暂停的时间；不改变评分，也不统计后台或暂停时间。</p>
+      </fieldset>
+      <details className="qt-rule-details"><summary>适用范围与发布限制</summary><p>默认关闭。仅支持明确的 Training 课程投放；公开链接必须唯一绑定一个课程。时间仅作描述，发布后采集策略固定。</p></details>
+    </DeliveryOptionCard>
+  </div> : <>
             <fieldset disabled={kind!=='COURSE'||!draft||busy} className="space-y-2 rounded border p-3">
               <legend>可选草稿保留策略（发布后冻结）</legend>
               <label className="block"><input type="checkbox" checked={checkpointEnabled} onChange={e=>setCheckpointEnabled(e.target.checked)}/> 启用服务器草稿</label>
@@ -653,8 +680,9 @@ export function QuestionnaireProductEdit() {
             <p className="text-sm">默认关闭，仅支持明确 Training 课程投放；公开链接必须唯一绑定一个课程。时间仅作描述，不改变评分，后台及暂停时间不计入。发布后采集策略冻结。</p>
   </>
   const feedbackSettings = <>
+            {trainingDesign && !trainingEligible && !detail?.trainingFeedbackPolicy && !feedbackChanged && <section className="qt-feedback-placeholder"><h3>03 · 学员何时看报告</h3><p>选择并保存 Training 课程后，可设置报告在测评完成后开放，或在指定时间开放。</p></section>}
             {(trainingEligible || detail?.trainingFeedbackPolicy || feedbackChanged) && <fieldset className="space-y-2 rounded border p-3 qt-feedback-settings" disabled={busy || !draft || !trainingEligible}>
-              <legend>学员报告开放（发布后冻结）</legend>
+              <legend>{trainingDesign ? '03 · 学员何时看报告' : '学员报告开放（发布后冻结）'}</legend>{trainingDesign && <p className="qt-section-help">通常沿用默认设置即可；需要统一讲解时，再指定开放时间。发布后此策略固定。</p>}
               <label className="block"><input type="radio" name="training-feedback-mode" value="IMMEDIATE" checked={feedbackMode === 'IMMEDIATE'} onChange={() => { setFeedbackMode('IMMEDIATE'); setFeedbackChanged(true); setFeedbackError('') }} /> 整份测评完成且报告生成后即可查看（默认）</label>
               <label className="block"><input type="radio" name="training-feedback-mode" value="SCHEDULED" checked={feedbackMode === 'SCHEDULED'} onChange={() => { setFeedbackMode('SCHEDULED'); setFeedbackChanged(true); setFeedbackError('') }} /> 预设时间开放</label>
               {feedbackMode === 'SCHEDULED' && <label className="block">报告开放时间<LocalDateTimeInput picker id="questionnaire-feedback-release" className="input w-full" value={feedbackReleaseAt}
@@ -687,7 +715,7 @@ export function QuestionnaireProductEdit() {
             )}
             {kind === 'COURSE' && (
               <fieldset>
-                <legend>投放课程（可多选）</legend>
+                <legend>{trainingDesign ? '01 · 谁来作答' : '投放课程（可多选）'}</legend>{trainingDesign && <p className="qt-section-help">选择参加本次测评的课程，可多选。</p>}
                 <p>{draft ? '草稿可暂不选择课程，发布前需选择至少一个投放课程。' : '当前版本的课程投放范围。'}</p>
                 {catalog.courses.map((v: any) => (
                   <label className="block" key={v.id}>
@@ -707,17 +735,18 @@ export function QuestionnaireProductEdit() {
                 ))}
               </fieldset>
             )}
-            <label className="block">
+            <label className={trainingDesign ? 'qt-public-choice' : 'block'}>
               <input
                 type="checkbox"
                 checked={publicEnabled}
+                aria-label="允许通过公开链接作答"
                 onChange={(e) => setPublic(e.target.checked)}
               />{' '}
-              允许通过公开链接作答
+              {trainingDesign ? <span>允许通过公开链接作答<small>需要把链接分享给课程外的作答者时开启；公开链接须设置截止时间。</small></span> : '允许通过公开链接作答'}
             </label>
             {!trainingDesign && persistenceSettings}
             {!trainingDesign && feedbackSettings}
-            </div><div className="questionnaire-delivery-window"><div className="questionnaire-date-grid"><label className="block">
+            </div><div className="questionnaire-delivery-window">{trainingDesign && <div className="qt-delivery-section-heading"><h3>02 · 何时开放作答</h3><p>设定学员可以进入测评的时间范围。</p></div>}<div className="questionnaire-date-grid"><label className="block">
               开始时间
               {!draft && !opensAt ? <p className="questionnaire-window-summary">发布后立即开放</p> : <LocalDateTimeInput picker className="input w-full"
                 id="questionnaire-product-opens"
@@ -1088,7 +1117,8 @@ export function QuestionnaireProductEdit() {
   </>
 
   const advancedSettings = detail && <>
-              {(draft ? variantsEligible || trainingVariantDraft || detail.trainingVariantDraft : detail.trainingVariantFrozen) && <TrainingVariantEditor
+              {(draft ? variantsEligible || trainingVariantDraft || detail.trainingVariantDraft || (trainingDesign && trainingEligible) : detail.trainingVariantFrozen) && <TrainingVariantEditor
+                guided={trainingDesign}
                 config={trainingVariantDraft}
                 frozen={detail.trainingVariantFrozen ?? null}
                 maxAttempts={maxAttempts}
@@ -1102,6 +1132,7 @@ export function QuestionnaireProductEdit() {
                 onSave={() => void save()}
               />}
               {(draft ? trainingEligible || trainingFlowText || detail.trainingFlowDraft : detail.trainingFlowFrozen) && <TrainingFlowEditor
+                guided={trainingDesign}
                 text={trainingFlowText} frozen={detail.trainingFlowFrozen ?? null} units={units}
                 maxAttempts={maxAttempts} onMaxAttemptsChange={setMaxAttempts}
                 draft={draft} eligible={flowEligible} busy={busy} dirty={flowDirty} error={trainingFlowError}
@@ -1178,7 +1209,12 @@ export function QuestionnaireProductEdit() {
               )}
   </>
 
-  const timingDisclosure = <>
+  const timingDisclosure = trainingDesign ? detail && <DeliveryOptionCard icon={ShieldCheck} title="教师查看与导出计时" description="单独决定有权限的教师能否在报告或导出文件中看到计时。" enabled={Boolean(detail.timingExportEnabled)} badge={detail.timingExportEnabled ? '已允许' : '未允许'}>
+    <label className="qt-toggle-line"><input type="checkbox" disabled={busy || dirty} checked={Boolean(detail.timingExportEnabled)} onChange={e => { const enabled = e.target.checked; void action(async () => { hydrate(await request('/' + id + '/timing-export-policy', { revision: detail.revision, enabled })) }) }} />允许教师查看及导出计时</label>
+    <p className="qt-option-help">仅开启上方“时间记录”不会自动开放查看权限。学员反馈中不显示计时。</p>
+    {dirty && <p className="qt-inline-notice">请先保存其他修改，再调整这项权限。</p>}
+    <details className="qt-rule-details"><summary>权限如何生效？</summary><p>此项调整会立即保存，独立于原始回答权限。摘要报告也可导出计时；撤销后，旧计时产物不可再下载。默认关闭。</p></details>
+  </DeliveryOptionCard> : <>
       {detail&&<section aria-label="计时披露权限"><label><input type="checkbox" disabled={busy||dirty} checked={Boolean(detail.timingExportEnabled)} onChange={e=>{const enabled=e.target.checked;void action(async()=>{hydrate(await request('/'+id+'/timing-export-policy',{revision:detail.revision,enabled}))})}}/>允许有权限的教师报告与 CSV/ZIP 导出计时</label><p>默认关闭，独立于原始回答权限；摘要也可导出计时，撤销后旧计时产物不可下载。学员反馈不显示计时。</p></section>}
   </>
 
@@ -1259,9 +1295,12 @@ export function QuestionnaireProductEdit() {
             </section>}
             <section className="qt-panel" hidden={stepIndex !== 2} aria-label="投放设置步骤">
               <header className="qt-panel-heading"><small>STEP 03 / 04</small><h2>投放设置</h2><p>先选择课程与开放时间，再决定学员何时查看反馈。</p></header>
-              <div className="qt-panel-body">{deliverySettings}
-                <details className="qt-advanced" open={Boolean(checkpointEnabled || localCognitiveEnabled || timingEnabled || detail?.timingExportEnabled) || undefined}><summary>草稿保留与计时记录 <span>可选</span></summary><div className="qt-advanced-body"><fieldset className="qt-policy-controls" disabled={busy || !draft}>{persistenceSettings}</fieldset>{timingDisclosure}</div></details>
-                {detail && <details className="qt-advanced" open={Boolean(trainingVariantDraft || trainingFlowText || detail.trainingVariantFrozen || detail.trainingFlowFrozen || trainingFlowError) || undefined}><summary>随机分组与条件流程 <span>高级</span></summary><div className="qt-advanced-body">{advancedSettings}</div></details>}
+              <div className="qt-panel-body qt-delivery-body">
+                <div className="qt-delivery-intro"><ListChecks size={20} aria-hidden="true" /><p><strong>先完成 3 项基础设置</strong><span>普通测评设置好课程、时间和报告即可，下方可选功能按需开启。</span></p></div>
+                {deliverySettings}
+                <div className="qt-optional-heading"><h3>按需添加功能</h3><p>以下功能默认关闭，不影响普通测评的编制与发布。</p></div>
+                <details className="qt-advanced qt-delivery-disclosure" open={Boolean(checkpointEnabled || localCognitiveEnabled || timingEnabled || detail?.timingExportEnabled) || undefined}><summary><span className="qt-disclosure-title"><Save size={20} aria-hidden="true" /><span><strong>进度保存与作答时间</strong><small>允许稍后继续、清理认知本机草稿，或记录量表用时。</small></span></span><span className="qt-disclosure-badge">可选</span></summary><div className="qt-advanced-body">{persistenceSettings}{timingDisclosure}</div></details>
+                {detail && <details className="qt-advanced qt-delivery-disclosure" open={Boolean(trainingVariantDraft || trainingFlowText || detail.trainingVariantFrozen || detail.trainingFlowFrozen || trainingFlowError) || undefined}><summary><span className="qt-disclosure-title"><Shuffle size={20} aria-hidden="true" /><span><strong>分组与条件路径</strong><small>让学员随机作答不同内容，或根据前题答案决定后续路径。</small></span></span><span className="qt-disclosure-badge">高级</span></summary><div className="qt-advanced-body"><p className="qt-strategy-guide">两种方式选其一：随机分组决定“这次抽到哪套内容”；条件路径决定“满足什么条件后，继续哪些内容”。</p>{advancedSettings}</div></details>}
               </div>
             </section>
             {detail && <section className="qt-panel" hidden={stepIndex !== 3} aria-label="检查与发布步骤">
