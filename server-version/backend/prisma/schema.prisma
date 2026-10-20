@@ -3891,3 +3891,39 @@ model TrainingAttemptCheckpoint {
   attempt CompositeAssessmentAttempt @relation(fields:[attemptId],references:[id],onDelete:Restrict)
   @@map("training_attempt_checkpoints")
 }
+
+// Three independently versioned content layers; no personal answer data.
+model MeasurementContentRelease {
+  id              String @id
+  layer           String
+  family          String
+  key             String @map("content_key")
+  version         String
+  hashScheme      String @map("hash_scheme")
+  contentHash     String @map("content_hash")
+  content         Json
+  scope           Json
+  assetRefs       Json @map("asset_refs")
+  sourceReleaseId String? @map("source_release_id")
+  source          MeasurementContentRelease? @relation("ContentSource",fields:[sourceReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  adaptations     MeasurementContentRelease[] @relation("ContentSource")
+  publishedBy     String @map("published_by")
+  publishedAt     DateTime @default(now()) @map("published_at") @db.Timestamptz(6)
+  status          String @default("PUBLISHED")
+  events          MeasurementContentReleaseEvent[]
+  @@unique([family,layer,key,version],map:"measurement_content_release_identity_key")
+  @@index([family,layer,status],map:"measurement_content_catalog_idx")
+  @@map("measurement_content_releases")
+}
+model MeasurementContentReleaseEvent {
+  id         String @id
+  releaseId  String @map("release_id")
+  release    MeasurementContentRelease @relation(fields:[releaseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  fromStatus String @map("from_status")
+  toStatus   String @map("to_status")
+  actorId    String @map("actor_id")
+  reason     String
+  createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@index([releaseId,createdAt],map:"measurement_content_events_release_idx")
+  @@map("measurement_content_release_events")
+}

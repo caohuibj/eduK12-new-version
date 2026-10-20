@@ -9,7 +9,7 @@
 
 - Scale、现有 Cognitive 与现有 SJT 共用发布身份、状态、绑定与治理合同；保留各自权威 scorer 和 runner。按用户最新范围，SJT 现有内容/专家评分 key、参考/报告须接入三层版本及回读绑定，不是未来空占位；本 PR 不增加完整 SJT 编辑器或新运行范式。
 - 三层依次为测量本体、参考规则、报告。发布身份各自演进，目录是可发现性投影，不能另存评分/阈值权威。私有作者获准范围内 publish 不依赖平台目录批准。
-- 复用已有七轴：instrumentVersion、measurementHash、scoringVersion、referenceVersion、reportVersion、localizationVersion、catalogManifestVersion。三层不是把七轴合成一个版本号，也不是再建三套服务。
+- 复用已有七轴：instrumentVersion、scoringVersion、reportVersion、referenceVersion、localizationVersion、catalogManifestVersion、InstrumentAuthorization.version。measurementHash 是内容指纹，不替代授权版本轴；授权轴不进入测量指纹。三层不是把七轴合成一个版本号，也不是再建三套服务。
 - 复用 `scale-definition.ts`、`scale-scoring.ts`、Scale onboarding、Reference Core、Cognitive v2 registry/scorer/session snapshot、共享 runtime artifact/template 和冻结 binding。`assessment-identity` 是被试/作答身份，不是内容发布身份；保留其“历史未知不补造”的规则。
 - 不新增连续年龄模型、新认知范式/runner、上传脚本执行、外来常模表直接激活、生产真实常模或生产部署。授权内部样本离线分析后回流的候选仍须受控复核。
 - 不长期双写或保留旧权威 runtime。一次迁移先盘点，再按已确认对象切换；真实不可逆删除、凭据及安全配置变更不在授权内。已应用 migration 不改写。
@@ -137,3 +137,9 @@ FINAL 以既有 submissionId/payloadHash/epoch 原子接收：正常成功路径
 - `hashScaleDefinition` 对有 versionAxes 的定义已剔除 report/reference；无轴旧对象仍是旧投影。不得把已解耦逻辑重新实现为全定义 hash。
 - 逐项记录 publication gate 的旧 severity → 新 severity。无 norm/文献不充分对可描述性私有发布不得再做形式性硬阻；无 runner、错误计分配置、来源权利、越界解释仍硬阻。未核对的具体门禁不提前宣称已降级。
 - 第一份报告请求、候选集合冻结、独立解释和固定导出 manifest 须逐入口落实，不能因现有 snapshot/导出 worker 存在就宣称完成。
+
+## V02 实施记录
+
+新增 `measurement-content/release.ts` 与 repository：统一的三层精确身份、独立内容投影、不可变版本冲突、确定生命周期、来源/指标引用检查及有界目录投影。现有草稿工作区、scorer、runner 不变；本单元没有公开未授权 API。新增单一共享 release 表及 append-only 状态事件表，数据库 trigger 保护已发布内容/来源，未执行实际迁移。V03/V04 家族适配器仍须用既有 schema/runner/资产授权验证内容；V05 接入管理员能力；V07 完成报告语义门禁。通用信封结构校验不是科学发布资格。
+
+轻量检查：6 个新纯合同用例通过；新模块 strict TypeScript 检查通过；Prisma schema validate 通过。复用相邻官方依赖目录只读符号链接，未安装/复制大依赖。真实 PostgreSQL 迁移/并发/恢复与最终应用回归留 V10 集中执行，不能以本次 schema validate 代替。七轴表述已按既有 `server-version/docs/scale-library/catalog-version-semantics.md` 修正。
