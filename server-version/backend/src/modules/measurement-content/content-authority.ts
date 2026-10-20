@@ -3,7 +3,7 @@ import { z } from 'zod'
 export const CONTENT_CAPABILITIES = [
   'measurement.edit', 'measurement.publish', 'reference.analyze', 'reference.review',
   'reference.publish', 'report.edit', 'report.publish', 'catalog.manage',
-  'material.use', 'material.adapt', 'material.distribute',
+  'material.use', 'material.adapt', 'material.distribute', 'data.reinterpret',
 ] as const
 export const MAX_CONTENT_GRANT_DEPTH = 2
 const identifier = z.string().trim().min(1).max(240)
@@ -13,9 +13,11 @@ export const contentAuthorityScopeSchema = z.object({
   product: z.enum(['TRAINING', 'SURVEY', 'SCHOOL', 'TEACHER']),
   scopeKind: z.enum(['PLATFORM', 'ORGANIZATION', 'PROJECT', 'COURSE']),
   scopeId: identifier,
-  resourceKind: z.enum(['measurement', 'reference', 'report', 'catalog', 'material']),
+  resourceKind: z.enum(['measurement', 'reference', 'report', 'catalog', 'material', 'data']),
   resourceKeys: z.array(identifier).min(1).max(128).refine(unique),
-}).strict()
+}).strict().refine(scope => scope.resourceKind !== 'data' || scope.scopeKind === 'PROJECT', {
+  message: 'Data reinterpretation requires exact project scope',
+})
 export const contentGrantInputSchema = z.object({
   subjectId: identifier,
   scope: contentAuthorityScopeSchema,

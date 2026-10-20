@@ -310,3 +310,13 @@ FINAL 解释补齐实际 Scale/SJT v1 存储结构：它们只有 privateScoring
 渲染只消费已保存事实/解释及精确报告模板，按报告 metricKeys 白名单，不重新计分或匹配参考。返回 accessAudience=researcher，与模板 intendedAudience 分开；选了 student 模板也不把结果送给被试。当前参考撤回以独立 lifecycle notice 呈现，保存的 FINAL 数值不改变；measurement/report 撤回不能新生成此视图。READY 并非已存渲染工件，因此没有借“历史已生成报告”放行首次渲染。普通 superseded/retired 保原版本。
 
 23 项实际 reader/报告服务定向合同、strict TypeScript 通过；无真实 HTTP/并发。当前完成的是研究者读取 API，研究者 UI、被试显式允许反馈、独立新解释 artifact 仍未完成。被试 GENERAL 合同不变，不以此步骤宣称整个报告闭环完成。
+
+### V08 explicit reinterpretation authority (2026-10-20)
+
+`data.reinterpret` is an independently granted fixed capability on the existing
+User/root/one-child chain. Its `data` resource scope is one PROJECT plus exact
+FINAL identifiers. `report.publish` remains template publication only and cannot
+substitute for this capability. No existing owner/administrator receives it
+implicitly. The consuming service must verify actual FINAL/project membership
+and intersect current Survey owner/data access; a capability alone grants no
+sample access. The additive CHECK migration changes no existing grant rows.

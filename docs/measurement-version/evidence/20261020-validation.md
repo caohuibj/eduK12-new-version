@@ -33,3 +33,13 @@ The exact new migration `20261020040000_survey_attempt_content_binding` and `sur
 ## V08 explicit interpretation export constraint, 05:09 UTC
 
 Applied new `20261020041000_survey_interpretation_exports` and reapplied its identical bytes to verify idempotence in the synthetic single-user cluster. `survey-interpretation-export-database-contracts.sql` successfully inserted all six existing formats plus INTERPRETATION_LONG, and confirmed INVALID_FORMAT is rejected by survey_export_tickets_format_check. No old migration changed. Exact hashes/results are in `20261020-v08-interpretation-export-sql.json`; this closes the CHECK omission not exercised by mocked ticket tests. No connected Prisma/HTTP/concurrency claim.
+
+#### Explicit reinterpretation authority
+
+Added migration `20261020042000_data_reinterpret_authority` applied to the same
+isolated PG 16.15 single-user database. The exact accompanying
+`data-reinterpret-authority-database-contracts.sql` completed without ERROR:
+legal root/child grants, FINAL/project/expiry/depth containment, wrong template
+capability, unsupported read/export capability, non-project scope and revoked
+parent rejection. The 12 authority Vitest contracts passed. This is SQL constraint
+and pure-contract evidence only, not HTTP, Prisma deployment or concurrent revoke.

@@ -93,3 +93,43 @@ describe('bounded permanent content authority', () => {
     await expect(revokeContentAuthority(db,{actorId:'intruder',grantId:'child',expectedVersion:1,reason:'No'})).rejects.toThrow('CONTENT_AUTHORITY_STALE_OR_DENIED')
   })
 })
+
+
+describe('separate exact-FINAL data reinterpretation authority', () => {
+  const dataRoot = (): ContentGrant => ({ ...root(),
+    scope: { ...root().scope, resourceKind: 'data', resourceKeys: ['final1', 'final2'] },
+    capabilities: ['data.reinterpret'], delegableCapabilities: ['data.reinterpret'],
+  })
+  const dataChild = (): ContentGrant => ({ ...child(),
+    scope: { ...dataRoot().scope, resourceKeys: ['final1'] }, capabilities: ['data.reinterpret'],
+  })
+  it('accepts a separately issued root and bounded one-level exact-FINAL child', async () => {
+    expect(() => contentGrantInputSchema.parse(input(dataRoot()))).not.toThrow()
+    expect(assertContentGrantChain([dataRoot(), dataChild()], 'child', now)).toEqual(dataChild())
+    await expect(assertContentAuthority(dbFor([dataRoot(), dataChild()]).db, {
+      actorId: 'author', grantId: 'child', capability: 'data.reinterpret', scope: dataChild().scope,
+    })).resolves.toEqual({ grantId: 'child', version: 1 })
+  })
+  it('rejects broader project/FINAL/delegation/expiry and non-project data scopes', () => {
+    for (const change of [
+      { scope: { ...dataChild().scope, scopeId: 'other-project' } },
+      { scope: { ...dataChild().scope, resourceKeys: ['other-final'] } },
+      { remainingDelegationDepth: 1, delegableCapabilities: ['data.reinterpret'] },
+      { expiresAt: new Date('2027-01-01') },
+    ]) expect(() => assertContentDelegation(dataRoot(), { ...input(dataChild()), ...change } as ContentGrantInput, 'entry-admin')).toThrow()
+    for (const scopeKind of ['PLATFORM', 'ORGANIZATION', 'COURSE'])
+      expect(() => contentGrantInputSchema.parse({ ...input(dataRoot()), scope: { ...dataRoot().scope, scopeKind } })).toThrow()
+    for (const capability of ['data.read', 'data.export', 'data.*', 'report.publish'])
+      expect(() => contentGrantInputSchema.parse({ ...input(dataChild()), capabilities: [capability] })).toThrow()
+  })
+  it('does not accept report.publish, another FINAL, another project or another actor', async () => {
+    const invoke = (grants: ContentGrant[], overrides = {}) => assertContentAuthority(dbFor(grants).db, {
+      actorId: 'author', grantId: 'child', capability: 'data.reinterpret', scope: dataChild().scope, ...overrides,
+    })
+    await expect(invoke([root(), child()])).rejects.toThrow('CONTENT_AUTHORITY_DENIED')
+    await expect(invoke([dataRoot(), dataChild()], { scope: { ...dataChild().scope, resourceKeys: ['final2'] } })).rejects.toThrow('CONTENT_AUTHORITY_DENIED')
+    await expect(invoke([dataRoot(), dataChild()], { scope: { ...dataChild().scope, scopeId: 'other-project' } })).rejects.toThrow('CONTENT_AUTHORITY_DENIED')
+    await expect(invoke([dataRoot(), dataChild()], { actorId: 'owner-without-this-grant' })).rejects.toThrow('CONTENT_AUTHORITY_DENIED')
+    await expect(invoke([{ ...dataRoot(), revokedAt: now }, dataChild()])).rejects.toThrow('CONTENT_AUTHORITY_DENIED')
+  })
+})
