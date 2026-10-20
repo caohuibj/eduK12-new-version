@@ -24,6 +24,8 @@
 | `training-flow-sjt-export.test.ts` | 24 | SJT 身份、分支可见性、导出投影；这是 mock 功能用例，不是运行重型导出 |
 | 合计 | **119 / 119** | 6 文件，零失败，13.338s 观察窗口 |
 
+按独立review口径，上述119个用例包含4项源码wiring断言；其余含真实函数及mock persistence。不能称作真实PostgreSQL并发全验。后续真实单份/存储profile结果另见[单份诊断](20261020-training-storage-profile.md)。
+
 另一次 `tsc --noEmit --incremental false` 成功，50.517s；没有再次运行原构建中的 manifest/内容检查或无关前端检查。
 
 操作次数证据：原源码的 candidate 解密/hash 各两处，补丁实际缺失 Scale child 的 materialization 路径各调用一次；runtime load 使用同一 tx，权限检查仍执行。该用例在授权 runtime load 边界主动停止，不冒充整条真实业务复测。checkpoint 新断言证明 SAVE 额外 carrier 查询从一到零；GET/CLEAR 没有新增该载荷。

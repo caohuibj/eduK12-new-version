@@ -124,3 +124,7 @@ API 在 03:34:16.447 UTC 收到 SIGTERM，约 0.200s 优雅退出，退出码 0�
 4. **事务驻留和 API 计算归因。** 采样约 t15–45s 多次出现 18–20 个 idle-in-transaction、0 个 lock waiter；API 大部分 CPU 消耗也集中于前约 50s。它支持检查应用在事务中持有连接时的计算/等待，尚不能判定具体函数或数据库慢查询。checkpoint 的 parent/policy/slot 读取和 progress 的 child/proof 处理可纳入一次集中静态 review，不逐处修改后逐处压测。
 
 本轮只证明当前 native profile 在该固定短负载及截止下出现大量拒绝/超时，未测得可持续系统上限。后续是否改产品、启用可选路径或复测，由父对话给出具体范围。
+
+## 后续只读分类补充（不重跑基线）
+
+61个503 body全为 `ASSESSMENT_SUBMIT_BUSY` / “测评提交繁忙，请稍后重试”；同期metrics为 `unit_submit, reason=timeout` 61，是原5s admission等待预算超时，不混称PG事务或池超时。229个UNKNOWN全为TimeoutError，均在t29.780–39.398s开始、受40s剩余预算截断，观测abort在t40.008–40.128s；单请求30s上限触发为0。额外31个DB完整中，26个SJT FINAL响应未知，5个FINAL已ACK但progress GET未知。一次完整份含四工具串行保存/FINAL/推进/报告；300份实际2679 HTTP、841 FINAL，不能说仅发300个单FINAL。当前所有未来压测计划已取消。
