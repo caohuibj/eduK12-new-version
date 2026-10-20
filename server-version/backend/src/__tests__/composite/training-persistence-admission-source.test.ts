@@ -64,11 +64,16 @@ describe('Training persistence publication/admission source contracts (not HTTP 
     expect(composite).not.toContain('sessionEpoch: session.attemptNo')
     expect(cognitive).toContain('sessionId: session.id')
     expect(cognitive).toContain('trainingPersistenceMetadata(session.compositeAttempt as any)')
-    for (const start of ['export const getSession =', 'export const getPublicSession =']) {
-      const body = cognitive.slice(cognitive.indexOf(start), cognitive.indexOf(start) + 2200)
+    const file = ts.createSourceFile('session.service.ts', cognitive, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS)
+    const declarations = file.statements.flatMap(statement => ts.isVariableStatement(statement) ? [...statement.declarationList.declarations] : [])
+    for (const name of ['getSession', 'getPublicSession']) {
+      const declaration = declarations.find(node => ts.isIdentifier(node.name) && node.name.text === name)
+      expect(declaration).toBeDefined()
+      expect(ts.isArrowFunction(declaration!.initializer!)).toBe(true)
+      const body = (declaration!.initializer! as ts.ArrowFunction).body.getText(file)
       expect(body).toContain('trainingPersistenceSnapshot: true')
       expect(body).toContain('trainingPersistenceSnapshotHash: true')
-      expect(body).toContain('toRunnerPayload(session')
+      expect(body).toContain('buildRunnerPayload(session')
     }
   })
 })
