@@ -320,3 +320,18 @@ substitute for this capability. No existing owner/administrator receives it
 implicitly. The consuming service must verify actual FINAL/project membership
 and intersect current Survey owner/data access; a capability alone grants no
 sample access. The additive CHECK migration changes no existing grant rows.
+
+### V08 participant controlled raw-metric feedback
+
+Survey prepare can explicitly freeze `participantFeedback` for Scale/SJT:
+`SURVEY_RAW_METRICS_V1`, DESCRIPTIVE mode, a nonempty exact published-metric
+allowlist, and the existing AFTER_FINAL/AFTER_COLLECTION timing. Omission is off;
+GENERAL and Cognitive's existing product allowlist are unchanged. `/general`
+rechecks the existing current credential, consent, withdrawal and completion
+contract under its established locks. Only saved finite, calculated metrics with
+interpretable quality are projected. No rescoring, reference bands, researcher
+template or inferred anonymous-participant age/role is disclosed. The policy is
+separate from measurementHash. Real compiler→compute cases cover Scale and both
+SJT structures. This completes the backend controlled raw-feedback path; author
+UI configuration and participant-specific template/reference rendering remain
+separate, uncompleted scope. This is not a claim of all participant reports.

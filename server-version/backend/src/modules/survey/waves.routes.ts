@@ -1,3 +1,4 @@
+import {surveyParticipantFeedbackSelectionsSchema} from './participant-feedback'
 import {surveyContentSelectionsSchema} from './content-selection'
 import {SurveyGovernanceError} from './governance.service'
 import {CatalogSourceError} from './catalog.sources'
@@ -68,8 +69,8 @@ for(const [name,action] of [['rotate','ROTATE'],['revoke','REVOKE']] as const){
     })))
 }
 surveyWavesRouter.post('/:pid/waves/:wid/prepare',handle(req=>{
-  const input=revision.extend({contentSelections:surveyContentSelectionsSchema.optional()}).parse(req.body)
-  return publish.prepareWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid),input.revision,input.contentSelections)
+  const input=revision.extend({contentSelections:surveyContentSelectionsSchema.optional(),participantFeedback:surveyParticipantFeedbackSelectionsSchema.optional()}).parse(req.body)
+  return publish.prepareWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid),input.revision,input.contentSelections,input.participantFeedback)
 }))
 surveyWavesRouter.post('/:pid/waves/:wid/open',handle(req=>
   publish.openWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid),

@@ -1,3 +1,4 @@
+import {freezeSurveyParticipantFeedback,type SurveyRawFeedback,type SurveyParticipantFeedbackSelection} from './participant-feedback'
 import {freezeSurveyContentSelections,type SurveyContentSelection,type FrozenSurveyContentSelection} from './content-selection'
 import {ContentReleaseError} from '../measurement-content/release'
 import { cognitiveMeasurementRelease } from '../measurement-content/cognitive'
@@ -30,6 +31,7 @@ import { freezeGroupIpPolicy,resolveGroupIpOpenWindow,type FrozenGroupIpPolicy }
  * publication. The Survey FINAL admission adapter is separate from legacy catalog.
  */
 export interface ResearchFrozenUnit {
+  participantFeedback?:SurveyRawFeedback
   contentSelection?:FrozenSurveyContentSelection
   measurementRelease?: { releaseId: string; contentHash: string; measurementHash: string }
   sourceProvenance?:Record<string,unknown>
@@ -133,7 +135,7 @@ export function compileFrozenResearchUnit(draft:{
  * authenticated action and remains fail-closed behind SURVEY_PUBLICATION_ENABLED.
  */
 export async function freezeResearchWaveDraft(input:{
-  actorUserId:string;projectId:string;waveId:string;revision:number;contentSelections?:SurveyContentSelection[]
+  actorUserId:string;projectId:string;waveId:string;revision:number;contentSelections?:SurveyContentSelection[];participantFeedback?:SurveyParticipantFeedbackSelection[]
 }):Promise<{publicationId:string;version:number;digest:string;waveId:string;runtimeReady:true}> {
   return prisma.$transaction(async tx=>{
     // Lock project first so concurrent freezes share one exact publication sequence.
@@ -189,6 +191,7 @@ export async function freezeResearchWaveDraft(input:{
       if(!draft)stop('研究工具来源已发生变化')
       return draft!.catalogGrantId?compileCatalogUnit(draft!,sources.get(draft!.catalogGrantId)!):compileFrozenResearchUnit(draft!)
     })
+    const feedbackMetrics=new Map<string,string[]>()
     for (const unit of units) {
       if (unit.kind === 'FORM') continue
       // Native authors explicitly publish before Wave freezing. Existing
@@ -196,9 +199,11 @@ export async function freezeResearchWaveDraft(input:{
       const release=unit.sourceProvenance
         ?await publishSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
         :await resolveSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
+      feedbackMetrics.set(unit.draftId,release.content.metrics.map(metric=>metric.metricKey))
       unit.measurementRelease = { releaseId: release.releaseId, contentHash: release.contentHash,
         measurementHash: release.content.measurementHash }
     }
+    freezeSurveyParticipantFeedback(units,input.participantFeedback??[],feedbackMetrics)
     await freezeSurveyContentSelections(tx,input.actorUserId,input.projectId,units,input.contentSelections??[])
     // Initial bounded research safety limit, not a measured capacity claim.
     if(units.filter(unit=>unit.kind==='COGNITIVE').length>4)

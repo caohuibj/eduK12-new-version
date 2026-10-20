@@ -1,3 +1,4 @@
+import {rawParticipantFeedback} from './participant-feedback'
 import {interpretSurveyFinal} from './final-interpretation.service'
 import { verifySurveyCognitiveReferences,loadSurveyCognitiveResults,assertSurveyCognitiveLockedAnswers } from './cognitive.results'
 import type { SurveyCognitiveReference } from './cognitive.definition'
@@ -202,7 +203,7 @@ export async function readGeneralForOwnAttempt(input:{
   publicId:string;attemptId:string;researchCode?:string;accessCredential:string
 }){
   const valid=await verifiedSurveyAttempt(input)
-  const hasFeedback=valid.compiledSnapshot.units.some(unit=>unit.kind==='COGNITIVE')
+  const hasFeedback=valid.compiledSnapshot.units.some(unit=>unit.kind==='COGNITIVE'||unit.participantFeedback?.mode==='DESCRIPTIVE')
   if(hasFeedback)return prisma.$transaction(async tx=>{
     // Serialize disclosure with current withdrawal/credential/window governance.
     await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${valid.projectId} FOR SHARE`
@@ -234,10 +235,11 @@ export async function readGeneralForOwnAttempt(input:{
     const collectionClosed=attempt.wave.hardStopAt!==null||
       (collectionEnd!==null&&collectionEnd<=new Date())
     const measurements=[];let pending=false
-    for(const unit of valid.compiledSnapshot.units.filter(unit=>unit.kind==='COGNITIVE')){
+    for(const unit of valid.compiledSnapshot.units.filter(unit=>unit.kind==='COGNITIVE'||unit.participantFeedback?.mode==='DESCRIPTIVE')){
       const stored=result.units.find(candidate=>candidate.instrumentKey===unit.instrumentKey)
       if(!stored)blocked('研究反馈工具来源缺失')
-      const feedback=cognitiveParticipantFeedback(unit,stored,collectionClosed)
+      const feedback=unit.kind==='COGNITIVE'?cognitiveParticipantFeedback(unit,stored,collectionClosed):
+        rawParticipantFeedback(unit,stored,collectionClosed)
       if(feedback?.pending)pending=true
       else if(feedback)measurements.push(feedback)
     }

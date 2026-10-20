@@ -1,3 +1,4 @@
+import type {SurveyParticipantFeedbackSelection} from './participant-feedback'
 import type {SurveyContentSelection} from './content-selection'
 import { randomBytes,randomUUID,createHash } from 'node:crypto'
 import { Prisma } from '@prisma/client'
@@ -44,9 +45,9 @@ function assertRuntime(publication:{compiledSnapshot:Prisma.JsonValue;definition
     fail('此研究版本未具备已验证的 Survey FINAL 执行定义')
   return snapshot
 }
-export async function prepareWave(userId:string,projectId:string,waveId:string,revision:number,contentSelections?:SurveyContentSelection[]){
+export async function prepareWave(userId:string,projectId:string,waveId:string,revision:number,contentSelections?:SurveyContentSelection[],participantFeedback?:SurveyParticipantFeedbackSelection[]){
   enabled()
-  return freezeResearchWaveDraft({actorUserId:userId,projectId,waveId,revision,contentSelections})
+  return freezeResearchWaveDraft({actorUserId:userId,projectId,waveId,revision,contentSelections,participantFeedback})
 }
 export async function openWave(userId:string,projectId:string,waveId:string,revision:number){
   enabled()
