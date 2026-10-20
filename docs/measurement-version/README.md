@@ -302,3 +302,11 @@ FINAL 解释补齐实际 Scale/SJT v1 存储结构：它们只有 privateScoring
 验证：formatter/真实 reader 投影/既有 ticket 服务共 37 个定向合同、strict TypeScript 与 diff 检查通过。包含默认六格式不启用解释、真实加密 FINAL/binding 读取、错误 hash/来源变化拒绝、旧数据不补算。数据库访问使用 mock，未声称真实 HTTP/并发或全链验收。
 
 7B 数据库格式约束使用新的增量迁移 20261020041000_survey_interpretation_exports 扩展到七种格式；旧六种全部保留，不修改已应用迁移。隔离 PG single-user 执行该新迁移及一次幂等重复应用后，真实插入七种格式各一份 ticket 成功，非法格式被原命名 CHECK 拒绝。此前 formatter/ticket mock 合同不代表该 SQL 边界已通过，现以单独 SQL 证据补齐；仍非应用 HTTP/并发验收。
+
+### 研究者读取固定解释的报告视图
+
+新增研究者 GET `/api/survey/projects/:pid/analytics/waves/:wid/finals/:finalId/reports/:instrumentKey`，沿现有 analytics flag、Survey 认证及五分钟近期 MFA。内部 reader 只读取该项目/波次下精确一个 FINAL，禁止 raw/attendance/cursor 混用，复用原有 hash/绑定/来源前后 fence；不扫整波次。最终短事务再次核当前 owner/grant/MFA、项目 revision、该 FINAL 的当前纳入范围与 hash。
+
+渲染只消费已保存事实/解释及精确报告模板，按报告 metricKeys 白名单，不重新计分或匹配参考。返回 accessAudience=researcher，与模板 intendedAudience 分开；选了 student 模板也不把结果送给被试。当前参考撤回以独立 lifecycle notice 呈现，保存的 FINAL 数值不改变；measurement/report 撤回不能新生成此视图。READY 并非已存渲染工件，因此没有借“历史已生成报告”放行首次渲染。普通 superseded/retired 保原版本。
+
+23 项实际 reader/报告服务定向合同、strict TypeScript 通过；无真实 HTTP/并发。当前完成的是研究者读取 API，研究者 UI、被试显式允许反馈、独立新解释 artifact 仍未完成。被试 GENERAL 合同不变，不以此步骤宣称整个报告闭环完成。

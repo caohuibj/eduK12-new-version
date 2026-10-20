@@ -424,6 +424,8 @@ export function surveyExclusiveSnapshotCutOff(timestamp:Date):Date {
 }
 type SurveySourceInput = {
   actorUserId:string;projectId:string;waveIds?:string[];maxFinals?:number;
+  /** Internal exact report read only; never forwarded from public raw/analytics inputs. */
+  finalId?:string;
   /** Only Wide exports need the schema of Waves with no completed FINAL. */
   includeWideSchema?:boolean
   /** Half-open FINAL completion-time slice for bounded per-wave exports. */
@@ -455,6 +457,9 @@ type SurveySourceInput = {
 }
 
 export async function loadSurveySource(input: SurveySourceInput): Promise<SurveySourceProjection> {
+  if(input.finalId!==undefined&&(!input.finalId||input.finalId.length>240||input.includeInterpretation!==true
+    ||input.selectRaw!==false||input.includeAttendance!==false||input.attendanceOnly||input.afterFinal||input.cognitiveTrials))
+    throw new SurveyAnalyticsError(400,'单份报告来源仅允许精确 FINAL、已存解释与非原始数据投影')
   if(input.waveIds&&input.waveIds.length>100)throw new SurveyAnalyticsError(413,'本次选择的波次数量超出安全上限')
   if(input.cognitiveTrials&&(!input.pageMode||!input.stableIdCursor||input.maxFinals!==1
     ||input.waveIds?.length!==1||input.includeAttendance!==false||input.attendanceOnly))
@@ -517,6 +522,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
     if(!Number.isFinite(cutOff.getTime()))throw new SurveyAnalyticsError(400,'分页时间水位非法')
     const sourceWhere:Prisma.SurveyWaveFinalWhereInput={
       projectId:input.projectId,
+      ...(input.finalId!==undefined?{id:input.finalId}:{}),
       ...(input.waveIds?.length?{waveId:{in:input.waveIds}}:{}),
       completedAt:{
         ...(input.completedFrom?{gte:input.completedFrom}:{}),

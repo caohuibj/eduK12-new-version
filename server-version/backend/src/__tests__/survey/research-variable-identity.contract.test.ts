@@ -115,6 +115,33 @@ describe('Frozen Survey raw variable identity',()=>{
     f.result.interpretation.contentBindingHash='f'.repeat(64);f.final.resultsHash=canonicalHash(f.result);f.final.resultsCipher=encryptUnifiedRuntimePayload(f.result)
     await expect(loadSurveySource({...owner,selectRaw:false,selectScore:false,includeInterpretation:true})).rejects.toMatchObject({statusCode:409})
   })
+  it('internally filters a single FINAL under owner scope in both passes without weakening projection rules',async()=>{
+    const f=fixture([formUnit('form',[question('ordinary')])],{form:{ordinary:1}})
+    const original=f.tx.$queryRaw.getMockImplementation()!
+    f.tx.$queryRaw.mockImplementation(async parts=>surveyFixtureSql(parts).includes('content_binding_cipher AS cipher')
+      ?[{id:'synthetic-attempt',cipher:null,hash:null}] as never:original(parts))
+    const exact={...owner,finalId:f.final.id,selectRaw:false as const,includeInterpretation:true,pageMode:true}
+    const result=await loadSurveySource(exact)
+    expect(result.completeAttempts).toBe(1);expect(result.raw).toEqual([])
+    expect(result.interpretations).toHaveLength(1)
+    const headers=f.tx.surveyWaveFinal.findMany.mock.calls.filter(([args])=>(args as any).select?.publicationId===true&&(args as any).select?.resultsCipher!==true)
+    expect(headers).toHaveLength(2)
+    for(const [args] of headers)expect((args as any).where).toMatchObject({id:f.final.id,projectId:owner.projectId,waveId:{in:owner.waveIds}})
+    for(const [args] of f.tx.surveyWaveFinal.count.mock.calls)expect((args as any).where).toMatchObject({id:f.final.id,projectId:owner.projectId})
+    for(const change of [{includeInterpretation:false},{selectRaw:undefined},{includeAttendance:true},{afterFinal:{id:f.final.id,completedAt:new Date()}}])
+      await expect(loadSurveySource({...exact,...change})).rejects.toMatchObject({statusCode:400})
+  })
+  it('returns no match for an absent scoped FINAL and rejects unowned project before looking up its id',async()=>{
+    const f=fixture([formUnit('form',[question('ordinary')])],{form:{ordinary:1}})
+    f.tx.surveyWaveFinal.findMany.mockResolvedValue([]);f.tx.surveyWaveFinal.count.mockResolvedValue(0)
+    const exact={...owner,finalId:'00000000-0000-0000-0000-000000000099',selectRaw:false as const,includeInterpretation:true,pageMode:true}
+    const missing=await loadSurveySource(exact)
+    expect(missing.completeAttempts).toBe(0);expect(missing.sourceFinalCount).toBe(0);expect(missing.interpretations).toEqual([])
+    f.tx.surveyWaveFinal.findMany.mockClear();f.tx.surveyWaveFinal.count.mockClear()
+    f.tx.$queryRaw.mockResolvedValue([])
+    await expect(loadSurveySource(exact)).rejects.toMatchObject({statusCode:404})
+    expect(f.tx.surveyWaveFinal.findMany).not.toHaveBeenCalled();expect(f.tx.surveyWaveFinal.count).not.toHaveBeenCalled()
+  })
   it('exports valid hyphen and underscore item keys without collision',async()=>{
     const unit=formUnit('form',[question('q-a'),question('q_a')])
     fixture([unit],{form:{'q-a':1,q_a:2}})

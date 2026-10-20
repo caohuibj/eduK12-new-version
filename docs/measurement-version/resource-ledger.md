@@ -47,3 +47,5 @@
 | R20 | FINAL固定数值解释 | final-interpretation.service.ts、submitResearchFinal；Reference Core | 已有FINAL入口与权限；binding存在才解释；无新flag | 60目标合同/strict tsc，非容量/并发 | scorer只原路径一次；每答只存个人数值+状态和bindingHash，模板/来源/常模包共享；幂等重放不解释 | V08 | 原选择成员/身份、层级撤回、finite/质量、receipt白名单 | FINAL解释已接；报告读取/显式新解释另接 | 历史读取不可重新select/resolve；READY不等于被试披露权 |
 
 | R21 | 7B独立解释导出 | analytics.interpretation-export.ts、analytics.source/export服务 | INTERPRETATION_LONG显式opt-in；近期MFA/当前owner；不变生产flags | 37目标合同、strict tsc；非容量实测 | 默认格式不读binding；新格式批量receipt读有8MiB预算/前后fence，复用2MiB加密ticket与10分钟保留 | V08/7B | 不重算、不复制模板/manifest；cursor精确；撤权/源变化拒绝 | 实际API已接，UI另接 | FINAL状态≠当前release状态；不削弱下载再次授权或来源fence |
+
+| R22 | 研究者单份报告视图 | report-results.service.ts、analytics.source finalId内部filter | 既有analytics flag/认证/近期MFA/当前owner | reader+service23合同、strict tsc；非HTTP/容量实测 | 精确单FINAL，复用已存数值，不重计分/重选；模板共享按需读取，未重复落每答全文 | V07–V08 | 来源前后fence、末锁scope/hash、metric白名单、撤回不得首次渲染 | 研究者API已接，UI/被试/新解释另接 | accessAudience不由模板intendedAudience授予；不将READY当已有报告artifact |

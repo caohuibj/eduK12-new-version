@@ -1,3 +1,4 @@
+import {readSurveyStoredReport} from './report-results.service'
 import { Router,type Request,type Response,type NextFunction } from 'express'
 import { z } from 'zod'
 import { surveyAnalyticsItemRequestSchema } from './analytics.request'
@@ -119,4 +120,11 @@ surveyAnalyticsRouter.post('/:pid/analytics/paired-scores',wrap(async req=>{
     actorUserId:req.user!.userId,
     projectId:id.parse(req.params.pid),...measurement.parse(req.body),
   })
+}))
+
+
+surveyAnalyticsRouter.get('/:pid/analytics/waves/:wid/finals/:finalId/reports/:instrumentKey',wrap(async req=>{
+  assertRecentSurveyMfa(req)
+  return readSurveyStoredReport(req.user!.userId,{projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid),
+    finalId:id.parse(req.params.finalId),instrumentKey:key.parse(req.params.instrumentKey)})
 }))
