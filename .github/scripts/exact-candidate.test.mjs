@@ -271,3 +271,20 @@ test('all automatic workflow entry points are inventoried and standalone exact b
   assert.match(workflow,/Detect publication-relevant changes\n        if: steps.exact.outputs.handled != 'true'/);
   assert.match(workflow,/npm ci --ignore-scripts\n        if: steps.scope.outputs.relevant == 'true'/);
 });
+
+test('optional legacy step plans remain parseable before false route conditions are applied',()=>{
+  const main=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  const expressions=[...main.matchAll(/fromJSON\((steps\.scope\.outputs\.[a-z_]+)([^)]*)\)/g)];
+  assert.equal(expressions.length,1);
+  for(const [,name,fallback] of expressions) {
+    assert.equal(name,'steps.scope.outputs.homepage_copy_plan');
+    assert.equal(fallback," || '{}'");
+  }
+  const outputs=exactCandidateOutputs(plan);
+  assert.equal(outputs.homepage_copy_plan,undefined);
+  assert.equal(JSON.parse(outputs.homepage_copy_plan || '{}').base,undefined);
+  const homepage={base:'a'.repeat(40)};
+  assert.deepEqual(JSON.parse(JSON.stringify(homepage) || '{}'),homepage);
+  assert.throws(()=>JSON.parse('invalid' || '{}'));
+  assert.match(main,/if: steps.scope.outputs.application_route == 'homepage-copy' && github.event_name == 'pull_request'/);
+});

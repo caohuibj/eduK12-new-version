@@ -404,7 +404,7 @@ jobs:
       - name: homepage copy boundary and affected routing contracts
         if: steps.scope.outputs.application_route == 'homepage-copy' && github.event_name == 'pull_request'
         env:
-          CI_BASE_SHA: ${{ fromJSON(steps.scope.outputs.homepage_copy_plan).base }}
+          CI_BASE_SHA: ${{ fromJSON(steps.scope.outputs.homepage_copy_plan || '{}').base }}
         run: node --test .github/scripts/homepage-copy.test.mjs .github/scripts/campus-scope.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/maintenance-routing.test.mjs .github/scripts/dependency-routing.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs
 
       - name: frozen assessment durability, routing and reuse refusal contracts
