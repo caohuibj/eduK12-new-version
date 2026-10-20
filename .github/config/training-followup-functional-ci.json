@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "mode": "training-followup-functional-only",
+  "base": "f41dca3f347b253b500de600c75855ffcd275491",
+  "reason": "The owner paused additional Training optimization and pressure tests. Qualify the already reviewed followup on the merged administrator main, retaining all functional, security, migration, browser, image and merge gates; omit only the named 200-completion and phase-0 performance tasks.",
+  "sourcePaths": [
+    "docs/performance/20261020-training-burst-baseline.md",
+    "docs/performance/20261020-training-final-single.md",
+    "docs/performance/20261020-training-load-startup.md",
+    "docs/performance/20261020-training-main-alignment.md",
+    "docs/performance/20261020-training-single-baseline.md",
+    "docs/performance/20261020-training-storage-optional-profile.md",
+    "docs/performance/20261020-training-storage-profile.md",
+    "docs/performance/20261020-training-two-reuse-patch.md",
+    "server-version/backend/src/__tests__/cognitive/frozen-report-storage.test.ts",
+    "server-version/backend/src/__tests__/composite/training-checkpoint.contract.test.ts",
+    "server-version/backend/src/__tests__/composite/training-flow-assignment-snapshot.test.ts",
+    "server-version/backend/src/__tests__/composite/training-flow-materialization-reuse.test.ts",
+    "server-version/backend/src/modules/cognitive/profile-freeze.ts",
+    "server-version/backend/src/modules/composite/composite.service.ts",
+    "server-version/backend/src/modules/composite/training-checkpoint.service.ts",
+    "server-version/backend/src/modules/composite/training-flow-scope.ts",
+    "server-version/scripts/load/training-burst-followup.mjs",
+    "server-version/scripts/load/training-followup.mjs"
+  ]
+}

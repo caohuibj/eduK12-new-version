@@ -29,8 +29,9 @@ async function limits(tx: Prisma.TransactionClient) {
   await tx.$executeRawUnsafe("SET LOCAL lock_timeout = '500ms'")
   await tx.$executeRawUnsafe("SET LOCAL statement_timeout = '2000ms'")
 }
-/** Compact authorization header only. No score, report, trial or answer ciphertext is fetched. */
-async function access(tx: Prisma.TransactionClient, attemptId: string, principal: Principal, epoch?: number) {
+/** No score, report, trial or answer ciphertext. Only SAVE loads the frozen slot
+ * carrier in the locked parent read; GET/CLEAR retain their compact projection. */
+async function access(tx: Prisma.TransactionClient, attemptId: string, principal: Principal, epoch?: number, includeFrozenSlots=false) {
   const known = await tx.compositeAssessmentAttempt.findUnique({where:{id:attemptId},select:{compositeAssessmentId:true,deliveryCourseId:true,trainingPersistenceSnapshotHash:true}})
   if (!known?.deliveryCourseId || !known.trainingPersistenceSnapshotHash) fail(403,'此作答未启用 Training 草稿')
   await tx.$queryRaw`SELECT id FROM composite_assessments WHERE id=${known!.compositeAssessmentId} FOR SHARE`
@@ -39,6 +40,7 @@ async function access(tx: Prisma.TransactionClient, attemptId: string, principal
   const attempt = await tx.compositeAssessmentAttempt.findUnique({where:{id:attemptId},select:{id:true,compositeAssessmentId:true,deliveryCourseId:true,
     userId:true,recoveryTokenHash:true,attemptEpoch:true,status:true,deliveryMode:true,runtimeGeneration:true,
     trainingPersistenceSnapshot:true,trainingPersistenceSnapshotHash:true,frozenActiveSlotSetHash:true,trainingTimingSnapshot:true,
+    ...(includeFrozenSlots?{frozenActiveSlotSetEncrypted:true as const}:{}),
     compositeAssessment:{select:{id:true,publishedAt:true,status:true,productKind:true,questionnaireType:true,
       trainingFlowDigest:true,trainingVariantDigest:true,expiresAt:true,trainingPersistencePolicyHash:true}},
     accessToken:{select:{trainingRoundId:true,trainingRound:{select:{id:true,courseId:true,compositeId:true,publicationHash:true,closesAt:true}}}},
@@ -80,9 +82,8 @@ export function assertTrainingCheckpointBounds(value: unknown, depth = 0, budget
 async function validateDrafts(tx: Prisma.TransactionClient, context: Awaited<ReturnType<typeof access>>, envelope: TrainingCheckpointSave['envelope']) {
   const a = context.attempt
   if (envelope.snapshotHash !== a.trainingPersistenceSnapshotHash || envelope.definitionHash !== a.frozenActiveSlotSetHash) fail(409,'草稿冻结摘要不匹配')
-  const carrier = await tx.compositeAssessmentAttempt.findUniqueOrThrow({where:{id:a.id},select:{frozenActiveSlotSetEncrypted:true}})
-  if (!carrier.frozenActiveSlotSetEncrypted) fail(409,'冻结工具缺失')
-  const frozen = await loadFrozenActiveSlotSet(carrier.frozenActiveSlotSetEncrypted!)
+  if (!a.frozenActiveSlotSetEncrypted) fail(409,'冻结工具缺失')
+  const frozen = await loadFrozenActiveSlotSet(a.frozenActiveSlotSetEncrypted!)
   if (frozen.snapshotHash !== a.frozenActiveSlotSetHash || frozen.attemptEpoch !== a.attemptEpoch) fail(409,'冻结工具版本不匹配')
   const slots = new Map(frozen.slots.map(slot=>[slot.slotKey,slot]))
   const keys = envelope.drafts.map(d=>d.slotKey)
@@ -165,7 +166,7 @@ export async function saveTrainingCheckpoint(attemptId:string,principal:Principa
   const encoded=encodeTrainingCheckpointEnvelope(input.envelope)
   return prisma.$transaction(async tx=>{
     await limits(tx)
-    const c=await access(tx,attemptId,principal,input.attemptEpoch)
+    const c=await access(tx,attemptId,principal,input.attemptEpoch,true)
     if(c.closed){await clearPayload(tx,attemptId);return {closed:true}}
     let row=await tx.trainingAttemptCheckpoint.findUnique({where:{attemptId}})
     if (row?.payloadEncrypted && row.expiresAt && row.expiresAt<=c.now) {

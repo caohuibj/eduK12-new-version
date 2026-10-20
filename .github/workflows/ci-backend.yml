@@ -13,6 +13,9 @@ on:
       admin_permissions_functional:
         type: boolean
         default: false
+      training_followup_functional:
+        type: boolean
+        default: false
 
 permissions:
   contents: read
@@ -243,9 +246,13 @@ jobs:
         if: ${{ !inputs.run_performance_tests }}
         run: node "$GITHUB_WORKSPACE/.github/scripts/training-functional-report.mjs" /tmp/eduk12-backend-functional-vitest.json
       - name: administrator real PostgreSQL, HTTP, ceremony and migration recovery contracts
-        if: inputs.admin_permissions_functional
+        if: inputs.admin_permissions_functional || inputs.training_followup_functional
         timeout-minutes: 8
         env:
+          TRAINING_FOLLOWUP_FUNCTIONAL: ${{ inputs.training_followup_functional }}
+          RUN_PERFORMANCE_TESTS: ${{ inputs.run_performance_tests }}
+          CI_EVENT: ${{ github.event_name }}
+          CI_FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
           CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
           ADMIN_PERMISSIONS_ISOLATED_TEST: '1'
@@ -265,6 +272,10 @@ jobs:
           ADMIN_PASSWORD: ci-admin-permissions-reference-2026
         run: |
           set -euo pipefail
+          if [ "$TRAINING_FOLLOWUP_FUNCTIONAL" = true ]; then
+            test "$RUN_PERFORMANCE_TESTS" = false
+            node "$GITHUB_WORKSPACE/.github/scripts/training-functional.mjs" verify-followup
+          fi
           umask 077
           mkdir -p "$ADMIN_PERMISSIONS_PRIVATE_DIR" "$UPLOAD_DIR" "$EXPORT_DIR"
           admin_api_pid=''
@@ -307,14 +318,14 @@ jobs:
           assert.equal(rehearsal.dumpRestorePreserved,true);assert.equal(rehearsal.restrictedRuntime,true);
           assert.equal(read('rollback-current.json').result,'PASS');assert.equal(read('rollback-old.json').result,'DENIED');
           writeFileSync(process.env.RUNNER_TEMP+'/admin-permissions-functional-summary.json',JSON.stringify({
-            result:'PASS',head:process.env.GITHUB_SHA,mode:'admin-permissions-functional-only',
+            result:'PASS',head:process.env.GITHUB_SHA,mode:process.env.TRAINING_FOLLOWUP_FUNCTIONAL==='true'?'training-followup-functional-only':'admin-permissions-functional-only',
             tests:{total:tests.numTotalTests,passed:tests.numPassedTests,pending:0,failed:0},
             additiveReplayPreserved:true,dumpRestorePreserved:true,restrictedRuntime:true,
             codeRollback:{current:'PASS',oldBase:'DENIED'},rawDatabaseUploaded:false,productionAccess:false,
           },null,2),{mode:0o600});
           NODE
       - name: upload administrator functional summary only
-        if: inputs.admin_permissions_functional && always()
+        if: (inputs.admin_permissions_functional || inputs.training_followup_functional) && always()
         uses: actions/upload-artifact@v4
         with:
           name: admin-permissions-functional-${{ github.sha }}
