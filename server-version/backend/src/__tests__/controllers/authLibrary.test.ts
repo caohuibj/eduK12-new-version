@@ -87,7 +87,8 @@ describe('current user mobile bootstrap contract', () => {
   it.each(['STUDENT', 'PARENT', 'TEACHER', 'ADMIN'])('adds versioned discovery for %s without credentials or child/report grants', async role => {
     mockPrisma.user.findUnique.mockResolvedValue({ id: 'u', username: 'u', role, nickname: 'user', isActive: true, isFrozen: false, expiresAt: null, teacherApproved: true, mustChangePassword: false })
     const res = makeRes()
-    await authController.me({ user: { userId: 'u' } } as any, res)
+    await authController.me({ user: { userId: 'u', role, businessRole: role, platformRole: 'STANDARD',
+      entryGrants: role === 'ADMIN' ? [{ entry: 'TRAINING', version: 1 }] : [] } } as any, res)
     expect(res.statusCode).toBe(200)
     expect(res.body.data.mobile.activeRole).toBe(role)
     expect(res.body.data.mobile.capabilities.canReadChildReports).toBe(false)

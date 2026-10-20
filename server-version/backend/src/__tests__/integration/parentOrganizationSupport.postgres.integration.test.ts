@@ -35,7 +35,7 @@ async function user(
   role: 'ADMIN' | 'STUDENT' | 'TEACHER' | 'PARENT',
   system = false,
 ) {
-  return prisma.user.create({
+  const created = await prisma.user.create({
     data: {
       username: 'support-test-' + randomUUID(),
       role,
@@ -44,6 +44,8 @@ async function user(
       passwordHash: 'test-only',
     },
   })
+  if(role==='ADMIN')await prisma.adminEntryGrant.create({data:{id:randomUUID(),userId:created.id,entry:'TRAINING',grantedBy:created.id}})
+  return created
 }
 const actor = (u: Awaited<ReturnType<typeof user>>) => ({
   userId: u.id,
@@ -86,6 +88,7 @@ async function request(
             username: u.username,
             role: u.role,
             tokenVersion: u.tokenVersion,
+            adminVerifiedAt: Math.floor(Date.now()/1000), adminSessionId: randomUUID(),
           })),
       'X-CSRF-Token': 'support-csrf',
       'Content-Type': 'application/json',

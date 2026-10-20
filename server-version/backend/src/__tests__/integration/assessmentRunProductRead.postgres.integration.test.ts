@@ -84,6 +84,7 @@ const authHeaders = (user: TestUser, csrf = `csrf-${suffix}`): Record<string, st
     username: user.username,
     role: user.role,
     tokenVersion: user.tokenVersion,
+    adminVerifiedAt: Math.floor(Date.now()/1000), adminSessionId: randomUUID(),
   }))}; ${CSRF_COOKIE_NAME}=${encodeURIComponent(csrf)}`,
   [CSRF_HEADER_NAME]: csrf,
   'content-type': 'application/json',
@@ -245,6 +246,7 @@ suite('PR5 Run product read models (real PostgreSQL)', () => {
     await db.$executeRaw`UPDATE "assessment_run_executions" SET "runtime_binding_kind" = 'COMPOSITE', "runtime_binding_ref" = ${runtimeRef} WHERE "id" = ${task.executionId}`
     await db.user.update({ where: { id: student.id }, data: { role: UserRole.ADMIN } })
     await db.user.update({ where: { id: outsider.id }, data: { role: UserRole.ADMIN } })
+    await db.adminEntryGrant.createMany({data:[student.id,outsider.id].map(userId=>({id:randomUUID(),userId,entry:'TRAINING',grantedBy:owner.id}))})
     expect((await jsonRequest(`/api/runtime-probe/${runtimeRef}`, student)).status).toBe(200)
     expect((await jsonRequest(`/api/runtime-probe/${runtimeRef}`, outsider)).status).toBe(403)
     expect((await jsonRequest(`/api/runtime-probe/${randomUUID()}`, student)).status).toBe(403)

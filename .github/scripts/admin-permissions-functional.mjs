@@ -23,6 +23,8 @@ const exactSources = new Set([
   'server-version/e2e/ops-export-worker-smoke.ts',
   'server-version/e2e/qa-round3-browser-e2e.cjs',
   'server-version/e2e/qa-round5-sjt-upload-browser-e2e.cjs',
+  'server-version/miniprogram-v2/domains/account/service.js',
+  'server-version/miniprogram-v2/tests/runtime.test.cjs',
 ]);
 const sourcePath = path => canonical(path) && (exactSources.has(path)
   || /^server-version\/(backend|frontend)\/src\/.+\.(ts|tsx|css)$/.test(path)

@@ -15,6 +15,7 @@ suite('Survey immutable catalog grants PostgreSQL',()=>{
  beforeAll(async()=>{
   requireIsolatedReleaseDatabase(url!);db=new PrismaClient({datasources:{db:{url:url!}}});await db.$connect()
   admin=(await db.user.create({data:{username:'catalog-admin-'+randomUUID(),passwordHash:'synthetic',role:'ADMIN',platformRole:'SYSTEM_ADMIN',accountDomain:'LEGACY'}})).id
+  await db.adminEntryGrant.create({data:{id:randomUUID(),userId:admin,entry:'SURVEY',grantedBy:admin}})
   const ids=[]
   for(let i=0;i<2;i++){
    const login='catalog_'+randomUUID().replace(/-/g,'').slice(0,16);const u=await db.user.create({data:{username:login,passwordHash:'synthetic',role:'STUDENT',accountDomain:'SURVEY'}})

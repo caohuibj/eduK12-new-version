@@ -124,7 +124,7 @@ suite('PR4 delivery, Safety and CSV authority gate (real PostgreSQL/HTTP)', () =
       .rejects.toMatchObject({ code: 'REPORT_NOT_FOUND' })
     await expect(readOrganizationSafetyCase({ ...caseInput, organizationId: randomUUID() })).rejects.toMatchObject({ code: 'REPORT_NOT_FOUND' })
 
-    const token = generateToken({ userId: owner.id, username: owner.username, role: owner.role, tokenVersion: owner.tokenVersion })
+    const token = generateToken({ userId: owner.id, username: owner.username, role: owner.role, tokenVersion: owner.tokenVersion, adminVerifiedAt: Math.floor(Date.now()/1000), adminSessionId: randomUUID() })
     const headers = { 'content-type': 'application/json', cookie: `${AUTH_COOKIE_NAME}=${token}; ${CSRF_COOKIE_NAME}=pr4-csrf`, [CSRF_HEADER_NAME]: 'pr4-csrf' }
     const response = await fetch(`${baseUrl}/api/organizations/${orgId}/reporting/exports`, { method: 'POST', headers, body: JSON.stringify(exportInput.target) })
     expect(response.status).toBe(200)

@@ -63,6 +63,7 @@ suite('Survey realm, TOTP and project ACL — isolated PostgreSQL',()=>{
       accountDomain:'LEGACY',platformRole:'SYSTEM_ADMIN',
     }})
     adminId=admin.id
+    await db.adminEntryGrant.create({data:{id:randomUUID(),userId:adminId,entry:'SURVEY',grantedBy:adminId}})
     const app=express()
     app.use(express.json())
     app.use('/api',csrfProtection)

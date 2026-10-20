@@ -1,18 +1,21 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { UserRole } from '../../types'
 
-const { mockPrisma } = vi.hoisted(() => ({
+const { mockPrisma, revoked } = vi.hoisted(() => ({
+  revoked: vi.fn(),
   mockPrisma: {
     $queryRaw: vi.fn(),
   },
 }))
 
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
+vi.mock('../../utils/sessionRevocation', () => ({ isSessionRevoked: revoked }))
 
 import { SocketService } from '../../services/socketService'
 
 const makeRemoteSocket = (data: Record<string, unknown>) => ({
   data,
+  handshake: { headers: { cookie: 'ptool_session=synthetic-session-verified-at-handshake' } },
   disconnect: vi.fn(),
 })
 
@@ -21,6 +24,8 @@ const principalRow = (overrides: Record<string, unknown> = {}) => [{
   username: 'teacher-1',
   role: UserRole.TEACHER,
   platformRole: 'STANDARD',
+  accountDomain: 'TRAINING',
+  entryGrants: [],
   isActive: true,
   isFrozen: false,
   expiresAt: null,
@@ -33,6 +38,7 @@ const principalRow = (overrides: Record<string, unknown> = {}) => [{
 describe('SocketService manager room revalidation', () => {
   beforeEach(() => {
     vi.clearAllMocks()
+    revoked.mockResolvedValue(false)
   })
 
   it('disconnects a manager whose account is no longer active', async () => {

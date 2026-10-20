@@ -35,7 +35,7 @@ function needsFor(){
 
 test('administrator integration declares its own exact main base, complete reviewed source paths and only two omissions',()=>{
   assert.equal(config.base,'c3f9a7e77447c706f4a83a93c7429a7bcb164e94');
-  assert.equal(config.mode,'admin-permissions-functional-only');assert.equal(config.sourcePaths.length,131);
+  assert.equal(config.mode,'admin-permissions-functional-only');assert.equal(config.sourcePaths.length,153);
   assert.deepEqual(ADMIN_FUNCTIONAL_OMISSIONS,['aggregate-report-200-completion','perf-phase0-smoke']);
   assert.equal(validAdminFunctionalPlan(plan()),true);
   assert.equal(plan().mode,ADMIN_FUNCTIONAL_MODE);

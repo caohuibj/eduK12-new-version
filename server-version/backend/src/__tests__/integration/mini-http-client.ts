@@ -1,8 +1,21 @@
 import {createRequire} from 'node:module'
 import {expect} from 'vitest'
+import {randomUUID} from 'node:crypto'
+import {generateToken} from '../../utils/jwt'
 const require=createRequire(import.meta.url)
 const {createRuntime}=require('../../../../miniprogram-v2/app/bootstrap/index.js')
 export const nativeRequire=require
+// Protected-operation fixtures start after authentication. This signed server
+// fixture is not evidence that the native password entrance supports WebAuthn;
+// separate admission/ceremony cases cover that boundary over real HTTP.
+export async function restoreVerifiedMiniFixture(c:any,user:any,origin='https://mini-http-fixture.example'){
+ if(process.env.NODE_ENV!=='test')throw new Error('Synthetic test session only')
+ const {createStorage}=require('../../../../miniprogram-v2/core/storage/index.js')
+ const token=generateToken({userId:user.id,username:user.username,role:user.role,tokenVersion:user.tokenVersion,
+  accountDomain:user.accountDomain,adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID()})
+ await createStorage(c.platform,origin).writeSession({version:1,cookies:{ptool_session:{value:token,expiresAt:Date.now()+3600000}}})
+ await c.runtime.session.restore()
+}
 export function miniHttpClient(baseUrl:string){
  const stored=new Map(),calls:any[]=[]
  const platform={canIUse:()=>true,request(options:any){calls.push(options);const url=new URL(options.url);void fetch(baseUrl+url.pathname+url.search,{method:options.method,headers:{...options.header,'Content-Type':'application/json'},body:['GET','HEAD'].includes(options.method)?undefined:JSON.stringify(options.data)}).then(async res=>options.success({statusCode:res.status,header:Object.fromEntries(res.headers),cookies:res.headers.getSetCookie(),data:await res.json()})).catch(options.fail)},getNetworkType(o:any){o.success({networkType:'wifi'})},onNetworkStatusChange(){},setStorage(o:any){expect(o.encrypt).toBe(true);stored.set(o.key,structuredClone(o.data));o.success({})},getStorage(o:any){expect(o.encrypt).toBe(true);if(stored.has(o.key))o.success({data:structuredClone(stored.get(o.key))});else o.fail({errMsg:'getStorage:fail data not found'})},removeStorage(o:any){stored.delete(o.key);o.success({})}}
