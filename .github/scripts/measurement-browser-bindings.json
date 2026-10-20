@@ -12,7 +12,9 @@
     "server-version/backend/scripts/measurement-browser-fixture.ts",
     "server-version/e2e/measurement-version-browser.cjs",
     "server-version/e2e/measurement-browser-proxy.cjs",
-    "server-version/e2e/measurement-version-journeys.cjs"
+    "server-version/e2e/measurement-version-journeys.cjs",
+    "server-version/e2e/helpers/measurement-response-loss.cjs",
+    "server-version/e2e/helpers/measurement-response-loss.test.cjs"
   ],
   "fixedBuildSource": {
     "repository": "caohuibj/eduK12-new-version",
@@ -79,6 +81,24 @@
     },
     "fixtureBefore": "4fd705b7bf2f3fe7b94f9419fff4e26fe6b6bdc2",
     "fixtureAdminSliceSha256": "80c6a08f4637d3c1707f11057cc99f08cb48312f15c0f13b72a05f2e1e2a4357",
-    "runtimeConfigurationSha256": "8b6e8ef6493a3646d3b00741e897d1e558d5d5831565b3d56edded38593efba7"
+    "runtimeConfigurationSha256": "8b6e8ef6493a3646d3b00741e897d1e558d5d5831565b3d56edded38593efba7",
+    "reviewedTestToolRepairs": {
+      "server-version/e2e/measurement-version-browser.cjs": {
+        "before": "fd0a09370114b358bbe929c674add25dda711007",
+        "after": "0e6c9d7a2cb360c9865ae3a357deedb22707b77a",
+        "reason": "Independently reviewed failure-only callback barriers and journeys-only loopback fault injection; original admin assertions and product unchanged. New admin failure paths are not claimed tested."
+      },
+      "server-version/e2e/measurement-version-journeys.cjs": {
+        "before": "3f81de54bed5897091881c26d34eade9bf40ce92",
+        "after": "fcc0cc3e38bed519264398cccc80779e8df51ae3",
+        "reason": "Independently reviewed failure-only callback barriers and journeys-only loopback fault injection; original admin assertions and product unchanged. New admin failure paths are not claimed tested."
+      }
+    },
+    "adminRunnerSuccessSha256": "1ae187bc47d82446fb1bd3e58bde433fe69cb2c8ed90f7e93a36569240e8d60d",
+    "adminLocatorSha256": "0624cbdcb267b8db3a845373f63d326c18ffae2dbd23e8980b52df582f6bec7c",
+    "newFailureGuardTools": {
+      "server-version/e2e/helpers/measurement-response-loss.cjs": "713afdb39ede0a0ee17d99cf59103302f851ea09",
+      "server-version/e2e/helpers/measurement-response-loss.test.cjs": "63d13177b2ccfbac02a91780a4e52228a291a1a7"
+    }
   }
 }

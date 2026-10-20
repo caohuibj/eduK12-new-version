@@ -6,6 +6,7 @@ const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const path = require('node:path')
 const { createHmac } = require('node:crypto')
+const { createResponseLoss } = require('./helpers/measurement-response-loss.cjs')
 
 // Playwright's getByLabel(..., {exact:true}) reads a wrapping label's
 // descendant option text too. Target the explicitly named wrapping label and
@@ -80,7 +81,7 @@ async function formalReferenceJourney({ page, browser, fixture: f, output, check
   check(formal.sampleCount === 5 && formal.analyzerId === f.teacher.id, 'UI formal submission preserves exact source candidate and analyzer identity')
   const context = await browser.newContext({ viewport: { width: 1440, height: 960 } }), reviewer = await context.newPage(), errors = []
   reviewer.on('pageerror', error => errors.push(error.name))
-  reviewer.on('dialog', dialog => dialog.accept())
+  reviewer.on('dialog', dialog => dialog.accept().catch(() => errors.push('DialogHandlingFailure')))
   reviewer.setDefaultTimeout(20000)
   try {
     await reviewer.goto(f.trainingUrl + '/teacher/account-login')
@@ -118,7 +119,7 @@ async function trainingJourney({ browser, fixture: f, output, check, prepareFina
   const context = await browser.newContext({ acceptDownloads: true, viewport: { width: 1440, height: 960 } })
   const page = await context.newPage(), errors = []
   page.on('pageerror', error => errors.push(error.name + ': ' + error.message))
-  page.on('dialog', dialog => dialog.accept())
+  page.on('dialog', dialog => dialog.accept().catch(() => errors.push('DialogHandlingFailure')))
   page.setDefaultTimeout(20000)
   try {
     await page.goto(base + '/teacher/account-login')
@@ -141,17 +142,8 @@ async function trainingJourney({ browser, fixture: f, output, check, prepareFina
     await selection.getByRole('button', { name: '读取可选报告与参考', exact: true }).click()
     await selection.getByLabel('报告 ' + f.itemId, { exact: true }).selectOption(f.report.releaseId)
     const endpoint = '/api/questionnaire-products/' + f.product.id + '/content-report-selection'
-    let committed = null, lossCount = 0
-    const loseCommittedResponse = async route => {
-      if (route.request().method() !== 'POST') return route.continue()
-      lossCount++
-      const actual = await route.fetch()
-      assert.equal(actual.status(), 200, 'Recovery injection only after a real successful selection write')
-      const envelope = await actual.json()
-      assert.equal(envelope.code, 0)
-      committed = envelope.data
-      await route.abort('failed')
-    }
+    const loss = createResponseLoss()
+    const loseCommittedResponse = loss.handler
     await page.route('**' + endpoint, loseCommittedResponse)
     await selection.getByRole('button', { name: '保存报告选择', exact: true }).click()
     await selection.getByRole('button', { name: '核对原选择请求', exact: true }).waitFor()
@@ -159,11 +151,14 @@ async function trainingJourney({ browser, fixture: f, output, check, prepareFina
     // failure before inspecting the upstream commit or removing this route.
     await selection.getByRole('alert').waitFor()
     await page.unroute('**' + endpoint, loseCommittedResponse)
+    await loss.settled
+    assert.equal(loss.state.failure, null, 'Real upstream commit must be confirmed before recovery: ' + loss.state.failure)
+    const committed = loss.state.committed
     assert.ok(committed, 'Real server write completed before browser transport loss')
     await page.reload()
     await page.getByRole('button', { name: '核对原选择请求', exact: true }).click()
     await page.getByText('已核对：服务器当前已保存相同选择。', { exact: true }).waitFor()
-    check(lossCount === 1 && committed.trainingReportSelectionDraft.units[0].reportReleaseId === f.report.releaseId,
+    check(loss.state.requests === 1 && committed.trainingReportSelectionDraft.units[0].reportReleaseId === f.report.releaseId,
       'Report selection survives lost committed response and reload; UI reconciles original selection without resubmit')
     await page.getByRole('button', { name: '发布前自检', exact: true }).click()
     await page.getByRole('heading', { name: '当前草稿自检通过', exact: true }).waitFor()
@@ -273,7 +268,7 @@ async function surveyJourney({ browser, fixture: f, output, check }) {
   assert.equal(new URL(base).hostname, 'survey.eduk12.top')
   const context = await browser.newContext({ viewport: { width: 1440, height: 960 } }), page = await context.newPage(), errors = []
   page.on('pageerror', error => errors.push(error.name + ': ' + error.message))
-  page.on('dialog', dialog => dialog.accept())
+  page.on('dialog', dialog => dialog.accept().catch(() => errors.push('DialogHandlingFailure')))
   page.setDefaultTimeout(20000)
   try {
     await page.goto(base + '/login')

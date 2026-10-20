@@ -108,3 +108,27 @@ including shared setup and cleanup, is independently fingerprinted without those
 precise regions. The full new fixture blob remains explicitly pinned; this is
 not a generic permission to change arbitrary excluded code. Old success retains
 its original SHA/run/attempt and ten checks; current journeys get new evidence.
+
+## Fourth round: scoped transport and error-reporting repair
+
+Run `39401916198` reached five Training authoring/layout assertions before the
+journey fault-injection transport failed. Its unfinished report is not accepted
+as a whole-journey pass. Recreating the connected report in a fresh isolated
+fixture is required preparation for the missing recovery and downstream checks;
+it does not imply the old run completed. No private DB/session checkpoint is
+introduced.
+
+The repair forwards only the real synthetic selection POST through loopback TLS
+with canonical Host/SNI, the job CA, and normal certificate verification. New
+failure barriers prevent unhandled route/cleanup errors from disclosing request
+headers or leaving a PASS report after failure. The new helper contracts are run
+once locally; CI does not repeat them.
+
+Original administrator report/tool hashes remain unchanged in its provenance.
+Two exact reviewed test-tool before/after overlays are recorded separately;
+current blobs must match their approved after hashes while original report scope
+must match before hashes. Normalized successful administrator runner code and its
+imported locator helpers are additionally byte-bound. The new failure-only
+barriers are covered by new helper contracts/current journey execution, not
+retroactively claimed as exercised administrator failure scenarios. Original
+production build pins and fixture identity remain unchanged.

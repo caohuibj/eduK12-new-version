@@ -214,12 +214,48 @@ def admin_fixture_slice(fixture):
     return success + '}).finally(async () => {' + cleanup
 
 
+def admin_runner_success_slice(text):
+    # Reverse only this reviewed failure-barrier overlay. Whole after blobs are
+    # pinned separately; no unrelated edit can gain admission through this slice.
+    text = text.split('})().catch(async error=>{', 1)[0]
+    text = text.replace("const {guardRouteCallback}=require('./helpers/measurement-response-loss.cjs')\n", '')
+    text = text.replace('blockedExternalRequests:[],callbackFailures:[],', 'blockedExternalRequests:[],')
+    if 'function callbackFailure(scope)' in text:
+        start = text.index('function callbackFailure(scope)')
+        end = text.index('function save()', start)
+        text = text[:start] + text[end:]
+    text = text.replace("dialog=>dialog.accept().catch(()=>callbackFailure('admin-dialog'))", 'dialog=>dialog.accept()')
+    text = text.replace("guardRouteCallback(async route=>{", "async route=>{")
+    text = text.replace("},()=>callbackFailure('admin-response-loss')),{times:1})", "},{times:1})")
+    text = text.replace("guardRouteCallback(route=>{", "route=>{")
+    text = text.replace("},()=>callbackFailure('browser-network-route')))", "})")
+    text = text.replace("  assert.equal(evidence.callbackFailures.length,0,'Asynchronous browser callback failure')\n", '')
+    return text
+
+
+def admin_locator_slice(text):
+    return text.split('function labeledControl(scope, text, tag) {', 1)[1].split('async function responseData(response)', 1)[0]
+
+
 def admin_inputs():
     binding = json.loads(BINDING.read_text())
     pin = binding['fixedAdminSource']
     fixed_inputs('backend'); fixed_inputs('frontend')
     for file, blob in pin['unchangedTools'].items():
-        assert git('rev-parse', 'HEAD:' + file) == blob, 'Admin tool input changed: ' + file
+        repair = pin.get('reviewedTestToolRepairs', {}).get(file)
+        if repair:
+            assert repair['before'] == blob
+            assert git('rev-parse', 'HEAD:' + file) == repair['after'], 'Unreviewed admin test-tool repair'
+        else:
+            assert git('rev-parse', 'HEAD:' + file) == blob, 'Admin tool input changed: ' + file
+    if pin.get('reviewedTestToolRepairs'):
+        runner = (ROOT / 'server-version/e2e/measurement-version-browser.cjs').read_text()
+        journey = (ROOT / 'server-version/e2e/measurement-version-journeys.cjs').read_text()
+        assert hashlib.sha256(admin_runner_success_slice(runner).encode()).hexdigest() == pin['adminRunnerSuccessSha256']
+        assert hashlib.sha256(admin_locator_slice(journey).encode()).hexdigest() == pin['adminLocatorSha256']
+        for file, blob in pin['newFailureGuardTools'].items():
+            assert git('rev-parse', 'HEAD:' + file) == blob, 'Unreviewed failure guard'
+
     fixture = (ROOT / binding['fixedBuildSource']['fixtureRepair']['path']).read_text()
     admin_slice = admin_fixture_slice(fixture)
     assert hashlib.sha256(admin_slice.encode()).hexdigest() == pin['fixtureAdminSliceSha256'], 'Admin fixture inputs changed'

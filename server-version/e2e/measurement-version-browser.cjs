@@ -11,6 +11,7 @@ const fs=require('node:fs')
 const path=require('node:path')
 const {spawnSync}=require('node:child_process')
 const {chromium}=require('../backend/node_modules/playwright-core')
+const {guardRouteCallback}=require('./helpers/measurement-response-loss.cjs')
 const {runJourneys,requiredChecks,labeledSelect,labeledTextarea}=require('./measurement-version-journeys.cjs')
 assert.equal(process.env.GITHUB_ACTIONS,'true','Browser execution belongs only in GitHub CI')
 assert.equal(process.env.MEASUREMENT_BROWSER_ISOLATED,'1')
@@ -33,10 +34,11 @@ fixture.compositeId??=fixture.product?.id
 const allowedOrigins=new Set([origin,fixture.trainingUrl,fixture.surveyUrl].filter(Boolean))
 for(const url of allowedOrigins)assert.ok(['http://localhost:5174','https://training.eduk12.top:3189','https://survey.eduk12.top:3189'].includes(url),'Only exact isolated browser origins')
 let browser,admin,phase='startup',activePage
-const evidence={schemaVersion:1,status:'RUNNING',head:process.env.GITHUB_SHA,checks:[],actions:[],screenshots:[],pageErrors:[],blockedExternalRequests:[],
+const evidence={schemaVersion:1,status:'RUNNING',head:process.env.GITHUB_SHA,checks:[],actions:[],screenshots:[],pageErrors:[],blockedExternalRequests:[],callbackFailures:[],
   physicalHardwareVerified:false,nativeSafariVerified:false,authenticator:'Chromium virtual CTAP2, real server registration/login/step-up verification',
   selectedPhase,grantProvenance:selectedPhase==='admin'?'REAL_UI_WEBAUTHN_ROOT_ISSUANCE':'SYNTHETIC_DB_FIXTURE_NOT_ADMIN_ISSUANCE_OR_CROSS_JOB_END_TO_END',
   scope:'Missing representative measurement-version rendered UI paths only; no repetition of prior backend assertion suites'}
+function callbackFailure(scope){evidence.callbackFailures.push({scope,phase});evidence.status='FAIL';evidence.failure={phase,scope,name:'AsyncCallbackFailure'};process.exitCode=1;save()}
 function save(){fs.writeFileSync(path.join(output,'result.json'),JSON.stringify(evidence,null,2))}
 function check(name,actual=true,expected=true){assert.deepEqual(actual,expected,name);evidence.checks.push({name,phase,status:'PASS'});save();console.log(JSON.stringify({check:name,phase,status:'PASS'}))}
 async function shot(page,name,width=1440){
@@ -70,7 +72,7 @@ async function register(){
   await admin.getByText('安全密钥验证完成，五分钟内可执行敏感操作。',{exact:true}).waitFor()
   const after=(await cdp.send('WebAuthn.getCredentials',{authenticatorId})).credentials[0].signCount
   check('UI step-up creates fresh actual authenticator assertion',after>before)
-  admin.on('dialog',dialog=>dialog.accept())
+  admin.on('dialog',dialog=>dialog.accept().catch(()=>callbackFailure('admin-dialog')))
 }
 const localDate=ms=>new Date(ms).toISOString().slice(0,16)
 async function fillGrant({product='TRAINING',purpose='report',subjectId=fixture.teacher.id,scopeId=fixture.courseId,resourceIds=[fixture.compositeId],capabilities=['report.edit','report.publish'],expired=false}){
@@ -109,14 +111,14 @@ async function issueWithRecovery(){
   check('Expired grant form blocked before transmission',posts,0);admin.off('request',count)
   await fillGrant({})
   let committed,injectionFailure
-  await admin.route('**/api/admin/permissions/content-grants',async route=>{
+  await admin.route('**/api/admin/permissions/content-grants',guardRouteCallback(async route=>{
     try{
       const response=await route.fetch()
       if(response.status()!==200)injectionFailure='Real upstream grant failed with status '+response.status()
       else committed=(await response.json()).data.grantId
     }catch{injectionFailure='Real upstream grant transport failed'}
     await route.abort('connectionreset')
-  },{times:1})
+  },()=>callbackFailure('admin-response-loss')),{times:1})
   await admin.getByRole('button',{name:'确认签发内容授权',exact:true}).click()
   await admin.getByText(/待核对请求编号：/).waitFor();await admin.getByRole('alert').filter({hasText:'请求编号及内容已保留'}).waitFor()
   assert.equal(injectionFailure,undefined,'Grant must commit before loss injection');assert.ok(committed);await admin.reload();await admin.getByText('待核对请求编号：'+committed,{exact:false}).waitFor()
@@ -177,11 +179,11 @@ async function prepareFinals(){
   browser.newContext=async options=>{
     const context=await newContext({...options,timezoneId:'UTC'})
     context.setDefaultTimeout(20000)
-    await context.route('**/*',route=>{
+    await context.route('**/*',guardRouteCallback(route=>{
       const url=new URL(route.request().url())
       if(!['http:','https:'].includes(url.protocol)||allowedOrigins.has(url.origin))return route.continue()
       evidence.blockedExternalRequests.push({host:url.hostname});save();return route.abort('blockedbyclient')
-    })
+    },()=>callbackFailure('browser-network-route')))
     context.on('page',page=>{
       page.on('pageerror',e=>{evidence.pageErrors.push({name:e.name,phase});save()})
       page.on('response',r=>{const url=new URL(r.url());if(url.pathname.startsWith('/api/')){evidence.actions.push({phase,method:r.request().method(),path:url.pathname.replace(/[a-f0-9]{8}-[a-f0-9-]{27,}/gi,':id'),status:r.status()});save()}})
@@ -198,6 +200,7 @@ async function prepareFinals(){
     await runJourneys({browser,origin,fixture,output,check,shot,issueGrant:syntheticGrant,prepareFinals})
     for(const name of requiredChecks)assert.ok(evidence.checks.some(row=>row.name===name),'Missing required browser scenario: '+name)
   }
+  assert.equal(evidence.callbackFailures.length,0,'Asynchronous browser callback failure')
   check('No uncaught browser errors',evidence.pageErrors.length,0)
   check('No external browser requests',evidence.blockedExternalRequests.length,0)
   const mandatory=selectedPhase==='admin'?['Real virtual CTAP2 registration','UI step-up creates fresh actual authenticator assertion','Expired grant form blocked before transmission','Real committed grant response-loss recovered via same UUID after reload','UI revoke and fresh page metadata retain revoked state','UI issued TRAINING reference-governance grant']:requiredChecks
@@ -208,4 +211,8 @@ async function prepareFinals(){
   // Never screenshot auth forms, nor emit input values, credentials, cookies or bodies.
   if(activePage&&phase!=='admin-webauthn'&&phase!=='startup')await shot(activePage,'failure',1440).catch(()=>{})
   save();console.error(JSON.stringify(evidence.failure));process.exitCode=1
-}).finally(async()=>{await browser?.close();console.log(JSON.stringify({status:evidence.status,checks:evidence.checks.length,physicalHardwareVerified:false,nativeSafariVerified:false}))})
+}).finally(async()=>{
+  try{await browser?.close()}catch{evidence.status='FAIL';evidence.failure={phase:'browser-cleanup',name:'BrowserCleanupFailure'};process.exitCode=1;save()}
+  if(evidence.callbackFailures.length){evidence.status='FAIL';process.exitCode=1}
+  save()
+  console.log(JSON.stringify({status:evidence.status,checks:evidence.checks.length,physicalHardwareVerified:false,nativeSafariVerified:false}))})

@@ -125,5 +125,26 @@ class FixedAdminAdmission(unittest.TestCase):
         self.assertIn('needs: [scope, reuse, admin, browser]', workflow)
 
 
+class AdminFailureOverlay(unittest.TestCase):
+    def test_exact_overlay_preserves_original_admin_success(self):
+        binding, pin = module.admin_inputs()
+        for file, repair in pin['reviewedTestToolRepairs'].items():
+            self.assertEqual(repair['before'], pin['unchangedTools'][file])
+            self.assertEqual(module.git('rev-parse', 'HEAD:' + file), repair['after'])
+            self.assertNotEqual(repair['before'], repair['after'])
+        self.assertEqual(binding['fixedBuildSource']['runId'], '39399331312')
+        self.assertEqual(pin['runId'], '39400868129')
+
+    def test_modified_admin_assertion_not_hidden_by_overlay(self):
+        original_read = Path.read_text
+        def altered(file, *args, **kwargs):
+            text = original_read(file, *args, **kwargs)
+            if file.name == 'measurement-version-browser.cjs':
+                return text.replace("check('Real virtual CTAP2 registration'", "check('Weakened registration'")
+            return text
+        with patch.object(Path, 'read_text', altered), self.assertRaises(AssertionError):
+            module.admin_inputs()
+
+
 if __name__ == '__main__':
     unittest.main()
