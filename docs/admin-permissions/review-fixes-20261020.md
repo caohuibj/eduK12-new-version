@@ -67,3 +67,11 @@
 - security 的原始失败日志被现有 EXIT 清理移除，官方日志无法确定根因；不能声称已修复该失败。本地新合成账号在系统 Chromium、CI 锁定 Chromium 两种运行器下，真实虚拟 CTAP2 业务 42 项与入口/撤权 198 项均通过（分开运行，不累计）；锁定版撤权样本约 130ms，非生产 SLA。编译后 API 在 CI 对应的测试开关及必需 Redis 下 readiness 也通过。新增失败摘要仅保留阶段、检查数、错误类型和失败退出码；原始消息、URL、账号、票据、Cookie、密钥仍删除且不上传。模拟失败验证退出码仍为失败、私有数据清理且秘密哨兵不外泄，等待官方候选实测以定位环境差异。
 
 本阶段 CI 范围契约 53 项、43 段 shell 语法及 YAML 通过；完整来源清单增加至 160 项，仅明确列入本次受影响的五个 E2E 文件和两个界面文件。仍只排除原已授权的两个性能执行点；所有功能、认证、权限、迁移、恢复、浏览器及安全门保持必需。没有重复运行上一轮已成功的本地后端全套。本增量先进入无 PR 备份引用供独立 review，未获 GO 前不更新 PR 或启动新官方候选。
+
+## 第三轮 security 来源夹具定位
+
+[CI 39368960480](https://github.com/caohuibj/eduK12-new-version/actions/runs/39368960480) 使用 head `aba9db66`、merge `071d2f1c`。本轮后端、完整回归、前端、镜像、三引擎视觉、foundation/products 浏览器和媒体实际通过；security 摘要明确失败于 `workspaces / A05-deep-system-SURVEY / checks=14 / TimeoutError`，不是登记或登录阶段。第二轮原始日志缺失的事实保留，不能倒推那一轮的精确失败点。
+
+本轮根因是构建来源前置：官方 production 包的 `import.meta.env.DEV=false`，`SurveyAdminOrigin` 按原规则在 localhost 关闭，先于 `AdminAccess`；前序本地测试包允许 loopback。不能放宽产品来源或将“来源关闭”当作完整授权矩阵通过。修复只涉及测试：先在官方 production artifact 上保留真实虚拟 CTAP2 业务 42 项，并新增 4 项关闭检查（明确警告、无治理标题、无 Survey 治理请求、无页面异常）；再在私有目录从同一源码显式构建 NODE_ENV=test 的 loopback 包，运行原有 198 项、9 身份矩阵、step-up、撤权及 API 资源拒绝。正式生产 artifact、其他浏览器门和固定来源实现均不变；最终脱敏摘要必须区分两种前端构建，不把 loopback 包声称为生产 Survey 来源验收。
+
+本地已经按上述 production→loopback 顺序实际通过 42+4 与 198 项，使用锁定 Chromium 和真实虚拟 CTAP2，无请求 mock、签名会话替换、忽略证书或系统信任/hosts 修改；撤权样本约 138ms，非 SLA。CI 契约 53 项、43 段 shell/YAML 通过。此次无产品实现改动，160+9 路径范围及两个非执行性能点不变；候选仍须增量独立 review 和新的官方全门禁，不将本地通过作为官方认证 success。

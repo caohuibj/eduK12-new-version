@@ -229,12 +229,29 @@ async function verifyBusinessOverlaps(sessions){
   check(errors.length===0,'no overlap browser page errors')
   console.log(JSON.stringify({result:'PASS',phase:'P2-business-and-governance',checks,pageErrors:errors.length,physicalKeyVerified:false,officialCI}))
 }
+async function verifyProductionOriginClosure(page){
+  step='production-origin-closure';activePage=page
+  const requests=[],errors=[]
+  const observe=request=>{if(new URL(request.url()).pathname.startsWith('/api/platform/survey/'))requests.push(request.method())}
+  const observeError=error=>errors.push(error.name)
+  page.on('request',observe)
+  page.on('pageerror',observeError)
+  try{
+    await page.goto(origin+'/admin/survey-researchers')
+    await page.getByRole('alert').filter({hasText:'当前地址不支持 Survey 管理入口，请使用已配置的管理站点。'}).waitFor()
+    assert.equal(await page.getByRole('heading',{name:'研究者与工具授权',exact:true}).count(),0)
+    assert.deepEqual(requests,[],'unsupported production origin must not mount governance requests')
+    assert.deepEqual(errors,[])
+    console.log(JSON.stringify({result:'PASS',phase:'production-origin-closure',checks:4,pageErrors:errors.length,physicalKeyVerified:false,officialCI}))
+  }finally{page.off('request',observe);page.off('pageerror',observeError)}
+}
 ;(async()=>{
   browser=await chromium.launch({executablePath:process.env.CHROMIUM_EXECUTABLE||'/usr/bin/chromium',headless:true,args:['--no-sandbox','--disable-dev-shm-usage']})
   const sessions={}
   if(process.env.ADMIN_PERMISSIONS_BROWSER_PHASE==='business-overlaps'){
     for(const name of ['system','training','both','none'])sessions[name]=await register(name)
     await verifyBusinessOverlaps(sessions)
+    if(process.env.ADMIN_PERMISSIONS_EXPECT_PRODUCTION_ORIGIN==='1')await verifyProductionOriginClosure(sessions.system.page)
     return
   }
   if(['workspaces','workspaces-resume'].includes(process.env.ADMIN_PERMISSIONS_BROWSER_PHASE)){

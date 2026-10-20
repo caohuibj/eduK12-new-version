@@ -112,6 +112,9 @@ test('administrator CI runs its actual isolated PG/API and both real virtual-key
   assert.match(browser,/PHASE=business-overlaps node e2e\/admin-permissions-browser\.cjs/);
   assert.match(browser,/PHASE=workspaces-resume node e2e\/admin-permissions-browser\.cjs/);
   assert.match(browser,/result\('business\.log','P2-business-and-governance',42\)/);
+  assert.match(browser,/result\('business\.log','production-origin-closure',4\)/);
+  assert.match(browser,/NODE_ENV=test npm --prefix frontend run build -- --outDir "\$ADMIN_PERMISSIONS_PRIVATE_DIR\/frontend-loopback"/);
+  assert.match(browser,/frontend:\{business:'official-production-artifact',workspaces:'same-source-loopback-test-build'\}/);
   assert.match(browser,/result\('workspaces\.log','A05-workspaces',198\)/);
   for(const source of [backend,browser]){
     assert.match(source,/trap cleanup_admin.* EXIT/);

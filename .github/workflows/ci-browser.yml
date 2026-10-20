@@ -538,7 +538,29 @@ jobs:
           done
           test "$ready" = true
           export ADMIN_BROWSER_STAGE='business'
-          ADMIN_PERMISSIONS_BROWSER_PHASE=business-overlaps node e2e/admin-permissions-browser.cjs > "$ADMIN_PERMISSIONS_PRIVATE_DIR/business.log" 2>&1
+          ADMIN_PERMISSIONS_EXPECT_PRODUCTION_ORIGIN=1 ADMIN_PERMISSIONS_BROWSER_PHASE=business-overlaps node e2e/admin-permissions-browser.cjs > "$ADMIN_PERMISSIONS_PRIVATE_DIR/business.log" 2>&1
+          # Production closes unsupported localhost Survey origins. Preserve that
+          # assertion above, then use the same-source test build for the complete
+          # loopback matrix. Never relax product origins or replace real CTAP2.
+          export ADMIN_BROWSER_STAGE='loopback-build'
+          NODE_ENV=test npm --prefix frontend run build -- --outDir "$ADMIN_PERMISSIONS_PRIVATE_DIR/frontend-loopback" > "$ADMIN_PERMISSIONS_PRIVATE_DIR/build.log" 2>&1
+          export ADMIN_BROWSER_STAGE='loopback-preview'
+          kill -- -"$admin_preview_pid"
+          wait "$admin_preview_pid" 2>/dev/null || true
+          for attempt in $(seq 1 30); do
+            if ! curl --fail --silent --max-time 2 http://localhost:5174/ >/dev/null; then break; fi
+            sleep 1
+          done
+          if curl --fail --silent --max-time 2 http://localhost:5174/ >/dev/null; then exit 1; fi
+          nohup setsid npm --prefix frontend run preview -- --host localhost --port 5174 --strictPort --outDir "$ADMIN_PERMISSIONS_PRIVATE_DIR/frontend-loopback" > "$ADMIN_PERMISSIONS_PRIVATE_DIR/preview.log" 2>&1 &
+          admin_preview_pid=$!
+          ready=false
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent --max-time 2 http://localhost:5174/ >/dev/null; then ready=true; break; fi
+            if ! kill -0 "$admin_preview_pid" 2>/dev/null; then break; fi
+            sleep 1
+          done
+          test "$ready" = true
           export ADMIN_BROWSER_STAGE='workspaces'
           ADMIN_PERMISSIONS_BROWSER_PHASE=workspaces-resume node e2e/admin-permissions-browser.cjs > "$ADMIN_PERMISSIONS_PRIVATE_DIR/workspaces.log" 2>&1
           export ADMIN_BROWSER_STAGE='summary'
@@ -555,11 +577,14 @@ jobs:
             return rows[0];
           };
           const business=result('business.log','P2-business-and-governance',42);
+          const productionOrigin=result('business.log','production-origin-closure',4);
           const workspaces=result('workspaces.log','A05-workspaces',198);
           assert.equal(workspaces.identities,9);
           writeFileSync(process.env.RUNNER_TEMP+'/admin-permissions-browser-summary.json',JSON.stringify({
             result:'PASS',head:process.env.GITHUB_SHA,mode:'admin-permissions-functional-only',
-            business,workspaces,physicalHardwareVerified:false,rawCredentialsUploaded:false,productionAccess:false,
+            business,productionOrigin,workspaces,
+            frontend:{business:'official-production-artifact',workspaces:'same-source-loopback-test-build'},
+            physicalHardwareVerified:false,rawCredentialsUploaded:false,productionAccess:false,
           },null,2),{mode:0o600});
           NODE
       - name: upload administrator browser summary only
