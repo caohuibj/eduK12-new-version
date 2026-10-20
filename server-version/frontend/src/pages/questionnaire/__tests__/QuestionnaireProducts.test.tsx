@@ -1,7 +1,10 @@
 import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route, Link } from 'react-router-dom'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+const trainingPresentation = vi.hoisted(() => ({ enabled: false }))
+vi.mock('../../../training/context', () => ({ isTrainingHost: () => trainingPresentation.enabled }))
+beforeEach(() => { trainingPresentation.enabled = false })
 const capabilities = vi.hoisted(() => ({ enabled: true }))
 vi.mock('../../../contexts/CapabilitiesContext', () => ({ useCognitiveEnabled: () => capabilities.enabled }))
 const api = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(), put: vi.fn() }))
@@ -502,5 +505,206 @@ describe('C22 Training feedback release authoring', () => {
     fireEvent.click(screen.getByRole('button', { name: '创建草稿' }))
     await waitFor(() => expect(api.post).toHaveBeenCalledTimes(1))
     expect(api.post.mock.calls[0][1]).not.toHaveProperty('trainingFeedbackPolicy')
+  })
+})
+
+describe('Training questionnaire guided editor', () => {
+  const originalScroll = Object.getOwnPropertyDescriptor(Element.prototype, 'scrollIntoView')
+  afterEach(() => {
+    if (originalScroll) Object.defineProperty(Element.prototype, 'scrollIntoView', originalScroll)
+    else Reflect.deleteProperty(Element.prototype, 'scrollIntoView')
+  })
+  const resources = { scales: [{ id: 'scale', name: '可用量表' }], cognitive: [], situational: [], courses: [{ id: 'course', title: '本地课程', courseType: 'TRAINING_COURSE', isLibrary: false }] }
+  const row = { id: 'guided', name: '步骤测评', status: 'DRAFT', revision: 7, questionnaireType: 'COURSE', productKind: 'QUESTIONNAIRE', questionnaireCourses: [{ courseId: 'course' }], publicEnabled: false, items: [{ id: 'item', type: 'SCALE', position: 0, scale: { name: '已有量表' } }], formSections: [] }
+  beforeEach(() => {
+    Object.defineProperty(Element.prototype, 'scrollIntoView', { configurable: true, value: vi.fn() })
+    trainingPresentation.enabled = true
+    capabilities.enabled = true
+    vi.resetAllMocks()
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? resources : row }))
+    api.put.mockImplementation(async (_path, body) => ({ code: 0, data: { ...row, ...body, revision: 8 } }))
+  })
+  it('keeps unsaved metadata across steps and saves through the existing revision contract', async () => {
+    mount('guided')
+    await screen.findByDisplayValue('步骤测评')
+    fireEvent.change(screen.getByLabelText('测评名称'), { target: { value: '保留未保存修改' } })
+    fireEvent.click(screen.getByRole('link', { name: /02 内容与顺序/ }))
+    expect(screen.getByRole('group', { name: '内容类型' })).toBeVisible()
+    expect(screen.getByRole('button', { name: '添加到测评' })).toBeDisabled()
+    fireEvent.click(screen.getByRole('link', { name: /基本信息/ }))
+    expect(screen.getByLabelText('测评名称')).toHaveValue('保留未保存修改')
+    fireEvent.click(screen.getByRole('button', { name: '保存全部修改' }))
+    await waitFor(() => expect(api.put).toHaveBeenCalledWith('/questionnaire-products/guided', expect.objectContaining({ name: '保留未保存修改', revision: 7 })))
+  })
+  it('reveals and focuses an invalid feedback time when saving from another step', async () => {
+    mount('guided', '#questionnaire-delivery')
+    fireEvent.click(await screen.findByRole('radio', { name: '预设时间开放' }))
+    fireEvent.click(screen.getByRole('link', { name: /04 检查与发布/ }))
+    fireEvent.click(screen.getByRole('button', { name: '保存全部修改' }))
+    const input = screen.getByLabelText('报告开放时间')
+    await waitFor(() => expect(input).toBeVisible())
+    await waitFor(() => expect(input).toHaveFocus())
+    expect(input).toHaveAttribute('aria-invalid', 'true')
+    expect(api.put).not.toHaveBeenCalled()
+  })
+  it('opens the publish deep link and routes a server preflight issue back to its unit', async () => {
+    api.post.mockResolvedValue({ code: 0, data: { revision: 7, ok: false, checks: [{ key: 'content', label: '内容资格', status: 'failed', message: '请检查对应单元', targetId: 'item' }] } })
+    mount('guided', '#questionnaire-publish')
+    fireEvent.click(await screen.findByRole('button', { name: '发布前自检' }))
+    expect(api.post).toHaveBeenCalledWith('/questionnaire-products/guided/preflight', { revision: 7 })
+    fireEvent.click(await screen.findByRole('button', { name: '配置对应单元' }))
+    expect(await screen.findByRole('button', { name: '配置第 1 项：1. 已有量表' })).toBeVisible()
+    expect(screen.queryByRole('button', { name: '发布组合测评' })).not.toBeInTheDocument()
+  })
+  it('creates with the existing request payload and opens real content authoring', async () => {
+    const created = { ...row, id: 'created', name: '新步骤测评', items: [], revision: 1 }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? resources : created }))
+    api.post.mockResolvedValue({ code: 0, data: created })
+    mount('new', '?courseId=course')
+    await waitFor(() => expect(screen.getByRole('checkbox', { name: '本地课程', hidden: true })).toBeChecked())
+    fireEvent.change(screen.getByLabelText('测评名称'), { target: { value: '新步骤测评' } })
+    fireEvent.click(screen.getByRole('button', { name: '创建草稿，继续编排' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/questionnaire-products', expect.objectContaining({ name: '新步骤测评', courseIds: ['course'], trainingFeedbackPolicy: { schemaVersion: 1, mode: 'IMMEDIATE' } })))
+    expect(await screen.findByRole('group', { name: '内容类型' })).toBeVisible()
+  })
+})
+
+describe('Training automatic Form stages', () => {
+  const source = { id: 'source', type: 'FORM', position: 0, formSectionId: 'stage-1', formSectionPosition: 0, formType: 'single_choice', formLabel: '已有选择题', required: true, formDefinition: { itemKey: 'q_source', type: 'SINGLE', options: [{ optionKey: 'yes', label: '是' }, { optionKey: 'no', label: '否' }] } }
+  const resources = { scales: [], cognitive: [], situational: [], courses: [] }
+  let row: any
+  beforeEach(() => {
+    trainingPresentation.enabled = true
+    capabilities.enabled = true
+    vi.resetAllMocks()
+    row = { id: 'stages', name: '阶段表单', revision: 3, status: 'DRAFT', questionnaireType: 'COURSE', publicEnabled: false, questionnaireCourses: [], items: [structuredClone(source)], formSections: [{ id: 'stage-1', title: '现有表单', position: 0, contextSection: false, items: [structuredClone(source)] }] }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? resources : row }))
+    api.post.mockImplementation(async (_path, body) => {
+      const sectionId = body.formSectionId || 'stage-2'
+      const item = { ...body.item, id: 'added-' + row.revision, position: row.items.length, formSectionId: sectionId }
+      row = { ...row, revision: row.revision + 1, items: [...row.items, item], formSections: row.formSections.some((section: any) => section.id === sectionId)
+        ? row.formSections.map((section: any) => section.id === sectionId ? { ...section, items: [...section.items, item] } : section)
+        : [...row.formSections, { id: sectionId, title: '新表单', position: item.position, contextSection: false, items: [item] }] }
+      return { code: 0, data: row }
+    })
+  })
+  const openForm = async () => {
+    mount('stages', '#questionnaire-content')
+    await userEvent.setup().click(await screen.findByRole('button', { name: '自定义表单' }))
+  }
+  const openAdvanced = async () => userEvent.setup().click(screen.getByText('高级答题规则', { selector: 'summary' }))
+  it('hides manual grouping and automatically appends ordinary questions without enabling V3', async () => {
+    await openForm()
+    expect(screen.queryByRole('combobox', { name: '加入表单区段' })).not.toBeInTheDocument()
+    expect(screen.getByText('高级答题规则', { selector: 'summary' }).closest('details')).not.toHaveAttribute('open')
+    expect(screen.getByLabelText('启用条件显示、拒答等规则')).not.toBeVisible()
+    fireEvent.change(screen.getByLabelText('题目文字'), { target: { value: '普通追加题' } })
+    fireEvent.click(screen.getByRole('button', { name: '添加到测评' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/questionnaire-products/stages/items', expect.objectContaining({ revision: 3, formSectionId: 'stage-1', item: expect.objectContaining({ formLabel: '普通追加题' }) })))
+    expect(api.post.mock.calls[0][1].item.formPolicy).toBeUndefined()
+  })
+  it('starts a new stage only on request, then appends subsequent questions to that new stage', async () => {
+    await openForm(); await openAdvanced()
+    await userEvent.setup().click(screen.getByRole('button', { name: '新增答题阶段' }))
+    fireEvent.change(screen.getByLabelText('题目文字'), { target: { value: '新阶段首题' } })
+    fireEvent.click(screen.getByRole('button', { name: '添加到测评' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledTimes(1))
+    expect(api.post.mock.calls[0][1]).not.toHaveProperty('formSectionId')
+    await waitFor(() => expect(screen.getByLabelText('题目文字')).toHaveValue(''))
+    fireEvent.change(screen.getByLabelText('题目文字'), { target: { value: '新阶段第二题' } })
+    fireEvent.click(screen.getByRole('button', { name: '添加到测评' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledTimes(2))
+    expect(api.post.mock.calls[1][1]).toMatchObject({ revision: 4, formSectionId: 'stage-2' })
+  })
+  it('provides same-stage condition sources and clears a condition when starting another stage', async () => {
+    await openForm(); await openAdvanced()
+    fireEvent.click(screen.getByRole('checkbox', { name: '启用条件显示、拒答等规则' }))
+    await userEvent.setup().selectOptions(screen.getByLabelText('显示条件'), 'q_source')
+    expect(screen.getByLabelText('前题选项')).toHaveValue('yes')
+    fireEvent.click(screen.getByRole('button', { name: '新增答题阶段' }))
+    expect(screen.getByLabelText('显示条件')).toHaveValue('')
+    expect(screen.queryByRole('option', { name: '已有选择题' })).not.toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('题目文字'), { target: { value: '无跨阶段引用' } })
+    fireEvent.click(screen.getByRole('button', { name: '添加到测评' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledTimes(1))
+    expect(api.post.mock.calls[0][1].item.formDefinition.displayIf).toBeUndefined()
+    expect(api.post.mock.calls[0][1]).not.toHaveProperty('formSectionId')
+  })
+  it('sends a selected same-stage condition with the existing stable item key', async () => {
+    await openForm(); await openAdvanced()
+    fireEvent.click(screen.getByRole('checkbox', { name: '启用条件显示、拒答等规则' }))
+    await userEvent.setup().selectOptions(screen.getByLabelText('显示条件'), 'q_source')
+    fireEvent.change(screen.getByLabelText('题目文字'), { target: { value: '同阶段条件题' } })
+    fireEvent.click(screen.getByRole('button', { name: '添加到测评' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/questionnaire-products/stages/items', expect.objectContaining({ formSectionId: 'stage-1', item: expect.objectContaining({ formPolicy: { version: 3, requiredRefusal: 'BLOCK_SUBMIT', hiddenRequired: 'EXEMPT' }, formDefinition: expect.objectContaining({ displayIf: { itemKey: 'q_source', operator: 'EQUALS', optionKey: 'yes' } }) }) })))
+  })
+  it('starts automatically after another instrument instead of appending to an earlier section', async () => {
+    row.items.push({ id: 'scale', type: 'SCALE', position: 1, scale: { name: '中间量表' } })
+    await openForm()
+    fireEvent.change(screen.getByLabelText('题目文字'), { target: { value: '量表之后的新题' } })
+    fireEvent.click(screen.getByRole('button', { name: '添加到测评' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledTimes(1))
+    expect(api.post.mock.calls[0][1]).not.toHaveProperty('formSectionId')
+  })
+  it('keeps the special background section separate from ordinary questions', async () => {
+    row.items[0].contextKey = 'gradeLevel'
+    row.formSections[0].contextSection = true
+    row.formSections[0].items[0].contextKey = 'gradeLevel'
+    await openForm()
+    fireEvent.change(screen.getByLabelText('题目文字'), { target: { value: '背景信息后的普通题' } })
+    fireEvent.click(screen.getByRole('button', { name: '添加到测评' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledTimes(1))
+    expect(api.post.mock.calls[0][1]).not.toHaveProperty('formSectionId')
+  })
+
+  it('saves row-based legacy options with punctuation intact and preserves them on a rejected request', async () => {
+    await openForm()
+    await userEvent.setup().selectOptions(screen.getByLabelText('题型'), 'single_choice')
+    fireEvent.change(screen.getByLabelText('题目文字'), { target: { value: '新选择题' } })
+    fireEvent.change(screen.getByLabelText('选项 1 文字'), { target: { value: '中文, English' } })
+    fireEvent.change(screen.getByLabelText('选项 2 文字'), { target: { value: 'a=b' } })
+    api.post.mockRejectedValueOnce(new Error('本次保存失败'))
+    fireEvent.click(screen.getByRole('button', { name: '添加到测评' }))
+    await screen.findByRole('alert')
+    expect(api.post.mock.calls[0][1]).toMatchObject({ formSectionId: 'stage-1', item: { formOptions: [{ value: 'option_1', label: '中文, English' }, { value: 'option_2', label: 'a=b' }] } })
+    expect(screen.getByLabelText('选项 1 文字')).toHaveValue('中文, English')
+    expect(screen.getByLabelText('题目文字')).toHaveValue('新选择题')
+  })
+
+  it('saves bulk matrix rows and options using the existing typed definition shape', async () => {
+    await openForm()
+    const user = userEvent.setup()
+    await user.selectOptions(screen.getByLabelText('题型'), 'matrix')
+    fireEvent.change(screen.getByLabelText('题目文字'), { target: { value: '矩阵评价' } })
+    fireEvent.paste(screen.getByLabelText('矩阵行 1 文字'), { clipboardData: { getData: () => '课堂内容\n教学方式' } })
+    fireEvent.paste(screen.getByLabelText('选项 1 文字'), { clipboardData: { getData: () => '满意\n一般' } })
+    fireEvent.click(screen.getByRole('button', { name: '添加到测评' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledTimes(1))
+    expect(api.post.mock.calls[0][1].item.formDefinition).toMatchObject({ type: 'MATRIX', options: [{ optionKey: 'option_1', label: '满意' }, { optionKey: 'option_3', label: '一般' }], rows: [{ rowKey: 'row_1', label: '课堂内容' }, { rowKey: 'row_3', label: '教学方式' }] })
+  })
+
+  it('preserves supplied background codes and clears removed other/exclusive option references', async () => {
+    await openForm()
+    const user = userEvent.setup()
+    await user.selectOptions(screen.getByLabelText('背景字段'), 'sexAtBirth')
+    fireEvent.change(screen.getByLabelText('题目文字'), { target: { value: '背景问题' } })
+    fireEvent.click(screen.getByRole('button', { name: '添加到测评' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledTimes(1))
+    expect(api.post.mock.calls[0][1].item.formOptions[0]).toMatchObject({ value: 'female' })
+    await user.selectOptions(screen.getByLabelText('背景字段'), '')
+    await user.selectOptions(screen.getByLabelText('题型'), 'multiple_choice')
+    fireEvent.change(screen.getByLabelText('选项 1 文字'), { target: { value: '其他' } })
+    fireEvent.change(screen.getByLabelText('选项 2 文字'), { target: { value: '普通' } })
+    await openAdvanced()
+    fireEvent.click(screen.getByRole('checkbox', { name: '启用条件显示、拒答等规则' }))
+    await user.selectOptions(screen.getByLabelText('其他填写选项'), 'option_1')
+    fireEvent.click(screen.getByRole('checkbox', { name: '其他' }))
+    fireEvent.click(screen.getByRole('button', { name: '删除选项 1' }))
+    expect(screen.getByLabelText('其他填写选项')).toHaveValue('')
+    fireEvent.change(screen.getByLabelText('题目文字'), { target: { value: '移除高级引用' } })
+    fireEvent.click(screen.getByRole('button', { name: '添加到测评' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledTimes(2))
+    expect(api.post.mock.calls[1][1].item.formDefinition.otherOptionKey).toBeUndefined()
+    expect(api.post.mock.calls[1][1].item.formDefinition.exclusiveOptionKeys).toEqual([])
   })
 })
