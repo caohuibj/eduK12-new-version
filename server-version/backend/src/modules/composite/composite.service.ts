@@ -1,3 +1,4 @@
+import {prepareTrainingContentSnapshot,prepareTrainingContentAttemptBinding} from './training-content-binding'
 import { evaluateTrainingFeedbackForAttempt, prepareTrainingFeedbackBinding, freezeTrainingFeedbackSnapshot, trainingFeedbackAttemptSelect, trainingFeedbackParentSelect, type TrainingFeedbackBinding } from './training-feedback-binding'
 import { isLoadedCompositeParticipantFeedbackDeferred, trainingFeedbackReportReady } from '../assessment-policy/participant-feedback'
 import { freezeTrainingPersistenceSnapshot, readTrainingPersistencePolicy, trainingPersistenceMetadata } from './training-persistence.policy'
@@ -211,6 +212,8 @@ const reportPackageSummary = (row: {
 
 const withoutAnalysisProtocolCipher = <T extends Record<string, unknown>>(row: T) => {
   const {
+    trainingContentSnapshot: _ignoredTrainingContent,
+    trainingContentSnapshotHash: _ignoredTrainingContentHash,
     analysisProtocolSnapshotEncrypted: _ignoredProtocol,
     reportPackageSnapshotEncrypted: _ignoredPackage,
     analysisProtocolKey: _ignoredProtocolKey,
@@ -2093,7 +2096,10 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
     const frozen = compileWeightedVariants(composite.trainingVariantDraft, buildTrainingVariantUnion(composite))
     variantFields = { trainingVariantFrozen: frozen as any, trainingVariantDigest: frozen.configDigest }
   } else if (composite.trainingVariantFrozen != null || composite.trainingVariantDigest != null) throw compositeBadRequest('概率分卷草稿与冻结配置不一致')
-  return { analysisProtocolSnapshotEncrypted, reportPackageSnapshotEncrypted, ...variantFields, ...flowFields, ...persistenceFields, ...feedbackFields }
+  const content = composite.items.some((item:any)=>item.type!=='FORM')
+    ? await prepareTrainingContentSnapshot(prisma as Prisma.TransactionClient,composite,situationalReleases) : null
+  return { analysisProtocolSnapshotEncrypted, reportPackageSnapshotEncrypted, ...variantFields, ...flowFields, ...persistenceFields, ...feedbackFields,
+    ...(content?{trainingContentSnapshot:content.snapshot as Prisma.InputJsonValue,trainingContentSnapshotHash:content.snapshotHash}:{}) }
 }
 
 const publishCompositeInTransaction = async (userId: string, role: UserRole, id: string, db: Db, resolvedSituational?: Map<string, ResolvedSituationalRelease>) => {
@@ -2633,6 +2639,12 @@ const createAttempt = async (
   restartMaterialClaimId?: string,
 ) => {
   assertSupportedComposite(composite)
+  if (!['QUESTIONNAIRE','ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
+    const current=await db.compositeAssessment.findUnique({where:{id:composite.id},
+      select:{status:true,trainingContentSnapshot:true,trainingContentSnapshotHash:true}})
+    if(!current||current.status!=='PUBLISHED')throw compositeForbidden('测评已停止接收新作答')
+    composite={...composite,trainingContentSnapshot:current.trainingContentSnapshot,trainingContentSnapshotHash:current.trainingContentSnapshotHash}
+  }
   let feedbackBinding: TrainingFeedbackBinding | null = null
   let persistenceBinding: { publicationIdentity: Record<string, unknown>; courseId: string; roundId: string | null; cutoffs: Array<Date | null> } | null = null
   if(composite.items.some((item:any)=>item.formPolicy!=null) && (composite.productKind!=='QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || relationalIdentity || composite.reportPackageKey || composite.analysisProtocolKey)) throw compositeBadRequest('Form V3 只支持普通问卷的统一 FINAL 运行时')
@@ -2642,12 +2654,14 @@ const createAttempt = async (
     const current = await db.compositeAssessment.findUnique({ where: { id: composite.id },
       select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true,
         trainingPersistencePolicy: true, trainingPersistencePolicyHash: true,
+        trainingContentSnapshot:true,trainingContentSnapshotHash:true,
         trainingFeedbackPolicy: true, trainingFeedbackPolicyHash: true } })
     if (!current || current.status !== 'PUBLISHED' || (!userId && !current.publicEnabled)) throw compositeForbidden('问卷已停止接收新作答')
     if (current.opensAt && current.opensAt.getTime() > Date.now()) throw compositeBadRequest('问卷尚未开始')
     if (current.expiresAt && current.expiresAt.getTime() <= Date.now()) throw compositeBadRequest('问卷已过期')
     // Read the publication-owned policy under the same admission lock as status.
-    composite = { ...composite, trainingPersistencePolicy: current.trainingPersistencePolicy,
+    composite = { ...composite, trainingContentSnapshot:current.trainingContentSnapshot,trainingContentSnapshotHash:current.trainingContentSnapshotHash,
+      trainingPersistencePolicy: current.trainingPersistencePolicy,
       trainingPersistencePolicyHash: current.trainingPersistencePolicyHash,
       trainingFeedbackPolicy: current.trainingFeedbackPolicy, trainingFeedbackPolicyHash: current.trainingFeedbackPolicyHash }
     const persistence = readTrainingPersistencePolicy(current.trainingPersistencePolicy)
@@ -2820,6 +2834,13 @@ const createAttempt = async (
   }
 
   const newAttemptId = randomUUID()
+  // Validate the whole frozen candidate set before any random draw. Execution
+  // sources must match the frozen release; never choose the latest pointer here.
+  const contentCandidate=await prepareTrainingContentAttemptBinding(db as Prisma.TransactionClient,{
+    compositeId:composite.id,attemptId:newAttemptId,epoch:attemptEpoch,
+    snapshot:composite.trainingContentSnapshot,snapshotHash:composite.trainingContentSnapshotHash,
+    composite,resolvedSituational:situationalReleases,
+  })
   let variantAllocation: ReturnType<typeof createWeightedVariantAllocation> | null = null
   if (variantEnabled) {
     const frozen = parseCompiledWeightedVariants(composite.trainingVariantFrozen)
@@ -2848,9 +2869,14 @@ const createAttempt = async (
     attemptId: newAttemptId, attemptEpoch, compositeId: composite.id, ...persistenceBinding,
   }) : null
   const trainingFeedbackSnapshot = feedbackBinding ? freezeTrainingFeedbackSnapshot({ ...feedbackBinding, attemptId: newAttemptId, attemptEpoch }) : null
+  const selectedContentItems=new Set<string>(composite.items.map((item:any)=>item.id))
+  const trainingContentBinding=contentCandidate?{...contentCandidate.binding,
+    units:contentCandidate.binding.units.filter(unit=>selectedContentItems.has(unit.itemId))}:null
   const attempt = await db.compositeAssessmentAttempt.create({
     data: {
       id: newAttemptId,
+      ...(trainingContentBinding?{trainingContentBinding:trainingContentBinding as Prisma.InputJsonValue,
+        trainingContentBindingHash:canonicalHash(trainingContentBinding)}:{}),
       ...(trainingFeedbackSnapshot ? { trainingFeedbackSnapshot: trainingFeedbackSnapshot as Prisma.InputJsonValue,
         trainingFeedbackSnapshotHash: canonicalHash(trainingFeedbackSnapshot) } : {}),
       ...(trainingPersistenceSnapshot ? { trainingPersistenceSnapshot: trainingPersistenceSnapshot as Prisma.InputJsonValue,

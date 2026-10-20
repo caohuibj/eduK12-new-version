@@ -32,7 +32,7 @@ V01 不改生产代码、数据库、账号或发布规则；只运行文档差�
 | delegate | 上游可委派操作、资源、入口/组织/项目、期限 | 给下级交集范围 | 横向入口、扩大期限或来源权利 |
 
 上表是本 PR 永久内容域的细粒度能力；V05 在既有 User 上实现精确资源授权，管理员 PR 提供 principal、入口资格与近期强认证基座，不提供这些科学/内容能力。不得另建账户角色或 MFA。businessRole 与管理 grant 正交；入口管理资格不得隐含该入口业务身份。后端对象范围为权威，菜单/深链/API 一致；仅隐藏按钮不算授权。
-管理员 PR 当前不在本基点，不能当作已经合并。内容能力核心与现有受控私有报告服务可先实施；系统签发授权入口需对齐最终 main 的近期强认证后开放。
+管理员 PR317 已合并，实际 main f41dca3f 已以双父 merge 对齐本分支。系统签发已接统一管理与近期强认证；首批仅支持已实现的 SURVEY PROJECT reference/data 范围，其他入口仍待接入。
 
 ## 3. 四入口编制与消费映射
 
@@ -553,3 +553,11 @@ pending create request. Only the matching pending artifact can finish that reque
 reading another artifact cannot disable its same-UUID retry. Eight focused
 component contracts include unknown A → successful old B read → A 404 → identical
 A retry, preserving A's body throughout.
+
+## V08 Training measurement publication and START (incremental)
+
+Composite 发布以真实已挂载 Scale、Cognitive effective profile、已解析 SJT 包重建测量投影，与源发布指针精确比对。共享 publication snapshot 只保存身份。新 START 锁后绑定原指针，SUPERSEDED/RETIRED 不换版，REVOKED 拒新 START；恢复不重选，旧 null/null 不回填。分卷先核全候选再抽取，只存选中项；FLOW 保留候选，FINAL 后续只解释实际执行项。通用 participant DTO 不输出发布元数据。
+
+素材挂载许可撤销保留既有合同：仅拦新挂载，已挂 DRAFT 可发布；源许可硬撤回及 measurement REVOKED 是独立门禁。科学 analyze/review/publish 等仍须当前精确能力。
+
+本节点仅测量发布/START。静态 SJT 缺源指针、Cog effective profile 与 config release 不同暂明确拒绝；V09 必须提供真实 registry/compiler/许可驱动转换或显式发布，拒绝不是完成。Training reference/report 选择、FINAL/报告及 COURSE 科学能力未完成。新增 SQL 待集中真实迁移/并发验证。

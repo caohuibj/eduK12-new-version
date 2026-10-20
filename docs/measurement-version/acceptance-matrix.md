@@ -19,7 +19,7 @@ flags have not been changed by this work.
 | V08 participant feedback | Explicit Scale/SJT raw metric allowlist, default GENERAL, existing timing/credential/withdrawal policy; existing Cog feedback preserved | Frozen author allowlist, valid saved quality | Real browser acceptance. Participant reference/template interpretation is not implemented or implied |
 | V08 explicit new interpretation | Independent immutable encrypted artifact POST/GET; exact source FINAL and idempotent UUID; old FINAL unchanged | Current data.reinterpret over the exact FINAL plus actual project data access | Researcher creation/recovery and explicit authorized artifact JSON export implemented; real API/browser acceptance pending |
 | 7B export | Raw/facts default unchanged; opt-in saved FINAL interpretation CSV, independent download UI/tickets | Recent MFA/current owner/source revision/watermark | Actual HTTP/browser recovery; independent new-interpretation JSON export is an explicit separate action |
-| Training/other entries | Shared layer adapters exist; original scorer/runner/storage codec retained | Existing resource access must intersect new fixed content capability | Actual version selection/binding/FINAL/report and capability consumer alignment incomplete |
+| Training/other entries | Actual Composite publication/new START measurement pointers and effective runtime validation; original codecs retained | Existing attached material-use contract and independent lifecycle; scientific consumers require current capabilities | Static SJT/effective Cog conversion, reference/report selection, FINAL/report and COURSE capability alignment incomplete |
 | V09 | Migration inventory and incremental immutable schemas recorded | No real data deleted; old double-null facts retain legacy identity | One-time cutover and redundant-path cleanup incomplete; no invented old release pointers |
 | V10 | Focused pure/service/component tests, private client/types, isolated single-user SQL evidence | Synthetic data only | Recheck allowed normal PG startup; Prisma deploy, HTTP/browser, real lock races, independent final review and one official CI/merge still required |
 
@@ -31,3 +31,7 @@ norm arrays/templates. Reuse the existing Training shared artifact/codec work;
 no new compression model or trial removal. No byte estimate is promoted to a
 measurement without an observed fixture and effective-flag record. The independent
 storage branch will be absorbed after its reviewed main merge.
+
+Material-use grant revocation blocks new attachment while already attached DRAFT
+material remains publishable. It does not override hard source-license withdrawal
+or measurement REVOKED, or preserve revoked scientific capabilities.

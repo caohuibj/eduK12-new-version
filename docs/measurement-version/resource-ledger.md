@@ -70,3 +70,14 @@ Storage formula amendment: explicit reinterpretation adds one `I_i = encrypted(p
 - Unit: V05/V06. Acceptance: actual system/scope/expiry proof checks; max 250 candidate FINALs; path scope matches stored candidate; no client facts/approval object.
 - Result: implementation and focused contracts pass; connected API/browser/concurrency pending.
 - Regression watch: no general resource browsing, N+1 release reads, automatic formal norm promotion, or giant per-answer definition/manifest copies.
+
+### R28 — Training publication and START identities
+
+- Chain/object: shared Composite publication and per-attempt measurement pointers.
+- Source: training-content-binding.ts, actual composite.service.ts publish/createAttempt; migration 20261020132000 pair/immutable guards.
+- Effective flags: existing Training/Cognitive/source gates unchanged.
+- Measured vs estimated: source and targeted contracts; bytes/heap/latency not measured.
+- Risk: bounded source query at publication; one locked release read per unique ID per operation. START validates actual effective runtime, never follows current source pointers. No per-attempt definition/template copy.
+- Unit: V08; V09 must explicitly publish static SJT and selected Cog profiles.
+- Acceptance/result: source/runtime/scope/lifecycle/variant identities; SQL/HTTP/concurrency pending.
+- Regression watch: retain raw/trials/shared codec; no default-profile substitution, fabricated static SJT identity, answer-key DTO, or retirement reselection.
