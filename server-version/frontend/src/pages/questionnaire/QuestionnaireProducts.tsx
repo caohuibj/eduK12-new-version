@@ -1,3 +1,4 @@
+import { TrainingQuestionnaireList } from './TrainingQuestionnaireList'
 import { DeliveryOptionCard } from './DeliveryOptionCard'
 import { FormChoiceEditor } from './FormChoiceEditor'
 import { choiceError, emptyChoices, filledChoices, type ChoiceDraft } from './formChoices'
@@ -78,14 +79,19 @@ export function QuestionnaireProductList() {
   const [page, setPage] = useState(1)
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
+  const [listRevision, setListRevision] = useState(0)
   const navigate = useNavigate()
   useEffect(() => {
+    let active = true
     setLoading(true)
+    setError('')
+    setData({ list: [], total: 0 })
     request('?page=' + page)
-      .then(setData)
-      .catch((e) => setError(message(e)))
-      .finally(() => setLoading(false))
-  }, [page])
+      .then(value => { if (active) setData(value) })
+      .catch((e) => { if (active) setError(message(e)) })
+      .finally(() => { if (active) setLoading(false) })
+    return () => { active = false }
+  }, [page, listRevision])
   const copy = async (id: string) => {
     try {
       const row = await request('/' + id + '/copy', {
@@ -96,6 +102,22 @@ export function QuestionnaireProductList() {
       setError(message(e))
     }
   }
+  const templatePanel = templateSource && <section className="my-4 rounded border p-4" aria-label="保存组合模板"><h2>从 {templateSource.name} 保存私有模板</h2><p>只复制内容定义，移除课程投放与公开链接，不携带作答或授权。</p><p>模板不保留学员反馈开放时间、草稿保留时长或课程级作答计时选项。复制为新草稿后，请为新课程重新选择这些投放设置，再发布；题目定义、计分规则和认知任务的刺激时序不变。</p><label>模板名称<input className="input" maxLength={200} value={templateName} onChange={e => setTemplateName(e.target.value)} disabled={savingTemplate}/></label><ProductButton disabled={savingTemplate || !templateName.trim()} onClick={async () => {
+        if (saving.current) return
+        saving.current = true; setSavingTemplate(true); setError('')
+        const key = `save-composition-template:${user?.id}:${templateSource.id}:${templateName.trim()}`
+        try {
+          let requestId = sessionStorage.getItem(key)
+          if (!requestId) { requestId = crypto.randomUUID(); sessionStorage.setItem(key, requestId) }
+          await request('/templates', { sourceId: templateSource.id, name: templateName.trim(), requestId })
+          sessionStorage.removeItem(key); navigate('/assessment-templates')
+        }
+        catch (e) { setError(message(e)) }
+        finally { saving.current = false; setSavingTemplate(false) }
+      }}>{savingTemplate ? '保存中…' : '保存为模板'}</ProductButton><ProductButton disabled={savingTemplate} onClick={() => setTemplateSource(null)}>取消</ProductButton></section>
+  if (isTrainingHost()) return <TrainingQuestionnaireList data={data} page={page} loading={loading} error={error}
+    onPage={setPage} onCopy={copy} onTemplate={row=>{setTemplateSource(row);setTemplateName(row.name)}} savingTemplate={savingTemplate}
+    templatePanel={templatePanel} actorId={user?.id || ''} onReload={()=>setListRevision(value=>value+1)}/>
   return (
     <ProductPage width="management" className={`hui-questionnaire-products${isTrainingHost() ? ' training-form-management' : ''}`}>
       <PageHeader
@@ -109,19 +131,7 @@ export function QuestionnaireProductList() {
       />
       {error && <p role="alert">{error}</p>}
       <nav className="my-4 flex flex-wrap gap-4"><Link to="/assessment-templates">从模板创建</Link><Link to="/assessment-workbench">结果与质量概览</Link><Link to="/assessment-management">筛选归档与操作记录</Link></nav>
-      {templateSource && <section className="my-4 rounded border p-4" aria-label="保存组合模板"><h2>从 {templateSource.name} 保存私有模板</h2><p>只复制内容定义，移除课程投放与公开链接，不携带作答或授权。</p><p>模板不保留学员反馈开放时间、草稿保留时长或课程级作答计时选项。复制为新草稿后，请为新课程重新选择这些投放设置，再发布；题目定义、计分规则和认知任务的刺激时序不变。</p><label>模板名称<input className="input" maxLength={200} value={templateName} onChange={e => setTemplateName(e.target.value)} disabled={savingTemplate}/></label><ProductButton disabled={savingTemplate || !templateName.trim()} onClick={async () => {
-        if (saving.current) return
-        saving.current = true; setSavingTemplate(true); setError('')
-        const key = `save-composition-template:${user?.id}:${templateSource.id}:${templateName.trim()}`
-        try {
-          let requestId = sessionStorage.getItem(key)
-          if (!requestId) { requestId = crypto.randomUUID(); sessionStorage.setItem(key, requestId) }
-          await request('/templates', { sourceId: templateSource.id, name: templateName.trim(), requestId })
-          sessionStorage.removeItem(key); navigate('/assessment-templates')
-        }
-        catch (e) { setError(message(e)) }
-        finally { saving.current = false; setSavingTemplate(false) }
-      }}>{savingTemplate ? '保存中…' : '保存为模板'}</ProductButton><ProductButton disabled={savingTemplate} onClick={() => setTemplateSource(null)}>取消</ProductButton></section>}
+      {templatePanel}
       {loading ? (
         <p role="status">正在加载组合测评…</p>
       ) : (
