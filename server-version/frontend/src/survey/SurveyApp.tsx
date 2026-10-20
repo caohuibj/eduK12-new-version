@@ -3,6 +3,7 @@ import { useCallback, useEffect, useMemo, useState, type FormEvent } from 'react
 import { QRCodeSVG } from 'qrcode.react'
 import { ProductPasswordChange } from '../components/account/ProductPasswordChange'
 import { SurveyBuilder } from './SurveyBuilder'
+import { SurveyReportStudio } from './SurveyReportStudio'
 import { createInstrumentLibrary } from './instrument-library'
 import { SurveyWaveStudio } from './SurveyWaveStudio'
 import { SurveyAnalyticsWorkspace } from './SurveyAnalyticsWorkspace'
@@ -234,6 +235,7 @@ export default function SurveyApp(){
             {selected&&<button type="button" className="btn-secondary" onClick={()=>{setSelected(null);setTitle('');setDescription('')}}>新建其他项目</button>}</div>
         </form><p className="text-sm text-slate-500 mt-4">研究工具编辑、研究专用发布、匿名参与与科研分析可按功能开关使用；正式生产开通须完成独立部署验收。</p>
       </section>{selected&&<><div id="survey-workspace-tools" role="tabpanel" aria-labelledby="survey-workspace-tab-tools" hidden={workspaceSection!=='tools'}><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary}/></div>
+        <div id="survey-workspace-reports" role="tabpanel" aria-labelledby="survey-workspace-tab-reports" hidden={workspaceSection!=='reports'}><SurveyReportStudio key={'reports-'+selected.id} projectId={selected.id} projectStatus={selected.status} active={workspaceSection==='reports'}/></div>
         <div id="survey-workspace-publish" role="tabpanel" aria-labelledby="survey-workspace-tab-publish" hidden={workspaceSection!=='publish'}><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary} onProjectChanged={projectChanged}/></div>
         <div id="survey-workspace-data" role="tabpanel" aria-labelledby="survey-workspace-tab-data" hidden={workspaceSection!=='data'}>
           {available?.analytics

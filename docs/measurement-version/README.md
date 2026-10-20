@@ -215,3 +215,11 @@ Survey 项目授权把原有 owner/账户/grant/MFA 的 FOR SHARE 行集合放�
 新增 `POST /api/survey/projects/:pid/instruments/:iid/measurement-release`，只接受精确 `revision`。沿真实项目 owner/grant/MFA 和草稿共享锁检查 revision/status，复用现有 Scale/Cognitive/SJT 编译器、发布适配器与项目图片许可；普通 FORM 和目录来源草稿不走该原生作者入口。返回只含 release 身份、hash、版本与指标键，不含题目评分 key 或可执行定义。相同草稿 revision 重试复用不可变 release，资产引用同事务保留，停止可用的旧 revision 不能被重试重新激活。
 
 此步解除“先投放才能编报告”的依赖；Wave 的既有发布调用暂共享相同适配函数。V08 仍需把 Wave 改为仅冻结显式选择的精确已发布测量/参考策略候选/report，并清除该隐式发布路径。该切换尚未在本步骤声称完成。
+
+### Survey 私有报告编制界面
+
+项目工作区新增“私有报告”页签。首次打开才读取报告与测量列表，切换页签保留未保存编辑。界面提供原生测量显式发布（按需加载）、报告草稿创建、受控 TEXT/METRIC/REFERENCE_BAND 编辑、保存、三个明确标记的合成预览、带说明的显式发布与已发布版复制为新版本。非当前编辑器支持的 CHART/ASSET 区块和资产清单读取后原样保留，不能用 JSON 编辑器改数值规则。CLOSED/ARCHIVED 只允许历史报告编制，不能发布新测量或重新采集。
+
+创建响应不确定时保留原 requestId/内容，重试不自动换新请求。列表刷新失败与已成功写入分别提示，不要求重新发布。参考 band key 仍需作者引用已批准规则；合成预览明确不证明真实参考存在/适用。实际 wave/report 绑定、被试消费及独立解释结果持久化仍归 V08，未由此 UI 提前完成。
+
+验证：前端专用 10 项、工作区导航/请求 21 项、入口相关 14 项通过；定向 strict TypeScript 与五个变更前端文件 ESLint 通过。未运行全量 build、真实浏览器、最终 CI。

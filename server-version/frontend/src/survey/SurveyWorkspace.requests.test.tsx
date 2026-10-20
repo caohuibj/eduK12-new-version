@@ -40,6 +40,8 @@ function fixture({many=false,empty=false,waveCount=1}={}){
     if(path==='')return response(projects.find(project=>project.id===id))
     if(path==='/catalog?page=1')return response({list:[{id:'grant1',title:'授权原版',kind:'FORM',status:'ACTIVE',sourceRef:{kind:'FORM',sourceId:'form',sourceVersion:1}}]})
     if(path==='/assets')return response({assets:[]})
+    if(path==='/report-drafts/measurements')return response([{id:'measurement1',family:'SCALE',key:'private-scale',version:'1',status:'PUBLISHED',contentHash:'a'.repeat(64),metrics:[{metricKey:'score',unit:'points'}]}])
+    if(path==='/report-drafts?page=1')return response([])
     if(path.startsWith('/waves?page='))return response({list:Array.from({length:Number(path.split('=')[1])===1?waveCount:1},(_,i)=>wave('w'+(i+1),i+1))})
     if(path.startsWith('/instruments?page=')){
       const page=Number(path.split('=')[1])
@@ -366,6 +368,14 @@ describe('shared Survey workspace instruments requests',()=>{
 describe('S04 workspace section navigation',()=>{
   it('retains unsaved settings, tool and wave edits across sections without any new request',async()=>{
     const api=fixture();await openWorkspace()
+    // First opening loads this independent resource once; later section changes
+    // still retain every editor without issuing redundant requests.
+    fireEvent.click(screen.getByRole('tab',{name:'私有报告'}))
+    await screen.findByRole('option',{name:/private-scale/})
+    await waitFor(()=>expect(screen.getByRole('button',{name:'刷新报告与测量列表'})).toBeEnabled())
+    expect(api.count(base+'/report-drafts/measurements')).toBe(1)
+    expect(api.count(base+'/report-drafts?page=1')).toBe(1)
+    fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}))
     fireEvent.change(studio().getByLabelText('波次标题'),{target:{value:'未保存的采集计划'}})
     fireEvent.click(screen.getByRole('tab',{name:'研究设置'}))
     fireEvent.change(screen.getByLabelText('研究名称'),{target:{value:'未保存的研究名称'}})
@@ -385,6 +395,9 @@ describe('S04 workspace section navigation',()=>{
     expect(builder().getByRole('button',{name:'保存草稿'})).toBeEnabled()
     const tools=screen.getByRole('tab',{name:'研究工具'});tools.focus()
     fireEvent.keyDown(tools,{key:'ArrowRight'})
+    expect(screen.getByRole('tab',{name:'私有报告'})).toHaveFocus()
+    expect(screen.getByRole('tab',{name:'私有报告'})).toHaveAttribute('aria-selected','true')
+    fireEvent.keyDown(screen.getByRole('tab',{name:'私有报告'}),{key:'ArrowRight'})
     expect(screen.getByRole('tab',{name:'发布与采集'})).toHaveFocus()
     expect(screen.getByRole('tab',{name:'发布与采集'})).toHaveAttribute('aria-selected','true')
     fireEvent.keyDown(screen.getByRole('tab',{name:'发布与采集'}),{key:'End'})

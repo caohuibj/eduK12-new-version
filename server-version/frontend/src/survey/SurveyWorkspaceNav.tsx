@@ -1,7 +1,8 @@
 import type { KeyboardEvent } from 'react'
-export type WorkspaceSection='settings'|'tools'|'publish'|'data'
+export type WorkspaceSection='settings'|'tools'|'reports'|'publish'|'data'
 const sections:[WorkspaceSection,string,string][]=[
   ['settings','研究设置','名称、说明与采集方式'],['tools','研究工具','编题、导入与试答'],
+  ['reports','私有报告','模板、合成预览与版本'],
   ['publish','发布与采集','波次、知情同意与链接'],['data','研究数据','质量、分析与导出'],
 ]
 export function SurveyWorkspaceNav({active,onChange,title}:{active:WorkspaceSection;
@@ -16,8 +17,8 @@ export function SurveyWorkspaceNav({active,onChange,title}:{active:WorkspaceSect
   }
   return <header className="survey-workspace-nav">
     <p className="survey-workspace-eyebrow">当前研究</p><h2>{title}</h2>
-    <p>按研究设置、工具编制、发布采集和数据整理逐步完成。切换分区会保留本页未保存的编辑；离开页面前请保存。</p>
-    <div role="tablist" aria-label="研究工作分区">
+    <p>按研究设置、工具编制、报告编制、发布采集和数据整理逐步完成。切换分区会保留本页未保存的编辑；离开页面前请保存。</p>
+    <div role="tablist" aria-label="研究工作分区" style={{gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))'}}>
       {sections.map(([key,label,hint],index)=><button key={key} type="button" role="tab"
         id={'survey-workspace-tab-'+key} aria-controls={'survey-workspace-'+key}
         aria-selected={active===key} aria-label={label} tabIndex={active===key?0:-1}
