@@ -288,3 +288,13 @@ test('optional legacy step plans remain parseable before false route conditions 
   assert.throws(()=>JSON.parse('invalid' || '{}'));
   assert.match(main,/if: steps.scope.outputs.application_route == 'homepage-copy' && github.event_name == 'pull_request'/);
 });
+
+test('schema diagnosis cannot replace required runtime qualification',()=>{
+  const workflow=readFileSync(new URL('../workflows/ci-exact-candidate.yml',import.meta.url),'utf8');
+  const runtime=workflow.split('\n  runtime:\n')[1].split('\n  ready:\n')[0];
+  assert.match(runtime,/if: false/);
+  assert.match(workflow,/schema-diagnostic.py --plan exact-candidate-plan.json/);
+  assert.match(workflow,/needs: \[admission, browser, runtime\]/);
+  assert.match(workflow,/row.result,'success'/);
+  assert.doesNotMatch(workflow,/needs: \[admission, browser, schema-diagnostic\]/);
+});

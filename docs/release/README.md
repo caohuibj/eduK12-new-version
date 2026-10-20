@@ -402,3 +402,18 @@ The user explicitly approved only this run's ephemeral loopback HTTPS CA in an i
 
 
 The Survey CI follow-up corrects mixed-language CodeQL paths to directories and adds two missing, immutable, read-only monorepo JSON fixture mounts for frontend type checking. Both original compiles, backend audit/runtime and their three image archives remain qualified by their exact successful phase prefix; the failed type phase and unexecuted checks are not accepted. The adapter admits only the reviewed transition and verifies the original same-PR official failed job, source/merge trees, exact seven-success/one-failure phase shape, 24-hour artifact digest, unchanged product/execution inputs and original image IDs/revision labels. Raw failed evidence is retained separately. It restores the three images without recompiling and packages the missing frontend runtime from the original builder's /app/dist plus the recorded nginx digest. The current head executes corrected types/lint, missing frontend audit/runtime, both runtime scans, fresh isolated services, selected contracts, migration/restore and browser checks, alongside SAST and changed gate contracts. No failed/skipped work is promoted to passing and no fallback rebuild occurs. A separate small reports artifact permits evidence review without transferring image archives.
+
+### Measurement schema 比较故障的限定诊断与恢复
+
+官方 run 39442752356 的 runtime job 已完成失败：prepare、audit、变化 lint、
+app types、runtime 装配及扫描通过，schema 最后定义比较失败。完整官方
+artifact 清单仅保留 JSON，没有已扫描镜像归档，不能将镜像 ID 当作仍持有
+原镜像字节。诊断候选仅运行隔离 schema 比较诊断；真实 runtime job 暂停，
+原 aggregate 因该必需 job 未成功而继续阻止合并，诊断成功不授予资格。
+
+之后恢复仅接纳固定官方记录中 audit/lint/app-types 三项原成功，保留原
+失败 job 身份并核对原始 ZIP、记录、输入及完整消费工具闭包。不得重跑
+这些已通过应用检查。丢失镜像字节需要从原已核验编译输出重新装配 runtime
+并扫描新的实际镜像，不重新编译，旧镜像扫描不能继承给新镜像。包装和
+扫描已成功时，即使后续 schema 失败，也核对镜像与扫描身份、归档摘要后
+保存实际镜像 artifact，同时保留整体失败状态；不保存半成品为合格镜像。
