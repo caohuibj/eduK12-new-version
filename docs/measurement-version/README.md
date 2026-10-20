@@ -242,3 +242,11 @@ Survey 项目授权把原有 owner/账户/grant/MFA 的 FOR SHARE 行集合放�
 候选新增可信 `sourceBinding`（wave/variable/revision/count/cutoff）供下一步复核与发布精确重读；其内容进入 candidateHash。尚无此服务的 HTTP 或系统根授权签发入口；当前不把此内部服务称作用户可用正式 norm 工作台。正式跨入口 norm 仍须独立复核，人口分层必须来自明确版本化字段映射。
 
 验证：新服务＋候选＋真实 reader 合同共 38 项、定向 strict TypeScript 通过。尚未运行真实 PostgreSQL 并发或应用 HTTP；未改迁移、未跑全链或压测。
+
+## V08 原生 Survey 冻结先行收口
+
+原生 Scale/Cognitive/SJT 的 Wave freeze 不再隐式创建 measurement release，而是由同一编译投影解析精确 draft revision 对应的已发布身份。缺少发布或内容/来源不一致返回受控 409；要求先在原生发布入口发布，再冻结投放。事务用 release 行 FOR SHARE 锁后检查 PUBLISHED/精确内容与scope/provenance，避免拿普通 SELECT 的旧可用状态继续冻结。显式 publish 的幂等命中也取得同一状态锁，不反向激活停用身份。
+
+目录来源仍走原有授权导入路径，待 V09 集中迁移切换；本次不增加目录改编权限。reference 候选集合/report 选择、START 人口匹配、FINAL 一次计分/结果解释、四入口与旧记录迁移仍待后续，不能把本项称为完整 V08。
+
+验证：发布/编制 16 项加新锁定解析 7 项定向合同通过，strict TypeScript 通过。该锁状态合同为 mock/静态验证，真实多连接生命周期竞态未在本环境验证。

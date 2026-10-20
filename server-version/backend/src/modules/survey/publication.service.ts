@@ -1,8 +1,9 @@
+import {ContentReleaseError} from '../measurement-content/release'
 import { cognitiveMeasurementRelease } from '../measurement-content/cognitive'
 import { sjtMeasurementRelease } from '../measurement-content/sjt'
-import { publishContentRelease } from '../measurement-content/repository'
+import { publishContentRelease,requirePublishedContentRelease } from '../measurement-content/repository'
 import { parseFrozenSurveyCognitive } from './cognitive.definition'
-import { publishScaleMeasurement, surveyScaleReleaseContext } from '../measurement-content/scale'
+import { scaleMeasurementRelease, surveyScaleReleaseContext } from '../measurement-content/scale'
 import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
 import type {SourceAnswerMapping} from './catalog.sources'
 import { SURVEY_COGNITIVE_NOTICE } from './measurement.notice'
@@ -60,35 +61,40 @@ export interface ResearchFrozenPublication {
 }
 const stop=(message:string):never=>{throw new SurveyWaveError(409,message)}
 
-/** Shared by explicit content publication and Wave freeze; identical revision identity. */
-export async function publishSurveyMeasurementUnit(tx:Prisma.TransactionClient,unit:ResearchFrozenUnit,actorId:string,projectId:string){
+/** Both paths derive identical identity from the existing compiler and adapters. */
+export function surveyMeasurementReleaseInput(unit:ResearchFrozenUnit,actorId:string,projectId:string){
   if(unit.kind==='FORM')throw new SurveyWaveError(400,'普通表单不生成测量版本')
-  const scope = { kind: 'PRIVATE' as const, ownerId: actorId, product: 'SURVEY' as const, resourceId: projectId }
-  let release
-  if (unit.kind === 'COGNITIVE') {
-    const frozen = parseFrozenSurveyCognitive(unit.compiledDefinition)
-    const snapshot = frozen.sessionSnapshot
-    release = await publishContentRelease(tx, cognitiveMeasurementRelease({
-      localId: unit.draftId, version: String(unit.draftRevision), scope,
-      testType: snapshot.testType, configVersion: snapshot.configVersion,
-      engineVersion: snapshot.engineVersion, scoringVersion: snapshot.scoringVersion, config: snapshot.config,
-      protocolContext: { timingPolicy: frozen.timingPolicy, devicePolicy: frozen.devicePolicy, restartLimit: frozen.restartLimit },
-    }), actorId)
-  } else if (unit.kind === 'SJT') {
-    release = await publishContentRelease(tx, sjtMeasurementRelease({
-      localId: unit.draftId, version: String(unit.draftRevision), instrumentVersion: surveyScaleReleaseContext(unit).instrumentVersion,
-      definition: unit.compiledDefinition, displayProtocol: unit.displayDefinition, scope, provenance: unit.sourceProvenance ?? {},
-    }), actorId)
-  } else release = await publishScaleMeasurement(tx, {
-    localId: unit.draftId, version: String(unit.draftRevision),
-    ...surveyScaleReleaseContext(unit), definition: unit.compiledDefinition,
-    instrumentClass: unit.sourceProvenance ? 'STANDARD' : 'CUSTOM_DESCRIPTIVE',
-    provenance: unit.sourceProvenance ?? {},
-    scope: { kind: 'PRIVATE', ownerId: actorId, product: 'SURVEY', resourceId: projectId },
-  }, actorId)
-  if (release.layer !== 'MEASUREMENT') throw new Error('研究测量发布身份不匹配')
+  const scope={kind:'PRIVATE' as const,ownerId:actorId,product:'SURVEY' as const,resourceId:projectId}
+  if(unit.kind==='COGNITIVE'){
+    const frozen=parseFrozenSurveyCognitive(unit.compiledDefinition),snapshot=frozen.sessionSnapshot
+    return cognitiveMeasurementRelease({localId:unit.draftId,version:String(unit.draftRevision),scope,
+      testType:snapshot.testType,configVersion:snapshot.configVersion,engineVersion:snapshot.engineVersion,
+      scoringVersion:snapshot.scoringVersion,config:snapshot.config,
+      protocolContext:{timingPolicy:frozen.timingPolicy,devicePolicy:frozen.devicePolicy,restartLimit:frozen.restartLimit}})
+  }
+  if(unit.kind==='SJT')return sjtMeasurementRelease({localId:unit.draftId,version:String(unit.draftRevision),
+    instrumentVersion:surveyScaleReleaseContext(unit).instrumentVersion,definition:unit.compiledDefinition,
+    displayProtocol:unit.displayDefinition,scope,provenance:unit.sourceProvenance??{}})
+  return scaleMeasurementRelease({localId:unit.draftId,version:String(unit.draftRevision),
+    ...surveyScaleReleaseContext(unit),definition:unit.compiledDefinition,
+    instrumentClass:unit.sourceProvenance?'STANDARD':'CUSTOM_DESCRIPTIVE',provenance:unit.sourceProvenance??{},scope})
+}
+export async function publishSurveyMeasurementUnit(tx:Prisma.TransactionClient,unit:ResearchFrozenUnit,actorId:string,projectId:string){
+  const release=await publishContentRelease(tx,surveyMeasurementReleaseInput(unit,actorId,projectId),actorId)
+  if(release.layer!=='MEASUREMENT')throw new Error('研究测量发布身份不匹配')
   if(release.status!=='PUBLISHED')throw new SurveyWaveError(409,'该测量版本已停止用于新施测，请发布新版本')
   return release
+}
+export async function resolveSurveyMeasurementUnit(tx:Prisma.TransactionClient,unit:ResearchFrozenUnit,actorId:string,projectId:string){
+  try{
+    const release=await requirePublishedContentRelease(tx,surveyMeasurementReleaseInput(unit,actorId,projectId))
+    if(release.layer!=='MEASUREMENT')throw new Error('研究测量发布身份不匹配')
+    return release
+  }catch(error){
+    if(error instanceof ContentReleaseError)throw new SurveyWaveError(409,
+      error.code==='CONTENT_RELEASE_NOT_PUBLISHED'?'请先显式发布当前修订的测量版本，再冻结波次':'测量发布版本已变化或不可用于新施测，请刷新核对')
+    throw error
+  }
 }
 
 export function compileFrozenResearchUnit(draft:{
@@ -181,7 +187,11 @@ export async function freezeResearchWaveDraft(input:{
     })
     for (const unit of units) {
       if (unit.kind === 'FORM') continue
-      const release=await publishSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
+      // Native authors explicitly publish before Wave freezing. Existing
+      // licensed catalog import migration remains a separate V09 transition.
+      const release=unit.sourceProvenance
+        ?await publishSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
+        :await resolveSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
       unit.measurementRelease = { releaseId: release.releaseId, contentHash: release.contentHash,
         measurementHash: release.content.measurementHash }
     }

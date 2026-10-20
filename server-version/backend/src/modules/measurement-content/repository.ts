@@ -28,6 +28,19 @@ export async function getContentRelease(db: Db, releaseId: string, lockForPublic
   }
   return value
 }
+/** Admission/freezing resolves an existing exact identity and holds its state
+ * lock through the caller's transaction. It never publishes a missing version. */
+export async function requirePublishedContentRelease(db:Db,raw:unknown):Promise<StoredRelease>{
+  const expected=prepareRelease(raw)
+  const rows=await db.$queryRaw<Row[]>(Prisma.sql`SELECT * FROM measurement_content_releases
+    WHERE family=${expected.family} AND layer=${expected.layer} AND content_key=${expected.key} AND version=${expected.version} FOR SHARE`)
+  if(!rows[0])throw new ContentReleaseError('CONTENT_RELEASE_NOT_PUBLISHED')
+  const release=decode(rows[0])
+  if(release.status!=='PUBLISHED')throw new ContentReleaseError('CONTENT_RELEASE_NOT_AVAILABLE_FOR_ADMINISTRATION')
+  if(release.hashScheme!==expected.hashScheme||release.contentHash!==expected.contentHash
+    ||canonicalHash(valueForInput(release))!==canonicalHash(valueForInput(expected)))throw new ContentReleaseError('CONTENT_VERSION_IMMUTABLE')
+  return release
+}
 const valueForInput = (r: PreparedRelease) => ({ layer:r.layer,family:r.family,key:r.key,version:r.version,content:r.content,scope:r.scope,provenance:r.provenance,assetRefs:r.assetRefs,sourceReleaseId:r.sourceReleaseId })
 
 async function checkReferences(db: Db, input: PreparedRelease, purpose: 'NEW_ADMINISTRATION' | 'HISTORICAL_INTERPRETATION'): Promise<void> {
@@ -58,7 +71,7 @@ export async function publishContentRelease(db: Db, raw: unknown, actorId: strin
   const lockKey = canonicalHash([input.family,input.layer,input.key,input.version])
   await db.$executeRaw(Prisma.sql`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`)
   const existing = await db.$queryRaw<Row[]>(Prisma.sql`SELECT * FROM measurement_content_releases
-    WHERE family=${input.family} AND layer=${input.layer} AND content_key=${input.key} AND version=${input.version}`)
+    WHERE family=${input.family} AND layer=${input.layer} AND content_key=${input.key} AND version=${input.version} FOR SHARE`)
   if (existing[0]) {
     const prior = decode(existing[0])
     if (canonicalHash(valueForInput(prior)) !== canonicalHash(valueForInput(input))) throw new ContentReleaseError('CONTENT_VERSION_IMMUTABLE')
