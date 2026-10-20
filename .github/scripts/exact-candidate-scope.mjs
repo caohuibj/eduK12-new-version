@@ -131,7 +131,7 @@ export function validExactPlan(p) {
 
 // The standalone catalog workflow must classify the same frozen candidate, not
 // start an unrelated all-instrument installation on either PR/review event.
-export const MAC_CATALOG_DEPENDENCY_DELTA = [{"path":"server-version/backend/package.json","before":"ebe2f4233e00784fafc2f866e6c1f212ff31385e","after":"e17cb797e0e3182eaaf643bea1767d24067daa10"},{"path":"server-version/backend/package-lock.json","before":"9e55fdb8bc4a29baf93fe815cd1585090364cd0b","after":"d32fb42875033a1774dd83262a3b95e3fb6ca5d8"}];
+export const MAC_CATALOG_DEPENDENCY_DELTA = [{"path":"server-version/backend/package.json","before":"ebe2f4233e00784fafc2f866e6c1f212ff31385e","after":"033398f6361b0e4217226ae00f2edc2ed3380ecd"},{"path":"server-version/backend/package-lock.json","before":"9e55fdb8bc4a29baf93fe815cd1585090364cd0b","after":"73607721290dd28f1c6f85d5e12d5d517926ede3"}];
 export function verifyUnchangedCatalogInputs(inputs,baseRows,headRows,dependencyDelta=[]) {
   if(dependencyDelta.length && JSON.stringify(dependencyDelta)!==JSON.stringify(MAC_CATALOG_DEPENDENCY_DELTA))
     throw Error('Unreviewed catalog dependency delta');

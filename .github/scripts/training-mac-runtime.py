@@ -37,13 +37,20 @@ def validate_dependency_patch(inputs):
     R.require(patch['tarball'] == 'https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.16.1.tgz' and
               patch['integrity'] == 'sha512-FNvFGzoMLWmE6Yj9spb/zjd7yiNCHiAW9/Tg9CXrQ8wuu32HtlJOwWO11OJafl5FfY3DxTdQ0vj42zU1kvv5jg==' and
               patch['tarSha256'] == '6e075d999dc5ff568916954508397b11a537b18bde615986d7bd8b3d3fa1799f' and patch['tarBytes'] == 10076, 'Unreviewed official package bytes')
-    paths = ['server-version/backend/package.json', 'server-version/backend/package-lock.json', 'server-version/frontend/package-lock.json']
+    paths = ['server-version/' + c + '/' + p for c in R.COMPONENTS for p in ('package.json', 'package-lock.json')]
     R.require(sorted(patch['reviewedSourceFiles']) == sorted(paths), 'Unexpected dependency source boundary')
+    vite_pins = inputs['macRuntime']['vitePatch']
+    R.require(set(vite_pins) == set(R.COMPONENTS), 'Missing exact Vite repair')
     for component in R.COMPONENTS:
+        vite = vite_pins[component]
+        old_version, new_version, tar_hash, tar_bytes = (('7.3.6', '7.3.7', '61819c1c5e0b526a012b39b5d4dfb9d10875ced139554f9105a8999990ce7b08', 544713)
+            if component == 'backend' else ('6.4.3', '6.4.4', '09242e9a1f45c17ef96402dc1b39cfcf93b6a65a5bc965622641be50830fa71b', 635040))
+        R.require((vite['name'], vite['fromVersion'], vite['toVersion'], vite['tarSha256'], vite['tarBytes']) == ('vite', old_version, new_version, tar_hash, tar_bytes)
+                  and vite['tarball'] == 'https://registry.npmjs.org/vite/-/vite-' + new_version + '.tgz', 'Unreviewed Vite repair bytes')
         previous = patch['originalComponents'][component]
         current_tree = R.git('rev-parse', 'HEAD:server-version/' + component)
         changed = R.git('diff', '--name-only', previous['sourceTree'], current_tree).splitlines()
-        expected_paths = ['package-lock.json', 'package.json'] if component == 'backend' else ['package-lock.json']
+        expected_paths = ['package-lock.json', 'package.json']
         R.require(sorted(changed) == sorted(expected_paths), 'Changed source outside exact package repair')
         old = {}
         current = {}
@@ -59,11 +66,18 @@ def validate_dependency_patch(inputs):
         entry = lock['packages']['node_modules/follow-redirects']
         R.require(entry['version'] == '1.16.0', 'Wrong original package')
         entry.update(version='1.16.1', resolved=patch['tarball'], integrity=patch['integrity'])
-        R.require(current['package-lock.json'] == lock, 'Unreviewed dependency lock delta')
         package = copy.deepcopy(old['package.json'])
         if component == 'backend':
             R.require(package['overrides']['follow-redirects'] == '1.16.0', 'Wrong original override')
             package['overrides']['follow-redirects'] = '1.16.1'
+        declaration = '' if component == 'backend' else '^'
+        R.require(package['devDependencies']['vite'] == declaration + old_version and
+                  lock['packages']['']['devDependencies']['vite'] == declaration + old_version and
+                  lock['packages']['node_modules/vite']['version'] == old_version, 'Wrong original Vite source')
+        package['devDependencies']['vite'] = declaration + new_version
+        lock['packages']['']['devDependencies']['vite'] = declaration + new_version
+        lock['packages']['node_modules/vite'].update(version=new_version, resolved=vite['tarball'], integrity=vite['integrity'])
+        R.require(current['package-lock.json'] == lock, 'Unreviewed dependency lock delta')
         R.require(current['package.json'] == package, 'Unreviewed package manifest delta')
     return patch
 
@@ -185,7 +199,8 @@ class MacQualification(R.Qualification):
             R.require(R.digest(raw) == expected['sha256'], 'Changed external fixture bytes')
             (self.private / Path(path).name).write_bytes(raw)
         patched = self.apply_dependency_patch()
-        return {'officialDependenciesVerified': True, 'originalDistConsumed': False, 'dependencyInstallCommandExecuted': False, 'sourceLockedPackageOverlayApplied': True, 'dependencyPatch': patched}
+        vite = self.apply_vite_patch()
+        return {'officialDependenciesVerified': True, 'originalDistConsumed': False, 'dependencyInstallCommandExecuted': False, 'sourceLockedPackageOverlayApplied': True, 'dependencyPatch': patched, 'vitePatch': vite}
 
     def compile_component(self, component):
         self.ready('prepare')
@@ -214,6 +229,57 @@ class MacQualification(R.Qualification):
         proof = cognitive_subsumption(self.private / 'frontend')
         super().app_types()
         return proof
+
+    def apply_vite_patch(self):
+        import base64
+        result = {}
+        for component, pin in self.inputs['macRuntime']['vitePatch'].items():
+            with R.urllib.request.urlopen(R.urllib.request.Request(pin['tarball']), timeout=60) as response:
+                R.require(response.geturl() == pin['tarball'], 'Unexpected Vite archive redirect')
+                raw = response.read(pin['tarBytes'] + 1)
+            R.require(len(raw) == pin['tarBytes'] and R.digest(raw) == pin['tarSha256'] and
+                'sha512-' + base64.b64encode(R.hashlib.sha512(raw).digest()).decode() == pin['integrity'], 'Official Vite archive mismatch')
+            archive = self.private / (component + '-vite.tgz'); archive.write_bytes(raw)
+            unpacked = self.private / (component + '-vite'); R.safe_extract(archive, unpacked, {'package'})
+            context = self.private / component; target = context / 'node_modules/vite'
+            R.require(target.is_dir() and not target.is_symlink(), 'Wrong installed Vite path')
+            old = json.loads((target / 'package.json').read_text()); new = json.loads((unpacked / 'package/package.json').read_text())
+            R.require(old['name'] == new['name'] == 'vite' and old['version'] == pin['fromVersion'] and new['version'] == pin['toVersion'], 'Wrong Vite package version')
+            R.require(all(old.get(k) == new.get(k) for k in ('dependencies', 'peerDependencies', 'optionalDependencies', 'types', 'exports', 'bin', 'engines', 'type', 'scripts')), 'Unexpected Vite dependency/API delta')
+            lock = json.loads((context / 'package-lock.json').read_text())['packages']['node_modules/vite']
+            R.require(all(lock[k] == pin[v] for k, v in [('version', 'toVersion'), ('resolved', 'tarball'), ('integrity', 'integrity')]), 'Vite patch differs from source lock')
+            shutil.rmtree(target); shutil.move(unpacked / 'package', target)
+            hidden = context / 'node_modules/.package-lock.json'
+            if hidden.exists():
+                data = json.loads(hidden.read_text()); entry = data['packages']['node_modules/vite']
+                R.require(entry['version'] == pin['fromVersion'], 'Wrong hidden Vite lock')
+                entry.update(version=pin['toVersion'], resolved=pin['tarball'], integrity=pin['integrity'])
+                hidden.write_text(json.dumps(data, indent=2) + '\n')
+            result[component] = {k: pin[k] for k in ('fromVersion', 'toVersion', 'tarSha256', 'integrity')}
+        self.state['vitePatch'] = result
+        return result
+
+    def compile_patched_frontend(self, original, archive):
+        R.require(original['name'] == 'frontend-compile' and original['status'] == 'success', 'Wrong original frontend reference')
+        archive = Path(archive).resolve(); details = original['details']
+        R.require(archive.is_relative_to(self.private) and R.sha(archive) == details['archiveSha256'], 'Changed original frontend archive')
+        reference = self.private / 'frontend-comparison'
+        R.safe_extract(archive, reference, {'dist'})
+        result = self.compile_component('frontend')
+        def inventory(root):
+            rows = {}
+            for path in sorted(root.rglob('*')):
+                R.require(not path.is_symlink() and (path.is_dir() or path.is_file()), 'Nonregular compiled frontend member')
+                if path.is_file(): rows[path.relative_to(root).as_posix()] = R.sha(path)
+            R.require(rows and 'index.html' in rows, 'Missing compiled frontend comparison')
+            return rows
+        before = inventory(reference / 'dist'); after = inventory(self.private / 'frontend/dist')
+        comparison = {'equal': before == after, 'originalArchiveSha256': details['archiveSha256'], 'currentArchiveSha256': result['archiveSha256'],
+            'filesCompared': len(set(before) | set(after)), 'originalInventorySha256': R.digest(R.canonical(before)), 'currentInventorySha256': R.digest(R.canonical(after)),
+            'originalFileCount': len(before), 'currentFileCount': len(after)}
+        result['distEquality'] = comparison
+        self.state['components']['frontend']['distEquality'] = comparison
+        return result
 
     def apply_dependency_patch(self):
         import base64
@@ -263,13 +329,87 @@ class MacQualification(R.Qualification):
 
     def audit(self):
         # Both source locks contain the changed package. Old audit is not inherited.
-        return super().audit()
+        self.ready('prepare')
+        result = {}
+        for component in R.COMPONENTS:
+            context = self.private / component
+            command = ['npm', '--prefix', str(context), '--registry=https://registry.npmjs.org', '--replace-registry-host=always', 'audit', '--audit-level=high', '--json']
+            audit = self.command(command, accepted=(0, 1))
+            data = json.loads(audit.stdout)
+            R.require('error' not in data and isinstance(data.get('metadata', {}).get('vulnerabilities'), dict), 'No valid dependency audit')
+            counts = data['metadata']['vulnerabilities']
+            R.require(all(type(counts.get(k)) is int for k in ('high', 'critical')), 'Incomplete dependency audit')
+            lock = json.loads((context / 'package-lock.json').read_text())['packages']
+            # Publish only bounded package/advisory identities, never raw npm
+            # output, paths, environment, registry credentials or message text.
+            def safe(value, pattern, limit=200):
+                return value if isinstance(value, str) and len(value) <= limit and re.fullmatch(pattern, value) else None
+            package_pattern = r'(?:@[a-z0-9._-]+/)?[a-z0-9._-]+'
+            version_pattern = r'[0-9A-Za-z.*+<>=~^| -]+'
+            findings = []
+            for name, row in sorted(data.get('vulnerabilities', {}).items()):
+                if row.get('severity') not in ('high', 'critical'): continue
+                name = safe(name, package_pattern)
+                if name is None: continue
+                versions = sorted({p['version'] for path, p in lock.items() if path and
+                    (p.get('name') or path.rsplit('node_modules/', 1)[-1]) == name and safe(p.get('version'), version_pattern)})
+                advisories = []
+                for via in row.get('via', []):
+                    if not isinstance(via, dict): continue
+                    source = via.get('source')
+                    url = safe(via.get('url'), r'https://(?:github\.com/(?:advisories|[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+/security/advisories)/GHSA-[a-z0-9-]+|www\.npmjs\.com/advisories/[0-9]+)')
+                    cves = sorted(set(re.findall(r'CVE-[0-9]{4}-[0-9]{4,}', json.dumps({k: via.get(k) for k in ('cve', 'cves', 'title')}))))
+                    advisories.append({'source': source if type(source) is int else None, 'url': url,
+                        'range': safe(via.get('range'), version_pattern), 'cves': cves})
+                fix = row.get('fixAvailable')
+                if isinstance(fix, dict):
+                    fix = {'name': safe(fix.get('name'), package_pattern), 'version': safe(fix.get('version'), version_pattern),
+                           'isSemVerMajor': fix.get('isSemVerMajor') if type(fix.get('isSemVerMajor')) is bool else None}
+                elif type(fix) is not bool: fix = None
+                findings.append({'name': name, 'severity': row['severity'], 'installedVersions': versions,
+                    'range': safe(row.get('range'), version_pattern), 'fixAvailable': fix, 'advisories': advisories})
+            result[component] = {'vulnerabilities': counts, 'auditLevel': 'high', 'exitCode': audit.returncode,
+                'lockfileSha256': self.inputs['components'][component]['lockfileSha256'], 'blockingFindings': findings}
+            (self.out / (component + '-audit.json')).write_text(json.dumps(result[component], indent=2) + '\n')
+            R.require(audit.returncode == 0 and counts['high'] == counts['critical'] == 0, 'High/critical dependency vulnerabilities')
+        return result
 
     def browser(self):
         self.ready('frontend-compile')
-        spec = importlib.util.spec_from_file_location('mac_completed_browser', Path(__file__).with_name('training-mac-runtime-reuse.py'))
-        module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
-        return module.admit_prior_browser_success(self)
+        equality = self.state['components']['frontend']['distEquality']
+        R.require(type(equality.get('equal')) is bool and equality['currentArchiveSha256'] == self.state['components']['frontend']['compiledArchiveSha256'], 'Missing exact compiled-byte comparison')
+        if equality['equal']:
+            spec = importlib.util.spec_from_file_location('mac_completed_browser', Path(__file__).with_name('training-mac-runtime-reuse.py'))
+            module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+            return module.admit_prior_browser_success(self)
+        pin = self.inputs['macRuntime']
+        script = '.github/scripts/training-mac-browser.mjs'
+        R.require(pin['browserScriptBlob'] == R.git('rev-parse', 'HEAD:' + script), 'Unreviewed browser fixture')
+        # Only changed compiled bytes need a new browser execution. Use a
+        # per-command signed official Ubuntu source list, not runner mirrors.
+        sources = self.private / 'font-official-sources.list'
+        sources.write_text('deb [signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] https://archive.ubuntu.com/ubuntu noble main universe\n'
+                           'deb [signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] https://archive.ubuntu.com/ubuntu noble-updates main universe\n'
+                           'deb [signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] https://security.ubuntu.com/ubuntu noble-security main universe\n')
+        apt = ['sudo', 'apt-get', '-o', 'Dir::Etc::sourcelist=' + str(sources), '-o', 'Dir::Etc::sourceparts=-', '-o', 'APT::Update::Error-Mode=any']
+        self.command([*apt, 'update'], timeout=180)
+        self.command([*apt, 'install', '-y', '--no-install-recommends', 'fonts-noto-cjk'], timeout=180)
+        font = Path(self.command(['fc-match', '--format=%{file}', 'Noto Sans CJK SC']).stdout.strip()).resolve()
+        family = self.command(['fc-match', '--format=%{family}', 'Noto Sans CJK SC']).stdout.strip()
+        R.require(font.is_file() and font.is_relative_to('/usr/share/fonts') and 'Noto Sans CJK SC' in family, 'CJK font unavailable')
+        owner = self.command(['dpkg-query', '-S', str(font)]).stdout.strip()
+        R.require(owner.startswith('fonts-noto-cjk:'), 'Unexpected CJK font package')
+        font_receipt = {'package': 'fonts-noto-cjk', 'version': self.command(['dpkg-query', '-W', '-f=${Version}', 'fonts-noto-cjk']).stdout.strip(),
+                        'family': family, 'fileSha256': R.sha(font), 'source': 'signed official Ubuntu noble archives'}
+        browsers = self.private / 'browsers'
+        module = self.private / 'backend/node_modules/playwright-core'
+        self.command(['env', 'PLAYWRIGHT_BROWSERS_PATH=' + str(browsers), 'node', str(module / 'cli.js'), 'install', 'chromium'], timeout=600)
+        output = self.out / 'browser'
+        self.command(['env', 'PLAYWRIGHT_BROWSERS_PATH=' + str(browsers), 'node', script,
+                      '--frontend-dir', str(self.private / 'frontend/dist'), '--playwright-module', str(module), '--output', str(output)], timeout=180)
+        report = json.loads((output / 'browser-result.json').read_text())
+        checks = require_browser_report(report, pin['browserExpectedAssertions'])
+        return {'resultSha256': R.sha(output / 'browser-result.json'), 'checks': checks, 'cjkFont': font_receipt, 'frontendCompiledArchiveSha256': self.state['components']['frontend']['compiledArchiveSha256']}
 
     def failure_receipt(self, error):
         details = {'errorType': type(error).__name__, 'phase': next((p['name'] for p in reversed(self.state['phases']) if p['status'] in ('running', 'failure')), 'initialization')}
@@ -438,8 +578,8 @@ class MacQualification(R.Qualification):
             reuse = module.admit_reusable_phases(self)
             names = {'backend-compile', 'frontend-compile', 'frontend-app-types', 'changed-lint'}
             R.require(set(reuse) == {'phases', 'archives'} and set(reuse['phases']) == names and set(reuse['archives']) == set(R.COMPONENTS), 'Incomplete exact prior success admission')
-            for component in R.COMPONENTS:
-                self.phase(component + '-compile', lambda component=component: self.restore_compilation(component, reuse['phases'][component + '-compile'], reuse['archives'][component]))
+            self.phase('backend-compile', lambda: self.restore_compilation('backend', reuse['phases']['backend-compile'], reuse['archives']['backend']))
+            self.phase('frontend-compile', lambda: self.compile_patched_frontend(reuse['phases']['frontend-compile'], reuse['archives']['frontend']))
             for name in ('frontend-app-types', 'changed-lint'):
                 original = reuse['phases'][name]
                 R.require(original['name'] == name and original['status'] == 'success', 'Prior check not successful')

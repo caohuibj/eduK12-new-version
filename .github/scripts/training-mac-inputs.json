@@ -8,12 +8,12 @@
       "zipSha256": "1b63bd5f180fd34dd5d8c203269e054bbd614a8c058df619ffadf11e8c9a0e97",
       "archiveSha256": "68eab0cc18f679331898914caf2c44cc1a64af88c33f677940032419874fe0b2",
       "componentTree": "8804b7ff3d5d02555bfa5a338702bd23702d6561",
-      "productionInputSha256": "bb1a034fbdc6ea8131868e172e06fe8e0b9fa2a432dc5b6de227b00bd0ed1120",
+      "productionInputSha256": "7e4c70ba5f290942b81b980265737774a9b69c161dce8c67ab339a55cdefd4a6",
       "receiptSha256": "55d7f4e9d65f261c270da0e171a705033eea272668f7351bb60fce9d3711ad1b",
       "head": "da713c522be4fd3309e4dcf327bfb71384c784fe",
       "runId": "39399331312",
       "attempt": "1",
-      "lockfileSha256": "6afb2ad9d3439fba2198a0088a19783135054a9e856537a541ef3a123c29552f",
+      "lockfileSha256": "e7ead36aea4702185f0dfcebc3089723258a402218b1addde09e03ec1c5e9b57",
       "buildFlags": {
         "VITE_COGNITIVE_MODULE_ENABLED": "true",
         "TZ": "UTC"
@@ -34,7 +34,7 @@
       "branch": "ci/measurement-browser-20261020",
       "jobName": "production compile once / backend",
       "artifactName": "measurement-39399331312-da713c522be4fd3309e4dcf327bfb71384c784fe-backend-build",
-      "sourceTree": "0875c8db8691e2d034f1d8d1611febb060a94756",
+      "sourceTree": "52ebc98b0b94df2e72231f60f26abe76a4874a0f",
       "excludedNonProductionPaths": []
     },
     "frontend": {
@@ -46,7 +46,7 @@
       "runId": "39425861081",
       "attempt": "1",
       "componentTree": "a4fa70dfd71450f7840708377a4815c073bfbc9b",
-      "lockfileSha256": "de1dcdda3c42b0d929b44a7f553401ff55cf9af7e66b98550ac681c3b615ac3a",
+      "lockfileSha256": "be71016d67ab0f980f10210387fa1f953bafc41f7b823e5f6ea4c0f68ddc45e0",
       "archiveSha256": "a7d629206aefc034fd0698e931122da400f889712c6697e2484daf538b9dbf80",
       "buildFlags": {
         "VITE_COGNITIVE_MODULE_ENABLED": "true",
@@ -61,8 +61,8 @@
       "jobName": "build changed measurement frontend once",
       "artifactName": "measurement-39425861081-4286a59b649c37662cdbc0e7ca4e41103ad4e4f2-frontend-build",
       "receiptSha256": "d467a7312ae1daa2672b5a1ff635c9561408b65116a3cad5cbabd0a3551430b4",
-      "sourceTree": "b3fd7ccfdb3e5bc28fc88acd136d0418184df74d",
-      "productionInputSha256": "9972d013181318ec3dde4b84229f6308e51501e07018f8ea11b634d0dc09e058",
+      "sourceTree": "2a2ee43781069a8ab076d2a2e50b33bfe3042370",
+      "productionInputSha256": "959b9030ce4b3435052fc8fb6fe8361e795c5e98405178aefd64b3381ac267c3",
       "excludedNonProductionPaths": []
     }
   },
@@ -176,7 +176,7 @@
     ],
     "compileReasons": {
       "backend": "Three corrected catalog source inputs invalidate old backend dist. Direct compiler only, no unchanged build prerequisites.",
-      "frontend": "One official Linux delivery build because retained private local output has no safe supported external-to-Actions artifact channel. No old frontend test replay."
+      "frontend": "One affected frontend build using patched Vite 6.4.4. Compare complete dist bytes with the original verified browser input; admit browser only on exact equality, otherwise execute existing bounded browser checks."
     },
     "lintAdmission": {
       "kind": "historical-observed-lint-with-limited-selection",
@@ -336,8 +336,29 @@
       "reviewedSourceFiles": [
         "server-version/backend/package.json",
         "server-version/backend/package-lock.json",
+        "server-version/frontend/package.json",
         "server-version/frontend/package-lock.json"
       ]
+    },
+    "vitePatch": {
+      "backend": {
+        "name": "vite",
+        "fromVersion": "7.3.6",
+        "toVersion": "7.3.7",
+        "tarball": "https://registry.npmjs.org/vite/-/vite-7.3.7.tgz",
+        "integrity": "sha512-AHEzTORMbi7/7aXp7w7KZ5+DCUdSeLsJz0grY8xHpc9DHdYb0vQu6DqJfm2tOw3gDExNgPgnJTXxM6syYFHaCA==",
+        "tarSha256": "61819c1c5e0b526a012b39b5d4dfb9d10875ced139554f9105a8999990ce7b08",
+        "tarBytes": 544713
+      },
+      "frontend": {
+        "name": "vite",
+        "fromVersion": "6.4.3",
+        "toVersion": "6.4.4",
+        "tarball": "https://registry.npmjs.org/vite/-/vite-6.4.4.tgz",
+        "integrity": "sha512-xGjU/SyjeNyb0E4KxXBvYz/1C+3JXuujvf2hXNOtnlcE+58o5ajd9N2/n2VhkiJvpCP2qQasnUpx5PXNeI+p1Q==",
+        "tarSha256": "09242e9a1f45c17ef96402dc1b39cfcf93b6a65a5bc965622641be50830fa71b",
+        "tarBytes": 635040
+      }
     }
   }
 }

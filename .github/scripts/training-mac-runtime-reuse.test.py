@@ -24,6 +24,22 @@ class Contract(unittest.TestCase):
         value['macRuntime']['dependencyPatch']['toVersion'] = '1.16.2'
         self.assertNotEqual(M.hashlib.sha256(json.dumps(value).encode()).hexdigest(), M.REVIEWED_SECURITY_INPUTS_SHA256)
 
+    def test_new_archive_requires_complete_dist_equality(self):
+        from types import SimpleNamespace
+        old = M.ARTIFACTS['frontend']['archiveSha256']; new = 'a' * 64
+        equality = dict(equal=True, originalArchiveSha256=old, currentArchiveSha256=new,
+            originalInventorySha256='b'*64, currentInventorySha256='b'*64,
+            originalFileCount=415, currentFileCount=415, filesCompared=415)
+        def reached_api(path): raise RuntimeError('verified-input-reached-api')
+        q = SimpleNamespace(ready=lambda name: None, api=reached_api,
+            state={'components':{'frontend':{'compiledArchiveSha256':new,'distEquality':equality}}})
+        with self.assertRaisesRegex(RuntimeError, 'verified-input-reached-api'): M.admit_prior_browser_success(q)
+        for key, bad in [('equal',False),('originalArchiveSha256',new),('currentArchiveSha256',old),
+                         ('currentInventorySha256','c'*64),('currentFileCount',414)]:
+            saved=equality[key]; equality[key]=bad
+            with self.assertRaisesRegex(ValueError,'Browser compiled input changed'): M.admit_prior_browser_success(q)
+            equality[key]=saved
+
     def test_artifact_refuses_expiry_and_cross_run(self):
         p = M.ARTIFACTS['backend']
         a = dict(id=p['artifactId'], name=p['artifactName'], expired=False, size_in_bytes=p['zipBytes'], digest='sha256:' + p['zipSha256'], workflow_run={'id':int(M.PIN['runId']), 'head_sha':M.PIN['sourceHead']})

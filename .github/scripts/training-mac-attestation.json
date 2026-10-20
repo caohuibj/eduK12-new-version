@@ -9,7 +9,7 @@
   "originalTree": "260731545117e518be70f4796d7cd15addb50d6b",
   "historicalExecutionReferenceAssertion": "65f18b5583984b0427ff6e635a376e4d3d1cb8ae",
   "originalProductInventorySha256": "377f6f50af93584a16316888c88c66309ae2a47a39e27f130757c5dab97d8d65",
-  "productInventorySha256": "4988cd1cf07c8a84f4be538627c0e5f7f1366ab35d114782553f13dda2e92df4",
+  "productInventorySha256": "294e7a9741c87ba8d6761559e681a3bfc2ab2dae4526dbd2dc054ae314aee0e5",
   "reviewedProductDelta": [
     {
       "path": "server-version/backend/package-lock.json",
@@ -20,7 +20,7 @@
       },
       "after": {
         "mode": "100644",
-        "blob": "d32fb42875033a1774dd83262a3b95e3fb6ca5d8",
+        "blob": "73607721290dd28f1c6f85d5e12d5d517926ede3",
         "path": "server-version/backend/package-lock.json"
       }
     },
@@ -33,7 +33,7 @@
       },
       "after": {
         "mode": "100644",
-        "blob": "e17cb797e0e3182eaaf643bea1767d24067daa10",
+        "blob": "033398f6361b0e4217226ae00f2edc2ed3380ecd",
         "path": "server-version/backend/package.json"
       }
     },
@@ -112,8 +112,21 @@
       },
       "after": {
         "mode": "100644",
-        "blob": "5e5450258450fd5282b66ccc15368c1310d7913d",
+        "blob": "70318f94fe631d8292f567cf421f97e7d5613b31",
         "path": "server-version/frontend/package-lock.json"
+      }
+    },
+    {
+      "path": "server-version/frontend/package.json",
+      "before": {
+        "mode": "100644",
+        "blob": "4a287572dfb7d636477ea34985fab7a0b12fae53",
+        "path": "server-version/frontend/package.json"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "84089551a17c85d00f03a36081fe78e6374f0716",
+        "path": "server-version/frontend/package.json"
       }
     }
   ],
@@ -407,5 +420,11 @@
       "server-version/frontend/package-lock.json"
     ],
     "rationale": "Only standalone Node redirect implementation changes, no declarations/compiler/lint dependencies or application source changes. Axios browser mapping excludes Node HTTP adapter; backend direct consumer uses maxRedirects:0. Original records and dist retain their original identity, not new-lock execution. Both current-lock audits and patched runtime scans remain mandatory."
+  },
+  "viteSecurityDelta": {
+    "kind": "reviewed-tool-dependency-impact",
+    "backend": "7.3.6 -> 7.3.7",
+    "frontend": "6.4.3 -> 6.4.4",
+    "rationale": "Backend compiler is tsc and unchanged Vite declarations do not invalidate prior types/lint. Frontend shared build implementation changed: execute one new build. Reuse original browser only if the complete dist file set and every file byte match; otherwise execute the existing bounded browser cases. Both lock audits remain required."
   }
 }

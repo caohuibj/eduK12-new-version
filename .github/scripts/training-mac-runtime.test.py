@@ -310,11 +310,43 @@ class MacContracts(unittest.TestCase):
         with patch.object(M.R.urllib.request, 'urlopen', return_value=response), self.assertRaises(ValueError): self.q.apply_dependency_patch()
 
     def test_security_repair_runs_fresh_both_lock_audit_instead_of_old_admission(self):
-        with patch.object(M.R.Qualification, 'audit', return_value={'backend': 'fresh', 'frontend': 'fresh'}) as audit:
-            self.assertEqual(self.q.audit(), {'backend': 'fresh', 'frontend': 'fresh'})
-        audit.assert_called_once_with()
+        for component in M.R.COMPONENTS:
+            context = self.q.private / component; context.mkdir()
+            (context / 'package-lock.json').write_text(json.dumps({'packages': {}}))
+        self.q.command = Mock(return_value=SimpleNamespace(returncode=0, stdout=json.dumps({'metadata': {'vulnerabilities': {'high': 0, 'critical': 0}}, 'vulnerabilities': {}})))
+        result = self.q.audit()
+        self.assertEqual(set(result), set(M.R.COMPONENTS))
+        self.assertEqual(self.q.command.call_count, 2)
+        for component, call in zip(M.R.COMPONENTS, self.q.command.call_args_list):
+            self.assertEqual(call.args[0], ['npm', '--prefix', str(self.q.private / component), '--registry=https://registry.npmjs.org', '--replace-registry-host=always', 'audit', '--audit-level=high', '--json'])
+            self.assertEqual(call.kwargs, {'accepted': (0, 1)})
+            self.assertEqual(result[component]['blockingFindings'], [])
+
+    def test_failed_audit_preserves_only_safe_package_advisory_and_version_details(self):
+        context = self.q.private / 'backend'; context.mkdir()
+        (context / 'package-lock.json').write_text(json.dumps({'packages': {'node_modules/synthetic-package': {'version': '1.2.3'}}}))
+        data = {'metadata': {'vulnerabilities': {'high': 1, 'critical': 0}}, 'vulnerabilities': {
+            'synthetic-package': {'severity': 'high', 'range': '<1.2.4', 'nodes': ['/private/secret'],
+                'fixAvailable': {'name': 'synthetic-package', 'version': '1.2.4', 'isSemVerMajor': False, 'secret': 'private-token'},
+                'via': [{'source': 123, 'range': '<1.2.4', 'url': 'https://github.com/advisories/GHSA-aaaa-bbbb-cccc',
+                         'title': 'CVE-2026-12345 private-token'}, {'url': 'https://private-token.example/?secret=value', 'range': 'private\nsecret'}]}}}
+        self.q.command = Mock(return_value=SimpleNamespace(returncode=1, stdout=json.dumps(data)))
+        with self.assertRaises(ValueError): self.q.audit()
+        self.q.command.assert_called_once()
+        raw = (self.q.out / 'backend-audit.json').read_text(); saved = json.loads(raw)
+        finding = saved['blockingFindings'][0]
+        self.assertEqual(saved['exitCode'], 1); self.assertEqual(saved['vulnerabilities']['high'], 1)
+        self.assertEqual(finding['installedVersions'], ['1.2.3'])
+        self.assertEqual(finding['fixAvailable']['version'], '1.2.4')
+        self.assertEqual(finding['advisories'][0]['cves'], ['CVE-2026-12345'])
+        self.assertEqual(finding['advisories'][0]['source'], 123)
+        self.assertIsNone(finding['advisories'][1]['url']); self.assertIsNone(finding['advisories'][1]['range'])
+        self.assertNotIn('private', raw); self.assertNotIn('secret', raw)
+        self.assertFalse((self.q.out / 'frontend-audit.json').exists())
 
     def test_complete_browser_is_mandatory_original_success_without_process_replay(self):
+        self.q.state['components']['frontend'] = {'compiledArchiveSha256': 'current',
+            'distEquality': {'equal': True, 'currentArchiveSha256': 'current'}}
         original = {'kind': 'admitted-prior-official-success', 'ciExecuted': False, 'original': {'name': 'compiled-browser', 'status': 'success'}}
         module = SimpleNamespace(admit_prior_browser_success=Mock(return_value=original))
         spec = SimpleNamespace(loader=SimpleNamespace(exec_module=Mock()))
@@ -325,9 +357,9 @@ class MacContracts(unittest.TestCase):
             with self.assertRaises(ValueError): self.q.browser()
         self.q.command.assert_not_called()
 
-    def test_repair_executes_missing_phases_but_never_successful_compiles_types_lint(self):
+    def test_vite_repair_builds_frontend_once_but_never_replays_backend_types_lint(self):
         self.q.state['phases'] = []
-        for name in ('prepare', 'compile_component', 'restore_compilation', 'app_types', 'lint', 'audit', 'browser', 'package', 'scan'):
+        for name in ('prepare', 'compile_component', 'compile_patched_frontend', 'restore_compilation', 'app_types', 'lint', 'audit', 'browser', 'package', 'scan'):
             setattr(self.q, name, Mock())
         def schema(): self.q.phase('scoped-pg-http', Mock())
         self.q.schema = schema
@@ -341,9 +373,84 @@ class MacContracts(unittest.TestCase):
             self.q.execute()
         self.assertEqual({p['name'] for p in self.q.state['phases']}, set(M.PHASES))
         self.q.compile_component.assert_not_called(); self.q.app_types.assert_not_called(); self.q.lint.assert_not_called()
-        self.assertEqual(self.q.restore_compilation.call_count, 2)
+        self.assertEqual(self.q.restore_compilation.call_count, 1)
+        self.assertEqual(self.q.restore_compilation.call_args.args[0], 'backend')
+        self.q.compile_patched_frontend.assert_called_once()
         self.assertEqual(self.q.state['status'], 'success')
         self.assertFalse(self.q.private.exists())
+
+    def test_vite_overlay_preserves_other_dependencies_and_rejects_corrupt_tar(self):
+        import base64
+        import io
+        responses = {}
+        for component, pin in self.q.inputs['macRuntime']['vitePatch'].items():
+            old = {'name': 'vite', 'version': pin['fromVersion'], 'dependencies': {'unchanged': '1.0.0'}, 'bin': {'vite': 'bin/vite.js'}}
+            new = {**old, 'version': pin['toVersion']}
+            stream = io.BytesIO()
+            with M.R.tarfile.open(fileobj=stream, mode='w:gz') as tar:
+                for name, data in [('package.json', json.dumps(new).encode()), ('bin/vite.js', b'never executed')]:
+                    row = M.R.tarfile.TarInfo('package/' + name); row.size = len(data); row.mode = 0o755 if name.startswith('bin/') else 0o644
+                    tar.addfile(row, io.BytesIO(data))
+            raw = stream.getvalue(); pin.update(tarBytes=len(raw), tarSha256=M.R.digest(raw), integrity='sha512-' + base64.b64encode(M.R.hashlib.sha512(raw).digest()).decode())
+            context = self.q.private / component; target = context / 'node_modules/vite'; target.mkdir(parents=True)
+            (target / 'package.json').write_text(json.dumps(old)); (target.parent / 'untouched').write_text('same')
+            (context / 'package-lock.json').write_text(json.dumps({'packages': {'node_modules/vite': {'version': pin['toVersion'], 'resolved': pin['tarball'], 'integrity': pin['integrity']}}}))
+            (context / 'node_modules/.package-lock.json').write_text(json.dumps({'packages': {'node_modules/vite': {'version': pin['fromVersion']}, 'node_modules/other': {'version': 'same'}}}))
+            response = Mock(); response.__enter__ = Mock(return_value=response); response.__exit__ = Mock(return_value=False)
+            response.geturl.return_value = pin['tarball']; response.read.return_value = raw; responses[pin['tarball']] = response
+        self.q.command = Mock(side_effect=AssertionError('No install or app execution'))
+        first = responses[self.q.inputs['macRuntime']['vitePatch']['backend']['tarball']]
+        original = first.read.return_value; first.read.return_value += b'corrupt'
+        with patch.object(M.R.urllib.request, 'urlopen', side_effect=lambda req, **_: responses[req.full_url]), self.assertRaises(ValueError): self.q.apply_vite_patch()
+        first.read.return_value = original
+        with patch.object(M.R.urllib.request, 'urlopen', side_effect=lambda req, **_: responses[req.full_url]): self.q.apply_vite_patch()
+        for component, pin in self.q.inputs['macRuntime']['vitePatch'].items():
+            context = self.q.private / component
+            self.assertEqual(json.loads((context / 'node_modules/vite/package.json').read_text())['version'], pin['toVersion'])
+            self.assertEqual((context / 'node_modules/untouched').read_text(), 'same')
+            self.assertEqual(json.loads((context / 'node_modules/.package-lock.json').read_text())['packages']['node_modules/other'], {'version': 'same'})
+        self.q.command.assert_not_called()
+
+    def test_new_frontend_compilation_compares_complete_dist_bytes(self):
+        original, archive = self.retained_compilation('frontend')
+        old_text = 'verified public fixture dist/index.html'
+        def compile(component):
+            self.assertEqual(component, 'frontend')
+            dist = self.q.private / 'frontend/dist'; dist.mkdir()
+            (dist / 'index.html').write_text(old_text)
+            return {'archiveSha256': 'new-archive'}
+        self.q.compile_component = Mock(side_effect=compile)
+        result = self.q.compile_patched_frontend(original, archive)
+        self.q.compile_component.assert_called_once_with('frontend')
+        self.assertTrue(result['distEquality']['equal'])
+        self.assertEqual(result['distEquality']['originalArchiveSha256'], original['details']['archiveSha256'])
+        self.assertEqual(result['distEquality']['currentArchiveSha256'], 'new-archive')
+        M.shutil.rmtree(self.q.private / 'frontend-comparison'); M.shutil.rmtree(self.q.private / 'frontend/dist')
+        def changed(component):
+            result = compile(component); (self.q.private / 'frontend/dist/added.js').write_text('changed'); return result
+        self.q.compile_component = Mock(side_effect=changed)
+        result = self.q.compile_patched_frontend(original, archive)
+        self.assertFalse(result['distEquality']['equal']); self.q.compile_component.assert_called_once_with('frontend')
+
+    def test_changed_dist_executes_existing_six_browser_cases_without_prior_admission(self):
+        self.q.state['components']['frontend'] = {'compiledArchiveSha256': 'new', 'distEquality': {'equal': False, 'currentArchiveSha256': 'new'}}
+        font = '/usr/share/fonts/synthetic-cjk.ttc'; commands = []
+        def command(args, **kwargs):
+            commands.append(args)
+            if args[0] == 'fc-match': return SimpleNamespace(stdout=font if 'file' in args[1] else 'Noto Sans CJK SC')
+            if args[:2] == ['dpkg-query', '-S']: return SimpleNamespace(stdout='fonts-noto-cjk: ' + font)
+            if args[:2] == ['dpkg-query', '-W']: return SimpleNamespace(stdout='fixture-version')
+            if '.github/scripts/training-mac-browser.mjs' in args:
+                folder = self.q.out / 'browser'; folder.mkdir()
+                (folder / 'browser-result.json').write_text(json.dumps({'schema': 1, 'status': 'PASS', 'kind': 'compiled-ui-synthetic-api-integration', 'errors': [], 'checks': [{'name': name, 'status': 'PASS'} for name in CHECKS]}))
+            return SimpleNamespace(stdout='')
+        self.q.command = command
+        is_file = M.Path.is_file; sha = M.R.sha
+        with patch.object(M.R, 'git', return_value=self.q.inputs['macRuntime']['browserScriptBlob']), patch.object(M.Path, 'is_file', lambda path: True if str(path) == font else is_file(path)), patch.object(M.R, 'sha', side_effect=lambda path: 'font-hash' if str(path) == font else sha(path)):
+            result = self.q.browser()
+        invocations = [args for args in commands if '.github/scripts/training-mac-browser.mjs' in args]
+        self.assertEqual(len(invocations), 1); self.assertNotIn('--prior-browser-result', invocations[0])
+        self.assertEqual(len(result['checks']), 6)
 
     def test_reject_non_actions_execution_before_any_action(self):
         self.q.phase = Mock()

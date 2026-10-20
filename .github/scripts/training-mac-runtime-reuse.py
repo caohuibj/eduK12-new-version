@@ -37,8 +37,8 @@ def validate_artifact(artifact, pin):
     require(str(artifact['workflow_run']['id']) == PIN['runId'] and artifact['workflow_run']['head_sha'] == PIN['sourceHead'], 'Wrong artifact producer')
 
 
-REVIEWED_SECURITY_RUNTIME_SHA256 = 'a2b332ed5b769904b2e4e04b5c3d8a90c3fcb4ef5b44ae3c3bbb0b58b2b227ec'
-REVIEWED_SECURITY_INPUTS_SHA256 = 'c64a32df55e1ea338a23dbe00d754167fd0f0e717a97046ce1a7c99bfaa79ca7'
+REVIEWED_SECURITY_RUNTIME_SHA256 = 'aeb8192ce6bc413dc22777c58dd64d84bbea2a489e9e35dd0b167487d96de2a7'
+REVIEWED_SECURITY_INPUTS_SHA256 = 'f2b6d1e6abd3ebdf9bc4bc86eca8276666602a23706df27432196dde147803a4'
 
 
 def validate_records(run, job, raw, inputs, source):
@@ -193,7 +193,12 @@ def validate_complete_browser(run, job, artifacts, raw, report_raw):
 def admit_prior_browser_success(q):
     q.ready('frontend-compile')
     require(hashlib.sha256(Path(__file__).with_name('training-mac-browser.mjs').read_bytes()).hexdigest() == REVIEWED_BROWSER_SHA256, 'Browser script changed')
-    require(q.state['components']['frontend']['compiledArchiveSha256'] == ARTIFACTS['frontend']['archiveSha256'], 'Browser compiled input changed')
+    component = q.state['components']['frontend']; equality = component.get('distEquality', {})
+    require(equality.get('equal') is True and equality.get('originalArchiveSha256') == ARTIFACTS['frontend']['archiveSha256']
+        and equality.get('currentArchiveSha256') == component['compiledArchiveSha256']
+        and equality.get('originalInventorySha256') == equality.get('currentInventorySha256')
+        and len(equality.get('originalInventorySha256', '')) == 64
+        and equality.get('originalFileCount') == equality.get('currentFileCount') == equality.get('filesCompared') == 415, 'Browser compiled input changed')
     p = COMPLETE_BROWSER_PIN
     run = q.api('/actions/runs/' + p['runId'] + '/attempts/1'); job = q.api('/actions/jobs/' + str(p['jobId']))
     artifacts = {}; files = {}
