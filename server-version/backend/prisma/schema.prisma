@@ -9,6 +9,8 @@ datasource db {
 }
 
 model User {
+  measurementReferenceCandidates MeasurementReferenceCandidate[]
+  measurementReferenceReviews MeasurementReferenceReview[]
   compositionTemplates AssessmentCompositionTemplate[]
   assessmentManagementEvents AssessmentManagementEvent[]
   scalePublicationAudits ScalePublicationAudit[]
@@ -3900,6 +3902,7 @@ model TrainingAttemptCheckpoint {
 
 // Three independently versioned content layers; no personal answer data.
 model MeasurementContentRelease {
+  referenceCandidates MeasurementReferenceCandidate[]
   id              String @id
   layer           String
   family          String
@@ -3936,4 +3939,30 @@ model MeasurementContentReleaseEvent {
   createdAt  DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   @@index([releaseId,createdAt],map:"measurement_content_events_release_idx")
   @@map("measurement_content_release_events")
+}
+
+model MeasurementReferenceCandidate {
+  id String @id
+  candidateHash String @unique @map("candidate_hash")
+  measurementReleaseId String @map("measurement_release_id")
+  measurementRelease MeasurementContentRelease @relation(fields:[measurementReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  analyzerId String @map("analyzer_id")
+  analyzer User @relation(fields:[analyzerId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  payload Json
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  reviews MeasurementReferenceReview[]
+  @@map("measurement_reference_candidates")
+}
+model MeasurementReferenceReview {
+  id String @id
+  candidateId String @map("candidate_id")
+  candidate MeasurementReferenceCandidate @relation(fields:[candidateId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  candidateHash String @map("candidate_hash")
+  reviewerId String @map("reviewer_id")
+  reviewer User @relation(fields:[reviewerId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  decision String
+  statement String
+  reviewedAt DateTime @default(now()) @map("reviewed_at") @db.Timestamptz(6)
+  @@index([candidateId,reviewedAt],map:"measurement_reference_review_candidate_idx")
+  @@map("measurement_reference_reviews")
 }

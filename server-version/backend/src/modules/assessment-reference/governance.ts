@@ -36,19 +36,22 @@ export function validateReferenceGovernance(entry: Partial<AssessmentReferenceEn
   if (!grades.length || JSON.stringify(entry.population?.match?.gradeLevels) !== JSON.stringify(grades) || entry.population?.language !== g.locale) errors.push('REFERENCE_POPULATION_IDENTITY_INVALID')
   const bands = g.bands
   if (!g.scoreRange || !Number.isFinite(g.scoreRange.min) || !Number.isFinite(g.scoreRange.max) || g.scoreRange.min >= g.scoreRange.max) return [...errors, 'REFERENCE_RANGE_INVALID']
-  if (!Array.isArray(bands) || bands.length < 3 || bands.length > 5) return [...errors, 'BAND_COUNT_INVALID']
+  // Empirical intervals are optional; no universal count or per-band sample quota.
+  // Theoretical/criterion presentation keeps its existing bounded contract.
+  if (g.bandSource !== 'EMPIRICAL_DISTRIBUTION' && (bands.length < 3 || bands.length > 5)) return [...errors, 'BAND_COUNT_INVALID']
   if (new Set(bands.map(b => b.key)).size !== bands.length) errors.push('BAND_KEYS_DUPLICATE')
   bands.forEach((b,i) => {
     if (!text(b.key) || !text(b.label) || !Number.isFinite(b.lower) || !Number.isFinite(b.upper) || b.lower >= b.upper || b.lower !== (i ? bands[i-1].upper : g.scoreRange.min)) errors.push('BAND_COVERAGE_INVALID')
   })
-  if (bands[bands.length-1].upper !== g.scoreRange.max) errors.push('BAND_COVERAGE_INVALID')
+  if (bands.length && bands[bands.length-1].upper !== g.scoreRange.max) errors.push('BAND_COVERAGE_INVALID')
   if (g.kind === 'THEORETICAL_RANGE') {
     if (entry.referenceKind !== 'theoretical_range' || entry.evidenceLevel !== 'theoretical' || entry.provenanceType !== 'theoretical_score_range' || g.bandSource !== 'THEORETICAL_SCORE_RANGE' || g.sampleN !== null || entry.source?.sampleSize !== undefined || Object.keys(entry.statistics ?? {}).length || g.calibration || bands.some(b => b.sampleN !== undefined)) errors.push('THEORETICAL_EMPIRICAL_CLAIM_FORBIDDEN')
   } else if (g.bandSource === 'EMPIRICAL_DISTRIBUTION') {
     if(entry.provenanceType!=='local_observed' || entry.evidenceLevel==='theoretical' || !['normative_distribution','descriptive_sample'].includes(entry.referenceKind??'') || g.kind==='CRITERION')errors.push('REFERENCE_KIND_SOURCE_MISMATCH')
-    if (!Number.isInteger(g.sampleN) || (g.sampleN ?? 0) < 100 || !g.calibration || !g.calibration.subgroupReview || !/^[a-f0-9]{64}$/.test(g.sourceSnapshot)) errors.push('EMPIRICAL_REVIEW_REQUIRED')
-    if (bands.some(b => !Number.isInteger(b.sampleN) || (b.sampleN ?? 0) < 20) || bands.reduce((n,b) => n+(b.sampleN ?? 0),0) !== g.sampleN) errors.push('EMPIRICAL_BAND_ALLOCATION_INVALID')
+    if (!Number.isInteger(g.sampleN) || (g.sampleN ?? 0) < 1 || !g.calibration || !g.calibration.subgroupReview || !/^[a-f0-9]{64}$/.test(g.sourceSnapshot)) errors.push('EMPIRICAL_REVIEW_REQUIRED')
+    if (bands.length && (bands.some(b => !Number.isInteger(b.sampleN) || (b.sampleN ?? 0) < 0) || bands.reduce((n,b) => n+(b.sampleN ?? 0),0) !== g.sampleN)) errors.push('EMPIRICAL_BAND_ALLOCATION_INVALID')
     if (g.calibration && (!text(g.calibration.method) || !Number.isFinite(g.calibration.skew) || [g.calibration.missingness,g.calibration.floor,g.calibration.ceiling].some(x => !Number.isFinite(x) || x < 0 || x > 1))) errors.push('EMPIRICAL_QC_INVALID')
+    if ((g.sampleN ?? 0) < 2 && (entry.statistics?.sd !== undefined || Boolean(entry.statistics?.percentileTable?.length))) errors.push('EMPIRICAL_ESTIMATE_NOT_COMPUTABLE')
     if (entry.source?.sampleSize !== g.sampleN) errors.push('EMPIRICAL_SAMPLE_MISMATCH')
   }
   if(g.kind!=='THEORETICAL_RANGE' && g.bandSource!=='EMPIRICAL_DISTRIBUTION' && !(g.kind==='CRITERION' && g.bandSource==='CRITERION' && entry.referenceKind==='criterion_threshold'))errors.push('REFERENCE_KIND_SOURCE_MISMATCH')
