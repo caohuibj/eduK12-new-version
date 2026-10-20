@@ -8,12 +8,15 @@ import path from 'node:path'
 import { createRequire } from 'node:module'
 import { randomUUID, randomBytes, createHash } from 'node:crypto'
 const [mode, state] = process.argv.slice(2)
-assert.ok(['seed', 'prepare', 'single', 'verify', 'export'].includes(mode))
+assert.ok(['seed', 'prepare', 'single', 'verify', 'export', 'verify-export'].includes(mode))
 assert.equal(process.env.PERF_ISOLATED_TEST_MODE, '1')
 assert.equal(new URL(process.env.DATABASE_URL).pathname, '/training_followup_20261020')
-assert.equal(new URL(process.env.DATABASE_URL).hostname, 'postgres')
+const native = process.env.TRAINING_EXECUTION_PROFILE === 'NATIVE_ISOLATED'
+assert.equal(new URL(process.env.DATABASE_URL).hostname, native ? process.env.TRAINING_EXPECTED_DATABASE_HOST : 'postgres')
 assert.equal(process.version, 'v24.21.0')
-assert.equal(state, '/state')
+assert.equal(state, native ? '/workspace/training-load-followup-state-20261020' : '/state')
+const apiOrigin = native ? process.env.TRAINING_API_ORIGIN : 'http://backend:3000'
+if (native) assert.equal(apiOrigin, 'http://127.0.0.1:3000')
 const backend = process.env.TRAINING_BACKEND_DIR || '/app'
 const require = createRequire(path.join(backend, 'package.json'))
 const { PrismaClient } = require('@prisma/client')
@@ -33,7 +36,7 @@ function client(saved = {}) {
       const started = performance.now()
       let response
       try {
-        response = await fetch('http://backend:3000/api' + route, { method, signal: AbortSignal.timeout(30_000),
+        response = await fetch(apiOrigin + '/api' + route, { method, signal: AbortSignal.timeout(30_000),
           headers: { 'content-type': 'application/json', ...(cookies.size ? { cookie: [...cookies].map(([k,v]) => `${k}=${v}`).join('; ') } : {}),
             ...(cookies.has('ptool_csrf') ? { 'x-csrf-token': cookies.get('ptool_csrf') } : {}) },
           ...(body === undefined ? {} : { body: JSON.stringify(body) }) })
@@ -85,6 +88,23 @@ async function counts(attemptId) {
     sjt: await db.situationalAttempt.findMany({ where: { compositeAttemptId: attemptId } }),
     snapshots: await db.assessmentUnitSnapshot.findMany({ where: { compositeAttemptId: attemptId } }),
     jobs: await db.compositeReportJob.findMany({ where: { attemptId } }) }
+}
+// Existing C19 CSV parser shape, used only after the timed download.
+function parseCsv(bytes) {
+  const text = bytes.toString('utf8').replace(/^\uFEFF/, ''), rows = []
+  let row = [], cell = '', quoted = false
+  for (let i = 0; i < text.length; i++) {
+    const c = text[i]
+    if (quoted) { if (c === '"' && text[i+1] === '"') { cell += '"'; i++ } else if (c === '"') quoted = false; else cell += c }
+    else if (c === '"') quoted = true
+    else if (c === ',') { row.push(cell); cell = '' }
+    else if (c === '\n') { row.push(cell.replace(/\r$/, '')); rows.push(row); row = []; cell = '' }
+    else cell += c
+  }
+  if (row.length || cell) rows.push([...row, cell])
+  assert.equal(quoted, false)
+  const [columns, ...values] = rows
+  return { columns, rows: values.map(value => Object.fromEntries(columns.map((key, index) => [key, value[index]]))) }
 }
 try {
   if (mode === 'seed') {
@@ -231,21 +251,77 @@ try {
     assert.deepEqual(accepted.snapshots.map(row => row.unitType).sort(), ['COGNITIVE','FORM_SECTION','SCALE','SITUATIONAL'])
     const raw = await db.cognitiveRawSubmission.findFirstOrThrow({ where: { sessionId: accepted.cognitive[0].id } })
     assert.equal(raw.trialCount, 120)
+    const { decryptUnifiedRuntimePayload } = require(path.join(backend, 'dist/modules/assessment-runtime/security.js'))
+    assert.equal(decryptUnifiedRuntimePayload(raw.payloadEncrypted).trials.length, 120)
+    const canonical = {}
+    for (const row of accepted.snapshots) {
+      assert.equal(row.attemptEpoch, accepted.parent.attemptEpoch)
+      assert.equal(row.sourceSubmissionId, fixture.single.submissions.find(item => item.type === row.unitType).submissionId)
+      if (row.unitType === 'FORM_SECTION') continue
+      const envelope = decryptUnifiedRuntimePayload(row.canonicalResultEncrypted)
+      assert.equal(envelope.core.unitType, row.unitType)
+      assert.equal(envelope.core.sourceDefinitionHash, row.sourceDefinitionHash)
+      assert.equal(envelope.core.compiledRuntimeHash, row.compiledRuntimeHash)
+      canonical[row.unitType] = { metrics: Object.fromEntries(envelope.core.metrics.map(metric => [metric.key, metric.value])),
+        resultHash: envelope.resultHash, instrumentKey: envelope.core.instrumentKey, instrumentVersion: envelope.core.instrumentVersion,
+        sourceDefinitionHash: envelope.core.sourceDefinitionHash, scorerKey: envelope.core.scorerKey, scorerVersion: envelope.core.scorerVersion }
+    }
+    assert.equal(canonical.SCALE.metrics.total, 1)
+    for (const [key, value] of Object.entries(fixture.sjtExpected)) assert.equal(canonical.SITUATIONAL.metrics[key], value)
     const report = read('private/single-report.json')
-    assert.equal(report.unitReports.filter(unit => unit.type === 'SCALE').length, 1)
+    assert.deepEqual(report.unitReports.map(unit => unit.type).sort(), ['COGNITIVE','SCALE','SITUATIONAL'])
+    assert.equal(report.backgroundValues.length, 1)
+    const cognitiveReport = report.unitReports.find(unit => unit.type === 'COGNITIVE').singleTaskReport
+    assert.ok(cognitiveReport.primaryMetrics.length + cognitiveReport.secondaryMetrics.length > 0)
     const before = sha(JSON.stringify(accepted)), otherTeacher = client(fixture.cookies.otherTeacher), outsider = client(fixture.cookies.outsider)
     await otherTeacher.request(`${prefix}/${fixture.product.id}/attempts/${fixture.single.attemptId}/report`, 'GET', undefined, [403,404])
     await outsider.request(`${prefix}/attempts/${fixture.single.attemptId}`, 'GET', undefined, [403,404])
     await outsider.request(`${prefix}/${fixture.product.id}/attempts`, 'POST', {}, [403,404])
     assert.equal(sha(JSON.stringify(await counts(fixture.single.attemptId))), before)
     result.verified = { fourSnapshots: 4, cognitiveTrials: raw.trialCount, outboxJobs: 0, asyncEnrolled: false,
-      parentStatus: accepted.parent.status, factsUnchangedByNegatives: true, negativeCases: 3 }
-  } else {
+      parentStatus: accepted.parent.status, factsUnchangedByNegatives: true, negativeCases: 3, canonical }
+  } else if (mode === 'export') {
     const fixture = read('private/fixture.json'), teacher = client(fixture.cookies.teacher)
+    assert.ok(!fixture.export, 'Do not repeat an export whose outcome already exists or is uncertain')
+    const started = performance.now()
+    fixture.export = { state: 'ABOUT_TO_SEND' }; write('private/fixture.json', fixture)
     const queued = await teacher.request(`${prefix}/${fixture.product.id}/export`, 'POST', { detail: 'full', format: 'csv' })
-    fixture.export = queued; write('private/fixture.json', fixture)
+    fixture.export = { ...queued, state: 'QUEUED' }; write('private/fixture.json', fixture)
     result.queued = { batchId: queued.batchId, artifacts: queued.artifacts.length }
-    result.processing = 'PENDING_DEFAULT_HEAVY_CONSUMERS_DISABLED; NO_DIRECT_PROCESSOR_FALLBACK'
+    result.enqueueAckMs = performance.now() - started
+    const route = queued.artifacts[0].downloadUrl.replace(/^\/api/, '')
+    let ready
+    while (performance.now() - started < 60_000) {
+      ready = await teacher.request(route + '/status')
+      if (ready.status === 'READY') break
+      assert.notEqual(ready.status, 'FAILED', 'Real export consumer marked this batch FAILED')
+      await new Promise(resolve => setTimeout(resolve, 500))
+    }
+    assert.equal(ready?.status, 'READY', 'Export did not become READY within 60 seconds; do not re-enqueue')
+    result.readyMs = performance.now() - started
+    const downloadStart = performance.now(), bytes = await teacher.request(route, 'GET', undefined, 200, true)
+    result.downloadMs = performance.now() - downloadStart
+    fs.writeFileSync(path.join(state, 'private/single-export.csv'), bytes, { mode: 0o600 })
+    result.export = { bytes: bytes.length, sha256: sha(bytes), totalThroughDownloadMs: performance.now() - started, source: 'STANDARD_CONSUMER_REDIS_EXPORT_QUEUE' }
+    fixture.export.state = 'DOWNLOADED'; write('private/fixture.json', fixture)
+  } else {
+    const fixture = read('private/fixture.json'), bytes = fs.readFileSync(path.join(state, 'private/single-export.csv'))
+    const csv = parseCsv(bytes)
+    assert.equal(csv.rows.length, 1)
+    const row = csv.rows[0], parent = await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: fixture.single.attemptId } })
+    assert.equal(row.A_attempt_id, fixture.single.attemptId)
+    assert.equal(row.P_path_hash, parent.trainingFlowPathHash)
+    assert.equal(Number(row.S002_SCORE_total), 1)
+    const sjtMetric = 'J004_M_cooperation_' + sha('cooperation').slice(0, 16)
+    assert.equal(Number(row[sjtMetric]), fixture.sjtExpected.cooperation)
+    assert.ok(csv.columns.some(key => key.startsWith('F001_')))
+    assert.ok(csv.columns.some(key => key.startsWith('C003_')))
+    const before = sha(JSON.stringify(await counts(fixture.single.attemptId)))
+    const url = fixture.export.artifacts[0].downloadUrl.replace(/^\/api/, '')
+    await client(fixture.cookies.otherTeacher).request(url, 'GET', undefined, [403,404])
+    assert.equal(sha(JSON.stringify(await counts(fixture.single.attemptId))), before)
+    result.verified = { rows: csv.rows.length, columns: csv.columns.length, scaleTotal: 1, sjtCooperation: fixture.sjtExpected.cooperation,
+      formAndCognitiveColumnsPresent: true, pathIdentityMatched: true, crossTeacherDownloadDenied: true, bytes: bytes.length, sha256: sha(bytes) }
   }
   result.passed = true
 } catch (error) {

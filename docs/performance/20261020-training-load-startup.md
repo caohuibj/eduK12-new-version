@@ -1,6 +1,6 @@
 # Training 隔离测试启动记录（2026-10-20）
 
-最新状态：`STATIC_NATIVE_PLAN_READY_NOT_EXECUTED`。父对话停止扩大Docker预算，批准同节点native API/标准consumer＋现有容器PG/Redis，并要求先给静态路径及回收范围。当前仅完成该预检与方案；未回收cache、导出依赖、构建原生应用或运行单份。原VFS两次预算停止和PG/Redis均保留，300份仍未获准启动。
+最新状态：`SINGLE_COMPLETE_EXPORT_VERIFIED_300_NOT_STARTED`。同节点 native API＋现有容器 PG/Redis 已完成实际构建、迁移、单份四工具链路和标准 consumer 导出，正确性及必要权限负例通过；API/临时 consumer 已优雅停止，默认 heavy/idle/video 恢复 false，数据服务与证据保留。完整结果、SQL 范围和缺测见[单份基线报告](20261020-training-single-baseline.md)。下文保留各阶段历史，早期建议和“尚未执行”只表示当时状态；300 份仍未启动。
 
 ## 冻结基线和边界
 
