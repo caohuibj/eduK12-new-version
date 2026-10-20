@@ -13,7 +13,7 @@ suite('real HTTP middleware, routes and current PostgreSQL authority',()=>{
     db=(await import('../../config/database')).prisma;sign=(await import('../../utils/jwt')).generateToken
     process.env.ADMIN_WEBAUTHN_ORIGIN='http://localhost:5174';process.env.ADMIN_WEBAUTHN_RP_ID='localhost'
     for(const name of ['system','training','legacy','school','survey']){
-      const u=await db.user.create({data:{username:'http-admin-'+randomUUID(),passwordHash:'unusable-synthetic',role:'ADMIN',
+      const u=await db.user.create({data:{username:'http-admin-'+randomUUID(),passwordHash:'unusable-synthetic',role:name==='training'?'TEACHER':'ADMIN',
         platformRole:name==='system'?'SYSTEM_ADMIN':'STANDARD',accountDomain:name==='school'?'SCHOOL':name==='survey'?'SURVEY':'TRAINING'}})
       users.set(name,u);if(name==='system')systemId=u.id;if(name==='training')trainingId=u.id
     }
@@ -90,6 +90,6 @@ suite('real HTTP middleware, routes and current PostgreSQL authority',()=>{
     expect((await call('training','/users')).status).toBe(401)
     users.get('training')!.tokenVersion++
     expect((await call('training','/users','GET',undefined,false)).status).toBe(403)
-    expect((await call('training','/auth/me','GET',undefined,false)).body.data.role).toBe('STUDENT')
+    expect((await call('training','/auth/me','GET',undefined,false)).body.data.role).toBe('TEACHER')
   })
 })
