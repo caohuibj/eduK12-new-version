@@ -130,6 +130,11 @@
 .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-text){padding:23px 25px}
 .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-item,.training-side-panel,.training-course-work){border-color:var(--tt-line);border-radius:11px;background:white;box-shadow:0 2px 8px #263d2b03}
 .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-code-panel){border-color:var(--tt-line)}
+/* Course navigation is a tab strip, not an ordinary action-button row. */
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-section-tab){border-radius:0;white-space:nowrap}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-code-panel>div){min-width:0}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-code-panel strong){white-space:nowrap}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-code-copy){display:inline-flex;flex:none;align-items:center;justify-content:center;gap:5px;white-space:nowrap;min-height:36px;padding:7px 10px;border:1px solid var(--tt-line);border-radius:7px;background:white;color:var(--tt-green);font-size:12px;line-height:1.5;cursor:pointer}
 .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-section-switch button){font-size:14px;min-height:60px}
 .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-section-switch button[aria-pressed=true]){color:var(--tt-green);border-bottom-color:var(--tt-green)}
 .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-task-item){padding:22px 0;gap:18px;align-items:center}
@@ -189,6 +194,13 @@
 .staff-more-actions__menu[data-training-teacher=true] :where(button,a):hover{background:#eff5e8}
 .staff-more-actions__menu[data-training-teacher=true] .staff-danger-action{color:#a53c32}
 .staff-more-actions__menu[data-training-teacher=true] :where(button,a):focus-visible{outline:3px solid #598d70;outline-offset:1px}
+@media(min-width:701px){.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-trainer-course .training-detail-header){grid-template-columns:minmax(0,1fr) max-content}}
+@media(max-width:700px){.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-trainer-course .training-course-code-panel){flex-wrap:wrap;row-gap:8px}}
+/* On compact screens keep task actions below the full-width tab strip. */
+@media(max-width:1000px){
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual .training-trainer-course :where(.training-section-action:not(.training-assessment-shortcuts)){position:static;justify-content:flex-end;padding-top:16px;margin-bottom:14px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-trainer-course .training-section-switch){gap:18px;padding-inline:16px}
+}
 @media(max-width:1000px){
  .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-app-main){padding:24px}
  .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-toolbar){align-items:stretch}

@@ -96,7 +96,7 @@ export default function TrainingTrainerCourse() {
               </div>
               {codeNotice && <p role="status" className="training-code-notice">{codeNotice}</p>}
 
-              <div className="training-course-code-panel"><small>课程码 · 邀请学员</small><div><strong>{code}</strong><button type="button" onClick={() => void copyCode()}><Copy size={16} aria-hidden="true" />复制</button></div></div>
+              <div className="training-course-code-panel"><small>课程码 · 邀请学员</small><div><strong>{code}</strong><button type="button" className="training-course-code-copy" onClick={() => void copyCode()}><Copy size={16} aria-hidden="true" />复制</button></div></div>
             </header>
             <div className="training-mobile-course-actions"><Link to={'/courses/' + encoded + '/students'}>管理学员</Link><Link to={'/assessment-workbench?courseId=' + encoded}>培训结果</Link><a href="#training-course-settings">课程设置 ↓</a></div>
             <div className="training-course-layout"><div className="training-course-work">
@@ -104,7 +104,7 @@ export default function TrainingTrainerCourse() {
               {([
                 ['assignments', '作业'], ['checkins', '打卡'], ['assessments', '测评'], ['analysis', '数据分析'],
               ] as const).map(([value, label]) =>
-                <button key={value} type="button" aria-pressed={section === value} onClick={() => setSection(value)}>{label}</button>)}
+                <button key={value} type="button" className="training-section-tab" aria-pressed={section === value} onClick={() => setSection(value)}>{label}</button>)}
             </nav>
 
             {section === 'assignments' && <section className="training-detail-content" aria-label="课程作业管理">
