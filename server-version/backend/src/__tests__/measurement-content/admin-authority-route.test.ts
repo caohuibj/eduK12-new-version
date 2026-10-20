@@ -1,7 +1,7 @@
 import {beforeEach,describe,it,expect,vi} from 'vitest'
-const mocks=vi.hoisted(()=>({issue:vi.fn(),revoke:vi.fn(),authenticate:vi.fn((_req:any,_res:any,next:any)=>next()),
+const mocks=vi.hoisted(()=>({issue:vi.fn(),revoke:vi.fn(),read:vi.fn(),authenticate:vi.fn((_req:any,_res:any,next:any)=>next()),
  system:vi.fn((_req:any,_res:any,next:any)=>next()),recent:vi.fn((_req:any,_res:any,next:any)=>next()),limit:vi.fn((_req:any,_res:any,next:any)=>next())}))
-vi.mock('../../modules/measurement-content/admin-authority.service',()=>({issueAdminContentRoot:mocks.issue,revokeAdminContentGrant:mocks.revoke}))
+vi.mock('../../modules/measurement-content/admin-authority.service',()=>({issueAdminContentRoot:mocks.issue,revokeAdminContentGrant:mocks.revoke,readAdminContentGrant:mocks.read}))
 vi.mock('../../middleware/auth',()=>({authenticate:mocks.authenticate}))
 vi.mock('../../modules/admin-permissions/guards',()=>({requireSystemAdmin:mocks.system,requireRecentAdminKey:mocks.recent}))
 vi.mock('../../middleware/redisRateLimit',()=>({createRedisRateLimiter:()=>mocks.limit}))
@@ -49,4 +49,13 @@ describe('system content grant routes reuse real management router boundaries',(
   mocks.revoke.mockRejectedValueOnce(new AdminPermissionError(409,'stale'))
   expect((await invoke('/content-grants/:id/revoke')).status).toBe(409)
  })
+})
+
+it('protects exact metadata read with existing system and recent-key boundaries',async()=>{
+ mocks.read.mockResolvedValue({grantId,version:1})
+ expect((await invoke('/content-grants/:id')).status).toBe(200)
+ expect(mocks.read).toHaveBeenCalledWith(principal.userId,principal,grantId)
+ expect(mocks.system).toHaveBeenCalled();expect(mocks.recent).toHaveBeenCalled()
+ mocks.system.mockImplementationOnce((_req,res)=>res.status(403).json({message:'system required'}))
+ expect((await invoke('/content-grants/:id')).status).toBe(403);expect(mocks.read).toHaveBeenCalledTimes(1)
 })

@@ -1,5 +1,5 @@
 import {beforeEach,afterEach,describe,it,expect,vi} from 'vitest'
-import {issueAdminContentRoot,revokeAdminContentGrant,adminContentRootRequestSchema} from '../../modules/measurement-content/admin-authority.service'
+import {issueAdminContentRoot,revokeAdminContentGrant,readAdminContentGrant,adminContentRootRequestSchema} from '../../modules/measurement-content/admin-authority.service'
 const mocks=vi.hoisted(()=>({transaction:vi.fn(),query:vi.fn(),execute:vi.fn(),audit:vi.fn(),auditRead:vi.fn()}))
 vi.mock('../../config/database',()=>({prisma:{$transaction:mocks.transaction}}))
 const id=(n:number)=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0')
@@ -97,5 +97,21 @@ describe('real system session bounded Survey content root issuance',()=>{
   await expect(revokeAdminContentGrant(actor,proof(),grantId,{expectedVersion:9,reason:'Stale'})).rejects.toMatchObject({statusCode:409})
   existing={...existing,version:2,revoked_at:now,revoked_by:actor,revoke_reason:'Emergency stop'}
   expect(await revokeAdminContentGrant(actor,proof(),grantId,{expectedVersion:1,reason:'Emergency stop'})).toMatchObject({changed:false})
+ })
+})
+
+describe('bounded content governance metadata',()=>{
+ it('returns only exact supported grant metadata without content reads',async()=>{
+  const result=await readAdminContentGrant(actor,proof(),grantId)
+  expect(result).toEqual({grantId,version:1,parentGrantId:null,issuerId:actor,...input().grant,validFrom:new Date(input().grant.validFrom).toISOString(),expiresAt:new Date(input().grant.expiresAt).toISOString(),revokedAt:null})
+  expect(mocks.query.mock.calls.some(([q])=>/FROM (survey_wave_finals|measurement_content_releases)/.test(sql(q)))).toBe(false)
+  expect(mocks.execute).not.toHaveBeenCalled();expect(mocks.audit).not.toHaveBeenCalled()
+ })
+ it('rejects stale system identity, unsupported scope and expiry after the grant wait',async()=>{
+  users[0].platform_role='STANDARD';await expect(readAdminContentGrant(actor,proof(),grantId)).rejects.toMatchObject({statusCode:403})
+  users[0]=user(actor);existing.product='TRAINING';await expect(readAdminContentGrant(actor,proof(),grantId)).rejects.toMatchObject({statusCode:403})
+  existing=row();const session=proof(),run=mocks.query.getMockImplementation()!
+  mocks.query.mockImplementation(async query=>{const result=await run(query);if(sql(query).includes('FROM content_capability_grants'))vi.setSystemTime(new Date(now.getTime()+301000));return result})
+  await expect(readAdminContentGrant(actor,session,grantId)).rejects.toMatchObject({statusCode:403})
  })
 })
