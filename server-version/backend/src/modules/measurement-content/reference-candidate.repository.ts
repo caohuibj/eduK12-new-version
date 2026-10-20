@@ -3,14 +3,14 @@ import { Prisma } from '@prisma/client'
 import { canonicalJsonString } from '../assessment-runtime/canonical'
 import { ContentReleaseError } from './release'
 import { getContentRelease } from './repository'
-import { prepareReferenceCandidate, reviewReferenceCandidate, type ReferenceCandidate, type ReferenceCandidateReview } from './reference-candidate'
+import { prepareReferenceCandidate, reviewReferenceCandidate, type ReferenceCandidate, type ReferenceCandidateReview, type AuthorizedReferenceFact } from './reference-candidate'
 
 /** Internal transaction helpers, not endpoints. The eventual V05 service must
  * authorize actor/sample scope within this transaction. No client-supplied access map.
  */
 export async function storeReferenceCandidate(db:Prisma.TransactionClient,input:Omit<ReferenceCandidate,'schemaVersion'|'candidateHash'>,
-  authorizedFactVersions:ReadonlyMap<string,string>):Promise<{candidateId:string;candidate:ReferenceCandidate}>{
-  const candidate=prepareReferenceCandidate(input,authorizedFactVersions)
+  authorizedFacts:ReadonlyMap<string,AuthorizedReferenceFact>):Promise<{candidateId:string;candidate:ReferenceCandidate}>{
+  const candidate=prepareReferenceCandidate(input,authorizedFacts)
   const measurement=await getContentRelease(db,candidate.measurement.releaseId,true)
   const family={scale:'SCALE',cognitive:'COGNITIVE',sjt:'SJT'}[candidate.definition.instrumentType]
   if(!measurement||measurement.layer!=='MEASUREMENT'||measurement.family!==family||measurement.status==='REVOKED'

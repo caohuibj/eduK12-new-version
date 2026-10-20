@@ -10,7 +10,7 @@ const key=z.string().trim().min(1).max(240)
 export const reportBlockSchema=z.discriminatedUnion('type',[
   z.object({type:z.literal('TEXT'),text:prose}).strict(),
   z.object({type:z.literal('METRIC'),metricKey:key,label:prose.optional(),display:z.enum(['RAW','REFERENCE_RESULT'])}).strict(),
-  z.object({type:z.literal('REFERENCE_BAND'),metricKey:key,bandKey:key,text:prose,guidance:z.array(prose).max(30).default([])}).strict(),
+  z.object({type:z.literal('REFERENCE_BAND'),metricKey:key,referenceKind:z.enum(['normative_distribution','criterion_threshold','descriptive_sample','theoretical_range']),bandKey:key,text:prose,guidance:z.array(prose).max(30).default([])}).strict(),
   z.object({type:z.literal('ASSET'),assetId:key,alt:prose}).strict(),
   z.object({type:z.literal('CHART'),metricKeys:z.array(key).min(1).max(100),style:z.enum(['BAR','TABLE']),caption:prose.optional()}).strict(),
 ])

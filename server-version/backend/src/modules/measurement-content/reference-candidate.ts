@@ -7,6 +7,17 @@ export interface ReferenceSampleMember {
   factVersion: string
   measurementReleaseId: string
   metricKeys: string[]
+  entryKeys: string[]
+}
+export interface AuthorizedReferenceFact {
+  factVersion:string
+  measurementReleaseId:string
+  metricKeys:readonly string[]
+  eligibleEntryKeys:readonly string[]
+}
+export function referenceEntryKey(entry:AssessmentReferenceSetDefinition['entries'][number]):string{
+  return canonicalHash({scoreKey:entry.scoreKey,referenceKind:entry.referenceKind,population:entry.population,
+    instrumentVersion:entry.instrumentVersion,scoringVersion:entry.scoringVersion})
 }
 export interface ReferenceAnalysisEvidence {
   source: 'INTERNAL_OBSERVED' | 'INTERNAL_OFFLINE_ANALYSIS'
@@ -35,23 +46,28 @@ export interface ReferenceCandidate {
 const nonblank=(value:unknown):value is string=>typeof value==='string'&&value.trim().length>0
 const fail=(code:string):never=>{throw new ContentReleaseError(code)}
 
-/** Internal preparation only. authorizedFactVersions is supplied by the current
+/** Internal preparation only. authorizedFacts is supplied by the current
  * scoped source reader, never accepted as an HTTP body or a stored permission.
  * This file creates no account, grant, publication endpoint or external norm import.
  */
 export function prepareReferenceCandidate(input:Omit<ReferenceCandidate,'schemaVersion'|'candidateHash'>,
-  authorizedFactVersions:ReadonlyMap<string,string>):ReferenceCandidate{
+  authorizedFacts:ReadonlyMap<string,AuthorizedReferenceFact>):ReferenceCandidate{
   if(!nonblank(input.measurement.releaseId)||!nonblank(input.measurement.instrumentVersion)||!nonblank(input.measurement.scoringVersion)
     ||![input.measurement.contentHash,input.measurement.measurementHash].every(h=>/^[a-f0-9]{64}$/.test(h)))fail('REFERENCE_MEASUREMENT_IDENTITY_REQUIRED')
   if(!nonblank(input.analyzerId))fail('REFERENCE_ANALYZER_REQUIRED')
   if(!['INTERNAL_OBSERVED','INTERNAL_OFFLINE_ANALYSIS'].includes(input.evidence.source))fail('REFERENCE_EXTERNAL_SOURCE_UNSUPPORTED')
   if(!Number.isFinite(Date.parse(input.evidence.cutoff))||Object.values(input.evidence).some(v=>!nonblank(v)))fail('REFERENCE_METHOD_EVIDENCE_REQUIRED')
   if(!input.sampleManifest.length||input.sampleManifest.length>100000)fail('REFERENCE_SAMPLE_BOUND_INVALID')
+  const entryKeys=new Set(input.definition.entries.map(referenceEntryKey))
   const ids=new Set<string>()
   for(const member of input.sampleManifest){
     if(ids.has(member.factId))fail('REFERENCE_DUPLICATE_FACT')
     ids.add(member.factId)
-    if(!nonblank(member.factVersion)||authorizedFactVersions.get(member.factId)!==member.factVersion)fail('REFERENCE_SAMPLE_NOT_AUTHORIZED')
+    const source=authorizedFacts.get(member.factId)
+    if(!source)throw new ContentReleaseError('REFERENCE_SAMPLE_NOT_AUTHORIZED')
+    if(!nonblank(member.factVersion)||source.factVersion!==member.factVersion)fail('REFERENCE_SAMPLE_NOT_AUTHORIZED')
+    if(source.measurementReleaseId!==member.measurementReleaseId||canonicalHash([...source.metricKeys].sort())!==canonicalHash([...member.metricKeys].sort()))fail('REFERENCE_SAMPLE_SOURCE_MISMATCH')
+    if(!member.entryKeys.length||new Set(member.entryKeys).size!==member.entryKeys.length||member.entryKeys.some(k=>!entryKeys.has(k)||!source.eligibleEntryKeys.includes(k)))fail('REFERENCE_SAMPLE_ENTRY_NOT_ELIGIBLE')
     if(new Set(member.metricKeys).size!==member.metricKeys.length||member.metricKeys.some(k=>!nonblank(k)))fail('REFERENCE_SAMPLE_METRICS_INVALID')
     if(member.measurementReleaseId!==input.measurement.releaseId||!member.metricKeys.length)fail('REFERENCE_SAMPLE_MEASUREMENT_MISMATCH')
   }
@@ -61,7 +77,7 @@ export function prepareReferenceCandidate(input:Omit<ReferenceCandidate,'schemaV
     if(entry.provenanceType!=='local_observed')fail('REFERENCE_INTERNAL_OBSERVATIONS_REQUIRED')
     if(entry.instrumentVersion!==input.measurement.instrumentVersion||entry.scoringVersion!==input.measurement.scoringVersion
       ||entry.governance&&entry.governance.measurementHash!==input.measurement.measurementHash)fail('REFERENCE_MEASUREMENT_MISMATCH')
-    const eligible=input.sampleManifest.filter(m=>m.metricKeys.includes(entry.scoreKey)).length
+    const eligible=input.sampleManifest.filter(m=>m.entryKeys.includes(referenceEntryKey(entry))&&m.metricKeys.includes(entry.scoreKey)).length
     if(!eligible||entry.source.sampleSize!==eligible)fail('REFERENCE_SAMPLE_COUNT_MISMATCH')
     if(eligible<2&&(entry.statistics.sd!==undefined||Boolean(entry.statistics.percentileTable?.length)))fail('REFERENCE_ESTIMATE_NOT_COMPUTABLE')
     if(input.scope.kind!=='PLATFORM'&&['local_norm','validated_norm'].includes(entry.evidenceLevel))fail('REFERENCE_PRIVATE_OFFICIAL_NORM_FORBIDDEN')
