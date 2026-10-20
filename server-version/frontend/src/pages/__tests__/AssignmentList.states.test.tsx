@@ -15,7 +15,7 @@ describe('AssignmentList states', () => {
   beforeEach(() => { get.mockReset(); post.mockReset(); Object.defineProperty(HTMLElement.prototype, 'scrollIntoView', { configurable: true, value: vi.fn() }) })
   it('keeps failed reads distinct from empty records and retries the same list request', async () => {
     let failed = true
-    get.mockImplementation(async (url: string) => url === '/assignments' && failed
+    get.mockImplementation(async (url: string) => url.startsWith('/assignments?view=summary&') && failed
       ? { code: 1, message: 'Offline' }
       : { code: 0, data: url.endsWith('/tags') ? { tags: [] } : { list: [] } })
     const user = userEvent.setup()
@@ -26,7 +26,7 @@ describe('AssignmentList states', () => {
     failed = false
     await user.click(screen.getByRole('button', { name: '重试' }))
     expect(await screen.findByText('暂无匹配作业')).toBeInTheDocument()
-    expect(get.mock.calls.filter(([url]) => url === '/assignments')).toHaveLength(2)
+    expect(get.mock.calls.filter(([url]) => url.startsWith('/assignments?view=summary&'))).toHaveLength(2)
   })
   it('opens course-initiated creation with the permitted course already selected', async () => {
     get.mockImplementation(async (url: string) => ({ code: 0, data: url === '/courses' ? { list: [{ id: 'course', title: '当前课程' }] } : url.endsWith('/tags') ? { tags: [] } : { list: [] } }))
@@ -56,7 +56,7 @@ describe('AssignmentList states', () => {
     expect(await screen.findByRole('button', { name: '任务 2' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '任务 1' })).toBeInTheDocument()
     expect(get.mock.calls.filter(([url]) => url === '/assignments/old?courseId=course')).toHaveLength(1)
-    expect(get).toHaveBeenCalledWith('/assignments?courseId=course')
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('/assignments?view=summary&'))
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
@@ -73,14 +73,16 @@ describe('AssignmentList states', () => {
     const user = userEvent.setup()
     render(<MemoryRouter initialEntries={['/assignments?courseId=course']}><AssignmentList /></MemoryRouter>)
     await screen.findByRole('button', { name: '旧作业' })
+    await user.click(screen.getByText('检索与筛选'))
     await user.type(screen.getByRole('searchbox', { name: '搜索作业' }), '旧作业')
     await user.click(screen.getByRole('button', { name: '布置作业' }))
     await user.selectOptions(screen.getByLabelText('选择课程 *'), course.id)
     await user.type(screen.getByLabelText('作业标题 *'), created.title)
     await user.click(screen.getByRole('button', { name: '创建作业' }))
     expect(await screen.findByRole('button', { name: '新作业' })).toBeInTheDocument()
+    await user.click(screen.getByText('检索与筛选'))
     expect(screen.getByRole('searchbox', { name: '搜索作业' })).toHaveValue('')
-    expect(get.mock.calls.filter(([url]) => url === '/assignments?courseId=course')).toHaveLength(2)
+    expect(get.mock.calls.filter(([url]) => url.startsWith('/assignments?view=summary&'))).toHaveLength(2)
     expect(post).toHaveBeenCalledTimes(1)
   })
 

@@ -203,3 +203,12 @@ it('preserves the course scope in list filtering and report navigation',async()=
  fireEvent.click(screen.getByRole('button',{name:'查看报告'}))
  expect(screen.getByTestId('location').textContent).toBe('/composite-assessments/one/attempts/complete/report?courseId=course-a')
 })
+
+it('returns to a filtered course workspace through its single explicit parent entry',async()=>{
+ trainingPresentation.enabled=true
+ const parent='/courses/course-a/detail?section=assessments&assessments_page=3'
+ attempts.mockResolvedValue({...response('QUESTIONNAIRE'),data:{...response('QUESTIONNAIRE').data,courseScope:{id:'course-a',title:'课程 A'}}})
+ render(<MemoryRouter initialEntries={['/composite-assessments/one/results?courseId=course-a&returnTo='+encodeURIComponent(parent)]}><Location/><Routes><Route path="/composite-assessments/:id/results" element={<CompositeAssessmentResults/>}/><Route path="*" element={<p>目标页面</p>}/></Routes></MemoryRouter>)
+ await screen.findByRole('button',{name:'查看报告'});fireEvent.click(screen.getByRole('button',{name:'返回课程测评'}))
+ expect(screen.getByTestId('location')).toHaveTextContent(parent)
+})

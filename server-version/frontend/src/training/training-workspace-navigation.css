@@ -1,0 +1,12 @@
+.hui-training .training-workspace-menu{position:relative;flex-shrink:0;color:#385a42;}
+.hui-training .training-workspace-menu>summary{display:flex;align-items:center;gap:8px;list-style:none;min-height:40px;padding:8px 13px;border:1px solid #d5e0cd;border-radius:7px;background:#fbfdf7;font-size:12px;cursor:pointer;}
+.hui-training .training-workspace-menu>summary::-webkit-details-marker{display:none;}
+.hui-training .training-menu-close{display:none;}
+.hui-training .training-workspace-menu[open] .training-menu-close{display:inline-flex;margin-left:14px;}
+.hui-training .training-workspace-menu nav{position:absolute;top:calc(100% + 9px);left:0;z-index:100;width:210px;max-width:calc(100vw - 28px);display:grid;gap:3px;padding:9px;border:1px solid #d7e1cf;border-radius:9px;background:#fff;box-shadow:0 12px 32px #254c3020;}
+.hui-training .training-workspace-menu nav a{display:block;padding:11px 13px;border-radius:5px;color:#506c46;text-decoration:none;font-size:13px;}
+.hui-training .training-workspace-menu nav a[aria-current=page]{background:#eef5e4;font-weight:600;color:#3e6537;}
+.hui-training .training-workspace-menu :is(summary,a):focus-visible{outline:2px solid #64875a;outline-offset:3px;}
+.hui-training .training-context-trail{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:0 0 20px;font-size:11px;color:#7b856f;}
+.hui-training .training-context-trail a{color:#5d7751;text-decoration:none;}
+@media(max-width:700px){.hui-training .training-workspace-menu{margin-left:auto}.hui-training .training-workspace-menu nav{left:auto;right:0}.hui-training .training-context-trail{gap:6px}}

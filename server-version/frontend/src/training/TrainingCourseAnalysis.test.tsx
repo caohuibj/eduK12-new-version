@@ -1,4 +1,6 @@
-import { act, fireEvent, render, screen, within } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
+import type { ReactElement } from 'react'
+import { act, fireEvent, render as rtlRender, screen, within } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import type { TrainingAnalysisResult, TrainingAnalysisSource } from '../api/trainingAnalysis'
 
@@ -15,6 +17,7 @@ vi.mock('../utils/exportJobs', () => ({
 }))
 import TrainingCourseAnalysis from './TrainingCourseAnalysis'
 
+const render = (ui: ReactElement) => rtlRender(ui, { wrapper: MemoryRouter })
 const metric = { itemId: 'item-1', metricKey: 'total', label: '总分' }
 const baseline: TrainingAnalysisSource = { taskId: 'task-1', taskName: '基线测评', publication: '2026-10-01T00:00:00.000Z', configDigest: 'config-1', variantKey: 'group-a', metrics: [metric] }
 const followup: TrainingAnalysisSource = { ...baseline, taskId: 'task-2', taskName: '随访测评', publication: '2026-10-15T00:00:00.000Z' }
@@ -84,6 +87,17 @@ describe('authorized course analysis workspace', () => {
     expect(screen.getByText('本分析仅作描述，不代表因果效应。')).toBeVisible()
   })
 
+  it('selects a unique version and group but requires deliberate metric selection',async()=>{
+    mocks.sources.mockResolvedValue({list:[followup],total:1,canQuality:false,canExport:false})
+    render(<TrainingCourseAnalysis courseId="course-1"/>)
+    await screen.findByRole('combobox',{name:'波次 1 任务'})
+    fireEvent.change(screen.getByRole('combobox',{name:'波次 1 任务'}),{target:{value:followup.taskId}})
+    expect(screen.getByRole('combobox',{name:'波次 1 发布版本'})).toHaveValue(JSON.stringify([followup.publication,followup.configDigest]))
+    expect(screen.getByRole('checkbox',{name:/总分/})).not.toBeChecked()
+    expect(screen.getByRole('button',{name:'生成课程分析'})).toBeDisabled()
+    expect(mocks.analyze).not.toHaveBeenCalled()
+  })
+
   it('shows a genuine empty state without treating course sharing as result permission', async () => {
     mocks.sources.mockResolvedValue({ list: [], total: 0, canQuality: false, canExport: false })
     render(<TrainingCourseAnalysis courseId="course-1" />)
@@ -115,6 +129,7 @@ describe('authorized course analysis workspace', () => {
   it('invalidates the manifest immediately when a selection changes', async () => {
     render(<TrainingCourseAnalysis courseId="course-1" />)
     await analyze()
+    fireEvent.click(screen.getAllByText('高级：导出中的时间点标识')[1])
     fireEvent.change(screen.getByRole('textbox', { name: '波次 2 标识' }), { target: { value: 'later_followup' } })
     expect(screen.queryByRole('region', { name: '课程分析结果' })).toBeNull()
     expect(screen.queryByRole('button', { name: '导出当前分析' })).toBeNull()
@@ -161,11 +176,13 @@ describe('authorized course analysis workspace', () => {
   it('requires unique wave names and exactly two PAIRWISE waves', async () => {
     render(<TrainingCourseAnalysis courseId="course-1" />)
     await selectSources()
+    fireEvent.click(screen.getAllByText('高级：导出中的时间点标识')[1])
     fireEvent.change(screen.getByRole('textbox', { name: '波次 2 标识' }), { target: { value: 'baseline' } })
     expect(screen.getByRole('button', { name: '生成课程分析' })).toBeDisabled()
     expect(screen.getByRole('button', { name: '添加随访波次' })).toBeDisabled()
     fireEvent.change(screen.getByRole('combobox', { name: '匹配方式' }), { target: { value: 'FULL_CASE' } })
     fireEvent.click(screen.getByRole('button', { name: '添加随访波次' }))
+    fireEvent.click(screen.getAllByText('高级：导出中的时间点标识')[2])
     expect(screen.getByRole('textbox', { name: '波次 3 标识' })).toHaveValue('followup_2')
     fireEvent.change(screen.getByRole('combobox', { name: '匹配方式' }), { target: { value: 'PAIRWISE' } })
     expect(screen.getByRole('button', { name: '生成课程分析' })).toBeDisabled()

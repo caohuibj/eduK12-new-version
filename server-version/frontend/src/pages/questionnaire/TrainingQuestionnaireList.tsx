@@ -1,5 +1,6 @@
+import TrainingCatalogTags from '../../training/TrainingCatalogTags'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { ArrowRight, BookOpen, ClipboardList, Copy, Download, FileArchive, FileSpreadsheet, Layers, Plus, ShieldCheck, X } from 'lucide-react'
 import { ProductPage, PageHeader, ProductButton } from '../../components/product-ui'
 import ModalSurface from '../../components/shared-ui/ModalSurface'
@@ -8,9 +9,9 @@ import { compositeApi } from '../../modules/composite/api'
 import { assertExportDownload, clearExportIntentKey, ExportJobFailedError, requestExportIntent, triggerExportDownload, waitForExportArtifacts } from '../../utils/exportJobs'
 import './training-questionnaire-list.css'
 
-type Row = { id: string; name: string; kind: string; status: string; editHref: string; created?: string }
+type Row = { id: string; name: string; kind: string; status: string; editHref: string; created?: string; tags?: string[] }
 type Props = { data: { list: Row[]; total: number }; page: number; loading: boolean; error: string; actorId: string
- onPage: (page: number) => void; onCopy: (id: string) => Promise<void>; onTemplate: (row: Row) => void; savingTemplate: boolean; templatePanel: ReactNode; onReload: () => void }
+ onPage: (page: number) => void; onCopy: (id: string) => Promise<void>; onTemplate: (row: Row) => void; savingTemplate: boolean; templatePanel: ReactNode; onReload: () => void; pagination?:ReactNode;filtered?:boolean }
 const statusLabel: Record<string,string> = { DRAFT:'草稿', PUBLISHED:'已发布', ARCHIVED:'已停用', DEPRECATED:'已停用' }
 const kindLabel = (kind: string) => kind === 'LEGACY' ? '历史问卷' : kind === 'LEGACY_COMPOSITE' ? '历史组合测评' : '组合测评'
 
@@ -56,14 +57,16 @@ export function AssessmentDataExport({ row, actorId, onClose, course }: { row: R
  </section></ModalSurface>
 }
 
-export function TrainingQuestionnaireList({data,page,loading,error,actorId,onPage,onCopy,onTemplate,savingTemplate,templatePanel,onReload}:Props) {
+export function TrainingQuestionnaireList({data,page,loading,error,actorId,onPage,onCopy,onTemplate,savingTemplate,templatePanel,onReload,pagination,filtered=false}:Props) {
+ const location=useLocation()
+ const contextualHref=(path:string)=>path+(path.includes('?')?'&':'?')+'returnTo='+encodeURIComponent(location.pathname+location.search)
  const [exportRow,setExportRow]=useState<Row|null>(null)
  const published=data.list.filter(row=>row.status==='PUBLISHED').length
  const drafts=data.list.filter(row=>row.status==='DRAFT').length
  return <ProductPage width="management" className="hui-questionnaire-products training-form-management tql-page">
   <div className="tql-eyebrow">课程测评 <span>/</span> 测评管理</div>
-  <PageHeader title="全部测评" description="跨课程查找、复制和复用测评；本课程的日常管理请从课程详情进入。" actions={<Link className="tql-primary" to="/questionnaire-products/new"><Plus size={17} aria-hidden="true"/>创建组合测评</Link>}/>
-  <section className="tql-overview" aria-label="测评概览"><div><ClipboardList size={20} aria-hidden="true"/><strong>{loading?'—':data.total}</strong><span>全部测评</span></div><div><span className="tql-dot"/><strong>{loading?'—':published}</strong><span>本页已发布</span></div><div><span className="tql-dot is-draft"/><strong>{loading?'—':drafts}</strong><span>本页草稿</span></div></section>
+  <PageHeader title="全部测评" description="跨课程查找、复制和复用测评；本课程的日常管理请从课程详情进入。" actions={<Link className="tql-primary" to={contextualHref("/questionnaire-products/new")}><Plus size={17} aria-hidden="true"/>创建组合测评</Link>}/>
+  <section className="tql-overview" aria-label="测评概览"><div><ClipboardList size={20} aria-hidden="true"/><strong>{loading?'—':data.total}</strong><span>{filtered?'筛选结果':'全部测评'}</span></div><div><span className="tql-dot"/><strong>{loading?'—':published}</strong><span>本页已发布</span></div><div><span className="tql-dot is-draft"/><strong>{loading?'—':drafts}</strong><span>本页草稿</span></div></section>
   <nav className="tql-shortcuts" aria-label="测评管理工具">{([
    ['/assessment-templates','从模板开始','复用内容，创建新草稿',Layers],['/assessment-workbench','作答概览','按课程了解测评进度',ClipboardList],['/assessment-management','筛选与归档','查找测评、查看操作记录',BookOpen],
   ] as const).map(([to,title,hint,Icon])=><Link key={to as string} to={to as string}><Icon size={20} aria-hidden="true"/><span><strong>{title as string}</strong><small>{hint as string}</small></span><ArrowRight size={15} aria-hidden="true"/></Link>)}</nav>
@@ -74,16 +77,17 @@ export function TrainingQuestionnaireList({data,page,loading,error,actorId,onPag
    {loading?<p role="status" className="tql-empty">正在加载组合测评…</p>:data.list.length?data.list.map(row=>{
     const hasResults=row.status!=='DRAFT', composite=row.kind==='COLLECTION'||row.kind==='LEGACY_COMPOSITE'
     return <article className="tql-card" key={row.kind+row.id}>
-     <div className="tql-card-main"><span className="tql-card-icon"><ClipboardList size={22} aria-hidden="true"/></span><div><div className="tql-card-title"><h3><Link to={row.editHref}>{row.name}</Link></h3><span className={`tql-status is-${row.status.toLowerCase()}`}>{statusLabel[row.status]||row.status}</span></div><p>{kindLabel(row.kind)} <span>·</span> 单项报告合集</p></div></div>
-     <div className="tql-card-actions"><Link className={hasResults&&composite?'tql-primary':'tql-secondary'} to={hasResults&&composite?`/composite-assessments/${encodeURIComponent(row.id)}/results`:row.editHref}>{hasResults&&composite?'作答与结果':row.status==='DRAFT'?'继续编制':'查看与编制'}<ArrowRight size={14} aria-hidden="true"/></Link>
+     <div className="tql-card-main"><span className="tql-card-icon"><ClipboardList size={22} aria-hidden="true"/></span><div><div className="tql-card-title"><h3><Link to={contextualHref(row.editHref)}>{row.name}</Link></h3><span className={`tql-status is-${row.status.toLowerCase()}`}>{statusLabel[row.status]||row.status}</span></div><p>{kindLabel(row.kind)} <span>·</span> 单项报告合集</p></div></div>
+     <div className="tql-card-actions"><Link className={hasResults&&composite?'tql-primary':'tql-secondary'} to={contextualHref(hasResults&&composite?`/composite-assessments/${encodeURIComponent(row.id)}/results`:row.editHref)}>{hasResults&&composite?'作答与结果':row.status==='DRAFT'?'继续编制':'查看与编制'}<ArrowRight size={14} aria-hidden="true"/></Link>
       {composite?<button type="button" className="tql-secondary" disabled={!hasResults} title={!hasResults?'发布并收集作答后即可导出数据':undefined} onClick={()=>setExportRow(row)}><Download size={15} aria-hidden="true"/>导出数据</button>:<Link className="tql-secondary" to="/questionnaires/legacy"><Download size={15} aria-hidden="true"/>历史问卷导出</Link>}
      </div>
-     <footer><span>{row.status==='DRAFT'?'草稿尚未收集作答':composite?'结果与导出按当前权限开放':'使用原有问卷流程管理与导出'}</span><details className="tql-more"><summary>更多操作</summary><div>{hasResults&&<Link to={row.editHref}>配置与链接</Link>}{row.kind==='COLLECTION'&&row.status==='DRAFT'&&<Link to={row.editHref+'#questionnaire-publish'}>前往发布</Link>}<ProductButton onClick={()=>void onCopy(row.id)}><Copy size={13} aria-hidden="true"/>复制为新草稿</ProductButton><ProductButton disabled={savingTemplate} onClick={()=>onTemplate(row)}>保存为组合模板</ProductButton></div></details></footer>
+     <TrainingCatalogTags key={JSON.stringify(row.tags)} id={row.id} kind={row.kind} tags={row.tags} onSaved={onReload}/>
+     <footer><span>{row.status==='DRAFT'?'草稿尚未收集作答':composite?'结果与导出按当前权限开放':'使用原有问卷流程管理与导出'}</span><details className="tql-more"><summary>更多操作</summary><div>{hasResults&&<Link to={contextualHref(row.editHref)}>配置与链接</Link>}{row.kind==='COLLECTION'&&row.status==='DRAFT'&&<Link to={contextualHref(row.editHref)+'#questionnaire-publish'}>前往发布</Link>}<ProductButton onClick={()=>void onCopy(row.id)}><Copy size={13} aria-hidden="true"/>复制为新草稿</ProductButton><ProductButton disabled={savingTemplate} onClick={()=>onTemplate(row)}>保存为组合模板</ProductButton></div></details></footer>
     </article>
-   }):error?<p className="tql-empty">列表暂不可用，请重新加载。</p>:<div className="tql-empty"><ClipboardList size={32} aria-hidden="true"/><h3>从第一份测评开始</h3><p>创建草稿，添加量表、表单、情境或认知内容。</p><Link className="tql-primary" to="/questionnaire-products/new">创建组合测评<ArrowRight size={14} aria-hidden="true"/></Link></div>}
+   }):error?<p className="tql-empty">列表暂不可用，请重新加载。</p>:<div className="tql-empty"><ClipboardList size={32} aria-hidden="true"/><h3>{filtered?'没有符合条件的测评':'从第一份测评开始'}</h3><p>{filtered?'请调整标题、标签或时间范围后重新查询。':'创建草稿，添加量表、表单、情境或认知内容。'}</p><Link className="tql-primary" to={contextualHref("/questionnaire-products/new")}>创建组合测评<ArrowRight size={14} aria-hidden="true"/></Link></div>}
   </section>
-  <nav className="tql-pagination" aria-label="组合测评分页"><button type="button" disabled={loading||page===1} onClick={()=>onPage(page-1)}>上一页</button><span>第 {page} 页，共 {data.total} 份</span><button type="button" disabled={loading||page*25>=data.total} onClick={()=>onPage(page+1)}>下一页</button></nav>
+  {pagination || <nav className="tql-pagination" aria-label="组合测评分页"><button type="button" disabled={loading||page===1} onClick={()=>onPage(page-1)}>上一页</button><span>第 {page} 页，共 {data.total} 份</span><button type="button" disabled={loading||page*25>=data.total} onClick={()=>onPage(page+1)}>下一页</button></nav>}
   <details className="tql-history"><summary>历史管理与其他测评产品</summary><div><Link to="/questionnaires/legacy">原有问卷管理与导出</Link><Link to="/composite-assessments">历史综合测评管理</Link><Link to="/bundle-products">固定测评包：管理员审批版本与整体报告</Link></div></details>
-  {exportRow&&<AssessmentDataExport key={JSON.stringify([actorId,exportRow.id])} row={exportRow} actorId={actorId} onClose={()=>setExportRow(null)}/>}
+  {exportRow&&<AssessmentDataExport key={JSON.stringify([actorId,exportRow.id])} row={{...exportRow,editHref:contextualHref(exportRow.editHref)}} actorId={actorId} onClose={()=>setExportRow(null)}/>}
  </ProductPage>
 }

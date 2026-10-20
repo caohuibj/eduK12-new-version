@@ -11,13 +11,13 @@ import { AssessmentDataExport } from '../TrainingQuestionnaireList'
 import { QuestionnaireProductList } from '../QuestionnaireProducts'
 const row=(id:string,status='PUBLISHED',kind='COLLECTION')=>({id,name:'合成测评 '+id,status,kind,editHref:'/questionnaire-products/'+id})
 const success=(data:unknown)=>({code:0,data})
-const mount=()=>render(<MemoryRouter><QuestionnaireProductList/></MemoryRouter>)
+const mount=()=>render(<MemoryRouter initialEntries={['/questionnaires']}><QuestionnaireProductList/></MemoryRouter>)
 beforeEach(()=>{vi.clearAllMocks();mocks.get.mockResolvedValue(success({list:[row('published'),row('draft','DRAFT'),row('history','PUBLISHED','LEGACY')],total:3}));mocks.post.mockResolvedValue(success({artifacts:[{id:'synthetic-artifact'}]}));mocks.wait.mockResolvedValue([{downloadUrl:'/api/synthetic/original',fileName:'original-summary.zip'}]);mocks.fetch.mockResolvedValue({ok:true,blob:async()=>new Blob(['synthetic'])})})
 describe('Training questionnaire list and deidentified export',()=>{
  it('separates result actions, draft editing and legacy exports without requesting data on opening',async()=>{
   mount();const title=await screen.findByRole('heading',{name:'合成测评 published'})
   const published=within(title.closest('article')!)
-  expect(published.getByRole('link',{name:'作答与结果'})).toHaveAttribute('href','/composite-assessments/published/results')
+  expect(published.getByRole('link',{name:'作答与结果'})).toHaveAttribute('href','/composite-assessments/published/results?returnTo=%2Fquestionnaires')
   expect(within(screen.getByRole('heading',{name:'合成测评 draft'}).closest('article')!).getByRole('button',{name:'导出数据'})).toBeDisabled()
   expect(screen.getByRole('link',{name:'历史问卷导出'})).toHaveAttribute('href','/questionnaires/legacy')
   await userEvent.click(published.getByRole('button',{name:'导出数据'}))

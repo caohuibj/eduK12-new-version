@@ -1,3 +1,5 @@
+import { courseCatalogPage } from '../modules/training-catalog/course'
+import { ZodError } from 'zod'
 import type { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { canAccessCourseRoster } from '../utils/courseAccess'
@@ -21,6 +23,7 @@ export async function courseTrainingAssessments(req: Request, res: Response) {
     // complete roster; only course creator and legacy Admin can read inventory.
     if (!canAccessCourseRoster(course, actor.userId, actor.role)) return forbidden(res, '无权管理此课程')
 
+    if (req.query?.view === 'summary') return success(res, await courseCatalogPage(courseId, actor, req.query))
     const includeManaged = req.query?.includeManaged === 'true'
     const [questionnaires, composed, scales, cognitive] = await Promise.all([
       prisma.questionnaire.findMany({
@@ -94,7 +97,9 @@ export async function courseTrainingAssessments(req: Request, res: Response) {
       })),
     ]
     return success(res, { list, total: list.length })
-  } catch {
+  } catch (cause) {
+    if (cause instanceof ZodError) return error(res, '筛选或分页条件无效，请缩小范围', -1, 400)
+    if ((cause as any)?.statusCode === 400) return error(res, (cause as Error).message, -1, 400)
     return error(res, '读取课程测评清单失败', -1, 500)
   }
 }

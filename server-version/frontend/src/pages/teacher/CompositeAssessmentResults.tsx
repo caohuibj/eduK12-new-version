@@ -1,3 +1,4 @@
+import { internalReturnTo } from '../../components/app-shell/access'
 import React, { useEffect, useState } from 'react'
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, ArrowUpRight, CheckCheck, CircleCheck, Clock3, FileText, Info, Search, Users } from 'lucide-react'
@@ -35,6 +36,7 @@ const CompositeAssessmentResultsContent: React.FC<{ id: string }> = ({ id }) => 
   const trainingDesign = isTrainingHost()
   const [search] = useSearchParams()
   const courseId = search.get('courseId') || undefined
+  const returnTarget = internalReturnTo(search.get('returnTo'))
   const [data, setData] = useState<CompositeTeacherAttemptsResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -88,6 +90,7 @@ const CompositeAssessmentResultsContent: React.FC<{ id: string }> = ({ id }) => 
     const query = new URLSearchParams()
     if(row.status !== 'COMPLETED')query.set('partial','1')
     if(courseId)query.set('courseId',courseId)
+    if(returnTarget)query.set('returnTo',`/composite-assessments/${encodeURIComponent(id)}/results?${search.toString()}`)
     navigate(`/composite-assessments/${id}/attempts/${row.id}/report${query.size ? '?'+query.toString() : ''}`)
   }
 
@@ -111,7 +114,7 @@ const CompositeAssessmentResultsContent: React.FC<{ id: string }> = ({ id }) => 
   return (
     <ProductPage width="management" className={trainingDesign ? "tr-results" : "space-y-6"}>
       {trainingDesign && <div className="tr-result-eyebrow"><span>课程测评</span><span> / </span><strong>作答与报告</strong></div>}
-      <PageHeader title={data?.assessment.name || '作答与报告'} description={trainingDesign ? '查看学员的作答进度，打开已完成的测评报告。' : data?.assessment.code || '查看参与者进度与已完成报告'} actions={courseId || editorPath ? <button onClick={() => navigate(courseId ? `/courses/${encodeURIComponent(courseId)}/detail?section=assessments` : editorPath!)} className="staff-secondary-link"><ArrowLeft className="w-4 h-4" aria-hidden="true" />{courseId ? '返回课程测评' : '返回配置'}</button> : undefined} />
+      <PageHeader title={data?.assessment.name || '作答与报告'} description={trainingDesign ? '查看学员的作答进度，打开已完成的测评报告。' : data?.assessment.code || '查看参与者进度与已完成报告'} actions={returnTarget || courseId || editorPath ? <button onClick={() => navigate(returnTarget || (courseId ? `/courses/${encodeURIComponent(courseId)}/detail?section=assessments` : editorPath!))} className="staff-secondary-link"><ArrowLeft className="w-4 h-4" aria-hidden="true" />{courseId ? '返回课程测评' : returnTarget ? '返回测评列表' : '返回配置'}</button> : undefined} />
       {trainingDesign && data && <div className="tr-result-meta"><span className="tr-result-assessment-status"><CircleCheck size={13} aria-hidden="true" />{assessmentStatus}</span><span>测评编号：{data.assessment.code}</span></div>}
       {error && <ProductStatus kind="error" title="作答名单加载失败" actions={<button type="button" className="btn-secondary" onClick={() => setRevision(value => value + 1)}>重试</button>}>{error}</ProductStatus>}
       {courseId && data?.courseScope && <p className="tr-result-count-note">当前课程：{data.courseScope.title}。仅统计明确绑定本课程的作答。</p>}

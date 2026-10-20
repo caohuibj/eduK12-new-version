@@ -1,3 +1,4 @@
+import { updateCatalogTags } from '../training-catalog/tags'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { authenticate, requireTeacher, requireRole } from '../../middleware/auth'
 import { UserRole } from '../../types'
@@ -13,7 +14,7 @@ const handle = (fn: (req: Request) => Promise<unknown>) => async (req: Request, 
     return next(e)
   }
 }
-const pagination = z.object({ page: z.coerce.number().int().min(1).default(1), pageSize: z.coerce.number().int().min(1).max(100).default(25) })
+const pagination = z.object({ page: z.coerce.number().int().min(1).max(500).default(1), pageSize: z.coerce.number().int().min(1).max(50).default(25) })
 router.get('/available', authenticate, requireRole(UserRole.STUDENT), handle(req => service.available(req.user!.userId)))
 router.use(authenticate, requireTeacher)
 router.get('/templates', handle(req => workbench.templates(req.user!, req.query)))
@@ -23,9 +24,10 @@ router.post('/templates/:templateId/archive', handle(req => workbench.archiveTem
 router.get('/management-events', handle(req => workbench.managementEvents(req.user!, req.query)))
 router.get('/workspace/courses/:courseId', handle(req => workbench.courseOverview(req.user!, req.params.courseId, req.query)))
 router.get('/resources', handle(req => service.resources(req.user!)))
-router.get('/', handle(req => { const p = pagination.parse(req.query); return service.list(req.user!, p.page, p.pageSize, { search: req.query.search, status: req.query.status, since: req.query.since }) }))
+router.get('/', handle(req => { const p = pagination.parse(req.query); return service.list(req.user!, p.page, p.pageSize, { search: req.query.search, status: req.query.status, since: req.query.since, tags: req.query.tags, from: req.query.from, to: req.query.to, dateField: req.query.dateField }) }))
 router.post('/', handle(req => service.create(req.user!, req.body)))
 router.get('/:id/reports', handle(req => service.exportReports(req.user!, req.params.id, req.query)))
+router.post('/:id/catalog-tags', handle(req => updateCatalogTags(req.user!, req.params.id, req.body)))
 router.get('/:id', handle(req => service.detail(req.user!, req.params.id)))
 router.put('/:id', handle(req => service.update(req.user!, req.params.id, req.body)))
 router.post('/:id/items', handle(req => service.addItem(req.user!, req.params.id, req.body)))

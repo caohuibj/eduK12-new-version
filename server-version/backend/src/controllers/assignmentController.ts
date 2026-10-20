@@ -1,3 +1,4 @@
+import { managementTaskList } from '../modules/training-catalog/tasks'
 import { Request, Response } from 'express'
 import { canReadLegacyContent } from '../utils/legacyContentRoles'
 import { prisma } from '../config/database'
@@ -162,6 +163,7 @@ export const assignmentController = {
   // 获取作业列表（添加分页优化）
   async list(req: Request, res: Response) {
     try {
+      if (req.query.view === 'summary') return await managementTaskList(req, res, 'assignment')
       const userId = req.user?.userId
       const userRole = req.user?.role
       if (!canReadLegacyContent(userRole)) return forbidden(res, '当前角色不能访问旧作业列表')

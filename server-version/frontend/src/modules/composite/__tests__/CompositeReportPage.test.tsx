@@ -589,3 +589,13 @@ it('returns a scoped teacher report to the same course results',async()=>{
  await screen.findByText('暂无已完成单项');fireEvent.click(screen.getByRole('button',{name:'返回'}))
  expect(screen.getByTestId('scoped-return')).toHaveTextContent('?courseId=course-a')
 })
+
+it('retains the filtered teacher results parent without accepting an external destination',async()=>{
+ authState.user={role:'TEACHER'}
+ mockCompositeApi.teacherReport.mockResolvedValue({code:0,data:{id:'scoped-attempt',assessmentId:'q',name:'课程报告',productKind:'QUESTIONNAIRE',reportMode:'COLLECTION_ONLY',reportState:'PARTIAL',completedAt:null,totalTime:null,anonymousCode:null,backgroundValues:[],unitReports:[]}})
+ const parent='/composite-assessments/q/results?courseId=course-a&returnTo='+encodeURIComponent('/courses/course-a/detail?section=assessments&assessments_page=3')
+ function Target(){return <p data-testid="filtered-report-return">{useLocation().pathname+useLocation().search}</p>}
+ render(<MemoryRouter initialEntries={['/composite-assessments/q/attempts/scoped-attempt/report?partial=1&courseId=course-a&returnTo='+encodeURIComponent(parent)]}><Routes><Route path="/composite-assessments/:id/attempts/:attemptId/report" element={<CompositeReportPage/>}/><Route path="/composite-assessments/:id/results" element={<Target/>}/></Routes></MemoryRouter>)
+ await screen.findByText('暂无已完成单项');fireEvent.click(screen.getByRole('button',{name:'返回'}))
+ expect(screen.getByTestId('filtered-report-return')).toHaveTextContent(parent)
+})

@@ -1,3 +1,4 @@
+import { parseCatalogFilters, sqlLike } from '../training-catalog/filters'
 import { parseTrainingFeedbackPolicy, trainingFeedbackPolicySchema } from '../assessment-policy/training-feedback-policy'
 import { parseTrainingPersistencePolicy } from '../composite/training-persistence.policy'
 import { compileWeightedVariants, weightedVariantConfigSchema } from '../assessment-core/weighted-variants'
@@ -441,14 +442,16 @@ export async function remove(actor: Actor, id: string, raw: unknown) {
 }
 export async function list(actor: Actor, page = 1, pageSize = 25, raw: unknown = {}) {
   author(actor)
-  const filters = z.object({ search: z.string().trim().max(200).default(''), status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED', 'DEPRECATED']).optional(), since: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(value => !Number.isNaN(Date.parse(value)) && new Date(value).toISOString().slice(0, 10) === value, '创建日期无效').optional() }).strict().parse(raw)
-  const search = '%' + filters.search.toLowerCase().replace(/[\\%_]/g, '\\$&') + '%'
+  const extra = z.object({ status: z.enum(['DRAFT','PUBLISHED','ARCHIVED','DEPRECATED']).optional(), since: z.string().regex(/^\d{4}-\d{2}-\d{2}$/).refine(value=>!Number.isNaN(Date.parse(value))&&new Date(value).toISOString().slice(0,10)===value,'创建日期无效').optional() }).parse(raw)
+  const filters = parseCatalogFilters({ ...(raw as object), page, pageSize })
+  if (filters.dateField !== 'created') throw compositeBadRequest('测评清单仅支持创建时间')
+  const search = sqlLike(filters.search)
   // SQL is static; values remain positional parameters, never interpolated.
-  const union = "SELECT id, name, status::text, created_at AS created, creator_id AS owner_id, 'LEGACY' AS kind, type::text AS questionnaire_type FROM questionnaires UNION ALL SELECT c.id, c.name, c.status::text, c.created_at AS created, c.created_by AS owner_id, CASE WHEN c.product_kind = 'QUESTIONNAIRE' THEN 'COLLECTION' ELSE 'LEGACY_COMPOSITE' END AS kind, c.questionnaire_type::text FROM composite_assessments c WHERE (c.product_kind = 'QUESTIONNAIRE' OR (c.product_kind = 'LEGACY_COMPOSITE' AND c.report_package_key IS NULL AND c.analysis_protocol_key IS NULL)) AND NOT EXISTS (SELECT 1 FROM assessment_composition_templates t WHERE t.definition_id = c.id)"
-  const filter = '($1::boolean OR owner_id = $2) AND LOWER(name) LIKE $3 AND ($4::text IS NULL OR status = $4::text) AND ($5::timestamp IS NULL OR created >= $5::timestamp)'
+  const union = "SELECT id, name, tags, status::text, created_at AS created, creator_id AS owner_id, 'LEGACY' AS kind, type::text AS questionnaire_type FROM questionnaires UNION ALL SELECT c.id, c.name, c.tags, c.status::text, c.created_at AS created, c.created_by AS owner_id, CASE WHEN c.product_kind = 'QUESTIONNAIRE' THEN 'COLLECTION' ELSE 'LEGACY_COMPOSITE' END AS kind, c.questionnaire_type::text FROM composite_assessments c WHERE (c.product_kind = 'QUESTIONNAIRE' OR (c.product_kind = 'LEGACY_COMPOSITE' AND c.report_package_key IS NULL AND c.analysis_protocol_key IS NULL)) AND NOT EXISTS (SELECT 1 FROM assessment_composition_templates t WHERE t.definition_id = c.id)"
+  const filter = '($1::boolean OR owner_id = $2) AND LOWER(name) LIKE $3 AND ($4::text IS NULL OR status = $4::text) AND ($5::timestamp IS NULL OR created >= $5::timestamp) AND ($8::timestamp IS NULL OR created < $8::timestamp) AND tags @> $9::text[]'
   const [rows, counts] = await prisma.$transaction([
-    prisma.$queryRawUnsafe<any[]>('SELECT * FROM (' + union + ') q WHERE ' + filter + ' ORDER BY created DESC,id,kind LIMIT $6 OFFSET $7', actor.role === 'ADMIN', actor.userId, search, filters.status ?? null, filters.since ? filters.since + 'T00:00:00.000Z' : null, pageSize, (page - 1) * pageSize),
-    prisma.$queryRawUnsafe<Array<{ total: bigint }>>('SELECT COUNT(*) AS total FROM (' + union + ') q WHERE ' + filter, actor.role === 'ADMIN', actor.userId, search, filters.status ?? null, filters.since ? filters.since + 'T00:00:00.000Z' : null),
+    prisma.$queryRawUnsafe<any[]>('SELECT * FROM (' + union + ') q WHERE ' + filter + ' ORDER BY created DESC,id,kind LIMIT $6 OFFSET $7', actor.role === 'ADMIN', actor.userId, search, extra.status ?? null, filters.from ?? (extra.since ? extra.since + 'T00:00:00.000Z' : null), pageSize, (page - 1) * pageSize, filters.to ?? null, filters.tags),
+    prisma.$queryRawUnsafe<Array<{ total: bigint }>>('SELECT COUNT(*) AS total FROM (' + union + ') q WHERE ' + filter.replace(/\$8/g,'$6').replace(/\$9/g,'$7'), actor.role === 'ADMIN', actor.userId, search, extra.status ?? null, filters.from ?? (extra.since ? extra.since + 'T00:00:00.000Z' : null), filters.to ?? null, filters.tags),
   ])
   return { list: rows.map(v => ({ ...v, reportMode: 'COLLECTION_ONLY', editHref: v.kind === 'COLLECTION' ? '/questionnaire-products/' + v.id : v.kind === 'LEGACY_COMPOSITE' ? '/composite-assessments/' + v.id : v.questionnaire_type === 'GENERAL' ? '/general-questionnaires/' + v.id + '/edit' : '/questionnaires/' + v.id })), total: Number(counts[0].total), page, pageSize }
 }

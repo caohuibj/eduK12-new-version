@@ -13,6 +13,7 @@ import { ProductButton } from '../product-ui'
 import StaffNavigation from './StaffNavigation'
 import { isTrainingHost, trainingNavigation } from '../../training/context'
 import TrainingBrand from '../../training/TrainingBrand'
+import TrainingWorkspaceNav from '../../training/TrainingWorkspaceNav'
 import TrainingContextBack from '../../training/TrainingContextBack'
 import { teacherVisualFamily } from '../../training/teacherVisual'
 import { homeFor, isAuthPath, isPublicAssessmentPath, shellModeFor } from './access'
@@ -72,7 +73,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
     <div className="hui-product"><a className="hui-skip" href="#hui-main" onClick={()=>mainRef.current?.focus()}>跳到主要内容</a></div>
     {!entryMode&&<header className="hui-product hui-app-header">{mode==='focused'?<span className="hui-brand">{training ? <TrainingBrand /> : 'Huisurvey'}</span>:<Link className="hui-brand" to={homeFor(user?.role)}>{training?<TrainingBrand />:'Huisurvey'}</Link>}
       {mode==='standard'&&!trainingWorkspace&&<ProductButton ref={toggleRef} className="hui-menu-toggle" aria-expanded={menuOpen} aria-controls="hui-navigation" onKeyDown={e=>{if(e.key==='Escape')setOpenPath(null)}} onClick={()=>setOpenPath(menuOpen?null:location.pathname)}><PanelLeft size={18} aria-hidden="true"/>导航菜单</ProductButton>}
-      {trainingWorkspace&&<nav id="hui-navigation" aria-label="主要导航" className="hui-product hui-navigation">{items.map(item=><Link key={item.path} to={item.path} aria-current={active?.path===item.path?'page':undefined} onClick={()=>onNavigate(item.path)}>{item.label}</Link>)}</nav>}
+      {trainingWorkspace&&<TrainingWorkspaceNav items={items} activePath={active?.path}/>}
       <div className="hui-account">{isPublicAssessmentPath(location.pathname)?<span>公开参与</span>:user?<span>{user.nickname||user.username} · {{STUDENT:training?'学员':'学生',TEACHER:training?'培训师':'教师',ADMIN:(platformRole??user.platformRole)==='SYSTEM_ADMIN'?'平台管理员':'旧版管理员',PARENT:'家长'}[user.role]}</span>:<span>欢迎使用</span>}
         {!training&&user&&mode==='standard'&&(organizations.length>0||organizationsLoading)&&<label className="hui-organization-switch"><span>组织</span><select aria-label="当前组织" value={displayOrganization?.organization.id||''} disabled={organizationLoading||organizationsLoading} onChange={e=>{const id=e.target.value;if(!id)return;if(organizationWorkspaceRoute)navigate(`/organizations/${encodeURIComponent(id)}`);else void selectOrganization(id)}}><option value="" disabled>{organizationLoading||organizationsLoading?'正在加载…':'选择组织'}</option>{displayOrganization&&!organizations.some(i=>i.id===displayOrganization.organization.id)&&<option value={displayOrganization.organization.id}>{displayOrganization.organization.name}</option>}{organizations.map(o=><option key={o.id} value={o.id}>{o.name}{o.status==='SUSPENDED'?'（已暂停）':''}</option>)}</select></label>}
         {!training&&staffMode&&organizationTotal>organizations.length&&<Link to="/organizations">更多组织</Link>}

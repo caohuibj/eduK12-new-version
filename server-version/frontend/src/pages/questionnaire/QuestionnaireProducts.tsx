@@ -1,3 +1,5 @@
+import { CatalogFilters, CatalogPagination } from '../../training/TrainingCatalogControls'
+import { useCatalogQuery } from '../../training/useCatalogQuery'
 import { TrainingQuestionnaireList } from './TrainingQuestionnaireList'
 import { DeliveryOptionCard } from './DeliveryOptionCard'
 import { FormChoiceEditor } from './FormChoiceEditor'
@@ -76,7 +78,9 @@ export function QuestionnaireProductList() {
   const [savingTemplate, setSavingTemplate] = useState(false)
   const saving = useRef(false)
   const [data, setData] = useState<any>({ list: [], total: 0 })
-  const [page, setPage] = useState(1)
+  const catalog = useCatalogQuery()
+  const page = catalog.selection.page
+  const setPage = (value: number | ((p:number)=>number)) => catalog.apply({...catalog.selection, page: typeof value === 'function' ? value(page) : value})
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [listRevision, setListRevision] = useState(0)
@@ -86,12 +90,12 @@ export function QuestionnaireProductList() {
     setLoading(true)
     setError('')
     setData({ list: [], total: 0 })
-    request('?page=' + page)
+    request('?' + catalog.params)
       .then(value => { if (active) setData(value) })
       .catch((e) => { if (active) setError(message(e)) })
       .finally(() => { if (active) setLoading(false) })
     return () => { active = false }
-  }, [page, listRevision])
+  }, [catalog.params, listRevision])
   const copy = async (id: string) => {
     try {
       const row = await request('/' + id + '/copy', {
@@ -117,7 +121,7 @@ export function QuestionnaireProductList() {
       }}>{savingTemplate ? '保存中…' : '保存为模板'}</ProductButton><ProductButton disabled={savingTemplate} onClick={() => setTemplateSource(null)}>取消</ProductButton></section>
   if (isTrainingHost()) return <TrainingQuestionnaireList data={data} page={page} loading={loading} error={error}
     onPage={setPage} onCopy={copy} onTemplate={row=>{setTemplateSource(row);setTemplateName(row.name)}} savingTemplate={savingTemplate}
-    templatePanel={templatePanel} actorId={user?.id || ''} onReload={()=>setListRevision(value=>value+1)}/>
+    templatePanel={<><CatalogFilters key={catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} label="测评"/>{templatePanel}</>} filtered={Boolean(catalog.selection.search||catalog.selection.tags||catalog.selection.from||catalog.selection.to)} pagination={<CatalogPagination selection={catalog.selection} onApply={catalog.apply} total={data.total} loading={loading} label="测评"/>} actorId={user?.id || ''} onReload={()=>setListRevision(value=>value+1)}/>
   return (
     <ProductPage width="management" className={`hui-questionnaire-products${isTrainingHost() ? ' training-form-management' : ''}`}>
       <PageHeader
@@ -167,7 +171,7 @@ export function QuestionnaireProductList() {
           第 {page} 页，共 {data.total} 份
         </span>
         <ProductButton
-          disabled={page * 25 >= data.total}
+          disabled={page * catalog.selection.pageSize >= data.total}
           onClick={() => setPage((p) => p + 1)}
         >
           下一页
@@ -450,7 +454,7 @@ export function QuestionnaireProductEdit() {
           questionnaireType: kind,
           requestId,
         })
-        navigate(base + '/' + row.id + (preselectedScaleId ? '?scaleId=' + encodeURIComponent(preselectedScaleId) : '') + (trainingDesign ? '#questionnaire-content' : ''), { replace: true })
+        { const next=new URLSearchParams(location.search);if(preselectedScaleId)next.set('scaleId',preselectedScaleId);navigate(base+'/'+row.id+(next.size?'?'+next.toString():'')+(trainingDesign?'#questionnaire-content':''),{replace:true}) }
       } else {
         let row = detail
         // Disable first so delivery can leave Training without an active config.
