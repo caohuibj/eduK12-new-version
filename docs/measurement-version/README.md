@@ -300,3 +300,5 @@ FINAL 解释补齐实际 Scale/SJT v1 存储结构：它们只有 privateScoring
 复用现有单波次 V4 keyset/cutoff/revision/count、自适应分页、2 MiB 工件预算、五分钟近期 MFA、十分钟加密 ticket、审计、下载再授权及清理；解释分页不进入 attendance 阶段，cursor 不能混用格式。guardedOwner 原授权单 SQL 改为锁集合后 clock_timestamp 过滤到期账户。
 
 验证：formatter/真实 reader 投影/既有 ticket 服务共 37 个定向合同、strict TypeScript 与 diff 检查通过。包含默认六格式不启用解释、真实加密 FINAL/binding 读取、错误 hash/来源变化拒绝、旧数据不补算。数据库访问使用 mock，未声称真实 HTTP/并发或全链验收。
+
+7B 数据库格式约束使用新的增量迁移 20261020041000_survey_interpretation_exports 扩展到七种格式；旧六种全部保留，不修改已应用迁移。隔离 PG single-user 执行该新迁移及一次幂等重复应用后，真实插入七种格式各一份 ticket 成功，非法格式被原命名 CHECK 拒绝。此前 formatter/ticket mock 合同不代表该 SQL 边界已通过，现以单独 SQL 证据补齐；仍非应用 HTTP/并发验收。

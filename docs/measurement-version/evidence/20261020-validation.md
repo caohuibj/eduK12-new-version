@@ -29,3 +29,7 @@ The same isolated single-user cluster applied the exact two new migration files 
 ## V08 START additive binding, 05:00 UTC
 
 The exact new migration `20261020040000_survey_attempt_content_binding` and `survey-content-binding-database-contracts.sql` ran once in the same isolated single-user cluster. Six rejection assertions passed (missing pair, malformed hash, mutation, clearing, scope change), followed by a legal completion status update retaining the binding. SHA-256 and outcomes are in `20261020-v08-binding-sql.json`. Cluster remains 69 MiB; free space 8.4 GiB. This does not establish connected Prisma execution or concurrent admission/lifecycle races. No old migration or real data changed.
+
+## V08 explicit interpretation export constraint, 05:09 UTC
+
+Applied new `20261020041000_survey_interpretation_exports` and reapplied its identical bytes to verify idempotence in the synthetic single-user cluster. `survey-interpretation-export-database-contracts.sql` successfully inserted all six existing formats plus INTERPRETATION_LONG, and confirmed INVALID_FORMAT is rejected by survey_export_tickets_format_check. No old migration changed. Exact hashes/results are in `20261020-v08-interpretation-export-sql.json`; this closes the CHECK omission not exercised by mocked ticket tests. No connected Prisma/HTTP/concurrency claim.
