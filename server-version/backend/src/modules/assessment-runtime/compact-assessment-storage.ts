@@ -91,15 +91,52 @@ export const resolveStoredScaleAnswers=async(value:unknown,record?:any,db:Db=pri
  return resolveRawFact({...rows[0],rawReceiptAttemptId:raw.parentId} as ScaleFactRecord,db,record)
 }
 export const getScaleReportSourceRow=(result:any):ScaleFactRecord|null=>result?.[SOURCE_ROW]??null
-export const preloadStoredScaleResults=async(records:any[],db:Db=prisma):Promise<void>=>{
- const missing=records.filter(row=>isScaleFactsReference(row.result)&&!readLoadedScaleFactRecord(row))
- if(missing.length){
-  const rows=await loadScaleFactRecords(missing.map(row=>({id:row.id,attemptEpoch:row.result.e})),db)
-  const byId=new Map(rows.map(row=>[row.id+'/'+row.attemptEpoch,row]))
-  for(const record of missing){const row=byId.get(record.id+'/'+record.result.e);if(!row)throw new Error('Immutable result fact missing');assertRecord(row,record);attachLoadedScaleFactRecord(record,row)}
+type StoredScaleRead = {row?:ScaleFactRecord;facts:ReturnType<typeof decodeScaleFacts>}
+export type StoredScaleFactsReader = {
+ read:(record:any,db:Db)=>StoredScaleRead
+ find:(id:string,epoch:number,db:Db)=>StoredScaleRead|undefined
+}
+const recordIdentity=(record:any)=>JSON.stringify([record.id,record.attemptEpoch,record.submissionId,record.submissionPayloadHash,record.result])
+const factIdentity=(row:ScaleFactRecord)=>JSON.stringify([row.id,row.attemptEpoch,row.submissionId,row.submissionPayloadHash,
+ row.factsEncrypted,row.sourceResultHash,row.canonicalResultHash,row.completedAt,row.totalTime])
+/** Invocation-local decoded facts, not committed write evidence. Views remain
+ * independent: canonical/full consumers still run their own reconstruction. */
+export const createStoredScaleFactsReader=async(records:any[],db:Db=prisma,strictRows=false):Promise<StoredScaleFactsReader>=>{
+ const pins=new Map(records.map(record=>[record,recordIdentity(record)]))
+ const references=records.filter(record=>isScaleFactsReference(record.result))
+ const missing=strictRows?references:references.filter(record=>!readLoadedScaleFactRecord(record))
+ const loaded=missing.length?await loadScaleFactRecords(missing.map(record=>({id:record.id,attemptEpoch:record.result.e})),db):[]
+ const byId=new Map(loaded.map(row=>[identityKey(row.id,row.attemptEpoch),row]))
+ if(strictRows&&(byId.size!==loaded.length||loaded.length!==references.length))throw new Error('Report batch immutable sources incomplete')
+ const entries=new Map<any,{row?:ScaleFactRecord;rowPin?:string;decoded?:StoredScaleRead}>(),sources=new Map<string,any>()
+ for(const record of records){
+  if(pins.get(record)!==recordIdentity(record))throw new Error('Scale read identity changed')
+  let row:ScaleFactRecord|undefined
+  if(isScaleFactsReference(record.result)){
+   row=byId.get(identityKey(record.id,record.result.e))??(!strictRows?readLoadedScaleFactRecord(record)??undefined:undefined)
+   if(!row)throw new Error('Immutable result fact missing')
+   assertRecord(row,record)
+   attachLoadedScaleFactRecord(record,row)
+   sources.set(identityKey(row.id,row.attemptEpoch),record)
+  }
+  entries.set(record,{row,rowPin:row?factIdentity(row):undefined})
  }
- const bodies=records.flatMap(record=>{if(readCommittedScaleFacts(record))return [];const row=readLoadedScaleFactRecord(record);const facts=row?decodeScaleFacts(row.factsEncrypted):decodeScaleFacts(record.result);return facts?[facts]:[]})
+ const read=(record:any,current:Db):StoredScaleRead=>{
+  const entry=entries.get(record)
+  if(current!==db||!entry||pins.get(record)!==recordIdentity(record)
+    ||(entry.row&&entry.rowPin!==factIdentity(entry.row)))throw new Error('Scale read identity changed')
+  return entry.decoded??(entry.decoded={row:entry.row,facts:decodeScaleFacts(entry.row?.factsEncrypted??record.result)})
+ }
+ return {read,find:(id,epoch,current)=>{
+  if(current!==db)throw new Error('Scale read transaction changed')
+  const record=sources.get(identityKey(id,epoch));return record?read(record,current):undefined
+ }}
+}
+export const preloadStoredScaleResults=async(records:any[],db:Db=prisma):Promise<StoredScaleFactsReader>=>{
+ const reader=await createStoredScaleFactsReader(records,db)
+ const bodies=records.flatMap(record=>{if(readCommittedScaleFacts(record))return [];const facts=reader.read(record,db).facts;return facts?[facts]:[]})
  await prefetchCompactScaleTemplates(bodies,publicTemplatesForDatabase(db))
+ return reader
 }
 
 const EXPORT_BATCH_ROWS=64
@@ -210,16 +247,17 @@ export const createStoredScaleExportReader=(records:readonly any[],db:Db=prisma)
  }
 }
 
-export const resolveStoredScaleResult=async(value:unknown,options:{record?:any;full?:boolean;db?:Db}={}):Promise<any>=>{
+export const resolveStoredScaleResult=async(value:unknown,options:{record?:any;full?:boolean;db?:Db;reader?:StoredScaleFactsReader}={}):Promise<any>=>{
  const db=options.db??prisma;let row:ScaleFactRecord|undefined
+ const cached=options.reader?.read(options.record,db)
  if(isScaleFactsReference(value)){
   if(!options.record?.id||(options.record.attemptEpoch!==undefined&&options.record.attemptEpoch!==value.e))throw new Error('Result reference requires the authorized unit and epoch')
-  row=cachedFact(options.record,value.e)??readLoadedScaleFactRecord(options.record)??await loadFact(options.record.id,value.e,db,options.full)
+  row=cached?.row??cachedFact(options.record,value.e)??readLoadedScaleFactRecord(options.record)??await loadFact(options.record.id,value.e,db,options.full)
   assertRecord(row,options.record)
   const committed=readCommittedScaleFacts(options.record)
   if(committed&&!options.full){const result={...committed.result};Object.defineProperty(result,SCALE_REPORT_FACTS_VIEW,{value:true});Object.defineProperty(result,SOURCE_ROW,{value:row});return result}
  }
- const facts=decodeScaleFacts(row?.factsEncrypted??value)
+ const facts=cached?cached.facts:decodeScaleFacts(row?.factsEncrypted??value)
  if(!facts)return value
  if(options.record)assertScaleFactsBinding(facts,options.record)
  if(row&&(facts.sourceResultHash!==row.sourceResultHash||facts.binding.assessmentId!==row.id||facts.binding.attemptEpoch!==row.attemptEpoch))throw new Error('Immutable fact body binding mismatch')
@@ -234,17 +272,18 @@ export const resolveStoredScaleResult=async(value:unknown,options:{record?:any;f
  return result
 }
 export const makeCanonicalFactsReference=(binding:ScaleFactsBinding,_resultHash:string):string=>(sharedControlWritesEnabled()?encryptControlReference:encryptUnifiedRuntimePayload)({k:'SCF2',a:binding.assessmentId,e:binding.attemptEpoch})
-export const loadStoredCanonicalUnitResults=async(encryptedValues:string[],db:Db=prisma,committedRecords:any[]=[]):Promise<CanonicalUnitResultEnvelopeV1[]>=>{
+export const loadStoredCanonicalUnitResults=async(encryptedValues:string[],db:Db=prisma,committedRecords:any[]=[],reader?:StoredScaleFactsReader):Promise<CanonicalUnitResultEnvelopeV1[]>=>{
  const values=encryptedValues.map(value=>decryptUnifiedRuntimePayload<any>(value))
  const refs=values.filter(value=>value?.k==='SCF2'||value?.kind==='SCALE_FACTS_CANONICAL_REF')
  const identity=(ref:any)=>ref.k==='SCF2'?{id:ref.a,attemptEpoch:ref.e}:{id:ref.binding?.assessmentId,attemptEpoch:ref.binding?.attemptEpoch}
  for(const ref of refs){const x=identity(ref);if(typeof x.id!=='string'||!x.id||!Number.isSafeInteger(x.attemptEpoch)||x.attemptEpoch<1||(ref.kind&&ref.version!==1))throw new Error('Invalid canonical fact reference')}
  const known=new Map<string,{row:ScaleFactRecord;canonical?:CanonicalUnitResultEnvelopeV1|null}>()
  for(const record of committedRecords){const context=readCommittedScaleFacts(record);if(context)known.set(context.row.id+'/'+context.row.attemptEpoch,{row:context.row,canonical:context.canonical})}
+ for(const ref of refs){const x=identity(ref),read=reader?.find(x.id,x.attemptEpoch,db);if(read?.row&&!known.has(x.id+'/'+x.attemptEpoch))known.set(x.id+'/'+x.attemptEpoch,{row:read.row})}
  const missing=refs.map(identity).filter(x=>!known.has(x.id+'/'+x.attemptEpoch))
  for(const row of await loadScaleFactRecords(missing,db))known.set(row.id+'/'+row.attemptEpoch,{row})
  const factsById=new Map<string,ReturnType<typeof decodeScaleFacts>>()
- for(const [id,item]of known){if(item.canonical)continue;const facts=decodeScaleFacts(item.row.factsEncrypted);if(!facts)throw new Error('Canonical fact body unavailable');assertScaleFactsBinding(facts,item.row);if(facts.sourceResultHash!==item.row.sourceResultHash)throw new Error('Canonical source digest mismatch');factsById.set(id,facts)}
+ for(const [id,item]of known){if(item.canonical)continue;const read=reader?.find(item.row.id,item.row.attemptEpoch,db),facts=read?read.facts:decodeScaleFacts(item.row.factsEncrypted);if(!facts)throw new Error('Canonical fact body unavailable');assertScaleFactsBinding(facts,item.row);if(facts.sourceResultHash!==item.row.sourceResultHash)throw new Error('Canonical source digest mismatch');factsById.set(id,facts)}
  await prefetchCompactScaleTemplates([...factsById.values()].filter((v):v is NonNullable<typeof v>=>Boolean(v)),publicTemplatesForDatabase(db))
  const output:CanonicalUnitResultEnvelopeV1[]=[]
  for(const value of values){

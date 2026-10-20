@@ -11,20 +11,6 @@ import type { TrainingAnalysisRequestV1 } from './types'
 type Tx = Prisma.TransactionClient
 const fail = (statusCode:number,code:string,message:string):never => {throw Object.assign(new Error(message),{statusCode,code})}
 const stale = ():never => fail(409,'TRAINING_ANALYSIS_STALE','来源、质量或访问权限已变化，请重新生成分析')
-/** Course lock serializes quality decisions and freezes their absence as well as
- * presence. Actor fields are current DB authority, never a cached role claim. */
-async function lockAuthority(tx:Tx,actor:TrainingAnalysisActor,courseId:string,write=false) {
-  const rows = await tx.$queryRaw<Array<{id:string}>>`
-    SELECT c.id FROM courses c JOIN users u ON u.id=${actor.id}
-    WHERE c.id=${courseId} AND c.course_type='TRAINING_COURSE' AND NOT c.is_library
-      AND (u.role::text='ADMIN' OR c.creator_id=u.id)
-      AND u.role::text=${actor.role} AND u.role::text IN ('ADMIN','TEACHER')
-      AND u.account_domain IN ('LEGACY','TRAINING') AND u.is_active AND NOT u.is_frozen
-      AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
-    ${write ? Prisma.sql`FOR UPDATE OF c FOR SHARE OF u` : Prisma.sql`FOR SHARE OF c,u`}
-  `
-  if(rows.length!==1) fail(404,'TRAINING_ANALYSIS_NOT_FOUND','课程不存在或无当前数据访问权限')
-}
 function sortedSources<T extends {waveKey:string;taskId:string;attemptId:string}>(rows:T[]):T[] {
   return [...rows].sort((a,b)=>`${a.waveKey}:${a.taskId}:${a.attemptId}`.localeCompare(`${b.waveKey}:${b.taskId}:${b.attemptId}`))
 }
@@ -44,8 +30,7 @@ async function readQuality(tx:Tx,courseId:string,sources:TrainingAnalysisManifes
 }
 export async function discoverTrainingCourseSources(actor:TrainingAnalysisActor,courseId:string) {
   return prisma.$transaction(async tx=>{
-    await lockAuthority(tx,actor,courseId)
-    return listTrainingAnalysisSources(tx,{userId:actor.id,role:actor.role},courseId)
+    return listTrainingAnalysisSources(tx,{userId:actor.id,role:actor.role},courseId,{authorityLock:'SHARE'})
   },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
 }
 
@@ -55,10 +40,9 @@ export async function analyzeTrainingCourse(input:{actor:TrainingAnalysisActor;c
   if(expected && (expected.actor.id!==input.actor.id || expected.actor.role!==input.actor.role
     || expected.courseId!==input.courseId || expected.definitionHash!==canonicalHash(selector))) stale()
   const frozen=await prisma.$transaction(async tx=>{
-    await lockAuthority(tx,input.actor,input.courseId)
     const sourceCutoff=expected?.sourceCutoff??input.sourceCutoff??new Date().toISOString()
     const loaded=await loadTrainingAnalysisSources(tx,{userId:input.actor.id,role:input.actor.role},selector,
-      expected ? {fixedManifest:{attempts:expected.sources,...(expected.schemaVersion===2?{researchSources:expected.researchSources}:{})},sourceCutoff} : {sourceCutoff})
+      expected ? {authorityLock:'SHARE',fixedManifest:{attempts:expected.sources,...(expected.schemaVersion===2?{researchSources:expected.researchSources}:{})},sourceCutoff} : {authorityLock:'SHARE',sourceCutoff})
     const sources=sortedSources(loaded.manifest.attempts)
     const {quality,qualityHash}=await readQuality(tx,input.courseId,sources)
     return {loaded,sources,sourceCutoff,quality,qualityHash}
@@ -76,7 +60,6 @@ export async function analyzeTrainingCourse(input:{actor:TrainingAnalysisActor;c
     if(reason)return {...row,value:null,reason}
     return row.attemptId && excluded.has(`${row.attemptId}:${row.attemptEpoch}`)?{...row,value:null,reason:'QUALITY_EXCLUDED' as const}:row
   })}
-  const analysis=buildTrainingAnalysis(selector,source)
   const dictionary=buildTrainingDictionary(selector,source)
   const unsigned={schemaVersion:(frozen.loaded.researchGovernance.length?2:1) as 1|2,kind:'TRAINING_ANALYSIS' as const,
     ...(frozen.loaded.researchGovernance.length?{researchGovernanceHash:canonicalHash(frozen.loaded.researchGovernance),researchSources:frozen.loaded.researchGovernance.map(({attemptId,taskId,attemptEpoch})=>({attemptId,taskId,attemptEpoch}))}:{}),
@@ -86,8 +69,9 @@ export async function analyzeTrainingCourse(input:{actor:TrainingAnalysisActor;c
     observationCount:source.observations.length}
   const manifest=assertTrainingManifest({...unsigned,manifestHash:trainingManifestHash(unsigned)})
   if(expected && expected.manifestHash!==manifest.manifestHash) stale()
+  let cachedAnalysis: ReturnType<typeof buildTrainingAnalysis> | undefined
   let cachedTables: ReturnType<typeof buildTrainingAnalysisTables> | undefined
-  return {manifest,analysis,get tables(){return cachedTables??(cachedTables=buildTrainingAnalysisTables(selector,source))},quality:frozen.quality}
+  return {manifest,get analysis(){return cachedAnalysis??(cachedAnalysis=buildTrainingAnalysis(selector,source))},get tables(){return cachedTables??(cachedTables=buildTrainingAnalysisTables(selector,source))},quality:frozen.quality}
 }
 
 export async function revalidateTrainingAnalysisManifest(actor:TrainingAnalysisActor,manifest:TrainingAnalysisManifestV1):Promise<void> {
@@ -102,8 +86,7 @@ export async function setTrainingAnalysisQuality(input:{actor:TrainingAnalysisAc
   if(reason.length<2||reason.length>1000 || !Number.isInteger(input.expectedRevision)||input.expectedRevision<0)
     fail(400,'TRAINING_ANALYSIS_QUALITY_INVALID','复核理由须为2–1000字，且须提供当前版本')
   return prisma.$transaction(async tx=>{
-    await lockAuthority(tx,input.actor,input.courseId,true)
-    const loaded=await loadTrainingAnalysisSources(tx,{userId:input.actor.id,role:input.actor.role},selector)
+    const loaded=await loadTrainingAnalysisSources(tx,{userId:input.actor.id,role:input.actor.role},selector,{authorityLock:'UPDATE'})
     const matches=loaded.manifest.attempts.filter(row=>row.attemptId===input.attemptId && row.attemptEpoch===input.attemptEpoch && row.sourceHash===input.sourceHash)
     if(!matches.length) fail(404,'TRAINING_ANALYSIS_NOT_FOUND','记录不存在或无当前数据访问权限')
     if(matches.some(row=>row.status!=='COMPLETED')) fail(409,'TRAINING_ANALYSIS_FINAL_REQUIRED','仅可复核已完成的冻结事实')

@@ -25,6 +25,7 @@ import {
 } from '../../components/product-ui'
 import FinalCompositeAssessment from '../../components/FinalCompositeAssessment'
 import WholeCompositeQuestionnaire from '../../components/WholeCompositeQuestionnaire'
+import { normalizeApiError } from '../../utils/normalizeApiError'
 
 const tokenKey = (token: string) => `composite:recovery:token:${token}`
 const attemptKey = (attemptId: string) =>
@@ -39,14 +40,15 @@ const store = (key: string, value: string) => {
 
 const CompositeAssessmentContent: React.FC = () => {
   const pageSignal = usePageSignal()
+  const location = useLocation()
   const params = useParams<{
     assessmentId?: string
     token?: string
     attemptId?: string
   }>()
   const navigate = useNavigate()
-  const publicMode = window.location.pathname.startsWith('/public/composite')
-  const relationalMode = window.location.pathname.startsWith('/relational/')
+  const publicMode = location.pathname.startsWith('/public/composite')
+  const relationalMode = location.pathname.startsWith('/relational/')
   const organizationTask =
     relationalMode &&
     ['/organization-tasks', '/my-assessments'].includes(
@@ -62,6 +64,8 @@ const CompositeAssessmentContent: React.FC = () => {
   const [recoveryToken, setRecoveryToken] = useState('')
   const [recoveryInput, setRecoveryInput] = useState('')
   const [newRecoveryToken, setNewRecoveryToken] = useState<string | null>(null)
+  const [cognitiveRestartBlocked, setCognitiveRestartBlocked] = useState(false)
+  const restartInFlight = useRef(false)
   const [scaleAnswers, setScaleAnswers] = useState<
     Record<string, string | number>
   >({})
@@ -74,6 +78,14 @@ const CompositeAssessmentContent: React.FC = () => {
   }, [state?.currentItem?.id, scaleIndex])
 
   const attemptId = params.attemptId || state?.id || ''
+  // Query data selects UI only and cannot authorize a restart or create a new
+  // scientific identity. Bind the hint to the server's current parent/child.
+  const recoveryHint = new URLSearchParams(location.search)
+  const cognitiveRecoveryRequested = recoveryHint.get('recovery') === 'cognitive-draft-expired'
+    && state?.trainingPersistence?.attemptId === state?.id
+    && state?.trainingPersistence?.localCognitive?.enabled === true
+    && state?.currentItem?.type === 'COGNITIVE'
+    && state.currentItem.cognitiveSession?.sessionId === recoveryHint.get('sessionId')
   const api = useMemo(
     () => (publicMode ? publicCompositeApi(recoveryToken) : compositeApi),
     [publicMode, recoveryToken],
@@ -239,7 +251,7 @@ const CompositeAssessmentContent: React.FC = () => {
 
   const restartLegacyAttempt = async () => {
     const signal = pageSignal()
-    if (!state || signal.aborted) return
+    if (!state || signal.aborted || restartInFlight.current || (cognitiveRecoveryRequested && cognitiveRestartBlocked)) return
     if (relationalMode) {
       setError(
         '关系测评旧版记录不能从通用重启入口迁移，请返回任务列表重新发起。',
@@ -247,6 +259,7 @@ const CompositeAssessmentContent: React.FC = () => {
       return
     }
     try {
+      restartInFlight.current = true
       setSubmitting(true)
       setError(null)
       const response = publicMode
@@ -256,6 +269,7 @@ const CompositeAssessmentContent: React.FC = () => {
       if (response.code !== 0 || !response.data)
         throw new Error(response.message || '重启综合测评失败')
       const nextId = response.data.attempt.id
+      if (!nextId || nextId === state.id) throw new Error('服务器未返回新的综合测评记录，重启尚未确认。')
       if (publicMode) {
         const nextCredential = response.data.recoveryToken || recoveryToken
         if (nextCredential) {
@@ -273,8 +287,13 @@ const CompositeAssessmentContent: React.FC = () => {
         navigate(`/student/composite/attempts/${nextId}`)
       }
     } catch (err) {
-      setError((err as { message?: string }).message || '重启综合测评失败')
-      setSubmitting(false)
+      if (!signal.aborted) {
+        setError(normalizeApiError(err).message || '重启综合测评失败')
+        if (cognitiveRecoveryRequested) setCognitiveRestartBlocked(true)
+      }
+    } finally {
+      restartInFlight.current = false
+      if (!signal.aborted) setSubmitting(false)
     }
   }
 
@@ -457,6 +476,7 @@ const CompositeAssessmentContent: React.FC = () => {
         <input value={recoveryInput} onChange={(event) => setRecoveryInput(event.target.value)} className="w-full border rounded px-3 py-2 mb-4" placeholder="粘贴保存时获得的恢复凭证（可选）" />
         {error && <p role="alert" className="text-red-500 text-sm mb-4">{error}</p>}
         {!params.attemptId && !publicInfo && <p className="mb-4 text-sm">当前入口不能开始新作答。已有恢复凭证可继续尝试恢复原记录。</p>}
+        {publicInfo?.groupIpWindow && <p className="mb-4 text-sm">同 IP 集体作答窗口：{new Date(publicInfo.groupIpWindow.opensAt).toLocaleString()} 至 {new Date(publicInfo.groupIpWindow.closesAt).toLocaleString()}（{Intl.DateTimeFormat().resolvedOptions().timeZone}），最长 48 小时。到期不再接受新参与者；已有恢复凭证仍按原作答规则恢复。轮次提示不能代替凭证。</p>}
         {publicInfo?.studyEntryPath && <Link className="block mb-4 text-action" to={publicInfo.studyEntryPath}>选择单次访客或保存研究内身份码</Link>}
         <button
           onClick={() => {
@@ -518,6 +538,7 @@ const CompositeAssessmentContent: React.FC = () => {
         onEnterCognitive={enterChild}
         onEnterSituational={enterChild}
         onRestart={restartLegacyAttempt}
+        cognitiveRecovery={cognitiveRecoveryRequested ? { reason: 'LOCAL_DRAFT_EXPIRED', restarting: submitting, restartError: cognitiveRestartBlocked ? error : null } : undefined}
       />
     )
     if (!state.trainingFlow && state.productKind === 'QUESTIONNAIRE' && !relationalMode && state.currentItem?.type === 'SCALE') {

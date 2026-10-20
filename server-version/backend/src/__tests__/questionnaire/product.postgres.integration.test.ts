@@ -345,8 +345,9 @@ suite('Four-type Questionnaire production lifecycle', () => {
     })
     const { compositeController } = await import('../../modules/composite/composite.controller')
     let response: any
-    const res: any = { status() { return this }, json(body: any) { response = body; return this } }
+    const res: any = { setHeader: vi.fn(), status() { return this }, json(body: any) { response = body; return this } }
     await compositeController.publicEmbeddedSituational({ params: { attemptId, itemId: child.compositeItemId, situationalAttemptId: child.id }, headers: { 'x-recovery-token': recoveryToken } } as any, res)
+    expect(res.setHeader).toHaveBeenCalledWith('Cache-Control', 'no-store')
     expect(response).toMatchObject({ code: 0, data: { feedbackDeferred: true, attempt: { status: 'COMPLETED', compositeAttemptId: attemptId } } })
     expect(response.data).not.toHaveProperty('result')
     await expect(runtime.getReport(attemptId, { recoveryTokenHash })).rejects.toMatchObject({ statusCode: 400 })

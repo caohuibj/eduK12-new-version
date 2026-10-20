@@ -29,12 +29,20 @@ const AssignmentSubmit: React.FC = () => {
   const [loading, setLoading] = useState(true)
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState('')
+  const [formErrorAttempt, setFormErrorAttempt] = useState(0)
   const [playingVideo, setPlayingVideo] = useState<MediaItem | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [selectedDocument, setSelectedDocument] = useState<DocumentItem | null>(null)
   const [showPdfViewer, setShowPdfViewer] = useState(false)
   const submitIdempotencyKeyRef = useRef<{ key: string; fingerprint: string } | null>(null)
   const submitInFlightRef = useRef(false)
+  const formErrorRef = useRef<HTMLParagraphElement>(null)
+
+  useEffect(() => {
+    // A repeated invalid submit may keep the same message. Focus belongs to
+    // the user's new error event, not to loading or successful hydration.
+    if (formErrorAttempt > 0 && isTrainingHost()) formErrorRef.current?.focus()
+  }, [formErrorAttempt])
 
   useEffect(() => {
     if (assignmentId) {
@@ -109,6 +117,11 @@ const AssignmentSubmit: React.FC = () => {
     setTextAnswers({ ...textAnswers, [index]: value })
   }
 
+  const showFormError = (message: string) => {
+    setFormError(message)
+    setFormErrorAttempt(attempt => attempt + 1)
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!assignment || submitInFlightRef.current) return
@@ -118,8 +131,8 @@ const AssignmentSubmit: React.FC = () => {
     const missing = questions.findIndex((question, index) =>
       question.type === 'text' ? !textAnswers[index]?.trim() :
       question.type === 'multiple_choice' ? !multipleOptions[index]?.length : !selectedOptions[index])
-    if (missing >= 0) { setFormError(`请完成题目${missing + 1}后再提交。`); return }
-    if (!questions.length && !content.trim()) { setFormError('请填写作答内容后再提交。'); return }
+    if (missing >= 0) { showFormError(`请完成题目${missing + 1}后再提交。`); return }
+    if (!questions.length && !content.trim()) { showFormError('请填写作答内容后再提交。'); return }
 
     submitInFlightRef.current = true
     setSubmitting(true)
@@ -269,23 +282,24 @@ const AssignmentSubmit: React.FC = () => {
           </h3>
           <div className="space-y-2">
             {assignment.documents.map((doc, index) => (
-              <div
+              <button
                 key={index}
+                type="button"
                 onClick={() => {
                   setSelectedDocument(doc)
                   setShowPdfViewer(true)
                 }}
-                className="flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                className="w-full text-left flex items-center justify-between p-3 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-action"
               >
-                <div className="flex items-center space-x-3">
-                  <FileIcon className="w-5 h-5 text-red-500" />
+                <span className="flex items-center space-x-3">
+                  <FileIcon className="w-5 h-5 text-red-500" aria-hidden="true" />
                   <span className="text-gray-700">{doc.title}</span>
                   {doc.fileName && (
                     <span className="text-xs text-gray-500">({doc.fileName})</span>
                   )}
-                </div>
+                </span>
                 <span className="text-xs text-action">点击查看</span>
-              </div>
+              </button>
             ))}
           </div>
           <p className="text-xs text-gray-500 mt-2">
@@ -339,7 +353,7 @@ const AssignmentSubmit: React.FC = () => {
           </div>
         ) : (
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
-            {formError && <p role="alert" className="text-red-600">{formError}</p>}
+            {formError && <p ref={formErrorRef} tabIndex={isTrainingHost() ? -1 : undefined} role="alert" className="text-red-600 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-action">{formError}</p>}
             {/* Quiz Options */}
             {assignment.questions && assignment.questions.length > 0 && (
               <div className="space-y-4">

@@ -1,3 +1,4 @@
+import { trainingCheckpointHandler } from './composite.controller'
 import { sharedControlRequestContext } from '../assessment-runtime/shared-control-records'
 import { observeWholeMiddleware } from '../../services/runtimeObservability'
 import { assessmentExportHttp } from '../../services/assessmentExportHttp'
@@ -68,6 +69,9 @@ const relationalWholeFinalConsentGuard = (req: Request, res: Response, next: Nex
 }
 
 router.get('/available', authenticate, requireRole(UserRole.STUDENT), compositeController.available)
+router.get('/attempts/:attemptId/checkpoint', authenticate, respondentAttemptAccess, trainingCheckpointHandler(false,'read'))
+router.put('/attempts/:attemptId/checkpoint', authenticate, respondentAttemptAccess, trainingCheckpointHandler(false,'save'))
+router.delete('/attempts/:attemptId/checkpoint', authenticate, respondentAttemptAccess, trainingCheckpointHandler(false,'clear'))
 router.get('/attempts/:attemptId', authenticate, respondentAttemptAccess, compositeController.getAttempt)
 router.get('/attempts/:attemptId/whole/definition', authenticate, respondentAttemptAccess, compositeController.wholeDefinition)
 router.get('/attempts/:attemptId/whole/receipt', authenticate, respondentAttemptAccess, compositeController.wholeReceipt)

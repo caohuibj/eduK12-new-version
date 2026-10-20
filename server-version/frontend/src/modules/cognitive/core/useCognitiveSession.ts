@@ -25,9 +25,25 @@ import { useCheckpointLifecycle } from '../../../services/persistence/flushLifec
 import {
   createFinalDraftMeta,
   finalDraftStore,
+  trainingCognitiveDraftKey,
 } from '../../../services/persistence/finalDraftStore'
 import { runFinalDraftCapacityRetry } from '../../../services/persistence/finalDraftCapacityRetry'
+import { cleanupExpiredTrainingCognitiveDrafts, holdTrainingCognitiveDraft, trainingRetentionFromServer } from '../../../training/training-cognitive-retention'
 import { saveCognitiveRecoveryCredential } from './recovery-credential'
+
+const trainingBinding = (session: CognitiveSession) => {
+  const descriptor = session.trainingPersistence
+  if (!descriptor?.localCognitive?.enabled) return undefined
+  const binding = trainingRetentionFromServer(descriptor, session.sessionId, session.sessionEpoch)
+  if (!binding) {
+    throw new Error('Training 本地保留策略缺少有效的服务器会话版本')
+  }
+  return binding
+}
+const cognitiveDraftKey = (session: CognitiveSession) => {
+  const binding = trainingBinding(session)
+  return binding ? trainingCognitiveDraftKey(binding) : `cognitive:${session.sessionId}`
+}
 
 interface CognitiveCheckpointPayload {
   trialIndex: number
@@ -120,6 +136,9 @@ export function useCognitiveSession(
   options: { aggregateOnly?: boolean; failClosedOnTrialPersistence?: boolean } = {},
 ): CognitiveSessionController {
   const [state, dispatch] = useReducer(runnerReducer, initialRunnerState)
+  const trainingLease = useRef<{ controller: AbortController; holds: Map<string, Promise<() => void>>; cleaned: boolean }>({
+    controller: new AbortController(), holds: new Map(), cleaned: false,
+  })
   const sessionIdRef = useRef(sessionId)
   sessionIdRef.current = sessionId
 
@@ -164,6 +183,7 @@ export function useCognitiveSession(
   )
 
   const load = useCallback(async () => {
+    const lease = trainingLease.current
     dispatch({ type: 'LOADING' })
     try {
       const response = await api.getSession(sessionId)
@@ -171,6 +191,7 @@ export function useCognitiveSession(
         dispatch({ type: 'SESSION_ERROR', error: { code: 'NOT_FOUND', message: '测评不存在或不可访问' } })
         return
       }
+      if (lease.controller.signal.aborted) return
       const session: CognitiveSession = response.data
 
       if (session.deliveryMode === 'FINAL_ONLY') {
@@ -179,7 +200,18 @@ export function useCognitiveSession(
           dispatch({ type: 'SESSION_ERROR', error: { code: 'DEFINITION_MISMATCH', message: '该认知测评缺少可恢复的冻结定义，请重启后重试' } })
           return
         }
-        const draftKey = `cognitive:${session.sessionId}`
+        const draftKey = cognitiveDraftKey(session)
+        const retention = trainingBinding(session)
+        if (retention) {
+          if (!lease.holds.has(draftKey)) lease.holds.set(draftKey, holdTrainingCognitiveDraft(retention, lease.controller.signal))
+          await lease.holds.get(draftKey)
+          if (lease.controller.signal.aborted) return
+          if (!lease.cleaned) {
+            lease.cleaned = true
+            await cleanupExpiredTrainingCognitiveDrafts()
+            if (lease.controller.signal.aborted) return
+          }
+        }
         if (session.status === 'COMPLETED') {
           await finalDraftStore.delete(draftKey).catch(() => undefined)
           dispatch({ type: 'SESSION_LOADED', session, trialIndex: 0 })
@@ -190,16 +222,17 @@ export function useCognitiveSession(
             draftKey,
             instrument: 'cognitive',
             attemptId: session.sessionId,
-            attemptEpoch: session.attemptEpoch ?? session.attemptNo,
+            attemptEpoch: retention?.sessionEpoch ?? session.attemptEpoch ?? session.attemptNo,
             definitionHash: session.definitionHash,
             contextSnapshotHash: session.contextSnapshotHash ?? null,
             deliveryMode: 'final_only',
             submissionId: checkpointId(),
+            ...(retention ? { trainingRetention: retention } : {}),
             ...(api.localDraftScope === 'survey-cognitive'
               ? { surveyRetention: { schemaVersion: 1 as const, lastWriteAt: Date.now() } } : {}),
           }))
           if (meta.status === 'CONFLICT') {
-            dispatch({ type: 'RECOVERY_REQUIRED' })
+            dispatch({ type: 'RECOVERY_REQUIRED', session })
             return
           }
           if (session.status !== 'IN_PROGRESS') {
@@ -243,7 +276,7 @@ export function useCognitiveSession(
                 message: friendlyError(error).message,
               }).catch(() => undefined)
               if (status === 'CONFLICT') {
-                dispatch({ type: 'RECOVERY_REQUIRED' })
+                dispatch({ type: 'RECOVERY_REQUIRED', session })
               } else {
                 dispatch({
                   type: 'SESSION_ERROR',
@@ -267,7 +300,10 @@ export function useCognitiveSession(
           const nextTrialIndex = trials.reduce((max, trial) => Math.max(max, trial.trialIndex + 1), 0)
           dispatch({ type: 'SESSION_LOADED', session, trialIndex: nextTrialIndex })
         } catch (error) {
-          dispatch({ type: 'SESSION_ERROR', error: friendlyError(error) })
+          const recoveryError = friendlyError(error)
+          dispatch(recoveryError.code === 'FINAL_DRAFT_EXPIRED'
+            ? { type: 'RECOVERY_REQUIRED', session, error: recoveryError }
+            : { type: 'SESSION_ERROR', error: recoveryError })
         }
         return
       }
@@ -302,7 +338,7 @@ export function useCognitiveSession(
         return Math.max(nextIndex, payload.trialIndex + 1)
       }, 0)
       if (!ledger && session.nextTrialIndex === undefined && pendingNextTrialIndex === 0) {
-        dispatch({ type: 'RECOVERY_REQUIRED' })
+        dispatch({ type: 'RECOVERY_REQUIRED', session })
         return
       }
       const trialIndex = Math.max(
@@ -321,7 +357,10 @@ export function useCognitiveSession(
   }, [api, cognitiveCheckpointTransport, handleCheckpointError, sessionId])
 
   useEffect(() => {
+    const lease = { controller: new AbortController(), holds: new Map<string, Promise<() => void>>(), cleaned: false }
+    trainingLease.current = lease
     void load()
+    return () => { lease.controller.abort() }
   }, [load])
 
   const start = useCallback(() => {
@@ -330,6 +369,7 @@ export function useCognitiveSession(
 
   const appendTrial = useCallback(
     async (payload: Record<string, unknown>): Promise<boolean> => {
+      if (stateRef.current.status === 'RECOVERY_REQUIRED') return false
       const nextIndex = stateRef.current.trialIndex
       dispatch({ type: 'TRIAL_SUBMIT_START' })
       try {
@@ -338,7 +378,7 @@ export function useCognitiveSession(
           ? wrapCognitiveTrial({ trialIndex: nextIndex, payload })
           : payload
         if (session?.deliveryMode === 'FINAL_ONLY') {
-          const draftKey = `cognitive:${session.sessionId}`
+          const draftKey = cognitiveDraftKey(session)
           await finalDraftStore.putTrial({
             draftKey,
             trialIndex: nextIndex,
@@ -379,6 +419,7 @@ export function useCognitiveSession(
   )
 
   const complete = useCallback(async (administrationProvenance?: AdministrationProvenanceV1) => {
+    if (stateRef.current.status === 'RECOVERY_REQUIRED') return
     dispatch({ type: 'COMPLETE_START' })
     let finalDraftKey: string | null = null
     try {
@@ -386,7 +427,7 @@ export function useCognitiveSession(
       if (session?.deliveryMode === 'FINAL_ONLY') {
         const submitFinal = api.submitFinal
         if (!submitFinal || !session.definitionHash) throw new Error('该认知测评无法提交：缺少冻结定义')
-        const draftKey = `cognitive:${session.sessionId}`
+        const draftKey = cognitiveDraftKey(session)
         finalDraftKey = draftKey
         const currentMeta = await finalDraftStore.get(draftKey)
         if (!currentMeta) throw new Error('本地认知草稿不存在，请重启测评')
@@ -510,6 +551,9 @@ export function useCognitiveSession(
   }, [load])
 
   const restart = useCallback(async (): Promise<CognitiveSession | null> => {
+    if (stateRef.current.session?.trainingPersistence?.attemptId) {
+      throw new Error('请返回上层综合测评并从那里处理恢复')
+    }
     if (!api.restartSession) throw new Error('该认知测评不支持重启')
     const response = await api.restartSession(sessionId)
     if (response.code !== 0 || !response.data) throw new Error(response.message || '重启认知测评失败')

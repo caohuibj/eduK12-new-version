@@ -2,7 +2,7 @@ import { beforeEach, expect, it, vi } from 'vitest'
 import { publicDeliveryAdapter, publicLinkStatus, type PublicDeliveryFamily } from '../publicDelivery'
 const api=vi.hoisted(()=>({get:vi.fn(),post:vi.fn(),delete:vi.fn()}))
 vi.mock('../client',()=>({default:api,sessionFetch:vi.fn()}))
-const hidden={id:'link',token:null,createdAt:null,expiresAt:'2099-01-01T00:00:00Z',maxUses:2,usedCount:1,isActive:true}
+const hidden={roundId:null,groupIpWindow:null,id:'link',token:null,createdAt:null,expiresAt:'2099-01-01T00:00:00Z',maxUses:2,usedCount:1,isActive:true}
 const revealed={...hidden,token:'opaque'}
 beforeEach(()=>{vi.clearAllMocks();api.get.mockResolvedValue({code:0,data:{list:[hidden]}});api.post.mockResolvedValue({code:0,data:revealed});api.delete.mockResolvedValue({code:0})})
 it.each([

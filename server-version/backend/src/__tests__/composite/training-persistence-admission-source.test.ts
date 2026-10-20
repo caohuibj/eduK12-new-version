@@ -1,0 +1,153 @@
+import { readFileSync } from 'node:fs'
+import { Prisma } from '@prisma/client'
+import ts from 'typescript'
+import { describe, expect, it } from 'vitest'
+import { canonicalHash } from '../../modules/assessment-runtime/canonical'
+import { freezeTrainingPersistenceSnapshot, parseTrainingPersistencePolicy, trainingCheckpointExpiry, trainingPersistenceMetadata } from '../../modules/composite/training-persistence.policy'
+
+const source = (file: string) => readFileSync(`src/modules/${file}`, 'utf8')
+const composite = source('composite/composite.service.ts')
+const authoring = source('questionnaire-product/service.ts')
+const cognitive = source('cognitive/session.service.ts')
+const admission = composite.slice(composite.indexOf('const createAttempt = async'), composite.indexOf('const createAttempt = async') + 30000)
+const now = new Date('2026-10-19T00:00:00.000Z')
+const publicationIdentity = { schemaVersion: 1, compositeId: 'publication', courseId: 'training', publishedAt: now.toISOString(), productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', trainingFlowDigest: null, trainingVariantDigest: null }
+
+describe('Training persistence publication/admission source contracts (not HTTP evidence)', () => {
+  it('keeps authoring strict while defaulting each absent opt-in independently off', () => {
+    expect(authoring).toContain('checkpoint: retentionSettingSchema.optional().default(null), localCognitive: retentionSettingSchema.optional().default(null)')
+    expect(authoring).toContain("const retentionSettingSchema = z.object({ enabled: z.literal(true), ttlHours: z.number().int().min(1).max(48) }).strict().nullable()")
+    expect(authoring).toContain('trainingPersistencePolicy: persistencePolicySchema.optional()')
+    expect(authoring).toContain('trainingPersistencePolicyHash: canonicalHash(policy)')
+    expect(composite).toContain("validateTrainingPersistenceAuthoring(prisma as Prisma.TransactionClient, composite, composite.trainingPersistencePolicy)")
+    expect(composite).toContain('...flowFields, ...persistenceFields')
+    expect(authoring).toContain('input.trainingPersistencePolicy === undefined ? row.trainingPersistencePolicy : input.trainingPersistencePolicy')
+    expect(authoring).toContain('publicEnabled:false},composite?.trainingPersistencePolicy)')
+  })
+
+  it('resolves policy/course under parent lock before optional flow and variant branches', () => {
+    const lock = admission.indexOf('FOR UPDATE')
+    const policyRead = admission.indexOf('readTrainingPersistencePolicy(current.trainingPersistencePolicy)')
+    const course = admission.indexOf('const courseId = userId ? composite.deliveryCourseId')
+    expect(lock).toBeGreaterThan(0)
+    expect(policyRead).toBeGreaterThan(lock)
+    expect(course).toBeGreaterThan(policyRead)
+    expect(course).toBeLessThan(admission.indexOf('const flowEnabled'))
+    expect(admission).toContain('courseIds.length === 1 ? courseIds[0] : null')
+    expect(admission).toContain('!courseIds.includes(courseId)')
+    expect(admission).toContain("c.course_type='TRAINING_COURSE' AND NOT c.is_library AND c.status::text='PUBLISHED'")
+    expect(admission).toContain('FOR SHARE OF c,u')
+    expect(admission).toContain('db.courseStudent.findFirst')
+    expect(admission).toContain('if (accessTokenId)')
+    expect(admission).toContain('if (token.trainingRoundId)')
+    expect(admission).not.toContain('trainingPublicRound.create')
+    expect(admission).not.toContain('compositeAssessmentAccessToken.create')
+  })
+
+  it('uses the same C21 identity DTO as checkpoint access and inserts frozen snapshot immediately', () => {
+    expect(admission).toContain('trainingRoundPublicationIdentity(current, courseId)')
+    expect(source('composite/training-checkpoint.service.ts')).toContain('trainingRoundPublicationIdentity(parent,s.courseId)')
+    expect(admission).toContain('round.publicationHash !== canonicalHash(publicationIdentity)')
+    expect(admission).toContain('cutoffs: [facts[0].endedAt, current.expiresAt, roundCutoff]')
+    const insert = admission.indexOf('const attempt = await db.compositeAssessmentAttempt.create')
+    expect(admission.indexOf('const trainingPersistenceSnapshot =')).toBeLessThan(insert)
+    const insertData = admission.slice(insert, admission.indexOf('const attempt = await db.compositeAssessmentAttempt.create') + 1100)
+    expect(insertData).toContain('trainingPersistenceSnapshotHash: canonicalHash(trainingPersistenceSnapshot)')
+    expect(insertData).toContain('id: newAttemptId')
+  })
+
+  it('shares authenticated/public cognitive metadata and frozen admission session epoch', () => {
+    expect(cognitive).toContain('sessionEpoch: admission.attemptEpoch')
+    expect(composite).toContain('sessionEpoch: admission.attemptEpoch')
+    expect(composite).toContain('checkpointDefinitionHash: attempt.frozenActiveSlotSetHash')
+    expect(cognitive).not.toContain('sessionEpoch: session.attemptNo')
+    expect(composite).not.toContain('sessionEpoch: session.attemptNo')
+    expect(cognitive).toContain('sessionId: session.id')
+    expect(cognitive).toContain('trainingPersistenceMetadata(session.compositeAttempt as any)')
+    const file = ts.createSourceFile('session.service.ts', cognitive, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS)
+    const declarations = file.statements.flatMap(statement => ts.isVariableStatement(statement) ? [...statement.declarationList.declarations] : [])
+    for (const name of ['getSession', 'getPublicSession']) {
+      const declaration = declarations.find(node => ts.isIdentifier(node.name) && node.name.text === name)
+      expect(declaration).toBeDefined()
+      expect(ts.isArrowFunction(declaration!.initializer!)).toBe(true)
+      const body = (declaration!.initializer! as ts.ArrowFunction).body.getText(file)
+      expect(body).toContain('trainingPersistenceSnapshot: true')
+      expect(body).toContain('trainingPersistenceSnapshotHash: true')
+      expect(body).toContain('buildRunnerPayload(session')
+    }
+  })
+})
+
+describe('Training admission snapshot unit contracts', () => {
+  for (const mode of ['authenticated-no-token', 'anonymous-null-round']) {
+    it(`${mode}: old/unknown/malformed policy never activates retention`, () => {
+      for (const policy of [undefined, null, {}, { schemaVersion: 2 }, { schemaVersion: 1, checkpoint: { enabled: true, ttlHours: 49 } }]) {
+        expect(freezeTrainingPersistenceSnapshot({ policy, policyHash: null, publicationIdentity, attemptId: mode, attemptEpoch: 1, compositeId: 'publication', courseId: 'training', cutoffs: [] })).toBeNull()
+      }
+      expect(trainingPersistenceMetadata({ id: mode, attemptEpoch: 1, deliveryCourseId: 'training' })).toBeUndefined()
+    })
+
+    it(`${mode}: supports a genuine >48-hour task with no round and bounds each payload`, () => {
+      const policy = parseTrainingPersistencePolicy({ schemaVersion: 1, checkpoint: { enabled: true, ttlHours: 6 } })!
+      const snapshot = freezeTrainingPersistenceSnapshot({ policy, policyHash: canonicalHash(policy), publicationIdentity, attemptId: mode, attemptEpoch: 2, compositeId: 'publication', courseId: 'training', cutoffs: [new Date('2026-11-19')] })!
+      expect(snapshot.roundId).toBeNull()
+      expect(snapshot.frozenCutoff).toBe('2026-11-19T00:00:00.000Z')
+      expect(trainingCheckpointExpiry(snapshot, now, []).toISOString()).toBe('2026-10-19T06:00:00.000Z')
+      const metadata = trainingPersistenceMetadata({ id: mode, attemptEpoch: 2, deliveryCourseId: 'training', trainingPersistenceSnapshot: snapshot, trainingPersistenceSnapshotHash: canonicalHash(snapshot) })!
+      expect(metadata).toEqual({ snapshotHash: canonicalHash(snapshot), attemptId: mode, attemptEpoch: 2, courseId: 'training', checkpoint: { enabled: true, ttlHours: 6 }, localCognitive: null })
+    })
+  }
+})
+
+describe('C23 compact admission projection source contracts', () => {
+  it('types the shared configured-policy projection against real model fields and retains the runtime LEGACY guard', () => {
+    const file = ts.createSourceFile('composite.service.ts', composite, ts.ScriptTarget.Latest, true, ts.ScriptKind.TS)
+    const declarations: ts.VariableDeclaration[] = []
+    const calls: ts.CallExpression[] = []
+    const visit = (node: ts.Node) => {
+      if (ts.isVariableDeclaration(node) && node.name.getText(file) === 'configuredPolicySelect') declarations.push(node)
+      if (ts.isCallExpression(node) && node.expression.getText(file) === 'publicationReader.compositeAssessment.findUnique') calls.push(node)
+      ts.forEachChild(node, visit)
+    }
+    visit(file)
+    expect(declarations).toHaveLength(1)
+    expect(calls).toHaveLength(1)
+    const initializer = declarations[0].initializer!
+    expect(ts.isSatisfiesExpression(initializer)).toBe(true)
+    const constraint = initializer as ts.SatisfiesExpression
+    expect(constraint.type.getText(file)).toBe('Prisma.CompositeAssessmentSelect')
+    const selected = (constraint.expression as ts.ObjectLiteralExpression).properties.map((node) => node.name!.getText(file))
+    const args = calls[0].arguments[0] as ts.ObjectLiteralExpression
+    const select = args.properties.find((node) => ts.isPropertyAssignment(node) && node.name.getText(file) === 'select') as ts.PropertyAssignment
+    expect(select.initializer.getText(file)).toBe('configuredPolicySelect')
+    // Generated metadata supplies the actual schema; no mock invents deliveryMode.
+    const model = Prisma.dmmf.datamodel.models.find((entry) => entry.name === 'CompositeAssessment')!
+    expect(selected.filter((name) => !model.fields.some((field) => field.name === name))).toEqual([])
+    expect(selected).not.toContain('deliveryMode')
+    expect(selected).toContain('questionnaireCourses')
+    expect(selected).toContain('trainingFeedbackPolicy')
+    expect(selected).toContain('trainingFeedbackPolicyHash')
+    expect(admission).toContain("const publicationReader: Pick<Prisma.TransactionClient, 'compositeAssessment'> = db")
+    const enabled = admission.slice(admission.indexOf('if (persistence?.checkpoint'), admission.indexOf('const courseIds'))
+    expect(enabled).toContain('|| feedbackConfigured')
+    expect(enabled).toContain("composite.deliveryMode === 'LEGACY'")
+    expect(enabled).not.toContain('current.deliveryMode')
+    expect(enabled).not.toContain("deliveryMode === 'FINAL_ONLY'")
+  })
+
+  it('keeps legacy/off policy on a compact locked header without course/blob reads', () => {
+    const header=admission.slice(admission.indexOf('const current ='),admission.indexOf('if (persistence?.checkpoint'))
+    expect(header).toContain('select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true,')
+    expect(header).toContain('trainingPersistencePolicy: true, trainingPersistencePolicyHash: true')
+    expect(header).not.toContain('include:')
+    expect(header).not.toContain('questionnaireCourses:')
+    const enabled=admission.slice(admission.indexOf('if (persistence?.checkpoint'),admission.indexOf('const courseIds'))
+    expect(enabled).toContain('questionnaireCourses: { select: { courseId: true } }')
+    expect(enabled).not.toContain('include:')
+    expect(enabled).toContain('satisfies Prisma.CompositeAssessmentSelect')
+    expect(enabled).toContain("Pick<Prisma.TransactionClient, 'compositeAssessment'>")
+    expect(enabled).toContain("composite.deliveryMode === 'LEGACY'")
+    expect(enabled).not.toContain('current.deliveryMode')
+    expect(enabled).not.toContain('deliveryMode: true')
+  })
+})

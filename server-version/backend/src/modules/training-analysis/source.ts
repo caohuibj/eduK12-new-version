@@ -63,14 +63,40 @@ const templateInclude = {
 
 /** Permission identity deliberately excludes lastSeen, updatedAt and other
  * unrelated activity. C13 reporting grants are never consulted as raw access. */
-async function authority(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string) {
-  if (![UserRole.TEACHER, UserRole.ADMIN].includes(actor.role as any)) unavailable()
-  const principal = await tx.user.findFirst({where: {id: actor.userId, role: actor.role, isActive: true, isFrozen: false, mustChangePassword: false, accountDomain: {in: ['LEGACY', 'TRAINING']},
+async function authority(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string, lockMode?: 'SHARE' | 'UPDATE') {
+  if (!lockMode && ![UserRole.TEACHER, UserRole.ADMIN].includes(actor.role as any)) unavailable()
+  let principal: {id:string;role:UserRole;isActive:boolean;isFrozen:boolean;expiresAt:Date|null;teacherApproved:boolean;accountDomain:string;mustChangePassword:boolean;tokenVersion:number} | null
+  let course: {id:string;creatorId:string;courseType:string;isLibrary:boolean} | null
+  if (lockMode) {
+    // The lock and its returned authority describe one database snapshot. The
+    // independent public loaders never accept a caller-supplied verified flag.
+    const rows = await tx.$queryRaw<Array<NonNullable<typeof principal> & {courseId:string;creatorId:string;courseType:string;isLibrary:boolean}>>`
+      SELECT u.id,u.role,u.is_active AS "isActive",u.is_frozen AS "isFrozen",u.expires_at AS "expiresAt",
+        u.teacher_approved AS "teacherApproved",u.account_domain AS "accountDomain",
+        u.must_change_password AS "mustChangePassword",u.token_version AS "tokenVersion",
+        c.id AS "courseId",c.creator_id AS "creatorId",c.course_type AS "courseType",c.is_library AS "isLibrary"
+      FROM courses c JOIN users u ON u.id=${actor.userId}
+      WHERE c.id=${courseId} AND c.course_type='TRAINING_COURSE' AND NOT c.is_library
+        AND (u.role::text='ADMIN' OR c.creator_id=u.id)
+        AND u.role::text=${actor.role} AND u.role::text IN ('ADMIN','TEACHER')
+        AND u.account_domain IN ('LEGACY','TRAINING') AND u.is_active AND NOT u.is_frozen
+        AND (u.expires_at IS NULL OR u.expires_at>statement_timestamp())
+      ${lockMode === 'UPDATE' ? Prisma.sql`FOR UPDATE OF c FOR SHARE OF u` : Prisma.sql`FOR SHARE OF c,u`}
+    `
+    if (rows.length !== 1) throw Object.assign(new Error('课程不存在或无当前数据访问权限'), {statusCode:404,code:'TRAINING_ANALYSIS_NOT_FOUND'})
+    const row = rows[0]
+    principal = {id:row.id,role:row.role,isActive:row.isActive,isFrozen:row.isFrozen,expiresAt:row.expiresAt,
+      teacherApproved:row.teacherApproved,accountDomain:row.accountDomain,mustChangePassword:row.mustChangePassword,tokenVersion:row.tokenVersion}
+    course = {id:row.courseId,creatorId:row.creatorId,courseType:row.courseType,isLibrary:row.isLibrary}
+    if (principal.mustChangePassword || (actor.role === UserRole.TEACHER && !principal.teacherApproved)) unavailable()
+  } else {
+    principal = await tx.user.findFirst({where: {id: actor.userId, role: actor.role, isActive: true, isFrozen: false, mustChangePassword: false, accountDomain: {in: ['LEGACY', 'TRAINING']},
     ...(actor.role === UserRole.TEACHER ? {teacherApproved: true} : {}), OR: [{expiresAt: null}, {expiresAt: {gt: new Date()}}]}, select: {id: true, role: true, isActive: true, isFrozen: true, expiresAt: true, teacherApproved: true, accountDomain: true, mustChangePassword: true, tokenVersion: true}})
-  if (!principal) unavailable()
-  const course = await tx.course.findFirst({where: {id: courseId, courseType: 'TRAINING_COURSE', isLibrary: false,
+    if (!principal) unavailable()
+    course = await tx.course.findFirst({where: {id: courseId, courseType: 'TRAINING_COURSE', isLibrary: false,
     ...(actor.role === UserRole.ADMIN ? {} : {creatorId: actor.userId})}, select: {id: true, creatorId: true, courseType: true, isLibrary: true}})
-  if (!course) unavailable()
+    if (!course) unavailable()
+  }
   const assignments = actor.role === UserRole.TEACHER ? await tx.relationalAssessmentAssignment.findMany({where: {
     createdByUserId: actor.userId, perspective: 'OBSERVER_REPORT', analysisMode: 'INDIVIDUAL_ONLY', visibilityPolicyKey: 'observer_assigning_teacher_v1',
   }, select: {id: true, createdByUserId: true, perspective: true, analysisMode: true, visibilityPolicyKey: true}, orderBy: {id: 'asc'}}) : []
@@ -200,10 +226,10 @@ function cognitivePermission(item: any, key: string, actor: TrainingAnalysisActo
  * including shared plans/templates/facts, uses that exact client. No current
  * CourseStudent join is used: departed students keep their historical records. */
 export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, selector: TrainingAnalysisRequestV1,
-  options: {fixedManifest?: {attempts: TrainingAnalysisManifestAttemptV1[];researchSources?:Array<{taskId:string;attemptId:string;attemptEpoch:number}>}; sourceCutoff?: string} = {}): Promise<LoadedTrainingAnalysisSources> {
+  options: {authorityLock?: 'SHARE' | 'UPDATE'; fixedManifest?: {attempts: TrainingAnalysisManifestAttemptV1[];researchSources?:Array<{taskId:string;attemptId:string;attemptEpoch:number}>}; sourceCutoff?: string} = {}): Promise<LoadedTrainingAnalysisSources> {
   const cutoff = options.sourceCutoff ? new Date(options.sourceCutoff) : null
   if (cutoff && !Number.isFinite(cutoff.getTime())) throw compositeBadRequest('来源截止时间无效')
-  const auth = await authority(tx, actor, selector.courseId)
+  const auth = await authority(tx, actor, selector.courseId, options.authorityLock)
   if (!selector.waves.length || selector.waves.length > 8) throw compositeBadRequest('请选择 1–8 个明确波次')
   const tasks = await tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, selector.courseId), id: {in: [...new Set(selector.waves.map(wave => wave.taskId))]}}, include: templateInclude})
   if (tasks.length !== new Set(selector.waves.map(wave => wave.taskId)).size) unavailable()
@@ -309,10 +335,10 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
   for (const {wave, attempt} of final) {const ids = selectedItemIds.get(attempt.id) ?? new Set<string>(); wave.metrics.forEach(metric => ids.add(metric.itemId)); selectedItemIds.set(attempt.id, ids)}
   const factsFor = await preloadCompositeReportFacts(final.map(entry => entry.attempt), tx, {selectedItemIds, numericOnly: true})
   // Existing canonical validation may internally expand scored item facts, but
-  // never reads raw answers. Reference storage adds one bounded fact batch;
+  // never reads raw answers. Reuse the same invocation-local fact rows/body;
   // neither scored items nor raw fields enter analysis/export output.
   const uniqueCiphers = [...new Set(canonicalCiphers)]
-  const canonicalViews = await loadStoredCanonicalUnitResults(uniqueCiphers, tx)
+  const canonicalViews = await loadStoredCanonicalUnitResults(uniqueCiphers, tx, [], factsFor.scaleFacts)
   const canonicalByCipher = new Map(uniqueCiphers.map((cipher, index) => [cipher, canonicalViews[index]]))
   const observations: TrainingNumericObservationV1[] = [], manifests: TrainingAnalysisManifestAttemptV1[] = [], formSourceHashes = new WeakMap<object, string>()
   for (const {wave, attempt, scope, slots} of selected) {
@@ -570,8 +596,8 @@ async function discoverFrozenScaleMetrics(tx: Prisma.TransactionClient, actor: T
 
 /** Bounded, owner-authorized discovery. Actual runs revalidate every frozen
  * source and disclosure; Scale selectors come only from frozen runtimes. */
-export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string) {
-  const auth = await authority(tx, actor, courseId)
+export async function listTrainingAnalysisSources(tx: Prisma.TransactionClient, actor: TrainingAnalysisActor, courseId: string, options: {authorityLock?: 'SHARE' | 'UPDATE'} = {}) {
+  const auth = await authority(tx, actor, courseId, options.authorityLock)
   const tasks: any[] = await tx.compositeAssessment.findMany({where: {...authorizedTaskWhere(actor, courseId), publishedAt: {not: null}}, include: templateInclude,
     orderBy: [{publishedAt: 'desc'}, {id: 'asc'}], take: 101})
   const list: Array<{taskId: string; taskName: string; publication: string; configDigest: string | null; variantKey: string | null; materialGroupKey?: string; metrics: Array<{itemId: string; metricKey: string; label: string}>}> = []

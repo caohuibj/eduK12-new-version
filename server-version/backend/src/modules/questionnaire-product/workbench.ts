@@ -2,7 +2,7 @@ import { resolveTrainingAttemptScope, type TrainingAttemptScope } from '../compo
 import { trainingVariantProvenance } from '../composite/training-variant-export'
 import { loadSituationalExportSlotSets } from '../composite/situational-canonical-export'
 import { isTaskSatisfied } from '../assessment-runtime/form-policy'
-import { UserRole } from '@prisma/client'
+import { Prisma, UserRole } from '@prisma/client'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -38,7 +38,15 @@ export async function saveTemplate(actor: Actor, raw: unknown) {
     const prototype = await tx.compositeAssessment.findUnique({ where: { id: copy.id }, include: { _count: { select: { attempts: true, accessTokens: true } } } })
     if (!prototype || prototype.status !== 'DRAFT' || prototype._count.attempts || prototype._count.accessTokens) throw compositeConflict('此请求已用于投放对象，请使用新的保存模板请求')
     await tx.questionnaireCourseDelivery.deleteMany({ where: { compositeId: copy.id } })
-    await tx.compositeAssessment.update({ where: { id: copy.id }, data: { name: input.name, courseId: null, publicEnabled: false, opensAt: null, expiresAt: null } })
+    await tx.compositeAssessment.update({ where: { id: copy.id }, data: {
+      name: input.name, courseId: null, publicEnabled: false, opensAt: null, expiresAt: null,
+      // These settings belong to a course delivery, not reusable content.
+      // Clear only this locked, unused draft copy; never alter its source or
+      // scientific/cognitive task configuration. A new delivery selects them anew.
+      trainingFeedbackPolicy: Prisma.DbNull, trainingFeedbackPolicyHash: null,
+      trainingPersistencePolicy: Prisma.DbNull, trainingPersistencePolicyHash: null,
+      trainingTimingPolicy: Prisma.DbNull,
+    } })
     const row = await tx.assessmentCompositionTemplate.create({ data: { ownerId: actor.userId, definitionId: copy.id, name: input.name, requestKey, requestHash } })
     await tx.assessmentManagementEvent.create({ data: { actorId: actor.userId, resourceId: row.id, action: 'TEMPLATE_SAVE', metadata: { name: row.name, sourceId: input.sourceId } } })
     return row

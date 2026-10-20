@@ -189,7 +189,8 @@ export interface CognitiveHistoryItem {
   scoringVersion: string
   finishedAt: string | null
   score: number | null
-  qualityState: 'interpretable' | 'limited' | 'invalid'
+  qualityState: 'interpretable' | 'limited' | 'invalid' | null
+  feedbackDeferred?: boolean
 }
 
 export interface CognitiveHistoryPage {
@@ -231,6 +232,8 @@ export interface CognitivePresentationDefinitionV1 {
 }
 
 export interface CognitiveSession {
+  trainingPersistence?: import('../../training/training-cognitive-retention').TrainingPersistenceDescriptor
+  sessionEpoch?: number
   feedbackDeferred?: boolean
   sessionId: string
   assignmentId: string | null

@@ -5,7 +5,8 @@ import { parseVersionedFrozenScaleRuntimeSnapshot, type VersionedFrozenScaleRunt
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { publicTemplates, publicTemplatesForDatabase, type PublicTemplateStore } from '../assessment-runtime/public-templates'
-import { loadScaleFactRecords, isScaleFactsReference } from '../assessment-runtime/scale-fact-records'
+import { createStoredScaleFactsReader, type StoredScaleFactsReader } from '../assessment-runtime/compact-assessment-storage'
+import { isScaleFactsReference } from '../assessment-runtime/scale-fact-records'
 import { decodeScaleFacts, assertScaleFactsBinding, prefetchCompactScaleTemplates, restoreCompactScaleFacts } from '../assessment-runtime/compact-scale-facts'
 import { mapCompositeSection } from '../assessment-runtime/form-section-definition'
 import { readLoadedCompositeTypedFormValues, type TypedFormMetadata } from '../assessment-runtime/typed-form-facts'
@@ -40,7 +41,7 @@ export type CompositeReportFacts = {
   typedFormValues: Map<string, TypedFormValue>
   typedFormStates: Map<string, TypedFormMetadata>
 }
-export type CompositeReportFactsReader = (attempt: any) => CompositeReportFacts
+export type CompositeReportFactsReader = ((attempt: any) => CompositeReportFacts) & {readonly scaleFacts:StoredScaleFactsReader}
 const identity = (attempt: any) => canonicalHash({
   id: attempt.id, epoch: attempt.attemptEpoch, slotSetHash: attempt.frozenActiveSlotSetHash ?? null,
   ...(attempt.trainingFlowPathHash!=null?{trainingFlowPathHash:attempt.trainingFlowPathHash}:{}),
@@ -68,7 +69,7 @@ export async function preloadCompositeReportFacts(attempts: any[], db: Prisma.Tr
     for (const row of attempt.scaleAssessments) if (row.compositeAttemptId !== attempt.id || row.attemptEpoch !== attempt.attemptEpoch || !scope.itemIds.has(row.compositeItemId)) throw new Error('Report batch scale ownership/version mismatch')
     contexts.set(attempt, {identity: identity(attempt), facts: {scaleResults: new Map(), scaleSourceResultHashes: new Map(), scaleRuntimes: new Map(), typedFormValues: new Map(), typedFormStates: new Map()}})
   }
-  const records = attempts.flatMap(attempt => attempt.scaleAssessments), references = records.filter(row => isScaleFactsReference(row.result))
+  const records = attempts.flatMap(attempt => attempt.scaleAssessments)
   const snapshotWhere = attempts.flatMap(attempt => {
     const sections = sectionsByAttempt.get(attempt)!
     return sections.length ? [{compositeAttemptId: attempt.id, attemptEpoch: attempt.attemptEpoch, slotKey: {in: sections.map(section => formSectionSlotKey(section.id))}}] : []
@@ -80,8 +81,8 @@ export async function preloadCompositeReportFacts(attempts: any[], db: Prisma.Tr
       if(isSharedScaleRuntimeReference(value)&&typeof value.artifactHash==='string'&&/^[a-f0-9]{64}$/.test(value.artifactHash))artifactHashes.add(value.artifactHash)
     }catch{runtimes.set(record,undefined)}
   }
-  const [rows, snapshots, artifacts] = await Promise.all([
-    loadScaleFactRecords(references.map(row => ({id: row.id, attemptEpoch: row.result.e})), db),
+  const [scaleFacts, snapshots, artifacts] = await Promise.all([
+    createStoredScaleFactsReader(records, db, true),
     snapshotWhere.length ? db.assessmentUnitSnapshot.findMany({where: {OR: snapshotWhere}}) : [],
     artifactHashes.size?db.$queryRaw<SharedScaleArtifactRecord[]>`SELECT artifact_hash AS "artifactHash",format_version AS "formatVersion",plaintext_bytes AS "plaintextBytes",payload_encrypted AS "payloadEncrypted"
       FROM assessment_runtime_artifacts WHERE artifact_hash IN (${Prisma.join([...artifactHashes])})`:[],
@@ -89,13 +90,10 @@ export async function preloadCompositeReportFacts(attempts: any[], db: Prisma.Tr
   const artifactRows=new Map(artifacts.map(row=>[row.artifactHash,row]))
   if(artifactRows.size!==artifacts.length||artifacts.some(row=>!artifactHashes.has(row.artifactHash)))throw new Error('Report runtime artifact batch binding mismatch')
   const runtimeStore=createSharedScaleRuntimeStore({find:async hash=>artifactRows.get(hash)??null,insert:async()=>{throw new Error('Report runtime batch is read only')}})
-  const byId = new Map(rows.map(row => [`${row.id}:${row.attemptEpoch}`, row]))
-  if (byId.size !== rows.length || rows.length !== references.length) throw new Error('Report batch immutable sources incomplete')
   const decoded = new Map<any, NonNullable<ReturnType<typeof decodeScaleFacts>>>()
   for (const record of records) {
-    const row = isScaleFactsReference(record.result) ? byId.get(`${record.id}:${record.result.e}`) : null
+    const {row,facts} = scaleFacts.read(record,db)
     if (isScaleFactsReference(record.result) && (!row || record.attemptEpoch !== row.attemptEpoch || record.submissionId !== row.submissionId || record.submissionPayloadHash !== row.submissionPayloadHash)) throw new Error('Report batch fact binding mismatch')
-    const facts = decodeScaleFacts(row?.factsEncrypted ?? record.result)
     if (row && (!facts || facts.sourceResultHash !== row.sourceResultHash)) throw new Error('Report batch source digest mismatch')
     if (facts) {assertScaleFactsBinding(facts, record); decoded.set(record, facts)}
   }
@@ -120,9 +118,10 @@ export async function preloadCompositeReportFacts(attempts: any[], db: Prisma.Tr
     const sections = sectionsByAttempt.get(attempt)!
     if (sections.length) context.typedFormValues = readLoadedCompositeTypedFormValues(attempt, sections, snapshotsByAttempt.get(attempt.id) ?? [], context.typedFormStates)
   }
-  return attempt => {
+  const reader = (attempt:any) => {
     const context = contexts.get(attempt)
     if (!context || context.identity !== identity(attempt)) throw new Error('Report batch identity changed')
     return context.facts
   }
+  return Object.assign(reader,{scaleFacts})
 }

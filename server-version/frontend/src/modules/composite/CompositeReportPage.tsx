@@ -52,8 +52,8 @@ const CompositeReportPage: React.FC = () => {
   const teacherMode = Boolean(id && attemptId && location.pathname.startsWith('/composite-assessments/'))
   const staffMode = teacherMode && (user?.role === 'TEACHER' || user?.role === 'ADMIN')
   const adminMode = teacherMode && user?.role === 'ADMIN'
-  const selectedSnapshotId = new URLSearchParams(location.search).get('snapshotId') || undefined
-  const partial = teacherMode && new URLSearchParams(location.search).get('partial') === '1'
+  const selectedSnapshotId = staffMode ? new URLSearchParams(location.search).get('snapshotId') || undefined : undefined
+  const partial = staffMode && new URLSearchParams(location.search).get('partial') === '1'
   const [recoveryToken, setRecoveryToken] = useState(publicMode && attemptId ? readRecovery(attemptId) : '')
   const [recoveryInput, setRecoveryInput] = useState('')
   const [report, setReport] = useState<CompositeReport | null>(null)
@@ -72,6 +72,8 @@ const CompositeReportPage: React.FC = () => {
   const statusAbort = useRef<AbortController | null>(null)
   const pollingProfile = generation?.feedbackPollProfile ?? (generation?.wholeSubmissionReceived ? 'QUEUED' : 'LEGACY')
   const automaticPollLimit = pollingProfile === 'LEGACY' ? 12 : REPORT_AUTO_POLL_LIMIT
+  const participantFeedback = staffMode ? null : generation?.participantFeedback
+  const canPollGeneration = !participantFeedback || participantFeedback.state === 'REPORT_PROCESSING'
 
   const studyReturn=attemptId?sessionStorage.getItem(`composite:study:return:${attemptId}`):null
   const ownStudyReturn=studyReturn && /^\/public\/studies\/[0-9a-f-]{36}$/.test(studyReturn)?studyReturn:null
@@ -107,7 +109,11 @@ const CompositeReportPage: React.FC = () => {
         if (current !== epoch.current) return
         if (status.code !== 0 || !status.data) throw new Error(status.message || '报告状态无法读取')
         setGeneration(status.data)
-        if (status.data.reportStatus.state !== 'READY') { setReport(null); return }
+        if (status.data.reportStatus.state !== 'READY' ||
+          (!staffMode && status.data.participantFeedback && status.data.participantFeedback.state !== 'AVAILABLE')) {
+          setReport(null)
+          return
+        }
       }
       const response = await withReportReadRecovery(() => teacherMode && id
         ? partial ? compositeApi.teacherReport(id, attemptId, snapshotId, true) : compositeApi.teacherReport(id, attemptId, snapshotId)
@@ -123,14 +129,14 @@ const CompositeReportPage: React.FC = () => {
       setGeneration(previous => previous && (previous.wholeSubmissionReceived || previous.hasAcceptedSubmission) && ['PENDING', 'PROCESSING'].includes(previous.reportStatus.state) ? { ...previous } : null)
       setReport(null)
     } finally { if (current === epoch.current) setLoading(false) }
-  }, [attemptId, id, publicMode, recoveryToken, selectedSnapshotId, teacherMode, partial])
+  }, [attemptId, id, publicMode, recoveryToken, selectedSnapshotId, teacherMode, staffMode, partial])
 
   useEffect(() => {
-    if (!(generation?.wholeSubmissionReceived || generation?.hasAcceptedSubmission) || !['PENDING', 'PROCESSING'].includes(generation.reportStatus.state)) return
+    if (!canPollGeneration || !(generation?.wholeSubmissionReceived || generation?.hasAcceptedSubmission) || !['PENDING', 'PROCESSING'].includes(generation.reportStatus.state)) return
     const update = () => setWaitSeconds(Math.max(0, Math.floor((Date.now() - waitStartedAt.current) / 1000)))
     update(); const timer = window.setInterval(update, 1000)
     return () => window.clearInterval(timer)
-  }, [generation?.wholeSubmissionReceived, generation?.hasAcceptedSubmission, generation?.reportStatus.state])
+  }, [canPollGeneration, generation?.wholeSubmissionReceived, generation?.hasAcceptedSubmission, generation?.reportStatus.state])
 
   const loadSnapshots = useCallback(async () => {
     if (!staffMode || !attemptId) return
@@ -147,7 +153,7 @@ const CompositeReportPage: React.FC = () => {
 
   useEffect(() => { pollCount.current = 0; void load(); return () => { epoch.current++; statusAbort.current?.abort() } }, [load])
   useEffect(() => {
-    if (!generation || report || !['PENDING', 'PROCESSING'].includes(generation.reportStatus.state) || pollCount.current >= automaticPollLimit) return
+    if (!canPollGeneration || !generation || report || !['PENDING', 'PROCESSING'].includes(generation.reportStatus.state) || pollCount.current >= automaticPollLimit) return
     // A bounded server wait wakes on committed readiness. When unavailable,
     // keep the existing bounded polling fallback; hidden pages stay idle.
     let waitingForVisibility = false
@@ -162,7 +168,7 @@ const CompositeReportPage: React.FC = () => {
     }
     document.addEventListener('visibilitychange', onVisible)
     return () => { window.clearTimeout(timer); document.removeEventListener('visibilitychange', onVisible) }
-  }, [generation, load, report, pollingProfile, automaticPollLimit])
+  }, [generation, load, report, pollingProfile, automaticPollLimit, canPollGeneration])
   useEffect(() => {
     if (!shouldLoadSnapshots) {
       setSnapshots([])
@@ -246,6 +252,31 @@ const CompositeReportPage: React.FC = () => {
   </ReportSection>
 
   if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">加载报告中...</div>
+
+  if (!report && participantFeedback && (
+    participantFeedback.state === 'GENERATED_NOT_RELEASED' ||
+    participantFeedback.state === 'WAITING_SUBMISSION' ||
+    participantFeedback.state === 'UNAVAILABLE'
+  )) {
+    const waitingForSubmission = participantFeedback.state === 'WAITING_SUBMISSION'
+    const scheduled = participantFeedback.state === 'GENERATED_NOT_RELEASED'
+    const releaseDate = participantFeedback.releaseAt ? new Date(participantFeedback.releaseAt) : null
+    const releaseLabel = releaseDate && Number.isFinite(releaseDate.getTime())
+      ? releaseDate.toLocaleString('zh-CN', { timeZoneName: 'short' }) : null
+    return <ReportShell
+      title="综合测评报告"
+      status={{ kind: 'info',
+        title: waitingForSubmission ? '作答尚未全部完成' : scheduled ? '测评已完成，报告尚未开放' : '报告暂时不可用',
+        description: waitingForSubmission ? '已提交单元保留在服务器，请先继续完成整份测评。'
+          : scheduled ? `作答已保存，报告已生成。${releaseLabel ? `预计于 ${releaseLabel} 开放。` : '请等待教师预设的开放时间。'}到时可刷新查看，无需重新交卷。`
+          : '已保存的作答不受影响，请稍后刷新或联系测评负责人。' }}
+      actions={<>
+        <button type="button" className="hui-button hui-button--secondary" onClick={() => { pollCount.current = 0; void load() }}>刷新开放状态</button>
+        {waitingForSubmission && <button type="button" className="hui-button hui-button--primary" onClick={() => navigate(`${publicMode ? '/public' : '/student'}/composite/attempts/${attemptId}`)}>继续作答</button>}
+        <button type="button" className="hui-button hui-button--secondary" onClick={() => navigate(backTo)}>返回</button>
+      </>}
+    />
+  }
 
   if (!report && generation && generation.reportStatus.state !== 'READY') {
     const failed = generation.reportStatus.state === 'FAILED'

@@ -387,3 +387,120 @@ describe('C20 material flow editor and attempt budget', () => {
     expect(JSON.parse((screen.getByLabelText('流程 JSON（高级编辑）') as HTMLTextAreaElement).value)).toEqual(config)
   })
 })
+
+describe('Training persistence authoring', () => {
+  beforeEach(() => { vi.resetAllMocks(); capabilities.enabled=true; api.get.mockResolvedValue({code:0,data:{scales:[],cognitive:[],situational:[],courses:[]}}) })
+  it('starts both independent retention controls off',async()=>{mount();await screen.findByRole('checkbox',{name:'启用服务器草稿'});expect(screen.getByRole('checkbox',{name:'启用服务器草稿'})).not.toBeChecked();expect(screen.getByRole('checkbox',{name:'启用认知任务本机草稿到期清理'})).not.toBeChecked();fireEvent.click(screen.getByRole('checkbox',{name:'启用服务器草稿'}));expect(screen.getByLabelText('服务器草稿保留小时数')).toHaveValue(24);expect(screen.queryByLabelText('认知本机草稿保留小时数')).not.toBeInTheDocument()})
+  it('freezes both settings after publication',async()=>{const row={name:'冻结策略',status:'PUBLISHED',revision:1,questionnaireType:'COURSE',questionnaireCourses:[],items:[],formSections:[],publicEnabled:false,trainingPersistencePolicy:{schemaVersion:1,checkpoint:{enabled:true,ttlHours:48},localCognitive:{enabled:true,ttlHours:1}}};api.get.mockImplementation(async path=>({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[]}:row}));mount('saved');await screen.findByDisplayValue('冻结策略');expect(screen.getByRole('checkbox',{name:'启用服务器草稿'})).toBeDisabled();expect(screen.getByLabelText('服务器草稿保留小时数')).toHaveValue(48);expect(screen.getByLabelText('认知本机草稿保留小时数')).toHaveValue(1);expect(screen.getByLabelText('认知本机草稿保留小时数')).toBeDisabled()})
+})
+
+describe('C22 Training feedback release authoring', () => {
+  const resources = { scales: [], cognitive: [], situational: [], courses: [
+    { id: 'training-course', title: 'Training 课程', courseType: 'TRAINING_COURSE', isLibrary: false },
+    { id: 'other-course', title: '其他课程', courseType: 'NORMAL_COURSE', isLibrary: false },
+  ] }
+  const row = { id: 'feedback', name: '学员反馈设置', status: 'DRAFT', revision: 7, questionnaireType: 'COURSE', productKind: 'QUESTIONNAIRE', questionnaireCourses: [{ courseId: 'training-course' }], items: [], formSections: [], publicEnabled: false }
+  const configure = (detail: Record<string, unknown> = row) => {
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? resources : detail }))
+    api.put.mockImplementation(async (_path, body) => ({ code: 0, data: { ...detail, ...body, revision: 8 } }))
+    api.post.mockImplementation(async (_path, body) => ({ code: 0, data: { ...detail, ...body } }))
+  }
+  beforeEach(() => { vi.resetAllMocks(); capabilities.enabled = true; configure() })
+
+  it('defaults a newly bound Training questionnaire to immediate feedback after completion and generation', async () => {
+    mount('new', '?courseId=training-course')
+    expect(await screen.findByRole('radio', { name: '整份测评完成且报告生成后即可查看（默认）' })).toBeChecked()
+    fireEvent.change(screen.getByLabelText('测评名称'), { target: { value: '新课程问卷' } })
+    fireEvent.click(screen.getByRole('button', { name: '创建草稿' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith('/questionnaire-products', expect.objectContaining({
+      trainingFeedbackPolicy: { schemaVersion: 1, mode: 'IMMEDIATE' }, courseIds: ['training-course'],
+    })))
+  })
+
+  it('requires a valid release time before saving scheduled feedback', async () => {
+    mount('feedback')
+    fireEvent.click(await screen.findByRole('radio', { name: '预设时间开放' }))
+    fireEvent.click(screen.getByRole('button', { name: '保存投放设置' }))
+    expect(screen.getByRole('alert')).toHaveTextContent('请选择有效的报告开放时间。')
+    expect(screen.getByLabelText('报告开放时间')).toHaveFocus()
+    expect(screen.getByLabelText('报告开放时间')).toHaveAttribute('aria-invalid', 'true')
+    expect(api.put).not.toHaveBeenCalled()
+  })
+
+  it('defaults to immediate feedback when a course-less draft first binds Training', async () => {
+    configure({ ...row, questionnaireCourses: [] })
+    mount('feedback')
+    await screen.findByDisplayValue('学员反馈设置')
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Training 课程' }))
+    expect(screen.getByRole('radio', { name: '整份测评完成且报告生成后即可查看（默认）' })).toBeChecked()
+    fireEvent.click(screen.getByRole('button', { name: '保存投放设置' }))
+    await waitFor(() => expect(api.put).toHaveBeenCalledWith('/questionnaire-products/feedback', expect.objectContaining({
+      revision: 7, trainingFeedbackPolicy: { schemaVersion: 1, mode: 'IMMEDIATE' }, courseIds: ['training-course'],
+    })))
+  })
+
+  it('saves the scheduled device-local time as an ISO timestamp with the current revision', async () => {
+    mount('feedback')
+    fireEvent.click(await screen.findByRole('radio', { name: '预设时间开放' }))
+    fireEvent.change(screen.getByLabelText('报告开放时间'), { target: { value: '2026-10-21T09:30' } })
+    expect(screen.getByRole('button', { name: '发布组合测评' })).toBeDisabled()
+    fireEvent.click(screen.getByRole('button', { name: '保存投放设置' }))
+    await waitFor(() => expect(api.put).toHaveBeenCalledWith('/questionnaire-products/feedback', expect.objectContaining({
+      revision: 7, trainingFeedbackPolicy: { schemaVersion: 1, mode: 'SCHEDULED', releaseAt: new Date('2026-10-21T09:30').toISOString() },
+    })))
+  })
+
+  it('allows returning an existing scheduled draft to immediate feedback without a stale timestamp', async () => {
+    configure({ ...row, trainingFeedbackPolicy: { schemaVersion: 1, mode: 'SCHEDULED', releaseAt: '2026-10-21T09:30:00.000Z' } })
+    mount('feedback')
+    fireEvent.click(await screen.findByRole('radio', { name: '整份测评完成且报告生成后即可查看（默认）' }))
+    expect(screen.queryByLabelText('报告开放时间')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '保存投放设置' }))
+    await waitFor(() => expect(api.put).toHaveBeenCalledWith('/questionnaire-products/feedback', expect.objectContaining({
+      revision: 7, trainingFeedbackPolicy: { schemaVersion: 1, mode: 'IMMEDIATE' },
+    })))
+  })
+
+  it('keeps published policy and timestamp read-only', async () => {
+    configure({ ...row, status: 'PUBLISHED', trainingFeedbackPolicy: { schemaVersion: 1, mode: 'SCHEDULED', releaseAt: '2026-10-21T09:30:00.000Z' } })
+    mount('feedback')
+    const scheduled = await screen.findByRole('radio', { name: '预设时间开放' })
+    expect(scheduled).toBeChecked()
+    expect(scheduled).toBeDisabled()
+    expect(screen.getByRole('radio', { name: '整份测评完成且报告生成后即可查看（默认）' })).toBeDisabled()
+    expect(screen.getByLabelText('报告开放时间')).toBeDisabled()
+    expect(screen.getByText('仅在统一讲解或保护测评过程时选择预设时间。教师原有的报告查看、分析和导出不受此设置影响。')).toBeInTheDocument()
+    expect(api.put).not.toHaveBeenCalled()
+  })
+
+  it('preserves an unconfigured legacy policy while saving unrelated metadata', async () => {
+    mount('feedback')
+    await screen.findByRole('radio', { name: '预设时间开放' })
+    fireEvent.change(screen.getByLabelText('测评名称'), { target: { value: '改名保持原反馈' } })
+    fireEvent.click(screen.getByRole('button', { name: '保存投放设置' }))
+    await waitFor(() => expect(api.put).toHaveBeenCalledTimes(1))
+    expect(api.put.mock.calls[0][1]).not.toHaveProperty('trainingFeedbackPolicy')
+  })
+
+  it('clears a configured draft policy when its author changes delivery out of Training scope', async () => {
+    configure({ ...row, trainingFeedbackPolicy: { schemaVersion: 1, mode: 'SCHEDULED', releaseAt: '2026-10-21T09:30:00.000Z' } })
+    mount('feedback')
+    await screen.findByRole('radio', { name: '预设时间开放' })
+    fireEvent.click(screen.getByRole('checkbox', { name: '其他课程' }))
+    expect(screen.getByText('当前投放已不符合 Training 课程范围，保存时将清除学员报告开放设置。')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '保存投放设置' }))
+    await waitFor(() => expect(api.put).toHaveBeenCalledWith('/questionnaire-products/feedback', expect.objectContaining({
+      revision: 7, trainingFeedbackPolicy: null, courseIds: ['training-course', 'other-course'],
+    })))
+  })
+
+  it('does not add Training feedback to a non-Training creation', async () => {
+    mount('new', '?courseId=other-course')
+    await waitFor(() => expect(screen.getByRole('checkbox', { name: '其他课程' })).toBeChecked())
+    expect(screen.queryByRole('radio', { name: '预设时间开放' })).not.toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('测评名称'), { target: { value: '普通课程问卷' } })
+    fireEvent.click(screen.getByRole('button', { name: '创建草稿' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledTimes(1))
+    expect(api.post.mock.calls[0][1]).not.toHaveProperty('trainingFeedbackPolicy')
+  })
+})

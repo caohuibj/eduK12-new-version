@@ -1,24 +1,74 @@
-import { describe, expect, it, vi } from 'vitest'
-import { isCompositeParticipantFeedbackDeferred } from '../../modules/assessment-policy/participant-feedback'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import { isCompositeParticipantFeedbackDeferred, isLoadedCompositeParticipantFeedbackDeferred, trainingFeedbackReportReady } from '../../modules/assessment-policy/participant-feedback'
 import { projectRelationalUnitFinalResponse } from '../../modules/assessment-relational/result-authority'
+import { feedbackAttempt, readyFeedbackJob } from '../fixtures/training-feedback'
 
+const data = { submissionId: 'final', payloadHash: 'hash', replayed: true, response: { report: 'PRIVATE_FEEDBACK', metrics: { fixture: 1 } } }
+const receipt = { submissionId: 'final', payloadHash: 'hash', replayed: true, completed: true, feedbackDeferred: true }
+const dbFor = (parent: any, job: any = null) => ({ $queryRaw: vi.fn().mockResolvedValue(parent ? [{ parent, job }] : []), compositeReportJob: { findUnique: vi.fn().mockResolvedValue(job) } })
+afterEach(() => vi.useRealTimers())
 describe('participant feedback after the whole composite completes', () => {
   it('retains standalone feedback without reading a parent', async () => {
-    const findUnique = vi.fn(), db = { compositeAssessmentAttempt: { findUnique } }
+    const db = dbFor(null)
     expect(await isCompositeParticipantFeedbackDeferred(null, db)).toBe(false)
-    expect(await projectRelationalUnitFinalResponse(null, { replayed: false, response: { metrics: { fixture: 1 } } }, db)).toHaveProperty('response')
-    expect(findUnique).not.toHaveBeenCalled()
+    expect(await projectRelationalUnitFinalResponse(null, data, db)).toEqual(data)
+    expect(db.$queryRaw).not.toHaveBeenCalled()
   })
-  it.each(['IN_PROGRESS', 'ABANDONED', null])('returns only a durable acknowledgement for parent %s', async status => {
-    const db = { compositeAssessmentAttempt: { findUnique: vi.fn().mockResolvedValue(status ? { status, assignmentRef: null } : null) } }
-    const result = await projectRelationalUnitFinalResponse('parent', { submissionId: 'final', payloadHash: 'hash', replayed: true, response: { report: 'PRIVATE_FEEDBACK', metrics: { fixture: 1 } } }, db)
-    expect(result).toEqual({ submissionId: 'final', payloadHash: 'hash', replayed: true, completed: true, feedbackDeferred: true })
+  it.each(['IN_PROGRESS', 'ABANDONED', null])('returns only durable acknowledgement for parent %s', async status => {
+    const db = dbFor(status ? { status, assignmentRef: null } : null)
+    expect(await projectRelationalUnitFinalResponse('parent', data, db)).toEqual(receipt)
+    expect(db.$queryRaw).toHaveBeenCalledTimes(1)
   })
-  it('opens ordinary completed feedback but keeps cohort-only completed feedback withheld', async () => {
-    const findUnique = vi.fn().mockResolvedValue({ status: 'COMPLETED', assignmentRef: null })
-    const db = { compositeAssessmentAttempt: { findUnique } }, data = { replayed: false, response: { report: 'frozen' } }
-    expect(await projectRelationalUnitFinalResponse('parent', data, db)).toEqual(data)
-    findUnique.mockResolvedValue({ status: 'COMPLETED', assignmentRef: 'relational', respondentType: null })
-    expect(await projectRelationalUnitFinalResponse('parent', data, db)).toEqual({ replayed: false, completed: true })
+  it('opens legacy completed feedback but keeps cohort-only completed feedback withheld', async () => {
+    expect(await projectRelationalUnitFinalResponse('parent', data, dbFor({ status: 'COMPLETED', assignmentRef: null }))).toEqual(data)
+    expect(await projectRelationalUnitFinalResponse('parent', data, dbFor({ status: 'COMPLETED', assignmentRef: 'relational', respondentType: null })))
+      .toEqual({ submissionId: 'final', payloadHash: 'hash', replayed: true, completed: true })
+  })
+  it.each([false, true])('withholds initial/replayed FINAL %s but preserves submission identity', async replayed => {
+    const parent = feedbackAttempt(), db = dbFor(parent)
+    expect(await projectRelationalUnitFinalResponse(parent.id, { ...data, replayed }, db)).toEqual({ ...receipt, replayed })
+    expect(db.$queryRaw).toHaveBeenCalledTimes(1)
+    expect(db.compositeReportJob.findUnique).not.toHaveBeenCalled()
+    const query = db.$queryRaw.mock.calls[0][0].join(' ')
+    expect(query).toContain('LEFT JOIN composite_report_jobs')
+    expect(query).toContain("AT TIME ZONE 'UTC'")
+    expect(query).not.toMatch(/FOR (UPDATE|SHARE)|report_encrypted|answers|is_active|expires_at/)
+  })
+  it('uses the exact release boundary without a job, scoring, clock task or extra query', async () => {
+    const parent = feedbackAttempt(), db = dbFor(parent)
+    vi.useFakeTimers(); vi.setSystemTime(new Date('2098-12-31T23:59:59.999Z'))
+    expect(await isCompositeParticipantFeedbackDeferred(parent.id, db)).toBe(true)
+    vi.setSystemTime(new Date('2099-01-01T00:00:00.000Z'))
+    expect(await isCompositeParticipantFeedbackDeferred(parent.id, db)).toBe(false)
+    expect(db.$queryRaw).toHaveBeenCalledTimes(2)
+  })
+  it.each(['PENDING', 'PROCESSING', 'FAILED', 'CANCELLED', 'WAITING'])('does not release current async %s even after the preset time', async status => {
+    const parent = feedbackAttempt({ asyncReportEpoch: 1 }, { schemaVersion: 1, mode: 'IMMEDIATE' })
+    const db = dbFor(parent, { ...readyFeedbackJob(parent), status })
+    expect(await projectRelationalUnitFinalResponse(parent.id, data, db)).toEqual(receipt)
+    expect(db.$queryRaw).toHaveBeenCalledTimes(1)
+    expect(db.compositeReportJob.findUnique).not.toHaveBeenCalled()
+  })
+  it('allows current READY while rejecting a stale materialization binding', async () => {
+    const parent = feedbackAttempt({ asyncReportEpoch: 1 }, { schemaVersion: 1, mode: 'IMMEDIATE' }), job = readyFeedbackJob(parent)
+    expect(await projectRelationalUnitFinalResponse(parent.id, data, dbFor(parent, job))).toEqual(data)
+    for (const change of [{ attemptEpoch: 0 }, { slotSetHash: 'old' }, { contextHash: 'old' }, { aggregateInputHash: 'old' }]) {
+      expect(trainingFeedbackReportReady(parent, { ...job, ...change })).toBe(false)
+      expect(await isCompositeParticipantFeedbackDeferred(parent.id, dbFor(parent, { ...job, ...change }))).toBe(true)
+    }
+  })
+  it('reads one native async header only when timing and completion already permit', async () => {
+    const parent = feedbackAttempt({ asyncReportEpoch: 1 }, { schemaVersion: 1, mode: 'IMMEDIATE' }), db = dbFor(parent, readyFeedbackJob(parent))
+    expect(await isLoadedCompositeParticipantFeedbackDeferred(parent, db)).toBe(false)
+    expect(db.compositeReportJob.findUnique).toHaveBeenCalledTimes(1)
+    db.compositeReportJob.findUnique.mockClear()
+    for (const value of [feedbackAttempt(), { ...parent, status: 'IN_PROGRESS' }, { ...parent, trainingFeedbackSnapshotHash: 'bad' }])
+      expect(await isLoadedCompositeParticipantFeedbackDeferred(value, db)).toBe(true)
+    expect(db.compositeReportJob.findUnique).not.toHaveBeenCalled()
+  })
+  it('keeps malformed configured policy and omitted/stale generation markers closed', async () => {
+    const parent = feedbackAttempt({}, { schemaVersion: 1, mode: 'IMMEDIATE' })
+    for (const change of [{ trainingFeedbackSnapshot: {} }, { trainingFeedbackSnapshotHash: null }, { asyncReportEpoch: undefined }, { asyncReportEpoch: 4 }])
+      expect(await isLoadedCompositeParticipantFeedbackDeferred({ ...parent, ...change }, dbFor(null))).toBe(true)
   })
 })

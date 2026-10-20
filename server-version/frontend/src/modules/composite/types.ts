@@ -1,3 +1,4 @@
+import type { TrainingPersistence } from './training-checkpoint'
 export type TrainingTimingBinding={schemaVersion:1;contract:'BROWSER_ACTIVE_SCALE_V1';snapshotHash:string}
 import type { FormQuestion } from '../assessment-core/form/types'
 import type { CognitiveSession } from '../cognitive/types'
@@ -132,6 +133,15 @@ export interface CompositeReportJobState {
   completedAt: string | null
 }
 
+export type TrainingFeedbackPolicy =
+  | { schemaVersion: 1; mode: 'IMMEDIATE' }
+  | { schemaVersion: 1; mode: 'SCHEDULED'; releaseAt: string }
+
+export interface ParticipantFeedbackStatus {
+  state: 'WAITING_SUBMISSION' | 'REPORT_PROCESSING' | 'GENERATED_NOT_RELEASED' | 'AVAILABLE' | 'UNAVAILABLE'
+  releaseAt: string | null
+}
+
 
 export interface WholeQuestionnaireDefinition {
   attemptId: string
@@ -160,6 +170,8 @@ export interface WholeQuestionnaireReceipt {
 }
 
 export interface CompositeReportStatus {
+  /** Absent on legacy records. Report generation and participant access are separate. */
+  participantFeedback?: ParticipantFeedbackStatus | null
   feedbackWaitMs?: number
   feedbackPollProfile?: 'FAST_START' | 'QUEUED'
   wholeSubmissionReceived?: boolean
@@ -179,6 +191,9 @@ export type TrainingFlowState = {
 }
 
 export interface CompositeAttemptState {
+  trainingPersistence?: TrainingPersistence
+  checkpointDefinitionHash?: string
+
   trainingFlow?: TrainingFlowState
   taskSatisfaction?: string | null
   taskSatisfied?: boolean
@@ -217,6 +232,8 @@ export interface CompositeMutationAck {
 }
 
 export interface CompositePublicInfo {
+  roundId?: string | null
+  groupIpWindow?: { opensAt: string; closesAt: string } | null
   id: string
   name: string
   description: string | null
@@ -229,6 +246,8 @@ export interface CompositePublicInfo {
 }
 
 export interface CompositePublicAccessToken {
+  roundId?: string | null
+  groupIpWindow?: { opensAt: string; closesAt: string } | null
   id: string
   token: string | null
   expiresAt: string

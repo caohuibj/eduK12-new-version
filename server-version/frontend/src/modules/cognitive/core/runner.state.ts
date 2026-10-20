@@ -19,7 +19,7 @@ export type RunnerAction =
   | { type: 'LEGACY_READ_ONLY'; session: NonNullable<RunnerState['session']> }
   | { type: 'SESSION_ERROR'; error: RunnerError }
   | { type: 'RUNNER_UNSUPPORTED' }
-  | { type: 'RECOVERY_REQUIRED'; error?: RunnerError }
+  | { type: 'RECOVERY_REQUIRED'; session?: NonNullable<RunnerState['session']>; error?: RunnerError }
   | { type: 'START_RUN' }
   | { type: 'TRIAL_SUBMIT_START' }
   | { type: 'TRIAL_SUBMIT_SUCCESS'; trialIndex: number }
@@ -97,6 +97,9 @@ export function runnerReducer(state: RunnerState, action: RunnerAction): RunnerS
       return {
         ...state,
         status: 'RECOVERY_REQUIRED',
+        // Retain the verified parent descriptor without making a task runnable.
+        session: action.session ?? state.session,
+        taskContext: null,
         error: action.error ?? { code: 'RECOVERY_REQUIRED', message: '检测到未完成的测评，但无法确认进度，请勿重复提交' },
       }
     case 'START_RUN':

@@ -56,6 +56,19 @@ beforeEach(() => {
 })
 
 describe('CompositeAssessmentPage public entry', () => {
+  it('shows the server window while a round query hint grants no credential or automatic start', async () => {
+    mockPublicApi.info.mockResolvedValue({ code: 0, data: { name: '集体作答', roundId: 'server-round', groupIpWindow: {
+      opensAt: '2026-10-19T00:00:00Z', closesAt: '2026-10-19T01:00:00Z',
+    } } })
+    render(<MemoryRouter initialEntries={['/public/composite/token-1?round=untrusted-hint']}><Routes>
+      <Route path="/public/composite/:token" element={<CompositeAssessmentPage />} />
+    </Routes></MemoryRouter>)
+    expect(await screen.findByText(/同 IP 集体作答窗口：/)).toHaveTextContent('最长 48 小时')
+    expect(screen.getByText(/同 IP 集体作答窗口：/)).toHaveTextContent('已有恢复凭证仍按原作答规则恢复')
+    expect(screen.getByPlaceholderText('粘贴保存时获得的恢复凭证（可选）')).toHaveValue('')
+    expect(mockPublicApi.info).toHaveBeenCalledWith('token-1')
+    expect(mockPublicApi.start).not.toHaveBeenCalled()
+  })
   it('clears the previous entry and credential when switching to a closed link in the same page', async () => {
     mockPublicApi.info.mockImplementation((token: string) => Promise.resolve(token === 'token-1'
       ? { code: 0, data: { name: '原开放入口', studyEntryPath: '/public/studies/waves/old/token-1' } }

@@ -21,14 +21,16 @@ const authorizeCurrentExportPrincipal = async (claim: ClaimedExportBatch) => {
 }
 
 export const revalidateAssessmentExport = async (claim: ClaimedExportBatch, ids?: string[]) => {
-  const principal = await authorizeCurrentExportPrincipal(claim)
   if (claim.resourceType === 'TRAINING_ANALYSIS') {
     const options = trainingAnalysisExportOptionsSchema.parse(claim.options.trainingAnalysis)
-    assertTrainingAnalysisExportIdentity(options, { courseId: claim.resourceId, createdBy: claim.createdBy, creatorRole: principal.role })
+    assertTrainingAnalysisExportIdentity(options, { courseId: claim.resourceId, createdBy: claim.createdBy, creatorRole: claim.options.creatorRole })
     if (!claim.options.anonymize) throw new Error('Training analysis export must be anonymized')
     const { revalidateTrainingAnalysisManifest } = await import('../modules/training-analysis/service')
-    await revalidateTrainingAnalysisManifest({ id: principal.userId, role: options.manifest.actor.role }, options.manifest)
-  } else if (claim.resourceType === 'COGNITIVE') {
+    await revalidateTrainingAnalysisManifest({ id: claim.createdBy, role: options.manifest.actor.role }, options.manifest)
+    return { userId: claim.createdBy, role: options.manifest.actor.role }
+  }
+  const principal = await authorizeCurrentExportPrincipal(claim)
+  if (claim.resourceType === 'COGNITIVE') {
     const assignment = await assignmentService.getAssignmentForTeacher(principal.userId, principal.role, claim.resourceId)
     if (isCompositeWrapper(assignment)) throw new Error('Standalone wrapper export forbidden')
   } else {
@@ -46,10 +48,9 @@ export const revalidateAssessmentExport = async (claim: ClaimedExportBatch, ids?
 }
 export const prepareAssessmentExport = async (claim: ClaimedExportBatch) => {
   if (claim.resourceType === 'TRAINING_ANALYSIS') {
-    const principal = await authorizeCurrentExportPrincipal(claim)
-    const actor = { userId: principal.userId, role: principal.role }
     const trainingAnalysis = trainingAnalysisExportOptionsSchema.parse(claim.options.trainingAnalysis)
-    assertTrainingAnalysisExportIdentity(trainingAnalysis, { courseId: claim.resourceId, createdBy: claim.createdBy, creatorRole: actor.role })
+    assertTrainingAnalysisExportIdentity(trainingAnalysis, { courseId: claim.resourceId, createdBy: claim.createdBy, creatorRole: claim.options.creatorRole })
+    const actor = { userId: claim.createdBy, role: trainingAnalysis.manifest.actor.role }
     if (!claim.options.anonymize) throw new Error('Training analysis export must be anonymized')
     // analyzeTrainingCourse validates live authority and the exact manifest in
     // its single source load. The worker still revalidates after serialization.
