@@ -1,7 +1,7 @@
 import {beforeEach,describe,it,expect,vi} from 'vitest'
-const mocks=vi.hoisted(()=>({create:vi.fn(),read:vi.fn(),review:vi.fn(),publish:vi.fn(),mfa:vi.fn()}))
+const mocks=vi.hoisted(()=>({status:vi.fn(),create:vi.fn(),read:vi.fn(),review:vi.fn(),publish:vi.fn(),mfa:vi.fn()}))
 vi.mock('../../modules/survey/reference-candidates.service',async importOriginal=>({...await importOriginal<object>(),
-  createSurveyReferenceCandidate:mocks.create,readSurveyReferenceCandidate:mocks.read,
+  readSurveyReferenceRequest:mocks.status,createSurveyReferenceCandidate:mocks.create,readSurveyReferenceCandidate:mocks.read,
   reviewSurveyReferenceCandidate:mocks.review,publishSurveyReferenceCandidate:mocks.publish}))
 vi.mock('../../modules/survey/analytics.export.service',()=>({assertRecentSurveyMfa:mocks.mfa}))
 import {surveyAnalyticsRouter} from '../../modules/survey/analytics.routes'
@@ -10,8 +10,8 @@ import {ContentReleaseError} from '../../modules/measurement-content/release'
 import {SurveyAnalyticsError} from '../../modules/survey/analytics.errors'
 const id='00000000-0000-4000-8000-000000000001'
 const evidence={methodRationale:'rationale',inclusionRule:'included',missingness:'missing',repeatResponses:'one',organizationClustering:'cluster',administrationDifferences:'same',uncertainty:'uncertain',applicability:'local',sampleAdequacy:'exploratory'}
-const create=()=>({grantId:id,instrumentKey:'scale',scoreKey:'total',referenceVersion:'v1',evidence})
-const review=()=>({grantId:id,decision:'APPROVED',statement:'Examined local descriptive evidence'})
+const create=()=>({requestId:id,grantId:id,instrumentKey:'scale',scoreKey:'total',referenceVersion:'v1',evidence})
+const review=()=>({requestId:id,candidateHash:'a'.repeat(64),grantId:id,decision:'APPROVED',statement:'Examined local descriptive evidence'})
 const publish=()=>({grantId:id,reviewId:id,localKey:'local',version:'v1'})
 async function invoke(suffix='',body:unknown=create(),method='post'){
  const path='/:pid/analytics/waves/:wid/reference-candidates'+suffix
@@ -50,6 +50,17 @@ describe('private descriptive reference route handlers (no HTTP transport)',()=>
   expect((await invoke('/:candidateId/reviews',{...review(),reviewerId:id})).status).toBe(400)
   expect((await invoke('/:candidateId/publish',{...publish(),purpose:'NEW_ADMINISTRATION'})).status).toBe(400)
   expect(mocks.create).not.toHaveBeenCalled();expect(mocks.review).not.toHaveBeenCalled();expect(mocks.publish).not.toHaveBeenCalled()
+ })
+ it('checks status using original strict bodies and authenticated scope after MFA',async()=>{
+  mocks.status.mockResolvedValue({status:'MISSING',requestId:id})
+  expect((await invoke('/request-status',create())).payload.data).toEqual({status:'MISSING',requestId:id})
+  expect(mocks.status).toHaveBeenCalledWith('authenticated-user','CREATE',{...create(),projectId:id,waveId:id})
+  expect((await invoke('/:candidateId/reviews/request-status',review())).status).toBe(200)
+  expect(mocks.status).toHaveBeenCalledWith('authenticated-user','REVIEW',{...review(),projectId:id,waveId:id,candidateId:id})
+  expect(mocks.mfa.mock.invocationCallOrder[0]).toBeLessThan(mocks.status.mock.invocationCallOrder[0])
+  expect((await invoke('/request-status',{...create(),actorId:id})).status).toBe(400)
+  mocks.status.mockRejectedValueOnce(new ContentReleaseError('REFERENCE_REQUEST_INPUT_MISMATCH'))
+  expect((await invoke('/request-status',create())).status).toBe(409)
  })
  it('fails MFA/capability/source conflicts closed and keeps unknown failures as 500',async()=>{
   mocks.mfa.mockImplementationOnce(()=>{throw new SurveyAnalyticsError(403,'recent MFA required')})

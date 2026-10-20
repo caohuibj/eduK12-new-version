@@ -1,4 +1,4 @@
-import {createSurveyReferenceCandidate,readSurveyReferenceCandidate,reviewSurveyReferenceCandidate,publishSurveyReferenceCandidate,
+import {readSurveyReferenceRequest,createSurveyReferenceCandidate,readSurveyReferenceCandidate,reviewSurveyReferenceCandidate,publishSurveyReferenceCandidate,
   referenceCandidateView,surveyReferenceCreateSchema,surveyReferenceReviewSchema,surveyReferencePublishSchema} from './reference-candidates.service'
 import {ContentReleaseError} from '../measurement-content/release'
 import {createSurveyReinterpretation,readSurveyReinterpretation} from './reinterpretation.service'
@@ -161,6 +161,16 @@ const candidatePath='/:pid/analytics/waves/:wid/reference-candidates'
 const referenceCreateBody=surveyReferenceCreateSchema.omit({projectId:true,waveId:true})
 const referenceReviewBody=surveyReferenceReviewSchema.omit({projectId:true,waveId:true,candidateId:true})
 const referencePublishBody=surveyReferencePublishSchema.omit({projectId:true,waveId:true,candidateId:true})
+surveyAnalyticsRouter.post(candidatePath+'/request-status',wrap(async req=>{
+  assertRecentSurveyMfa(req)
+  return readSurveyReferenceRequest(req.user!.userId,'CREATE',{...referenceCreateBody.parse(req.body),
+    projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid)})
+}))
+surveyAnalyticsRouter.post(candidatePath+'/:candidateId/reviews/request-status',wrap(async req=>{
+  assertRecentSurveyMfa(req)
+  return readSurveyReferenceRequest(req.user!.userId,'REVIEW',{...referenceReviewBody.parse(req.body),
+    projectId:id.parse(req.params.pid),waveId:id.parse(req.params.wid),candidateId:id.parse(req.params.candidateId)})
+}))
 surveyAnalyticsRouter.post(candidatePath,wrap(async req=>{
   assertRecentSurveyMfa(req)
   const result=await createSurveyReferenceCandidate(req.user!.userId,{...referenceCreateBody.parse(req.body),

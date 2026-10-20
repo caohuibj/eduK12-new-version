@@ -1,3 +1,4 @@
+import {findReferenceRequest,lockReferenceRequest,storeReferenceRequest,referenceRequestHash,assertReferenceRequestIdentity,type ReferenceRequest} from './reference-requests.repository'
 import { Prisma } from '@prisma/client'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
@@ -15,7 +16,7 @@ import { SurveyAnalyticsError } from './analytics.errors'
 const text=z.string().trim().min(1).max(4000)
 const selector=z.string().trim().min(1).max(240)
 export const surveyReferenceCreateSchema=z.object({
-  projectId:z.string().uuid(),waveId:z.string().uuid(),grantId:z.string().uuid(),
+  requestId:z.string().uuid(),projectId:z.string().uuid(),waveId:z.string().uuid(),grantId:z.string().uuid(),
   instrumentKey:selector,scoreKey:selector,referenceVersion:selector,
   evidence:z.object({methodRationale:text,inclusionRule:text,missingness:text,repeatResponses:text,
     organizationClustering:text,administrationDifferences:text,uncertainty:text,applicability:text,sampleAdequacy:text}).strict(),
@@ -78,8 +79,11 @@ async function sourceFence(tx:Prisma.TransactionClient,source:SurveyReferenceSou
  */
 export async function createSurveyReferenceCandidate(actorId:string,raw:unknown){
   const input=surveyReferenceCreateSchema.parse(raw)
-  const {binding,sourceRevision,authority,measurement}=await prisma.$transaction(async tx=>{
+  const inputHash=referenceRequestHash(actorId,'CREATE',input)
+  const initial=await prisma.$transaction(async tx=>{
     await authorizedProject(tx,actorId,input.projectId,false)
+    const replay=await recoverReferenceRequest(tx,actorId,input,{operation:'CREATE',inputHash})
+    if(replay)return {kind:'REPLAY' as const,replay}
     // Obtain only the persisted binding before accessing samples. The reader
     // later verifies publication digests and must return this exact identity.
     const {binding,sourceRevision}=await readBinding(tx,input)
@@ -94,8 +98,10 @@ export async function createSurveyReferenceCandidate(actorId:string,raw:unknown)
       ||measurement.provenance.source||measurement.contentHash!==binding.contentHash
       ||measurement.content.measurementHash!==binding.measurementHash
       ||!measurement.content.metrics.some(metric=>metric.metricKey===input.scoreKey))fail('REFERENCE_SURVEY_MEASUREMENT_MISMATCH')
-    return {binding,sourceRevision,authority,measurement}
+    return {kind:'NEW' as const,binding,sourceRevision,authority,measurement}
   },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
+    if(initial.kind==='REPLAY')return {candidateId:initial.replay.row.candidate_id,candidate:initial.replay.candidate,exclusionCounts:initial.replay.row.exclusion_counts!}
+    const {binding,sourceRevision,authority,measurement}=initial
     const source=await loadSurveySource({actorUserId:actorId,projectId:input.projectId,waveIds:[input.waveId],
       maxFinals:250,pageMode:true,stableIdCursor:true,selectRaw:false,
       selectScore:{instrumentKey:input.instrumentKey,scoreKey:input.scoreKey},includeAttendance:false,
@@ -141,15 +147,21 @@ export async function createSurveyReferenceCandidate(actorId:string,raw:unknown)
     // Lock current owner/project and capabilities through commit; a withdrawal
     // or quality change since the reader returned must fail this revision fence.
     return prisma.$transaction(async tx=>{
+    await lockReferenceRequest(tx,input.requestId)
     await authorizedProject(tx,actorId,input.projectId,false)
+    const replay=await recoverReferenceRequest(tx,actorId,input,{operation:'CREATE',inputHash})
+    if(replay)return {candidateId:replay.row.candidate_id,candidate:replay.candidate,exclusionCounts:replay.row.exclusion_counts!}
     await assertContentAuthority(tx,authority)
     await sourceFence(tx,candidate.sourceBinding!,candidate.measurement)
-    return {...await storeReferenceCandidate(tx,candidate,authorizedFacts),exclusionCounts}
+    const result=await storeReferenceCandidate(tx,candidate,authorizedFacts)
+    await storeReferenceRequest(tx,{request_id:input.requestId,actor_id:actorId,project_id:input.projectId,wave_id:input.waveId,
+      operation:'CREATE',input_hash:inputHash,candidate_id:result.candidateId,review_id:null,exclusion_counts:exclusionCounts})
+    return {...result,exclusionCounts}
   },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:5000})
 }
 
 export const surveyReferenceActionSchema=z.object({projectId:z.string().uuid(),waveId:z.string().uuid(),candidateId:z.string().uuid(),grantId:z.string().uuid()}).strict()
-export const surveyReferenceReviewSchema=surveyReferenceActionSchema.extend({decision:z.enum(['APPROVED','REJECTED']),statement:text}).strict()
+export const surveyReferenceReviewSchema=surveyReferenceActionSchema.extend({requestId:z.string().uuid(),candidateHash:z.string().regex(/^[a-f0-9]{64}$/),decision:z.enum(['APPROVED','REJECTED']),statement:text}).strict()
 export const surveyReferencePublishSchema=surveyReferenceActionSchema.extend({reviewId:z.string().uuid(),localKey:z.string().trim().min(1).max(165),version:selector}).strict()
 
 async function readCandidate(tx:Prisma.TransactionClient,id:string){
@@ -168,7 +180,7 @@ async function readCandidate(tx:Prisma.TransactionClient,id:string){
 }
 
 async function authorizeCandidate(tx:Prisma.TransactionClient,actorId:string,grantId:string,
-  capability:'reference.review'|'reference.publish',candidate:ReferenceCandidate,source:SurveyReferenceSourceBinding){
+  capability:'reference.analyze'|'reference.review'|'reference.publish',candidate:ReferenceCandidate,source:SurveyReferenceSourceBinding,verifySource=true){
   await authorizedProject(tx,actorId,source.projectId,false)
   if(candidate.scope.kind!=='PRIVATE'||candidate.scope.ownerId!==actorId)fail('REFERENCE_SURVEY_CANDIDATE_REQUIRED')
   await assertContentAuthority(tx,{actorId,grantId,capability,scope:{product:'SURVEY',scopeKind:'PROJECT',scopeId:source.projectId,
@@ -180,18 +192,22 @@ async function authorizeCandidate(tx:Prisma.TransactionClient,actorId:string,gra
       scoringVersion:measurement.content.scoringVersion,measurementHash:measurement.content.measurementHash})!==canonicalHash(candidate.measurement)
     ||({SCALE:'scale',COGNITIVE:'cognitive',SJT:'sjt'} as const)[measurement.family]!==candidate.definition.instrumentType
     ||!measurement.content.metrics.some(metric=>metric.metricKey===source.scoreKey))fail('REFERENCE_SURVEY_MEASUREMENT_MISMATCH')
-  await sourceFence(tx,source,candidate.measurement)
+  if(verifySource)await sourceFence(tx,source,candidate.measurement)
   return measurement.family
 }
 
 async function withVerifiedCandidate<T>(actorId:string,input:z.infer<typeof surveyReferenceActionSchema>,capability:'reference.review'|'reference.publish',
-  write:(tx:Prisma.TransactionClient,candidate:ReferenceCandidate,facts:Map<string,AuthorizedReferenceFact>)=>Promise<T>){
+  write:(tx:Prisma.TransactionClient,candidate:ReferenceCandidate,facts:Map<string,AuthorizedReferenceFact>)=>Promise<T>,
+  recover?:(tx:Prisma.TransactionClient,lock:boolean)=>Promise<T|null>){
   const initial=await prisma.$transaction(async tx=>{
+    const replay=await recover?.(tx,false)
+    if(replay)return {kind:'REPLAY' as const,replay}
     const saved=await readCandidate(tx,input.candidateId)
     if(saved.source.projectId!==input.projectId||saved.source.waveId!==input.waveId)fail('REFERENCE_SURVEY_CANDIDATE_REQUIRED')
     const family=await authorizeCandidate(tx,actorId,input.grantId,capability,saved.candidate,saved.source)
-    return {...saved,family}
+    return {kind:'NEW' as const,...saved,family}
   },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
+  if(initial.kind==='REPLAY')return initial.replay
   const binding=initial.source
   const source=await loadSurveySource({actorUserId:actorId,projectId:binding.projectId,waveIds:[binding.waveId],maxFinals:250,
     pageMode:true,stableIdCursor:true,selectRaw:false,selectScore:{instrumentKey:binding.instrumentKey,scoreKey:binding.scoreKey},includeAttendance:false,
@@ -207,6 +223,8 @@ async function withVerifiedCandidate<T>(actorId:string,input:z.infer<typeof surv
   if(prepareReferenceCandidate(payload,facts).candidateHash!==candidateHash||facts.size!==initial.candidate.sampleManifest.length)
     fail('REFERENCE_REVIEW_STALE')
   return prisma.$transaction(async tx=>{
+    const replay=await recover?.(tx,true)
+    if(replay)return replay
     const current=await readCandidate(tx,input.candidateId)
     if(current.candidate.candidateHash!==candidateHash)fail('REFERENCE_REVIEW_STALE')
     await authorizeCandidate(tx,actorId,input.grantId,capability,current.candidate,current.source)
@@ -217,9 +235,20 @@ async function withVerifiedCandidate<T>(actorId:string,input:z.infer<typeof surv
 /** Private descriptive review only. Same-user review still requires its own current review capability. */
 export async function reviewSurveyReferenceCandidate(actorId:string,raw:unknown){
   const input=surveyReferenceReviewSchema.parse(raw)
-  return withVerifiedCandidate(actorId,input,'reference.review',async(tx,candidate)=>({reviewId:await storeReferenceReview(tx,input.candidateId,{
-    candidateHash:candidate.candidateHash,reviewerId:actorId,decision:input.decision,statement:input.statement,reviewedAt:new Date().toISOString(),
-  })}))
+  const inputHash=referenceRequestHash(actorId,'REVIEW',input)
+  return withVerifiedCandidate(actorId,input,'reference.review',async(tx,candidate)=>{
+    if(candidate.candidateHash!==input.candidateHash)fail('REFERENCE_REVIEW_STALE')
+    const reviewId=await storeReferenceReview(tx,input.candidateId,{
+      candidateHash:candidate.candidateHash,reviewerId:actorId,decision:input.decision,statement:input.statement,reviewedAt:new Date().toISOString(),
+    })
+    await storeReferenceRequest(tx,{request_id:input.requestId,actor_id:actorId,project_id:input.projectId,wave_id:input.waveId,
+      operation:'REVIEW',input_hash:inputHash,candidate_id:input.candidateId,review_id:reviewId,exclusion_counts:null})
+    return {reviewId}
+  },async(tx,lock)=>{
+    if(lock)await lockReferenceRequest(tx,input.requestId)
+    const replay=await recoverReferenceRequest(tx,actorId,input,{operation:'REVIEW',inputHash})
+    return replay?{reviewId:replay.row.review_id!}:null
+  })
 }
 /** Existing immutable candidate/review records are revalidated; caller cannot supply an approval or purpose. */
 export async function publishSurveyReferenceCandidate(actorId:string,raw:unknown){
@@ -240,4 +269,42 @@ export async function readSurveyReferenceCandidate(actorId:string,raw:unknown){
   return withVerifiedCandidate(actorId,input,'reference.review',async(_tx,candidate)=>({
     candidateId:input.candidateId,...referenceCandidateView(candidate),
   }))
+}
+
+/** Recovery never re-analyzes historical samples. Current owner and capability
+ * still gate every pointer, including retries after a response was lost. */
+async function recoverReferenceRequest(tx:Prisma.TransactionClient,actorId:string,
+  input:{requestId:string;projectId:string;waveId:string;grantId:string},
+  expected:{operation:ReferenceRequest['operation'];inputHash:string}){
+  const row=await findReferenceRequest(tx,input.requestId)
+  if(!row)return null
+  assertReferenceRequestIdentity(row,actorId,input,expected)
+  const {candidate,source}=await readCandidate(tx,row.candidate_id)
+  if(source.projectId!==input.projectId||source.waveId!==input.waveId)fail('REFERENCE_REQUEST_SCOPE_MISMATCH')
+  await authorizeCandidate(tx,actorId,input.grantId,row.operation==='CREATE'?'reference.analyze':'reference.review',candidate,source,false)
+  return {row,candidate}
+}
+
+/** Exact status requests reuse the original strict input and hash, not a UUID
+ * enumeration endpoint. Missing is returned only after current scope authority. */
+export async function readSurveyReferenceRequest(actorId:string,operation:'CREATE'|'REVIEW',raw:unknown){
+  const input=operation==='CREATE'?surveyReferenceCreateSchema.parse(raw):surveyReferenceReviewSchema.parse(raw)
+  return prisma.$transaction(async tx=>{
+    await authorizedProject(tx,actorId,input.projectId,false)
+    if('candidateId' in input){
+      const saved=await readCandidate(tx,input.candidateId)
+      if(saved.source.projectId!==input.projectId||saved.source.waveId!==input.waveId)fail('REFERENCE_SURVEY_CANDIDATE_REQUIRED')
+      await authorizeCandidate(tx,actorId,input.grantId,'reference.review',saved.candidate,saved.source,false)
+      if(saved.candidate.candidateHash!==input.candidateHash)fail('REFERENCE_REVIEW_STALE')
+    }else{
+      const {binding}=await readBinding(tx,input)
+      await assertContentAuthority(tx,{actorId,grantId:input.grantId,capability:'reference.analyze',scope:{product:'SURVEY',
+        scopeKind:'PROJECT',scopeId:input.projectId,resourceKind:'reference',resourceKeys:[binding.releaseId]}})
+    }
+    const replay=await recoverReferenceRequest(tx,actorId,input,{operation,inputHash:referenceRequestHash(actorId,operation,input)})
+    if(!replay)return {status:'MISSING' as const,requestId:input.requestId}
+    return {status:'COMPLETED' as const,requestId:input.requestId,operation,
+      result:operation==='CREATE'?{candidateId:replay.row.candidate_id,...referenceCandidateView(replay.candidate),exclusionCounts:replay.row.exclusion_counts}
+        :{reviewId:replay.row.review_id!}}
+  },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:5000})
 }

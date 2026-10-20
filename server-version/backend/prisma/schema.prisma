@@ -9,6 +9,7 @@ datasource db {
 }
 
 model User {
+  surveyReferenceRequests SurveyReferenceRequest[]
   contentCapabilityGrants       ContentCapabilityGrant[] @relation("ContentCapabilitySubject")
   issuedContentCapabilityGrants ContentCapabilityGrant[] @relation("ContentCapabilityIssuer")
   revokedContentCapabilityGrants ContentCapabilityGrant[] @relation("ContentCapabilityRevoker")
@@ -2886,6 +2887,7 @@ model SurveyMfaRecoveryCode {
   @@map("survey_mfa_recovery_codes")
 }
 model SurveyProject {
+  referenceRequests SurveyReferenceRequest[]
   reportDrafts SurveyReportDraft[]
   instruments    SurveyInstrumentDraft[]
   waves          SurveyWave[]
@@ -2962,6 +2964,7 @@ model SurveyPublication {
   @@map("survey_publications")
 }
 model SurveyWave {
+  referenceRequests SurveyReferenceRequest[]
   id              String        @id
   projectId       String        @map("project_id")
   project         SurveyProject @relation(fields:[projectId],references:[id],onDelete:Restrict)
@@ -4003,6 +4006,7 @@ model MeasurementContentReleaseEvent {
 }
 
 model MeasurementReferenceCandidate {
+  surveyRequests SurveyReferenceRequest[]
   id String @id
   candidateHash String @unique @map("candidate_hash")
   measurementReleaseId String @map("measurement_release_id")
@@ -4015,6 +4019,7 @@ model MeasurementReferenceCandidate {
   @@map("measurement_reference_candidates")
 }
 model MeasurementReferenceReview {
+  surveyRequests SurveyReferenceRequest[]
   id String @id
   candidateId String @map("candidate_id")
   candidate MeasurementReferenceCandidate @relation(fields:[candidateId],references:[id],onDelete:Restrict,onUpdate:NoAction)
@@ -4093,4 +4098,25 @@ model SurveyInterpretationArtifact {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   @@index([finalId,createdAt,id],map:"survey_interpretation_artifacts_final_time_idx")
   @@map("survey_interpretation_artifacts")
+}
+
+// Immutable operation-to-result pointers. CHECK constraints and immutability
+// trigger are defined in the additive survey_reference_requests migration.
+model SurveyReferenceRequest {
+  requestId String @id @map("request_id") @db.Uuid
+  actorId String @map("actor_id")
+  actor User @relation(fields:[actorId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  projectId String @map("project_id")
+  project SurveyProject @relation(fields:[projectId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  waveId String @map("wave_id")
+  wave SurveyWave @relation(fields:[waveId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  operation String
+  inputHash String @map("input_hash")
+  candidateId String @map("candidate_id")
+  candidate MeasurementReferenceCandidate @relation(fields:[candidateId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  reviewId String? @map("review_id")
+  review MeasurementReferenceReview? @relation(fields:[reviewId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  exclusionCounts Json? @map("exclusion_counts")
+  createdAt DateTime @default(dbgenerated("clock_timestamp()")) @map("created_at") @db.Timestamptz(6)
+  @@map("survey_reference_requests")
 }

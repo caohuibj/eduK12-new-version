@@ -1,20 +1,23 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest'
+import {referenceRequestHash} from '../../modules/survey/reference-requests.repository'
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import {prepareReferenceCandidate} from '../../modules/measurement-content/reference-candidate'
 import type {SurveySourceProjection} from '../../modules/survey/analytics.source'
-const mocks=vi.hoisted(()=>({transaction:vi.fn(),owner:vi.fn(),authority:vi.fn(),release:vi.fn(),load:vi.fn(),store:vi.fn(),publish:vi.fn(),
+const mocks=vi.hoisted(()=>({findRequest:vi.fn(),lockRequest:vi.fn(),storeRequest:vi.fn(),transaction:vi.fn(),owner:vi.fn(),authority:vi.fn(),release:vi.fn(),load:vi.fn(),store:vi.fn(),publish:vi.fn(),
   tx:{$queryRaw:vi.fn(),$executeRaw:vi.fn(),surveyProject:{findUnique:vi.fn()},surveyWaveFinal:{count:vi.fn()}}}))
+vi.mock('../../modules/survey/reference-requests.repository',async importOriginal=>({...await importOriginal<object>(),findReferenceRequest:mocks.findRequest,lockReferenceRequest:mocks.lockRequest,storeReferenceRequest:mocks.storeRequest}))
 vi.mock('../../config/database',()=>({prisma:{$transaction:mocks.transaction}}))
 vi.mock('../../modules/survey/builder.service',()=>({authorizedProject:mocks.owner}))
 vi.mock('../../modules/measurement-content/content-authority.repository',()=>({assertContentAuthority:mocks.authority}))
 vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.release,publishContentRelease:mocks.publish}))
 vi.mock('../../modules/survey/analytics.source',()=>({loadSurveySource:mocks.load}))
 vi.mock('../../modules/measurement-content/reference-candidate.repository',async importOriginal=>({...await importOriginal<object>(),storeReferenceCandidate:mocks.store}))
-import {createSurveyReferenceCandidate,reviewSurveyReferenceCandidate,publishSurveyReferenceCandidate,readSurveyReferenceCandidate} from '../../modules/survey/reference-candidates.service'
+import {createSurveyReferenceCandidate,reviewSurveyReferenceCandidate,publishSurveyReferenceCandidate,readSurveyReferenceCandidate,readSurveyReferenceRequest} from '../../modules/survey/reference-candidates.service'
 const pid='11111111-1111-4111-8111-111111111111',wid='22222222-2222-4222-8222-222222222222'
 const mid='33333333-3333-4333-8333-333333333333',gid='44444444-4444-4444-8444-444444444444'
 const binding={releaseId:mid,contentHash:'a'.repeat(64),measurementHash:'b'.repeat(64)}
-const input=()=>({projectId:pid,waveId:wid,grantId:gid,instrumentKey:'instrument',scoreKey:'effort',referenceVersion:'1',
+const requestId='77777777-7777-4777-8777-777777777777'
+const input=()=>({requestId,projectId:pid,waveId:wid,grantId:gid,instrumentKey:'instrument',scoreKey:'effort',referenceVersion:'1',
   evidence:{methodRationale:'Project exploratory sample description',inclusionRule:'Included complete FINAL only',missingness:'Exclude missing numeric scores',
     repeatResponses:'One completed attempt per wave',organizationClustering:'One project sample',administrationDifferences:'Same frozen protocol',
     uncertainty:'Descriptive only',applicability:'Project sample only',sampleAdequacy:'Exploratory, not population inference'}})
@@ -28,7 +31,7 @@ const source=():SurveySourceProjection=>({projectId:pid,collectionMode:'SINGLE_U
     researchCode:null,sourceFinalHash:String(i+1).repeat(64),sourceVerified:true,completedAt:'2026-10-20T03:00:00Z',value,missingReason:null,status:'calculated',quality:{status:'interpretable',flags:{}},
     measurement:{instrumentKey:'instrument',scoreKey:'effort',scoringDigest:'s',responseSignature:'r',respondentType:'research',unit:'points'}}))})
 beforeEach(()=>{
-  vi.resetAllMocks();mocks.transaction.mockImplementation((fn:(tx:typeof mocks.tx)=>unknown)=>fn(mocks.tx))
+  vi.resetAllMocks();mocks.findRequest.mockResolvedValue(null);mocks.transaction.mockImplementation((fn:(tx:typeof mocks.tx)=>unknown)=>fn(mocks.tx))
   mocks.owner.mockResolvedValue({id:pid,status:'CLOSED'});mocks.authority.mockResolvedValue({grantId:gid,version:1})
   mocks.tx.$queryRaw.mockResolvedValue([{measurement:binding,source_revision:7}]);mocks.release.mockResolvedValue(release())
   mocks.load.mockResolvedValue(source());mocks.tx.surveyProject.findUnique.mockResolvedValue({revision:7});mocks.tx.surveyWaveFinal.count.mockResolvedValue(2)
@@ -185,7 +188,7 @@ describe('private Survey reference review and publish current-fact fences',()=>{
     })
     mocks.publish.mockResolvedValue({releaseId:'published'})
   })
-  const reviewInput=()=>({projectId:pid,waveId:wid,candidateId:cid,grantId:gid,decision:'APPROVED',statement:'Reviewed observed sample'})
+  const reviewInput=()=>({requestId,candidateHash:saved.candidateHash,projectId:pid,waveId:wid,candidateId:cid,grantId:gid,decision:'APPROVED',statement:'Reviewed observed sample'})
   const publishInput=()=>({projectId:pid,waveId:wid,candidateId:cid,reviewId:rid,grantId:gid,localKey:'local',version:'1'})
   it('rejects candidate path project or wave substitution before source read',async()=>{
     await expect(reviewSurveyReferenceCandidate('actor',{...reviewInput(),projectId:wid})).rejects.toThrow('REFERENCE_SURVEY_CANDIDATE_REQUIRED')
@@ -284,5 +287,75 @@ describe('private Survey reference review and publish current-fact fences',()=>{
     saved.evidence.softwareVersion='OTHER'
     await expect(publishSurveyReferenceCandidate('actor',publishInput())).rejects.toThrow('REFERENCE_SURVEY_CANDIDATE_REQUIRED')
     expect(mocks.load).not.toHaveBeenCalled()
+  })
+})
+
+
+describe('exact reference request recovery',()=>{
+  async function completed(){
+    const result=await createSurveyReferenceCandidate('actor',input())
+    const row=mocks.storeRequest.mock.calls[0][1]
+    vi.clearAllMocks()
+    mocks.findRequest.mockResolvedValue(row)
+    mocks.tx.$queryRaw.mockImplementation(async query=>query.strings.join(' ').includes('measurement_reference_candidates')
+      ?[{payload:result.candidate}]:[{measurement:binding,source_revision:99}])
+    mocks.load.mockRejectedValue(new Error('REPLAY_MUST_NOT_READ_SAMPLES'))
+    return {result,row}
+  }
+  it('returns the immutable create result after response loss despite newer source revision',async()=>{
+    const {result}=await completed()
+    expect(await createSurveyReferenceCandidate('actor',input())).toEqual(result)
+    expect(mocks.load).not.toHaveBeenCalled();expect(mocks.store).not.toHaveBeenCalled()
+    expect(mocks.tx.surveyWaveFinal.count).not.toHaveBeenCalled()
+    expect(mocks.authority).toHaveBeenCalledWith(mocks.tx,expect.objectContaining({capability:'reference.analyze'}))
+  })
+  it('rejects same UUID with changed evidence or actor/scope',async()=>{
+    await completed()
+    await expect(createSurveyReferenceCandidate('actor',{...input(),referenceVersion:'2'})).rejects.toThrow('REFERENCE_REQUEST_INPUT_MISMATCH')
+    await expect(createSurveyReferenceCandidate('other',input())).rejects.toThrow('REFERENCE_REQUEST_SCOPE_MISMATCH')
+    await expect(createSurveyReferenceCandidate('actor',{...input(),waveId:pid})).rejects.toThrow('REFERENCE_REQUEST_SCOPE_MISMATCH')
+    expect(mocks.load).not.toHaveBeenCalled()
+  })
+  it('does not replay after current owner or capability revocation',async()=>{
+    await completed()
+    mocks.owner.mockRejectedValueOnce(new Error('OWNER_REVOKED'))
+    await expect(createSurveyReferenceCandidate('actor',input())).rejects.toThrow('OWNER_REVOKED')
+    mocks.authority.mockRejectedValueOnce(new Error('CAPABILITY_REVOKED'))
+    await expect(createSurveyReferenceCandidate('actor',input())).rejects.toThrow('CAPABILITY_REVOKED')
+    expect(mocks.load).not.toHaveBeenCalled()
+  })
+  it('status is safe and missing requires authority before disclosure',async()=>{
+    await completed()
+    const result=await readSurveyReferenceRequest('actor','CREATE',input())
+    expect(result.status).toBe('COMPLETED');expect(result.result).toHaveProperty('candidateId')
+    expect(JSON.stringify(result)).not.toContain('attempt0');expect(result.result).not.toHaveProperty('sampleManifest')
+    mocks.findRequest.mockResolvedValue(null)
+    mocks.authority.mockRejectedValueOnce(new Error('DENIED'))
+    await expect(readSurveyReferenceRequest('actor','CREATE',input())).rejects.toThrow('DENIED')
+    expect(await readSurveyReferenceRequest('actor','CREATE',input())).toEqual({status:'MISSING',requestId})
+    expect(mocks.load).not.toHaveBeenCalled()
+  })
+  it('rechecks the atomic winner under the final UUID lock before source fence or inserts',async()=>{
+    const {row,result}=await completed()
+    mocks.load.mockResolvedValue(source())
+    mocks.tx.$queryRaw.mockImplementation(async query=>query.strings.join(' ').includes('measurement_reference_candidates')
+      ?[{payload:result.candidate}]:[{measurement:binding,source_revision:7}])
+    mocks.findRequest.mockResolvedValueOnce(null).mockResolvedValueOnce(row)
+    expect(await createSurveyReferenceCandidate('actor',input())).toEqual(result)
+    expect(mocks.lockRequest).toHaveBeenCalledExactlyOnceWith(mocks.tx,requestId)
+    expect(mocks.store).not.toHaveBeenCalled();expect(mocks.storeRequest).not.toHaveBeenCalled()
+    expect(mocks.tx.surveyWaveFinal.count).not.toHaveBeenCalled()
+  })
+  it('review retries return the same review ID and bind decision, statement and candidate hash',async()=>{
+    const {result}=await completed()
+    const review={projectId:pid,waveId:wid,grantId:gid,requestId,candidateId:cid,candidateHash:result.candidate.candidateHash,
+      decision:'APPROVED',statement:'Verified descriptive sample'}
+    mocks.findRequest.mockResolvedValue({request_id:requestId,actor_id:'actor',project_id:pid,wave_id:wid,operation:'REVIEW',
+      input_hash:referenceRequestHash('actor','REVIEW',review),candidate_id:cid,review_id:rid,exclusion_counts:null})
+    expect(await reviewSurveyReferenceCandidate('actor',review)).toEqual({reviewId:rid})
+    expect(await readSurveyReferenceRequest('actor','REVIEW',review)).toMatchObject({status:'COMPLETED',result:{reviewId:rid}})
+    for(const changed of [{decision:'REJECTED'},{statement:'Changed statement'},{candidateHash:'e'.repeat(64)}])
+      await expect(reviewSurveyReferenceCandidate('actor',{...review,...changed})).rejects.toThrow('REFERENCE_REQUEST_INPUT_MISMATCH')
+    expect(mocks.load).not.toHaveBeenCalled();expect(mocks.tx.$executeRaw).not.toHaveBeenCalled()
   })
 })

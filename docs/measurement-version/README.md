@@ -498,3 +498,20 @@ retains the UUID after subsequent refusals. In-flight storage is pessimistically
 marked unknown; old records without this marker are also treated as unknown.
 Fourteen component contracts cover both step-up → rejection and step-up → unknown
 transport → rejection paths.
+
+### Reference create/review response-loss recovery
+
+Create and review require a request UUID; review also fixes the candidate hash.
+The normalized body, actor and operation are hashed. A short transaction-scoped
+UUID advisory lock plus the exact unique request key makes the candidate/review
+and pointer mapping atomic. A changed body is rejected; a completed retry returns
+the original result without re-analyzing historical samples. Current owner,
+measurement scope and the operation's capability still gate every recovery.
+
+Exact POST request-status accepts the original strict body, returns a safe completed
+result or MISSING only after current authorization. MISSING is not cancellation:
+an earlier computation may still finish; only the identical UUID/body may retry.
+The mapping stores result pointers and exclusion counts, never another sample or
+release package. 49 focused service/route/helper contracts, backend strict types
+and Prisma schema validation passed. The additive migration and real concurrent
+winner/rollback behavior remain for concentrated database acceptance.
