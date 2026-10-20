@@ -60,7 +60,7 @@
       "repository": "caohuibj/eduK12-new-version",
       "workflowPath": ".github/workflows/ci-measurement-browser.yml",
       "branch": "ci/measurement-browser-20261020",
-      "jobName": "build changed formal-reference frontend once",
+      "jobName": "build changed measurement frontend once",
       "artifactName": "measurement-39425861081-4286a59b649c37662cdbc0e7ca4e41103ad4e4f2-frontend-build",
       "receiptSha256": "d467a7312ae1daa2672b5a1ff635c9561408b65116a3cad5cbabd0a3551430b4",
       "sourceTree": "a4fa70dfd71450f7840708377a4815c073bfbc9b",
