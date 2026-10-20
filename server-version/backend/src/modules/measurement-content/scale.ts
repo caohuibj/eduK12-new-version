@@ -18,6 +18,7 @@ export interface ScaleReleaseSource {
   scope: ReleaseInput['scope']
   sourceReleaseId?: string | null
   provenance?: Record<string,unknown>
+  presentationMode?: 'ONE_BY_ONE' | 'ALL_AT_ONCE' | 'RUNNER_DEFAULT'
 }
 /** Training definitions and Survey's existing compileResearchScale both enter here.
  * Import format stays with each workbench; this does not add a second scorer.
@@ -30,6 +31,7 @@ export function scaleMeasurementRelease(input: ScaleReleaseSource): ReleaseInput
   // All runtime measurement content remains; report/reference/rights/catalog do not.
   const executable = JSON.parse(JSON.stringify({
     schemaVersion:d.schemaVersion,respondentType:d.respondentType,display:d.display,
+    presentationMode:input.presentationMode??'RUNNER_DEFAULT',
     responseSets:d.responseSets,items:d.items,scoring:d.scoring,
     ...(d.versionAxes ? {versionAxes:d.versionAxes}:{}),
   })) as Record<string,unknown>
@@ -58,4 +60,16 @@ export async function publishScaleMeasurement(db:Prisma.TransactionClient,input:
   const release = await publishContentRelease(db,scaleMeasurementRelease(input),actorId)
   if (release.layer !== 'MEASUREMENT') throw new ContentReleaseError('CONTENT_SCALE_LAYER_MISMATCH')
   return release
+}
+
+/** Catalog source version is not the private draft's edit revision. */
+export function surveyScaleReleaseContext(unit:{draftRevision:number;sourceProvenance?:Record<string,unknown>;displayDefinition:unknown}):{instrumentVersion:string;presentationMode:'ONE_BY_ONE'|'ALL_AT_ONCE'}{
+  const source=unit.sourceProvenance?.source as {sourceVersion?:unknown}|undefined
+  if(unit.sourceProvenance&&(!source||typeof source.sourceVersion!=='string'||!source.sourceVersion.trim())){
+    throw new ContentReleaseError('CONTENT_SOURCE_VERSION_MISSING')
+  }
+  const display=unit.displayDefinition as {presentationMode?:unknown}
+  const mode=display.presentationMode??'ALL_AT_ONCE'
+  if(mode!=='ONE_BY_ONE'&&mode!=='ALL_AT_ONCE')throw new ContentReleaseError('CONTENT_SCALE_PRESENTATION_INVALID')
+  return {instrumentVersion:(source?.sourceVersion as string | undefined) ?? String(unit.draftRevision),presentationMode:mode}
 }

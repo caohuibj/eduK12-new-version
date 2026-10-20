@@ -1,4 +1,4 @@
-import { publishScaleMeasurement } from '../measurement-content/scale'
+import { publishScaleMeasurement, surveyScaleReleaseContext } from '../measurement-content/scale'
 import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
 import type {SourceAnswerMapping} from './catalog.sources'
 import { SURVEY_COGNITIVE_NOTICE } from './measurement.notice'
@@ -148,7 +148,7 @@ export async function freezeResearchWaveDraft(input:{
       if (unit.kind !== 'SCALE') continue
       const release = await publishScaleMeasurement(tx, {
         localId: unit.draftId, version: String(unit.draftRevision),
-        instrumentVersion: String(unit.draftRevision), definition: unit.compiledDefinition,
+        ...surveyScaleReleaseContext(unit), definition: unit.compiledDefinition,
         instrumentClass: unit.sourceProvenance ? 'STANDARD' : 'CUSTOM_DESCRIPTIVE',
         provenance: unit.sourceProvenance ?? {},
         scope: { kind: 'PRIVATE', ownerId: input.actorUserId, product: 'SURVEY', resourceId: input.projectId },

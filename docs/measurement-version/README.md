@@ -151,3 +151,5 @@ Training 自编发布、Standard onboarding 发布及 Survey Wave 中的 Scale �
 新增 Scale 当前 release 指针和 Survey frozen unit 的精确 release/hash；旧运行字段暂时保留至 V08/V09 完成一次性切换，不宣称已移除双轨。新测量投影显式排除 report/reference/source/license，保留完整题目/响应/计分/质量/媒体协议；旧 definitionHash 不被改造为新身份。copySource/目录来源证据冻结到独立 provenance，不成为第二份当前授权。报告及参考独立发布/数值规则仍属 V06/V07，不在本单元声称完成。
 
 修正 V02 review：参考/报告修正文案的内部发布用途区分 NEW_ADMINISTRATION 与 HISTORICAL_INTERPRETATION。后者可引用 SUPERSEDED/RETIRED 测量，仍拒 REVOKED；该参数不由前端直接控制，未来新投放仍要检查测量可用性。新增状态负例与 Scale 投影/跨项目同名/无参考/不支持参数合同，总计 11 个相关用例通过。新核心/适配器 strict TypeScript 与 Prisma schema validate 通过。实际发布接入点的扩展类型检查发现共享依赖中的旧 Prisma client 缺现有 Training 字段，且定向编译未加载 Request 全局扩展；本改动另发现的 Survey 返回类型 narrowing 已修正。未将该扩展检查标为通过，最终须使用本分支私有生成 client 集中验收。未执行数据库迁移、完整应用/浏览器回归或 CI。
+
+V03 独审修复：Survey 的有效 presentationMode（省略时与现有 UI 一致为 ALL_AT_ONCE）进入 measurement canonical 投影；ONE_BY_ONE 与 ALL_AT_ONCE 即便题目/计分相同也不能同 hash。Training ScaleDefinition 没有独立可编辑 presentationMode，保持 RUNNER_DEFAULT 及既有 display.randomizeItems 不支持硬阻；后续投放协议仍由 V08 冻结。目录导入使用 sourceProvenance.source.sourceVersion，draftRevision 只表示私有编辑/发布序列，缺来源版本拒绝而不猜测。两项新负例单独通过。
