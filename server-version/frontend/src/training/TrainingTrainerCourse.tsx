@@ -132,10 +132,9 @@ export default function TrainingTrainerCourse() {
             {section === 'assessments' && <section className="training-detail-content" aria-label="课程测评管理">
               <div className="training-section-action training-assessment-shortcuts">
                 <Link to={'/questionnaire-products/new?courseId=' + encoded} className="training-action">布置组合测评</Link>
-                {cognitiveEnabled && <Link to={'/cognitive-assignments?create=true&courseId=' + encoded} className="training-action training-action--quiet">布置认知任务</Link>}
                 <Link to="/questionnaires" className="training-action training-action--quiet">已有测评</Link>
               </div>
-              <p className="training-science-note">只可发布当前拥有使用权且满足内容资格的测评，资源发布和报告披露仍由平台规则控制。</p>
+              <p className="training-science-note">组合测评可按需加入量表、表单、情境判断和认知任务。已有测评可继续编辑与投放。</p>
               {assessments.error && <div className="training-message training-message--compact" role="alert">
                 <p>当前课程测评清单暂时无法读取：{assessments.error}</p>
                 <button type="button" onClick={retry}>重新加载测评</button>
