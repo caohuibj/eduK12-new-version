@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { reportTemplateSchema, validateReportTemplateBindings } from './report-template'
 import { canonicalHash, canonicalJsonString } from '../assessment-runtime/canonical'
 
 export const CONTENT_HASH_SCHEME = 'MEASUREMENT_CONTENT_CANONICAL_V1' as const
@@ -49,7 +50,7 @@ export const reportContent = z.object({
   language: text,
   generatorVersion: text,
   // Text/layout only. Numeric reference rules belong to reference releases.
-  template: z.record(z.unknown()),
+  template: reportTemplateSchema,
 }).strict()
 const common = {
   family: releaseFamily, key: text, version: text, scope: contentScope,
@@ -80,6 +81,7 @@ export function prepareRelease(input: unknown): PreparedRelease {
   if (value.layer === 'REPORT' && new Set(value.content.metricKeys).size !== value.content.metricKeys.length) {
     throw new ContentReleaseError('CONTENT_METRIC_DUPLICATE')
   }
+  if(value.layer==='REPORT')validateReportTemplateBindings(value.content.template,value.content.metricKeys,assetRefs.map(a=>a.assetId))
   // Explicit layer projection: identity, ownership, catalog and lifecycle never
   // change scientific contentHash. Scope/provenance are still immutable in storage.
   const contentHash = canonicalHash({ hashScheme: CONTENT_HASH_SCHEME, family: value.family, layer: value.layer, content: value.content, assetRefs })
