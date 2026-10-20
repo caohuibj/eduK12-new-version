@@ -6,6 +6,10 @@ on:
       runner_labels:
         type: string
         required: true
+      run_performance_tests:
+        type: boolean
+        default: true
+        description: 'False only for the reviewed Training functional-only integration; all functional checks remain mandatory'
 
 permissions:
   contents: read
@@ -17,7 +21,7 @@ env:
 
 jobs:
   backend:
-    name: backend (migrate + build + performance gate)
+    name: ${{ inputs.run_performance_tests && 'backend (migrate + build + performance gate)' || 'backend (migrate + build + functional gate; performance not executed)' }}
     runs-on: ubuntu-24.04
     timeout-minutes: 35
     env:
@@ -77,12 +81,20 @@ jobs:
         with:
           fetch-depth: 0
       - name: clear reports from previous backend jobs
-        run: rm -f /tmp/eduk12-backend-performance-vitest.json /tmp/eduk12-ci-env.txt
+        run: rm -f /tmp/eduk12-backend-performance-vitest.json /tmp/eduk12-ci-env.txt /tmp/eduk12-backend-functional-vitest.json
       - name: check CI disk headroom
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: verify explicit Training scope before omitting performance
+        if: ${{ !inputs.run_performance_tests }}
+        env:
+          CI_EVENT: ${{ github.event_name }}
+          CI_BASE_SHA: ${{ github.event.pull_request.base.sha || github.event.before }}
+          CI_FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
+        working-directory: .
+        run: node .github/scripts/training-functional.mjs verify-backend
       - name: verify runner capacity and clean application ports
         run: node "$GITHUB_WORKSPACE/.github/scripts/runner-preflight.mjs"
       - name: configure runner-local npm cache
@@ -192,8 +204,14 @@ jobs:
       - name: Wave1 calibration generator contracts
         run: python3 scripts/learning-motivation-wave1/test_reference_generation.py
       - name: 200-completion performance and report integrity gate
+        if: inputs.run_performance_tests
         # Keep the <10s burst on its own hosted VM and durable PostgreSQL.
         run: npm test -- src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-performance-vitest.json
+      - name: aggregate encryption, readability and terminal replay functional contracts
+        if: ${{ !inputs.run_performance_tests }}
+        # Match both functional cases exactly. The 200-completion case remains
+        # visibly unexecuted in JSON and is never reported as performance passed.
+        run: npm test -- src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts --testNamePattern='(writes ciphertext only and keeps the report readable through the service|keeps one terminal report and timestamp across concurrent completion and replay)$' --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-functional-vitest.json
       - name: capture CI environment snapshot
         if: always()
         run: |-
@@ -205,15 +223,20 @@ jobs:
             date -u +"timestamp %FT%TZ"
           } > /tmp/eduk12-ci-env.txt
       - name: performance suite must not skip
+        if: inputs.run_performance_tests
         run: node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-performance-vitest.json src/__tests__/questionnaire/aggregate-report.postgres.integration.test.ts
+      - name: functional aggregate must have exactly two passes and only the named performance nonexecution
+        if: ${{ !inputs.run_performance_tests }}
+        run: node "$GITHUB_WORKSPACE/.github/scripts/training-functional-report.mjs" /tmp/eduk12-backend-functional-vitest.json
       - name: upload vitest report artifact
         if: always()
         continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
-          name: backend-performance-vitest-report
+          name: ${{ inputs.run_performance_tests && 'backend-performance-vitest-report' || 'backend-functional-vitest-report' }}
           path: |
             /tmp/eduk12-backend-performance-vitest.json
+            /tmp/eduk12-backend-functional-vitest.json
             /tmp/eduk12-ci-env.txt
           if-no-files-found: ignore
 

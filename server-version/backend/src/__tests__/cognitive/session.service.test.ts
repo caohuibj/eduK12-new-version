@@ -31,6 +31,7 @@ vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 import {
   createSession,
   getSession,
+  getPublicSession,
   restartSession,
 } from '../../modules/cognitive/session.service'
 import { decryptCognitivePayload, encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
@@ -414,4 +415,18 @@ describe('C23 single admission decode', () => {
       expect(ensure).not.toHaveBeenCalled()
     } finally { stored.mockRestore(); ensure.mockRestore() }
   })
+})
+
+describe('completed session config reuse',()=>{
+ it.each(['owner','public'])('decodes the same frozen config once for %s payload and result selection',async kind=>{
+  const crypto=await import('../../modules/cognitive/cognitive.security')
+  const read=vi.spyOn(crypto,'decryptCognitivePayload')
+  try {
+    const row=sessionRow({status:'COMPLETED',...(kind==='public'?{userId:null,recoveryTokenHash:'token'}:{})})
+    mockPrisma.cognitiveSession.findUnique.mockResolvedValue(row)
+    const result=kind==='public'?await getPublicSession('token','session-1'):await getSession('student-1','session-1')
+    expect(read.mock.calls.filter(([cipher])=>cipher===row.configSnapshotEncrypted)).toHaveLength(1)
+    expect(result).not.toHaveProperty('storedConfig');expect(result).not.toHaveProperty('snapshot')
+  }finally{read.mockRestore()}
+ })
 })

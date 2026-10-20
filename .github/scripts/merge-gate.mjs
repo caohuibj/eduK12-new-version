@@ -1,3 +1,4 @@
+import {trainingFunctionalPlan,validTrainingFunctionalPlan,TRAINING_FUNCTIONAL_BASE} from './training-functional.mjs';
 import {validSurveyMacPlan,recheckSurveyMac} from './survey-mac-ui-scope.mjs';
 import {validReviewedCandidatePlan} from './reviewed-candidate-scope.mjs';
 import { pathToFileURL } from 'node:url';
@@ -85,6 +86,15 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  const trainingFunctional = scope.training_functional_only === 'true';
+  let trainingPlan; try { trainingPlan = JSON.parse(scope.training_functional_plan || 'null'); } catch { failed.push('scope'); }
+  if (trainingFunctional) {
+    if (draft || !validTrainingFunctionalPlan(trainingPlan) || scope.application_route !== 'legacy'
+        || scope.scenario !== 'platform' || scope.run_performance_tests !== 'false'
+        || scope.perf_smoke !== 'false' || needs['accept-perf']?.result !== 'skipped') failed.push('scope');
+  } else if ((scope.training_functional_only !== undefined && scope.training_functional_only !== 'false')
+      || (scope.run_performance_tests !== undefined && scope.run_performance_tests !== 'true')
+      || trainingPlan !== null) failed.push('scope');
   if (scope.application_route === 'survey-mac-ui') {
     let p; try { p=JSON.parse(scope.survey_mac_ui_plan); } catch {}
     if(draft||!validSurveyMacPlan(p)||scope.scenario!=='survey-mac-ui'||scope.codeql!=='true'
@@ -230,7 +240,7 @@ export function failedChecks(needs, draft) {
     || scope.visual_hosted !== String(hostedVisual)
     || scope.media_selection !== JSON.stringify(selected)
     || scope.media_groups !== JSON.stringify(selected.length ? mediaPlan(selected) : [])
-    || (scope.scenario === 'platform' && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'true'));
+    || (scope.scenario === 'platform' && Object.keys(acceptanceJobs).some(key=>scope[key] !== (trainingFunctional && key === 'perf_smoke' ? 'false' : 'true')));
   if (scope.scenario === 'release-tooling' && Object.keys(acceptanceJobs).some(key=>scope[key] !== 'false')) failed.push('scope');
   if (scope.scenario === 'frontend-test' && (scope.codeql !== 'false'
     || Object.keys(acceptanceJobs).some(key => scope[key] !== 'false')))
@@ -242,6 +252,19 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const needs = readNeeds();
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if (needs.scope?.outputs?.training_functional_only === 'true' || process.env.CI_BASE_SHA === TRAINING_FUNCTIONAL_BASE) {
+    try {
+      const { changedEntries } = await import('./content-scope.mjs');
+      const { execFileSync } = await import('node:child_process');
+      const head = execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim();
+      const base = process.env.CI_BASE_SHA;
+      const actual = trainingFunctionalPlan(changedEntries(base, head), base, head);
+      const emitted = JSON.parse(needs.scope.outputs.training_functional_plan || 'null');
+      if (JSON.stringify(actual) !== JSON.stringify(emitted)
+          || (actual !== null) !== (needs.scope.outputs.training_functional_only === 'true'))
+        failed.push('recomputed-training-functional-plan');
+    } catch { failed.push('recomputed-training-functional-plan'); }
+  }
   if(needs.scope?.outputs?.application_route==='survey-mac-ui') {
     try { recheckSurveyMac(JSON.parse(needs.scope.outputs.survey_mac_ui_plan)); }
     catch { failed.push('recomputed-survey-mac-ui-plan'); }

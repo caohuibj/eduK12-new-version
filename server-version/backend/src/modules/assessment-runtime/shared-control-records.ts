@@ -1,3 +1,4 @@
+import { createHash } from 'node:crypto'
 import { readTrainingTimingSnapshot } from './training-scale-timing'
 import { encryptControlReference } from './control-reference-codec'
 import { AsyncLocalStorage } from 'node:async_hooks'
@@ -33,7 +34,9 @@ const verifyBinding = (row: any) => {
   const envelope=decryptCompactField<any>(row.payloadEncrypted,256*1024+1024)
   if(envelope?.schemaVersion!==1)throw new Error('Frozen binding encryption version invalid')
   const body=envelope.value
-  if (body?.version !== 1 || !body.value || canonicalHash(body.value) !== row.bindingHash.toString('hex') || canonicalJsonBytes(body.value).length !== row.plaintextBytes) throw new Error('Frozen personal binding integrity mismatch')
+  if (body?.version !== 1 || !body.value) throw new Error('Frozen personal binding integrity mismatch')
+  const bytes = canonicalJsonBytes(body.value)
+  if (createHash('sha256').update(bytes).digest('hex') !== row.bindingHash.toString('hex') || bytes.length !== row.plaintextBytes) throw new Error('Frozen personal binding integrity mismatch')
   const value = body.value
   if (value.version !== 1 || !Number.isSafeInteger(value.attemptEpoch) || value.attemptEpoch < 1 || !value.principal
     || !['composite', 'questionnaire'].includes(value.parent?.kind) || typeof value.parent.id !== 'string'
@@ -53,7 +56,7 @@ const readBinding = async (id: string, db:SharedControlDb=prisma) => {
 }
 const saveBinding = async (value: ReturnType<typeof bindingBody>,db:SharedControlDb=prisma): Promise<string> => {
   const bytes = canonicalJsonBytes(value); if (bytes.length > 256 * 1024) throw new Error('Frozen binding size limit')
-  const hash = canonicalHash(value), context = contextFor(db)
+  const hash = createHash('sha256').update(bytes).digest('hex'), context = contextFor(db)
   return limited(context?.writes, hash, async () => {
     const binary = Buffer.from(hash, 'hex')
     const payload = encryptUnifiedRuntimePayload({ version: 1, value })
@@ -64,7 +67,7 @@ const saveBinding = async (value: ReturnType<typeof bindingBody>,db:SharedContro
       composite_attempt_id AS "compositeAttemptId",questionnaire_assessment_id AS "questionnaireAssessmentId" FROM assessment_frozen_bindings WHERE binding_hash=${binary}`
     if (rows.length !== 1) throw new Error('Frozen binding append verification failed')
     const verified = verifyBinding(rows[0])
-    if (canonicalHash(verified) !== hash) throw new Error('Frozen binding append verification failed')
+    if (!rows[0].bindingHash.equals(binary)) throw new Error('Frozen binding append verification failed')
     const id = String(rows[0].id); if (context && context.reads.size < 32) context.reads.set(id, Promise.resolve(verified))
     return id
   })

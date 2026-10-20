@@ -329,7 +329,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
     }
   }
 
-  const { result, compactFact, persistedProvenance, encryptedAnswers, encrypted, completedAt } = await prepareUnifiedScaleWrite(
+  const { timingEncrypted, result, compactFact, persistedProvenance, encryptedAnswers, encrypted, completedAt } = await prepareUnifiedScaleWrite(
     input, child, { submissionId, admission, snapshot, answers, payloadHash, timing }, wholeReceipt, referenceDb)
 
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
@@ -383,7 +383,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
         submissionId,
         submissionPayloadHash: payloadHash,
         submissionCompletedAt: completedAt,
-        ...(timing ? {timingEncrypted:encryptUnifiedRuntimePayload(timing)} : {}),
+        ...(timingEncrypted ? { timingEncrypted } : {}),
       },
     }).catch(rethrowScaleSubmissionIdConflict)
     if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评状态已变化，请重试', 409)
@@ -438,7 +438,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
         submissionId,
         submissionPayloadHash: payloadHash,
         submissionCompletedAt: completedAt,
-        ...(timing ? {timingEncrypted:encryptUnifiedRuntimePayload(timing)} : {}),
+        ...(timingEncrypted ? { timingEncrypted } : {}),
       },
     }
   })

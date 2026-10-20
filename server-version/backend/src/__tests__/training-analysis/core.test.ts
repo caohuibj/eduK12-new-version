@@ -325,3 +325,23 @@ describe('material arm identity in the numeric kernel', () => {
     expect(tables.dictionary.columns).not.toContain('materialGroupKey')
   })
 })
+
+describe('demand-built export views',()=>{
+ it('keeps each view lazy, memoized, and isolated from inputs and other views',()=>{
+  const req=request(),input=source(),expected=JSON.parse(JSON.stringify(buildTrainingAnalysisTables(req,input)))
+  const tables=buildTrainingAnalysisTables(req,input)
+  expect(Object.keys(tables)).toEqual(['long','wide','dictionary'])
+  for(const key of ['long','wide','dictionary'] as const)expect(typeof Object.getOwnPropertyDescriptor(tables,key)?.get).toBe('function')
+  req.courseId='changed';input.observations[0].value=999;input.observations[0].measurement!.unit='changed';input.observations[0].sourceHashes.result='0'.repeat(64)
+  expect(tables.dictionary).toEqual(expected.dictionary)
+  tables.dictionary.rows[0].unit='mutated-return'
+  expect(tables.long).toEqual(expected.long);tables.long.rows[0].value=999
+  expect(tables.wide).toEqual(expected.wide)
+  expect(tables.wide).toBe(tables.wide)
+ })
+ it('can export finite original values even when unused descriptive statistics overflow',()=>{
+  const input=source();input.observations.forEach(row=>{row.value=Number.MAX_VALUE})
+  expect(buildTrainingAnalysisTables(request(),input).long.rows.every(row=>row.value===Number.MAX_VALUE)).toBe(true)
+  failure(()=>buildTrainingAnalysis(request(),input),'REPORT_STATISTIC_OVERFLOW',500)
+ })
+})

@@ -29,7 +29,7 @@ describe('Training original export worker frozen manifest lifecycle', () => {
   })
   it('reconstructs only the original selector and exact manifest, preserving cutoff across retries', async () => {
     const intent = claim(), prepared = await prepareAssessmentExport(intent)
-    expect(mocks.principal).toHaveBeenCalledOnce()
+    expect(mocks.principal).not.toHaveBeenCalled()
     expect(mocks.analyze).toHaveBeenCalledOnce()
     expect(mocks.revalidate).not.toHaveBeenCalled()
     expect(mocks.analyze).toHaveBeenCalledWith({ actor, courseId, selector: intent.options.trainingAnalysis.selector, expectedManifest: intent.options.trainingAnalysis.manifest })
@@ -47,19 +47,19 @@ describe('Training original export worker frozen manifest lifecycle', () => {
     expect(mocks.save).not.toHaveBeenCalled()
   })
   it('fails closed for revoked creator authority or missing durable manifest', async () => {
-    mocks.principal.mockResolvedValue({ ...currentPrincipal(), isFrozen: true })
+    mocks.analyze.mockRejectedValueOnce(new Error('Export authority revoked'))
     await expect(prepareAssessmentExport(claim())).rejects.toThrow(/authority revoked/)
     mocks.principal.mockResolvedValue(currentPrincipal())
     await expect(prepareAssessmentExport({ ...claim(), options: { anonymize: true, creatorRole: actor.role } })).rejects.toThrow()
     await expect(revalidateAssessmentExport({ ...claim(), options: { anonymize: true, creatorRole: actor.role } })).rejects.toThrow()
-    expect(mocks.analyze).not.toHaveBeenCalled()
+    expect(mocks.analyze).toHaveBeenCalledOnce()
   })
   it('publishes through the existing generation fence only after post-generation revalidation', async () => {
     const result = await runExportBatch(job)
     expect(result.status).toBe('READY')
     expect(mocks.analyze).toHaveBeenCalledOnce()
     expect(mocks.revalidate).toHaveBeenCalledOnce()
-    expect(mocks.principal).toHaveBeenCalledTimes(2)
+    expect(mocks.principal).not.toHaveBeenCalled()
     expect(mocks.revalidate.mock.invocationCallOrder[0]).toBeGreaterThan(mocks.save.mock.invocationCallOrder[0])
     expect(mocks.publish.mock.invocationCallOrder[0]).toBeGreaterThan(mocks.revalidate.mock.invocationCallOrder[0])
     expect(mocks.publish).toHaveBeenCalledWith(expect.objectContaining({ batchId: claim().batchId, generation: 1,

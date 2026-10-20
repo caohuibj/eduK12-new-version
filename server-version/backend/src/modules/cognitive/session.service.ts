@@ -288,7 +288,7 @@ const isPrismaUniqueViolation = (err: unknown): boolean =>
   typeof err === 'object' && err !== null && (err as { code?: string }).code === 'P2002'
 
 /** 组装 runner payload（D4 §12）：绝不返回 participantKey / *Encrypted / userId。 */
-const toRunnerPayload = async (session: {
+const buildRunnerPayload = async (session: {
   id: string
   assignmentId: string | null
   testType: string
@@ -321,7 +321,7 @@ const toRunnerPayload = async (session: {
   const snapshot = storedConfig.snapshot
   const report = frozenReport ?? readFrozenReport(session.assignment?.resolvedReportSnapshotEncrypted)
   const entry = report ? null : requireCognitiveRegistryEntry(session.testType, session.engineVersion, session.scoringVersion)
-  return {
+  return { storedConfig, payload: {
     sessionId: session.id,
     ...(admission ? { sessionEpoch: admission.attemptEpoch } : {}),
     ...(persistence ? { trainingPersistence: persistence } : {}),
@@ -348,8 +348,11 @@ const toRunnerPayload = async (session: {
     ...(nextTrialIndex === undefined ? {} : { nextTrialIndex }),
     ...(session.submittedAt ? { submittedAt: session.submittedAt } : {}),
     ...(exposeAnonymousCode ? { anonymousCode: session.anonymousCode ?? null } : {}),
-  }
+  } }
 }
+
+// The decoded config stays invocation-local and never enters the HTTP DTO.
+const toRunnerPayload = async (...args: Parameters<typeof buildRunnerPayload>) => (await buildRunnerPayload(...args)).payload
 
 export const createSession = async (userId: string, assignmentId: string) => {
   const participantKey = getParticipantKey(userId)
@@ -455,7 +458,7 @@ export const getSession = async (userId: string, sessionId: string) => {
   if (session.status === 'COMPLETED') {
     // Relational cohort-only attempts expose terminal state but never an
     // individual Cognitive result. The parent cohort projection is authoritative.
-    const runnerPayload = await toRunnerPayload(session)
+    const { payload: runnerPayload, storedConfig } = await buildRunnerPayload(session)
     if (session.compositeAttemptId && await isLoadedCompositeParticipantFeedbackDeferred(session.compositeAttempt)) {
       return { ...runnerPayload, status: session.status, finishedAt: session.finishedAt, feedbackDeferred: true }
     }
@@ -470,7 +473,6 @@ export const getSession = async (userId: string, sessionId: string) => {
       }
     }
     // D6 后：普通完成态返回 decrypted result。
-    const storedConfig = await loadCognitiveSessionConfig(session.configSnapshotEncrypted)
     if (storedConfig.snapshot) {
       if (!session.resultSnapshotEncrypted) throw CONFLICT('v2 completed session result snapshot is missing')
       return {
@@ -561,13 +563,12 @@ export const getPublicSession = async (recoveryTokenHash: string, sessionId: str
   if (!allowed) throw FORBIDDEN('Recovery credential does not own this session')
 
   const nextTrialIndex = (session.trials?.[0]?.trialIndex ?? -1) + 1
-  const runnerPayload = await toRunnerPayload(session, nextTrialIndex, true)
+  const { payload: runnerPayload, storedConfig } = await buildRunnerPayload(session, nextTrialIndex, true)
   if (session.status !== 'COMPLETED') return runnerPayload
   if (session.compositeAttemptId && await isLoadedCompositeParticipantFeedbackDeferred(session.compositeAttempt)) {
     return { ...runnerPayload, finishedAt: session.finishedAt, feedbackDeferred: true }
   }
 
-  const storedConfig = await loadCognitiveSessionConfig(session.configSnapshotEncrypted)
   if (storedConfig.snapshot) {
     if (!session.resultSnapshotEncrypted) throw CONFLICT('v2 completed session result snapshot is missing')
     return {

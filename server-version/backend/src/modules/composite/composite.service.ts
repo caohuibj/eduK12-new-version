@@ -33,7 +33,6 @@ import { resolveStoredScaleResult } from '../assessment-runtime/compact-assessme
 import { preloadStoredScaleResults } from '../assessment-runtime/compact-assessment-storage'
 import { loadPackageAnalysisForAttempt } from './composite-analysis-snapshot.service'
 import { assertTrainingVariantReportScope, canStoreCompactCompositeReport, encryptCompactCompositeReport, decryptCompactCompositeReport, preloadCompactCompositeReportReads, type CompactReportReadDependencies } from './compact-composite-report'
-import { loadScaleUnitReport } from '../reporting/scale-unit-report'
 import { loadScaleAnswers } from '../scale/scale-workflow.service'
 import { readCompositeReportStatusContext } from './composite-report-read'
 import type { WholeQuestionnaireReportContext } from './whole-questionnaire.service'
@@ -4925,7 +4924,7 @@ export const completeScale = async (attemptId: string, itemId: string, context: 
 export const buildCompositeReport = async (attempt: any, verifiedContext?: WholeQuestionnaireReportContext, readBatch?: CompositeReportFactsReader) => {
   const batch = readBatch?.(attempt)
   attempt = await applyTrainingAttemptScope(attempt)
-  if (!batch) await preloadStoredScaleResults(attempt.scaleAssessments)
+  const scaleFacts = batch ? undefined : await preloadStoredScaleResults(attempt.scaleAssessments)
   const scaleMap = new Map<string, any>(attempt.scaleAssessments.map((item: any) => [item.compositeItemId, item]))
   const cognitiveMap = new Map<string, any>(attempt.cognitiveSessions.map((item: any) => [item.compositeItemId, item]))
   const situationalMap = new Map<string, any>((attempt.situationalAttempts ?? []).map((item: any) => [item.compositeItemId, item]))
@@ -4960,7 +4959,8 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
           totalTime: result?.totalTime,
         }
         const report = batch && result && batch.scaleResults.has(result)
-          ? buildScaleUnitReport({...reportInput, result: batch.scaleResults.get(result)}) : await loadScaleUnitReport(reportInput, result)
+          ? buildScaleUnitReport({...reportInput, result: batch.scaleResults.get(result)})
+          : buildScaleUnitReport({...reportInput,result:await resolveStoredScaleResult(reportInput.result,{record:result,reader:result?scaleFacts:undefined})})
         if (['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind)) {
           const entry = verifiedContext?.units.get(result?.id)
           const reusable = Boolean(verifiedContext && entry && result && verifiedContext.attemptId === attempt.id
@@ -5440,7 +5440,7 @@ const materializeCompactReportFromFacts = async (attempt: any, binding: ReportJo
   const scaleByItem = new Map<string,any>(attempt.scaleAssessments.map((row:any)=>[row.compositeItemId,row])), cogByItem = new Map<string,any>(attempt.cognitiveSessions.map((row:any)=>[row.compositeItemId,row]))
   const rows = attempt.compositeAssessment.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>scaleByItem.get(item.id))
   if (rows.some((row:any)=>!row || row.result?.k!=='SFF1') || attempt.compositeAssessment.items.some((item:any)=>item.type==='COGNITIVE'&&!cogByItem.get(item.id)?.resultSnapshotEncrypted)) return null
-  await preloadStoredScaleResults(rows)
+  const scaleFacts = await preloadStoredScaleResults(rows)
   const labels=getFrozenPackageSlotLabels(attempt.compositeAssessment),formValues=readContextFormAnswers(attempt.compositeAssessment.items.filter((item:any)=>item.type==='FORM').map((item:any)=>({id:item.id,contextKey:item.contextKey})),attempt.formAnswers)
   const formById=new Map<string,any>(formValues.map((row:any)=>[row.itemId,row])),backgroundValues:any[]=[],unitReports:any[]=[]
   for(const item of attempt.compositeAssessment.items){
@@ -5453,7 +5453,7 @@ const materializeCompactReportFromFacts = async (attempt: any, binding: ReportJo
       if(frozen?.metricDefinitions)Object.defineProperty(unit,'__frozenMetricDefinitions',{value:frozen.metricDefinitions,enumerable:false})
       unitReports.push(unit);continue
     }
-    const child=scaleByItem.get(item.id),committed=readCommittedScaleFacts(child),result=committed?.result??await resolveStoredScaleResult(child.result,{record:child})
+    const child=scaleByItem.get(item.id),committed=readCommittedScaleFacts(child),result=committed?.result??await resolveStoredScaleResult(child.result,{record:child,reader:scaleFacts})
     const entry=verified?.units.get(child.id),reuse=verified&&entry&&verified.attemptId===attempt.id&&verified.attemptEpoch===attempt.attemptEpoch
       &&verified.slotSetHash===attempt.frozenActiveSlotSetHash&&verified.contextHash===attempt.contextSnapshotHash&&entry.attemptEpoch===child.attemptEpoch
       &&entry.runtimeSnapshotEncrypted===child.runtimeSnapshotEncrypted&&entry.runtime.compiledRuntime.compiledRuntimeHash===child.compiledRuntimeHash
