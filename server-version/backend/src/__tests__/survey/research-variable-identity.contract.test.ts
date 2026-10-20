@@ -147,6 +147,7 @@ describe('Frozen Survey raw variable identity',()=>{
       dimensions:[{dimensionKey:'total',label:'Total',direction:'descriptive'}],
       items:['q-a','q_a'].map(itemKey=>({itemKey,prompt:itemKey,required:true,reverse:false,dimensionKeys:['total']}))}
     const unit=compileFrozenResearchUnit({id:'scale',instrumentKey:'scale',kind:'SCALE',title:'Scale',revision:1,definition})
+    unit.measurementRelease={releaseId:'11111111-1111-4111-8111-111111111111',contentHash:'a'.repeat(64),measurementHash:'b'.repeat(64)}
     const timing={schemaVersion:1,firstResponseMs:100,activeTimeMs:250,changeCount:0,revisitCount:0,
       visits:1,interrupted:false,recoveredWithoutClock:false}
     fixture([unit],{scale:{'q-a':'a',q_a:'b'}},{scale:{'q-a':timing,q_a:{...timing,firstResponseMs:150}}})
@@ -158,10 +159,19 @@ describe('Frozen Survey raw variable identity',()=>{
       expect(wide.csv).toContain('"'+row.columnKey+'__timing_status"')
       expect(row.itemTiming?.activeTimeMs).toBe(250)
     }
+    expect(source.sourceVersions).toEqual([expect.objectContaining({waveId:owner.waveIds[0],instrumentKey:'scale',measurementRelease:unit.measurementRelease})])
     expect(source.scores[0].value).toBe(4)
     const measurement=source.scores[0].measurement
     expect(exportLong(owner.projectId,source.scores).codebook[0].column)
       .toBe('W001__scale__total__'+canonicalHash(measurement).slice(0,12))
+  })
+  it('does not infer a release for old frozen sources and rejects a tampered frozen pointer',async()=>{
+    const unit=formUnit('form',[question('ordinary')])
+    fixture([unit],{form:{ordinary:1}})
+    expect((await loadSurveySource({...owner,includeWideSchema:true})).sourceVersions).toBeUndefined()
+    // A database snapshot mutation without its frozen digest must not become trusted metadata.
+    unit.measurementRelease={releaseId:'forged',contentHash:'a'.repeat(64),measurementHash:'b'.repeat(64)}
+    await expect(loadSurveySource({...owner,includeWideSchema:true})).rejects.toThrow()
   })
   it('still denies ownership revoked after colliding-source projection',async()=>{
     const unit=formUnit('form',[question('q-a'),question('q_a')])

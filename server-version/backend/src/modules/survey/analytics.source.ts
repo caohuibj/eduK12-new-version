@@ -58,7 +58,10 @@ export interface ResearchRawObservation extends SurveyVariantAudit {
   completionStatus?:'COMPLETE'|'COMPLETE_EARLY'|'SCREEN_OUT'
 }
 export type SurveySourceVersion=Pick<ResearchRawCodebook,'waveId'|'instrumentKey'|'publicationVersion'|
-  'instrumentRevision'|'definitionDigest'|'scoringDigest'|'sourceProvenance'|'sourceAnswerMapping'>
+  'instrumentRevision'|'definitionDigest'|'scoringDigest'|'sourceProvenance'|'sourceAnswerMapping'> & {
+  /** From the digest-verified frozen publication, never an analyst request. */
+  measurementRelease?:ResearchFrozenUnit['measurementRelease']
+}
 export interface SurveySourceProjection {
   /** Frozen sourced instruments, including cognitive units with no raw item codebook. */
   sourceVersions?:SurveySourceVersion[]
@@ -743,9 +746,10 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
     })
     const sourceVersions:SurveySourceVersion[]=publications.flatMap(publication=>{
       const snapshot=verifiedSnapshots.get(publication.id)!
-      return snapshot.units.filter(unit=>unit.sourceProvenance||unit.sourceAnswerMapping).map(unit=>({
+      return snapshot.units.filter(unit=>unit.measurementRelease||unit.sourceProvenance||unit.sourceAnswerMapping).map(unit=>({
         waveId:snapshot.waveId,instrumentKey:unit.instrumentKey,publicationVersion:publication.version,
         instrumentRevision:unit.draftRevision,definitionDigest:unit.sourceDigest,scoringDigest:unit.scoringDigest,
+        ...(unit.measurementRelease?{measurementRelease:{...unit.measurementRelease}}:{}),
         ...frozenSourceMetadata(unit),
       }))
     })

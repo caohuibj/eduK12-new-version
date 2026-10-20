@@ -33,3 +33,9 @@ Survey 当前项目原始表单字段是研究者自定义语义；本次未找�
 4. Training复用已授权parent集合与request-local facts reader，再接真实frozen context。新解释只读原始计分事实与精确参考，不调用scorer，不用当前默认版本猜历史。
 
 尚未改应用reader或新增API。本次盘点不替代真实授权/Prisma/并发/浏览器验证。
+
+## 已接入：冻结测量身份投影
+
+现有 `loadSurveySource().sourceVersions` 已补入新原生内容的 `measurementRelease`（releaseId/contentHash/measurementHash）。身份直接来自经过 publication definitionDigest 校验的冻结 unit，并沿现有 owner/来源前后 fence；不是 analyst/body 提交。只有确实有冻结指针的来源才返回它，旧记录不自动匹配“latest”，不根据题名/版本号猜测 release。原先目录 sourceProvenance/sourceAnswerMapping 保留。
+
+对应合同验证原生量表读取真实冻结指针、旧来源不推断身份、篡改冻结指针但不更新可信digest时拒绝。实际 candidate 样本成员仍待下一个业务服务把此 sourceVersions 与已验证分数逐 wave/instrument 连接，并从数据库核实际 release 内容/能力；本投影本身不授予参考分析/复核/发布权限，也不新增人口映射。
