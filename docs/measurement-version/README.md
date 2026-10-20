@@ -177,3 +177,5 @@ V07 内部准备：REPORT template 现使用严格展示节点合同（文字、
 V06 后续内部准备：经验治理去掉固定总 N/每段 N 门槛，允许无经验分段；保留精确样本分配、正有效样本、分布/SD 最低可计算性、finite、来源和质量校验。方法充分性/适用性仍需候选证据与授权审阅，少量描述样本不等于正式 norm。新增不可变候选/审核表的追加迁移及内部事务助手，候选检查实际测量 release 身份与指标，审核绑定候选 hash；数据库 trigger 从候选内容派生正式跨入口用途，拒绝计算者自审，actor FK 必须对应真实 users。新增治理 3 项 + 候选 4 项测试通过，Prisma schema validate、定向 strict TypeScript 通过。未执行真实 PostgreSQL 迁移/trigger 测试；未接审核发布服务和能力授权，因此不声称数据库行为已经验收或 V06 完成。
 
 内部合同独审修正：候选现按稳定 entryKey（指标/参考种类/人口条件/测量评分版本）冻结实际成员，可信 scoped reader 需提供每事实的真实 measurementReleaseId、metricKeys、eligibleEntryKeys；输入自报字段必须一致。互斥年龄组各 50 的总批 100 复现已覆盖：正确 50/50 通过，错误整批 100/100 与跨组伪造拒绝。实际测量三项身份由候选 repository 的一次可信 release 读取校验。报告 REFERENCE_BAND 增加 referenceKind，避免同指标 norm/criterion 同名 high 混淆，模板不固定具体 norm 版本。相关 9 项纯合同通过，strict TypeScript 通过；均为尚未暴露 API 的阶段合同修复，不表示既有用户已受影响。
+
+V06 内部审核发布助手从数据库读取指定 candidate/review，不接受客户端 approval JSON；重新验证当前 scoped reader 的样本资格后构造 scope 派生 key，再交共享发布事务。真实服务仍必须从 authenticated actor 与当前授权派生 actor/authorizedFacts，不能将请求 body 直接传入这些信任参数。新增 repository 合同验证实际 scoring identity 不符拒绝、失权拒绝及数据库 REJECTED 不发布。entryKey 现每 entry 只 canonical/hash 一次，样本循环复用 key；调用次数合同覆盖，未扩算法或做性能实验。相关 8 项纯/mock 合同通过，真实数据库验收仍待集中运行。

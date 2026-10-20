@@ -1,5 +1,6 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { prepareReferenceCandidate, reviewReferenceCandidate, referenceCandidateRelease, referenceEntryKey } from '../../modules/measurement-content/reference-candidate'
+import * as canonical from '../../modules/assessment-runtime/canonical'
 import type { ReferenceCandidate } from '../../modules/measurement-content/reference-candidate'
 const fixture=():Omit<ReferenceCandidate,'schemaVersion'|'candidateHash'>=>({
   analyzerId:'analyst',measurement:{releaseId:'m1',contentHash:'a'.repeat(64),measurementHash:'b'.repeat(64),instrumentVersion:'1',scoringVersion:'1'},
@@ -51,6 +52,14 @@ describe('internal reference candidate preparation',()=>{
     expect(()=>prepareReferenceCandidate(input,trusted)).toThrow('REFERENCE_SAMPLE_COUNT_MISMATCH')
     first.source.sampleSize=50;second.source.sampleSize=50;input.sampleManifest[0].entryKeys=[keys[1]]
     expect(()=>prepareReferenceCandidate(input,trusted)).toThrow('REFERENCE_SAMPLE_ENTRY_NOT_ELIGIBLE')
+  })
+  it('computes each population entry key once per preparation, not once per sample',()=>{
+    const input=fixture(),access=authorize(input),spy=vi.spyOn(canonical,'canonicalHash')
+    try{
+      prepareReferenceCandidate(input,access)
+      const entryHashCalls=spy.mock.calls.filter(([value])=>Boolean(value&&typeof value==='object'&&'population' in value&&'scoreKey' in value))
+      expect(entryHashCalls).toHaveLength(input.definition.entries.length)
+    }finally{spy.mockRestore()}
   })
   it('rejects nonfinite estimates and false sample counts',()=>{
     const invalid=fixture();invalid.definition.entries[0].statistics.mean=NaN

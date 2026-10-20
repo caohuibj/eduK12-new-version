@@ -58,7 +58,8 @@ export function prepareReferenceCandidate(input:Omit<ReferenceCandidate,'schemaV
   if(!['INTERNAL_OBSERVED','INTERNAL_OFFLINE_ANALYSIS'].includes(input.evidence.source))fail('REFERENCE_EXTERNAL_SOURCE_UNSUPPORTED')
   if(!Number.isFinite(Date.parse(input.evidence.cutoff))||Object.values(input.evidence).some(v=>!nonblank(v)))fail('REFERENCE_METHOD_EVIDENCE_REQUIRED')
   if(!input.sampleManifest.length||input.sampleManifest.length>100000)fail('REFERENCE_SAMPLE_BOUND_INVALID')
-  const entryKeys=new Set(input.definition.entries.map(referenceEntryKey))
+  const orderedEntryKeys=input.definition.entries.map(referenceEntryKey)
+  const entryKeys=new Set(orderedEntryKeys)
   const ids=new Set<string>()
   for(const member of input.sampleManifest){
     if(ids.has(member.factId))fail('REFERENCE_DUPLICATE_FACT')
@@ -73,11 +74,12 @@ export function prepareReferenceCandidate(input:Omit<ReferenceCandidate,'schemaV
   }
   const checked=validateReferenceSetDefinition(input.definition)
   if(input.definition.status!=='DRAFT'||!checked.definition||checked.issues.some(i=>i.severity==='error'))fail('REFERENCE_CANDIDATE_INVALID')
-  for(const entry of input.definition.entries){
+  for(const [entryIndex,entry] of input.definition.entries.entries()){
     if(entry.provenanceType!=='local_observed')fail('REFERENCE_INTERNAL_OBSERVATIONS_REQUIRED')
     if(entry.instrumentVersion!==input.measurement.instrumentVersion||entry.scoringVersion!==input.measurement.scoringVersion
       ||entry.governance&&entry.governance.measurementHash!==input.measurement.measurementHash)fail('REFERENCE_MEASUREMENT_MISMATCH')
-    const eligible=input.sampleManifest.filter(m=>m.entryKeys.includes(referenceEntryKey(entry))&&m.metricKeys.includes(entry.scoreKey)).length
+    const entryKey=orderedEntryKeys[entryIndex]
+    const eligible=input.sampleManifest.filter(m=>m.entryKeys.includes(entryKey)&&m.metricKeys.includes(entry.scoreKey)).length
     if(!eligible||entry.source.sampleSize!==eligible)fail('REFERENCE_SAMPLE_COUNT_MISMATCH')
     if(eligible<2&&(entry.statistics.sd!==undefined||Boolean(entry.statistics.percentileTable?.length)))fail('REFERENCE_ESTIMATE_NOT_COMPUTABLE')
     if(input.scope.kind!=='PLATFORM'&&['local_norm','validated_norm'].includes(entry.evidenceLevel))fail('REFERENCE_PRIVATE_OFFICIAL_NORM_FORBIDDEN')
