@@ -107,7 +107,7 @@ test('administrator CI runs its actual isolated PG/API and both real virtual-key
   assert.match(backend,/admin-permissions-rehearsal\.mjs/);
   assert.match(backend,/\(cd "\$GITHUB_WORKSPACE" && node server-version\/backend\/scripts\/admin-permissions-rollback-preflight\.mjs/);
   assert.match(backend,/assert\.equal\(tests\.numPendingTests,0\)/);
-  assert.match(browser,/if: inputs\.admin_permissions_functional && matrix\.group == 'security'/);
+  assert.match(browser,/if: \(inputs\.admin_permissions_functional \|\| inputs\.training_followup_functional\) && matrix\.group == 'security'/);
   assert.match(browser,/eduk12_admin_permissions_ci_browser/);
   assert.match(browser,/PHASE=business-overlaps node e2e\/admin-permissions-browser\.cjs/);
   assert.match(browser,/PHASE=workspaces-resume node e2e\/admin-permissions-browser\.cjs/);

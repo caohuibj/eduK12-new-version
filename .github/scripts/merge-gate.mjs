@@ -1,4 +1,4 @@
-import {trainingFunctionalPlan,validTrainingFunctionalPlan,TRAINING_FUNCTIONAL_BASE} from './training-functional.mjs';
+import {trainingFunctionalPlan,validTrainingFunctionalPlan,TRAINING_FUNCTIONAL_BASE,TRAINING_FOLLOWUP_BASE,TRAINING_FOLLOWUP_MODE} from './training-functional.mjs';
 import {adminFunctionalPlan,validAdminFunctionalPlan,ADMIN_FUNCTIONAL_BASE} from './admin-permissions-functional.mjs';
 import {validSurveyMacPlan,recheckSurveyMac} from './survey-mac-ui-scope.mjs';
 import {validReviewedCandidatePlan} from './reviewed-candidate-scope.mjs';
@@ -95,7 +95,10 @@ export function failedChecks(needs, draft) {
   if (trainingFunctional) {
     if (draft || !validTrainingFunctionalPlan(trainingPlan) || scope.application_route !== 'legacy'
         || scope.scenario !== 'platform' || scope.run_performance_tests !== 'false'
-        || scope.perf_smoke !== 'false' || needs['accept-perf']?.result !== 'skipped') failed.push('scope');
+        || scope.perf_smoke !== 'false' || needs['accept-perf']?.result !== 'skipped'
+        || (trainingPlan?.mode === TRAINING_FOLLOWUP_MODE
+          && ['codeql','frontend_build','ui_required','visual_hosted',...Object.keys(acceptanceJobs).filter(key=>key!=='perf_smoke')]
+            .some(key=>scope[key]!=='true'))) failed.push('scope');
   } else if ((scope.training_functional_only !== undefined && scope.training_functional_only !== 'false')
       || (!adminFunctional && scope.run_performance_tests !== undefined && scope.run_performance_tests !== 'true')
       || trainingPlan !== null) failed.push('scope');
@@ -276,7 +279,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
         failed.push('recomputed-admin-functional-plan');
     } catch { failed.push('recomputed-admin-functional-plan'); }
   }
-  if (needs.scope?.outputs?.training_functional_only === 'true' || process.env.CI_BASE_SHA === TRAINING_FUNCTIONAL_BASE) {
+  if (needs.scope?.outputs?.training_functional_only === 'true' || [TRAINING_FUNCTIONAL_BASE,TRAINING_FOLLOWUP_BASE].includes(process.env.CI_BASE_SHA)) {
     try {
       const { changedEntries } = await import('./content-scope.mjs');
       const { execFileSync } = await import('node:child_process');

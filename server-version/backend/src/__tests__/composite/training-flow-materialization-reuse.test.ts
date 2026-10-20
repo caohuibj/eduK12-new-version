@@ -3,7 +3,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks=vi.hoisted(()=>({
   global:{compositeAssessmentAttempt:{findUnique:vi.fn()},$transaction:vi.fn()},
   tx:{$queryRaw:vi.fn(),compositeAssessmentAttempt:{findUnique:vi.fn()},compositeAssessment:{findUnique:vi.fn()},
-    assessment:{findFirst:vi.fn()},assessmentUnitSnapshot:{findMany:vi.fn()}},
+    assessment:{findFirst:vi.fn()},assessmentUnitSnapshot:{findMany:vi.fn()},materialGrant:{findUnique:vi.fn()}},
   allowed:vi.fn(),runtime:vi.fn(),boundary:new Error('fixture reached authorized runtime materialization'),
 }))
 vi.mock('../../config/database',()=>({prisma:mocks.global}))
@@ -19,6 +19,7 @@ import { createFrozenActiveSlotSet, encryptFrozenActiveSlotSet } from '../../mod
 import { getAttemptState } from '../../modules/composite/composite.service'
 import { buildTrainingFlowUnits } from '../../modules/composite/training-flow-definition'
 import { resolveTrainingFlowScope } from '../../modules/composite/training-flow-scope'
+import { config } from '../../config'
 
 beforeEach(()=>{
   vi.resetAllMocks();vi.stubEnv('DATA_ENCRYPTION_KEY','e'.repeat(64))
@@ -92,5 +93,30 @@ describe('locked Training child candidate reuse',()=>{
     mocks.allowed.mockResolvedValue(false)
     await expect(getAttemptState(parent.id,{userId:'student'})).rejects.toMatchObject({statusCode:403})
     expect(mocks.runtime).not.toHaveBeenCalled()
+  })
+
+  it.each([false,true])('keeps separate Scale-use rights for a STUDENT Training-entry administrator, material grant=%s',async granted=>{
+    const {parent,composite}=fixture()
+    composite.createdBy='entry-admin';composite.creator={id:'entry-admin',role:'STUDENT'}
+    // Entry membership is a separate contract (admin-permissions/training-merge
+    // PostgreSQL suite). It must not be substituted for this resource grant.
+    const {canUseScale}=await vi.importActual<typeof import('../../services/materialGrant')>('../../services/materialGrant')
+    const previous=config.materialGrantsEnabled;config.materialGrantsEnabled=true
+    mocks.allowed.mockImplementation(canUseScale)
+    mocks.tx.materialGrant.findUnique.mockResolvedValue(granted?{id:'explicit-scale-grant'}:null)
+    try{
+      const outcome=getAttemptState(parent.id,{userId:'student'})
+      if(granted){
+        await expect(outcome).rejects.toBe(mocks.boundary)
+        expect(mocks.runtime).toHaveBeenCalledExactlyOnceWith('runtime-cipher',mocks.tx)
+      }else{
+        await expect(outcome).rejects.toMatchObject({statusCode:403})
+        expect(mocks.runtime).not.toHaveBeenCalled()
+      }
+      expect(mocks.allowed).toHaveBeenCalledExactlyOnceWith('entry-admin','STUDENT',composite.items[0].scale,mocks.tx)
+      expect(mocks.tx.materialGrant.findUnique).toHaveBeenCalledExactlyOnceWith({where:{teacherId_resourceType_resourceId:{
+        teacherId:'entry-admin',resourceType:'SCALE',resourceId:'scale',
+      }}})
+    }finally{config.materialGrantsEnabled=previous}
   })
 })
