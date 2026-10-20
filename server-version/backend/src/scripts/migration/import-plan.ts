@@ -5,7 +5,7 @@ import { decryptToken } from '../../services/checkinTokenCrypto'
 export type ImportAction = {
   model: string
   operation: 'upsert' | 'update'
-  args: { where: { id: string }; create?: Record<string, unknown>; data?: Record<string, unknown> }
+  args: { where: { id: string }; create?: Record<string, unknown>; data?: Record<string, unknown>; update?: Record<string, unknown> }
   mapping?: { entity: string; legacyId: string; newId: string }
 }
 const models = new Map(Prisma.dmmf.datamodel.models.map(model => [model.name[0].toLowerCase() + model.name.slice(1), model]))
@@ -80,6 +80,20 @@ function canonical(value: unknown): unknown {
 }
 export const contentEqual = (actual: unknown, expected: unknown): boolean => JSON.stringify(canonical(actual)) === JSON.stringify(canonical(expected))
 const expectedData = (action: ImportAction): Record<string, unknown> => action.args.create ?? action.args.data ?? {}
+/** Existing mapped identities own their current platform authority. A new
+ * default STANDARD is a creation policy, never a request to promote/demote an
+ * existing user. Only the importer-owned, empty-update upsert gets this rule;
+ * collisions, other fields and explicit update operations stay strict. */
+function existingComparisonData(action: ImportAction): Record<string, unknown> {
+  const data = expectedData(action)
+  if (action.model === 'user' && action.operation === 'upsert' && data.platformRole === 'STANDARD'
+    && action.mapping?.entity === 'user' && action.mapping.newId === action.args.where.id
+    && action.args.update && Object.keys(action.args.update).length === 0) {
+    const { platformRole: _creationDefault, ...preserved } = data
+    return preserved
+  }
+  return data
+}
 function tokenContent(value: unknown): string {
   const decoded = typeof value === 'string' ? decryptToken(value) : null
   if (!decoded) throw new Error('Invalid imported token ciphertext')
@@ -110,7 +124,7 @@ export async function verifyImportPlan(client: PrismaClient, actions: ImportActi
   for (const action of actions) {
     const row = await delegate(client, action.model).findUnique({ where: action.args.where })
     if (!row) throw new Error('Reconciliation: missing row in ' + action.model)
-    const different = differingFields(row, expectedData(action))
+    const different = differingFields(row, existingComparisonData(action))
     if (different.length) throw new Error('Reconciliation: content mismatch in ' + action.model + ' fields ' + different.join(','))
     if (!action.mapping) throw new Error('Reconciliation: missing planned ID mapping')
     const map = await client.legacyImportIdMap.findUnique({ where: { entity_legacyId: { entity: action.mapping.entity, legacyId: action.mapping.legacyId } } })
@@ -133,7 +147,7 @@ async function inspectOwnedUpdate(client: PrismaClient | Prisma.TransactionClien
   const base = actions.find(value => value.operation === 'upsert' && value.model === action.model && value.args.where.id === action.args.where.id)
   if (!base?.mapping) throw new Error('Import update has no mapped predecessor')
   const owner = await client.legacyImportIdMap.findUnique({ where: { entity_legacyId: { entity: base.mapping.entity, legacyId: base.mapping.legacyId } } })
-  if (!owner || owner.newId !== action.args.where.id || differingFields(row, expectedData(base)).length) throw new Error('Existing update conflicts with legacy import in ' + action.model)
+  if (!owner || owner.newId !== action.args.where.id || differingFields(row, existingComparisonData(base)).length) throw new Error('Existing update conflicts with legacy import in ' + action.model)
   for (const [key, value] of Object.entries(expectedData(action))) {
     if (!contentEqual(row[key], value) && !contentEqual(row[key], expectedData(base)[key] ?? null)) throw new Error('Existing update conflicts with legacy import in ' + action.model)
   }
@@ -150,7 +164,7 @@ export async function applyImportPlan(client: PrismaClient, actions: ImportActio
         const row = await delegate(tx, action.model).findUnique({ where: action.args.where })
         if (row && action.operation === 'upsert') {
           const owned = await tx.legacyImportIdMap.findUnique({ where: { entity_legacyId: { entity: action.mapping.entity, legacyId: action.mapping.legacyId } } })
-          if (!owned || owned.newId !== action.mapping.newId || differingFields(row, data).length) throw new Error('Existing row conflicts with legacy import in ' + action.model)
+          if (!owned || owned.newId !== action.mapping.newId || differingFields(row, existingComparisonData(action)).length) throw new Error('Existing row conflicts with legacy import in ' + action.model)
         }
         if (action.operation === 'update') await inspectOwnedUpdate(tx, action, actions, row)
         await delegate(tx, action.model)[action.operation](action.args)
@@ -183,7 +197,7 @@ export async function inspectImportPlan(client: PrismaClient, actions: ImportAct
     const current = await delegate(client, action.model).findUnique({ where: action.args.where })
     if (current) {
       const map = await client.legacyImportIdMap.findUnique({ where: { entity_legacyId: { entity: action.mapping.entity, legacyId: action.mapping.legacyId } } })
-      if (!map || map.newId !== action.args.where.id || differingFields(current, data).length) throw new Error('Existing row conflicts with legacy import in ' + action.model)
+      if (!map || map.newId !== action.args.where.id || differingFields(current, existingComparisonData(action)).length) throw new Error('Existing row conflicts with legacy import in ' + action.model)
       existing += 1
     } else {
       for (const field of model.fields.filter(field => field.isUnique && field.name !== 'id' && data[field.name] != null)) {

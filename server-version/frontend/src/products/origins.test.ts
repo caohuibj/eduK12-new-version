@@ -50,10 +50,10 @@ describe('trusted product origin links', () => {
       expect(surveyRecruitmentUrl(source,'http://survey.localhost:5173',true)).toBeNull()
     })
   it.each(['https://training.eduk12.top','http://localhost:5173','http://127.0.0.1:5173','http://training.localhost:5173','https://unknown.test'])(
-    'keeps both independent roles required for navigation at %s', origin => {
+    'requires an independent entry grant for navigation at %s', origin => {
       for(const role of ['ADMIN','TEACHER','STUDENT','PARENT',undefined] as const)
         for(const platformRole of ['SYSTEM_ADMIN','STANDARD',null,undefined])
-          expect(surveyGovernanceNavigation(Boolean(productOrigins(origin,true)),role,platformRole).length)
-            .toBe(origin!=='https://unknown.test'&&role==='ADMIN'&&platformRole==='SYSTEM_ADMIN'?1:0)
+          expect(surveyGovernanceNavigation(Boolean(productOrigins(origin,true)),role,platformRole,[{entry:'SURVEY'}]).length)
+            .toBe(origin!=='https://unknown.test'?1:0)
     })
 })

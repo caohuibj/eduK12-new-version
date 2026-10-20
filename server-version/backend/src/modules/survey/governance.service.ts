@@ -1,7 +1,7 @@
 import { createHash, randomBytes, randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
-import { assertCurrentSystemAdmin } from '../../services/accountAuthorityService'
+import { assertEntryAdmin } from '../admin-permissions/service'
 import { comparePassword, hashPassword } from '../../utils/password'
 import { withLoginPasswordVerification } from '../../middleware/loginRateLimit'
 import { cacheService } from '../../services/cacheService'
@@ -17,8 +17,9 @@ type Tx=Prisma.TransactionClient
 export async function authorizeAdmin(actorId:string,password:string) {
   await withLoginPasswordVerification(async()=>{
     const a=await prisma.user.findUnique({where:{id:actorId}})
-    if(!a || !a.isActive || a.isFrozen || a.platformRole!=='SYSTEM_ADMIN')
+    if(!a || !a.isActive || a.isFrozen || !['LEGACY','TRAINING'].includes(a.accountDomain))
       throw new SurveyGovernanceError(403,'需要系统管理员当前密码重新验证')
+    await assertEntryAdmin(prisma,actorId,'SURVEY')
     const protectedMode=process.env.NODE_ENV!=='development' && process.env.NODE_ENV!=='test'
     const failureKey='auth:survey:admin-password:'+digest(actorId)
     // Check inside the existing bcrypt admission, not before its queue. Only
@@ -47,7 +48,7 @@ async function event(tx:Tx, actor:string|null, action:string, target:string|null
 async function invite(actorId:string,kind:'INVITE'|'PASSWORD_RESET',targetId:string|null) {
   const value=randomSecret(),id=randomUUID()
   await prisma.$transaction(async tx=>{
-    await assertCurrentSystemAdmin(tx,actorId)
+    await assertEntryAdmin(tx,actorId,'SURVEY')
     if(targetId){
       const user=await tx.user.findFirst({where:{id:targetId,accountDomain:'SURVEY'},select:{id:true}})
       const grant=await tx.surveyResearcherGrant.findUnique({where:{userId:targetId}})
@@ -119,7 +120,7 @@ export async function redeemPasswordReset(req:Request,res:Response,raw:string,pa
   return {mfaRequired:true,enrolled:false}
 }
 export async function researcherList(actorId:string,page:number) {
-  await assertCurrentSystemAdmin(prisma,actorId)
+  await assertEntryAdmin(prisma,actorId,'SURVEY')
   const skip=(page-1)*25
   const rows=await prisma.surveyAccount.findMany({orderBy:{createdAt:'desc'},skip,take:25})
   const grants=await prisma.surveyResearcherGrant.findMany({where:{userId:{in:rows.map(x=>x.userId)}}})
@@ -132,7 +133,7 @@ export async function researcherList(actorId:string,page:number) {
 /** The administrator may list and revoke unclaimed invitations, never read
  * their bearer token, password or the Researcher raw research data. */
 export async function unclaimedResearcherInvitations(actorId:string,page:number){
-  await assertCurrentSystemAdmin(prisma,actorId)
+  await assertEntryAdmin(prisma,actorId,'SURVEY')
   const invitations=await prisma.surveyInvitation.findMany({
     where:{kind:'INVITE',claimedAt:null,revokedAt:null},
     orderBy:[{createdAt:'desc'},{id:'desc'}],
@@ -146,7 +147,7 @@ export async function unclaimedResearcherInvitations(actorId:string,page:number)
 }
 export async function revokeInvite(actorId:string,inviteId:string){
   return prisma.$transaction(async tx=>{
-    await assertCurrentSystemAdmin(tx,actorId)
+    await assertEntryAdmin(tx,actorId,'SURVEY')
     const changed=await tx.surveyInvitation.updateMany({where:{id:inviteId,kind:'INVITE',claimedAt:null,revokedAt:null},data:{revokedAt:new Date()}})
     if(changed.count!==1)throw new SurveyGovernanceError(404,'邀请不可撤销')
     await event(tx,actorId,'RESEARCHER_INVITE_REVOKED',null,{invitationId:inviteId})
@@ -155,7 +156,7 @@ export async function revokeInvite(actorId:string,inviteId:string){
 }
 export async function updateResearcherStatus(actorId:string,targetId:string,status:'SUSPENDED'|'ACTIVE') {
   return prisma.$transaction(async tx=>{
-    await assertCurrentSystemAdmin(tx,actorId)
+    await assertEntryAdmin(tx,actorId,'SURVEY')
     const account=await tx.surveyAccount.findUnique({where:{userId:targetId}})
     const grant=await tx.surveyResearcherGrant.findUnique({where:{userId:targetId}})
     if(!account||!grant||!['ACTIVE','PENDING_MFA','SUSPENDED'].includes(grant.status))
@@ -180,7 +181,7 @@ export async function updateResearcherStatus(actorId:string,targetId:string,stat
  */
 export async function revokeResearcherPermanently(actorId:string,targetId:string){
   return prisma.$transaction(async tx=>{
-    await assertCurrentSystemAdmin(tx,actorId)
+    await assertEntryAdmin(tx,actorId,'SURVEY')
     const account=await tx.surveyAccount.findUnique({where:{userId:targetId}})
     const grant=await tx.surveyResearcherGrant.findUnique({where:{userId:targetId}})
     if(!account||!grant||grant.status==='REVOKED')
@@ -201,7 +202,7 @@ export async function revokeResearcherPermanently(actorId:string,targetId:string
 }
 export async function resetResearcherMfa(actorId:string,targetId:string){
   return prisma.$transaction(async tx=>{
-    await assertCurrentSystemAdmin(tx,actorId)
+    await assertEntryAdmin(tx,actorId,'SURVEY')
     const grant=await tx.surveyResearcherGrant.findUnique({where:{userId:targetId}})
     if(!grant||!['ACTIVE','PENDING_MFA'].includes(grant.status))
       throw new SurveyGovernanceError(409,'已暂停或撤销的研究者不能通过重置双因素认证获得新资格')

@@ -46,7 +46,7 @@ export const trainingAnalysisController={
     const result=await reproduce(req)
     const tables=result.tables
     for(const table of format==='zip'?Object.values(tables):[tables[layout]]) assertExportLimits({records:table.rows.length,fields:table.columns.length})
-    return success(res,await enqueueExportJob({resourceType:'TRAINING_ANALYSIS',resourceId:req.params.id,createdBy:req.user!.userId,
+    return success(res,await enqueueExportJob({ authorityTokenVersion: req.user!.tokenVersion,resourceType:'TRAINING_ANALYSIS',resourceId:req.params.id,createdBy:req.user!.userId,
       anonymized:true,format,recordCount:tables[layout].rows.length,requestKey,
       options:{anonymize:true,creatorRole:actor(req).role,detail:'research',trainingAnalysis:{version:1,selector:result.manifest.selector,manifest:result.manifest,table:layout}}}))
   }catch(err){return respondError(res,err)}},

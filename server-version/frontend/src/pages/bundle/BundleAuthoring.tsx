@@ -62,7 +62,7 @@ export default function BundleAuthoring() {
     <section className="my-6 space-y-4 rounded border bg-white p-4 sm:p-6" aria-label="包定义制作">
       <h2 className="text-lg font-semibold">1. 制作或导入版本</h2>
       <p>导入受控声明式包文件，配置基本信息、精确槽位、背景信息和整体报告规则。修改已登记版本时请使用新版本号。</p>
-      <label className="block">导入包文件（JSON，最多 1 MB）<input type="file" accept=".json,application/json" disabled={busy} onChange={event => {
+      <label className="block">导入包文件（JSON，最多 1 MB）<input className="block w-full min-w-0 max-w-full" type="file" accept=".json,application/json" disabled={busy} onChange={event => {
         const file = event.target.files?.[0]
         if (!file) return
         void action(async () => { if (file.size > 1024 * 1024) throw new Error('包文件超过 1 MB'); setContent(await file.text()); setPreview(null); setSelected(null); setReviewed([]) })

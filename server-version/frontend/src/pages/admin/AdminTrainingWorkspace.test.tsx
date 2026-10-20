@@ -22,6 +22,6 @@ describe('unified training administration', () => {
     expect(screen.getByRole('link', { name: /认知配置与授权/ })).toHaveAttribute('href', '/cognitive-assignments?workspace=training')
     expect(screen.getByRole('link', { name: /查看和撤销授权/ })).toHaveAttribute('href', '/admin/material-grants?workspace=training')
     expect(screen.getByRole('link', { name: /课程管理与查询/ })).toHaveAttribute('href', '/courses?workspace=training')
-    expect(screen.getByText(/未建立“只属于培训版”的数据筛选/)).toBeInTheDocument()
+    expect(screen.getByText(/本窗口使用显式 Training 管理授权/)).toBeInTheDocument()
   })
 })

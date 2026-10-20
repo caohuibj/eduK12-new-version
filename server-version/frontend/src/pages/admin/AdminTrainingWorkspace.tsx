@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { BookOpen, ClipboardCheck, KeyRound, ShieldCheck, Users } from 'lucide-react'
+import { BookOpen, KeyRound, ShieldCheck, Users } from 'lucide-react'
 import { PageHeader, ProductPage } from '../../components/product-ui'
 import './admin-training.css'
 
@@ -31,15 +31,6 @@ const work = [
     Icon: BookOpen,
     links: [{ to: '/courses', label: '课程管理与查询' }],
   },
-  {
-    title: '内容审核与报告配置',
-    description: '测评包发布资格、报告方案和测评内容治理继续使用统一平台的审批与科学流程。',
-    Icon: ClipboardCheck,
-    links: [
-      { to: '/admin/bundle-authoring', label: '固定测评包制作与审批' },
-      { to: '/admin/reporting-content', label: '报告方案与内容审核' },
-    ],
-  },
 ] as const
 
 /** A navigation workspace, not another admin authority or copied grant state. */
@@ -47,8 +38,8 @@ export default function AdminTrainingWorkspace() {
   return <ProductPage width="management" className="training-admin-space">
     <PageHeader title="培训版管理" description="培训师审核、测评授权与课程治理统一办理。学员和培训师仍使用独立的培训前台。" />
     <p className="training-admin-scope" role="note">
-      当前账号、课程和授权数据库由 Huisurvey 多个产品入口共享；这里展示的是统一管理能力，
-      并未建立“只属于培训版”的数据筛选。正式多产品隔离需要服务端产品归属与权限规则。
+      本窗口使用显式 Training 管理授权，管理培训账号、培训课程及适用资源。
+      系统治理、Survey 研究和学校产品需要各自授权；学校活动、研究项目与个人答卷仍按所属范围检查。
     </p>
     <div className="training-admin-grid">
       {work.map(({ title, description, Icon, links }) => <section key={title} className="training-admin-card">

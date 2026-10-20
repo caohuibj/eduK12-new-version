@@ -49,6 +49,7 @@ import { decryptFrozenSituationalRuntimeSnapshot } from '../assessment-runtime/s
 import { randomBytes, randomUUID } from 'crypto'
 import { nanoid } from 'nanoid'
 import { Prisma, UserRole } from '@prisma/client'
+import { trainingCreatorAuthoritySql } from '../admin-permissions/training-authority'
 import { prisma } from '../../config/database'
 const defaultPrisma = prisma
 import { config } from '../../config'
@@ -2675,7 +2676,7 @@ const createAttempt = async (
       const facts = await (db as Prisma.TransactionClient).$queryRaw<Array<{ id: string; endedAt: Date | null }>>`SELECT c.id,c.ended_at AS "endedAt"
         FROM courses c JOIN users u ON u.id=${current.createdBy}
         WHERE c.id=${courseId} AND c.course_type='TRAINING_COURSE' AND NOT c.is_library AND c.status::text='PUBLISHED'
-        AND (u.role::text='ADMIN' OR (u.role::text='TEACHER' AND c.creator_id=u.id)) FOR SHARE OF c,u`
+        AND ${trainingCreatorAuthoritySql} FOR SHARE OF c,u`
       if (facts.length !== 1 || (facts[0].endedAt && new Date(facts[0].endedAt).getTime() <= Date.now()))
         throw compositeForbidden('Training 课程已关闭或投放权限无效')
       const publicationIdentity = trainingRoundPublicationIdentity(current, courseId)

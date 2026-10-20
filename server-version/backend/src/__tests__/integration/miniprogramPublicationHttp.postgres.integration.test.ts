@@ -8,7 +8,7 @@ import {config} from '../../config'
 import {prisma} from '../../config/database'
 import {cacheService} from '../../services/cacheService'
 import {integrationDatabaseUrl} from './integration-env'
-import {miniHttpClient,nativeRequire,assertMiniTestDatabase} from './mini-http-client'
+import {miniHttpClient,nativeRequire,assertMiniTestDatabase,restoreVerifiedMiniFixture} from './mini-http-client'
 import {buildReportingFixture} from './reporting-fixture'
 import {createPlatformReportingSpec,reviewPlatformReportingSpec,publishPlatformReportingSpec} from '../../modules/reporting/spec'
 import {generateOrganizationProtectedFeedback} from '../../modules/reporting/pr4Service'
@@ -54,7 +54,7 @@ suite('PR3 independent PARENT publication through real Mini Cookie/CSRF HTTP and
   const parent=await prisma.user.create({data:{username:'publication-parent-'+randomUUID(),passwordHash,role:'PARENT'}})
   const outsider=await prisma.user.create({data:{username:'publication-outsider-'+randomUUID(),passwordHash,role:'PARENT'}})
   const course=await prisma.course.create({data:{creatorId:manager.id,title:'Publication synthetic course',courseCode:randomUUID().slice(0,12)}});await prisma.courseStudent.create({data:{courseId:course.id,studentId:child.id,status:'ACTIVE'}})
-  const s=client(),p=client(),a=client(),other=client();for(const [c,u]of [[s,child],[p,parent],[a,manager],[other,outsider]]as const)await c.runtime.session.login({username:u.username,password})
+  const s=client(),p=client(),a=client(),other=client();for(const [c,u]of [[s,child],[p,parent],[a,manager],[other,outsider]]as const)if(u.id===manager.id)await restoreVerifiedMiniFixture(c,u);else await c.runtime.session.login({username:u.username,password})
   const invite=await s.runtime.parents.invite(course.id),link=await p.runtime.parents.claim(invite.inviteCode);await s.runtime.parents.approve(link.id,(await s.runtime.parents.view({view:'links'})).consent.version)
   const pub='/parent-report-publications/'+artifactId
   // SYSTEM_ADMIN alone cannot publish. Tool ceiling alone cannot grant reads.

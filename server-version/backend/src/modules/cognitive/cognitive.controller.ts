@@ -392,7 +392,7 @@ export const cognitiveController = {
       await assignmentService.getAssignmentForTeacher(req.user.userId, req.user.role, req.params.id)
 
       const anonymize = req.user.role === UserRole.ADMIN ? input.anonymize : true
-      const result = await enqueueExportJob({ resourceType: 'COGNITIVE', resourceId: req.params.id,
+      const result = await enqueueExportJob({ authorityTokenVersion: req.user!.tokenVersion, resourceType: 'COGNITIVE', resourceId: req.params.id,
         createdBy: req.user.userId, anonymized: anonymize, format: input.format, recordCount: 0,
         requestKey: req.get('X-Export-Request-Key'),
         options: { detail: input.detail, anonymize, dateRange: input.dateRange,

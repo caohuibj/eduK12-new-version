@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { validateScaleDefinition,hashScaleDefinition } from '../scale/scale-definition'
-import { assertCurrentSystemAdmin } from '../../services/accountAuthorityService'
+import { assertEntryAdmin } from '../admin-permissions/service'
 import { appendAudit } from '../organization/service'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
 import { teacherPilotContentIssues } from './teacherPilotContent'
@@ -86,7 +86,7 @@ export async function changeTeacherScaleLicense(input:{
   action:'GRANT'|'REVOKE'
 }){
   return prisma.$transaction(async tx=>{
-    await assertCurrentSystemAdmin(tx,input.actorUserId)
+    await assertEntryAdmin(tx,input.actorUserId,'HUITEACHER')
     await tx.$queryRaw`SELECT "id" FROM "organizations"
       WHERE "id"=${input.organizationId} AND "status"='ACTIVE'
         AND "product_domain"='SCHOOL' FOR UPDATE`

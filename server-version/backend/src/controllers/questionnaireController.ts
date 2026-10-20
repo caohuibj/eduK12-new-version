@@ -3005,7 +3005,7 @@ export const questionnaireController = {
       if (countDateFilter) countWhere.completedAt = countDateFilter
       const recordCount = await prisma.questionnaireAssessment.count({ where: countWhere })
 
-      const queued = await enqueueExportJob({
+      const queued = await enqueueExportJob({ authorityTokenVersion: req.user!.tokenVersion,
         resourceType: 'QUESTIONNAIRE',
         resourceId: id,
         createdBy: userId!,

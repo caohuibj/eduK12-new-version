@@ -12,6 +12,8 @@ export interface JwtPayload {
   accountDomain?: AccountDomain // Historical legacy tokens omit this claim.
   sessionProduct?: 'HUISCHOOL' | 'HUITEACHER' // Distinct signed browser audience within shared SCHOOL identity.
   mfaVerifiedAt?: number // Server-signed, only after verified TOTP/recovery
+  adminVerifiedAt?: number // Server-signed WebAuthn UV, never password/TOTP/recovery
+  adminSessionId?: string // Retained across security-key step-up; binds its challenge
   userId: string
   username: string
   role: UserRole
@@ -29,6 +31,11 @@ export interface AuthenticatedPrincipal {
   platformRole: PlatformRole
   tokenVersion: number
   mustChangePassword: boolean
+  entryGrants?: Array<{ entry: import('../modules/admin-permissions/service').AdminEntry; version: number }>
+  businessRole?: UserRole
+  teacherApproved?: boolean
+  adminVerifiedAt?: number
+  adminSessionId?: string
 }
 
 // Request with current database principal

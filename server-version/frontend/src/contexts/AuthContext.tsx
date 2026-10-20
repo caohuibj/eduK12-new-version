@@ -5,6 +5,7 @@ import React, {
   useEffect,
   useRef,
   useCallback,
+  useMemo,
   type ReactNode,
 } from 'react'
 import { authApi, type LoginRequest } from '../api/auth'
@@ -16,6 +17,7 @@ import {
   type ReauthReturn,
 } from '../components/app-shell/access'
 import type { User } from '../types'
+import {userForAccountView,type AccountView} from '../admin/accountView'
 
 interface AuthContextType {
   user: User | null
@@ -24,7 +26,7 @@ interface AuthContextType {
   clearReauthentication: () => void
   isAuthenticated: boolean
   isLoading: boolean
-  login: (username: string, password: string, expectedRole?: LoginRequest['expectedRole'], entrance?: 'admin') => Promise<void>
+  login: (username: string, password: string, expectedRole?: LoginRequest['expectedRole'], entrance?: 'admin') => Promise<User | undefined>
   setAuthenticatedUser: (userData: User) => void
   logout: () => Promise<void>
   setUser: (user: User | null) => void
@@ -97,6 +99,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
             ...nextUser,
             role: current.role,
             platformRole: current.platformRole,
+            businessRole: current.businessRole,
+            entryGrants: current.entryGrants,
           }
         : null,
     )
@@ -242,6 +246,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         replaceIdentity(response.data.user)
         setIsLoading(false)
         notifySessionChanged()
+        return response.data.user
       } else {
         throw new Error(response.message || '登录失败')
       }
@@ -298,6 +303,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       <React.Fragment key={identityGeneration}>{children}</React.Fragment>
     </AuthContext.Provider>
   )
+}
+
+export function AccountViewProvider({view,children}:{view:AccountView;children:ReactNode}){
+  const current=useAuth()
+  const user=useMemo(()=>userForAccountView(current.user,view),[current.user,view])
+  return <AuthContext.Provider value={{...current,user}}>{children}</AuthContext.Provider>
 }
 
 export const useAuth = () => {

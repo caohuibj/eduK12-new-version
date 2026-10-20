@@ -14,6 +14,7 @@ let prisma: PrismaClient
 let handler: InstanceType<typeof import('../../services/classroomSocketHandler')['ClassroomSocketHandler']>
 let socketService: typeof import('../../services/socketService')['socketService']
 let userId = ''
+let sessionToken = ''
 let courseId = ''
 let classroomId = ''
 let questionId = ''
@@ -33,6 +34,9 @@ suite('classroom teacher:start concurrency (real PostgreSQL)', () => {
       data: { username: `pr26-classroom-${suffix}`, passwordHash: 'test-only', role: 'TEACHER' },
     })
     userId = user.id
+    const { generateToken } = await import('../../utils/jwt')
+    sessionToken = generateToken({ userId: user.id, username: user.username, role: 'TEACHER',
+      accountDomain: 'LEGACY', tokenVersion: user.tokenVersion })
     const course = await prisma.course.create({
       data: {
         title: 'PR26 classroom race fixture',
@@ -81,6 +85,7 @@ suite('classroom teacher:start concurrency (real PostgreSQL)', () => {
     socketService.broadcastToRoom = vi.fn() as any
     try {
       const makeSocket = () => ({
+        handshake: { headers: { cookie: 'ptool_session=' + sessionToken } },
         data: {
           authenticated: true,
           userId,

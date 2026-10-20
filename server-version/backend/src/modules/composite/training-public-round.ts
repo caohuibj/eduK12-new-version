@@ -2,6 +2,7 @@ import { Prisma } from '@prisma/client'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { freezeGroupIpPolicy, resolveGroupIpOpenWindow, isGroupIpWindowActive, GroupIpPolicyError } from '../survey/group-ip-policy'
 import { compositeBadRequest, compositeForbidden } from './composite.errors'
+import { trainingCreatorAuthoritySql } from '../admin-permissions/training-authority'
 
 export type TrainingRoundInput={groupIpPolicy?:unknown;roundId?:string}
 export const trainingRoundSelect={id:true,opensAt:true,closesAt:true} as const
@@ -23,7 +24,7 @@ export async function prepareTrainingPublicRound(tx:Prisma.TransactionClient,row
   const courseId=courses[0].courseId
   const facts=await tx.$queryRaw<Array<{id:string;endedAt:Date|null}>>`SELECT c.id,c.ended_at AS "endedAt" FROM courses c JOIN users u ON u.id=${row.createdBy}
     WHERE c.id=${courseId} AND c.course_type='TRAINING_COURSE' AND NOT c.is_library
-    AND (u.role::text='ADMIN' OR (u.role::text='TEACHER' AND c.creator_id=u.id))
+    AND ${trainingCreatorAuthoritySql}
     FOR SHARE OF c,u`
   if(facts.length!==1)throw compositeForbidden('集中采集课程或编制者权限无效')
   if(facts[0].endedAt&&expiry>new Date(facts[0].endedAt))throw compositeBadRequest('集中采集不能超过课程截止时间')
