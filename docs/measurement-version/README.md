@@ -183,3 +183,14 @@ V06 内部审核发布助手从数据库读取指定 candidate/review，不接�
 V06/V08 冻结匹配内部准备：新增有界 EXACT_POPULATION_PRIORITY_V1 选择器，只接受已冻结的精确 release/hash/entry 集合及显式 priority，复用 ReferenceCore 人口匹配。相同 metric/referenceKind 的同优先级多匹配降为 AMBIGUOUS；缺人口字段只可回退到集合中真正适用的条目，不按“总体”名字猜测。已冻结集合正常 SUPERSEDED 仍可选；REVOKED slot 降级、RETIRED 不新增选择。结果仅保存精确引用及不可用原因，不复制参考统计、扫描样本、取 latest 或调用 scorer。3 项匹配合同及定向 strict TypeScript 通过。实际投放/Wave 冻结写入与 START 调用仍待 V05 接口稳定后的服务接入，不能将此纯函数当作完成的 V08。
 
 集中数据库部分验收见 [20261020-validation.md](evidence/20261020-validation.md)：隔离 PG16.15 single-user 实际执行182份 SQL迁移和16项数据库拒绝合同，另验证2种合法审核。socket/Prisma deploy/并发等未覆盖项明确保留，不把本次证据扩大为完整上线验收。
+
+### V05/V08 接入待办（当前接口阻塞，暂停新增准备层）
+
+真实 reader 只读盘点见 [reader-interface-audit.md](reader-interface-audit.md)。
+
+- [ ] 管理员最终接口恢复/合并后，认证 actor 的 capability 与现有 Training resource scope / Survey project owner scope 取交集；底层 facts reader 不独立授予访问。
+- [ ] 从真实 publication/runtime release 绑定补入 source 投影，拒绝客户端自报 measurementReleaseId；历史没有无损映射时单列，不编造同一测量身份。
+- [ ] Survey 人口组仅使用明确映射的真实冻结字段；现阶段不从题名推断、不自动映射、不新增人口资料采集。缺字段只匹配真正适用的已批准无约束参考。
+- [ ] Training 复用已校验 frozen context、sourceResultHash、epoch/slot 与现有有界 facts batch；保留关系测评可见范围及组织资源隔离。
+- [ ] 候选实际 membership reader 保留 Survey 计算前后 sourceRevision/count/撤回 fence，发布事务重核当前资格；不要把这些具有 TOCTOU 风险的检查当作冗余删除。
+- [ ] 原报告按原冻结工件读取，不重跑当前选择器；选择器任一候选 REVOKED 导致整 metric/referenceKind slot 降级的保守策略须在接入中显式保留。
