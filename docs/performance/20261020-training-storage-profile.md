@@ -2,6 +2,8 @@
 
 状态：`SINGLE_AND_CSV_VERIFIED_ALL_PROCESSES_STOPPED`。固定产品候选 `aff44d0cc4c935342dfaf55fa29b8fdde69c298b`，本轮只有一份三 flag 测评及一次闲时标准导出。候选全 OFF 单份此前也已完成；所有未来 300 份计划已取消，没有新压测。旧 main 只引用冻结证据，不重跑。
 
+后续获批的最小 frozen-report writer 修复及唯一最终单份结果见[最终复验](20261020-training-final-single.md)；本文保留 aff44d0 的原始诊断口径。
+
 ## 已验证范围与配置
 
 仅开启 `ASSESSMENT_COMPACT_FACTS_ENABLED=true`、`ASSESSMENT_SHARED_CONTROL_ENABLED=true`、`ASSESSMENT_SHARED_RUNTIME_STORAGE_ENABLED=true`。其余可选 flag 未开，报告同步、whole=false、报告配置600/2/50ms、pool20/4、API heap640MiB及原admission/timeout不变。Node24.21.0；API无独立硬CPU配额，根cgroup4核/16GiB，节点12GiB停止线；PG1CPU/1GiB，Redis0.25CPU/256MiB。
