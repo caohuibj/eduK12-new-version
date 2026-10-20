@@ -7,6 +7,15 @@ const fs = require('node:fs')
 const path = require('node:path')
 const { createHmac } = require('node:crypto')
 
+// Playwright's getByLabel(..., {exact:true}) reads a wrapping label's
+// descendant option text too. Target the explicitly named wrapping label and
+// its select; retain strict single-element resolution (never .first()).
+function labeledControl(scope, text, tag) {
+  const escaped = text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+  return scope.locator('label').filter({ hasText: new RegExp('^' + escaped) }).locator(tag)
+}
+const labeledSelect = (scope, text) => labeledControl(scope, text, 'select')
+const labeledTextarea = (scope, text) => labeledControl(scope, text, 'textarea')
 async function responseData(response) {
   assert.equal(response.status(), 200, 'UI request HTTP success: ' + new URL(response.url()).pathname)
   const envelope = await response.json()
@@ -40,12 +49,12 @@ async function authorReport(page, studio, base, { title, audience, check }) {
   await studio.getByLabel('报告版本', { exact: true }).fill('1')
   const draft = await clickWrite(page, studio.getByRole('button', { name: '创建报告草稿', exact: true }), base)
   await studio.getByLabel('报告标题', { exact: true }).fill(title)
-  await studio.getByLabel('受众', { exact: true }).selectOption(audience)
+  await labeledSelect(studio, '受众').selectOption(audience)
   await studio.getByRole('button', { name: '添加指标', exact: true }).click()
   await studio.getByLabel('局限说明（每行一条）', { exact: true }).fill('Synthetic browser acceptance only; not population norms.')
   await clickWrite(page, studio.getByRole('button', { name: '保存报告草稿', exact: true }), base + '/' + draft.id, 'PATCH')
   await studio.getByText('报告草稿已保存。', { exact: true }).waitFor()
-  await studio.getByLabel('预览情境', { exact: true }).selectOption('NO_REFERENCE')
+  await labeledSelect(studio, '预览情境').selectOption('NO_REFERENCE')
   const preview = await clickWrite(page, studio.getByRole('button', { name: '预览合成报告', exact: true }), base + '/' + draft.id + '/preview')
   check(preview.synthetic === true && preview.scenario === 'NO_REFERENCE', 'UI synthetic report preview explicitly identifies no-reference scenario')
   await studio.getByText('仅使用合成指标与参考情境，未读取真实答卷。', { exact: true }).waitFor()
@@ -64,7 +73,7 @@ async function formalReferenceJourney({ page, browser, fixture: f, output, check
   for (const label of ['正式提交说明', '目标人群说明', '正式适用性依据', '正式样本充分性判断', '正式不确定性说明', '已记录同意允许本用途的依据']) {
     await submission.getByLabel(label, { exact: true }).fill('Isolated synthetic aggregate browser acceptance only; five synthetic learners, not a population norm. The original accepted notice permits this software exercise only.')
   }
-  await submission.getByLabel('目标人群选择', { exact: true }).selectOption('GENERAL_POPULATION')
+  await labeledSelect(submission, '目标人群选择').selectOption('GENERAL_POPULATION')
   await submission.getByLabel('目标范围与代表性依据', { exact: true }).fill('Explicit fixture-only software matching exercise, not scientific evidence of general-population representativeness.')
   const formal = await clickWrite(page, submission.getByRole('button', { name: '提交给独立正式审核', exact: true }), '/api/training/reference-governance/submissions')
   await submission.getByText('正式候选已提交；请将下列候选 ID 与摘要交给有明确审核能力的独立人员。', { exact: true }).waitFor()
@@ -81,7 +90,7 @@ async function formalReferenceJourney({ page, browser, fixture: f, output, check
     await reviewer.waitForURL(/\/dashboard(?:\?|$)/)
     const governance = reviewer.getByRole('region', { name: '正式参考独立审核与发布', exact: true })
     await governance.getByLabel('正式候选 UUID', { exact: true }).fill(formal.candidateId)
-    await governance.getByLabel('读取能力授权', { exact: true }).selectOption(f.formalGovernanceGrantId)
+    await labeledSelect(governance, '读取能力授权').selectOption(f.formalGovernanceGrantId)
     const read = await clickWrite(reviewer, governance.getByRole('button', { name: '读取正式聚合证据', exact: true }), '/api/training/reference-governance/read')
     await governance.getByRole('article', { name: '正式候选聚合证据', exact: true }).waitFor()
     await governance.getByText('已接受同意正文：' + f.referenceConsent.body, { exact: true }).waitFor()
@@ -91,7 +100,7 @@ async function formalReferenceJourney({ page, browser, fixture: f, output, check
     await governance.getByRole('checkbox', { name: '已核对实际同意范围、适用人群和统计依据，未将提交说明当作新增同意', exact: true }).check()
     const review = await clickWrite(reviewer, governance.getByRole('button', { name: '保存正式审核决定', exact: true }), '/api/training/reference-governance/reviews')
     await governance.getByText('审核已保存：' + review.reviewId + ' · APPROVED', { exact: true }).waitFor()
-    await governance.getByLabel('正式发布授权', { exact: true }).selectOption(f.formalGovernanceGrantId)
+    await labeledSelect(governance, '正式发布授权').selectOption(f.formalGovernanceGrantId)
     await governance.getByLabel('正式发布 key', { exact: true }).fill('browser-formal')
     await governance.getByLabel('正式发布版本', { exact: true }).fill('1')
     const release = await clickWrite(reviewer, governance.getByRole('button', { name: '发布精确正式参考', exact: true }), '/api/training/reference-governance/publish')
@@ -122,7 +131,7 @@ async function trainingJourney({ browser, fixture: f, output, check, prepareFina
     await workspace.getByLabel('报告内容授权 ID', { exact: true }).fill(f.reportGrantId)
     await workspace.getByRole('button', { name: '打开课程报告', exact: true }).click()
     const studio = workspace.getByRole('region', { name: '项目私有报告', exact: true })
-    await studio.getByLabel('测量发布版本', { exact: true }).waitFor()
+    await labeledSelect(studio, '测量发布版本').waitFor()
     const reportBase = '/api/questionnaire-products/' + f.product.id + '/content-reports/courses/' + f.courseId
     f.report = await authorReport(page, studio, reportBase, { title: 'Synthetic browser frozen report', audience: 'teacher', check })
     await layout(page, output, 'training-report-editor', check)
@@ -172,8 +181,8 @@ async function trainingJourney({ browser, fixture: f, output, check, prepareFina
     await page.goto(base + '/courses/' + f.courseId + '/detail')
     await page.getByRole('button', { name: '数据分析', exact: true }).click()
     const reference = page.getByRole('region', { name: '课程描述性参考工作台', exact: true })
-    await firstRealOption(reference.getByLabel('参考来源投放', { exact: true }))
-    await firstRealOption(reference.getByLabel('参考数值指标', { exact: true }))
+    await firstRealOption(labeledSelect(reference, '参考来源投放'))
+    await firstRealOption(labeledSelect(reference, '参考数值指标'))
     await reference.getByLabel('analyze 授权 ID', { exact: true }).fill(f.referenceGrantId)
     await reference.getByLabel('参考候选版本', { exact: true }).fill('browser-1')
     for (const label of ['方法依据', '纳入规则', '缺失处理', '重复作答', '组织聚类', '施测差异', '不确定性', '适用范围', '样本充分性']) {
@@ -295,7 +304,7 @@ async function surveyJourney({ browser, fixture: f, output, check }) {
   } finally { await context.close() }
 }
 const requiredChecks = ['measurement.training.report-and-recovery', 'measurement.training.reference-selection', 'measurement.training.final-interpretation-download', 'measurement.survey.report-editor-totp-focus', 'measurement.training.denied-scope-and-expiry', 'measurement.training.formal-independent-review-publish']
-module.exports = { requiredChecks, runJourneys: async options => {
+module.exports = { labeledSelect, labeledTextarea, requiredChecks, runJourneys: async options => {
   const reportCheck = options.check
   options = { ...options, check: (condition, name) => reportCheck(name, condition, true) }
   assert.equal(typeof options.prepareFinals, 'function', 'Real FINAL prerequisite callback is required')

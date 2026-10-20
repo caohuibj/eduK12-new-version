@@ -4,6 +4,7 @@ on:
     branches: [ci/measurement-browser-20261020]
 permissions:
   contents: read
+  actions: read
 concurrency:
   group: measurement-browser-${{ github.ref }}
   cancel-in-progress: false
@@ -30,11 +31,11 @@ jobs:
           path: measurement-browser-evidence/scope.json
           retention-days: 3
           if-no-files-found: error
-  build:
-    name: production compile once / ${{ matrix.component }}
+  reuse:
+    name: verify original successful build / ${{ matrix.component }}
     needs: scope
     runs-on: ubuntu-24.04
-    timeout-minutes: 30
+    timeout-minutes: 5
     strategy:
       fail-fast: false
       matrix:
@@ -43,34 +44,21 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-      - name: native backend compile dependencies
-        if: matrix.component == 'backend'
-        run: bash server-version/scripts/ci-install-canvas-deps.sh
-      - name: compile and retain exact reusable output
+      - name: admit only the fixed original successful build
         env:
           COMPONENT: ${{ matrix.component }}
-        run: python3 -B .github/scripts/measurement-browser-ci.py build "$COMPONENT"
-      - uses: actions/upload-artifact@v4
-        with:
-          name: measurement-${{ github.run_id }}-${{ github.sha }}-${{ matrix.component }}-build
-          path: |
-            measurement-browser-evidence/${{ matrix.component }}-build.json
-            measurement-browser-evidence/${{ matrix.component }}-build.tar.gz
-          retention-days: 3
-          if-no-files-found: error
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B .github/scripts/measurement-browser-ci.py admit "$COMPONENT"
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: measurement-${{ github.run_id }}-${{ github.sha }}-${{ matrix.component }}-producer-attempt-${{ github.run_attempt }}
+          name: measurement-${{ github.run_id }}-${{ github.sha }}-${{ matrix.component }}-admission-attempt-${{ github.run_attempt }}
           path: measurement-browser-evidence/*.json
           retention-days: 3
           if-no-files-found: error
   browser:
     name: missing measurement browser paths / ${{ matrix.phase }}
-    needs: build
+    needs: reuse
     strategy:
       fail-fast: false
       matrix:
@@ -123,12 +111,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - uses: actions/download-artifact@v4
-        with:
-          pattern: measurement-${{ github.run_id }}-${{ github.sha }}-*-build
-          path: measurement-browser-evidence
-          merge-multiple: true
-      - name: verify same-run compiled outputs without rebuild
+      - name: authenticate and restore fixed original compiled outputs without rebuild
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
           python3 -B .github/scripts/measurement-browser-ci.py restore backend
           python3 -B .github/scripts/measurement-browser-ci.py restore frontend
@@ -201,13 +186,14 @@ jobs:
           name: measurement-${{ github.run_id }}-${{ github.sha }}-browser-${{ matrix.phase }}-attempt-${{ github.run_attempt }}
           path: |
             measurement-browser-evidence/*-consumed.json
+            measurement-browser-evidence/*-admission.json
             measurement-browser-evidence/scope.json
             ${{ runner.temp }}/measurement-browser-evidence/
           retention-days: 3
           if-no-files-found: error
   result:
     name: bounded browser result (not merge readiness)
-    needs: [scope, build, browser]
+    needs: [scope, reuse, browser]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 5
@@ -218,7 +204,7 @@ jobs:
           python3 - <<'PY'
           import json, os
           results = json.loads(os.environ['RESULTS'])
-          assert set(results) == {'scope', 'build', 'browser'}
+          assert set(results) == {'scope', 'reuse', 'browser'}
           assert all(row['result'] == 'success' for row in results.values()), results
           with open(os.environ['GITHUB_STEP_SUMMARY'], 'a') as output:
             output.write('Bounded measurement browser qualification succeeded on the exact compiled candidate. Local checks are reference-only, not replayed or formally admitted. No full-platform, merge, image-security, deployment or scientific-norm qualification is claimed.\n')

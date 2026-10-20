@@ -7,6 +7,9 @@ from pathlib import Path
 import subprocess
 import tarfile
 import time
+import urllib.request
+import urllib.error
+import zipfile
 
 ROOT = Path(__file__).resolve().parents[2]
 E = ROOT / 'measurement-browser-evidence'
@@ -115,13 +118,96 @@ def validate_receipt(receipt, component, plan, archive_hash, tree, lock_hash):
     assert receipt['archiveSha256'] == archive_hash, 'Archive content changed'
 
 
+def production_inputs(component, excluded):
+    rows = subprocess.check_output(['git', 'ls-tree', '-r', '-z', 'HEAD', '--', 'server-version/' + component], cwd=ROOT).split(b'\0')
+    return hashlib.sha256(b'\0'.join(row for row in rows if row and row.split(b'\t', 1)[1].decode() != excluded)).hexdigest()
+
+
+def fixed_inputs(component):
+    source = json.loads(BINDING.read_text())['fixedBuildSource']
+    pin = source['components'][component]
+    fixture = source['fixtureRepair']
+    assert git('rev-parse', 'HEAD:' + fixture['path']) == fixture['after'], 'Unreviewed fixture repair'
+    assert production_inputs(component, fixture['path']) == pin['productionInputSha256'], 'Production build inputs changed'
+    return source, pin
+
+
+def api(route):
+    repository = os.environ['GITHUB_REPOSITORY']
+    assert repository == json.loads(BINDING.read_text())['fixedBuildSource']['repository']
+    request = urllib.request.Request('https://api.github.com/repos/' + repository + route,
+        headers={'Authorization': 'Bearer ' + os.environ['GH_TOKEN'], 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+    with urllib.request.urlopen(request, timeout=60) as response:
+        return json.load(response)
+
+
+def admit(component):
+    plan = scope()
+    source, pin = fixed_inputs(component)
+    run = api('/actions/runs/' + source['runId'])
+    assert str(run['id']) == source['runId'] and str(run['run_attempt']) == source['attempt']
+    assert run['head_sha'] == source['head'] and run['head_branch'] == source['branch']
+    assert run['event'] == 'push' and run['path'] == source['workflowPath']
+    assert run['status'] == 'completed', 'Original run is not terminal'
+    job = api('/actions/jobs/' + str(pin['jobId']))
+    assert str(job['run_id']) == source['runId'] and str(job['run_attempt']) == source['attempt']
+    assert job['head_sha'] == source['head'] and job['conclusion'] == 'success'
+    assert job['name'] == 'production compile once / ' + component
+    artifact = api('/actions/artifacts/' + str(pin['artifactId']))
+    assert artifact['id'] == pin['artifactId'] and not artifact['expired']
+    assert artifact['name'] == f"measurement-{source['runId']}-{source['head']}-{component}-build"
+    assert artifact['size_in_bytes'] == pin['zipBytes'] and artifact['digest'] == 'sha256:' + pin['zipSha256']
+    assert str(artifact['workflow_run']['id']) == source['runId'] and artifact['workflow_run']['head_sha'] == source['head']
+    write(component + '-admission.json', {**plan, 'originalBuild': source, 'component': component,
+          'status': 'admitted original successful build only; failed browser run remains failed'})
+    return source, pin
+
+
+def download_fixed(component):
+    source, pin = admit(component)
+    E.mkdir(exist_ok=True)
+    archive = E / (component + '-official.zip')
+    class NoRedirect(urllib.request.HTTPRedirectHandler):
+        def redirect_request(self, req, fp, code, msg, headers, newurl):
+            return None
+    request = urllib.request.Request(f"https://api.github.com/repos/{source['repository']}/actions/artifacts/{pin['artifactId']}/zip",
+        headers={'Authorization': 'Bearer ' + os.environ['GH_TOKEN'], 'Accept': 'application/vnd.github+json'})
+    try:
+        urllib.request.build_opener(NoRedirect).open(request, timeout=60)
+        raise AssertionError('Expected signed artifact download redirect')
+    except urllib.error.HTTPError as error:
+        assert error.code == 302
+        location = error.headers['Location']
+        assert location.startswith('https://')
+    # Never forward GitHub authorization to the signed storage URL.
+    with urllib.request.urlopen(location, timeout=120) as response, archive.open('wb') as target:
+        total = 0
+        while chunk := response.read(1024 * 1024):
+            total += len(chunk)
+            assert total <= pin['zipBytes'], 'Oversized artifact'
+            target.write(chunk)
+    assert total == pin['zipBytes'] and sha(archive) == pin['zipSha256'], 'Official artifact bytes changed'
+    with zipfile.ZipFile(archive) as zipped:
+        expected = {component + '-build.json', component + '-build.tar.gz'}
+        assert set(zipped.namelist()) == expected, 'Unexpected artifact members'
+        for name in expected:
+            with zipped.open(name) as src, (E / name).open('wb') as dst:
+                while chunk := src.read(1024 * 1024): dst.write(chunk)
+    archive.unlink()
+    return source, pin
+
+
 def restore(component):
     plan = scope()
+    source, pin = download_fixed(component)
     folder = ROOT / 'server-version' / component
     archive = E / (component + '-build.tar.gz')
+    assert sha(archive) == pin['archiveSha256']
     receipt = json.loads((E / (component + '-build.json')).read_text())
-    validate_receipt(receipt, component, plan, sha(archive), git('rev-parse', 'HEAD:server-version/' + component), sha(folder / 'package-lock.json'))
-    # Only same-run own build outputs are accepted. Retain modes and internal npm
+    validate_receipt(receipt, component, {**plan, 'head': source['head'], 'runId': source['runId']}, sha(archive), pin['componentTree'], sha(folder / 'package-lock.json'))
+    assert receipt['attempt'] == source['attempt'] and sha(E / (component + '-build.json')) == pin['receiptSha256']
+    assert receipt['tools'][source['fixtureRepair']['path']] == source['fixtureRepair']['before'], 'Original fixture identity mismatch'
+    # Only the pinned original successful producer outputs are accepted. Retain modes and internal npm
     # symlinks; reject absolute/traversal member names before extracting.
     with tarfile.open(archive) as tar:
         for member in tar.getmembers():
@@ -134,7 +220,7 @@ def restore(component):
         file = Path(relative)
         assert not file.is_absolute() and '..' not in file.parts
         assert sha(folder / file) == expected, 'Required emitted/source asset changed: ' + relative
-    write(component + '-consumed.json', {**plan, 'producerAttempt': receipt['attempt'], 'archiveSha256': receipt['archiveSha256'], 'status': 'verified'})
+    write(component + '-consumed.json', {**plan, 'producerHead': receipt['head'], 'producerRunId': receipt['runId'], 'producerAttempt': receipt['attempt'], 'archiveSha256': receipt['archiveSha256'], 'status': 'verified'})
 
 
 def tls():
@@ -167,7 +253,7 @@ def tls():
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('action', choices=['scope', 'build', 'restore', 'tls'])
+    parser.add_argument('action', choices=['scope', 'build', 'restore', 'tls', 'admit'])
     parser.add_argument('component', nargs='?', choices=['backend', 'frontend'])
     args = parser.parse_args()
     if args.action in ['scope', 'tls']:

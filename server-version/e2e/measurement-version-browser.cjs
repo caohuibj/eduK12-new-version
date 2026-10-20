@@ -11,7 +11,7 @@ const fs=require('node:fs')
 const path=require('node:path')
 const {spawnSync}=require('node:child_process')
 const {chromium}=require('../backend/node_modules/playwright-core')
-const {runJourneys,requiredChecks}=require('./measurement-version-journeys.cjs')
+const {runJourneys,requiredChecks,labeledSelect,labeledTextarea}=require('./measurement-version-journeys.cjs')
 assert.equal(process.env.GITHUB_ACTIONS,'true','Browser execution belongs only in GitHub CI')
 assert.equal(process.env.MEASUREMENT_BROWSER_ISOLATED,'1')
 const privateRoot=path.resolve(process.env.RUNNER_TEMP,'measurement-browser-private')
@@ -76,12 +76,12 @@ const localDate=ms=>new Date(ms).toISOString().slice(0,16)
 async function fillGrant({product='TRAINING',purpose='report',subjectId=fixture.teacher.id,scopeId=fixture.courseId,resourceIds=[fixture.compositeId],capabilities=['report.edit','report.publish'],expired=false}){
   const another=admin.getByRole('button',{name:'编制另一份授权',exact:true})
   if(await another.count())await another.click()
-  await admin.getByLabel('产品授权范围',{exact:true}).selectOption(product)
-  if(product==='TRAINING')await admin.getByLabel('Training 授权用途',{exact:true}).selectOption(purpose)
-  else await admin.getByLabel('资源类型',{exact:true}).selectOption(purpose==='data'?'data':'reference')
+  await labeledSelect(admin,'产品授权范围').selectOption(product)
+  if(product==='TRAINING')await labeledSelect(admin,'Training 授权用途').selectOption(purpose)
+  else await labeledSelect(admin,'资源类型').selectOption(purpose==='data'?'data':'reference')
   await admin.getByLabel(product==='TRAINING'?'目标教师 UUID':'目标研究者 UUID',{exact:true}).fill(subjectId)
   if(purpose!=='reference-governance')await admin.getByLabel(product==='TRAINING'?'课程 UUID':'项目 UUID',{exact:true}).fill(scopeId)
-  await admin.getByLabel('精确资源 UUID（逗号或换行分隔）',{exact:true}).fill(resourceIds.join('\n'))
+  await labeledTextarea(admin,'精确资源 UUID（逗号或换行分隔）').fill(resourceIds.join('\n'))
   for(const cap of capabilities)await admin.getByRole('checkbox',{name:cap,exact:true}).check()
   await admin.getByLabel('生效时间（本地时间）',{exact:true}).fill(localDate(Date.now()-120000))
   await admin.getByLabel('到期时间（本地时间）',{exact:true}).fill(localDate(Date.now()+(expired?-60000:3600000)))
@@ -204,7 +204,7 @@ async function prepareFinals(){
   for(const name of mandatory)assert.ok(evidence.checks.some(row=>row.name===name),'Missing required browser scenario: '+name)
   evidence.status='PASS';save()
 })().catch(async error=>{
-  evidence.status='FAIL';evidence.failure={phase,name:error.name,message:'Browser phase failed; inspect precise named check and sanitized action/status trace',sourceFrames:String(error.stack||'').split('\n').slice(1,4).filter(line=>/^\s+at /.test(line))}
+  evidence.status='FAIL';evidence.failure={phase,name:error.name,message:'Browser phase failed; inspect precise named check and sanitized action/status trace',sourceFrames:String(error.stack||'').split('\n').filter(line=>/^\s+at /.test(line)).slice(0,3)}
   // Never screenshot auth forms, nor emit input values, credentials, cookies or bodies.
   if(activePage&&phase!=='admin-webauthn'&&phase!=='startup')await shot(activePage,'failure',1440).catch(()=>{})
   save();console.error(JSON.stringify(evidence.failure));process.exitCode=1

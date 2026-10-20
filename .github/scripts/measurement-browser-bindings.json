@@ -13,5 +13,40 @@
     "server-version/e2e/measurement-version-browser.cjs",
     "server-version/e2e/measurement-browser-proxy.cjs",
     "server-version/e2e/measurement-version-journeys.cjs"
-  ]
+  ],
+  "fixedBuildSource": {
+    "repository": "caohuibj/eduK12-new-version",
+    "runId": "39399331312",
+    "attempt": "1",
+    "head": "da713c522be4fd3309e4dcf327bfb71384c784fe",
+    "branch": "ci/measurement-browser-20261020",
+    "workflowPath": ".github/workflows/ci-measurement-browser.yml",
+    "fixtureRepair": {
+      "path": "server-version/backend/scripts/measurement-browser-fixture.ts",
+      "before": "c8357e27d566f68a8c1ad520d3ab17d6ce7af8d5",
+      "after": "4fd705b7bf2f3fe7b94f9419fff4e26fe6b6bdc2"
+    },
+    "components": {
+      "backend": {
+        "jobId": 118549912875,
+        "artifactId": 12254021820,
+        "zipBytes": 111466192,
+        "zipSha256": "1b63bd5f180fd34dd5d8c203269e054bbd614a8c058df619ffadf11e8c9a0e97",
+        "archiveSha256": "68eab0cc18f679331898914caf2c44cc1a64af88c33f677940032419874fe0b2",
+        "componentTree": "8804b7ff3d5d02555bfa5a338702bd23702d6561",
+        "productionInputSha256": "a1bba1b32276d872a6e3ebd56a0cf3eebf84c4f9c71ccaea7e789a8447429cbd",
+        "receiptSha256": "55d7f4e9d65f261c270da0e171a705033eea272668f7351bb60fce9d3711ad1b"
+      },
+      "frontend": {
+        "jobId": 118549912646,
+        "artifactId": 12253537237,
+        "zipBytes": 129064422,
+        "zipSha256": "7eae79cb4c9d736cb2ac05aa505eeb11e2291ec29dcda9777721ab0b551398b9",
+        "archiveSha256": "66df59142b3c35ceb328d12320c699c6516a82d333b35803b2eac433bc87f560",
+        "componentTree": "3fb713c81a2d795c4fddbf17ebf23acd876eaf16",
+        "productionInputSha256": "59a1a285a10501523eb655bfe458017381408bce8b7d298c8d04ded6da6ed485",
+        "receiptSha256": "99afeff8467df11bfb363d4eef282942abbe1557a1a0701b00307a66a70ff041"
+      }
+    }
+  }
 }

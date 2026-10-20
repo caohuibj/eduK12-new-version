@@ -26,15 +26,33 @@ run, attempt, source inventory, component tree and archive SHA-256.
   local-to-Actions evidence admission. Existing release/merge prerequisites remain
   separate and must not be inferred from this bounded result.
 
-Both components carry their installed dependencies and dist in immutable same-run
-Actions artifacts. Source assets, configuration, Prisma schema and runtime files
-remain the exact checked-out source, bound by scope. Consumers verify SHA/run/tree,
-lockfile and archive hash before extraction. No download failure falls back to
-rebuild. Failed browser jobs can use **Re-run failed jobs** on the same run, keeping
-successful producer artifacts and their original attempt. Do not re-run all jobs.
-A product input change requires explicit affected-evidence review, not a silent
-fingerprint refresh. Failures, missing/skipped/cancelled jobs cannot pass the final
-bounded result.
+The first run built both components once. The repair round pins original run
+`39399331312`, attempt 1, head `da713c522be4fd3309e4dcf327bfb71384c784fe`.
+That run's browser jobs failed and remain failed; only its successful backend job
+`118549912875` and frontend job `118549912646` are admitted. Exact original build
+artifact IDs, ZIP sizes/digests, receipt hashes, tar hashes and component trees are
+frozen in the binding file. The workflow has no producer or rebuild fallback.
+
+Before download, Actions API must confirm the original run/head/attempt/branch,
+producer success and exact unexpired artifact. Signed artifact ZIP bytes are
+stream-hashed, and only the expected receipt/tar pair is extracted. Consumers
+verify the original receipt identity, flags, lockfiles, archive hash and restored
+required-file hashes. Current source identity is recorded separately, never
+rewritten over the producer identity. GitHub authorization is not forwarded to
+signed storage URLs. Missing/expired/mismatched evidence stops, never rebuilds.
+
+All production component files remain identical. The only backend-tree exception
+is the exact reviewed `scripts/measurement-browser-fixture.ts` before/after blob,
+which is not included by production tsconfig and not consumed by npm build. Full
+component inventories excluding that one test fixture must match the original;
+frontend tree remains exact. Other harness/control changes remain inside the
+previous precise tool allowlist and complete frozen-source boundary.
+
+Use **Re-run failed jobs** for an unchanged current attempt. For this repaired
+harness commit the workflow consumes the fixed original build artifacts directly,
+without relabeling them as a new build. A production input change stops for an
+explicit affected-evidence review. Failures, missing/skipped/cancelled jobs cannot
+pass the final bounded result. This is not generic cross-run evidence discovery.
 
 Only official package/tool sources are used. No production secrets, new persistent
 credentials, repository settings or permissions are required. Browser artifacts

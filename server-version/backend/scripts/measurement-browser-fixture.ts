@@ -153,7 +153,8 @@ async function seed() {
   closeQueues = (await import('../src/config/queue')).closeQueues
   const createDraft = async (account: any, courseId: string, title: string, scale: boolean, publicEnabled = false) => {
     const author = { userId: account.id, role: UserRole.TEACHER }
-    let draft = await questionnaire.create(author, { requestId: randomUUID(), name: title, questionnaireType: 'COURSE', courseIds: [courseId], publicEnabled })
+    let draft = await questionnaire.create(author, { requestId: randomUUID(), name: title, questionnaireType: 'COURSE', courseIds: [courseId], publicEnabled,
+      ...(publicEnabled ? { expiresAt: new Date(Date.now() + 2 * 3600000).toISOString() } : {}) })
     if (scale) draft = await questionnaire.addItem(author, draft.id, { revision: draft.revision, item: { type: 'SCALE', scaleId: fixture.scaleId, required: true } })
     return draft
   }
