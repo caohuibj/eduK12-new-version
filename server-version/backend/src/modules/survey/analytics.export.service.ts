@@ -210,13 +210,12 @@ export async function createSurveyExport(req:Request,input:{
         if(/exceeds?|too many|too large|oversiz|bounded rows/i.test(detail))fail(413,detail)
         fail(409,'导出来源不完整或不一致，请先核验研究数据')
       }
-      const selectedVersions=[...new Map([
-        ...(sources.sourceVersions??[]).map(x=>[
-          x.waveId+':'+x.instrumentKey+':'+x.definitionDigest,{...x},
-        ] as const),
-        ...sources.codebook.map(x=>[
-        x.waveId+':'+x.instrumentKey+':'+x.definitionDigest,
-        {waveId:x.waveId,instrumentKey:x.instrumentKey,
+      // Merge codebook display metadata with the verified source identity. A raw
+      // item descriptor must never overwrite a frozen release pointer.
+      const selectedVersionMap=new Map<string,Record<string,unknown>>()
+      for(const x of sources.codebook){
+        const key=x.waveId+':'+x.instrumentKey+':'+x.definitionDigest
+        selectedVersionMap.set(key,{waveId:x.waveId,instrumentKey:x.instrumentKey,
           publicationVersion:x.publicationVersion,
           instrumentRevision:x.instrumentRevision,
           definitionDigest:x.definitionDigest,scoringDigest:x.scoringDigest,
@@ -224,8 +223,13 @@ export async function createSurveyExport(req:Request,input:{
           scalePresentationMode:x.scalePresentationMode??null,
           scaleTimingContract:x.timingContract??null,
           ...(x.sourceProvenance?{sourceProvenance:x.sourceProvenance}:{}),
-          ...(x.sourceAnswerMapping?{sourceAnswerMapping:x.sourceAnswerMapping}:{})},
-      ] as const)]).values()]
+          ...(x.sourceAnswerMapping?{sourceAnswerMapping:x.sourceAnswerMapping}:{})})
+      }
+      for(const source of sources.sourceVersions??[]){
+        const key=source.waveId+':'+source.instrumentKey+':'+source.definitionDigest
+        selectedVersionMap.set(key,{...selectedVersionMap.get(key),...source})
+      }
+      const selectedVersions=[...selectedVersionMap.values()]
       const measurementVersions=[...new Map(sources.scoreColumns.filter(column=>column.measurement.provenance)
         .map(column=>[canonicalHash({waveId:column.waveId,instrumentKey:column.measurement.instrumentKey,
           provenance:column.measurement.provenance}),{waveId:column.waveId,instrumentKey:column.measurement.instrumentKey,

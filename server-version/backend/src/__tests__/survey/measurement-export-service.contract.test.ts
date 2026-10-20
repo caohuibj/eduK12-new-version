@@ -61,6 +61,21 @@ describe('Cognitive trial export uses existing MFA, ticket and revocation bounda
     expect((downloaded.manifest as {selectedVersions:unknown[]}).selectedVersions).toEqual([frozenSource])
   })
 
+  it.each(['SCALE','SJT'] as const)('retains %s frozen release identity alongside overlapping raw codebook metadata',async kind=>{
+    database()
+    const binding={releaseId:'55555555-5555-4555-8555-555555555555',contentHash:'a'.repeat(64),measurementHash:'b'.repeat(64)}
+    const frozen={waveId,instrumentKey:'native',publicationVersion:1,instrumentRevision:2,definitionDigest:'digest',scoringDigest:'scoring',measurementRelease:binding}
+    vi.mocked(loadSurveySource).mockResolvedValue({...source(0,null,firstFinal,false),sourceVersions:[frozen],codebook:[{
+      ...frozen,columnKey:'raw-native',waveOrdinal:1,itemKey:'item',kind,responseType:'LIKERT',title:'Native',prompt:'Item',options:[],flowDigest:'flow-proof',
+      // Real raw codebook need not duplicate the shared source release pointer.
+      measurementRelease:undefined,
+    } as never]})
+    const created=await createSurveyExport(req,{projectId,waveId,format:'SCORE_LONG'})
+    expect(created.manifest.selectedVersions).toEqual([expect.objectContaining({measurementRelease:binding,flowDigest:'flow-proof',definitionDigest:'digest'})])
+    const downloaded=await downloadSurveyExport(req,{projectId,exportId:created.id})
+    expect((downloaded.manifest as {selectedVersions:unknown[]}).selectedVersions).toEqual(created.manifest.selectedVersions)
+  })
+
   it('advances within one FINAL before advancing the exact existing FINAL keyset',async()=>{
     const db=database()
     vi.mocked(loadSurveySource).mockResolvedValueOnce(source(0,40)).mockResolvedValueOnce(source(40,null))

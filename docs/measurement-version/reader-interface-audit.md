@@ -39,3 +39,7 @@ Survey 当前项目原始表单字段是研究者自定义语义；本次未找�
 现有 `loadSurveySource().sourceVersions` 已补入新原生内容的 `measurementRelease`（releaseId/contentHash/measurementHash）。身份直接来自经过 publication definitionDigest 校验的冻结 unit，并沿现有 owner/来源前后 fence；不是 analyst/body 提交。只有确实有冻结指针的来源才返回它，旧记录不自动匹配“latest”，不根据题名/版本号猜测 release。原先目录 sourceProvenance/sourceAnswerMapping 保留。
 
 对应合同验证原生量表读取真实冻结指针、旧来源不推断身份、篡改冻结指针但不更新可信digest时拒绝。实际 candidate 样本成员仍待下一个业务服务把此 sourceVersions 与已验证分数逐 wave/instrument 连接，并从数据库核实际 release 内容/能力；本投影本身不授予参考分析/复核/发布权限，也不新增人口映射。
+
+## 导出清单保留已验证 release 指针
+
+`analytics.export.service.ts` 的 selectedVersions 现在先聚合 codebook 的显示/flow/timing 元数据，再合并同键真实 sourceVersions；不再由后来的 raw codebook 覆盖 Scale/SJT 的 measurementRelease。SCORE_LONG 清单创建和票据下载的 Scale/SJT 重叠键合同通过，原 cognitive 无 raw-codebook 的清单行为保留。本项只解决身份清单回读，不代表独立 interpretation 导出或 V08 投放绑定完成。
