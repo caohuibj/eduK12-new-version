@@ -3,6 +3,17 @@ const {platform,response,csrf,session,user,mobile}=require('./helpers.cjs')
 const {createRuntime}=require('../app/bootstrap/index');const {createCookieJar}=require('../core/auth/cookies');const {createStorage}=require('../core/storage/index')
 const {createDomainService}=require('../domains/shared/service');const {createWorkspaceService}=require('../workspaces/service');const {navigationFor}=require('../app/navigation/index');const {resolveRole,destination}=require('../app/router/index');const {resolveCapabilities}=require('../app/capabilities/index');const {parseEntry,resolveEntry,KINDS}=require('../app/entry/index');const {fromResponse}=require('../core/errors/index')
 const origin='https://acceptance.example'
+test('administrator key challenge gives a Web management handoff without accepting a password session',async()=>{
+ const p=platform(options=>{
+  if(options.url.endsWith('/auth/csrf'))return csrf()
+  if(options.url.endsWith('/auth/login'))return response({adminKeyRequired:true,challengeId:'synthetic-challenge',options:{}},200)
+  throw new Error('A challenge must not continue to authenticated discovery')
+ })
+ const runtime=createRuntime(p,origin)
+ await assert.rejects(runtime.session.login({username:'synthetic-manager',password:'synthetic-password'}),error=>error.status===403&&error.message.includes('Web 管理入口'))
+ assert.equal(runtime.session.get().user,null)
+ assert.equal(p.calls.some(call=>call.url.endsWith('/auth/me')),false)
+})
 function route(options){return options.url.slice((origin+'/api').length).split('?')[0]}
 function apiPlatform(role='STUDENT',mustChangePassword=false) {return platform(options=>{
  const path=route(options)

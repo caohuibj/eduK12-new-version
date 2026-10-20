@@ -1,10 +1,13 @@
 import { productOrigins } from '../../products/origins'
+import { hasAdminEntry } from '../../admin/authority'
+import {adminNavigation,isAdminWorkspacePath,managementIdentityLabel} from '../../admin/navigation'
 import { RelationalAvailabilityProvider, useRelationalAvailability } from '../../contexts/RelationalAvailabilityContext'
 import AssessmentTaskShortcut from '../AssessmentTaskShortcut'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, matchPath, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronRight, LogOut, PanelLeft } from 'lucide-react'
-import { useAuth } from '../../contexts/AuthContext'
+import { AccountViewProvider,useAuth } from '../../contexts/AuthContext'
+import {accountView} from '../../admin/accountView'
 import { useCapabilities } from '../../contexts/CapabilitiesContext'
 import { OrganizationProvider, useOrganization } from '../../contexts/OrganizationContext'
 import OrganizationProductRoutes from '../../pages/organization/OrganizationProductRoutes'
@@ -32,6 +35,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const relational = useRelationalAvailability()
   const { organizations, total: organizationTotal, platformRole, allowedActions: directoryActions, active: activeOrganization, activeLoading: organizationLoading, activeError: organizationError, error: organizationListError, isLoading: organizationsLoading, refresh: refreshOrganizations, selectOrganization } = useOrganization()
   const location=useLocation(), navigate=useNavigate()
+  const adminWorkspace=isAdminWorkspacePath(location.pathname)
   const trainingAdmin = user?.role === 'ADMIN' && (location.pathname === '/admin/training' || new URLSearchParams(location.search).get('workspace') === 'training')
   const organizationProductRoute=location.pathname==='/organizations'||location.pathname.startsWith('/organizations/')||(location.pathname==='/organization-tasks'||location.pathname==='/my-assessments')
   const organizationWorkspaceRoute=location.pathname.startsWith('/organizations/')
@@ -42,18 +46,23 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const reportSurfaceClass=/^\/student\/(?:scales\/result\/|questionnaires\/result\/|cognitive\/sessions\/[^/]+\/result|situational\/attempts\/[^/]+\/result|composite\/attempts\/[^/]+\/report)/.test(location.pathname)||/^\/relational\/attempts\/[^/]+\/report/.test(location.pathname)?' hui-app--report-surface':''
   const studentSubmitClass=/^\/student\/(?:assignments|checkins)\/[^/]+$/.test(location.pathname)?' hui-app--student-submit':''
   const entryMode=location.pathname==='/'||isAuthPath(location.pathname)
-  const staffMode=mode==='standard'&&(user?.role==='ADMIN'||user?.role==='TEACHER'), staffWorkspace=staffMode&&!training&&isStaffWorkspacePath(location.pathname)
+  const staffMode=mode==='standard'&&(adminWorkspace||user?.role==='ADMIN'||user?.role==='TEACHER'), staffWorkspace=staffMode&&!training&&isStaffWorkspacePath(location.pathname)
   const routeOrganizationId=matchPath('/organizations/:organizationId/*',location.pathname)?.params.organizationId
   const displayOrganization=!routeOrganizationId||routeOrganizationId==='new'||activeOrganization?.organization.id===routeOrganizationId?activeOrganization:null
-  const items=training?trainingNavigation(user?.role):[...navigationFor(user?.role,cognitive,relational.status==='available'),...(user?organizationNavigation(displayOrganization?.organization.id,displayOrganization?.allowedActions,platformRole,directoryActions):[])]
-  items.push(...surveyGovernanceNavigation(Boolean(productOrigins()),user?.role,platformRole??user?.platformRole))
+  const items=adminWorkspace?adminNavigation(user):training?trainingNavigation(user?.role):[...navigationFor(user?.role,cognitive,relational.status==='available'),...(user?organizationNavigation(displayOrganization?.organization.id,displayOrganization?.allowedActions,platformRole,directoryActions):[])]
+  if(!adminWorkspace){
+  items.push(...surveyGovernanceNavigation(Boolean(productOrigins()),user?.role,platformRole??user?.platformRole,user?.entryGrants))
+  if(user?.platformRole==='SYSTEM_ADMIN')items.push({path:'/admin/permissions',label:'系统治理与入口授权',section:'system'},
+    {path:'/admin/reporting-content',label:'报告方案与内容审核',section:'system'})
+  if(user&&(user.platformRole==='SYSTEM_ADMIN'||user.entryGrants?.length))items.push({path:'/admin/entrances',label:'管理入口',section:'system'})
   if(!training&&user?.role==='ADMIN'&&platformRole==='SYSTEM_ADMIN') items.push({path:'/admin/legacy-archive',label:'历史归档（只读）',section:'system'})
-  if(!training&&user?.role==='ADMIN'&&platformRole==='SYSTEM_ADMIN')
+  if(hasAdminEntry(user,'HUISCHOOL')||hasAdminEntry(user,'HUITEACHER'))
     items.push({path:'/admin/education-products',label:'教育产品治理',section:'system'})
   if(!training&&parentPortalEnabled&&user?.role==='PARENT')items.push({path:'/parent/children',label:'我的孩子'},{path:'/parent/links',label:'家长关联'})
   if(!training&&parentPortalEnabled&&user?.role==='STUDENT')items.push({path:'/student/parent-links',label:'家长关联',section:'account'})
   if(!training&&(platformRole??user?.platformRole)==='SYSTEM_ADMIN')items.push({path:'/parent-accounts',label:'家长账号管理',section:'system'})
   if(!training&&parentPortalEnabled&&displayOrganization?.allowedActions.includes('PARENT_REPORT_PUBLICATION'))items.push({path:`/organizations/${encodeURIComponent(displayOrganization.organization.id)}/parent-reports`,label:'家长报告',section:'organization'})
+  }
   const trainingWorkspace=training&&mode==='standard'&&(user?.role==='TEACHER'||user?.role==='STUDENT')
   const active=activeNavigation(items,location.pathname), title=routeTitle(location.pathname,active), breadcrumbs=breadcrumbsFor(location.pathname,homeFor(user?.role),active,displayOrganization?.organization.name)
   const mainRef=useRef<HTMLElement>(null), toggleRef=useRef<HTMLButtonElement>(null), previousPath=useRef(location.pathname)
@@ -67,7 +76,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
     {!entryMode&&<header className="hui-product hui-app-header">{mode==='focused'?<span className="hui-brand">Huisurvey</span>:<Link className="hui-brand" to={homeFor(user?.role)}>{training?<TrainingBrand />:'Huisurvey'}</Link>}
       {mode==='standard'&&!trainingWorkspace&&<ProductButton ref={toggleRef} className="hui-menu-toggle" aria-expanded={menuOpen} aria-controls="hui-navigation" onKeyDown={e=>{if(e.key==='Escape')setOpenPath(null)}} onClick={()=>setOpenPath(menuOpen?null:location.pathname)}><PanelLeft size={18} aria-hidden="true"/>导航菜单</ProductButton>}
       {trainingWorkspace&&<nav id="hui-navigation" aria-label="主要导航" className="hui-product hui-navigation">{items.map(item=><Link key={item.path} to={item.path} aria-current={active?.path===item.path?'page':undefined} onClick={()=>onNavigate(item.path)}>{item.label}</Link>)}</nav>}
-      <div className="hui-account">{isPublicAssessmentPath(location.pathname)?<span>公开参与</span>:user?<span>{user.nickname||user.username} · {{STUDENT:training?'学员':'学生',TEACHER:training?'培训师':'教师',ADMIN:(platformRole??user.platformRole)==='SYSTEM_ADMIN'?'平台管理员':'旧版管理员',PARENT:'家长'}[user.role]}</span>:<span>欢迎使用</span>}
+      <div className="hui-account">{isPublicAssessmentPath(location.pathname)?<span>公开参与</span>:user?<span>{user.nickname||user.username} · {adminWorkspace?managementIdentityLabel(user):{STUDENT:training?'学员':'学生',TEACHER:training?'培训师':'教师',ADMIN:(platformRole??user.platformRole)==='SYSTEM_ADMIN'?'系统管理员':'Training 管理员',PARENT:'家长'}[user.role]}</span>:<span>欢迎使用</span>}
         {!training&&user&&mode==='standard'&&(organizations.length>0||organizationsLoading)&&<label className="hui-organization-switch"><span>组织</span><select aria-label="当前组织" value={displayOrganization?.organization.id||''} disabled={organizationLoading||organizationsLoading} onChange={e=>{const id=e.target.value;if(!id)return;if(organizationWorkspaceRoute)navigate(`/organizations/${encodeURIComponent(id)}`);else void selectOrganization(id)}}><option value="" disabled>{organizationLoading||organizationsLoading?'正在加载…':'选择组织'}</option>{displayOrganization&&!organizations.some(i=>i.id===displayOrganization.organization.id)&&<option value={displayOrganization.organization.id}>{displayOrganization.organization.name}</option>}{organizations.map(o=><option key={o.id} value={o.id}>{o.name}{o.status==='SUSPENDED'?'（已暂停）':''}</option>)}</select></label>}
         {!training&&staffMode&&organizationTotal>organizations.length&&<Link to="/organizations">更多组织</Link>}
         {!training&&user&&mode==='standard'&&(organizationError||organizationListError)&&<button type="button" className="hui-context-retry" onClick={()=>{if(routeOrganizationId&&routeOrganizationId!=='new')void selectOrganization(routeOrganizationId);else void refreshOrganizations()}}>组织连接失败，重试</button>}
@@ -83,16 +92,16 @@ function AppShellContent({ children }: { children: ReactNode }) {
   </div>
 }
 export default function AppShell({children}:{children:ReactNode}) {
-  const { pathname } = useLocation()
+  const { pathname,search } = useLocation()
   const training = isTrainingHost()
   // Direct deep links to the existing Organization/Relational product must
   // still be functional; only ordinary Training course navigation skips
   // irrelevant discovery. Host context changes presentation, not API authority.
   const requiresOrganization = /^\/(organizations(?:\/|$)|organization-tasks(?:\/|$)|my-assessments(?:\/|$)|organization-invitations(?:\/|$))/.test(pathname)
   const requiresRelational = /^\/(relational(?:\/|$)|parent(?:\/|$)|student\/parent-links(?:\/|$))/.test(pathname)
-  return <OrganizationProvider suspended={training && !requiresOrganization}>
+  return <AccountViewProvider view={accountView(pathname,search)}><OrganizationProvider suspended={training && !requiresOrganization}>
     <RelationalAvailabilityProvider suspended={training && !requiresRelational}>
       <AppShellContent>{children}</AppShellContent>
     </RelationalAvailabilityProvider>
-  </OrganizationProvider>
+  </OrganizationProvider></AccountViewProvider>
 }

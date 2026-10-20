@@ -1,4 +1,7 @@
 import { config } from '../config'
+import { loadCurrentPrincipal } from '../modules/organization/principal'
+import { beginAdminLogin, needsAdminKey } from '../modules/admin-permissions/security'
+import { AdminPermissionError } from '../modules/admin-permissions/service'
 import { mobileDiscovery } from '../modules/mobile/discovery'
 import { changePasswordHandler } from './changePasswordController'
 import { Request, Response } from 'express'
@@ -32,18 +35,18 @@ const teacherRegisterSchema = z.object({
   username: z.string().min(4, '用户名至少4个字符').max(20, '用户名最多20个字符'),
   password: z.string().min(PASSWORD_MIN_LENGTH, '密码至少8个字符').max(PASSWORD_MAX_LENGTH, '密码最多128个字符').refine(isValidPassword, '密码必须包含字母和数字'),
   nickname: z.string().min(1, '真实姓名不能为空'),
-})
+}).strict()
 
 const verifyTeacherCodeSchema = z.object({
   teacherCode: z.string().trim().toUpperCase().regex(/^[0-9A-HJKMNP-TV-Z]{8}$/, '教师码格式无效'),
-})
+}).strict()
 
 const studentRegisterSchema = z.object({
   courseCode: z.string().min(1, '课程码不能为空'),
   username: z.string().min(4, '用户名至少4个字符').max(20, '用户名最多20个字符'),
   password: z.string().min(PASSWORD_MIN_LENGTH, '密码至少8个字符').max(PASSWORD_MAX_LENGTH, '密码最多128个字符').refine(isValidPassword, '密码必须包含字母和数字'),
   nickname: z.string().min(2, '姓名至少2个字符'),
-})
+}).strict()
 
 export const authController = {
   // 登录
@@ -78,6 +81,12 @@ export const authController = {
         return usable && matches && (!current.expiresAt || current.expiresAt > new Date()) ? current : null
       })
       if (!user || !['LEGACY','TRAINING'].includes(user.accountDomain)) return failedLogin()
+      const currentPrincipal = await loadCurrentPrincipal(user.id)
+      if (!currentPrincipal) return failedLogin()
+      if (needsAdminKey(currentPrincipal)) {
+        if (expectedRole || res.locals?.trainingEntrance) return error(res, '请使用独立管理员入口和安全密钥登录', -1, 403)
+        return success(res, await beginAdminLogin(req, res, user.id, undefined, currentPrincipal))
+      }
 
       // This flag is set only by the dedicated server-side training entrance.
       // Resolve authority before issuing any cookie; never trust a client role.
@@ -108,7 +117,8 @@ export const authController = {
         user: {
           id: user.id,
           username: user.username,
-          role: user.role,
+          role: currentPrincipal.role,
+          businessRole: currentPrincipal.businessRole,
         platformRole: user.platformRole,
           nickname: user.nickname,
           avatarUrl: user.avatarUrl,
@@ -118,6 +128,7 @@ export const authController = {
         }
       }, '登录成功')
     } catch (err) {
+      if (err instanceof AdminPermissionError) return error(res, err.message, -1, err.statusCode)
       logger.error('登录错误', err)
       if (isBoundedAdmissionBusyError(err) && err.code === 'LOGIN_VERIFY_BUSY') {
         res.setHeader('Retry-After', String(err.retryAfterSeconds))
@@ -394,14 +405,16 @@ export const authController = {
       return success(res, {
         id: user.id,
         username: user.username,
-        role: user.role,
-        platformRole: user.platformRole,
+        role: req.user!.role,
+        businessRole: req.user!.businessRole,
+        platformRole: req.user!.platformRole,
+        entryGrants: req.user!.entryGrants ?? [],
         nickname: user.nickname,
         avatarUrl: user.avatarUrl,
         phone: user.phone,
         expiresAt: user.expiresAt,
         mustChangePassword: user.mustChangePassword,
-        mobile: mobileDiscovery(user.role, user.mustChangePassword, config.parentPortalEnabled, config.miniClassroomEnabled, user.platformRole, config.miniAssessmentEnabled),
+        mobile: mobileDiscovery(req.user!.role, user.mustChangePassword, config.parentPortalEnabled, config.miniClassroomEnabled, req.user!.platformRole, config.miniAssessmentEnabled),
       })
     } catch (err) {
       logger.error('获取用户信息错误', err)

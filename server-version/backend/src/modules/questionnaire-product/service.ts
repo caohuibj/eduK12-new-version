@@ -12,6 +12,8 @@ import { assertCognitiveCatalogConfiguration } from '../cognitive/assignment.ser
 import { Prisma, UserRole } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
+import { loadCurrentPrincipal } from '../organization/principal'
+import { inactiveAccountMessage } from '../../utils/accountStatus'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { lockCompositeAssetReferences, compositeSjtGrantScope, inspectCompositeSituationalItems, resolveCompositeSituationalItems, assertValidItem, getCompositeForTeacher, publishComposite, prepareCompositePublication, listAvailableForStudent } from '../composite/composite.service'
 import { compositeBadRequest, compositeConflict, compositeForbidden, compositeNotFound } from '../composite/composite.errors'
@@ -65,6 +67,12 @@ async function courses(tx: Tx, actor: Actor, ids: string[], type: string) {
   const rows = await tx.course.findMany({ where: { id: { in: ids } } })
   if (rows.length !== ids.length || rows.some(r => r.isLibrary || (actor.role !== 'ADMIN' && r.creatorId !== actor.userId))) throw compositeForbidden('只能投放到有管理权限的非库课程')
 }
+async function assertTrainingPolicyCreator(tx: Tx, row: {createdBy?:string|null}, facts: Array<{creatorId:string}>, label:string) {
+  const creator=row.createdBy?await loadCurrentPrincipal(row.createdBy,tx):null
+  if(!creator || !['LEGACY','TRAINING'].includes(creator.accountDomain) || inactiveAccountMessage(creator) || creator.mustChangePassword
+    || (creator.role!=='ADMIN' && (creator.role!=='TEACHER' || !creator.teacherApproved || facts.some(course=>course.creatorId!==creator.userId))))
+    throw compositeForbidden(label+'的课程编制权限无效')
+}
 export async function validateTrainingPersistenceAuthoring(tx: Tx, row: any, raw: unknown) {
   const policy = parseTrainingPersistencePolicy(raw)
   if (!policy) return { trainingPersistencePolicy: Prisma.DbNull, trainingPersistencePolicyHash: null }
@@ -75,9 +83,7 @@ export async function validateTrainingPersistenceAuthoring(tx: Tx, row: any, raw
     if (!ids.length || (row.publicEnabled && ids.length !== 1)) throw compositeBadRequest('公开草稿策略必须明确绑定唯一 Training 课程')
     const facts = await tx.course.findMany({ where: { id: { in: ids } }, select: { id: true, courseType: true, isLibrary: true, creatorId: true } })
     if (facts.length !== ids.length || facts.some(course => course.isLibrary || course.courseType !== 'TRAINING_COURSE')) throw compositeBadRequest('草稿策略的 Training 课程来源无效')
-    const creator = row.createdBy ? await tx.user.findUnique({ where: { id: row.createdBy }, select: { role: true } }) : null
-    if (!creator || (creator.role !== 'ADMIN' && (creator.role !== 'TEACHER' || facts.some(course => course.creatorId !== row.createdBy))))
-      throw compositeForbidden('草稿策略的课程编制权限无效')
+    await assertTrainingPolicyCreator(tx,row,facts,'草稿策略')
   }
   return { trainingPersistencePolicy: policy as Prisma.InputJsonValue, trainingPersistencePolicyHash: canonicalHash(policy) }
 }
@@ -99,9 +105,7 @@ export async function validateTrainingFeedbackAuthoring(tx: Tx, row: any, raw: u
     if (raw == null) return absent
     throw compositeBadRequest('反馈开放策略的 Training 课程来源无效')
   }
-  const creator = row.createdBy ? await tx.user.findUnique({ where: { id: row.createdBy }, select: { role: true } }) : null
-  if (!creator || (creator.role !== 'ADMIN' && (creator.role !== 'TEACHER' || facts.some(course => course.creatorId !== row.createdBy))))
-    throw compositeForbidden('反馈开放策略的课程编制权限无效')
+  await assertTrainingPolicyCreator(tx,row,facts,'反馈开放策略')
   let policy
   try { policy = parseTrainingFeedbackPolicy(raw) } catch { throw compositeBadRequest('反馈开放策略或预设开放时间无效') }
   return { trainingFeedbackPolicy: policy as Prisma.InputJsonValue, trainingFeedbackPolicyHash: canonicalHash(policy) }

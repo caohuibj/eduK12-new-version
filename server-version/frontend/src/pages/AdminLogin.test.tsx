@@ -20,14 +20,14 @@ beforeEach(()=>{
   vi.clearAllMocks();sessionStorage.clear()
   me.mockRejectedValue(new Error('anonymous'))
   csrf.mockResolvedValue({code:0,data:{csrfToken:'synthetic-csrf'}})
-  login.mockResolvedValue({code:0,data:{user:{id:'admin',username:'synthetic-admin',role:'ADMIN',platformRole:'SYSTEM_ADMIN'}}})
+  login.mockResolvedValue({code:0,data:{user:{id:'admin',username:'synthetic-admin',role:'ADMIN',platformRole:'SYSTEM_ADMIN',entryGrants:[{entry:'SURVEY',version:1}]}}})
 })
 afterEach(()=>vi.unstubAllGlobals())
 describe('administrator login flow',()=>{
   it.each(['/admin/login','/admin/login?returnTo=https%3A%2F%2Fevil.test','/admin/login?returnTo=%2Fadmin%2Flogin'])(
     'selects explicit generic auth and a reachable admin fallback for %s',async path=>{
       mount(path);submit()
-      expect(await screen.findByText('destination:/users')).toBeInTheDocument()
+      expect(await screen.findByText('destination:/admin/permissions')).toBeInTheDocument()
       expect(csrf).toHaveBeenCalledTimes(1)
       expect(login).toHaveBeenCalledExactlyOnceWith({username:'synthetic-admin',password:'synthetic-password'},'admin')
     })
@@ -35,7 +35,7 @@ describe('administrator login flow',()=>{
     mount('/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers');submit()
     expect(await screen.findByText('destination:/admin/survey-researchers')).toBeInTheDocument()
   })
-  it.each([['TEACHER','/dashboard'],['STUDENT','/student'],['PARENT','/parent']])(
+  it.each([['TEACHER','/admin/entrances'],['STUDENT','/admin/entrances'],['PARENT','/admin/entrances']])(
     'does not promote an authenticated %s into governance',async(role,target)=>{
       login.mockResolvedValue({code:0,data:{user:{id:'ordinary',username:'ordinary',role,platformRole:'STANDARD'}}})
       mount('/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers');submit()
@@ -47,7 +47,7 @@ describe('administrator login flow',()=>{
     expect(await screen.findByRole('alert')).toHaveTextContent('密码错误')
     await waitFor(()=>expect(screen.getByRole('button',{name:'管理员登录'})).toBeEnabled())
     fireEvent.click(screen.getByRole('button',{name:'管理员登录'}))
-    expect(await screen.findByText('destination:/users')).toBeInTheDocument()
+    expect(await screen.findByText('destination:/admin/permissions')).toBeInTheDocument()
     expect(login).toHaveBeenCalledTimes(2);expect(csrf).toHaveBeenCalledTimes(2)
   })
   it('does not render credential fields or issue login requests before alias canonicalization',()=>{

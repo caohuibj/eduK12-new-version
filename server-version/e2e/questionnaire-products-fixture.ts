@@ -6,12 +6,16 @@ import { MIXED_SCALE_DEFINITION } from '../backend/src/__tests__/questionnaire/p
 import { hashScaleDefinition } from '../backend/src/modules/scale/scale-definition'
 import { freezeAssignmentProfile, freezeDataForWrite } from '../backend/src/modules/cognitive/profile-freeze'
 import { requireCognitiveRegistryEntry } from '../backend/src/modules/cognitive/cognitive.registry'
+import { changeEntryGrant } from '../backend/src/modules/admin-permissions/service'
+import { prisma as authorityDb } from '../backend/src/config/database'
+const { assertSyntheticDatabase } = require('./helpers/synthetic-admin-session.cjs')
 
 async function main() {
   if (process.env.NODE_ENV !== 'test' || !process.env.QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL ||
       process.env.QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL !== process.env.DATABASE_URL) {
     throw new Error('Use an explicitly isolated QUESTIONNAIRE_PRODUCT_TEST_DATABASE_URL with NODE_ENV=test')
   }
+  assertSyntheticDatabase()
   if (process.env.TRAINING_OPTIONAL_WORK === 'copy-source') {
     const file = process.env.QUESTIONNAIRE_PRODUCT_FIXTURE_FILE || '/tmp/huisurvey-q1-browser-fixture.json'
     const fixture = JSON.parse(await readFile(file, 'utf8'))
@@ -65,6 +69,16 @@ async function main() {
     for (const [id, role] of [[actor.userId, 'TEACHER'], [other.userId, 'ADMIN'], [student, 'STUDENT'], [student2, 'STUDENT']] as const) {
       await db.user.create({ data: { id, username: id, passwordHash, role, teacherApproved: true, mustChangePassword: false } })
     }
+    // An old ADMIN label alone grants nothing. An unusable synthetic governor
+    // supplies the explicit entry precondition through the audited grant service.
+    const governor = await db.user.create({ data: { username: 'q1-browser-governor-' + suffix,
+      passwordHash: 'unusable', role: 'ADMIN', platformRole: 'SYSTEM_ADMIN', mustChangePassword: false } })
+    try {
+      await changeEntryGrant({ actorUserId: governor.id, actorSession: { tokenVersion: 0,
+        adminVerifiedAt: Math.floor(Date.now() / 1000), adminSessionId: randomUUID() },
+        targetUserId: other.userId, entry: 'TRAINING', active: true, expectedVersion: 0,
+        reason: 'isolated questionnaire public-delivery business acceptance precondition' })
+    } finally { await authorityDb.$disconnect() }
     const cs = []
     for (let i=0;i<2;i++) cs.push(await db.course.create({ data: { creatorId: actor.userId, title: 'Q1 course '+i, courseCode: 'Q1-'+suffix+'-'+i, status: 'PUBLISHED' } }))
     course1=cs[0].id; course2=cs[1].id

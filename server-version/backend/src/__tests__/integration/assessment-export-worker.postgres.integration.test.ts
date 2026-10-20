@@ -15,6 +15,7 @@ suite('real assessment export worker process', () => {
     await prisma.exportBatch.deleteMany({ where: { id: { in: batches } } })
     if (cognitiveId) await prisma.cognitiveAssignment.delete({ where: { id: cognitiveId } })
     if (compositeId) await prisma.compositeAssessment.delete({ where: { id: compositeId } })
+    if (userId) await prisma.adminEntryGrant.deleteMany({where:{userId}})
     if (userId) await prisma.user.delete({ where: { id: userId } })
     for (const path of paths) await fs.rm(path, { force: true })
     await prisma.$disconnect()
@@ -25,13 +26,14 @@ suite('real assessment export worker process', () => {
     const { resolveAssessmentExport } = await import('../../services/assessmentExportArtifact')
     const { resolveCompositeExportProjectionBinding } = await import('../../modules/composite/composite-export-projection')
     userId = (await prisma.user.create({ data: { username: `worker-export-${randomUUID()}`, passwordHash: 'test-only', role: 'ADMIN' } })).id
+    await prisma.adminEntryGrant.create({data:{id:randomUUID(),userId,entry:'TRAINING',grantedBy:userId}})
     const config = await prisma.cognitiveTestConfig.findUniqueOrThrow({ where: { testType_configVersion: { testType: 'fake', configVersion: '1.0.0' } } })
     cognitiveId = (await prisma.cognitiveAssignment.create({ data: { title: 'worker snapshot', configId: config.id, createdBy: userId } })).id
     compositeId = (await prisma.compositeAssessment.create({ data: { name: 'worker snapshot', code: randomUUID(), createdBy: userId } })).id
     for (const type of ['COGNITIVE', 'COMPOSITE'] as const) {
       const id = type === 'COGNITIVE' ? cognitiveId : compositeId
       const projectionFingerprint = type === 'COGNITIVE' ? 'cognitive-frozen-export-v1' : (await resolveCompositeExportProjectionBinding(id)).fingerprint
-      const request = { resourceType: type, resourceId: id, createdBy: userId, anonymized: true, format: 'csv', recordCount: 0,
+      const request = { authorityTokenVersion: 0, resourceType: type, resourceId: id, createdBy: userId, anonymized: true, format: 'csv', recordCount: 0,
         requestKey: randomUUID(), options: { anonymize: true, detail: 'summary' as const, creatorRole: 'ADMIN' as const, projectionFingerprint } }
       const batch = await enqueueExportJob(request); batches.push(batch.batchId)
       expect((await enqueueExportJob(request)).batchId).toBe(batch.batchId)
@@ -44,7 +46,7 @@ suite('real assessment export worker process', () => {
       expect((await fs.stat(filePath!)).size).toBeGreaterThan(0)
     }
     await prisma.user.update({ where: { id: userId }, data: { isFrozen: true } })
-    const denied = await enqueueExportJob({ resourceType: 'COGNITIVE', resourceId: cognitiveId, createdBy: userId, anonymized: true,
+    const denied = await enqueueExportJob({ authorityTokenVersion: 0, resourceType: 'COGNITIVE', resourceId: cognitiveId, createdBy: userId, anonymized: true,
       format: 'csv', recordCount: 0, requestKey: randomUUID(), options: { anonymize: true, detail: 'summary', creatorRole: 'ADMIN', projectionFingerprint: 'cognitive-frozen-export-v1' } })
     batches.push(denied.batchId)
     const job = await queues.exportQueue.getJob(`export-${denied.batchId}`)

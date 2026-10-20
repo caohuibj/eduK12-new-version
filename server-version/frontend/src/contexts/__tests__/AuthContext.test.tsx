@@ -405,6 +405,14 @@ describe('AuthContext session expiry handling', () => {
     expect(screen.getByRole('status')).toHaveTextContent('teacher-2:completed')
     window.history.replaceState(null, '', '/')
   })
+  it('a profile payload cannot add entry grants or replace the business identity',async()=>{
+    mockMe.mockResolvedValue({code:0,data:{id:'user-1',username:'overlap',role:'STUDENT',businessRole:'STUDENT',platformRole:'STANDARD',entryGrants:[]}})
+    const Profile=()=>{const {user,setUser}=useAuth();return <><output>{JSON.stringify([user?.role,user?.businessRole,user?.platformRole,user?.entryGrants])}</output><button onClick={()=>setUser({id:'user-1',username:'updated',role:'ADMIN',businessRole:'TEACHER',platformRole:'SYSTEM_ADMIN',entryGrants:[{entry:'TRAINING',version:1}]})}>profile authority</button></>}
+    render(<AuthProvider><Profile/></AuthProvider>)
+    await screen.findByText('["STUDENT","STUDENT","STANDARD",[]]')
+    act(()=>screen.getByRole('button',{name:'profile authority'}).click())
+    expect(screen.getByRole('status')).toHaveTextContent('["STUDENT","STUDENT","STANDARD",[]]')
+  })
   it('does not broadcast profile refreshes or let a late previous-account profile restore its identity', async () => {
     const write = vi.spyOn(Storage.prototype, 'setItem')
     const Profile = () => {

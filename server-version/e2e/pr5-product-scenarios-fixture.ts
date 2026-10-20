@@ -3,22 +3,31 @@ import { randomUUID } from 'node:crypto'
 import { writeFileSync } from 'node:fs'
 import bcrypt from '../backend/node_modules/bcryptjs'
 import { prisma } from '../backend/src/config/database'
+import { changeEntryGrant } from '../backend/src/modules/admin-permissions/service'
 import { resultAudiences, type ResultDisclosureContractV1 } from '../backend/src/modules/assessment-policy/result-disclosure'
 import type { RelationalProductEntryV1 } from '../backend/src/modules/assessment-relational/product-registry'
+const { assertSyntheticDatabase } = require('./helpers/synthetic-admin-session.cjs')
 
 async function main() {
   if (process.env.NODE_ENV !== 'test') throw new Error('PR5 fixture requires NODE_ENV=test')
+  assertSyntheticDatabase()
   const suffix = randomUUID().slice(0, 8)
   const password = 'Pr5ScenarioPass2026!'
   const passwordHash = await bcrypt.hash(password, 10)
   const users: Record<string, any> = {}
   for (const name of ['platform', 'platformReviewer', 'owner', 'parent', 'legacyTeacher', 'teacher0', 'teacher1', 'teacher2', 'student0', 'student1', 'student2', 'counselor0', 'counselor1', 'counselor2', 'client0', 'client1', 'client2']) {
     const isPlatformAdmin = name === 'platform' || name === 'platformReviewer'
-    const role = isPlatformAdmin || name === 'counselor0' ? 'ADMIN' : name === 'parent' ? 'PARENT' : name === 'legacyTeacher' ? 'TEACHER' : 'STUDENT'
+    const role = isPlatformAdmin ? 'ADMIN' : name === 'parent' ? 'PARENT' : ['legacyTeacher', 'counselor0'].includes(name) ? 'TEACHER' : 'STUDENT'
     const user = await prisma.user.create({ data: { username: `pr5_scenario_${name}_${suffix}`, passwordHash, role,
       platformRole: isPlatformAdmin ? 'SYSTEM_ADMIN' : 'STANDARD', teacherApproved: true, mustChangePassword: false } })
-    users[name] = { id: user.id, username: user.username, password, role }
+    users[name] = { id: user.id, username: user.username, password, role, management: isPlatformAdmin || name === 'counselor0' }
   }
+  // Historical ADMIN is not authority. Only this synthetic counselor receives
+  // the Training entry; platform governance accounts receive no entry grant.
+  await changeEntryGrant({ actorUserId: users.platform.id, actorSession: { tokenVersion: 0,
+    adminVerifiedAt: Math.floor(Date.now() / 1000), adminSessionId: randomUUID() },
+    targetUserId: users.counselor0.id, entry: 'TRAINING', active: true,
+    expectedVersion: 0, reason: 'isolated PR5 counselor business acceptance precondition' })
   const composite = await prisma.compositeAssessment.create({ data: {
     code: `pr5-scenario-${suffix}`, name: 'PR5 隔离验收测评', status: 'PUBLISHED', createdBy: users.platform.id, publishedAt: new Date(),
   } })
@@ -57,7 +66,7 @@ async function main() {
   const course = await prisma.course.create({ data: { title: 'PR5 legacy isolation', courseCode: `pr5-legacy-${suffix}`, creatorId: users.legacyTeacher.id, status: 'PUBLISHED' } })
   for (const name of ['student0', 'student1', 'student2']) await prisma.courseStudent.create({ data: { courseId: course.id, studentId: users[name].id, status: 'ACTIVE' } })
   const output = process.env.PR5_SCENARIOS_FIXTURE || '/tmp/eduk12-pr5-scenarios.json'
-  writeFileSync(output, JSON.stringify({ suffix, users, courseId: course.id, compositeId: composite.id, itemId: item.id, entries }, null, 2))
+  writeFileSync(output, JSON.stringify({ suffix, users, courseId: course.id, compositeId: composite.id, itemId: item.id, entries }, null, 2), { mode: 0o600 })
   console.log(`PR5 scenario inputs written to ${output}`)
 }
 main().catch(err => { console.error(err); process.exitCode = 1 }).finally(() => prisma.$disconnect())

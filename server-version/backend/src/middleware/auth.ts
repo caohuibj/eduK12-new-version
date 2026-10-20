@@ -5,9 +5,10 @@ import { unauthorized, forbidden } from '../utils/response'
 import { inactiveAccountMessage } from '../utils/accountStatus'
 import { getSessionToken, getSchoolSessionToken, getSurveySessionToken, getHuiteacherSessionToken } from '../utils/authCookies'
 import { measureRequestPhase } from '../services/runtimeObservability'
-import { loadCurrentPrincipal, toRequestPrincipal } from '../modules/organization/principal'
+import { asBusinessPrincipal, loadCurrentPrincipal, toRequestPrincipal } from '../modules/organization/principal'
 import { schoolAccountNeedsMfa } from '../modules/campus/mfa.service'
 import { isSessionRevoked } from '../utils/sessionRevocation'
+import { needsAdminKey, validAdminProof, ADMIN_STEP_UP_SECONDS } from '../modules/admin-permissions/security'
 
 // Extend Express Request
 declare global {
@@ -50,6 +51,8 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
     if (payload.tokenVersion !== principal!.tokenVersion) {
       return unauthorized(res, '认证令牌已失效，请重新登录')
     }
+    const management = needsAdminKey(principal!) && ['LEGACY','TRAINING'].includes(principal!.accountDomain)
+    if (management && !validAdminProof(payload)) return unauthorized(res, '请使用安全密钥完成管理员登录')
 
     // A domain mismatch cannot be fixed by a client-supplied hostname or
     // JWT role. Historical JWTs without an audience remain legacy-only.
@@ -85,6 +88,25 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
     // authoritative for every mutable authorization attribute, including the
     // legacy role and the independent platform role.
     req.user = toRequestPrincipal(principal!)
+    req.user.adminVerifiedAt = payload.adminVerifiedAt
+    req.user.adminSessionId = payload.adminSessionId
+    // The view header selects only the current DB business identity. It never
+    // supplies a role, grant or authentication proof. No header preserves the
+    // existing management compatibility contract for older clients/workers.
+    if(product==='LEGACY'&&req.get('X-EduK12-Account-View')==='BUSINESS'){
+      const business=asBusinessPrincipal(req.user)
+      if(!business)return forbidden(res,'当前账号没有可用的业务身份')
+      req.user=business
+    }
+    // Key ceremonies must remain reachable to renew an otherwise valid admin
+    // session. Sensitive governance writes cannot fall back to password-only.
+    if (management && !['GET','HEAD','OPTIONS'].includes(req.method)
+      && !req.originalUrl.startsWith('/api/admin/security/')
+      && req.originalUrl.split('?')[0]!=='/api/auth/logout'
+      && (principal!.platformRole === 'SYSTEM_ADMIN' || /^\/api\/(platform\/|users(?:\/|$)|admin\/permissions(?:\/|$)|auth\/(change-password|extend-account))/.test(req.originalUrl))
+      && !validAdminProof(payload, ADMIN_STEP_UP_SECONDS)) {
+      return res.status(403).json({ code: 'ADMIN_KEY_STEP_UP_REQUIRED', message: '敏感操作需要重新验证安全密钥' })
+    }
 
     const allowedWhileChangingPassword = new Set([
       '/api/auth/me',
@@ -92,6 +114,8 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
       '/api/users/change-password',
       '/api/auth/logout',
       '/api/auth/csrf',
+      '/api/admin/security/step-up/options',
+      '/api/admin/security/step-up/verify',
       '/api/campus/auth/me',
       '/api/campus/auth/logout',
       '/api/huiteacher/auth/me',
@@ -133,8 +157,10 @@ export const optionalAuthenticate = async (req: Request, res: Response, next: Ne
         }
         if (revoked !== true) {
           const principal = await loadPrincipal(payload.userId)
-          if (!inactiveAccountMessage(principal) && payload.tokenVersion === principal!.tokenVersion && ['LEGACY','TRAINING'].includes(principal!.accountDomain) && (payload.accountDomain === undefined || ['LEGACY','TRAINING'].includes(payload.accountDomain))) {
+          if (!inactiveAccountMessage(principal) && payload.tokenVersion === principal!.tokenVersion && ['LEGACY','TRAINING'].includes(principal!.accountDomain) && (payload.accountDomain === undefined || ['LEGACY','TRAINING'].includes(payload.accountDomain))
+            && (!needsAdminKey(principal!) || validAdminProof(payload))) {
             req.user = toRequestPrincipal(principal!)
+            if(req.get('X-EduK12-Account-View')==='BUSINESS')req.user=asBusinessPrincipal(req.user)??undefined
           }
         }
       }
@@ -164,7 +190,14 @@ export const requireRole = (...roles: UserRole[]) => {
 
 export const requireAdmin = requireRole(UserRole.ADMIN)
 export const requireTeacher = requireRole(UserRole.TEACHER, UserRole.ADMIN)
-export const requireStudent = requireRole(UserRole.STUDENT)
+export const requireBusinessRole = (...roles:UserRole[]) => (req:Request,res:Response,next:NextFunction)=>{
+  if(!req.user)return unauthorized(res)
+  const business=asBusinessPrincipal(req.user)
+  if(!business||!roles.includes(business.role))return forbidden(res,'需要对应的业务身份')
+  req.user=business
+  next()
+}
+export const requireStudent = requireBusinessRole(UserRole.STUDENT)
 
 /** Allow a user to access only their own record, unless they are a legacy admin. */
 export const requireSelfOrAdmin = (req: Request, res: Response, next: NextFunction) => {

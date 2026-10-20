@@ -46,7 +46,7 @@ export function navigationFor(role: Role | undefined, cognitive: boolean, relati
     { path: '/admin/training', label: '培训版管理', section: 'system' },
     { path: '/users', label: '用户管理', section: 'system' }, { path: '/teacher-codes', label: '教师码', section: 'system' },
     { path: '/admin/bundle-authoring', label: '固定包制作', section: 'system' },
-    { path: '/admin/reporting-content', label: '测量与报告方案', section: 'system' }, { path: '/admin/material-grants', label: '材料授权', section: 'system' }, { path: '/admin/instrument-authorizations', label: '测评授权', section: 'system' },
+    { path: '/admin/material-grants', label: '材料授权', section: 'system' }, { path: '/admin/instrument-authorizations', label: '测评授权', section: 'system' },
   )
   if (role !== 'PARENT') items.push({ path: role === 'STUDENT' ? '/student/profile' : '/profile', label: '账户设置', section: 'account' })
   if (!items.some(item => item.path === '/my-assessments')) items.unshift({ path: '/my-assessments', label: '我的测评', section: 'assessment' })
@@ -72,6 +72,8 @@ export function activeNavigation(items: NavigationItem[], pathname: string): Nav
     .sort((a, b) => b.path.length - a.path.length)[0]?.item
 }
 const staffTitles: Array<[string, string]> = [
+  ['/admin/permissions','系统治理与入口授权'],['/admin/entrances','管理入口'],
+  ['/admin/huischool','校园心理健康产品治理'],['/admin/huiteacher','教师发展与学校改进治理'],
   ['/admin/training', '培训版管理'],
   ['/admin/survey-researchers', 'Survey 研究者与工具授权'],
   ['/assessment-workbench', '测评结果工作台'], ['/assessment-templates', '测评模板库'], ['/assessment-management', '对象与操作记录'],
@@ -136,7 +138,7 @@ export function isStaffWorkspacePath(pathname: string): boolean {
 }
 
 /** Discovery only; platform governance API remains the authorization boundary. */
-export function surveyGovernanceNavigation(supportedOrigin: boolean, role?: Role, platformRole?: string | null): NavigationItem[] {
-  return supportedOrigin && role === 'ADMIN' && platformRole === 'SYSTEM_ADMIN'
+export function surveyGovernanceNavigation(supportedOrigin: boolean, _role?: Role, _platformRole?: string | null, entries: readonly {entry:string}[] = []): NavigationItem[] {
+  return supportedOrigin && entries.some(g=>g.entry==='SURVEY')
     ? [{ path: '/admin/survey-researchers', label: 'Survey 研究者与工具授权', section: 'system' }] : []
 }

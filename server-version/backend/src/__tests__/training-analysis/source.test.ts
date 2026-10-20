@@ -24,6 +24,7 @@ import {encryptCognitivePayload} from '../../modules/cognitive/cognitive.securit
 import {DISCLOSURE_PRESETS} from '../../modules/scale/policy/disclosure'
 import {createCanonicalUnitResultEnvelope, projectScaleCanonicalUnitResult} from '../../modules/assessment-runtime/unit-result'
 import type {TrainingAnalysisRequestV1} from '../../modules/training-analysis/types'
+import {sourceAuthorityRow} from './source-authority-fixture'
 
 beforeEach(() => {vi.clearAllMocks(); vi.stubEnv('DATA_ENCRYPTION_KEY', 'b'.repeat(64))})
 const actor = {userId: 'teacher', role: 'TEACHER' as const}
@@ -48,6 +49,7 @@ function fixture(n = 2) {
     sourceDefinitionHash: canonicalHash(mapCompositeSection(section)), collectionFactsEncrypted: encryptUnifiedRuntimePayload({schemaVersion: 2, sectionKey: section.id, items: [{key: field.id, label: field.formLabel, value: i}]}), completedAt: new Date(publication)}))
   const matches = (row: any, condition: any): boolean => Object.entries(condition).every(([key, value]: any) => key === 'AND' ? value.every((part: any) => matches(row, part)) : key === 'OR' ? value.some((part: any) => matches(row, part)) : value && typeof value === 'object' ? ('in' in value ? value.in.includes(row[key]) : 'lte' in value ? row[key] && new Date(row[key]) <= value.lte : false) : row[key] === value)
   const db: any = {
+    authorityRow: sourceAuthorityRow(),
     user: {findFirst: vi.fn(async () => ({id: 'teacher', role: 'TEACHER', isActive: true, isFrozen: false, expiresAt: null, teacherApproved: true, accountDomain: 'TRAINING', mustChangePassword: false, tokenVersion: 0}))},
     course: {findFirst: vi.fn(async () => ({id: 'course', creatorId: 'teacher', courseType: 'TRAINING_COURSE', isLibrary: false}))},
     relationalAssessmentAssignment: {findMany: vi.fn(async () => [])},
@@ -55,7 +57,7 @@ function fixture(n = 2) {
     compositeAssessmentAttempt: {findMany: vi.fn(async ({where}: any) => parents.filter(row => matches(row, where)))},
     assessment: {findMany: vi.fn(async () => [])},
     assessmentUnitSnapshot: {findMany: vi.fn(async ({where}: any) => snapshots.filter(row => (where.OR ?? [where]).some((condition: any) => condition.compositeAttemptId === row.compositeAttemptId && condition.attemptEpoch === row.attemptEpoch && (!condition.slotKey || condition.slotKey.in.includes(row.slotKey)))))},
-    $queryRaw: vi.fn(async () => []),
+    $queryRaw: vi.fn(async (parts: TemplateStringsArray) => parts.join('').includes('FROM courses c JOIN users') && db.authorityRow ? [db.authorityRow] : []),
   }
   return {db, task, parents, snapshots, section, field}
 }
@@ -98,7 +100,8 @@ async function compactScaleFixture() {
   ;(f.child as any).result = {k: 'SFF1', e: 1}
   f.snapshots[1].canonicalResultEncrypted = encryptUnifiedRuntimePayload(envelope)
   f.db.$queryRaw.mockImplementation(async (parts: TemplateStringsArray) => parts.join('').includes('assessment_result_facts') ? [fact]
-    : parts.join('').includes('assessment_public_templates') ? [...storage.values()] : [])
+    : parts.join('').includes('assessment_public_templates') ? [...storage.values()]
+    : parts.join('').includes('FROM courses c JOIN users') ? [f.db.authorityRow] : [])
   return {...f, fact, envelope}
 }
 describe('authorized Training numeric source adapter', () => {
@@ -113,9 +116,9 @@ describe('authorized Training numeric source adapter', () => {
   })
   it.each(['course', 'task', 'actor'])('hides unauthorized %s without reading child facts', async mode => {
     const f = fixture()
-    if (mode === 'course') f.db.course.findFirst.mockResolvedValue(null)
+    if (mode === 'course') f.db.authorityRow = null
     if (mode === 'task') f.db.compositeAssessment.findMany.mockResolvedValue([])
-    if (mode === 'actor') f.db.user.findFirst.mockResolvedValue(null)
+    if (mode === 'actor') f.db.authorityRow = null
     await expect(loadTrainingAnalysisSources(f.db, actor, request())).rejects.toMatchObject({statusCode: 404})
     expect(f.db.assessment.findMany).not.toHaveBeenCalled(); expect(f.db.assessmentUnitSnapshot.findMany).not.toHaveBeenCalled()
   })
@@ -161,12 +164,13 @@ describe('authorized Training numeric source adapter', () => {
   it('does not turn unrelated actor activity into permission drift', async () => {
     const f = fixture(), before = await loadTrainingAnalysisSources(f.db, actor, request())
     // The query only selects genuine permission fields; a lastSeen change is not selected.
-    expect(f.db.user.findFirst.mock.calls[0][0].select).not.toHaveProperty('lastSeenAt')
+    expect(f.db.$queryRaw.mock.calls[0][0].join('')).not.toContain('last_seen')
     const after = await loadTrainingAnalysisSources(f.db, actor, request())
     expect(after.authorityHash).toBe(before.authorityHash)
   })
   it('refuses governed resultDisclosure grants as original/raw instrument authority', async () => {
-    const f = fixture(); f.db.$queryRaw.mockImplementation(async (parts: TemplateStringsArray) => parts.join('').includes('assessment_run_executions') ? [{id: 'attempt-0'}] : [])
+    const f = fixture(); f.db.$queryRaw.mockImplementation(async (parts: TemplateStringsArray) => parts.join('').includes('assessment_run_executions') ? [{id: 'attempt-0'}]
+      : parts.join('').includes('FROM courses c JOIN users') ? [f.db.authorityRow] : [])
     await expect(loadTrainingAnalysisSources(f.db, actor, request())).rejects.toMatchObject({statusCode: 404})
     expect(f.db.assessmentUnitSnapshot.findMany).not.toHaveBeenCalled()
   })
@@ -189,7 +193,8 @@ describe('authorized Training numeric source adapter', () => {
       row.frozenActiveSlotSetEncrypted = encryptFrozenActiveSlotSet(slots); row.frozenActiveSlotSetHash = slots.snapshotHash
     })
     f.snapshots[1].slotKey = `form-section:${sectionB.id}`; f.snapshots[1].collectionFactsEncrypted = 'POISON-MUST-NOT-BE-DECRYPTED'
-    f.db.$queryRaw.mockImplementation(async (parts: TemplateStringsArray) => parts.join('').includes('training_variant_frozen') ? [{id: 'task'}] : [])
+    f.db.$queryRaw.mockImplementation(async (parts: TemplateStringsArray) => parts.join('').includes('training_variant_frozen') ? [{id: 'task'}]
+      : parts.join('').includes('FROM courses c JOIN users') ? [f.db.authorityRow] : [])
     const selected = request(); selected.waves[0].configDigest = config.configDigest; selected.waves[0].variantKey = 'group_0'
     const result = await loadTrainingAnalysisSources(f.db, actor, selected)
     expect(result.source.observations).toHaveLength(1); expect(result.source.observations[0].value).toBe(0)
@@ -487,8 +492,7 @@ it('material arms retain hand-calculated means 4 versus 5 instead of a pooled 4.
 })
 
 describe('single locked Training authority',()=>{
- const locked=()=>({id:'teacher',role:'TEACHER',isActive:true,isFrozen:false,expiresAt:null,teacherApproved:true,accountDomain:'TRAINING',mustChangePassword:false,tokenVersion:0,
-  courseId:'course',creatorId:'teacher',courseType:'TRAINING_COURSE',isLibrary:false})
+ const locked=sourceAuthorityRow
  it.each(['SHARE','UPDATE'] as const)('reuses actual locked principal/course fields in %s and preserves the authority fingerprint',async authorityLock=>{
   const before=fixture(),expected=await loadTrainingAnalysisSources(before.db,actor,request())
   const f=fixture();f.db.$queryRaw.mockImplementation(async(parts:TemplateStringsArray)=>parts.join('').includes('FROM courses c JOIN users')?[locked()]:[])
@@ -510,8 +514,10 @@ describe('single locked Training authority',()=>{
   const f=fixture();f.db.$queryRaw.mockResolvedValue([])
   await expect(loadTrainingAnalysisSources(f.db,actor,request(),{authorityLock:'SHARE'})).rejects.toMatchObject({statusCode:404,code:'TRAINING_ANALYSIS_NOT_FOUND'})
   expect(f.db.user.findFirst).not.toHaveBeenCalled()
+  f.db.$queryRaw.mockImplementation(async(parts:TemplateStringsArray)=>parts.join('').includes('FROM courses c JOIN users')?[locked()]:[])
   await loadTrainingAnalysisSources(f.db,actor,request())
-  expect(f.db.user.findFirst).toHaveBeenCalledOnce();expect(f.db.course.findFirst).toHaveBeenCalledOnce()
+  expect(f.db.user.findFirst).not.toHaveBeenCalled();expect(f.db.course.findFirst).not.toHaveBeenCalled()
+  expect(f.db.$queryRaw.mock.calls.filter(([parts]:any)=>parts.join('').includes('FROM courses c JOIN users'))).toHaveLength(2)
  })
 })
 

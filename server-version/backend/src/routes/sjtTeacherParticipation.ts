@@ -1,5 +1,5 @@
 import { Router } from 'express'
-import { authenticate, requireRole } from '../middleware/auth'
+import { authenticate, requireBusinessRole } from '../middleware/auth'
 import { UserRole } from '../types'
 import { getSituationalInstrument } from '../modules/situational/situational-runtime.service'
 import { availableSjtPackages } from '../modules/situational/authoring/service'
@@ -7,7 +7,7 @@ import { situationalController } from '../controllers/situationalController'
 
 // A separate teacher participant surface. Student routes and research grants stay unchanged.
 const router = Router()
-router.use(authenticate, requireRole(UserRole.TEACHER))
+router.use(authenticate, requireBusinessRole(UserRole.TEACHER))
 router.get('/instruments', situationalController.listInstruments)
 router.get('/instruments/:instrumentKey', situationalController.getInstrument)
 router.get('/history', situationalController.history)

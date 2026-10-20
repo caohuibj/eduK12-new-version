@@ -29,13 +29,14 @@ const output = process.env.VISUAL_QA_EVIDENCE_DIR || '/tmp/eduk12-r5-sjt'
     const server = http.createServer(async (request, response) => {
       response.setHeader('Access-Control-Allow-Origin', base)
       response.setHeader('Access-Control-Allow-Credentials', 'true')
-      response.setHeader('Access-Control-Allow-Headers', 'Content-Type,X-CSRF-Token')
+      response.setHeader('Access-Control-Allow-Headers', 'Content-Type,X-CSRF-Token,X-EduK12-Account-View')
       response.setHeader('Access-Control-Allow-Methods', 'POST,OPTIONS')
       if (request.method === 'OPTIONS') { response.writeHead(204); response.end(); return }
       let data, status = 200, issues
       try {
         assert.ok(['/api/situational/authoring/validate', '/api/situational/authoring/drafts'].includes(request.url), 'upload must not publish or approve content')
         assert.equal(request.method, 'POST')
+        assert.equal(request.headers['x-eduk12-account-view'], 'BUSINESS')
         assert.match(request.headers['content-type'], /^multipart\/form-data; boundary=/)
         const chunks = []
         for await (const chunk of request) chunks.push(chunk)

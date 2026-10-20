@@ -6,7 +6,8 @@ import { createRedisRateLimiter } from '../../middleware/redisRateLimit'
 import { withLoginPasswordVerification } from '../../middleware/loginRateLimit'
 import { comparePassword } from '../../utils/password'
 import { forbidden, error, success } from '../../utils/response'
-import { assertCurrentSystemAdmin } from '../../services/accountAuthorityService'
+import { assertEntryAdmin } from '../admin-permissions/service'
+import { requireRecentAdminKey } from '../admin-permissions/guards'
 import type { EducationProduct } from '../organization/educationProductAccess'
 import { changeTeacherScaleLicense,TeacherScaleLicenseError } from './scaleLicense.service'
 import { changeTeacherPersonalGrant,TeacherPersonalGrantError } from './personalScaleGrant.service'
@@ -53,12 +54,13 @@ function platformEducationOrigin(req:Request,res:Response,next:NextFunction){
 async function adminStepUp(req:Request,currentPassword:string){
   const user=await prisma.user.findUnique({where:{id:req.user!.userId}})
   if(!user||!['LEGACY','TRAINING'].includes(user.accountDomain)
-    ||user.platformRole!=='SYSTEM_ADMIN'||!user.isActive||user.isFrozen
+    ||!user.isActive||user.isFrozen
     ||user.mustChangePassword||(user.expiresAt&&user.expiresAt<=new Date()))
     throw new EducationProductGovernanceError('PLATFORM_ADMIN_REQUIRED','无产品授权管理权限',403)
   const verified=await withLoginPasswordVerification(()=>comparePassword(currentPassword,user.passwordHash))
   if(!verified)throw new EducationProductGovernanceError('ADMIN_STEP_UP_REQUIRED','需要验证当前管理员密码',403)
-  await assertCurrentSystemAdmin(prisma,req.user!.userId)
+  const entry=req.params.product==='HUISCHOOL'?'HUISCHOOL':'HUITEACHER'
+  await assertEntryAdmin(prisma,req.user!.userId,entry)
 }
 const handle=(work:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
   try{return success(res,await work(req))}
@@ -71,6 +73,7 @@ const handle=(work:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respo
   }
 }
 router.use(authenticate,platformEducationOrigin,limiter)
+router.use((req,res,next)=>['GET','HEAD','OPTIONS'].includes(req.method)?next():requireRecentAdminKey(req,res,next))
 router.get('/organizations/:organizationId/products',handle(req=>
   readEducationProductEntitlements(req.user!.userId,uuid.parse(req.params.organizationId))))
 router.get('/organizations/:organizationId/teacher-admins',handle(req=>

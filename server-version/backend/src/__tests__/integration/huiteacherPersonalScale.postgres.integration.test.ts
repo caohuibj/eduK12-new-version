@@ -91,6 +91,7 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
       accountDomain:'TRAINING',role:'ADMIN',platformRole:'SYSTEM_ADMIN',
     }})
     const actor={userId:admin.id,platformRole:'SYSTEM_ADMIN'}
+    await db.adminEntryGrant.create({data:{id:randomUUID(),userId:admin.id,entry:'HUITEACHER',grantedBy:admin.id}})
     const definition=createCustomScaleDefinition()
     definition.respondentType='teacher_self_report'
     definition.source.title='原创合成教师工作体验'

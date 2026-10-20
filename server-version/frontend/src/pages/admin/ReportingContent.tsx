@@ -25,7 +25,7 @@ export default function ReportingContent() {
     const request = ++epoch.current
     setBusy(true); setError('')
     try {
-      const [r, s, scale] = await Promise.all([reportingContentApi.resources(), reportingContentApi.specs(), apiClient.get<{ list: typeof scales }>('/scales?page=1&pageSize=100')])
+      const [r, s, scale] = await Promise.all([reportingContentApi.resources(), reportingContentApi.specs(), apiClient.get<{ list: typeof scales }>('/organizations/measurement-resources/candidates')])
       if (request !== epoch.current) return
       if (scale.code !== 0 || !scale.data) throw new Error(scale.message || '量表列表加载失败')
       setResources(r.list); setSpecs(s.list); setNextPage(s.nextPage); setResourceNextPage(r.nextPage)

@@ -23,6 +23,7 @@ it('exposes normal resource and spec draft → review → publication with expli
   api.transitionSpec.mockImplementation(async(_id,action)=>{spec={...spec,status:action==='review'?'REVIEWED':'PUBLISHED'};return spec})
   const user=userEvent.setup();render(<MemoryRouter><ReportingContent/></MemoryRouter>)
   await user.selectOptions(await screen.findByLabelText('原创量表'),'scale')
+  expect(client.get).toHaveBeenCalledWith('/organizations/measurement-resources/candidates')
   await user.click(screen.getByRole('button',{name:'注册资源草稿'}))
   await user.click(await screen.findByRole('button',{name:'审核'}));await user.click(await screen.findByRole('button',{name:'发布'}))
   await waitFor(()=>expect(stored.status).toBe('PUBLISHED'))
