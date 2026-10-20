@@ -1,3 +1,4 @@
+import { assertCompositeCourseScope } from '../modules/composite/composite-course-scope'
 import { UserRole } from '@prisma/client'
 import { prisma } from '../config/database'
 import { loadCurrentPrincipal } from '../modules/organization/principal'
@@ -34,12 +35,16 @@ export const revalidateAssessmentExport = async (claim: ClaimedExportBatch, ids?
     if (isCompositeWrapper(assignment)) throw new Error('Standalone wrapper export forbidden')
   } else {
     await getExportContext(principal.userId, principal.role, claim.resourceId)
+    if (claim.options.courseId) {
+      if (!claim.options.anonymize) throw new Error('Course export must be anonymized')
+      await assertCompositeCourseScope(principal.userId, principal.role, claim.resourceId, claim.options.courseId)
+    }
     const binding = await resolveCompositeExportProjectionBinding(claim.resourceId, 'teacher')
     if (binding.fingerprint !== claim.options.projectionFingerprint) throw new Error('Export disclosure changed')
     if (ids) {
       const visibility = await teacherRelationalExportVisibility(principal)
       const count = await prisma.compositeAssessmentAttempt.count({ where: { AND: [
-        { id: { in: ids }, compositeAssessmentId: claim.resourceId, status: 'COMPLETED' }, ...(visibility ? [visibility] : []) ] } })
+        { id: { in: ids }, compositeAssessmentId: claim.resourceId, status: 'COMPLETED', ...(claim.options.courseId ? { deliveryCourseId: claim.options.courseId } : {}) }, ...(visibility ? [visibility] : []) ] } })
       if (count !== ids.length) throw new Error('Export row authority revoked')
     }
   }
@@ -82,11 +87,12 @@ export const prepareAssessmentExport = async (claim: ClaimedExportBatch) => {
       return generated
     } }
   }
-  const compositeOptions = { ...options, detail: claim.options.detail === 'full' ? 'full' as const : 'summary' as const }
+  const compositeOptions = { ...options, ...(claim.options.courseId ? { courseId: claim.options.courseId } : {}), detail: claim.options.detail === 'full' ? 'full' as const : 'summary' as const }
   const binding = await resolveCompositeExportProjectionBinding(claim.resourceId, 'teacher')
   const data = projectCompositeExportData(await compositeExportService.getExportData(claim.resourceId, compositeOptions), binding)
   const provenance = provenanceSchema.parse({ version: 1, generation: claim.batchId, creatorRole: actor.role,
     audience: 'teacher', detail: data.detail, dateRange, projectionFingerprint: binding.fingerprint,
+    ...(claim.options.courseId ? { courseId: claim.options.courseId } : {}),
     attemptIds: data.rows.map(row => String(row.A_attempt_id)) })
   return { data, provenance, save: async (format: string) => (await compositeExportService.saveExportFiles(claim.resourceId, compositeOptions, format as CompositeExportFormat, data)).filePath }
 }

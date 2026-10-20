@@ -103,7 +103,7 @@ export const compositeApi = {
   createToken: (id: string, input: PublicDeliveryCreateInput) => apiClient.post<any>(`/composite-assessments/${id}/public-tokens`, input),
   revealToken: (id: string, tokenId: string) => apiClient.post<any>(`/composite-assessments/${id}/public-tokens/${tokenId}/reveal`, {}),
   disableToken: (id: string, tokenId: string) => apiClient.delete(`/composite-assessments/${id}/public-tokens/${tokenId}`),
-  exportData: (id: string, input: { detail: 'summary' | 'full'; format: 'csv' | 'sav' | 'zip'; anonymize?: boolean }, requestKey?: string) => apiClient.post<any>(`/composite-assessments/${id}/export`, input, { headers: { 'X-Export-Request-Key': requestKey } }),
+  exportData: (id: string, input: { detail: 'summary' | 'full'; format: 'csv' | 'sav' | 'zip'; anonymize?: boolean; courseId?: string }, requestKey?: string) => apiClient.post<any>(`/composite-assessments/${id}/export`, input, { headers: { 'X-Export-Request-Key': requestKey } }),
   listAvailable: () => apiClient.get<{ list: Array<Record<string, unknown>> }>('/composite-assessments/available'),
   start: (assessmentId: string) => apiClient.post<{ attempt: CompositeAttemptState; recoveryToken: null }>(`/composite-assessments/${assessmentId}/attempts`),
   restart: (attemptId: string) => apiClient.post<{ attempt: CompositeAttemptState; recoveryToken: null }>(`/composite-assessments/attempts/${attemptId}/restart`),
@@ -125,9 +125,10 @@ export const compositeApi = {
   partialReport: (attemptId: string) => apiClient.get<CompositeReport>(`/composite-assessments/attempts/${attemptId}/report?partial=1`),
   snapshots: (attemptId: string) => apiClient.get<{ list: CompositeSnapshotMetadata[]; total: number }>(`/composite-assessments/attempts/${attemptId}/snapshots`),
   reanalyze: (attemptId: string) => apiClient.post<CompositeSnapshotMetadata>(`/composite-assessments/attempts/${attemptId}/reanalyze`, {}),
-  attempts: (id: string, query: { status?: 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'; q?: string; page?: number; pageSize?: number } = {}) => {
+  attempts: (id: string, query: { status?: 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'; q?: string; page?: number; pageSize?: number; courseId?: string } = {}) => {
     const params = new URLSearchParams()
     if (query.status) params.set('status', query.status)
+    if (query.courseId) params.set('courseId', query.courseId)
     const q = query.q?.trim()
     if (q) params.set('q', q)
     if (query.page) params.set('page', String(query.page))

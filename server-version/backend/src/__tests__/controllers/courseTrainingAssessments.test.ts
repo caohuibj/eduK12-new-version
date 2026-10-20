@@ -108,3 +108,11 @@ describe('course-scoped read-only Training measurement inventory', () => {
     expect(mock.questionnaire).not.toHaveBeenCalled()
   })
 })
+
+ it('opts into owned course drafts without changing the default delivered inventory', async () => {
+  mock.composite.mockResolvedValue([{id:'draft',name:'本课程草稿',createdBy:'creator',productKind:'QUESTIONNAIRE',status:'DRAFT',description:null,_count:{items:1}}])
+  const response=res()
+  await courseTrainingAssessments({...req(UserRole.TEACHER),query:{includeManaged:'true'}} as any,response)
+  expect(response.body.data.list.find((row:any)=>row.id==='draft')).toMatchObject({status:'DRAFT',manageHref:'/questionnaire-products/draft'})
+  expect(mock.composite.mock.calls[0][0].where.OR).toContainEqual({productKind:'QUESTIONNAIRE',questionnaireType:'COURSE',status:{in:['DRAFT','ARCHIVED']},createdBy:'creator',questionnaireCourses:{some:{courseId:'course-1'}}})
+ })

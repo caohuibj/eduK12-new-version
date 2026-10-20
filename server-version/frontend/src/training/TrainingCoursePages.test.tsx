@@ -36,7 +36,7 @@ beforeEach(() => {
     if (url === '/courses/course-1') return Promise.resolve({ code: 0, data: course })
     if (url === '/courses/course-1/assignments') return Promise.resolve({ code: 0, data: { list: [{ id: 'a-1', title: '课程作业', status: 'PUBLISHED', submitted: false }] } })
     if (url === '/courses/course-1/checkins') return Promise.resolve({ code: 0, data: { list: [{ id: 'c-1', title: '每周打卡', status: 'PUBLISHED', submitted: false }] } })
-    if (url === '/courses/course-1/training-assessments') return Promise.resolve({ code: 0, data: { list: [
+    if (url === '/courses/course-1/training-assessments?includeManaged=true') return Promise.resolve({ code: 0, data: { list: [
       { key: 'questionnaire:q-1', id: 'q-1', name: '学习状态', kind: 'QUESTIONNAIRE', typeLabel: '课程问卷', unitCount: 2, unitLabel: '单元', manageHref: '/questionnaire-products/q-1' },
       { key: 'scale:s-1', id: 's-1', name: '积极应对量表', kind: 'SCALE', typeLabel: '课程量表', unitCount: 12, unitLabel: '道题目', manageHref: '/scales/s-1' },
       { key: 'cognitive:c-1', id: 'c-1', name: '已发布认知历史', kind: 'COGNITIVE', typeLabel: '认知测评', unitCount: 1, unitLabel: '个任务', manageHref: '/cognitive-assignments/c-1' },
@@ -113,8 +113,8 @@ describe('course-first training workspaces', () => {
     fireEvent.click(screen.getByRole('button', { name: '测评' }))
     expect(await screen.findByText('积极应对量表')).toBeInTheDocument()
     expect(screen.getByText('学习综合测评包')).toBeInTheDocument()
-    expect(screen.getAllByRole('link', { name: /管理测评/ }).map(link => link.getAttribute('href'))).toEqual(['/questionnaire-products/q-1', '/scales/s-1', '/cognitive-assignments/c-1', '/bundle-products/b-1'])
-    expect(get).toHaveBeenCalledWith('/courses/course-1/training-assessments')
+    expect(screen.getAllByRole('link', { name: /配置与匿名链接|管理测评/ }).map(link => link.getAttribute('href'))).toEqual(['/questionnaire-products/q-1', '/scales/s-1', '/cognitive-assignments/c-1', '/bundle-products/b-1'])
+    expect(get).toHaveBeenCalledWith('/courses/course-1/training-assessments?includeManaged=true')
   })
 
   it('loads authorized analysis sources only when the trainer opens its data-analysis tab', async () => {

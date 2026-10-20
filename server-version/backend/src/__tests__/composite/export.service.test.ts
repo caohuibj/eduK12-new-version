@@ -630,3 +630,10 @@ describe('composite export service', () => {
     expect(csv).not.toContain("'-3")
   })
 })
+
+it('applies exact persisted course delivery before counting, variants and answer materialization',async()=>{
+ mockPrisma.compositeAssessment.findUnique.mockResolvedValue(makeTemplate(false))
+ await compositeExportService.getExportData('composite-1',{detail:'summary',courseId:'course-a'})
+ expect(mockPrisma.compositeAssessmentAttempt.count).toHaveBeenCalledWith({where:expect.objectContaining({compositeAssessmentId:'composite-1',status:'COMPLETED',deliveryCourseId:'course-a'})})
+ expect(mockPrisma.compositeAssessment.findUnique.mock.calls[0][0].include.attempts.where).toMatchObject({deliveryCourseId:'course-a'})
+})

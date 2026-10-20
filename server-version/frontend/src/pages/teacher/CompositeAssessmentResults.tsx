@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { ArrowLeft, ArrowUpRight, CheckCheck, CircleCheck, Clock3, FileText, Info, Search, Users } from 'lucide-react'
 import { isTrainingHost } from '../../training/context'
 import './composite-training-results.css'
@@ -33,6 +33,8 @@ const CompositeAssessmentResults: React.FC = () => {
 const CompositeAssessmentResultsContent: React.FC<{ id: string }> = ({ id }) => {
   const navigate = useNavigate()
   const trainingDesign = isTrainingHost()
+  const [search] = useSearchParams()
+  const courseId = search.get('courseId') || undefined
   const [data, setData] = useState<CompositeTeacherAttemptsResponse | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
@@ -53,12 +55,14 @@ const CompositeAssessmentResultsContent: React.FC<{ id: string }> = ({ id }) => 
         if (!id) throw new Error('测评链接无效')
         const response = await compositeApi.attempts(id, {
           status: status || undefined,
+          ...(courseId ? {courseId} : {}),
           q: q || undefined,
           page,
           pageSize: 20,
         })
         if (!active) return
         if (response.code !== 0 || !response.data || response.data.assessment.id !== id) throw new Error(response.message || '无法加载作答名单')
+        if(courseId && response.data.courseScope?.id !== courseId) throw new Error('课程数据范围无法确认，请返回课程重新打开')
         setData(response.data)
       } catch (err) {
         if (active) {
@@ -70,7 +74,7 @@ const CompositeAssessmentResultsContent: React.FC<{ id: string }> = ({ id }) => 
       }
     })()
     return () => { active = false }
-  }, [id, status, q, page, revision])
+  }, [id, status, q, page, revision, courseId])
 
   const productKind = data?.assessment.productKind
   const isBundle = productKind === 'ASSESSMENT_BUNDLE'
@@ -81,7 +85,10 @@ const CompositeAssessmentResultsContent: React.FC<{ id: string }> = ({ id }) => 
 
   const openReport = (row: CompositeTeacherAttemptRow) => {
     if (!reportAvailable(row)) return
-    navigate(`/composite-assessments/${id}/attempts/${row.id}/report${row.status === 'COMPLETED' ? '' : '?partial=1'}`)
+    const query = new URLSearchParams()
+    if(row.status !== 'COMPLETED')query.set('partial','1')
+    if(courseId)query.set('courseId',courseId)
+    navigate(`/composite-assessments/${id}/attempts/${row.id}/report${query.size ? '?'+query.toString() : ''}`)
   }
 
   const counts = data?.attemptCounts
@@ -104,9 +111,10 @@ const CompositeAssessmentResultsContent: React.FC<{ id: string }> = ({ id }) => 
   return (
     <ProductPage width="management" className={trainingDesign ? "tr-results" : "space-y-6"}>
       {trainingDesign && <div className="tr-result-eyebrow"><span>课程测评</span><span> / </span><strong>作答与报告</strong></div>}
-      <PageHeader title={data?.assessment.name || '作答与报告'} description={trainingDesign ? '查看学员的作答进度，打开已完成的测评报告。' : data?.assessment.code || '查看参与者进度与已完成报告'} actions={editorPath ? <button onClick={() => navigate(editorPath)} className="staff-secondary-link"><ArrowLeft className="w-4 h-4" aria-hidden="true" />返回配置</button> : undefined} />
+      <PageHeader title={data?.assessment.name || '作答与报告'} description={trainingDesign ? '查看学员的作答进度，打开已完成的测评报告。' : data?.assessment.code || '查看参与者进度与已完成报告'} actions={courseId || editorPath ? <button onClick={() => navigate(courseId ? `/courses/${encodeURIComponent(courseId)}/detail?section=assessments` : editorPath!)} className="staff-secondary-link"><ArrowLeft className="w-4 h-4" aria-hidden="true" />{courseId ? '返回课程测评' : '返回配置'}</button> : undefined} />
       {trainingDesign && data && <div className="tr-result-meta"><span className="tr-result-assessment-status"><CircleCheck size={13} aria-hidden="true" />{assessmentStatus}</span><span>测评编号：{data.assessment.code}</span></div>}
       {error && <ProductStatus kind="error" title="作答名单加载失败" actions={<button type="button" className="btn-secondary" onClick={() => setRevision(value => value + 1)}>重试</button>}>{error}</ProductStatus>}
+      {courseId && data?.courseScope && <p className="tr-result-count-note">当前课程：{data.courseScope.title}。仅统计明确绑定本课程的作答。</p>}
       {isBundle && <p className="text-sm text-gray-600">综合报告可用时，可在报告页导出 JSON。</p>}
       {stats}
       {(!trainingDesign || data) && <p className={trainingDesign ? 'tr-result-count-note' : 'text-sm text-gray-600'}>{trainingDesign && <Info size={15} aria-hidden="true" />}<span>按作答次数统计；已交卷中任务达成 {counts?.satisfied ?? counts?.completed ?? 0} 次，未达成 {counts?.notSatisfied ?? 0} 次。重复作答不去重为人数。</span></p>}

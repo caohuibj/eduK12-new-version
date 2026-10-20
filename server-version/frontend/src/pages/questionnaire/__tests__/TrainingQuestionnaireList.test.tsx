@@ -7,6 +7,7 @@ vi.mock('../../../api/client',()=>({default:{get:mocks.get,post:mocks.post},sess
 vi.mock('../../../training/context',()=>({isTrainingHost:()=>true}))
 vi.mock('../../../contexts/AuthContext',()=>({useAuth:()=>({user:{id:'synthetic-teacher',role:'TEACHER'}})}))
 vi.mock('../../../utils/exportJobs',()=>({requestExportIntent:(scope:string,run:(key:string)=>unknown)=>{mocks.intent(scope);return run('stable-synthetic-key')},waitForExportArtifacts:mocks.wait,assertExportDownload:(r:{ok:boolean})=>{if(!r.ok)throw Error('下载失败')},triggerExportDownload:mocks.download,clearExportIntentKey:mocks.clear,ExportJobFailedError:class extends Error{}}))
+import { AssessmentDataExport } from '../TrainingQuestionnaireList'
 import { QuestionnaireProductList } from '../QuestionnaireProducts'
 const row=(id:string,status='PUBLISHED',kind='COLLECTION')=>({id,name:'合成测评 '+id,status,kind,editHref:'/questionnaire-products/'+id})
 const success=(data:unknown)=>({code:0,data})
@@ -57,4 +58,13 @@ describe('Training questionnaire list and deidentified export',()=>{
   expect(await screen.findByRole('heading',{name:'从第一份测评开始'})).toBeInTheDocument()
   expect(screen.queryByRole('alert')).toBeNull();expect(mocks.get).toHaveBeenCalledTimes(2)
  })
+ it('exports only the explicitly selected course and keeps it in the durable request identity',async()=>{
+  render(<MemoryRouter><AssessmentDataExport row={row('published')} actorId="synthetic-teacher" course={{id:'course-a',title:'课程 A'}} onClose={vi.fn()}/></MemoryRouter>)
+  expect(screen.getByRole('dialog')).toHaveTextContent('仅导出「课程 A」')
+  await userEvent.click(screen.getByRole('button',{name:'导出 CSV'}))
+  await waitFor(()=>expect(mocks.download).toHaveBeenCalled())
+  expect(mocks.post).toHaveBeenCalledWith('/composite-assessments/published/export',{detail:'summary',format:'csv',anonymize:true,courseId:'course-a'},{headers:{'X-Export-Request-Key':'stable-synthetic-key'}})
+  expect(mocks.intent).toHaveBeenCalledWith('training-list:synthetic-teacher:published:summary:csv:anonymized:course-a')
+ })
+
 })

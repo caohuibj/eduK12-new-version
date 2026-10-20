@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-const mocks = vi.hoisted(() => ({ find: vi.fn(), count: vi.fn(), stat: vi.fn(), visibility: vi.fn() }))
+const mocks = vi.hoisted(() => ({ find: vi.fn(), count: vi.fn(), stat: vi.fn(), visibility: vi.fn(), scope: vi.fn() }))
 vi.mock('../../config/database', () => ({ prisma: { exportArtifact: { findFirst: mocks.find }, compositeAssessmentAttempt: { count: mocks.count } } }))
 vi.mock('node:fs', () => ({ promises: { stat: mocks.stat } }))
 vi.mock('../../modules/composite/composite-export.service', () => ({ teacherRelationalExportVisibility: mocks.visibility }))
+vi.mock('../../modules/composite/composite-course-scope',()=>({assertCompositeCourseScope:mocks.scope}))
 import { resolveAssessmentExport } from '../../services/assessmentExportArtifact'
 
 const provenance = { version: 1, generation: '00000000-0000-4000-8000-000000000001', creatorRole: 'TEACHER', audience: 'teacher', detail: 'summary', dateRange: {}, projectionFingerprint: 'current', attemptIds: ['attempt'] }
@@ -33,4 +34,14 @@ describe('assessment artifact authority (known exact filename)', () => {
   it('rejects wrong resource identity', async () => { mocks.find.mockResolvedValue({ ...artifact(), resourceId: 'other' }); expect(await resolveAssessmentExport(input)).toBeNull() })
   it('handles missing files locally', async () => { mocks.stat.mockRejectedValue(new Error('ENOENT')); expect(await resolveAssessmentExport(input)).toBeNull() })
   it('retains administrator access to registered nonanonymous artifacts', async () => { mocks.find.mockResolvedValue({ ...artifact(), anonymized: false }); expect(await resolveAssessmentExport({ ...input, actor: { userId: 'admin', role: 'ADMIN' } })).toMatch(/known.csv$/) })
+  it('revalidates the live course binding and exact delivery rows before serving scoped bytes',async()=>{
+    const courseId='00000000-0000-4000-8000-000000000001'
+    mocks.find.mockResolvedValue({...artifact(),provenance:{...provenance,courseId}})
+    expect(await resolveAssessmentExport(input)).toMatch(/known.csv$/)
+    expect(mocks.scope).toHaveBeenCalledWith('teacher','TEACHER','assessment',courseId)
+    expect(mocks.count).toHaveBeenCalledWith({where:{AND:[{id:{in:['attempt']},compositeAssessmentId:'assessment',status:'COMPLETED',deliveryCourseId:courseId},{assignmentRef:null}]}})
+    mocks.stat.mockClear();mocks.scope.mockRejectedValueOnce(new Error('binding revoked'))
+    expect(await resolveAssessmentExport(input)).toBeNull();expect(mocks.stat).not.toHaveBeenCalled()
+  })
+
 })

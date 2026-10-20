@@ -192,3 +192,14 @@ describe('Training results presentation', () => {
     expect(attempts).toHaveBeenLastCalledWith('one', { status: undefined, q: undefined, page: 2, pageSize: 20 })
   })
 })
+
+it('preserves the course scope in list filtering and report navigation',async()=>{
+ trainingPresentation.enabled=true
+ const payload=response('QUESTIONNAIRE');Object.assign(payload.data,{courseScope:{id:'course-a',title:'课程 A'}})
+ attempts.mockResolvedValue(payload)
+ render(<MemoryRouter initialEntries={['/composite-assessments/one/results?courseId=course-a']}><Location/><Routes><Route path="/composite-assessments/:id/results" element={<CompositeAssessmentResults/>}/><Route path="*" element={<p>目标页面</p>}/></Routes></MemoryRouter>)
+ await screen.findByText(/当前课程：课程 A/)
+ expect(attempts).toHaveBeenCalledWith('one',expect.objectContaining({courseId:'course-a'}))
+ fireEvent.click(screen.getByRole('button',{name:'查看报告'}))
+ expect(screen.getByTestId('location').textContent).toBe('/composite-assessments/one/attempts/complete/report?courseId=course-a')
+})

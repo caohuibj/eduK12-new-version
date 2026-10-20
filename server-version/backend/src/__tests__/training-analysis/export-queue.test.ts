@@ -73,4 +73,13 @@ describe('Training analysis durable original ExportBatch intent', () => {
     for (const format of ['sav', 'sps', 'spss', 'xlsx']) expect(() => formatsForRequest('TRAINING_ANALYSIS', format)).toThrow()
     expect(exportArtifactUrl('TRAINING_ANALYSIS', courseId, 'artifact')).toBe(`/api/courses/${courseId}/training-analysis/export/artifacts/artifact`)
   })
+  it('keeps a Composite course scope in the intent and artifact and prevents replay under another course',async()=>{
+    const input={resourceType:'COMPOSITE' as const,resourceId:'assessment',createdBy:actor.id,anonymized:true,format:'csv',recordCount:0,requestKey:randomUUID(),options:{anonymize:true,creatorRole:actor.role,projectionFingerprint:'current',detail:'summary' as const,courseId}}
+    await enqueueExportJob(input)
+    expect(batches[0].options.courseId).toBe(courseId)
+    expect(artifacts[0].provenance.courseId).toBe(courseId)
+    await expect(enqueueExportJob({...input,options:{...input.options,courseId:'00000000-0000-4000-8000-000000000099'}})).rejects.toThrow()
+    expect(batches).toHaveLength(1)
+  })
+
 })

@@ -13,6 +13,7 @@ export type ExportJobFormat = 'csv' | 'sav' | 'sps' | 'xlsx' | 'zip'
 export type ExportJobResourceType = 'SCALE' | 'QUESTIONNAIRE' | 'COGNITIVE' | 'COMPOSITE' | 'TRAINING_ANALYSIS'
 
 export type ExportJobOptions = {
+  courseId?: string
   creatorRole?: 'ADMIN' | 'TEACHER'
   trainingAnalysis?: TrainingAnalysisExportOptions
   projectionFingerprint?: string
@@ -69,6 +70,7 @@ const pendingStorageKey = (resourceType: string, resourceId: string, batchId: st
 
 const normalizeOptions = (options: ExportJobOptions): ExportJobOptions => ({
   anonymize: Boolean(options.anonymize),
+  ...(options.courseId ? { courseId: options.courseId } : {}),
   ...(options.trainingAnalysis ? { trainingAnalysis: trainingAnalysisExportOptionsSchema.parse(options.trainingAnalysis) } : {}),
   ...(options.creatorRole ? { creatorRole: options.creatorRole } : {}),
   ...(options.projectionFingerprint ? { projectionFingerprint: options.projectionFingerprint } : {}),
@@ -213,6 +215,7 @@ export const enqueueExportJob = async (params: {
         } else if (params.resourceType === 'COGNITIVE' || params.resourceType === 'COMPOSITE') {
           const provenance = provenanceSchema.parse({ version: 1, generation: batchId,
             creatorRole: options.creatorRole, audience: 'teacher', detail: options.detail ?? 'summary',
+            ...(options.courseId ? { courseId: options.courseId } : {}),
             dateRange: options.dateRange ?? {}, projectionFingerprint: options.projectionFingerprint, attemptIds: [] })
           await tx.exportArtifact.create({ data: { resourceType: params.resourceType, resourceId: params.resourceId,
             createdBy: params.createdBy, format, anonymized: params.anonymized,

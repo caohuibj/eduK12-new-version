@@ -14,7 +14,7 @@ type Props = { data: { list: Row[]; total: number }; page: number; loading: bool
 const statusLabel: Record<string,string> = { DRAFT:'草稿', PUBLISHED:'已发布', ARCHIVED:'已停用', DEPRECATED:'已停用' }
 const kindLabel = (kind: string) => kind === 'LEGACY' ? '历史问卷' : kind === 'LEGACY_COMPOSITE' ? '历史组合测评' : '组合测评'
 
-function AssessmentDataExport({ row, actorId, onClose }: { row: Row; actorId: string; onClose: () => void }) {
+export function AssessmentDataExport({ row, actorId, onClose, course }: { row: Row; actorId: string; onClose: () => void; course?: { id: string; title: string } }) {
  const [format, setFormat] = useState<'csv'|'zip'>('csv')
  const [busy, setBusy] = useState(false), [notice, setNotice] = useState(''), [error, setError] = useState('')
  const pending = useRef(false), alive = useRef(true)
@@ -23,9 +23,9 @@ function AssessmentDataExport({ row, actorId, onClose }: { row: Row; actorId: st
  async function run() {
   if (pending.current) return
   pending.current=true;setBusy(true);setError('');setNotice('正在提交导出…')
-  const scope=`training-list:${actorId}:${row.id}:summary:${format}:anonymized`
+  const scope=`training-list:${actorId}:${row.id}:summary:${format}:anonymized${course ? ':'+course.id : ''}`
   try {
-   const response=await requestExportIntent(scope,key=>compositeApi.exportData(row.id,{detail:'summary',format,anonymize:true},key))
+   const response=await requestExportIntent(scope,key=>compositeApi.exportData(row.id,{detail:'summary',format,anonymize:true,...(course ? {courseId:course.id} : {})},key))
    if (!alive.current) return
    if(response.code!==0||!response.data?.artifacts)throw Error(response.message||'导出失败')
    setNotice('导出已受理，正在生成文件，请稍候。')
@@ -45,7 +45,7 @@ function AssessmentDataExport({ row, actorId, onClose }: { row: Row; actorId: st
  }
  return <ModalSurface open onClose={close} className="tql-modal-surface"><section className="tql-export-dialog" role="dialog" aria-modal="true" aria-labelledby="tql-export-title" aria-describedby="tql-export-description" tabIndex={-1} aria-busy={busy}>
   <header><span className="tql-export-icon"><Download size={22} aria-hidden="true"/></span><div><small>数据与分析</small><h2 id="tql-export-title">导出脱敏摘要</h2></div><button type="button" disabled={busy} onClick={close} aria-label="关闭数据导出"><X size={20}/></button></header>
-  <p className="tql-export-name">{row.name}</p><p id="tql-export-description">导出此测评的已完成作答摘要，按系统现有授权提供可用字段。</p>
+  <p className="tql-export-name">{row.name}</p><p id="tql-export-description">{course ? `仅导出「${course.title}」中明确绑定本课程的已完成作答摘要，不合并其他课程或无法确定课程的历史记录。` : '导出此测评的已完成作答摘要，按系统现有授权提供可用字段。'}</p>
   <fieldset disabled={busy}><legend>选择文件格式</legend><div className="tql-format-options">{([
    ['csv','CSV 数据表','便于用 Excel、R 等工具读取',FileSpreadsheet],['zip','ZIP 数据与字典','包含数据表和字段说明，适合留存与分析',FileArchive],
   ] as const).map(([value,label,hint,Icon])=><label key={value} className={format===value?'is-selected':''}><input type="radio" name="tql-format" value={value} checked={format===value} onChange={()=>setFormat(value)}/><Icon size={22} aria-hidden="true"/><strong>{label}</strong><small>{hint}</small></label>)}</div></fieldset>
@@ -62,7 +62,7 @@ export function TrainingQuestionnaireList({data,page,loading,error,actorId,onPag
  const drafts=data.list.filter(row=>row.status==='DRAFT').length
  return <ProductPage width="management" className="hui-questionnaire-products training-form-management tql-page">
   <div className="tql-eyebrow">课程测评 <span>/</span> 测评管理</div>
-  <PageHeader title="组合测评" description="编排内容、发布作答入口，在这里管理每一份课程测评。" actions={<Link className="tql-primary" to="/questionnaire-products/new"><Plus size={17} aria-hidden="true"/>创建组合测评</Link>}/>
+  <PageHeader title="全部测评" description="跨课程查找、复制和复用测评；本课程的日常管理请从课程详情进入。" actions={<Link className="tql-primary" to="/questionnaire-products/new"><Plus size={17} aria-hidden="true"/>创建组合测评</Link>}/>
   <section className="tql-overview" aria-label="测评概览"><div><ClipboardList size={20} aria-hidden="true"/><strong>{loading?'—':data.total}</strong><span>全部测评</span></div><div><span className="tql-dot"/><strong>{loading?'—':published}</strong><span>本页已发布</span></div><div><span className="tql-dot is-draft"/><strong>{loading?'—':drafts}</strong><span>本页草稿</span></div></section>
   <nav className="tql-shortcuts" aria-label="测评管理工具">{([
    ['/assessment-templates','从模板开始','复用内容，创建新草稿',Layers],['/assessment-workbench','作答概览','按课程了解测评进度',ClipboardList],['/assessment-management','筛选与归档','查找测评、查看操作记录',BookOpen],
@@ -70,7 +70,7 @@ export function TrainingQuestionnaireList({data,page,loading,error,actorId,onPag
   <aside className="tql-export-guide"><ShieldCheck size={22} aria-hidden="true"/><div><h2>测评数据，从每一份测评导出</h2><p>在下方点击“导出数据”，选择 CSV 摘要或包含字段字典的 ZIP。先选测评，再选格式，更容易核对数据来源。</p><details><summary>格式和脱敏范围</summary><p>CSV：数据表；ZIP：数据表与字段字典。系统姓名会隐藏，编号及获授权的背景题仍可能保留；脱敏不等于完全匿名。高级表单暂不支持 SAV。独立报告另支持 JSON，历史问卷另有 CSV / SAV 入口。</p></details></div></aside>
   {templatePanel}
   {error && <div role="alert" className="tql-error">{error}<ProductButton onClick={onReload}>重新加载列表</ProductButton></div>}
-  <section className="tql-records" aria-label="测评列表"><header><div><h2>我的测评</h2><p>先编制内容，发布后查看作答结果与导出数据。</p></div><span>{loading?'正在加载':`共 ${data.total} 份`}</span></header>
+  <section className="tql-records" aria-label="测评列表"><header><div><h2>全部测评与草稿</h2><p>未绑定课程的草稿、历史测评和可复用内容统一保留在这里。</p></div><span>{loading?'正在加载':`共 ${data.total} 份`}</span></header>
    {loading?<p role="status" className="tql-empty">正在加载组合测评…</p>:data.list.length?data.list.map(row=>{
     const hasResults=row.status!=='DRAFT', composite=row.kind==='COLLECTION'||row.kind==='LEGACY_COMPOSITE'
     return <article className="tql-card" key={row.kind+row.id}>
