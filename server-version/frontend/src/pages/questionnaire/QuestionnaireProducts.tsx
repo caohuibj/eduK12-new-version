@@ -168,6 +168,10 @@ export function QuestionnaireProductList() {
   )
 }
 
+type PendingCognitivePublication={actorId:string;id:string;revision:number;itemIds:string[]}
+function readPendingCognitivePublication(key:string,actorId:string,id:string):PendingCognitivePublication|null{
+  try{const value=JSON.parse(sessionStorage.getItem(key)||'null');return value&&value.actorId===actorId&&value.id===id&&Number.isSafeInteger(value.revision)&&value.revision>=0&&Array.isArray(value.itemIds)&&value.itemIds.length>0&&value.itemIds.every((item:unknown)=>typeof item==='string')?value:null}catch{return null}
+}
 export function QuestionnaireProductEdit() {
   const cognitiveEnabled = useCognitiveEnabled()
   const { user } = useAuth()
@@ -239,7 +243,17 @@ export function QuestionnaireProductEdit() {
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const reportRisk = useRef({dirty:false,pending:false,busy:false})
-  const reportRiskChanged = React.useCallback((risk: {dirty:boolean;pending:boolean;busy:boolean}) => { reportRisk.current = risk }, [])
+  const [reportBlocked,setReportBlocked]=useState(false)
+  const reportRiskChanged = React.useCallback((risk: {dirty:boolean;pending:boolean;busy:boolean}) => { reportRisk.current = risk;setReportBlocked(risk.dirty||risk.pending||risk.busy) }, [])
+  const [measurementNotice,setMeasurementNotice]=useState('')
+  const measurementRecoveryKey='training-cognitive-publication:'+JSON.stringify([user?.id??'',id])
+  const [measurementUnknown,setMeasurementUnknown]=useState<PendingCognitivePublication|null>(()=>readPendingCognitivePublication(measurementRecoveryKey,user?.id??'',id))
+  useEffect(()=>{setMeasurementUnknown(readPendingCognitivePublication(measurementRecoveryKey,user?.id??'',id));setMeasurementNotice('')},[measurementRecoveryKey,user?.id,id])
+  const pendingMeasurement=measurementUnknown?.actorId===user?.id&&measurementUnknown?.id===id?measurementUnknown:null
+  const rememberMeasurement=(pending:PendingCognitivePublication|null)=>{
+    if(pending)sessionStorage.setItem(measurementRecoveryKey,JSON.stringify(pending));else sessionStorage.removeItem(measurementRecoveryKey)
+    setMeasurementUnknown(pending)
+  }
   const actionInFlight = useRef(false)
   const [preflight, setPreflight] = useState<{ revision: number; ok: boolean; checks: Array<{ key: string; label: string; status: string; message: string; targetId?: string }> } | null>(null)
   const [nameError, setNameError] = useState('')
@@ -319,6 +333,13 @@ export function QuestionnaireProductEdit() {
       setBusy(false)
     }
   }
+  const publishCognitiveMeasurement=(pending:PendingCognitivePublication)=>void action(async()=>{
+    if(pending.actorId!==user?.id||pending.id!==id)throw new Error('认知发布请求所属账号或组合已变化')
+    rememberMeasurement(pending);setMeasurementNotice('')
+    const row=await request('/'+pending.id+'/measurement-instances/publish',{revision:pending.revision})
+    hydrate(row);setPreflight(null);rememberMeasurement(null)
+    setMeasurementNotice('当前认知配置版本已发布。组合测评仍为草稿，尚未启动投放。')
+  })
   const persistencePolicy = () => ({schemaVersion:1,checkpoint:checkpointEnabled?{enabled:true,ttlHours:checkpointHours}:null,localCognitive:localCognitiveEnabled?{enabled:true,ttlHours:localCognitiveHours}:null})
   const feedbackPolicy = (): TrainingFeedbackPolicy => feedbackMode === 'SCHEDULED'
     ? { schemaVersion: 1, mode: 'SCHEDULED', releaseAt: parseLocalDateTime(feedbackReleaseAt)?.toISOString() ?? feedbackReleaseAt }
@@ -692,6 +713,18 @@ export function QuestionnaireProductEdit() {
       {detail&&<section aria-label="计时披露权限"><label><input type="checkbox" disabled={busy||dirty} checked={Boolean(detail.timingExportEnabled)} onChange={e=>{const enabled=e.target.checked;void action(async()=>{hydrate(await request('/'+id+'/timing-export-policy',{revision:detail.revision,enabled}))})}}/>允许有权限的教师报告与 CSV/ZIP 导出计时</label><p>默认关闭，独立于原始回答权限；摘要也可导出计时，撤销后旧计时产物不可下载。学员反馈不显示计时。</p></section>}
       {id === 'new' && <p className="questionnaire-publish-hint" role="status">先创建草稿，再添加测评内容、设置投放范围，最后正式发布。</p>}
       {detail && !draft && <section className="questionnaire-publish-panel" aria-label="发布状态"><div className="questionnaire-publish-summary"><div><h2>{labels[detail.status] || detail.status} · {detail.name}</h2><p>当前版本的内容与投放设置已锁定。如需调整，请复制为新草稿后重新编制。</p></div><Link className="hui-button hui-button--primary" to={'/composite-assessments/' + id + '/results'}>查看作答与结果</Link></div></section>}
+      {detail && ((draft && cognitiveEnabled && detail.items?.some((item: any) => item.type === 'COGNITIVE')) || pendingMeasurement) && <section className="my-4 rounded border p-4" aria-label="认知测量版本发布">
+        <h2 className="font-semibold">固定当前认知配置</h2>
+        <p>仅将当前草稿中允许调整的受控认知参数冻结为精确私有测量版本。不转换量表或静态情境判断，不发布组合投放，也不启动作答。</p>
+        <ProductButton disabled={busy || dirty || reportBlocked || !!pendingMeasurement || !draft || !cognitiveEnabled} onClick={() => publishCognitiveMeasurement({actorId:user!.id,id,revision:detail.revision,itemIds:detail.items.filter((item:any)=>item.type==='COGNITIVE').map((item:any)=>item.id)})}>发布当前认知配置版本</ProductButton>
+        {measurementNotice && <p role="status">{measurementNotice}</p>}
+        {pendingMeasurement && <div role="status"><p>修订 {pendingMeasurement.revision} 的发布结果尚未确认。重试始终使用原修订，不会自动改用当前修订或重复创建实例。重新读取不代表原请求已成功。</p>
+          <ProductButton disabled={busy || dirty || reportBlocked} onClick={() => publishCognitiveMeasurement(pendingMeasurement)}>重试原修订请求</ProductButton>
+          <ProductButton disabled={busy || dirty || reportBlocked} onClick={() => void action(async () => { hydrate(await request('/' + id));setPreflight(null);setMeasurementNotice('已重新读取当前草稿。请核对认知配置及发布记录；原请求仍保持未确认。') })}>重新读取当前草稿</ProductButton>
+          {detail.revision>pendingMeasurement.revision && pendingMeasurement.itemIds.every(itemId=>detail.items?.some((item:any)=>item.id===itemId&&item.type==='COGNITIVE'&&typeof item.cognitiveAssignment?.measurementReleaseId==='string'&&item.cognitiveAssignment.measurementReleaseId)) && <div><p>当前修订已推进，原请求中的全部认知项均有测量版本指针。此状态不单独证明原请求成功；请明确核对后结束恢复。</p>
+            <ProductButton disabled={busy || dirty || reportBlocked} onClick={()=>{rememberMeasurement(null);setMeasurementNotice('已按你的确认结束原请求恢复，未再次发布。')}}>已核对全部原认知项，结束恢复</ProductButton></div>}
+        </div>}
+      </section>}
       {detail && draft && <section id="questionnaire-publish" aria-label="正式发布" className="questionnaire-publish-panel">
         <div className="questionnaire-publish-summary"><div><h2>草稿 · 尚未发布</h2><p>{dirty ? '设置有未保存的修改，请先保存设置。' : '确认内容与投放设置后，可自检或正式发布。'}</p></div>
         <div className="flex flex-wrap gap-3">

@@ -1,4 +1,4 @@
-import { render, screen, fireEvent, act, waitFor } from '@testing-library/react'
+import { cleanup, render, screen, fireEvent, act, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter, Routes, Route, Link } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -26,6 +26,7 @@ function mount(id = 'new', search = '') {
 describe('questionnaire draft feedback', () => {
   beforeEach(() => {
     capabilities.enabled = true
+    sessionStorage.clear()
     vi.resetAllMocks()
     api.get.mockResolvedValue({
       code: 0,
@@ -45,6 +46,52 @@ describe('questionnaire draft feedback', () => {
     await screen.findByDisplayValue('历史认知问卷')
     expect(screen.queryByRole('option', { name:'认知测验' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: '配置第 1 项：1. 历史认知任务' })).toBeInTheDocument()
+  })
+
+  it('explicitly publishes the current cognitive configuration using the saved revision without publishing delivery', async () => {
+    const row = { id:'saved', name:'认知草稿', status:'DRAFT', revision:7, questionnaireType:'COURSE', questionnaireCourses:[], items:[{id:'cog',type:'COGNITIVE',position:0,cognitiveAssignment:{title:'认知任务'}}], formSections:[], publicEnabled:false }
+    api.get.mockImplementation(async path => ({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[]}:row}))
+    api.post.mockResolvedValue({code:0,data:{...row,revision:8}})
+    mount('saved');const button=await screen.findByRole('button',{name:'发布当前认知配置版本'})
+    fireEvent.change(screen.getByLabelText('测评名称'),{target:{value:'未保存'}});expect(button).toBeDisabled()
+    fireEvent.change(screen.getByLabelText('测评名称'),{target:{value:row.name}});fireEvent.click(button)
+    await screen.findByText('当前认知配置版本已发布。组合测评仍为草稿，尚未启动投放。')
+    expect(api.post).toHaveBeenCalledExactlyOnceWith('/questionnaire-products/saved/measurement-instances/publish',{revision:7})
+    expect(screen.getByRole('button',{name:'发布组合测评'})).toBeInTheDocument()
+  })
+  it('holds an unknown cognitive publication without resending after read-only refresh', async () => {
+    const row = { id:'saved', name:'认知草稿', status:'DRAFT', revision:7, questionnaireType:'COURSE', questionnaireCourses:[], items:[{id:'cog',type:'COGNITIVE',position:0,cognitiveAssignment:{title:'认知任务'}}], formSections:[], publicEnabled:false }
+    api.get.mockImplementation(async path => ({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[]}:row}))
+    api.post.mockRejectedValue(new Error('response lost'))
+    mount('saved');fireEvent.click(await screen.findByRole('button',{name:'发布当前认知配置版本'}))
+    await screen.findByRole('button',{name:'重新读取当前草稿'})
+    expect(screen.getByRole('button',{name:'发布当前认知配置版本'})).toBeDisabled()
+    api.get.mockResolvedValue({code:0,data:{...row,revision:8}})
+    fireEvent.click(screen.getByRole('button',{name:'重新读取当前草稿'}));await screen.findByText('已重新读取当前草稿。请核对认知配置及发布记录；原请求仍保持未确认。')
+    expect(api.post).toHaveBeenCalledOnce();expect(screen.getByRole('button',{name:'发布当前认知配置版本'})).toBeDisabled()
+    api.post.mockResolvedValue({code:0,data:{...row,revision:8}})
+    fireEvent.click(screen.getByRole('button',{name:'重试原修订请求'}))
+    await screen.findByText('当前认知配置版本已发布。组合测评仍为草稿，尚未启动投放。')
+    expect(api.post.mock.calls.map(call=>call[1])).toEqual([{revision:7},{revision:7}])
+  })
+
+  it('restores the original actor/composite revision after remount and only archives after explicit verified-pointer review', async () => {
+    const row = { id:'saved', name:'认知草稿', status:'DRAFT', revision:7, questionnaireType:'COURSE', questionnaireCourses:[], items:[{id:'cog',type:'COGNITIVE',position:0,cognitiveAssignment:{title:'认知任务'}}], formSections:[], publicEnabled:false }
+    let current:any=row
+    api.get.mockImplementation(async path => ({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[]}:current}))
+    api.post.mockRejectedValue(new Error('response lost'))
+    mount('saved');fireEvent.click(await screen.findByRole('button',{name:'发布当前认知配置版本'}));await screen.findByRole('button',{name:'重试原修订请求'})
+    const key='training-cognitive-publication:'+JSON.stringify(['teacher-1','saved'])
+    expect(JSON.parse(sessionStorage.getItem(key)!)).toEqual({actorId:'teacher-1',id:'saved',revision:7,itemIds:['cog']})
+    cleanup();current={...row,revision:8};mount('saved');await screen.findByRole('button',{name:'重试原修订请求'})
+    expect(screen.queryByRole('button',{name:'已核对全部原认知项，结束恢复'})).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button',{name:'重试原修订请求'}));await waitFor(()=>expect(api.post).toHaveBeenCalledTimes(2))
+    expect(api.post.mock.calls[1][1]).toEqual({revision:7})
+    current={...current,items:[{...row.items[0],cognitiveAssignment:{title:'认知任务',measurementReleaseId:'exact-release'}}]}
+    await waitFor(()=>expect(screen.getByRole('button',{name:'重新读取当前草稿'})).toBeEnabled())
+    fireEvent.click(screen.getByRole('button',{name:'重新读取当前草稿'}))
+    fireEvent.click(await screen.findByRole('button',{name:'已核对全部原认知项，结束恢复'}))
+    expect(sessionStorage.getItem(key)).toBeNull();expect(api.post).toHaveBeenCalledTimes(2)
   })
 
   it('exposes the active composition section to keyboard and screen-reader users', async () => {
@@ -187,6 +234,7 @@ describe('questionnaire draft feedback', () => {
 describe('C04 typed authoring', () => {
   it.each(['number', 'long_text', 'date', 'time'])('creates %s using the public Form definition without a client itemKey', async type => {
     capabilities.enabled = true
+    sessionStorage.clear()
     vi.resetAllMocks()
     const row = { name: '基础题型', status: 'DRAFT', revision: 4, questionnaireType: 'COURSE', questionnaireCourses: [], items: [], formSections: [], publicEnabled: false }
     api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [] } : row }))
@@ -222,6 +270,7 @@ describe('C04 typed authoring', () => {
 describe('C05 structured authoring', () => {
   it.each(['likert', 'matrix', 'matrix_multiple', 'rank_order', 'slider', 'constant_sum'])('creates %s as one public FormQuestion', async type => {
     capabilities.enabled = true
+    sessionStorage.clear()
     vi.resetAllMocks()
     const row = { name: '结构化题型', status: 'DRAFT', revision: 4, questionnaireType: 'COURSE', questionnaireCourses: [], items: [], formSections: [], publicEnabled: false }
     api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [] } : row }))
@@ -252,6 +301,7 @@ describe('C05 structured authoring', () => {
 describe('C05 incomplete single question stays editable', () => {
   it('retains title, options and matrix rows when the server rejects adding an incomplete question', async () => {
     capabilities.enabled = true
+    sessionStorage.clear()
     vi.resetAllMocks()
     const row = { name: '结构化草稿', status: 'DRAFT', revision: 4, questionnaireType: 'COURSE', questionnaireCourses: [], items: [], formSections: [], publicEnabled: false }
     api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? { scales: [], cognitive: [], situational: [], courses: [] } : row }))
