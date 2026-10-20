@@ -191,7 +191,7 @@
       "node",
       ".github/scripts/training-mac-browser.mjs"
     ],
-    "browserScriptBlob": "0775f54d19ec96913e9927f586171944ce8f9736",
+    "browserScriptBlob": "4d25a9827022e3b590c13ccb59dc8af026291115",
     "browserExpectedAssertions": [
       "course-shell-1440",
       "analysis-reference-1440",

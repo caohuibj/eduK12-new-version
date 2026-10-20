@@ -23,6 +23,8 @@ export const TOOLS = Object.freeze([
   '.github/scripts/training-mac-inputs.json',
   '.github/scripts/training-mac-runtime.py',
   '.github/scripts/training-mac-runtime.test.py',
+  '.github/scripts/training-mac-runtime-reuse.py',
+  '.github/scripts/training-mac-runtime-reuse.test.py',
   '.github/scripts/training-mac-browser.mjs',
   '.github/scripts/training-mac-browser.test.mjs',
   '.github/workflows/ci-training-mac-qualification.yml',

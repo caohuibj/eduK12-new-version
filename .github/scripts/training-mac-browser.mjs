@@ -29,7 +29,7 @@ export function fixture(method,pathname){
     [`/api/composite-assessments/${PRODUCT}/public-tokens`]:{list:[]},
   };
   if(!Object.hasOwn(rows,pathname))throw new Error('UNEXPECTED_API');
-  return {code:0,data:rows[pathname]};
+  return {code:0,message:'Synthetic compiled UI fixture',data:rows[pathname]};
 }
 export function staticRelative(url){
   const parsed=new URL(url);

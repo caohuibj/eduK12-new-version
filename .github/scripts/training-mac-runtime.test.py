@@ -213,19 +213,95 @@ class MacContracts(unittest.TestCase):
         self.assertIn('TRAINING_MAC_FIXTURE_REDIS_IMAGE_DIGEST=sha256:' + 'e' * 64, tests)
         self.assertNotIn('--publish', tests)
 
-    def test_actual_execute_order_has_no_general_skip_or_replay(self):
+    def retained_compilation(self, component, unsafe=False):
+        context = self.q.private / component; context.mkdir()
+        source = self.root / ('retained-' + component); source.mkdir()
+        members = ['dist', 'node_modules/.prisma/client'] if component == 'backend' else ['dist']
+        required = {}
+        for path in self.q.dependency_pins[component]['requiredFiles']:
+            target = (source if path.startswith('dist/') else context) / path
+            target.parent.mkdir(parents=True, exist_ok=True); target.write_text('verified public fixture ' + path)
+            required[path] = M.R.sha(target)
+        if component == 'backend':
+            (context / 'node_modules/.prisma/client').mkdir(parents=True)
+            client = source / 'node_modules/.prisma/client'; client.mkdir(parents=True)
+            (client / 'schema.prisma').write_text('current generated schema fixture')
+        archive = self.q.private / (component + '-retained.tar.gz')
+        with M.R.tarfile.open(archive, 'w:gz') as tar:
+            for member in members: tar.add(source / member, arcname=member)
+            if unsafe:
+                bad = source / 'unexpected.txt'; bad.write_text('reject'); tar.add(bad, arcname='node_modules/unapproved.txt')
+        details = {'sourceTree': self.q.inputs['components'][component]['sourceTree'], 'requiredFiles': required,
+                   'archiveSha256': M.R.sha(archive), 'archivePath': component + '-compiled.tar.gz', 'archiveMembers': members}
+        if component == 'backend': details['generatedSchemaSha256'] = M.R.sha(source / 'node_modules/.prisma/client/schema.prisma')
+        return {'name': component + '-compile', 'status': 'success', 'head': 'original-head', 'details': details}, archive
+
+    def test_restores_only_bound_bytes_without_commands_or_relabeling_original(self):
+        self.q.command = Mock(side_effect=AssertionError('must never execute compile'))
+        for component in M.R.COMPONENTS:
+            original, archive = self.retained_compilation(component)
+            result = self.q.restore_compilation(component, original, archive)
+            self.assertEqual(result['original']['head'], 'original-head')
+            self.assertFalse(result['ciExecuted']); self.assertEqual(result['kind'], 'admitted-prior-official-success')
+            self.assertEqual(M.R.sha(self.q.out / result['archivePath']), result['archiveSha256'])
+        self.q.command.assert_not_called()
+
+    def test_restore_rejects_unexpected_members_before_extraction(self):
+        original, archive = self.retained_compilation('backend', unsafe=True)
+        with self.assertRaises(ValueError): self.q.restore_compilation('backend', original, archive)
+        self.assertFalse((self.q.private / 'backend/dist').exists())
+
+    def test_restore_rejects_digest_changed_source_and_generated_client_mismatch(self):
+        original, archive = self.retained_compilation('backend')
+        for field, value in [('archiveSha256', '0' * 64), ('sourceTree', '0' * 40), ('archiveMembers', ['dist'])]:
+            bad = copy.deepcopy(original); bad['details'][field] = value
+            with self.subTest(field=field), self.assertRaises(ValueError): self.q.restore_compilation('backend', bad, archive)
+        original['details']['generatedSchemaSha256'] = '0' * 64
+        with self.assertRaises(ValueError): self.q.restore_compilation('backend', original, archive)
+
+    def test_browser_installs_signed_official_cjk_font_and_records_identity(self):
+        self.q.state['components']['frontend']['compiledArchiveSha256'] = 'archive'
+        output = self.q.out / 'browser'; output.mkdir()
+        (output / 'browser-result.json').write_text(json.dumps({'schema': 1, 'status': 'PASS',
+            'kind': 'compiled-ui-synthetic-api-integration', 'errors': [], 'checks': [{'name': n, 'status': 'PASS'} for n in CHECKS]}))
+        self.q.inputs['macRuntime']['browserExpectedAssertions'] = CHECKS
+        calls = []
+        def command(args, **kwargs):
+            calls.append(args)
+            if args[:2] == ['fc-match', '--format=%{file}']: return SimpleNamespace(stdout='/usr/share/fonts/opentype/noto/NotoSansCJK-Regular.ttc')
+            if args[:2] == ['fc-match', '--format=%{family}']: return SimpleNamespace(stdout='Noto Sans CJK SC')
+            if args[:2] == ['dpkg-query', '-S']: return SimpleNamespace(stdout='fonts-noto-cjk: font')
+            if args[:2] == ['dpkg-query', '-W']: return SimpleNamespace(stdout='1:official-test-version')
+            return SimpleNamespace(stdout='')
+        self.q.command = command
+        with patch.object(M.R, 'git', return_value=self.q.inputs['macRuntime']['browserScriptBlob']), patch.object(M.Path, 'is_file', return_value=True), patch.object(M.R, 'sha', return_value='verified-font-hash'):
+            result = self.q.browser()
+        self.assertEqual(result['cjkFont']['family'], 'Noto Sans CJK SC')
+        self.assertEqual(result['cjkFont']['fileSha256'], 'verified-font-hash')
+        source = (self.q.private / 'font-official-sources.list').read_text()
+        self.assertIn('signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg', source)
+        self.assertIn('https://archive.ubuntu.com/ubuntu noble ', source)
+        self.assertIn('https://security.ubuntu.com/ubuntu noble-security ', source)
+        self.assertFalse(any('trusted=yes' in arg or 'allow-unauthenticated' in arg for call in calls for arg in call))
+        self.assertEqual(sum('fonts-noto-cjk' in call and 'install' in call for call in calls), 1)
+
+    def test_repair_executes_missing_phases_but_never_successful_compiles_types_lint(self):
         self.q.state['phases'] = []
-        for name in ('prepare', 'compile_component', 'app_types', 'lint', 'audit', 'browser', 'package', 'scan'):
+        for name in ('prepare', 'compile_component', 'restore_compilation', 'app_types', 'lint', 'audit', 'browser', 'package', 'scan'):
             setattr(self.q, name, Mock())
         def schema(): self.q.phase('scoped-pg-http', Mock())
         self.q.schema = schema
         def phase(name, action):
             action(); self.q.state['phases'].append({'name': name, 'status': 'success'})
         self.q.phase = phase
-        with patch.dict('os.environ', {'CI': 'true', 'GITHUB_ACTIONS': 'true', 'GITHUB_SHA': 'b' * 40, 'GITHUB_REPOSITORY': 'caohuibj/eduK12-new-version'}):
+        rows = {name: {'name': name, 'status': 'success', 'details': {}} for name in ('backend-compile', 'frontend-compile', 'frontend-app-types', 'changed-lint')}
+        module = SimpleNamespace(admit_reusable_phases=Mock(return_value={'phases': rows, 'archives': {'backend': self.root / 'backend.tar.gz', 'frontend': self.root / 'frontend.tar.gz'}}))
+        spec = SimpleNamespace(loader=SimpleNamespace(exec_module=Mock()))
+        with patch.dict('os.environ', {'CI': 'true', 'GITHUB_ACTIONS': 'true', 'GITHUB_SHA': 'b' * 40, 'GITHUB_REPOSITORY': 'caohuibj/eduK12-new-version'}), patch.object(M.importlib.util, 'spec_from_file_location', return_value=spec), patch.object(M.importlib.util, 'module_from_spec', return_value=module):
             self.q.execute()
         self.assertEqual({p['name'] for p in self.q.state['phases']}, set(M.PHASES))
-        self.assertEqual(self.q.compile_component.call_count, 2)
+        self.q.compile_component.assert_not_called(); self.q.app_types.assert_not_called(); self.q.lint.assert_not_called()
+        self.assertEqual(self.q.restore_compilation.call_count, 2)
         self.assertEqual(self.q.state['status'], 'success')
         self.assertFalse(self.q.private.exists())
 

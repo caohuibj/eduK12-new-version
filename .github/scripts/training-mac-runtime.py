@@ -192,6 +192,22 @@ class MacQualification(R.Qualification):
         pin = self.inputs['macRuntime']
         script = '.github/scripts/training-mac-browser.mjs'
         R.require(pin['browserScriptBlob'] == R.git('rev-parse', 'HEAD:' + script), 'Unreviewed browser fixture')
+        # Only the failed browser environment gains CJK glyph support. Use a
+        # per-command signed official Ubuntu source list, not runner mirrors.
+        sources = self.private / 'font-official-sources.list'
+        sources.write_text('deb [signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] https://archive.ubuntu.com/ubuntu noble main universe\n'
+                           'deb [signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] https://archive.ubuntu.com/ubuntu noble-updates main universe\n'
+                           'deb [signed-by=/usr/share/keyrings/ubuntu-archive-keyring.gpg] https://security.ubuntu.com/ubuntu noble-security main universe\n')
+        apt = ['sudo', 'apt-get', '-o', 'Dir::Etc::sourcelist=' + str(sources), '-o', 'Dir::Etc::sourceparts=-', '-o', 'APT::Update::Error-Mode=any']
+        self.command([*apt, 'update'], timeout=180)
+        self.command([*apt, 'install', '-y', '--no-install-recommends', 'fonts-noto-cjk'], timeout=180)
+        font = Path(self.command(['fc-match', '--format=%{file}', 'Noto Sans CJK SC']).stdout.strip()).resolve()
+        family = self.command(['fc-match', '--format=%{family}', 'Noto Sans CJK SC']).stdout.strip()
+        R.require(font.is_file() and font.is_relative_to('/usr/share/fonts') and 'Noto Sans CJK SC' in family, 'CJK font unavailable')
+        owner = self.command(['dpkg-query', '-S', str(font)]).stdout.strip()
+        R.require(owner.startswith('fonts-noto-cjk:'), 'Unexpected CJK font package')
+        font_receipt = {'package': 'fonts-noto-cjk', 'version': self.command(['dpkg-query', '-W', '-f=${Version}', 'fonts-noto-cjk']).stdout.strip(),
+                        'family': family, 'fileSha256': R.sha(font), 'source': 'signed official Ubuntu noble archives'}
         browsers = self.private / 'browsers'
         module = self.private / 'backend/node_modules/playwright-core'
         self.command(['env', 'PLAYWRIGHT_BROWSERS_PATH=' + str(browsers), 'node', str(module / 'cli.js'), 'install', 'chromium'], timeout=600)
@@ -200,7 +216,7 @@ class MacQualification(R.Qualification):
                       '--frontend-dir', str(self.private / 'frontend/dist'), '--playwright-module', str(module), '--output', str(output)], timeout=180)
         report = json.loads((output / 'browser-result.json').read_text())
         checks = require_browser_report(report, pin['browserExpectedAssertions'])
-        return {'resultSha256': R.sha(output / 'browser-result.json'), 'checks': checks, 'frontendCompiledArchiveSha256': self.state['components']['frontend']['compiledArchiveSha256']}
+        return {'resultSha256': R.sha(output / 'browser-result.json'), 'checks': checks, 'cjkFont': font_receipt, 'frontendCompiledArchiveSha256': self.state['components']['frontend']['compiledArchiveSha256']}
 
     def failure_receipt(self, error):
         details = {'errorType': type(error).__name__, 'phase': next((p['name'] for p in reversed(self.state['phases']) if p['status'] in ('running', 'failure')), 'initialization')}
@@ -329,15 +345,55 @@ class MacQualification(R.Qualification):
         finally:
             self.schema_active = False
 
+    def restore_compilation(self, component, original, archive):
+        self.ready('prepare')
+        R.require(component in R.COMPONENTS and original['name'] == component + '-compile' and original['status'] == 'success', 'Wrong prior compilation')
+        details = original['details']
+        archive = Path(archive).resolve()
+        R.require(archive.is_relative_to(self.private) and archive.is_file() and R.sha(archive) == details['archiveSha256'], 'Changed retained compilation bytes')
+        members = ['dist', 'node_modules/.prisma/client'] if component == 'backend' else ['dist']
+        R.require(details['archiveMembers'] == members and details['archivePath'] == component + '-compiled.tar.gz', 'Changed compiler archive contract')
+        R.require(details['sourceTree'] == self.inputs['components'][component]['sourceTree'], 'Changed compiled source')
+        with R.tarfile.open(archive) as tar:
+            names = [str(R.PurePosixPath(m.name)) for m in tar.getmembers()]
+            R.require(all(any(name == root or name.startswith(root + '/') for root in members) for name in names), 'Unexpected compiler archive member')
+            R.require(all(names.count(root) == 1 for root in members), 'Missing or duplicate compilation root')
+        context = self.private / component
+        R.require(not (context / 'dist').exists(), 'Existing compilation cannot be overwritten')
+        if component == 'backend':
+            client = context / 'node_modules/.prisma/client'
+            R.require(client.is_dir() and not client.is_symlink(), 'Unexpected original generated-client path')
+            shutil.rmtree(client)
+        R.safe_extract(archive, context, {'dist', 'node_modules'} if component == 'backend' else {'dist'})
+        R.require(set(details['requiredFiles']) == set(self.dependency_pins[component]['requiredFiles']), 'Changed selected required files')
+        for path, expected in details['requiredFiles'].items():
+            R.require(R.sha(context / path) == expected, 'Restored compiled/source hash differs')
+        if component == 'backend':
+            R.require(R.sha(context / 'node_modules/.prisma/client/schema.prisma') == details['generatedSchemaSha256'], 'Restored Prisma client differs')
+        self.inputs['components'][component]['requiredFiles'] = details['requiredFiles']
+        self.state['components'][component].update(requiredFiles=details['requiredFiles'], compiledArchiveSha256=details['archiveSha256'])
+        shutil.copyfile(archive, self.out / details['archivePath'])
+        return {**details, 'kind': 'admitted-prior-official-success', 'ciExecuted': False, 'original': original}
+
     def execute(self):
         R.require(os.environ.get('CI') == os.environ.get('GITHUB_ACTIONS') == 'true', 'Official isolated Actions only')
         R.require(os.environ.get('GITHUB_SHA') == self.plan['head'] and os.environ.get('GITHUB_REPOSITORY') == 'caohuibj/eduK12-new-version', 'Wrong official consumer')
-        actions = [('prepare', self.prepare), ('backend-compile', lambda: self.compile_component('backend')),
-                   ('frontend-compile', lambda: self.compile_component('frontend')), ('frontend-app-types', self.app_types),
-                   ('changed-lint', self.lint), ('dependency-audit', self.audit), ('compiled-browser', self.browser),
-                   ('runtime-packaging', self.package), ('runtime-scans', self.scan), ('schema-upgrade-restore', self.schema)]
         try:
-            for name, action in actions: self.phase(name, action)
+            self.phase('prepare', self.prepare)
+            spec = importlib.util.spec_from_file_location('mac_prior_success', Path(__file__).with_name('training-mac-runtime-reuse.py'))
+            module = importlib.util.module_from_spec(spec); spec.loader.exec_module(module)
+            reuse = module.admit_reusable_phases(self)
+            names = {'backend-compile', 'frontend-compile', 'frontend-app-types', 'changed-lint'}
+            R.require(set(reuse) == {'phases', 'archives'} and set(reuse['phases']) == names and set(reuse['archives']) == set(R.COMPONENTS), 'Incomplete exact prior success admission')
+            for component in R.COMPONENTS:
+                self.phase(component + '-compile', lambda component=component: self.restore_compilation(component, reuse['phases'][component + '-compile'], reuse['archives'][component]))
+            for name in ('frontend-app-types', 'changed-lint'):
+                original = reuse['phases'][name]
+                R.require(original['name'] == name and original['status'] == 'success', 'Prior check not successful')
+                self.phase(name, lambda original=original: {**original['details'], 'kind': 'admitted-prior-official-success', 'ciExecuted': False, 'original': original})
+            for name, action in [('dependency-audit', self.audit), ('compiled-browser', self.browser),
+                                 ('runtime-packaging', self.package), ('runtime-scans', self.scan), ('schema-upgrade-restore', self.schema)]:
+                self.phase(name, action)
             R.require({p['name'] for p in self.state['phases'] if p['status'] == 'success'} == set(PHASES), 'Missing actual Mac gate')
             self.state['status'] = 'success'; self.save()
         except Exception as error:
