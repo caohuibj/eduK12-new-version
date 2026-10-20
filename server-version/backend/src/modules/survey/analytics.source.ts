@@ -240,9 +240,10 @@ const scoresFrom=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult,meta:{
     },
     value:typeof r.value==='number'&&Number.isFinite(r.value)?r.value:null,
     missingReason:(typeof r.value==='number'&&Number.isFinite(r.value)?null:'SHOWN_MISSING') as MissingReason|null,
-    ...(provenance?{status:r.status,metricDetails:storedSjtMetricDetails(r),
-      ...(privateResult?.quality?{quality:{status:privateResult.quality.status,
-        flags:Object.fromEntries((privateResult.quality.flags??[]).map(flag=>[flag,true]))}}:{})}:{}),
+    status:r.status,
+    ...(privateResult?.quality?{quality:{status:privateResult.quality.status,
+      flags:Object.fromEntries((privateResult.quality.flags??[]).map(flag=>[flag,true]))}}:{}),
+    ...(provenance?{metricDetails:storedSjtMetricDetails(r)}:{}),
   }))
 }
 function storedSjtMetricDetails(record:unknown):FrozenScoreObservation['metricDetails']{

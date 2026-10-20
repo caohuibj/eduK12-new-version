@@ -161,9 +161,12 @@ describe('Frozen Survey raw variable identity',()=>{
     }
     expect(source.sourceVersions).toEqual([expect.objectContaining({waveId:owner.waveIds[0],instrumentKey:'scale',measurementRelease:unit.measurementRelease})])
     expect(source.scores[0].value).toBe(4)
+    expect(source.scores[0]).toMatchObject({status:'calculated',quality:{status:'interpretable',flags:{}}})
     const measurement=source.scores[0].measurement
     expect(exportLong(owner.projectId,source.scores).codebook[0].column)
       .toBe('W001__scale__total__'+canonicalHash(measurement).slice(0,12))
+    // Native Scale FINAL creation rejects incomplete answers before persistence.
+    expect(()=>fixture([unit],{scale:{'q-a':'a'}})).toThrow('研究量表必须完整选择有效的响应选项')
   })
   it('does not infer a release for old frozen sources and rejects a tampered frozen pointer',async()=>{
     const unit=formUnit('form',[question('ordinary')])

@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { canonicalHash, canonicalJsonString } from '../assessment-runtime/canonical'
 import { validateReferenceSetDefinition, type AssessmentReferenceSetDefinition } from '../assessment-reference/reference'
 import { ContentReleaseError, type ReleaseInput } from './release'
@@ -33,8 +34,16 @@ export interface ReferenceAnalysisEvidence {
   applicability: string
   sampleAdequacy: string
 }
+export const surveyReferenceSourceBindingSchema=z.object({
+  kind:z.literal('SURVEY_VERIFIED_SOURCE_V1'),projectId:z.string().uuid(),waveId:z.string().uuid(),
+  instrumentKey:z.string().trim().min(1).max(240),scoreKey:z.string().trim().min(1).max(240),
+  sourceRevision:z.number().int().nonnegative().safe(),sourceFinalCount:z.number().int().nonnegative().safe(),
+  cutOff:z.string().max(64).refine(value=>Number.isFinite(Date.parse(value))),
+}).strict()
+export type SurveyReferenceSourceBinding=z.infer<typeof surveyReferenceSourceBindingSchema>
 export interface ReferenceCandidate {
   schemaVersion: 1
+  sourceBinding?:SurveyReferenceSourceBinding
   analyzerId: string
   measurement: { releaseId: string; contentHash: string; instrumentVersion: string; scoringVersion: string; measurementHash: string }
   scope: ReleaseInput['scope']
@@ -52,6 +61,13 @@ const fail=(code:string):never=>{throw new ContentReleaseError(code)}
  */
 export function prepareReferenceCandidate(input:Omit<ReferenceCandidate,'schemaVersion'|'candidateHash'>,
   authorizedFacts:ReadonlyMap<string,AuthorizedReferenceFact>):ReferenceCandidate{
+  if(input.sourceBinding!==undefined){
+    const source=surveyReferenceSourceBindingSchema.safeParse(input.sourceBinding)
+    if(!source.success||source.data.cutOff!==input.evidence.cutoff
+      ||input.scope.kind!=='PRIVATE'||input.scope.product!=='SURVEY'||input.scope.resourceId!==source.data.projectId
+      ||input.definition.instrumentKey!==source.data.instrumentKey
+      ||input.definition.entries.some(entry=>entry.scoreKey!==source.data.scoreKey))fail('REFERENCE_SOURCE_BINDING_INVALID')
+  }
   if(!nonblank(input.measurement.releaseId)||!nonblank(input.measurement.instrumentVersion)||!nonblank(input.measurement.scoringVersion)
     ||![input.measurement.contentHash,input.measurement.measurementHash].every(h=>/^[a-f0-9]{64}$/.test(h)))fail('REFERENCE_MEASUREMENT_IDENTITY_REQUIRED')
   if(!nonblank(input.analyzerId))fail('REFERENCE_ANALYZER_REQUIRED')

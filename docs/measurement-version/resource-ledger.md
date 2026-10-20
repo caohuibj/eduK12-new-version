@@ -34,3 +34,5 @@
 | R13 | 私有报告编制/合成预览 | survey/report-drafts.service.ts；report-renderer.ts | authenticateSurvey＋现有 owner/grant/MFA enabled；无默认flag变更 | 定向服务/渲染测试；非真实答卷容量 | 草稿与共享 REPORT release 有独立编制/发布语义；预览不读取样本，不每答复制模板/资产 | V07 | CAS、不可变发布、精确测量/资产、合成标识 | 服务已接，UI/实际解释待接 | MFA enabled 不是 recent strong-auth；原始事实不能被新解释覆盖 |
 
 | R14 | 独立存储诊断供 V08 复用 | 父协调提供固定 fa34852c8692b12b237b6e2556bee175eadb602a，docs/performance/20261020-training-storage-profile.md | COMPACT_FACTS/SHARED_CONTROL/SHARED_RUNTIME=true；仅该隔离场景 | 独立线实测，本主线未重复压测：selected records 318661→102831 B；个人 core56786＋facts1680＋binding560 B；首次 shared artifact5080/template7144/assignment31581 B 独立列 | 复用 PR302 artifact/codec/事实读写，首次共享成本不能按每答重复计算 | V08–V09 | 四工具、120trial逐项、report/CSV/权限为独立线证据 | 待版本绑定接入验证 | 不据此宣称默认生产flags或所有场景收益；约5KiB SJT暂不拆；保留原始trials |
+
+| R15 | 真实 Survey 候选分析 | reference-candidates.service.ts；loadSurveySource/describeWave；sample-quality/withdrawal项目锁+revision协议 | 无新公开HTTP；必须当前owner范围∩reference.analyze | 38 pure/mock/reader合同；非PG并发实测 | 两个短事务夹既有reader，避免长外事务嵌套占第二连接；最多250 FINAL无runtime扫描；统计与manifest复用同一合格集合 | V06 | 有界真实reader、前后scope/source fence、排除计数、无自报事实 | 内部创建已接 | 不删独立前后fence；count不是未提交FINAL全库快照；分析与施测runtime分离 |

@@ -229,3 +229,16 @@ Survey 项目授权把原有 owner/账户/grant/MFA 的 FOR SHARE 行集合放�
 报告面板向父工作区报告 dirty/pending/busy。跨项目“查看/编辑”、新建其他项目及主动登出/改密导致离开时统一检查：未保存文案需要明确确认放弃；写入处理中或创建结果不确定时禁止切换，先回报告面板核对/重试原 requestId，不能卸载后悄悄换请求。浏览器离开使用 beforeunload 提示；未把报告草稿或敏感内容额外复制到持久化浏览器存储。
 
 真实 SurveyApp＋SurveyReportStudio 组件合同验证取消保留、确认离开、busy/pending 阻止跨项目/新建，以及不确定创建重试的完整请求身份不变。两前端定向套件 33 项通过，相关文件 ESLint 与真实 App 依赖图 strict TypeScript 通过；不是浏览器端到端测试。
+
+## V06 真实 Survey 描述性候选创建服务
+
+`survey/reference-candidates.service.ts` 现将真实 source reader 接到候选持久化。范围严格为一个项目、一个波次、一个原生测量指标、最多 250 份 FINAL（资源界限，不是统计充分性门槛），仅创建私有 descriptive_sample/local_pilot。请求只含来源选择、版本与方法说明；均值/样本标准差、人口描述、measurement 身份、样本 manifest、factVersion 和分析者均由服务端派生，不接受外来 norm/statistics/population JSON。
+
+1. 短事务核当前 owner/Survey grant/MFA，读取真实冻结测量指针，再核精确 PROJECT/reference/measurementReleaseId 的 `reference.analyze`。项目 owner、入口 ADMIN 或 MaterialGrant 都不自动替代该能力。
+2. 事务外调用既有 `loadSurveySource(selectScore,selectRaw:false)`，保留其源头/末尾 fence 和有界解密；不在外长事务内再占第二数据库连接。源身份须与已验证 frozen sourceVersions 对上。
+3. 同一纳入集合用于既有 describeWave 和 manifest：Cognitive metric 为 OK、Scale/SJT 为 calculated，且真实已冻结 quality 为 interpretable。Scale 现在透传原本已存在但未投影的 privateScoring status/quality；不新增质量阈值、不重计分。无质量证据、limited、invalid、未可计算、缺失值按互斥优先级计数，聚合计数返回并写入候选局限，不暴露被排除者身份。n=1 不填不可估计 SD；零变异单独说明，不伪装常模。
+4. 短写事务重新核当前 owner/capability、精确 binding 与项目 revision、同 cutoff/wave/filter 的整批 FINAL count，再调用已有 storeReferenceCandidate。质量审核及两类撤回的既有先锁项目/递增 revision 协议保留。此处冻结明确 manifest，不声称包含尚未提交的 FINAL。
+
+候选新增可信 `sourceBinding`（wave/variable/revision/count/cutoff）供下一步复核与发布精确重读；其内容进入 candidateHash。尚无此服务的 HTTP 或系统根授权签发入口；当前不把此内部服务称作用户可用正式 norm 工作台。正式跨入口 norm 仍须独立复核，人口分层必须来自明确版本化字段映射。
+
+验证：新服务＋候选＋真实 reader 合同共 38 项、定向 strict TypeScript 通过。尚未运行真实 PostgreSQL 并发或应用 HTTP；未改迁移、未跑全链或压测。
