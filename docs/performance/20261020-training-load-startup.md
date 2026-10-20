@@ -1,6 +1,6 @@
 # Training 隔离测试启动记录（2026-10-20）
 
-最新状态：`BUILD_BLOCKED_TLS_TRUST`。父对话已批准构建、部署和单份，尚未批准300份负载。PostgreSQL/Redis已独立启动且healthy，受限运行角色已创建；backend构建在npm下载阶段遇到代理CA信任问题，尚无应用镜像、迁移、fixture或单份结果。下文原始启动记录的建议200/1配置已被父对话否决，最新配置与待决项见文末续记。
+最新状态：`STOPPED_BUILD_BUDGET_PENDING_PARENT_DECISION`。用户已批准原精确临时CA提案，npm安装和Prisma Client生成均成功；随后触发8GiB构建准备增量预算而停止，尚无应用镜像、迁移、fixture或单份结果。PG/Redis保持独立healthy。下文保留各阶段原始状态与被覆盖的建议，最新状态见最后续记；300份仍未获准启动。
 
 ## 冻结基线和边界
 
@@ -78,3 +78,13 @@
 - 单份驱动`server-version/scripts/load/training-followup.mjs`已准备并通过Node语法检查；仅脚手架，未动态验证。它新建合成来源、真实API编制/发布和四工具FINAL，不复制旧库、直接写accepted结果或调用内部report/export处理器；业务请求间不抓metrics或扫表。
 - 导出另有明确profile待决：当前POST export实际enqueue Redis，默认`HEAVY_PROCESSING_ENABLED=false`会让任务保持PENDING。若父对话批准，可仅在单份测评/报告计时完成且隔离节点idle后，以`HEAVY_PROCESSING_ENABLED=true`及`HEAVY_MAINTENANCE_IDLE_CONFIRMED=true`启动标准worker处理单次真实导出；视频仍false。未获确认前不启动、不改走内部函数。
 - 当前阻塞是环境TLS构建信任处理待父对话确认，导出消费者profile也待确认；没有自动审批拒绝、未知业务写入或报告工具审批事件。300份负载保持未启动。
+
+## 临时CA获准执行后的预算停止
+
+- 用户明确允许原精确临时CA提案；父对话也批准仅在提交/报告计时结束且idle后，临时启用标准consumer的两个HEAVY开关处理单次导出，视频false，成本单列后恢复。未扩大CA范围，尚未启动consumer。
+- CA来源为节点现有`NODE_EXTRA_CA_CERTS`使用的环境代理根证书（公开证书文件，不是私钥）。仅在`deps`阶段npm安装这一条RUN中以BuildKit secret挂到`/run/secrets/environment_proxy_ca`，shell设置`NODE_EXTRA_CA_CERTS`供npm及其安装子进程使用。没有设置npm的`cafile`配置，没有写Dockerfile `ENV`，没有修改系统、Mac或runtime信任。
+- 原精确diff不变，构建命令通过`--secret id=environment_proxy_ca,src=/usr/local/share/ca-certificates/environment-proxy-ca.crt`引用原证书，没有复制临时CA文件。secret在该RUN完成时由BuildKit解除挂载；保留原节点证书及不含证书字节的diff/指纹/失败日志。最终runtime镜像尚不存在，不能声称已做成品镜像检查；后续构建完成再核环境与产物边界。
+- attempt4日志显示npm安装和`prisma generate`已成功，随后停止于build的COPY阶段，尚未运行应用编译。监督器记录`BUILD_GROWTH_EXCEEDS_8GIB`，进程退出130，准备增量为8,844,341,248B（约8.24GiB）。这是从首次构建起点量得的workspace已用空间变化，包含本任务PG/Redis初始化和工具文件，不是纯业务数据增量。一秒检查存在小量超出，原值保留，不重设起点继续构建。停止后工作盘仍余约21.49GiB。
+- 没有进行cache prune、改预算、改下载路径、删除失败证据或继续构建。新的待决项是父对话调整构建准备预算或给出明确清理范围；2GiB数据预算与4GiB磁盘停止线未变。
+- 离线VM替换fetch，无网络/服务负载地检查6种运输情形：首轮5通过，HTTP200非JSON未明确归类unknown的1项失败；驱动已修正并仅复验该项通过。最初结果与单项复验分开留存，未重跑已通过项。这只证明驱动错误记账，无应用、权限或性能资格。
+- 驱动修复已备份`b32fdec15a527337797d4757d51f8cc2dc1a216d`。原始预算停止及CA范围记录统一引用`evidence/build-blocker.json`和`build/attempt-004-authorized-ca/summary.json`，不复制整份证据。
