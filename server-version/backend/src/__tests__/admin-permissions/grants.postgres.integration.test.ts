@@ -46,6 +46,59 @@ suite('explicit entry grants, real PostgreSQL', () => {
     await service.assertEntryAdmin(db, teacherId, 'SURVEY')
     expect(await db.user.findUniqueOrThrow({ where: { id: teacherId } })).toMatchObject({ tokenVersion: 3 })
   })
+  async function invitationAfterEntryLock(expireWhileWaiting: boolean) {
+    const { inviteResearcher } = await import('../../modules/survey/governance.service')
+    const actor = await db.user.create({ data: { username: 'admin-expiry-' + randomUUID(),
+      passwordHash: 'unusable-synthetic-hash', role: 'TEACHER' } })
+    await service.changeEntryGrant({ actorUserId: systemId, actorSession: { tokenVersion: 0,
+      adminVerifiedAt: Math.floor(Date.now()/1000), adminSessionId: randomUUID() },
+      targetUserId: actor.id, entry: 'SURVEY', active: true, expectedVersion: 0, reason: 'synthetic expiry race' })
+    const [{ expiresAt }] = await db.$queryRaw<Array<{ expiresAt: Date }>>`
+      UPDATE "users" SET "expires_at"=clock_timestamp()+
+        CASE WHEN ${expireWhileWaiting} THEN interval '2 seconds' ELSE interval '60 seconds' END
+      WHERE "id"=${actor.id} RETURNING "expires_at" AS "expiresAt"`
+    let pending: Promise<PromiseSettledResult<Awaited<ReturnType<typeof inviteResearcher>>>> | undefined
+    let outcome: Awaited<typeof pending>
+    try {
+      await db.$transaction(async holder => {
+        const [{ pid }] = await holder.$queryRaw<Array<{ pid: number }>>`SELECT pg_backend_pid() AS pid`
+        await holder.$queryRaw`SELECT "id" FROM "users" WHERE "id"=${actor.id} FOR UPDATE`
+        pending = inviteResearcher(actor.id).then(value => ({ status: 'fulfilled', value }), reason => ({ status: 'rejected', reason }))
+        let observed = false
+        for (let attempt=0; attempt<100; attempt++) {
+          // Refresh activity within this same holder connection, not a third actor.
+          await holder.$queryRaw`SELECT pg_stat_clear_snapshot()::text`
+          const [waiting] = await holder.$queryRaw<Array<{ startedWhileValid: boolean }>>`
+            SELECT a.query_start < ${expiresAt}::timestamptz AS "startedWhileValid"
+            FROM pg_stat_activity a WHERE a.datname=current_database()
+              AND ${pid}=ANY(pg_blocking_pids(a.pid)) AND a.query LIKE '%admin_entry_grants%'`
+          if (waiting) { expect(waiting.startedWhileValid).toBe(true); observed=true; break }
+          await new Promise(resolve => setTimeout(resolve, 10))
+        }
+        expect(observed, 'entry authorization must actually wait on the other PostgreSQL connection').toBe(true)
+        if (expireWhileWaiting) await holder.$queryRaw`
+          SELECT pg_sleep((GREATEST(0, EXTRACT(EPOCH FROM (${expiresAt}::timestamptz-clock_timestamp())))+0.05)::double precision)::text`
+        const [{ expired }] = await holder.$queryRaw<Array<{ expired: boolean }>>`
+          SELECT clock_timestamp() >= ${expiresAt}::timestamptz AS expired`
+        expect(expired).toBe(expireWhileWaiting)
+      }, { timeout: 10000 })
+    } finally { if (pending) outcome = await pending }
+    return { outcome: outcome!,
+      invitations: await db.surveyInvitation.count({ where: { createdBy: actor.id } }),
+      events: await db.surveyEvent.count({ where: { actorUserId: actor.id } }) }
+  }
+  it('denies a Survey invitation after the actor expires during the actual entry lock wait', async () => {
+    const result = await invitationAfterEntryLock(true)
+    expect({ status: result.outcome.status, invitations: result.invitations, events: result.events })
+      .toEqual({ status: 'rejected', invitations: 0, events: 0 })
+    if (result.outcome.status === 'rejected') expect(result.outcome.reason).toMatchObject({ statusCode: 403 })
+  }, 10000)
+  it('allows the same Survey invitation while the actor remains valid after an actual lock wait', async () => {
+    const result = await invitationAfterEntryLock(false)
+    expect({ status: result.outcome.status, invitations: result.invitations, events: result.events })
+      .toEqual({ status: 'fulfilled', invitations: 1, events: 1 })
+    if (result.outcome.status === 'fulfilled') expect(result.outcome.value.kind).toBe('INVITE')
+  }, 10000)
   it('stale racing re-grants cannot undo committed revocation', async () => {
     let revoke!:ReturnType<typeof change>,stale!:ReturnType<typeof change>
     const blocked=async(count:number)=>{
