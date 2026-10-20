@@ -33,7 +33,7 @@ type QualityRow={attemptId:string;attemptCode:string;researchCode:string|null;wa
   completedAt:string;verdict:'INCLUDED'|'EXCLUDED';reason:string|null;revision:number}
 type QualityAudit={reviewedAt:string;reviewerId:string|null;previousVerdict:'INCLUDED'|'EXCLUDED';
   verdict:'INCLUDED'|'EXCLUDED';reason:string;revision:number}
-type ExportFormat='RAW_WAVE'|'RAW_LONG'|'RAW_WIDE'|'SCORE_LONG'|'SCORE_WIDE'|'COGNITIVE_TRIAL_LONG'
+type ExportFormat='RAW_WAVE'|'RAW_LONG'|'RAW_WIDE'|'SCORE_LONG'|'SCORE_WIDE'|'COGNITIVE_TRIAL_LONG'|'INTERPRETATION_LONG'
 type Ticket={id:string;status:'READY';format:ExportFormat;expiresAt:string;
   nextCursor:string|null;pageNumber:number|null;
   manifest:{rowCount:number;columnCount:number;
@@ -72,6 +72,7 @@ const kindOptions:Record<ExportFormat,string>={
   SCORE_LONG:'全部波次探索性得分 Long',
   SCORE_WIDE:'同编号探索性得分 Wide',
   COGNITIVE_TRIAL_LONG:'单波次认知原始试次 Long',
+  INTERPRETATION_LONG:'已保存解释（独立导出）',
 }
 async function api<T>(endpoint:string,method='GET',body?:unknown):Promise<T>{
   const headers:Record<string,string>={'Content-Type':'application/json'}
@@ -293,10 +294,10 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
     void execute(async()=>{
       try{
         const selection:ExportSelection=continuing?{...exportRequest!.selection}:{
-          format,...(['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)?{waveId}:
+          format,...(['RAW_WAVE','COGNITIVE_TRIAL_LONG','INTERPRETATION_LONG'].includes(format)?{waveId}:
             (['RAW_LONG','SCORE_LONG'].includes(format)&&exportWaveId?{waveId:exportWaveId}:{})),
           ...(format.startsWith('RAW')?{includeFreeText}:{}),
-          ...(['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)?{
+          ...(['RAW_WAVE','COGNITIVE_TRIAL_LONG','INTERPRETATION_LONG'].includes(format)?{
             ...(completedFrom?{completedFrom:new Date(completedFrom).toISOString()}:{}),
             ...(completedBefore?{completedBefore:new Date(completedBefore).toISOString()}:{}),
           }:{}),
@@ -601,18 +602,18 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
                  {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
                </select>
              </label>}
-           {['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)&&<label className="text-sm">波次
+           {['RAW_WAVE','COGNITIVE_TRIAL_LONG','INTERPRETATION_LONG'].includes(format)&&<label className="text-sm">波次
             <select className="input block" value={waveId} onChange={e=>changeWave(e.target.value)}>
               {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
             </select></label>}
-          {['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)&&<div className="grid gap-2 text-sm">
+          {['RAW_WAVE','COGNITIVE_TRIAL_LONG','INTERPRETATION_LONG'].includes(format)&&<div className="grid gap-2 text-sm">
             <label>完成时间起点（含）<input type="datetime-local" className="input block w-full"
               value={completedFrom} onChange={e=>{setCompletedFrom(e.target.value);invalidateExport()}}/></label>
             <label>完成时间终点（不含）<input type="datetime-local" className="input block w-full"
               value={completedBefore} onChange={e=>{setCompletedBefore(e.target.value);invalidateExport()}}/></label>
-            <p className="text-xs">留空表示不限制。按完成时间分段；未 FINAL 的记录可能重复出现，合并时请按研究编号和状态去重。</p>
+            <p className="text-xs">{format==='INTERPRETATION_LONG'?'留空表示不限制。仅按 FINAL 完成时间筛选已保存解释。':'留空表示不限制。按完成时间分段；未 FINAL 的记录可能重复出现，合并时请按研究编号和状态去重。'}</p>
           </div>}
-          <button type="button" className="btn-primary" disabled={busy||waiting||['RAW_WAVE','COGNITIVE_TRIAL_LONG'].includes(format)&&!waveId}
+          <button type="button" className="btn-primary" disabled={busy||waiting||['RAW_WAVE','COGNITIVE_TRIAL_LONG','INTERPRETATION_LONG'].includes(format)&&!waveId}
             onClick={()=>createExport()}>创建受控导出</button>
         </div>
         {retryUntil>0&&<p role="status" className="text-sm text-amber-800">
@@ -625,6 +626,7 @@ export function SurveyAnalyticsWorkspace({projectId}:{projectId:string}){
           旧票据 {previousFiles.ticketId}（第 {previousFiles.page} 批）的 {previousFiles.parts.join('、')} 曾发起，未确认保存。
           旧磁盘文件不会删除；不能将旧的部分文件与新票据三件混作同一批。
         </p>}
+        {format==='INTERPRETATION_LONG'&&<p className="text-sm text-amber-800">独立导出 FINAL 时已保存的个人解释及精确版本指针，不按当前版本重算或重新选择参考。旧记录未保存解释时明确标记为 LEGACY_NOT_RECORDED；不包含自由文本、报告模板或常模来源清单。请保留每批 CSV、Codebook 与 Manifest。</p>}
         {format==='COGNITIVE_TRIAL_LONG'&&<p className="text-sm text-amber-800">认知试次按行与字节预算分批导出，只包含已被整轮 FINAL 引用的子结果；含协议、epoch、测量签名与研究授权范围内的复现信息。请保留每批 Codebook 与 Manifest，不将不同版本、输入设备的结果直接合并。</p>}
         {format.startsWith('RAW')&&<label className="flex gap-2 text-sm items-start rounded-lg border border-amber-200 bg-amber-50 p-3">
           <input type="checkbox" checked={includeFreeText}

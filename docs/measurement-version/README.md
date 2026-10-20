@@ -373,3 +373,12 @@ contracts executed in isolated PG 16.15 single-user mode, plus immutable retry a
 unchanged original FINAL checks. Handler tests do not prove HTTP transport; actual
 concurrent retry/revoke and Prisma deployment await the authorized connected test
 environment. New-interpretation UI/root grant issuance are still pending.
+
+### V08 interpretation export UI
+
+The existing analytics export selector now offers an explicit “已保存解释（独立导出）”
+choice. Default RAW export is unchanged. The interpretation format binds one wave
+and optional FINAL completion-time window, uses existing signed pagination and
+three-file download/recovery, and never includes free text even if RAW previously
+selected it. UI explains saved-at-FINAL semantics, legacy absence and no current
+reference reselection. 33 actual download/recovery component contracts passed.
