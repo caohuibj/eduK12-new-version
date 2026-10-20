@@ -1,6 +1,6 @@
 # Training 隔离测试启动记录（2026-10-20）
 
-最新状态：`STOPPED_BUILD_BUDGET_PENDING_PARENT_DECISION`。用户已批准原精确临时CA提案，npm安装和Prisma Client生成均成功；随后触发8GiB构建准备增量预算而停止，尚无应用镜像、迁移、fixture或单份结果。PG/Redis保持独立healthy。下文保留各阶段原始状态与被覆盖的建议，最新状态见最后续记；300份仍未获准启动。
+最新状态：`STOPPED_PREPARATION_16GIB_PENDING_PARENT_DECISION`。8GiB停止后，父对话批准同起点16GiB准备预算；attempt005复用npm/Prisma层，在连续COPY阶段再次触发预算停止。已核Docker驱动为vfs，准备估计此前遗漏其逐层完整复制开销。这不是产品性能结果；尚无应用镜像、迁移、fixture或单份结果。PG/Redis保持独立healthy。下文保留各阶段原始状态与被覆盖的建议，最新状态见最后续记；300份仍未获准启动。
 
 ## 冻结基线和边界
 
@@ -88,3 +88,11 @@
 - 没有进行cache prune、改预算、改下载路径、删除失败证据或继续构建。新的待决项是父对话调整构建准备预算或给出明确清理范围；2GiB数据预算与4GiB磁盘停止线未变。
 - 离线VM替换fetch，无网络/服务负载地检查6种运输情形：首轮5通过，HTTP200非JSON未明确归类unknown的1项失败；驱动已修正并仅复验该项通过。最初结果与单项复验分开留存，未重跑已通过项。这只证明驱动错误记账，无应用、权限或性能资格。
 - 驱动修复已备份`b32fdec15a527337797d4757d51f8cc2dc1a216d`。原始预算停止及CA范围记录统一引用`evidence/build-blocker.json`和`build/attempt-004-authorized-ca/summary.json`，不复制整份证据。
+
+## 16GiB预算的实际VFS停止
+
+- 父对话批准准备总增量16GiB，原起点118,054,912B、数据2GiB预算、磁盘4GiB停止线保持；attempt005明确关联attempt004，未清缓存或重置计数。日志确认npm安装和Prisma generate均CACHED，未重新执行依赖安装。
+- attempt005运行35.41秒后在第9/18个build步骤`COPY scripts/runtime-table-policy.json`停止，未运行应用编译或runtime阶段。监督器记录`PREPARATION_GROWTH_EXCEEDS_16GIB`，退出130。实际workspace准备增量17,563,488,256B（约16.36GiB，含一秒采样超出），剩余14,353,764,352B（约13.37GiB）；观察到的cgroup内存峰值13,877,190,656B（约12.92GiB），未触发2GiB可用内存停止条件。
+- `docker info`实际返回`vfs`。本次六份COPY源文件合计24,702B，却伴随约8.12GiB的额外workspace占用；逻辑BuildKit cache统计约972MB不能代表节点物理准备开销。[Docker官方说明](https://docs.docker.com/engine/storage/drivers/vfs-driver/)确认VFS没有COW，每创建一层会深复制前层，因而多层Dockerfile放大磁盘使用。此前16GiB建议遗漏该环境特性，属于准备预算误估，不能归为业务性能问题。
+- 原始引用：`evidence/preparation-budget16-stop.json`、`build/attempt-005-budget16/summary.json`及该目录ops.log。停止后未清缓存、删除失败记录、改Dockerfile COPY组合、变更storage driver、切换构建路径或继续发起构建；没有产品优化任务。
+- 需父对话决定可承受当前Dockerfile的构建资源或具体获准环境适配范围。当前成品镜像/实际应用配置/单份CPU、RSS、SQL、业务存储增量均未测，保持unknown或未开始，不填0或冒称通过。原CA及单次临时导出consumer授权仍有效。
