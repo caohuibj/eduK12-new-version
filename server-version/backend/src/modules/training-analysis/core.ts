@@ -273,70 +273,91 @@ const exportParticipantKey = (courseId: string, participantKind: string, partici
  * this is pseudonymization, not an assertion of absolute de-identification. */
 export const buildTrainingAnalysisTables = (request: TrainingAnalysisRequestV1, source: TrainingAnalysisSourceV1): TrainingAnalysisTablesV1 => {
   const prepared = prepare(request, source)
+  // Keep deferred construction private to this call. Returned tables and the
+  // caller's inputs cannot mutate another not-yet-built view.
+  prepared.rows = prepared.rows.map(row => ({ ...row, measurement: row.measurement ? { ...row.measurement } : null }))
+  prepared.dictionary = prepared.dictionary.map(column => ({ ...column, measurement: column.measurement ? { ...column.measurement } : null }))
+  const courseId = request.courseId
   const materialColumns = request.waves.some(wave => wave.materialGroupKey !== undefined) ? ['materialGroupKey'] : []
-  const columns = new Map(prepared.dictionary.map((column) => [groupKey(column.waveKey, column.metricKey), column]))
-  const metricIdentities = new Map<string, Set<string>>()
-  for (const column of prepared.dictionary) if (column.measurement !== null) {
-    const identities = metricIdentities.get(column.metricKey) ?? new Set<string>()
-    identities.add(identityKey(column.measurement)); metricIdentities.set(column.metricKey, identities)
-  }
-  // Preserve the accepted source, but never export incomparable or excluded
-  // numbers as if they were valid longitudinal cells. Lack of a comparison
-  // alone does not turn a valid single-Wave numeric cell into NOT_COMPARABLE.
-  const observedExportRows = prepared.rows.map((row) => row.reason !== null ? { ...row, value: null }
-    : (metricIdentities.get(row.metricKey)?.size ?? 0) > 1 ? { ...row, value: null, reason: 'NOT_COMPARABLE' as const } : row)
+  let participantCells: Map<string, Map<string, TrainingNumericObservationV1>> | undefined
+  const cells = () => {
+    if (participantCells) return participantCells
+    const metricIdentities = new Map<string, Set<string>>()
+    for (const column of prepared.dictionary) if (column.measurement !== null) {
+      const identities = metricIdentities.get(column.metricKey) ?? new Set<string>()
+      identities.add(identityKey(column.measurement)); metricIdentities.set(column.metricKey, identities)
+    }
+    // Preserve the accepted source, but never export incomparable or excluded
+    // numbers as if they were valid longitudinal cells. Lack of a comparison
+    // alone does not turn a valid single-Wave numeric cell into NOT_COMPARABLE.
+    const observedExportRows = prepared.rows.map((row) => row.reason !== null ? { ...row, value: null }
+      : (metricIdentities.get(row.metricKey)?.size ?? 0) > 1 ? { ...row, value: null, reason: 'NOT_COMPARABLE' as const } : row)
 
-  const byParticipant = new Map<string, Map<string, TrainingNumericObservationV1>>()
-  for (const row of observedExportRows) {
-    const key = stableParticipant(row), cells = byParticipant.get(key) ?? new Map<string, TrainingNumericObservationV1>()
-    cells.set(groupKey(row.waveKey, row.metricKey), row); byParticipant.set(key, cells)
+    const byParticipant = new Map<string, Map<string, TrainingNumericObservationV1>>()
+    for (const row of observedExportRows) {
+      const key = stableParticipant(row), cells = byParticipant.get(key) ?? new Map<string, TrainingNumericObservationV1>()
+      cells.set(groupKey(row.waveKey, row.metricKey), row); byParticipant.set(key, cells)
+    }
+    return participantCells = byParticipant
   }
-  // Dense export cells use only the union of actually observed participants.
-  // Absence is not evidence of recruitment, invitation or failed completion.
-  const exportRows = prepared.participants.flatMap((participant) => {
-    const [participantKind, participantKey] = JSON.parse(participant) as [TrainingNumericObservationV1['participantKind'], string]
-    return prepared.dictionary.map((column): TrainingNumericObservationV1 => {
-      const observed = byParticipant.get(participant)!.get(groupKey(column.waveKey, column.metricKey))
-      if (observed) return observed
-      return {
-        participantKind, participantKey, waveKey: column.waveKey, taskId: column.taskId,
-        publication: column.publication, configDigest: column.configDigest, variantKey: column.variantKey, ...materialFields(column),
-        metricKey: column.metricKey, itemId: column.itemId, measurement: column.measurement,
-        attemptId: null, attemptEpoch: null, sourceHashes: {}, originalFinalStatus: null,
-        taskSatisfied: null, value: null, reason: 'NO_OBSERVATION',
-      }
-    })
-  })
-  const long: TrainingAnalysisTableV1 = { columns: [...LONG_COLUMNS, ...materialColumns], rows: exportRows.map((row) => ({
-    participantKind: row.participantKind, participantKey: exportParticipantKey(request.courseId, row.participantKind, row.participantKey), waveKey: row.waveKey, taskId: row.taskId,
-    publication: row.publication, configDigest: row.configDigest, variantKey: row.variantKey, ...materialFields(row),
-    itemId: row.itemId, metricKey: row.metricKey, columnKey: columns.get(groupKey(row.waveKey, row.metricKey))!.columnKey,
-    attemptId: row.attemptId, attemptEpoch: row.attemptEpoch,
-    originalFinalStatus: row.originalFinalStatus ?? null, taskSatisfied: row.taskSatisfied ?? null,
-    sourceHashes: canonicalJsonString(row.sourceHashes), ...identityFields(row.measurement), value: row.value, reason: row.reason,
-  })) }
-  const wide: TrainingAnalysisTableV1 = {
-    columns: ['participantKind', 'participantKey', ...prepared.dictionary.flatMap((column) => WIDE_SUFFIXES.map((suffix) => `${column.columnKey}__${suffix}`))],
-    rows: prepared.participants.map((participant) => {
-      const [participantKind, participantKey] = JSON.parse(participant) as [string, string]
-      const row: Record<string, unknown> = { participantKind, participantKey: exportParticipantKey(request.courseId, participantKind, participantKey) }
-      for (const column of prepared.dictionary) {
-        const observation = byParticipant.get(participant)!.get(groupKey(column.waveKey, column.metricKey))
-        for (const suffix of WIDE_SUFFIXES) {
-          row[`${column.columnKey}__${suffix}`] = observation
-            ? suffix === 'sourceHashes' ? canonicalJsonString(observation.sourceHashes) : observation[suffix] ?? null
-            : suffix === 'reason' ? 'NO_OBSERVATION' : suffix === 'sourceHashes' ? '{}' : null
+  const buildLong = (): TrainingAnalysisTableV1 => {
+    const byParticipant = cells()
+    const columns = new Map(prepared.dictionary.map(column => [groupKey(column.waveKey, column.metricKey), column]))
+    // Dense export cells use only the union of actually observed participants.
+    // Absence is not evidence of recruitment, invitation or failed completion.
+    const exportRows = prepared.participants.flatMap((participant) => {
+      const [participantKind, participantKey] = JSON.parse(participant) as [TrainingNumericObservationV1['participantKind'], string]
+      return prepared.dictionary.map((column): TrainingNumericObservationV1 => {
+        const observed = byParticipant.get(participant)!.get(groupKey(column.waveKey, column.metricKey))
+        if (observed) return observed
+        return {
+          participantKind, participantKey, waveKey: column.waveKey, taskId: column.taskId,
+          publication: column.publication, configDigest: column.configDigest, variantKey: column.variantKey, ...materialFields(column),
+          metricKey: column.metricKey, itemId: column.itemId, measurement: column.measurement,
+          attemptId: null, attemptEpoch: null, sourceHashes: {}, originalFinalStatus: null,
+          taskSatisfied: null, value: null, reason: 'NO_OBSERVATION',
         }
-      }
-      return row
-    }),
+      })
+    })
+    return { columns: [...LONG_COLUMNS, ...materialColumns], rows: exportRows.map((row) => ({
+      participantKind: row.participantKind, participantKey: exportParticipantKey(courseId, row.participantKind, row.participantKey), waveKey: row.waveKey, taskId: row.taskId,
+      publication: row.publication, configDigest: row.configDigest, variantKey: row.variantKey, ...materialFields(row),
+      itemId: row.itemId, metricKey: row.metricKey, columnKey: columns.get(groupKey(row.waveKey, row.metricKey))!.columnKey,
+      attemptId: row.attemptId, attemptEpoch: row.attemptEpoch,
+      originalFinalStatus: row.originalFinalStatus ?? null, taskSatisfied: row.taskSatisfied ?? null,
+      sourceHashes: canonicalJsonString(row.sourceHashes), ...identityFields(row.measurement), value: row.value, reason: row.reason,
+    })) }
   }
-  const dictionary: TrainingAnalysisTableV1 = { columns: [...DICTIONARY_COLUMNS, ...materialColumns], rows: prepared.dictionary.map((column) => ({
+  const buildWide = (): TrainingAnalysisTableV1 => {
+    const byParticipant = cells()
+    return {
+      columns: ['participantKind', 'participantKey', ...prepared.dictionary.flatMap((column) => WIDE_SUFFIXES.map((suffix) => `${column.columnKey}__${suffix}`))],
+      rows: prepared.participants.map((participant) => {
+        const [participantKind, participantKey] = JSON.parse(participant) as [string, string]
+        const row: Record<string, unknown> = { participantKind, participantKey: exportParticipantKey(courseId, participantKind, participantKey) }
+        for (const column of prepared.dictionary) {
+          const observation = byParticipant.get(participant)!.get(groupKey(column.waveKey, column.metricKey))
+          for (const suffix of WIDE_SUFFIXES) {
+            row[`${column.columnKey}__${suffix}`] = observation
+              ? suffix === 'sourceHashes' ? canonicalJsonString(observation.sourceHashes) : observation[suffix] ?? null
+              : suffix === 'reason' ? 'NO_OBSERVATION' : suffix === 'sourceHashes' ? '{}' : null
+          }
+        }
+        return row
+      }),
+    }
+  }
+  const buildDictionary = (): TrainingAnalysisTableV1 => ({ columns: [...DICTIONARY_COLUMNS, ...materialColumns], rows: prepared.dictionary.map((column) => ({
     columnKey: column.columnKey, waveKey: column.waveKey, taskId: column.taskId, publication: column.publication,
     configDigest: column.configDigest, variantKey: column.variantKey, ...materialFields(column), itemId: column.itemId, metricKey: column.metricKey,
     valueType: column.valueType, ...identityFields(column.measurement), missingReasons: canonicalJsonString(column.missingReasons),
-  })) }
-  return { long, wide, dictionary }
+  })) })
+  let long: TrainingAnalysisTableV1 | undefined, wide: TrainingAnalysisTableV1 | undefined, dictionary: TrainingAnalysisTableV1 | undefined
+  return {
+    get long() { return long ?? (long = buildLong()) },
+    get wide() { return wide ?? (wide = buildWide()) },
+    get dictionary() { return dictionary ?? (dictionary = buildDictionary()) },
+  }
 }
 
 export const trainingAnalysisTableToCsv = (table: TrainingAnalysisTableV1): string => {

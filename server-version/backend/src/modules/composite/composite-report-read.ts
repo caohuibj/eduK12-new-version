@@ -13,11 +13,12 @@ export const readCompositeReportStatusContext = async (attemptId: string, includ
       'runtimeGeneration', p."runtime_generation", 'frozenActiveSlotSetHash', p."frozen_active_slot_set_hash",
       'contextSnapshotHash', p."context_snapshot_hash", 'aggregateInputHash', p."aggregate_input_hash",
       'assignmentRef', p."assignment_ref", 'deliveryCourseId', p."delivery_course_id",
+      'accessTokenId',p."access_token_id",'trainingFeedbackSnapshot',p."training_feedback_snapshot",'trainingFeedbackSnapshotHash',p."training_feedback_snapshot_hash",
       'compositeAssessmentId', p."composite_assessment_id", 'userId', p."user_id",
       'trainingFlowSnapshotEncrypted',p."training_flow_snapshot_encrypted",'trainingFlowSnapshotHash',p."training_flow_snapshot_hash",
       'trainingFlowPathEncrypted',p."training_flow_path_encrypted",'trainingFlowPathHash',p."training_flow_path_hash",
       'trainingVariantAllocationEncrypted',p."training_variant_allocation_encrypted",'trainingVariantAllocationHash',p."training_variant_allocation_hash",'recoveryTokenHash', p."recovery_token_hash",'trainingTimingSnapshot',p."training_timing_snapshot",
-      'compositeAssessment', jsonb_build_object('trainingFlowDraft',c."training_flow_draft",'trainingFlowFrozen',c."training_flow_frozen",'trainingFlowDigest',c."training_flow_digest",'trainingVariantFrozen',c."training_variant_frozen",'trainingVariantDraft',c."training_variant_draft",'trainingVariantDigest',c."training_variant_digest",'id', c."id", 'productKind', c."product_kind",'timingExportEnabled',c."timing_export_enabled",'revision',c."revision",
+      'compositeAssessment', jsonb_build_object('trainingFeedbackPolicy',c."training_feedback_policy",'trainingFeedbackPolicyHash',c."training_feedback_policy_hash",'questionnaireType',c."questionnaire_type",'publishedAt',c."published_at" AT TIME ZONE 'UTC','trainingFlowDraft',c."training_flow_draft",'trainingFlowFrozen',c."training_flow_frozen",'trainingFlowDigest',c."training_flow_digest",'trainingVariantFrozen',c."training_variant_frozen",'trainingVariantDraft',c."training_variant_draft",'trainingVariantDigest',c."training_variant_digest",'id', c."id", 'productKind', c."product_kind",'timingExportEnabled',c."timing_export_enabled",'revision',c."revision",
         'items', COALESCE((SELECT jsonb_agg(jsonb_build_object('type', i."type"))
           FROM "composite_assessment_items" i WHERE i."composite_assessment_id" = c."id"), '[]'::jsonb))
     ) AS parent,

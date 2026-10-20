@@ -1,3 +1,4 @@
+import { trainingCheckpointHandler } from './composite.controller'
 import { sharedControlRequestContext } from '../assessment-runtime/shared-control-records'
 import { Router } from 'express'
 import { compositeController } from './composite.controller'
@@ -9,6 +10,9 @@ import { legacyWriteDisabled } from '../../middleware/instrumentFinalOnly'
 const router = Router()
 router.use(sharedControlRequestContext)
 
+router.get('/attempts/:attemptId/checkpoint', trainingCheckpointHandler(true,'read'))
+router.put('/attempts/:attemptId/checkpoint', trainingCheckpointHandler(true,'save'))
+router.delete('/attempts/:attemptId/checkpoint', trainingCheckpointHandler(true,'clear'))
 router.get('/attempts/:attemptId', compositeController.publicAttempt)
 router.get('/attempts/:attemptId/whole/definition', compositeController.publicWholeDefinition)
 router.get('/attempts/:attemptId/whole/receipt', compositeController.publicWholeReceipt)

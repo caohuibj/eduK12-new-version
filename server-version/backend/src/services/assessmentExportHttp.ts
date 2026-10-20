@@ -1,6 +1,5 @@
 import type { Request, Response } from 'express'
-import { prisma } from '../config/database'
-import { resolveAssessmentExport } from './assessmentExportArtifact'
+import { resolveAssessmentExportById } from './assessmentExportArtifact'
 import { exportArtifactUrl } from './exportJobService'
 import { success, notFound, unauthorized } from '../utils/response'
 import * as assignmentService from '../modules/cognitive/assignment.service'
@@ -19,12 +18,11 @@ export const assessmentExportHttp = (type: 'COGNITIVE' | 'COMPOSITE' | 'TRAINING
       await getExportContext(req.user.userId, req.user.role, resourceId)
       fingerprint = (await resolveCompositeExportProjectionBinding(resourceId, 'teacher')).fingerprint
     }
-    const artifact = await prisma.exportArtifact.findUnique({ where: { id: req.params.artifactId } })
-    if (!artifact || artifact.resourceType !== type || artifact.resourceId !== resourceId) return notFound(res, '文件不存在')
-    const resolved = await resolveAssessmentExport({ resourceType: type, resourceId: resourceId,
-      actor: req.user, fileName: artifact.storageKey, projectionFingerprint: fingerprint, metadataOnly })
+    const resolved = await resolveAssessmentExportById({ resourceType: type, resourceId,
+      actor: req.user, artifactId: req.params.artifactId, projectionFingerprint: fingerprint, metadataOnly })
     if (!resolved) return notFound(res, '文件不存在')
-    if (!metadataOnly) return res.download(resolved)
+    const {artifact,filePath} = resolved
+    if (!metadataOnly) return res.download(filePath)
     return success(res, { id: artifact.id, batchId: artifact.batchId, status: artifact.status, errorCode: artifact.errorCode,
       format: artifact.format, fileName: artifact.storageKey, expiresAt: artifact.expiresAt,
       downloadUrl: exportArtifactUrl(type, resourceId, artifact.id) })

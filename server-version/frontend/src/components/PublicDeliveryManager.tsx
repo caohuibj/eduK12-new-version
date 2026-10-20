@@ -1,28 +1,31 @@
 import { AnonymousStudyManager } from './AnonymousStudyManager'
 import LocalDateTimeInput, { parseLocalDateTime } from './LocalDateTimeInput'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { publicDeliveryAdapter, publicLinkStatus, type PublicDeliveryFamily, type PublicDeliveryLink } from '../api/publicDelivery'
+import { PublicDeliveryValidationError, publicDeliveryAdapter, publicLinkStatus, type PublicDeliveryFamily, type PublicDeliveryLink } from '../api/publicDelivery'
 
-export function PublicDeliveryManager({ family, resourceId, canCreate = true, maximumExpiry }: {
-  family: PublicDeliveryFamily; resourceId: string; canCreate?: boolean; maximumExpiry?: string | null
+export function PublicDeliveryManager({ family, resourceId, canCreate = true, maximumExpiry, groupIpEligible = false }: {
+  family: PublicDeliveryFamily; resourceId: string; canCreate?: boolean; maximumExpiry?: string | null; groupIpEligible?: boolean
 }) {
   const adapter = useMemo(()=>publicDeliveryAdapter(family,resourceId),[family,resourceId])
+  const [groupIpEnabled,setGroupIpEnabled]=useState(false)
+  const [groupTimeZone,setGroupTimeZone]=useState(()=>Intl.DateTimeFormat().resolvedOptions().timeZone)
   const [links,setLinks]=useState<PublicDeliveryLink[]>([])
   const [expiresAt,setExpiry]=useState(''),[maxUses,setMaxUses]=useState('0')
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
   const generation=useRef(0)
   useEffect(()=>{
     const current=++generation.current
-    setLinks([]);setError('');setNotice('');setExpiry('');setMaxUses('0');setBusy(true)
+    setLinks([]);setError('');setNotice('');setExpiry('');setMaxUses('0');setGroupIpEnabled(false);setBusy(true)
     adapter.listLinks().then(rows=>{if(current===generation.current)setLinks(rows)})
       .catch(()=>{if(current===generation.current)setError('无法读取匿名链接，请确认当前访问权限后重试')})
       .finally(()=>{if(current===generation.current)setBusy(false)})
     return ()=>{generation.current=current+1}
   },[adapter])
-  const act=async(work:()=>Promise<void>)=>{
+  useEffect(()=>{if(!groupIpEligible)setGroupIpEnabled(false)},[groupIpEligible])
+  const act=async(work:()=>Promise<void>, preserveLinksOnError=false)=>{
     setBusy(true);setError('');setNotice('')
     const current=generation.current
-    try{await work()}catch(e){if(current===generation.current){setLinks([]);setError(e instanceof Error?e.message:'匿名链接操作失败')}}
+    try{await work()}catch(e){if(current===generation.current){if(!preserveLinksOnError)setLinks([]);setError(e instanceof Error?e.message:typeof (e as {message?:unknown})?.message==='string'?(e as {message:string}).message:'匿名链接操作失败')}}
     finally{if(current===generation.current)setBusy(false)}
   }
   const create=()=>act(async()=>{
@@ -31,9 +34,22 @@ export function PublicDeliveryManager({ family, resourceId, canCreate = true, ma
     if(maximumExpiry && expiry.getTime()>Date.parse(maximumExpiry)) throw new Error('链接有效期不能晚于测评截止时间，请先在测评设置中调整截止时间')
     if(!maxUses.trim()) throw new Error('请填写最大参与次数，0 表示不限')
     const current=generation.current
-    const link=await adapter.createLink({expiresAt:expiry.toISOString(),maxUses:Number(maxUses)})
+    const input={expiresAt:expiry.toISOString(),maxUses:Number(maxUses),
+      ...(family==='COMPOSITE' && groupIpEligible && groupIpEnabled ? {groupIpPolicy:{schemaVersion:1 as const,timeZone:groupTimeZone.trim()}} : {})}
+    const link=await adapter.createLink(input).catch(async error=>{
+      if(error instanceof PublicDeliveryValidationError)throw error
+      // A rejected create does not remove old links. Revalidate access before
+      // retaining credentials, including application-level permission failures.
+      const status=(error as {status?:number;response?:{status?:number}})?.status ?? (error as {response?:{status?:number}})?.response?.status
+      if(status===401 || status===403){if(current===generation.current)setLinks([])}
+      else {
+        try { const rows=await adapter.listLinks();if(current===generation.current)setLinks(rows) }
+        catch { if(current===generation.current)setLinks([]) }
+      }
+      throw error
+    })
     if(current===generation.current){setLinks(old=>[link,...old.filter(l=>l.id!==link.id)]);setNotice('匿名链接已生成')}
-  })
+  },true)
   const disable=(link:PublicDeliveryLink)=>act(async()=>{
     const current=generation.current
     await adapter.disableLink(link.id)
@@ -58,10 +74,19 @@ export function PublicDeliveryManager({ family, resourceId, canCreate = true, ma
     {links.map(link=>{const url=adapter.getPublicEntry(link);return <article key={link.id} className="rounded border p-3 text-sm space-y-2">
       {url ? <a className="block break-all text-action" href={url}>{url}</a> : <p>链接地址已隐藏，复制时会重新验证权限。</p>}
       <p>创建于：{link.createdAt?new Date(link.createdAt).toLocaleString():'刚刚'} · 有效期至：{new Date(link.expiresAt).toLocaleString()}</p>
+      {link.roundId && link.groupIpWindow && <p>同 IP 短窗口：{new Date(link.groupIpWindow.opensAt).toLocaleString()} 至 {new Date(link.groupIpWindow.closesAt).toLocaleString()}（{Intl.DateTimeFormat().resolvedOptions().timeZone}）。轮次：{link.roundId}。最长 48 小时，到期不再接收新参与者。</p>}
       <p>已使用 {link.usedCount} 次 / 最大次数：{link.maxUses || '不限'} · {publicLinkStatus(link)}</p>
       <div className="flex gap-3"><button disabled={busy} onClick={()=>void copy(link)}>复制链接</button>{link.isActive && <button disabled={busy} onClick={()=>void disable(link)}>停用此链接</button>}</div>
     </article>})}
     {canCreate ? <div className="public-delivery-create flex flex-wrap gap-3 items-end">
+      {family==='COMPOSITE' && groupIpEligible && <div className="w-full space-y-2">
+        <label className="flex gap-2"><input type="checkbox" checked={groupIpEnabled} disabled={busy} onChange={e=>setGroupIpEnabled(e.target.checked)}/>为此新链接启用同 IP 集体作答短窗口</label>
+        {groupIpEnabled && <>
+          <label className="grid gap-1">窗口时区（IANA）<input className="input border rounded px-3 py-2" value={groupTimeZone} disabled={busy} onChange={e=>setGroupTimeZone(e.target.value)}/></label>
+          <p className="text-sm">生成时立即开放并冻结新轮次；下方有效期为结束时间，最长 48 小时，且不得晚于课程任务截止时间。冻结后不可延长；请核对开始、结束和时区后生成。</p>
+          <p className="text-sm">仅影响此新公开链接的新准入，登录和账号限流保持不变。到期或停用招募链接后，已有恢复凭证仍按原作答规则恢复，不代表允许新参与者进入。地址中的轮次提示不能代替链接或恢复凭证。</p>
+        </>}
+      </div>}
       <label className="grid gap-1">有效期<LocalDateTimeInput picker value={expiresAt} onChange={e=>setExpiry(e.target.value)} disabled={busy} className="input border rounded px-3 py-2" /></label>
       <label className="grid gap-1">最大参与次数（0 表示不限）<input type="number" min="0" max="2147483647" step="1" value={maxUses} onChange={e=>setMaxUses(e.target.value)} disabled={busy} className="input border rounded px-3 py-2" /></label>
       <button disabled={busy} className="btn-primary" onClick={()=>void create()}>生成新链接</button>

@@ -61,7 +61,8 @@ export const readCompositeReportMaterialization = async (attemptId: string, atte
 
 export const readCompositeReportJobHeader = async (attemptId: string, attemptEpoch: number) => (
   prisma.compositeReportJob.findUnique({ where: { attemptId_attemptEpoch: { attemptId, attemptEpoch } },
-    select: { id: true, status: true, errorCode: true, completedAt: true, requestedRevision: true, wholeSubmissionId: true } })
+    select: { id: true, status: true, errorCode: true, completedAt: true, requestedRevision: true, wholeSubmissionId: true,
+      attemptEpoch: true, slotSetHash: true, contextHash: true, aggregateInputHash: true } })
 )
 
 const reserveBudget = async (tx: Prisma.TransactionClient): Promise<number> => {

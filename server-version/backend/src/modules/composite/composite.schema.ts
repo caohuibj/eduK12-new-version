@@ -1,3 +1,4 @@
+import { groupIpDraftPolicySchema } from '../survey/group-ip-policy'
 import { z } from 'zod'
 import { trainingFormPolicySchema } from '../assessment-runtime/form-policy'
 import { formQuestionSchema } from '../assessment-core/form/definition'
@@ -130,9 +131,11 @@ export const reorderCompositeContentUnitsSchema = z.object({
 }).strict()
 
 export const createCompositeTokenSchema = z.object({
+  groupIpPolicy: groupIpDraftPolicySchema.optional(),
+  roundId: z.string().uuid().optional(),
   expiresAt: dateTime,
   maxUses: z.number().int().min(0).max(MAX_TOKEN_USES).default(0),
-}).strict()
+}).strict().refine(value => !(value.groupIpPolicy && value.roundId), "新轮次设置与已有轮次不能同时提交")
 
 export const compositeExportQuerySchema = z.object({
   detail: z.enum(['summary', 'full']).default('summary'),

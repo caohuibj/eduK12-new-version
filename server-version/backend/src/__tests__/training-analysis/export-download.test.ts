@@ -1,10 +1,10 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-const mocks = vi.hoisted(() => ({ find: vi.fn(), stat: vi.fn(), principal: vi.fn(), revalidate: vi.fn() }))
-vi.mock('../../config/database', () => ({ prisma: { exportArtifact: { findFirst: mocks.find } } }))
+const mocks = vi.hoisted(() => ({ find: vi.fn(), byId: vi.fn(), stat: vi.fn(), principal: vi.fn(), revalidate: vi.fn() }))
+vi.mock('../../config/database', () => ({ prisma: { exportArtifact: { findFirst: mocks.find, findUnique: mocks.byId } } }))
 vi.mock('node:fs', () => ({ promises: { stat: mocks.stat } }))
 vi.mock('../../modules/organization/principal', () => ({ loadCurrentPrincipal: mocks.principal }))
 vi.mock('../../modules/training-analysis/service', () => ({ revalidateTrainingAnalysisManifest: mocks.revalidate }))
-import { resolveAssessmentExport } from '../../services/assessmentExportArtifact'
+import { resolveAssessmentExport, resolveAssessmentExportById } from '../../services/assessmentExportArtifact'
 import { actor, courseId, currentPrincipal, exportOptions } from './export-fixtures'
 
 const input = { resourceType: 'TRAINING_ANALYSIS' as const, resourceId: courseId, actor: { userId: actor.id, role: actor.role }, fileName: 'training_analysis_known.csv' }
@@ -36,11 +36,11 @@ describe('Training artifact live exact-creator manifest gate', () => {
     expect(mocks.revalidate).not.toHaveBeenCalled(); expect(mocks.stat).not.toHaveBeenCalled()
   })
   it.each(['isFrozen', 'mustChangePassword'])('rejects revoked current account field %s', async (field) => {
-    mocks.principal.mockResolvedValue({ ...currentPrincipal(), [field]: true })
-    expect(await resolveAssessmentExport(input)).toBeNull(); expect(mocks.revalidate).not.toHaveBeenCalled()
+    mocks.revalidate.mockRejectedValue(new Error(`current authority denied: ${field}`))
+    expect(await resolveAssessmentExport(input)).toBeNull(); expect(mocks.revalidate).toHaveBeenCalledOnce()
   })
   it('rejects a role downgrade or a stale request actor role', async () => {
-    mocks.principal.mockResolvedValue({ ...currentPrincipal(), role: 'STUDENT' })
+    mocks.revalidate.mockRejectedValue(new Error('current role changed'))
     expect(await resolveAssessmentExport(input)).toBeNull(); expect(mocks.stat).not.toHaveBeenCalled()
   })
   it('rejects absent or tampered provenance and cross-course filenames', async () => {
@@ -55,4 +55,20 @@ describe('Training artifact live exact-creator manifest gate', () => {
     mocks.find.mockResolvedValue({ ...artifact(), expiresAt: new Date(0) })
     expect(await resolveAssessmentExport(input)).toBeNull(); expect(mocks.revalidate).not.toHaveBeenCalled(); expect(mocks.stat).not.toHaveBeenCalled()
   })
+})
+
+describe('one artifact row per id request',()=>{
+ beforeEach(()=>{vi.resetAllMocks();mocks.stat.mockResolvedValue({isFile:()=>true});mocks.revalidate.mockResolvedValue(undefined)})
+ it('uses findUnique once and returns the very row whose metadata was verified',async()=>{
+  const row={...artifact(),id:'artifact-id'};mocks.byId.mockResolvedValue(row)
+  const result=await resolveAssessmentExportById({...input,artifactId:row.id,metadataOnly:true})
+  expect(result?.artifact).toBe(row);expect(result?.filePath).toBe(row.storageKey)
+  expect(mocks.byId).toHaveBeenCalledExactlyOnceWith({where:{id:row.id}})
+  expect(mocks.find).not.toHaveBeenCalled();expect(mocks.principal).not.toHaveBeenCalled();expect(mocks.stat).not.toHaveBeenCalled()
+ })
+ it.each([{resourceId:'other-course'},{resourceType:'COMPOSITE'},{storageKey:'../outside.csv'}])('rejects mismatched id metadata before source reads: %s',async patch=>{
+  mocks.byId.mockResolvedValue({...artifact(),...patch})
+  expect(await resolveAssessmentExportById({...input,artifactId:'artifact-id'})).toBeNull()
+  expect(mocks.revalidate).not.toHaveBeenCalled();expect(mocks.stat).not.toHaveBeenCalled()
+ })
 })

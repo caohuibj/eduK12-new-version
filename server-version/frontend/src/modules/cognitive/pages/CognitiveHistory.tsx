@@ -10,7 +10,9 @@ const qualityLabel = (state: CognitiveHistoryItem['qualityState']) => (
     ? '数据质量：可解释'
     : state === 'limited'
       ? '数据质量：受限解释'
-      : '数据质量：无效，暂不解释'
+      : state === 'invalid'
+        ? '数据质量：无效，暂不解释'
+        : '数据质量：暂不可用'
 )
 
 const CognitiveHistory: React.FC = () => {
@@ -49,7 +51,7 @@ const CognitiveHistory: React.FC = () => {
         title="认知测评历史"
         description={(
           <>
-            <p>历史记录按服务器分页读取，每条记录直接打开对应的冻结结果。</p>
+            <p>历史记录按服务器分页读取，可查看对应结果或反馈开放状态。</p>
             <p className="mt-1 text-xs">重复测验可能因为熟悉任务而产生变化；反应速度还可能受到设备和输入方式影响。</p>
           </>
         )}
@@ -67,7 +69,7 @@ const CognitiveHistory: React.FC = () => {
         <ProductStatus kind="error" title="认知测评历史加载失败" announce="assertive">{error}</ProductStatus>
       ) : items.length === 0 ? (
         <ProductStatus kind="info" title="暂无已完成的认知测评">
-          完成认知任务后，对应结果会出现在这里。
+          完成认知任务后，对应记录会出现在这里。
         </ProductStatus>
       ) : (
         <div className="grid gap-4">
@@ -76,7 +78,7 @@ const CognitiveHistory: React.FC = () => {
               key={item.sessionId}
               to={item.reportHref || `/student/cognitive/sessions/${item.sessionId}/result`}
               title={item.title}
-              ariaLabel={`${item.title}，查看尝试 ${item.attemptNo} 的结果`}
+              ariaLabel={`${item.title}，查看尝试 ${item.attemptNo} 的${item.feedbackDeferred ? '反馈状态' : '结果'}`}
               leading={(
                 <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-blue-50 text-blue-700">
                   <History className="h-5 w-5" />
@@ -84,10 +86,10 @@ const CognitiveHistory: React.FC = () => {
               )}
               status={(
                 <span className="rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-700">
-                  {item.score === null ? '查看结果' : `得分 ${Math.round(item.score)}`}
+                  {item.feedbackDeferred ? '已完成，反馈尚未开放' : item.score === null ? '查看结果' : `得分 ${Math.round(item.score)}`}
                 </span>
               )}
-              description={`${item.source === 'composition' ? `组合测评 · ${item.sourceName} · ` : '独立任务 · '}${qualityLabel(item.qualityState)}`}
+              description={`${item.source === 'composition' ? `组合测评 · ${item.sourceName} · ` : '独立任务 · '}${item.feedbackDeferred ? '反馈开放后可查看结果' : qualityLabel(item.qualityState)}`}
               meta={(
                 <>
                   <span>{item.testType} / {item.engineVersion}</span>

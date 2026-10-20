@@ -253,6 +253,7 @@ export const cognitiveController = {
   },
 
   async getPublicSession(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       const input = cognitivePublicRecoverySchema.parse({ recoveryToken: req.headers['x-recovery-token'] })
       const data = await publicCognitiveService.getSession(req.params.id, input.recoveryToken)
@@ -263,6 +264,7 @@ export const cognitiveController = {
   },
 
   async submitPublicSession(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       const input = finalCognitivePublicSubmitSchema.parse(req.body)
       const data = await publicCognitiveService.submitSessionFinal(
@@ -445,6 +447,7 @@ export const cognitiveController = {
   },
 
   async getSession(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       if (!req.user) return unauthorized(res)
       const data = await sessionService.getSession(req.user.userId, req.params.id)
@@ -455,6 +458,7 @@ export const cognitiveController = {
   },
 
   async submitSessionFinal(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'no-store')
     try {
       if (!req.user) return unauthorized(res)
       const input = finalCognitiveSubmitSchema.parse(req.body)

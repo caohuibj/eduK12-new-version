@@ -244,4 +244,19 @@ describe('PR9 package report service', () => {
       .rejects.toMatchObject({ statusCode: 400 })
     expect(mockPrisma.compositeAnalysisSnapshot.findFirst).not.toHaveBeenCalled()
   })
+
+  it('keeps teacher exports/history scoped by existing permissions when participant release is invalid', async () => {
+    // A malformed configured marker must close participant exits, but it is
+    // not a new teacher authorization rule or a reason to erase stored facts.
+    state.attempt.trainingFeedbackSnapshot = {}
+    state.attempt.trainingFeedbackSnapshotHash = 'invalid'
+    state.attempt.compositeAssessment.trainingFeedbackPolicy = { schemaVersion: 1, mode: 'SCHEDULED', releaseAt: '2099-01-01T00:00:00Z' }
+    state.attempt.compositeAssessment.trainingFeedbackPolicyHash = 'invalid'
+    await expect(getAnalysisExportForParticipant('attempt-1', { userId: 'student-1' })).rejects.toMatchObject({ statusCode: 403 })
+    const teacher = await getAnalysisExportForTeacher('teacher-a', UserRole.TEACHER, 'composite-1', 'attempt-1', 'snapshot-reanalysis')
+    expect(teacher).toMatchObject({ audience: 'teacher', snapshot: { id: 'snapshot-reanalysis' } })
+    const history = await listPackageAnalysisSnapshotsForTeacher('teacher-a', UserRole.TEACHER, 'attempt-1')
+    expect(history.total).toBe(2); expect(history.list[0]).not.toHaveProperty('inputFingerprint')
+    await expect(getAnalysisExportForTeacher('teacher-b', UserRole.TEACHER, 'composite-1', 'attempt-1')).rejects.toMatchObject({ statusCode: 403 })
+  })
 })

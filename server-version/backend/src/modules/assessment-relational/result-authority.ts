@@ -3,7 +3,7 @@ import {
   type RelationalDisclosureDispositionV1,
 } from '../assessment-policy/disclosure'
 import { prisma } from '../../config/database'
-import { isCompositeParticipantFeedbackDeferred } from '../assessment-policy/participant-feedback'
+import { isLoadedCompositeParticipantFeedbackDeferred, readCompositeParticipantFeedbackContext } from '../assessment-policy/participant-feedback'
 
 export type RelationalResultDispositionV1 = RelationalDisclosureDispositionV1
 
@@ -34,9 +34,10 @@ export const dispositionFromFrozenRelationalAttemptIdentity = (
 export const resolveRelationalCompositeResultDisposition = async (
   compositeAttemptId: string | null | undefined,
   db: any = prisma,
+  loadedAttempt?: FrozenRelationalAttemptIdentity | null,
 ): Promise<RelationalResultDispositionV1> => {
   if (!compositeAttemptId) return 'NON_RELATIONAL'
-  const attempt = await db.compositeAssessmentAttempt.findUnique({
+  const attempt = loadedAttempt !== undefined ? loadedAttempt : await db.compositeAssessmentAttempt.findUnique({
     where: { id: compositeAttemptId },
     select: { assignmentRef: true, respondentType: true },
   })
@@ -74,13 +75,14 @@ export const projectRelationalUnitFinalResponse = async <T extends Record<string
   completed: true
   feedbackDeferred?: true
 }> => {
-  const disposition = await resolveRelationalCompositeResultDisposition(compositeAttemptId, db)
+  const loaded = compositeAttemptId ? await readCompositeParticipantFeedbackContext(compositeAttemptId, db) : null
+  const disposition = await resolveRelationalCompositeResultDisposition(compositeAttemptId, db, loaded?.parent ?? null)
   const disclosure = disclosureFromRelationalDisposition({
     disposition,
     audience: 'RESPONDENT',
     policyKey: 'frozen-relational-final-v1',
   })
-  const feedbackDeferred = await isCompositeParticipantFeedbackDeferred(compositeAttemptId, db)
+  const feedbackDeferred = Boolean(compositeAttemptId) && await isLoadedCompositeParticipantFeedbackDeferred(loaded?.parent, db, loaded?.job ?? null)
   if (disclosure.mode !== 'COMPLETION_ONLY' && !feedbackDeferred) return data
   return {
     ...(typeof data.submissionId === 'string' ? { submissionId: data.submissionId } : {}),
