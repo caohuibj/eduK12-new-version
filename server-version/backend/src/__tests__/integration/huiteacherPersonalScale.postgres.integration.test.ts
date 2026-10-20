@@ -5,6 +5,8 @@ import {
   integrationDatabaseUrl,requireIsolatedReleaseDatabase,
 } from './integration-env'
 import { independentReviewer } from './independent-reviewer'
+import { publishRegisteredScaleFixture } from './registered-resource-fixture'
+import { decodeTrainingFinalReceipt } from '../../modules/composite/training-content-final'
 import {
   createCustomScaleDefinition,hashScaleDefinition,
 } from '../../modules/scale/scale-definition'
@@ -137,6 +139,7 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
       creatorId:admin.id,instrumentClass:'CUSTOM_DESCRIPTIVE',
       definition,definitionHash,
     }})
+    const measurement = await publishRegisteredScaleFixture(db, scale.id)
     const resource=await registerDescriptiveResource(
       actor,scale.id,'TEACHER_INDIVIDUAL')
     expect(resource.resource_key).toBe('teacher-scale:'+scale.id+':INDIVIDUAL')
@@ -153,6 +156,11 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
     const reviewer=await independentReviewer(actor)
     await transitionDescriptiveResource(reviewer,resource.id,'review')
     await transitionDescriptiveResource(actor,resource.id,'publish')
+    const frozen = await db.compositeAssessment.findUniqueOrThrow({ where: { id: resource.composite_id } })
+    expect(frozen.trainingContentSnapshot).toMatchObject({ units: [{
+      measurement: { releaseId: measurement.releaseId },
+      referencePolicy: { choices: [] },
+    }] })
 
     const manager=await edu()
     const other=await edu()
@@ -241,16 +249,20 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
     const child=await db.assessment.findFirstOrThrow({
       where:{compositeAttemptId:started.runtimeBindingRef},
     })
-    const frozen=decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted!)
+    const frozenChild=decryptFrozenScaleRuntimeSnapshot(child.runtimeSnapshotEncrypted!)
     await submitScaleAssessmentFinal({
       assessmentId:child.id,submissionId:randomUUID(),
-      attemptEpoch:child.attemptEpoch,definitionHash:frozen.legacyDefinitionHash,
+      attemptEpoch:child.attemptEpoch,definitionHash:frozenChild.legacyDefinitionHash,
       userId:other.id,compositeAttemptId:started.runtimeBindingRef,
       answers:[1,3,5].map((v,i)=>({
         itemCode:'Q'+(i+1),responseValue:'option_'+v,
       })),
     })
     await finalizeCompositeAttemptIfReady(started.runtimeBindingRef)
+    const final = await db.compositeAssessmentAttempt.findUniqueOrThrow({ where: { id: started.runtimeBindingRef } })
+    expect(final.trainingContentBindingHash).toBeTruthy()
+    expect(decodeTrainingFinalReceipt(final)?.interpretation.units[0])
+      .toMatchObject({ references: [], report: { status: 'NOT_SELECTED' } })
     const report=await readTeacherPersonalScaleReport({
       actorUserId:other.id,executionId:execution.id,
     })

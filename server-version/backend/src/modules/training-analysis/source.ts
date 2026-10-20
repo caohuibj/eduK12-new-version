@@ -352,6 +352,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
     const isFinal = finalSet.has(attempt), facts = isFinal ? factsFor(attempt) : null
     for (const metric of wave.metrics) {
       const item = scope.items.find(candidate => candidate.id === metric.itemId)
+      let measurementQuality: string | undefined, metricQuality: string | undefined
       let value: number | null = null, measurement: TrainingMetricIdentityV1 | null = null, reason: TrainingObservationReason | null = null
       if (!item) reason = 'NOT_ASSIGNED'
       else if (!isFinal) reason = 'NON_FINAL'
@@ -385,6 +386,8 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
         } else {
           const core = envelope.core, storedMetric = core.metrics.find(candidate => candidate.key === metric.metricKey)
           if (!storedMetric) unavailable()
+          measurementQuality = core.quality.status
+          metricQuality = storedMetric.quality
           let responseSignature = core.scientificProvenance.protocolSignature ?? core.compiledRuntimeHash
           if (item.type === 'SCALE') {
             const matches = attempt.scaleAssessments.filter((row: any) => row.compositeItemId === item.id), child = matches[0]
@@ -438,7 +441,7 @@ export async function loadTrainingAnalysisSources(tx: Prisma.TransactionClient, 
       }
       attemptObservations.push({...participant,...(participant.participantKind==='STUDY_LOCAL'?{researchCategory:item?.type==='SITUATIONAL'?'SJT':item?.type}:{}), waveKey: wave.waveKey, taskId: wave.taskId, publication: wave.publication, configDigest: wave.configDigest, variantKey: wave.variantKey, ...materialFields(wave),
         attemptId: attempt.id, attemptEpoch: attempt.attemptEpoch, sourceHashes, metricKey: metric.metricKey, itemId: metric.itemId, measurement, value, reason,
-        originalFinalStatus: attempt.status, taskSatisfied: attempt.taskSatisfaction === 'SATISFIED' ? true : attempt.taskSatisfaction === 'NOT_SATISFIED' ? false : null})
+        ...(measurementQuality===undefined?{}:{measurementQuality}),...(metricQuality===undefined?{}:{metricQuality}),originalFinalStatus: attempt.status, taskSatisfied: attempt.taskSatisfaction === 'SATISFIED' ? true : attempt.taskSatisfaction === 'NOT_SATISFIED' ? false : null})
     }
     const sourceHash = hash({sourceHashes, observations: attemptObservations.map(({metricKey, itemId, measurement, value, reason}) => ({metricKey, itemId, measurement, value, reason}))})
     sourceHashes.sourceHash = sourceHash

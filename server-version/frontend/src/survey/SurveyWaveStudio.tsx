@@ -8,12 +8,14 @@ import type { CognitivePreviewSnapshot } from './ResearchCognitivePreview'
 import type { FormDraft, ResearchDraft } from './builder.types'
 import { useInstrumentLibrary, type InstrumentLibrary } from './instrument-library'
 
+type RawFeedbackChoice={metricKeys:string[];release:'AFTER_FINAL'|'AFTER_COLLECTION'}
 type ApiResult<T>={code:number|string;message:string;data:T|null}
 type Instrument={id:string;title:string;kind:string;status:string;instrumentKey:string}
-type InstrumentDetails=Instrument&{definition:FormDraft|Record<string,unknown>}
+type InstrumentDetails=Instrument&{catalogGrantId?:string|null;readOnly?:boolean;revision?:number;definition:FormDraft|Record<string,unknown>}
 type Project={id:string;collectionMode:'LINKED_WAVES'|'SINGLE_UNLINKED';status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED';revision:number}
 type GroupIpPolicy={schemaVersion:1;timeZone:string;activationDate?:string}
 type Wave={
+  frozenParticipantFeedback?:{draftId:string;instrumentKey:string;title:string;participantFeedback:({mode:'GENERAL'|'DESCRIPTIVE'}&RawFeedbackChoice)|null}[]
   id:string;projectId:string;title:string;ordinal:number;status:'DRAFT'|'OPEN'|'PAUSED'|'CLOSED';
   revision:number;instrumentIds:string[];publicationId:string|null;
   consentText:string;generalText:string;consentVersion:number;linkageNoticeConfirmed:boolean;
@@ -84,6 +86,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
   const [waves,setWaves]=useState<Wave[]>([])
   const {list:tools,page:toolPage,refresh:refreshTools,error:toolsError,loading:toolsLoading,revision:instrumentsRevision}=useInstrumentLibrary(projectId,instrumentLibrary)
   const [details,setDetails]=useState<Record<string,InstrumentDetails>>({})
+  const [participantFeedback,setParticipantFeedback]=useState<Record<string,RawFeedbackChoice>>({})
   const [detailsError,setDetailsError]=useState(''),[detailsRetry,setDetailsRetry]=useState(0)
   const [wavePage,setWavePage]=useState(1),[waveError,setWaveError]=useState('')
   const [project,setProject]=useState<Project|null>(null)
@@ -122,6 +125,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
     void Promise.all([refreshWaves(1),refreshProject()]).catch(e=>{if(epoch===projectEpoch.current)setError(message(e))})
     return()=>{projects.current++;selections.current++;previews.current++}
   },[refreshWaves,refreshProject])
+  useEffect(()=>{setParticipantFeedback({})},[path,instrumentsRevision,form.instrumentIds])
   useEffect(()=>{
     let current=true
     const previous=detailReads.current
@@ -156,6 +160,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
   }
   const select=(wave:Wave)=>void act(async()=>{
     const selection=++selectionEpoch.current,epoch=projectEpoch.current
+    setParticipantFeedback({})
     previewEpoch.current++;setStudyPreview(null)
     const detail=await surveyApi<Wave>(path+'/waves/'+wave.id)
     if(selection!==selectionEpoch.current||epoch!==projectEpoch.current)return
@@ -235,6 +240,9 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
       if(operation==='open')setShareLink('')
       const result=await surveyApi<{researchUrl?:string}>(path+'/waves/'+wave.id+'/'+operation,'POST',{
         revision:wave.revision,
+        ...(operation==='prepare'&&Object.keys(participantFeedback).length?{participantFeedback:Object.entries(participantFeedback).map(([instrumentId,choice])=>({
+          instrumentId,feedback:{policyVersion:'SURVEY_RAW_METRICS_V1',mode:'DESCRIPTIVE',...choice},
+        }))}:{}),
       })
       if(epoch!==projectEpoch.current)return
       if(selection!==selectionEpoch.current){await refresh();return}
@@ -338,6 +346,14 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
         :(def.metrics??[]).map(x=>({key:x.metricKey,label:x.label}))
       return list.map(x=>({instrumentKey:d.instrumentKey,scoreKey:x.key,label:x.label}))
     })
+  const feedbackTools=Object.values(details).filter(d=>
+    editing?.instrumentIds.includes(d.id)&&form.instrumentIds.includes(d.id)&&
+    ['SCALE','SJT'].includes(d.kind)&&!d.catalogGrantId&&!d.readOnly)
+    .map(d=>({...d,metrics:flowMetrics.filter(metric=>metric.instrumentKey===d.instrumentKey)}))
+  const feedbackInvalid=Object.entries(participantFeedback).some(([id,choice])=>{
+    const tool=feedbackTools.find(tool=>tool.id===id)
+    return !tool||!choice.metricKeys.length||choice.metricKeys.some(key=>!tool.metrics.some(metric=>metric.scoreKey===key))
+  })
   return <section className="border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-5" aria-label="研究波次">
     <header><h2 className="text-xl font-semibold">研究波次 · T1 / T2 / T3</h2>
       <p className="text-sm text-slate-600">
@@ -370,7 +386,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
     <div className="grid md:grid-cols-[220px_minmax(0,1fr)] gap-5">
       <nav aria-label="研究波次列表" className="space-y-2">
         <button className="btn-secondary w-full" type="button" onClick={()=>{
-          previewEpoch.current++;selectionEpoch.current++;setDetails({});setStudyPreview(null);setEditing(null);setForm(initial());setReady(null);setShareLink('')
+          previewEpoch.current++;selectionEpoch.current++;setParticipantFeedback({});setDetails({});setStudyPreview(null);setEditing(null);setForm(initial());setReady(null);setShareLink('')
         }}>新建波次</button>
         <div className="flex items-center justify-between text-xs gap-2">
           <button type="button" className="btn-secondary" disabled={busy||wavePage<=1}
@@ -508,10 +524,42 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
               <p className="text-xs text-slate-600">开放后最长 48 小时，到期自动结束且无宽限；暂停或恢复不会续期。邀请、同意、身份与名额限制仍有效。</p>
             </>}
           </section>}
+          <section className="border rounded-lg p-3 space-y-3" aria-label="受控原始指标反馈">
+            <h4 className="font-semibold">被试原始指标反馈（默认关闭）</h4>
+            {editing.publicationId?<div className="text-sm space-y-2"><p>反馈设置已随研究定义冻结，不可修改。</p>
+                {editing.frozenParticipantFeedback?editing.frozenParticipantFeedback.map(item=><p key={item.draftId}>
+                  {item.title}（{item.instrumentKey}）：{item.participantFeedback?.mode==='DESCRIPTIVE'
+                    ?'原始指标 '+item.participantFeedback.metricKeys.join('、')+'；'+(item.participantFeedback.release==='AFTER_COLLECTION'?'本轮采集结束后':'本人正式提交后')
+                    :'未启用原始指标反馈'}
+                </p>):<p>当前未取得冻结反馈配置，请刷新后核对；不能从当前草稿推断。</p>}
+                {editing.frozenParticipantFeedback?.length===0&&<p>本版本没有可配置原始指标反馈的 Scale/SJT 工具。</p>}
+              </div>:<>
+              <p className="text-sm">仅在本次冻结时提交所选指标，不随“保存波次草稿”保存；离开波次或工具更新后需重新选择。匿名身份不推断年龄或角色，不提供参考等级、常模或研究者报告模板。指标来自当前草稿供选择，后端仍须校验实际已发布测量版本。</p>
+              {feedbackTools.map(tool=><fieldset key={tool.id} className="border rounded p-2 space-y-2">
+                <legend>{tool.kind} · {tool.title}</legend>
+                <label className="block text-sm"><input type="checkbox" checked={!!participantFeedback[tool.id]} disabled={busy}
+                  onChange={e=>setParticipantFeedback(old=>{const next={...old};if(e.target.checked)next[tool.id]={metricKeys:[],release:'AFTER_FINAL'};else delete next[tool.id];return next})}/>
+                  启用 {tool.title} 的原始指标反馈</label>
+                {participantFeedback[tool.id]&&<>
+                  {tool.metrics.map(metric=><label key={metric.scoreKey} className="block text-sm"><input type="checkbox" disabled={busy}
+                    checked={participantFeedback[tool.id].metricKeys.includes(metric.scoreKey)}
+                    onChange={e=>setParticipantFeedback(old=>({...old,[tool.id]:{...old[tool.id],metricKeys:e.target.checked
+                      ?[...old[tool.id].metricKeys,metric.scoreKey]:old[tool.id].metricKeys.filter(key=>key!==metric.scoreKey)}}))}/>
+                    {tool.title}：{metric.label}（{metric.scoreKey}）</label>)}
+                  <label className="block text-sm">{tool.title} 反馈开放时机<select className="input block" disabled={busy}
+                    value={participantFeedback[tool.id].release} onChange={e=>setParticipantFeedback(old=>({...old,[tool.id]:{...old[tool.id],release:e.target.value as RawFeedbackChoice['release']}}))}>
+                    <option value="AFTER_FINAL">本人正式提交后</option><option value="AFTER_COLLECTION">本轮采集结束后</option>
+                  </select></label>
+                </>}
+              </fieldset>)}
+              {!feedbackTools.length&&<p className="text-sm">请先保存本波次选择的原生 Scale/SJT 工具。FORM、认知任务及目录工具不在此配置。</p>}
+              {feedbackInvalid&&<p role="alert" className="text-sm">启用的反馈须至少选择一个当前有效指标。</p>}
+            </>}
+          </section>
           <div className="flex flex-wrap gap-2">
             {editing.status==='DRAFT'&&!editing.publicationId&&<>
               <button type="button" className="btn-secondary" disabled={busy} onClick={preflight}>检查知情同意与所有工具</button>
-              <button type="button" className="btn-secondary" disabled={busy||!ready?.ok} onClick={()=>lifecycle('prepare')}>冻结研究定义</button>
+              <button type="button" className="btn-secondary" disabled={busy||!ready?.ok||feedbackInvalid} onClick={()=>lifecycle('prepare')}>冻结研究定义</button>
             </>}
             {editing.status==='DRAFT'&&editing.publicationId&&
               <button type="button" className="btn-primary" disabled={busy} onClick={()=>lifecycle('open')}>正式开放本轮</button>}

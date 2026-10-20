@@ -1,4 +1,6 @@
 import { describe,expect,it,vi } from 'vitest'
+import { prepareRelease } from '../../modules/measurement-content/release'
+import { scaleMeasurementRelease } from '../../modules/measurement-content/scale'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { compileResearchScale } from '../../modules/survey/builder.compiler'
 import { compileSurveySjtV2 } from '../../modules/survey/sjt-v2.compiler'
@@ -106,12 +108,18 @@ describe('immutable system catalog source adapters',()=>{
   })
   it('rechecks multiple frozen grants with one query per family and rejects changed source',async()=>{
     const definition=scale(),ref=scaleRef
-    const row={id:ref.sourceId,instrumentVersion:ref.sourceVersion,status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE',code:'custom_source',name:'Source',definition,definitionHash:hashScaleDefinition(definition)}
-    const db={$queryRaw:vi.fn().mockResolvedValue([]),scale:{findFirst:vi.fn().mockResolvedValue(row),findMany:vi.fn().mockResolvedValue([row])}}
+    const row={id:ref.sourceId,creatorId:'author',measurementReleaseId:'00000000-0000-4000-8000-000000000011',instrumentVersion:ref.sourceVersion,status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE',code:'custom_source',name:'Source',definition,definitionHash:hashScaleDefinition(definition)}
+    const projected=prepareRelease(scaleMeasurementRelease({localId:row.id,version:'conversion-1',instrumentVersion:row.instrumentVersion,
+      definition,instrumentClass:'CUSTOM_DESCRIPTIVE',scope:{kind:'PRIVATE',ownerId:'author',product:'TRAINING',resourceId:row.id}}))
+    const release={id:row.measurementReleaseId,layer:projected.layer,family:projected.family,content_key:projected.key,version:projected.version,
+      hash_scheme:projected.hashScheme,content_hash:projected.contentHash,content:projected.content,scope:projected.scope,
+      provenance:projected.provenance,asset_refs:projected.assetRefs,source_release_id:null,published_by:'author',published_at:new Date(),status:'PUBLISHED'}
+    const db={$queryRaw:vi.fn(async(q:any)=>q.sql.includes('measurement_content_releases')?[release]:q.sql.includes('clock_timestamp')?[{now:new Date()}]:[]),
+      scale:{findFirst:vi.fn().mockResolvedValue(row),findMany:vi.fn().mockResolvedValue([row])}}
     const frozen=await getCatalogSourceSnapshot({actorUserId:'admin',ref},db as never)
     await assertCatalogSourcesCurrent([{snapshot:frozen,actorUserId:'admin'},{snapshot:frozen,actorUserId:'admin'}],db as never)
     expect(db.scale.findMany).toHaveBeenCalledTimes(1)
-    expect(db.$queryRaw).toHaveBeenCalledTimes(2) // one getter lock plus one batched family lock
+    expect(db.$queryRaw).toHaveBeenCalledTimes(8) // identity + row locks, release + clock per unique source
     const lock=db.$queryRaw.mock.calls[1][0] as {strings:string[]}
     expect(lock.strings.join(' ')).toContain('FOR SHARE')
     expect(db.scale.findFirst).toHaveBeenCalledTimes(1)
@@ -133,12 +141,12 @@ describe('immutable system catalog source adapters',()=>{
     await expect(getCatalogSourceSnapshot({actorUserId:'org-admin',ref},db as never)).rejects.toThrow('DIGEST_MISMATCH')
   })
 
-  it('lists 25 real-shaped source candidates with one family query and no per-row database lookup',async()=>{
+  it('keeps 25 unmapped legacy candidates visible but unavailable without per-row database lookup',async()=>{
     const definition=scale(),rows=Array.from({length:26},(_,i)=>({id:'source-'+i,instrumentVersion:'1',status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE',code:'custom-'+i,name:'Source '+i,definition,definitionHash:hashScaleDefinition(definition)}))
     const db={scale:{findMany:vi.fn().mockResolvedValue(rows),findFirst:vi.fn()},$queryRaw:vi.fn()}
     const result=await listCatalogSources({actorUserId:'admin',kind:'SCALE',page:2,limit:25},db as never)
     expect(result.list).toHaveLength(25);expect(result.hasMore).toBe(true)
-    expect(result.list.every(r=>r.available)).toBe(true)
+    expect(result.list.every(r=>!r.available&&r.unsupportedReason==='SOURCE_SCALE_EXPLICIT_CONVERSION_REQUIRED')).toBe(true)
     expect(db.scale.findMany).toHaveBeenCalledTimes(1)
     expect(db.scale.findMany).toHaveBeenCalledWith(expect.objectContaining({skip:25,take:26}))
     expect(db.scale.findFirst).not.toHaveBeenCalled();expect(db.$queryRaw).not.toHaveBeenCalled()

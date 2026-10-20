@@ -1,3 +1,5 @@
+import {z} from 'zod'
+import {surveyRawFeedbackSchema} from './participant-feedback'
 import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
@@ -18,8 +20,9 @@ export class SurveyWaveError extends Error {
 }
 const fail=(status:number,message:string):never=>{throw new SurveyWaveError(status,message)}
 async function ownProject(tx:Tx,uid:string,pid:string,write:boolean,lockForCreate=false){
-  const rows=await tx.$queryRaw<Array<{id:string;status:string;collectionMode:string}>>`
-    SELECT p.id,p.status,p.collection_mode AS "collectionMode"
+  const rows=await tx.$queryRaw<Array<{id:string;status:string;collectionMode:string;expires_at:Date|null;checked_at:Date}>>`
+    WITH locked AS MATERIALIZED (
+    SELECT p.id,p.status,p.collection_mode AS "collectionMode",u.expires_at
     FROM "survey_projects" p
     JOIN "users" u ON u.id=p.owner_user_id
     JOIN "survey_researcher_grants" g ON g.user_id=u.id
@@ -31,8 +34,9 @@ async function ownProject(tx:Tx,uid:string,pid:string,write:boolean,lockForCreat
     ${lockForCreate
       ?Prisma.sql`FOR UPDATE OF p FOR SHARE OF u,g,m`
       :Prisma.sql`FOR SHARE OF p,u,g,m`}
+    ) SELECT locked.*,clock_timestamp() AS checked_at FROM locked
   `
-  if(!rows.length)fail(404,'研究项目不存在')
+  if(!rows.length||(rows[0].expires_at&&rows[0].expires_at<=rows[0].checked_at))fail(404,'研究项目不存在')
   if(write&&!['DRAFT','ACTIVE'].includes(rows[0].status))fail(409,'当前项目状态禁止编辑波次')
   return rows[0]
 }
@@ -76,7 +80,22 @@ export async function listWaves(uid:string,pid:string,page:number){
 export async function getWave(uid:string,pid:string,wid:string){
   return prisma.$transaction(async tx=>{
     await ownProject(tx,uid,pid,false)
-    return ownWave(tx,pid,wid)
+    const wave=await ownWave(tx,pid,wid)
+    if(!wave.publicationId)return wave
+    const publication=await tx.surveyPublication.findFirst({where:{id:wave.publicationId,projectId:pid},
+      select:{id:true,projectId:true,definitionDigest:true,compiledSnapshot:true}})
+    if(!publication||publication.id!==wave.publicationId||publication.projectId!==pid||
+      canonicalHash(publication.compiledSnapshot)!==publication.definitionDigest)
+      return fail(409,'冻结反馈来源校验失败')
+    const parsed=z.object({schemaVersion:z.literal(1),purpose:z.literal('RESEARCH_ONLY'),
+      projectId:z.literal(pid),waveId:z.literal(wid),units:z.array(z.object({
+        draftId:z.string().min(1).max(240),instrumentKey:z.string().min(1).max(240),title:z.string(),
+        kind:surveyKindSchema,participantFeedback:surveyRawFeedbackSchema.optional(),
+      })).max(30),
+    }).safeParse(publication.compiledSnapshot)
+    if(!parsed.success)return fail(409,'冻结反馈来源校验失败')
+    return {...wave,frozenParticipantFeedback:parsed.data.units.filter(unit=>unit.kind==='SCALE'||unit.kind==='SJT')
+      .map(unit=>({draftId:unit.draftId,instrumentKey:unit.instrumentKey,title:unit.title,participantFeedback:unit.participantFeedback??null}))}
   })
 }
 type WaveInput={

@@ -1,0 +1,207 @@
+name: Exact two-candidate qualification
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  CI: 'true'
+  TZ: UTC
+  VITE_COGNITIVE_MODULE_ENABLED: 'true'
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  CI_EVENT: ${{ github.event_name }}
+  CI_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+  CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+  CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+  CI_FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
+  EXACT_PLAN: ${{ inputs.plan }}
+jobs:
+  admission:
+    name: reviewed historical and fresh local evidence (no test replay)
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: materialize exact plan without shell interpolation
+        run: node -e "require('node:fs').writeFileSync('exact-candidate-plan.json',JSON.stringify(JSON.parse(process.env.EXACT_PLAN)))"
+      - name: verify reviewed original identities and unchanged consumed inputs
+        run: node .github/scripts/exact-candidate-admission.mjs historical exact-candidate-plan.json local-evidence-admission.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exact-local-evidence-${{ github.sha }}-${{ github.run_attempt }}
+          path: local-evidence-admission.json
+          if-no-files-found: error
+          retention-days: 3
+  browser:
+    name: fixed original successful compiled browser evidence
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - run: node -e "require('node:fs').writeFileSync('exact-candidate-plan.json',JSON.stringify(JSON.parse(process.env.EXACT_PLAN)))"
+      - name: verify fixed successful official run, jobs, ZIP and complete journey result
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/exact-candidate-admission.mjs browser exact-candidate-plan.json compiled-browser-admission.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exact-browser-${{ github.sha }}-${{ github.run_attempt }}
+          path: compiled-browser-admission.json
+          if-no-files-found: error
+          retention-days: 3
+  runtime:
+    name: missing runtime packaging security and schema recovery
+    needs: [admission, browser]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - run: node -e "require('node:fs').writeFileSync('exact-candidate-plan.json',JSON.stringify(JSON.parse(process.env.EXACT_PLAN)))"
+      - name: recheck exact candidate immediately before missing work
+        run: |
+          node --input-type=module <<'JS'
+          import {readFileSync} from 'node:fs';
+          import {recheckPlan} from './.github/scripts/exact-candidate-admission.mjs';
+          recheckPlan(JSON.parse(readFileSync('exact-candidate-plan.json','utf8')));
+          JS
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: package original compilation once and execute only missing qualification
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B .github/scripts/exact-candidate-runtime.py --plan exact-candidate-plan.json --phase all --output exact-candidate-runtime-evidence
+      - name: require complete current-plan runtime evidence and retained image hashes
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {readFileSync,createReadStream} from 'node:fs';
+          import {createHash} from 'node:crypto';
+          const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
+          const bytes=readFileSync('exact-candidate-plan.json'), plan=JSON.parse(bytes);
+          const root='exact-candidate-runtime-evidence/';
+          const result=JSON.parse(readFileSync(root+'runtime-result.json','utf8'));
+          assert.equal(result.status,'success');
+          assert.equal(result.planSha256,digest(bytes));
+          assert.equal(result.inputsSha256,digest(readFileSync('.github/scripts/exact-candidate-runtime-inputs.json')));
+          for(const key of ['head','sourceHead','tree']) assert.equal(result[key],plan[key]);
+          assert.equal(String(result.consumerRunId),process.env.GITHUB_RUN_ID);
+          assert.equal(String(result.consumerAttempt),process.env.GITHUB_RUN_ATTEMPT);
+          const expected=['prepare','dependency-audit','changed-lint','frontend-app-types','runtime-packaging','runtime-scans','schema-upgrade-restore'];
+          assert.deepEqual(result.phases.map(p=>p.name).sort(),expected.sort());
+          for(const phase of result.phases) assert.equal(phase.status,'success',phase.name);
+          for(const name of ['dependency-audit','changed-lint','frontend-app-types']) {
+            const details=result.phases.find(row=>row.name===name).details;
+            assert.equal(details.kind,'admitted-prior-official-success');
+            assert.equal(details.ciExecuted,false);
+            assert.equal(details.original.name,name);
+            assert.equal(details.original.status,'success');
+            assert.equal(details.original.consumerRunId,'39442752356');
+            assert.equal(details.original.consumerAttempt,'1');
+            assert.equal(details.original.head,'16625dbd4cfd938e16f7c0adb5e14a01c0ebd22c');
+          }
+          for(const component of ['backend','frontend']) {
+            const image=result.components[component];
+            assert.match(image.runtimeImageId,/^sha256:[a-f0-9]{64}$/);
+            const hash=createHash('sha256');
+            for await(const chunk of createReadStream(root+component+'-runtime.tar.gz')) hash.update(chunk);
+            assert.equal(hash.digest('hex'),image.runtimeArchiveSha256);
+          }
+          JS
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: exact-runtime-${{ github.sha }}-${{ github.run_attempt }}
+          path: exact-candidate-runtime-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+      - name: verify completed packaging and scans for retention even after later failure
+        id: retained-images
+        if: always()
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {existsSync,readFileSync,createReadStream,appendFileSync} from 'node:fs';
+          import {createHash} from 'node:crypto';
+          const root='exact-candidate-runtime-evidence/';
+          if(!existsSync(root+'runtime-result.json')) process.exit(0);
+          const result=JSON.parse(readFileSync(root+'runtime-result.json','utf8'));
+          for(const name of ['runtime-packaging','runtime-scans']) {
+            const rows=result.phases.filter(row=>row.name===name);
+            if(rows.length!==1 || rows[0].status!=='success') process.exit(0);
+          }
+          const digest=bytes=>createHash('sha256').update(bytes).digest('hex');
+          const plan=JSON.parse(readFileSync('exact-candidate-plan.json','utf8'));
+          assert.equal(result.planSha256,digest(readFileSync('exact-candidate-plan.json')));
+          for(const key of ['head','sourceHead','tree']) assert.equal(result[key],plan[key]);
+          assert.equal(String(result.consumerRunId),process.env.GITHUB_RUN_ID);
+          assert.equal(String(result.consumerAttempt),process.env.GITHUB_RUN_ATTEMPT);
+          for(const component of ['backend','frontend']) {
+            const image=result.components[component];
+            const scan=JSON.parse(readFileSync(root+component+'-scan.json','utf8'));
+            assert.equal(scan.imageId,image.runtimeImageId);
+            assert.equal(scan.exitCode,0); assert.deepEqual(scan.findings,[]);
+            assert.deepEqual(scan.severity,['HIGH','CRITICAL']);
+            const hash=createHash('sha256');
+            for await(const chunk of createReadStream(root+component+'-runtime.tar.gz')) hash.update(chunk);
+            assert.equal(hash.digest('hex'),image.runtimeArchiveSha256);
+          }
+          appendFileSync(process.env.GITHUB_OUTPUT,'eligible=true\n');
+          JS
+      - name: retain successfully scanned image bytes without claiming later gates passed
+        uses: actions/upload-artifact@v4
+        if: always() && steps.retained-images.outputs.eligible == 'true'
+        with:
+          name: exact-runtime-images-${{ github.sha }}-${{ github.run_attempt }}
+          path: |
+            exact-candidate-runtime-evidence/backend-runtime.tar.gz
+            exact-candidate-runtime-evidence/frontend-runtime.tar.gz
+            exact-candidate-runtime-evidence/runtime-result.json
+            exact-candidate-runtime-evidence/runtime-packaging.json
+            exact-candidate-runtime-evidence/runtime-scans.json
+            exact-candidate-runtime-evidence/backend-scan.json
+            exact-candidate-runtime-evidence/frontend-scan.json
+          if-no-files-found: error
+          retention-days: 3
+  ready:
+    name: exact selected qualification result
+    needs: [admission, browser, runtime]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    steps:
+      - env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          node <<'JS'
+          const assert=require('node:assert/strict');
+          const results=JSON.parse(process.env.RESULTS);
+          assert.deepEqual(Object.keys(results).sort(),['admission','browser','runtime']);
+          for(const [name,row] of Object.entries(results)) assert.equal(row.result,'success',name);
+          JS

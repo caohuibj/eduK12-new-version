@@ -25,7 +25,26 @@ jobs:
         with:
           fetch-depth: 0
           ref: ${{ github.event.pull_request.head.sha }}
+      - name: Classify reviewed exact candidate catalog boundary without replay
+        id: exact
+        if: contains(fromJSON('["work/measurement-version-final-20261020","work/training-mac-ui-final-20261020"]'), github.event.pull_request.head.ref)
+        env:
+          CI_EVENT: ${{ github.event_name }}
+          CI_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+          CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+          CI_FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          node --input-type=module <<'JS'
+          import {appendFileSync} from 'node:fs';
+          import {git,situationalPublicationBoundary} from './.github/scripts/exact-candidate-scope.mjs';
+          const result=situationalPublicationBoundary(process.env.BASE_SHA,git('rev-parse','HEAD'));
+          appendFileSync(process.env.GITHUB_OUTPUT,`handled=${result!==null}\n`);
+          if(result) console.log(JSON.stringify(result));
+          JS
       - name: Detect publication-relevant changes
+        if: steps.exact.outputs.handled != 'true'
         id: scope
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}

@@ -79,7 +79,7 @@ export interface AssessmentReferenceEntry {
 
 export interface AssessmentReferenceSetDefinition {
   schemaVersion: 1
-  instrumentType: 'scale' | 'cognitive'
+  instrumentType: 'scale' | 'cognitive' | 'sjt'
   instrumentKey: string
   referenceVersion: string
   status: 'DRAFT' | 'ACTIVE' | 'SUPERSEDED' | 'RETIRED'
@@ -125,7 +125,7 @@ export const validateReferenceSetDefinition = (
   if (!input || typeof input !== 'object') return { issues: [{ path: 'definition', message: 'reference definition 必须是对象', severity: 'error' }] }
   const value = input as Partial<AssessmentReferenceSetDefinition>
   if (value.schemaVersion !== 1) issues.push({ path: 'schemaVersion', message: 'reference schemaVersion 必须为 1', severity: 'error' })
-  if (value.instrumentType !== 'scale' && value.instrumentType !== 'cognitive') issues.push({ path: 'instrumentType', message: 'instrumentType 必须为 scale 或 cognitive', severity: 'error' })
+  if (value.instrumentType !== 'scale' && value.instrumentType !== 'cognitive' && value.instrumentType !== 'sjt') issues.push({ path: 'instrumentType', message: 'instrumentType 必须为 scale、cognitive 或 sjt', severity: 'error' })
   if (typeof value.instrumentKey !== 'string' || value.instrumentKey.length === 0) issues.push({ path: 'instrumentKey', message: 'instrumentKey 不能为空', severity: 'error' })
   if (typeof value.referenceVersion !== 'string' || value.referenceVersion.length === 0) issues.push({ path: 'referenceVersion', message: 'referenceVersion 不能为空', severity: 'error' })
   if (value.status !== 'DRAFT' && value.status !== 'ACTIVE' && value.status !== 'SUPERSEDED' && value.status !== 'RETIRED') issues.push({ path: 'status', message: 'status 不合法', severity: 'error' })
@@ -439,6 +439,12 @@ const matchesContext = (population: ReferencePopulation, context: ReferenceConte
     && (population.countryOrRegion == null || population.countryOrRegion === context.countryOrRegion)
 }
 
+/** Shared population predicate for frozen policy selection and scoped sample readers. */
+export function matchReferencePopulation(population:ReferencePopulation,context:ReferenceContext):'MATCH'|'MISSING_CONTEXT'|'NO_MATCH'{
+  if(missingPopulationContext(population,context))return 'MISSING_CONTEXT'
+  return matchesContext(population,context)?'MATCH':'NO_MATCH'
+}
+
 const criterionBandFor = (value: number, thresholds: ReferenceThreshold[]): ResolvedScaleReference['criterionBand'] => {
   const threshold = thresholds.find((candidate) => (
     (candidate.minInclusive === undefined || value >= candidate.minInclusive) &&
@@ -477,7 +483,7 @@ export interface AssessmentReferenceScoreLike {
  * intentionally live here so consumers cannot drift into task-local copies.
  */
 export const resolveAssessmentReference = (input: {
-  instrumentType: 'scale' | 'cognitive'
+  instrumentType: 'scale' | 'cognitive' | 'sjt'
   selections: AssessmentReferenceSelection[]
   references: AssessmentReferenceSetDefinition[]
   instrumentKey: string

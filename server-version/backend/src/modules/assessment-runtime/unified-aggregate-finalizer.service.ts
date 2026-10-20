@@ -1,3 +1,4 @@
+import {prepareTrainingFinalReceipt} from '../composite/training-content-final'
 import { applyTrainingAttemptScope } from '../composite/training-variant-scope'
 import { resolveTrainingFlowScope } from '../composite/training-flow-scope'
 import { mergeRequiredSituationalTaskSatisfaction } from '../situational/situational-task-satisfaction'
@@ -137,6 +138,9 @@ const compositeParentHeaderSelect = {
 } as const
 
 const compositeParentGraphSelect = {
+  compositeAssessmentId:true, trainingContentBinding:true,trainingContentBindingHash:true,
+  trainingReferenceBinding:true,trainingReferenceBindingHash:true,
+  trainingContentInterpretationEncrypted:true,trainingContentInterpretationHash:true,
   trainingFlowSnapshotEncrypted: true, trainingFlowSnapshotHash: true,
   trainingFlowPathEncrypted: true, trainingFlowPathHash: true,
   participantKey: true, trainingVariantAllocationEncrypted: true, trainingVariantAllocationHash: true,
@@ -161,7 +165,7 @@ const compositeParentGraphSelect = {
   frozenActiveSlotSetHash: true,
   compositeAssessment: {
     select: {
-      id: true,
+      id: true,createdBy:true,
       productKind: true,
       bundleInstance: true,
       publishedAt: true, trainingVariantDraft: true, trainingVariantFrozen: true, trainingVariantDigest: true,
@@ -1096,6 +1100,9 @@ const finalizeTrainingFlowCompositeUnified = async (attemptId: string, expected:
       trainingFlowPathEncrypted: encryptUnifiedRuntimePayload(scope.evidence), trainingFlowPathHash: scope.pathHash,
     } })
     if (updated.count !== 1) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '流程终态已变化', 409)
+    const content=await prepareTrainingFinalReceipt(tx,{parent,aggregateInputHash,completedAt,verifiedPayloads:completed.payloads})
+    if(content)await tx.compositeAssessmentAttempt.update({where:{id:parent.id},data:{
+      trainingContentInterpretationEncrypted:content.encrypted,trainingContentInterpretationHash:content.hash}})
     return { status: 'COMPLETED', progress: 100, completedAt, aggregateInputHash, taskSatisfaction, totalTime }
   }, { isolationLevel: 'ReadCommitted' }))
 )
@@ -1115,11 +1122,16 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
   if (probe.kind === 'terminal') return probe.result
   if (probe.kind === 'incomplete') return updateIncompleteComposite(probe.parent, probe.completeness)
 
+  // An older worker projection must reload: absent binding fields are not an
+  // authoritative legacy null, and would otherwise silently skip the FINAL receipt.
   const reusable = reportJob && preloadedGraph && preloadedGraph.id === attemptId
     && preloadedGraph.attemptEpoch === reportJob.attemptEpoch
     && preloadedGraph.frozenActiveSlotSetHash === reportJob.slotSetHash
     && preloadedGraph.contextSnapshotHash === reportJob.contextHash
     && preloadedGraph.status === 'IN_PROGRESS'
+    && Object.prototype.hasOwnProperty.call(preloadedGraph,'trainingContentBinding') && Object.prototype.hasOwnProperty.call(preloadedGraph,'trainingContentBindingHash')
+    && Object.prototype.hasOwnProperty.call(preloadedGraph,'trainingReferenceBinding') && Object.prototype.hasOwnProperty.call(preloadedGraph,'trainingReferenceBindingHash')
+    && typeof preloadedGraph.compositeAssessmentId==='string' && typeof preloadedGraph.compositeAssessment?.createdBy==='string'
   let parent = reusable ? preloadedGraph : await measureRequestPhase('aggregate.definition_db', () => prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId }, select: compositeParentGraphSelect as any,
   })) as any
@@ -1204,7 +1216,7 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
     ? await measureRequestPhase('aggregate.encrypt', async () => (await import('../cognitive/cognitive.security')).encryptCognitivePayload(packageAnalysis.analysis))
     : null
   return persistCompositeCompletion({
-    parent,
+    parent,verifiedPayloads:completed.payloads,
     frozenSlots,
     headers,
     contextHash: context.hash,
@@ -1223,6 +1235,7 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
 }
 
 const persistCompositeCompletion = async (input: {
+  verifiedPayloads:CanonicalPayload[]
   taskSatisfaction: string | null
   parent: any
   frozenSlots: FrozenActiveSlotSetV1
@@ -1252,6 +1265,24 @@ const persistCompositeCompletion = async (input: {
         },
       })
       if (updated.count !== 1) throw new AggregateCasLost()
+      if(input.parent.trainingContentBinding!=null||input.parent.trainingContentBindingHash!=null) {
+        // Parent CAS now holds its write lock. Load only accepted optional facts
+        // not included in the existing required aggregate, once; never rescore.
+        const optionalSlots=input.frozenSlots.slots.filter(slot=>!slot.required&&slot.unitType!=='FORM_SECTION')
+        let optionalPayloads:CanonicalPayload[]=[]
+        if(optionalSlots.length) {
+          const optionalRows=await tx.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:input.parent.id,
+            attemptEpoch:input.parent.attemptEpoch,slotKey:{in:optionalSlots.map(slot=>slot.slotKey)}},select:snapshotPayloadSelect}) as AggregateSnapshotRow[]
+          const actualKeys=new Set(optionalRows.map(row=>row.slotKey))
+          if(optionalRows.length)optionalPayloads=(await decryptCompletedPayloads({parentId:input.parent.id,attemptEpoch:input.parent.attemptEpoch,
+            composite:true,slots:optionalSlots.filter(slot=>actualKeys.has(slot.slotKey)),headers:optionalRows.map(headerFromRow),
+            snapshotRows:optionalRows,contextHash:input.contextHash,db:tx,includeOptionalSlots:true})).payloads
+        }
+        const content=await prepareTrainingFinalReceipt(tx,{parent:input.parent,aggregateInputHash:input.aggregateInputHash,
+          completedAt,verifiedPayloads:[...input.verifiedPayloads,...optionalPayloads]})
+        if(content)await tx.compositeAssessmentAttempt.update({where:{id:input.parent.id},data:{
+          trainingContentInterpretationEncrypted:content.encrypted,trainingContentInterpretationHash:content.hash}})
+      }
 
       const instance = input.parent.compositeAssessment?.productKind === 'ASSESSMENT_BUNDLE'
         ? input.parent.compositeAssessment.bundleInstance : null

@@ -10,6 +10,7 @@ export const TRAINING_VARIANT_DEFINITION_MARKER_SELECT = {
 
 export const TRAINING_VARIANT_PARENT_MARKER_SELECT = {
   id: true,
+  trainingContentBindingHash: true, trainingReferenceBindingHash: true,
   trainingFlowSnapshotEncrypted: true, trainingFlowSnapshotHash: true,
   trainingFlowPathEncrypted: true, trainingFlowPathHash: true,
   trainingVariantAllocationEncrypted: true,

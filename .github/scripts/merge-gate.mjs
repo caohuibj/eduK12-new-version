@@ -1,3 +1,4 @@
+import {validExactPlan,exactCandidatePlan,exactCandidateOutputs} from './exact-candidate-scope.mjs';
 import {trainingFunctionalPlan,validTrainingFunctionalPlan,TRAINING_FUNCTIONAL_BASE,TRAINING_FOLLOWUP_BASE,TRAINING_FOLLOWUP_MODE} from './training-functional.mjs';
 import {adminFunctionalPlan,validAdminFunctionalPlan,ADMIN_FUNCTIONAL_BASE} from './admin-permissions-functional.mjs';
 import {validSurveyMacPlan,recheckSurveyMac} from './survey-mac-ui-scope.mjs';
@@ -36,6 +37,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='exact-candidate') return ['scope','exact-candidate','codeql'];
   if (scope.application_route === 'survey-mac-ui') return ['scope','survey-mac-ui','codeql'];
   if (scope.application_route === 'reviewed-candidate') return ['scope','reviewed-candidate','codeql'];
   if (scope.application_route === 'survey-candidate') return ['scope','survey-candidate','codeql'];
@@ -87,6 +89,15 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='exact-candidate') {
+    let p;try {p=JSON.parse(scope.exact_candidate_plan);}catch{}
+    if(draft||!validExactPlan(p)||p.postMerge!==false) failed.push('scope');
+    else {
+      const expected=exactCandidateOutputs(p);
+      if(Object.entries(expected).some(([k,v])=>scope[k]!==String(v))) failed.push('scope');
+    }
+    return [...new Set(failed)];
+  }
   const trainingFunctional = scope.training_functional_only === 'true';
   const adminFunctional = scope.admin_permissions_functional_only === 'true';
   let trainingPlan; try { trainingPlan = JSON.parse(scope.training_functional_plan || 'null'); } catch { failed.push('scope'); }
@@ -267,6 +278,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const needs = readNeeds();
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.application_route==='exact-candidate') {
+    const {execFileSync}=await import('node:child_process');
+    const p=JSON.parse(needs.scope.outputs.exact_candidate_plan);
+    const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+    if(p.head!==head || JSON.stringify(exactCandidatePlan(p.base,head))!==JSON.stringify(p))
+      failed.push('recomputed-exact-candidate-plan');
+  }
   if (needs.scope?.outputs?.admin_permissions_functional_only === 'true' || process.env.CI_BASE_SHA === ADMIN_FUNCTIONAL_BASE) {
     try {
       const { changedEntries } = await import('./content-scope.mjs');

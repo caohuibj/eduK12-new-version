@@ -1,3 +1,7 @@
+import {prepareAdminStaticSjtMapping,publishAdminStaticSjtMeasurement} from '../situational/static-measurement-admin.service'
+import {ContentReleaseError} from '../measurement-content/release'
+import {ContentAuthorityError} from '../measurement-content/content-authority'
+import {issueAdminContentRoot,revokeAdminContentGrant,readAdminContentGrant} from '../measurement-content/admin-authority.service'
 import { Router, type Request, type Response, type NextFunction } from 'express'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
@@ -17,6 +21,8 @@ const handle = (work: (req: Request, res: Response) => Promise<unknown>) => asyn
   catch (e) {
     if (e instanceof z.ZodError) return error(res, '输入格式不合法', -1, 400)
     if (e instanceof AdminPermissionError) return error(res, e.message, -1, e.statusCode)
+    if (e instanceof ContentAuthorityError) return error(res, e.code, -1, 403)
+    if (e instanceof ContentReleaseError) return error(res, e.code, -1, 409)
     next(e)
   }
 }
@@ -89,3 +95,18 @@ adminPermissionsRouter.get('/audit', handle(req => {
   return prisma.adminAuthorizationAudit.findMany({ where: { targetUserId: input.targetUserId }, take: 25, skip: (input.page - 1) * 25,
     orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] })
 }))
+
+// Fixed first-wave content domains only. Uses the existing management session,
+// origin and rate boundaries; the transaction rechecks strong authentication.
+adminPermissionsRouter.post('/content-grants',requireRecentAdminKey,handle(req=>
+  issueAdminContentRoot(req.user!.userId,req.user!,req.body)))
+adminPermissionsRouter.post('/content-grants/:id/revoke',requireRecentAdminKey,handle(req=>
+  revokeAdminContentGrant(req.user!.userId,req.user!,z.string().uuid().parse(req.params.id),req.body)))
+
+adminPermissionsRouter.get('/content-grants/:id',requireRecentAdminKey,handle(req=>
+  readAdminContentGrant(req.user!.userId,req.user!,z.string().uuid().parse(req.params.id))))
+
+adminPermissionsRouter.post('/static-sjt/prepare',requireRecentAdminKey,handle(req=>
+  prepareAdminStaticSjtMapping(req.user!.userId,req.user!,req.body)))
+adminPermissionsRouter.post('/static-sjt/publish',requireRecentAdminKey,handle(req=>
+  publishAdminStaticSjtMeasurement(req.user!.userId,req.user!,req.body)))

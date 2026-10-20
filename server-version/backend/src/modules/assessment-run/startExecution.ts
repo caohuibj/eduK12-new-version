@@ -1,3 +1,4 @@
+import {assertTrainingPrivateReferenceAdmissionCurrent} from '../composite/training-private-reference-use'
 import { Prisma } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
@@ -233,6 +234,7 @@ const startTransactionalComposite = async (input: {
   `
   if (Number(changed) !== 1) throw new RunStartExecutionError('RUN_RUNTIME_BIND_CONFLICT', 'runtime binding changed concurrently', 409)
   await markRunStartClaimCompleted(tx, { claimId: input.decision.claim.id, generation: input.decision.claim.claimGeneration })
+  await assertTrainingPrivateReferenceAdmissionCurrent(tx)
   return { state: 'STARTED' as const, runtimeBindingKind: 'COMPOSITE', runtimeBindingRef: attempt.id, replayed: false }
 })
 

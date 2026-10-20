@@ -1,4 +1,5 @@
 import { prisma } from '../../config/database'
+import {assertTrainingReferenceReadyForMeasurement} from './training-reference-admission'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { applyTrainingAttemptScope, resolveTrainingAttemptScope } from './training-variant-scope'
 import { resolveTrainingFlowScope, trainingFlowMarkerState } from './training-flow-scope'
@@ -137,6 +138,7 @@ export const assertTrainingChildSelected = async (
   if (resolved.scope && (!child.compositeItemId || !resolved.scope.itemIds.has(child.compositeItemId))) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '当前分组未包含此测评单元', 404)
   }
+  await assertTrainingReferenceReadyForMeasurement(db,resolved.parent)
   return resolved.parent
 }
 

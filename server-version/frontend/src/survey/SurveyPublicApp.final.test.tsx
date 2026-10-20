@@ -469,3 +469,46 @@ describe('Survey authoritative FINAL and timing lifecycle',()=>{
   })
 
 })
+
+
+describe('participant stored raw feedback display',()=>{
+  it.each(['SCALE','SJT'])('renders /general %s raw metrics without milliseconds or pilot labeling',async family=>{
+    taskValue={...taskValue,status:'COMPLETED'}
+    generalReply=()=>response({kind:'DESCRIPTIVE',text:'感谢参与',disclaimer:'受控指标',completedAt:'2026-10-17T00:00:00Z',measurements:[{
+      feedbackKind:'RAW_METRICS',instrumentKey:family.toLowerCase(),title:family+' 工具',measurementReleaseId:'release',quality:'interpretable',
+      metrics:[{key:'total',label:'原始总分',value:7,unit:null,status:'OK'}],
+    }]})
+    render(<SurveyPublicApp/>);fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+    expect(await screen.findByText('原始总分：7（OK）')).toBeInTheDocument()
+    expect(screen.getByText(/受控原始指标 · 质量状态/)).toBeInTheDocument()
+    expect(screen.queryByText(/7 ms|试点测量/)).toBeNull()
+    expect(generalCalls()).toHaveLength(1)
+  })
+  it('preserves cognitive ratio percent, millisecond units and existing pilot labeling',async()=>{
+    taskValue={...taskValue,status:'COMPLETED'}
+    generalReply=()=>response({kind:'DESCRIPTIVE',text:'感谢参与',disclaimer:'认知说明',completedAt:'2026-10-17T00:00:00Z',measurements:[{
+      instrumentKey:'cog',title:'认知工具',measurementDigest:'digest',maturity:'PILOT',quality:'limited',metrics:[
+        {key:'hitRate',label:'命中率',value:.8,unit:'ratio',status:'OK'},
+        {key:'goMedianRtMs',label:'反应时间',value:320,unit:'ms',status:'OK'},
+      ],
+    }]})
+    render(<SurveyPublicApp/>);fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+    expect(await screen.findByText('命中率：80.0%（OK）')).toBeInTheDocument()
+    expect(screen.getByText('反应时间：320 ms（OK）')).toBeInTheDocument()
+    expect(screen.getByText(/试点测量 · 质量状态：limited/)).toBeInTheDocument()
+  })
+})
+
+
+it('fetches currently authorized raw feedback on first successful FINAL instead of the general receipt shortcut',async()=>{
+  taskOverrides={reportMode:'DESCRIPTIVE'}
+  finalReply=()=>response(firstSuccess())
+  generalReply=()=>response({kind:'DESCRIPTIVE',text:'感谢参与',disclaimer:'受控指标',completedAt:'2026-10-17T00:00:00Z',measurements:[{
+    feedbackKind:'RAW_METRICS',instrumentKey:'scale',title:'量表',measurementReleaseId:'release',quality:'interpretable',
+    metrics:[{key:'total',label:'原始总分',value:7,unit:null,status:'OK'}],
+  }]})
+  await openTask();fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+  expect(await screen.findByText('原始总分：7（OK）')).toBeInTheDocument()
+  expect(generalCalls()).toHaveLength(1)
+  expect(screen.queryByText(receiptText)).toBeNull()
+})

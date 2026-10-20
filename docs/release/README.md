@@ -1,5 +1,76 @@
 # 应用发布、CI 与验收统一规则
 
+## 两个收尾候选的限定本地证据接纳（等待精确候选审查）
+
+2026-10-20 用户仅批准 Measurement 与随后基于其合并结果集成的 Training
+Mac 两个最终审查候选接纳已完成的本地应用检查。对应分支仅为
+`work/measurement-version-final-20261020` 和
+`work/training-mac-ui-final-20261020`。这不是通用签名执行系统，不增加密钥、
+仓库变量、协作者要求或分支保护例外。原 `local-validation.mjs` 的文档/工具
+签名用途不扩张，也不补造历史执行签名。
+
+`exact-candidate` 以完整 Git tree/raw diff 的路径、模式、blob、固定 main
+base、真实 PR source 与 checkout/merge tree 绑定产品。只有逐项列出的接纳
+工具路径可区别于原产品快照，最终工具本身须独立 review；未知产品差异、
+base 前移、未集成 Mac、缺失或未审查证明均停止，不退回全平台路线。
+两个分支的手动 full/probe 在 job.if 层排除；原
+`ci/measurement-browser-20261020` push-only 路线保持独立。
+
+发布前已枚举全部 44 份 workflow：自动入口仅主 CI、Situational publication、
+专用 measurement-browser 与 shared-assessment-foundation 两个固定分支 push。
+新候选分支 push 不启动后两者。独立 Situational PR/review 入口对两个精确
+分支重算相同候选边界，并核查 53 个 checker 输入及完整 instruments 目录
+与固定 main 相同，才标记 `not-executed-unaffected-catalog`，不安装依赖或
+重跑全目录 onboarding。此分类不声称 checker/scientific review 新通过；
+本批三个变化服务不被该 checker 消费，其类型、发布权限/竞争和实际消费者
+仍由主 CI 必需门禁负责。其他分支流程不变，未冻结 Mac 或任意输入漂移拒绝。
+
+历史证据必须经过独立原始记录及传递依赖闭包审阅，接纳代码固定其确切
+attestation SHA-256。总报告明确写 `reviewed-local-evidence`，历史组另标
+`historicalKind=reviewed-historical-local`、
+`ciExecuted=false`、`originalExecutionSigned=false`，不称这些应用检查在
+Actions 重新执行或历史执行已有密码学认证。接纳的是经审查的历史断言，
+而不是未经验证的自述。原执行结果、失败历史、执行/过滤项与输入保持原身份。
+可从 failed 或 unknown invocation 中接纳有真实 reporter 证明的指定
+passed case，但不能因此宣称整条命令、teardown 或 cleanup 成功。
+没有退出状态的空类型日志不能证明通过；必需断言缺失仍阻塞。
+仅允许 attestation 内独立审阅的逐 case 不相交增量：固定旧/新 blob、
+文件模式及实际选中 case，并复核 imports、共享状态、validator、callee、
+配置和 schema 的传递影响。不能仅凭函数正文未变或通用文件豁免接纳；
+实际消费的源码或运行时文件影响不明时仍保留证据缺口。
+每次原执行分别标明环境证据：原 lock blob、已记录的工具/生成物哈希、
+留存依赖版本与原 lock 的相符情况。历史完整 node_modules 字节清单未记录
+必须明确披露；该有限历史审阅不声称整个环境已有密码学绑定。
+不适用项须写理由，缺失实际结果或已知输入漂移不能以此豁免。
+唯一额外限制明确的 reporter 例外是固定 Cognitive wrapper JSON 的 35 个
+实际通过断言：固定报告摘要和顺序名称摘要，保留 invocation UNKNOWN、
+退出状态未知和 10 个过滤项。其工具及生成物原哈希未留存，源码/lock
+是事后重建并审阅，不声称 contemporaneous run-bound；不借用其他执行
+的哈希，不授予整条命令、teardown 或 cleanup 成功，也不扩展至类型检查。
+
+当前新输入的前端 app types 单独执行一次直接 TypeScript 命令，不重复
+pretypecheck 或其他已通过的合同。Cognitive 类型闭包未受本次局部 TSX/CSS
+修改影响，旧凭据仍不冒称恢复。用户于 2026-10-20 单独允许补跑一次后，
+13:24:57–13:25:05 UTC 的唯一 Cognitive tsc --noEmit 实际退出 0。
+该新执行单列 `freshChecks` / `recorded-local-execution`，绑定官方第 7 轮
+依赖归档、实际同步读取内容、工具、源码/config/lock、时间和原始退出/log；
+不归入历史断言，不重跑其他应用检查，也不把它称为 CI 或已签名执行。
+
+正式资格保留：历史本地断言接纳、固定官方成功编译/浏览器证据、原编译
+输出的 runtime-only 装配与原生依赖兼容、实际 runtime HIGH/CRITICAL 扫描、
+适用依赖 audit、变化文件 lint、当前 app types、隔离旧 schema 升级及
+新 schema dump/restore/权限/不可变事实保护、JS/TS 与 Python SAST。
+不运行无关媒体、性能、Ops 或全平台检查；不自动部署。扫描后的实际
+backend/frontend 镜像归档及摘要必须作为官方 artifact 保留，不能在以后
+重新构建并继承旧镜像的资格。
+
+稳定 `merge gate / ready PR` 要求 `scope`、`exact-candidate` 和 `codeql`
+真实 success，并从实际 checkout 重算完整计划。draft、失败、缺失、取消、
+跳过均不授予资格。精确已合并 main push 只核对应 tree/diff 后停止消费，
+不重跑 PR 的检查。product bindings 与精确 attestation review digest 仅在独立审查后开启；
+这份实现、本地类型结果和控制测试本身不代表 runtime/security/SAST、合并
+或发布资格已经通过。
+
 本文件是新发布路线的统一入口，实现位于 `server-version/scripts/release/`。生产启用须有当次用户授权；文档本身不自动赋予部署权限。本轮用户已追加快速合并及部署授权，实际结果另行记录。
 
 ## 已审查候选的正式接纳（reviewed-candidate）
@@ -331,3 +402,25 @@ The user explicitly approved only this run's ephemeral loopback HTTPS CA in an i
 
 
 The Survey CI follow-up corrects mixed-language CodeQL paths to directories and adds two missing, immutable, read-only monorepo JSON fixture mounts for frontend type checking. Both original compiles, backend audit/runtime and their three image archives remain qualified by their exact successful phase prefix; the failed type phase and unexecuted checks are not accepted. The adapter admits only the reviewed transition and verifies the original same-PR official failed job, source/merge trees, exact seven-success/one-failure phase shape, 24-hour artifact digest, unchanged product/execution inputs and original image IDs/revision labels. Raw failed evidence is retained separately. It restores the three images without recompiling and packages the missing frontend runtime from the original builder's /app/dist plus the recorded nginx digest. The current head executes corrected types/lint, missing frontend audit/runtime, both runtime scans, fresh isolated services, selected contracts, migration/restore and browser checks, alongside SAST and changed gate contracts. No failed/skipped work is promoted to passing and no fallback rebuild occurs. A separate small reports artifact permits evidence review without transferring image archives.
+
+### Measurement schema 比较故障的限定诊断与恢复
+
+官方 run 39442752356 的 runtime job 已完成失败：prepare、audit、变化 lint、
+app types、runtime 装配及扫描通过，schema 最后定义比较失败。完整官方
+artifact 清单仅保留 JSON，没有已扫描镜像归档，不能将镜像 ID 当作仍持有
+原镜像字节。诊断候选仅运行隔离 schema 比较诊断；真实 runtime job 暂停，
+原 aggregate 因该必需 job 未成功而继续阻止合并，诊断成功不授予资格。
+
+之后恢复仅接纳固定官方记录中 audit/lint/app-types 三项原成功，保留原
+失败 job 身份并核对原始 ZIP、记录、输入及完整消费工具闭包。不得重跑
+这些已通过应用检查。丢失镜像字节需要从原已核验编译输出重新装配 runtime
+并扫描新的实际镜像，不重新编译，旧镜像扫描不能继承给新镜像。包装和
+扫描已成功时，即使后续 schema 失败，也核对镜像与扫描身份、归档摘要后
+保存实际镜像 artifact，同时保留整体失败状态；不保存半成品为合格镜像。
+
+实际诊断 run 39446973848 已保留原始 schema diff：仅四条固定 CHECK 的
+AND 子表达式冗余括号输出不同。恢复候选关闭临时诊断路线，重新要求真实
+runtime 全部选中阶段成功；仅针对该四条完整原/恢复 SQL 行的已审阅等价
+写法处理，不泛化去括号或忽略其他 DDL、权限和结构差异。三项既有成功
+由固定原记录接纳，重新装配及扫描仅恢复丢失的镜像字节，schema 必须真实
+完成；诊断本身仍保持 qualified=false，不能充当恢复或合并资格。
