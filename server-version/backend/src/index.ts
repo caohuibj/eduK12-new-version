@@ -1,4 +1,5 @@
 import { organizationInvitationsRouter } from './modules/organization/invitations'
+import { adminPermissionsRouter, adminSecurityRouter } from './modules/admin-permissions/routes'
 import { parentAccountsRouter, platformUsersRouter } from './modules/parent-portal/accounts.routes'
 import { parentToolPolicyRouter } from './modules/parent-portal/tool-policy.routes'
 import { classroomRuntimeRouter } from './modules/mobile/classroom.routes'
@@ -279,6 +280,8 @@ app.use('/api/capabilities', capabilitiesRoutes)
 // API 路由
 app.use('/api/admin/legacy-archive', legacyArchiveRoutes)
 app.use('/api/auth', authRoutes)
+app.use('/api/admin/security', adminSecurityRouter)
+app.use('/api/admin/permissions', adminPermissionsRouter)
 const surveyFeatureGuard: express.RequestHandler = (_req,res,next) => {
   if (process.env.SURVEY_WORKSPACE_ENABLED !== 'true') return res.status(404).json({code:-1,message:'Survey 尚未启用',data:null})
   next()

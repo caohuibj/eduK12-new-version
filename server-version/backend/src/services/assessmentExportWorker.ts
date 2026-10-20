@@ -15,6 +15,7 @@ import { trainingAnalysisExportOptionsSchema, trainingAnalysisProvenanceSchema, 
 const authorizeCurrentExportPrincipal = async (claim: ClaimedExportBatch) => {
   const principal = await loadCurrentPrincipal(claim.createdBy)
   if (!principal || inactiveAccountMessage(principal) || principal.mustChangePassword || principal.role !== claim.options.creatorRole
+    || claim.options.authorityTokenVersion !== principal.tokenVersion
     || (!claim.options.anonymize && principal.role !== UserRole.ADMIN)) throw new Error('Export authority revoked')
   return principal
 }

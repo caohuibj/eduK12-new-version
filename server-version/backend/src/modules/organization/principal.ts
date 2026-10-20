@@ -1,5 +1,6 @@
 import { UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
+import type { AdminEntry } from '../admin-permissions/service'
 
 export type PlatformRole = 'SYSTEM_ADMIN' | 'STANDARD'
 
@@ -15,6 +16,8 @@ export interface CurrentPrincipal {
   isFrozen: boolean
   expiresAt: Date | null
   teacherApproved: boolean
+  entryGrants?: Array<{ entry: AdminEntry; version: number }>
+  businessRole?: UserRole
 }
 
 type PrincipalRow = Omit<CurrentPrincipal, 'userId'> & {
@@ -35,7 +38,9 @@ export async function loadCurrentPrincipal(userId: string): Promise<CurrentPrinc
       "is_active" AS "isActive",
       "is_frozen" AS "isFrozen",
       "expires_at" AS "expiresAt",
-      "teacher_approved" AS "teacherApproved"
+      "teacher_approved" AS "teacherApproved",
+      COALESCE((SELECT json_agg(json_build_object('entry', g."entry", 'version', g."version") ORDER BY g."entry")
+        FROM "admin_entry_grants" g WHERE g."user_id"="users"."id" AND g."revoked_at" IS NULL), '[]'::json) AS "entryGrants"
     FROM "users"
     WHERE "id" = ${userId}
     LIMIT 1
@@ -45,7 +50,12 @@ export async function loadCurrentPrincipal(userId: string): Promise<CurrentPrinc
   if (!row) return null
   const resolvedUserId = row.userId ?? row.id
   if (!resolvedUserId) return null
-  return { ...row, userId: resolvedUserId }
+  // Legacy ADMIN is only a historical business label. Project the compatibility
+  // ADMIN role exclusively inside Training, from a current explicit grant.
+  const training = ['LEGACY','TRAINING'].includes(row.accountDomain)
+  const role = training ? row.entryGrants?.some(g => g.entry === 'TRAINING') ? UserRole.ADMIN
+    : row.role === UserRole.ADMIN ? UserRole.STUDENT : row.role : row.role
+  return { ...row, userId: resolvedUserId, businessRole: row.role, role }
 }
 
 export function toRequestPrincipal(principal: CurrentPrincipal) {
@@ -57,5 +67,7 @@ export function toRequestPrincipal(principal: CurrentPrincipal) {
     platformRole: principal.platformRole,
     tokenVersion: principal.tokenVersion,
     mustChangePassword: principal.mustChangePassword,
+    entryGrants: principal.entryGrants ?? [],
+    businessRole: principal.businessRole ?? principal.role,
   }
 }

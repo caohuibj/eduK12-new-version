@@ -2,6 +2,7 @@ export interface User {
   id: string
   mobile?: { capabilities: { canManageParentToolDisclosure?: boolean } }
   platformRole?: 'SYSTEM_ADMIN' | 'STANDARD'
+  entryGrants?: Array<{entry:'TRAINING'|'SURVEY'|'HUISCHOOL'|'HUITEACHER';version:number}>
   username: string
   role: 'STUDENT' | 'TEACHER' | 'ADMIN' | 'PARENT'
   nickname?: string

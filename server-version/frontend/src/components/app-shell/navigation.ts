@@ -136,7 +136,7 @@ export function isStaffWorkspacePath(pathname: string): boolean {
 }
 
 /** Discovery only; platform governance API remains the authorization boundary. */
-export function surveyGovernanceNavigation(supportedOrigin: boolean, role?: Role, platformRole?: string | null): NavigationItem[] {
-  return supportedOrigin && role === 'ADMIN' && platformRole === 'SYSTEM_ADMIN'
+export function surveyGovernanceNavigation(supportedOrigin: boolean, _role?: Role, _platformRole?: string | null, entries: readonly {entry:string}[] = []): NavigationItem[] {
+  return supportedOrigin && entries.some(g=>g.entry==='SURVEY')
     ? [{ path: '/admin/survey-researchers', label: 'Survey 研究者与工具授权', section: 'system' }] : []
 }

@@ -10,6 +10,10 @@ import { isTrainingHost } from './training/context'
 // Portal & Auth Pages
 import Portal from './pages/Portal'
 import SurveyAdminOrigin from './components/app-shell/SurveyAdminOrigin'
+import AdminAccess from './admin/AdminAccess'
+const AdminPermissions = React.lazy(() => import('./admin/AdminPermissions'))
+const AdminEntrances = React.lazy(() => import('./admin/AdminEntrances'))
+const AdminKeyEnrollment = React.lazy(() => import('./admin/AdminKeyEnrollment'))
 import AdminLogin from './pages/AdminLogin'
 import TeacherLogin from './pages/TeacherLogin'
 import TeacherRegister from './pages/TeacherRegister'
@@ -408,7 +412,10 @@ function AppRoutes() {
             }
           />
           <Route path="/bundle-products" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><BundleProducts /></ProtectedRoute>} />
-          <Route path="/admin/survey-researchers" element={<SurveyAdminOrigin><RelationalProtectedRoute><SurveyResearchersAdmin /></RelationalProtectedRoute></SurveyAdminOrigin>} />
+          <Route path="/admin/security/enroll" element={<AdminKeyEnrollment/>}/>
+          <Route path="/admin/permissions" element={<AdminAccess system><AdminPermissions/></AdminAccess>}/>
+          <Route path="/admin/entrances" element={<AdminAccess><AdminEntrances/></AdminAccess>}/>
+          <Route path="/admin/survey-researchers" element={<SurveyAdminOrigin><AdminAccess entries={['SURVEY']}><SurveyResearchersAdmin /></AdminAccess></SurveyAdminOrigin>} />
           <Route path="/admin/bundle-authoring" element={<ProtectedRoute roles={['ADMIN']}><BundleAuthoring /></ProtectedRoute>} />
           <Route path="/bundle-products/:id" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><BundleProductDetail /></ProtectedRoute>} />
           <Route
@@ -553,9 +560,9 @@ function AppRoutes() {
           />
           <Route path="/admin/training" element={<ProtectedRoute roles={['ADMIN']}><AdminTrainingWorkspace /></ProtectedRoute>} />
           <Route path="/admin/education-products"
-            element={!isTrainingHost()?<ProtectedRoute roles={['ADMIN']}>
+            element={<AdminAccess entries={['HUISCHOOL','HUITEACHER']}>
               <EducationProductGovernance/>
-            </ProtectedRoute>:<Navigate to="/" replace/>}/>
+            </AdminAccess>}/>
           <Route path="/admin/reporting-content" element={<ProtectedRoute roles={['ADMIN']}><ReportingContent /></ProtectedRoute>} />
           <Route path="/admin/legacy-archive" element={<ProtectedRoute roles={['ADMIN']}><LegacyArchive /></ProtectedRoute>} />
           <Route path="/admin/legacy-archive/:kind/:id" element={<ProtectedRoute roles={['ADMIN']}><LegacyArchive /></ProtectedRoute>} />

@@ -78,7 +78,7 @@ export const compositeExportController = {
       if(input.format==='sav' && context._count.items>0) return error(res,'TYPED_FORM_SAV_NOT_SUPPORTED: typed Form 仅支持 CSV/ZIP 无损导出',-1,400)
       const anonymize = req.user.role === UserRole.ADMIN ? input.anonymize : true
       const binding = await resolveCompositeExportProjectionBinding(req.params.id, 'teacher')
-      return success(res, await enqueueExportJob({ resourceType: 'COMPOSITE', resourceId: req.params.id,
+      return success(res, await enqueueExportJob({ authorityTokenVersion: req.user!.tokenVersion, resourceType: 'COMPOSITE', resourceId: req.params.id,
         createdBy: req.user.userId, anonymized: anonymize, format: input.format, recordCount: 0,
         requestKey: req.get('X-Export-Request-Key'), options: { detail: input.detail, anonymize, dateRange: input.dateRange,
           creatorRole: req.user.role as 'ADMIN' | 'TEACHER', projectionFingerprint: binding.fingerprint } }), '导出已排队')

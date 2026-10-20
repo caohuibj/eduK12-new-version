@@ -19,7 +19,7 @@ const focusedPaths = [
   '/relational/attempts/:attemptId', '/relational/cognitive/sessions/:sessionId',
   '/relational/composite/situational/:attemptId',
 ]
-export const isAuthPath = (pathname: string) => /^\/(login|register|admin\/login|teacher\/(login|account-login|register)|student\/(login|course-login|register)|parent\/login)$/.test(pathname)
+export const isAuthPath = (pathname: string) => /^\/(login|register|admin\/(login|security\/enroll)|teacher\/(login|account-login|register)|student\/(login|course-login|register)|parent\/login)$/.test(pathname)
 export function shellModeFor(pathname: string): ShellMode {
   if (pathname.startsWith('/bigscreen/')) return 'display'
   if (pathname !== '/student/situational/history' && focusedPaths.some((path) => matchPath(path, pathname))) return 'focused'

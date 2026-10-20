@@ -8,6 +8,7 @@ import { measureRequestPhase } from '../services/runtimeObservability'
 import { loadCurrentPrincipal, toRequestPrincipal } from '../modules/organization/principal'
 import { schoolAccountNeedsMfa } from '../modules/campus/mfa.service'
 import { isSessionRevoked } from '../utils/sessionRevocation'
+import { needsAdminKey, validAdminProof, ADMIN_STEP_UP_SECONDS } from '../modules/admin-permissions/security'
 
 // Extend Express Request
 declare global {
@@ -50,6 +51,8 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
     if (payload.tokenVersion !== principal!.tokenVersion) {
       return unauthorized(res, '认证令牌已失效，请重新登录')
     }
+    const management = needsAdminKey(principal!) && ['LEGACY','TRAINING'].includes(principal!.accountDomain)
+    if (management && !validAdminProof(payload)) return unauthorized(res, '请使用安全密钥完成管理员登录')
 
     // A domain mismatch cannot be fixed by a client-supplied hostname or
     // JWT role. Historical JWTs without an audience remain legacy-only.
@@ -85,6 +88,17 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
     // authoritative for every mutable authorization attribute, including the
     // legacy role and the independent platform role.
     req.user = toRequestPrincipal(principal!)
+    req.user.adminVerifiedAt = payload.adminVerifiedAt
+    req.user.adminSessionId = payload.adminSessionId
+    // Key ceremonies must remain reachable to renew an otherwise valid admin
+    // session. Sensitive governance writes cannot fall back to password-only.
+    if (management && !['GET','HEAD','OPTIONS'].includes(req.method)
+      && !req.originalUrl.startsWith('/api/admin/security/')
+      && !req.originalUrl.startsWith('/api/auth/')
+      && (principal!.platformRole === 'SYSTEM_ADMIN' || /^\/api\/(platform\/|users(?:\/|$)|admin\/permissions(?:\/|$))/.test(req.originalUrl))
+      && !validAdminProof(payload, ADMIN_STEP_UP_SECONDS)) {
+      return res.status(403).json({ code: 'ADMIN_KEY_STEP_UP_REQUIRED', message: '敏感操作需要重新验证安全密钥' })
+    }
 
     const allowedWhileChangingPassword = new Set([
       '/api/auth/me',
@@ -133,7 +147,8 @@ export const optionalAuthenticate = async (req: Request, res: Response, next: Ne
         }
         if (revoked !== true) {
           const principal = await loadPrincipal(payload.userId)
-          if (!inactiveAccountMessage(principal) && payload.tokenVersion === principal!.tokenVersion && ['LEGACY','TRAINING'].includes(principal!.accountDomain) && (payload.accountDomain === undefined || ['LEGACY','TRAINING'].includes(payload.accountDomain))) {
+          if (!inactiveAccountMessage(principal) && payload.tokenVersion === principal!.tokenVersion && ['LEGACY','TRAINING'].includes(principal!.accountDomain) && (payload.accountDomain === undefined || ['LEGACY','TRAINING'].includes(payload.accountDomain))
+            && (!needsAdminKey(principal!) || validAdminProof(payload))) {
             req.user = toRequestPrincipal(principal!)
           }
         }

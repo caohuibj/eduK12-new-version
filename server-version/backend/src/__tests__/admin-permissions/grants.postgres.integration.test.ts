@@ -22,7 +22,7 @@ suite('explicit entry grants, real PostgreSQL', () => {
   })
   afterAll(async () => { await db?.$disconnect() })
   const change = (entry: 'TRAINING' | 'SURVEY', active: boolean, expectedVersion: number, actorUserId = systemId) =>
-    service.changeEntryGrant({ actorUserId, targetUserId: teacherId, entry, active, expectedVersion, reason: 'synthetic integration fixture' })
+    service.changeEntryGrant({ actorUserId, actorSession:{tokenVersion:0,adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:randomUUID()},targetUserId: teacherId, entry, active, expectedVersion, reason: 'synthetic integration fixture' })
   it('default deny: old ADMIN is not system or entry administrator', async () => {
     await expect(service.assertEntryAdmin(db, legacyId, 'TRAINING')).rejects.toMatchObject({ statusCode: 403 })
     await expect(change('TRAINING', true, 0, legacyId)).rejects.toMatchObject({ statusCode: 403 })

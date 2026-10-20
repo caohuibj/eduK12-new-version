@@ -1,4 +1,5 @@
 import { productOrigins } from '../../products/origins'
+import { hasAdminEntry } from '../../admin/authority'
 import { RelationalAvailabilityProvider, useRelationalAvailability } from '../../contexts/RelationalAvailabilityContext'
 import AssessmentTaskShortcut from '../AssessmentTaskShortcut'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
@@ -46,9 +47,11 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const routeOrganizationId=matchPath('/organizations/:organizationId/*',location.pathname)?.params.organizationId
   const displayOrganization=!routeOrganizationId||routeOrganizationId==='new'||activeOrganization?.organization.id===routeOrganizationId?activeOrganization:null
   const items=training?trainingNavigation(user?.role):[...navigationFor(user?.role,cognitive,relational.status==='available'),...(user?organizationNavigation(displayOrganization?.organization.id,displayOrganization?.allowedActions,platformRole,directoryActions):[])]
-  items.push(...surveyGovernanceNavigation(Boolean(productOrigins()),user?.role,platformRole??user?.platformRole))
+  items.push(...surveyGovernanceNavigation(Boolean(productOrigins()),user?.role,platformRole??user?.platformRole,user?.entryGrants))
+  if(user?.platformRole==='SYSTEM_ADMIN')items.push({path:'/admin/permissions',label:'系统治理与入口授权',section:'system'})
+  if(user&&(user.platformRole==='SYSTEM_ADMIN'||user.entryGrants?.length))items.push({path:'/admin/entrances',label:'管理入口',section:'system'})
   if(!training&&user?.role==='ADMIN'&&platformRole==='SYSTEM_ADMIN') items.push({path:'/admin/legacy-archive',label:'历史归档（只读）',section:'system'})
-  if(!training&&user?.role==='ADMIN'&&platformRole==='SYSTEM_ADMIN')
+  if(hasAdminEntry(user,'HUISCHOOL')||hasAdminEntry(user,'HUITEACHER'))
     items.push({path:'/admin/education-products',label:'教育产品治理',section:'system'})
   if(!training&&parentPortalEnabled&&user?.role==='PARENT')items.push({path:'/parent/children',label:'我的孩子'},{path:'/parent/links',label:'家长关联'})
   if(!training&&parentPortalEnabled&&user?.role==='STUDENT')items.push({path:'/student/parent-links',label:'家长关联',section:'account'})

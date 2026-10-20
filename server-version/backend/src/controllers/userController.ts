@@ -13,9 +13,9 @@ import { setUserActiveState, UserLifecycleError } from '../services/userLifecycl
 const createUserSchema = z.object({
   username: z.string().min(3, '用户名至少3个字符'),
   password: z.string().min(PASSWORD_MIN_LENGTH, '密码至少8个字符').max(PASSWORD_MAX_LENGTH, '密码最多128个字符').refine(isValidPassword, '密码必须包含字母和数字'),
-  role: z.enum(['STUDENT', 'TEACHER', 'ADMIN', 'PARENT']),
+  role: z.enum(['STUDENT', 'TEACHER', 'PARENT']),
   nickname: z.string().optional(),
-})
+}).strict()
 
 const updateUserSchema = z.object({
   nickname: z.string().optional(),
@@ -24,7 +24,7 @@ const updateUserSchema = z.object({
   // Compatibility input only. The controller never writes this field directly;
   // it delegates to the platform-authoritative lifecycle service.
   isActive: z.boolean().optional(),
-})
+}).strict()
 
 // 分页参数解析工具函数
 const getPaginationParams = (req: Request) => {

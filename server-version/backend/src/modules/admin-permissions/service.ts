@@ -1,7 +1,7 @@
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
-import { assertCurrentSystemAdmin } from '../../services/accountAuthorityService'
+import { ADMIN_STEP_UP_SECONDS, validAdminProof, type AdminSessionProof } from './proof'
 
 export const ADMIN_ENTRIES = ['TRAINING', 'SURVEY', 'HUISCHOOL', 'HUITEACHER'] as const
 export type AdminEntry = typeof ADMIN_ENTRIES[number]
@@ -15,7 +15,7 @@ export async function assertEntryAdmin(db: Prisma.TransactionClient, userId: str
     WHERE u."id"=${userId} AND g."entry"=${entry} AND g."revoked_at" IS NULL
       AND u."is_active" AND NOT u."is_frozen" AND NOT u."must_change_password"
       AND u."account_domain" IN ('LEGACY','TRAINING')
-      AND (u."expires_at" IS NULL OR u."expires_at">statement_timestamp()) LIMIT 1
+      AND (u."expires_at" IS NULL OR u."expires_at">statement_timestamp()) LIMIT 1 FOR SHARE OF u,g
   `
   if (!rows.length) throw new AdminPermissionError(403, '缺少当前入口管理授权')
 }
@@ -24,15 +24,23 @@ export async function assertEntryAdmin(db: Prisma.TransactionClient, userId: str
 // operation is idempotent; an older command cannot silently undo newer state.
 export async function changeEntryGrant(input: {
   actorUserId: string; targetUserId: string; entry: AdminEntry
-  active: boolean; expectedVersion: number; reason: string
+  active: boolean; expectedVersion: number; reason: string; actorSession: AdminSessionProof
 }) {
+  if (!validAdminProof(input.actorSession, ADMIN_STEP_UP_SECONDS)) throw new AdminPermissionError(403, '授权变更需要最近的安全密钥验证')
   return prisma.$transaction(async tx => {
     // Stable user lock order serializes grants and account deactivation without
     // a global lock. The actor is rechecked after locking, inside this mutation.
     const ids = [...new Set([input.actorUserId, input.targetUserId])].sort()
-    await tx.$queryRaw`SELECT "id" FROM "users" WHERE "id" IN (${Prisma.join(ids)}) ORDER BY "id" FOR UPDATE`
-    await assertCurrentSystemAdmin(tx, input.actorUserId)
-    const target = await tx.user.findUnique({ where: { id: input.targetUserId }, select: { accountDomain: true } })
+    const locked = await tx.$queryRaw<Array<{id:string;tokenVersion:number;platformRole:string;accountDomain:string;isActive:boolean;isFrozen:boolean;expiresAt:Date|null;mustChangePassword:boolean}>>`
+      SELECT "id","token_version" AS "tokenVersion","platform_role"::text AS "platformRole","account_domain" AS "accountDomain",
+        "is_active" AS "isActive","is_frozen" AS "isFrozen","expires_at" AS "expiresAt","must_change_password" AS "mustChangePassword"
+      FROM "users" WHERE "id" IN (${Prisma.join(ids)}) ORDER BY "id" FOR UPDATE`
+    const actor = locked.find(row=>row.id===input.actorUserId)
+    if (!actor || actor.platformRole!=='SYSTEM_ADMIN' || !actor.isActive || actor.isFrozen || (actor.expiresAt && actor.expiresAt<=new Date())
+      || !['LEGACY','TRAINING'].includes(actor.accountDomain) || actor.mustChangePassword || actor.tokenVersion !== input.actorSession.tokenVersion
+      || !validAdminProof(input.actorSession, ADMIN_STEP_UP_SECONDS))
+      throw new AdminPermissionError(403, '操作者会话已失效，请重新登录')
+    const target = locked.find(row=>row.id===input.targetUserId)
     if (!target || !['LEGACY', 'TRAINING'].includes(target.accountDomain))
       throw new AdminPermissionError(404, '管理账号不存在或不属于管理身份域')
     const current = await tx.adminEntryGrant.findUnique({ where: { userId_entry: { userId: input.targetUserId, entry: input.entry } } })

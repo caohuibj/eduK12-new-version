@@ -18,6 +18,8 @@ import { inactiveAccountMessage } from '../utils/accountStatus'
 import { UserRole } from '../types'
 import { getCookieValue } from '../utils/authCookies'
 import { loadCurrentPrincipal } from '../modules/organization/principal'
+import { needsAdminKey, validAdminProof } from '../modules/admin-permissions/security'
+import { isSessionRevoked } from '../utils/sessionRevocation'
 
 type SocketNext = (error?: Error) => void
 export type SocketRedisState = 'ready' | 'degraded' | 'failed'
@@ -153,6 +155,10 @@ export class SocketService {
           if (payload.tokenVersion !== principal!.tokenVersion) {
             return next(new Error('Socket认证令牌已失效'))
           }
+          const revoked = await isSessionRevoked(token)
+          if (revoked === true || (revoked === null && config.nodeEnv === 'production')
+            || !['LEGACY','TRAINING'].includes(principal!.accountDomain)
+            || (needsAdminKey(principal!) && !validAdminProof(payload))) return next(new Error('Socket管理认证已失效'))
 
           if (principal!.mustChangePassword) {
             return next(new Error('首次登录必须先修改密码'))
@@ -163,6 +169,7 @@ export class SocketService {
           socket.data.tokenVersion = payload.tokenVersion
           socket.data.userRole = principal!.role
           socket.data.platformRole = principal!.platformRole
+          socket.data.adminProof = { adminVerifiedAt: payload.adminVerifiedAt, adminSessionId: payload.adminSessionId }
         }
 
         logger.debug('Socket连接认证完成', {
@@ -197,12 +204,16 @@ export class SocketService {
 
     try {
       const principal = await loadCurrentPrincipal(socket.data.userId)
+      const token = getSocketToken(socket)
+      const revoked = token ? await isSessionRevoked(token) : true
 
       if (
         !principal ||
         inactiveAccountMessage(principal) ||
         principal.mustChangePassword ||
-        principal.tokenVersion !== socket.data.tokenVersion
+        principal.tokenVersion !== socket.data.tokenVersion || revoked === true || (revoked === null && config.nodeEnv === 'production')
+        || !['LEGACY','TRAINING'].includes(principal.accountDomain)
+        || (needsAdminKey(principal) && !validAdminProof(socket.data.adminProof ?? {}))
       ) {
         socket.data.authenticated = false
         socket.data.userId = undefined

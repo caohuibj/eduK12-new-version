@@ -2,6 +2,8 @@ import {useState} from 'react'
 import {Link} from 'react-router-dom'
 import {useAuth} from '../../contexts/AuthContext'
 import {sessionFetch} from '../../api/client'
+import {hasAdminEntry} from '../../admin/authority'
+import AdminStepUp from '../../admin/AdminStepUp'
 import './education-products.css'
 
 type Product='HUISCHOOL'|'HUITEACHER'
@@ -38,11 +40,12 @@ export default function EducationProductGovernance(){
   const [error,setError]=useState('')
   const [notice,setNotice]=useState('')
   const [busy,setBusy]=useState(false)
-  const allowed=user?.role==='ADMIN'&&user.platformRole==='SYSTEM_ADMIN'
+  const teacherAllowed=hasAdminEntry(user,'HUITEACHER')
+  const allowed=teacherAllowed||hasAdminEntry(user,'HUISCHOOL')
   const read=async (org:string)=>{
     const [data,admins]=await Promise.all([
       request<Entitlement[]>('/organizations/'+org+'/products'),
-      request<{list:Grant[];truncated:boolean}>('/organizations/'+org+'/teacher-admins'),
+      teacherAllowed?request<{list:Grant[];truncated:boolean}>('/organizations/'+org+'/teacher-admins'):Promise.resolve({list:[],truncated:false}),
     ])
     setProducts(data);setGrants(admins.list);setLoaded(org)
   }
@@ -67,7 +70,7 @@ export default function EducationProductGovernance(){
   }
   if(!allowed)return <section className="epg-main">
     <h1>校园教育产品治理</h1>
-    <p role="alert">此入口仅接受独立平台 SYSTEM_ADMIN 身份，不接受 School 或 Teacher 登录会话。</p>
+    <p role="alert">此入口需要当前学校产品的入口管理授权。</p>
     <Link to="/admin/login">前往平台管理员登录</Link>
   </section>
   return <section className="epg-main" aria-label="校园教育产品治理">
@@ -76,6 +79,7 @@ export default function EducationProductGovernance(){
       <p>共享教育账号及组织基础信息，但两个产品分别开通、分别授权。
         管理员不能从本页面读取任何教师私人报告、学生心理数据或评教个人作答。</p>
     </header>
+    <AdminStepUp/>
     <nav aria-label="平台治理导航" className="epg-actions">
       <Link to="/organizations">学校组织</Link>
       <Link to="/admin/instrument-authorizations">科学工具许可</Link>
@@ -96,7 +100,7 @@ export default function EducationProductGovernance(){
         <h2>独立产品开通</h2>
         <p>组织 ID：<code>{loaded}</code></p>
         <div className="epg-grid">
-          {(['HUISCHOOL','HUITEACHER'] as const).map(product=>{
+          {(['HUISCHOOL','HUITEACHER'] as const).filter(product=>hasAdminEntry(user,product)).map(product=>{
             const item=products.find(x=>x.product===product)
             return <article key={product}>
               <h3>{labels[product]}</h3>
@@ -125,7 +129,7 @@ export default function EducationProductGovernance(){
             onChange={e=>setSchoolAdmin(e.target.value)}/>
         </label>
       </div>
-      <div className="epg-panel">
+      {teacherAllowed&&<div className="epg-panel">
         <h2>Teacher 学校产品管理员</h2>
         {grants.length?grants.map(g=><article className="epg-grant" key={g.grantId}>
           <strong>{g.loginName}</strong>
@@ -143,7 +147,7 @@ export default function EducationProductGovernance(){
           secret=>request('/organizations/'+loaded+'/teacher-admins','POST',{
             membershipId:member.trim(),currentPassword:secret,
           }))}>授予 Teacher 产品管理员</button>
-      </div>
+      </div>}
       <div className="epg-panel">
         <h2>管理员操作确认</h2>
         <label>本次平台管理员密码

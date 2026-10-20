@@ -24,7 +24,7 @@ interface AuthContextType {
   clearReauthentication: () => void
   isAuthenticated: boolean
   isLoading: boolean
-  login: (username: string, password: string, expectedRole?: LoginRequest['expectedRole'], entrance?: 'admin') => Promise<void>
+  login: (username: string, password: string, expectedRole?: LoginRequest['expectedRole'], entrance?: 'admin') => Promise<User | undefined>
   setAuthenticatedUser: (userData: User) => void
   logout: () => Promise<void>
   setUser: (user: User | null) => void
@@ -242,6 +242,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
         replaceIdentity(response.data.user)
         setIsLoading(false)
         notifySessionChanged()
+        return response.data.user
       } else {
         throw new Error(response.message || '登录失败')
       }

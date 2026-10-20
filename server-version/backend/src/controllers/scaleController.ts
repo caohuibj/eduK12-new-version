@@ -1465,7 +1465,7 @@ export const scaleController = {
       if (countDateFilter) countWhere.completedAt = countDateFilter
       const recordCount = await prisma.assessment.count({ where: countWhere })
 
-      const queued = await enqueueExportJob({
+      const queued = await enqueueExportJob({ authorityTokenVersion: req.user!.tokenVersion,
         resourceType: 'SCALE',
         resourceId: scaleId,
         createdBy: userId!,
