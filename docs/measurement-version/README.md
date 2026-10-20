@@ -163,3 +163,11 @@ Cognitive 内容投影冻结实际配置、协议、输入/时序/随机策略�
 Cognitive 原发布入口此前没有 actor 参数；现在 controller 使用已验证请求身份，CLI apply 必须显式提供真实既存 `--actor` 并在事务中校验当前系统管理员。无 actor 拒绝，不补造身份；V05 将按管理员最终接口映射内容能力。现有生命周期测试已同步，真实 PG 测试使用独立合成 publisher，不把普通教师自动升权。
 
 验证：新增 4 项 Cognitive/SJT 合同通过；受影响 release service 的 7 项单元通过；本分支 Prisma schema validate 通过。首轮新 fixture 缺 SJT 必需第二题及认知测试开关，修正测试输入后通过，未放宽产品校验。私有 Prisma client 已从本分支 schema 成功生成（独立 dependency overlay，仅复制约 8 MB client，其他官方依赖只读软链，生成物约几十 MB），没有覆盖共享依赖。加载真实 Request 扩展后，V02–V04 新核心与实际发布接入点定向 strict TypeScript 检查通过，解决此前旧生成 client 导致的检查阻塞。真实 PostgreSQL 迁移/事务/恢复和浏览器回归尚未执行，留集中验收；schema validate 和 mock 单元不替代这些证据。独立报告/参考、投放消费和旧结果回读仍须 V06–V09 完成，不将本单元登记为整个闭环上线。
+
+### V04 review correction and V06 internal preparation
+
+V04 共享 Cognitive adapter 不读取 Training admission 开关；各入口仍执行自己的准入门禁。精确已注册 runner、受支持参数和 fake fixture 禁止保留。新增关闭 Training 开关时 Survey 编译仍可执行的合同，5 项 adapter 测试通过。
+
+V06 当前仅准备内部候选/审阅 DTO 与纯函数，尚无公开接口：冻结授权来源事实 ID/version、测量身份、方法证据及候选 hash；拒绝重复/失权样本、错误样本数、非有限估计、不可计算的分布估计、私有样本自动提升正式 norm；正式跨入口 norm 拒绝分析者自审。ReferenceCore 增加 SJT 显式 instrumentType，没有以 Scale 冒充。4 项内部合同通过，定向 strict TypeScript 通过。
+
+此阶段不等于 V06 完成：实际 scoped sample reader、持久化候选/审阅及数据库独立复核约束、能力接入、撤回与逐指标选择仍待实施；现有治理固定经验样本门槛尚未替换。理论/准则规则不能强塞进经验样本候选。存储与冗余持续记录见 [resource-ledger.md](resource-ledger.md)，未测项保持显式待验收。
