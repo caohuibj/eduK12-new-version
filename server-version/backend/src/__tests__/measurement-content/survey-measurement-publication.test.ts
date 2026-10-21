@@ -1,5 +1,5 @@
 import {beforeEach,describe,it,expect,vi} from 'vitest'
-const m=vi.hoisted(()=>({tx:{$queryRaw:vi.fn(),surveyInstrumentDraft:{findUniqueOrThrow:vi.fn()}},transaction:vi.fn(),authorize:vi.fn(),compile:vi.fn(),publish:vi.fn(),assets:vi.fn(),retain:vi.fn(),sources:vi.fn(),catalogCompile:vi.fn(),expiry:vi.fn()}))
+const m=vi.hoisted(()=>({tx:{$queryRaw:vi.fn(),surveyInstrumentDraft:{findUniqueOrThrow:vi.fn(),update:vi.fn()}},transaction:vi.fn(),authorize:vi.fn(),compile:vi.fn(),publish:vi.fn(),assets:vi.fn(),retain:vi.fn(),sources:vi.fn(),catalogCompile:vi.fn(),expiry:vi.fn()}))
 vi.mock('../../config/database',()=>({prisma:{$transaction:m.transaction}}))
 vi.mock('../../modules/survey/builder.service',()=>({authorizedProject:m.authorize,SurveyBuilderError:class extends Error{constructor(readonly statusCode:number,message:string){super(message)}}}))
 vi.mock('../../modules/survey/publication.service',()=>({compileFrozenResearchUnit:m.compile,publishSurveyMeasurementUnit:m.publish}))
@@ -14,7 +14,8 @@ describe('explicit private measurement publication',()=>{
  it('authorizes, locks exact revision, compiles and retains in the same transaction',async()=>{
   await expect(publishSurveyMeasurementDraft('owner','project','draft',2)).resolves.toEqual({releaseId:'release',contentHash:'hash',measurementHash:'measurement',family:'SCALE',version:'2',metricKeys:['total']})
   expect(m.authorize).toHaveBeenCalledWith(m.tx,'owner','project',true)
-  expect(m.tx.$queryRaw.mock.calls[0][0].sql).toContain('FOR SHARE')
+  expect(m.tx.$queryRaw.mock.calls[0][0].sql).toContain('FOR UPDATE')
+  expect(m.tx.surveyInstrumentDraft.update).toHaveBeenCalledWith({where:{id:'draft'},data:{status:'PUBLISHED',measurementReleaseId:'release'}})
   expect(m.assets.mock.invocationCallOrder[0]).toBeLessThan(m.publish.mock.invocationCallOrder[0])
   expect(m.retain).toHaveBeenCalledWith({owner:{entityType:'MeasurementContentRelease',entityId:'release',field:'media'},references:[],db:m.tx})
  })

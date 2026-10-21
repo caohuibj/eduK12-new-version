@@ -1,4 +1,8 @@
-import { MaterialResourceType, UserRole } from '@prisma/client'
+import {libraryReadableScaleIds} from '../modules/scale-library-governance/readers'
+import {assertLibraryUseGrantCurrent} from '../modules/scale-library-governance/usage'
+import {ScaleLibraryError} from '../modules/scale-library-governance/contracts'
+import {ContentAuthorityError} from '../modules/measurement-content/content-authority'
+import { MaterialResourceType, UserRole, type Prisma } from '@prisma/client'
 import { prisma } from '../config/database'
 import { config } from '../config'
 import {
@@ -37,15 +41,20 @@ const isEligibleTeacher = (user: {
 export const scaleSource = (
   userId: string,
   role: UserRole | string,
-  scale: { creatorId: string },
+  scale: { creatorId: string; libraryEntryId?:string|null },
 ): ScaleSource => {
+  if (scale.libraryEntryId) return 'granted'
   if (scale.creatorId === userId) return 'owned'
   if (role === UserRole.ADMIN) return 'other'
   return 'granted'
 }
 
 export const grantedResourceIds = async (userId: string, resourceType: MaterialResourceType): Promise<string[]> => {
-  if (!config.materialGrantsEnabled) return []
+  if (!config.materialGrantsEnabled) {
+    if(resourceType!==MaterialResourceType.SCALE)return []
+    const governed=await prisma.$queryRaw<Array<{source_id:string}>>`SELECT m.resource_id AS source_id FROM scale_library_use_grants g JOIN scale_library_entries e ON e.id=g.entry_id JOIN material_grants m ON m.id=g.material_grant_id WHERE g.user_id=${userId} AND g.product='TRAINING' AND g.status='ACTIVE' AND e.status='ACTIVE'`
+    return governed.map(row=>row.source_id)
+  }
   const rows = await prisma.materialGrant.findMany({
     where: { teacherId: userId, resourceType },
     select: { resourceId: true },
@@ -58,22 +67,24 @@ export const scaleWhereForViewer = async (
   role: UserRole | string,
   extra: Record<string, unknown> = {},
 ) => {
-  if (role === UserRole.ADMIN) return extra
+  if(role!==UserRole.ADMIN&&role!==UserRole.TEACHER)return extra
+  const readable=await libraryReadableScaleIds(userId)
+  if (role === UserRole.ADMIN) return readable.systemAdmin?extra:{...extra,OR:[{libraryEntryId:null},{id:{in:readable.ids}}]}
   // 学生等非教师角色：GET /scales/tags 只要求登录，保持全量标签，不要按 creatorId 滤成空。
   if (role !== UserRole.TEACHER) return extra
-  if (!config.materialGrantsEnabled) return { ...extra, creatorId: userId }
   const grantedIds = await grantedResourceIds(userId, MaterialResourceType.SCALE)
   return {
     ...extra,
     OR: [
-      { creatorId: userId },
-      { id: { in: grantedIds }, status: 'PUBLISHED' },
+      { creatorId: userId, libraryEntryId: null },
+      { id: { in: grantedIds }, status: 'PUBLISHED', libraryEntryId:null },
+      { id:{in:readable.ids},status:'PUBLISHED' },
     ],
   }
 }
 
 // 撤销 grant 只拦新的 addItem / addScale / 空白 createAssignment。
-// 已挂在 DRAFT 综合测评或问卷里的 scaleId 仍可发布；不扫描草稿、不拆已发布容器。
+// 新公库使用在草稿发布时再次验证；已发布冻结容器不受普通撤权影响。
 /** Every projected scale passed to canUseScale must retain these fields. */
 export const SCALE_USE_AUTHORIZATION_SELECT = { id: true, creatorId: true, status: true } as const
 
@@ -81,22 +92,28 @@ export const canUseScale = async (
   userId: string,
   role: UserRole | string,
   scale: { id: string; creatorId: string; status: string },
-  db: Pick<typeof prisma, 'materialGrant'> = prisma,
+  db: Pick<typeof prisma, 'materialGrant' | '$queryRaw'> = prisma,
 ): Promise<boolean> => {
-  if (role === UserRole.ADMIN) return true
-  if (scale.creatorId === userId) return true
-  if (!config.materialGrantsEnabled) return false
-  if (scale.status !== 'PUBLISHED') return false
-  const grant = await db.materialGrant.findUnique({
-    where: {
-      teacherId_resourceType_resourceId: {
-        teacherId: userId,
-        resourceType: MaterialResourceType.SCALE,
-        resourceId: scale.id,
-      },
-    },
-  })
-  return Boolean(grant)
+  const check=async(tx:Prisma.TransactionClient)=>{
+    const [identity]=await tx.$queryRaw<Array<{library_entry_id:string|null}>>`SELECT library_entry_id FROM scales WHERE id=${scale.id}`
+    if(!identity?.library_entry_id&&scale.creatorId===userId)return true
+    const governed=await tx.$queryRaw<Array<{entry_id:string;status:string}>>`SELECT g.entry_id,g.status FROM scale_library_use_grants g
+      JOIN material_grants m ON m.id=g.material_grant_id
+      WHERE g.user_id=${userId} AND g.product='TRAINING' AND m.resource_id=${scale.id} ORDER BY g.created_at DESC LIMIT 1`
+    if(governed.length){
+      if(scale.status!=='PUBLISHED'||governed[0].status!=='ACTIVE')return false
+      try{await assertLibraryUseGrantCurrent(tx,{entryId:governed[0].entry_id,userId,product:'TRAINING'});return true}
+      catch(e){if(e instanceof ScaleLibraryError||e instanceof ContentAuthorityError)return false;throw e}
+    }
+    if(identity?.library_entry_id)return false
+    const library=await tx.$queryRaw<Array<{id:string}>>`SELECT e.id FROM scale_library_entries e JOIN scale_library_submissions s ON s.id=e.submission_id WHERE s.source_id=${scale.id} LIMIT 1`
+    // Legacy ADMIN visibility is not a new platform-library use grant.
+    if(role===UserRole.ADMIN&&!library.length)return true
+    if(!config.materialGrantsEnabled||scale.status!=='PUBLISHED')return false
+    const legacy=await tx.materialGrant.findUnique({where:{teacherId_resourceType_resourceId:{teacherId:userId,resourceType:MaterialResourceType.SCALE,resourceId:scale.id}}})
+    return Boolean(legacy&&(!library.length||legacy.legacyScaleGrant))
+  }
+  return db===prisma?prisma.$transaction(check):check(db as Prisma.TransactionClient)
 }
 
 export const canInstantiateConfig = async (
@@ -154,6 +171,7 @@ const assertGrantableResource = async (resourceType: MaterialResourceType, resou
     const scale = await prisma.scale.findUnique({ where: { id: resourceId } })
     if (!scale) throw grantNotFound('量表不存在')
     if (scale.status !== 'PUBLISHED') throw grantBadRequest('只能授权已发布量表')
+    if(scale.instrumentClass==='CUSTOM_DESCRIPTIVE')throw grantBadRequest('自编量表新授权必须通过精确版本共用库审批与分配，旧授权不得扩大')
     return
   }
   if (resourceType === MaterialResourceType.COGNITIVE_CONFIG) {

@@ -3,7 +3,7 @@ import { gzipSync } from 'node:zlib'
 import { createHash } from 'node:crypto'
 import { getScaleInstrumentSource } from '../../modules/scale/onboarding/instrument-registry'
 import { compileScalePolicy } from '../../modules/scale/policy/compile'
-import { createFrozenScaleRuntimeSnapshot, encryptFrozenScaleRuntimeSnapshot, loadFrozenScaleRuntimeSnapshot,
+import { createFrozenScaleRuntimeSnapshot, encryptFrozenScaleRuntimeSnapshot, loadFrozenScaleRuntimeSnapshot, hashFrozenScaleRuntimeSnapshot,
   preparedScaleArtifactCacheStats } from '../../modules/assessment-runtime/runtime-snapshot'
 import { createFrozenScaleRuntimeSnapshotV2ForTest } from '../../modules/assessment-runtime/runtime-snapshot-v2'
 import { createSharedScaleRuntimeStore, type SharedScaleArtifactRecord } from '../../modules/assessment-runtime/shared-scale-runtime'
@@ -126,4 +126,15 @@ describe('compiled artifacts and exact canonical hash reuse', () => {
     expect(jsonArtifactBytes({ get x() { return 1 } })).toBeNull()
     expect(jsonArtifactBytes(Object.assign([], { toJSON: () => ({ fake: true }) }))).toBeNull()
   })
+})
+
+// New library protocol is immutable shared content, never an attempt/client override.
+it('roundtrips exact library presentation through shared runtime storage', async () => {
+  const m = memory(), frozen = snapshot()
+  frozen.measurementPresentation = { releaseId: 'approved-release', contentHash: 'a'.repeat(64), presentationMode: 'ALL_AT_ONCE' }
+  frozen.snapshotHash = hashFrozenScaleRuntimeSnapshot(frozen)
+  const cipher = await m.store.save(frozen)
+  const restored = await createSharedScaleRuntimeStore(m.repository).load(reference(cipher))
+  expect(restored).toEqual(frozen)
+  expect(restored.measurementPresentation?.presentationMode).toBe('ALL_AT_ONCE')
 })

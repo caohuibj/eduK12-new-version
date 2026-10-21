@@ -65,6 +65,7 @@ describe('FinalCompositeAssessment presentation reuse', () => {
 
   afterEach(async () => {
     await finalDraftStore.delete('composite-form-section:composite-attempt-form-player:composite-form-choice-section')
+    await finalDraftStore.delete('composite-scale:whole-page-scale')
   })
 
   it('uses FormPlayer native choice semantics while preserving the Composite FINAL payload', async () => {
@@ -143,4 +144,52 @@ describe('FinalCompositeAssessment presentation reuse', () => {
     expect(container.querySelector('.training-form-surface')).toBeNull()
   })
 
+})
+
+
+const wholePageScale: CompositeCurrentItem = {
+  id: 'whole-page-unit', type: 'SCALE', position: 0, required: true,
+  presentationMode: 'ALL_AT_ONCE', scaleAssessmentId: 'whole-page-scale', definitionHash: 'frozen-page-hash',
+  scale: { id: 'source-scale', name: '冻结整页量表', definition: {
+    schemaVersion: 2, respondentType: 'participant_self_report', display: { randomizeItems: false },
+    items: [0, 1, 2].map(index => ({ itemCode: `q${index}`, content: `整页题目${index}`, type: 'single', required: true, sortOrder: index, responseSetKey: 'choice', randomizeOptions: false,
+      options: [{ value: 1, label: `数值${index}` }, { value: '1', label: `文本${index}` }] })),
+  } },
+}
+
+describe('Composite exact frozen presentation mode', () => {
+  beforeEach(() => { vi.clearAllMocks(); trainingHost.mockReturnValue(true); mockRetry.mockImplementation(async ({ operation }: { operation: () => Promise<unknown> }) => operation()) })
+  afterEach(async () => { await finalDraftStore.delete('composite-scale:whole-page-scale') })
+  const props = () => ({ state: { ...state, currentItem: wholePageScale }, submitFormSection: vi.fn(), submitScale: vi.fn().mockResolvedValue({ code: 0, data: null }), onReload: vi.fn().mockResolvedValue(undefined), onExit: vi.fn(), onCompleted: vi.fn(), onEnterCognitive: vi.fn(), onEnterSituational: vi.fn() })
+  it('shows three items together, preserves typed local restore and requires manual unit submission', async () => {
+    const user = userEvent.setup(), input = props()
+    const view = render(<FinalCompositeAssessment {...input} />)
+    await screen.findByRole('button', { name: '数值0' })
+    expect(screen.getAllByRole('group', { name: /整页题目/ })).toHaveLength(3)
+    expect(screen.queryByRole('button', { name: '下一题' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '上一题' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '数值0' }))
+    await user.click(screen.getByRole('button', { name: '文本1' }))
+    await user.click(screen.getByRole('button', { name: '数值2' }))
+    await waitFor(async () => expect((await finalDraftStore.listAnswers('composite-scale:whole-page-scale')).length).toBe(3))
+    expect(input.submitScale).not.toHaveBeenCalled()
+    view.unmount()
+    render(<FinalCompositeAssessment {...input} />)
+    expect(await screen.findByRole('button', { name: '数值0' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: '文本0' })).toHaveAttribute('aria-pressed', 'false')
+    expect(screen.getByRole('button', { name: '文本1' })).toHaveAttribute('aria-pressed', 'true')
+    expect(input.submitScale).not.toHaveBeenCalled()
+    await user.click(screen.getByRole('button', { name: '提交整份量表' }))
+    await waitFor(() => expect(input.submitScale).toHaveBeenCalledTimes(1))
+    expect(input.submitScale.mock.calls[0][2].answers).toEqual([
+      { itemCode: 'q0', responseValue: 1 }, { itemCode: 'q1', responseValue: '1' }, { itemCode: 'q2', responseValue: 1 },
+    ])
+  })
+  it('keeps old units sequential without inferring mode from origin', async () => {
+    const input = props()
+    render(<FinalCompositeAssessment {...input} state={{ ...input.state, currentItem: { ...wholePageScale, presentationMode: undefined } }} />)
+    await screen.findByRole('button', { name: '数值0' })
+    expect(screen.queryByRole('button', { name: '数值1' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '下一题' })).toBeInTheDocument()
+  })
 })

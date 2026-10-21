@@ -47,6 +47,7 @@ const ReportingContent = React.lazy(() => import('./pages/admin/ReportingContent
 const MaterialGrants = React.lazy(() => import('./pages/admin/MaterialGrants'))
 const AdminTrainingWorkspace = React.lazy(() => import('./pages/admin/AdminTrainingWorkspace'))
 const SurveyResearchersAdmin = React.lazy(() => import('./pages/admin/SurveyResearchersAdmin'))
+const ScaleLibraryGovernance = React.lazy(() => import('./pages/admin/ScaleLibraryGovernance'))
 const InstrumentAuthorization = React.lazy(() => import('./pages/admin/InstrumentAuthorization'))
 const EducationProductGovernance = React.lazy(() => import('./pages/admin/EducationProductGovernance'))
 const TeacherProfile = React.lazy(() => import('./pages/teacher/TeacherProfile'))
@@ -413,6 +414,7 @@ function AppRoutes() {
           />
           <Route path="/bundle-products" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><BundleProducts /></ProtectedRoute>} />
           <Route path="/admin/security/enroll" element={<AdminKeyEnrollment/>}/>
+          <Route path="/admin/scale-library-governance" element={<AdminAccess><ScaleLibraryGovernance/></AdminAccess>}/>
           <Route path="/admin/permissions" element={<AdminAccess system><AdminPermissions/></AdminAccess>}/>
           <Route path="/admin/entrances" element={<AdminAccess><AdminEntrances/></AdminAccess>}/>
           <Route path="/admin/survey-researchers" element={<SurveyAdminOrigin><AdminAccess entries={['SURVEY']}><SurveyResearchersAdmin /></AdminAccess></SurveyAdminOrigin>} />

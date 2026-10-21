@@ -245,7 +245,8 @@ export const loadScaleAssessmentForResponse = async (assessment: any, options: S
     try { runtime = await loadFrozenScaleRuntimeSnapshot(assessment.runtimeSnapshotEncrypted, db) }
     catch { return scaleAssessmentForResponse(assessment, options) }
   }
-  return scaleAssessmentForResponse(assessment, options, runtime)
+  return { ...scaleAssessmentForResponse(assessment, options, runtime),
+    presentationMode: runtime?.measurementPresentation?.presentationMode ?? 'ONE_BY_ONE' }
 }
 
 const inferServerAudience = (assessment: any): ScaleDisclosureAudience => (

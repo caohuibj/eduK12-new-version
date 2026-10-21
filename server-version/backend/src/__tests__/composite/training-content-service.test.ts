@@ -3,8 +3,8 @@ import {UserRole} from '@prisma/client'
 const mocks=vi.hoisted(()=>{
  process.env.DATA_ENCRYPTION_KEY='a'.repeat(64);process.env.DATA_PSEUDONYM_KEY='b'.repeat(64)
  const db={compositeAssessment:{findUnique:vi.fn(),update:vi.fn()},compositeAssessmentAttempt:{findFirst:vi.fn(),create:vi.fn(),update:vi.fn()},
-  compositeAssessmentItem:{create:vi.fn()},assessment:{create:vi.fn()},course:{findUnique:vi.fn()},scale:{findUnique:vi.fn()},materialGrant:{findUnique:vi.fn()},$queryRaw:vi.fn(),$transaction:vi.fn()}
- return {db,publication:vi.fn(),binding:vi.fn(),freezeScale:vi.fn(),persistScale:vi.fn(),persistSlots:vi.fn(),retain:vi.fn()}
+  compositeAssessmentItem:{create:vi.fn()},assessment:{create:vi.fn()},course:{findUnique:vi.fn()},scale:{findUnique:vi.fn(),findMany:vi.fn()},materialGrant:{findUnique:vi.fn()},$queryRaw:vi.fn(),$transaction:vi.fn()}
+ return {db,publication:vi.fn(),binding:vi.fn(),freezeScale:vi.fn(),persistScale:vi.fn(),persistSlots:vi.fn(),retain:vi.fn(),recheckPublication:vi.fn(),recheckBinding:vi.fn()}
 })
 vi.mock('../../config/database',()=>({prisma:mocks.db}))
 vi.mock('../../modules/composite/training-content-binding',async original=>({...await original<object>(),prepareTrainingContentSnapshot:mocks.publication,prepareTrainingContentAttemptBinding:mocks.binding}))
@@ -28,9 +28,11 @@ beforeEach(()=>{
  vi.clearAllMocks();previousGrants=config.materialGrantsEnabled;config.materialGrantsEnabled=true
  mocks.db.compositeAssessment.findUnique.mockResolvedValue(fixture());mocks.db.materialGrant.findUnique.mockResolvedValue(null)
  mocks.db.scale.findUnique.mockResolvedValue(fixture().items[0].scale);mocks.db.compositeAssessmentAttempt.findFirst.mockResolvedValue(null)
+ mocks.db.scale.findMany.mockResolvedValue([{id:'scale',measurementReleaseId:null}]);
  mocks.db.$queryRaw.mockResolvedValue([]);mocks.db.$transaction.mockImplementation(fn=>fn(mocks.db))
- mocks.publication.mockResolvedValue({snapshot,snapshotHash})
- mocks.binding.mockImplementation(async(_db,input)=>{const binding={schemaVersion:1,compositeId:input.compositeId,attemptId:input.attemptId,epoch:input.epoch,publicationHash:input.snapshotHash,units:[unit]};return {binding,bindingHash:canonicalHash(binding)}})
+ mocks.recheckPublication.mockResolvedValue(undefined);mocks.recheckBinding.mockResolvedValue(undefined)
+ mocks.publication.mockResolvedValue({snapshot,snapshotHash,recheckSourceLicenses:mocks.recheckPublication})
+ mocks.binding.mockImplementation(async(_db,input)=>{const binding={schemaVersion:1,compositeId:input.compositeId,attemptId:input.attemptId,epoch:input.epoch,publicationHash:input.snapshotHash,units:[unit]};return {binding,bindingHash:canonicalHash(binding),recheckSourceLicenses:mocks.recheckBinding}})
  mocks.db.compositeAssessmentAttempt.create.mockImplementation(async({data})=>data)
  mocks.db.assessment.create.mockResolvedValue({id:'child'});mocks.db.compositeAssessmentAttempt.update.mockResolvedValue({})
  mocks.freezeScale.mockResolvedValue({schemaVersion:1,sourceDefinitionHash:'c'.repeat(64),compiledRuntime:{compiledRuntimeHash:'d'.repeat(64)}})
@@ -44,6 +46,7 @@ describe('actual composite service measurement-binding call chain (mock DB and r
   mocks.db.materialGrant.findUnique.mockClear()
   const prepared=await prepareCompositePublication('teacher',UserRole.TEACHER,'composite',mocks.db as never,new Map())
   expect(prepared).toMatchObject({trainingContentSnapshot:snapshot,trainingContentSnapshotHash:snapshotHash})
+  expect(mocks.recheckPublication).toHaveBeenCalledTimes(1)
   expect(mocks.publication).toHaveBeenCalledExactlyOnceWith(mocks.db,fixture(),new Map())
   expect(mocks.db.materialGrant.findUnique).not.toHaveBeenCalled()
  })
@@ -58,12 +61,19 @@ describe('actual composite service measurement-binding call chain (mock DB and r
   expect(persisted).toMatchObject({assignmentRef:'assignment',attemptEpoch:1,runtimeGeneration:'UNIFIED_V1'})
   expect(mocks.binding.mock.invocationCallOrder[0]).toBeLessThan(mocks.db.compositeAssessmentAttempt.create.mock.invocationCallOrder[0])
   expect(mocks.db.assessment.create).toHaveBeenCalledTimes(1)
+  expect(mocks.recheckBinding).toHaveBeenCalledTimes(1)
  })
  it('fails new START before attempt/child writes when the frozen measurement is revoked',async()=>{
   mocks.db.compositeAssessment.findUnique.mockResolvedValue(fixture('PUBLISHED'))
   mocks.binding.mockRejectedValueOnce(Object.assign(new Error('CONTENT_TRAINING_BINDING_INVALID'),{statusCode:409}))
   await expect(start()).rejects.toMatchObject({message:'CONTENT_TRAINING_BINDING_INVALID',statusCode:409})
   expect(mocks.db.compositeAssessmentAttempt.create).not.toHaveBeenCalled();expect(mocks.db.assessment.create).not.toHaveBeenCalled()
+ })
+ it('propagates the final source-license recheck failure rather than publishing a prepared snapshot',async()=>{
+  mocks.recheckPublication.mockRejectedValueOnce(new Error('SOURCE_LICENSE_WITHDRAWN'))
+  await expect(prepareCompositePublication('teacher',UserRole.TEACHER,'composite',mocks.db as never,new Map())).rejects.toThrow('SOURCE_LICENSE_WITHDRAWN')
+  expect(mocks.recheckPublication).toHaveBeenCalledTimes(1)
+  expect(mocks.db.compositeAssessment.update).not.toHaveBeenCalled()
  })
  it('returns an existing relational attempt without reselecting or overwriting its binding',async()=>{
   mocks.db.compositeAssessment.findUnique.mockResolvedValue(fixture('PUBLISHED'))
@@ -79,7 +89,7 @@ it('publication attaches a selected owner report to the actual measurement snaps
  const current={...fixture(),trainingReportSelectionDraft:{schemaVersion:1,units:[{itemId,reportReleaseId:reportId}]}}
  current.items[0].id=itemId;mocks.db.compositeAssessment.findUnique.mockResolvedValue(current)
  const measured={...snapshot,units:[{...unit,itemId}]}
- mocks.publication.mockResolvedValue({snapshot:measured,snapshotHash:canonicalHash(measured),releases:new Map([[unit.measurement.releaseId,{layer:'MEASUREMENT',contentHash:unit.measurement.contentHash,content:{metrics:[{metricKey:'effort'}]}}],[reportId,report]])})
+ mocks.publication.mockResolvedValue({recheckSourceLicenses:mocks.recheckPublication,snapshot:measured,snapshotHash:canonicalHash(measured),releases:new Map([[unit.measurement.releaseId,{layer:'MEASUREMENT',contentHash:unit.measurement.contentHash,content:{metrics:[{metricKey:'effort'}]}}],[reportId,report]])})
  mocks.db.$queryRaw.mockImplementation(async query=>query.strings.join(' ').includes('FROM users')?[{role:'TEACHER',teacher_approved:true,account_domain:'TRAINING',is_active:true,is_frozen:false,must_change_password:false,expires_at:null}]:[{now:new Date()}])
  const result=await prepareCompositePublication('teacher',UserRole.TEACHER,'composite',mocks.db as never,new Map())
  expect((result.trainingContentSnapshot as any).units[0].report).toEqual({releaseId:reportId,contentHash:report.contentHash})

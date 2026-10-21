@@ -1,3 +1,4 @@
+import {authorizedLibraryUnitMedia,type LibraryBoundMediaUnit} from '../scale-library-governance/media.authorization'
 import { rawScoreFeedbackImages } from '../scale/scale-image-retention'
 import type { RawScoreFeedback } from '../scale/raw-score-feedback'
 import type { AssessmentImagePresentationV1 } from '../assessment-media/assessment-image-presentation'
@@ -16,7 +17,7 @@ export class SurveyMediaError extends Error{
 const fail=(statusCode:number,message:string):never=>{throw new SurveyMediaError(statusCode,message)}
 type ImageIdentity={asset:{assetId:string;contentHash:string;mimeType:string};altText:string;caption?:string;
   rightsStatus:'self_authored'|'authorized'|'unknown';rightsNote:string}
-type UnitDef={kind:SurveyKind;definition:unknown}
+type UnitDef=LibraryBoundMediaUnit & {kind:SurveyKind}
 export const surveyImageRefs=(units:readonly UnitDef[]):ImageIdentity[]=>units.flatMap(({kind,definition})=>{
   if(kind==='FORM'){
     const d=definition as FormDraft
@@ -30,12 +31,19 @@ export const surveyImageRefs=(units:readonly UnitDef[]):ImageIdentity[]=>units.f
 })
 
 export async function assertSurveyMediaOwned(tx:Tx,userId:string,projectId:string,units:readonly UnitDef[]){
-  const stimuli=surveyImageRefs(units)
-  const reportImages=units.flatMap(unit=>unit.kind==='SCALE'
+  const nativeUnits:UnitDef[]=[]
+  const libraryRefs:Array<{assetId:string;contentHash:string;mimeType:string}>=[]
+  for(const unit of units){
+    const authorized=await authorizedLibraryUnitMedia(tx,userId,unit)
+    if(authorized===null)nativeUnits.push(unit)
+    else libraryRefs.push(...authorized)
+  }
+  const stimuli=surveyImageRefs(nativeUnits)
+  const reportImages=nativeUnits.flatMap(unit=>unit.kind==='SCALE'
     ?rawScoreFeedbackImages((unit.definition as {rawScoreFeedback?:RawScoreFeedback}).rawScoreFeedback):[])
   const refs:Array<ImageIdentity|AssessmentImagePresentationV1>=[...stimuli,...reportImages]
   const ids=[...new Set(refs.map(r=>r.asset.assetId))]
-  if(!ids.length)return []
+  if(!ids.length)return libraryRefs
   if(ids.length>30)fail(400,'单次研究发布最多引用 30 个静态图片')
   const assets=await tx.storedAsset.findMany({where:{id:{in:ids},ownerId:userId,scopeId:projectId,
     accessScope:'PRIVATE',deletedAt:null},select:{
@@ -52,7 +60,7 @@ export async function assertSurveyMediaOwned(tx:Tx,userId:string,projectId:strin
       ||!surveyMimeTypes.includes(a.mimeType as (typeof surveyMimeTypes)[number]))
       fail(403,'研究图片缺少本项目授权或与上传时的文件摘要不一致')
   }
-  return refs.map(r=>r.asset)
+  return [...libraryRefs,...refs.map(r=>r.asset)]
 }
 export async function retainSurveyMedia(tx:Tx,userId:string,projectId:string,publicationId:string,
   units:readonly UnitDef[]){

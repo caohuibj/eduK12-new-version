@@ -1,3 +1,4 @@
+import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
 import { lockTrainingFlowFinalAdmission, requiresTrainingFlowFinalLock } from '../composite/training-variant-child-scope'
 import {normalizeTrainingScaleTiming} from '../assessment-runtime/training-scale-timing'
 import { rethrowScaleSubmissionIdConflict, rethrowConfirmedScaleBatchSubmissionConflict } from './scale-final-submit-conflict'
@@ -354,6 +355,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
       return { replayed: true, current }
     }
     if (current.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评已结束', 409)
+    await assertTrainingScaleCollectionAllowed(tx, [child.scaleId])
     assertFlowFinal(false)
     const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())
     const where: Record<string, unknown> = {
@@ -546,6 +548,7 @@ export const submitUnifiedScaleCollectionBatch = async (
       }
       if (current.status !== 'IN_PROGRESS' || !unit.write || current.snapshotId)
         throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表提交状态已变化', 409)
+      await assertTrainingScaleCollectionAllowed(tx, [unit.child.scaleId])
       const { completedAt, encryptedAnswers, encrypted } = unit.write
       if (!encrypted.canonicalResult) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '批量量表缺少权威结果', 409)
       const totalTime = Math.max(0, completedAt.getTime() - current.startedAt.getTime())

@@ -194,6 +194,7 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
         ? Date.parse(admission.scalePolicy.deployment.completionDeadline) : null,
       ...rule })
     units.push({ itemId: child.compositeItemId!, scaleAssessmentId: child.id, definitionHash: runtime.legacyDefinitionHash,
+      presentationMode: runtime.measurementPresentation?.presentationMode ?? 'ONE_BY_ONE',
       ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
       scale: { id: child.scale.id, name: child.scale.name, instruction: child.scale.instruction, instrumentVersion: child.scale.instrumentVersion,
         definition: runnerDefinition(runtime.definition) } })

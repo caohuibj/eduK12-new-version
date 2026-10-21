@@ -33,6 +33,7 @@ export async function importScaleCsv(id: string, actor: { userId: string; role: 
     const scale = await lockScaleCopySource(tx, id)
     if (!scale) return fail(404, '量表不存在')
     if (scale.creatorId !== actor.userId && actor.role !== 'ADMIN') fail(403, '无权限修改此量表；使用授权不包含改编权')
+    if (scale.libraryEntryId) fail(409, '共用库授权引用只读，不能导入覆盖')
     if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE') fail(409, '标准量表由代码 package 管理，不能导入覆盖')
     if (scale.status !== 'DRAFT') fail(409, '仅草稿支持导入；已发布定义不可变更')
     if (scale.updatedAt.getTime() !== new Date(input.expectedUpdatedAt).getTime()) fail(409, '量表版本已变化，请重新预检')

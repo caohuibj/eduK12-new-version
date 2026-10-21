@@ -1,3 +1,4 @@
+import { assertTrainingScaleCollectionAllowed } from '../modules/scale/scale-collection-guard'
 import { serveProjectedReportImage } from '../modules/reporting/report-image-delivery'
 import { loadQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import { loadScaleAnswers } from '../modules/scale/scale-workflow.service'
@@ -614,6 +615,7 @@ export const publicQuestionnaireController = {
             if (snapshot.schemaVersion === 2) assertScaleContextCollectable({ policy: snapshot.compiledPolicy.applicability, scalePosition: qs.position, sections: frozenFormSections })
             return { qs, snapshot }
           }))
+          await assertTrainingScaleCollectionAllowed(tx,startContent.questionnaireScales.map((entry:any)=>entry.scaleId))
           await tx.assessment.createMany({
             data: (await Promise.all(scaleRuntimeSnapshots.map(async ({ qs, snapshot }) => ({
               scaleId: qs.scaleId,

@@ -1,13 +1,13 @@
 import api from './client'
 
-export type ContentCapability = 'reference.analyze' | 'reference.review' | 'reference.publish' | 'report.edit' | 'report.publish' | 'data.reinterpret' | 'measurement.publish'
+export type ContentCapability = 'reference.analyze' | 'reference.review' | 'reference.publish' | 'report.edit' | 'report.publish' | 'data.reinterpret' | 'measurement.publish' | 'catalog.manage' | 'material.distribute'
 export type AdminContentGrant = {
   subjectId: string
   scope: {
     product: 'SURVEY' | 'TRAINING'
     scopeKind: 'PROJECT' | 'COURSE' | 'PLATFORM'
     scopeId: string
-    resourceKind: 'reference' | 'data' | 'report' | 'measurement'
+    resourceKind: 'reference' | 'data' | 'report' | 'measurement' | 'catalog' | 'material'
     resourceKeys: string[]
   }
   capabilities: ContentCapability[]

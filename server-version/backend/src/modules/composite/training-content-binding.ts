@@ -1,3 +1,4 @@
+import {readLibraryScaleMeasurementSource} from '../scale-library-governance/training-source'
 import {trainingReferencePolicySchema} from './training-reference-selection'
 import {readStaticSjtMeasurementForStart,recheckStaticSjtConsumerLicense} from '../situational/static-measurement-release'
 import { validateTrainingReportPointer } from './training-report-selection'
@@ -18,7 +19,8 @@ import { situationalReleaseKey, type ResolvedSituationalRelease } from '../situa
 
 const text=z.string().min(1).max(240),digest=z.string().regex(/^[a-f0-9]{64}$/)
 const sourceSchema=z.object({kind:z.enum(['SCALE','COGNITIVE_CONFIG','SJT_AUTHOR_RELEASE','STATIC_SJT_REGISTRY']),id:text,ownerId:text.optional(),
-  assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+  libraryEntryId:z.string().uuid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+ if(source.libraryEntryId&&source.kind!=='SCALE')ctx.addIssue({code:'custom',message:'Library identity is only valid for Scale'})
  if(source.kind==='STATIC_SJT_REGISTRY'?(!z.string().uuid().safeParse(source.id).success||source.ownerId!==undefined||!source.instrumentKey||!source.instrumentVersion||source.assignmentId!==undefined):!source.ownerId)
   ctx.addIssue({code:'custom',message:'Exact source identity required'})
 })
@@ -28,13 +30,13 @@ export const trainingContentSnapshotSchema=z.object({schemaVersion:z.literal(1),
 export type TrainingContentSnapshot=z.infer<typeof trainingContentSnapshotSchema>
 type Unit=TrainingContentSnapshot['units'][number]
 type Stored=NonNullable<Awaited<ReturnType<typeof getContentRelease>>>
-type SourceRow={kind:Unit['source']['kind'];id:string;assignment_id:string|null;owner_id:string|null;measurement_release_id:string|null;instrument_key:string|null;instrument_version:string|null}
+type SourceRow={library_entry_id?:string|null;kind:Unit['source']['kind'];id:string;assignment_id:string|null;owner_id:string|null;measurement_release_id:string|null;instrument_key:string|null;instrument_version:string|null}
 class TrainingContentError extends ContentReleaseError { readonly statusCode=409 }
 function fail(code:string):never { throw new TrainingContentError('CONTENT_TRAINING_'+code) }
 
 /** Only server-loaded composite items are accepted. Caller must complete existing
  * source access/license/material gates before calling. Existing material grants
- * authorize attachment; their revocation does not invalidate an attached draft. */
+ * authorize attachment; library grants are revalidated by the publishing caller. */
 export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient,composite:{id:string;items:any[]},
   resolvedSituational:Map<string,ResolvedSituationalRelease>,purpose:'NEW_ADMINISTRATION'|'HISTORICAL_INTERPRETATION'='NEW_ADMINISTRATION'){
   if(!composite.id||!Array.isArray(composite.items)||composite.items.length>1000)fail('SNAPSHOT_INVALID')
@@ -57,7 +59,7 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
   // One bounded source-pointer query. CTEs lock the actual source rows before
   // release locks; no client pointer or default registry selection is consulted.
   const rows=items.length?await db.$queryRaw<SourceRow[]>(Prisma.sql`
-    WITH scale_sources AS (SELECT id,creator_id,measurement_release_id FROM scales
+    WITH scale_sources AS (SELECT id,creator_id,measurement_release_id,library_entry_id FROM scales
       WHERE id IN (${Prisma.join(scaleIds.length?scaleIds:[''])}) ORDER BY id FOR SHARE),
     cognitive_sources AS (SELECT c.id,a.id AS assignment_id,a.created_by,
         COALESCE(a.measurement_release_id,c.measurement_release_id) AS measurement_release_id
@@ -67,9 +69,9 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
     sjt_sources AS (SELECT id,author_id,measurement_release_id,instrument_key,instrument_version FROM sjt_author_releases
       WHERE ${authorSjt.length?Prisma.join(authorSjt.map(identity=>Prisma.sql`(instrument_key=${identity.instrumentKey} AND instrument_version=${identity.instrumentVersion})`),' OR '):Prisma.sql`FALSE`}
       ORDER BY id FOR SHARE)
-    SELECT 'SCALE' AS kind,id,creator_id AS owner_id,measurement_release_id,NULL::text AS instrument_key,NULL::text AS instrument_version,NULL::text AS assignment_id FROM scale_sources
-    UNION ALL SELECT 'COGNITIVE_CONFIG',id,created_by,measurement_release_id,NULL::text,NULL::text,assignment_id FROM cognitive_sources
-    UNION ALL SELECT 'SJT_AUTHOR_RELEASE',id,author_id,measurement_release_id,instrument_key,instrument_version,NULL::text FROM sjt_sources`):[]
+    SELECT 'SCALE' AS kind,id,creator_id AS owner_id,measurement_release_id,NULL::text AS instrument_key,NULL::text AS instrument_version,NULL::text AS assignment_id,library_entry_id FROM scale_sources
+    UNION ALL SELECT 'COGNITIVE_CONFIG',id,created_by,measurement_release_id,NULL::text,NULL::text,assignment_id,NULL::text FROM cognitive_sources
+    UNION ALL SELECT 'SJT_AUTHOR_RELEASE',id,author_id,measurement_release_id,instrument_key,instrument_version,NULL::text,NULL::text FROM sjt_sources`):[]
   const bySource=new Map(rows.map(row=>[`${row.kind}:${row.id}${row.kind==='COGNITIVE_CONFIG'?':'+row.assignment_id:''}`,row]))
   const bySjt=new Map(rows.filter(row=>row.kind==='SJT_AUTHOR_RELEASE').map(row=>[situationalReleaseKey({instrumentKey:row.instrument_key!,instrumentVersion:row.instrument_version!}),row]))
   const releases=new Map<string,Stored>()
@@ -93,11 +95,13 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
     if(item.type==='COGNITIVE'&&row.owner_id!==item.cognitiveAssignment.createdBy)fail('SOURCE_MISMATCH')
     const release=await read(row.measurement_release_id)
     if(release.layer!=='MEASUREMENT'||release.status==='REVOKED'||purpose==='NEW_ADMINISTRATION'&&release.status!=='PUBLISHED')fail('RELEASE_NOT_PUBLISHED')
-    const source:Unit['source']={kind:row.kind,id:row.id,...(row.kind==='STATIC_SJT_REGISTRY'?{}:{ownerId:row.owner_id??item.cognitiveAssignment?.createdBy}),
+    const source:Unit['source']={kind:row.kind,id:row.id,...(row.library_entry_id?{libraryEntryId:row.library_entry_id}:{}),...(row.kind==='STATIC_SJT_REGISTRY'?{}:{ownerId:row.owner_id??item.cognitiveAssignment?.createdBy}),
       ...(item.type==='COGNITIVE'?{assignmentId:item.cognitiveAssignment.id}:{}),
       ...(identity?{instrumentKey:identity.instrumentKey,instrumentVersion:identity.instrumentVersion}:{})}
-    assertScope(release,source)
-    const expected=projectActualMeasurement(item,release,resolvedSituational)
+    const library=source.libraryEntryId?await readExactLibrarySource(db,release,source,'NEW_USE'):null
+    if(!library)assertScope(release,source)
+    if(library&&canonicalHash(item.scale.definition)!==canonicalHash(library.definition))fail('SOURCE_MISMATCH')
+    const expected=projectActualMeasurement(item,release,resolvedSituational,Boolean(library))
     const projected=prepareRelease(expected)
     if(release.family!==expected.family||projected.contentHash!==release.contentHash
       ||canonicalHash(expected.content)!==canonicalHash(release.content))fail('SOURCE_MISMATCH')
@@ -107,12 +111,12 @@ export async function prepareTrainingContentSnapshot(db:Prisma.TransactionClient
   const snapshot=trainingContentSnapshotSchema.parse({schemaVersion:1,compositeId:composite.id,units})
   return {snapshot,snapshotHash:canonicalHash(snapshot),releases,recheckSourceLicenses:async()=>{for(const receipt of staticSjt.values())await recheckStaticSjtConsumerLicense(db,receipt)}}
 }
-function projectActualMeasurement(item:any,release:Stored,resolvedSituational:Map<string,ResolvedSituationalRelease>):ReleaseInput{
+function projectActualMeasurement(item:any,release:Stored,resolvedSituational:Map<string,ResolvedSituationalRelease>,library=false):ReleaseInput{
   let expected:ReleaseInput
     try{
       if(item.type==='SCALE')expected=scaleMeasurementRelease({localId:item.scale.code,version:release.version,
         instrumentVersion:item.scale.instrumentVersion,definition:frozenDatabaseScaleDefinition(item.scale),
-        instrumentClass:item.scale.instrumentClass,scope:release.scope})
+        instrumentClass:item.scale.instrumentClass,scope:release.scope,...(library?{presentationMode:libraryPresentationMode(release)}:{})})
       else if(item.type==='COGNITIVE'){
         const assignment=item.cognitiveAssignment,config=assignment.config
         const entry=requireCognitiveRegistryEntry(config.testType,config.engineVersion,config.scoringVersion)
@@ -134,6 +138,7 @@ function projectActualMeasurement(item:any,release:Stored,resolvedSituational:Ma
   return expected
 }
 export function trainingMeasurementSourceScopeMatches(release:Stored,source:Unit['source']){
+ if(source.libraryEntryId)return false // Requires the database-backed exact adapter below.
  const scope=release.scope
  if(release.provenance?.sourceKind==='STATIC_SJT_REGISTRY'&&source.kind!=='STATIC_SJT_REGISTRY')return false
  if(source.kind==='STATIC_SJT_REGISTRY')return release.layer==='MEASUREMENT'&&release.family==='SJT'&&scope.kind==='PLATFORM'&&scope.ownerId===undefined&&source.ownerId===undefined
@@ -143,6 +148,29 @@ export function trainingMeasurementSourceScopeMatches(release:Stored,source:Unit
  if(scope.kind==='SHARED'||!source.ownerId)return false
  const resourceId=source.kind==='COGNITIVE_CONFIG'?source.assignmentId:source.id
  return scope.kind!=='PRIVATE'||scope.product==='TRAINING'&&scope.ownerId===source.ownerId&&scope.resourceId===resourceId
+}
+function libraryPresentationMode(release:Stored):'ALL_AT_ONCE'|'ONE_BY_ONE'|'RUNNER_DEFAULT'{
+ if(release.layer!=='MEASUREMENT')fail('SOURCE_MISMATCH')
+ const mode=release.content.executable.presentationMode
+ if(mode!=='ALL_AT_ONCE'&&mode!=='ONE_BY_ONE'&&mode!=='RUNNER_DEFAULT')fail('SOURCE_MISMATCH')
+ return mode
+}
+async function readExactLibrarySource(db:Prisma.TransactionClient,release:Stored,source:Unit['source'],purpose:'NEW_USE'|'FROZEN_IDENTITY'){
+ if(source.kind!=='SCALE'||!source.libraryEntryId)fail('SCOPE_DENIED')
+ const scale=await db.scale.findUnique({where:{id:source.id}})
+ if(!scale||scale.libraryEntryId!==source.libraryEntryId||scale.creatorId!==source.ownerId)fail('SCOPE_DENIED')
+ const exact=await readLibraryScaleMeasurementSource(db,scale,purpose)
+ if(exact.release.releaseId!==release.releaseId||exact.release.contentHash!==release.contentHash
+   ||canonicalHash(exact.release.scope)!==canonicalHash(release.scope))fail('SOURCE_MISMATCH')
+ return exact
+}
+/** Frozen consumers validate the real platform wrapper, never a client-provided
+ * entry marker or a widened PRIVATE scope. Their existing lifecycle/stop policy
+ * remains at each collection or historical-report boundary. */
+export async function trainingMeasurementSourceScopeMatchesForConsumer(db:Prisma.TransactionClient,release:Stored,source:Unit['source']){
+ if(!source.libraryEntryId)return trainingMeasurementSourceScopeMatches(release,source)
+ await readExactLibrarySource(db,release,source,'FROZEN_IDENTITY')
+ return true
 }
 function assertScope(release:Stored,source:Unit['source']){
  if(!trainingMeasurementSourceScopeMatches(release,source))fail('SCOPE_DENIED')
@@ -180,8 +208,10 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
     if(!release){const loaded=await getContentRelease(db,unit.measurement.releaseId,true);if(!loaded)fail('RELEASE_REQUIRED');release=loaded;releases.set(release.releaseId,release)}
     if(release.layer!=='MEASUREMENT'||release.family!==unit.family||release.status==='REVOKED'
       ||release.contentHash!==unit.measurement.contentHash||release.content.measurementHash!==unit.measurement.measurementHash)fail('BINDING_INVALID')
-    assertScope(release,unit.source)
-    const expected=projectActualMeasurement(item,release,input.resolvedSituational)
+    const library=unit.source.libraryEntryId?await readExactLibrarySource(db,release,unit.source,'FROZEN_IDENTITY'):null
+    if(!library)assertScope(release,unit.source)
+    if(library&&canonicalHash(item.scale.definition)!==canonicalHash(library.definition))fail('SOURCE_MISMATCH')
+    const expected=projectActualMeasurement(item,release,input.resolvedSituational,Boolean(library))
     if(expected.family!==unit.family||prepareRelease(expected).contentHash!==unit.measurement.contentHash
       ||canonicalHash(expected.content)!==canonicalHash(release.content))fail('SOURCE_MISMATCH')
   }

@@ -1,3 +1,4 @@
+import {assertLibraryUseGrantCurrent} from '../scale-library-governance/usage'
 import {randomUUID} from 'node:crypto'
 import {Prisma} from '@prisma/client'
 import {prisma} from '../../config/database'
@@ -30,6 +31,10 @@ async function target(tx:Tx,id:string){
 export async function grantCatalogSource(actorUserId:string,userId:string,ref:CatalogSourceRef){
   return prisma.$transaction(async tx=>{
     await assertEntryAdmin(tx,actorUserId,'SURVEY');await target(tx,userId)
+    if(ref.kind==='SCALE'){
+      const [source]=await tx.$queryRaw<Array<{instrument_class:string}>>`SELECT instrument_class::text FROM scales WHERE id=${ref.sourceId} FOR SHARE`
+      if(source?.instrument_class==='CUSTOM_DESCRIPTIVE')fail(403,'自编量表新分配必须通过已批准的共用库精确版本；旧授权不能扩大')
+    }
     const snapshot=await getCatalogSourceSnapshot({actorUserId,ref},tx)
     const snapshotDigest=canonicalHash(snapshot)
     const rows=await tx.$queryRaw<Grant[]>`INSERT INTO survey_tool_grants
@@ -67,7 +72,7 @@ export async function catalogSnapshotsForDrafts(tx:Tx,userId:string,ids:readonly
   if(!ids.length)return new Map<string,CatalogSnapshot>()
   const rows=await tx.$queryRaw<Grant[]>`SELECT id,created_by AS "createdBy",user_id AS "userId",status,snapshot,snapshot_digest AS "snapshotDigest",
     created_at AS "createdAt",revoked_at AS "revokedAt" FROM survey_tool_grants
-    WHERE id IN (${Prisma.join([...new Set(ids)])}) AND user_id=${userId} ORDER BY id FOR SHARE`
+    WHERE id IN (${Prisma.join([...new Set(ids)])}) AND user_id=${userId} ORDER BY id`
   const map=new Map<string,CatalogSnapshot>()
   for(const row of rows){
     if(active&&row.status!=='ACTIVE')fail(409,'工具复用授权已撤销，不能继续导入或冻结新的研究版本')
@@ -75,7 +80,22 @@ export async function catalogSnapshotsForDrafts(tx:Tx,userId:string,ids:readonly
     map.set(row.id,row.snapshot)
   }
   if(map.size!==new Set(ids).size)fail(403,'工具来源不属于当前研究者授权')
-  if(active)await assertCatalogSourcesCurrent(rows.map(r=>({snapshot:r.snapshot,actorUserId:r.createdBy})),tx)
+  if(active){
+    for(const row of rows){const entryId=row.snapshot.provenance.libraryEntryId
+      if(typeof entryId==='string')await assertLibraryUseGrantCurrent(tx,{entryId,userId,product:'SURVEY'})
+    }
+    await assertCatalogSourcesCurrent(rows.filter(r=>typeof r.snapshot.provenance.libraryEntryId!=='string').map(r=>({snapshot:r.snapshot,actorUserId:r.createdBy})),tx)
+  }
+  // Match governance revocation's use-grant -> tool-grant lock order. Reading
+  // the immutable identity first must not hold tool SHARE while waiting for use.
+  const locked=await tx.$queryRaw<Grant[]>`SELECT id,status,snapshot,snapshot_digest AS "snapshotDigest" FROM survey_tool_grants
+    WHERE id IN (${Prisma.join([...new Set(ids)])}) AND user_id=${userId} ORDER BY id FOR SHARE`
+  if(locked.length!==rows.length)fail(403,'工具来源授权已变化')
+  for(const row of locked){
+    const original=rows.find(r=>r.id===row.id)
+    if(!original||row.snapshotDigest!==original.snapshotDigest||canonicalHash(row.snapshot)!==row.snapshotDigest
+      ||active&&row.status!=='ACTIVE')fail(409,'工具来源授权已变化，请重新载入')
+  }
   return map
 }
 export function compileCatalogUnit(draft:{id:string;instrumentKey:string;kind:string;title:string;revision:number;definition:unknown},snapshot:CatalogSnapshot):ResearchFrozenUnit{

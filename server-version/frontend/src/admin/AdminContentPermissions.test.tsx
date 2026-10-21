@@ -222,3 +222,27 @@ it('blocks restoration of a stored grant with a wider unsupported scientific sco
  sessionStorage.setItem('admin-content-pending:'+id(9),JSON.stringify({actorId:id(9),request:{requestId:id(5),expectedVersion:0,reason:'invalid',grant:{...revokeMetadata(),scope:{product:'TRAINING',scopeKind:'PLATFORM',scopeId:'reference-governance',resourceKind:'reference',resourceKeys:[id(3)]},capabilities:['reference.analyze']}}}))
  render(<AdminContentPermissions actorId={id(9)}/>);expect(screen.getByRole('button',{name:'确认签发内容授权'})).toBeDisabled();expect(mocks.post).not.toHaveBeenCalled()
 })
+
+describe('exact scale library authority',()=>{
+ it.each([
+  ['TRAINING','library-review','catalog','catalog.manage','目标审核账号 UUID'],
+  ['SURVEY','library-distribute','material','material.distribute','目标入口管理员 UUID'],
+ ])('issues %s %s only in the fixed platform scope',async(product,purpose,resourceKind,capability,subjectLabel)=>{
+  render(<AdminContentPermissions actorId={id(9)}/>)
+  fireEvent.change(screen.getByLabelText('产品授权范围'),{target:{value:product}})
+  fireEvent.change(screen.getByLabelText(product==='TRAINING'?'Training 授权用途':'Survey 授权用途'),{target:{value:purpose}})
+  for(const [label,value] of [[subjectLabel,id(1)],['精确资源 UUID（逗号或换行分隔）',id(3)],['生效时间（本地时间）','2098-10-20T06:00'],['到期时间（本地时间）','2098-10-21T06:00'],['内容授权原因','明确版本范围']])fireEvent.change(screen.getByLabelText(label),{target:{value}})
+  expect(screen.queryByLabelText('项目 UUID')).not.toBeInTheDocument()
+  expect(screen.queryByLabelText('课程 UUID')).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button',{name:'确认签发内容授权'}))
+  await waitFor(()=>expect(mocks.post).toHaveBeenCalledTimes(1))
+  expect(mocks.post.mock.calls[0][1].grant).toMatchObject({scope:{product,scopeKind:'PLATFORM',scopeId:'scale-library-governance',resourceKind,resourceKeys:[id(3)]},capabilities:[capability],delegableCapabilities:[],remainingDelegationDepth:0})
+ })
+ it('restores a pending library review request using its original exact grant',async()=>{
+  const request={requestId:id(8),expectedVersion:0,reason:'精确审核',grant:{subjectId:id(1),scope:{product:'TRAINING',scopeKind:'PLATFORM',scopeId:'scale-library-governance',resourceKind:'catalog',resourceKeys:[id(3)]},capabilities:['catalog.manage'],delegableCapabilities:[],remainingDelegationDepth:0,validFrom:'2098-10-20T06:00:00Z',expiresAt:'2098-10-21T06:00:00Z'}}
+  sessionStorage.setItem('admin-content-pending:'+id(9),JSON.stringify({actorId:id(9),request,hadUnknownOutcome:true}))
+  render(<AdminContentPermissions actorId={id(9)}/>)
+  fireEvent.click(screen.getByRole('button',{name:'重试同一签发请求'}))
+  await waitFor(()=>expect(mocks.post).toHaveBeenCalledWith('/admin/permissions/content-grants',request))
+ })
+})

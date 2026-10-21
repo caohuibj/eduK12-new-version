@@ -77,7 +77,7 @@ describe('Training scale authoring additions', () => {
     await user.upload(screen.getByLabelText('上传反馈图片'), new File(['png'], 'feedback.png', { type: 'image/png' }))
     await waitFor(() => expect(api.upload).toHaveBeenCalled())
     expect(screen.getByRole('button', { name: '保存报告定义' })).toBeDisabled()
-    expect(screen.getByRole('button', { name: '发布描述性量表' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: '发布自用（描述性量表）' })).toBeDisabled()
     finish({ data: { code: 0, data: { assetId: 'asset-1', contentHash: 'a'.repeat(64), mimeType: 'image/png' } } })
     await waitFor(() => expect(screen.getByRole('button', { name: '保存报告定义' })).toBeEnabled())
     await user.click(screen.getByRole('button', { name: '保存报告定义' }))

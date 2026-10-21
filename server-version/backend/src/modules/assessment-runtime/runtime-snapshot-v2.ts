@@ -1,3 +1,4 @@
+import { frozenScalePresentationSchema, type FrozenScalePresentation } from '../scale/scale-presentation'
 import { z } from 'zod'
 import { createHash } from 'node:crypto'
 import { canonicalHash, canonicalHashObjectParts, retainImmutableCanonicalValue } from './canonical'
@@ -26,6 +27,7 @@ export interface FrozenScaleRuntimeSnapshotV2 {
   definition: ScaleDefinitionV2
   compiledPolicy: CompiledScalePolicyV1
   runtimePolicyHash: string
+  measurementPresentation?: FrozenScalePresentation
   snapshotHash: string
 }
 
@@ -40,6 +42,7 @@ export interface FrozenScaleRuntimeSnapshotV1Like {
   compiledRuntime: CompiledInstrumentRuntimeV1
   referenceBindings: ReferenceBindingSnapshot[]
   definition: ScaleDefinitionV2
+  measurementPresentation?: FrozenScalePresentation
   snapshotHash: string
 }
 
@@ -53,6 +56,7 @@ const referenceBindingSchema = z.object({
 }).strict()
 
 const frozenScaleRuntimeSnapshotV2Schema = z.object({
+  measurementPresentation: frozenScalePresentationSchema.optional(),
   schemaVersion: z.literal(2),
   runtimeGeneration: z.literal('UNIFIED_V1'),
   frozenAt: z.string().datetime({ offset: true }),
@@ -105,6 +109,7 @@ const unsignedV2 = (input: Omit<FrozenScaleRuntimeSnapshotV2, 'snapshotHash'>) =
   compiledRuntime: input.compiledRuntime,
   referenceBindings: input.referenceBindings,
   definition: input.definition,
+  ...(input.measurementPresentation ? { measurementPresentation: input.measurementPresentation } : {}),
   compiledPolicy: input.compiledPolicy,
   runtimePolicyHash: input.runtimePolicyHash,
 })
@@ -220,6 +225,7 @@ export const createFrozenScaleRuntimeSnapshotV2FromV1 = (
     compiledRuntime: v1.compiledRuntime,
     referenceBindings: v1.referenceBindings,
     definition: v1.definition,
+    ...(v1.measurementPresentation ? { measurementPresentation: v1.measurementPresentation } : {}),
     compiledPolicy,
     runtimePolicyHash: compiledPolicy.runtimePolicyHash,
   }

@@ -1,3 +1,4 @@
+import { frozenScalePresentationSchema, freezeLibraryScalePresentation, type FrozenScalePresentation } from '../scale/scale-presentation'
 import { assertAssessmentStartResources } from '../../services/assessmentResourceProtection'
 import { hashScaleDefinition, scaleDefinitionSchema, type ScaleDefinitionV2 } from '../scale/scale-definition'
 import { assertAssessmentOperationallyActive } from '../assessment-governance/operational-hold'
@@ -26,6 +27,7 @@ export interface FrozenScaleRuntimeSnapshotV1 {
   compiledRuntime: CompiledInstrumentRuntimeV1
   referenceBindings: ReferenceBindingSnapshot[]
   definition: ScaleDefinitionV2
+  measurementPresentation?: FrozenScalePresentation
   snapshotHash: string
 }
 
@@ -42,6 +44,7 @@ const unsignedSnapshot = (input: Omit<FrozenScaleRuntimeSnapshotV1, 'snapshotHas
   compiledRuntime: input.compiledRuntime,
   referenceBindings: input.referenceBindings,
   definition: input.definition,
+  ...(input.measurementPresentation ? { measurementPresentation: input.measurementPresentation } : {}),
 })
 
 const referenceBindingSchema = z.object({
@@ -54,6 +57,7 @@ const referenceBindingSchema = z.object({
 }).strict()
 
 const frozenScaleRuntimeSnapshotSchema = z.object({
+  measurementPresentation: frozenScalePresentationSchema.optional(),
   schemaVersion: z.literal(1),
   runtimeGeneration: z.literal('UNIFIED_V1'),
   frozenAt: z.string().datetime({ offset: true }),
@@ -240,10 +244,15 @@ export const freezeScaleRuntimeAtAttemptStart = async (
   if (!scaleModel || typeof scaleModel.findUnique !== 'function') return v1
   const scale = await scaleModel.findUnique({
     where: { code: input.instrumentKey },
-    select: { id: true, code: true, instrumentVersion: true, instrumentClass: true, status: true },
+    select: { id: true, code: true, instrumentVersion: true, instrumentClass: true, status: true, libraryEntryId: true, measurementReleaseId: true },
   })
   if (!scale) throw new Error('Scale new start denied: DEPLOYMENT_SCALE_MISSING')
   if (scale.instrumentVersion !== input.instrumentVersion) throw new Error('Scale new start denied: DEPLOYMENT_VERSION_CONFLICT')
+
+  if (scale.libraryEntryId) {
+    v1.measurementPresentation = await freezeLibraryScalePresentation(db as any, scale, input.definition)
+    v1.snapshotHash = hashFrozenScaleRuntimeSnapshot(v1)
+  }
 
   const { resolveScaleStartDeployment } = await import('../scale/deployment/service')
   const resolution = await resolveScaleStartDeployment({ db: db as any, scale, requestedMode: input.requestedMode })
@@ -313,6 +322,7 @@ export const parseFrozenScaleRuntimeSnapshot = (value: unknown): FrozenScaleRunt
     legacyDefinitionHash: snapshot.legacyDefinitionHash,
     compiledRuntime,
     referenceBindings: snapshot.referenceBindings,
+    measurementPresentation: snapshot.measurementPresentation,
     definition,
   })
   if (canonicalHashObjectParts(unsigned) !== snapshot.snapshotHash) throw new Error('Frozen Scale runtime snapshot hash mismatch')

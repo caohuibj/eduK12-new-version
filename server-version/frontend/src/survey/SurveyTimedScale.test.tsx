@@ -21,6 +21,27 @@ function Harness(){
   </>
 }
 describe('Survey Scale participant one-by-one delivery',()=>{
+  it('gates current image answers and forward navigation without deleting restored answers',()=>{
+    const props={unit,answer:{first:'o2'},tracker:new SurveyScaleTimingTracker(),index:0,
+      onIndexChange:vi.fn(),onAnswer:vi.fn(),onTiming:vi.fn()}
+    const {rerender}=render(<SurveyTimedScale {...props} imagesReady={false}/>)
+    expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
+    expect(screen.getByRole('radio',{name:'同意'})).toBeDisabled()
+    expect(screen.getByRole('button',{name:'下一题'})).toBeDisabled()
+    rerender(<SurveyTimedScale {...props} imagesReady/>)
+    expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
+    expect(screen.getByRole('radio',{name:'同意'})).toBeEnabled()
+    expect(screen.getByRole('button',{name:'下一题'})).toBeEnabled()
+  })
+  it('uses per-item source response options rather than the compatibility union and renders authorized media',()=>{
+    render(<SurveyTimedScale unit={{...unit,items:[{itemKey:'source',prompt:'Source item',required:false,
+      responseOptions:[{optionKey:'typed_number',label:'Source numeric'},{optionKey:'typed_string',label:'Source string'}]}]}}
+      answer={{}} tracker={new SurveyScaleTimingTracker()} index={0} onIndexChange={()=>{}}
+      onAnswer={()=>{}} onTiming={()=>{}} renderMedia={key=><p>Frozen media {key}</p>}/>)
+    expect(screen.getByRole('radio',{name:'Source numeric'})).toBeInTheDocument()
+    expect(screen.queryByRole('radio',{name:'同意'})).toBeNull()
+    expect(screen.getByText('Frozen media source')).toBeInTheDocument()
+  })
   it('handles an item key that matches a built-in Object property',()=>{
     const answer=vi.fn()
     const tracker=new SurveyScaleTimingTracker()

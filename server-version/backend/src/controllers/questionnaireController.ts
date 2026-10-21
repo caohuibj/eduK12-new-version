@@ -1,3 +1,5 @@
+import { assertScalePublicationRights } from '../modules/scale/scale-publication-guard'
+import { assertTrainingScaleCollectionAllowed } from '../modules/scale/scale-collection-guard'
 import { serveProjectedReportImage } from '../modules/reporting/report-image-delivery'
 import { loadQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import { assertScaleContextCollectable } from '../modules/scale/policy/context-preflight'
@@ -554,9 +556,9 @@ export const questionnaireController = {
       const contextIssues = validateContextFormItems(contextItems, measurementPositions)
       if (contextIssues.length > 0) return error(res, contextIssues[0].message)
 
-      const updated = await prisma.questionnaire.update({
-        where: { id },
-        data: { status: 'PUBLISHED' },
+      const updated = await prisma.$transaction(async tx=>{
+        await assertScalePublicationRights(tx,req.user!.userId,req.user!.role,questionnaire.questionnaireScales.map(entry=>entry.scaleId))
+        return tx.questionnaire.update({where:{id,status:'DRAFT'},data:{status:'PUBLISHED'}})
       })
       await cacheService.clearQuestionnaireCache(id)
 
@@ -2439,6 +2441,7 @@ export const questionnaireController = {
           if (snapshot.schemaVersion === 2) assertScaleContextCollectable({ policy: snapshot.compiledPolicy.applicability, scalePosition: qs.position, sections: frozenFormSections })
           return { qs, snapshot }
         }))
+        await assertTrainingScaleCollectionAllowed(tx,questionnaire.questionnaireScales.map((entry:any)=>entry.scaleId))
         await tx.assessment.createMany({
           data: (await Promise.all(scaleRuntimeSnapshots.map(async ({ qs, snapshot }) => ({
             scaleId: qs.scaleId,

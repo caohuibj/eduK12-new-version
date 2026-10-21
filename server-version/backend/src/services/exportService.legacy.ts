@@ -171,12 +171,14 @@ export async function getScaleExportData(
   // score keys. Export never re-runs reverse scoring or another scorer.
   const scale = await prisma.scale.findUnique({
     where: { id: scaleId },
-    select: { id: true, name: true, definition: true },
+    select: { id: true, name: true, definition: true, libraryEntryId: true },
   })
 
   if (!scale) {
     throw new Error('量表不存在')
   }
+  // A platform wrapper's creator is provenance, never authority over participant data.
+  if (scale.libraryEntryId) throw Object.assign(new Error('共用量表数据必须通过获授权的任务报告访问'), { statusCode: 403 })
 
   const definition = scale.definition && typeof scale.definition === 'object'
     ? scale.definition as {

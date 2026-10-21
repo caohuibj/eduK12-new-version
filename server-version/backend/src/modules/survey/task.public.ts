@@ -1,13 +1,14 @@
+import {readSurveyScalePresentation,scalePresentationOptions} from './catalog-scale.presentation'
 import { readSurveyCognitiveProgressFromVerifiedAttempt } from './cognitive.service'
 import { surveySjtScenes } from './sjt-structure'
 import { parseFrozenSurveyCognitive } from './cognitive.definition'
-import { assertSurveyDraft, type FormDraft, type ScaleDraft, type AnySjtDraft } from './builder.definition'
+import { assertSurveyDraft, type FormDraft, type AnySjtDraft } from './builder.definition'
 import { verifiedSurveyAttempt } from './admission.service'
 import { prisma } from '../../config/database'
 import { ensureSurveyFlowAssignment,assignedSurveySnapshot } from './flow.assignment'
 import { buildSurveyFlowPublicProjection } from './flow.runtime'
 import { SurveyWaveError } from './waves.service'
-type SurveyFrozenImage=NonNullable<FormDraft['pages'][number]['questions'][number]['image']>
+type SurveyFrozenImage=Pick<NonNullable<FormDraft['pages'][number]['questions'][number]['image']>,'asset'|'altText'|'caption'>
 export function projectPublicSurveyImage(image:SurveyFrozenImage|undefined){
   if(!image)return undefined
   return {asset:{assetId:image.asset.assetId,contentHash:image.asset.contentHash,
@@ -59,11 +60,14 @@ export async function getOwnResearchTask(input:{
           }))}))}
     }
     if(unit.kind==='SCALE'){
-      const d=assertSurveyDraft('SCALE',unit.displayDefinition,true) as ScaleDraft
+      const d=readSurveyScalePresentation(unit.displayDefinition)
       return {kind:'SCALE',instrumentKey:unit.instrumentKey,title:unit.title,
         presentationMode:d.presentationMode??'ALL_AT_ONCE',
         responseOptions:d.responseOptions.map(o=>({optionKey:o.optionKey,label:o.label})),
-        items:d.items.map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required}))}
+        items:d.items.map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required,
+          responseOptions:scalePresentationOptions(d,q).map(o=>({optionKey:o.optionKey,label:o.label})),
+          ...('images' in q&&q.images?{images:[...q.images].sort((a,b)=>a.order-b.order).map(image=>projectPublicSurveyImage(image))}:{}),
+          ...('video' in q&&q.video?{video:q.video}:{})}))}
     }
     if(unit.kind==='COGNITIVE'){
       const frozen=parseFrozenSurveyCognitive(unit.compiledDefinition)

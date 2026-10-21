@@ -1,3 +1,8 @@
+import { ScaleLibraryError } from '../modules/scale-library-governance/contracts'
+import {canReadLibraryScale} from '../modules/scale-library-governance/readers'
+import { setScalePublicDelivery } from '../modules/scale/scale-public-delivery'
+import { assertTrainingScaleCollectionAllowed } from '../modules/scale/scale-collection-guard'
+import { randomUUID } from 'node:crypto'
 import { assertScaleReportImagesOwned } from '../modules/scale/scale-image-retention'
 import { previewScaleRawScoreFeedback } from '../modules/scale/raw-score-feedback-preview'
 import { assertTrainingChildSelected, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../modules/composite/training-variant-child-scope'
@@ -183,7 +188,9 @@ export const scaleController = {
       ])
 
       const withSource = scales.map((scale) => {
-        const { copySource, ...metadata } = scale
+        const { copySource, ...allMetadata } = scale
+        const {courseScales:_courses,_count:_counts,...libraryMetadata}=allMetadata
+        const metadata=scale.libraryEntryId?libraryMetadata:allMetadata
         return {
           ...metadata,
           ...(scale.creatorId === userId || userRole === UserRole.ADMIN ? { copySource } : {}),
@@ -212,6 +219,7 @@ export const scaleController = {
       }
 
       const { code, name, description, visibility, estimatedTime, instruction, tags } = result.data
+      if (visibility === 'PUBLIC') return forbidden(res, '全平台公开须由独立的平台投放授权设置，作者只能选择私有或课程')
       const definition = createCustomScaleDefinition()
       const summary = definitionSummary(definition)
 
@@ -232,6 +240,7 @@ export const scaleController = {
           visibility: visibility || 'HIDDEN',
           instrumentClass: 'CUSTOM_DESCRIPTIVE',
           instrumentVersion: '2.0.0',
+          authoringFamilyId: randomUUID(), authoringVersion: 1,
           definition: definition as any,
           definitionHash: hashScaleDefinition(definition),
           ...summary,
@@ -281,6 +290,37 @@ export const scaleController = {
     }
   },
 
+  async versions(req: Request,res: Response){
+    try {
+      const source=await prisma.scale.findUnique({where:{id:req.params.id}})
+      if(!source||source.creatorId!==req.user?.userId)return notFound(res,'量表不存在')
+      const family=source.authoringFamilyId??source.id
+      const list=await prisma.scale.findMany({where:{creatorId:source.creatorId,OR:[{authoringFamilyId:family},{id:source.id}]},
+        orderBy:[{authoringVersion:'desc'},{createdAt:'desc'}],select:{id:true,name:true,status:true,instrumentVersion:true,
+          authoringFamilyId:true,authoringVersion:true,sourceScaleId:true,measurementReleaseId:true,createdAt:true}})
+      return success(res,{list})
+    }catch{return error(res,'无法读取版本谱系')}
+  },
+
+  async publicDelivery(req: Request,res: Response){
+    try {
+      if(!req.user?.userId)return forbidden(res,'未登录')
+      const input=z.object({grantId:z.string().uuid(),enabled:z.boolean()}).strict().parse(req.body)
+      return success(res,await setScalePublicDelivery(req.user.userId,req.params.id,input.grantId,input.enabled))
+    } catch(cause){return error(res,cause instanceof Error?cause.message:'平台投放权限不足',-1,403)}
+  },
+
+  async revise(req: Request, res: Response) {
+    try {
+      if (!req.user?.userId) return forbidden(res, '未登录')
+      if (!z.object({}).strict().safeParse(req.body || {}).success) return error(res, '修订请求不能覆盖来源或定义')
+      return success(res, await copyScaleToDraft(req.params.id, req.user.userId, 'REVISION'), '已创建同一工具的新修订草稿，旧版本保持不变')
+    } catch (cause) {
+      if (cause instanceof ScaleCopyError) return error(res, cause.message, -1, cause.status)
+      return error(res, '创建修订失败', -1, 409)
+    }
+  },
+
   // 原子保存完整的 ScaleDefinitionV2。新建的教师量表只能是描述性自定义量表。
   async updateDefinition(req: Request, res: Response) {
     try {
@@ -293,6 +333,7 @@ export const scaleController = {
       const scale = await prisma.scale.findUnique({ where: { id } })
       if (!scale) return notFound(res, '量表不存在')
       if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) return forbidden(res, '无权限修改此量表')
+      if (scale.libraryEntryId) return forbidden(res, '共用库授权引用只读，请通过公共量表库管理版本与状态')
       if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE') return error(res, 'STANDARD 量表 definition 由代码 package 管理，不能通过网页修改')
       if (scale.status !== 'DRAFT') return error(res, '只有草稿状态的量表可以修改 definition', -1, 409)
 
@@ -364,10 +405,12 @@ export const scaleController = {
       if (!body.success) return error(res, body.error.errors[0]?.message ?? '回答格式不正确')
       const scale = await prisma.scale.findUnique({
         where: { id },
-        select: { id: true, code: true, name: true, creatorId: true, instrumentVersion: true, instrumentClass: true, definition: true },
+        select: { id: true, code: true, name: true, creatorId: true, instrumentVersion: true, instrumentClass: true, definition: true, libraryEntryId: true },
       })
       if (!scale) return notFound(res, '量表不存在')
-      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) return forbidden(res, '无权限预览此量表')
+      if (scale.libraryEntryId) {
+        if (!userId || !await canReadLibraryScale(userId, scale.libraryEntryId)) return forbidden(res, '无权限预览此量表')
+      } else if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) return forbidden(res, '无权限预览此量表')
       if (body.data.rawScores) return success(res, previewScaleRawScoreFeedback(scaleDefinitionFromRecord(scale), body.data.rawScores))
       const result = await buildScaleResultForRecord({
         scale,
@@ -388,6 +431,7 @@ export const scaleController = {
       const scale = await prisma.scale.findUnique({ where: { id } })
       if (!scale) return notFound(res, '量表不存在')
       if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) return forbidden(res, '无权限发布此量表')
+      if (scale.libraryEntryId) return forbidden(res, '共用库授权引用只读，请通过公共量表库管理版本与状态')
       if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE') return error(res, 'STANDARD 量表必须由代码 package 发布，网页只读')
       if (scale.status !== 'DRAFT') return error(res, '只有草稿状态的量表可以发布')
 
@@ -448,7 +492,9 @@ export const scaleController = {
       }
 
       let runner = null
-      if (req.user?.role === UserRole.ADMIN) {
+      if(scale.libraryEntryId){
+        if(!req.user?.userId||!await canReadLibraryScale(req.user.userId,scale.libraryEntryId))return notFound(res,'量表不存在')
+      }else if (req.user?.role === UserRole.ADMIN) {
         // Administrators can inspect every scale for management and support.
       } else if (req.user?.role === UserRole.TEACHER) {
         if (!(await canUseScale(req.user.userId, req.user.role, scale))) return notFound(res, '量表不存在')
@@ -468,10 +514,12 @@ export const scaleController = {
         const { definition: _definition, copySource: _copySource, ...metadata } = scale
         return success(res, { ...metadata, runner })
       }
-      const { copySource, ...metadata } = scale
+      const { copySource, ...allMetadata } = scale
+      const {courseScales:_courses,_count:_counts,...libraryMetadata}=allMetadata
+      const metadata=scale.libraryEntryId?libraryMetadata:allMetadata
       return success(res, { ...metadata, runner,
         ...(scale.creatorId === req.user!.userId || req.user!.role === UserRole.ADMIN ? { copySource } : {}),
-        copyEligibility: scaleCopyEligibility(scale, req.user!.userId) })
+        revisionEligibility: scaleCopyEligibility(scale, req.user!.userId), copyEligibility: scaleCopyEligibility(scale, req.user!.userId) })
     } catch (err) {
       logger.error('获取量表详情错误', err)
       return error(res, '获取量表详情失败')
@@ -503,6 +551,7 @@ export const scaleController = {
         return forbidden(res, '无权限修改此量表')
       }
 
+      if (scale.libraryEntryId) return forbidden(res, '共用库授权引用只读，请通过公共量表库管理版本与状态')
       if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE') {
         return error(res, 'STANDARD 量表由代码 package 管理，网页只读')
       }
@@ -512,10 +561,11 @@ export const scaleController = {
       }
 
       const { expectedUpdatedAt, ...payload } = result.data
+      if (payload.visibility === 'PUBLIC') return forbidden(res, '全平台公开须独立的平台投放授权，作者不能设置 PUBLIC')
 
       const updated = await prisma.scale.update({
         where: { id, ...(expectedUpdatedAt ? { updatedAt: new Date(expectedUpdatedAt) } : {}), status: 'DRAFT', instrumentClass: 'CUSTOM_DESCRIPTIVE' },
-        data: payload,
+        data: { ...payload, ...(payload.visibility ? { legacyPublicAccess: false } : {}) },
         include: {
           creator: {
             select: {
@@ -567,6 +617,8 @@ export const scaleController = {
         return notFound(res, '量表不存在')
       }
 
+      if (scale.libraryEntryId) return forbidden(res, '共用库授权引用只读，请通过公共量表库管理版本与状态')
+
       // 权限检查
       if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
         return forbidden(res, '无权限删除此量表')
@@ -609,6 +661,8 @@ export const scaleController = {
         return notFound(res, '量表不存在')
       }
 
+      if (scale.libraryEntryId) return forbidden(res, '共用库授权引用只读，请通过公共量表库管理版本与状态')
+
       // 权限检查
       if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
         return forbidden(res, '无权限废弃此量表')
@@ -640,6 +694,8 @@ export const scaleController = {
       if (!scale) {
         return notFound(res, '量表不存在')
       }
+
+      if (scale.libraryEntryId) return forbidden(res, '共用库授权引用只读，请通过公共量表库管理版本与状态')
 
       // 权限检查
       if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
@@ -831,9 +887,10 @@ export const scaleController = {
       const { scaleId } = req.params
       const scale = await prisma.scale.findUnique({
         where: { id: scaleId },
-        select: { id: true, code: true, name: true, description: true, instruction: true, estimatedTime: true, status: true, visibility: true, instrumentVersion: true, instrumentClass: true, definition: true },
+        select: { id: true, code: true, name: true, description: true, instruction: true, estimatedTime: true, status: true, visibility: true, libraryEntryId: true, instrumentVersion: true, instrumentClass: true, definition: true },
       })
       if (!scale) return notFound(res, '量表不存在')
+      if (scale.libraryEntryId) return forbidden(res, '共用库量表请使用正式测评入口')
       if (req.user?.role === UserRole.STUDENT && !(await canStudentAccessScale(scale, userId!))) {
         return notFound(res, '量表不存在')
       }
@@ -867,6 +924,7 @@ export const scaleController = {
       })
       try {
         assessment = await prisma.$transaction(async (tx) => {
+          await assertTrainingScaleCollectionAllowed(tx,[scaleId])
           const created = await tx.assessment.create({
             data: {
               scaleId,
@@ -954,6 +1012,7 @@ export const scaleController = {
         if (assessment.userId !== userId) return { kind: 'forbidden' as const }
         await assertTrainingChildSelected(assessment, { db: tx })
         if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
+        await assertTrainingScaleCollectionAllowed(tx, [assessment.scaleId])
         const definition = scaleDefinitionFromRecord(assessment.scale)
         const answer = { itemCode, responseValue, responseTimeMs: responseTimeMs === undefined ? undefined : Number(responseTimeMs), answeredAt: new Date().toISOString() }
         try {
@@ -1030,6 +1089,7 @@ export const scaleController = {
         if (assessment.userId !== userId) return { kind: 'forbidden' as const }
         await assertTrainingChildSelected(assessment, { db: tx })
         if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
+        await assertTrainingScaleCollectionAllowed(tx, [assessment.scaleId])
 
         const definition = scaleDefinitionFromRecord(assessment.scale)
         const answers = parsed.data.answers.map((input) => ({
@@ -1115,6 +1175,7 @@ export const scaleController = {
           return { kind: 'completed' as const, assessment: (await loadScaleAssessmentForResponse(assessment, undefined, tx)) }
         }
         if (assessment.status !== 'IN_PROGRESS') return { kind: 'ended' as const }
+        await assertTrainingScaleCollectionAllowed(tx, [assessment.scaleId])
         const contextSnapshot = assessment.questionnaireAssessmentId
           ? await freezeQuestionnaireAssessmentContext(tx, assessment.questionnaireAssessmentId)
           : null
@@ -1256,6 +1317,8 @@ export const scaleController = {
         return notFound(res, '量表不存在')
       }
 
+      if (scale.libraryEntryId) return forbidden(res, '共用量表不提供跨任务数据访问，请从获授权的课程或任务报告查看')
+
       if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
         return forbidden(res, '无权限查看此量表的测评记录')
       }
@@ -1350,50 +1413,30 @@ export const scaleController = {
     try {
       const userId = req.user?.userId
       const userRole = req.user?.role
+      if (!userId) return forbidden(res, '请先登录')
       const { scaleId } = req.params
-      const { courseIds } = req.body
-
-      if (!courseIds || !Array.isArray(courseIds) || courseIds.length === 0) {
-        return error(res, '请选择要关联的课程')
-      }
-
-      // 检查量表是否存在和权限
-      const scale = await prisma.scale.findUnique({
-        where: { id: scaleId }
-      })
-
-      if (!scale) {
-        return notFound(res, '量表不存在')
-      }
-
-      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
-        return forbidden(res, '无权限修改此量表')
-      }
-
-      // 检查课程是否存在
-      const courses = await prisma.course.findMany({
-        where: { id: { in: courseIds } }
-      })
-
-      if (courses.length !== courseIds.length) {
-        return error(res, '部分课程不存在')
-      }
-
-      // A share grants content visibility, not write access. Teachers may
-      // associate a scale only with courses they own; validate the whole
-      // batch before creating any relation.
-      if (userRole !== UserRole.ADMIN && courses.some((course) => course.creatorId !== userId)) {
-        return forbidden(res, '只能关联自己创建的课程')
-      }
-
-      // 批量创建关联（忽略已存在的）
-      const created = await prisma.$transaction(async (tx) => tx.courseScale.createMany({
-        data: courseIds.map(courseId => ({ scaleId, courseId })),
-        skipDuplicates: true,
-      }))
-
+      const parsed = z.array(z.string().min(1)).min(1).max(200).safeParse(req.body?.courseIds)
+      if (!parsed.success) return error(res, '请选择有效课程')
+      const courseIds = [...new Set(parsed.data)]
+      const created = await prisma.$transaction(async (tx) => {
+        const scale = await tx.scale.findUnique({ where: { id: scaleId } })
+        if (!scale) throw new ScaleLibraryError(404, '量表不存在')
+        if (scale.libraryEntryId) {
+          await assertTrainingScaleCollectionAllowed(tx, [scale.id])
+          if (!(await canUseScale(userId, userRole ?? '', scale, tx))) throw new ScaleLibraryError(403, '量表使用授权已失效')
+        } else if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
+          throw new ScaleLibraryError(403, '无权限修改此量表')
+        }
+        const courses = await tx.course.findMany({ where: { id: { in: courseIds } } })
+        if (courses.length !== courseIds.length) throw new ScaleLibraryError(404, '部分课程不存在')
+        if ((scale.libraryEntryId || userRole !== UserRole.ADMIN) && courses.some(course => course.creatorId !== userId)) {
+          throw new ScaleLibraryError(403, '只能关联自己创建的课程')
+        }
+        return tx.courseScale.createMany({ data: courseIds.map(courseId => ({ scaleId, courseId })), skipDuplicates: true })
+      }, { isolationLevel: 'Serializable' })
       return success(res, { added: created.count }, '课程关联成功')
     } catch (err) {
+      if (err instanceof ScaleLibraryError) return error(res, err.message, -1, err.statusCode)
       logger.error('添加课程关联错误', err)
       return error(res, '添加课程关联失败')
     }
@@ -1415,11 +1458,11 @@ export const scaleController = {
         return notFound(res, '量表不存在')
       }
 
-      if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
+      if (!scale.libraryEntryId && scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
         return forbidden(res, '无权限修改此量表')
       }
 
-      if (userRole !== UserRole.ADMIN) {
+      if (scale.libraryEntryId || userRole !== UserRole.ADMIN) {
         const course = await prisma.course.findUnique({
           where: { id: courseId },
           select: { id: true, creatorId: true },
@@ -1461,9 +1504,11 @@ export const scaleController = {
 
       const scale = await prisma.scale.findUnique({
         where: { id: scaleId },
-        select: { id: true, name: true, creatorId: true },
+        select: { id: true, name: true, creatorId: true, libraryEntryId: true },
       })
       if (!scale) return notFound(res, '量表不存在')
+      if (scale.libraryEntryId) return forbidden(res, '共用量表不提供跨任务数据访问，请从获授权的课程或任务报告查看')
+
       if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
         return forbidden(res, '无权限导出此量表数据')
       }
@@ -1522,6 +1567,8 @@ export const scaleController = {
       if (!scale) {
         return notFound(res, '量表不存在')
       }
+
+      if (scale.libraryEntryId) return forbidden(res, '共用量表不提供跨任务数据访问，请从获授权的课程或任务报告查看')
 
       if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) {
         return forbidden(res, '无权限查看此量表')

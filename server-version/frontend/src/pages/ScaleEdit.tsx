@@ -1,6 +1,8 @@
 import { type RawScoreFeedback, type RawScoreFeedbackRule, validateRawScoreFeedback } from '../modules/scale/rawScoreFeedback'
 import { TrainingRawScoreFeedbackEditor } from './TrainingRawScoreFeedbackEditor'
 import ScaleCsvImport from './ScaleCsvImport'
+import { TrainingScaleVersions } from '../components/scale-governance/TrainingScaleVersions'
+import { TrainingScaleLibrarySubmission } from '../components/scale-governance/TrainingScaleLibrarySubmission'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowDown, ArrowUp, ArrowLeft, CheckCircle, Copy, Eye, Plus, Save, Trash2 } from 'lucide-react'
@@ -66,6 +68,11 @@ interface ScaleMeta {
   estimatedTime: number | null
   instruction: string | null
   tags?: string[]
+  authoringFamilyId?: string
+  authoringVersion?: number
+  sourceScaleId?: string | null
+  legacyPublicAccess?: boolean
+  revisionEligibility?: { allowed: boolean; reason?: string }
   copyEligibility?: { allowed: boolean; reason?: string }
   copySource?: {
     schemaVersion: 1
@@ -193,6 +200,7 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
   const basicDirty = JSON.stringify(basicValues(scale)) !== savedBasic
   const definitionDirty = JSON.stringify(definition) !== savedDefinition
   const canCopy = !loading && !accessBlocked && scale.id === id && scale.status === 'PUBLISHED' && !standard && scale.copyEligibility?.allowed === true
+  const canRevise = canCopy && scale.revisionEligibility?.allowed === true
   const responseSet = definition.responseSets[0]
   const sortedItems = useMemo(() => [...definition.items].sort((a, b) => a.sortOrder - b.sortOrder), [definition.items])
 
@@ -205,6 +213,7 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
     const next: ScaleMeta = {
       id: value.id, code: value.code, name: value.name, description: value.description, status: value.status, visibility: value.visibility,
       instrumentClass: value.instrumentClass || 'CUSTOM_DESCRIPTIVE', instrumentVersion: value.instrumentVersion || '2.0.0', estimatedTime: value.estimatedTime, instruction: value.instruction, tags: value.tags || [],
+      authoringFamilyId: value.authoringFamilyId, authoringVersion: value.authoringVersion, sourceScaleId: value.sourceScaleId, legacyPublicAccess: value.legacyPublicAccess, revisionEligibility: value.revisionEligibility,
       copyEligibility: value.copyEligibility, copySource: value.copySource || null,
     }
     setSavedBasic(JSON.stringify(basicValues(next)))
@@ -376,15 +385,15 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
     finally { finishWrite(operation) }
   }
 
-  const copyAsDraft = async () => {
-    if (!mountedRef.current || !canCopy || savingRef.current) return
+  const copyAsDraft = async (mode: 'copy' | 'revise' = 'copy') => {
+    if (!mountedRef.current || !(mode === 'revise' ? canRevise : canCopy) || savingRef.current) return
     savingRef.current = true
     setCopying(true)
     setIssues([])
     const operation = ++operationRef.current
     let opened = false
     try {
-      const response = await apiClient.post<any>(`/scales/${id}/copy`, {})
+      const response = await apiClient.post<any>(`/scales/${id}/${mode}`, {})
       if (!isCurrentOperation(operation)) return
       assertResponse(response, '复制失败，请重试')
       const draft = response.data
@@ -540,7 +549,8 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
           <div className="staff-inline-actions">
             <Link to="/scales" className="staff-secondary-link"><ArrowLeft className="w-4 h-4" aria-hidden="true" />返回量表列表</Link>
             {!isNew && <button onClick={() => void previewDefinition()} disabled={importing || mediaUploadCount > 0 || saving || copying || standard || accessBlocked || definitionDirty} title={definitionDirty ? '请先保存定义，再预览服务端计分' : '对已保存定义使用每题首个选项进行真实服务端计分'} className="hui-button hui-button--secondary"><Eye className="w-4 h-4" aria-hidden="true" />计分预览</button>}
-            {canCopy && <button type="button" onClick={() => void copyAsDraft()} disabled={copying} aria-busy={copying} className="hui-button hui-button--primary scale-edit-copy"><Copy className="w-4 h-4" aria-hidden="true" />{copying ? '正在创建新草稿…' : '复制为新草稿'}</button>}
+            {canCopy && <button type="button" onClick={() => void copyAsDraft()} disabled={copying} aria-busy={copying} className="hui-button hui-button--primary scale-edit-copy"><Copy className="w-4 h-4" aria-hidden="true" />{copying ? '正在创建新草稿…' : '另存为新量表'}</button>}
+            {canRevise && <button type="button" onClick={() => void copyAsDraft('revise')} disabled={copying} className="hui-button hui-button--secondary">修订为新版本</button>}
             {!readOnly && <button onClick={() => void (isNew ? saveBasic() : saveDraft())} disabled={saving || importing || mediaUploadCount > 0} className="hui-button hui-button--secondary"><Save className="w-4 h-4" aria-hidden="true" />保存草稿</button>}
           </div>
         )}
@@ -548,22 +558,24 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
       <div className="scale-edit-state" aria-label="量表状态">
         <div className="scale-edit-state__labels">
           <span className={`scale-edit-badge ${scale.status === 'PUBLISHED' ? 'scale-edit-badge--published' : ''}`}>{standard ? '标准量表 · 只读' : scale.status === 'PUBLISHED' ? '已发布 · 只读' : readOnly ? '只读' : '草稿'}</span>
-          <span>{scale.visibility === 'PUBLIC' ? '公开可用' : scale.visibility === 'COURSE' ? '课程可用' : '隐藏'}</span>
-          {!isNew && scale.id && <span>版本 {scale.instrumentVersion}</span>}
+          <span>{scale.visibility === 'PUBLIC' ? '历史公开范围（兼容保留）' : scale.visibility === 'COURSE' ? '课程可用' : '隐藏'}</span>
+          {!isNew && scale.id && <span>正式版本 v{scale.authoringVersion ?? 1} · 定义格式 {scale.instrumentVersion}</span>}
         </div>
-        <p className="scale-edit-save-state" role="status" aria-live="polite">{mediaUploadCount > 0 ? '正在上传反馈图片，完成后可保存或发布…' : copying ? '正在复制为独立的隐藏草稿…' : saving ? '正在保存，请稍候…' : hasConflict ? '状态已变更，本页编辑已保留，请核对后继续' : readOnly ? '当前版本不可编辑' : isNew ? '尚未创建，先保存基本信息' : basicDirty || definitionDirty ? [basicDirty && '基本信息待保存', definitionDirty && '题目与定义待保存'].filter(Boolean).join(' · ') : '草稿内容已保存'}</p>
+        <p className="scale-edit-save-state" role="status" aria-live="polite">{mediaUploadCount > 0 ? '正在上传反馈图片，完成后可保存或发布…' : copying ? '正在创建隐藏草稿…' : saving ? '正在保存，请稍候…' : hasConflict ? '状态已变更，本页编辑已保留，请核对后继续' : readOnly ? '当前版本不可编辑' : isNew ? '尚未创建，先保存基本信息' : basicDirty || definitionDirty ? [basicDirty && '基本信息待保存', definitionDirty && '题目与定义待保存'].filter(Boolean).join(' · ') : '草稿内容已保存'}</p>
       </div>
+      {!isNew && !standard && scale.id === id && <TrainingScaleVersions key={scale.id + scale.status} sourceId={scale.id} />}
+      {scale.sourceScaleId && <div className="scale-edit-source"><strong>版本谱系</strong><p><Link to={`/scales/${scale.sourceScaleId}`}>查看来源工具 / 版本</Link> → 当前 v{scale.authoringVersion ?? 1}</p><p>修订沿用量表谱系，另存建立独立谱系。来源仅作追溯，旧任务和问卷不会自动升级。</p></div>}
       {scale.copySource && <aside className="scale-edit-source" aria-label="量表副本来源">
         <div className="scale-edit-source__heading"><Copy className="w-4 h-4" aria-hidden="true" /><strong>复制来源</strong></div>
         <p><Link to={`/scales/${scale.copySource.parentId}`}>{scale.copySource.parentCode}</Link><span> · 版本 {scale.copySource.parentVersion}</span></p>
-        <p>这是独立副本，修改和发布仅作用于当前量表。</p>
+        <p>{(scale.authoringVersion ?? 1) > 1 ? '这是同一量表的后续编制版本，修改和发布不覆盖原版。' : '这是独立副本，修改和发布仅作用于当前量表。'}</p>
         <details><summary>查看来源版本标识</summary><dl><dt>定义标识</dt><dd>{scale.copySource.parentDefinitionHash}</dd><dt>计分标识</dt><dd>{scale.copySource.parentScoringHash}</dd></dl></details>
       </aside>}
-      {scale.status === 'PUBLISHED' && <div className="scale-edit-readonly-note">{canCopy ? '此版本已发布并冻结。复制为新草稿后，可以修改内容并重新检查、发布。' : scale.copyEligibility?.reason || '此版本已发布并冻结，当前不可复制。'}</div>}
+      {scale.status === 'PUBLISHED' && <div className="scale-edit-readonly-note">{canCopy ? '此版本已发布并冻结。另存为新量表将创建独立量表，不是原量表的版本修订。旧任务和问卷不会自动升级。' : scale.copyEligibility?.reason || '此版本已发布并冻结，当前不可复制。'}</div>}
       {issues.length > 0 && <div className="scale-edit-feedback mb-5 rounded-lg border p-4 bg-gray-50" role={issues.some(issue => issue.severity !== 'success') ? 'alert' : 'status'}><ul className="space-y-1 text-sm">{issues.map((issue, index) => <li key={`${issue.path}-${index}`} className={issue.severity === 'success' ? 'text-green-700' : 'text-red-700'}>{issue.severity === 'success' && <CheckCircle className="w-4 h-4 inline mr-1" />}{issue.path}：{issue.message}</li>)}</ul></div>}
       <div className="staff-toolbar"><div className="staff-segmented scale-edit-tabs" role="group" aria-label="量表编辑分区">{tabs.map(([key, label]) => <button key={key} type="button" aria-pressed={activeTab === key} disabled={importing || (isNew && key !== 'basic')} title={isNew && key !== 'basic' ? '请先保存基本信息创建草稿' : undefined} onClick={() => setActiveTab(key)}>{label}</button>)}</div></div>
 
-      {activeTab === 'basic' && <section className="staff-panel staff-panel--padded p-6 space-y-4"><p className="scale-edit-multiset-note">{isNew ? '请先保存基本信息创建草稿，再编制响应选项、题目、计分、授权声明与报告反馈。此步骤仅保存基本元数据。' : '本区仅保存基本元数据；自有内容 / 授权声明请在“报告文案”中随量表定义保存。'}</p><div className="grid md:grid-cols-2 gap-4"><label className="text-sm text-gray-700">量表编码<input disabled={!isNew || controlsDisabled} value={scale.code} onChange={(event) => setScale({ ...scale, code: event.target.value })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">量表名称<input disabled={controlsDisabled} value={scale.name} onChange={(event) => setScale({ ...scale, name: event.target.value })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">预计用时（分钟）<input type="number" disabled={controlsDisabled} value={scale.estimatedTime ?? ''} onChange={(event) => setScale({ ...scale, estimatedTime: event.target.value ? Number(event.target.value) : null })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">可见性<select aria-label="可见性" disabled={controlsDisabled} value={scale.visibility} onChange={(event) => setScale({ ...scale, visibility: event.target.value as ScaleMeta['visibility'] })} className="input mt-1 w-full"><option value="HIDDEN">隐藏</option><option value="COURSE">课程可用</option><option value="PUBLIC">公开可用</option></select></label></div><label className="block text-sm text-gray-700">说明<textarea disabled={controlsDisabled} value={scale.description || ''} onChange={(event) => setScale({ ...scale, description: event.target.value })} className="input mt-1 w-full min-h-24" /></label><label className="block text-sm text-gray-700">作答指导<textarea disabled={controlsDisabled} value={scale.instruction || ''} onChange={(event) => setScale({ ...scale, instruction: event.target.value })} className="input mt-1 w-full min-h-24" /></label><div className="flex justify-end"><button onClick={() => void saveBasic()} disabled={controlsDisabled || mediaUploadCount > 0} className="hui-button hui-button--primary"><Save className="w-4 h-4 inline mr-1" />保存基本信息</button></div></section>}
+      {activeTab === 'basic' && <section className="staff-panel staff-panel--padded p-6 space-y-4"><p className="scale-edit-multiset-note">{isNew ? '请先保存基本信息创建草稿，再编制响应选项、题目、计分、授权声明与报告反馈。此步骤仅保存基本元数据，私有量表不会自动对全平台学生开放。' : '本区仅保存基本元数据；自有内容 / 授权声明请在“报告文案”中随量表定义保存。'}</p><div className="grid md:grid-cols-2 gap-4"><label className="text-sm text-gray-700">量表编码<input disabled={!isNew || controlsDisabled} value={scale.code} onChange={(event) => setScale({ ...scale, code: event.target.value })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">量表名称<input disabled={controlsDisabled} value={scale.name} onChange={(event) => setScale({ ...scale, name: event.target.value })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">预计用时（分钟）<input type="number" disabled={controlsDisabled} value={scale.estimatedTime ?? ''} onChange={(event) => setScale({ ...scale, estimatedTime: event.target.value ? Number(event.target.value) : null })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">可见性<select aria-label="可见性" disabled={controlsDisabled} value={scale.visibility} onChange={(event) => setScale({ ...scale, visibility: event.target.value as ScaleMeta['visibility'] })} className="input mt-1 w-full"><option value="HIDDEN">隐藏</option><option value="COURSE">课程可用</option>{scale.visibility === 'PUBLIC' && <option value="PUBLIC" disabled>历史公开范围（兼容保留，不可新增）</option>}</select></label></div><label className="block text-sm text-gray-700">说明<textarea disabled={controlsDisabled} value={scale.description || ''} onChange={(event) => setScale({ ...scale, description: event.target.value })} className="input mt-1 w-full min-h-24" /></label><label className="block text-sm text-gray-700">作答指导<textarea disabled={controlsDisabled} value={scale.instruction || ''} onChange={(event) => setScale({ ...scale, instruction: event.target.value })} className="input mt-1 w-full min-h-24" /></label><div className="flex justify-end"><button onClick={() => void saveBasic()} disabled={controlsDisabled || mediaUploadCount > 0} className="hui-button hui-button--primary"><Save className="w-4 h-4 inline mr-1" />保存基本信息</button></div></section>}
 
       {activeTab === 'responses' && <section className="staff-panel staff-panel--padded p-6"><div className="flex justify-between mb-4"><div><h2 className="font-semibold">共享响应选项</h2><p className="text-sm text-gray-500">学生只看到标签；分值仅由服务端用于权威计分。</p>{definition.responseSets.length > 1 && <p className="scale-edit-multiset-note">此量表含 {definition.responseSets.length} 组响应选项；这里编辑第一组（{responseSet.key}），其余响应集将完整保留。</p>}</div><button onClick={addOption} disabled={controlsDisabled} className="hui-button hui-button--secondary"><Plus className="w-4 h-4 inline mr-1" />增加选项</button></div><div className="space-y-3">{responseSet.options.map((option, index) => <div key={index} className="grid grid-cols-[1fr_1fr_100px_40px] gap-2 items-center"><input disabled={controlsDisabled} value={String(option.value)} onChange={(event) => updateOption(index, { value: event.target.value })} className="input" placeholder="稳定 value" /><input disabled={controlsDisabled} value={option.label} onChange={(event) => updateOption(index, { label: event.target.value })} className="input" placeholder="显示标签" /><input disabled={controlsDisabled} type="number" value={option.score} onChange={(event) => updateOption(index, { score: Number(event.target.value) })} className="input" placeholder="基础分" /><button onClick={() => removeOption(index)} disabled={controlsDisabled || responseSet.options.length <= 2} className="text-red-500 disabled:text-gray-300"><Trash2 className="w-4 h-4" /></button></div>)}</div><div className="flex justify-end mt-5"><button onClick={() => void saveDefinition()} disabled={controlsDisabled || mediaUploadCount > 0} className="hui-button hui-button--primary">保存响应集</button></div></section>}
 
@@ -574,7 +586,8 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
       {activeTab === 'report' && <section className="staff-panel staff-panel--padded p-6"><label className="block text-sm text-gray-700">自有内容 / 授权声明<textarea disabled={controlsDisabled} value={definition.license.note || ''} onChange={(event) => setDefinition((current) => ({ ...current, license: { ...current.license, note: event.target.value } }))} className="input mt-1 w-full min-h-20" placeholder="说明题目内容由谁提供，以及允许在本系统中使用的范围" /></label><p className="scale-edit-multiset-note">授权声明属于量表定义，请使用“保存报告定义”或“保存草稿”保存。</p><h2 className="font-semibold mb-2">量表专属解释</h2><p className="text-sm text-gray-500 mb-5">自定义量表仅能写描述性解释；可按原始总分或维度分设置区间图文反馈；不提供正常/异常、常模或百分位配置。</p><div className="space-y-4">{definition.scoring.scores.map((score) => { const entry = definition.report.interpretations.find((candidate) => candidate.scoreKey === score.key); if (!entry) return null; return <article key={score.key} className="border rounded-lg p-4 space-y-2"><h3 className="font-medium">{score.label}</h3><input disabled={controlsDisabled} value={entry.headline} onChange={(event) => updateInterpretation(score.key, { headline: event.target.value })} className="input w-full" placeholder="标题" /><textarea disabled={controlsDisabled} value={entry.summary} onChange={(event) => updateInterpretation(score.key, { summary: event.target.value })} className="input w-full min-h-20" placeholder="描述性解释" /><TrainingRawScoreFeedbackEditor onUploadBusy={onUploadBusy} scoreKey={score.key} rule={definition.report.rawScoreFeedback?.rules.find(rule => rule.scoreKey === score.key)} disabled={controlsDisabled} onChange={rule => updateRawFeedback(score.key, rule)} /></article> })}</div><label className="block text-sm text-gray-700 mt-5">免责声明<textarea disabled={controlsDisabled} value={definition.report.disclaimer} onChange={(event) => setDefinition((current) => ({ ...current, report: { ...current.report, disclaimer: event.target.value } }))} className="input mt-1 w-full min-h-20" /></label><div className="flex justify-end mt-5"><button onClick={() => void saveDefinition()} disabled={controlsDisabled || mediaUploadCount > 0} className="hui-button hui-button--primary">保存报告定义</button></div></section>}
 
       {preview && <section className="staff-panel staff-panel--padded p-6 mt-5"><h2 className="font-semibold mb-3">服务端计分预览</h2><p className="scale-edit-multiset-note">使用已保存定义，每题选择首个响应选项。这是服务端计分结果，区别于报告编辑中的模拟分数呈现；被试实际可见内容仍由发布与披露设置决定。</p><pre className="text-xs bg-gray-50 rounded p-3 overflow-auto">{JSON.stringify(preview, null, 2)}</pre></section>}
-      {!isNew && !readOnly && <div className="flex justify-end gap-2 mt-6"><button onClick={() => void validate()} disabled={saving || importing || mediaUploadCount > 0} className="hui-button hui-button--secondary">运行发布检查</button><button onClick={() => void publish()} disabled={saving || importing || mediaUploadCount > 0 || scale.status !== 'DRAFT'} className="hui-button hui-button--primary">发布描述性量表</button></div>}
+      {!isNew && !standard && scale.id === id && <TrainingScaleLibrarySubmission key={scale.id + scale.status} sourceId={scale.id} />}
+      {!isNew && !readOnly && <div className="flex justify-end gap-2 mt-6"><button onClick={() => void validate()} disabled={saving || importing || mediaUploadCount > 0} className="hui-button hui-button--secondary">运行发布检查</button><button onClick={() => void publish()} disabled={saving || importing || mediaUploadCount > 0 || scale.status !== 'DRAFT'} className="hui-button hui-button--primary">发布自用（描述性量表）</button></div>}
     </ProductPage>
   )
 }

@@ -65,6 +65,27 @@ suite('Scale copied draft immutable provenance and publication',()=>{
   definition.license={status:'unknown',redistribution:'unknown'};const native=await db.scale.create({data:{code:randomUUID(),name:'Native',creatorId:user.id,definition:definition as any,definitionHash:hashScaleDefinition(definition)}})
   const n=response();await publish(request(native.id,user.id),n);expect(n.body.code).toBe(0)
  })
+ it.each([false,true])('publishes independent COPY with exact release provenance and no source FK (legacy null families: %s)',async legacy=>{
+  const {scale,user}=await fixture({status:'DRAFT'})
+  const first=response();await publish(request(scale.id,user.id),first);expect(first.body.code).toBe(0)
+  const source=await db.scale.findUniqueOrThrow({where:{id:scale.id}})
+  expect(source.measurementReleaseId).not.toBeNull()
+  const copied=await copy(source.id,user.id)
+  // Model a pre-migration copy without inventing historical family metadata.
+  const draft=legacy ? await db.scale.update({where:{id:copied.id},data:{authoringFamilyId:null,authoringVersion:null}}) : copied
+  if(legacy){expect(source.authoringFamilyId).toBeNull();expect(draft.authoringFamilyId).toBeNull()}
+  expect(draft.sourceScaleId).toBeNull()
+  expect(draft.copySource).toMatchObject({parentId:source.id,parentDefinitionHash:source.definitionHash})
+  const result=response();await publish(request(draft.id,user.id),result);expect(result.body.code).toBe(0)
+  const published=await db.scale.findUniqueOrThrow({where:{id:draft.id}})
+  if(legacy)expect(published.authoringFamilyId).toBeNull()
+  const release=await db.measurementContentRelease.findUniqueOrThrow({where:{id:published.measurementReleaseId!}})
+  expect(release.sourceReleaseId).toBe(source.measurementReleaseId)
+  expect(release.provenance).toMatchObject({authoringRelationship:'COPY',copySource:{parentId:source.id}})
+  await db.scale.delete({where:{id:source.id}})
+  expect(await db.measurementContentRelease.findUniqueOrThrow({where:{id:release.id}})).toEqual(release)
+  expect((await db.scale.findUniqueOrThrow({where:{id:draft.id}})).status).toBe('PUBLISHED')
+ })
  it('retains copied media, rolls back failed replacement, releases draft pins only after publish/delete',async()=>{
   const {scale,user,definition}=await fixture();const asset=await db.storedAsset.create({data:{objectKey:'copy-test/'+randomUUID(),provider:'local',mimeType:'image/png',sizeBytes:1,sha256:'a'.repeat(64),originalName:'synthetic.png',accessScope:'PRIVATE'}});assets.push(asset.id)
   definition.items[0].images=[{asset:{assetId:asset.id,mimeType:'image/png',contentHash:asset.sha256},altText:'Synthetic',order:0}]
@@ -85,6 +106,32 @@ suite('Scale copied draft immutable provenance and publication',()=>{
  it('concurrent publishers freeze one version and later edits cannot change it',async()=>{
   const {scale,user,definition}=await fixture();const draft=await copy(scale.id,user.id);const a=response(),b=response();await Promise.all([publish(request(draft.id,user.id),a),publish(request(draft.id,user.id),b)]);expect([a.statusCode,b.statusCode].sort()).toEqual([200,409]);const frozen=await db.scale.findUniqueOrThrow({where:{id:draft.id}})
   definition.items[0].content='Too late';const r=response();await controller.updateDefinition(request(draft.id,user.id,{definition}),r);expect(r.statusCode).toBe(409);expect(await db.scale.findUniqueOrThrow({where:{id:draft.id}})).toEqual(frozen)
+ })
+
+ it('revisions retain one family while save-as allocates an independent family without PUBLIC inheritance',async()=>{
+  const {scale,user}=await fixture()
+  const revision=await copy(scale.id,user.id,'REVISION')
+  const independent=await copy(scale.id,user.id)
+  expect(revision).toMatchObject({authoringFamilyId:scale.id,authoringVersion:2,sourceScaleId:scale.id,visibility:'HIDDEN',legacyPublicAccess:false})
+  expect(independent.authoringFamilyId).not.toBe(revision.authoringFamilyId)
+  expect(independent.authoringVersion).toBe(1)
+  expect(independent.sourceScaleId).toBeNull()
+  expect(independent.copySource).toMatchObject({parentId:scale.id,parentDefinitionHash:scale.definitionHash})
+  // A revision retains the RESTRICT lifecycle relation; COPY does not.
+  await expect(db.scale.delete({where:{id:scale.id}})).rejects.toMatchObject({code:'P2003'})
+  const revised=response();await publish(request(revision.id,user.id),revised);expect(revised.body.code).toBe(0)
+  const publishedRevision=await db.scale.findUniqueOrThrow({where:{id:revision.id}})
+  expect((await db.measurementContentRelease.findUniqueOrThrow({where:{id:publishedRevision.measurementReleaseId!}})).provenance).toMatchObject({authoringRelationship:'REVISION'})
+  expect(revision.instrumentVersion).toBe(scale.instrumentVersion)
+  expect((await db.scale.findUniqueOrThrow({where:{id:scale.id}})).definition).toEqual(scale.definition)
+ })
+ it('serializes concurrent revision numbers even when different published siblings are the sources',async()=>{
+  const {scale,user}=await fixture()
+  const second=await copy(scale.id,user.id,'REVISION')
+  await db.scale.update({where:{id:second.id},data:{status:'PUBLISHED'}})
+  const next=await Promise.all([copy(scale.id,user.id,'REVISION'),copy(second.id,user.id,'REVISION')])
+  expect(next.map(row=>row.authoringVersion).sort()).toEqual([3,4])
+  expect(new Set(next.map(row=>row.authoringFamilyId)).size).toBe(1)
  })
 
 })

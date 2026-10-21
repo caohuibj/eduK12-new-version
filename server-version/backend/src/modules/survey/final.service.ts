@@ -1,3 +1,4 @@
+import { assertSurveyScaleCollectionAllowed } from './scale-collection-guard'
 import {rawParticipantFeedback} from './participant-feedback'
 import {interpretSurveyFinal} from './final-interpretation.service'
 import { verifySurveyCognitiveReferences,loadSurveyCognitiveResults,assertSurveyCognitiveLockedAnswers } from './cognitive.results'
@@ -136,6 +137,7 @@ export async function submitResearchFinal(input:FinalInput){
         status:'COMPLETED' as const,idempotent:true,
         generalText:wave.generalText||defaultGeneralText}
     }
+    await assertSurveyScaleCollectionAllowed(tx,assignedSurveySnapshot(snapshot,assignment))
     if(attempt.status!=='STARTED')invalid('这份作答已经关闭或终止')
     const now=new Date()
     const finishUntil=wave.finishUntil||wave.closesAt

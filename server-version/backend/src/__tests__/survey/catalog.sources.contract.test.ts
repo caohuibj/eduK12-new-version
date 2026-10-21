@@ -55,7 +55,7 @@ describe('immutable system catalog source adapters',()=>{
     const definition=scale();definition.license.redistribution='restricted'
     expect(()=>adaptCatalogScale(scaleRef,'Source',definition)).toThrow('SOURCE_RIGHTS')
     definition.license.redistribution='allowed';definition.items[0].randomizeOptions=true
-    expect(()=>adaptCatalogScale(scaleRef,'Source',definition)).toThrow('PRESENTATION_UNSUPPORTED')
+    expect(()=>adaptCatalogScale(scaleRef,'Source',definition)).toThrow('RANDOMIZATION_RUNTIME_UNSUPPORTED')
   })
   it('preserves authorized V2 SJT original scoring and every choice matches the source oracle',()=>{
     const pkg=sjt(),original=structuredClone(pkg)

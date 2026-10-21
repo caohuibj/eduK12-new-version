@@ -31,6 +31,9 @@ import { freezeGroupIpPolicy,resolveGroupIpOpenWindow,type FrozenGroupIpPolicy }
  * publication. The Survey FINAL admission adapter is separate from legacy catalog.
  */
 export interface ResearchFrozenUnit {
+  revisionSourceReleaseId?:string
+  authoringFamilyId?:string
+  authoringVersion?:number
   participantFeedback?:SurveyRawFeedback
   contentSelection?:FrozenSurveyContentSelection
   measurementRelease?: { releaseId: string; contentHash: string; measurementHash: string }
@@ -81,9 +84,11 @@ export function surveyMeasurementReleaseInput(unit:ResearchFrozenUnit,actorId:st
     displayProtocol:unit.displayDefinition,scope,provenance:unit.sourceProvenance??{}})
   const source=unit.sourceProvenance?.sourceMeasurementRelease as {releaseId?:string}|undefined
   if(unit.sourceProvenance&&!source?.releaseId)throw new SurveyWaveError(409,'目录量表须先由来源管理者完成显式版本转换，再重新授权导入')
-  return scaleMeasurementRelease({localId:unit.draftId,version:String(unit.draftRevision),sourceReleaseId:source?.releaseId??null,
+  return scaleMeasurementRelease({localId:unit.draftId,version:unit.authoringVersion?`v${unit.authoringVersion}`:String(unit.draftRevision),sourceReleaseId:source?.releaseId??unit.revisionSourceReleaseId??null,
     ...surveyScaleReleaseContext(unit),definition:unit.compiledDefinition,
-    instrumentClass:unit.sourceProvenance?'STANDARD':'CUSTOM_DESCRIPTIVE',provenance:unit.sourceProvenance??{},scope})
+    instrumentClass:unit.sourceProvenance&&unit.sourceProvenance.instrumentClass!=='CUSTOM_DESCRIPTIVE'?'STANDARD':'CUSTOM_DESCRIPTIVE',provenance:{...(unit.sourceProvenance??{}),
+      ...(!unit.sourceProvenance&&unit.authoringFamilyId?{authoringRelationship:unit.revisionSourceReleaseId?((unit.authoringVersion??1)>1?'REVISION':'COPY'):'ORIGINAL',authoringFamilyId:unit.authoringFamilyId??unit.draftId,authoringVersion:unit.authoringVersion??1,
+        authoringSnapshot:{title:unit.title,definition:unit.displayDefinition,instrumentClass:'CUSTOM_DESCRIPTIVE',product:'SURVEY'}}:{})},scope})
 }
 export async function publishSurveyMeasurementUnit(tx:Prisma.TransactionClient,unit:ResearchFrozenUnit,actorId:string,projectId:string){
   const release=await publishContentRelease(tx,surveyMeasurementReleaseInput(unit,actorId,projectId),actorId)
@@ -104,7 +109,7 @@ export async function resolveSurveyMeasurementUnit(tx:Prisma.TransactionClient,u
 }
 
 export function compileFrozenResearchUnit(draft:{
-  id:string;instrumentKey:string;kind:string;title:string;revision:number;definition:unknown
+  id:string;instrumentKey:string;kind:string;title:string;revision:number;definition:unknown;authoringFamilyId?:string|null;authoringVersion?:number|null;revisionSourceReleaseId?:string|null
 }):ResearchFrozenUnit {
   const kind=surveyKindSchema.parse(draft.kind)
   const normalized=assertSurveyDraft(kind,draft.definition,true)
@@ -116,7 +121,7 @@ export function compileFrozenResearchUnit(draft:{
   }
   if(kind==='SCALE'){
     const compiled=compileResearchScale(draft.title,normalized)
-    return {draftId:draft.id,instrumentKey:draft.instrumentKey,kind,title:draft.title,
+    return {...(draft.authoringFamilyId?{authoringFamilyId:draft.authoringFamilyId,authoringVersion:draft.authoringVersion??1,...(draft.revisionSourceReleaseId?{revisionSourceReleaseId:draft.revisionSourceReleaseId}:{})}:{}),draftId:draft.id,instrumentKey:draft.instrumentKey,kind,title:draft.title,
       draftRevision:draft.revision,sourceDigest,
       scoringDigest:canonicalHash(compiled.scoring),compiledDefinition:compiled,displayDefinition:normalized}
   }
@@ -179,12 +184,12 @@ export async function freezeResearchWaveDraft(input:{
     const locks=await tx.$queryRaw<Array<{id:string}>>`
       SELECT "id" FROM "survey_instrument_drafts"
       WHERE "project_id"=${input.projectId} AND "id" IN (${Prisma.join(orderedIds)})
-        AND "status"='DRAFT'
+        AND "status" IN ('DRAFT','PUBLISHED')
       ORDER BY "id" FOR SHARE
     `
     if(locks.length!==orderedIds.length)stop('波次中存在被删除、归档或越权的研究工具')
     const rows=await tx.surveyInstrumentDraft.findMany({
-      where:{projectId:input.projectId,id:{in:orderedIds},status:'DRAFT'},
+      where:{projectId:input.projectId,id:{in:orderedIds},status:{in:['DRAFT','PUBLISHED']}},
     })
     const sources=await catalogSnapshotsForDrafts(tx,input.actorUserId,rows.flatMap(r=>r.catalogGrantId?[r.catalogGrantId]:[]))
     const byId=new Map(rows.map(row=>[row.id,row]))
@@ -312,7 +317,7 @@ export async function freezeResearchWaveDraft(input:{
     const version=(await tx.surveyPublication.aggregate({where:{projectId:input.projectId},_max:{version:true}}))._max.version||0
     const publicationId=randomUUID()
     await retainSurveyMedia(tx,input.actorUserId,input.projectId,publicationId,
-      rows.map(r=>({kind:surveyKindSchema.parse(r.kind),definition:r.definition})))
+      units.map(unit=>({kind:unit.kind,definition:unit.displayDefinition,compiledDefinition:unit.compiledDefinition,sourceProvenance:unit.sourceProvenance})))
     await tx.surveyPublication.create({data:{
       id:publicationId,projectId:input.projectId,
       version:version+1,definitionDigest:digest,

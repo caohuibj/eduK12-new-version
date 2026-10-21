@@ -71,6 +71,36 @@ const firstSuccess=(overrides:Record<string,unknown>={})=>({
 const generalCalls=()=>vi.mocked(fetch).mock.calls.filter(([url])=>String(url).endsWith('/general'))
 
 describe('Survey first-success GENERAL receipt consumption',()=>{
+  it('blocks all-at-once image answers and FINAL until actual decode, and keeps restored choices through failure/retry',async()=>{
+    const image={asset:{assetId:'stimulus',contentHash:'b'.repeat(64),mimeType:'image/png'},altText:'Required stimulus'}
+    taskOverrides={units:[{...task.units[0],presentationMode:'ALL_AT_ONCE',items:[{...task.units[0].items[0],images:[image]}]}]}
+    const originalFetch=fetch
+    const create=URL.createObjectURL,revoke=URL.revokeObjectURL
+    URL.createObjectURL=vi.fn().mockReturnValue('blob:stimulus');URL.revokeObjectURL=vi.fn()
+    vi.stubGlobal('fetch',vi.fn((url:string,init?:RequestInit)=>url.endsWith('/images/stimulus')
+      ?Promise.resolve(new Response(new Blob(['image'], { type: 'image/png' }), { status: 200, headers: { 'Content-Type': 'image/png' } }))
+      :originalFetch(url,init)))
+    try{
+      render(<SurveyPublicApp/>)
+      fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+      const picture=await screen.findByAltText('Required stimulus')
+      expect(screen.getByRole('radio',{name:'同意'})).toBeDisabled()
+      expect(screen.getByRole('button',{name:'提交本轮正式回答'})).toBeDisabled()
+      fireEvent.load(picture)
+      fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+      fireEvent.error(picture)
+      expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
+      expect(screen.getByRole('radio',{name:'同意'})).toBeDisabled()
+      expect(screen.getByRole('button',{name:'提交本轮正式回答'})).toBeDisabled()
+      expect(finalCalls).toHaveLength(0)
+      fireEvent.click(screen.getByRole('button',{name:'重试图片'}))
+      fireEvent.load(await screen.findByAltText('Required stimulus'))
+      expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
+      expect(screen.getByRole('button',{name:'提交本轮正式回答'})).toBeEnabled()
+      submit()
+      await waitFor(()=>expect(finalCalls).toHaveLength(1))
+    }finally{URL.createObjectURL=create;URL.revokeObjectURL=revoke}
+  })
   it('renders the controlled first-success receipt without another HTTP request or persisting it',async()=>{
     finalReply=()=>response(firstSuccess())
     generalReply=()=>Promise.reject(new Error('First success must not read GENERAL'))

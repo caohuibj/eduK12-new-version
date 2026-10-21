@@ -582,3 +582,82 @@ replacement-row/property counts. It is an isolated function microbenchmark, not
 full-service execution, production peak memory or proven end-to-end speedup.
 Main push only classifies the merged diff; it does not replay application checks.
 Five minutes triggers a progress update, not a promise of scan/download duration.
+
+## Scale library governance bounded candidate (2026-10-21)
+
+The fixed governance branch admits only its frozen complete product/blob inventory
+and reviewed control paths against base `aabbe049`. Unknown paths, source/base
+drift, unusual modes and manual full/probe requests fail closed, never platform
+fallback. The stable gate requires scope, governance acceptance and actual
+JavaScript/TypeScript plus Python CodeQL success. Existing candidate routes and
+branch protection are unchanged.
+
+GitHub is the sole application-check execution location: one backend and one
+frontend compilation, affected contract inventories, app types/changed-file lint,
+actual runtime scans, four real PostgreSQL suites, old-schema synthetic upgrade,
+and a nonempty synthetic database dump/independent restore of this feature's
+dependency closure. This is not production disaster-recovery or attachment-backup
+qualification. Identical package/lock audits retain their fixed official prior
+run/job source and explicitly do not claim a new vulnerability lookup.
+
+Two actual production-UI journeys exercise opposite entrypoints, exact approval,
+readonly use, original scoring/typed quality answers, ordinary revoke versus
+emergency stop/replay, unified catalog and image/video delivery. The synthetic
+video uses the same compiled backend with isolated DB/Redis and a bounded worker;
+no accepted media/release/session is faked. Synthetic admin uses real WebAuthn
+with a virtual authenticator, not physical-key acceptance. This round's explicit
+approval covers only disposable browser-profile CA trust and loopback HTTPS;
+no host system trust, production routing or certificate-error bypass is used.
+
+Builder/runtime image bytes are archived immediately and separately from small
+reports/screenshots, including when later checks fail. Private credentials, DB
+dumps, raw server logs and capability URLs are excluded from public artifacts;
+owned services and private files are removed on every outcome. Plan roughly
+10–15 minutes for the new connected scope, reporting the actual waiting step
+after five minutes; failures invalidate only their consumed inputs and do not
+authorize full-platform retries. No deployment is included.
+
+Governance round-1 continuation retains run `39605768918` as failed. Its frontend
+compile step succeeded and the complete builder/runtime archive is accepted only
+with fixed official artifact digests, original image IDs/revision and unchanged
+frontend production/config/lock inputs. Exactly two repaired test files are
+mounted read-only into that original builder for the previously failed types and
+unexecuted lint/contracts; the original runtime receives its first scan. No Vite
+compile, image relabeling or successful-test replay is involved. Backend never
+produced a successful image and therefore must compile the repaired source before
+its missing checks. Original CodeQL completion remains attributable to its old
+source; only actual changed JS/TS/Python inputs receive new analysis. No failed
+job or old report is rewritten as successful.
+
+Governance PR326 second-run continuation preserves the failed run 39610102026.
+Its unchanged 16 backend suites (161 assertions) and 18 frontend suites (159
+assertions) are accepted only from the pinned official report archives, with
+reviewed component-input and mock boundaries. The repaired readonly frontend
+suite runs again, together with application types, its targeted lint, and the
+first runtime scan; original frontend image bytes are restored without a new
+compile. The real backend wrapper fix requires a new backend build, nine failed
+suites, five existing direct binding/FINAL/report/reinterpretation suites, and
+the new wrapper-binding suite. PostgreSQL, restoration, connected browser and
+runtime scans have not passed previously and remain required. Only changed
+SAST inputs are analyzed after verifying the second run's official completion.
+
+The next fixed continuation accepts run 39614240900's complete frontend
+qualification and its original image bytes without compiling, testing, scanning
+or re-uploading the frontend archive again. Backend copy-lock SQL and governance
+trigger repairs invalidate backend compilation and image scan, but not the
+mocked/pure unit paths already passed. Those reports remain explicitly sourced
+from their original runs. The ordinary instrument FINAL PostgreSQL suite's 13
+passing assertions do not execute either changed SQL path; only the three failed
+PG suites run again. Migration upgrade/legacy-byte validation uses the new SQL;
+nonempty recovery and the two browser journeys still require actual execution.
+
+Run 39616852296 passed the repaired 29 PostgreSQL assertions, exact legacy
+upgrade checks and nonempty synthetic restore; its failed account-fixture step
+is not relabeled successful. A diagnostic-only continuation restores both
+original scanned images and runs only fresh browser-database preparation and
+previously unexecuted fixture/browser work. The checkout fixture's current SHA
+and the old backend image revision are recorded separately. Error reporting
+retains safe class/code/phase and basename/line frames, never raw messages,
+Prisma metadata, bootstrap output, credentials or private stderr. The fixture's
+business statements are compared unchanged after removing phase markers and its
+error-handler-only diagnostic tail. Image labels are never rewritten.

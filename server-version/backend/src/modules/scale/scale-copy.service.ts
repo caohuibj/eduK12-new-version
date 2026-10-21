@@ -21,8 +21,9 @@ export class ScaleCopyError extends Error {
 const stable = (value: any): any => Array.isArray(value) ? value.map(stable)
   : value && typeof value === 'object' ? Object.fromEntries(Object.keys(value).sort().map(key => [key, stable(value[key])])) : value
 const digestValue = (value: unknown) => createHash('sha256').update(JSON.stringify(stable(value))).digest('hex')
-type Source = { id: string; code: string; creatorId: string; status: string; instrumentClass: string; instrumentVersion: string; definition: unknown; definitionHash: string | null }
+type Source = { libraryEntryId?: string | null; id: string; code: string; creatorId: string; status: string; instrumentClass: string; instrumentVersion: string; definition: unknown; definitionHash: string | null }
 export const scaleCopyEligibility = (scale: Source, userId: string) => {
+  if (scale.libraryEntryId) return { allowed: false, reason: '共用库授权引用只读，不能复制或修订为私人可编辑工具。' }
   if (scale.creatorId !== userId) return { allowed: false, reason: '仅作者可以复制自编量表；查看或使用授权不包含改编权。' }
   if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE' || scale.status !== 'PUBLISHED') return { allowed: false, reason: '仅已发布的自编描述性量表可以复制。' }
   const definition = scale.definition as Partial<ScaleDefinitionV2> | null
@@ -57,8 +58,9 @@ export const assertScaleCopyPublishSource = async (tx: Prisma.TransactionClient,
     || JSON.stringify(stable(sourceSnapshot(source, validation.definition))) !== JSON.stringify(stable(parsed.data))) {
     throw new ScaleCopyError('复制来源或许可已变化，不能发布此草稿，请重新核对来源。')
   }
+  return source // Reuse this locked, rights-checked identity for release provenance.
 }
-export const copyScaleToDraft = async (sourceId: string, userId: string) => prisma.$transaction(async tx => {
+export const copyScaleToDraft = async (sourceId: string, userId: string, mode: 'COPY' | 'REVISION' = 'COPY') => prisma.$transaction(async tx => {
   const source = await lockScaleCopySource(tx, sourceId)
   if (!source) throw new ScaleCopyError('量表不存在', 404)
   const eligibility = scaleCopyEligibility(source, userId)
@@ -67,8 +69,18 @@ export const copyScaleToDraft = async (sourceId: string, userId: string) => pris
   if (!validation.valid || !validation.definition) throw new ScaleCopyError('来源定义与当前编制器不兼容，不能复制。')
   const definition = validation.definition
   if (source.definitionHash !== hashScaleDefinition(definition)) throw new ScaleCopyError('来源定义摘要不一致，不能复制。')
+  const familyId = mode === 'REVISION' ? source.authoringFamilyId ?? source.id : randomUUID()
+  // Serialize sibling revision allocation on the original family root. Return
+  // an integer, not the lock function's PostgreSQL void (unsupported by Prisma).
+  await tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtext(${"scale-authoring-family:" + familyId}))`
+  const latest = mode === 'REVISION' ? await tx.scale.aggregate({ where: { authoringFamilyId: familyId }, _max: { authoringVersion: true } }) : null
+  const authoringVersion = mode === 'REVISION' ? Math.max(source.authoringVersion ?? 1, latest?._max.authoringVersion ?? 1) + 1 : 1
+  if (mode === 'REVISION' && !source.authoringFamilyId) await tx.scale.update({ where: { id: source.id }, data: { authoringFamilyId: familyId, authoringVersion: 1 } })
   const copied = await tx.scale.create({ data: {
-    code: `COPY_${randomUUID()}`, name: `${source.name}（新草稿）`, description: source.description,
+    code: `COPY_${randomUUID()}`, name: `${source.name}（${mode === 'REVISION' ? '修订' : '新工具'}草稿）`, description: source.description,
+    // Independent copies retain provenance in immutable copySource, not a
+    // lifecycle FK. Revisions alone protect their same-family parent row.
+    authoringFamilyId: familyId, authoringVersion, sourceScaleId: mode === 'REVISION' ? source.id : null,
     status: 'DRAFT', visibility: 'HIDDEN', instrumentClass: 'CUSTOM_DESCRIPTIVE', instrumentVersion: source.instrumentVersion,
     definition: source.definition as Prisma.InputJsonValue, definitionHash: source.definitionHash,
     copySource: sourceSnapshot(source, definition), itemCount: source.itemCount, dimensionCount: source.dimensionCount,

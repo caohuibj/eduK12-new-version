@@ -12,6 +12,9 @@ import { ResearchAuthoringGuide,ResearchImportGuide } from './ResearchAuthoringG
 import { ResearchIssueList } from './ResearchIssueList'
 import { authoringIssueTarget,type AuthoringIssue,type ImportIssueContext } from './authoring-issue-location'
 import './survey-workspace.css'
+import { publishSurveyMeasurement } from './measurement-publication'
+import { SurveyScaleLibrarySubmission } from './SurveyScaleLibrarySubmission'
+import { SurveyScaleVersions } from './SurveyScaleVersions'
 import { useInstrumentLibrary, type InstrumentLibrary } from './instrument-library'
 
 type Envelope<T>={code:number|string;message:string;data:T|null}
@@ -47,11 +50,15 @@ async function api<T>(path:string,method='GET',payload?:unknown):Promise<T>{
   return data.data as T
 }
 const displayKind:Record<Kind,string>={FORM:'Form · 表单',SCALE:'Scale · 量表',SJT:'SJT · 情境判断',COGNITIVE:'Cognitive · 认知任务'}
-export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;instrumentLibrary?:InstrumentLibrary}){
+export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary}:{projectId:string;projectStatus?:string;instrumentLibrary?:InstrumentLibrary}){
   const prefix='/projects/'+encodeURIComponent(projectId)+'/instruments'
   const {list:instruments,page:instrumentPage,refresh:refreshList,error:listError,loading:listLoading}=useInstrumentLibrary(projectId,instrumentLibrary)
   const [active,setActive]=useState<ResearchDraft|null>(null),[dirty,setDirty]=useState(false)
-  const readOnly=Boolean(active?.readOnly||active?.catalogGrantId)
+  const licensedReadOnly=Boolean(active?.readOnly||active?.catalogGrantId)
+  const readOnly=licensedReadOnly||active?.status==='PUBLISHED'
+  const measurementWritable=['DRAFT','ACTIVE'].includes(projectStatus)
+  const [publishedReleaseId,setPublishedReleaseId]=useState('')
+  const [showLibrarySubmission,setShowLibrarySubmission]=useState(false)
   const editGeneration=useRef(0)
   const editorRoot=useRef<HTMLDivElement>(null)
   const [apiIssues,setApiIssues]=useState<AuthoringIssue[]>([])
@@ -76,7 +83,7 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
   // and must never invite another create/import with a fresh request ID.
   const refreshAfterWrite=(page:number)=>refreshList(page,true).catch(()=>{})
   const clearReview=()=>{
-    setPreview(null);setShowPreview(false);setAnswerReview(null);setPreviewFocus(null)
+    setPublishedReleaseId('');setShowLibrarySubmission(false);setPreview(null);setShowPreview(false);setAnswerReview(null);setPreviewFocus(null)
     setBulk(null);setUndo(null);setBulkTargetPageKey('')
   }
   const select=async(id:string)=>{
@@ -122,7 +129,19 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
     setDirty(changedWhileSaving);setPreview(null);setBulk(null);setUndo(null)
     await refreshAfterWrite(instrumentPage)
     setNotice(changedWhileSaving?'本次草稿已保存；保存期间产生的新修改仍待保存。'
-      :'草稿已保存；发布冻结将在研究波次阶段执行')
+      :'草稿已保存；可在编制区发布测量版本，波次冻结另行进行')
+  })}
+  const publishMeasurement=()=>{if(!active||dirty||!measurementWritable||active.status==='ARCHIVED')return;void run(async()=>{
+    const result=await publishSurveyMeasurement(api,projectId,active)
+    setPublishedReleaseId(result.releaseId)
+    if(active.kind==='SCALE'&&!licensedReadOnly)setActive({...active,status:'PUBLISHED',measurementReleaseId:result.releaseId})
+    await refreshAfterWrite(instrumentPage)
+    setNotice('测量版本已发布供本项目自用；未创建波次、启动采集或进入共用库。')
+  })}
+  const revise=()=>{if(!active||active.kind!=='SCALE'||licensedReadOnly||active.status!=='PUBLISHED'||dirty)return;void run(async()=>{
+    const next=await api<ResearchDraft>(prefix+'/'+encodeURIComponent(active.id)+'/revise','POST',{revision:active.revision})
+    setActive(next);setDirty(false);clearReview();await refreshAfterWrite(instrumentPage)
+    setNotice('已建立下一版本草稿；原发布版本、报告和波次保持不变。')
   })}
   const validate=()=>{if(!active||readOnly||dirty)return;void run(async()=>{
     const result=await api<Preview>(prefix+'/'+active.id+'/validate','POST',{})
@@ -244,14 +263,14 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
           className={'block w-full text-left rounded-lg border p-3 '+(active?.id===item.id?'border-sky-700 bg-sky-50':'bg-white')}
           onClick={()=>void select(item.id)} disabled={busy}>
           <strong className="block text-sm break-words">{item.title}</strong>
-          <span className="text-xs text-slate-600">{item.kind} · v{item.revision} · {item.status==='DRAFT'?'草稿':'已归档'}</span>
+          <span className="text-xs text-slate-600">{item.kind} · 修订 {item.revision} · {item.status==='DRAFT'?'草稿':item.status==='PUBLISHED'?'已发布':'已归档'}</span>
         </button>)}
       </nav>
       <div className="min-w-0 space-y-4">
-      {!active&&<div className="border border-dashed rounded-xl p-6 text-sm text-slate-600">选择工具后可编辑题目、检查结构并预览作答。正式发布在下方研究波次中进行。</div>}
+      {!active&&<div className="border border-dashed rounded-xl p-6 text-sm text-slate-600">选择工具后可编辑题目、检查结构并预览作答。量表等测量工具可在此发布自用版本；研究波次另行选择版本并冻结采集。</div>}
       {active&&<><div className="rounded-xl bg-slate-50 border p-4 space-y-3">
         <p className="text-xs">{displayKind[active.kind]} · 工具标识 <code>{active.instrumentKey}</code> · 修订 {active.revision} {dirty?'· 未保存':''}</p>
-        {readOnly&&<SourceProvenance provenance={active.sourceProvenance}/>}
+        {licensedReadOnly&&<SourceProvenance provenance={active.sourceProvenance}/>}
         <label className="text-sm block">研究工具名称
           <input className="input block w-full" value={active.title} readOnly={readOnly} maxLength={200} onChange={e=>{
             if(readOnly)return
@@ -265,6 +284,19 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
           <button className="btn-secondary" type="button" disabled={busy||dirty||active.status==='ARCHIVED'} onClick={archive}>归档</button>
           {undo&&<button className="btn-secondary" type="button" disabled={busy||dirty} onClick={undoImport}>撤销本次导入</button>}
         </div>
+        {active.kind!=='FORM'&&(!readOnly||(active.kind==='SCALE'&&!!active.catalogGrantId))&&<section aria-label="测量版本发布" className="rounded-lg border border-sky-200 bg-sky-50 p-3 space-y-2">
+          <h3 className="font-semibold text-sky-900">发布测量版本 · 项目自用</h3>
+          <p className="text-sm text-slate-600">发布保存后的精确测量版本供报告及波次使用，不启动采集。波次冻结会锁定该次采集内容；申请进入共用库需另行提交审核。</p>
+          <button type="button" className="btn-primary" disabled={busy||dirty||active.status==='ARCHIVED'||!measurementWritable} onClick={publishMeasurement}>发布测量版本</button>
+          {!measurementWritable&&<p className="text-sm">项目已关闭或归档，不能发布新的测量版本。</p>}
+          {publishedReleaseId&&<p className="text-xs break-all">已发布版本标识：{publishedReleaseId}</p>}
+        </section>}
+        {active.kind==='SCALE'&&!licensedReadOnly&&<>
+          <SurveyScaleVersions key={active.id+'-'+active.revision+'-'+active.status} projectId={projectId} draft={active} transport={api}/>
+          {active.status==='PUBLISHED'&&<><p className="text-sm text-sky-900">已发布版本只读。修订会建立下一版本草稿，不覆盖原发布版本。</p><button type="button" className="btn-primary" disabled={busy||dirty||!measurementWritable} onClick={revise}>修订新版本</button></>}
+          <button type="button" className="btn-secondary" onClick={()=>setShowLibrarySubmission(value=>!value)}>{showLibrarySubmission?'收起共用库申请':'申请进入共用库'}</button>
+          {showLibrarySubmission&&<SurveyScaleLibrarySubmission key={active.id} sourceId={active.id}/>}
+        </>}
         {dirty&&<p className="text-xs text-amber-700">请先保存。若另一个标签已经更新，服务器将拒绝旧 revision 的覆盖，本地内容不会被自动清除。</p>}
       </div>
       {!readOnly&&active.status==='DRAFT'&&<div ref={editorRoot} id="survey-authoring-definition" tabIndex={-1} className="survey-authoring-target">

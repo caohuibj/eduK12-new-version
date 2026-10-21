@@ -1,3 +1,4 @@
+import {canonicalScalePresentation} from './catalog-scale.presentation'
 import { Prisma, PrismaClient } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -18,11 +19,12 @@ import { compileResearchCognitive, initialCognitiveDefinition, SURVEY_GONOGO_CON
 
 type Database=Prisma.TransactionClient|PrismaClient
 export const CATALOG_ADAPTER_VERSION='survey-catalog-v1' as const
+export const CANONICAL_SCALE_ADAPTER_VERSION='survey-catalog-scale-v2' as const
 export type CatalogSourceRef={kind:SurveyKind;sourceId:string;sourceVersion:string;organizationId?:string}
 export type SourceAnswerMapping={type:'SCALE_TYPED_V1';items:Record<string,string>;options:Record<string,string|number>}
 export type CatalogSourceSnapshot={ref:CatalogSourceRef;title:string;displayDefinition:unknown;compiledDefinition:unknown;
   definitionDigest:string;scoringDigest:string|null;answerMapping?:SourceAnswerMapping;
-  adapterVersion:typeof CATALOG_ADAPTER_VERSION;provenance:Record<string,unknown>}
+  adapterVersion:typeof CATALOG_ADAPTER_VERSION|typeof CANONICAL_SCALE_ADAPTER_VERSION;provenance:Record<string,unknown>}
 export type CatalogSourceRow={ref:CatalogSourceRef;title:string;available:boolean;unsupportedReason:string|null;definitionDigest?:string}
 const CATALOG_MAX_PAGE=40
 export type CatalogSourcePage={list:CatalogSourceRow[];page:number;hasMore:boolean;terminalReason:'PAGE_LIMIT_REACHED'|'END_OF_CATALOG'|null}
@@ -42,7 +44,25 @@ function snapshot(ref:CatalogSourceRef,title:string,original:unknown,display:unk
     provenance,...(answerMapping?{answerMapping}:{})})
 }
 /** Only presentation identifiers are translated. The canonical score definition is copied byte-for-byte. */
-export function adaptCatalogScale(ref:CatalogSourceRef,title:string,definition:ScaleDefinitionV2):CatalogSourceSnapshot {
+export function adaptCatalogScale(ref:CatalogSourceRef,title:string,definition:ScaleDefinitionV2,
+  options:{instrumentClass?:'STANDARD'|'CUSTOM_DESCRIPTIVE';presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE'}={}):CatalogSourceSnapshot {
+  rights(definition.license)
+  const valid=validateScaleDefinition(definition,{instrumentClass:options.instrumentClass??'STANDARD',scorerKeys:getScaleCustomScorerKeys()})
+  if(!valid.definition||valid.issues.some(i=>i.severity==='error'))fail('SOURCE_SCALE_INVALID')
+  // The canonical Training publisher also rejects randomization: never silently flatten it.
+  if(definition.display?.randomizeItems||definition.items.some(i=>i.randomizeOptions))fail('SOURCE_SCALE_RANDOMIZATION_RUNTIME_UNSUPPORTED')
+  if(definition.items.some(i=>i.type!=='single'))fail('SOURCE_SCALE_RESPONSE_TYPE_RUNTIME_UNSUPPORTED')
+  if(definition.items.length>500)fail('SOURCE_SCALE_SURVEY_ANSWER_LIMIT_500_EXCEEDED')
+  const {display,mapping}=canonicalScalePresentation(definition,options.presentationMode??'ONE_BY_ONE')
+  return copy({ref,title,displayDefinition:display,compiledDefinition:definition,
+    definitionDigest:canonicalHash(definition),scoringDigest:canonicalHash(definition.scoring),
+    adapterVersion:CANONICAL_SCALE_ADAPTER_VERSION,answerMapping:mapping,
+    provenance:{source:definition.source,license:definition.license,originalScoreKeys:definition.scoring.scores.map(s=>s.key),presentationOnly:true}})
+}
+/** Historical V1 grants keep their exact original presentation, including
+ * ALL_AT_ONCE. This adapter is only used to verify an existing immutable grant;
+ * new grants always receive the canonical consumption protocol above. */
+function adaptLegacyCatalogScale(ref:CatalogSourceRef,title:string,definition:ScaleDefinitionV2):CatalogSourceSnapshot {
   rights(definition.license)
   const valid=validateScaleDefinition(definition,{instrumentClass:'STANDARD',scorerKeys:getScaleCustomScorerKeys()})
   if(!valid.definition||valid.issues.some(i=>i.severity==='error'))fail('SOURCE_SCALE_INVALID')
@@ -64,6 +84,11 @@ export function adaptCatalogScale(ref:CatalogSourceRef,title:string,definition:S
   const display={schemaVersion:1,presentationMode:'ALL_AT_ONCE',respondentType:definition.respondentType,responseOptions,dimensions,aggregation:'sum',items}
   return snapshot(ref,title,definition,display,definition,canonicalHash(definition.scoring),
     {source:definition.source,license:definition.license,originalScoreKeys:definition.scoring.scores.map(s=>s.key),presentationOnly:true},answerMapping)
+}
+export function catalogAdapterForRecheck(current:CatalogSourceSnapshot,stored:CatalogSourceSnapshot):CatalogSourceSnapshot {
+  if(stored.ref.kind!=='SCALE'||stored.adapterVersion!==CATALOG_ADAPTER_VERSION)return current
+  const legacy=adaptLegacyCatalogScale(current.ref,current.title,current.compiledDefinition as ScaleDefinitionV2)
+  return {...current,...legacy,provenance:{...current.provenance,...legacy.provenance}}
 }
 /** This adapter admits only complete, fixed V2 expert-key presentations; no branch flattening. */
 export function adaptCatalogSjt(ref:CatalogSourceRef,title:string,pkg:SituationPackage):CatalogSourceSnapshot {
@@ -246,7 +271,7 @@ export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyK
   let cached:Database=db
   let scaleReleases:Map<string,StoredRelease>|undefined
   if(kind==='SCALE'){
-    const rows=await db.scale.findMany({where:{status:'PUBLISHED'},orderBy:{id:'asc'},skip:offset,take})
+    const rows=await db.scale.findMany({where:{status:'PUBLISHED',instrumentClass:'STANDARD'},orderBy:{id:'asc'},skip:offset,take})
     for(const row of rows)refs.push({ref:{kind,sourceId:row.id,sourceVersion:row.instrumentVersion},title:row.name})
     scaleReleases=await getContentReleaseBatch(db,rows.slice(0,limit).flatMap(row=>row.measurementReleaseId?[row.measurementReleaseId]:[]))
     cached={scale:{findFirst:async({where}:any)=>rows.find(r=>r.id===where.id&&r.instrumentVersion===where.instrumentVersion)??null}} as unknown as Database
@@ -320,7 +345,7 @@ export async function assertCatalogSourcesCurrent(entries:Array<{snapshot:Catalo
     let current=verified.get(key)
     if(!current){current=await readCatalogSourceSnapshot({actorUserId:entry.actorUserId,ref:entry.snapshot.ref},cached,true,db,scaleReleases);verified.set(key,current)}
     // Whole immutable adapter identity includes original scorer, presentation, typed mapping and provenance.
-    if(canonicalHash(current)!==canonicalHash(entry.snapshot))fail('SOURCE_SNAPSHOT_CHANGED')
+    if(canonicalHash(catalogAdapterForRecheck(current,entry.snapshot))!==canonicalHash(entry.snapshot))fail('SOURCE_SNAPSHOT_CHANGED')
   }
 }
 

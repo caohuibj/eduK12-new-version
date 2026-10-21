@@ -9,6 +9,7 @@ export default function AdminEntrances(){
     {user&&<p role="note">业务身份：{businessRoleLabel(user)}。管理资格与业务身份分别保存；本页只显示当前管理授权。</p>}
     {user&&['STUDENT','TEACHER','PARENT'].includes(user.businessRole??user.role)&&<p><Link to={((user.businessRole??user.role)==='STUDENT'?'/student':(user.businessRole??user.role)==='PARENT'?'/parent':'/dashboard')+'?workspace=business'}>前往{businessRoleLabel(user)}业务工作台</Link></p>}
     {Boolean(user?.platformRole==='SYSTEM_ADMIN'||user?.entryGrants?.length)&&<AdminStepUp/>}
+    <p><Link to="/admin/scale-library-governance">共用量表审核与使用授权（按实际权限）</Link></p>
     <ul>{user?.platformRole==='SYSTEM_ADMIN'&&<li><Link to="/admin/permissions">系统治理与入口授权</Link></li>}
       {(Object.keys(entryPaths) as AdminEntry[]).filter(entry=>hasAdminEntry(user,entry)).map(entry=><li key={entry}><Link to={entryPaths[entry]}>{entryLabels[entry]}</Link></li>)}
     </ul>

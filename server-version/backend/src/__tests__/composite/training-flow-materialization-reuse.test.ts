@@ -19,12 +19,11 @@ import { createFrozenActiveSlotSet, encryptFrozenActiveSlotSet } from '../../mod
 import { getAttemptState } from '../../modules/composite/composite.service'
 import { buildTrainingFlowUnits } from '../../modules/composite/training-flow-definition'
 import { resolveTrainingFlowScope } from '../../modules/composite/training-flow-scope'
-import { config } from '../../config'
 
 beforeEach(()=>{
   vi.resetAllMocks();vi.stubEnv('DATA_ENCRYPTION_KEY','e'.repeat(64))
   mocks.global.$transaction.mockImplementation(fn=>fn(mocks.tx))
-  mocks.tx.$queryRaw.mockResolvedValue([{id:'attempt'}])
+  mocks.tx.$queryRaw.mockImplementation(async(sql:any)=>String(sql?.sql??sql).includes('scale_library_emergency_stops')?[]:[{id:'attempt'}])
   mocks.tx.assessment.findFirst.mockResolvedValue(null)
   mocks.tx.assessmentUnitSnapshot.findMany.mockResolvedValue([])
   mocks.allowed.mockResolvedValue(true)
@@ -64,7 +63,7 @@ describe('locked Training child candidate reuse',()=>{
     expect(vi.mocked(decryptUnifiedRuntimePayload).mock.calls.filter(([cipher])=>cipher===parent.trainingFlowSnapshotEncrypted)).toHaveLength(1)
     expect(vi.mocked(canonicalHash).mock.calls.filter(([value])=>(value as any)?.privateMarker==='CANDIDATE_PRIVATE')).toHaveLength(1)
     expect(mocks.runtime).toHaveBeenCalledExactlyOnceWith('runtime-cipher',mocks.tx)
-    expect(mocks.allowed).toHaveBeenCalledExactlyOnceWith('teacher','TEACHER',parent.compositeAssessment.items[0].scale,mocks.tx)
+    expect(mocks.allowed).not.toHaveBeenCalled() // Frozen delivery does not reacquire ordinary use rights.
     expect(mocks.tx.$queryRaw.mock.invocationCallOrder[0]).toBeLessThan(mocks.tx.compositeAssessmentAttempt.findUnique.mock.invocationCallOrder[0])
   })
   it('does not expose the candidate on ordinary scope results or reuse it across invocations',async()=>{
@@ -86,37 +85,19 @@ describe('locked Training child candidate reuse',()=>{
     await expect(getAttemptState(parent.id,{userId:'student'})).rejects.toMatchObject({statusCode:403})
     expect(mocks.runtime).not.toHaveBeenCalled()
   })
-  it('retains owner and current resource authorization before materialization',async()=>{
+  it('retains participant ownership while ordinary grant withdrawal does not interrupt frozen delivery',async()=>{
     const {parent}=fixture()
     await expect(getAttemptState(parent.id,{userId:'outsider'})).rejects.toMatchObject({statusCode:403})
     expect(decryptUnifiedRuntimePayload).not.toHaveBeenCalled()
     mocks.allowed.mockResolvedValue(false)
-    await expect(getAttemptState(parent.id,{userId:'student'})).rejects.toMatchObject({statusCode:403})
-    expect(mocks.runtime).not.toHaveBeenCalled()
+    await expect(getAttemptState(parent.id,{userId:'student'})).rejects.toBe(mocks.boundary)
+    expect(mocks.allowed).not.toHaveBeenCalled()
+    expect(mocks.runtime).toHaveBeenCalledExactlyOnceWith('runtime-cipher',mocks.tx)
   })
-
-  it.each([false,true])('keeps separate Scale-use rights for a STUDENT Training-entry administrator, material grant=%s',async granted=>{
-    const {parent,composite}=fixture()
-    composite.createdBy='entry-admin';composite.creator={id:'entry-admin',role:'STUDENT'}
-    // Entry membership is a separate contract (admin-permissions/training-merge
-    // PostgreSQL suite). It must not be substituted for this resource grant.
-    const {canUseScale}=await vi.importActual<typeof import('../../services/materialGrant')>('../../services/materialGrant')
-    const previous=config.materialGrantsEnabled;config.materialGrantsEnabled=true
-    mocks.allowed.mockImplementation(canUseScale)
-    mocks.tx.materialGrant.findUnique.mockResolvedValue(granted?{id:'explicit-scale-grant'}:null)
-    try{
-      const outcome=getAttemptState(parent.id,{userId:'student'})
-      if(granted){
-        await expect(outcome).rejects.toBe(mocks.boundary)
-        expect(mocks.runtime).toHaveBeenCalledExactlyOnceWith('runtime-cipher',mocks.tx)
-      }else{
-        await expect(outcome).rejects.toMatchObject({statusCode:403})
-        expect(mocks.runtime).not.toHaveBeenCalled()
-      }
-      expect(mocks.allowed).toHaveBeenCalledExactlyOnceWith('entry-admin','STUDENT',composite.items[0].scale,mocks.tx)
-      expect(mocks.tx.materialGrant.findUnique).toHaveBeenCalledExactlyOnceWith({where:{teacherId_resourceType_resourceId:{
-        teacherId:'entry-admin',resourceType:'SCALE',resourceId:'scale',
-      }}})
-    }finally{config.materialGrantsEnabled=previous}
+  it('emergency stop rejects a frozen pending child before runtime materialization',async()=>{
+    const {parent}=fixture()
+    mocks.tx.$queryRaw.mockImplementation(async(sql:any)=>String(sql?.sql??sql).includes('scale_library_emergency_stops')?[{target_id:'scale'}]:[{id:'scale',measurement_release_id:null}])
+    await expect(getAttemptState(parent.id,{userId:'student'})).rejects.toMatchObject({statusCode:409})
+    expect(mocks.runtime).not.toHaveBeenCalled()
   })
 })
