@@ -111,6 +111,7 @@ export const surveyWaveSelectionFiles = new Set([
 export const surveyWaveSelectionTools = new Set([
   '.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs',
   '.github/scripts/survey-wave-selection.test.mjs','.github/scripts/survey-wave-selection-browser.mjs',
+  '.github/scripts/maintenance-routing.test.mjs',
   '.github/workflows/ci.yml','.github/workflows/ci-backend-regression.yml',
   '.github/workflows/ci-frontend.yml','.github/workflows/ci-images.yml','docs/release/README.md',
 ]);

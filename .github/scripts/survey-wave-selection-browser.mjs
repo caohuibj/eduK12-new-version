@@ -15,6 +15,7 @@ const image='server-version-frontend:latest',imageId=docker('image','inspect','-
 const temp=await mkdtemp(join(tmpdir(),'survey-wave-selection-')),dist=join(temp,'html');
 let container,server,browser,timer;
 const reportDir='survey-wave-selection-browser-report',records=[];
+const saveReport=()=>writeFile(reportDir+'/results.json',JSON.stringify({imageId,kind:'synthetic-production-frontend-browser',records},null,2));
 const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.woff2':'font/woff2','.ico':'image/x-icon'};
 const origin='http://survey.eduk12.top';
 const projectId='11111111-1111-4111-8111-111111111111',waveId='22222222-2222-4222-8222-222222222222',toolId='33333333-3333-4333-8333-333333333333';
@@ -31,7 +32,7 @@ const frozen=[{draftId:toolId,instrumentKey:tool.instrumentKey,title:'冻结合�
 const expected={revision:3,contentSelections:[{instrumentId:toolId,reportReleaseId:reportId,references:[{releaseId:referenceId,entryKey,priority:2}]}]};
 try{
  container=docker('create',imageId);await mkdir(dist);docker('cp',container+':/usr/share/nginx/html/.',dist);docker('rm',container);container=null;
- await stat(join(dist,'index.html'));await mkdir(reportDir,{recursive:true});
+ await stat(join(dist,'index.html'));await mkdir(reportDir,{recursive:true});await saveReport();
  server=createServer(async(req,res)=>{
   try{
    const pathname=decodeURIComponent(new URL(req.url,'http://localhost').pathname);let file=resolve(dist,'.'+pathname);
@@ -94,6 +95,10 @@ try{
    }catch(error){unknown.push({key,error:String(error)});return json(null,500,'unexpected browser contract request');}
   });
   try{
+   const panel=page.getByRole('region',{name:'研究者报告与参考版本',exact:true});
+   // The label wraps the select and its options. Match its stable accessible
+   // prefix, not an exact label string that also includes option text.
+   const reportSelect=panel.getByRole('combobox',{name:/^报告版本 · 合成测量/});
    const openWave=async()=>{
     await page.getByRole('button',{name:'查看/编辑',exact:true}).click();
     await page.getByRole('tab',{name:'发布与采集',exact:true}).click();
@@ -101,14 +106,14 @@ try{
    };
    await page.goto(origin+'/workspace');await openWave();
    await page.getByRole('button',{name:'读取 合成测量 的报告版本',exact:true}).click();
-   await page.getByLabel('报告版本 · 合成测量',{exact:true}).selectOption(reportId);
+   await reportSelect.waitFor({state:'visible'});assert.equal(await reportSelect.count(),1);
+   await reportSelect.selectOption(reportId);
    await page.getByRole('button',{name:'读取 合成测量 的参考版本',exact:true}).click();
    await page.getByRole('checkbox',{name:'合成私有参考 · ref1 · total · descriptive_sample',exact:true}).check();
    await page.getByLabel('优先级 · ref1 · total',{exact:true}).fill('2');
    await page.waitForLoadState('networkidle');assert.deepEqual(posts,[],'selection itself must never write');assert.deepEqual(optionReads,['REPORT','REFERENCE']);
    await page.getByRole('button',{name:'检查知情同意与所有工具',exact:true}).click();
    await page.getByRole('button',{name:'冻结研究定义',exact:true}).click();
-   const panel=page.getByRole('region',{name:'研究者报告与参考版本',exact:true});
    if(mode==='success'){
     await panel.getByText('报告版本：'+reportId,{exact:true}).waitFor();
     assert.equal(await panel.getByRole('combobox').count(),0,'frozen selection must be read-only');
@@ -119,7 +124,7 @@ try{
     assert.equal(await panel.getByRole('combobox').count(),0);assert.deepEqual(optionReads,['REPORT','REFERENCE'],'frozen reload must not discover current candidates');
    }else{
     await page.getByText(/合成报告已停用；原报告／参考选择保留/).waitFor();
-    assert.equal(await page.getByLabel('报告版本 · 合成测量',{exact:true}).inputValue(),reportId);
+    assert.equal(await reportSelect.inputValue(),reportId);
     assert.equal(await page.getByRole('checkbox',{name:'合成私有参考 · ref1 · total · descriptive_sample',exact:true}).isChecked(),true);
    }
    await page.waitForLoadState('networkidle');
@@ -129,9 +134,16 @@ try{
    assert.deepEqual(errors,[],'browser errors');assert.deepEqual(unknown,[],'unknown API/assets');
    await page.screenshot({path:reportDir+'/'+mode+'.png',fullPage:false});
    records.push({mode,status:'passed',optionReads,preparePosts:1});console.log('PASS Survey Wave selection '+mode);
-  }finally{await context.close();}
+  }catch(error){
+   const failure={mode,status:'failed',error:String(error),stack:error?.stack,unknown,errors,posts,optionReads};
+   try{failure.alerts=await page.getByRole('alert').allTextContents();failure.visibleText=await page.locator('body').innerText({timeout:2000});}
+   catch(diagnosticError){failure.diagnosticError=String(diagnosticError);}
+   try{await page.screenshot({path:reportDir+'/'+mode+'-failure.png',fullPage:false,timeout:5000});}
+   catch(screenshotError){failure.screenshotError=String(screenshotError);}
+   records.push(failure);await saveReport();throw error;
+  }finally{await saveReport();await context.close();}
  }
- await writeFile(reportDir+'/results.json',JSON.stringify({imageId,kind:'synthetic-production-frontend-browser',records},null,2));
+ await saveReport();
 }finally{
  clearTimeout(timer);await browser?.close();if(server){server.closeAllConnections();await new Promise(resolve=>server.close(resolve));}
  if(container)docker('rm','-f',container);await rm(temp,{recursive:true,force:true});

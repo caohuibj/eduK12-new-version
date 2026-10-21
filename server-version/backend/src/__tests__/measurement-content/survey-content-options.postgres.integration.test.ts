@@ -51,7 +51,8 @@ suite('Survey Wave private content options / real isolated PostgreSQL',()=>{
   const admin=await db.user.create({data:{username:'selectionadmin'+key(),passwordHash:'synthetic',role:'ADMIN',platformRole:'SYSTEM_ADMIN',accountDomain:'LEGACY'}})
   for(let i=0;i<2;i++){
    const user=await db.user.create({data:{username:'selection'+key(),passwordHash:'synthetic',role:'STUDENT',accountDomain:'SURVEY'}})
-   const login='selection'+key();await db.surveyAccount.create({data:{userId:user.id,loginName:login,normalizedLogin:login}})
+   // The real realm SQL constraint permits 4–32 lowercase login characters.
+   const login='selection'+key().slice(0,20);await db.surveyAccount.create({data:{userId:user.id,loginName:login,normalizedLogin:login}})
    await db.surveyResearcherGrant.create({data:{userId:user.id,status:'ACTIVE',grantedBy:admin.id}})
    await db.surveyMfaCredential.create({data:{userId:user.id,enabled:true,secretCipher:'synthetic'}})
    if(i===0)owner=user.id;else other=user.id
