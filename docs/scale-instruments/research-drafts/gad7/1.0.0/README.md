@@ -35,9 +35,11 @@ safety-screening item is added. No PHQ-9 item-9 logic is imported into GAD-7.
 2. Versioned report QC requires a truthful reviewer, timestamp and basis. The
    schema does not require that reviewer to be human; AI review must identify
    itself honestly. scientificReview is a separate human-reviewed maturity
-   claim and is not created here. The respondent enum includes ADULT_SELF, but
-   the audience enum only has student/parent/teacher; that mismatch needs an
-   explicit suitable product decision, not a fabricated audience or reviewer.
+   claim and is not created here. ADULT_SELF with audience=student is already
+   supported: student is the technical respondent/subject report audience, not
+   an age restriction. Actual call-site disclosure, adult-facing wording and
+   report projection remain unverified; scientific age applicability remains
+   unchanged. No fabricated audience or reviewer is needed.
 3. Standard instruments already support descriptive raw-score prose through
    report.interpretations with source=score_only. Only the separate self-authored
    rawScoreFeedback feature is prohibited for STANDARD; this does not prevent a

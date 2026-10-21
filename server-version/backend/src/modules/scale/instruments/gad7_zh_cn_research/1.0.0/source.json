@@ -112,7 +112,8 @@
         "报告设计仅七题总分0–21；所选standalone版本不含功能困难附加题；任一症状缺答不算总分是平台保守草稿选择。",
         "无诊断、常模、百分位、筛查阳性或自杀风险等级；原英文阈值仅研究材料元数据。",
         "现有score_only解释支持标准量表描述报告；qcReview可真实记录AI身份，不冒充人审；未生成scientificReview。",
-        "本工具不是诊断或自杀风险评估，分数低也不能排除需要帮助的情况。若持续感到困扰，可寻求合格专业人员的评估。若正处于即时危险或无法保证自身安全，请立即联系当地急救服务，并寻求可信赖的人陪伴。此页面无人实时监测，不会自动联系您或安排援助。"
+        "本工具不是诊断或自杀风险评估，分数低也不能排除需要帮助的情况。若持续感到困扰，可寻求合格专业人员的评估。若正处于即时危险或无法保证自身安全，请立即联系当地急救服务，并寻求可信赖的人陪伴。此页面无人实时监测，不会自动联系您或安排援助。",
+        "现有 ADULT_SELF 与 audience=student 可合法组合；student 是 respondent/subject 的技术报告受众，不是未成年人年龄限制。具体调用的披露、成人文案与报告投影尚待验证，不能据此宣称已可施测；科学适用年龄限制仍保留。"
       ],
       "disclaimer": "仅研究候选，未注册可执行包，不可施测。AI工作译稿未验证，未获得原开发者审校或认可。"
     },
@@ -120,7 +121,7 @@
       "EXECUTABLE_NOT_REGISTERED",
       "LOCALIZATION_REVIEW_PENDING",
       "INDEPENDENT_INSTRUCTIONS_PRESENTATION_REQUIRED",
-      "ADULT_AUDIENCE_CONTRACT_REVIEW_REQUIRED",
+      "RESPONDENT_REPORT_PROJECTION_VERIFICATION_PENDING",
       "SUPPORT_AND_PRIVACY_REVIEW_REQUIRED"
     ]
   }

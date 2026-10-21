@@ -119,7 +119,8 @@
         "高分不是更好，低分不是更差。情绪稳定性不能同向改称神经质；智性/想象力不是IQ或能力成绩。不推断性取向，不形成招聘、升学或其他高风险选拔建议。",
         "不承诺绝对保密；施测前须另行落实真实的数据使用、访问、保存及退出说明。",
         "只展示候选目录资料，不可开始、施测或生成实际报告；无总分、等级、临床阈值、常模或百分位。",
-        "公有领域许可仅为工具来源权利依据，非平台授权；现有score_only可承载描述性报告，qcReview可真实记录AI身份，未生成scientificReview。"
+        "公有领域许可仅为工具来源权利依据，非平台授权；现有score_only可承载描述性报告，qcReview可真实记录AI身份，未生成scientificReview。",
+        "现有 ADULT_SELF 与 audience=student 可合法组合；student 是 respondent/subject 的技术报告受众，不是未成年人年龄限制。具体调用的披露、成人文案与报告投影尚待验证，不能据此宣称已可施测；科学适用年龄限制仍保留。"
       ],
       "disclaimer": "仅研究候选，未注册可执行包，不可施测。AI中文译稿未验证，不以任何人格维度评价人的好坏或能力。"
     },
@@ -128,7 +129,7 @@
       "LOCALIZATION_REVIEW_PENDING",
       "EXACT_FORM_VALIDATION_MATCH_OPEN",
       "VERSIONED_INSTRUCTIONS_AND_PRIVACY_REVIEW_REQUIRED",
-      "ADULT_AUDIENCE_CONTRACT_REVIEW_REQUIRED"
+      "RESPONDENT_REPORT_PROJECTION_VERIFICATION_PENDING"
     ]
   }
 }

@@ -133,7 +133,8 @@
         "无反向、无总分，无高低档、常模、百分位或诊断；不得用于升学、就业选拔或成功/困境责任归因。",
         "2026方法因子证据不是简单四题总分或普通单因子获得支持，当前仅保留2022双均分的来源可追溯性。",
         "只展示候选目录资料，不可开始、施测或生成实际报告；现有score_only支持描述性解释，但未启用执行。",
-        "CC BY 4.0允许按署名要求复制及翻译，不等于平台grant；未生成scientificReview。"
+        "CC BY 4.0允许按署名要求复制及翻译，不等于平台grant；未生成scientificReview。",
+        "现有 ADULT_SELF 与 audience=student 可合法组合；student 是 respondent/subject 的技术报告受众，不是未成年人年龄限制。具体调用的披露、成人文案与报告投影尚待验证，不能据此宣称已可施测；科学适用年龄限制仍保留。"
       ],
       "disclaimer": "仅研究候选，不可施测。AI中文译稿未验证；控制信念不代表实际能力、个人价值或应负责任。双维结构存在须明确呈现的研究争议。"
     },
@@ -142,7 +143,7 @@
       "LOCALIZATION_REVIEW_PENDING",
       "STRUCTURAL_EVIDENCE_REVIEW_REQUIRED",
       "INDEPENDENT_INSTRUCTIONS_PRESENTATION_REQUIRED",
-      "ADULT_AUDIENCE_CONTRACT_REVIEW_REQUIRED",
+      "RESPONDENT_REPORT_PROJECTION_VERIFICATION_PENDING",
       "PRIVACY_AND_RESEARCH_USE_REVIEW_REQUIRED"
     ]
   }

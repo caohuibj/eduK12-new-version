@@ -40,7 +40,10 @@ review, psychometric validation, a medical safety review or developer endorsemen
    not be relabelled as attention/social-desirability, given an invented score,
    omitted from the chosen form, or made a required contributor to the sum.
 3. Versioned report QC requires `audienceContract.qcReview` with reviewer/time;
-   the audience enum lacks an adult-self audience. No reviewer, human approval,
+   ADULT_SELF with audience=student is supported. Here student denotes the
+   technical respondent/subject report audience, not an age limit. Actual
+   call-site disclosure, adult-facing wording and report projection remain
+   unverified. No reviewer, human approval,
    scientificReview or authorization is invented, and version axes are not
    removed to bypass validation. Registry initialization throws on invalid
    sources, so registering an expected-failure draft would harm other tools.
@@ -84,6 +87,8 @@ report and is not by itself an executable-onboarding blocker.
 
 The actual PHQ-9 constraints remain: independent two-week instructions and
 unconditional safety visibility, a genuine unscored optional functional question,
-a suitable adult-facing audience contract, and a reviewed support/privacy plan.
+verified respondent report projection/disclosure and adult-facing wording, and
+a reviewed support/privacy plan. The existing adult-self technical audience
+combination is not a schema blocker; scientific age applicability remains unchanged.
 The research translation remains unvalidated and not developer-endorsed. This
 clarification changes no items, scoring contract, fixtures or arithmetic results.

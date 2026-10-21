@@ -31,7 +31,7 @@
   "publicationGates": [
     "Human translation/expert review and cognitive debrief",
     "Unconditional administration instructions and support notice",
-    "Appropriate adult-facing audience contract and truthful QC reviewer/time/basis; schema itself does not require human QC. scientificReview remains a separate human-reviewed maturity claim.",
+    "ADULT_SELF with audience=student is already supported: student is the technical respondent/subject report audience, not an age restriction. Verify actual call-site disclosure, adult-facing wording and report projection before use; retain scientific population limits. Record truthful QC reviewer/time/basis without fabricated human or scientific review.",
     "Privacy, consent, minimization and real deployment authorization",
     "Local psychometric evidence for any population/threshold claim"
   ],

@@ -113,7 +113,8 @@
         "报告设计仅九题总分0–27；不计分功能题独立，缺答不影响完整九题总分。",
         "无诊断、常模、百分位、筛查阳性或自杀风险等级；原英文阈值仅研究材料元数据。",
         "现有score_only解释支持标准量表描述报告；qcReview可真实记录AI身份，不冒充人审；未生成scientificReview。",
-        "第 9 题选择任何非零选项时，都需要由专业人员进一步评估，不应等待总分。第 9 题或总分不能判断自杀意图或风险等级，选择零分也不能排除风险。若正处于即时危险或无法保证自身安全，请立即联系当地急救服务，并寻求可信赖的人陪伴。此页面无人实时监测，不会自动联系您或安排援助。"
+        "第 9 题选择任何非零选项时，都需要由专业人员进一步评估，不应等待总分。第 9 题或总分不能判断自杀意图或风险等级，选择零分也不能排除风险。若正处于即时危险或无法保证自身安全，请立即联系当地急救服务，并寻求可信赖的人陪伴。此页面无人实时监测，不会自动联系您或安排援助。",
+        "现有 ADULT_SELF 与 audience=student 可合法组合；student 是 respondent/subject 的技术报告受众，不是未成年人年龄限制。具体调用的披露、成人文案与报告投影尚待验证，不能据此宣称已可施测；科学适用年龄限制仍保留。"
       ],
       "disclaimer": "仅研究候选，未注册可执行包，不可施测。AI工作译稿未验证，未获得原开发者审校或认可。"
     },
@@ -122,7 +123,7 @@
       "LOCALIZATION_REVIEW_PENDING",
       "INDEPENDENT_INSTRUCTIONS_PRESENTATION_REQUIRED",
       "UNSCORED_IMPAIRMENT_REPRESENTATION_REQUIRED",
-      "ADULT_AUDIENCE_CONTRACT_REVIEW_REQUIRED",
+      "RESPONDENT_REPORT_PROJECTION_VERIFICATION_PENDING",
       "IN_SESSION_SAFETY_AND_PRIVACY_REVIEW_REQUIRED"
     ]
   }

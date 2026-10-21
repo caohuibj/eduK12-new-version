@@ -25,7 +25,7 @@
   "norms": null,
   "imageStatus": "DRAFT_PREVIEW_ASSET_PENDING",
   "publicationGates": [
-    "Appropriate population and adult-facing audience decision",
+    "ADULT_SELF with audience=student is already supported: student is the technical respondent/subject report audience, not an age restriction. Verify actual call-site disclosure, adult-facing wording and report projection before use; retain scientific population limits. Record truthful QC reviewer/time/basis without fabricated human or scientific review.",
     "Truthful report QC reviewer/time/basis; no fabricated human review",
     "Privacy, consent, retention and actual deployment authority",
     "Exact Chinese validation match before any validity/threshold claims",
