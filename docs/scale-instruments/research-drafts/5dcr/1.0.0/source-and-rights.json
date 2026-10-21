@@ -1,0 +1,106 @@
+{
+  "schemaVersion": 1,
+  "sourcePackage": "/workspace/scratch/5a77e8bdc1ae/library-research/scales/review-packages/5dcr_review_package.r2.json",
+  "frozenReviewPackageSha256": "8bbfbdec883b8d5b6fcd7597e88edcb343fe4612f800b55fe7df9949d0e14b68",
+  "revisionRecord": {
+    "revision": "r2",
+    "r1_path": "/workspace/scratch/5a77e8bdc1ae/library-research/scales/review-packages/5dcr_review_package.json",
+    "r1_sha256": "f5bb41f4449c44638d96adc1147e94ec2ddd50a27ad566d384994ebc9c89a045",
+    "r2_path": "/workspace/scratch/5a77e8bdc1ae/library-research/scales/review-packages/5dcr_review_package.r2.json",
+    "r2_sha256": "8bbfbdec883b8d5b6fcd7597e88edcb343fe4612f800b55fe7df9949d0e14b68",
+    "review_provenance": "Parent /root task message, 2026-10-21 20:06:50 UTC: independent review GO_FOR_MATERIAL_PACKAGE; two requested revisions. This is a materials preparation decision, not a claim of scientific human validation.",
+    "changes": [
+      {
+        "path": "items[22].zh_ai",
+        "before": "边走边创造一段冒险经历，比按计划进行的冒险更吸引我。",
+        "after": "比起事先安排好的冒险，我觉得在过程中即兴展开的冒险要吸引人得多。"
+      },
+      {
+        "path": "scoring.missing_ambiguity.validation_sample_note",
+        "after": "Official technical documentation printed page 5, Item analyses, states that the retained validation sample had no missing values after data processing. This does not resolve the scoring denominator ambiguity or establish an author complete-response requirement."
+      }
+    ],
+    "unchanged": "All English items, other Chinese items, anchors, facet keys, scoring equations, rights and report boundaries."
+  },
+  "instrumentLicense": {
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "primary_instrument": "https://access.gesis.org/zis/1218",
+    "primary_documentation": "https://access.gesis.org/zis/1217",
+    "evidence": "Both official PDFs, second PDF page, Terms of use. The licensed work includes the full instrument, not merely a separate third-party article citation.",
+    "quotation": "licensed under a Creative Commons Attribution 4.0 International License.",
+    "permissions": [
+      "public reproduction",
+      "redistribution",
+      "translation/adaptation",
+      "commercial reuse with attribution and change notice"
+    ],
+    "attribution": "Original 5DCR: Todd B. Kashdan, David J. Disabato, Fallon R. Goodman and Patrick E. McKnight (2020). GESIS English form/documentation: David J. Grüning and Clemens M. Lechner (2022), DOI 10.1080/00223891.2022.2057318, CC BY 4.0. Chinese text is an AI-created adaptation, not an author-endorsed or validated Chinese version.",
+    "author_use_page": "https://toddkashdan.com/publications/",
+    "author_use_quote": "All measures and scales available for free use in science or practice. No need to ask!",
+    "article_rights_separate": "2020 original article readable through author-linked full text; redistribution permission not established, link only. 2022 full publisher article access blocked; official licensed technical excerpt is not described as the full article."
+  },
+  "originalPaper": {
+    "citation": "Kashdan, T. B., Disabato, D. J., Goodman, F. R., & McKnight, P. E. (2020). The Five-Dimensional Curiosity Scale Revised (5DCR): Briefer subscales while separating overt and covert social curiosity. Personality and Individual Differences, 157, 109836.",
+    "doi": "10.1016/j.paid.2020.109836",
+    "publisher_url": "https://www.sciencedirect.com/science/article/pii/S019188692030026X",
+    "author_link_provenance": "https://www.fallongoodman.com/publications",
+    "fulltext_url": "https://www.researchgate.net/publication/336571293_The_Five-Dimensional_Curiosity_Scale_Revised_5DCR_Briefer_subscales_while_separating_general_overt_and_covert_social_curiosity",
+    "fulltext_status": "Read full author-linked manuscript including Appendix and scoring; free to read, NOT claimed openly licensed.",
+    "backup": "LINK_ONLY",
+    "order_note": "Original Appendix places Thrill Seeking before social facets and orders overt social items differently. This package pins GESIS 2022 order, not original 2020 presentation order.",
+    "population": "US working adults N=483 and community sample N=460; not a schoolchild norm."
+  },
+  "validationDocument": {
+    "doi": "10.1080/00223891.2022.2057318",
+    "citation": "Grüning, D. J., & Lechner, C. M. (online 2022; print 2023). Measuring Six Facets of Curiosity in Germany and the UK: A German-Language Adaptation of the 5DCR and Its Comparability with the English-Language Source Version. Journal of Personality Assessment, 105(2), 283–295.",
+    "fulltext_url": "https://www.tandfonline.com/doi/full/10.1080/00223891.2022.2057318",
+    "fulltext_access": "403, not bypassed; official 16-page technical excerpt read and available for backup.",
+    "sample": "UK native-English adults N=483, ages 18–69, mean 44, SD 15; 51.2% female; two-week retest N=182.",
+    "reliability": "Facet omega .88–.92; retest .64–.76.",
+    "invariance": "At least partial scalar invariance reported across examined age, sex, education and UK/Germany comparisons; not evidence of Chinese equivalence."
+  },
+  "chineseEvidence": {
+    "package_status": "AI initial translation, unvalidated; independent bilingual review pending.",
+    "existing_validation_doi": "10.1002/pchj.813",
+    "existing_validation_url": "https://onlinelibrary.wiley.com/doi/10.1002/pchj.813",
+    "citation": "Tian, Y., Huang, Q., Liu, X., Zhang, J., Ye, Y., & Wu, H. (online 2024; print 2025). Unraveling the Intricacies of Curiosity: A Comprehensive Study of Its Measures in the Chinese Context. PsyCh Journal, 14(2), 219–234.",
+    "sample": "N=723, ages 18–53, mean 22.11 (SD 4.35); 455 women; 654 students and 69 employed.",
+    "evidence": "Six-factor 5DCR: CFI .89, TLI .88, RMSEA .06, SRMR .05; authors retained six factors despite CFI/TLI below .90. Facet omegas .732–.842.",
+    "version_rights": "Study translation prepared/proofread by first five authors. Exact translation rights and correspondence to this AI draft not established; no copying of that Chinese text, no transfer of its validity to this draft.",
+    "equivalence": "No English/Chinese equivalence or Chinese norms claimed."
+  },
+  "officialBackups": [
+    {
+      "path": "/workspace/scratch/5a77e8bdc1ae/library-research/scales/review-packages/5dcr_sources/official_instrument.pdf",
+      "source_url": "https://access.gesis.org/zis/1218",
+      "bytes": 317811,
+      "sha256": "db3de44c0f136a554992bff7c6307697a358c81468515249002ecc608de1e641",
+      "license": "CC BY 4.0",
+      "notion_backup": "Uploaded and read back as hosted PDF block on candidate page; local hash pertains to downloaded source, not independently downloaded Notion bytes."
+    },
+    {
+      "path": "/workspace/scratch/5a77e8bdc1ae/library-research/scales/review-packages/5dcr_sources/official_documentation.pdf",
+      "source_url": "https://access.gesis.org/zis/1217",
+      "bytes": 701318,
+      "sha256": "a6d7e79a912dff0b8b529fa444c43d8ef20b6ba4177a74d2c01c1f1c341e0cb4",
+      "license": "CC BY 4.0",
+      "notion_backup": "Uploaded and read back as hosted PDF block on candidate page; local hash pertains to downloaded source, not independently downloaded Notion bytes."
+    }
+  ],
+  "notion": {
+    "id": "400d2763-5a38-811c-9a1f-ca3fbd129bd8",
+    "url": "https://app.notion.com/p/400d27635a38811c9a1fca3fbd129bd8?pvs=204",
+    "pdf_blocks": [
+      "<pdf source=\"notion-file-block://4d797430-89c6-48e9-bb89-4733aecf3ebd/efd096d6-d857-4a20-8bd7-101c29cfb7bd?space_id=9e43fb55-6bac-475f-885c-3de56256643e&name=5DCR_official_instrument.pdf\" />",
+      "<pdf source=\"notion-file-block://13f481d6-4929-4111-bbcd-a0b4474a9b5d/07a3bca3-f792-4188-886a-08d8f75db96a?space_id=9e43fb55-6bac-475f-885c-3de56256643e&name=5DCR_official_documentation.pdf\" />"
+    ],
+    "q24_present": true,
+    "missing_ambiguity_present": true,
+    "ai_notice_present": true,
+    "truncated": false
+  },
+  "rightsStatus": "CLEAR",
+  "releaseStatus": "UNREGISTERED_RESEARCH_MATERIALS",
+  "scientificHumanValidation": false
+}
