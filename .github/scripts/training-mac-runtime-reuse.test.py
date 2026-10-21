@@ -40,6 +40,24 @@ class Contract(unittest.TestCase):
             with self.assertRaisesRegex(ValueError,'Browser compiled input changed'): M.admit_prior_browser_success(q)
             equality[key]=saved
 
+    def test_round8_refuses_wrong_producer_before_download(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        pin=M.ROUND8_PIN
+        run={'id':int(pin['runId']),'run_attempt':1,'head_sha':'wrong','head_branch':'work/training-mac-ui-final-20261020',
+             'repository':{'full_name':'caohuibj/eduK12-new-version'},'head_repository':{'full_name':'caohuibj/eduK12-new-version'}}
+        q=SimpleNamespace(api=lambda path: run)
+        with patch.object(M,'REVIEWED_SECURITY_RUNTIME_SHA256',M.hashlib.sha256((ROOT/'training-mac-runtime.py').read_bytes()).hexdigest()), patch.object(M,'REVIEWED_SECURITY_INPUTS_SHA256',M.hashlib.sha256((ROOT/'training-mac-inputs.json').read_bytes()).hexdigest()):
+            with self.assertRaisesRegex(ValueError,'Wrong round8 producer'):M.admit_round8_successes(q)
+
+    def test_round8_case_inference_preserves_failed_case(self):
+        self.assertEqual(len(set(M.ROUND8_PASSED_CASES)),3)
+        self.assertNotIn(M.ROUND8_FAILED_CASE,M.ROUND8_PASSED_CASES)
+        self.assertEqual(M.ROUND8_PIN['runId'],'39526376171')
+        source=(ROOT/'training-mac-runtime-reuse.py').read_text()
+        self.assertIn("phases['scoped-pg-http']['status'] == 'failure'",source)
+        self.assertIn('original per-case reporter was not retained',source)
+
     def test_artifact_refuses_expiry_and_cross_run(self):
         p = M.ARTIFACTS['backend']
         a = dict(id=p['artifactId'], name=p['artifactName'], expired=False, size_in_bytes=p['zipBytes'], digest='sha256:' + p['zipSha256'], workflow_run={'id':int(M.PIN['runId']), 'head_sha':M.PIN['sourceHead']})

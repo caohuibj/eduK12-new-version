@@ -34,3 +34,13 @@ it('preserves creator restrictions and leaves analysis to its single course tab'
  expect(screen.queryByRole('button',{name:'作答与结果'})).toBeNull();expect(screen.queryByRole('button',{name:'导出本课程数据'})).toBeNull()
  expect(screen.queryByRole('button',{name:'课程数据分析'})).toBeNull()
 })
+
+it.each(['LEGACY_COMPOSITE','ASSESSMENT_BUNDLE'])('does not offer course-scoped results for untracked %s delivery',kind=>{
+ const p=props();p.rows=[{...published,kind}]
+ render(<MemoryRouter><TrainingCourseAssessments {...p}/></MemoryRouter>)
+ expect(screen.queryByRole('button',{name:'作答与结果'})).toBeNull()
+ expect(screen.queryByRole('button',{name:'导出本课程数据'})).toBeNull()
+ expect(screen.getByText(/未记录每次作答的课程来源/)).toBeInTheDocument()
+ expect(screen.getByRole('link',{name:'管理测评'})).toBeInTheDocument()
+ expect(m.attempts).not.toHaveBeenCalled()
+})

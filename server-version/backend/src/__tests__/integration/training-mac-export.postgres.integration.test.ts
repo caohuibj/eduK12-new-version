@@ -236,23 +236,37 @@ suite('Training Mac migrated PostgreSQL catalog and course export qualification'
     await prisma.$executeRaw`INSERT INTO admin_entry_grants (id,user_id,entry,granted_by) VALUES (${randomUUID()},${other},'TRAINING',${other})`
     const adminSession = jwt.generateToken({ userId: other, username: 'synthetic-admin', role: 'ADMIN', tokenVersion: 0, accountDomain: 'TRAINING', adminVerifiedAt: Math.floor(Date.now() / 1000), adminSessionId: randomUUID() })
     const adminBatch = await enqueue(courseA, randomUUID(), adminSession)
-    for (const [batch, courseId, expected, excluded, session] of [[a, courseA, attemptA, attemptB, token], [b, courseB, attemptB, attemptA, token], [adminBatch, courseA, attemptA, attemptB, adminSession]] as const) {
+    const requests = [[a, courseA, attemptA, attemptB, token], [b, courseB, attemptB, attemptA, token], [adminBatch, courseA, attemptA, attemptB, adminSession]] as const
+    const pendingKeys = new Map<string, string>()
+    // A single resume may process every queued request. Inspect all durable
+    // intents before any resume rather than assuming later requests stay queued.
+    for (const [batch, courseId] of requests) {
       const intent = await prisma.exportBatch.findUniqueOrThrow({ where: { id: batch.batchId } })
-      expect(intent.anonymized).toBe(true)
+      expect(intent.status).toBe('PROCESSING'); expect(intent.anonymized).toBe(true)
       expect(intent.options).toMatchObject({ courseId, anonymize: true, authorityTokenVersion: 0 })
       const queued = await prisma.exportArtifact.findUniqueOrThrow({ where: { id: batch.artifacts[0].id } })
+      expect(queued.status).toBe('PROCESSING'); expect(queued.batchId).toBe(batch.batchId)
       expect(queued.provenance).toMatchObject({ courseId, generation: batch.batchId })
+      pendingKeys.set(batch.batchId, queued.storageKey)
+    }
+    for (const [batch, courseId, expected, excluded, session] of requests) {
       await finish(batch.batchId)
       const artifact = await prisma.exportArtifact.findUniqueOrThrow({ where: { id: batch.artifacts[0].id } })
+      const ready = await prisma.exportBatch.findUniqueOrThrow({ where: { id: batch.batchId } })
       expect(artifact.status).toBe('READY'); expect(artifact.anonymized).toBe(true)
-      expect(artifact.provenance).toMatchObject({ courseId, attemptIds: [expected], generation: batch.batchId })
+      expect(artifact.batchId).toBe(batch.batchId)
+      // Publication replaces provenance.generation with a fresh artifact UUID;
+      // the batch FK and generation-bound storage key carry durable job identity.
+      expect(artifact.provenance).toMatchObject({ courseId, attemptIds: [expected],
+        generation: expect.stringMatching(/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/) })
+      expect(ready.status).toBe('READY'); expect(ready.generation).toBeGreaterThan(0)
+      expect(artifact.storageKey).toBe(pendingKeys.get(batch.batchId)!.replace(/\.csv$/, `__generation_${ready.generation}.csv`))
       const res = await invoke(http.assessmentExportHttp('COMPOSITE', false), {}, '', artifact.id, session)
       expect(res.downloaded).toBeTruthy()
       const csv = await fs.readFile(res.downloaded!, 'utf8')
       expect(csv).toContain(expected); expect(csv).not.toContain(excluded); expect(csv).not.toContain(attemptUnbound)
       expect(csv).not.toContain('SYNTHETIC_PRIVATE_NAME'); expect(csv).not.toContain('U_name')
       expect(csv.trim().split(/\r?\n/)).toHaveLength(2)
-      const ready = await prisma.exportBatch.findUniqueOrThrow({ where: { id: batch.batchId } })
       expect(ready.recordCount).toBe(1)
     }
   }, 60000)

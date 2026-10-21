@@ -537,6 +537,21 @@ describe('Training SJT page confirmation and choice focus', () => {
     expect(situationalApi.submit).not.toHaveBeenCalled()
   })
 
+  it('keeps a completed but unconfirmed Training scene on refresh', async () => {
+    const view = renderRunner()
+    await screen.findByText('第一段文字情境')
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    await waitFor(() => expect(screen.getByRole('slider')).not.toBeDisabled())
+    fireEvent.change(screen.getByRole('slider'), { target: { value: '80' } })
+    await waitFor(() => expect(screen.getByRole('button', { name: /确认本页/ })).not.toBeDisabled())
+    view.unmount()
+    renderRunner()
+    await screen.findByText('第一段文字情境')
+    expect(screen.queryByText('第二段文字情境')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: /确认本页/ })).not.toBeDisabled()
+    expect(situationalApi.submit).not.toHaveBeenCalled()
+  })
+
   it('stays at the current question on answer storage failure', async () => {
     renderRunner()
     await screen.findByText('第一段文字情境')

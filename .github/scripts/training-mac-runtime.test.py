@@ -17,12 +17,21 @@ CHECKS = ['course-shell-1440', 'analysis-reference-1440', 'pending-publication-1
           'course-shell-390', 'analysis-reference-390', 'pending-publication-390']
 
 
+PG_PRIOR = {'original': {'name': 'scoped-pg-http', 'status': 'failure', 'consumerRunId': '39526376171'},
+    'failure': {'failedCases': [M.PG_FAILED_CASE]},
+    'passedCases': ['catalog boundary SQL on isolated PostgreSQL matches offset/Z half-open boundaries, includes NULL tags without a filter, and fences atomic tag writes',
+        'Training Mac migrated PostgreSQL catalog and course export qualification filters/counts/pages all four source families on real schema and atomically fences nullable legacy Scale tags',
+        'Training Mac migrated PostgreSQL catalog and course export qualification rejects token-version and principal revocation while queued and when READY, and course removal at download'],
+    'assurance': 'Inferred from original aggregate and fixed source; no original per-case reporter.'}
+
+
 def report():
-    return {'success': True, 'numTotalTests': 4, 'numPassedTests': 4, 'numFailedTests': 0,
-            'numPendingTests': 0, 'numTodoTests': 0, 'testResults': [
-                {'name': '/app/' + file, 'status': 'passed', 'assertionResults': [
-                    {'fullName': 'public fixture ' + str(n), 'status': 'passed'} for n in range(count)]}
-                for file, count in zip(M.INTEGRATION_FILES, (1, 3))]}
+    return {'success': True, 'numTotalTests': 3, 'numPassedTests': 1, 'numFailedTests': 0,
+            'numPendingTests': 2, 'numTodoTests': 0, 'testResults': [
+                {'name': '/app/' + M.INTEGRATION_FILES[1], 'status': 'passed', 'assertionResults': [
+                    {'fullName': PG_PRIOR['passedCases'][1], 'status': 'pending'},
+                    {'fullName': M.PG_FAILED_CASE, 'status': 'passed'},
+                    {'fullName': PG_PRIOR['passedCases'][2], 'status': 'pending'}]}]}
 
 
 class MacContracts(unittest.TestCase):
@@ -100,17 +109,23 @@ class MacContracts(unittest.TestCase):
             with self.subTest(change=change), self.assertRaises(ValueError): M.require_browser_report({**r, **change}, CHECKS)
         with self.assertRaises(ValueError): M.require_browser_report(r, CHECKS[:-1])
 
-    def test_integration_requires_four_positive_cases_both_files_no_skips(self):
-        self.assertEqual(M.require_test_report(report())['passed'], 4)
-        for key, value in [('success', False), ('numPassedTests', 0), ('numTotalTests', 0), ('numFailedTests', 1), ('numPendingTests', 1), ('numTodoTests', 1), ('testResults', [])]:
-            altered = report(); altered[key] = value
-            with self.subTest(key=key), self.assertRaises(ValueError): M.require_test_report(altered)
-        for change in ('skip', 'wrong-file', 'duplicate-file'):
-            altered = report()
-            if change == 'skip': altered['testResults'][0]['assertionResults'][0]['status'] = 'pending'
-            elif change == 'wrong-file': altered['testResults'][0]['name'] = 'unrelated.test.ts'
-            else: altered['testResults'][1]['name'] = altered['testResults'][0]['name']
-            with self.subTest(change=change), self.assertRaises(ValueError): M.require_test_report(altered)
+    def test_single_failed_pg_retry_requires_one_actual_pass_and_preserves_original_inference(self):
+        result = M.require_test_report(report(), PG_PRIOR)
+        self.assertEqual(result['passed'], 4)
+        self.assertEqual(result['currentExecution'], {'passed': 1, 'failed': 0, 'filtered': 2,
+            'files': [M.INTEGRATION_FILES[1]], 'caseNames': [M.PG_FAILED_CASE]})
+        self.assertEqual(result['priorSuccesses']['original']['status'], 'failure')
+        self.assertFalse(result['priorSuccesses']['ciExecuted'])
+        self.assertEqual(result['priorSuccesses']['assurance'], PG_PRIOR['assurance'])
+        for key, value in [('success', False), ('numPassedTests', 3), ('numTotalTests', 4), ('numFailedTests', 1), ('numPendingTests', 0), ('numTodoTests', 1), ('testResults', [])]:
+            changed = report(); changed[key] = value
+            with self.subTest(key=key), self.assertRaises(ValueError): M.require_test_report(changed, PG_PRIOR)
+        for kind in ('wrong-case', 'replayed-success', 'wrong-file'):
+            changed = report()
+            if kind == 'wrong-case': changed['testResults'][0]['assertionResults'][1]['fullName'] = 'other'
+            elif kind == 'replayed-success': changed['testResults'][0]['assertionResults'][0]['status'] = 'passed'
+            else: changed['testResults'][0]['name'] = M.INTEGRATION_FILES[0]
+            with self.subTest(kind=kind), self.assertRaises(ValueError): M.require_test_report(changed, PG_PRIOR)
 
     def test_cognitive_type_subsumption_requires_identical_semantic_options(self):
         context = self.root / 'frontend'; context.mkdir()
@@ -245,6 +260,8 @@ class MacContracts(unittest.TestCase):
         self.assertIn('TRAINING_MAC_FIXTURE_REDIS_ID=' + 'd' * 64, tests)
         self.assertIn('TRAINING_MAC_FIXTURE_REDIS_IMAGE_DIGEST=sha256:' + 'e' * 64, tests)
         self.assertNotIn('--publish', tests)
+        self.assertIn(M.INTEGRATION_FILES[1], tests); self.assertNotIn(M.INTEGRATION_FILES[0], tests)
+        self.assertEqual(tests[tests.index('--testNamePattern') + 1], '^' + M.re.escape(M.PG_FAILED_CASE) + '$')
 
     def retained_compilation(self, component, unsafe=False):
         context = self.q.private / component; context.mkdir()
@@ -355,40 +372,23 @@ class MacContracts(unittest.TestCase):
         response.read.return_value = raw + b'corrupt'
         with patch.object(M.R.urllib.request, 'urlopen', return_value=response), self.assertRaises(ValueError): self.q.apply_dependency_patch()
 
-    def test_security_repair_runs_fresh_both_lock_audit_instead_of_old_admission(self):
+    def test_round8_audit_admission_binds_both_unchanged_locks_and_never_runs_npm(self):
+        original = {'name': 'dependency-audit', 'status': 'success', 'consumerRunId': '39526376171', 'details': {}}
         for component in M.R.COMPONENTS:
             context = self.q.private / component; context.mkdir()
-            (context / 'package-lock.json').write_text(json.dumps({'packages': {}}))
-        self.q.command = Mock(return_value=SimpleNamespace(returncode=0, stdout=json.dumps({'metadata': {'vulnerabilities': {'high': 0, 'critical': 0}}, 'vulnerabilities': {}})))
+            (context / 'package-lock.json').write_text('synthetic exact lock ' + component)
+            digest = M.R.sha(context / 'package-lock.json')
+            self.q.inputs['components'][component]['lockfileSha256'] = digest
+            original['details'][component] = {'lockfileSha256': digest, 'exitCode': 0, 'vulnerabilities': {'high': 0, 'critical': 0}}
+        self.q.round8 = {'audit': original}; self.q.command = Mock(side_effect=AssertionError('No audit replay'))
         result = self.q.audit()
-        self.assertEqual(set(result), set(M.R.COMPONENTS))
-        self.assertEqual(self.q.command.call_count, 2)
-        for component, call in zip(M.R.COMPONENTS, self.q.command.call_args_list):
-            self.assertEqual(call.args[0], ['npm', '--prefix', str(self.q.private / component), '--registry=https://registry.npmjs.org', '--replace-registry-host=always', 'audit', '--audit-level=high', '--json'])
-            self.assertEqual(call.kwargs, {'accepted': (0, 1)})
-            self.assertEqual(result[component]['blockingFindings'], [])
-
-    def test_failed_audit_preserves_only_safe_package_advisory_and_version_details(self):
-        context = self.q.private / 'backend'; context.mkdir()
-        (context / 'package-lock.json').write_text(json.dumps({'packages': {'node_modules/synthetic-package': {'version': '1.2.3'}}}))
-        data = {'metadata': {'vulnerabilities': {'high': 1, 'critical': 0}}, 'vulnerabilities': {
-            'synthetic-package': {'severity': 'high', 'range': '<1.2.4', 'nodes': ['/private/secret'],
-                'fixAvailable': {'name': 'synthetic-package', 'version': '1.2.4', 'isSemVerMajor': False, 'secret': 'private-token'},
-                'via': [{'source': 123, 'range': '<1.2.4', 'url': 'https://github.com/advisories/GHSA-aaaa-bbbb-cccc',
-                         'title': 'CVE-2026-12345 private-token'}, {'url': 'https://private-token.example/?secret=value', 'range': 'private\nsecret'}]}}}
-        self.q.command = Mock(return_value=SimpleNamespace(returncode=1, stdout=json.dumps(data)))
+        self.assertIs(result['original'], original); self.assertFalse(result['ciExecuted'])
+        for component in M.R.COMPONENTS:
+            self.assertEqual(json.loads((self.q.out / (component + '-audit.json')).read_text())['original'], original)
+        self.q.command.assert_not_called()
+        (self.q.private / 'frontend/package-lock.json').write_text('different')
         with self.assertRaises(ValueError): self.q.audit()
-        self.q.command.assert_called_once()
-        raw = (self.q.out / 'backend-audit.json').read_text(); saved = json.loads(raw)
-        finding = saved['blockingFindings'][0]
-        self.assertEqual(saved['exitCode'], 1); self.assertEqual(saved['vulnerabilities']['high'], 1)
-        self.assertEqual(finding['installedVersions'], ['1.2.3'])
-        self.assertEqual(finding['fixAvailable']['version'], '1.2.4')
-        self.assertEqual(finding['advisories'][0]['cves'], ['CVE-2026-12345'])
-        self.assertEqual(finding['advisories'][0]['source'], 123)
-        self.assertIsNone(finding['advisories'][1]['url']); self.assertIsNone(finding['advisories'][1]['range'])
-        self.assertNotIn('private', raw); self.assertNotIn('secret', raw)
-        self.assertFalse((self.q.out / 'frontend-audit.json').exists())
+        self.q.command.assert_not_called()
 
     def test_complete_browser_is_mandatory_original_success_without_process_replay(self):
         self.q.state['components']['frontend'] = {'compiledArchiveSha256': 'current',
@@ -413,7 +413,7 @@ class MacContracts(unittest.TestCase):
             action(); self.q.state['phases'].append({'name': name, 'status': 'success'})
         self.q.phase = phase
         rows = {name: {'name': name, 'status': 'success', 'details': {}} for name in ('backend-compile', 'frontend-compile', 'frontend-app-types', 'changed-lint')}
-        module = SimpleNamespace(admit_reusable_phases=Mock(return_value={'phases': rows, 'archives': {'backend': self.root / 'backend.tar.gz', 'frontend': self.root / 'frontend.tar.gz'}}))
+        module = SimpleNamespace(admit_reusable_phases=Mock(return_value={'phases': rows, 'archives': {'backend': self.root / 'backend.tar.gz', 'frontend': self.root / 'frontend.tar.gz'}}), admit_round8_successes=Mock(return_value={'audit': {}, 'backend': {}, 'pg': {}}))
         spec = SimpleNamespace(loader=SimpleNamespace(exec_module=Mock()))
         with patch.dict('os.environ', {'CI': 'true', 'GITHUB_ACTIONS': 'true', 'GITHUB_SHA': 'b' * 40, 'GITHUB_REPOSITORY': 'caohuibj/eduK12-new-version'}), patch.object(M.importlib.util, 'spec_from_file_location', return_value=spec), patch.object(M.importlib.util, 'module_from_spec', return_value=module):
             self.q.execute()
@@ -513,6 +513,92 @@ class MacContracts(unittest.TestCase):
         invocations = [args for args in commands if '.github/scripts/training-mac-browser.mjs' in args]
         self.assertEqual(len(invocations), 1); self.assertNotIn('--prior-browser-result', invocations[0])
         self.assertEqual(len(result['checks']), 6)
+
+    def test_review_and_fixture_boundaries_reject_missing_changed_or_extra_paths(self):
+        M.validate_dependency_patch(copy.deepcopy(INPUTS))
+        for kind in ('review-missing', 'review-blob', 'fixture-path', 'fixture-blob', 'old-lint'):
+            changed = copy.deepcopy(INPUTS)
+            if kind == 'review-missing': changed['macRuntime']['reviewFixDelta'].pop()
+            elif kind == 'review-blob': changed['macRuntime']['reviewFixDelta'][0]['after']['blob'] = '0' * 40
+            elif kind == 'fixture-path': changed['macRuntime']['pgFixtureDelta']['path'] += '.other'
+            elif kind == 'fixture-blob': changed['macRuntime']['pgFixtureDelta']['after']['blob'] = '0' * 40
+            else: changed['runtime']['changedFrontendFiles'] = ['src/training/TrainingBrand.tsx']
+            with self.subTest(kind=kind), self.assertRaises(ValueError): M.validate_dependency_patch(changed)
+
+    def test_synthetic_assertion_diagnostics_keep_real_error_and_redact_credentials(self):
+        self.q.state['phases'] = [{'name': 'scoped-pg-http', 'status': 'failure'}]
+        data = report(); data['success'] = False; data['numFailedTests'] = 1; data['numPassedTests'] = 0
+        case = data['testResults'][0]['assertionResults'][1]; case['status'] = 'failed'
+        case['failureMessages'] = ['AssertionError: expected synthetic nonce to equal batch id\n at ' + str(self.q.private / 'backend/src/public.ts') + ':42:1\n password=private-password postgresql://user:credential@host/db Bearer secret-bearer']
+        (self.q.private / 'integration-result.json').write_text(json.dumps(data))
+        self.q.failure_receipt(ValueError('not-public'))
+        result = json.loads((self.q.out / 'failure-details.json').read_text())
+        self.assertEqual(result['failedCases'], [M.PG_FAILED_CASE])
+        output = result['failedAssertions'][0]['failureMessages'][0]['stdoutAndStderr']
+        self.assertIn('AssertionError: expected synthetic nonce', output)
+        self.assertIn('[isolated-workdir]/backend/src/public.ts:42:1', output)
+        for secret in ('private-password', 'credential', 'secret-bearer', str(self.q.private)):
+            self.assertNotIn(secret, output)
+
+    def runtime_reuse_fixture(self):
+        backend = {'runtimeImageId': 'sha256:' + 'b' * 64, 'runtimeRecipeSha256': 'r' * 64,
+            'runtimeRootFs': ['sha256:' + 'c' * 64], 'requiredFiles': {'dist/server.js': 'd' * 64}, 'compiledArchiveSha256': 'e' * 64}
+        archive = self.q.private / 'retained-backend.tar.gz'; archive.write_bytes(b'verified original image bytes')
+        backend['runtimeArchiveSha256'] = M.R.sha(archive)
+        self.q.state['components']['backend'].update(requiredFiles=backend['requiredFiles'], compiledArchiveSha256=backend['compiledArchiveSha256'])
+        self.q.round8 = {'backend': {'component': backend, 'archive': archive,
+            'packaging': {'name': 'runtime-packaging', 'status': 'success', 'sourceHead': 'f' * 40},
+            'scanPhase': {'name': 'runtime-scans', 'status': 'success', 'consumerRunId': '39526376171'},
+            'scan': {'imageId': backend['runtimeImageId'], 'scanner': 'Trivy original', 'exitCode': 0,
+                'severity': ['HIGH', 'CRITICAL'], 'ignoreUnfixed': True, 'findings': []}}}
+        return backend
+
+    def test_package_loads_original_backend_identity_and_builds_only_frontend(self):
+        backend = self.runtime_reuse_fixture()
+        context = self.q.private / 'frontend'; context.mkdir()
+        (context / 'Dockerfile').write_bytes((M.ROOT / 'server-version/frontend/Dockerfile').read_bytes())
+        self.q.inputs['components']['frontend']['requiredFiles'] = {'dist/index.html': 'a' * 64}
+        self.q.base_image = Mock(side_effect=['node@sha256:' + '1' * 64, 'nginx@sha256:' + '2' * 64])
+        original = {'Id': backend['runtimeImageId'], 'Architecture': 'amd64', 'RootFS': {'Layers': backend['runtimeRootFs']},
+            'Config': {'User': 'node', 'Labels': {'org.opencontainers.image.revision': 'f' * 40}}}
+        frontend = {'Id': 'sha256:' + '3' * 64, 'Architecture': 'amd64', 'RootFS': {'Layers': ['sha256:' + '4' * 64]}}
+        calls = []
+        def command(args, **kwargs):
+            calls.append(args)
+            if args[:3] == ['docker', 'image', 'inspect']:
+                return SimpleNamespace(stdout=json.dumps([original if args[-1] == backend['runtimeImageId'] else frontend]))
+            if 'sha256sum' in args: return SimpleNamespace(stdout='a' * 64 + '  index.html')
+            if args[0] == 'gzip': Path(args[-1] + '.gz').write_bytes(b'new frontend image')
+            return SimpleNamespace(stdout='', returncode=0)
+        self.q.command = command
+        result = self.q.package()
+        self.assertFalse(result['backend']['ciExecuted']); self.assertTrue(result['frontend']['ciExecuted'])
+        self.assertEqual((self.q.out / 'backend-runtime.tar.gz').read_bytes(), b'verified original image bytes')
+        builds = [c for c in calls if c[:2] == ['docker', 'build']]
+        self.assertEqual(len(builds), 1); self.assertEqual(builds[0][-1], str(context))
+        self.assertFalse(any(c[:2] == ['docker', 'run'] and backend['runtimeImageId'] in c for c in calls))
+        original['Config']['Labels']['org.opencontainers.image.revision'] = 'wrong'
+        calls.clear()
+        with self.assertRaises(ValueError): self.q.package()
+        self.assertFalse(any(c[:2] == ['docker', 'build'] for c in calls))
+
+    def test_scans_only_frontend_and_rejects_findings_without_losing_safe_report(self):
+        backend = self.runtime_reuse_fixture()
+        self.q.state['components']['backend']['runtimeImageId'] = backend['runtimeImageId']
+        image = 'sha256:' + 'a' * 64; self.q.state['components']['frontend']['runtimeImageId'] = image
+        finding = []; calls = []
+        def command(args, **kwargs):
+            calls.append(args)
+            if args == ['trivy', '--version']: return SimpleNamespace(stdout='Version: 0.70.0')
+            self.assertEqual(args[-1], image); self.assertIn('HIGH,CRITICAL', args)
+            (self.q.private / 'frontend-scan.json').write_text(json.dumps({'SchemaVersion': 2, 'Metadata': {'ImageID': image}, 'Results': [{'Vulnerabilities': finding}]}))
+            return SimpleNamespace(stdout='', returncode=int(bool(finding)))
+        self.q.command = command
+        result = self.q.scan()
+        self.assertFalse(result['backend']['ciExecuted']); self.assertEqual(len(calls), 2)
+        finding.append({'VulnerabilityID': 'CVE-2026-12345', 'Severity': 'HIGH', 'PkgName': 'synthetic'})
+        with self.assertRaises(ValueError): self.q.scan()
+        self.assertEqual(json.loads((self.q.out / 'frontend-scan.json').read_text())['findings'][0]['VulnerabilityID'], 'CVE-2026-12345')
 
     def test_reject_non_actions_execution_before_any_action(self):
         self.q.phase = Mock()

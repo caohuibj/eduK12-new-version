@@ -38,12 +38,13 @@ export default function TrainingCourseAssessments({course,actorId,rows,loading,e
   <p className="tca-intro">组合测评可按需加入量表、表单、情境判断和认知任务。跨课程查找与未绑定课程的草稿保留在“全部测评”。</p>
   <div className="tca-summary"><span>本页已发布 <strong>{loading||error?'—':published}</strong></span><span>本页草稿 <strong>{loading||error?'—':drafts}</strong></span></div>
   {error?<div className="training-message training-message--compact" role="alert"><p>当前课程测评清单暂时无法读取：{error}</p><button type="button" onClick={onRetry}>重新加载测评</button></div>:loading?<p role="status">正在读取本课程测评与草稿…</p>:rows.length===0?<div className="tca-empty"><ClipboardList size={30} aria-hidden="true"/><h3>{filtered?'没有符合条件的测评':'从本课程的第一份测评开始'}</h3><p>{filtered?'请调整标题、标签或时间范围后重新查询。':'创建时会自动选择当前课程；也可以从已有测评复制复用。'}</p></div>:<div className="tca-list">{rows.map(task=>{
-   const href=internalReturnTo(task.manageHref),draft=task.status==='DRAFT',composite=['QUESTIONNAIRE','LEGACY_COMPOSITE','ASSESSMENT_BUNDLE'].includes(task.kind)
+   const href=internalReturnTo(task.manageHref),draft=task.status==='DRAFT',composite=task.kind==='QUESTIONNAIRE'
    const status=draft?'草稿':task.status==='PUBLISHED'?'已发布':'已停用'
    return <article key={task.key} className="tca-card"><header><span className="tca-icon"><ClipboardList size={21} aria-hidden="true"/></span><div><div className="tca-title"><h3>{task.name}</h3><span className={draft?'is-draft':''}>{status}</span></div><p>{task.typeLabel}{task.unitCount!==null?` · ${task.unitCount} ${task.unitLabel||'测评单元'}`:''}</p></div></header>
     {task.description&&<p className="tca-description">{task.description}</p>}
     <div className="tca-card-actions">{href?<><Link to={href+'?courseId='+encoded+'&returnTo='+encodeURIComponent(location.pathname+location.search)} className="tql-primary">{draft?'继续编制':task.kind==='QUESTIONNAIRE'?'配置与匿名链接':'管理测评'}<ArrowRight size={14} aria-hidden="true"/></Link>{composite&&!draft&&<><button type="button" className="tql-secondary" aria-expanded={progress===task.key} onClick={()=>setProgress(value=>value===task.key?null:task.key)}>作答与结果</button>{task.kind!=='ASSESSMENT_BUNDLE'&&<button type="button" className="tql-secondary" onClick={()=>setExportRow(task)}><Download size={15} aria-hidden="true"/>导出本课程数据</button>}</>}</>:<span className="training-task-disabled">由资源创建者管理</span>}</div>
     {href&&task.kind!=='ASSESSMENT_BUNDLE'&&<TrainingCatalogTags key={JSON.stringify(task.tags)} id={task.id} kind={task.kind} tags={task.tags} onSaved={onRetry}/>}
+    {href&&!draft&&['LEGACY_COMPOSITE','ASSESSMENT_BUNDLE'].includes(task.kind)&&<p className="tca-note">此类测评未记录每次作答的课程来源，无法提供本课程结果或导出。请从管理测评查看完整结果（非课程范围）。</p>}
     {draft&&<p className="tca-note">草稿尚未发布，可继续编制；发布后在这里查看作答和导出。</p>}
     {progress===task.key&&composite&&href&&<CourseProgress id={task.id} courseId={course.id}/>}
    </article>

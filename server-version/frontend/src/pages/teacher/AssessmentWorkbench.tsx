@@ -1,6 +1,6 @@
 import './assessment-workbench.css'
 import { useEffect, useRef, useState } from 'react'
-import { Link, useSearchParams } from 'react-router-dom'
+import { Link, useLocation, useSearchParams } from 'react-router-dom'
 import api from '../../api/client'
 import { useAuth } from '../../contexts/AuthContext'
 import { useOrganization } from '../../contexts/OrganizationContext'
@@ -23,6 +23,10 @@ function TrainingResultsView({ courses, course, page, data, loading, error, onCo
  courses: CourseOption[]; course: string; page: number; data: Overview | null; loading: boolean; error: string
  onCourse: (id: string) => void; onRefresh: () => void; onPage: (page: number) => void
 }) {
+ const location = useLocation()
+ const returnQuery = new URLSearchParams(location.search)
+ returnQuery.set('courseId', course)
+ const resultsReturnTo = location.pathname + '?' + returnQuery.toString()
  const courseTitle = data?.course.title || courses.find(row => row.id === course)?.title || '选择要查看的课程'
  const pageCount = data ? Math.max(1, Math.ceil(data.total / data.pageSize)) : 1
  return <ProductPage width="management" className="training-results-workbench">
@@ -56,7 +60,7 @@ function TrainingResultsView({ courses, course, page, data, loading, error, onCo
      <header><span className="twb-card-icon"><Layers3 size={19} aria-hidden="true"/></span><span className={`twb-status twb-status--${row.status.toLowerCase()}`}>{labels[row.status] || row.status}</span></header>
      <h3>{row.name}</h3><p className="twb-report-kind">组合测评 · {row.productKind === 'ASSESSMENT_BUNDLE' ? '整体报告' : '单项报告合集'}</p>
      <dl className="twb-attempts">{['IN_PROGRESS','COMPLETED','SATISFIED','NOT_SATISFIED','ABANDONED'].map(status => <div key={status} className={status === 'COMPLETED' ? 'twb-attempts-submitted' : undefined}><dt>{labels[status]}</dt><dd>{row.attempts[status] || 0}</dd></div>)}</dl>
-     <footer><span>统计单位：作答次数</span><Link to={`/composite-assessments/${encodeURIComponent(row.id)}/results`}>查看作答与获授权报告<ArrowUpRight size={16} aria-hidden="true"/></Link></footer>
+     <footer><span>统计单位：作答次数</span>{row.productKind === 'QUESTIONNAIRE' ? <Link to={`/composite-assessments/${encodeURIComponent(row.id)}/results?courseId=${encodeURIComponent(course)}&returnTo=${encodeURIComponent(resultsReturnTo)}`}>查看作答与获授权报告<ArrowUpRight size={16} aria-hidden="true"/></Link> : <span>此类历史测评未记录课程来源，请从测评管理查看完整结果（非课程范围）。</span>}</footer>
     </article>)}</div>
     {!data.list.length && <div className="twb-empty"><div className="twb-empty-icon"><Layers3 size={27} aria-hidden="true"/></div><h3>当前课程暂无组合测评投放。</h3><p>课程发布组合测评后，作答进度和报告入口会显示在这里。</p></div>}
    </section>

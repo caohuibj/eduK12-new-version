@@ -241,7 +241,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
         const confirmedPage = trainingSequential
           ? trainingSjtPageIndex(meta.instrumentMetadata, reachableScenes.map(scene => scene.sceneKey))
           : null
-        setCurrentIndex(confirmedPage ?? (
+        setCurrentIndex(trainingSequential ? (confirmedPage ?? 0) : (
           pendingStageIndex >= 0
             ? pendingStageIndex
             : missingIndex >= 0

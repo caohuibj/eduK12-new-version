@@ -34,11 +34,11 @@ describe('Training unified assessment results', () => {
 
  it('keeps report links and count meaning, without a separate cognitive panel or cognitive-only pages', async () => {
   mockOverview()
-  render(<MemoryRouter initialEntries={['/assessment-workbench?courseId=course']}><AssessmentWorkbench /></MemoryRouter>)
+  render(<MemoryRouter initialEntries={['/assessment-workbench?courseId=course&view=summary']}><AssessmentWorkbench /></MemoryRouter>)
   expect(await screen.findByText('综合学习测评')).toBeInTheDocument()
   expect(screen.queryByRole('heading', { name: '认知任务完成与质量' })).not.toBeInTheDocument()
   expect(screen.queryByText('独立认知记录')).not.toBeInTheDocument()
-  expect(screen.getByRole('link', { name: '查看作答与获授权报告' })).toHaveAttribute('href', '/composite-assessments/assessment/results')
+  expect(screen.getByRole('link', { name: '查看作答与获授权报告' })).toHaveAttribute('href', '/composite-assessments/assessment/results?courseId=course&returnTo=%2Fassessment-workbench%3FcourseId%3Dcourse%26view%3Dsummary')
   expect(screen.getByText(overview.countMeaning)).toBeInTheDocument()
   expect(screen.getByRole('button', { name: '下一页' })).toBeDisabled()
  })

@@ -37,8 +37,8 @@ def validate_artifact(artifact, pin):
     require(str(artifact['workflow_run']['id']) == PIN['runId'] and artifact['workflow_run']['head_sha'] == PIN['sourceHead'], 'Wrong artifact producer')
 
 
-REVIEWED_SECURITY_RUNTIME_SHA256 = 'e762ae477b492675ff17a5f61a0de171a1e77bff67d46d0d8f76ab1c26ece9de'
-REVIEWED_SECURITY_INPUTS_SHA256 = '99107e43d6c89a7dc141cde9f3507847cf4c3cefca0bd640e70b0ce319f26253'
+REVIEWED_SECURITY_RUNTIME_SHA256 = 'c604b5c0cf4477f14eaf48ece1896ec52c33be9bd9c0f4d905a4f59d8fd3892e'
+REVIEWED_SECURITY_INPUTS_SHA256 = 'c8be4307174e2cc951e2ba4cb1db72b2c67fddf27faa2b7cad22d90f9ef0e6be'
 
 
 def validate_records(run, job, raw, inputs, source):
@@ -217,3 +217,66 @@ def admit_prior_browser_success(q):
         require(sorted(z.namelist()) == sorted(expected), 'Unexpected retained browser evidence')
     for name in expected: (folder / name).write_bytes(zip_member(files['browser'], name, 4*1024*1024))
     return result
+
+
+ROUND8_PIN = {'head': 'd2283f17633a4486c8818ccf00598920500047f8', 'sourceHead': '0dedbf42358e462e814d8ebad087d84a35e6d245', 'tree': 'fd7df4aaa304defe6f9d99e6212756400e19d3f4', 'planSha256': 'b858b124ae2466bea171b2ae7d9caa22a34a5dfa7076fa8e55e69fe4cf7965b4', 'inputsSha256': '99107e43d6c89a7dc141cde9f3507847cf4c3cefca0bd640e70b0ce319f26253', 'runId': '39526376171', 'jobId': 118981971254, 'jobName': 'exact-candidate / integrated Mac candidate qualification / fixed Mac inputs and missing affected qualification', 'resultSha256': '21f9821530394fea9882f257dff7190c3a7bc2b1850386d9be33d17c77b40804', 'failureSha256': '017d76591d4f4396c54af2e694866680ecd0f71bb9b7201e04b8e02cc09bb041', 'scanSha256': '107b657e6487603569940368501467b4a0f006e7e8df16cdd4905870928ef7a3'}
+ROUND8_ARTIFACTS = {'results': {'artifactId': 12313837934, 'artifactName': 'training-mac-results-d2283f17633a4486c8818ccf00598920500047f8-1', 'zipBytes': 33831, 'zipSha256': '9b14f60f6f94378eb0890c7a5fc598d87c24adea50dac83d37bffb9edb0a0a4e'}, 'images': {'artifactId': 12313568278, 'artifactName': 'training-mac-runtime-images-d2283f17633a4486c8818ccf00598920500047f8-1', 'zipBytes': 413411667, 'zipSha256': '7bae02fb78845d85472203e052cf5f260be92a60d9b6408e8ea9d5b70a2da9fb'}}
+ROUND8_PASSED_CASES = [
+    'catalog boundary SQL on isolated PostgreSQL matches offset/Z half-open boundaries, includes NULL tags without a filter, and fences atomic tag writes',
+    'Training Mac migrated PostgreSQL catalog and course export qualification filters/counts/pages all four source families on real schema and atomically fences nullable legacy Scale tags',
+    'Training Mac migrated PostgreSQL catalog and course export qualification rejects token-version and principal revocation while queued and when READY, and course removal at download',
+]
+ROUND8_FAILED_CASE = 'Training Mac migrated PostgreSQL catalog and course export qualification persists distinct course intents, replays identical keys, and emits only requested-course anonymous rows through the real worker'
+
+
+def admit_round8_successes(q):
+    if hasattr(q, '_round8_successes'): return q._round8_successes
+    p = ROUND8_PIN
+    require(hashlib.sha256(Path(__file__).with_name('training-mac-runtime.py').read_bytes()).hexdigest() == REVIEWED_SECURITY_RUNTIME_SHA256
+        and hashlib.sha256(Path(__file__).with_name('training-mac-inputs.json').read_bytes()).hexdigest() == REVIEWED_SECURITY_INPUTS_SHA256, 'Unreviewed current continuation')
+    run = q.api('/actions/runs/' + p['runId'] + '/attempts/1'); job = q.api('/actions/jobs/' + str(p['jobId']))
+    require(str(run['id']) == p['runId'] and run['run_attempt'] == 1 and run['head_sha'] == p['sourceHead']
+        and run['head_branch'] == 'work/training-mac-ui-final-20261020'
+        and run['repository']['full_name'] == run['head_repository']['full_name'] == 'caohuibj/eduK12-new-version', 'Wrong round8 producer')
+    require(job['id'] == p['jobId'] and str(job['run_id']) == p['runId'] and job['run_attempt'] == 1
+        and job['head_sha'] == p['sourceHead'] and job['name'] == p['jobName'] and job['status'] == 'completed'
+        and job['conclusion'] == 'failure', 'Original round8 failed job changed')
+    files = {}
+    for key, pin in ROUND8_ARTIFACTS.items():
+        artifact = q.api('/actions/artifacts/' + str(pin['artifactId']))
+        require(artifact['id'] == pin['artifactId'] and artifact['name'] == pin['artifactName'] and not artifact['expired']
+            and artifact['size_in_bytes'] == pin['zipBytes'] and artifact['digest'] == 'sha256:' + pin['zipSha256']
+            and str(artifact['workflow_run']['id']) == p['runId'] and artifact['workflow_run']['head_sha'] == p['sourceHead'], 'Wrong round8 artifact')
+        target = q.private / ('round8-' + key + '.zip'); q.download({**pin, 'repository':'caohuibj/eduK12-new-version'}, target)
+        require(target.stat().st_size == pin['zipBytes'] and hashlib.file_digest(target.open('rb'), 'sha256').hexdigest() == pin['zipSha256'], 'Changed round8 ZIP')
+        files[key] = target
+    def document(name, digest):
+        raw = zip_member(files['results'], 'training-mac-evidence/' + name, 2*1024*1024)
+        require(hashlib.sha256(raw).hexdigest() == digest, 'Changed original round8 receipt')
+        return json.loads(raw)
+    result = document('runtime-result.json', p['resultSha256'])
+    failure = document('failure-details.json', p['failureSha256'])
+    scan = document('backend-scan.json', p['scanSha256'])
+    require(result['status'] == 'failure' and result['consumerRunId'] == p['runId'] and result['consumerAttempt'] == '1', 'Lost original failure')
+    for key in ('head','sourceHead','tree','planSha256','inputsSha256'): require(result[key] == p[key], 'Wrong original round8 identity')
+    phases = {row['name']:row for row in result['phases']}
+    for name in ('dependency-audit','runtime-packaging','runtime-scans'): require(phases[name]['status'] == 'success', 'Missing original selected success')
+    require(phases['scoped-pg-http']['status'] == 'failure' and failure['phase'] == 'scoped-pg-http'
+        and failure['integrationCounts'] == {'numTotalTests':4,'numPassedTests':3,'numFailedTests':1,'numPendingTests':0}
+        and failure['failedCases'] == [ROUND8_FAILED_CASE], 'Changed original PG outcome')
+    for component in ('backend','frontend'):
+        audit = phases['dependency-audit']['details'][component]
+        require(audit['exitCode'] == 0 and audit['lockfileSha256'] == q.inputs['components'][component]['lockfileSha256'], 'Changed audited lock')
+    backend = result['components']['backend']
+    require(backend['runtimeImageId'] == scan['imageId'] == 'sha256:0d71bafd53f1345f8deca05062288eecddbae1a66f26d735540c55ad0b939c01'
+        and scan['exitCode'] == 0 and scan['severity'] == ['HIGH','CRITICAL'] and scan['findings'] == [], 'Changed original backend scan')
+    archive = q.private / 'round8-backend-runtime.tar.gz'
+    with zipfile.ZipFile(files['images']) as z:
+        require(z.namelist().count('backend-runtime.tar.gz') == 1, 'Missing original backend archive')
+        with z.open('backend-runtime.tar.gz') as source, archive.open('wb') as output:
+            while chunk := source.read(1024*1024): output.write(chunk)
+    require(hashlib.file_digest(archive.open('rb'), 'sha256').hexdigest() == backend['runtimeArchiveSha256'] == '4fcfbb2ae2c11fe8976aa581b008638b7f469220fdaa752e3e9b66cbd09a0e67', 'Changed scanned backend bytes')
+    q._round8_successes = {'audit':phases['dependency-audit'], 'backend':{'component':backend,'packaging':phases['runtime-packaging'],
+        'scan':scan,'scanPhase':phases['runtime-scans'],'archive':archive}, 'pg':{'original':phases['scoped-pg-http'],'failure':failure,
+        'passedCases':ROUND8_PASSED_CASES,'assurance':'Inferred selected successes from the fixed four-case source and original aggregate plus sole failed name; original per-case reporter was not retained.'}}
+    return q._round8_successes

@@ -48,6 +48,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
   const [useFallback, setUseFallback] = useState(false)
   const [accepted, setAccepted] = useState(false)
   const [checkpointBusy, setCheckpointBusy] = useState(false)
+  const [checkpointRestoreGeneration, setCheckpointRestoreGeneration] = useState(0)
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loadRound, setLoadRound] = useState(0)
@@ -263,6 +264,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
           { snapshotHash: unit.trainingTiming!.snapshotHash, items: nextTiming[unit.itemId].snapshot() }]))
         await finalDraftStore.replaceAnswers(meta, Object.entries(next).map(([itemKey, value]) => ({ draftKey, itemKey, value, updatedAt: Date.now() })), { wholeScaleTiming })
         // Every unit's answers and timing committed together before UI/ref changes.
+        setCheckpointRestoreGeneration(value => value + 1)
         timingRef.current = nextTiming
         setAnswers(next); setIndex(0)
       }}/>:null}
@@ -276,7 +278,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
           <p className="mb-4 text-sm text-slate-600">整卷第 {index + 1} / {questions.length} 题</p>
           <AssessmentImageGate items={assessmentImageItems((current.question as { images?: unknown }).images)} loadAsset={loadImage} disabled={busy}>
             <ScaleFormVideoGate presentation={scaleItemVideoPresentation(current.question)} loadSources={() => requestAssessmentVideoCapabilities(`${unitPath}/items/${encodeURIComponent(current.question.itemCode)}/video-capability`, publicMode ? { headers: { 'X-Recovery-Token': recoveryToken || '' } } : undefined)}>
-              {(()=>{const player=(<ScalePlayer scopeKey={`${draftKey}:${current.unit.itemId}`} autoAdvance={isTrainingHost() && !publicMode} item={current.question} value={answers[wholeAnswerKey(current.unit.itemId, current.question.itemCode)]?.responseValue}
+              {(()=>{const player=(<ScalePlayer scopeKey={`${draftKey}:${current.unit.itemId}:${checkpointRestoreGeneration}`} autoAdvance={isTrainingHost() && !publicMode} item={current.question} value={answers[wholeAnswerKey(current.unit.itemId, current.question.itemCode)]?.responseValue}
                 answerDisabled={locked || busy} navigationDisabled={busy} submitDisabled={busy || meta?.status === 'CONFLICT'}
                 position={index + 1} total={questions.length} onChange={saveAnswer} onPrevious={() => setIndex(prior => Math.max(0, prior - 1))}
                 onNext={index + 1 < questions.length ? () => setIndex(prior => prior + 1) : undefined}

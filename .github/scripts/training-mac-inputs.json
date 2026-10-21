@@ -8,7 +8,7 @@
       "zipSha256": "1b63bd5f180fd34dd5d8c203269e054bbd614a8c058df619ffadf11e8c9a0e97",
       "archiveSha256": "68eab0cc18f679331898914caf2c44cc1a64af88c33f677940032419874fe0b2",
       "componentTree": "8804b7ff3d5d02555bfa5a338702bd23702d6561",
-      "productionInputSha256": "7e4c70ba5f290942b81b980265737774a9b69c161dce8c67ab339a55cdefd4a6",
+      "productionInputSha256": "7b0b93923f97285a101dee18557cbd5928607661da847f63c942f91c4ca55375",
       "receiptSha256": "55d7f4e9d65f261c270da0e171a705033eea272668f7351bb60fce9d3711ad1b",
       "head": "da713c522be4fd3309e4dcf327bfb71384c784fe",
       "runId": "39399331312",
@@ -34,7 +34,7 @@
       "branch": "ci/measurement-browser-20261020",
       "jobName": "production compile once / backend",
       "artifactName": "measurement-39399331312-da713c522be4fd3309e4dcf327bfb71384c784fe-backend-build",
-      "sourceTree": "52ebc98b0b94df2e72231f60f26abe76a4874a0f",
+      "sourceTree": "97d2c719f44179bdb68168303c4f2a7fa35aafa2",
       "excludedNonProductionPaths": []
     },
     "frontend": {
@@ -61,8 +61,8 @@
       "jobName": "build changed measurement frontend once",
       "artifactName": "measurement-39425861081-4286a59b649c37662cdbc0e7ca4e41103ad4e4f2-frontend-build",
       "receiptSha256": "d467a7312ae1daa2672b5a1ff635c9561408b65116a3cad5cbabd0a3551430b4",
-      "sourceTree": "0647a51a9e240aa19c3fd725fdd90b0dc306f169",
-      "productionInputSha256": "c9eb1a77f8e8bc971c4b93785889ae2a59eb6bf3ac8fc80ec300f24cba79f32a",
+      "sourceTree": "e1059cdb8bbe73d4c4f1eb4b16c42ee8d6cf953f",
+      "productionInputSha256": "813e6253c8ab84b5374eab1009a00564c52bc62f0106016b25b9afd72631b273",
       "excludedNonProductionPaths": []
     }
   },
@@ -75,13 +75,18 @@
       "20261021000000_training_catalog_discovery"
     ],
     "changedFrontendFiles": [
-      "src/components/app-shell/__tests__/shell.test.tsx",
-      "src/training/TrainingAuth.test.tsx",
-      "src/training/TrainingBrand.tsx",
-      "src/training/TrainingScreens.test.tsx"
+      "src/components/FinalCompositeAssessment.tsx",
+      "src/components/WholeCompositeQuestionnaire.tsx",
+      "src/components/__tests__/TrainingCheckpointRecovery.test.tsx",
+      "src/modules/situational/__tests__/SituationalRunner.test.tsx",
+      "src/modules/situational/pages/SituationalRunner.tsx",
+      "src/pages/teacher/AssessmentWorkbench.training.test.tsx",
+      "src/pages/teacher/AssessmentWorkbench.tsx",
+      "src/training/TrainingCourseAssessments.test.tsx",
+      "src/training/TrainingCourseAssessments.tsx"
     ],
     "sourceOverlay": "Current exact logo source plus official follow-redirects and Vite patches matching current locks. Restore original backend compilation; execute one affected frontend build.",
-    "claim": "Preserve original backend compilation identity. Execute affected frontend build, app types and four-file lint; reuse browser only on complete compiled-byte equality, otherwise run existing bounded cases. Fresh audits, runtime scans and missing isolated PG/schema checks remain required. No deployment.",
+    "claim": "Preserve original backend compilation and verified round8 backend image/audit identities. Execute affected frontend build, app types and nine-file lint; reuse browser only on complete compiled-byte equality, otherwise run existing bounded cases. Fresh frontend image scans, the corrected failed export case and missing isolated schema/restore qualification remain required. No deployment.",
     "frontendExternalInputs": {
       "server-version/cognitive-randomization-golden-v1.json": {
         "gitBlob": "5b3cb7c11138044ad6a85626e74004bea2a3e62a",
@@ -173,7 +178,7 @@
     ],
     "compileReasons": {
       "backend": "Three corrected catalog source inputs invalidate old backend dist. Direct compiler only, no unchanged build prerequisites.",
-      "frontend": "One current-input frontend build for approved final Training logo and patched Vite 6.4.4. Changed compiled UI uses existing bounded browser checks; no backend compiler replay."
+      "frontend": "Current frontend build includes approved logo, Vite patch and bounded course-scope/manual-confirmation/checkpoint-recovery fixes. Backend compile is unchanged and retained."
     },
     "lintAdmission": {
       "kind": "historical-observed-lint-with-limited-selection",
@@ -198,10 +203,15 @@
       "pending-publication-390"
     ],
     "changedLintFiles": [
-      "src/components/app-shell/__tests__/shell.test.tsx",
-      "src/training/TrainingAuth.test.tsx",
-      "src/training/TrainingBrand.tsx",
-      "src/training/TrainingScreens.test.tsx"
+      "src/components/FinalCompositeAssessment.tsx",
+      "src/components/WholeCompositeQuestionnaire.tsx",
+      "src/components/__tests__/TrainingCheckpointRecovery.test.tsx",
+      "src/modules/situational/__tests__/SituationalRunner.test.tsx",
+      "src/modules/situational/pages/SituationalRunner.tsx",
+      "src/pages/teacher/AssessmentWorkbench.training.test.tsx",
+      "src/pages/teacher/AssessmentWorkbench.tsx",
+      "src/training/TrainingCourseAssessments.test.tsx",
+      "src/training/TrainingCourseAssessments.tsx"
     ],
     "integrationFiles": [
       "src/__tests__/controllers/trainingCatalog.boundaries.postgres.test.ts",
@@ -440,6 +450,118 @@
           "blob": "1732258c8ec9a70b439f69dac89646d9b91231c4"
         }
       }
-    ]
+    ],
+    "reviewFixDelta": [
+      {
+        "path": "server-version/frontend/src/components/FinalCompositeAssessment.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "f41dcc2536afbfa296dc588ae3f33ee718e19342"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "b565d5ed4a6ce8a534fe445a8d8a1e597afc883e"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/components/WholeCompositeQuestionnaire.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "482005cca2d59167843f676c3ddc2f12163b029a"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "ce764faea226562b5b434376b67f57f68318bd5c"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/components/__tests__/TrainingCheckpointRecovery.test.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "10e688c7101805f3cc579f7e257cd9433e3595be"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "133f254653323d563b380ca71e19e00c346ec8cb"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/modules/situational/__tests__/SituationalRunner.test.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "070d84df4a8f75c0364ce5fcbb4beaa684d23196"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "fffbd87c7bf6372032b09a942cf51d0a98e16f8d"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "b96aa1b9416ad7c33d279abede8d30a1cfebdb09"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "118c9de18846e4a834afb0afc36d4dbf4102411b"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/pages/teacher/AssessmentWorkbench.training.test.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "a4ed347f9ffe29548f755fc6b665edfd10f92ef6"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "ad654cd64eaab772c7f95d7cbbe49287dfa0bf49"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/pages/teacher/AssessmentWorkbench.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "000b9e178236d27930717c6343ff9e9acaf050f8"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "43d0ef8c92cfec6703c59a0fb71fbc570b6d098a"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/TrainingCourseAssessments.test.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "b84270b25ffac70ede9c0ec5ca15b5eb2b8982fb"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "c40562657aa3be4291624aae7c8783ea22534ca1"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/TrainingCourseAssessments.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "1131ebeea322bee9e2344b3a3a8610ee43abb512"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "33a3a72d266e17d2c8c2df44a6f671aa2378822c"
+        }
+      }
+    ],
+    "pgFixtureDelta": {
+      "path": "server-version/backend/src/__tests__/integration/training-mac-export.postgres.integration.test.ts",
+      "before": {
+        "mode": "100644",
+        "blob": "0a30954a626d4285d983a79df365d14096c6e2de"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "31e12b25911fa1534ff86bd05d3036ce2ee28271"
+      }
+    }
   }
 }

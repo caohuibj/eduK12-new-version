@@ -9,7 +9,7 @@
   "originalTree": "260731545117e518be70f4796d7cd15addb50d6b",
   "historicalExecutionReferenceAssertion": "65f18b5583984b0427ff6e635a376e4d3d1cb8ae",
   "originalProductInventorySha256": "377f6f50af93584a16316888c88c66309ae2a47a39e27f130757c5dab97d8d65",
-  "productInventorySha256": "6f8acf80a1c07f2c664e7aabb99afcf76a326186d7cc3571de32395543637fef",
+  "productInventorySha256": "c9c7b697c6d0e57bf0412b973e040d974f209c6a9afc9ad02470af07339c773b",
   "reviewedProductDelta": [
     {
       "path": "server-version/backend/package-lock.json",
@@ -60,7 +60,7 @@
       "before": null,
       "after": {
         "mode": "100644",
-        "blob": "0a30954a626d4285d983a79df365d14096c6e2de",
+        "blob": "31e12b25911fa1534ff86bd05d3036ce2ee28271",
         "path": "server-version/backend/src/__tests__/integration/training-mac-export.postgres.integration.test.ts"
       }
     },
@@ -130,6 +130,45 @@
       }
     },
     {
+      "path": "server-version/frontend/src/components/FinalCompositeAssessment.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "f41dcc2536afbfa296dc588ae3f33ee718e19342",
+        "path": "server-version/frontend/src/components/FinalCompositeAssessment.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "b565d5ed4a6ce8a534fe445a8d8a1e597afc883e",
+        "path": "server-version/frontend/src/components/FinalCompositeAssessment.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/components/WholeCompositeQuestionnaire.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "482005cca2d59167843f676c3ddc2f12163b029a",
+        "path": "server-version/frontend/src/components/WholeCompositeQuestionnaire.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "ce764faea226562b5b434376b67f57f68318bd5c",
+        "path": "server-version/frontend/src/components/WholeCompositeQuestionnaire.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/components/__tests__/TrainingCheckpointRecovery.test.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "10e688c7101805f3cc579f7e257cd9433e3595be",
+        "path": "server-version/frontend/src/components/__tests__/TrainingCheckpointRecovery.test.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "133f254653323d563b380ca71e19e00c346ec8cb",
+        "path": "server-version/frontend/src/components/__tests__/TrainingCheckpointRecovery.test.tsx"
+      }
+    },
+    {
       "path": "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx",
       "before": {
         "mode": "100644",
@@ -140,6 +179,58 @@
         "mode": "100644",
         "blob": "0b6068789aa1d30db5d7a6cc6021a2378513df2e",
         "path": "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/modules/situational/__tests__/SituationalRunner.test.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "070d84df4a8f75c0364ce5fcbb4beaa684d23196",
+        "path": "server-version/frontend/src/modules/situational/__tests__/SituationalRunner.test.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "fffbd87c7bf6372032b09a942cf51d0a98e16f8d",
+        "path": "server-version/frontend/src/modules/situational/__tests__/SituationalRunner.test.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "b96aa1b9416ad7c33d279abede8d30a1cfebdb09",
+        "path": "server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "118c9de18846e4a834afb0afc36d4dbf4102411b",
+        "path": "server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/pages/teacher/AssessmentWorkbench.training.test.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "a4ed347f9ffe29548f755fc6b665edfd10f92ef6",
+        "path": "server-version/frontend/src/pages/teacher/AssessmentWorkbench.training.test.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "ad654cd64eaab772c7f95d7cbbe49287dfa0bf49",
+        "path": "server-version/frontend/src/pages/teacher/AssessmentWorkbench.training.test.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/pages/teacher/AssessmentWorkbench.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "000b9e178236d27930717c6343ff9e9acaf050f8",
+        "path": "server-version/frontend/src/pages/teacher/AssessmentWorkbench.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "43d0ef8c92cfec6703c59a0fb71fbc570b6d098a",
+        "path": "server-version/frontend/src/pages/teacher/AssessmentWorkbench.tsx"
       }
     },
     {
@@ -166,6 +257,32 @@
         "mode": "100644",
         "blob": "258558b1d5f95bf328f437417be637293817ad24",
         "path": "server-version/frontend/src/training/TrainingBrand.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingCourseAssessments.test.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "b84270b25ffac70ede9c0ec5ca15b5eb2b8982fb",
+        "path": "server-version/frontend/src/training/TrainingCourseAssessments.test.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "c40562657aa3be4291624aae7c8783ea22534ca1",
+        "path": "server-version/frontend/src/training/TrainingCourseAssessments.test.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingCourseAssessments.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "1131ebeea322bee9e2344b3a3a8610ee43abb512",
+        "path": "server-version/frontend/src/training/TrainingCourseAssessments.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "33a3a72d266e17d2c8c2df44a6f671aa2378822c",
+        "path": "server-version/frontend/src/training/TrainingCourseAssessments.tsx"
       }
     },
     {
@@ -547,5 +664,13 @@
       "provenance": "Mac child report, not an authenticated Actions execution"
     },
     "qualification": "New current frontend build, affected types/lint and existing compiled browser checks required; backend inputs unchanged by logo."
+  },
+  "reviewFixes": {
+    "sourceCommit": "5e1cc1d34845995cad48caed745e14e93b17ce02",
+    "fixtureCommit": "1a76e212",
+    "uniqueTargetedPasses": 6,
+    "originalRaceFailurePreserved": true,
+    "checkRecordSha256": "252fc6e5481839375d0b94e3b676d849521093cd5315d1af5dbc3353547cc6b8",
+    "scope": "Course-scoped links restricted to supported QUESTIONNAIRE and preserve context; Training page confirmation retained across refresh; successful checkpoint restore cancels pending auto advance. Only erroneous export fixture nonce/queued timing assertions corrected. No backend application change."
   }
 }
