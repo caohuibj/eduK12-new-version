@@ -1,3 +1,4 @@
+import { trainingReleaseQueryFixture } from './training-release-query.fixture'
 import { beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 import { UserRole } from '@prisma/client'
 import { getCognitiveRegistryEntry } from '../../modules/cognitive/cognitive.registry'
@@ -178,6 +179,7 @@ const scalePackageDefinition = {
 
 const adexiScale = (status = 'PUBLISHED') => ({
   id: 'scale-adexi',
+  creatorId: 'teacher-1',
   code: 'adexi_v1',
   name: 'ADEXI',
   description: 'draft fixture',
@@ -262,7 +264,11 @@ const frozenPackageComposite = (status: 'DRAFT' | 'PUBLISHED' = 'PUBLISHED') => 
 
 beforeEach(() => {
   vi.clearAllMocks()
-  mockPrisma.$queryRaw.mockResolvedValue([])
+  mockPrisma.$queryRaw.mockImplementation(trainingReleaseQueryFixture(async () => {
+    const last = mockPrisma.compositeAssessment.findUnique.mock.results.at(-1)
+    if (!last || last.type !== 'return') throw new Error('Expected an authoritative composite read before release lookup')
+    return await last.value
+  }))
   mockPrisma.scale.findMany.mockResolvedValue([adexiScale()])
   packageMock.mockReturnValue(packageDefinition)
   protocolMock.mockReturnValue(protocol)

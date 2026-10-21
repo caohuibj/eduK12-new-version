@@ -64,6 +64,7 @@ const publicScale = {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPrisma.$queryRaw.mockResolvedValue([])
   process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
   mockPrisma.$transaction.mockImplementation(async (callback: (tx: typeof mockPrisma) => unknown) => callback(mockPrisma))
   mockPrisma.scale.findMany.mockResolvedValue([{id:'scale-1',measurementReleaseId:null}])
@@ -108,6 +109,12 @@ describe('Scale v2 controller boundaries', () => {
     mockPrisma.scale.findMany.mockResolvedValue([{ ...publicScale, copySource }])
     mockPrisma.scale.count.mockResolvedValue(1)
     mockPrisma.materialGrant.findMany.mockResolvedValue([{ resourceId: 'scale-1' }])
+    mockPrisma.$queryRaw.mockImplementation(async (query: any) => {
+      const sql=Array.from(query.strings ?? query).join(' ')
+      if(sql.includes('FROM users'))return [{id:userId,platform_role:null,account_domain:'TRAINING',role,teacher_approved:true,expires_at:null}]
+      if(sql.includes('clock_timestamp() AS now'))return [{now:new Date()}]
+      return [] // No platform library grants/wrappers in this legacy provenance fixture.
+    })
     const res = makeRes()
     await scaleController.list(makeReq({ user: { userId, role } }) as any, res)
     expect(res.statusCode).toBe(200)

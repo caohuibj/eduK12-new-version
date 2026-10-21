@@ -16,15 +16,22 @@ function source(){
   definition.responseSets[0].options=[{value:'1',label:'String one',score:0},{value:1,label:'Number one',score:2}]
   definition.responseSets.push({key:'quality',options:[{value:'yes',label:'Quality yes',score:900},{value:'no',label:'Quality no',score:800}]})
   definition.items.push({...definition.items[0],itemCode:'quality',content:'Quality',sortOrder:1,
-    purpose:'ATTENTION_CHECK',attentionTarget:'yes',required:false,responseSetKey:'quality'})
+    purpose:'CONTENT',required:false,responseSetKey:'quality'})
+  definition.scoring.itemRules.push({itemCode:'quality',transform:{type:'identity'}})
   definition.items[0].images=[{asset:{assetId:'00000000-0000-4000-8000-000000000001',contentHash:'a'.repeat(64),mimeType:'image/png'},altText:'Stimulus',order:0}]
   definition.items[0].video={schemaVersion:1,video:{assetId:'00000000-0000-4000-8000-000000000002',contentHash:'b'.repeat(64),mimeType:'video/mp4'},transcript:{language:'en',text:'Frozen transcript'}}
   return definition
 }
-function imported(){
+function customSource(){
   const definition=source()
+  definition.responseSets=definition.responseSets.slice(0,1)
+  definition.items[1]={...definition.items[1],purpose:'ATTENTION_CHECK',attentionTarget:'1',required:true,responseSetKey:definition.responseSets[0].key}
+  return definition
+}
+// STANDARD here is only the adapter validation contract, not registry authorization.
+function imported(definition=source(),instrumentClass:'STANDARD'|'CUSTOM_DESCRIPTIVE'='STANDARD'){
   const snapshot=adaptCatalogScale({kind:'SCALE',sourceId:'library:approved',sourceVersion:'1'},'Canonical',definition,
-    {instrumentClass:'CUSTOM_DESCRIPTIVE',presentationMode:'ALL_AT_ONCE'})
+    {instrumentClass,presentationMode:'ALL_AT_ONCE'})
   const unit:ResearchFrozenUnit={draftId:'draft',instrumentKey:'scale',kind:'SCALE',title:'Canonical',draftRevision:1,
     sourceDigest:snapshot.definitionDigest,scoringDigest:snapshot.scoringDigest,compiledDefinition:snapshot.compiledDefinition,
     displayDefinition:snapshot.displayDefinition,sourceAnswerMapping:snapshot.answerMapping}
@@ -39,14 +46,14 @@ describe('canonical read-only Scale consumption',()=>{
     expect(snapshot.definitionDigest).toBe(canonicalHash(definition))
     expect(display.presentationMode).toBe('ALL_AT_ONCE')
     expect(display.items[0]).toMatchObject({reverse:true,images:definition.items[0].images,video:definition.items[0].video})
-    expect(display.items[1]).toMatchObject({purpose:'ATTENTION_CHECK',required:false,attentionTarget:'o_1_0',dimensionKeys:[]})
+    expect(display.items[1]).toMatchObject({purpose:'CONTENT',required:false,dimensionKeys:[]})
     expect(scalePresentationOptions(display,display.items[0]).map(o=>o.optionKey)).toEqual(['o_0','o_1'])
     expect(scalePresentationOptions(display,display.items[1]).map(o=>o.optionKey)).toEqual(['o_1_0','o_1_1'])
     expect(snapshot.answerMapping?.options).toEqual({o_0:'1',o_1:1,o_1_0:'yes',o_1_1:'no'})
     expect(()=>assertSurveyDraft('SCALE',display,true)).toThrow()
     expect(canonicalScalePresentation(definition,'ONE_BY_ONE').display.presentationMode).toBe('ONE_BY_ONE')
   })
-  it('uses the original scorer for string/number values, reverse transforms and unscored quality items',()=>{
+  it('uses the original scorer for string/number values, reverse transforms and unscored optional content',()=>{
     const {definition,publication}=imported()
     for(const [key,value] of [['o_0','1'],['o_1',1]] as const){
       const result=computeSurveyFinal(publication,{scale:{i_0:key,i_1:'o_1_0'}}).units[0]
@@ -62,10 +69,32 @@ describe('canonical read-only Scale consumption',()=>{
     expect(()=>computeSurveyFinal(publication,{scale:{i_0:'o_1_0'}})).toThrow()
     expect(()=>computeSurveyFinal(publication,{scale:{i_1:'o_1_0'}})).toThrow()
   })
+  it('preserves valid CUSTOM shared typed options and unscored required quality items through the real adapter',()=>{
+    const {definition,snapshot,publication}=imported(customSource(),'CUSTOM_DESCRIPTIVE')
+    const display=readSurveyScalePresentation(snapshot.displayDefinition)
+    expect(snapshot.compiledDefinition).toEqual(definition)
+    expect(display.items[1]).toMatchObject({purpose:'ATTENTION_CHECK',required:true,attentionTarget:'o_0',dimensionKeys:[]})
+    expect(scalePresentationOptions(display,display.items[1]).map(option=>option.optionKey)).toEqual(['o_0','o_1'])
+    for(const [option,value] of [['o_0','1'],['o_1',1]] as const){
+      const result=computeSurveyFinal(publication,{scale:{i_0:option,i_1:'o_0'}}).units[0]
+      expect(result.privateScoring).toEqual(scoreScale(definition,{content:value,quality:'1'}))
+      expect(result.rawAnswers).toEqual({i_0:option,i_1:'o_0'})
+      const changedQuality=computeSurveyFinal(publication,{scale:{i_0:option,i_1:'o_1'}}).units[0]
+      expect(changedQuality.privateScoring).toMatchObject({scores:scoreScale(definition,{content:value,quality:'1'}).scores})
+    }
+  })
+  it('rejects unsupported CUSTOM multiple response sets and optional items instead of silently flattening them',()=>{
+    const ref={kind:'SCALE' as const,sourceId:'library:approved',sourceVersion:'1'}
+    const multiple=customSource();multiple.responseSets.push({key:'extra',options:[{value:'yes',label:'Yes',score:1},{value:'no',label:'No',score:0}]})
+    expect(()=>adaptCatalogScale(ref,'Canonical',multiple,{instrumentClass:'CUSTOM_DESCRIPTIVE'})).toThrow('SOURCE_SCALE_INVALID')
+    const optional=customSource();optional.items[1].required=false
+    expect(()=>adaptCatalogScale(ref,'Canonical',optional,{instrumentClass:'CUSTOM_DESCRIPTIVE'})).toThrow('SOURCE_SCALE_INVALID')
+  })
   it('rechecks historical V1 grants under their original presentation without rewriting them',()=>{
     const definition=source();definition.items=definition.items.slice(0,1)
     delete definition.items[0].images;delete definition.items[0].video
     definition.responseSets=definition.responseSets.slice(0,1)
+    definition.scoring.itemRules=definition.scoring.itemRules.filter(rule=>rule.itemCode==='content')
     const current=adaptCatalogScale({kind:'SCALE',sourceId:'source',sourceVersion:'1'},'Canonical',definition)
     const stored={...current,adapterVersion:'survey-catalog-v1' as const,displayDefinition:{schemaVersion:1,
       presentationMode:'ALL_AT_ONCE',respondentType:'participant_self_report',
@@ -80,7 +109,7 @@ describe('canonical read-only Scale consumption',()=>{
     expect(canonicalHash(catalogAdapterForRecheck(changed,stored))).not.toBe(canonicalHash(stored))
   })
   it('does not erase unsupported randomization or response mechanics',()=>{
-    const definition=source(),ref={kind:'SCALE' as const,sourceId:'library:approved',sourceVersion:'1'}
+    const definition=customSource(),ref={kind:'SCALE' as const,sourceId:'library:approved',sourceVersion:'1'}
     definition.items[0].randomizeOptions=true
     expect(()=>adaptCatalogScale(ref,'Canonical',definition,{instrumentClass:'CUSTOM_DESCRIPTIVE'})).toThrow('RANDOMIZATION_RUNTIME_UNSUPPORTED')
     definition.items[0].randomizeOptions=false;definition.items[0].type='multiple'

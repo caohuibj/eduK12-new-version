@@ -1,3 +1,4 @@
+import { trainingReleaseQueryFixture } from './training-release-query.fixture'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { UserRole } from '@prisma/client'
 
@@ -64,7 +65,11 @@ const assignment = (overrides: Record<string, unknown> = {}) => ({
 
 beforeEach(() => {
   vi.clearAllMocks()
-  mockPrisma.$queryRaw.mockResolvedValue([])
+  mockPrisma.$queryRaw.mockImplementation(trainingReleaseQueryFixture(async () => {
+    const last = mockPrisma.compositeAssessment.findUnique.mock.results.at(-1)
+    if (!last || last.type !== 'return') throw new Error('Expected an authoritative composite read before release lookup')
+    return await last.value
+  }))
   mockPrisma.compositeAssessmentItem.create.mockResolvedValue({ id: 'item-1' })
   mockPrisma.course.findUnique.mockResolvedValue({ id: 'course-1', creatorId: 'teacher-a' })
   mockPrisma.materialGrant.findUnique.mockResolvedValue(null)
@@ -169,9 +174,26 @@ describe('addItem scale grants', () => {
     })).rejects.toMatchObject({ statusCode: 403 })
   })
 
+  it.each(['missing-release','wrong-digest'] as const)('retains real measurement publication rejection for %s',async failure=>{
+    const source=draftComposite({items:[{id:'item-scale',type:'SCALE',scaleId:'scale-other',required:true,position:0,
+      scale:{id:'scale-other',code:'adexi_v1',creatorId:'admin-1',status:'PUBLISHED',instrumentClass:'STANDARD',instrumentVersion:'2.0.0',definition:ADEXI_V2_DEFINITION}}]})
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(source)
+    mockPrisma.materialGrant.findUnique.mockResolvedValue({id:'valid-use'})
+    const rows=trainingReleaseQueryFixture(async()=>source)
+    mockPrisma.$queryRaw.mockImplementation(async(query:any,...args:unknown[])=>{
+      const sql=Array.from(query.strings??query).join(' ')
+      const result=await rows(query,...args)
+      if(failure==='missing-release'&&sql.includes('WITH scale_sources AS'))return result.map(row=>({...row,measurement_release_id:null}))
+      if(failure==='wrong-digest'&&sql.includes('SELECT * FROM measurement_content_releases'))return result.map(row=>({...row,content_hash:'0'.repeat(64)}))
+      return result
+    })
+    await expect(publishComposite('teacher-a',TEACHER,'composite-1')).rejects.toThrow(failure==='missing-release'?'CONTENT_TRAINING_RELEASE_REQUIRED':'CONTENT_RELEASE_HASH_MISMATCH')
+    expect(mockPrisma.compositeAssessment.update).not.toHaveBeenCalled()
+  })
+
   it('rejects a new publication after its scale grant is revoked', async () => {
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite({
-      items: [{ type: 'SCALE', scaleId:'scale-other', scale: { id: 'scale-other', status: 'PUBLISHED', creatorId: 'admin-1' } }],
+      items: [{ id:'item-scale',type: 'SCALE', scaleId:'scale-other', required:true,position:0, scale: { id: 'scale-other', code:'adexi_v1', status: 'PUBLISHED', creatorId: 'admin-1', instrumentClass:'STANDARD',instrumentVersion:'2.0.0',definition:ADEXI_V2_DEFINITION } }],
     }))
     mockPrisma.materialGrant.findUnique.mockResolvedValue(null)
     mockPrisma.compositeAssessment.update.mockResolvedValue({ status: 'PUBLISHED' })
@@ -194,11 +216,13 @@ describe('publishComposite cognitive course match', () => {
       .rejects.toMatchObject({ statusCode: 400, message: '认知任务必须与综合测评属于同一课程' })
   })
 
-  it('uses database publication as release authority when v2 compatibility metadata is Draft', async () => {
+  it('uses a published scientific configuration and its exact release as publication authority', async () => {
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite({
       items: [{
-        type: 'COGNITIVE',
-        cognitiveAssignment: assignment(),
+        id:'item-cognitive',position:0,required:true,type: 'COGNITIVE',
+        cognitiveAssignment: assignment({config:{...publishedConfig,testType:'reaction',configVersion:'1.1.0',scoringVersion:'1.1.0',
+          config:{totalTrials:20,foreperiodMinMs:700,foreperiodMaxMs:1500,timeoutMs:2000,readyDurationMs:1000,
+            report:{reportVersion:'1.1.0',referenceMode:'simulated',referenceVersion:'lit-sim-k12-v0.2',referenceBand:'K7-9'}}}}),
       }],
     }))
     mockPrisma.compositeAssessment.update.mockResolvedValue({ status: 'PUBLISHED' })

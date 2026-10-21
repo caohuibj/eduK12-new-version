@@ -36,6 +36,17 @@ function deferred<T>() {
   return { promise, resolve, reject }
 }
 const editor = () => <MemoryRouter><ScaleEdit /></MemoryRouter>
+// Version history and library governance are separate sections, not controls
+// that mutate the frozen definition. Scope every lock assertion to the active
+// editor using its real save action, retaining all inputs and buttons inside it.
+const activeEditingSection = () => {
+  const save = screen.getAllByRole('button', { name: /^保存/ }).find(button => button.closest('section'))
+  expect(save).toBeDefined()
+  const section = save!.closest('section')!
+  expect(section).not.toBeNull()
+  return section
+}
+
 
 beforeEach(() => {
   vi.resetAllMocks()
@@ -52,18 +63,19 @@ describe('ScaleEdit frozen definition and request ownership', () => {
   ])('keeps all %s %s editing controls and saves disabled', async (status, instrumentClass) => {
     api.get.mockResolvedValue(ok(scale({ status, instrumentClass })))
     const user = userEvent.setup()
-    const view = render(editor())
+    render(editor())
     await screen.findByLabelText('量表名称')
     expect(screen.queryByRole('button', { name: '保存草稿' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: '发布自用（描述性量表）' })).not.toBeInTheDocument()
     for (const tab of ['基本信息', '响应选项', '题目', '计分', '报告文案']) {
       await user.click(screen.getByRole('button', { name: tab }))
-      const controls = view.container.querySelectorAll('section input, section textarea, section select, section button')
+      const controls = activeEditingSection().querySelectorAll('input, textarea, select, button')
       expect(controls.length).toBeGreaterThan(0)
       controls.forEach(control => expect(control).toBeDisabled())
       const save = Array.from(controls).find(control => control.textContent?.startsWith('保存'))!
       fireEvent.click(save)
     }
+    if (instrumentClass === 'CUSTOM_DESCRIPTIVE') expect(screen.getByRole('button', { name: '查看同量表版本历史' })).toBeEnabled()
     expect(api.put).not.toHaveBeenCalled()
     expect(api.post).not.toHaveBeenCalled()
   })
@@ -116,10 +128,13 @@ describe('ScaleEdit frozen definition and request ownership', () => {
     const pending = deferred<ReturnType<typeof ok>>()
     api.put.mockReturnValue(pending.promise)
     const user = userEvent.setup()
-    const view = render(editor())
+    render(editor())
     await user.click(await screen.findByRole('button', { name: '响应选项' }))
     await user.click(screen.getByRole('button', { name: '保存响应集' }))
-    view.container.querySelectorAll('section input, section button').forEach(control => expect(control).toBeDisabled())
+    const controls = activeEditingSection().querySelectorAll('input, textarea, select, button')
+    expect(controls.length).toBeGreaterThan(0)
+    controls.forEach(control => expect(control).toBeDisabled())
+    expect(screen.getByRole('button', { name: '查看同量表版本历史' })).toBeEnabled()
     await user.click(screen.getByRole('button', { name: '保存响应集' }))
     expect(api.put).toHaveBeenCalledTimes(1)
     await act(async () => pending.resolve(ok(scale())))

@@ -1,3 +1,5 @@
+import { ADEXI_V2_DEFINITION } from '../../modules/scale/packages/adexi-v2'
+import { trainingReleaseQueryFixture } from './training-release-query.fixture'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { UserRole } from '@prisma/client'
 
@@ -137,7 +139,11 @@ const draftComposite = (overrides: Record<string, unknown> = {}) => ({
 
 beforeEach(() => {
   vi.clearAllMocks()
-  mockPrisma.$queryRaw.mockResolvedValue([])
+  mockPrisma.$queryRaw.mockImplementation(trainingReleaseQueryFixture(async () => {
+    const last = mockPrisma.compositeAssessment.findUnique.mock.results.at(-1)
+    if (!last || last.type !== 'return') throw new Error('Expected an authoritative composite read before release lookup')
+    return await last.value
+  }))
   mockPrisma.scale.findMany.mockResolvedValue([{id:'scale-1',status:'PUBLISHED',creatorId:'teacher-1'}])
   getProtocolMock.mockImplementation((key: string, version: string) =>
     key === protocol.key && version === protocol.version ? protocol : undefined,
@@ -328,7 +334,7 @@ describe('Composite analysis protocol publish freeze', () => {
 
   it('publishes legacy collection-only composites without an analysis snapshot', async () => {
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite({
-      items: [{ type: 'SCALE', scaleId:'scale-1', required: true, scale: { id: 'scale-1', status: 'PUBLISHED' } }],
+      items: [{ id:'item-scale',type: 'SCALE', scaleId:'scale-1', required: true, position:0, scale: { id: 'scale-1', code:'adexi_v1',status: 'PUBLISHED', creatorId:'teacher-1',instrumentClass:'STANDARD',instrumentVersion:'2.0.0',definition:ADEXI_V2_DEFINITION } }],
     }))
     await publishComposite('teacher-1', TEACHER, 'composite-1')
     expect(mockPrisma.compositeAssessment.update).toHaveBeenCalledWith(expect.objectContaining({

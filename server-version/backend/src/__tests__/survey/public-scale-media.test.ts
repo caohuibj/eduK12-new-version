@@ -24,6 +24,9 @@ function unit():ResearchFrozenUnit{
  definition.items=[{itemCode:'private-code',content:'Question',images:[image],video,type:'single',required:true,sortOrder:0,responseSetKey:'default',randomizeOptions:false}]
  definition.scoring.itemRules=[{itemCode:'private-code',transform:{type:'identity'}}]
  definition.scoring.scores=[{key:'total',type:'total',label:'Total',direction:'higher_is_more',canonical:true,displayPrecision:1,source:{type:'items',items:[{itemCode:'private-code',weight:1}],aggregation:'sum'}}]
+ definition.report.primaryScoreKeys=['total']
+ definition.report.scoreOrder=['total']
+ definition.report.interpretations=[{scoreKey:'total',headline:'Total',source:{type:'score_only'},summary:'Synthetic descriptive score',bands:[],guidance:[]}]
  definition.report.rawScoreFeedback={schemaVersion:1,rules:[{scoreKey:'total',ranges:[{key:'all',min:1,max:5,includeMax:true,text:'Report',images:[report]}]}]}
  const {display,mapping}=canonicalScalePresentation(definition,'ONE_BY_ONE')
  return {draftId:'draft',instrumentKey:'scale',kind:'SCALE',title:'Synthetic',draftRevision:1,sourceDigest:'digest',scoringDigest:'score',compiledDefinition:definition,displayDefinition:display,sourceAnswerMapping:mapping}
