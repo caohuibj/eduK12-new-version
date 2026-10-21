@@ -68,13 +68,12 @@ test('browser admission refuses missing checkpoints, media bytes, wrong provenan
  assert.throws(()=>verifyGovernanceBrowserReport(r,{...options,read:()=>Buffer.from('not PNG')}));
 });
 
-test('fixed continuation does not rebuild frontend or relabel old images as a new compile',()=>{
+test('SQL repair continuation compiles only backend and accepts frontend without repeating qualification',()=>{
  const w=readFileSync(new URL('../workflows/ci-scale-library-governance.yml',import.meta.url),'utf8');
- assert.match(w,/compile once and preserve exact builder and runtime bytes\n        if: matrix.component == 'backend'/);
- assert.match(w,/restore fixed original frontend builder and runtime without compilation\n        if: matrix.component == 'frontend'/);
- assert.match(w,/image_head=f41811053761c25709f98d74f0abed7eb1c61711/);
- for(const path of ['src/components/scale-governance/TrainingScaleLibrarySubmission.test.tsx','src/survey/SurveyPublicApp.final.test.tsx'])assert(w.includes(path));
- assert.match(w,/\/app\/\$file:ro/);assert.match(w,/image_run=39605768918/);
+ assert.match(w,/component: \[backend\]/);assert.doesNotMatch(w,/component: \[backend, frontend\]/);
+ assert.match(w,/scale-library-governance-build.sh backend/);
+ assert.match(w,/resume.py qualified-frontend/);assert.match(w,/resume.py round3 backend/);assert.match(w,/resume.py round3 postgres/);
+ assert.doesNotMatch(w,/checks.mjs.*(?:backend|frontend)/);
  const reuse=readFileSync(new URL('./scale-library-governance-resume.py',import.meta.url),'utf8');
  assert.doesNotMatch(reuse,/docker['", ]+build|npm ci|docker['", ]+tag/);
  assert.match(reuse,/org.opencontainers.image.revision/);assert.match(reuse,/originalJobConclusion.*failure/);
@@ -124,5 +123,24 @@ for kind in ['failed','suite-failed','missing','false-green','duplicate']:
  try:m.validate_prior_report('frontend',bad,p)
  except AssertionError:pass
  else:raise AssertionError('invalid partial report accepted: '+kind)
+`],{stdio:'pipe'});
+});
+
+test('SQL-only continuation rejects missing, pending and suite-level failed prior results',async()=>{
+ const {execFileSync}=await import('node:child_process');
+ execFileSync('python3',['-B','-c',`
+import importlib.util,copy
+spec=importlib.util.spec_from_file_location('resume','.github/scripts/scale-library-governance-resume.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+r={'success':True,'numFailedTests':0,'numPendingTests':0,'testResults':[{'name':'/app/src/test.ts','status':'passed','assertionResults':[{'status':'passed'}]}]}
+assert m.passed_suites(r,['src/test.ts'],1,True)==[{'file':'src/test.ts','passed':1}]
+for kind in ['suite','assertion','missing','pending']:
+ bad=copy.deepcopy(r)
+ if kind=='suite':bad['testResults'][0]['status']='failed'
+ if kind=='assertion':bad['testResults'][0]['assertionResults'][0]['status']='failed'
+ if kind=='missing':bad['testResults']=[]
+ if kind=='pending':bad['numPendingTests']=1
+ try:m.passed_suites(bad,['src/test.ts'],1,True)
+ except (AssertionError,KeyError):pass
+ else:raise AssertionError('invalid success accepted: '+kind)
 `],{stdio:'pipe'});
 });

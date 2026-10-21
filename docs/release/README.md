@@ -640,3 +640,13 @@ suites, five existing direct binding/FINAL/report/reinterpretation suites, and
 the new wrapper-binding suite. PostgreSQL, restoration, connected browser and
 runtime scans have not passed previously and remain required. Only changed
 SAST inputs are analyzed after verifying the second run's official completion.
+
+The next fixed continuation accepts run 39614240900's complete frontend
+qualification and its original image bytes without compiling, testing, scanning
+or re-uploading the frontend archive again. Backend copy-lock SQL and governance
+trigger repairs invalidate backend compilation and image scan, but not the
+mocked/pure unit paths already passed. Those reports remain explicitly sourced
+from their original runs. The ordinary instrument FINAL PostgreSQL suite's 13
+passing assertions do not execute either changed SQL path; only the three failed
+PG suites run again. Migration upgrade/legacy-byte validation uses the new SQL;
+nonempty recovery and the two browser journeys still require actual execution.

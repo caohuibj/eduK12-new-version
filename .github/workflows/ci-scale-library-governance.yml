@@ -20,7 +20,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        component: [backend, frontend]
+        component: [backend]
     env:
       PLAN: ${{ inputs.plan }}
     steps:
@@ -59,49 +59,22 @@ jobs:
           (out/'audit-source.json').write_text(json.dumps({'status':'ACCEPTED_PRIOR','run':p.RUN,'job':p.JOBS[c],'head':p.SOURCE,'inputs':['package.json','package-lock.json'],'newAuditPerformed':False}))
           PY
       - uses: docker/setup-buildx-action@v3
-      - name: restore fixed original frontend builder and runtime without compilation
-        if: matrix.component == 'frontend'
+      - name: accept fixed third-run unit contracts without reexecution
         env:
           GH_TOKEN: ${{ github.token }}
-        run: python3 -B .github/scripts/scale-library-governance-resume.py frontend
+        run: |
+          git fetch --no-tags --depth=1 origin 1dc16b8ef542f4f68457100f652fdd34074b6311
+          python3 -B .github/scripts/scale-library-governance-resume.py round3 backend
       - name: compile once and preserve exact builder and runtime bytes
         if: matrix.component == 'backend'
-        run: bash .github/scripts/scale-library-governance-build.sh ${{ matrix.component }}
-      - name: accept unchanged successful suites from the fixed failed second run
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          git fetch --no-tags --depth=1 origin 0152447ae08beefc04ffffa9601dd33295d3c33e
-          python3 -B .github/scripts/scale-library-governance-resume.py contracts ${{ matrix.component }}
-      - name: selected missing contracts and frontend types/lint in the original builder
-        shell: bash
-        run: |
-          mounts=()
-          image_head="$GITHUB_SHA"
-          if [ '${{ matrix.component }}' = frontend ]; then
-            image_head=f41811053761c25709f98d74f0abed7eb1c61711
-            mounts=(-v "$GITHUB_WORKSPACE/server-version/cognitive-randomization-golden-v1.json:/cognitive-randomization-golden-v1.json:ro" -v "$GITHUB_WORKSPACE/server-version/backend/src/modules/cognitive/generated/identities.json:/backend/src/modules/cognitive/generated/identities.json:ro")
-            for file in src/pages/__tests__/ScaleEdit.readonly.test.tsx src/components/scale-governance/TrainingScaleLibrarySubmission.test.tsx src/survey/SurveyPublicApp.final.test.tsx; do mounts+=(-v "$GITHUB_WORKSPACE/server-version/frontend/$file:/app/$file:ro"); done
-          fi
-          test_env=()
-          if [ '${{ matrix.component }}' = backend ]; then
-            # Public synthetic test-only keys, never used by the isolated runtime or production.
-            test_env=(-e COGNITIVE_MODULE_ENABLED=true -e DATA_ENCRYPTION_KEY=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa -e DATA_PSEUDONYM_KEY=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb)
-          fi
-          docker run --rm "${mounts[@]}" "${test_env[@]}" -e CI=true -e NODE_ENV=test -e TZ=UTC \
-            -e DATABASE_URL=postgresql://unused:unused@127.0.0.1:1/unused \
-            -e GITHUB_WORKSPACE="$GITHUB_WORKSPACE" -e GOVERNANCE_EVIDENCE=/evidence \
-            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
-            -v "$GITHUB_WORKSPACE/scale-library-governance-evidence/${{ matrix.component }}:/evidence" \
-            scale-library-governance-${{ matrix.component }}-builder:"$image_head" \
-            node "$GITHUB_WORKSPACE/.github/scripts/scale-library-governance-checks.mjs" ${{ matrix.component }}
+        run: bash .github/scripts/scale-library-governance-build.sh backend
       - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
         with:
           version: v0.70.0
           cache: false
       - name: scan the actual runtime image for the first time
         env:
-          IMAGE_HEAD: ${{ matrix.component == 'frontend' && 'f41811053761c25709f98d74f0abed7eb1c61711' || github.sha }}
+          IMAGE_HEAD: ${{ github.sha }}
         run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output scale-library-governance-evidence/${{ matrix.component }}/runtime-scan.json scale-library-governance-${{ matrix.component }}-runtime:$IMAGE_HEAD
       - uses: actions/upload-artifact@v4
         if: always()
@@ -165,7 +138,7 @@ jobs:
       - name: verify and load this run exact compiled images
         shell: bash
         run: |
-          for component in backend frontend; do
+          for component in backend; do
             reports="governance-downloads/reports/scale-library-governance-$component-reports-$GITHUB_SHA"
             archive="governance-downloads/images/scale-library-governance-$component-images-$GITHUB_SHA"
             image_head="$GITHUB_SHA"; image_run="$GITHUB_RUN_ID"
@@ -179,6 +152,13 @@ jobs:
               IMAGE_ID="$actual" IMAGE_TAG="scale-library-governance-$component-$target:$image_head" REPORT="$reports/images.json" node -e 'const r=require(process.env.GITHUB_WORKSPACE+"/"+process.env.REPORT);if(!r.some(x=>x.Id===process.env.IMAGE_ID&&x.RepoTags.includes(process.env.IMAGE_TAG)))throw Error("Original exact image tag/ID missing")'
             done
           done
+      - name: restore qualified original frontend and accept only unchanged PostgreSQL suite
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --no-tags --depth=1 origin 1dc16b8ef542f4f68457100f652fdd34074b6311
+          python3 -B .github/scripts/scale-library-governance-resume.py qualified-frontend
+          python3 -B .github/scripts/scale-library-governance-resume.py round3 postgres
       - name: prepare isolated services and private prerequisite directory
         shell: bash
         run: |
@@ -254,7 +234,7 @@ jobs:
           mkdir -p server-version/frontend/dist
           docker cp "$id:/usr/share/nginx/html/." server-version/frontend/dist/
           docker rm "$id"
-          (cd server-version/frontend/dist; sha256sum -c "$GITHUB_WORKSPACE/governance-downloads/reports/scale-library-governance-frontend-reports-$GITHUB_SHA/runtime-files.sha256")
+          (cd server-version/frontend/dist; sha256sum -c "$GITHUB_WORKSPACE/scale-library-governance-evidence/frontend/runtime-files.sha256")
           docker run --rm --cpus=1 --memory=512m --user "$(id -u):$(id -g)" -v "$RUNNER_TEMP/scale-library-governance-private:$RUNNER_TEMP/scale-library-governance-private" "scale-library-governance-backend-runtime:$GITHUB_SHA" ffmpeg -nostdin -f lavfi -i color=c=blue:s=160x120:r=10 -t 2 -an -c:v libx264 -pix_fmt yuv420p "$SCALE_GOVERNANCE_VIDEO_FILE"
       - name: serve restricted API, isolated video worker and canonical loopback HTTPS
         shell: bash

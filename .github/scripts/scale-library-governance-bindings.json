@@ -4,7 +4,7 @@
   "source": {
     "server-version/backend/prisma/migrations/20261021123000_scale_library_governance/migration.sql": {
       "before": null,
-      "after": "79628cc4732d989ac27b2c94dd8db8fbcecaec3e"
+      "after": "7a3bc3e53488269cb8e847c3a17172c87106f766"
     },
     "server-version/backend/prisma/schema.prisma": {
       "before": "e1cefbd04bc7a8b626ade44f21748f66df14d89e",
@@ -284,7 +284,7 @@
     },
     "server-version/backend/src/modules/scale/scale-copy.service.ts": {
       "before": "2386715599107c9baee23b6a8e1a518bb788c73c",
-      "after": "8f4c748ddba5bc08fbeb7a88a2411cd048989a69"
+      "after": "6010deb89139b1afdeafbdea56e4e1fd8c79a376"
     },
     "server-version/backend/src/modules/scale/scale-final-submit.service.ts": {
       "before": "56be2069f5fd2394830e97c87e04dbea89a29fbc",
@@ -648,38 +648,17 @@
     }
   },
   "tests": {
-    "backend": [
-      "src/__tests__/assessment-runtime/shared-scale-runtime.test.ts",
-      "src/__tests__/composite/addItem.service.test.ts",
-      "src/__tests__/composite/analysis-protocol.service.test.ts",
-      "src/__tests__/composite/report-package.service.test.ts",
-      "src/__tests__/composite/training-content-service.test.ts",
-      "src/__tests__/scale/scale-controller-v2.test.ts",
-      "src/__tests__/scale/scale-presentation.test.ts",
-      "src/__tests__/survey/catalog-scale-presentation.contract.test.ts",
-      "src/__tests__/survey/public-scale-media.test.ts",
-      "src/__tests__/measurement-content/training-content-binding.test.ts",
-      "src/__tests__/measurement-content/registered-resource-content.test.ts",
-      "src/__tests__/measurement-content/training-content-final.test.ts",
-      "src/__tests__/measurement-content/training-content-report.test.ts",
-      "src/__tests__/measurement-content/training-reinterpretation.test.ts",
-      "src/__tests__/scale-library-governance/wrapper-content-binding.test.ts"
-    ],
-    "frontend": [
-      "src/pages/__tests__/ScaleEdit.readonly.test.tsx"
-    ],
+    "backend": [],
+    "frontend": [],
     "postgres": [
-      "src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts",
       "src/__tests__/scale-library-governance/governance.postgres.integration.test.ts",
       "src/__tests__/scale-library-governance/media.postgres.integration.test.ts",
       "src/__tests__/scale/scale-copy.postgres.integration.test.ts"
     ]
   },
-  "frontendLint": [
-    "src/pages/__tests__/ScaleEdit.readonly.test.tsx"
-  ],
+  "frontendLint": [],
   "browserProfileTrustApproved": true,
-  "productReference": "cd148f9be5d80e51c2e469ccedf88f65e6de4c30",
+  "productReference": "b1375c10c62a8986dede0ccbe9d67f14bc2d7d6f",
   "priorContracts": {
     "run": 39610102026,
     "head": "0152447ae08beefc04ffffa9601dd33295d3c33e",

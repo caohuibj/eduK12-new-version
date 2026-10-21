@@ -17,6 +17,12 @@ if(component!=='postgres'){
  assert.deepEqual(prior.suites.map(s=>s.file).sort(),[...plan.priorContracts[component]].sort());
  assert(prior.suites.every(s=>s.passed>0));assert.equal(prior.passed,component==='backend'?161:159);
 }
+if(component==='postgres'){
+ const prior=JSON.parse(readFileSync(resolve(evidence,'round3-accepted.json')));
+ assert.equal(prior.status,'ACCEPTED_PRIOR_SUCCESS');assert.equal(prior.sourceRun,39614240900);
+ assert.deepEqual(prior.suites,[{file:'src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts',passed:13}]);
+ assert(!files.includes(prior.suites[0].file));
+}
 const run=args=>execFileSync(process.execPath,args,{stdio:'inherit',timeout:300000});
 if(component==='frontend'){
  run(['node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit']);

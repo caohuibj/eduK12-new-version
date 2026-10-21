@@ -31,6 +31,7 @@ def official(kind,read=r.api):
             steps=[s for s in job['steps'] if s['name']==name];assert len(steps)==1 and steps[0]['conclusion']=='success'
     else:assert job['conclusion']=='success'
 def restore():
+    r.RUN,r.SOURCE=RUN,SOURCE
     closure();official('frontend')
     evidence=Path('scale-library-governance-evidence/frontend');archive=Path('scale-library-governance-images/frontend')
     r.download('governanceReports',evidence);r.download('governanceImages',archive)
@@ -89,9 +90,64 @@ def prior_contracts(component):
     receipt={'status':'ACCEPTED_PRIOR_CONTRACTS_ONLY','sourceRun':ROUND2,'sourceHead':ROUND2_SOURCE,'sourceCheckout':ROUND2_CHECKOUT,'sourceJob':ROUND2_JOBS[component],'originalJobConclusion':'failure','originalRunConclusion':'failure','suites':accepted,'passed':count,'newExecution':False,'reviewedBoundary':prior['reviewedBoundary']}
     (evidence/'prior-contracts.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt))
 
+ROUND3={'run': 39614240900, 'head': '1dc16b8ef542f4f68457100f652fdd34074b6311', 'checkout': 'cf6ef4ee00b774037129b671ab5ff8d8f36ef69c', 'jobs': {'backend': 119271089353, 'frontend': 119271089484, 'postgres': 119273407309, 'sast': 119271088571}, 'reports': {'backend': [12352157951, 'scale-library-governance-backend-reports-cf6ef4ee00b774037129b671ab5ff8d8f36ef69c', 593533, '72bb70a02b04435e5f77b1eb6968705888659153409453eb0115351ec8fe0f2f'], 'frontend': [12351463531, 'scale-library-governance-frontend-reports-cf6ef4ee00b774037129b671ab5ff8d8f36ef69c', 81684, '8b18972246d25406ef4ad4ff5f025d9d7927721a00e778389c55e08d99b97637'], 'postgres': [12352123235, 'scale-library-governance-connected-cf6ef4ee00b774037129b671ab5ff8d8f36ef69c', 4667, '48366c915b250225689dd181ac07645d9bcdbc2d04fa2f2adb8263cf73867761']}}
+SQL_REPAIRS=['server-version/backend/prisma/migrations/20261021123000_scale_library_governance/migration.sql','server-version/backend/src/modules/scale/scale-copy.service.ts']
+def round3_official(component,read=r.api):
+    run=read('runs/'+str(ROUND3['run']));assert run['id']==ROUND3['run'] and run['head_sha']==ROUND3['head'] and run['run_attempt']==1 and run['status']=='completed' and run['conclusion']=='failure'
+    job=read('jobs/'+str(ROUND3['jobs'][component]));assert job['id']==ROUND3['jobs'][component] and job['run_id']==ROUND3['run'] and job['head_sha']==ROUND3['head'] and job['run_attempt']==1 and job['status']=='completed'
+    assert job['conclusion']==('failure' if component=='postgres' else 'success')
+def round3_closure():
+    assert git('diff','--name-only',ROUND3['head'],'HEAD','--','server-version/frontend')==''
+    assert sorted(git('diff','--name-only',ROUND3['head'],'HEAD','--','server-version/backend').splitlines())==SQL_REPAIRS
+    closure() # Original frontend compile/tool/environment closure is also retained.
+    original=json.loads(git('show',ROUND3['head']+':.github/scripts/scale-library-governance-bindings.json'))
+    for component in ['backend','frontend','postgres']:
+        for file in original['tests'][component]+(original['priorContracts'].get(component,[])):
+            path='server-version/'+('backend' if component=='postgres' else component)+'/'+file
+            assert git('rev-parse',ROUND3['head']+':'+path)==git('rev-parse','HEAD:'+path)
+    return original
+
+def passed_suites(report,files,count,complete):
+    suites={row['name'].removeprefix('/app/'):row for row in report['testResults']}
+    assert len(suites)==len(report['testResults'])
+    if complete:assert report['success'] is True and report['numFailedTests']==0 and report['numPendingTests']==0 and sorted(suites)==sorted(files)
+    else:assert report['success'] is False and report['numFailedTests']==24
+    accepted=[]
+    for file in files:
+        suite=suites[file];assert suite['status']=='passed' and suite['assertionResults'] and all(a['status']=='passed' for a in suite['assertionResults'])
+        accepted.append({'file':file,'passed':len(suite['assertionResults'])})
+    assert sum(s['passed'] for s in accepted)==count
+    return accepted
+
+def round3_accept(component):
+    original=round3_closure();round3_official(component)
+    evidence=Path('scale-library-governance-evidence')/component;evidence.mkdir(parents=True,exist_ok=True)
+    directory=evidence/'prior-round3';r.RUN,r.SOURCE=ROUND3['run'],ROUND3['head'];r.ARTIFACTS['governanceRound3']=tuple(ROUND3['reports'][component]);r.download('governanceRound3',directory)
+    if component=='postgres':
+        file='src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts'
+        report=json.loads((directory/'postgres/postgres-tests.json').read_text());assert sorted(s['name'].removeprefix('/app/') for s in report['testResults'])==sorted(original['tests']['postgres'])
+        accepted=passed_suites(report,[file],13,False)
+        cleanup=json.loads((directory/'cleanup.json').read_text());assert cleanup['exitStatus']==0 and cleanup['privateMaterialRemoved'] is True
+    else:
+        report=json.loads((directory/(component+'-tests.json')).read_text());accepted=passed_suites(report,original['tests'][component],162 if component=='backend' else 21,True)
+        old=json.loads((directory/'prior-round2'/(component+'-tests.json')).read_text());validate_prior_report(component,old,original['priorContracts'])
+        if component=='frontend':
+            scan=json.loads((directory/'runtime-scan.json').read_text())
+            assert scan['ArtifactName']=='scale-library-governance-frontend-runtime:'+CHECKOUT and scan['Metadata']['ImageID']==IMAGES['runtime']
+            assert not [v for result in scan.get('Results',[]) for v in result.get('Vulnerabilities',[]) if v.get('Severity') in ['HIGH','CRITICAL']]
+    out={'status':'ACCEPTED_PRIOR_SUCCESS','sourceRun':ROUND3['run'],'sourceHead':ROUND3['head'],'sourceJob':ROUND3['jobs'][component],'originalRunConclusion':'failure','originalJobConclusion':'failure' if component=='postgres' else 'success','suites':accepted,'newExecution':False,'scope':'ordinary instrument FINAL only' if component=='postgres' else ('full frontend qualification including prior 159, types/lint and runtime scan' if component=='frontend' else 'unit contracts including prior 161 only; backend build/scan invalidated by SQL repairs')}
+    (evidence/'round3-accepted.json').write_text(json.dumps(out,indent=2)+'\n');print(json.dumps(out))
+    return directory
+
+def qualified_frontend():
+    directory=round3_accept('frontend');restore()
+    receipt=Path('scale-library-governance-evidence/frontend/frontend-resume.json');data=json.loads(receipt.read_text());data['newChecksRequired']=[];data['qualificationRun']=ROUND3['run'];data['qualificationJob']=ROUND3['jobs']['frontend'];receipt.write_text(json.dumps(data,indent=2)+'\n')
+
 if __name__=='__main__':
     if sys.argv[1:] == ['frontend']:restore()
     elif len(sys.argv)==3 and sys.argv[1]=='contracts' and sys.argv[2] in ['backend','frontend']:prior_contracts(sys.argv[2])
+    elif sys.argv[1:]==['qualified-frontend']:qualified_frontend()
+    elif len(sys.argv)==3 and sys.argv[1]=='round3' and sys.argv[2] in ['backend','postgres']:round3_accept(sys.argv[2])
     elif sys.argv[1:]==['sast']:
-        prior_official('sast');out=Path('scale-library-governance-prior-sast.json');out.write_text(json.dumps({'sourceRun':ROUND2,'sourceHead':ROUND2_SOURCE,'sourceJob':ROUND2_JOBS['sast'],'status':'ANALYSIS_COMPLETED_PRIOR','zeroFindingsClaim':False}));print(out.read_text())
+        round3_official('sast');out=Path('scale-library-governance-prior-sast.json');out.write_text(json.dumps({'sourceRun':ROUND3['run'],'sourceHead':ROUND3['head'],'sourceJob':ROUND3['jobs']['sast'],'status':'ANALYSIS_COMPLETED_PRIOR','zeroFindingsClaim':False}));print(out.read_text())
     else:raise ValueError('Only this fixed frontend continuation or original SAST completion is supported')
