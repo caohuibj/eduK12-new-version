@@ -61,8 +61,8 @@
       "jobName": "build changed measurement frontend once",
       "artifactName": "measurement-39425861081-4286a59b649c37662cdbc0e7ca4e41103ad4e4f2-frontend-build",
       "receiptSha256": "d467a7312ae1daa2672b5a1ff635c9561408b65116a3cad5cbabd0a3551430b4",
-      "sourceTree": "2a2ee43781069a8ab076d2a2e50b33bfe3042370",
-      "productionInputSha256": "959b9030ce4b3435052fc8fb6fe8361e795c5e98405178aefd64b3381ac267c3",
+      "sourceTree": "0647a51a9e240aa19c3fd725fdd90b0dc306f169",
+      "productionInputSha256": "c9eb1a77f8e8bc971c4b93785889ae2a59eb6bf3ac8fc80ec300f24cba79f32a",
       "excludedNonProductionPaths": []
     }
   },
@@ -75,16 +75,13 @@
       "20261021000000_training_catalog_discovery"
     ],
     "changedFrontendFiles": [
-      "src/components/app-shell/AppShell.tsx",
-      "src/modules/composite/CompositeReportPage.tsx",
-      "src/pages/questionnaire/QuestionnaireProducts.tsx",
-      "src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
-      "src/training/TrainingCourseAnalysis.tsx",
-      "src/training/TrainingTrainerCourse.tsx",
-      "src/training/TrainingCourseAnalysis.integration.test.tsx"
+      "src/components/app-shell/__tests__/shell.test.tsx",
+      "src/training/TrainingAuth.test.tsx",
+      "src/training/TrainingBrand.tsx",
+      "src/training/TrainingScreens.test.tsx"
     ],
-    "sourceOverlay": "Current exact source plus verified official follow-redirects 1.16.1 package matching both current locks. Restore original successful compiled outputs; no compiler execution.",
-    "claim": "Exact source-reviewed dependency security repair. Original compile/type/lint/browser successes retain their original identities. Fresh both-lock audits, patched runtime assembly/scans and missing isolated PG/schema recovery remain required; no application-check replay or deployment.",
+    "sourceOverlay": "Current exact logo source plus official follow-redirects and Vite patches matching current locks. Restore original backend compilation; execute one affected frontend build.",
+    "claim": "Preserve original backend compilation identity. Execute affected frontend build, app types and four-file lint; reuse browser only on complete compiled-byte equality, otherwise run existing bounded cases. Fresh audits, runtime scans and missing isolated PG/schema checks remain required. No deployment.",
     "frontendExternalInputs": {
       "server-version/cognitive-randomization-golden-v1.json": {
         "gitBlob": "5b3cb7c11138044ad6a85626e74004bea2a3e62a",
@@ -176,7 +173,7 @@
     ],
     "compileReasons": {
       "backend": "Three corrected catalog source inputs invalidate old backend dist. Direct compiler only, no unchanged build prerequisites.",
-      "frontend": "One affected frontend build using patched Vite 6.4.4. Compare complete dist bytes with the original verified browser input; admit browser only on exact equality, otherwise execute existing bounded browser checks."
+      "frontend": "One current-input frontend build for approved final Training logo and patched Vite 6.4.4. Changed compiled UI uses existing bounded browser checks; no backend compiler replay."
     },
     "lintAdmission": {
       "kind": "historical-observed-lint-with-limited-selection",
@@ -201,13 +198,10 @@
       "pending-publication-390"
     ],
     "changedLintFiles": [
-      "src/components/app-shell/AppShell.tsx",
-      "src/modules/composite/CompositeReportPage.tsx",
-      "src/pages/questionnaire/QuestionnaireProducts.tsx",
-      "src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
-      "src/training/TrainingCourseAnalysis.tsx",
-      "src/training/TrainingTrainerCourse.tsx",
-      "src/training/TrainingCourseAnalysis.integration.test.tsx"
+      "src/components/app-shell/__tests__/shell.test.tsx",
+      "src/training/TrainingAuth.test.tsx",
+      "src/training/TrainingBrand.tsx",
+      "src/training/TrainingScreens.test.tsx"
     ],
     "integrationFiles": [
       "src/__tests__/controllers/trainingCatalog.boundaries.postgres.test.ts",
@@ -359,6 +353,93 @@
         "tarSha256": "09242e9a1f45c17ef96402dc1b39cfcf93b6a65a5bc965622641be50830fa71b",
         "tarBytes": 635040
       }
-    }
+    },
+    "logoDelta": [
+      {
+        "path": "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "05f25919a5ff535f7b5ff418a96c50b1a3e58139"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "0b6068789aa1d30db5d7a6cc6021a2378513df2e"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/TrainingAuth.test.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "15dc98c0ad405e93f3b396875a9c02ec960d89dd"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "e47c4e452d4590d6e1da2c6a81ea1c4dd60f1130"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/TrainingBrand.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "3c5d5edfe1093edd0cf5db6f93ee17602e05f5ef"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "258558b1d5f95bf328f437417be637293817ad24"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/TrainingScreens.test.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "bf401023cfe74b3d6d61638b230781bcbfa20273"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "67585808362b3fc434802b3bb70df7045e7200ee"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/training-book-mountain.svg",
+        "before": {
+          "mode": "100644",
+          "blob": "7064be8d98ba14d862defac80ccd18681939f615"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "2a2e19ab46e4b6fe0fd72a8b72356ca427282d47"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/training-brand.css",
+        "before": {
+          "mode": "100644",
+          "blob": "d18487baeef4b0c3e83cad120f67f5df0b1612fc"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "150c09b5bc06dad9043c389b69a8458a8b417b9c"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/training-home-brand.css",
+        "before": {
+          "mode": "100644",
+          "blob": "327b3a425967f128fe2c0abea9369bbc3f535bbd"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "a38ceea75fc2be047b6ad789a0049eda4c8fd163"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/training-logo.svg",
+        "before": null,
+        "after": {
+          "mode": "100644",
+          "blob": "1732258c8ec9a70b439f69dac89646d9b91231c4"
+        }
+      }
+    ]
   }
 }

@@ -31,7 +31,7 @@ describe('training presentation and course-first entry', () => {
     expect(screen.queryByText('登录账号')).toBeNull()
     expect(screen.queryByText('注册账号')).toBeNull()
     expect(screen.getByRole('heading', { name: /以学习为径，.*见更远的天地。/ })).toBeInTheDocument()
-    expect(screen.getByText('Huitraining')).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Training @eduk12.top' })).toBeInTheDocument()
     expect(screen.queryByText('我是学员')).toBeNull()
     expect(screen.queryByText('我是培训师')).toBeNull()
     expect(screen.queryByRole('link', { name: /管理员入口/ })).toBeNull()

@@ -9,7 +9,7 @@ import {recheckPlan} from './exact-candidate-admission.mjs';
 
 // This is an independently reviewed, bounded historical-local exception, not
 // retrospective CI execution, signed execution, or missing-case PASS.
-export const REVIEWED_MAC_ATTESTATION_SHA256 = '52a661d5f628efa7263eba1a6b644b1b1a6ff7baa3dcd7d6cbbd3a75130025dc';
+export const REVIEWED_MAC_ATTESTATION_SHA256 = '9e7f91aebae604f0ebd0e3325d9ff6a3517d9ff04222bac880cabfce6841af5f';
 export function productDelta(base,head) {
   const before=new Map(inventory(base).filter(r=>!TOOLS.includes(r.path)).map(r=>[r.path,r]));
   const after=new Map(inventory(head).filter(r=>!TOOLS.includes(r.path)).map(r=>[r.path,r]));

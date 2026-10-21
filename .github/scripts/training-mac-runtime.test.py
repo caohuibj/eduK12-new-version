@@ -186,6 +186,39 @@ class MacContracts(unittest.TestCase):
         self.assertEqual(result['typescriptDiagnostics'], [{'file': 'src/public.ts', 'line': '12', 'column': '3', 'code': 'TS2322'}])
         self.assertEqual(result['phase'], 'backend-compile')
 
+    def test_failed_vite_output_retains_error_and_stack_but_redacts_sensitive_values(self):
+        self.q.state['phases'] = [{'name': 'frontend-compile', 'status': 'failure'}]
+        self.q.last_command_kind = 'vite'; self.q.command_index = 1
+        raw = ('\x1b[31merror during build:\x1b[0m\nError [ERR_MODULE_NOT_FOUND]: Cannot find package synthetic-missing\n'
+            + '    at ' + str(self.q.private / 'frontend/node_modules/vite/dist/node/index.js') + ':123:4\n'
+            + 'token=literal-private-token password="literal-private-password"\n'
+            + 'Bearer authorization-value\nhttps://user:credential@example.invalid/path?token=secret\n'
+            + 'environment-private-token\n' + 'x' * 30000 + '\nFinal compiler error retained\n')
+        (self.q.private / 'command-1.log').write_text(raw)
+        with patch.dict('os.environ', {'GITHUB_TOKEN': 'environment-private-token'}): self.q.failure_receipt(ValueError('must-not-publish-exception-message'))
+        saved = json.loads((self.q.out / 'failure-details.json').read_text())['sanitizedCommandOutput']
+        output = saved['stdoutAndStderr']
+        for secret in ('literal-private-token', 'literal-private-password', 'authorization-value', 'credential', 'environment-private-token', str(self.q.private), 'must-not-publish-exception-message'):
+            self.assertNotIn(secret, output)
+        self.assertIn('ERR_MODULE_NOT_FOUND', output); self.assertIn('synthetic-missing', output)
+        self.assertIn('[isolated-workdir]/frontend/node_modules/vite/dist/node/index.js:123:4', output)
+        self.assertIn('Final compiler error retained', output)
+        self.assertTrue(saved['truncated']); self.assertLess(len(output), 24100)
+        self.assertEqual(saved['rawOutputSha256'], M.R.digest(raw.encode()))
+
+    def test_failed_compiler_timeout_keeps_partial_output_without_sql_output(self):
+        self.q.last_command_kind = 'vite'; self.q.command_index = 1
+        error = subprocess.TimeoutExpired(['private-command'], 1, output=b'Vite partial stdout', stderr=b'partial compiler stderr')
+        self.q.failure_receipt(error)
+        saved = json.loads((self.q.out / 'failure-details.json').read_text())
+        self.assertIn('Vite partial stdout', saved['sanitizedCommandOutput']['stdoutAndStderr'])
+        self.assertIn('partial compiler stderr', saved['sanitizedCommandOutput']['stdoutAndStderr'])
+        self.q.last_command_kind = 'postgres-sql'
+        (self.q.private / 'command-1.log').write_text('private SQL and row values')
+        self.q.failure_receipt(ValueError('private'))
+        saved = json.loads((self.q.out / 'failure-details.json').read_text())
+        self.assertNotIn('sanitizedCommandOutput', saved); self.assertNotIn('private SQL', json.dumps(saved))
+
     def test_redis_isolation_marker_actual_identity_and_cleanup_on_test_failure(self):
         self.q.state['components']['backend']['runtimeImageId'] = 'sha256:' + 'b' * 64
         self.q.base_image = Mock(return_value='redis@sha256:' + 'c' * 64)
@@ -272,6 +305,19 @@ class MacContracts(unittest.TestCase):
             return raw
         with patch.object(M.Path, 'read_text', drift), self.assertRaises(ValueError): M.validate_dependency_patch(INPUTS)
 
+    def test_logo_delta_rejects_missing_extra_changed_mode_or_blob_and_old_lint_selection(self):
+        changes = []
+        missing = copy.deepcopy(INPUTS); missing['macRuntime']['logoDelta'].pop(); changes.append(missing)
+        extra = copy.deepcopy(INPUTS); extra['macRuntime']['logoDelta'].append(copy.deepcopy(extra['macRuntime']['logoDelta'][0])); changes.append(extra)
+        for field, value in [('mode', '100755'), ('blob', '0' * 40)]:
+            changed = copy.deepcopy(INPUTS); changed['macRuntime']['logoDelta'][0]['after'][field] = value; changes.append(changed)
+        before = copy.deepcopy(INPUTS)
+        row = next(row for row in before['macRuntime']['logoDelta'] if row['before'] is not None)
+        row['before']['blob'] = '0' * 40; changes.append(before)
+        lint = copy.deepcopy(INPUTS); lint['runtime']['changedFrontendFiles'] = ['src/training/CourseScreens.tsx']; changes.append(lint)
+        for index, changed in enumerate(changes):
+            with self.subTest(index=index), self.assertRaises(ValueError): M.validate_dependency_patch(changed)
+
     def test_source_locked_dependency_overlay_changes_only_exact_package_and_hidden_entry(self):
         import base64
         import io
@@ -357,7 +403,7 @@ class MacContracts(unittest.TestCase):
             with self.assertRaises(ValueError): self.q.browser()
         self.q.command.assert_not_called()
 
-    def test_vite_repair_builds_frontend_once_but_never_replays_backend_types_lint(self):
+    def test_logo_builds_and_checks_changed_frontend_once_but_preserves_backend_compile(self):
         self.q.state['phases'] = []
         for name in ('prepare', 'compile_component', 'compile_patched_frontend', 'restore_compilation', 'app_types', 'lint', 'audit', 'browser', 'package', 'scan'):
             setattr(self.q, name, Mock())
@@ -372,7 +418,7 @@ class MacContracts(unittest.TestCase):
         with patch.dict('os.environ', {'CI': 'true', 'GITHUB_ACTIONS': 'true', 'GITHUB_SHA': 'b' * 40, 'GITHUB_REPOSITORY': 'caohuibj/eduK12-new-version'}), patch.object(M.importlib.util, 'spec_from_file_location', return_value=spec), patch.object(M.importlib.util, 'module_from_spec', return_value=module):
             self.q.execute()
         self.assertEqual({p['name'] for p in self.q.state['phases']}, set(M.PHASES))
-        self.q.compile_component.assert_not_called(); self.q.app_types.assert_not_called(); self.q.lint.assert_not_called()
+        self.q.compile_component.assert_not_called(); self.q.app_types.assert_called_once_with(); self.q.lint.assert_called_once_with()
         self.assertEqual(self.q.restore_compilation.call_count, 1)
         self.assertEqual(self.q.restore_compilation.call_args.args[0], 'backend')
         self.q.compile_patched_frontend.assert_called_once()

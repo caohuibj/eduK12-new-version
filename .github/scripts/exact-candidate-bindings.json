@@ -366,9 +366,9 @@
     "training-mac": {
       "enabled": true,
       "base": "9e1b302e1e255050b15ab150905bc69cee1b3c1b",
-      "sourceReference": "328c25eefda2ef2cba6e9ecb5a9910fafd29e86e",
-      "productInventorySha256": "294e7a9741c87ba8d6761559e681a3bfc2ab2dae4526dbd2dc054ae314aee0e5",
-      "diffSha256": "a76e29cc4426f9f35bd808d69932b7191a70c81142596e19489166697e80e0aa",
+      "sourceReference": "16fe9e6d3fcb527eb9841e9b521fe5654a0d5a73",
+      "productInventorySha256": "6f8acf80a1c07f2c664e7aabb99afcf76a326186d7cc3571de32395543637fef",
+      "diffSha256": "38bad90034165425dc4bb32a920bf3a798fe818f66005eb47b26dda6ad10e95e",
       "situationalCatalogBoundary": {
         "disposition": "not-executed-unaffected-catalog",
         "reviewed": true,

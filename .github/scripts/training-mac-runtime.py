@@ -39,6 +39,12 @@ def validate_dependency_patch(inputs):
               patch['tarSha256'] == '6e075d999dc5ff568916954508397b11a537b18bde615986d7bd8b3d3fa1799f' and patch['tarBytes'] == 10076, 'Unreviewed official package bytes')
     paths = ['server-version/' + c + '/' + p for c in R.COMPONENTS for p in ('package.json', 'package-lock.json')]
     R.require(sorted(patch['reviewedSourceFiles']) == sorted(paths), 'Unexpected dependency source boundary')
+    logo = inputs['macRuntime']['logoDelta']
+    logo_paths = ['src/components/app-shell/__tests__/shell.test.tsx', 'src/training/TrainingAuth.test.tsx',
+        'src/training/TrainingBrand.tsx', 'src/training/TrainingScreens.test.tsx', 'src/training/training-book-mountain.svg',
+        'src/training/training-brand.css', 'src/training/training-home-brand.css', 'src/training/training-logo.svg']
+    R.require(len(logo) == 8 and sorted(row['path'] for row in logo) == sorted('server-version/frontend/' + p for p in logo_paths), 'Unexpected logo source boundary')
+    R.require(sorted(inputs['runtime']['changedFrontendFiles']) == sorted(p for p in logo_paths if p.endswith('.tsx')), 'Wrong affected logo lint selection')
     vite_pins = inputs['macRuntime']['vitePatch']
     R.require(set(vite_pins) == set(R.COMPONENTS), 'Missing exact Vite repair')
     for component in R.COMPONENTS:
@@ -51,7 +57,20 @@ def validate_dependency_patch(inputs):
         current_tree = R.git('rev-parse', 'HEAD:server-version/' + component)
         changed = R.git('diff', '--name-only', previous['sourceTree'], current_tree).splitlines()
         expected_paths = ['package-lock.json', 'package.json']
-        R.require(sorted(changed) == sorted(expected_paths), 'Changed source outside exact package repair')
+        if component == 'frontend':
+            expected_paths += logo_paths
+            for row in logo:
+                path = row['path'].removeprefix('server-version/frontend/')
+                R.require(set(row) == {'path', 'before', 'after'} and (row['before'] is None) == (path == 'src/training/training-logo.svg'), 'Unexpected logo file addition')
+                for field, tree in [('before', previous['sourceTree']), ('after', current_tree)]:
+                    expected = row[field]
+                    actual = R.git('ls-tree', tree, '--', path)
+                    if expected is None:
+                        R.require(actual == '', 'Logo addition already existed')
+                    else:
+                        R.require(set(expected) == {'mode', 'blob'} and expected['mode'] == '100644' and bool(re.fullmatch('[0-9a-f]{40}', expected['blob'])), 'Invalid logo file identity')
+                        R.require(actual == '100644 blob ' + expected['blob'] + '\t' + path, 'Changed frozen logo file')
+        R.require(sorted(changed) == sorted(expected_paths), 'Changed source outside exact dependency/logo repair')
         old = {}
         current = {}
         for path in ('package.json', 'package-lock.json'):
@@ -422,14 +441,37 @@ class MacQualification(R.Qualification):
             frame = frame.tb_next
         details['locations'] = locations
         details['commandKind'] = getattr(self, 'last_command_kind', 'none')
-        # Only diagnostic codes and public source positions, never compiler
-        # message text, command arguments, SQL or synthetic secret values.
+        # Compiler diagnostics need their actual error text. Other commands may
+        # contain SQL/row data and retain only the structured summaries below.
         log = self.private / ('command-' + str(self.command_index) + '.log')
+        compiler_output = None
         if log.is_file():
+            compiler_output = log.read_text(errors='replace')
             diagnostics = []
-            for match in re.finditer(r'(?m)^(?P<file>(?:src|examples)/[A-Za-z0-9_./@+ -]+\.tsx?)\((?P<line>[0-9]+),(?P<column>[0-9]+)\): error (?P<code>TS[0-9]+):', log.read_text(errors='replace')):
+            for match in re.finditer(r'(?m)^(?P<file>(?:src|examples)/[A-Za-z0-9_./@+ -]+\.tsx?)\((?P<line>[0-9]+),(?P<column>[0-9]+)\): error (?P<code>TS[0-9]+):', compiler_output):
                 diagnostics.append(match.groupdict())
             details['typescriptDiagnostics'] = diagnostics[:100]
+        elif isinstance(error, subprocess.TimeoutExpired):
+            parts = [getattr(error, key, None) for key in ('stdout', 'stderr')]
+            compiler_output = '\n'.join(p.decode(errors='replace') if isinstance(p, bytes) else p for p in parts if p)
+        if compiler_output is not None and details['commandKind'] in ('vite', 'typescript', 'eslint'):
+            sanitized = re.sub(r'\x1b\[[0-?]*[ -/]*[@-~]', '', compiler_output)
+            sanitized = re.sub(r'[\x00-\x08\x0b-\x1f\x7f]', '', sanitized)
+            for key, value in os.environ.items():
+                if value and re.search(r'(?i)(token|secret|password|passwd|credential|cookie|authorization|private.?key|api.?key)', key):
+                    sanitized = sanitized.replace(value, '[redacted-secret]')
+            sanitized = re.sub(r'-----BEGIN [^-]*PRIVATE KEY-----.*?-----END [^-]*PRIVATE KEY-----', '[redacted-private-key]', sanitized, flags=re.S)
+            sanitized = re.sub(r'(?i)\b(?:https?|postgres(?:ql)?|redis)://[^\s\x22\x27<>]+', '[redacted-url]', sanitized)
+            sanitized = re.sub(r'(?i)\b(?:bearer|basic)\s+[A-Za-z0-9+/=_\-.]+', '[redacted-authorization]', sanitized)
+            sanitized = re.sub(r'(?i)((?:token|secret|password|passwd|api[_-]?key|authorization|cookie)[\x22\x27]?\s*[:=]\s*)(?:\x22[^\x22]*\x22|\x27[^\x27]*\x27|[^\s,;}]+)', r'\1[redacted-secret]', sanitized)
+            sanitized = re.sub(r'\b(?:gh[pousr]_[A-Za-z0-9]+|github_pat_[A-Za-z0-9_]+|eyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+)\b', '[redacted-token]', sanitized)
+            for path, label in ((str(self.private), '[isolated-workdir]'), (str(ROOT), '[checkout]'), (str(Path.home()), '[runner-home]')):
+                if path != '/': sanitized = sanitized.replace(path, label)
+            limit = 24000
+            truncated = len(sanitized) > limit
+            if truncated: sanitized = sanitized[:limit // 2] + '\n[output truncated]\n' + sanitized[-limit // 2:]
+            details['sanitizedCommandOutput'] = {'stdoutAndStderr': sanitized, 'truncated': truncated,
+                'rawOutputSha256': R.digest(compiler_output.encode()), 'scope': 'failed compiler output only; credentials and private path prefixes redacted'}
         reporter = self.private / 'integration-result.json'
         if reporter.is_file():
             try:
@@ -580,11 +622,8 @@ class MacQualification(R.Qualification):
             R.require(set(reuse) == {'phases', 'archives'} and set(reuse['phases']) == names and set(reuse['archives']) == set(R.COMPONENTS), 'Incomplete exact prior success admission')
             self.phase('backend-compile', lambda: self.restore_compilation('backend', reuse['phases']['backend-compile'], reuse['archives']['backend']))
             self.phase('frontend-compile', lambda: self.compile_patched_frontend(reuse['phases']['frontend-compile'], reuse['archives']['frontend']))
-            for name in ('frontend-app-types', 'changed-lint'):
-                original = reuse['phases'][name]
-                R.require(original['name'] == name and original['status'] == 'success', 'Prior check not successful')
-                self.phase(name, lambda original=original: {**original['details'], 'kind': 'admitted-prior-official-success', 'ciExecuted': False, 'original': original})
-            for name, action in [('dependency-audit', self.audit), ('compiled-browser', self.browser),
+            for name, action in [('frontend-app-types', self.app_types), ('changed-lint', self.lint),
+                                 ('dependency-audit', self.audit), ('compiled-browser', self.browser),
                                  ('runtime-packaging', self.package), ('runtime-scans', self.scan), ('schema-upgrade-restore', self.schema)]:
                 self.phase(name, action)
             R.require({p['name'] for p in self.state['phases'] if p['status'] == 'success'} == set(PHASES), 'Missing actual Mac gate')

@@ -9,7 +9,7 @@
   "originalTree": "260731545117e518be70f4796d7cd15addb50d6b",
   "historicalExecutionReferenceAssertion": "65f18b5583984b0427ff6e635a376e4d3d1cb8ae",
   "originalProductInventorySha256": "377f6f50af93584a16316888c88c66309ae2a47a39e27f130757c5dab97d8d65",
-  "productInventorySha256": "294e7a9741c87ba8d6761559e681a3bfc2ab2dae4526dbd2dc054ae314aee0e5",
+  "productInventorySha256": "6f8acf80a1c07f2c664e7aabb99afcf76a326186d7cc3571de32395543637fef",
   "reviewedProductDelta": [
     {
       "path": "server-version/backend/package-lock.json",
@@ -127,6 +127,106 @@
         "mode": "100644",
         "blob": "84089551a17c85d00f03a36081fe78e6374f0716",
         "path": "server-version/frontend/package.json"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "05f25919a5ff535f7b5ff418a96c50b1a3e58139",
+        "path": "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "0b6068789aa1d30db5d7a6cc6021a2378513df2e",
+        "path": "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingAuth.test.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "15dc98c0ad405e93f3b396875a9c02ec960d89dd",
+        "path": "server-version/frontend/src/training/TrainingAuth.test.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "e47c4e452d4590d6e1da2c6a81ea1c4dd60f1130",
+        "path": "server-version/frontend/src/training/TrainingAuth.test.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingBrand.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "3c5d5edfe1093edd0cf5db6f93ee17602e05f5ef",
+        "path": "server-version/frontend/src/training/TrainingBrand.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "258558b1d5f95bf328f437417be637293817ad24",
+        "path": "server-version/frontend/src/training/TrainingBrand.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingScreens.test.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "bf401023cfe74b3d6d61638b230781bcbfa20273",
+        "path": "server-version/frontend/src/training/TrainingScreens.test.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "67585808362b3fc434802b3bb70df7045e7200ee",
+        "path": "server-version/frontend/src/training/TrainingScreens.test.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/training-book-mountain.svg",
+      "before": {
+        "mode": "100644",
+        "blob": "7064be8d98ba14d862defac80ccd18681939f615",
+        "path": "server-version/frontend/src/training/training-book-mountain.svg"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "2a2e19ab46e4b6fe0fd72a8b72356ca427282d47",
+        "path": "server-version/frontend/src/training/training-book-mountain.svg"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/training-brand.css",
+      "before": {
+        "mode": "100644",
+        "blob": "d18487baeef4b0c3e83cad120f67f5df0b1612fc",
+        "path": "server-version/frontend/src/training/training-brand.css"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "150c09b5bc06dad9043c389b69a8458a8b417b9c",
+        "path": "server-version/frontend/src/training/training-brand.css"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/training-home-brand.css",
+      "before": {
+        "mode": "100644",
+        "blob": "327b3a425967f128fe2c0abea9369bbc3f535bbd",
+        "path": "server-version/frontend/src/training/training-home-brand.css"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "a38ceea75fc2be047b6ad789a0049eda4c8fd163",
+        "path": "server-version/frontend/src/training/training-home-brand.css"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/training-logo.svg",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "blob": "1732258c8ec9a70b439f69dac89646d9b91231c4",
+        "path": "server-version/frontend/src/training/training-logo.svg"
       }
     }
   ],
@@ -426,5 +526,26 @@
     "backend": "7.3.6 -> 7.3.7",
     "frontend": "6.4.3 -> 6.4.4",
     "rationale": "Backend compiler is tsc and unchanged Vite declarations do not invalidate prior types/lint. Frontend shared build implementation changed: execute one new build. Reuse original browser only if the complete dist file set and every file byte match; otherwise execute the existing bounded browser cases. Both lock audits remain required."
+  },
+  "approvedLogoDelta": {
+    "sourceReference": "4d292975c4a32cb1b11f4c4024da4cc28be32710",
+    "patchSha256": "fbbcd321a26525842ebe298c5f69bb44ba5251dfda2b26b654ae0bdbd18635a4",
+    "paths": [
+      "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx",
+      "server-version/frontend/src/training/TrainingAuth.test.tsx",
+      "server-version/frontend/src/training/TrainingBrand.tsx",
+      "server-version/frontend/src/training/TrainingScreens.test.tsx",
+      "server-version/frontend/src/training/training-book-mountain.svg",
+      "server-version/frontend/src/training/training-brand.css",
+      "server-version/frontend/src/training/training-home-brand.css",
+      "server-version/frontend/src/training/training-logo.svg"
+    ],
+    "historicalLocalClaim": {
+      "passed": 8,
+      "filtered": 45,
+      "buildExecuted": false,
+      "provenance": "Mac child report, not an authenticated Actions execution"
+    },
+    "qualification": "New current frontend build, affected types/lint and existing compiled browser checks required; backend inputs unchanged by logo."
   }
 }
