@@ -68,3 +68,22 @@ Materials-only PHQ-9 files → JSON structure, exact frozen source binding and
 synthetic arithmetic/rejection contract → local one-shot check → preserve its
 output, do not repeat app/CI suites → roughly one minute. This check cannot
 prove runner safety, optional-item runtime behavior, human review or diagnosis.
+## Clarification: report capabilities and review identity
+
+The report QC schema requires a truthful reviewer, reviewedAt and basis; it does
+not itself require human review. An actual AI text review may be recorded as AI,
+without suggesting human/clinical approval or psychometric validation.
+scientificReview is a separate explicitly human-reviewed scientific maturity
+claim and remains absent. Human translation/expert review is recorded as not yet
+performed, not misrepresented as a mandatory condition imposed by qcReview.
+
+STANDARD instruments already support descriptive raw-score prose through
+report.interpretations with source=score_only. The prohibition on the separate
+self-authored rawScoreFeedback feature does not prohibit a legitimate raw-total
+report and is not by itself an executable-onboarding blocker.
+
+The actual PHQ-9 constraints remain: independent two-week instructions and
+unconditional safety visibility, a genuine unscored optional functional question,
+a suitable adult-facing audience contract, and a reviewed support/privacy plan.
+The research translation remains unvalidated and not developer-endorsed. This
+clarification changes no items, scoring contract, fixtures or arithmetic results.

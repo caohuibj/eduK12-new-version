@@ -172,5 +172,13 @@
       "path": "source-and-rights.json",
       "sha256": "9782f38e63d0dd5f5da49893b62b44a7e7a2a9ef6703a3d8a24200db56bf93e7"
     }
+  ],
+  "postValidationDocumentationChanges": [
+    {
+      "path": "README.md",
+      "currentSha256": "1793845fa543a0f6435cf97922855afb6ba35e9e69e24e62d695145118847c33",
+      "scope": "Appended correction of report capabilities and AI QC identity only; original validation file hashes preserved as historical evidence. Five JSON inputs verified unchanged; mathematical checks not repeated.",
+      "verifiedAt": "2026-10-21T17:38:56.889162+00:00"
+    }
   ]
 }
