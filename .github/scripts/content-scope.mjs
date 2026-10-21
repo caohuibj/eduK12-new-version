@@ -69,6 +69,39 @@ export function frontendFile(file) {
   return !/^server-version\/frontend\/src\/(?:modules\/(?:cognitive|situational|composite|assessment-runtime|assessment-bundle)\/|(?:api|types|services)\/|modules\/assessment-context\/|utils\/(?:scor|assessment|cognitive|situational)|.*(?:scoring|scorer|algorithm|finalizer|trial-timing|reference-data))/i.test(file);
 }
 
+// Bounded presentation/startup optimization, not a generic authorization/runtime
+// exemption. Complete raw diff admission keeps all other consumers unchanged.
+export const frontendPerformanceFiles = new Set([
+  'main.tsx', 'product-entry.ts', 'product-entry.test.ts', 'pages/ScaleList.tsx',
+  'pages/__tests__/ScaleList.grants.test.tsx', 'training/context.test.ts', 'school/SchoolLanding.tsx',
+  'school/school-landing.css', 'school/school-workspace.css',
+  'school/huischool-campus-sunlight.webp',
+].map(file => frontendSrc + file));
+export const frontendPerformanceTools = new Set([
+  '.github/scripts/content-scope.mjs', '.github/scripts/merge-gate.mjs',
+  '.github/scripts/frontend-performance.test.mjs', '.github/scripts/frontend-performance-browser.mjs',
+  '.github/workflows/ci.yml', '.github/workflows/ci-frontend-build.yml',
+  'docs/release/README.md',
+]);
+export function requireFrontendPerformanceScope(required, admitted) {
+  if (required && !admitted) throw new Error('Frontend optimization scope drift: stop; unrelated platform fallback is not authorized');
+}
+export function frontendPerformanceScope(entries, read) {
+  if (!entries.length || !entries.some(e => frontendPerformanceFiles.has(e.file))) return false;
+  for (const e of entries) {
+    if (!frontendPerformanceFiles.has(e.file) && !frontendPerformanceTools.has(e.file)) return false;
+    if (e.newMode !== '100644' || !((e.status === 'A' && e.oldMode === '000000')
+      || (e.status === 'M' && e.oldMode === '100644'))) return false;
+    if (e.file.endsWith('.webp')) {
+      const bytes = read(e.file);
+      if (!Buffer.isBuffer(bytes) || bytes.length < 20 || bytes.toString('ascii',0,4) !== 'RIFF'
+        || bytes.toString('ascii',8,12) !== 'WEBP' || bytes.readUInt32LE(4) !== bytes.length - 8
+        || !['VP8 ', 'VP8L', 'VP8X'].includes(bytes.toString('ascii',12,16))) return false;
+    }
+  }
+  return true;
+}
+
 // Only existing UI-surface test modules qualify. Production source, shared
 // assessment/scoring modules, config, dependency and executable test harness
 // changes never enter this fast lane.
@@ -257,7 +290,11 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     : classifyChanges(entries, process.env.CI_FORCE_FULL === 'true');
   const dependencies = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
     && dependencyScope(entries, {base});
-  const frontendTest = result.frontend_test === true;
+  const performance = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
+    && frontendPerformanceScope(entries, file => execFileSync('git', ['show', `HEAD:${file}`], {maxBuffer: 8 * 1024 * 1024}));
+  requireFrontendPerformanceScope(process.env.CI_FRONTEND_PERFORMANCE_REQUIRED === 'true', performance);
+  if (performance) { result.frontend = true; result.content = false; result.presentation = false; result.documentation = false; }
+  const frontendTest = !performance && result.frontend_test === true;
   const frontend = result.frontend === true && !frontendTest;
   const releaseTools = !result.documentation && !dependencies && process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' && toolingOnly(entries);
   const campus = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' ? campusPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
@@ -278,12 +315,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const surveyMac = event !== 'workflow_dispatch'
     ? surveyMacPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
   if(surveyMac && process.env.CI_FORCE_FULL==='true') throw new Error('Exact Survey Mac candidate cannot run unrelated full acceptance');
-  const scenario = trainingFunctional || adminFunctional ? 'platform' : surveyMac ? 'survey-mac-ui' : reviewedCandidate ? 'reviewed-candidate' : surveyCandidate ? 'survey-candidate' : sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : releaseTools ? 'release-tooling' : dependencies ? 'dependencies' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
+  const scenario = performance ? 'frontend-performance' : trainingFunctional || adminFunctional ? 'platform' : surveyMac ? 'survey-mac-ui' : reviewedCandidate ? 'reviewed-candidate' : surveyCandidate ? 'survey-candidate' : sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : releaseTools ? 'release-tooling' : dependencies ? 'dependencies' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
     : result.presentation ? 'presentation' : frontendTest ? 'frontend-test' : frontend ? 'frontend' : 'platform';
   // No production artifact or acceptance scenario is changed by a narrowly
   // admitted test-only diff. Keep the full frontend test suite itself mandatory.
   const selectedAcceptance = acceptanceFor(files);
-  const acceptance = surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || teacher || survey || copy || campus || frontendTest || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
+  const acceptance = performance || surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || teacher || survey || copy || campus || frontendTest || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
   if (scenario === 'platform' || (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true'))
     for (const key of Object.keys(acceptance)) acceptance[key] = true;
   // Preserve every platform functional/security/build/recovery check. Only the
@@ -304,7 +341,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
     ...acceptance, ...Object.fromEntries(Object.entries(plan).map(([key,value]) =>
       [key, Array.isArray(value) ? JSON.stringify(value) : value])) };
-  console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles', platformReasons: surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || dependencies ? [] : platformReasons(entries, process.env.CI_FORCE_FULL === 'true' || event === 'workflow_dispatch') }));
+  console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles', platformReasons: performance || surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || dependencies ? [] : platformReasons(entries, process.env.CI_FORCE_FULL === 'true' || event === 'workflow_dispatch') }));
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(output).map(([key, value]) => `${key}=${value}\n`).join(''));
 }

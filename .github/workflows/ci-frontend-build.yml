@@ -5,6 +5,9 @@ on:
       runner_labels:
         type: string
         required: true
+      performance_smoke:
+        type: boolean
+        default: false
       ui_runner_labels:
         type: string
         default: ''
@@ -39,6 +42,16 @@ jobs:
         run: |
           npm run build
           node "$GITHUB_WORKSPACE/.github/scripts/ci-artifact.mjs" write frontend
+      - name: install pinned affected-entry browser tools
+        if: inputs.performance_smoke
+        working-directory: .
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+      - name: rendered product entries and on-demand ScaleList paging
+        if: inputs.performance_smoke
+        working-directory: .
+        run: node .github/scripts/frontend-performance-browser.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: frontend-dist-${{ github.sha }}

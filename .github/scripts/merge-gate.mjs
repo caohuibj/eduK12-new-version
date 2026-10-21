@@ -37,6 +37,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.scenario === 'frontend-performance') return ['scope','frontend','frontend-build','docker','codeql'];
   if(scope.application_route==='exact-candidate') return ['scope','exact-candidate','codeql'];
   if (scope.application_route === 'survey-mac-ui') return ['scope','survey-mac-ui','codeql'];
   if (scope.application_route === 'reviewed-candidate') return ['scope','reviewed-candidate','codeql'];
@@ -89,6 +90,13 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if (scope.scenario === 'frontend-performance') {
+    if (draft || scope.application_route !== 'legacy' || scope.frontend !== 'true'
+      || scope.frontend_build !== 'true' || scope.codeql !== 'true'
+      || scope.runner_profile !== 'hosted' || scope.media_selection !== '[]' || scope.media_groups !== '[]'
+      || ['maintenance','content','presentation','frontend_test','documentation','ui_required','visual_hosted',...Object.keys(acceptanceJobs)].some(k => scope[k] !== 'false')) failed.push('scope');
+    return [...new Set(failed)];
+  }
   if(scope.application_route==='exact-candidate') {
     let p;try {p=JSON.parse(scope.exact_candidate_plan);}catch{}
     if(draft||!validExactPlan(p)||p.postMerge!==false) failed.push('scope');
@@ -278,6 +286,17 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const needs = readNeeds();
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  // Recompute the complete raw-diff boundary, rather than trusting scope outputs.
+  if (needs.scope?.outputs?.scenario === 'frontend-performance') {
+    try {
+      const {changedEntries,frontendPerformanceScope} = await import('./content-scope.mjs');
+      const {execFileSync} = await import('node:child_process');
+      if (process.env.CI_FORCE_FULL === 'true' || process.env.CI_EVENT !== 'pull_request'
+        || !frontendPerformanceScope(changedEntries(process.env.CI_BASE_SHA),
+          file => execFileSync('git',['show',`HEAD:${file}`], {maxBuffer:8 * 1024 * 1024})))
+        failed.push('recomputed-frontend-performance-scope');
+    } catch { failed.push('recomputed-frontend-performance-scope'); }
+  }
   if(needs.scope?.outputs?.application_route==='exact-candidate') {
     const {execFileSync}=await import('node:child_process');
     const p=JSON.parse(needs.scope.outputs.exact_candidate_plan);

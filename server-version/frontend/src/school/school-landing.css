@@ -51,7 +51,7 @@
 .hs-feature-blank { min-height:60vh; }
 /* Shared public account layout; the same campus artwork remains a separate layer. */
 .hs-main.hs-main-auth { position:relative;isolation:isolate;width:100%;margin:0;min-height:calc(100svh - 145px);padding:40px 24px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:16px; }
-.hs-main-auth:before { content:'';position:absolute;inset:0;z-index:-2;background:#edf4dc url('./huischool-campus-sunlight.png') center 65% / cover no-repeat; }
+.hs-main-auth:before { content:'';position:absolute;inset:0;z-index:-2;background:#edf4dc url('./huischool-campus-sunlight.webp') center 65% / cover no-repeat; }
 .hs-main-auth:after { content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#f4f8e966,#f4f8e926); }
 .hs-code-page { width:100%;max-width:520px; }
 .hs-main-auth .hs-panel,.hs-code-panel { width:100%;max-width:520px;margin:0;padding:34px 38px;background:rgba(255,255,242,.88);backdrop-filter:blur(5px);border:1px solid #ffffffc2;border-radius:22px;box-shadow:0 12px 40px #254b351a; }
