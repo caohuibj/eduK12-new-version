@@ -81,7 +81,7 @@ export const scaleImageController = {
       }
       const definitionHash = hashScaleDefinition(definition)
       const updated = await prisma.$transaction(async (tx) => {
-        await assertScaleCopyPublishSource(tx, scale)
+        const checkedCopySource = await assertScaleCopyPublishSource(tx, scale)
         await assertScaleReportImagesOwned(definition, scale.creatorId, tx as never)
         await retainScaleAssessmentImages({
           owner: publishedScaleMediaOwner(scale.id, definitionHash),
@@ -101,7 +101,7 @@ export const scaleImageController = {
             ...definitionSummary(definition),
           },
         })
-        const source = scale.sourceScaleId ? await tx.scale.findUnique({where:{id:scale.sourceScaleId},select:{measurementReleaseId:true,authoringFamilyId:true}}) : null
+        const source = checkedCopySource ?? (scale.sourceScaleId ? await tx.scale.findUnique({where:{id:scale.sourceScaleId},select:{measurementReleaseId:true,authoringFamilyId:true}}) : null)
         const release = await publishScaleMeasurement(tx, {
           sourceReleaseId: source?.measurementReleaseId ?? null,
           localId: scale.id, version: scale.authoringVersion ? `v${scale.authoringVersion}` : scale.updatedAt.toISOString(),

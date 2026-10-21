@@ -111,7 +111,7 @@ export async function approveLibraryMedia(tx:Tx,entryId:string,submissionId:stri
   // catalog records and their retention pins, or none. READY is never claimed for a queued copy.
   for (const item of manifest.items) await tx.$executeRaw(Prisma.sql`
     INSERT INTO scale_library_media(id,entry_id,asset_id,manifest_hash,identity,state)
-    VALUES(${randomUUID()},${entryId},${item.assetId},${manifest.manifestHash},${JSON.stringify(item)}::jsonb,'READY')`)
+    VALUES(${randomUUID()}::uuid,${entryId},${item.assetId},${manifest.manifestHash},${JSON.stringify(item)}::jsonb,'READY')`)
   const pins=manifest.items.length?await tx.assetReference.count({where:{entityType:'ScaleLibrarySubmission',entityId:submissionId,field:'media',assetId:{in:manifest.items.map(i=>i.assetId)}}}):0
   if (pins!==manifest.items.length) fail('SCALE_LIBRARY_SUBMISSION_MEDIA_NOT_RETAINED')
 }

@@ -8,7 +8,7 @@ const source = { sourceId: 's', product: 'TRAINING', releases: [{ releaseId: 're
 const open = async () => {
   fireEvent.click(screen.getByRole('button', { name: '申请进入共用库 / 查看申请状态' }))
   await waitFor(() => expect(api.source).toHaveBeenCalledWith('s'))
-  fireEvent.click(await screen.findByRole('button', { name: '申请进入共用库', exact: true }))
+  fireEvent.click(await screen.findByRole('button', { name: /^申请进入共用库$/ }))
   await screen.findByRole('option', { name: '自编量表 · v1' })
 }
 beforeEach(() => { vi.resetAllMocks(); api.source.mockResolvedValue(source); api.submissions.mockResolvedValue({ list: [] }); api.submit.mockResolvedValue({ id: 'application' }) })
@@ -46,7 +46,7 @@ describe('Training exact-version library submission', () => {
     api.source.mockRejectedValue(new Error('权限已撤销'))
     render(<TrainingScaleLibrarySubmission sourceId="s" />)
     fireEvent.click(screen.getByRole('button', { name: '申请进入共用库 / 查看申请状态' }))
-    fireEvent.click(await screen.findByRole('button', { name: '申请进入共用库', exact: true }))
+    fireEvent.click(await screen.findByRole('button', { name: /^申请进入共用库$/ }))
     expect(await screen.findByRole('alert')).toHaveTextContent('权限已撤销')
     expect(screen.getByRole('button', { name: '提交入库申请' })).toBeDisabled()
   })

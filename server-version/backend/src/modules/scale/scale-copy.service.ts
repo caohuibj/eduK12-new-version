@@ -58,6 +58,7 @@ export const assertScaleCopyPublishSource = async (tx: Prisma.TransactionClient,
     || JSON.stringify(stable(sourceSnapshot(source, validation.definition))) !== JSON.stringify(stable(parsed.data))) {
     throw new ScaleCopyError('复制来源或许可已变化，不能发布此草稿，请重新核对来源。')
   }
+  return source // Reuse this locked, rights-checked identity for release provenance.
 }
 export const copyScaleToDraft = async (sourceId: string, userId: string, mode: 'COPY' | 'REVISION' = 'COPY') => prisma.$transaction(async tx => {
   const source = await lockScaleCopySource(tx, sourceId)
@@ -76,7 +77,9 @@ export const copyScaleToDraft = async (sourceId: string, userId: string, mode: '
   if (mode === 'REVISION' && !source.authoringFamilyId) await tx.scale.update({ where: { id: source.id }, data: { authoringFamilyId: familyId, authoringVersion: 1 } })
   const copied = await tx.scale.create({ data: {
     code: `COPY_${randomUUID()}`, name: `${source.name}（${mode === 'REVISION' ? '修订' : '新工具'}草稿）`, description: source.description,
-    authoringFamilyId: familyId, authoringVersion, sourceScaleId: source.id,
+    // Independent copies retain provenance in immutable copySource, not a
+    // lifecycle FK. Revisions alone protect their same-family parent row.
+    authoringFamilyId: familyId, authoringVersion, sourceScaleId: mode === 'REVISION' ? source.id : null,
     status: 'DRAFT', visibility: 'HIDDEN', instrumentClass: 'CUSTOM_DESCRIPTIVE', instrumentVersion: source.instrumentVersion,
     definition: source.definition as Prisma.InputJsonValue, definitionHash: source.definitionHash,
     copySource: sourceSnapshot(source, definition), itemCount: source.itemCount, dimensionCount: source.dimensionCount,

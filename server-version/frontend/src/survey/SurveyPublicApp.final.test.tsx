@@ -78,7 +78,7 @@ describe('Survey first-success GENERAL receipt consumption',()=>{
     const create=URL.createObjectURL,revoke=URL.revokeObjectURL
     URL.createObjectURL=vi.fn().mockReturnValue('blob:stimulus');URL.revokeObjectURL=vi.fn()
     vi.stubGlobal('fetch',vi.fn((url:string,init?:RequestInit)=>url.endsWith('/images/stimulus')
-      ?Promise.resolve({ok:true,headers:{get:()=> 'image/png'},blob:async()=>new Blob(['image'])} as Response)
+      ?Promise.resolve(new Response(new Blob(['image'], { type: 'image/png' }), { status: 200, headers: { 'Content-Type': 'image/png' } }))
       :originalFetch(url,init)))
     try{
       render(<SurveyPublicApp/>)

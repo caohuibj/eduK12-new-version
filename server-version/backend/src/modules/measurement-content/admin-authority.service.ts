@@ -19,7 +19,9 @@ const wireGrant=contentGrantInputSchema.innerType().extend({
 export const adminContentRootRequestSchema=z.object({requestId:uuid,expectedVersion:z.literal(0),reason,grant:wireGrant}).strict()
 export const adminContentRevokeRequestSchema=z.object({expectedVersion:z.number().int().positive(),reason}).strict()
 const options={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:5000}
-const deny=(message='内容授权范围或当前身份无效'):never=>{throw new AdminPermissionError(403,message)}
+function deny(message = '内容授权范围或当前身份无效'): never {
+  throw new AdminPermissionError(403, message)
+}
 function platformSjt(grant:Pick<ContentGrantInput,'scope'|'capabilities'>){
   return grant.scope.product==='TRAINING'&&grant.scope.scopeKind==='PLATFORM'&&grant.scope.scopeId==='situational-registry'
     &&grant.scope.resourceKind==='measurement'&&grant.capabilities.length===1&&grant.capabilities[0]==='measurement.publish'

@@ -18,5 +18,9 @@ export const distributionInput=z.object({requestId:z.string().uuid(),userId:z.st
 export class ScaleLibraryError extends Error {
   constructor(public readonly statusCode:number,message:string){super(message);this.name='ScaleLibraryError'}
 }
-export const fail=(message:string,status=409):never=>{throw new ScaleLibraryError(status,message)}
+// A declaration makes the never-returning control-flow contract visible to callers.
+// Keep the same exception/status: this is not an authorization fallback.
+export function fail(message: string, status = 409): never {
+  throw new ScaleLibraryError(status, message)
+}
 export const LIBRARY_SCOPE='scale-library-governance'
