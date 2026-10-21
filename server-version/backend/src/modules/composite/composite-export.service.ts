@@ -665,10 +665,8 @@ export const exportToCSV = (data: CompositeExportData) => {
   if(!data.fields.some(field=>field.formSource)) return exportCognitiveToCSV(data)
   // Only new typed text cells use the shared strengthened guard. Legacy bytes stay unchanged.
   const typedTextFields=new Set(data.fields.filter(field=>field.formSource && field.type==='string').map(field=>field.name))
-  const rows=data.rows.map(row=>Object.fromEntries(Object.entries(row).map(([name,value])=>{
-    return [name,typedTextFields.has(name)?protectCsvCell(value):value]
-  })))
-  return exportCognitiveToCSV({...data,rows})
+  // Transform while serializing instead of retaining a second table of row objects.
+  return exportCognitiveToCSV(data,(value,field)=>typedTextFields.has(field.name)?protectCsvCell(value):value)
 }
 
 export const makeFileName = (assessmentId: string, detail: CompositeExportDetail, format: CompositeExportFormat) => {

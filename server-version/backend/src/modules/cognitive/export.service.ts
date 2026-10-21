@@ -669,10 +669,16 @@ const csvValue = (value: unknown, type?: CognitiveExportField['type']): string =
   return safeText
 }
 
-export function exportCognitiveToCSV(data: Pick<CognitiveExportData, 'fields' | 'rows'>): string {
+export function exportCognitiveToCSV(
+  data: Pick<CognitiveExportData, 'fields' | 'rows'>,
+  transformCell?: (value: unknown, field: CognitiveExportField) => unknown,
+): string {
   const lines = [data.fields.map((field) => field.name).join(',')]
   for (const row of data.rows) {
-    lines.push(data.fields.map((field) => csvValue(row[field.name], field.type)).join(','))
+    lines.push(data.fields.map((field) => csvValue(
+      transformCell ? transformCell(row[field.name], field) : row[field.name],
+      field.type,
+    )).join(','))
   }
   return lines.join('\n')
 }

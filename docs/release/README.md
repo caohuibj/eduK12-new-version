@@ -557,3 +557,28 @@ backend-regression, frontend, docker and CodeQL success; skipped/missing/failed,
 cancelled and draft candidates cannot qualify. Main push reclassifies only,
 without rerunning these PR checks. Five minutes is a progress/diagnosis threshold,
 not a guarantee for first downloads or scanning. This change does not deploy.
+
+## Frozen Composite CSV memory batch (2026-10-21)
+
+`work/composite-csv-memory-20261021` admits only its fixed main base, five exact
+backend source/test blobs and named CI controls. Unknown input, dependency,
+permission, database, frontend, mode or base changes fail closed, never fall back
+to platform CI. The original merge gate requires scope, this backend candidate,
+and changed JavaScript/TypeScript CodeQL to actually succeed.
+
+GitHub is the sole application-check location: one full backend TypeScript build,
+precise CSV safety/default/typed/ZIP contracts, runtime assembly from the same
+cached build with byte comparison, and the actual runtime HIGH/CRITICAL scan.
+Both built images are saved in a separate compressed image artifact; small
+reports retain their archive digest, so a later failure does not lose build bytes.
+Unchanged generated-instrument checks follow the existing campus build policy.
+No database, browser, frontend, worker process, deployment or load test runs.
+The unchanged locked audit is read from its original official successful job,
+with package/lock equality; missing or changed evidence stops rather than reruns.
+The diagnostic extracts exact baseline/candidate function AST declarations plus
+csvValue and protectCsvCell dependencies. It proves equal full CSV bytes on one
+1,000-by-100 synthetic table and reports retained preparation/output heap and
+replacement-row/property counts. It is an isolated function microbenchmark, not
+full-service execution, production peak memory or proven end-to-end speedup.
+Main push only classifies the merged diff; it does not replay application checks.
+Five minutes triggers a progress update, not a promise of scan/download duration.

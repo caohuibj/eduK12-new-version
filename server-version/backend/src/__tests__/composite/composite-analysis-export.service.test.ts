@@ -122,6 +122,17 @@ const makeContext = (audience: 'participant' | 'teacher' | 'researcher'): Compos
 }
 
 describe('PR11 frozen composite analysis exports', () => {
+  it('keeps default CSV bytes for the shared analysis consumer', async () => {
+    const context = makeContext('researcher')
+    context.snapshot.payload.recommendations[0].text = '\u200B=1,"quoted"\nnext'
+    const zip = await buildCompositeAnalysisExport(context, 'zip')
+    expect(zipEntry(zip.body, 'recommendations.csv')).toBe(
+      'rule_id,rule_version,audience,construct,priority,evidence_refs,text\n' +
+      'clear_difficulty_watch,1.1.0,researcher,,watch,evidence-1,"\u200B=1,""quoted""\nnext"',
+    )
+    expect(zipEntry(zip.body, 'domain_evidence.csv')).toContain("'=1+1")
+  })
+
   it('keeps participant and teacher JSON within their existing safe projection', async () => {
     const participant = await buildCompositeAnalysisExport(makeContext('participant'), 'json')
     const teacher = await buildCompositeAnalysisExport(makeContext('teacher'), 'json')

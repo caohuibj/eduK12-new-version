@@ -1,0 +1,122 @@
+name: Frozen Composite CSV memory candidate
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  candidate:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    env:
+      CI: 'true'
+      PLAN: ${{ inputs.plan }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: recheck exact source and full diff
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {execFileSync} from 'node:child_process';
+          import {changedEntries} from './.github/scripts/content-scope.mjs';
+          import {compositeCsvMemoryPlan} from './.github/scripts/composite-csv-memory-scope.mjs';
+          const p=JSON.parse(process.env.PLAN),head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+          assert.equal(p.head,head);assert.deepEqual(p,compositeCsvMemoryPlan(changedEntries(p.base,head),p.base,head));
+          JS
+      - name: accept the unchanged locked dependency audit from its official successful job
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -B - <<'PY'
+          import importlib.util
+          spec=importlib.util.spec_from_file_location('prior','.github/scripts/survey-wave-selection-reuse.py')
+          prior=importlib.util.module_from_spec(spec);spec.loader.exec_module(prior)
+          for path in ['server-version/backend/package.json','server-version/backend/package-lock.json']:
+            prior.same(path)
+          prior.official('backend');prior.log_contract('backend',prior.logs('backend'))
+          print('Official run 39546696259/job119046433031 full locked audit accepted; no new audit run or new zero-findings claim.')
+          PY
+      - uses: docker/setup-buildx-action@v3
+      - name: compile backend once and assemble its actual runtime
+        shell: bash
+        run: |
+          mkdir -p csv-memory-evidence
+          # Same established campus build policy: unchanged generated instruments are not rerun.
+          python3 - <<'PY'
+          from pathlib import Path
+          text=Path('server-version/backend/Dockerfile').read_text()
+          assert text.count('RUN npm run build\n')==1
+          Path('csv-memory-evidence/Backend.Dockerfile').write_text(text.replace('RUN npm run build\n','RUN npx tsc\n'))
+          PY
+          docker build --label org.opencontainers.image.revision=${{ github.sha }} --target build --build-arg NPM_REGISTRY=https://registry.npmjs.org -f csv-memory-evidence/Backend.Dockerfile -t csv-memory-builder:${{ github.sha }} server-version/backend
+          docker build --label org.opencontainers.image.revision=${{ github.sha }} --target runtime --build-arg NPM_REGISTRY=https://registry.npmjs.org -f csv-memory-evidence/Backend.Dockerfile -t csv-memory-runtime:${{ github.sha }} server-version/backend
+          docker image inspect csv-memory-builder:${{ github.sha }} csv-memory-runtime:${{ github.sha }} > csv-memory-evidence/images.json
+          mkdir -p csv-memory-images
+          docker save csv-memory-builder:${{ github.sha }} csv-memory-runtime:${{ github.sha }} | gzip > csv-memory-images/backend-images.tar.gz
+          (cd csv-memory-images; sha256sum backend-images.tar.gz) > csv-memory-evidence/backend-images.sha256
+          for phase in builder runtime; do
+            id="$(docker create csv-memory-$phase:${{ github.sha }})"
+            mkdir -p "$RUNNER_TEMP/csv-$phase"
+            docker cp "$id:/app/dist/." "$RUNNER_TEMP/csv-$phase/"
+            docker rm "$id"
+          done
+          diff -qr "$RUNNER_TEMP/csv-builder" "$RUNNER_TEMP/csv-runtime"
+          (cd "$RUNNER_TEMP/csv-runtime"; find . -type f -print0 | sort -z | xargs -0 sha256sum) > csv-memory-evidence/compiled-runtime.sha256
+      - name: exact missing CSV contracts on the same Debian build image
+        run: |
+          docker run --rm -e CI=true -e NODE_ENV=test -e DATABASE_URL=postgresql://unused:unused@127.0.0.1:1/unused -v "$PWD/csv-memory-evidence:/evidence" csv-memory-builder:${{ github.sha }} sh -ec '
+            npx vitest run src/__tests__/cognitive/export.service.test.ts src/__tests__/composite/typed-form-export.test.ts --maxWorkers=1 --reporter=default --reporter=json --outputFile=/evidence/new-contracts.json
+            node scripts/assert-release-test-report.mjs /evidence/new-contracts.json src/__tests__/cognitive/export.service.test.ts src/__tests__/composite/typed-form-export.test.ts
+            npx vitest run src/__tests__/composite/export.service.test.ts src/__tests__/composite/composite-analysis-export.service.test.ts src/__tests__/services/wide-export-package.test.ts -t "neutralizes spreadsheet formulas in CSV values|keeps negative numeric values numeric in CSV output|exports researcher evidence, preserves zero/structured values and neutralizes CSV formulas|keeps default CSV bytes for the shared analysis consumer|packages a standard CSV and matching frozen dictionary without inventing units or cross-resource identity" --maxWorkers=1 --reporter=default --reporter=json --outputFile=/evidence/consumer-contracts.json
+          '
+      - name: every selected existing consumer assertion must actually pass
+        run: |
+          node <<'JS'
+          const assert=require('node:assert/strict'),fs=require('node:fs');
+          const r=JSON.parse(fs.readFileSync('csv-memory-evidence/consumer-contracts.json'));
+          const titles=['neutralizes spreadsheet formulas in CSV values','keeps negative numeric values numeric in CSV output','exports researcher evidence, preserves zero/structured values and neutralizes CSV formulas','keeps default CSV bytes for the shared analysis consumer','packages a standard CSV and matching frozen dictionary without inventing units or cross-resource identity'];
+          assert.equal(r.success,true);const all=r.testResults.flatMap(s=>s.assertionResults);
+          for(const title of titles){const rows=all.filter(a=>a.title===title);assert.equal(rows.length,1,title);assert.equal(rows[0].status,'passed',title);}
+          assert.equal(all.filter(a=>a.status==='passed').length,titles.length);
+          JS
+      - name: retained-copy diagnostic using exact baseline and candidate functions
+        run: |
+          for file in modules/cognitive/export.service.ts modules/composite/composite-export.service.ts utils/exportCsvCell.ts; do
+            target="csv-memory-evidence/baseline/server-version/backend/src/$file"
+            mkdir -p "$(dirname "$target")"
+            git show "bcacf2430784533d117299b72e83f281a8f85c31:server-version/backend/src/$file" > "$target"
+          done
+          docker run --rm -v "$PWD:/source:ro" -v "$PWD/csv-memory-evidence:/evidence" -w /source -e CSV_TYPESCRIPT_ROOT=/app/node_modules/typescript -e CSV_BASELINE_ROOT=/evidence/baseline -e CSV_PROBE_REPORT=/evidence/memory-probe.json csv-memory-builder:${{ github.sha }} node .github/scripts/composite-csv-memory-probe.cjs
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: scan this compiled backend runtime
+        run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output csv-memory-evidence/runtime-scan.json csv-memory-runtime:${{ github.sha }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: composite-csv-memory-${{ github.sha }}
+          path: csv-memory-evidence/
+          if-no-files-found: error
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: composite-csv-memory-images-${{ github.sha }}
+          path: csv-memory-images/backend-images.tar.gz
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 3
