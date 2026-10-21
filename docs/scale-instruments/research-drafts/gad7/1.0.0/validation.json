@@ -1,0 +1,136 @@
+{
+  "status": "PASS",
+  "scope": "One-shot JSON/provenance and pure arithmetic specification validation only; not application tests, production scorer execution, frontend rendering, runtime safety or clinical validation.",
+  "checkedAt": "2026-10-21T17:39:09.425360+00:00",
+  "caseCount": 25,
+  "cases": [
+    {
+      "name": "all-zero",
+      "status": "PASS"
+    },
+    {
+      "name": "all-max",
+      "status": "PASS"
+    },
+    {
+      "name": "all-one",
+      "status": "PASS"
+    },
+    {
+      "name": "boundary-4-arithmetic-only",
+      "status": "PASS"
+    },
+    {
+      "name": "boundary-5-arithmetic-only",
+      "status": "PASS"
+    },
+    {
+      "name": "boundary-9-arithmetic-only",
+      "status": "PASS"
+    },
+    {
+      "name": "boundary-10-arithmetic-only",
+      "status": "PASS"
+    },
+    {
+      "name": "boundary-14-arithmetic-only",
+      "status": "PASS"
+    },
+    {
+      "name": "boundary-15-arithmetic-only",
+      "status": "PASS"
+    },
+    {
+      "name": "missing-symptom-1",
+      "status": "PASS"
+    },
+    {
+      "name": "missing-symptom-2",
+      "status": "PASS"
+    },
+    {
+      "name": "missing-symptom-3",
+      "status": "PASS"
+    },
+    {
+      "name": "missing-symptom-4",
+      "status": "PASS"
+    },
+    {
+      "name": "missing-symptom-5",
+      "status": "PASS"
+    },
+    {
+      "name": "missing-symptom-6",
+      "status": "PASS"
+    },
+    {
+      "name": "missing-symptom-7",
+      "status": "PASS"
+    },
+    {
+      "name": "all-missing",
+      "status": "PASS"
+    },
+    {
+      "name": "reject-numeric-string",
+      "status": "PASS"
+    },
+    {
+      "name": "reject-non-numeric-string",
+      "status": "PASS"
+    },
+    {
+      "name": "reject-boolean",
+      "status": "PASS"
+    },
+    {
+      "name": "reject-fraction",
+      "status": "PASS"
+    },
+    {
+      "name": "reject-negative",
+      "status": "PASS"
+    },
+    {
+      "name": "reject-out-of-range",
+      "status": "PASS"
+    },
+    {
+      "name": "reject-array",
+      "status": "PASS"
+    },
+    {
+      "name": "duplicate-item-response",
+      "status": "PASS"
+    }
+  ],
+  "formRejections": "Explicit null, multiple-answer array and extraneous item expectations recorded; no platform form handler executed.",
+  "checkerSha256": "970b64f270edba12e5f98659826fdb9a6dd53d1e4714a47806edba3c03816751",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "57087073623429636696ca43881fa092dbeec5a058db88942a9fb9d83a0b8da7"
+    },
+    {
+      "path": "content-draft.json",
+      "sha256": "08382442f006eeba48fe43feac99ce8a3b69498f03fe3365ffddd65ddeaf840f"
+    },
+    {
+      "path": "golden-fixtures.json",
+      "sha256": "9d48cb59eeff996502b2465bab41df384b0869a295a012d9a847b974c2ad0448"
+    },
+    {
+      "path": "report-design.json",
+      "sha256": "167ad4078e377e6c35ec7468dd2c05c1edaf545848b75bf777957e1639cebd6f"
+    },
+    {
+      "path": "scoring-contract.json",
+      "sha256": "0871536f95c7db9d94859a498d75b312b8bc6ef19b8cc992da8b86bba5c36f94"
+    },
+    {
+      "path": "source-and-rights.json",
+      "sha256": "c53ebc622bf0bc5a2add393410cf9b50f3e2ae0f5d43c419d2f6127686788fa2"
+    }
+  ]
+}
