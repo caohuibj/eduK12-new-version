@@ -1,6 +1,7 @@
+import { SurveyRawScoreFeedbackEditor } from './SurveyRawScoreFeedbackEditor'
 import type { ScaleDraft } from './builder.types'
 import { researchKey } from './builder.types'
-export function ResearchScaleEditor({value,onChange}:{value:ScaleDraft;onChange:(next:ScaleDraft)=>void}){
+export function ResearchScaleEditor({value,onChange,projectId}:{value:ScaleDraft;onChange:(next:ScaleDraft)=>void;projectId?:string}){
   const setItem=(index:number,fn:(item:ScaleDraft['items'][number])=>ScaleDraft['items'][number])=>
     onChange({...value,items:value.items.map((x,i)=>i===index?fn(x):x)})
   return <div className="space-y-5">
@@ -70,11 +71,23 @@ export function ResearchScaleEditor({value,onChange}:{value:ScaleDraft;onChange:
             onClick={()=>{const items=value.items.slice();[items[i],items[i+1]]=[items[i+1],items[i]];onChange({...value,items})}}>↓</button>
           <button type="button" className="btn-secondary" onClick={()=>onChange({...value,items:[
             ...value.items.slice(0,i+1),{...q,itemKey:researchKey('q'),dimensionKeys:[...q.dimensionKeys]},...value.items.slice(i+1)]})}>复制</button>
-          <button type="button" className="btn-secondary" onClick={()=>onChange({...value,items:value.items.filter((_,k)=>k!==i)})}>删除</button>
+          <button type="button" className="btn-secondary" onClick={()=>onChange({...value,items:value.items.filter((_,k)=>k!==i),totalScore:value.totalScore?{...value.totalScore,itemKeys:value.totalScore.itemKeys.filter(k=>k!==q.itemKey)}:undefined})}>删除</button>
         </div>
+        <label className="block text-sm">题目用途
+          <select className="input block w-full" aria-label={'题目用途 '+(i+1)} value={q.purpose??'CONTENT'} onChange={e=>{
+            const purpose=e.target.value as NonNullable<typeof q.purpose>
+            onChange({...value,items:value.items.map((x,k)=>k===i?{...x,purpose,attentionTarget:undefined,...(purpose!=='CONTENT'?{reverse:false,dimensionKeys:[]}: {})}:x),
+              totalScore:value.totalScore&&purpose!=='CONTENT'?{...value.totalScore,itemKeys:value.totalScore.itemKeys.filter(key=>key!==q.itemKey)}:value.totalScore})
+          }}><option value="CONTENT">内容题（计分）</option><option value="ATTENTION_CHECK">注意力题（仅采集）</option><option value="SOCIAL_DESIRABILITY">社会赞许题／测谎题（仅采集）</option></select>
+        </label>
+        {q.purpose==='ATTENTION_CHECK'&&<label className="block text-sm">作者设定的目标选项
+          <select className="input block w-full" aria-label={'目标选项 '+(i+1)} value={q.attentionTarget??''} onChange={e=>setItem(i,x=>({...x,attentionTarget:e.target.value||undefined}))}>
+            <option value="">请选择</option>{value.responseOptions.map(o=><option key={o.optionKey} value={o.optionKey}>{o.label}</option>)}
+          </select></label>}
+        {q.purpose&&q.purpose!=='CONTENT'&&<p className="text-xs text-slate-600">沿用共享 Likert 选项；不计入维度或总分，不反向计分。仅导出作答供研究者分析，不在系统内判定通过、失败或说谎。</p>}
         <textarea className="input w-full" rows={2} aria-label={'题干 '+(i+1)} value={q.prompt}
           onChange={e=>setItem(i,x=>({...x,prompt:e.target.value}))}/>
-        <label className="inline-flex gap-2 items-center"><input type="checkbox" checked={q.reverse}
+        {(!q.purpose||q.purpose==='CONTENT')&&<><label className="inline-flex gap-2 items-center"><input type="checkbox" checked={q.reverse}
           onChange={e=>setItem(i,x=>({...x,reverse:e.target.checked}))}/>反向计分</label>
         <fieldset className="flex flex-wrap gap-3 text-sm"><legend className="font-semibold">所属维度</legend>
           {value.dimensions.map(dim=><label key={dim.dimensionKey} className="inline-flex gap-1 items-center">
@@ -82,8 +95,19 @@ export function ResearchScaleEditor({value,onChange}:{value:ScaleDraft;onChange:
               onChange={e=>setItem(i,x=>({...x,dimensionKeys:e.target.checked?
                 [...x.dimensionKeys,dim.dimensionKey]:x.dimensionKeys.filter(k=>k!==dim.dimensionKey)}))}/>
             {dim.label||dim.dimensionKey}</label>)}
-        </fieldset>
+        </fieldset></>}
       </article>)}
     </section>
+    <section className="border rounded-xl p-4 space-y-3 bg-white">
+      <h3 className="font-semibold">研究总分（可选）</h3>
+      <label className="inline-flex gap-2"><input type="checkbox" checked={!!value.totalScore} onChange={e=>onChange({...value,totalScore:e.target.checked?{key:'total',label:'总分',aggregation:'sum',itemKeys:value.items.filter(q=>!q.purpose||q.purpose==='CONTENT').map(q=>q.itemKey)}:undefined})}/>启用独立总分</label>
+      {value.totalScore&&<>
+        <label className="block text-sm">总分标识<input className="input block" value={value.totalScore.key} onChange={e=>onChange({...value,totalScore:{...value.totalScore!,key:e.target.value}})}/></label>
+        <label className="block text-sm">总分名称<input className="input block" value={value.totalScore.label} onChange={e=>onChange({...value,totalScore:{...value.totalScore!,label:e.target.value}})}/></label>
+        <label className="block text-sm">总分聚合<select className="input block" value={value.totalScore.aggregation} onChange={e=>onChange({...value,totalScore:{...value.totalScore!,aggregation:e.target.value as 'sum'|'mean'}})}><option value="sum">求和</option><option value="mean">平均</option></select></label>
+        <fieldset className="space-y-2"><legend className="text-sm font-semibold">纳入总分的内容题</legend>{value.items.filter(q=>!q.purpose||q.purpose==='CONTENT').map(q=><label className="flex gap-2 text-sm" key={q.itemKey}><input type="checkbox" checked={value.totalScore!.itemKeys.includes(q.itemKey)} onChange={e=>onChange({...value,totalScore:{...value.totalScore!,itemKeys:e.target.checked?[...value.totalScore!.itemKeys,q.itemKey]:value.totalScore!.itemKeys.filter(k=>k!==q.itemKey)}})}/>{q.prompt||q.itemKey}</label>)}</fieldset>
+      </>}
+    </section>
+    <SurveyRawScoreFeedbackEditor value={value} onChange={onChange} projectId={projectId}/>
   </div>
 }

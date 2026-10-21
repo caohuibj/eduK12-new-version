@@ -1,6 +1,6 @@
 import { canonicalHash } from '../assessment-runtime/canonical'
 import {
-  validateScaleDefinition, type ScaleDefinitionV2,
+  validateScaleDefinition, isScaleContentItem, type ScaleDefinitionV2,
 } from '../scale/scale-definition'
 import { scoreScale } from '../scale/scale-scoring'
 import { compileSjtTemplate, SjtTemplateError } from '../situational/authoring/template'
@@ -22,7 +22,7 @@ const disclaimer='研究者自编探索性工具。结果用于本项目科研�
 /** The canonical score engine is the same ScaleDefinitionV2 and scoreScale used by production. */
 export function compileResearchScale(title:string,input:unknown):ScaleDefinitionV2 {
   const d=assertSurveyDraft('SCALE',input,true) as ScaleDraft
-  const scores=d.dimensions.map((dimension,i)=>({
+  const scores:ScaleDefinitionV2['scoring']['scores']=d.dimensions.map((dimension,i)=>({
     key:dimension.dimensionKey,
     type:'dimension' as const,
     label:dimension.label,
@@ -31,11 +31,13 @@ export function compileResearchScale(title:string,input:unknown):ScaleDefinition
     displayPrecision:2,
     source:{
       type:'items' as const,
-      items:d.items.filter(q=>q.dimensionKeys.includes(dimension.dimensionKey))
+      items:d.items.filter(q=>isScaleContentItem(q)&&q.dimensionKeys.includes(dimension.dimensionKey))
         .map(q=>({itemCode:q.itemKey,weight:1})),
       aggregation:d.aggregation,
     },
   }))
+  if(d.totalScore)scores.push({key:d.totalScore.key,type:'total',label:d.totalScore.label,direction:'descriptive',canonical:false,displayPrecision:2,
+    source:{type:'items',items:d.totalScore.itemKeys.map(itemCode=>({itemCode,weight:1})),aggregation:d.totalScore.aggregation}})
   const definition:ScaleDefinitionV2={
     schemaVersion:2,respondentType:d.respondentType,
     source:{title},license:{status:'self_authored',redistribution:'allowed'},
@@ -45,20 +47,22 @@ export function compileResearchScale(title:string,input:unknown):ScaleDefinition
     }))}],
     items:d.items.map((q,i)=>({
       itemCode:q.itemKey,content:q.prompt,type:'single',required:q.required,
+      ...(q.purpose?{purpose:q.purpose}:{}),...(q.attentionTarget!==undefined?{attentionTarget:q.attentionTarget}:{}),
       sortOrder:i,responseSetKey:'research_options',randomizeOptions:false,
     })),
     scoring:{
       scoringVersion:'survey-research-v1',
-      itemRules:d.items.map(q=>({itemCode:q.itemKey,transform:{type:q.reverse?'reverse' as const:'identity' as const}})),
+      itemRules:d.items.filter(isScaleContentItem).map(q=>({itemCode:q.itemKey,transform:{type:q.reverse?'reverse' as const:'identity' as const}})),
       defaultMissingPolicy:{type:'complete_required'},
       scores,
     },
     report:{
       reportVersion:'survey-private-score-v1',
+      ...(d.rawScoreFeedback?{rawScoreFeedback:d.rawScoreFeedback}:{}),
       primaryScoreKeys:d.dimensions.slice(0,1).map(x=>x.dimensionKey),
-      scoreOrder:d.dimensions.map(x=>x.dimensionKey),
-      interpretations:d.dimensions.map(x=>({
-        scoreKey:x.dimensionKey,headline:x.label,
+      scoreOrder:scores.map(x=>x.key),
+      interpretations:scores.map(x=>({
+        scoreKey:x.key,headline:x.label,
         source:{type:'score_only' as const},summary:'研究探索性得分，不对被试作诊断或常模解释。',
         bands:[],guidance:[],
       })),

@@ -352,6 +352,8 @@ router.post('/image', uploadPrincipalRateLimit, boundedUpload('image', 10 * 1024
     return success(res, {
       id: storedAsset.id,
       assetId: storedAsset.id,
+      contentHash: storedAsset.sha256,
+      mimeType: storedAsset.mimeType,
       filename: storedAsset.id,
       name: storedAsset.originalName || file.originalname,
       size: storedAsset.sizeBytes,

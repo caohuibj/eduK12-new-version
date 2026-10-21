@@ -1,3 +1,5 @@
+import { rawScoreFeedbackSchema, rawScoreFeedbackBindingIssues } from '../scale/raw-score-feedback'
+import { scaleItemPurposeSchema, isScaleContentItem } from '../scale/scale-definition'
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { expandedSurveySjtOptions } from './sjt-selection'
@@ -20,6 +22,8 @@ const option = z.object({
   optionKey: key, label, score: z.number().finite().min(-10000).max(10000).optional(),
 }).strict()
 export const scaleDraftSchema=z.object({
+  rawScoreFeedback:rawScoreFeedbackSchema.optional(),
+  totalScore:z.object({key,label,itemKeys:z.array(key).min(1).max(240),aggregation:z.enum(['sum','mean'])}).strict().optional(),
   schemaVersion:z.literal(1),
   /** Missing on historical immutable Scale publications means ALL_AT_ONCE. */
   presentationMode:z.enum(['ONE_BY_ONE','ALL_AT_ONCE']).optional(),
@@ -32,6 +36,7 @@ export const scaleDraftSchema=z.object({
   aggregation:z.enum(['sum','mean']),
   items:z.array(z.object({
     itemKey:key,prompt:note,required:z.boolean(),
+    purpose:scaleItemPurposeSchema.optional(),attentionTarget:key.optional(),
     reverse:z.boolean(),dimensionKeys:z.array(key).max(20),
   }).strict()).max(240),
 }).strict()
@@ -95,22 +100,39 @@ const validateSurveyDraftCore=(
     if(forPreview){
       if(d.responseOptions.length<2)err(issues,'responseOptions','至少两种响应选项')
       if(!d.dimensions.length)err(issues,'dimensions','至少一个维度')
-      if(!d.items.length)err(issues,'items','至少一道题目')
+      if(!d.items.some(isScaleContentItem))err(issues,'items','至少一道计分内容题')
       d.responseOptions.forEach((o,i)=>requireText(o.label,`responseOptions.${i}.label`,issues))
     }
     const dimSet=new Set(d.dimensions.map(x=>x.dimensionKey))
     d.items.forEach((q,i)=>{
       if(forPreview)requireText(q.prompt,`items.${i}.prompt`,issues)
-      if(forPreview&&!q.dimensionKeys.length)err(issues,`items.${i}.dimensionKeys`,'至少归属一个维度')
+      if(forPreview&&isScaleContentItem(q)&&!q.dimensionKeys.length)err(issues,`items.${i}.dimensionKeys`,'至少归属一个维度')
+      if(!isScaleContentItem(q)) {
+        if(q.dimensionKeys.length)err(issues,`items.${i}.dimensionKeys`,'质量题不能纳入维度')
+        if(q.reverse)err(issues,`items.${i}.reverse`,'质量题不参与反向计分')
+      }
+      if(q.attentionTarget!==undefined&&(q.purpose!=='ATTENTION_CHECK'||!d.responseOptions.some(option=>option.optionKey===q.attentionTarget)))err(issues,`items.${i}.attentionTarget`,'仅注意力题可指定共享响应集中的目标选项')
       unique(q.dimensionKeys,`items.${i}.dimensionKeys`,issues)
       q.dimensionKeys.forEach(k=>{if(!dimSet.has(k))err(issues,`items.${i}.dimensionKeys`,'引用了不存在的维度')})
       if(forPreview&&!q.required)err(issues,`items.${i}.required`,'首版研究描述性量表要求完整作答')
     })
     if(forPreview)d.dimensions.forEach((dim,i)=>{
       requireText(dim.label,`dimensions.${i}.label`,issues)
-      if(!d.items.some(q=>q.dimensionKeys.includes(dim.dimensionKey)))
+      if(!d.items.some(q=>isScaleContentItem(q)&&q.dimensionKeys.includes(dim.dimensionKey)))
         err(issues,`dimensions.${i}`,'维度至少包含一道题目')
     })
+  }
+  if(kind==='SCALE') {
+    const d=definition as ScaleDraft
+    const keys=d.dimensions.map(dim=>dim.dimensionKey)
+    if(d.totalScore) {
+      if(keys.includes(d.totalScore.key))err(issues,'totalScore.key','总分标识不得与维度重复')
+      unique(d.totalScore.itemKeys,'totalScore.itemKeys',issues)
+      for(const itemKey of d.totalScore.itemKeys)if(!d.items.some(q=>q.itemKey===itemKey&&isScaleContentItem(q)))err(issues,'totalScore.itemKeys','总分只能包含现有计分内容题')
+      if(forPreview)requireText(d.totalScore.label,'totalScore.label',issues)
+      keys.push(d.totalScore.key)
+    }
+    issues.push(...rawScoreFeedbackBindingIssues(d.rawScoreFeedback,keys).map(issue=>({...issue,path:issue.path.replace(/^report\./,'')})))
   }
   if(kind==='COGNITIVE')issues.push(...validateCognitiveDraft(definition as CognitiveDraft,forPreview))
   if(kind==='SJT'&&definition.schemaVersion===2)issues.push(...validateSurveySjtV2(definition as SjtDraftV2,forPreview))

@@ -36,6 +36,8 @@ export const toScaleUnitReport = (value: Assessment): SafeScaleUnitReport => {
       : undefined
     return {
       itemId: value.id,
+      assessmentId: value.id,
+      ...(external.kind === 'full' && external.rawScoreFeedback ? { rawScoreFeedback: external.rawScoreFeedback } : {}),
       type: 'SCALE',
       kind: 'scale',
       reportKind: external.kind,

@@ -1,3 +1,4 @@
+import { sessionFetch } from '../../api/client'
 import { internalReturnTo } from '../../components/app-shell/access'
 import { TrainingReinterpretationStudio } from './TrainingReinterpretationStudio'
 import { TrainingContentReports } from './TrainingContentReports'
@@ -88,6 +89,19 @@ const CompositeReportPage: React.FC = () => {
   const unitReports = (report?.unitReports || legacyModules).filter((module) => module.type !== 'FORM') as CompositeReport['unitReports']
   const backgroundValues = report?.backgroundValues || legacyModules.filter((module) => module.type === 'FORM')
   const shouldLoadSnapshots = staffMode && !report?.bundleReport && Boolean(report?.packageReport || selectedSnapshotId)
+
+  const loadReportImage = useCallback(async (assetId: string) => {
+    if (!attemptId || (publicMode && !recoveryToken)) throw new Error('缺少报告访问凭据')
+    const base = teacherMode && id
+      ? `/api/composite-assessments/${encodeURIComponent(id)}/attempts/${encodeURIComponent(attemptId)}/report`
+      : `/api/${publicMode ? 'public/' : ''}composite-assessments/attempts/${encodeURIComponent(attemptId)}/report`
+    const params = new URLSearchParams()
+    if (selectedSnapshotId) params.set('snapshotId', selectedSnapshotId)
+    if (partial) params.set('partial', '1')
+    const response = await sessionFetch(`${base}/assets/${encodeURIComponent(assetId)}${params.size ? '?' + params.toString() : ''}`, publicMode ? { headers: { 'X-Recovery-Token': recoveryToken } } : {})
+    if (!response.ok) throw new Error('反馈图片暂时无法读取')
+    return response.blob()
+  }, [attemptId, id, publicMode, recoveryToken, selectedSnapshotId, teacherMode, partial])
 
   const load = useCallback(async (credential = recoveryToken, snapshotId = selectedSnapshotId, waitMs = 0) => {
     if (!attemptId) return
@@ -391,7 +405,7 @@ const CompositeReportPage: React.FC = () => {
             <p className="text-amber-700">该模块结果无法解密，分数未展示。</p>
           ) : (
             <>
-              {module.type === 'SCALE' && <><ScaleUnitReportCard report={module as SafeScaleUnitReport} />{staffMode && module.trainingTiming && <TrainingTimingReport value={module.trainingTiming} />}</>}
+              {module.type === 'SCALE' && <><ScaleUnitReportCard report={module as SafeScaleUnitReport} loadReportImage={loadReportImage} />{staffMode && module.trainingTiming && <TrainingTimingReport value={module.trainingTiming} />}</>}
               {module.type === 'COGNITIVE' && (
                 module.singleTaskReport
                   ? <CognitiveSingleTaskReportCard report={module.singleTaskReport as unknown as CognitiveSingleTaskReport} headingLevel={3} />

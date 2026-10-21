@@ -269,7 +269,7 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
       </div>
       {!readOnly&&active.status==='DRAFT'&&<div ref={editorRoot} id="survey-authoring-definition" tabIndex={-1} className="survey-authoring-target">
         {active.kind==='FORM'&&<ResearchFormEditor key={active.id} value={active.definition as FormDraft} onChange={change} projectId={projectId}/>}
-        {active.kind==='SCALE'&&<ResearchScaleEditor key={active.id} value={active.definition as ScaleDraft} onChange={change}/>}
+        {active.kind==='SCALE'&&<ResearchScaleEditor key={active.id} value={active.definition as ScaleDraft} onChange={change} projectId={projectId}/>}
         {active.kind==='COGNITIVE'&&<ResearchCognitiveEditor value={active.definition as CognitiveDraft} onChange={change}/>}
         {active.kind==='SJT'&&<ResearchSjtEditor key={active.id} value={active.definition as SjtDraft} onChange={change} projectId={projectId}/>}
       </div>}

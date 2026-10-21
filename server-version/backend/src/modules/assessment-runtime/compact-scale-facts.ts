@@ -42,6 +42,7 @@ const encodeCanonicalGraph = (envelope: CanonicalUnitResultEnvelopeV1, result: S
   const visit = (value: any, path: Array<string | number>): Graph => {
     const where = path.join('.')
     if(compactMetadata){const meta=['resultHash','bundleBridgeHash','completedAt','persistenceProvenance','bundleBridge.sourceResultHash'].indexOf(where);if(meta>=0)return [5,meta]}
+    if (where === 'bundleBridge.rawScoreFeedback') return link(value,['rawScoreFeedback'])
     if (where === 'core.quality') return link(value,['quality'])
     if (where === 'core.contextHash') return link(value,['method','assessmentContext','snapshotHash'])
     if (/^core\.metrics\.[0-9]+\.(value|quality)$/.test(where)) {

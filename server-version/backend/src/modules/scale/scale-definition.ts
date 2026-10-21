@@ -1,3 +1,4 @@
+import { rawScoreFeedbackSchema, rawScoreFeedbackBindingIssues } from './raw-score-feedback'
 import { validateAudienceReport } from './library/audience-report-gate'
 import { createHash } from 'node:crypto'
 import { z } from 'zod'
@@ -49,7 +50,12 @@ const transformSchema = z.discriminatedUnion('type', [
 ])
 export type ScaleTransform = z.infer<typeof transformSchema>
 
+export const scaleItemPurposeSchema = z.enum(['CONTENT', 'ATTENTION_CHECK', 'SOCIAL_DESIRABILITY'])
+export const isScaleContentItem = (item: { purpose?: string }): boolean => !item.purpose || item.purpose === 'CONTENT'
+
 export const scaleItemDefinitionSchema = z.object({
+  purpose: scaleItemPurposeSchema.optional(),
+  attentionTarget: responseValueSchema.optional(),
   itemCode: z.string().min(1),
   content: z.string().min(1),
   images: assessmentImagePresentationListSchema.optional(),
@@ -128,6 +134,7 @@ const interpretationSchema = z.object({
 export type ScaleInterpretationDefinition = z.infer<typeof interpretationSchema>
 
 export const scaleReportDefinitionSchema = z.object({
+  rawScoreFeedback: rawScoreFeedbackSchema.optional(),
   audienceContract: z.object({ schemaVersion: z.literal(1), respondent: z.enum(['STUDENT_SELF','ADULT_SELF','PARENT_REPORT','TEACHER_REPORT','OBSERVER_REPORT']), audience: z.enum(['student','parent','teacher']), locale: z.string().min(1), qcReview: z.object({ reviewer: z.string().min(1), reviewedAt: z.string().datetime(), basis: z.string().min(1) }).strict() }).strict().optional(),
   reportVersion: z.string().min(1),
   primaryScoreKeys: z.array(z.string().min(1)).min(1),
@@ -253,14 +260,23 @@ export const validateScaleDefinition = (
     }
   })
 
+  definition.items.forEach((item, index) => {
+    if (item.attentionTarget !== undefined && item.purpose !== 'ATTENTION_CHECK') issues.push({ path: `items.${index}.attentionTarget`, message: '只有注意力题可以配置目标选项', severity: 'error' })
+    if (item.attentionTarget !== undefined && !responseSets.get(item.responseSetKey)?.options.some(option => sameResponseValue(option.value, item.attentionTarget!))) issues.push({ path: `items.${index}.attentionTarget`, message: '目标选项必须属于该题响应集', severity: 'error' })
+    if (!isScaleContentItem(item) && options.instrumentClass === 'STANDARD') issues.push({ path: `items.${index}.purpose`, message: '标准量表不得添加自编质量题', severity: 'error' })
+  })
+  if (!definition.items.some(isScaleContentItem)) issues.push({ path: 'items', message: '量表至少需要一道计分内容题', severity: 'error' })
+
   const ruleByItem = new Map<string, ScaleItemRule>()
   definition.scoring.itemRules.forEach((rule, ruleIndex) => {
     if (!itemCodes.has(rule.itemCode)) issues.push({ path: `scoring.itemRules.${ruleIndex}.itemCode`, message: `计分规则引用了不存在的题目：${rule.itemCode}`, severity: 'error' })
     if (ruleByItem.has(rule.itemCode)) issues.push({ path: `scoring.itemRules.${ruleIndex}.itemCode`, message: '同一题目只能有一个计分 transform', severity: 'error' })
+    const item = definition.items.find(candidate => candidate.itemCode === rule.itemCode)
+    if (item && !isScaleContentItem(item) && rule.transform.type !== 'identity') issues.push({ path: `scoring.itemRules.${ruleIndex}.transform`, message: '质量题不参与反向或其他计分转换', severity: 'error' })
     ruleByItem.set(rule.itemCode, rule)
   })
   definition.items.forEach((item) => {
-    if (!ruleByItem.has(item.itemCode)) issues.push({ path: `scoring.itemRules`, message: `缺少题目计分规则：${item.itemCode}`, severity: 'error' })
+    if (isScaleContentItem(item) && !ruleByItem.has(item.itemCode)) issues.push({ path: `scoring.itemRules`, message: `缺少题目计分规则：${item.itemCode}`, severity: 'error' })
   })
 
   // A map transform is deliberately explicit: every score that can be
@@ -291,6 +307,8 @@ export const validateScaleDefinition = (
       source.items.forEach((item) => {
         if (!itemCodes.has(item.itemCode)) issues.push({ path: `scoring.scores.${scoreIndex}.source`, message: `score 引用了不存在的题目：${item.itemCode}`, severity: 'error' })
         if (sourceItems.has(item.itemCode)) issues.push({ path: `scoring.scores.${scoreIndex}.source`, message: `score 不能重复引用题目：${item.itemCode}`, severity: 'error' })
+        const sourceItem = definition.items.find(candidate => candidate.itemCode === item.itemCode)
+        if (sourceItem && !isScaleContentItem(sourceItem)) issues.push({ path: `scoring.scores.${scoreIndex}.source`, message: `质量题不能纳入计分：${item.itemCode}`, severity: 'error' })
         sourceItems.add(item.itemCode)
       })
     } else {
@@ -302,6 +320,8 @@ export const validateScaleDefinition = (
     }
   })
 
+  issues.push(...rawScoreFeedbackBindingIssues(definition.report.rawScoreFeedback, [...scoreKeys]))
+  if (definition.report.rawScoreFeedback && options.instrumentClass === 'STANDARD') issues.push({ path: 'report.rawScoreFeedback', message: '标准量表不得使用自编原始分反馈', severity: 'error' })
   const hasCustomScorer = Boolean(definition.scoring.scorerKey)
   definition.scoring.scores.forEach((score, scoreIndex) => {
     if (hasCustomScorer && !score.range) {
@@ -506,7 +526,7 @@ export const runnerDefinition = (definition: ScaleDefinitionV2) => ({
   schemaVersion: definition.schemaVersion,
   respondentType: definition.respondentType,
   display: definition.display,
-  items: [...definition.items].sort((left, right) => left.sortOrder - right.sortOrder).map((item) => ({
+  items: [...definition.items].sort((left, right) => left.sortOrder - right.sortOrder).map(({ attentionTarget: _target, purpose: _purpose, ...item }) => ({
     ...item,
     options: responseSetForItem(definition, item).options.map(({ value, label }) => ({ value, label })),
   })),

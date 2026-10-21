@@ -1,4 +1,5 @@
 import React from 'react'
+import { TrainingRawScoreFeedback, type MatchedRawScoreFeedback } from './TrainingRawScoreFeedback'
 import {
   ReportCoreSummary,
   ReportDetails,
@@ -22,6 +23,8 @@ export type SafeScaleUnitReport = Pick<
   'itemId' | 'type' | 'kind' | 'scaleCode' | 'scaleName' | 'caveats' | 'disclaimer' | 'completedAt' | 'totalTime' | 'decryptError'
 > & {
   scaleId?: string
+  assessmentId?: string
+  rawScoreFeedback?: MatchedRawScoreFeedback[]
   label?: string | null
   result?: ScaleResultV2 | null
   quality?: ExternalScaleQuality | null
@@ -120,7 +123,7 @@ const overlayFor = (score: ExternalScaleScoreValue, references: ScaleReferenceVa
   }
 }
 
-const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport }> = ({ report }) => {
+const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportImage?: (assetId: string) => Promise<Blob> }> = ({ report, loadReportImage }) => {
   if (report.decryptError) {
     return <p className="text-amber-700">该量表结果无法解密，分数未展示。</p>
   }
@@ -198,6 +201,8 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport }> = ({ report
           </div>
         )}
       </ReportSection>
+
+      {!invalid && Boolean(report.rawScoreFeedback?.length) && <TrainingRawScoreFeedback loadReportImage={loadReportImage} entries={report.rawScoreFeedback!} assessmentId={report.assessmentId} labels={Object.fromEntries(scores.map(score => [score.key, score.label]))} />}
 
       {!invalid && interpretations.length > 0 && (
         <div data-testid="scale-core-feedback">

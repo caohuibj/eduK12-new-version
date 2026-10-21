@@ -41,7 +41,7 @@ type Unit={kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';instrumentKey:string;title:stri
   scenes?:{sceneKey:string;title:string;stimulus:string;image?:SurveyPublicImage;questions:SjtPublicQuestion[]}[];
   questions?:SjtPublicQuestion[]}
 type Task={attemptId:string;waveId:string;status:string;definitionDigest:string;units:Unit[];reportMode:'GENERAL_ONLY'|'DESCRIPTIVE';cognitiveSessions?:SurveyCognitiveSessionInfo[];lockedPriorAnswers?:Record<string,Record<string,Answer>>;flow?:PublicFlow;checkpointPolicy?:{enabled:true;ttlHours:number}}
-type ParticipantFeedbackBase={instrumentKey:string;title:string;quality:string}
+type ParticipantFeedbackBase={instrumentKey:string;title:string;quality:string;rawScoreFeedback?:import('../modules/scale/rawScoreFeedback').MatchedRawScoreFeedback[]}
 type ParticipantFeedback=ParticipantFeedbackBase&(
   {feedbackKind:'RAW_METRICS';measurementReleaseId:string;metrics:{key:string;label:string;value:number|null;unit:null;status:string}[]}
   |{feedbackKind?:undefined;measurementDigest:string;maturity:'PILOT';metrics:{key:string;label:string;value:number|null;unit:'ratio'|'ms';status:string}[]})
@@ -1024,6 +1024,10 @@ export default function SurveyPublicApp(){
             <h4 className="font-medium">{measurement.title}</h4>
             <p className="text-xs">{measurement.feedbackKind==='RAW_METRICS'?'受控原始指标':'试点测量'} · 质量状态：{measurement.quality}。仅反映本次条件下的表现。</p>
             {measurement.metrics.map(metric=><p key={metric.key}>{metric.label}：{metric.value===null?'不可计算':measurement.feedbackKind==='RAW_METRICS'?String(metric.value):metric.unit==='ratio'?(metric.value*100).toFixed(1)+'%':metric.unit==='ms'?metric.value+' ms':String(metric.value)}（{metric.status}）</p>)}
+            {measurement.feedbackKind==='RAW_METRICS'&&measurement.rawScoreFeedback?.map((feedback,index)=><section className="border-l-2 border-slate-300 pl-3 space-y-2" key={feedback.scoreKey+':'+index} aria-label="原始分描述性反馈">
+              <p className="whitespace-pre-wrap text-sm">{feedback.text}</p>
+              {completion&&feedback.images?.map(image=><SurveyParticipantImage key={image.asset.assetId} image={image} purpose="report" proof={{publicId,attemptId:completion.attemptId,...completion.proof}}/>)}
+            </section>)}
           </article>)}
         </section>}
         <p className="text-xs">完成时间：{new Date(general.completedAt).toLocaleString('zh-CN')}</p>

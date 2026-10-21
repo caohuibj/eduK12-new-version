@@ -88,6 +88,15 @@ describe('Composite wide Scale export projection', () => {
     expect(projected.rows[0]).toEqual({ U_id: 'u1', S001_scale_id: 'scale-1', C002_score: 3 })
   })
 
+  it('classifies quality codebook as raw-only, not ordinary quality diagnostics', () => {
+    const extra = {...data, fields:[...data.fields, {name:'S001_Q_META_item',label:'Author codebook',type:'string' as const}],
+      rows:[{...data.rows[0],'S001_Q_META_item':'AUTHOR_TARGET'}]}
+    const publicData = projectCompositeExportData(extra,binding(DISCLOSURE_PRESETS.FULL_REPORT()))
+    expect(JSON.stringify(publicData)).not.toContain('AUTHOR_TARGET')
+    const rawData = projectCompositeExportData(extra,binding({...DISCLOSURE_PRESETS.FULL_REPORT(),rawAnswers:true}))
+    expect(rawData.rows[0]['S001_Q_META_item']).toBe('AUTHOR_TARGET')
+  })
+
   it('binds artifacts to audience and policy fingerprint and rejects old/stale names', () => {
     const legacy = 'composite_12345678_full_2026-09-21T03-00-00_00000000-0000-0000-0000-000000000000.csv'
     const current = binding()

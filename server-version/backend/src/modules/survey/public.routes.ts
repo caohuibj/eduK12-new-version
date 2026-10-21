@@ -155,3 +155,25 @@ publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/images/:assetId',
       next(e)
     }
   })
+
+/** Reuse the exact current report disclosure check. A valid attempt alone is
+ * insufficient: only image identities in its released saved feedback qualify. */
+publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/report-images/:assetId',async(req,res,next)=>{
+  try{
+    const params=proof.parse(req.body)
+    const report=await readGeneralForOwnAttempt({publicId:id.parse(req.params.publicId),
+      attemptId:id.parse(req.params.attemptId),...params})
+    const assetId=id.parse(req.params.assetId)
+    const measurements='measurements' in report?report.measurements:[]
+    const reference=measurements.flatMap(measurement=>
+      'rawScoreFeedback' in measurement?(measurement.rawScoreFeedback??[]).flatMap(feedback=>feedback.images??[]):[])
+      .find(image=>image.asset.assetId===assetId)?.asset
+    if(!reference)return res.status(404).end()
+    res.setHeader('Cache-Control','private, no-store, max-age=0')
+    await serveAssessmentImageContent({reference,res})
+  }catch(e){
+    if(e instanceof z.ZodError||e instanceof SurveyWaveError||e instanceof SurveyFinalError
+      ||e instanceof ResearchIdentityError||e instanceof AssessmentImageDeliveryError)return res.status(404).end()
+    next(e)
+  }
+})

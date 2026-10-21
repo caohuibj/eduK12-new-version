@@ -1,3 +1,4 @@
+import { rawScoreFeedbackMatchSchema, type RawScoreFeedbackMatch } from '../scale/raw-score-feedback'
 import { scaleReferenceIdentitySchema, type ScaleReferenceIdentityV1 } from '../assessment-reference/longitudinal'
 import type { ScaleResultV2 } from '../scale/scale-result'
 import type { CognitiveResultSnapshot } from '../cognitive/v2/types'
@@ -65,6 +66,9 @@ export interface CanonicalUnitResultCoreV1 {
 
 /** Additive Bundle v3 bridge computed at UNIT submit while full result is in memory. */
 export interface CanonicalBundleBridgeV1 {
+  /** Frozen display-only selection, excluded from scientific core/resultHash. */
+  rawScoreFeedback?: RawScoreFeedbackMatch[]
+  reportAudience?: 'student' | 'parent' | 'teacher'
   sourceResultHash: string
   /** Scale scores with frozen criterionBandKey; omitted for Cognitive. */
   scores?: Array<{
@@ -501,6 +505,8 @@ const canonicalUnitResultCoreSchema = z.object({
 })
 
 const canonicalBundleBridgeSchema = z.object({
+  rawScoreFeedback: z.array(rawScoreFeedbackMatchSchema).optional(),
+  reportAudience: z.enum(['student', 'parent', 'teacher']).optional(),
   sourceResultHash: z.string().regex(/^[0-9a-f]{64}$/),
   scores: z.array(z.object({
     scoreKey: z.string().min(1),

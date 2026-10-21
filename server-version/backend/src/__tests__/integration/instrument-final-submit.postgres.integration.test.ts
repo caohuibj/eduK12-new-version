@@ -1,7 +1,7 @@
 import { createHash, randomUUID } from 'node:crypto'
 import { afterAll, beforeAll, describe, expect, it } from 'vitest'
 import { Prisma, type PrismaClient } from '@prisma/client'
-import { integrationDatabaseUrl } from './integration-env'
+import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from './integration-env'
 import { createTrialEnvelope } from '../../modules/cognitive/v2/trial-envelope'
 import { canonicalJsonBytes } from '../../modules/assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
@@ -56,6 +56,7 @@ let userId = ''
 let fakeConfigId = ''
 let ownsFakeConfig = false
 const createdScaleIds: string[] = []
+const createdAssetIds: string[] = []
 const createdAssessmentIds: string[] = []
 const createdQuestionnaireIds: string[] = []
 const createdQuestionnaireAssessmentIds: string[] = []
@@ -143,8 +144,9 @@ const scaleDefinitionFor = (size: number, prefix: string): ScaleDefinitionV2 => 
   }
 }
 
-const createScaleFixture = async (size: number, suffix = randomUUID().slice(0, 8)) => {
+const createScaleFixture = async (size: number, suffix = randomUUID().slice(0, 8), customize?: (definition: ScaleDefinitionV2) => void) => {
   const definition = scaleDefinitionFor(size, `FINAL-SCALE-${size}-${suffix}`)
+  customize?.(definition)
   const scale = await prisma.scale.create({
     data: {
       code: `FINAL-SCALE-${size}-${suffix}`,
@@ -156,7 +158,7 @@ const createScaleFixture = async (size: number, suffix = randomUUID().slice(0, 8
       instrumentVersion: '2.0.0',
       definition: definition as unknown as Prisma.InputJsonValue,
       definitionHash: hashScaleDefinition(definition),
-      itemCount: size,
+      itemCount: definition.items.length,
       dimensionCount: 1,
     },
   })
@@ -442,6 +444,7 @@ const createCompositeFixture = async () => {
 suite('instrument final submit (real PostgreSQL)', () => {
   beforeAll(async () => {
     process.env.DATABASE_URL = DB_URL!
+    if (process.env.SCALE_AUTHORING_ACCEPTANCE === '1') requireIsolatedReleaseDatabase(DB_URL!)
     process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
     process.env.DATA_PSEUDONYM_KEY = 'b'.repeat(64)
     const database = await import('../../config/database')
@@ -508,12 +511,88 @@ suite('instrument final submit (real PostgreSQL)', () => {
       if (createdQuestionnaireIds.length) await prisma.questionnaire.deleteMany({ where: { id: { in: createdQuestionnaireIds } } })
       if (createdAssessmentIds.length) await prisma.assessment.deleteMany({ where: { id: { in: createdAssessmentIds } } })
       if (createdScaleIds.length) await prisma.scale.deleteMany({ where: { id: { in: createdScaleIds } } })
+      if (createdAssetIds.length) await prisma.storedAsset.deleteMany({ where: { id: { in: createdAssetIds } } })
       if (userId) await prisma.user.delete({ where: { id: userId } })
       if (ownsFakeConfig && fakeConfigId) await prisma.cognitiveTestConfig.delete({ where: { id: fakeConfigId } })
     } finally {
       await prisma?.$disconnect()
     }
   })
+
+  it('persists quality-item raw answers and frozen image feedback without scoring quality items', async () => {
+    requireIsolatedReleaseDatabase(DB_URL!)
+    // Catalog/retention is real PostgreSQL. Actual image upload and byte access
+    // are covered by the separate Chromium journey, not faked in this test.
+    const asset = await prisma.storedAsset.create({ data: {
+      objectKey: `scale-authoring-ci/${randomUUID()}.png`, provider: 'local',
+      mimeType: 'image/png', sizeBytes: 67, sha256: 'c'.repeat(64),
+      ownerId: userId, accessScope: 'PRIVATE',
+    } })
+    createdAssetIds.push(asset.id)
+    const image = { asset: { assetId: asset.id, mimeType: 'image/png' as const, contentHash: asset.sha256 }, altText: 'Synthetic feedback image', order: 0 }
+    const fixture = await createScaleFixture(2, randomUUID().slice(0, 8), definition => {
+      definition.items.push(
+        { itemCode: 'AC', content: 'Choose no', type: 'single', required: true, sortOrder: 2, responseSetKey: 'default', randomizeOptions: false, purpose: 'ATTENTION_CHECK', attentionTarget: 'no' },
+        { itemCode: 'SD', content: 'I never lie', type: 'single', required: true, sortOrder: 3, responseSetKey: 'default', randomizeOptions: false, purpose: 'SOCIAL_DESIRABILITY' },
+      )
+      definition.report.rawScoreFeedback = { schemaVersion: 1, rules: [{ scoreKey: 'total', ranges: [
+        { key: 'lower', min: 0, max: 1, includeMax: false, text: 'Lower frozen interval' },
+        { key: 'upper', min: 1, max: 2, includeMax: true, text: 'Frozen author feedback', images: [image] },
+      ] }] }
+    })
+    const { assertScaleReportImagesOwned, scaleAssessmentImageReferences } = await import('../../modules/scale/scale-image-retention')
+    await expect(assertScaleReportImagesOwned(fixture.definition, userId)).resolves.toBeUndefined()
+    await expect(assertScaleReportImagesOwned(fixture.definition, randomUUID())).rejects.toThrow('作者')
+    const altered = structuredClone(fixture.definition)
+    altered.report.rawScoreFeedback!.rules[0].ranges[1].images![0].asset.contentHash = 'd'.repeat(64)
+    await expect(assertScaleReportImagesOwned(altered, userId)).rejects.toThrow()
+    expect(scaleAssessmentImageReferences(fixture.definition)).toEqual([])
+
+    const { freezeScaleRuntimeAtAttemptStart, persistFrozenScaleRuntimeSnapshot } = await import('../../modules/assessment-runtime/runtime-snapshot')
+    const { retainFrozenScaleAssessmentImages } = await import('../../modules/scale/scale-image-retention')
+    await prisma.$transaction(async tx => {
+      const snapshot = await freezeScaleRuntimeAtAttemptStart(tx, {
+        instrumentKey: fixture.scale.code, instrumentVersion: fixture.scale.instrumentVersion, definition: fixture.definition,
+      })
+      await tx.assessment.update({ where: { id: fixture.assessment.id }, data: {
+        runtimeSnapshotEncrypted: await persistFrozenScaleRuntimeSnapshot(snapshot, tx),
+        compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
+      } })
+      await retainFrozenScaleAssessmentImages({ assessmentId: fixture.assessment.id, snapshot, db: tx })
+    })
+
+    // AC is deliberately answered against the target. It is accepted without
+    // a pass/fail decision, retained raw, and never enters scored item facts.
+    await submitScaleAssessmentFinal(fixture.input)
+    const row = await prisma.assessment.findUniqueOrThrow({ where: { id: fixture.assessment.id } })
+    expect(row.status).toBe('COMPLETED')
+    const { loadScaleAnswers, loadScaleResult } = await import('../../modules/scale/scale-workflow.service')
+    const raw = await loadScaleAnswers(row.answers, row)
+    expect(raw.decryptError).toBe(false)
+    expect(raw.answers).toEqual(expect.arrayContaining([
+      expect.objectContaining({ itemCode: 'AC', responseValue: 'yes' }),
+      expect.objectContaining({ itemCode: 'SD', responseValue: 'yes' }),
+    ]))
+    const restored = await loadScaleResult(row.result, row, { full: true })
+    expect(restored.decryptError).toBe(false)
+    expect(restored.result!.itemScores.map(item => item.itemCode)).toEqual(fixture.definition.items.slice(0, 2).map(item => item.itemCode))
+    expect(restored.result!.scores[0]).toMatchObject({ value: 2, expectedItems: fixture.definition.items.slice(0, 2).map(item => item.itemCode) })
+    expect(restored.result!.rawScoreFeedback).toEqual([{ scoreKey: 'total', rangeKey: 'upper', text: 'Frozen author feedback', images: [image] }])
+    expect(restored.result!.quality.flags).not.toContain('ATTENTION_CHECK_FAILED')
+    const refs = await prisma.assetReference.findMany({ where: { assetId: asset.id } })
+    expect(refs.some(ref => ref.entityId === `SCALE:${row.id}`)).toBe(true)
+
+    const { getScaleExportData } = await import('../../services/exportService.legacy')
+    const exported = await getScaleExportData(fixture.scale.id)
+    expect(exported.rows).toHaveLength(1)
+    expect(exported.rows[0]).toMatchObject({ Q_V_ac: 'yes', Q_V_sd: 'yes', Q_S_ac: null, Q_S_sd: null })
+    expect(JSON.parse(exported.rows[0].Q_META_ac)).toMatchObject({ purpose: 'ATTENTION_CHECK', attentionTarget: 'no', scored: false })
+    expect(JSON.parse(exported.rows[0].Q_META_sd)).toMatchObject({ purpose: 'SOCIAL_DESIRABILITY', scored: false })
+    const replayed = await submitScaleAssessmentFinal(fixture.input)
+    expect(replayed.replayed).toBe(true)
+    const reread = await prisma.assessment.findUniqueOrThrow({ where: { id: row.id } })
+    expect((await loadScaleResult(reread.result, reread, { full: true })).result!.rawScoreFeedback).toEqual(restored.result!.rawScoreFeedback)
+  }, 30_000)
 
   it('submits scale answers as one final mutation for sizes 1, 5, and 10', async () => {
     const fixtures = []

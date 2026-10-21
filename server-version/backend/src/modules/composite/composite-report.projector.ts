@@ -28,6 +28,8 @@ const contextForScaleUnit = (unit: any, audience: CompositeReportAudience): Scal
 const strictScaleUnit = (unit: any, audience: CompositeReportAudience): any => {
   const internal: ScaleUnitReport = {
     itemId: unit?.itemId,
+    ...(typeof unit?.assessmentId === 'string' ? { assessmentId: unit.assessmentId } : {}),
+    ...((unit?.rawScoreFeedback ?? unit?.result?.rawScoreFeedback) ? { rawScoreFeedback: unit.rawScoreFeedback ?? unit.result.rawScoreFeedback } : {}),
     type: 'SCALE',
     kind: 'scale',
     scaleId: unit?.scaleId ?? unit?.result?.instrument?.scaleId ?? 'unknown',

@@ -15,11 +15,35 @@ import {
   assessmentVideoPresentationSchema,
 } from '../assessment-media/assessment-video'
 import type { VersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/runtime-snapshot'
+import type { RawScoreFeedback } from './raw-score-feedback'
 import type { ScaleDefinitionV2 } from './scale-definition'
 
 export const scaleAssessmentImageReferences = (definition: ScaleDefinitionV2) => (
   definition.items.flatMap((item) => assessmentImageAssetReferences(item.images))
 )
+
+// Report media must be pinned but never added to the attempt/stimulus allowlist.
+export const rawScoreFeedbackImages = (feedback: RawScoreFeedback | undefined) => (
+  feedback?.rules.flatMap(rule => [
+    ...rule.ranges.flatMap(range => range.images ?? []), ...(rule.fallback?.images ?? []),
+  ]) ?? []
+)
+export const scaleReportImageReferences = (definition: ScaleDefinitionV2) => (
+  assessmentImageAssetReferences(rawScoreFeedbackImages(definition.report?.rawScoreFeedback))
+)
+export const assertScaleReportImagesOwned = async (
+  definition: ScaleDefinitionV2, ownerId: string, db: AssetDatabase = prisma,
+): Promise<void> => {
+  const references = scaleReportImageReferences(definition)
+  if (!references.length) return
+  const ids = [...new Set(references.map(reference => reference.assetId))]
+  const assets = await db.storedAsset.findMany({
+    where: { id: { in: ids }, ownerId, deletedAt: null, accessScope: 'PRIVATE' },
+    select: { id: true },
+  })
+  if (assets.length !== ids.length) throw new Error('报告图片必须来自量表作者自己的素材库')
+  await assertAssessmentAssetReferencesReady(references, db)
+}
 
 const scaleAssessmentVideoReferencesForRetention = (definition: ScaleDefinitionV2) => (
   definition.items.flatMap((item) => {
@@ -31,13 +55,14 @@ const scaleAssessmentVideoReferencesForRetention = (definition: ScaleDefinitionV
 
 export const scaleAssessmentMediaReferences = (definition: ScaleDefinitionV2) => ([
   ...scaleAssessmentImageReferences(definition),
+  ...scaleReportImageReferences(definition),
   ...scaleAssessmentVideoReferencesForRetention(definition),
 ])
 
 export const assertScaleAssessmentImagesReady = async (
   definition: ScaleDefinitionV2,
   db: AssetDatabase = prisma,
-): Promise<void> => assertAssessmentAssetReferencesReady(scaleAssessmentImageReferences(definition), db)
+): Promise<void> => assertAssessmentAssetReferencesReady([...scaleAssessmentImageReferences(definition), ...scaleReportImageReferences(definition)], db)
 
 export const publishedScaleMediaOwner = (scaleId: string, definitionHash: string): AssessmentAssetRetentionOwner => ({
   entityType: ASSESSMENT_PUBLISHED_DEFINITION_REFERENCE_TYPE,

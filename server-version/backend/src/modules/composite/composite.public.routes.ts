@@ -37,6 +37,7 @@ router.post('/attempts/:attemptId/bundle-retry', compositeController.publicRetry
 router.get('/attempts/:attemptId/report-status', compositeController.publicReportStatus)
 router.post('/attempts/:attemptId/report-retry', compositeController.publicRetryReport)
 router.get('/attempts/:attemptId/report', compositeController.publicReport)
+router.get('/attempts/:attemptId/report/assets/:assetId', compositeController.publicReport)
 router.get('/attempts/:attemptId/analysis-export', compositeController.publicAnalysisExport)
 router.get('/:token', compositeController.publicInfo)
 router.post('/:token/start', compositeController.publicStart)

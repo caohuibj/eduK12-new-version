@@ -1,5 +1,6 @@
 import {
   itemForCode,
+  isScaleContentItem,
   responseSetForItem,
   scaleDefinitionSchema,
   type ScaleAggregation,
@@ -265,6 +266,7 @@ const validateAnswers = (definition: ScaleDefinitionV2, answers: ScaleAnswer[]):
 const scoreItems = (definition: ScaleDefinitionV2, answers: Map<string, ScaleAnswer>): ScoredItem[] => {
   const rules = new Map(definition.scoring.itemRules.map((rule) => [rule.itemCode, rule]))
   return definition.items.flatMap((item) => {
+    if (!isScaleContentItem(item)) return []
     const answer = answers.get(item.itemCode)
     if (!answer) return []
     const responseSet = responseSetForItem(definition, item)
@@ -492,7 +494,7 @@ const validateCustomScorerOutput = (
   return { itemScores: [], scores: scorerScores, quality: { status: quality.status, flags: [...new Set(quality.flags)] } }
 }
 
-const calculateScoreRanges = (definition: ScaleDefinitionV2): Map<string, ScaleScoreRange> => {
+export const calculateScoreRanges = (definition: ScaleDefinitionV2): Map<string, ScaleScoreRange> => {
   const ranges = itemRanges(definition)
   const scoreRanges = new Map<string, ScaleScoreRange>()
   const pending = new Set(definition.scoring.scores.map((score) => score.key))
@@ -515,6 +517,10 @@ export const scoreScale = (
   inputAnswers: ScaleAnswer[] | Record<string, ScaleResponseValue>,
 ): ScaleScoringOutput => {
   const parsed = scaleDefinitionSchema.parse(definitionInput)
+  // Fail closed even if a caller bypasses authoring validation. Quality answers
+  // stay in raw storage, never in a scoring denominator or a custom scorer.
+  const qualityCodes = new Set(parsed.items.filter(item => !isScaleContentItem(item)).map(item => item.itemCode))
+  if (qualityCodes.size && (parsed.scoring.scorerKey || parsed.scoring.scores.some(score => score.source.type === 'items' && score.source.items.some(item => qualityCodes.has(item.itemCode))))) throw new Error('质量题不能纳入计分')
   const answers = normalizeAnswers(inputAnswers)
   const answerByItem = validateAnswers(parsed, answers)
   const scoredItems = scoreItems(parsed, answerByItem)

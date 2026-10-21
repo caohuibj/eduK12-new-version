@@ -1,3 +1,4 @@
+import {validate as validateScaleBindings,REF as SCALE_REF} from './scale-authoring-scope.mjs';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {readFileSync} from 'node:fs';
@@ -6,16 +7,21 @@ export const REPOSITORY = 'caohuibj/eduK12-new-version';
 export const BRANCHES = Object.freeze({
   'work/measurement-version-final-20261020': 'measurement',
   'work/training-mac-ui-final-20261020': 'training-mac',
+  'work/scale-authoring-feedback-20261021': 'scale-authoring',
 });
 export const REQUIRED = Object.freeze(['historical-local','compiled-browser','runtime-packaging',
   'runtime-scans','dependency-audit','changed-lint','frontend-app-types','schema-upgrade-restore','sast']);
 export const MAC_REQUIRED = Object.freeze(['historical-local','backend-compile','frontend-compile',
   'frontend-app-types','changed-lint','compiled-browser','scoped-pg-http','runtime-packaging',
   'runtime-scans','dependency-audit','schema-upgrade-restore','sast']);
-export const requiredFor = candidate => candidate === 'training-mac' ? MAC_REQUIRED : REQUIRED;
+export const SCALE_REQUIRED = Object.freeze(['backend-compile','frontend-compile','locked-regression','frontend-app-types','changed-lint','dependency-audit','runtime-scans','scoped-postgres','compiled-browser','sast']);
+export const requiredFor = candidate => candidate === 'scale-authoring' ? SCALE_REQUIRED : candidate === 'training-mac' ? MAC_REQUIRED : REQUIRED;
 // Exact paths, not a directory exemption. All remain subject to independent
 // review of the final candidate; the product fingerprint excludes only these.
 export const TOOLS = Object.freeze([
+  '.github/scripts/scale-authoring-admission.py',
+  '.github/scripts/scale-authoring-admission.test.py',
+  '.github/scripts/scale-authoring-bindings.json',
   '.github/scripts/exact-candidate-scope.mjs',
   '.github/scripts/training-mac-admission.mjs',
   '.github/scripts/training-mac-admission.test.mjs',
@@ -101,6 +107,16 @@ export function exactCandidatePlan(base,head,env=process.env) {
   const frozen=validateFrozen({candidate,base,head,sourceHead,tree,
     sourceTree:git('rev-parse',sourceHead+'^{tree}'),rows:inventory(head),
     diffHash:changedFingerprint(base,head)},bindings);
+  if(candidate==='scale-authoring') {
+    const manifest=JSON.parse(readFileSync(new URL('./scale-authoring-bindings.json',import.meta.url),'utf8'));
+    const parts=execFileSync('git',['diff','--raw','-z','--no-renames','--abbrev=40',base,head],{encoding:'utf8'}).split('\0').filter(Boolean);
+    const entries=[];
+    for(let i=0;i<parts.length;i+=2){const [beforeMode,afterMode,before,after,status]=parts[i].slice(1).split(' ');entries.push({file:parts[i+1],beforeMode,afterMode,before,after,status})}
+    validateScaleBindings(entries,manifest,{event:'push',ref:SCALE_REF,head});
+    return {schema:1,route:'exact-candidate',candidate,base,head,sourceHead,tree,postMerge,
+      productInventorySha256:frozen.productInventorySha256,diffSha256:frozen.diffSha256,
+      required:[...SCALE_REQUIRED],components:null,runtime:null};
+  }
   const runtimePath=new URL(candidate==='training-mac'?'./training-mac-inputs.json':'./exact-candidate-runtime-inputs.json',import.meta.url);
   let runtimeInputs=null;
   try { runtimeInputs=JSON.parse(readFileSync(runtimePath,'utf8')); }
@@ -121,7 +137,7 @@ export function exactCandidateOutputs(plan) {
   return output;
 }
 export function validExactPlan(p) {
-  return p?.schema===1&&p.route==='exact-candidate'&&['measurement','training-mac'].includes(p.candidate)
+  return p?.schema===1&&p.route==='exact-candidate'&&['measurement','training-mac','scale-authoring'].includes(p.candidate)
     &&typeof p.postMerge==='boolean'
     &&[p.base,p.head,p.sourceHead,p.tree].every(fullSha)
     &&/^[a-f0-9]{64}$/.test(p.productInventorySha256||'')
@@ -147,6 +163,9 @@ export function verifyUnchangedCatalogInputs(inputs,baseRows,headRows,dependency
     throw Error('Situational catalog/checker consumed input changed');
 }
 export function situationalPublicationBoundary(base,head,env=process.env) {
+  // This candidate uses the unchanged catalog workflow's ordinary relevance detector.
+  // Its shared scale definition changed, so do not claim the old checker-input proof.
+  if(BRANCHES[env.CI_HEAD_REF]==='scale-authoring') return null;
   if(!BRANCHES[env.CI_HEAD_REF]) return null;
   if(!['pull_request','pull_request_review'].includes(env.CI_EVENT))
     throw Error('Catalog boundary is limited to actual PR/review events');

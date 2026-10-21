@@ -5,8 +5,8 @@ type Stored={assetId:string;contentHash:string;mimeType:SurveyImage['asset']['mi
 type Envelope<T>={code:number|string;message:string;data:T|null}
 const cookie=()=>decodeURIComponent(document.cookie.split('; ').find(x=>
   x.startsWith('huisurvey_research_csrf='))?.split('=').slice(1).join('=')||'')
-export function SurveyImageField({projectId,image,onChange}:{
-  projectId:string;image?:SurveyImage;onChange:(value:SurveyImage|undefined)=>void
+export function SurveyImageField({projectId,image,onChange,presentationOnly=false}:{
+  projectId:string;image?:SurveyImage;presentationOnly?:boolean;onChange:(value:SurveyImage|undefined)=>void
 }){
   const [library,setLibrary]=useState<Stored[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState('')
   const [libraryOpen,setLibraryOpen]=useState(false),[libraryLoading,setLibraryLoading]=useState(false)
@@ -14,6 +14,8 @@ export function SurveyImageField({projectId,image,onChange}:{
   const libraryId=useId(),libraryRequest=useRef<AbortController|null>(null)
   const base='/api/survey/projects/'+encodeURIComponent(projectId)+'/assets'
   const currentBase=useRef(base),mounted=useRef(true)
+  const latestOnChange=useRef(onChange)
+  latestOnChange.current=onChange
   currentBase.current=base
   useEffect(()=>{
     mounted.current=true
@@ -67,7 +69,7 @@ export function SurveyImageField({projectId,image,onChange}:{
       if(!current())return
       const media=output.data
       setLibrary(xs=>[media,...xs.filter(x=>x.assetId!==media.assetId)])
-      onChange({asset:{
+      latestOnChange.current({asset:{
         assetId:media.assetId,contentHash:media.contentHash,mimeType:media.mimeType,
       },altText:file.name.replace(/\.[^.]+$/,'').slice(0,300)||'研究图片',
         rightsStatus:'unknown',rightsNote:''})
@@ -117,7 +119,7 @@ export function SurveyImageField({projectId,image,onChange}:{
       <label className="text-sm block">图片说明（可选）
         <input className="input block w-full" maxLength={1000} value={image.caption||''}
           onChange={e=>onChange({...image,caption:e.target.value})}/></label>
-      <label className="text-sm block">图片版权状态
+      {!presentationOnly&&<><label className="text-sm block">图片版权状态
         <select className="input block w-full" value={image.rightsStatus}
           onChange={e=>onChange({...image,rightsStatus:e.target.value as SurveyImage['rightsStatus']})}>
           <option value="unknown">未核实（不可发布）</option>
@@ -129,6 +131,7 @@ export function SurveyImageField({projectId,image,onChange}:{
           value={image.rightsNote}
           onChange={e=>onChange({...image,rightsNote:e.target.value})}/>
       </label>
+      </>}
       <button className="btn-secondary" type="button" onClick={()=>onChange(undefined)}>从此题移除图片引用</button>
     </div>}
   </fieldset>

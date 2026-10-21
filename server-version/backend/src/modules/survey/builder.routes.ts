@@ -61,16 +61,17 @@ surveyBuilderRouter.post('/:pid/instruments/:iid/validate',handle(req=>
   service.validateDraftForPreview(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid))))
 
 const simulation=z.object({
+  rawScores:z.record(z.number().finite()).optional(),
   answers:z.record(z.union([
     z.string().max(2000),z.number().finite(),z.null(),
     z.object({_surveyRefusal:z.literal(true)}).strict(),
     z.array(z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)).max(6),
-  ])),
-}).strict()
+  ])).optional(),
+}).strict().refine(value=>(value.answers!==undefined)!==(value.rawScores!==undefined))
 surveyBuilderRouter.post('/:pid/instruments/:iid/preview',handle(req=>{
   const data=simulation.parse(req.body)
-  if(Object.keys(data.answers).length>240)throw new BulkImportError([{line:1,message:'预览作答超过题目数量上限'}])
-  return service.simulateSurveyDraft(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid),data.answers)
+  if(Object.keys(data.answers??{}).length>240)throw new BulkImportError([{line:1,message:'预览作答超过题目数量上限'}])
+  return service.simulateSurveyDraft(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid),data.answers,data.rawScores)
 }))
 const formDryRun=z.object({answers:z.record(z.unknown())}).strict()
 surveyBuilderRouter.post('/:pid/instruments/:iid/form-dry-run',handle(req=>

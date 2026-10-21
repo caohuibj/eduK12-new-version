@@ -1,0 +1,382 @@
+name: Scale authoring fixed-product browser diagnosis
+# Fixed-product browser continuation; original failed runs remain failed.
+on:
+  push:
+    branches: [ci/scale-authoring-browser-diagnostic-20261021]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: scale-authoring-browser-diagnostic-20261021
+  cancel-in-progress: false
+env:
+  CI: 'true'
+  TZ: UTC
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  scope:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: verify exact script-only diff and completed official producer evidence
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -B - <<'VERIFY'
+          import importlib.util,json,os,subprocess
+          from pathlib import Path
+          source='312cfdc95e53b243b2de0bea9beb5ca3a3132a81'; run=39568118300
+          allowed={'.github/scripts/scale-authoring-scope.mjs','.github/scripts/scale-authoring-scope.test.mjs','server-version/e2e/scale-authoring-feedback-browser.cjs','server-version/e2e/scale-authoring-feedback-browser.test.cjs','.github/workflows/ci-scale-authoring-browser-diagnostic.yml','.github/scripts/scale-authoring-bindings.json'}
+          changed=set(subprocess.check_output(['git','diff','--name-only',source,'HEAD'],text=True).splitlines())
+          assert changed==allowed, 'Product/fixture/other controls changed; fixed evidence cannot be reused'
+          for line in subprocess.check_output(['git','diff','--raw','--no-abbrev','--no-renames',source,'HEAD'],text=True).splitlines():
+              header,path=line.split('\t'); before_mode,after_mode,before,after,status=header[1:].split()
+              assert path in allowed and status=='M' and before_mode==after_mode=='100644'
+          plan=json.loads(Path('.github/scripts/scale-authoring-bindings.json').read_text())
+          assert set(subprocess.check_output(['git','diff','--name-only',plan['base'],'HEAD'],text=True).splitlines())==set(plan['files'])
+          for path,binding in plan['files'].items():
+              if binding['after'] is not None: assert subprocess.check_output(['git','hash-object',path],text=True).strip()==binding['after']
+          subprocess.run(['python3','-B','.github/scripts/scale-authoring-reuse.py','verify'],check=True)
+          spec=importlib.util.spec_from_file_location('reuse','.github/scripts/scale-authoring-reuse.py');r=importlib.util.module_from_spec(spec);spec.loader.exec_module(r)
+          original=r.api('runs/'+str(run));assert original['head_sha']==source and original['run_attempt']==1 and original['conclusion']=='failure'
+          for jid,name in [(119115404858,'build (frontend)'),(119115404683,'sast')]:
+              job=r.api('jobs/'+str(jid));assert job['run_id']==run and job['head_sha']==source and job['name']==name and job['conclusion']=='success'
+          full=r.api('jobs/119106743347');assert full['run_id']==39565491980 and full['head_sha']=='9b289945f5c782b98027ff7228c344c362247e17' and full['conclusion']=='success'
+          r.FRONTEND_SOURCE=source;r.FRONTEND_RUN=run
+          r.ARTIFACTS['currentFrontendReports']=(12330399320,'scale-frontend-reports-'+source,43070,'ebeb66e2dd76a1e8351d54d8f152f3cad40015f54987a0dde823b5fe1a01e6df')
+          r.ARTIFACTS['currentFrontendSast']=(12330194879,'scale-sast-'+source,71508,'1d6506b097b8d95cc0610c1e300b514452e9ff36d8c10044664d6848aee8285e')
+          reports=Path('scale-authoring-evidence/completed-frontend');r.download('currentFrontendReports',reports)
+          r.download('currentFrontendSast',Path('scale-authoring-evidence/completed-sast'))
+          checks=json.loads((reports/'frontend-resume-checks.json').read_text());assert checks=={'typecheck':'PASS','lint':'PASS','sourceRun':39565491980,'compilerRepeated':False,'testsRepeated':False,'auditRepeated':False}
+          assembly=json.loads((reports/'frontend-runtime-reassembly.json').read_text());assert assembly=={'sourceRun':39565491980,'sourceHead':'9b289945f5c782b98027ff7228c344c362247e17','candidateHead':source,'compilerRepeated':False,'runtimeReassembled':True,'allOriginalCompilerHashesMatch':True}
+          scan=json.loads((reports/'frontend-runtime-scan.json').read_text());assert 'Results' in scan
+          image=json.loads((reports/'frontend-reassembled-image.json').read_text())
+          assert scan['Metadata']['ImageID']==image['Id'] and scan['ArtifactName']=='scale-authoring-frontend-runtime:'+source and scan['ArtifactName'] in image['RepoTags']
+          assert not [v for result in scan['Results'] for v in result.get('Vulnerabilities',[]) if v['Severity'] in ['HIGH','CRITICAL']]
+          Path('scale-authoring-evidence/browser-continuation.json').write_text(json.dumps({'originalRun':run,'originalHead':source,'originalConclusion':'failure','successfulFrontendAndSastReused':True,'newCompiler':False,'repeatedTypesLintAuditScan':False,'repeatedPostgresTest':False,'currentHead':os.environ['GITHUB_SHA']},indent=2))
+
+          # Reuse only the complete Training journey from the original failed browser run.
+          training_head='7daa3ad8cb0fb9597303a2ef3e1c28c3209dd548'; training_run=39571934879
+          # Exact shared success consumers; the only reviewed exception is failure diagnostics.
+          import re
+          old_script=subprocess.check_output(['git','show',training_head+':server-version/e2e/scale-authoring-feedback-browser.cjs'],text=True)
+          new_script=Path('server-version/e2e/scale-authoring-feedback-browser.cjs').read_text()
+          def functions(text):
+              rows=list(re.finditer(r'^(?:async )?function (\w+)\(',text,re.M))
+              return {m[1]:text[m.start():rows[i+1].start() if i+1<len(rows) else len(text)] for i,m in enumerate(rows)}
+          before,after=functions(old_script),functions(new_script)
+          for name in ['action', 'newPage', 'capture', 'redactDiagnostics', 'layout', 'accessibility', 'totpAt', 'failureDetail', 'assertDeniedImage', 'imageRequest', 'assertExportParts', 'answerTrainingItem', 'trainingLogin', 'trainingJourney']:assert before[name]==after[name], 'Training consumed function changed: '+name
+          import hashlib
+          assert hashlib.sha256(before['responseData'].encode()).hexdigest()=='314d8893056224502b914489fe62b15cb1c2e9465eae3da0ab997f9aea7dcaf2'
+          assert hashlib.sha256(after['responseData'].encode()).hexdigest()=='4585017e6bca3ee037829038802c40056041fb6a8b976c7f55c1e1efa22adbba'
+          job=r.api('jobs/119128163823');assert job['run_id']==training_run and job['head_sha']==training_head and job['conclusion']=='failure'
+          for job_id in [119128054238,119128163682]:
+              job=r.api('jobs/'+str(job_id));assert job['run_id']==training_run and job['head_sha']==training_head and job['conclusion']=='success'
+          r.FRONTEND_SOURCE=training_head;r.FRONTEND_RUN=training_run
+          r.ARTIFACTS['currentFrontendTraining']=(12332407955,'scale-browser-'+training_head,2645376,'4ed07312ff97a33673f5670432977d50ed8e3bd217c908c97280819692d6093f')
+          training=Path('scale-authoring-evidence/reused-training');r.download('currentFrontendTraining',training)
+          report=training/'browser/result.json'
+          import hashlib,shutil
+          report_hash='d7511d708d7b12dc643f02061b526da9b9bb61292ddc5172a7a1300bc95ad3e3'
+          assert hashlib.sha256(report.read_bytes()).hexdigest()==report_hash
+          prior=json.loads(report.read_text());assert prior['status']=='FAIL' and prior['sourceCommit']==training_head and prior['phase']=='survey-publication'
+          assert json.loads((training/'cleanup.json').read_text())=={'exitStatus':0,'privateMaterialRemoved':True}
+          assert prior['browserErrors']==[] and prior['blockedExternalRequests']==0
+          checks=['training-stable-item-operations','training-editor-native','training-quality-roundtrip','training-published','training-final-report-image','training-report-image-denies-other-user']
+          assert [x for x in prior['checks'] if x.startswith('training-')]==checks
+          surfaces=['training-editor','training-report']; widths=[390,768,1440]
+          selected=lambda key:[x for x in prior[key] if x['name'] in surfaces]
+          shots=selected('screenshots'); layouts=selected('layoutChecks'); axe=selected('accessibility')
+          assert sorted((x['name'],x['width']) for x in shots)==sorted((n,w) for n in surfaces for w in widths)
+          assert sorted((x['name'],x['width']) for x in layouts)==sorted((n,w) for n in surfaces for w in widths) and all(x['overflow'] is False for x in layouts)
+          assert sorted(x['name'] for x in axe)==sorted(surfaces) and all(x['passes']>0 and x['violations']==[] for x in axe)
+          assert prior['participantAnswers']==[{'name':'training','answerCount':3,'matchesFinalSnapshot':True}]
+          assert prior['imageAuthorization']==[{'name':'training-other-user','positiveStatus':200,'deniedStatus':404,'deniedImage':False,'deniedLength':60}]
+          hashes={'training-editor-1440.png': 'a1f620b475d1af6b7bb6f7219caedcf7224e57c27178727d72ed4247aa874c79', 'training-editor-390.png': 'fcc5cf3e25f9f3fed748156a6dd289e27822872850e6275c4cc65d90c1937057', 'training-editor-768.png': '1baa0b62047a51aec1882c9bbd78d171b308b815832a8715e92088735dfb2e5c', 'training-report-1440.png': 'a7400392843a26c0d574d5d6970498bef087f1d08d5fc8b3478b43b4308df108', 'training-report-390.png': '62e73fa19b7d4c7cf30d1bc6f900d4dc3b03d913885854aa3e8a229dda1ffd73', 'training-report-768.png': '03fc1e967aedf3952b7e973ec0ba01787ce9cc3453ced7b94d24c8847ff0664e'}
+          for shot in shots:
+              assert shot['file']==shot['name']+'-'+str(shot['width'])+'.png'
+              assert hashlib.sha256((training/'browser'/shot['file']).read_bytes()).hexdigest()==hashes[shot['file']]
+              shot['sha256']=hashes[shot['file']]
+          receipt={'sourceRun':training_run,'sourceHead':training_head,'sourceReportSha256':report_hash,'originalStatus':'FAIL','checks':checks,'screenshots':shots,'layoutChecks':layouts,'accessibility':axe,'computedStyles':selected('computedStyles'),'participantAnswers':prior['participantAnswers'],'imageAuthorization':prior['imageAuthorization'],'browserErrors':[],'blockedExternalRequests':0}
+          (training/'training-reuse.json').write_text(json.dumps(receipt,indent=2))
+          VERIFY
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scale-browser-continuation-${{ github.sha }}
+          path: |
+            scale-authoring-evidence/browser-continuation.json
+            scale-authoring-evidence/backend-reuse.json
+            scale-authoring-evidence/completed-frontend/
+            scale-authoring-evidence/completed-sast/
+          retention-days: 3
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scale-training-reuse-${{ github.sha }}
+          path: scale-authoring-evidence/reused-training/
+          retention-days: 3
+          if-no-files-found: error
+  browser:
+    needs: scope
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      DATABASE_URL_ADMIN: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      REDIS_URL: redis://localhost:6379
+      PORT: '3000'
+      SOCKET_REDIS_REQUIRED: 'true'
+      COOKIE_SECURE: 'true'
+      CORS_ORIGIN: https://training.eduk12.top,https://survey.eduk12.top
+      TRUST_PROXY_HOPS: '1'
+      SURVEY_WORKSPACE_ENABLED: 'true'
+      SURVEY_PUBLICATION_ENABLED: 'true'
+      SURVEY_ANALYTICS_ENABLED: 'true'
+      COGNITIVE_MODULE_ENABLED: 'true'
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      HEAVY_PROCESSING_ENABLED: 'false'
+      VIDEO_PROCESSING_ENABLED: 'false'
+      LOG_LEVEL: warn
+      ASSET_MIGRATION_COMPLETE: 'false'
+      SCALE_AUTHORING_ISOLATED: '1'
+      SCALE_AUTHORING_ACCEPTANCE: '1'
+      MEASUREMENT_BROWSER_ISOLATED: '1'
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U ptool -d ptool" --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4.11-bookworm
+        ports: ['6379:6379']
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: restore only the fixed successful backend artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B .github/scripts/scale-authoring-reuse.py restore
+      - name: restore fixed successful frontend compiled bytes without any checks repeated
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -B - <<'RESTORE'
+          import importlib.util
+          from pathlib import Path
+          spec=importlib.util.spec_from_file_location('reuse','.github/scripts/scale-authoring-reuse.py');r=importlib.util.module_from_spec(spec);spec.loader.exec_module(r)
+          r.FRONTEND_SOURCE='312cfdc95e53b243b2de0bea9beb5ca3a3132a81';r.FRONTEND_RUN=39568118300
+          r.ARTIFACTS['currentFrontend']=(12331006469,'scale-frontend-'+r.FRONTEND_SOURCE,127333116,'7831a3475b02758eedf25fd74c10c46fcec717a1fdfd8e175cfc082bf62d5c68')
+          r.download('currentFrontend',Path('scale-authoring-evidence'))
+          RESTORE
+      - name: verify original backend and current frontend artifacts
+        run: |
+          set -euo pipefail
+          for component in backend frontend; do
+            expected_head=9b289945f5c782b98027ff7228c344c362247e17; expected_run=39565491980
+            if [ "$component" = backend ]; then expected_head=48defee0aecbc36138ad624f729b9a7cbb634efc; expected_run=39560427570; fi
+            test "$(cat scale-authoring-evidence/$component-head.txt)" = "$expected_head"
+            test "$(cat scale-authoring-evidence/$component-run.txt)" = "$expected_run"
+            (cd scale-authoring-evidence; sha256sum -c "$component-build.sha256")
+            tar -xzf "scale-authoring-evidence/$component-build.tgz" -C "server-version/$component"
+          done
+          (cd scale-authoring-evidence; sha256sum -c backend-images.sha256)
+          gzip -dc scale-authoring-evidence/backend-images.tgz | docker load
+          for target in builder runtime; do
+            original="scale-authoring-backend-$target:48defee0aecbc36138ad624f729b9a7cbb634efc"
+            docker tag "$original" "scale-authoring-backend-$target:$GITHUB_SHA"
+            test "$(docker image inspect "$original" --format '{{.Id}}')" = "$(docker image inspect "scale-authoring-backend-$target:$GITHUB_SHA" --format '{{.Id}}')"
+          done
+          test -f server-version/backend/dist/index.js
+          test -f server-version/frontend/dist/index.html
+      - name: prepare official browser and native runtime libraries
+        run: |
+          node server-version/backend/node_modules/playwright-core/cli.js install --with-deps chromium
+          sudo apt-get install -y --no-install-recommends libnss3-tools
+          npm ci --prefix .github/release-tools
+      - name: create disposable private paths and fresh encryption keys
+        run: |
+          python3 - <<'PY'
+          import json,os,secrets
+          from pathlib import Path
+          private=Path(os.environ['RUNNER_TEMP'])/'scale-authoring-private'
+          private.mkdir(mode=0o700)
+          values={'SCALE_AUTHORING_FIXTURE_FILE':private/'fixture.json','MEASUREMENT_BROWSER_FIXTURE_DIR':private,'SCALE_AUTHORING_EVIDENCE_DIR':Path(os.environ['GITHUB_WORKSPACE'])/'scale-authoring-evidence/browser','SCALE_AUTHORING_BACKEND_ROOT':Path(os.environ['GITHUB_WORKSPACE'])/'server-version/backend','UPLOAD_DIR':private/'uploads','EXPORT_DIR':private/'exports','CREDENTIAL_HANDOFF_DIR':private/'credentials'}
+          for key in ['JWT_SECRET','DATA_ENCRYPTION_KEY','DATA_PSEUDONYM_KEY','ASSET_SIGNING_SECRET','SURVEY_MFA_ENCRYPTION_KEY']:
+            values[key]=secrets.token_hex(32);print('::add-mask::'+values[key])
+          for key in ['SCALE_AUTHORING_EVIDENCE_DIR','UPLOAD_DIR','EXPORT_DIR','CREDENTIAL_HANDOFF_DIR']: Path(values[key]).mkdir(parents=True,exist_ok=True,mode=0o700)
+          with open(os.environ['GITHUB_ENV'],'a') as output:
+            for k,v in values.items():output.write(f'{k}={v}\n')
+          PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: scale-training-reuse-${{ github.sha }}
+          path: ${{ runner.temp }}/scale-authoring-private/training-source
+      - name: stage fixed Training evidence without executing its journey
+        run: |
+          python3 -B - <<'STAGE'
+          import hashlib,json,os,shutil
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'scale-authoring-private'
+          source=root/'training-source'; receipt=json.loads((source/'training-reuse.json').read_text())
+          shutil.copyfile(source/'training-reuse.json',root/'training-reuse.json')
+          for shot in receipt['screenshots']:
+              assert '/' not in shot['file'] and '\\' not in shot['file']
+              file=source/'browser'/shot['file'];assert hashlib.sha256(file.read_bytes()).hexdigest()==shot['sha256']
+              shutil.copyfile(file,Path(os.environ['SCALE_AUTHORING_EVIDENCE_DIR'])/shot['file'])
+          with open(os.environ['GITHUB_ENV'],'a') as output:
+              output.write('SCALE_AUTHORING_BROWSER_MODE=survey-only-fixed-training\n')
+              output.write('SCALE_AUTHORING_TRAINING_REUSE_FILE='+str(root/'training-reuse.json')+'\n')
+          STAGE
+      - name: initialize empty synthetic schema only
+        run: |
+          bash .github/scripts/scale-authoring-backend.sh node scripts/pr24-migration-preflight.mjs
+          bash .github/scripts/scale-authoring-backend.sh node node_modules/prisma/build/index.js migrate deploy
+      - name: seed browser prerequisites and restricted API role
+        run: |
+          set +e
+          bash .github/scripts/scale-authoring-backend.sh node --import tsx scripts/scale-authoring-browser-fixture.ts > "$RUNNER_TEMP/scale-authoring-private/fixture.private.log" 2>&1
+          status=$?
+          set -e
+          FIXTURE_EXIT="$status" python3 - <<'PYDIAG'
+          import json,os,re
+          from pathlib import Path
+          text=(Path(os.environ['RUNNER_TEMP'])/'scale-authoring-private'/'fixture.private.log').read_text()
+          for line in text.splitlines():
+              if line.startswith('::add-mask::'): print(line)
+          matches=re.findall(r'Synthetic scale prerequisite failed: (AssertionError|Error|TypeError|PrismaClientKnownRequestError|PrismaClientInitializationError)\b',text)
+          status=int(os.environ['FIXTURE_EXIT'])
+          report={'phase':'synthetic-fixture-and-restricted-runtime-role','exitStatus':status,'errorName':matches[-1] if matches else None,'message':'Fixture and restricted runtime-role prerequisites completed' if status==0 else 'Synthetic fixture or restricted runtime-role prerequisite failed; raw SQL and credential-bearing output withheld'}
+          Path('scale-authoring-evidence/fixture-diagnostic.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report))
+          PYDIAG
+          exit "$status"
+      - name: require current explicit private-profile trust approval
+        run: |
+          node -e "if(require('./.github/scripts/scale-authoring-bindings.json').browserProfileTrustApproved!==true)throw new Error('This round profile-only CA approval is still pending; no TLS trust action executed')"
+          echo 'MEASUREMENT_BROWSER_EPHEMERAL_CA_APPROVED=true' >> "$GITHUB_ENV"
+      - name: isolated profile-only test TLS (never system trust)
+        run: python3 -B .github/scripts/measurement-browser-ci.py tls
+      - name: serve exact compiled backend and frontend through existing loopback proxy
+        run: |
+          set -euo pipefail
+          bash .github/scripts/scale-authoring-backend.sh serve
+          nohup setsid node server-version/e2e/measurement-browser-proxy.cjs > "$RUNNER_TEMP/scale-authoring-private/proxy.private.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/scale-proxy.pid"
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --max-time 2 http://127.0.0.1:3000/ready >/dev/null && curl --noproxy '*' --fail --silent --max-time 2 --cacert "$MEASUREMENT_BROWSER_TLS_CA" --resolve training.eduk12.top:3189:127.0.0.1 https://training.eduk12.top:3189/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          python3 - <<'PYREADY'
+          import json,os,subprocess
+          from pathlib import Path
+          result=subprocess.run(['docker','inspect','scale-authoring-api','--format','{{json .State}}'],text=True,capture_output=True)
+          try: state=json.loads(result.stdout)
+          except (ValueError,TypeError):state={}
+          report={'phase':'compiled-api-and-loopback-https-readiness','exitStatus':1,'message':'Compiled API or loopback HTTPS proxy did not become ready within the bounded wait','apiContainerStatus':state.get('Status'),'apiExitCode':state.get('ExitCode'),'apiOOMKilled':state.get('OOMKilled')}
+          for name,url in [('api','http://127.0.0.1:3000/ready'),('proxy','https://training.eduk12.top:3189/')]:
+              args=['curl','--noproxy','*','--silent','--max-time','2','--output','/dev/null','--write-out','%{http_code}']
+              if name=='proxy':args+=['--cacert',os.environ['MEASUREMENT_BROWSER_TLS_CA'],'--resolve','training.eduk12.top:3189:127.0.0.1']
+              response=subprocess.run(args+[url],text=True,capture_output=True)
+              report[name+'CurlExit']=response.returncode;report[name+'HttpStatus']=response.stdout if response.stdout.isdigit() else 'unavailable'
+          Path('scale-authoring-evidence/readiness-diagnostic.json').write_text(json.dumps(report,indent=2));print(json.dumps(report))
+          PYREADY
+          echo '::error::Compiled services failed readiness; see sanitized readiness-diagnostic.json'
+          exit 1
+      - name: real two-entry editing, final feedback and visual checks
+        run: |
+          node server-version/e2e/scale-authoring-feedback-browser.cjs
+          node .github/scripts/scale-authoring-scope.mjs browser-report
+      - name: stop this run processes and clear private credentials
+        if: always()
+        run: |
+          set +e
+          status=0
+          containers="$(docker ps -a --format '{{.Names}}')" || status=1
+          if grep -qx scale-authoring-api <<< "$containers"; then docker rm -f scale-authoring-api >/dev/null || status=1; fi
+          remaining="$(docker ps -a --format '{{.Names}}')" || status=1
+          if grep -qx scale-authoring-api <<< "$remaining"; then status=1; fi
+          file="$RUNNER_TEMP/scale-proxy.pid"
+          if [ -f "$file" ]; then
+            pid="$(cat "$file")"
+            if [[ "$pid" =~ ^[0-9]+$ ]] && [ "$pid" -gt 1 ]; then
+              kill -- -"$pid" 2>/dev/null
+              for attempt in $(seq 1 10); do kill -0 -- -"$pid" 2>/dev/null || break; sleep 0.2; done
+              if kill -0 -- -"$pid" 2>/dev/null; then kill -KILL -- -"$pid" 2>/dev/null; sleep 0.2; fi
+              if kill -0 -- -"$pid" 2>/dev/null; then status=1; fi
+            else status=1; fi
+          fi
+          rm -rf "$RUNNER_TEMP/scale-authoring-private" || status=1
+          test ! -e "$RUNNER_TEMP/scale-authoring-private" || status=1
+          mkdir -p scale-authoring-evidence
+          printf '{"exitStatus":%s,"privateMaterialRemoved":%s}\n' "$status" "$([ ! -e "$RUNNER_TEMP/scale-authoring-private" ] && echo true || echo false)" > scale-authoring-evidence/cleanup.json
+          exit "$status"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scale-browser-${{ github.sha }}
+          path: |
+            scale-authoring-evidence/fixture-diagnostic.json
+            scale-authoring-evidence/readiness-diagnostic.json
+            scale-authoring-evidence/cleanup.json
+            scale-authoring-evidence/browser/
+          retention-days: 3
+          if-no-files-found: error
+  sast:
+    needs: scope
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: github/codeql-action/init@ce5e7eeac396d720fe2d802714996c8ce561e311
+        with:
+          languages: javascript-typescript
+          config: 'paths: [server-version/e2e/scale-authoring-feedback-browser.cjs, server-version/e2e/scale-authoring-feedback-browser.test.cjs, .github/scripts/scale-authoring-scope.mjs, .github/scripts/scale-authoring-scope.test.mjs]'
+          ram: 3500
+          threads: 2
+      - uses: github/codeql-action/analyze@ce5e7eeac396d720fe2d802714996c8ce561e311
+        with:
+          upload: never
+          upload-database: false
+          output: scale-authoring-evidence/sarif
+      - name: verify same original CodeQL tool and query pack
+        run: python3 -B .github/scripts/scale-authoring-reuse.py sast-tools
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scale-sast-${{ github.sha }}
+          path: |
+            scale-authoring-evidence/sarif
+          retention-days: 3
+          if-no-files-found: error
+  ready:
+    needs: [scope, browser, sast]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: exact selected jobs must all succeed (not merge/deploy permission)
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          node -e "const n=JSON.parse(process.env.RESULTS);for(const [k,v] of Object.entries(n))if(v.result!=='success')throw new Error(k+': '+v.result);console.log('Bounded scale authoring checks passed; no merge or production authorization')"
