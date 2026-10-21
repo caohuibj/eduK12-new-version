@@ -12,6 +12,10 @@ const cwd='/app',out=process.env.WORKSPACE_EVIDENCE;
 assert(out);mkdirSync(out,{recursive:true});
 const run=(cmd,args)=>execFileSync(cmd,args,{cwd,stdio:'inherit',env:{...process.env,NODE_ENV:'test'},timeout:600000});
 let tests=binding[component+'Tests'];assert(Array.isArray(tests)&&tests.length);
+if(component==='backend'){
+ tests=['src/__tests__/measurement-content/runtime-table-policy.test.ts'];
+ assert(readFileSync(resolve(root,'server-version/backend/scripts/runtime-role-defaults.sql')).equals(readFileSync('/app/scripts/runtime-role-defaults.sql')));
+}
 assert(tests.every(p=>/^src\/[A-Za-z0-9_./-]+\.test\.tsx?$/.test(p)));
 if(component==='frontend'){
  for(const[source,target]of [['server-version/cognitive-randomization-golden-v1.json','/cognitive-randomization-golden-v1.json'],['server-version/backend/src/modules/cognitive/generated/identities.json','/backend/src/modules/cognitive/generated/identities.json']]){

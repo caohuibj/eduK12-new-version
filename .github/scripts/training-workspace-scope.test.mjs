@@ -47,10 +47,14 @@ test('integrated candidate fails on missing extra drift duplicate mode and base 
  for(const mutate of [e=>e.pop(),e=>e.push({...e[0]}),e=>e.push({file:'unexpected.ts',status:'A',oldMode:'000000',newMode:'100644'}),e=>{e[0].newMode='120000'},e=>{e.find(x=>x.file===integratedBindingPath).status='M'}]){const e=integratedEntries();mutate(e);assert.throws(()=>integratedWorkspacePlan(e,integratedBinding.base,head,integratedRead))}
  assert.throws(()=>integratedWorkspacePlan(integratedEntries(),head,head,integratedRead));assert.throws(()=>integratedWorkspacePlan(integratedEntries(),integratedBinding.base,head,()=>head));
 });
-test('integrated execution retains each unique compiler, artifacts, exact PG and real browser gates',()=>{
+test('integrated continuation restores exact products and runs only missing qualification',()=>{
  const workflow=readFileSync(new URL('../workflows/ci-training-workspace-integrated.yml',import.meta.url),'utf8');
- assert.equal((workflow.match(/run: bash \.github\/scripts\/training-workspace-integrated-build.sh/g)||[]).length,1);
- assert.match(workflow,/component: \[backend, frontend\]/);assert.match(workflow,/restore-images/);
+ assert.doesNotMatch(workflow,/integrated-build.sh|component: \[backend, frontend\]|docker build/);
+ assert.equal((workflow.match(/integrated-evidence.mjs resume/g)||[]).length,2);
+ assert.match(workflow,/runtime-role-defaults.sql,target=\/app\/scripts\/runtime-role-defaults.sql,readonly/);
+ assert.equal((workflow.match(/integrated-checks.mjs\" backend/g)||[]).length,1);
+ assert.doesNotMatch(workflow,/integrated-checks.mjs\" frontend/);
+ assert.match(workflow,/backend-runtime:\$TRAINING_WORKSPACE_BACKEND_IMAGE_HEAD/);
  assert.match(workflow,/if-no-files-found: error/);assert.match(workflow,/connection_limit=4/);
  assert.match(workflow,/integrated-checks.mjs" postgres/);assert.match(workflow,/integrated-recovery.mjs restore/);
  assert.match(workflow,/browserProfileTrustApproved!==true/);assert.match(workflow,/integration-browser.cjs/);assert.match(workflow,/integrated-evidence.mjs browser-report/);
@@ -71,4 +75,11 @@ const browserOptions={head,runId:'327',directory:'/synthetic-only',read(file){co
 test('browser validator accepts only its complete declared matrix and fails every missing or unsafe result',()=>{
  assert.equal(verifyIntegratedWorkspaceBrowser(sampleBrowser(),browserOptions).checkpoints,8);
  for(const change of [r=>r.status='FAIL',r=>r.sourceCommit='b'.repeat(40),r=>r.checks.pop(),r=>r.accessibility[0].violations.push({id:'synthetic'}),r=>r.layoutChecks[0].overflow=true,r=>r.keyboard[0].reached=false,r=>r.screenshots.pop(),r=>r.blockedExternalRequests=1,r=>r.frozen.allAtOnceRequalified=true,r=>r.lifecycle.sourcePrivateEndpointsDenied=false]){const r=sampleBrowser();change(r);assert.throws(()=>verifyIntegratedWorkspaceBrowser(r,browserOptions))}
+});
+
+import {validatePriorTests} from './training-workspace-integrated-evidence.mjs';
+test('prior qualification rejects missing suite, hook failure and failed assertions',()=>{
+ const report={testResults:[{name:'/app/src/unchanged.test.ts',status:'passed',assertionResults:[{status:'passed'}]}]};
+ assert.equal(validatePriorTests(report,['src/unchanged.test.ts'],'frontend'),1);
+ for(const mutate of [r=>r.testResults[0].status='failed',r=>r.testResults[0].assertionResults[0].status='pending',r=>r.testResults=[],r=>r.testResults.push(r.testResults[0])]){const r=structuredClone(report);mutate(r);assert.throws(()=>validatePriorTests(r,['src/unchanged.test.ts'],'frontend'))}
 });

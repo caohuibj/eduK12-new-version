@@ -17,10 +17,6 @@ jobs:
   component:
     runs-on: ubuntu-24.04
     timeout-minutes: 20
-    strategy:
-      fail-fast: false
-      matrix:
-        component: [backend, frontend]
     env:
       PLAN: ${{ inputs.plan }}
     steps:
@@ -33,21 +29,15 @@ jobs:
           node-version: '24.21.0'
       - name: exact complete source and generator input boundary
         run: node .github/scripts/training-workspace-integrated-evidence.mjs scope
-      - name: compile once and retain actual builder and runtime bytes
-        shell: bash
-        run: bash .github/scripts/training-workspace-integrated-build.sh ${{ matrix.component }}
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: workspace-integrated-${{ matrix.component }}-images-${{ github.sha }}
-          path: training-workspace-integrated-images/${{ matrix.component }}/
-          retention-days: 3
-          if-no-files-found: error
+      - name: accept fixed official prior qualifications and restore immutable image bytes
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node .github/scripts/training-workspace-integrated-evidence.mjs resume
       - name: affected contracts in the same locked native environment
         shell: bash
         run: |
           docker run --rm --workdir /app -e CI=true -e TZ=UTC -e GITHUB_SHA -e GITHUB_RUN_ID -e GITHUB_WORKSPACE \
-            -e WORKSPACE_EVIDENCE=/evidence/${{ matrix.component }} -e COGNITIVE_MODULE_ENABLED=true -e MATERIAL_GRANTS_ENABLED=true \
+            -e WORKSPACE_EVIDENCE=/evidence/backend -e COGNITIVE_MODULE_ENABLED=true -e MATERIAL_GRANTS_ENABLED=true \
             -e DATABASE_URL=postgresql://synthetic:synthetic@127.0.0.1:1/synthetic \
             -e JWT_SECRET=synthetic-workspace-only-no-real-credential \
             -e DATA_ENCRYPTION_KEY=1111111111111111111111111111111111111111111111111111111111111111 \
@@ -55,28 +45,29 @@ jobs:
             -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" -v "$GITHUB_WORKSPACE/training-workspace-integrated-evidence:/evidence" \
             --mount "type=bind,source=$GITHUB_WORKSPACE/server-version/cognitive-randomization-golden-v1.json,target=/cognitive-randomization-golden-v1.json,readonly" \
             --mount "type=bind,source=$GITHUB_WORKSPACE/server-version/backend/src/modules/cognitive/generated/identities.json,target=/backend/src/modules/cognitive/generated/identities.json,readonly" \
-            training-workspace-integrated-${{ matrix.component }}-builder:$GITHUB_SHA \
-            node "$GITHUB_WORKSPACE/.github/scripts/training-workspace-integrated-checks.mjs" ${{ matrix.component }}
+            --mount "type=bind,source=$GITHUB_WORKSPACE/server-version/backend/scripts/runtime-role-defaults.sql,target=/app/scripts/runtime-role-defaults.sql,readonly" \
+            training-workspace-integrated-backend-builder:$TRAINING_WORKSPACE_BACKEND_IMAGE_HEAD \
+            node "$GITHUB_WORKSPACE/.github/scripts/training-workspace-integrated-checks.mjs" backend
       - name: audit complete locked dependencies
         shell: bash
         run: |
           set +e
-          docker run --rm training-workspace-integrated-${{ matrix.component }}-builder:$GITHUB_SHA npm audit --audit-level=high --json > training-workspace-integrated-evidence/${{ matrix.component }}/audit.json
+          docker run --rm training-workspace-integrated-backend-builder:$TRAINING_WORKSPACE_BACKEND_IMAGE_HEAD npm audit --audit-level=high --json > training-workspace-integrated-evidence/backend/audit.json
           status=$?
           set -e
-          node -e 'const r=require("./training-workspace-integrated-evidence/${{ matrix.component }}/audit.json");console.log(JSON.stringify({vulnerabilities:r.metadata?.vulnerabilities,errorCode:r.error?.code}))'
+          node -e 'const r=require("./training-workspace-integrated-evidence/backend/audit.json");console.log(JSON.stringify({vulnerabilities:r.metadata?.vulnerabilities,errorCode:r.error?.code}))'
           exit "$status"
       - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
         with:
           version: v0.70.0
           cache: false
       - name: scan actual runtime image
-        run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output training-workspace-integrated-evidence/${{ matrix.component }}/runtime-scan.json training-workspace-integrated-${{ matrix.component }}-runtime:$GITHUB_SHA
+        run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output training-workspace-integrated-evidence/backend/runtime-scan.json training-workspace-integrated-backend-runtime:$TRAINING_WORKSPACE_BACKEND_IMAGE_HEAD
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: workspace-integrated-${{ matrix.component }}-reports-${{ github.sha }}
-          path: training-workspace-integrated-evidence/${{ matrix.component }}/
+          name: workspace-integrated-backend-reports-${{ github.sha }}
+          path: training-workspace-integrated-evidence/backend/
           retention-days: 3
           if-no-files-found: error
   connected:
@@ -118,24 +109,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - uses: actions/download-artifact@v4
-        with:
-          name: workspace-integrated-backend-images-${{ github.sha }}
-          path: training-workspace-integrated-images/backend
+      - name: restore the same fixed original product bytes without rebuilding
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: node .github/scripts/training-workspace-integrated-evidence.mjs resume
       - uses: actions/download-artifact@v4
         with:
           name: workspace-integrated-backend-reports-${{ github.sha }}
           path: training-workspace-integrated-evidence/backend
-      - uses: actions/download-artifact@v4
-        with:
-          name: workspace-integrated-frontend-images-${{ github.sha }}
-          path: training-workspace-integrated-images/frontend
-      - uses: actions/download-artifact@v4
-        with:
-          name: workspace-integrated-frontend-reports-${{ github.sha }}
-          path: training-workspace-integrated-evidence/frontend
-      - name: verify same-run bytes and exact immutable image identities
-        run: node .github/scripts/training-workspace-integrated-evidence.mjs restore-images
       - name: prepare isolated services and private prerequisite directory
         shell: bash
         run: |
@@ -225,10 +206,10 @@ jobs:
           echo 'MEASUREMENT_BROWSER_EPHEMERAL_CA_APPROVED=true' >> "$GITHUB_ENV"
       - name: isolated profile-only HTTPS trust
         run: python3 -B .github/scripts/measurement-browser-ci.py tls
-      - name: exact newly compiled frontend bytes
+      - name: exact accepted frontend compiled bytes
         shell: bash
         run: |
-          id="$(docker create training-workspace-integrated-frontend-runtime:$GITHUB_SHA)"
+          id="$(docker create training-workspace-integrated-frontend-runtime:$TRAINING_WORKSPACE_FRONTEND_IMAGE_HEAD)"
           mkdir -p server-version/frontend/dist
           docker cp "$id:/usr/share/nginx/html/." server-version/frontend/dist/
           docker rm "$id"
@@ -253,7 +234,7 @@ jobs:
           docker run -d --name training-workspace-integrated-proxy --network host --user 0 --cap-drop ALL --cap-add NET_BIND_SERVICE \
             -e GITHUB_ACTIONS=true -e GITHUB_SHA -e GITHUB_RUN_ID -e MEASUREMENT_BROWSER_ISOLATED=1 -e MEASUREMENT_BROWSER_EPHEMERAL_CA_APPROVED=true --env-file "$RUNNER_TEMP/training-workspace-integrated-private/proxy-tls.env" \
             -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
-            "training-workspace-integrated-backend-runtime:$GITHUB_SHA" node "$GITHUB_WORKSPACE/server-version/e2e/training-workspace-integrated-proxy.cjs" || startup_failed=1
+            "training-workspace-integrated-backend-runtime:$TRAINING_WORKSPACE_BACKEND_IMAGE_HEAD" node "$GITHUB_WORKSPACE/server-version/e2e/training-workspace-integrated-proxy.cjs" || startup_failed=1
           for attempt in $(seq 1 60); do
             if [ "$startup_failed" = 1 ]; then break; fi
             if curl --fail --silent --max-time 2 http://127.0.0.1:3000/ready >/dev/null && curl --noproxy '*' --fail --silent --max-time 2 --cacert "$MEASUREMENT_BROWSER_TLS_CA" --resolve training.eduk12.top:443:127.0.0.1 https://training.eduk12.top/__ci_marker >/dev/null; then exit 0; fi

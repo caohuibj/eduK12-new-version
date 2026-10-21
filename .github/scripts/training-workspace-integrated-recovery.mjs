@@ -8,7 +8,7 @@ const evidence=resolve(root,'training-workspace-integrated-evidence/postgres');
 const binding=JSON.parse(readFileSync(resolve(root,'.github/scripts/training-workspace-integrated-bindings.json')));
 assert.equal(process.env.GITHUB_ACTIONS,'true');assert.equal(process.env.TRAINING_WORKSPACE_ISOLATED,'1');
 const url=new URL(process.env.DATABASE_URL);assert.equal(url.hostname,'127.0.0.1');assert.equal(url.pathname,'/ptool');assert(Number(url.searchParams.get('connection_limit'))>=4);
-const container='training-workspace-integrated-postgres',image='training-workspace-integrated-backend-builder:'+process.env.GITHUB_SHA;
+const container='training-workspace-integrated-postgres',image='training-workspace-integrated-backend-builder:'+(process.env.TRAINING_WORKSPACE_BACKEND_IMAGE_HEAD||process.env.GITHUB_SHA);
 mkdirSync(evidence,{recursive:true});
 const run=(cmd,args,options={})=>execFileSync(cmd,args,{encoding:'utf8',...options});
 const sql=(text,db='ptool')=>run('docker',['exec','-i',container,'psql','-X','-v','ON_ERROR_STOP=1','-U','ptool','-d',db,'-At'],{input:text}).trim();
