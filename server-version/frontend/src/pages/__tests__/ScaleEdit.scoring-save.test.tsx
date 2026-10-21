@@ -90,7 +90,7 @@ describe('计分定义保存与回读', () => {
     const user = userEvent.setup()
     render(<MemoryRouter><ScaleEdit /></MemoryRouter>)
     await user.click(await screen.findByRole('button', { name: '计分' }))
-    expect(screen.getByLabelText('total_1 指标标识')).toBeDisabled()
+    expect(screen.getByText('total_1', { selector: 'code' }).closest('details')).not.toHaveAttribute('open')
     expect(screen.getByPlaceholderText('输入报告中显示的名称，如：学习投入总分')).toHaveValue('总分')
     expect(screen.getByText(/未勾选：仍会计分/)).toBeInTheDocument()
     const direction = screen.getByRole('combobox', { name: /分数方向/ })

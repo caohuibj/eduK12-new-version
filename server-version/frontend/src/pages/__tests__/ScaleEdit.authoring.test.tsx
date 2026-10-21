@@ -36,6 +36,7 @@ describe('Training scale authoring additions', () => {
   it('shares Likert options and persists quality items only outside score selection', async () => {
     const user = userEvent.setup(); render(<MemoryRouter><ScaleEdit /></MemoryRouter>)
     await user.click(await screen.findByRole('button', { name: '题目' }))
+    await user.click(screen.getByText('更多录入方式与辅助题'))
     await user.click(screen.getByRole('button', { name: '插入注意力题' }))
     await user.click(screen.getByRole('button', { name: '插入社会赞许性题（测谎题）' }))
     const target = screen.getByRole('combobox', { name: /目标选项/ })
@@ -60,6 +61,7 @@ describe('Training scale authoring additions', () => {
     })
     const user = userEvent.setup(); render(<MemoryRouter><ScaleEdit /></MemoryRouter>)
     await user.click(await screen.findByRole('button', { name: '题目' }))
+    await user.click(screen.getByText('更多录入方式与辅助题'))
     await user.click(screen.getByRole('button', { name: '插入注意力题' }))
     await user.click(screen.getByRole('button', { name: '保存题目' }))
     await screen.findByText(/保存后的题型或反馈配置与当前编辑不一致/)
