@@ -1,0 +1,280 @@
+name: Scale authoring bounded acceptance
+# Ordinary work/scale-authoring-feedback-20261021 pushes never activate CI.
+# The publisher creates this exact activation branch only after final review.
+on:
+  push:
+    branches: [ci/scale-authoring-feedback-20261021]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: scale-authoring-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  CI: 'true'
+  TZ: UTC
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  scope:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - run: node .github/scripts/scale-authoring-scope.mjs scope
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scale-scope-${{ github.sha }}
+          path: scale-authoring-evidence/scope.json
+          retention-days: 3
+          if-no-files-found: error
+  build:
+    needs: scope
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [backend, frontend]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - run: bash server-version/scripts/ci-disk-preflight.sh
+      - name: one locked build and cached runtime assembly
+        run: bash .github/scripts/scale-authoring-build.sh '${{ matrix.component }}'
+      - name: exact affected contracts, types, lint and dependency audit
+        env:
+          NODE_ENV: test
+          DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+          DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+          JWT_SECRET: isolated-ci-scale-authoring-test-secret-20261021
+          ASSET_SIGNING_SECRET: isolated-ci-scale-authoring-asset-secret-20261021
+        run: |
+          docker run --rm --env HOME=/tmp --env NPM_CONFIG_CACHE=/tmp/npm-cache --user "$(id -u):$(id -g)" -e CI -e NODE_ENV -e GITHUB_WORKSPACE -e DATA_ENCRYPTION_KEY -e DATA_PSEUDONYM_KEY -e JWT_SECRET -e ASSET_SIGNING_SECRET -e NPM_CONFIG_REGISTRY -e NPM_CONFIG_REPLACE_REGISTRY_HOST -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" "scale-authoring-${{ matrix.component }}-builder:$GITHUB_SHA" bash .github/scripts/scale-authoring-checks.sh '${{ matrix.component }}' 
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: existing runtime HIGH and CRITICAL threshold
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: scale-authoring-${{ matrix.component }}-runtime:${{ github.sha }}
+          format: json
+          output: scale-authoring-evidence/${{ matrix.component }}-runtime-scan.json
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+          cache: 'false'
+          skip-setup-trivy: true
+      - name: retain exact built inputs (no consumer recompilation)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scale-${{ matrix.component }}-${{ github.sha }}
+          path: scale-authoring-evidence/${{ matrix.component }}-*
+          retention-days: 3
+          if-no-files-found: error
+          compression-level: 0
+  browser:
+    needs: [scope, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      DATABASE_URL_ADMIN: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      REDIS_URL: redis://localhost:6379
+      PORT: '3000'
+      SOCKET_REDIS_REQUIRED: 'true'
+      COOKIE_SECURE: 'true'
+      CORS_ORIGIN: https://training.eduk12.top,https://survey.eduk12.top
+      TRUST_PROXY_HOPS: '1'
+      SURVEY_WORKSPACE_ENABLED: 'true'
+      SURVEY_PUBLICATION_ENABLED: 'true'
+      SURVEY_ANALYTICS_ENABLED: 'true'
+      COGNITIVE_MODULE_ENABLED: 'true'
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      HEAVY_PROCESSING_ENABLED: 'false'
+      VIDEO_PROCESSING_ENABLED: 'false'
+      LOG_LEVEL: warn
+      ASSET_MIGRATION_COMPLETE: 'false'
+      SCALE_AUTHORING_ISOLATED: '1'
+      SCALE_AUTHORING_ACCEPTANCE: '1'
+      MEASUREMENT_BROWSER_ISOLATED: '1'
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U ptool -d ptool" --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4.11-bookworm
+        ports: ['6379:6379']
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: scale-backend-${{ github.sha }}
+          path: scale-authoring-evidence
+      - uses: actions/download-artifact@v4
+        with:
+          name: scale-frontend-${{ github.sha }}
+          path: scale-authoring-evidence
+      - name: verify and restore same-run artifacts
+        run: |
+          set -euo pipefail
+          for component in backend frontend; do
+            test "$(cat scale-authoring-evidence/$component-head.txt)" = "$GITHUB_SHA"
+            test "$(cat scale-authoring-evidence/$component-run.txt)" = "$GITHUB_RUN_ID"
+            (cd scale-authoring-evidence; sha256sum -c "$component-build.sha256")
+            tar -xzf "scale-authoring-evidence/$component-build.tgz" -C "server-version/$component"
+          done
+          (cd scale-authoring-evidence; sha256sum -c backend-images.sha256)
+          gzip -dc scale-authoring-evidence/backend-images.tgz | docker load
+          test -f server-version/backend/dist/index.js
+          test -f server-version/frontend/dist/index.html
+      - name: prepare official browser and native runtime libraries
+        run: |
+          node server-version/backend/node_modules/playwright-core/cli.js install --with-deps chromium
+          sudo apt-get install -y --no-install-recommends libnss3-tools
+          npm ci --prefix .github/release-tools
+      - name: create disposable private paths and fresh encryption keys
+        run: |
+          python3 - <<'PY'
+          import json,os,secrets
+          from pathlib import Path
+          private=Path(os.environ['RUNNER_TEMP'])/'scale-authoring-private'
+          private.mkdir(mode=0o700)
+          values={'SCALE_AUTHORING_FIXTURE_FILE':private/'fixture.json','MEASUREMENT_BROWSER_FIXTURE_DIR':private,'SCALE_AUTHORING_EVIDENCE_DIR':Path(os.environ['GITHUB_WORKSPACE'])/'scale-authoring-evidence/browser','SCALE_AUTHORING_BACKEND_ROOT':Path(os.environ['GITHUB_WORKSPACE'])/'server-version/backend','UPLOAD_DIR':private/'uploads','EXPORT_DIR':private/'exports','CREDENTIAL_HANDOFF_DIR':private/'credentials'}
+          for key in ['JWT_SECRET','DATA_ENCRYPTION_KEY','DATA_PSEUDONYM_KEY','ASSET_SIGNING_SECRET','SURVEY_MFA_ENCRYPTION_KEY']:
+            values[key]=secrets.token_hex(32);print('::add-mask::'+values[key])
+          for key in ['SCALE_AUTHORING_EVIDENCE_DIR','UPLOAD_DIR','EXPORT_DIR','CREDENTIAL_HANDOFF_DIR']: Path(values[key]).mkdir(parents=True,exist_ok=True,mode=0o700)
+          with open(os.environ['GITHUB_ENV'],'a') as output:
+            for k,v in values.items():output.write(f'{k}={v}\n')
+          PY
+      - name: initialize empty synthetic schema only
+        run: |
+          bash .github/scripts/scale-authoring-backend.sh node scripts/pr24-migration-preflight.mjs
+          bash .github/scripts/scale-authoring-backend.sh node node_modules/prisma/build/index.js migrate deploy
+      - name: new exact PostgreSQL persistence and image permission case
+        env:
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+        run: |
+          bash .github/scripts/scale-authoring-backend.sh node node_modules/vitest/vitest.mjs run src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts -t 'persists quality-item raw answers and frozen image feedback without scoring quality items' --reporter=json --outputFile="$GITHUB_WORKSPACE/scale-authoring-evidence/postgres.json"
+          node "$GITHUB_WORKSPACE/.github/scripts/scale-authoring-scope.mjs" report "$GITHUB_WORKSPACE/scale-authoring-evidence/postgres.json" filtered
+          node - <<'JS'
+          const assert=require('node:assert/strict');const r=require(process.env.GITHUB_WORKSPACE+'/scale-authoring-evidence/postgres.json');const a=r.testResults.flatMap(x=>x.assertionResults).filter(x=>x.title==='persists quality-item raw answers and frozen image feedback without scoring quality items');assert.equal(a.length,1);assert.equal(a[0].status,'passed');assert.equal(r.numPassedTests,1);
+          JS
+      - name: seed browser prerequisites and restricted API role
+        run: bash .github/scripts/scale-authoring-backend.sh node --import tsx scripts/scale-authoring-browser-fixture.ts
+      - name: require current explicit private-profile trust approval
+        run: |
+          node -e "if(require('./.github/scripts/scale-authoring-bindings.json').browserProfileTrustApproved!==true)throw new Error('This round profile-only CA approval is still pending; no TLS trust action executed')"
+          echo 'MEASUREMENT_BROWSER_EPHEMERAL_CA_APPROVED=true' >> "$GITHUB_ENV"
+      - name: isolated profile-only test TLS (never system trust)
+        run: python3 -B .github/scripts/measurement-browser-ci.py tls
+      - name: serve exact compiled backend and frontend through existing loopback proxy
+        run: |
+          set -euo pipefail
+          bash .github/scripts/scale-authoring-backend.sh serve
+          nohup setsid node server-version/e2e/measurement-browser-proxy.cjs > "$RUNNER_TEMP/scale-proxy.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/scale-proxy.pid"
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --max-time 2 http://127.0.0.1:3000/ready >/dev/null && curl --noproxy '*' --fail --silent --max-time 2 --cacert "$MEASUREMENT_BROWSER_TLS_CA" --resolve training.eduk12.top:3189:127.0.0.1 https://training.eduk12.top:3189/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          echo '::error::Compiled services failed readiness; private logs are not uploaded'
+          exit 1
+      - name: real two-entry editing, final feedback and visual checks
+        run: |
+          node server-version/e2e/scale-authoring-feedback-browser.cjs
+          node .github/scripts/scale-authoring-scope.mjs browser-report
+      - name: stop this run processes and clear private credentials
+        if: always()
+        run: |
+          set +e
+          status=0
+          containers="$(docker ps -a --format '{{.Names}}')" || status=1
+          if grep -qx scale-authoring-api <<< "$containers"; then docker rm -f scale-authoring-api >/dev/null || status=1; fi
+          remaining="$(docker ps -a --format '{{.Names}}')" || status=1
+          if grep -qx scale-authoring-api <<< "$remaining"; then status=1; fi
+          file="$RUNNER_TEMP/scale-proxy.pid"
+          if [ -f "$file" ]; then
+            pid="$(cat "$file")"
+            if [[ "$pid" =~ ^[0-9]+$ ]] && [ "$pid" -gt 1 ]; then
+              kill -- -"$pid" 2>/dev/null
+              for attempt in $(seq 1 10); do kill -0 -- -"$pid" 2>/dev/null || break; sleep 0.2; done
+              if kill -0 -- -"$pid" 2>/dev/null; then kill -KILL -- -"$pid" 2>/dev/null; sleep 0.2; fi
+              if kill -0 -- -"$pid" 2>/dev/null; then status=1; fi
+            else status=1; fi
+          fi
+          rm -rf "$RUNNER_TEMP/scale-authoring-private" || status=1
+          test ! -e "$RUNNER_TEMP/scale-authoring-private" || status=1
+          mkdir -p scale-authoring-evidence
+          printf '{"exitStatus":%s,"privateMaterialRemoved":%s}\n' "$status" "$([ ! -e "$RUNNER_TEMP/scale-authoring-private" ] && echo true || echo false)" > scale-authoring-evidence/cleanup.json
+          exit "$status"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scale-browser-${{ github.sha }}
+          path: |
+            scale-authoring-evidence/postgres.json
+            scale-authoring-evidence/cleanup.json
+            scale-authoring-evidence/browser/
+          retention-days: 3
+          if-no-files-found: error
+  sast:
+    needs: scope
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: javascript-typescript
+          config: 'paths: [server-version/backend/src, server-version/backend/scripts, server-version/frontend/src, server-version/e2e, .github/scripts]'
+          ram: 3500
+          threads: 2
+      - uses: github/codeql-action/analyze@v3
+        with:
+          upload: never
+          upload-database: false
+          output: scale-authoring-evidence/sarif
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scale-sast-${{ github.sha }}
+          path: scale-authoring-evidence/sarif
+          retention-days: 3
+          if-no-files-found: error
+  ready:
+    needs: [scope, build, browser, sast]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: exact selected jobs must all succeed (not merge/deploy permission)
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          node -e "const n=JSON.parse(process.env.RESULTS);for(const [k,v] of Object.entries(n))if(v.result!=='success')throw new Error(k+': '+v.result);console.log('Bounded scale authoring checks passed; no merge or production authorization')"

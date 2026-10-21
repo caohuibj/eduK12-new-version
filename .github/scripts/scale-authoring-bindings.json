@@ -1,0 +1,501 @@
+{
+  "scope": "scale-authoring-feedback-20261021",
+  "base": "d3b51288a66843168480af99fe451914a76a020f",
+  "files": {
+    ".github/scripts/scale-authoring-backend.sh": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3828fc5c635d37f78c4b8ca718704c77bd6a531e"
+    },
+    ".github/scripts/scale-authoring-bindings.json": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": null
+    },
+    ".github/scripts/scale-authoring-build.sh": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "5e42dfe3488547f7361fa3c8f0e340169a5e7f0f"
+    },
+    ".github/scripts/scale-authoring-checks.sh": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "df98b2e1809f1b68e7ee22472bfcec24e16e9d5e"
+    },
+    ".github/scripts/scale-authoring-scope.mjs": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f0d7bcc03c265118d8a3a612d85b073d6e1a3138"
+    },
+    ".github/scripts/scale-authoring-scope.test.mjs": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8fe5921f8cc5640716b7270552353e0ecfabb4d9"
+    },
+    ".github/workflows/ci-scale-authoring.yml": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "adc5903ed91ef30fec0a75e6c121d42bb8113cf6"
+    },
+    "docs/release/scale-authoring-ci-20261021.md": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "35ecc885721695be024274c0456dcc939e9b74b6"
+    },
+    "server-version/backend/scripts/scale-authoring-browser-fixture.ts": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e57bb5315fb87c50eaa1a49138c6d08136d02a14"
+    },
+    "server-version/backend/src/__tests__/assessment-media/raw-feedback-media.test.ts": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "628513b514e31527eca964f090a7c8f9a2c67ad3"
+    },
+    "server-version/backend/src/__tests__/composite/composite-report.projector.test.ts": {
+      "before": "0affc3f07e675e3321a0d170619299081287c288",
+      "after": "94dea8c6a6db044cba99db9806f73028615ac3bf"
+    },
+    "server-version/backend/src/__tests__/composite/export.reader.integration.test.ts": {
+      "before": "56daec8f0dff200e33024cc237a4144c87d5899d",
+      "after": "6e30262d4bea1c464a31c3a9a3ffad85e79390f8"
+    },
+    "server-version/backend/src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts": {
+      "before": "925095758d54c8f20709208cdee5e124f223cb3e",
+      "after": "4c5b407c94071bdb82c924b88dc449e9f7908e07"
+    },
+    "server-version/backend/src/__tests__/measurement-content/survey-participant-feedback.test.ts": {
+      "before": "865a77d8b19d3504de89842243de06cd0fc61ca8",
+      "after": "336e35c749177ca2cca0804b8429d4d3a5f883bd"
+    },
+    "server-version/backend/src/__tests__/scale/composite-export-projection.test.ts": {
+      "before": "56c97069ff727f8f3a89e3736311daa09d9a48c2",
+      "after": "637627ec5dba30ceedaa803c3ab330b137740bae"
+    },
+    "server-version/backend/src/__tests__/scale/export-projection-policy.test.ts": {
+      "before": "4d750ef42ba504714003ac0e48acd51bc71fd879",
+      "after": "320da9a9b862de9ca8efb1c453846e8c022f0910"
+    },
+    "server-version/backend/src/__tests__/scale/raw-feedback-compact-collection.test.ts": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "2124471b0f1caf00b9b75e02037b8e6f2e4b6364"
+    },
+    "server-version/backend/src/__tests__/scale/scale-authoring-feedback.test.ts": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8725482854faff2e65296c21b761de09ac60c6a7"
+    },
+    "server-version/backend/src/__tests__/scale/scale-export-provenance.test.ts": {
+      "before": "de0986677e28448b8417fd46db4ef89f903cddda",
+      "after": "215666ee7b6a22174fac9140b156460b74adc4ef"
+    },
+    "server-version/backend/src/__tests__/survey/research-raw-descriptors.contract.test.ts": {
+      "before": "f5819646e30396d54ef7f5a4e25b8d63555a08f8",
+      "after": "f8e291620fae7d1307f51e74045f377e3cad327f"
+    },
+    "server-version/backend/src/controllers/publicQuestionnaireController.ts": {
+      "before": "5e710b6b6be8bd6e881583f92d3e524cdc90f52e",
+      "after": "3bb12bbcd907202ef19feeb17b78004401019f0b"
+    },
+    "server-version/backend/src/controllers/questionnaireController.ts": {
+      "before": "de66bbb94121fe3c5fee4476634b805f9a757f90",
+      "after": "33767e7df17b7a66bb86500bae6204b63adb7e9b"
+    },
+    "server-version/backend/src/controllers/scaleController.ts": {
+      "before": "88d4fdd90148720702355ab7c291fa545855baa9",
+      "after": "a392e16cb00cd761be3a88cdfcdc472da856aa07"
+    },
+    "server-version/backend/src/controllers/scaleImageController.ts": {
+      "before": "360fa9891041346f671a4dc94eae0085b0c008d1",
+      "after": "f5628aca424aa51c1c590546cf0d5305bf0fab5f"
+    },
+    "server-version/backend/src/modules/assessment-bundle/sources.ts": {
+      "before": "a0f67474413ad28ef80e0fefc915866c25bff24e",
+      "after": "864aba79b11a808cc253358ea1b17988895d7bd2"
+    },
+    "server-version/backend/src/modules/assessment-runtime/compact-scale-facts.ts": {
+      "before": "ffb55b45436a7e60c5ee5a3a0da645c173219b72",
+      "after": "f32a343850a5ae23bec88948d6e3f3a57025bf14"
+    },
+    "server-version/backend/src/modules/assessment-runtime/unified-aggregate-finalizer.service.ts": {
+      "before": "bd369bf85035c745c1fbd269e903ba2ce342937f",
+      "after": "a13ee56b946b7c7e4ceb165ef10ad07a490137b5"
+    },
+    "server-version/backend/src/modules/assessment-runtime/unit-result.ts": {
+      "before": "efe3ee9c3a61c17c7d53c4554d34a8faa1f07e83",
+      "after": "ee7dbc191330ec075b467c60b20e3baf6210432a"
+    },
+    "server-version/backend/src/modules/composite/compact-composite-report.ts": {
+      "before": "fbdedcf821cb62a48303d0c3ca503c5a52ad2ea2",
+      "after": "0c724198c5de7bef55287d8b61827e12d6f07813"
+    },
+    "server-version/backend/src/modules/composite/composite-export-projection.ts": {
+      "before": "86031e83e806d0421f663b31ecee532c9322997d",
+      "after": "8bcda0d96703df6bf6386bb211aceff670a95d13"
+    },
+    "server-version/backend/src/modules/composite/composite-export.service.ts": {
+      "before": "4e7234a1217de4bc8766c69407fd2856955597e2",
+      "after": "608f506b8ebe86525e07a85090c6e22b4ef20107"
+    },
+    "server-version/backend/src/modules/composite/composite-report.projector.ts": {
+      "before": "e87434fa5d71a412f7e35e3fab1d00e92dbcbfb6",
+      "after": "0f9dc13eb0d9d51a0ca1c8ed6029d22444910e75"
+    },
+    "server-version/backend/src/modules/composite/composite.controller.ts": {
+      "before": "36b167ec4f3f340b9a292c07f7f3681902356f68",
+      "after": "5acf61efa78ae19200511dbdb24f8c8a1e98c6c5"
+    },
+    "server-version/backend/src/modules/composite/composite.public.routes.ts": {
+      "before": "f9f75121e3559c1e5001c528c7a3443bc70e1e7a",
+      "after": "a143fab5ea09b620164b7532383e2339549cf4e9"
+    },
+    "server-version/backend/src/modules/composite/composite.routes.ts": {
+      "before": "a2008cfd8dd0829205fdd02ff067d13a24dcd51f",
+      "after": "244e054f08448948749271b09a47c95fa2e9738e"
+    },
+    "server-version/backend/src/modules/composite/composite.service.ts": {
+      "before": "95abf6347368ab3078c77a8cf4a25b04b72d6163",
+      "after": "bd2930affcfba1dcee6a18d8ff008bd27ec0869b"
+    },
+    "server-version/backend/src/modules/reporting/compact-questionnaire-report.ts": {
+      "before": "c5859f6f834706a394539a00299974e7d3651a8d",
+      "after": "a0d673484ab6a40e04a3cf9d83c3f5858ffe248b"
+    },
+    "server-version/backend/src/modules/reporting/questionnaire-collection-report.ts": {
+      "before": "bc4c6ece9c3c2195ac92a12ae21e4afd267935de",
+      "after": "615a9e349b00bfd4b659bf17fb269054d11e9e9e"
+    },
+    "server-version/backend/src/modules/reporting/report-image-delivery.ts": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e9f0aba042fb86ba91dc73c1831f9e0492fa52b9"
+    },
+    "server-version/backend/src/modules/reporting/scale-unit-report.ts": {
+      "before": "d741100924df6131ff9de80e6e73cd047ec3bd99",
+      "after": "a65aa1a03e56dbb1355ee0de348167a5f5ee00fe"
+    },
+    "server-version/backend/src/modules/scale/projection/scale-result.projector.ts": {
+      "before": "fabd3c79cd5e89bbb59f145c54459c6d512a00da",
+      "after": "25e734a6a0fc87dc5f78d92ec9840e69a569a2a4"
+    },
+    "server-version/backend/src/modules/scale/projection/types.ts": {
+      "before": "3898de816f55bb061d58aa6c6579b023b3ba51a0",
+      "after": "1722a322ae6fc3f245bd7d329d072e207445306c"
+    },
+    "server-version/backend/src/modules/scale/raw-score-feedback-preview.ts": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "4d3cad9d4cec86e560b886361227cb28dd30a9dc"
+    },
+    "server-version/backend/src/modules/scale/raw-score-feedback.ts": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "6567e01a0cbb027b0098e1b5cc4165c6af673829"
+    },
+    "server-version/backend/src/modules/scale/scale-definition.ts": {
+      "before": "82f2c30aa0873c50ac1572b518c5310443b4aaa3",
+      "after": "95d4a7cc52b863fd2e613eb8eca07bfc5e649a21"
+    },
+    "server-version/backend/src/modules/scale/scale-image-retention.ts": {
+      "before": "eacbc5a63e3ab895a49a8c881572d29942d80292",
+      "after": "a1d6767d179ea54194e0d0a8d936b93b439eee5d"
+    },
+    "server-version/backend/src/modules/scale/scale-result.ts": {
+      "before": "0767e76bd83f850820d3dcd7bcd12248ab60cc3b",
+      "after": "f7114f4040176df66b5101007571b221caea1a37"
+    },
+    "server-version/backend/src/modules/scale/scale-scoring.ts": {
+      "before": "6c9c3c2259900f75fa6c204a730d8d65f7424dc1",
+      "after": "ce315802e4d6fdffb494c54658d4bb5ac019781d"
+    },
+    "server-version/backend/src/modules/survey/analytics.raw-export.ts": {
+      "before": "1917616268c21e0097bdc95f174864e012e4638d",
+      "after": "19b60841338fa6a8c47d2c51066e5ae3163932ed"
+    },
+    "server-version/backend/src/modules/survey/analytics.source.ts": {
+      "before": "da81063acee7db72515564302c2bb0315c06918d",
+      "after": "8ab30e7bc92cd20ad183dad7721e27b3ed4ae5ec"
+    },
+    "server-version/backend/src/modules/survey/builder.compiler.ts": {
+      "before": "6a15c7cc1f185d507193c059cc82ee9557e663ce",
+      "after": "54de0ce099ed2607340bde56d6e288ae7dd22099"
+    },
+    "server-version/backend/src/modules/survey/builder.definition.ts": {
+      "before": "213354961196cf457ed455a5a11106af511e6e6c",
+      "after": "2eb7787092aa78901dbb0cff3991db59a5fc8a9e"
+    },
+    "server-version/backend/src/modules/survey/builder.routes.ts": {
+      "before": "686cd559cdb810b9a9f80bb23fcb30769edced59",
+      "after": "fe93d4b9183bfa76435b136571e43a1972ed91ba"
+    },
+    "server-version/backend/src/modules/survey/builder.service.ts": {
+      "before": "c28b1aa415547cddae47410f3b1b441acc654843",
+      "after": "52f9e71c3f87a80a7c5bb4620c328fd015b4fabe"
+    },
+    "server-version/backend/src/modules/survey/final.compute.ts": {
+      "before": "0a2285462822251f21711ba01d615a09965d601b",
+      "after": "49cec878a4d07af46f3f436bd32ba876cdc22fdf"
+    },
+    "server-version/backend/src/modules/survey/media.references.ts": {
+      "before": "043f9b185522617dc526c29fe4c4fdf0078761d9",
+      "after": "37de5e5efe40ff173be33d00666121dcfd442a35"
+    },
+    "server-version/backend/src/modules/survey/participant-feedback.ts": {
+      "before": "533e18230bb0c3908d6bcb1e5178cf0e89ff09c2",
+      "after": "6aa91697b128cc2ecf0569fe3523acbb925cbf5f"
+    },
+    "server-version/backend/src/modules/survey/public.routes.ts": {
+      "before": "e442413c08dd96e395e973b982b11fc50559ad6b",
+      "after": "cd9914459a5dede06f6fed95f016edfd74ec9609"
+    },
+    "server-version/backend/src/routes/public.ts": {
+      "before": "82f260d242b1b0eb7123a79a7d5f361d710350b2",
+      "after": "8e5effa87dcf79e0f7f037a2fad9c8bd9bd4a296"
+    },
+    "server-version/backend/src/routes/questionnaires.ts": {
+      "before": "3128f2950bf2f0da7e27fac462653042211b1230",
+      "after": "b4ac898b76f0bb9bafa693c4c2222ec5c0e9a301"
+    },
+    "server-version/backend/src/routes/scales.ts": {
+      "before": "3037c21fbfebd3edbf414418f454b83f894a23a6",
+      "after": "4f5d9c5c2a228ec473734554977f8b05955d0f97"
+    },
+    "server-version/backend/src/routes/uploads.ts": {
+      "before": "677a8d1f65a19f970d6bf82b57cd6cd920269011",
+      "after": "ab76c3138ce83adfb8272b31f105b9ba8a69f63e"
+    },
+    "server-version/backend/src/services/exportProjectionPolicy.ts": {
+      "before": "28bc41ab5b1f57ac74e7442b17e86620544e5675",
+      "after": "20f2b17a1775628d716eb2cec89e8bdce85a8e32"
+    },
+    "server-version/backend/src/services/exportService.legacy.ts": {
+      "before": "663c765e0c49bf0897c39f5602e968d8a22f50d5",
+      "after": "36a6113c6f204ccd1f34ec5d878070e27009ff67"
+    },
+    "server-version/backend/src/services/qualityItemExport.ts": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "f9d9235251f5e8425404f73d07d5f16b8bd9a6a3"
+    },
+    "server-version/e2e/scale-authoring-feedback-browser.cjs": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "c676d8b9081f7b2d60d9c59cfe8063e494aad1bf"
+    },
+    "server-version/frontend/src/modules/composite/CompositeReportPage.tsx": {
+      "before": "ececf212fdaeb80af244be4317908fe0e49c6623",
+      "after": "57538bcd7dcc34173155390d6ad6e5c24f79a8fa"
+    },
+    "server-version/frontend/src/modules/reporting/ScaleUnitReportCard.legacy.tsx": {
+      "before": "641482eb27c0d836b31033131d5ff38c2f0ea61a",
+      "after": "09275fba97785f08afb62b5ae89d99024faa7baf"
+    },
+    "server-version/frontend/src/modules/reporting/ScaleUnitReportCard.tsx": {
+      "before": "abda1c644cde4ff63dd26b880c937ae2a7068b65",
+      "after": "52a6857e02a3f7839aa6027c10673199d5634776"
+    },
+    "server-version/frontend/src/modules/reporting/TrainingRawScoreFeedback.tsx": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "a554b8bf1fd577b6328668f87b7ef52536f67d5d"
+    },
+    "server-version/frontend/src/modules/reporting/__tests__/ScaleFeedback.page-transports.test.tsx": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "602fd4ee6faa79230ecfb9c067fc01b01ab11128"
+    },
+    "server-version/frontend/src/modules/reporting/__tests__/TrainingRawScoreFeedback.test.tsx": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "2a62bd22989a92da2328a6ec0a76d7dc6e29cbae"
+    },
+    "server-version/frontend/src/modules/reporting/types.ts": {
+      "before": "6787979d2ed499cd34c2c40f90ef1f915fefdcae",
+      "after": "06414415bb7891ac73362a22554a764284efa885"
+    },
+    "server-version/frontend/src/modules/scale/__tests__/rawScoreFeedback.test.ts": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e9da39332a2ff0235ecb96e69faaa6a2f427ef14"
+    },
+    "server-version/frontend/src/modules/scale/rawScoreFeedback.ts": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "201598ee8f1075eb0a568515bcc5e622507c122b"
+    },
+    "server-version/frontend/src/pages/ScaleEdit.css": {
+      "before": "0afe4bb0efe02c691f7b3893eb6431dc92a32593",
+      "after": "0557af515f7492c18a60805bb1f9fd20d24f1cc3"
+    },
+    "server-version/frontend/src/pages/ScaleEdit.tsx": {
+      "before": "43d8fc6700d871dd6df493c28c03b181565084f8",
+      "after": "a4dae864054fe6fe3af57d7fac38096d0c1f1482"
+    },
+    "server-version/frontend/src/pages/TrainingFeedbackImageField.tsx": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "839aaf94bac879eae7872b05c4e7d9a403ccb587"
+    },
+    "server-version/frontend/src/pages/TrainingRawScoreFeedbackEditor.tsx": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "bffad14a4294ed52b5be17de7eed88027f512106"
+    },
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.authoring.test.tsx": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "0f39ef0341e8922936ee9abff1dd61b3d60191b4"
+    },
+    "server-version/frontend/src/pages/__tests__/TrainingFeedbackImageField.test.tsx": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "3cd2a1852a0dd2e73fffc09d76a5040257893fc1"
+    },
+    "server-version/frontend/src/pages/public/PublicQuestionnaireResult.tsx": {
+      "before": "ff2f19142bae537697950788d32b2e8208639abb",
+      "after": "9d901ecde0267d4b81dae3fcae074fa6cde71e95"
+    },
+    "server-version/frontend/src/pages/student/QuestionnaireResult.tsx": {
+      "before": "9cf85e59ea548ef8c0ba643dc99c7165caaade09",
+      "after": "cc8cab14ed9cf3da8803a9e88540f5086756c215"
+    },
+    "server-version/frontend/src/pages/student/ScaleResult.tsx": {
+      "before": "63295d5d2ffb3823a51de1c0cefdc050a52a0567",
+      "after": "3861adbfae514574eb0f1a10d2417a22be237686"
+    },
+    "server-version/frontend/src/survey/ResearchScaleEditor.feedback.test.tsx": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "03fbf9c4d9667f4717ecfc2e40b91407bf7784cb"
+    },
+    "server-version/frontend/src/survey/ResearchScaleEditor.tsx": {
+      "before": "2c6e6bdc4f9305cf65c516c0f98d72c9c0098cfe",
+      "after": "09b87fe58fe7db04e3a760cf6c422a03ffce9120"
+    },
+    "server-version/frontend/src/survey/SurveyBuilder.tsx": {
+      "before": "e52174ac20623cadeac1c2dfd519978f83e8ceac",
+      "after": "24cdbc5e92cc4530ddfcb8cf1406e43537af3f5e"
+    },
+    "server-version/frontend/src/survey/SurveyImageField.tsx": {
+      "before": "e04be9a0cf7d56469bf734b881e174edd19ee3c5",
+      "after": "e226f32b60de8541f08bbfc6a9bdd98d25570bdf"
+    },
+    "server-version/frontend/src/survey/SurveyParticipantImage.feedback.test.tsx": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "0f39cf03e3b894d232934045b289851d6fbba582"
+    },
+    "server-version/frontend/src/survey/SurveyParticipantImage.tsx": {
+      "before": "7a3c60993716bd2807a2c62f44ceec7cc1228f32",
+      "after": "140a66ba050c0c0d4183ceff011a42addbb7fbd1"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx": {
+      "before": "2af6d3b12d9450d2c5bc50becdc404ffe3a61e01",
+      "after": "99f6502afda12c651ce3a6df47263b88322fec3b"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "before": "03763bdf929467be10ecc69d77167a158b9bbc3c",
+      "after": "b23da9e0ee265ab28b7d8210f2524249ce0208a5"
+    },
+    "server-version/frontend/src/survey/SurveyRawScoreFeedbackEditor.tsx": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "8016341ea892b5834c6d84ef36956909df87a117"
+    },
+    "server-version/frontend/src/survey/SurveyRawScoreFeedbackEditor.upload.test.tsx": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "e9aff020b12053e1fa61cff5b2d3a13112cc7b97"
+    },
+    "server-version/frontend/src/survey/builder.types.ts": {
+      "before": "9411ef9870430e0f01acab4c0a425ed9628513ae",
+      "after": "a531cca1dbea149440bed82c70b9cc5f959607c1"
+    }
+  },
+  "tests": {
+    "backend": [
+      "src/__tests__/assessment-media/raw-feedback-media.test.ts",
+      "src/__tests__/composite/composite-report.projector.test.ts",
+      "src/__tests__/composite/export.reader.integration.test.ts",
+      "src/__tests__/measurement-content/survey-participant-feedback.test.ts",
+      "src/__tests__/scale/composite-export-projection.test.ts",
+      "src/__tests__/scale/export-projection-policy.test.ts",
+      "src/__tests__/scale/raw-feedback-compact-collection.test.ts",
+      "src/__tests__/scale/scale-authoring-feedback.test.ts",
+      "src/__tests__/scale/scale-export-provenance.test.ts",
+      "src/__tests__/survey/research-raw-descriptors.contract.test.ts",
+      "src/__tests__/scale/scale-v2.test.ts",
+      "src/__tests__/scale/scale-projection.test.ts",
+      "src/__tests__/assessment-runtime/compact-assessment-storage.test.ts",
+      "src/__tests__/assessment-runtime/frozen-scale-v2-artifact-cache.test.ts",
+      "src/__tests__/assessment-runtime/v32-1.contract.test.ts",
+      "src/__tests__/questionnaire/collection-report.controller.test.ts",
+      "src/__tests__/survey/research-builder.contract.test.ts"
+    ],
+    "frontend": [
+      "src/modules/reporting/__tests__/ScaleFeedback.page-transports.test.tsx",
+      "src/modules/reporting/__tests__/TrainingRawScoreFeedback.test.tsx",
+      "src/modules/scale/__tests__/rawScoreFeedback.test.ts",
+      "src/pages/__tests__/ScaleEdit.authoring.test.tsx",
+      "src/pages/__tests__/TrainingFeedbackImageField.test.tsx",
+      "src/survey/ResearchScaleEditor.feedback.test.tsx",
+      "src/survey/SurveyParticipantImage.feedback.test.tsx",
+      "src/survey/SurveyPublicApp.final.test.tsx",
+      "src/survey/SurveyRawScoreFeedbackEditor.upload.test.tsx",
+      "src/pages/__tests__/ScaleEdit.scoring-save.test.tsx",
+      "src/pages/__tests__/ScaleEdit.readonly.test.tsx",
+      "src/pages/__tests__/ScaleEdit.copy-publish.test.tsx",
+      "src/pages/student/__tests__/ScaleResult.report-shell.test.tsx",
+      "src/modules/reporting/__tests__/ScaleResult.test.ts",
+      "src/survey/SurveyImageField.test.tsx"
+    ]
+  },
+  "frontendLint": [
+    "src/modules/composite/CompositeReportPage.tsx",
+    "src/modules/reporting/ScaleUnitReportCard.legacy.tsx",
+    "src/modules/reporting/ScaleUnitReportCard.tsx",
+    "src/modules/reporting/TrainingRawScoreFeedback.tsx",
+    "src/modules/reporting/__tests__/ScaleFeedback.page-transports.test.tsx",
+    "src/modules/reporting/__tests__/TrainingRawScoreFeedback.test.tsx",
+    "src/modules/reporting/types.ts",
+    "src/modules/scale/__tests__/rawScoreFeedback.test.ts",
+    "src/modules/scale/rawScoreFeedback.ts",
+    "src/pages/ScaleEdit.tsx",
+    "src/pages/TrainingFeedbackImageField.tsx",
+    "src/pages/TrainingRawScoreFeedbackEditor.tsx",
+    "src/pages/__tests__/ScaleEdit.authoring.test.tsx",
+    "src/pages/__tests__/TrainingFeedbackImageField.test.tsx",
+    "src/pages/public/PublicQuestionnaireResult.tsx",
+    "src/pages/student/QuestionnaireResult.tsx",
+    "src/pages/student/ScaleResult.tsx",
+    "src/survey/ResearchScaleEditor.feedback.test.tsx",
+    "src/survey/ResearchScaleEditor.tsx",
+    "src/survey/SurveyBuilder.tsx",
+    "src/survey/SurveyImageField.tsx",
+    "src/survey/SurveyParticipantImage.feedback.test.tsx",
+    "src/survey/SurveyParticipantImage.tsx",
+    "src/survey/SurveyPublicApp.final.test.tsx",
+    "src/survey/SurveyPublicApp.tsx",
+    "src/survey/SurveyRawScoreFeedbackEditor.tsx",
+    "src/survey/SurveyRawScoreFeedbackEditor.upload.test.tsx",
+    "src/survey/builder.types.ts"
+  ],
+  "browserProfileTrustApproved": true,
+  "browserProfileTrustApproval": "User confirmation Sentinel_d001b8ceda8881918cbf6eba669aa1de, 2026-10-21; this disposable CI profile and loopback hosts only",
+  "testReasons": {
+    "backend": {
+      "src/__tests__/assessment-media/raw-feedback-media.test.ts": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/__tests__/composite/composite-report.projector.test.ts": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/__tests__/composite/export.reader.integration.test.ts": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/__tests__/measurement-content/survey-participant-feedback.test.ts": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/__tests__/scale/composite-export-projection.test.ts": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/__tests__/scale/export-projection-policy.test.ts": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/__tests__/scale/raw-feedback-compact-collection.test.ts": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/__tests__/scale/scale-authoring-feedback.test.ts": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/__tests__/scale/scale-export-provenance.test.ts": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/__tests__/survey/research-raw-descriptors.contract.test.ts": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/__tests__/scale/scale-v2.test.ts": "Changed definition/hash/scoring must preserve legacy identities and standard score behavior.",
+      "src/__tests__/scale/scale-projection.test.ts": "Changed Scale result projector must preserve disclosure capabilities.",
+      "src/__tests__/assessment-runtime/compact-assessment-storage.test.ts": "Changed compact facts and report serialization must preserve raw/canonical identity and historical decoding.",
+      "src/__tests__/assessment-runtime/frozen-scale-v2-artifact-cache.test.ts": "Changed definition projection must preserve immutable frozen V2 artifacts and cache binding.",
+      "src/__tests__/assessment-runtime/v32-1.contract.test.ts": "Changed canonical unit-result envelope must retain identity and rejection contracts.",
+      "src/__tests__/questionnaire/collection-report.controller.test.ts": "Changed collection report read must preserve owner/role filtering.",
+      "src/__tests__/survey/research-builder.contract.test.ts": "Changed Survey compiler/definition must preserve old native authoring validation."
+    },
+    "frontend": {
+      "src/modules/reporting/__tests__/ScaleFeedback.page-transports.test.tsx": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/modules/reporting/__tests__/TrainingRawScoreFeedback.test.tsx": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/modules/scale/__tests__/rawScoreFeedback.test.ts": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/pages/__tests__/ScaleEdit.authoring.test.tsx": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/pages/__tests__/TrainingFeedbackImageField.test.tsx": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/survey/ResearchScaleEditor.feedback.test.tsx": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/survey/SurveyParticipantImage.feedback.test.tsx": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/survey/SurveyPublicApp.final.test.tsx": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/survey/SurveyRawScoreFeedbackEditor.upload.test.tsx": "Changed contract; first run against official exact locked dependencies (local adjacent dependencies differ).",
+      "src/pages/__tests__/ScaleEdit.scoring-save.test.tsx": "Changed editor must save existing scoring without breaking choices.",
+      "src/pages/__tests__/ScaleEdit.readonly.test.tsx": "Changed editor must not unlock catalog/readonly content.",
+      "src/pages/__tests__/ScaleEdit.copy-publish.test.tsx": "Changed editor must preserve source copy/publish authorization.",
+      "src/pages/student/__tests__/ScaleResult.report-shell.test.tsx": "Changed student result must retain real report shell and permissions.",
+      "src/modules/reporting/__tests__/ScaleResult.test.ts": "Changed result rendering must retain old score projection.",
+      "src/survey/SurveyImageField.test.tsx": "Changed shared upload UI must preserve ordinary image handling and recovery."
+    }
+  },
+  "frozenProductPathCount": 84,
+  "additionalPostgresPathCount": 1,
+  "controlPathCount": 10,
+  "selectedRegressionCount": {
+    "backend": 17,
+    "frontend": 15
+  }
+}
