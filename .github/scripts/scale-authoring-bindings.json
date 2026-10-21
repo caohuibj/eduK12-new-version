@@ -2,6 +2,26 @@
   "scope": "scale-authoring-feedback-20261021",
   "base": "d3b51288a66843168480af99fe451914a76a020f",
   "files": {
+    ".github/scripts/exact-candidate-bindings.json": {
+      "before": "6315381e0390fd8c81d7b4618c9f73b2e5fe35b3",
+      "after": "316da999d8be5953f246ccc517872c990db76785"
+    },
+    ".github/scripts/exact-candidate-scope.mjs": {
+      "before": "3458d57069fa2dfefff2bcfd8399fdc8a4e0de72",
+      "after": "4c55cbad0ff5e31eedcee46cf78abd6a27a4c901"
+    },
+    ".github/scripts/exact-candidate.test.mjs": {
+      "before": "c92a4328c976a591267897fad66d87c4689ba0e8",
+      "after": "120102edc38ba354f12b63f93b48abbe4b6914ca"
+    },
+    ".github/scripts/scale-authoring-admission.py": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "69cfba4fc750c03c8a490152e8caad7d9c35f84a"
+    },
+    ".github/scripts/scale-authoring-admission.test.py": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "81352cba05a45e0665243b3daa9235feccdf37bc"
+    },
     ".github/scripts/scale-authoring-backend.sh": {
       "before": "0000000000000000000000000000000000000000",
       "after": "3828fc5c635d37f78c4b8ca718704c77bd6a531e"
@@ -34,6 +54,10 @@
       "before": "0000000000000000000000000000000000000000",
       "after": "b0fb9bdacd3c4498737a0a40b61194515377ae7b"
     },
+    ".github/workflows/ci-exact-candidate.yml": {
+      "before": "7fe0a5dab0b3ea3d2227ecafdd8cb7f86898195c",
+      "after": "d92f8f4a6a210041a2f101486f3e9fe9c6e021fe"
+    },
     ".github/workflows/ci-scale-authoring-browser-diagnostic.yml": {
       "before": "0000000000000000000000000000000000000000",
       "after": "ef96d95cfae1b8bac3b3d97ab067ed019ffb777e"
@@ -45,6 +69,14 @@
     ".github/workflows/ci-scale-authoring.yml": {
       "before": "0000000000000000000000000000000000000000",
       "after": "15d0c2dea4ad0278b045407c385a99f7017a4d42"
+    },
+    ".github/workflows/ci.yml": {
+      "before": "4d068eae84d25718b43f11d79e49a71be09db83c",
+      "after": "dde48df4adc9f60842711e18534ad10427150761"
+    },
+    "docs/release/README.md": {
+      "before": "6919863b196d21811f1d1226ccc364af526d0d95",
+      "after": "8f366a1e8fc07a3bbcc4bf7a9d6f520406afc49a"
     },
     "docs/release/scale-authoring-ci-20261021.md": {
       "before": "0000000000000000000000000000000000000000",
@@ -498,7 +530,7 @@
   },
   "frozenProductPathCount": 87,
   "additionalPostgresPathCount": 1,
-  "controlPathCount": 15,
+  "controlPathCount": 23,
   "selectedRegressionCount": {
     "backendReused": 17,
     "frontendReusedCurrent": 8,

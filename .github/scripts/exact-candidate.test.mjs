@@ -182,7 +182,7 @@ test('only new qualification jobs are wired, no old test rerun in dedicated work
   for(const forbidden of ['npm run build','vitest','tsc --noEmit','npm test','node --test'])
     assert.equal(workflow.includes(forbidden),false,forbidden);
   assert.match(workflow,/needs: \[admission, browser\]/);
-  assert.match(workflow,/needs: \[admission, browser, runtime, mac\]/);
+  assert.match(workflow,/needs: \[admission, browser, runtime, mac, scale\]/);
   assert.match(workflow,/selected.includes\(name\)\?'success':'skipped'/);
   const main=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
   assert.match(main,/needs: \[scope, exact-candidate,/);
@@ -205,6 +205,7 @@ test('all fifteen manual probes and scope/merge refuse the two bounded branches 
     assert.match(condition,/!\(github.event_name == 'workflow_dispatch' && contains/);
     assert.match(condition,/work\/measurement-version-final-20261020/);
     assert.match(condition,/work\/training-mac-ui-final-20261020/);
+    assert.match(condition,/work\/scale-authoring-feedback-20261021/);
   }
 });
 
@@ -264,7 +265,7 @@ test('all automatic workflow entry points are inventoried and standalone exact b
   const dir=new URL('../workflows/',import.meta.url);
   const automatic=readdirSync(dir).filter(p=>/\.ya?ml$/.test(p)).filter(p=>
     /\n  (push|pull_request|pull_request_review|pull_request_target|workflow_run|schedule|release):/.test(readFileSync(new URL(p,dir),'utf8').split('\njobs:')[0])).sort();
-  assert.deepEqual(automatic,['ci-measurement-browser.yml','ci-shared-assessment-foundation.yml','ci.yml','situational-publication.yml']);
+  assert.deepEqual(automatic,['ci-measurement-browser.yml','ci-scale-authoring-browser-diagnostic.yml','ci-scale-authoring-evidence.yml','ci-scale-authoring.yml','ci-shared-assessment-foundation.yml','ci.yml','situational-publication.yml']);
   const workflow=readFileSync(new URL('situational-publication.yml',dir),'utf8');
   assert.match(workflow,/situationalPublicationBoundary/);
   assert.match(workflow,/if: contains\(fromJSON\('\["work\/measurement-version-final-20261020","work\/training-mac-ui-final-20261020"\]'/);
@@ -275,9 +276,9 @@ test('all automatic workflow entry points are inventoried and standalone exact b
 test('optional legacy step plans remain parseable before false route conditions are applied',()=>{
   const main=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
   const expressions=[...main.matchAll(/fromJSON\((steps\.scope\.outputs\.[a-z_]+)([^)]*)\)/g)];
-  assert.equal(expressions.length,1);
+  assert.equal(expressions.length,2);
   for(const [,name,fallback] of expressions) {
-    assert.equal(name,'steps.scope.outputs.homepage_copy_plan');
+    assert(['steps.scope.outputs.homepage_copy_plan','steps.scope.outputs.exact_candidate_plan'].includes(name));
     assert.equal(fallback," || '{}'");
   }
   const outputs=exactCandidateOutputs(plan);
@@ -295,7 +296,7 @@ test('restored route requires real runtime qualification and cannot select diagn
   assert.doesNotMatch(runtime,/if: false/);
   assert.doesNotMatch(workflow,/schema-diagnostic:/);
   assert.match(runtime,/exact-candidate-runtime.py --plan exact-candidate-plan.json --phase all/);
-  assert.match(workflow,/needs: \[admission, browser, runtime, mac\]/);
+  assert.match(workflow,/needs: \[admission, browser, runtime, mac, scale\]/);
   assert.match(workflow,/selected.includes\(name\)\?'success':'skipped'/);
 });
 
@@ -315,4 +316,18 @@ test('Mac catalog accepts only exact reviewed follow-redirects dependency pairs'
   assert.throws(()=>verifyUnchangedCatalogInputs(inputs,inputs,after));
   assert.throws(()=>verifyUnchangedCatalogInputs(inputs,inputs,after,[{...pairs[0],after:'1'.repeat(40)},pairs[1]]));
   assert.throws(()=>verifyUnchangedCatalogInputs(inputs,inputs,[{...after[0],blob:'1'.repeat(40)},after[1]],pairs));
+});
+
+test('scale authoring third candidate preserves strict original aggregate and bounded codeql route',()=>{
+  const p={...plan,candidate:'scale-authoring',required:['backend-compile','frontend-compile','locked-regression','frontend-app-types','changed-lint','dependency-audit','runtime-scans','scoped-postgres','compiled-browser','sast']};
+  assert.equal(validExactPlan(p),true);assert.equal(validExactPlan({...p,required:p.required.slice(1)}),false);
+  const n={scope:{result:'success',outputs:Object.fromEntries(Object.entries(exactCandidateOutputs(p)).map(([k,v])=>[k,String(v)]))},'exact-candidate':{result:'success'},codeql:{result:'success'}};
+  assert.deepEqual(requiredChecks(n,false),['scope','exact-candidate','codeql']);
+  for(const key of ['scope','exact-candidate','codeql'])assert(failedChecks({...n,[key]:{...n[key],result:'skipped'}},false).length>0);
+  assert.equal(situationalPublicationBoundary(base,h,{CI_HEAD_REF:'work/scale-authoring-feedback-20261021'}),null);
+  const main=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  assert.match(main,/candidate == 'scale-authoring' && 'paths: \[\.github\/scripts\/exact-candidate-scope.mjs/);
+  assert.match(main,/scale-authoring-admission.test.py/);
+  const workflow=readFileSync(new URL('../workflows/ci-exact-candidate.yml',import.meta.url),'utf8');
+  assert.match(workflow,/candidate==='scale-authoring'\?\['scale'\]/);
 });
