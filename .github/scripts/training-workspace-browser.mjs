@@ -30,16 +30,16 @@ const local = `http://127.0.0.1:${server.address().port}`;
 const evidence=resolve(root,'training-workspace-evidence');await mkdir(evidence,{recursive:true});
 const courses=Array.from({length:7},(_,i)=>({id:'c'+(i+1),title:'Synthetic course '+(i+1),description:'Course description '.repeat(25),creatorId:'trainer',courseCode:'SYNTHETIC'+i,status:'PUBLISHED',isRecruiting:true,isLibrary:false,studentCount:0,createdAt:'2026-01-01T00:00:00Z'}));
 const assessments=Array.from({length:7},(_,i)=>({id:'q'+i,name:'Synthetic assessment '+i,status:i<2?'PUBLISHED':'DRAFT',kind:'COLLECTION',editHref:'/questionnaire-products/q'+i,tags:[]}));
-const unexpected=[],errors=[],checks=[];let browser;
+const unexpected=[],errors=[],checks=[];let browser,page;
 const deadline=setTimeout(async()=>{server.closeAllConnections();await browser?.close();process.exit(1)},120000);
 try{
  browser=await chromium.launch({headless:true});
- const context=await browser.newContext({serviceWorkers:'block',viewport:{width:1365,height:900}}),page=await context.newPage();
+ const context=await browser.newContext({serviceWorkers:'block',viewport:{width:1365,height:900}});page=await context.newPage();
  page.setDefaultTimeout(10000);page.on('pageerror',e=>errors.push(e.message));
  await context.route('**/*',async route=>{
   const request=route.request(),url=new URL(request.url()),p=url.pathname,q=url.searchParams;
   const json=(data,status=200)=>route.fulfill({status,contentType:'application/json',body:JSON.stringify({code:status===200?0:status,data})});
-  if(url.hostname!=='training.localhost'){unexpected.push(url.origin);return route.abort()}
+  if(url.hostname!=='training.eduk12.top'){unexpected.push(url.origin);return route.abort()}
   if(p.startsWith('/api/')){
    if(request.method()!=='GET'){unexpected.push(request.method()+' '+p);return json(null,500)}
    if(p==='/api/auth/me')return json({id:'trainer',username:'synthetic',nickname:'Synthetic trainer',role:'TEACHER',platformRole:'STANDARD',mustChangePassword:false});
@@ -61,9 +61,9 @@ try{
   return route.fulfill({status:response.status,contentType:response.headers.get('content-type')||'application/octet-stream',body:Buffer.from(await response.arrayBuffer())});
  });
  async function proof(name){await page.waitForLoadState('networkidle');assert.deepEqual(unexpected,[],name);assert.deepEqual(errors,[],name);await page.screenshot({path:resolve(evidence,name+'.png'),fullPage:true});checks.push(name)}
- await page.goto('http://training.localhost/dashboard');await page.getByRole('heading',{name:'Synthetic course 1',exact:true}).waitFor();
+ await page.goto('http://training.eduk12.top/dashboard');await page.getByRole('heading',{name:'Synthetic course 1',exact:true}).waitFor();
  const size=page.locator('select').filter({visible:true});assert.equal(await size.count(),1);await size.selectOption('6');await page.getByRole('heading',{name:'Synthetic course 6',exact:true}).waitFor();await page.reload();await page.getByRole('heading',{name:'Synthetic course 6',exact:true}).waitFor();assert.equal(await size.inputValue(),'6');await proof('dashboard-page-size-persistence');
- await page.goto('http://training.localhost/courses/c1/detail?section=analysis');await page.getByRole('link',{name:'复用测评',exact:true}).waitFor();assert.match(page.url(),/section=assessments/);assert.equal(await page.getByRole('navigation',{name:'课程管理内容'}).getByRole('button').count(),4);await proof('hidden-analysis-old-link');
+ await page.goto('http://training.eduk12.top/courses/c1/detail?section=analysis');await page.getByRole('link',{name:'复用测评',exact:true}).waitFor();assert.match(page.url(),/section=assessments/);assert.equal(await page.getByRole('navigation',{name:'课程管理内容'}).getByRole('button').count(),4);await proof('hidden-analysis-old-link');
  await page.getByRole('link',{name:'复用测评',exact:true}).click();await page.getByRole('button',{name:'已发布',exact:true}).click();await page.getByText('共 2 份',{exact:true}).waitFor();assert.equal(await page.locator('.tql-card').count(),2);assert.equal(await page.getByRole('navigation',{name:'课程管理内容'}).getByRole('link').count(),4);await proof('assessment-published-filter');
  await page.getByRole('button',{name:'草稿',exact:true}).click();await page.getByText('共 5 份',{exact:true}).waitFor();await page.reload();await page.getByText('共 5 份',{exact:true}).waitFor();assert.equal(await page.getByRole('button',{name:'草稿',exact:true}).getAttribute('aria-pressed'),'true');await proof('assessment-draft-refresh');
  for(const [tab,label]of [['练习','练习'],['打卡','打卡']]){
@@ -73,4 +73,4 @@ try{
  await page.getByRole('link',{name:'课程管理',exact:true}).click();await page.getByRole('textbox',{name:'课程介绍',exact:true}).waitFor();assert.equal(await page.getByRole('link',{name:'管理学员',exact:true}).count(),1);assert.equal(await page.getByRole('link',{name:'测评与结果',exact:true}).count(),0);await proof('course-management');
  await page.setViewportSize({width:390,height:844});assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth));await proof('course-management-mobile');
  await writeFile(resolve(evidence,'browser.json'),JSON.stringify({checks,unexpected,errors,syntheticOnly:true},null,2));
-}finally{clearTimeout(deadline);await browser?.close();server.closeAllConnections();await new Promise(r=>server.close(r))}
+}catch(error){if(page){await page.screenshot({path:resolve(evidence,'browser-failure.png'),fullPage:true});await writeFile(resolve(evidence,'browser-failure.json'),JSON.stringify({error:String(error),url:page.url(),unexpected,errors,checks,body:await page.locator('body').innerText()},null,2))}throw error}finally{clearTimeout(deadline);await browser?.close();server.closeAllConnections();await new Promise(r=>server.close(r))}

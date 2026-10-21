@@ -2,7 +2,7 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync} from 'node:fs';
 export const bindingPath='.github/scripts/training-workspace-bindings.json';
 export const binding=JSON.parse(readFileSync(new URL('./training-workspace-bindings.json',import.meta.url)));
-const tools=new Set([bindingPath,'.github/scripts/training-workspace-scope.mjs','.github/scripts/training-workspace-scope.test.mjs','.github/scripts/training-workspace-checks.mjs','.github/scripts/training-workspace-browser.mjs','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml','.github/workflows/ci-training-workspace.yml']);
+const tools=new Set([bindingPath,'.github/scripts/training-workspace-scope.mjs','.github/scripts/training-workspace-scope.test.mjs','.github/scripts/training-workspace-checks.mjs','.github/scripts/training-workspace-reuse.mjs','.github/scripts/training-workspace-browser.mjs','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml','.github/workflows/ci-training-workspace.yml']);
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 export function trainingWorkspacePlan(entries,base,head,read=git){
  const marker=entries.find(e=>e.file===bindingPath);
