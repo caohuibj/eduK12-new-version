@@ -1,0 +1,85 @@
+{
+  "schemaVersion": "ie4-unregistered-content-draft-v1",
+  "runtimeRegistration": false,
+  "status": "AI_RESEARCH_WORKING_TRANSLATION_UNVALIDATED",
+  "versionIntent": {
+    "instrumentKey": "ie4_zh_cn_research",
+    "instrumentVersion": "1.0.0",
+    "localizationVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "reportVersion": "1.0.0",
+    "releaseStatus": "DRAFT"
+  },
+  "frozenReviewPackageSha256": "3085d235de800b06db3bc92d2806618244cabbe0189ed43a97cdd4da3426619d",
+  "administration": {
+    "language": "en",
+    "mode": "self-report CASI / paper",
+    "time_frame": "general personal beliefs; no fixed recall period",
+    "instruction_en": "The following statements may apply more or less to you. To what extent do you think each statement applies to you personally?",
+    "instruction_zh_ai": "以下陈述可能在不同程度上符合您的情况。您认为每条陈述在多大程度上符合您本人？",
+    "anchors": [
+      {
+        "value": 1,
+        "en": "does not apply at all",
+        "zh_ai": "完全不符合"
+      },
+      {
+        "value": 2,
+        "en": "applies a bit",
+        "zh_ai": "有一点符合"
+      },
+      {
+        "value": 3,
+        "en": "applies somewhat",
+        "zh_ai": "有些符合"
+      },
+      {
+        "value": 4,
+        "en": "applies mostly",
+        "zh_ai": "大体符合"
+      },
+      {
+        "value": 5,
+        "en": "applies completely",
+        "zh_ai": "完全符合"
+      }
+    ]
+  },
+  "items": [
+    {
+      "id": 1,
+      "en": "I’m my own boss.",
+      "zh_ai": "我自己做主。",
+      "subscale": "internal",
+      "reverse": false
+    },
+    {
+      "id": 2,
+      "en": "If I work hard, I will succeed.",
+      "zh_ai": "只要我努力，就会成功。",
+      "subscale": "internal",
+      "reverse": false
+    },
+    {
+      "id": 3,
+      "en": "Whether at work or in my private life: What I do is mainly determined by others.",
+      "zh_ai": "无论是在工作中还是在私人生活中，我做什么主要由别人决定。",
+      "subscale": "external",
+      "reverse": false
+    },
+    {
+      "id": 4,
+      "en": "Fate often gets in the way of my plans.",
+      "zh_ai": "命运常常阻碍我的计划。",
+      "subscale": "external",
+      "reverse": false
+    }
+  ],
+  "chinese": {
+    "status": "AI初译研究工作稿，未经独立语言审查或心理测量验证",
+    "license": "Derivative under CC BY4; attribute source and state AI translation",
+    "validated_exact_version_found": false,
+    "warning": "Not an official Chinese translation; no Chinese norm; no inferred English–Chinese invariance."
+  },
+  "platform_notice_zh": "本次作答可分别描述您对自身行动影响结果、以及外部力量影响结果的看法。两个维度应分别看待，不合并为总分，也不代表能力、人格优劣或心理诊断。当前中文仅为未经验证的研究工作译稿，不能用于个体诊断、升学或就业选拔。 这些分数描述您对控制来源的看法，不测量实际能控制多少事情，也不能判断成功或困境是谁的责任。 为保持2022英文版计分可追溯性保留双均分，2026德语研究提出应答倾向解释，不能宣称两个无争议独立特质。"
+}
