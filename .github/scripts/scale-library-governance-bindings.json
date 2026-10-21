@@ -104,7 +104,7 @@
     },
     "server-version/backend/src/__tests__/scale/scale-copy.postgres.integration.test.ts": {
       "before": "2294294f67bd61189de898d3a633b2028c2113e0",
-      "after": "26590d1dd2e08decbfe25b822100adba86470ed5"
+      "after": "262e16d350f6744812ad816a986311fe6acacb87"
     },
     "server-version/backend/src/__tests__/scale/scale-governance-boundaries.test.ts": {
       "before": null,
@@ -164,7 +164,7 @@
     },
     "server-version/backend/src/controllers/scaleImageController.ts": {
       "before": "f5628aca424aa51c1c590546cf0d5305bf0fab5f",
-      "after": "403e57ca59d8b0733e1fdbe3324ccd3eca136ea2"
+      "after": "cd90dd6a09e573e487999dba93bf196b84976f96"
     },
     "server-version/backend/src/controllers/scaleLibraryController.ts": {
       "before": "5b095b378684fdfc28312f623dbd99126ef6b509",
@@ -196,7 +196,7 @@
     },
     "server-version/backend/src/modules/measurement-content/admin-authority.service.ts": {
       "before": "94e8289a7347d257b5b0990828d796f3ab95ed20",
-      "after": "14a6320e0e0ec6264dc2d9b4511e1d83ea4bb342"
+      "after": "cd995a6d1e9831b98bbe305bcfc5ca4a47364dce"
     },
     "server-version/backend/src/modules/scale-library-governance/authority.ts": {
       "before": null,
@@ -212,7 +212,7 @@
     },
     "server-version/backend/src/modules/scale-library-governance/contracts.ts": {
       "before": null,
-      "after": "bf625bb4602d180b9f650ae75da203b720c58603"
+      "after": "36a65c410beaa855272814c6042a0421f376a3ba"
     },
     "server-version/backend/src/modules/scale-library-governance/distribution.ts": {
       "before": null,
@@ -228,7 +228,7 @@
     },
     "server-version/backend/src/modules/scale-library-governance/media.ts": {
       "before": null,
-      "after": "ca54401ca70ed75f3ff0d5b746f6e591bae69f38"
+      "after": "436059f6b88842030f4b64a44cc96c5d919541ab"
     },
     "server-version/backend/src/modules/scale-library-governance/readers.ts": {
       "before": null,
@@ -284,7 +284,7 @@
     },
     "server-version/backend/src/modules/scale/scale-copy.service.ts": {
       "before": "2386715599107c9baee23b6a8e1a518bb788c73c",
-      "after": "d514b0eac2363c0ce9e9e30b583a50c1121ba341"
+      "after": "8f4c748ddba5bc08fbeb7a88a2411cd048989a69"
     },
     "server-version/backend/src/modules/scale/scale-final-submit.service.ts": {
       "before": "56be2069f5fd2394830e97c87e04dbea89a29fbc",
@@ -424,7 +424,7 @@
     },
     "server-version/e2e/scale-library-governance-browser.cjs": {
       "before": null,
-      "after": "2124008870124e58e748e439bf08b63b77765305"
+      "after": "4158a182be5073234fb6e39f0f3ed3baec99a6b1"
     },
     "server-version/e2e/scale-library-governance-proxy.cjs": {
       "before": null,
@@ -488,7 +488,7 @@
     },
     "server-version/frontend/src/components/scale-governance/TrainingScaleLibrarySubmission.test.tsx": {
       "before": null,
-      "after": "fd93f5abad21bc021f737611bb271ae66c1006cb"
+      "after": "1b3ba80fe37b9150ebcee971488d5b24f8940b43"
     },
     "server-version/frontend/src/components/scale-governance/TrainingScaleLibrarySubmission.tsx": {
       "before": null,
@@ -572,7 +572,7 @@
     },
     "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx": {
       "before": "99f6502afda12c651ce3a6df47263b88322fec3b",
-      "after": "cb107a034f2a69332dedf026188eea9743103488"
+      "after": "36b4e5356280751d9add7800e34ce2dcba17e2af"
     },
     "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
       "before": "b23da9e0ee265ab28b7d8210f2524249ce0208a5",
@@ -730,5 +730,5 @@
     "src/survey/measurement-publication.ts"
   ],
   "browserProfileTrustApproved": true,
-  "productReference": "86e28bd10405873b0ed8b65367ee8170136d18d5"
+  "productReference": "051907b4b173518818f28e44712ffc80d8bef11e"
 }

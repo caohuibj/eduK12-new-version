@@ -67,3 +67,40 @@ test('browser admission refuses missing checkpoints, media bytes, wrong provenan
  for(const mutate of [r=>r.status='FAIL',r=>r.sourceCommit='2'.repeat(40),r=>r.checks.pop(),r=>r.layoutChecks[0].overflow=true,r=>r.accessibility[0].violations.push({id:'color-contrast'}),r=>r.media[1].sha256='c'.repeat(64),r=>r.media.at(-1).ended=false,r=>r.journeys[1].allAtOnce=false,r=>r.physicalSecurityKeyVerified=true,r=>r.screenshots[0].file='../private.json',r=>r.lifecycle.sameReceipt=false]){const invalid=structuredClone(r);mutate(invalid);assert.throws(()=>verifyGovernanceBrowserReport(invalid,options));}
  assert.throws(()=>verifyGovernanceBrowserReport(r,{...options,read:()=>Buffer.from('not PNG')}));
 });
+
+test('fixed continuation does not rebuild frontend or relabel old images as a new compile',()=>{
+ const w=readFileSync(new URL('../workflows/ci-scale-library-governance.yml',import.meta.url),'utf8');
+ assert.match(w,/compile once and preserve exact builder and runtime bytes\n        if: matrix.component == 'backend'/);
+ assert.match(w,/restore fixed original frontend builder and runtime without compilation\n        if: matrix.component == 'frontend'/);
+ assert.match(w,/image_head=f41811053761c25709f98d74f0abed7eb1c61711/);
+ for(const path of ['src/components/scale-governance/TrainingScaleLibrarySubmission.test.tsx','src/survey/SurveyPublicApp.final.test.tsx'])assert(w.includes(path));
+ assert.match(w,/\/app\/\$file:ro/);assert.match(w,/image_run=39605768918/);
+ const reuse=readFileSync(new URL('./scale-library-governance-resume.py',import.meta.url),'utf8');
+ assert.doesNotMatch(reuse,/docker['", ]+build|npm ci|docker['", ]+tag/);
+ assert.match(reuse,/org.opencontainers.image.revision/);assert.match(reuse,/originalJobConclusion.*failure/);
+});
+
+test('official continuation requires the exact failed producer and successful build step',async()=>{
+ const {execFileSync}=await import('node:child_process');
+ execFileSync('python3',['-B','-c',`
+import importlib.util,copy
+spec=importlib.util.spec_from_file_location('resume','.github/scripts/scale-library-governance-resume.py')
+m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+run={'id':m.RUN,'head_sha':m.SOURCE,'run_attempt':1,'status':'completed','conclusion':'failure'}
+job={'id':119241598178,'run_id':m.RUN,'head_sha':m.SOURCE,'run_attempt':1,'status':'completed','conclusion':'failure','steps':[{'name':n,'conclusion':'success'} for n in ['compile once and preserve exact builder and runtime bytes','verify prior official audit on the identical locked dependency inputs']]}
+def read(path):return run if path.startswith('runs/') else job
+m.official('frontend',read)
+for field,value in [('head_sha','0'*40),('run_attempt',2),('conclusion','success')]:
+ original=job[field];job[field]=value
+ try:m.official('frontend',read)
+ except AssertionError:pass
+ else:raise AssertionError('invalid producer accepted')
+ job[field]=original
+for value in ['failure','skipped',None]:
+ job['steps'][0]['conclusion']=value
+ try:m.official('frontend',read)
+ except AssertionError:pass
+ else:raise AssertionError('missing original build success accepted')
+job['id']=119241597740;job['conclusion']='success';m.official('sast',read)
+`],{stdio:'pipe'});
+});

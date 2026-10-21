@@ -2,7 +2,7 @@ import {execFileSync} from 'node:child_process';
 import {readFileSync,readdirSync,lstatSync,appendFileSync} from 'node:fs';
 export const bindingPath='.github/scripts/scale-library-governance-bindings.json';
 export const binding=JSON.parse(readFileSync(new URL('./scale-library-governance-bindings.json',import.meta.url)));
-const tools=new Set([bindingPath,'.github/scripts/scale-library-governance-scope.mjs','.github/scripts/scale-library-governance-scope.test.mjs','.github/scripts/scale-library-governance-build.sh','.github/scripts/scale-library-governance-checks.mjs','.github/scripts/scale-library-governance-backend.sh','.github/scripts/scale-library-governance-recovery.py','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml','.github/workflows/ci-scale-library-governance.yml','docs/release/README.md']);
+const tools=new Set([bindingPath,'.github/scripts/scale-library-governance-resume.py','.github/scripts/scale-library-governance-scope.mjs','.github/scripts/scale-library-governance-scope.test.mjs','.github/scripts/scale-library-governance-build.sh','.github/scripts/scale-library-governance-checks.mjs','.github/scripts/scale-library-governance-backend.sh','.github/scripts/scale-library-governance-recovery.py','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml','.github/workflows/ci-scale-library-governance.yml','docs/release/README.md']);
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
 export function scaleLibraryGovernancePlan(entries,base,head,read=git){
  const marker=entries.find(e=>e.file===bindingPath);
@@ -30,7 +30,9 @@ export function scaleLibraryGovernanceOutputs(plan){
 
 export function governanceCodeqlConfig(){
  if(binding.frozen!==true)throw Error('Unfrozen analysis inventory');
- const selected=[...new Set([...Object.keys(binding.source),...tools])].filter(f=>/\.(?:[cm]?[jt]sx?|py)$/.test(f));
+ const original='88bf456d09bab16f2823fe7cb4229176784bc559';
+ const selected=git('diff','--name-only',original,'HEAD').split('\n').filter(f=>/\.(?:[cm]?[jt]sx?|py)$/.test(f));
+ if(!selected.length||selected.some(f=>!tools.has(f)&&!Object.hasOwn(binding.source,f)))throw Error('Unknown or empty changed SAST input');
  const directories=[...new Set(selected.map(f=>f.slice(0,f.lastIndexOf('/'))))];
  const roots=directories.filter(d=>!directories.some(other=>d!==other&&d.startsWith(other+'/')));
  const ignored=[];

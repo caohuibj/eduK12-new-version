@@ -120,15 +120,17 @@ async function videoRange(locator) {
   assert.equal(result.status,206);assert.match(result.contentRange,/^bytes 0-1023\/\d+$/);assert.equal(result.byteLength,1024);assert.match(result.contentType,/^video\//);assert(result.currentTime>0&&result.videoWidth>0&&result.videoHeight>0)
   return result
 }
-async function upload(page,endpoint,field,name,mime,bytes) {
-  const result=await page.evaluate(async({endpoint,field,name,mime,base64})=>{
+async function upload(page,endpoint,field,name,mime,bytes,extraFields={}) {
+  for(const [key,value] of Object.entries(extraFields)){assert(key!==field);assert.equal(typeof value,'string')}
+  const result=await page.evaluate(async({endpoint,field,name,mime,base64,extraFields})=>{
     const survey=location.hostname==='survey.eduk12.top'
     const csrf=await(await fetch(survey?'/api/survey/auth/csrf':'/api/auth/csrf',{credentials:'same-origin'})).json()
     if(csrf.code!==0)throw new Error('Upload CSRF acquisition rejected')
     const data=new FormData();data.append(field,new Blob([Uint8Array.from(atob(base64),x=>x.charCodeAt(0))],{type:mime}),name)
+    for(const [key,value] of Object.entries(extraFields))data.append(key,value)
     const response=await fetch(endpoint,{method:'POST',credentials:'same-origin',headers:{'X-CSRF-Token':csrf.data.csrfToken,...(!survey?{'X-EduK12-Account-View':'BUSINESS'}:{})},body:data})
     return {status:response.status,body:await response.json()}
-  },{endpoint,field,name,mime,base64:bytes.toString('base64')})
+  },{endpoint,field,name,mime,base64:bytes.toString('base64'),extraFields})
   assert(result.status>=200&&result.status<300&&result.body.code===0,JSON.stringify(clean({status:result.status,code:result.body.code,message:result.body.message})))
   return result.body.data
 }
@@ -136,7 +138,7 @@ async function processedVideo(author) {
   const file=process.env.SCALE_GOVERNANCE_VIDEO_FILE
   assert.equal(path.resolve(file),path.join(path.dirname(process.env.SCALE_GOVERNANCE_FIXTURE_FILE),'synthetic.mp4'))
   const bytes=fs.readFileSync(file);assert(bytes.length>1024&&bytes.length<2*1024*1024)
-  const uploaded=await upload(author,'/api/videos/upload','video','synthetic.mp4','video/mp4',bytes)
+  const uploaded=await upload(author,'/api/videos/upload','video','synthetic.mp4','video/mp4',bytes,{title:'Synthetic governance media'})
   assert(uploaded.id&&uploaded.originalAssetId)
   const deadline=Date.now()+150000
   let state

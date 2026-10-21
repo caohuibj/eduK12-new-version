@@ -616,3 +616,15 @@ owned services and private files are removed on every outcome. Plan roughly
 10–15 minutes for the new connected scope, reporting the actual waiting step
 after five minutes; failures invalidate only their consumed inputs and do not
 authorize full-platform retries. No deployment is included.
+
+Governance round-1 continuation retains run `39605768918` as failed. Its frontend
+compile step succeeded and the complete builder/runtime archive is accepted only
+with fixed official artifact digests, original image IDs/revision and unchanged
+frontend production/config/lock inputs. Exactly two repaired test files are
+mounted read-only into that original builder for the previously failed types and
+unexecuted lint/contracts; the original runtime receives its first scan. No Vite
+compile, image relabeling or successful-test replay is involved. Backend never
+produced a successful image and therefore must compile the repaired source before
+its missing checks. Original CodeQL completion remains attributable to its old
+source; only actual changed JS/TS/Python inputs receive new analysis. No failed
+job or old report is rewritten as successful.

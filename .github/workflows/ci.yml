@@ -826,6 +826,13 @@ jobs:
           const config = {paths, 'paths-ignore': ignored};
           fs.appendFileSync(process.env.GITHUB_OUTPUT, `config=${JSON.stringify(config)}\n`);
           console.log(JSON.stringify({paths, python, excludedUnchangedPython: ignored.length}));
+      - name: verify original governance SAST and fetch only its exact source
+        if: needs.scope.outputs.application_route == 'scale-library-governance'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --no-tags --depth=1 origin 88bf456d09bab16f2823fe7cb4229176784bc559
+          python3 -B .github/scripts/scale-library-governance-resume.py sast
       - name: bound governance mixed-language analysis to frozen changed inputs
         id: governance-codeql-config
         if: needs.scope.outputs.application_route == 'scale-library-governance'
