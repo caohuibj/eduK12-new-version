@@ -12,7 +12,9 @@ export type ScaleDraft={
   responseOptions:{optionKey:string;label:string;score:number}[];
   dimensions:{dimensionKey:string;label:string;direction:'descriptive'|'higher_is_more'|'higher_is_better'|'higher_is_worse'|'bipolar'}[];
   aggregation:'sum'|'mean';
-  items:{itemKey:string;prompt:string;required:boolean;reverse:boolean;dimensionKeys:string[]}[]
+  totalScore?:{key:string;label:string;itemKeys:string[];aggregation:'sum'|'mean'};
+  rawScoreFeedback?:import('../modules/scale/rawScoreFeedback').RawScoreFeedback;
+  items:{itemKey:string;prompt:string;required:boolean;reverse:boolean;dimensionKeys:string[];purpose?:'CONTENT'|'ATTENTION_CHECK'|'SOCIAL_DESIRABILITY';attentionTarget?:string}[]
 }
 export type SjtDraftV1={
   schemaVersion:1;respondentType:'student_self_report'|'teacher_self_report';
