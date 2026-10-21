@@ -67,3 +67,21 @@ test('real browser transport contract does not use unsupported batch download or
   assert(source.includes("stepUpCode.step > loginStep"))
   assert(source.includes("assert.equal(denied.length, 0)"))
 })
+
+test('Training declaration locator remains stable after React textarea value updates', () => {
+  const source = fs.readFileSync(require.resolve('./scale-authoring-feedback-browser.cjs'), 'utf8')
+  const locator = "author.getByPlaceholder('说明题目内容由谁提供，以及允许在本系统中使用的范围', { exact: true })"
+  assert.equal(source.split(locator).length - 1, 3, 'Use the same stable identity before creation, when editing and on readback')
+  assert(!source.includes("getByLabel('自有内容 / 授权声明'"), 'Nested textarea child text is part of Playwright label text after React updates')
+  assert(source.includes(locator + '.count(), 0'), 'New draft must still reject unsavable definition inputs')
+  assert(source.includes(locator + ".fill('Self-authored synthetic CI content only')"))
+  assert(source.includes(locator + '.inputValue(), written.license.note)'), 'Persisted value equality must not be weakened')
+})
+
+test('Survey publication waits for library refresh completion, not just PATCH acknowledgement', () => {
+  const source = fs.readFileSync(require.resolve('./scale-authoring-feedback-browser.cjs'), 'utf8')
+  const ack = source.indexOf("phase('survey-author-save')")
+  const ready = source.indexOf("await builder.getByRole('status').filter({ hasText: '草稿已保存；发布冻结将在研究波次阶段执行' }).waitFor()")
+  const publication = source.indexOf("phase('survey-publication')")
+  assert(ack >= 0 && ready > ack && publication > ready)
+})

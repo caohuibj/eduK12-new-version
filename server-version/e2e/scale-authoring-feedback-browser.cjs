@@ -168,7 +168,7 @@ async function trainingJourney() {
   await author.getByLabel('量表编码', { exact: true }).fill('SCALE-CI-' + fixture.runId)
   await author.getByLabel('量表名称', { exact: true }).fill('Synthetic Training scale')
   await author.getByRole('combobox', { name: '可见性', exact: true }).selectOption('PUBLIC')
-  assert.equal(await author.getByLabel('自有内容 / 授权声明', { exact: true }).count(), 0, 'New metadata step must not accept unsavable definition changes')
+  assert.equal(await author.getByPlaceholder('说明题目内容由谁提供，以及允许在本系统中使用的范围', { exact: true }).count(), 0, 'New metadata step must not accept unsavable definition changes')
   const created = await action(author, '/api/scales', () => button(author, '保存基本信息').click())
   const scaleId = created.data.id; assert(scaleId)
   await author.waitForURL('**/scales/' + scaleId)
@@ -191,7 +191,7 @@ async function trainingJourney() {
   await button(author, '计分').click(); await button(author, '+ 总分').click(); await button(author, codes[0]).click()
   assert.equal(await button(author, codes[1]).count(), 0); assert.equal(await button(author, codes[2]).count(), 0)
   await button(author, '报告文案').click()
-  await author.getByLabel('自有内容 / 授权声明', { exact: true }).fill('Self-authored synthetic CI content only')
+  await author.getByPlaceholder('说明题目内容由谁提供，以及允许在本系统中使用的范围', { exact: true }).fill('Self-authored synthetic CI content only')
   await button(author, '增加原始分反馈区间').click()
   await author.getByLabel('total_1 区间 1 上限', { exact: true }).fill('10')
   await author.getByLabel('total_1 区间 1 反馈文字', { exact: true }).fill('TRAINING RAW INTERVAL FEEDBACK')
@@ -205,7 +205,9 @@ async function trainingJourney() {
   assert.equal(written.license.note, 'Self-authored synthetic CI content only')
   check('training-quality-roundtrip', written.items.filter(x => x.purpose && x.purpose !== 'CONTENT').length === 2 && written.scoring.scores[0].source.items.length === 1 && written.report.rawScoreFeedback.rules[0].ranges[0].images[0].asset.assetId === upload.data.assetId)
   await author.getByText(/已保存，并重新读取确认计分题目。/).waitFor()
-  assert.equal(await author.getByLabel('自有内容 / 授权声明', { exact: true }).inputValue(), written.license.note)
+  // React updates textarea child text on value changes; exact getByLabel then includes
+  // that value. The existing unique placeholder remains stable across save/readback.
+  assert.equal(await author.getByPlaceholder('说明题目内容由谁提供，以及允许在本系统中使用的范围', { exact: true }).inputValue(), written.license.note)
   await action(author, '/api/scales/' + scaleId + '/publish', () => button(author, '发布描述性量表').click())
   check('training-published', true)
   phase('training-participant'); const learner = await newPage(); await trainingLogin(learner, fixture.student, true)
@@ -275,6 +277,9 @@ async function surveyJourney() {
   assert.deepEqual(saved.data.definition.items, definition.items, 'Survey saved quality item roundtrip')
   assert.deepEqual(saved.data.definition.rawScoreFeedback, definition.rawScoreFeedback, 'Survey saved feedback roundtrip')
   check('survey-quality-roundtrip', definition.items.filter(x => x.purpose && x.purpose !== 'CONTENT').every(x => x.dimensionKeys.length === 0 && !x.reverse) && definition.items.length === 3 && definition.rawScoreFeedback.rules[0].ranges[0].images[0].asset.assetId)
+  // PATCH ACK precedes library refresh, which resets wave feedback selections.
+  // Wait for the real completed-save state before configuring the publication.
+  await builder.getByRole('status').filter({ hasText: '草稿已保存；发布冻结将在研究波次阶段执行' }).waitFor()
   phase('survey-publication'); await author.getByRole('tab', { name: /发布与采集/ }).click()
   const waves = author.getByRole('region', { name: '研究波次', exact: true })
   await waves.getByLabel('波次标题', { exact: true }).fill('Synthetic scale wave')
