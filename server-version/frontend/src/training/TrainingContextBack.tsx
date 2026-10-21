@@ -1,5 +1,7 @@
 import { ArrowLeft } from 'lucide-react'
 import { Link, useLocation } from 'react-router-dom'
+import { internalReturnTo } from '../components/app-shell/access'
+import { routeTitle } from '../components/app-shell/navigation'
 import type { Role } from '../components/app-shell/access'
 
 /** Breadcrumb escape for deep legacy editors and participant submissions.
@@ -10,6 +12,16 @@ export default function TrainingContextBack({ role }: { role: Role | undefined }
   if (role !== 'STUDENT' && role !== 'TEACHER') return null
   const path = location.pathname
   const studentRoot = role === 'STUDENT'
+  const search=new URLSearchParams(location.search)
+  const returnTo=internalReturnTo(search.get('returnTo'))
+  const hintedCourse=search.get('courseId')
+  const safeCourse=hintedCourse&&/^[A-Za-z0-9_-]{1,100}$/.test(hintedCourse)?hintedCourse:null
+  if(returnTo||safeCourse&&/^\/(questionnaire-products|composite-assessments|scales|cognitive-assignments)\//.test(path)) {
+    const home=studentRoot?'/student':'/dashboard'
+    const parent=returnTo||(studentRoot?'/student/courses/':'/courses/')+encodeURIComponent(safeCourse!)+(studentRoot?'':'/detail?section=assessments')
+    return <nav className="training-context-trail" aria-label="当前位置"><Link to={home}>我的课程</Link><span>/</span><Link to={parent}>{safeCourse?'返回当前课程':'返回上一层'}</Link><span>/</span><span aria-current="page">{routeTitle(path)}</span></nav>
+  }
+
   if (path === '/student' || path === '/dashboard') return null
   // The two purpose-built Training Course pages have their own back link.
   if (studentRoot && /^\/student\/courses\/[^/]+$/.test(path)) return null

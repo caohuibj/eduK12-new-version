@@ -32,5 +32,37 @@
 .hui-training.hui-app--standard.training-workspace-shell .training-trainer-course .training-section-switch { flex-wrap:wrap; padding-right:142px; column-gap:20px; row-gap:0; }
 .hui-training.hui-app--standard.training-workspace-shell .training-trainer-course .training-section-switch button { white-space:nowrap; }
 
+.hui-training.training-workspace-shell .training-course-analysis{background:#fff;border:1px solid #dce5d4;border-radius:11px;padding:24px;color:#2e4836;}
+.hui-training.training-workspace-shell .tca-analysis-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;}
+.hui-training.training-workspace-shell .tca-analysis-heading small{font-size:10px;color:#6a7b5f;letter-spacing:.1em;}
+.hui-training.training-workspace-shell .tca-analysis-heading h2{font-family:var(--training-serif);font-size:26px;margin:6px 0;}
+.hui-training.training-workspace-shell .tca-analysis-heading p{font-size:12px;color:#65775b;}
+.hui-training.training-workspace-shell .tca-analysis-heading button{font-size:11px;flex-shrink:0;background:#f8faf3;color:#57744a;}
+.hui-training.training-workspace-shell .tca-analysis-start{margin:23px 0 16px;padding:19px;border:1px solid #d9e3ce;border-radius:8px;background:#f3f7eb;}
+.hui-training.training-workspace-shell .tca-analysis-start>strong{font-size:14px;}
+.hui-training.training-workspace-shell .tca-analysis-start ol{display:grid;gap:14px;list-style:none;margin:16px 0 0;padding:0;}
+.hui-training.training-workspace-shell .tca-analysis-start li{display:flex;gap:12px;font-size:13px;}
+.hui-training.training-workspace-shell .tca-analysis-start li>span{display:grid;place-items:center;flex-shrink:0;width:25px;height:25px;border-radius:50%;background:#e2ecd6;color:#57764a;font-size:11px;}
+.hui-training.training-workspace-shell .tca-analysis-start small{display:block;margin-top:3px;font-size:11px;color:#697b5c;}
+.hui-training.training-workspace-shell .training-course-analysis .tca-analysis-permission{font-size:11px;color:#68795d;}
+.hui-training.training-workspace-shell .training-course-analysis :is(.tca-analysis-help,.tca-source-detail){margin:12px 0;font-size:12px;border-top:1px solid #e6ecdf;}
+.hui-training.training-workspace-shell .training-course-analysis :is(.tca-analysis-help,.tca-source-detail) p{font-size:11px;color:#637659;line-height:1.9;}
+.hui-training.training-workspace-shell .training-analysis-wave{padding:19px;background:#fcfdf9;border-color:#d8e2ce;border-radius:9px;}
+.hui-training.training-workspace-shell .training-analysis-wave>legend{font-family:var(--training-serif);font-size:17px;}
+.hui-training.training-workspace-shell .training-analysis-wave>legend>span{margin-right:8px;color:#78925e;font-family:inherit;}
+.hui-training.training-workspace-shell .training-analysis-wave label{font-size:12px;}
+.hui-training.training-workspace-shell .training-analysis-metrics{padding:15px 12px;border:1px solid #e0e8d7;border-radius:7px;background:white;}
+.hui-training.training-workspace-shell .training-analysis-metrics small{font-size:10px;color:#79866e;overflow-wrap:anywhere;}
+.hui-training.training-workspace-shell .tca-analysis-empty{padding:23px;border:1px dashed #cfdcc3;border-radius:9px;background:#fafcf5;}
+.hui-training.training-workspace-shell .tca-analysis-empty h3{font-family:var(--training-serif);font-size:20px;margin-top:0;}
+.hui-training.training-workspace-shell .tca-analysis-empty :is(p,li){font-size:12px;color:#637658;line-height:1.9;}
+.hui-training.training-workspace-shell .tca-analysis-empty a{display:inline-block;margin-top:13px;font-size:12px;color:#4d7241;}
+.hui-training.training-workspace-shell .training-course-analysis .tca-analysis-next{font-size:12px;color:#5f7950;padding:12px;background:#f4f8ed;border-radius:6px;}
+@media(max-width:640px){.hui-training.training-workspace-shell .training-course-analysis{padding:17px}.hui-training.training-workspace-shell .tca-analysis-heading{flex-wrap:wrap}.hui-training.training-workspace-shell .tca-analysis-heading h2{font-size:23px}}
+
+.hui-training.training-workspace-shell .training-course-analysis .training-analysis-controls button[type=submit].training-action{background:#365d3a;color:#fff;border-color:#365d3a;opacity:1}
+.hui-training.training-workspace-shell .training-course-analysis .training-analysis-controls button[type=submit].training-action:disabled{background:#e7ede1;color:#586b50;border-color:#d0dbc8;opacity:1}
+/* Override the shared primary-button white text only for this disabled state. */
+.hui-training.training-workspace-shell .training-course-analysis .training-analysis-controls button[type=submit].training-action:disabled{color:#586b50!important}
 .training-reference-studio fieldset { min-width:0; margin:16px 0; padding:14px; border:1px solid var(--training-border,#dce3d8); border-radius:6px; }
 .training-reference-studio textarea { min-height:88px; resize:vertical; }

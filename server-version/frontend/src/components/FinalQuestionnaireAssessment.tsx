@@ -1,3 +1,4 @@
+import { isTrainingHost } from '../training/context'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { FileText, Layers, Save } from 'lucide-react'
 import { sessionFetch } from '../api/client'
@@ -324,10 +325,10 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
   }
 
   const saveScaleValue = (itemCode: string, value: ResponseValue) => {
-    if (!currentKey || submitting || draftLocked) return
+    if (!currentKey || submitting || draftLocked) return false
     setError(null)
     setScaleValues((previous) => ({ ...previous, [itemCode]: value }))
-    void scheduleLocalSave(`scale:${itemCode}`, async () => {
+    return scheduleLocalSave(`scale:${itemCode}`, async () => {
       await finalDraftStore.putAnswer({ draftKey: currentKey, itemKey: itemCode, value: { responseValue: value }, updatedAt: Date.now() })
     })
   }
@@ -641,6 +642,8 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
                   } : undefined}
                 >
                   <ScalePlayer
+                    autoAdvance={isTrainingHost() && !publicMode}
+                    scopeKey={currentKey || currentScale.scaleAssessmentId}
                     item={item}
                     value={scaleValues[item.itemCode]}
                     answerDisabled={draftLocked}
@@ -650,7 +653,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
                     onChange={(nextValue) => saveScaleValue(item.itemCode, nextValue)}
                     onPrevious={() => void goToScaleIndex(scaleIndex - 1)}
                     onNext={scaleIndex < currentScale.definition.items.length - 1
-                      ? () => void goToScaleIndex(scaleIndex + 1)
+                      ? () => goToScaleIndex(scaleIndex + 1)
                       : undefined}
                     onSubmit={scaleIndex === currentScale.definition.items.length - 1 ? submitScale : undefined}
                     submitting={submitting}

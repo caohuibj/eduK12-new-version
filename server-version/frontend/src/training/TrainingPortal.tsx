@@ -1,4 +1,5 @@
 import TrainingHomeBrand from './TrainingHomeBrand'
+import { trainingWelcomeCopy } from './welcomeCopy'
 import './training-portal-refresh.css'
 import { Link } from 'react-router-dom'
 import { useAuthLinks } from '../components/app-shell/useAuthLinks'
@@ -16,12 +17,12 @@ export default function TrainingPortal() {
     </header>
     <section className="training-portal-main" aria-labelledby="training-title">
       <div className="training-portal-copy">
-        <p className="training-eyebrow">书山问道 · 拾级而上</p>
-        <h1 id="training-title">以学习为径，<br />见更远的天地。</h1>
-        <p className="training-portal-description">从一门课程启程，<br />在探索中求知，在实践中成长。</p>
+        <p className="training-eyebrow">{trainingWelcomeCopy.eyebrow}</p>
+        <h1 id="training-title">{trainingWelcomeCopy.titleLines[0]}<br />{trainingWelcomeCopy.titleLines[1]}</h1>
+        <p className="training-portal-description">{trainingWelcomeCopy.descriptionLines[0]}<br />{trainingWelcomeCopy.descriptionLines[1]}</p>
         <span className="training-portal-accent" aria-hidden="true" />
       </div>
     </section>
-    <footer className="training-portal-footer"><span>© {new Date().getFullYear()} Huitraining</span><span>学习，始于当下。</span></footer>
+    <footer className="training-portal-footer"><span>© {new Date().getFullYear()} Huitraining</span><span>{trainingWelcomeCopy.footer}</span></footer>
   </div>
 }

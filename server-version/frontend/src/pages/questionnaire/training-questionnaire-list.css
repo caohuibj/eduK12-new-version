@@ -1,0 +1,93 @@
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page{color:#2b4237;line-height:1.8;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page :is(h2,h3,p,fieldset){margin:0;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-eyebrow{font-size:11px;letter-spacing:.12em;color:#61725e;margin-bottom:18px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-eyebrow>span{margin:0 10px;color:#acb6a5;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page :is(.tql-primary,.tql-secondary,.tql-pagination>button,.tql-export-dialog footer>button){display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:9px 15px;border:1px solid #d4dfcc;border-radius:7px;background:#fff;color:#365a43;font-size:12px;font-weight:550;text-decoration:none;cursor:pointer;line-height:1.6;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page :is(.tql-primary,.tql-export-dialog footer>.tql-primary){background:#365a47;border-color:#365a47;color:white;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page :is(a,button,summary,input):focus-visible{outline:2px solid #64886b;outline-offset:3px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page button:disabled{cursor:default;opacity:.5;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page :is(.tql-primary,.tql-secondary):hover:not(:disabled){filter:brightness(.97);}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-overview{display:flex;flex-wrap:wrap;gap:20px 38px;padding:20px 24px;margin:24px 0;border:1px solid #dce5d5;border-radius:10px;background:#fff;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-overview>div{display:flex;align-items:center;gap:12px;min-width:150px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-overview strong{font-family:var(--training-serif);font-size:27px;font-weight:600;line-height:1.3;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-overview span{color:#65765d;font-size:12px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-dot{width:8px;height:8px;border-radius:50%;background:#7f9c61;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-dot.is-draft{background:#c6ad78;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-shortcuts{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:15px;margin:24px 0;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-shortcuts>a{display:flex;align-items:center;gap:14px;padding:19px 20px;border:1px solid #dce5d5;border-radius:10px;background:#fff;color:#456442;text-decoration:none;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-shortcuts>a>svg{flex-shrink:0;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-shortcuts>a>svg:last-child{margin-left:auto;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-shortcuts strong{display:block;font-size:14px;font-weight:550;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-shortcuts small{display:block;font-size:11px;color:#66765e;margin-top:3px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-guide{display:flex;align-items:flex-start;gap:14px;padding:19px 22px;margin:25px 0 29px;border:1px solid #dce5d1;border-radius:9px;background:#f0f5e9;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-guide>svg{flex-shrink:0;color:#628050;margin-top:3px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-guide h2{font-size:14px;font-weight:600;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-guide :is(p,details){font-size:12px;color:#5f7355;margin-top:5px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page summary{cursor:pointer;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-guide details p{margin:8px 0 0;max-width:850px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-records>header{display:flex;align-items:center;justify-content:space-between;gap:15px;margin-bottom:17px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-records>header h2{font-family:var(--training-serif);font-size:23px;font-weight:600;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-records>header p{margin-top:5px;font-size:12px;color:#65765f;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-records>header>span{font-size:11px;color:#66775f;white-space:nowrap;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:20px;padding:23px 24px 0;margin-bottom:15px;border:1px solid #dce4d5;border-radius:11px;background:#fff;box-shadow:0 2px 7px #344c2c04;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card-main{display:flex;gap:15px;align-items:flex-start;min-width:0;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card-icon{display:grid;place-items:center;flex-shrink:0;width:45px;height:45px;background:#f2f5e9;color:#67814e;border-radius:9px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card-main>div{min-width:0;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card-title{display:flex;align-items:center;flex-wrap:wrap;gap:9px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card-title h3{font-size:18px;font-family:var(--training-serif);font-weight:600;overflow-wrap:anywhere;line-height:1.7;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card-title h3 a{color:#2f4939;text-decoration:none;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-status{padding:2px 8px;border-radius:4px;background:#f0f1ed;font-size:10px;color:#64715d;white-space:nowrap;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-status.is-published{background:#edf4e5;color:#527044;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-status.is-draft{background:#f8f3e8;color:#8c7045;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card-main p{font-size:11px;color:#6c7964;margin-top:5px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card-main p span{margin:0 6px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card-actions{display:flex;align-items:center;justify-content:flex-end;flex-wrap:wrap;gap:9px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card>footer{grid-column:1/-1;display:flex;align-items:flex-start;justify-content:space-between;gap:15px;border-top:1px solid #edf0e8;padding:12px 0 14px;color:#73806b;font-size:11px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-more{text-align:right;min-width:85px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-more>summary{color:#5e7453;font-size:11px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-more>div{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:9px;margin-top:12px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-more :is(button,a){display:inline-flex;align-items:center;gap:6px;font-size:11px;color:#42623e;background:#f7faf1;border:1px solid #dce5d3;padding:7px 10px;border-radius:6px;min-height:36px;box-shadow:none;text-decoration:none;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-pagination{display:flex;justify-content:space-between;align-items:center;gap:12px;margin:24px 0;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-pagination>span{font-size:12px;color:#66765d;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-history{border-top:1px solid #dce5d3;padding:18px 0;color:#65765d;font-size:12px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-history>div{display:flex;flex-wrap:wrap;gap:15px;margin-top:12px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-history a{color:#56754a;text-decoration:none;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-empty{display:grid;justify-items:center;gap:12px;padding:45px 20px;border:1px dashed #cedbc4;border-radius:10px;background:#fff;color:#617554;text-align:center;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-empty h3{font-family:var(--training-serif);font-size:20px;color:#39553b;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-empty p{font-size:12px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-error{padding:12px 16px;margin:18px 0;background:#fff2ed;border:1px solid #e8c8bd;border-radius:8px;color:#913d31;font-size:13px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page [aria-label="保存组合模板"]{padding:22px;margin-bottom:24px;border:1px solid #d7e1cb;border-radius:10px;background:#fff;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page [aria-label="保存组合模板"] h2{font-family:var(--training-serif);font-size:20px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page [aria-label="保存组合模板"] p{font-size:12px;line-height:1.9;color:#62745a;margin:10px 0;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page [aria-label="保存组合模板"] label{display:block;margin:15px 0;font-size:12px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page [aria-label="保存组合模板"] button{margin-right:10px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-modal-surface{position:fixed;inset:0;width:100%;max-width:none;height:100%;max-height:none;margin:0;border:0;padding:24px;display:flex;align-items:center;justify-content:center;background:#1e332666;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-dialog{width:100%;max-width:600px;max-height:90vh;overflow:auto;min-width:0;padding:27px;border:1px solid #dae4d0;border-radius:13px;background:#fff;box-shadow:0 20px 80px #172e2633;outline:none;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-dialog>header{display:flex;align-items:center;gap:14px;margin-bottom:19px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-icon{display:grid;place-items:center;width:44px;height:44px;border-radius:9px;background:#eff5e7;color:#5c7c4b;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-dialog>header small{font-size:10px;letter-spacing:.1em;color:#64775a;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-dialog h2{font-size:23px;font-family:var(--training-serif);font-weight:600;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-dialog>header>button{display:grid;place-items:center;width:38px;height:38px;margin-left:auto;border:1px solid #dce4d4;border-radius:6px;background:white;color:#617559;cursor:pointer;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-name{font-size:15px;color:#3c583f;font-weight:550;overflow-wrap:anywhere;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page #tql-export-description{font-size:12px;color:#68785f;margin:7px 0 21px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-dialog fieldset{padding:0;border:0;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-dialog legend{margin-bottom:10px;font-size:12px;font-weight:550;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-format-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-format-options label{position:relative;display:grid;justify-items:start;gap:7px;min-width:0;padding:15px;border:1px solid #d6e1ce;border-radius:8px;background:#fff;cursor:pointer;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-format-options label.is-selected{background:#f4f8ed;border-color:#68865a;box-shadow:inset 0 0 0 1px #68865a;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-format-options input{position:absolute;right:13px;top:13px;display:block;width:16px;min-height:0;height:16px;padding:0;margin:0;accent-color:#4d704a;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-format-options svg{color:#688454;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-format-options strong{font-size:13px;font-weight:550;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-format-options small{font-size:11px;color:#66795b;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-privacy{display:flex;align-items:flex-start;gap:10px;margin-top:20px;padding:13px;background:#f3f7ec;border:1px solid #e1e8d7;border-radius:7px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-privacy>svg{flex-shrink:0;color:#668650;margin-top:3px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-privacy strong{font-size:12px;font-weight:550;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-privacy p{font-size:11px;color:#607355;margin-top:4px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-help{font-size:12px;color:#5c7351;margin:18px 0;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-help p{font-size:11px;margin:10px 0;color:#63765a;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-help a{display:inline-flex;align-items:center;gap:5px;color:#456c3e;font-size:12px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-dialog>footer{display:flex;justify-content:flex-end;gap:10px;padding-top:17px;margin-top:18px;border-top:1px solid #e4eadc;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page :is(.tql-export-notice,.tql-export-error){padding:11px 12px;border-radius:6px;background:#f3f7eb;color:#45673c;font-size:12px;}
+.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-error{background:#fff2ed;color:#913d31;}
+@media(max-width:900px){.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-shortcuts{grid-template-columns:minmax(0,1fr)}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card{grid-template-columns:minmax(0,1fr)}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card-actions{justify-content:flex-start;margin-left:60px}}
+@media(max-width:640px){.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-overview{padding:16px;gap:14px}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-overview>div{min-width:0;gap:9px;flex:1;flex-wrap:wrap}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-overview>div>svg{display:none}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-overview strong{font-size:23px}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-overview span:last-child{width:100%;font-size:11px}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-shortcuts{gap:10px}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-shortcuts>a{padding:16px}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-guide{padding:16px}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-guide>svg{display:none}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card{padding:18px 16px 0;gap:17px}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card-title h3{font-size:17px}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card-icon{width:36px;height:36px}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card-main{gap:11px}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card-actions{margin-left:0}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-card>footer{flex-wrap:wrap}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-more{text-align:left}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-more>div{justify-content:flex-start}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-records>header{align-items:flex-start}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-pagination{gap:7px}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-pagination>button{padding:9px 12px}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-pagination>span{font-size:11px}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-modal-surface{padding:12px}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-dialog{padding:20px;max-height:94vh}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-format-options{grid-template-columns:minmax(0,1fr)}.hui-training.hui-app.training-workspace-shell .tql-page.tql-page .tql-export-dialog h2{font-size:21px}}

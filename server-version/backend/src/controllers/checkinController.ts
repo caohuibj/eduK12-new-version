@@ -1,3 +1,4 @@
+import { managementTaskList } from '../modules/training-catalog/tasks'
 import { listPage, cursorWhere, listPageResult, ListCursorError } from '../utils/listCursor'
 import { checkinExportImages } from '../utils/checkinExportImages'
 import { readTemporaryUpload, acceptedImageTypes } from '../middleware/uploadAdmission'
@@ -407,6 +408,7 @@ export const checkinController = {
   // 获取打卡列表（添加分页优化）
   async list(req: Request, res: Response) {
     try {
+      if (req.query.view === 'summary') return await managementTaskList(req, res, 'checkin')
       const userId = req.user?.userId
       const userRole = req.user?.role
       if (!canReadLegacyContent(userRole)) return forbidden(res, '当前角色不能访问旧打卡列表')

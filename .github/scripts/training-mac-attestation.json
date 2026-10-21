@@ -1,0 +1,676 @@
+{
+  "schema": 1,
+  "candidate": "training-mac",
+  "reviewed": true,
+  "kind": "reviewed-historical-local-with-disclosed-limits",
+  "ciExecuted": false,
+  "originalExecutionSigned": false,
+  "originalSource": "db77e4c5ad6ab5cd91a8df030b9e070b38a2c181",
+  "originalTree": "260731545117e518be70f4796d7cd15addb50d6b",
+  "historicalExecutionReferenceAssertion": "65f18b5583984b0427ff6e635a376e4d3d1cb8ae",
+  "originalProductInventorySha256": "377f6f50af93584a16316888c88c66309ae2a47a39e27f130757c5dab97d8d65",
+  "productInventorySha256": "c9c7b697c6d0e57bf0412b973e040d974f209c6a9afc9ad02470af07339c773b",
+  "reviewedProductDelta": [
+    {
+      "path": "server-version/backend/package-lock.json",
+      "before": {
+        "mode": "100644",
+        "blob": "9e55fdb8bc4a29baf93fe815cd1585090364cd0b",
+        "path": "server-version/backend/package-lock.json"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "73607721290dd28f1c6f85d5e12d5d517926ede3",
+        "path": "server-version/backend/package-lock.json"
+      }
+    },
+    {
+      "path": "server-version/backend/package.json",
+      "before": {
+        "mode": "100644",
+        "blob": "ebe2f4233e00784fafc2f866e6c1f212ff31385e",
+        "path": "server-version/backend/package.json"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "033398f6361b0e4217226ae00f2edc2ed3380ecd",
+        "path": "server-version/backend/package.json"
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/controllers/trainingCatalog.boundaries.postgres.test.ts",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "blob": "9530688c99883d4255664a4c49d739ddb9f70b80",
+        "path": "server-version/backend/src/__tests__/controllers/trainingCatalog.boundaries.postgres.test.ts"
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/controllers/trainingCatalog.boundaries.test.ts",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "blob": "dadbc29ff1cc9ca9e1e5c8906fb52c103676a5b0",
+        "path": "server-version/backend/src/__tests__/controllers/trainingCatalog.boundaries.test.ts"
+      }
+    },
+    {
+      "path": "server-version/backend/src/__tests__/integration/training-mac-export.postgres.integration.test.ts",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "blob": "31e12b25911fa1534ff86bd05d3036ce2ee28271",
+        "path": "server-version/backend/src/__tests__/integration/training-mac-export.postgres.integration.test.ts"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/training-catalog/course.ts",
+      "before": {
+        "mode": "100644",
+        "blob": "1bb6927fae49a7d3d18c528ba6c1a23524f6f0fb",
+        "path": "server-version/backend/src/modules/training-catalog/course.ts"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "db71ec8f4dd1554771ad6319b072ca884e4f3ee0",
+        "path": "server-version/backend/src/modules/training-catalog/course.ts"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/training-catalog/filters.ts",
+      "before": {
+        "mode": "100644",
+        "blob": "3d285b4fe6c968a5ee591cecd6bddc2d20b92962",
+        "path": "server-version/backend/src/modules/training-catalog/filters.ts"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "c8fb39bd2d7b3a7ea16388d841058aa5baa629dd",
+        "path": "server-version/backend/src/modules/training-catalog/filters.ts"
+      }
+    },
+    {
+      "path": "server-version/backend/src/modules/training-catalog/tags.ts",
+      "before": {
+        "mode": "100644",
+        "blob": "8f7c117ff9699c067caffbafc47f0c1b219fe15c",
+        "path": "server-version/backend/src/modules/training-catalog/tags.ts"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "af26fbd939f32e599063956b98166f19cf268ae4",
+        "path": "server-version/backend/src/modules/training-catalog/tags.ts"
+      }
+    },
+    {
+      "path": "server-version/frontend/package-lock.json",
+      "before": {
+        "mode": "100644",
+        "blob": "9fc33dd617ce75766564786d880e588142c11eed",
+        "path": "server-version/frontend/package-lock.json"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "70318f94fe631d8292f567cf421f97e7d5613b31",
+        "path": "server-version/frontend/package-lock.json"
+      }
+    },
+    {
+      "path": "server-version/frontend/package.json",
+      "before": {
+        "mode": "100644",
+        "blob": "4a287572dfb7d636477ea34985fab7a0b12fae53",
+        "path": "server-version/frontend/package.json"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "84089551a17c85d00f03a36081fe78e6374f0716",
+        "path": "server-version/frontend/package.json"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/components/FinalCompositeAssessment.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "f41dcc2536afbfa296dc588ae3f33ee718e19342",
+        "path": "server-version/frontend/src/components/FinalCompositeAssessment.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "b565d5ed4a6ce8a534fe445a8d8a1e597afc883e",
+        "path": "server-version/frontend/src/components/FinalCompositeAssessment.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/components/WholeCompositeQuestionnaire.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "482005cca2d59167843f676c3ddc2f12163b029a",
+        "path": "server-version/frontend/src/components/WholeCompositeQuestionnaire.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "ce764faea226562b5b434376b67f57f68318bd5c",
+        "path": "server-version/frontend/src/components/WholeCompositeQuestionnaire.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/components/__tests__/TrainingCheckpointRecovery.test.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "10e688c7101805f3cc579f7e257cd9433e3595be",
+        "path": "server-version/frontend/src/components/__tests__/TrainingCheckpointRecovery.test.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "133f254653323d563b380ca71e19e00c346ec8cb",
+        "path": "server-version/frontend/src/components/__tests__/TrainingCheckpointRecovery.test.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "05f25919a5ff535f7b5ff418a96c50b1a3e58139",
+        "path": "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "0b6068789aa1d30db5d7a6cc6021a2378513df2e",
+        "path": "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/modules/situational/__tests__/SituationalRunner.test.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "070d84df4a8f75c0364ce5fcbb4beaa684d23196",
+        "path": "server-version/frontend/src/modules/situational/__tests__/SituationalRunner.test.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "fffbd87c7bf6372032b09a942cf51d0a98e16f8d",
+        "path": "server-version/frontend/src/modules/situational/__tests__/SituationalRunner.test.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "b96aa1b9416ad7c33d279abede8d30a1cfebdb09",
+        "path": "server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "118c9de18846e4a834afb0afc36d4dbf4102411b",
+        "path": "server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/pages/teacher/AssessmentWorkbench.training.test.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "a4ed347f9ffe29548f755fc6b665edfd10f92ef6",
+        "path": "server-version/frontend/src/pages/teacher/AssessmentWorkbench.training.test.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "ad654cd64eaab772c7f95d7cbbe49287dfa0bf49",
+        "path": "server-version/frontend/src/pages/teacher/AssessmentWorkbench.training.test.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/pages/teacher/AssessmentWorkbench.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "000b9e178236d27930717c6343ff9e9acaf050f8",
+        "path": "server-version/frontend/src/pages/teacher/AssessmentWorkbench.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "43d0ef8c92cfec6703c59a0fb71fbc570b6d098a",
+        "path": "server-version/frontend/src/pages/teacher/AssessmentWorkbench.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingAuth.test.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "15dc98c0ad405e93f3b396875a9c02ec960d89dd",
+        "path": "server-version/frontend/src/training/TrainingAuth.test.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "e47c4e452d4590d6e1da2c6a81ea1c4dd60f1130",
+        "path": "server-version/frontend/src/training/TrainingAuth.test.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingBrand.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "3c5d5edfe1093edd0cf5db6f93ee17602e05f5ef",
+        "path": "server-version/frontend/src/training/TrainingBrand.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "258558b1d5f95bf328f437417be637293817ad24",
+        "path": "server-version/frontend/src/training/TrainingBrand.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingCourseAssessments.test.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "b84270b25ffac70ede9c0ec5ca15b5eb2b8982fb",
+        "path": "server-version/frontend/src/training/TrainingCourseAssessments.test.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "c40562657aa3be4291624aae7c8783ea22534ca1",
+        "path": "server-version/frontend/src/training/TrainingCourseAssessments.test.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingCourseAssessments.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "1131ebeea322bee9e2344b3a3a8610ee43abb512",
+        "path": "server-version/frontend/src/training/TrainingCourseAssessments.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "33a3a72d266e17d2c8c2df44a6f671aa2378822c",
+        "path": "server-version/frontend/src/training/TrainingCourseAssessments.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/TrainingScreens.test.tsx",
+      "before": {
+        "mode": "100644",
+        "blob": "bf401023cfe74b3d6d61638b230781bcbfa20273",
+        "path": "server-version/frontend/src/training/TrainingScreens.test.tsx"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "67585808362b3fc434802b3bb70df7045e7200ee",
+        "path": "server-version/frontend/src/training/TrainingScreens.test.tsx"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/training-book-mountain.svg",
+      "before": {
+        "mode": "100644",
+        "blob": "7064be8d98ba14d862defac80ccd18681939f615",
+        "path": "server-version/frontend/src/training/training-book-mountain.svg"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "2a2e19ab46e4b6fe0fd72a8b72356ca427282d47",
+        "path": "server-version/frontend/src/training/training-book-mountain.svg"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/training-brand.css",
+      "before": {
+        "mode": "100644",
+        "blob": "d18487baeef4b0c3e83cad120f67f5df0b1612fc",
+        "path": "server-version/frontend/src/training/training-brand.css"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "150c09b5bc06dad9043c389b69a8458a8b417b9c",
+        "path": "server-version/frontend/src/training/training-brand.css"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/training-home-brand.css",
+      "before": {
+        "mode": "100644",
+        "blob": "327b3a425967f128fe2c0abea9369bbc3f535bbd",
+        "path": "server-version/frontend/src/training/training-home-brand.css"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "a38ceea75fc2be047b6ad789a0049eda4c8fd163",
+        "path": "server-version/frontend/src/training/training-home-brand.css"
+      }
+    },
+    {
+      "path": "server-version/frontend/src/training/training-logo.svg",
+      "before": null,
+      "after": {
+        "mode": "100644",
+        "blob": "1732258c8ec9a70b439f69dac89646d9b91231c4",
+        "path": "server-version/frontend/src/training/training-logo.svg"
+      }
+    }
+  ],
+  "executions": [
+    {
+      "id": "frontendOverlap",
+      "kind": "test",
+      "originalExitCode": 1,
+      "originalStatus": "failed",
+      "receiptSha256": "0beeecbc6273e54d31b446e5ffc8322c7807db9eca119e8dc465f34796ef087f",
+      "logSha256": "b4518c340166753f1fea2c79aa7d5c452a34e60da773b4b4a698643e85ef17dc",
+      "originalPassingCaseNames": [],
+      "passingCaseNamesOriginallyRecorded": false,
+      "countedAsApplicationTest": true,
+      "selectionProvenance": "Reconstructed from retained execution summary; original command string, shell wrapper, all worker flags/environment were not independently retained. Output redirection omitted. This is not a verbatim original invocation.",
+      "sourceProvenance": "Resolved conflict source before visible pending-publication paragraph was added. Original conflict and pre-final resolved diff retained. Exact complete pre-execution working-tree snapshot was not recorded; do not claim final-tree execution.",
+      "aggregate": {
+        "passed": 145,
+        "failed": 1,
+        "filtered": 0
+      },
+      "originalFailureNames": [
+        "src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > questionnaire draft feedback > blocks edits while the original publication is pending and safely ends an obsolete revision without claiming success"
+      ],
+      "retrospectiveSelection": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
+        "src/training/TrainingCourseAnalysis.test.tsx",
+        "src/training/TrainingCoursePages.test.tsx",
+        "src/components/app-shell/__tests__/shell.test.tsx",
+        "--maxWorkers=2"
+      ],
+      "impactReviewAgainstRepair103953ac": "Original invocation remains FAILED (145 passed,1 failed) on resolved merge before visible pending-publication paragraph. Its original named failure is retained. Later single-case success does not rewrite this whole invocation. Original full pre-run snapshot was not retained. Final103 patch changes no frontend source; only its historical aggregate is admitted.",
+      "sourceImpactAssurance": "Independent reviewed historical impact, not contemporaneous execution-input authentication or promotion of reconstructed case names."
+    },
+    {
+      "id": "frontendPendingRetry",
+      "kind": "test",
+      "originalExitCode": 0,
+      "originalStatus": "passed",
+      "receiptSha256": "0beeecbc6273e54d31b446e5ffc8322c7807db9eca119e8dc465f34796ef087f",
+      "logSha256": "12c9c803bf4fd782fee88ecabc0bd2399d4cdf211eb74e9ef99dfd1a3bff8790",
+      "originalPassingCaseNames": [],
+      "passingCaseNamesOriginallyRecorded": false,
+      "countedAsApplicationTest": true,
+      "selectionProvenance": "Reconstructed from retained execution summary; original command string, shell wrapper, all worker flags/environment were not independently retained. Output redirection omitted. This is not a verbatim original invocation.",
+      "sourceProvenance": "Final candidate production source; only test fixtures/new test/docs changed after backend compilation. Frontend production build is final candidate code. Complete tracked identity in final-file-diff.json and HEAD/tree; no contemporaneous all-input digest.",
+      "aggregate": {
+        "passed": 1,
+        "failed": 0,
+        "filtered": 71
+      },
+      "originalFailureNames": [],
+      "retrospectiveSelection": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
+        "-t",
+        "blocks edits while the original publication is pending",
+        "--maxWorkers=2"
+      ],
+      "impactReviewAgainstRepair103953ac": "Retained corrected selected invocation has raw exit0 and original1 passed/71 filtered. checks.json states final candidate production source but command/name selection is retrospective. Final103 patch changes no frontend source/config/locks. Preserve selected-invocation success without converting71 filtered cases or asserting original per-case reporter names.",
+      "sourceImpactAssurance": "Independent reviewed historical impact, not contemporaneous execution-input authentication or promotion of reconstructed case names."
+    },
+    {
+      "id": "measurementInteractions",
+      "kind": "test",
+      "originalExitCode": 0,
+      "originalStatus": "passed",
+      "receiptSha256": "0beeecbc6273e54d31b446e5ffc8322c7807db9eca119e8dc465f34796ef087f",
+      "logSha256": "42cc52dc9bceae14d230ce4f9835d7b38efef1ce9d0f7b40ac5a3b307eb5954b",
+      "originalPassingCaseNames": [],
+      "passingCaseNamesOriginallyRecorded": false,
+      "countedAsApplicationTest": true,
+      "selectionProvenance": "Reconstructed from retained execution summary; original command string, shell wrapper, all worker flags/environment were not independently retained. Output redirection omitted. This is not a verbatim original invocation.",
+      "sourceProvenance": "Main measurement selection suite; merge product source, pending status paragraph may have been added afterward. No contemporaneous complete snapshot.",
+      "aggregate": {
+        "passed": 5,
+        "failed": 0,
+        "filtered": 0
+      },
+      "originalFailureNames": [],
+      "retrospectiveSelection": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/pages/questionnaire/__tests__/TrainingContentSelectionIntegration.test.tsx",
+        "--maxWorkers=2"
+      ],
+      "impactReviewAgainstRepair103953ac": "Original5-pass invocation covers actual QuestionnaireProducts and content/report selection using mocked API. The only later identified production adjustment in this workspace is conditional explanatory pending-publication status text, not selection/recovery serialization, request payloads or authoringLocked predicates. Test source exercises these guards and requests, not absence of that paragraph. Full pre-run snapshot absent; retain historical aggregate with disclosed source-impact review. Final103 patch has no frontend changes.",
+      "sourceImpactAssurance": "Independent reviewed historical impact, not contemporaneous execution-input authentication or promotion of reconstructed case names."
+    },
+    {
+      "id": "referenceLock",
+      "kind": "test",
+      "originalExitCode": 0,
+      "originalStatus": "passed",
+      "receiptSha256": "0beeecbc6273e54d31b446e5ffc8322c7807db9eca119e8dc465f34796ef087f",
+      "logSha256": "270fd251864c32c435ce7f605527f7f2972b935b76d8eee16243bf454cbecdf7",
+      "originalPassingCaseNames": [],
+      "passingCaseNamesOriginallyRecorded": false,
+      "countedAsApplicationTest": true,
+      "selectionProvenance": "Reconstructed from retained execution summary; original command string, shell wrapper, all worker flags/environment were not independently retained. Output redirection omitted. This is not a verbatim original invocation.",
+      "sourceProvenance": "Final candidate production source; only test fixtures/new test/docs changed after backend compilation. Frontend production build is final candidate code. Complete tracked identity in final-file-diff.json and HEAD/tree; no contemporaneous all-input digest.",
+      "aggregate": {
+        "passed": 1,
+        "failed": 0,
+        "filtered": 0
+      },
+      "originalFailureNames": [],
+      "retrospectiveSelection": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/training/TrainingCourseAnalysis.integration.test.tsx",
+        "--maxWorkers=2"
+      ],
+      "impactReviewAgainstRepair103953ac": "Original1-pass invocation covers final TrainingCourseAnalysis actor/course props and scientific lock propagation with reference studio internals mocked. Final103 changes no frontend source/config/locks. Admit only this interaction scope, not end-to-end reference governance or browser execution.",
+      "sourceImpactAssurance": "Independent reviewed historical impact, not contemporaneous execution-input authentication or promotion of reconstructed case names."
+    },
+    {
+      "id": "backendExportOverlap",
+      "kind": "test",
+      "originalExitCode": 1,
+      "originalStatus": "failed",
+      "receiptSha256": "0beeecbc6273e54d31b446e5ffc8322c7807db9eca119e8dc465f34796ef087f",
+      "logSha256": "3a4543be807367ef997fa462ba856c947ff091c3dad87cb9bc17225eeb88878a",
+      "originalPassingCaseNames": [],
+      "passingCaseNamesOriginallyRecorded": false,
+      "countedAsApplicationTest": true,
+      "selectionProvenance": "Reconstructed from retained execution summary; original command string, shell wrapper, all worker flags/environment were not independently retained. Output redirection omitted. This is not a verbatim original invocation.",
+      "sourceProvenance": "Final merged backend production source. Synthetic worker fixtures were still Mac versions, missing main principal and authority token data; new revocation case did not yet exist. Exact complete snapshot not recorded.",
+      "aggregate": {
+        "passed": 17,
+        "failed": 3,
+        "filtered": 0
+      },
+      "originalFailureNames": [
+        "src/__tests__/services/course-export-worker.test.ts > preserves the course boundary, cutoff and provenance through preparation and serialization",
+        "src/__tests__/services/course-export-worker.test.ts > fails closed if the course binding is revoked or exported rows leave its scope",
+        "src/__tests__/training-analysis/export-queue.test.ts > Training analysis durable original ExportBatch intent > keeps a Composite course scope in the intent and artifact and prevents replay under another course"
+      ],
+      "retrospectiveSelection": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/composite/course-scope.test.ts",
+        "src/__tests__/composite/export.controller.test.ts",
+        "src/__tests__/services/export-intent-date-range.test.ts",
+        "src/__tests__/services/course-export-worker.test.ts",
+        "src/__tests__/training-analysis/export-queue.test.ts",
+        "--maxWorkers=2"
+      ],
+      "impactReviewAgainstRepair103953ac": "The repair is functionally disjoint, not a claim that all imported modules are identical. course-scope.test calls composite-course-scope with Prisma mocked. export.controller.test mocks composite.service and composite exporter. course-export-worker.test mocks composite.service/exporter/projection/course authority and calls prepare/revalidate against synthetic principal/rows. export-intent-date-range.test calls separate exportIntentDateRange. export-queue.test calls enqueueExportJob/export identity schemas with DB/queue mocked. A conservative relative import scan reaches filters.ts through composite.service dynamic questionnaire-product/service dependencies and mock targets; catalog parse/list/tag APIs are not invoked. New finite-date refine is a deferred schema predicate with no new top-level I/O or shared-state effects. course.ts/tags.ts are absent even from that conservative closure. Queue/provenance/authority functions, config, lock and schema are unchanged by103. Original17-pass/3-fail invocation remains FAILED; original worker missing asBusinessPrincipal and queue missing authorityTokenVersion failures stay retained, with no full pre-execution snapshot.",
+      "sourceImpactAssurance": "Independent reviewed historical impact, not contemporaneous execution-input authentication or promotion of reconstructed case names."
+    },
+    {
+      "id": "backendExportRetry",
+      "kind": "test",
+      "originalExitCode": 0,
+      "originalStatus": "passed",
+      "receiptSha256": "0beeecbc6273e54d31b446e5ffc8322c7807db9eca119e8dc465f34796ef087f",
+      "logSha256": "ebab74f6d915d26e7846a87a9257a6879e19e32170b3b1e496aa7946ce13827d",
+      "originalPassingCaseNames": [],
+      "passingCaseNamesOriginallyRecorded": false,
+      "countedAsApplicationTest": true,
+      "selectionProvenance": "Reconstructed from retained execution summary; original command string, shell wrapper, all worker flags/environment were not independently retained. Output redirection omitted. This is not a verbatim original invocation.",
+      "sourceProvenance": "Final candidate production source; only test fixtures/new test/docs changed after backend compilation. Frontend production build is final candidate code. Complete tracked identity in final-file-diff.json and HEAD/tree; no contemporaneous all-input digest.",
+      "aggregate": {
+        "passed": 4,
+        "failed": 0,
+        "filtered": 7
+      },
+      "originalFailureNames": [],
+      "retrospectiveSelection": [
+        "node",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/__tests__/services/course-export-worker.test.ts",
+        "src/__tests__/training-analysis/export-queue.test.ts",
+        "-t",
+        "course boundary|course binding|Composite course scope|authority revocation",
+        "--maxWorkers=2"
+      ],
+      "impactReviewAgainstRepair103953ac": "The repair is functionally disjoint, not a claim that all imported modules are identical. course-scope.test calls composite-course-scope with Prisma mocked. export.controller.test mocks composite.service and composite exporter. course-export-worker.test mocks composite.service/exporter/projection/course authority and calls prepare/revalidate against synthetic principal/rows. export-intent-date-range.test calls separate exportIntentDateRange. export-queue.test calls enqueueExportJob/export identity schemas with DB/queue mocked. A conservative relative import scan reaches filters.ts through composite.service dynamic questionnaire-product/service dependencies and mock targets; catalog parse/list/tag APIs are not invoked. New finite-date refine is a deferred schema predicate with no new top-level I/O or shared-state effects. course.ts/tags.ts are absent even from that conservative closure. Queue/provenance/authority functions, config, lock and schema are unchanged by103. Corrected4-pass/7-filtered selected invocation uses repaired principal/token fixtures and adds authority-revocation assertion. Its raw exit0 and aggregate are retained; inferred selected names stay labeled.",
+      "sourceImpactAssurance": "Independent reviewed historical impact, not contemporaneous execution-input authentication or promotion of reconstructed case names."
+    },
+    {
+      "id": "overlapLint",
+      "kind": "lint",
+      "originalExitCode": 0,
+      "originalStatus": "passed",
+      "receiptSha256": "0beeecbc6273e54d31b446e5ffc8322c7807db9eca119e8dc465f34796ef087f",
+      "logSha256": "2c1d9503ce0794ce07ecff44712b866f1f0a474e5f341cdf8027ad2b022bffb6",
+      "originalPassingCaseNames": [],
+      "passingCaseNamesOriginallyRecorded": false,
+      "countedAsApplicationTest": false,
+      "selectionProvenance": "Reconstructed from retained execution summary; original command string, shell wrapper, all worker flags/environment were not independently retained. Output redirection omitted. This is not a verbatim original invocation.",
+      "sourceProvenance": "Merged conflict source before final visible pending status/test addition. Original exact 8-file argv was not retained in the compacted execution record; no fabricated command and no lint rerun."
+    },
+    {
+      "id": "frontendCollection",
+      "kind": "post-hoc-case-collection",
+      "originalExitCode": 0,
+      "originalStatus": "passed",
+      "receiptSha256": "0beeecbc6273e54d31b446e5ffc8322c7807db9eca119e8dc465f34796ef087f",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalPassingCaseNames": [],
+      "passingCaseNamesOriginallyRecorded": false,
+      "countedAsApplicationTest": false,
+      "selectionProvenance": "Original command not independently retained",
+      "sourceProvenance": "Freeze assertion, not authenticated historical working tree"
+    },
+    {
+      "id": "backendCollection",
+      "kind": "post-hoc-case-collection",
+      "originalExitCode": 0,
+      "originalStatus": "passed",
+      "receiptSha256": "0beeecbc6273e54d31b446e5ffc8322c7807db9eca119e8dc465f34796ef087f",
+      "logSha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalPassingCaseNames": [],
+      "passingCaseNamesOriginallyRecorded": false,
+      "countedAsApplicationTest": false,
+      "selectionProvenance": "Original command not independently retained",
+      "sourceProvenance": "Freeze assertion, not authenticated historical working tree"
+    }
+  ],
+  "compiledOutput": {
+    "originalExitCode": null,
+    "admission": "historical-completed-output-only-new-official-build-required-for-delivery",
+    "completionMarker": "Vite completed in 18.57s",
+    "logSha256": "468913a8eedbe738e7e1acb25f7a4a0d37894b0df9a5958ae79f3a69b1c62ac2",
+    "manifestSha256": "1b0f25db7a83f453763f2ef6d6f01412200f420d7e11088de3e6f50217ce3072",
+    "files": 415
+  },
+  "types": {
+    "admittedAsPassed": false,
+    "reason": "Empty original app type logs and retrospective observed-exit claim are retained but not promoted to raw completion. New current-input app tsc required; its roots/options subsume affected cognitive roots without claiming separate cognitive command."
+  },
+  "deltaReview": {
+    "backendCatalogFix": "Frontend closures contain none of the three backend files. Export tests exercise enqueue/date-range/course-scope with mocks. Conservative import closure can reach filters.ts through a dynamic service import, but catalog parsing is not invoked. New finite-date predicate only executes upon catalog parse; no top-level I/O/shared-state effects. course.ts/tags.ts are absent from those export closures.",
+    "newChecks": "New seven unique boundary controls have raw successful outcomes, original six then only two affected date checks; five unchanged controls filtered in latter invocation. Real PostgreSQL remains mandatory and was not run locally."
+  },
+  "limitations": [
+    "Original failed invocations remain failed. Selected retry success never converts entire earlier invocation to pass.",
+    "Original passing test names are not present; post-hoc reconstruction stays labeled.",
+    "Nine completion events do not authenticate full source or dependency bytes before runs.",
+    "Freeze tool/config hashes are after-execution records, not historical signatures.",
+    "Mac e05 database/browser evidence is historical on earlier source, not integrated65/db77 or103 candidate acceptance.",
+    "No tests/build/migration/CI were executed during this audit; no archived scripts executed.",
+    "No reconstructed passing name is represented as an original reporter name.",
+    "This gate admits the bounded historical record, not completion of failed invocations or all current functional risks.",
+    "Private raw logs and Library transport credentials are not published with this normalized metadata."
+  ],
+  "reviewedRawAuditSha256": "d6581bfa8b95fe5166398c2c8fb9c389d08d72932f58353401f2e36b44db8421",
+  "repairChecks": {
+    "commit": "103953acaecda6c31269332f8dbe7bc433950288",
+    "tree": "8c64bc597e21a7c17cb8836cb42edfd53f7aaaab",
+    "sourceReview": "No blocking defect found. UTC normalization, finite Date.parse guard, empty-tag OR/NULL DTO normalization, and parameterized atomic owner/admin expected-tags Scale CAS reviewed. Non-Scale write path unchanged.",
+    "evidenceRecordSha256": "bcf078734c2b137fee0636563e261ede254637ab5cd0aca9e494171dae4e4f94",
+    "unitOutcomes": [
+      {
+        "passed": 6,
+        "failed": 0,
+        "filtered": 0,
+        "phase": "Before finite-date refinement/new seventh test"
+      },
+      {
+        "passed": 2,
+        "failed": 0,
+        "filtered": 5,
+        "phase": "Final date-only refinement check"
+      }
+    ],
+    "uniqueCases": 7,
+    "postgresExecuted": false,
+    "ciExecuted": false,
+    "limitation": "Original six passed; final finite-date guard/new seventh case revalidated only two affected date cases; five unaffected controls retained by exact independent impact review."
+  },
+  "dependencySecurityDelta": {
+    "kind": "reviewed-exact-source-impact-not-unchanged-locks",
+    "package": "follow-redirects",
+    "from": "1.16.0",
+    "to": "1.16.1",
+    "paths": [
+      "server-version/backend/package.json",
+      "server-version/backend/package-lock.json",
+      "server-version/frontend/package-lock.json"
+    ],
+    "rationale": "Only standalone Node redirect implementation changes, no declarations/compiler/lint dependencies or application source changes. Axios browser mapping excludes Node HTTP adapter; backend direct consumer uses maxRedirects:0. Original records and dist retain their original identity, not new-lock execution. Both current-lock audits and patched runtime scans remain mandatory."
+  },
+  "viteSecurityDelta": {
+    "kind": "reviewed-tool-dependency-impact",
+    "backend": "7.3.6 -> 7.3.7",
+    "frontend": "6.4.3 -> 6.4.4",
+    "rationale": "Backend compiler is tsc and unchanged Vite declarations do not invalidate prior types/lint. Frontend shared build implementation changed: execute one new build. Reuse original browser only if the complete dist file set and every file byte match; otherwise execute the existing bounded browser cases. Both lock audits remain required."
+  },
+  "approvedLogoDelta": {
+    "sourceReference": "4d292975c4a32cb1b11f4c4024da4cc28be32710",
+    "patchSha256": "fbbcd321a26525842ebe298c5f69bb44ba5251dfda2b26b654ae0bdbd18635a4",
+    "paths": [
+      "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx",
+      "server-version/frontend/src/training/TrainingAuth.test.tsx",
+      "server-version/frontend/src/training/TrainingBrand.tsx",
+      "server-version/frontend/src/training/TrainingScreens.test.tsx",
+      "server-version/frontend/src/training/training-book-mountain.svg",
+      "server-version/frontend/src/training/training-brand.css",
+      "server-version/frontend/src/training/training-home-brand.css",
+      "server-version/frontend/src/training/training-logo.svg"
+    ],
+    "historicalLocalClaim": {
+      "passed": 8,
+      "filtered": 45,
+      "buildExecuted": false,
+      "provenance": "Mac child report, not an authenticated Actions execution"
+    },
+    "qualification": "New current frontend build, affected types/lint and existing compiled browser checks required; backend inputs unchanged by logo."
+  },
+  "reviewFixes": {
+    "sourceCommit": "5e1cc1d34845995cad48caed745e14e93b17ce02",
+    "fixtureCommit": "1a76e212",
+    "uniqueTargetedPasses": 6,
+    "originalRaceFailurePreserved": true,
+    "checkRecordSha256": "252fc6e5481839375d0b94e3b676d849521093cd5315d1af5dbc3353547cc6b8",
+    "scope": "Course-scoped links restricted to supported QUESTIONNAIRE and preserve context; Training page confirmation retained across refresh; successful checkpoint restore cancels pending auto advance. Only erroneous export fixture nonce/queued timing assertions corrected. No backend application change."
+  }
+}

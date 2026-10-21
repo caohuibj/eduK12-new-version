@@ -91,6 +91,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   const [meta, setMeta] = useState<FinalDraftMeta | null>(null)
   const [loadingDraft, setLoadingDraft] = useState(true)
   const [checkpointBusy, setCheckpointBusy] = useState(false)
+  const [checkpointRestoreGeneration, setCheckpointRestoreGeneration] = useState(0)
   const [submitting, setSubmitting] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [requiresRestart, setRequiresRestart] = useState(false)
@@ -283,10 +284,10 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   }
 
   const saveScale = async (itemCode: string, value: ResponseValue) => {
-    if (!draftKey || checkpointBusy || submitting || exiting || draftLocked) return
+    if (!draftKey || checkpointBusy || submitting || exiting || draftLocked) return false
     timingRef.current?.answer(itemCode,scaleValues[itemCode],value)
     setScaleValues((previous) => ({ ...previous, [itemCode]: value }))
-    await scheduleLocalSave(`scale:${itemCode}`, async () => {
+    return scheduleLocalSave(`scale:${itemCode}`, async () => {
       await finalDraftStore.putAnswer({ draftKey, itemKey: itemCode, value: { responseValue: value }, updatedAt: Date.now() })
       if(item?.trainingTiming&&timingRef.current)await finalDraftStore.setInstrumentMetadata(draftKey,{trainingScaleTiming:{snapshotHash:item.trainingTiming.snapshotHash,items:timingRef.current.snapshot()}})
     })
@@ -556,6 +557,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           const timingMetadata = nextTiming ? { trainingScaleTiming: { snapshotHash: item.trainingTiming!.snapshotHash, items: nextTiming.snapshot() } } : undefined
           await finalDraftStore.replaceAnswers(meta, Object.entries(values).map(([itemKey, value]) => ({ draftKey, itemKey, value, updatedAt: Date.now() })), timingMetadata)
           // Do not publish recovered values or timer refs until durable commit.
+          setCheckpointRestoreGeneration(value => value + 1)
           if (sectionId) { formValuesRef.current = nextForm; setFormValues(nextForm); setSectionIndex(0) }
           else { timingRef.current = nextTiming; setScaleValues(nextScale); setScaleIndex(0) }
         }}/>:null}
@@ -673,6 +675,8 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                 >
                   {(() => { const player=(<ScalePlayer
                     key={question.itemCode}
+                    autoAdvance={isTrainingHost() && !campusMode && !publicMode}
+                    scopeKey={`${draftKey || item.id}:${checkpointRestoreGeneration}`}
                     item={question}
                     value={scaleValues[question.itemCode]}
                     navigationDisabled={exiting}

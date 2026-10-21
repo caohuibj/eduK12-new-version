@@ -54,7 +54,7 @@ export default function MoreActions({ label = '更多操作', children, align = 
   }, [open])
   return <div className={`staff-more-actions staff-more-actions--${align}`}>
     <button ref={trigger} className="staff-more-actions__trigger" type="button" aria-label={label} aria-expanded={open} aria-controls={open ? id : undefined} onClick={() => setOpen(value => !value)} onKeyDown={event => { if (event.key === 'ArrowDown') { event.preventDefault(); setOpen(true) } }}><MoreHorizontal size={18} aria-hidden="true" /></button>
-    {open && createPortal(<div ref={menu} id={id} className="staff-more-actions__menu" role="group" aria-label={`${label}菜单`} style={position} onKeyDown={event => {
+    {open && createPortal(<div ref={menu} id={id} className="staff-more-actions__menu" data-training-teacher={trigger.current?.closest('.training-teacher-visual') ? 'true' : undefined} role="group" aria-label={`${label}菜单`} style={position} onKeyDown={event => {
       const controls = [...(menu.current?.querySelectorAll<HTMLElement>('button:not(:disabled), a[href]') ?? [])]
       if (!controls.length || !['ArrowDown', 'ArrowUp', 'Home', 'End'].includes(event.key)) return
       event.preventDefault()

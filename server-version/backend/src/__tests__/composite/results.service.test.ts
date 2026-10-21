@@ -26,6 +26,7 @@ const { mockPrisma } = vi.hoisted(() => ({
 
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
+vi.mock('../../modules/composite/composite-course-scope',()=>({assertCompositeCourseScope:vi.fn().mockResolvedValue({id:'course-a',title:'课程 A'})}))
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import { resolveCognitiveReferenceForResult } from '../../modules/cognitive/reference'
 import { readFrozenReport } from '../../modules/cognitive/profile-freeze'
@@ -296,6 +297,11 @@ describe('listAttemptsForTeacher', () => {
     mockPrisma.compositeAssessmentAttempt.count.mockResolvedValue(4)
 
     const result = await listAttemptsForTeacher('teacher-a', TEACHER, 'composite-1', page)
+    const scoped = await listAttemptsForTeacher('teacher-a', TEACHER, 'composite-1', {...page,courseId:'course-a'})
+    expect(scoped.courseScope).toEqual({id:'course-a',title:'课程 A'})
+    const scopedQuery=mockPrisma.compositeAssessmentAttempt.findMany.mock.calls.find(([input]:any[])=>JSON.stringify(input.where).includes('deliveryCourseId'))![0]
+    expect(scopedQuery.where.AND).toContainEqual({compositeAssessmentId:'composite-1',deliveryCourseId:'course-a'})
+    expect(mockPrisma.compositeAssessmentAttempt.groupBy.mock.calls.at(-1)![0].where.AND).toContainEqual({compositeAssessmentId:{in:['composite-1']},deliveryCourseId:'course-a'})
 
     expect(mockPrisma.compositeAssessmentAttempt.findMany.mock.calls[0][0].select).not.toHaveProperty('recoveryTokenHash')
     expect(JSON.stringify(result)).not.toContain('recoveryTokenHash')

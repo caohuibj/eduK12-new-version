@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import CompositeReportPage from '../CompositeReportPage'
 import type { CompositeReportStatus, ParticipantFeedbackStatus } from '../types'
 
@@ -579,4 +579,23 @@ it.each(['student', 'public'])('shows submitted unsatisfied %s reports and all c
   expect(screen.queryByText('未作答')).not.toBeInTheDocument()
   expect(mockCompositeApi.report).toHaveBeenCalledTimes(1)
   expect(mockCompositeApi.reanalyze).not.toHaveBeenCalled()
+})
+
+it('returns a scoped teacher report to the same course results',async()=>{
+ authState.user={role:'TEACHER'}
+ mockCompositeApi.teacherReport.mockResolvedValue({code:0,data:{id:'scoped-attempt',assessmentId:'q',name:'课程报告',productKind:'QUESTIONNAIRE',reportMode:'COLLECTION_ONLY',reportState:'PARTIAL',completedAt:null,totalTime:null,anonymousCode:null,backgroundValues:[],unitReports:[]}})
+ function Target(){return <p data-testid="scoped-return">{useLocation().search}</p>}
+ render(<MemoryRouter initialEntries={['/composite-assessments/q/attempts/scoped-attempt/report?partial=1&courseId=course-a']}><Routes><Route path="/composite-assessments/:id/attempts/:attemptId/report" element={<CompositeReportPage/>}/><Route path="/composite-assessments/:id/results" element={<Target/>}/></Routes></MemoryRouter>)
+ await screen.findByText('暂无已完成单项');fireEvent.click(screen.getByRole('button',{name:'返回'}))
+ expect(screen.getByTestId('scoped-return')).toHaveTextContent('?courseId=course-a')
+})
+
+it('retains the filtered teacher results parent without accepting an external destination',async()=>{
+ authState.user={role:'TEACHER'}
+ mockCompositeApi.teacherReport.mockResolvedValue({code:0,data:{id:'scoped-attempt',assessmentId:'q',name:'课程报告',productKind:'QUESTIONNAIRE',reportMode:'COLLECTION_ONLY',reportState:'PARTIAL',completedAt:null,totalTime:null,anonymousCode:null,backgroundValues:[],unitReports:[]}})
+ const parent='/composite-assessments/q/results?courseId=course-a&returnTo='+encodeURIComponent('/courses/course-a/detail?section=assessments&assessments_page=3')
+ function Target(){return <p data-testid="filtered-report-return">{useLocation().pathname+useLocation().search}</p>}
+ render(<MemoryRouter initialEntries={['/composite-assessments/q/attempts/scoped-attempt/report?partial=1&courseId=course-a&returnTo='+encodeURIComponent(parent)]}><Routes><Route path="/composite-assessments/:id/attempts/:attemptId/report" element={<CompositeReportPage/>}/><Route path="/composite-assessments/:id/results" element={<Target/>}/></Routes></MemoryRouter>)
+ await screen.findByText('暂无已完成单项');fireEvent.click(screen.getByRole('button',{name:'返回'}))
+ expect(screen.getByTestId('filtered-report-return')).toHaveTextContent(parent)
 })

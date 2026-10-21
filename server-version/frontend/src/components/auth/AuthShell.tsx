@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { ArrowLeft, BookOpenCheck, GraduationCap, HeartHandshake, ShieldCheck, UserRound } from 'lucide-react'
 import './auth-shell.css'
 import TrainingBrand from '../../training/TrainingBrand'
+import { trainingWelcomeCopy } from '../../training/welcomeCopy'
 import { useAuthLinks } from '../app-shell/useAuthLinks'
 import { isTrainingHost } from '../../training/context'
 import '../../training/training-auth-refresh.css'
@@ -74,13 +75,10 @@ export default function AuthShell({
   const preset = toneContent[tone]
   const training = isTrainingHost() && (tone === 'student' || tone === 'teacher')
   const Icon = training ? (trainingUnified ? BookOpenCheck : tone === 'student' ? UserRound : GraduationCap) : preset.Icon
-  const trainingRole = tone === 'student' ? '学员' : '培训师'
-  const trainingHeroLines = trainingUnified ? ['让学习，', '更有回响。'] : tone === 'student' ? ['循着课程，', '慢慢向前。'] : ['以所学，', '启发更多人。']
+  const trainingHeroLines = trainingWelcomeCopy.titleLines
   const copy = (value: string) => training ? value.replace(/教师邀请码|教师码/g, '培训师注册码').replace(/学生/g, '学员').replace(/教师/g, '培训师').replace(/班级/g, '课程') : value
-  const displayHeroTitle = training ? (tone === 'student' ? '循着课程，慢慢向前。' : '以所学，启发更多人。') : (heroTitle ?? preset.heroTitle)
-  const displayHeroDescription = training
-    ? (trainingUnified ? '学习与教学，从一个账号开始。' : tone === 'student' ? '加入培训课程，完成作业、打卡与测评。' : '创建课程，组织培训，见证学习与成长。')
-    : (heroDescription ?? preset.heroDescription)
+  const displayHeroTitle = heroTitle ?? preset.heroTitle
+  const displayHeroDescription = heroDescription ?? preset.heroDescription
   const registration = training && ['/register', '/student/course-login', '/student/register', '/teacher/login', '/teacher/register'].includes(pathname)
   const accountStep = registrationStep ? registrationStep !== 'verify' : ['/student/register', '/teacher/register'].includes(pathname)
   const submitted = registrationStep === 'submitted'
@@ -108,9 +106,9 @@ export default function AuthShell({
           </Link>}
 
           <div className="hui-auth-hero__copy">
-            <span className="hui-auth-eyebrow"><Icon size={16} aria-hidden="true" />{training ? (trainingUnified ? '培训账号入口' : `${trainingRole}入口`) : preset.label}</span>
+            <span className="hui-auth-eyebrow"><Icon size={16} aria-hidden="true" />{training ? trainingWelcomeCopy.eyebrow : preset.label}</span>
             <p className="hui-auth-hero__title">{training ? <>{trainingHeroLines.map(line => <span className="training-auth-title-line" key={line}>{line}</span>)}</> : displayHeroTitle}</p>
-            <p className="hui-auth-hero__description">{displayHeroDescription}</p>
+            <p className="hui-auth-hero__description">{training ? <>{trainingWelcomeCopy.descriptionLines[0]}<br />{trainingWelcomeCopy.descriptionLines[1]}</> : displayHeroDescription}</p>
           </div>
 
           {bullets.length > 0 && <ul className="hui-auth-benefits">
@@ -152,7 +150,7 @@ export default function AuthShell({
         </div>
       </section>
       {training && <footer className="training-auth-footer">
-        <span>© {new Date().getFullYear()} Huitraining</span><span>让学习，更有回响。</span>
+        <span>© {new Date().getFullYear()} Huitraining</span><span>{trainingWelcomeCopy.footer}</span>
       </footer>}
     </div>
   )

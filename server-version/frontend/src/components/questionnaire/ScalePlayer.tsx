@@ -1,3 +1,4 @@
+import { useScaleAutoAdvance } from '../../hooks/useScaleAutoAdvance'
 import { CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 
 export type ScalePlayerValue = string | number
@@ -9,6 +10,7 @@ export interface ScalePlayerOption {
 
 export interface ScalePlayerItem {
   itemCode: string
+  type?: string
   content: string
   required: boolean
   options: ScalePlayerOption[]
@@ -23,7 +25,9 @@ export interface ScalePlayerProps {
   submitDisabled?: boolean
   position: number
   total: number
-  onChange: (value: ScalePlayerValue) => void | Promise<void>
+  autoAdvance?: boolean
+  scopeKey?: string
+  onChange: (value: ScalePlayerValue) => void | boolean | Promise<void | boolean>
   onPrevious: () => void | Promise<void>
   onNext?: () => void | Promise<void>
   onSubmit?: () => void | Promise<void>
@@ -46,14 +50,22 @@ export function ScalePlayer({
   onSubmit,
   submitLabel = '提交整份量表',
   submitting = false,
+  autoAdvance = false,
+  scopeKey = '',
 }: ScalePlayerProps) {
-  const answerControlsDisabled = disabled || answerDisabled || submitting
-  const navigationControlsDisabled = disabled || navigationDisabled || submitting
-  const submitControlsDisabled = disabled || submitDisabled || submitting
+  const automatic = autoAdvance && item.type === 'single'
+  const selection = useScaleAutoAdvance({
+    questionKey: `${scopeKey}:${item.itemCode}`, enabled: automatic,
+    disabled: disabled || answerDisabled || navigationDisabled || submitting,
+    hasNext: position < total, onSave: onChange, onNext,
+  })
+  const answerControlsDisabled = disabled || answerDisabled || submitting || selection.busy
+  const navigationControlsDisabled = disabled || navigationDisabled || submitting || selection.busy
+  const submitControlsDisabled = disabled || submitDisabled || submitting || selection.busy
 
   return (
     <section aria-label={`量表题目 ${position} / ${total}`}>
-      <h3 className="mb-5 text-lg font-medium text-slate-900">
+      <h3 ref={selection.headingRef} tabIndex={automatic ? -1 : undefined} className="mb-5 text-lg font-medium text-slate-900">
         {item.content}
         {item.required ? <span className="ml-2 text-sm text-red-600">必答</span> : null}
       </h3>
@@ -66,7 +78,7 @@ export function ScalePlayer({
               type="button"
               key={`${typeof option.value}:${String(option.value)}`}
               aria-pressed={selected}
-              onClick={() => void onChange(option.value)}
+              onClick={event => { if (!automatic || event.detail < 2) void selection.select(option.value) }}
               disabled={answerControlsDisabled}
               className={`block min-h-11 w-full rounded-lg border px-4 py-3 text-left ${selected ? 'border-blue-700 bg-blue-50 text-blue-900' : 'border-slate-300 hover:border-slate-400'}`}
             >

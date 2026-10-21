@@ -12,6 +12,10 @@ vi.mock('../../../api/client', () => ({
   default: { patch: mockPatch, post: mockPost },
 }))
 
+const training = vi.hoisted(() => ({ enabled: false }))
+vi.mock('../../../training/context', async importOriginal => ({
+  ...await importOriginal<typeof import('../../../training/context')>(), isTrainingHost: () => training.enabled,
+}))
 import ScaleAssessment from '../ScaleAssessment'
 
 const scale = {
@@ -76,6 +80,7 @@ const renderPage = (id = `assessment-${Date.now()}-${Math.random()}`) => {
 }
 
 beforeEach(() => {
+  training.enabled = false
   vi.clearAllMocks()
   mockPost.mockImplementation((path: string) => (
     path === '/scales/scale-1/assessments'
@@ -92,6 +97,24 @@ beforeEach(() => {
 })
 
 describe('ScaleAssessment answer navigation', () => {
+  it('Training advances after an explicit answer and retains final submission and back navigation', async () => {
+    training.enabled = true
+    const user = userEvent.setup()
+    renderPage(`training-auto-${Date.now()}`)
+    await screen.findByRole('heading', { name: '第一题内容' })
+    await user.click(screen.getByRole('radio', { name: '选项 A' }))
+    expect(await screen.findByRole('heading', { name: '第二题内容' })).toHaveFocus()
+    await user.click(screen.getByRole('radio', { name: '选项 C' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: '完成测评' })).toBeEnabled())
+    expect(mockPost).not.toHaveBeenCalledWith(expect.stringContaining('/complete'), expect.anything())
+    await user.click(screen.getByRole('button', { name: '上一题' }))
+    expect(await screen.findByRole('heading', { name: '第一题内容' })).toHaveFocus()
+    expect(screen.getByRole('radio', { name: '选项 A' })).toBeChecked()
+    await user.click(screen.getByRole('radio', { name: '选项 A' }))
+    expect(await screen.findByRole('heading', { name: '第二题内容' })).toHaveFocus()
+    expect(mockPatch).not.toHaveBeenCalled()
+  })
+
   it('appends locally and advances explicitly before the batched network flush', async () => {
     let resolvePatch!: (value: { code: number; data?: { acceptedIds: string[]; acceptedSequences: number[] } }) => void
     mockPatch.mockReturnValueOnce(new Promise((resolve) => {

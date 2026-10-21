@@ -364,8 +364,297 @@
       }
     },
     "training-mac": {
-      "enabled": false,
-      "blockedReason": "PR319 is not yet integrated onto the merged measurement main; no candidate frozen"
+      "enabled": true,
+      "base": "9e1b302e1e255050b15ab150905bc69cee1b3c1b",
+      "sourceReference": "1a76e212cbdc5d5c79209a583b09d5c7632ea830",
+      "productInventorySha256": "c9c7b697c6d0e57bf0412b973e040d974f209c6a9afc9ad02470af07339c773b",
+      "diffSha256": "1aafb26e432fd00b8230d69abd1c036a497aa0977dbc1385801b99cbf385cbc8",
+      "situationalCatalogBoundary": {
+        "disposition": "not-executed-unaffected-catalog",
+        "reviewed": true,
+        "inputs": [
+          {
+            "path": "server-version/backend/package-lock.json",
+            "mode": "100644",
+            "blob": "9e55fdb8bc4a29baf93fe815cd1585090364cd0b"
+          },
+          {
+            "path": "server-version/backend/package.json",
+            "mode": "100644",
+            "blob": "ebe2f4233e00784fafc2f866e6c1f212ff31385e"
+          },
+          {
+            "path": "server-version/backend/scripts/generate-situational-instruments.mjs",
+            "mode": "100644",
+            "blob": "383d99d5193bc97d1130e3337dc658e14d3db0b2"
+          },
+          {
+            "path": "server-version/backend/src/modules/assessment-core/definition-primitives.ts",
+            "mode": "100644",
+            "blob": "831ec982b84246fabb514622697c95af34b379e9"
+          },
+          {
+            "path": "server-version/backend/src/modules/assessment-core/sjt/compiler.ts",
+            "mode": "100644",
+            "blob": "d7e97d5798ac92126c5e763265225ed9610c6d16"
+          },
+          {
+            "path": "server-version/backend/src/modules/assessment-core/sjt/definition.ts",
+            "mode": "100644",
+            "blob": "7e88c67cbcedc5095cc69af54d27fb40937a468d"
+          },
+          {
+            "path": "server-version/backend/src/modules/assessment-core/sjt/runtime.ts",
+            "mode": "100644",
+            "blob": "fd0b55202bad12e8eabeae1f270390616e1bf52a"
+          },
+          {
+            "path": "server-version/backend/src/modules/assessment-core/sjt/selection.ts",
+            "mode": "100644",
+            "blob": "f7e74711d6d77b3b22914963974547399693ed41"
+          },
+          {
+            "path": "server-version/backend/src/modules/assessment-core/sjt/structure.ts",
+            "mode": "100644",
+            "blob": "39955dff22f5583f510515ac6c0c0790ba64f87b"
+          },
+          {
+            "path": "server-version/backend/src/modules/assessment-core/sjt/validation.ts",
+            "mode": "100644",
+            "blob": "4450a24c965fed09c856c445843b856279750c1d"
+          },
+          {
+            "path": "server-version/backend/src/modules/assessment-governance/scientific-maturity.ts",
+            "mode": "100644",
+            "blob": "9897dc83313ec92d0014cdee2bb3b1d229a312d6"
+          },
+          {
+            "path": "server-version/backend/src/modules/assessment-governance/scientific-qualification.ts",
+            "mode": "100644",
+            "blob": "3aa1b69ab6c711905b24a06e63d5ee737b809c72"
+          },
+          {
+            "path": "server-version/backend/src/modules/assessment-media/assessment-asset-identity.ts",
+            "mode": "100644",
+            "blob": "6a0819dba0c2c94c0c6fcbf66a9f67ccde62b241"
+          },
+          {
+            "path": "server-version/backend/src/modules/assessment-media/assessment-image-presentation.ts",
+            "mode": "100644",
+            "blob": "8bb97c61e852cdd841138887795b32fa79f02ae3"
+          },
+          {
+            "path": "server-version/backend/src/modules/assessment-media/assessment-image.ts",
+            "mode": "100644",
+            "blob": "09b4f6f27c6b6975a61688af120709664d530d10"
+          },
+          {
+            "path": "server-version/backend/src/modules/assessment-media/assessment-video.ts",
+            "mode": "100644",
+            "blob": "17249b599e5266c5df5fb5add7277ff7980622d7"
+          },
+          {
+            "path": "server-version/backend/src/modules/assessment-runtime/canonical.ts",
+            "mode": "100644",
+            "blob": "a115b41386a6a6eb9baba9e158611dfd5d3ed425"
+          },
+          {
+            "path": "server-version/backend/src/modules/assessment-runtime/compiler.ts",
+            "mode": "100644",
+            "blob": "97841e4be7163fa28f456bdc60e041617c6dddce"
+          },
+          {
+            "path": "server-version/backend/src/modules/cognitive/v2/presentation.ts",
+            "mode": "100644",
+            "blob": "4d91bb2a10761c4c8f7882070997a9693bc41aee"
+          },
+          {
+            "path": "server-version/backend/src/modules/scale/library/audience-report-gate.ts",
+            "mode": "100644",
+            "blob": "d64805f97d3732111efd890196104985fb385460"
+          },
+          {
+            "path": "server-version/backend/src/modules/scale/scale-definition.ts",
+            "mode": "100644",
+            "blob": "82f2c30aa0873c50ac1572b518c5310443b4aaa3"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/authoring/online.ts",
+            "mode": "100644",
+            "blob": "1b6be2fe04a9e97c94eecc240cdf64f3b700ff64"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/authoring/template.ts",
+            "mode": "100644",
+            "blob": "55435fe80b4b3f2f88622dc4ad841e2646865530"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/instruments/sjt-anxiety-golden/1.0.0/instrument.json",
+            "mode": "100644",
+            "blob": "512ce2d9a38c4527830fd9902de27bbf95333fff"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/instruments/sjt-anxiety-golden/1.0.0/publication.json",
+            "mode": "100644",
+            "blob": "be5e38a3ff1b0599298bb01c1bd786fab186246b"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/instruments/sjt-anxiety-golden/1.0.0/scientific.json",
+            "mode": "100644",
+            "blob": "afea7e78e76105bbe69d6f4242eaf536d4c71c59"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/instruments/sjt-assertiveness-golden/1.0.0/instrument.json",
+            "mode": "100644",
+            "blob": "3b48d35e415dc83ce8546eefd8d435db444f7555"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/instruments/sjt-assertiveness-golden/1.0.0/publication.json",
+            "mode": "100644",
+            "blob": "bab09770c3880a86f59bef51cf05b5ae25768136"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/instruments/sjt-assertiveness-golden/1.0.0/scientific.json",
+            "mode": "100644",
+            "blob": "afea7e78e76105bbe69d6f4242eaf536d4c71c59"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/instruments/sjt-responsibility-golden/1.0.0/instrument.json",
+            "mode": "100644",
+            "blob": "fb684a7bf72a3654008953af9ddabaaeefb9ba53"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/instruments/sjt-responsibility-golden/1.0.0/publication.json",
+            "mode": "100644",
+            "blob": "e80f67b1c8b7167f86c7e462bb9bb282b7765ab6"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/instruments/sjt-responsibility-golden/1.0.0/scientific.json",
+            "mode": "100644",
+            "blob": "afea7e78e76105bbe69d6f4242eaf536d4c71c59"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/onboarding/instrument-registry.ts",
+            "mode": "100644",
+            "blob": "d9c136e29bbf0324c530d7f7a44e8499dc53ff20"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/onboarding/instruments.generated.ts",
+            "mode": "100644",
+            "blob": "2c3782eecafb7e782615bb7cfefa2d7531352836"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/onboarding/migration-releases.json",
+            "mode": "100644",
+            "blob": "afe854a133c30aefa60f5ff35c0d1f6b6360101a"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/onboarding/path-policy.ts",
+            "mode": "100644",
+            "blob": "54eede5f92a0c2b8685367c2840b7b47852bde8f"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/onboarding/publication-gate.ts",
+            "mode": "100644",
+            "blob": "baa4c814513090d9d5a5bcdeea5caef3462e88f2"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/onboarding/review-authority.ts",
+            "mode": "100644",
+            "blob": "170a76d802e998502bbfa262243f867acc0c4a89"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/onboarding/schema.ts",
+            "mode": "100644",
+            "blob": "07923cc58bd7391e7ab6e19a67062bf4c83a5f0c"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/onboarding/scientific-governance.ts",
+            "mode": "100644",
+            "blob": "70ba43fa3a752d02ced8bef941ac531e0c1ed106"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/onboarding/scientific-qualification.ts",
+            "mode": "100644",
+            "blob": "0f31f831b8c3f98c6c74ed365cc123ae8cb6cfde"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/onboarding/scientific-schema.ts",
+            "mode": "100644",
+            "blob": "665cd22d30221c549e944fe8e3b11e08574c2da7"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/situation-branching.ts",
+            "mode": "100644",
+            "blob": "3ce3e81dd03cffc7fdaecd57573ce01113401437"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/situation-definition.ts",
+            "mode": "100644",
+            "blob": "16e38a100d26bf46af5706ef1074539269959b51"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/situation-model-resolver.ts",
+            "mode": "100644",
+            "blob": "70344ef3f3bf229748d8165d8fc01558f26ccaad"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/situation-package.ts",
+            "mode": "100644",
+            "blob": "ea972ef01211f119998293ef8e79354beaa63e1b"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/situation-runtime-definition.ts",
+            "mode": "100644",
+            "blob": "3c883c09437d50c6fdaea2782238ce57080cd838"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/situation-scientific-contract.ts",
+            "mode": "100644",
+            "blob": "3c9c7232cc6f345cbd2660e6294ab083aefa0356"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/situation-scientific-validation.ts",
+            "mode": "100644",
+            "blob": "e80112bc6d685c33e9fbbed74134fc9afeb1cbc4"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/situation-scoring.ts",
+            "mode": "100644",
+            "blob": "11ad6009ec5f276b4b6d54057b9e46771f62eb8b"
+          },
+          {
+            "path": "server-version/backend/src/modules/situational/situation-trajectory.ts",
+            "mode": "100644",
+            "blob": "d22d9ade5a5b62568803c5584939fcc6e3af3257"
+          },
+          {
+            "path": "server-version/backend/src/scripts/situational-onboarding-check.ts",
+            "mode": "100644",
+            "blob": "db7abc6088ad052a1bff76889764bf63a8fafb17"
+          },
+          {
+            "path": "server-version/backend/tsconfig.json",
+            "mode": "100644",
+            "blob": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d"
+          }
+        ],
+        "sourceReviewSha256": "97d94ebcdaf029fa67d29dc77b49955730ae9916f1ac04710ddb48fb952175cb",
+        "rationale": "All other checker/catalog consumed inputs and the complete instrument tree are unchanged. The exact two dependency files are separately reviewed below; sourceReviewSha256 identifies the original boundary review, not a claim that current locks are unchanged. The three changed consumer services are not checker consumers. No checker execution PASS is claimed.",
+        "reviewedDependencyDelta": [
+          {
+            "path": "server-version/backend/package.json",
+            "before": "ebe2f4233e00784fafc2f866e6c1f212ff31385e",
+            "after": "033398f6361b0e4217226ae00f2edc2ed3380ecd"
+          },
+          {
+            "path": "server-version/backend/package-lock.json",
+            "before": "9e55fdb8bc4a29baf93fe815cd1585090364cd0b",
+            "after": "73607721290dd28f1c6f85d5e12d5d517926ede3"
+          }
+        ],
+        "dependencyDeltaRationale": "Exact follow-redirects and Vite security patches only. Catalog source and instruments are unchanged; the checker executes tsx, not Vite, and does not consume Axios redirects. Fresh dependency audits remain mandatory."
+      }
     }
   }
 }

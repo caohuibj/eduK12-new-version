@@ -403,6 +403,8 @@ model Assignment {
   submissions Submission[]
 
   @@map("assignments")
+  @@index([courseId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([tags], type: Gin)
 }
 
 model Submission {
@@ -486,6 +488,8 @@ model Checkin {
   creator         User                 @relation("CheckinCreator", fields: [creatorId], references: [id])
 
   @@map("checkins")
+  @@index([courseId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([tags], type: Gin)
 }
 
 model CheckinSubmission {
@@ -762,6 +766,8 @@ model Scale {
   compositeItems      CompositeAssessmentItem[] @relation("CompositeAssessmentScale")
 
   @@map("scales")
+  @@index([creatorId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([tags], type: Gin)
 }
 
 // 测评记录表
@@ -872,6 +878,7 @@ enum QuestionnaireType {
 
 // 问卷主表
 model Questionnaire {
+  tags String[] @default([])
   id            String              @id @default(uuid())
   code          String              @unique // 问卷编码
   name          String // 问卷名称
@@ -895,6 +902,8 @@ model Questionnaire {
   accessTokens         QuestionnaireAccessToken[] // 新增：访问令牌关联
 
   @@map("questionnaires")
+  @@index([creatorId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([tags], type: Gin)
 }
 
 // 问卷-量表关联表
@@ -1187,6 +1196,7 @@ enum CompositeAnalysisSnapshotGenerationReason {
 
 // 综合测评模板。发布后项目配置不可修改，历史测评通过子记录保存各自的结果快照。
 model CompositeAssessment {
+  tags String[] @default([])
   trainingReportSelectionDraft Json? @map("training_report_selection_draft")
   trainingReferenceSelectionDraft Json? @map("training_reference_selection_draft")
   trainingReportDrafts TrainingReportDraft[]
@@ -1253,6 +1263,8 @@ model CompositeAssessment {
   @@index([copyable, status])
   @@index([reportPackageKey, reportPackageVersion], map: "composite_assessments_report_package_key_version_idx")
   @@map("composite_assessments")
+  @@index([createdBy, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([tags], type: Gin)
 }
 
 // Private reusable definitions. Prototype drafts contain no deliveries/answers.
@@ -1811,6 +1823,7 @@ model CognitiveTestConfig {
 
 // 认知测评分发（课程作业）。courseId 可空 + SetNull，保留 courseSnapshot 以抵御课程删除。
 model CognitiveAssignment {
+  tags String[] @default([])
   measurementReleaseId String? @map("measurement_release_id")
   measurementRelease MeasurementContentRelease? @relation(fields:[measurementReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction)
   id                              String                    @id @default(uuid())
@@ -1848,6 +1861,8 @@ model CognitiveAssignment {
   @@index([courseId])
   @@index([quotaSourceAssignmentId])
   @@map("cognitive_assignments")
+  @@index([courseId, createdAt(sort: Desc), id(sort: Desc)])
+  @@index([tags], type: Gin)
 }
 
 // 认知测评会话。所有敏感字段以密文存储（*Encrypted，统一 Cognitive 信封）。

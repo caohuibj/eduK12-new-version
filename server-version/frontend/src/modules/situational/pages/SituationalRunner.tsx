@@ -44,6 +44,9 @@ import { useAssessmentImageAssets } from '../../assessment-media/useAssessmentIm
 import type { AssessmentImagePresentationItem } from '../../assessment-media/types'
 import SituationalVideoPresentation, { type SituationalVideoGateStatus } from '../SituationalVideoPresentation'
 import { resolveSituationalRunnerRouteContext } from '../runner-context'
+import { isTrainingHost } from '../../../training/context'
+import { useScaleAutoAdvance } from '../../../hooks/useScaleAutoAdvance'
+import { TRAINING_SJT_PAGE, trainingSjtPageCursor, trainingSjtPageIndex } from '../training-navigation'
 
 const responseValueFor = (
   responses: Record<string, SituationalDraftAnswer>,
@@ -159,6 +162,10 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
   const submittingRef = useRef(false)
   const saveQueueRef = useRef<Promise<void>>(Promise.resolve())
   const pendingSavesRef = useRef(0)
+  const trainingSequential = isTrainingHost() && !campus && !publicMode
+  const selectedChannelRef = useRef<string | null>(null)
+  const pageMovingRef = useRef(false)
+  const [pageMoving, setPageMoving] = useState(false)
 
   useEffect(() => {
     responsesRef.current = responses
@@ -231,15 +238,18 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
           const node = next.instrument.definition.schemaVersion === 2 ? next.instrument.definition.flow.nodes.find(n => n.nodeType === 'SCENE' && n.sceneKey === scene.sceneKey) : undefined
           return node?.nodeType === 'SCENE' && Boolean(currentResponseStage(node, histories[scene.sceneKey] ?? '[]', restoredEvents))
         }) : -1
-        setCurrentIndex(
+        const confirmedPage = trainingSequential
+          ? trainingSjtPageIndex(meta.instrumentMetadata, reachableScenes.map(scene => scene.sceneKey))
+          : null
+        setCurrentIndex(trainingSequential ? (confirmedPage ?? 0) : (
           pendingStageIndex >= 0
             ? pendingStageIndex
             : missingIndex >= 0
               ? missingIndex
             : next.instrument.definition.schemaVersion === 1
               ? 0
-              : Math.max(0, reachableScenes.length - 1),
-        )
+              : Math.max(0, reachableScenes.length - 1)
+        ))
       } catch (reason) {
         if (!cancelled) setError(situationalErrorMessage(reason))
       } finally {
@@ -248,7 +258,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
     }
     void load()
     return () => { cancelled = true }
-  }, [attemptId, client, embeddedCompletionPath, instrumentKey, navigate, publicMode, recoveryToken])
+  }, [attemptId, client, embeddedCompletionPath, instrumentKey, navigate, publicMode, recoveryToken, trainingSequential])
 
   const scenes = useMemo(() => (
     data ? reachableSituationalScenes(data.instrument.definition, responses) : []
@@ -374,8 +384,8 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
     channel: SituationalRunnerChannel,
     responseValue: string | number | string[],
     status?: 'ANSWERED' | 'REFUSED' | 'BLANK',
-  ): Promise<void> => {
-    if (!data || checkpointBusy || submitting || submissionLocked) return Promise.resolve()
+  ): Promise<boolean> => {
+    if (!data || checkpointBusy || submitting || submissionLocked || pageMovingRef.current) return Promise.resolve(false)
     const currentData = data
     const key = responseKey(scene.sceneKey, channel.channelKey)
     const answeredAt = new Date().toISOString()
@@ -441,19 +451,68 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
         if (pendingSavesRef.current === 1) {
           setSaveStatus({ state: 'saved', message: '最新作答已保存到本机。' })
         }
+        return true
       })
       .catch((reason) => {
         const message = situationalErrorMessage(reason)
         setNotice(message)
         setSaveStatus({ state: 'error', message })
+        return false
       })
       .finally(() => {
         pendingSavesRef.current = Math.max(0, pendingSavesRef.current - 1)
         if (pendingSavesRef.current === 0) setSaving(false)
       })
 
-    saveQueueRef.current = tracked.catch(() => undefined)
+    saveQueueRef.current = tracked.then(() => undefined)
     return tracked
+  }
+
+  const choiceAdvance = useScaleAutoAdvance<{
+    channel: SituationalRunnerChannel; value: string | string[]; status?: 'ANSWERED' | 'REFUSED' | 'BLANK'
+  }>({
+    questionKey: `${data?.attempt.id}:${currentScene?.sceneKey}:${responseStage?.stageKey ?? ''}`,
+    enabled: trainingSequential,
+    disabled: checkpointBusy || submitting || submissionLocked || mediaBusy || pageMoving,
+    hasNext: true,
+    onSave: async ({ channel, value, status }) => {
+      selectedChannelRef.current = status && status !== 'ANSWERED' ? null : channel.channelKey
+      if (!currentScene) return false
+      return persistAnswer(currentScene, channel, value, status)
+    },
+    onNext: () => {
+      // Move within the current page only; never reveal a new scientific stage or scene.
+      const fields = Array.from(stageInputsRef.current?.querySelectorAll<HTMLFieldSetElement>('[data-sjt-question]') ?? [])
+      const active = visibleChannels.filter(channel => !currentFlowNode?.responseStages || responseStage?.channelKeys.includes(channel.channelKey))
+      const index = active.findIndex(channel => channel.channelKey === selectedChannelRef.current)
+      const nextKey = index < 0 ? undefined : active[index + 1]?.channelKey
+      const next = nextKey ? fields.find(field => field.dataset.sjtQuestion === nextKey) : undefined
+      const legend = next?.querySelector('legend')
+      legend?.focus()
+      legend?.scrollIntoView?.({ behavior: 'smooth', block: 'center' })
+    },
+  })
+
+  const confirmNextScene = async () => {
+    if (!data || !currentScene || !currentSceneComplete || checkpointBusy || saving || pendingSavesRef.current
+      || submitting || submissionLocked || mediaBusy || choiceAdvance.busy || pageMovingRef.current || currentIndex >= scenes.length - 1) return
+    if (!trainingSequential) { setCurrentIndex(index => index + 1); return }
+    pageMovingRef.current = true
+    setPageMoving(true)
+    try {
+      await saveQueueRef.current
+      const meta = await finalDraftStore.setInstrumentMetadata(situationalDraftKey(data.attempt.id), {
+        [TRAINING_SJT_PAGE]: trainingSjtPageCursor(scenes.slice(0, currentIndex + 2).map(scene => scene.sceneKey)),
+      })
+      if (!meta) throw new Error('本机草稿不存在，未换页。请重试保存。')
+      setCurrentIndex(index => index + 1)
+      setNotice(null)
+    } catch (reason) {
+      setNotice(situationalErrorMessage(reason))
+    } finally {
+      pageMovingRef.current = false
+      setPageMoving(false)
+    }
   }
 
   const confirmStage = async () => {
@@ -631,7 +690,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
       <button
         type="button"
         onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))}
-        disabled={checkpointBusy || currentIndex === 0 || saving || submitting}
+        disabled={trainingSequential || checkpointBusy || currentIndex === 0 || saving || submitting}
         className="inline-flex min-h-11 items-center justify-center gap-1 rounded-lg px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 disabled:cursor-not-allowed disabled:opacity-50"
       >
         <ChevronLeft className="h-4 w-4" />上一题
@@ -640,17 +699,17 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
         {currentIndex < scenes.length - 1 ? (
           <button
             type="button"
-            onClick={() => setCurrentIndex((index) => Math.min(scenes.length - 1, index + 1))}
-            disabled={checkpointBusy || saving || submitting || mediaBusy || !currentSceneComplete}
+            onClick={() => void confirmNextScene()}
+            disabled={checkpointBusy || saving || submitting || submissionLocked || mediaBusy || !currentSceneComplete || choiceAdvance.busy || pageMoving}
             className="inline-flex min-h-11 items-center justify-center gap-1 rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-50"
           >
-            下一题<ChevronRight className="h-4 w-4" />
+            {trainingSequential ? '确认本页并进入下一情境' : '下一题'}<ChevronRight className="h-4 w-4" />
           </button>
         ) : null}
         <button
           type="button"
           onClick={() => void submit()}
-          disabled={checkpointBusy || saving || submitting || mediaBusy}
+          disabled={checkpointBusy || saving || submitting || mediaBusy || choiceAdvance.busy || pageMoving || (trainingSequential && currentIndex < scenes.length - 1)}
           className="inline-flex min-h-11 items-center justify-center gap-2 rounded-lg bg-emerald-600 px-5 py-2 text-sm font-medium text-white hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-50"
         >
           <Send className="h-4 w-4" />{submitting ? '提交中…' : submissionLocked ? '重新核对提交' : '提交测评'}
@@ -668,7 +727,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
             key={`${scene.sceneKey}:${index}`}
             type="button"
             onClick={() => setCurrentIndex(index)}
-            disabled={checkpointBusy || saving || submitting || (Boolean(responseStage) && index > currentIndex)}
+            disabled={(trainingSequential && index !== currentIndex) || checkpointBusy || saving || submitting || (Boolean(responseStage) && index > currentIndex)}
             aria-label={`情境 ${index + 1}${sceneIsComplete(data.instrument.definition, index, responses) ? '，已完成' : '，未完成'}`}
             aria-current={currentIndex === index ? 'step' : undefined}
             className={`min-h-11 min-w-11 rounded-lg px-3 text-sm font-medium transition ${currentIndex === index ? 'bg-indigo-600 text-white' : sceneIsComplete(data.instrument.definition, index, responses) ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
@@ -684,7 +743,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
     <AssessmentShell
       title={currentScene.title}
       eyebrow={embedded ? '综合测评 · 情境单元' : '情境化测评'}
-      instructions={`冻结版本 ${data.attempt.instrumentVersion}。请根据当前可达情境完成作答；分支变化时，只保留当前路径上仍有效的答案。`}
+      instructions={trainingSequential ? '单选保存后会自动定位到本页下一题。进入下一情境前请检查本页答案，点击确认后不能返回本页修改。' : `冻结版本 ${data.attempt.instrumentVersion}。请根据当前可达情境完成作答；分支变化时，只保留当前路径上仍有效的答案。`}
       progress={shellProgress}
       saveStatus={saveStatus}
       submissionStatus={submissionStatus}
@@ -703,8 +762,13 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
             const row=rows.find(row=>row.slotKey===`situational:${compositeItemId}`)
             if(!row)throw new Error('服务器没有当前情境单元草稿，本机内容保持不变。')
             const next=situationalCheckpointAnswers(data,row.answers)
+            if (trainingSequential && currentIndex > 0) {
+              const lockedKeys = scenes.slice(0, currentIndex).flatMap(scene => scene.channels.map(channel => responseKey(scene.sceneKey, channel.channelKey)))
+              if (lockedKeys.some(key => JSON.stringify([next[key]?.responseValue,next[key]?.status]) !== JSON.stringify([responsesRef.current[key]?.responseValue,responsesRef.current[key]?.status]))) throw new Error('服务器草稿会改变已确认情境的答案，未恢复。本机草稿保持不变。')
+              trainingSjtPageIndex(meta.instrumentMetadata, reachableSituationalScenes(data.instrument.definition,next).map(scene => scene.sceneKey))
+            }
             await finalDraftStore.replaceSituationalAnswers(meta,Object.entries(next).map(([itemKey,value])=>({draftKey:key,itemKey,value,updatedAt:Date.now()})))
-            responsesRef.current=next;setResponses(next);setContinuousInputs({});setCurrentIndex(0);setRecoveryState({state:'resumed',message:'已恢复服务器情境答案草稿，尚未正式交卷。'})
+            responsesRef.current=next;setResponses(next);setContinuousInputs({});if(!trainingSequential)setCurrentIndex(0);setRecoveryState({state:'resumed',message:'已恢复服务器情境答案草稿，尚未正式交卷。'})
           }}/> : null}
       {notice ? <div role="alert" className="mb-5 rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">{notice}</div> : null}
 
@@ -713,8 +777,10 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
           <span>{data.instrument.definition.schemaVersion === 1 ? `情境 ${currentIndex + 1} / ${scenes.length}` : '开放路径中的当前情境'}</span>
           <span>{currentSceneComplete ? <span className="inline-flex items-center gap-1 text-emerald-700"><CheckCircle2 className="h-4 w-4" />已完成</span> : '待完成'}</span>
         </div>
-        <h2 id="situational-scene-content-title" className="text-base font-semibold text-gray-900">情境内容</h2>
+        <h2 ref={choiceAdvance.headingRef} tabIndex={trainingSequential ? -1 : undefined} id="situational-scene-content-title" className="text-base font-semibold text-gray-900">情境内容</h2>
         {renderStimulus()}
+
+        {trainingSequential ? <p className="mt-5 text-sm text-gray-600">本页共 {currentScene.channels.length} 个问题，其中 {currentScene.channels.filter(channel => channel.responseType === 'SINGLE_CHOICE' || channel.responseType === 'MULTIPLE_CHOICE').length} 道选择题。{responseStage ? '分阶段展示，确认前不会显示后续问题。' : null}{currentIndex < scenes.length - 1 ? '本页完成后需手动确认换页；确认后不能返回。' : '这是最后一个情境，完成后请手动提交测评。'}</p> : null}
 
         {responseStage ? <p role="status" className="mt-5 text-sm text-gray-600">{responseStage.kind === 'CHOICE' ? '确认行动选择后，将展示后续问题。确认后的行动选择将锁定。' : '请根据已看到的信息回答本阶段问题。'}</p> : null}
         <div ref={stageInputsRef} className="mt-7 space-y-7">
@@ -722,12 +788,12 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
             const answer = responseValueFor(responses, currentScene, channel)
             const fieldName = responseKey(currentScene.sceneKey, channel.channelKey)
             return (
-              <fieldset key={fieldName} className="space-y-3" disabled={checkpointBusy || submitting || mediaBusy || submissionLocked || (channel.online && saving) || Boolean(currentFlowNode?.responseStages?.some(stage => stage.channelKeys.includes(channel.channelKey) && stage.stageKey !== responseStage?.stageKey))}>
-                <legend className="text-base font-semibold text-gray-900">{channel.prompt}{channel.required === false ? <span className="ml-2 text-sm font-normal text-gray-500">（可选）</span> : null}</legend>
-                {channel.online && <OnlineAnswerField channel={channel} answer={answer} name={fieldName} onChange={(value,status)=>void persistAnswer(currentScene,channel,value,status)}/>}
+              <fieldset key={fieldName} data-sjt-question={channel.channelKey} className="space-y-3" disabled={checkpointBusy || submitting || mediaBusy || submissionLocked || pageMoving || (trainingSequential && (saving || choiceAdvance.busy)) || (channel.online && saving) || Boolean(currentFlowNode?.responseStages?.some(stage => stage.channelKeys.includes(channel.channelKey) && stage.stageKey !== responseStage?.stageKey))}>
+                <legend tabIndex={trainingSequential ? -1 : undefined} className="text-base font-semibold text-gray-900">{channel.prompt}{channel.required === false ? <span className="ml-2 text-sm font-normal text-gray-500">（可选）</span> : null}</legend>
+                {channel.online && <OnlineAnswerField channel={channel} answer={answer} name={fieldName} onChange={(value,status)=>{if(channel.responseType==='SINGLE_CHOICE')void choiceAdvance.select({channel,value,status});else void persistAnswer(currentScene,channel,value,status)}}/>}
                 {!channel.online && channel.responseType === 'SINGLE_CHOICE' && (channel.options ?? []).map((option) => (
                   <label key={option.optionKey} className={`flex min-h-11 cursor-pointer items-start gap-3 rounded-xl border p-4 transition ${answer?.responseValue === option.optionKey ? 'border-indigo-500 bg-indigo-50 ring-1 ring-indigo-500' : 'border-gray-200 hover:border-indigo-300'}`}>
-                    <input type="radio" name={fieldName} value={option.optionKey} checked={answer?.responseValue === option.optionKey} onChange={() => void persistAnswer(currentScene, channel, option.optionKey)} className="mt-1 h-5 w-5 text-indigo-600 focus:ring-indigo-500" aria-label={option.label} />
+                    <input type="radio" name={fieldName} value={option.optionKey} checked={answer?.responseValue === option.optionKey} onChange={() => void choiceAdvance.select({channel,value:option.optionKey})} className="mt-1 h-5 w-5 text-indigo-600 focus:ring-indigo-500" aria-label={option.label} />
                     <span className="text-sm leading-6 text-gray-700">{option.label}</span>
                   </label>
                 ))}
@@ -743,7 +809,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
             )
           })}
         </div>
-        {responseStage ? <button type="button" onClick={() => void confirmStage()} disabled={checkpointBusy || saving || submitting || mediaBusy || submissionLocked} className="mt-6 min-h-11 rounded-lg bg-indigo-600 px-5 py-2 text-white disabled:opacity-50">{responseStage.kind === 'CHOICE' ? '确认行动选择' : '确认本阶段作答'}</button> : null}
+        {responseStage ? <button type="button" onClick={() => void confirmStage()} disabled={checkpointBusy || saving || submitting || mediaBusy || submissionLocked || choiceAdvance.busy || pageMoving} className="mt-6 min-h-11 rounded-lg bg-indigo-600 px-5 py-2 text-white disabled:opacity-50">{responseStage.kind === 'CHOICE' ? '确认行动选择' : '确认本阶段作答'}</button> : null}
       </section>
     </AssessmentShell>
   )

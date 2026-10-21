@@ -1,8 +1,10 @@
-import { act, fireEvent, render, screen } from '@testing-library/react'
+import { act, fireEvent, render, screen, within } from '@testing-library/react'
 import { MemoryRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 const { attempts, exportData } = vi.hoisted(() => ({ attempts: vi.fn(), exportData: vi.fn() }))
+const trainingPresentation = vi.hoisted(() => ({ enabled: false }))
+vi.mock('../../../training/context', () => ({ isTrainingHost: () => trainingPresentation.enabled }))
 vi.mock('../../../modules/composite/api', () => ({ compositeApi: { attempts, exportData } }))
 vi.mock('../../../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'trainer', role: 'TEACHER' } }) }))
 import CompositeAssessmentResults from '../CompositeAssessmentResults'
@@ -24,7 +26,7 @@ function response(productKind: string, id = 'one') {
   } }
 }
 function deferred() { let resolve!: (value: unknown) => void; const promise = new Promise(done => { resolve = done }); return { promise, resolve } }
-beforeEach(() => { attempts.mockReset(); exportData.mockReset() })
+beforeEach(() => { attempts.mockReset(); exportData.mockReset(); trainingPresentation.enabled = false })
 
 // The previous binary branch sent every non-QUESTIONNAIRE result, including
 // ASSESSMENT_BUNDLE, to the legacy composite editor and its unsupported exports.
@@ -130,4 +132,83 @@ it('keeps the anonymous unsatisfied submission report available and labels quali
   expect(screen.getByText(/已交卷中任务达成 0 次，未达成 1 次/)).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button', { name: '查看' }))
   expect(screen.getByTestId('location').textContent).toBe('/composite-assessments/one/attempts/complete/report')
+})
+
+describe('Training results presentation', () => {
+  beforeEach(() => { trainingPresentation.enabled = true })
+  it('shows the existing counts separately from participant progress and preserves full/partial report actions', async () => {
+    const payload = response('QUESTIONNAIRE')
+    Object.assign(payload.data.attemptCounts, { satisfied: 0, notSatisfied: 1 })
+    Object.assign(payload.data.list[0], { taskSatisfied: false })
+    attempts.mockResolvedValue(payload)
+    mount()
+    await screen.findByRole('heading', { name: 'one 结果' })
+    const overview = screen.getByRole('region', { name: '作答概览' })
+    expect(within(overview).getByText('任务达成')).toBeInTheDocument()
+    expect(within(overview).getByText('0', { selector: 'strong' })).toBeInTheDocument()
+    expect(screen.getByRole('progressbar', { name: '进行者的作答进度' })).toHaveAttribute('value', '50')
+    expect(screen.getByText('任务未达成')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '查看报告' })).toBeEnabled()
+    fireEvent.click(screen.getByRole('button', { name: '已完成单项' }))
+    expect(screen.getByTestId('location').textContent).toBe('/composite-assessments/one/attempts/partial/report?partial=1')
+    expect(exportData).not.toHaveBeenCalled()
+  })
+  it('distinguishes no attempts from no filter matches and clears filters using the existing API', async () => {
+    const empty = response('QUESTIONNAIRE')
+    empty.data.list = []; empty.data.total = 0
+    attempts.mockResolvedValue(empty)
+    mount()
+    expect(await screen.findByRole('heading', { name: '还没有作答记录' })).toBeInTheDocument()
+    fireEvent.change(screen.getByLabelText('搜索'), { target: { value: '没有此人' } })
+    fireEvent.click(screen.getByRole('button', { name: '筛选' }))
+    expect(await screen.findByRole('heading', { name: '没有符合条件的作答记录' })).toBeInTheDocument()
+    expect(attempts).toHaveBeenLastCalledWith('one', { status: undefined, q: '没有此人', page: 1, pageSize: 20 })
+    fireEvent.click(screen.getByRole('button', { name: '清除筛选' }))
+    expect(await screen.findByRole('heading', { name: '还没有作答记录' })).toBeInTheDocument()
+    expect(screen.getByLabelText('搜索')).toHaveValue('')
+    expect(attempts).toHaveBeenLastCalledWith('one', { status: undefined, q: undefined, page: 1, pageSize: 20 })
+  })
+  it('does not show zero counts or a no-attempts message when access fails', async () => {
+    attempts.mockResolvedValue({ code: 403, message: '无权读取结果' })
+    mount()
+    await screen.findByText('无权读取结果')
+    const overview = screen.getByRole('region', { name: '作答概览' })
+    expect(within(overview).getAllByText('—', { selector: 'strong' })).toHaveLength(4)
+    expect(screen.queryByText('还没有作答记录')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '返回配置' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '查看报告' })).not.toBeInTheDocument()
+  })
+  it('keeps uncertain progress unmeasured and preserves pagination', async () => {
+    const payload = response('QUESTIONNAIRE')
+    Object.assign(payload.data.list[1], { progressUnavailableReason: '等待核对' })
+    payload.data.totalPages = 2; payload.data.hasMore = true; payload.data.total = 21
+    attempts.mockResolvedValue(payload)
+    mount()
+    await screen.findByText('进度待核对')
+    expect(screen.queryByRole('progressbar', { name: '进行者的作答进度' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '上一页' })).toBeDisabled()
+    fireEvent.click(screen.getByRole('button', { name: '下一页' }))
+    await screen.findByText('进度待核对')
+    expect(attempts).toHaveBeenLastCalledWith('one', { status: undefined, q: undefined, page: 2, pageSize: 20 })
+  })
+})
+
+it('preserves the course scope in list filtering and report navigation',async()=>{
+ trainingPresentation.enabled=true
+ const payload=response('QUESTIONNAIRE');Object.assign(payload.data,{courseScope:{id:'course-a',title:'课程 A'}})
+ attempts.mockResolvedValue(payload)
+ render(<MemoryRouter initialEntries={['/composite-assessments/one/results?courseId=course-a']}><Location/><Routes><Route path="/composite-assessments/:id/results" element={<CompositeAssessmentResults/>}/><Route path="*" element={<p>目标页面</p>}/></Routes></MemoryRouter>)
+ await screen.findByText(/当前课程：课程 A/)
+ expect(attempts).toHaveBeenCalledWith('one',expect.objectContaining({courseId:'course-a'}))
+ fireEvent.click(screen.getByRole('button',{name:'查看报告'}))
+ expect(screen.getByTestId('location').textContent).toBe('/composite-assessments/one/attempts/complete/report?courseId=course-a')
+})
+
+it('returns to a filtered course workspace through its single explicit parent entry',async()=>{
+ trainingPresentation.enabled=true
+ const parent='/courses/course-a/detail?section=assessments&assessments_page=3'
+ attempts.mockResolvedValue({...response('QUESTIONNAIRE'),data:{...response('QUESTIONNAIRE').data,courseScope:{id:'course-a',title:'课程 A'}}})
+ render(<MemoryRouter initialEntries={['/composite-assessments/one/results?courseId=course-a&returnTo='+encodeURIComponent(parent)]}><Location/><Routes><Route path="/composite-assessments/:id/results" element={<CompositeAssessmentResults/>}/><Route path="*" element={<p>目标页面</p>}/></Routes></MemoryRouter>)
+ await screen.findByRole('button',{name:'查看报告'});fireEvent.click(screen.getByRole('button',{name:'返回课程测评'}))
+ expect(screen.getByTestId('location')).toHaveTextContent(parent)
 })

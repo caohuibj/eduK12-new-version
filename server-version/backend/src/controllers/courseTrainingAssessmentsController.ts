@@ -1,3 +1,5 @@
+import { courseCatalogPage } from '../modules/training-catalog/course'
+import { ZodError } from 'zod'
 import type { Request, Response } from 'express'
 import { prisma } from '../config/database'
 import { canAccessCourseRoster } from '../utils/courseAccess'
@@ -21,6 +23,8 @@ export async function courseTrainingAssessments(req: Request, res: Response) {
     // complete roster; only course creator and legacy Admin can read inventory.
     if (!canAccessCourseRoster(course, actor.userId, actor.role)) return forbidden(res, '无权管理此课程')
 
+    if (req.query?.view === 'summary') return success(res, await courseCatalogPage(courseId, actor, req.query))
+    const includeManaged = req.query?.includeManaged === 'true'
     const [questionnaires, composed, scales, cognitive] = await Promise.all([
       prisma.questionnaire.findMany({
         where: { type: 'COURSE', status: 'PUBLISHED', visibility: { in: ['PUBLIC', 'COURSE'] }, courseQuestionnaires: { some: { courseId } } },
@@ -30,13 +34,19 @@ export async function courseTrainingAssessments(req: Request, res: Response) {
       }),
       prisma.compositeAssessment.findMany({
         where: {
-          status: 'PUBLISHED',
-          OR: [
+          ...(includeManaged ? { OR: [
+            { status: 'PUBLISHED', OR: [
+              { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId } } },
+              { productKind: { in: ['LEGACY_COMPOSITE', 'ASSESSMENT_BUNDLE'] }, courseId },
+            ] },
+            { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', status: { in: ['DRAFT', 'ARCHIVED'] },
+              ...(actor.role === 'ADMIN' ? {} : { createdBy: actor.userId }), questionnaireCourses: { some: { courseId } } },
+          ] } : { status: 'PUBLISHED', OR: [
             { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId } } },
             { productKind: { in: ['LEGACY_COMPOSITE', 'ASSESSMENT_BUNDLE'] }, courseId },
-          ],
+          ] }),
         },
-        select: { id: true, name: true, description: true, createdBy: true, productKind: true,
+        select: { id: true, name: true, description: true, createdBy: true, productKind: true, status: true,
           _count: { select: { items: true } } },
         orderBy: [{ name: 'asc' }, { id: 'asc' }],
       }),
@@ -66,7 +76,7 @@ export async function courseTrainingAssessments(req: Request, res: Response) {
         key: 'composite:' + row.id, id: row.id, kind: row.productKind,
         typeLabel: row.productKind === 'QUESTIONNAIRE' ? '课程问卷'
           : row.productKind === 'ASSESSMENT_BUNDLE' ? '固定测评包' : '组合测评',
-        name: row.name, description: row.description, status: 'PUBLISHED',
+        name: row.name, description: row.description, status: row.status || 'PUBLISHED',
         unitCount: row._count.items, unitLabel: '个测评单元',
         manageHref: link(row.createdBy,
           row.productKind === 'QUESTIONNAIRE' ? '/questionnaire-products/'
@@ -87,7 +97,9 @@ export async function courseTrainingAssessments(req: Request, res: Response) {
       })),
     ]
     return success(res, { list, total: list.length })
-  } catch {
+  } catch (cause) {
+    if (cause instanceof ZodError) return error(res, '筛选或分页条件无效，请缩小范围', -1, 400)
+    if ((cause as any)?.statusCode === 400) return error(res, (cause as Error).message, -1, 400)
     return error(res, '读取课程测评清单失败', -1, 500)
   }
 }

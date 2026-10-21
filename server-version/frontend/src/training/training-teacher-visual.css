@@ -1,0 +1,233 @@
+/* Teacher workspace presentation. Scientific runners, chart marks, score colours,
+ * permission checks and the approved qt-editor / tr-results layouts are preserved.
+ * :where keeps shared rules below those page-specific layouts in the cascade. */
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual {
+ --tt-paper:#f8f5ee; --tt-surface:#fff; --tt-ink:#233b34; --tt-muted:#66756c;
+ --tt-line:#dce4db; --tt-green:#285b47; --tt-soft:#f1f6eb;
+ --training-paper:var(--tt-paper); --training-surface:var(--tt-surface); --training-ink:var(--tt-ink);
+ --training-muted:var(--tt-muted); --training-border:var(--tt-line); --training-bamboo:var(--tt-green);
+ --staff-ink:var(--tt-ink); --staff-muted:var(--tt-muted); --staff-line:var(--tt-line);
+ --staff-accent:var(--tt-green); --staff-accent-hover:#204d3b; --staff-surface:var(--tt-surface); --staff-bg:var(--tt-paper);
+ background:var(--tt-paper); color:var(--tt-ink);
+}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-product) {
+ --hui-color-text:var(--tt-ink); --hui-color-muted:var(--tt-muted); --hui-color-border:var(--tt-line);
+ --hui-color-action:var(--tt-green); --hui-color-action-hover:#204d3b; --hui-color-focus:#598d70;
+ --hui-radius:9px;
+}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-app-main){max-width:1376px;padding:28px 32px 48px;font-size:14px;line-height:1.75;min-width:0}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page){width:100%;max-width:none;min-width:0;padding:0}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page-header){gap:20px;align-items:center;margin-bottom:25px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page-header__title){font-size:28px;line-height:1.4;letter-spacing:-.3px;color:var(--tt-ink)}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page-header__description){font-size:13px;line-height:1.85;color:var(--tt-muted);margin-top:7px;max-width:72ch}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page-header__actions,.staff-inline-actions){display:flex;align-items:center;flex-wrap:wrap;gap:10px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page h2,.staff-panel h2){font-size:18px;line-height:1.5;color:var(--tt-ink)}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page h3){font-size:14px;line-height:1.6;color:var(--tt-ink)}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-context-back,.training-back){font-size:12px;min-height:34px;margin-bottom:17px;color:#65785f;text-decoration:none}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-context-back:hover,.training-back:hover){color:var(--tt-green)}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page label,.staff-dialog label){font-size:12px;line-height:1.75;color:#405c49}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page p,.staff-dialog p){line-height:1.85}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-help,.staff-muted,.hui-page-header small){font-size:12px;color:var(--tt-muted);line-height:1.85}
+
+/* Every ordinary form control, including controls that predate ProductButton. */
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-app-main,.hui-modal-surface) :where(input:not([type=checkbox]):not([type=radio]):not([type=file]):not([type=hidden]):not([type=range]):not([type=color]):not(.hidden),select,textarea){
+ min-height:42px;max-width:100%;border:1px solid #d4ded3;border-radius:8px;background:white;color:var(--tt-ink);
+ padding:10px 12px;font:inherit;font-size:13px;line-height:1.6;box-shadow:none;
+}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-app-main,.hui-modal-surface) :where(input,textarea)::placeholder{color:#89958b;opacity:1}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-app-main,.hui-modal-surface) :where(textarea){min-height:100px;resize:vertical}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-app-main,.hui-modal-surface) :where(input[type=checkbox],input[type=radio]){width:17px;height:17px;min-width:17px;accent-color:var(--tt-green);vertical-align:middle;flex-shrink:0}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-app-main,.hui-modal-surface) :where(button,a,input,select,textarea,summary):focus-visible{outline:3px solid #598d70;outline-offset:3px;box-shadow:none}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-app-main,.hui-modal-surface) :where(input,select,textarea):disabled{background:#f4f6f0;color:#75826e;cursor:not-allowed}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-app-main,.hui-modal-surface) :where(input,select,textarea)[aria-invalid=true]{border-color:#b54e44}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.input,.staff-dialog input,.staff-dialog select,.staff-dialog textarea){width:100%}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(input.pl-10){padding-left:40px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(input.pl-9){padding-left:36px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-search-field){min-height:43px;border:1px solid var(--tt-line);border-radius:8px;background:white;padding:0 12px;gap:8px;color:#788970}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-search-field input){padding:8px 0;border:0;min-height:41px;background:transparent}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-search-field:focus-within){border-color:#93af83;box-shadow:0 0 0 2px #dfead7}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-search-field input:focus-visible){outline:none}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.btn-primary,.btn-secondary,.hui-button,.staff-primary-link,.staff-secondary-link,.training-action,button:not([class])){
+ display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:9px 15px;
+ border:1px solid #d3dfd1;border-radius:8px;background:white;color:#365c46;font-size:13px;font-weight:550;
+ line-height:1.55;white-space:normal;text-decoration:none;box-shadow:none;cursor:pointer;
+}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.btn-primary,.hui-button--primary,.staff-primary-link,.training-action:not(.training-action--quiet)){
+ background:var(--tt-green);border-color:var(--tt-green);color:white!important;
+}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-secondary-link){color:#365c46!important}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.btn-secondary,.hui-button--secondary,.staff-secondary-link,.training-action--quiet):hover:not(:disabled){background:#f0f5eb;border-color:#a8bda0;color:#315c40}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.btn-primary,.hui-button--primary,.staff-primary-link,.training-action:not(.training-action--quiet)):hover:not(:disabled){background:#204d3b;border-color:#204d3b;color:white}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-button--danger,.staff-danger-action,.training-danger-action){color:#a53c32;border-color:#e2bfb5;background:#fff9f6}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-danger-action,.training-danger-action):hover:not(:disabled){background:#fceee7;color:#8b3027}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(button:disabled,a[aria-disabled=true]){opacity:.5;cursor:not-allowed;box-shadow:none}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-record-button,.staff-text-action,.staff-record-title){color:#3d6948;font-size:13px;text-underline-offset:3px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-segmented){border:1px solid var(--tt-line);border-radius:8px;background:#f0f4ea;padding:4px;gap:3px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-segmented button){min-height:37px;padding:7px 13px;border-radius:6px;font-size:12px;color:#6c7c63}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-segmented button[aria-pressed=true]){background:var(--tt-green);color:white;box-shadow:none}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-section-nav){border-color:var(--tt-line);background:#fffffff5;border-radius:9px;backdrop-filter:blur(8px)}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-section-nav a){font-size:12px;color:#5a7250}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-section-nav a:hover){background:#eff5e8;color:var(--tt-green)}
+
+/* Panels, library cards and list toolbars share the authoring page rhythm. */
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.card,.staff-panel,.staff-toolbar,.staff-catalog-card,.staff-course-card,.staff-detail-header,.hui-discovery-card){
+ border:1px solid var(--tt-line);border-radius:10px;background:white;box-shadow:0 2px 8px #263d2b03;
+}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.card,.staff-panel,.staff-catalog-card,.staff-detail-header){padding:22px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-toolbar){padding:17px 20px;margin-bottom:21px;gap:13px;background:#fbfcf8}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-card-grid,.staff-course-grid){gap:18px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-catalog-card){gap:12px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-catalog-card h2,.staff-course-card h2){font-size:17px;font-weight:600}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-catalog-card p,.staff-course-description,.staff-course-meta){font-size:12px;color:var(--tt-muted);line-height:1.85}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-catalog-card:hover,.staff-course-card:hover){border-color:#b0c2a6;box-shadow:0 5px 18px #304c2510}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-course-card__body){padding:20px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-course-cover--placeholder){color:#80966d;background:#f0f5e9}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-badge){font-size:10px;font-weight:550;border-radius:5px;padding:3px 8px;background:#f1f4ec;color:#667b5a}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-badge--success){background:#eaf3e2;color:#4e743e}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-badge--warning){background:#faf1dc;color:#866b31}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-badge--danger){background:#fae9e4;color:#9b3f34}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-target-row){background:#eff6e7!important;outline-color:#89a76f}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-detail-meta){color:var(--tt-muted);font-size:12px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-action-footer){border-color:var(--tt-line);background:#fffffffa;border-radius:9px;padding:13px 17px;box-shadow:0 5px 20px #32452c08}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-pagination){font-size:12px;color:var(--tt-muted);gap:12px;margin-top:20px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page fieldset){border-color:var(--tt-line);border-radius:9px;min-width:0}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page legend){font-size:13px;font-weight:600;color:#36543c;padding:0 5px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page section[class~="border"],.hui-page article[class~="border"]){border-color:var(--tt-line);border-radius:10px;background:white;padding:20px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page section[class~="border"]>p,.hui-page article[class~="border"]>p){font-size:12px;color:var(--tt-muted)}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page details[class~="border"]){border-color:var(--tt-line);border-radius:9px;background:#fbfcf8}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page summary){color:#52714a;cursor:pointer;font-size:12px;line-height:1.8}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page a:not([class])){color:#3e6a48;text-underline-offset:4px}
+
+/* Readable tables, including older roster and resource tables. No chart selectors. */
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-table-container,.staff-record-table,.hui-page .overflow-x-auto){border:1px solid var(--tt-line);border-radius:10px;background:white;overflow-x:auto}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-table,.hui-page table){width:100%;border-collapse:collapse;font-size:12px;color:#586e58}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-table th,.hui-page table th){padding:13px 16px;background:#f3f7ed;color:#6b7d61;font-size:11px;font-weight:600;line-height:1.7;white-space:nowrap;border-bottom:1px solid #e0e8d7}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-table td,.hui-page table td){padding:16px;border-color:#e9eee3;vertical-align:middle;line-height:1.8;color:#52674f}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-table tbody tr:hover,.hui-page table tbody tr:hover){background:#fafcf6}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-table-actions){gap:7px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-table-actions button,.staff-table-actions a){font-size:11px;min-height:35px;padding:6px 10px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-table-actions .staff-more-actions__trigger){padding:6px;min-width:35px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-record-title,.staff-record-course){color:#3e6245}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-record-table td small,.staff-inline-tags){font-size:10px;color:#7f8c78}
+
+/* Modal surfaces stay in the caller tree; retain native focus and inert behavior. */
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-modal-surface)::backdrop{background:#203e3480;backdrop-filter:blur(3px)}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-modal-backdrop,.training-dialog-backdrop){background:#203e3480;padding:24px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-dialog,.training-dialog){background:white;border:1px solid var(--tt-line);border-radius:12px;box-shadow:0 24px 70px #24432b24;color:var(--tt-ink)}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-dialog__header){padding:22px 24px;border-color:#e4eadc}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-dialog__header h2,.training-dialog h2){font-size:20px;line-height:1.5;color:var(--tt-ink)}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-dialog__description,.training-dialog>p){font-size:12px;color:var(--tt-muted);line-height:1.85;margin-top:6px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-dialog__body){padding:24px;scrollbar-gutter:stable}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-dialog__actions,.training-dialog-actions){padding:16px 24px;border-color:#e4eadc;background:#f8faf4;border-radius:0 0 12px 12px;gap:10px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-icon-button){border-radius:7px;color:#718469}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-icon-button:hover){background:#eff5e8;color:#34583a}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-more-actions__trigger){border-color:var(--tt-line);border-radius:7px;background:white;color:#637f58}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-more-actions__trigger[aria-expanded=true]){background:#eff5e8;border-color:#a8bf9a}
+
+/* Home, course details and embedded analysis use the same spacing and card edge. */
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-home h1,.training-detail-header h1){font-size:28px;line-height:1.4;letter-spacing:-.3px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-home-subtitle){font-size:13px;color:var(--tt-muted)}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-text){padding:23px 25px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-item,.training-side-panel,.training-course-work){border-color:var(--tt-line);border-radius:11px;background:white;box-shadow:0 2px 8px #263d2b03}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-code-panel){border-color:var(--tt-line)}
+/* Course navigation is a tab strip, not an ordinary action-button row. */
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-section-tab){border-radius:0;white-space:nowrap}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-code-panel>div){min-width:0}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-code-panel strong){white-space:nowrap}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-code-copy){display:inline-flex;flex:none;align-items:center;justify-content:center;gap:5px;white-space:nowrap;min-height:36px;padding:7px 10px;border:1px solid var(--tt-line);border-radius:7px;background:white;color:var(--tt-green);font-size:12px;line-height:1.5;cursor:pointer}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-section-switch button){font-size:14px;min-height:60px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-section-switch button[aria-pressed=true]){color:var(--tt-green);border-bottom-color:var(--tt-green)}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-task-item){padding:22px 0;gap:18px;align-items:center}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-task-item h2){font-size:16px;line-height:1.5}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-task-item p,.training-side-panel>p){font-size:12px;color:var(--tt-muted);line-height:1.85}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-task-type,.training-task-item>div>span){font-size:10px;border-radius:5px;color:#6d825e}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-side-panel){padding:21px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-side-panel h2){font-size:14px;margin-bottom:13px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-row-action,.training-trainer-shortcuts a){font-size:12px;color:#4c7144;min-height:38px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-settings>summary){font-size:12px;color:#517347}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-settings-actions button){display:inline-flex;justify-content:center;min-height:38px;padding:8px 12px;border:1px solid var(--tt-line);border-radius:7px;font-size:11px;color:#527345;background:white}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-settings-actions .training-danger-action){border-color:#e2bfb5;color:#a53c32}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-empty-small,.training-empty){border:1px dashed #d4dfcb;background:#fafcf6;border-radius:9px;padding:30px 20px;margin:20px 0;font-size:12px;color:#74836b;text-align:center;line-height:1.9}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-analysis-wave,.training-analysis-quality-row){padding:19px;border-color:var(--tt-line);border-radius:9px;background:#fbfcf8}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-analysis-controls){border:1px solid var(--tt-line);padding:16px;border-radius:9px;background:#fafcf7;gap:12px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-analysis-results,.training-analysis-export,.training-analysis-quality){border-color:var(--tt-line)}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-analysis h3){font-size:15px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-analysis p,.training-course-analysis label){font-size:12px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-analysis-matched){background:#f0f5e8;border-radius:8px;padding:16px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-analysis button){font-size:12px;min-height:40px;border-radius:8px;border-color:var(--tt-line);background:white;color:#466b3e}
+
+/* Route families adapt old markup without rewriting business forms. */
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=account] :where(.hui-teacher-profile){max-width:940px;margin-inline:auto}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=account]>.training-context-back{width:100%;max-width:940px;margin-inline:auto}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=account] :where(.card){border:1px solid var(--tt-line);border-radius:11px;padding:24px;background:white}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=account] :where(.card h2){font-size:16px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=account] :where(.training-security-hint){background:#f3f7ee;border:1px solid #e3eadb;border-radius:8px;padding:12px 15px;font-size:12px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=roster] :where([class~="rounded-lg"][class~="bg-white"]){border:1px solid var(--tt-line);border-radius:10px;box-shadow:none}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-roster-stats){gap:16px;border:0}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-roster-stats>div){padding:18px;border:1px solid var(--tt-line);border-radius:10px;background:white}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=resources] :where(.staff-toolbar>div.flex){flex:1;min-width:0;display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=resources] :where(.staff-search-field){width:min(100%,320px);min-width:0}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=resources] :where(.staff-panel){overflow:hidden}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=resources] :where(.staff-panel h3){font-size:14px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=resources] :where(.staff-panel .aspect-video,.group .aspect-square){border-radius:8px;overflow:hidden;background:#f1f5eb}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=reports] :where(.report-metric){background:#fbfcf7;border:1px solid var(--tt-line);border-radius:9px;padding:18px;color:var(--tt-ink)}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=reports] :where(.report-metric__label){font-size:11px;color:var(--tt-muted)}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=reports] :where(.report-module-index){border-color:var(--tt-line);border-radius:9px;background:#f4f7ee}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=reports] :where(.training-results-sections>section){padding:22px;border:1px solid var(--tt-line);border-radius:10px;background:white;margin-top:22px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=reports] :where(.training-results-sections h2){margin:0 0 12px;font-size:18px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=reports] :where(.training-results-sections article){background:#fcfdf9;border-color:var(--tt-line);border-radius:9px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=reports] :where(.training-results-sections dt){font-size:10px;color:var(--tt-muted)}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=reports] :where(.training-results-sections dd){font-size:24px;color:#375e3d}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=assessments] :where(.staff-panel){padding:23px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=assessments] :where(.scale-edit-state){border-color:var(--tt-line);background:#f8faf5;border-radius:9px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=assessments] :where(.scale-edit-source){background:#f1f5eb;border-color:#d6e3ca;border-radius:8px}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=assessments] :where(.scale-edit-readonly-note){font-size:12px;line-height:1.85;color:#687d60}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=classroom] :where(.card){border-color:var(--tt-line);background:white;border-radius:10px}
+
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-template-row){display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:12px;padding-block:16px;border-color:var(--tt-line)}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-template-row h3){overflow-wrap:anywhere;font-weight:550}
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-template-library>div.grid){align-items:start}
+
+/* Portalled overflow menus inherit only the marker of their own trigger. */
+.staff-more-actions__menu[data-training-teacher=true]{border:1px solid #dce4db;border-radius:9px;background:white;box-shadow:0 14px 40px #24432b24;padding:6px;font-size:12px}
+.staff-more-actions__menu[data-training-teacher=true] :where(button,a){color:#3b5c40;border-radius:6px;min-height:39px}
+.staff-more-actions__menu[data-training-teacher=true] :where(button,a):hover{background:#eff5e8}
+.staff-more-actions__menu[data-training-teacher=true] .staff-danger-action{color:#a53c32}
+.staff-more-actions__menu[data-training-teacher=true] :where(button,a):focus-visible{outline:3px solid #598d70;outline-offset:1px}
+@media(min-width:701px){.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-trainer-course .training-detail-header){grid-template-columns:minmax(0,1fr) max-content}}
+@media(max-width:700px){.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-trainer-course .training-course-code-panel){flex-wrap:wrap;row-gap:8px}}
+/* On compact screens keep task actions below the full-width tab strip. */
+@media(max-width:1000px){
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual .training-trainer-course :where(.training-section-action:not(.training-assessment-shortcuts)){position:static;justify-content:flex-end;padding-top:16px;margin-bottom:14px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-trainer-course .training-section-switch){gap:18px;padding-inline:16px}
+}
+@media(max-width:1000px){
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-app-main){padding:24px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-toolbar){align-items:stretch}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-layout){gap:18px}
+}
+@media(max-width:700px){
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-app-main){padding:20px 16px 36px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page-header){align-items:flex-start;flex-wrap:wrap;gap:14px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page-header__title,.training-home h1,.training-detail-header h1){font-size:24px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page-header__description){font-size:12px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.hui-page-header__actions){width:100%;justify-content:flex-start}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.card,.staff-panel,.staff-detail-header,.staff-catalog-card){padding:17px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-toolbar){padding:15px;gap:12px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-search-field){min-width:0;width:100%}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-dialog__header,.staff-dialog__body){padding:17px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-dialog__actions){padding:13px 17px;flex-wrap:wrap}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-modal-backdrop,.training-dialog-backdrop){padding:12px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-dialog){max-height:94dvh;border-radius:10px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.staff-dialog__header h2){font-size:18px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-task-item){align-items:flex-start;flex-wrap:wrap;gap:12px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-task-item .training-row-action){margin-left:auto}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-course-text){padding:18px 16px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-detail-content){padding-inline:16px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-section-switch button){font-size:13px;min-height:54px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-record-table td){padding:0}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-side-panel){padding:18px}
+ .hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual [data-training-family=reports] :where(.training-results-sections>section){padding:17px}
+}
+@media(max-width:1100px){.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-template-row){grid-template-columns:minmax(0,1fr) auto}.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-template-row h3){grid-column:1 / -1}.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(.training-template-row button){justify-self:start}}
+@media(prefers-reduced-motion:reduce){.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual :where(button,a,.staff-catalog-card,.staff-course-card,.training-course-item){transition:none;scroll-behavior:auto}}

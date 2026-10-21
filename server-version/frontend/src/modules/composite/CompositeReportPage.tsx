@@ -1,3 +1,4 @@
+import { internalReturnTo } from '../../components/app-shell/access'
 import { TrainingReinterpretationStudio } from './TrainingReinterpretationStudio'
 import { TrainingContentReports } from './TrainingContentReports'
 import { TrainingTimingReport } from './TrainingTimingReport'
@@ -79,7 +80,10 @@ const CompositeReportPage: React.FC = () => {
 
   const studyReturn=attemptId?sessionStorage.getItem(`composite:study:return:${attemptId}`):null
   const ownStudyReturn=studyReturn && /^\/public\/studies\/[0-9a-f-]{36}$/.test(studyReturn)?studyReturn:null
-  const backTo = publicMode && ownStudyReturn ? ownStudyReturn : teacherMode && id ? `/composite-assessments/${id}/results` : publicMode ? '/' : '/student'
+  const returnCourseId = teacherMode ? new URLSearchParams(location.search).get('courseId') : null
+  const requestedResults = teacherMode ? internalReturnTo(new URLSearchParams(location.search).get('returnTo')) : null
+  const resultsReturn = teacherMode && id && requestedResults?.split('?')[0] === `/composite-assessments/${encodeURIComponent(id)}/results` ? requestedResults : null
+  const backTo = publicMode && ownStudyReturn ? ownStudyReturn : teacherMode && id ? resultsReturn || `/composite-assessments/${id}/results${returnCourseId ? '?courseId='+encodeURIComponent(returnCourseId) : ''}` : publicMode ? '/' : '/student'
   const legacyModules = (report as (CompositeReport & { modules?: LegacyCompositeModule[] }) | null)?.modules || []
   const unitReports = (report?.unitReports || legacyModules).filter((module) => module.type !== 'FORM') as CompositeReport['unitReports']
   const backgroundValues = report?.backgroundValues || legacyModules.filter((module) => module.type === 'FORM')

@@ -1,6 +1,6 @@
 import type { ComponentProps, ReactNode } from 'react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import FinalCompositeAssessment from '../FinalCompositeAssessment'
 import WholeCompositeQuestionnaire, { wholeAnswerKey, wholeDraftKey } from '../WholeCompositeQuestionnaire'
 import { createFinalDraftMeta, finalDraftStore } from '../../services/persistence/finalDraftStore'
@@ -8,7 +8,7 @@ import type { CompositeAttemptState, CompositeCurrentItem, WholeQuestionnaireDef
 import type { TrainingCheckpointPanel } from '../../modules/composite/TrainingCheckpointPanel'
 import type { SurveyScaleTimings } from '../../modules/scale/item-timing'
 
-const checkpoint = vi.hoisted(() => ({ props: null as ComponentProps<typeof TrainingCheckpointPanel> | null }))
+const checkpoint = vi.hoisted(() => ({ props: null as ComponentProps<typeof TrainingCheckpointPanel> | null, realPlayer: false }))
 vi.mock('../../modules/composite/TrainingCheckpointPanel', () => ({ TrainingCheckpointPanel: (props: ComponentProps<typeof TrainingCheckpointPanel>) => { checkpoint.props = props; return null } }))
 vi.mock('../../modules/scale/TrainingTimingBoundary', async () => ({
   ...await vi.importActual<typeof import('../../modules/scale/TrainingTimingBoundary')>('../../modules/scale/TrainingTimingBoundary'),
@@ -16,7 +16,8 @@ vi.mock('../../modules/scale/TrainingTimingBoundary', async () => ({
 }))
 vi.mock('../../modules/assessment-media/AssessmentImageGate', () => ({ default: ({ children }: { children: ReactNode }) => children }))
 vi.mock('../../modules/assessment-media/ScaleFormVideoGate', () => ({ default: ({ children }: { children: ReactNode }) => children }))
-vi.mock('../questionnaire/ScalePlayer', () => ({ default: ({ value }: { value: unknown }) => <output data-testid="scale-value">{String(value)}</output> }))
+vi.mock('../../training/context', () => ({ isTrainingHost: () => true }))
+vi.mock('../questionnaire/ScalePlayer', async () => { const actual = await vi.importActual<typeof import('../questionnaire/ScalePlayer')>('../questionnaire/ScalePlayer'); return { ...actual, default: (props: ComponentProps<typeof actual.default>) => <>{checkpoint.realPlayer && <actual.default {...props}/>}<output data-testid="scale-value">{String(props.value)}</output></> } })
 vi.mock('../questionnaire/FormPlayer', () => ({ default: ({ value }: { value: unknown }) => <output data-testid="form-value">{String(value)}</output> }))
 
 const timing = (count: number): SurveyScaleTimings => ({ q: { schemaVersion: 1, firstResponseMs: count * 10, activeTimeMs: count * 20,
@@ -139,4 +140,25 @@ describe('checkpoint recovery publication boundaries', () => {
     expect(await checkpoint.props!.getDrafts()).toEqual(before)
     expect((await finalDraftStore.listAnswers(key)).map(row => row.value)).toEqual([{ responseValue: 1 }, { responseValue: 1 }])
   })
+
+ it.each(['unit','whole'] as const)('cancels pending Training advance when checkpoint restores the same first question: %s', async kind => {
+   checkpoint.realPlayer = true
+   const items = scale.definition!.items
+   items.push({...items[0], itemCode:'q-next', content:'Second question', sortOrder:1})
+   try {
+     let rows: Array<{slotKey:string;answers:Record<string,unknown>}>
+     if(kind==='unit'){const {slotKey}=await mountUnit('scale');rows=[{slotKey,answers:{q:{responseValue:1}}}]}
+     else {const mounted=await mountWhole();rows=mounted.rows.map(row=>({...row,answers:{q:{responseValue:1}}}))}
+     await screen.findByRole('button',{name:'Two'})
+     vi.useFakeTimers({toFake:['setTimeout','clearTimeout']})
+     await act(async()=>{fireEvent.click(screen.getByRole('button',{name:'Two'})); await Promise.resolve()})
+     await act(async()=>{await checkpoint.props!.getDrafts()})
+     expect(vi.getTimerCount()).toBeGreaterThan(0)
+     await act(async()=>{checkpoint.props!.onBusy(true);await checkpoint.props!.restore(rows);checkpoint.props!.onBusy(false)})
+     await act(async()=>{await vi.advanceTimersByTimeAsync(250)})
+     expect(screen.queryByRole('heading',{name:/Second question/})).toBeNull()
+     expect(screen.getByRole('button',{name:'One'})).toHaveAttribute('aria-pressed','true')
+   } finally {vi.useRealTimers();checkpoint.realPlayer=false;items.pop()}
+ })
+
 })

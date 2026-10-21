@@ -628,6 +628,7 @@ export const compositeController = {
       const pagination = getPaginationParams(req)
       return success(res, await service.listAttemptsForTeacher(req.user.userId, req.user.role, req.params.id, {
         status: query.status,
+        courseId: query.courseId,
         q: query.q,
         page: pagination.page,
         pageSize: pagination.pageSize,

@@ -1,0 +1,271 @@
+/* Training presentation only. No answer, timing, persistence or submission changes.
+ * Do not style cognitive stimuli: the existing data-cognitive-task-root boundary
+ * excludes descendants and restores inherited runner/product tokens below. */
+.hui-training.hui-app.training-assessment-visual {
+  --runner-ink: #233f35;
+  --runner-muted: #657369;
+  --runner-line: #dce4d8;
+  --runner-page: #f7f5ef;
+  --runner-soft: #edf3e7;
+  --runner-blue: #285b47;
+  --runner-blue-hover: #204a39;
+  --runner-green: #426f43;
+  --runner-surface: #fffefa;
+  background: #f7f5ef;
+}
+.hui-training.hui-app.training-assessment-visual .hui-product:not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  --hui-color-text: var(--runner-ink);
+  --hui-color-muted: var(--runner-muted);
+  --hui-color-surface: var(--runner-surface);
+  --hui-color-background: var(--runner-page);
+  --hui-color-border: var(--runner-line);
+  --hui-color-action: var(--runner-blue);
+  --hui-color-action-hover: var(--runner-blue-hover);
+  --hui-color-focus: var(--runner-blue);
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.hui-app-header):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  min-height: 64px; padding: 9px max(20px, calc((100vw - 1120px)/2)); border-bottom: 1px solid #dce4d8; background: #fffefa; backdrop-filter: none;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.hui-brand):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  text-decoration: none; min-height: 40px;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.training-wordmark.training-wordmark--mountain):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  font-size: 25px; gap: 7px;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.training-brand-icon):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  width: 64px; height: 38px;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.hui-account):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  color: #657369; font-size: 12px;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.hui-product.hui-page):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  padding-block: 28px 42px;
+}
+
+.hui-training.hui-app.training-assessment-visual :where([data-assessment-shell-header]):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  padding: 24px 26px; border: 1px solid #dce4d8; border-radius: 12px; background: linear-gradient(115deg, #eef3e7, #faf8ef 85%); box-shadow: none;
+}
+
+.hui-training.hui-app.training-assessment-visual :where([data-assessment-shell-header] h1, .hui-page-header h1):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  font-family: var(--training-serif); font-size: clamp(24px, 2.4vw, 30px); line-height: 1.5; letter-spacing: 0; color: #233f35; overflow-wrap: anywhere;
+}
+
+.hui-training.hui-app.training-assessment-visual :where([data-assessment-shell-header] p, [data-assessment-shell-header] .text-slate-600):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  color: #607263; line-height: 1.8;
+}
+
+.hui-training.hui-app.training-assessment-visual :where([data-assessment-shell-header] > div:first-child > div:first-child > p:first-child):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  font-size: 11px; letter-spacing: .1em; color: #62794f;
+}
+
+.hui-training.hui-app.training-assessment-visual :where([data-assessment-shell-header] .max-w-prose):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  font-size: 13px; line-height: 1.9; max-width: 60ch;
+}
+
+.hui-training.hui-app.training-assessment-visual :where([data-assessment-shell-content] > section, [data-assessment-shell-content] > .card, [data-assessment-shell-content] > .rounded-xl, [data-assessment-shell-navigation] > section, [data-assessment-shell-navigation] > nav):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  border: 1px solid #dce4d8; border-radius: 12px; background: #fffefa; box-shadow: 0 4px 18px #25442e05;
+}
+
+.hui-training.hui-app.training-assessment-visual :where([data-assessment-shell-content] h2, [data-assessment-shell-content] h3):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  color: #233f35; line-height: 1.7; overflow-wrap: anywhere;
+}
+
+.hui-training.hui-app.training-assessment-visual :where([data-assessment-shell-content] h2):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  font-size: 20px;
+}
+
+.hui-training.hui-app.training-assessment-visual :where([data-assessment-shell-content] h3):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  font-size: 17px;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.text-slate-500, .text-slate-600, .text-gray-500, .text-gray-600, .text-slate-700, .text-gray-700):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  color: #657369;
+}
+
+.hui-training.hui-app.training-assessment-visual :where([class~="bg-white"][class*="rounded"], .card):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  background-color: #fffefa; border-color: #dce4d8;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.bg-slate-50, .bg-gray-50):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  background-color: #f2f5ed;
+}
+
+.hui-training.hui-app.training-assessment-visual :where([role="progressbar"]):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  background: #e3e9dc;
+}
+
+.hui-training.hui-app.training-assessment-visual :where([role="progressbar"] > div):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  background: #456e4a; transition: none;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.btn-primary, .hui-button--primary, .bg-blue-700, .bg-indigo-600, .bg-action):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  background-color: #285b47; border-color: #285b47; color: white;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.btn-primary:hover:not(:disabled), .hui-button--primary:hover:not(:disabled), button.bg-indigo-600:hover:not(:disabled)):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  background-color: #204a39; border-color: #204a39; color: white;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.text-blue-700, .text-blue-900, .text-indigo-600, .text-indigo-700):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  color: #285b47;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.bg-blue-50, .bg-indigo-50):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  background-color: #edf4e6;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.border-blue-700, .border-indigo-500):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  border-color: #6c8e58; --tw-ring-color: #6c8e58;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.btn-primary, .btn-secondary, .hui-button, [data-assessment-shell-actions] button, [data-assessment-shell-navigation] button):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  min-height: 44px; border-radius: 8px; font-size: 14px; line-height: 1.6; box-shadow: none;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.btn-secondary, .hui-button--secondary):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  border: 1px solid #ccd9c6; background: #fffefa; color: #365d43;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.btn-secondary:hover:not(:disabled), .hui-button--secondary:hover:not(:disabled)):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  background: #eef3e7; border-color: #9db18e;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(button[aria-pressed="true"][class*="border"], label:has(input:checked)):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  background: #edf4e6; border-color: #6c8e58; color: #285b47; --tw-ring-color: #6c8e58;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(button[aria-pressed="false"][class*="border"], label:has(input[type="radio"]), label:has(input[type="checkbox"])):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  border-radius: 9px; line-height: 1.75;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(button[aria-pressed][class*="border"]:hover:not(:disabled), label:has(input:not(:disabled)):hover):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  border-color: #8ea97c;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(input[type="radio"], input[type="checkbox"], input[type="range"]):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  accent-color: #285b47;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(input:not([type="radio"]):not([type="checkbox"]):not([type="range"]), textarea, select):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  border-color: #cdd9c6; border-radius: 8px; background-color: white; color: #233f35; font-size: 16px;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(a:focus-visible, button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible, summary:focus-visible):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  outline: 3px solid #4c7c59; outline-offset: 3px; --tw-ring-color: #4c7c59;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(button:disabled, input:disabled, select:disabled, textarea:disabled):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  cursor: not-allowed;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.hui-status):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  border-radius: 11px; box-shadow: none;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.hui-status--info, .hui-status--success):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  border-color: #cddfc3; background: #eef5e8; color: #335d3f;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.hui-status--pending):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  border-color: #dce4d8; background: #f5f7ef; color: #536b4c;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.hui-status--warning):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  border-color: #ead7b6; background: #fff7e8; color: #805b29;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.hui-status--error):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  border-color: #e7cbbf; background: #fff2ed; color: #964d3d;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.hui-status__description):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  line-height: 1.85;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.hui-app-main > .card.max-w-xl, .hui-app-main > .max-w-xl[class*="rounded"]):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  width: min(calc(100% - 32px), 680px); margin: 32px auto; border: 1px solid #dce4d8; border-radius: 14px; padding: 30px; box-shadow: 0 5px 24px #25442e08;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.hui-app-main > .card.max-w-xl h1):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  font-family: var(--training-serif); line-height: 1.5; color: #233f35;
+}
+
+.hui-training.hui-app.training-assessment-visual :where(.hui-app-main > .h-64):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  width: min(calc(100% - 32px), 720px); margin: 32px auto; border: 1px solid #dce4d8; border-radius: 12px; background: #fffefa; color: #657369;
+}
+
+.hui-training.hui-app.training-assessment-visual :where([data-testid="report-shell"] .hui-page-header):not([data-cognitive-task-root], [data-cognitive-task-root] *) {
+  background: linear-gradient(115deg, #eef3e7, #faf8ef); border-color: #dce4d8; border-radius: 12px;
+}
+
+/* Preserve the original inherited presentation contract inside active tasks.
+ * No descendant rules above match this boundary or anything beneath it. */
+.hui-training.hui-app.training-assessment-visual [data-cognitive-task-root] {
+  --runner-ink: var(--hui-ds-color-ink);
+  --runner-muted: var(--hui-ds-color-muted);
+  --runner-line: var(--hui-ds-role-runner-line);
+  --runner-page: var(--hui-ds-color-page-strong);
+  --runner-soft: var(--hui-ds-color-soft);
+  --runner-blue: var(--hui-ds-color-action);
+  --runner-blue-hover: var(--hui-ds-color-action-hover);
+  --runner-green: var(--hui-ds-color-success);
+  --runner-surface: var(--hui-ds-color-surface);
+  --hui-color-text: var(--runner-ink);
+  --hui-color-muted: var(--runner-muted);
+  --hui-color-surface: var(--runner-surface);
+  --hui-color-background: var(--runner-page);
+  --hui-color-border: var(--runner-line);
+  --hui-color-action: var(--runner-blue);
+  --hui-color-action-hover: var(--runner-blue-hover);
+  --hui-color-focus: var(--runner-blue);
+  color: var(--runner-ink);
+}
+@media (max-width: 640px) {
+  .hui-training.hui-app.training-assessment-visual .hui-app-header { flex-wrap: nowrap; gap: 12px; padding-inline: 16px; }
+  .hui-training.hui-app.training-assessment-visual .hui-account { width: auto; margin-left: auto; font-size: 11px; }
+  .hui-training.hui-app.training-assessment-visual .training-wordmark.training-wordmark--mountain { font-size: 21px; }
+  .hui-training.hui-app.training-assessment-visual .training-brand-icon { width: 43px; height: 31px; }
+  .hui-training.hui-app.training-assessment-visual .hui-product.hui-page { padding-inline: 16px; }
+  .hui-training.hui-app.training-assessment-visual [data-assessment-shell-header] { padding: 20px; }
+  .hui-training.hui-app.training-assessment-visual [data-assessment-shell-header] h1 { font-size: 24px; }
+  .hui-training.hui-app.training-assessment-visual [data-assessment-shell-content] > .card { padding: 20px; }
+}
+/* Do not change the active cognitive task's available width or padding. */
+.hui-training.hui-app.training-assessment-visual:has([data-cognitive-task-root]) .hui-product.hui-page {
+  padding: 28px max(18px,env(safe-area-inset-left)) 42px max(18px,env(safe-area-inset-right));
+}
+
+/* Explicit non-stimulus panels: instruction, practice feedback and completion.
+ * Only surfaces and control colors change; metrics and active response/stimulus
+ * elements inside the task boundary retain their original presentation. */
+.hui-training.hui-app.training-assessment-visual [data-cognitive-task-root] :is(.cognitive-task-panel--intro, .cognitive-task-panel--result, .cognitive-task-panel--transition, .cognitive-task-panel--completion) {
+  --hui-color-action: #285b47;
+  --hui-color-action-hover: #204a39;
+  --hui-color-focus: #4c7c59;
+  border-color: #dce4d8;
+  background: #fffefa;
+  box-shadow: 0 4px 18px #25442e05;
+}
+.hui-training.hui-app.training-assessment-visual [data-cognitive-task-root] :is(.cognitive-task-panel--intro, .cognitive-task-panel--result, .cognitive-task-panel--transition, .cognitive-task-panel--completion) > :is(.cognitive-task-title, .cognitive-task-eyebrow) {
+  color: #285b47;
+}
+.hui-training.hui-app.training-assessment-visual [data-cognitive-task-root] .cognitive-task-panel--intro > .cognitive-task-hint {
+  border-color: #dce4d8;
+  background: #f2f5ed;
+}
+.hui-training.hui-app.training-assessment-visual .hui-status__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+.hui-training.hui-app.training-assessment-visual [data-assessment-shell-content] :is(h2, h3)[tabindex="-1"]:focus:not([data-cognitive-task-root] *) {
+  outline: 2px solid #4c7c59;
+  outline-offset: 4px;
+  border-radius: 2px;
+}

@@ -1,3 +1,4 @@
+import { assertCompositeCourseScope } from './composite-course-scope'
 import { enqueueExportJob } from '../../services/exportJobService'
 import { registerAssessmentExport, resolveAssessmentExport } from '../../services/assessmentExportArtifact'
 import { Request, Response } from 'express'
@@ -76,11 +77,12 @@ export const compositeExportController = {
       const input = compositeExportRequestSchema.parse(req.body || {})
       const context = await service.getExportContext(req.user.userId, req.user.role, req.params.id)
       if(input.format==='sav' && context._count.items>0) return error(res,'TYPED_FORM_SAV_NOT_SUPPORTED: typed Form 仅支持 CSV/ZIP 无损导出',-1,400)
-      const anonymize = req.user.role === UserRole.ADMIN ? input.anonymize : true
+      if (input.courseId) await assertCompositeCourseScope(req.user.userId, req.user.role, req.params.id, input.courseId)
+      const anonymize = input.courseId ? true : req.user.role === UserRole.ADMIN ? input.anonymize : true
       const binding = await resolveCompositeExportProjectionBinding(req.params.id, 'teacher')
       return success(res, await enqueueExportJob({ authorityTokenVersion: req.user!.tokenVersion, resourceType: 'COMPOSITE', resourceId: req.params.id,
         createdBy: req.user.userId, anonymized: anonymize, format: input.format, recordCount: 0,
-        requestKey: req.get('X-Export-Request-Key'), options: { detail: input.detail, anonymize, dateRange: input.dateRange,
+        requestKey: req.get('X-Export-Request-Key'), options: { detail: input.detail, anonymize, ...(input.courseId ? { courseId: input.courseId } : {}), dateRange: input.dateRange,
           creatorRole: req.user.role as 'ADMIN' | 'TEACHER', projectionFingerprint: binding.fingerprint } }), '导出已排队')
     } catch (err) { return handleError(res, err) }
   },

@@ -1,3 +1,4 @@
+import { assertCompositeCourseScope } from './composite-course-scope'
 import {assertTrainingPrivateReferenceAdmissionCurrent} from './training-private-reference-use'
 import {attachTrainingReferenceSelection} from './training-reference-selection'
 import {freezeTrainingReferenceBinding} from './training-reference-binding'
@@ -772,13 +773,13 @@ const loadAttemptCountsByCompositeIds = async (
   ids: string[],
   userId: string,
   role: UserRole,
+  courseId?: string,
 ): Promise<Map<string, AttemptCounts>> => {
   const byId = new Map<string, AttemptCounts>()
   if (ids.length === 0) return byId
   const visibility = await teacherRelationalAttemptVisibility(userId, role)
-  const where = visibility
-    ? { AND: [{ compositeAssessmentId: { in: ids } }, visibility] }
-    : { compositeAssessmentId: { in: ids } }
+  const scope = { compositeAssessmentId: { in: ids }, ...(courseId ? { deliveryCourseId: courseId } : {}) }
+  const where = visibility ? { AND: [scope, visibility] } : scope
   const grouped = await prisma.compositeAssessmentAttempt.groupBy({
     by: ['compositeAssessmentId', 'status', 'taskSatisfaction'],
     where,
@@ -1323,6 +1324,7 @@ export const listAttemptsForTeacher = async (
   compositeId: string,
   query: {
     status?: 'IN_PROGRESS' | 'COMPLETED' | 'ABANDONED'
+    courseId?: string
     q?: string
     page: number
     pageSize: number
@@ -1332,7 +1334,8 @@ export const listAttemptsForTeacher = async (
   const composite = await loadComposite(compositeId, true)
   assertOwner(composite, userId, role)
 
-  const filters: Prisma.CompositeAssessmentAttemptWhereInput[] = [{ compositeAssessmentId: compositeId }]
+  const courseScope = query.courseId ? await assertCompositeCourseScope(userId, role, compositeId, query.courseId) : null
+  const filters: Prisma.CompositeAssessmentAttemptWhereInput[] = [{ compositeAssessmentId: compositeId, ...(courseScope ? { deliveryCourseId: courseScope.id } : {}) }]
   const visibility = await teacherRelationalAttemptVisibility(userId, role)
   if (visibility) filters.push(visibility)
   if (query.status) filters.push({ status: query.status })
@@ -1380,7 +1383,7 @@ export const listAttemptsForTeacher = async (
       },
     }),
     prisma.compositeAssessmentAttempt.count({ where }),
-    loadAttemptCountsByCompositeIds([compositeId], userId, role),
+    loadAttemptCountsByCompositeIds([compositeId], userId, role, query.courseId),
   ])
 
   const totalPages = Math.ceil(total / query.pageSize)
@@ -1415,6 +1418,7 @@ export const listAttemptsForTeacher = async (
       status: composite.status,
       courseId: composite.courseId,
     },
+    ...(courseScope ? { courseScope } : {}),
     attemptCounts: counts.get(compositeId) ?? emptyAttemptCounts(),
     list: await Promise.all(attempts.map(async attempt => {
       const variantScope=await resolveTrainingAttemptScope(attempt,composite)

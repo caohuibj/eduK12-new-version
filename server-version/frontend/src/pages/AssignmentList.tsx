@@ -1,7 +1,9 @@
+import { CatalogFilters, CatalogPagination } from '../training/TrainingCatalogControls'
+import { useCatalogQuery } from '../training/useCatalogQuery'
 import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import React, { useState, useEffect, useRef } from 'react'
-import { Plus, Search, Edit, Trash2, ClipboardList, FileText, Copy, CheckCircle2, Clock, BookOpen, Video, Image as ImageIcon, Download, Eye, CheckSquare, Square, MessageSquare, Users, X } from 'lucide-react'
+import { Plus, Trash2, ClipboardList, FileText, Clock, Video, Image as ImageIcon, CheckSquare, Square, MessageSquare, Users, X } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import apiClient from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
@@ -12,8 +14,7 @@ import RichTextEditor from '../components/RichTextEditor'
 import MediaSelector, { MediaItem } from '../components/MediaSelector'
 import TagInput from '../components/TagInput'
 import TagBadge from '../components/TagBadge'
-import TagFilter from '../components/TagFilter'
-import { sanitizeHtml } from '../utils/sanitize'
+import {} from '../utils/sanitize'
 import { normalizeImageUrl, handleImageError } from '../utils/mediaUtils'
 import { buildAssignmentAttachmentUpdateFields } from '../utils/attachmentUpdate'
 import type { Assignment, Course } from '../types'
@@ -94,11 +95,13 @@ const AssignmentListContent: React.FC = () => {
   const [loadError, setLoadError] = useState<string | null>(null)
   const mounted = useRef(true)
   const loadSequence = useRef(0)
-  const [keyword, setKeyword] = useState('')
+  const detailSequence = useRef(0)
+  const [openingDetail,setOpeningDetail]=useState(false)
+  const catalog = useCatalogQuery()
+  const [filterRevision,setFilterRevision]=useState(0)
+  const [total, setTotal] = useState(0)
   const [showModal, setShowModal] = useState(false)
   const [editingAssignment, setEditingAssignment] = useState<Assignment | null>(null)
-  const [availableTags, setAvailableTags] = useState<string[]>([])
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [formData, setFormData] = useState<AssignmentFormData>({
     courseId: '',
     title: '',
@@ -126,11 +129,11 @@ const AssignmentListContent: React.FC = () => {
 
   useEffect(() => {
     mounted.current = true
-    void fetchAssignments()
     void fetchCourses()
-    void fetchTags()
     return () => { mounted.current = false; loadSequence.current++ }
   }, [])
+
+  useEffect(() => { void fetchAssignments(); return () => { loadSequence.current++ } }, [catalog.params, focusId, requestedCourseId])
 
   useEffect(() => {
     if (loading || !focusId) return
@@ -171,11 +174,12 @@ const AssignmentListContent: React.FC = () => {
         }
         setAssignments([record])
       } else {
-        const path = '/assignments' + (requestedCourseId ? `?courseId=${encodeURIComponent(requestedCourseId)}` : '')
-        const response = await apiClient.get<{ list: Assignment[] }>(path)
+        const path = '/assignments?view=summary&' + catalog.params + (requestedCourseId ? `&courseId=${encodeURIComponent(requestedCourseId)}` : '')
+        const response = await apiClient.get<{ list: Assignment[]; total: number }>(path)
         if (request !== loadSequence.current) return
         if (response.code !== 0) throw new Error(response.message || '获取作业列表失败')
         setAssignments(response.data.list)
+        setTotal(response.data.total ?? response.data.list.length)
       }
     } catch (error) {
       if (request !== loadSequence.current) return
@@ -204,16 +208,6 @@ const AssignmentListContent: React.FC = () => {
     }
   }
 
-  const fetchTags = async () => {
-    try {
-      const response = await apiClient.get('/assignments/tags')
-      if (response.code === 0) {
-        if (mounted.current) setAvailableTags(response.data.tags)
-      }
-    } catch (error) {
-      console.error('获取标签列表失败:', error)
-    }
-  }
 
   const fetchSubmissions = async (assignmentId: string) => {
     try {
@@ -324,7 +318,19 @@ const AssignmentListContent: React.FC = () => {
       if (response.code === 0) {
         setShowModal(false)
         resetForm()
-        fetchAssignments()
+        setFilterRevision(value=>value+1)
+        // A record deep link reads only that record. Leave it after creating
+        // so the teacher can see the new assignment in its course list.
+        if (searchParams.has('id') || requestedCourseId !== data.courseId || ['search','tags','from','to','page'].some(key=>searchParams.has(key))) {
+          const next = new URLSearchParams(searchParams)
+          next.delete('id')
+          next.delete('create')
+          for (const key of ['search','tags','from','to','page']) next.delete(key)
+          next.set('courseId', data.courseId)
+          setSearchParams(next, { replace: true })
+        } else {
+          void fetchAssignments()
+        }
       }
     } catch (error: any) {
       editorGuard.fail(String(error.message || '创建失败'))
@@ -378,6 +384,9 @@ const AssignmentListContent: React.FC = () => {
   const handleClone = async (assignment: Assignment) => {
     if (!(await confirm({ title: `复制作业「${assignment.title}」？`, body: '副本会清空截止时间和作答数据，原作业不会改变。', confirmLabel: '复制作业' }))) return
     try {
+      const full = await loadFullRecord(assignment)
+      if (!full) return
+      assignment = full
       const response = await apiClient.post(`/assignments`, {
         courseId: assignment.courseId,
         title: `${assignment.title} (复制)`,
@@ -425,7 +434,24 @@ const AssignmentListContent: React.FC = () => {
     setShowModal(true)
   }
 
-  const openEditModal = (assignment: Assignment) => {
+  const loadFullRecord = async (row: Assignment): Promise<Assignment | null> => {
+    const token=++detailSequence.current
+    if (!(row as Assignment & {summary?:boolean}).summary) return mounted.current ? row : null
+    setOpeningDetail(true)
+    const sequence = loadSequence.current
+    try {
+      const response = await apiClient.get<Assignment>(`/assignments/${encodeURIComponent(row.id)}?courseId=${encodeURIComponent(row.courseId)}`)
+      if (!mounted.current || sequence !== loadSequence.current || token !== detailSequence.current) return null
+      const record = response.data
+      if (response.code !== 0 || !record || record.id !== row.id || record.courseId !== row.courseId || record.course?.id !== row.courseId || (user?.role === 'TEACHER' && record.course.creatorId !== user.id)) throw new Error(response.message || '无法读取完整内容')
+      return record
+    } catch (cause) { if(mounted.current && token===detailSequence.current) showError('读取失败', cause instanceof Error ? cause.message : '请重试'); return null }
+    finally { if(mounted.current && token===detailSequence.current)setOpeningDetail(false) }
+  }
+
+  const openEditModal = async (row: Assignment) => {
+    const assignment = await loadFullRecord(row)
+    if (!assignment) return
     setEditingAssignment(assignment)
     setFormData({
       courseId: assignment.courseId,
@@ -503,13 +529,7 @@ const AssignmentListContent: React.FC = () => {
     })
   }
 
-  const filteredAssignments = assignments.filter((a) => {
-    const matchesKeyword = a.title.toLowerCase().includes(keyword.toLowerCase()) ||
-                           a.course?.title?.toLowerCase().includes(keyword.toLowerCase())
-    const matchesTags = selectedTags.length === 0 || 
-                       selectedTags.some(tag => a.tags?.includes(tag))
-    return matchesKeyword && matchesTags
-  })
+  const filteredAssignments = assignments
 
   const formatDeadline = (deadline?: string) => {
     if (!deadline) return '无截止时间'
@@ -548,11 +568,8 @@ const AssignmentListContent: React.FC = () => {
     <ProductPage width="management" className="space-y-6">
       <PageHeader title="作业管理" description="集中查看课程作业、提交进度和截止时间。" actions={<ProductButton variant="primary" onClick={openCreateModal}><Plus className="w-4 h-4" aria-hidden="true" />布置作业</ProductButton>} />
       {feedback}
-      <div className="staff-toolbar">
-        <label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索作业</span><input type="search" value={keyword} onChange={e=>setKeyword(e.target.value)} placeholder="搜索作业或课程" /></label>
-        {!loading && !loadError && <span className="staff-help">共 {filteredAssignments.length} 个作业</span>}
-      </div>
-      {availableTags.length > 0 && <TagFilter availableTags={availableTags} selectedTags={selectedTags} onChange={setSelectedTags} title="标签筛选" />}
+      {openingDetail && <p role="status">正在读取作业完整内容…</p>}
+      {!focusId && <CatalogFilters key={filterRevision+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline label="作业"/>}
       {loading ? <ProductStatus kind="pending" title="正在加载作业">正在读取作业和提交概况。</ProductStatus>
       : loadError ? <ProductStatus kind="error" title="作业列表加载失败" actions={<ProductButton onClick={() => void fetchAssignments()}>重试</ProductButton>}>{loadError}</ProductStatus>
       : filteredAssignments.length === 0 ? <ProductStatus kind="info" title="暂无匹配作业">可以调整筛选条件，或布置第一份作业。</ProductStatus>
@@ -562,10 +579,11 @@ const AssignmentListContent: React.FC = () => {
           <td className="staff-record-course" data-label="课程">{assignment.course?.title || '未知课程'}</td>
           <td data-label="截止时间">{formatDeadline(assignment.deadline)}</td>
           <td data-label="提交"><button type="button" className="staff-text-action" onClick={()=>openSubmissionsModal(assignment)}>{assignment._count?.submissions || 0} 份提交</button></td>
-          <td data-label="题目">{assignment.questions?.length || 0}</td>
+          <td data-label="题目">{(assignment as Assignment & {summary?:boolean}).summary ? '打开后查看' : assignment.questions?.length || 0}</td>
           <td><div className="staff-table-actions"><ProductButton onClick={()=>openSubmissionsModal(assignment)}>查看提交</ProductButton><MoreActions label={`${assignment.title} 的更多操作`}><button type="button" onClick={()=>void handleExport(assignment)}>导出提交</button><button type="button" onClick={()=>void handleClone(assignment)}>复制作业</button><button type="button" onClick={()=>openEditModal(assignment)}>编辑作业</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(assignment)}>删除作业</button></MoreActions></div></td>
         </tr>)}
       </tbody></table></div>}
+      {!focusId && <CatalogPagination selection={catalog.selection} onApply={catalog.apply} total={total} loading={loading} label="作业"/>}
       {/* Create/Edit Modal */}
       {showModal && (
         <ModalSurface open onClose={editorGuard.close} className="staff-modal-backdrop">

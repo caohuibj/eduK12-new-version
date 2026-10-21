@@ -16,6 +16,11 @@ const auth = vi.hoisted(() => ({
   reauthReturn: null,
   clearReauthentication: vi.fn(),
 }))
+const presentation = vi.hoisted(() => ({ training: false }))
+vi.mock('../../../training/context', async importOriginal => ({
+  ...await importOriginal<typeof import('../../../training/context')>(),
+  isTrainingHost: () => presentation.training,
+}))
 const organization = vi.hoisted(() => ({
   organizations: [] as Array<{ id: string; name: string; status: 'ACTIVE' | 'SUSPENDED' }>,
   total: 0,
@@ -38,6 +43,7 @@ vi.mock('../../../contexts/OrganizationContext', () => ({
 vi.mock('../../../pages/FirstLoginPasswordChange', () => ({ default: () => <p>修改临时密码</p> }))
 const student = { id: 's1', role: 'STUDENT', username: 'student' } as User
 beforeEach(() => {
+  presentation.training = false
   auth.user = student
   auth.isLoading = false
   auth.reauthReturn = null
@@ -56,6 +62,63 @@ beforeEach(() => {
   organization.refresh.mockResolvedValue(undefined)
   organization.selectOrganization.mockReset()
   sessionStorage.clear()
+})
+
+describe('Training assessment presentation boundary', () => {
+  it.each([
+    '/student/scales/scale-1', '/student/questionnaires/questionnaire-1',
+    '/student/composite/attempts/attempt-1', '/student/cognitive/sessions/session-1',
+    '/student/composite/situational/attempt-1', '/student/scales/result/result-1',
+  ])('uses Training presentation on %s while preserving the existing content', path => {
+    presentation.training = true
+    const view = render(<MemoryRouter initialEntries={[path]}><AppShell><button>既有作答操作</button><div data-cognitive-task-root>既有刺激</div></AppShell></MemoryRouter>)
+    expect(view.container.querySelector('.hui-training.training-assessment-visual')).not.toBeNull()
+    expect(view.container.querySelector('.hui-brand')).toContainElement(screen.getByRole('img', { name: 'Training @eduk12.top' }))
+    expect(screen.getByRole('button', { name: '既有作答操作' })).toBeEnabled()
+    expect(view.container.querySelector('[data-cognitive-task-root]')).toHaveTextContent('既有刺激')
+  })
+  it('keeps the Survey runner brand and presentation unchanged', () => {
+    const view = render(<MemoryRouter initialEntries={['/student/composite/attempts/a']}><AppShell><p>Survey 作答内容</p></AppShell></MemoryRouter>)
+    expect(view.container.querySelector('.training-assessment-visual')).toBeNull()
+    expect(view.container.querySelector('.hui-brand')).toHaveTextContent('Huisurvey')
+  })
+})
+
+describe('Training teacher visual boundary', () => {
+  it.each([
+    ['/dashboard', 'courses'],
+    ['/courses/c1/students', 'roster'],
+    ['/assignments', 'teaching'],
+    ['/images', 'resources'],
+    ['/questionnaire-products/draft', 'assessments'],
+    ['/composite-assessments/draft/results', 'reports'],
+    ['/profile', 'account'],
+    ['/teacher/classrooms/room/control', 'classroom'],
+  ])('applies the common teacher presentation on %s without replacing the page', (path, family) => {
+    presentation.training = true
+    auth.user = { id: 't1', role: 'TEACHER', username: 'trainer' } as User
+    const view = render(<MemoryRouter initialEntries={[path]}><AppShell><h1>当前业务页面</h1><button>既有操作</button></AppShell></MemoryRouter>)
+    expect(view.container.querySelector('.training-teacher-visual')).not.toBeNull()
+    expect(screen.getByRole('main')).toHaveAttribute('data-training-family', family)
+    expect(screen.getByRole('heading', { name: '当前业务页面' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '既有操作' })).toBeEnabled()
+    expect(screen.getByRole('navigation', { name: '主要导航' })).toHaveTextContent('我的课程')
+  })
+  it.each([
+    ['STUDENT', true, '/student'],
+    ['ADMIN', true, '/admin/training'],
+    ['TEACHER', false, '/dashboard'],
+    ['TEACHER', true, '/teacher/situational/example'],
+    ['TEACHER', true, '/teacher/situational/attempts/run-id'],
+    ['TEACHER', true, '/student/cognitive/sessions/run-id'],
+  ] as const)('keeps %s/%s/%s outside the teacher skin', (role, training, path) => {
+    presentation.training = training
+    auth.user = { id: 'principal', role, username: 'principal' } as User
+    const view = render(<MemoryRouter initialEntries={[path]}><AppShell><p>原有内容</p></AppShell></MemoryRouter>)
+    expect(view.container.querySelector('.training-teacher-visual')).toBeNull()
+    expect(screen.getByRole('main')).not.toHaveAttribute('data-training-family')
+    expect(screen.getByText('原有内容')).toBeInTheDocument()
+  })
 })
 function Location() { const location = useLocation(); return <output>{location.pathname}{location.search}</output> }
 it('preserves protected deep-link query and hash through sign-in redirect', () => {

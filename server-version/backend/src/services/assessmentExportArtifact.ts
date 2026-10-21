@@ -1,3 +1,4 @@
+import { assertCompositeCourseScope } from '../modules/composite/composite-course-scope'
 import { randomUUID } from 'node:crypto'
 import { promises as fs } from 'node:fs'
 import path from 'node:path'
@@ -10,6 +11,7 @@ import { trainingAnalysisProvenanceSchema, assertTrainingAnalysisExportIdentity 
 
 export const provenanceSchema = z.object({
   version: z.literal(1),
+  courseId: z.string().uuid().optional(),
   generation: z.string().uuid(),
   creatorRole: z.enum(['ADMIN', 'TEACHER']),
   audience: z.literal('teacher'),
@@ -103,12 +105,16 @@ async function validateAssessmentExport(input: ResolveAssessmentExportInput, art
     input.actor.role !== UserRole.TEACHER || artifact.createdBy !== input.actor.userId
     || !artifact.anonymized || parsed.data.creatorRole !== input.actor.role
   )) return null
+  if (parsed.data.courseId) {
+    if (input.resourceType !== 'COMPOSITE' || !artifact.anonymized) return null
+    try { await assertCompositeCourseScope(input.actor.userId, input.actor.role as UserRole, input.resourceId, parsed.data.courseId) } catch { return null }
+  }
   if (input.resourceType === 'COMPOSITE' && artifact.status === 'READY') {
     const { teacherRelationalExportVisibility } = await import('../modules/composite/composite-export.service')
     const visibility = await teacherRelationalExportVisibility(input.actor)
     const ids = parsed.data.attemptIds
     const count = await prisma.compositeAssessmentAttempt.count({ where: { AND: [
-      { id: { in: ids }, compositeAssessmentId: input.resourceId, status: 'COMPLETED' },
+      { id: { in: ids }, compositeAssessmentId: input.resourceId, status: 'COMPLETED', ...(parsed.data.courseId ? { deliveryCourseId: parsed.data.courseId } : {}) },
       ...(visibility ? [visibility] : []),
     ] } })
     if (count !== ids.length) return null

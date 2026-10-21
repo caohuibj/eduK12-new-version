@@ -1,10 +1,12 @@
+import { CatalogFilters, CatalogPagination } from '../training/TrainingCatalogControls'
+import { useCatalogQuery } from '../training/useCatalogQuery'
 import { useCursorList } from '../hooks/useCursorList'
 import { isTrainingHost } from '../training/context'
 import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import React, { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Plus, Search, Camera, Trash2, Edit, Copy, Users, BookOpen, CheckCircle2, Video, Image as ImageIcon, Download, Eye, X, FileText, Share2 } from 'lucide-react'
+import { Plus, Camera, Trash2, Users, Video, Image as ImageIcon, Download, X, FileText } from 'lucide-react'
 import apiClient from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
 import { resolveTrainingCoursePrefill } from '../training/resolveCoursePrefill'
@@ -12,10 +14,9 @@ import { sessionFetch } from '../api/client'
 import RichTextEditor from '../components/RichTextEditor'
 import MediaSelector, { MediaItem } from '../components/MediaSelector'
 import TagBadge from '../components/TagBadge'
-import TagFilter from '../components/TagFilter'
 import TagInput from '../components/TagInput'
 import CheckinTokenManager from '../components/CheckinTokenManager'
-import { sanitizeHtml } from '../utils/sanitize'
+import {} from '../utils/sanitize'
 import { normalizeImageUrl, handleImageError } from '../utils/mediaUtils'
 import { buildAttachmentUpdateFields } from '../utils/attachmentUpdate'
 import type { Checkin, Course } from '../types'
@@ -90,7 +91,11 @@ const CheckinListContent: React.FC = () => {
   const [loadError, setLoadError] = useState<string | null>(null)
   const mounted = useRef(true)
   const loadSequence = useRef(0)
-  const [keyword, setKeyword] = useState('')
+  const detailSequence = useRef(0)
+  const [openingDetail,setOpeningDetail]=useState(false)
+  const catalog = useCatalogQuery()
+  const [filterRevision,setFilterRevision]=useState(0)
+  const [total, setTotal] = useState(0)
   const [showModal, setShowModal] = useState(false)
   const [editingCheckin, setEditingCheckin] = useState<Checkin | null>(null)
   const [formData, setFormData] = useState<CheckinFormData>({
@@ -106,8 +111,6 @@ const CheckinListContent: React.FC = () => {
   })
   const [showMediaSelector, setShowMediaSelector] = useState(false)
   const [mediaSelectorType, setMediaSelectorType] = useState<'video' | 'image' | 'document'>('video')
-  const [availableTags, setAvailableTags] = useState<string[]>([])
-  const [selectedTags, setSelectedTags] = useState<string[]>([])
   
   // 提交列表弹窗状态
   const [showSubmissionsModal, setShowSubmissionsModal] = useState(false)
@@ -116,11 +119,11 @@ const CheckinListContent: React.FC = () => {
 
   useEffect(() => {
     mounted.current = true
-    void fetchCheckins()
     void fetchCourses()
-    void fetchTags()
     return () => { mounted.current = false; loadSequence.current++ }
   }, [])
+
+  useEffect(() => { void fetchCheckins(); return () => { loadSequence.current++ } }, [catalog.params, focusId, requestedCourseId])
 
   // Permit a course page to open the existing check-in editor with its
   // course preselected. Never accept a course not in the authorized roster.
@@ -176,11 +179,12 @@ const CheckinListContent: React.FC = () => {
         }
         setCheckins([record])
       } else {
-        const path = '/checkins' + (requestedCourseId ? `?courseId=${encodeURIComponent(requestedCourseId)}` : '')
-        const response = await apiClient.get<{ list: Checkin[] }>(path)
+        const path = '/checkins?view=summary&' + catalog.params + (requestedCourseId ? `&courseId=${encodeURIComponent(requestedCourseId)}` : '')
+        const response = await apiClient.get<{ list: Checkin[]; total: number }>(path)
         if (request !== loadSequence.current) return
         if (response.code !== 0) throw new Error(response.message || '获取打卡列表失败')
         setCheckins(response.data.list)
+        setTotal(response.data.total ?? response.data.list.length)
       }
     } catch (error) {
       if (request !== loadSequence.current) return
@@ -209,16 +213,6 @@ const CheckinListContent: React.FC = () => {
     }
   }
 
-  const fetchTags = async () => {
-    try {
-      const response = await apiClient.get('/checkins/tags')
-      if (response.code === 0) {
-        if (mounted.current) setAvailableTags(response.data.tags)
-      }
-    } catch (error) {
-      console.error('获取标签列表失败:', error)
-    }
-  }
 
   const handleCreate = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -241,7 +235,12 @@ const CheckinListContent: React.FC = () => {
       if (response.code === 0) {
         setShowModal(false)
         resetForm()
-        fetchCheckins()
+        setFilterRevision(value=>value+1)
+        if (focusId || requestedCourseId !== data.courseId || ['search','tags','from','to','page'].some(key=>searchParams.has(key))) {
+          const next=new URLSearchParams(searchParams)
+          for(const key of ['id','create','search','tags','from','to','page'])next.delete(key)
+          next.set('courseId',data.courseId);setSearchParams(next,{replace:true})
+        } else void fetchCheckins()
       }
     } catch (error: any) {
       editorGuard.fail(String(error.message || '创建失败'))
@@ -296,6 +295,9 @@ const CheckinListContent: React.FC = () => {
   const handleClone = async (checkin: Checkin) => {
     if (!(await confirm({ title: `复制打卡「${checkin.title}」？`, body: '将创建独立副本，原打卡和历史提交不会改变。', confirmLabel: '复制打卡' }))) return
     try {
+      const full = await loadFullRecord(checkin)
+      if (!full) return
+      checkin = full
       // 确保 videos 和 images 是数组格式
       let videos = checkin.videos
       let images = checkin.images
@@ -361,7 +363,24 @@ const CheckinListContent: React.FC = () => {
     setShowModal(true)
   }
 
-  const openEditModal = (checkin: Checkin) => {
+  const loadFullRecord = async (row: Checkin): Promise<Checkin | null> => {
+    const token=++detailSequence.current
+    if (!(row as Checkin & {summary?:boolean}).summary) return mounted.current ? row : null
+    setOpeningDetail(true)
+    const sequence = loadSequence.current
+    try {
+      const response = await apiClient.get<Checkin>(`/checkins/${encodeURIComponent(row.id)}?courseId=${encodeURIComponent(row.courseId)}`)
+      if (!mounted.current || sequence !== loadSequence.current || token !== detailSequence.current) return null
+      const record = response.data
+      if (response.code !== 0 || !record || record.id !== row.id || record.courseId !== row.courseId || record.course?.id !== row.courseId || (user?.role === 'TEACHER' && record.course.creatorId !== user.id)) throw new Error(response.message || '无法读取完整内容')
+      return record
+    } catch (cause) { if(mounted.current && token===detailSequence.current) showError('读取失败', cause instanceof Error ? cause.message : '请重试'); return null }
+    finally { if(mounted.current && token===detailSequence.current)setOpeningDetail(false) }
+  }
+
+  const openEditModal = async (row: Checkin) => {
+    const checkin = await loadFullRecord(row)
+    if (!checkin) return
     setEditingCheckin(checkin)
     setFormData({
       courseId: checkin.courseId,
@@ -437,13 +456,7 @@ const CheckinListContent: React.FC = () => {
     })
   }
 
-  const filteredCheckins = checkins.filter((c) => {
-    const matchesKeyword = c.title.toLowerCase().includes(keyword.toLowerCase()) ||
-                           c.course?.title?.toLowerCase().includes(keyword.toLowerCase())
-    const matchesTags = selectedTags.length === 0 || 
-                       selectedTags.some(tag => c.tags?.includes(tag))
-    return matchesKeyword && matchesTags
-  })
+  const filteredCheckins = checkins
 
   const closeEditor = () => {
     setShowModal(false)
@@ -462,8 +475,8 @@ const CheckinListContent: React.FC = () => {
     <ProductPage width="management" className="space-y-6">
       <PageHeader title="打卡管理" description="集中查看课程打卡、参与情况和截止时间。" actions={<ProductButton variant="primary" onClick={openCreateModal}><Plus className="w-4 h-4" aria-hidden="true" />创建打卡</ProductButton>} />
       {feedback}
-      <div className="staff-toolbar"><label className="staff-search-field"><Search className="w-4 h-4" aria-hidden="true" /><span className="sr-only">搜索打卡</span><input type="search" value={keyword} onChange={e=>setKeyword(e.target.value)} placeholder="搜索打卡或课程" /></label>{!loading && !loadError && <span className="staff-help">共 {filteredCheckins.length} 个打卡</span>}</div>
-      {availableTags.length > 0 && <TagFilter availableTags={availableTags} selectedTags={selectedTags} onChange={setSelectedTags} title="标签筛选" />}
+      {openingDetail && <p role="status">正在读取打卡完整内容…</p>}
+      {!focusId && <CatalogFilters key={filterRevision+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline label="打卡"/>}
       {loading ? <ProductStatus kind="pending" title="正在加载打卡">正在读取打卡和参与概况。</ProductStatus>
       : loadError ? <ProductStatus kind="error" title="打卡列表加载失败" actions={<ProductButton onClick={() => void fetchCheckins()}>重试</ProductButton>}>{loadError}</ProductStatus>
       : filteredCheckins.length === 0 ? <ProductStatus kind="info" title="暂无匹配打卡">可以调整筛选条件，或创建第一项打卡。</ProductStatus>
@@ -477,6 +490,7 @@ const CheckinListContent: React.FC = () => {
           <td><div className="staff-table-actions"><ProductButton onClick={()=>openSubmissionsModal(checkin)}>查看提交</ProductButton><MoreActions label={`${checkin.title} 的更多操作`}><CheckinTokenManager checkinId={checkin.id} checkinTitle={checkin.title} allowAnonymous={checkin.allowAnonymous||false} onAllowAnonymousChange={value=>setCheckins(current=>current.map(item=>item.id===checkin.id?{...item,allowAnonymous:value}:item))}/><button type="button" onClick={()=>void handleExport(checkin)}>导出数据</button><button type="button" onClick={()=>void handleClone(checkin)}>复制打卡</button><button type="button" onClick={()=>openEditModal(checkin)}>编辑打卡</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(checkin)}>删除打卡</button></MoreActions></div></td>
         </tr>)}
       </tbody></table></div>}
+      {!focusId && <CatalogPagination selection={catalog.selection} onApply={catalog.apply} total={total} loading={loading} label="打卡"/>}
       {/* Create/Edit Modal */}
       {showModal && (
         <ModalSurface open onClose={editorGuard.close} className="staff-modal-backdrop">

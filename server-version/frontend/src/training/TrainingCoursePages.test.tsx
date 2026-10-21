@@ -34,9 +34,9 @@ beforeEach(() => {
   loadAssessments.mockReset()
   get.mockImplementation((url: string) => {
     if (url === '/courses/course-1') return Promise.resolve({ code: 0, data: course })
-    if (url === '/courses/course-1/assignments') return Promise.resolve({ code: 0, data: { list: [{ id: 'a-1', title: '课程作业', status: 'PUBLISHED', submitted: false }] } })
-    if (url === '/courses/course-1/checkins') return Promise.resolve({ code: 0, data: { list: [{ id: 'c-1', title: '每周打卡', status: 'PUBLISHED', submitted: false }] } })
-    if (url === '/courses/course-1/training-assessments') return Promise.resolve({ code: 0, data: { list: [
+    if ((url === '/courses/course-1/assignments' || url.startsWith('/assignments?view=summary&courseId=course-1&'))) return Promise.resolve({ code: 0, data: { list: [{ id: 'a-1', title: '课程作业', status: 'PUBLISHED', submitted: false }] } })
+    if ((url === '/courses/course-1/checkins' || url.startsWith('/checkins?view=summary&courseId=course-1&'))) return Promise.resolve({ code: 0, data: { list: [{ id: 'c-1', title: '每周打卡', status: 'PUBLISHED', submitted: false }] } })
+    if (url.startsWith('/courses/course-1/training-assessments?includeManaged=true&view=summary&')) return Promise.resolve({ code: 0, data: { list: [
       { key: 'questionnaire:q-1', id: 'q-1', name: '学习状态', kind: 'QUESTIONNAIRE', typeLabel: '课程问卷', unitCount: 2, unitLabel: '单元', manageHref: '/questionnaire-products/q-1' },
       { key: 'scale:s-1', id: 's-1', name: '积极应对量表', kind: 'SCALE', typeLabel: '课程量表', unitCount: 12, unitLabel: '道题目', manageHref: '/scales/s-1' },
       { key: 'cognitive:c-1', id: 'c-1', name: '已发布认知历史', kind: 'COGNITIVE', typeLabel: '认知测评', unitCount: 1, unitLabel: '个任务', manageHref: '/cognitive-assignments/c-1' },
@@ -77,11 +77,11 @@ describe('course-first training workspaces', () => {
   it('does not mislabel a saved draft as submitted or a closed check-in as actionable', async () => {
     get.mockImplementation((url: string) => {
       if (url === '/courses/course-1') return Promise.resolve({ code: 0, data: course })
-      if (url === '/courses/course-1/assignments') return Promise.resolve({ code: 0, data: { list: [{
+      if ((url === '/courses/course-1/assignments' || url.startsWith('/assignments?view=summary&courseId=course-1&'))) return Promise.resolve({ code: 0, data: { list: [{
         id: 'draft-1', title: '尚未提交的草稿', status: 'PUBLISHED',
         submitted: true, mySubmission: { status: 'DRAFT' },
       }] } })
-      if (url === '/courses/course-1/checkins') return Promise.resolve({ code: 0, data: { list: [{
+      if ((url === '/courses/course-1/checkins' || url.startsWith('/checkins?view=summary&courseId=course-1&'))) return Promise.resolve({ code: 0, data: { list: [{
         id: 'closed-1', title: '已到期打卡', endTime: '2020-01-01T00:00:00Z', submitted: false,
       }] } })
       throw new Error('unexpected url ' + url)
@@ -98,8 +98,8 @@ describe('course-first training workspaces', () => {
   it('shows assignment API failure without crashing the course page', async () => {
     get.mockImplementation((url: string) => {
       if (url === '/courses/course-1') return Promise.resolve({ code: 0, data: course })
-      if (url === '/courses/course-1/assignments') return Promise.reject(new Error('作业查询超时'))
-      if (url === '/courses/course-1/checkins') return Promise.resolve({ code: 0, data: { list: [] } })
+      if ((url === '/courses/course-1/assignments' || url.startsWith('/assignments?view=summary&courseId=course-1&'))) return Promise.reject(new Error('作业查询超时'))
+      if ((url === '/courses/course-1/checkins' || url.startsWith('/checkins?view=summary&courseId=course-1&'))) return Promise.resolve({ code: 0, data: { list: [] } })
       throw new Error('unexpected url ' + url)
     })
     mount('/student/courses/course-1', '/student/courses/:courseId', TrainingLearnerCourse)
@@ -113,8 +113,8 @@ describe('course-first training workspaces', () => {
     fireEvent.click(screen.getByRole('button', { name: '测评' }))
     expect(await screen.findByText('积极应对量表')).toBeInTheDocument()
     expect(screen.getByText('学习综合测评包')).toBeInTheDocument()
-    expect(screen.getAllByRole('link', { name: /管理测评/ }).map(link => link.getAttribute('href'))).toEqual(['/questionnaire-products/q-1', '/scales/s-1', '/cognitive-assignments/c-1', '/bundle-products/b-1'])
-    expect(get).toHaveBeenCalledWith('/courses/course-1/training-assessments')
+    expect(screen.getAllByRole('link', { name: /配置与匿名链接|管理测评/ }).map(link => link.getAttribute('href')?.split('?')[0])).toEqual(['/questionnaire-products/q-1', '/scales/s-1', '/cognitive-assignments/c-1', '/bundle-products/b-1'])
+    expect(get).toHaveBeenCalledWith(expect.stringContaining('/courses/course-1/training-assessments?includeManaged=true&view=summary&page=1&pageSize=20'))
   })
 
   it('loads authorized analysis sources only when the trainer opens its data-analysis tab', async () => {
@@ -125,16 +125,17 @@ describe('course-first training workspaces', () => {
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     await screen.findByRole('heading', { name: course.title })
     expect(get).not.toHaveBeenCalledWith('/courses/course-1/training-analysis/sources')
-    fireEvent.click(screen.getByRole('button', { name: '数据分析' }))
+    fireEvent.click(screen.getByRole('button', { name: '信息统计' }))
     expect(await screen.findByText(/当前没有可分析的授权数值来源/)).toBeVisible()
     expect(get).toHaveBeenCalledWith('/courses/course-1/training-analysis/sources')
     fireEvent.click(screen.getByRole('button', { name: '作业' }))
-    expect(screen.getByRole('link', { name: /发布作业/ })).toHaveAttribute('href', '/assignments?create=true&courseId=course-1')
+    expect(screen.getByRole('link', { name: /发布作业/ })).toHaveAttribute('href', expect.stringContaining('/assignments?create=true&courseId=course-1&returnTo='))
   })
 
   it('keeps course code operations in a low-frequency settings section with explicit confirmation', async () => {
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button',{name:'课程管理'}))
     fireEvent.click(screen.getByText(/课程设置/, { selector: 'summary' }))
     fireEvent.click(screen.getByRole('button', { name: '轮换课程码' }))
     await screen.findByRole('button', { name: '轮换课程码' })
@@ -152,6 +153,7 @@ describe('course-first training workspaces', () => {
     })
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     await screen.findByRole('heading', { name: course.title })
+    fireEvent.click(screen.getByRole('button',{name:'课程管理'}))
     const summary = screen.getByText(/课程设置/, { selector: 'summary' })
     const settings = summary.closest('details')!
     fireEvent.click(summary)
@@ -169,6 +171,7 @@ describe('course-first training workspaces', () => {
     confirm.mockResolvedValueOnce(false)
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button',{name:'课程管理'}))
     fireEvent.click(screen.getByText(/课程设置/, { selector: 'summary' }))
     fireEvent.click(screen.getByRole('button', { name: '结束课程' }))
     await waitFor(() => expect(confirm).toHaveBeenCalledWith(expect.objectContaining({
@@ -180,13 +183,15 @@ describe('course-first training workspaces', () => {
   it('trainer publishing links keep the exact course context', async () => {
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()
-    expect(await screen.findByRole('link', { name: /发布作业/ })).toHaveAttribute('href', '/assignments?create=true&courseId=course-1')
-    expect(screen.getByRole('link', { name: /查看管理/ })).toHaveAttribute('href', '/assignments?id=a-1&courseId=course-1')
+    expect(await screen.findByRole('link', { name: /发布作业/ })).toHaveAttribute('href', expect.stringContaining('/assignments?create=true&courseId=course-1&returnTo='))
+    expect(await screen.findByRole('link', { name: /查看管理/ })).toHaveAttribute('href', expect.stringContaining('/assignments?id=a-1&courseId=course-1&returnTo='))
     fireEvent.click(screen.getByRole('button', { name: '打卡' }))
-    expect(screen.getByRole('link', { name: /发布打卡/ })).toHaveAttribute('href', '/checkins?create=true&courseId=course-1')
-    expect(screen.getByRole('link', { name: /查看管理/ })).toHaveAttribute('href', '/checkins?id=c-1&courseId=course-1')
+    expect(screen.getByRole('link', { name: /发布打卡/ })).toHaveAttribute('href', expect.stringContaining('/checkins?create=true&courseId=course-1&returnTo='))
+    expect(await screen.findByRole('link', { name: /查看管理/ })).toHaveAttribute('href', expect.stringContaining('/checkins?id=c-1&courseId=course-1&returnTo='))
     fireEvent.click(screen.getByRole('button', { name: '测评' }))
-    expect(screen.getByRole('link', { name: /布置组合测评/ })).toHaveAttribute('href', '/questionnaire-products/new?courseId=course-1')
+    expect(screen.getByRole('link', { name: /布置组合测评/ })).toHaveAttribute('href', expect.stringContaining('/questionnaire-products/new?courseId=course-1&returnTo='))
+    expect(screen.queryByRole('link',{name:/管理学员/})).toBeNull()
+    fireEvent.click(screen.getByRole('button',{name:'课程管理'}))
     for (const link of screen.getAllByRole('link', { name: /管理学员/ })) expect(link).toHaveAttribute('href', '/courses/course-1/students')
   })
 })

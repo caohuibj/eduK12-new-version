@@ -1,0 +1,567 @@
+{
+  "schema": 1,
+  "components": {
+    "backend": {
+      "jobId": 118549912875,
+      "artifactId": 12254021820,
+      "zipBytes": 111466192,
+      "zipSha256": "1b63bd5f180fd34dd5d8c203269e054bbd614a8c058df619ffadf11e8c9a0e97",
+      "archiveSha256": "68eab0cc18f679331898914caf2c44cc1a64af88c33f677940032419874fe0b2",
+      "componentTree": "8804b7ff3d5d02555bfa5a338702bd23702d6561",
+      "productionInputSha256": "7b0b93923f97285a101dee18557cbd5928607661da847f63c942f91c4ca55375",
+      "receiptSha256": "55d7f4e9d65f261c270da0e171a705033eea272668f7351bb60fce9d3711ad1b",
+      "head": "da713c522be4fd3309e4dcf327bfb71384c784fe",
+      "runId": "39399331312",
+      "attempt": "1",
+      "lockfileSha256": "e7ead36aea4702185f0dfcebc3089723258a402218b1addde09e03ec1c5e9b57",
+      "buildFlags": {
+        "VITE_COGNITIVE_MODULE_ENABLED": "true",
+        "TZ": "UTC"
+      },
+      "requiredFiles": {
+        "dist/index.js": "0ad259adc0c7648e992abde10a29f24e316d790548c4e62973f9f16653ac8047",
+        "assets/sjt-upload-v1.xlsx": "3ddecbb4857fa88edbe9139c2bcd3dadddd778458b536156a0998edef0a1123e",
+        "assets/sjt-upload-example-v1.xlsx": "fc460834806a5827e23f5a246ee13e6d24cf58880608bea248fcc7bfbe6ca19c",
+        "dist/modules/cognitive/generated/catalog.js": "afaa96795f2057fb28654b2b1a077f524eb7ea3b2796d1c0fac2d8b06000163b",
+        "dist/modules/cognitive/generated/execution.js": "82ab84654ef3ee3fdc4812869873ca22df070ddd5c460029957cc4fe813a8adc",
+        "dist/modules/cognitive/generated/presentation.js": "02394ad54c01fbcf037999b320e4c06bf9e315e6858d7744aac1aa6a5ac93eb6",
+        "dist/modules/cognitive/generated/scientific.js": "ba2cc93c945f4ae195d87f7b5c18dba1c355b29cca365f6acc27cdcdfd13e007",
+        "dist/modules/cognitive/generated/seeds.js": "44db9ff4c955976d67d4fb2726c6ff02df2fa17bd26f22896e0e48ed1f05adcd",
+        "src/modules/cognitive/generated/identities.json": "4297b93ac8237f7fbf94a56fd5cce086c589602b8bc0dcf801731a18ac2c2d34"
+      },
+      "repository": "caohuibj/eduK12-new-version",
+      "workflowPath": ".github/workflows/ci-measurement-browser.yml",
+      "branch": "ci/measurement-browser-20261020",
+      "jobName": "production compile once / backend",
+      "artifactName": "measurement-39399331312-da713c522be4fd3309e4dcf327bfb71384c784fe-backend-build",
+      "sourceTree": "97d2c719f44179bdb68168303c4f2a7fa35aafa2",
+      "excludedNonProductionPaths": []
+    },
+    "frontend": {
+      "jobId": 118638223116,
+      "artifactId": 12265672275,
+      "zipBytes": 129060477,
+      "zipSha256": "b232da6c941e31390052800656fd91c370fabbced6ec41a812ce3f71c1969593",
+      "head": "4286a59b649c37662cdbc0e7ca4e41103ad4e4f2",
+      "runId": "39425861081",
+      "attempt": "1",
+      "componentTree": "a4fa70dfd71450f7840708377a4815c073bfbc9b",
+      "lockfileSha256": "be71016d67ab0f980f10210387fa1f953bafc41f7b823e5f6ea4c0f68ddc45e0",
+      "archiveSha256": "a7d629206aefc034fd0698e931122da400f889712c6697e2484daf538b9dbf80",
+      "buildFlags": {
+        "VITE_COGNITIVE_MODULE_ENABLED": "true",
+        "TZ": "UTC"
+      },
+      "requiredFiles": {
+        "dist/index.html": "9d56abf17367cc08e25ae7261067eb9940a0dcaf75f98cbd91d64ac820df0dbb"
+      },
+      "repository": "caohuibj/eduK12-new-version",
+      "workflowPath": ".github/workflows/ci-measurement-browser.yml",
+      "branch": "ci/measurement-browser-20261020",
+      "jobName": "build changed measurement frontend once",
+      "artifactName": "measurement-39425861081-4286a59b649c37662cdbc0e7ca4e41103ad4e4f2-frontend-build",
+      "receiptSha256": "d467a7312ae1daa2672b5a1ff635c9561408b65116a3cad5cbabd0a3551430b4",
+      "sourceTree": "e1059cdb8bbe73d4c4f1eb4b16c42ee8d6cf953f",
+      "productionInputSha256": "813e6253c8ab84b5374eab1009a00564c52bc62f0106016b25b9afd72631b273",
+      "excludedNonProductionPaths": []
+    }
+  },
+  "runtime": {
+    "base": "9e1b302e1e255050b15ab150905bc69cee1b3c1b",
+    "nodeImage": "node:24.21.0-bookworm-slim",
+    "nginxImage": "nginx:1.31.6-alpine3.24-slim",
+    "postgresImage": "postgres:16.15-bookworm",
+    "newMigrations": [
+      "20261021000000_training_catalog_discovery"
+    ],
+    "changedFrontendFiles": [
+      "src/components/FinalCompositeAssessment.tsx",
+      "src/components/WholeCompositeQuestionnaire.tsx",
+      "src/components/__tests__/TrainingCheckpointRecovery.test.tsx",
+      "src/modules/situational/__tests__/SituationalRunner.test.tsx",
+      "src/modules/situational/pages/SituationalRunner.tsx",
+      "src/pages/teacher/AssessmentWorkbench.training.test.tsx",
+      "src/pages/teacher/AssessmentWorkbench.tsx",
+      "src/training/TrainingCourseAssessments.test.tsx",
+      "src/training/TrainingCourseAssessments.tsx"
+    ],
+    "sourceOverlay": "Current exact logo source plus official follow-redirects and Vite patches matching current locks. Restore original backend compilation; execute one affected frontend build.",
+    "claim": "Preserve original backend compilation and verified round8 backend image/audit identities. Execute affected frontend build, app types and nine-file lint; reuse browser only on complete compiled-byte equality, otherwise run existing bounded cases. Fresh frontend image scans, the corrected failed export case and missing isolated schema/restore qualification remain required. No deployment.",
+    "frontendExternalInputs": {
+      "server-version/cognitive-randomization-golden-v1.json": {
+        "gitBlob": "5b3cb7c11138044ad6a85626e74004bea2a3e62a",
+        "sha256": "8187a90193eafee847446274c27fe3891386ad15efabf6f5b0f94e90fa5299ba"
+      }
+    }
+  },
+  "macRuntime": {
+    "dependencySources": {
+      "backend": {
+        "jobId": 118549912875,
+        "artifactId": 12254021820,
+        "zipBytes": 111466192,
+        "zipSha256": "1b63bd5f180fd34dd5d8c203269e054bbd614a8c058df619ffadf11e8c9a0e97",
+        "archiveSha256": "68eab0cc18f679331898914caf2c44cc1a64af88c33f677940032419874fe0b2",
+        "componentTree": "8804b7ff3d5d02555bfa5a338702bd23702d6561",
+        "productionInputSha256": "a1bba1b32276d872a6e3ebd56a0cf3eebf84c4f9c71ccaea7e789a8447429cbd",
+        "receiptSha256": "55d7f4e9d65f261c270da0e171a705033eea272668f7351bb60fce9d3711ad1b",
+        "head": "da713c522be4fd3309e4dcf327bfb71384c784fe",
+        "runId": "39399331312",
+        "attempt": "1",
+        "lockfileSha256": "0261d2047bbaab484ae6088526037120a5e058472047b6b964c959d3ff065d9d",
+        "buildFlags": {
+          "VITE_COGNITIVE_MODULE_ENABLED": "true",
+          "TZ": "UTC"
+        },
+        "requiredFiles": {
+          "dist/index.js": "0ad259adc0c7648e992abde10a29f24e316d790548c4e62973f9f16653ac8047",
+          "assets/sjt-upload-v1.xlsx": "3ddecbb4857fa88edbe9139c2bcd3dadddd778458b536156a0998edef0a1123e",
+          "assets/sjt-upload-example-v1.xlsx": "fc460834806a5827e23f5a246ee13e6d24cf58880608bea248fcc7bfbe6ca19c",
+          "dist/modules/cognitive/generated/catalog.js": "afaa96795f2057fb28654b2b1a077f524eb7ea3b2796d1c0fac2d8b06000163b",
+          "dist/modules/cognitive/generated/execution.js": "82ab84654ef3ee3fdc4812869873ca22df070ddd5c460029957cc4fe813a8adc",
+          "dist/modules/cognitive/generated/presentation.js": "02394ad54c01fbcf037999b320e4c06bf9e315e6858d7744aac1aa6a5ac93eb6",
+          "dist/modules/cognitive/generated/scientific.js": "ba2cc93c945f4ae195d87f7b5c18dba1c355b29cca365f6acc27cdcdfd13e007",
+          "dist/modules/cognitive/generated/seeds.js": "44db9ff4c955976d67d4fb2726c6ff02df2fa17bd26f22896e0e48ed1f05adcd",
+          "src/modules/cognitive/generated/identities.json": "4297b93ac8237f7fbf94a56fd5cce086c589602b8bc0dcf801731a18ac2c2d34"
+        },
+        "repository": "caohuibj/eduK12-new-version",
+        "workflowPath": ".github/workflows/ci-measurement-browser.yml",
+        "branch": "ci/measurement-browser-20261020",
+        "jobName": "production compile once / backend",
+        "artifactName": "measurement-39399331312-da713c522be4fd3309e4dcf327bfb71384c784fe-backend-build",
+        "sourceTree": "1fd85660d7b0de7c0cfd3b3ad2c491f493bdcf5c",
+        "excludedNonProductionPaths": [
+          "server-version/backend/scripts/measurement-browser-fixture.ts"
+        ]
+      },
+      "frontend": {
+        "jobId": 118638223116,
+        "artifactId": 12265672275,
+        "zipBytes": 129060477,
+        "zipSha256": "b232da6c941e31390052800656fd91c370fabbced6ec41a812ce3f71c1969593",
+        "head": "4286a59b649c37662cdbc0e7ca4e41103ad4e4f2",
+        "runId": "39425861081",
+        "attempt": "1",
+        "componentTree": "a4fa70dfd71450f7840708377a4815c073bfbc9b",
+        "lockfileSha256": "5288a377ebdd829533561cf2383cd2bcd20e15bd12e6d15762b36a05f7bec1ca",
+        "archiveSha256": "a7d629206aefc034fd0698e931122da400f889712c6697e2484daf538b9dbf80",
+        "buildFlags": {
+          "VITE_COGNITIVE_MODULE_ENABLED": "true",
+          "TZ": "UTC"
+        },
+        "requiredFiles": {
+          "dist/index.html": "9d56abf17367cc08e25ae7261067eb9940a0dcaf75f98cbd91d64ac820df0dbb"
+        },
+        "repository": "caohuibj/eduK12-new-version",
+        "workflowPath": ".github/workflows/ci-measurement-browser.yml",
+        "branch": "ci/measurement-browser-20261020",
+        "jobName": "build changed measurement frontend once",
+        "artifactName": "measurement-39425861081-4286a59b649c37662cdbc0e7ca4e41103ad4e4f2-frontend-build",
+        "receiptSha256": "d467a7312ae1daa2672b5a1ff635c9561408b65116a3cad5cbabd0a3551430b4",
+        "sourceTree": "a4fa70dfd71450f7840708377a4815c073bfbc9b",
+        "productionInputSha256": "53370643b8aa370e337561d7491ead82dab64557f2714b95b9fc5da9a73bce8f",
+        "excludedNonProductionPaths": []
+      }
+    },
+    "requiredRuntimePhases": [
+      "prepare",
+      "backend-compile",
+      "frontend-compile",
+      "frontend-app-types",
+      "changed-lint",
+      "dependency-audit",
+      "compiled-browser",
+      "scoped-pg-http",
+      "runtime-packaging",
+      "runtime-scans",
+      "schema-upgrade-restore"
+    ],
+    "compileReasons": {
+      "backend": "Three corrected catalog source inputs invalidate old backend dist. Direct compiler only, no unchanged build prerequisites.",
+      "frontend": "Current frontend build includes approved logo, Vite patch and bounded course-scope/manual-confirmation/checkpoint-recovery fixes. Backend compile is unchanged and retained."
+    },
+    "lintAdmission": {
+      "kind": "historical-observed-lint-with-limited-selection",
+      "originalExitCode": 0,
+      "receiptSha256": "0beeecbc6273e54d31b446e5ffc8322c7807db9eca119e8dc465f34796ef087f",
+      "logSha256": "2c1d9503ce0794ce07ecff44712b866f1f0a474e5f341cdf8027ad2b022bffb6",
+      "limitations": [
+        "Original exact eight-file argv unrecoverable; not represented as complete current lint. Fresh lint runs the seven independently selected overlap/final-addition files."
+      ]
+    },
+    "browserCommand": [
+      "node",
+      ".github/scripts/training-mac-browser.mjs"
+    ],
+    "browserScriptBlob": "0e97eceb3b8951c32e18455d7d73292fe3c1cdef",
+    "browserExpectedAssertions": [
+      "course-shell-1440",
+      "analysis-reference-1440",
+      "pending-publication-1440",
+      "course-shell-390",
+      "analysis-reference-390",
+      "pending-publication-390"
+    ],
+    "changedLintFiles": [
+      "src/components/FinalCompositeAssessment.tsx",
+      "src/components/WholeCompositeQuestionnaire.tsx",
+      "src/components/__tests__/TrainingCheckpointRecovery.test.tsx",
+      "src/modules/situational/__tests__/SituationalRunner.test.tsx",
+      "src/modules/situational/pages/SituationalRunner.tsx",
+      "src/pages/teacher/AssessmentWorkbench.training.test.tsx",
+      "src/pages/teacher/AssessmentWorkbench.tsx",
+      "src/training/TrainingCourseAssessments.test.tsx",
+      "src/training/TrainingCourseAssessments.tsx"
+    ],
+    "integrationFiles": [
+      "src/__tests__/controllers/trainingCatalog.boundaries.postgres.test.ts",
+      "src/__tests__/integration/training-mac-export.postgres.integration.test.ts"
+    ],
+    "expectedIntegrationAssertions": 4,
+    "browserAssertions": [
+      "course-shell-1440",
+      "analysis-reference-1440",
+      "pending-publication-1440",
+      "course-shell-390",
+      "analysis-reference-390",
+      "pending-publication-390"
+    ],
+    "dependencyPatch": {
+      "name": "follow-redirects",
+      "fromVersion": "1.16.0",
+      "toVersion": "1.16.1",
+      "tarball": "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.16.1.tgz",
+      "integrity": "sha512-FNvFGzoMLWmE6Yj9spb/zjd7yiNCHiAW9/Tg9CXrQ8wuu32HtlJOwWO11OJafl5FfY3DxTdQ0vj42zU1kvv5jg==",
+      "tarSha256": "6e075d999dc5ff568916954508397b11a537b18bde615986d7bd8b3d3fa1799f",
+      "tarBytes": 10076,
+      "files": [
+        {
+          "path": "LICENSE",
+          "sha256": "bfa8a54bb952ccda79f0f1889721d108f5b605babbb2b8a3705ffb52f4132eb7",
+          "bytes": 1136
+        },
+        {
+          "path": "debug.js",
+          "sha256": "8dbf7e71a9292be180e3469a6b7a164171d3c39dec79e5dbc4aa1c9f09509faf",
+          "bytes": 315
+        },
+        {
+          "path": "http.js",
+          "sha256": "754c0078c57625db7b55b4c3fb30ff5c207fc49284a5022742e81d0c595403c5",
+          "bytes": 37
+        },
+        {
+          "path": "https.js",
+          "sha256": "7a28e323ffd91094e083a8954fe027839c06d948603d7f2719ed17c446885272",
+          "bytes": 38
+        },
+        {
+          "path": "index.js",
+          "sha256": "656e169cc2e8043ec00b7d912f3ff523a01026a3fd38e04516b37fb39be94f14",
+          "bytes": 21539
+        },
+        {
+          "path": "package.json",
+          "sha256": "3b63e57223c63eff7b1c9ecdcd6615af8c6fcbaa9d436e949f02acf2b6dbe588",
+          "bytes": 1289
+        },
+        {
+          "path": "README.md",
+          "sha256": "190b2c4cce3593592f9661d1bff3ab398317e195425ef3f23758d1f52c42f6af",
+          "bytes": 6605
+        }
+      ],
+      "originalComponents": {
+        "backend": {
+          "jobId": 118549912875,
+          "artifactId": 12254021820,
+          "zipBytes": 111466192,
+          "zipSha256": "1b63bd5f180fd34dd5d8c203269e054bbd614a8c058df619ffadf11e8c9a0e97",
+          "archiveSha256": "68eab0cc18f679331898914caf2c44cc1a64af88c33f677940032419874fe0b2",
+          "componentTree": "8804b7ff3d5d02555bfa5a338702bd23702d6561",
+          "productionInputSha256": "1873e5bb5c9853e66910fe95b8f1022e26bda558e28997a4d75d0622ccdfe8cf",
+          "receiptSha256": "55d7f4e9d65f261c270da0e171a705033eea272668f7351bb60fce9d3711ad1b",
+          "head": "da713c522be4fd3309e4dcf327bfb71384c784fe",
+          "runId": "39399331312",
+          "attempt": "1",
+          "lockfileSha256": "0261d2047bbaab484ae6088526037120a5e058472047b6b964c959d3ff065d9d",
+          "buildFlags": {
+            "VITE_COGNITIVE_MODULE_ENABLED": "true",
+            "TZ": "UTC"
+          },
+          "requiredFiles": {
+            "dist/index.js": "0ad259adc0c7648e992abde10a29f24e316d790548c4e62973f9f16653ac8047",
+            "assets/sjt-upload-v1.xlsx": "3ddecbb4857fa88edbe9139c2bcd3dadddd778458b536156a0998edef0a1123e",
+            "assets/sjt-upload-example-v1.xlsx": "fc460834806a5827e23f5a246ee13e6d24cf58880608bea248fcc7bfbe6ca19c",
+            "dist/modules/cognitive/generated/catalog.js": "afaa96795f2057fb28654b2b1a077f524eb7ea3b2796d1c0fac2d8b06000163b",
+            "dist/modules/cognitive/generated/execution.js": "82ab84654ef3ee3fdc4812869873ca22df070ddd5c460029957cc4fe813a8adc",
+            "dist/modules/cognitive/generated/presentation.js": "02394ad54c01fbcf037999b320e4c06bf9e315e6858d7744aac1aa6a5ac93eb6",
+            "dist/modules/cognitive/generated/scientific.js": "ba2cc93c945f4ae195d87f7b5c18dba1c355b29cca365f6acc27cdcdfd13e007",
+            "dist/modules/cognitive/generated/seeds.js": "44db9ff4c955976d67d4fb2726c6ff02df2fa17bd26f22896e0e48ed1f05adcd",
+            "src/modules/cognitive/generated/identities.json": "4297b93ac8237f7fbf94a56fd5cce086c589602b8bc0dcf801731a18ac2c2d34"
+          },
+          "repository": "caohuibj/eduK12-new-version",
+          "workflowPath": ".github/workflows/ci-measurement-browser.yml",
+          "branch": "ci/measurement-browser-20261020",
+          "jobName": "production compile once / backend",
+          "artifactName": "measurement-39399331312-da713c522be4fd3309e4dcf327bfb71384c784fe-backend-build",
+          "sourceTree": "c82d6ef9a61236e5b99e88f35b9cc0e6e5bf930e",
+          "excludedNonProductionPaths": []
+        },
+        "frontend": {
+          "jobId": 118638223116,
+          "artifactId": 12265672275,
+          "zipBytes": 129060477,
+          "zipSha256": "b232da6c941e31390052800656fd91c370fabbced6ec41a812ce3f71c1969593",
+          "head": "4286a59b649c37662cdbc0e7ca4e41103ad4e4f2",
+          "runId": "39425861081",
+          "attempt": "1",
+          "componentTree": "a4fa70dfd71450f7840708377a4815c073bfbc9b",
+          "lockfileSha256": "5288a377ebdd829533561cf2383cd2bcd20e15bd12e6d15762b36a05f7bec1ca",
+          "archiveSha256": "a7d629206aefc034fd0698e931122da400f889712c6697e2484daf538b9dbf80",
+          "buildFlags": {
+            "VITE_COGNITIVE_MODULE_ENABLED": "true",
+            "TZ": "UTC"
+          },
+          "requiredFiles": {
+            "dist/index.html": "9d56abf17367cc08e25ae7261067eb9940a0dcaf75f98cbd91d64ac820df0dbb"
+          },
+          "repository": "caohuibj/eduK12-new-version",
+          "workflowPath": ".github/workflows/ci-measurement-browser.yml",
+          "branch": "ci/measurement-browser-20261020",
+          "jobName": "build changed measurement frontend once",
+          "artifactName": "measurement-39425861081-4286a59b649c37662cdbc0e7ca4e41103ad4e4f2-frontend-build",
+          "receiptSha256": "d467a7312ae1daa2672b5a1ff635c9561408b65116a3cad5cbabd0a3551430b4",
+          "sourceTree": "6fe522474014fc06948fbd4e5fb0b36c6ba581c0",
+          "productionInputSha256": "4ea252203ada3e369aa74935e8baae73dc047c032857d7efc4b62577ddab061a",
+          "excludedNonProductionPaths": []
+        }
+      },
+      "reviewedSourceFiles": [
+        "server-version/backend/package.json",
+        "server-version/backend/package-lock.json",
+        "server-version/frontend/package.json",
+        "server-version/frontend/package-lock.json"
+      ]
+    },
+    "vitePatch": {
+      "backend": {
+        "name": "vite",
+        "fromVersion": "7.3.6",
+        "toVersion": "7.3.7",
+        "tarball": "https://registry.npmjs.org/vite/-/vite-7.3.7.tgz",
+        "integrity": "sha512-AHEzTORMbi7/7aXp7w7KZ5+DCUdSeLsJz0grY8xHpc9DHdYb0vQu6DqJfm2tOw3gDExNgPgnJTXxM6syYFHaCA==",
+        "tarSha256": "61819c1c5e0b526a012b39b5d4dfb9d10875ced139554f9105a8999990ce7b08",
+        "tarBytes": 544713
+      },
+      "frontend": {
+        "name": "vite",
+        "fromVersion": "6.4.3",
+        "toVersion": "6.4.4",
+        "tarball": "https://registry.npmjs.org/vite/-/vite-6.4.4.tgz",
+        "integrity": "sha512-xGjU/SyjeNyb0E4KxXBvYz/1C+3JXuujvf2hXNOtnlcE+58o5ajd9N2/n2VhkiJvpCP2qQasnUpx5PXNeI+p1Q==",
+        "tarSha256": "09242e9a1f45c17ef96402dc1b39cfcf93b6a65a5bc965622641be50830fa71b",
+        "tarBytes": 635040
+      }
+    },
+    "logoDelta": [
+      {
+        "path": "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "05f25919a5ff535f7b5ff418a96c50b1a3e58139"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "0b6068789aa1d30db5d7a6cc6021a2378513df2e"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/TrainingAuth.test.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "15dc98c0ad405e93f3b396875a9c02ec960d89dd"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "e47c4e452d4590d6e1da2c6a81ea1c4dd60f1130"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/TrainingBrand.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "3c5d5edfe1093edd0cf5db6f93ee17602e05f5ef"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "258558b1d5f95bf328f437417be637293817ad24"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/TrainingScreens.test.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "bf401023cfe74b3d6d61638b230781bcbfa20273"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "67585808362b3fc434802b3bb70df7045e7200ee"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/training-book-mountain.svg",
+        "before": {
+          "mode": "100644",
+          "blob": "7064be8d98ba14d862defac80ccd18681939f615"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "2a2e19ab46e4b6fe0fd72a8b72356ca427282d47"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/training-brand.css",
+        "before": {
+          "mode": "100644",
+          "blob": "d18487baeef4b0c3e83cad120f67f5df0b1612fc"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "150c09b5bc06dad9043c389b69a8458a8b417b9c"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/training-home-brand.css",
+        "before": {
+          "mode": "100644",
+          "blob": "327b3a425967f128fe2c0abea9369bbc3f535bbd"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "a38ceea75fc2be047b6ad789a0049eda4c8fd163"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/training-logo.svg",
+        "before": null,
+        "after": {
+          "mode": "100644",
+          "blob": "1732258c8ec9a70b439f69dac89646d9b91231c4"
+        }
+      }
+    ],
+    "reviewFixDelta": [
+      {
+        "path": "server-version/frontend/src/components/FinalCompositeAssessment.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "f41dcc2536afbfa296dc588ae3f33ee718e19342"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "b565d5ed4a6ce8a534fe445a8d8a1e597afc883e"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/components/WholeCompositeQuestionnaire.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "482005cca2d59167843f676c3ddc2f12163b029a"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "ce764faea226562b5b434376b67f57f68318bd5c"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/components/__tests__/TrainingCheckpointRecovery.test.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "10e688c7101805f3cc579f7e257cd9433e3595be"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "133f254653323d563b380ca71e19e00c346ec8cb"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/modules/situational/__tests__/SituationalRunner.test.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "070d84df4a8f75c0364ce5fcbb4beaa684d23196"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "fffbd87c7bf6372032b09a942cf51d0a98e16f8d"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "b96aa1b9416ad7c33d279abede8d30a1cfebdb09"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "118c9de18846e4a834afb0afc36d4dbf4102411b"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/pages/teacher/AssessmentWorkbench.training.test.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "a4ed347f9ffe29548f755fc6b665edfd10f92ef6"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "ad654cd64eaab772c7f95d7cbbe49287dfa0bf49"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/pages/teacher/AssessmentWorkbench.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "000b9e178236d27930717c6343ff9e9acaf050f8"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "43d0ef8c92cfec6703c59a0fb71fbc570b6d098a"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/TrainingCourseAssessments.test.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "b84270b25ffac70ede9c0ec5ca15b5eb2b8982fb"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "c40562657aa3be4291624aae7c8783ea22534ca1"
+        }
+      },
+      {
+        "path": "server-version/frontend/src/training/TrainingCourseAssessments.tsx",
+        "before": {
+          "mode": "100644",
+          "blob": "1131ebeea322bee9e2344b3a3a8610ee43abb512"
+        },
+        "after": {
+          "mode": "100644",
+          "blob": "33a3a72d266e17d2c8c2df44a6f671aa2378822c"
+        }
+      }
+    ],
+    "pgFixtureDelta": {
+      "path": "server-version/backend/src/__tests__/integration/training-mac-export.postgres.integration.test.ts",
+      "before": {
+        "mode": "100644",
+        "blob": "0a30954a626d4285d983a79df365d14096c6e2de"
+      },
+      "after": {
+        "mode": "100644",
+        "blob": "31e12b25911fa1534ff86bd05d3036ce2ee28271"
+      }
+    }
+  }
+}

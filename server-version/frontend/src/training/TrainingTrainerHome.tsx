@@ -1,3 +1,4 @@
+import TrainingCourseCode from './TrainingCourseCode'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { ArrowRight, Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
@@ -102,10 +103,10 @@ export default function TrainingTrainerHome() {
         : loadError ? <div className="training-message" role="alert">课程暂时无法显示：{loadError}<button type="button" onClick={() => void refresh()}>重试</button></div>
         : courses.length === 0 ? <div className="training-empty"><p>还没有创建课程。</p><button type="button" onClick={() => setCreateOpen(true)}>创建第一门课程 →</button></div>
         : <div className={`training-course-list ${courses.length === 1 ? 'training-course-list--single' : ''}`}>{courses.map(course =>
-          <Link key={course.id} to={`/courses/${encodeURIComponent(course.id)}/detail`} className="training-course-item">
+          <article key={course.id} className="training-course-item">
             <span className="training-course-cover" aria-hidden="true"><span>授</span></span>
-            <span className="training-course-text"><strong>{course.title}</strong><small>{course.description || '管理学员、作业、打卡与课程测评'}</small><span className="training-course-card-bottom"><span>{course.status === 'DRAFT' ? '草稿' : course.status === 'COMPLETED' ? '已完结' : course.status === 'PUBLISHED' ? '已发布' : ''}</span><span>管理课程 <ArrowRight size={16} aria-hidden="true" /></span></span></span>
-          </Link>)}</div>}
+            <div className="training-course-text"><div className="training-course-card-title"><Link to={`/courses/${encodeURIComponent(course.id)}/detail`}><strong>{course.title}</strong></Link><TrainingCourseCode key={course.id+course.courseCode} compact code={course.courseCode} title={course.title}/></div><small>{course.description || '管理学员、作业、打卡与课程测评'}</small><span className="training-course-card-bottom"><span>{course.status === 'DRAFT' ? '草稿' : course.status === 'COMPLETED' ? '已完结' : course.status === 'PUBLISHED' ? '已发布' : ''}</span><Link to={`/courses/${encodeURIComponent(course.id)}/detail`}>管理课程 <ArrowRight size={16} aria-hidden="true" /></Link></span></div>
+          </article>)}</div>}
       {!loading && !loadError && (hasMore || moreError) && <div className="training-load-more">
         {moreError && <p role="alert">后续课程暂未加载：{moreError}</p>}
         {hasMore && <button type="button" disabled={loadingMore} onClick={() => void loadMore()} className="training-action training-action--quiet">
