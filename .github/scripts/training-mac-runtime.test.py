@@ -29,9 +29,9 @@ def report():
     return {'success': True, 'numTotalTests': 3, 'numPassedTests': 1, 'numFailedTests': 0,
             'numPendingTests': 2, 'numTodoTests': 0, 'testResults': [
                 {'name': '/app/' + M.INTEGRATION_FILES[1], 'status': 'passed', 'assertionResults': [
-                    {'fullName': PG_PRIOR['passedCases'][1], 'status': 'pending'},
+                    {'fullName': PG_PRIOR['passedCases'][1], 'status': 'skipped'},
                     {'fullName': M.PG_FAILED_CASE, 'status': 'passed'},
-                    {'fullName': PG_PRIOR['passedCases'][2], 'status': 'pending'}]}]}
+                    {'fullName': PG_PRIOR['passedCases'][2], 'status': 'skipped'}]}]}
 
 
 class MacContracts(unittest.TestCase):
@@ -120,10 +120,11 @@ class MacContracts(unittest.TestCase):
         for key, value in [('success', False), ('numPassedTests', 3), ('numTotalTests', 4), ('numFailedTests', 1), ('numPendingTests', 0), ('numTodoTests', 1), ('testResults', [])]:
             changed = report(); changed[key] = value
             with self.subTest(key=key), self.assertRaises(ValueError): M.require_test_report(changed, PG_PRIOR)
-        for kind in ('wrong-case', 'replayed-success', 'wrong-file'):
+        for kind in ('wrong-case', 'replayed-success', 'wrong-file', 'still-running-pending'):
             changed = report()
             if kind == 'wrong-case': changed['testResults'][0]['assertionResults'][1]['fullName'] = 'other'
             elif kind == 'replayed-success': changed['testResults'][0]['assertionResults'][0]['status'] = 'passed'
+            elif kind == 'still-running-pending': changed['testResults'][0]['assertionResults'][0]['status'] = 'pending'
             else: changed['testResults'][0]['name'] = M.INTEGRATION_FILES[0]
             with self.subTest(kind=kind), self.assertRaises(ValueError): M.require_test_report(changed, PG_PRIOR)
 
@@ -234,34 +235,17 @@ class MacContracts(unittest.TestCase):
         saved = json.loads((self.q.out / 'failure-details.json').read_text())
         self.assertNotIn('sanitizedCommandOutput', saved); self.assertNotIn('private SQL', json.dumps(saved))
 
-    def test_redis_isolation_marker_actual_identity_and_cleanup_on_test_failure(self):
-        self.q.state['components']['backend']['runtimeImageId'] = 'sha256:' + 'b' * 64
-        self.q.base_image = Mock(return_value='redis@sha256:' + 'c' * 64)
-        (self.q.private / 'backend').mkdir()
-        calls = []
-        def command(args, **kwargs):
-            calls.append(args)
-            if args[:2] == ['docker', 'inspect']:
-                return SimpleNamespace(stdout=json.dumps([{'Id': 'd' * 64, 'Image': 'sha256:' + 'e' * 64}]))
-            if 'ping' in args: return SimpleNamespace(stdout='PONG', returncode=0)
-            if 'SET' in args: return SimpleNamespace(stdout='OK')
-            if 'node_modules/vitest/vitest.mjs' in args: raise ValueError('synthetic failure')
-            return SimpleNamespace(stdout='', returncode=0)
-        self.q.command = command
-        with patch.dict('os.environ', {'GITHUB_RUN_ID': '123', 'GITHUB_RUN_ATTEMPT': '1'}), patch.object(M.R, 'remove_isolated_resources') as cleanup:
-            with self.assertRaises(ValueError): self.q.integration('synthetic-pg')
-        self.assertEqual(cleanup.call_count, 2)
-        marker = next(c for c in calls if 'SET' in c)
-        self.assertIn('15', marker); self.assertIn('training-mac:qualification:123:1', marker)
-        tests = next(c for c in calls if 'node_modules/vitest/vitest.mjs' in c)
-        for env in ('REDIS_URL=redis://127.0.0.1:6379/15', 'CI=true', 'GITHUB_ACTIONS=true',
-                    'TRAINING_MAC_FIXTURE_CONTRACT=actions-isolated-v1', 'TRAINING_MAC_FIXTURE_REDIS_NAME=training-mac-redis-123-1'):
-            self.assertIn(env, tests)
-        self.assertIn('TRAINING_MAC_FIXTURE_REDIS_ID=' + 'd' * 64, tests)
-        self.assertIn('TRAINING_MAC_FIXTURE_REDIS_IMAGE_DIGEST=sha256:' + 'e' * 64, tests)
-        self.assertNotIn('--publish', tests)
-        self.assertIn(M.INTEGRATION_FILES[1], tests); self.assertNotIn(M.INTEGRATION_FILES[0], tests)
-        self.assertEqual(tests[tests.index('--testNamePattern') + 1], '^' + M.re.escape(M.PG_FAILED_CASE) + '$')
+    def test_round9_selected_pg_success_is_admitted_without_replaying_any_case(self):
+        prior = {'original': {'status': 'failure'}, 'selectedCase': M.PG_FAILED_CASE,
+            'failure': {'integrationCounts': {'numTotalTests': 3, 'numPassedTests': 1, 'numFailedTests': 0, 'numPendingTests': 2}, 'failedCases': []},
+            'priorPassedCases': PG_PRIOR['passedCases'], 'assurance': 'Original aggregate plus fixed single selection; no retained per-case reporter.'}
+        self.q.round9 = {'pg': prior}; self.q.command = Mock(side_effect=AssertionError('No PG replay'))
+        result = self.q.integration('unused-disposable-postgres')
+        self.assertIs(result['original'], prior); self.assertFalse(result['ciExecuted'])
+        self.assertEqual(result['currentExecution']['passed'], 0); self.assertEqual(result['passed'], 4)
+        prior['failure']['integrationCounts']['numFailedTests'] = 1
+        with self.assertRaises(ValueError): self.q.integration('unused')
+        self.q.command.assert_not_called()
 
     def retained_compilation(self, component, unsafe=False):
         context = self.q.private / component; context.mkdir()
@@ -281,7 +265,7 @@ class MacContracts(unittest.TestCase):
             for member in members: tar.add(source / member, arcname=member)
             if unsafe:
                 bad = source / 'unexpected.txt'; bad.write_text('reject'); tar.add(bad, arcname='node_modules/unapproved.txt')
-        details = {'sourceTree': self.q.inputs['macRuntime']['dependencyPatch']['originalComponents'][component]['sourceTree'], 'requiredFiles': required,
+        details = {'sourceTree': (self.q.inputs['components']['frontend']['sourceTree'] if component == 'frontend' else self.q.inputs['macRuntime']['dependencyPatch']['originalComponents']['backend']['sourceTree']), 'requiredFiles': required,
                    'archiveSha256': M.R.sha(archive), 'archivePath': component + '-compiled.tar.gz', 'archiveMembers': members}
         if component == 'backend': details['generatedSchemaSha256'] = M.R.sha(source / 'node_modules/.prisma/client/schema.prisma')
         return {'name': component + '-compile', 'status': 'success', 'head': 'original-head', 'details': details}, archive
@@ -380,7 +364,7 @@ class MacContracts(unittest.TestCase):
             digest = M.R.sha(context / 'package-lock.json')
             self.q.inputs['components'][component]['lockfileSha256'] = digest
             original['details'][component] = {'lockfileSha256': digest, 'exitCode': 0, 'vulnerabilities': {'high': 0, 'critical': 0}}
-        self.q.round8 = {'audit': original}; self.q.command = Mock(side_effect=AssertionError('No audit replay'))
+        self.q.round9 = {'audit': original}; self.q.command = Mock(side_effect=AssertionError('No audit replay'))
         result = self.q.audit()
         self.assertIs(result['original'], original); self.assertFalse(result['ciExecuted'])
         for component in M.R.COMPONENTS:
@@ -403,27 +387,27 @@ class MacContracts(unittest.TestCase):
             with self.assertRaises(ValueError): self.q.browser()
         self.q.command.assert_not_called()
 
-    def test_logo_builds_and_checks_changed_frontend_once_but_preserves_backend_compile(self):
+    def test_round9_continuation_runs_only_schema_and_no_successful_application_commands(self):
         self.q.state['phases'] = []
         for name in ('prepare', 'compile_component', 'compile_patched_frontend', 'restore_compilation', 'app_types', 'lint', 'audit', 'browser', 'package', 'scan'):
             setattr(self.q, name, Mock())
         def schema(): self.q.phase('scoped-pg-http', Mock())
-        self.q.schema = schema
+        self.q.schema = Mock(side_effect=schema)
         def phase(name, action):
             action(); self.q.state['phases'].append({'name': name, 'status': 'success'})
         self.q.phase = phase
         rows = {name: {'name': name, 'status': 'success', 'details': {}} for name in ('backend-compile', 'frontend-compile', 'frontend-app-types', 'changed-lint')}
-        module = SimpleNamespace(admit_reusable_phases=Mock(return_value={'phases': rows, 'archives': {'backend': self.root / 'backend.tar.gz', 'frontend': self.root / 'frontend.tar.gz'}}), admit_round8_successes=Mock(return_value={'audit': {}, 'backend': {}, 'pg': {}}))
+        retained = {name: {'name': name, 'status': 'success'} for name in ('frontend-compile', 'frontend-app-types', 'changed-lint', 'compiled-browser', 'runtime-packaging', 'runtime-scans')}
+        module = SimpleNamespace(admit_reusable_phases=Mock(return_value={'phases': rows, 'archives': {'backend': self.root / 'backend.tar.gz', 'frontend': self.root / 'frontend.tar.gz'}}),
+            admit_round9_successes=Mock(return_value={'phases': retained, 'frontendArchive': self.root / 'round9-frontend.tar.gz'}))
         spec = SimpleNamespace(loader=SimpleNamespace(exec_module=Mock()))
         with patch.dict('os.environ', {'CI': 'true', 'GITHUB_ACTIONS': 'true', 'GITHUB_SHA': 'b' * 40, 'GITHUB_REPOSITORY': 'caohuibj/eduK12-new-version'}), patch.object(M.importlib.util, 'spec_from_file_location', return_value=spec), patch.object(M.importlib.util, 'module_from_spec', return_value=module):
             self.q.execute()
         self.assertEqual({p['name'] for p in self.q.state['phases']}, set(M.PHASES))
-        self.q.compile_component.assert_not_called(); self.q.app_types.assert_called_once_with(); self.q.lint.assert_called_once_with()
-        self.assertEqual(self.q.restore_compilation.call_count, 1)
-        self.assertEqual(self.q.restore_compilation.call_args.args[0], 'backend')
-        self.q.compile_patched_frontend.assert_called_once()
-        self.assertEqual(self.q.state['status'], 'success')
-        self.assertFalse(self.q.private.exists())
+        for name in ('compile_component', 'compile_patched_frontend', 'app_types', 'lint', 'browser'):
+            getattr(self.q, name).assert_not_called()
+        self.assertEqual([call.args[0] for call in self.q.restore_compilation.call_args_list], ['backend', 'frontend'])
+        self.q.schema.assert_called_once(); self.assertEqual(self.q.state['status'], 'success')
 
     def test_vite_overlay_preserves_other_dependencies_and_rejects_corrupt_tar(self):
         import base64
@@ -541,64 +525,48 @@ class MacContracts(unittest.TestCase):
             self.assertNotIn(secret, output)
 
     def runtime_reuse_fixture(self):
-        backend = {'runtimeImageId': 'sha256:' + 'b' * 64, 'runtimeRecipeSha256': 'r' * 64,
-            'runtimeRootFs': ['sha256:' + 'c' * 64], 'requiredFiles': {'dist/server.js': 'd' * 64}, 'compiledArchiveSha256': 'e' * 64}
-        archive = self.q.private / 'retained-backend.tar.gz'; archive.write_bytes(b'verified original image bytes')
-        backend['runtimeArchiveSha256'] = M.R.sha(archive)
-        self.q.state['components']['backend'].update(requiredFiles=backend['requiredFiles'], compiledArchiveSha256=backend['compiledArchiveSha256'])
-        self.q.round8 = {'backend': {'component': backend, 'archive': archive,
-            'packaging': {'name': 'runtime-packaging', 'status': 'success', 'sourceHead': 'f' * 40},
-            'scanPhase': {'name': 'runtime-scans', 'status': 'success', 'consumerRunId': '39526376171'},
-            'scan': {'imageId': backend['runtimeImageId'], 'scanner': 'Trivy original', 'exitCode': 0,
-                'severity': ['HIGH', 'CRITICAL'], 'ignoreUnfixed': True, 'findings': []}}}
-        return backend
+        self.q.round9 = {'components': {}, 'images': {}, 'phases': {
+            'runtime-packaging': {'name': 'runtime-packaging', 'status': 'success', 'sourceHead': 'f' * 40},
+            'runtime-scans': {'name': 'runtime-scans', 'status': 'success', 'details': {}}}}
+        for name, digit in (('backend', 'b'), ('frontend', 'c')):
+            component = {'runtimeImageId': 'sha256:' + digit * 64, 'runtimeRecipeSha256': 'r' * 64,
+                'runtimeRootFs': ['sha256:' + digit * 64], 'requiredFiles': {'dist/index': digit * 64}, 'compiledArchiveSha256': digit * 64}
+            archive = self.q.private / (name + '-retained.tar.gz'); archive.write_bytes(('verified ' + name).encode())
+            component['runtimeArchiveSha256'] = M.R.sha(archive)
+            if name == 'backend': component['runtimeAdmission'] = {'original': {'sourceHead': 'e' * 40}}
+            self.q.round9['components'][name] = component; self.q.round9['images'][name] = archive
+            self.q.state['components'][name].update(requiredFiles=component['requiredFiles'], compiledArchiveSha256=component['compiledArchiveSha256'], runtimeImageId=component['runtimeImageId'])
+            self.q.round9['phases']['runtime-scans']['details'][name] = {'imageId': component['runtimeImageId'], 'scanner': 'Trivy original',
+                'exitCode': 0, 'severity': ['HIGH', 'CRITICAL'], 'ignoreUnfixed': True, 'findings': []}
 
-    def test_package_loads_original_backend_identity_and_builds_only_frontend(self):
-        backend = self.runtime_reuse_fixture()
-        context = self.q.private / 'frontend'; context.mkdir()
-        (context / 'Dockerfile').write_bytes((M.ROOT / 'server-version/frontend/Dockerfile').read_bytes())
-        self.q.inputs['components']['frontend']['requiredFiles'] = {'dist/index.html': 'a' * 64}
-        self.q.base_image = Mock(side_effect=['node@sha256:' + '1' * 64, 'nginx@sha256:' + '2' * 64])
-        original = {'Id': backend['runtimeImageId'], 'Architecture': 'amd64', 'RootFS': {'Layers': backend['runtimeRootFs']},
-            'Config': {'User': 'node', 'Labels': {'org.opencontainers.image.revision': 'f' * 40}}}
-        frontend = {'Id': 'sha256:' + '3' * 64, 'Architecture': 'amd64', 'RootFS': {'Layers': ['sha256:' + '4' * 64]}}
-        calls = []
+    def test_loads_both_original_images_without_build_or_probe_and_preserves_each_revision(self):
+        self.runtime_reuse_fixture(); calls = []
         def command(args, **kwargs):
             calls.append(args)
             if args[:3] == ['docker', 'image', 'inspect']:
-                return SimpleNamespace(stdout=json.dumps([original if args[-1] == backend['runtimeImageId'] else frontend]))
-            if 'sha256sum' in args: return SimpleNamespace(stdout='a' * 64 + '  index.html')
-            if args[0] == 'gzip': Path(args[-1] + '.gz').write_bytes(b'new frontend image')
+                name = next(n for n, c in self.q.round9['components'].items() if c['runtimeImageId'] == args[-1])
+                component = self.q.round9['components'][name]
+                return SimpleNamespace(stdout=json.dumps([{'Id': component['runtimeImageId'], 'Architecture': 'amd64',
+                    'RootFS': {'Layers': component['runtimeRootFs']}, 'Config': {'User': 'node',
+                        'Labels': {'org.opencontainers.image.revision': ('e' if name == 'backend' else 'f') * 40}}}]))
             return SimpleNamespace(stdout='', returncode=0)
         self.q.command = command
-        result = self.q.package()
-        self.assertFalse(result['backend']['ciExecuted']); self.assertTrue(result['frontend']['ciExecuted'])
-        self.assertEqual((self.q.out / 'backend-runtime.tar.gz').read_bytes(), b'verified original image bytes')
-        builds = [c for c in calls if c[:2] == ['docker', 'build']]
-        self.assertEqual(len(builds), 1); self.assertEqual(builds[0][-1], str(context))
-        self.assertFalse(any(c[:2] == ['docker', 'run'] and backend['runtimeImageId'] in c for c in calls))
-        original['Config']['Labels']['org.opencontainers.image.revision'] = 'wrong'
-        calls.clear()
+        result = self.q.package(); self.assertFalse(result['ciExecuted'])
+        self.assertEqual(len(calls), 4)
+        self.assertTrue(all(c[:2] == ['docker', 'load'] or c[:3] == ['docker', 'image', 'inspect'] for c in calls))
+        for name in M.R.COMPONENTS:
+            self.assertEqual((self.q.out / (name + '-runtime.tar.gz')).read_bytes(), ('verified ' + name).encode())
+        self.q.round9['components']['backend']['runtimeAdmission']['original']['sourceHead'] = 'wrong'
         with self.assertRaises(ValueError): self.q.package()
-        self.assertFalse(any(c[:2] == ['docker', 'build'] for c in calls))
 
-    def test_scans_only_frontend_and_rejects_findings_without_losing_safe_report(self):
-        backend = self.runtime_reuse_fixture()
-        self.q.state['components']['backend']['runtimeImageId'] = backend['runtimeImageId']
-        image = 'sha256:' + 'a' * 64; self.q.state['components']['frontend']['runtimeImageId'] = image
-        finding = []; calls = []
-        def command(args, **kwargs):
-            calls.append(args)
-            if args == ['trivy', '--version']: return SimpleNamespace(stdout='Version: 0.70.0')
-            self.assertEqual(args[-1], image); self.assertIn('HIGH,CRITICAL', args)
-            (self.q.private / 'frontend-scan.json').write_text(json.dumps({'SchemaVersion': 2, 'Metadata': {'ImageID': image}, 'Results': [{'Vulnerabilities': finding}]}))
-            return SimpleNamespace(stdout='', returncode=int(bool(finding)))
-        self.q.command = command
-        result = self.q.scan()
-        self.assertFalse(result['backend']['ciExecuted']); self.assertEqual(len(calls), 2)
-        finding.append({'VulnerabilityID': 'CVE-2026-12345', 'Severity': 'HIGH', 'PkgName': 'synthetic'})
+    def test_both_original_scans_are_admitted_without_trivy_and_fail_on_changed_identity(self):
+        self.runtime_reuse_fixture(); self.q.command = Mock(side_effect=AssertionError('No scan replay'))
+        result = self.q.scan(); self.assertFalse(result['ciExecuted'])
+        for name in M.R.COMPONENTS:
+            self.assertFalse(json.loads((self.q.out / (name + '-scan.json')).read_text())['ciExecuted'])
+        self.q.state['components']['frontend']['runtimeImageId'] = 'changed'
         with self.assertRaises(ValueError): self.q.scan()
-        self.assertEqual(json.loads((self.q.out / 'frontend-scan.json').read_text())['findings'][0]['VulnerabilityID'], 'CVE-2026-12345')
+        self.q.command.assert_not_called()
 
     def test_reject_non_actions_execution_before_any_action(self):
         self.q.phase = Mock()

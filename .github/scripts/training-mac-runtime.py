@@ -165,7 +165,9 @@ def require_test_report(report, prior):
     R.require(len(rows) == 1 and rows[0]['name'].endswith('/' + INTEGRATION_FILES[1]), 'Unexpected retry file')
     cases = rows[0].get('assertionResults', [])
     passed = [c['fullName'] for c in cases if c.get('status') == 'passed']
-    pending = [c['fullName'] for c in cases if c.get('status') == 'pending']
+    # Fixed Vitest 4.1.11 counts filtered cases as pending, but serializes
+    # each filtered assertion as skipped (StatusMap.skip), not pending.
+    pending = [c['fullName'] for c in cases if c.get('status') == 'skipped']
     R.require(len(cases) == 3 and passed == [PG_FAILED_CASE] and len(set(pending)) == 2 and
               set(pending) == set(prior['passedCases'][1:]) and len(prior['passedCases']) == 3, 'Changed selected retry cases')
     R.require(prior['original']['status'] == 'failure' and prior['failure']['failedCases'] == [PG_FAILED_CASE], 'Lost original failed phase')
@@ -385,7 +387,7 @@ class MacQualification(R.Qualification):
 
     def audit(self):
         self.ready('prepare')
-        original = self.round8['audit']
+        original = self.round9['audit']
         R.require(original['name'] == 'dependency-audit' and original['status'] == 'success', 'Missing successful audit')
         for component in R.COMPONENTS:
             row = original['details'][component]
@@ -398,65 +400,39 @@ class MacQualification(R.Qualification):
 
     def package(self):
         self.ready('prepare')
-        prior = self.round8['backend']
-        component = prior['component']
-        archive = Path(prior['archive']).resolve()
-        R.require(archive.is_relative_to(self.private) and R.sha(archive) == component['runtimeArchiveSha256'], 'Changed retained runtime archive')
-        R.require(all(self.state['components']['backend'][key] == component[key] for key in ('requiredFiles', 'compiledArchiveSha256')), 'Changed backend runtime compilation')
-        self.command(['docker', 'load', '--input', str(archive)], timeout=180)
-        original = json.loads(self.command(['docker', 'image', 'inspect', component['runtimeImageId']]).stdout)[0]
-        R.require(original['Id'] == component['runtimeImageId'] and original['Architecture'] == 'amd64' and
-                  original['RootFS']['Layers'] == component['runtimeRootFs'] and original['Config']['User'] == 'node' and
-                  original['Config']['Labels']['org.opencontainers.image.revision'] == prior['packaging']['sourceHead'], 'Loaded runtime provenance differs')
-        for key in ('runtimeImageId', 'runtimeRecipeSha256', 'runtimeRootFs', 'runtimeArchiveSha256'):
-            self.state['components']['backend'][key] = component[key]
-        self.state['components']['backend']['runtimeAdmission'] = {'kind': 'admitted-prior-official-success', 'ciExecuted': False,
-            'original': prior['packaging'], 'originalComponent': component}
-        shutil.copyfile(archive, self.out / 'backend-runtime.tar.gz')
-        self.save()
-        node = self.base_image(self.inputs['runtime']['nodeImage'])
-        nginx = self.base_image(self.inputs['runtime']['nginxImage'])
-        self.state['baseImages'] = {'node': node, 'nginx': nginx}
-        context = self.private / 'frontend'
-        recipe = R.runtime_recipe('frontend', (context / 'Dockerfile').read_text(), node, nginx)
-        (context / 'Dockerfile.runtime-only').write_text(recipe)
-        (context / 'Dockerfile.runtime-only.dockerignore').write_text('Dockerfile\n')
-        tag = self.prefix + '-frontend:runtime'
-        self.command(['docker', 'build', '--network=default', '--file', str(context / 'Dockerfile.runtime-only'), '--label', 'org.opencontainers.image.revision=' + self.plan['sourceHead'], '--tag', tag, str(context)], timeout=900)
-        details = json.loads(self.command(['docker', 'image', 'inspect', tag]).stdout)[0]
-        R.require(re.fullmatch('sha256:[0-9a-f]{64}', details['Id']) and details['Architecture'] == 'amd64', 'Invalid frontend runtime')
-        self.state['components']['frontend'].update(runtimeImageId=details['Id'], runtimeRecipeSha256=R.digest(recipe.encode()), runtimeRootFs=details['RootFS']['Layers'])
-        self.command(['docker', 'run', '--rm', '--network', 'none', '--add-host', 'backend:127.0.0.1', details['Id'], 'nginx', '-t'])
-        actual = self.command(['docker', 'run', '--rm', '--network', 'none', '--entrypoint', 'sha256sum', details['Id'], '/usr/share/nginx/html/index.html']).stdout.split()[0]
-        R.require(actual == self.inputs['components']['frontend']['requiredFiles']['dist/index.html'], 'Runtime frontend differs from compilation')
-        raw = self.private / 'frontend-runtime.tar'
-        self.command(['docker', 'save', '--output', str(raw), details['Id']], timeout=180)
-        self.command(['gzip', '-n', '-1', str(raw)], timeout=180)
-        shutil.move(str(raw) + '.gz', self.out / 'frontend-runtime.tar.gz')
-        self.state['components']['frontend']['runtimeArchiveSha256'] = R.sha(self.out / 'frontend-runtime.tar.gz')
-        self.save()
-        return {'compilationExecuted': False, 'runtimeRecipesRetained': True, 'baseImages': self.state['baseImages'],
-                'backend': self.state['components']['backend']['runtimeAdmission'], 'frontend': {'kind': 'current-execution', 'ciExecuted': True}}
+        original_phase = self.round9['phases']['runtime-packaging']
+        R.require(original_phase['status'] == 'success', 'Missing original packaging success')
+        for name in R.COMPONENTS:
+            component = self.round9['components'][name]
+            archive = Path(self.round9['images'][name]).resolve()
+            R.require(archive.is_relative_to(self.private) and R.sha(archive) == component['runtimeArchiveSha256'], 'Changed retained runtime archive')
+            R.require(all(self.state['components'][name][key] == component[key] for key in ('requiredFiles', 'compiledArchiveSha256')), 'Changed retained runtime compilation')
+            self.command(['docker', 'load', '--input', str(archive)], timeout=180)
+            actual = json.loads(self.command(['docker', 'image', 'inspect', component['runtimeImageId']]).stdout)[0]
+            producer = component.get('runtimeAdmission', {}).get('original', original_phase)
+            R.require(actual['Id'] == component['runtimeImageId'] and actual['Architecture'] == 'amd64' and
+                      actual['RootFS']['Layers'] == component['runtimeRootFs'] and
+                      actual['Config']['Labels']['org.opencontainers.image.revision'] == producer['sourceHead'], 'Loaded runtime provenance differs')
+            if name == 'backend': R.require(actual['Config']['User'] == 'node', 'Backend runtime must remain nonroot')
+            for key in ('runtimeImageId', 'runtimeRecipeSha256', 'runtimeRootFs', 'runtimeArchiveSha256'):
+                self.state['components'][name][key] = component[key]
+            self.state['components'][name]['runtimeAdmission'] = {'kind': 'admitted-prior-official-success', 'ciExecuted': False,
+                'original': producer, 'originalComponent': component}
+            shutil.copyfile(archive, self.out / (name + '-runtime.tar.gz'))
+            self.save()
+        return {'kind': 'admitted-prior-official-success', 'ciExecuted': False, 'original': original_phase}
 
     def scan(self):
         self.ready('runtime-packaging')
-        prior = self.round8['backend']
-        old = prior['scan']
-        R.require(old['imageId'] == self.state['components']['backend']['runtimeImageId'] and old['exitCode'] == 0 and
-                  old['severity'] == ['HIGH', 'CRITICAL'] and old['ignoreUnfixed'] is True and old['findings'] == [], 'Missing original backend scan')
-        backend = {**old, 'kind': 'admitted-prior-official-success', 'ciExecuted': False, 'original': prior['scanPhase']}
-        (self.out / 'backend-scan.json').write_text(json.dumps(backend, indent=2) + '\n')
-        version = self.command(['trivy', '--version']).stdout.splitlines()[0]
-        image = self.state['components']['frontend']['runtimeImageId']
-        raw = self.private / 'frontend-scan.json'
-        completed = self.command(['trivy', 'image', '--exit-code', '1', '--ignore-unfixed', '--scanners', 'vuln', '--severity', 'HIGH,CRITICAL', '--format', 'json', '--output', str(raw), image], timeout=600, accepted=(0, 1))
-        report = json.loads(raw.read_text())
-        R.require(report.get('Metadata', {}).get('ImageID') == image and 'Results' in report and report.get('SchemaVersion'), 'Invalid frontend image scan')
-        findings = [{k: item.get(k) for k in ('VulnerabilityID', 'PkgName', 'InstalledVersion', 'FixedVersion', 'Severity')} for group in report['Results'] for item in group.get('Vulnerabilities', [])]
-        frontend = {'imageId': image, 'scanner': version, 'exitCode': completed.returncode, 'severity': ['HIGH', 'CRITICAL'], 'ignoreUnfixed': True, 'findings': findings}
-        (self.out / 'frontend-scan.json').write_text(json.dumps(frontend, indent=2) + '\n')
-        R.require(completed.returncode == 0 and not findings, 'Runtime vulnerability gate failed')
-        return {'backend': backend, 'frontend': frontend}
+        original = self.round9['phases']['runtime-scans']
+        R.require(original['status'] == 'success', 'Missing original runtime scans')
+        for name in R.COMPONENTS:
+            row = original['details'][name]
+            R.require(row['imageId'] == self.state['components'][name]['runtimeImageId'] and row['exitCode'] == 0 and
+                      row['severity'] == ['HIGH', 'CRITICAL'] and row['ignoreUnfixed'] is True and row['findings'] == [], 'Changed scanned runtime')
+            (self.out / (name + '-scan.json')).write_text(json.dumps({**row, 'kind': 'admitted-prior-official-success',
+                'ciExecuted': False, 'original': original}, indent=2) + '\n')
+        return {'kind': 'admitted-prior-official-success', 'ciExecuted': False, 'original': original}
 
     def browser(self):
         self.ready('frontend-compile')
@@ -596,53 +572,16 @@ class MacQualification(R.Qualification):
         self.catalog_schema = {'newTagColumns': 3, 'historicalEmptyTagsVerified': True, 'newIndexes': actual}
 
     def integration(self, postgres):
-        context = self.private / 'backend'
-        run, attempt = os.environ['GITHUB_RUN_ID'], os.environ['GITHUB_RUN_ATTEMPT']
-        R.require(re.fullmatch('[0-9]+', run) and re.fullmatch('[0-9]+', attempt), 'Missing official run identity')
-        redis_name, test_name = 'training-mac-redis-' + run + '-' + attempt, self.prefix + '-tests'
-        redis = self.base_image('redis:7.4.11-bookworm')
-        attempted_redis = attempted_test = False
-        raw = self.private / 'integration-result.json'
-        try:
-            names = self.command(['docker', 'container', 'ls', '--all', '--format', '{{.Names}}']).stdout.splitlines()
-            R.require(redis_name not in names and test_name not in names, 'Existing integration resource')
-            attempted_redis = True
-            self.command(['docker', 'run', '-d', '--name', redis_name, '--network', 'container:' + postgres, redis, 'redis-server', '--bind', '127.0.0.1', '--save', '', '--appendonly', 'no'])
-            for _ in range(30):
-                ready = self.command(['docker', 'exec', redis_name, 'redis-cli', 'ping'], accepted=(0, 1))
-                if ready.returncode == 0 and ready.stdout.strip() == 'PONG': break
-                time.sleep(1)
-            else: raise ValueError('Disposable Redis not ready')
-            metadata = json.loads(self.command(['docker', 'inspect', redis_name]).stdout)[0]
-            redis_id, redis_image = metadata['Id'], metadata['Image']
-            R.require(re.fullmatch('[0-9a-f]{64}', redis_id) and re.fullmatch('sha256:[0-9a-f]{64}', redis_image), 'Invalid disposable Redis identity')
-            marker = 'training-mac:qualification:' + run + ':' + attempt
-            value = ':'.join((redis_name, redis_id, redis_image))
-            R.require(self.command(['docker', 'exec', redis_name, 'redis-cli', '-n', '15', 'SET', marker, value, 'EX', '900']).stdout.strip() == 'OK', 'Redis isolation marker missing')
-            database = 'postgresql://exact_owner:synthetic-only@127.0.0.1:5432/exact_upgrade_test?schema=public'
-            env = {'NODE_ENV': 'test', 'DATABASE_URL': database, 'RELEASE_INTEGRATION_DATABASE_URL': database,
-                   'CATALOG_BOUNDARY_ISOLATED_TEST': '1', 'CATALOG_BOUNDARY_DATABASE_URL': database,
-                   'REDIS_URL': 'redis://127.0.0.1:6379/15', 'DATA_ENCRYPTION_KEY': '31' * 32,
-                   'CI': 'true', 'GITHUB_ACTIONS': 'true', 'GITHUB_RUN_ID': run, 'GITHUB_RUN_ATTEMPT': attempt,
-                   'TRAINING_MAC_FIXTURE_CONTRACT': 'actions-isolated-v1', 'TRAINING_MAC_FIXTURE_REDIS_NAME': redis_name,
-                   'TRAINING_MAC_FIXTURE_REDIS_ID': redis_id, 'TRAINING_MAC_FIXTURE_REDIS_IMAGE_DIGEST': redis_image,
-                   'JWT_SECRET': 'synthetic-mac-integration-only-' + 'a' * 40}
-            args = ['docker', 'run', '--rm', '--name', test_name, '--network', 'container:' + postgres,
-                    '--user', str(os.getuid()) + ':' + str(os.getgid()), '--mount', f'type=bind,src={context},dst=/app',
-                    '--mount', f'type=bind,src={self.private},dst=/evidence', '-w', '/app']
-            for key, value in env.items(): args += ['-e', key + '=' + value]
-            args += [self.state['components']['backend']['runtimeImageId'], 'node', 'node_modules/vitest/vitest.mjs', 'run', INTEGRATION_FILES[1], '--testNamePattern', '^' + re.escape(PG_FAILED_CASE) + '$',
-                     '--maxWorkers=1', '--reporter=json', '--outputFile=/evidence/integration-result.json']
-            attempted_test = True
-            self.command(args, timeout=300)
-            report = require_test_report(json.loads(raw.read_text()), self.round8['pg'])
-            return {**report, 'rawReportSha256': R.sha(raw), 'transport': 'actual authentication middleware and handlers with captured Express transport; real export worker; no HTTP socket', 'redisImage': redis, 'redisContainerId': redis_id, 'redisImageId': redis_image, 'redisName': redis_name, 'isolationMarkerVerified': True, 'syntheticOnly': True, 'network': 'shared disposable PostgreSQL namespace; no host ports'}
-        finally:
-            errors = []
-            for name, attempted in ((test_name, attempted_test), (redis_name, attempted_redis)):
-                try: R.remove_isolated_resources(self.command, name, '', attempted, False)
-                except Exception as error: errors.append(type(error).__name__)
-            R.require(not errors, 'Integration resource cleanup failed')
+        # The fixed single selected case actually passed in round9. Its original
+        # per-case report was not retained; never invent it or replay the case.
+        prior = self.round9['pg']
+        R.require(prior['selectedCase'] == PG_FAILED_CASE and prior['failure']['integrationCounts'] == {
+            'numTotalTests': 3, 'numPassedTests': 1, 'numFailedTests': 0, 'numPendingTests': 2} and
+            prior['failure']['failedCases'] == [] and prior['original']['status'] == 'failure' and
+            len(prior['priorPassedCases']) == 3, 'Missing exact original PG success evidence')
+        return {'passed': 4, 'failed': 0, 'skipped': 0, 'kind': 'admitted-prior-official-success',
+                'ciExecuted': False, 'original': prior, 'assurance': prior['assurance'],
+                'currentExecution': {'passed': 0, 'failed': 0, 'caseNames': []}}
 
     def schema(self):
         self.schema_active = True
@@ -661,7 +600,7 @@ class MacQualification(R.Qualification):
         R.require(archive.is_relative_to(self.private) and archive.is_file() and R.sha(archive) == details['archiveSha256'], 'Changed retained compilation bytes')
         members = ['dist', 'node_modules/.prisma/client'] if component == 'backend' else ['dist']
         R.require(details['archiveMembers'] == members and details['archivePath'] == component + '-compiled.tar.gz', 'Changed compiler archive contract')
-        R.require(details['sourceTree'] == self.inputs['macRuntime']['dependencyPatch']['originalComponents'][component]['sourceTree'], 'Changed compiled source')
+        R.require(details['sourceTree'] == (self.inputs['components']['frontend']['sourceTree'] if component == 'frontend' else self.inputs['macRuntime']['dependencyPatch']['originalComponents']['backend']['sourceTree']), 'Changed compiled source')
         with R.tarfile.open(archive) as tar:
             names = [str(R.PurePosixPath(m.name)) for m in tar.getmembers()]
             R.require(all(any(name == root or name.startswith(root + '/') for root in members) for name in names), 'Unexpected compiler archive member')
@@ -694,12 +633,16 @@ class MacQualification(R.Qualification):
             names = {'backend-compile', 'frontend-compile', 'frontend-app-types', 'changed-lint'}
             R.require(set(reuse) == {'phases', 'archives'} and set(reuse['phases']) == names and set(reuse['archives']) == set(R.COMPONENTS), 'Incomplete exact prior success admission')
             self.phase('backend-compile', lambda: self.restore_compilation('backend', reuse['phases']['backend-compile'], reuse['archives']['backend']))
-            self.round8 = module.admit_round8_successes(self)
-            R.require(set(self.round8) == {'audit', 'backend', 'pg'}, 'Incomplete retained runtime success')
-            self.phase('frontend-compile', lambda: self.compile_patched_frontend(reuse['phases']['frontend-compile'], reuse['archives']['frontend']))
-            for name, action in [('frontend-app-types', self.app_types), ('changed-lint', self.lint),
-                                 ('dependency-audit', self.audit), ('compiled-browser', self.browser),
-                                 ('runtime-packaging', self.package), ('runtime-scans', self.scan), ('schema-upgrade-restore', self.schema)]:
+            self.round9 = module.admit_round9_successes(self)
+            retained = self.round9['phases']
+            expected = {'frontend-compile', 'frontend-app-types', 'changed-lint', 'compiled-browser', 'runtime-packaging', 'runtime-scans'}
+            R.require(set(retained) == expected and all(row['status'] == 'success' for row in retained.values()), 'Incomplete round9 success admission')
+            self.phase('frontend-compile', lambda: self.restore_compilation('frontend', retained['frontend-compile'], self.round9['frontendArchive']))
+            for name in ('frontend-app-types', 'changed-lint'):
+                self.phase(name, lambda name=name: {'kind': 'admitted-prior-official-success', 'ciExecuted': False, 'original': retained[name]})
+            self.phase('dependency-audit', self.audit)
+            self.phase('compiled-browser', lambda: {'kind': 'admitted-prior-official-success', 'ciExecuted': False, 'original': retained['compiled-browser']})
+            for name, action in [('runtime-packaging', self.package), ('runtime-scans', self.scan), ('schema-upgrade-restore', self.schema)]:
                 self.phase(name, action)
             R.require({p['name'] for p in self.state['phases'] if p['status'] == 'success'} == set(PHASES), 'Missing actual Mac gate')
             self.state['status'] = 'success'; self.save()

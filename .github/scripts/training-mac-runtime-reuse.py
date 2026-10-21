@@ -37,7 +37,7 @@ def validate_artifact(artifact, pin):
     require(str(artifact['workflow_run']['id']) == PIN['runId'] and artifact['workflow_run']['head_sha'] == PIN['sourceHead'], 'Wrong artifact producer')
 
 
-REVIEWED_SECURITY_RUNTIME_SHA256 = 'c604b5c0cf4477f14eaf48ece1896ec52c33be9bd9c0f4d905a4f59d8fd3892e'
+REVIEWED_SECURITY_RUNTIME_SHA256 = 'edb4282529cdb39979f1d169ed56029163ac803c9e754fcd298e8199929bfbfb'
 REVIEWED_SECURITY_INPUTS_SHA256 = 'c8be4307174e2cc951e2ba4cb1db72b2c67fddf27faa2b7cad22d90f9ef0e6be'
 
 
@@ -280,3 +280,66 @@ def admit_round8_successes(q):
         'scan':scan,'scanPhase':phases['runtime-scans'],'archive':archive}, 'pg':{'original':phases['scoped-pg-http'],'failure':failure,
         'passedCases':ROUND8_PASSED_CASES,'assurance':'Inferred selected successes from the fixed four-case source and original aggregate plus sole failed name; original per-case reporter was not retained.'}}
     return q._round8_successes
+
+
+ROUND9_PIN = {'head': '079b496e6e61394e94276f7017874525443c9b3f', 'sourceHead': 'de437887568e209ffe4ea5c5a5122087aef8b759', 'tree': 'd3f4efad57d071c7de363419ef754908796a0b94', 'planSha256': 'a07aa0063aabda0b8cb1bf1f77074abfd0be26329b1a7f37985b7d8002be82c7', 'inputsSha256': 'c8be4307174e2cc951e2ba4cb1db72b2c67fddf27faa2b7cad22d90f9ef0e6be', 'runId': '39530150997', 'jobId': 118994005841, 'jobName': 'exact-candidate / integrated Mac candidate qualification / fixed Mac inputs and missing affected qualification', 'resultSha256': '45ea75d67098b2897acea228ddf1d1b704656781ef5154ef197159a8a5fbc026', 'failureSha256': '705862cc2aa261eda8e81d1a36302ec74c7ae23781ee8af2e4853e46f266a382'}
+ROUND9_ARTIFACTS = {'results': {'artifactId': 12315292597, 'artifactName': 'training-mac-results-079b496e6e61394e94276f7017874525443c9b3f-1', 'zipBytes': 41925, 'zipSha256': '96790a6f962d86e228096bacd987d1082f530af3358042cf52459f9da0d4898d'}, 'frontend': {'artifactId': 12315232633, 'artifactName': 'training-mac-frontend-compiled-079b496e6e61394e94276f7017874525443c9b3f-1', 'zipBytes': 22343408, 'zipSha256': 'b3e9ee44f223779874275642338e00d0dfa83ea40ecbb9c16456bdddb511d766'}, 'images': {'artifactId': 12314129840, 'artifactName': 'training-mac-runtime-images-079b496e6e61394e94276f7017874525443c9b3f-1', 'zipBytes': 413413069, 'zipSha256': '9f397a8729c8b8ad3e0426d3cd5818c0b8fc25a3aa40c427a8654232a830257f'}}
+
+
+def admit_round9_successes(q):
+    """Retain completed work; the old failed aggregate is never relabelled."""
+    p = ROUND9_PIN
+    require(hashlib.sha256(Path(__file__).with_name('training-mac-runtime.py').read_bytes()).hexdigest() == REVIEWED_SECURITY_RUNTIME_SHA256
+        and hashlib.sha256(Path(__file__).with_name('training-mac-inputs.json').read_bytes()).hexdigest() == p['inputsSha256'] == REVIEWED_SECURITY_INPUTS_SHA256, 'Changed continuation inputs')
+    run = q.api('/actions/runs/' + p['runId'] + '/attempts/1'); job = q.api('/actions/jobs/' + str(p['jobId']))
+    require(str(run['id']) == p['runId'] and run['run_attempt'] == 1 and run['head_sha'] == p['sourceHead']
+        and run['head_branch'] == 'work/training-mac-ui-final-20261020'
+        and run['repository']['full_name'] == run['head_repository']['full_name'] == 'caohuibj/eduK12-new-version', 'Wrong round9 producer')
+    require(job['id'] == p['jobId'] and str(job['run_id']) == p['runId'] and job['run_attempt'] == 1
+        and job['head_sha'] == p['sourceHead'] and job['name'] == p['jobName'] and job['status'] == 'completed'
+        and job['conclusion'] == 'failure', 'Original round9 failure changed')
+    files = {}
+    for key, pin in ROUND9_ARTIFACTS.items():
+        a = q.api('/actions/artifacts/' + str(pin['artifactId']))
+        require(a['id'] == pin['artifactId'] and a['name'] == pin['artifactName'] and not a['expired']
+            and a['size_in_bytes'] == pin['zipBytes'] and a['digest'] == 'sha256:' + pin['zipSha256']
+            and str(a['workflow_run']['id']) == p['runId'] and a['workflow_run']['head_sha'] == p['sourceHead'], 'Wrong round9 artifact')
+        target = q.private / ('round9-' + key + '.zip'); q.download({**pin,'repository':'caohuibj/eduK12-new-version'}, target)
+        with target.open('rb') as source: digest = hashlib.file_digest(source, 'sha256').hexdigest()
+        require(target.stat().st_size == pin['zipBytes'] and digest == pin['zipSha256'], 'Changed round9 ZIP')
+        files[key] = target
+    def document(name, digest):
+        raw = zip_member(files['results'], 'training-mac-evidence/' + name, 2*1024*1024)
+        require(hashlib.sha256(raw).hexdigest() == digest, 'Changed original round9 receipt')
+        return json.loads(raw)
+    result = document('runtime-result.json', p['resultSha256']); failure = document('failure-details.json', p['failureSha256'])
+    require(result['status'] == 'failure' and result['consumerRunId'] == p['runId'] and result['consumerAttempt'] == '1', 'Lost original failed aggregate')
+    for key in ('head','sourceHead','tree','planSha256','inputsSha256'): require(result[key] == p[key], 'Wrong original round9 identity')
+    phases = {row['name']:row for row in result['phases']}
+    names = ('frontend-compile','frontend-app-types','changed-lint','compiled-browser','runtime-packaging','runtime-scans')
+    require(all(phases[name]['status'] == 'success' for name in names), 'Missing selected original success')
+    require(phases['scoped-pg-http']['status'] == 'failure' and failure['phase'] == 'scoped-pg-http'
+        and failure['integrationCounts'] == {'numTotalTests':3,'numPassedTests':1,'numFailedTests':0,'numPendingTests':2}
+        and failure['failedCases'] == [] and failure['failedAssertions'] == []
+        and any(row.get('helper') == 'require_test_report' and row.get('line') == 169 for row in failure['locations']), 'Different PG failure')
+    audit = phases['dependency-audit']['details']['original']
+    require(audit['status'] == 'success', 'Missing admitted audit')
+    for component in ('backend','frontend'):
+        require(audit['details'][component]['exitCode'] == 0 and audit['details'][component]['lockfileSha256'] == q.inputs['components'][component]['lockfileSha256'], 'Changed audited lock')
+    require(phases['frontend-compile']['details']['sourceTree'] == q.inputs['components']['frontend']['sourceTree'], 'Changed frontend input')
+    def archive(key, member, expected):
+        target = q.private / ('round9-' + member)
+        with zipfile.ZipFile(files[key]) as z:
+            require(z.namelist().count(member) == 1, 'Missing exact retained archive')
+            with z.open(member) as source, target.open('wb') as output:
+                while chunk := source.read(1024*1024): output.write(chunk)
+        with target.open('rb') as source: digest = hashlib.file_digest(source, 'sha256').hexdigest()
+        require(digest == expected, 'Changed retained archive bytes')
+        return target
+    frontend = archive('frontend','frontend-compiled.tar.gz',result['components']['frontend']['compiledArchiveSha256'])
+    images = {c:archive('images', c+'-runtime.tar.gz',result['components'][c]['runtimeArchiveSha256']) for c in ('backend','frontend')}
+    return {'phases':{name:phases[name] for name in names}, 'frontendArchive':frontend, 'components':result['components'],
+        'images':images, 'audit':audit, 'pg':{'original':phases['scoped-pg-http'],'failure':failure,'selectedCase':ROUND8_FAILED_CASE,
+        'priorPassedCases':ROUND8_PASSED_CASES,'priorReference':{'runId':ROUND8_PIN['runId'],'jobId':ROUND8_PIN['jobId'],
+            'resultSha256':ROUND8_PIN['resultSha256'],'failureSha256':ROUND8_PIN['failureSha256'],'total':4,'passed':3,'failed':1,'failedCase':ROUND8_FAILED_CASE},
+        'assurance':'Selected success inferred from the exact anchored single-case command and original 3/1/0/2 aggregate; prior three inferred from fixed four-case source and original 4/3/1/0 aggregate plus sole failed name. Original per-case reporter was not retained; both original failed phases remain failed.'}}

@@ -50,6 +50,16 @@ class Contract(unittest.TestCase):
         with patch.object(M,'REVIEWED_SECURITY_RUNTIME_SHA256',M.hashlib.sha256((ROOT/'training-mac-runtime.py').read_bytes()).hexdigest()), patch.object(M,'REVIEWED_SECURITY_INPUTS_SHA256',M.hashlib.sha256((ROOT/'training-mac-inputs.json').read_bytes()).hexdigest()):
             with self.assertRaisesRegex(ValueError,'Wrong round8 producer'):M.admit_round8_successes(q)
 
+    def test_round9_refuses_wrong_producer_before_download(self):
+        from types import SimpleNamespace
+        from unittest.mock import patch
+        pin=M.ROUND9_PIN
+        run={'id':int(pin['runId']),'run_attempt':1,'head_sha':'wrong','head_branch':'work/training-mac-ui-final-20261020',
+             'repository':{'full_name':'caohuibj/eduK12-new-version'},'head_repository':{'full_name':'caohuibj/eduK12-new-version'}}
+        q=SimpleNamespace(api=lambda path: run)
+        with patch.object(M,'REVIEWED_SECURITY_RUNTIME_SHA256',M.hashlib.sha256((ROOT/'training-mac-runtime.py').read_bytes()).hexdigest()), patch.object(M,'REVIEWED_SECURITY_INPUTS_SHA256',M.hashlib.sha256((ROOT/'training-mac-inputs.json').read_bytes()).hexdigest()):
+            with self.assertRaisesRegex(ValueError,'Wrong round9 producer'):M.admit_round9_successes(q)
+
     def test_round8_case_inference_preserves_failed_case(self):
         self.assertEqual(len(set(M.ROUND8_PASSED_CASES)),3)
         self.assertNotIn(M.ROUND8_FAILED_CASE,M.ROUND8_PASSED_CASES)
