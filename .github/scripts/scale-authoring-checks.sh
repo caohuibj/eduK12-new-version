@@ -9,7 +9,7 @@ cd "$root/server-version/$component"
 # Exact changed contract files only. PG lifecycle is a separately selected case.
 mapfile -t tests < <(node -e 'const p=require(process.argv[1]);for(const t of p.tests[process.argv[2]]) console.log(t)' "$root/.github/scripts/scale-authoring-bindings.json" "$component")
 [ "${#tests[@]}" -gt 0 ]
-node node_modules/vitest/vitest.mjs run --maxWorkers=2 "${tests[@]}" --reporter=json --outputFile="$evidence/$component-tests.json"
+node node_modules/vitest/vitest.mjs run --maxWorkers=2 "${tests[@]}" --reporter=default --reporter=json --outputFile="$evidence/$component-tests.json"
 node "$root/.github/scripts/scale-authoring-scope.mjs" report "$evidence/$component-tests.json"
 COMPONENT="$component" EVIDENCE="$evidence" node - <<'JS'
 const assert=require('node:assert/strict');const path=require('node:path');

@@ -57,7 +57,7 @@ jobs:
           JWT_SECRET: isolated-ci-scale-authoring-test-secret-20261021
           ASSET_SIGNING_SECRET: isolated-ci-scale-authoring-asset-secret-20261021
         run: |
-          docker run --rm --env HOME=/tmp --env NPM_CONFIG_CACHE=/tmp/npm-cache --user "$(id -u):$(id -g)" -e CI -e NODE_ENV -e GITHUB_WORKSPACE -e DATA_ENCRYPTION_KEY -e DATA_PSEUDONYM_KEY -e JWT_SECRET -e ASSET_SIGNING_SECRET -e NPM_CONFIG_REGISTRY -e NPM_CONFIG_REPLACE_REGISTRY_HOST -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" "scale-authoring-${{ matrix.component }}-builder:$GITHUB_SHA" bash .github/scripts/scale-authoring-checks.sh '${{ matrix.component }}' 
+          docker run --rm --env HOME=/tmp --env NPM_CONFIG_CACHE=/tmp/npm-cache --user "$(id -u):$(id -g)" -e CI -e NODE_ENV -e GITHUB_WORKSPACE -e DATA_ENCRYPTION_KEY -e DATA_PSEUDONYM_KEY -e JWT_SECRET -e ASSET_SIGNING_SECRET -e NPM_CONFIG_REGISTRY -e NPM_CONFIG_REPLACE_REGISTRY_HOST -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE" "scale-authoring-${{ matrix.component }}-builder:$GITHUB_SHA" bash .github/scripts/scale-authoring-checks.sh '${{ matrix.component }}'
       - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
         with:
           version: v0.70.0
@@ -74,6 +74,14 @@ jobs:
           severity: CRITICAL,HIGH
           cache: 'false'
           skip-setup-trivy: true
+      - name: retain lightweight diagnostic reports independently
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scale-${{ matrix.component }}-reports-${{ github.sha }}
+          path: scale-authoring-evidence/${{ matrix.component }}-*.json
+          retention-days: 3
+          if-no-files-found: error
       - name: retain exact built inputs (no consumer recompilation)
         if: always()
         uses: actions/upload-artifact@v4
@@ -178,7 +186,7 @@ jobs:
         env:
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
         run: |
-          bash .github/scripts/scale-authoring-backend.sh node node_modules/vitest/vitest.mjs run src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts -t 'persists quality-item raw answers and frozen image feedback without scoring quality items' --reporter=json --outputFile="$GITHUB_WORKSPACE/scale-authoring-evidence/postgres.json"
+          bash .github/scripts/scale-authoring-backend.sh node node_modules/vitest/vitest.mjs run src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts -t 'persists quality-item raw answers and frozen image feedback without scoring quality items' --reporter=default --reporter=json --outputFile="$GITHUB_WORKSPACE/scale-authoring-evidence/postgres.json"
           node "$GITHUB_WORKSPACE/.github/scripts/scale-authoring-scope.mjs" report "$GITHUB_WORKSPACE/scale-authoring-evidence/postgres.json" filtered
           node - <<'JS'
           const assert=require('node:assert/strict');const r=require(process.env.GITHUB_WORKSPACE+'/scale-authoring-evidence/postgres.json');const a=r.testResults.flatMap(x=>x.assertionResults).filter(x=>x.title==='persists quality-item raw answers and frozen image feedback without scoring quality items');assert.equal(a.length,1);assert.equal(a[0].status,'passed');assert.equal(r.numPassedTests,1);

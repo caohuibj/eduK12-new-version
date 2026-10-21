@@ -101,15 +101,17 @@ describe('compact result authority across scale combinations',()=>{
 })
 
 describe('report manifests and end-to-end representation equivalence',()=>{
- it('restores full report fields from one facts source, with no original-answer query',async()=>{
+ for(const optionalFields of ['legacy','identity','feedback','identity-and-feedback'] as const)
+ it('restores full report fields from one facts source, with no original-answer query'+(optionalFields==='legacy'?'':` (${optionalFields})`),async()=>{
   vi.stubEnv('ASSESSMENT_COMPACT_FACTS_ENABLED','true')
   const m=memory(),normalize=(x:any)=>JSON.parse(JSON.stringify(x)),size=(x:string)=>Buffer.byteLength(x)
   let samples:any[]
   if(process.env.COMPACT_SYNTHETIC_FIXTURE){const fixture=decryptField<any>(readFileSync(process.env.COMPACT_SYNTHETIC_FIXTURE,'utf8'));expect(fixture.kind).toBe('ATTRIBUTABLE_SYNTHETIC_PHASE10');samples=fixture.people}
   else{
    const pkg=selected[0],fixture=pkg.goldenCases.find(c=>c.expected.quality)!,result=resultFor(pkg,fixture),id=binding(),parent='parent-one'
+   if(optionalFields==='feedback'||optionalFields==='identity-and-feedback')result.rawScoreFeedback=[{scoreKey:result.scores[0].key,rangeKey:'synthetic',text:'Frozen authored feedback'}]
    const record={id:id.assessmentId,attemptEpoch:1,submissionId:id.submissionId,submissionPayloadHash:id.payloadHash,compositeAttemptId:parent,compositeItemId:'item-one',completedAt:'2026-10-16T00:00:00.000Z',totalTime:123}
-   const unit=buildScaleUnitReport({itemId:record.compositeItemId,scaleId:result.instrument.scaleId,scaleCode:pkg.key,scaleName:result.instrument.name,result,completedAt:record.completedAt,totalTime:123})
+   const unit=buildScaleUnitReport({...(['identity','identity-and-feedback'].includes(optionalFields)?{assessmentId:record.id}:{}),itemId:record.compositeItemId,scaleId:result.instrument.scaleId,scaleCode:pkg.key,scaleName:result.instrument.name,result,completedAt:record.completedAt,totalTime:123})
    const report={id:parent,assessmentId:'questionnaire-one',name:'合成问卷',productKind:'QUESTIONNAIRE',reportMode:'COLLECTION',anonymousCode:null,completedAt:record.completedAt,totalTime:123,backgroundValues:[],unitReports:[unit]}
    samples=[{children:[{record,result,answers:fixture.answers,itemOrder:pkg.definition.items.map(i=>i.itemCode),canonical:canonicalFor(result),oldFieldBytes:0}],binding:{attemptId:parent,attemptEpoch:1,slotSetHash:'a'.repeat(64),contextHash:'e'.repeat(64),aggregateInputHash:'b'.repeat(64)},report,policies:[],whole:{schemaVersion:1,binding:{attemptId:parent,attemptEpoch:1},payloadHash:'d'.repeat(64),units:[{assessmentId:record.id,attemptEpoch:1,submissionId:id.submissionId,answers:fixture.answers}]},oldParentFieldBytes:0}]
   }
@@ -126,11 +128,20 @@ describe('report manifests and end-to-end representation equivalence',()=>{
     counts.result+=size(encrypted)+size(JSON.stringify(makeScaleFactsReference(r.attemptEpoch)));counts.rawRefs+=size(JSON.stringify(makeScaleRawReference(r.attemptEpoch)));counts.canonicalRefs+=size(makeCanonicalFactsReference(id,child.canonical.resultHash))
    }
    for(const unit of sample.report.unitReports){const policy=sample.policies.find((p:any)=>p.itemId===unit.itemId)?.policy;if(policy)Object.defineProperty(unit,'__scaleProjectionPolicy',{value:policy,enumerable:false})}
+   if(sample.report.unitReports.some((unit:any)=>unit.assessmentId !== undefined)){
+    const wrongIdentity=structuredClone(sample.report);wrongIdentity.unitReports.find((unit:any)=>unit.assessmentId !== undefined).assessmentId='not-the-verified-child'
+    await expect(encryptCompactCompositeReport(wrongIdentity,sample.binding,children,m.store)).rejects.toThrow('Report assessment identity mismatch')
+   }
    const encrypted=await encryptCompactCompositeReport(sample.report,sample.binding,children,m.store),readRows=vi.fn(async()=>sourceRows)
    const restored=await decryptCompactCompositeReport(encrypted,sample.binding,{templates:createPublicTemplateStore(m.repo),readRows})
    const projected=(r:any)=>({...r,unitReports:r.unitReports.map(({result,...unit}:any)=>unit)})
    expect(isDeepStrictEqual(normalize(projected(restored)),normalize(projected(sample.report)))).toBe(true)
    expect(readRows).toHaveBeenCalledTimes(1)
+   expect(readRows).toHaveBeenCalledWith(sample.binding,sample.children.map((child:any)=>child.record.id))
+   for(let i=0;i<restored.unitReports.length;i++){
+    expect(Object.hasOwn(restored.unitReports[i],'assessmentId')).toBe(Object.hasOwn(sample.report.unitReports[i],'assessmentId'))
+    expect(Object.hasOwn(restored.unitReports[i],'rawScoreFeedback')).toBe(Object.hasOwn(sample.report.unitReports[i],'rawScoreFeedback'))
+   }
    const raw=size(encryptCompactField({schemaVersion:1,value:packWholeRawEnvelope(sample.whole)}))
    const varied=normalize(sample.whole);let seed=28431
    for(const unit of varied.units)for(const answer of unit.answers){seed=(Math.imul(seed,1664525)+1013904223)>>>0;answer.responseTimeMs=100+seed%300000;answer.changeCount=seed%5}

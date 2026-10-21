@@ -16,7 +16,7 @@
     },
     ".github/scripts/scale-authoring-checks.sh": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "df98b2e1809f1b68e7ee22472bfcec24e16e9d5e"
+      "after": "f208eb398ef52860036b7568c9777e51466da843"
     },
     ".github/scripts/scale-authoring-scope.mjs": {
       "before": "0000000000000000000000000000000000000000",
@@ -26,9 +26,13 @@
       "before": "0000000000000000000000000000000000000000",
       "after": "8fe5921f8cc5640716b7270552353e0ecfabb4d9"
     },
+    ".github/workflows/ci-scale-authoring-evidence.yml": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "708f60d2591d773c7f6fba9716cbe48a72431005"
+    },
     ".github/workflows/ci-scale-authoring.yml": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "adc5903ed91ef30fec0a75e6c121d42bb8113cf6"
+      "after": "58632d7f2c33cb3595ba24f1a881539b3c6138bb"
     },
     "docs/release/scale-authoring-ci-20261021.md": {
       "before": "0000000000000000000000000000000000000000",
@@ -41,6 +45,10 @@
     "server-version/backend/src/__tests__/assessment-media/raw-feedback-media.test.ts": {
       "before": "0000000000000000000000000000000000000000",
       "after": "628513b514e31527eca964f090a7c8f9a2c67ad3"
+    },
+    "server-version/backend/src/__tests__/assessment-runtime/compact-assessment-storage.test.ts": {
+      "before": "e7845e37892ea88fa331d40d31f72ca956c313c1",
+      "after": "c30b182f2d7f42a85015f925f315e5b7c8e3c18d"
     },
     "server-version/backend/src/__tests__/composite/composite-report.projector.test.ts": {
       "before": "0affc3f07e675e3321a0d170619299081287c288",
@@ -116,7 +124,7 @@
     },
     "server-version/backend/src/modules/composite/compact-composite-report.ts": {
       "before": "fbdedcf821cb62a48303d0c3ca503c5a52ad2ea2",
-      "after": "0c724198c5de7bef55287d8b61827e12d6f07813"
+      "after": "0ad1811687a283cfc35ee7708715943d55ad7530"
     },
     "server-version/backend/src/modules/composite/composite-export-projection.ts": {
       "before": "86031e83e806d0421f663b31ecee532c9322997d",
