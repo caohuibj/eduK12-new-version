@@ -537,7 +537,7 @@ const VideoLibrary: React.FC = () => {
       {loading ? (
         <ProductStatus kind="pending" title="正在加载视频">正在读取视频及处理状态。</ProductStatus>
       ) : listError ? <ProductStatus kind="error" title="视频列表加载失败" announce="assertive" actions={<ProductButton onClick={() => void fetchVideos()}>重试</ProductButton>}>{listError}</ProductStatus> : displayVideos.length === 0 ? (
-        <ProductStatus kind="info" title="暂无视频">上传第一段视频后，可以在课程、作业和测评中复用。</ProductStatus>
+        <ProductStatus kind="info" title="暂无视频">上传第一段视频后，可以在课程、练习和测评中复用。</ProductStatus>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {displayVideos.map((video) => {

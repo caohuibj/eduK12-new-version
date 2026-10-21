@@ -42,7 +42,7 @@ beforeEach(() => {
 // and scroll to an already-rendered DOM id. These tests deliberately put the
 // requested record outside that list and require its existing detail API.
 describe.each([
-  { path: 'assignments', label: '作业', count: '7 份提交' },
+  { path: 'assignments', label: '练习', count: '7 份提交' },
   { path: 'checkins', label: '打卡', count: '7 人参与' },
 ])('Training $label deep links', ({ path, label, count }) => {
   const legacyDetail = '/' + path + '/old-21'

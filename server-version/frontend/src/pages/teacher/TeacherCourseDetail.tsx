@@ -19,7 +19,7 @@ interface Questionnaire {
   manageHref: string | null
 }
 
-// 带统计的作业类型
+// 带统计的练习类型
 interface AssignmentWithStats extends Assignment {
   submissionCount?: number
   totalStudents?: number
@@ -81,7 +81,7 @@ const TeacherCourseDetail: React.FC = () => {
         setAssignments(response.data.list)
       }
     } catch (error) {
-      console.error('获取作业列表失败:', error)
+      console.error('获取练习列表失败:', error)
     }
   }
 
@@ -135,7 +135,7 @@ const TeacherCourseDetail: React.FC = () => {
     }
   }
 
-  if (loading) return <ProductPage width="management"><ProductStatus kind="pending" title="正在加载课程">正在读取课程、作业和打卡概况。</ProductStatus></ProductPage>
+  if (loading) return <ProductPage width="management"><ProductStatus kind="pending" title="正在加载课程">正在读取课程、练习和打卡概况。</ProductStatus></ProductPage>
   if (!course) return <ProductPage width="management"><ProductStatus kind="error" title="课程不可用" actions={<Link to="/courses">返回课程列表</Link>}>课程不存在、已删除，或当前账户无法访问。</ProductStatus></ProductPage>
 
   return (
@@ -176,7 +176,7 @@ const TeacherCourseDetail: React.FC = () => {
 
       <dl className="staff-stat-grid" aria-label="课程内容概况">
         <div className="staff-stat">
-          <dt>作业</dt>
+          <dt>练习</dt>
           <dd>{assignments.length}</dd>
         </div>
         <div className="staff-stat">
@@ -193,7 +193,7 @@ const TeacherCourseDetail: React.FC = () => {
         <div className="staff-segmented" role="group" aria-label="课程内容">
           <button type="button" aria-pressed={activeTab === 'assignments'} onClick={() => setActiveTab('assignments')}>
             <ClipboardList className="w-4 h-4" aria-hidden="true" />
-            作业 ({assignments.length})
+            练习 ({assignments.length})
           </button>
           <button type="button" aria-pressed={activeTab === 'checkins'} onClick={() => setActiveTab('checkins')}>
             <Calendar className="w-4 h-4" aria-hidden="true" />
@@ -207,14 +207,14 @@ const TeacherCourseDetail: React.FC = () => {
       </div>
 
       {activeTab === 'assignments' && (
-        <section aria-label="课程作业">
+        <section aria-label="课程练习">
           {assignments.length === 0 ? (
             <ProductStatus
               kind="info"
-              title="暂无作业"
-              actions={<ProductButton variant="primary" onClick={() => navigate(`/assignments?create=true&courseId=${encodeURIComponent(courseId || '')}`)}>去创建作业</ProductButton>}
+              title="暂无练习"
+              actions={<ProductButton variant="primary" onClick={() => navigate(`/assignments?create=true&courseId=${encodeURIComponent(courseId || '')}`)}>去创建练习</ProductButton>}
             >
-              当前课程还没有作业。
+              当前课程还没有练习。
             </ProductStatus>
           ) : (
             <div className="staff-course-detail-list">

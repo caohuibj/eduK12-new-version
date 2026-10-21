@@ -49,7 +49,7 @@ export default function TrainingLearnerCourse() {
       (async () => {
         try {
           const res = await apiClient.get<{ list: Assignment[] }>('/courses/' + encoded + '/assignments')
-          if (res.code !== 0) throw new Error(res.message || '作业加载失败')
+          if (res.code !== 0) throw new Error(res.message || '练习加载失败')
           if (alive) setAssignments({ loading: false, error: null, rows: res.data?.list || [] })
         } catch (error) { if (alive) setAssignments({ loading: false, error: message(error), rows: [] }) }
       })(),
@@ -100,15 +100,15 @@ export default function TrainingLearnerCourse() {
           <div className={`training-course-layout ${course.description ? '' : 'training-course-layout--full'}`}><div className="training-course-work">
           <nav className="training-section-switch" aria-label="课程任务类别">
             {([
-              ['assignments', '作业'], ['checkins', '打卡'], ['assessments', '测评'],
+              ['assignments', '练习'], ['checkins', '打卡'], ['assessments', '测评'],
             ] as const).map(([value, label]) =>
               <button key={value} type="button" aria-pressed={section === value} onClick={() => setSection(value)}>{label}</button>)}
           </nav>
 
-          {section === 'assignments' && <section className="training-detail-content" aria-label="课程作业">
-            {assignments.loading ? <p role="status">正在读取作业…</p>
-              : assignments.error ? <div role="alert">作业读取失败：{assignments.error}<button type="button" onClick={retry}>重试</button></div>
-                : assignments.rows.length === 0 ? <p className="training-empty-small">目前没有布置作业。</p>
+          {section === 'assignments' && <section className="training-detail-content" aria-label="课程练习">
+            {assignments.loading ? <p role="status">正在读取练习…</p>
+              : assignments.error ? <div role="alert">练习读取失败：{assignments.error}<button type="button" onClick={retry}>重试</button></div>
+                : assignments.rows.length === 0 ? <p className="training-empty-small">目前没有布置练习。</p>
                   : <div className="training-item-list">{assignments.rows.map(task => {
                     const draft = task.mySubmission?.status === 'DRAFT'
                     const done = task.mySubmission?.status === 'SUBMITTED'
@@ -117,10 +117,10 @@ export default function TrainingLearnerCourse() {
                     const expired = Boolean(task.deadline && Date.parse(task.deadline) < Date.now())
                     const state = done ? '已提交' : expired ? '已截止'
                       : draft ? '已保存草稿' : '待完成'
-                    const action = done ? '查看提交' : expired ? '查看作业'
-                      : draft ? '继续作业' : '完成作业'
+                    const action = done ? '查看提交' : expired ? '查看练习'
+                      : draft ? '继续练习' : '完成练习'
                     return <article className="training-task-item" key={task.id}>
-                      <div><h2>{task.title}</h2><p>{task.description || '请阅读作业要求后提交。'}</p><span>{state}</span></div>
+                      <div><h2>{task.title}</h2><p>{task.description || '请阅读练习要求后提交。'}</p><span>{state}</span></div>
                       <Link to={'/student/assignments/' + encodeURIComponent(task.id) + '?courseId=' + encodeURIComponent(course.id)} className="training-row-action">{action}<ArrowRight size={16} aria-hidden="true" /></Link>
                     </article>
                   })}</div>}

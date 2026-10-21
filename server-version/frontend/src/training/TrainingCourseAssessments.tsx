@@ -1,7 +1,7 @@
 import TrainingCatalogTags from './TrainingCatalogTags'
 import { useEffect, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
-import { ArrowRight, ClipboardList, Download, Plus, RefreshCw } from 'lucide-react'
+import { ArrowRight, Download, Plus } from 'lucide-react'
 import { internalReturnTo } from '../components/app-shell/access'
 import { compositeApi } from '../modules/composite/api'
 import type { CompositeTeacherAttemptsResponse } from '../modules/composite/types'
@@ -31,16 +31,13 @@ export default function TrainingCourseAssessments({course,actorId,rows,loading,e
 }) {
  const location=useLocation()
  const [progress,setProgress]=useState<string|null>(null),[exportRow,setExportRow]=useState<CourseAssessment|null>(null)
- const encoded=encodeURIComponent(course.id),published=rows.filter(row=>row.status==='PUBLISHED').length,drafts=rows.filter(row=>row.status==='DRAFT').length
+ const encoded=encodeURIComponent(course.id)
  return <section className="training-detail-content tql-page tca-workspace" aria-label="课程测评管理">
-  <header className="tca-heading"><div><small>当前课程 · 测评工作台</small><h2>测评与作答</h2><p>在本课程完成编制、分享、查看结果和脱敏导出。</p></div><button type="button" onClick={onRetry} disabled={loading} aria-label="刷新课程测评"><RefreshCw size={15} aria-hidden="true"/></button></header>
-  <div className="training-section-action tca-actions"><Link to={'/questionnaire-products/new?courseId='+encoded+'&returnTo='+encodeURIComponent(location.pathname+location.search)} className="tql-primary"><Plus size={15} aria-hidden="true"/>布置组合测评</Link><Link to="/questionnaires" className="tql-secondary">从已有测评复用<ArrowRight size={14} aria-hidden="true"/></Link></div>
-  <p className="tca-intro">组合测评可按需加入量表、表单、情境判断和认知任务。跨课程查找与未绑定课程的草稿保留在“全部测评”。</p>
-  <div className="tca-summary"><span>本页已发布 <strong>{loading||error?'—':published}</strong></span><span>本页草稿 <strong>{loading||error?'—':drafts}</strong></span></div>
-  {error?<div className="training-message training-message--compact" role="alert"><p>当前课程测评清单暂时无法读取：{error}</p><button type="button" onClick={onRetry}>重新加载测评</button></div>:loading?<p role="status">正在读取本课程测评与草稿…</p>:rows.length===0?<div className="tca-empty"><ClipboardList size={30} aria-hidden="true"/><h3>{filtered?'没有符合条件的测评':'从本课程的第一份测评开始'}</h3><p>{filtered?'请调整标题、标签或时间范围后重新查询。':'创建时会自动选择当前课程；也可以从已有测评复制复用。'}</p></div>:<div className="tca-list">{rows.map(task=>{
+  <div className="training-course-actions"><Link to={'/questionnaire-products/new?courseId='+encoded+'&returnTo='+encodeURIComponent(location.pathname+location.search)} className="training-action"><Plus size={15} aria-hidden="true"/>发布测评</Link><Link to={'/questionnaires?courseId='+encoded+'&returnTo='+encodeURIComponent(location.pathname+location.search)} className="training-action training-action--quiet">复用测评</Link></div>
+  {error?<div className="training-message training-message--compact" role="alert"><p>当前课程测评清单暂时无法读取：{error}</p><button type="button" onClick={onRetry}>重新加载测评</button></div>:loading?<p role="status">正在读取本课程测评与草稿…</p>:rows.length===0?<p className="training-empty-small">{filtered?'没有符合当前条件的测评。':'还没有布置测评。'}</p>:<div className="tca-list">{rows.map(task=>{
    const href=internalReturnTo(task.manageHref),draft=task.status==='DRAFT',composite=task.kind==='QUESTIONNAIRE'
    const status=draft?'草稿':task.status==='PUBLISHED'?'已发布':'已停用'
-   return <article key={task.key} className="tca-card"><header><span className="tca-icon"><ClipboardList size={21} aria-hidden="true"/></span><div><div className="tca-title"><h3>{task.name}</h3><span className={draft?'is-draft':''}>{status}</span></div><p>{task.typeLabel}{task.unitCount!==null?` · ${task.unitCount} ${task.unitLabel||'测评单元'}`:''}</p></div></header>
+   return <article key={task.key} className="tca-card"><header><div><div className="tca-title"><h3>{task.name}</h3><span className={draft?'is-draft':''}>{status}</span></div><p>{task.typeLabel}{task.unitCount!==null?` · ${task.unitCount} ${task.unitLabel||'测评单元'}`:''}</p></div></header>
     {task.description&&<p className="tca-description">{task.description}</p>}
     <div className="tca-card-actions">{href?<><Link to={href+'?courseId='+encoded+'&returnTo='+encodeURIComponent(location.pathname+location.search)} className="tql-primary">{draft?'继续编制':task.kind==='QUESTIONNAIRE'?'配置与匿名链接':'管理测评'}<ArrowRight size={14} aria-hidden="true"/></Link>{composite&&!draft&&<><button type="button" className="tql-secondary" aria-expanded={progress===task.key} onClick={()=>setProgress(value=>value===task.key?null:task.key)}>作答与结果</button>{task.kind!=='ASSESSMENT_BUNDLE'&&<button type="button" className="tql-secondary" onClick={()=>setExportRow(task)}><Download size={15} aria-hidden="true"/>导出本课程数据</button>}</>}</>:<span className="training-task-disabled">由资源创建者管理</span>}</div>
     {href&&task.kind!=='ASSESSMENT_BUNDLE'&&<TrainingCatalogTags key={JSON.stringify(task.tags)} id={task.id} kind={task.kind} tags={task.tags} onSaved={onRetry}/>}
@@ -49,7 +46,7 @@ export default function TrainingCourseAssessments({course,actorId,rows,loading,e
     {progress===task.key&&composite&&href&&<CourseProgress id={task.id} courseId={course.id}/>}
    </article>
   })}</div>}
-  <p className="tca-boundary">课程结果与导出仅包含明确绑定本课程的作答。匿名链接可在测评配置中管理；完整测评库与历史复用仍从“全部测评”进入。</p>
+  <details className="tca-boundary"><summary>测评与数据范围说明</summary><p>组合测评可包含量表、表单、情境判断和认知任务。课程结果与导出仅包含明确绑定本课程的作答；匿名链接在测评配置中管理。跨课程查找与复用可进入“全部测评”。</p></details>
   {exportRow&&exportRow.manageHref&&<AssessmentDataExport key={JSON.stringify([actorId,course.id,exportRow.id])} row={{...exportRow,editHref:exportRow.manageHref}} course={course} actorId={actorId} onClose={()=>setExportRow(null)}/>}
  </section>
 }

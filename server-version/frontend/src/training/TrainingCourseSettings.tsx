@@ -1,5 +1,7 @@
 import { useEffect, useState, type FormEvent } from 'react'
-import { Settings2 } from 'lucide-react'
+import { ArrowRight, Users, BookOpen, UserPlus } from 'lucide-react'
+import { Link } from 'react-router-dom'
+import './training-course-settings.css'
 import apiClient from '../api/client'
 import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 import type { Course } from '../types'
@@ -82,35 +84,37 @@ export default function TrainingCourseSettings({
     } finally { setBusy(false) }
   }
 
-  return <div className="training-course-settings-wrap">
+  return <section className="training-course-admin" aria-label="课程管理设置">
     {feedback}
-    <details className="training-course-settings">
-      <summary><Settings2 size={18} aria-hidden="true" />课程设置 <span>名称、课程码与招募</span></summary>
-      <div className="training-course-settings-body">
-        <form onSubmit={event => void updateDetails(event)} className="training-settings-form">
-          <label htmlFor="training-settings-name">课程名称</label>
-          <input id="training-settings-name" value={title} maxLength={200}
-            disabled={closed || busy} onChange={event => setTitle(event.target.value)} required />
-          <label htmlFor="training-settings-description">课程介绍</label>
-          <textarea id="training-settings-description" rows={3} maxLength={2000}
-            disabled={closed || busy} value={description}
-            onChange={event => setDescription(event.target.value)} />
-          <button type="submit" className="training-action training-action--quiet"
+    <section className="training-admin-roster" aria-label="学员管理">
+      <div className="training-admin-roster-heading"><span className="training-admin-icon"><Users size={22} aria-hidden="true" /></span><div><h2>学员管理</h2><p>查看学员名单、处理报名与维护学员账号。</p></div></div>
+      <Link className="training-action" to={'/courses/' + encodeURIComponent(course.id) + '/students'}>管理学员<ArrowRight size={16} aria-hidden="true" /></Link>
+    </section>
+    <div className="training-admin-grid">
+      <section className="training-admin-card" aria-labelledby="training-admin-info-title">
+        <header className="training-admin-card-heading"><BookOpen size={19} aria-hidden="true" /><div><h2 id="training-admin-info-title">课程信息</h2><p>名称和介绍将展示在学员的课程页面。</p></div></header>
+        <form onSubmit={event => void updateDetails(event)} className="training-admin-form">
+          <div><label htmlFor="training-settings-name">课程名称</label><input id="training-settings-name" value={title} maxLength={200}
+            disabled={closed || busy} onChange={event => setTitle(event.target.value)} required /></div>
+          <div><label htmlFor="training-settings-description">课程介绍</label><textarea id="training-settings-description" rows={6} maxLength={2000}
+            disabled={closed || busy} value={description} placeholder="介绍课程目标、学习内容与参与方式。"
+            onChange={event => setDescription(event.target.value)} /><p className="training-admin-character-count">{description.length} / 2000</p></div>
+          <div className="training-admin-save"><span>{closed ? '课程已结束，信息仅供查看。' : '修改后点击保存，更新课程信息。'}</span><button type="submit" className="training-action"
             disabled={busy || closed || !title.trim() || (title === course.title && description === (course.description || ''))}>
-            保存课程信息
-          </button>
+            {busy ? '处理中…' : '保存课程信息'}
+          </button></div>
         </form>
-        <div className="training-settings-actions" aria-label="课程招募与结束">
-          {closed ? <p>课程已结束，不再接受新报名；历史任务和结果仍按原有权限查看。</p> : <>
-            <p>招募状态：{course.isRecruiting ? '接受报名' : '已暂停报名'}</p>
-            <button type="button" disabled={busy} onClick={() => void execute('rotate-code')}>轮换课程码</button>
-            {course.isRecruiting
-              ? <button type="button" disabled={busy} onClick={() => void execute('stop-recruiting')}>暂停报名</button>
-              : <button type="button" disabled={busy} onClick={() => void execute('resume-recruiting')}>恢复报名</button>}
-            <button type="button" disabled={busy} className="training-danger-action" onClick={() => void execute('end')}>结束课程</button>
-          </>}
-        </div>
-      </div>
-    </details>
-  </div>
+      </section>
+      <section className="training-admin-card training-admin-enrollment" aria-labelledby="training-admin-enrollment-title">
+        <header className="training-admin-card-heading"><UserPlus size={19} aria-hidden="true" /><div><h2 id="training-admin-enrollment-title">报名与课程码</h2><p>控制新学员加入课程的方式。</p></div></header>
+        <div className="training-admin-enrollment-state"><span>报名状态</span><strong className={closed || !course.isRecruiting ? 'is-paused' : ''}>{closed ? '已结束报名' : course.isRecruiting ? '接受报名' : '已暂停报名'}</strong></div>
+        {closed ? <p className="training-admin-note">课程已结束，不再接受新报名；历史任务和结果仍按原有权限查看。</p> : <>
+          <p className="training-admin-note">{course.isRecruiting ? '新学员可通过当前课程码申请加入。暂停报名不影响已加入的学员。' : '新学员暂时无法通过课程码加入；已加入的学员可继续学习。'}</p>
+          <button type="button" className="training-action training-action--quiet" disabled={busy} onClick={() => void execute(course.isRecruiting ? 'stop-recruiting' : 'resume-recruiting')}>{course.isRecruiting ? '暂停报名' : '恢复报名'}</button>
+          <div className="training-admin-code-maintenance"><h3>课程码维护</h3><p>需要更换课程码时使用。轮换后原码失效，已加入的学员不受影响。</p><button type="button" disabled={busy} onClick={() => void execute('rotate-code')}>轮换课程码<ArrowRight size={14} aria-hidden="true" /></button></div>
+        </>}
+      </section>
+    </div>
+    {!closed && <section className="training-admin-end" aria-label="课程结束设置"><div><h2>结束课程</h2><p>结束后停止接收新学员，保留课程内容与历史记录。</p></div><button type="button" disabled={busy} onClick={() => void execute('end')}>结束课程</button></section>}
+  </section>
 }

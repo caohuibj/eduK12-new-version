@@ -2,11 +2,16 @@ import { CatalogFilters, CatalogPagination } from '../training/TrainingCatalogCo
 import { useCatalogQuery } from '../training/useCatalogQuery'
 import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import ModalSurface from '../components/shared-ui/ModalSurface'
+import TrainingCourseEditorTabs from '../training/TrainingCourseEditorTabs'
+import '../training/training-task-editor.css'
+import TrainingTaskReusePicker from '../training/TrainingTaskReusePicker'
+import { assignmentReuseContent } from '../training/taskReuse'
 import React, { useState, useEffect, useRef } from 'react'
 import { Plus, Trash2, ClipboardList, FileText, Clock, Video, Image as ImageIcon, CheckSquare, Square, MessageSquare, Users, X } from 'lucide-react'
 import { useSearchParams } from 'react-router-dom'
 import apiClient from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
+import { isTrainingHost } from '../training/context'
 import { resolveTrainingCoursePrefill } from '../training/resolveCoursePrefill'
 import { sessionFetch } from '../api/client'
 import QuestionEditor, { Question } from '../components/QuestionEditor'
@@ -86,6 +91,8 @@ const AssignmentListContent: React.FC = () => {
   const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const requestedCourseId = searchParams.get('courseId')
+  const [showReuse, setShowReuse] = useState(false)
+  const canReuse = isTrainingHost() && user?.role === 'TEACHER'
   const focusId = searchParams.get('id')
   const { feedback, confirm, success, error: showError, info } = useStaffFeedback()
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
@@ -123,7 +130,7 @@ const AssignmentListContent: React.FC = () => {
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [submissionsLoading, setSubmissionsLoading] = useState(false)
   const [selectedSubmissions, setSelectedSubmissions] = useState<Set<string>>(new Set())
-  const [batchComment, setBatchComment] = useState('你的作业质量很棒，再接再厉！')
+  const [batchComment, setBatchComment] = useState('你的练习质量很棒，再接再厉！')
   const [isBatchGrading, setIsBatchGrading] = useState(false)
   const [showBatchGradeModal, setShowBatchGradeModal] = useState(false)
 
@@ -152,6 +159,14 @@ const AssignmentListContent: React.FC = () => {
     setSearchParams(next, { replace: true })
   }, [courses, requestedCourseId, searchParams, setSearchParams])
 
+  useEffect(() => {
+    if (!canReuse || searchParams.get('reuse') !== 'true' || !courses.some(course => course.id === requestedCourseId)) return
+    setShowReuse(true)
+    const next = new URLSearchParams(searchParams)
+    next.delete('reuse')
+    setSearchParams(next, { replace: true })
+  }, [canReuse, courses, requestedCourseId, searchParams, setSearchParams])
+
   const fetchAssignments = async () => {
     if (!mounted.current) return
     const request = ++loadSequence.current
@@ -164,27 +179,27 @@ const AssignmentListContent: React.FC = () => {
         const detailPath = `/assignments/${encodeURIComponent(focusId)}` + (requestedCourseId ? `?courseId=${encodeURIComponent(requestedCourseId)}` : '')
         const response = await apiClient.get<Assignment>(detailPath)
         if (request !== loadSequence.current) return
-        if (response.code !== 0 || !response.data) throw new Error(response.message || '无法读取作业')
+        if (response.code !== 0 || !response.data) throw new Error(response.message || '无法读取练习')
         const record = response.data
         if (record.id !== focusId || !record.courseId
           || (requestedCourseId && record.courseId !== requestedCourseId)
           || record.course?.id !== record.courseId
           || (user?.role === 'TEACHER' && record.course?.creatorId !== user.id)) {
-          throw new Error('无法管理此课程的作业')
+          throw new Error('无法管理此课程的练习')
         }
         setAssignments([record])
       } else {
         const path = '/assignments?view=summary&' + catalog.params + (requestedCourseId ? `&courseId=${encodeURIComponent(requestedCourseId)}` : '')
         const response = await apiClient.get<{ list: Assignment[]; total: number }>(path)
         if (request !== loadSequence.current) return
-        if (response.code !== 0) throw new Error(response.message || '获取作业列表失败')
+        if (response.code !== 0) throw new Error(response.message || '获取练习列表失败')
         setAssignments(response.data.list)
         setTotal(response.data.total ?? response.data.list.length)
       }
     } catch (error) {
       if (request !== loadSequence.current) return
       setAssignments([])
-      setLoadError(error instanceof Error ? error.message : '获取作业列表失败')
+      setLoadError(error instanceof Error ? error.message : '获取练习列表失败')
     } finally {
       if (request === loadSequence.current) setLoading(false)
     }
@@ -195,7 +210,7 @@ const AssignmentListContent: React.FC = () => {
       const response = await apiClient.get<{ list: Course[] }>('/courses')
       if (response.code === 0) {
         const list = response.data.list
-        const appended = searchParams.get('create') === 'true'
+        const appended = (searchParams.get('create') === 'true' || searchParams.get('reuse') === 'true')
           ? await resolveTrainingCoursePrefill({
             courseId: requestedCourseId,
             userId: user?.id,
@@ -238,7 +253,7 @@ const AssignmentListContent: React.FC = () => {
   const handleBatchGrade = async () => {
     if (!selectedAssignment) return
     if (selectedSubmissions.size === 0) {
-      showMessage('请至少选择一份作业')
+      showMessage('请至少选择一份练习')
       return
     }
     if (!batchComment.trim()) {
@@ -263,7 +278,7 @@ const AssignmentListContent: React.FC = () => {
         }
       }
       
-      showMessage(`批量批复完成，成功批复 ${successCount} 份作业`)
+      showMessage(`批量批复完成，成功批复 ${successCount} 份练习`)
       setShowBatchGradeModal(false)
       // 刷新提交列表
       fetchSubmissions(selectedAssignment.id)
@@ -369,20 +384,20 @@ const AssignmentListContent: React.FC = () => {
   }
 
   const handleDelete = async (assignment: Assignment) => {
-    if (!(await confirm({ title: `删除作业「${assignment.title}」？`, body: '删除后将无法继续提交；已有业务约束仍由服务器检查。', confirmLabel: '删除作业', danger: true }))) return
+    if (!(await confirm({ title: `删除练习「${assignment.title}」？`, body: '删除后将无法继续提交；已有业务约束仍由服务器检查。', confirmLabel: '删除练习', danger: true }))) return
     try {
       const response = await apiClient.delete(`/assignments/${assignment.id}`)
       if (response.code === 0) {
-        success('作业已删除')
+        success('练习已删除')
         fetchAssignments()
       }
     } catch (error: any) {
-      showError('删除作业失败', error.message || '请稍后重试')
+      showError('删除练习失败', error.message || '请稍后重试')
     }
   }
 
   const handleClone = async (assignment: Assignment) => {
-    if (!(await confirm({ title: `复制作业「${assignment.title}」？`, body: '副本会清空截止时间和作答数据，原作业不会改变。', confirmLabel: '复制作业' }))) return
+    if (!(await confirm({ title: `复制练习「${assignment.title}」？`, body: '副本会清空截止时间和作答数据，原练习不会改变。', confirmLabel: '复制练习' }))) return
     try {
       const full = await loadFullRecord(assignment)
       if (!full) return
@@ -398,11 +413,11 @@ const AssignmentListContent: React.FC = () => {
         documents: assignment.documents,
       })
       if (response.code === 0) {
-        success('作业已复制')
+        success('练习已复制')
         fetchAssignments()
       }
     } catch (error: any) {
-      showError('复制作业失败', error.message || '请稍后重试')
+      showError('复制练习失败', error.message || '请稍后重试')
     }
   }
 
@@ -430,6 +445,7 @@ const AssignmentListContent: React.FC = () => {
 
   const openCreateModal = () => {
     resetForm()
+    if (isTrainingHost() && courses.some(course => course.id === requestedCourseId)) setFormData(current => ({ ...current, courseId: requestedCourseId! }))
     setEditingAssignment(null)
     setShowModal(true)
   }
@@ -566,104 +582,81 @@ const AssignmentListContent: React.FC = () => {
 
   return (
     <ProductPage width="management" className="space-y-6">
-      <PageHeader title="作业管理" description="集中查看课程作业、提交进度和截止时间。" actions={<ProductButton variant="primary" onClick={openCreateModal}><Plus className="w-4 h-4" aria-hidden="true" />布置作业</ProductButton>} />
+      <PageHeader title="练习管理" description="集中查看课程练习、提交进度和截止时间。" actions={<><ProductButton variant="primary" onClick={openCreateModal}><Plus className="w-4 h-4" aria-hidden="true" />布置练习</ProductButton>{canReuse && <ProductButton onClick={() => setShowReuse(true)}>复用练习</ProductButton>}</>} />
       {feedback}
-      {openingDetail && <p role="status">正在读取作业完整内容…</p>}
-      {!focusId && <CatalogFilters key={filterRevision+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline label="作业"/>}
-      {loading ? <ProductStatus kind="pending" title="正在加载作业">正在读取作业和提交概况。</ProductStatus>
-      : loadError ? <ProductStatus kind="error" title="作业列表加载失败" actions={<ProductButton onClick={() => void fetchAssignments()}>重试</ProductButton>}>{loadError}</ProductStatus>
-      : filteredAssignments.length === 0 ? <ProductStatus kind="info" title="暂无匹配作业">可以调整筛选条件，或布置第一份作业。</ProductStatus>
-      : <div className="staff-table-container staff-record-table"><table className="staff-table" aria-label="作业记录"><thead><tr><th scope="col">作业</th><th scope="col">课程</th><th scope="col">截止时间</th><th scope="col">提交</th><th scope="col">题目</th><th scope="col" className="text-right">操作</th></tr></thead><tbody>
+      {openingDetail && <p role="status">正在读取练习完整内容…</p>}
+      {!focusId && <CatalogFilters key={filterRevision+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline label="练习"/>}
+      {loading ? <ProductStatus kind="pending" title="正在加载练习">正在读取练习和提交概况。</ProductStatus>
+      : loadError ? <ProductStatus kind="error" title="练习列表加载失败" actions={<ProductButton onClick={() => void fetchAssignments()}>重试</ProductButton>}>{loadError}</ProductStatus>
+      : filteredAssignments.length === 0 ? <ProductStatus kind="info" title="暂无匹配练习">可以调整筛选条件，或布置第一份练习。</ProductStatus>
+      : <div className="staff-table-container staff-record-table"><table className="staff-table" aria-label="练习记录"><thead><tr><th scope="col">练习</th><th scope="col">课程</th><th scope="col">截止时间</th><th scope="col">提交</th><th scope="col">题目</th><th scope="col" className="text-right">操作</th></tr></thead><tbody>
         {filteredAssignments.map(assignment=><tr id={`assignment-record-${assignment.id}`} tabIndex={-1} key={assignment.id} className={focusId===assignment.id?'staff-target-row':''}>
           <td><button type="button" className="staff-record-button" onClick={()=>openEditModal(assignment)}>{assignment.title}</button>{assignment.tags?.length?<div className="staff-inline-tags">{assignment.tags.slice(0,2).map((tag,index)=><TagBadge key={index} tag={tag}/>)}</div>:null}</td>
           <td className="staff-record-course" data-label="课程">{assignment.course?.title || '未知课程'}</td>
           <td data-label="截止时间">{formatDeadline(assignment.deadline)}</td>
           <td data-label="提交"><button type="button" className="staff-text-action" onClick={()=>openSubmissionsModal(assignment)}>{assignment._count?.submissions || 0} 份提交</button></td>
           <td data-label="题目">{(assignment as Assignment & {summary?:boolean}).summary ? '打开后查看' : assignment.questions?.length || 0}</td>
-          <td><div className="staff-table-actions"><ProductButton onClick={()=>openSubmissionsModal(assignment)}>查看提交</ProductButton><MoreActions label={`${assignment.title} 的更多操作`}><button type="button" onClick={()=>void handleExport(assignment)}>导出提交</button><button type="button" onClick={()=>void handleClone(assignment)}>复制作业</button><button type="button" onClick={()=>openEditModal(assignment)}>编辑作业</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(assignment)}>删除作业</button></MoreActions></div></td>
+          <td><div className="staff-table-actions"><ProductButton onClick={()=>openSubmissionsModal(assignment)}>查看提交</ProductButton><MoreActions label={`${assignment.title} 的更多操作`}><button type="button" onClick={()=>void handleExport(assignment)}>导出提交</button><button type="button" onClick={()=>void handleClone(assignment)}>复制练习</button><button type="button" onClick={()=>openEditModal(assignment)}>编辑练习</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(assignment)}>删除练习</button></MoreActions></div></td>
         </tr>)}
       </tbody></table></div>}
-      {!focusId && <CatalogPagination selection={catalog.selection} onApply={catalog.apply} total={total} loading={loading} label="作业"/>}
+      {!focusId && <CatalogPagination selection={catalog.selection} onApply={catalog.apply} total={total} loading={loading} label="练习"/>}
       {/* Create/Edit Modal */}
       {showModal && (
         <ModalSurface open onClose={editorGuard.close} className="staff-modal-backdrop">
-          <form onSubmit={editingAssignment ? handleUpdate : handleCreate} className="staff-dialog staff-dialog--wide" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="assignment-editor-title" aria-busy={editorGuard.busy}>
+          <form onSubmit={editingAssignment ? handleUpdate : handleCreate} className="staff-dialog staff-dialog--wide training-task-editor" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="assignment-editor-title" aria-busy={editorGuard.busy}>
+            <TrainingCourseEditorTabs courseId={formData.courseId} leave={editorGuard.leave} />
             {editorGuard.error}<fieldset disabled={editorGuard.busy} className="contents">
             <div className="staff-dialog__header">
               <div>
-                <h2 id="assignment-editor-title">{editingAssignment ? '编辑作业' : '布置作业'}</h2>
-                <p className="staff-dialog__description">设置课程、截止时间、作业内容与附件。</p>
+                <h2 id="assignment-editor-title">{editingAssignment ? '编辑练习' : isTrainingHost() ? '发布练习' : '布置练习'}</h2>
+                <p className="staff-dialog__description">编写任务内容，按需添加题目和资料，再确认发布设置。</p>
               </div>
             </div>
             
-            <div {...(editorGuard.busy ? { inert: '' } : {})} className="staff-dialog__body staff-form">
-              {/* Course Selection */}
-              <div>
-                <label htmlFor="AssignmentList-field-101" className="label">选择课程 *</label>
-                <select id="AssignmentList-field-101"
-                  value={formData.courseId}
-                  onChange={(e) => setFormData({ ...formData, courseId: e.target.value })}
-                  className="input w-full"
-                  required
-                  disabled={!!editingAssignment}
-                >
-                  <option value="">请选择课程</option>
-                  {editingAssignment?.course && !courses.some(course => course.id === editingAssignment.courseId) && <option value={editingAssignment.courseId}>{editingAssignment.course.title}</option>}
-                  {courses.map((course) => (
-                    <option key={course.id} value={course.id}>
-                      {course.title} (课程码: {course.courseCode})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+            <div {...(editorGuard.busy ? { inert: '' } : {})} className="staff-dialog__body staff-form training-task-editor__body">
+              <div className="training-task-editor__layout">
+                <div className="training-task-editor__main">
+                  <section className="training-task-editor__section" aria-label="练习内容编辑">
+                    <header className="training-task-editor__section-heading"><h3>编辑内容</h3><span>标题与任务说明</span></header>
               {/* Title */}
               <div>
-                <label htmlFor="AssignmentList-field-102" className="label">作业标题 *</label>
+                <label htmlFor="AssignmentList-field-102" className="label">练习标题 *</label>
                 <input id="AssignmentList-field-102"
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="input w-full"
-                  placeholder="请输入作业标题"
+                  placeholder="请输入练习标题"
                   required
                 />
               </div>
 
               {/* Rich Text Content */}
               <div>
-                <label className="label">作业内容</label>
+                <label className="label">练习内容</label>
                 <RichTextEditor
                   value={formData.content}
                   onChange={(content) => setFormData({ ...formData, content })}
-                  placeholder="请输入作业内容..."
-                  height="150px"
+                  placeholder="请输入练习内容..."
+                  height={isTrainingHost() ? "210px" : "150px"}
                 />
               </div>
 
-              {/* Deadline */}
+                  </section>
+              <section className="training-task-editor__section" aria-label="练习题目设置">
+                <header className="training-task-editor__section-heading"><h3>题目设置</h3><span>{formData.questions.length} 道题</span></header>
+              {/* Questions */}
               <div>
-                <label htmlFor="AssignmentList-field-103" className="label">截止时间</label>
-                <input id="AssignmentList-field-103"
-                  type="datetime-local"
-                  value={formData.deadline}
-                  onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
-                  className="input w-full"
+                <QuestionEditor
+                  questions={formData.questions}
+                  onChange={(questions) => setFormData({ ...formData, questions })}
                 />
               </div>
 
-              <p className="staff-help">截止时间按当前设备时区输入：{localTimeZoneLabel()}。</p>
-
-              {/* Tags */}
-              <div>
-                <label className="label">标签</label>
-                <TagInput
-                  value={formData.tags}
-                  onChange={(tags) => setFormData({ ...formData, tags })}
-                  placeholder="输入标签后按回车添加"
-                />
-              </div>
-
+              </section>
+                  <section className="training-task-editor__section" aria-label="练习附件资料">
+                    <header className="training-task-editor__section-heading"><h3>附件与资料</h3><span>选填</span></header>
+                    <div className="training-task-editor__attachments">
               {/* Videos */}
               <div>
                 <div className="flex items-center justify-between mb-2">
@@ -783,18 +776,59 @@ const AssignmentListContent: React.FC = () => {
                 )}
               </div>
 
-              {/* Questions */}
+                    </div>
+                  </section>
+                </div>
+                <aside className="training-task-editor__settings" aria-label="练习发布设置">
+                  <header className="training-task-editor__section-heading"><h3>发布设置</h3></header>
+              {/* Course Selection */}
               <div>
-                <label className="label">题目设置</label>
-                <QuestionEditor
-                  questions={formData.questions}
-                  onChange={(questions) => setFormData({ ...formData, questions })}
+                <label htmlFor="AssignmentList-field-101" className="label">选择课程 *</label>
+                <select id="AssignmentList-field-101"
+                  value={formData.courseId}
+                  onChange={(e) => setFormData({ ...formData, courseId: e.target.value })}
+                  className="input w-full"
+                  required
+                  disabled={!!editingAssignment}
+                >
+                  <option value="">请选择课程</option>
+                  {editingAssignment?.course && !courses.some(course => course.id === editingAssignment.courseId) && <option value={editingAssignment.courseId}>{editingAssignment.course.title}</option>}
+                  {courses.map((course) => (
+                    <option key={course.id} value={course.id}>
+                      {course.title}{!isTrainingHost() && ` (课程码: ${course.courseCode})`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Deadline */}
+              <div>
+                <label htmlFor="AssignmentList-field-103" className="label">截止时间</label>
+                <input id="AssignmentList-field-103"
+                  type="datetime-local"
+                  value={formData.deadline}
+                  onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+                  className="input w-full"
                 />
               </div>
 
+              <p className="staff-help">截止时间按当前设备时区输入：{localTimeZoneLabel()}。</p>
+
+              {/* Tags */}
+              <div>
+                <label className="label">标签</label>
+                <TagInput
+                  value={formData.tags}
+                  onChange={(tags) => setFormData({ ...formData, tags })}
+                  placeholder="输入标签后按回车添加"
+                />
+              </div>
+
+                </aside>
+              </div>
               {/* Actions */}
             </div>
-            <div className="staff-dialog__actions">
+            <div className="staff-dialog__actions"><span className="training-task-editor__footer-note">{editingAssignment ? '编辑完成后保存修改。' : '发布后，课程学员即可查看。'}</span>
               <ProductButton
                 type="button"
                 onClick={editorGuard.close}
@@ -802,13 +836,20 @@ const AssignmentListContent: React.FC = () => {
                 取消
               </ProductButton>
               <ProductButton type="submit" variant="primary">
-                {editorGuard.busy ? '保存中...' : editingAssignment ? '保存修改' : '创建作业'}
+                {editorGuard.busy ? '保存中...' : editingAssignment ? '保存修改' : isTrainingHost() ? '发布练习' : '创建练习'}
               </ProductButton>
             </div>
             </fieldset>
           </form>
         </ModalSurface>
       )}
+
+      {canReuse && showReuse && <TrainingTaskReusePicker kind="assignments" courses={courses} initialCourseId={requestedCourseId} onClose={() => setShowReuse(false)} onSelect={(source, targetCourseId) => {
+        setEditingAssignment(null)
+        setFormData(assignmentReuseContent(source as Assignment, targetCourseId) as AssignmentFormData)
+        setShowReuse(false)
+        setShowModal(true)
+      }} />}
 
       {/* Media Selector */}
       <MediaSelector
@@ -824,13 +865,13 @@ const AssignmentListContent: React.FC = () => {
           <div className="staff-dialog staff-dialog--wide" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="assignment-submissions-title">
             <div className="staff-dialog__header">
               <div>
-                <h2 id="assignment-submissions-title">作业提交列表</h2>
+                <h2 id="assignment-submissions-title">练习提交列表</h2>
                 <p className="staff-dialog__description">{selectedAssignment.title}</p>
               </div>
               <button
                 onClick={closeSubmissions}
                 className="staff-icon-button"
-                aria-label="关闭作业提交列表"
+                aria-label="关闭练习提交列表"
               >
                 <X className="w-5 h-5" aria-hidden="true" />
               </button>
@@ -947,7 +988,7 @@ const AssignmentListContent: React.FC = () => {
             <div className="staff-dialog__header">
               <div>
                 <h2 id="batch-grade-title">一键批量批复</h2>
-                <p className="staff-dialog__description">已选择 {selectedSubmissions.size} 份待批改作业</p>
+                <p className="staff-dialog__description">已选择 {selectedSubmissions.size} 份待批改练习</p>
               </div>
             </div>
             
@@ -955,7 +996,7 @@ const AssignmentListContent: React.FC = () => {
               {/* Select All */}
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
                 <span className="text-sm font-medium text-gray-700">
-                  待批改作业 ({submissions.filter(s => s.status !== 'GRADED').length})
+                  待批改练习 ({submissions.filter(s => s.status !== 'GRADED').length})
                 </span>
                 <button
                   onClick={toggleSelectAll}
@@ -1010,7 +1051,7 @@ const AssignmentListContent: React.FC = () => {
                   placeholder="请输入评语..."
                 />
                 <p className="text-xs text-gray-500 mt-1">
-                  默认评语：你的作业质量很棒，再接再厉！
+                  默认评语：你的练习质量很棒，再接再厉！
                 </p>
               </div>
 

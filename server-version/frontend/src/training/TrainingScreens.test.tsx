@@ -59,22 +59,22 @@ describe('training presentation and course-first entry', () => {
     expect(screen.queryByText('库课程')).toBeNull()
   })
 
-  it('loads later trainer course pages instead of silently truncating at 20 or 100', async () => {
-    const first = Array.from({ length: 100 }, (_, index) => ({
+  it('paginates trainer courses without appending the previous page', async () => {
+    const first = Array.from({ length: 2 }, (_, index) => ({
       ...course, id: 'owned-' + index, title: '课程' + (index + 1),
     }))
     get.mockImplementation((url: string) => Promise.resolve({
-      code: 0, data: url === '/courses?status=all&page=1&pageSize=100'
-        ? { list: first, total: 101 }
-        : url === '/courses?status=all&page=2&pageSize=100'
-          ? { list: [{ ...course, id: 'last-course', title: '第101门课程' }], total: 101 }
+      code: 0, data: url === '/courses?status=all&page=1&pageSize=2&excludeLibrary=true'
+        ? { list: first, total: 3 }
+        : url === '/courses?status=all&page=2&pageSize=2&excludeLibrary=true'
+          ? { list: [{ ...course, id: 'last-course', title: '第3门课程' }], total: 3 }
           : { list: [], total: 0 },
     }))
     render(<MemoryRouter><TrainingTrainerHome /></MemoryRouter>)
-    const more = await screen.findByRole('button', { name: '加载更多课程' })
-    fireEvent.click(more)
-    expect(await screen.findByRole('link', { name: /第101门课程/ })).toHaveAttribute('href', '/courses/last-course/detail')
-    expect(get).toHaveBeenCalledWith('/courses?status=all&page=2&pageSize=100')
+    fireEvent.click(await screen.findByRole('button', { name: '下一页' }))
+    expect(await screen.findByRole('link', { name: '第3门课程' })).toHaveAttribute('href', '/courses/last-course/detail')
+    expect(screen.queryByRole('link', { name: '课程1' })).toBeNull()
+    expect(get).toHaveBeenCalledWith('/courses?status=all&page=2&pageSize=2&excludeLibrary=true')
   })
 
   it('a learner can join an existing course through the original API', async () => {

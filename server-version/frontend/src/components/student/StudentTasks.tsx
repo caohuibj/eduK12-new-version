@@ -15,7 +15,7 @@ export interface TaskPage {
   total: number
   generatedAt: string
 }
-const kindLabels = { ASSIGNMENT: '作业', CHECKIN: '打卡', QUESTIONNAIRE: '问卷', COMPOSITE: '组合测评' }
+const kindLabels = { ASSIGNMENT: '练习', CHECKIN: '打卡', QUESTIONNAIRE: '问卷', COMPOSITE: '组合测评' }
 
 export default function StudentTasks({ refreshKey = 0 }: { refreshKey?: number }) {
   const [state, setState] = useState<State | 'ACTIONABLE' | ''>('ACTIONABLE')

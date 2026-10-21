@@ -61,7 +61,7 @@ const StudentHome: React.FC = () => {
     <ProductPage width="management" className="hui-student-page hui-student-home">
       <PageHeader
         title="我的课程"
-        description={`欢迎回来，${user?.nickname || user?.username || '同学'}。从课程进入作业、打卡、问卷和综合测评。`}
+        description={`欢迎回来，${user?.nickname || user?.username || '同学'}。从课程进入练习、打卡、问卷和综合测评。`}
         actions={(
           <div className="flex flex-wrap gap-2">
             {cognitiveModuleEnabled ? (

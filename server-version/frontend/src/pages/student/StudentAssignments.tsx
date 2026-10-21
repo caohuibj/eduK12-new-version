@@ -18,11 +18,11 @@ const StudentAssignments: React.FC = () => {
       setLoading(true)
       setError(null)
       const response = await apiClient.get('/assignments/my')
-      if (response.code !== 0) throw new Error(response.message || '获取作业列表失败')
+      if (response.code !== 0) throw new Error(response.message || '获取练习列表失败')
       setAssignments(response.data.list)
     } catch (reason) {
-      console.error('获取作业列表失败:', reason)
-      setError(reason instanceof Error ? reason.message : '获取作业列表失败')
+      console.error('获取练习列表失败:', reason)
+      setError(reason instanceof Error ? reason.message : '获取练习列表失败')
     } finally {
       setLoading(false)
     }
@@ -49,14 +49,14 @@ const StudentAssignments: React.FC = () => {
 
   return (
     <ProductPage width="assessment" className="hui-student-page hui-student-tasks">
-      <PageHeader title="我的作业" description="查看课程作业状态，并打开对应提交记录。" />
+      <PageHeader title="我的练习" description="查看课程练习状态，并打开对应提交记录。" />
 
       {loading ? (
-        <ProductStatus kind="pending" title="正在加载作业" announce="polite" />
+        <ProductStatus kind="pending" title="正在加载练习" announce="polite" />
       ) : error ? (
-        <ProductStatus kind="error" title="作业列表加载失败" announce="assertive">{error}</ProductStatus>
+        <ProductStatus kind="error" title="练习列表加载失败" announce="assertive">{error}</ProductStatus>
       ) : assignments.length === 0 ? (
-        <ProductStatus kind="info" title="暂无作业">你还没有需要完成的作业。</ProductStatus>
+        <ProductStatus kind="info" title="暂无练习">你还没有需要完成的练习。</ProductStatus>
       ) : (
         <div className="grid gap-4">
           {assignments.map((assignment) => {
@@ -67,7 +67,7 @@ const StudentAssignments: React.FC = () => {
                 key={assignment.id}
                 to={`/student/assignments/${assignment.id}`}
                 title={assignment.title}
-                ariaLabel={`${assignment.title}，${assignment.submitted ? '查看已提交作业' : '打开作业'}`}
+                ariaLabel={`${assignment.title}，${assignment.submitted ? '查看已提交练习' : '打开练习'}`}
                 leading={<span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-100 text-slate-700"><ClipboardList className="h-5 w-5" /></span>}
                 status={<span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-semibold ${status.className}`}><StatusIcon className="h-3.5 w-3.5" />{status.label}</span>}
                 description={assignment.description}

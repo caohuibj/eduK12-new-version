@@ -17,6 +17,7 @@ export function useEditorGuard({ open, value, onClose, externalBusy = false }: {
   const [busy, setBusy] = useState(false)
   const [confirming, setConfirming] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const leaveAction = useRef(onClose)
   useLayoutEffect(() => {
     if (open && !wasOpen.current) baseline.current = serialized
     wasOpen.current = open
@@ -33,11 +34,13 @@ export function useEditorGuard({ open, value, onClose, externalBusy = false }: {
     window.addEventListener('beforeunload', warn)
     return () => window.removeEventListener('beforeunload', warn)
   }, [open, dirty, busy, externalBusy])
-  const close = () => {
+  const leave = (action: () => void) => {
     if (pending.current || externalBusy) return
+    leaveAction.current = action
     if (baseline.current !== serialized) setConfirming(true)
-    else onClose()
+    else action()
   }
+  const close = () => leave(onClose)
   const begin = () => {
     if (pending.current || externalBusy || confirming) return false
     pending.current = true
@@ -50,10 +53,10 @@ export function useEditorGuard({ open, value, onClose, externalBusy = false }: {
     if (alive.current) setBusy(false)
   }
   const confirmation = <ManagementDialog open={open && confirming} title="放弃未保存的修改？" description="退出后，本次修改将不会保存。" onClose={() => setConfirming(false)} width="compact"
-    actions={<><ProductButton onClick={() => setConfirming(false)}>继续编辑</ProductButton><ProductButton variant="danger" onClick={() => { setConfirming(false); onClose() }}>放弃修改</ProductButton></>}>
-    <p>你可以继续编辑并保存，或放弃本次修改。</p>
+    actions={<><ProductButton onClick={() => setConfirming(false)}>继续编辑</ProductButton><ProductButton variant="danger" onClick={() => { if (pending.current || externalBusy) return; setConfirming(false); leaveAction.current() }}>放弃修改</ProductButton></>}>
+      <p>你可以继续编辑并保存，或放弃本次修改。</p>
   </ManagementDialog>
   const fail = (message: string) => { if (alive.current) setErrorMessage(message) }
   const error = errorMessage ? <div role="alert" className="mx-4 my-3 rounded-lg border border-red-200 bg-red-50 p-3 text-sm text-red-700">{errorMessage}</div> : null
-  return { dirty, busy: busy || externalBusy, close, begin, finish, fail, error, confirmation }
+  return { dirty, busy: busy || externalBusy, close, leave, begin, finish, fail, error, confirmation }
 }

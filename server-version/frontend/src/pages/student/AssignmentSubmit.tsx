@@ -93,7 +93,7 @@ const AssignmentSubmit: React.FC = () => {
         }
       }
     } catch (error) {
-      console.error('获取作业详情失败:', error)
+      console.error('获取练习详情失败:', error)
     } finally {
       setLoading(false)
     }
@@ -212,7 +212,7 @@ const AssignmentSubmit: React.FC = () => {
   if (loading) {
     return (
       <ProductPage width="reading" className="hui-student-page hui-student-submission">
-        <ProductStatus kind="pending" title="正在加载作业">正在读取作业内容与已有提交。</ProductStatus>
+        <ProductStatus kind="pending" title="正在加载练习">正在读取练习内容与已有提交。</ProductStatus>
       </ProductPage>
     )
   }
@@ -222,10 +222,10 @@ const AssignmentSubmit: React.FC = () => {
       <ProductPage width="reading" className="hui-student-page hui-student-submission">
         <ProductStatus
           kind="warning"
-          title="作业不存在"
+          title="练习不存在"
           actions={<ProductButton variant="primary" onClick={() => navigate('/student')}>返回学生首页</ProductButton>}
         >
-          当前作业可能已被移除，或您没有访问权限。
+          当前练习可能已被移除，或您没有访问权限。
         </ProductStatus>
       </ProductPage>
     )
@@ -243,10 +243,10 @@ const AssignmentSubmit: React.FC = () => {
 
       <PageHeader
         title={assignment.title}
-        description={assignment.description || '查看作业要求并完成本次提交。'}
+        description={assignment.description || '查看练习要求并完成本次提交。'}
       />
 
-      <section className="student-submit-info" aria-label="作业说明">
+      <section className="student-submit-info" aria-label="练习说明">
         {assignment.content && (
           <div
             className="student-submit-richtext prose prose-sm max-w-none"
@@ -312,7 +312,7 @@ const AssignmentSubmit: React.FC = () => {
       <section className="card student-submit-panel">
         <h3 className="text-lg font-semibold text-gray-800 mb-4 flex items-center">
           <FileText className="w-5 h-5 mr-2" />
-          {hasSubmitted && !isEditing ? '我的提交' : (isOverdue ? '作业已截止' : '提交作业')}
+          {hasSubmitted && !isEditing ? '我的提交' : (isOverdue ? '练习已截止' : '提交练习')}
         </h3>
 
         {hasSubmitted && !isEditing ? (
@@ -343,13 +343,13 @@ const AssignmentSubmit: React.FC = () => {
                 onClick={() => { setFormError(''); setIsEditing(true) }}
                 className="w-full btn-secondary flex items-center justify-center space-x-2"
               >
-                <span>修改作业</span>
+                <span>修改练习</span>
               </button>
             )}
           </div>
         ) : isOverdue ? (
           <div className="text-center py-8">
-            <p className="text-red-500">作业已截止，无法提交</p>
+            <p className="text-red-500">练习已截止，无法提交</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} noValidate className="space-y-4">
@@ -456,7 +456,7 @@ const AssignmentSubmit: React.FC = () => {
                   <span>{submission ? '保存中...' : '提交中...'}</span>
                 </>
               ) : (
-                <span>{submission ? '保存修改' : '提交作业'}</span>
+                <span>{submission ? '保存修改' : '提交练习'}</span>
               )}
             </button>
             {isEditing && (

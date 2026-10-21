@@ -12,7 +12,8 @@ beforeEach(()=>{vi.clearAllMocks();m.attempts.mockResolvedValue({code:0,data:{co
 it('unifies drafts, configuration and scoped results without reading participant data on mount',async()=>{
  render(<MemoryRouter><TrainingCourseAssessments {...props()}/></MemoryRouter>)
  expect(screen.getByRole('link',{name:'继续编制'})).toHaveAttribute('href','/questionnaire-products/draft?courseId=course-a&returnTo=%2F')
- expect(screen.getByRole('link',{name:'从已有测评复用'})).toHaveAttribute('href','/questionnaires')
+ expect(screen.getByRole('link',{name:'复用测评'})).toHaveAttribute('href','/questionnaires?courseId=course-a&returnTo=%2F')
+ expect(screen.getByRole('link',{name:'发布测评'})).toHaveAttribute('href','/questionnaire-products/new?courseId=course-a&returnTo=%2F')
  expect(m.attempts).not.toHaveBeenCalled();expect(m.exportData).not.toHaveBeenCalled()
  fireEvent.click(screen.getByRole('button',{name:'作答与结果'}))
  expect(await screen.findByRole('link',{name:'打开本课程作答名单与报告'})).toHaveAttribute('href','/composite-assessments/assessment/results?courseId=course-a&returnTo=%2F')

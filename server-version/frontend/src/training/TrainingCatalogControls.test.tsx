@@ -7,11 +7,11 @@ import {expect,it,vi} from 'vitest'
 import { CatalogFilters, CatalogPagination } from './TrainingCatalogControls'
 import { useCatalogQuery } from './useCatalogQuery'
 import TrainingWorkspaceNav from './TrainingWorkspaceNav'
-function Surface(){const c=useCatalogQuery('assignments_');const location=useLocation();return <><CatalogFilters key={c.stateKey} selection={c.selection} onApply={c.apply} deadline label="作业"/><CatalogPagination selection={c.selection} onApply={c.apply} loading={false} total={42} label="作业"/><pre data-testid="query">{location.search}</pre><code>{c.params}</code></>}
+function Surface(){const c=useCatalogQuery('assignments_');const location=useLocation();return <><CatalogFilters key={c.stateKey} selection={c.selection} onApply={c.apply} deadline label="练习"/><CatalogPagination selection={c.selection} onApply={c.apply} loading={false} total={42} label="练习"/><pre data-testid="query">{location.search}</pre><code>{c.params}</code></>}
 it('applies server filters only on submit, resets paging and preserves course-section query',async()=>{
  render(<MemoryRouter initialEntries={['/courses/c/detail?section=assignments&assignments_page=2']}><Surface/></MemoryRouter>)
  fireEvent.click(screen.getByText('检索与筛选'))
- fireEvent.change(screen.getByRole('searchbox',{name:'搜索作业'}),{target:{value:'第二期'}})
+ fireEvent.change(screen.getByRole('searchbox',{name:'搜索练习'}),{target:{value:'第二期'}})
  expect(screen.getByRole('status')).toHaveTextContent('第 2 / 3 页')
  expect(screen.getByText(/section=assignments/,{selector:'pre'})).not.toHaveTextContent('第二期')
  fireEvent.click(screen.getByRole('button',{name:'查询'}))

@@ -1,0 +1,89 @@
+name: Training workspace bounded checks
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  CI_EVENT: pull_request
+  TZ: UTC
+  NODE_OPTIONS: --max-old-space-size=3072
+jobs:
+  component:
+    name: ${{ matrix.component }} affected contracts
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [frontend, backend]
+    env:
+      PLAN: ${{ inputs.plan }}
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      DATABASE_URL: postgresql://synthetic:synthetic@127.0.0.1:1/synthetic
+      JWT_SECRET: synthetic-ci-secret-not-a-real-credential
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify frozen diff and plan on the actual checkout
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {execFileSync} from 'node:child_process';
+          import {binding,trainingWorkspacePlan} from './.github/scripts/training-workspace-scope.mjs';
+          import {changedEntries} from './.github/scripts/content-scope.mjs';
+          const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+          assert.deepEqual(JSON.parse(process.env.PLAN),trainingWorkspacePlan(changedEntries(binding.base,head),binding.base,head));
+          JS
+      - name: admit original passed stages on exact unchanged inputs
+        id: reuse
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/training-workspace-reuse.mjs ${{ matrix.component }}
+      - name: install locked component dependencies from official registry
+        if: steps.reuse.outputs.reused != 'true'
+        working-directory: server-version/${{ matrix.component }}
+        run: npm ci
+      - name: affected types, lint and non-empty regression contracts
+        if: steps.reuse.outputs.reused != 'true'
+        run: node .github/scripts/training-workspace-checks.mjs ${{ matrix.component }}
+      - name: audit locked component dependencies
+        if: steps.reuse.outputs.reused != 'true'
+        working-directory: server-version/${{ matrix.component }}
+        run: npm audit --audit-level=high
+      - name: compile changed frontend once
+        if: matrix.component == 'frontend' && steps.reuse.outputs.build_reused != 'true'
+        working-directory: server-version/frontend
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        if: matrix.component == 'frontend' && steps.reuse.outputs.build_reused != 'true'
+        with:
+          name: training-workspace-frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+          retention-days: 3
+          if-no-files-found: error
+      - name: install pinned browser tools
+        if: matrix.component == 'frontend'
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+      - name: rendered affected Training journeys
+        if: matrix.component == 'frontend'
+        run: node .github/scripts/training-workspace-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: training-workspace-${{ matrix.component }}-${{ github.sha }}
+          path: training-workspace-evidence
+          retention-days: 3
+          if-no-files-found: error

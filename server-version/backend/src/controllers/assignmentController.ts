@@ -31,7 +31,7 @@ const attachmentsSchema = z.array(attachmentSchema).max(100)
 
 const createAssignmentSchema = z.object({
   courseId: z.string().min(1, '课程ID不能为空'),
-  title: z.string().min(1, '作业标题不能为空'),
+  title: z.string().min(1, '练习标题不能为空'),
   description: z.string().optional(),
   deadline: z.string().optional(), // 接受任何字符串格式，后端再转换
   questions: z.array(z.any()).optional(),
@@ -160,13 +160,13 @@ const gradeSchema = z.object({
 })
 
 export const assignmentController = {
-  // 获取作业列表（添加分页优化）
+  // 获取练习列表（添加分页优化）
   async list(req: Request, res: Response) {
     try {
       if (req.query.view === 'summary') return await managementTaskList(req, res, 'assignment')
       const userId = req.user?.userId
       const userRole = req.user?.role
-      if (!canReadLegacyContent(userRole)) return forbidden(res, '当前角色不能访问旧作业列表')
+      if (!canReadLegacyContent(userRole)) return forbidden(res, '当前角色不能访问旧练习列表')
       const { courseId, tags } = req.query
       const pagination = getPaginationParams(req)
 
@@ -184,7 +184,7 @@ export const assignmentController = {
         }
       }
 
-      // 学生只能看到自己已加入课程中的已发布作业
+      // 学生只能看到自己已加入课程中的已发布练习
       if (userRole === UserRole.STUDENT) {
         where.status = AssignmentStatus.PUBLISHED
         where.course = {
@@ -197,7 +197,7 @@ export const assignmentController = {
         }
       }
 
-      // 教师只能看到自己课程的作业，管理员可以看到所有
+      // 教师只能看到自己课程的练习，管理员可以看到所有
       if (userRole === UserRole.TEACHER) {
         // 获取教师的所有课程ID
         const teacherCourses = await prisma.course.findMany({
@@ -212,7 +212,7 @@ export const assignmentController = {
             return success(res, buildPaginatedResult([], 0, pagination))
           }
         } else {
-          // 未指定courseId，只看自己课程的作业
+          // 未指定courseId，只看自己课程的练习
           where.courseId = { in: courseIds }
         }
       }
@@ -278,12 +278,12 @@ export const assignmentController = {
       )
       return success(res, buildPaginatedResult(hydratedAssignments, total, pagination))
     } catch (err) {
-      logger.error('获取作业列表错误', err)
+      logger.error('获取练习列表错误', err)
       return error(res, Messages.COMMON.FAILED)
     }
   },
 
-  // 创建作业
+  // 创建练习
   async create(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
@@ -310,7 +310,7 @@ export const assignmentController = {
 
       // 检查权限
       if (course.creatorId !== userId && req.user?.role !== UserRole.ADMIN) {
-        return forbidden(res, '无权限在此课程创建作业')
+        return forbidden(res, '无权限在此课程创建练习')
       }
 
       let deadlineDate: Date | null = null
@@ -372,17 +372,17 @@ export const assignmentController = {
         entityId: assignment.id,
         courseId,
         parentAccess: true,
-      }), '作业创建成功')
+      }), '练习创建成功')
     } catch (err) {
       if (err instanceof AssetReferenceValidationError) {
         return error(res, err.message)
       }
-      logger.error('创建作业错误', err)
+      logger.error('创建练习错误', err)
       return error(res, Messages.COMMON.FAILED)
     }
   },
 
-  // 获取作业详情
+  // 获取练习详情
   async detail(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
@@ -422,19 +422,19 @@ export const assignmentController = {
       })
 
       if (!assignment || (req.query.courseId !== undefined && req.query.courseId !== assignment.courseId)) {
-        return notFound(res, '作业不存在')
+        return notFound(res, '练习不存在')
       }
 
       if (userRole === UserRole.STUDENT) {
         if (!userId || !(await hasActiveCourseMembership(assignment.course.id, userId))) {
           return forbidden(res, '您不是该课程的学员')
         }
-        // 学生只能看到已发布的作业
+        // 学生只能看到已发布的练习
         if (assignment.status !== AssignmentStatus.PUBLISHED) {
-          return forbidden(res, '无权限查看此作业')
+          return forbidden(res, '无权限查看此练习')
         }
       } else if (!canAccessCourseContent(assignment.course, userId, userRole)) {
-        return forbidden(res, '您没有权限访问此作业')
+        return forbidden(res, '您没有权限访问此练习')
       }
 
       // 查询学生的提交
@@ -463,12 +463,12 @@ export const assignmentController = {
         parentAccess: true,
       }))
     } catch (err) {
-      logger.error('获取作业详情错误', err)
+      logger.error('获取练习详情错误', err)
       return error(res, Messages.COMMON.FAILED)
     }
   },
 
-  // 更新作业
+  // 更新练习
   async update(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
@@ -487,12 +487,12 @@ export const assignmentController = {
       })
 
       if (!assignment) {
-        return notFound(res, '作业不存在')
+        return notFound(res, '练习不存在')
       }
 
       // 权限检查
       if (assignment.course.creatorId !== userId && userRole !== UserRole.ADMIN) {
-        return forbidden(res, '无权限修改此作业')
+        return forbidden(res, '无权限修改此练习')
       }
 
       const result = updateAssignmentSchema.safeParse(req.body)
@@ -549,17 +549,17 @@ export const assignmentController = {
         entityId: id,
         courseId: assignment.courseId,
         parentAccess: true,
-      }), '作业更新成功')
+      }), '练习更新成功')
     } catch (err) {
       if (err instanceof AssetReferenceValidationError) {
         return error(res, err.message)
       }
-      logger.error('更新作业错误', err)
+      logger.error('更新练习错误', err)
       return error(res, Messages.COMMON.FAILED)
     }
   },
 
-  // 删除作业
+  // 删除练习
   async delete(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
@@ -578,12 +578,12 @@ export const assignmentController = {
       })
 
       if (!assignment) {
-        return notFound(res, '作业不存在')
+        return notFound(res, '练习不存在')
       }
 
       // 权限检查
       if (assignment.course.creatorId !== userId && userRole !== UserRole.ADMIN) {
-        return forbidden(res, '无权限删除此作业')
+        return forbidden(res, '无权限删除此练习')
       }
 
       await prisma.$transaction(async (tx) => {
@@ -593,14 +593,14 @@ export const assignmentController = {
         await tx.assignment.delete({ where: { id } })
       })
 
-      return success(res, null, '作业已删除')
+      return success(res, null, '练习已删除')
     } catch (err) {
-      logger.error('删除作业错误', err)
-      return error(res, '删除作业失败')
+      logger.error('删除练习错误', err)
+      return error(res, '删除练习失败')
     }
   },
 
-  // 提交作业
+  // 提交练习
   async submit(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
@@ -627,13 +627,13 @@ export const assignmentController = {
         ? hashIdempotencyPayload(assignmentSubmissionPayload({ content, answers: normalizedAnswers }))
         : undefined
 
-      // 检查作业是否存在
+      // 检查练习是否存在
       const assignment = await prisma.assignment.findUnique({
         where: { id }
       })
 
       if (!assignment) {
-        return notFound(res, '作业不存在')
+        return notFound(res, '练习不存在')
       }
 
       if (req.user?.role !== UserRole.STUDENT || !(await hasActiveCourseMembership(assignment.courseId, userId))) {
@@ -654,7 +654,7 @@ export const assignmentController = {
           if (committedReceipt.idempotencyPayloadHash !== idempotencyPayloadHash) {
             return error(res, 'Idempotency-Key 已用于其他提交内容', -1, 409)
           }
-          return success(res, committedReceipt.response, '作业提交成功')
+          return success(res, committedReceipt.response, '练习提交成功')
         }
 
         const committedRetry = await prisma.submission.findFirst({
@@ -666,12 +666,12 @@ export const assignmentController = {
           if (committedPayloadHash !== idempotencyPayloadHash) {
             return error(res, 'Idempotency-Key 已用于其他提交内容', -1, 409)
           }
-          return success(res, committedRetry, '作业提交成功')
+          return success(res, committedRetry, '练习提交成功')
         }
       }
 
       if (assignment.status !== AssignmentStatus.PUBLISHED) {
-        return error(res, '作业未发布')
+        return error(res, '练习未发布')
       }
 
       if (assignment.deadline && new Date() > assignment.deadline) {
@@ -819,10 +819,10 @@ export const assignmentController = {
       })
 
       const message = submissionResult.replayed
-        ? '作业提交成功'
+        ? '练习提交成功'
         : submissionResult.wasExisting
-          ? '作业更新成功'
-          : '作业提交成功'
+          ? '练习更新成功'
+          : '练习提交成功'
       return success(res, submissionResult.submission, message)
     } catch (err) {
       if (err instanceof IdempotencyPayloadMismatchError) {
@@ -831,11 +831,11 @@ export const assignmentController = {
       if (err instanceof SubmissionRevisionConflictError) {
         return error(res, err.message, -1, 409)
       }
-      logger.error('提交作业错误', err)
+      logger.error('提交练习错误', err)
       // An unknown failure may occur after the database write is committed
       // (for example while constructing the response). Mark it as a 5xx so
       // clients retain the idempotency key and safely retry the same payload.
-      return error(res, '提交作业失败', -1, 500)
+      return error(res, '提交练习失败', -1, 500)
     }
   },
 
@@ -858,7 +858,7 @@ export const assignmentController = {
       })
 
       if (!assignment) {
-        return notFound(res, '作业不存在')
+        return notFound(res, '练习不存在')
       }
 
       // 权限检查
@@ -893,7 +893,7 @@ export const assignmentController = {
     }
   },
 
-  // 批改作业
+  // 批改练习
   async grade(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
@@ -907,7 +907,7 @@ export const assignmentController = {
 
       const { comment } = result.data
 
-      // 检查作业和提交
+      // 检查练习和提交
       const assignment = await prisma.assignment.findUnique({
         where: { id },
         include: {
@@ -920,12 +920,12 @@ export const assignmentController = {
       })
 
       if (!assignment) {
-        return notFound(res, '作业不存在')
+        return notFound(res, '练习不存在')
       }
 
       // 权限检查
       if (assignment.course.creatorId !== userId && userRole !== UserRole.ADMIN) {
-        return forbidden(res, '无权限批改此作业')
+        return forbidden(res, '无权限批改此练习')
       }
 
       const submission = await prisma.submission.findFirst({
@@ -950,7 +950,7 @@ export const assignmentController = {
 
       return success(res, updated, '批改成功')
     } catch (err) {
-      logger.error('批改作业错误', err)
+      logger.error('批改练习错误', err)
       return error(res, '批改失败')
     }
   },
@@ -967,7 +967,7 @@ export const assignmentController = {
         return error(res, '评语不能为空')
       }
 
-      // 检查作业
+      // 检查练习
       const assignment = await prisma.assignment.findUnique({
         where: { id },
         include: {
@@ -980,12 +980,12 @@ export const assignmentController = {
       })
 
       if (!assignment) {
-        return notFound(res, '作业不存在')
+        return notFound(res, '练习不存在')
       }
 
       // 权限检查
       if (assignment.course.creatorId !== userId && userRole !== UserRole.ADMIN) {
-        return forbidden(res, '无权限批改此作业')
+        return forbidden(res, '无权限批改此练习')
       }
 
       // 获取所有未批改的提交
@@ -1012,7 +1012,7 @@ export const assignmentController = {
 
       return success(res, {
         gradedCount: submissions.length
-      }, `批量批改成功，共 ${submissions.length} 份作业`)
+      }, `批量批改成功，共 ${submissions.length} 份练习`)
     } catch (err) {
       logger.error('批量批改错误', err)
       return error(res, '批量批改失败')
@@ -1026,7 +1026,7 @@ export const assignmentController = {
       const userRole = req.user?.role
       const { id } = req.params
 
-      // 检查作业
+      // 检查练习
       const assignment = await prisma.assignment.findUnique({
         where: { id },
         include: {
@@ -1040,7 +1040,7 @@ export const assignmentController = {
       })
 
       if (!assignment) {
-        return notFound(res, '作业不存在')
+        return notFound(res, '练习不存在')
       }
 
       // 权限检查
@@ -1121,7 +1121,7 @@ export const assignmentController = {
       res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`)
 
       // 发送文件
-      const buffer = await workbookBuffer({ '作业提交数据': exportData })
+      const buffer = await workbookBuffer({ '练习提交数据': exportData })
       res.send(buffer)
     } catch (err) {
       logger.error('导出数据错误', err)
@@ -1149,7 +1149,7 @@ export const assignmentController = {
       })
 
       if (!assignment) {
-        return notFound(res, '作业不存在')
+        return notFound(res, '练习不存在')
       }
 
       if (!(await hasActiveCourseMembership(assignment.courseId, userId))) {
@@ -1170,7 +1170,7 @@ export const assignmentController = {
     }
   },
 
-  // 获取我的作业（学生视角）
+  // 获取我的练习（学生视角）
   async myAssignments(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
@@ -1188,7 +1188,7 @@ export const assignmentController = {
       })
       const courseIds = courseStudents.map(cs => cs.courseId)
 
-      // 获取这些课程的已发布作业
+      // 获取这些课程的已发布练习
       const assignments = await prisma.assignment.findMany({
         where: {
           courseId: { in: courseIds },
@@ -1225,12 +1225,12 @@ export const assignmentController = {
         total: formattedAssignments.length,
       })
     } catch (err) {
-      logger.error('获取我的作业错误', err)
-      return error(res, '获取我的作业失败')
+      logger.error('获取我的练习错误', err)
+      return error(res, '获取我的练习失败')
     }
   },
 
-  // 获取作业标签列表
+  // 获取练习标签列表
   async getTags(req: Request, res: Response) {
     try {
       const { userId, role: userRole } = req.user!
@@ -1239,7 +1239,7 @@ export const assignmentController = {
 
       let where: any = {}
 
-      // 教师只能看自己创建的作业标签
+      // 教师只能看自己创建的练习标签
       if (userRole === UserRole.TEACHER) {
         const teacherCourses = await prisma.course.findMany({
           where: { creatorId: userId },
@@ -1259,8 +1259,8 @@ export const assignmentController = {
 
       return success(res, { tags: allTags })
     } catch (err) {
-      logger.error('获取作业标签错误', err)
-      return error(res, '获取作业标签失败')
+      logger.error('获取练习标签错误', err)
+      return error(res, '获取练习标签失败')
     }
   }
 }

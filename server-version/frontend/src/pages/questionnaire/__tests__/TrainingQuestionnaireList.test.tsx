@@ -1,6 +1,6 @@
 import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter } from 'react-router-dom'
+import { MemoryRouter, useLocation } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks=vi.hoisted(()=>({get:vi.fn(),post:vi.fn(),fetch:vi.fn(),wait:vi.fn(),download:vi.fn(),intent:vi.fn(),clear:vi.fn()}))
 vi.mock('../../../api/client',()=>({default:{get:mocks.get,post:mocks.post},sessionFetch:mocks.fetch}))
@@ -11,7 +11,8 @@ import { AssessmentDataExport } from '../TrainingQuestionnaireList'
 import { QuestionnaireProductList } from '../QuestionnaireProducts'
 const row=(id:string,status='PUBLISHED',kind='COLLECTION')=>({id,name:'合成测评 '+id,status,kind,editHref:'/questionnaire-products/'+id})
 const success=(data:unknown)=>({code:0,data})
-const mount=()=>render(<MemoryRouter initialEntries={['/questionnaires']}><QuestionnaireProductList/></MemoryRouter>)
+const mount=(entry='/questionnaires')=>render(<MemoryRouter initialEntries={[entry]}><QuestionnaireProductList/><LocationProbe/></MemoryRouter>)
+function LocationProbe(){const l=useLocation();return <output data-testid="location">{l.pathname+l.search}</output>}
 beforeEach(()=>{vi.clearAllMocks();mocks.get.mockResolvedValue(success({list:[row('published'),row('draft','DRAFT'),row('history','PUBLISHED','LEGACY')],total:3}));mocks.post.mockResolvedValue(success({artifacts:[{id:'synthetic-artifact'}]}));mocks.wait.mockResolvedValue([{downloadUrl:'/api/synthetic/original',fileName:'original-summary.zip'}]);mocks.fetch.mockResolvedValue({ok:true,blob:async()=>new Blob(['synthetic'])})})
 describe('Training questionnaire list and deidentified export',()=>{
  it('separates result actions, draft editing and legacy exports without requesting data on opening',async()=>{
@@ -25,6 +26,40 @@ describe('Training questionnaire list and deidentified export',()=>{
   expect(mocks.get).toHaveBeenCalledTimes(1);expect(mocks.post).not.toHaveBeenCalled()
   fireEvent.keyDown(screen.getByRole('dialog'),{key:'Escape'})
   expect(screen.queryByRole('dialog')).toBeNull()
+ })
+ it('filters the full server list by status, resets pagination and preserves the course context',async()=>{
+  mount('/questionnaires?courseId=course-a&returnTo=%2Fcourses%2Fcourse-a%2Fdetail%3Fsection%3Dassessments&page=3&search=合成&pageSize=10')
+  await screen.findByRole('heading',{name:'合成测评 draft'})
+  mocks.get.mockResolvedValue(success({list:[row('draft','DRAFT')],total:24}))
+  await userEvent.click(screen.getByRole('button',{name:'草稿'}))
+  await waitFor(()=>expect(new URL(mocks.get.mock.lastCall![0],'https://test').searchParams.get('status')).toBe('DRAFT'))
+  const params=new URL(mocks.get.mock.lastCall![0],'https://test').searchParams
+  expect(params.get('page')).toBe('1');expect(params.get('search')).toBe('合成');expect(params.get('pageSize')).toBe('10')
+  expect(screen.getByRole('button',{name:'草稿'})).toHaveAttribute('aria-pressed','true')
+  expect(screen.getByRole('navigation',{name:'测评分页'})).toHaveTextContent('共 24 条')
+  const location=new URL('https://test'+screen.getByTestId('location').textContent)
+  expect(location.searchParams.get('courseId')).toBe('course-a')
+  expect(location.searchParams.get('returnTo')).toBe('/courses/course-a/detail?section=assessments')
+  await userEvent.click(screen.getByRole('button',{name:'已发布'}))
+  await waitFor(()=>expect(new URL(mocks.get.mock.lastCall![0],'https://test').searchParams.get('status')).toBe('PUBLISHED'))
+  await userEvent.click(screen.getByRole('button',{name:'全部'}))
+  await waitFor(()=>expect(new URL(mocks.get.mock.lastCall![0],'https://test').searchParams.has('status')).toBe(false))
+ })
+ it('keeps course navigation hints on review and on the copied new draft without duplicating overview content',async()=>{
+  mocks.post.mockResolvedValue(success({id:'copy'}))
+  mount('/questionnaires?courseId=course-a&returnTo=%2Fcourses%2Fcourse-a%2Fdetail%3Fsection%3Dassessments')
+  expect(await screen.findByRole('heading',{name:'复用测评'})).toBeVisible()
+  expect(screen.queryByRole('region',{name:'测评概览'})).toBeNull()
+  const article=within((await screen.findByRole('heading',{name:'合成测评 published'})).closest('article')!)
+  const link=new URL(article.getByRole('link',{name:'查看内容'}).getAttribute('href')!,'https://test')
+  expect(link.pathname).toBe('/questionnaire-products/published')
+  expect(link.searchParams.get('courseId')).toBe('course-a')
+  await userEvent.click(article.getByRole('button',{name:'使用此测评'}))
+  await waitFor(()=>expect(screen.getByTestId('location')).toHaveTextContent('/questionnaire-products/copy?'))
+  const location=new URL('https://test'+screen.getByTestId('location').textContent)
+  expect(location.searchParams.get('courseId')).toBe('course-a')
+  expect(location.searchParams.get('returnTo')).toBe('/courses/course-a/detail?section=assessments')
+  expect(mocks.post).toHaveBeenCalledTimes(1)
  })
  it('requests the selected ZIP as explicitly anonymized summary and downloads the authenticated original artifact',async()=>{
   mount();await userEvent.click((await screen.findAllByRole('button',{name:'导出数据'}))[0])

@@ -25,7 +25,7 @@ const staff: NavigationItem[] = [
   { path: '/assessment-management', label: '对象与操作记录', section: 'assessment' },
   { path: '/dashboard', label: '课程管理', aliases: ['/courses'], section: 'teaching' },
   { path: '/students', label: '学生管理', section: 'teaching' },
-  { path: '/assignments', label: '作业管理', section: 'teaching' },
+  { path: '/assignments', label: '练习管理', section: 'teaching' },
   { path: '/checkins', label: '打卡管理', section: 'teaching' },
   { path: '/teacher/classrooms', label: '课堂互动', section: 'teaching' },
   { path: '/sjt-authoring', label: 'SJT 题包管理', section: 'assessment' },

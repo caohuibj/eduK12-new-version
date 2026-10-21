@@ -1,0 +1,39 @@
+.hui-training .staff-dialog:has(.training-task-reuse) { width: min(920px, calc(100vw - 40px)); max-height: min(850px, calc(100dvh - 48px)); border: 1px solid var(--training-border); border-radius: 16px; background: #fff; }
+.hui-training .staff-dialog:has(.training-task-reuse) .staff-dialog__header { padding: 24px 28px 20px; }
+.hui-training .staff-dialog:has(.training-task-reuse) .staff-dialog__header h2 { font-family: var(--training-serif); font-size: 26px; }
+.hui-training .staff-dialog:has(.training-task-reuse) .staff-dialog__description { font-size: 14px; color: var(--training-muted); margin-top: 6px; }
+.hui-training .staff-dialog:has(.training-task-reuse) .staff-dialog__body { padding: 22px 28px; background: var(--training-paper, #f8f6ef); }
+.hui-training .staff-dialog:has(.training-task-reuse) .staff-dialog__actions { padding: 16px 28px; }
+.hui-training .training-task-reuse { display: grid; gap: 18px; }
+.hui-training .training-task-reuse label { display: grid; gap: 8px; font-size: 14px; }
+.hui-training .training-task-reuse :is(input,select) { min-height: 44px; padding: 10px 12px; border: 1px solid var(--training-border); border-radius: 8px; background: white; font: inherit; }
+.hui-training .training-reuse-target { display: flex; align-items: center; gap: 12px; padding: 14px 16px; border: 1px solid var(--training-border); border-radius: 10px; background: #edf3ea; color: var(--training-bamboo); }
+.hui-training .training-reuse-target span { display: block; font-size: 12px; color: var(--training-muted); margin-bottom: 3px; }
+.hui-training .training-task-reuse .training-reuse-target strong { font-size: 17px; }
+.hui-training .training-reuse-note { margin: -6px 0 0; font-size: 13px; line-height: 1.7; color: var(--training-muted); }
+.hui-training .training-reuse-search { display: flex; align-items: center; gap: 10px; }
+.hui-training .training-reuse-search>svg { color: var(--training-muted); }
+.hui-training .training-reuse-search input { flex: 1; min-width: 0; }
+.hui-training :is(.training-task-reuse,.training-reuse-footer) button { display: inline-flex; justify-content: center; align-items: center; gap: 8px; min-height: 42px; padding: 9px 15px; border: 1px solid var(--training-border); border-radius: 8px; color: var(--training-bamboo); background: white; font-size: 14px; white-space: nowrap; cursor: pointer; }
+.hui-training :is(.training-task-reuse,.training-reuse-footer) button:disabled { opacity: .5; cursor: not-allowed; }
+.hui-training.hui-app.training-workspace-shell .staff-dialog .training-task-reuse :is(.training-reuse-search button,li button) { background: var(--training-bamboo); color: white; border-color: var(--training-bamboo); }
+.hui-training .training-task-reuse ul { display: grid; gap: 12px; list-style: none; margin: 0; padding: 0; }
+.hui-training .training-task-reuse li { display: flex; align-items: center; gap: 14px; padding: 19px 18px; border: 1px solid var(--training-border); border-radius: 10px; background: white; }
+.hui-training .training-task-reuse li div { min-width: 0; flex: 1; overflow-wrap: anywhere; }
+.hui-training .training-task-reuse strong { font-size: 17px; font-weight: 600; line-height: 1.6; }
+.hui-training .training-task-reuse small { display: block; margin-top: 6px; color: var(--training-muted); font-size: 13px; }
+.hui-training .training-reuse-source-icon { display: grid; place-items: center; width: 42px; height: 42px; flex-shrink: 0; border-radius: 9px; background: #f0f4eb; color: var(--training-bamboo); }
+.hui-training .training-reuse-footer { display: flex; flex: 1; align-items: center; justify-content: space-between; gap: 12px; color: var(--training-muted); font-size: 13px; }
+.hui-training .training-reuse-footer nav { display: flex; align-items: center; gap: 12px; }
+.hui-training .training-reuse-empty { display: grid; justify-items: center; gap: 12px; padding: 38px 18px; margin: 0; border: 1px dashed var(--training-border); border-radius: 10px; color: var(--training-muted); text-align: center; background: white; }
+.hui-training .training-reuse-empty p { font-size: 14px; }
+.hui-training .training-reuse-error { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px; border-radius: 8px; background: #fff0eb; color: #923e30; font-size: 14px; }
+@media(max-width:600px) {
+ .hui-training .staff-dialog:has(.training-task-reuse) { width: calc(100vw - 24px); max-height: calc(100dvh - 24px); border-radius: 12px; }
+ .hui-training .staff-dialog:has(.training-task-reuse) :is(.staff-dialog__header,.staff-dialog__body,.staff-dialog__actions) { padding: 18px 16px; }
+ .hui-training .training-task-reuse :is(input,select) { font-size: 16px; }
+ .hui-training .training-task-reuse li { flex-wrap: wrap; padding: 16px; }
+ .hui-training .training-task-reuse li>button { width: 100%; }
+ .hui-training .training-reuse-footer { flex-wrap: wrap; gap: 10px; }
+ .hui-training .training-reuse-footer nav { order: 3; width: 100%; justify-content: space-between; }
+}
