@@ -65,16 +65,20 @@ suite('Scale copied draft immutable provenance and publication',()=>{
   definition.license={status:'unknown',redistribution:'unknown'};const native=await db.scale.create({data:{code:randomUUID(),name:'Native',creatorId:user.id,definition:definition as any,definitionHash:hashScaleDefinition(definition)}})
   const n=response();await publish(request(native.id,user.id),n);expect(n.body.code).toBe(0)
  })
- it('publishes an independent COPY with exact release provenance but no source lifecycle FK',async()=>{
+ it.each([false,true])('publishes independent COPY with exact release provenance and no source FK (legacy null families: %s)',async legacy=>{
   const {scale,user}=await fixture({status:'DRAFT'})
   const first=response();await publish(request(scale.id,user.id),first);expect(first.body.code).toBe(0)
   const source=await db.scale.findUniqueOrThrow({where:{id:scale.id}})
   expect(source.measurementReleaseId).not.toBeNull()
-  const draft=await copy(source.id,user.id)
+  const copied=await copy(source.id,user.id)
+  // Model a pre-migration copy without inventing historical family metadata.
+  const draft=legacy ? await db.scale.update({where:{id:copied.id},data:{authoringFamilyId:null,authoringVersion:null}}) : copied
+  if(legacy){expect(source.authoringFamilyId).toBeNull();expect(draft.authoringFamilyId).toBeNull()}
   expect(draft.sourceScaleId).toBeNull()
   expect(draft.copySource).toMatchObject({parentId:source.id,parentDefinitionHash:source.definitionHash})
   const result=response();await publish(request(draft.id,user.id),result);expect(result.body.code).toBe(0)
   const published=await db.scale.findUniqueOrThrow({where:{id:draft.id}})
+  if(legacy)expect(published.authoringFamilyId).toBeNull()
   const release=await db.measurementContentRelease.findUniqueOrThrow({where:{id:published.measurementReleaseId!}})
   expect(release.sourceReleaseId).toBe(source.measurementReleaseId)
   expect(release.provenance).toMatchObject({authoringRelationship:'COPY',copySource:{parentId:source.id}})
@@ -115,6 +119,9 @@ suite('Scale copied draft immutable provenance and publication',()=>{
   expect(independent.copySource).toMatchObject({parentId:scale.id,parentDefinitionHash:scale.definitionHash})
   // A revision retains the RESTRICT lifecycle relation; COPY does not.
   await expect(db.scale.delete({where:{id:scale.id}})).rejects.toMatchObject({code:'P2003'})
+  const revised=response();await publish(request(revision.id,user.id),revised);expect(revised.body.code).toBe(0)
+  const publishedRevision=await db.scale.findUniqueOrThrow({where:{id:revision.id}})
+  expect((await db.measurementContentRelease.findUniqueOrThrow({where:{id:publishedRevision.measurementReleaseId!}})).provenance).toMatchObject({authoringRelationship:'REVISION'})
   expect(revision.instrumentVersion).toBe(scale.instrumentVersion)
   expect((await db.scale.findUniqueOrThrow({where:{id:scale.id}})).definition).toEqual(scale.definition)
  })

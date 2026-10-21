@@ -101,13 +101,16 @@ export const scaleImageController = {
             ...definitionSummary(definition),
           },
         })
-        const source = checkedCopySource ?? (scale.sourceScaleId ? await tx.scale.findUnique({where:{id:scale.sourceScaleId},select:{measurementReleaseId:true,authoringFamilyId:true}}) : null)
+        const source = checkedCopySource ?? (scale.sourceScaleId ? await tx.scale.findUnique({where:{id:scale.sourceScaleId},select:{id:true,measurementReleaseId:true,authoringFamilyId:true}}) : null)
+        const isRevision = Boolean(source && scale.sourceScaleId === source.id
+          && scale.authoringFamilyId && source.authoringFamilyId
+          && source.authoringFamilyId === scale.authoringFamilyId)
         const release = await publishScaleMeasurement(tx, {
           sourceReleaseId: source?.measurementReleaseId ?? null,
           localId: scale.id, version: scale.authoringVersion ? `v${scale.authoringVersion}` : scale.updatedAt.toISOString(),
           instrumentVersion: scale.instrumentVersion, definition, instrumentClass: 'CUSTOM_DESCRIPTIVE',
           provenance: { ...(scale.copySource ? { copySource: scale.copySource } : {}),
-            authoringRelationship: source ? (source.authoringFamilyId === scale.authoringFamilyId ? 'REVISION' : 'COPY') : 'ORIGINAL',
+            authoringRelationship: source ? (isRevision ? 'REVISION' : 'COPY') : 'ORIGINAL',
             authoringFamilyId: scale.authoringFamilyId ?? scale.id, authoringVersion: scale.authoringVersion ?? 1,
             authoringSnapshot: { title: scale.name, definition, instrumentClass: 'CUSTOM_DESCRIPTIVE', product: 'TRAINING' } },
           scope: { kind: 'PRIVATE', ownerId: scale.creatorId, product: 'TRAINING', resourceId: scale.id },
