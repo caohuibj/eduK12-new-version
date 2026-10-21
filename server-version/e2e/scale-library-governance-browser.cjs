@@ -96,8 +96,9 @@ async function adminLogin(page) {
   check('real-virtual-ctap2-administrator-session')
 }
 async function renderedImage(locator,hash) {
+  await locator.waitFor({state:'visible'})
   assert.equal(await locator.count(),1)
-  await locator.waitFor();await locator.scrollIntoViewIfNeeded()
+  await locator.scrollIntoViewIfNeeded()
   await locator.evaluate(img=>new Promise((resolve,reject)=>{if(img.complete)return img.naturalWidth?resolve():reject(new Error('Image decode failed'));const timer=setTimeout(()=>reject(new Error('Image decode timed out')),10000);img.addEventListener('load',()=>{clearTimeout(timer);resolve()},{once:true});img.addEventListener('error',()=>{clearTimeout(timer);reject(new Error('Image decode failed'))},{once:true})}))
   const result=await locator.evaluate(async img=>{
     if(!img.currentSrc.startsWith('blob:')||img.src!==img.currentSrc||new URL(img.currentSrc).origin!==location.origin)throw new Error('Expected the actual same-origin API image Blob')
@@ -107,6 +108,7 @@ async function renderedImage(locator,hash) {
   assertRenderedSurveyImage(result,hash);return result
 }
 async function videoRange(locator) {
+  await locator.waitFor({state:'visible'})
   assert.equal(await locator.count(),1)
   const result=await locator.evaluate(async video=>{
     const source=new URL(video.currentSrc||video.src,location.href)
@@ -220,15 +222,16 @@ async function reviewAndGrant(admin,source,product,recipient) {
   const approved=await action(admin,governance('TRAINING')+'/submissions/'+source.submission.id+'/review',()=>button(article,'批准精确版本入库').click())
   assert.equal(approved.data.status,'APPROVED')
   await admin.getByRole('status').filter({hasText:'已批准收录，尚未自动分配使用权限。'}).waitFor()
+  await button(admin,'刷新状态').locator(':scope:enabled').waitFor()
   const entries=await api(admin,governance('TRAINING')+'/entries','GET',undefined,'MANAGEMENT')
   const entry=entries.list.find(row=>row.submissionId===source.submission.id);assert(entry&&entry.status==='ACTIVE');assert.equal(entry.releaseId,source.release.releaseId)
   const row=admin.locator('article').filter({has:admin.getByRole('heading',{level:3,name:source.title+' · 自编描述性量表 · 已收录',exact:true})})
   for(let page=1;await row.count()===0;page++) {
     assert(page<20,'Approved entry not found in bounded catalog')
-    const next=admin.getByRole('button',{name:'目录下一页',exact:true,disabled:false})
+    const next=button(admin,'目录下一页').locator(':scope:enabled')
     await next.waitFor()
     await action(admin,governance('TRAINING')+'/catalog',()=>next.click(),'GET')
-    await admin.getByRole('button',{name:'刷新状态',exact:true,disabled:false}).waitFor()
+    await button(admin,'刷新状态').locator(':scope:enabled').waitFor()
   }
   await button(row,'查看 / 分配只读使用权限').click()
   const grants=admin.getByRole('region',{name:'精确版本使用授权',exact:true})

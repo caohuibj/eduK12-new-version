@@ -424,7 +424,7 @@
     },
     "server-version/e2e/scale-library-governance-browser.cjs": {
       "before": null,
-      "after": "be9c70952c1f8fb42a7ab2a99e361a36aebfc434"
+      "after": "6ba3476a6dd471feeafc6cf98c2a94164bf36901"
     },
     "server-version/e2e/scale-library-governance-proxy.cjs": {
       "before": null,
