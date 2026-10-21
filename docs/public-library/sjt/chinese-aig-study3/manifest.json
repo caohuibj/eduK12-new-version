@@ -1,0 +1,28 @@
+{
+  "source_package_sha256": "6272fe67a87b392dba9ff7e2ed4bc550d9a54d5819b636f2127954338d42dac7",
+  "original_workbook": {
+    "url": "https://osf.io/download/gj76w/",
+    "sha256": "c108776b6ebfff742708426f6640698c348272cf95ad1d35402c077ae243d306",
+    "copied": false
+  },
+  "original_supplement": {
+    "url": "https://osf.io/download/zsnfa/",
+    "sha256": "2ed925f7bacf11cb454c90a8dba48593c4b6b9c3af58939928c660044ebe6386",
+    "copied": false
+  },
+  "article": {
+    "doi": "10.1016/j.chbr.2026.100964",
+    "copied": false
+  },
+  "files": {
+    "COPYRIGHT.md": "1e7d2597b46aee4b197129f4db1cf7dbac0f1bd7038403c2798373b240d357e2",
+    "README.md": "2572795d539843c2d8f8245a0dfd7693e11ff7cefdacc3e7e068a6967d77de2e",
+    "engine-fit-readonly.md": "ad63311cfcf0f0d0adc4b41534d17b995f117a7edb5dce816a128caaad3bfe6f",
+    "limitations-and-notes.md": "6e01e8e1e6f5bdf38452c96d75d7a85031158ff565045fac2999a639eea08e1b",
+    "package-integrity.json": "084ddb5bd88087738bee0a5683ce568d541512a4fcfd167e4c9003d9ecf8280a",
+    "report-draft-zh.md": "d0923b6902d83ec50bae3eeef89e004f533145b2f5025cf0aeb9221e594d75f5",
+    "scoring-contract.json": "69440144bf077a1d7903656fffd66f7ff48a1bd58955cfe5e58a0a9efec09313",
+    "selected-materials-notion.md": "f3f701da86a3dbf0db8636d0f12503fcd3f2d345891e66e8587c2e58da221c76",
+    "selected-study3.json": "cd1cbf4d4dce628607a7651d08a8e03a621072fec824b5726f7c2b8b3aa3c95a"
+  }
+}
