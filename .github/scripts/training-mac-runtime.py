@@ -265,8 +265,19 @@ class MacQualification(R.Qualification):
             old = json.loads((target / 'package.json').read_text()); new = json.loads((unpacked / 'package/package.json').read_text())
             R.require(old['name'] == new['name'] == 'vite' and old['version'] == pin['fromVersion'] and new['version'] == pin['toVersion'], 'Wrong Vite package version')
             R.require(all(old.get(k) == new.get(k) for k in ('dependencies', 'peerDependencies', 'optionalDependencies', 'types', 'exports', 'bin', 'engines', 'type', 'scripts')), 'Unexpected Vite dependency/API delta')
-            lock = json.loads((context / 'package-lock.json').read_text())['packages']['node_modules/vite']
+            packages = json.loads((context / 'package-lock.json').read_text())['packages']
+            lock = packages['node_modules/vite']
             R.require(all(lock[k] == pin[v] for k, v in [('version', 'toVersion'), ('resolved', 'tarball'), ('integrity', 'integrity')]), 'Vite patch differs from source lock')
+            nested_versions = {path: row['version'] for path, row in packages.items() if path.startswith('node_modules/vite/node_modules/')}
+            for path, version in nested_versions.items():
+                R.require(json.loads((context / path / 'package.json').read_text())['version'] == version, 'Missing locked nested Vite dependency')
+            nested = target / 'node_modules'; destination = unpacked / 'package/node_modules'
+            R.require(not destination.exists() and not destination.is_symlink(), 'Unexpected bundled Vite dependency overlay')
+            if nested.exists():
+                R.require(nested.is_dir() and not nested.is_symlink(), 'Unsafe nested Vite dependency directory')
+                # Move the original verified dependency tree intact. Replacing
+                # Vite must not discard its locked nested packages or .bin links.
+                shutil.move(nested, destination)
             shutil.rmtree(target); shutil.move(unpacked / 'package', target)
             hidden = context / 'node_modules/.package-lock.json'
             if hidden.exists():
@@ -275,6 +286,7 @@ class MacQualification(R.Qualification):
                 entry.update(version=pin['toVersion'], resolved=pin['tarball'], integrity=pin['integrity'])
                 hidden.write_text(json.dumps(data, indent=2) + '\n')
             result[component] = {k: pin[k] for k in ('fromVersion', 'toVersion', 'tarSha256', 'integrity')}
+            result[component]['preservedNestedDependencies'] = nested_versions
         self.state['vitePatch'] = result
         return result
 

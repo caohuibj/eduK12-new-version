@@ -440,7 +440,17 @@ class MacContracts(unittest.TestCase):
             raw = stream.getvalue(); pin.update(tarBytes=len(raw), tarSha256=M.R.digest(raw), integrity='sha512-' + base64.b64encode(M.R.hashlib.sha512(raw).digest()).decode())
             context = self.q.private / component; target = context / 'node_modules/vite'; target.mkdir(parents=True)
             (target / 'package.json').write_text(json.dumps(old)); (target.parent / 'untouched').write_text('same')
-            (context / 'package-lock.json').write_text(json.dumps({'packages': {'node_modules/vite': {'version': pin['toVersion'], 'resolved': pin['tarball'], 'integrity': pin['integrity']}}}))
+            packages = {'node_modules/vite': {'version': pin['toVersion'], 'resolved': pin['tarball'], 'integrity': pin['integrity']}}
+            if component == 'frontend':
+                for name, version in [('fdir', '6.5.0'), ('picomatch', '4.0.7')]:
+                    path = 'node_modules/vite/node_modules/' + name
+                    folder = context / path; folder.mkdir(parents=True)
+                    (folder / 'package.json').write_text(json.dumps({'name': name, 'version': version}))
+                    (folder / 'index.js').write_bytes(b'preserved exact nested dependency\x00bytes')
+                    packages[path] = {'version': version}
+                (target / 'node_modules/.bin').mkdir()
+                (target / 'node_modules/.bin/synthetic').symlink_to('../picomatch/index.js')
+            (context / 'package-lock.json').write_text(json.dumps({'packages': packages}))
             (context / 'node_modules/.package-lock.json').write_text(json.dumps({'packages': {'node_modules/vite': {'version': pin['fromVersion']}, 'node_modules/other': {'version': 'same'}}}))
             response = Mock(); response.__enter__ = Mock(return_value=response); response.__exit__ = Mock(return_value=False)
             response.geturl.return_value = pin['tarball']; response.read.return_value = raw; responses[pin['tarball']] = response
@@ -455,6 +465,12 @@ class MacContracts(unittest.TestCase):
             self.assertEqual(json.loads((context / 'node_modules/vite/package.json').read_text())['version'], pin['toVersion'])
             self.assertEqual((context / 'node_modules/untouched').read_text(), 'same')
             self.assertEqual(json.loads((context / 'node_modules/.package-lock.json').read_text())['packages']['node_modules/other'], {'version': 'same'})
+        nested = self.q.private / 'frontend/node_modules/vite/node_modules'
+        for name in ('fdir', 'picomatch'):
+            self.assertEqual((nested / name / 'index.js').read_bytes(), b'preserved exact nested dependency\x00bytes')
+        self.assertTrue((nested / '.bin/synthetic').is_symlink())
+        self.assertEqual((nested / '.bin/synthetic').readlink().as_posix(), '../picomatch/index.js')
+        self.assertEqual(self.q.state['vitePatch']['frontend']['preservedNestedDependencies'], {'node_modules/vite/node_modules/fdir': '6.5.0', 'node_modules/vite/node_modules/picomatch': '4.0.7'})
         self.q.command.assert_not_called()
 
     def test_new_frontend_compilation_compares_complete_dist_bytes(self):

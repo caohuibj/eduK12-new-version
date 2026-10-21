@@ -37,7 +37,7 @@ def validate_artifact(artifact, pin):
     require(str(artifact['workflow_run']['id']) == PIN['runId'] and artifact['workflow_run']['head_sha'] == PIN['sourceHead'], 'Wrong artifact producer')
 
 
-REVIEWED_SECURITY_RUNTIME_SHA256 = 'f083ecb2137afa8d0ba3a36ce3845240397f305759a24d5f7bba05723d4278b9'
+REVIEWED_SECURITY_RUNTIME_SHA256 = 'e762ae477b492675ff17a5f61a0de171a1e77bff67d46d0d8f76ab1c26ece9de'
 REVIEWED_SECURITY_INPUTS_SHA256 = '99107e43d6c89a7dc141cde9f3507847cf4c3cefca0bd640e70b0ce319f26253'
 
 
