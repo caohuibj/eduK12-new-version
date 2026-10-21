@@ -326,8 +326,22 @@ test('scale authoring third candidate preserves strict original aggregate and bo
   for(const key of ['scope','exact-candidate','codeql'])assert(failedChecks({...n,[key]:{...n[key],result:'skipped'}},false).length>0);
   assert.equal(situationalPublicationBoundary(base,h,{CI_HEAD_REF:'work/scale-authoring-feedback-20261021'}),null);
   const main=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
-  assert.match(main,/candidate == 'scale-authoring' && 'paths: \[\.github\/scripts\/exact-candidate-scope.mjs/);
+  assert.match(main,/candidate == 'scale-authoring' && steps\.scale-codeql-config\.outputs\.config/);
   assert.match(main,/scale-authoring-admission.test.py/);
   const workflow=readFileSync(new URL('../workflows/ci-exact-candidate.yml',import.meta.url),'utf8');
   assert.match(workflow,/candidate==='scale-authoring'\?\['scale'\]/);
+});
+
+ test('scale CodeQL directory config executes against real controls without selecting application or unrelated scripts',()=>{
+  const main=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+  const block=main.split('      - name: bound scale authoring cross-language extraction to six controls\n')[1].split('      - name: initialize CodeQL')[0];
+  const source=block.split('        run: |\n')[1].split('\n').map(line=>line.replace(/^          /,'')).join('\n');
+  const result=spawnSync(process.execPath,['-e',source.replace("fs.appendFileSync(process.env.GITHUB_OUTPUT, `config=${JSON.stringify(config)}\\n`);","console.log('CONFIG='+JSON.stringify(config));")],{encoding:'utf8'});
+  assert.equal(result.status,0,result.stderr);
+  const config=JSON.parse(result.stdout.split('\n').find(line=>line.startsWith('CONFIG=')).slice(7));
+  assert.deepEqual(config.paths,['.github/scripts']);
+  const selected=readdirSync('.github/scripts').map(name=>'.github/scripts/'+name).filter(name=>!config['paths-ignore'].includes(name)).sort();
+  assert.deepEqual(selected,['exact-candidate-scope.mjs','exact-candidate.test.mjs','scale-authoring-admission.py','scale-authoring-admission.test.py','scale-authoring-reuse.py','scale-authoring-reuse.test.py'].map(name=>'.github/scripts/'+name).sort());
+  assert.equal(selected.filter(name=>name.endsWith('.py')).length,4);
+  assert.equal(selected.filter(name=>name.endsWith('.mjs')).length,2);
 });

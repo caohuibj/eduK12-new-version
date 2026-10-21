@@ -12,7 +12,7 @@
     },
     ".github/scripts/exact-candidate.test.mjs": {
       "before": "c92a4328c976a591267897fad66d87c4689ba0e8",
-      "after": "120102edc38ba354f12b63f93b48abbe4b6914ca"
+      "after": "18d87ca7da982e2dac66ef703d183d1309776957"
     },
     ".github/scripts/scale-authoring-admission.py": {
       "before": "0000000000000000000000000000000000000000",
@@ -72,7 +72,7 @@
     },
     ".github/workflows/ci.yml": {
       "before": "4d068eae84d25718b43f11d79e49a71be09db83c",
-      "after": "dde48df4adc9f60842711e18534ad10427150761"
+      "after": "c724f3de94b8cc73458fa0c6c470e40457b7b1cd"
     },
     "docs/release/README.md": {
       "before": "6919863b196d21811f1d1226ccc364af526d0d95",
