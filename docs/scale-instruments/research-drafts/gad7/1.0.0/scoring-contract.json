@@ -1,0 +1,40 @@
+{
+  "schemaVersion": "gad7-research-scoring-contract-v1",
+  "status": "SPECIFICATION_ONLY_NOT_REGISTERED",
+  "scoredItems": [
+    "GAD7-01",
+    "GAD7-02",
+    "GAD7-03",
+    "GAD7-04",
+    "GAD7-05",
+    "GAD7-06",
+    "GAD7-07"
+  ],
+  "allowedValues": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "requireNumericIntegerWithoutCoercion": true,
+  "formula": "Sum exactly seven symptom values",
+  "minimum": 0,
+  "maximum": 21,
+  "reverseScoring": false,
+  "weights": "All 1; no normalization or cognitive weighted index",
+  "extraQuestions": "None in selected standalone form; no impairment, attention or safety-screening items inserted.",
+  "missingPolicy": {
+    "status": "PRODUCT_CHOICE_NOT_ORIGINAL_AUTHOR_RULE",
+    "rule": "Missing symptom -> no total. No imputation/proration/blank-to-zero. May skip or leave; no forced disclosure."
+  },
+  "invalidPolicy": "Reject strings including numeric strings, booleans, fractions, out-of-range, explicit null answers, arrays and duplicate responses. Missing means no submitted answer.",
+  "report": "Only total/21 with descriptive limitations. No clinical band, screen-positive label, diagnosis, norm, percentile, treatment-response or suicide-risk inference.",
+  "supportImplementationRules": {
+    "alwaysVisible": true,
+    "notContingentOnTotal": true,
+    "lowScoreDoesNotRuleOutNeedForHelp": true,
+    "suicideRiskAssessment": false,
+    "unmonitored": true,
+    "automaticContactPromised": false
+  }
+}

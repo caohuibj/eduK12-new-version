@@ -4,7 +4,7 @@ import {
   intendedUseSchema,
   respondentTypeSchema,
 } from '../modules/scale/library/catalog-manifest'
-import type { ScaleLibraryFilterInput } from '../modules/scale/library/scale-library-read-model'
+import { scaleLibraryClassificationFilterSchema, type ScaleLibraryFilterInput } from '../modules/scale/library/scale-library-read-model'
 import {
   filterUnifiedScaleLibraryEntries,
   getUnifiedScaleLibraryEntry,
@@ -26,6 +26,7 @@ const optionalNumber = z.preprocess((value) => {
 }, z.number().int().min(0).max(100).optional())
 
 const libraryQuerySchema = z.object({
+  ...scaleLibraryClassificationFilterSchema.shape,
   keyword: z.preprocess(queryValue, z.string().trim().min(1).max(100).optional()),
   instrumentFamily: z.preprocess(queryValue, z.string().trim().min(1).max(100).optional()),
   primaryDomain: z.preprocess(queryValue, constructDomainSchema.optional()),
@@ -61,6 +62,8 @@ const parseQuery = (req: Request): { query?: z.infer<typeof libraryQuerySchema>;
 }
 
 const filterFromQuery = (query: z.infer<typeof libraryQuerySchema>): ScaleLibraryFilterInput => ({
+  constructDomain: query.constructDomain,
+  overlapTag: query.overlapTag,
   keyword: query.keyword,
   instrumentFamily: query.instrumentFamily,
   primaryDomain: query.primaryDomain,

@@ -1,0 +1,384 @@
+{
+  "schemaVersion": "gad7-content-fixtures-v1",
+  "synthetic": true,
+  "clinicalClassificationExpected": false,
+  "nullInSymptomArrayMeans": "Absent response only; explicit submitted null is rejected.",
+  "cases": [
+    {
+      "name": "all-zero",
+      "symptoms": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expectedTotal": 0,
+      "expectedOutcome": "SCORED"
+    },
+    {
+      "name": "all-max",
+      "symptoms": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        3,
+        3
+      ],
+      "expectedTotal": 21,
+      "expectedOutcome": "SCORED"
+    },
+    {
+      "name": "all-one",
+      "symptoms": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "expectedTotal": 7,
+      "expectedOutcome": "SCORED"
+    },
+    {
+      "name": "boundary-4-arithmetic-only",
+      "symptoms": [
+        3,
+        1,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expectedTotal": 4,
+      "expectedOutcome": "SCORED"
+    },
+    {
+      "name": "boundary-5-arithmetic-only",
+      "symptoms": [
+        3,
+        2,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expectedTotal": 5,
+      "expectedOutcome": "SCORED"
+    },
+    {
+      "name": "boundary-9-arithmetic-only",
+      "symptoms": [
+        3,
+        3,
+        3,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expectedTotal": 9,
+      "expectedOutcome": "SCORED"
+    },
+    {
+      "name": "boundary-10-arithmetic-only",
+      "symptoms": [
+        3,
+        3,
+        3,
+        1,
+        0,
+        0,
+        0
+      ],
+      "expectedTotal": 10,
+      "expectedOutcome": "SCORED"
+    },
+    {
+      "name": "boundary-14-arithmetic-only",
+      "symptoms": [
+        3,
+        3,
+        3,
+        3,
+        2,
+        0,
+        0
+      ],
+      "expectedTotal": 14,
+      "expectedOutcome": "SCORED"
+    },
+    {
+      "name": "boundary-15-arithmetic-only",
+      "symptoms": [
+        3,
+        3,
+        3,
+        3,
+        3,
+        0,
+        0
+      ],
+      "expectedTotal": 15,
+      "expectedOutcome": "SCORED"
+    },
+    {
+      "name": "missing-symptom-1",
+      "symptoms": [
+        null,
+        1,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "expectedTotal": null,
+      "expectedOutcome": "INCOMPLETE"
+    },
+    {
+      "name": "missing-symptom-2",
+      "symptoms": [
+        1,
+        null,
+        1,
+        1,
+        1,
+        1,
+        1
+      ],
+      "expectedTotal": null,
+      "expectedOutcome": "INCOMPLETE"
+    },
+    {
+      "name": "missing-symptom-3",
+      "symptoms": [
+        1,
+        1,
+        null,
+        1,
+        1,
+        1,
+        1
+      ],
+      "expectedTotal": null,
+      "expectedOutcome": "INCOMPLETE"
+    },
+    {
+      "name": "missing-symptom-4",
+      "symptoms": [
+        1,
+        1,
+        1,
+        null,
+        1,
+        1,
+        1
+      ],
+      "expectedTotal": null,
+      "expectedOutcome": "INCOMPLETE"
+    },
+    {
+      "name": "missing-symptom-5",
+      "symptoms": [
+        1,
+        1,
+        1,
+        1,
+        null,
+        1,
+        1
+      ],
+      "expectedTotal": null,
+      "expectedOutcome": "INCOMPLETE"
+    },
+    {
+      "name": "missing-symptom-6",
+      "symptoms": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        null,
+        1
+      ],
+      "expectedTotal": null,
+      "expectedOutcome": "INCOMPLETE"
+    },
+    {
+      "name": "missing-symptom-7",
+      "symptoms": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        1,
+        null
+      ],
+      "expectedTotal": null,
+      "expectedOutcome": "INCOMPLETE"
+    },
+    {
+      "name": "all-missing",
+      "symptoms": [
+        null,
+        null,
+        null,
+        null,
+        null,
+        null,
+        null
+      ],
+      "expectedTotal": null,
+      "expectedOutcome": "INCOMPLETE"
+    },
+    {
+      "name": "reject-numeric-string",
+      "symptoms": [
+        "1",
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expectedTotal": null,
+      "expectedOutcome": "REJECT"
+    },
+    {
+      "name": "reject-non-numeric-string",
+      "symptoms": [
+        "often",
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expectedTotal": null,
+      "expectedOutcome": "REJECT"
+    },
+    {
+      "name": "reject-boolean",
+      "symptoms": [
+        true,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expectedTotal": null,
+      "expectedOutcome": "REJECT"
+    },
+    {
+      "name": "reject-fraction",
+      "symptoms": [
+        1.5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expectedTotal": null,
+      "expectedOutcome": "REJECT"
+    },
+    {
+      "name": "reject-negative",
+      "symptoms": [
+        -1,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expectedTotal": null,
+      "expectedOutcome": "REJECT"
+    },
+    {
+      "name": "reject-out-of-range",
+      "symptoms": [
+        4,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expectedTotal": null,
+      "expectedOutcome": "REJECT"
+    },
+    {
+      "name": "reject-array",
+      "symptoms": [
+        [
+          1
+        ],
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "expectedTotal": null,
+      "expectedOutcome": "REJECT"
+    },
+    {
+      "name": "duplicate-item-response",
+      "symptoms": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "duplicateItem": "GAD7-01",
+      "expectedTotal": null,
+      "expectedOutcome": "REJECT"
+    }
+  ],
+  "formValidationRejections": [
+    {
+      "name": "explicit-null-answer",
+      "itemCode": "GAD7-01",
+      "responseValue": null,
+      "expected": "REJECT"
+    },
+    {
+      "name": "multiple-answer-array",
+      "itemCode": "GAD7-01",
+      "responseValue": [
+        0,
+        1
+      ],
+      "expected": "REJECT"
+    },
+    {
+      "name": "extra-item-not-in-selected-form",
+      "itemCode": "GAD7-08",
+      "responseValue": 1,
+      "expected": "REJECT"
+    }
+  ]
+}

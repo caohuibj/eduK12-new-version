@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "k6-research-scoring-contract-v1",
+  "status": "SPECIFICATION_ONLY_NOT_REGISTERED",
+  "scoredItems": [
+    "Q1a",
+    "Q1b",
+    "Q1c",
+    "Q1d",
+    "Q1e",
+    "Q1f"
+  ],
+  "inputModes": {
+    "PRINTED_CODE_1_TO_5": {
+      "allowedValues": [
+        1,
+        2,
+        3,
+        4,
+        5
+      ],
+      "itemFormula": "5 - code"
+    },
+    "SEMANTIC_DISTRESS_0_TO_4": {
+      "allowedValues": [
+        0,
+        1,
+        2,
+        3,
+        4
+      ],
+      "itemFormula": "identity; never reverse a second time"
+    }
+  },
+  "inputModeMustBeExplicit": true,
+  "mixedOrUnknownMode": "REJECT",
+  "requireNumericIntegerWithoutCoercion": true,
+  "formula": "Sum exactly six semantic distress values",
+  "minimum": 0,
+  "maximum": 24,
+  "reverseWordedItems": [],
+  "weights": "All 1",
+  "missingPolicy": {
+    "status": "PROPOSED_NOT_AUTHOR_RULE",
+    "policy": "Any absent, multiple or invalid symptom response makes total and threshold label unavailable. Do not silently fill0, use mode, prorate or impute for an individual's report. Permit skip/exit; missing is not absence of distress."
+  },
+  "authorMissingRule": "Author FAQ explicitly states no published recommendation prescribing how to handle missing values. It discusses survey-analysis choices rather than a fixed clinical/personal scoring rule.",
+  "invalidPolicy": "Reject explicit null, booleans, strings, fractions, arrays, out-of-range, unknown item ids, duplicate ids and unknown/mixed input mode. Missing id -> no total. No imputation.",
+  "excludedFromSum": "All K6+ supplementary questions Q2–Q6 and administrative fields.",
+  "scoringSourceUrl": "https://rckessler.scholars.harvard.edu/sites/g/files/omnuum8166/files/2026-03/Scoring_K6_K10.pdf",
+  "report": "Continuous total/24 only; no threshold, severity band, norm, diagnosis or suicide-risk inference."
+}

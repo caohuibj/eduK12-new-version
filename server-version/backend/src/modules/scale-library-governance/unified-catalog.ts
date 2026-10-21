@@ -1,5 +1,6 @@
 /** Unified directory only. Mutation and execution stay with the source-owned
  * STANDARD authorization/runtime and approved authored exact-release services. */
+import { matchesScaleLibraryClassification, scaleLibraryClassificationFilterSchema, type ScaleLibraryClassificationFilters } from '../scale/library/scale-library-read-model'
 import { prisma } from '../../config/database'
 import { UserRole } from '../../types'
 import { readStandardScaleLibraryForActor } from '../scale/library/standard-catalog-reader'
@@ -14,14 +15,25 @@ async function readStandard(actorId: string) {
   return readStandardScaleLibraryForActor({ userId: actorId, role })
 }
 
-export async function readUnifiedCatalog(actorId: string, product: LibraryProduct, pagination = { page: 1, pageSize: 25 }) {
+export async function readUnifiedCatalog(actorId: string, product: LibraryProduct, pagination: { page: number; pageSize: number } & ScaleLibraryClassificationFilters = { page: 1, pageSize: 25 }) {
   if (!Number.isSafeInteger(pagination.page) || pagination.page < 1 || pagination.page > Math.floor(Number.MAX_SAFE_INTEGER / 100)
     || !Number.isInteger(pagination.pageSize) || pagination.pageSize < 1 || pagination.pageSize > 100) {
     return fail('量表库分页参数不合法', 400)
   }
+  const parsed = scaleLibraryClassificationFilterSchema.safeParse(pagination)
+  if (!parsed.success) return fail('量表库分类筛选参数不合法', 400)
+  const filters = parsed.data
+  const classificationActive = filters.constructDomain !== undefined || filters.overlapTag !== undefined
   const standard = await readStandard(actorId)
-  const plan = platformCatalogPagePlan(standard.entries, pagination.page, pagination.pageSize)
-  const authored = await listEntries(actorId, undefined, { offset: plan.authoredOffset, limit: plan.authoredLimit })
+  // Filter the complete actor-visible STANDARD projection, never a page or a runtime definition.
+  const visibleStandard = classificationActive
+    ? standard.entries.filter(entry => matchesScaleLibraryClassification(entry.construct, filters))
+    : standard.entries
+  const plan = platformCatalogPagePlan(visibleStandard, pagination.page, pagination.pageSize)
+  // AUTHORED has no declared construct classification. Do not infer it or fetch it when filtering.
+  const authored = classificationActive
+    ? { list: [], hasMore: false }
+    : await listEntries(actorId, undefined, { offset: plan.authoredOffset, limit: plan.authoredLimit })
   return {
     ...combinePlatformCatalog(plan.standardPage, authored.list, product),
     generatedAt: standard.generatedAt, page: pagination.page, pageSize: pagination.pageSize,

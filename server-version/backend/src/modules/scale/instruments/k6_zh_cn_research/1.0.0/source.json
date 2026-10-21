@@ -1,0 +1,145 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "k6_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "K6 官方普通话六题研究候选（精确验证对应未建立）",
+      "abbreviation": "K6",
+      "instrumentFamily": "Kessler Psychological Distress Scales"
+    },
+    "construct": {
+      "primaryDomain": "WELL_BEING",
+      "secondaryDomains": [],
+      "constructDefinition": "过去30天非特异性心理困扰的自述出现频率；官方普通话六题形式，精确验证版本对应未建立。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "mental_health",
+        "psychological_distress"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "populationNotes": "仅限成人研究候选范围，不推定未成年人适用性。作者官网普通话译本不等于本平台已完成精确版本验证，禁止实际施测。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 6,
+      "estimatedMinutes": 3,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "过去30天",
+      "requiredTraining": true,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "仅选官方K6+表的六道计分症状题Q1a–f，不是完整K6+附加问卷；不添加功能问题、注意力题或额外安全筛查题。",
+        "保持30天时间框架和官方普通话原题；印刷代码1–5映射为计分4–0，总分0–24，不能直接把印刷代码相加。",
+        "独立指导语及平台支持提示不得塞入题干；当前仅目录信息，不提供施测入口。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅文本、计分和安全方案审查，不供实际施测。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "k6-kessler-2002-original-development",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "Original general-health-survey development samples; not exact validation of this Mandarin form",
+        "locale": "en",
+        "territory": "US",
+        "studyDesign": "Original scale development using item-response methods; six symptoms and 30-day recall.",
+        "rating": "UNKNOWN",
+        "citation": "Kessler RC, Andrews G, Colpe LJ, Hiripi E, Mroczek DK, Normand SLT, Walters EE, Zaslavsky AM. Short screening scales to monitor population prevalences and trends in non-specific psychological distress. Psychological Medicine.2002;32(6):959–976.",
+        "doi": "10.1017/S0033291702006074",
+        "url": "https://doi.org/10.1017/S0033291702006074",
+        "notes": "Literature index only; no local exact-version validity, threshold or norm claim."
+      },
+      {
+        "evidenceId": "k6-kessler-2003-original-calibration",
+        "evidenceType": "CRITERION",
+        "population": "Enriched US adult calibration convenience sample; worst month in previous 12 months",
+        "locale": "en",
+        "territory": "US",
+        "sampleSize": 155,
+        "studyDesign": "Serious mental illness criterion calibration; original worst-month period differs from selected past-30-day Mandarin form.",
+        "rating": "UNKNOWN",
+        "citation": "Kessler RC et al. Screening for serious mental illness in the general population. Archives of General Psychiatry.2003;60(2):184–189.",
+        "doi": "10.1001/archpsyc.60.2.184",
+        "url": "https://jamanetwork.com/journals/jamapsychiatry/fullarticle/207204",
+        "notes": "Required author citation retained. Original threshold is research metadata only and is not applied to this 30-day form; no diagnosis, label or Chinese norm."
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "Yueqin Huang, MD, MPH, PhD, and Ping Liu, MD, Institute of Mental Health, Peking University, Beijing; translation on behalf of the Composite International Diagnostic Interview Advisory Committee. Official author-hosted Mandarin translation: https://rckessler.scholars.harvard.edu/sites/g/files/omnuum8166/files/2026-03/Chinese_Mandarin_K6.pdf Exact English/Mandarin materials: docs/scale-instruments/research-drafts/k6/1.0.0/. No assistant-generated translation.",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "作者官网普通话译本，精确验证版本对应未建立。仅供研究材料审查，不供实际施测或临床使用；并非 AI 自译。 © Ronald C. Kessler, PhD. 2003. All rights reserved. © Ronald C. Kessler, PhD. 2006. All rights reserved. Based on the Composite International Diagnostic Interview ©2001 Ronald C. Kessler, PhD. All rights reserved. Author free-use grant retains copyright; not public domain. Source v1/2006; exact wording/recall validation match OPEN. No new human or expert review claimed."
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "K6 — official Mandarin six-item, past-30-day research candidate; not complete K6+",
+      "citation": "Kessler RC et al. Screening for serious mental illness in the general population. Archives of General Psychiatry.2003;60(2):184–189.",
+      "url": "https://rckessler.scholars.harvard.edu/sites/g/files/omnuum8166/files/2026-03/Chinese_Mandarin_K6.pdf",
+      "publicationYear": 2006
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "K6 六题原始分（仅报告设计，未运行）"
+      ],
+      "limitations": [
+        "作者官网普通话译本，精确验证版本对应未建立。仅供研究材料审查，不供实际施测或临床使用；并非 AI 自译。",
+        "只展示候选目录资料，不可开始、施测或生成实际报告；仅六道Q1a–f，非完整K6+。",
+        "报告设计为印刷代码1–5映射计分4–0后的六题总分0–24；六题完整才计总分是平台保守策略。",
+        "原研究最差月份阈值不能用于本30天普通话表；无诊断、常模、百分位、阳性标签或自杀风险等级。",
+        "现有score_only解释支持标准量表描述报告；qcReview可真实记录审查身份，不冒充人审；未生成scientificReview。",
+        "Yueqin Huang, MD, MPH, PhD, and Ping Liu, MD, Institute of Mental Health, Peking University, Beijing; translation on behalf of the Composite International Diagnostic Interview Advisory Committee.",
+        "© Ronald C. Kessler, PhD. 2006. All rights reserved.",
+        "本工具不是诊断或自杀风险评估，分数低也不能排除需要帮助的情况。若困扰持续或影响生活，可寻求合格专业人员评估。若正处于即时危险或无法保证自身安全，请联系当地急救服务并寻求可信赖的人陪伴。此页面无人实时监测，不会自动联系您或安排援助。",
+        "现有 ADULT_SELF 与 audience=student 可合法组合；student 是 respondent/subject 的技术报告受众，不是未成年人年龄限制。具体调用的披露、成人文案与报告投影尚待验证，不能据此宣称已可施测；科学适用年龄限制仍保留。"
+      ],
+      "disclaimer": "仅研究候选，未注册可执行包，不可施测。官方普通话译本，非AI自译；精确验证版本对应未建立。"
+    },
+    "blockers": [
+      "EXECUTABLE_NOT_REGISTERED",
+      "LOCALIZATION_REVIEW_PENDING",
+      "EXACT_MANDARIN_VALIDATION_MATCH_OPEN",
+      "INDEPENDENT_INSTRUCTIONS_PRESENTATION_REQUIRED",
+      "RESPONDENT_REPORT_PROJECTION_VERIFICATION_PENDING",
+      "SUPPORT_AND_PRIVACY_REVIEW_REQUIRED"
+    ]
+  }
+}

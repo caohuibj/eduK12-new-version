@@ -1,3 +1,4 @@
+import { z } from 'zod'
 import { listScaleInstrumentSources, getScaleInstrumentLocalization } from '../onboarding/instrument-registry'
 import { materializeCatalogManifest } from '../onboarding/validate-instrument'
 import {
@@ -17,6 +18,7 @@ import {
   type ScaleCatalogRegistry,
 } from './catalog-registry'
 import {
+  constructDomainSchema,
   type ConstructDomain,
   type ForbiddenUse,
   type IntendedUse,
@@ -57,7 +59,22 @@ export interface ScaleLibraryReadModelContext {
   nowIso?: string
 }
 
-export interface ScaleLibraryFilterInput {
+/** Discovery-only filters; no classification is inferred from names or runtime tags. */
+export const scaleLibraryClassificationFilterSchema = z.object({
+  constructDomain: constructDomainSchema.optional(),
+  overlapTag: z.string().min(1).max(120).refine(value => value.trim().length > 0, 'overlapTag must not be blank').optional(),
+})
+export type ScaleLibraryClassificationFilters = z.infer<typeof scaleLibraryClassificationFilterSchema>
+
+export const matchesScaleLibraryClassification = (
+  construct: ScaleCatalogManifestV1['construct'],
+  filters: ScaleLibraryClassificationFilters,
+): boolean => (
+  (filters.constructDomain === undefined || construct.primaryDomain === filters.constructDomain || construct.secondaryDomains.includes(filters.constructDomain))
+  && (filters.overlapTag === undefined || construct.constructOverlapTags.includes(filters.overlapTag))
+)
+
+export interface ScaleLibraryFilterInput extends ScaleLibraryClassificationFilters {
   keyword?: string
   instrumentFamily?: string
   primaryDomain?: ConstructDomain
@@ -451,6 +468,7 @@ export const filterScaleLibraryEntries = (
       ].join(' '))
       if (!haystack.includes(keyword)) return false
     }
+    if (!matchesScaleLibraryClassification(entry.construct, filters)) return false
     if (filters.instrumentFamily && entry.identity.instrumentFamily !== filters.instrumentFamily) return false
     if (filters.primaryDomain && entry.construct.primaryDomain !== filters.primaryDomain) return false
     if (filters.secondaryDomain && !entry.construct.secondaryDomains.includes(filters.secondaryDomain)) return false

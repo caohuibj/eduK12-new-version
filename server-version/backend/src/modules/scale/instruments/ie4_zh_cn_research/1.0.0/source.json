@@ -1,0 +1,150 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ie4_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "IE-4 内外控制信念四题 简体中文研究工作译稿（未验证）",
+      "abbreviation": "IE-4",
+      "instrumentFamily": "Internal–External Locus of Control Short Scale"
+    },
+    "construct": {
+      "primaryDomain": "PERSONALITY",
+      "secondaryDomains": [],
+      "constructDefinition": "内控与外控信念的自述；保留2022英文版双均分计分。2026德语证据提出包含默许应答方法因子的单内容潜因子解释，不能宣称两个无争议独立特质，不能据此改为四题总分。",
+      "constructLevel": "SPECIFIC_CONSTRUCT",
+      "constructOverlapTags": [
+        "locus_of_control",
+        "internal_control",
+        "external_control"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "populationNotes": "成人研究候选范围；2022 UK/德国原语在线配额样本18–69岁，不是中文验证或学生专门证据，不推定未成年人适用性。当前AI中文译稿不可施测。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 4,
+      "estimatedMinutes": 2,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED",
+        "PAPER"
+      ],
+      "timeFrame": "一般个人控制信念；无固定回顾时间窗。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "保留2022英文版四题顺序及1–5符合程度锚点，不插入注意力题。",
+        "第1、2题内控均分，第3、4题外控均分，各自1–5；无反向、不合并总分。",
+        "独立平台说明控制信念不等于实际控制能力或责任归因；当前仅目录资料，无施测入口。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅研究自评文本、双均分计分与报告审查；原作者不建议个体诊断，CC BY 4.0许可不等于科学适用或平台授权。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "ie4-niessen-2022-english-adaptation",
+        "evidenceType": "CROSS_CULTURAL_VALIDITY",
+        "population": "UK and German native-speaking adult online quota samples, ages18–69; UK n468, Germany n474; not Chinese or youth validation",
+        "locale": "en",
+        "territory": "GB",
+        "studyDesign": "2022 English adaptation and validation; UK retest n111, Germany n117. Metric, not scalar, invariance across UK/DE.",
+        "rating": "MIXED",
+        "citation": "Nießen, D., Schmidt, I., Groskurth, K., Rammstedt, B., & Lechner, C. M. (2022). Internal–External Locus of Control Short Scale–4 (IE-4). DOI 10.6102/zis323_exz; original validation DOI 10.1371/journal.pone.0271289. CC BY 4.0.",
+        "doi": "10.1371/journal.pone.0271289",
+        "url": "https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0271289",
+        "notes": "Very short subscales limit precision. Preserve source two-mean scoring for traceability; no English–Chinese invariance or cross-national mean-equivalence claim."
+      },
+      {
+        "evidenceId": "ie4-2026-dimensionality-counterevidence",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "German representative adult sample, n2522; not Chinese validation",
+        "locale": "de",
+        "territory": "DE",
+        "sampleSize": 2522,
+        "studyDesign": "2026 counterevidence favors a single content latent dimension with an acquiescence method factor; ordinary single-factor model fits poorly.",
+        "rating": "MIXED",
+        "citation": "2026 dimensionality study, DOI 10.1186/s40359-026-05101-4.",
+        "doi": "10.1186/s40359-026-05101-4",
+        "url": "https://link.springer.com/article/10.1186/s40359-026-05101-4",
+        "notes": "德国代表性成人样本N=2522，支持包含默许应答倾向方法因子的单内容潜因子模型；普通单因子模型拟合不佳。不是简单四题合计或普通单因子得到支持。 为保持2022英文版计分可追溯性保留双均分，2026德语研究提出应答倾向解释，不能宣称两个无争议独立特质。"
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "AI-assisted Simplified Chinese working translation derived from the pinned GESIS 2022 English IE-4 instrument under CC BY 4.0; not an official Chinese version. Source items, attribution and disclosed changes retained in docs/scale-instruments/research-drafts/ie4/1.0.0/.",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "AI初译研究工作稿，未经独立语言审查或心理测量验证 Nießen, D., Schmidt, I., Groskurth, K., Rammstedt, B., & Lechner, C. M. (2022). Internal–External Locus of Control Short Scale–4 (IE-4). DOI 10.6102/zis323_exz; original validation DOI 10.1371/journal.pone.0271289. CC BY 4.0. No exact validated Chinese version or English–Chinese invariance established; no human-review claim or InstrumentAuthorization created."
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "Internal–External Locus of Control Short Scale–4 — unvalidated Simplified Chinese research working translation",
+      "citation": "Nießen, D., Schmidt, I., Groskurth, K., Rammstedt, B., & Lechner, C. M. (2022). Internal–External Locus of Control Short Scale–4 (IE-4). DOI 10.6102/zis323_exz; original validation DOI 10.1371/journal.pone.0271289. CC BY 4.0.",
+      "url": "https://access.gesis.org/zis/1259",
+      "publicationYear": 2022
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "内控信念均分（1–5，仅报告设计）",
+        "外控信念均分（1–5，仅报告设计）"
+      ],
+      "limitations": [
+        "本次作答可分别描述您对自身行动影响结果、以及外部力量影响结果的看法。两个维度应分别看待，不合并为总分，也不代表能力、人格优劣或心理诊断。当前中文仅为未经验证的研究工作译稿，不能用于个体诊断、升学或就业选拔。",
+        "这些分数描述您对控制来源的看法，不测量实际能控制多少事情，也不能判断成功或困境是谁的责任。",
+        "为保持2022英文版计分可追溯性保留双均分，2026德语研究提出应答倾向解释，不能宣称两个无争议独立特质。",
+        "当前中文是AI初译研究工作稿，未经心理测量验证。",
+        "UK/DE仅支持metric而非scalar invariance；不进行跨国均值或中文等值推断。",
+        "作答不完整；缺题维度不计算，另一完整维度如显示也须保留本提示。",
+        "无反向、无总分，无高低档、常模、百分位或诊断；不得用于升学、就业选拔或成功/困境责任归因。",
+        "2026方法因子证据不是简单四题总分或普通单因子获得支持，当前仅保留2022双均分的来源可追溯性。",
+        "只展示候选目录资料，不可开始、施测或生成实际报告；现有score_only支持描述性解释，但未启用执行。",
+        "CC BY 4.0允许按署名要求复制及翻译，不等于平台grant；未生成scientificReview。",
+        "现有 ADULT_SELF 与 audience=student 可合法组合；student 是 respondent/subject 的技术报告受众，不是未成年人年龄限制。具体调用的披露、成人文案与报告投影尚待验证，不能据此宣称已可施测；科学适用年龄限制仍保留。"
+      ],
+      "disclaimer": "仅研究候选，不可施测。AI中文译稿未验证；控制信念不代表实际能力、个人价值或应负责任。双维结构存在须明确呈现的研究争议。"
+    },
+    "blockers": [
+      "EXECUTABLE_NOT_REGISTERED",
+      "LOCALIZATION_REVIEW_PENDING",
+      "STRUCTURAL_EVIDENCE_REVIEW_REQUIRED",
+      "INDEPENDENT_INSTRUCTIONS_PRESENTATION_REQUIRED",
+      "RESPONDENT_REPORT_PROJECTION_VERIFICATION_PENDING",
+      "PRIVACY_AND_RESEARCH_USE_REVIEW_REQUIRED"
+    ]
+  }
+}

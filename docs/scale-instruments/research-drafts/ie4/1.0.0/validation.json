@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "checkType": "SINGLE_LOCAL_PURE_JSON_SOURCE_BINDING_AND_MATH_CHECK",
+  "executionCount": 1,
+  "performedAt": "2026-10-21T19:31:47.959543+00:00",
+  "frozenSourceSha256": "3085d235de800b06db3bc92d2806618244cabbe0189ed43a97cdd4da3426619d",
+  "checks": [
+    "Four English/Chinese items and all anchors identical to frozen source",
+    "625 exhaustive complete response vectors,4singlemissing,and1allmissing cases",
+    "6 malformed response vectors rejected",
+    "No app test suite or CI run"
+  ],
+  "syntheticCases": 636,
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "e778502d9ec6a7fa61e68da10da17fa5c0314b617e3f8eb91b3ca64d3b29d74d"
+    },
+    {
+      "path": "content-draft.json",
+      "sha256": "8c04c6f690abeed92b69b7eddbfb5b7d1e02d4bded64551122cb540e2c80a8bf"
+    },
+    {
+      "path": "golden-fixtures.json",
+      "sha256": "ded3fa7d91ecb6e0a4c99d54289c950716e30da7d4d59513196b61e6794eddfc"
+    },
+    {
+      "path": "report-design.json",
+      "sha256": "b39478377c9487593c5e16487661a5c72bf31ff8502e675518ed96bd67ca97cc"
+    },
+    {
+      "path": "scoring-contract.json",
+      "sha256": "ea9207cab164f94b56c9705f8cd8c6aa7b812714cd3a4e45a4999b9dae9e045a"
+    },
+    {
+      "path": "source-and-rights.json",
+      "sha256": "498ede7da4e25b4ecb203430322ae6939f489a5ad829bf3345d644e4a7b8adb7"
+    }
+  ]
+}

@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "status": "RESEARCH_REPORT_DRAFT_NOT_VALIDATED",
+  "summary": "本次作答可分别描述您对自身行动影响结果、以及外部力量影响结果的看法。两个维度应分别看待，不合并为总分，也不代表能力、人格优劣或心理诊断。当前中文仅为未经验证的研究工作译稿，不能用于个体诊断、升学或就业选拔。",
+  "requiredNotices": [
+    "这些分数描述您对控制来源的看法，不测量实际能控制多少事情，也不能判断成功或困境是谁的责任。",
+    "为保持2022英文版计分可追溯性保留双均分，2026德语研究提出应答倾向解释，不能宣称两个无争议独立特质。",
+    "当前中文是AI初译研究工作稿，未经心理测量验证。",
+    "UK/DE仅支持metric而非scalar invariance；不进行跨国均值或中文等值推断。"
+  ],
+  "scores": [
+    {
+      "key": "internal",
+      "label": "对自身行动影响结果的看法",
+      "range": [
+        1,
+        5
+      ]
+    },
+    {
+      "key": "external",
+      "label": "对外部力量影响结果的看法",
+      "range": [
+        1,
+        5
+      ]
+    }
+  ],
+  "missingNotice": "作答不完整；缺题维度不计算，另一完整维度如显示也须保留本提示。",
+  "doNotGenerate": [
+    "total",
+    "high/medium/low bands",
+    "percentiles",
+    "diagnosis",
+    "success/blame attribution",
+    "actual control capacity",
+    "uncontested independent trait labels",
+    "student or employee selection recommendation"
+  ],
+  "visuals": "Optional two raw-score positions with endpoints1–5; no normative colors/ranks. No external images."
+}

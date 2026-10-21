@@ -1,0 +1,845 @@
+{
+  "schemaVersion": "k6-content-fixtures-v1",
+  "synthetic": true,
+  "clinicalClassificationExpected": false,
+  "cases": [
+    {
+      "name": "printed-none",
+      "inputMode": "PRINTED_CODE_1_TO_5",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 5
+        },
+        {
+          "itemId": "Q1b",
+          "value": 5
+        },
+        {
+          "itemId": "Q1c",
+          "value": 5
+        },
+        {
+          "itemId": "Q1d",
+          "value": 5
+        },
+        {
+          "itemId": "Q1e",
+          "value": 5
+        },
+        {
+          "itemId": "Q1f",
+          "value": 5
+        }
+      ],
+      "expectedOutcome": "SCORED",
+      "expectedTotal": 0,
+      "expectedCategory": null
+    },
+    {
+      "name": "printed-all",
+      "inputMode": "PRINTED_CODE_1_TO_5",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 1
+        },
+        {
+          "itemId": "Q1b",
+          "value": 1
+        },
+        {
+          "itemId": "Q1c",
+          "value": 1
+        },
+        {
+          "itemId": "Q1d",
+          "value": 1
+        },
+        {
+          "itemId": "Q1e",
+          "value": 1
+        },
+        {
+          "itemId": "Q1f",
+          "value": 1
+        }
+      ],
+      "expectedOutcome": "SCORED",
+      "expectedTotal": 24,
+      "expectedCategory": null
+    },
+    {
+      "name": "printed-some",
+      "inputMode": "PRINTED_CODE_1_TO_5",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 3
+        },
+        {
+          "itemId": "Q1b",
+          "value": 3
+        },
+        {
+          "itemId": "Q1c",
+          "value": 3
+        },
+        {
+          "itemId": "Q1d",
+          "value": 3
+        },
+        {
+          "itemId": "Q1e",
+          "value": 3
+        },
+        {
+          "itemId": "Q1f",
+          "value": 3
+        }
+      ],
+      "expectedOutcome": "SCORED",
+      "expectedTotal": 12,
+      "expectedCategory": null
+    },
+    {
+      "name": "printed-13-arithmetic-only",
+      "inputMode": "PRINTED_CODE_1_TO_5",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 2
+        },
+        {
+          "itemId": "Q1b",
+          "value": 3
+        },
+        {
+          "itemId": "Q1c",
+          "value": 3
+        },
+        {
+          "itemId": "Q1d",
+          "value": 3
+        },
+        {
+          "itemId": "Q1e",
+          "value": 3
+        },
+        {
+          "itemId": "Q1f",
+          "value": 3
+        }
+      ],
+      "expectedOutcome": "SCORED",
+      "expectedTotal": 13,
+      "expectedCategory": null
+    },
+    {
+      "name": "printed-mixed",
+      "inputMode": "PRINTED_CODE_1_TO_5",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 1
+        },
+        {
+          "itemId": "Q1b",
+          "value": 2
+        },
+        {
+          "itemId": "Q1c",
+          "value": 3
+        },
+        {
+          "itemId": "Q1d",
+          "value": 4
+        },
+        {
+          "itemId": "Q1e",
+          "value": 5
+        },
+        {
+          "itemId": "Q1f",
+          "value": 1
+        }
+      ],
+      "expectedOutcome": "SCORED",
+      "expectedTotal": 14,
+      "expectedCategory": null
+    },
+    {
+      "name": "semantic-none",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 0
+        },
+        {
+          "itemId": "Q1b",
+          "value": 0
+        },
+        {
+          "itemId": "Q1c",
+          "value": 0
+        },
+        {
+          "itemId": "Q1d",
+          "value": 0
+        },
+        {
+          "itemId": "Q1e",
+          "value": 0
+        },
+        {
+          "itemId": "Q1f",
+          "value": 0
+        }
+      ],
+      "expectedOutcome": "SCORED",
+      "expectedTotal": 0,
+      "expectedCategory": null
+    },
+    {
+      "name": "semantic-all",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 4
+        },
+        {
+          "itemId": "Q1b",
+          "value": 4
+        },
+        {
+          "itemId": "Q1c",
+          "value": 4
+        },
+        {
+          "itemId": "Q1d",
+          "value": 4
+        },
+        {
+          "itemId": "Q1e",
+          "value": 4
+        },
+        {
+          "itemId": "Q1f",
+          "value": 4
+        }
+      ],
+      "expectedOutcome": "SCORED",
+      "expectedTotal": 24,
+      "expectedCategory": null
+    },
+    {
+      "name": "semantic-ones-no-double-reverse",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 1
+        },
+        {
+          "itemId": "Q1b",
+          "value": 1
+        },
+        {
+          "itemId": "Q1c",
+          "value": 1
+        },
+        {
+          "itemId": "Q1d",
+          "value": 1
+        },
+        {
+          "itemId": "Q1e",
+          "value": 1
+        },
+        {
+          "itemId": "Q1f",
+          "value": 1
+        }
+      ],
+      "expectedOutcome": "SCORED",
+      "expectedTotal": 6,
+      "expectedCategory": null
+    },
+    {
+      "name": "semantic-13-arithmetic-only",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 3
+        },
+        {
+          "itemId": "Q1b",
+          "value": 2
+        },
+        {
+          "itemId": "Q1c",
+          "value": 2
+        },
+        {
+          "itemId": "Q1d",
+          "value": 2
+        },
+        {
+          "itemId": "Q1e",
+          "value": 2
+        },
+        {
+          "itemId": "Q1f",
+          "value": 2
+        }
+      ],
+      "expectedOutcome": "SCORED",
+      "expectedTotal": 13,
+      "expectedCategory": null
+    },
+    {
+      "name": "missing-1",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1b",
+          "value": 0
+        },
+        {
+          "itemId": "Q1c",
+          "value": 0
+        },
+        {
+          "itemId": "Q1d",
+          "value": 0
+        },
+        {
+          "itemId": "Q1e",
+          "value": 0
+        },
+        {
+          "itemId": "Q1f",
+          "value": 0
+        }
+      ],
+      "expectedOutcome": "INCOMPLETE",
+      "expectedTotal": null,
+      "expectedCategory": null
+    },
+    {
+      "name": "missing-2",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 0
+        },
+        {
+          "itemId": "Q1c",
+          "value": 0
+        },
+        {
+          "itemId": "Q1d",
+          "value": 0
+        },
+        {
+          "itemId": "Q1e",
+          "value": 0
+        },
+        {
+          "itemId": "Q1f",
+          "value": 0
+        }
+      ],
+      "expectedOutcome": "INCOMPLETE",
+      "expectedTotal": null,
+      "expectedCategory": null
+    },
+    {
+      "name": "missing-3",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 0
+        },
+        {
+          "itemId": "Q1b",
+          "value": 0
+        },
+        {
+          "itemId": "Q1d",
+          "value": 0
+        },
+        {
+          "itemId": "Q1e",
+          "value": 0
+        },
+        {
+          "itemId": "Q1f",
+          "value": 0
+        }
+      ],
+      "expectedOutcome": "INCOMPLETE",
+      "expectedTotal": null,
+      "expectedCategory": null
+    },
+    {
+      "name": "missing-4",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 0
+        },
+        {
+          "itemId": "Q1b",
+          "value": 0
+        },
+        {
+          "itemId": "Q1c",
+          "value": 0
+        },
+        {
+          "itemId": "Q1e",
+          "value": 0
+        },
+        {
+          "itemId": "Q1f",
+          "value": 0
+        }
+      ],
+      "expectedOutcome": "INCOMPLETE",
+      "expectedTotal": null,
+      "expectedCategory": null
+    },
+    {
+      "name": "missing-5",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 0
+        },
+        {
+          "itemId": "Q1b",
+          "value": 0
+        },
+        {
+          "itemId": "Q1c",
+          "value": 0
+        },
+        {
+          "itemId": "Q1d",
+          "value": 0
+        },
+        {
+          "itemId": "Q1f",
+          "value": 0
+        }
+      ],
+      "expectedOutcome": "INCOMPLETE",
+      "expectedTotal": null,
+      "expectedCategory": null
+    },
+    {
+      "name": "missing-6",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 0
+        },
+        {
+          "itemId": "Q1b",
+          "value": 0
+        },
+        {
+          "itemId": "Q1c",
+          "value": 0
+        },
+        {
+          "itemId": "Q1d",
+          "value": 0
+        },
+        {
+          "itemId": "Q1e",
+          "value": 0
+        }
+      ],
+      "expectedOutcome": "INCOMPLETE",
+      "expectedTotal": null,
+      "expectedCategory": null
+    },
+    {
+      "name": "invalid-null",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": null
+        },
+        {
+          "itemId": "Q1b",
+          "value": 0
+        },
+        {
+          "itemId": "Q1c",
+          "value": 0
+        },
+        {
+          "itemId": "Q1d",
+          "value": 0
+        },
+        {
+          "itemId": "Q1e",
+          "value": 0
+        },
+        {
+          "itemId": "Q1f",
+          "value": 0
+        }
+      ],
+      "expectedOutcome": "INVALID",
+      "expectedTotal": null,
+      "expectedCategory": null
+    },
+    {
+      "name": "invalid-boolean",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": true
+        },
+        {
+          "itemId": "Q1b",
+          "value": 0
+        },
+        {
+          "itemId": "Q1c",
+          "value": 0
+        },
+        {
+          "itemId": "Q1d",
+          "value": 0
+        },
+        {
+          "itemId": "Q1e",
+          "value": 0
+        },
+        {
+          "itemId": "Q1f",
+          "value": 0
+        }
+      ],
+      "expectedOutcome": "INVALID",
+      "expectedTotal": null,
+      "expectedCategory": null
+    },
+    {
+      "name": "invalid-string",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": "1"
+        },
+        {
+          "itemId": "Q1b",
+          "value": 0
+        },
+        {
+          "itemId": "Q1c",
+          "value": 0
+        },
+        {
+          "itemId": "Q1d",
+          "value": 0
+        },
+        {
+          "itemId": "Q1e",
+          "value": 0
+        },
+        {
+          "itemId": "Q1f",
+          "value": 0
+        }
+      ],
+      "expectedOutcome": "INVALID",
+      "expectedTotal": null,
+      "expectedCategory": null
+    },
+    {
+      "name": "invalid-fraction",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 1.5
+        },
+        {
+          "itemId": "Q1b",
+          "value": 0
+        },
+        {
+          "itemId": "Q1c",
+          "value": 0
+        },
+        {
+          "itemId": "Q1d",
+          "value": 0
+        },
+        {
+          "itemId": "Q1e",
+          "value": 0
+        },
+        {
+          "itemId": "Q1f",
+          "value": 0
+        }
+      ],
+      "expectedOutcome": "INVALID",
+      "expectedTotal": null,
+      "expectedCategory": null
+    },
+    {
+      "name": "invalid-negative",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": -1
+        },
+        {
+          "itemId": "Q1b",
+          "value": 0
+        },
+        {
+          "itemId": "Q1c",
+          "value": 0
+        },
+        {
+          "itemId": "Q1d",
+          "value": 0
+        },
+        {
+          "itemId": "Q1e",
+          "value": 0
+        },
+        {
+          "itemId": "Q1f",
+          "value": 0
+        }
+      ],
+      "expectedOutcome": "INVALID",
+      "expectedTotal": null,
+      "expectedCategory": null
+    },
+    {
+      "name": "invalid-too-large",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 5
+        },
+        {
+          "itemId": "Q1b",
+          "value": 0
+        },
+        {
+          "itemId": "Q1c",
+          "value": 0
+        },
+        {
+          "itemId": "Q1d",
+          "value": 0
+        },
+        {
+          "itemId": "Q1e",
+          "value": 0
+        },
+        {
+          "itemId": "Q1f",
+          "value": 0
+        }
+      ],
+      "expectedOutcome": "INVALID",
+      "expectedTotal": null,
+      "expectedCategory": null
+    },
+    {
+      "name": "invalid-array",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": []
+        },
+        {
+          "itemId": "Q1b",
+          "value": 0
+        },
+        {
+          "itemId": "Q1c",
+          "value": 0
+        },
+        {
+          "itemId": "Q1d",
+          "value": 0
+        },
+        {
+          "itemId": "Q1e",
+          "value": 0
+        },
+        {
+          "itemId": "Q1f",
+          "value": 0
+        }
+      ],
+      "expectedOutcome": "INVALID",
+      "expectedTotal": null,
+      "expectedCategory": null
+    },
+    {
+      "name": "printed-zero",
+      "inputMode": "PRINTED_CODE_1_TO_5",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 0
+        },
+        {
+          "itemId": "Q1b",
+          "value": 1
+        },
+        {
+          "itemId": "Q1c",
+          "value": 1
+        },
+        {
+          "itemId": "Q1d",
+          "value": 1
+        },
+        {
+          "itemId": "Q1e",
+          "value": 1
+        },
+        {
+          "itemId": "Q1f",
+          "value": 1
+        }
+      ],
+      "expectedOutcome": "INVALID",
+      "expectedTotal": null,
+      "expectedCategory": null
+    },
+    {
+      "name": "unknown-mode",
+      "inputMode": "UNKNOWN",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 0
+        },
+        {
+          "itemId": "Q1b",
+          "value": 0
+        },
+        {
+          "itemId": "Q1c",
+          "value": 0
+        },
+        {
+          "itemId": "Q1d",
+          "value": 0
+        },
+        {
+          "itemId": "Q1e",
+          "value": 0
+        },
+        {
+          "itemId": "Q1f",
+          "value": 0
+        }
+      ],
+      "expectedOutcome": "INVALID",
+      "expectedTotal": null,
+      "expectedCategory": null
+    },
+    {
+      "name": "duplicate-id",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q1a",
+          "value": 0
+        },
+        {
+          "itemId": "Q1b",
+          "value": 0
+        },
+        {
+          "itemId": "Q1c",
+          "value": 0
+        },
+        {
+          "itemId": "Q1d",
+          "value": 0
+        },
+        {
+          "itemId": "Q1e",
+          "value": 0
+        },
+        {
+          "itemId": "Q1f",
+          "value": 0
+        },
+        {
+          "itemId": "Q1a",
+          "value": 0
+        }
+      ],
+      "expectedOutcome": "INVALID",
+      "expectedTotal": null,
+      "expectedCategory": null
+    },
+    {
+      "name": "unknown-id",
+      "inputMode": "SEMANTIC_DISTRESS_0_TO_4",
+      "responses": [
+        {
+          "itemId": "Q2",
+          "value": 0
+        },
+        {
+          "itemId": "Q1b",
+          "value": 0
+        },
+        {
+          "itemId": "Q1c",
+          "value": 0
+        },
+        {
+          "itemId": "Q1d",
+          "value": 0
+        },
+        {
+          "itemId": "Q1e",
+          "value": 0
+        },
+        {
+          "itemId": "Q1f",
+          "value": 0
+        }
+      ],
+      "expectedOutcome": "INVALID",
+      "expectedTotal": null,
+      "expectedCategory": null
+    }
+  ]
+}

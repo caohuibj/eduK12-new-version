@@ -136,6 +136,8 @@ export interface ScaleLibraryFilters {
   instrumentFamily?: string
   primaryDomain?: string
   secondaryDomain?: string
+  constructDomain?: string
+  overlapTag?: string
   respondent?: ScaleLibraryRespondent
   minAge?: number
   maxAge?: number

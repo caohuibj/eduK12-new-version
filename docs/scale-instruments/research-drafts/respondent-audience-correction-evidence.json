@@ -1,0 +1,264 @@
+{
+  "schemaVersion": 1,
+  "correction": "Adult-self respondent audience is supported; prior schema-blocker assertion was incorrect. Actual call-site disclosure/wording/projection remains unverified.",
+  "baseCommit": "6fffa068090aa8a5eec87da194a2bc526c15f7e8",
+  "changes": [
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/phq9_zh_cn_research/1.0.0/source.json",
+      "beforeSha256": "18c4f85321f04302ade0a556ef9ba8abcf50bb7859f5cacc982226e8910d5210",
+      "afterSha256": "0a125db935b2084377eb073cfe244bbcf7f58de07215d25c8713b1383975f641"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/gad7_zh_cn_research/1.0.0/source.json",
+      "beforeSha256": "ddb3e187b6b94ec2972208f8066109209ba635616bac13e43bd0295e3dd06976",
+      "afterSha256": "36a7cb7b412cd7fcbacd6c0c7638c5a05515e1b5ab1b83639a0c821e0d77b382"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/k6_zh_cn_research/1.0.0/source.json",
+      "beforeSha256": "33dec1ad59659b670c3a843466cc309a4e597c572ecfc2caa09eaa542c5fdd80",
+      "afterSha256": "f1ec1919f81b823650706f3729e6a3935c1a34a4191c17b67c911fad852b312d"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ipip50_zh_cn_research/1.0.0/source.json",
+      "beforeSha256": "de4dbc015834527045db06ac81786418560870db259032bfeb692f98bebf3a6e",
+      "afterSha256": "d3fd2c4fe9b2aca566c926f4727e2c13b0e853e4a09980eacd8a1953c84d0104"
+    },
+    {
+      "path": "server-version/backend/src/modules/scale/instruments/ie4_zh_cn_research/1.0.0/source.json",
+      "beforeSha256": "b7303e2edc125fe8b3746ff562a0a5c6c01ec4b8699739ddd13054984fd7667a",
+      "afterSha256": "71785f8bab163324654bdfa7a2baa3d52b0eb3d9f61c9b9cc008e78ba874232b"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/phq9/1.0.0/report-design.json",
+      "beforeSha256": "7be85642ba1ebb195caacc815f72c7070454c95cdfd3f47faa29c2ba6d8027f8",
+      "afterSha256": "efcb0dea7b9a9bb620e906abecb5bc8a0f60e456dc0da9ecd1c77b88675894b1"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gad7/1.0.0/report-design.json",
+      "beforeSha256": "167ad4078e377e6c35ec7468dd2c05c1edaf545848b75bf777957e1639cebd6f",
+      "afterSha256": "12e49f6ad5e83446faacfb507680900990ef5531dbcc4008c2ea9623a97950a1"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/k6/1.0.0/report-design.json",
+      "beforeSha256": "a8a91eaa75f921592d10c8eefa077275d85900853f25f6605e21422d973f6726",
+      "afterSha256": "6eff716ae0d359b5a50492e69b1c206144bbc21cb4f599665309bae6cc3dbadb"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/phq9/1.0.0/README.md",
+      "beforeSha256": "1793845fa543a0f6435cf97922855afb6ba35e9e69e24e62d695145118847c33",
+      "afterSha256": "5b4076fa7acbefb379ef5aa4888c464d73b27d57a1bbd10dd7278045221aa79f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gad7/1.0.0/README.md",
+      "beforeSha256": "57087073623429636696ca43881fa092dbeec5a058db88942a9fb9d83a0b8da7",
+      "afterSha256": "8e24a42357221b8c90d2578eb2e11ac583ceef0b8c389c616fc20383e303b4b6"
+    }
+  ],
+  "unchangedResearchFiles": [
+    {
+      "path": "docs/scale-instruments/research-drafts/phq9/1.0.0/content-draft.json",
+      "sha256": "c3f2855289e18b6bad4938f45682d2228c3d082cdfe31dbbb0fe8aff3545b654"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/phq9/1.0.0/golden-fixtures.json",
+      "sha256": "114bc45467b0220d3e48923ea25dda898c08059d68b18fe1fe0d67eadf35f422"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/phq9/1.0.0/scoring-contract.json",
+      "sha256": "155cc2c6916d1b4730288dad4c0afc2a8d45b032d02ad6bdf4d865dd26b16461"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/phq9/1.0.0/source-and-rights.json",
+      "sha256": "9782f38e63d0dd5f5da49893b62b44a7e7a2a9ef6703a3d8a24200db56bf93e7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/phq9/1.0.0/validation.json",
+      "sha256": "69ea16d76c2ef8e894406d460f4d24a2f5d0930e9540dc58da818b0649ad50e4"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gad7/1.0.0/content-draft.json",
+      "sha256": "08382442f006eeba48fe43feac99ce8a3b69498f03fe3365ffddd65ddeaf840f"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gad7/1.0.0/golden-fixtures.json",
+      "sha256": "9d48cb59eeff996502b2465bab41df384b0869a295a012d9a847b974c2ad0448"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gad7/1.0.0/scoring-contract.json",
+      "sha256": "0871536f95c7db9d94859a498d75b312b8bc6ef19b8cc992da8b86bba5c36f94"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gad7/1.0.0/source-and-rights.json",
+      "sha256": "c53ebc622bf0bc5a2add393410cf9b50f3e2ae0f5d43c419d2f6127686788fa2"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/gad7/1.0.0/validation.json",
+      "sha256": "9e09929e095d25b62a4c64a076b54920c6d40495be6f9fca252c11cb27093673"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/k6/1.0.0/README.md",
+      "sha256": "3759bc2bbd5e4236357a6635715b9d67bca3daf7713f6404cb5c53e8ac769b2c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/k6/1.0.0/content-draft.json",
+      "sha256": "01c90fe471f8bbc833c96c50563f830710e66fa1d46ff46886ab6bfb62f51986"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/k6/1.0.0/golden-fixtures.json",
+      "sha256": "6c8e584869518ec6938b124f99168668b756d5b98f528d87090bc679442a8157"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/k6/1.0.0/scoring-contract.json",
+      "sha256": "4211a9ee01dec11b28f7653a06d26a1ad475884df2521729819042e224dd0bf4"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/k6/1.0.0/source-and-rights.json",
+      "sha256": "909c3a8869e158954ed2fde2ef87dfd82ed6beb3508749dcf1ddfe694164122d"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/k6/1.0.0/validation.json",
+      "sha256": "164c4a47a7f94cafe3bdf107d9728c339271339d6920b01c78c7d4b4adfd86e5"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.0.0/README.md",
+      "sha256": "06c4cadb237fbefff3b17c9eeb0a4145366c61f5d4a5842672fde6bd719fcb56"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.0.0/content-draft.json",
+      "sha256": "9896befacfd50d42d5883a5b8c49d0379ac7eb9effa2b27346b6b33bd14c777c"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.0.0/golden-fixtures.json",
+      "sha256": "df0c307620c3c1d632842afe275524304f47a080282c64d33f6a1b56ed83ab7e"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.0.0/report-design.json",
+      "sha256": "83365011be9333c663e52a214440659de00e7e9ce00e6840fdf5defaacddb917"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.0.0/scoring-contract.json",
+      "sha256": "19e84e8ea664702bfd65be9be45b3feaa9facbab2c2f79662fa82a47d901bd17"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.0.0/source-and-rights.json",
+      "sha256": "0ebe4b8ebd9bcce1cda47563657b37ba38cb27b3db8f44dc00e45dfc18031d19"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ipip50/1.0.0/validation.json",
+      "sha256": "fee0f5e50b54a5561d20431f3155936b664af6dfaaf91fac154481d83a489aac"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ie4/1.0.0/README.md",
+      "sha256": "e778502d9ec6a7fa61e68da10da17fa5c0314b617e3f8eb91b3ca64d3b29d74d"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ie4/1.0.0/content-draft.json",
+      "sha256": "8c04c6f690abeed92b69b7eddbfb5b7d1e02d4bded64551122cb540e2c80a8bf"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ie4/1.0.0/golden-fixtures.json",
+      "sha256": "ded3fa7d91ecb6e0a4c99d54289c950716e30da7d4d59513196b61e6794eddfc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ie4/1.0.0/report-design.json",
+      "sha256": "b39478377c9487593c5e16487661a5c72bf31ff8502e675518ed96bd67ca97cc"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ie4/1.0.0/scoring-contract.json",
+      "sha256": "ea9207cab164f94b56c9705f8cd8c6aa7b812714cd3a4e45a4999b9dae9e045a"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ie4/1.0.0/source-and-rights.json",
+      "sha256": "498ede7da4e25b4ecb203430322ae6939f489a5ad829bf3345d644e4a7b8adb7"
+    },
+    {
+      "path": "docs/scale-instruments/research-drafts/ie4/1.0.0/validation.json",
+      "sha256": "240d3a19af6073f652963196044940d9bf68caff9617fa0e4da8b154ebd778a4"
+    }
+  ],
+  "scope": "candidatePreview only; catalog/localization/definition unchanged. No catalogManifestVersion bump; no generator or runtime edits. IPIP50 and IE4 report-design have no corresponding audience-schema error and are unchanged.",
+  "historicalEvidence": "All prior validation files/hashes and mathematical results retained unchanged; no old tests or arithmetic rerun. Report wording changes affect PHQ9/GAD7/K6 only, not items/scoring/goldens.",
+  "remainingInstructionGap": "Materialization does not write instruction; standalone/whole paths read live Scale.instruction; frozen Survey presentation does not contain administration instructions. These presentation/freeze gaps remain unresolved.",
+  "codeReferences": [
+    "server-version/backend/src/modules/scale/projection/scale-result.projector.ts:65",
+    "server-version/backend/src/modules/reporting/scale-unit-report.ts:139"
+  ],
+  "targetedMetadataCheck": {
+    "status": "PASS",
+    "command": "node --import tsx /workspace/scratch/5a77e8bdc1ae/library-research/scales/check_audience_metadata.cjs",
+    "node": "v24.19.0",
+    "exitCode": 0,
+    "checkedAt": "2026-10-21T19:37:52.755Z",
+    "checkerSha256": "ae649c76d124cf6d20d4a4a1f3f9ffb2872da95f43a77927ba396426e52440fc",
+    "results": [
+      {
+        "tool": "phq9",
+        "status": "PASS",
+        "sourceSha256": "0a125db935b2084377eb073cfe244bbcf7f58de07215d25c8713b1383975f641"
+      },
+      {
+        "tool": "gad7",
+        "status": "PASS",
+        "sourceSha256": "36a7cb7b412cd7fcbacd6c0c7638c5a05515e1b5ab1b83639a0c821e0d77b382"
+      },
+      {
+        "tool": "k6",
+        "status": "PASS",
+        "sourceSha256": "f1ec1919f81b823650706f3729e6a3935c1a34a4191c17b67c911fad852b312d"
+      },
+      {
+        "tool": "ipip50",
+        "status": "PASS",
+        "sourceSha256": "d3fd2c4fe9b2aca566c926f4727e2c13b0e853e4a09980eacd8a1953c84d0104"
+      },
+      {
+        "tool": "ie4",
+        "status": "PASS",
+        "sourceSha256": "71785f8bab163324654bdfa7a2baa3d52b0eb3d9f61c9b9cc008e78ba874232b"
+      }
+    ],
+    "scope": "Five source schemas, changed blocker/clarification, unchanged catalog/localization/definition, no executable, public projection unavailable/no launch/report ineligible, admin publishable=false/no authorization; untouched research files equal HEAD. No historical tests or math rerun.",
+    "environmentQualification": "UNSUPPORTED: Node v24.19.0 is below backend engines >=24.21.0 <25; actual PASS retained historically, not qualified acceptance evidence."
+  },
+  "additionalQualifiedReceipts": [
+    {
+      "status": "PASS",
+      "command": "/workspace/scratch/5a77e8bdc1ae/eduk12_tools_20261018/node_modules/node/bin/node --import tsx /workspace/scratch/5a77e8bdc1ae/library-research/scales/check_audience_metadata.cjs",
+      "node": "v24.21.0",
+      "exitCode": 0,
+      "checkedAt": "2026-10-21T19:38:40.260Z",
+      "checkerSha256": "ae649c76d124cf6d20d4a4a1f3f9ffb2872da95f43a77927ba396426e52440fc",
+      "results": [
+        {
+          "tool": "phq9",
+          "status": "PASS",
+          "sourceSha256": "0a125db935b2084377eb073cfe244bbcf7f58de07215d25c8713b1383975f641"
+        },
+        {
+          "tool": "gad7",
+          "status": "PASS",
+          "sourceSha256": "36a7cb7b412cd7fcbacd6c0c7638c5a05515e1b5ab1b83639a0c821e0d77b382"
+        },
+        {
+          "tool": "k6",
+          "status": "PASS",
+          "sourceSha256": "f1ec1919f81b823650706f3729e6a3935c1a34a4191c17b67c911fad852b312d"
+        },
+        {
+          "tool": "ipip50",
+          "status": "PASS",
+          "sourceSha256": "d3fd2c4fe9b2aca566c926f4727e2c13b0e853e4a09980eacd8a1953c84d0104"
+        },
+        {
+          "tool": "ie4",
+          "status": "PASS",
+          "sourceSha256": "71785f8bab163324654bdfa7a2baa3d52b0eb3d9f61c9b9cc008e78ba874232b"
+        }
+      ],
+      "scope": "Five source schemas, changed blocker/clarification, unchanged catalog/localization/definition, no executable, public projection unavailable/no launch/report ineligible, admin publishable=false/no authorization; untouched research files equal HEAD. No historical tests or math rerun.",
+      "environmentQualification": "SUPPORTED: Node v24.21.0 meets backend engines >=24.21.0 <25; version checked immediately before this run.",
+      "nodeBinarySha256": "7fde7b8afa198da66257f42ee2001d874c7355631e6d1579a5fb5ef1f246df4c",
+      "reason": "Single permitted rerun to repair unsupported tool environment, not repetition of a qualified successful check. Identical checker hash and all five source input hashes; historical tests and mathematical cases not rerun."
+    }
+  ]
+}

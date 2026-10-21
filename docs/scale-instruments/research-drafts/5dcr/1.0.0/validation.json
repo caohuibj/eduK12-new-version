@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "checkType": "R2_TWO_APPROVED_EDITS_AND_COMPLETE_JSON_ONLY",
+  "executionCount": 1,
+  "performedAt": "2026-10-21T20:07:43.657335+00:00",
+  "r1Sha256": "f5bb41f4449c44638d96adc1147e94ec2ddd50a27ad566d384994ebc9c89a045",
+  "r2Sha256": "8bbfbdec883b8d5b6fcd7597e88edcb343fe4612f800b55fe7df9949d0e14b68",
+  "checks": [
+    "Exactly Q23 Chinese wording and missing-sample note changed in source JSON",
+    "All generated JSON parsed",
+    "All 24 derived items bound to r2 source"
+  ],
+  "previousMathEvidence": {
+    "file": "/workspace/scratch/5a77e8bdc1ae/library-research/scales/review-packages/5dcr_validation.json",
+    "cases": 4802,
+    "rerun": false
+  },
+  "applicationSuiteRun": false,
+  "ciRun": false,
+  "scientificHumanValidation": false
+}

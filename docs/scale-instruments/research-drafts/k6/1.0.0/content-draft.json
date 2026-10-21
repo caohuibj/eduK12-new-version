@@ -1,0 +1,177 @@
+{
+  "schemaVersion": "k6-unregistered-content-draft-v1",
+  "status": "OFFICIAL_MANDARIN_TRANSLATION_EXACT_VALIDATION_MATCH_OPEN",
+  "runtimeRegistration": false,
+  "versionIntent": {
+    "instrumentKey": "k6_zh_cn_research",
+    "instrumentVersion": "1.0.0",
+    "localizationVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "reportVersion": "1.0.0",
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "releaseStatus": "DRAFT"
+  },
+  "selectedForm": "Six scored K6 symptom questions Q1a–f, extracted verbatim from official K6+ self-report form; past30days. Not an entire reproduction of all K6+ supplementary questions.",
+  "sourceEnglish": {
+    "source_url": "https://rckessler.scholars.harvard.edu/sites/g/files/omnuum8166/files/2026-03/Self%20admin_K6.pdf",
+    "source_locator": "p.1 Q1a–f; source has K6+ supplementary questions p.2 and copyright p.3.",
+    "instructions": "The following questions ask about how you have been feeling during the past 30 days. For each question, please circle the number that best describes how often you had this feeling.",
+    "prompt": "Q1. During the past 30 days, about how often did you feel …",
+    "recall_period_days": 30,
+    "response_options": [
+      {
+        "printed_code": 1,
+        "label": "All of the time",
+        "scored_value": 4
+      },
+      {
+        "printed_code": 2,
+        "label": "Most of the time",
+        "scored_value": 3
+      },
+      {
+        "printed_code": 3,
+        "label": "Some of the time",
+        "scored_value": 2
+      },
+      {
+        "printed_code": 4,
+        "label": "A little of the time",
+        "scored_value": 1
+      },
+      {
+        "printed_code": 5,
+        "label": "None of the time",
+        "scored_value": 0
+      }
+    ],
+    "items": [
+      {
+        "number": 1,
+        "source_id": "Q1a",
+        "text": "…nervous?",
+        "reverse_keyed_construct": false
+      },
+      {
+        "number": 2,
+        "source_id": "Q1b",
+        "text": "…hopeless?",
+        "reverse_keyed_construct": false
+      },
+      {
+        "number": 3,
+        "source_id": "Q1c",
+        "text": "…restless or fidgety?",
+        "reverse_keyed_construct": false
+      },
+      {
+        "number": 4,
+        "source_id": "Q1d",
+        "text": "…so depressed that nothing could cheer you up?",
+        "reverse_keyed_construct": false
+      },
+      {
+        "number": 5,
+        "source_id": "Q1e",
+        "text": "…that everything was an effort?",
+        "reverse_keyed_construct": false
+      },
+      {
+        "number": 6,
+        "source_id": "Q1f",
+        "text": "…worthless?",
+        "reverse_keyed_construct": false
+      }
+    ],
+    "transcription_method": "PDF line-wrap whitespace normalized; wording, numbering a–f, punctuation and response semantics retained. No added attention questions.",
+    "excluded_supplementary_fields": "K6+ Q2 persistence/comparison; Q3–Q4 activity impairment; Q5 health-service contacts; Q6 physical-health attribution. Official author page says these are not required for K6 scoring. Administrative identifiers/demographics are not scale items and are not added to this research form."
+  },
+  "officialMandarin": {
+    "status": "OFFICIAL_AUTHOR_HOSTED_TRANSLATION_RIGHTS_CLEAR_VALIDATION_MATCH_OPEN",
+    "source_url": "https://rckessler.scholars.harvard.edu/sites/g/files/omnuum8166/files/2026-03/Chinese_Mandarin_K6.pdf",
+    "source_locator": "p.1 scored Q1a–f; p.3 translators/copyright.",
+    "language": "Mandarin; Simplified Chinese",
+    "edition_notice": "v1; copyright2006",
+    "translator": "Yueqin Huang, MD, MPH, PhD, and Ping Liu, MD, Institute of Mental Health, Peking University, Beijing; translation on behalf of the Composite International Diagnostic Interview Advisory Committee.",
+    "translation_rights_status": "CLEAR_AUTHOR_POSTED_TRANSLATION_GRANT",
+    "instructions": "下面的问题是询问您过去 30 天中的情绪。回答每一个问题时，请圈出最能描述这种情绪的出现频率的号码。",
+    "prompt": "问 1. 在过去３０天中，您经常会感到 …",
+    "recall_period_days": 30,
+    "response_options": [
+      {
+        "printed_code": 1,
+        "label": "全部时间",
+        "scored_value": 4
+      },
+      {
+        "printed_code": 2,
+        "label": "大部分时间",
+        "scored_value": 3
+      },
+      {
+        "printed_code": 3,
+        "label": "一部分时间",
+        "scored_value": 2
+      },
+      {
+        "printed_code": 4,
+        "label": "偶尔",
+        "scored_value": 1
+      },
+      {
+        "printed_code": 5,
+        "label": "无",
+        "scored_value": 0
+      }
+    ],
+    "items": [
+      {
+        "number": 1,
+        "source_id": "Q1a",
+        "text": "…紧张?"
+      },
+      {
+        "number": 2,
+        "source_id": "Q1b",
+        "text": "…绝望?"
+      },
+      {
+        "number": 3,
+        "source_id": "Q1c",
+        "text": "…不安或烦躁?"
+      },
+      {
+        "number": 4,
+        "source_id": "Q1d",
+        "text": "…太沮丧以至于什么都不能让您愉快起来?"
+      },
+      {
+        "number": 5,
+        "source_id": "Q1e",
+        "text": "…做每一件事情都很费劲?"
+      },
+      {
+        "number": 6,
+        "source_id": "Q1f",
+        "text": "…无价值?"
+      }
+    ],
+    "transcription_method": "Only line-wrap whitespace joined; no machine translation, simplification or modernization. Printed source question uses fullwidth30; preserved.",
+    "translated_by_assistant": false,
+    "exact_validation_match": "Not yet proved that a cited validation administered this exact downloadable2006 Mandarin form and same30-day recall frame.",
+    "other_official_language": "Cantonese is separately available at https://rckessler.scholars.harvard.edu/sites/g/files/omnuum8166/files/2026-03/Chinese_Cantonese_K6.pdf ; its validation evidence cannot automatically validate Mandarin."
+  },
+  "platformInstructionsNotOriginalItems": {
+    "draftNotice": "作者官网普通话译本，精确验证版本对应未建立。仅供研究材料审查，不供实际施测或临床使用；并非 AI 自译。",
+    "missingResponsePolicy": "可跳过或退出。六题未完整合法作答时不计算总分；这是平台保守草稿策略，不是作者唯一规定。",
+    "supportNotice": "本工具不是诊断或自杀风险评估，分数低也不能排除需要帮助的情况。若困扰持续或影响生活，可寻求合格专业人员评估。若正处于即时危险或无法保证自身安全，请联系当地急救服务并寻求可信赖的人陪伴。此页面无人实时监测，不会自动联系您或安排援助。",
+    "displayRequirement": "Unconditional before/during answering and in reports, including incomplete attempts; outside original items."
+  },
+  "reviewStatus": {
+    "humanReview": "NOT_CLAIMED",
+    "scientificReview": "NOT_CLAIMED",
+    "exactChineseValidationMatch": "OPEN",
+    "deploymentAuthorization": "NOT_CREATED"
+  }
+}

@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "status": "RESEARCH_DESIGN_NOT_RUNTIME_REPORT",
+  "text": {
+    "draftNotice": "作者官网普通话译本，精确验证版本对应未建立。仅供研究材料审查，不供实际施测或临床使用；并非 AI 自译。",
+    "headline": "过去30天心理困扰自述原始分",
+    "complete": "本次 K6 心理困扰自评分为 {total}/24，反映过去30天所报告的困扰频率；分数越高表示困扰出现得越频繁。这不是精神障碍诊断，也不是全国或同龄人的常模排名。若困扰影响生活或持续存在，可考虑进一步专业评估。",
+    "incomplete": "有题目未完成，暂不计算总分。",
+    "support": "本工具不是诊断或自杀风险评估，分数低也不能排除需要帮助的情况。若困扰持续或影响生活，可寻求合格专业人员评估。若正处于即时危险或无法保证自身安全，请联系当地急救服务并寻求可信赖的人陪伴。此页面无人实时监测，不会自动联系您或安排援助。",
+    "limitations": [
+      "作者官网译本不等于本平台已验证或获临床认可。",
+      "原研究最差月份阈值不直接用于本30天普通话表。",
+      "不提供严重程度、阳性标签、常模、百分位、治疗效果或自杀风险判断。",
+      "不用于诊断、选拔、人员考核或排名；不得推定未成年人适用性。"
+    ]
+  },
+  "structure": [
+    "Unconditional provenance and support notice",
+    "Total only when six valid answers",
+    "Meaning and limitations",
+    "Source methods"
+  ],
+  "clinicalLabels": [],
+  "bands": [],
+  "norms": null,
+  "imageStatus": "DRAFT_PREVIEW_ASSET_PENDING",
+  "publicationGates": [
+    "ADULT_SELF with audience=student is already supported: student is the technical respondent/subject report audience, not an age restriction. Verify actual call-site disclosure, adult-facing wording and report projection before use; retain scientific population limits. Record truthful QC reviewer/time/basis without fabricated human or scientific review.",
+    "Truthful report QC reviewer/time/basis; no fabricated human review",
+    "Privacy, consent, retention and actual deployment authority",
+    "Exact Chinese validation match before any validity/threshold claims",
+    "Independent administration instructions visible outside original items"
+  ],
+  "supportAlwaysVisible": true,
+  "automaticContactPromised": false
+}

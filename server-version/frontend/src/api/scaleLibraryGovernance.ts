@@ -1,5 +1,5 @@
 import apiClient, { sessionFetch } from './client'
-import type { ScaleLibraryEntry } from './scaleLibrary'
+import type { ScaleLibraryEntry, ScaleLibraryFilters } from './scaleLibrary'
 
 export type GovernanceMediaItem = { assetId: string; contentHash: string; mimeType: string; sizeBytes: number; assetVersion: string; usages: string[]; rights: 'AUTHOR_SHARED_FOR_BOUND_SCALE'; dependencyReleaseIds: string[] }
 export type GovernanceMediaManifest = { schemaVersion: 1; releaseIds: string[]; items: GovernanceMediaItem[]; manifestHash: string }
@@ -22,6 +22,7 @@ export type GovernanceCatalogRecord = {
   standard?: ScaleLibraryEntry; authored?: GovernanceEntry;
 }
 export type GovernanceCatalogPage = { schemaVersion: 1; list: GovernanceCatalogRecord[]; generatedAt: string; page: number; pageSize: number; hasMore: boolean }
+export type GovernanceCatalogFilters = Pick<ScaleLibraryFilters, 'constructDomain' | 'overlapTag'>
 
 async function request<T>(product: GovernanceProduct, path: string, payload?: unknown): Promise<T> {
   const url = `/${product.toLowerCase()}/scale-library-governance${path}`
@@ -44,7 +45,7 @@ async function request<T>(product: GovernanceProduct, path: string, payload?: un
   return body.data
 }
 export const governanceApi = (product: GovernanceProduct) => ({
-  catalog: (page = 1, pageSize = 25) => request<GovernanceCatalogPage>(product, '/catalog?' + new URLSearchParams({ page: String(page), pageSize: String(pageSize) })),
+  catalog: (page = 1, pageSize = 25, filters: GovernanceCatalogFilters = {}) => request<GovernanceCatalogPage>(product, '/catalog?' + new URLSearchParams({ page: String(page), pageSize: String(pageSize), ...(filters.constructDomain ? { constructDomain: filters.constructDomain } : {}), ...(filters.overlapTag ? { overlapTag: filters.overlapTag } : {}) })),
   catalogDetail: (row: GovernanceCatalogRecord) => request<{ entry: GovernanceCatalogRecord }>(product, row.origin === 'STANDARD_REGISTRY' ? '/catalog/standard/' + encodeURIComponent(row.exactVersion.instrumentKey || '') + '/' + encodeURIComponent(row.exactVersion.instrumentVersion || '') : '/catalog/authored/' + encodeURIComponent(row.exactVersion.entryId || '')),
   capabilities: () => request<GovernanceCapabilities>(product, '/capabilities'),
   source: (sourceId: string) => request<GovernanceSource>(product, '/sources/' + encodeURIComponent(sourceId)),

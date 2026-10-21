@@ -1,0 +1,184 @@
+{
+  "status": "PASS",
+  "scope": "One-shot JSON/provenance and pure arithmetic specification validation only; not application tests, production scorer execution, frontend rendering, runtime safety or clinical validation.",
+  "checkedAt": "2026-10-21T17:34:17.973009+00:00",
+  "caseCount": 35,
+  "cases": [
+    {
+      "name": "all-zero",
+      "status": "PASS"
+    },
+    {
+      "name": "all-max",
+      "status": "PASS"
+    },
+    {
+      "name": "all-one",
+      "status": "PASS"
+    },
+    {
+      "name": "boundary-4-arithmetic-only",
+      "status": "PASS"
+    },
+    {
+      "name": "boundary-5-arithmetic-only",
+      "status": "PASS"
+    },
+    {
+      "name": "boundary-9-arithmetic-only",
+      "status": "PASS"
+    },
+    {
+      "name": "boundary-10-arithmetic-only",
+      "status": "PASS"
+    },
+    {
+      "name": "boundary-14-arithmetic-only",
+      "status": "PASS"
+    },
+    {
+      "name": "boundary-15-arithmetic-only",
+      "status": "PASS"
+    },
+    {
+      "name": "boundary-19-arithmetic-only",
+      "status": "PASS"
+    },
+    {
+      "name": "boundary-20-arithmetic-only",
+      "status": "PASS"
+    },
+    {
+      "name": "missing-symptom-1",
+      "status": "PASS"
+    },
+    {
+      "name": "missing-symptom-2",
+      "status": "PASS"
+    },
+    {
+      "name": "missing-symptom-3",
+      "status": "PASS"
+    },
+    {
+      "name": "missing-symptom-4",
+      "status": "PASS"
+    },
+    {
+      "name": "missing-symptom-5",
+      "status": "PASS"
+    },
+    {
+      "name": "missing-symptom-6",
+      "status": "PASS"
+    },
+    {
+      "name": "missing-symptom-7",
+      "status": "PASS"
+    },
+    {
+      "name": "missing-symptom-8",
+      "status": "PASS"
+    },
+    {
+      "name": "missing-symptom-9",
+      "status": "PASS"
+    },
+    {
+      "name": "all-missing",
+      "status": "PASS"
+    },
+    {
+      "name": "impairment-0-excluded",
+      "status": "PASS"
+    },
+    {
+      "name": "impairment-1-excluded",
+      "status": "PASS"
+    },
+    {
+      "name": "impairment-2-excluded",
+      "status": "PASS"
+    },
+    {
+      "name": "impairment-3-excluded",
+      "status": "PASS"
+    },
+    {
+      "name": "missing-impairment-does-not-block",
+      "status": "PASS"
+    },
+    {
+      "name": "item9-nonzero-other-item-missing",
+      "status": "PASS"
+    },
+    {
+      "name": "reject-numeric-string",
+      "status": "PASS"
+    },
+    {
+      "name": "reject-non-numeric-string",
+      "status": "PASS"
+    },
+    {
+      "name": "reject-boolean",
+      "status": "PASS"
+    },
+    {
+      "name": "reject-fraction",
+      "status": "PASS"
+    },
+    {
+      "name": "reject-negative",
+      "status": "PASS"
+    },
+    {
+      "name": "reject-out-of-range",
+      "status": "PASS"
+    },
+    {
+      "name": "reject-array",
+      "status": "PASS"
+    },
+    {
+      "name": "duplicate-item-response",
+      "status": "PASS"
+    }
+  ],
+  "explicitNullAndMultiAnswerCases": "Recorded rejection expectations; no platform form handler executed.",
+  "checkerSha256": "9d80c124d67c2fc86f260a049f994d89dda6e7eec42821c3998be577910d366e",
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "d7d85bf4d67486f80fcc1953edc9050f663dc3a2973387880ec3260a5e00b573"
+    },
+    {
+      "path": "content-draft.json",
+      "sha256": "c3f2855289e18b6bad4938f45682d2228c3d082cdfe31dbbb0fe8aff3545b654"
+    },
+    {
+      "path": "golden-fixtures.json",
+      "sha256": "114bc45467b0220d3e48923ea25dda898c08059d68b18fe1fe0d67eadf35f422"
+    },
+    {
+      "path": "report-design.json",
+      "sha256": "7be85642ba1ebb195caacc815f72c7070454c95cdfd3f47faa29c2ba6d8027f8"
+    },
+    {
+      "path": "scoring-contract.json",
+      "sha256": "155cc2c6916d1b4730288dad4c0afc2a8d45b032d02ad6bdf4d865dd26b16461"
+    },
+    {
+      "path": "source-and-rights.json",
+      "sha256": "9782f38e63d0dd5f5da49893b62b44a7e7a2a9ef6703a3d8a24200db56bf93e7"
+    }
+  ],
+  "postValidationDocumentationChanges": [
+    {
+      "path": "README.md",
+      "currentSha256": "1793845fa543a0f6435cf97922855afb6ba35e9e69e24e62d695145118847c33",
+      "scope": "Appended correction of report capabilities and AI QC identity only; original validation file hashes preserved as historical evidence. Five JSON inputs verified unchanged; mathematical checks not repeated.",
+      "verifiedAt": "2026-10-21T17:38:56.889162+00:00"
+    }
+  ]
+}

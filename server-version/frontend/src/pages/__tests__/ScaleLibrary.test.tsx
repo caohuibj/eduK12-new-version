@@ -1,4 +1,4 @@
-import { act, render, screen, waitFor } from '@testing-library/react'
+import { act, render, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
@@ -99,6 +99,41 @@ const entry = (overrides: Partial<ScaleLibraryEntry> = {}): ScaleLibraryEntry =>
 })
 
 describe('ScaleLibrary page', () => {
+  it.each(['list', 'detail'] as const)('displays deduplicated primary, secondary and overlap classifications in the %s', async view => {
+    const classified = entry({ construct: {
+      primaryDomain: 'WELL_BEING', secondaryDomains: ['WELL_BEING', 'RESILIENCE', 'RESILIENCE'],
+      constructDefinition: '跨构念说明', constructLevel: 'SPECIFIC_CONSTRUCT', constructOverlapTags: ['stress', 'coping', 'stress'],
+    } })
+    mockList.mockResolvedValue({ code: 0, data: { entries: [classified] } })
+    mockDetail.mockResolvedValue({ code: 0, data: { entry: classified } })
+    render(<MemoryRouter initialEntries={[view === 'list' ? '/scale-library' : '/scale-library/who5/1.0.0']}>
+      <Routes><Route path="/scale-library" element={<ScaleLibrary />} /><Route path="/scale-library/:instrumentKey/:instrumentVersion" element={<ScaleLibrary />} /></Routes>
+    </MemoryRouter>)
+    const classifications = within(await screen.findByRole('group', { name: '构念与交叉标签' }))
+    expect(classifications.getAllByLabelText('构念：身心健康')).toHaveLength(1)
+    expect(classifications.getAllByLabelText('构念：心理韧性')).toHaveLength(1)
+    expect(classifications.getAllByLabelText('交叉标签：stress')).toHaveLength(1)
+    expect(classifications.getByLabelText('交叉标签：coping')).toBeInTheDocument()
+  })
+
+  it('applies and removes the combined domain and exact overlap filters', async () => {
+    mockList.mockResolvedValue({ code: 0, data: { entries: [] } })
+    const user = userEvent.setup()
+    render(<MemoryRouter><ScaleLibrary /></MemoryRouter>)
+    await screen.findByText('没有符合条件的量表')
+    await user.click(screen.getByText('更多筛选'))
+    await user.selectOptions(screen.getByLabelText('构念分类（主要或次要）'), 'RESILIENCE')
+    const overlap = screen.getByLabelText('交叉标签（精确匹配）')
+    expect(overlap).toHaveAttribute('maxlength', '120')
+    await user.type(overlap, 'stress/perceived')
+    await user.click(screen.getByRole('button', { name: '应用筛选' }))
+    await waitFor(() => expect(mockList).toHaveBeenLastCalledWith({ constructDomain: 'RESILIENCE', overlapTag: 'stress/perceived' }))
+    await user.click(screen.getByRole('button', { name: '移除构念分类：心理韧性' }))
+    await waitFor(() => expect(mockList).toHaveBeenLastCalledWith({ constructDomain: undefined, overlapTag: 'stress/perceived' }))
+    await user.click(screen.getByRole('button', { name: '清除全部' }))
+    await waitFor(() => expect(mockList).toHaveBeenLastCalledWith({}))
+  })
+
   it('keeps progressive filters open and ignores late results after a newer filter request', async () => {
     let resolveOld!: (value: unknown) => void
     mockList.mockResolvedValueOnce({ code: 0, data: { entries: [entry()] } })

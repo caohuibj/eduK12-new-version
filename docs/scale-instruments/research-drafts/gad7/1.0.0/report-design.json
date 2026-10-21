@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "status": "RESEARCH_DESIGN_NOT_RUNTIME_REPORT",
+  "text": {
+    "draftNotice": "AI 辅助生成的简体中文研究工作译稿，尚未验证，未获得原开发者对本译稿的审校或认可。原始量表许可允许翻译，但不代表开发者认可本译稿。仅供文本、计分与报告方案审查，不供实际施测或临床使用。",
+    "headline": "过去两周的焦虑相关症状自述原始分（研究译稿）",
+    "complete": "原始分 {total}/21（未经验证的研究译稿）",
+    "incomplete": "症状问题尚未完整作答，不计算总分。",
+    "summary": "原始分是七个症状问题的答案分值相加，理论范围为 0–21 分。较高分数只表示本次自述的这些问题出现得更频繁，不能单凭总分判断是否患有焦虑障碍，也不能判断自杀意图或风险等级。本简体中文文本是尚未验证的 AI 辅助研究工作译稿，未获得原开发者对本译稿的审校或认可。报告不提供严重程度分类、筛查阳性标签、常模、百分位或治疗效果结论。漏答任何症状题时不计算总分，也不把空白当作零分。",
+    "reflection": "审查时请区分症状出现频率与临床诊断；原始分不能替代对具体困扰、功能影响及背景的专业评估。",
+    "support": "本工具不是诊断或自杀风险评估，分数低也不能排除需要帮助的情况。若持续感到困扰，可寻求合格专业人员的评估。若正处于即时危险或无法保证自身安全，请立即联系当地急救服务，并寻求可信赖的人陪伴。此页面无人实时监测，不会自动联系您或安排援助。",
+    "limitations": [
+      "不供实际施测或临床使用。",
+      "未建立本译稿的人群适用性、效度、常模或诊断阈值。",
+      "原成人英文研究证据不能直接赋予本译稿儿童或青少年适用性。",
+      "完整七题才计总分为本平台保守草稿选择，不声称原作者规定唯一缺失规则。",
+      "不用于诊断、选拔、排名、人员考核或无依据的群体比较。"
+    ]
+  },
+  "structure": [
+    "Unconditional draft and support notice",
+    "Raw total only if all seven responses valid",
+    "Plain-language meaning and limitations",
+    "Expandable provenance and methods"
+  ],
+  "styleReference": "Existing ReportPrimitives/go-no-go report layering only, not cognitive scoring or weighted indices.",
+  "clinicalLabels": [],
+  "bands": [],
+  "imageStatus": "DRAFT_PREVIEW_ASSET_PENDING",
+  "imageReason": "Runtime preview requires installed raster asset identity, not a local SVG or fabricated StoredAsset ID. No third-party asset copied.",
+  "publicationGates": [
+    "Human translation/expert review and cognitive debrief",
+    "Unconditional administration instructions and support notice",
+    "ADULT_SELF with audience=student is already supported: student is the technical respondent/subject report audience, not an age restriction. Verify actual call-site disclosure, adult-facing wording and report projection before use; retain scientific population limits. Record truthful QC reviewer/time/basis without fabricated human or scientific review.",
+    "Privacy, consent, minimization and real deployment authorization",
+    "Local psychometric evidence for any population/threshold claim"
+  ],
+  "runtimeReportCapability": "Existing report.interpretations with source=score_only supports descriptive raw-score prose for STANDARD instruments. The separate rawScoreFeedback guard is not a blocker to this report approach."
+}

@@ -1,0 +1,40 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "checkType": "SINGLE_LOCAL_PURE_JSON_PROVENANCE_AND_MATH_CHECK",
+  "performedAt": "2026-10-21T17:48:25.828149+00:00",
+  "executionCount": 1,
+  "checks": [
+    "Frozen review source SHA256 matches",
+    "Complete selected English/Mandarin text and source provenance match frozen source",
+    "Copyright retained; six items; disputed Hong Kong numeric field absent; no applied bands",
+    "26 synthetic cases passed: both explicit input modes, no double reversal, missing, invalid and duplicate IDs"
+  ],
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "3759bc2bbd5e4236357a6635715b9d67bca3daf7713f6404cb5c53e8ac769b2c"
+    },
+    {
+      "path": "content-draft.json",
+      "sha256": "01c90fe471f8bbc833c96c50563f830710e66fa1d46ff46886ab6bfb62f51986"
+    },
+    {
+      "path": "golden-fixtures.json",
+      "sha256": "6c8e584869518ec6938b124f99168668b756d5b98f528d87090bc679442a8157"
+    },
+    {
+      "path": "report-design.json",
+      "sha256": "a8a91eaa75f921592d10c8eefa077275d85900853f25f6605e21422d973f6726"
+    },
+    {
+      "path": "scoring-contract.json",
+      "sha256": "4211a9ee01dec11b28f7653a06d26a1ad475884df2521729819042e224dd0bf4"
+    },
+    {
+      "path": "source-and-rights.json",
+      "sha256": "909c3a8869e158954ed2fde2ef87dfd82ed6beb3508749dcf1ddfe694164122d"
+    }
+  ],
+  "limitations": "Not application/runtime, rendering, clinical validation, human review, CI, publication or registration evidence."
+}

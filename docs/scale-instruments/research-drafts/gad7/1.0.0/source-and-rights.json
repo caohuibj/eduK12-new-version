@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "frozenReviewPackageSha256": "a0cc7c686dc4d4e8076acf6770433507f89a6eece06efe045ad34c158dfe5aa6",
+  "instrumentLicense": {
+    "instrument_grant": "Public-domain measure; developer manual explicitly permits reproduction, translation, display and distribution. Retain developer attribution; do not claim publisher articles, third-party branding or all translations are covered.",
+    "source_url": "https://www.hss.gov.nt.ca/professionals/sites/professionals/files/resources/instruction-manual-phq-scoring.pdf",
+    "source_locator": "p.8, QUESTIONS REGARDING DEVELOPMENT, ACKNOWLEDGMENTS AND USE; Table1 p.3 includes both measures.",
+    "quotation": "No permission is required to reproduce, translate, display or distribute.",
+    "form_source_url": "https://www.ncbi.nlm.nih.gov/projects/gap/cgi-bin/GetPdf.cgi?id=phd007940.1",
+    "form_footer": "Developer attribution and no-permission reproduction/translation/display/distribution statement present on standalone form.",
+    "attribution": "Developed by Drs. Robert L. Spitzer, Janet B.W. Williams, Kurt Kroenke and colleagues, with an educational grant from Pfizer Inc.",
+    "archive_policy": "Only original instrument wording transcribed under instrument grant. No journal article or manual PDF downloaded/uploaded; links retained. No logos copied.",
+    "historical_notice": "Early journal appendix copyright notice predates the later public-domain/free-use grant; retain current instrument-specific evidence rather than treating the journal article as public domain.",
+    "corroboration_url": "https://www.pfizer.com/news/press-release/press-release-detail/pfizer_to_offer_free_public_access_to_mental_health_assessment_tools_to_improve_diagnosis_and_patient_care",
+    "corroboration_date": "2010-07-21",
+    "corroboration_summary": "Pfizer announced download access without copyright restrictions; this corroborates the instrument grant, not journal article reuse."
+  },
+  "sourceEnglishIdentity": {
+    "language": "en",
+    "form": "Original adult self-report symptom-severity form; not adolescent modification, short form, or diagnostic interview.",
+    "version_selection": "Developer GAD-7_v2.doc one-page form hosted by NCBI: seven scored items. Original article Figure 1 also includes unscored impairment item, not present in this standalone PDF.",
+    "function_tags": [
+      "anxiety_screening",
+      "symptom_severity",
+      "change_monitoring"
+    ],
+    "population_scope": "Adult self-report first-review scope. No pediatric validation or Chinese population norm is implied."
+  },
+  "originalPaperLinkOnly": {
+    "citation": "Spitzer RL, Kroenke K, Williams JBW, Löwe B. A Brief Measure for Assessing Generalized Anxiety Disorder: The GAD-7. Archives of Internal Medicine. 2006;166(10):1092–1097.",
+    "doi": "10.1001/archinte.166.10.1092",
+    "fulltext_url": "https://depts.washington.edu/psychres/wordpress/wp-content/uploads/2017/09/gad7_ref.pdf",
+    "access_note": "Six-page publisher article openly readable from University of Washington; Figure 1 p.1094 confirms original seven symptoms and extra unscored difficulty question. Freely readable is not an open redistribution license.",
+    "article_reuse_status": "LINK_ONLY: PDF explicitly says ©2006 American Medical Association, all rights reserved; no article PDF copied.",
+    "evidence_summary": "US study across 15 primary-care clinics; adult participants 18–95 years. Abstract reports 2,740, body 2,739 with no/minimal missing data; preserve this source discrepancy. Criterion interviews: 965. Threshold >=10 had sensitivity 89%, specificity 82% for GAD. Original severity tables: 0–4 minimal,5–9 mild,10–14 moderate,15–21 severe. Two-week symptom window does not establish diagnostic duration; original reference interview used six months."
+  },
+  "originalEnglishThresholdsReviewOnly": {
+    "severity": {
+      "kind": "Descriptive symptom-severity bands, not diagnosis or percentile norms",
+      "bands": [
+        {
+          "min": 0,
+          "max": 4,
+          "label": "minimal"
+        },
+        {
+          "min": 5,
+          "max": 9,
+          "label": "mild"
+        },
+        {
+          "min": 10,
+          "max": 14,
+          "label": "moderate"
+        },
+        {
+          "min": 15,
+          "max": 21,
+          "label": "severe"
+        }
+      ],
+      "source_doi": "10.1001/archinte.166.10.1092",
+      "source_locator": "Original article Tables 2–3 and discussion, pp.1095–1096; PDF text extraction drops the leading 1 in one severe row, corroborated by Table3 and discussion.",
+      "population": "Original US clinical adult study, not Chinese norms."
+    },
+    "screening": {
+      "operator": ">=",
+      "cutoff": 10,
+      "target": "Possible generalized anxiety disorder for further clinical assessment",
+      "sensitivity": 0.89,
+      "specificity": 0.82,
+      "source_doi": "10.1001/archinte.166.10.1092",
+      "criterion_sample_n": 965,
+      "scope": "Original clinical criterion-validation sample only; no claim of accuracy for all users, Chinese translations or adolescents.",
+      "diagnostic_use": false
+    },
+    "norms": "No population norms or percentiles approved.",
+    "longitudinal": "May describe within-person score changes with consistent form/language/recall period; do not claim a validated treatment response or minimal important difference from these packages."
+  },
+  "formChoice": "Selected standalone NCBI developer seven-item form. The original article contains an extra unscored impairment question; it is deliberately not appended or silently mixed into this version.",
+  "scope": "Only original instrument wording under its grant. No journal/manual PDFs, uncertain Chinese mirror wording, logos or third-party artwork redistributed. Original English thresholds are evidence metadata, not executable classifications or validated Chinese cutoffs.",
+  "translationProvenance": "New AI-assisted Simplified Chinese working translation from frozen English source. Text review is not psychometric validation, human approval or developer endorsement."
+}

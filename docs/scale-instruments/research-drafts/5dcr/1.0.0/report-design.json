@@ -1,0 +1,71 @@
+{
+  "schemaVersion": 1,
+  "status": "RESEARCH_REPORT_DRAFT_NOT_VALIDATED",
+  "summary": "这份研究性反馈描述您自报的六类好奇倾向，不是学习动机、学习能力、智力或职业适合度测验，也不是心理诊断。各维度单独呈现，分数越高仅表示更符合该维度的描述，不代表人更好或更差。我们不提供总分、常模排名或高低分界。隐蔽社会好奇心不意味着应侵犯他人隐私，寻求刺激也不是冒险行为建议。当前中文为 AI 初译，尚未验证；未完成的维度不计分，其他已完成维度仍可呈现并注明资料不完整。",
+  "scoreDisplays": [
+    {
+      "facet": "Joyous exploration",
+      "label": "愉悦探索",
+      "range": [
+        1,
+        7
+      ],
+      "bands": null
+    },
+    {
+      "facet": "Deprivation sensitivity",
+      "label": "匮乏敏感性",
+      "range": [
+        1,
+        7
+      ],
+      "bands": null
+    },
+    {
+      "facet": "Stress tolerance",
+      "label": "压力耐受",
+      "range": [
+        1,
+        7
+      ],
+      "bands": null
+    },
+    {
+      "facet": "Social curiosity general",
+      "label": "一般（外显）社会好奇心",
+      "range": [
+        1,
+        7
+      ],
+      "bands": null
+    },
+    {
+      "facet": "Social curiosity covert",
+      "label": "隐蔽社会好奇心",
+      "range": [
+        1,
+        7
+      ],
+      "bands": null
+    },
+    {
+      "facet": "Thrill seeking",
+      "label": "寻求刺激",
+      "range": [
+        1,
+        7
+      ],
+      "bands": null
+    }
+  ],
+  "missingNotice": "资料不完整。未完成的维度不计分，其他完整维度可单独查看。",
+  "prohibited": [
+    "overall total",
+    "norm percentile",
+    "diagnosis",
+    "academic ability inference",
+    "career or school selection",
+    "higher score means better person",
+    "claims that this AI Chinese translation is validated"
+  ]
+}

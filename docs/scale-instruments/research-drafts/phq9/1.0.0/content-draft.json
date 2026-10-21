@@ -1,0 +1,209 @@
+{
+  "schemaVersion": "phq9-unregistered-content-draft-v1",
+  "status": "AI_RESEARCH_WORKING_TRANSLATION_UNVALIDATED_NOT_DEVELOPER_ENDORSED",
+  "runtimeRegistration": false,
+  "versionIntent": {
+    "instrumentKey": "phq9_zh_cn_research",
+    "instrumentVersion": "1.0.0",
+    "localizationVersion": "1.0.0",
+    "scoringVersion": "1.0.0",
+    "reportVersion": "1.0.0",
+    "catalogManifestVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "releaseStatus": "DRAFT",
+    "scientificMaturity": "PILOT"
+  },
+  "sourceEnglish": {
+    "source_url": "https://www.phqscreeners.com/images/sites/g/files/g10060481/f/201412/PHQ-9_English.pdf",
+    "source_type": "Developer/project PDF",
+    "transcription_method": "Line-wrap whitespace normalized; item text, ordering, response labels and two-week frame preserved. No new attention items or altered symptom text.",
+    "prompt": "Over the last 2 weeks, how often have you been bothered by any of the following problems?",
+    "response_instruction": "(Use “✔” to indicate your answer)",
+    "recall_period_days": 14,
+    "response_options": [
+      {
+        "value": 0,
+        "label": "Not at all"
+      },
+      {
+        "value": 1,
+        "label": "Several days"
+      },
+      {
+        "value": 2,
+        "label": "More than half the days"
+      },
+      {
+        "value": 3,
+        "label": "Nearly every day"
+      }
+    ],
+    "items": [
+      {
+        "number": 1,
+        "text": "Little interest or pleasure in doing things",
+        "reverse_scored": false
+      },
+      {
+        "number": 2,
+        "text": "Feeling down, depressed, or hopeless",
+        "reverse_scored": false
+      },
+      {
+        "number": 3,
+        "text": "Trouble falling or staying asleep, or sleeping too much",
+        "reverse_scored": false
+      },
+      {
+        "number": 4,
+        "text": "Feeling tired or having little energy",
+        "reverse_scored": false
+      },
+      {
+        "number": 5,
+        "text": "Poor appetite or overeating",
+        "reverse_scored": false
+      },
+      {
+        "number": 6,
+        "text": "Feeling bad about yourself — or that you are a failure or have let yourself or your family down",
+        "reverse_scored": false
+      },
+      {
+        "number": 7,
+        "text": "Trouble concentrating on things, such as reading the newspaper or watching television",
+        "reverse_scored": false
+      },
+      {
+        "number": 8,
+        "text": "Moving or speaking so slowly that other people could have noticed? Or the opposite — being so fidgety or restless that you have been moving around a lot more than usual",
+        "reverse_scored": false
+      },
+      {
+        "number": 9,
+        "text": "Thoughts that you would be better off dead or of hurting yourself in some way",
+        "reverse_scored": false
+      }
+    ],
+    "impairment_item": {
+      "included_in_selected_pdf": true,
+      "original_article_includes": true,
+      "text": "If you checked off any problems, how difficult have these problems made it for you to do your work, take care of things at home, or get along with other people?",
+      "options": [
+        "Not difficult at all",
+        "Somewhat difficult",
+        "Very difficult",
+        "Extremely difficult"
+      ],
+      "scored": false,
+      "placement": "Original extra unscored question retained after the nine scored symptoms."
+    }
+  },
+  "chineseWorkingTranslation": {
+    "prompt": "过去两周里，以下问题困扰您的频率是多少？",
+    "responseOptions": [
+      {
+        "value": 0,
+        "label": "完全没有"
+      },
+      {
+        "value": 1,
+        "label": "有几天"
+      },
+      {
+        "value": 2,
+        "label": "超过一半的天数"
+      },
+      {
+        "value": 3,
+        "label": "几乎每天"
+      }
+    ],
+    "scoredItems": [
+      {
+        "number": 1,
+        "itemCode": "PHQ9-01",
+        "text": "做事情时没什么兴趣或乐趣",
+        "reverseScored": false
+      },
+      {
+        "number": 2,
+        "itemCode": "PHQ9-02",
+        "text": "感到情绪低落、抑郁或没有希望",
+        "reverseScored": false
+      },
+      {
+        "number": 3,
+        "itemCode": "PHQ9-03",
+        "text": "难以入睡、难以维持睡眠，或睡得太多",
+        "reverseScored": false
+      },
+      {
+        "number": 4,
+        "itemCode": "PHQ9-04",
+        "text": "感到疲倦或没什么精力",
+        "reverseScored": false
+      },
+      {
+        "number": 5,
+        "itemCode": "PHQ9-05",
+        "text": "食欲不振或吃得过多",
+        "reverseScored": false
+      },
+      {
+        "number": 6,
+        "itemCode": "PHQ9-06",
+        "text": "对自己感觉很糟，或觉得自己是个失败者，或让自己或家人失望了",
+        "reverseScored": false
+      },
+      {
+        "number": 7,
+        "itemCode": "PHQ9-07",
+        "text": "难以集中注意力做事，例如读报纸或看电视",
+        "reverseScored": false
+      },
+      {
+        "number": 8,
+        "itemCode": "PHQ9-08",
+        "text": "动作或说话慢到别人可能会注意到的程度？或者相反，坐立不安或躁动不宁，以至于活动比平时多得多",
+        "reverseScored": false
+      },
+      {
+        "number": 9,
+        "itemCode": "PHQ9-09",
+        "text": "想到自己死了会更好，或想到以某种方式伤害自己",
+        "reverseScored": false
+      }
+    ],
+    "optionalUnscoredImpairmentQuestion": {
+      "text": "如果您勾选了任何问题，这些问题使您在工作、料理家中事务或与他人相处时感到多大困难？",
+      "options": [
+        "完全没有困难",
+        "有些困难",
+        "很困难",
+        "极其困难"
+      ],
+      "optional": true,
+      "scored": false,
+      "optionalPolicy": "optional=true 是本平台研究草稿的施测选择，并非声称原作者规定该题可选；保留原题条件提示。该题在原量表中不计分。"
+    },
+    "responseInstruction": "请选择您的答案。"
+  },
+  "platformInstructionsNotOriginalItems": {
+    "draftNotice": "AI 辅助生成的简体中文研究工作译稿，尚未验证，未获得原开发者对本译稿的审校或认可。原始量表许可允许翻译，但不代表开发者认可本译稿。仅供文本、计分与安全方案审查，不供实际施测或临床使用。",
+    "missingResponsePolicy": "您可以跳过问题或退出；九个症状问题未完整且合法作答时不计算总分。这是本平台的保守草稿策略，不是声称原作者规定的唯一规则。",
+    "safetyNotice": "第 9 题选择任何非零选项时，都需要由专业人员进一步评估，不应等待总分。第 9 题或总分不能判断自杀意图或风险等级，选择零分也不能排除风险。若正处于即时危险或无法保证自身安全，请立即联系当地急救服务，并寻求可信赖的人陪伴。此页面无人实时监测，不会自动联系您或安排援助。",
+    "displayRequirement": "Unconditional before and during answering and in report, including incomplete attempts. Never hide behind a total-score band. Not inserted into original questionnaire item text."
+  },
+  "reviewStatus": {
+    "translation": "AI_TEXT_REVIEW_COMPLETED_WITH_REVISIONS",
+    "reviewType": "AI_TEXT_REVIEW",
+    "humanReview": "PENDING",
+    "expertReview": "PENDING",
+    "cognitiveDebrief": "NOT_ESTABLISHED",
+    "psychometricValidation": "PENDING",
+    "scientificReview": "NOT_CLAIMED",
+    "authorization": "NOT_CREATED"
+  }
+}

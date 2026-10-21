@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "frozenReviewPackageSha256": "2d84d3abf2bd51afc85aa78337f1ad91131282763f72cd15f035509b7e275074",
+  "instrumentLicense": {
+    "type": "PUBLIC_DOMAIN",
+    "permission_url": "https://ipip.ori.org/newPermission.htm",
+    "quotation": "use IPIP items, scales, and inventories for any purpose, commercial or non-commercial",
+    "administration_permission_url": "https://ipip.ori.org/New_IPIP-50-item-scale.htm",
+    "translation_and_electronic_use": "Official administration page expressly permits Internet use, editing and translating. This permits a new AI translation but does not validate it.",
+    "scope": "IPIP items/scales/inventories, not copyrighted journal/chapter PDFs, logos or unrelated instruments.",
+    "scholarly_attribution": "International Personality Item Pool, Lewis R. Goldberg and colleagues; cite official item/key pages and relevant literature."
+  },
+  "identity": {
+    "name": "IPIP 50-item Big-Five Factor Markers",
+    "selected_form": "Official 50-item sample questionnaire with five 10-item scales",
+    "not_equivalent_to": [
+      "TIPI",
+      "IPIP-NEO-50",
+      "IPIP-NEO-120",
+      "100-item Big-Five markers",
+      "1992 adjective markers"
+    ],
+    "counting": "One inventory, not five instruments or separate language instruments.",
+    "function_tags": [
+      "personality_traits",
+      "self_reflection"
+    ],
+    "audience": "Adult self-report research first-review scope; no child validation claim.",
+    "standardization_note": "Official site explicitly says no mandatory item order or standardized administration. This package pins the published sample order/anchors for reproducibility, not claims a universal required order."
+  },
+  "originalPapersLinkOnly": [
+    {
+      "role": "Historical target factor-marker development, NOT these 50 sentence items",
+      "citation": "Goldberg LR (1992). The development of markers for the Big-Five factor structure. Psychological Assessment 4:26–42.",
+      "doi": "10.1037/1040-3590.4.1.26",
+      "fulltext_url": "https://projects.ori.org/lrg/PDFs_papers/Goldberg.Big-Five-Markers-Psych.Assess.1992.pdf",
+      "access": "17-page author-hosted scan detected; searchable primary abstract confirms adjective markers. Not claimed exact IPIP50 original item publication.",
+      "rights": "APA copyright 1992; link only."
+    },
+    {
+      "role": "Original IPIP methodology chapter",
+      "citation": "Goldberg LR (1999). A broad-bandwidth, public-domain, personality inventory measuring the lower-level facets of several five-factor models. In Mervielde et al., Personality psychology in Europe 7:7–28. Tilburg University Press.",
+      "doi": null,
+      "doi_status": "No DOI verified; do not invent.",
+      "fulltext_url": "https://ipip.ori.org/A%20broad-bandwidth%20inventory.pdf",
+      "bibliography_url": "https://projects.ori.org/lrg/PDFs_papers/",
+      "access": "Official22-page full chapter retrieved for temporary reading; scanned PDF OCR verified title/copyright, pp10–11 origin/methods and p28 anchors. Chapter develops broad preliminary facet scales, not evidence that these exact50 sample items were first printed there.",
+      "rights": "Chapter copyright distinct from IPIP items; link only, no archive permission established.",
+      "method_summary": "Early IPIP drew on Dutch sentence items plus newly written English items;1252-item pool administered in parts to an adult Eugene–Springfield community sample. Footnote describes initial approximate1000 adults aged18–85. Five-point accuracy anchors appear in appendix. This history is not a norm or validation of the new Chinese draft.",
+      "temporary_reading_sha256": "a3c336c4703c38eff452ea2039da68c70ae254a52ea328219ec63e1f6a3733f2",
+      "temporary_copy_policy": "Temporary reading/OCR only, outside deliverable; not uploaded or redistributed."
+    },
+    {
+      "role": "Primary project methodology and development overview",
+      "citation": "Goldberg LR, Johnson JA, Eber HW, Hogan R, Ashton MC, Cloninger CR, Gough HG (2006). The international personality item pool and the future of public-domain personality measures. Journal of Research in Personality 40:84–96.",
+      "doi": "10.1016/j.jrp.2005.08.007",
+      "fulltext_url": "https://ipip.ori.org/Goldberg_etal_2006_IPIP_JRP.pdf",
+      "access": "13-page official fulltext readable; describes IPIP history, construction and free-use principles, not a new exact-form Chinese validation.",
+      "rights": "Copyright 2005 Elsevier Inc., all rights reserved. LINK_ONLY."
+    }
+  ],
+  "existingChineseVersions": [
+    {
+      "provider": "Sih-Ci Jhu; supervised by Yi-Chao Wang, National Dong Hwa University",
+      "url": "https://ipip.ori.org/ChineseAB5CFactorMarkers.htm",
+      "provenance_url": "https://ipip.ori.org/newItemTranslations.htm",
+      "language": "Traditional Chinese",
+      "status": "Official project hosts complete50 wording and notes Taiwanese reliability/validity work, but publication/coefficients/precise population not located. Not selected as validated Simplified Chinese.",
+      "rights": "General IPIP public-domain page covers IPIP materials; independent translation-specific chain not separately adjudicated, link only here."
+    },
+    {
+      "provider": "Xian Xu, University of South Florida",
+      "language": "Mandarin",
+      "provenance_url": "https://ipip.ori.org/newItemTranslations.htm",
+      "status": "Zheng2008 used100items translated/backtranslated by Xu and derived50subset; complete exact Chinese wording not recovered. Not same as Jhu form."
+    }
+  ],
+  "chineseValidationEvidence": {
+    "citation": "Zheng L et al. (2008). Reliability and concurrent validation of the IPIP Big-Five factor markers in China. Personality and Individual Differences45:649–654.",
+    "doi": "10.1016/j.paid.2008.07.009",
+    "fulltext_url": "https://projects.ori.org/lrg/PDFs_papers/Zheng_Goldberg_etal_2008_PAID.pdf",
+    "rights": "Copyright2008 Elsevier Ltd. LINK_ONLY.",
+    "population": "Internet-recruited Chinese samples,633 heterosexual and437 homosexual participants; total1070;100items administered,50subset analyzed. These sample strata are literature context only, not requested respondent fields or inferable traits.",
+    "provenance": "Methods p650 identifies Xian Xu translation/backtranslation. Not validation of new AI draft or Jhu version.",
+    "reliability_caution": "Narrative p652 reports short Agreeableness alpha .69/.66 and other short scales .76–.87. Extracted Table1 duplicates long/short columns and conflicts with narrative: do not ingest table numeric values pending visual primary verification.",
+    "norms": "No study means or sexual-orientation comparisons imported as platform norms, profiling rules or individual classification."
+  },
+  "exactFormEvidenceBoundary": "当前官网50题与2008论文50题子集逐项对应尚未独立建立；Xu100题和Jhu50题的证据不能转移给本AI译稿。",
+  "translationRevisions": [
+    {
+      "number": 16,
+      "from": "我不引人注目。",
+      "to": "我保持低调，不让自己引人注目。",
+      "reason": "Preserve active background stance rather than merely being unnoticed."
+    },
+    {
+      "number": 28,
+      "from": "我常忘记把东西放回原处。",
+      "to": "我常忘记把东西放回它们应放的位置。",
+      "reason": "Proper place is the appropriate place, not necessarily original location."
+    }
+  ],
+  "thresholds": {
+    "clinical_cutoffs": [],
+    "norms": null,
+    "percentiles": null,
+    "bands": [],
+    "policy": "No low/medium/high thresholds, desirable direction, diagnosis, types or ranking approved. Higher scores reflect more of the named tendency, not better people."
+  },
+  "scope": "PD English instrument text only plus separately labelled AI translation. Journal/chapter PDFs not copied or uploaded. Historical original absolute-confidentiality promise preserved only as source evidence, not platform promise."
+}
