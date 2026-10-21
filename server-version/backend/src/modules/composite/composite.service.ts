@@ -5040,7 +5040,8 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
         const report = batch && result && batch.scaleResults.has(result)
           ? buildScaleUnitReport({...reportInput, result: batch.scaleResults.get(result)})
           : buildScaleUnitReport({...reportInput,result:await resolveStoredScaleResult(reportInput.result,{record:result,reader:result?scaleFacts:undefined})})
-        if (['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind)) {
+        const libraryWrapper = Boolean(result?.scale?.libraryEntryId)
+        if (libraryWrapper || ['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(attempt.compositeAssessment.productKind)) {
           const entry = verifiedContext?.units.get(result?.id)
           const reusable = Boolean(verifiedContext && entry && result && verifiedContext.attemptId === attempt.id
             && verifiedContext.attemptEpoch === attempt.attemptEpoch
@@ -5051,8 +5052,25 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
             && entry.runtime.compiledRuntime.compiledRuntimeHash === result?.compiledRuntimeHash
             && entry.runtime.instrumentKey === result?.scale?.code
             && entry.runtime.instrumentVersion === result?.scale?.instrumentVersion)
-          const policy = batch ? resolveProjectionPolicyForAssessment(result, report.result, batch.scaleRuntimes.get(result))
-            : await loadProjectionPolicyForAssessment(result, report.result, reusable ? entry!.runtime : undefined)
+          // Legacy composites can consume approved library wrappers too. Their
+          // generated code is not a registry key: carry the actual child's
+          // frozen disclosure instead of guessing a policy in the projector.
+          let frozenRuntime = batch?.scaleRuntimes.get(result) ?? (reusable ? entry!.runtime : undefined)
+          if (libraryWrapper) {
+            if (!frozenRuntime && !batch && typeof result.runtimeSnapshotEncrypted === 'string') {
+              frozenRuntime = await loadFrozenScaleRuntimeSnapshot(result.runtimeSnapshotEncrypted)
+            }
+            if (!frozenRuntime || result.scaleId !== item.scaleId
+              || frozenRuntime.instrumentKey !== result.scale.code
+              || frozenRuntime.instrumentVersion !== result.scale.instrumentVersion
+              || frozenRuntime.compiledRuntime.compiledRuntimeHash !== result.compiledRuntimeHash
+              || !result.scale.measurementReleaseId
+              || frozenRuntime.measurementPresentation?.releaseId !== result.scale.measurementReleaseId) {
+              throw new Error('Library report frozen identity unavailable')
+            }
+          }
+          const policy = batch ? resolveProjectionPolicyForAssessment(result, report.result, frozenRuntime)
+            : await loadProjectionPolicyForAssessment(result, report.result, frozenRuntime)
           Object.defineProperty(report, '__scaleProjectionPolicy', { value: policy.policy, enumerable: false })
         }
         if (report.decryptError) {
@@ -5507,10 +5525,10 @@ const loadCollectionReportAttempt = async (attemptId: string) => {
         } },
       } },
       scaleAssessments: { select: {
-        id: true, compositeItemId: true, result: true, completedAt: true, totalTime: true,
+        id: true, scaleId: true, compositeItemId: true, result: true, completedAt: true, totalTime: true,
         submissionId: true, submissionPayloadHash: true,
         attemptEpoch: true, compiledRuntimeHash: true, runtimeSnapshotEncrypted: true,
-        scale: { select: { code: true, instrumentVersion: true, instrumentClass: true } },
+        scale: { select: { code: true, instrumentVersion: true, instrumentClass: true, libraryEntryId: true, measurementReleaseId: true } },
       } },
       cognitiveSessions: { select: {
         id: true, compositeItemId: true, attemptNo: true, testType: true, finishedAt: true,

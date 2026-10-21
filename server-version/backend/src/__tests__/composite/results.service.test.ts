@@ -43,6 +43,9 @@ import {
   listComposites,
 } from '../../modules/composite/composite.service'
 
+import { compileResearchScale } from '../../modules/survey/builder.compiler'
+import { createFrozenScaleRuntimeSnapshot, encryptFrozenScaleRuntimeSnapshot, hashFrozenScaleRuntimeSnapshot } from '../../modules/assessment-runtime/runtime-snapshot'
+
 const TEACHER = UserRole.TEACHER
 const ADMIN = UserRole.ADMIN
 const page = { page: 1, pageSize: 20 }
@@ -786,5 +789,62 @@ describe('C06 teacher submission and satisfaction counts', () => {
     expect(result.list[0]).toMatchObject({ status: 'COMPLETED', taskSatisfied: false, taskSatisfaction: 'NOT_SATISFIED', isAnonymous: true, nickname: null, username: null })
     expect(mockPrisma.compositeAssessmentAttempt.findMany.mock.calls[0][0].select.taskSatisfaction).toBe(true)
     expect(JSON.stringify(result)).not.toContain('recoveryTokenHash')
+  })
+})
+
+
+describe('legacy composite approved-library report disclosure', () => {
+  const fixture = () => {
+    const code = 'library:11111111-1111-4111-8111-111111111111'
+    const definition = compileResearchScale('Frozen library report', {
+      schemaVersion: 1, presentationMode: 'ALL_AT_ONCE', respondentType: 'participant_self_report', aggregation: 'mean',
+      responseOptions: [{ optionKey: 'one', label: 'One', score: 1 }, { optionKey: 'two', label: 'Two', score: 2 }],
+      dimensions: [{ dimensionKey: 'total', label: 'Total', direction: 'descriptive' }],
+      items: [{ itemKey: 'one', prompt: 'Synthetic item', required: true, reverse: false, dimensionKeys: ['total'] }],
+    })
+    const runtime = createFrozenScaleRuntimeSnapshot({ instrumentKey: code, instrumentVersion: '2.0.0', definition })
+    runtime.measurementPresentation = { releaseId: 'original-survey-release', contentHash: 'a'.repeat(64), presentationMode: 'ALL_AT_ONCE' }
+    runtime.snapshotHash = hashFrozenScaleRuntimeSnapshot(runtime)
+    const scale = { id: 'scale-1', code, name: 'Library', instrumentVersion: '2.0.0', instrumentClass: 'CUSTOM_DESCRIPTIVE',
+      libraryEntryId: '11111111-1111-4111-8111-111111111111', measurementReleaseId: 'original-survey-release' }
+    const child = { id: 'child', scaleId: scale.id, compositeItemId: 'item-scale', scale,
+      runtimeSnapshotEncrypted: encryptFrozenScaleRuntimeSnapshot(runtime), compiledRuntimeHash: runtime.compiledRuntime.compiledRuntimeHash,
+      result: makeScaleResult({ scaleId: scale.id, code, name: scale.name, scoreKey: 'total', value: 1 }),
+      completedAt: new Date('2026-10-21T00:00:00Z'), totalTime: 1000 }
+    const attempt = completedAttemptForReport({
+      compositeAssessment: { ...completedAttemptForReport().compositeAssessment, productKind: 'LEGACY_COMPOSITE',
+        items: [{ id: 'item-scale', type: 'SCALE', scaleId: scale.id, scale }] },
+      scaleAssessments: [child], cognitiveSessions: [], formAnswers: [],
+    })
+    return { attempt, child }
+  }
+  const project = async (attempt: ReturnType<typeof fixture>['attempt']) =>
+    projectCompositeCollectionReport(await buildCompositeReport(attempt), 'participant').unitReports[0]
+
+  it('projects the actual frozen child through build and the strict HTTP projector', async () => {
+    const { attempt } = fixture()
+    const report = await project(attempt)
+    expect(report.reportKind).not.toBe('unavailable')
+    expect(report.scores).toEqual(expect.arrayContaining([expect.objectContaining({ key: 'total', value: 1 })]))
+    expect(JSON.stringify(report)).not.toContain('__scaleProjectionPolicy')
+  })
+
+  it.each(['missing', 'wrong-code', 'wrong-release', 'wrong-runtime-hash'] as const)('fails closed for %s frozen identity', async fault => {
+    const { attempt, child } = fixture()
+    if (fault === 'missing') child.runtimeSnapshotEncrypted = ''
+    if (fault === 'wrong-code') child.scale.code = 'library:another-entry'
+    if (fault === 'wrong-release') child.scale.measurementReleaseId = 'other-release'
+    if (fault === 'wrong-runtime-hash') child.compiledRuntimeHash = 'f'.repeat(64)
+    const report = await project(attempt)
+    expect(report.reportKind).toBe('unavailable')
+    expect(report).not.toHaveProperty('scores')
+  })
+
+  it('does not infer a custom policy for an unknown non-library legacy source', async () => {
+    const { attempt, child } = fixture()
+    child.scale.libraryEntryId = ''
+    const report = await project(attempt)
+    expect(report).toMatchObject({ reportKind: 'unavailable', reason: 'POLICY_UNAVAILABLE' })
+    expect(report).not.toHaveProperty('scores')
   })
 })
