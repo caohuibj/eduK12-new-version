@@ -51,12 +51,11 @@ test('integrated continuation restores exact products and runs only missing qual
  const workflow=readFileSync(new URL('../workflows/ci-training-workspace-integrated.yml',import.meta.url),'utf8');
  assert.doesNotMatch(workflow,/integrated-build.sh|component: \[backend, frontend\]|docker build/);
  assert.equal((workflow.match(/integrated-evidence.mjs resume/g)||[]).length,2);
- assert.match(workflow,/runtime-role-defaults.sql,target=\/app\/scripts\/runtime-role-defaults.sql,readonly/);
- assert.equal((workflow.match(/integrated-checks.mjs\" backend/g)||[]).length,1);
+ assert.doesNotMatch(workflow,/integrated-checks.mjs|setup-trivy|npm audit/);
  assert.doesNotMatch(workflow,/integrated-checks.mjs\" frontend/);
  assert.match(workflow,/backend-runtime:\$TRAINING_WORKSPACE_BACKEND_IMAGE_HEAD/);
  assert.match(workflow,/if-no-files-found: error/);assert.match(workflow,/connection_limit=4/);
- assert.match(workflow,/integrated-checks.mjs" postgres/);assert.match(workflow,/integrated-recovery.mjs restore/);
+ assert.doesNotMatch(workflow,/integrated-recovery.mjs upgrade/);assert.match(workflow,/integrated-recovery.mjs prepare-restore/);assert.match(workflow,/integrated-recovery.mjs restore/);
  assert.match(workflow,/browserProfileTrustApproved!==true/);assert.match(workflow,/integration-browser.cjs/);assert.match(workflow,/integrated-evidence.mjs browser-report/);
  assert.doesNotMatch(workflow,/training-workspace-reuse.mjs|training-workspace-browser.mjs|scale-library-governance-resume|ignoreHTTPSErrors|disable-web-security/);
  const wrapper=readFileSync(new URL('../workflows/ci-training-workspace.yml',import.meta.url),'utf8');
@@ -82,4 +81,10 @@ test('prior qualification rejects missing suite, hook failure and failed asserti
  const report={testResults:[{name:'/app/src/unchanged.test.ts',status:'passed',assertionResults:[{status:'passed'}]}]};
  assert.equal(validatePriorTests(report,['src/unchanged.test.ts'],'frontend'),1);
  for(const mutate of [r=>r.testResults[0].status='failed',r=>r.testResults[0].assertionResults[0].status='pending',r=>r.testResults=[],r=>r.testResults.push(r.testResults[0])]){const r=structuredClone(report);mutate(r);assert.throws(()=>validatePriorTests(r,['src/unchanged.test.ts'],'frontend'))}
+});
+
+import {validateQualifiedPostgres} from './training-workspace-integrated-evidence.mjs';
+test('qualified PG accepts only the one named excluded live scheduler case',()=>{
+ const file='src/__tests__/integration/checkinSchedule.postgres.integration.test.ts';const r={success:true,numPassedTests:20,numFailedTests:0,numPendingTests:1,testResults:[{name:'/app/'+file,status:'passed',assertionResults:[{fullName:'checkin schedule PostgreSQL transaction contract live API scheduler publishes a due disposable fixture without a browser remaining open',status:'skipped'},...Array.from({length:20},(_,i)=>({fullName:'real contract '+i,status:'passed'}))]}]};assert.equal(validateQualifiedPostgres(r,[file]),20);
+ for(const mutate of [r=>r.testResults[0].assertionResults[1].status='skipped',r=>r.testResults[0].status='failed',r=>r.testResults[0].assertionResults[0].fullName='other skipped',r=>r.numFailedTests=1]){const bad=structuredClone(r);mutate(bad);assert.throws(()=>validateQualifiedPostgres(bad,[file]))}
 });

@@ -38,7 +38,7 @@ for(const file of tests){
  const suites=result.testResults.filter(s=>s.name===resolve(cwd,file));assert.equal(suites.length,1,file);const suite=suites[0];assert.equal(suite.status,'passed',file);assert(suite.assertionResults.length,file);
  for(const item of suite.assertionResults){
   // The existing optional live background tick is not a concurrency qualification.
-  if(component==='postgres'&&file.endsWith('checkinSchedule.postgres.integration.test.ts')&&item.title==='live API scheduler publishes a due disposable fixture without a browser remaining open')assert.equal(item.status,'pending');
+  if(component==='postgres'&&file.endsWith('checkinSchedule.postgres.integration.test.ts')&&item.title==='live API scheduler publishes a due disposable fixture without a browser remaining open')assert.equal(item.status,'skipped');
   else assert.equal(item.status,'passed',item.fullName);
  }
 }

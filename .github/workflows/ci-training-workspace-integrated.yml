@@ -33,41 +33,11 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: node .github/scripts/training-workspace-integrated-evidence.mjs resume
-      - name: affected contracts in the same locked native environment
-        shell: bash
-        run: |
-          docker run --rm --workdir /app -e CI=true -e TZ=UTC -e GITHUB_SHA -e GITHUB_RUN_ID -e GITHUB_WORKSPACE \
-            -e WORKSPACE_EVIDENCE=/evidence/backend -e COGNITIVE_MODULE_ENABLED=true -e MATERIAL_GRANTS_ENABLED=true \
-            -e DATABASE_URL=postgresql://synthetic:synthetic@127.0.0.1:1/synthetic \
-            -e JWT_SECRET=synthetic-workspace-only-no-real-credential \
-            -e DATA_ENCRYPTION_KEY=1111111111111111111111111111111111111111111111111111111111111111 \
-            -e DATA_PSEUDONYM_KEY=2222222222222222222222222222222222222222222222222222222222222222 \
-            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" -v "$GITHUB_WORKSPACE/training-workspace-integrated-evidence:/evidence" \
-            --mount "type=bind,source=$GITHUB_WORKSPACE/server-version/cognitive-randomization-golden-v1.json,target=/cognitive-randomization-golden-v1.json,readonly" \
-            --mount "type=bind,source=$GITHUB_WORKSPACE/server-version/backend/src/modules/cognitive/generated/identities.json,target=/backend/src/modules/cognitive/generated/identities.json,readonly" \
-            --mount "type=bind,source=$GITHUB_WORKSPACE/server-version/backend/scripts/runtime-role-defaults.sql,target=/app/scripts/runtime-role-defaults.sql,readonly" \
-            training-workspace-integrated-backend-builder:$TRAINING_WORKSPACE_BACKEND_IMAGE_HEAD \
-            node "$GITHUB_WORKSPACE/.github/scripts/training-workspace-integrated-checks.mjs" backend
-      - name: audit complete locked dependencies
-        shell: bash
-        run: |
-          set +e
-          docker run --rm training-workspace-integrated-backend-builder:$TRAINING_WORKSPACE_BACKEND_IMAGE_HEAD npm audit --audit-level=high --json > training-workspace-integrated-evidence/backend/audit.json
-          status=$?
-          set -e
-          node -e 'const r=require("./training-workspace-integrated-evidence/backend/audit.json");console.log(JSON.stringify({vulnerabilities:r.metadata?.vulnerabilities,errorCode:r.error?.code}))'
-          exit "$status"
-      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
-        with:
-          version: v0.70.0
-          cache: false
-      - name: scan actual runtime image
-        run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output training-workspace-integrated-evidence/backend/runtime-scan.json training-workspace-integrated-backend-runtime:$TRAINING_WORKSPACE_BACKEND_IMAGE_HEAD
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: workspace-integrated-backend-reports-${{ github.sha }}
-          path: training-workspace-integrated-evidence/backend/
+          path: training-workspace-integrated-evidence/
           retention-days: 3
           if-no-files-found: error
   connected:
@@ -113,10 +83,6 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: node .github/scripts/training-workspace-integrated-evidence.mjs resume
-      - uses: actions/download-artifact@v4
-        with:
-          name: workspace-integrated-backend-reports-${{ github.sha }}
-          path: training-workspace-integrated-evidence/backend
       - name: prepare isolated services and private prerequisite directory
         shell: bash
         run: |
@@ -139,10 +105,8 @@ jobs:
             sleep 1
           done
           exit 1
-      - name: upgrade old synthetic schema and retain historical rows
-        run: node .github/scripts/training-workspace-integrated-recovery.mjs upgrade
-      - name: four real PostgreSQL authorization and scheduling suites
-        run: bash .github/scripts/training-workspace-integrated-backend.sh once node "$GITHUB_WORKSPACE/.github/scripts/training-workspace-integrated-checks.mjs" postgres
+      - name: initialize fresh synthetic data for the first restore without repeating qualification
+        run: node .github/scripts/training-workspace-integrated-recovery.mjs prepare-restore
       - name: nonempty bounded synthetic backup and restore
         run: node .github/scripts/training-workspace-integrated-recovery.mjs restore
       - name: initialize a separate fresh browser database

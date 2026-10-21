@@ -28,6 +28,14 @@ if(mode==='upgrade'){
  const before=history();migrate('/app/prisma/schema.prisma');assert.deepEqual(history(),before);
  const values=sql(`SELECT enum_range(NULL::"MaterialResourceType")::text`);assert(values.includes('MEDIA_ASSET')&&values.includes('FORM_TEMPLATE'));
  writeFileSync(resolve(evidence,'migration.json'),JSON.stringify({status:'PASS',base:binding.base,legacyDigests:before,newEnums:['MEDIA_ASSET','FORM_TEMPLATE'],productionMigrationClaim:false}));
+}else if(mode==='prepare-restore'){
+ // Fresh disposable restore fixture only. Prior old-schema upgrade qualification is accepted separately.
+ assert.equal(sql("SELECT count(*) FROM information_schema.tables WHERE table_schema='public'"),'0');
+ migrate('/app/prisma/schema.prisma');
+ sql(`INSERT INTO users(id,username,password_hash,role,account_domain,teacher_approved,updated_at) VALUES('${id.user}','workspace_restore_teacher','synthetic-only','TEACHER','TRAINING',true,NOW());
+ INSERT INTO courses(id,title,course_code,creator_id,status,course_type,updated_at) VALUES('${id.course}','Synthetic historical course','WSRESTORE','${id.user}','PUBLISHED','TRAINING_COURSE',NOW());
+ INSERT INTO checkins(id,course_id,title,creator_id,content,updated_at) VALUES('${id.checkin}','${id.course}','Synthetic historical checkin','${id.user}','retain',NOW());`);
+ writeFileSync(resolve(evidence,'restore-fixture.json'),JSON.stringify({status:'PREPARED',priorUpgradeReexecuted:false}));
 }else if(mode==='restore'){
  // Prisma supplies the real defaults/types; these are backup fixtures, never fake UI/publication facts.
  const code=`const {PrismaClient}=require('@prisma/client');const p=new PrismaClient();(async()=>{const owner=${JSON.stringify(id.user)};const schedule=await p.checkinSchedule.create({data:{courseId:${JSON.stringify(id.course)},creatorId:owner,template:{title:'Synthetic recovery only'},intervalDays:1,durationHours:24,firstPublishAt:new Date('2026-01-01'),nextPublishAt:new Date('2026-01-02'),timezone:'UTC',publishedCount:1}});await p.checkin.update({where:{id:${JSON.stringify(id.checkin)}},data:{scheduleId:schedule.id,scheduledFor:new Date('2026-01-01')}});const asset=await p.storedAsset.create({data:{objectKey:'workspace-recovery/synthetic.png',sha256:'0'.repeat(64),mimeType:'image/png',sizeBytes:1,ownerId:owner,originalName:'Synthetic recovery metadata',accessScope:'PRIVATE'}});const form=await p.questionnaire.create({data:{code:'WORKSPACE_RECOVERY',name:'Synthetic recovery form',creatorId:owner,type:'GENERAL',status:'PUBLISHED',visibility:'HIDDEN'}});for(const [resourceType,resourceId]of [['MEDIA_ASSET',asset.id],['FORM_TEMPLATE',form.id]])await p.materialGrant.create({data:{teacherId:owner,grantedBy:owner,resourceType,resourceId}});await p.$disconnect()})().catch(async()=>{await p.$disconnect();process.exit(1)})`;

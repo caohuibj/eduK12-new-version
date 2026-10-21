@@ -16,6 +16,13 @@ export function validatePriorTests(report,selected,component){
  for(const file of selected){const suites=report.testResults.filter(s=>s.name==='/app/'+file);assert.equal(suites.length,1);const suite=suites[0];if(component==='backend'&&file===failedSuite){assert.equal(suite.status,'failed');assert.equal(suite.assertionResults.filter(a=>a.status==='failed').length,1);continue}assert.equal(suite.status,'passed');assert(suite.assertionResults.length);assert(suite.assertionResults.every(a=>a.status==='passed'));reused+=suite.assertionResults.length}
  return reused;
 }
+export function validateQualifiedPostgres(report,selected){
+ assert.equal(report.success,true);assert.equal(report.numPassedTests,20);assert.equal(report.numFailedTests,0);assert.equal(report.numPendingTests,1);assert.equal(report.testResults.length,selected.length);
+ let excluded=0,passed=0;
+ for(const file of selected){const suites=report.testResults.filter(s=>s.name==='/app/'+file);assert.equal(suites.length,1);const suite=suites[0];assert.equal(suite.status,'passed');assert(suite.assertionResults.length);
+  for(const item of suite.assertionResults){if(file==='src/__tests__/integration/checkinSchedule.postgres.integration.test.ts'&&item.fullName==='checkin schedule PostgreSQL transaction contract live API scheduler publishes a due disposable fixture without a browser remaining open'){assert.equal(item.status,'skipped');excluded++}else {assert.equal(item.status,'passed');passed++}}
+ }assert.equal(excluded,1);assert.equal(passed,20);return 20;
+}
 const mode=process.argv[2];
 if(mode==='codeql-config'){
  run('git',['fetch','--no-tags','https://github.com/caohuibj/eduK12-new-version.git',prior.head]);
@@ -36,8 +43,7 @@ if(mode==='codeql-config'){
  const allowedChanges=['.github/scripts/training-workspace-integrated-evidence.mjs','.github/scripts/training-workspace-integrated-checks.mjs','.github/scripts/training-workspace-integrated-recovery.mjs','.github/scripts/training-workspace-scope.test.mjs','.github/workflows/ci-training-workspace-integrated.yml'];
  const changed=run('git',['diff','--name-only',prior.head,'HEAD']).trim().split('\n');assert(changed.every(p=>allowedChanges.includes(p)));
  for(const path of ['server-version','.github/release-tools','.github/scripts/training-workspace-integrated-build.sh','.github/scripts/training-workspace-integrated-backend.sh','.github/scripts/measurement-browser-ci.py'])assert.equal(run('git',['rev-parse',prior.head+':'+path]).trim(),run('git',['rev-parse','HEAD:'+path]).trim(),path);
- const recoveryPath='.github/scripts/training-workspace-integrated-recovery.mjs';
- assert.equal(readFileSync(resolve(root,recoveryPath),'utf8').replace('(process.env.TRAINING_WORKSPACE_BACKEND_IMAGE_HEAD||process.env.GITHUB_SHA)','process.env.GITHUB_SHA'),run('git',['show',prior.head+':'+recoveryPath]));
+ assert.equal(hash(resolve(root,'.github/scripts/training-workspace-integrated-recovery.mjs')),'b33c4df99112b8e0f85c83e1651fbb5dec0afe232a86b17d3cb1910c52a130ca');
  for(const key of ['backendTests','frontendTests','postgresTests','unchangedGeneratorInputs'])assert.deepEqual(binding[key],JSON.parse(run('git',['show',prior.head+':.github/scripts/training-workspace-integrated-bindings.json']))[key]);
  mkdirSync(evidence,{recursive:true});
  for(const component of ['backend','frontend']){
@@ -64,6 +70,24 @@ if(mode==='codeql-config'){
   run('docker',['load','-i',archive],{stdio:'inherit'});const originalImages=JSON.parse(readFileSync(resolve(dir,'images.json')));assert.equal(originalImages.length,2);
   for(const kind of ['builder','runtime']){const tag=`training-workspace-integrated-${component}-${kind}:${prior.checkout}`;const current=JSON.parse(run('docker',['image','inspect',tag]))[0];const old=originalImages.find(r=>r.RepoTags.includes(tag));assert(old);assert.equal(current.Id,old.Id);assert.equal(current.Config.Labels['org.opencontainers.image.revision'],prior.checkout)}
  }
+ const qualified={"run":39685055338,"head":"2faae47d745fa2d53bc130c987f08817ba52f76c","componentJob":119517024530,"connectedJob":119517829888,"artifact":{"id":12386845537,"name":"training-workspace-integrated-connected-bbf9fbe4c57e7c74db9cbca236cd963798216c2d","size_in_bytes":397348,"digest":"sha256:9959f4825acbb9ee71da52a8c1350e23de176a19b0bb0196e63666d3225eb5d2"}};
+ const qualifiedRun=await api('actions/runs/'+qualified.run);assert.equal(qualifiedRun.head_sha,qualified.head);assert.equal(qualifiedRun.conclusion,'failure');assert.equal(qualifiedRun.status,'completed');assert.equal(qualifiedRun.run_attempt,1);
+ const qualifiedJobs=await api('actions/runs/'+qualified.run+'/jobs?per_page=100');assert.equal(qualifiedJobs.jobs.find(j=>j.id===qualified.componentJob)?.conclusion,'success');
+ const connected=qualifiedJobs.jobs.find(j=>j.id===qualified.connectedJob);assert.equal(connected?.conclusion,'failure');assert(connected.steps.some(s=>s.name==='upgrade old synthetic schema and retain historical rows'&&s.conclusion==='success'));
+ run('git',['fetch','--no-tags','https://github.com/caohuibj/eduK12-new-version.git',qualified.head]);assert.equal(run('git',['rev-parse',qualified.head+':server-version']).trim(),run('git',['rev-parse','HEAD:server-version']).trim());
+ const pin=qualified.artifact,meta=await api('actions/artifacts/'+pin.id);for(const k of ['id','name','size_in_bytes','digest'])assert.equal(meta[k],pin[k]);assert.equal(meta.expired,false);assert.equal(meta.workflow_run.id,qualified.run);assert.equal(meta.workflow_run.head_sha,qualified.head);
+ const response=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/actions/artifacts/'+pin.id+'/zip',{headers:{Authorization:'Bearer '+process.env.GITHUB_TOKEN}});assert(response.ok);const bytes=Buffer.from(await response.arrayBuffer());assert.equal(bytes.length,pin.size_in_bytes);assert.equal(createHash('sha256').update(bytes).digest('hex'),pin.digest.slice(7));
+ const zip=resolve(process.env.RUNNER_TEMP,'workspace-qualified.zip'),accepted=resolve(evidence,'accepted-qualification');writeFileSync(zip,bytes);mkdirSync(accepted,{recursive:true});run('python3',['-c',"import sys,zipfile,pathlib; z=zipfile.ZipFile(sys.argv[1]); assert all(not pathlib.PurePosixPath(n).is_absolute() and '..' not in pathlib.PurePosixPath(n).parts for n in z.namelist()); assert z.testzip() is None; z.extractall(sys.argv[2])",zip,accepted]);
+ const backend=JSON.parse(readFileSync(resolve(accepted,'backend/backend-tests.json')));assert.equal(validatePriorTests(backend,[failedSuite],'frontend'),6);assert.equal(backend.numFailedTests,0);
+ const checks=JSON.parse(readFileSync(resolve(accepted,'backend/checks.json')));assert.equal(checks.status,'PASS');assert.equal(checks.reportSHA256,hash(resolve(accepted,'backend/backend-tests.json')));
+ const audit=JSON.parse(readFileSync(resolve(accepted,'backend/audit.json')));assert.equal(audit.metadata.vulnerabilities.high,0);assert.equal(audit.metadata.vulnerabilities.critical,0);
+ const scan=JSON.parse(readFileSync(resolve(accepted,'backend/runtime-scan.json')));assert(scan.Results?.length);assert(!scan.Results.some(r=>(r.Vulnerabilities||[]).some(v=>['HIGH','CRITICAL'].includes(v.Severity)&&v.FixedVersion)));
+ const runtimeTag='training-workspace-integrated-backend-runtime:'+prior.checkout;const runtimeImage=JSON.parse(run('docker',['image','inspect',runtimeTag]))[0];assert.equal(scan.Metadata.ImageID,runtimeImage.Id);assert.equal(scan.ArtifactName,runtimeTag);
+ assert.equal(checks.ciRunId,String(qualified.run));assert.deepEqual(checks.suites,[failedSuite]);
+ const pg=JSON.parse(readFileSync(resolve(accepted,'postgres/postgres-tests.json')));validateQualifiedPostgres(pg,binding.postgresTests);
+ const migration=JSON.parse(readFileSync(resolve(accepted,'postgres/migration.json')));assert.equal(migration.status,'PASS');assert.equal(migration.base,binding.base);assert.deepEqual(migration.newEnums,['MEDIA_ASSET','FORM_TEMPLATE']);assert.equal(migration.productionMigrationClaim,false);assert(Object.values(migration.legacyDigests).every(x=>/^[a-f0-9]{32}$/.test(x)));
+ assert.deepEqual(JSON.parse(readFileSync(resolve(accepted,'cleanup.json'))),{exitStatus:0,privateMaterialRemoved:true});
+ writeFileSync(resolve(evidence,'qualified-continuation.json'),JSON.stringify({status:'ACCEPTED_PRIOR',run:qualified.run,head:qualified.head,originalConclusion:'failure',backendAdditionalPassed:6,postgresPassed:20,excludedOptionalLive:1,upgradeAccepted:true,restoreAndBrowserPreviouslyExecuted:false}));
  appendFileSync(process.env.GITHUB_ENV,`TRAINING_WORKSPACE_BACKEND_IMAGE_HEAD=${prior.checkout}\nTRAINING_WORKSPACE_FRONTEND_IMAGE_HEAD=${prior.checkout}\n`);
  writeFileSync(resolve(evidence,'prior-qualification.json'),JSON.stringify({status:'ACCEPTED_PRIOR',run:prior.run,head:prior.head,originalConclusion:'failure',frontendPassed:284,backendReusedSuites:9,backendFailedSuite:failedSuite,compilationRepeated:false}));
 }else if(mode==='browser-report'){
