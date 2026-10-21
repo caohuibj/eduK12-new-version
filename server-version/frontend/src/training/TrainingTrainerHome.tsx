@@ -142,10 +142,10 @@ export default function TrainingTrainerHome() {
     </header>
     {mutationNotice && <p className="training-message" role="status">{mutationNotice}</p>}
     <section className="training-course-section" aria-labelledby="trainer-courses">
-      <div className="training-trainer-course-controls">
+      <div className="training-trainer-course-controls training-workspace-filter-bar">
         <fieldset className="training-trainer-course-filters">
           <legend>课程状态</legend>
-          <div>{COURSE_FILTERS.map(filter => <button key={filter.value} type="button"
+          <div className="training-workspace-filters">{COURSE_FILTERS.map(filter => <button key={filter.value} type="button"
             aria-pressed={query.status === filter.value}
             onClick={() => { if (query.status !== filter.value) setQuery(current => ({ ...current, page: 1, status: filter.value })) }}>
             {filter.label}

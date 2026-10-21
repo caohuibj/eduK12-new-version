@@ -11,7 +11,29 @@ const own={canUpdateVersion:true,id:'own',name:'我的工具',kind:'scale',sourc
 const grant={id:'grant',name:'授权工具',kind:'scale',source:'granted',status:'PUBLISHED',href:'/scales/grant'}
 beforeEach(()=>{vi.clearAllMocks();mocks.get.mockResolvedValue({code:0,data:{list:[],total:0}})})
 afterEach(()=>vi.useRealTimers())
-function show(area:'media'|'tools'='tools'){return render(<MemoryRouter initialEntries={['/toolkit']}><Routes><Route path="/toolkit" element={<TrainingLibrary area={area}/>}/><Route path="/scales/:id" element={<p>量表编辑页</p>}/></Routes></MemoryRouter>)}
+function show(area:'media'|'tools'='tools',entry='/toolkit'){return render(<MemoryRouter initialEntries={[entry]}><Routes><Route path="/toolkit" element={<TrainingLibrary area={area}/>}/><Route path="/scales/:id" element={<p>量表编辑页</p>}/></Routes></MemoryRouter>)}
+it.each(['media','tools'] as const)('pages %s in groups of nine and resets to page one after filtering',async area=>{
+ const rows=Array.from({length:10},(_,index)=>({...own,id:'row-'+index,name:'资源'+(index+1),kind:area==='media'?'image':'scale'}))
+ mocks.get.mockImplementation(async(_path,{params})=>({code:0,data:{list:rows.slice((params.page-1)*params.pageSize,params.page*params.pageSize),total:rows.length}}))
+ show(area)
+ await screen.findByRole('article',{name:'资源1'})
+ expect(screen.getAllByRole('article')).toHaveLength(9)
+ expect(mocks.get).toHaveBeenLastCalledWith('/training-workspace/'+area,expect.objectContaining({params:expect.objectContaining({page:1,pageSize:9})}))
+ expect(screen.getByRole('navigation',{name:'资源分页'})).toHaveTextContent('1 / 2')
+ fireEvent.click(screen.getByRole('button',{name:'下一页'}));await screen.findByRole('article',{name:'资源10'})
+ expect(screen.getAllByRole('article')).toHaveLength(1);expect(screen.getByRole('button',{name:'下一页'})).toBeDisabled()
+ fireEvent.click(screen.getByRole('button',{name:area==='media'?'图片':'量表'}));await screen.findByRole('article',{name:'资源1'})
+ expect(mocks.get).toHaveBeenLastCalledWith('/training-workspace/'+area,expect.objectContaining({params:expect.objectContaining({page:1,pageSize:9,kind:area==='media'?'image':'scale'})}))
+})
+it('clamps an old out-of-range page to the final nine-item page',async()=>{
+ const rows=Array.from({length:19},(_,index)=>({...own,id:'row-'+index,name:'资源'+(index+1)}))
+ mocks.get.mockImplementation(async(_path,{params})=>({code:0,data:{list:rows.slice((params.page-1)*params.pageSize,params.page*params.pageSize),total:rows.length}}))
+ show('tools','/toolkit?page=99')
+ await screen.findByRole('article',{name:'资源19'})
+ expect(screen.getAllByRole('article')).toHaveLength(1)
+ expect(screen.getByRole('navigation',{name:'资源分页'})).toHaveTextContent('3 / 3')
+ expect(mocks.get).toHaveBeenLastCalledWith('/training-workspace/tools',expect.objectContaining({params:expect.objectContaining({page:3,pageSize:9})}))
+})
 it('offers version updates only for own published tools and creates a draft through the existing copy API',async()=>{
  mocks.get.mockResolvedValue({code:0,data:{list:[own,grant],total:2}});mocks.post.mockResolvedValue({code:0,data:{id:'next'}});show()
  expect(await screen.findByText('授权工具')).toBeInTheDocument();expect(screen.getAllByRole('button',{name:'更新版本'})).toHaveLength(1)

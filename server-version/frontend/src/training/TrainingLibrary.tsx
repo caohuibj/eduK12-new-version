@@ -16,6 +16,7 @@ const labels:Record<string,string> = {image:'图片',video:'视频',document:'�
 const statuses:Record<string,string> = {DRAFT:'草稿',PUBLISHED:'已发布',IN_REVIEW:'审核中',REJECTED:'待修订',DEPRECATED:'已停用',RETIRED:'已停用'}
 const mediaKinds = [['all','全部'],['video','视频'],['image','图片'],['document','文档']]
 const toolKinds = [['all','全部'],['scale','量表'],['form','表单'],['situational','情境判断'],['cognitive','认知测验'],['composition','组合测评']]
+const LIBRARY_PAGE_SIZE = 9
 
 export default function TrainingLibrary({ area }:{area:'media'|'tools'}) {
   const media=area==='media', navigate=useNavigate(), {user}=useAuth()
@@ -37,8 +38,8 @@ export default function TrainingLibrary({ area }:{area:'media'|'tools'}) {
   useEffect(()=>{setSearch(keyword)},[keyword])
   useEffect(()=>{
     let active=true;setLoading(true);setError('')
-    void apiClient.get<{list:Row[];total:number}>(`/training-workspace/${media?'media':'tools'}`,{params:{keyword,kind,source,page,pageSize:12}})
-      .then(result=>{if(!active)return;if(result.code!==0)throw new Error(result.message);const last=Math.max(1,Math.ceil(result.data.total/12));if(page>last){setParams(previous=>{const next=new URLSearchParams(previous);next.set('page',String(last));return next},{replace:true});return}setRows(result.data.list);setTotal(result.data.total)})
+    void apiClient.get<{list:Row[];total:number}>(`/training-workspace/${media?'media':'tools'}`,{params:{keyword,kind,source,page,pageSize:LIBRARY_PAGE_SIZE}})
+      .then(result=>{if(!active)return;if(result.code!==0)throw new Error(result.message);const last=Math.max(1,Math.ceil(result.data.total/LIBRARY_PAGE_SIZE));if(page>last){setParams(previous=>{const next=new URLSearchParams(previous);next.set('page',String(last));return next},{replace:true});return}setRows(result.data.list);setTotal(result.data.total)})
       .catch(cause=>{if(active)setError(cause.message||'读取失败，请重试')}).finally(()=>{if(active)setLoading(false)})
     return()=>{active=false}
   },[media,keyword,kind,source,page,revision,setParams])
@@ -58,13 +59,13 @@ export default function TrainingLibrary({ area }:{area:'media'|'tools'}) {
       navigate(path+result.data.id+(row.kind==='form'?'/edit':''))
     }catch(cause){setError(cause instanceof Error?cause.message:'无法创建新版本')}finally{setBusy(false)}
   }
-  const pages=Math.max(1,Math.ceil(total/12))
+  const pages=Math.max(1,Math.ceil(total/LIBRARY_PAGE_SIZE))
   return <div className="training-library">
     <header className="training-library-heading training-workspace-heading"><div><h1>{media?'媒体':'工具'}</h1><p>{media?'统一管理上传的素材，查找已获授权的教学资源。':'编制和管理教学工具，按授权使用测验与组合测评。'}</p></div>
       <form className="training-workspace-search" role="search" onSubmit={event=>{event.preventDefault();update('keyword',search.trim())}}><Search size={18} aria-hidden="true"/><input aria-label={media?'检索媒体':'检索工具'} placeholder={media?'搜索媒体名称':'搜索工具名称或介绍'} value={search} onChange={event=>setSearch(event.target.value)}/>{search&&<button type="button" aria-label="清除检索" onClick={()=>{setSearch('');update('keyword','')}}><X size={16}/></button>}<button type="submit">检索</button></form>
       <details className="training-library-create"><summary><Plus size={18}/>{media?'上传媒体':'编制工具'}</summary><div>{media?(['video','image','document'] as const).map(type=><button key={type} onClick={()=>{setUpload(type);document.querySelector<HTMLDetailsElement>('.training-library-create')?.removeAttribute('open')}}><Upload size={16}/>上传{labels[type]}</button>):<><Link to="/scales">编制量表</Link><Link to="/general-questionnaires/create">编制表单</Link><Link to="/sjt-authoring">编制情境判断</Link><Link to="/questionnaire-products/new">编制组合测评</Link></>}</div></details>
     </header>
-    <div className="training-library-filter"><div role="group" aria-label="资源类型">{(media?mediaKinds:toolKinds).map(([value,label])=><button key={value} aria-pressed={kind===value} onClick={()=>update('kind',value)}>{label}</button>)}</div><div className="training-library-filter-meta"><label>来源<select aria-label="资源来源" value={source} onChange={event=>update('source',event.target.value)}><option value="all">全部来源</option><option value="owned">{media?'我上传的':'我编制的'}</option><option value="granted">已获授权</option></select></label><span>{loading?'正在读取…':`共 ${total} 项`}</span></div></div>
+    <div className="training-library-filter training-workspace-filter-bar"><div className="training-workspace-filters" role="group" aria-label="资源类型">{(media?mediaKinds:toolKinds).map(([value,label])=><button key={value} aria-pressed={kind===value} onClick={()=>update('kind',value)}>{label}</button>)}</div><div className="training-library-filter-meta"><label>来源<select aria-label="资源来源" value={source} onChange={event=>update('source',event.target.value)}><option value="all">全部来源</option><option value="owned">{media?'我上传的':'我编制的'}</option><option value="granted">已获授权</option></select></label><span>{loading?'正在读取…':`共 ${total} 项`}</span></div></div>
     {error&&!rename&&<div role="alert" className="training-library-error">{error}<button onClick={()=>setRevision(value=>value+1)}>重新读取</button></div>}{notice&&<div role="status" className="training-library-notice"><span>{notice}</span><button type="button" aria-label="关闭提示" onClick={()=>setNotice('')}><X size={16}/></button></div>}
     {loading?<p role="status" className="training-library-empty">正在读取{media?'媒体':'工具'}…</p>:!error&&!rows.length?<div className="training-library-empty"><Wrench size={28}/><h2>暂无符合条件的{media?'媒体':'工具'}</h2><p>调整检索和筛选条件，或{media?'上传新的素材':'编制你的第一个工具'}。</p></div>:<div className="training-library-grid training-workspace-grid">{rows.map(row=>{
       const Icon=row.kind==='image'?Image:row.kind==='video'?Video:media?FileText:Wrench

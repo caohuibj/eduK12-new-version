@@ -1,11 +1,12 @@
 /* Shared teacher workspace cards; content-specific controls keep their behavior. */
-.hui-training.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-grid {
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: stretch;
   gap: 20px;
 }
-.hui-training.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card {
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-library .training-workspace-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card {
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -19,7 +20,7 @@
 .hui-training .training-workspace-card-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; }
 .hui-training .training-workspace-card-kind { display: inline-flex; align-items: center; gap: 8px; color: #60736a; font-size: 13px; line-height: 1.5; }
 .hui-training .training-workspace-card-kind svg { flex: none; color: #446653; }
-.hui-training.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card-badge {
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card-badge {
   flex: none;
   min-height: 27px;
   margin: 0;
@@ -31,7 +32,7 @@
   line-height: 1.6;
   font-weight: 500;
 }
-.hui-training.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card-title {
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card-title {
   min-width: 0;
   margin: 0 0 12px;
   color: #213f33;
@@ -39,19 +40,19 @@
   overflow-wrap: anywhere;
 }
 .hui-training .training-library-card .training-workspace-card-title { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-.hui-training.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) :is(.training-trainer-course-description, .training-library-description) {
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) :is(.training-trainer-course-description, .training-library-description) {
   margin: 0;
   color: #607064;
   font-size: 14px;
   line-height: 1.8;
   overflow-wrap: anywhere;
 }
-.hui-training.hui-app--standard.training-workspace-shell .training-trainer-home .training-trainer-course-intro { min-height: 86px; margin: 0 0 16px; }
-.hui-training.hui-app--standard.training-workspace-shell .training-library .training-library-card .training-library-description { margin: 12px 0 20px; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .training-trainer-course-intro { min-height: 86px; margin: 0 0 16px; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-library .training-library-card .training-library-description { margin: 12px 0 20px; }
 .hui-training .training-workspace-card-status { align-self: flex-start; display: inline-flex; padding: 3px 8px; margin: 0 0 10px; border-radius: 5px; background: #f2f3ed; color: #607064; font-size: 12px; line-height: 1.6; }
 .hui-training .training-workspace-card .is-published { background: #e5efe2; color: #315b35; }
 .hui-training .training-workspace-card .is-draft { background: #f5ecd7; color: #765d27; }
-.hui-training.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card-footer {
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card-footer {
   display: flex;
   flex-wrap: wrap;
   align-items: flex-end;
@@ -61,7 +62,7 @@
   padding-top: 16px;
   border-top: 1px solid #e2e7dc;
 }
-.hui-training.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card-meta {
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card-meta {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -71,7 +72,7 @@
   line-height: 1.6;
 }
 .hui-training .training-workspace-card-actions { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: 8px; margin-left: auto; min-width: 0; }
-.hui-training.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card-actions :is(a, button) {
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card-actions :is(a, button) {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -91,15 +92,27 @@
   white-space: normal;
   cursor: pointer;
 }
-.hui-training.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card-actions .training-workspace-card-primary { background: #eaf0e4; color: #28553c; border-color: #dde6d7; }
-.hui-training.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card-actions :is(a, button):hover:not(:disabled) { background: #e2ebdc; border-color: #cbdac3; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card-actions .training-workspace-card-primary { background: #eaf0e4; color: #28553c; border-color: #dde6d7; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card-actions :is(a, button):hover:not(:disabled) { background: #e2ebdc; border-color: #cbdac3; }
 .hui-training .training-workspace-card-actions :is(a, button):focus-visible { outline: 2px solid #315c40; outline-offset: 3px; }
-.hui-training.hui-app--standard.training-workspace-shell .training-library { max-width: none; }
-.hui-training.hui-app--standard.training-workspace-shell .training-library .training-library-heading h1 { margin: 0; color: #213f33; font: 600 28px/1.4 var(--training-serif); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-library { max-width: none; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-library .training-library-heading h1 { margin: 0; color: #213f33; font: 600 28px/1.4 var(--training-serif); }
 .hui-training .training-library-heading > div > p:last-child { margin: 7px 0 0; font-size: 13px; line-height: 1.7; color: #607064; }
+/* Shared filter tabs across courses, media and tools. */
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-filter-bar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px; margin: 0 0 20px; padding: 15px 0 0; border-top: 1px solid #dce3d8; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-filter-bar .training-workspace-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 0; border: 0; background: transparent; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-filter-bar .training-workspace-filters button { display: inline-flex; align-items: center; justify-content: center; min-height: 38px; margin: 0; padding: 8px 16px; border: 1px solid transparent; border-radius: 7px; background: transparent; color: #53655a; box-shadow: none; font-family: inherit; font-size: 14px; font-weight: 500; line-height: 1.5; cursor: pointer; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-filter-bar .training-workspace-filters button:hover { background: #eaf0e4; color: #28553c; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-filter-bar .training-workspace-filters button[aria-pressed=true] { background: #285b49; border-color: #285b49; color: #fff; font-weight: 600; }
+.hui-training .training-workspace-filters button:focus-visible { outline: 2px solid #315c40; outline-offset: 3px; }
+@media (max-width: 1050px) {
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-library .training-workspace-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
 @media (max-width: 680px) {
-  .hui-training.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-grid { grid-template-columns: 1fr; gap: 16px; }
-  .hui-training.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card { min-height: 260px; padding: 22px 20px; }
-  .hui-training.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card-title { font-size: 21px; }
-  .hui-training.hui-app--standard.training-workspace-shell .training-trainer-home .training-trainer-course-intro { min-height: 0; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-grid { grid-template-columns: 1fr; gap: 16px; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-library .training-workspace-grid { grid-template-columns: 1fr; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card { min-height: 260px; padding: 22px 20px; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-card-title { font-size: 21px; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .training-trainer-course-intro { min-height: 0; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-filter-bar .training-workspace-filters button { min-height: 40px; padding: 8px 12px; }
 }

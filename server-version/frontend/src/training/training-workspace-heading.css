@@ -1,12 +1,12 @@
 /* Course, media and tool headings share one compact search/action layout. */
-.hui-training.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-heading {
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-heading {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(260px, 340px) auto;
   align-items: center;
   gap: 24px;
 }
 .training-workspace-heading > div { min-width: 0; }
-.hui-training.hui-app--standard.training-workspace-shell .training-workspace-search {
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-workspace-search {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -20,12 +20,12 @@
   background: #fffdf9;
   color: #60736a;
 }
-.hui-training.hui-app--standard.training-workspace-shell .training-workspace-search:focus-within {
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-workspace-search:focus-within {
   border-color: #315c40;
   box-shadow: 0 0 0 2px #315c4018;
 }
-.hui-training.hui-app--standard.training-workspace-shell .training-workspace-search > svg { flex: none; }
-.hui-training.hui-app--standard.training-workspace-shell .training-workspace-search input {
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-workspace-search > svg { flex: none; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-workspace-search input {
   width: 100%;
   min-width: 0;
   min-height: 32px;
@@ -40,7 +40,7 @@
   color: #25483d;
   font-size: 14px;
 }
-.hui-training.hui-app--standard.training-workspace-shell .training-workspace-search button {
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-workspace-search button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -56,19 +56,19 @@
   white-space: nowrap;
   cursor: pointer;
 }
-.hui-training.hui-app--standard.training-workspace-shell .training-workspace-search button[type=submit] { background: #e9efe3; font-weight: 600; }
-.hui-training.hui-app--standard.training-workspace-shell .training-workspace-search button:focus-visible { outline: 2px solid #315c40; outline-offset: 2px; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-workspace-search button[type=submit] { background: #e9efe3; font-weight: 600; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-workspace-search button:focus-visible { outline: 2px solid #315c40; outline-offset: 2px; }
 .training-library .training-library-filter { flex-wrap: wrap; }
 .training-library .training-library-filter-meta { display: flex; align-items: center; gap: 18px; margin-left: auto; }
 .training-library-filter-meta label { display: flex; align-items: center; gap: 10px; color: #60736a; font-size: 14px; }
 .training-library-filter-meta select { min-height: 40px; padding: 7px 28px 7px 10px; border: 1px solid #cfd9ca; border-radius: 7px; background-color: #fffdf9; color: #2d5244; font-size: 14px; }
 .training-library-filter-meta > span { color: #60736a; font-size: 14px; white-space: nowrap; }
 @media (max-width: 960px) {
-  .hui-training.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-heading { grid-template-columns: minmax(0, 1fr) auto; gap: 16px; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-heading { grid-template-columns: minmax(0, 1fr) auto; gap: 16px; }
   .training-workspace-heading .training-workspace-search { grid-column: 1 / -1; grid-row: 2; max-width: 420px; }
 }
 @media (max-width: 600px) {
-  .hui-training.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-heading { gap: 14px 12px; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-trainer-home, .training-library) .training-workspace-heading { gap: 14px 12px; }
   .training-workspace-heading .training-workspace-search { max-width: none; }
   .training-library .training-library-filter-meta { width: 100%; justify-content: space-between; margin-left: 0; }
 }
