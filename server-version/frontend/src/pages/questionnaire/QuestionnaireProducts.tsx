@@ -24,6 +24,7 @@ import { resolveTrainingCoursePrefill } from '../../training/resolveCoursePrefil
 import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
+import AssessmentToolPicker from '../../components/AssessmentToolPicker'
 import LocalDateTimeInput, { localDateTimeValue, parseLocalDateTime } from '../../components/LocalDateTimeInput'
 import './questionnaire-products.css'
 import './questionnaire-training-editor.css'
@@ -933,7 +934,7 @@ export function QuestionnaireProductEdit() {
                     </select>
                   </label>
                   {type !== 'FORM' ? (
-                    <label className="block">
+                    trainingDesign ? <AssessmentToolPicker options={choices} value={selected} onChange={setSelected} label={labels[type]} disabled={busy || dirty || authoringLocked} /> : <label className="block">
                       选择测评
                       <select
                         aria-label="选择测评"

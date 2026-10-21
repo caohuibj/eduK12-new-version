@@ -707,6 +707,26 @@ describe('Training questionnaire guided editor', () => {
     api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? resources : row }))
     api.put.mockImplementation(async (_path, body) => ({ code: 0, data: { ...row, ...body, revision: 8 } }))
   })
+  it.each([
+    ['SCALE', '量表', { scaleId: 'scale' }],
+    ['COGNITIVE', '认知测验', { cognitiveAssignmentId: 'cognitive' }],
+    ['SITUATIONAL', '情境判断', { situationalInstrumentKey: 'sjt-key', situationalInstrumentVersion: '2.0' }],
+  ] as const)('selects %s through searchable cards while keeping the existing item API', async (type, label, itemFields) => {
+    const available = { ...resources, cognitive: [{ id: 'cognitive', name: '授权认知', configVersion: '1.0' }], situational: [{ id: 'situational', name: '授权情境', instrumentKey: 'sjt-key', instrumentVersion: '2.0' }] }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? available : row }))
+    api.post.mockResolvedValue({ code: 0, data: { ...row, revision: 8 } })
+    mount('guided', '#questionnaire-content')
+    fireEvent.click(await screen.findByRole('button', { name: label }))
+    fireEvent.click(screen.getByRole('button', { name: new RegExp('选择' + label) }))
+    const dialog = screen.getByRole('dialog')
+    const title = type === 'SCALE' ? '可用量表' : type === 'COGNITIVE' ? '授权认知' : '授权情境'
+    fireEvent.change(within(dialog).getByRole('textbox', { name: '检索工具' }), { target: { value: title } })
+    fireEvent.click(within(dialog).getByRole('button', { name: new RegExp('选择 ' + title) }))
+    expect(api.post).not.toHaveBeenCalled()
+    expect(screen.queryByRole('dialog')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '添加到测评' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledExactlyOnceWith('/questionnaire-products/guided/items', { revision: 7, item: { type, required: true, ...itemFields } }))
+  })
   it('keeps unsaved metadata across steps and saves through the existing revision contract', async () => {
     mount('guided')
     await screen.findByDisplayValue('步骤测评')
