@@ -31,7 +31,7 @@ export function reportCheck(report,{allowFiltered=false,minimum=1}={}) {
 }
 export function browserCheck(report,head) {
   assert.equal(report.status,'PASS'); assert.equal(report.sourceCommit,head);
-  const required=['training-editor-native','training-stable-item-operations','training-quality-roundtrip','training-published','training-final-report-image','survey-editor-native','survey-quality-roundtrip','survey-published','survey-final-report-image','survey-raw-quality-export','desktop-mobile-layout'];
+  const required=['training-editor-native','training-stable-item-operations','training-quality-roundtrip','training-published','training-final-report-image','survey-editor-native','survey-quality-roundtrip','survey-published','survey-final-report-image','survey-raw-quality-export','training-report-image-denies-other-user','survey-report-image-denies-missing-proof','desktop-mobile-layout'];
   assert.deepEqual([...report.checks].sort(),required.sort());
   assert.equal(report.blockedExternalRequests,0);assert.deepEqual(report.browserErrors,[]);
   assert.equal(report.screenshots.length,12);assert.equal(new Set(report.screenshots.map(x=>x.file)).size,12);
@@ -42,6 +42,12 @@ export function browserCheck(report,head) {
   assert.deepEqual(report.layoutChecks.map(x=>x.name+':'+x.width).sort(),layoutMatrix);
   for(const item of report.layoutChecks) assert.equal(item.overflow,false,'Layout overflow or missing observation');
   assert.equal(report.accessibility.length,4);
+  const surfaces=['training-editor','training-report','survey-editor','survey-report'];
+  assert.deepEqual(report.accessibility.map(x=>x.name).sort(),[...surfaces].sort());
+  assert.deepEqual(report.screenshots.map(x=>x.file).sort(),surfaces.flatMap(name=>[390,768,1440].map(width=>name+'-'+width+'.png')).sort());
+  assert.equal(report.export.format,'RAW_WAVE');assert.equal(report.export.rowCount,3);assert.equal(report.export.downloadedFiles,3);
+  assert.deepEqual(report.imageAuthorization.map(x=>x.name).sort(),['survey-missing-proof','training-other-user']);
+  for(const item of report.imageAuthorization){assert.equal(item.positiveStatus,200);assert.equal(item.deniedStatus,404);assert.equal(item.deniedImage,false);assert(Number.isInteger(item.deniedLength)&&item.deniedLength>=0);if(item.name==='survey-missing-proof')assert.equal(item.deniedLength,0)}
   for(const check of report.accessibility){assert(check.passes>0);assert.deepEqual(check.violations,[])}
   return {status:'PASS',checks:required.length,screenshots:12,accessibility:4};
 }

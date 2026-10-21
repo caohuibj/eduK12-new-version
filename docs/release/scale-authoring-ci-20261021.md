@@ -16,7 +16,37 @@ Only the separately created `ci/scale-authoring-feedback-20261021` branch activa
 the dedicated workflow, after the final review. No PR is created and PR322, main,
 existing CI routes, repository rules and production settings are unchanged.
 
-## Required checks and their failure targets
+## Current reviewed retry boundary (not yet activated)
+
+The current frontend/browser repair reuses only backend evidence from official
+run `39560427570`, source `48defee0aecbc36138ad624f729b9a7cbb634efc`:
+174 backend assertions, full-dependency audit, runtime scan, compiled images and
+the one exact PostgreSQL case. This does not turn that failed overall run into a
+pass. The original browser failure remains recorded. `scale-authoring-reuse.py`
+checks the successful producer and PG/cleanup steps, immutable artifact IDs and
+whole ZIP SHA-256, then original reports and inner archive checksums.
+
+Reuse requires the entire backend tree (including fixture, tests, schema, lock and
+Dockerfile), build/runtime/bootstrap/proxy scripts, backend test selection and
+environment, browser service configuration, registry/timezone and tool versions to
+remain unchanged. The only accepted check-script difference removes the redundant
+frontend Cognitive subset typecheck. Any other relevant drift stops this fixed
+lane for explicit re-scoping; it does not trigger a full fallback build.
+
+Only the affected frontend is built and checked again, with eight directly affected
+editor/save/preview suites. The original 123 frontend assertions are checked from
+the fixed official report; unchanged tests and all other frontend transitive inputs
+are protected by the exact seven-path repair boundary. Browser execution combines
+that current frontend with the verified unchanged backend image, retaining its
+original image ID. The old PostgreSQL test is not repeated; an empty database and
+fresh synthetic browser prerequisites are still required. App typechecking covers
+the Cognitive subset once. Fixture/readiness failures keep a nonzero exit and
+small allowlisted diagnostic reports; private SQL, credentials and API logs are
+not uploaded. Browser qualification still requires all 13 business checkpoints,
+two image-authorization denials, three validated downloads, four zero-violation
+axe records and the exact four-surface/three-width no-overflow screenshot matrix.
+
+## Required checks and their failure targets (initial candidate)
 
 - Locked backend/frontend installs and the existing Dockerfile build stages each
   run once. This catches dependency/schema/compiler integration failures; backend
@@ -29,7 +59,7 @@ existing CI routes, repository rules and production settings are unchanged.
   is in the manifest. Earlier local checks used an adjacent dependency environment,
   not the exact official lock environment, so these selected checks run once on
   the locked inputs. They are not a rerun of the whole application suite.
-- Frontend app/Cognitive types and changed-file lint catch integration and invalid
+- Frontend app types (including the Cognitive subset) and changed-file lint catch integration and invalid
   UI API usage. Full-dependency audit retains HIGH threshold for both components.
 - One new real PostgreSQL case exercises quality raw facts, frozen image feedback,
   native submission, authorized read/export and replay. Filtered old cases are

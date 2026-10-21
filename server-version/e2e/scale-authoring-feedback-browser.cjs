@@ -9,10 +9,11 @@ const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const path = require('node:path')
 const { createHmac } = require('node:crypto')
-const { chromium } = require(process.env.SCALE_AUTHORING_PLAYWRIGHT_MODULE || '../backend/node_modules/playwright-core')
-const REQUIRED = ['training-editor-native', 'training-stable-item-operations', 'training-quality-roundtrip', 'training-published', 'training-final-report-image', 'survey-editor-native', 'survey-quality-roundtrip', 'survey-published', 'survey-final-report-image', 'survey-raw-quality-export', 'desktop-mobile-layout']
-const evidence = { schemaVersion: 1, status: 'RUNNING', checks: [], screenshots: [], browserErrors: [], accessibility: [], computedStyles: [], layoutChecks: [], blockedExternalRequests: 0, scope: 'Real Chromium, synthetic accounts, candidate built UI and real API/PostgreSQL; no physical-device timing claim' }
+let chromium // Loaded only by the guarded real-browser entry; pure contracts need no browser dependency.
+const REQUIRED = ['training-editor-native', 'training-stable-item-operations', 'training-quality-roundtrip', 'training-published', 'training-final-report-image', 'survey-editor-native', 'survey-quality-roundtrip', 'survey-published', 'survey-final-report-image', 'survey-raw-quality-export', 'training-report-image-denies-other-user', 'survey-report-image-denies-missing-proof', 'desktop-mobile-layout']
+const evidence = { schemaVersion: 1, status: 'RUNNING', checks: [], screenshots: [], browserErrors: [], failedRequests: [], imageAuthorization: [], accessibility: [], computedStyles: [], layoutChecks: [], blockedExternalRequests: 0, scope: 'Real Chromium, synthetic accounts, candidate built UI and real API/PostgreSQL; no physical-device timing claim' }
 let fixture, output, browser, activePage
+const diagnosticSecrets = new Set()
 const phase = name => { evidence.phase = name; if (output) save() }
 const check = (name, condition) => { assert.ok(condition, name); evidence.checks.push(name) }
 const save = () => fs.writeFileSync(path.join(output, 'result.json'), JSON.stringify(evidence, null, 2))
@@ -35,7 +36,10 @@ async function newPage() {
   await context.route('**/*', route => { const url = new URL(route.request().url()); if (!['http:', 'https:'].includes(url.protocol) || [fixture.trainingUrl, fixture.surveyUrl].includes(url.origin)) return route.continue(); evidence.blockedExternalRequests++; return route.abort('blockedbyclient') })
   const page = await context.newPage(); activePage = page
   page.setDefaultTimeout(25000); page.setDefaultNavigationTimeout(30000)
-  page.on('pageerror', e => evidence.browserErrors.push(e.name))
+  page.on('pageerror', e => evidence.browserErrors.push(redactDiagnostics({ name: e.name, message: e.message })))
+  page.on('requestfailed', request => {
+    if (evidence.failedRequests.length < 20) evidence.failedRequests.push(redactDiagnostics({ phase: evidence.phase, method: request.method(), pathname: new URL(request.url()).pathname, reason: request.failure()?.errorText }))
+  })
   page.on('dialog', d => { evidence.browserErrors.push('UnexpectedDialog'); return d.dismiss() })
   return page
 }
@@ -51,11 +55,14 @@ async function capture(page, name, width, failure = false) {
 // Preserve diagnostic structure and measured colors, not authentication values or URLs.
 function redactDiagnostics(value) {
   if (Array.isArray(value)) return value.map(redactDiagnostics)
-  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, redactDiagnostics(item)]))
+  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, /^(password|token|accessCredential|researchCode|authorization|cookie|secret|totpSecretBase64)$/i.test(key) ? '[redacted-secret]' : redactDiagnostics(item)]))
   if (typeof value !== 'string') return value
   let text = value.replace(/\b(value|src|href|action|data-[\w-]+)=("[^"]*"|'[^']*')/gi, '$1="[redacted]"')
     .replace(/https?:\/\/[^\s"'<>]+/g, '[redacted-url]')
-  for (const secret of [fixture?.teacher?.password, fixture?.student?.password, fixture?.researcher?.password, fixture?.researcher?.totpSecretBase64].filter(Boolean)) text = text.split(secret).join('[redacted-secret]')
+    .replace(/Bearer\s+[^\s"'<>]+/gi, 'Bearer [redacted-secret]')
+    .replace(/\beyJ[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\b/g, '[redacted-token]')
+    .replace(/((?:password|accessCredential|researchCode|authorization|cookie|secret|token)\s*[:=]\s*)[^\s,;}]+/gi, '$1[redacted-secret]')
+  for (const secret of [...diagnosticSecrets, fixture?.teacher?.password, fixture?.student?.password, fixture?.researcher?.password, fixture?.researcher?.totpSecretBase64].filter(Boolean)) text = text.split(secret).join('[redacted-secret]')
   return text
 }
 async function layout(page, name, scope) {
@@ -97,11 +104,56 @@ async function accessibility(page, name) {
   // Tool/runtime failures and all functional assertions still stop immediately.
   assert.equal(result.version, version); assert(result.passes > 0)
 }
-function totp() {
-  const counter = Buffer.alloc(8); counter.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30000)))
-  const mac = createHmac('sha1', Buffer.from(fixture.researcher.totpSecretBase64, 'base64')).update(counter).digest()
+function totpAt(secretBase64, now = Date.now()) {
+  const step = Math.floor(now / 30000)
+  const counter = Buffer.alloc(8); counter.writeBigUInt64BE(BigInt(step))
+  const mac = createHmac('sha1', Buffer.from(secretBase64, 'base64')).update(counter).digest()
   const offset = mac[mac.length - 1] & 15
-  return String((mac.readUInt32BE(offset) & 0x7fffffff) % 1000000).padStart(6, '0')
+  return { step, code: String((mac.readUInt32BE(offset) & 0x7fffffff) % 1000000).padStart(6, '0') }
+}
+function failureDetail(error, currentPhase = evidence.phase || 'prerequisites') {
+  return redactDiagnostics({ phase: currentPhase, name: error?.name || 'Error', message: String(error?.message || error),
+    stack: typeof error?.stack === 'string' ? error.stack.slice(0, 6000) : undefined, completedChecks: evidence.checks.length })
+}
+function assertDeniedImage(result, expectedStatus) {
+  assert.equal(result.status, expectedStatus, 'Expected explicit report-image authorization rejection')
+  assert(!/^image\//i.test(result.contentType || ''), 'Denied response must not be image content')
+  assert.equal(result.pngSignature, false, 'Denied response must not contain PNG bytes')
+  assert.equal(result.jpegSignature, false, 'Denied response must not contain JPEG bytes')
+  assert.equal(result.webpSignature, false, 'Denied response must not contain WebP bytes')
+}
+async function imageRequest(page, endpoint, method = 'GET', body) {
+  assert.equal(new URL(endpoint).origin, new URL(page.url()).origin)
+  return page.evaluate(async ({ endpoint, method, body }) => {
+    const response = await fetch(endpoint, { method, credentials: 'same-origin', cache: 'no-store',
+      headers: { 'X-EduK12-Account-View': 'BUSINESS', ...(body === undefined ? {} : { 'Content-Type': 'application/json' }) },
+      ...(body === undefined ? {} : { body: JSON.stringify(body) }) })
+    const bytes = new Uint8Array(await response.arrayBuffer())
+    return { status: response.status, contentType: response.headers.get('content-type'), length: bytes.length,
+      pngSignature: bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47,
+      jpegSignature: bytes[0] === 0xff && bytes[1] === 0xd8,
+      webpSignature: String.fromCharCode(...bytes.slice(0,4)) === 'RIFF' && String.fromCharCode(...bytes.slice(8,12)) === 'WEBP' }
+  }, { endpoint, method, body })
+}
+function assertExportParts(parts, ticket) {
+  assert.deepEqual(parts.map(p => p.part), ['csv', 'codebook', 'manifest'])
+  const artifact = parts[0].artifact
+  assert.equal(artifact.id, ticket.id); assert.equal(artifact.format, ticket.format)
+  for (const part of parts) assert.deepEqual(part.artifact, artifact, 'All three downloads must use the exact same frozen ticket')
+  assert.equal(parts[0].text.replace(/^\uFEFF/, ''), artifact.csv)
+  assert.deepEqual(JSON.parse(parts[1].text), artifact.codebook)
+  assert.deepEqual(JSON.parse(parts[2].text), artifact.manifest)
+  const names = parts.map(p => p.filename)
+  assert.equal(new Set(names).size, 3)
+  assert(names[0].endsWith('.csv') && names[1].endsWith('_codebook.json') && names[2].endsWith('_manifest.json'))
+  assert.equal(names[0].slice(0, -4), names[1].slice(0, -14))
+  assert.equal(names[0].slice(0, -4), names[2].slice(0, -14))
+  assert.equal(artifact.manifest.rowCount, 3, 'One FINAL with three original answers')
+  assert(artifact.csv.includes('item_purpose') && artifact.csv.includes('ATTENTION_CHECK') && artifact.csv.includes('SOCIAL_DESIRABILITY'))
+  assert(Array.isArray(artifact.codebook))
+  assert.equal(artifact.codebook.filter(x => x.purpose === 'ATTENTION_CHECK').length, 1)
+  assert.equal(artifact.codebook.filter(x => x.purpose === 'SOCIAL_DESIRABILITY').length, 1)
+  return artifact
 }
 async function trainingLogin(page, actor, student = false) {
   await page.goto(fixture.trainingUrl + (student ? '/student/login' : '/teacher/account-login'))
@@ -116,7 +168,7 @@ async function trainingJourney() {
   await author.getByLabel('量表编码', { exact: true }).fill('SCALE-CI-' + fixture.runId)
   await author.getByLabel('量表名称', { exact: true }).fill('Synthetic Training scale')
   await author.getByRole('combobox', { name: '可见性', exact: true }).selectOption('PUBLIC')
-  await author.getByLabel('自有内容 / 授权声明', { exact: true }).fill('Self-authored synthetic CI content only')
+  assert.equal(await author.getByLabel('自有内容 / 授权声明', { exact: true }).count(), 0, 'New metadata step must not accept unsavable definition changes')
   const created = await action(author, '/api/scales', () => button(author, '保存基本信息').click())
   const scaleId = created.data.id; assert(scaleId)
   await author.waitForURL('**/scales/' + scaleId)
@@ -134,11 +186,13 @@ async function trainingJourney() {
   assert.deepEqual(await itemIds.evaluateAll(nodes => nodes.map(n => n.value)), [codes[0], codes[2], codes[1]])
   await button(author, '下移 ' + codes[2]).click()
   check('training-stable-item-operations', JSON.stringify(await itemIds.evaluateAll(nodes => nodes.map(n => n.value))) === JSON.stringify(codes))
-  await author.getByRole('combobox', { name: '目标选项 ' + codes[1], exact: true }).selectOption('option_2')
+  await author.getByRole('combobox', { name: '目标选项 ' + codes[1], exact: true }).selectOption({ label: '选项 2' })
   await author.getByPlaceholder('题目内容', { exact: true }).nth(1).fill('请选择「选项 2」。')
   await button(author, '计分').click(); await button(author, '+ 总分').click(); await button(author, codes[0]).click()
   assert.equal(await button(author, codes[1]).count(), 0); assert.equal(await button(author, codes[2]).count(), 0)
-  await button(author, '报告文案').click(); await button(author, '增加原始分反馈区间').click()
+  await button(author, '报告文案').click()
+  await author.getByLabel('自有内容 / 授权声明', { exact: true }).fill('Self-authored synthetic CI content only')
+  await button(author, '增加原始分反馈区间').click()
   await author.getByLabel('total_1 区间 1 上限', { exact: true }).fill('10')
   await author.getByLabel('total_1 区间 1 反馈文字', { exact: true }).fill('TRAINING RAW INTERVAL FEEDBACK')
   const upload = await action(author, '/api/uploads/image', () => author.getByLabel('上传反馈图片', { exact: true }).setInputFiles(imageFile))
@@ -148,8 +202,10 @@ async function trainingJourney() {
   await layout(author, 'training-editor', '.scale-edit-page')
   phase('training-author-save'); const saved = await action(author, '/api/scales/' + scaleId + '/definition', () => button(author, '保存报告定义').click(), 'PUT')
   const written = saved.request.postDataJSON().definition
+  assert.equal(written.license.note, 'Self-authored synthetic CI content only')
   check('training-quality-roundtrip', written.items.filter(x => x.purpose && x.purpose !== 'CONTENT').length === 2 && written.scoring.scores[0].source.items.length === 1 && written.report.rawScoreFeedback.rules[0].ranges[0].images[0].asset.assetId === upload.data.assetId)
   await author.getByText(/已保存，并重新读取确认计分题目。/).waitFor()
+  assert.equal(await author.getByLabel('自有内容 / 授权声明', { exact: true }).inputValue(), written.license.note)
   await action(author, '/api/scales/' + scaleId + '/publish', () => button(author, '发布描述性量表').click())
   check('training-published', true)
   phase('training-participant'); const learner = await newPage(); await trainingLogin(learner, fixture.student, true)
@@ -162,11 +218,18 @@ async function trainingJourney() {
     await learner.getByRole('heading', { name: prompt, exact: true }).waitFor()
     await learner.getByRole('radio', { name: index === 1 ? '选项 2' : '选项 1', exact: true }).check()
   }
-  await action(learner, /\/api\/scales\/assessments\/[^/]+\/submit$/, () => button(learner, '完成测评').click())
+  const trainingImage = learner.waitForResponse(r => r.request().method() === 'GET' && /\/api\/scales\/assessments\/[^/]+\/report-assets\/[^/]+$/.test(new URL(r.url()).pathname))
+  const [trainingImageResponse] = await Promise.all([trainingImage, action(learner, /\/api\/scales\/assessments\/[^/]+\/submit$/, () => button(learner, '完成测评').click())])
   await learner.getByText('TRAINING RAW INTERVAL FEEDBACK', { exact: true }).waitFor()
   await learner.getByAltText('Training synthetic feedback picture', { exact: true }).waitFor()
   await learner.waitForFunction(() => [...document.images].some(i => i.alt === 'Training synthetic feedback picture' && i.complete && i.naturalWidth > 0))
+  assert.equal(trainingImageResponse.status(), 200); assert.match(trainingImageResponse.headers()['content-type'], /^image\/png/); assert((await trainingImageResponse.body()).length > 0)
   check('training-final-report-image', true)
+  phase('training-image-authorization')
+  const denied = await imageRequest(author, trainingImageResponse.url())
+  assertDeniedImage(denied, 404)
+  evidence.imageAuthorization.push({ name: 'training-other-user', positiveStatus: trainingImageResponse.status(), deniedStatus: denied.status, deniedImage: denied.pngSignature || denied.jpegSignature || denied.webpSignature || /^image\//i.test(denied.contentType || ''), deniedLength: denied.length })
+  check('training-report-image-denies-other-user', true)
   await layout(learner, 'training-report', '.hui-report')
   await author.context().close(); await learner.context().close()
 }
@@ -176,8 +239,10 @@ async function surveyJourney() {
   await author.getByLabel('研究者登录名', { exact: true }).fill(fixture.researcher.username)
   await author.getByLabel('密码', { exact: true }).fill(fixture.researcher.password)
   await button(author, '进入双因素验证').click()
-  const loginStep = Math.floor(Date.now() / 30000)
-  await author.getByLabel('动态验证码／恢复码', { exact: true }).fill(totp())
+  const loginCode = totpAt(fixture.researcher.totpSecretBase64)
+  diagnosticSecrets.add(loginCode.code)
+  const loginStep = loginCode.step
+  await author.getByLabel('动态验证码／恢复码', { exact: true }).fill(loginCode.code)
   await button(author, '验证并登录').click()
   await author.getByRole('heading', { name: '我的研究', exact: true }).waitFor()
   assert(await author.evaluate(() => isSecureContext && typeof crypto.randomUUID === 'function'))
@@ -236,36 +301,53 @@ async function surveyJourney() {
     await participant.getByRole('radio', { name: i === 1 ? '不同意' : '非常不同意', exact: true }).check()
     if (i < 2) await button(participant, '下一题').click()
   }
-  const final = await action(participant, /\/api\/public\/survey\/r\/[^/]+\/attempts\/[^/]+\/final$/, () => button(participant, '提交本轮正式回答').click())
+  const surveyImage = participant.waitForResponse(r => r.request().method() === 'POST' && /\/api\/public\/survey\/r\/[^/]+\/attempts\/[^/]+\/report-images\/[^/]+$/.test(new URL(r.url()).pathname))
+  const [surveyImageResponse, final] = await Promise.all([surveyImage, action(participant, /\/api\/public\/survey\/r\/[^/]+\/attempts\/[^/]+\/final$/, () => button(participant, '提交本轮正式回答').click())])
   assert.equal(final.data.status, 'COMPLETED')
   await participant.getByText('SURVEY RAW INTERVAL FEEDBACK', { exact: true }).waitFor()
   await participant.waitForFunction(() => [...document.images].some(i => i.alt === 'Survey synthetic feedback picture' && i.complete && i.naturalWidth > 0))
+  assert.equal(surveyImageResponse.status(), 200); assert.match(surveyImageResponse.headers()['content-type'], /^image\/png/); assert((await surveyImageResponse.body()).length > 0)
   check('survey-final-report-image', true)
+  phase('survey-image-authorization')
+  const denied = await imageRequest(author, surveyImageResponse.url(), 'POST', {})
+  assertDeniedImage(denied, 404); assert.equal(denied.length, 0)
+  evidence.imageAuthorization.push({ name: 'survey-missing-proof', positiveStatus: surveyImageResponse.status(), deniedStatus: denied.status, deniedImage: denied.pngSignature || denied.jpegSignature || denied.webpSignature || /^image\//i.test(denied.contentType || ''), deniedLength: denied.length })
+  check('survey-report-image-denies-missing-proof', true)
   await layout(participant, 'survey-report', '[aria-label="原始分描述性反馈"]')
   phase('survey-export'); await author.getByRole('tab', { name: /研究数据/ }).click()
   const analytics = author.getByRole('region', { name: '研究数据', exact: true })
   const overview = await action(author, base + '/analytics/overview', () => button(analytics, '刷新完成进度').click(), 'GET')
   assert.equal(overview.data.waves.find(x => x.id === wave.id).finalCompleted, 1)
   // Respect real TOTP replay protection: wait for a new wall-clock step, never fake clocks.
-  if (Math.floor(Date.now() / 30000) <= loginStep) await author.waitForTimeout((loginStep + 1) * 30000 - Date.now() + 500)
-  await analytics.getByLabel('最新 TOTP 动态验证码', { exact: true }).fill(totp())
+  while (Math.floor(Date.now() / 30000) <= loginStep) await author.waitForTimeout(Math.max(1, (loginStep + 1) * 30000 - Date.now() + 500))
+  const stepUpCode = totpAt(fixture.researcher.totpSecretBase64)
+  diagnosticSecrets.add(stepUpCode.code)
+  assert(stepUpCode.step > loginStep, 'MFA step-up must use a later real counter')
+  await analytics.getByLabel('最新 TOTP 动态验证码', { exact: true }).fill(stepUpCode.code)
   await action(author, '/api/survey/auth/mfa/step-up', () => button(analytics, '完成五分钟内二次认证').click())
   const section = analytics.locator('div.border.rounded-xl').filter({ has: author.getByRole('heading', { name: '匿名科研数据导出', exact: true }) })
   await section.getByRole('combobox', { name: '数据格式', exact: true }).selectOption('RAW_WAVE')
   await section.getByRole('combobox', { name: '波次', exact: true }).selectOption(wave.id)
   const ticket = (await action(author, base + '/exports', () => button(section, '创建受控导出').click())).data
   assert.equal(ticket.status, 'READY'); assert(ticket.nextCursor == null)
-  const downloads = []; const listener = download => downloads.push(download); author.on('download', listener)
-  const artifact = (await action(author, base + '/exports/' + ticket.id + '/download', () => button(analytics, '下载当前批次 CSV、Codebook 与 Manifest').click(), 'GET')).data
-  const deadline = Date.now() + 10000
-  while (downloads.length < 3 && Date.now() < deadline) await author.waitForTimeout(25)
-  author.off('download', listener); assert.equal(downloads.length, 3)
-  for (const download of downloads) { assert.equal(await download.failure(), null) }
-  check('survey-raw-quality-export', artifact.csv.includes('item_purpose') && artifact.csv.includes('ATTENTION_CHECK') && artifact.csv.includes('SOCIAL_DESIRABILITY'))
-  evidence.export = { format: artifact.format, rowCount: artifact.manifest.rowCount, downloadedFiles: downloads.length }
+  const parts = []
+  for (const [part, label] of [['csv', 'CSV'], ['codebook', 'Codebook'], ['manifest', 'Manifest']]) {
+    phase('survey-export-' + part)
+    const [download, response] = await Promise.all([
+      author.waitForEvent('download'),
+      action(author, base + '/exports/' + ticket.id + '/download', () => button(analytics, '下载 ' + label).click(), 'GET'),
+    ])
+    assert.equal(await download.failure(), null)
+    const downloadedPath = await download.path(); assert(downloadedPath)
+    parts.push({ part, artifact: response.data, filename: download.suggestedFilename(), text: fs.readFileSync(downloadedPath, 'utf8') })
+  }
+  const artifact = assertExportParts(parts, ticket)
+  check('survey-raw-quality-export', true)
+  evidence.export = { format: artifact.format, rowCount: artifact.manifest.rowCount, downloadedFiles: parts.length }
   await author.context().close(); await participant.context().close()
 }
 async function main() {
+  phase('prerequisites')
   assert.equal(process.env.GITHUB_ACTIONS, 'true'); assert.equal(process.env.NODE_ENV, 'test'); assert.equal(process.env.SCALE_AUTHORING_ISOLATED, '1')
   assert.match(process.env.GITHUB_SHA || '', /^[a-f0-9]{40}$/)
   assert(process.env.RUNNER_TEMP && process.env.GITHUB_WORKSPACE)
@@ -287,6 +369,8 @@ async function main() {
     const profileHome = path.resolve(process.env.MEASUREMENT_BROWSER_PROFILE_HOME || '')
     assert(profileHome.startsWith(privateRoot + path.sep)); assert.equal(fs.realpathSync(profileHome), profileHome)
     assert(fs.lstatSync(profileHome).isDirectory() && !fs.lstatSync(profileHome).isSymbolicLink())
+    phase('browser-launch')
+    ;({ chromium } = require(process.env.SCALE_AUTHORING_PLAYWRIGHT_MODULE || '../backend/node_modules/playwright-core'))
     browser = await chromium.launch({ headless: true, env: { ...process.env, HOME: profileHome }, executablePath: process.env.SCALE_AUTHORING_CHROMIUM_EXECUTABLE || chromium.executablePath(), args: ['--no-sandbox', '--disable-dev-shm-usage', '--host-resolver-rules=MAP training.eduk12.top 127.0.0.1, MAP survey.eduk12.top 127.0.0.1'] })
     evidence.browserVersion = browser.version()
     await trainingJourney(); await surveyJourney()
@@ -298,7 +382,7 @@ async function main() {
     for (const name of REQUIRED) assert(evidence.checks.includes(name), 'Missing acceptance checkpoint ' + name)
     evidence.status = 'PASS'
   } catch (error) {
-    evidence.status = 'FAIL'; evidence.failure = { name: error.name, message: redactDiagnostics(error.message), completedChecks: evidence.checks.length }; process.exitCode = 1
+    evidence.status = 'FAIL'; evidence.failure = failureDetail(error); process.exitCode = 1
     save()
     if (activePage && !activePage.isClosed()) {
       try { await capture(activePage, 'failure-' + (evidence.phase || 'unknown'), activePage.viewportSize()?.width || 1440, true) }
@@ -307,4 +391,10 @@ async function main() {
   }
   finally { if (browser) await browser.close(); save() }
 }
-main().catch(error => { console.error('Scale browser prerequisites failed:', error.name); process.exitCode = 1 })
+if (require.main === module) main().catch(error => {
+  evidence.status = 'FAIL'; evidence.failure = failureDetail(error)
+  console.error('Scale browser failed:', JSON.stringify(evidence.failure))
+  if (output) { try { save() } catch (writeError) { console.error('Evidence write failed:', JSON.stringify(failureDetail(writeError, 'evidence-write'))) } }
+  process.exitCode = 1
+})
+module.exports = { totpAt, redactDiagnostics, failureDetail, assertDeniedImage, assertExportParts, REQUIRED }

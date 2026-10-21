@@ -25,10 +25,20 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
       - run: node .github/scripts/scale-authoring-scope.mjs scope
+      - name: verify fixed successful backend and PostgreSQL evidence (fail closed on changed inputs)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B .github/scripts/scale-authoring-reuse.py verify
       - uses: actions/upload-artifact@v4
         with:
           name: scale-scope-${{ github.sha }}
-          path: scale-authoring-evidence/scope.json
+          path: |
+            scale-authoring-evidence/scope.json
+            scale-authoring-evidence/backend-reuse.json
+            scale-authoring-evidence/reused-backend-reports/*.json
+            scale-authoring-evidence/reused-frontend-reports/*.json
+            scale-authoring-evidence/reused-postgres/postgres.json
+            scale-authoring-evidence/reused-postgres/cleanup.json
           retention-days: 3
           if-no-files-found: error
   build:
@@ -36,7 +46,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        component: [backend, frontend]
+        component: [frontend]
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     steps:
@@ -135,28 +145,36 @@ jobs:
       - uses: actions/checkout@v4
         with:
           persist-credentials: false
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - uses: actions/download-artifact@v4
-        with:
-          name: scale-backend-${{ github.sha }}
-          path: scale-authoring-evidence
+      - name: restore only the fixed successful backend artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B .github/scripts/scale-authoring-reuse.py restore
       - uses: actions/download-artifact@v4
         with:
           name: scale-frontend-${{ github.sha }}
           path: scale-authoring-evidence
-      - name: verify and restore same-run artifacts
+      - name: verify original backend and current frontend artifacts
         run: |
           set -euo pipefail
           for component in backend frontend; do
-            test "$(cat scale-authoring-evidence/$component-head.txt)" = "$GITHUB_SHA"
-            test "$(cat scale-authoring-evidence/$component-run.txt)" = "$GITHUB_RUN_ID"
+            expected_head="$GITHUB_SHA"; expected_run="$GITHUB_RUN_ID"
+            if [ "$component" = backend ]; then expected_head=48defee0aecbc36138ad624f729b9a7cbb634efc; expected_run=39560427570; fi
+            test "$(cat scale-authoring-evidence/$component-head.txt)" = "$expected_head"
+            test "$(cat scale-authoring-evidence/$component-run.txt)" = "$expected_run"
             (cd scale-authoring-evidence; sha256sum -c "$component-build.sha256")
             tar -xzf "scale-authoring-evidence/$component-build.tgz" -C "server-version/$component"
           done
           (cd scale-authoring-evidence; sha256sum -c backend-images.sha256)
           gzip -dc scale-authoring-evidence/backend-images.tgz | docker load
+          for target in builder runtime; do
+            original="scale-authoring-backend-$target:48defee0aecbc36138ad624f729b9a7cbb634efc"
+            docker tag "$original" "scale-authoring-backend-$target:$GITHUB_SHA"
+            test "$(docker image inspect "$original" --format '{{.Id}}')" = "$(docker image inspect "scale-authoring-backend-$target:$GITHUB_SHA" --format '{{.Id}}')"
+          done
           test -f server-version/backend/dist/index.js
           test -f server-version/frontend/dist/index.html
       - name: prepare official browser and native runtime libraries
@@ -182,17 +200,25 @@ jobs:
         run: |
           bash .github/scripts/scale-authoring-backend.sh node scripts/pr24-migration-preflight.mjs
           bash .github/scripts/scale-authoring-backend.sh node node_modules/prisma/build/index.js migrate deploy
-      - name: new exact PostgreSQL persistence and image permission case
-        env:
-          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
-        run: |
-          bash .github/scripts/scale-authoring-backend.sh node node_modules/vitest/vitest.mjs run src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts -t 'persists quality-item raw answers and frozen image feedback without scoring quality items' --reporter=default --reporter=json --outputFile="$GITHUB_WORKSPACE/scale-authoring-evidence/postgres.json"
-          node "$GITHUB_WORKSPACE/.github/scripts/scale-authoring-scope.mjs" report "$GITHUB_WORKSPACE/scale-authoring-evidence/postgres.json" filtered
-          node - <<'JS'
-          const assert=require('node:assert/strict');const r=require(process.env.GITHUB_WORKSPACE+'/scale-authoring-evidence/postgres.json');const a=r.testResults.flatMap(x=>x.assertionResults).filter(x=>x.title==='persists quality-item raw answers and frozen image feedback without scoring quality items');assert.equal(a.length,1);assert.equal(a[0].status,'passed');assert.equal(r.numPassedTests,1);
-          JS
       - name: seed browser prerequisites and restricted API role
-        run: bash .github/scripts/scale-authoring-backend.sh node --import tsx scripts/scale-authoring-browser-fixture.ts
+        run: |
+          set +e
+          bash .github/scripts/scale-authoring-backend.sh node --import tsx scripts/scale-authoring-browser-fixture.ts > "$RUNNER_TEMP/scale-authoring-private/fixture.private.log" 2>&1
+          status=$?
+          set -e
+          FIXTURE_EXIT="$status" python3 - <<'PYDIAG'
+          import json,os,re
+          from pathlib import Path
+          text=(Path(os.environ['RUNNER_TEMP'])/'scale-authoring-private'/'fixture.private.log').read_text()
+          for line in text.splitlines():
+              if line.startswith('::add-mask::'): print(line)
+          matches=re.findall(r'Synthetic scale prerequisite failed: (AssertionError|Error|TypeError|PrismaClientKnownRequestError|PrismaClientInitializationError)\b',text)
+          status=int(os.environ['FIXTURE_EXIT'])
+          report={'phase':'synthetic-fixture-and-restricted-runtime-role','exitStatus':status,'errorName':matches[-1] if matches else None,'message':'Fixture and restricted runtime-role prerequisites completed' if status==0 else 'Synthetic fixture or restricted runtime-role prerequisite failed; raw SQL and credential-bearing output withheld'}
+          Path('scale-authoring-evidence/fixture-diagnostic.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report))
+          PYDIAG
+          exit "$status"
       - name: require current explicit private-profile trust approval
         run: |
           node -e "if(require('./.github/scripts/scale-authoring-bindings.json').browserProfileTrustApproved!==true)throw new Error('This round profile-only CA approval is still pending; no TLS trust action executed')"
@@ -203,13 +229,27 @@ jobs:
         run: |
           set -euo pipefail
           bash .github/scripts/scale-authoring-backend.sh serve
-          nohup setsid node server-version/e2e/measurement-browser-proxy.cjs > "$RUNNER_TEMP/scale-proxy.log" 2>&1 &
+          nohup setsid node server-version/e2e/measurement-browser-proxy.cjs > "$RUNNER_TEMP/scale-authoring-private/proxy.private.log" 2>&1 &
           echo $! > "$RUNNER_TEMP/scale-proxy.pid"
           for attempt in $(seq 1 60); do
             if curl --fail --silent --max-time 2 http://127.0.0.1:3000/ready >/dev/null && curl --noproxy '*' --fail --silent --max-time 2 --cacert "$MEASUREMENT_BROWSER_TLS_CA" --resolve training.eduk12.top:3189:127.0.0.1 https://training.eduk12.top:3189/ >/dev/null; then exit 0; fi
             sleep 1
           done
-          echo '::error::Compiled services failed readiness; private logs are not uploaded'
+          python3 - <<'PYREADY'
+          import json,os,subprocess
+          from pathlib import Path
+          result=subprocess.run(['docker','inspect','scale-authoring-api','--format','{{json .State}}'],text=True,capture_output=True)
+          try: state=json.loads(result.stdout)
+          except (ValueError,TypeError):state={}
+          report={'phase':'compiled-api-and-loopback-https-readiness','exitStatus':1,'message':'Compiled API or loopback HTTPS proxy did not become ready within the bounded wait','apiContainerStatus':state.get('Status'),'apiExitCode':state.get('ExitCode'),'apiOOMKilled':state.get('OOMKilled')}
+          for name,url in [('api','http://127.0.0.1:3000/ready'),('proxy','https://training.eduk12.top:3189/')]:
+              args=['curl','--noproxy','*','--silent','--max-time','2','--output','/dev/null','--write-out','%{http_code}']
+              if name=='proxy':args+=['--cacert',os.environ['MEASUREMENT_BROWSER_TLS_CA'],'--resolve','training.eduk12.top:3189:127.0.0.1']
+              response=subprocess.run(args+[url],text=True,capture_output=True)
+              report[name+'CurlExit']=response.returncode;report[name+'HttpStatus']=response.stdout if response.stdout.isdigit() else 'unavailable'
+          Path('scale-authoring-evidence/readiness-diagnostic.json').write_text(json.dumps(report,indent=2));print(json.dumps(report))
+          PYREADY
+          echo '::error::Compiled services failed readiness; see sanitized readiness-diagnostic.json'
           exit 1
       - name: real two-entry editing, final feedback and visual checks
         run: |
@@ -244,7 +284,8 @@ jobs:
         with:
           name: scale-browser-${{ github.sha }}
           path: |
-            scale-authoring-evidence/postgres.json
+            scale-authoring-evidence/fixture-diagnostic.json
+            scale-authoring-evidence/readiness-diagnostic.json
             scale-authoring-evidence/cleanup.json
             scale-authoring-evidence/browser/
           retention-days: 3

@@ -21,7 +21,6 @@ JS
 npm audit --audit-level=high --json > "$evidence/$component-audit.json"
 if [ "$component" = frontend ]; then
   node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit
-  node node_modules/typescript/bin/tsc -p tsconfig.cognitive.json --noEmit
   mapfile -t lint < <(node -e 'const p=require(process.argv[1]);for(const f of p.frontendLint) console.log(f)' "$root/.github/scripts/scale-authoring-bindings.json")
   node node_modules/eslint/bin/eslint.js "${lint[@]}"
 fi
