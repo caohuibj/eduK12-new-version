@@ -1,0 +1,94 @@
+{
+  "schemaVersion": 1,
+  "frozenReviewPackageSha256": "e1609f419aa73d318bdc58528f41d71decffe55fa85e430efe260f77944ebc95",
+  "instrumentLicense": {
+    "instrument_grant": "Public-domain measure; developer manual explicitly permits reproduction, translation, display and distribution. Retain developer attribution; do not claim publisher articles, third-party branding or all translations are covered.",
+    "source_url": "https://www.hss.gov.nt.ca/professionals/sites/professionals/files/resources/instruction-manual-phq-scoring.pdf",
+    "source_locator": "p.8, QUESTIONS REGARDING DEVELOPMENT, ACKNOWLEDGMENTS AND USE; Table1 p.3 includes both measures.",
+    "quotation": "No permission is required to reproduce, translate, display or distribute.",
+    "form_source_url": "https://www.phqscreeners.com/images/sites/g/files/g10060481/f/201412/PHQ-9_English.pdf",
+    "form_footer": "Developer attribution and no-permission reproduction/translation/display/distribution statement present on standalone form.",
+    "attribution": "Developed by Drs. Robert L. Spitzer, Janet B.W. Williams, Kurt Kroenke and colleagues, with an educational grant from Pfizer Inc.",
+    "archive_policy": "Only original instrument wording transcribed under instrument grant. No journal article or manual PDF downloaded/uploaded; links retained. No logos copied.",
+    "historical_notice": "Early journal appendix copyright notice predates the later public-domain/free-use grant; retain current instrument-specific evidence rather than treating the journal article as public domain.",
+    "corroboration_url": "https://www.pfizer.com/news/press-release/press-release-detail/pfizer_to_offer_free_public_access_to_mental_health_assessment_tools_to_improve_diagnosis_and_patient_care",
+    "corroboration_date": "2010-07-21",
+    "corroboration_summary": "Pfizer announced download access without copyright restrictions; this corroborates the instrument grant, not journal article reuse."
+  },
+  "sourceEnglishIdentity": {
+    "language": "en",
+    "form": "Original adult self-report symptom-severity form; not adolescent modification, short form, or diagnostic interview.",
+    "version_selection": "Official PHQ Screeners English PDF (201412 directory) with nine scored items and one unscored impairment item.",
+    "function_tags": [
+      "depression_screening",
+      "symptom_severity",
+      "change_monitoring"
+    ],
+    "population_scope": "Adult self-report first-review scope. No pediatric validation or Chinese population norm is implied."
+  },
+  "originalPaperLinkOnly": {
+    "citation": "Kroenke K, Spitzer RL, Williams JBW. The PHQ-9: Validity of a Brief Depression Severity Measure. Journal of General Internal Medicine. 2001;16(9):606–613.",
+    "doi": "10.1046/j.1525-1497.2001.016009606.x",
+    "fulltext_url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC1495268/",
+    "publisher_fulltext_url": "https://onlinelibrary.wiley.com/doi/full/10.1046/j.1525-1497.2001.016009606.x",
+    "pubmed_url": "https://pubmed.ncbi.nlm.nih.gov/11556941/",
+    "access_note": "Publicly indexed full text verified through primary-source search; direct PMC fetch currently presents browser challenge and Wiley direct fetch returned 403. Do not describe direct retrieval as successful. No article file copied.",
+    "article_reuse_status": "LINK_ONLY: article copyright/repository redistribution grant not established; later instrument permission is not an article license.",
+    "evidence_summary": "Development validation: 6,000 patients across eight primary-care and seven obstetrics/gynecology clinics; criterion interview subgroup 580 primary-care patients. Threshold >=10: sensitivity 88%, specificity 88% for major depression against independent mental-health-professional interview. Severity lower bounds 5,10,15,20. These are not population norms or a self-administered diagnosis."
+  },
+  "originalEnglishThresholdsReviewOnly": {
+    "severity": {
+      "kind": "Descriptive symptom-severity bands, not diagnosis or percentile norms",
+      "bands": [
+        {
+          "min": 0,
+          "max": 4,
+          "label": "none/minimal"
+        },
+        {
+          "min": 5,
+          "max": 9,
+          "label": "mild"
+        },
+        {
+          "min": 10,
+          "max": 14,
+          "label": "moderate"
+        },
+        {
+          "min": 15,
+          "max": 19,
+          "label": "moderately severe"
+        },
+        {
+          "min": 20,
+          "max": 27,
+          "label": "severe"
+        }
+      ],
+      "source_doi": "10.1046/j.1525-1497.2001.016009606.x",
+      "source_locator": "Original article discussion: lower limits 5,10,15,20; 0–4 residual none/minimal band.",
+      "population": "Original US clinical adult study, not Chinese norms."
+    },
+    "screening": {
+      "operator": ">=",
+      "cutoff": 10,
+      "target": "Possible major depression for further clinical assessment",
+      "sensitivity": 0.88,
+      "specificity": 0.88,
+      "source_doi": "10.1046/j.1525-1497.2001.016009606.x",
+      "criterion_sample_n": 580,
+      "scope": "Original clinical criterion-validation sample only; no claim of accuracy for all users, Chinese translations or adolescents.",
+      "diagnostic_use": false
+    },
+    "norms": "No population norms or percentiles approved.",
+    "longitudinal": "May describe within-person score changes with consistent form/language/recall period; do not claim a validated treatment response or minimal important difference from these packages."
+  },
+  "scope": "Original instrument text only under its specific grant. No journal/manual PDFs, mirror translation wording or third-party artwork redistributed. Original English study thresholds are not executable classifications or validated Chinese thresholds.",
+  "translationProvenance": "New AI-assisted Simplified Chinese translation prepared from the frozen licensed English text, not copied from a Chinese mirror. Independent linguistic review is not psychometric validation or developer endorsement.",
+  "reviewStatus": {
+    "type": "AI_TEXT_REVIEW",
+    "originalEnglishAndInstrumentRights": "Reviewed against frozen research package; not a new human or legal authorization record.",
+    "translation": "Revised after independent AI text review; human review and psychometric validation remain pending."
+  }
+}

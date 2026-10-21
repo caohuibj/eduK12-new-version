@@ -1,0 +1,50 @@
+{
+  "schemaVersion": "phq9-research-scoring-contract-v1",
+  "status": "SPECIFICATION_ONLY_NOT_REGISTERED",
+  "scoredItems": [
+    "PHQ9-01",
+    "PHQ9-02",
+    "PHQ9-03",
+    "PHQ9-04",
+    "PHQ9-05",
+    "PHQ9-06",
+    "PHQ9-07",
+    "PHQ9-08",
+    "PHQ9-09"
+  ],
+  "allowedValues": [
+    0,
+    1,
+    2,
+    3
+  ],
+  "requireNumericIntegerWithoutCoercion": true,
+  "formula": "sum of exactly nine symptom values",
+  "minimum": 0,
+  "maximum": 27,
+  "reverseScoring": false,
+  "weights": "All 1; no normalization or weighted cognitive index",
+  "impairmentQuestion": {
+    "optional": true,
+    "scored": false,
+    "excludedFromSum": true,
+    "missingDoesNotBlockTotal": true,
+    "invalidAnswerBehavior": "Reject malformed impairment answers at the form-validation layer; no invented score for the functional response."
+  },
+  "missingPolicy": {
+    "status": "PRODUCT_CHOICE_NOT_ORIGINAL_AUTHOR_RULE",
+    "rule": "Missing symptom -> no total. No imputation, prorating, blank-to-zero, severity or screen label. Participants may skip/leave; no forced disclosure."
+  },
+  "invalidPolicy": "Reject strings (including numeric strings), booleans, fractions, out-of-range, null-as-an-answer, arrays and duplicate item responses. Missing means absence of an answer rather than an invalid response value.",
+  "safety": "Nonzero item 9 requires further professional assessment regardless of missing other responses or total. Do not derive suicide intent/risk level; missing item 9 is unknown. Safety guidance always visible.",
+  "safetyImplementationRules": {
+    "alwaysShowDraftAndSafetyInstructions": true,
+    "item9NonzeroShowSupportEvenIfOtherSymptomsMissing": true,
+    "doNotRequireTotalForSafety": true,
+    "inferSuicideIntentOrRiskLevel": false,
+    "zeroDoesNotRuleOutRisk": true,
+    "missingItem9IsUnknown": true,
+    "unmonitored": true,
+    "automaticContactPromised": false
+  }
+}

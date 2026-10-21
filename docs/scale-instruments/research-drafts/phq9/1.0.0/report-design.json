@@ -1,0 +1,65 @@
+{
+  "schemaVersion": 1,
+  "status": "RESEARCH_DESIGN_NOT_RUNTIME_REPORT",
+  "text": {
+    "reportVersion": "1.0.0",
+    "primaryScoreKeys": [
+      "raw_total"
+    ],
+    "scoreOrder": [
+      "raw_total"
+    ],
+    "interpretations": [
+      {
+        "scoreKey": "raw_total",
+        "headline": "过去两周的症状自述原始分（研究译稿）",
+        "source": {
+          "type": "score_only"
+        },
+        "summary": "原始分是九个症状问题的答案分值相加，理论范围为 0–27 分。较高分数只表示本次自述的这些问题出现得更频繁，不能单凭总分判断是否患有抑郁症，也不能据此判断自杀意图或风险等级。本简体中文文本是未经验证、未获得原开发者对本译稿的审校或认可的 AI 辅助研究译稿；本报告不提供严重程度分类、筛查阳性标签、常模、百分位或治疗效果结论。额外的功能困难问题不进入总分；漏答任何症状题时不计算总分，也不把空白当作零分。",
+        "bands": [],
+        "guidance": [
+          {
+            "category": "reflection",
+            "text": "审查时请区分症状出现频率、功能困难和临床判断；三者不能由一个总分相互替代。"
+          },
+          {
+            "category": "support",
+            "text": "第 9 题选择任何非零选项时，都需要由专业人员进一步评估，不应等待总分。第 9 题或总分不能判断自杀意图或风险等级，选择零分也不能排除风险。若正处于即时危险或无法保证自身安全，请立即联系当地急救服务，并寻求可信赖的人陪伴。此页面无人实时监测，不会自动联系您或安排援助。"
+          }
+        ]
+      }
+    ],
+    "limitations": [
+      "AI 辅助生成的简体中文研究工作译稿，尚未验证，未获得原开发者对本译稿的审校或认可。原始量表许可允许翻译，但不代表开发者认可本译稿。仅供文本、计分与安全方案审查，不供实际施测或临床使用。",
+      "不用于儿童或青少年，不用于诊断、选拔、排名或人员考核。",
+      "未建立本译稿的本地人群效度、常模、诊断阈值或变化量解释。",
+      "九题完整且合法才计算总分是本产品的保守缺失数据规则，不是声称原作者规定的唯一规则。",
+      "第 9 题选择任何非零选项时，都需要由专业人员进一步评估，不应等待总分。第 9 题或总分不能判断自杀意图或风险等级，选择零分也不能排除风险。若正处于即时危险或无法保证自身安全，请立即联系当地急救服务，并寻求可信赖的人陪伴。此页面无人实时监测，不会自动联系您或安排援助。"
+    ],
+    "disclaimer": "AI 辅助生成的简体中文研究工作译稿，尚未验证，未获得原开发者对本译稿的审校或认可。原始量表许可允许翻译，但不代表开发者认可本译稿。仅供文本、计分与安全方案审查，不供实际施测或临床使用。 第 9 题选择任何非零选项时，都需要由专业人员进一步评估，不应等待总分。第 9 题或总分不能判断自杀意图或风险等级，选择零分也不能排除风险。若正处于即时危险或无法保证自身安全，请立即联系当地急救服务，并寻求可信赖的人陪伴。此页面无人实时监测，不会自动联系您或安排援助。"
+  },
+  "structure": [
+    "Unconditional draft and safety notice",
+    "Core raw total only if all nine scored responses are valid",
+    "Plain-language meaning and limitations",
+    "Optional functional difficulty shown as text, never as a numerical score",
+    "Provenance and methodology details"
+  ],
+  "styleReference": "Existing ReportPrimitives / go-no-go report layering only; no cognitive scoring/weighted index reused.",
+  "rawScoreDisplay": {
+    "complete": "原始分 {total}/27（未经验证的研究译稿）",
+    "incomplete": "症状问题尚未完整作答，不计算总分。",
+    "range": "0–27 theoretical raw sum, not percentile, norm or diagnosis"
+  },
+  "clinicalLabels": [],
+  "imageStatus": "DRAFT_PREVIEW_ASSET_PENDING",
+  "imageReason": "Current runtime images require installed raster asset identities and exclude SVG; no fake StoredAsset ID or third-party figure inserted. An original accessible illustration can be designed after a real supported preview destination is available.",
+  "publicationGates": [
+    "Linguistic and professional review",
+    "Unconditional instructions/safety capability",
+    "Actual unscored optional item representation",
+    "Adult report audience/QC without fabricated review",
+    "Privacy, consent, minimization, retention and professional support plan"
+  ]
+}
