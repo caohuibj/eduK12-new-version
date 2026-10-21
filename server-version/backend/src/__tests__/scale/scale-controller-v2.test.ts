@@ -66,6 +66,7 @@ beforeEach(() => {
   vi.clearAllMocks()
   process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
   mockPrisma.$transaction.mockImplementation(async (callback: (tx: typeof mockPrisma) => unknown) => callback(mockPrisma))
+  mockPrisma.scale.findMany.mockResolvedValue([{id:'scale-1',measurementReleaseId:null}])
   mockPrisma.assessment.updateMany.mockResolvedValue({ count: 1 })
 })
 
@@ -147,7 +148,7 @@ describe('Scale v2 controller boundaries', () => {
 
   it('keeps an assessment in progress when a required item is missing', async () => {
     mockPrisma.assessment.findUnique.mockResolvedValue({
-      id: 'assessment-1',
+      id: 'assessment-1', scaleId: 'scale-1',
       userId: 'student-1',
       status: 'IN_PROGRESS',
       answers: [{ itemCode: 'ADEXI-01', responseValue: 'never' }],
@@ -178,7 +179,7 @@ describe('Scale v2 controller boundaries', () => {
       return responseSet?.options[0]?.value
     }
     mockPrisma.assessment.findUnique.mockResolvedValue({
-      id: 'assessment-1',
+      id: 'assessment-1', scaleId: 'scale-1',
       userId: 'student-1',
       status: 'IN_PROGRESS',
       answers: encryptScaleAnswers([]),
@@ -224,7 +225,7 @@ describe('Scale v2 controller boundaries', () => {
     const responseSet = definition.responseSets.find((set) => set.key === item.responseSetKey)
     const responseValue = responseSet?.options[0]?.value
     mockPrisma.assessment.findUnique.mockResolvedValue({
-      id: 'assessment-1',
+      id: 'assessment-1', scaleId: 'scale-1',
       userId: 'student-1',
       status: 'IN_PROGRESS',
       answers: encryptScaleAnswers([{ itemCode: item.itemCode, responseValue, changeCount: 4 }]),
@@ -264,7 +265,7 @@ describe('Scale v2 controller boundaries', () => {
     const currentValue = responseSet?.options[0]?.value
     const nextValue = responseSet?.options.find((option) => option.value !== currentValue)?.value
     mockPrisma.assessment.findUnique.mockResolvedValue({
-      id: 'assessment-1',
+      id: 'assessment-1', scaleId: 'scale-1',
       userId: 'student-1',
       status: 'IN_PROGRESS',
       answers: encryptScaleAnswers([{ itemCode: item.itemCode, responseValue: currentValue, revision: 2 }]),

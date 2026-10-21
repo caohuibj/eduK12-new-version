@@ -22,6 +22,7 @@ const { mockPrisma, packageMock, protocolMock, grantMock } = vi.hoisted(() => ({
     },
     cognitiveTestConfig: { findUnique: vi.fn() },
     course: { findUnique: vi.fn() },
+    scale: { findMany: vi.fn() },
     $transaction: vi.fn(),
     $queryRaw: vi.fn(),
   },
@@ -261,6 +262,8 @@ const frozenPackageComposite = (status: 'DRAFT' | 'PUBLISHED' = 'PUBLISHED') => 
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPrisma.$queryRaw.mockResolvedValue([])
+  mockPrisma.scale.findMany.mockResolvedValue([adexiScale()])
   packageMock.mockReturnValue(packageDefinition)
   protocolMock.mockReturnValue(protocol)
   grantMock.mockResolvedValue(true)
@@ -346,6 +349,8 @@ describe('ReportPackage composite boundary', () => {
 
     for (const [, mutate] of cases) {
       vi.clearAllMocks()
+  mockPrisma.$queryRaw.mockResolvedValue([])
+  mockPrisma.scale.findMany.mockResolvedValue([adexiScale()])
       packageMock.mockReturnValue(packageDefinition)
       protocolMock.mockReturnValue(protocol)
       mockPrisma.course.findUnique.mockResolvedValue({ id: 'course-1', creatorId: 'teacher-1', isLibrary: false })

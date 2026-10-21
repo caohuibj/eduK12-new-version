@@ -13,7 +13,7 @@ const { mockPrisma, getProtocolMock } = vi.hoisted(() => ({
     cognitiveTestConfig: { findUnique: vi.fn() },
     cognitiveAssignment: { findMany: vi.fn(), create: vi.fn(), findUnique: vi.fn() },
     course: { findUnique: vi.fn() },
-    scale: { findUnique: vi.fn() },
+    scale: { findUnique: vi.fn(), findMany: vi.fn() },
     materialGrant: { findUnique: vi.fn() },
     $transaction: vi.fn(),
     $queryRaw: vi.fn(),
@@ -137,6 +137,8 @@ const draftComposite = (overrides: Record<string, unknown> = {}) => ({
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPrisma.$queryRaw.mockResolvedValue([])
+  mockPrisma.scale.findMany.mockResolvedValue([{id:'scale-1',status:'PUBLISHED',creatorId:'teacher-1'}])
   getProtocolMock.mockImplementation((key: string, version: string) =>
     key === protocol.key && version === protocol.version ? protocol : undefined,
   )
@@ -326,7 +328,7 @@ describe('Composite analysis protocol publish freeze', () => {
 
   it('publishes legacy collection-only composites without an analysis snapshot', async () => {
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite({
-      items: [{ type: 'SCALE', required: true, scale: { id: 'scale-1', status: 'PUBLISHED' } }],
+      items: [{ type: 'SCALE', scaleId:'scale-1', required: true, scale: { id: 'scale-1', status: 'PUBLISHED' } }],
     }))
     await publishComposite('teacher-1', TEACHER, 'composite-1')
     expect(mockPrisma.compositeAssessment.update).toHaveBeenCalledWith(expect.objectContaining({

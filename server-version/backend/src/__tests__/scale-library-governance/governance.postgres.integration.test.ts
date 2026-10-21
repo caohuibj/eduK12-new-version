@@ -116,6 +116,35 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
   const snapshots=await db.$transaction(tx=>catalogSnapshotsForDrafts(tx,reader,[tool.survey_tool_grant_id]))
   expect(snapshots.get(tool.survey_tool_grant_id)?.compiledDefinition).toEqual(compiled)
  })
+ it('keeps approved Survey ALL_AT_ONCE through the real Training parent publication/start/restore chain',async()=>{
+  const composite=await import('../../modules/composite/composite.service')
+  const whole=await import('../../modules/composite/whole-questionnaire.service')
+  const {entryId}=await approved()
+  const teacher=(await db.user.create({data:{username:'protocolteacher'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'TRAINING'}})).id
+  const student=(await db.user.create({data:{username:'protocolstudent'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'STUDENT',accountDomain:'TRAINING'}})).id
+  const use=await grantUse(admin,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})
+  const wrapper=await db.scale.findUniqueOrThrow({where:{libraryEntryId:entryId}})
+  const course=await db.course.create({data:{title:'Synthetic protocol course',courseCode:randomUUID(),creatorId:teacher,status:'PUBLISHED'}})
+  await db.courseStudent.create({data:{courseId:course.id,studentId:student,status:'APPROVED'}})
+  const draft=await db.compositeAssessment.create({data:{code:randomUUID(),name:'Shared protocol questionnaire',createdBy:teacher,
+    productKind:'QUESTIONNAIRE',questionnaireType:'COURSE',status:'DRAFT',questionnaireCourses:{create:{courseId:course.id}}}})
+  await composite.addItem(teacher,'TEACHER',draft.id,{type:'SCALE',scaleId:wrapper.id,required:true})
+  await composite.publishComposite(teacher,'TEACHER',draft.id)
+  const oldWhole=process.env.ASSESSMENT_WHOLE_SUBMIT_ENABLED,oldAsync=process.env.ASSESSMENT_REPORT_ASYNC_ENABLED
+  process.env.ASSESSMENT_WHOLE_SUBMIT_ENABLED='true';process.env.ASSESSMENT_REPORT_ASYNC_ENABLED='true'
+  try{
+    const started=await composite.startUserAttempt(student,draft.id)
+    expect(started.attempt.currentItem).toMatchObject({type:'SCALE',presentationMode:'ALL_AT_ONCE'})
+    const frozen=await whole.getWholeQuestionnaireDefinition(started.attempt.id,{userId:student})
+    expect(frozen.units).toHaveLength(1);expect(frozen.units[0].presentationMode).toBe('ALL_AT_ONCE')
+    await revokeUse(admin,use.id,{expectedVersion:1,reason:'Synthetic ordinary withdrawal after frozen publication'})
+    const restored=await composite.getAttemptState(started.attempt.id,{userId:student})
+    expect(restored.currentItem).toMatchObject({type:'SCALE',presentationMode:'ALL_AT_ONCE'})
+  }finally{
+    if(oldWhole===undefined)delete process.env.ASSESSMENT_WHOLE_SUBMIT_ENABLED;else process.env.ASSESSMENT_WHOLE_SUBMIT_ENABLED=oldWhole
+    if(oldAsync===undefined)delete process.env.ASSESSMENT_REPORT_ASYNC_ENABLED;else process.env.ASSESSMENT_REPORT_ASYNC_ENABLED=oldAsync
+  }
+ })
  it('entry admin is a distributor only within the exact explicit parent grant; revocation stops new use',async()=>{
   const {entryId,release}=await approved()
   const delegate=(await db.user.create({data:{username:'libdelegate'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'ADMIN',accountDomain:'LEGACY'}})).id

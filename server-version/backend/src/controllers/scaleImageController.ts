@@ -69,6 +69,7 @@ export const scaleImageController = {
       const scale = await prisma.scale.findUnique({ where: { id } })
       if (!scale) return notFound(res, '量表不存在')
       if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) return forbidden(res, '无权限发布此量表')
+      if (scale.libraryEntryId) return forbidden(res, '共用库授权引用不能另行发布或改写')
       if (scale.instrumentClass !== 'CUSTOM_DESCRIPTIVE') return error(res, 'STANDARD 量表必须由代码 package 发布，网页只读')
       if (scale.status !== 'DRAFT') return error(res, '只有草稿状态的量表可以发布', -1, 409)
       if (request.data.expectedUpdatedAt && new Date(request.data.expectedUpdatedAt).getTime() !== scale.updatedAt.getTime()) return error(res, '量表草稿已变化，请刷新后重新发布', -1, 409)
@@ -94,15 +95,21 @@ export const scaleImageController = {
             updatedAt: scale.updatedAt, definitionHash: scale.definitionHash },
           data: {
             status: 'PUBLISHED',
+            ...(scale.visibility==='PUBLIC'&&!scale.legacyPublicAccess&&!scale.publicDistributionGrantId?{visibility:'HIDDEN' as const}:{}),
             definition: definition as any,
             definitionHash,
             ...definitionSummary(definition),
           },
         })
+        const source = scale.sourceScaleId ? await tx.scale.findUnique({where:{id:scale.sourceScaleId},select:{measurementReleaseId:true,authoringFamilyId:true}}) : null
         const release = await publishScaleMeasurement(tx, {
-          localId: scale.id, version: scale.updatedAt.toISOString(),
+          sourceReleaseId: source?.measurementReleaseId ?? null,
+          localId: scale.id, version: scale.authoringVersion ? `v${scale.authoringVersion}` : scale.updatedAt.toISOString(),
           instrumentVersion: scale.instrumentVersion, definition, instrumentClass: 'CUSTOM_DESCRIPTIVE',
-          provenance: scale.copySource ? { copySource: scale.copySource } : {},
+          provenance: { ...(scale.copySource ? { copySource: scale.copySource } : {}),
+            authoringRelationship: source ? (source.authoringFamilyId === scale.authoringFamilyId ? 'REVISION' : 'COPY') : 'ORIGINAL',
+            authoringFamilyId: scale.authoringFamilyId ?? scale.id, authoringVersion: scale.authoringVersion ?? 1,
+            authoringSnapshot: { title: scale.name, definition, instrumentClass: 'CUSTOM_DESCRIPTIVE', product: 'TRAINING' } },
           scope: { kind: 'PRIVATE', ownerId: scale.creatorId, product: 'TRAINING', resourceId: scale.id },
         }, userId!)
         await tx.$executeRaw(Prisma.sql`UPDATE scales SET measurement_release_id=${release.releaseId} WHERE id=${scale.id}`)

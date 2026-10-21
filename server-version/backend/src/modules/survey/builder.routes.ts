@@ -93,3 +93,9 @@ surveyBuilderRouter.post('/:pid/catalog/:gid/import',handle(req=>service.importC
 
 surveyBuilderRouter.post('/:pid/instruments/:iid/measurement-release',handle(req=>
   publishSurveyMeasurementDraft(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid),archive.parse(req.body).revision)))
+
+surveyBuilderRouter.post('/:pid/instruments/:iid/revise',handle(req=>
+  service.reviseDraft(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid),archive.parse(req.body).revision)))
+
+surveyBuilderRouter.get('/:pid/instruments/:iid/versions',handle(req=>
+  service.listInstrumentVersions(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.iid))))

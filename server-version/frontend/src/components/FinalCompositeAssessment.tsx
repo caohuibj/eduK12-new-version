@@ -85,6 +85,8 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   const [sectionIndex, setSectionIndex] = useState(0)
   const timingRef=useRef<SurveyScaleTimingTracker|null>(null)
   const [scaleIndex, setScaleIndex] = useState(0)
+  const allScaleItems = item?.presentationMode === 'ALL_AT_ONCE'
+  const [activeWholePageItem, setActiveWholePageItem] = useState('')
   const [formValues, setFormValues] = useState<Record<string, FormValue>>({})
   const formValuesRef = useRef<Record<string, FormValue>>({})
   const [scaleValues, setScaleValues] = useState<Record<string, ResponseValue>>({})
@@ -146,6 +148,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
   useEffect(() => {
     setSectionIndex(0)
     setScaleIndex(0)
+    setActiveWholePageItem('')
     setError(null)
   }, [unitKey])
 
@@ -285,6 +288,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
 
   const saveScale = async (itemCode: string, value: ResponseValue) => {
     if (!draftKey || checkpointBusy || submitting || exiting || draftLocked) return false
+    if (allScaleItems) timingRef.current?.enter(itemCode, document.visibilityState !== 'hidden' && document.hasFocus())
     timingRef.current?.answer(itemCode,scaleValues[itemCode],value)
     setScaleValues((previous) => ({ ...previous, [itemCode]: value }))
     return scheduleLocalSave(`scale:${itemCode}`, async () => {
@@ -559,7 +563,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           // Do not publish recovered values or timer refs until durable commit.
           setCheckpointRestoreGeneration(value => value + 1)
           if (sectionId) { formValuesRef.current = nextForm; setFormValues(nextForm); setSectionIndex(0) }
-          else { timingRef.current = nextTiming; setScaleValues(nextScale); setScaleIndex(0) }
+          else { timingRef.current = nextTiming; setScaleValues(nextScale); setScaleIndex(0); setActiveWholePageItem('') }
         }}/>:null}
       {error ? <p role="alert" className="mb-4 text-sm text-red-600">{error}</p> : null}
       {requiresRestart && onRestart ? (
@@ -659,15 +663,14 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
               <p className="text-sm text-slate-500"><Layers className="mr-1 inline h-4 w-4" />量表</p>
               <h2 className="text-xl font-semibold text-slate-900">{item.scale.name}</h2>
             </div>
-            <span className="text-sm text-slate-500">题目 {scaleIndex + 1} / {scaleItems.length}</span>
+            <span className="text-sm text-slate-500">{allScaleItems ? `整页呈现 · 共 ${scaleItems.length} 题，最后手动提交` : `题目 ${scaleIndex + 1} / ${scaleItems.length}`}</span>
           </div>
           {(() => {
-            const question = scaleItems[scaleIndex]
-            if (!question) return <p className="text-gray-500">量表题目为空。</p>
+            const renderQuestion = (question: typeof scaleItems[number], questionIndex: number) => {
             const imageItems = assessmentImageItems(question.images)
             const videoPresentation = scaleItemVideoPresentation(question)
             return (
-              <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${question.content} 视觉内容`}>
+              <AssessmentImageGate key={question.itemCode} items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${question.content} 视觉内容`}>
                 <ScaleFormVideoGate
                   presentation={videoPresentation}
                   loadSources={() => loadCompositeVideoCapability(`${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/items/${encodeURIComponent(item.id)}/scale/items/${encodeURIComponent(question.itemCode)}/video-capability`)}
@@ -675,26 +678,35 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                 >
                   {(() => { const player=(<ScalePlayer
                     key={question.itemCode}
-                    autoAdvance={isTrainingHost() && !campusMode && !publicMode}
+                    autoAdvance={!allScaleItems && isTrainingHost() && !campusMode && !publicMode}
+                    hideNavigation={allScaleItems}
                     scopeKey={`${draftKey || item.id}:${checkpointRestoreGeneration}`}
                     item={question}
                     value={scaleValues[question.itemCode]}
                     navigationDisabled={exiting}
                     answerDisabled={draftLocked || exiting}
                     submitDisabled={requiresRestart || exiting}
-                    position={scaleIndex + 1}
+                    position={questionIndex + 1}
                     total={scaleItems.length}
                     onChange={(nextValue) => saveScale(question.itemCode, nextValue)}
                     onPrevious={() => setScaleIndex((index) => Math.max(0, index - 1))}
-                    onNext={scaleIndex < scaleItems.length - 1
+                    onNext={!allScaleItems && questionIndex < scaleItems.length - 1
                       ? () => setScaleIndex((index) => index + 1)
                       : undefined}
-                    onSubmit={scaleIndex === scaleItems.length - 1 ? submitScaleNow : undefined}
+                    onSubmit={questionIndex === scaleItems.length - 1 ? submitScaleNow : undefined}
                     submitting={submitting}
-                  />);return item.trainingTiming&&timingRef.current ? <TrainingTimingBoundary tracker={timingRef.current} itemKey={question.itemCode} locked={draftLocked||submitting||exiting} onTiming={rows=>{if(draftKey&&!draftLocked&&!submitting&&!exiting)void scheduleLocalSave('scale-timing',()=>finalDraftStore.setInstrumentMetadata(draftKey,{trainingScaleTiming:{snapshotHash:item.trainingTiming!.snapshotHash,items:rows}}).then(()=>undefined)).catch(()=>undefined)}}>{player}</TrainingTimingBoundary>:player })()}
+                  />); if (allScaleItems) return <div onFocusCapture={() => activateQuestion(question.itemCode)} onPointerDownCapture={() => activateQuestion(question.itemCode)}>{player}</div>; return item.trainingTiming&&timingRef.current ? <TrainingTimingBoundary tracker={timingRef.current} itemKey={question.itemCode} locked={draftLocked||submitting||exiting} onTiming={rows=>{if(draftKey&&!draftLocked&&!submitting&&!exiting)void scheduleLocalSave('scale-timing',()=>finalDraftStore.setInstrumentMetadata(draftKey,{trainingScaleTiming:{snapshotHash:item.trainingTiming!.snapshotHash,items:rows}}).then(()=>undefined)).catch(()=>undefined)}}>{player}</TrainingTimingBoundary>:player })()}
                 </ScaleFormVideoGate>
               </AssessmentImageGate>
             )
+            }
+            const activateQuestion = (key: string) => {
+              if (draftLocked || submitting || exiting) return
+              setActiveWholePageItem(key)
+            }
+            if (!allScaleItems) return scaleItems[scaleIndex] ? renderQuestion(scaleItems[scaleIndex], scaleIndex) : <p>量表题目为空。</p>
+            const questions = <div className="space-y-6" data-scale-presentation-mode="ALL_AT_ONCE">{scaleItems.map(renderQuestion)}</div>
+            return item.trainingTiming && timingRef.current ? <TrainingTimingBoundary tracker={timingRef.current} itemKey={activeWholePageItem} locked={draftLocked || submitting || exiting} onTiming={rows => { if (draftKey && !draftLocked && !submitting && !exiting) void scheduleLocalSave('scale-timing', () => finalDraftStore.setInstrumentMetadata(draftKey, { trainingScaleTiming: { snapshotHash: item.trainingTiming!.snapshotHash, items: rows } }).then(() => undefined)).catch(() => undefined) }}>{questions}</TrainingTimingBoundary> : questions
           })()}
         </div>
       ) : null}

@@ -1,3 +1,4 @@
+import { assertScalePublicationRights } from '../modules/scale/scale-publication-guard'
 import type { Request, Response } from 'express'
 import { lockStoredAssetRows } from '../services/assetStorage'
 import { assessmentVideoPresentationAssetReferences } from '../modules/assessment-media/assessment-video'
@@ -124,6 +125,7 @@ export const questionnaireImageController = {
       if (contextIssues.length > 0) return error(res, contextIssues[0].message)
 
       const updated = await prisma.$transaction(async (tx) => {
+        await assertScalePublicationRights(tx,req.user!.userId,req.user!.role,questionnaire.questionnaireScales.map(entry=>entry.scaleId))
         const media = sections.map(section => ({
           section,
           references: questionnaireFormSectionImageReferences(section),

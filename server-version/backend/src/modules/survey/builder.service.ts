@@ -22,6 +22,7 @@ const fail=(code:number,text:string):never=>{throw new SurveyBuilderError(code,t
 const publicRow=(row:any)=>({
   id:row.id,projectId:row.projectId,instrumentKey:row.instrumentKey,
   kind:row.kind,title:row.title,definition:row.definition,revision:row.revision,
+  authoringFamilyId:row.authoringFamilyId??null,authoringVersion:row.authoringVersion??null,sourceDraftId:row.sourceDraftId??null,measurementReleaseId:row.measurementReleaseId??null,
   catalogGrantId:row.catalogGrantId??null,readOnly:!!row.catalogGrantId,
   status:row.status,createdAt:row.createdAt,updatedAt:row.updatedAt,
 })
@@ -60,7 +61,7 @@ export async function listDrafts(userId:string,projectId:string,page:number) {
     const list=await tx.surveyInstrumentDraft.findMany({
       where:{projectId},orderBy:[{updatedAt:'desc'},{id:'desc'}],
       take:25,skip:(page-1)*25,
-      select:{id:true,projectId:true,instrumentKey:true,kind:true,title:true,status:true,revision:true,updatedAt:true,createdAt:true,catalogGrantId:true},
+      select:{id:true,projectId:true,instrumentKey:true,kind:true,title:true,status:true,revision:true,updatedAt:true,createdAt:true,catalogGrantId:true,authoringFamilyId:true,authoringVersion:true,sourceDraftId:true,measurementReleaseId:true},
     })
     return {page,pageSize:25,list:list.map(row=>({...row,readOnly:!!row.catalogGrantId}))}
   })
@@ -91,6 +92,7 @@ export async function createDraft(userId:string,projectId:string,raw:{
       fail(409,'工具编码已存在')
     const row=await tx.surveyInstrumentDraft.create({data:{
       id:raw.requestId,projectId,instrumentKey,kind,title:raw.title,
+      ...(kind==='SCALE'?{authoringFamilyId:randomUUID(),authoringVersion:1}:{}),
       definition:persistable(initial),
     }})
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:userId,projectId,action:'INSTRUMENT_CREATED',
@@ -137,10 +139,26 @@ export async function copyDraft(userId:string,projectId:string,id:string,input:{
     const created=await tx.surveyInstrumentDraft.create({data:{
       id:input.requestId,projectId,instrumentKey:input.instrumentKey,title:input.title,
       kind:from.kind,definition:from.definition as Prisma.InputJsonValue,catalogGrantId:from.catalogGrantId,
+      ...(from.kind==='SCALE'?{authoringFamilyId:randomUUID(),authoringVersion:1,sourceDraftId:from.id,revisionSourceReleaseId:from.status==='PUBLISHED'?from.measurementReleaseId:null}:{}),
     }})
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:userId,projectId,action:'INSTRUMENT_COPIED',
       metadata:{instrumentId:created.id,copiedFrom:id}}})
     return publicRow(created)
+  })
+}
+/** A revision reopens only this author's editable workspace; releases and waves stay immutable. */
+export async function reviseDraft(userId:string,projectId:string,id:string,revision:number){
+  return prisma.$transaction(async tx=>{
+    await authorizedProject(tx,userId,projectId,true)
+    await tx.$queryRaw`SELECT id FROM survey_instrument_drafts WHERE id=${id} AND project_id=${projectId} FOR UPDATE`
+    const row=await findDraft(tx,projectId,id)
+    if(row.kind!=='SCALE'||row.catalogGrantId||row.status!=='PUBLISHED'||row.revision!==revision)
+      fail(409,'仅本人已发布自编量表支持修订；请刷新版本')
+    const updated=await tx.surveyInstrumentDraft.update({where:{id},data:{status:'DRAFT',revision:{increment:1},
+      authoringFamilyId:row.authoringFamilyId??row.id,authoringVersion:(row.authoringVersion??1)+1,revisionSourceReleaseId:row.measurementReleaseId}})
+    await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:userId,projectId,action:'INSTRUMENT_REVISION_CREATED',
+      metadata:{instrumentId:id,sourceReleaseId:row.measurementReleaseId,authoringVersion:updated.authoringVersion}}})
+    return publicRow(updated)
   })
 }
 export async function archiveDraft(userId:string,projectId:string,id:string,revision:number){
@@ -148,7 +166,7 @@ export async function archiveDraft(userId:string,projectId:string,id:string,revi
     await authorizedProject(tx,userId,projectId,true)
     await findDraft(tx,projectId,id)
     const changed=await tx.surveyInstrumentDraft.updateMany({
-      where:{id,projectId,revision,status:'DRAFT'},
+      where:{id,projectId,revision,status:{in:['DRAFT','PUBLISHED']}},
       data:{status:'ARCHIVED',revision:{increment:1},updatedAt:new Date()},
     })
     if(changed.count!==1)fail(409,'草稿状态或版本已发生变化')
@@ -275,5 +293,20 @@ export async function importCatalogDraft(userId:string,projectId:string,grantId:
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:userId,projectId,
       action:'CATALOG_TOOL_IMPORTED',metadata:{grantId,instrumentId:row.id,sourceDigest:source.definitionDigest}}})
     return {...publicRow(row),sourceProvenance:compileCatalogUnit(row,source).sourceProvenance}
+  })
+}
+
+export async function listInstrumentVersions(userId:string,projectId:string,id:string){
+  return prisma.$transaction(async tx=>{
+    await authorizedProject(tx,userId,projectId,false)
+    const row=await findDraft(tx,projectId,id)
+    if(row.kind!=='SCALE')return {list:[]}
+    const list=await tx.measurementContentRelease.findMany({where:{family:'SCALE',layer:'MEASUREMENT',
+      scope:{path:['resourceId'],equals:projectId},OR:[
+        {provenance:{path:['authoringFamilyId'],equals:row.authoringFamilyId??row.id}},
+        {key:`scale:${canonicalHash({kind:'PRIVATE',ownerId:userId,product:'SURVEY',resourceId:projectId})}:${row.id}`},
+      ]},orderBy:{publishedAt:'desc'},select:{id:true,version:true,publishedAt:true,status:true,provenance:true}})
+    return {list:list.map(({id,provenance,...release})=>({releaseId:id,...release,
+      authoringVersion:(provenance as Record<string,unknown>).authoringVersion??null}))}
   })
 }

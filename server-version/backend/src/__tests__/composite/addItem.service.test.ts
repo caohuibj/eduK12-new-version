@@ -11,7 +11,7 @@ const { mockPrisma } = vi.hoisted(() => {
     cognitiveAssignment: { findUnique: vi.fn() },
     compositeAssessmentItem: { create: vi.fn() },
     course: { findUnique: vi.fn() },
-    scale: { findUnique: vi.fn() },
+    scale: { findUnique: vi.fn(), findMany: vi.fn() },
     materialGrant: { findUnique: vi.fn() },
     $queryRaw: vi.fn(),
   }
@@ -64,6 +64,7 @@ const assignment = (overrides: Record<string, unknown> = {}) => ({
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPrisma.$queryRaw.mockResolvedValue([])
   mockPrisma.compositeAssessmentItem.create.mockResolvedValue({ id: 'item-1' })
   mockPrisma.course.findUnique.mockResolvedValue({ id: 'course-1', creatorId: 'teacher-a' })
   mockPrisma.materialGrant.findUnique.mockResolvedValue(null)
@@ -168,16 +169,15 @@ describe('addItem scale grants', () => {
     })).rejects.toMatchObject({ statusCode: 403 })
   })
 
-  it('still publishes a draft after the scale grant is revoked', async () => {
+  it('rejects a new publication after its scale grant is revoked', async () => {
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue(draftComposite({
-      items: [{ type: 'SCALE', scale: { id: 'scale-other', status: 'PUBLISHED', creatorId: 'admin-1' } }],
+      items: [{ type: 'SCALE', scaleId:'scale-other', scale: { id: 'scale-other', status: 'PUBLISHED', creatorId: 'admin-1' } }],
     }))
     mockPrisma.materialGrant.findUnique.mockResolvedValue(null)
     mockPrisma.compositeAssessment.update.mockResolvedValue({ status: 'PUBLISHED' })
-    await publishComposite('teacher-a', TEACHER, 'composite-1')
-    expect(mockPrisma.compositeAssessment.update).toHaveBeenCalledWith(expect.objectContaining({
-      data: expect.objectContaining({ status: 'PUBLISHED' }),
-    }))
+    mockPrisma.scale.findMany.mockResolvedValue([{id:'scale-other',creatorId:'admin-1',status:'PUBLISHED'}])
+    await expect(publishComposite('teacher-a', TEACHER, 'composite-1')).rejects.toMatchObject({statusCode:403})
+    expect(mockPrisma.compositeAssessment.update).not.toHaveBeenCalled()
   })
 })
 

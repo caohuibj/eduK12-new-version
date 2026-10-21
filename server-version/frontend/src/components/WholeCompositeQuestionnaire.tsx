@@ -105,6 +105,8 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
           throw responseError(delivered)
         }
         const next = delivered.data
+        // Whole-questionnaire flattening must not override a frozen whole-page unit.
+        if (next.units.some(unit => unit.presentationMode === 'ALL_AT_ONCE')) { setUseFallback(true); return }
         if (next.attemptId !== state.id || next.attemptEpoch !== (state.attemptEpoch ?? 1)
           || !next.units.length || next.units.some(unit => !unit.scale.definition?.items.length)) throw new Error('整卷内容不完整，请重新加载；本地草稿会保留。')
         // Do not switch a pre-existing sealed unit into a different submission protocol.
@@ -292,6 +294,6 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
 /** Conditional paths must submit only the current accepted unit, even if a
  * stale whole-questionnaire draft happens to exist in this browser. */
 export default function WholeCompositeQuestionnaire(props: Props) {
-  if (props.state.trainingFlow) return <>{props.fallback}</>
+  if (props.state.trainingFlow || props.state.currentItem?.presentationMode === 'ALL_AT_ONCE') return <>{props.fallback}</>
   return <WholeCompositeQuestionnaireRunner {...props} />
 }

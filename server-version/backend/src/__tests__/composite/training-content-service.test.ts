@@ -3,7 +3,7 @@ import {UserRole} from '@prisma/client'
 const mocks=vi.hoisted(()=>{
  process.env.DATA_ENCRYPTION_KEY='a'.repeat(64);process.env.DATA_PSEUDONYM_KEY='b'.repeat(64)
  const db={compositeAssessment:{findUnique:vi.fn(),update:vi.fn()},compositeAssessmentAttempt:{findFirst:vi.fn(),create:vi.fn(),update:vi.fn()},
-  compositeAssessmentItem:{create:vi.fn()},assessment:{create:vi.fn()},course:{findUnique:vi.fn()},scale:{findUnique:vi.fn()},materialGrant:{findUnique:vi.fn()},$queryRaw:vi.fn(),$transaction:vi.fn()}
+  compositeAssessmentItem:{create:vi.fn()},assessment:{create:vi.fn()},course:{findUnique:vi.fn()},scale:{findUnique:vi.fn(),findMany:vi.fn()},materialGrant:{findUnique:vi.fn()},$queryRaw:vi.fn(),$transaction:vi.fn()}
  return {db,publication:vi.fn(),binding:vi.fn(),freezeScale:vi.fn(),persistScale:vi.fn(),persistSlots:vi.fn(),retain:vi.fn()}
 })
 vi.mock('../../config/database',()=>({prisma:mocks.db}))
@@ -28,6 +28,7 @@ beforeEach(()=>{
  vi.clearAllMocks();previousGrants=config.materialGrantsEnabled;config.materialGrantsEnabled=true
  mocks.db.compositeAssessment.findUnique.mockResolvedValue(fixture());mocks.db.materialGrant.findUnique.mockResolvedValue(null)
  mocks.db.scale.findUnique.mockResolvedValue(fixture().items[0].scale);mocks.db.compositeAssessmentAttempt.findFirst.mockResolvedValue(null)
+ mocks.db.scale.findMany.mockResolvedValue([{id:'scale',measurementReleaseId:null}]);
  mocks.db.$queryRaw.mockResolvedValue([]);mocks.db.$transaction.mockImplementation(fn=>fn(mocks.db))
  mocks.publication.mockResolvedValue({snapshot,snapshotHash})
  mocks.binding.mockImplementation(async(_db,input)=>{const binding={schemaVersion:1,compositeId:input.compositeId,attemptId:input.attemptId,epoch:input.epoch,publicationHash:input.snapshotHash,units:[unit]};return {binding,bindingHash:canonicalHash(binding)}})

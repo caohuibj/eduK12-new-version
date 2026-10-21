@@ -1,3 +1,5 @@
+import { assertScalePublicationRights } from '../scale/scale-publication-guard'
+import { assertTrainingScaleCollectionAllowed } from '../scale/scale-collection-guard'
 import { assertCompositeCourseScope } from './composite-course-scope'
 import {assertTrainingPrivateReferenceAdmissionCurrent} from './training-private-reference-use'
 import {attachTrainingReferenceSelection} from './training-reference-selection'
@@ -591,7 +593,7 @@ export const assertValidItem = async (
     if (!input.scaleId || supplied !== 1) throw compositeBadRequest('量表模块必须提供 scaleId')
     const scale = await prisma.scale.findUnique({ where: { id: input.scaleId } })
     if (!scale) throw compositeNotFound('量表不存在')
-    if (!(await canUseScale(userId, role, scale))) throw compositeForbidden('无权限使用此量表')
+    if (!(await canUseScale(userId, role, scale, prisma))) throw compositeForbidden('无权限使用此量表')
     if (scale.status !== 'PUBLISHED') throw compositeBadRequest('只能添加已发布量表')
     if (!scale.definition) throw compositeBadRequest('只能添加已安装 v2 definition 的量表')
     const definitionValidation = validateScaleDefinition(scale.definition)
@@ -2128,6 +2130,8 @@ export const prepareCompositePublication = async (userId: string, role: UserRole
 const publishCompositeInTransaction = async (userId: string, role: UserRole, id: string, db: Db, resolvedSituational?: Map<string, ResolvedSituationalRelease>) => {
   await db.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${id} FOR UPDATE`
   const prepared = await prepareCompositePublication(userId, role, id, db, resolvedSituational)
+  const publicationSource=await loadComposite(id,true,db)
+  await assertScalePublicationRights(db as Prisma.TransactionClient,userId,role,publicationSource.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scaleId))
   const published = await db.compositeAssessment.update({
     where: { id },
     data: {
@@ -2486,6 +2490,7 @@ const createChildRecords = async (db: Db, attempt: any, items: any[], userId: st
           })
         : null
       if (frozenScale?.schemaVersion === 2) assertScaleContextCollectable({ policy: frozenScale.compiledPolicy.applicability, scalePosition: item.position, sections: formSections })
+      await assertTrainingScaleCollectionAllowed(db as Prisma.TransactionClient, [item.scaleId!])
       const child = await db.assessment.create({
         data: {
           scaleId: item.scaleId,
@@ -2615,7 +2620,8 @@ const ensureTrainingFlowCurrentChildInTransaction = async (tx:Prisma.Transaction
   const prepared:PreparedVariantRuntimes={scales:new Map(),cognitive:new Map(),assignments:new Map(),references:new Map()}
   const releases=new Map<string,ResolvedSituationalRelease>()
   if(item.type==='SCALE'){
-    if(item.scale.status!=='PUBLISHED'||!await canUseScale(composite.createdBy,composite.creator?.role??UserRole.TEACHER,item.scale,tx))throw compositeForbidden('当前量表已不可准入')
+    if(item.scale.status!=='PUBLISHED')throw compositeForbidden('当前量表已不可准入')
+    await assertTrainingScaleCollectionAllowed(tx,[item.scaleId])
     const snapshot=await loadFrozenScaleRuntimeSnapshot(candidate.references[item.id],tx)
     prepared.scales.set(item.id,snapshot);prepared.references!.set(item.id,candidate.references[item.id])
   }else if(item.type==='COGNITIVE'){
@@ -2781,12 +2787,12 @@ const createAttempt = async (
   if (variantEnabled || flowEnabled) {
     if(variantEnabled)await assertTrainingVariantAuthoringScope(db as any, composite)
     if(!userId)composite={...composite,deliveryCourseId:composite.questionnaireCourses[0].courseId}
-    // Validate every candidate before drawing. A revoked/broken candidate fails admission;
+    // Frozen published deliveries retain ordinary use rights. Broken identities still fail admission;
     // never redraw or silently renormalize the remaining probabilities.
     const scaleIds=composite.items.filter((i:any)=>i.type==='SCALE').map((i:any)=>i.scaleId)
     const scales=await db.scale.findMany({where:{id:{in:scaleIds}}})
     const scaleMap=new Map(scales.map((x:any)=>[x.id,x]))
-    for(const id of scaleIds){const scale:any=scaleMap.get(id);if(!scale||scale.status!=='PUBLISHED'||!scale.definition||!await canUseScale(composite.createdBy,composite.creator?.role??UserRole.TEACHER,scale,db))throw compositeForbidden('候选分卷的量表已不可用')}
+    for(const id of scaleIds){const scale:any=scaleMap.get(id);if(!scale||scale.status!=='PUBLISHED'||!scale.definition)throw compositeForbidden('候选分卷的量表已不可用')}
     const cognitiveIds=composite.items.filter((i:any)=>i.type==='COGNITIVE').map((i:any)=>i.cognitiveAssignmentId)
     const cognitive=await db.cognitiveAssignment.findMany({where:{id:{in:cognitiveIds}},include:{config:true}})
     if(cognitive.length!==new Set(cognitiveIds).size)throw compositeForbidden('候选分卷的认知配置不存在')
@@ -3934,6 +3940,7 @@ const getUnifiedCompositeAttemptState = async (
         scaleAssessmentId: child.id,
         ...(admission.trainingTiming ? {trainingTiming:admission.trainingTiming} : {}),
         definitionHash: runtime.legacyDefinitionHash,
+        presentationMode: runtime.measurementPresentation?.presentationMode ?? 'ONE_BY_ONE',
         answers: [],
         scale: {
           id: item.scale.id,
@@ -4636,11 +4643,15 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
       : current.scale
     let runnerScale = scale
     let definitionHash: string | undefined
+    let presentationMode: 'ONE_BY_ONE' | 'ALL_AT_ONCE' = 'ONE_BY_ONE'
     if (scale) {
       try {
-        definitionHash = hashScaleDefinition(scaleDefinitionFromRecord(scale))
+        const frozen = assessment?.runtimeSnapshotEncrypted
+          ? await loadFrozenScaleRuntimeSnapshot(assessment.runtimeSnapshotEncrypted) : null
+        definitionHash = frozen?.legacyDefinitionHash ?? hashScaleDefinition(scaleDefinitionFromRecord(scale))
+        presentationMode = frozen?.measurementPresentation?.presentationMode ?? 'ONE_BY_ONE'
         const { definition: _definition, ...metadata } = scale
-        runnerScale = { ...metadata, definition: scaleRunnerFromRecord(scale) }
+        runnerScale = { ...metadata, definition: frozen ? runnerDefinition(frozen.definition) : scaleRunnerFromRecord(scale) }
       } catch {
         const { definition: _definition, ...metadata } = scale
         runnerScale = { ...metadata, definition: null, definitionError: true }
@@ -4653,6 +4664,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
       position: current.position,
       required: current.required,
       scaleAssessmentId: assessment?.id,
+      presentationMode,
       scale: runnerScale,
       answers: decodedAnswers.answers,
       definitionHash,

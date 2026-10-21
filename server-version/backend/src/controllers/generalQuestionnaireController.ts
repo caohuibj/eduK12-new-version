@@ -1,3 +1,4 @@
+import { assertScalePublicationRights } from '../modules/scale/scale-publication-guard'
 /**
  * 泛化问卷管理控制器（教师端）
  * 
@@ -758,9 +759,9 @@ export const generalQuestionnaireController = {
       const contextIssues = validateContextFormItems(contextItems, measurementPositions)
       if (contextIssues.length > 0) return error(res, contextIssues[0].message)
 
-      const updated = await prisma.questionnaire.update({
-        where: { id },
-        data: { status: 'PUBLISHED' },
+      const updated = await prisma.$transaction(async tx=>{
+        await assertScalePublicationRights(tx,req.user!.userId,req.user!.role,questionnaire.questionnaireScales.map(entry=>entry.scaleId))
+        return tx.questionnaire.update({where:{id,status:'DRAFT'},data:{status:'PUBLISHED'}})
       })
       await cacheService.clearQuestionnaireCache(id)
 

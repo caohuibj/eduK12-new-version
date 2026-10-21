@@ -1,3 +1,4 @@
+import { assertTrainingScaleCollectionAllowed } from '../scale/scale-collection-guard'
 import { scaleTimingItemSchema } from '../assessment-core/scale/item-timing'
 import { normalizeTrainingScaleTiming } from '../assessment-runtime/training-scale-timing'
 import { Prisma } from '@prisma/client'
@@ -99,7 +100,8 @@ async function validateDrafts(tx: Prisma.TransactionClient, context: Awaited<Ret
   }
   // One bounded batch per requested kind; no per-item authorization query.
   const forms = formIds.length ? await tx.compositeFormSectionAttempt.findMany({where:{attemptId:a.id,attemptEpoch:a.attemptEpoch,sectionId:{in:formIds},status:'IN_PROGRESS'},select:{sectionId:true,section:{include:{items:true}}}}) : []
-  const scales = scaleIds.length ? await tx.assessment.findMany({where:{compositeAttemptId:a.id,attemptEpoch:a.attemptEpoch,compositeItemId:{in:scaleIds},status:'IN_PROGRESS'},select:{compositeItemId:true,runtimeSnapshotEncrypted:true}}) : []
+  const scales = scaleIds.length ? await tx.assessment.findMany({where:{compositeAttemptId:a.id,attemptEpoch:a.attemptEpoch,compositeItemId:{in:scaleIds},status:'IN_PROGRESS'},select:{scaleId:true,compositeItemId:true,runtimeSnapshotEncrypted:true}}) : []
+  await assertTrainingScaleCollectionAllowed(tx,scales.map(row=>row.scaleId))
   const sjts = sjtIds.length ? await tx.situationalAttempt.findMany({where:{compositeAttemptId:a.id,attemptEpoch:a.attemptEpoch,compositeItemId:{in:sjtIds},status:'IN_PROGRESS'},select:{compositeItemId:true,runtimeSnapshotEncrypted:true}}) : []
   for (const draft of envelope.drafts) {
     const slot = slots.get(draft.slotKey)!

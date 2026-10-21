@@ -87,4 +87,23 @@ suite('Scale copied draft immutable provenance and publication',()=>{
   definition.items[0].content='Too late';const r=response();await controller.updateDefinition(request(draft.id,user.id,{definition}),r);expect(r.statusCode).toBe(409);expect(await db.scale.findUniqueOrThrow({where:{id:draft.id}})).toEqual(frozen)
  })
 
+ it('revisions retain one family while save-as allocates an independent family without PUBLIC inheritance',async()=>{
+  const {scale,user}=await fixture()
+  const revision=await copy(scale.id,user.id,'REVISION')
+  const independent=await copy(scale.id,user.id)
+  expect(revision).toMatchObject({authoringFamilyId:scale.id,authoringVersion:2,sourceScaleId:scale.id,visibility:'HIDDEN',legacyPublicAccess:false})
+  expect(independent.authoringFamilyId).not.toBe(revision.authoringFamilyId)
+  expect(independent.authoringVersion).toBe(1)
+  expect(revision.instrumentVersion).toBe(scale.instrumentVersion)
+  expect((await db.scale.findUniqueOrThrow({where:{id:scale.id}})).definition).toEqual(scale.definition)
+ })
+ it('serializes concurrent revision numbers even when different published siblings are the sources',async()=>{
+  const {scale,user}=await fixture()
+  const second=await copy(scale.id,user.id,'REVISION')
+  await db.scale.update({where:{id:second.id},data:{status:'PUBLISHED'}})
+  const next=await Promise.all([copy(scale.id,user.id,'REVISION'),copy(second.id,user.id,'REVISION')])
+  expect(next.map(row=>row.authoringVersion).sort()).toEqual([3,4])
+  expect(new Set(next.map(row=>row.authoringFamilyId)).size).toBe(1)
+ })
+
 })

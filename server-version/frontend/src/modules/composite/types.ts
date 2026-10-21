@@ -61,6 +61,7 @@ export interface CompositeScale {
 }
 
 export interface CompositeCurrentItem {
+  presentationMode?: 'ONE_BY_ONE' | 'ALL_AT_ONCE'
   trainingTiming?:TrainingTimingBinding
   id: string
   type: CompositeItemType
@@ -148,7 +149,7 @@ export interface WholeQuestionnaireDefinition {
   attemptEpoch: number
   slotSetHash: string
   contextSnapshotHash: string | null
-  units: Array<{ trainingTiming?:TrainingTimingBinding; itemId: string; scaleAssessmentId: string; definitionHash: string; scale: CompositeScale }>
+  units: Array<{ presentationMode?: 'ONE_BY_ONE' | 'ALL_AT_ONCE'; trainingTiming?:TrainingTimingBinding; itemId: string; scaleAssessmentId: string; definitionHash: string; scale: CompositeScale }>
 }
 export interface WholeQuestionnaireInput {
   submissionId: string

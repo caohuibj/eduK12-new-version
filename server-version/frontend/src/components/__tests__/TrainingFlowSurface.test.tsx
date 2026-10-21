@@ -54,4 +54,12 @@ describe('Training server flow presentation', () => {
     expect(api.wholeReceipt).not.toHaveBeenCalled()
     expect(api.submitWhole).not.toHaveBeenCalled()
   })
+  it('bypasses whole-questionnaire flattening for a frozen ALL_AT_ONCE current unit', () => {
+    const api = { wholeDefinition: vi.fn(), reportStatus: vi.fn(), submitWhole: vi.fn(), wholeReceipt: vi.fn() }
+    render(<WholeCompositeQuestionnaire state={{ ...state, trainingFlow: undefined, currentItem: { id: 'scale', type: 'SCALE', position: 0, required: true, presentationMode: 'ALL_AT_ONCE' } }} api={api} fallback={<p>按冻结模式呈现整页</p>} onExit={vi.fn()} onCompleted={vi.fn()} />)
+    expect(screen.getByText('按冻结模式呈现整页')).toBeInTheDocument()
+    expect(api.wholeDefinition).not.toHaveBeenCalled()
+    expect(api.submitWhole).not.toHaveBeenCalled()
+  })
+
 })
