@@ -1,3 +1,4 @@
+import { isQualityExportItem, qualityItemCodebook, type QualityExportItem } from './qualityItemExport'
 import { loadScaleResult } from '../modules/scale/scale-workflow.service'
 import { loadScaleAnswers } from '../modules/scale/scale-workflow.service'
 import { pinyin } from 'pinyin-pro'
@@ -179,7 +180,8 @@ export async function getScaleExportData(
 
   const definition = scale.definition && typeof scale.definition === 'object'
     ? scale.definition as {
-        items?: Array<{ itemCode: string; content: string }>
+        items?: QualityExportItem[]
+        responseSets?: Array<{ key: string; options: Array<{ value: string | number; label: string }> }>
         scoring?: { scores?: Array<{ key: string; label: string }> }
       }
     : null
@@ -231,12 +233,14 @@ export async function getScaleExportData(
   fields.push(...deviceProvenanceFields(''))
 
   // Each item has response value, transformed item score and response time.
-  const itemFieldMap = new Map<string, { response: string; score: string; responseTime: string }>()
+  const itemFieldMap = new Map<string, { response: string; score: string; responseTime: string; metadata?: string }>()
   for (const item of definitionItems) {
     const responseField = toPinyinFieldName(item.itemCode, `${FIELD_RULES.QUESTION_PREFIX}V_`, fieldNameContext)
     const scoreField = toPinyinFieldName(item.itemCode, `${FIELD_RULES.QUESTION_PREFIX}S_`, fieldNameContext)
     const responseTimeField = toPinyinFieldName(item.itemCode, 'RT_', fieldNameContext)
-    itemFieldMap.set(item.itemCode, { response: responseField, score: scoreField, responseTime: responseTimeField })
+    const metadata = isQualityExportItem(item) ? toPinyinFieldName(item.itemCode, 'Q_META_', fieldNameContext) : undefined
+    itemFieldMap.set(item.itemCode, { response: responseField, score: scoreField, responseTime: responseTimeField, metadata })
+    if (metadata) fields.push({ name: metadata, label: `${item.itemCode} 非计分题原答代码本(JSON)`, type: 'string', width: 32767 })
     fields.push({
       name: responseField,
       label: `${item.itemCode} 原始回答 ${item.content.substring(0, 20)}`,
@@ -315,7 +319,8 @@ export async function getScaleExportData(
     for (const item of definitionItems) {
       const fieldNames = itemFieldMap.get(item.itemCode)!
       row[fieldNames.response] = answerMap.get(item.itemCode) ?? null
-      row[fieldNames.score] = resultValue ? itemScoreMap.get(item.itemCode)?.score ?? null : null
+      if (fieldNames.metadata) row[fieldNames.metadata] = qualityItemCodebook(item, definition ?? {})
+      row[fieldNames.score] = !isQualityExportItem(item) && resultValue ? itemScoreMap.get(item.itemCode)?.score ?? null : null
       row[fieldNames.responseTime] = responseTimeMap.get(item.itemCode) ?? null
     }
 
@@ -660,12 +665,13 @@ async function getQuestionnaireExportDataV2(
     fields.push({ name: fieldName, label: `[表单] ${formItem.label}`, type: 'string', width: 20 })
   })
 
-  type V2Item = { itemCode: string; content: string }
+  type V2Item = QualityExportItem
   type V2Score = { key: string; label: string }
   type ScaleMap = {
     scaleId: string
     items: V2Item[]
     scores: V2Score[]
+    qualityMetadata: Map<string, { field: string; value: string }>
     responseFields: Map<string, string>
     itemScoreFields: Map<string, string>
     responseTimeFields: Map<string, string>
@@ -699,6 +705,7 @@ async function getQuestionnaireExportDataV2(
     const scores: V2Score[] = Array.isArray(definition?.scoring?.scores) ? definition.scoring.scores : []
     if (items.length === 0 || scores.length === 0) throw new Error(`问卷包含尚未安装有效 v2 definition 的量表：${scale.code}`)
     const prefix = `S${scaleIndex + 1}_`
+    const qualityMetadata = new Map<string, { field: string; value: string }>()
     const responseFields = new Map<string, string>()
     const itemScoreFields = new Map<string, string>()
     const responseTimeFields = new Map<string, string>()
@@ -707,6 +714,11 @@ async function getQuestionnaireExportDataV2(
       const responseField = toPinyinFieldName(item.itemCode, `${prefix}Q_V_`, fieldNameContext)
       const scoreField = toPinyinFieldName(item.itemCode, `${prefix}Q_S_`, fieldNameContext)
       const responseTimeField = toPinyinFieldName(item.itemCode, `${prefix}RT_`, fieldNameContext)
+      if (isQualityExportItem(item)) {
+        const field = toPinyinFieldName(item.itemCode, `${prefix}Q_META_`, fieldNameContext)
+        qualityMetadata.set(item.itemCode, { field, value: qualityItemCodebook(item, definition ?? {}) })
+        fields.push({ name: field, label: `[${scale.name}] ${item.itemCode} 非计分题原答代码本(JSON)`, type: 'string', width: 32767 })
+      }
       responseFields.set(item.itemCode, responseField)
       itemScoreFields.set(item.itemCode, scoreField)
       responseTimeFields.set(item.itemCode, responseTimeField)
@@ -751,7 +763,7 @@ async function getQuestionnaireExportDataV2(
       { name: metadataFields.contextSnapshotHashField, label: `[${scale.name}] 测评上下文快照哈希`, type: 'string', width: 64 },
       ...deviceProvenanceFields(prefix, scale.name),
     )
-    scaleMaps.push({ scaleId: scale.id, items, scores, responseFields, itemScoreFields, responseTimeFields, scoreFields, ...metadataFields })
+    scaleMaps.push({ scaleId: scale.id, items, scores, qualityMetadata, responseFields, itemScoreFields, responseTimeFields, scoreFields, ...metadataFields })
   }
 
   const rows: Record<string, any>[] = []
@@ -780,7 +792,9 @@ async function getQuestionnaireExportDataV2(
       scaleMap.items.forEach((item) => {
         const answer = answerMap.get(item.itemCode)
         row[scaleMap.responseFields.get(item.itemCode)!] = answer?.responseValue ?? null
-        row[scaleMap.itemScoreFields.get(item.itemCode)!] = result.result ? itemScoreMap.get(item.itemCode)?.score ?? null : null
+        const metadata = scaleMap.qualityMetadata.get(item.itemCode)
+        if (metadata) row[metadata.field] = metadata.value
+        row[scaleMap.itemScoreFields.get(item.itemCode)!] = !isQualityExportItem(item) && result.result ? itemScoreMap.get(item.itemCode)?.score ?? null : null
         row[scaleMap.responseTimeFields.get(item.itemCode)!] = answer?.responseTimeMs ?? null
       })
       scaleMap.scores.forEach((score) => {

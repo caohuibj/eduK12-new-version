@@ -1,3 +1,4 @@
+import { serveProjectedReportImage } from '../reporting/report-image-delivery'
 import { RelationalAssessmentError } from '../assessment-relational/errors'
 import { wholeQuestionnaireArrival, markAssessmentTimeline, traceAssessmentPhase, traceAssessmentPhaseSync } from '../../services/runtimeObservability'
 import { Request, Response } from 'express'
@@ -583,8 +584,9 @@ export const compositeController = {
     try {
       if (!req.user) return unauthorized(res)
       const query = compositeReportQuerySchema.parse(req.query)
-      if (query.partial) return success(res, await service.getPartialReport(req.params.attemptId, req.user.userId))
-      return success(res, await service.getReport(req.params.attemptId, { userId: req.user.userId }))
+      const report = query.partial ? await service.getPartialReport(req.params.attemptId, req.user.userId)
+        : await service.getReport(req.params.attemptId, { userId: req.user.userId })
+      return req.params.assetId ? await serveProjectedReportImage(report, req.params.assetId, res) : success(res, report)
     } catch (err) { return handleError(res, err) }
   },
 
@@ -640,14 +642,15 @@ export const compositeController = {
     try {
       if (!req.user) return unauthorized(res)
       const query = compositeReportQuerySchema.parse(req.query)
-      return success(res, await service.getReportForTeacher(
+      const report = await service.getReportForTeacher(
         req.user.userId,
         req.user.role,
         req.params.id,
         req.params.attemptId,
         query.snapshotId,
         ...(query.partial === '1' ? [true] as const : [] as const),
-      ))
+      )
+      return req.params.assetId ? await serveProjectedReportImage(report, req.params.assetId, res) : success(res, report)
     } catch (err) { return handleError(res, err) }
   },
 
@@ -882,7 +885,10 @@ export const compositeController = {
   },
   async publicReport(req: Request, res: Response) {
     res.setHeader('Cache-Control', 'no-store')
-    try { return success(res, await service.getReport(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) } catch (err) { return handleError(res, err) }
+    try {
+      const report = await service.getReport(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })
+      return req.params.assetId ? await serveProjectedReportImage(report, req.params.assetId, res) : success(res, report)
+    } catch (err) { return handleError(res, err) }
   },
 
   async publicAnalysisExport(req: Request, res: Response) {

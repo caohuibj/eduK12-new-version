@@ -1472,6 +1472,7 @@ const finalizeQuestionnaireUnifiedImpl = async (assessmentId: string, preloadedP
         completedAt: payload.envelope.completedAt,
         totalTime: null,
         core: payload.envelope.core,
+        bundleBridge: payload.envelope.bundleBridge,
       }
     })
     const nextFormInputs = parent.questionnaire.formSections.map((section: any) => {

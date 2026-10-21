@@ -36,6 +36,7 @@ router.post('/assessments/:assessmentId/form-sections/:sectionId/items/:itemId/o
 router.post('/assessments/:assessmentId/scales/:scaleAssessmentId/items/:itemCode/video-capability', authenticate, questionnaireVideoController.authenticatedScaleVideo)
 router.post('/assessments/:id/complete', authenticate, questionnaireController.completeAssessment)
 router.get('/assessments/:id/report', authenticate, relationalGenericQuestionnaireReportGuard, questionnaireController.getReport)
+router.get('/assessments/:id/report/assets/:assetId', authenticate, relationalGenericQuestionnaireReportGuard, questionnaireController.getReport)
 router.get('/exports/:artifactId', authenticate, questionnaireController.downloadExportFile)
 router.get('/exports/:artifactId/status', authenticate, questionnaireController.exportArtifactStatus)
 router.get('/:id', authenticate, questionnaireController.detail)

@@ -173,7 +173,7 @@ export const decryptCompactCompositeReport=async(encrypted:string,binding:Bindin
     }
     const row=byId.get(source.assessmentId!)!,{scaleProjectionPolicy,...header}=meta
     const {result}=await restoreCompactScaleFacts(facts[scaleIndex++],{canonical:false,reportOnly:sharedControlWritesEnabled()},templates)
-    const unit={...header,completedAt:row.completedAt,totalTime:row.totalTime,method:result.method,caveats:result.caveats,disclaimer:result.disclaimer,
+    const unit={...header,assessmentId:source.assessmentId,completedAt:row.completedAt,totalTime:row.totalTime,method:result.method,caveats:result.caveats,disclaimer:result.disclaimer,
       result,quality:result.quality,scores:result.scores,references:result.references,interpretations:result.interpretations}
     if(scaleProjectionPolicy)Object.defineProperty(unit,'__scaleProjectionPolicy',{value:scaleProjectionPolicy,enumerable:false})
     unitReports.push(unit)

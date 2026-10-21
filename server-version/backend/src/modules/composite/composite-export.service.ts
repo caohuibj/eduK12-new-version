@@ -1,3 +1,4 @@
+import { isQualityExportItem, qualityItemCodebook } from '../../services/qualityItemExport'
 import { loadTrainingVariantExportGraph, trainingVariantProvenance, trainingVariantStratumKey, trainingVariantExportStrata, readTrainingVariantCognitiveTrials, TRAINING_VARIANT_EXPORT_VERSION } from './training-variant-export'
 import { loadSituationalExportSlotSets, readSituationalExportResults, situationalExportColumns } from './situational-canonical-export'
 import {projectTrainingTimingFact} from '../assessment-runtime/training-scale-timing'
@@ -330,6 +331,7 @@ export const getExportData = async (
       if (detail === 'full') {
         v2Items.forEach((scaleItem: any) => {
           const itemCode = scaleItem.itemCode
+          if (isQualityExportItem(scaleItem)) builder.add(fieldName(`${prefix}Q_META_`, itemCode), `[${scaleLabel}] ${itemCode} 非计分题原答代码本(JSON)`, 'string', 32767)
           builder.add(fieldName(`${prefix}Q_V_`, itemCode), `[${scaleLabel}] ${itemCode} 原始回答`, 'string', 32)
           builder.add(fieldName(`${prefix}Q_S_`, itemCode), `[${scaleLabel}] ${itemCode} 映射后题目分值`, 'numeric', 12, 6)
           builder.add(fieldName(`${prefix}RT_`, itemCode), `[${scaleLabel}] ${itemCode} 作答时间(毫秒)`, 'numeric', 12)
@@ -514,11 +516,15 @@ export const getExportData = async (
         if (detail === 'full') {
           v2Items.forEach((scaleItem: any) => {
             const itemCode = scaleItem.itemCode
+            if (isQualityExportItem(scaleItem)) {
+              const label = `[${packageSlotLabels.get(item.position) ?? item.scale.name}] ${itemCode} 非计分题原答代码本(JSON)`
+              row[builder.resolve(fieldName(`${prefix}Q_META_`, itemCode), label)] = qualityItemCodebook(scaleItem, definition)
+            }
             const questionLabel = `[${packageSlotLabels.get(item.position) ?? item.scale.name}] ${itemCode} 原始回答`
             const scoreLabel = `[${packageSlotLabels.get(item.position) ?? item.scale.name}] ${itemCode} 映射后题目分值`
             const responseTimeLabel = `[${packageSlotLabels.get(item.position) ?? item.scale.name}] ${itemCode} 作答时间(毫秒)`
             row[builder.resolve(fieldName(`${prefix}Q_V_`, itemCode), questionLabel)] = answerMap.get(itemCode)?.responseValue ?? null
-            row[builder.resolve(fieldName(`${prefix}Q_S_`, itemCode), scoreLabel)] = itemScoreMap.get(itemCode)?.score ?? null
+            row[builder.resolve(fieldName(`${prefix}Q_S_`, itemCode), scoreLabel)] = isQualityExportItem(scaleItem) ? null : itemScoreMap.get(itemCode)?.score ?? null
             row[builder.resolve(fieldName(`${prefix}RT_`, itemCode), responseTimeLabel)] = answerMap.get(itemCode)?.responseTimeMs ?? null
           })
         }

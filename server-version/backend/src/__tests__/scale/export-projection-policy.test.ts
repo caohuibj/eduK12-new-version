@@ -86,6 +86,15 @@ describe('export projection policy', () => {
     expect(JSON.stringify(projected.rows)).not.toContain('DO_NOT_LEAK')
   })
 
+  it('classifies quality codebook as raw-only, not ordinary quality diagnostics', () => {
+    const extra = {...data, fields:[...data.fields, {name:'Q_META_item',label:'Author codebook',type:'string' as const}],
+      rows:[{...data.rows[0],'Q_META_item':'AUTHOR_TARGET'}]}
+    const publicData = projectExportData(extra,binding(DISCLOSURE_PRESETS.FULL_REPORT()))
+    expect(JSON.stringify(publicData)).not.toContain('AUTHOR_TARGET')
+    const rawData = projectExportData(extra,binding({...DISCLOSURE_PRESETS.FULL_REPORT(),rawAnswers:true}))
+    expect(rawData.rows[0]['Q_META_item']).toBe('AUTHOR_TARGET')
+  })
+
   it('persists audience scope in the storage key and rejects cross-audience artifact reuse', () => {
     const teacher = {
       ...binding(DISCLOSURE_PRESETS.FULL_REPORT()),

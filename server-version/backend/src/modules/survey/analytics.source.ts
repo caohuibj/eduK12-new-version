@@ -23,6 +23,9 @@ import {validateSurveyScaleTimings,SurveyScaleTimingError,
   type SurveyScaleItemTimingV1} from './timing.definition'
 
 export interface ResearchRawCodebook {
+  /** Author-only metadata; raw export remains under existing owner/MFA scope. */
+  purpose?: 'CONTENT' | 'ATTENTION_CHECK' | 'SOCIAL_DESIRABILITY'
+  attentionTarget?: string
   variantConfiguration?:SurveyVariantConfiguration
   sourceProvenance?:ResearchFrozenUnit['sourceProvenance']
   sourceAnswerMapping?:ResearchFrozenUnit['sourceAnswerMapping']
@@ -106,6 +109,7 @@ const answerValueEncoding=(type:string):NonNullable<ResearchRawCodebook['valueEn
     type==='SLIDER'||type==='NUMBER'?'NUMBER':'TEXT'
 type FrozenRawItem=Readonly<{
   itemKey:string;prompt:string;responseType:string;
+  qualityMetadata?:Pick<ResearchRawCodebook,'purpose'|'attentionTarget'>
   options:ReadonlyArray<Readonly<{code:string;label:string;nonanswerReason?:string}>>;
   answerKey:string;matrixRow?:string;timeZone?:'Asia/Shanghai'|'UTC'
   sjtQuestion?:SurveySjtQuestion
@@ -143,7 +147,10 @@ const frozenRawItems=(frozen:ResearchFrozenUnit,includeOptions:boolean):readonly
     const draft=frozen.displayDefinition as ScaleDraft
     const options=optionsFor(draft.responseOptions)
     for(const q of draft.items)add({itemKey:q.itemKey,prompt:q.prompt,responseType:'LIKERT',
-      options,answerKey:q.itemKey})
+      options,answerKey:q.itemKey,
+      ...(q.purpose ? { qualityMetadata: { purpose: q.purpose,
+        ...(q.purpose === 'ATTENTION_CHECK' && q.attentionTarget !== undefined
+          ? { attentionTarget: q.attentionTarget } : {}) } } : {})})
   }else if(frozen.kind==='SJT'){
     const draft=frozen.displayDefinition as AnySjtDraft
     if(draft.schemaVersion===1)for(const q of draft.questions)add({itemKey:q.questionKey,prompt:q.prompt,
@@ -835,6 +842,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
             ...(item.timeZone?{timeZone:item.timeZone}:{}),
             valueEncoding:answerValueEncoding(item.responseType),
             ...(item.sjtMetadata??{}),
+            ...(item.qualityMetadata??{}),
             ...(frozen.kind==='FORM'?{formSchemaVersion:(frozen.displayDefinition as FormDraft).schemaVersion}:{}),
             ...(frozen.kind==='SCALE'?{
               scalePresentationMode:(frozen.displayDefinition as ScaleDraft).presentationMode??'ALL_AT_ONCE',
@@ -1030,6 +1038,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
                 ...(r.timeZone?{timeZone:r.timeZone}:{}),
                 valueEncoding:answerValueEncoding(r.responseType),
                 ...(r.sjtMetadata??{}),
+                ...(r.qualityMetadata??{}),
                 ...(frozen.kind==='FORM'?{formSchemaVersion:(frozen.displayDefinition as FormDraft).schemaVersion}:{}),
                 ...(frozen.kind==='SCALE'?{
                   scalePresentationMode:(frozen.displayDefinition as ScaleDraft).presentationMode??'ALL_AT_ONCE',

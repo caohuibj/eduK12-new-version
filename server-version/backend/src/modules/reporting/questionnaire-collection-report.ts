@@ -4,7 +4,7 @@ import { buildFormBackgroundReport, buildScaleUnitReport, projectScaleUnitReport
 import { readContextFormAnswers } from '../assessment-context'
 import { safeDecrypt } from '../../utils/encryption'
 import { isFormAnswerComplete } from '../../services/questionnaireFormAnswerState'
-import type { CanonicalUnitResultCoreV1 } from '../assessment-runtime/unit-result'
+import type { CanonicalUnitResultCoreV1, CanonicalBundleBridgeV1 } from '../assessment-runtime/unit-result'
 import { legacyFormValueProjection } from '../assessment-runtime/typed-form'
 import type { FormSectionCollectionFacts } from '../assessment-runtime/form-facts'
 import { createScaleProjectionContext } from '../scale/projection/context-factory'
@@ -83,6 +83,7 @@ export const buildQuestionnaireCollectionReport = (qa: any, options?: Questionna
   }): ScaleUnitReport => {
     const { scale, assessment, stored } = input
     const internal = buildScaleUnitReport({
+      assessmentId: assessment?.id,
       itemId: input.itemId,
       scaleId: input.scaleId,
       scaleCode: scale?.code ?? stored?.scaleCode,
@@ -98,6 +99,8 @@ export const buildQuestionnaireCollectionReport = (qa: any, options?: Questionna
     return stored && internal.result === null ? {
       ...internal,
       quality: stored.quality ?? internal.quality,
+      ...(stored.rawScoreFeedback && stored.assessmentId ? { assessmentId: stored.assessmentId } : {}),
+      ...(stored.rawScoreFeedback ? { rawScoreFeedback: stored.rawScoreFeedback } : {}),
       scores: Array.isArray(stored.scores) ? stored.scores : internal.scores,
       references: Array.isArray(stored.references) ? stored.references : internal.references,
       interpretations: Array.isArray(stored.interpretations) ? stored.interpretations : internal.interpretations,
@@ -171,6 +174,8 @@ export const buildQuestionnaireCollectionReportFromUnifiedInput = (input: {
     completedAt: Date | string | null
     totalTime: number | null
     core: CanonicalUnitResultCoreV1
+    sourceAttemptId?: string
+    bundleBridge?: CanonicalBundleBridgeV1
   }>
   formSections: Array<{ itemId: string; facts: FormSectionCollectionFacts }>
 }): any => {
@@ -190,6 +195,7 @@ export const buildQuestionnaireCollectionReportFromUnifiedInput = (input: {
       }))
     return {
       itemId: scale.itemId,
+      ...(scale.bundleBridge?.rawScoreFeedback ? { rawScoreFeedback: scale.bundleBridge.rawScoreFeedback, ...(scale.sourceAttemptId ? { assessmentId: scale.sourceAttemptId } : {}) } : {}),
       type: 'SCALE',
       kind: 'scale',
       scaleId: scale.scaleId,
@@ -209,6 +215,7 @@ export const buildQuestionnaireCollectionReportFromUnifiedInput = (input: {
         instrumentKey: scale.core.instrumentKey,
         instrumentVersion: scale.core.instrumentVersion,
         compiledRuntimeHash: scale.core.compiledRuntimeHash,
+        ...(scale.bundleBridge?.reportAudience ? { reportAudience: scale.bundleBridge.reportAudience } : {}),
       },
     }
   })

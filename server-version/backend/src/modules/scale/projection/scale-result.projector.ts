@@ -1,3 +1,4 @@
+import { projectRawScoreFeedback } from '../raw-score-feedback'
 import type { DisclosureCapabilitiesV1 } from '../policy/types'
 import type { ScaleResultV2 } from '../scale-result'
 import { resolveEffectiveScaleDisclosure } from './context'
@@ -95,7 +96,7 @@ export const projectScaleResult = (input: ProjectScaleResultInput): ExternalScal
       ? { references: projectExternalScaleReferences(input.result.references, capabilities) }
       : {}),
     ...(capabilities.individualInterpretations
-      ? { interpretations: projectExternalInterpretations(input.result.interpretations, capabilities) }
+      ? { interpretations: projectExternalInterpretations(input.result.interpretations, capabilities), ...(input.result.rawScoreFeedback ? { rawScoreFeedback: projectRawScoreFeedback(input.result.rawScoreFeedback, capabilities.scoreDerivedLabels) } : {}) }
       : {}),
     ...(quality ? { quality, caveats: input.result.caveats.map(String) } : {}),
     ...(capabilities.itemScores

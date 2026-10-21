@@ -1,3 +1,11 @@
+import { loadScaleAssessmentForResponse } from '../modules/scale/scale-workflow.service'
+import { assertTrainingChildSelected, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../modules/composite/training-variant-child-scope'
+import { trainingFeedbackAttemptSelect, trainingFeedbackParentSelect } from '../modules/composite/training-feedback-binding'
+import { isLoadedCompositeParticipantFeedbackDeferred } from '../modules/assessment-policy/participant-feedback'
+import { isRelationalCohortOnlyCompositeAttempt } from '../modules/assessment-relational/result-authority'
+import { serveAssessmentImageContent } from '../modules/assessment-media/assessment-image-delivery'
+import type { RawScoreFeedbackMatch } from '../modules/scale/raw-score-feedback'
+import { assertScaleReportImagesOwned } from '../modules/scale/scale-image-retention'
 import { publishScaleMeasurement } from '../modules/measurement-content/scale'
 import { Prisma } from '@prisma/client'
 import { z } from 'zod'
@@ -25,6 +33,32 @@ const definitionSummary = (definition: { items: unknown[]; scoring: { scores: Ar
 })
 
 export const scaleImageController = {
+  async serveReportImage(req: Request, res: Response) {
+    res.setHeader('Cache-Control', 'private, no-store, max-age=0')
+    res.setHeader('Referrer-Policy', 'no-referrer')
+    try {
+      const userId = req.user?.userId
+      if (!userId) return forbidden(res, '未登录')
+      const assessment = await prisma.assessment.findUnique({
+        where: { id: req.params.assessmentId },
+        include: { compositeAttempt: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, ...trainingFeedbackAttemptSelect,
+          compositeAssessment: { select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT.compositeAssessment.select, ...trainingFeedbackParentSelect } } } },
+          scale: { select: { id: true, code: true, name: true, instrumentVersion: true, instrumentClass: true, definition: true } } },
+      })
+      if (!assessment || assessment.userId !== userId || assessment.status !== 'COMPLETED') return notFound(res, '报告图片不可访问')
+      await assertTrainingChildSelected(assessment)
+      if (assessment.compositeAttemptId && await isLoadedCompositeParticipantFeedbackDeferred(assessment.compositeAttempt)) return forbidden(res, '报告尚未开放')
+      if (await isRelationalCohortOnlyCompositeAttempt(assessment.compositeAttemptId)) return forbidden(res, '个人报告不可访问')
+      const projected = await loadScaleAssessmentForResponse(assessment)
+      const feedback: RawScoreFeedbackMatch[] = projected.report?.rawScoreFeedback ?? []
+      const image = feedback.flatMap(item => item.images ?? []).find(item => item.asset.assetId === req.params.assetId)
+      if (!image) return notFound(res, '报告图片不可访问')
+      await serveAssessmentImageContent({ reference: image.asset, res })
+      return undefined
+    } catch {
+      return notFound(res, '报告图片不可访问')
+    }
+  },
   async publish(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
@@ -47,6 +81,7 @@ export const scaleImageController = {
       const definitionHash = hashScaleDefinition(definition)
       const updated = await prisma.$transaction(async (tx) => {
         await assertScaleCopyPublishSource(tx, scale)
+        await assertScaleReportImagesOwned(definition, scale.creatorId, tx as never)
         await retainScaleAssessmentImages({
           owner: publishedScaleMediaOwner(scale.id, definitionHash),
           definition,

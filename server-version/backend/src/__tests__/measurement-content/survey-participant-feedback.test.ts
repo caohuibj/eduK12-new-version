@@ -149,3 +149,18 @@ it('signals explicit raw feedback in the actual task DTO without disclosing poli
  activeUnit.participantFeedback={...policy(),mode:'GENERAL',metricKeys:[]}
  expect((await getOwnResearchTask(proof)).reportMode).toBe('GENERAL_ONLY')
 })
+
+it('freezes matched text and images at FINAL rather than rerendering a later draft',()=>{
+ const image={asset:{assetId:'00000000-0000-4000-8000-000000000002',contentHash:'a'.repeat(64),mimeType:'image/png' as const},altText:'Saved illustration',order:0}
+ const authored={...realScale,rawScoreFeedback:{schemaVersion:1,rules:[{scoreKey:'total',ranges:[{key:'upper',min:0,max:3,includeMax:true,text:'Original report',images:[image]}]}]}}
+ const frozen=compileFrozenResearchUnit({id:draftId,instrumentKey:'tool',kind:'SCALE',title:'Test',revision:1,definition:authored})
+ const release=prepareRelease(surveyMeasurementReleaseInput(frozen,'owner','project'))
+ if(release.layer!=='MEASUREMENT')throw new Error('Expected measurement')
+ frozen.measurementRelease={releaseId:'measurement',contentHash:release.contentHash,measurementHash:release.content.measurementHash}
+ frozen.participantFeedback={...policy(),metricKeys:['total']}
+ const snapshot:ResearchFrozenPublication={schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:'project',waveId:'wave',collectionMode:'SINGLE_UNLINKED',consentVersion:1,
+ linkageNoticeConfirmed:false,consentDigest:'consent',runtimeStatus:'SURVEY_FINAL_V1',units:[frozen]}
+ const calculated=verifySurveyFinalPublication(snapshot,canonicalHash(snapshot))!.compute({tool:{one:'yes'}},null,[],'FINAL')
+ authored.rawScoreFeedback.rules[0].ranges[0].text='Edited later'
+ expect(rawParticipantFeedback(frozen,calculated.units[0],true)).toMatchObject({rawScoreFeedback:[{scoreKey:'total',rangeKey:'upper',text:'Original report',images:[image]}]})
+})

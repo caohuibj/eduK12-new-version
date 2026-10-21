@@ -1,3 +1,4 @@
+import { assessmentImagePresentationListSchema } from '../assessment-media/assessment-image-presentation'
 import {z} from 'zod'
 import type {ResearchFrozenUnit} from './publication.service'
 import type {FrozenUnitResult} from './final.compute'
@@ -32,6 +33,9 @@ export function freezeSurveyParticipantFeedback(units:ResearchFrozenUnit[],raw:u
     unit.participantFeedback=selection.feedback
   }
 }
+const savedFeedbackSchema=z.array(z.object({scoreKey:z.string(),rangeKey:z.string().nullable(),
+  text:z.string(),images:assessmentImagePresentationListSchema.optional(),
+}).strict())
 const recordedScores=z.object({
   scores:z.array(z.object({key:z.string(),value:z.number().finite().nullable(),status:z.string()}).passthrough()),
   quality:z.object({status:z.string()}).passthrough(),
@@ -52,7 +56,7 @@ export function rawParticipantFeedback(unit:ResearchFrozenUnit,result:FrozenUnit
   const defined=unit.kind==='SCALE'?definition.scoring?.scores:definition.scoring?.publishedMetrics
   if(!defined||policy.metricKeys.some(key=>!defined.some(metric=>metric.key===key)))
     throw new Error('Frozen participant metric policy mismatch')
-  const saved=result.privateScoring as {scores?:unknown;metrics?:unknown;quality?:unknown}|null
+  const saved=result.privateScoring as {scores?:unknown;metrics?:unknown;quality?:unknown;rawScoreFeedback?:unknown}|null
   const parsed=recordedScores.safeParse({scores:unit.kind==='SCALE'?saved?.scores:saved?.metrics,quality:saved?.quality})
   if(!parsed.success||parsed.data.quality.status!=='interpretable')return null
   const scores=parsed.data.scores
@@ -63,6 +67,11 @@ export function rawParticipantFeedback(unit:ResearchFrozenUnit,result:FrozenUnit
       ?[{key,label:key,value:score.value,unit:null,status:'OK' as const}]:[]
   })
   if(!metrics.length)return null
+  // Display only saved matches for the same already-authorized metrics. Never
+  // rerender current definitions on read or disclose unselected interval rules.
+  const feedback=savedFeedbackSchema.safeParse(saved?.rawScoreFeedback)
+  const rawScoreFeedback=unit.kind==='SCALE'&&feedback.success
+    ?feedback.data.filter(item=>metrics.some(metric=>metric.key===item.scoreKey)):[]
   return {feedbackKind:'RAW_METRICS' as const,pending:false as const,instrumentKey:unit.instrumentKey,title:unit.title,
-    measurementReleaseId:unit.measurementRelease.releaseId,metrics,quality:'interpretable' as const}
+    measurementReleaseId:unit.measurementRelease.releaseId,metrics,...(rawScoreFeedback.length?{rawScoreFeedback}:{}),quality:'interpretable' as const}
 }

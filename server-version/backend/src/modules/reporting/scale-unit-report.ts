@@ -1,3 +1,4 @@
+import { projectRawScoreFeedback } from '../scale/raw-score-feedback'
 import { resolveStoredScaleResult } from '../assessment-runtime/compact-assessment-storage'
 import { isScaleReportFactsView } from '../assessment-runtime/compact-scale-facts'
 import { safeDecrypt } from '../../utils/encryption'
@@ -21,6 +22,7 @@ export const SCALE_REPORT_DISCLAIMER = '量表结果仅反映本次作答，不�
 export const SCALE_REPORT_DEFINITION_VERSION = 'scale-unit-report-v2'
 
 export interface ScaleUnitReport {
+  assessmentId?: string
   itemId?: string
   type: 'SCALE'
   kind: 'scale'
@@ -32,6 +34,7 @@ export interface ScaleUnitReport {
   quality: ScaleResultV2['quality'] | null
   scores: ScaleResultV2['scores']
   references: ScaleResultV2['references']
+  rawScoreFeedback?: ScaleResultV2['rawScoreFeedback']
   interpretations: ScaleResultV2['interpretations']
   caveats: string[]
   disclaimer: string
@@ -51,6 +54,7 @@ export const decodeReportField = <T extends object>(value: unknown): DecodedRepo
 }
 
 export interface BuildScaleUnitReportInput {
+  assessmentId?: string
   itemId?: string
   scaleId: string
   scaleCode?: string | null
@@ -63,6 +67,7 @@ export interface BuildScaleUnitReportInput {
 }
 
 const baseFor = (input: BuildScaleUnitReportInput) => ({
+  ...(input.assessmentId ? { assessmentId: input.assessmentId } : {}),
   ...(input.itemId ? { itemId: input.itemId } : {}),
   type: 'SCALE' as const,
   kind: 'scale' as const,
@@ -104,6 +109,7 @@ export const buildScaleUnitReport = (input: BuildScaleUnitReportInput): ScaleUni
     scores: result.scores,
     references: result.references,
     interpretations: result.interpretations,
+    ...(result.rawScoreFeedback ? { rawScoreFeedback: result.rawScoreFeedback } : {}),
     method: result.method,
     caveats: input.caveats?.map(String) ?? result.caveats,
     disclaimer: input.disclaimer || result.disclaimer || SCALE_REPORT_DISCLAIMER,
@@ -129,7 +135,9 @@ export const projectScaleUnitReport = (report: ScaleUnitReport, context: ScalePr
     return { ...base, reportKind: 'unavailable', reason: 'POLICY_UNAVAILABLE' }
   }
   if (report.decryptError) return { ...base, reportKind: 'unavailable', reason: 'RESULT_UNAVAILABLE', decryptError: true }
-  const capabilities = resolveEffectiveScaleDisclosure(context)
+  const capabilities = { ...resolveEffectiveScaleDisclosure(context) }
+  const expectedAudience = ['respondent','subject'].includes(context.audience) ? 'student' : context.audience === 'teacher' ? 'teacher' : null
+  const allowRawFeedback = capabilities.individualInterpretations && (!report.method?.reportAudience || report.method.reportAudience === expectedAudience)
   const rich = capabilities.references
     || capabilities.individualInterpretations
     || capabilities.scoreDerivedLabels
@@ -170,6 +178,7 @@ export const projectScaleUnitReport = (report: ScaleUnitReport, context: ScalePr
     ...(capabilities.references ? { references: projectExternalScaleReferences(report.references, capabilities) } : {}),
     ...(capabilities.individualInterpretations ? {
       interpretations: projectExternalInterpretations(report.interpretations, capabilities),
+      ...(allowRawFeedback && report.rawScoreFeedback ? { rawScoreFeedback: projectRawScoreFeedback(report.rawScoreFeedback, capabilities.scoreDerivedLabels), ...(report.assessmentId ? { assessmentId: report.assessmentId } : {}) } : {}),
     } : {}),
     ...(quality ? { quality, caveats: report.caveats.map(String) } : {}),
     ...(method ? { method } : {}),
