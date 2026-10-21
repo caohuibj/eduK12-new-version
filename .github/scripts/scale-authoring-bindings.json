@@ -28,11 +28,11 @@
     },
     ".github/scripts/scale-authoring-scope.mjs": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "7ea1ad71327d290e0f55f87ca408e3551b5bbd77"
+      "after": "824bb37fcbeccd8752a85e4d4eb88c5ca533b243"
     },
     ".github/scripts/scale-authoring-scope.test.mjs": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "92b248bc17254836e095ad6e082f749f777949a0"
+      "after": "b0fb9bdacd3c4498737a0a40b61194515377ae7b"
     },
     ".github/workflows/ci-scale-authoring-browser-diagnostic.yml": {
       "before": "0000000000000000000000000000000000000000",
@@ -284,11 +284,11 @@
     },
     "server-version/e2e/scale-authoring-feedback-browser.cjs": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "15c07b345caeb969755e0d0ab1df64e04c4d8c7d"
+      "after": "93dccecd4ff4359b9daf149ba1dfb22f883ed932"
     },
     "server-version/e2e/scale-authoring-feedback-browser.test.cjs": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "b00abbcf6eb86a4733b1f68f21800d33e16d1488"
+      "after": "73633345951d2522bda388dd051e9f9a454ffedf"
     },
     "server-version/frontend/src/modules/composite/CompositeReportPage.tsx": {
       "before": "ececf212fdaeb80af244be4317908fe0e49c6623",

@@ -184,6 +184,13 @@ async function answerTrainingItem(page, prompt, option, nextPrompt) {
     assert(await page.getByRole('heading', { name: prompt, exact: true }).isVisible(), 'Last item must remain until explicit submission')
   }
 }
+function assertRenderedSurveyImage(rendered, expectedHash) {
+  assert.equal(rendered.sourceKind, 'blob', 'Participant image must use the actual authorized POST blob')
+  assert.equal(rendered.complete, true); assert(rendered.naturalWidth > 0 && rendered.naturalHeight > 0)
+  assert.equal(rendered.contentType, 'image/png'); assert(rendered.byteLength > 0, 'Rendered image bytes must be nonempty')
+  assert.deepEqual(rendered.signature, [137, 80, 78, 71, 13, 10, 26, 10])
+  assert.equal(rendered.sha256, expectedHash, 'Rendered bytes must equal the uploaded and frozen image')
+}
 async function trainingLogin(page, actor, student = false) {
   await page.goto(fixture.trainingUrl + (student ? '/student/login' : '/teacher/account-login'))
   await page.locator('#auth-username').fill(actor.username); await page.locator('#auth-password').fill(actor.password)
@@ -304,7 +311,7 @@ async function surveyJourney() {
   await button(editor, '新增指标反馈').click()
   await editor.getByLabel('反馈 1 区间 1 上限', { exact: true }).fill('10')
   await editor.getByLabel('反馈 1 区间 1 文字', { exact: true }).fill('SURVEY RAW INTERVAL FEEDBACK')
-  await action(author, /\/api\/survey\/projects\/[^/]+\/assets$/, () => editor.getByLabel('选择图片上传', { exact: true }).setInputFiles(imageFile))
+  const surveyUpload = await action(author, /\/api\/survey\/projects\/[^/]+\/assets$/, () => editor.getByLabel('选择图片上传', { exact: true }).setInputFiles(imageFile))
   await editor.getByLabel('替代文字（屏幕阅读器可读，必填）', { exact: true }).fill('Survey synthetic feedback picture')
   check('survey-editor-native', await editor.locator('.bg-white').count() > 0 && await author.locator('.scale-raw-feedback,.hui-training').count() === 0)
   await layout(author, 'survey-editor', '#survey-authoring-definition')
@@ -359,6 +366,13 @@ async function surveyJourney() {
     await participant.getByRole('radio', { name: i === 1 ? '不同意' : '非常不同意', exact: true }).check()
     if (i < 2) await button(participant, '下一题').click()
   }
+  evidence.surveyImageDelivery = { responses: [] }
+  participant.on('response', response => {
+    if (/\/api\/public\/survey\/r\/[^/]+\/attempts\/[^/]+\/report-images\/[^/]+$/.test(new URL(response.url()).pathname) && evidence.surveyImageDelivery.responses.length < 10) {
+      const headers = response.headers()
+      evidence.surveyImageDelivery.responses.push({ method: response.request().method(), status: response.status(), contentType: headers['content-type'] ?? null, contentLength: headers['content-length'] ?? null })
+    }
+  })
   const surveyImage = participant.waitForResponse(r => r.request().method() === 'POST' && /\/api\/public\/survey\/r\/[^/]+\/attempts\/[^/]+\/report-images\/[^/]+$/.test(new URL(r.url()).pathname))
   const general = participant.waitForResponse(r => r.request().method() === 'POST' && /\/api\/public\/survey\/r\/[^/]+\/attempts\/[^/]+\/general$/.test(new URL(r.url()).pathname)).then(responseData)
   const [surveyImageResponse, final, receipt] = await Promise.all([surveyImage, action(participant, /\/api\/public\/survey\/r\/[^/]+\/attempts\/[^/]+\/final$/, () => button(participant, '提交本轮正式回答').click()), general])
@@ -373,7 +387,25 @@ async function surveyJourney() {
   evidence.participantAnswers.push({ name: 'survey', answerCount: Object.keys(expectedSurveyAnswers).length, matchesFinalSnapshot: true })
   await participant.getByText('SURVEY RAW INTERVAL FEEDBACK', { exact: true }).waitFor()
   await participant.waitForFunction(() => [...document.images].some(i => i.alt === 'Survey synthetic feedback picture' && i.complete && i.naturalWidth > 0))
-  assert.equal(surveyImageResponse.status(), 200); assert.match(surveyImageResponse.headers()['content-type'], /^image\/png/); assert((await surveyImageResponse.body()).length > 0)
+  assert.equal(surveyImageResponse.status(), 200); assert.match(surveyImageResponse.headers()['content-type'], /^image\/png/)
+  // Protocol response.body() was empty while the actual rendered Blob decoded.
+  // Validate consumer bytes directly; the exact protocol discrepancy is not established.
+  // Fetching this blob: URL only reads browser-local bytes, never replays the API.
+  const rendered = await participant.getByAltText('Survey synthetic feedback picture', { exact: true }).evaluate(async img => {
+    if (!img.currentSrc.startsWith('blob:') || img.src !== img.currentSrc || new URL(img.currentSrc).origin !== location.origin) throw new Error('Expected the report POST image Blob from this origin, not a fallback resource')
+    const blob = await (await fetch(img.currentSrc)).blob()
+    const bytes = new Uint8Array(await blob.arrayBuffer())
+    const digest = new Uint8Array(await crypto.subtle.digest('SHA-256', bytes))
+    return { sourceKind: 'blob', complete: img.complete, naturalWidth: img.naturalWidth, naturalHeight: img.naturalHeight,
+      byteLength: bytes.length, contentType: blob.type, signature: [...bytes.slice(0, 8)], sha256: [...digest].map(byte => byte.toString(16).padStart(2, '0')).join('') }
+  })
+  evidence.surveyImageDelivery.rendered = rendered; save()
+  const imageHash = createHash('sha256').update(png).digest('hex')
+  assert.equal(surveyUpload.data.contentHash, imageHash)
+  assert.equal(new URL(surveyImageResponse.url()).pathname.split('/').pop(), surveyUpload.data.assetId, 'Captured report response must be for the uploaded frozen asset')
+  const frozenImage = frozenMeasurement.rawScoreFeedback.flatMap(feedback => feedback.images ?? []).find(image => image.asset.assetId === surveyUpload.data.assetId); assert(frozenImage)
+  assert.equal(frozenImage.asset.contentHash, imageHash)
+  assertRenderedSurveyImage(rendered, imageHash)
   check('survey-final-report-image', true)
   phase('survey-image-authorization')
   const denied = await imageRequest(author, surveyImageResponse.url(), 'POST', {})
@@ -508,4 +540,4 @@ if (require.main === module) main().catch(error => {
   if (output) { try { save() } catch (writeError) { console.error('Evidence write failed:', JSON.stringify(failureDetail(writeError, 'evidence-write'))) } }
   process.exitCode = 1
 })
-module.exports = { validateTrainingReuse, TRAINING_REUSE_SOURCE, apiFailureDetail, answerTrainingItem, totpAt, redactDiagnostics, failureDetail, assertDeniedImage, assertExportParts, REQUIRED }
+module.exports = { assertRenderedSurveyImage, validateTrainingReuse, TRAINING_REUSE_SOURCE, apiFailureDetail, answerTrainingItem, totpAt, redactDiagnostics, failureDetail, assertDeniedImage, assertExportParts, REQUIRED }

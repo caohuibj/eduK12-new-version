@@ -171,3 +171,21 @@ test('Survey explicitly publishes current revision before freezing and binds par
   assert(source.includes("frozenMeasurement.measurementReleaseId, measurement.data.releaseId"))
   assert(source.includes("name: '刷新报告与测量列表', exact: true, disabled: false"))
 })
+
+test('rendered Survey blob requires nonempty exact uploaded bytes, PNG signature and decoded pixels', () => {
+  const { assertRenderedSurveyImage } = require('./scale-authoring-feedback-browser.cjs')
+  const hash = 'a'.repeat(64)
+  const rendered = { sourceKind: 'blob', complete: true, naturalWidth: 16, naturalHeight: 16, contentType: 'image/png', byteLength: 119,
+    signature: [137, 80, 78, 71, 13, 10, 26, 10], sha256: hash }
+  assert.doesNotThrow(() => assertRenderedSurveyImage(rendered, hash))
+  for (const change of [{ byteLength: 0 }, { sha256: 'b'.repeat(64) }, { signature: [] }, { sourceKind: 'https' }, { naturalWidth: 0 }, { complete: false }, { contentType: 'text/html' }]) {
+    assert.throws(() => assertRenderedSurveyImage({ ...rendered, ...change }, hash))
+  }
+  const source = fs.readFileSync(require.resolve('./scale-authoring-feedback-browser.cjs'), 'utf8')
+  assert(!source.includes('surveyImageResponse.body()'))
+  assert(source.includes("if (!img.currentSrc.startsWith('blob:')"))
+  assert(source.includes('fetch(img.currentSrc)'))
+  assert(source.includes('surveyUpload.data.contentHash, imageHash'))
+  assert(source.includes('frozenImage.asset.contentHash, imageHash'))
+  assert(source.includes("assertDeniedImage(denied, 404); assert.equal(denied.length, 0)"))
+})

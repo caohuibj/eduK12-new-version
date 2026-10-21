@@ -55,6 +55,9 @@ export function browserCheck(report,head,runId) {
   const surfaces=['training-editor','training-report','survey-editor','survey-report'];
   assert.deepEqual(report.accessibility.map(x=>x.name).sort(),[...surfaces].sort());
   assert.deepEqual(report.screenshots.map(x=>x.file).sort(),surfaces.flatMap(name=>[390,768,1440].map(width=>name+'-'+width+'.png')).sort());
+  assert.deepEqual(report.surveyImageDelivery.rendered,{"sourceKind":"blob","complete":true,"naturalWidth":16,"naturalHeight":16,"byteLength":103,"contentType":"image/png","signature":[137,80,78,71,13,10,26,10],"sha256":"f152348704ab15cbdb0c57d769e0541c42100dccf86572485b8b912b248d33b3"});
+  assert(report.surveyImageDelivery.responses.length>0&&report.surveyImageDelivery.responses.length<=10);
+  for(const response of report.surveyImageDelivery.responses){assert.equal(response.method,'POST');assert.equal(response.status,200);assert.match(response.contentType,/^image\/png(?:;|$)/);assert(response.contentLength===null||typeof response.contentLength==='string'&&/^\d+$/.test(response.contentLength))}
   assert.deepEqual(report.measurementPublication,{status:'PUBLISHED',currentRevisionBound:true,frozenReleaseMatches:true});
   assert.deepEqual(report.participantAnswers,[{name:'training',answerCount:3,matchesFinalSnapshot:true},{name:'survey',answerCount:3,matchesFinalSnapshot:true}]);
   assert.equal(report.export.format,'RAW_WAVE');assert.equal(report.export.rowCount,3);assert.equal(report.export.downloadedFiles,3);
