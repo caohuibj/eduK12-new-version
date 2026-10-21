@@ -59,6 +59,51 @@ jobs:
           assert scan['Metadata']['ImageID']==image['Id'] and scan['ArtifactName']=='scale-authoring-frontend-runtime:'+source and scan['ArtifactName'] in image['RepoTags']
           assert not [v for result in scan['Results'] for v in result.get('Vulnerabilities',[]) if v['Severity'] in ['HIGH','CRITICAL']]
           Path('scale-authoring-evidence/browser-continuation.json').write_text(json.dumps({'originalRun':run,'originalHead':source,'originalConclusion':'failure','successfulFrontendAndSastReused':True,'newCompiler':False,'repeatedTypesLintAuditScan':False,'repeatedPostgresTest':False,'currentHead':os.environ['GITHUB_SHA']},indent=2))
+
+          # Reuse only the complete Training journey from the original failed browser run.
+          training_head='7daa3ad8cb0fb9597303a2ef3e1c28c3209dd548'; training_run=39571934879
+          # Exact shared success consumers; the only reviewed exception is failure diagnostics.
+          import re
+          old_script=subprocess.check_output(['git','show',training_head+':server-version/e2e/scale-authoring-feedback-browser.cjs'],text=True)
+          new_script=Path('server-version/e2e/scale-authoring-feedback-browser.cjs').read_text()
+          def functions(text):
+              rows=list(re.finditer(r'^(?:async )?function (\w+)\(',text,re.M))
+              return {m[1]:text[m.start():rows[i+1].start() if i+1<len(rows) else len(text)] for i,m in enumerate(rows)}
+          before,after=functions(old_script),functions(new_script)
+          for name in ['action', 'newPage', 'capture', 'redactDiagnostics', 'layout', 'accessibility', 'totpAt', 'failureDetail', 'assertDeniedImage', 'imageRequest', 'assertExportParts', 'answerTrainingItem', 'trainingLogin', 'trainingJourney']:assert before[name]==after[name], 'Training consumed function changed: '+name
+          import hashlib
+          assert hashlib.sha256(before['responseData'].encode()).hexdigest()=='314d8893056224502b914489fe62b15cb1c2e9465eae3da0ab997f9aea7dcaf2'
+          assert hashlib.sha256(after['responseData'].encode()).hexdigest()=='4585017e6bca3ee037829038802c40056041fb6a8b976c7f55c1e1efa22adbba'
+          job=r.api('jobs/119128163823');assert job['run_id']==training_run and job['head_sha']==training_head and job['conclusion']=='failure'
+          for job_id in [119128054238,119128163682]:
+              job=r.api('jobs/'+str(job_id));assert job['run_id']==training_run and job['head_sha']==training_head and job['conclusion']=='success'
+          r.FRONTEND_SOURCE=training_head;r.FRONTEND_RUN=training_run
+          r.ARTIFACTS['currentFrontendTraining']=(12332407955,'scale-browser-'+training_head,2645376,'4ed07312ff97a33673f5670432977d50ed8e3bd217c908c97280819692d6093f')
+          training=Path('scale-authoring-evidence/reused-training');r.download('currentFrontendTraining',training)
+          report=training/'browser/result.json'
+          import hashlib,shutil
+          report_hash='d7511d708d7b12dc643f02061b526da9b9bb61292ddc5172a7a1300bc95ad3e3'
+          assert hashlib.sha256(report.read_bytes()).hexdigest()==report_hash
+          prior=json.loads(report.read_text());assert prior['status']=='FAIL' and prior['sourceCommit']==training_head and prior['phase']=='survey-publication'
+          assert json.loads((training/'cleanup.json').read_text())=={'exitStatus':0,'privateMaterialRemoved':True}
+          assert prior['browserErrors']==[] and prior['blockedExternalRequests']==0
+          checks=['training-stable-item-operations','training-editor-native','training-quality-roundtrip','training-published','training-final-report-image','training-report-image-denies-other-user']
+          assert [x for x in prior['checks'] if x.startswith('training-')]==checks
+          surfaces=['training-editor','training-report']; widths=[390,768,1440]
+          selected=lambda key:[x for x in prior[key] if x['name'] in surfaces]
+          shots=selected('screenshots'); layouts=selected('layoutChecks'); axe=selected('accessibility')
+          assert sorted((x['name'],x['width']) for x in shots)==sorted((n,w) for n in surfaces for w in widths)
+          assert sorted((x['name'],x['width']) for x in layouts)==sorted((n,w) for n in surfaces for w in widths) and all(x['overflow'] is False for x in layouts)
+          assert sorted(x['name'] for x in axe)==sorted(surfaces) and all(x['passes']>0 and x['violations']==[] for x in axe)
+          assert prior['participantAnswers']==[{'name':'training','answerCount':3,'matchesFinalSnapshot':True}]
+          assert prior['imageAuthorization']==[{'name':'training-other-user','positiveStatus':200,'deniedStatus':404,'deniedImage':False,'deniedLength':60}]
+          hashes={'training-editor-1440.png': 'a1f620b475d1af6b7bb6f7219caedcf7224e57c27178727d72ed4247aa874c79', 'training-editor-390.png': 'fcc5cf3e25f9f3fed748156a6dd289e27822872850e6275c4cc65d90c1937057', 'training-editor-768.png': '1baa0b62047a51aec1882c9bbd78d171b308b815832a8715e92088735dfb2e5c', 'training-report-1440.png': 'a7400392843a26c0d574d5d6970498bef087f1d08d5fc8b3478b43b4308df108', 'training-report-390.png': '62e73fa19b7d4c7cf30d1bc6f900d4dc3b03d913885854aa3e8a229dda1ffd73', 'training-report-768.png': '03fc1e967aedf3952b7e973ec0ba01787ce9cc3453ced7b94d24c8847ff0664e'}
+          for shot in shots:
+              assert shot['file']==shot['name']+'-'+str(shot['width'])+'.png'
+              assert hashlib.sha256((training/'browser'/shot['file']).read_bytes()).hexdigest()==hashes[shot['file']]
+              shot['sha256']=hashes[shot['file']]
+          receipt={'sourceRun':training_run,'sourceHead':training_head,'sourceReportSha256':report_hash,'originalStatus':'FAIL','checks':checks,'screenshots':shots,'layoutChecks':layouts,'accessibility':axe,'computedStyles':selected('computedStyles'),'participantAnswers':prior['participantAnswers'],'imageAuthorization':prior['imageAuthorization'],'browserErrors':[],'blockedExternalRequests':0}
+          (training/'training-reuse.json').write_text(json.dumps(receipt,indent=2))
           VERIFY
       - uses: actions/upload-artifact@v4
         if: always()
@@ -69,6 +114,12 @@ jobs:
             scale-authoring-evidence/backend-reuse.json
             scale-authoring-evidence/completed-frontend/
             scale-authoring-evidence/completed-sast/
+          retention-days: 3
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scale-training-reuse-${{ github.sha }}
+          path: scale-authoring-evidence/reused-training/
           retention-days: 3
           if-no-files-found: error
   browser:
@@ -174,6 +225,26 @@ jobs:
           with open(os.environ['GITHUB_ENV'],'a') as output:
             for k,v in values.items():output.write(f'{k}={v}\n')
           PY
+      - uses: actions/download-artifact@v4
+        with:
+          name: scale-training-reuse-${{ github.sha }}
+          path: ${{ runner.temp }}/scale-authoring-private/training-source
+      - name: stage fixed Training evidence without executing its journey
+        run: |
+          python3 -B - <<'STAGE'
+          import hashlib,json,os,shutil
+          from pathlib import Path
+          root=Path(os.environ['RUNNER_TEMP'])/'scale-authoring-private'
+          source=root/'training-source'; receipt=json.loads((source/'training-reuse.json').read_text())
+          shutil.copyfile(source/'training-reuse.json',root/'training-reuse.json')
+          for shot in receipt['screenshots']:
+              assert '/' not in shot['file'] and '\\' not in shot['file']
+              file=source/'browser'/shot['file'];assert hashlib.sha256(file.read_bytes()).hexdigest()==shot['sha256']
+              shutil.copyfile(file,Path(os.environ['SCALE_AUTHORING_EVIDENCE_DIR'])/shot['file'])
+          with open(os.environ['GITHUB_ENV'],'a') as output:
+              output.write('SCALE_AUTHORING_BROWSER_MODE=survey-only-fixed-training\n')
+              output.write('SCALE_AUTHORING_TRAINING_REUSE_FILE='+str(root/'training-reuse.json')+'\n')
+          STAGE
       - name: initialize empty synthetic schema only
         run: |
           bash .github/scripts/scale-authoring-backend.sh node scripts/pr24-migration-preflight.mjs

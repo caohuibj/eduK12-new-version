@@ -1,4 +1,5 @@
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {readFileSync,writeFileSync,mkdirSync,statSync} from 'node:fs';
 import {pathToFileURL} from 'node:url';
@@ -29,8 +30,17 @@ export function reportCheck(report,{allowFiltered=false,minimum=1}={}) {
   if(!allowFiltered) assert.equal(report.numPendingTests||0,0,'Selected tests skipped');
   return {passed:report.numPassedTests,filtered:report.numPendingTests||0};
 }
-export function browserCheck(report,head) {
+export function browserCheck(report,head,runId) {
   assert.equal(report.status,'PASS'); assert.equal(report.sourceCommit,head);
+  const source=report.journeySources;assert(source);
+  assert.equal(source.survey.mode,'executed');assert.equal(source.survey.sourceHead,head);assert(Number.isInteger(source.survey.runId)&&source.survey.runId>0);
+  if(runId!==undefined)assert.equal(source.survey.runId,runId);
+  if(source.training.mode==='reused') {
+    assert.equal(source.training.runId,39571934879);assert.equal(source.training.sourceHead,'7daa3ad8cb0fb9597303a2ef3e1c28c3209dd548');
+    assert.equal(source.training.reportSha256,'d7511d708d7b12dc643f02061b526da9b9bb61292ddc5172a7a1300bc95ad3e3');assert.equal(source.training.originalStatus,'FAIL');
+    assert.deepEqual(source.training.screenshotHashes,{"training-editor-1440.png":"a1f620b475d1af6b7bb6f7219caedcf7224e57c27178727d72ed4247aa874c79","training-editor-390.png":"fcc5cf3e25f9f3fed748156a6dd289e27822872850e6275c4cc65d90c1937057","training-editor-768.png":"1baa0b62047a51aec1882c9bbd78d171b308b815832a8715e92088735dfb2e5c","training-report-1440.png":"a7400392843a26c0d574d5d6970498bef087f1d08d5fc8b3478b43b4308df108","training-report-390.png":"62e73fa19b7d4c7cf30d1bc6f900d4dc3b03d913885854aa3e8a229dda1ffd73","training-report-768.png":"03fc1e967aedf3952b7e973ec0ba01787ce9cc3453ced7b94d24c8847ff0664e"});
+  } else assert.deepEqual(source.training,{mode:'executed',runId:source.survey.runId,sourceHead:head});
+
   const required=['training-editor-native','training-stable-item-operations','training-quality-roundtrip','training-published','training-final-report-image','survey-editor-native','survey-quality-roundtrip','survey-published','survey-final-report-image','survey-raw-quality-export','training-report-image-denies-other-user','survey-report-image-denies-missing-proof','desktop-mobile-layout'];
   assert.deepEqual([...report.checks].sort(),required.sort());
   assert.equal(report.blockedExternalRequests,0);assert.deepEqual(report.browserErrors,[]);
@@ -45,6 +55,7 @@ export function browserCheck(report,head) {
   const surfaces=['training-editor','training-report','survey-editor','survey-report'];
   assert.deepEqual(report.accessibility.map(x=>x.name).sort(),[...surfaces].sort());
   assert.deepEqual(report.screenshots.map(x=>x.file).sort(),surfaces.flatMap(name=>[390,768,1440].map(width=>name+'-'+width+'.png')).sort());
+  assert.deepEqual(report.measurementPublication,{status:'PUBLISHED',currentRevisionBound:true,frozenReleaseMatches:true});
   assert.deepEqual(report.participantAnswers,[{name:'training',answerCount:3,matchesFinalSnapshot:true},{name:'survey',answerCount:3,matchesFinalSnapshot:true}]);
   assert.equal(report.export.format,'RAW_WAVE');assert.equal(report.export.rowCount,3);assert.equal(report.export.downloadedFiles,3);
   assert.deepEqual(report.imageAuthorization.map(x=>x.name).sort(),['survey-missing-proof','training-other-user']);
@@ -60,6 +71,6 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href) {
     const result=validate(entries,JSON.parse(readFileSync('.github/scripts/scale-authoring-bindings.json')),{event:process.env.GITHUB_EVENT_NAME,ref:process.env.GITHUB_REF,head:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()});
     mkdirSync('scale-authoring-evidence',{recursive:true}); writeFileSync('scale-authoring-evidence/scope.json',JSON.stringify(result,null,2)); console.log(JSON.stringify(result));
   } else if(command==='report') console.log(JSON.stringify(reportCheck(JSON.parse(readFileSync(process.argv[3])),{allowFiltered:process.argv[4]==='filtered'})));
-  else if(command==='browser-report') {const report=JSON.parse(readFileSync('scale-authoring-evidence/browser/result.json'));console.log(JSON.stringify(browserCheck(report,process.env.GITHUB_SHA)));for(const shot of report.screenshots)assert(statSync('scale-authoring-evidence/browser/'+shot.file).size>0)}
+  else if(command==='browser-report') {const report=JSON.parse(readFileSync('scale-authoring-evidence/browser/result.json'));console.log(JSON.stringify(browserCheck(report,process.env.GITHUB_SHA,Number(process.env.GITHUB_RUN_ID))));for(const shot of report.screenshots){const file='scale-authoring-evidence/browser/'+shot.file;assert(statSync(file).size>0);const hash=report.journeySources.training.screenshotHashes?.[shot.file];if(hash)assert.equal(createHash('sha256').update(readFileSync(file)).digest('hex'),hash)}}
   else throw new Error('Unknown operation');
 }

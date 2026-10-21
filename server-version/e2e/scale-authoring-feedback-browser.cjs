@@ -8,7 +8,7 @@
 const assert = require('node:assert/strict')
 const fs = require('node:fs')
 const path = require('node:path')
-const { createHmac } = require('node:crypto')
+const { createHmac, createHash } = require('node:crypto')
 let chromium // Loaded only by the guarded real-browser entry; pure contracts need no browser dependency.
 const REQUIRED = ['training-editor-native', 'training-stable-item-operations', 'training-quality-roundtrip', 'training-published', 'training-final-report-image', 'survey-editor-native', 'survey-quality-roundtrip', 'survey-published', 'survey-final-report-image', 'survey-raw-quality-export', 'training-report-image-denies-other-user', 'survey-report-image-denies-missing-proof', 'desktop-mobile-layout']
 const evidence = { schemaVersion: 1, status: 'RUNNING', checks: [], screenshots: [], browserErrors: [], failedRequests: [], imageAuthorization: [], participantAnswers: [], accessibility: [], computedStyles: [], layoutChecks: [], blockedExternalRequests: 0, scope: 'Real Chromium, synthetic accounts, candidate built UI and real API/PostgreSQL; no physical-device timing claim' }
@@ -21,9 +21,25 @@ const button = (page, name) => page.getByRole('button', { name, exact: true })
 // Generated test image, no external download or personal media.
 const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAACXBIWXMAAAPoAAAD6AG1e1JrAAAAGUlEQVQokWOwyZtGEmIY1ZA3Gko2wzVpAADFt0AQijuzMgAAAABJRU5ErkJggg==', 'base64')
 const imageFile = { name: 'synthetic-feedback.png', mimeType: 'image/png', buffer: png }
+function apiFailureDetail(response, body) {
+  const clean = value => typeof value === 'string' ? redactDiagnostics(value).slice(0, 1200) : typeof value === 'number' ? value : undefined
+  const issues = body?.data?.issues ?? body?.issues ?? body?.errors
+  return {
+    phase: evidence.phase, status: response.status(), method: response.request().method(),
+    pathname: new URL(response.url()).pathname.replace(/(\/r\/)[^/]+/g, '$1[redacted]'),
+    code: clean(body?.code), message: clean(body?.message) ?? 'Response has no safe API message',
+    ...(Array.isArray(issues) ? { issues: issues.slice(0, 10).map(issue => ({
+      path: clean(Array.isArray(issue?.path) ? issue.path.join('.') : issue?.path), code: clean(issue?.code), message: clean(issue?.message),
+    })) } : {}),
+  }
+}
 async function responseData(response) {
-  assert(response.ok(), 'Real API returned HTTP ' + response.status() + ' for ' + new URL(response.url()).pathname)
-  const body = await response.json(); assert.equal(body.code, 0, 'API envelope rejected ' + new URL(response.url()).pathname)
+  // Parse only the envelope; never retain full bodies, input values, credentials or headers.
+  let body
+  try { body = await response.json() } catch {
+    throw new Error('Real API invalid JSON: ' + JSON.stringify(apiFailureDetail(response, null)))
+  }
+  if (!response.ok() || body?.code !== 0) throw new Error('Real API rejected: ' + JSON.stringify(apiFailureDetail(response, body)))
   return body.data
 }
 async function action(page, endpoint, trigger, method = 'POST') {
@@ -300,6 +316,18 @@ async function surveyJourney() {
   // PATCH ACK precedes library refresh, which resets wave feedback selections.
   // Wait for the real completed-save state before configuring the publication.
   await builder.getByRole('status').filter({ hasText: '草稿已保存；发布冻结将在研究波次阶段执行' }).waitFor()
+  phase('survey-measurement-publication')
+  await author.getByRole('tab', { name: /私有报告/ }).click()
+  const reports = author.getByRole('region', { name: '项目私有报告', exact: true })
+  // A fresh project with no releases automatically expands native publication.
+  await reports.getByRole('combobox', { name: '可发布测量', exact: true }).selectOption(created.data.id)
+  const measurement = await action(author, base + '/instruments/' + created.data.id + '/measurement-release', () => button(reports, '发布所选测量版本').click())
+  assert.equal(measurement.request.postDataJSON().revision, saved.data.revision)
+  assert.equal(measurement.data.version, String(saved.data.revision))
+  assert(measurement.data.releaseId && measurement.data.contentHash && measurement.data.measurementHash)
+  await reports.getByRole('status').filter({ hasText: '测量版本已发布，可用于编制报告；未开启被试采集。' }).waitFor()
+  await reports.getByRole('button', { name: '刷新报告与测量列表', exact: true, disabled: false }).waitFor()
+  assert.equal(await reports.getByRole('combobox', { name: '测量发布版本', exact: true }).inputValue(), measurement.data.releaseId)
   phase('survey-publication'); await author.getByRole('tab', { name: /发布与采集/ }).click()
   const waves = author.getByRole('region', { name: '研究波次', exact: true })
   await waves.getByLabel('波次标题', { exact: true }).fill('Synthetic scale wave')
@@ -311,8 +339,13 @@ async function surveyJourney() {
   await feedback.getByRole('checkbox', { name: '启用 Synthetic Survey scale 的原始指标反馈', exact: true }).check()
   await feedback.getByRole('checkbox', { name: /^Synthetic Survey scale：Synthetic dimension/ }).check()
   const waveBase = base + '/waves/' + wave.id
-  assert((await action(author, waveBase + '/preflight', () => button(waves, '检查知情同意与所有工具').click())).data.ok)
-  await action(author, waveBase + '/prepare', () => button(waves, '冻结研究定义').click())
+  const preflight = await action(author, waveBase + '/preflight', () => button(waves, '检查知情同意与所有工具').click())
+  assert(preflight.data.ok, 'Survey preflight rejected: ' + JSON.stringify(redactDiagnostics(preflight.data.checks?.filter(check => !check.ok).map(({ key, issues }) => ({ key, issues })))))
+  const prepared = await action(author, waveBase + '/prepare', () => button(waves, '冻结研究定义').click())
+  assert.equal(prepared.data.waveId, wave.id); assert.equal(prepared.data.runtimeReady, true); assert(prepared.data.publicationId && prepared.data.digest)
+  assert.equal(prepared.request.postDataJSON().revision, wave.revision)
+  const selectedMetrics = prepared.request.postDataJSON().participantFeedback[0].feedback.metricKeys
+  assert(selectedMetrics.length > 0 && selectedMetrics.every(key => measurement.data.metricKeys.includes(key)))
   const opened = (await action(author, waveBase + '/open', () => button(waves, '正式开放本轮').click())).data
   const url = new URL(opened.researchUrl); assert.equal(url.hostname, 'survey.eduk12.top'); assert(url.hash)
   check('survey-published', true)
@@ -327,8 +360,13 @@ async function surveyJourney() {
     if (i < 2) await button(participant, '下一题').click()
   }
   const surveyImage = participant.waitForResponse(r => r.request().method() === 'POST' && /\/api\/public\/survey\/r\/[^/]+\/attempts\/[^/]+\/report-images\/[^/]+$/.test(new URL(r.url()).pathname))
-  const [surveyImageResponse, final] = await Promise.all([surveyImage, action(participant, /\/api\/public\/survey\/r\/[^/]+\/attempts\/[^/]+\/final$/, () => button(participant, '提交本轮正式回答').click())])
+  const general = participant.waitForResponse(r => r.request().method() === 'POST' && /\/api\/public\/survey\/r\/[^/]+\/attempts\/[^/]+\/general$/.test(new URL(r.url()).pathname)).then(responseData)
+  const [surveyImageResponse, final, receipt] = await Promise.all([surveyImage, action(participant, /\/api\/public\/survey\/r\/[^/]+\/attempts\/[^/]+\/final$/, () => button(participant, '提交本轮正式回答').click()), general])
   assert.equal(final.data.status, 'COMPLETED')
+  const frozenMeasurement = receipt.measurements.find(item => item.instrumentKey === saved.data.instrumentKey); assert(frozenMeasurement)
+  assert.equal(frozenMeasurement.measurementReleaseId, measurement.data.releaseId, 'Participant feedback must use the exact explicitly published measurement')
+  assert.deepEqual(frozenMeasurement.metrics.map(metric => metric.key), selectedMetrics)
+  evidence.measurementPublication = { status: 'PUBLISHED', currentRevisionBound: true, frozenReleaseMatches: true }
   const surveyUnit = task.data.units.find(unit => unit.kind === 'SCALE'); assert(surveyUnit)
   const expectedSurveyAnswers = Object.fromEntries(surveyUnit.items.map((item, index) => [item.itemKey, surveyUnit.responseOptions.find(option => option.label === (index === 1 ? '不同意' : '非常不同意')).optionKey]))
   assert.deepEqual(final.request.postDataJSON().answers, { [surveyUnit.instrumentKey]: expectedSurveyAnswers }, 'Survey FINAL must retain all three original answers')
@@ -375,6 +413,34 @@ async function surveyJourney() {
   evidence.export = { format: artifact.format, rowCount: artifact.manifest.rowCount, downloadedFiles: parts.length }
   await author.context().close(); await participant.context().close()
 }
+const TRAINING_REUSE_SOURCE = Object.freeze({ sourceRun: 39571934879, sourceHead: '7daa3ad8cb0fb9597303a2ef3e1c28c3209dd548', sourceReportSha256: 'd7511d708d7b12dc643f02061b526da9b9bb61292ddc5172a7a1300bc95ad3e3' })
+function validateTrainingReuse(dto, readBytes) {
+  for (const [key, expected] of Object.entries(TRAINING_REUSE_SOURCE)) assert.equal(dto[key], expected, 'Unexpected Training source ' + key)
+  assert.equal(dto.originalStatus, 'FAIL', 'Keep original whole-run failure visible')
+  const names = ['training-editor', 'training-report']
+  const checks = ['training-stable-item-operations', 'training-editor-native', 'training-quality-roundtrip', 'training-published', 'training-final-report-image', 'training-report-image-denies-other-user']
+  assert.deepEqual(dto.checks, checks)
+  assert.deepEqual(dto.browserErrors, []); assert.equal(dto.blockedExternalRequests, 0)
+  assert.deepEqual(dto.participantAnswers, [{ name: 'training', answerCount: 3, matchesFinalSnapshot: true }])
+  assert.deepEqual(dto.imageAuthorization, [{ name: 'training-other-user', positiveStatus: 200, deniedStatus: 404, deniedImage: false, deniedLength: 60 }])
+  assert.equal(dto.screenshots.length, 6); assert.equal(dto.layoutChecks.length, 6)
+  const screenshotHashes = {}
+  for (const [index, [name, width]] of names.flatMap(name => [1440, 768, 390].map(width => [name, width])).entries()) {
+    const item = dto.screenshots[index], file = name + '-' + width + '.png'
+    assert.deepEqual({ name: item.name, width: item.width, file: item.file }, { name, width, file })
+    assert.match(item.sha256, /^[a-f0-9]{64}$/)
+    assert.equal(createHash('sha256').update(readBytes(file)).digest('hex'), item.sha256, 'Original Training screenshot bytes drifted')
+    screenshotHashes[file] = item.sha256
+    assert.deepEqual(dto.layoutChecks[index], { name, width, overflow: false })
+  }
+  assert.equal(dto.accessibility.length, 2); assert.equal(dto.computedStyles.length, 2)
+  for (const [index, name] of names.entries()) {
+    assert.equal(dto.accessibility[index].name, name); assert.equal(dto.accessibility[index].version, '4.10.3')
+    assert(dto.accessibility[index].passes > 0); assert.deepEqual(dto.accessibility[index].violations, [])
+    assert.equal(dto.computedStyles[index].name, name)
+  }
+  return { mode: 'reused', runId: dto.sourceRun, sourceHead: dto.sourceHead, reportSha256: dto.sourceReportSha256, originalStatus: dto.originalStatus, screenshotHashes }
+}
 async function main() {
   phase('prerequisites')
   assert.equal(process.env.GITHUB_ACTIONS, 'true'); assert.equal(process.env.NODE_ENV, 'test'); assert.equal(process.env.SCALE_AUTHORING_ISOLATED, '1')
@@ -402,7 +468,23 @@ async function main() {
     ;({ chromium } = require(process.env.SCALE_AUTHORING_PLAYWRIGHT_MODULE || '../backend/node_modules/playwright-core'))
     browser = await chromium.launch({ headless: true, env: { ...process.env, HOME: profileHome }, executablePath: process.env.SCALE_AUTHORING_CHROMIUM_EXECUTABLE || chromium.executablePath(), args: ['--no-sandbox', '--disable-dev-shm-usage', '--host-resolver-rules=MAP training.eduk12.top 127.0.0.1, MAP survey.eduk12.top 127.0.0.1'] })
     evidence.browserVersion = browser.version()
-    await trainingJourney(); await surveyJourney()
+    const mode = process.env.SCALE_AUTHORING_BROWSER_MODE
+    assert(mode === undefined || mode === 'survey-only-fixed-training', 'Unsupported browser journey mode')
+    if (mode === 'survey-only-fixed-training') {
+      const reusePath = path.resolve(process.env.SCALE_AUTHORING_TRAINING_REUSE_FILE || '')
+      assert.equal(reusePath, path.join(privateRoot, 'training-reuse.json')); assert.equal(fs.realpathSync(reusePath), reusePath)
+      const dto = JSON.parse(fs.readFileSync(reusePath, 'utf8'))
+      const training = validateTrainingReuse(dto, file => fs.readFileSync(path.join(output, file)))
+      for (const key of ['checks', 'layoutChecks', 'accessibility', 'computedStyles', 'participantAnswers', 'imageAuthorization']) evidence[key].push(...dto[key])
+      evidence.screenshots.push(...dto.screenshots.map(({ name, width, file }) => ({ name, width, file })))
+      evidence.journeySources = { training, survey: { mode: 'executed', runId: Number(process.env.GITHUB_RUN_ID), sourceHead: process.env.GITHUB_SHA } }
+      save()
+    } else {
+      const executed = { mode: 'executed', runId: Number(process.env.GITHUB_RUN_ID), sourceHead: process.env.GITHUB_SHA }
+      evidence.journeySources = { training: { ...executed }, survey: { ...executed } }
+      await trainingJourney()
+    }
+    await surveyJourney()
     check('desktop-mobile-layout', evidence.screenshots.length === 12)
     assert.equal(evidence.layoutChecks.length, 12)
     assert(evidence.layoutChecks.every(item => !item.overflow), 'Document overflow recorded in layoutChecks')
@@ -426,4 +508,4 @@ if (require.main === module) main().catch(error => {
   if (output) { try { save() } catch (writeError) { console.error('Evidence write failed:', JSON.stringify(failureDetail(writeError, 'evidence-write'))) } }
   process.exitCode = 1
 })
-module.exports = { answerTrainingItem, totpAt, redactDiagnostics, failureDetail, assertDeniedImage, assertExportParts, REQUIRED }
+module.exports = { validateTrainingReuse, TRAINING_REUSE_SOURCE, apiFailureDetail, answerTrainingItem, totpAt, redactDiagnostics, failureDetail, assertDeniedImage, assertExportParts, REQUIRED }

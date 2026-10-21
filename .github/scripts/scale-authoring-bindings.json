@@ -28,15 +28,15 @@
     },
     ".github/scripts/scale-authoring-scope.mjs": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "edfeb3c145d91e8994eb26690a9b24aea9efb864"
+      "after": "7ea1ad71327d290e0f55f87ca408e3551b5bbd77"
     },
     ".github/scripts/scale-authoring-scope.test.mjs": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "9460c191360ff4dc5e2f05133c1060a0427f6371"
+      "after": "92b248bc17254836e095ad6e082f749f777949a0"
     },
     ".github/workflows/ci-scale-authoring-browser-diagnostic.yml": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "2208aabcf93cdfed2e6613a5f2012827515827be"
+      "after": "ef96d95cfae1b8bac3b3d97ab067ed019ffb777e"
     },
     ".github/workflows/ci-scale-authoring-evidence.yml": {
       "before": "0000000000000000000000000000000000000000",
@@ -284,11 +284,11 @@
     },
     "server-version/e2e/scale-authoring-feedback-browser.cjs": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "fe184d4da1027ca9e7aa0381267647ebc7e3fd18"
+      "after": "15c07b345caeb969755e0d0ab1df64e04c4d8c7d"
     },
     "server-version/e2e/scale-authoring-feedback-browser.test.cjs": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "811bebb7896534d01d6ee9aae47e63bc70bfd5bf"
+      "after": "b00abbcf6eb86a4733b1f68f21800d33e16d1488"
     },
     "server-version/frontend/src/modules/composite/CompositeReportPage.tsx": {
       "before": "ececf212fdaeb80af244be4317908fe0e49c6623",

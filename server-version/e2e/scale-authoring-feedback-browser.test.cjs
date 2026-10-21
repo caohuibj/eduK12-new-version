@@ -121,3 +121,53 @@ test('Training final answer waits for selection and enabled explicit submit with
   assert(source.includes("trainingFinal.request.postDataJSON().answers.map(({ itemCode, responseValue }) => ({ itemCode, responseValue })), expectedAnswers"))
   assert(source.includes("final.request.postDataJSON().answers, { [surveyUnit.instrumentKey]: expectedSurveyAnswers }"))
 })
+
+test('API failure diagnostics retain business rejection and issue fields without bodies or credentials', () => {
+  const { apiFailureDetail } = require('./scale-authoring-feedback-browser.cjs')
+  const response = { status: () => 409, request: () => ({ method: () => 'POST' }), url: () => 'https://survey.test/api/public/survey/r/private-cap/attempts/one/prepare' }
+  const detail = apiFailureDetail(response, { code: 'CONTENT_RELEASE_NOT_PUBLISHED', message: '请先显式发布当前修订的测量版本，再冻结波次',
+    token: 'secret-body', data: { accessCredential: 'private-proof', issues: [{ path: ['items', 1], code: 'invalid_type', message: 'invalid token=unsafe', input: 'private-input' }] } })
+  assert.equal(detail.status, 409); assert.equal(detail.code, 'CONTENT_RELEASE_NOT_PUBLISHED')
+  assert.equal(detail.message, '请先显式发布当前修订的测量版本，再冻结波次')
+  assert.equal(detail.issues[0].path, 'items.1')
+  for (const secret of ['private-cap', 'secret-body', 'private-proof', 'private-input', 'unsafe']) assert(!JSON.stringify(detail).includes(secret))
+  assert.equal(apiFailureDetail(response, null).message, 'Response has no safe API message')
+})
+function trainingReuseFixture() {
+  const { TRAINING_REUSE_SOURCE } = require('./scale-authoring-feedback-browser.cjs')
+  const bytes = Buffer.from('original synthetic screenshot bytes')
+  const hash = require('node:crypto').createHash('sha256').update(bytes).digest('hex')
+  const pairs = ['training-editor', 'training-report'].flatMap(name => [1440, 768, 390].map(width => ({ name, width })))
+  return { bytes, dto: { ...TRAINING_REUSE_SOURCE, originalStatus: 'FAIL',
+    checks: ['training-stable-item-operations', 'training-editor-native', 'training-quality-roundtrip', 'training-published', 'training-final-report-image', 'training-report-image-denies-other-user'],
+    screenshots: pairs.map(pair => ({ ...pair, file: pair.name + '-' + pair.width + '.png', sha256: hash })),
+    layoutChecks: pairs.map(pair => ({ ...pair, overflow: false })),
+    accessibility: ['training-editor', 'training-report'].map(name => ({ name, version: '4.10.3', passes: 17, violations: [] })),
+    computedStyles: ['training-editor', 'training-report'].map(name => ({ name })),
+    participantAnswers: [{ name: 'training', answerCount: 3, matchesFinalSnapshot: true }],
+    imageAuthorization: [{ name: 'training-other-user', positiveStatus: 200, deniedStatus: 404, deniedImage: false, deniedLength: 60 }], browserErrors: [], blockedExternalRequests: 0,
+  } }
+}
+test('fixed Training reuse verifies exact source, actual screenshot bytes and every inherited gate', () => {
+  const { validateTrainingReuse } = require('./scale-authoring-feedback-browser.cjs')
+  const { dto, bytes } = trainingReuseFixture()
+  const source = validateTrainingReuse(dto, () => bytes)
+  assert.equal(source.runId, 39571934879); assert.equal(source.originalStatus, 'FAIL'); assert.equal(Object.keys(source.screenshotHashes).length, 6)
+  for (const mutate of [
+    d => { d.sourceRun++ }, d => { d.sourceReportSha256 = '0'.repeat(64) }, d => { d.originalStatus = 'PASS' },
+    d => { d.checks.pop() }, d => { d.screenshots[0].file = '../unsafe.png' }, d => { d.layoutChecks[0].overflow = true },
+    d => { d.accessibility[1].violations.push({ id: 'contrast' }) }, d => { d.participantAnswers[0].answerCount = 2 },
+    d => { d.imageAuthorization[0].deniedStatus = 500 },
+  ]) { const altered = structuredClone(dto); mutate(altered); assert.throws(() => validateTrainingReuse(altered, () => bytes)) }
+  assert.throws(() => validateTrainingReuse(dto, () => Buffer.from('changed bytes')))
+})
+test('Survey explicitly publishes current revision before freezing and binds participant receipt to that release', () => {
+  const source = fs.readFileSync(require.resolve('./scale-authoring-feedback-browser.cjs'), 'utf8')
+  const published = source.indexOf("phase('survey-measurement-publication')")
+  assert(published > source.indexOf("await builder.getByRole('status')"))
+  assert(source.indexOf("phase('survey-publication')") > published)
+  assert(source.includes("measurement.request.postDataJSON().revision, saved.data.revision"))
+  assert(source.includes("measurement.data.version, String(saved.data.revision)"))
+  assert(source.includes("frozenMeasurement.measurementReleaseId, measurement.data.releaseId"))
+  assert(source.includes("name: '刷新报告与测量列表', exact: true, disabled: false"))
+})
