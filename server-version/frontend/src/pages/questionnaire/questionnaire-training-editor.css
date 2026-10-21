@@ -178,3 +178,30 @@
 .hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-off{margin-top:13px;font-size:12px;color:#62755a;}
 .hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-settings .training-public-delivery{padding-top:21px;border-top:1px solid #e0e8d8;}
 @media(max-width:640px){.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-settings{padding:15px}.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-expiry{padding:13px}.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-anonymous-expiry>input{flex-basis:100%}}
+
+/* Align the editor with the workspace navigation; keep secondary settings in
+   the overview column and keep the action bar in the document flow. */
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor{max-width:1280px;padding:0 0 28px}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-breadcrumb{margin-bottom:10px}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .hui-page-header{margin-bottom:20px}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-workspace{grid-template-columns:minmax(0,1fr) 290px;gap:24px}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-sidebar{position:static;gap:16px}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-tool-summary{padding:20px;border:1px solid var(--qt-line);border-radius:11px;background:#f4f7ef}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-tool-summary h3{font-size:15px;margin-bottom:14px}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-tool-summary dl{display:grid;gap:10px;font-size:13px}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-tool-summary dl>div{display:flex;justify-content:space-between;gap:14px}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-tool-summary dt{color:var(--qt-muted)}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-tool-summary a{display:block;margin-top:16px;font-size:13px;line-height:1.7;text-decoration:none;color:var(--qt-green);font-weight:600}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-tool-pending{margin-top:14px;padding:10px;border-radius:7px;background:#fff3df;color:#795522;font-size:13px}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-footer{position:static;margin-top:24px;box-shadow:none}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-summary :is(dl,ul){font-size:13px}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-summary>p{margin:7px 0 20px}
+@media(max-width:1000px){.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-workspace{grid-template-columns:minmax(0,1fr) 250px;gap:18px}}
+@media(max-width:820px){.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-workspace{grid-template-columns:1fr}.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-sidebar{grid-template-columns:repeat(2,minmax(0,1fr));align-items:start}.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-help{grid-column:1/-1}}
+@media(max-width:540px){.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-sidebar{grid-template-columns:1fr}.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-tool-summary{padding:18px}.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-footer{flex-wrap:wrap}.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-footer>div{flex:1;justify-content:flex-end}}
+
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor fieldset[aria-label="组合测评编辑"]{background:transparent!important}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor label{font-size:14px}
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor :is(input:not([type=checkbox]):not([type=radio]),select,textarea){font-size:15px}
+
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .qt-type-tabs button[aria-pressed=true]{background:#edf4e6;border-color:#75966c;color:#2b553e;box-shadow:inset 0 0 0 1px #75966c30}

@@ -26,6 +26,12 @@ export default function TrainingLibrary({ area }:{area:'media'|'tools'}) {
   const [rename,setRename]=useState<Row|null>(null),[name,setName]=useState(''),[busy,setBusy]=useState(false)
   const [preview,setPreview]=useState<Row|null>(null),[upload,setUpload]=useState<'video'|'image'|'document'|null>(null)
   const update=(key:string,value:string)=>{const next=new URLSearchParams(params);if(value==='all'||!value)next.delete(key);else next.set(key,value);next.delete('page');setParams(next,{replace:true})}
+  useEffect(()=>{setNotice('')},[area,keyword,kind,source,page])
+  useEffect(()=>{
+    if(!notice)return
+    const timer=window.setTimeout(()=>setNotice(''),5000)
+    return()=>window.clearTimeout(timer)
+  },[notice])
   useEffect(()=>{setSearch(keyword)},[keyword])
   useEffect(()=>{
     let active=true;setLoading(true);setError('')
@@ -35,7 +41,7 @@ export default function TrainingLibrary({ area }:{area:'media'|'tools'}) {
     return()=>{active=false}
   },[media,keyword,kind,source,page,revision,setParams])
   async function saveName(){
-    if(!rename||!name.trim())return;setBusy(true);setError('')
+    if(!rename||!name.trim())return;setBusy(true);setError('');setNotice('')
     try{const result=await apiClient.patch(`/training-workspace/media/${rename.id}/name`,{name:name.trim()});if(result.code!==0)throw new Error(result.message);setRename(null);setNotice('名称已更新，已有引用保持有效。');setRevision(value=>value+1)}catch(cause){setError(cause instanceof Error?cause.message:'改名失败')}finally{setBusy(false)}
   }
   async function updateVersion(row:Row){
@@ -58,7 +64,7 @@ export default function TrainingLibrary({ area }:{area:'media'|'tools'}) {
     <div className="training-library-toolbar"><form role="search" onSubmit={event=>{event.preventDefault();update('keyword',search.trim())}}><Search size={20} aria-hidden="true"/><input aria-label={media?'检索媒体':'检索工具'} placeholder={media?'搜索媒体名称':'搜索工具名称或介绍'} value={search} onChange={event=>setSearch(event.target.value)}/>{search&&<button type="button" aria-label="清除检索" onClick={()=>{setSearch('');update('keyword','')}}><X size={16}/></button>}<button type="submit">检索</button></form>
       <label>来源<select aria-label="资源来源" value={source} onChange={event=>update('source',event.target.value)}><option value="all">全部来源</option><option value="owned">{media?'我上传的':'我编制的'}</option><option value="granted">已获授权</option></select></label></div>
     <div className="training-library-filter"><div role="group" aria-label="资源类型">{(media?mediaKinds:toolKinds).map(([value,label])=><button key={value} aria-pressed={kind===value} onClick={()=>update('kind',value)}>{label}</button>)}</div><span>{loading?'正在读取…':`共 ${total} 项`}</span></div>
-    {error&&!rename&&<div role="alert" className="training-library-error">{error}<button onClick={()=>setRevision(value=>value+1)}>重新读取</button></div>}{notice&&<p role="status">{notice}</p>}
+    {error&&!rename&&<div role="alert" className="training-library-error">{error}<button onClick={()=>setRevision(value=>value+1)}>重新读取</button></div>}{notice&&<div role="status" className="training-library-notice"><span>{notice}</span><button type="button" aria-label="关闭提示" onClick={()=>setNotice('')}><X size={16}/></button></div>}
     {loading?<p role="status" className="training-library-empty">正在读取{media?'媒体':'工具'}…</p>:!error&&!rows.length?<div className="training-library-empty"><Wrench size={28}/><h2>暂无符合条件的{media?'媒体':'工具'}</h2><p>调整检索和筛选条件，或{media?'上传新的素材':'编制你的第一个工具'}。</p></div>:<div className="training-library-grid">{rows.map(row=>{
       const Icon=row.kind==='image'?Image:row.kind==='video'?Video:media?FileText:Wrench
       const versionable=row.canUpdateVersion===true&&row.source==='owned'&&row.status==='PUBLISHED'&&['scale','form','composition','form-composition','sjt-draft'].includes(row.kind)

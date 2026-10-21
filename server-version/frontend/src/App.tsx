@@ -297,8 +297,8 @@ function AppRoutes() {
           {/* Admin/Teacher Routes */}
           <Route path="/assessment-workbench" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><AssessmentWorkbench /></ProtectedRoute>} />
           <Route path="/assessment-templates" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><AssessmentTemplates /></ProtectedRoute>} />
-          <Route path="/media-library" element={<ProtectedRoute roles={['TEACHER']}><TrainingLibrary area="media" /></ProtectedRoute>} />
-          <Route path="/toolkit" element={<ProtectedRoute roles={['TEACHER']}><TrainingLibrary area="tools" /></ProtectedRoute>} />
+          <Route path="/media-library" element={<ProtectedRoute roles={['TEACHER']}><TrainingLibrary key="media" area="media" /></ProtectedRoute>} />
+          <Route path="/toolkit" element={<ProtectedRoute roles={['TEACHER']}><TrainingLibrary key="tools" area="tools" /></ProtectedRoute>} />
           <Route path="/toolkit/compositions/:id" element={<ProtectedRoute roles={['TEACHER']}><QuestionnaireProductEdit /></ProtectedRoute>} />
           <Route path="/assessment-management" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><AssessmentManagement /></ProtectedRoute>} />
           <Route

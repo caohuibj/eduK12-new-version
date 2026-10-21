@@ -1395,6 +1395,11 @@ export function QuestionnaireProductEdit() {
     {(workspaceMeasured||needsToolRecovery)&&scientificTools}
     {detail&&!draft&&<p>已发布版本的配置保持冻结；需要修订内容时，请从工具包创建新版本草稿。</p>}
   </div>
+  const toolConfigurationSummary = detail&&(workspaceMeasured||externalToolPending)&&<section className="qt-tool-summary" aria-label="工具配置与报告">
+    <h3>工具配置与报告</h3><dl><div><dt>单独报告方案</dt><dd>{detail.trainingReportSelectionDraft?.units?.length?'已选择':'未选择'}</dd></div><div><dt>参考</dt><dd>{detail.trainingReferenceSelectionDraft?.units?.length?'已选择':'未选择'}</dd></div></dl>
+    {externalToolPending&&<p role="status" className="qt-tool-pending">有一项参数／报告请求尚未确认，请在工具包核对后继续修改。</p>}
+    <Link to={'/toolkit/compositions/'+id}>在工具包中管理参数、参考与报告 →</Link>
+  </section>
   if (trainingDesign) return (
     <ProductPage width="management" className="hui-questionnaire-products training-form-management qt-editor">
       <Link className="qt-breadcrumb" to={assessmentContextHref('/questionnaires',location.pathname,location.search)}>组合测评 <span>/</span> {draft ? '编制草稿' : '查看测评'}</Link>
@@ -1402,7 +1407,6 @@ export function QuestionnaireProductEdit() {
         description="从内容编排到发布，按步骤完成一份课程测评。"
         actions={<><span className="qt-draft-status">{busy ? '正在处理…' : dirty ? '有未保存的修改' : labels[detail?.status] || '新建草稿'}</span>{draft && <ProductButton variant="primary" disabled={authoringLocked || busy || (id !== 'new' && !dirty)} onClick={() => void save()}><Save size={16} />{id === 'new' ? '创建草稿' : '保存全部设置'}</ProductButton>}</>} />
       {feedback}
-      {detail&&(workspaceMeasured||externalToolPending)&&<section className="qt-advanced"><h2>工具配置与报告</h2><p>{detail.items?.length||0} 项内容 · 单独报告方案{detail.trainingReportSelectionDraft?.units?.length?'已选择':'未选择'} · 参考{detail.trainingReferenceSelectionDraft?.units?.length?'已选择':'未选择'}</p><p>{externalToolPending?'有一项参数／报告请求尚未确认，请在工具包核对后继续修改。':'当前内容单元、测量版本及报告方案沿用已保存的设置。'}</p><Link to={'/toolkit/compositions/'+id}>在工具包中管理参数、参考与报告 →</Link></section>}
       {pendingMeasurement&&<p role="status">请先恢复或明确结束原认知发布请求，再修改组合测评。</p>}
       <nav aria-label="编制步骤" className="qt-steps">
         {editorSteps.map(([key,label,hint], index) => <a key={key} href={'#'+key}
@@ -1447,7 +1451,7 @@ export function QuestionnaireProductEdit() {
               </div>
             </section>}
           </div>
-          <aside className="qt-sidebar" aria-label="编制概览"><div className="qt-summary"><small>当前测评</small><h2>{name.trim() || '未命名测评'}</h2><p>{kind === 'COURSE' ? '课程问卷' : '通用公开问卷'} · 单项报告合集</p><dl><div><dt>内容单元</dt><dd>{units.length} 个</dd></div><div><dt>投放课程</dt><dd>{courseIds.map(courseId => catalog.courses.find((course:any) => course.id === courseId)?.title || '已绑定课程').join('、') || '尚未选择'}</dd></div><div><dt>开放时间</dt><dd>{opensAt ? localDate(opensAt).replace('T',' ') : '发布后立即开放'}</dd></div><div><dt>报告开放</dt><dd>{reportSummary}</dd></div></dl><div className="qt-ready-title"><h3>{draft ? '发布准备' : '当前状态'}</h3><span>{draft ? `${readyItems.filter(([,ready]) => ready).length} / 4` : labels[detail?.status]}</span></div>{draft && <><progress aria-label="发布准备完成度" value={readyItems.filter(([,ready]) => ready).length} max={4} /><ul>{readyItems.map(([label,ready]) => <li key={label} className={ready ? 'is-ready' : ''}><span>{ready ? <Check size={12} /> : '·'}</span>{label}</li>)}</ul></>}</div><div className="qt-help"><ListChecks size={17} /><h3>{['先把测评介绍清楚','先确定内容，再安排投放','先设置必需项，再查看可选项','发布前再核对一次'][stepIndex]}</h3><p>{['名称便于课程成员识别，指导语会展示给学员。','可添加不同类型的单元，再按学员作答顺序排列。','课程、开放时间和报告反馈是主流程，高级策略按需启用。','正式发布会再次校验权限；发布后内容和相关策略冻结。'][stepIndex]}</p></div></aside>
+          <aside className="qt-sidebar" aria-label="编制概览"><div className="qt-summary"><small>当前测评</small><h2>{name.trim() || '未命名测评'}</h2><p>{kind === 'COURSE' ? '课程问卷' : '通用公开问卷'} · 单项报告合集</p><dl><div><dt>内容单元</dt><dd>{units.length} 个</dd></div><div><dt>投放课程</dt><dd>{courseIds.map(courseId => catalog.courses.find((course:any) => course.id === courseId)?.title || '已绑定课程').join('、') || '尚未选择'}</dd></div><div><dt>开放时间</dt><dd>{opensAt ? localDate(opensAt).replace('T',' ') : '发布后立即开放'}</dd></div><div><dt>报告开放</dt><dd>{reportSummary}</dd></div></dl><div className="qt-ready-title"><h3>{draft ? '发布准备' : '当前状态'}</h3><span>{draft ? `${readyItems.filter(([,ready]) => ready).length} / 4` : labels[detail?.status]}</span></div>{draft && <><progress aria-label="发布准备完成度" value={readyItems.filter(([,ready]) => ready).length} max={4} /><ul>{readyItems.map(([label,ready]) => <li key={label} className={ready ? 'is-ready' : ''}><span>{ready ? <Check size={12} /> : '·'}</span>{label}</li>)}</ul></>}</div>{toolConfigurationSummary}<div className="qt-help"><ListChecks size={17} /><h3>{['先把测评介绍清楚','先确定内容，再安排投放','先设置必需项，再查看可选项','发布前再核对一次'][stepIndex]}</h3><p>{['名称便于课程成员识别，指导语会展示给学员。','可添加不同类型的单元，再按学员作答顺序排列。','课程、开放时间和报告反馈是主流程，高级策略按需启用。','正式发布会再次校验权限；发布后内容和相关策略冻结。'][stepIndex]}</p></div></aside>
         </div>
         <footer className="qt-footer"><ProductButton disabled={busy || stepIndex === 0} onClick={() => goToStep(id === 'new' ? 'questionnaire-basic' : editorSteps[stepIndex-1][0])}><ArrowLeft size={16} />上一步</ProductButton><span role="status">{busy ? '正在处理，请稍候…' : id === 'new' ? '先创建草稿，再添加测评内容。' : dirty ? '有未保存的修改，请先保存。' : '设置已同步'}</span><div>{draft && id !== 'new' && <ProductButton disabled={busy || !dirty} onClick={() => void save()}>保存全部修改</ProductButton>}{stepIndex < 3 && <ProductButton variant="primary" disabled={busy} onClick={() => id === 'new' ? void save() : goToStep(editorSteps[stepIndex+1][0])}>{id === 'new' ? '创建草稿，继续编排' : `下一步：${editorSteps[stepIndex+1][1]}`}<ArrowRight size={16} /></ProductButton>}</div></footer>
       </fieldset>}
