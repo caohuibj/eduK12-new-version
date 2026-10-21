@@ -1,0 +1,103 @@
+{
+  "schemaVersion": 1,
+  "frozenReviewPackageSha256": "dd5dd13703c14aec03be313354961e36a7b1f0b1d25fca432a800f3d3dc4395c",
+  "instrumentLicense": {
+    "type": "AUTHOR_FREE_USE_GRANT_COPYRIGHT_RETAINED",
+    "source_url": "https://rckessler.scholars.harvard.edu/k10-and-k6-scales",
+    "quotation": "Use of the K6 and K10 is free and does not require any formal permission or approval.",
+    "translation_grant_summary": "The same author page expressly posts translations for unrestricted use, subject to copyright acknowledgement and citation of Kessler et al.(2003).",
+    "copyright_english": "© Ronald C. Kessler, PhD. 2003. All rights reserved.",
+    "copyright_mandarin": "© Ronald C. Kessler, PhD. 2006. All rights reserved.",
+    "underlying_notice": "Based on the Composite International Diagnostic Interview ©2001 Ronald C. Kessler, PhD. All rights reserved.",
+    "required_citation_doi": "10.1001/archpsyc.60.2.184",
+    "historical_permission_notice": "PDFs retain an older request-permission footer. Current rights-holder webpage provides free/unrestricted-use permission; preserve both provenance and copyright, do not label CC0/public domain.",
+    "archive_policy": "Official English and Mandarin instrument text reproduced under current author grant; source PDFs linked only in this package. Journal articles link only. Copyright retained; not public domain."
+  },
+  "sourceIdentity": {
+    "family": "K6/K10",
+    "counting_rule": "One K6 candidate; K10, language editions and administration modes are not counted as additional instruments.",
+    "selected_version": "Six scored K6 symptom questions Q1a–f, extracted verbatim from official K6+ self-report form; past30days. Not an entire reproduction of all K6+ supplementary questions.",
+    "primary_language_candidate": "Official author-hosted Mandarin translation (2006 copyright notice); original English retained for verification.",
+    "function_tags": [
+      "nonspecific_psychological_distress",
+      "symptom_severity",
+      "mental_health_screening",
+      "change_monitoring"
+    ],
+    "population_scope": "Adult first-review scope. No youth validity or universal Chinese norms inferred.",
+    "version_lock": "Retain 30-day frame, exact six stems and frequency labels. Do not substitute worst-month-in-past-year or7-day questions without a separate version/evidence review."
+  },
+  "originalPapersLinkOnly": [
+    {
+      "role": "Original development paper",
+      "citation": "Kessler RC, Andrews G, Colpe LJ, Hiripi E, Mroczek DK, Normand SLT, Walters EE, Zaslavsky AM. Short screening scales to monitor population prevalences and trends in non-specific psychological distress. Psychological Medicine.2002;32(6):959–976.",
+      "doi": "10.1017/S0033291702006074",
+      "fulltext_url": "https://www.researchgate.net/profile/Daniel-Mroczek/publication/11174017_Short_Screening_Scales_to_Monitor_Population_Prevlances_and_Trends_in_Non-Specific_Psychological_Distress/links/09e415086e6f1ba56f000000/Short-Screening-Scales-to-Monitor-Population-Prevlances-and-Trends-in-Non-Specific-Psychological-Distress.pdf",
+      "access_status": "18-page original paper readable from coauthor Daniel Mroczek profile; copyright Cambridge University Press2002. Publicly readable copy, not an established open redistribution license.",
+      "summary": "K6 and K10 were developed for general health surveys using item-response methods. Table2 identifies final six symptoms and30-day frame.",
+      "backup": "LINK_ONLY"
+    },
+    {
+      "role": "Required author citation and SMI calibration",
+      "citation": "Kessler RC et al. Screening for serious mental illness in the general population. Archives of General Psychiatry.2003;60(2):184–189.",
+      "doi": "10.1001/archpsyc.60.2.184",
+      "fulltext_url": "https://jamanetwork.com/journals/jamapsychiatry/fullarticle/207204",
+      "author_copy_url": "https://www.hcp.med.harvard.edu/ncs/ftpdir/PA284.pdf",
+      "access_status": "Publisher full article readable through web; author copy indexed but direct fetch timed out. No article PDF copied.",
+      "summary": "Enriched convenience sample155; reference12-month DSM-IV disorder (excluding substance-use disorder) with GAF<60. Cutoff13+ on0–24 equalized weighted false positives/negatives; sensitivity.36, specificity.96. Critically, NHSDA implementation changed recall to the emotionally worst month within the previous12months. These performance estimates must not be presented as validation of the selected30-day Mandarin form.",
+      "backup": "LINK_ONLY"
+    }
+  ],
+  "translationProvenance": "Yueqin Huang, MD, MPH, PhD, and Ping Liu, MD, Institute of Mental Health, Peking University, Beijing; translation on behalf of the Composite International Diagnostic Interview Advisory Committee.",
+  "chineseStatus": "作者官网普通话译本，精确验证版本对应未建立。仅供研究材料审查，不供实际施测或临床使用；并非 AI 自译。",
+  "chineseValidationEvidence": [
+    {
+      "citation": "Kang YK et al. The6-item Kessler psychological distress scale to survey serious mental illness among Chinese undergraduates: Psychometric properties and prevalence estimate. Comprehensive Psychiatry.2015;63:105–112.",
+      "doi": "10.1016/j.comppsych.2015.08.011",
+      "url": "https://pubmed.ncbi.nlm.nih.gov/26555498/",
+      "population": "8,289 randomly sampled students at one major comprehensive Chinese university;222 reassessed/interviewed using Chinese CIDI3.1.",
+      "reliability": {
+        "alpha": 0.84,
+        "test_retest": 0.79
+      },
+      "study_screening_cutoff": {
+        "operator": ">=",
+        "value": 13,
+        "scale": "0–24",
+        "sensitivity": 0.83,
+        "specificity": 0.79,
+        "metadataOnly": true,
+        "autoApply": false
+      },
+      "caveat": "Primary abstract evidence only; exact Chinese wording, translator lineage, recall and scoring implementation need full-text/version matching. Not national norms and not proof for all ages or Mandarin-speaking populations.",
+      "exact_match_to_selected_form": false
+    },
+    {
+      "citation": "Lee et al. Performance of the6-item Kessler scale for measuring serious mental illness in Hong Kong. Comprehensive Psychiatry.2012;53(5):584–592.",
+      "doi": "10.1016/j.comppsych.2011.10.001",
+      "url": "https://www.sciencedirect.com/science/article/abs/pii/S0010440X11001970",
+      "population": "Hong Kong telephone population survey3,014;153 clinician reassessments.",
+      "reliability": "Abstract reports high internal consistency and test-retest reliability; coefficients not independently extracted.",
+      "caveat": "Cantonese/Hong Kong context is not a validation of the author-posted Mandarin translation; no Hong Kong prevalence or individual probability transplanted into reports.",
+      "exact_match_to_selected_form": false,
+      "verification_status": "PENDING_PRIMARY_RECHECK: reviewer received HTTP403; numeric AUC/cutpoint claim omitted, not approved evidence."
+    }
+  ],
+  "originalEnglishThresholdsReviewOnly": {
+    "screening_reference": {
+      "operator": ">=",
+      "value": 13,
+      "scale": "0–24",
+      "source_doi": "10.1001/archpsyc.60.2.184",
+      "source_url": "https://rckessler.scholars.harvard.edu/sites/g/files/omnuum8166/files/2026-03/Scoring_K6_K10.pdf",
+      "target": "Research screening reference for serious mental illness in source study, not a diagnosis.",
+      "population_and_period": "2003 enriched US calibration, weighted for population estimation; worst-month-in-previous12months implementation differs from selected past30days.",
+      "auto_apply_to_selected_chinese_form": false
+    },
+    "severity_bands": [],
+    "norms": null,
+    "interpretation_policy": "No mild/moderate/severe bands or percentile norms approved. Display continuous0–24 descriptive distress score only pending independent review; any future threshold display must name applicable population, period, language and source.",
+    "prevalence_warning": "Do not estimate SMI prevalence as raw percentage scoring13+ in arbitrary sample; official scoring FAQ warns calibration depends on population characteristics."
+  },
+  "scope": "Six Q1a–f symptoms only, not complete K6+. No added attention or safety item. No article PDFs, app registration, deployment or human review claim. Current 30-day Mandarin report has no automatic threshold/band."
+}
