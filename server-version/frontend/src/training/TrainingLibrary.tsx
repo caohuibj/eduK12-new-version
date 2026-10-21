@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
-import { Search, Plus, Upload, FileText, Image, Video, Wrench, ArrowUpRight, Pencil, X } from 'lucide-react'
+import { Search, Plus, Upload, FileText, Image, Video, Wrench, ArrowRight, Pencil, X } from 'lucide-react'
 import apiClient from '../api/client'
 import MediaSelector from '../components/MediaSelector'
 import { ProductButton } from '../components/product-ui'
@@ -9,6 +9,7 @@ import FormalReferenceStudio from './FormalReferenceStudio'
 import { useAuth } from '../contexts/AuthContext'
 import './training-workspace.css'
 import './training-workspace-heading.css'
+import './training-workspace-cards.css'
 
 type Row = { canUpdateVersion?:boolean; id:string; name:string; kind:string; description?:string; source:'owned'|'granted'; status?:string; version?:string; size?:number; url?:string; updatedAt?:string; href?:string }
 const labels:Record<string,string> = {image:'图片',video:'视频',document:'文档',scale:'量表',form:'表单','form-composition':'表单',situational:'情境判断', 'sjt-draft':'情境判断',cognitive:'认知测验',composition:'组合测评',bundle:'组合测评 · 预置授权'}
@@ -59,17 +60,38 @@ export default function TrainingLibrary({ area }:{area:'media'|'tools'}) {
   }
   const pages=Math.max(1,Math.ceil(total/12))
   return <div className="training-library">
-    <header className="training-library-heading training-workspace-heading"><div><p className="training-library-eyebrow">我的工作台</p><h1>{media?'媒体库':'工具包'}</h1><p>{media?'统一管理上传的素材，查找已获授权的教学资源。':'编制和管理教学工具，按授权使用测验与组合测评。'}</p></div>
+    <header className="training-library-heading training-workspace-heading"><div><h1>{media?'媒体':'工具'}</h1><p>{media?'统一管理上传的素材，查找已获授权的教学资源。':'编制和管理教学工具，按授权使用测验与组合测评。'}</p></div>
       <form className="training-workspace-search" role="search" onSubmit={event=>{event.preventDefault();update('keyword',search.trim())}}><Search size={18} aria-hidden="true"/><input aria-label={media?'检索媒体':'检索工具'} placeholder={media?'搜索媒体名称':'搜索工具名称或介绍'} value={search} onChange={event=>setSearch(event.target.value)}/>{search&&<button type="button" aria-label="清除检索" onClick={()=>{setSearch('');update('keyword','')}}><X size={16}/></button>}<button type="submit">检索</button></form>
       <details className="training-library-create"><summary><Plus size={18}/>{media?'上传媒体':'编制工具'}</summary><div>{media?(['video','image','document'] as const).map(type=><button key={type} onClick={()=>{setUpload(type);document.querySelector<HTMLDetailsElement>('.training-library-create')?.removeAttribute('open')}}><Upload size={16}/>上传{labels[type]}</button>):<><Link to="/scales">编制量表</Link><Link to="/general-questionnaires/create">编制表单</Link><Link to="/sjt-authoring">编制情境判断</Link><Link to="/questionnaire-products/new">编制组合测评</Link></>}</div></details>
     </header>
     <div className="training-library-filter"><div role="group" aria-label="资源类型">{(media?mediaKinds:toolKinds).map(([value,label])=><button key={value} aria-pressed={kind===value} onClick={()=>update('kind',value)}>{label}</button>)}</div><div className="training-library-filter-meta"><label>来源<select aria-label="资源来源" value={source} onChange={event=>update('source',event.target.value)}><option value="all">全部来源</option><option value="owned">{media?'我上传的':'我编制的'}</option><option value="granted">已获授权</option></select></label><span>{loading?'正在读取…':`共 ${total} 项`}</span></div></div>
     {error&&!rename&&<div role="alert" className="training-library-error">{error}<button onClick={()=>setRevision(value=>value+1)}>重新读取</button></div>}{notice&&<div role="status" className="training-library-notice"><span>{notice}</span><button type="button" aria-label="关闭提示" onClick={()=>setNotice('')}><X size={16}/></button></div>}
-    {loading?<p role="status" className="training-library-empty">正在读取{media?'媒体':'工具'}…</p>:!error&&!rows.length?<div className="training-library-empty"><Wrench size={28}/><h2>暂无符合条件的{media?'媒体':'工具'}</h2><p>调整检索和筛选条件，或{media?'上传新的素材':'编制你的第一个工具'}。</p></div>:<div className="training-library-grid">{rows.map(row=>{
+    {loading?<p role="status" className="training-library-empty">正在读取{media?'媒体':'工具'}…</p>:!error&&!rows.length?<div className="training-library-empty"><Wrench size={28}/><h2>暂无符合条件的{media?'媒体':'工具'}</h2><p>调整检索和筛选条件，或{media?'上传新的素材':'编制你的第一个工具'}。</p></div>:<div className="training-library-grid training-workspace-grid">{rows.map(row=>{
       const Icon=row.kind==='image'?Image:row.kind==='video'?Video:media?FileText:Wrench
       const versionable=row.canUpdateVersion===true&&row.source==='owned'&&row.status==='PUBLISHED'&&['scale','form','composition','form-composition','sjt-draft'].includes(row.kind)
-      return <article key={row.kind+':'+row.id} className="training-library-card"><div className="training-library-card-top"><span className="training-library-icon"><Icon size={24}/></span><span className="training-library-badge">{row.source==='owned'?(media?'我上传的':'我编制的'):'已获授权'}</span></div><p className="training-library-kind">{labels[row.kind]}{row.status?` · ${statuses[row.status]||row.status}`:''}</p><h2>{row.name}</h2>{row.description&&<p className="training-library-description" title={row.description}>{row.description}</p>}<p className="training-library-meta">{row.version?`${['composition','form-composition'].includes(row.kind)?'修订':'版本'} ${row.version}`:row.size!=null?`${(row.size/1024/1024).toFixed(1)} MB`:''}{row.updatedAt?` · ${new Date(row.updatedAt).toLocaleDateString('zh-CN')}`:''}</p>
-        <footer>{media?<><button onClick={()=>setPreview(row)}>预览<ArrowUpRight size={16}/></button>{row.source==='owned'&&<button onClick={()=>{setRename(row);setName(row.name)}}><Pencil size={15}/>改名</button>}</>:<>{row.kind==='form'&&row.source==='granted'?<button disabled={busy} onClick={()=>void updateVersion(row)}>复用为我的草稿<ArrowUpRight size={16}/></button>:<Link to={row.kind==='form-composition'?'/questionnaire-products/'+row.id:row.href||'/toolkit'}>{row.kind==='composition'?'配置与报告':row.source==='owned'&&row.status==='DRAFT'?'编辑':row.source==='granted'?'查看与使用':'查看'}<ArrowUpRight size={16}/></Link>}{row.source==='owned'&&row.status==='DRAFT'&&row.kind==='composition'&&<Link to={'/questionnaire-products/'+row.id}>编辑内容</Link>}{versionable&&<button disabled={busy} onClick={()=>void updateVersion(row)}>更新版本</button>}</>}</footer></article>
+      return <article key={row.kind+':'+row.id} className="training-library-card training-workspace-card" aria-labelledby={`resource-${row.kind}-${row.id}`}>
+        <div className="training-workspace-card-top">
+          <span className="training-workspace-card-kind"><Icon size={18} aria-hidden="true"/>{labels[row.kind]}</span>
+          <span className="training-workspace-card-badge">{row.source==='owned'?(media?'我上传的':'我编制的'):'已获授权'}</span>
+        </div>
+        <h2 id={`resource-${row.kind}-${row.id}`} className="training-workspace-card-title" title={row.name}>{row.name}</h2>
+        {row.status&&<span className={`training-workspace-card-status is-${row.status.toLowerCase()}`}>{statuses[row.status]||row.status}</span>}
+        {row.description&&<p className="training-library-description" title={row.description}>{row.description}</p>}
+        <footer className="training-workspace-card-footer">
+          <div className="training-workspace-card-meta">
+            {row.version?<span>{['composition','form-composition'].includes(row.kind)?'修订':'版本'} {row.version}</span>:row.size!=null?<span>{(row.size/1024/1024).toFixed(1)} MB</span>:null}
+            {row.updatedAt&&<time dateTime={row.updatedAt}>更新于 {new Date(row.updatedAt).toLocaleDateString('zh-CN')}</time>}
+          </div>
+          <div className="training-workspace-card-actions">{media?<>
+            <button className="training-workspace-card-primary" onClick={()=>setPreview(row)}>预览<ArrowRight size={16} aria-hidden="true"/></button>
+            {row.source==='owned'&&<button onClick={()=>{setRename(row);setName(row.name)}}><Pencil size={15} aria-hidden="true"/>改名</button>}
+          </>:<>
+            {row.kind==='form'&&row.source==='granted'?<button className="training-workspace-card-primary" disabled={busy} onClick={()=>void updateVersion(row)}>复用为我的草稿<ArrowRight size={16} aria-hidden="true"/></button>:<Link className="training-workspace-card-primary" to={row.kind==='form-composition'?'/questionnaire-products/'+row.id:row.href||'/toolkit'}>{row.kind==='composition'?'配置与报告':row.source==='owned'&&row.status==='DRAFT'?'编辑':row.source==='granted'?'查看与使用':'查看'}<ArrowRight size={16} aria-hidden="true"/></Link>}
+            {row.source==='owned'&&row.status==='DRAFT'&&row.kind==='composition'&&<Link to={'/questionnaire-products/'+row.id}>编辑内容</Link>}
+            {versionable&&<button disabled={busy} onClick={()=>void updateVersion(row)}>更新版本</button>}
+          </>}</div>
+        </footer>
+      </article>
     })}</div>}
     {pages>1&&<nav className="training-library-pagination" aria-label="资源分页"><button disabled={page<=1||loading} onClick={()=>{const next=new URLSearchParams(params);next.set('page',String(page-1));setParams(next)}}>上一页</button><span>{page} / {pages}</span><button disabled={page>=pages||loading} onClick={()=>{const next=new URLSearchParams(params);next.set('page',String(page+1));setParams(next)}}>下一页</button></nav>}
     {!media&&<><p className="training-library-footnote">更新已发布的工具会创建独立草稿。课程继续使用原版本；获授权的工具按许可使用。</p><details className="training-library-governance" onToggle={event=>setGovernanceOpen(event.currentTarget.open)}><summary>参考、阈值与报告管理</summary><p>课程私有配置请进入上方组合测评的“配置与报告”；下方管理可复用的参考内容。</p>{governanceOpen&&user?.id&&<FormalReferenceStudio key={user.id} actorId={user.id}/>}</details></>}

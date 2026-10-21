@@ -57,6 +57,6 @@ it('clears the success notice when changing resource tabs and workspace areas, i
  await screen.findByText('名称已更新，已有引用保持有效。')
  fireEvent.click(screen.getByRole('button',{name:'图片'}));await waitFor(()=>expect(screen.queryByText('名称已更新，已有引用保持有效。')).not.toBeInTheDocument())
  await screen.findByText('我的工具');fireEvent.click(screen.getByRole('button',{name:'改名'}));fireEvent.click(screen.getByRole('button',{name:'保存名称'}));await screen.findByText('名称已更新，已有引用保持有效。')
- fireEvent.click(screen.getByRole('link',{name:'切到工具包'}));await screen.findByRole('heading',{name:'工具包',level:1});expect(screen.queryByText('名称已更新，已有引用保持有效。')).not.toBeInTheDocument()
- fireEvent.click(screen.getByRole('link',{name:'回到媒体库'}));await screen.findByRole('heading',{name:'媒体库',level:1});expect(screen.queryByText('名称已更新，已有引用保持有效。')).not.toBeInTheDocument()
+ fireEvent.click(screen.getByRole('link',{name:'切到工具包'}));await screen.findByRole('heading',{name:'工具',level:1});expect(screen.queryByText('名称已更新，已有引用保持有效。')).not.toBeInTheDocument()
+ fireEvent.click(screen.getByRole('link',{name:'回到媒体库'}));await screen.findByRole('heading',{name:'媒体',level:1});expect(screen.queryByText('名称已更新，已有引用保持有效。')).not.toBeInTheDocument()
 })

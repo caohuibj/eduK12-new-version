@@ -17,7 +17,7 @@ describe('Training deep-page return context', () => {
   })
   it('rejects malformed course hint and uses the proper home', () => {
     mount('/assignments?courseId=bad%2Fother', 'TEACHER')
-    expect(screen.getByRole('link', { name: /返回我的课程/ })).toHaveAttribute('href', '/dashboard')
+    expect(screen.getByRole('link', { name: /返回课程/ })).toHaveAttribute('href', '/dashboard')
   })
   it('does not duplicate the existing course-level back navigation', () => {
     mount('/student/courses/course-1', 'STUDENT')

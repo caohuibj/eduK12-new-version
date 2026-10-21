@@ -403,7 +403,7 @@ export function QuestionnaireProductEdit() {
     return () => { active = false }
   }, [id, preselectedScaleId, preselectedCourseId, user?.id])
   const action = async (fn: () => Promise<void>, measurementRecovery = false) => {
-    if(externalToolPending){setError('请先在工具包中核对未确认的参数／报告请求，再修改组合测评。');return}
+    if(externalToolPending){setError('请先在工具中核对未确认的参数／报告请求，再修改组合测评。');return}
     if(pendingMeasurement&&!measurementRecovery){setError('请先恢复或明确结束原认知发布请求，再修改组合测评。');return}
     const scopeEpoch=measurementScope.current.epoch
     if (selectionRisk.current.busy || (!measurementRecovery && (selectionRisk.current.dirty || selectionRisk.current.pending))) { setError('请先保存报告／参考选择或核对未确认请求，再修改组合测评。'); return }
@@ -1389,17 +1389,17 @@ export function QuestionnaireProductEdit() {
   const needsToolRecovery=Boolean(user?.id&&hasPendingTrainingToolRequest(user.id,id))
   const toolkitConfiguration = trainingDesign && location.pathname.startsWith('/toolkit/compositions/')
   if (toolkitConfiguration) return <div className="training-tool-config">
-    <header><Link to="/toolkit">← 返回工具包</Link><h1>{detail?.name || '组合测评'} · 配置与报告</h1><p>集中管理当前组合测评的认知参数、参考与报告。课程私有设置仍绑定原课程及测量版本。</p>
+    <header><Link to="/toolkit">← 返回工具</Link><h1>{detail?.name || '组合测评'} · 配置与报告</h1><p>集中管理当前组合测评的认知参数、参考与报告。课程私有设置仍绑定原课程及测量版本。</p>
       <nav aria-label="工具配置"><a href={workspaceMeasured?'#tool-measurement':base+'/'+id}>内容与参数</a>{(workspaceMeasured||needsToolRecovery)&&<><a href="#tool-references">参考与阈值</a><a href="#tool-reports">报告模板</a></>}<Link to={base+'/'+id}>版本与投放设置 ↗</Link></nav>
     </header>{feedback}{error&&<p role="alert">{error}</p>}{!detail&&<p role="status">正在读取工具配置…</p>}
     {detail&&<section><h2>当前版本</h2><p>{labels[detail.status]} · 修订 {detail.revision} · {detail.items?.length||0} 个内容单元</p><p>发布报告不会改写历史分数。新配置仅在后续明确发布的投放中使用。</p></section>}
     {(workspaceMeasured||needsToolRecovery)&&scientificTools}
-    {detail&&!draft&&<p>已发布版本的配置保持冻结；需要修订内容时，请从工具包创建新版本草稿。</p>}
+    {detail&&!draft&&<p>已发布版本的配置保持冻结；需要修订内容时，请从工具创建新版本草稿。</p>}
   </div>
   const toolConfigurationSummary = detail&&(workspaceMeasured||externalToolPending)&&<section className="qt-tool-summary" aria-label="工具配置与报告">
     <h3>工具配置与报告</h3><dl><div><dt>单独报告方案</dt><dd>{detail.trainingReportSelectionDraft?.units?.length?'已选择':'未选择'}</dd></div><div><dt>参考</dt><dd>{detail.trainingReferenceSelectionDraft?.units?.length?'已选择':'未选择'}</dd></div></dl>
-    {externalToolPending&&<p role="status" className="qt-tool-pending">有一项参数／报告请求尚未确认，请在工具包核对后继续修改。</p>}
-    <Link to={'/toolkit/compositions/'+id}>在工具包中管理参数、参考与报告 →</Link>
+    {externalToolPending&&<p role="status" className="qt-tool-pending">有一项参数／报告请求尚未确认，请在工具核对后继续修改。</p>}
+    <Link to={'/toolkit/compositions/'+id}>在工具中管理参数、参考与报告 →</Link>
   </section>
   if (trainingDesign) return (
     <ProductPage width="management" className="hui-questionnaire-products training-form-management qt-editor">

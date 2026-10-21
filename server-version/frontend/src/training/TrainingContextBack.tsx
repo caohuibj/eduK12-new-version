@@ -20,7 +20,7 @@ export default function TrainingContextBack({ role }: { role: Role | undefined }
       ? '/courses/' + encodeURIComponent(courseContext.courseId) + '/detail?section=management'
       : courseContext.returnTo || '/courses/' + encodeURIComponent(courseContext.courseId) + '/detail' + (courseContext.section === 'assessments' ? '?section=assessments' : '')
     return <section className="training-course-context" aria-label="当前课程工作区">
-      <nav className="training-context-trail" aria-label="当前位置"><Link to="/dashboard">我的课程</Link><span>/</span><Link to={parent}>返回当前课程</Link><span>/</span><span aria-current="page">{pageTitle}</span></nav>
+      <nav className="training-context-trail" aria-label="当前位置"><Link to="/dashboard">课程</Link><span>/</span><Link to={parent}>返回当前课程</Link><span>/</span><span aria-current="page">{pageTitle}</span></nav>
       <TrainingCourseTabs {...courseContext} />
     </section>
   }
@@ -33,7 +33,7 @@ export default function TrainingContextBack({ role }: { role: Role | undefined }
   if(returnTo||safeCourse&&/^\/(questionnaire-products|composite-assessments|scales|cognitive-assignments)\//.test(path)) {
     const home=studentRoot?'/student':'/dashboard'
     const parent=returnTo||(studentRoot?'/student/courses/':'/courses/')+encodeURIComponent(safeCourse!)+(studentRoot?'':'/detail?section=assessments')
-    return <nav className="training-context-trail" aria-label="当前位置"><Link to={home}>我的课程</Link><span>/</span><Link to={parent}>{safeCourse?'返回当前课程':'返回上一层'}</Link><span>/</span><span aria-current="page">{routeTitle(path)}</span></nav>
+    return <nav className="training-context-trail" aria-label="当前位置"><Link to={home}>{studentRoot?'我的课程':'课程'}</Link><span>/</span><Link to={parent}>{safeCourse?'返回当前课程':'返回上一层'}</Link><span>/</span><span aria-current="page">{routeTitle(path)}</span></nav>
   }
 
   if (role==='TEACHER' && /^\/(media-library|toolkit)(\/|$)/.test(path)) return null
@@ -61,6 +61,6 @@ export default function TrainingContextBack({ role }: { role: Role | undefined }
     : home
 
   return <Link className="training-context-back" to={to}>
-    <ArrowLeft size={16} aria-hidden="true" />{courseId ? '返回当前课程' : '返回我的课程'}
+    <ArrowLeft size={16} aria-hidden="true" />{courseId ? '返回当前课程' : studentRoot ? '返回我的课程' : '返回课程'}
   </Link>
 }

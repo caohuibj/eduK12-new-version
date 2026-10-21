@@ -1,12 +1,13 @@
 import TrainingCourseCode from './TrainingCourseCode'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { ArrowRight, ChevronDown, ChevronUp, Plus, Search } from 'lucide-react'
+import { ArrowRight, BookOpen, ChevronDown, ChevronUp, Plus, Search } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import apiClient from '../api/client'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import type { Course } from '../types'
 import './training-trainer-home.css'
 import './training-workspace-heading.css'
+import './training-workspace-cards.css'
 
 const PAGE_SIZES = [2, 6, 10]
 const PAGE_SIZE_STORAGE_KEY = 'training:trainer-courses:page-size'
@@ -133,7 +134,7 @@ export default function TrainingTrainerHome() {
   return <div className="training-home training-trainer-home">
     <header className="training-home-header training-workspace-heading">
       <div>
-        <h1 id="trainer-courses">我的课程</h1>
+        <h1 id="trainer-courses">课程</h1>
         <p className="training-home-subtitle">管理课程内容，邀请学员参与学习。</p>
       </div>
       <form className="training-workspace-search" role="search" onSubmit={event=>{event.preventDefault();setKeyword(search.trim());setQuery(current=>({...current,page:1}))}}><Search size={18} aria-hidden="true"/><input aria-label="检索课程" placeholder="搜索课程名称、介绍或课程码" value={search} onChange={event=>setSearch(event.target.value)}/><button type="submit">检索</button></form>
@@ -167,21 +168,24 @@ export default function TrainingTrainerHome() {
           {query.status === 'all' ? <button type="button" onClick={() => setCreateOpen(true)}>创建第一门课程 →</button>
             : <button type="button" onClick={() => setQuery(current => ({ ...current, page: 1, status: 'all' }))}>查看全部课程</button>}
         </div>
-        : <div className="training-trainer-course-grid">{courses.map(course => {
+        : <div className="training-trainer-course-grid training-workspace-grid">{courses.map(course => {
           const date = courseDate(course.createdAt)
-          return <article key={course.id} className="training-trainer-course-card" aria-labelledby={`trainer-course-${course.id}`}>
+          return <article key={course.id} className="training-trainer-course-card training-workspace-card" aria-labelledby={`trainer-course-${course.id}`}>
+            <div className="training-workspace-card-top">
+              <span className="training-workspace-card-kind"><BookOpen size={18} aria-hidden="true"/>课程</span>
+              <span className={`training-trainer-course-state training-workspace-card-badge is-${course.status?.toLowerCase()}`}>{course.status === 'DRAFT' ? '草稿' : COURSE_FILTERS.find(filter => filter.value === course.status)?.label}</span>
+            </div>
             <div className="training-trainer-card-heading">
-              <h3 id={`trainer-course-${course.id}`}><Link to={`/courses/${encodeURIComponent(course.id)}/detail`} title={course.title}>{course.title}</Link></h3>
-              <span className={`training-trainer-course-state is-${course.status?.toLowerCase()}`}>{course.status === 'DRAFT' ? '草稿' : COURSE_FILTERS.find(filter => filter.value === course.status)?.label}</span>
+              <h3 id={`trainer-course-${course.id}`} className="training-workspace-card-title"><Link to={`/courses/${encodeURIComponent(course.id)}/detail`} title={course.title}>{course.title}</Link></h3>
             </div>
             <CourseDescription id={`trainer-course-description-${course.id}`} description={course.description || '管理学员、练习、打卡与课程测评'} />
             <TrainingCourseCode key={course.id+course.courseCode} compact code={course.courseCode} title={course.title}/>
-            <div className="training-trainer-card-footer">
-              <div className="training-trainer-course-details">
+            <div className="training-trainer-card-footer training-workspace-card-footer">
+              <div className="training-trainer-course-details training-workspace-card-meta">
                 {typeof course.studentCount === 'number' && <span>{course.studentCount} 位学员</span>}
                 {date && <time dateTime={course.createdAt}>创建于 {date}</time>}
               </div>
-              <Link to={`/courses/${encodeURIComponent(course.id)}/detail`}>管理课程 <ArrowRight size={16} aria-hidden="true" /></Link>
+              <div className="training-workspace-card-actions"><Link className="training-workspace-card-primary" to={`/courses/${encodeURIComponent(course.id)}/detail`}>管理课程 <ArrowRight size={16} aria-hidden="true" /></Link></div>
             </div>
           </article>
         })}</div>}
