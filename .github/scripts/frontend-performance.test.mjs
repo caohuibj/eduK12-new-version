@@ -71,3 +71,8 @@ test('known optimization branch refuses full fallback on scope drift',()=>{
   assert.doesNotThrow(()=>requireFrontendPerformanceScope(false,false));
   assert.match(readFileSync('.github/workflows/ci.yml','utf8'),/CI_FRONTEND_PERFORMANCE_REQUIRED:.*perf\/frontend-startup-catalog-20261021/);
 });
+
+test('training correction admits only the stale assertion, never navigation implementation',()=>{
+  assert.equal(frontendPerformanceScope([entry(root+'main.tsx'),entry(root+'training/context.test.ts')],read),true);
+  assert.equal(frontendPerformanceScope([entry(root+'main.tsx'),entry(root+'training/context.ts')],read),false);
+});

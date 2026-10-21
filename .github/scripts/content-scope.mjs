@@ -73,7 +73,7 @@ export function frontendFile(file) {
 // exemption. Complete raw diff admission keeps all other consumers unchanged.
 export const frontendPerformanceFiles = new Set([
   'main.tsx', 'product-entry.ts', 'product-entry.test.ts', 'pages/ScaleList.tsx',
-  'pages/__tests__/ScaleList.grants.test.tsx', 'school/SchoolLanding.tsx',
+  'pages/__tests__/ScaleList.grants.test.tsx', 'training/context.test.ts', 'school/SchoolLanding.tsx',
   'school/school-landing.css', 'school/school-workspace.css',
   'school/huischool-campus-sunlight.webp',
 ].map(file => frontendSrc + file));

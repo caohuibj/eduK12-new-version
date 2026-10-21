@@ -120,7 +120,10 @@ const ScaleList: React.FC = () => {
       setTotal(response.data.total)
     } catch (fetchError: unknown) {
       if (epoch !== listEpoch.current) return
-      const message = fetchError instanceof Error ? fetchError.message : '获取量表列表失败'
+      // The shared API client normalizes HTTP failures to plain objects, not Error instances.
+      const message = typeof fetchError === 'object' && fetchError !== null
+        && 'message' in fetchError && typeof fetchError.message === 'string' && fetchError.message.trim()
+        ? fetchError.message : '获取量表列表失败'
       if (append) setMoreError(message)
       else setError(message)
     } finally {

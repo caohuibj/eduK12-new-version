@@ -134,17 +134,21 @@ describe('ScaleList paginated version discovery', () => {
     expect(screen.getByText(/标签筛选适用于已加载量表/)).toBeInTheDocument()
   })
 
-  it('retries the failed next page and deduplicates overlapping rows without clearing the list', async () => {
+  it.each([
+    ['Error instance', new Error('连接中断'), '连接中断'],
+    ['normalized HTTP object', { name: 'ApiClientError', message: '服务暂不可用', status: 503, retryable: true }, '服务暂不可用'],
+    ['unknown rejection', null, '获取量表列表失败'],
+  ])('retries the failed next page for %s and deduplicates rows without clearing the list', async (_kind, failure, message) => {
     let attempts=0
     mockGet.mockImplementation((url:string)=>{
       if(url.includes('/tags'))return Promise.resolve({code:0,data:{tags:[]}})
-      if(url.includes('page=2&'))return ++attempts===1?Promise.reject(new Error('连接中断'))
+      if(url.includes('page=2&'))return ++attempts===1?Promise.reject(failure)
         :Promise.resolve({code:0,data:{list:[scale(),scale({id:'older',name:'更旧版本'})],total:101}})
       return Promise.resolve({code:0,data:{list:[scale()],total:101}})
     })
     open();await screen.findByText('焦虑量表')
     fireEvent.click(screen.getByRole('button',{name:'加载更多量表'}))
-    await screen.findByText(/后续量表加载失败/)
+    expect((await screen.findByRole('alert')).textContent).toBe(`后续量表加载失败：${message}。已加载内容保留。`)
     expect(screen.getByText('焦虑量表')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button',{name:'重试加载更多量表'}))
     await screen.findByText('更旧版本')
