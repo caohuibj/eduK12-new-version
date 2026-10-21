@@ -1,6 +1,7 @@
+import { useTrainingLearnerNavigation } from '../../../training/learnerNavigation'
 import { useCognitiveEnabled } from '../../../contexts/CapabilitiesContext'
 import React, { useCallback, useEffect, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { ArrowLeft, Play, RotateCcw } from 'lucide-react'
 import { cognitiveApi } from '../api'
 import { resolveCognitiveEntryAction } from '../entry-action'
@@ -24,9 +25,10 @@ import type { CognitiveAssignmentSummary, CognitiveSession } from '../types'
 const CognitiveAssignmentEntry: React.FC = () => {
   const cognitiveEnabled = useCognitiveEnabled()
   const { assignmentId } = useParams<{ assignmentId: string }>()
-  const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [assignment, setAssignment] = useState<CognitiveAssignmentSummary | null>(null)
+  const learner = useTrainingLearnerNavigation({ courseId: assignment?.courseId })
+  const navigate = learner.navigate
   const [error, setError] = useState<string | null>(null)
   const [submitting, setSubmitting] = useState(false)
 
@@ -108,7 +110,7 @@ const CognitiveAssignmentEntry: React.FC = () => {
       <div className="card p-8 text-center">
         <p className="text-red-500 mb-4">{error || '测评不存在'}</p>
         <button onClick={() => navigate('/student/cognitive')} className="btn-secondary">
-          返回列表
+          {learner.enabled ? learner.backLabel : '返回列表'}
         </button>
       </div>
     )
@@ -122,7 +124,7 @@ const CognitiveAssignmentEntry: React.FC = () => {
         onClick={() => navigate('/student/cognitive')}
         className="flex items-center text-gray-500 hover:text-gray-700 mb-4"
       >
-        <ArrowLeft className="w-4 h-4 mr-1" /> 返回列表
+        <ArrowLeft className="w-4 h-4 mr-1" /> {learner.enabled ? learner.backLabel : '返回列表'}
       </button>
 
       <div className="card p-8 max-w-2xl">

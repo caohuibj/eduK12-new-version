@@ -67,11 +67,11 @@ describe('course-first training workspaces', () => {
   it('learner sees only three task groups, reuses existing assignment and check-in routes', async () => {
     mount('/student/courses/course-1', '/student/courses/:courseId', TrainingLearnerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()
-    expect(await screen.findByRole('link', { name: /完成练习/ })).toHaveAttribute('href', '/student/assignments/a-1?courseId=course-1')
+    expect(await screen.findByRole('link', { name: /完成练习/ })).toHaveAttribute('href', '/student/assignments/a-1?courseId=course-1&courseSection=assignments')
     fireEvent.click(screen.getByRole('button', { name: '打卡' }))
-    expect(await screen.findByRole('link', { name: /去打卡/ })).toHaveAttribute('href', '/student/checkins/c-1?courseId=course-1')
+    expect(await screen.findByRole('link', { name: /去打卡/ })).toHaveAttribute('href', '/student/checkins/c-1?courseId=course-1&courseSection=checkins')
     fireEvent.click(screen.getByRole('button', { name: '测评' }))
-    expect(await screen.findByRole('link', { name: /进入测评/ })).toHaveAttribute('href', '/student/scales/s-1')
+    expect(await screen.findByRole('link', { name: /进入测评/ })).toHaveAttribute('href', '/student/scales/s-1?courseId=course-1&courseSection=assessments')
     expect(loadAssessments).toHaveBeenCalledWith('course-1', false)
   })
 
@@ -83,7 +83,7 @@ describe('course-first training workspaces', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('测评查询超时')
     expect(screen.queryByText('正在核对本课程的可用测评…')).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: '重新加载测评' }))
-    expect(await screen.findByRole('link', { name: /进入测评/ })).toHaveAttribute('href', '/student/scales/s-1')
+    expect(await screen.findByRole('link', { name: /进入测评/ })).toHaveAttribute('href', '/student/scales/s-1?courseId=course-1&courseSection=assessments')
     expect(loadAssessments).toHaveBeenCalledTimes(2)
   })
 
@@ -101,11 +101,11 @@ describe('course-first training workspaces', () => {
     })
     mount('/student/courses/course-1', '/student/courses/:courseId', TrainingLearnerCourse)
     expect(await screen.findByText('已保存草稿')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /继续练习/ })).toHaveAttribute('href', '/student/assignments/draft-1?courseId=course-1')
+    expect(screen.getByRole('link', { name: /继续练习/ })).toHaveAttribute('href', '/student/assignments/draft-1?courseId=course-1&courseSection=assignments')
     fireEvent.click(screen.getByRole('button', { name: '打卡' }))
     expect(await screen.findByText('已截止')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /去打卡/ })).toBeNull()
-    expect(screen.getByRole('link', { name: /查看打卡/ })).toHaveAttribute('href', '/student/checkins/closed-1?courseId=course-1')
+    expect(screen.getByRole('link', { name: /查看打卡/ })).toHaveAttribute('href', '/student/checkins/closed-1?courseId=course-1&courseSection=checkins')
   })
 
   it('shows assignment API failure without crashing the course page', async () => {
@@ -205,4 +205,10 @@ describe('course-first training workspaces', () => {
     fireEvent.click(screen.getByRole('button',{name:'课程管理'}))
     for (const link of screen.getAllByRole('link', { name: /管理学员/ })) expect(link).toHaveAttribute('href', '/courses/course-1/students')
   })
+})
+
+it('restores the learner assessment section from a refreshed URL', async () => {
+  mount('/student/courses/course-1?section=assessments', '/student/courses/:courseId', TrainingLearnerCourse)
+  expect(await screen.findByRole('link', { name: /进入测评/ })).toHaveAttribute('href', '/student/scales/s-1?courseId=course-1&courseSection=assessments')
+  expect(screen.getByRole('button', { name: '测评' })).toHaveAttribute('aria-pressed', 'true')
 })

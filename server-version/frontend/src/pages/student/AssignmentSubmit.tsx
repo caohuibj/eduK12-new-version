@@ -1,7 +1,8 @@
+import { useTrainingLearnerNavigation } from '../../training/learnerNavigation'
 import { isTrainingHost } from '../../training/context'
 import { formatLocalDateTime } from '../../utils/dateTime'
 import React, { useState, useEffect, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { ArrowLeft, Clock, FileText, Loader2, FileText as FileIcon } from 'lucide-react'
 import apiClient from '../../api/client'
 import type { Assignment, Submission, MediaItem, DocumentItem } from '../../types'
@@ -19,8 +20,9 @@ import {
 
 const AssignmentSubmit: React.FC = () => {
   const { assignmentId } = useParams<{ assignmentId: string }>()
-  const navigate = useNavigate()
   const [assignment, setAssignment] = useState<Assignment | null>(null)
+  const learner = useTrainingLearnerNavigation({ courseId: assignment?.courseId, section: 'assignments' })
+  const navigate = learner.navigate
   const [submission, setSubmission] = useState<Submission | null>(null)
   const [content, setContent] = useState('')
   const [selectedOptions, setSelectedOptions] = useState<string[]>([])
@@ -223,7 +225,7 @@ const AssignmentSubmit: React.FC = () => {
         <ProductStatus
           kind="warning"
           title="练习不存在"
-          actions={<ProductButton variant="primary" onClick={() => navigate('/student')}>返回学生首页</ProductButton>}
+          actions={<ProductButton variant="primary" onClick={() => navigate('/student')}>{learner.enabled ? learner.backLabel : '返回学生首页'}</ProductButton>}
         >
           当前练习可能已被移除，或您没有访问权限。
         </ProductStatus>
@@ -238,7 +240,7 @@ const AssignmentSubmit: React.FC = () => {
     <ProductPage width="reading" className="hui-student-page hui-student-submission hui-assignment-submit">
       <ProductButton className="student-submit-back" onClick={() => navigate(-1)}>
         <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-        返回
+        {learner.enabled ? learner.backLabel : '返回'}
       </ProductButton>
 
       <PageHeader

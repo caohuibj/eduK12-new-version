@@ -3,14 +3,14 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import MyAssessments from '../MyAssessments'
 
-vi.mock('../../contexts/AuthContext',()=>({useAuth:()=>({user:{role:'PARENT'}})}))
-const mocks = vi.hoisted(() => ({ get: vi.fn(), start: vi.fn(), acceptConsent: vi.fn(), training: false }))
+vi.mock('../../contexts/AuthContext',()=>({useAuth:()=>({user:{role:mocks.role}})}))
+const mocks = vi.hoisted(() => ({ get: vi.fn(), start: vi.fn(), acceptConsent: vi.fn(), training: false, role: 'PARENT' }))
 vi.mock('../../api/client', () => ({ default: { get: mocks.get } }))
 vi.mock('../../api/runs', () => ({ runApi: { start: mocks.start, acceptConsent: mocks.acceptConsent } }))
 vi.mock('../../training/context', () => ({ isTrainingHost: () => mocks.training }))
 const task = { taskId: 'run:e1', sourceType: 'ORGANIZATION_RUN', sourceId: 'run1', title: '课堂体验', state: 'ASSIGNED', resultAvailability: 'PENDING',
   runTask: { executionId: 'e1', runId: 'run1', organizationId: 'org1', status: 'ASSIGNED', consentRequired: true, consentPurpose: '课堂体验反馈', consentVisibility: '仅群体汇总', claimState: null } }
-beforeEach(() => { vi.clearAllMocks(); mocks.training = false; mocks.get.mockResolvedValue({ code: 0, data: { list: [task], pendingCount: 1, truncated: false } }) })
+beforeEach(() => { vi.clearAllMocks(); mocks.training = false; mocks.role = 'PARENT'; mocks.get.mockResolvedValue({ code: 0, data: { list: [task], pendingCount: 1, truncated: false } }) })
 describe('My Assessments', () => {
   it('requires consent before launching and preserves the assigned execution', async () => {
     render(<MemoryRouter><MyAssessments /></MemoryRouter>)
@@ -113,4 +113,14 @@ describe('Training course report wording', () => {
     if (!training) expect(screen.getByText(/开始、继续作答和查看自己的报告/)).toBeInTheDocument()
     expect(mocks.get.mock.calls.map(([url]) => url)).toEqual(['/my-assessments', '/my-assessments/catalog'])
   })
+})
+
+it('keeps Training student assigned tasks and historical reports without requesting free discovery', async () => {
+  mocks.training = true; mocks.role = 'STUDENT'
+  mocks.get.mockResolvedValue({ code: 0, data: { list: [{ ...task, runTask: undefined, state: 'COMPLETED', reportTarget: '/student/scales/result/history-1' }], pendingCount: 0, truncated: false } })
+  render(<MemoryRouter><MyAssessments /></MemoryRouter>)
+  expect(await screen.findByRole('link', { name: '我的报告' })).toHaveAttribute('href', '/student/scales/result/history-1')
+  expect(screen.queryByRole('link', { name: '选择适合自己的测评' })).toBeNull()
+  expect(screen.queryByRole('heading', { name: '可参与的测评' })).toBeNull()
+  expect(mocks.get).not.toHaveBeenCalledWith('/my-assessments/catalog')
 })

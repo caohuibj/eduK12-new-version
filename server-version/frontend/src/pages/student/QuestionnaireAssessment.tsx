@@ -1,5 +1,6 @@
+import { useTrainingLearnerNavigation } from '../../training/learnerNavigation'
 import React, { useCallback, useState, useEffect, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { ChevronLeft, ChevronRight, CheckCircle, FileText, Layers } from 'lucide-react'
 import { normalizeApiError } from '../../utils/normalizeApiError'
@@ -97,7 +98,8 @@ interface QuestionnaireScaleCheckpointPayload {
 
 const QuestionnaireAssessment: React.FC = () => {
   const { questionnaireId } = useParams<{ questionnaireId: string }>()
-  const navigate = useNavigate()
+  const learner = useTrainingLearnerNavigation()
+  const navigate = learner.navigate
 
   const [loading, setLoading] = useState(true)
   const [data, setData] = useState<QuestionnaireAssessmentData | null>(null)
@@ -543,6 +545,7 @@ const QuestionnaireAssessment: React.FC = () => {
     return (
       <div className="text-center py-12">
         <p className="text-gray-500">问卷不存在或未发布</p>
+        {learner.enabled && <button type="button" className="btn-secondary mt-4" onClick={() => navigate(learner.backHref)}>{learner.backLabel}</button>}
       </div>
     )
   }

@@ -25,6 +25,7 @@ export default function TrainingContextBack({ role }: { role: Role | undefined }
     </section>
   }
   const studentRoot = role === 'STUDENT'
+  if (studentRoot && /^\/student\/(?:assignments|checkins|scales|questionnaires|cognitive|composite|situational)\//.test(path)) return null
   const search=new URLSearchParams(location.search)
   const returnTo=internalReturnTo(search.get('returnTo'))
   const hintedCourse=search.get('courseId')

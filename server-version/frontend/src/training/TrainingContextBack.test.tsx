@@ -11,9 +11,9 @@ describe('Training deep-page return context', () => {
     mount('/assignments?create=true&courseId=course-1', 'TEACHER')
     expect(screen.getByRole('link', { name: /返回当前课程/ })).toHaveAttribute('href', '/courses/course-1/detail')
   })
-  it('retains course-specific return for a learner submitted task', () => {
+  it('leaves learner submission navigation to its task-owned return action', () => {
     mount('/student/assignments/a-1?courseId=course-1', 'STUDENT')
-    expect(screen.getByRole('link', { name: /返回当前课程/ })).toHaveAttribute('href', '/student/courses/course-1')
+    expect(screen.queryByRole('link')).toBeNull()
   })
   it('rejects malformed course hint and uses the proper home', () => {
     mount('/assignments?courseId=bad%2Fother', 'TEACHER')
