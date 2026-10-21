@@ -1,3 +1,6 @@
+import { rawScoreFeedbackImages } from '../scale/scale-image-retention'
+import type { RawScoreFeedback } from '../scale/raw-score-feedback'
+import type { AssessmentImagePresentationV1 } from '../assessment-media/assessment-image-presentation'
 import { surveySjtScenes } from './sjt-structure'
 import { Prisma } from '@prisma/client'
 import { retainAssessmentAssetReferences } from '../assessment-media/assessment-asset'
@@ -27,7 +30,10 @@ export const surveyImageRefs=(units:readonly UnitDef[]):ImageIdentity[]=>units.f
 })
 
 export async function assertSurveyMediaOwned(tx:Tx,userId:string,projectId:string,units:readonly UnitDef[]){
-  const refs=surveyImageRefs(units)
+  const stimuli=surveyImageRefs(units)
+  const reportImages=units.flatMap(unit=>unit.kind==='SCALE'
+    ?rawScoreFeedbackImages((unit.definition as {rawScoreFeedback?:RawScoreFeedback}).rawScoreFeedback):[])
+  const refs:Array<ImageIdentity|AssessmentImagePresentationV1>=[...stimuli,...reportImages]
   const ids=[...new Set(refs.map(r=>r.asset.assetId))]
   if(!ids.length)return []
   if(ids.length>30)fail(400,'单次研究发布最多引用 30 个静态图片')
@@ -38,7 +44,7 @@ export async function assertSurveyMediaOwned(tx:Tx,userId:string,projectId:strin
   const byId=new Map(assets.map(a=>[a.id,a]))
   for(const image of refs){
     if(!image.altText?.trim())fail(400,'研究图片必须提供可阅读替代文字')
-    if(!['self_authored','authorized'].includes(image.rightsStatus)||!image.rightsNote?.trim())
+    if('rightsStatus' in image&&(!['self_authored','authorized'].includes(image.rightsStatus)||!image.rightsNote?.trim()))
       fail(403,'研究图片必须提供明确的原创或授权依据')
     const a=byId.get(image.asset.assetId)
     if(!a||a.sizeBytes<=0||a.sizeBytes>surveyMaxImageBytes

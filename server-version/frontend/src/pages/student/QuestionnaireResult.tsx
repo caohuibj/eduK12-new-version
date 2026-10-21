@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import apiClient from '../../api/client'
+import apiClient, { sessionFetch } from '../../api/client'
 import ReportShell from '../../modules/reporting/ReportShell'
 import ScaleUnitReportCard from '../../modules/reporting/ScaleUnitReportCard'
 import type { CollectionQuestionnaireResponse } from '../../modules/reporting/types'
@@ -17,6 +17,13 @@ const QuestionnaireResult: React.FC = () => {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(true)
   const [result, setResult] = useState<CollectionQuestionnaireResponse | null>(null)
+
+  const loadReportImage = useCallback(async (assetId: string) => {
+    if (!assessmentId) throw new Error('缺少报告标识')
+    const response = await sessionFetch(`/api/questionnaires/assessments/${encodeURIComponent(assessmentId)}/report/assets/${encodeURIComponent(assetId)}`)
+    if (!response.ok) throw new Error('反馈图片暂时无法读取')
+    return response.blob()
+  }, [assessmentId])
 
   useEffect(() => {
     const fetchResult = async () => {
@@ -89,7 +96,7 @@ const QuestionnaireResult: React.FC = () => {
       )}
       {result.unitReports.map((report, index) => (
         <ReportSection key={report.itemId || report.scaleId || index} id={`questionnaire-unit-${index}`} title={`量表 ${index + 1}: ${report.scaleName}`} eyebrow="Scale">
-          <ScaleUnitReportCard report={report} />
+          <ScaleUnitReportCard report={report} loadReportImage={loadReportImage} />
         </ReportSection>
       ))}
     </ReportShell>

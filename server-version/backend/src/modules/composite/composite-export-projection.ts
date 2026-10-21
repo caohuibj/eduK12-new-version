@@ -156,7 +156,7 @@ export const resolveCompositeExportProjectionBinding = async (
 
 const scaleFieldAllowed = (suffix: string, caps: DisclosureCapabilitiesV1): boolean => {
   if (suffix === 'scale_id' || suffix === 'scale_code') return true
-  if (suffix.startsWith('Q_V_') || suffix.startsWith('RT_') || suffix.startsWith('device_')) return caps.rawAnswers
+  if (suffix.startsWith('Q_META_') || suffix.startsWith('Q_V_') || suffix.startsWith('RT_') || suffix.startsWith('device_')) return caps.rawAnswers
   if (suffix.startsWith('Q_S_')) return caps.itemScores
   if (suffix.startsWith('SCORE_')) return caps.numericScores
   if (suffix.startsWith('quality_')) return caps.resultQualityDetails

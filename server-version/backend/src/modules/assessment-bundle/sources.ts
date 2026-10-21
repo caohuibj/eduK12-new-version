@@ -597,6 +597,7 @@ export const buildScaleBundleBridge = (result: ScaleResultV2): NonNullable<Canon
     result,
   })
   return {
+    ...(result.rawScoreFeedback ? { rawScoreFeedback: result.rawScoreFeedback, ...(result.method.reportAudience ? { reportAudience: result.method.reportAudience } : {}) } : {}),
     sourceResultHash: projected.sourceResultHash,
     scores: projected.scores,
   }

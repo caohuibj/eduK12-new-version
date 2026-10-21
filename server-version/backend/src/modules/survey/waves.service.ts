@@ -1,3 +1,4 @@
+import {surveyFrozenMeasurementPointerSchema,surveyFrozenContentSelectionSchema} from './content-selection'
 import {z} from 'zod'
 import {surveyRawFeedbackSchema} from './participant-feedback'
 import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
@@ -91,10 +92,16 @@ export async function getWave(uid:string,pid:string,wid:string){
       projectId:z.literal(pid),waveId:z.literal(wid),units:z.array(z.object({
         draftId:z.string().min(1).max(240),instrumentKey:z.string().min(1).max(240),title:z.string(),
         kind:surveyKindSchema,participantFeedback:surveyRawFeedbackSchema.optional(),
+        measurementRelease:surveyFrozenMeasurementPointerSchema.optional(),contentSelection:surveyFrozenContentSelectionSchema.optional(),
       })).max(30),
     }).safeParse(publication.compiledSnapshot)
     if(!parsed.success)return fail(409,'冻结反馈来源校验失败')
-    return {...wave,frozenParticipantFeedback:parsed.data.units.filter(unit=>unit.kind==='SCALE'||unit.kind==='SJT')
+    if(parsed.data.units.some(unit=>unit.contentSelection&&(!unit.measurementRelease||unit.kind==='FORM'||
+      unit.contentSelection.referencePolicy.measurementReleaseId!==unit.measurementRelease.releaseId)))
+      return fail(409,'冻结内容版本来源校验失败')
+    return {...wave,frozenContentSelections:parsed.data.units.filter(unit=>unit.kind!=='FORM').map(unit=>({
+      draftId:unit.draftId,instrumentKey:unit.instrumentKey,title:unit.title,
+      measurementRelease:unit.measurementRelease??null,contentSelection:unit.contentSelection??null})),frozenParticipantFeedback:parsed.data.units.filter(unit=>unit.kind==='SCALE'||unit.kind==='SJT')
       .map(unit=>({draftId:unit.draftId,instrumentKey:unit.instrumentKey,title:unit.title,participantFeedback:unit.participantFeedback??null}))}
   })
 }

@@ -1,3 +1,4 @@
+import { serveProjectedReportImage } from '../modules/reporting/report-image-delivery'
 import { loadQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import { assertScaleContextCollectable } from '../modules/scale/policy/context-preflight'
 import { Request, Response } from 'express'
@@ -2959,6 +2960,7 @@ export const questionnaireController = {
       }
 
       const collectionReport = (await loadQuestionnaireCollectionReport(qa))
+      if (req.params.assetId) return await serveProjectedReportImage(collectionReport, req.params.assetId, res)
 
       return success(res, {
         questionnaireId: qa.questionnaireId,

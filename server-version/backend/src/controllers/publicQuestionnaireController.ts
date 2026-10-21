@@ -1,3 +1,4 @@
+import { serveProjectedReportImage } from '../modules/reporting/report-image-delivery'
 import { loadQuestionnaireCollectionReport } from '../modules/reporting/questionnaire-collection-report'
 import { loadScaleAnswers } from '../modules/scale/scale-workflow.service'
 import { assertScaleContextCollectable } from '../modules/scale/policy/context-preflight'
@@ -2016,6 +2017,7 @@ export const publicQuestionnaireController = {
       }
 
       const collectionReport = (await loadQuestionnaireCollectionReport(qa))
+      if (req.params.assetId) return await serveProjectedReportImage(collectionReport, req.params.assetId, res)
 
       return success(res, {
         questionnaireId: qa.questionnaireId,

@@ -37,5 +37,6 @@ router.post('/assessments/:sessionId/form-answers/batch', requireQuestionnaireRe
 router.post('/assessments/:sessionId/scale/complete', requireQuestionnaireResume, legacyWriteDisabled)
 router.post('/assessments/:sessionId/complete', requireQuestionnaireResume, legacyWriteDisabled)
 router.get('/assessments/:sessionId/report', requireQuestionnaireResume, publicQuestionnaireController.getReport)
+router.get('/assessments/:sessionId/report/assets/:assetId', requireQuestionnaireResume, publicQuestionnaireController.getReport)
 
 export default router

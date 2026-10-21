@@ -5016,6 +5016,7 @@ export const buildCompositeReport = async (attempt: any, verifiedContext?: Whole
       try {
         const result = scaleMap.get(item.id)
         const reportInput = {
+          assessmentId: result?.id,
           itemId: item.id,
           scaleId: item.scaleId,
           scaleCode: item.scale?.code,

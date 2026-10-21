@@ -13,7 +13,8 @@ const tools=[{id:scaleId,kind:'SCALE',title:'量表甲',status:'DRAFT',instrumen
 const baseWave={id:'w1',projectId:'p1',title:'反馈波次',ordinal:1,status:'DRAFT',revision:1,instrumentIds:tools.map(t=>t.id),publicationId:null,
  consentText:'本次研究的参与说明与知情同意材料，至少二十字。',generalText:'谢谢',consentVersion:1,linkageNoticeConfirmed:false,
  opensAt:null,closesAt:null,finishUntil:null,quotaStarts:null,startsCount:0,allowNewParticipants:false,hardStopAt:null}
-function fixture(frozen=false){
+function fixture(frozen=false,nativeDefinition?:Record<string,unknown>){
+ const availableTools=tools.map((tool,index)=>index===0&&nativeDefinition?{...tool,definition:nativeDefinition}:tool)
  let wave={...baseWave,publicationId:frozen?'publication':null,frozenParticipantFeedback:frozen?[{draftId:scaleId,instrumentKey:'scale',title:'冻结标题',participantFeedback:{mode:'DESCRIPTIVE',metricKeys:['old_metric'],release:'AFTER_COLLECTION'}},{draftId:'sjt',instrumentKey:'sjt',title:'旧情境',participantFeedback:null}]:undefined}
  const requests:Array<{url:string;body:any}>=[]
  const response=(data:unknown)=>({ok:true,json:async()=>({code:0,data})})
@@ -22,8 +23,8 @@ function fixture(frozen=false){
   requests.push({url,body})
   if(url.endsWith('/auth/csrf'))return response({csrfToken:'csrf'})
   if(url.includes('/waves?page='))return response({list:[wave,{...wave,id:'w2',ordinal:2}]})
-  if(url.includes('/instruments?page='))return response({list:tools})
-  if(url.includes('/instruments/'))return response(tools.find(t=>url.endsWith('/'+t.id)))
+  if(url.includes('/instruments?page='))return response({list:availableTools})
+  if(url.includes('/instruments/'))return response(availableTools.find(t=>url.endsWith('/'+t.id)))
   if(url.endsWith('/preflight'))return response({ok:true,publicationReady:true,checks:[]})
   if(url.endsWith('/prepare')){wave={...wave,publicationId:'publication',frozenParticipantFeedback:(body.participantFeedback??[]).map((item:any)=>({draftId:item.instrumentId,instrumentKey:'scale',title:'冻结标题',participantFeedback:item.feedback}))};return response({publicationId:'publication'})}
   if(/\/waves\/w[12]$/.test(url))return response({...wave,id:url.endsWith('w2')?'w2':'w1'})
@@ -56,6 +57,31 @@ describe('explicit Wave participant feedback',()=>{
   await screen.findByText(/反馈设置已随研究定义冻结/)
   expect(requests.find(r=>r.url.endsWith('/prepare'))?.body).toEqual({revision:1,participantFeedback:[{instrumentId:scaleId,feedback:{policyVersion:'SURVEY_RAW_METRICS_V1',mode:'DESCRIPTIVE',metricKeys:['total'],release:'AFTER_COLLECTION'}}]})
   expect(screen.queryByLabelText('启用 量表甲 的原始指标反馈')).toBeNull()
+ })
+ it('explicitly freezes a native total score policy that can release its configured interval feedback',async()=>{
+  const definition={dimensions:[{dimensionKey:'dimension',label:'维度分'}],
+   totalScore:{key:'research_total',label:'研究总分',itemKeys:['content'],aggregation:'sum'},
+   rawScoreFeedback:{schemaVersion:1,rules:[{scoreKey:'research_total',ranges:[{key:'range',min:0,max:10,includeMax:true,text:'总分区间反馈'}]}]}}
+  const requests=fixture(false,definition);render(<SurveyWaveStudio projectId="p1"/>);await select();await preflight()
+  expect(await screen.findByLabelText('启用 量表甲 的原始指标反馈')).not.toBeChecked()
+  fireEvent.click(screen.getByLabelText('启用 量表甲 的原始指标反馈'))
+  const total=screen.getByLabelText('量表甲：研究总分（research_total）')
+  expect(total).not.toBeChecked()
+  expect(screen.getByLabelText('量表甲：维度分（dimension）')).not.toBeChecked()
+  expect(screen.getByRole('button',{name:'冻结研究定义'})).toBeDisabled()
+  fireEvent.click(total)
+  fireEvent.click(screen.getByRole('button',{name:'冻结研究定义'}))
+  await screen.findByText(/反馈设置已随研究定义冻结/)
+  const frozen=requests.find(r=>r.url.endsWith('/prepare'))?.body
+  expect(frozen).toEqual({revision:1,participantFeedback:[{instrumentId:scaleId,feedback:{policyVersion:'SURVEY_RAW_METRICS_V1',mode:'DESCRIPTIVE',metricKeys:['research_total'],release:'AFTER_FINAL'}}]})
+  expect(frozen.participantFeedback[0].feedback.metricKeys).toContain(definition.rawScoreFeedback.rules[0].scoreKey)
+ })
+ it('does not invent a total feedback metric when the optional native total is disabled',async()=>{
+  fixture(false,{dimensions:[{dimensionKey:'dimension',label:'维度分'}]})
+  render(<SurveyWaveStudio projectId="p1"/>);await select()
+  fireEvent.click(await screen.findByLabelText('启用 量表甲 的原始指标反馈'))
+  expect(screen.getByLabelText('量表甲：维度分（dimension）')).not.toBeChecked()
+  expect(screen.queryByLabelText(/量表甲：.*总分/)).toBeNull()
  })
  it('clears selection when a tool is removed/reselected and when the Wave changes',async()=>{
   fixture();render(<SurveyWaveStudio projectId="p1"/>);await select();await enable()

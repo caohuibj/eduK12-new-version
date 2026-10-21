@@ -42,6 +42,7 @@ router.patch('/assessments/:assessmentId/answers', authenticate, legacyWriteDisa
 // Frozen image delivery. Authorization is attempt-scoped; the adapter resolves
 // only immutable identities present in the encrypted Scale runtime snapshot.
 router.get('/assessments/:assessmentId/assets/:assetId', authenticate, scaleImageController.serveAssessmentImage)
+router.get('/assessments/:assessmentId/report-assets/:assetId', authenticate, scaleImageController.serveReportImage)
 // Native video URLs are issued only after the same frozen-attempt authorization.
 router.post('/assessments/:assessmentId/items/:itemCode/video-capability', authenticate, scaleVideoController.issueAssessmentVideo)
 

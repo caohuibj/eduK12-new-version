@@ -655,6 +655,14 @@
         ],
         "dependencyDeltaRationale": "Exact follow-redirects and Vite security patches only. Catalog source and instruments are unchanged; the checker executes tsx, not Vite, and does not consume Axios redirects. Fresh dependency audits remain mandatory."
       }
+    },
+    "scale-authoring": {
+      "enabled": true,
+      "base": "d3b51288a66843168480af99fe451914a76a020f",
+      "sourceReference": "8c56b5f7da3fdc16eca054fdf5f4c1612c421aea",
+      "productInventorySha256": "2778a0613789654b94b188b4e3c43baa122b977d91c6f2d2b0e84d0b6f22c4e3",
+      "diffSha256": "5ed2aebbdce743a45ef8c7142708b481876ec5ba7b026377de015418c699e8b2",
+      "officialBrowserRun": 39574936019
     }
   }
 }

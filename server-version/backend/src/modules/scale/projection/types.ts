@@ -1,3 +1,4 @@
+import type { RawScoreFeedbackMatch } from '../raw-score-feedback'
 import type {
   AudienceDisclosurePolicyV1,
   DisclosureCapabilitiesV1,
@@ -53,6 +54,7 @@ export interface ExternalScaleReportBaseV1 {
 
 export interface ExternalScaleFullReportV1 extends ExternalScaleReportBaseV1 {
   kind: 'full'
+  rawScoreFeedback?: RawScoreFeedbackMatch[]
   scores?: ExternalScaleScoreV1[]
   references?: ResolvedScaleReference[]
   interpretations?: Array<{

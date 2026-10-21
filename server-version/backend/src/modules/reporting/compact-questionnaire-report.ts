@@ -26,7 +26,7 @@ export const restoreCompactQuestionnaireReport=async(manifest:Manifest,qa:any,bu
    AND s.source_attempt_id IN (${Prisma.join(ids)}) AND s.terminal_state='COMPLETED' AND s.payload_kind='UNIT_RESULT'`:[]
  if(rows.length!==ids.length)throw new Error('Questionnaire report result unavailable')
  const envelopes=await loadStoredCanonicalUnitResults(rows.map(row=>row.encrypted)),byId=new Map(rows.map((row,i)=>[row.sourceAttemptId,envelopes[i]]))
- const scales=manifest.units.map((unit,i)=>{const result=byId.get(unit.sourceAttemptId);if(!result||result.resultHash!==unit.resultHash)throw new Error('Questionnaire report result version mismatch');return {...layout.scales[i],completedAt:result.completedAt,totalTime:null,core:result.core}})
+ const scales=manifest.units.map((unit,i)=>{const result=byId.get(unit.sourceAttemptId);if(!result||result.resultHash!==unit.resultHash)throw new Error('Questionnaire report result version mismatch');return {...layout.scales[i],completedAt:result.completedAt,totalTime:null,core:result.core,sourceAttemptId:unit.sourceAttemptId,bundleBridge:result.bundleBridge}})
  const report=build({questionnaireName:layout.questionnaireName,scales,formSections:[]})
  return {reportDefinitionVersion:'collection-only-v2',scaleReports:report.unitReports,totalDimensions:report.totalDimensions,backgroundValues:manifest.backgroundValues}
 }

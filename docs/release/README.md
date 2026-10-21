@@ -521,3 +521,39 @@ Mac 的 8 pass/45 filtered 与桌面/手机观察保留为原本地报告，不�
 接纳。其 PG 四项有三项通过、唯一失败名已记录；三项名称由固定四项源码
 与原计数/失败名推导，非伪造原逐项 reporter。仅修并重试导出 fixture 的
 queued/READY nonce 契约错误，其他三项不重跑，实际恢复门禁仍须完成。
+
+### Scale authoring: fixed official evidence PR admission (2026-10-21)
+
+The same-repository `work/scale-authoring-feedback-20261021` PR has a third, exact `scale-authoring` candidate in the existing exact-candidate route. It retains the real `scope`, `exact-candidate`, and `codeql` requirements of `merge gate / ready PR`; draft, unknown paths/modes, changed main base, differing source/merge trees, missing/expired artifacts, or unsuccessful required jobs stop admission, never select platform fallback. The original measurement and Training Mac candidates retain their own required checks and workflows. PR322 is not modified.
+
+Application evidence is read from fixed official Actions identities and complete artifact SHA256 values. Run 39560427570 supplies backend build, 174 regression assertions, audit/image scan and the unique PostgreSQL persistence case. Runs 39565491980 and 39568118300 supply the unchanged frontend compilation, 70 affected assertions/audit, repaired types/lint and runtime-only image scan. Successful run 39574936019 supplies the completed browser/SAST/ready evidence: Training's six checkpoints and six screenshots are explicitly inherited from run 39571934879 (whose overall FAIL remains visible); Survey is newly executed with explicit measurement publication, both FINAL answer sets, actual rendered PNG hash, authorization refusal, and three real RAW_WAVE downloads. The report, twelve PNGs, four axe results and cleanup are checked, not replaced by a synthetic success status.
+
+Only the new routing/admission controls are tested or analyzed for this PR. Python reuse/admission helpers receive their first applicable Python CodeQL analysis; prior JS/TS application analysis completion is reused without claiming that the original full scan had zero findings. No application build, tests, PostgreSQL case, browser journey or image scan is repeated. The scanned frontend runtime image was not retained as an image archive: this admission permits PR merge only, not deployment or image delivery. Current screenshot inspection is representative human review plus automated layout/accessibility checks, not a claim of every-pixel manual review.
+
+The scale candidate does not borrow the older Situational checker-input invariance proof because its shared scale definition changed. Instead, the unmodified standalone publication workflow uses its ordinary relevant-path detector; this change contains no Situational catalog/package/workflow trigger paths. Manual full/probe dispatch is refused for this exact branch; an exact post-merge main tree is classified without replaying already accepted application evidence.
+
+## Private Survey Wave content selection (2026-10-21)
+
+The bounded `survey-wave-selection` scenario admits only the named Wave picker,
+read-only options/projection, direct tests and existing CI control files. Unknown
+paths, dependency/schema/permission/public-feedback changes, deletion, renaming
+and nonregular modes are rejected. The known feature branch fails closed on
+scope drift or full/manual fallback; it does not launch platform acceptance.
+
+Existing jobs are reused: backend-regression runs locked dependency installation,
+backend types/audit, three direct contracts and a small real PostgreSQL fixture
+for exact filtering, read-only discovery, stale-choice rejection and authoritative
+prepare/frozen identities; frontend runs lint/types/audit and six direct test
+modules. Selected suites must be present, nonempty and unskipped. Production
+images are built once by ci-images and retain HIGH/CRITICAL scanning. Its Chromium
+smoke reads the exact frontend runtime assets and checks selection/freeze/frozen
+read plus stale-error UI with synthetic APIs, not backend authorization. CodeQL
+covers the changed business and control surfaces. No full lifecycle, capacity,
+media, Mac, migration upgrade/dump-restore or production work is selected.
+
+Local exploratory dependency-drift results are not represented as formal CI
+receipts. The stable gate recomputes the complete diff and requires actual scope,
+backend-regression, frontend, docker and CodeQL success; skipped/missing/failed,
+cancelled and draft candidates cannot qualify. Main push reclassifies only,
+without rerunning these PR checks. Five minutes is a progress/diagnosis threshold,
+not a guarantee for first downloads or scanning. This change does not deploy.

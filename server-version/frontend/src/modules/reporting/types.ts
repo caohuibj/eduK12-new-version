@@ -1,3 +1,4 @@
+import type { MatchedRawScoreFeedback } from '../scale/rawScoreFeedback'
 export type ScaleResponseValue = string | number
 
 export type ScaleScoreDirection =
@@ -180,6 +181,7 @@ interface ExternalScaleReportBase {
 export type ExternalScaleReport =
   | (ExternalScaleReportBase & {
       kind: 'full'
+      rawScoreFeedback?: MatchedRawScoreFeedback[]
       scores?: ExternalScaleScoreValue[]
       references?: ScaleReferenceValue[]
       interpretations?: ScaleInterpretationValue[]
@@ -209,6 +211,8 @@ export type ExternalScaleReport =
     })
 
 export interface ScaleUnitReport {
+  assessmentId?: string
+  rawScoreFeedback?: MatchedRawScoreFeedback[]
   itemId?: string
   type: 'SCALE'
   kind: 'scale'

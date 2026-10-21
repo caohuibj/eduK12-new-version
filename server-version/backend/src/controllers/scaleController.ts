@@ -1,3 +1,5 @@
+import { assertScaleReportImagesOwned } from '../modules/scale/scale-image-retention'
+import { previewScaleRawScoreFeedback } from '../modules/scale/raw-score-feedback-preview'
 import { assertTrainingChildSelected, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../modules/composite/training-variant-child-scope'
 import { loadScaleAnswers } from '../modules/scale/scale-workflow.service'
 import { Request, Response } from 'express'
@@ -84,14 +86,15 @@ const definitionRequestSchema = z.object({
 })
 
 const answerPreviewSchema = z.object({
+  rawScores: z.record(z.number().finite()).optional(),
   answers: z.array(z.object({
     itemCode: z.string().min(1),
     responseValue: z.union([z.string(), z.number().finite()]),
     responseTimeMs: z.number().finite().nonnegative().optional(),
     answeredAt: z.string().optional(),
     changeCount: z.number().int().nonnegative().optional(),
-  })),
-})
+  })).optional(),
+}).strict().refine(value => (value.answers !== undefined) !== (value.rawScores !== undefined), '请只提交回答或模拟分数')
 
 const scaleBatchAnswerSchema = z.object({
   checkpointSequence: z.number().int().positive().optional(),
@@ -297,6 +300,7 @@ export const scaleController = {
       if (!validation.definition || validation.issues.some((issue) => issue.severity === 'error')) {
         return error(res, definitionIssuesMessage(validation.issues))
       }
+      await assertScaleReportImagesOwned(validation.definition!, scale.creatorId)
       // The state predicate is part of the write: publishing between the read
       // and this update must never mutate the newly frozen definition.
       const write = (db: typeof prisma) => db.scale.update({
@@ -364,9 +368,10 @@ export const scaleController = {
       })
       if (!scale) return notFound(res, '量表不存在')
       if (scale.creatorId !== userId && userRole !== UserRole.ADMIN) return forbidden(res, '无权限预览此量表')
+      if (body.data.rawScores) return success(res, previewScaleRawScoreFeedback(scaleDefinitionFromRecord(scale), body.data.rawScores))
       const result = await buildScaleResultForRecord({
         scale,
-        answers: body.data.answers,
+        answers: body.data.answers!,
       })
       return success(res, result)
     } catch (err) {

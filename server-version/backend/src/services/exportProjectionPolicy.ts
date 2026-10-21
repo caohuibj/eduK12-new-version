@@ -120,7 +120,7 @@ const METHOD_FIELDS = new Set(['INSTRUMENT_VERSION', 'SCORING_VERSION', 'REPORT_
 
 const standaloneAllowed = (name: string, caps: DisclosureCapabilitiesV1): boolean => {
   if (SAFE_STANDALONE_METADATA.has(name)) return true
-  if (name.startsWith('Q_V_') || name.startsWith('RT_') || name.startsWith('DEVICE_')) return caps.rawAnswers
+  if (name.startsWith('Q_META_') || name.startsWith('Q_V_') || name.startsWith('RT_') || name.startsWith('DEVICE_')) return caps.rawAnswers
   if (name.startsWith('Q_S_')) return caps.itemScores
   if (name.startsWith('SCORE_')) return caps.numericScores
   if (name.startsWith('QUALITY_')) return caps.resultQualityDetails
@@ -131,7 +131,7 @@ const standaloneAllowed = (name: string, caps: DisclosureCapabilitiesV1): boolea
 }
 
 const questionnaireScaleSuffixAllowed = (suffix: string, caps: DisclosureCapabilitiesV1): boolean => {
-  if (suffix.startsWith('Q_V_') || suffix.startsWith('RT_') || suffix.startsWith('DEVICE_')) return caps.rawAnswers
+  if (suffix.startsWith('Q_META_') || suffix.startsWith('Q_V_') || suffix.startsWith('RT_') || suffix.startsWith('DEVICE_')) return caps.rawAnswers
   if (suffix.startsWith('Q_S_')) return caps.itemScores
   if (suffix.startsWith('SCORE_')) return caps.numericScores
   if (suffix.startsWith('QUALITY_')) return caps.resultQualityDetails
