@@ -114,10 +114,11 @@ export const courseController = {
       const userRole = req.user?.role
       if (!canReadLegacyContent(userRole)) return forbidden(res, '当前角色不能访问旧课程列表')
       const { status = 'all' } = req.query
+      const excludeLibrary = req.query.excludeLibrary === 'true'
       const { page, pageSize, skip } = getPaginationParams(req)
 
       // 构建缓存键
-      const cacheKey = `courses:list:${userRole}:${userId}:${status}:${page}:${pageSize}`
+      const cacheKey = `courses:list:${userRole}:${userId}:${status}:${page}:${pageSize}:${excludeLibrary ? 'courses' : 'all'}`
       
       // 尝试从缓存获取
       const cached = cache.get(cacheKey)
@@ -127,6 +128,7 @@ export const courseController = {
       }
 
       let where: any = { courseType: { not: 'CAMPUS_ACTIVITY' } }
+      if (excludeLibrary) where.isLibrary = false
 
       if (status !== 'all') {
         where.status = status
@@ -173,9 +175,7 @@ export const courseController = {
               }
             }
           },
-          orderBy: {
-            createdAt: 'desc'
-          },
+          orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
           skip,
           take: pageSize,
         }),

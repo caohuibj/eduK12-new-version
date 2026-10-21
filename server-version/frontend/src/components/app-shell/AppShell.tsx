@@ -5,7 +5,7 @@ import { RelationalAvailabilityProvider, useRelationalAvailability } from '../..
 import AssessmentTaskShortcut from '../AssessmentTaskShortcut'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, matchPath, useLocation, useNavigate } from 'react-router-dom'
-import { ChevronRight, LogOut, PanelLeft } from 'lucide-react'
+import { ChevronRight, LogOut, PanelLeft, UserRound } from 'lucide-react'
 import { AccountViewProvider,useAuth } from '../../contexts/AuthContext'
 import {accountView} from '../../admin/accountView'
 import { useCapabilities } from '../../contexts/CapabilitiesContext'
@@ -31,6 +31,7 @@ import '../../training/training-subpages-refresh.css'
 import '../../pages/admin/admin-training.css'
 import '../../training/training-teacher-visual.css'
 import '../../training/training-assessment-visual.css'
+import '../../training/training-account.css'
 
 function AppShellContent({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth()
@@ -69,6 +70,8 @@ function AppShellContent({ children }: { children: ReactNode }) {
   if(!training&&parentPortalEnabled&&displayOrganization?.allowedActions.includes('PARENT_REPORT_PUBLICATION'))items.push({path:`/organizations/${encodeURIComponent(displayOrganization.organization.id)}/parent-reports`,label:'家长报告',section:'organization'})
   }
   const trainingWorkspace=training&&mode==='standard'&&(user?.role==='TEACHER'||user?.role==='STUDENT')
+  const identityLabel=user?`${user.nickname||user.username} · ${adminWorkspace?managementIdentityLabel(user):{STUDENT:training?'学员':'学生',TEACHER:training?'培训师':'教师',ADMIN:(platformRole??user.platformRole)==='SYSTEM_ADMIN'?'系统管理员':'Training 管理员',PARENT:'家长'}[user.role]}`:''
+  const profilePath=user?.role==='STUDENT'?'/student/profile':'/profile'
   const teacherFamily = teacherVisualFamily(location.pathname)
   const teacherVisual = trainingWorkspace && user?.role === 'TEACHER' && teacherFamily !== 'execution'
   const active=activeNavigation(items,location.pathname), title=routeTitle(location.pathname,active), breadcrumbs=breadcrumbsFor(location.pathname,homeFor(user?.role),active,displayOrganization?.organization.name)
@@ -83,12 +86,12 @@ function AppShellContent({ children }: { children: ReactNode }) {
     {!entryMode&&<header className="hui-product hui-app-header">{mode==='focused'?<span className="hui-brand">{training ? <TrainingBrand /> : 'Huisurvey'}</span>:<Link className="hui-brand" to={homeFor(user?.role)}>{training?<TrainingBrand />:'Huisurvey'}</Link>}
       {mode==='standard'&&!trainingWorkspace&&<ProductButton ref={toggleRef} className="hui-menu-toggle" aria-expanded={menuOpen} aria-controls="hui-navigation" onKeyDown={e=>{if(e.key==='Escape')setOpenPath(null)}} onClick={()=>setOpenPath(menuOpen?null:location.pathname)}><PanelLeft size={18} aria-hidden="true"/>导航菜单</ProductButton>}
       {trainingWorkspace&&<TrainingWorkspaceNav items={items} activePath={active?.path}/>}
-      <div className="hui-account">{isPublicAssessmentPath(location.pathname)?<span>公开参与</span>:user?<span>{user.nickname||user.username} · {adminWorkspace?managementIdentityLabel(user):{STUDENT:training?'学员':'学生',TEACHER:training?'培训师':'教师',ADMIN:(platformRole??user.platformRole)==='SYSTEM_ADMIN'?'系统管理员':'Training 管理员',PARENT:'家长'}[user.role]}</span>:<span>欢迎使用</span>}
+      <div className="hui-account">{isPublicAssessmentPath(location.pathname)?<span>公开参与</span>:user?(trainingWorkspace?<Link className="training-account-link" to={profilePath} title="个人账号设置" aria-label={`${identityLabel}，个人账号设置`} aria-current={location.pathname===profilePath?'page':undefined}><UserRound size={19} aria-hidden="true"/><span>{identityLabel}</span></Link>:<span>{identityLabel}</span>):<span>欢迎使用</span>}
         {!training&&user&&mode==='standard'&&(organizations.length>0||organizationsLoading)&&<label className="hui-organization-switch"><span>组织</span><select aria-label="当前组织" value={displayOrganization?.organization.id||''} disabled={organizationLoading||organizationsLoading} onChange={e=>{const id=e.target.value;if(!id)return;if(organizationWorkspaceRoute)navigate(`/organizations/${encodeURIComponent(id)}`);else void selectOrganization(id)}}><option value="" disabled>{organizationLoading||organizationsLoading?'正在加载…':'选择组织'}</option>{displayOrganization&&!organizations.some(i=>i.id===displayOrganization.organization.id)&&<option value={displayOrganization.organization.id}>{displayOrganization.organization.name}</option>}{organizations.map(o=><option key={o.id} value={o.id}>{o.name}{o.status==='SUSPENDED'?'（已暂停）':''}</option>)}</select></label>}
         {!training&&staffMode&&organizationTotal>organizations.length&&<Link to="/organizations">更多组织</Link>}
         {!training&&user&&mode==='standard'&&(organizationError||organizationListError)&&<button type="button" className="hui-context-retry" onClick={()=>{if(routeOrganizationId&&routeOrganizationId!=='new')void selectOrganization(routeOrganizationId);else void refreshOrganizations()}}>组织连接失败，重试</button>}
         {!training&&user&&mode==='standard'&&relational.status==='error'&&<button type="button" className="hui-context-retry" onClick={relational.retry}>测评入口加载失败，重试</button>}
-        {user&&mode==='standard'&&<ProductButton disabled={loggingOut} onClick={async()=>{setLoggingOut(true);try{await logout()}finally{setLoggingOut(false)}}}><LogOut size={16} aria-hidden="true"/>{loggingOut?'正在退出…':'退出登录'}</ProductButton>}
+        {user&&mode==='standard'&&<ProductButton className={trainingWorkspace?'training-account-logout':undefined} disabled={loggingOut} onClick={async()=>{setLoggingOut(true);try{await logout()}finally{setLoggingOut(false)}}}><LogOut size={trainingWorkspace?19:16} aria-hidden="true"/>{loggingOut?'正在退出…':'退出登录'}</ProductButton>}
       </div>
     </header>}
     <div className="hui-app-body">{mode==='standard'&&!trainingWorkspace&&<nav id="hui-navigation" aria-label="主要导航" className={`hui-product hui-navigation ${menuOpen?'hui-navigation--open':''}`} onKeyDown={e=>{if(e.key==='Escape'){setOpenPath(null);toggleRef.current?.focus()}}}>{staffMode&&!training?<StaffNavigation items={items} activePath={active?.path} onNavigate={onNavigate}/>:items.map(item=><Link key={item.path} to={item.path} aria-current={active?.path===item.path?'page':undefined} onClick={()=>onNavigate(item.path)}>{item.label}</Link>)}</nav>}
