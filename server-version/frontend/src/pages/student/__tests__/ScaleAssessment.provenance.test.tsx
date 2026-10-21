@@ -75,6 +75,7 @@ const scale = {
   },
 }
 
+let scaleForTest: unknown = scale
 let assessmentForTest: Record<string, unknown>
 
 const renderPage = (assessment: Record<string, unknown>) => {
@@ -119,11 +120,12 @@ const makeAssessment = (id: string, serverValue?: DeviceInputProvenanceV1) => ({
 
 beforeEach(() => {
   vi.clearAllMocks()
+  scaleForTest = scale
   mockCapture.mockReturnValue(provenance)
   mockResolve.mockImplementation(resolveProvenance)
   mockPost.mockImplementation((path: string) => (
     path === '/scales/scale-1/assessments'
-      ? Promise.resolve({ code: 0, data: { assessment: assessmentForTest, scale } })
+      ? Promise.resolve({ code: 0, data: { assessment: assessmentForTest, scale: scaleForTest } })
       : Promise.resolve({ code: 0 })
   ))
 })
@@ -192,5 +194,60 @@ describe('ScaleAssessment FINAL_ONLY provenance boundaries', () => {
 
     expect(mockCapture).not.toHaveBeenCalled()
     expect(mockResolve).toHaveBeenCalledWith(expect.objectContaining({ serverValue: provenance }))
+  })
+})
+
+
+describe('ScaleAssessment frozen presentation modes', () => {
+  it.each([undefined, 'RUNNER_DEFAULT', 'ONE_BY_ONE'])('keeps native sequential presentation for %s', async presentationMode => {
+    renderPage({ ...makeAssessment('assessment-fresh'), presentationMode })
+    await screen.findByRole('heading', { name: '第一题内容' })
+    expect(screen.queryByRole('heading', { name: '第二题内容' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '下一题' })).toBeInTheDocument()
+  })
+
+  it('renders all frozen items together and submits only after the final manual action', async () => {
+    const user = userEvent.setup()
+    scaleForTest = { ...scale, definition: { ...scale.definition, items: [
+      { ...scale.definition.items[0], options: [{ value: 1, label: '数值一' }, { value: '1', label: '文本一' }] },
+      { ...scale.definition.items[1], purpose: 'attention_check' },
+    ] } }
+    renderPage({ ...makeAssessment('assessment-fresh'), presentationMode: 'ALL_AT_ONCE' })
+    await screen.findByRole('heading', { name: '第一题内容' })
+    expect(screen.getByRole('heading', { name: '第二题内容' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '下一题' })).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', { name: '完成测评' }))
+    expect(mockPost).toHaveBeenCalledTimes(1)
+    await user.click(screen.getByRole('radio', { name: '数值一' }))
+    await waitFor(() => expect(screen.getByRole('radio', { name: '数值一' })).toBeChecked())
+    expect(screen.getByRole('radio', { name: '文本一' })).not.toBeChecked()
+    await user.click(screen.getByRole('radio', { name: '选项 B' }))
+    await waitFor(() => expect(screen.getByRole('radio', { name: '选项 B' })).toBeChecked())
+    expect(mockPost).toHaveBeenCalledTimes(1)
+    await user.click(screen.getByRole('button', { name: '完成测评' }))
+    await waitFor(() => expect(mockPost).toHaveBeenCalledTimes(2))
+    const body = mockPost.mock.calls[1][1]
+    expect(body.answers).toEqual(expect.arrayContaining([
+      expect.objectContaining({ itemCode: 'item-1', responseValue: 1 }),
+      expect.objectContaining({ itemCode: 'item-2', responseValue: 'never' }),
+    ]))
+    expect(body).not.toHaveProperty('score')
+    expect(body).not.toHaveProperty('presentationMode')
+  })
+
+  it('restores typed local answers across every visible item without auto-submitting', async () => {
+    const draftKey = 'scale:assessment-draft'
+    scaleForTest = { ...scale, definition: { ...scale.definition, items: [
+      { ...scale.definition.items[0], options: [{ value: 1, label: '恢复数值一' }, { value: '1', label: '恢复文本一' }] }, scale.definition.items[1],
+    ] } }
+    await finalDraftStore.ensure(createFinalDraftMeta({ draftKey, instrument: 'scale', attemptId: 'assessment-draft', attemptEpoch: 1, definitionHash: 'scale-definition-hash', contextSnapshotHash: null, deliveryMode: 'final_only', submissionId: 'restore-all' }))
+    await finalDraftStore.putAnswer({ draftKey, itemKey: 'item-1', value: { responseValue: 1, responseTimeMs: 20 }, updatedAt: Date.now() })
+    await finalDraftStore.putAnswer({ draftKey, itemKey: 'item-2', value: { responseValue: 'never', responseTimeMs: 30 }, updatedAt: Date.now() })
+    renderPage({ ...makeAssessment('assessment-draft'), presentationMode: 'ALL_AT_ONCE' })
+    expect(await screen.findByRole('radio', { name: '恢复数值一' })).toBeChecked()
+    expect(screen.getByRole('radio', { name: '恢复文本一' })).not.toBeChecked()
+    expect(screen.getByRole('radio', { name: '选项 B' })).toBeChecked()
+    expect(mockPost).toHaveBeenCalledTimes(1)
+    expect(screen.getByRole('button', { name: '完成测评' })).toBeEnabled()
   })
 })

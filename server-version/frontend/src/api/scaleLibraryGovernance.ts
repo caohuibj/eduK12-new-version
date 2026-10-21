@@ -1,4 +1,5 @@
 import apiClient, { sessionFetch } from './client'
+import type { ScaleLibraryEntry } from './scaleLibrary'
 
 export type GovernanceMediaItem = { assetId: string; contentHash: string; mimeType: string; sizeBytes: number; assetVersion: string; usages: string[]; rights: 'AUTHOR_SHARED_FOR_BOUND_SCALE'; dependencyReleaseIds: string[] }
 export type GovernanceMediaManifest = { schemaVersion: 1; releaseIds: string[]; items: GovernanceMediaItem[]; manifestHash: string }
@@ -12,6 +13,15 @@ export type GovernanceEntry = Omit<GovernanceSubmission, 'status'> & { submissio
 export type GovernanceCapabilities = { systemAdmin: boolean; canReview: boolean; reviewGrants: { grantId: string; releaseIds: string[] }[]; distributionGrants: { grantId: string; product: GovernanceProduct; releaseIds: string[] }[] }
 export type GovernanceSource = { sourceId: string; product: GovernanceProduct; releases: (GovernanceCompatibility & { releaseId: string; version: string; contentHash: string; publishedAt: string; title: string; mediaManifest: GovernanceMediaManifest; defaults?: SubmissionMetadata; eligible: boolean; unavailableReason?: string })[]; defaults: SubmissionMetadata }
 export type GovernanceUseGrant = { id: string; userId: string; product: GovernanceProduct; version: number; status: string }
+
+export type GovernanceCatalogRecord = {
+  catalogId: string; title: string; origin: 'STANDARD_REGISTRY' | 'AUTHORED'; instrumentClass: 'STANDARD' | 'CUSTOM_DESCRIPTIVE';
+  exactVersion: { origin: 'STANDARD_REGISTRY' | 'AUTHORED'; instrumentKey?: string; instrumentVersion?: string; entryId?: string; releaseId?: string; releaseVersion?: string; contentHash?: string };
+  availability: { status: 'AVAILABLE' | 'RESTRICTED' | 'NOT_AVAILABLE'; reasons: string[] };
+  authorization: { mechanism: 'INSTRUMENT_AUTHORIZATION' | 'LIBRARY_USE_GRANT'; requiresRuntimeCheck: true; useGrantStatus: 'NOT_EVALUATED' };
+  standard?: ScaleLibraryEntry; authored?: GovernanceEntry;
+}
+export type GovernanceCatalogPage = { schemaVersion: 1; list: GovernanceCatalogRecord[]; generatedAt: string; page: number; pageSize: number; hasMore: boolean }
 
 async function request<T>(product: GovernanceProduct, path: string, payload?: unknown): Promise<T> {
   const url = `/${product.toLowerCase()}/scale-library-governance${path}`
@@ -34,6 +44,8 @@ async function request<T>(product: GovernanceProduct, path: string, payload?: un
   return body.data
 }
 export const governanceApi = (product: GovernanceProduct) => ({
+  catalog: (page = 1, pageSize = 25) => request<GovernanceCatalogPage>(product, '/catalog?' + new URLSearchParams({ page: String(page), pageSize: String(pageSize) })),
+  catalogDetail: (row: GovernanceCatalogRecord) => request<{ entry: GovernanceCatalogRecord }>(product, row.origin === 'STANDARD_REGISTRY' ? '/catalog/standard/' + encodeURIComponent(row.exactVersion.instrumentKey || '') + '/' + encodeURIComponent(row.exactVersion.instrumentVersion || '') : '/catalog/authored/' + encodeURIComponent(row.exactVersion.entryId || '')),
   capabilities: () => request<GovernanceCapabilities>(product, '/capabilities'),
   source: (sourceId: string) => request<GovernanceSource>(product, '/sources/' + encodeURIComponent(sourceId)),
   submissions: (sourceId?: string) => request<{ list: GovernanceSubmission[] }>(product, '/submissions' + (sourceId ? '?sourceId=' + encodeURIComponent(sourceId) : '')),

@@ -1,14 +1,15 @@
+import type {ReactNode} from 'react'
 import {useScaleTimingLifecycle} from '../modules/scale/useScaleTimingLifecycle'
 import {SurveyScaleTimingTracker,type SurveyScaleTimings} from './survey-scale-timing'
 
 export type SurveyTimedScaleUnit={
   instrumentKey:string;title:string
-  items:{itemKey:string;prompt:string;required:boolean}[]
+  items:{itemKey:string;prompt:string;required:boolean;responseOptions?:{optionKey:string;label:string}[]}[]
   responseOptions:{optionKey:string;label:string}[]
 }
 /** One active Scale item at a time; answers and telemetry stay in local memory
  * until the same authoritative Survey FINAL. No per-question HTTP traffic. */
-export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,onIndexChange,paused=false,readOnly=false}:{
+export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,onIndexChange,paused=false,readOnly=false,renderMedia}:{
   unit:SurveyTimedScaleUnit;answer:Record<string,unknown>
   onAnswer:(itemKey:string,optionKey:string)=>void
   tracker:SurveyScaleTimingTracker
@@ -16,6 +17,7 @@ export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,on
   index:number
   paused?:boolean
   readOnly?:boolean
+  renderMedia?:(itemKey:string)=>ReactNode
   onIndexChange:(index:number)=>void
 }){
   const current=unit.items[Math.min(index,unit.items.length-1)]
@@ -37,7 +39,8 @@ export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,on
       value={index+1} aria-label="量表施测进度"/>
     <fieldset className="rounded-lg border bg-white p-4 space-y-2">
       <legend className="font-medium">{current.prompt}{current.required?' *':''}</legend>
-      {unit.responseOptions.map(option=><label key={option.optionKey}
+      {renderMedia?.(current.itemKey)}
+      {(current.responseOptions??unit.responseOptions).map(option=><label key={option.optionKey}
         className="flex items-start gap-3 rounded border p-3 text-sm min-h-11">
         <input type="radio" name={unit.instrumentKey+'-'+current.itemKey}
           checked={selected===option.optionKey} disabled={paused||readOnly}

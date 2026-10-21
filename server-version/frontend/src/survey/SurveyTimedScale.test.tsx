@@ -21,6 +21,15 @@ function Harness(){
   </>
 }
 describe('Survey Scale participant one-by-one delivery',()=>{
+  it('uses per-item source response options rather than the compatibility union and renders authorized media',()=>{
+    render(<SurveyTimedScale unit={{...unit,items:[{itemKey:'source',prompt:'Source item',required:false,
+      responseOptions:[{optionKey:'typed_number',label:'Source numeric'},{optionKey:'typed_string',label:'Source string'}]}]}}
+      answer={{}} tracker={new SurveyScaleTimingTracker()} index={0} onIndexChange={()=>{}}
+      onAnswer={()=>{}} onTiming={()=>{}} renderMedia={key=><p>Frozen media {key}</p>}/>)
+    expect(screen.getByRole('radio',{name:'Source numeric'})).toBeInTheDocument()
+    expect(screen.queryByRole('radio',{name:'同意'})).toBeNull()
+    expect(screen.getByText('Frozen media source')).toBeInTheDocument()
+  })
   it('handles an item key that matches a built-in Object property',()=>{
     const answer=vi.fn()
     const tracker=new SurveyScaleTimingTracker()

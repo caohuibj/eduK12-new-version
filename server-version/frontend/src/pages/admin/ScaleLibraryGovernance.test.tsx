@@ -2,13 +2,14 @@ import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ScaleLibraryGovernance from './ScaleLibraryGovernance'
-const api = vi.hoisted(() => ({ capabilities: vi.fn(), submissionDetail: vi.fn(), submissions: vi.fn(), entries: vi.fn(), review: vi.fn(), setStatus: vi.fn(), recipients: vi.fn(), grants: vi.fn(), grant: vi.fn(), revoke: vi.fn() }))
+const api = vi.hoisted(() => ({ catalog: vi.fn(), catalogDetail: vi.fn(), capabilities: vi.fn(), submissionDetail: vi.fn(), submissions: vi.fn(), entries: vi.fn(), review: vi.fn(), setStatus: vi.fn(), recipients: vi.fn(), grants: vi.fn(), grant: vi.fn(), revoke: vi.fn() }))
 vi.mock('../../api/scaleLibraryGovernance', () => ({ governanceApi: () => api, submissionStatusLabel: { SUBMITTED: '待审核' } }))
 const metadata = { title: '范围内量表', author: '作者', copyright: '自有', applicability: '研究', scoringDescription: '求和', reportDescription: '描述性' }
 const application = { id: 'application', releaseId: 'release', metadata, version: 3, status: 'SUBMITTED', product: 'TRAINING', supportedEntrypoints: ['TRAINING', 'SURVEY'] }
 const entry = { ...application, id: 'entry', status: 'ACTIVE' }
 beforeEach(() => {
   vi.resetAllMocks(); api.submissions.mockResolvedValue({ list: [application] }); api.entries.mockResolvedValue({ list: [entry] }); api.setStatus.mockResolvedValue(entry)
+  api.catalog.mockImplementation(async (page = 1) => ({ schemaVersion: 1, page, pageSize: 25, hasMore: false, list: (await api.entries()).list.map((row: typeof entry) => ({ catalogId: row.id, origin: 'AUTHORED', title: row.metadata.title, exactVersion: { origin: 'AUTHORED', entryId: row.id, releaseId: row.releaseId }, availability: { status: 'RESTRICTED', reasons: [] }, authored: row })) }))
   api.capabilities.mockResolvedValue({ systemAdmin: false, canReview: false, reviewGrants: [], distributionGrants: [{ grantId: 'distribute', product: 'TRAINING', releaseIds: ['release'] }] })
 })
 describe('Scale library system review versus entrance distribution', () => {
@@ -35,6 +36,23 @@ describe('Scale library system review versus entrance distribution', () => {
     fireEvent.change(screen.getByLabelText('授权对象'), { target: { value: 'researcher' } })
     fireEvent.click(screen.getByRole('button', { name: '授予所选账号只读使用' }))
     await waitFor(() => expect(api.grant).toHaveBeenCalledWith('entry', 'researcher', 'SURVEY', expect.any(String), 'survey-distribution'))
+  })
+  it('shows registry and authored records together, preserves standard identity and pages using hasMore', async () => {
+    const standard = { catalogId: 'standard:key:1', origin: 'STANDARD_REGISTRY', title: '标准原版', instrumentClass: 'STANDARD', exactVersion: { origin: 'STANDARD_REGISTRY', instrumentKey: 'key', instrumentVersion: '1' }, availability: { status: 'RESTRICTED', reasons: [] }, authorization: { mechanism: 'INSTRUMENT_AUTHORIZATION', useGrantStatus: 'NOT_EVALUATED', requiresRuntimeCheck: true }, standard: { construct: { constructDefinition: '原版构念' }, rights: { status: 'APPROVED' }, evidence: { coverageText: '原科学记录' } } }
+    api.catalog.mockImplementation(async (page: number) => ({ schemaVersion: 1, page, pageSize: 25, hasMore: page === 1, list: page === 1 ? [standard, { catalogId: 'custom', origin: 'AUTHORED', title: entry.metadata.title, exactVersion: { origin: 'AUTHORED', entryId: 'entry', releaseId: 'release' }, authored: entry }] : [{ ...standard, catalogId: 'standard:key:2', title: '后续目录记录', exactVersion: { origin: 'STANDARD_REGISTRY', instrumentKey: 'key', instrumentVersion: '2' } }] }))
+    api.catalogDetail.mockResolvedValue({ entry: standard })
+    render(<MemoryRouter><ScaleLibraryGovernance /></MemoryRouter>)
+    await screen.findByText('标准原版 · 标准量表（只读）')
+    expect(screen.getByText('范围内量表 · 自编描述性量表 · 已收录')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /开始测评|施测/ })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: '查看标准精确版本详情' }))
+    expect(await screen.findByRole('region', { name: '公共量表精确版本详情' })).toHaveTextContent('STANDARD_REGISTRY')
+    expect(api.catalogDetail).toHaveBeenCalledWith(standard)
+    fireEvent.click(screen.getByRole('button', { name: '目录下一页' }))
+    await screen.findByText('后续目录记录 · 标准量表（只读）')
+    expect(api.catalog).toHaveBeenCalledWith(2)
+    expect(screen.getByRole('button', { name: '目录下一页' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: '目录上一页' })).toBeEnabled()
   })
   it('requires inspecting frozen content before approval', async () => {
     api.capabilities.mockResolvedValue({ systemAdmin: true, canReview: true, reviewGrants: [], distributionGrants: [] })

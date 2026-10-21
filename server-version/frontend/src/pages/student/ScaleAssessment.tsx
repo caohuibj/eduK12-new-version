@@ -69,6 +69,8 @@ interface Scale {
 }
 
 interface Assessment {
+  /** Server projection of the frozen measurement release, never a UI preference. */
+  presentationMode?: 'ONE_BY_ONE' | 'ALL_AT_ONCE' | 'RUNNER_DEFAULT'
   id: string
   status: string
   progress: number
@@ -141,6 +143,8 @@ const ScaleAssessment: React.FC = () => {
   const [submissionLockReason, setSubmissionLockReason] = useState<SubmissionLockReason>(null)
   const [completionNotice, setCompletionNotice] = useState<string | null>(null)
   const [requiresRestart, setRequiresRestart] = useState(false)
+  const allItemStartTimesRef = useRef<Record<string, number>>({})
+  const allAtOnce = assessment?.presentationMode === 'ALL_AT_ONCE'
   const itemStartTimeRef = useRef<number>(readScaleTimingNow())
   const scaleDeviceInputProvenanceRef = useRef<DeviceInputProvenanceV1 | null>(null)
   const { saving: savingAnswer, savingRef: savingAnswerRef, runSave } = useRunnerSaveState()
@@ -227,6 +231,8 @@ const ScaleAssessment: React.FC = () => {
         const nextAssessment = response.data.assessment
         setAssessment(nextAssessment)
         setScale(response.data.scale)
+        const shownAt = readScaleTimingNow()
+        allItemStartTimesRef.current = Object.fromEntries(response.data.scale.definition.items.map(item => [item.itemCode, shownAt]))
         const existingAnswers: Record<string, ResponseValue> = {}
         const revisions: Record<string, number> = {}
         nextAssessment.answers?.forEach((answer) => {
@@ -311,12 +317,13 @@ const ScaleAssessment: React.FC = () => {
     return () => { cancelled = true }
   }, [navigate, registerScalePersistence, scaleId, contextInput])
 
-  const handleSelectAnswer = async (value: ResponseValue) => {
+  const handleSelectAnswer = async (value: ResponseValue, itemCode?: string) => {
     if (!scale || !assessment || savingAnswerRef.current || submitting || submissionLocked) return false
     const items = scale.definition.items
-    const item = items[currentIndex]
+    const item = itemCode ? items.find(candidate => candidate.itemCode === itemCode) : items[currentIndex]
     if (!item) return false
-    const responseTimeMs = elapsedScaleResponseTimeMs(itemStartTimeRef.current, readScaleTimingNow())
+    if (allAtOnce) setCurrentIndex(items.findIndex(candidate => candidate.itemCode === item.itemCode))
+    const responseTimeMs = elapsedScaleResponseTimeMs(allAtOnce ? allItemStartTimesRef.current[item.itemCode] ?? itemStartTimeRef.current : itemStartTimeRef.current, readScaleTimingNow())
     try {
       await runSave(async () => {
         if (assessment.deliveryMode === 'FINAL_ONLY') {
@@ -358,7 +365,7 @@ const ScaleAssessment: React.FC = () => {
     const unanswered = scale.definition.items.filter((item) => item.required && answers[item.itemCode] === undefined)
     if (unanswered.length > 0 && !submissionLocked) {
       const firstMissingIndex = scale.definition.items.findIndex((item) => item.required && answers[item.itemCode] === undefined)
-      if (firstMissingIndex >= 0) setCurrentIndex(firstMissingIndex)
+      if (firstMissingIndex >= 0) goToQuestion(firstMissingIndex)
       setCompletionNotice(`还有 ${unanswered.length} 道必答题未作答，请完成后再提交`)
       return
     }
@@ -464,7 +471,7 @@ const ScaleAssessment: React.FC = () => {
       }
       if (err instanceof ScaleVideoCompletionRequiredError) {
         const videoIndex = scale.definition.items.findIndex((item) => item.itemCode === err.itemCode)
-        if (videoIndex >= 0) setCurrentIndex(videoIndex)
+        if (videoIndex >= 0) goToQuestion(videoIndex)
       }
       if (isFinalAttemptConflict(err)) setRequiresRestart(true)
       setCompletionNotice(normalizeApiError(err).message)
@@ -489,7 +496,7 @@ const ScaleAssessment: React.FC = () => {
   const autoItem = scale?.definition.items[currentIndex]
   const autoSelection = useScaleAutoAdvance({
     questionKey: `${assessment?.id ?? ''}:${autoItem?.itemCode ?? ''}`,
-    enabled: isTrainingHost() && autoItem?.type === 'single',
+    enabled: !allAtOnce && isTrainingHost() && autoItem?.type === 'single',
     disabled: savingAnswer || submitting || submissionLocked,
     hasNext: Boolean(scale && currentIndex < scale.definition.items.length - 1),
     onSave: handleSelectAnswer,
@@ -560,12 +567,6 @@ const ScaleAssessment: React.FC = () => {
   const currentItem = items[currentIndex]
   const selectedValue = currentItem ? answers[currentItem.itemCode] : undefined
   const answeredCount = items.filter((item) => answers[item.itemCode] !== undefined).length
-  const imageItems = assessmentImageItems(currentItem.images)
-  const videoPresentation = scaleItemVideoPresentation(currentItem)
-  const draftKey = `scale:${assessment.id}`
-  const requiredViewing = videoPresentation && !submissionLocked
-    ? { draftKey, slotKey: scaleVideoSlotKey(currentItem.itemCode) }
-    : undefined
   const answerControlsDisabled = savingAnswer || submitting || submissionLocked || autoSelection.busy
 
   const saveStatus = savingAnswer
@@ -601,13 +602,22 @@ const ScaleAssessment: React.FC = () => {
       } as const)
     : ({ state: 'none' } as const)
 
+  const goToQuestion = (index: number) => {
+    setCurrentIndex(index)
+    if (allAtOnce) {
+      const heading = document.getElementById('scale-question-' + items[index]?.itemCode)
+      heading?.scrollIntoView?.({ block: 'center', behavior: 'smooth' })
+      heading?.focus({ preventScroll: true })
+    }
+  }
+
   const actions = (
     <ActionBar className="justify-between">
-      <ProductButton onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex === 0 || savingAnswer || submitting || autoSelection.busy}>
+      {!allAtOnce && <ProductButton onClick={() => setCurrentIndex((index) => Math.max(0, index - 1))} disabled={currentIndex === 0 || savingAnswer || submitting || autoSelection.busy}>
         <ChevronLeft className="h-5 w-5" aria-hidden="true" />
         上一题
-      </ProductButton>
-      {currentIndex === items.length - 1 ? (
+      </ProductButton>}
+      {allAtOnce || currentIndex === items.length - 1 ? (
         <ProductButton variant="primary" onClick={() => void handleComplete()} disabled={submitting || savingAnswer || requiresRestart || autoSelection.busy}>
           <CheckCircle className="h-5 w-5" aria-hidden="true" />
           {submitting ? '提交中…' : submissionLocked ? '重新核对提交' : '完成测评'}
@@ -632,7 +642,7 @@ const ScaleAssessment: React.FC = () => {
             <button
               key={item.itemCode}
               type="button"
-              onClick={() => setCurrentIndex(index)}
+              onClick={() => goToQuestion(index)}
               disabled={savingAnswer || submitting || autoSelection.busy}
               aria-current={current ? 'step' : undefined}
               aria-label={`第 ${index + 1} 题${answered ? '，已作答' : '，未作答'}`}
@@ -645,6 +655,65 @@ const ScaleAssessment: React.FC = () => {
       </div>
     </nav>
   )
+
+  // One renderer and the existing persistence/media gates serve both frozen modes.
+  const renderQuestion = (item: ScaleRunnerItem, index: number) => {
+    const itemValue = answers[item.itemCode]
+    const images = assessmentImageItems(item.images)
+    const video = scaleItemVideoPresentation(item)
+    const viewing = video && !submissionLocked ? { draftKey: `scale:${assessment.id}`, slotKey: scaleVideoSlotKey(item.itemCode) } : undefined
+    return (
+        <section key={item.itemCode} className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6" aria-labelledby={`scale-question-${item.itemCode}`}>
+          <div className="mb-5">
+            <p className="text-sm font-medium text-slate-500">第 {index + 1} 题 / 共 {items.length} 题</p>
+            <h2 ref={allAtOnce ? undefined : autoSelection.headingRef} tabIndex={allAtOnce || isTrainingHost() ? -1 : undefined} id={`scale-question-${item.itemCode}`} className="mt-2 text-lg font-semibold leading-relaxed text-slate-900">{item.content}</h2>
+          </div>
+
+          <AssessmentImageGate items={images} loadAsset={loadAssessmentImage} disabled={savingAnswer || submitting || autoSelection.busy} ariaLabel={`${item.content} 视觉内容`}>
+            <ScaleFormVideoGate
+              presentation={video}
+              loadSources={() => loadAssessmentVideo(item.itemCode)}
+              ariaLabel={`${item.content} 视频内容`}
+              requiredViewing={viewing}
+            >
+              <fieldset disabled={answerControlsDisabled} className="space-y-3">
+                <legend className="sr-only">{item.content}</legend>
+                {item.options.map((option) => {
+                  const checked = itemValue === option.value
+                  return (
+                    <label
+                      key={valueKey(option.value)}
+                      className={`flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-700 has-[:focus-visible]:ring-offset-2 ${checked ? 'border-blue-700 bg-blue-50 text-blue-900' : 'border-slate-300 bg-white text-slate-800 hover:border-slate-400'} ${answerControlsDisabled ? 'cursor-not-allowed opacity-60' : ''}`}
+                    >
+                      <input
+                        type="radio"
+                        name={`scale-${assessment.id}-${item.itemCode}`}
+                        checked={checked}
+                        onChange={() => void (allAtOnce ? handleSelectAnswer(option.value, item.itemCode) : autoSelection.select(option.value))}
+                        onClick={event => {
+                          if (!allAtOnce && isTrainingHost() && item.type === 'single' && checked && event.detail < 2) void autoSelection.select(option.value)
+                        }}
+                        disabled={answerControlsDisabled}
+                        className="mt-1 h-5 w-5 shrink-0 accent-blue-700"
+                      />
+                      <span className="min-w-0 flex-1 leading-relaxed">{option.label}</span>
+                    </label>
+                  )
+                })}
+              </fieldset>
+            </ScaleFormVideoGate>
+          </AssessmentImageGate>
+
+          <p className="mt-4 min-h-6 text-sm text-slate-500">
+            {itemValue === undefined && !savingAnswer
+              ? video && !submissionLocked
+                ? '完整观看视频后选择一个答案。'
+                : '请选择一个答案。'
+              : null}
+          </p>
+        </section>
+    )
+  }
 
   return (
     <AssessmentShell
@@ -675,55 +744,8 @@ const ScaleAssessment: React.FC = () => {
           </div>
         ) : null}
 
-        <section className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6" aria-labelledby={`scale-question-${currentItem.itemCode}`}>
-          <div className="mb-5">
-            <p className="text-sm font-medium text-slate-500">第 {currentIndex + 1} 题 / 共 {items.length} 题</p>
-            <h2 ref={autoSelection.headingRef} tabIndex={isTrainingHost() ? -1 : undefined} id={`scale-question-${currentItem.itemCode}`} className="mt-2 text-lg font-semibold leading-relaxed text-slate-900">{currentItem.content}</h2>
-          </div>
-
-          <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={savingAnswer || submitting || autoSelection.busy} ariaLabel={`${currentItem.content} 视觉内容`}>
-            <ScaleFormVideoGate
-              presentation={videoPresentation}
-              loadSources={() => loadAssessmentVideo(currentItem.itemCode)}
-              ariaLabel={`${currentItem.content} 视频内容`}
-              requiredViewing={requiredViewing}
-            >
-              <fieldset disabled={answerControlsDisabled} className="space-y-3">
-                <legend className="sr-only">{currentItem.content}</legend>
-                {currentItem.options.map((option) => {
-                  const checked = selectedValue === option.value
-                  return (
-                    <label
-                      key={valueKey(option.value)}
-                      className={`flex min-h-12 cursor-pointer items-start gap-3 rounded-xl border px-4 py-3 transition-colors has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-blue-700 has-[:focus-visible]:ring-offset-2 ${checked ? 'border-blue-700 bg-blue-50 text-blue-900' : 'border-slate-300 bg-white text-slate-800 hover:border-slate-400'} ${answerControlsDisabled ? 'cursor-not-allowed opacity-60' : ''}`}
-                    >
-                      <input
-                        type="radio"
-                        name={`scale-${assessment.id}-${currentItem.itemCode}`}
-                        checked={checked}
-                        onChange={() => void autoSelection.select(option.value)}
-                        onClick={event => {
-                          if (isTrainingHost() && currentItem.type === 'single' && checked && event.detail < 2) void autoSelection.select(option.value)
-                        }}
-                        disabled={answerControlsDisabled}
-                        className="mt-1 h-5 w-5 shrink-0 accent-blue-700"
-                      />
-                      <span className="min-w-0 flex-1 leading-relaxed">{option.label}</span>
-                    </label>
-                  )
-                })}
-              </fieldset>
-            </ScaleFormVideoGate>
-          </AssessmentImageGate>
-
-          <p className="mt-4 min-h-6 text-sm text-slate-500">
-            {selectedValue === undefined && !savingAnswer
-              ? videoPresentation && !submissionLocked
-                ? '完整观看视频后选择一个答案。'
-                : '请选择一个答案。'
-              : null}
-          </p>
-        </section>
+        {allAtOnce && <p className="mb-4 text-sm text-slate-600">整页呈现 · 请完成所有必答题，最后手动提交。呈现方式已随版本冻结。</p>}
+        <div className="space-y-5" data-scale-presentation-mode={allAtOnce ? 'ALL_AT_ONCE' : 'ONE_BY_ONE'}>{allAtOnce ? items.map(renderQuestion) : renderQuestion(currentItem, currentIndex)}</div>
       </div>
     </AssessmentShell>
   )
