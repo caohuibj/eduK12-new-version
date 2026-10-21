@@ -2,7 +2,7 @@
   "schema": 1,
   "base": "eb08515a26cc4637cbcb57a8859fec757a5b8b34",
   "product": "43d89082769d4b7c45cd11abb0abadc3bd8511c3",
-  "browserProfileTrustApproved": false,
+  "browserProfileTrustApproved": true,
   "source": {
     "docs/training-authorized-tool-picker-local.md": {
       "before": null,
