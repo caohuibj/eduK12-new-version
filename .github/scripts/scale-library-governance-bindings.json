@@ -424,7 +424,7 @@
     },
     "server-version/e2e/scale-library-governance-browser.cjs": {
       "before": null,
-      "after": "6e520f12f4e52445fbbd839941ca889fbb62270c"
+      "after": "680af37695dd56e8b7f78458c67f66036ca16258"
     },
     "server-version/e2e/scale-library-governance-proxy.cjs": {
       "before": null,
@@ -528,11 +528,11 @@
     },
     "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx": {
       "before": null,
-      "after": "94cb80d629ac6bd4735bd8acccab245aa71decf6"
+      "after": "4ef170b70cc7035570513ce09c88dd24db1ea7d8"
     },
     "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.tsx": {
       "before": null,
-      "after": "130c833ccead57f2bf0d0c8ee57bbc91cd02e92c"
+      "after": "a6ee33dfb3af938a588e64ebf22e2dfe6ad11559"
     },
     "server-version/frontend/src/pages/student/ScaleAssessment.tsx": {
       "before": "7cf73861b59b902f1350c69ea7acb3620d1a5bb3",
@@ -652,16 +652,18 @@
     }
   },
   "tests": {
-    "backend": [
-      "src/__tests__/composite/results.service.test.ts",
-      "src/__tests__/scale/composite-scale-disclosure.test.ts"
+    "backend": [],
+    "frontend": [
+      "src/pages/admin/ScaleLibraryGovernance.test.tsx"
     ],
-    "frontend": [],
     "postgres": []
   },
-  "frontendLint": [],
+  "frontendLint": [
+    "src/pages/admin/ScaleLibraryGovernance.tsx",
+    "src/pages/admin/ScaleLibraryGovernance.test.tsx"
+  ],
   "browserProfileTrustApproved": true,
-  "productReference": "ad5d5c7233e3c8fd0be004a50b967638bde73f7b",
+  "productReference": "0410bb7830a858f463b1f47fa0add9d2cea3bb4f",
   "priorContracts": {
     "run": 39610102026,
     "head": "0152447ae08beefc04ffffa9601dd33295d3c33e",
@@ -777,5 +779,59 @@
       "server-version/backend/src/modules/scale-library-governance/training-source.ts"
     ],
     "reviewedBoundary": "16 unchanged suites: materialization overrides encryption key; request-local FINAL mocks encryption/identity; materialGrant and list controllers mock config; remaining pure schema/hash/compiler/media/Scale authorization paths do not consume the added cognitive/encryption/pseudonym environment keys. Changed exact wrapper binding/final/report/reinterpretation paths are covered by six additional direct suites, not those reused contracts."
+  },
+  "priorBrowser": {
+    "run": 39628789620,
+    "head": "1074ed99311e43aab79e62e3064e8071cefad888",
+    "checkout": "ebd514073387bad5c10cf10c0439e503f6db5e91",
+    "jobs": {
+      "backend": 119321172359,
+      "connected": 119323246388,
+      "sast": 119321171361
+    },
+    "artifacts": {
+      "admission": [
+        12358024222,
+        "scale-library-governance-admission-ebd514073387bad5c10cf10c0439e503f6db5e91",
+        1379955,
+        "9a358123fae00d1db780bac94b971ad6656db78a4918c160265bf0214b732f38"
+      ],
+      "connected": [
+        12359430069,
+        "scale-library-governance-connected-ebd514073387bad5c10cf10c0439e503f6db5e91",
+        5788753,
+        "cfe52a56b0ddfb7f8b6bc0ffc84c3b7cd72b8bb85a54ed2ab1a698715eb59698"
+      ],
+      "images": [
+        12358432721,
+        "scale-library-governance-backend-images-ebd514073387bad5c10cf10c0439e503f6db5e91",
+        811193422,
+        "06198c4fe68f73aa188d6c96d4ddc4ee6f48086eecfc6db7e959ecaf434e9070"
+      ]
+    },
+    "archive": "78a8e7fd34f825c2744ff84a184f0e78afda46b269a4c9841094f0493b518543",
+    "images": [
+      {
+        "id": "sha256:2eb0097fb557185846a416d1de1d1e925e8c288be676d8cabdae1adf3a486c41",
+        "tags": [
+          "scale-library-governance-backend-builder:ebd514073387bad5c10cf10c0439e503f6db5e91"
+        ],
+        "revision": "ebd514073387bad5c10cf10c0439e503f6db5e91"
+      },
+      {
+        "id": "sha256:7c3f4d14685f60e58ff3d4c983100e10d1f5c7d8cfb8ddac2d6c9be4ccc65a3c",
+        "tags": [
+          "scale-library-governance-backend-runtime:ebd514073387bad5c10cf10c0439e503f6db5e91"
+        ],
+        "revision": "ebd514073387bad5c10cf10c0439e503f6db5e91"
+      }
+    ],
+    "browserSha256": "c2a3bc3c68949e62b7d0d8ad4adf8b36dab33e2a0a38ec50de459b86317817db",
+    "screenshots": {
+      "survey-shared-scale-report-390.png": "89f3c06190ec869a9af1aec93122af858167005d32956086b96ec277c7aec3f5",
+      "survey-shared-scale-report-1440.png": "fac566be8d6b8ef3718714ea04d9dce081481bcc3bedb0dd7e83a6b1be2f753c",
+      "training-all-at-once-390.png": "e34ea5b084b79840b4b0a51d1e17d8c15de15e2a860f919e30bc60599b66dce3",
+      "training-all-at-once-1440.png": "23852d4d98532022edea0b1884a7d4e1c18b3bc28c6cc3720eda3301544d8953"
+    }
   }
 }

@@ -17,10 +17,9 @@ if(component==='backend'){
  assert.equal(prior.backendScan,'PASS_PRIOR_IMAGE_ONLY');
 }
 if(component==='frontend'){
- const prior=JSON.parse(readFileSync(resolve(evidence,'prior-contracts.json')));
- assert.equal(prior.status,'ACCEPTED_PRIOR_CONTRACTS_ONLY');assert.equal(prior.sourceRun,39610102026);
- assert.deepEqual(prior.suites.map(s=>s.file).sort(),[...plan.priorContracts[component]].sort());
- assert(prior.suites.every(s=>s.passed>0));assert.equal(prior.passed,component==='backend'?161:159);
+ const prior=JSON.parse(readFileSync(resolve(evidence,'../round10-accepted.json')));
+ assert.equal(prior.status,'ACCEPTED_PRIOR_COMPONENT_AND_BUSINESS');assert.equal(prior.sourceRun,39628789620);
+ assert.deepEqual(files,['src/pages/admin/ScaleLibraryGovernance.test.tsx']);
 }
 if(component==='postgres'){
  const prior=JSON.parse(readFileSync(resolve(evidence,'round3-accepted.json')));

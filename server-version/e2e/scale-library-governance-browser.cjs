@@ -13,7 +13,9 @@ const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAACXBIWXM
 const pngHash = createHash('sha256').update(png).digest('hex')
 let fixture, output, browser, activePage
 const secrets = new Set()
-const requiredChecks=['real-virtual-ctap2-administrator-session','real-upload-worker-completed','training-approved-and-granted-survey','training-to-survey-readonly-exact-release-frozen','v2-and-ordinary-revoke-preserve-exact-frozen-v1','training-to-survey-final-original-scorer-media','survey-approved-and-granted-training','survey-to-training-recipient-course-published','survey-to-training-composite-final-all-at-once','emergency-denies-new-collection-preserves-final-replay','unified-catalog-exact-identity-pagination']
+const fullChecks=['real-virtual-ctap2-administrator-session','real-upload-worker-completed','training-approved-and-granted-survey','training-to-survey-readonly-exact-release-frozen','v2-and-ordinary-revoke-preserve-exact-frozen-v1','training-to-survey-final-original-scorer-media','survey-approved-and-granted-training','survey-to-training-recipient-course-published','survey-to-training-composite-final-all-at-once','emergency-denies-new-collection-preserves-final-replay','unified-catalog-exact-identity-pagination']
+const adminAccessibilityChecks=['real-virtual-ctap2-administrator-session','admin-pending-exact-detail','admin-standard-exact-detail','admin-json-keyboard-accessibility']
+let requiredChecks=fullChecks
 const evidence = {schemaVersion:1,status:'RUNNING',phase:'prerequisites',checks:[],screenshots:[],layoutChecks:[],accessibility:[],browserErrors:[],failedRequests:[],media:[],mediaResponses:[],journeys:[],blockedExternalRequests:0,authoring:'Real authenticated author API; production UI review and participant consumption',physicalSecurityKeyVerified:false}
 const clean = value => {
   if (Array.isArray(value)) return value.map(clean)
@@ -351,6 +353,9 @@ async function captureAndAudit(page,name) {
     evidence.layoutChecks.push({name,width,overflow:await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)})
   }
   await page.setViewportSize({width:1440,height:1000})
+  await auditPage(page,name)
+}
+async function auditPage(page,name,width) {
   assert(await page.locator('script[type=module][src*="/assets/"]').count()>0)
   assert.equal(await page.locator('script[src*="/@vite/client"]').count(),0)
   const toolsRoot=path.resolve(__dirname,'../../.github/release-tools')
@@ -362,7 +367,7 @@ async function captureAndAudit(page,name) {
   await page.route(toolUrl,route)
   try{await page.addScriptTag({url:toolUrl})}finally{await page.unroute(toolUrl,route)}
   const audit=await page.evaluate(async()=>{const result=await window.axe.run({include:['main']},{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}});return{passes:result.passes.length,violations:result.violations}})
-  assert(audit.passes>0);evidence.accessibility.push({name,...clean(audit)});save()
+  assert(audit.passes>0);evidence.accessibility.push({name,...(width===undefined?{}:{width}),...clean(audit)});save()
 }
 async function catalogIdentity(admin,sources) {
   phase('unified-standard-and-authored-catalog')
@@ -393,6 +398,14 @@ async function verifyIsolatedOrigin(page,origin) {
   assert(await page.evaluate(()=>isSecureContext))
 }
 function prerequisites() {
+  const mode=process.env.SCALE_GOVERNANCE_BROWSER_MODE??'full'
+  assert(['full','admin-accessibility'].includes(mode),'Unknown governance browser mode')
+  if(mode==='admin-accessibility') {
+    requiredChecks=adminAccessibilityChecks
+    assert.match(process.env.SCALE_GOVERNANCE_FRONTEND_SHA256??'',/^[a-f0-9]{64}$/)
+    evidence.mode=mode;evidence.frontendIdentity={distManifestSha256:process.env.SCALE_GOVERNANCE_FRONTEND_SHA256};evidence.keyboard=[]
+    evidence.authoring='Real teacher author/publish/submit; real administrator read-only pending and STANDARD details; no approval, grant or participant execution'
+  }
   assert.equal(process.env.SCALE_GOVERNANCE_ISOLATED,'1');assert.equal(process.env.GITHUB_ACTIONS,'true');assert.equal(process.env.NODE_ENV,'test')
   const root=path.resolve(process.env.RUNNER_TEMP,'scale-library-governance-private'),file=process.env.SCALE_GOVERNANCE_FIXTURE_FILE
   assert.equal(path.dirname(path.resolve(file)),root)
@@ -502,6 +515,78 @@ async function emergencyStopAndReplay(admin,shared,source,completed) {
   evidence.lifecycle={newRevisionDistinct:true,ordinaryRevocationFrozenFinalPassed:true,emergencyNewAdmissionStatus:409,previousFinalReplayStatus:200,sameReceipt:true}
   check('emergency-denies-new-collection-preserves-final-replay')
 }
+// Minimal real setup for the two changed JSON regions; no media or business journey rerun.
+async function adminAccessibility() {
+  const author=await pageFor(),admin=await pageFor()
+  await verifyIsolatedOrigin(author,fixture.trainingUrl);await verifyIsolatedOrigin(admin,fixture.trainingUrl)
+  await trainingLogin(author,fixture.teacher);await adminLogin(admin)
+  phase('admin-accessibility-real-pending-setup')
+  const definition=trainingDefinition(undefined,undefined)
+  definition.items=definition.items.slice(0,1)
+  delete definition.items[0].images;delete definition.items[0].video
+  delete definition.report.rawScoreFeedback
+  const scale=await api(author,'/api/scales','POST',{code:'A11Y-CI-'+fixture.runId,name:'Synthetic accessibility pending scale',visibility:'COURSE',tags:[]})
+  await api(author,`/api/scales/${scale.id}/definition`,'PUT',{definition})
+  const current=await api(author,`/api/scales/${scale.id}`)
+  await api(author,`/api/scales/${scale.id}/publish`,'POST',{expectedUpdatedAt:current.updatedAt})
+  const source=await applyForLibrary(author,{sourceId:scale.id,title:current.name,definition:current.definition,product:'TRAINING'})
+  assert.equal(source.manifest.items.length,0)
+  phase('admin-accessibility-real-exact-details')
+  const catalogResponse=admin.waitForResponse(r=>r.request().method()==='GET'&&new URL(r.url()).pathname===governance('TRAINING')+'/catalog').then(parsed)
+  await admin.goto(fixture.trainingUrl+'/admin/scale-library-governance')
+  await admin.getByRole('heading',{name:'公共量表库与授权治理',exact:true}).waitFor()
+  let catalog=await catalogResponse,standard
+  for(let page=1;page<=20;page++) {
+    standard=catalog.list.find(row=>row.origin==='STANDARD_REGISTRY')
+    if(standard)break
+    assert(catalog.hasMore&&page<20,'No STANDARD catalog detail in isolated registry')
+    catalog=(await action(admin,governance('TRAINING')+'/catalog',()=>button(admin,'目录下一页').click(),'GET')).data
+  }
+  assert(standard?.exactVersion.instrumentKey&&standard.exactVersion.instrumentVersion)
+  const article=admin.locator('article').filter({has:admin.getByRole('heading',{level:3,name:source.title+' · 待审核',exact:true})})
+  const detail=(await action(admin,governance('TRAINING')+'/submissions/'+source.submission.id,()=>button(article,'读取精确版本审核内容').click(),'GET')).data
+  assert.equal(detail.status,'SUBMITTED');assert.equal(detail.releaseId,source.release.releaseId)
+  assert.equal(detail.release.contentHash,source.release.contentHash);assert.deepEqual(detail.snapshot.definition,source.definition)
+  const pending=article.getByRole('region',{name:'审核冻结内容：'+source.title+' · '+source.release.releaseId,exact:true})
+  assert.deepEqual(JSON.parse(await pending.innerText()),detail)
+  check('admin-pending-exact-detail')
+  const standardRow=admin.locator('article').filter({has:admin.getByRole('heading',{level:3,name:standard.title+' · 标准量表（只读）',exact:true})})
+  const endpoint=governance('TRAINING')+'/catalog/standard/'+encodeURIComponent(standard.exactVersion.instrumentKey)+'/'+encodeURIComponent(standard.exactVersion.instrumentVersion)
+  const exact=(await action(admin,endpoint,()=>button(standardRow,'查看标准精确版本详情').click(),'GET')).data.entry
+  assert.equal(exact.origin,'STANDARD_REGISTRY');assert.equal(exact.instrumentClass,'STANDARD')
+  assert.equal(exact.catalogId,standard.catalogId);assert.deepEqual(exact.exactVersion,standard.exactVersion)
+  const standardPre=admin.getByRole('region',{name:'目录版本内容：'+standard.title,exact:true})
+  assert.deepEqual(JSON.parse(await standardPre.innerText()),exact)
+  evidence.exactDetails={pending:{submissionId:source.submission.id,releaseId:source.release.releaseId,contentHash:source.release.contentHash,status:detail.status},standard:{catalogId:exact.catalogId,...exact.exactVersion}}
+  check('admin-standard-exact-detail')
+  for(const width of [1440,390]) {
+    await admin.setViewportSize({width,height:1000});await admin.evaluate(()=>document.fonts.ready)
+    for(const [name,region] of [['pending',pending],['standard',standardPre]]) {
+      assert.equal(await region.count(),1)
+      let tabPresses=0
+      do {await admin.keyboard.press('Tab');tabPresses++;assert(tabPresses<=200,'JSON region unreachable by real Tab navigation')} while(!await region.evaluate(element=>document.activeElement===element))
+      const focus=await region.evaluate(element=>({tagName:element.tagName,role:element.getAttribute('role'),accessibleName:element.getAttribute('aria-label'),tabIndex:element.tabIndex,scrollHeight:element.scrollHeight,clientHeight:element.clientHeight,outlineStyle:getComputedStyle(element).outlineStyle,outlineWidth:getComputedStyle(element).outlineWidth}))
+      assert.equal(focus.tagName,'PRE');assert.equal(focus.role,'region');assert(focus.accessibleName);assert.equal(focus.tabIndex,0)
+      assert(focus.scrollHeight>focus.clientHeight);assert.notEqual(focus.outlineStyle,'none');assert(parseFloat(focus.outlineWidth)>0)
+      await admin.keyboard.press('Home')
+      await admin.waitForFunction(element=>element.scrollTop===0,await region.elementHandle())
+      const beforeScrollTop=await region.evaluate(element=>element.scrollTop)
+      await admin.keyboard.press('PageDown')
+      await admin.waitForFunction(element=>element.scrollTop>0,await region.elementHandle())
+      const afterScrollTop=await region.evaluate(element=>element.scrollTop)
+      assert(await region.evaluate(element=>document.activeElement===element))
+      evidence.keyboard.push({name,width,tabPresses,...focus,beforeScrollTop,afterScrollTop});save()
+    }
+    const name='library-governance',file=name+'-'+width+'.png'
+    await admin.screenshot({path:path.join(output,file),fullPage:true,mask:[admin.locator('input,textarea,code,[href*="/r/"]')]})
+    evidence.screenshots.push({name,width,file})
+    evidence.layoutChecks.push({name,width,overflow:await admin.evaluate(()=>document.documentElement.scrollWidth>innerWidth+1)})
+    await auditPage(admin,name,width)
+  }
+  check('admin-json-keyboard-accessibility')
+  const stillPending=await api(admin,governance('TRAINING')+'/submissions/'+source.submission.id,'GET',undefined,'MANAGEMENT')
+  assert.equal(stillPending.status,'SUBMITTED');assert.equal(stillPending.version,detail.version)
+}
 async function main() {
   try {
     prerequisites();save()
@@ -510,6 +595,8 @@ async function main() {
     assert(profileHome.startsWith(path.dirname(process.env.SCALE_GOVERNANCE_FIXTURE_FILE)+path.sep));assert.equal(fs.realpathSync(profileHome),profileHome)
     const {chromium}=require(process.env.SCALE_GOVERNANCE_PLAYWRIGHT_MODULE||'../backend/node_modules/playwright-core')
     browser=await chromium.launch({headless:true,env:{...process.env,HOME:profileHome},executablePath:process.env.SCALE_GOVERNANCE_CHROMIUM_EXECUTABLE||chromium.executablePath(),args:['--host-resolver-rules=MAP training.eduk12.top 127.0.0.1, MAP survey.eduk12.top 127.0.0.1']})
+    if(evidence.mode==='admin-accessibility')await adminAccessibility()
+    else {
     const author=await pageFor(),researcher=await pageFor(),admin=await pageFor()
     await verifyIsolatedOrigin(author,fixture.trainingUrl);await verifyIsolatedOrigin(researcher,fixture.surveyUrl);await verifyIsolatedOrigin(admin,fixture.trainingUrl)
     await trainingLogin(author,fixture.teacher);await surveyLogin(researcher);await adminLogin(admin)
@@ -523,6 +610,7 @@ async function main() {
     await trainingParticipant(delivery,second)
     await emergencyStopAndReplay(admin,shared,first,surveyResult)
     await catalogIdentity(admin,[first,second]);await captureAndAudit(admin,'library-governance')
+    }
     assert.equal(evidence.browserErrors.length,0);assert.equal(evidence.blockedExternalRequests,0)
     assert(evidence.layoutChecks.every(row=>!row.overflow));assert(evidence.accessibility.every(row=>row.violations.length===0))
     assert.deepEqual(evidence.checks,requiredChecks)

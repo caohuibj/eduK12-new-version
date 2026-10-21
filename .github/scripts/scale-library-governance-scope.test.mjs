@@ -22,12 +22,12 @@ test('all selected actual jobs must succeed, with no application/full fallback',
  for(const job of requiredChecks(n,false))for(const result of ['failure','skipped','cancelled',undefined])assert(failedChecks({...n,[job]:{...n[job],result}},false).includes(job));
  assert(failedChecks(n,true).includes('scope'));
 });
-test('same-builder report checks, prior PG recovery, isolated media and private cleanup remain required',()=>{
+test('same-builder admin checks, prior PG recovery and private cleanup remain required',()=>{
  const w=readFileSync(new URL('../workflows/ci-scale-library-governance.yml',import.meta.url),'utf8');
- assert.match(w,/resume.py round4-evidence/);assert.match(w,/scale-library-governance-build.sh backend/);assert.match(w,/same-run backend/);
- assert.doesNotMatch(w,/scale-library-governance-build.sh frontend|checks.mjs.* postgres|recovery.py (?:bootstrap|restore)/);
+ assert.match(w,/resume.py round10-evidence/);assert.match(w,/scale-library-governance-build.sh frontend/);assert.match(w,/same-run frontend/);
+ assert.doesNotMatch(w,/scale-library-governance-build.sh backend|checks.mjs.* postgres|recovery.py (?:bootstrap|restore)/);
  assert.match(w,/npx prisma migrate deploy/);
- assert.match(w,/backend.sh worker/);assert.match(w,/NET_BIND_SERVICE/);
+ assert.doesNotMatch(w,/backend.sh worker|ffmpeg -nostdin/);assert.match(w,/NET_BIND_SERVICE/);
  assert.doesNotMatch(w,/ignoreHTTPSErrors|--ignore-certificate-errors|\/etc\/hosts|update-ca-certificates/);
  assert.match(w,/if: always\(\)/);assert.match(w,/privateMaterialRemoved/);
  const build=readFileSync(new URL('./scale-library-governance-build.sh',import.meta.url),'utf8');
@@ -68,23 +68,20 @@ test('browser admission refuses missing checkpoints, media bytes, wrong provenan
  assert.throws(()=>verifyGovernanceBrowserReport(r,{...options,read:()=>Buffer.from('not PNG')}));
 });
 
-test('report repair rebuilds only backend and preserves all unrelated successful qualification',()=>{
+test('admin repair rebuilds only frontend and preserves all unrelated successful qualification',()=>{
  const w=readFileSync(new URL('../workflows/ci-scale-library-governance.yml',import.meta.url),'utf8');
- assert.equal((w.match(/scale-library-governance-build\.sh backend/g)||[]).length,1);
- assert.equal((w.match(/scale-library-governance-checks\.mjs\" backend/g)||[]).length,1);
+ assert.equal((w.match(/scale-library-governance-build\.sh frontend/g)||[]).length,1);
+ assert.equal((w.match(/scale-library-governance-checks\.mjs\" frontend/g)||[]).length,1);
  assert.match(w,/docker\/setup-buildx-action@v3/);
  assert.match(w,/aquasecurity\/setup-trivy@/);
- assert.match(w,/trivy image --exit-code 1.*--severity HIGH,CRITICAL.*scale-library-governance-backend-runtime:\$GITHUB_SHA/);
- assert.deepEqual(binding.tests.backend,[
-  'src/__tests__/composite/results.service.test.ts',
-  'src/__tests__/scale/composite-scale-disclosure.test.ts',
- ]);
- assert.deepEqual(binding.tests.frontend,[]);assert.deepEqual(binding.tests.postgres,[]);
- assert.doesNotMatch(w,/scale-library-governance-build\.sh frontend|checks\.mjs[\"']? (?:frontend|postgres)|recovery\.py (?:bootstrap|restore)|component: \[|trivy image[^\n]*frontend|npm run (?:test|build)|npx vitest/);
+ assert.match(w,/trivy image --exit-code 1.*--severity HIGH,CRITICAL.*scale-library-governance-frontend-runtime:\$GITHUB_SHA/);
+ assert.deepEqual(binding.tests.frontend,['src/pages/admin/ScaleLibraryGovernance.test.tsx']);
+ assert.deepEqual(binding.tests.backend,[]);assert.deepEqual(binding.tests.postgres,[]);
+ assert.doesNotMatch(w,/scale-library-governance-build\.sh backend|checks\.mjs[\"']? (?:backend|postgres)|recovery\.py (?:bootstrap|restore)|component: \[|trivy image[^\n]*backend|npm run (?:test|build)|npx vitest/);
  const checks=readFileSync(new URL('./scale-library-governance-checks.mjs',import.meta.url),'utf8');
  assert.match(checks,/const files=plan\.tests\[component\]/);
  assert.match(checks,/\.\.\.files/);
- assert.match(w,/resume.py qualified-frontend/);assert.match(w,/resume.py round4-evidence/);assert.match(w,/scale-library-governance-build.sh backend/);assert.match(w,/same-run backend/);
+ assert.match(w,/resume.py round10-backend/);assert.match(w,/resume.py round10-evidence/);assert.match(w,/scale-library-governance-build.sh frontend/);assert.match(w,/same-run frontend/);
  assert.match(w,/SCALE_GOVERNANCE_BACKEND_IMAGE_HEAD/);
  const reuse=readFileSync(new URL('./scale-library-governance-resume.py',import.meta.url),'utf8');
  assert.doesNotMatch(reuse,/docker['", ]+build|npm ci|docker['", ]+tag/);
@@ -165,4 +162,41 @@ test('fixture safe diagnostics retain error class and location without sensitive
  const error={name:'PrismaClientValidationError',code:'P2002',message:'password=DO_NOT_PRINT',meta:{query:'secret'},stack:'Error: secret\n    at main (/private/scale-library-governance-browser-fixture.ts:44:9)'};
  const result=safe(error);assert.equal(result.errorName,'PrismaClientValidationError');assert.equal(result.errorCode,'P2002');assert.equal(result.frames[0].line,44);
  assert.doesNotMatch(JSON.stringify(result),/DO_NOT_PRINT|secret|password|\/private/);
+});
+
+
+test('admin-only report requires real keyboard scrolling, both new viewports and exact served dist identity',async()=>{
+ const {verifyGovernanceAdminReport}=await import('./scale-library-governance-scope.mjs');
+ const digest='a'.repeat(64);
+ const r={schemaVersion:1,status:'PASS',phase:'complete',mode:'admin-accessibility',sourceCommit:head,ciRunId:'123',frontendIdentity:{distManifestSha256:digest},checks:['real-virtual-ctap2-administrator-session','admin-pending-exact-detail','admin-standard-exact-detail','admin-json-keyboard-accessibility'],browserErrors:[],blockedExternalRequests:0,physicalSecurityKeyVerified:false,
+ exactDetails:{pending:{status:'SUBMITTED',submissionId:'synthetic',releaseId:'synthetic',contentHash:'b'.repeat(64)},standard:{origin:'STANDARD_REGISTRY',catalogId:'standard:key:1',instrumentKey:'key',instrumentVersion:'1'}},
+ keyboard:[1440,390].flatMap(width=>['pending','standard'].map(name=>({name,width,tabPresses:1,role:'region',tabIndex:0,accessibleName:name,beforeScrollTop:0,afterScrollTop:100,tagName:'PRE',scrollHeight:1000,clientHeight:384,outlineStyle:'solid',outlineWidth:'2px'}))),
+ screenshots:[1440,390].map(width=>({name:'library-governance',width,file:`library-governance-${width}.png`})),layoutChecks:[1440,390].map(width=>({name:'library-governance',width,overflow:false})),accessibility:[1440,390].map(width=>({name:'library-governance',width,passes:1,violations:[]}))};
+ const options={head,runId:'123',directory:'/evidence',distManifestSha256:digest,read:file=>{const bytes=Buffer.alloc(128);Buffer.from([137,80,78,71,13,10,26,10]).copy(bytes);bytes.writeUInt32BE(Number(file.match(/-(\d+)\.png$/)[1]),16);bytes.writeUInt32BE(1000,20);return bytes;}};
+ assert.equal(verifyGovernanceAdminReport(r,options).status,'PASS');
+ for(const mutate of [r=>r.status='FAIL',r=>r.mode='full',r=>r.frontendIdentity.distManifestSha256='c'.repeat(64),r=>r.keyboard[0].tabPresses=0,r=>r.keyboard[0].afterScrollTop=0,r=>r.keyboard[0].outlineStyle='none',r=>r.accessibility[1].violations.push({id:'scrollable-region-focusable'}),r=>r.layoutChecks[0].overflow=true,r=>r.checks.pop(),r=>r.exactDetails.pending.status='APPROVED']){const bad=structuredClone(r);mutate(bad);assert.throws(()=>verifyGovernanceAdminReport(bad,options));}
+});
+
+
+test('fixed Round10 admission keeps failed browser identity and rejects mismatched official producers',async()=>{
+ const {execFileSync}=await import('node:child_process');
+ execFileSync('python3',['-B','-c',`
+import importlib.util
+spec=importlib.util.spec_from_file_location('resume','.github/scripts/scale-library-governance-resume.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+run={'id':m.ROUND10['run'],'head_sha':m.ROUND10['head'],'run_attempt':1,'status':'completed','conclusion':'failure'}
+job={'id':m.ROUND10['jobs']['backend'],'run_id':m.ROUND10['run'],'head_sha':m.ROUND10['head'],'run_attempt':1,'status':'completed','conclusion':'success'}
+def read(path):return run if path.startswith('runs/') else job
+m.round10_official('backend',read)
+for field,value in [('head_sha','0'*40),('run_attempt',2),('conclusion','failure')]:
+ old=job[field];job[field]=value
+ try:m.round10_official('backend',read)
+ except AssertionError:pass
+ else:raise AssertionError('invalid fixed producer')
+ job[field]=old
+job['id']=m.ROUND10['jobs']['connected'];job['conclusion']='failure';m.round10_official('connected',read)
+job['conclusion']='success'
+try:m.round10_official('connected',read)
+except AssertionError:pass
+else:raise AssertionError('old browser failure rewritten')
+`],{stdio:'pipe'});
 });

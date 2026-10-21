@@ -1,5 +1,6 @@
+import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
-import {readFileSync,readdirSync,lstatSync,appendFileSync} from 'node:fs';
+import {readFileSync,writeFileSync,readdirSync,lstatSync,appendFileSync} from 'node:fs';
 export const bindingPath='.github/scripts/scale-library-governance-bindings.json';
 export const binding=JSON.parse(readFileSync(new URL('./scale-library-governance-bindings.json',import.meta.url)));
 const tools=new Set([bindingPath,'.github/scripts/scale-library-governance-resume.py','.github/scripts/scale-library-governance-scope.mjs','.github/scripts/scale-library-governance-scope.test.mjs','.github/scripts/scale-library-governance-build.sh','.github/scripts/scale-library-governance-checks.mjs','.github/scripts/scale-library-governance-backend.sh','.github/scripts/scale-library-governance-recovery.py','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml','.github/workflows/ci-scale-library-governance.yml','docs/release/README.md']);
@@ -30,7 +31,7 @@ export function scaleLibraryGovernanceOutputs(plan){
 
 export function governanceCodeqlConfig(){
  if(binding.frozen!==true)throw Error('Unfrozen analysis inventory');
- const original='e74783c4a8baffa7b999b49182bd697018825bc7';
+ const original=binding.priorBrowser.head;
  const selected=git('diff','--name-only',original,'HEAD').split('\n').filter(f=>/\.(?:[cm]?[jt]sx?|py)$/.test(f));
  if(!selected.length||selected.some(f=>!tools.has(f)&&!Object.hasOwn(binding.source,f)))throw Error('Unknown or empty changed SAST input');
  const directories=[...new Set(selected.map(f=>f.slice(0,f.lastIndexOf('/'))))];
@@ -49,21 +50,27 @@ export function governanceCodeqlConfig(){
  return {paths:roots,'paths-ignore':ignored.sort()};
 }
 export const requiredGovernanceChecks=['real-virtual-ctap2-administrator-session','real-upload-worker-completed','training-approved-and-granted-survey','training-to-survey-readonly-exact-release-frozen','v2-and-ordinary-revoke-preserve-exact-frozen-v1','training-to-survey-final-original-scorer-media','survey-approved-and-granted-training','survey-to-training-recipient-course-published','survey-to-training-composite-final-all-at-once','emergency-denies-new-collection-preserves-final-replay','unified-catalog-exact-identity-pagination'];
-export function verifyGovernanceBrowserReport(report,{head,runId,directory,read=readFileSync}){
+export function verifyGovernanceBrowserReport(report,{head,runId,directory,read=readFileSync,priorBusiness=false}){
  const require=(ok,message)=>{if(!ok)throw Error('Governance browser evidence: '+message);};
  const same=(actual,expected,message)=>require(JSON.stringify(actual)===JSON.stringify(expected),message);
- require(report.schemaVersion===1&&report.status==='PASS'&&report.phase==='complete','completed real browser result required');
+ require(report.schemaVersion===1,'report schema');
+ if(priorBusiness){
+  require(head===binding.priorBrowser.checkout&&runId===String(binding.priorBrowser.run),'fixed prior business identity');
+  require(report.status==='FAIL'&&report.phase==='unified-standard-and-authored-catalog','original browser failure must remain failure');
+  const failed=report.accessibility.filter(row=>row.name==='library-governance');
+  require(failed.length===1&&failed[0].violations.length===1&&failed[0].violations[0].id==='scrollable-region-focusable','only excluded admin accessibility failure');
+ }else require(report.status==='PASS'&&report.phase==='complete','completed real browser result required');
  require(/^[a-f0-9]{40}$/.test(head)&&report.sourceCommit===head&&report.ciRunId===runId,'candidate/run identity');
  same(report.checks,requiredGovernanceChecks,'all ordered checkpoints');
  same(report.browserErrors,[],'browser errors');require(report.blockedExternalRequests===0,'external requests');
  require(report.physicalSecurityKeyVerified===false,'virtual authenticator must not claim physical-key acceptance');
- const names=['training-all-at-once','survey-shared-scale-report','library-governance'];
+ const names=priorBusiness?['training-all-at-once','survey-shared-scale-report']:['training-all-at-once','survey-shared-scale-report','library-governance'];
  for(const key of ['screenshots','layoutChecks']){
   require(Array.isArray(report[key])&&report[key].length===6,key+' matrix');
   for(const name of names)for(const width of [1440,390]){
    const rows=report[key].filter(row=>row.name===name&&row.width===width);require(rows.length===1,key+' unique viewport');const row=rows[0];
    if(key==='layoutChecks')require(row.overflow===false,'viewport overflow');
-   else{require(row.file===`${name}-${width}.png`,'screenshot safe exact name');const bytes=read(directory+'/'+row.file);require(bytes.length>100&&bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]))&&bytes.readUInt32BE(16)===width&&bytes.readUInt32BE(20)>0,'actual PNG dimensions');}
+   else{if(priorBusiness)require(createHash('sha256').update(read(directory+'/'+row.file)).digest('hex')===binding.priorBrowser.screenshots[row.file],'fixed original screenshot bytes');require(row.file===`${name}-${width}.png`,'screenshot safe exact name');const bytes=read(directory+'/'+row.file);require(bytes.length>100&&bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]))&&bytes.readUInt32BE(16)===width&&bytes.readUInt32BE(20)>0,'actual PNG dimensions');}
   }
  }
  require(Array.isArray(report.accessibility)&&report.accessibility.length===3,'accessibility matrix');
@@ -81,7 +88,34 @@ export function verifyGovernanceBrowserReport(report,{head,runId,directory,read=
  }
  for(const[name,seconds]of [['review-video',60],['survey-runtime-video',600]]){const v=one(name);require(v.capabilityMaxSeconds===seconds&&v.status===206&&/^video\//.test(v.contentType)&&/^bytes 0-1023\/\d+$/.test(v.contentRange)&&v.byteLength===1024&&v.currentTime>0&&v.videoWidth>0&&v.videoHeight>0,'real bounded capability / Range / playback '+name);if(name==='survey-runtime-video')require(v.ended===true,'actual complete stimulus viewing');}
  require(report.media.length===8,'no missing or unknown media observations');
- return {status:'PASS',sourceCommit:head,ciRunId:runId,checkpoints:11,screenshots:6,actualJourneys:2,physicalSecurityKeyVerified:false};
+ return {status:priorBusiness?'ACCEPTED_PRIOR_BUSINESS_ONLY':'PASS',originalStatus:report.status,sourceCommit:head,ciRunId:runId,checkpoints:11,screenshots:priorBusiness?4:6,actualJourneys:2,physicalSecurityKeyVerified:false};
+}
+
+export function verifyGovernanceAdminReport(report,{head,runId,directory,distManifestSha256,read=readFileSync}){
+ const require=(ok,message)=>{if(!ok)throw Error('Governance admin evidence: '+message);};
+ const same=(a,b,message)=>require(JSON.stringify(a)===JSON.stringify(b),message);
+ require(report.schemaVersion===1&&report.status==='PASS'&&report.phase==='complete'&&report.mode==='admin-accessibility','new actual admin mode complete');
+ require(report.sourceCommit===head&&report.ciRunId===runId&&/^[a-f0-9]{40}$/.test(head),'new candidate identity');
+ require(/^[a-f0-9]{64}$/.test(distManifestSha256)&&report.frontendIdentity.distManifestSha256===distManifestSha256,'new frontend compiled dist identity');
+ same(report.checks,['real-virtual-ctap2-administrator-session','admin-pending-exact-detail','admin-standard-exact-detail','admin-json-keyboard-accessibility'],'new admin checks');
+ same(report.browserErrors,[],'browser errors');require(report.blockedExternalRequests===0&&report.physicalSecurityKeyVerified===false,'isolation and virtual key boundary');
+ const exact=report.exactDetails;
+ require(exact?.pending?.status==='SUBMITTED'&&typeof exact.pending.submissionId==='string'&&typeof exact.pending.releaseId==='string'&&/^[a-f0-9]{64}$/.test(exact.pending.contentHash),'actual pending exact release');
+ require(exact?.standard?.origin==='STANDARD_REGISTRY'&&typeof exact.standard.catalogId==='string'&&typeof exact.standard.instrumentKey==='string'&&typeof exact.standard.instrumentVersion==='string','actual standard exact identity');
+ require(report.keyboard.length===4&&report.screenshots.length===2&&report.layoutChecks.length===2&&report.accessibility.length===2,'exact new UI inventory');
+ for(const width of [1440,390]){
+  for(const name of ['pending','standard']){
+   const rows=report.keyboard.filter(r=>r.name===name&&r.width===width);require(rows.length===1,'unique keyboard observation');const k=rows[0];
+   require(Number.isInteger(k.tabPresses)&&k.tabPresses>0&&k.role==='region'&&k.tabIndex===0&&typeof k.accessibleName==='string'&&k.accessibleName.length>0&&k.beforeScrollTop===0&&k.afterScrollTop>0&&k.tagName==='PRE'&&k.scrollHeight>k.clientHeight&&k.outlineStyle!=='none'&&parseFloat(k.outlineWidth)>0,'real Tab and keyboard scroll');
+  }
+  for(const key of ['screenshots','layoutChecks','accessibility']){
+   const rows=report[key].filter(r=>r.name==='library-governance'&&r.width===width);require(rows.length===1,'unique viewport '+key);const row=rows[0];
+   if(key==='layoutChecks')require(row.overflow===false,'overflow');
+   else if(key==='accessibility')require(row.passes>0&&row.violations.length===0,'nonempty zero-violation axe');
+   else {require(row.file===`library-governance-${width}.png`,'exact screenshot name');const bytes=read(directory+'/'+row.file);require(bytes.length>100&&bytes.subarray(0,8).equals(Buffer.from([137,80,78,71,13,10,26,10]))&&bytes.readUInt32BE(16)===width&&bytes.readUInt32BE(20)>0,'actual PNG');}
+  }
+ }
+ return {status:'PASS',sourceCommit:head,ciRunId:runId,distManifestSha256,newAdminViewports:2,priorBusinessRun:binding.priorBrowser.run,priorBusinessOriginalConclusion:'failure',newBusinessJourneysExecuted:0};
 }
 
 // Never return success for an unfinished or unknown executable entry point.
@@ -90,10 +124,19 @@ if(process.argv[1] && import.meta.url === (await import('node:url')).pathToFileU
   const config=governanceCodeqlConfig();
   if(!process.env.GITHUB_OUTPUT)throw Error('Actions output required');
   appendFileSync(process.env.GITHUB_OUTPUT,'config='+JSON.stringify(config)+'\n');console.log(JSON.stringify(config));
+ }else if(process.argv[2]==='prior-browser-report'){
+  const directory='scale-library-governance-evidence/prior-round10/connected/browser';const raw=readFileSync(directory+'/result.json');
+  if(createHash('sha256').update(raw).digest('hex')!==binding.priorBrowser.browserSha256)throw Error('Fixed prior report bytes differ');
+  console.log(JSON.stringify(verifyGovernanceBrowserReport(JSON.parse(raw),{head:binding.priorBrowser.checkout,runId:String(binding.priorBrowser.run),directory,priorBusiness:true})));
  }else if(process.argv[2]==='browser-report'){
   if(binding.frozen!==true)throw Error('Unfrozen browser contract');
   const directory=process.env.SCALE_GOVERNANCE_EVIDENCE_DIR;if(!directory)throw Error('Explicit browser evidence directory required');
   const report=JSON.parse(readFileSync(directory+'/result.json','utf8'));
-  console.log(JSON.stringify(verifyGovernanceBrowserReport(report,{head:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID,directory})));
+  const current=verifyGovernanceAdminReport(report,{head:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID,directory,distManifestSha256:createHash('sha256').update(readFileSync('scale-library-governance-evidence/frontend/runtime-files.sha256')).digest('hex')});
+  const priorDirectory='scale-library-governance-evidence/prior-round10/connected/browser',raw=readFileSync(priorDirectory+'/result.json');
+  if(createHash('sha256').update(raw).digest('hex')!==binding.priorBrowser.browserSha256)throw Error('Fixed prior report bytes differ');
+  const prior=verifyGovernanceBrowserReport(JSON.parse(raw),{head:binding.priorBrowser.checkout,runId:String(binding.priorBrowser.run),directory:priorDirectory,priorBusiness:true});
+  const summary={status:'PASS',newAdmin:current,priorBusiness:prior,priorReportSha256:binding.priorBrowser.browserSha256,newReportSha256:createHash('sha256').update(readFileSync(directory+'/result.json')).digest('hex'),sameRunFullJourneyClaim:false};
+  writeFileSync(directory+'/acceptance-summary.json',JSON.stringify(summary,null,2)+'\n');console.log(JSON.stringify(summary));
  }else throw Error('Unknown governance entry point');
 }
