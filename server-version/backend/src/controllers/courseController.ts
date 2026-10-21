@@ -1142,7 +1142,7 @@ export const courseController = {
     }
   },
 
-  // 复制课程 - 复制课程、作业和打卡，不复制学生数据
+  // 复制课程 - 复制课程、练习和打卡，不复制学生数据
   async cloneCourse(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
@@ -1193,7 +1193,7 @@ export const courseController = {
         }
       })
 
-      // 复制作业（清空截止时间）
+      // 复制练习（清空截止时间）
       if (originalCourse.assignments.length > 0) {
         await prisma.assignment.createMany({
           data: originalCourse.assignments.map(assignment => ({
@@ -1249,14 +1249,14 @@ export const courseController = {
         ...clonedCourseWithDetails,
         studentCount: 0,
         _count: undefined,
-      }, `课程复制成功，包含 ${originalCourse.assignments.length} 个作业和 ${originalCourse.checkins.length} 个打卡`)
+      }, `课程复制成功，包含 ${originalCourse.assignments.length} 个练习和 ${originalCourse.checkins.length} 个打卡`)
     } catch (err) {
       logger.error('复制课程错误', err)
       return error(res, '复制课程失败')
     }
   },
 
-  // 获取课程的作业列表（学生视角）
+  // 获取课程的练习列表（学生视角）
   async getAssignments(req: Request, res: Response) {
     try {
       const userId = req.user?.userId
@@ -1295,7 +1295,7 @@ export const courseController = {
         }
       }
 
-      // 获取课程的已发布作业（教师看全部，学生看已发布）
+      // 获取课程的已发布练习（教师看全部，学生看已发布）
       const assignments = await prisma.assignment.findMany({
         where: {
           courseId: id,
@@ -1331,8 +1331,8 @@ export const courseController = {
         total: formattedAssignments.length,
       })
     } catch (err) {
-      logger.error('获取课程作业错误', err)
-      return error(res, '获取课程作业失败')
+      logger.error('获取课程练习错误', err)
+      return error(res, '获取课程练习失败')
     }
   },
 
@@ -1631,7 +1631,7 @@ export const courseController = {
         }
       })
 
-      // 复制作业
+      // 复制练习
       if (originalCourse.assignments.length > 0) {
         await prisma.assignment.createMany({
           data: originalCourse.assignments.map(assignment => ({

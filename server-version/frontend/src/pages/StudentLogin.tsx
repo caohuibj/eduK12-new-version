@@ -106,7 +106,7 @@ const StudentLogin: React.FC = () => {
 
       <div className="hui-auth-note">
         <strong>{training ? '学员注册说明' : '学生注册说明'}</strong>
-        <div>{training ? '首次注册需使用培训师提供的课程码，验证后创建账号。' : '注册后使用课程号加入课程，即可查看作业和打卡任务。'}</div>
+        <div>{training ? '首次注册需使用培训师提供的课程码，验证后创建账号。' : '注册后使用课程号加入课程，即可查看练习和打卡任务。'}</div>
       </div>
     </AuthShell>
   )

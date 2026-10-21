@@ -34,7 +34,7 @@ beforeEach(() => {
   loadAssessments.mockReset()
   get.mockImplementation((url: string) => {
     if (url === '/courses/course-1') return Promise.resolve({ code: 0, data: course })
-    if ((url === '/courses/course-1/assignments' || url.startsWith('/assignments?view=summary&courseId=course-1&'))) return Promise.resolve({ code: 0, data: { list: [{ id: 'a-1', title: '课程作业', status: 'PUBLISHED', submitted: false }] } })
+    if ((url === '/courses/course-1/assignments' || url.startsWith('/assignments?view=summary&courseId=course-1&'))) return Promise.resolve({ code: 0, data: { list: [{ id: 'a-1', title: '课程练习', status: 'PUBLISHED', submitted: false }] } })
     if ((url === '/courses/course-1/checkins' || url.startsWith('/checkins?view=summary&courseId=course-1&'))) return Promise.resolve({ code: 0, data: { list: [{ id: 'c-1', title: '每周打卡', status: 'PUBLISHED', submitted: false }] } })
     if (url.startsWith('/courses/course-1/training-assessments?includeManaged=true&view=summary&')) return Promise.resolve({ code: 0, data: { list: [
       { key: 'questionnaire:q-1', id: 'q-1', name: '学习状态', kind: 'QUESTIONNAIRE', typeLabel: '课程问卷', unitCount: 2, unitLabel: '单元', manageHref: '/questionnaire-products/q-1' },
@@ -51,10 +51,22 @@ beforeEach(() => {
 })
 
 describe('course-first training workspaces', () => {
+  it('renames the exercise interface while preserving the authored task title', async () => {
+    const original = get.getMockImplementation()!
+    get.mockImplementation((url: string) => url.startsWith('/assignments?')
+      ? Promise.resolve({ code: 0, data: { list: [{ id: 'original', title: '保留原题名：我的作业', status: 'PUBLISHED' }], total: 1 } })
+      : original(url))
+    mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
+    expect(await screen.findByRole('heading', { name: '保留原题名：我的作业' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '练习' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.queryByRole('button', { name: '作业' })).toBeNull()
+    expect(screen.getByRole('link', { name: /发布练习/ })).toHaveAttribute('href', expect.stringContaining('/assignments?create=true&courseId=course-1'))
+    expect(screen.getByRole('link', { name: '复用练习' })).toBeInTheDocument()
+  })
   it('learner sees only three task groups, reuses existing assignment and check-in routes', async () => {
     mount('/student/courses/course-1', '/student/courses/:courseId', TrainingLearnerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()
-    expect(await screen.findByRole('link', { name: /完成作业/ })).toHaveAttribute('href', '/student/assignments/a-1?courseId=course-1')
+    expect(await screen.findByRole('link', { name: /完成练习/ })).toHaveAttribute('href', '/student/assignments/a-1?courseId=course-1')
     fireEvent.click(screen.getByRole('button', { name: '打卡' }))
     expect(await screen.findByRole('link', { name: /去打卡/ })).toHaveAttribute('href', '/student/checkins/c-1?courseId=course-1')
     fireEvent.click(screen.getByRole('button', { name: '测评' }))
@@ -88,7 +100,7 @@ describe('course-first training workspaces', () => {
     })
     mount('/student/courses/course-1', '/student/courses/:courseId', TrainingLearnerCourse)
     expect(await screen.findByText('已保存草稿')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /继续作业/ })).toHaveAttribute('href', '/student/assignments/draft-1?courseId=course-1')
+    expect(screen.getByRole('link', { name: /继续练习/ })).toHaveAttribute('href', '/student/assignments/draft-1?courseId=course-1')
     fireEvent.click(screen.getByRole('button', { name: '打卡' }))
     expect(await screen.findByText('已截止')).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: /去打卡/ })).toBeNull()
@@ -98,12 +110,12 @@ describe('course-first training workspaces', () => {
   it('shows assignment API failure without crashing the course page', async () => {
     get.mockImplementation((url: string) => {
       if (url === '/courses/course-1') return Promise.resolve({ code: 0, data: course })
-      if ((url === '/courses/course-1/assignments' || url.startsWith('/assignments?view=summary&courseId=course-1&'))) return Promise.reject(new Error('作业查询超时'))
+      if ((url === '/courses/course-1/assignments' || url.startsWith('/assignments?view=summary&courseId=course-1&'))) return Promise.reject(new Error('练习查询超时'))
       if ((url === '/courses/course-1/checkins' || url.startsWith('/checkins?view=summary&courseId=course-1&'))) return Promise.resolve({ code: 0, data: { list: [] } })
       throw new Error('unexpected url ' + url)
     })
     mount('/student/courses/course-1', '/student/courses/:courseId', TrainingLearnerCourse)
-    expect(await screen.findByRole('alert')).toHaveTextContent('作业查询超时')
+    expect(await screen.findByRole('alert')).toHaveTextContent('练习查询超时')
     expect(screen.getByRole('button', { name: '重试' })).toBeInTheDocument()
   })
 
@@ -117,33 +129,30 @@ describe('course-first training workspaces', () => {
     expect(get).toHaveBeenCalledWith(expect.stringContaining('/courses/course-1/training-assessments?includeManaged=true&view=summary&page=1&pageSize=20'))
   })
 
-  it('loads authorized analysis sources only when the trainer opens its data-analysis tab', async () => {
-    const original = get.getMockImplementation()!
-    get.mockImplementation((url: string) => url === '/courses/course-1/training-analysis/sources'
-      ? Promise.resolve({ code: 0, data: { list: [], total: 0, canQuality: false, canExport: false } })
-      : original(url))
-    mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
+  it('hides analysis and sends old analysis links to assessments without loading analysis sources', async () => {
+    mount('/courses/course-1/detail?section=analysis', '/courses/:courseId/detail', TrainingTrainerCourse)
     await screen.findByRole('heading', { name: course.title })
-    expect(get).not.toHaveBeenCalledWith('/courses/course-1/training-analysis/sources')
-    fireEvent.click(screen.getByRole('button', { name: '信息统计' }))
-    expect(await screen.findByText(/当前没有可分析的授权数值来源/)).toBeVisible()
-    expect(get).toHaveBeenCalledWith('/courses/course-1/training-analysis/sources')
-    fireEvent.click(screen.getByRole('button', { name: '作业' }))
-    expect(screen.getByRole('link', { name: /发布作业/ })).toHaveAttribute('href', expect.stringContaining('/assignments?create=true&courseId=course-1&returnTo='))
+    expect(screen.queryByRole('button', { name: '信息统计' })).toBeNull()
+    expect(screen.queryByRole('region', { name: '课程数据分析' })).toBeNull()
+    expect(screen.getByRole('button', { name: '测评' })).toHaveAttribute('aria-pressed', 'true')
+    expect(await screen.findByRole('link', { name: /发布测评/ })).toHaveAttribute('href', expect.stringContaining('/questionnaire-products/new?courseId=course-1&returnTo='))
+    expect(get.mock.calls.some(([url]) => url.includes('training-analysis'))).toBe(false)
+    fireEvent.click(screen.getByRole('button', { name: '练习' }))
+    expect(await screen.findByRole('link', { name: /发布练习/ })).toBeVisible()
+    expect(get.mock.calls.some(([url]) => url.includes('training-analysis'))).toBe(false)
   })
 
   it('keeps course code operations in a low-frequency settings section with explicit confirmation', async () => {
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button',{name:'课程管理'}))
-    fireEvent.click(screen.getByText(/课程设置/, { selector: 'summary' }))
     fireEvent.click(screen.getByRole('button', { name: '轮换课程码' }))
     await screen.findByRole('button', { name: '轮换课程码' })
     expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ title: '轮换课程码？' }))
     await waitFor(() => expect(post).toHaveBeenCalledWith('/courses/course-1/rotate-code', {}))
   })
 
-  it('keeps settings open while a successful recruitment change refreshes the same course', async () => {
+  it('keeps the course information form visible while a successful recruitment change refreshes the same course', async () => {
     const original = get.getMockImplementation()!
     let courseReads = 0
     let resolveRefresh!: (value: { code: number; data: typeof course }) => void
@@ -154,17 +163,19 @@ describe('course-first training workspaces', () => {
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     await screen.findByRole('heading', { name: course.title })
     fireEvent.click(screen.getByRole('button',{name:'课程管理'}))
-    const summary = screen.getByText(/课程设置/, { selector: 'summary' })
-    const settings = summary.closest('details')!
-    fireEvent.click(summary)
-    expect(settings.open).toBe(true)
+    const settings = screen.getByRole('textbox', { name: '课程介绍' })
+    expect(settings).toBeVisible()
+    expect(screen.queryByRole('link', { name: '测评与结果' })).toBeNull()
+    expect(screen.getByRole('link', { name: /管理学员/ })).toBeVisible()
     fireEvent.click(screen.getByRole('button', { name: '暂停报名' }))
     await waitFor(() => expect(courseReads).toBe(2))
     expect(settings).toBeInTheDocument()
-    expect(settings.open).toBe(true)
+    expect(settings).toBeVisible()
+    expect(screen.getByRole('textbox', { name: '课程介绍' })).toBe(settings)
     await act(async () => resolveRefresh({ code: 0, data: { ...course, isRecruiting: false } }))
     expect(await screen.findByRole('button', { name: '恢复报名' })).toBeVisible()
-    expect(settings.open).toBe(true)
+    expect(settings).toBeVisible()
+    expect(screen.getByRole('textbox', { name: '课程介绍' })).toBe(settings)
   })
 
   it('keeps course end behind explicit confirmation', async () => {
@@ -172,7 +183,6 @@ describe('course-first training workspaces', () => {
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button',{name:'课程管理'}))
-    fireEvent.click(screen.getByText(/课程设置/, { selector: 'summary' }))
     fireEvent.click(screen.getByRole('button', { name: '结束课程' }))
     await waitFor(() => expect(confirm).toHaveBeenCalledWith(expect.objectContaining({
       title: '确定结束课程？', danger: true,
@@ -183,13 +193,13 @@ describe('course-first training workspaces', () => {
   it('trainer publishing links keep the exact course context', async () => {
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()
-    expect(await screen.findByRole('link', { name: /发布作业/ })).toHaveAttribute('href', expect.stringContaining('/assignments?create=true&courseId=course-1&returnTo='))
+    expect(await screen.findByRole('link', { name: /发布练习/ })).toHaveAttribute('href', expect.stringContaining('/assignments?create=true&courseId=course-1&returnTo='))
     expect(await screen.findByRole('link', { name: /查看管理/ })).toHaveAttribute('href', expect.stringContaining('/assignments?id=a-1&courseId=course-1&returnTo='))
     fireEvent.click(screen.getByRole('button', { name: '打卡' }))
     expect(screen.getByRole('link', { name: /发布打卡/ })).toHaveAttribute('href', expect.stringContaining('/checkins?create=true&courseId=course-1&returnTo='))
     expect(await screen.findByRole('link', { name: /查看管理/ })).toHaveAttribute('href', expect.stringContaining('/checkins?id=c-1&courseId=course-1&returnTo='))
     fireEvent.click(screen.getByRole('button', { name: '测评' }))
-    expect(screen.getByRole('link', { name: /布置组合测评/ })).toHaveAttribute('href', expect.stringContaining('/questionnaire-products/new?courseId=course-1&returnTo='))
+    expect(screen.getByRole('link', { name: /发布测评/ })).toHaveAttribute('href', expect.stringContaining('/questionnaire-products/new?courseId=course-1&returnTo='))
     expect(screen.queryByRole('link',{name:/管理学员/})).toBeNull()
     fireEvent.click(screen.getByRole('button',{name:'课程管理'}))
     for (const link of screen.getAllByRole('link', { name: /管理学员/ })) expect(link).toHaveAttribute('href', '/courses/course-1/students')

@@ -4,6 +4,10 @@ import { useCursorList } from '../hooks/useCursorList'
 import { isTrainingHost } from '../training/context'
 import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
 import ModalSurface from '../components/shared-ui/ModalSurface'
+import TrainingCourseEditorTabs from '../training/TrainingCourseEditorTabs'
+import '../training/training-task-editor.css'
+import TrainingTaskReusePicker from '../training/TrainingTaskReusePicker'
+import { checkinReuseContent } from '../training/taskReuse'
 import React, { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Plus, Camera, Trash2, Users, Video, Image as ImageIcon, Download, X, FileText } from 'lucide-react'
@@ -46,6 +50,7 @@ interface DocumentItem {
 }
 
 interface CheckinFormData {
+  description?: string
   courseId: string
   title: string
   content: string
@@ -82,6 +87,8 @@ const CheckinListContent: React.FC = () => {
   const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const requestedCourseId = searchParams.get('courseId')
+  const [showReuse, setShowReuse] = useState(false)
+  const canReuse = isTrainingHost() && user?.role === 'TEACHER'
   const focusId = searchParams.get('id')
   const { feedback, confirm, success, error: showError, info } = useStaffFeedback()
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
@@ -157,6 +164,14 @@ const CheckinListContent: React.FC = () => {
     element.focus()
   }, [loading, focusId])
 
+  useEffect(() => {
+    if (!canReuse || searchParams.get('reuse') !== 'true' || !courses.some(course => course.id === requestedCourseId)) return
+    setShowReuse(true)
+    const next = new URLSearchParams(searchParams)
+    next.delete('reuse')
+    setSearchParams(next, { replace: true })
+  }, [canReuse, courses, requestedCourseId, searchParams, setSearchParams])
+
   const fetchCheckins = async () => {
     if (!mounted.current) return
     const request = ++loadSequence.current
@@ -200,7 +215,7 @@ const CheckinListContent: React.FC = () => {
       const response = await apiClient.get<{ list: Course[] }>('/courses')
       if (response.code === 0) {
         const list = response.data.list
-        const appended = searchParams.get('create') === 'true'
+        const appended = (searchParams.get('create') === 'true' || searchParams.get('reuse') === 'true')
           ? await resolveTrainingCoursePrefill({
             courseId: searchParams.get('courseId'),
             userId: user?.id,
@@ -221,7 +236,7 @@ const CheckinListContent: React.FC = () => {
       const data = {
         courseId: formData.courseId,
         title: formData.title,
-        description: '',
+        description: formData.description || '',
         content: formData.content,
         videos: formData.videos.length > 0 ? formData.videos : undefined,
         images: formData.images.length > 0 ? formData.images : undefined,
@@ -257,7 +272,7 @@ const CheckinListContent: React.FC = () => {
     try {
       const data = {
         title: formData.title,
-        description: '',
+        description: formData.description || '',
         content: formData.content,
         ...buildAttachmentUpdateFields(formData),
         endTime: formData.endTime || undefined,
@@ -359,6 +374,7 @@ const CheckinListContent: React.FC = () => {
 
   const openCreateModal = () => {
     resetForm()
+    if (isTrainingHost() && courses.some(course => course.id === requestedCourseId)) setFormData(current => ({ ...current, courseId: requestedCourseId! }))
     setEditingCheckin(null)
     setShowModal(true)
   }
@@ -385,6 +401,7 @@ const CheckinListContent: React.FC = () => {
     setFormData({
       courseId: checkin.courseId,
       title: checkin.title,
+      description: checkin.description || '',
       content: checkin.content || '',
       videos: (checkin.videos as VideoItem[]) || [],
       images: (checkin.images as ImageItem[]) || [],
@@ -473,7 +490,7 @@ const CheckinListContent: React.FC = () => {
 
   return (
     <ProductPage width="management" className="space-y-6">
-      <PageHeader title="打卡管理" description="集中查看课程打卡、参与情况和截止时间。" actions={<ProductButton variant="primary" onClick={openCreateModal}><Plus className="w-4 h-4" aria-hidden="true" />创建打卡</ProductButton>} />
+      <PageHeader title="打卡管理" description="集中查看课程打卡、参与情况和截止时间。" actions={<><ProductButton variant="primary" onClick={openCreateModal}><Plus className="w-4 h-4" aria-hidden="true" />创建打卡</ProductButton>{canReuse && <ProductButton onClick={() => setShowReuse(true)}>复用打卡</ProductButton>}</>} />
       {feedback}
       {openingDetail && <p role="status">正在读取打卡完整内容…</p>}
       {!focusId && <CatalogFilters key={filterRevision+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline label="打卡"/>}
@@ -494,37 +511,22 @@ const CheckinListContent: React.FC = () => {
       {/* Create/Edit Modal */}
       {showModal && (
         <ModalSurface open onClose={editorGuard.close} className="staff-modal-backdrop">
-          <form onSubmit={editingCheckin ? handleUpdate : handleCreate} className="staff-dialog" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="checkin-editor-title" aria-busy={editorGuard.busy}>
+          <form onSubmit={editingCheckin ? handleUpdate : handleCreate} className={`staff-dialog${isTrainingHost() ? ' staff-dialog--wide training-task-editor' : ''}`} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="checkin-editor-title" aria-busy={editorGuard.busy}>
+            <TrainingCourseEditorTabs courseId={formData.courseId} leave={editorGuard.leave} />
             {editorGuard.error}<fieldset disabled={editorGuard.busy} className="contents">
             <div className="staff-dialog__header">
               <div>
-                <h2 id="checkin-editor-title">{editingCheckin ? '编辑打卡' : '创建打卡'}</h2>
+                <h2 id="checkin-editor-title">{editingCheckin ? '编辑打卡' : isTrainingHost() ? '发布打卡' : '创建打卡'}</h2>
                 <p className="training-editor-scroll-note">向下滚动查看完整设置</p>
-                <p className="staff-dialog__description">设置课程、截止时间、参与方式与附件。</p>
+                <p className="staff-dialog__description">说明打卡要求，添加参考资料，再设置截止时间与参与方式。</p>
               </div>
             </div>
             
-            <div {...(editorGuard.busy ? { inert: '' } : {})} className="staff-dialog__body staff-form">
-              {/* Course Selection */}
-              <div>
-                <label htmlFor="CheckinList-field-101" className="label">选择课程 *</label>
-                <select id="CheckinList-field-101"
-                  value={formData.courseId}
-                  onChange={(e) => setFormData({ ...formData, courseId: e.target.value })}
-                  className="input w-full"
-                  required
-                  disabled={!!editingCheckin}
-                >
-                  <option value="">请选择课程</option>
-                  {editingCheckin?.course && !courses.some(course => course.id === editingCheckin.courseId) && <option value={editingCheckin.courseId}>{editingCheckin.course.title}</option>}
-                  {courses.map((course) => (
-                    <option key={course.id} value={course.id}>
-                      {course.title} (课程码: {course.courseCode})
-                    </option>
-                  ))}
-                </select>
-              </div>
-
+            <div {...(editorGuard.busy ? { inert: '' } : {})} className="staff-dialog__body staff-form training-task-editor__body">
+              <div className="training-task-editor__layout">
+                <div className="training-task-editor__main">
+                  <section className="training-task-editor__section" aria-label="打卡内容编辑">
+                    <header className="training-task-editor__section-heading"><h3>编辑内容</h3><span>标题与任务说明</span></header>
               {/* Title */}
               <div>
                 <label htmlFor="CheckinList-field-102" className="label">打卡标题 *</label>
@@ -545,46 +547,14 @@ const CheckinListContent: React.FC = () => {
                   value={formData.content}
                   onChange={(content) => setFormData({ ...formData, content })}
                   placeholder="请输入打卡内容..."
-                  height="150px"
+                  height={isTrainingHost() ? "210px" : "150px"}
                 />
               </div>
 
-              {/* End Time */}
-              <div>
-                <label htmlFor="CheckinList-field-103" className="label">截止时间</label>
-                <input id="CheckinList-field-103"
-                  type="datetime-local"
-                  value={formData.endTime}
-                  onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                  className="input w-full"
-                />
-                <p className="text-xs text-gray-500 mt-1">{isTrainingHost() ? '设置后，学员需在截止时间前完成打卡' : '设置后，学生需在截止时间前完成打卡'}</p>
-              </div>
-
-              {/* Tags */}
-              <div>
-                <label className="label">标签</label>
-                <TagInput
-                  value={formData.tags}
-                  onChange={(tags) => setFormData({ ...formData, tags })}
-                  placeholder="输入标签后按回车添加"
-                />
-              </div>
-
-              {/* Allow View Others */}
-              <div className="flex items-center space-x-2">
-                <input
-                  type="checkbox"
-                  id="allowViewOthers"
-                  checked={formData.allowViewOthers}
-                  onChange={(e) => setFormData({ ...formData, allowViewOthers: e.target.checked })}
-                  className="w-4 h-4 text-action rounded"
-                />
-                <label htmlFor="allowViewOthers" className="text-sm text-gray-700">
-                  {isTrainingHost() ? '允许学员查看其他人的打卡内容' : '允许学生查看其他人的打卡内容'}
-                </label>
-              </div>
-
+                  </section>
+                  <section className="training-task-editor__section" aria-label="打卡附件资料">
+                    <header className="training-task-editor__section-heading"><h3>附件与资料</h3><span>选填</span></header>
+                    <div className="training-task-editor__attachments">
               {/* Videos */}
               <div>
                 <div className="flex items-center justify-between mb-2">
@@ -612,6 +582,7 @@ const CheckinListContent: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => removeVideo(index)}
+                          aria-label={`移除视频 ${video.title}`}
                           className="text-red-400 hover:text-red-600"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -650,6 +621,7 @@ const CheckinListContent: React.FC = () => {
                           <button
                             type="button"
                             onClick={() => removeImage(index)}
+                            aria-label={`移除图片 ${image.name}`}
                             className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded opacity-0 group-hover:opacity-100 transition-opacity"
                           >
                             <Trash2 className="w-3 h-3" />
@@ -688,6 +660,7 @@ const CheckinListContent: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => removeDocument(index)}
+                          aria-label={`移除文档 ${doc.title}`}
                           className="text-red-400 hover:text-red-600"
                         >
                           <Trash2 className="w-4 h-4" />
@@ -698,9 +671,72 @@ const CheckinListContent: React.FC = () => {
                 )}
               </div>
 
+                    </div>
+                  </section>
+                </div>
+                <aside className="training-task-editor__settings" aria-label="打卡发布设置">
+                  <header className="training-task-editor__section-heading"><h3>发布设置</h3></header>
+              {/* Course Selection */}
+              <div>
+                <label htmlFor="CheckinList-field-101" className="label">选择课程 *</label>
+                <select id="CheckinList-field-101"
+                  value={formData.courseId}
+                  onChange={(e) => setFormData({ ...formData, courseId: e.target.value })}
+                  className="input w-full"
+                  required
+                  disabled={!!editingCheckin}
+                >
+                  <option value="">请选择课程</option>
+                  {editingCheckin?.course && !courses.some(course => course.id === editingCheckin.courseId) && <option value={editingCheckin.courseId}>{editingCheckin.course.title}</option>}
+                  {courses.map((course) => (
+                    <option key={course.id} value={course.id}>
+                      {course.title}{!isTrainingHost() && ` (课程码: ${course.courseCode})`}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {/* End Time */}
+              <div>
+                <label htmlFor="CheckinList-field-103" className="label">截止时间</label>
+                <input id="CheckinList-field-103"
+                  type="datetime-local"
+                  value={formData.endTime}
+                  onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
+                  className="input w-full"
+                />
+                <p className="text-xs text-gray-500 mt-1">{isTrainingHost() ? '设置后，学员需在截止时间前完成打卡' : '设置后，学生需在截止时间前完成打卡'}</p>
+              </div>
+
+              {/* Tags */}
+              <div>
+                <label className="label">标签</label>
+                <TagInput
+                  value={formData.tags}
+                  onChange={(tags) => setFormData({ ...formData, tags })}
+                  placeholder="输入标签后按回车添加"
+                />
+              </div>
+
+              {/* Allow View Others */}
+              <div className="flex items-center space-x-2 training-task-editor__visibility">
+                <input
+                  type="checkbox"
+                  id="allowViewOthers"
+                  checked={formData.allowViewOthers}
+                  onChange={(e) => setFormData({ ...formData, allowViewOthers: e.target.checked })}
+                  className="w-4 h-4 text-action rounded"
+                />
+                <label htmlFor="allowViewOthers" className="text-sm text-gray-700">
+                  {isTrainingHost() ? '允许学员查看其他人的打卡内容' : '允许学生查看其他人的打卡内容'}
+                </label>
+              </div>
+
+                </aside>
+              </div>
               {/* Actions */}
             </div>
-            <div className="staff-dialog__actions">
+            <div className="staff-dialog__actions"><span className="training-task-editor__footer-note">{editingCheckin ? '编辑完成后保存修改。' : '发布后，课程学员即可查看。'}</span>
               <ProductButton
                 type="button"
                 onClick={editorGuard.close}
@@ -708,13 +744,20 @@ const CheckinListContent: React.FC = () => {
                 取消
               </ProductButton>
               <ProductButton type="submit" variant="primary">
-                {editorGuard.busy ? '保存中...' : editingCheckin ? '保存修改' : '创建打卡'}
+                {editorGuard.busy ? '保存中...' : editingCheckin ? '保存修改' : isTrainingHost() ? '发布打卡' : '创建打卡'}
               </ProductButton>
             </div>
             </fieldset>
           </form>
         </ModalSurface>
       )}
+
+      {canReuse && showReuse && <TrainingTaskReusePicker kind="checkins" courses={courses} initialCourseId={requestedCourseId} onClose={() => setShowReuse(false)} onSelect={(source, targetCourseId) => {
+        setEditingCheckin(null)
+        setFormData(checkinReuseContent(source as Checkin, targetCourseId) as CheckinFormData)
+        setShowReuse(false)
+        setShowModal(true)
+      }} />}
 
       {/* Media Selector */}
       <MediaSelector

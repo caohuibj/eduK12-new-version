@@ -1,6 +1,7 @@
 import { CatalogFilters, CatalogPagination } from '../../training/TrainingCatalogControls'
 import { useCatalogQuery } from '../../training/useCatalogQuery'
 import { TrainingQuestionnaireList } from './TrainingQuestionnaireList'
+import { assessmentContextHref } from '../../training/assessmentContextHref'
 import { DeliveryOptionCard } from './DeliveryOptionCard'
 import { FormChoiceEditor } from './FormChoiceEditor'
 import { choiceError, emptyChoices, filledChoices, type ChoiceDraft } from './formChoices'
@@ -75,6 +76,9 @@ const labels: Record<string, string> = {
 
 export function QuestionnaireProductList() {
   const { user } = useAuth()
+  const location = useLocation()
+  const [searchParams, setSearchParams] = useSearchParams()
+  const status = ['DRAFT', 'PUBLISHED'].includes(searchParams.get('status') || '') ? searchParams.get('status')! : ''
   const [templateSource, setTemplateSource] = useState<{id:string;name:string} | null>(null)
   const [templateName, setTemplateName] = useState('')
   const [savingTemplate, setSavingTemplate] = useState(false)
@@ -86,27 +90,34 @@ export function QuestionnaireProductList() {
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(true)
   const [listRevision, setListRevision] = useState(0)
+  const [copying,setCopying] = useState('')
+  const copyPending = useRef(false)
   const navigate = useNavigate()
+  const listParams = new URLSearchParams(catalog.params)
+  if (status) listParams.set('status', status)
+  const requestParams = listParams.toString()
   useEffect(() => {
     let active = true
     setLoading(true)
     setError('')
     setData({ list: [], total: 0 })
-    request('?' + catalog.params)
+    request('?' + requestParams)
       .then(value => { if (active) setData(value) })
       .catch((e) => { if (active) setError(message(e)) })
       .finally(() => { if (active) setLoading(false) })
     return () => { active = false }
-  }, [catalog.params, listRevision])
+  }, [requestParams, listRevision])
   const copy = async (id: string) => {
+    if (copyPending.current) return
+    copyPending.current=true;setCopying(id)
     try {
       const row = await request('/' + id + '/copy', {
         requestId: crypto.randomUUID(),
       })
-      navigate(base + '/' + row.id)
+      navigate(isTrainingHost() ? assessmentContextHref(base + '/' + row.id, location.pathname, location.search) : base + '/' + row.id)
     } catch (e) {
       setError(message(e))
-    }
+    } finally { copyPending.current=false;setCopying('') }
   }
   const templatePanel = templateSource && <section className="my-4 rounded border p-4" aria-label="保存组合模板"><h2>从 {templateSource.name} 保存私有模板</h2><p>只复制内容定义，移除课程投放与公开链接，不携带作答或授权。</p><p>模板不保留学员反馈开放时间、草稿保留时长或课程级作答计时选项。复制为新草稿后，请为新课程重新选择这些投放设置，再发布；题目定义、计分规则和认知任务的刺激时序不变。</p><label>模板名称<input className="input" maxLength={200} value={templateName} onChange={e => setTemplateName(e.target.value)} disabled={savingTemplate}/></label><ProductButton disabled={savingTemplate || !templateName.trim()} onClick={async () => {
         if (saving.current) return
@@ -122,8 +133,9 @@ export function QuestionnaireProductList() {
         finally { saving.current = false; setSavingTemplate(false) }
       }}>{savingTemplate ? '保存中…' : '保存为模板'}</ProductButton><ProductButton disabled={savingTemplate} onClick={() => setTemplateSource(null)}>取消</ProductButton></section>
   if (isTrainingHost()) return <TrainingQuestionnaireList data={data} page={page} loading={loading} error={error}
+    copying={copying} status={status} onStatus={value=>setSearchParams(previous=>{const next=new URLSearchParams(previous);if(value)next.set('status',value);else next.delete('status');next.set('page','1');return next})}
     onPage={setPage} onCopy={copy} onTemplate={row=>{setTemplateSource(row);setTemplateName(row.name)}} savingTemplate={savingTemplate}
-    templatePanel={<><CatalogFilters key={catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} label="测评"/>{templatePanel}</>} filtered={Boolean(catalog.selection.search||catalog.selection.tags||catalog.selection.from||catalog.selection.to)} pagination={<CatalogPagination selection={catalog.selection} onApply={catalog.apply} total={data.total} loading={loading} label="测评"/>} actorId={user?.id || ''} onReload={()=>setListRevision(value=>value+1)}/>
+    templatePanel={<><CatalogFilters key={catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} label="测评"/>{templatePanel}</>} filtered={Boolean(status||catalog.selection.search||catalog.selection.tags||catalog.selection.from||catalog.selection.to)} pagination={<CatalogPagination selection={catalog.selection} onApply={catalog.apply} total={data.total} loading={loading} label="测评"/>} actorId={user?.id || ''} onReload={()=>setListRevision(value=>value+1)}/>
   return (
     <ProductPage width="management" className={`hui-questionnaire-products${isTrainingHost() ? ' training-form-management' : ''}`}>
       <PageHeader
@@ -1255,7 +1267,7 @@ export function QuestionnaireProductEdit() {
                       const row = await request('/' + id + '/copy', {
                         requestId: crypto.randomUUID(),
                       })
-                      navigate(base + '/' + row.id)
+                      navigate(trainingDesign ? assessmentContextHref(base + '/' + row.id, location.pathname, location.search) : base + '/' + row.id)
                     })
                   }
                 >
@@ -1293,7 +1305,7 @@ export function QuestionnaireProductEdit() {
                           await request('/' + id + '/remove', {
                             revision: detail.revision,
                           })
-                          navigate('/questionnaires')
+                          navigate(trainingDesign ? assessmentContextHref('/questionnaires', location.pathname, location.search) : '/questionnaires')
                         })
                     }}
                   >
@@ -1371,7 +1383,7 @@ export function QuestionnaireProductEdit() {
   ] as const
   if (trainingDesign) return (
     <ProductPage width="management" className="hui-questionnaire-products training-form-management qt-editor">
-      <Link className="qt-breadcrumb" to="/questionnaires">组合测评 <span>/</span> {draft ? '编制草稿' : '查看测评'}</Link>
+      <Link className="qt-breadcrumb" to={assessmentContextHref('/questionnaires',location.pathname,location.search)}>组合测评 <span>/</span> {draft ? '编制草稿' : '查看测评'}</Link>
       <PageHeader title={id === 'new' ? '创建组合测评' : draft ? '编制组合测评' : '查看组合测评'}
         description="从内容编排到发布，按步骤完成一份课程测评。"
         actions={<><span className="qt-draft-status">{busy ? '正在处理…' : dirty ? '有未保存的修改' : labels[detail?.status] || '新建草稿'}</span>{draft && <ProductButton variant="primary" disabled={authoringLocked || busy || (id !== 'new' && !dirty)} onClick={() => void save()}><Save size={16} />{id === 'new' ? '创建草稿' : '保存全部设置'}</ProductButton>}</>} />
@@ -1433,7 +1445,7 @@ export function QuestionnaireProductEdit() {
         title={id === 'new' ? '创建组合测评' : detail && !draft ? '查看组合测评' : '编制组合测评'}
         description="各项测评独立反馈，报告为单项结果合集。当前支持网页作答。"
       />
-      <Link to="/questionnaires">返回组合测评列表</Link>
+      <Link to={trainingDesign ? assessmentContextHref('/questionnaires',location.pathname,location.search) : '/questionnaires'}>返回组合测评列表</Link>
       {feedback}
       {scientificTools}
       {pendingMeasurement&&<p role="status">请先恢复或明确结束原认知发布请求，再修改组合测评。</p>}

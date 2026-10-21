@@ -127,11 +127,11 @@ const CourseDetail: React.FC = () => {
     beginSectionLoad('assignments')
     try {
       const response = await apiClient.get(`/courses/${courseId}/assignments`)
-      if (response.code !== 0) throw new Error(response.message || '获取作业列表失败')
+      if (response.code !== 0) throw new Error(response.message || '获取练习列表失败')
       setAssignments(response.data?.list || [])
     } catch (reason) {
-      console.error('获取作业列表失败:', reason)
-      setSectionErrors((current) => ({ ...current, assignments: getErrorMessage(reason, '获取作业列表失败') }))
+      console.error('获取练习列表失败:', reason)
+      setSectionErrors((current) => ({ ...current, assignments: getErrorMessage(reason, '获取练习列表失败') }))
     } finally {
       finishSectionLoad('assignments')
     }
@@ -330,7 +330,7 @@ const CourseDetail: React.FC = () => {
           }`}
         >
           <ClipboardList className="w-4 h-4" />
-          <span>作业</span>
+          <span>练习</span>
           <Badge count={uncompletedAssignments} />
         </button>
         <button
@@ -373,14 +373,14 @@ const CourseDetail: React.FC = () => {
 
       {/* Content */}
       {activeTab === 'assignments' && (sectionLoading.assignments || sectionErrors.assignments) && (
-        <SectionStatus section="assignments" label="作业" onRetry={() => { void fetchAssignments() }} />
+        <SectionStatus section="assignments" label="练习" onRetry={() => { void fetchAssignments() }} />
       )}
       {activeTab === 'assignments' && !sectionLoading.assignments && !sectionErrors.assignments && (
         <div className="hui-course-list space-y-4">
           {assignments.length === 0 ? (
             <div className="card text-center py-12">
               <ClipboardList className="w-16 h-16 text-gray-300 mx-auto mb-4" />
-              <p className="text-gray-500">暂无作业</p>
+              <p className="text-gray-500">暂无练习</p>
             </div>
           ) : (
             assignments.map((assignment) => (

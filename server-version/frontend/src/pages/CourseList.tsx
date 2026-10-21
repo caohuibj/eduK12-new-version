@@ -193,7 +193,7 @@ const CourseList: React.FC = () => {
   }
 
   const handleCloneCourse = async (course: Course) => {
-    if (!await ask(`确定要复制课程「${course.title}」吗？\n\n将复制课程、作业和打卡内容（不含学生数据和作答信息），新课程将以草稿状态创建。`)) {
+    if (!await ask(`确定要复制课程「${course.title}」吗？\n\n将复制课程、练习和打卡内容（不含学生数据和作答信息），新课程将以草稿状态创建。`)) {
       return
     }
 
@@ -271,7 +271,7 @@ const CourseList: React.FC = () => {
 
   // 从分享复制课程
   const handleCloneFromShare = async (share: CourseShare) => {
-    if (!await ask(`确定要复制课程「${share.course?.title}」吗？\n\n将复制课程、作业和打卡内容，新课程将以草稿状态创建。`)) {
+    if (!await ask(`确定要复制课程「${share.course?.title}」吗？\n\n将复制课程、练习和打卡内容，新课程将以草稿状态创建。`)) {
       return
     }
 

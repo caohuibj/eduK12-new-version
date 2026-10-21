@@ -1,0 +1,62 @@
+.hui-training.hui-app--standard.training-workspace-shell .staff-dialog.training-task-editor {
+  width: min(1152px, 100%); max-height: 92dvh; overflow: hidden;
+  border-radius: 14px; background: #fffdf9;
+}
+.hui-training.hui-app--standard.training-workspace-shell .training-task-editor :is(.staff-dialog__header,.staff-dialog__actions) { flex-shrink: 0; }
+.hui-training.hui-app--standard.training-workspace-shell .training-task-editor .staff-dialog__header { padding: 16px 24px; }
+.hui-training .training-task-editor .staff-dialog__header > div { min-width: 0; flex: 1; }
+.hui-training.hui-app--standard.training-workspace-shell .training-task-editor .staff-dialog__header h2 { font-size: 24px; line-height: 1.4; }
+.hui-training.hui-app--standard.training-workspace-shell .training-task-editor .staff-dialog__description { font-size: 14px; margin-top: 4px; }
+.hui-training.hui-app--standard.training-workspace-shell .training-task-editor .training-editor-scroll-note { display: none; }
+.hui-training.hui-app--standard.training-workspace-shell .training-task-editor .training-task-editor__body {
+  display: block; flex: 1 1 auto; min-height: 0; overflow-y: auto; padding: 20px;
+  background: #f5f7f1; overscroll-behavior: contain;
+}
+.hui-training .training-task-editor__layout { display: grid; grid-template-columns: minmax(0,1fr) 290px; align-items: start; gap: 20px; }
+.hui-training .training-task-editor__main { display: grid; min-width: 0; gap: 18px; }
+.hui-training .training-task-editor__section, .hui-training .training-task-editor__settings {
+  display: grid; gap: 18px; min-width: 0; padding: 20px; border: 1px solid #dfe6d9;
+  border-radius: 10px; background: #fff;
+}
+.hui-training .training-task-editor__settings { position: sticky; top: 0; background: #fdfdf9; }
+.hui-training .training-task-editor__section-heading { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 12px; }
+.hui-training .training-task-editor__section-heading h3 { margin: 0; color: #234b3a; font: 600 17px/1.5 'PingFang SC',sans-serif; }
+.hui-training .training-task-editor__section-heading span { color: #718174; font-size: 12px; }
+.hui-training.hui-app--standard.training-workspace-shell .training-task-editor .label { display: block; margin-bottom: 8px; font-size: 14px; font-weight: 500; }
+.hui-training.hui-app--standard.training-workspace-shell .training-task-editor :is(input:not([type=checkbox]),select,textarea) { font-size: 15px; min-height: 44px; }
+.hui-training .training-task-editor__settings :is(.staff-help,p) { margin: 0; color: #6b7b6c; font-size: 12px; line-height: 1.7; }
+.hui-training .training-task-editor__settings .staff-help { margin-top: -12px; }
+.hui-training .training-task-editor__attachments { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; }
+.hui-training .training-task-editor__attachments > div { min-width: 0; padding: 12px; border: 1px dashed #cedac7; border-radius: 8px; background: #fbfcf8; }
+.hui-training .training-task-editor__attachments > div > div:first-child { flex-wrap: wrap; gap: 6px; }
+.hui-training .training-task-editor__attachments :is(.label,button) { font-size: 13px; }
+.hui-training .training-task-editor__attachments button { min-height: 32px; flex-shrink: 0; }
+.hui-training .training-task-editor__attachments .grid { grid-template-columns: repeat(2,minmax(0,1fr)); }
+.hui-training .training-task-editor__attachments .truncate { max-width: 100%; }
+.hui-training .training-task-editor__attachments .space-x-2 { min-width: 0; }
+.hui-training .training-task-editor__attachments .group button { opacity: 1; }
+.hui-training .training-task-editor__visibility { align-items: start; gap: 10px; padding-top: 14px; border-top: 1px solid #e2e8dd; }
+.hui-training.hui-app--standard.training-workspace-shell .training-task-editor .training-task-editor__visibility input[type=checkbox] { width: 18px; min-width: 18px; height: 18px; margin: 3px 0 0; }
+.hui-training.hui-app--standard.training-workspace-shell .training-task-editor .staff-dialog__actions { align-items: center; padding: 14px 24px; gap: 10px; }
+.hui-training .training-task-editor__footer-note { flex: 1; color: #718174; font-size: 13px; line-height: 1.5; }
+@media(max-width:900px) {
+  .hui-training .training-task-editor__layout { grid-template-columns: minmax(0,1fr) 250px; gap: 14px; }
+  .hui-training .training-task-editor__section, .hui-training .training-task-editor__settings { padding: 16px; }
+  .hui-training .training-task-editor__attachments { grid-template-columns: 1fr; }
+}
+@media(max-width:700px) {
+  .hui-training.hui-app--standard.training-workspace-shell .staff-dialog.training-task-editor { max-height: 96dvh; border-radius: 10px; }
+  .hui-training.hui-app--standard.training-workspace-shell .training-task-editor .staff-dialog__header { padding: 12px 16px; }
+  .hui-training.hui-app--standard.training-workspace-shell .training-task-editor .staff-dialog__header h2 { font-size: 21px; }
+  .hui-training.hui-app--standard.training-workspace-shell .training-task-editor .staff-dialog__description { font-size: 13px; }
+  .hui-training.hui-app--standard.training-workspace-shell .training-task-editor .training-task-editor__body { padding: 12px; }
+  .hui-training .training-task-editor__layout { grid-template-columns: minmax(0,1fr); }
+  .hui-training .training-task-editor__settings { position: static; }
+  .hui-training.hui-app--standard.training-workspace-shell .training-task-editor :is(input:not([type=checkbox]),select,textarea) { font-size: 16px; }
+  .hui-training.hui-app--standard.training-workspace-shell .training-task-editor .staff-dialog__actions { flex-wrap: nowrap; padding: 12px 16px; }
+  .hui-training .training-task-editor__footer-note { display: none; }
+  .hui-training .training-task-editor .staff-dialog__actions button { flex: 1; min-height: 44px; }
+}
+.training-task-editor__layout, .training-task-editor__main, .training-task-editor__section, .training-task-editor__settings { display: grid; min-width: 0; gap: 18px; }
+.training-task-editor__section-heading { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.training-task-editor__footer-note { margin-right: auto; }

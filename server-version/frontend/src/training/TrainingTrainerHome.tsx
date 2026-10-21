@@ -10,9 +10,15 @@ import FormalReferenceStudio from './FormalReferenceStudio'
 import './training-trainer-home.css'
 
 const PAGE_SIZES = [2, 6, 10]
+const PAGE_SIZE_STORAGE_KEY = 'training:trainer-courses:page-size'
+function savedPageSize() {
+  try {
+    const size = Number(localStorage.getItem(PAGE_SIZE_STORAGE_KEY))
+    return PAGE_SIZES.includes(size) ? size : 2
+  } catch { return 2 }
+}
 const COURSE_FILTERS = [
   { value: 'all', label: '全部' },
-  { value: 'DRAFT', label: '草稿' },
   { value: 'PUBLISHED', label: '已发布' },
   { value: 'COMPLETED', label: '已完结' },
 ] as const
@@ -56,7 +62,7 @@ export default function TrainingTrainerHome() {
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
-  const [query, setQuery] = useState({ page: 1, pageSize: 2, status: 'all' as CourseFilter })
+  const [query, setQuery] = useState(() => ({ page: 1, pageSize: savedPageSize(), status: 'all' as CourseFilter }))
   const [total, setTotal] = useState(0)
   const [mutationNotice, setMutationNotice] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
@@ -146,7 +152,10 @@ export default function TrainingTrainerHome() {
         <label className="training-trainer-page-size">每页显示
           <select aria-label="每页课程数" value={query.pageSize} onChange={event => {
             const pageSize = Number(event.target.value)
-            if (PAGE_SIZES.includes(pageSize)) setQuery(current => ({ ...current, page: 1, pageSize }))
+            if (PAGE_SIZES.includes(pageSize)) {
+              try { localStorage.setItem(PAGE_SIZE_STORAGE_KEY, String(pageSize)) } catch { /* Keep paging usable when storage is unavailable. */ }
+              setQuery(current => ({ ...current, page: 1, pageSize }))
+            }
           }}>{PAGE_SIZES.map(size => <option key={size} value={size}>{size} 个</option>)}</select>
         </label>
       </div>
@@ -162,9 +171,9 @@ export default function TrainingTrainerHome() {
           return <article key={course.id} className="training-trainer-course-card" aria-labelledby={`trainer-course-${course.id}`}>
             <div className="training-trainer-card-heading">
               <h3 id={`trainer-course-${course.id}`}><Link to={`/courses/${encodeURIComponent(course.id)}/detail`} title={course.title}>{course.title}</Link></h3>
-              <span className={`training-trainer-course-state is-${course.status?.toLowerCase()}`}>{COURSE_FILTERS.find(filter => filter.value === course.status)?.label}</span>
+              <span className={`training-trainer-course-state is-${course.status?.toLowerCase()}`}>{course.status === 'DRAFT' ? '草稿' : COURSE_FILTERS.find(filter => filter.value === course.status)?.label}</span>
             </div>
-            <CourseDescription id={`trainer-course-description-${course.id}`} description={course.description || '管理学员、作业、打卡与课程测评'} />
+            <CourseDescription id={`trainer-course-description-${course.id}`} description={course.description || '管理学员、练习、打卡与课程测评'} />
             <TrainingCourseCode key={course.id+course.courseCode} compact code={course.courseCode} title={course.title}/>
             <div className="training-trainer-card-footer">
               <div className="training-trainer-course-details">

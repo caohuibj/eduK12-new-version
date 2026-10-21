@@ -66,7 +66,7 @@ export default function TrainingLearnerHome() {
               <div className="training-course-text">
                 <span className="learner-enrolled"><Check size={12} aria-hidden="true" />已加入</span>
                 <h3>{course.title}</h3>
-                <small title={course.description || undefined}>{course.description || '进入课程，查看作业、打卡与测评'}</small>
+                <small title={course.description || undefined}>{course.description || '进入课程，查看练习、打卡与测评'}</small>
                 <span className="training-course-card-bottom"><span>进入学习</span><ArrowRight size={17} aria-hidden="true" /></span>
               </div>
             </Link>)}</div>}
@@ -78,7 +78,7 @@ export default function TrainingLearnerHome() {
         <ol>
           <li><span className="learner-guide-icon"><KeyRound size={18} aria-hidden="true" /></span><div><h3>加入课程</h3><p>输入培训师提供的课程码。</p></div></li>
           <li><span className="learner-guide-icon"><BookOpen size={18} aria-hidden="true" /></span><div><h3>进入课程</h3><p>选择课程，查看学习安排。</p></div></li>
-          <li><span className="learner-guide-icon"><ListChecks size={18} aria-hidden="true" /></span><div><h3>完成任务</h3><p>按要求完成作业、打卡与测评。</p></div></li>
+          <li><span className="learner-guide-icon"><ListChecks size={18} aria-hidden="true" /></span><div><h3>完成任务</h3><p>按要求完成练习、打卡与测评。</p></div></li>
         </ol>
         <p className="learner-guide-note">学习，始于当下。</p>
       </aside>

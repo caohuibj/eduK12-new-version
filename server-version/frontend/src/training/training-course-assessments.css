@@ -1,4 +1,7 @@
 .hui-training .tca-workspace{padding:24px;border:1px solid #dce5d3;border-radius:11px;background:#fff;}
+.hui-training.hui-app--standard.training-workspace-shell .tca-workspace { border: 0; border-radius: 0; background: transparent; }
+.hui-training .training-course-actions { display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin: 16px 0 20px; }
+.hui-training .training-course-actions .training-action { display: inline-flex; align-items: center; justify-content: center; gap: 6px; min-height: 40px; }
 .hui-training .tca-heading{display:flex;justify-content:space-between;align-items:center;gap:15px;}
 .hui-training .tca-heading small{font-size:10px;letter-spacing:.1em;color:#6c7d60;}
 .hui-training .tca-heading h2{font-family:var(--training-serif);font-size:25px;font-weight:600;margin:6px 0;}

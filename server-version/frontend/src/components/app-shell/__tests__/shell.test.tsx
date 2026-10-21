@@ -85,6 +85,14 @@ describe('Training assessment presentation boundary', () => {
 })
 
 describe('Training teacher visual boundary', () => {
+  it.each(['/dashboard', '/courses/c1/detail?section=assessments', '/questionnaire-products/new?courseId=c1'])('omits the global menu inside the teacher course workspace at %s', path => {
+    presentation.training = true
+    auth.user = { id: 'teacher', role: 'TEACHER', username: 'trainer' } as User
+    const view = render(<MemoryRouter initialEntries={[path]}><AppShell><p>课程内容</p></AppShell></MemoryRouter>)
+    expect(view.container.querySelector('.training-workspace-menu')).toBeNull()
+    expect(screen.getByRole('link', { name: /个人账号设置/ })).toBeInTheDocument()
+    if (path.startsWith('/questionnaire-products')) expect(screen.getByRole('navigation', { name: '课程管理内容' })).toBeInTheDocument()
+  })
   it.each([
     ['/dashboard', 'courses'],
     ['/courses/c1/students', 'roster'],
@@ -102,7 +110,9 @@ describe('Training teacher visual boundary', () => {
     expect(screen.getByRole('main')).toHaveAttribute('data-training-family', family)
     expect(screen.getByRole('heading', { name: '当前业务页面' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '既有操作' })).toBeEnabled()
-    expect(screen.getByRole('navigation', { name: '主要导航' })).toHaveTextContent('我的课程')
+    if (path === '/dashboard' || path.startsWith('/courses/')) {
+      expect(screen.queryByRole('navigation', { name: '主要导航' })).toBeNull()
+    } else expect(screen.getByRole('navigation', { name: '主要导航' })).toHaveTextContent('我的课程')
   })
   it.each([
     ['STUDENT', true, '/student'],
@@ -237,16 +247,16 @@ describe('one shared chrome', () => {
   })
   it('renders grouped staff navigation without changing the active destination', async () => {
     auth.user = { id: 't1', role: 'TEACHER', username: 'teacher' } as User
-    render(<MemoryRouter initialEntries={['/assignments']}><AppShell><h1>作业页面</h1></AppShell></MemoryRouter>)
+    render(<MemoryRouter initialEntries={['/assignments']}><AppShell><h1>练习页面</h1></AppShell></MemoryRouter>)
     const nav = screen.getByRole('navigation', { name: '主要导航' })
     expect(nav).toHaveTextContent('教学管理')
     expect(nav).toHaveTextContent('测评内容')
     expect(nav).toHaveTextContent('内容资源')
-    expect(screen.getByRole('link', { name: '作业管理' })).toHaveAttribute('aria-current', 'page')
+    expect(screen.getByRole('link', { name: '练习管理' })).toHaveAttribute('aria-current', 'page')
     const search = screen.getByRole('searchbox', { name: '查找管理页面' })
     await userEvent.type(search, '文档')
     expect(screen.getByRole('link', { name: '文档库' })).toBeVisible()
-    expect(screen.queryByRole('link', { name: '作业管理' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: '练习管理' })).not.toBeInTheDocument()
   })
   it('keeps focused player descendants outside product token scope', () => {
     render(<MemoryRouter initialEntries={['/public/cognitive/sessions/s1']}><AppShell><button>task control</button></AppShell></MemoryRouter>)

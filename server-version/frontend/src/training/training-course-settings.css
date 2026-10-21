@@ -1,0 +1,43 @@
+.hui-training .training-course-admin { display: grid; gap: 20px; padding: 24px; background: #f8faf5; }
+.hui-training .training-admin-roster { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px 24px; border: 1px solid #dce6d5; border-radius: 10px; background: #fff; }
+.hui-training .training-admin-roster-heading { display: flex; align-items: center; gap: 15px; min-width: 0; }
+.hui-training .training-admin-icon { display: grid; place-items: center; flex-shrink: 0; width: 46px; height: 46px; border-radius: 10px; background: #eef4e7; color: #42643b; }
+.hui-training .training-course-admin h2 { margin: 0; color: #254b3b; font: 600 18px/1.5 'PingFang SC',sans-serif; }
+.hui-training .training-course-admin p { color: #6a7a6d; font-size: 13px; line-height: 1.75; margin: 5px 0 0; }
+.hui-training .training-admin-roster .training-action { display: inline-flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.hui-training .training-admin-grid { display: grid; grid-template-columns: minmax(0,1.55fr) minmax(280px,1fr); gap: 20px; align-items: start; }
+.hui-training .training-admin-card { min-width: 0; padding: 24px; border: 1px solid #dfe6da; border-radius: 10px; background: #fff; }
+.hui-training .training-admin-card-heading { display: flex; align-items: start; gap: 10px; margin-bottom: 24px; }
+.hui-training .training-admin-card-heading > svg { flex-shrink: 0; color: #68825c; margin-top: 4px; }
+.hui-training .training-admin-form { display: grid; gap: 20px; }
+.hui-training .training-admin-form label { display: block; margin-bottom: 9px; color: #3b5844; font-size: 14px; font-weight: 500; }
+.hui-training .training-admin-form :is(input,textarea) { width: 100%; min-width: 0; padding: 11px 13px; border: 1px solid #d6e0d0; border-radius: 6px; background: #fffefa; color: #264332; font: 15px/1.7 'PingFang SC',sans-serif; }
+.hui-training .training-admin-form textarea { resize: vertical; min-height: 156px; }
+.hui-training .training-admin-form .training-admin-character-count { text-align: right; margin-top: 5px; font-size: 12px; }
+.hui-training .training-admin-save { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-top: 16px; border-top: 1px solid #e6ecdf; }
+.hui-training .training-admin-save > span { font-size: 12px; color: #778475; line-height: 1.6; }
+.hui-training .training-admin-save button { flex-shrink: 0; }
+.hui-training .training-admin-enrollment-state { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 14px; color: #5a7059; }
+.hui-training .training-admin-enrollment-state strong { padding: 5px 10px; background: #edf5e6; color: #3b6d34; border-radius: 5px; font-size: 13px; font-weight: 500; }
+.hui-training .training-admin-enrollment-state .is-paused { background: #f5f1e8; color: #866c3f; }
+.hui-training .training-admin-enrollment .training-admin-note { margin: 16px 0; }
+.hui-training .training-admin-code-maintenance { margin-top: 26px; padding-top: 22px; border-top: 1px solid #e3eadb; }
+.hui-training .training-admin-code-maintenance h3 { color: #37583e; font-size: 15px; font-weight: 500; }
+.hui-training .training-admin-code-maintenance button { display: inline-flex; align-items: center; gap: 8px; margin-top: 12px; min-height: 38px; color: #557646; font-size: 14px; }
+.hui-training .training-admin-end { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding: 20px 24px; border: 1px solid #e8dcd5; border-radius: 10px; background: #fffdfb; }
+.hui-training .training-admin-end h2 { font-size: 16px; color: #82594d; }
+.hui-training .training-admin-end button { min-height: 40px; padding: 8px 15px; flex-shrink: 0; border: 1px solid #dcbfb3; border-radius: 6px; color: #985543; background: #fff; font-size: 14px; }
+.hui-training .training-course-admin :is(button,input,textarea):disabled { opacity: .5; cursor: not-allowed; }
+.hui-training .training-course-admin :is(button,input,textarea,a):focus-visible { outline: 2px solid #5a7d49; outline-offset: 3px; }
+@media(max-width:800px) {
+  .hui-training .training-course-admin { padding: 16px; gap: 16px; }
+  .hui-training .training-admin-grid { grid-template-columns: minmax(0,1fr); gap: 16px; }
+  .hui-training .training-admin-card { padding: 20px; }
+}
+@media(max-width:500px) {
+  .hui-training .training-admin-roster { flex-wrap: wrap; padding: 18px; gap: 15px; }
+  .hui-training .training-admin-roster .training-action { margin-left: 61px; }
+  .hui-training .training-admin-save { align-items: stretch; flex-direction: column; }
+  .hui-training .training-admin-form :is(input,textarea) { font-size: 16px; }
+  .hui-training .training-admin-end { padding: 18px; gap: 15px; flex-wrap: wrap; }
+}

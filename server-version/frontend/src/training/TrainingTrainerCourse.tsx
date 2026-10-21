@@ -1,17 +1,19 @@
 import TrainingCourseCode from './TrainingCourseCode'
+import TrainingCourseTabs from './TrainingCourseTabs'
 import { CatalogFilters, CatalogPagination } from './TrainingCatalogControls'
 import { useCatalogQuery } from './useCatalogQuery'
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import apiClient from '../api/client'
 import TrainingCourseAssessments, { type CourseAssessment } from './TrainingCourseAssessments'
 import { useAuth } from '../contexts/AuthContext'
 import TrainingCourseSettings from './TrainingCourseSettings'
-import TrainingCourseAnalysis from './TrainingCourseAnalysis'
+import { COURSE_ANALYSIS_ENABLED, resolveCourseSection, type CourseSection } from './courseNavigation'
 import type { Course, Assignment, Checkin } from '../types'
 
-type Section = 'assignments' | 'checkins' | 'assessments' | 'analysis' | 'management'
+const TrainingCourseAnalysis = lazy(() => import('./TrainingCourseAnalysis'))
+type Section = CourseSection
 type Collection<T> = { rows: T[]; loading: boolean; error: string | null }
 const pending = <T,>(): Collection<T> => ({ rows: [], loading: true, error: null })
 const errorMessage = (error: unknown) => error instanceof Error ? error.message : '加载失败'
@@ -21,8 +23,13 @@ export default function TrainingTrainerCourse() {
   const { user } = useAuth()
   const [query,setQuery] = useSearchParams()
   const selected = query.get('section')
-  const section: Section = selected === 'assessments' || selected === 'analysis' || selected === 'management' || selected === 'checkins' ? selected : 'assignments'
+  const section = resolveCourseSection(selected)
   const setSection = (value: Section) => setQuery(previous=>{const next=new URLSearchParams(previous);next.set('section',value);return next},{replace:true})
+  useEffect(() => {
+    if (selected === 'analysis' && !COURSE_ANALYSIS_ENABLED) {
+      setQuery(previous => { const next = new URLSearchParams(previous); next.set('section', 'assessments'); return next }, { replace: true })
+    }
+  }, [selected, setQuery])
   const catalog = useCatalogQuery(section+'_')
   const filtered=Boolean(catalog.selection.search||catalog.selection.tags||catalog.selection.from||catalog.selection.to)
   const [collectionTotal,setCollectionTotal] = useState(0)
@@ -85,27 +92,22 @@ export default function TrainingTrainerCourse() {
               </div>
             </header>
             <div className="training-course-layout training-course-layout--full"><div className="training-course-work">
-            <nav className="training-section-switch" aria-label="课程管理内容">
-              {([
-                ['assignments', '作业'], ['checkins', '打卡'], ['assessments', '测评'], ['analysis', '信息统计'], ['management','课程管理'],
-              ] as const).map(([value, label]) =>
-                <button key={value} type="button" className="training-section-tab" aria-pressed={section === value} onClick={() => setSection(value)}>{label}</button>)}
-            </nav>
+            <TrainingCourseTabs courseId={course.id} section={section} onSelect={setSection} />
 
-            {section !== 'analysis' && section !== 'management' && <CatalogFilters key={section+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline={section!=='assessments'} label={section==='assignments'?'作业':section==='checkins'?'打卡':'测评'}/>}
-            {section === 'assignments' && <section className="training-detail-content" aria-label="课程作业管理">
-              <div className="training-section-action"><Link to={'/assignments?create=true&courseId=' + encoded + returnContext} className="training-action">＋ 发布作业</Link></div>
-              {assignments.loading ? <p role="status">正在读取作业…</p> : assignments.error ? <div role="alert">读取作业失败：{assignments.error}<button type="button" onClick={retry}>重试</button></div>
-                : assignments.rows.length === 0 ? <p className="training-empty-small">{filtered?'没有符合当前条件的作业。':'还没有布置作业。'}</p>
+            {section !== 'analysis' && section !== 'management' && <CatalogFilters key={section+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline={section!=='assessments'} label={section==='assignments'?'练习':section==='checkins'?'打卡':'测评'}/>}
+            {section === 'assignments' && <section className="training-detail-content" aria-label="课程练习管理">
+              <div className="training-course-actions"><Link to={'/assignments?create=true&courseId=' + encoded + returnContext} className="training-action">＋ 发布练习</Link><Link to={'/assignments?reuse=true&courseId=' + encoded + returnContext} className="training-action training-action--quiet">复用练习</Link></div>
+              {assignments.loading ? <p role="status">正在读取练习…</p> : assignments.error ? <div role="alert">读取练习失败：{assignments.error}<button type="button" onClick={retry}>重试</button></div>
+                : assignments.rows.length === 0 ? <p className="training-empty-small">{filtered?'没有符合当前条件的练习。':'还没有布置练习。'}</p>
                   : <div className="training-item-list">{assignments.rows.map(task =>
                     <article className="training-task-item" key={task.id}>
-                      <div><h2>{task.title}</h2><p>{task.description || '课程作业'}</p><span>{task.status === 'PUBLISHED' ? '已发布' : '草稿'}</span></div>
+                      <div><h2>{task.title}</h2><p>{task.description || '课程练习'}</p><span>{task.status === 'PUBLISHED' ? '已发布' : '草稿'}</span></div>
                       <Link to={'/assignments?id=' + encodeURIComponent(task.id) + '&courseId=' + encoded + returnContext} className="training-row-action">查看管理<ArrowRight size={16} aria-hidden="true" /></Link>
                     </article>)}</div>}
             </section>}
 
             {section === 'checkins' && <section className="training-detail-content" aria-label="课程打卡管理">
-              <div className="training-section-action"><Link to={'/checkins?create=true&courseId=' + encoded + returnContext} className="training-action">＋ 发布打卡</Link></div>
+              <div className="training-course-actions"><Link to={'/checkins?create=true&courseId=' + encoded + returnContext} className="training-action">＋ 发布打卡</Link><Link to={'/checkins?reuse=true&courseId=' + encoded + returnContext} className="training-action training-action--quiet">复用打卡</Link></div>
               {checkins.loading ? <p role="status">正在读取打卡…</p> : checkins.error ? <div role="alert">读取打卡失败：{checkins.error}<button type="button" onClick={retry}>重试</button></div>
                 : checkins.rows.length === 0 ? <p className="training-empty-small">{filtered?'没有符合当前条件的打卡。':'还没有布置打卡。'}</p>
                   : <div className="training-item-list">{checkins.rows.map(task =>
@@ -117,10 +119,10 @@ export default function TrainingTrainerCourse() {
 
             {section === 'assessments' && <TrainingCourseAssessments key={course.id} course={course} actorId={user?.id||''}
               rows={assessments.rows} loading={assessments.loading} error={assessments.error} onRetry={retry} filtered={filtered}/>}
-            {section !== 'analysis' && section !== 'management' && <CatalogPagination selection={catalog.selection} onApply={catalog.apply} total={collectionTotal} loading={section==='assignments'?assignments.loading:section==='checkins'?checkins.loading:assessments.loading} label={section==='assignments'?'作业':section==='checkins'?'打卡':'测评'}/>}
-            {section === 'analysis' && <TrainingCourseAnalysis key={course.id} courseId={course.id} actorId={user?.id} />}
+            {section !== 'analysis' && section !== 'management' && <CatalogPagination selection={catalog.selection} onApply={catalog.apply} total={collectionTotal} loading={section==='assignments'?assignments.loading:section==='checkins'?checkins.loading:assessments.loading} label={section==='assignments'?'练习':section==='checkins'?'打卡':'测评'}/>}
+            {COURSE_ANALYSIS_ENABLED && section === 'analysis' && <Suspense fallback={<p role="status">正在读取统计页面…</p>}><TrainingCourseAnalysis key={course.id} courseId={course.id} actorId={user?.id} /></Suspense>}
 
-            {section === 'management' && <section className="training-course-management" aria-label="课程管理设置"><header><h2>课程管理</h2><p>管理学员、查看课程说明，或调整报名与课程状态。</p></header><div className="training-management-panels"><section className="training-side-panel"><h3>学员与测评</h3><div className="training-trainer-shortcuts"><Link to={'/courses/'+encoded+'/students'}>管理学员 <ArrowRight size={15} aria-hidden="true"/></Link><button type="button" onClick={()=>setSection('assessments')}>测评与结果 <ArrowRight size={15} aria-hidden="true"/></button></div></section><section className="training-side-panel"><h3>课程说明与设置</h3><p>{course.description||'管理本课程的作业、打卡与测评。'}</p><TrainingCourseSettings course={course} onUpdated={retry}/></section></div></section>}
+            {section === 'management' && <TrainingCourseSettings key={course.id} course={course} onUpdated={retry} />}
             </div></div>
           </>}
   </div>

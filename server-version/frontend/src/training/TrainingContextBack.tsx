@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom'
 import { internalReturnTo } from '../components/app-shell/access'
 import { routeTitle } from '../components/app-shell/navigation'
 import type { Role } from '../components/app-shell/access'
+import TrainingCourseTabs from './TrainingCourseTabs'
+import { trainingCourseContext } from './courseNavigation'
 
 /** Breadcrumb escape for deep legacy editors and participant submissions.
  * Context comes from a non-secret courseId URL hint; the backend remains
@@ -11,6 +13,17 @@ export default function TrainingContextBack({ role }: { role: Role | undefined }
   const location = useLocation()
   if (role !== 'STUDENT' && role !== 'TEACHER') return null
   const path = location.pathname
+  const courseContext = role === 'TEACHER' ? trainingCourseContext(path, location.search) : null
+  if (courseContext && !/^\/courses\/[^/]+\/detail$/.test(path)) {
+    const pageTitle = path === '/assignments' ? '练习管理' : path === '/checkins' ? '打卡管理' : path === '/questionnaires' ? '复用测评' : routeTitle(path)
+    const parent = /^\/courses\/[^/]+\/students$/.test(path)
+      ? '/courses/' + encodeURIComponent(courseContext.courseId) + '/detail?section=management'
+      : courseContext.returnTo || '/courses/' + encodeURIComponent(courseContext.courseId) + '/detail' + (courseContext.section === 'assessments' ? '?section=assessments' : '')
+    return <section className="training-course-context" aria-label="当前课程工作区">
+      <nav className="training-context-trail" aria-label="当前位置"><Link to="/dashboard">我的课程</Link><span>/</span><Link to={parent}>返回当前课程</Link><span>/</span><span aria-current="page">{pageTitle}</span></nav>
+      <TrainingCourseTabs {...courseContext} />
+    </section>
+  }
   const studentRoot = role === 'STUDENT'
   const search=new URLSearchParams(location.search)
   const returnTo=internalReturnTo(search.get('returnTo'))

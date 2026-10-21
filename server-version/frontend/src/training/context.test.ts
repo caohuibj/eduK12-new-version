@@ -16,7 +16,7 @@ describe('training edition is presentation only', () => {
       { path: '/dashboard', label: '我的课程' },
       { path: '/questionnaires', label: '全部测评' },
       { path: '/assessment-templates', label: '测评模板' },
-      { path: '/assignments', label: '作业管理' },
+      { path: '/assignments', label: '练习管理' },
       { path: '/checkins', label: '打卡管理' },
       { path: '/profile', label: '我的账户' },
     ])

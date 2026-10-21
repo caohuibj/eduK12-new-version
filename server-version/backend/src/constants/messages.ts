@@ -44,15 +44,15 @@ export const Messages = {
     ALREADY_JOINED: '已加入该课程',
   },
 
-  // 作业相关
+  // 练习相关
   ASSIGNMENT: {
-    CREATE_SUCCESS: '作业发布成功',
-    UPDATE_SUCCESS: '作业更新成功',
-    DELETE_SUCCESS: '作业删除成功',
-    SUBMIT_SUCCESS: '作业提交成功',
+    CREATE_SUCCESS: '练习发布成功',
+    UPDATE_SUCCESS: '练习更新成功',
+    DELETE_SUCCESS: '练习删除成功',
+    SUBMIT_SUCCESS: '练习提交成功',
     GRADE_SUCCESS: '批改成功',
     BATCH_GRADE_SUCCESS: '批量批改成功',
-    NOT_FOUND: '作业不存在',
+    NOT_FOUND: '练习不存在',
     DEADLINE_PASSED: '已过截止时间',
   },
 
