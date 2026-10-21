@@ -15,7 +15,7 @@ import { success, error, forbidden, notFound, instrumentError } from '../utils/r
 import { serializeQuestionnaireAccessToken, tokenService } from '../services/tokenService'
 import { logger } from '../utils/logger'
 import { UserRole } from '../types'
-import { canUseScale } from '../services/materialGrant'
+import { canUseScale, grantedResourceIds } from '../services/materialGrant'
 import { z } from 'zod'
 import { validateContextFormItem, validateContextFormItems } from '../modules/assessment-context'
 import { questionnaireAuthorizationService as questionnaireAuth } from '../services/questionnaireAuthorizationService'
@@ -828,6 +828,7 @@ export const generalQuestionnaireController = {
         where: { id, type: 'GENERAL' },
         include: {
           formItems: true,
+          formSections: true,
           questionnaireScales: true,
         },
       })
@@ -836,8 +837,12 @@ export const generalQuestionnaireController = {
         return notFound(res, '问卷不存在')
       }
 
-      // 权限检查
-      if (!(await canManageGeneral(req, original))) {
+      // A form-template grant permits a fresh content draft, never editing or
+      // reading the original's responses, tokens or authoring controls.
+      const grantedForm = original.status === 'PUBLISHED' && original.questionnaireScales.length === 0
+        && (await grantedResourceIds(userId, 'FORM_TEMPLATE')).includes(original.id)
+        && !!await prisma.user.findFirst({where:{id:original.creatorId,accountDomain:{in:['LEGACY','TRAINING']}},select:{id:true}})
+      if (!(await canManageGeneral(req, original)) && !grantedForm) {
         return forbidden(res, '无权限复制此问卷')
       }
 
@@ -858,6 +863,14 @@ export const generalQuestionnaireController = {
           },
         })
 
+        // Preserve section content/order with fresh identities. Never copy
+        // section attempts, answers, deliveries or access tokens.
+        const sections = new Map<string,string>()
+        for (const section of original.formSections) {
+          const copied = await tx.questionnaireFormSection.create({data:{questionnaireId:questionnaire.id,
+            title:section.title,description:section.description,position:section.position,contextSection:section.contextSection}})
+          sections.set(section.id,copied.id)
+        }
         // 复制表单题目
         if (original.formItems.length > 0) {
           await tx.questionnaireFormItem.createMany({
@@ -870,6 +883,8 @@ export const generalQuestionnaireController = {
               position: item.position,
               options: item.options as any,
               contextKey: item.contextKey,
+              sectionId: item.sectionId ? sections.get(item.sectionId) : undefined,
+              sectionPosition: item.sectionPosition,
             })),
           })
         }

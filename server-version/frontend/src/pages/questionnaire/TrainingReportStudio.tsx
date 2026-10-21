@@ -29,7 +29,7 @@ function TrainingReportWorkspace({actorId,compositeId,courses,onLeaveRiskChange,
     return envelope.data
   },[scope,actorId,compositeId,courses])
   const locked=risk.dirty||risk.pending||risk.busy
-  return <section className="my-5 rounded border p-4" aria-label="Training 私有报告工作台"><fieldset disabled={disabled}><legend className="sr-only">课程报告编辑</legend>
+  return <section id="tool-reports" className="my-5 rounded border p-4" aria-label="Training 私有报告工作台"><fieldset disabled={disabled}><legend className="sr-only">课程报告编辑</legend>
     {scope&&locked&&<ReportNavigationGuard risk={risk}/>}<h2 className="text-xl font-semibold">课程私有报告工作台</h2>
     <p>使用当前账号的报告内容授权。发布报告不会修改历史分数；报告面向教师或研究者。</p>
     <fieldset disabled={locked}><label>已保存的投放课程<select className="input" value={courseId} onChange={event=>setCourseId(event.target.value)}>{courses.map(course=><option key={course.id} value={course.id}>{course.title}</option>)}</select></label>

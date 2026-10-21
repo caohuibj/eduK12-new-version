@@ -1,7 +1,8 @@
+import { learnerCourseContext, withLearnerCourse, useTrainingLearnerNavigation } from '../../training/learnerNavigation'
 import { runWithCompletionRetry } from '../../services/completionRetry'
 import { usePageSignal } from '../../hooks/usePageSignal'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useParams } from 'react-router-dom'
 import {
   CheckCircle,
   ChevronLeft,
@@ -46,7 +47,6 @@ const CompositeAssessmentContent: React.FC = () => {
     token?: string
     attemptId?: string
   }>()
-  const navigate = useNavigate()
   const publicMode = location.pathname.startsWith('/public/composite')
   const relationalMode = location.pathname.startsWith('/relational/')
   const organizationTask =
@@ -60,6 +60,8 @@ const CompositeAssessmentContent: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const [existingReportId, setExistingReportId] = useState<string | null>(null)
   const [state, setState] = useState<CompositeAttemptState | null>(null)
+  const learner = useTrainingLearnerNavigation({ courseId: state?.trainingPersistence?.courseId })
+  const navigate = learner.navigate
   const [publicInfo, setPublicInfo] = useState<CompositePublicInfo | null>(null)
   const [recoveryToken, setRecoveryToken] = useState('')
   const [recoveryInput, setRecoveryInput] = useState('')
@@ -117,7 +119,7 @@ const CompositeAssessmentContent: React.FC = () => {
     }
   }
 
-  const goReport = (id: string) => {
+  const goReport = (id: string, courseId?: string) => {
     if (pageSignal().aborted) return
     if (relationalMode) {
       navigate(organizationTask ? '/my-assessments' : '/relational/tasks')
@@ -126,7 +128,7 @@ const CompositeAssessmentContent: React.FC = () => {
     navigate(
       publicMode
         ? `/public/composite/attempts/${id}/report`
-        : `/student/composite/attempts/${id}/report`,
+        : learner.enabled ? withLearnerCourse(`/student/composite/attempts/${id}/report`, learnerCourseContext(location.search, courseId || state?.trainingPersistence?.courseId)) : `/student/composite/attempts/${id}/report`,
     )
   }
 
@@ -134,7 +136,7 @@ const CompositeAssessmentContent: React.FC = () => {
     if (pageSignal().aborted) return
     setState(next)
     if (!next.trainingFlow && (next.status === 'COMPLETED' || next.allUnitsSubmitted)) {
-      goReport(next.id)
+      goReport(next.id, next.trainingPersistence?.courseId)
       return
     }
     const item = next.currentItem
@@ -503,7 +505,7 @@ const CompositeAssessmentContent: React.FC = () => {
   if (!state) return <ProductPage width="reading"><ProductStatus
     kind="warning"
     title={error?.includes('最大次数') ? '本次测评的参与次数已用尽' : '暂时无法进入测评'}
-    actions={<><Link className="hui-button hui-button--secondary" to={relationalMode ? (organizationTask ? '/my-assessments' : '/relational/tasks') : '/student'}>返回任务列表</Link>
+    actions={<><Link className="hui-button hui-button--secondary" to={relationalMode ? (organizationTask ? '/my-assessments' : '/relational/tasks') : learner.enabled ? learner.backHref : '/student'}>{learner.enabled ? learner.backLabel : '返回任务列表'}</Link>
       {existingReportId && <ProductButton variant="primary" onClick={() => goReport(existingReportId)}>查看已有结果</ProductButton>}
       {!error?.includes('最大次数') && <ProductButton onClick={() => params.attemptId ? void loadAttempt(params.attemptId) : void start()}>重新加载</ProductButton>}
     </>}

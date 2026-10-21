@@ -44,4 +44,22 @@
 .hui-training.hui-app--teacher.hui-app--standard.training-workspace-shell .training-trainer-course .training-section-switch .training-section-tab[aria-pressed=true]{border-color:#cbdac0;background:#e9f1e0;color:#305336;font-weight:600;box-shadow:0 1px 3px #2d4e3010}
 .hui-training.hui-app--teacher.hui-app--standard.training-workspace-shell .training-trainer-course .training-section-switch .training-section-tab::after{display:none}
 .hui-training.hui-app--teacher.hui-app--standard.training-workspace-shell .training-trainer-course .training-section-switch .training-section-tab:focus-visible{outline:2px solid #4a7749;outline-offset:3px}
-@media(max-width:700px){.hui-training.hui-app--teacher.hui-app--standard.training-workspace-shell .training-trainer-course .training-section-switch{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:4px;padding:8px;min-height:62px}.hui-training.hui-app--teacher.hui-app--standard.training-workspace-shell .training-trainer-course .training-section-switch .training-section-tab{min-width:0;padding:9px 6px;font-size:11px}}
+@media(max-width:700px){.hui-training.hui-app--teacher.hui-app--standard.training-workspace-shell .training-trainer-course .training-section-switch{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:4px;padding:8px;min-height:62px}.hui-training.hui-app--teacher.hui-app--standard.training-workspace-shell .training-trainer-course .training-section-switch .training-section-tab{min-width:0;padding:9px 6px;font-size:13px}}
+
+/* Keep course identity, filters, rows and paging on a shared inset. */
+.hui-training.hui-app--standard.training-workspace-shell .training-trainer-course .training-detail-header{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px 24px}
+.hui-training .training-trainer-course .training-course-title-row{display:contents}
+.hui-training .training-trainer-course .training-detail-header h1{grid-column:1;grid-row:1}
+.hui-training .training-trainer-course .training-detail-header .training-course-meta{grid-column:1;grid-row:2;margin:0}
+.hui-training .training-trainer-course .training-detail-header .training-inline-course-code{grid-column:2;grid-row:1 / 3}
+.hui-training .training-trainer-course .training-course-work{--course-inset:24px}
+.hui-training .training-trainer-course .training-course-work>.training-catalog-disclosure{margin:20px var(--course-inset)}
+.hui-training .training-trainer-course .training-course-work>.training-catalog-pagination{margin:20px var(--course-inset);padding-top:16px;border-top:1px solid var(--training-border)}
+.hui-training .training-trainer-course .training-course-actions{margin:0 0 20px}
+.hui-training.hui-app--standard.training-workspace-shell .training-trainer-course .training-task-item{padding:18px;border:1px solid var(--training-border);border-radius:10px}
+@media(max-width:700px){
+ .hui-training.hui-app--standard.training-workspace-shell .training-trainer-course .training-detail-header{grid-template-columns:minmax(0,1fr);gap:10px}
+ .hui-training .training-trainer-course .training-detail-header .training-inline-course-code{grid-column:1;grid-row:3;border-left:0;border-top:1px solid var(--training-border);padding:12px 0 0}
+ .hui-training .training-trainer-course .training-course-work{--course-inset:16px}
+ .hui-training.hui-app--standard.training-workspace-shell .training-trainer-course .training-task-item{padding:16px}
+}

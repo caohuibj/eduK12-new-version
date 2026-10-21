@@ -85,6 +85,17 @@ describe('Training assessment presentation boundary', () => {
 })
 
 describe('Training teacher visual boundary', () => {
+  it.each(['/student/cognitive', '/scale-library/tool/v1'])('redirects a Training student discovery route before its page mounts: %s', async path => {
+    presentation.training = true
+    auth.user = { id: 'student', role: 'STUDENT', username: 'learner' } as User
+    const Discovery = vi.fn(() => <p>自由选测</p>)
+    render(<MemoryRouter initialEntries={[path]}><AppShell><Routes>
+      <Route path="/student" element={<h1>我的课程内容</h1>} />
+      <Route path="*" element={<Discovery />} />
+    </Routes></AppShell></MemoryRouter>)
+    expect(await screen.findByRole('heading', { name: '我的课程内容' })).toBeInTheDocument()
+    expect(Discovery).not.toHaveBeenCalled()
+  })
   it.each(['/dashboard', '/courses/c1/detail?section=assessments', '/questionnaire-products/new?courseId=c1'])('omits the global menu inside the teacher course workspace at %s', path => {
     presentation.training = true
     auth.user = { id: 'teacher', role: 'TEACHER', username: 'trainer' } as User
@@ -110,9 +121,11 @@ describe('Training teacher visual boundary', () => {
     expect(screen.getByRole('main')).toHaveAttribute('data-training-family', family)
     expect(screen.getByRole('heading', { name: '当前业务页面' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '既有操作' })).toBeEnabled()
-    if (path === '/dashboard' || path.startsWith('/courses/')) {
-      expect(screen.queryByRole('navigation', { name: '主要导航' })).toBeNull()
-    } else expect(screen.getByRole('navigation', { name: '主要导航' })).toHaveTextContent('我的课程')
+    expect(screen.queryByRole('navigation', { name: '主要导航' })).toBeNull()
+    const workspace = screen.getByRole('navigation', { name: '教师工作台' })
+    expect(workspace).toHaveTextContent('我的课程')
+    expect(workspace).toHaveTextContent('媒体库')
+    expect(workspace).toHaveTextContent('工具包')
   })
   it.each([
     ['STUDENT', true, '/student'],

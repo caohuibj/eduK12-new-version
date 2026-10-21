@@ -1,9 +1,10 @@
+import { useTrainingLearnerNavigation } from '../../../training/learnerNavigation'
 import CognitiveCredentialReset from './CognitiveCredentialReset'
 import CognitiveSessionEntry from './CognitiveSessionEntry'
 import { isPublicAssessmentPath, parentReturnTo } from '../../../components/app-shell/access'
 import { AssessmentShell, type AssessmentInteractionReadiness, type AssessmentProgress } from '../../../components/assessment-shell'
 import React, { useCallback, useMemo, useState } from 'react'
-import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import { cognitiveApi, publicCognitiveApi, type CognitiveSessionApi } from '../api'
 import { readCognitiveRecoveryCredential } from '../core/recovery-credential'
 import { cognitiveInputNotice, resolveCognitiveReadinessProfile } from '../core/readiness'
@@ -62,7 +63,6 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
   const campus = embedded ?? legacyCampus
   const params = useParams<{ sessionId: string }>()
   const sessionId = campus?.sessionId ?? params.sessionId
-  const navigate = useNavigate()
   const location = useLocation()
   const [searchParams] = useSearchParams()
   const isPublic = !campus && isPublicAssessmentPath(location.pathname)
@@ -74,6 +74,8 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
   )
   const controller = useCognitiveSession(sessionId ?? '', sessionApi, { aggregateOnly: relationalMode, failClosedOnTrialPersistence: embedded?.failClosedOnTrialPersistence })
   const { state } = controller
+  const learner = useTrainingLearnerNavigation({ courseId: state.session?.trainingPersistence?.courseId, parentAttemptId: state.session?.trainingPersistence?.attemptId })
+  const navigate = learner.navigate
   const administrationProvenance = useAdministrationProvenance(state.session, state.status)
   const completeWithProvenance = () => controller.complete(administrationProvenance.snapshot() ?? undefined)
   const [restarting, setRestarting] = useState(false)
@@ -166,7 +168,7 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
     }
   }
 
-  const cognitiveFallback = campus ? '/school' : isPublic ? '/' : relationalMode ? '/relational/tasks' : '/student/cognitive'
+  const cognitiveFallback = campus ? '/school' : isPublic ? '/' : relationalMode ? '/relational/tasks' : learner.enabled ? learner.courseHref : '/student/cognitive'
   // A direct child link need not carry returnTo. Use only the parent identity
   // from the authorized session read; never infer it from a local draft.
   const trainingParent = state.session?.trainingPersistence?.attemptId
@@ -187,11 +189,11 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
       navigate(`${parentTarget}?${query}`)
     } else navigate(parentTarget)
   }
-  const leaveList = () => { if (campus) campus.onExit(); else navigate(cognitiveFallback) }
+  const leaveList = () => { if (campus) campus.onExit(); else if (learner.enabled) leaveParent(); else navigate(cognitiveFallback) }
   const recoveryActions = (
     <div className="flex flex-wrap justify-center gap-3">
       <button type="button" onClick={leaveParent} className="btn-secondary">
-        {hasParentReturn ? '返回上层测评' : '返回列表'}
+        {learner.enabled ? learner.backLabel : hasParentReturn ? '返回上层测评' : '返回列表'}
       </button>
       {!hasParentReturn ? (
         <button type="button" onClick={() => void handleRestart()} disabled={restarting} className="btn-primary">
@@ -220,7 +222,7 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
     )
     if (sessionId) {
       const returnTo = searchParams.get('returnTo')
-      const target = parentReturnTo(
+      const target = learner.enabled && trainingParent ? learner.backHref : parentReturnTo(
         returnTo, isPublic,
         isPublic
           ? `/public/cognitive/sessions/${sessionId}/result?public=1`
@@ -277,7 +279,7 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
         <AssessmentShell
           title="认知测评"
           interactionReadiness={{ state: 'blocked', message: '该冻结任务类型或 engineVersion 没有可用的前端支持契约。' }}
-          actions={<button type="button" onClick={leaveList} className="btn-secondary">返回列表</button>}
+          actions={<button type="button" onClick={leaveList} className="btn-secondary">{learner.enabled ? learner.backLabel : '返回列表'}</button>}
         >
           <p className="text-center text-slate-600">该测评类型或版本暂不支持，请联系老师处理。</p>
         </AssessmentShell>
@@ -399,7 +401,7 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
       <AssessmentShell
         title="认知测评"
         interactionReadiness={{ state: 'blocked', message: '该测评类型或版本暂不支持。' }}
-        actions={<button type="button" onClick={leaveList} className="btn-secondary">返回列表</button>}
+        actions={<button type="button" onClick={leaveList} className="btn-secondary">{learner.enabled ? learner.backLabel : '返回列表'}</button>}
       >
         <p className="text-center text-slate-600">请联系老师处理。</p>
       </AssessmentShell>
@@ -444,6 +446,7 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
         <AssessmentShell
           title="认知测评"
           interactionReadiness={{ state: 'blocked', message: '该测评类型或版本暂不支持。' }}
+          actions={learner.enabled ? <button type="button" onClick={leaveParent} className="btn-secondary">{learner.backLabel}</button> : undefined}
         >
           <p className="text-center text-slate-600">请联系老师处理。</p>
         </AssessmentShell>

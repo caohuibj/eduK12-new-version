@@ -1,0 +1,21 @@
+.hui-training .training-checkin-recurrence{min-width:0;margin:0;padding:0;border:0}
+.hui-training .training-checkin-recurrence__modes{display:flex;flex-wrap:wrap;gap:16px;margin:8px 0}
+.hui-training .training-checkin-recurrence__modes label{display:flex;align-items:center;gap:6px;font-size:14px}
+.hui-training.hui-app--standard.training-workspace-shell .training-task-editor .training-checkin-recurrence__modes label{display:inline-flex;flex:1;white-space:nowrap;gap:8px}
+.hui-training.hui-app--standard.training-workspace-shell .training-task-editor .training-checkin-recurrence__modes input[type=radio]{appearance:auto;flex:0 0 16px;width:16px;min-width:16px;height:16px;min-height:16px;margin:0;padding:0;accent-color:#315c43;box-shadow:none}
+.hui-training .training-checkin-recurrence__fields{display:grid;gap:16px;margin-top:16px;padding:16px;background:#f4f7ef;border:1px solid #dce4d5;border-radius:10px}
+.hui-training .training-checkin-recurrence__fields>label{display:grid;gap:8px;font-size:13px;color:#39533f}
+.hui-training .training-checkin-recurrence__fields small,.hui-training .training-checkin-recurrence__fields>p{font-size:12px;line-height:1.8;color:#6a7964;overflow-wrap:anywhere}
+.hui-training .training-checkin-recurrence__interval{display:grid;grid-template-columns:auto minmax(60px,1fr) 80px;align-items:center;gap:8px}
+.hui-training.hui-app--standard.training-workspace-shell .training-task-editor .training-checkin-recurrence__interval :is(input,select){min-width:0;width:100%}
+.hui-training .training-checkin-schedules{padding:18px;margin:0 0 20px;border:1px solid #dce4d5;border-radius:10px;background:#f8faf5}
+.hui-training .training-checkin-schedules>header{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+.hui-training .training-checkin-schedules h2{font-size:16px;font-weight:600;margin:0}
+.hui-training .training-checkin-schedules>header>span,.hui-training .training-checkin-schedules p{font-size:12px;line-height:1.8;color:#687861}
+.hui-training .training-checkin-schedules article{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:14px 0;border-top:1px solid #dfe7d9}
+.hui-training .training-checkin-schedules article>div{min-width:0}
+.hui-training .training-checkin-schedules h3{display:flex;align-items:center;flex-wrap:wrap;gap:8px;font-size:15px;font-weight:600;overflow-wrap:anywhere}
+.hui-training .training-checkin-schedules h3>span{font-size:11px;font-weight:400;color:#59734d;border:1px solid #d1dfc7;border-radius:5px;padding:2px 6px}
+.hui-training .training-checkin-schedules button{flex-shrink:0;min-height:40px;padding:8px 12px;border:1px solid #ccd9c4;border-radius:7px;background:#fff;color:#3d5c3e;font-size:12px}
+.hui-training .training-checkin-schedules p{overflow-wrap:anywhere}
+@media(max-width:700px){.hui-training .training-checkin-schedules{padding:14px}.hui-training .training-checkin-schedules article{align-items:flex-start;flex-direction:column}}

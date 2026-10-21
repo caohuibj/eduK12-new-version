@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { fireEvent, render, screen } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import CognitiveRunner from '../pages/CognitiveRunner'
+import { TrainingLearnerNavigationBoundary } from '../../../training/TrainingLearnerNavigationBoundary'
+vi.mock('../../../training/context', () => ({ isTrainingHost: () => true }))
 
 const mocks = vi.hoisted(() => ({
   imageStatus: 'ready' as 'ready' | 'error',
@@ -75,6 +77,26 @@ beforeEach(() => {
 })
 
 describe('FE-07A Cognitive shell integration', () => {
+  it.each(['UNSUPPORTED', 'COMPLETED'])('keeps the authoritative Training parent on %s without creating another attempt', status => {
+    const serverSession = { ...baseState().session, trainingPersistence: { attemptId: 'parent-real', courseId: 'course-real' } }
+    mocks.controller.state = { ...baseState(), session: serverSession }
+    const trainingApp = () => <MemoryRouter initialEntries={['/student/cognitive/sessions/s1?returnTo=%2Fstudent%2Fcomposite%2Fattempts%2Fwrong']}>
+      <TrainingLearnerNavigationBoundary role="STUDENT"><Routes>
+        <Route path="/student/cognitive/sessions/:sessionId" element={<CognitiveRunner />} />
+        <Route path="/student/composite/attempts/parent-real" element={<p>整份测评</p>} />
+        <Route path="/student/composite/attempts/wrong" element={<p>错误父级</p>} />
+      </Routes></TrainingLearnerNavigationBoundary>
+    </MemoryRouter>
+    const view = render(trainingApp())
+    mocks.controller.state = { ...mocks.controller.state, status }
+    view.rerender(trainingApp())
+    if (status === 'UNSUPPORTED') fireEvent.click(screen.getByRole('button', { name: '继续整份测评' }))
+    expect(screen.getByText('整份测评')).toBeInTheDocument()
+    expect(screen.queryByText('错误父级')).toBeNull()
+    expect(mocks.controller.complete).not.toHaveBeenCalled()
+    expect(mocks.controller.restart).not.toHaveBeenCalled()
+    expect(mocks.controller.start).not.toHaveBeenCalled()
+  })
   it('keeps the active task mounted when shell save status changes', () => {
     const view = render(app())
     const before = screen.getByRole('button', { name: 'trial 0' })

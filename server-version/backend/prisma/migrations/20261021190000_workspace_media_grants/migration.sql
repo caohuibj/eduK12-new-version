@@ -1,0 +1,1 @@
+ALTER TYPE "MaterialResourceType" ADD VALUE IF NOT EXISTS 'MEDIA_ASSET';

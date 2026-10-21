@@ -1,5 +1,6 @@
 import TrainingCourseCode from './TrainingCourseCode'
 import TrainingCourseTabs from './TrainingCourseTabs'
+import TrainingCheckinSchedules from './TrainingCheckinSchedules'
 import { CatalogFilters, CatalogPagination } from './TrainingCatalogControls'
 import { useCatalogQuery } from './useCatalogQuery'
 import { lazy, Suspense, useEffect, useState } from 'react'
@@ -108,11 +109,12 @@ export default function TrainingTrainerCourse() {
 
             {section === 'checkins' && <section className="training-detail-content" aria-label="课程打卡管理">
               <div className="training-course-actions"><Link to={'/checkins?create=true&courseId=' + encoded + returnContext} className="training-action">＋ 发布打卡</Link><Link to={'/checkins?reuse=true&courseId=' + encoded + returnContext} className="training-action training-action--quiet">复用打卡</Link></div>
+              <TrainingCheckinSchedules courseId={course.id} />
               {checkins.loading ? <p role="status">正在读取打卡…</p> : checkins.error ? <div role="alert">读取打卡失败：{checkins.error}<button type="button" onClick={retry}>重试</button></div>
                 : checkins.rows.length === 0 ? <p className="training-empty-small">{filtered?'没有符合当前条件的打卡。':'还没有布置打卡。'}</p>
                   : <div className="training-item-list">{checkins.rows.map(task =>
                     <article className="training-task-item" key={task.id}>
-                      <div><h2>{task.title}</h2><p>{task.description || '课程打卡'}</p><span>{task.status === 'DRAFT' ? '草稿' : '已发布'}</span></div>
+                      <div><h2>{task.title}</h2><p>{task.description || '课程打卡'}</p><span>{task.status === 'DRAFT' ? '草稿' : '已发布'}{task.scheduleId && task.scheduledFor ? ` · 周期打卡 · ${new Date(task.scheduledFor).toLocaleString('zh-CN')}` : ''}</span></div>
                       <Link to={'/checkins?id=' + encodeURIComponent(task.id) + '&courseId=' + encoded + returnContext} className="training-row-action">查看管理<ArrowRight size={16} aria-hidden="true" /></Link>
                     </article>)}</div>}
             </section>}

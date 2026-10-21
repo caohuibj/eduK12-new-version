@@ -707,6 +707,26 @@ describe('Training questionnaire guided editor', () => {
     api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? resources : row }))
     api.put.mockImplementation(async (_path, body) => ({ code: 0, data: { ...row, ...body, revision: 8 } }))
   })
+  it.each([
+    ['SCALE', '量表', { scaleId: 'scale' }],
+    ['COGNITIVE', '认知测验', { cognitiveAssignmentId: 'cognitive' }],
+    ['SITUATIONAL', '情境判断', { situationalInstrumentKey: 'sjt-key', situationalInstrumentVersion: '2.0' }],
+  ] as const)('selects %s through searchable cards while keeping the existing item API', async (type, label, itemFields) => {
+    const available = { ...resources, cognitive: [{ id: 'cognitive', name: '授权认知', configVersion: '1.0' }], situational: [{ id: 'situational', name: '授权情境', instrumentKey: 'sjt-key', instrumentVersion: '2.0' }] }
+    api.get.mockImplementation(async path => ({ code: 0, data: path.endsWith('/resources') ? available : row }))
+    api.post.mockResolvedValue({ code: 0, data: { ...row, revision: 8 } })
+    mount('guided', '#questionnaire-content')
+    fireEvent.click(await screen.findByRole('button', { name: label }))
+    fireEvent.click(screen.getByRole('button', { name: new RegExp('选择' + label) }))
+    const dialog = screen.getByRole('dialog')
+    const title = type === 'SCALE' ? '可用量表' : type === 'COGNITIVE' ? '授权认知' : '授权情境'
+    fireEvent.change(within(dialog).getByRole('textbox', { name: '检索工具' }), { target: { value: title } })
+    fireEvent.click(within(dialog).getByRole('button', { name: new RegExp('选择 ' + title) }))
+    expect(api.post).not.toHaveBeenCalled()
+    expect(screen.queryByRole('dialog')).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '添加到测评' }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledExactlyOnceWith('/questionnaire-products/guided/items', { revision: 7, item: { type, required: true, ...itemFields } }))
+  })
   it('keeps unsaved metadata across steps and saves through the existing revision contract', async () => {
     mount('guided')
     await screen.findByDisplayValue('步骤测评')
@@ -941,4 +961,30 @@ describe('guided anonymous publication', () => {
   } finally { if (original) Object.defineProperty(Element.prototype, 'scrollIntoView', { configurable: true, value: original }); else Reflect.deleteProperty(Element.prototype, 'scrollIntoView') }
  })
 
+})
+
+
+describe('Training toolkit separation',()=>{
+  const course={id:'course',title:'关联课程',courseType:'TRAINING_COURSE',isLibrary:false}
+  const row={id:'tool',name:'工具迁移测试',status:'DRAFT',productKind:'QUESTIONNAIRE',revision:3,questionnaireType:'COURSE',questionnaireCourses:[{courseId:'course'}],items:[{id:'cognitive',type:'COGNITIVE',position:0,cognitiveAssignment:{title:'认知内容'}}],formSections:[],publicEnabled:false}
+  beforeEach(()=>{vi.resetAllMocks();sessionStorage.clear();trainingPresentation.enabled=true;capabilities.enabled=true;api.get.mockImplementation(async path=>({code:0,data:path.endsWith('/resources')?{scales:[],cognitive:[],situational:[],courses:[course]}:row}))})
+  it('keeps the three advanced controls in toolkit with the saved course context',async()=>{
+    render(<MemoryRouter initialEntries={['/toolkit/compositions/tool']}><Routes><Route path="/toolkit/compositions/:id" element={<QuestionnaireProductEdit/>}/></Routes></MemoryRouter>)
+    expect(await screen.findByRole('heading',{name:'工具迁移测试 · 配置与报告'})).toBeInTheDocument()
+    expect(await screen.findByRole('region',{name:'认知测量版本发布'})).toBeInTheDocument()
+    expect(screen.getByRole('region',{name:'投放报告与参考选择'})).toBeInTheDocument()
+    expect(screen.getByRole('combobox',{name:'已保存的投放课程'})).toHaveValue('course')
+    expect(screen.queryByRole('navigation',{name:'编制步骤'})).not.toBeInTheDocument()
+  })
+  it('hides advanced controls in course editing while retaining an unconfirmed selection guard',async()=>{
+    sessionStorage.setItem('training-content-selection:'+JSON.stringify(['teacher-1','tool']),JSON.stringify({actorId:'teacher-1',compositeId:'tool',kind:'report',revision:3,selection:null,uncertain:true}))
+    mount('tool');await screen.findByDisplayValue('工具迁移测试')
+    expect(screen.queryByRole('region',{name:'认知测量版本发布'})).not.toBeInTheDocument()
+    expect(screen.queryByRole('region',{name:'投放报告与参考选择'})).not.toBeInTheDocument()
+    expect(screen.getByRole('link',{name:'在工具包中管理参数、参考与报告 →'})).toHaveAttribute('href','/toolkit/compositions/tool')
+    expect(within(screen.getByRole('complementary',{name:'编制概览'})).getByRole('region',{name:'工具配置与报告'})).toBeInTheDocument()
+    fireEvent.change(screen.getByDisplayValue('工具迁移测试'),{target:{value:'修改名称'}})
+    expect(screen.getByRole('button',{name:'保存全部设置'})).toBeDisabled()
+    expect(api.put).not.toHaveBeenCalled()
+  })
 })

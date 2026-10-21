@@ -3,7 +3,7 @@ import { internalReturnTo } from '../components/app-shell/access'
 // Temporarily closed to trainers; retain the implementation for a later opening.
 export const COURSE_ANALYSIS_ENABLED = false
 export const COURSE_SECTIONS = [
-  ['assignments', '练习'], ['checkins', '打卡'], ['assessments', '测评'],
+  ['assignments', '学习'], ['checkins', '打卡'], ['assessments', '测评'],
   ['analysis', '信息统计'], ['management', '课程管理'],
 ] as const
 export type CourseSection = typeof COURSE_SECTIONS[number][0]

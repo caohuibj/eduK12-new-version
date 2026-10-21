@@ -1,0 +1,19 @@
+.authorized-questionnaire-page > section { margin-top: 28px; }
+.authorized-questionnaire-page h2 { font-size: 20px; color: #294b3f; margin-bottom: 14px; }
+.authorized-questionnaire-search { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; margin: 18px 0; }
+.authorized-questionnaire-search label { font-weight: 600; color: #294b3f; }
+.authorized-questionnaire-search .input { flex: 1; max-width: 500px; min-width: 160px; min-height: 46px; font-size: 16px; background: #fff; }
+.authorized-questionnaire-search > span { color: #647565; font-size: 14px; }
+.authorized-questionnaire-grid { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; }
+.authorized-questionnaire-grid article { display: flex; flex-direction: column; gap: 12px; min-width: 0; border: 1px solid #d3ddcd; border-radius: 12px; background: #fff; padding: 22px; }
+.authorized-questionnaire-grid h3 { color: #294b3f; font-size: 19px; font-weight: 600; line-height: 1.6; overflow-wrap: anywhere; }
+.authorized-questionnaire-grid p { font-size: 14px; line-height: 1.8; color: #647565; overflow-wrap: anywhere; }
+.authorized-questionnaire-grid .btn-secondary { margin-top: auto; min-height: 44px; }
+.authorized-questionnaire-setup { max-width: 800px; padding: 26px; border-radius: 12px; background: #fff; }
+.authorized-questionnaire-setup > label,.authorized-questionnaire-setup > div { margin-top: 18px; }
+.authorized-questionnaire-setup > p { color: #647565; font-size: 14px; line-height: 1.8; }
+.authorized-questionnaire-paging { display: flex; align-items: center; justify-content: flex-end; gap: 16px; margin-top: 20px; }
+.authorized-questionnaire-paging button { border: 1px solid #cfdbca; border-radius: 8px; min-height: 42px; padding: 8px 14px; background: #fff; }
+.authorized-questionnaire-paging button:disabled { opacity: .5; }
+@media(max-width:900px) { .authorized-questionnaire-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
+@media(max-width:560px) { .authorized-questionnaire-grid { grid-template-columns: minmax(0,1fr); }.authorized-questionnaire-setup { padding: 18px; }.authorized-questionnaire-search .input { flex-basis: 100%; max-width: none; } }

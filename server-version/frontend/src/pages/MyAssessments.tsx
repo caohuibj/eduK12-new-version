@@ -22,6 +22,7 @@ export default function MyAssessments() {
   const navigate = useNavigate()
   const training = isTrainingHost()
   const {user}=useAuth()
+  const courseOnly = training && user?.role === 'STUDENT'
   const [catalog, setCatalog] = useState<CatalogCard[]>([])
   const [catalogError, setCatalogError] = useState(false)
   const [inbox, setInbox] = useState<AssessmentInbox | null>(null)
@@ -36,10 +37,10 @@ export default function MyAssessments() {
     setSummaries({}); setInbox(response.data)
   }, [])
   useEffect(() => { void load().catch(err => { setInbox(null); setError(String(err.message || err)) }) }, [load])
-  useEffect(() => { void apiClient.get<{ list: CatalogCard[] }>('/my-assessments/catalog').then(response => {
+  useEffect(() => { if (courseOnly) return; void apiClient.get<{ list: CatalogCard[] }>('/my-assessments/catalog').then(response => {
     if (response.code !== 0 || !response.data) throw new Error('catalog unavailable')
     setCatalog(response.data.list.filter(entry => entry.journey?.resource))
-  }).catch(() => setCatalogError(true)) }, [])
+  }).catch(() => setCatalogError(true)) }, [courseOnly])
   const start = async (task: InboxTask) => {
     if (busy || !task.runTask) return
     setBusy(task.taskId); setError(null)
@@ -72,7 +73,7 @@ export default function MyAssessments() {
     <PageHeader title="我的测评" description={`待完成测评：${inbox?.pendingCount ?? '…'}。${training ? '开始、继续作答，查看测评状态与可用反馈。' : '开始、继续作答和查看自己的报告。'}`} actions={<ProductButton disabled={busy !== null} onClick={() => { setError(null); void load().catch(err => setError(String(err.message || err))) }}>刷新任务</ProductButton>} />
     {error && <ProductStatus kind="error" title="操作未完成">{error}</ProductStatus>}
     {!inbox && !error && <p role="status">正在加载测评…</p>}
-    {user?.role !== 'PARENT' && <p className="mb-4"><Link to="/scale-library">选择适合自己的测评</Link></p>}
+    {!courseOnly && user?.role !== 'PARENT' && <p className="mb-4"><Link to="/scale-library">选择适合自己的测评</Link></p>}
     <div className="grid min-w-0 gap-4">{[...groups.entries()].map(([key, tasks]) => <section key={key} className="min-w-0 space-y-3 rounded-xl border bg-white p-4">
       <h2 className="break-words font-semibold">{tasks[0].title}</h2>
       {tasks.length > 1 && <p>已完成 {tasks.filter(t => t.state === 'COMPLETED').length} / {tasks.length}</p>}
@@ -93,7 +94,7 @@ export default function MyAssessments() {
       </article>)}
     </section>)}</div>
     {inbox?.list.length === 0 && <p>暂无分配给你的测评。</p>}
-    <section className="mt-6 space-y-3"><h2 className="font-semibold">可参与的测评</h2>{catalogError && <p>内容目录暂不可用，已分配任务仍可从上方进入。</p>}<div className="grid min-w-0 gap-3 sm:grid-cols-2">{catalog.map(entry => <article className="min-w-0 break-words rounded-xl border bg-white p-4" key={entry.journey.resource.family + ':' + entry.journey.resource.key + ':' + entry.journey.resource.version}><h3>{entry.title}</h3><Link to={entry.launchTarget}>{entry.journey.initiationModes.includes('RESPONDENT_SELF_START') ? '开始前确认适用条件' : '进入已授权测评'}</Link></article>)}</div></section>
+    {!courseOnly && <section className="mt-6 space-y-3"><h2 className="font-semibold">可参与的测评</h2>{catalogError && <p>内容目录暂不可用，已分配任务仍可从上方进入。</p>}<div className="grid min-w-0 gap-3 sm:grid-cols-2">{catalog.map(entry => <article className="min-w-0 break-words rounded-xl border bg-white p-4" key={entry.journey.resource.family + ':' + entry.journey.resource.key + ':' + entry.journey.resource.version}><h3>{entry.title}</h3><Link to={entry.launchTarget}>{entry.journey.initiationModes.includes('RESPONDENT_SELF_START') ? '开始前确认适用条件' : '进入已授权测评'}</Link></article>)}</div></section>}
     <MyLongitudinalFeedback />
     {inbox?.truncated && <p role="status">当前显示最近的任务，较早任务仍可从原入口访问。</p>}
   </ProductPage>

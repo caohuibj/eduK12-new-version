@@ -1,3 +1,4 @@
+import { useTrainingLearnerNavigation } from '../../training/learnerNavigation'
 import { sessionFetch } from '../../api/client'
 import { internalReturnTo } from '../../components/app-shell/access'
 import { TrainingReinterpretationStudio } from './TrainingReinterpretationStudio'
@@ -12,7 +13,7 @@ import { REPORT_AUTO_POLL_LIMIT, reportPollingDelayMs } from './report-polling'
 import type { CompositeReportStatus } from './types'
 import BundleReport from '../../pages/bundle/BundleReport'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { compositeApi, publicCompositeApi } from './api'
 import type { CompositeAnalysisExportFormat, CompositeReport, CompositeSnapshotMetadata } from './types'
 import { useAuth } from '../../contexts/AuthContext'
@@ -49,8 +50,9 @@ type LegacyCompositeModule = Record<string, unknown> & {
 const CompositeReportPage: React.FC = () => {
   const epoch = useRef(0)
   const { id, attemptId } = useParams<{ id?: string; attemptId?: string }>()
+  const learner = useTrainingLearnerNavigation()
+  const navigate = learner.navigate
   const location = useLocation()
-  const navigate = useNavigate()
   const { user } = useAuth()
   const publicMode = location.pathname.startsWith('/public/composite')
   const teacherMode = Boolean(id && attemptId && location.pathname.startsWith('/composite-assessments/'))
@@ -84,7 +86,7 @@ const CompositeReportPage: React.FC = () => {
   const returnCourseId = teacherMode ? new URLSearchParams(location.search).get('courseId') : null
   const requestedResults = teacherMode ? internalReturnTo(new URLSearchParams(location.search).get('returnTo')) : null
   const resultsReturn = teacherMode && id && requestedResults?.split('?')[0] === `/composite-assessments/${encodeURIComponent(id)}/results` ? requestedResults : null
-  const backTo = publicMode && ownStudyReturn ? ownStudyReturn : teacherMode && id ? resultsReturn || `/composite-assessments/${id}/results${returnCourseId ? '?courseId='+encodeURIComponent(returnCourseId) : ''}` : publicMode ? '/' : '/student'
+  const backTo = publicMode && ownStudyReturn ? ownStudyReturn : teacherMode && id ? resultsReturn || `/composite-assessments/${id}/results${returnCourseId ? '?courseId='+encodeURIComponent(returnCourseId) : ''}` : publicMode ? '/' : learner.enabled ? learner.backHref : '/student'
   const legacyModules = (report as (CompositeReport & { modules?: LegacyCompositeModule[] }) | null)?.modules || []
   const unitReports = (report?.unitReports || legacyModules).filter((module) => module.type !== 'FORM') as CompositeReport['unitReports']
   const backgroundValues = report?.backgroundValues || legacyModules.filter((module) => module.type === 'FORM')
@@ -293,7 +295,7 @@ const CompositeReportPage: React.FC = () => {
       actions={<>
         <button type="button" className="hui-button hui-button--secondary" onClick={() => { pollCount.current = 0; void load() }}>刷新开放状态</button>
         {waitingForSubmission && <button type="button" className="hui-button hui-button--primary" onClick={() => navigate(`${publicMode ? '/public' : '/student'}/composite/attempts/${attemptId}`)}>继续作答</button>}
-        <button type="button" className="hui-button hui-button--secondary" onClick={() => navigate(backTo)}>返回</button>
+        <button type="button" className="hui-button hui-button--secondary" onClick={() => navigate(backTo)}>{learner.enabled ? learner.backLabel : '返回'}</button>
       </>}
     />
   }
@@ -324,7 +326,7 @@ const CompositeReportPage: React.FC = () => {
         }}>重新生成报告</button>}
         <button type="button" className="hui-button hui-button--secondary" onClick={() => { pollCount.current = 0; void load() }}>重新加载报告</button>
         {waiting && !teacherMode && <button type="button" className="hui-button hui-button--primary" onClick={() => navigate(`${publicMode ? '/public' : '/student'}/composite/attempts/${attemptId}`)}>继续作答</button>}
-        <button type="button" className="hui-button hui-button--secondary" onClick={() => navigate(backTo)}>返回</button>
+        <button type="button" className="hui-button hui-button--secondary" onClick={() => navigate(backTo)}>{learner.enabled ? learner.backLabel : '返回'}</button>
       </>}
     />
   }
@@ -335,7 +337,7 @@ const CompositeReportPage: React.FC = () => {
         title="综合测评报告"
         description="无法读取当前结果记录。"
         status={{ kind: 'error', title: '报告暂时无法打开', description: <><p>{error || '暂无报告'}</p><p>报告读取失败不会改变已经完成的提交状态。</p></> }}
-        actions={<><button type="button" onClick={() => void load()} className="hui-button hui-button--primary">重新加载报告</button><button type="button" onClick={() => navigate(backTo)} className="hui-button hui-button--secondary">返回</button></>}
+        actions={<><button type="button" onClick={() => void load()} className="hui-button hui-button--primary">重新加载报告</button><button type="button" onClick={() => navigate(backTo)} className="hui-button hui-button--secondary">{learner.enabled ? learner.backLabel : '返回'}</button></>}
       >
         {snapshotControls}
         {publicMode && (
@@ -362,7 +364,7 @@ const CompositeReportPage: React.FC = () => {
       description={report.reportState === 'PARTIAL' ? '作答尚未全部完成。这里只读展示已完成单项的冻结结果，不生成整体报告。' : report.productKind === 'ASSESSMENT_BUNDLE' ? '综合报告结合各项冻结结果，以下同时保留单项反馈。' : '以下按内容顺序展示各项测评的独立结果。'}
       facts={facts}
       status={{ kind: submittedNotSatisfied ? 'info' : 'success', title: submittedNotSatisfied ? '已交卷，任务未达成' : '已提交', description: submittedNotSatisfied ? '本次作答已保存并计入作答次数；任务条件未达成，仍可查看本次报告。' : '本次作答已提交，测评结果如下。' }}
-      backAction={<button type="button" onClick={() => navigate(backTo)} className="hui-button hui-button--secondary">返回</button>}
+      backAction={<button type="button" onClick={() => navigate(backTo)} className="hui-button hui-button--secondary">{learner.enabled ? learner.backLabel : '返回'}</button>}
     >
       {snapshotControls}
       {report.bundleReport && attemptId && <BundleReport report={report.bundleReport} attemptId={attemptId} staff={staffMode} recoveryToken={publicMode ? recoveryToken : undefined} reload={()=>void load()} />}
