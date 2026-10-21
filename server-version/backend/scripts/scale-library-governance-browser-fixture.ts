@@ -28,8 +28,13 @@ async function main() {
   const { hashPassword } = require(path.join(backend, 'dist/utils/password.js'))
   assert.match(process.env.SURVEY_MFA_ENCRYPTION_KEY || '', /^[a-f0-9]{64}$/i)
   const runId = randomUUID().slice(0, 8)
-  const actor = key => ({ username: 'governance_ci_' + key + '_' + runId, password: randomBytes(20).toString('base64url') + 'Aa7!' })
+  const actor = key => ({ username: 'gov_ci_' + key + '_' + runId, password: randomBytes(20).toString('base64url') + 'Aa7!' })
   const teacher = actor('teacher'), student = actor('student'), researcher = actor('researcher'), administrator = actor('administrator')
+  // Match survey_login_shape_check before any write; this subset also satisfies admin bootstrap (4..64).
+  for (const account of [teacher, student, researcher, administrator]) {
+    assert.match(account.username, /^[a-z0-9_.-]{4,32}$/, 'Synthetic account must satisfy database login constraints')
+    assert.equal(account.username, account.username.trim().toLowerCase())
+  }
   const totp = randomBytes(20), iv = randomBytes(12)
   const cipher = createCipheriv('aes-256-gcm', Buffer.from(process.env.SURVEY_MFA_ENCRYPTION_KEY, 'hex'), iv)
   const encrypted = Buffer.concat([cipher.update(totp), cipher.final()])

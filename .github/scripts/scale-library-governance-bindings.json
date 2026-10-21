@@ -16,7 +16,7 @@
     },
     "server-version/backend/scripts/scale-library-governance-browser-fixture.ts": {
       "before": null,
-      "after": "bc24e6cb636e8992dd3322d25d68355d915185bb"
+      "after": "13ae07d3769057b743d7710bd01fa7837fcd5fff"
     },
     "server-version/backend/scripts/scale-library-governance-legacy-fixture.sql": {
       "before": null,
