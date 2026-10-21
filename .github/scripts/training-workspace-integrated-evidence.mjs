@@ -25,7 +25,7 @@ export function validateQualifiedPostgres(report,selected){
 }
 const mode=process.argv[2];
 if(mode==='codeql-config'){
- const lastSuccessfulAnalysisHead='af05a63aeec023ee98cbba004ada90b52e5b6dc6';
+ const lastSuccessfulAnalysisHead='1f4be6f53b0d57131dbd0aff3443289a778ec3d3';
  run('git',['fetch','--no-tags','https://github.com/caohuibj/eduK12-new-version.git',lastSuccessfulAnalysisHead]);
  const paths=run('git',['diff','--name-only',lastSuccessfulAnalysisHead,'HEAD']).trim().split('\n').filter(p=>/\.(?:[cm]?[jt]sx?)$/.test(p));assert(paths.length);
  appendFileSync(process.env.GITHUB_OUTPUT,'config='+JSON.stringify({paths})+'\n');
@@ -37,7 +37,7 @@ if(mode==='codeql-config'){
  }else if(mode==='resume'){
  assert(process.env.GITHUB_TOKEN,'Read-only Actions token required');
  const api=async path=>{const r=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/'+path,{headers:{Authorization:'Bearer '+process.env.GITHUB_TOKEN,Accept:'application/vnd.github+json'}});assert(r.ok,'Official evidence unavailable');return r.json()};
- const latestAnalysisRun=await api('actions/runs/39688107827');assert.equal(latestAnalysisRun.head_sha,'af05a63aeec023ee98cbba004ada90b52e5b6dc6');assert.equal(latestAnalysisRun.status,'completed');assert.equal(latestAnalysisRun.conclusion,'failure');const latestAnalysisJobs=await api('actions/runs/39688107827/jobs?per_page=100');assert.equal(latestAnalysisJobs.jobs.find(j=>j.id===119527306747)?.conclusion,'success');
+ const latestAnalysisRun=await api('actions/runs/39689509442');assert.equal(latestAnalysisRun.head_sha,'1f4be6f53b0d57131dbd0aff3443289a778ec3d3');assert.equal(latestAnalysisRun.status,'completed');assert.equal(latestAnalysisRun.conclusion,'failure');const latestAnalysisJobs=await api('actions/runs/39689509442/jobs?per_page=100');assert.equal(latestAnalysisJobs.jobs.find(j=>j.id===119532025826)?.conclusion,'success');
  const original=await api('actions/runs/'+prior.run);assert.equal(original.head_sha,prior.head);assert.equal(original.status,'completed');assert.equal(original.conclusion,'failure');assert.equal(original.run_attempt,1);
  const jobs=await api('actions/runs/'+prior.run+'/jobs?per_page=100');
  for(const [c,id]of Object.entries(prior.jobs)){const job=jobs.jobs.find(j=>j.id===id);assert(job);assert.equal(job.conclusion,c==='backend'?'failure':'success');if(c==='backend')assert(job.steps.some(s=>s.name==='compile once and retain actual builder and runtime bytes'&&s.conclusion==='success'))}
@@ -51,7 +51,7 @@ if(mode==='codeql-config'){
  mkdirSync(evidence,{recursive:true});
  for(const component of ['backend','frontend']){
   const dir=resolve(evidence,component);mkdirSync(dir,{recursive:true});
-  for(const kind of ['reports','images']){
+  for(const kind of component==='frontend'?['reports']:['reports','images']){
    const pin=prior.artifacts[component][kind],meta=await api('actions/artifacts/'+pin.id);
    for(const k of ['id','name','size_in_bytes','digest'])assert.equal(meta[k],pin[k]);assert.equal(meta.expired,false);assert.equal(meta.workflow_run.id,prior.run);assert.equal(meta.workflow_run.head_sha,prior.head);
    const archive=resolve(process.env.RUNNER_TEMP,`workspace-${component}-${kind}.zip`);
@@ -63,13 +63,14 @@ if(mode==='codeql-config'){
    run('python3',['-c',"import sys,zipfile,pathlib; z=zipfile.ZipFile(sys.argv[1]); assert all(not pathlib.PurePosixPath(n).is_absolute() and '..' not in pathlib.PurePosixPath(n).parts for n in z.namelist()); assert z.testzip() is None; z.extractall(sys.argv[2])",archive,destination]);
   }
   assert.equal(readFileSync(resolve(dir,'source-head.txt'),'utf8').trim(),prior.checkout);assert.equal(readFileSync(resolve(dir,'source-run.txt'),'utf8').trim(),String(prior.run));
-  const archive=resolve(root,'training-workspace-integrated-images',component,'images.tar.gz');assert.equal(hash(archive),readFileSync(resolve(dir,'images.sha256'),'utf8').trim().split(/\s+/)[0]);
+  const archive=resolve(root,'training-workspace-integrated-images',component,'images.tar.gz');if(component==='backend')assert.equal(hash(archive),readFileSync(resolve(dir,'images.sha256'),'utf8').trim().split(/\s+/)[0]);
   const report=JSON.parse(readFileSync(resolve(dir,component+'-tests.json')));const selected=binding[component+'Tests'];const reused=validatePriorTests(report,selected,component);assert.equal(reused,component==='backend'?117:284);
   if(component==='frontend'){
    assert.equal(report.numPassedTests,284);assert.equal(report.numFailedTests,0);assert.equal(JSON.parse(readFileSync(resolve(dir,'checks.json'))).status,'PASS');
    const audit=JSON.parse(readFileSync(resolve(dir,'audit.json')));assert.equal(audit.metadata.vulnerabilities.high,0);assert.equal(audit.metadata.vulnerabilities.critical,0);
    const scan=JSON.parse(readFileSync(resolve(dir,'runtime-scan.json')));assert(scan.Results?.length);assert(!scan.Results.some(r=>(r.Vulnerabilities||[]).some(v=>['HIGH','CRITICAL'].includes(v.Severity)&&v.FixedVersion)));
   }else {assert.equal(report.numPassedTests,122);assert.equal(report.numFailedTests,1);writeFileSync(resolve(dir,'prior-backend-tests.json'),JSON.stringify(report));}
+  if(component==='frontend')continue; // Only its old logic/types/audit qualify; current CSS image is restored separately.
   run('docker',['load','-i',archive],{stdio:'inherit'});const originalImages=JSON.parse(readFileSync(resolve(dir,'images.json')));assert.equal(originalImages.length,2);
   for(const kind of ['builder','runtime']){const tag=`training-workspace-integrated-${component}-${kind}:${prior.checkout}`;const current=JSON.parse(run('docker',['image','inspect',tag]))[0];const old=originalImages.find(r=>r.RepoTags.includes(tag));assert(old);assert.equal(current.Id,old.Id);assert.equal(current.Config.Labels['org.opencontainers.image.revision'],prior.checkout)}
  }
@@ -110,14 +111,32 @@ if(mode==='codeql-config'){
  assert(css.includes('.training-library input::placeholder{color:#526451;opacity:1}'));
  writeFileSync(resolve(evidence,'frontend/library-contrast.json'),JSON.stringify({status:'PASS',sourceCommit:process.env.GITHUB_SHA,ciRunId:process.env.GITHUB_RUN_ID,cssSHA256:hash(resolve(root,'server-version/frontend/src/training/training-workspace.css')),ratios,renderedAxeClaim:false}));
 }else if(mode==='frontend-current'){
- const dir=resolve(evidence,'frontend-current'),archive=resolve(root,'training-workspace-integrated-images/frontend-current/images.tar.gz');
- assert.equal(readFileSync(resolve(dir,'source-head.txt'),'utf8').trim(),process.env.GITHUB_SHA);assert.equal(readFileSync(resolve(dir,'source-run.txt'),'utf8').trim(),process.env.GITHUB_RUN_ID);
+ const frontend={"run":39689509442,"head":"1f4be6f53b0d57131dbd0aff3443289a778ec3d3","checkout":"d7fdc5bebd2e2d7cb650c90fa59657c8d3d4a96a","job":119532026532,"artifacts":{"images":{"id":12388141995,"name":"workspace-integrated-frontend-current-images-d7fdc5bebd2e2d7cb650c90fa59657c8d3d4a96a","size_in_bytes":395379800,"digest":"sha256:f2a1d1b17d83e302ae46717c4c19a4688632cd8e5516a32bbde706f7496d66ca"},"reports":{"id":12388182021,"name":"workspace-integrated-frontend-current-reports-d7fdc5bebd2e2d7cb650c90fa59657c8d3d4a96a","size_in_bytes":55984,"digest":"sha256:aa2c5f5433bb90ec240e5526c0717c4b050f26bb8139ca1eb6d8a51e1d9b5f8e"}}};
+ assert(process.env.GITHUB_TOKEN);
+ const api=async path=>{const response=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/'+path,{headers:{Authorization:'Bearer '+process.env.GITHUB_TOKEN,Accept:'application/vnd.github+json'}});assert(response.ok);return response.json()};
+ const original=await api('actions/runs/'+frontend.run);assert.equal(original.head_sha,frontend.head);assert.equal(original.status,'completed');assert.equal(original.conclusion,'failure');assert.equal(original.run_attempt,1);
+ const jobs=await api('actions/runs/'+frontend.run+'/jobs?per_page=100');const producer=jobs.jobs.find(j=>j.id===frontend.job);assert.equal(producer?.conclusion,'success');
+ for(const name of ['compile changed frontend once and retain actual image bytes','verify library-only secondary text contrast','scan newly built frontend runtime'])assert(producer.steps.some(s=>s.name===name&&s.conclusion==='success'));
+ run('git',['fetch','--no-tags','https://github.com/caohuibj/eduK12-new-version.git',frontend.head]);
+ for(const path of ['server-version/frontend','server-version/backend','.github/release-tools','.github/scripts/training-workspace-integrated-build.sh','server-version/cognitive-randomization-golden-v1.json'])assert.equal(run('git',['rev-parse',frontend.head+':'+path]).trim(),run('git',['rev-parse','HEAD:'+path]).trim(),path);
+ const dir=resolve(evidence,'frontend-current'),archive=resolve(root,'training-workspace-integrated-images/frontend-current/images.tar.gz');mkdirSync(dir,{recursive:true});
+ for(const kind of ['reports','images']){
+  const pin=frontend.artifacts[kind],meta=await api('actions/artifacts/'+pin.id);for(const key of ['id','name','size_in_bytes','digest'])assert.equal(meta[key],pin[key]);assert.equal(meta.expired,false);assert.equal(meta.workflow_run.id,frontend.run);assert.equal(meta.workflow_run.head_sha,frontend.head);
+  const response=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/actions/artifacts/'+pin.id+'/zip',{headers:{Authorization:'Bearer '+process.env.GITHUB_TOKEN}});assert(response.ok);
+  const zip=resolve(process.env.RUNNER_TEMP,'workspace-qualified-frontend-'+kind+'.zip');const {Readable}=await import('node:stream');const {pipeline}=await import('node:stream/promises');const {createWriteStream,statSync}=await import('node:fs');
+  await pipeline(Readable.fromWeb(response.body),createWriteStream(zip));assert.equal(statSync(zip).size,pin.size_in_bytes);assert.equal(hash(zip),pin.digest.slice(7));
+  const destination=kind==='reports'?dir:resolve(root,'training-workspace-integrated-images/frontend-current');mkdirSync(destination,{recursive:true});
+  run('python3',['-c',"import sys,zipfile,pathlib; z=zipfile.ZipFile(sys.argv[1]); assert all(not pathlib.PurePosixPath(n).is_absolute() and '..' not in pathlib.PurePosixPath(n).parts for n in z.namelist()); assert z.testzip() is None; z.extractall(sys.argv[2])",zip,destination]);
+ }
+
+ assert.equal(readFileSync(resolve(dir,'source-head.txt'),'utf8').trim(),frontend.checkout);assert.equal(readFileSync(resolve(dir,'source-run.txt'),'utf8').trim(),String(frontend.run));
  assert.equal(hash(archive),readFileSync(resolve(dir,'images.sha256'),'utf8').trim().split(/\s+/)[0]);run('docker',['load','-i',archive],{stdio:'inherit'});
  const expected=JSON.parse(readFileSync(resolve(dir,'images.json')));assert.equal(expected.length,2);
- for(const kind of ['builder','runtime']){const tag=`training-workspace-integrated-frontend-${kind}:${process.env.GITHUB_SHA}`,actual=JSON.parse(run('docker',['image','inspect',tag]))[0],old=expected.find(i=>i.RepoTags.includes(tag));assert(old);assert.equal(actual.Id,old.Id);assert.equal(actual.Config.Labels['org.opencontainers.image.revision'],process.env.GITHUB_SHA)}
- const scan=JSON.parse(readFileSync(resolve(dir,'runtime-scan.json')));const tag='training-workspace-integrated-frontend-runtime:'+process.env.GITHUB_SHA;assert.equal(scan.ArtifactName,tag);assert.equal(scan.Metadata.ImageID,JSON.parse(run('docker',['image','inspect',tag]))[0].Id);assert(scan.Results?.length);assert(!scan.Results.some(r=>(r.Vulnerabilities||[]).some(v=>['HIGH','CRITICAL'].includes(v.Severity)&&v.FixedVersion)));
- const contrast=JSON.parse(readFileSync(resolve(dir,'library-contrast.json')));assert.equal(contrast.status,'PASS');assert.equal(contrast.cssSHA256,hash(resolve(root,'server-version/frontend/src/training/training-workspace.css')));assert.equal(contrast.sourceCommit,process.env.GITHUB_SHA);assert.equal(contrast.ciRunId,process.env.GITHUB_RUN_ID);
- appendFileSync(process.env.GITHUB_ENV,`TRAINING_WORKSPACE_FRONTEND_IMAGE_HEAD=${process.env.GITHUB_SHA}\n`);
+ for(const kind of ['builder','runtime']){const tag=`training-workspace-integrated-frontend-${kind}:${frontend.checkout}`,actual=JSON.parse(run('docker',['image','inspect',tag]))[0],old=expected.find(i=>i.RepoTags.includes(tag));assert(old);assert.equal(actual.Id,old.Id);assert.equal(actual.Config.Labels['org.opencontainers.image.revision'],frontend.checkout)}
+ const scan=JSON.parse(readFileSync(resolve(dir,'runtime-scan.json')));const tag='training-workspace-integrated-frontend-runtime:'+frontend.checkout;assert.equal(scan.ArtifactName,tag);assert.equal(scan.Metadata.ImageID,JSON.parse(run('docker',['image','inspect',tag]))[0].Id);assert(scan.Results?.length);assert(!scan.Results.some(r=>(r.Vulnerabilities||[]).some(v=>['HIGH','CRITICAL'].includes(v.Severity)&&v.FixedVersion)));
+ const contrast=JSON.parse(readFileSync(resolve(dir,'library-contrast.json')));assert.equal(contrast.status,'PASS');assert.equal(contrast.cssSHA256,hash(resolve(root,'server-version/frontend/src/training/training-workspace.css')));assert.equal(contrast.sourceCommit,frontend.checkout);assert.equal(contrast.ciRunId,String(frontend.run));
+ appendFileSync(process.env.GITHUB_ENV,`TRAINING_WORKSPACE_FRONTEND_IMAGE_HEAD=${frontend.checkout}\n`);
+ writeFileSync(resolve(evidence,'current-frontend-accepted.json'),JSON.stringify({status:'ACCEPTED_PRIOR',run:frontend.run,head:frontend.head,checkout:frontend.checkout,originalConclusion:'failure',componentConclusion:'success',compilationRepeated:false,scanRepeated:false,browserAccepted:false}));
 }else if(mode==='browser-report'){
  const directory=resolve(evidence,'browser');
  const accepted=verifyIntegratedWorkspaceBrowser(JSON.parse(readFileSync(resolve(directory,'result.json'))),{head:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID,directory});

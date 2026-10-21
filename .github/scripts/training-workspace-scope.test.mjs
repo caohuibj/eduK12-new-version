@@ -49,9 +49,9 @@ test('integrated candidate fails on missing extra drift duplicate mode and base 
 });
 test('integrated continuation restores exact products and runs only missing qualification',()=>{
  const workflow=readFileSync(new URL('../workflows/ci-training-workspace-integrated.yml',import.meta.url),'utf8');
- assert.equal((workflow.match(/integrated-build.sh frontend/g)||[]).length,1);assert.doesNotMatch(workflow,/integrated-build.sh backend|component: \[backend, frontend\]|docker build/);
+ assert.doesNotMatch(workflow,/integrated-build.sh|setup-buildx|setup-trivy|trivy-action|component: \[backend, frontend\]|docker build/);
  assert.equal((workflow.match(/integrated-evidence.mjs resume/g)||[]).length,2);
- assert.doesNotMatch(workflow,/integrated-checks.mjs|npm audit/);assert.match(workflow,/integrated-evidence.mjs library-contrast/);assert.match(workflow,/scan newly built frontend runtime/);assert.match(workflow,/integrated-evidence.mjs frontend-current/);
+ assert.doesNotMatch(workflow,/integrated-checks.mjs|npm audit/);assert.doesNotMatch(workflow,/integrated-evidence.mjs library-contrast/);assert.equal((workflow.match(/integrated-evidence.mjs frontend-current/g)||[]).length,2);
  assert.doesNotMatch(workflow,/integrated-checks.mjs\" frontend/);
  assert.match(workflow,/backend-runtime:\$TRAINING_WORKSPACE_BACKEND_IMAGE_HEAD/);
  assert.match(workflow,/if-no-files-found: error/);assert.match(workflow,/connection_limit=4/);

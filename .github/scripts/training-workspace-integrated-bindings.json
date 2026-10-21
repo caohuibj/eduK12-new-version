@@ -154,7 +154,7 @@
     },
     "server-version/e2e/training-workspace-integration-browser.cjs": {
       "before": null,
-      "after": "a843adb57bb7549b776b98413dfdbcb7d6f847ec"
+      "after": "d34f72b42e7b6fb87bad0bc9c58876903583556a"
     },
     "server-version/frontend/src/App.tsx": {
       "before": "12796764967dbefc152c31e59fc1bccc677b1dc3",

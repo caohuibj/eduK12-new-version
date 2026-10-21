@@ -35,7 +35,14 @@ async function request(page,endpoint,method='GET',body,view='BUSINESS'){
   return {status:response.status,body:await response.json()}
  },{endpoint,method,body,view})
 }
-async function api(...args){const result=await request(...args);assert.equal(result.status,200,'API HTTP rejected');assert.equal(result.body.code,0,'API envelope rejected');return result.body.data}
+async function api(...args){
+ const result=await request(...args)
+ if(result.status!==200||result.body.code!==0){
+  const code=result.body.code
+  evidence.apiFailure={phase:evidence.phase,method:args[2]||'GET',status:result.status,code:typeof code==='number'&&Number.isFinite(code)?code:typeof code==='string'&&/^[A-Z][A-Z0-9_]{0,63}$/.test(code)?code:'UNCLASSIFIED'};save()
+ }
+ assert.equal(result.status,200,'API HTTP rejected');assert.equal(result.body.code,0,'API envelope rejected');return result.body.data
+}
 async function denied(page,endpoint,method='GET',body){
  const result=await request(page,endpoint,method,body)
  assert([403,404,409].includes(result.status),'Expected authorization/lifecycle rejection');assert.notEqual(result.body.code,0)
@@ -76,6 +83,23 @@ async function adminLogin(page) {
   await page.goto(fixture.trainingUrl+'/admin/login')
   await page.locator('#auth-username').fill(fixture.administrator.username);await page.locator('#auth-password').fill(fixture.administrator.password)
   await button(page,'管理员登录').click();await page.waitForURL(/\/admin\/(entrances|permissions)$/)
+  // System administration and Training entry authority are deliberately independent.
+  // Use the real versioned authorization API, then reauthenticate after tokenVersion changes.
+  const accounts=await api(page,'/api/admin/permissions/accounts?keyword='+encodeURIComponent(fixture.administrator.username),'GET',undefined,'MANAGEMENT')
+  const account=accounts.accounts.find(row=>row.id===fixture.administrator.id);assert(account)
+  const entry=account.entries.find(row=>row.entry==='TRAINING');assert(entry);assert.equal(entry.active,false)
+  const granted=await api(page,'/api/admin/permissions/accounts/'+account.id+'/entries/TRAINING','PUT',{active:true,expectedVersion:entry.version,reason:'Disposable CI Training entry administrator prerequisite'},'MANAGEMENT')
+  assert.equal(granted.active,true);assert.equal(granted.version,entry.version+1);assert.equal(granted.changed,true)
+  await page.goto(fixture.trainingUrl+'/admin/login')
+  await page.locator('#auth-username').fill(fixture.administrator.username);await page.locator('#auth-password').fill(fixture.administrator.password)
+  await button(page,'管理员登录').click();await page.waitForURL(/\/admin\/(entrances|permissions)$/)
+  const current=await api(page,'/api/auth/me','GET',undefined,'MANAGEMENT')
+  assert.equal(current.id,fixture.administrator.id);assert.equal(current.platformRole,'SYSTEM_ADMIN');assert.equal(current.role,'ADMIN')
+  assert(current.entryGrants.some(row=>row.entry==='TRAINING'))
+  const confirmed=await api(page,'/api/admin/permissions/accounts?keyword='+encodeURIComponent(fixture.administrator.username),'GET',undefined,'MANAGEMENT')
+  const confirmedEntry=confirmed.accounts.find(row=>row.id===account.id)?.entries.find(row=>row.entry==='TRAINING')
+  assert.deepEqual(confirmedEntry,{entry:'TRAINING',active:true,version:granted.version})
+  evidence.administratorEntry={entry:'TRAINING',explicitlyGranted:true,reauthenticated:true}
   check('real-virtual-ctap2-administrator-session')
 }
 
