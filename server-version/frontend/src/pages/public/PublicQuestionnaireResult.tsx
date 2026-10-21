@@ -25,6 +25,14 @@ const PublicQuestionnaireResult: React.FC = () => {
   const [error, setError] = useState<string | null>(null)
   const questionnaireEntry = token ? `/public/questionnaire/${encodeURIComponent(token)}` : '/'
 
+  const loadReportImage = useCallback(async (assetId: string) => {
+    const resumeToken = sessionId ? readQuestionnaireResumeToken(token, sessionId) : null
+    if (!sessionId || !resumeToken) throw new Error('缺少本次问卷的恢复凭据')
+    const response = await fetch(`/api/public/assessments/${encodeURIComponent(sessionId)}/report/assets/${encodeURIComponent(assetId)}`, { credentials: 'omit', headers: { Authorization: `Bearer ${resumeToken}` } })
+    if (!response.ok) throw new Error('反馈图片暂时无法读取')
+    return response.blob()
+  }, [sessionId, token])
+
   const fetchReport = useCallback(async () => {
     setError(null)
     if (!sessionId) {
@@ -147,7 +155,7 @@ const PublicQuestionnaireResult: React.FC = () => {
             title={unitReport.scaleName}
             eyebrow={`量表 ${index + 1}`}
           >
-            <ScaleUnitReportCard report={unitReport} />
+            <ScaleUnitReportCard report={unitReport} loadReportImage={loadReportImage} />
           </ReportSection>
         ))}
       </div>
