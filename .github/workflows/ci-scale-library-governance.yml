@@ -1,0 +1,288 @@
+name: Frozen scale library governance acceptance
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  CI: 'true'
+  TZ: UTC
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [backend, frontend]
+    env:
+      PLAN: ${{ inputs.plan }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify exact reviewed source and complete diff
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import {execFileSync} from 'node:child_process';
+          import {changedEntries} from './.github/scripts/content-scope.mjs';
+          import {binding,scaleLibraryGovernancePlan} from './.github/scripts/scale-library-governance-scope.mjs';
+          const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+          assert.deepEqual(JSON.parse(process.env.PLAN),scaleLibraryGovernancePlan(changedEntries(binding.base,head),binding.base,head));
+          JS
+      - name: verify prior official audit on the identical locked dependency inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+          COMPONENT: ${{ matrix.component }}
+        run: |
+          python3 -B - <<'PY'
+          import importlib.util,os,json
+          from pathlib import Path
+          spec=importlib.util.spec_from_file_location('prior','.github/scripts/survey-wave-selection-reuse.py')
+          p=importlib.util.module_from_spec(spec);spec.loader.exec_module(p)
+          c=os.environ['COMPONENT']
+          for f in ['package.json','package-lock.json']:p.same('server-version/'+c+'/'+f)
+          p.official(c);p.log_contract(c,p.logs(c))
+          out=Path('scale-library-governance-evidence')/c;out.mkdir(parents=True,exist_ok=True)
+          (out/'audit-source.json').write_text(json.dumps({'status':'ACCEPTED_PRIOR','run':p.RUN,'job':p.JOBS[c],'head':p.SOURCE,'inputs':['package.json','package-lock.json'],'newAuditPerformed':False}))
+          PY
+      - uses: docker/setup-buildx-action@v3
+      - name: compile once and preserve exact builder and runtime bytes
+        run: bash .github/scripts/scale-library-governance-build.sh ${{ matrix.component }}
+      - name: selected missing contracts and frontend types/lint in the original builder
+        shell: bash
+        run: |
+          mounts=()
+          if [ '${{ matrix.component }}' = frontend ]; then
+            mounts=(-v "$GITHUB_WORKSPACE/server-version/cognitive-randomization-golden-v1.json:/cognitive-randomization-golden-v1.json:ro" -v "$GITHUB_WORKSPACE/server-version/backend/src/modules/cognitive/generated/identities.json:/backend/src/modules/cognitive/generated/identities.json:ro")
+          fi
+          docker run --rm "${mounts[@]}" -e CI=true -e NODE_ENV=test -e TZ=UTC \
+            -e DATABASE_URL=postgresql://unused:unused@127.0.0.1:1/unused \
+            -e GITHUB_WORKSPACE="$GITHUB_WORKSPACE" -e GOVERNANCE_EVIDENCE=/evidence \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
+            -v "$GITHUB_WORKSPACE/scale-library-governance-evidence/${{ matrix.component }}:/evidence" \
+            scale-library-governance-${{ matrix.component }}-builder:${{ github.sha }} \
+            node "$GITHUB_WORKSPACE/.github/scripts/scale-library-governance-checks.mjs" ${{ matrix.component }}
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: scan the actual new runtime image
+        run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output scale-library-governance-evidence/${{ matrix.component }}/runtime-scan.json scale-library-governance-${{ matrix.component }}-runtime:${{ github.sha }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scale-library-governance-${{ matrix.component }}-reports-${{ github.sha }}
+          path: scale-library-governance-evidence/${{ matrix.component }}/
+          if-no-files-found: error
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scale-library-governance-${{ matrix.component }}-images-${{ github.sha }}
+          path: scale-library-governance-images/${{ matrix.component }}/images.tar.gz
+          if-no-files-found: error
+          compression-level: 0
+          retention-days: 3
+  connected:
+    needs: component
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      NODE_ENV: test
+      SCALE_GOVERNANCE_ISOLATED: '1'
+      MEASUREMENT_BROWSER_ISOLATED: '1'
+      DATABASE_URL: postgresql://ptool:ptool123@127.0.0.1:5432/ptool?schema=public
+      RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@127.0.0.1:5432/ptool?schema=public
+      INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@127.0.0.1:5432/ptool?schema=public
+      REDIS_URL: redis://127.0.0.1:6379
+      PORT: '3000'
+      SOCKET_REDIS_REQUIRED: 'true'
+      COOKIE_SECURE: 'true'
+      CORS_ORIGIN: https://training.eduk12.top,https://survey.eduk12.top
+      ADMIN_WEBAUTHN_ORIGIN: https://training.eduk12.top
+      ADMIN_WEBAUTHN_RP_ID: training.eduk12.top
+      TRUST_PROXY_HOPS: '1'
+      SURVEY_WORKSPACE_ENABLED: 'true'
+      SURVEY_PUBLICATION_ENABLED: 'true'
+      SURVEY_ANALYTICS_ENABLED: 'true'
+      COGNITIVE_MODULE_ENABLED: 'true'
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      HEAVY_PROCESSING_ENABLED: 'false'
+      VIDEO_PROCESSING_ENABLED: 'false'
+      ASSET_MIGRATION_COMPLETE: 'false'
+      LOG_LEVEL: warn
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: scale-library-governance-*-images-${{ github.sha }}
+          path: governance-downloads/images
+      - uses: actions/download-artifact@v4
+        with:
+          pattern: scale-library-governance-*-reports-${{ github.sha }}
+          path: governance-downloads/reports
+      - name: verify and load this run exact compiled images
+        shell: bash
+        run: |
+          for component in backend frontend; do
+            reports="governance-downloads/reports/scale-library-governance-$component-reports-$GITHUB_SHA"
+            archive="governance-downloads/images/scale-library-governance-$component-images-$GITHUB_SHA"
+            test "$(cat "$reports/source-head.txt")" = "$GITHUB_SHA"
+            test "$(cat "$reports/source-run.txt")" = "$GITHUB_RUN_ID"
+            (cd "$archive"; sha256sum -c "$GITHUB_WORKSPACE/$reports/images.sha256")
+            docker load -i "$archive/images.tar.gz"
+            for target in builder runtime; do
+              actual="$(docker image inspect "scale-library-governance-$component-$target:$GITHUB_SHA" --format '{{.Id}}')"
+              IMAGE_ID="$actual" IMAGE_TAG="scale-library-governance-$component-$target:$GITHUB_SHA" REPORT="$reports/images.json" node -e 'const r=require(process.env.GITHUB_WORKSPACE+"/"+process.env.REPORT);if(!r.some(x=>x.Id===process.env.IMAGE_ID&&x.RepoTags.includes(process.env.IMAGE_TAG)))throw Error("Original exact image tag/ID missing")'
+            done
+          done
+      - name: prepare isolated services and private prerequisite directory
+        shell: bash
+        run: |
+          python3 -B - <<'PY'
+          import os,secrets
+          from pathlib import Path
+          private=Path(os.environ['RUNNER_TEMP'])/'scale-library-governance-private';private.mkdir(mode=0o700)
+          evidence=Path(os.environ['GITHUB_WORKSPACE'])/'scale-library-governance-evidence'
+          values={'SCALE_GOVERNANCE_FIXTURE_FILE':private/'fixture.json','MEASUREMENT_BROWSER_FIXTURE_DIR':private,'SCALE_GOVERNANCE_EVIDENCE_DIR':evidence/'browser','SCALE_GOVERNANCE_BACKEND_ROOT':'/app','GOVERNANCE_EVIDENCE':evidence/'postgres','UPLOAD_DIR':private/'uploads','EXPORT_DIR':private/'exports','CREDENTIAL_HANDOFF_DIR':private/'credentials','SCALE_GOVERNANCE_VIDEO_FILE':private/'synthetic.mp4'}
+          for key in ['JWT_SECRET','DATA_ENCRYPTION_KEY','DATA_PSEUDONYM_KEY','ASSET_SIGNING_SECRET','SURVEY_MFA_ENCRYPTION_KEY']:
+            values[key]=secrets.token_hex(32);print('::add-mask::'+values[key])
+          for key in ['SCALE_GOVERNANCE_EVIDENCE_DIR','GOVERNANCE_EVIDENCE','UPLOAD_DIR','EXPORT_DIR','CREDENTIAL_HANDOFF_DIR']:Path(values[key]).mkdir(parents=True,exist_ok=True,mode=0o700)
+          with open(os.environ['GITHUB_ENV'],'a') as out:
+            for k,v in values.items():out.write(f'{k}={v}\n')
+          PY
+          docker run -d --name scale-library-governance-postgres -e POSTGRES_USER=ptool -e POSTGRES_PASSWORD=ptool123 -e POSTGRES_DB=ptool -p 127.0.0.1:5432:5432 postgres:16.15-bookworm
+          docker run -d --name scale-library-governance-redis -p 127.0.0.1:6379:6379 redis:7.4.11-bookworm
+          for attempt in $(seq 1 30); do
+            if docker exec scale-library-governance-postgres pg_isready -U ptool && docker exec scale-library-governance-redis redis-cli ping; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: upgrade only the synthetic old schema and preserve legacy bytes
+        run: python3 -B .github/scripts/scale-library-governance-recovery.py bootstrap
+      - name: real governance PostgreSQL contracts and concurrency
+        run: bash .github/scripts/scale-library-governance-backend.sh once node "$GITHUB_WORKSPACE/.github/scripts/scale-library-governance-checks.mjs" postgres
+      - name: limited synthetic new-schema dump and restore
+        run: python3 -B .github/scripts/scale-library-governance-recovery.py restore
+      - name: initialize a separate fresh browser database
+        shell: bash
+        run: |
+          docker exec scale-library-governance-postgres createdb -U ptool governance_browser
+          DATABASE_URL=postgresql://ptool:ptool123@127.0.0.1:5432/governance_browser?schema=public bash .github/scripts/scale-library-governance-backend.sh once npx prisma migrate deploy
+          echo 'DATABASE_URL=postgresql://ptool:ptool123@127.0.0.1:5432/governance_browser?schema=public' >> "$GITHUB_ENV"
+          echo 'DATABASE_URL_ADMIN=postgresql://ptool:ptool123@127.0.0.1:5432/governance_browser?schema=public' >> "$GITHUB_ENV"
+      - name: synthetic accounts and real administrator enrollment ticket, never sessions
+        shell: bash
+        run: |
+          set +e
+          bash .github/scripts/scale-library-governance-backend.sh once node "$GITHUB_WORKSPACE/server-version/backend/scripts/scale-library-governance-browser-fixture.ts" > "$RUNNER_TEMP/scale-library-governance-private/fixture.private.log" 2>&1
+          status=$?
+          set -e
+          FIXTURE_STATUS="$status" python3 -B - <<'PY'
+          import os,json,re
+          from pathlib import Path
+          text=(Path(os.environ['RUNNER_TEMP'])/'scale-library-governance-private/fixture.private.log').read_text()
+          for line in text.splitlines():
+            if line.startswith('::add-mask::'):print(line)
+          names=re.findall(r'Synthetic governance prerequisite failed: (AssertionError|Error|TypeError|PrismaClientKnownRequestError|PrismaClientInitializationError)\b',text)
+          report={'phase':'synthetic-accounts-admin-enrollment-and-restricted-runtime','exitStatus':int(os.environ['FIXTURE_STATUS']),'errorName':names[-1] if names else None,'privateDetailsWithheld':True}
+          Path('scale-library-governance-evidence/fixture-diagnostic.json').write_text(json.dumps(report));print(json.dumps(report))
+          PY
+          exit "$status"
+      - name: install official pinned browser tools
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libnss3-tools
+          echo "SCALE_GOVERNANCE_PLAYWRIGHT_MODULE=$GITHUB_WORKSPACE/.github/release-tools/node_modules/playwright-core" >> "$GITHUB_ENV"
+          node -e 'const fs=require("node:fs");fs.appendFileSync(process.env.GITHUB_ENV,"SCALE_GOVERNANCE_CHROMIUM_EXECUTABLE="+require("./.github/release-tools/node_modules/playwright-core").chromium.executablePath()+"\n")'
+          echo "SCALE_GOVERNANCE_SCORE_IMAGE=scale-library-governance-backend-runtime:$GITHUB_SHA" >> "$GITHUB_ENV"
+      - name: require this round approved private browser trust
+        run: |
+          node -e "if(require('./.github/scripts/scale-library-governance-bindings.json').browserProfileTrustApproved!==true)throw Error('Current isolated profile approval missing')"
+          echo 'MEASUREMENT_BROWSER_EPHEMERAL_CA_APPROVED=true' >> "$GITHUB_ENV"
+      - name: isolated profile-only HTTPS trust
+        run: python3 -B .github/scripts/measurement-browser-ci.py tls
+      - name: exact frontend bytes and a bounded synthetic video input
+        shell: bash
+        run: |
+          id="$(docker create scale-library-governance-frontend-runtime:$GITHUB_SHA)"
+          mkdir -p server-version/frontend/dist
+          docker cp "$id:/usr/share/nginx/html/." server-version/frontend/dist/
+          docker rm "$id"
+          (cd server-version/frontend/dist; sha256sum -c "$GITHUB_WORKSPACE/governance-downloads/reports/scale-library-governance-frontend-reports-$GITHUB_SHA/runtime-files.sha256")
+          docker run --rm --cpus=1 --memory=512m --user "$(id -u):$(id -g)" -v "$RUNNER_TEMP/scale-library-governance-private:$RUNNER_TEMP/scale-library-governance-private" "scale-library-governance-backend-runtime:$GITHUB_SHA" ffmpeg -nostdin -f lavfi -i color=c=blue:s=160x120:r=10 -t 2 -an -c:v libx264 -pix_fmt yuv420p "$SCALE_GOVERNANCE_VIDEO_FILE"
+      - name: serve restricted API, isolated video worker and canonical loopback HTTPS
+        shell: bash
+        run: |
+          bash .github/scripts/scale-library-governance-backend.sh serve
+          bash .github/scripts/scale-library-governance-backend.sh worker
+          docker run -d --name scale-library-governance-proxy --network host --user 0 --cap-drop ALL --cap-add NET_BIND_SERVICE \
+            -e GITHUB_ACTIONS=true -e GITHUB_SHA -e GITHUB_RUN_ID -e MEASUREMENT_BROWSER_ISOLATED=1 -e MEASUREMENT_BROWSER_EPHEMERAL_CA_APPROVED=true -e MEASUREMENT_BROWSER_TLS_KEY -e MEASUREMENT_BROWSER_TLS_CERT \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" -v "$RUNNER_TEMP/scale-library-governance-private:$RUNNER_TEMP/scale-library-governance-private:ro" \
+            "scale-library-governance-backend-runtime:$GITHUB_SHA" node "$GITHUB_WORKSPACE/server-version/e2e/scale-library-governance-proxy.cjs"
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --max-time 2 http://127.0.0.1:3000/ready >/dev/null && curl --noproxy '*' --fail --silent --max-time 2 --cacert "$MEASUREMENT_BROWSER_TLS_CA" --resolve training.eduk12.top:443:127.0.0.1 https://training.eduk12.top/__governance_ci_identity >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          python3 -B - <<'PYREADY'
+          import json,subprocess
+          from pathlib import Path
+          states={}
+          for name in ['scale-library-governance-api','scale-library-governance-worker','scale-library-governance-proxy']:
+            p=subprocess.run(['docker','inspect',name,'--format','{{json .State}}'],capture_output=True,text=True)
+            try:s=json.loads(p.stdout)
+            except ValueError:s={}
+            states[name]={k:s.get(k) for k in ['Status','ExitCode','OOMKilled']}
+          report={'phase':'isolated-runtime-and-canonical-https-readiness','status':'FAIL','containerStates':states,'credentialsSent':False}
+          Path('scale-library-governance-evidence/readiness-diagnostic.json').write_text(json.dumps(report));print(json.dumps(report))
+          PYREADY
+          echo '::error::Isolated API or canonical proxy readiness failed; no browser credentials sent'
+          exit 1
+      - name: two real directional library and media journeys
+        run: |
+          node server-version/e2e/scale-library-governance-browser.cjs
+          node .github/scripts/scale-library-governance-scope.mjs browser-report
+      - name: remove only this run containers and private material
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          status=0
+          for name in "scale-governance-score-$GITHUB_RUN_ID" scale-library-governance-proxy scale-library-governance-worker scale-library-governance-api scale-library-governance-redis scale-library-governance-postgres; do
+            all="$(docker ps -a --format '{{.Names}}')" || status=1
+            if grep -qx "$name" <<< "$all"; then docker rm -f -v "$name" >/dev/null || status=1; fi
+            after="$(docker ps -a --format '{{.Names}}')" || status=1
+            if grep -qx "$name" <<< "$after"; then status=1; fi
+          done
+          rm -rf "$RUNNER_TEMP/scale-library-governance-private" || status=1
+          test ! -e "$RUNNER_TEMP/scale-library-governance-private" || status=1
+          mkdir -p scale-library-governance-evidence
+          printf '{"exitStatus":%s,"privateMaterialRemoved":%s}\n' "$status" "$([ ! -e "$RUNNER_TEMP/scale-library-governance-private" ] && echo true || echo false)" > scale-library-governance-evidence/cleanup.json
+          exit "$status"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scale-library-governance-connected-${{ github.sha }}
+          path: scale-library-governance-evidence/
+          if-no-files-found: error
+          retention-days: 3

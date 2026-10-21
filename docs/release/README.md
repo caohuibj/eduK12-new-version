@@ -582,3 +582,37 @@ replacement-row/property counts. It is an isolated function microbenchmark, not
 full-service execution, production peak memory or proven end-to-end speedup.
 Main push only classifies the merged diff; it does not replay application checks.
 Five minutes triggers a progress update, not a promise of scan/download duration.
+
+## Scale library governance bounded candidate (2026-10-21)
+
+The fixed governance branch admits only its frozen complete product/blob inventory
+and reviewed control paths against base `aabbe049`. Unknown paths, source/base
+drift, unusual modes and manual full/probe requests fail closed, never platform
+fallback. The stable gate requires scope, governance acceptance and actual
+JavaScript/TypeScript plus Python CodeQL success. Existing candidate routes and
+branch protection are unchanged.
+
+GitHub is the sole application-check execution location: one backend and one
+frontend compilation, affected contract inventories, app types/changed-file lint,
+actual runtime scans, four real PostgreSQL suites, old-schema synthetic upgrade,
+and a nonempty synthetic database dump/independent restore of this feature's
+dependency closure. This is not production disaster-recovery or attachment-backup
+qualification. Identical package/lock audits retain their fixed official prior
+run/job source and explicitly do not claim a new vulnerability lookup.
+
+Two actual production-UI journeys exercise opposite entrypoints, exact approval,
+readonly use, original scoring/typed quality answers, ordinary revoke versus
+emergency stop/replay, unified catalog and image/video delivery. The synthetic
+video uses the same compiled backend with isolated DB/Redis and a bounded worker;
+no accepted media/release/session is faked. Synthetic admin uses real WebAuthn
+with a virtual authenticator, not physical-key acceptance. This round's explicit
+approval covers only disposable browser-profile CA trust and loopback HTTPS;
+no host system trust, production routing or certificate-error bypass is used.
+
+Builder/runtime image bytes are archived immediately and separately from small
+reports/screenshots, including when later checks fail. Private credentials, DB
+dumps, raw server logs and capability URLs are excluded from public artifacts;
+owned services and private files are removed on every outcome. Plan roughly
+10–15 minutes for the new connected scope, reporting the actual waiting step
+after five minutes; failures invalidate only their consumed inputs and do not
+authorize full-platform retries. No deployment is included.

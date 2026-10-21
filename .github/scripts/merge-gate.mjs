@@ -1,3 +1,4 @@
+import {scaleLibraryGovernancePlan} from './scale-library-governance-scope.mjs';
 import {compositeCsvMemoryPlan} from './composite-csv-memory-scope.mjs';
 import {trainingWorkspacePlan} from './training-workspace-scope.mjs';
 import {validExactPlan,exactCandidatePlan,exactCandidateOutputs} from './exact-candidate-scope.mjs';
@@ -39,6 +40,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='scale-library-governance')return ['scope','scale-library-governance','codeql'];
   if(scope.application_route==='composite-csv-memory')return ['scope','composite-csv-memory','codeql'];
   if(scope.application_route === 'training-workspace') return ['scope','training-workspace','codeql'];
   if(scope.scenario === 'survey-wave-selection') return ['scope','backend-regression','frontend','docker','codeql'];
@@ -95,6 +97,10 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='scale-library-governance'){
+    if(draft||scope.scenario!=='scale-library-governance'||scope.codeql!=='true'||scope.runner_profile!=='hosted'||scope.media_selection!=='[]'||scope.media_groups!=='[]'||['frontend_build','ui_required','maintenance','content','presentation','frontend','frontend_test','documentation','visual_hosted',...Object.keys(acceptanceJobs)].some(k=>scope[k]!=='false'))failed.push('scope');
+    return [...new Set(failed)];
+  }
   if(scope.application_route==='composite-csv-memory'){
     if(draft||scope.scenario!=='composite-csv-memory'||scope.codeql!=='true'||scope.runner_profile!=='hosted'||scope.media_selection!=='[]'||scope.media_groups!=='[]'||['frontend_build','ui_required','maintenance','content','presentation','frontend','frontend_test','documentation','visual_hosted',...Object.keys(acceptanceJobs)].some(k=>scope[k]!=='false'))failed.push('scope');
     return [...new Set(failed)];
@@ -311,6 +317,14 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       if (process.env.CI_FORCE_FULL === 'true' || process.env.CI_EVENT !== 'pull_request'
         || !surveyWaveSelectionScope(changedEntries(process.env.CI_BASE_SHA))) failed.push('recomputed-survey-wave-selection-scope');
     } catch { failed.push('recomputed-survey-wave-selection-scope'); }
+  }
+  if(needs.scope?.outputs?.application_route==='scale-library-governance'){
+    try{
+      const {changedEntries}=await import('./content-scope.mjs');
+      const {execFileSync}=await import('node:child_process');
+      const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.scale_library_governance_plan);
+      if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(scaleLibraryGovernancePlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-scale-library-governance-plan');
+    }catch{failed.push('recomputed-scale-library-governance-plan')}
   }
   if(needs.scope?.outputs?.application_route==='composite-csv-memory'){
     try{
