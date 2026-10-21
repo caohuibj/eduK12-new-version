@@ -1,0 +1,321 @@
+name: Integrated Training workspace qualification
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  CI: 'true'
+  TZ: UTC
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  component:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [backend, frontend]
+    env:
+      PLAN: ${{ inputs.plan }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: exact complete source and generator input boundary
+        run: node .github/scripts/training-workspace-integrated-evidence.mjs scope
+      - name: compile once and retain actual builder and runtime bytes
+        shell: bash
+        run: bash .github/scripts/training-workspace-integrated-build.sh ${{ matrix.component }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: workspace-integrated-${{ matrix.component }}-images-${{ github.sha }}
+          path: training-workspace-integrated-images/${{ matrix.component }}/
+          retention-days: 3
+          if-no-files-found: error
+      - name: affected contracts in the same locked native environment
+        shell: bash
+        run: |
+          docker run --rm --workdir /app -e CI=true -e TZ=UTC -e GITHUB_SHA -e GITHUB_RUN_ID -e GITHUB_WORKSPACE \
+            -e WORKSPACE_EVIDENCE=/evidence/${{ matrix.component }} -e COGNITIVE_MODULE_ENABLED=true -e MATERIAL_GRANTS_ENABLED=true \
+            -e DATABASE_URL=postgresql://synthetic:synthetic@127.0.0.1:1/synthetic \
+            -e JWT_SECRET=synthetic-workspace-only-no-real-credential \
+            -e DATA_ENCRYPTION_KEY=1111111111111111111111111111111111111111111111111111111111111111 \
+            -e DATA_PSEUDONYM_KEY=2222222222222222222222222222222222222222222222222222222222222222 \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" -v "$GITHUB_WORKSPACE/training-workspace-integrated-evidence:/evidence" \
+            --mount "type=bind,source=$GITHUB_WORKSPACE/server-version/cognitive-randomization-golden-v1.json,target=/cognitive-randomization-golden-v1.json,readonly" \
+            --mount "type=bind,source=$GITHUB_WORKSPACE/server-version/backend/src/modules/cognitive/generated/identities.json,target=/backend/src/modules/cognitive/generated/identities.json,readonly" \
+            training-workspace-integrated-${{ matrix.component }}-builder:$GITHUB_SHA \
+            node "$GITHUB_WORKSPACE/.github/scripts/training-workspace-integrated-checks.mjs" ${{ matrix.component }}
+      - name: audit complete locked dependencies
+        shell: bash
+        run: |
+          set +e
+          docker run --rm training-workspace-integrated-${{ matrix.component }}-builder:$GITHUB_SHA npm audit --audit-level=high --json > training-workspace-integrated-evidence/${{ matrix.component }}/audit.json
+          status=$?
+          set -e
+          node -e 'const r=require("./training-workspace-integrated-evidence/${{ matrix.component }}/audit.json");console.log(JSON.stringify({vulnerabilities:r.metadata?.vulnerabilities,errorCode:r.error?.code}))'
+          exit "$status"
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: scan actual runtime image
+        run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output training-workspace-integrated-evidence/${{ matrix.component }}/runtime-scan.json training-workspace-integrated-${{ matrix.component }}-runtime:$GITHUB_SHA
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: workspace-integrated-${{ matrix.component }}-reports-${{ github.sha }}
+          path: training-workspace-integrated-evidence/${{ matrix.component }}/
+          retention-days: 3
+          if-no-files-found: error
+  connected:
+    needs: component
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      NODE_ENV: test
+      MATERIAL_GRANTS_ENABLED: 'true'
+      CHECKIN_SCHEDULE_DB_TEST: '1'
+      WORKSPACE_LIBRARY_INTEGRATION: '1'
+      TRAINING_WORKSPACE_ISOLATED: '1'
+      MEASUREMENT_BROWSER_ISOLATED: '1'
+      DATABASE_URL: postgresql://ptool:ptool123@127.0.0.1:5432/ptool?schema=public&connection_limit=4&pool_timeout=30
+      RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@127.0.0.1:5432/ptool?schema=public&connection_limit=4&pool_timeout=30
+      INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@127.0.0.1:5432/ptool?schema=public&connection_limit=4&pool_timeout=30
+      REDIS_URL: redis://127.0.0.1:6379
+      PORT: '3000'
+      SOCKET_REDIS_REQUIRED: 'true'
+      COOKIE_SECURE: 'true'
+      CORS_ORIGIN: https://training.eduk12.top
+      ADMIN_WEBAUTHN_ORIGIN: https://training.eduk12.top
+      ADMIN_WEBAUTHN_RP_ID: training.eduk12.top
+      TRUST_PROXY_HOPS: '1'
+      SURVEY_WORKSPACE_ENABLED: 'false'
+      SURVEY_PUBLICATION_ENABLED: 'false'
+      SURVEY_ANALYTICS_ENABLED: 'false'
+      COGNITIVE_MODULE_ENABLED: 'true'
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      HEAVY_PROCESSING_ENABLED: 'false'
+      VIDEO_PROCESSING_ENABLED: 'false'
+      ASSET_MIGRATION_COMPLETE: 'false'
+      LOG_LEVEL: warn
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: workspace-integrated-backend-images-${{ github.sha }}
+          path: training-workspace-integrated-images/backend
+      - uses: actions/download-artifact@v4
+        with:
+          name: workspace-integrated-backend-reports-${{ github.sha }}
+          path: training-workspace-integrated-evidence/backend
+      - uses: actions/download-artifact@v4
+        with:
+          name: workspace-integrated-frontend-images-${{ github.sha }}
+          path: training-workspace-integrated-images/frontend
+      - uses: actions/download-artifact@v4
+        with:
+          name: workspace-integrated-frontend-reports-${{ github.sha }}
+          path: training-workspace-integrated-evidence/frontend
+      - name: verify same-run bytes and exact immutable image identities
+        run: node .github/scripts/training-workspace-integrated-evidence.mjs restore-images
+      - name: prepare isolated services and private prerequisite directory
+        shell: bash
+        run: |
+          python3 -B - <<'PY'
+          import os,secrets
+          from pathlib import Path
+          private=Path(os.environ['RUNNER_TEMP'])/'training-workspace-integrated-private';private.mkdir(mode=0o700)
+          evidence=Path(os.environ['GITHUB_WORKSPACE'])/'training-workspace-integrated-evidence'
+          values={'TRAINING_WORKSPACE_FIXTURE_FILE':private/'fixture.json','MEASUREMENT_BROWSER_FIXTURE_DIR':private,'TRAINING_WORKSPACE_EVIDENCE_DIR':evidence/'browser','TRAINING_WORKSPACE_BACKEND_ROOT':'/app','WORKSPACE_EVIDENCE':evidence/'postgres','UPLOAD_DIR':private/'uploads','EXPORT_DIR':private/'exports','CREDENTIAL_HANDOFF_DIR':private/'credentials'}
+          for key in ['JWT_SECRET','DATA_ENCRYPTION_KEY','DATA_PSEUDONYM_KEY','ASSET_SIGNING_SECRET','SURVEY_MFA_ENCRYPTION_KEY']:
+            values[key]=secrets.token_hex(32);print('::add-mask::'+values[key])
+          for key in ['TRAINING_WORKSPACE_EVIDENCE_DIR','WORKSPACE_EVIDENCE','UPLOAD_DIR','EXPORT_DIR','CREDENTIAL_HANDOFF_DIR']:Path(values[key]).mkdir(parents=True,exist_ok=True,mode=0o700)
+          with open(os.environ['GITHUB_ENV'],'a') as out:
+            for k,v in values.items():out.write(f'{k}={v}\n')
+          PY
+          docker run -d --name training-workspace-integrated-postgres -e POSTGRES_USER=ptool -e POSTGRES_PASSWORD=ptool123 -e POSTGRES_DB=ptool -p 127.0.0.1:5432:5432 postgres:16.15-bookworm
+          docker run -d --name training-workspace-integrated-redis -p 127.0.0.1:6379:6379 redis:7.4.11-bookworm
+          for attempt in $(seq 1 30); do
+            if docker exec training-workspace-integrated-postgres pg_isready -U ptool && docker exec training-workspace-integrated-redis redis-cli ping; then exit 0; fi
+            sleep 1
+          done
+          exit 1
+      - name: upgrade old synthetic schema and retain historical rows
+        run: node .github/scripts/training-workspace-integrated-recovery.mjs upgrade
+      - name: four real PostgreSQL authorization and scheduling suites
+        run: bash .github/scripts/training-workspace-integrated-backend.sh once node "$GITHUB_WORKSPACE/.github/scripts/training-workspace-integrated-checks.mjs" postgres
+      - name: nonempty bounded synthetic backup and restore
+        run: node .github/scripts/training-workspace-integrated-recovery.mjs restore
+      - name: initialize a separate fresh browser database
+        shell: bash
+        run: |
+          docker exec training-workspace-integrated-postgres createdb -U ptool workspace_browser
+          DATABASE_URL=postgresql://ptool:ptool123@127.0.0.1:5432/workspace_browser?schema=public bash .github/scripts/training-workspace-integrated-backend.sh once npx prisma migrate deploy
+          echo 'DATABASE_URL=postgresql://ptool:ptool123@127.0.0.1:5432/workspace_browser?schema=public' >> "$GITHUB_ENV"
+          echo 'DATABASE_URL_ADMIN=postgresql://ptool:ptool123@127.0.0.1:5432/workspace_browser?schema=public' >> "$GITHUB_ENV"
+      - name: synthetic accounts and real administrator enrollment ticket, never sessions
+        shell: bash
+        run: |
+          set +e
+          bash .github/scripts/training-workspace-integrated-backend.sh once node "$GITHUB_WORKSPACE/server-version/backend/scripts/training-workspace-integrated-browser-fixture.ts" > "$RUNNER_TEMP/training-workspace-integrated-private/fixture.private.log" 2>&1
+          status=$?
+          set -e
+          FIXTURE_STATUS="$status" python3 -B - <<'PY'
+          import os,json,re
+          from pathlib import Path
+          text=(Path(os.environ['RUNNER_TEMP'])/'training-workspace-integrated-private/fixture.private.log').read_text()
+          for line in text.splitlines():
+            if line.startswith('::add-mask::'):print(line)
+          records=[]
+          for line in text.splitlines():
+            if line.startswith('GOVERNANCE_FIXTURE_DIAGNOSTIC '):
+              try: records.append(json.loads(line.split(' ',1)[1]))
+              except (ValueError,IndexError): pass
+          record=records[-1] if records else {}
+          name=record.get('errorName')
+          if not isinstance(name,str) or not re.fullmatch(r'[A-Za-z][A-Za-z0-9]{0,70}Error|Error',name):
+            names=re.findall(r'\b([A-Za-z][A-Za-z0-9]{0,70}Error|Error)(?: \[|:)',text)
+            name=names[-1] if names else 'ProcessExitBeforeStructuredDiagnostic'
+          code=record.get('errorCode','UNCLASSIFIED')
+          if not isinstance(code,str) or not re.fullmatch(r'ERR_[A-Z_]{1,50}|MODULE_NOT_FOUND|P[0-9]{4}|E(?:ACCES|PERM|NOENT|PIPE|CONNREFUSED|TIMEDOUT)|[0-9]{2}[A-Z0-9]{3}|UNCLASSIFIED',code):code='UNCLASSIFIED'
+          if code=='UNCLASSIFIED':
+            codes=re.findall(r'\b(ERR_[A-Z_]{1,50}|MODULE_NOT_FOUND|EACCES|ENOENT|ECONNREFUSED)\b',text)
+            if codes:code=codes[-1]
+          phase=record.get('phase','node-or-container-entry-before-main-diagnostic')
+          if not isinstance(phase,str) or not re.fullmatch(r'[a-z][a-z-]{1,100}',phase):phase='invalid-structured-diagnostic'
+          frames=[]
+          for frame in record.get('frames',[]):
+            if isinstance(frame,dict) and isinstance(frame.get('file'),str) and re.fullmatch(r'[A-Za-z0-9_.-]+\.(?:[cm]?js|ts)',frame['file']) and type(frame.get('line')) is int and type(frame.get('column')) is int:
+              frames.append({k:frame[k] for k in ['file','line','column']})
+          if not frames:
+            frames=[{'file':m[0],'line':int(m[1]),'column':int(m[2])} for m in re.findall(r'/([A-Za-z0-9_.-]+\.(?:[cm]?js|ts)):(\d+):(\d+)\)?(?:\n|$)',text)][:6]
+          report={'schemaVersion':1,'phase':phase,'exitStatus':int(os.environ['FIXTURE_STATUS']),'errorName':name if int(os.environ['FIXTURE_STATUS']) else 'None','errorCode':code,'frames':frames[:6],'structuredDiagnostic':bool(records),'privateDetailsWithheld':True}
+          Path('training-workspace-integrated-evidence/fixture-diagnostic.json').write_text(json.dumps(report));print(json.dumps(report))
+          PY
+          exit "$status"
+      - name: install official pinned browser tools
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends libnss3-tools
+          echo "TRAINING_WORKSPACE_PLAYWRIGHT_MODULE=$GITHUB_WORKSPACE/.github/release-tools/node_modules/playwright-core" >> "$GITHUB_ENV"
+          node -e 'const fs=require("node:fs");fs.appendFileSync(process.env.GITHUB_ENV,"TRAINING_WORKSPACE_CHROMIUM_EXECUTABLE="+require("./.github/release-tools/node_modules/playwright-core").chromium.executablePath()+"\n")'
+      - name: require this round approved private browser trust
+        run: |
+          node -e "if(require('./.github/scripts/training-workspace-integrated-bindings.json').browserProfileTrustApproved!==true)throw Error('Current isolated profile approval missing')"
+          echo 'MEASUREMENT_BROWSER_EPHEMERAL_CA_APPROVED=true' >> "$GITHUB_ENV"
+      - name: isolated profile-only HTTPS trust
+        run: python3 -B .github/scripts/measurement-browser-ci.py tls
+      - name: exact newly compiled frontend bytes
+        shell: bash
+        run: |
+          id="$(docker create training-workspace-integrated-frontend-runtime:$GITHUB_SHA)"
+          mkdir -p server-version/frontend/dist
+          docker cp "$id:/usr/share/nginx/html/." server-version/frontend/dist/
+          docker rm "$id"
+          (cd server-version/frontend/dist; sha256sum -c "$GITHUB_WORKSPACE/training-workspace-integrated-evidence/frontend/runtime-files.sha256")
+      - name: serve restricted API and canonical loopback HTTPS
+        shell: bash
+        run: |
+          python3 -B - <<'PYTLS'
+          import base64,os
+          from pathlib import Path
+          private=Path(os.environ['RUNNER_TEMP'])/'training-workspace-integrated-private'
+          target=private/'proxy-tls.env'
+          with target.open('x') as output:
+            target.chmod(0o600)
+            for kind in ['KEY','CERT']:
+              source=Path(os.environ['MEASUREMENT_BROWSER_TLS_'+kind]).resolve()
+              assert source.parent==private/'tls'
+              output.write('WORKSPACE_PROXY_TLS_'+kind+'_BASE64='+base64.b64encode(source.read_bytes()).decode('ascii')+'\n')
+          PYTLS
+          startup_failed=0
+          bash .github/scripts/training-workspace-integrated-backend.sh serve || startup_failed=1
+          docker run -d --name training-workspace-integrated-proxy --network host --user 0 --cap-drop ALL --cap-add NET_BIND_SERVICE \
+            -e GITHUB_ACTIONS=true -e GITHUB_SHA -e GITHUB_RUN_ID -e MEASUREMENT_BROWSER_ISOLATED=1 -e MEASUREMENT_BROWSER_EPHEMERAL_CA_APPROVED=true --env-file "$RUNNER_TEMP/training-workspace-integrated-private/proxy-tls.env" \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
+            "training-workspace-integrated-backend-runtime:$GITHUB_SHA" node "$GITHUB_WORKSPACE/server-version/e2e/training-workspace-integrated-proxy.cjs" || startup_failed=1
+          for attempt in $(seq 1 60); do
+            if [ "$startup_failed" = 1 ]; then break; fi
+            if curl --fail --silent --max-time 2 http://127.0.0.1:3000/ready >/dev/null && curl --noproxy '*' --fail --silent --max-time 2 --cacert "$MEASUREMENT_BROWSER_TLS_CA" --resolve training.eduk12.top:443:127.0.0.1 https://training.eduk12.top/__ci_marker >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          python3 -B - <<'PYREADY'
+          import json,re,subprocess
+          from pathlib import Path
+          states={};diagnostics={}
+          for name in ['training-workspace-integrated-api','training-workspace-integrated-proxy']:
+            p=subprocess.run(['docker','inspect',name,'--format','{{json .State}}'],capture_output=True,text=True)
+            try:s=json.loads(p.stdout)
+            except ValueError:s={}
+            states[name]={k:s.get(k) for k in ['Status','ExitCode','OOMKilled']}
+            raw=subprocess.run(['docker','logs','--tail','100',name],capture_output=True,text=True)
+            text=raw.stdout+'\n'+raw.stderr
+            records=[]
+            for line in text.splitlines():
+              if line.startswith('WORKSPACE_PROCESS_DIAGNOSTIC '):
+                try: records.append(json.loads(line.split(' ',1)[1]))
+                except (ValueError,IndexError): pass
+            record=records[-1] if records else {}
+            names=re.findall(r'\b([A-Za-z][A-Za-z0-9]{0,70}Error|Error)(?: \[|:)',text)
+            codes=re.findall(r'\b(ERR_[A-Z_]{1,70}|EACCES|ENOENT|EADDRINUSE|EADDRNOTAVAIL|ECONNREFUSED|EPERM|MODULE_NOT_FOUND)\b',text)
+            error_name=record.get('errorName',names[-1] if names else 'ProcessWithoutStructuredDiagnostic')
+            error_code=record.get('errorCode',codes[-1] if codes else 'UNCLASSIFIED')
+            phase=record.get('phase','runtime-process-readiness')
+            frames=[{'file':m[0],'line':int(m[1]),'column':int(m[2])} for m in re.findall(r'/([A-Za-z0-9_.-]+\.(?:[cm]?js|ts)):(\d+):(\d+)\)?(?:\n|$)',text)][:6]
+            if records:
+              frames=[f for f in record.get('frames',[]) if isinstance(f,dict) and isinstance(f.get('file'),str) and re.fullmatch(r'[A-Za-z0-9_.-]+\.(?:[cm]?js|ts)',f['file']) and type(f.get('line')) is int and type(f.get('column')) is int]
+              frames=[{k:f[k] for k in ['file','line','column']} for f in frames[:6]]
+            diagnostics[name]={'phase':phase if isinstance(phase,str) and re.fullmatch(r'[a-z-]{1,100}',phase) else 'invalid-phase','errorName':error_name if isinstance(error_name,str) and re.fullmatch(r'[A-Za-z][A-Za-z0-9]{0,70}',error_name) else 'UnknownError','errorCode':error_code if isinstance(error_code,str) and re.fullmatch(r'ERR_[A-Z_]{1,70}|E[A-Z]{2,30}|MODULE_NOT_FOUND|UNCLASSIFIED',error_code) else 'UNCLASSIFIED','frames':frames,'privateDetailsWithheld':True}
+          report={'phase':'isolated-runtime-and-canonical-https-readiness','status':'FAIL','containerStates':states,'processDiagnostics':diagnostics,'credentialsSent':False}
+          Path('training-workspace-integrated-evidence/readiness-diagnostic.json').write_text(json.dumps(report));print(json.dumps(report))
+          PYREADY
+          echo '::error::Isolated API or canonical proxy readiness failed; no browser credentials sent'
+          exit 1
+      - name: real assigned Training learner and workspace journeys
+        run: |
+          node server-version/e2e/training-workspace-integration-browser.cjs
+          node .github/scripts/training-workspace-integrated-evidence.mjs browser-report
+      - name: remove only this run containers and private material
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          status=0
+          for name in training-workspace-integrated-proxy training-workspace-integrated-api training-workspace-integrated-redis training-workspace-integrated-postgres; do
+            all="$(docker ps -a --format '{{.Names}}')" || status=1
+            if grep -qx "$name" <<< "$all"; then docker rm -f -v "$name" >/dev/null || status=1; fi
+            after="$(docker ps -a --format '{{.Names}}')" || status=1
+            if grep -qx "$name" <<< "$after"; then status=1; fi
+          done
+          rm -rf "$RUNNER_TEMP/training-workspace-integrated-private" || status=1
+          test ! -e "$RUNNER_TEMP/training-workspace-integrated-private" || status=1
+          mkdir -p training-workspace-integrated-evidence
+          printf '{"exitStatus":%s,"privateMaterialRemoved":%s}\n' "$status" "$([ ! -e "$RUNNER_TEMP/training-workspace-integrated-private" ] && echo true || echo false)" > training-workspace-integrated-evidence/cleanup.json
+          exit "$status"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: training-workspace-integrated-connected-${{ github.sha }}
+          path: training-workspace-integrated-evidence/
+          if-no-files-found: error
+          retention-days: 3
