@@ -31,7 +31,7 @@ jobs:
           import importlib.util,json,os,subprocess
           from pathlib import Path
           source='312cfdc95e53b243b2de0bea9beb5ca3a3132a81'; run=39568118300
-          allowed={'server-version/e2e/scale-authoring-feedback-browser.cjs','server-version/e2e/scale-authoring-feedback-browser.test.cjs','.github/workflows/ci-scale-authoring-browser-diagnostic.yml','.github/scripts/scale-authoring-bindings.json'}
+          allowed={'.github/scripts/scale-authoring-scope.mjs','.github/scripts/scale-authoring-scope.test.mjs','server-version/e2e/scale-authoring-feedback-browser.cjs','server-version/e2e/scale-authoring-feedback-browser.test.cjs','.github/workflows/ci-scale-authoring-browser-diagnostic.yml','.github/scripts/scale-authoring-bindings.json'}
           changed=set(subprocess.check_output(['git','diff','--name-only',source,'HEAD'],text=True).splitlines())
           assert changed==allowed, 'Product/fixture/other controls changed; fixed evidence cannot be reused'
           for line in subprocess.check_output(['git','diff','--raw','--no-abbrev','--no-renames',source,'HEAD'],text=True).splitlines():
@@ -280,7 +280,7 @@ jobs:
       - uses: github/codeql-action/init@ce5e7eeac396d720fe2d802714996c8ce561e311
         with:
           languages: javascript-typescript
-          config: 'paths: [server-version/e2e/scale-authoring-feedback-browser.cjs, server-version/e2e/scale-authoring-feedback-browser.test.cjs]'
+          config: 'paths: [server-version/e2e/scale-authoring-feedback-browser.cjs, server-version/e2e/scale-authoring-feedback-browser.test.cjs, .github/scripts/scale-authoring-scope.mjs, .github/scripts/scale-authoring-scope.test.mjs]'
           ram: 3500
           threads: 2
       - uses: github/codeql-action/analyze@ce5e7eeac396d720fe2d802714996c8ce561e311

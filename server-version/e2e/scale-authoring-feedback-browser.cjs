@@ -11,7 +11,7 @@ const path = require('node:path')
 const { createHmac } = require('node:crypto')
 let chromium // Loaded only by the guarded real-browser entry; pure contracts need no browser dependency.
 const REQUIRED = ['training-editor-native', 'training-stable-item-operations', 'training-quality-roundtrip', 'training-published', 'training-final-report-image', 'survey-editor-native', 'survey-quality-roundtrip', 'survey-published', 'survey-final-report-image', 'survey-raw-quality-export', 'training-report-image-denies-other-user', 'survey-report-image-denies-missing-proof', 'desktop-mobile-layout']
-const evidence = { schemaVersion: 1, status: 'RUNNING', checks: [], screenshots: [], browserErrors: [], failedRequests: [], imageAuthorization: [], accessibility: [], computedStyles: [], layoutChecks: [], blockedExternalRequests: 0, scope: 'Real Chromium, synthetic accounts, candidate built UI and real API/PostgreSQL; no physical-device timing claim' }
+const evidence = { schemaVersion: 1, status: 'RUNNING', checks: [], screenshots: [], browserErrors: [], failedRequests: [], imageAuthorization: [], participantAnswers: [], accessibility: [], computedStyles: [], layoutChecks: [], blockedExternalRequests: 0, scope: 'Real Chromium, synthetic accounts, candidate built UI and real API/PostgreSQL; no physical-device timing claim' }
 let fixture, output, browser, activePage
 const diagnosticSecrets = new Set()
 const phase = name => { evidence.phase = name; if (output) save() }
@@ -155,6 +155,19 @@ function assertExportParts(parts, ticket) {
   assert.equal(artifact.codebook.filter(x => x.purpose === 'SOCIAL_DESIRABILITY').length, 1)
   return artifact
 }
+// A controlled radio stays unchecked until its durable async save resolves, and
+// then may be replaced by the next item. check() validates the wrong transient state.
+async function answerTrainingItem(page, prompt, option, nextPrompt) {
+  await page.getByRole('heading', { name: prompt, exact: true }).waitFor()
+  await page.getByRole('radio', { name: option, exact: true }).click()
+  if (nextPrompt) {
+    await page.getByRole('heading', { name: nextPrompt, exact: true }).waitFor()
+  } else {
+    await page.getByRole('radio', { name: option, exact: true, checked: true }).waitFor()
+    await page.getByRole('button', { name: '完成测评', exact: true, disabled: false }).waitFor()
+    assert(await page.getByRole('heading', { name: prompt, exact: true }).isVisible(), 'Last item must remain until explicit submission')
+  }
+}
 async function trainingLogin(page, actor, student = false) {
   await page.goto(fixture.trainingUrl + (student ? '/student/login' : '/teacher/account-login'))
   await page.locator('#auth-username').fill(actor.username); await page.locator('#auth-password').fill(actor.password)
@@ -215,13 +228,20 @@ async function trainingJourney() {
   await learner.goto(fixture.trainingUrl + '/student/scales/' + scaleId)
   const admission = await responseData(await started)
   assert(!JSON.stringify(admission).includes('attentionTarget'), 'Participant response exposes author target key')
-  // Training auto-advances native single-choice items after the real persistence promise.
-  for (const [index, prompt] of ['Synthetic scored content', '请选择「选项 2」。', '我从不撒谎'].entries()) {
-    await learner.getByRole('heading', { name: prompt, exact: true }).waitFor()
-    await learner.getByRole('radio', { name: index === 1 ? '选项 2' : '选项 1', exact: true }).check()
+  const prompts = ['Synthetic scored content', '请选择「选项 2」。', '我从不撒谎']
+  const expectedAnswers = []
+  for (const [index, prompt] of prompts.entries()) {
+    const label = index === 1 ? '选项 2' : '选项 1'
+    const item = admission.scale.definition.items.find(item => item.itemCode === codes[index])
+    assert.equal(item.content, prompt)
+    const option = item.options.find(option => option.label === label); assert(option)
+    expectedAnswers.push({ itemCode: item.itemCode, responseValue: option.value })
+    await answerTrainingItem(learner, prompt, label, prompts[index + 1])
   }
   const trainingImage = learner.waitForResponse(r => r.request().method() === 'GET' && /\/api\/scales\/assessments\/[^/]+\/report-assets\/[^/]+$/.test(new URL(r.url()).pathname))
-  const [trainingImageResponse] = await Promise.all([trainingImage, action(learner, /\/api\/scales\/assessments\/[^/]+\/submit$/, () => button(learner, '完成测评').click())])
+  const [trainingImageResponse, trainingFinal] = await Promise.all([trainingImage, action(learner, /\/api\/scales\/assessments\/[^/]+\/submit$/, () => button(learner, '完成测评').click())])
+  assert.deepEqual(trainingFinal.request.postDataJSON().answers.map(({ itemCode, responseValue }) => ({ itemCode, responseValue })), expectedAnswers, 'FINAL must contain all three durably saved raw answers')
+  evidence.participantAnswers.push({ name: 'training', answerCount: expectedAnswers.length, matchesFinalSnapshot: true })
   await learner.getByText('TRAINING RAW INTERVAL FEEDBACK', { exact: true }).waitFor()
   await learner.getByAltText('Training synthetic feedback picture', { exact: true }).waitFor()
   await learner.waitForFunction(() => [...document.images].some(i => i.alt === 'Training synthetic feedback picture' && i.complete && i.naturalWidth > 0))
@@ -309,6 +329,10 @@ async function surveyJourney() {
   const surveyImage = participant.waitForResponse(r => r.request().method() === 'POST' && /\/api\/public\/survey\/r\/[^/]+\/attempts\/[^/]+\/report-images\/[^/]+$/.test(new URL(r.url()).pathname))
   const [surveyImageResponse, final] = await Promise.all([surveyImage, action(participant, /\/api\/public\/survey\/r\/[^/]+\/attempts\/[^/]+\/final$/, () => button(participant, '提交本轮正式回答').click())])
   assert.equal(final.data.status, 'COMPLETED')
+  const surveyUnit = task.data.units.find(unit => unit.kind === 'SCALE'); assert(surveyUnit)
+  const expectedSurveyAnswers = Object.fromEntries(surveyUnit.items.map((item, index) => [item.itemKey, surveyUnit.responseOptions.find(option => option.label === (index === 1 ? '不同意' : '非常不同意')).optionKey]))
+  assert.deepEqual(final.request.postDataJSON().answers, { [surveyUnit.instrumentKey]: expectedSurveyAnswers }, 'Survey FINAL must retain all three original answers')
+  evidence.participantAnswers.push({ name: 'survey', answerCount: Object.keys(expectedSurveyAnswers).length, matchesFinalSnapshot: true })
   await participant.getByText('SURVEY RAW INTERVAL FEEDBACK', { exact: true }).waitFor()
   await participant.waitForFunction(() => [...document.images].some(i => i.alt === 'Survey synthetic feedback picture' && i.complete && i.naturalWidth > 0))
   assert.equal(surveyImageResponse.status(), 200); assert.match(surveyImageResponse.headers()['content-type'], /^image\/png/); assert((await surveyImageResponse.body()).length > 0)
@@ -402,4 +426,4 @@ if (require.main === module) main().catch(error => {
   if (output) { try { save() } catch (writeError) { console.error('Evidence write failed:', JSON.stringify(failureDetail(writeError, 'evidence-write'))) } }
   process.exitCode = 1
 })
-module.exports = { totpAt, redactDiagnostics, failureDetail, assertDeniedImage, assertExportParts, REQUIRED }
+module.exports = { answerTrainingItem, totpAt, redactDiagnostics, failureDetail, assertDeniedImage, assertExportParts, REQUIRED }

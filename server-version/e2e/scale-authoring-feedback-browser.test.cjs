@@ -85,3 +85,39 @@ test('Survey publication waits for library refresh completion, not just PATCH ac
   const publication = source.indexOf("phase('survey-publication')")
   assert(ack >= 0 && ready > ack && publication > ready)
 })
+
+test('Training answer action waits for durable next-item state rather than transient radio checked', async () => {
+  const { answerTrainingItem } = require('./scale-authoring-feedback-browser.cjs')
+  const events = []
+  const page = { getByRole(role, options) {
+    return {
+      async waitFor() { events.push(['wait', role, options]) },
+      async click() { events.push(['click', role, options]) },
+      async check() { throw new Error('Immediate post-click checked verification is incompatible with durable asynchronous selection') },
+    }
+  } }
+  await answerTrainingItem(page, 'first', 'choice', 'second')
+  assert.deepEqual(events, [
+    ['wait', 'heading', { name: 'first', exact: true }],
+    ['click', 'radio', { name: 'choice', exact: true }],
+    ['wait', 'heading', { name: 'second', exact: true }],
+  ])
+})
+test('Training final answer waits for selection and enabled explicit submit without auto-submitting', async () => {
+  const { answerTrainingItem } = require('./scale-authoring-feedback-browser.cjs')
+  const events = []
+  const page = { getByRole(role, options) { return {
+    async waitFor() { events.push(['wait', role, options]) },
+    async click() { assert.equal(role, 'radio'); events.push(['click', role, options]) },
+    async isVisible() { events.push(['visible', role, options]); return true },
+  } } }
+  await answerTrainingItem(page, 'last', 'choice', undefined)
+  assert.deepEqual(events.slice(2), [
+    ['wait', 'radio', { name: 'choice', exact: true, checked: true }],
+    ['wait', 'button', { name: '完成测评', exact: true, disabled: false }],
+    ['visible', 'heading', { name: 'last', exact: true }],
+  ])
+  const source = fs.readFileSync(require.resolve('./scale-authoring-feedback-browser.cjs'), 'utf8')
+  assert(source.includes("trainingFinal.request.postDataJSON().answers.map(({ itemCode, responseValue }) => ({ itemCode, responseValue })), expectedAnswers"))
+  assert(source.includes("final.request.postDataJSON().answers, { [surveyUnit.instrumentKey]: expectedSurveyAnswers }"))
+})

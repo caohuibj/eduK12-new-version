@@ -45,6 +45,7 @@ export function browserCheck(report,head) {
   const surfaces=['training-editor','training-report','survey-editor','survey-report'];
   assert.deepEqual(report.accessibility.map(x=>x.name).sort(),[...surfaces].sort());
   assert.deepEqual(report.screenshots.map(x=>x.file).sort(),surfaces.flatMap(name=>[390,768,1440].map(width=>name+'-'+width+'.png')).sort());
+  assert.deepEqual(report.participantAnswers,[{name:'training',answerCount:3,matchesFinalSnapshot:true},{name:'survey',answerCount:3,matchesFinalSnapshot:true}]);
   assert.equal(report.export.format,'RAW_WAVE');assert.equal(report.export.rowCount,3);assert.equal(report.export.downloadedFiles,3);
   assert.deepEqual(report.imageAuthorization.map(x=>x.name).sort(),['survey-missing-proof','training-other-user']);
   for(const item of report.imageAuthorization){assert.equal(item.positiveStatus,200);assert.equal(item.deniedStatus,404);assert.equal(item.deniedImage,false);assert(Number.isInteger(item.deniedLength)&&item.deniedLength>=0);if(item.name==='survey-missing-proof')assert.equal(item.deniedLength,0)}
