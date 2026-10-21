@@ -45,7 +45,7 @@ suite('Training workspace uses authoritative exact-version library permissions',
   const teachers=await Promise.all([0,1,2].map(()=>db.user.create({data:{username:randomUUID(),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'TRAINING'}})))
   ;[author,recipient,stranger]=teachers.map(row=>row.id)
   surveyAuthor=(await db.user.create({data:{username:randomUUID(),passwordHash:'synthetic',role:'STUDENT',accountDomain:'SURVEY'}})).id
-  const login=randomUUID();await db.surveyAccount.create({data:{userId:surveyAuthor,loginName:login,normalizedLogin:login}})
+  const login=randomUUID().replace(/-/g,'');await db.surveyAccount.create({data:{userId:surveyAuthor,loginName:login,normalizedLogin:login}})
   await db.surveyResearcherGrant.create({data:{userId:surveyAuthor,status:'ACTIVE',grantedBy:admin}})
   await db.surveyMfaCredential.create({data:{userId:surveyAuthor,enabled:true,secretCipher:'synthetic'}})
   project=randomUUID();await db.surveyProject.create({data:{id:project,ownerUserId:surveyAuthor,title:'Synthetic catalog project',collectionMode:'SINGLE_UNLINKED'}})
