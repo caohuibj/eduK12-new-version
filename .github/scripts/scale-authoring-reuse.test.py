@@ -80,6 +80,95 @@ class ReuseContracts(unittest.TestCase):
             file.write_text(json.dumps(report))
             with self.assertRaises(AssertionError): reuse.verify_frontend_report(root, ['different.test.ts'])
 
+    def test_frontend_resume_rejects_product_drift_or_failed_original_build(self):
+        plan = {'tests': {'frontend': ['a.test.ts']}}
+        def git(*args):
+            return '\n'.join(reuse.FRONTEND_TYPE_FIXES) if args[0] == 'diff' else json.dumps(plan)
+        def api(path):
+            if path.startswith('runs/'):
+                return {'id': reuse.FRONTEND_RUN, 'head_sha': reuse.FRONTEND_SOURCE, 'run_attempt': 1}
+            return {'run_id': reuse.FRONTEND_RUN, 'head_sha': reuse.FRONTEND_SOURCE, 'name': 'build (frontend)', 'steps': [{'name': 'one locked build and cached runtime assembly', 'conclusion': 'success'}]}
+        with tempfile.TemporaryDirectory() as folder:
+            previous = Path.cwd(); os.chdir(folder)
+            try:
+                Path('.github/scripts').mkdir(parents=True); Path('.github/scripts/scale-authoring-bindings.json').write_text(json.dumps(plan))
+                with patch.object(reuse, 'git', git), patch.object(reuse, 'api', api): reuse.check_frontend_resume_closure()
+                with patch.object(reuse, 'git', lambda *args: 'src/product.ts' if args[0]=='diff' else git(*args)), patch.object(reuse, 'api', api), self.assertRaises(ValueError): reuse.check_frontend_resume_closure()
+                def failed(path):
+                    value = api(path)
+                    if path.startswith('jobs/'): value['steps'][0]['conclusion'] = 'failure'
+                    return value
+                with patch.object(reuse, 'git', git), patch.object(reuse, 'api', failed), self.assertRaises(AssertionError): reuse.check_frontend_resume_closure()
+            finally: os.chdir(previous)
+
+    def test_frontend_resume_requires_original_70_tests_and_clean_audit(self):
+        with tempfile.TemporaryDirectory() as folder:
+            root = Path(folder)
+            report = {'success': True, 'numPassedTests': 70, 'numFailedTests': 0, 'numFailedTestSuites': 0, 'numPendingTests': 0, 'testResults': [{'name': '/runner/server-version/frontend/a.test.ts', 'assertionResults': [{'status': 'passed'}]}]}
+            (root / 'frontend-tests.json').write_text(json.dumps(report))
+            (root / 'frontend-audit.json').write_text(json.dumps({'metadata': {'vulnerabilities': {'high': 0, 'critical': 0}}}))
+            (root / 'frontend-runtime-output.json').write_text(json.dumps({'head': reuse.FRONTEND_SOURCE, 'sameCompilerOutput': True, 'files': {'index.html': 'hash'}}))
+            reuse.verify_current_frontend_report(root, ['a.test.ts'])
+            for bad in [{**report, 'numPassedTests': 0}, {**report, 'numPendingTests': 1}, {**report, 'testResults': []}]:
+                (root / 'frontend-tests.json').write_text(json.dumps(bad))
+                with self.assertRaises(AssertionError): reuse.verify_current_frontend_report(root, ['a.test.ts'])
+            (root / 'frontend-tests.json').write_text(json.dumps(report))
+            (root / 'frontend-audit.json').write_text(json.dumps({'metadata': {'vulnerabilities': {'high': 1, 'critical': 0}}}))
+            with self.assertRaises(AssertionError): reuse.verify_current_frontend_report(root, ['a.test.ts'])
+
+    def test_restored_frontend_bytes_and_lock_tool_versions_must_match(self):
+        with tempfile.TemporaryDirectory() as folder:
+            previous = Path.cwd(); os.chdir(folder)
+            try:
+                root = Path('server-version/frontend'); (root / 'dist').mkdir(parents=True); Path('scale-authoring-evidence').mkdir()
+                (root / 'dist/index.html').write_text('original compiled bytes')
+                digest = reuse.hashlib.sha256((root / 'dist/index.html').read_bytes()).hexdigest()
+                Path('scale-authoring-evidence/frontend-runtime-output.json').write_text(json.dumps({'head': reuse.FRONTEND_SOURCE, 'sameCompilerOutput': True, 'files': {'index.html': digest}}))
+                packages = {}
+                for tool in ['typescript', 'eslint']:
+                    (root / 'node_modules' / tool).mkdir(parents=True); (root / 'node_modules' / tool / 'package.json').write_text(json.dumps({'version': '1.0.0'})); packages['node_modules/' + tool] = {'version': '1.0.0'}
+                (root / 'package-lock.json').write_text(json.dumps({'packages': packages}))
+                reuse.verify_frontend_bytes()
+                (root / 'dist/index.html').write_text('changed bytes')
+                with self.assertRaises(AssertionError): reuse.verify_frontend_bytes()
+                (root / 'dist/index.html').write_text('original compiled bytes'); (root / 'node_modules/typescript/package.json').write_text(json.dumps({'version': '2.0.0'}))
+                with self.assertRaises(AssertionError): reuse.verify_frontend_bytes()
+            finally: os.chdir(previous)
+
+    def test_sast_requires_original_success_and_only_exact_changed_scan_inputs(self):
+        old_config = 'paths: [server-version/backend/src, server-version/backend/scripts, server-version/frontend/src, server-version/e2e, .github/scripts]'
+        new_config = 'paths: [' + ', '.join(reuse.FRONTEND_TYPE_FIXES) + ']'
+        old = '      - uses: github/codeql-action/init@v3\n        with:\n          config: ' + old_config + '\n      - uses: github/codeql-action/analyze@v3\n        with:\n          upload: never\n      - uses: actions/upload-artifact@v4\n'
+        def git(*args): return '\n'.join(reuse.FRONTEND_TYPE_FIXES) if args[0]=='diff' else old
+        def api(_): return {'run_id': reuse.FRONTEND_RUN, 'head_sha': reuse.FRONTEND_SOURCE, 'name': 'sast', 'conclusion': 'success'}
+        with tempfile.TemporaryDirectory() as folder:
+            previous=Path.cwd(); os.chdir(folder)
+            try:
+                Path('.github/workflows').mkdir(parents=True); file=Path('.github/workflows/ci-scale-authoring.yml'); file.write_text(old.replace(old_config,new_config).replace('@v3', '@ce5e7eeac396d720fe2d802714996c8ce561e311'))
+                with patch.object(reuse,'git',git), patch.object(reuse,'api',api), patch.dict(os.environ,{'GITHUB_SHA':'candidate'}): reuse.verify_sast_boundary()
+                for extra in ['src/other.jsx','src/other.mts','src/other.cts','src/other.html','src/package.json']:
+                    with patch.object(reuse,'git',lambda *args: git(*args)+'\n'+extra if args[0]=='diff' else git(*args)), self.assertRaises(ValueError): reuse.verify_sast_boundary()
+                file.write_text(old.replace(old_config,new_config).replace('@v3', '@ce5e7eeac396d720fe2d802714996c8ce561e311').replace('upload: never','upload: always'))
+                with patch.object(reuse,'git',git), self.assertRaises(ValueError): reuse.verify_sast_boundary()
+                file.write_text(old.replace(old_config,new_config).replace('@v3', '@ce5e7eeac396d720fe2d802714996c8ce561e311'))
+                with patch.object(reuse,'git',git), patch.object(reuse,'api',lambda _: {**api(''),'conclusion':'failure'}), self.assertRaises(AssertionError): reuse.verify_sast_boundary()
+            finally: os.chdir(previous)
+
+    def test_sast_tool_identity_rejects_cli_or_query_drift(self):
+        with tempfile.TemporaryDirectory() as folder:
+            previous = Path.cwd(); os.chdir(folder)
+            try:
+                output = Path('scale-authoring-evidence/sarif'); output.mkdir(parents=True)
+                report = {'runs': [{'tool': {'driver': {'semanticVersion': '2.27.2'}, 'extensions': [{'name': 'codeql/javascript-queries', 'semanticVersion': '2.4.7+a7057b836bf29767461026718b14d20790b9085f'}]}}]}
+                file = output / 'javascript.sarif'; file.write_text(json.dumps(report)); reuse.verify_sast_tools()
+                for changed in ['driver', 'extensions']:
+                    bad = copy.deepcopy(report)
+                    target = bad['runs'][0]['tool'][changed]
+                    (target if changed == 'driver' else target[0])['semanticVersion'] = 'different'
+                    file.write_text(json.dumps(bad))
+                    with self.assertRaises(AssertionError): reuse.verify_sast_tools()
+            finally: os.chdir(previous)
+
     def test_old_reports_require_real_selected_passes_audit_scan_pg_and_cleanup(self):
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder); reports = root / 'reports'; browser = root / 'browser'; reports.mkdir(); browser.mkdir()

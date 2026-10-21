@@ -11,8 +11,13 @@ import zipfile
 
 SOURCE = '48defee0aecbc36138ad624f729b9a7cbb634efc'
 RUN = 39560427570
+FRONTEND_SOURCE = '9b289945f5c782b98027ff7228c344c362247e17'
+FRONTEND_RUN = 39565491980
+FRONTEND_TYPE_FIXES = ['server-version/frontend/src/pages/__tests__/ScaleEdit.authoring.test.tsx', 'server-version/frontend/src/pages/__tests__/ScaleEdit.persistence-boundaries.test.tsx']
 TITLE = 'persists quality-item raw answers and frozen image feedback without scoring quality items'
 ARTIFACTS = {
+    'currentFrontend': (12330195734, 'scale-frontend-' + FRONTEND_SOURCE, 127259545, '8ba6190c5f4f84c9fcb49cd76f692c0de2f6c71345f9b134ae6f70134ba896de'),
+    'currentFrontendReports': (12329676846, 'scale-frontend-reports-' + FRONTEND_SOURCE, 29808, 'bcbd561e2ba6062a7195f77e8a39394f0986f6b85f465b94aeee3f3b495f8d04'),
     'backend': (12326834164, 'scale-backend-' + SOURCE, 924879951, '5cba5d3efd53318479134d8e0b380993533e2eb6847fa3fb41d9d1f1aaf77280'),
     'reports': (12327198696, 'scale-backend-reports-' + SOURCE, 330235, '29ec19e7828503e60383c3b388b5317897e4148cec04915dc7867439e10cc605'),
     'frontendReports': (12327173709, 'scale-frontend-reports-' + SOURCE, 43617, '16250de1efb6f3b2fb628078213916abf4aacdc5ce7998c94f17ede393643391'),
@@ -93,7 +98,8 @@ def artifact_identity(meta, key):
     aid, name, size, digest = ARTIFACTS[key]
     assert meta['id'] == aid and meta['name'] == name and not meta['expired']
     assert meta['size_in_bytes'] == size and meta['digest'] == 'sha256:' + digest
-    assert meta['workflow_run']['id'] == RUN and meta['workflow_run']['head_sha'] == SOURCE
+    run, source = (FRONTEND_RUN, FRONTEND_SOURCE) if key.startswith('currentFrontend') else (RUN, SOURCE)
+    assert meta['workflow_run']['id'] == run and meta['workflow_run']['head_sha'] == source
 
 
 def checked_zip(archive, key, output):
@@ -165,13 +171,98 @@ def verify_frontend_report(reports, selected):
     assert all(x['assertionResults'] and all(a['status'] == 'passed' for a in x['assertionResults']) for x in report['testResults'])
 
 
+def check_frontend_resume_closure():
+    unchanged(sorted(FRONTEND_TYPE_FIXES), sorted(git('diff', '--name-only', FRONTEND_SOURCE, 'HEAD', '--', 'server-version/frontend').splitlines()), 'frontend compiler product/dependency closure; only reviewed type-option test fixes allowed')
+    original = json.loads(git('show', FRONTEND_SOURCE + ':.github/scripts/scale-authoring-bindings.json'))
+    current = json.loads(Path('.github/scripts/scale-authoring-bindings.json').read_text())
+    unchanged(original['tests']['frontend'], current['tests']['frontend'], 'original 70-assertion selected files')
+    run = api('runs/' + str(FRONTEND_RUN))
+    assert run['id'] == FRONTEND_RUN and run['head_sha'] == FRONTEND_SOURCE and run['run_attempt'] == 1
+    job = api('jobs/119106743241')
+    assert job['run_id'] == FRONTEND_RUN and job['head_sha'] == FRONTEND_SOURCE and job['name'] == 'build (frontend)'
+    matches = [step for step in job['steps'] if step['name'] == 'one locked build and cached runtime assembly']
+    assert len(matches) == 1 and matches[0]['conclusion'] == 'success'
+    return original
+
+
+def verify_current_frontend_report(reports, selected):
+    test = json.loads((reports / 'frontend-tests.json').read_text())
+    assert test['success'] is True and test['numPassedTests'] == 70 and test['numFailedTests'] == 0 and test['numFailedTestSuites'] == 0 and test['numPendingTests'] == 0
+    assert sorted(x['name'].split('/server-version/frontend/', 1)[1] for x in test['testResults']) == sorted(selected)
+    assert all(x['assertionResults'] and all(a['status'] == 'passed' for a in x['assertionResults']) for x in test['testResults'])
+    audit = json.loads((reports / 'frontend-audit.json').read_text())['metadata']['vulnerabilities']
+    assert audit['high'] == 0 and audit['critical'] == 0
+    output = json.loads((reports / 'frontend-runtime-output.json').read_text())
+    assert output['head'] == FRONTEND_SOURCE and output['sameCompilerOutput'] is True and output['files']
+
+
+def verify_frontend_bytes():
+    root = Path('server-version/frontend')
+    output = json.loads(Path('scale-authoring-evidence/frontend-runtime-output.json').read_text())
+    assert output['head'] == FRONTEND_SOURCE and output['sameCompilerOutput'] is True
+    actual = {str(file.relative_to(root / 'dist')): hashlib.sha256(file.read_bytes()).hexdigest() for file in (root / 'dist').rglob('*') if file.is_file()}
+    assert actual and actual == output['files'], 'Compiled frontend file set or bytes changed'
+    lock = json.loads((root / 'package-lock.json').read_text())
+    for tool in ['typescript', 'eslint']:
+        version = json.loads((root / 'node_modules' / tool / 'package.json').read_text())['version']
+        assert version == lock['packages']['node_modules/' + tool]['version'], 'Restored tool identity differs from unchanged lock'
+
+
+def verify_sast_boundary():
+    roots = ['server-version/backend/src', 'server-version/backend/scripts', 'server-version/frontend/src', 'server-version/e2e', '.github/scripts']
+    changed = set(git('diff', '--name-only', FRONTEND_SOURCE, 'HEAD', '--', *roots).splitlines())
+    # These exact reviewed Python/data controls are not JavaScript/TypeScript inputs.
+    controls = {'.github/scripts/scale-authoring-reuse.py', '.github/scripts/scale-authoring-reuse.test.py', '.github/scripts/scale-authoring-bindings.json'}
+    unchanged(set(FRONTEND_TYPE_FIXES), changed - controls, 'CodeQL input boundary (all original roots, including JSX/MTS/CTS and dependency configs)')
+    old = git('show', FRONTEND_SOURCE + ':.github/workflows/ci-scale-authoring.yml')
+    current = Path('.github/workflows/ci-scale-authoring.yml').read_text()
+    original_config = 'paths: [server-version/backend/src, server-version/backend/scripts, server-version/frontend/src, server-version/e2e, .github/scripts]'
+    new_config = 'paths: [' + ', '.join(FRONTEND_TYPE_FIXES) + ']'
+    def query_options(text):
+        text = text.replace('@' + 'ce5e7eeac396d720fe2d802714996c8ce561e311', '@v3')
+        return text.split('      - uses: github/codeql-action/init@v3\n', 1)[1].split('      - uses: actions/upload-artifact@v4\n', 1)[0]
+    unchanged(query_options(old).replace(original_config, new_config), query_options(current.split('      - name: verify same original CodeQL tool and query pack')[0]), 'CodeQL language/query/tool invocation options (only exact input paths may change)')
+    job = api('jobs/119106743347')
+    assert job['run_id'] == FRONTEND_RUN and job['head_sha'] == FRONTEND_SOURCE and job['name'] == 'sast' and job['conclusion'] == 'success', 'Original full analysis has not succeeded; do not substitute the partial scan'
+    output = Path('scale-authoring-evidence'); output.mkdir(exist_ok=True)
+    (output / 'sast-input-boundary.json').write_text(json.dumps({'originalRun': FRONTEND_RUN, 'originalHead': FRONTEND_SOURCE, 'originalFullAnalysis': 'success', 'currentHead': os.environ['GITHUB_SHA'], 'currentAnalysisPaths': FRONTEND_TYPE_FIXES, 'currentFullRepositoryScan': False, 'pythonAndWorkflowReview': 'independent static control review; not claimed CodeQL coverage'}, indent=2))
+
+
+
+def verify_sast_tools():
+    reports = list(Path('scale-authoring-evidence/sarif').glob('*.sarif'))
+    assert reports, 'Missing actual CodeQL output'
+    for report in reports:
+        runs = json.loads(report.read_text())['runs']
+        assert runs, 'Empty CodeQL output'
+        for run in runs:
+            assert run['tool']['driver']['semanticVersion'] == '2.27.2', 'CodeQL CLI changed from original evidence'
+            packs = [x for x in run['tool']['extensions'] if x['name'] == 'codeql/javascript-queries']
+            assert len(packs) == 1 and packs[0]['semanticVersion'] == '2.4.7+a7057b836bf29767461026718b14d20790b9085f', 'CodeQL query pack changed from original evidence'
+
+
 def main():
     mode = sys.argv[1]
-    assert mode in ['verify', 'restore']
+    assert mode in ['verify', 'restore', 'restore-frontend', 'frontend-bytes', 'sast-boundary', 'sast-tools']
+    if mode == 'sast-tools':
+        verify_sast_tools()
+        return
+    if mode == 'sast-boundary':
+        verify_sast_boundary()
+        return
+    if mode == 'frontend-bytes':
+        verify_frontend_bytes()
+        return
     plan = check_closure()
     verify_jobs()
     output = Path('scale-authoring-evidence')
-    if mode == 'verify':
+    if mode == 'restore-frontend':
+        current_plan = check_frontend_resume_closure()
+        download('currentFrontend', output)
+        assert (output / 'frontend-head.txt').read_text().strip() == FRONTEND_SOURCE
+        assert (output / 'frontend-run.txt').read_text().strip() == str(FRONTEND_RUN)
+        verify_current_frontend_report(output, current_plan['tests']['frontend'])
+    elif mode == 'verify':
         reports = output / 'reused-backend-reports'
         browser = output / 'reused-postgres'
         download('reports', reports)
@@ -180,6 +271,11 @@ def main():
         frontend_reports = output / 'reused-frontend-reports'
         download('frontendReports', frontend_reports)
         verify_frontend_report(frontend_reports, plan['tests']['frontend'])
+        current_plan = check_frontend_resume_closure()
+        current_reports = output / 'reused-current-frontend-reports'
+        download('currentFrontendReports', current_reports)
+        verify_current_frontend_report(current_reports, current_plan['tests']['frontend'])
+        (output / 'frontend-resume.json').write_text(json.dumps({'sourceRun': FRONTEND_RUN, 'sourceHead': FRONTEND_SOURCE, 'candidateHead': os.environ['GITHUB_SHA'], 'originalAssertionsPassed': 70, 'auditRepeated': False, 'testsRepeated': False, 'compilerRepeated': False, 'runtimeReassemblyPlanned': True, 'typecheckAndLintPending': True}, indent=2))
         (output / 'backend-reuse.json').write_text(json.dumps({'status': 'PASS', 'sourceRun': RUN, 'sourceHead': SOURCE, 'candidateHead': os.environ['GITHUB_SHA'], 'backendPassed': 174, 'originalFrontendPassed': 123, 'frontendRepairPaths': FRONTEND_REPAIR_PATHS, 'postgresPassed': 1, 'backendRebuilt': False, 'pgRepeated': False, 'mergeQualified': False, 'artifacts': ARTIFACTS}, indent=2))
     else:
         download('backend', output)

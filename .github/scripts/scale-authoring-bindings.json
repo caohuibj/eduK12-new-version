@@ -20,11 +20,11 @@
     },
     ".github/scripts/scale-authoring-reuse.py": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "8146c6f0eca6383f28bccccc5e00ba31dbb94d44"
+      "after": "9b33799746b63ff08b562b69f4c58be1af97750e"
     },
     ".github/scripts/scale-authoring-reuse.test.py": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "ec61b7a38dbcb6c569cf9efd04ba0ff489cd461b"
+      "after": "628c999ac46f46eb39b337f0fcbedbad7f2ac679"
     },
     ".github/scripts/scale-authoring-scope.mjs": {
       "before": "0000000000000000000000000000000000000000",
@@ -44,11 +44,11 @@
     },
     ".github/workflows/ci-scale-authoring.yml": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "8e55367e503c60c1553bfa606fbb6605b6a94175"
+      "after": "15d0c2dea4ad0278b045407c385a99f7017a4d42"
     },
     "docs/release/scale-authoring-ci-20261021.md": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "6eb75a43aee3be741439457495bf5adc229d6022"
+      "after": "823225036e327660c099d666b7779d1dc4ad804d"
     },
     "server-version/backend/scripts/scale-authoring-browser-fixture.ts": {
       "before": "0000000000000000000000000000000000000000",
@@ -344,7 +344,7 @@
     },
     "server-version/frontend/src/pages/__tests__/ScaleEdit.authoring.test.tsx": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "6030cb40e72c3de442e1cbaad95548613cbe4506"
+      "after": "d916bfb9046a1deb238b6db0fc183863d1e51d96"
     },
     "server-version/frontend/src/pages/__tests__/ScaleEdit.contrast.test.ts": {
       "before": "0000000000000000000000000000000000000000",
@@ -352,7 +352,7 @@
     },
     "server-version/frontend/src/pages/__tests__/ScaleEdit.persistence-boundaries.test.tsx": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "59a6aa00107b162c7803801d678700f29b0e967e"
+      "after": "c86d93907fe84e8f0bf0cea6e6af55628a4be75c"
     },
     "server-version/frontend/src/pages/__tests__/TrainingFeedbackImageField.test.tsx": {
       "before": "0000000000000000000000000000000000000000",
@@ -501,7 +501,8 @@
   "controlPathCount": 15,
   "selectedRegressionCount": {
     "backendReused": 17,
-    "frontendExecuted": 8
+    "frontendReusedCurrent": 8,
+    "frontendExecuted": 0
   },
   "reusedEvidence": {
     "run": 39560427570,
@@ -509,6 +510,12 @@
     "backendAssertions": 174,
     "postgresAssertions": 1,
     "originalFrontendAssertions": 123,
-    "policy": "Exact official source artifacts, reports and whole input closure are checked by scale-authoring-reuse.py; no changed backend fallback and no claim that the original overall failed run passed."
+    "policy": "Exact official source artifacts, reports and whole input closure are checked by scale-authoring-reuse.py; no changed backend fallback and no claim that the original overall failed run passed.",
+    "currentFrontend": {
+      "run": 39565491980,
+      "head": "9b289945f5c782b98027ff7228c344c362247e17",
+      "assertions": 70,
+      "policy": "Only two reviewed semantically equivalent selector test fixes; exact production and lock inputs unchanged. Reuse compiled dist and audit; execute missing types/lint and first new runtime scan."
+    }
   }
 }

@@ -16,7 +16,35 @@ Only the separately created `ci/scale-authoring-feedback-20261021` branch activa
 the dedicated workflow, after the final review. No PR is created and PR322, main,
 existing CI routes, repository rules and production settings are unchanged.
 
-## Current reviewed retry boundary (not yet activated)
+## Type-only recovery after run 39565491980 (not yet activated)
+
+The official frontend producer compiled and archived the repaired product, passed
+all 70 selected assertions and the full dependency audit, then stopped at app
+TypeScript checking because two tests used an unsupported query option. Only those
+two tests are repaired with reviewed equivalent anchored accessible-name queries.
+The current frontend tree must otherwise exactly match source
+`9b289945f5c782b98027ff7228c344c362247e17`; any product, lock, config or dependency
+change stops reuse. The fixed official ZIP, original build-success step, reports,
+all compiled-file hashes and original locked TypeScript/ESLint identities are
+checked. No Vite compilation, 70-assertion test execution or audit is repeated.
+
+Only missing app types and lint run on the original official Debian/Node base
+image digest. The original frontend Docker image was not archived: its original
+runtime Dockerfile tail is used to assemble a new runtime from the exact old dist
+bytes, with only the COPY source adjusted. Every compiled output is rechecked;
+this newly assembled runtime receives its first required Trivy scan. Browser
+execution combines these original compiled frontend bytes with the unchanged
+verified round-2 backend.
+
+The original complete CodeQL analysis must finish successfully. The new analysis
+runs the same JavaScript/TypeScript query/action configuration on the two actually
+changed test files only. Every other change in the original scan roots stops this
+partial-scan route, except the explicitly reviewed Python/data controls that were
+not JavaScript/TypeScript inputs. This is not a claim of a new full-repository scan
+or CodeQL coverage of Python/workflow controls; those controls receive independent
+static review. Original and changed-input analysis evidence remain distinguishable.
+
+## Earlier reviewed retry boundary
 
 The current frontend/browser repair reuses only backend evidence from official
 run `39560427570`, source `48defee0aecbc36138ad624f729b9a7cbb634efc`:
@@ -103,3 +131,5 @@ reuse successful immutable input artifacts after review, and rerun only invalida
 or missing work. Do not click an unchanged monolithic rerun or create another
 activation commit merely to repeat completed builds/checks. No automatic fallback
 rebuild or blanket-retry mechanism is introduced by this lane.
+
+Recovery SAST identity: original run 39565491980 / job 119106743347 completed successfully; action `ce5e7eeac396d720fe2d802714996c8ce561e311`, CLI `2.27.2`, JavaScript query pack `2.4.7+a7057b836bf29767461026718b14d20790b9085f`. The new two-file analysis pins that action and rejects changed CLI/query identities in actual SARIF. Original full SARIF contains findings; completion is not a zero-findings claim.
