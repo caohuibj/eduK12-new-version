@@ -318,7 +318,8 @@ async function surveyParticipant(shared,source) {
   const measurement=receipt.measurements.find(row=>row.instrumentKey===unit.instrumentKey);assert(measurement)
   assert.equal(measurement.measurementReleaseId,shared.release.releaseId)
   const scoreImage=process.env.SCALE_GOVERNANCE_SCORE_IMAGE
-  assert.equal(scoreImage,'scale-library-governance-backend-runtime:'+process.env.GITHUB_SHA)
+  assert.equal(process.env.SCALE_GOVERNANCE_BACKEND_IMAGE_HEAD,'c2c383fd4f61d09b91d61ae16eaec9f5c7c0db22')
+  assert.equal(scoreImage,'scale-library-governance-backend-runtime:'+process.env.SCALE_GOVERNANCE_BACKEND_IMAGE_HEAD)
   const canonical=JSON.parse(execFileSync('docker',['run','--rm','--name','scale-governance-score-'+process.env.GITHUB_RUN_ID,'--label','scale-governance-ci='+process.env.GITHUB_RUN_ID,'--network','none','--cpus=1','--memory=256m','-i',scoreImage,'node','-e',
     "let text='';process.stdin.on('data',chunk=>text+=chunk);process.stdin.on('end',()=>{const input=JSON.parse(text);process.stdout.write(JSON.stringify(require('/app/dist/modules/scale/scale-scoring.js').scoreScale(input.definition,input.answers)))})"],
     {input:JSON.stringify({definition:source.compiledDefinition,answers:{content:1,attention:'1',social:1}}),encoding:'utf8',timeout:15000,maxBuffer:1024*1024}))

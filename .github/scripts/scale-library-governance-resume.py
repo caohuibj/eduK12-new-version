@@ -1,5 +1,5 @@
 """One fixed failed-run continuation: original frontend image bytes, not a rebuild."""
-import hashlib, importlib.util, json, os, subprocess, sys
+import hashlib, importlib.util, json, os, re, subprocess, sys
 from pathlib import Path
 spec=importlib.util.spec_from_file_location('original',Path(__file__).with_name('scale-authoring-reuse.py'))
 r=importlib.util.module_from_spec(spec);spec.loader.exec_module(r)
@@ -98,7 +98,8 @@ def round3_official(component,read=r.api):
     assert job['conclusion']==('failure' if component=='postgres' else 'success')
 def round3_closure():
     assert git('diff','--name-only',ROUND3['head'],'HEAD','--','server-version/frontend')==''
-    assert sorted(git('diff','--name-only',ROUND3['head'],'HEAD','--','server-version/backend').splitlines())==SQL_REPAIRS
+    assert sorted(git('diff','--name-only',ROUND3['head'],'HEAD','--','server-version/backend').splitlines())==sorted(SQL_REPAIRS+[FIXTURE_PATH])
+    fixture_diagnostics_only(ROUND3['head'])
     closure() # Original frontend compile/tool/environment closure is also retained.
     original=json.loads(git('show',ROUND3['head']+':.github/scripts/scale-library-governance-bindings.json'))
     for component in ['backend','frontend','postgres']:
@@ -143,11 +144,66 @@ def qualified_frontend():
     directory=round3_accept('frontend');restore()
     receipt=Path('scale-library-governance-evidence/frontend/frontend-resume.json');data=json.loads(receipt.read_text());data['newChecksRequired']=[];data['qualificationRun']=ROUND3['run'];data['qualificationJob']=ROUND3['jobs']['frontend'];receipt.write_text(json.dumps(data,indent=2)+'\n')
 
+ROUND4={'run': 39616852296, 'head': 'e74783c4a8baffa7b999b49182bd697018825bc7', 'checkout': 'c2c383fd4f61d09b91d61ae16eaec9f5c7c0db22', 'jobs': {'backend': 119280244137, 'connected': 119282119128, 'sast': 119280242999}, 'artifacts': {'backend': [12353556421, 'scale-library-governance-backend-reports-c2c383fd4f61d09b91d61ae16eaec9f5c7c0db22', 923893, 'a91e142c5ed9ea30d0a39710f2ddc9fdc78864d17df3d1ed467ee3e5f37033ca'], 'connected': [12353556809, 'scale-library-governance-connected-c2c383fd4f61d09b91d61ae16eaec9f5c7c0db22', 121472, '06636b47c081383981acda374e15ba05e997080e7061ecb749c8585fff0b0662'], 'images': [12352902574, 'scale-library-governance-backend-images-c2c383fd4f61d09b91d61ae16eaec9f5c7c0db22', 811175079, '7a3a87f4a0e128290d5546885bfb7a0ee682e8b77d27b25ec3b6f12a33bcb165']}, 'archive': '5dd226d615c9caf52a3c3b849d28a8cf9ab6c18ececde76167dec04906282c29', 'images': [{'id': 'sha256:ee6b31bf7cbf0258f62f6f59e89e5a80be5cbd72550baebef55f5cff8129badf', 'tags': ['scale-library-governance-backend-builder:c2c383fd4f61d09b91d61ae16eaec9f5c7c0db22'], 'revision': 'c2c383fd4f61d09b91d61ae16eaec9f5c7c0db22'}, {'id': 'sha256:95e989c026a2405dffc56f47c2ee78c2b648f67a447e179051faed60be161a0d', 'tags': ['scale-library-governance-backend-runtime:c2c383fd4f61d09b91d61ae16eaec9f5c7c0db22'], 'revision': 'c2c383fd4f61d09b91d61ae16eaec9f5c7c0db22'}]}
+FIXTURE_PATH='server-version/backend/scripts/scale-library-governance-browser-fixture.ts'
+def fixture_diagnostics_only(original):
+    old=git('show',original+':'+FIXTURE_PATH);current=Path(FIXTURE_PATH).read_text()
+    def business(text):
+        text=text.split('// Do not serialize Error.message',1)[0].split('main().catch(',1)[0]
+        return '\n'.join(line for line in text.splitlines() if not re.match(r"\s*phase = '[a-z-]+'",line)).strip()
+    assert business(old)==business(current),'Fixture business input changed, not a diagnostic-only continuation'
+def round4_closure():
+    assert git('diff','--name-only',ROUND4['head'],'HEAD','--','server-version/frontend')==''
+    assert git('diff','--name-only',ROUND4['head'],'HEAD','--','server-version/backend').splitlines()==[FIXTURE_PATH]
+    fixture_diagnostics_only(ROUND4['head'])
+    for path in ['.github/scripts/scale-library-governance-recovery.py','.github/scripts/scale-library-governance-build.sh','server-version/backend/scripts/scale-library-governance-legacy-fixture.sql']:
+        assert git('show',ROUND4['head']+':'+path)==Path(path).read_text().strip()
+    closure()
+def round4_official(kind,read=r.api):
+    run=read('runs/'+str(ROUND4['run']));assert run['id']==ROUND4['run'] and run['head_sha']==ROUND4['head'] and run['run_attempt']==1 and run['status']=='completed' and run['conclusion']=='failure'
+    job=read('jobs/'+str(ROUND4['jobs'][kind]));assert job['id']==ROUND4['jobs'][kind] and job['run_id']==ROUND4['run'] and job['head_sha']==ROUND4['head'] and job['run_attempt']==1 and job['status']=='completed'
+    assert job['conclusion']==('failure' if kind=='connected' else 'success')
+    if kind=='connected':
+        for name in ['upgrade only the synthetic old schema and preserve legacy bytes','real governance PostgreSQL contracts and concurrency','limited synthetic new-schema dump and restore']:
+            steps=[s for s in job['steps'] if s['name']==name];assert len(steps)==1 and steps[0]['conclusion']=='success'
+        steps=[s for s in job['steps'] if s['name']=='synthetic accounts and real administrator enrollment ticket, never sessions'];assert len(steps)==1 and steps[0]['conclusion']=='failure'
+def round4_evidence():
+    round4_closure();round4_official('backend');round4_official('connected')
+    root=Path('scale-library-governance-evidence/prior-round4');root.mkdir(parents=True,exist_ok=True)
+    r.RUN,r.SOURCE=ROUND4['run'],ROUND4['head']
+    for kind in ['backend','connected']:
+        r.ARTIFACTS['governanceRound4']=tuple(ROUND4['artifacts'][kind]);r.download('governanceRound4',root/kind)
+    original=json.loads(git('show',ROUND4['head']+':.github/scripts/scale-library-governance-bindings.json'))
+    connected=root/'connected';report=json.loads((connected/'postgres/postgres-tests.json').read_text());passed_suites(report,original['tests']['postgres'],29,True)
+    inherited=json.loads((connected/'postgres/round3-accepted.json').read_text());assert inherited['sourceRun']==ROUND3['run'] and inherited['status']=='ACCEPTED_PRIOR_SUCCESS' and inherited['suites']==[{'file':'src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts','passed':13}]
+    migration=json.loads((connected/'postgres/migration.json').read_text());assert migration['status']=='PASS' and migration['legacyPublishedPublicPreserved'] is True and migration['lineageNotInvented'] is True
+    restored=json.loads((connected/'postgres/restore.json').read_text());assert restored['status']=='PASS' and restored['productionRecoveryClaim'] is False and len(restored['tables'])==16 and all(t['count']>0 and re.fullmatch('[a-f0-9]{32}',t['digest']) for t in restored['tables'].values())
+    cleanup=json.loads((connected/'cleanup.json').read_text());assert cleanup['exitStatus']==0 and cleanup['privateMaterialRemoved'] is True
+    scan=json.loads((root/'backend/runtime-scan.json').read_text());runtime=next(i for i in ROUND4['images'] if any('-runtime:' in t for t in i['tags']))
+    assert scan['Metadata']['ImageID']==runtime['id'] and scan['ArtifactName'] in runtime['tags']
+    assert not [v for result in scan.get('Results',[]) for v in result.get('Vulnerabilities',[]) if v.get('Severity') in ['HIGH','CRITICAL']]
+    prior=json.loads((root/'backend/round3-accepted.json').read_text());assert prior['sourceRun']==ROUND3['run'] and prior['status']=='ACCEPTED_PRIOR_SUCCESS' and sum(s['passed'] for s in prior['suites'])==162
+    out={'status':'ACCEPTED_PRIOR_QUALIFICATION','sourceRun':ROUND4['run'],'sourceHead':ROUND4['head'],'sourceJobs':ROUND4['jobs'],'originalRunConclusion':'failure','originalConnectedConclusion':'failure','postgresPassed':29,'instrumentFinalInherited':13,'migration':'PASS','syntheticRestore':'PASS','productionRecoveryClaim':False,'backendScan':'PASS','currentFixtureSha256':hashlib.sha256(Path(FIXTURE_PATH).read_bytes()).hexdigest(),'backendOriginalRevision':ROUND4['checkout'],'newBuildOrQualificationPerformed':False}
+    (Path('scale-library-governance-evidence')/'round4-accepted.json').write_text(json.dumps(out,indent=2)+'\n');print(json.dumps(out));return root
+
+def round4_backend_restore():
+    root=round4_evidence();r.RUN,r.SOURCE=ROUND4['run'],ROUND4['head'];r.ARTIFACTS['governanceRound4Images']=tuple(ROUND4['artifacts']['images'])
+    archive=Path('scale-library-governance-images/backend');r.download('governanceRound4Images',archive)
+    image=archive/'images.tar.gz';assert hashlib.file_digest(image.open('rb'),'sha256').hexdigest()==ROUND4['archive']
+    assert (root/'backend/images.sha256').read_text().split()[0]==ROUND4['archive']
+    subprocess.run(['docker','load','-i',str(image)],check=True)
+    for expected in ROUND4['images']:
+        tag=expected['tags'][0];actual=json.loads(subprocess.check_output(['docker','image','inspect',tag],text=True))[0]
+        assert actual['Id']==expected['id'] and tag in actual['RepoTags'] and actual['Config']['Labels']['org.opencontainers.image.revision']==expected['revision']==ROUND4['checkout']
+    with open(os.environ['GITHUB_ENV'],'a') as out:out.write('SCALE_GOVERNANCE_BACKEND_IMAGE_HEAD='+ROUND4['checkout']+'\n')
+
 if __name__=='__main__':
     if sys.argv[1:] == ['frontend']:restore()
     elif len(sys.argv)==3 and sys.argv[1]=='contracts' and sys.argv[2] in ['backend','frontend']:prior_contracts(sys.argv[2])
     elif sys.argv[1:]==['qualified-frontend']:qualified_frontend()
     elif len(sys.argv)==3 and sys.argv[1]=='round3' and sys.argv[2] in ['backend','postgres']:round3_accept(sys.argv[2])
+    elif sys.argv[1:]==['round4-evidence']:round4_evidence()
+    elif sys.argv[1:]==['round4-backend']:round4_backend_restore()
     elif sys.argv[1:]==['sast']:
-        round3_official('sast');out=Path('scale-library-governance-prior-sast.json');out.write_text(json.dumps({'sourceRun':ROUND3['run'],'sourceHead':ROUND3['head'],'sourceJob':ROUND3['jobs']['sast'],'status':'ANALYSIS_COMPLETED_PRIOR','zeroFindingsClaim':False}));print(out.read_text())
+        round4_official('sast');out=Path('scale-library-governance-prior-sast.json');out.write_text(json.dumps({'sourceRun':ROUND4['run'],'sourceHead':ROUND4['head'],'sourceJob':ROUND4['jobs']['sast'],'status':'ANALYSIS_COMPLETED_PRIOR','zeroFindingsClaim':False}));print(out.read_text())
     else:raise ValueError('Only this fixed frontend continuation or original SAST completion is supported')

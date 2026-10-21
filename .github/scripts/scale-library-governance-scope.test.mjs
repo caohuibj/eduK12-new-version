@@ -24,9 +24,9 @@ test('all selected actual jobs must succeed, with no application/full fallback',
 });
 test('same-builder checks, real PG recovery, isolated media and private cleanup remain required',()=>{
  const w=readFileSync(new URL('../workflows/ci-scale-library-governance.yml',import.meta.url),'utf8');
- assert.match(w,/scale-library-governance-build.sh/);assert.match(w,/--severity HIGH,CRITICAL/);
- assert.match(w,/recovery.py bootstrap/);assert.match(w,/recovery.py restore/);
- assert.match(w,/backend.sh once node .*checks.mjs.* postgres/);
+ assert.match(w,/resume.py round4-evidence/);assert.match(w,/resume.py round4-backend/);
+ assert.doesNotMatch(w,/scale-library-governance-build.sh|checks.mjs.* postgres|recovery.py (?:bootstrap|restore)/);
+ assert.match(w,/npx prisma migrate deploy/);
  assert.match(w,/backend.sh worker/);assert.match(w,/NET_BIND_SERVICE/);
  assert.doesNotMatch(w,/ignoreHTTPSErrors|--ignore-certificate-errors|\/etc\/hosts|update-ca-certificates/);
  assert.match(w,/if: always\(\)/);assert.match(w,/privateMaterialRemoved/);
@@ -68,15 +68,14 @@ test('browser admission refuses missing checkpoints, media bytes, wrong provenan
  assert.throws(()=>verifyGovernanceBrowserReport(r,{...options,read:()=>Buffer.from('not PNG')}));
 });
 
-test('SQL repair continuation compiles only backend and accepts frontend without repeating qualification',()=>{
+test('diagnostic continuation restores exact images and never repeats successful qualification',()=>{
  const w=readFileSync(new URL('../workflows/ci-scale-library-governance.yml',import.meta.url),'utf8');
- assert.match(w,/component: \[backend\]/);assert.doesNotMatch(w,/component: \[backend, frontend\]/);
- assert.match(w,/scale-library-governance-build.sh backend/);
- assert.match(w,/resume.py qualified-frontend/);assert.match(w,/resume.py round3 backend/);assert.match(w,/resume.py round3 postgres/);
- assert.doesNotMatch(w,/checks.mjs.*(?:backend|frontend)/);
+ assert.doesNotMatch(w,/docker build|setup-buildx|setup-trivy|component: \[|checks.mjs/);
+ assert.match(w,/resume.py qualified-frontend/);assert.match(w,/resume.py round4-evidence/);assert.match(w,/resume.py round4-backend/);
+ assert.match(w,/SCALE_GOVERNANCE_BACKEND_IMAGE_HEAD/);
  const reuse=readFileSync(new URL('./scale-library-governance-resume.py',import.meta.url),'utf8');
  assert.doesNotMatch(reuse,/docker['", ]+build|npm ci|docker['", ]+tag/);
- assert.match(reuse,/org.opencontainers.image.revision/);assert.match(reuse,/originalJobConclusion.*failure/);
+ assert.match(reuse,/fixture_diagnostics_only/);assert.match(reuse,/org.opencontainers.image.revision/);
 });
 
 test('official continuation requires the exact failed producer and successful build step',async()=>{
@@ -143,4 +142,14 @@ for kind in ['suite','assertion','missing','pending']:
  except (AssertionError,KeyError):pass
  else:raise AssertionError('invalid success accepted: '+kind)
 `],{stdio:'pipe'});
+});
+
+test('fixture safe diagnostics retain error class and location without sensitive values',async()=>{
+ const vm=await import('node:vm');
+ const source=readFileSync(new URL('../../server-version/backend/scripts/scale-library-governance-browser-fixture.ts',import.meta.url),'utf8');
+ const fn=source.slice(source.indexOf('function safeFixtureDiagnostic('),source.indexOf('main().catch('));
+ const safe=vm.runInNewContext(fn+';safeFixtureDiagnostic',{phase:'create-synthetic-survey-account'});
+ const error={name:'PrismaClientValidationError',code:'P2002',message:'password=DO_NOT_PRINT',meta:{query:'secret'},stack:'Error: secret\n    at main (/private/scale-library-governance-browser-fixture.ts:44:9)'};
+ const result=safe(error);assert.equal(result.errorName,'PrismaClientValidationError');assert.equal(result.errorCode,'P2002');assert.equal(result.frames[0].line,44);
+ assert.doesNotMatch(JSON.stringify(result),/DO_NOT_PRINT|secret|password|\/private/);
 });

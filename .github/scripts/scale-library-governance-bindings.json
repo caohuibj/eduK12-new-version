@@ -16,7 +16,7 @@
     },
     "server-version/backend/scripts/scale-library-governance-browser-fixture.ts": {
       "before": null,
-      "after": "5e45515aabab52730bba9e6b639526f8864737da"
+      "after": "bc24e6cb636e8992dd3322d25d68355d915185bb"
     },
     "server-version/backend/scripts/scale-library-governance-legacy-fixture.sql": {
       "before": null,
@@ -424,7 +424,7 @@
     },
     "server-version/e2e/scale-library-governance-browser.cjs": {
       "before": null,
-      "after": "50b694556c9fa212c745a49384d08b19c5dabd76"
+      "after": "be9c70952c1f8fb42a7ab2a99e361a36aebfc434"
     },
     "server-version/e2e/scale-library-governance-proxy.cjs": {
       "before": null,
@@ -650,15 +650,11 @@
   "tests": {
     "backend": [],
     "frontend": [],
-    "postgres": [
-      "src/__tests__/scale-library-governance/governance.postgres.integration.test.ts",
-      "src/__tests__/scale-library-governance/media.postgres.integration.test.ts",
-      "src/__tests__/scale/scale-copy.postgres.integration.test.ts"
-    ]
+    "postgres": []
   },
   "frontendLint": [],
   "browserProfileTrustApproved": true,
-  "productReference": "b1375c10c62a8986dede0ccbe9d67f14bc2d7d6f",
+  "productReference": "20d983dff99b7163146376001b30ee59583f6734",
   "priorContracts": {
     "run": 39610102026,
     "head": "0152447ae08beefc04ffffa9601dd33295d3c33e",

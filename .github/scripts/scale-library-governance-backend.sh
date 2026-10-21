@@ -18,8 +18,8 @@ p=Path(os.environ['GOVERNANCE_CONTAINER_ENV']);p.write_text(''.join(k+'='+v+'\n'
 PY
 common=(--network host --user "$(id -u):$(id -g)" --env HOME=/tmp --env-file "$GOVERNANCE_CONTAINER_ENV" -v "$private:$private" -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro")
 case "$mode" in
-  serve) docker run -d --name scale-library-governance-api "${common[@]}" "scale-library-governance-backend-runtime:$GITHUB_SHA";;
-  worker) docker run -d --name scale-library-governance-worker --cpus=1 --memory=1g "${common[@]}" "scale-library-governance-backend-runtime:$GITHUB_SHA" node dist/workers/main.js;;
-  once) docker run --rm "${common[@]}" -v "$GITHUB_ENV:$GITHUB_ENV" -v "$GITHUB_WORKSPACE/scale-library-governance-evidence:$GITHUB_WORKSPACE/scale-library-governance-evidence" "scale-library-governance-backend-builder:$GITHUB_SHA" "$@";;
+  serve) docker run -d --name scale-library-governance-api "${common[@]}" "scale-library-governance-backend-runtime:${SCALE_GOVERNANCE_BACKEND_IMAGE_HEAD:-$GITHUB_SHA}";;
+  worker) docker run -d --name scale-library-governance-worker --cpus=1 --memory=1g "${common[@]}" "scale-library-governance-backend-runtime:${SCALE_GOVERNANCE_BACKEND_IMAGE_HEAD:-$GITHUB_SHA}" node dist/workers/main.js;;
+  once) docker run --rm "${common[@]}" -v "$GITHUB_ENV:$GITHUB_ENV" -v "$GITHUB_WORKSPACE/scale-library-governance-evidence:$GITHUB_WORKSPACE/scale-library-governance-evidence" "scale-library-governance-backend-builder:${SCALE_GOVERNANCE_BACKEND_IMAGE_HEAD:-$GITHUB_SHA}" "$@";;
   *) echo 'Explicit once/serve/worker mode required' >&2; exit 2;;
 esac

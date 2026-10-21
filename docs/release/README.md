@@ -650,3 +650,14 @@ from their original runs. The ordinary instrument FINAL PostgreSQL suite's 13
 passing assertions do not execute either changed SQL path; only the three failed
 PG suites run again. Migration upgrade/legacy-byte validation uses the new SQL;
 nonempty recovery and the two browser journeys still require actual execution.
+
+Run 39616852296 passed the repaired 29 PostgreSQL assertions, exact legacy
+upgrade checks and nonempty synthetic restore; its failed account-fixture step
+is not relabeled successful. A diagnostic-only continuation restores both
+original scanned images and runs only fresh browser-database preparation and
+previously unexecuted fixture/browser work. The checkout fixture's current SHA
+and the old backend image revision are recorded separately. Error reporting
+retains safe class/code/phase and basename/line frames, never raw messages,
+Prisma metadata, bootstrap output, credentials or private stderr. The fixture's
+business statements are compared unchanged after removing phase markers and its
+error-handler-only diagnostic tail. Image labels are never rewritten.

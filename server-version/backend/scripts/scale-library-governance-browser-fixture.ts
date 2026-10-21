@@ -22,7 +22,9 @@ async function main() {
   assert(['localhost', '127.0.0.1'].includes(db.hostname))
   assert.equal(db.pathname, '/governance_browser', 'Only the disposable CI service database is permitted')
   const backend = path.resolve(process.env.SCALE_GOVERNANCE_BACKEND_ROOT || path.join(__dirname, '..'))
+  phase = 'load-candidate-database-module'
   const { prisma } = require(path.join(backend, 'dist/config/database.js'))
+  phase = 'load-candidate-password-module'
   const { hashPassword } = require(path.join(backend, 'dist/utils/password.js'))
   assert.match(process.env.SURVEY_MFA_ENCRYPTION_KEY || '', /^[a-f0-9]{64}$/i)
   const runId = randomUUID().slice(0, 8)
@@ -36,9 +38,11 @@ async function main() {
     phase = 'fresh-database-and-synthetic-accounts'
     assert.equal(await prisma.user.count(), 0, 'Fresh disposable database required')
     for (const [account, role, accountDomain] of [[teacher, 'TEACHER', 'TRAINING'], [student, 'STUDENT', 'TRAINING'], [researcher, 'STUDENT', 'SURVEY']]) {
+      phase = 'create-synthetic-' + role.toLowerCase() + '-' + accountDomain.toLowerCase()
       const user = await prisma.user.create({ data: { username: account.username, passwordHash: await hashPassword(account.password), role, accountDomain, teacherApproved: true } })
       account.id = user.id
     }
+    phase = 'create-synthetic-survey-account'
     await prisma.surveyAccount.create({ data: { userId: researcher.id, loginName: researcher.username, normalizedLogin: researcher.username } })
     // Only synthetic account authority is seeded; approvals/releases/grants must use real product actions.
     phase = 'real-administrator-enrollment-bootstrap'
@@ -52,8 +56,10 @@ async function main() {
     administrator.id = admin.id
     administrator.enrollmentToken = JSON.parse(fs.readFileSync(handoff,'utf8')).enrollmentToken
     assert(administrator.enrollmentToken, 'Real one-use enrollment handoff required')
+    phase = 'create-synthetic-researcher-grant-and-mfa'
     await prisma.surveyResearcherGrant.create({ data: { userId: researcher.id, grantedBy: admin.id, status: 'ACTIVE' } })
     await prisma.surveyMfaCredential.create({ data: { userId: researcher.id, enabled: true, secretCipher, enabledAt: new Date() } })
+    phase = 'create-empty-synthetic-project-and-course'
     const project = await prisma.surveyProject.create({ data: { id: randomUUID(), ownerUserId: researcher.id, title: 'Synthetic scale authoring ' + runId, description: 'Disposable software acceptance only', collectionMode: 'SINGLE_UNLINKED' } })
     const course = await prisma.course.create({ data: { creatorId: teacher.id, title: 'Synthetic scale course', courseCode: 'SCALE' + runId, courseType: 'TRAINING_COURSE', status: 'PUBLISHED' } })
     await prisma.courseStudent.create({ data: { courseId: course.id, studentId: student.id, status: 'ACTIVE' } })
@@ -89,4 +95,16 @@ async function main() {
     console.log(JSON.stringify({ fixtureReady: true, runId, scope: 'synthetic accounts, enrolled MFA, empty project and course only' }))
   } finally { await prisma.$disconnect() }
 }
-main().catch(error => { console.error('Synthetic governance prerequisite failed:', error.name); console.error(JSON.stringify({phase,errorName:error.name,privateDetailsWithheld:true})); process.exitCode = 1 })
+// Do not serialize Error.message, Prisma.meta, subprocess output or configuration.
+// These diagnostics retain only code identity and script locations, never values.
+function safeFixtureDiagnostic(error) {
+  const name = typeof error?.name === 'string' && /^[A-Za-z][A-Za-z0-9]{0,70}Error$|^Error$/.test(error.name) ? error.name : 'UnknownError'
+  const rawCode = String(error?.code || '')
+  const code = /^(?:ERR_[A-Z_]{1,50}|MODULE_NOT_FOUND|P[0-9]{4}|E(?:ACCES|PERM|NOENT|PIPE|CONNREFUSED|TIMEDOUT)|[0-9]{2}[A-Z0-9]{3})$/.test(rawCode) ? rawCode : 'UNCLASSIFIED'
+  const frames = String(error?.stack || '').split('\n').slice(1).flatMap(line => {
+    const match = line.match(/(?:\/|^)([A-Za-z0-9_.-]+\.(?:[cm]?js|ts)):(\d+):(\d+)\)?$/)
+    return match ? [{ file: match[1], line: Number(match[2]), column: Number(match[3]) }] : []
+  }).slice(0, 6)
+  return { schemaVersion: 1, phase, errorName: name, errorCode: code, frames, privateDetailsWithheld: true }
+}
+main().catch(error => { console.error('GOVERNANCE_FIXTURE_DIAGNOSTIC ' + JSON.stringify(safeFixtureDiagnostic(error))); process.exitCode = 1 })
