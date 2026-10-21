@@ -1,3 +1,4 @@
+import {readLibraryScaleMeasurementSource} from '../scale-library-governance/training-source'
 import { Prisma, type Scale } from '@prisma/client'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { mapAuthorizationRowToDomain } from '../assessment-authorization/repository'
@@ -28,6 +29,7 @@ export async function readManagedScaleSourceRights(tx: Prisma.TransactionClient,
 /** Read-only source admission, not conversion/publication. Existing attempts do
  * not call it: they keep their frozen identities and their current data access. */
 export async function readPublishedScaleMeasurementSource(tx: Prisma.TransactionClient, scale: Scale, releases?: ReadonlyMap<string, StoredRelease>) {
+  if(scale.libraryEntryId)return readLibraryScaleMeasurementSource(tx,scale)
   if (!scale.measurementReleaseId) fail('EXPLICIT_CONVERSION_REQUIRED')
   if (scale.status !== 'PUBLISHED') fail('NOT_PUBLISHED')
   const definition = frozenDatabaseScaleDefinition(scale)

@@ -10,6 +10,7 @@ import { canUseScale, SCALE_USE_AUTHORIZATION_SELECT } from '../../services/mate
 
 const fullScale = { id: 'frozen-scale', creatorId: 'scale-owner', status: 'PUBLISHED', name: 'Unneeded display name' }
 const transaction = (grant: unknown = null) => ({
+  $queryRaw: vi.fn().mockResolvedValue([]),
   scale: { findUnique: vi.fn(async ({ select }: { where: { id: string }; select: Record<string, boolean> }) => Object.fromEntries(
     Object.entries(select).filter(([, enabled]) => enabled).map(([key]) => [key, fullScale[key as keyof typeof fullScale]]),
   )) },

@@ -233,6 +233,12 @@
     "survey_report_drafts": "RUNTIME_RW",
     "training_reference_requests": "RUNTIME_RW",
     "training_report_drafts": "RUNTIME_RW",
-    "training_interpretation_artifacts": "RUNTIME_RW"
+    "training_interpretation_artifacts": "RUNTIME_RW",
+    "scale_library_submissions": "RUNTIME_RW",
+    "scale_library_entries": "RUNTIME_RW",
+    "scale_library_use_grants": "RUNTIME_RW",
+    "scale_library_events": "RUNTIME_RW",
+    "scale_library_emergency_stops": "RUNTIME_RW",
+    "scale_library_media": "RUNTIME_RW"
   }
 }

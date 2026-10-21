@@ -9,6 +9,11 @@ datasource db {
 }
 
 model User {
+  scaleLibrarySubmissions ScaleLibrarySubmission[]
+  scaleLibraryReceivedGrants ScaleLibraryUseGrant[] @relation("LibraryGrantRecipient")
+  scaleLibraryIssuedGrants ScaleLibraryUseGrant[] @relation("LibraryGrantIssuer")
+  scaleLibraryEvents ScaleLibraryEvent[]
+  scaleLibraryEmergencyStops ScaleLibraryEmergencyStop[]
   trainingReportDrafts TrainingReportDraft[]
   surveyReferenceRequests SurveyReferenceRequest[]
   contentCapabilityGrants       ContentCapabilityGrant[] @relation("ContentCapabilitySubject")
@@ -714,6 +719,7 @@ enum CognitiveConfigAccessPolicy {
 }
 
 model MaterialGrant {
+  legacyScaleGrant Boolean @default(false) @map("legacy_scale_grant")
   id           String               @id @default(uuid())
   teacherId    String               @map("teacher_id")
   resourceType MaterialResourceType @map("resource_type")
@@ -731,6 +737,17 @@ model MaterialGrant {
 
 // 量表表
 model Scale {
+  libraryEntryId String? @unique @map("library_entry_id")
+  libraryEntry ScaleLibraryEntry? @relation(fields:[libraryEntryId],references:[id],onDelete:Restrict)
+  publicDistributionGrantId String? @map("public_distribution_grant_id")
+  publicDistributionGrant ContentCapabilityGrant? @relation(fields:[publicDistributionGrantId],references:[id],onDelete:Restrict)
+  legacyPublicAccess Boolean @default(false) @map("legacy_public_access")
+  authoringFamilyId String? @map("authoring_family_id")
+  authoringVersion Int? @map("authoring_version")
+  sourceScaleId String? @map("source_scale_id")
+  authoringSource Scale? @relation("ScaleAuthoringSource",fields:[sourceScaleId],references:[id],onDelete:Restrict)
+  authoringDescendants Scale[] @relation("ScaleAuthoringSource")
+
   measurementReleaseId String? @map("measurement_release_id")
   measurementRelease MeasurementContentRelease? @relation(fields:[measurementReleaseId],references:[id],onDelete:Restrict,onUpdate:NoAction,map:"scales_measurement_release_fkey")
   publicationAudits ScalePublicationAudit[]
@@ -765,6 +782,7 @@ model Scale {
   // 综合测评模块关联
   compositeItems      CompositeAssessmentItem[] @relation("CompositeAssessmentScale")
 
+  @@unique([authoringFamilyId,authoringVersion],map:"scales_authoring_family_version_key")
   @@map("scales")
   @@index([creatorId, createdAt(sort: Desc), id(sort: Desc)])
   @@index([tags], type: Gin)
@@ -1576,6 +1594,7 @@ model Document {
 // ==================== 统一文件资产 ====================
 
 model StoredAsset {
+ scaleLibraryMedia ScaleLibraryMedia[]
   id           String    @id @default(uuid())
   objectKey    String    @unique @map("object_key")
   storageObjectKey String? @map("storage_object_key")
@@ -2955,6 +2974,16 @@ model SurveyEvent {
 // Project-scoped research-only authoring. Freezing occurs in PR3; never
 // grant access to the legacy scale/SJT publication registry through this row.
 model SurveyInstrumentDraft {
+  revisionSourceReleaseId String? @map("revision_source_release_id")
+  revisionSourceRelease MeasurementContentRelease? @relation("SurveyRevisionSource",fields:[revisionSourceReleaseId],references:[id],onDelete:Restrict)
+  authoringFamilyId String? @map("authoring_family_id")
+  authoringVersion Int? @map("authoring_version")
+  sourceDraftId String? @map("source_draft_id")
+  authoringSource SurveyInstrumentDraft? @relation("SurveyAuthoringSource",fields:[sourceDraftId],references:[id],onDelete:Restrict)
+  authoringDescendants SurveyInstrumentDraft[] @relation("SurveyAuthoringSource")
+  measurementReleaseId String? @map("measurement_release_id")
+  currentMeasurementRelease MeasurementContentRelease? @relation("SurveyDraftMeasurement",fields:[measurementReleaseId],references:[id],onDelete:Restrict)
+
   catalogGrantId String? @map("catalog_grant_id")
   id           String        @id
   projectId    String        @map("project_id")
@@ -2969,6 +2998,7 @@ model SurveyInstrumentDraft {
   updatedAt    DateTime      @default(now()) @map("updated_at") @db.Timestamptz(6)
   @@unique([projectId, instrumentKey], map:"survey_instruments_project_key_uniq")
   @@index([projectId, status, updatedAt, id], map:"survey_instruments_project_status_idx")
+  @@unique([authoringFamilyId,authoringVersion],map:"survey_authoring_family_version_key")
   @@map("survey_instrument_drafts")
 }
 
@@ -3995,6 +4025,10 @@ model TrainingAttemptCheckpoint {
 
 // Three independently versioned content layers; no personal answer data.
 model MeasurementContentRelease {
+  surveyAuthoringDrafts SurveyInstrumentDraft[] @relation("SurveyDraftMeasurement")
+  surveyRevisionDrafts SurveyInstrumentDraft[] @relation("SurveyRevisionSource")
+  scaleLibrarySubmissions ScaleLibrarySubmission[]
+  scaleLibraryEntries ScaleLibraryEntry[]
   cognitiveAssignments CognitiveAssignment[]
   trainingReportDrafts TrainingReportDraft[]
   surveyReportDrafts SurveyReportDraft[]
@@ -4087,6 +4121,8 @@ model SurveyReportDraft {
 }
 
 model ContentCapabilityGrant {
+  publicScaleDistributions Scale[]
+  scaleLibraryUseGrants ScaleLibraryUseGrant[]
   id                       String   @id
   subjectId                String   @map("subject_id")
   issuerId                 String   @map("issuer_id")
@@ -4211,4 +4247,102 @@ model TrainingInterpretationArtifact {
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   @@index([attemptId,createdAt,id],map:"training_interpretation_artifacts_attempt_time_idx")
   @@map("training_interpretation_artifacts")
+}
+
+// Exact approved content only. No participant answers or data access grants.
+model ScaleLibrarySubmission {
+ id String @id
+ releaseId String @map("release_id")
+ release MeasurementContentRelease @relation(fields:[releaseId],references:[id],onDelete:Restrict)
+ product String
+ sourceId String @map("source_id")
+ authorId String @map("author_id")
+ author User @relation(fields:[authorId],references:[id],onDelete:Restrict)
+ metadata Json
+ dependencyReleaseIds String[] @default([]) @map("dependency_release_ids")
+ snapshot Json
+ snapshotHash String @map("snapshot_hash")
+ status String @default("SUBMITTED")
+ version Int @default(1)
+ reason String?
+ createdAt DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
+ updatedAt DateTime @default(now()) @db.Timestamptz(6) @map("updated_at")
+ entry ScaleLibraryEntry?
+ events ScaleLibraryEvent[]
+ @@index([authorId,createdAt(sort:Desc),id],map:"scale_library_submission_author")
+ @@map("scale_library_submissions")
+}
+model ScaleLibraryEntry {
+ trainingWrapper Scale?
+ media ScaleLibraryMedia[]
+ id String @id
+ submissionId String @unique @map("submission_id")
+ submission ScaleLibrarySubmission @relation(fields:[submissionId],references:[id],onDelete:Restrict)
+ releaseId String @unique @map("release_id")
+ release MeasurementContentRelease @relation(fields:[releaseId],references:[id],onDelete:Restrict)
+ status String @default("ACTIVE")
+ version Int @default(1)
+ reason String?
+ createdAt DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
+ updatedAt DateTime @default(now()) @db.Timestamptz(6) @map("updated_at")
+ grants ScaleLibraryUseGrant[]
+ events ScaleLibraryEvent[]
+ @@map("scale_library_entries")
+}
+model ScaleLibraryUseGrant {
+ id String @id
+ entryId String @map("entry_id")
+ entry ScaleLibraryEntry @relation(fields:[entryId],references:[id],onDelete:Restrict)
+ userId String @map("user_id")
+ user User @relation("LibraryGrantRecipient",fields:[userId],references:[id],onDelete:Restrict)
+ product String
+ issuerId String @map("issuer_id")
+ issuer User @relation("LibraryGrantIssuer",fields:[issuerId],references:[id],onDelete:Restrict)
+ authorityGrantId String? @map("authority_grant_id")
+ authorityGrant ContentCapabilityGrant? @relation(fields:[authorityGrantId],references:[id],onDelete:Restrict)
+ materialGrantId String? @map("material_grant_id")
+ surveyToolGrantId String? @map("survey_tool_grant_id")
+ status String @default("ACTIVE")
+ version Int @default(1)
+ reason String?
+ createdAt DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
+ revokedAt DateTime? @db.Timestamptz(6) @map("revoked_at")
+ @@map("scale_library_use_grants")
+}
+model ScaleLibraryEvent {
+ id String @id
+ submissionId String? @map("submission_id")
+ submission ScaleLibrarySubmission? @relation(fields:[submissionId],references:[id],onDelete:Restrict)
+ entryId String? @map("entry_id")
+ entry ScaleLibraryEntry? @relation(fields:[entryId],references:[id],onDelete:Restrict)
+ actorId String @map("actor_id")
+ actor User @relation(fields:[actorId],references:[id],onDelete:Restrict)
+ action String
+ reason String
+ details Json @default("{}")
+ createdAt DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
+ @@map("scale_library_events")
+}
+model ScaleLibraryEmergencyStop {
+ targetKind String @map("target_kind")
+ targetId String @map("target_id")
+ actorId String @map("actor_id")
+ actor User @relation(fields:[actorId],references:[id],onDelete:Restrict)
+ reason String
+ createdAt DateTime @default(now()) @db.Timestamptz(6) @map("created_at")
+ @@id([targetKind,targetId])
+ @@map("scale_library_emergency_stops")
+}
+
+model ScaleLibraryMedia {
+ id String @id @db.Uuid
+ entryId String @map("entry_id")
+ entry ScaleLibraryEntry @relation(fields:[entryId],references:[id],onDelete:Restrict)
+ assetId String @map("asset_id")
+ asset StoredAsset @relation(fields:[assetId],references:[id],onDelete:Restrict)
+ manifestHash String @map("manifest_hash")
+ identity Json
+ state String @default("READY")
+ @@unique([entryId,assetId])
+ @@map("scale_library_media")
 }
