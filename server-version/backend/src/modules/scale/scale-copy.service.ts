@@ -70,8 +70,9 @@ export const copyScaleToDraft = async (sourceId: string, userId: string, mode: '
   const definition = validation.definition
   if (source.definitionHash !== hashScaleDefinition(definition)) throw new ScaleCopyError('来源定义摘要不一致，不能复制。')
   const familyId = mode === 'REVISION' ? source.authoringFamilyId ?? source.id : randomUUID()
-  // Serialize sibling revision allocation on the original family root.
-  await tx.$queryRaw`SELECT pg_advisory_xact_lock(hashtext(${"scale-authoring-family:" + familyId}))`
+  // Serialize sibling revision allocation on the original family root. Return
+  // an integer, not the lock function's PostgreSQL void (unsupported by Prisma).
+  await tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtext(${"scale-authoring-family:" + familyId}))`
   const latest = mode === 'REVISION' ? await tx.scale.aggregate({ where: { authoringFamilyId: familyId }, _max: { authoringVersion: true } }) : null
   const authoringVersion = mode === 'REVISION' ? Math.max(source.authoringVersion ?? 1, latest?._max.authoringVersion ?? 1) + 1 : 1
   if (mode === 'REVISION' && !source.authoringFamilyId) await tx.scale.update({ where: { id: source.id }, data: { authoringFamilyId: familyId, authoringVersion: 1 } })

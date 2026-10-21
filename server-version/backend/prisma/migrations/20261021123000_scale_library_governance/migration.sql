@@ -47,16 +47,23 @@ CREATE FUNCTION protect_scale_library_facts() RETURNS trigger LANGUAGE plpgsql A
 BEGIN
  IF TG_OP='DELETE' THEN RAISE EXCEPTION 'Scale library history is retained'; END IF;
  IF TG_TABLE_NAME IN ('scale_library_events','scale_library_emergency_stops','scale_library_media') THEN RAISE EXCEPTION 'Scale library events are append only'; END IF;
- IF TG_TABLE_NAME='scale_library_submissions' AND
-   (NEW.id,NEW.release_id,NEW.product,NEW.source_id,NEW.author_id,NEW.metadata,NEW.dependency_release_ids,NEW.snapshot,NEW.snapshot_hash,NEW.created_at)
-   IS DISTINCT FROM (OLD.id,OLD.release_id,OLD.product,OLD.source_id,OLD.author_id,OLD.metadata,OLD.dependency_release_ids,OLD.snapshot,OLD.snapshot_hash,OLD.created_at)
- THEN RAISE EXCEPTION 'Submitted release and metadata are immutable'; END IF;
- IF TG_TABLE_NAME='scale_library_entries' AND (NEW.id,NEW.submission_id,NEW.release_id,NEW.created_at)
-   IS DISTINCT FROM (OLD.id,OLD.submission_id,OLD.release_id,OLD.created_at)
- THEN RAISE EXCEPTION 'Approved entry identity is immutable'; END IF;
- IF TG_TABLE_NAME='scale_library_use_grants' AND (NEW.id,NEW.entry_id,NEW.user_id,NEW.product,NEW.issuer_id,NEW.authority_grant_id,NEW.material_grant_id,NEW.survey_tool_grant_id,NEW.created_at)
-   IS DISTINCT FROM (OLD.id,OLD.entry_id,OLD.user_id,OLD.product,OLD.issuer_id,OLD.authority_grant_id,OLD.material_grant_id,OLD.survey_tool_grant_id,OLD.created_at)
- THEN RAISE EXCEPTION 'Use grant scope is immutable'; END IF;
+ -- Dispatch before referencing table-specific record fields. SQL AND does not
+ -- protect heterogeneous NEW/OLD records from field resolution in PostgreSQL.
+ IF TG_TABLE_NAME='scale_library_submissions' THEN
+  IF (NEW.id,NEW.release_id,NEW.product,NEW.source_id,NEW.author_id,NEW.metadata,NEW.dependency_release_ids,NEW.snapshot,NEW.snapshot_hash,NEW.created_at)
+    IS DISTINCT FROM (OLD.id,OLD.release_id,OLD.product,OLD.source_id,OLD.author_id,OLD.metadata,OLD.dependency_release_ids,OLD.snapshot,OLD.snapshot_hash,OLD.created_at)
+  THEN RAISE EXCEPTION 'Submitted release and metadata are immutable'; END IF;
+ ELSIF TG_TABLE_NAME='scale_library_entries' THEN
+  IF (NEW.id,NEW.submission_id,NEW.release_id,NEW.created_at)
+    IS DISTINCT FROM (OLD.id,OLD.submission_id,OLD.release_id,OLD.created_at)
+  THEN RAISE EXCEPTION 'Approved entry identity is immutable'; END IF;
+ ELSIF TG_TABLE_NAME='scale_library_use_grants' THEN
+  IF (NEW.id,NEW.entry_id,NEW.user_id,NEW.product,NEW.issuer_id,NEW.authority_grant_id,NEW.material_grant_id,NEW.survey_tool_grant_id,NEW.created_at)
+    IS DISTINCT FROM (OLD.id,OLD.entry_id,OLD.user_id,OLD.product,OLD.issuer_id,OLD.authority_grant_id,OLD.material_grant_id,OLD.survey_tool_grant_id,OLD.created_at)
+  THEN RAISE EXCEPTION 'Use grant scope is immutable'; END IF;
+ ELSE
+  RAISE EXCEPTION 'Unsupported scale library history table';
+ END IF;
  IF NEW.status IS DISTINCT FROM OLD.status THEN
   IF NEW.version<>OLD.version+1 THEN RAISE EXCEPTION 'Scale library transition version must advance once'; END IF;
   IF TG_TABLE_NAME='scale_library_submissions' AND NOT (OLD.status='SUBMITTED' AND NEW.status IN ('WITHDRAWN','RETURNED','APPROVED')) THEN RAISE EXCEPTION 'Invalid application transition'; END IF;
