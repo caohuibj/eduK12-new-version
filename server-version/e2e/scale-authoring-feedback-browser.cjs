@@ -11,7 +11,7 @@ const path = require('node:path')
 const { createHmac } = require('node:crypto')
 const { chromium } = require(process.env.SCALE_AUTHORING_PLAYWRIGHT_MODULE || '../backend/node_modules/playwright-core')
 const REQUIRED = ['training-editor-native', 'training-stable-item-operations', 'training-quality-roundtrip', 'training-published', 'training-final-report-image', 'survey-editor-native', 'survey-quality-roundtrip', 'survey-published', 'survey-final-report-image', 'survey-raw-quality-export', 'desktop-mobile-layout']
-const evidence = { schemaVersion: 1, status: 'RUNNING', checks: [], screenshots: [], browserErrors: [], accessibility: [], computedStyles: [], blockedExternalRequests: 0, scope: 'Real Chromium, synthetic accounts, candidate built UI and real API/PostgreSQL; no physical-device timing claim' }
+const evidence = { schemaVersion: 1, status: 'RUNNING', checks: [], screenshots: [], browserErrors: [], accessibility: [], computedStyles: [], layoutChecks: [], blockedExternalRequests: 0, scope: 'Real Chromium, synthetic accounts, candidate built UI and real API/PostgreSQL; no physical-device timing claim' }
 let fixture, output, browser, activePage
 const phase = name => { evidence.phase = name; if (output) save() }
 const check = (name, condition) => { assert.ok(condition, name); evidence.checks.push(name) }
@@ -65,7 +65,8 @@ async function layout(page, name, scope) {
     await page.evaluate(() => document.fonts.ready)
     await page.waitForTimeout(150) // CSS/layout settlement only, never accelerate task timing.
     await capture(page, name, width)
-    assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false, name + ' overflows at ' + width)
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1)
+    evidence.layoutChecks.push({ name, width, overflow }); save()
     const surface = page.locator(scope); assert(await surface.count() > 0, name + ' missing native surface')
     if (width === 1440) {
       assert(await page.locator('script[type=module][src*="/assets/"]').count() > 0, 'Candidate must use built module assets')
@@ -92,7 +93,9 @@ async function accessibility(page, name) {
       violations: result.violations.map(v => ({ id: v.id, impact: v.impact, description: v.description, help: v.help, helpUrl: v.helpUrl, nodeCount: v.nodes.length, nodes: v.nodes })) }
   })
   evidence.accessibility.push({ name, ...redactDiagnostics(result), diagnosticRedaction: 'URL, input-value and secret attributes removed; targets, HTML structure, failureSummary and all check/related-node data retained' }); save()
-  assert.equal(result.version, version); assert(result.passes > 0); assert.equal(result.violations.length, 0, name + ' WCAG violations')
+  // Record visual failures now; fail the run after all reachable real journeys.
+  // Tool/runtime failures and all functional assertions still stop immediately.
+  assert.equal(result.version, version); assert(result.passes > 0)
 }
 function totp() {
   const counter = Buffer.alloc(8); counter.writeBigUInt64BE(BigInt(Math.floor(Date.now() / 30000)))
@@ -288,6 +291,9 @@ async function main() {
     evidence.browserVersion = browser.version()
     await trainingJourney(); await surveyJourney()
     check('desktop-mobile-layout', evidence.screenshots.length === 12)
+    assert.equal(evidence.layoutChecks.length, 12)
+    assert(evidence.layoutChecks.every(item => !item.overflow), 'Document overflow recorded in layoutChecks')
+    assert(evidence.accessibility.every(item => item.violations.length === 0), 'WCAG violations recorded in accessibility')
     assert.equal(evidence.browserErrors.length, 0); assert.equal(evidence.blockedExternalRequests, 0); assert.equal(evidence.accessibility.length, 4)
     for (const name of REQUIRED) assert(evidence.checks.includes(name), 'Missing acceptance checkpoint ' + name)
     evidence.status = 'PASS'

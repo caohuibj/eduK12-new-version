@@ -37,6 +37,10 @@ export function browserCheck(report,head) {
   assert.equal(report.screenshots.length,12);assert.equal(new Set(report.screenshots.map(x=>x.file)).size,12);
   for(const width of [390,768,1440]) assert.equal(report.screenshots.filter(x=>x.width===width).length,4);
   for(const shot of report.screenshots) assert(/^[a-z0-9-]+\.png$/.test(shot.file));
+  const layoutMatrix=['training-editor','training-report','survey-editor','survey-report'].flatMap(name=>[390,768,1440].map(width=>name+':'+width)).sort();
+  assert.equal(report.layoutChecks.length,12);
+  assert.deepEqual(report.layoutChecks.map(x=>x.name+':'+x.width).sort(),layoutMatrix);
+  for(const item of report.layoutChecks) assert.equal(item.overflow,false,'Layout overflow or missing observation');
   assert.equal(report.accessibility.length,4);
   for(const check of report.accessibility){assert(check.passes>0);assert.deepEqual(check.violations,[])}
   return {status:'PASS',checks:required.length,screenshots:12,accessibility:4};

@@ -86,3 +86,9 @@
 .hui-training.hui-app--standard.training-workspace-shell .scale-edit-page .scale-feedback-thumbnail { max-height: 160px; max-width: 100%; object-fit: contain; }
 .hui-training.hui-app--standard.training-workspace-shell .scale-edit-page .scale-feedback-image { padding: 12px 0; }
 .hui-training.hui-app--standard.training-workspace-shell .scale-edit-page .scale-feedback-issues { color: #9b342d; font-size: 13px; padding-left: 20px; }
+
+/* The teacher theme's muted header was 4.45:1 on Training paper in Chromium.
+ * Reuse this page's darker muted green for all three editor header states only. */
+.hui-training.hui-app--teacher.training-workspace-shell.training-teacher-visual .scale-edit-page .hui-page-header__description {
+  color: #53675d;
+}

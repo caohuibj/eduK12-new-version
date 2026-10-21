@@ -20,11 +20,15 @@
     },
     ".github/scripts/scale-authoring-scope.mjs": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "f0d7bcc03c265118d8a3a612d85b073d6e1a3138"
+      "after": "675849871b351637a31439a85e4f53565c83609e"
     },
     ".github/scripts/scale-authoring-scope.test.mjs": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "8fe5921f8cc5640716b7270552353e0ecfabb4d9"
+      "after": "5245a7b83f99554a520f30e376809c7f48d70d6d"
+    },
+    ".github/workflows/ci-scale-authoring-browser-diagnostic.yml": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "9d36343bb73ac3da7181ef52bdb5bb976191f9b7"
     },
     ".github/workflows/ci-scale-authoring-evidence.yml": {
       "before": "0000000000000000000000000000000000000000",
@@ -272,7 +276,7 @@
     },
     "server-version/e2e/scale-authoring-feedback-browser.cjs": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "c676d8b9081f7b2d60d9c59cfe8063e494aad1bf"
+      "after": "53580c7d56ab3fcaef514d8e383bfbff0b23986d"
     },
     "server-version/frontend/src/modules/composite/CompositeReportPage.tsx": {
       "before": "ececf212fdaeb80af244be4317908fe0e49c6623",
@@ -312,7 +316,7 @@
     },
     "server-version/frontend/src/pages/ScaleEdit.css": {
       "before": "0afe4bb0efe02c691f7b3893eb6431dc92a32593",
-      "after": "0557af515f7492c18a60805bb1f9fd20d24f1cc3"
+      "after": "f46501b63d1288f7ae3afdbcd18e85a433903d36"
     },
     "server-version/frontend/src/pages/ScaleEdit.tsx": {
       "before": "43d8fc6700d871dd6df493c28c03b181565084f8",
@@ -329,6 +333,10 @@
     "server-version/frontend/src/pages/__tests__/ScaleEdit.authoring.test.tsx": {
       "before": "0000000000000000000000000000000000000000",
       "after": "0f39ef0341e8922936ee9abff1dd61b3d60191b4"
+    },
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.contrast.test.ts": {
+      "before": "0000000000000000000000000000000000000000",
+      "after": "41baa68730e05cdf8b7fe065c6d4da52652c8cf3"
     },
     "server-version/frontend/src/pages/__tests__/TrainingFeedbackImageField.test.tsx": {
       "before": "0000000000000000000000000000000000000000",
@@ -426,7 +434,8 @@
       "src/pages/__tests__/ScaleEdit.copy-publish.test.tsx",
       "src/pages/student/__tests__/ScaleResult.report-shell.test.tsx",
       "src/modules/reporting/__tests__/ScaleResult.test.ts",
-      "src/survey/SurveyImageField.test.tsx"
+      "src/survey/SurveyImageField.test.tsx",
+      "src/pages/__tests__/ScaleEdit.contrast.test.ts"
     ]
   },
   "frontendLint": [
@@ -457,7 +466,8 @@
     "src/survey/SurveyPublicApp.tsx",
     "src/survey/SurveyRawScoreFeedbackEditor.tsx",
     "src/survey/SurveyRawScoreFeedbackEditor.upload.test.tsx",
-    "src/survey/builder.types.ts"
+    "src/survey/builder.types.ts",
+    "src/pages/__tests__/ScaleEdit.contrast.test.ts"
   ],
   "browserProfileTrustApproved": true,
   "browserProfileTrustApproval": "User confirmation Sentinel_d001b8ceda8881918cbf6eba669aa1de, 2026-10-21; this disposable CI profile and loopback hosts only",
@@ -496,14 +506,15 @@
       "src/pages/__tests__/ScaleEdit.copy-publish.test.tsx": "Changed editor must preserve source copy/publish authorization.",
       "src/pages/student/__tests__/ScaleResult.report-shell.test.tsx": "Changed student result must retain real report shell and permissions.",
       "src/modules/reporting/__tests__/ScaleResult.test.ts": "Changed result rendering must retain old score projection.",
-      "src/survey/SurveyImageField.test.tsx": "Changed shared upload UI must preserve ordinary image handling and recovery."
+      "src/survey/SurveyImageField.test.tsx": "Changed shared upload UI must preserve ordinary image handling and recovery.",
+      "src/pages/__tests__/ScaleEdit.contrast.test.ts": "Observed real Chromium header contrast failure; assert local selector and corrected color contrast before rebuilt browser validation."
     }
   },
-  "frozenProductPathCount": 84,
+  "frozenProductPathCount": 86,
   "additionalPostgresPathCount": 1,
-  "controlPathCount": 10,
+  "controlPathCount": 12,
   "selectedRegressionCount": {
     "backend": 17,
-    "frontend": 15
+    "frontend": 16
   }
 }
