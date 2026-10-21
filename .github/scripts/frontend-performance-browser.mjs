@@ -60,6 +60,10 @@ try {
         if (['GET /api/campus/auth/me', 'GET /api/huiteacher/auth/me', 'GET /api/survey/auth/me'].includes(key)) return json(null, 401, '请先登录');
         if (key === 'GET /api/capabilities') return json({ cognitive: false, parentPortal: false });
         if (authenticated && key === 'GET /api/organizations?page=1&pageSize=100') return json({ list: [], total: 0, page: 1, pageSize: 100, platformRole: 'STANDARD', allowedActions: [] });
+        // AppShell discovery reads these two {list} envelopes for the synthetic teacher.
+        // Empty lists keep relational navigation unavailable without changing its contract.
+        if (authenticated && key === 'GET /api/relational-assessments/catalog') return json({ list: [] });
+        if (authenticated && key === 'GET /api/relational-assessments/tasks') return json({ list: [] });
         if (authenticated && key === 'GET /api/scales/tags') return json({ tags: [] });
         if (authenticated && key === 'GET /api/scales?page=1&pageSize=100') { pages.push(1); return json({ list: Array.from({ length: 100 }, (_, n) => scale(n + 1)), total: 101 }); }
         if (authenticated && key === 'GET /api/scales?page=2&pageSize=100') {
