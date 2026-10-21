@@ -1,3 +1,4 @@
+import {trainingWorkspacePlan} from './training-workspace-scope.mjs';
 import {validExactPlan,exactCandidatePlan,exactCandidateOutputs} from './exact-candidate-scope.mjs';
 import {trainingFunctionalPlan,validTrainingFunctionalPlan,TRAINING_FUNCTIONAL_BASE,TRAINING_FOLLOWUP_BASE,TRAINING_FOLLOWUP_MODE} from './training-functional.mjs';
 import {adminFunctionalPlan,validAdminFunctionalPlan,ADMIN_FUNCTIONAL_BASE} from './admin-permissions-functional.mjs';
@@ -37,6 +38,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route === 'training-workspace') return ['scope','training-workspace','codeql'];
   if(scope.scenario === 'survey-wave-selection') return ['scope','backend-regression','frontend','docker','codeql'];
   if(scope.scenario === 'frontend-performance') return ['scope','frontend','frontend-build','docker','codeql'];
   if(scope.application_route==='exact-candidate') return ['scope','exact-candidate','codeql'];
@@ -91,6 +93,10 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='training-workspace'){
+    if(draft||scope.scenario!=='training-workspace'||scope.codeql!=='true'||scope.runner_profile!=='hosted'||scope.media_selection!=='[]'||scope.media_groups!=='[]'||['frontend_build','ui_required','maintenance','content','presentation','frontend','frontend_test','documentation','visual_hosted',...Object.keys(acceptanceJobs)].some(k=>scope[k]!=='false'))failed.push('scope');
+    return [...new Set(failed)];
+  }
   if (scope.scenario === 'survey-wave-selection') {
     if (draft || scope.application_route !== 'legacy' || scope.codeql !== 'true'
       || scope.runner_profile !== 'hosted' || scope.media_selection !== '[]' || scope.media_groups !== '[]'
@@ -299,6 +305,14 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       if (process.env.CI_FORCE_FULL === 'true' || process.env.CI_EVENT !== 'pull_request'
         || !surveyWaveSelectionScope(changedEntries(process.env.CI_BASE_SHA))) failed.push('recomputed-survey-wave-selection-scope');
     } catch { failed.push('recomputed-survey-wave-selection-scope'); }
+  }
+  if(needs.scope?.outputs?.application_route==='training-workspace'){
+    try{
+      const {changedEntries}=await import('./content-scope.mjs');
+      const {execFileSync}=await import('node:child_process');
+      const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.training_workspace_plan);
+      if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(trainingWorkspacePlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-training-workspace-plan');
+    }catch{failed.push('recomputed-training-workspace-plan')}
   }
   // Recompute the complete raw-diff boundary, rather than trusting scope outputs.
   if (needs.scope?.outputs?.scenario === 'frontend-performance') {

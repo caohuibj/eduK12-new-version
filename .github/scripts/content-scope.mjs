@@ -1,3 +1,4 @@
+import {trainingWorkspacePlan,trainingWorkspaceOutputs} from './training-workspace-scope.mjs';
 import {exactCandidatePlan,exactCandidateOutputs} from './exact-candidate-scope.mjs';
 import {trainingFunctionalPlan} from './training-functional.mjs';
 import {adminFunctionalPlan} from './admin-permissions-functional.mjs';
@@ -299,6 +300,14 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE !== 'true')
     throw new Error('Choose a step_probe for component CI, or explicitly set full_acceptance=true for whole-platform CI');
   const entries = event === 'workflow_dispatch' ? [] : changedEntries(base);
+  const workspace=trainingWorkspacePlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  if(process.env.CI_HEAD_REF==='fix/training-course-pagination-20261021'&&!workspace)throw Error('Frozen Training workspace drift: unrelated platform fallback is not authorized');
+  if(workspace){
+    const output={...trainingWorkspaceOutputs(workspace),...Object.fromEntries(Object.entries(runnerPlan({scenario:'training-workspace'})).map(([k,v])=>[k,Array.isArray(v)?JSON.stringify(v):v]))};
+    console.log(JSON.stringify(output));
+    if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));
+    process.exit(0);
+  }
   const files = entries.map(entry => entry.file);
   const trainingFunctional = event === 'workflow_dispatch' ? null
     : trainingFunctionalPlan(entries, base, execFileSync('git', ['rev-parse', 'HEAD'], { encoding: 'utf8' }).trim());
