@@ -30,4 +30,22 @@ const report=JSON.parse(execFileSync('python3',['-c','import zipfile,sys; z=zipf
 assert.equal(report.success,true);assert.equal(report.numFailedTests,0);assert.equal(report.numPendingTests,0);assert.ok(report.numPassedTests>0);
 for(const file of binding[component+'Tests'])assert.ok(report.testResults.some(r=>r.name.endsWith('/server-version/'+component+'/'+file)&&r.status==='passed'&&r.assertionResults.length&&r.assertionResults.every(a=>a.status==='passed')));
 const receipt={status:'REUSED_OFFICIAL_PASSED_STAGES',component,currentHead:head,source,merge,runId,jobId,artifactId:artifact.id,artifactDigest:artifact.digest,passedTests:report.numPassedTests,originalJobConclusion:job.conclusion,originalBrowser:'failure; not admitted',currentBrowser:'must execute separately',buildArtifact:'not retained in original failed job; not admitted'};
+if(component==='frontend'){
+ const buildRun=await api('/actions/runs/39584656927'),buildJob=await api('/actions/jobs/119170563207'),build=await api('/actions/artifacts/12339492405');
+ assert.equal(buildRun.head_sha,'cecf9ef589edaa7b23168ca329e7eba9fca4a706');assert.equal(buildRun.event,'pull_request');assert.equal(buildRun.path,'.github/workflows/ci.yml');assert.ok(buildRun.pull_requests.some(p=>p.number===324));
+ assert.equal(buildJob.run_id,39584656927);assert.equal(buildJob.name,'training-workspace / frontend affected contracts');assert.equal(buildJob.conclusion,'failure');assert.ok(buildJob.steps.some(s=>s.name==='compile changed frontend once'&&s.conclusion==='success'));assert.deepEqual(buildJob.steps.filter(s=>s.conclusion==='failure').map(s=>s.name),['rendered affected Training journeys']);
+ assert.equal(git('rev-parse',buildRun.head_sha+':server-version/frontend'),git('rev-parse',head+':server-version/frontend'));
+ assert.equal(build.workflow_run.id,39584656927);assert.equal(build.name,'training-workspace-frontend-dist-3741eb4acf4a48d74d4bde921bb1f8f77c47b5b1');assert.equal(build.expired,false);assert.equal(build.digest,'sha256:abc8304fc1cc76327792c093df09d2278e3301189b3857f5a6e8c9e5109e785b');assert.ok(Date.now()-Date.parse(build.created_at)<24*60*60*1000);
+ const redirect=await fetch('https://api.github.com/repos/'+repo+'/actions/artifacts/'+build.id+'/zip',{headers:{Authorization:'Bearer '+process.env.GH_TOKEN},redirect:'manual',signal:AbortSignal.timeout(30000)});assert.equal(redirect.status,302);
+ const url=new URL(redirect.headers.get('location'));assert.equal(url.protocol,'https:');assert.ok(url.hostname.endsWith('.blob.core.windows.net')||url.hostname.endsWith('.actions.githubusercontent.com'));
+ const fetched=await fetch(url,{redirect:'error',signal:AbortSignal.timeout(60000)});assert.equal(fetched.status,200);const compiled=Buffer.from(await fetched.arrayBuffer());assert.equal(compiled.length,build.size_in_bytes);assert.equal('sha256:'+createHash('sha256').update(compiled).digest('hex'),build.digest);
+ const path='training-workspace-evidence/compiled-original.zip';writeFileSync(path,compiled);
+ execFileSync('python3',['-c',`import zipfile,sys,pathlib,stat
+z=zipfile.ZipFile(sys.argv[1]); assert sum(i.file_size for i in z.infolist())<200*1024*1024
+for i in z.infolist():
+ p=pathlib.PurePosixPath(i.filename); assert not p.is_absolute() and '..' not in p.parts and not stat.S_ISLNK(i.external_attr>>16)
+z.extractall('server-version/frontend/dist')`,path],{stdio:'inherit'});
+ const {unlinkSync}=await import('node:fs');unlinkSync(path);
+ receipt.buildArtifact={status:'REUSED_EXACT_COMPILED_BYTES',runId:39584656927,jobId:119170563207,artifactId:build.id,digest:build.digest};appendFileSync(process.env.GITHUB_OUTPUT,'build_reused=true\n');
+}
 writeFileSync('training-workspace-evidence/'+component+'-reuse.json',JSON.stringify(receipt,null,2));console.log(JSON.stringify(receipt));appendFileSync(process.env.GITHUB_OUTPUT,'reused=true\n');

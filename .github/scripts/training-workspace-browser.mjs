@@ -38,7 +38,7 @@ try{
  page.setDefaultTimeout(10000);page.on('pageerror',e=>errors.push(e.message));
  await context.route('**/*',async route=>{
   const request=route.request(),url=new URL(request.url()),p=url.pathname,q=url.searchParams;
-  const json=(data,status=200)=>route.fulfill({status,contentType:'application/json',body:JSON.stringify({code:status===200?0:status,data})});
+  const json=(data,status=200)=>route.fulfill({status,contentType:'application/json',body:JSON.stringify({code:status===200?0:status,data,message:''})});
   if(url.hostname!=='training.eduk12.top'){unexpected.push(url.origin);return route.abort()}
   if(p.startsWith('/api/')){
    if(request.method()!=='GET'){unexpected.push(request.method()+' '+p);return json(null,500)}

@@ -51,7 +51,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: node .github/scripts/training-workspace-reuse.mjs ${{ matrix.component }}
       - name: install locked component dependencies from official registry
-        if: matrix.component == 'frontend' || steps.reuse.outputs.reused != 'true'
+        if: steps.reuse.outputs.reused != 'true'
         working-directory: server-version/${{ matrix.component }}
         run: npm ci
       - name: affected types, lint and non-empty regression contracts
@@ -62,11 +62,11 @@ jobs:
         working-directory: server-version/${{ matrix.component }}
         run: npm audit --audit-level=high
       - name: compile changed frontend once
-        if: matrix.component == 'frontend'
+        if: matrix.component == 'frontend' && steps.reuse.outputs.build_reused != 'true'
         working-directory: server-version/frontend
         run: npm run build
       - uses: actions/upload-artifact@v4
-        if: matrix.component == 'frontend'
+        if: matrix.component == 'frontend' && steps.reuse.outputs.build_reused != 'true'
         with:
           name: training-workspace-frontend-dist-${{ github.sha }}
           path: server-version/frontend/dist
