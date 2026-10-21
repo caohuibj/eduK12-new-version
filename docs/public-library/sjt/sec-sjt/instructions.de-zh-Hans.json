@@ -1,0 +1,147 @@
+{
+  "schema_version": "1.0",
+  "instrument_id": "SEC-SJT",
+  "source_instruction": {
+    "source_pdf_page": 20,
+    "title_de": "Die Aufgabe",
+    "title_zh_Hans": "任务说明",
+    "paragraphs": [
+      {
+        "de": "Menschen sind verschieden: sie handeln nicht immer gleich, sie erleben verschiedene Gefühle, sie zeigen ihre Gefühle unterschiedlich und sie reagieren auch verschieden auf Gefühle anderer.",
+        "zh_Hans": "人与人并不一样：大家的做法不总是相同，会体验到不同的情绪，表达情绪的方式不同，对别人情绪的反应也不同。"
+      },
+      {
+        "de": "Auf den nächsten Seiten haben wir eine Menge Fragen an dich. Bei jeder Frage geht es darum, dass du dich in die beschriebene Situation hineinversetzt. Wähle bei jeder Frage die Antwort, die du am besten findest. Bitte wähle stets EINE EINZIGE ANTWORT und kreuze sie an.",
+        "zh_Hans": "接下来的几页有一些问题。回答每个问题时，请想象自己身处题目描述的情境。在每道题中，选出你认为最好的回答。每道题始终只能选择一个回答，并在它旁边打勾。"
+      },
+      {
+        "de": "Findest du keine Antwort gut? Dann kreuze einfach die Antwort an, die für dich noch am besten ist.",
+        "zh_Hans": "你觉得没有哪个回答好吗？那就勾选其中对你来说还算最好的那个。"
+      }
+    ]
+  },
+  "practice": {
+    "title_de": "Hier ein Beispiel:",
+    "title_zh_Hans": "下面是一个例子：",
+    "source_label_de": "Bsp.)",
+    "source_label_zh_Hans": "例题）",
+    "id": "SEC-SJT-PRACTICE",
+    "source_pdf_page": 21,
+    "source_sec_sjt_page": 3,
+    "scored": false,
+    "included_in_item_count": false,
+    "keyed_option_1based": null,
+    "key_status": "No practice key is asserted in this package; not part of the formal scoring key.",
+    "stem_de": "Sabrina hat alle Arbeitsaufgaben für heute erledigt. Sie ist erschöpft. Bald hat sie Feierabend. Ihr Arbeitskollege Anton hat noch viel zu tun. Was sollte Sabrina tun, damit es Anton besser geht?",
+    "stem_zh_Hans": "Sabrina 已经完成了今天的全部工作任务。她很疲惫。快到她下班的时间了。她的同事 Anton 还有很多事情要做。Sabrina 应该怎么做，才能让 Anton 感觉好一些？",
+    "options": [
+      {
+        "option_number": 1,
+        "text_de": "Nach Hause gehen.",
+        "text_zh_Hans": "回家。"
+      },
+      {
+        "option_number": 2,
+        "text_de": "Anton fragen: „Brauchst du Hilfe? Kann ich irgendetwas für dich tun?“",
+        "text_zh_Hans": "问 Anton：“你需要帮助吗？我能为你做点什么吗？”"
+      },
+      {
+        "option_number": 3,
+        "text_de": "Anton sagen: „Wenn du dich beeilst, schaffst du es sicher noch bis zum Feierabend fertig zu sein.“",
+        "text_zh_Hans": "对 Anton 说：“如果你抓紧一点，肯定能赶在下班前做完。”"
+      },
+      {
+        "option_number": 4,
+        "text_de": "Anton sagen: „Ich hatte auch schon viel zu tun. Du schaffst das schon!“",
+        "text_zh_Hans": "对 Anton 说：“我也遇到过事情很多的时候。你会做完的！”"
+      },
+      {
+        "option_number": 5,
+        "text_de": "Anton erzählen, was sie am Abend noch machen wird.",
+        "text_zh_Hans": "告诉 Anton，她晚上还打算做什么。"
+      }
+    ]
+  },
+  "post_practice_instruction": {
+    "source_pdf_page": 21,
+    "paragraphs": [
+      {
+        "de": "Welche Antwort würdest du auswählen? Hast du verstanden worum es geht?",
+        "zh_Hans": "你会选择哪个回答？你明白要做什么了吗？"
+      },
+      {
+        "de": "Auf jeder Seite findest du 2 Fragen. Wenn du eine Pause zwischendurch brauchst, kannst du jederzeit unterbrechen.",
+        "zh_Hans": "每页有 2 道题。如果中途需要休息，你随时都可以暂停。"
+      },
+      {
+        "de": "Hast du noch Fragen?",
+        "zh_Hans": "你还有什么问题吗？"
+      },
+      {
+        "de": "Wenn du keine Fragen mehr hast, geht es auf der nächsten Seite los.",
+        "zh_Hans": "如果你没有其他问题，就从下一页开始。"
+      }
+    ]
+  },
+  "repeated_item_page_instruction": {
+    "source_pdf_pages": [
+      22,
+      23,
+      24,
+      25,
+      26
+    ],
+    "de": "Was ist für dich die beste Antwort? Bitte kreuze die für dich beste Antwort an. Findest du keine Antwort gut? Dann kreuze einfach die Antwort an, die für dich noch am besten ist.",
+    "zh_Hans": "对你来说，哪个回答最好？请勾选你认为最好的回答。你觉得没有哪个回答好吗？那就勾选其中对你来说还算最好的那个。"
+  },
+  "demographic_fields": {
+    "title_de": "Angaben zur Testperson",
+    "title_zh_Hans": "受测者信息",
+    "source_pdf_page": 20,
+    "source_only": true,
+    "collect_by_default": false,
+    "fields": [
+      {
+        "de": "Datum",
+        "zh_Hans": "日期"
+      },
+      {
+        "de": "Name, Vorname oder Personenkennziffer",
+        "zh_Hans": "姓、名或受测者编号"
+      },
+      {
+        "de": "Alter",
+        "zh_Hans": "年龄"
+      },
+      {
+        "de": "Geschlecht",
+        "zh_Hans": "性别",
+        "options": [
+          {
+            "de": "weiblich",
+            "zh_Hans": "女性"
+          },
+          {
+            "de": "männlich",
+            "zh_Hans": "男性"
+          },
+          {
+            "de": "divers",
+            "zh_Hans": "其他性别（原文：divers）"
+          }
+        ]
+      }
+    ]
+  },
+  "platform_notice": {
+    "not_part_of_original_instruction": true,
+    "zh_Hans": [
+      "这是 SEC-SJT 的中文工作初译，尚未经过独立人工双语审校、认知访谈或中文样本验证。",
+      "本材料用于研究与资料展示，不用于诊断、给人贴标签或作出升学、就业等高影响决定。",
+      "正式部分有 10 道题，每题选 1 个你认为最好的回答，不是选择你平时最可能采取的做法。练习题不计分。",
+      "没有硬性时间限制。原德文材料通常约需 30 分钟，个别情况约需 60 分钟；中途可以休息。",
+      "只有 10 道正式题全部作答且每题仅有 1 个有效选项时，才显示原始分；缺答时不计总分，也不补算。",
+      "原版纸本每页 2 题。平台如改变分页、文字呈现或输入方式，应另行说明并记录，不能冒称与纸本等同。"
+    ]
+  }
+}

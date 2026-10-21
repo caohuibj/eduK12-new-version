@@ -1,0 +1,96 @@
+{
+  "schema_version": "1.0",
+  "package_id": "sec-sjt-de-zh-Hans-research-draft-2026-10-21-r2",
+  "instrument_id": "SEC-SJT",
+  "original_citation": "Wolf, D., Schneider, S., & Schütz, A. (2020). Inventar und Situational Judgement Test zur Erfassung sozial-emotionaler Kompetenz(en) (SEC-I und SEC-SJT). Otto-Friedrich-Universität Bamberg. https://doi.org/10.20378/irb-48863",
+  "authors": [
+    "Daniel Wolf",
+    "Sarah Schneider",
+    "Astrid Schütz"
+  ],
+  "publication_year": 2020,
+  "edition": "1st edition, 2020",
+  "publisher": "Otto-Friedrich-Universität Bamberg",
+  "doi": "https://doi.org/10.20378/irb-48863",
+  "record_url": "https://fis.uni-bamberg.de/entities/publication/b64e469f-1bea-488c-8ac7-186222773827",
+  "license_spdx": "CC-BY-SA-4.0",
+  "license_url": "https://creativecommons.org/licenses/by-sa/4.0/",
+  "license_legalcode_url": "https://creativecommons.org/licenses/by-sa/4.0/legalcode",
+  "license_scope_evidence": {
+    "source": "sec-sjt-manual.pdf",
+    "pdf_page_1based": 4,
+    "section": "Lizenz",
+    "covered_original_components": [
+      "Testmanual",
+      "Testmaterialien",
+      "Auswertungsdatei"
+    ]
+  },
+  "source_files": {
+    "sec-sjt-manual.pdf": {
+      "relative_path": "../sec-sjt-manual.pdf",
+      "bytes": 5999660,
+      "sha256": "514a0b046c27b63e575efe2b242bb580c9eb07d6acb9dc7250c1e7eedf9e9dd3",
+      "verified_download_url": "https://fis.uni-bamberg.de/bitstreams/12d3fbfe-be50-4ff2-b35c-6253bd3c74cf/download",
+      "record_url": "https://fis.uni-bamberg.de/entities/publication/b64e469f-1bea-488c-8ac7-186222773827"
+    },
+    "sec-sjt-materials.pdf": {
+      "relative_path": "../sec-sjt-materials.pdf",
+      "bytes": 622219,
+      "sha256": "c457fd71b6163c8c200f21cfbea4cd8c58cf8e2ab68d2641cbe54eba0c82bd21",
+      "verified_download_url": "https://fis.uni-bamberg.de/bitstreams/56cebab3-7970-4357-8825-296dcad97731/download",
+      "record_url": "https://fis.uni-bamberg.de/entities/publication/b64e469f-1bea-488c-8ac7-186222773827"
+    },
+    "sec-sjt-scoring.xlsx": {
+      "relative_path": "../sec-sjt-scoring.xlsx",
+      "bytes": 429254,
+      "sha256": "00be8717e23682da7cc6e1590eb54578a51e2452ee6034293e6c1e7f12a7b546",
+      "verified_download_url": null,
+      "record_url": "https://fis.uni-bamberg.de/entities/publication/b64e469f-1bea-488c-8ac7-186222773827"
+    }
+  },
+  "source_counts": {
+    "manual_pdf_pages": 168,
+    "materials_pdf_pages": 45,
+    "formal_items": 10,
+    "formal_options": 50,
+    "practice_items": 1,
+    "practice_options": 5
+  },
+  "source_scope": {
+    "instruction_materials_pdf_page": 20,
+    "practice_materials_pdf_page": 21,
+    "formal_items_materials_pdf_pages": [
+      22,
+      23,
+      24,
+      25,
+      26
+    ],
+    "scoring_form_materials_pdf_page": 39,
+    "excluded": "SEC-I-SR and SEC-I-OR item sets, original norms as runtime tables, screening cutoffs as runtime labels"
+  },
+  "derivative_credit": "AI-assisted German transcription and Simplified Chinese working translation prepared for the eduK12 research library, 2026-10-21. Not an original-author translation or endorsement.",
+  "changes": [
+    "Extracted only SEC-SJT instructions, independent practice, and 10 formal items from the source test materials.",
+    "Normalized German PDF line breaks and repeated spaces for structured fields; preserved original wording and punctuation.",
+    "Added a Simplified Chinese working translation retaining original personal names, contexts, item order, and option order.",
+    "Separated original instructions from new platform notices.",
+    "Added scoring/data-quality safeguards, research evidence summaries, and explicit interpretation limitations.",
+    "Did not alter the scoring key, omit item 3, apply Chinese norms, or normalize reported source percentages."
+  ],
+  "translation_status": {
+    "stage": "working_first_translation",
+    "independent_human_bilingual_review_completed": false,
+    "independent_ai_comparison_completed": true,
+    "back_translation_completed": false,
+    "cognitive_interviews_completed": false,
+    "Chinese_validation_completed": false,
+    "K12_validation_completed": false
+  },
+  "independent_review_note": "Separate source/scoring review does not constitute independent translation or psychometric validation.",
+  "retrieval_and_verification_date_utc": "2026-10-21",
+  "repository_integration_performed": false,
+  "CI_run": false,
+  "commit_or_push_performed": false
+}
