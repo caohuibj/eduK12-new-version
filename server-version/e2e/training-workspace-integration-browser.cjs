@@ -43,8 +43,13 @@ async function api(...args){
  }
  assert.equal(result.status,200,'API HTTP rejected');assert.equal(result.body.code,0,'API envelope rejected');return result.body.data
 }
+function rejectionDiagnostic(result,method='GET'){
+ const code=result.body.code
+ return {phase:evidence.phase,method,status:result.status,code:typeof code==='number'&&Number.isFinite(code)?code:typeof code==='string'&&/^[A-Z][A-Z0-9_]{0,63}$/.test(code)?code:'UNCLASSIFIED',dataAbsent:result.body.data==null}
+}
 async function denied(page,endpoint,method='GET',body){
  const result=await request(page,endpoint,method,body)
+ evidence.lastDenial=rejectionDiagnostic(result,method);save()
  assert([403,404,409].includes(result.status),'Expected authorization/lifecycle rejection');assert.notEqual(result.body.code,0)
  return result.status
 }
@@ -221,7 +226,14 @@ async function learnerJourney(teacher,admin,source,tool){
  await stranger.goto(fixture.trainingUrl+'/student/composite/'+task.id+'?courseId='+fixture.courseId+'&courseSection=assessments')
  assert([403,404].includes((await deniedAdmission).status()));await stranger.getByText('暂时无法进入测评',{exact:true}).waitFor()
  assert.equal(await stranger.getByRole('group',{name:unit.scale.definition.items[0].content,exact:true}).count(),0)
- await denied(stranger,base+'/attempts/'+attempt.id+'/report?courseId='+fixture.courseId)
+ // A navigation hint is not an accepted report API query. Prove schema rejection
+ // separately from actual ownership denial using the valid report URL.
+ const invalidQuery=await request(stranger,base+'/attempts/'+attempt.id+'/report?courseId='+fixture.courseId)
+ evidence.reportDenial={invalidQuery:rejectionDiagnostic(invalidQuery)};save()
+ assert.equal(invalidQuery.status,400);assert.equal(invalidQuery.body.code,-1);assert.equal(invalidQuery.body.data,null)
+ const nonOwner=await request(stranger,base+'/attempts/'+attempt.id+'/report')
+ evidence.reportDenial.nonOwner=rejectionDiagnostic(nonOwner);save()
+ assert.equal(nonOwner.status,403);assert.equal(nonOwner.body.code,-1);assert.equal(nonOwner.body.data,null)
  await denied(student,'/api/courses/'+fixture.foreignCourseId)
  // Hints are navigation only: they cannot disclose a foreign course or another user's report.
  await student.goto(fixture.trainingUrl+'/student/composite/attempts/'+attempt.id+'?courseId='+fixture.foreignCourseId+'&courseSection=assessments')

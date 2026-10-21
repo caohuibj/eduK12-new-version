@@ -25,7 +25,7 @@ export function validateQualifiedPostgres(report,selected){
 }
 const mode=process.argv[2];
 if(mode==='codeql-config'){
- const lastSuccessfulAnalysisHead='1f4be6f53b0d57131dbd0aff3443289a778ec3d3';
+ const lastSuccessfulAnalysisHead='8b7508dd14e4b7ae292ba381ef0cad27dd76cef0';
  run('git',['fetch','--no-tags','https://github.com/caohuibj/eduK12-new-version.git',lastSuccessfulAnalysisHead]);
  const paths=run('git',['diff','--name-only',lastSuccessfulAnalysisHead,'HEAD']).trim().split('\n').filter(p=>/\.(?:[cm]?[jt]sx?)$/.test(p));assert(paths.length);
  appendFileSync(process.env.GITHUB_OUTPUT,'config='+JSON.stringify({paths})+'\n');
@@ -37,7 +37,7 @@ if(mode==='codeql-config'){
  }else if(mode==='resume'){
  assert(process.env.GITHUB_TOKEN,'Read-only Actions token required');
  const api=async path=>{const r=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/'+path,{headers:{Authorization:'Bearer '+process.env.GITHUB_TOKEN,Accept:'application/vnd.github+json'}});assert(r.ok,'Official evidence unavailable');return r.json()};
- const latestAnalysisRun=await api('actions/runs/39689509442');assert.equal(latestAnalysisRun.head_sha,'1f4be6f53b0d57131dbd0aff3443289a778ec3d3');assert.equal(latestAnalysisRun.status,'completed');assert.equal(latestAnalysisRun.conclusion,'failure');const latestAnalysisJobs=await api('actions/runs/39689509442/jobs?per_page=100');assert.equal(latestAnalysisJobs.jobs.find(j=>j.id===119532025826)?.conclusion,'success');
+ const latestAnalysisRun=await api('actions/runs/39691197545');assert.equal(latestAnalysisRun.head_sha,'8b7508dd14e4b7ae292ba381ef0cad27dd76cef0');assert.equal(latestAnalysisRun.status,'completed');assert.equal(latestAnalysisRun.conclusion,'failure');const latestAnalysisJobs=await api('actions/runs/39691197545/jobs?per_page=100');assert.equal(latestAnalysisJobs.jobs.find(j=>j.id===119537629474)?.conclusion,'success');
  const original=await api('actions/runs/'+prior.run);assert.equal(original.head_sha,prior.head);assert.equal(original.status,'completed');assert.equal(original.conclusion,'failure');assert.equal(original.run_attempt,1);
  const jobs=await api('actions/runs/'+prior.run+'/jobs?per_page=100');
  for(const [c,id]of Object.entries(prior.jobs)){const job=jobs.jobs.find(j=>j.id===id);assert(job);assert.equal(job.conclusion,c==='backend'?'failure':'success');if(c==='backend')assert(job.steps.some(s=>s.name==='compile once and retain actual builder and runtime bytes'&&s.conclusion==='success'))}
