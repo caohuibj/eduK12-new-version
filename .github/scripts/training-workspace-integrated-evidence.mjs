@@ -25,7 +25,7 @@ export function validateQualifiedPostgres(report,selected){
 }
 const mode=process.argv[2];
 if(mode==='codeql-config'){
- const lastSuccessfulAnalysisHead='b85b3b767a269aa5ac1254accadf07f85cc8b710';
+ const lastSuccessfulAnalysisHead='af05a63aeec023ee98cbba004ada90b52e5b6dc6';
  run('git',['fetch','--no-tags','https://github.com/caohuibj/eduK12-new-version.git',lastSuccessfulAnalysisHead]);
  const paths=run('git',['diff','--name-only',lastSuccessfulAnalysisHead,'HEAD']).trim().split('\n').filter(p=>/\.(?:[cm]?[jt]sx?)$/.test(p));assert(paths.length);
  appendFileSync(process.env.GITHUB_OUTPUT,'config='+JSON.stringify({paths})+'\n');
@@ -37,6 +37,7 @@ if(mode==='codeql-config'){
  }else if(mode==='resume'){
  assert(process.env.GITHUB_TOKEN,'Read-only Actions token required');
  const api=async path=>{const r=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/'+path,{headers:{Authorization:'Bearer '+process.env.GITHUB_TOKEN,Accept:'application/vnd.github+json'}});assert(r.ok,'Official evidence unavailable');return r.json()};
+ const latestAnalysisRun=await api('actions/runs/39688107827');assert.equal(latestAnalysisRun.head_sha,'af05a63aeec023ee98cbba004ada90b52e5b6dc6');assert.equal(latestAnalysisRun.status,'completed');assert.equal(latestAnalysisRun.conclusion,'failure');const latestAnalysisJobs=await api('actions/runs/39688107827/jobs?per_page=100');assert.equal(latestAnalysisJobs.jobs.find(j=>j.id===119527306747)?.conclusion,'success');
  const original=await api('actions/runs/'+prior.run);assert.equal(original.head_sha,prior.head);assert.equal(original.status,'completed');assert.equal(original.conclusion,'failure');assert.equal(original.run_attempt,1);
  const jobs=await api('actions/runs/'+prior.run+'/jobs?per_page=100');
  for(const [c,id]of Object.entries(prior.jobs)){const job=jobs.jobs.find(j=>j.id===id);assert(job);assert.equal(job.conclusion,c==='backend'?'failure':'success');if(c==='backend')assert(job.steps.some(s=>s.name==='compile once and retain actual builder and runtime bytes'&&s.conclusion==='success'))}
@@ -103,9 +104,9 @@ if(mode==='codeql-config'){
  writeFileSync(resolve(evidence,'prior-qualification.json'),JSON.stringify({status:'ACCEPTED_PRIOR',run:prior.run,head:prior.head,originalConclusion:'failure',frontendPassed:284,frontendChecksScope:'Unchanged TypeScript, logic tests and lock audit only; old image scan is PRIOR_IMAGE_ONLY after library CSS change',backendReusedSuites:9,backendFailedSuite:failedSuite,compilationRepeated:false}));
 }else if(mode==='library-contrast'){
  const css=readFileSync(resolve(root,'server-version/frontend/src/training/training-workspace.css'),'utf8');
- const selectors=['.training-library-heading p','.training-library-toolbar label','.training-library-filter button','.training-library-filter>span','.training-library-badge','.training-library-kind','.training-library-description','.training-library-meta','.training-library-footnote','.training-library-empty'];
+ const selectors=['.training-workspace-tabs a','.training-library-heading p','.training-library-toolbar label','.training-library-filter button','.training-library-filter>span','.training-library-badge','.training-library-kind','.training-library-description','.training-library-meta','.training-library-footnote','.training-library-empty'];
  const luminance=hex=>hex.slice(1).match(/../g).map(x=>parseInt(x,16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4).reduce((s,x,i)=>s+x*[.2126,.7152,.0722][i],0);
- const ratios=[];for(const selector of selectors){const start=css.indexOf(selector+'{');assert(start>=0);const block=css.slice(start,css.indexOf('}',start));assert.match(block,/color:#526451(?:;|$)/);for(const background of ['#f8f5ee','#ffffff','#f4f6ef']){const ratio=(luminance(background)+.05)/(luminance('#526451')+.05);assert(ratio>=4.5);ratios.push({selector,foreground:'#526451',background,ratio})}}
+ const ratios=[];for(const selector of selectors){const start=css.indexOf(selector+'{');assert(start>=0);const block=css.slice(start,css.indexOf('}',start));assert.match(block,/color:#526451(?:;|$)/);for(const background of ['#f8f5ee','#ffffff','#f4f6ef','#edf1e8']){const ratio=(luminance(background)+.05)/(luminance('#526451')+.05);assert(ratio>=4.5);ratios.push({selector,foreground:'#526451',background,ratio})}}
  assert(css.includes('.training-library input::placeholder{color:#526451;opacity:1}'));
  writeFileSync(resolve(evidence,'frontend/library-contrast.json'),JSON.stringify({status:'PASS',sourceCommit:process.env.GITHUB_SHA,ciRunId:process.env.GITHUB_RUN_ID,cssSHA256:hash(resolve(root,'server-version/frontend/src/training/training-workspace.css')),ratios,renderedAxeClaim:false}));
 }else if(mode==='frontend-current'){

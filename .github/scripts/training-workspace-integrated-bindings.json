@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "base": "eb08515a26cc4637cbcb57a8859fec757a5b8b34",
-  "product": "d5b703f96fdd478c3e8256c29b1fcbf43e696f85",
+  "product": "6ad0356e40e2a1f047cbcdfb1319172f047a067b",
   "browserProfileTrustApproved": true,
   "source": {
     "docs/training-authorized-tool-picker-local.md": {
@@ -426,7 +426,7 @@
     },
     "server-version/frontend/src/training/training-workspace.css": {
       "before": null,
-      "after": "3113cea93db46e5fb1b668f6fd639dcd767dd45d"
+      "after": "342a8cc42fcb200d8896e92960241745839b603b"
     },
     "server-version/frontend/src/types/index.ts": {
       "before": "dbd766a39ac786674f8f684ed3e2bd1de41cb7de",
