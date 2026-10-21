@@ -1,3 +1,6 @@
+import {listSurveyContentOptions,surveyContentOptionsQuerySchema} from './content-options.service'
+import {SurveyBuilderError} from './builder.service'
+import {ContentReleaseError} from '../measurement-content/release'
 import {surveyParticipantFeedbackSelectionsSchema} from './participant-feedback'
 import {surveyContentSelectionsSchema} from './content-selection'
 import {SurveyGovernanceError} from './governance.service'
@@ -41,6 +44,8 @@ const handle=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respons
     if(e instanceof SurveyDraftError)return res.status(400).json({code:'SURVEY_DRAFT_INVALID',
       message:e.issues.slice(0,5).map(i=>i.path+'：'+i.message).join('；')||'研究工具包含待修正字段',
       data:{issues:e.issues}})
+    if(e instanceof ContentReleaseError)return error(res,'内容版本校验失败，请刷新后重试',-1,409)
+    if(e instanceof SurveyBuilderError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof SurveyGovernanceError||e instanceof CatalogSourceError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof GroupIpPolicyError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof service.SurveyWaveError)return error(res,e.message,-1,e.statusCode)
@@ -52,6 +57,8 @@ surveyWavesRouter.get('/:pid/waves',handle(req=>
   service.listWaves(req.user!.userId,id.parse(req.params.pid),Math.min(1000,Math.max(1,Number(req.query.page)||1)))))
 surveyWavesRouter.post('/:pid/waves',handle(req=>
   service.createWave(req.user!.userId,id.parse(req.params.pid),create.parse(req.body))))
+surveyWavesRouter.get('/:pid/waves/:wid/content-options',handle(req=>
+  listSurveyContentOptions(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid),surveyContentOptionsQuerySchema.parse(req.query))))
 surveyWavesRouter.get('/:pid/waves/:wid',handle(req=>
   service.getWave(req.user!.userId,id.parse(req.params.pid),id.parse(req.params.wid))))
 surveyWavesRouter.patch('/:pid/waves/:wid',handle(req=>

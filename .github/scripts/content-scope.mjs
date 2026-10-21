@@ -102,6 +102,28 @@ export function frontendPerformanceScope(entries, read) {
   return true;
 }
 
+// Bounded private Wave discovery/selection increment; never a broad Survey exemption.
+export const surveyWaveSelectionFiles = new Set([
+  ...['content-options.service.ts','content-selection.ts','waves.routes.ts','waves.service.ts'].map(f => modules+'survey/'+f),
+  ...['survey-content-options.test.ts','survey-frozen-feedback-read.test.ts','survey-content-options.postgres.integration.test.ts'].map(f => 'server-version/backend/src/__tests__/measurement-content/'+f),
+  ...['SurveyWaveContentSelection.tsx','SurveyWaveContentSelection.test.tsx','SurveyWaveStudio.tsx','SurveyWaveStudio.content.test.tsx'].map(f => frontendSrc+'survey/'+f),
+]);
+export const surveyWaveSelectionTools = new Set([
+  '.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs',
+  '.github/scripts/survey-wave-selection.test.mjs','.github/scripts/survey-wave-selection-browser.mjs',
+  '.github/workflows/ci.yml','.github/workflows/ci-backend-regression.yml',
+  '.github/workflows/ci-frontend.yml','.github/workflows/ci-images.yml','docs/release/README.md',
+]);
+export function surveyWaveSelectionScope(entries) {
+  return entries.length > 0 && entries.some(e => e.file === modules+'survey/content-options.service.ts')
+    && entries.every(e => (surveyWaveSelectionFiles.has(e.file) || surveyWaveSelectionTools.has(e.file))
+      && e.newMode === '100644' && ((e.status === 'A' && e.oldMode === '000000') || (e.status === 'M' && e.oldMode === '100644')));
+}
+export function requireSurveyWaveSelectionScope(required, admitted, event, forceFull) {
+  if (required && (!admitted || event === 'workflow_dispatch' || forceFull === 'true'))
+    throw Error('Survey Wave selection scope drift: stop; unrelated platform fallback is not authorized');
+}
+
 // Only existing UI-surface test modules qualify. Production source, shared
 // assessment/scoring modules, config, dependency and executable test harness
 // changes never enter this fast lane.
@@ -290,6 +312,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     : classifyChanges(entries, process.env.CI_FORCE_FULL === 'true');
   const dependencies = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
     && dependencyScope(entries, {base});
+  const surveySelection = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch' && surveyWaveSelectionScope(entries);
+  requireSurveyWaveSelectionScope(process.env.CI_SURVEY_SELECTION_REQUIRED === 'true', surveySelection, event, process.env.CI_FORCE_FULL);
   const performance = process.env.CI_FORCE_FULL !== 'true' && event !== 'workflow_dispatch'
     && frontendPerformanceScope(entries, file => execFileSync('git', ['show', `HEAD:${file}`], {maxBuffer: 8 * 1024 * 1024}));
   requireFrontendPerformanceScope(process.env.CI_FRONTEND_PERFORMANCE_REQUIRED === 'true', performance);
@@ -315,12 +339,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const surveyMac = event !== 'workflow_dispatch'
     ? surveyMacPlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim()) : null;
   if(surveyMac && process.env.CI_FORCE_FULL==='true') throw new Error('Exact Survey Mac candidate cannot run unrelated full acceptance');
-  const scenario = performance ? 'frontend-performance' : trainingFunctional || adminFunctional ? 'platform' : surveyMac ? 'survey-mac-ui' : reviewedCandidate ? 'reviewed-candidate' : surveyCandidate ? 'survey-candidate' : sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : releaseTools ? 'release-tooling' : dependencies ? 'dependencies' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
+  const scenario = surveySelection ? 'survey-wave-selection' : performance ? 'frontend-performance' : trainingFunctional || adminFunctional ? 'platform' : surveyMac ? 'survey-mac-ui' : reviewedCandidate ? 'reviewed-candidate' : surveyCandidate ? 'survey-candidate' : sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : releaseTools ? 'release-tooling' : dependencies ? 'dependencies' : result.maintenance ? 'maintenance' : result.documentation ? 'documentation' : result.content ? (frontend ? 'content-frontend' : 'content')
     : result.presentation ? 'presentation' : frontendTest ? 'frontend-test' : frontend ? 'frontend' : 'platform';
   // No production artifact or acceptance scenario is changed by a narrowly
   // admitted test-only diff. Keep the full frontend test suite itself mandatory.
   const selectedAcceptance = acceptanceFor(files);
-  const acceptance = performance || surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || teacher || survey || copy || campus || frontendTest || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
+  const acceptance = surveySelection || performance || surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || teacher || survey || copy || campus || frontendTest || releaseTools ? Object.fromEntries(Object.keys(selectedAcceptance).map(key => [key, false])) : selectedAcceptance;
   if (scenario === 'platform' || (event === 'workflow_dispatch' && process.env.CI_FULL_ACCEPTANCE === 'true'))
     for (const key of Object.keys(acceptance)) acceptance[key] = true;
   // Preserve every platform functional/security/build/recovery check. Only the
@@ -330,7 +354,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const mediaSelection = ['media2','video_core','media7','situational_video','situational_branching'].filter(key => acceptance[key]);
   const uiRequired = acceptance.app_shell || acceptance.canonical_visual;
   const frontendBuild = Boolean(surveyCandidate) || Boolean(assessment) || Boolean(efficiency) || dependencies || frontend || scenario === 'platform' || uiRequired || mediaSelection.length > 0;
-  const codeql = Boolean(surveyMac) || Boolean(reviewedCandidate) || Boolean(surveyCandidate) || Boolean(sharedStorage) || Boolean(assessment) || Boolean(review) || Boolean(efficiency) || Boolean(backendRepair) || Boolean(teacher) || Boolean(survey) || Boolean(campus) || releaseTools || dependencies || scenario === 'platform' || frontend
+  const codeql = surveySelection || Boolean(surveyMac) || Boolean(reviewedCandidate) || Boolean(surveyCandidate) || Boolean(sharedStorage) || Boolean(assessment) || Boolean(review) || Boolean(efficiency) || Boolean(backendRepair) || Boolean(teacher) || Boolean(survey) || Boolean(campus) || releaseTools || dependencies || scenario === 'platform' || frontend
     || (result.content && files.some(file => /\.[cm]?[jt]sx?$/.test(file)));
   const release = event === 'workflow_dispatch' || process.env.CI_FORCE_FULL === 'true' ? null : applicationPlan(base, execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   const output = { admin_permissions_functional_only:Boolean(adminFunctional), admin_permissions_functional_plan:JSON.stringify(adminFunctional), training_functional_only:Boolean(trainingFunctional), run_performance_tests:!(trainingFunctional || adminFunctional), training_functional_plan:JSON.stringify(trainingFunctional), survey_mac_ui_plan:JSON.stringify(surveyMac), reviewed_candidate_plan:JSON.stringify(reviewedCandidate), survey_candidate_plan:JSON.stringify(surveyCandidate), shared_asset_storage_plan:JSON.stringify(sharedStorage), assessment_capacity_plan:JSON.stringify(assessment), teacher_survey_plan:JSON.stringify(review), access_efficiency_plan:JSON.stringify(efficiency), backend_security_efficiency_plan:JSON.stringify(backendRepair), teacher_home_plan:JSON.stringify(teacher), survey_home_plan:JSON.stringify(survey), homepage_copy_plan:JSON.stringify(copy), application_route:trainingFunctional || adminFunctional ? 'legacy' : surveyMac ? 'survey-mac-ui' : reviewedCandidate ? 'reviewed-candidate' : surveyCandidate ? 'survey-candidate' : sharedStorage ? 'shared-asset-storage' : assessment ? 'assessment-capacity' : review ? 'teacher-survey' : efficiency ? 'access-efficiency' : backendRepair ? 'backend-security-efficiency' : teacher ? 'teacher-home' : survey ? 'survey-home' : copy ? 'homepage-copy' : campus ? 'campus' : release && release.route !== 'C' ? release.route : 'legacy', campus_plan:JSON.stringify(campus), release_plan:JSON.stringify(release), maintenance: result.maintenance, content: result.content, presentation: result.presentation, frontend, frontend_test:frontendTest,
@@ -341,7 +365,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     situational: result.domains.includes('situational'), bundle: result.domains.includes('bundle'),
     ...acceptance, ...Object.fromEntries(Object.entries(plan).map(([key,value]) =>
       [key, Array.isArray(value) ? JSON.stringify(value) : value])) };
-  console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles', platformReasons: performance || surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || dependencies ? [] : platformReasons(entries, process.env.CI_FORCE_FULL === 'true' || event === 'workflow_dispatch') }));
+  console.log(JSON.stringify({ ...output, base, validationClosure: 'all-bundles', platformReasons: surveySelection || performance || surveyMac || reviewedCandidate || surveyCandidate || sharedStorage || assessment || review || efficiency || backendRepair || dependencies ? [] : platformReasons(entries, process.env.CI_FORCE_FULL === 'true' || event === 'workflow_dispatch') }));
   if (process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
     Object.entries(output).map(([key, value]) => `${key}=${value}\n`).join(''));
 }

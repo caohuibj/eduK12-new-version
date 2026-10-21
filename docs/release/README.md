@@ -521,3 +521,29 @@ Mac 的 8 pass/45 filtered 与桌面/手机观察保留为原本地报告，不�
 接纳。其 PG 四项有三项通过、唯一失败名已记录；三项名称由固定四项源码
 与原计数/失败名推导，非伪造原逐项 reporter。仅修并重试导出 fixture 的
 queued/READY nonce 契约错误，其他三项不重跑，实际恢复门禁仍须完成。
+
+## Private Survey Wave content selection (2026-10-21)
+
+The bounded `survey-wave-selection` scenario admits only the named Wave picker,
+read-only options/projection, direct tests and existing CI control files. Unknown
+paths, dependency/schema/permission/public-feedback changes, deletion, renaming
+and nonregular modes are rejected. The known feature branch fails closed on
+scope drift or full/manual fallback; it does not launch platform acceptance.
+
+Existing jobs are reused: backend-regression runs locked dependency installation,
+backend types/audit, three direct contracts and a small real PostgreSQL fixture
+for exact filtering, read-only discovery, stale-choice rejection and authoritative
+prepare/frozen identities; frontend runs lint/types/audit and six direct test
+modules. Selected suites must be present, nonempty and unskipped. Production
+images are built once by ci-images and retain HIGH/CRITICAL scanning. Its Chromium
+smoke reads the exact frontend runtime assets and checks selection/freeze/frozen
+read plus stale-error UI with synthetic APIs, not backend authorization. CodeQL
+covers the changed business and control surfaces. No full lifecycle, capacity,
+media, Mac, migration upgrade/dump-restore or production work is selected.
+
+Local exploratory dependency-drift results are not represented as formal CI
+receipts. The stable gate recomputes the complete diff and requires actual scope,
+backend-regression, frontend, docker and CodeQL success; skipped/missing/failed,
+cancelled and draft candidates cannot qualify. Main push reclassifies only,
+without rerunning these PR checks. Five minutes is a progress/diagnosis threshold,
+not a guarantee for first downloads or scanning. This change does not deploy.

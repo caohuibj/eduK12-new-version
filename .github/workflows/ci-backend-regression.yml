@@ -128,20 +128,33 @@ jobs:
           })().catch(error => { console.error(error); process.exitCode = 1; });
           NODE
       - name: seed reference and configuration data
+        if: inputs.focus != 'survey-wave-selection'
         run: npm run db:seed
         env:
           ADMIN_USERNAME: ci-admin
           ADMIN_PASSWORD: ci-admin-password-2026
       - name: backfill check-in token protection
+        if: inputs.focus != 'survey-wave-selection'
         run: npm run db:backfill:checkin-tokens
       - name: frontend dependencies for cross-tree Cognitive package tests
+        if: inputs.focus != 'survey-wave-selection'
         working-directory: server-version/frontend
         run: npm ci --ignore-scripts
       - name: validate regression selection
         env:
           REGRESSION_FOCUS: ${{ inputs.focus }}
         run: |
-          case "$REGRESSION_FOCUS" in full|reporting|assessment-repair) ;; *) exit 1 ;; esac
+          case "$REGRESSION_FOCUS" in full|reporting|assessment-repair|survey-wave-selection) ;; *) exit 1 ;; esac
+      - name: bounded Survey Wave options and authoritative freeze contracts
+        if: inputs.focus == 'survey-wave-selection'
+        env:
+          SURVEY_PUBLICATION_ENABLED: 'true'
+          SURVEY_WORKSPACE_ENABLED: 'true'
+        run: |
+          npx tsc --noEmit --incremental false
+          npm audit --audit-level=high
+          npm test -- src/__tests__/measurement-content/survey-content-options.test.ts src/__tests__/measurement-content/survey-content-selection.test.ts src/__tests__/measurement-content/survey-frozen-feedback-read.test.ts src/__tests__/measurement-content/survey-content-options.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
+          node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json src/__tests__/measurement-content/survey-content-options.test.ts src/__tests__/measurement-content/survey-content-selection.test.ts src/__tests__/measurement-content/survey-frozen-feedback-read.test.ts src/__tests__/measurement-content/survey-content-options.postgres.integration.test.ts
       - name: R5 assessment repair regression
         if: inputs.focus == 'assessment-repair'
         env:

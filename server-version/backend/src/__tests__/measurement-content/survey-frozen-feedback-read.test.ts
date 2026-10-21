@@ -30,6 +30,19 @@ describe('owner frozen participant feedback read',()=>{
   else{published.compiledSnapshot[reason==='project'?'projectId':'waveId']='other';published.definitionDigest=canonicalHash(published.compiledSnapshot)}
   await expect(getWave('owner','project','wave')).rejects.toMatchObject({statusCode:409})
  })
+ it('projects exact frozen content pointers and rejects mismatched identities without following current drafts',async()=>{
+  const measurementRelease={releaseId:'measurement',contentHash:'a'.repeat(64),measurementHash:'b'.repeat(64)}
+  const contentSelection={referencePolicy:{policyVersion:'EXACT_POPULATION_PRIORITY_V1',measurementReleaseId:'measurement',choices:[{
+   releaseId:'reference',contentHash:'c'.repeat(64),entryKey:'d'.repeat(64),priority:1,metricKey:'total',referenceKind:'descriptive_sample'}]},
+   reportRelease:{releaseId:'report',contentHash:'e'.repeat(64)}}
+  Object.assign(published.compiledSnapshot.units[0],{measurementRelease,contentSelection})
+  published.definitionDigest=canonicalHash(published.compiledSnapshot)
+  expect(await getWave('owner','project','wave')).toMatchObject({frozenContentSelections:[{draftId:'draft',measurementRelease,contentSelection},
+    {draftId:'legacy',measurementRelease:null,contentSelection:null}]})
+  expect(mocks.draft).not.toHaveBeenCalled()
+  contentSelection.referencePolicy.measurementReleaseId='different';published.definitionDigest=canonicalHash(published.compiledSnapshot)
+  await expect(getWave('owner','project','wave')).rejects.toMatchObject({statusCode:409})
+ })
  it('rechecks account expiry with the clock after acquiring identity locks',async()=>{
   mocks.owner.mockResolvedValue([{id:'project',status:'ACTIVE',expires_at:new Date('2026-10-20T05:00:00Z'),checked_at:new Date('2026-10-20T05:00:01Z')}])
   await expect(getWave('owner','project','wave')).rejects.toMatchObject({statusCode:404})
