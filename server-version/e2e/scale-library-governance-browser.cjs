@@ -13,6 +13,7 @@ const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAIAAACQkWg2AAAACXBIWXM
 const pngHash = createHash('sha256').update(png).digest('hex')
 let fixture, output, browser, activePage
 const secrets = new Set()
+const requiredChecks=['real-virtual-ctap2-administrator-session','real-upload-worker-completed','training-approved-and-granted-survey','training-to-survey-readonly-exact-release-frozen','v2-and-ordinary-revoke-preserve-exact-frozen-v1','training-to-survey-final-original-scorer-media','survey-approved-and-granted-training','survey-to-training-recipient-course-published','survey-to-training-composite-final-all-at-once','emergency-denies-new-collection-preserves-final-replay','unified-catalog-exact-identity-pagination']
 const evidence = {schemaVersion:1,status:'RUNNING',phase:'prerequisites',checks:[],screenshots:[],layoutChecks:[],accessibility:[],browserErrors:[],failedRequests:[],media:[],mediaResponses:[],journeys:[],blockedExternalRequests:0,authoring:'Real authenticated author API; production UI review and participant consumption',physicalSecurityKeyVerified:false}
 const clean = value => {
   if (Array.isArray(value)) return value.map(clean)
@@ -22,9 +23,15 @@ const clean = value => {
   for (const secret of secrets) if (secret) text = text.split(secret).join('[redacted]')
   return text
 }
-const save = () => { if (output) fs.writeFileSync(path.join(output,'result.json'),JSON.stringify(clean(evidence),null,2)) }
+const save = () => {
+  if (!output) return
+  const report=clean(evidence)
+  // Only authored enum values bypass opaque-proof redaction, never arbitrary strings.
+  report.checks=evidence.checks.map(name=>{assert(requiredChecks.includes(name),'Unknown evidence checkpoint');return name})
+  fs.writeFileSync(path.join(output,'result.json'),JSON.stringify(report,null,2))
+}
 const phase = name => { evidence.phase=name; save() }
-const check = (name, condition=true) => { assert(condition,name); evidence.checks.push(name); save() }
+const check = (name, condition=true) => { assert(requiredChecks.includes(name),'Unknown evidence checkpoint');assert(condition,name); evidence.checks.push(name); save() }
 const button = (page,name) => page.getByRole('button',{name,exact:true})
 const governance = product => '/api/'+product.toLowerCase()+'/scale-library-governance'
 async function parsed(response) {
@@ -321,7 +328,7 @@ async function surveyParticipant(shared,source) {
   const measurement=receipt.measurements.find(row=>row.instrumentKey===unit.instrumentKey);assert(measurement)
   assert.equal(measurement.measurementReleaseId,shared.release.releaseId)
   const scoreImage=process.env.SCALE_GOVERNANCE_SCORE_IMAGE
-  assert.equal(process.env.SCALE_GOVERNANCE_BACKEND_IMAGE_HEAD,'c2c383fd4f61d09b91d61ae16eaec9f5c7c0db22')
+  assert.equal(process.env.SCALE_GOVERNANCE_BACKEND_IMAGE_HEAD,process.env.GITHUB_SHA)
   assert.equal(scoreImage,'scale-library-governance-backend-runtime:'+process.env.SCALE_GOVERNANCE_BACKEND_IMAGE_HEAD)
   const canonical=JSON.parse(execFileSync('docker',['run','--rm','--name','scale-governance-score-'+process.env.GITHUB_RUN_ID,'--label','scale-governance-ci='+process.env.GITHUB_RUN_ID,'--network','none','--cpus=1','--memory=256m','-i',scoreImage,'node','-e',
     "let text='';process.stdin.on('data',chunk=>text+=chunk);process.stdin.on('end',()=>{const input=JSON.parse(text);process.stdout.write(JSON.stringify(require('/app/dist/modules/scale/scale-scoring.js').scoreScale(input.definition,input.answers)))})"],
@@ -449,6 +456,7 @@ async function trainingParticipant(delivery,source) {
   await page.waitForURL(reportUrl)
   const report=await reportResponse
   const result=report.unitReports.find(row=>row.type==='SCALE'&&row.scaleId===delivery.wrapper.id);assert(result)
+  assert(Array.isArray(result.scores), JSON.stringify({failure:'Expected projected scale scores',reportKind:['full','scores','educational','completion','unavailable'].includes(result.reportKind)?result.reportKind:'unspecified',reason:['POLICY_UNAVAILABLE','RESULT_UNAVAILABLE'].includes(result.reason)?result.reason:'unspecified',hasRawFeedback:Array.isArray(result.rawScoreFeedback)}))
   assert.deepEqual(result.scores.map(({key,value})=>({key,value})),[{key:'total',value:1}])
   await page.getByText('SURVEY LIBRARY FEEDBACK',{exact:true}).waitFor()
   evidence.media.push({name:'training-parent-report-image',...await renderedImage(page.getByAltText('SURVEY LIBRARY FEEDBACK image',{exact:true}),source.image.contentHash)})
@@ -517,8 +525,7 @@ async function main() {
     await catalogIdentity(admin,[first,second]);await captureAndAudit(admin,'library-governance')
     assert.equal(evidence.browserErrors.length,0);assert.equal(evidence.blockedExternalRequests,0)
     assert(evidence.layoutChecks.every(row=>!row.overflow));assert(evidence.accessibility.every(row=>row.violations.length===0))
-    const required=['real-virtual-ctap2-administrator-session','real-upload-worker-completed','training-approved-and-granted-survey','training-to-survey-readonly-exact-release-frozen','v2-and-ordinary-revoke-preserve-exact-frozen-v1','training-to-survey-final-original-scorer-media','survey-approved-and-granted-training','survey-to-training-recipient-course-published','survey-to-training-composite-final-all-at-once','emergency-denies-new-collection-preserves-final-replay','unified-catalog-exact-identity-pagination']
-    assert.deepEqual(evidence.checks,required)
+    assert.deepEqual(evidence.checks,requiredChecks)
     evidence.status='PASS';phase('complete')
   } catch(error) {
     evidence.status='FAIL';evidence.failure=clean({phase:evidence.phase,name:error.name,message:error.message,stack:error.stack?.split('\n').slice(0,8).join('\n')})

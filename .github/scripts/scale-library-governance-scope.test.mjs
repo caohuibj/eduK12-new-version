@@ -24,8 +24,8 @@ test('all selected actual jobs must succeed, with no application/full fallback',
 });
 test('same-builder checks, real PG recovery, isolated media and private cleanup remain required',()=>{
  const w=readFileSync(new URL('../workflows/ci-scale-library-governance.yml',import.meta.url),'utf8');
- assert.match(w,/resume.py round4-evidence/);assert.match(w,/resume.py round4-backend/);
- assert.doesNotMatch(w,/scale-library-governance-build.sh|checks.mjs.* postgres|recovery.py (?:bootstrap|restore)/);
+ assert.match(w,/resume.py round4-evidence/);assert.match(w,/scale-library-governance-build.sh backend/);assert.match(w,/same-run backend/);
+ assert.doesNotMatch(w,/scale-library-governance-build.sh frontend|checks.mjs.* postgres|recovery.py (?:bootstrap|restore)/);
  assert.match(w,/npx prisma migrate deploy/);
  assert.match(w,/backend.sh worker/);assert.match(w,/NET_BIND_SERVICE/);
  assert.doesNotMatch(w,/ignoreHTTPSErrors|--ignore-certificate-errors|\/etc\/hosts|update-ca-certificates/);
@@ -71,7 +71,7 @@ test('browser admission refuses missing checkpoints, media bytes, wrong provenan
 test('diagnostic continuation restores exact images and never repeats successful qualification',()=>{
  const w=readFileSync(new URL('../workflows/ci-scale-library-governance.yml',import.meta.url),'utf8');
  assert.doesNotMatch(w,/docker build|setup-buildx|setup-trivy|component: \[|checks.mjs/);
- assert.match(w,/resume.py qualified-frontend/);assert.match(w,/resume.py round4-evidence/);assert.match(w,/resume.py round4-backend/);
+ assert.match(w,/resume.py qualified-frontend/);assert.match(w,/resume.py round4-evidence/);assert.match(w,/scale-library-governance-build.sh backend/);assert.match(w,/same-run backend/);
  assert.match(w,/SCALE_GOVERNANCE_BACKEND_IMAGE_HEAD/);
  const reuse=readFileSync(new URL('./scale-library-governance-resume.py',import.meta.url),'utf8');
  assert.doesNotMatch(reuse,/docker['", ]+build|npm ci|docker['", ]+tag/);

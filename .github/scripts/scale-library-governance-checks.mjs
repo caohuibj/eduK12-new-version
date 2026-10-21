@@ -11,7 +11,12 @@ const files=plan.tests[component];assert(Array.isArray(files)&&files.length>0);
 assert.equal(new Set(files).size,files.length);
 assert(files.every(f=>/^src\/[A-Za-z0-9_./-]+\.test\.tsx?$/.test(f)));
 const evidence=process.env.GOVERNANCE_EVIDENCE;assert(evidence);mkdirSync(evidence,{recursive:true});
-if(component!=='postgres'){
+if(component==='backend'){
+ const prior=JSON.parse(readFileSync(resolve(evidence,'../round4-accepted.json')));
+ assert.equal(prior.status,'ACCEPTED_PRIOR_QUALIFICATION');assert.equal(prior.sourceRun,39616852296);
+ assert.equal(prior.backendScan,'PASS_PRIOR_IMAGE_ONLY');
+}
+if(component==='frontend'){
  const prior=JSON.parse(readFileSync(resolve(evidence,'prior-contracts.json')));
  assert.equal(prior.status,'ACCEPTED_PRIOR_CONTRACTS_ONLY');assert.equal(prior.sourceRun,39610102026);
  assert.deepEqual(prior.suites.map(s=>s.file).sort(),[...plan.priorContracts[component]].sort());

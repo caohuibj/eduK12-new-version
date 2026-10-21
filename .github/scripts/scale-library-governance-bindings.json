@@ -184,7 +184,7 @@
     },
     "server-version/backend/src/modules/composite/composite.service.ts": {
       "before": "bd2930affcfba1dcee6a18d8ff008bd27ec0869b",
-      "after": "3ce295e228d761320114b9e3d24ae4563c95b701"
+      "after": "46f32bff98701bbad3eb98bdf4acb3cfad8e4c6c"
     },
     "server-version/backend/src/modules/composite/training-checkpoint.service.ts": {
       "before": "55f24f48f2611837b932db97c1d761240a12c789",
@@ -424,7 +424,7 @@
     },
     "server-version/e2e/scale-library-governance-browser.cjs": {
       "before": null,
-      "after": "6ba3476a6dd471feeafc6cf98c2a94164bf36901"
+      "after": "6e520f12f4e52445fbbd839941ca889fbb62270c"
     },
     "server-version/e2e/scale-library-governance-proxy.cjs": {
       "before": null,
@@ -645,16 +645,23 @@
     "server-version/backend/src/modules/questionnaire-product/reinterpretation.service.ts": {
       "before": "082348f0ee5f99c624d1792eeb2b7f6bbe8426d2",
       "after": "9a60b98bf2333619322e588c670c1fa3f3363ad3"
+    },
+    "server-version/backend/src/__tests__/composite/results.service.test.ts": {
+      "before": "e8d9398d6129fcfe3911c516c55b166c456fe89e",
+      "after": "7534618c001594afc03ebe536b0729ae3718a1fd"
     }
   },
   "tests": {
-    "backend": [],
+    "backend": [
+      "src/__tests__/composite/results.service.test.ts",
+      "src/__tests__/scale/composite-scale-disclosure.test.ts"
+    ],
     "frontend": [],
     "postgres": []
   },
   "frontendLint": [],
   "browserProfileTrustApproved": true,
-  "productReference": "20d983dff99b7163146376001b30ee59583f6734",
+  "productReference": "ad5d5c7233e3c8fd0be004a50b967638bde73f7b",
   "priorContracts": {
     "run": 39610102026,
     "head": "0152447ae08beefc04ffffa9601dd33295d3c33e",

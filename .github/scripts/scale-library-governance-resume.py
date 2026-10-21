@@ -91,6 +91,7 @@ def prior_contracts(component):
     (evidence/'prior-contracts.json').write_text(json.dumps(receipt,indent=2)+'\n');print(json.dumps(receipt))
 
 ROUND3={'run': 39614240900, 'head': '1dc16b8ef542f4f68457100f652fdd34074b6311', 'checkout': 'cf6ef4ee00b774037129b671ab5ff8d8f36ef69c', 'jobs': {'backend': 119271089353, 'frontend': 119271089484, 'postgres': 119273407309, 'sast': 119271088571}, 'reports': {'backend': [12352157951, 'scale-library-governance-backend-reports-cf6ef4ee00b774037129b671ab5ff8d8f36ef69c', 593533, '72bb70a02b04435e5f77b1eb6968705888659153409453eb0115351ec8fe0f2f'], 'frontend': [12351463531, 'scale-library-governance-frontend-reports-cf6ef4ee00b774037129b671ab5ff8d8f36ef69c', 81684, '8b18972246d25406ef4ad4ff5f025d9d7927721a00e778389c55e08d99b97637'], 'postgres': [12352123235, 'scale-library-governance-connected-cf6ef4ee00b774037129b671ab5ff8d8f36ef69c', 4667, '48366c915b250225689dd181ac07645d9bcdbc2d04fa2f2adb8263cf73867761']}}
+REPORT_REPAIRS=['server-version/backend/src/modules/composite/composite.service.ts','server-version/backend/src/__tests__/composite/results.service.test.ts']
 SQL_REPAIRS=['server-version/backend/prisma/migrations/20261021123000_scale_library_governance/migration.sql','server-version/backend/src/modules/scale/scale-copy.service.ts']
 def round3_official(component,read=r.api):
     run=read('runs/'+str(ROUND3['run']));assert run['id']==ROUND3['run'] and run['head_sha']==ROUND3['head'] and run['run_attempt']==1 and run['status']=='completed' and run['conclusion']=='failure'
@@ -98,7 +99,7 @@ def round3_official(component,read=r.api):
     assert job['conclusion']==('failure' if component=='postgres' else 'success')
 def round3_closure():
     assert git('diff','--name-only',ROUND3['head'],'HEAD','--','server-version/frontend')==''
-    assert sorted(git('diff','--name-only',ROUND3['head'],'HEAD','--','server-version/backend').splitlines())==sorted(SQL_REPAIRS+[FIXTURE_PATH])
+    assert sorted(git('diff','--name-only',ROUND3['head'],'HEAD','--','server-version/backend').splitlines())==sorted(SQL_REPAIRS+[FIXTURE_PATH]+REPORT_REPAIRS)
     fixture_diagnostics_only(ROUND3['head'])
     closure() # Original frontend compile/tool/environment closure is also retained.
     original=json.loads(git('show',ROUND3['head']+':.github/scripts/scale-library-governance-bindings.json'))
@@ -159,7 +160,7 @@ def fixture_diagnostics_only(original):
     assert business(old)==business(current),'Fixture input differs beyond reviewed diagnostics and synthetic-login correction'
 def round4_closure():
     assert git('diff','--name-only',ROUND4['head'],'HEAD','--','server-version/frontend')==''
-    assert git('diff','--name-only',ROUND4['head'],'HEAD','--','server-version/backend').splitlines()==[FIXTURE_PATH]
+    assert sorted(git('diff','--name-only',ROUND4['head'],'HEAD','--','server-version/backend').splitlines())==sorted([FIXTURE_PATH]+REPORT_REPAIRS)
     fixture_diagnostics_only(ROUND4['head'])
     for path in ['.github/scripts/scale-library-governance-recovery.py','.github/scripts/scale-library-governance-build.sh','server-version/backend/scripts/scale-library-governance-legacy-fixture.sql']:
         assert git('show',ROUND4['head']+':'+path)==Path(path).read_text().strip()
@@ -188,7 +189,7 @@ def round4_evidence():
     assert scan['Metadata']['ImageID']==runtime['id'] and scan['ArtifactName'] in runtime['tags']
     assert not [v for result in scan.get('Results',[]) for v in result.get('Vulnerabilities',[]) if v.get('Severity') in ['HIGH','CRITICAL']]
     prior=json.loads((root/'backend/round3-accepted.json').read_text());assert prior['sourceRun']==ROUND3['run'] and prior['status']=='ACCEPTED_PRIOR_SUCCESS' and sum(s['passed'] for s in prior['suites'])==162
-    out={'status':'ACCEPTED_PRIOR_QUALIFICATION','sourceRun':ROUND4['run'],'sourceHead':ROUND4['head'],'sourceJobs':ROUND4['jobs'],'originalRunConclusion':'failure','originalConnectedConclusion':'failure','postgresPassed':29,'instrumentFinalInherited':13,'migration':'PASS','syntheticRestore':'PASS','productionRecoveryClaim':False,'backendScan':'PASS','currentFixtureSha256':hashlib.sha256(Path(FIXTURE_PATH).read_bytes()).hexdigest(),'backendOriginalRevision':ROUND4['checkout'],'newBuildOrQualificationPerformed':False}
+    out={'status':'ACCEPTED_PRIOR_QUALIFICATION','sourceRun':ROUND4['run'],'sourceHead':ROUND4['head'],'sourceJobs':ROUND4['jobs'],'originalRunConclusion':'failure','originalConnectedConclusion':'failure','postgresPassed':29,'instrumentFinalInherited':13,'migration':'PASS','syntheticRestore':'PASS','productionRecoveryClaim':False,'backendScan':'PASS_PRIOR_IMAGE_ONLY','currentFixtureSha256':hashlib.sha256(Path(FIXTURE_PATH).read_bytes()).hexdigest(),'backendOriginalRevision':ROUND4['checkout'],'newBuildOrQualificationPerformed':False}
     (Path('scale-library-governance-evidence')/'round4-accepted.json').write_text(json.dumps(out,indent=2)+'\n');print(json.dumps(out));return root
 
 def round4_backend_restore():
