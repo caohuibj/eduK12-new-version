@@ -1,11 +1,12 @@
 import TrainingCourseCode from './TrainingCourseCode'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { ArrowRight, ChevronDown, ChevronUp, Plus } from 'lucide-react'
+import { ArrowRight, ChevronDown, ChevronUp, Plus, Search } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import apiClient from '../api/client'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import type { Course } from '../types'
 import './training-trainer-home.css'
+import './training-workspace-heading.css'
 
 const PAGE_SIZES = [2, 6, 10]
 const PAGE_SIZE_STORAGE_KEY = 'training:trainer-courses:page-size'
@@ -130,14 +131,14 @@ export default function TrainingTrainerHome() {
   }
 
   return <div className="training-home training-trainer-home">
-    <header className="training-home-header">
+    <header className="training-home-header training-workspace-heading">
       <div>
         <h1 id="trainer-courses">我的课程</h1>
         <p className="training-home-subtitle">管理课程内容，邀请学员参与学习。</p>
       </div>
+      <form className="training-workspace-search" role="search" onSubmit={event=>{event.preventDefault();setKeyword(search.trim());setQuery(current=>({...current,page:1}))}}><Search size={18} aria-hidden="true"/><input aria-label="检索课程" placeholder="搜索课程名称、介绍或课程码" value={search} onChange={event=>setSearch(event.target.value)}/><button type="submit">检索</button></form>
       <button type="button" className="training-action" onClick={() => { setCreateError(''); setCreateOpen(true) }}><Plus size={18} aria-hidden="true" />创建课程</button>
     </header>
-    <form className="training-library-toolbar" role="search" onSubmit={event=>{event.preventDefault();setKeyword(search.trim());setQuery(current=>({...current,page:1}))}}><input aria-label="检索课程" placeholder="搜索课程名称、介绍或课程码" value={search} onChange={event=>setSearch(event.target.value)}/><button type="submit">检索</button></form>
     {mutationNotice && <p className="training-message" role="status">{mutationNotice}</p>}
     <section className="training-course-section" aria-labelledby="trainer-courses">
       <div className="training-trainer-course-controls">
