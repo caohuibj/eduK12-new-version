@@ -43,28 +43,25 @@ jobs:
         run: |
           git fetch --no-tags --depth=1 origin 1074ed99311e43aab79e62e3064e8071cefad888
           python3 -B .github/scripts/scale-library-governance-resume.py round10-evidence
-      - uses: docker/setup-buildx-action@v3
-      - name: compile changed frontend once and preserve builder/runtime bytes
-        run: bash .github/scripts/scale-library-governance-build.sh frontend
+      - name: restore successful frontend bytes without compilation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --no-tags --depth=1 origin c53141edfb4b1979705403b75c7e7f0181948185
+          python3 -B .github/scripts/scale-library-governance-resume.py round11-frontend
       - name: execute changed admin types lint and its exact UI suite
         run: |
-          docker run --rm -e CI=true -e TZ=UTC -e GITHUB_WORKSPACE="$GITHUB_WORKSPACE" -e GOVERNANCE_EVIDENCE=/evidence/frontend \
+          docker run --rm --workdir /app -e CI=true -e TZ=UTC -e GITHUB_WORKSPACE="$GITHUB_WORKSPACE" -e GOVERNANCE_EVIDENCE=/evidence/frontend \
             -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" -v "$GITHUB_WORKSPACE/scale-library-governance-evidence:/evidence" \
-            "scale-library-governance-frontend-builder:$GITHUB_SHA" node "$GITHUB_WORKSPACE/.github/scripts/scale-library-governance-checks.mjs" frontend
+            --mount "type=bind,source=$GITHUB_WORKSPACE/server-version/cognitive-randomization-golden-v1.json,target=/cognitive-randomization-golden-v1.json,readonly" \
+            --mount "type=bind,source=$GITHUB_WORKSPACE/server-version/backend/src/modules/cognitive/generated/identities.json,target=/backend/src/modules/cognitive/generated/identities.json,readonly" \
+            "scale-library-governance-frontend-builder:$SCALE_GOVERNANCE_FRONTEND_IMAGE_HEAD" node "$GITHUB_WORKSPACE/.github/scripts/scale-library-governance-checks.mjs" frontend
       - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
         with:
           version: v0.70.0
           cache: false
-      - name: scan newly assembled frontend runtime
-        run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output scale-library-governance-evidence/frontend/runtime-scan.json scale-library-governance-frontend-runtime:$GITHUB_SHA
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: scale-library-governance-frontend-images-${{ github.sha }}
-          path: scale-library-governance-images/frontend/images.tar.gz
-          if-no-files-found: error
-          compression-level: 0
-          retention-days: 3
+      - name: first scan of the preserved frontend runtime
+        run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output scale-library-governance-evidence/frontend/runtime-scan.json scale-library-governance-frontend-runtime:$SCALE_GOVERNANCE_FRONTEND_IMAGE_HEAD
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -110,39 +107,16 @@ jobs:
           node-version: '24.21.0'
       - uses: actions/download-artifact@v4
         with:
-          name: scale-library-governance-frontend-images-${{ github.sha }}
-          path: scale-library-governance-images/frontend
-      - uses: actions/download-artifact@v4
-        with:
           name: scale-library-governance-admission-${{ github.sha }}
           path: scale-library-governance-evidence
-      - name: restore same-run frontend and fixed qualified backend bytes
+      - name: restore exact qualified backend and successful frontend bytes
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           git fetch --no-tags --depth=1 origin 1074ed99311e43aab79e62e3064e8071cefad888
-          (cd scale-library-governance-images/frontend; sha256sum -c "$GITHUB_WORKSPACE/scale-library-governance-evidence/frontend/images.sha256")
-          docker load -i scale-library-governance-images/frontend/images.tar.gz
-          python3 -B - <<'PYIMAGE'
-          import json,os,subprocess
-          from pathlib import Path
-          evidence=Path('scale-library-governance-evidence/frontend')
-          assert (evidence/'source-head.txt').read_text().strip()==os.environ['GITHUB_SHA']
-          assert (evidence/'source-run.txt').read_text().strip()==os.environ['GITHUB_RUN_ID']
-          images=json.loads((evidence/'images.json').read_text())
-          for target in ['builder','runtime']:
-            tag='scale-library-governance-frontend-'+target+':'+os.environ['GITHUB_SHA']
-            actual=json.loads(subprocess.check_output(['docker','image','inspect',tag],text=True))[0]
-            expected=[image for image in images if tag in image['RepoTags']]
-            assert len(expected)==1 and actual['Id']==expected[0]['Id'] and tag in actual['RepoTags']
-            assert actual['Config']['Labels']['org.opencontainers.image.revision']==os.environ['GITHUB_SHA']
-          import hashlib
-          with open(os.environ['GITHUB_ENV'],'a') as out:
-            out.write('SCALE_GOVERNANCE_FRONTEND_IMAGE_HEAD='+os.environ['GITHUB_SHA']+'\n')
-            out.write('SCALE_GOVERNANCE_FRONTEND_SHA256='+hashlib.sha256((evidence/'runtime-files.sha256').read_bytes()).hexdigest()+'\n')
-            out.write('SCALE_GOVERNANCE_BROWSER_MODE=admin-accessibility\n')
-          PYIMAGE
+          git fetch --no-tags --depth=1 origin c53141edfb4b1979705403b75c7e7f0181948185
           python3 -B .github/scripts/scale-library-governance-resume.py round10-backend
+          python3 -B .github/scripts/scale-library-governance-resume.py round11-frontend
       - name: prepare isolated services and private prerequisite directory
         shell: bash
         run: |

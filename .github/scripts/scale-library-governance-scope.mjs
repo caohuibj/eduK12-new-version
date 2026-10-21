@@ -31,7 +31,7 @@ export function scaleLibraryGovernanceOutputs(plan){
 
 export function governanceCodeqlConfig(){
  if(binding.frozen!==true)throw Error('Unfrozen analysis inventory');
- const original=binding.priorBrowser.head;
+ const original='c53141edfb4b1979705403b75c7e7f0181948185';
  const selected=git('diff','--name-only',original,'HEAD').split('\n').filter(f=>/\.(?:[cm]?[jt]sx?|py)$/.test(f));
  if(!selected.length||selected.some(f=>!tools.has(f)&&!Object.hasOwn(binding.source,f)))throw Error('Unknown or empty changed SAST input');
  const directories=[...new Set(selected.map(f=>f.slice(0,f.lastIndexOf('/'))))];

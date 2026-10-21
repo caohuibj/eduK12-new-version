@@ -831,7 +831,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git fetch --no-tags --depth=1 origin 1074ed99311e43aab79e62e3064e8071cefad888
+          git fetch --no-tags --depth=1 origin c53141edfb4b1979705403b75c7e7f0181948185
           python3 -B .github/scripts/scale-library-governance-resume.py sast
       - name: bound governance mixed-language analysis to frozen changed inputs
         id: governance-codeql-config

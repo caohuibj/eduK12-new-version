@@ -1,5 +1,6 @@
 // Runs only the frozen affected inventory, inside the original Debian builder.
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 import {execFileSync} from 'node:child_process';
 import {readFileSync,mkdirSync} from 'node:fs';
 import {resolve} from 'node:path';
@@ -20,6 +21,11 @@ if(component==='frontend'){
  const prior=JSON.parse(readFileSync(resolve(evidence,'../round10-accepted.json')));
  assert.equal(prior.status,'ACCEPTED_PRIOR_COMPONENT_AND_BUSINESS');assert.equal(prior.sourceRun,39628789620);
  assert.deepEqual(files,['src/pages/admin/ScaleLibraryGovernance.test.tsx']);
+ assert.equal(process.cwd(),'/app');
+ const restored=JSON.parse(readFileSync(resolve(evidence,'frontend-resume.json')));
+ assert.equal(restored.status,'ACCEPTED_BUILD_ONLY');assert.equal(restored.sourceRun,39631988687);
+ assert.deepEqual(Object.keys(restored.readonlyExternalInputs).sort(),['server-version/backend/src/modules/cognitive/generated/identities.json','server-version/cognitive-randomization-golden-v1.json']);
+ for(const input of Object.values(restored.readonlyExternalInputs))assert.equal(createHash('sha256').update(readFileSync(input.target)).digest('hex'),input.sha256,'Exact readonly external type fixture bytes');
 }
 if(component==='postgres'){
  const prior=JSON.parse(readFileSync(resolve(evidence,'round3-accepted.json')));

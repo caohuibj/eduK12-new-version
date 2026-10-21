@@ -264,8 +264,43 @@ def round10_backend_restore():
         assert actual['Id']==expected['id'] and tag in actual['RepoTags'] and actual['Config']['Labels']['org.opencontainers.image.revision']==expected['revision']==ROUND10['checkout']
     with open(os.environ['GITHUB_ENV'],'a') as out:out.write('SCALE_GOVERNANCE_BACKEND_IMAGE_HEAD='+ROUND10['checkout']+'\n')
 
+ROUND11={'run': 39631988687, 'head': 'c53141edfb4b1979705403b75c7e7f0181948185', 'checkout': '899a7b305b2bfce9f3030dcc95055098ee7d3461', 'jobs': {'frontend': 119332566926, 'sast': 119332566090}, 'artifacts': {'reports': [12360256067, 'scale-library-governance-admission-899a7b305b2bfce9f3030dcc95055098ee7d3461', 7207348, '487ccc5d4836778d5de97be474d996ec733546183c82abb227653f0196ae7638'], 'images': [12358873308, 'scale-library-governance-frontend-images-899a7b305b2bfce9f3030dcc95055098ee7d3461', 395521138, '697d3704f02a8a73da387e10a17a22106d2800ec68a59ae109463a4c23bd1fec']}, 'archive': '45a7d65696a79038361366c6228f5be5523a43dd0578a27859bb5922ee86fa5e', 'images': [{'id': 'sha256:50030320632fbbadc6dbcae8ac686bd7f08aed246ec5d5cc90f75b9c0af90715', 'tags': ['scale-library-governance-frontend-builder:899a7b305b2bfce9f3030dcc95055098ee7d3461'], 'revision': '899a7b305b2bfce9f3030dcc95055098ee7d3461'}, {'id': 'sha256:d27611fec4b6ca481268e4050cc759cbcb5086f189864bd780846820cc9b07a9', 'tags': ['scale-library-governance-frontend-runtime:899a7b305b2bfce9f3030dcc95055098ee7d3461'], 'revision': '899a7b305b2bfce9f3030dcc95055098ee7d3461'}]}
+FRONTEND_EXTERNAL_INPUTS={'server-version/cognitive-randomization-golden-v1.json':'/cognitive-randomization-golden-v1.json','server-version/backend/src/modules/cognitive/generated/identities.json':'/backend/src/modules/cognitive/generated/identities.json'}
+def round11_official(kind,read=r.api):
+    run=read('runs/'+str(ROUND11['run']));assert run['id']==ROUND11['run'] and run['head_sha']==ROUND11['head'] and run['run_attempt']==1 and run['status']=='completed' and run['conclusion']=='failure'
+    job=read('jobs/'+str(ROUND11['jobs'][kind]));assert job['id']==ROUND11['jobs'][kind] and job['run_id']==ROUND11['run'] and job['head_sha']==ROUND11['head'] and job['run_attempt']==1 and job['status']=='completed'
+    assert job['conclusion']==('failure' if kind=='frontend' else 'success')
+    if kind=='frontend':
+        steps=[step for step in job['steps'] if step['name']=='compile changed frontend once and preserve builder/runtime bytes'];assert len(steps)==1 and steps[0]['conclusion']=='success'
+
+def round11_frontend_restore():
+    round11_official('frontend')
+    assert git('diff','--name-only',ROUND11['head'],'HEAD','--','server-version')=='','Original compiled product/source input drift'
+    for path in ['.github/scripts/scale-library-governance-build.sh',*FRONTEND_EXTERNAL_INPUTS]:
+        assert git('show',ROUND11['head']+':'+path)==Path(path).read_text().strip(),'Original build or external JSON input drift'
+    r.RUN,r.SOURCE=ROUND11['run'],ROUND11['head']
+    reports=Path('scale-library-governance-evidence/prior-round11');archive=Path('scale-library-governance-images/frontend')
+    for kind,directory in [('reports',reports),('images',archive)]:
+        r.ARTIFACTS['governanceRound11']=tuple(ROUND11['artifacts'][kind]);r.download('governanceRound11',directory)
+    frontend=reports/'frontend';assert (frontend/'source-head.txt').read_text().strip()==ROUND11['checkout'] and (frontend/'source-run.txt').read_text().strip()==str(ROUND11['run'])
+    assert (frontend/'images.sha256').read_text().split()[0]==ROUND11['archive']
+    image=archive/'images.tar.gz';assert hashlib.file_digest(image.open('rb'),'sha256').hexdigest()==ROUND11['archive']
+    subprocess.run(['docker','load','-i',str(image)],check=True)
+    for expected in ROUND11['images']:
+        tag=expected['tags'][0];actual=json.loads(subprocess.check_output(['docker','image','inspect',tag],text=True))[0]
+        assert actual['Id']==expected['id'] and tag in actual['RepoTags'] and actual['Config']['Labels']['org.opencontainers.image.revision']==expected['revision']==ROUND11['checkout']
+    evidence=Path('scale-library-governance-evidence/frontend');evidence.mkdir(parents=True,exist_ok=True)
+    for name in ['images.json','images.sha256','runtime-files.sha256','runtime-base-extras.json','source-head.txt','source-run.txt']:(evidence/name).write_bytes((frontend/name).read_bytes())
+    receipt={'status':'ACCEPTED_BUILD_ONLY','sourceRun':ROUND11['run'],'sourceHead':ROUND11['head'],'sourceCheckout':ROUND11['checkout'],'sourceJob':ROUND11['jobs']['frontend'],'originalRunConclusion':'failure','originalJobConclusion':'failure','newBuildPerformed':False,'newChecksRequired':['types','target lint','admin UI suite','runtime scan'],'readonlyExternalInputs':{path:{'target':target,'sha256':hashlib.sha256(Path(path).read_bytes()).hexdigest()} for path,target in FRONTEND_EXTERNAL_INPUTS.items()}}
+    (evidence/'frontend-resume.json').write_text(json.dumps(receipt,indent=2)+'\n')
+    with open(os.environ['GITHUB_ENV'],'a') as out:
+        out.write('SCALE_GOVERNANCE_FRONTEND_IMAGE_HEAD='+ROUND11['checkout']+'\n')
+        out.write('SCALE_GOVERNANCE_FRONTEND_SHA256='+hashlib.sha256((frontend/'runtime-files.sha256').read_bytes()).hexdigest()+'\n')
+        out.write('SCALE_GOVERNANCE_BROWSER_MODE=admin-accessibility\n')
+
 if __name__=='__main__':
-    if sys.argv[1:]==['round10-evidence']:round10_evidence()
+    if sys.argv[1:]==['round11-frontend']:round11_frontend_restore()
+    elif sys.argv[1:]==['round10-evidence']:round10_evidence()
     elif sys.argv[1:]==['round10-backend']:round10_backend_restore()
     elif sys.argv[1:] == ['frontend']:restore()
     elif len(sys.argv)==3 and sys.argv[1]=='contracts' and sys.argv[2] in ['backend','frontend']:prior_contracts(sys.argv[2])
@@ -274,5 +309,5 @@ if __name__=='__main__':
     elif sys.argv[1:]==['round4-evidence']:round4_evidence()
     elif sys.argv[1:]==['round4-backend']:round4_backend_restore()
     elif sys.argv[1:]==['sast']:
-        round10_official('sast');out=Path('scale-library-governance-prior-sast.json');out.write_text(json.dumps({'sourceRun':ROUND10['run'],'sourceHead':ROUND10['head'],'sourceJob':ROUND10['jobs']['sast'],'status':'ANALYSIS_COMPLETED_PRIOR','zeroFindingsClaim':False}));print(out.read_text())
+        round11_official('sast');out=Path('scale-library-governance-prior-sast.json');out.write_text(json.dumps({'sourceRun':ROUND11['run'],'sourceHead':ROUND11['head'],'sourceJob':ROUND11['jobs']['sast'],'status':'ANALYSIS_COMPLETED_PRIOR','zeroFindingsClaim':False}));print(out.read_text())
     else:raise ValueError('Only this fixed frontend continuation or original SAST completion is supported')

@@ -24,7 +24,7 @@ test('all selected actual jobs must succeed, with no application/full fallback',
 });
 test('same-builder admin checks, prior PG recovery and private cleanup remain required',()=>{
  const w=readFileSync(new URL('../workflows/ci-scale-library-governance.yml',import.meta.url),'utf8');
- assert.match(w,/resume.py round10-evidence/);assert.match(w,/scale-library-governance-build.sh frontend/);assert.match(w,/same-run frontend/);
+ assert.match(w,/resume.py round10-evidence/);assert.match(w,/resume.py round11-frontend/);assert.match(w,/restore exact qualified backend/);
  assert.doesNotMatch(w,/scale-library-governance-build.sh backend|checks.mjs.* postgres|recovery.py (?:bootstrap|restore)/);
  assert.match(w,/npx prisma migrate deploy/);
  assert.doesNotMatch(w,/backend.sh worker|ffmpeg -nostdin/);assert.match(w,/NET_BIND_SERVICE/);
@@ -68,20 +68,22 @@ test('browser admission refuses missing checkpoints, media bytes, wrong provenan
  assert.throws(()=>verifyGovernanceBrowserReport(r,{...options,read:()=>Buffer.from('not PNG')}));
 });
 
-test('admin repair rebuilds only frontend and preserves all unrelated successful qualification',()=>{
+test('admin continuation restores successful frontend and preserves all unrelated successful qualification',()=>{
  const w=readFileSync(new URL('../workflows/ci-scale-library-governance.yml',import.meta.url),'utf8');
- assert.equal((w.match(/scale-library-governance-build\.sh frontend/g)||[]).length,1);
+ assert.doesNotMatch(w,/scale-library-governance-build\.sh|setup-buildx|docker build/);
  assert.equal((w.match(/scale-library-governance-checks\.mjs\" frontend/g)||[]).length,1);
- assert.match(w,/docker\/setup-buildx-action@v3/);
+ assert.match(w,/--workdir \/app/);
+ assert.match(w,/target=\/cognitive-randomization-golden-v1\.json,readonly/);
+ assert.match(w,/target=\/backend\/src\/modules\/cognitive\/generated\/identities\.json,readonly/);
  assert.match(w,/aquasecurity\/setup-trivy@/);
- assert.match(w,/trivy image --exit-code 1.*--severity HIGH,CRITICAL.*scale-library-governance-frontend-runtime:\$GITHUB_SHA/);
+ assert.match(w,/trivy image --exit-code 1.*--severity HIGH,CRITICAL.*scale-library-governance-frontend-runtime:\$SCALE_GOVERNANCE_FRONTEND_IMAGE_HEAD/);
  assert.deepEqual(binding.tests.frontend,['src/pages/admin/ScaleLibraryGovernance.test.tsx']);
  assert.deepEqual(binding.tests.backend,[]);assert.deepEqual(binding.tests.postgres,[]);
  assert.doesNotMatch(w,/scale-library-governance-build\.sh backend|checks\.mjs[\"']? (?:backend|postgres)|recovery\.py (?:bootstrap|restore)|component: \[|trivy image[^\n]*backend|npm run (?:test|build)|npx vitest/);
  const checks=readFileSync(new URL('./scale-library-governance-checks.mjs',import.meta.url),'utf8');
  assert.match(checks,/const files=plan\.tests\[component\]/);
  assert.match(checks,/\.\.\.files/);
- assert.match(w,/resume.py round10-backend/);assert.match(w,/resume.py round10-evidence/);assert.match(w,/scale-library-governance-build.sh frontend/);assert.match(w,/same-run frontend/);
+ assert.match(w,/resume.py round10-backend/);assert.match(w,/resume.py round10-evidence/);assert.match(w,/resume.py round11-frontend/);assert.match(w,/restore exact qualified backend/);
  assert.match(w,/SCALE_GOVERNANCE_BACKEND_IMAGE_HEAD/);
  const reuse=readFileSync(new URL('./scale-library-governance-resume.py',import.meta.url),'utf8');
  assert.doesNotMatch(reuse,/docker['", ]+build|npm ci|docker['", ]+tag/);
@@ -198,5 +200,23 @@ job['conclusion']='success'
 try:m.round10_official('connected',read)
 except AssertionError:pass
 else:raise AssertionError('old browser failure rewritten')
+`],{stdio:'pipe'});
+});
+
+
+test('Round11 original failed frontend requires its actual successful compile step',async()=>{
+ const {execFileSync}=await import('node:child_process');
+ execFileSync('python3',['-B','-c',`
+import importlib.util
+spec=importlib.util.spec_from_file_location('resume','.github/scripts/scale-library-governance-resume.py');m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+run={'id':m.ROUND11['run'],'head_sha':m.ROUND11['head'],'run_attempt':1,'status':'completed','conclusion':'failure'}
+job={'id':m.ROUND11['jobs']['frontend'],'run_id':m.ROUND11['run'],'head_sha':m.ROUND11['head'],'run_attempt':1,'status':'completed','conclusion':'failure','steps':[{'name':'compile changed frontend once and preserve builder/runtime bytes','conclusion':'success'}]}
+def read(path):return run if path.startswith('runs/') else job
+m.round11_official('frontend',read)
+for bad in ['failure','skipped',None]:
+ job['steps'][0]['conclusion']=bad
+ try:m.round11_official('frontend',read)
+ except AssertionError:pass
+ else:raise AssertionError('unqualified compile accepted')
 `],{stdio:'pipe'});
 });
