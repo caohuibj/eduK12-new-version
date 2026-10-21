@@ -1,6 +1,7 @@
 import TrainingCourseCode from './TrainingCourseCode'
+import TrainingCardDescription from './TrainingCardDescription'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
-import { ArrowRight, BookOpen, ChevronDown, ChevronUp, Plus, Search } from 'lucide-react'
+import { ArrowRight, BookOpen, Plus, Search } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import apiClient from '../api/client'
 import ModalSurface from '../components/shared-ui/ModalSurface'
@@ -29,31 +30,6 @@ const courseDate = (value: string) => {
   return Number.isFinite(date.getTime())
     ? new Intl.DateTimeFormat('zh-CN', { year: 'numeric', month: '2-digit', day: '2-digit' }).format(date)
     : null
-}
-
-function CourseDescription({ description, id }: { description: string; id: string }) {
-  const textRef = useRef<HTMLParagraphElement>(null)
-  const [expanded, setExpanded] = useState(false)
-  const [overflows, setOverflows] = useState(false)
-
-  useEffect(() => {
-    const text = textRef.current
-    if (!text || expanded) return
-    const measure = () => setOverflows(text.scrollHeight > text.clientHeight + 1)
-    measure()
-    const observer = typeof ResizeObserver === 'function' ? new ResizeObserver(measure) : undefined
-    observer?.observe(text)
-    return () => observer?.disconnect()
-  }, [description, expanded])
-
-  return <div className="training-trainer-course-intro">
-    <p ref={textRef} id={id} className={`training-trainer-course-description${expanded ? ' is-expanded' : ''}`}
-      title={expanded ? undefined : description}>{description}</p>
-    {(overflows || expanded) && <button type="button" className="training-trainer-description-toggle"
-      aria-expanded={expanded} aria-controls={id} onClick={() => setExpanded(value => !value)}>
-      {expanded ? '收起介绍' : '展开介绍'}{expanded ? <ChevronUp size={14} aria-hidden="true" /> : <ChevronDown size={14} aria-hidden="true" />}
-    </button>}
-  </div>
 }
 
 /** The course is the training workspace. Resources and reports live inside it. */
@@ -178,7 +154,7 @@ export default function TrainingTrainerHome() {
             <div className="training-trainer-card-heading">
               <h3 id={`trainer-course-${course.id}`} className="training-workspace-card-title"><Link to={`/courses/${encodeURIComponent(course.id)}/detail`} title={course.title}>{course.title}</Link></h3>
             </div>
-            <CourseDescription id={`trainer-course-description-${course.id}`} description={course.description || '管理学员、练习、打卡与课程测评'} />
+            <TrainingCardDescription course id={`trainer-course-description-${course.id}`} description={course.description || '管理学员、练习、打卡与课程测评'} />
             <TrainingCourseCode key={course.id+course.courseCode} compact code={course.courseCode} title={course.title}/>
             <div className="training-trainer-card-footer training-workspace-card-footer">
               <div className="training-trainer-course-details training-workspace-card-meta">

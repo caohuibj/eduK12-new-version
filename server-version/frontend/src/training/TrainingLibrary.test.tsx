@@ -10,8 +10,31 @@ import TrainingLibrary from './TrainingLibrary'
 const own={canUpdateVersion:true,id:'own',name:'我的工具',kind:'scale',source:'owned',status:'PUBLISHED',version:'1.0.0',href:'/scales/own'}
 const grant={id:'grant',name:'授权工具',kind:'scale',source:'granted',status:'PUBLISHED',href:'/scales/grant'}
 beforeEach(()=>{vi.clearAllMocks();mocks.get.mockResolvedValue({code:0,data:{list:[],total:0}})})
-afterEach(()=>vi.useRealTimers())
+afterEach(()=>{vi.useRealTimers();vi.restoreAllMocks()})
 function show(area:'media'|'tools'='tools',entry='/toolkit'){return render(<MemoryRouter initialEntries={[entry]}><Routes><Route path="/toolkit" element={<TrainingLibrary area={area}/>}/><Route path="/scales/:id" element={<p>量表编辑页</p>}/></Routes></MemoryRouter>)}
+it.each(['media','tools'] as const)('expands and collapses a truncated %s description without opening the resource',async area=>{
+ vi.spyOn(HTMLElement.prototype,'scrollHeight','get').mockReturnValue(100)
+ vi.spyOn(HTMLElement.prototype,'clientHeight','get').mockReturnValue(40)
+ const description='完整说明文字，需要在卡片中展开查看。'.repeat(6)
+ mocks.get.mockResolvedValue({code:0,data:{list:[{...own,kind:area==='media'?'image':'scale',description}],total:1}})
+ show(area)
+ const expand=await screen.findByRole('button',{name:'显示更多'})
+ const text=document.getElementById(expand.getAttribute('aria-controls')!)!
+ expect(expand).toHaveAttribute('aria-expanded','false');expect(text).not.toHaveClass('is-expanded')
+ fireEvent.click(expand)
+ expect(screen.getByRole('button',{name:'收起'})).toHaveAttribute('aria-expanded','true')
+ expect(text).toHaveClass('is-expanded');expect(text.textContent).toBe(description)
+ fireEvent.click(screen.getByRole('button',{name:'收起'}))
+ expect(screen.getByRole('button',{name:'显示更多'})).toHaveAttribute('aria-expanded','false')
+ expect(text).not.toHaveClass('is-expanded');expect(mocks.post).not.toHaveBeenCalled()
+})
+it('omits the expand button when the complete description already fits',async()=>{
+ vi.spyOn(HTMLElement.prototype,'scrollHeight','get').mockReturnValue(40)
+ vi.spyOn(HTMLElement.prototype,'clientHeight','get').mockReturnValue(40)
+ mocks.get.mockResolvedValue({code:0,data:{list:[{...own,description:'简短说明'}],total:1}})
+ show();await screen.findByText('简短说明')
+ expect(screen.queryByRole('button',{name:'显示更多'})).not.toBeInTheDocument()
+})
 it.each(['media','tools'] as const)('pages %s in groups of nine and resets to page one after filtering',async area=>{
  const rows=Array.from({length:10},(_,index)=>({...own,id:'row-'+index,name:'资源'+(index+1),kind:area==='media'?'image':'scale'}))
  mocks.get.mockImplementation(async(_path,{params})=>({code:0,data:{list:rows.slice((params.page-1)*params.pageSize,params.page*params.pageSize),total:rows.length}}))

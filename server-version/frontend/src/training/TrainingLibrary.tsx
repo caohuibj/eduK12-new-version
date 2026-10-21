@@ -7,6 +7,7 @@ import { ProductButton } from '../components/product-ui'
 import ManagementDialog from '../components/staff-ui/ManagementDialog'
 import FormalReferenceStudio from './FormalReferenceStudio'
 import { useAuth } from '../contexts/AuthContext'
+import TrainingCardDescription from './TrainingCardDescription'
 import './training-workspace.css'
 import './training-workspace-heading.css'
 import './training-workspace-cards.css'
@@ -77,7 +78,7 @@ export default function TrainingLibrary({ area }:{area:'media'|'tools'}) {
         </div>
         <h2 id={`resource-${row.kind}-${row.id}`} className="training-workspace-card-title" title={row.name}>{row.name}</h2>
         {row.status&&<span className={`training-workspace-card-status is-${row.status.toLowerCase()}`}>{statuses[row.status]||row.status}</span>}
-        {row.description&&<p className="training-library-description" title={row.description}>{row.description}</p>}
+        {row.description&&<TrainingCardDescription id={`resource-description-${row.kind}-${row.id}`} description={row.description}/>}
         <footer className="training-workspace-card-footer">
           <div className="training-workspace-card-meta">
             {row.version?<span>{['composition','form-composition'].includes(row.kind)?'修订':'版本'} {row.version}</span>:row.size!=null?<span>{(row.size/1024/1024).toFixed(1)} MB</span>:null}
