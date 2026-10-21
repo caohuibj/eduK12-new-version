@@ -22,7 +22,7 @@ test('all selected actual jobs must succeed, with no application/full fallback',
  for(const job of requiredChecks(n,false))for(const result of ['failure','skipped','cancelled',undefined])assert(failedChecks({...n,[job]:{...n[job],result}},false).includes(job));
  assert(failedChecks(n,true).includes('scope'));
 });
-test('same-builder checks, real PG recovery, isolated media and private cleanup remain required',()=>{
+test('same-builder report checks, prior PG recovery, isolated media and private cleanup remain required',()=>{
  const w=readFileSync(new URL('../workflows/ci-scale-library-governance.yml',import.meta.url),'utf8');
  assert.match(w,/resume.py round4-evidence/);assert.match(w,/scale-library-governance-build.sh backend/);assert.match(w,/same-run backend/);
  assert.doesNotMatch(w,/scale-library-governance-build.sh frontend|checks.mjs.* postgres|recovery.py (?:bootstrap|restore)/);
@@ -68,9 +68,22 @@ test('browser admission refuses missing checkpoints, media bytes, wrong provenan
  assert.throws(()=>verifyGovernanceBrowserReport(r,{...options,read:()=>Buffer.from('not PNG')}));
 });
 
-test('diagnostic continuation restores exact images and never repeats successful qualification',()=>{
+test('report repair rebuilds only backend and preserves all unrelated successful qualification',()=>{
  const w=readFileSync(new URL('../workflows/ci-scale-library-governance.yml',import.meta.url),'utf8');
- assert.doesNotMatch(w,/docker build|setup-buildx|setup-trivy|component: \[|checks.mjs/);
+ assert.equal((w.match(/scale-library-governance-build\.sh backend/g)||[]).length,1);
+ assert.equal((w.match(/scale-library-governance-checks\.mjs\" backend/g)||[]).length,1);
+ assert.match(w,/docker\/setup-buildx-action@v3/);
+ assert.match(w,/aquasecurity\/setup-trivy@/);
+ assert.match(w,/trivy image --exit-code 1.*--severity HIGH,CRITICAL.*scale-library-governance-backend-runtime:\$GITHUB_SHA/);
+ assert.deepEqual(binding.tests.backend,[
+  'src/__tests__/composite/results.service.test.ts',
+  'src/__tests__/scale/composite-scale-disclosure.test.ts',
+ ]);
+ assert.deepEqual(binding.tests.frontend,[]);assert.deepEqual(binding.tests.postgres,[]);
+ assert.doesNotMatch(w,/scale-library-governance-build\.sh frontend|checks\.mjs[\"']? (?:frontend|postgres)|recovery\.py (?:bootstrap|restore)|component: \[|trivy image[^\n]*frontend|npm run (?:test|build)|npx vitest/);
+ const checks=readFileSync(new URL('./scale-library-governance-checks.mjs',import.meta.url),'utf8');
+ assert.match(checks,/const files=plan\.tests\[component\]/);
+ assert.match(checks,/\.\.\.files/);
  assert.match(w,/resume.py qualified-frontend/);assert.match(w,/resume.py round4-evidence/);assert.match(w,/scale-library-governance-build.sh backend/);assert.match(w,/same-run backend/);
  assert.match(w,/SCALE_GOVERNANCE_BACKEND_IMAGE_HEAD/);
  const reuse=readFileSync(new URL('./scale-library-governance-resume.py',import.meta.url),'utf8');
