@@ -1,0 +1,217 @@
+name: Scale authoring fixed-product browser diagnosis
+# One bounded diagnostic run, not a replacement for the normal acceptance gate.
+on:
+  push:
+    branches: [ci/scale-authoring-browser-diagnostic-20261021]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: scale-authoring-browser-diagnostic-20261021
+  cancel-in-progress: false
+env:
+  CI: 'true'
+  TZ: UTC
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  browser:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      DATABASE_URL_ADMIN: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      REDIS_URL: redis://localhost:6379
+      PORT: '3000'
+      SOCKET_REDIS_REQUIRED: 'true'
+      COOKIE_SECURE: 'true'
+      CORS_ORIGIN: https://training.eduk12.top,https://survey.eduk12.top
+      TRUST_PROXY_HOPS: '1'
+      SURVEY_WORKSPACE_ENABLED: 'true'
+      SURVEY_PUBLICATION_ENABLED: 'true'
+      SURVEY_ANALYTICS_ENABLED: 'true'
+      COGNITIVE_MODULE_ENABLED: 'true'
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      HEAVY_PROCESSING_ENABLED: 'false'
+      VIDEO_PROCESSING_ENABLED: 'false'
+      LOG_LEVEL: warn
+      ASSET_MIGRATION_COMPLETE: 'false'
+      SCALE_AUTHORING_ISOLATED: '1'
+      SCALE_AUTHORING_ACCEPTANCE: '1'
+      MEASUREMENT_BROWSER_ISOLATED: '1'
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U ptool -d ptool" --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4.11-bookworm
+        ports: ['6379:6379']
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify fixed producer identity, diagnostic-only diff and exact ZIP hashes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'VERIFY'
+          import hashlib,json,os,subprocess,urllib.request,urllib.error,zipfile
+          from pathlib import Path
+          source='48defee0aecbc36138ad624f729b9a7cbb634efc'
+          allowed={'server-version/e2e/scale-authoring-feedback-browser.cjs','.github/workflows/ci-scale-authoring-browser-diagnostic.yml'}
+          changed=set(subprocess.check_output(['git','diff','--name-only',source,'HEAD'],text=True).splitlines())
+          assert changed==allowed, 'Only the frozen diagnostic script and this workflow may differ'
+          raw=subprocess.check_output(['git','diff','--raw','--no-abbrev','--no-renames',source,'HEAD'],text=True).splitlines()
+          for line in raw:
+              header,path=line.split('\t');before_mode,after_mode,before,after,status=header[1:].split()
+              expected='M' if path.endswith('.cjs') else 'A'
+              assert path in allowed and status==expected and after_mode=='100644'
+              assert before_mode==('100644' if expected=='M' else '000000')
+          assert subprocess.check_output(['git','hash-object','server-version/e2e/scale-authoring-feedback-browser.cjs'],text=True).strip()=='ee6c62ab5ce83c51fecbd3bff82035f327424dfa'
+          api='https://api.github.com/repos/caohuibj/eduK12-new-version/actions/'
+          headers={'Authorization':'Bearer '+os.environ['GH_TOKEN'],'Accept':'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}
+          def read(path):
+              with urllib.request.urlopen(urllib.request.Request(api+path,headers=headers),timeout=30) as r:return json.load(r)
+          run=read('runs/39560427570');assert run['head_sha']==source and run['run_attempt']==1
+          for jid,name in [(119090160085,'build (backend)'),(119090160090,'build (frontend)')]:
+              j=read('jobs/'+str(jid));assert j['run_id']==39560427570 and j['head_sha']==source and j['name']==name and j['conclusion']=='success'
+          original_browser=read('jobs/119091427956')
+          assert original_browser['run_id']==39560427570 and original_browser['head_sha']==source
+          assert any(x['name']=='new exact PostgreSQL persistence and image permission case' and x['conclusion']=='success' for x in original_browser['steps'])
+          class NoRedirect(urllib.request.HTTPRedirectHandler):
+              def redirect_request(self,*args,**kwargs):return None
+          opener=urllib.request.build_opener(NoRedirect)
+          output=Path('scale-authoring-evidence');output.mkdir()
+          artifacts=[(12326834164,'backend',924879951,'5cba5d3efd53318479134d8e0b380993533e2eb6847fa3fb41d9d1f1aaf77280'),(12327033671,'frontend',127369173,'3e52e930b2b3d71b0208011d89a2da0c4fc44214b952bb658d3515ab8b419052')]
+          for aid,component,size,digest in artifacts:
+              a=read('artifacts/'+str(aid));assert a['workflow_run']['id']==39560427570 and a['workflow_run']['head_sha']==source
+              assert a['name']=='scale-'+component+'-'+source and not a['expired'] and a['size_in_bytes']==size and a['digest']=='sha256:'+digest
+              try:opener.open(urllib.request.Request(api+'artifacts/'+str(aid)+'/zip',headers=headers),timeout=30)
+              except urllib.error.HTTPError as e:
+                  assert e.code in (301,302,303,307,308);url=e.headers['Location']
+              else:raise RuntimeError('Expected official signed artifact redirect')
+              assert url.startswith('https://')
+              archive=Path(os.environ['RUNNER_TEMP'])/('scale-original-'+component+'.zip');h=hashlib.sha256();count=0
+              # No authorization header is forwarded to the signed artifact host.
+              with urllib.request.urlopen(url,timeout=120) as r,archive.open('wb') as f:
+                  while chunk:=r.read(1024*1024):f.write(chunk);h.update(chunk);count+=len(chunk)
+              assert count==size and h.hexdigest()==digest,'Original ZIP bytes differ'
+              with zipfile.ZipFile(archive) as z:
+                  for info in z.infolist():
+                      assert '/' not in info.filename and '\\' not in info.filename and info.filename.startswith(component+'-')
+                      assert (info.external_attr>>16)&0o170000 != 0o120000
+                  z.extractall(output)
+              archive.unlink()
+          (output/'diagnostic-provenance.json').write_text(json.dumps({'sourceRun':39560427570,'sourceHead':source,'diagnosticHead':os.environ['GITHUB_SHA'],'productUnchanged':True,'newBuild':False,'pgRepeated':False,'mergeQualified':False,'artifacts':artifacts},indent=2))
+          VERIFY
+      - name: restore verified original products without rebuilding
+        run: |
+          set -euo pipefail
+          for component in backend frontend; do
+            test "$(cat scale-authoring-evidence/$component-head.txt)" = "48defee0aecbc36138ad624f729b9a7cbb634efc"
+            test "$(cat scale-authoring-evidence/$component-run.txt)" = "39560427570"
+            (cd scale-authoring-evidence; sha256sum -c "$component-build.sha256")
+            tar -xzf "scale-authoring-evidence/$component-build.tgz" -C "server-version/$component"
+          done
+          (cd scale-authoring-evidence; sha256sum -c backend-images.sha256)
+          gzip -dc scale-authoring-evidence/backend-images.tgz | docker load
+          for target in builder runtime; do
+            original="scale-authoring-backend-$target:48defee0aecbc36138ad624f729b9a7cbb634efc"
+            docker tag "$original" "scale-authoring-backend-$target:$GITHUB_SHA"
+            test "$(docker image inspect "$original" --format '{{.Id}}')" = "$(docker image inspect "scale-authoring-backend-$target:$GITHUB_SHA" --format '{{.Id}}')"
+          done
+          test -f server-version/backend/dist/index.js
+          test -f server-version/frontend/dist/index.html
+      - name: prepare official browser and native runtime libraries
+        run: |
+          node server-version/backend/node_modules/playwright-core/cli.js install --with-deps chromium
+          sudo apt-get install -y --no-install-recommends libnss3-tools
+          npm ci --prefix .github/release-tools
+      - name: create disposable private paths and fresh encryption keys
+        run: |
+          python3 - <<'PY'
+          import json,os,secrets
+          from pathlib import Path
+          private=Path(os.environ['RUNNER_TEMP'])/'scale-authoring-private'
+          private.mkdir(mode=0o700)
+          values={'SCALE_AUTHORING_FIXTURE_FILE':private/'fixture.json','MEASUREMENT_BROWSER_FIXTURE_DIR':private,'SCALE_AUTHORING_EVIDENCE_DIR':Path(os.environ['GITHUB_WORKSPACE'])/'scale-authoring-evidence/browser','SCALE_AUTHORING_BACKEND_ROOT':Path(os.environ['GITHUB_WORKSPACE'])/'server-version/backend','UPLOAD_DIR':private/'uploads','EXPORT_DIR':private/'exports','CREDENTIAL_HANDOFF_DIR':private/'credentials'}
+          for key in ['JWT_SECRET','DATA_ENCRYPTION_KEY','DATA_PSEUDONYM_KEY','ASSET_SIGNING_SECRET','SURVEY_MFA_ENCRYPTION_KEY']:
+            values[key]=secrets.token_hex(32);print('::add-mask::'+values[key])
+          for key in ['SCALE_AUTHORING_EVIDENCE_DIR','UPLOAD_DIR','EXPORT_DIR','CREDENTIAL_HANDOFF_DIR']: Path(values[key]).mkdir(parents=True,exist_ok=True,mode=0o700)
+          with open(os.environ['GITHUB_ENV'],'a') as output:
+            for k,v in values.items():output.write(f'{k}={v}\n')
+          PY
+      - name: initialize empty synthetic schema only
+        run: |
+          bash .github/scripts/scale-authoring-backend.sh node scripts/pr24-migration-preflight.mjs
+          bash .github/scripts/scale-authoring-backend.sh node node_modules/prisma/build/index.js migrate deploy
+      - name: seed browser prerequisites and restricted API role
+        run: bash .github/scripts/scale-authoring-backend.sh node --import tsx scripts/scale-authoring-browser-fixture.ts
+      - name: require current explicit private-profile trust approval
+        run: |
+          node -e "if(require('./.github/scripts/scale-authoring-bindings.json').browserProfileTrustApproved!==true)throw new Error('This round profile-only CA approval is still pending; no TLS trust action executed')"
+          echo 'MEASUREMENT_BROWSER_EPHEMERAL_CA_APPROVED=true' >> "$GITHUB_ENV"
+      - name: isolated profile-only test TLS (never system trust)
+        run: python3 -B .github/scripts/measurement-browser-ci.py tls
+      - name: serve exact compiled backend and frontend through existing loopback proxy
+        run: |
+          set -euo pipefail
+          bash .github/scripts/scale-authoring-backend.sh serve
+          nohup setsid node server-version/e2e/measurement-browser-proxy.cjs > "$RUNNER_TEMP/scale-proxy.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/scale-proxy.pid"
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --max-time 2 http://127.0.0.1:3000/ready >/dev/null && curl --noproxy '*' --fail --silent --max-time 2 --cacert "$MEASUREMENT_BROWSER_TLS_CA" --resolve training.eduk12.top:3189:127.0.0.1 https://training.eduk12.top:3189/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          echo '::error::Compiled services failed readiness; private logs are not uploaded'
+          exit 1
+      - name: real two-entry editing, final feedback and visual checks
+        run: |
+          node server-version/e2e/scale-authoring-feedback-browser.cjs
+          node .github/scripts/scale-authoring-scope.mjs browser-report
+      - name: stop this run processes and clear private credentials
+        if: always()
+        run: |
+          set +e
+          status=0
+          containers="$(docker ps -a --format '{{.Names}}')" || status=1
+          if grep -qx scale-authoring-api <<< "$containers"; then docker rm -f scale-authoring-api >/dev/null || status=1; fi
+          remaining="$(docker ps -a --format '{{.Names}}')" || status=1
+          if grep -qx scale-authoring-api <<< "$remaining"; then status=1; fi
+          file="$RUNNER_TEMP/scale-proxy.pid"
+          if [ -f "$file" ]; then
+            pid="$(cat "$file")"
+            if [[ "$pid" =~ ^[0-9]+$ ]] && [ "$pid" -gt 1 ]; then
+              kill -- -"$pid" 2>/dev/null
+              for attempt in $(seq 1 10); do kill -0 -- -"$pid" 2>/dev/null || break; sleep 0.2; done
+              if kill -0 -- -"$pid" 2>/dev/null; then kill -KILL -- -"$pid" 2>/dev/null; sleep 0.2; fi
+              if kill -0 -- -"$pid" 2>/dev/null; then status=1; fi
+            else status=1; fi
+          fi
+          rm -rf "$RUNNER_TEMP/scale-authoring-private" || status=1
+          test ! -e "$RUNNER_TEMP/scale-authoring-private" || status=1
+          mkdir -p scale-authoring-evidence
+          printf '{"exitStatus":%s,"privateMaterialRemoved":%s}\n' "$status" "$([ ! -e "$RUNNER_TEMP/scale-authoring-private" ] && echo true || echo false)" > scale-authoring-evidence/cleanup.json
+          exit "$status"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scale-browser-diagnostic-${{ github.sha }}
+          path: |
+            scale-authoring-evidence/diagnostic-provenance.json
+            scale-authoring-evidence/cleanup.json
+            scale-authoring-evidence/browser/
+          retention-days: 3
+          if-no-files-found: error

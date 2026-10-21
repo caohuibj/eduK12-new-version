@@ -12,7 +12,7 @@ const { createHmac } = require('node:crypto')
 const { chromium } = require(process.env.SCALE_AUTHORING_PLAYWRIGHT_MODULE || '../backend/node_modules/playwright-core')
 const REQUIRED = ['training-editor-native', 'training-stable-item-operations', 'training-quality-roundtrip', 'training-published', 'training-final-report-image', 'survey-editor-native', 'survey-quality-roundtrip', 'survey-published', 'survey-final-report-image', 'survey-raw-quality-export', 'desktop-mobile-layout']
 const evidence = { schemaVersion: 1, status: 'RUNNING', checks: [], screenshots: [], browserErrors: [], accessibility: [], computedStyles: [], blockedExternalRequests: 0, scope: 'Real Chromium, synthetic accounts, candidate built UI and real API/PostgreSQL; no physical-device timing claim' }
-let fixture, output, browser
+let fixture, output, browser, activePage
 const phase = name => { evidence.phase = name; if (output) save() }
 const check = (name, condition) => { assert.ok(condition, name); evidence.checks.push(name) }
 const save = () => fs.writeFileSync(path.join(output, 'result.json'), JSON.stringify(evidence, null, 2))
@@ -26,23 +26,45 @@ async function responseData(response) {
   return body.data
 }
 async function action(page, endpoint, trigger, method = 'POST') {
+  activePage = page
   const [response] = await Promise.all([page.waitForResponse(r => r.request().method() === method && (endpoint instanceof RegExp ? endpoint.test(new URL(r.url()).pathname) : new URL(r.url()).pathname === endpoint)), trigger()])
   return { data: await responseData(response), request: response.request() }
 }
 async function newPage() {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, locale: 'zh-CN', timezoneId: 'UTC', acceptDownloads: true, serviceWorkers: 'block' })
   await context.route('**/*', route => { const url = new URL(route.request().url()); if (!['http:', 'https:'].includes(url.protocol) || [fixture.trainingUrl, fixture.surveyUrl].includes(url.origin)) return route.continue(); evidence.blockedExternalRequests++; return route.abort('blockedbyclient') })
-  const page = await context.newPage()
+  const page = await context.newPage(); activePage = page
   page.setDefaultTimeout(25000); page.setDefaultNavigationTimeout(30000)
   page.on('pageerror', e => evidence.browserErrors.push(e.name))
   page.on('dialog', d => { evidence.browserErrors.push('UnexpectedDialog'); return d.dismiss() })
   return page
 }
+async function capture(page, name, width, failure = false) {
+  const file = name + '-' + width + '.png'
+  await page.screenshot({ path: path.join(output, file), fullPage: true,
+    mask: [page.locator('code,input,textarea,svg,[href*="/r/"]')] })
+  const item = { name, width, file }
+  if (failure) evidence.failureScreenshot = item
+  else evidence.screenshots.push(item)
+  save()
+}
+// Preserve diagnostic structure and measured colors, not authentication values or URLs.
+function redactDiagnostics(value) {
+  if (Array.isArray(value)) return value.map(redactDiagnostics)
+  if (value && typeof value === 'object') return Object.fromEntries(Object.entries(value).map(([key, item]) => [key, redactDiagnostics(item)]))
+  if (typeof value !== 'string') return value
+  let text = value.replace(/\b(value|src|href|action|data-[\w-]+)=("[^"]*"|'[^']*')/gi, '$1="[redacted]"')
+    .replace(/https?:\/\/[^\s"'<>]+/g, '[redacted-url]')
+  for (const secret of [fixture?.teacher?.password, fixture?.student?.password, fixture?.researcher?.password, fixture?.researcher?.totpSecretBase64].filter(Boolean)) text = text.split(secret).join('[redacted-secret]')
+  return text
+}
 async function layout(page, name, scope) {
+  activePage = page
   for (const width of [1440, 768, 390]) {
     await page.setViewportSize({ width, height: 1000 })
     await page.evaluate(() => document.fonts.ready)
     await page.waitForTimeout(150) // CSS/layout settlement only, never accelerate task timing.
+    await capture(page, name, width)
     assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1), false, name + ' overflows at ' + width)
     const surface = page.locator(scope); assert(await surface.count() > 0, name + ' missing native surface')
     if (width === 1440) {
@@ -51,9 +73,6 @@ async function layout(page, name, scope) {
       evidence.computedStyles.push({ name, ...(await surface.first().evaluate(node => { const style = getComputedStyle(node); return { fontFamily: style.fontFamily, color: style.color, backgroundColor: style.backgroundColor, borderRadius: style.borderRadius } })) })
       await accessibility(page, name)
     }
-    const filename = name + '-' + width + '.png'
-    await page.screenshot({ path: path.join(output, filename), fullPage: true, mask: [page.locator('code,input[type=password]')] })
-    evidence.screenshots.push({ name, width, file: filename })
   }
   await page.setViewportSize({ width: 1440, height: 1000 })
 }
@@ -70,9 +89,9 @@ async function accessibility(page, name) {
   const result = await page.evaluate(async () => {
     const result = await window.axe.run({ include: ['main'] }, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
     return { version: window.axe.version, passes: result.passes.length, incomplete: result.incomplete.length,
-      violations: result.violations.map(v => ({ id: v.id, impact: v.impact, nodeCount: v.nodes.length })) }
+      violations: result.violations.map(v => ({ id: v.id, impact: v.impact, description: v.description, help: v.help, helpUrl: v.helpUrl, nodeCount: v.nodes.length, nodes: v.nodes })) }
   })
-  evidence.accessibility.push({ name, ...result }); save()
+  evidence.accessibility.push({ name, ...redactDiagnostics(result), diagnosticRedaction: 'URL, input-value and secret attributes removed; targets, HTML structure, failureSummary and all check/related-node data retained' }); save()
   assert.equal(result.version, version); assert(result.passes > 0); assert.equal(result.violations.length, 0, name + ' WCAG violations')
 }
 function totp() {
@@ -272,7 +291,14 @@ async function main() {
     assert.equal(evidence.browserErrors.length, 0); assert.equal(evidence.blockedExternalRequests, 0); assert.equal(evidence.accessibility.length, 4)
     for (const name of REQUIRED) assert(evidence.checks.includes(name), 'Missing acceptance checkpoint ' + name)
     evidence.status = 'PASS'
-  } catch (error) { evidence.status = 'FAIL'; evidence.failure = { name: error.name, completedChecks: evidence.checks.length }; process.exitCode = 1 }
+  } catch (error) {
+    evidence.status = 'FAIL'; evidence.failure = { name: error.name, message: redactDiagnostics(error.message), completedChecks: evidence.checks.length }; process.exitCode = 1
+    save()
+    if (activePage && !activePage.isClosed()) {
+      try { await capture(activePage, 'failure-' + (evidence.phase || 'unknown'), activePage.viewportSize()?.width || 1440, true) }
+      catch (captureError) { evidence.failureScreenshotError = { name: captureError.name }; save() }
+    }
+  }
   finally { if (browser) await browser.close(); save() }
 }
 main().catch(error => { console.error('Scale browser prerequisites failed:', error.name); process.exitCode = 1 })
