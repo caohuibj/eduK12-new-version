@@ -3,6 +3,7 @@ import { AuthorPreviewMedia } from '../AuthorPreviewMedia'
 import { OnlineAnswerField } from '../OnlineAnswerField'
 import { onlineRunnerDefinition, onlineResponses, onlineAnswerComplete } from '../online'
 import React, { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useAuth } from '../../../contexts/AuthContext'
 import { sessionFetch } from '../../../api/client'
 import { ProductPage, PageHeader, ProductStatus } from '../../../components/product-ui'
@@ -84,6 +85,8 @@ export default function SjtAuthoring() {
   const [newDraftEpoch, setNewDraftEpoch] = useState(0)
   const [mediaBusy, setMediaBusy] = useState(false)
   const [policyChoice, setPolicyChoice] = useState<'LEGACY' | 'COURSE_GRANT_V1'>('COURSE_GRANT_V1')
+  const [workspaceParams]=useSearchParams()
+  const requestedDraftId=workspaceParams.get('draftId')
   const [drafts, setDrafts] = useState<Draft[]>([]),
     [selected, setSelected] = useState<Draft | null>(null)
   const [file, setFile] = useState<File | null>(null),
@@ -103,8 +106,8 @@ export default function SjtAuthoring() {
     finally { setLoading(false) }
   }
   useEffect(() => {
-    void refresh().catch((e) => {setFailed(true);setNotice(e.message)})
-  }, [])
+    void refresh().then(async()=>{if(requestedDraftId)await open(requestedDraftId)}).catch((e) => {setFailed(true);setNotice(e.message)})
+  }, [requestedDraftId])
   async function run(action: () => Promise<void>) {
     setBusy(true)
     setIssues([])

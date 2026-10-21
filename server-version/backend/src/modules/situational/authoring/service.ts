@@ -110,6 +110,43 @@ export async function listSjtDrafts(actor: SjtAuthorActor) {
     }
   })
 }
+/** A new content draft, never an in-place edit of a reviewed release. */
+export async function forkSjtDraftVersion(actor: SjtAuthorActor, id: string) {
+  return prisma.$transaction(async tx => {
+    await tx.$queryRaw`SELECT id FROM sjt_author_drafts WHERE id=${id} FOR UPDATE`
+    const source = await tx.sjtAuthorDraft.findUnique({where:{id}})
+    if (!source || source.ownerId !== actor.userId) throw problem('只能更新自己编制的工具',403)
+    if (source.status !== 'PUBLISHED') throw problem('仅已发布工具需要创建新版本')
+    const template = source.template as Record<string, any>
+    const parts = String(template.instrumentVersion).split('.').map(Number)
+    if (parts.length!==3 || parts.some(value=>!Number.isSafeInteger(value)||value<0)) throw problem('来源版本号无效')
+    // Release identities are global, including retired versions. Serialize forks
+    // across source rows/authors without returning anyone else's draft metadata.
+    // No other writer takes this lock, so source -> key introduces no reverse
+    // row-lock dependency; publication still enforces its unique release identity.
+    await tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtext(${"sjt-version:" + template.instrumentKey}))`
+    const used = await tx.$queryRaw<Array<{version:string}>>`SELECT template->>'instrumentVersion' AS version
+      FROM sjt_author_drafts WHERE template->>'instrumentKey'=${template.instrumentKey}
+      UNION SELECT instrument_version AS version FROM sjt_author_releases WHERE instrument_key=${template.instrumentKey}`
+    let patch=parts[2]
+    for(const row of used){
+      if(!/^\d+\.\d+\.\d+$/.test(row.version))continue
+      const candidate=row.version.split('.').map(Number)
+      if(candidate.every(value=>Number.isSafeInteger(value))&&candidate[0]===parts[0]&&candidate[1]===parts[1])patch=Math.max(patch,candidate[2])
+    }
+    if(!Number.isSafeInteger(patch+1))throw problem('版本号已达到上限，请使用新的内容版本')
+    const next = {...template,instrumentVersion:`${parts[0]}.${parts[1]}.${patch+1}`}
+    const compiled = compileSjtAuthorDocument(next)
+    assertAdaptedVersion(source.adaptationSource,compiled.template)
+    const mediaOptions=await adaptationMediaOptions(tx,source,true)
+    await assertSjtAuthorMedia(tx,actor.userId,compiled.template,mediaOptions)
+    const row=await tx.sjtAuthorDraft.create({data:{ownerId:actor.userId,template:json(compiled.template),contentDigest:compiled.contentDigest,
+      authorizationPolicy:source.authorizationPolicy,adaptationSource:source.adaptationSource===null?Prisma.DbNull:json(source.adaptationSource)}})
+    await tx.sjtAuthorAudit.create({data:{draftId:row.id,actorId:actor.userId,revision:1,action:'VERSION_COPY',contentDigest:compiled.contentDigest,
+      template:json(compiled.template),authorizationPolicy:source.authorizationPolicy,note:`来源草稿 ${source.id}；原发布版本保持不变`}})
+    return row
+  })
+}
 export async function getSjtDraft(actor: SjtAuthorActor, id: string) {
   const draft = await prisma.sjtAuthorDraft.findUnique({
     where: { id },

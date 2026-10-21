@@ -1,8 +1,9 @@
+import { useTrainingLearnerNavigation } from '../../../training/learnerNavigation'
 import CognitiveCredentialReset from './CognitiveCredentialReset'
 import CognitiveSessionEntry from './CognitiveSessionEntry'
 import { isPublicAssessmentPath } from '../../../components/app-shell/access'
 import React, { useEffect, useMemo, useState } from 'react'
-import { useLocation, useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useParams } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 import { ProductPage, ProductStatus } from '../../../components/product-ui'
 import {
@@ -54,12 +55,13 @@ const isCognitiveV2Report = (value: unknown): value is CognitiveV2Report => {
 
 const CognitiveResult: React.FC = () => {
   const { sessionId } = useParams<{ sessionId: string }>()
-  const navigate = useNavigate()
   const isPublic = isPublicAssessmentPath(useLocation().pathname)
   const recoveryToken = sessionId && isPublic ? readCognitiveRecoveryCredential(sessionId) : ''
   const sessionApi = useMemo(() => (isPublic ? publicCognitiveApi(recoveryToken) : cognitiveApi), [isPublic, recoveryToken])
   const [loading, setLoading] = useState(true)
   const [session, setSession] = useState<CognitiveSession | null>(null)
+  const learner = useTrainingLearnerNavigation({ courseId: session?.trainingPersistence?.courseId, parentAttemptId: session?.trainingPersistence?.attemptId })
+  const navigate = learner.navigate
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -92,7 +94,7 @@ const CognitiveResult: React.FC = () => {
   if (session?.feedbackDeferred) {
     return <ProductPage width="report" className="hui-report">
       <ProductStatus kind="pending" title="单项已提交，反馈暂未开放">完成整份测评后，按权限查看单项反馈。</ProductStatus>
-      <button onClick={back} className="btn-secondary mt-4">返回列表</button>
+      <button onClick={back} className="btn-secondary mt-4">{learner.enabled ? learner.backLabel : '返回列表'}</button>
     </ProductPage>
   }
   if (error || !session?.result) {
@@ -100,7 +102,7 @@ const CognitiveResult: React.FC = () => {
       <ProductPage width="report" className="hui-report">
         <ProductStatus kind="error" title="认知测评报告暂不可用">{error || '暂无结果'}</ProductStatus>
         <div className="mt-4 flex flex-wrap gap-2" data-report-screen-only>
-          <button onClick={back} className="btn-secondary">返回列表</button>
+          <button onClick={back} className="btn-secondary">{learner.enabled ? learner.backLabel : '返回列表'}</button>
           {isPublic && sessionId && <CognitiveCredentialReset sessionId={sessionId} />}
         </div>
       </ProductPage>
@@ -115,7 +117,7 @@ const CognitiveResult: React.FC = () => {
     return (
       <ProductPage width="report" className="hui-report">
         <button onClick={back} className="mb-4 inline-flex min-h-11 items-center gap-2 text-gray-500 hover:text-gray-700" data-report-screen-only>
-          <ArrowLeft className="h-4 w-4" aria-hidden="true" />返回列表
+          <ArrowLeft className="h-4 w-4" aria-hidden="true" />{learner.enabled ? learner.backLabel : '返回列表'}
         </button>
         <CognitiveV2ReportCard
           report={v2Report}
@@ -180,7 +182,7 @@ const CognitiveResult: React.FC = () => {
   return (
     <ProductPage width="report" className="hui-report">
       <button onClick={back} className="mb-4 inline-flex min-h-11 items-center gap-2 text-gray-500 hover:text-gray-700" data-report-screen-only>
-        <ArrowLeft className="h-4 w-4" aria-hidden="true" />返回列表
+        <ArrowLeft className="h-4 w-4" aria-hidden="true" />{learner.enabled ? learner.backLabel : '返回列表'}
       </button>
 
       {result.singleTaskReport ? (

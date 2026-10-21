@@ -1,7 +1,8 @@
+import { learnerCourseContext, learnerCourseHref, useTrainingLearnerNavigation, withLearnerCourse } from '../../../training/learnerNavigation'
 import { situationalBasePath } from '../paths'
 import React, { useEffect, useState } from 'react'
 import { Download } from 'lucide-react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import ReportShell from '../../reporting/ReportShell'
 import SituationalReportCard, { type SituationalReportView } from '../../reporting/SituationalReportCard'
 import { situationalApi } from '../api'
@@ -17,13 +18,18 @@ const formatDuration = (ms: number) => {
 
 const SituationalResult: React.FC = () => {
   const { attemptId } = useParams<{ attemptId: string }>()
-  const navigate = useNavigate()
   const [data, setData] = useState<SituationalAttemptResponse | null>(null)
+  const learner = useTrainingLearnerNavigation({ courseId: data?.trainingPersistence?.courseId, parentAttemptId: data?.attempt.compositeAttemptId })
+  const navigate = useNavigate()
+  const { search } = useLocation()
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
     let cancelled = false
+    setLoading(true)
+    setData(null)
+    setError(null)
     if (!attemptId) {
       setError('测评记录标识缺失')
       setLoading(false)
@@ -32,9 +38,15 @@ const SituationalResult: React.FC = () => {
 
     void situationalApi.result(attemptId)
       .then((response) => {
+        if (cancelled) return
         if (response.code !== 0) throw Object.assign(new Error(response.message), { code: response.code })
         if (!response.data.result && !response.data.feedbackDeferred) {
-          navigate(`${situationalBasePath()}/${encodeURIComponent(response.data.attempt.instrumentKey)}`, { replace: true })
+          const context = learnerCourseContext(search, response.data.trainingPersistence?.courseId)
+          const parentId = response.data.attempt.compositeAttemptId
+          const back = parentId && /^[A-Za-z0-9_-]{1,100}$/.test(parentId)
+            ? withLearnerCourse(`/student/composite/attempts/${parentId}`, context)
+            : context ? learnerCourseHref(context.courseId, context.section) : '/student'
+          navigate(learner.enabled ? back : `${situationalBasePath()}/${encodeURIComponent(response.data.attempt.instrumentKey)}`, { replace: true })
           return
         }
         if (!cancelled) setData(response.data)
@@ -47,7 +59,7 @@ const SituationalResult: React.FC = () => {
       })
 
     return () => { cancelled = true }
-  }, [attemptId, navigate])
+  }, [attemptId, navigate, learner.enabled, search])
 
   if (loading) return <div className="flex min-h-[360px] items-center justify-center text-gray-500">加载权威结果…</div>
   if (data?.feedbackDeferred) {
@@ -55,7 +67,7 @@ const SituationalResult: React.FC = () => {
       ? `/student/composite/attempts/${encodeURIComponent(data.attempt.compositeAttemptId)}` : null
     return <ReportShell title="情境化测评报告"
       status={{ kind: 'pending', title: '单项已提交，反馈暂未开放', description: '完成整份测评后，按权限查看单项反馈。' }}
-      actions={<Link to={compositePath || situationalBasePath() + '/history'} className="btn-secondary">{compositePath ? '继续整份测评' : '查看历史'}</Link>} />
+      actions={<Link to={learner.enabled ? learner.backHref : compositePath || situationalBasePath() + '/history'} className="btn-secondary">{learner.enabled ? learner.backLabel : compositePath ? '继续整份测评' : '查看历史'}</Link>} />
   }
 
   if (error || !data || !data.result) {
@@ -64,7 +76,7 @@ const SituationalResult: React.FC = () => {
         title="情境化测评报告"
         description="无法读取当前权威结果记录。"
         status={{ kind: 'error', title: '报告暂时无法打开', description: error || '结果暂时无法读取' }}
-        actions={<button type="button" onClick={() => navigate(`${situationalBasePath()}/history`)} className="btn-secondary">查看历史</button>}
+        actions={<button type="button" onClick={() => navigate(learner.enabled ? learner.backHref : `${situationalBasePath()}/history`)} className="btn-secondary">{learner.enabled ? learner.backLabel : '查看历史'}</button>}
       />
     )
   }
@@ -106,7 +118,7 @@ const SituationalResult: React.FC = () => {
         title: '测评已完成',
         description: result.narrative ? (result.quality.status==='invalid'?'存在非回答，报告按已回答内容描述。':'已保存本次作答与报告。') : <><span>已提交</span> · 数据质量：{result.quality.status}</>,
       }}
-      backAction={<Link to={`${situationalBasePath()}/history`} aria-label="测评历史" className="btn-secondary">返回测评历史</Link>}
+      backAction={<Link to={learner.enabled ? learner.backHref : `${situationalBasePath()}/history`} aria-label={learner.enabled ? learner.backLabel : "测评历史"} className="btn-secondary">{learner.enabled ? learner.backLabel : '返回测评历史'}</Link>}
       limitations={[
         ...data.instrument.report.limitations,
         result.narrative ? '类别变化只用于描述本次回答，不代表能力变化或因果改善。' : '本页面只展示服务器保存的 Construct × Channel 指标；没有百分位、常模或参考分布，不应把不同通道简单合成为单一人格结论。',
@@ -115,7 +127,7 @@ const SituationalResult: React.FC = () => {
         <>
           <button type="button" aria-label="JSON" onClick={() => downloadSituationalExport(data, 'json')} className="btn-secondary inline-flex items-center gap-2"><Download className="h-4 w-4" />导出 JSON</button>
           <button type="button" aria-label="CSV" onClick={() => downloadSituationalExport(data, 'csv')} className="btn-secondary inline-flex items-center gap-2"><Download className="h-4 w-4" />导出 CSV</button>
-          <Link to={situationalBasePath()} className="btn-primary">返回题包</Link>
+          {!learner.enabled && <Link to={situationalBasePath()} className="btn-primary">返回题包</Link>}
         </>
       }
     >

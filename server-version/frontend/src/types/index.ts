@@ -123,6 +123,8 @@ export interface Checkin {
   endTime?: string
   allowViewOthers?: boolean
   allowAnonymous?: boolean
+  scheduleId?: string | null
+  scheduledFor?: string | null
   status?: 'DRAFT' | 'PUBLISHED'
   courseName?: string
   submitted?: boolean

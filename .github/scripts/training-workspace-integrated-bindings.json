@@ -1,0 +1,506 @@
+{
+  "schema": 1,
+  "base": "eb08515a26cc4637cbcb57a8859fec757a5b8b34",
+  "product": "6ad0356e40e2a1f047cbcdfb1319172f047a067b",
+  "browserProfileTrustApproved": true,
+  "source": {
+    "docs/training-authorized-tool-picker-local.md": {
+      "before": null,
+      "after": "b0e3b2463b7f9307d100de50d696ceba6097dffa"
+    },
+    "docs/training-learner-course-navigation-local.md": {
+      "before": null,
+      "after": "799e57206e313db5b9378eb161ce2ace42679834"
+    },
+    "docs/training-workspace-libraries-local.md": {
+      "before": null,
+      "after": "6731905a341599191fd9964e2ce40777a3d2ae52"
+    },
+    "server-version/backend/prisma/migrations/20261021160000_checkin_schedules/migration.sql": {
+      "before": null,
+      "after": "786b9886de84a116df1067368bd14da35a64cc11"
+    },
+    "server-version/backend/prisma/migrations/20261021190000_workspace_media_grants/migration.sql": {
+      "before": null,
+      "after": "89e8ec9eef873fc052b2f66d421988be02d79ed1"
+    },
+    "server-version/backend/prisma/migrations/20261021194500_workspace_form_grants/migration.sql": {
+      "before": null,
+      "after": "e12b63366456c0f3b47a1f5609cd8efebac4aab4"
+    },
+    "server-version/backend/prisma/schema.prisma": {
+      "before": "6120ed7a889f9c3d123bc2cd8fd6e3fdff6c4537",
+      "after": "e525bd1952aac26cba5ebfec80be0b519a02a017"
+    },
+    "server-version/backend/scripts/runtime-table-policy.json": {
+      "before": "9537f5d2562b41e64d5448c919067807380b4fdc",
+      "after": "a1544c1599566096a64ed4e833e7886cac615dd4"
+    },
+    "server-version/backend/scripts/training-workspace-integrated-browser-fixture.ts": {
+      "before": null,
+      "after": "19bf46c300d7cf8169237466fced8782ceeb4121"
+    },
+    "server-version/backend/src/__tests__/controllers/checkinSchedule.test.ts": {
+      "before": null,
+      "after": "73fb01da1eb0dcb95e517bf193dc10678b28a335"
+    },
+    "server-version/backend/src/__tests__/controllers/courseLibrary.test.ts": {
+      "before": "4257796b992e64cb5e10e6044fb9536fd263f314",
+      "after": "ed504bc8a83ff3e40e0969ef3cb40adc1860c73c"
+    },
+    "server-version/backend/src/__tests__/controllers/generalQuestionnaire-copy-authorization.test.ts": {
+      "before": null,
+      "after": "7246a241e458b56f5c9b997993e4ecdaf9961c5a"
+    },
+    "server-version/backend/src/__tests__/integration/checkinSchedule.postgres.integration.test.ts": {
+      "before": null,
+      "after": "1355a9a5e54710b5a34e59c5ec92dee07ba6fd0f"
+    },
+    "server-version/backend/src/__tests__/services/checkinScheduleRunner.test.ts": {
+      "before": null,
+      "after": "089df9661d6689f9dc78ba60f0b555d62d78b01c"
+    },
+    "server-version/backend/src/__tests__/services/checkinScheduleTiming.test.ts": {
+      "before": null,
+      "after": "9948b311bfab40d52f9961c922303c61b942f5ef"
+    },
+    "server-version/backend/src/__tests__/services/workspaceMedia.test.ts": {
+      "before": null,
+      "after": "a1e8672e2b666b9fc70ffe2cf6da4ac70f9c5172"
+    },
+    "server-version/backend/src/__tests__/situational/sjt-course-grants.test.ts": {
+      "before": "fee3f68e95f4a713b61fa669010faf5ebb6b04f3",
+      "after": "f49c8f52894d64a11c4015f1f0ba88560f1123f6"
+    },
+    "server-version/backend/src/__tests__/situational/sjt-version-allocation.postgres.integration.test.ts": {
+      "before": null,
+      "after": "0c2fd64325c8914d6924059b2ea49f4f99a1518e"
+    },
+    "server-version/backend/src/__tests__/training-workspace-governance.postgres.integration.test.ts": {
+      "before": null,
+      "after": "7762081a57290badd8a0834b1ce33f4ce4207355"
+    },
+    "server-version/backend/src/__tests__/training-workspace.postgres.integration.test.ts": {
+      "before": null,
+      "after": "ee21658fab05ac68f7f6b9a37036c43a8a7a3cd1"
+    },
+    "server-version/backend/src/controllers/checkinController.ts": {
+      "before": "768395741df3120afde4c1c1474c2659a594a30c",
+      "after": "9b5442fd4efa0c073fdba0260e6fa870b16eccb5"
+    },
+    "server-version/backend/src/controllers/checkinScheduleController.ts": {
+      "before": null,
+      "after": "d125552c75cd7c76fda05fd3a0bcb614065cbef4"
+    },
+    "server-version/backend/src/controllers/courseController.ts": {
+      "before": "7592f9411885dba0d704f87efbac4aeea4d64c1f",
+      "after": "b0a954eddb4610d34064438f52d83c0c1fc56c38"
+    },
+    "server-version/backend/src/controllers/generalQuestionnaireController.ts": {
+      "before": "5c33cad90ba7f7a650fca6f9e818b2829250ab5c",
+      "after": "69a416ffb9f94e034aee597f71224d1e4d50c8cb"
+    },
+    "server-version/backend/src/index.ts": {
+      "before": "2e480a6d5024cf94511fc3d2e8f1c78f3319bec5",
+      "after": "49d6c826264cfbca71b0c68e66773cf38002e634"
+    },
+    "server-version/backend/src/modules/situational/authoring/service.ts": {
+      "before": "5b7c95b3ea539e472971589ec375f1c738983b19",
+      "after": "4026b0525ae516e9b0a093db562e6365cc982afe"
+    },
+    "server-version/backend/src/modules/training-catalog/tasks.ts": {
+      "before": "13dade9719b6980b7ae63a264cabb543a5bf88a0",
+      "after": "641e587041ebb6d8c4a4742ab2e834fe452ea443"
+    },
+    "server-version/backend/src/routes/checkins.ts": {
+      "before": "3877653fdeaeb458785376c4301ecb504f813e9c",
+      "after": "8b2a8e32ec7d2964336d94ed9be027625cd1804b"
+    },
+    "server-version/backend/src/routes/sjtAuthoring.ts": {
+      "before": "c667f82dba6d3775b0c31575cef7edcd785eba35",
+      "after": "da83f23d578327c5e079fef00e5d94373e9a0478"
+    },
+    "server-version/backend/src/routes/trainingWorkspace.ts": {
+      "before": null,
+      "after": "e759e5b9ee1fd119cd6242a44a46c95c211e563a"
+    },
+    "server-version/backend/src/services/assetStorage.ts": {
+      "before": "39cfd463269318a31a33d401bd1f0c5bb1452b9d",
+      "after": "18b2409ec1b2347e5104e29f74b6712dc6172a03"
+    },
+    "server-version/backend/src/services/checkinScheduleService.ts": {
+      "before": null,
+      "after": "dce5c64cacf0135a70e5c5e96ce231af51aac3e8"
+    },
+    "server-version/backend/src/services/checkinScheduleTiming.ts": {
+      "before": null,
+      "after": "5f67b42aa92216cca0c5945715213fd1dde7106f"
+    },
+    "server-version/backend/src/services/materialGrant.ts": {
+      "before": "834ede8279f55b6fd8689f3e14cab7ed3d72a833",
+      "after": "d1f0a103d21dec80363bb6672a933662ba440aba"
+    },
+    "server-version/backend/src/services/workspaceMedia.ts": {
+      "before": null,
+      "after": "6353f48b382e9a48de56421d9f4b59c1d5260210"
+    },
+    "server-version/backend/src/utils/checkinSchema.ts": {
+      "before": null,
+      "after": "986cbc00cfcce1d44749cb402f9f790b3f4315ae"
+    },
+    "server-version/e2e/training-workspace-integrated-proxy.cjs": {
+      "before": null,
+      "after": "c43b6a58bcc0cc0a950d7391b056a45cf9c82064"
+    },
+    "server-version/e2e/training-workspace-integration-browser.cjs": {
+      "before": null,
+      "after": "08820be3b8ae10c386e0f8bf641de5b716fdba76"
+    },
+    "server-version/frontend/src/App.tsx": {
+      "before": "12796764967dbefc152c31e59fc1bccc677b1dc3",
+      "after": "444db0b50ecce188f300840b4f16fa782ea96e19"
+    },
+    "server-version/frontend/src/api/materialGrants.ts": {
+      "before": "f1ad696c5fce43c15d26a4bf784a5b2970ed9473",
+      "after": "661a71baee62b375fb8cb0570e576cad9278f4ba"
+    },
+    "server-version/frontend/src/components/AssessmentToolPicker.tsx": {
+      "before": null,
+      "after": "5f39db35af8bc8491978cd8889357439ae5c88f0"
+    },
+    "server-version/frontend/src/components/MediaSelector.tsx": {
+      "before": "e593307166c002ceb7dec9d069d17b10eb5e66d6",
+      "after": "89cbfeaa2686b8e7aad0891633fc1e5da68e66fa"
+    },
+    "server-version/frontend/src/components/__tests__/AssessmentToolPicker.test.tsx": {
+      "before": null,
+      "after": "c96acbbcc121352dd518f59c427bb988506aa689"
+    },
+    "server-version/frontend/src/components/__tests__/MediaSelector.test.tsx": {
+      "before": "4db18d1a3baafdcfeee4c6adb7e177a3c756c9c7",
+      "after": "505512bb1d4cbf482975473850b907d9cf80729e"
+    },
+    "server-version/frontend/src/components/app-shell/AppShell.tsx": {
+      "before": "f0804274bee494d4b4ca8f02b9f6f1e2f53f0b37",
+      "after": "f2633799fce2bbe1344a79181d85c6b21e1b3b99"
+    },
+    "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx": {
+      "before": "ec05325c38f1da9f61fc003b53de6ce68188f7f8",
+      "after": "1253d76a69128531445467fec05a089955784a62"
+    },
+    "server-version/frontend/src/components/assessment-tool-picker.css": {
+      "before": null,
+      "after": "5ea971b9b5da1034940555c1d6e84a4e8e5f18e7"
+    },
+    "server-version/frontend/src/modules/cognitive/__tests__/CognitiveRunner.fe07a.test.tsx": {
+      "before": "bf9b7f11b15cb1392f7e58c6f50d8aa023da1261",
+      "after": "4c3f5cd9c254474cde12ea0a0ae6c0ee75d1012a"
+    },
+    "server-version/frontend/src/modules/cognitive/pages/CognitiveAssignmentEntry.tsx": {
+      "before": "dd8ff535cb03536801632845eb64702da20d6b02",
+      "after": "d513e818508c8098ffd0581a35159a6652c78219"
+    },
+    "server-version/frontend/src/modules/cognitive/pages/CognitiveResult.tsx": {
+      "before": "493a4941652c5a5128eb43aeee823c57f5e5addc",
+      "after": "6c635944c5e0b2fe5ff2d9f439d6a3d7b0ab7e42"
+    },
+    "server-version/frontend/src/modules/cognitive/pages/CognitiveRunner.tsx": {
+      "before": "b14c93053e234cf5889e9c66b3409a30d636da8f",
+      "after": "426e1a91a915dc7a12acfeed2c85f4a38f8ed4c7"
+    },
+    "server-version/frontend/src/modules/cognitive/pages/CognitiveSessionEntry.tsx": {
+      "before": "b94f471ec278b7c2fabd83652806b94b100e5c00",
+      "after": "d74ef9a989557c96d925884d1bc0618bf9bce3b3"
+    },
+    "server-version/frontend/src/modules/composite/CompositeAssessmentPage.tsx": {
+      "before": "56b8b3418261c037bb003477be3ae3c1a0bec45e",
+      "after": "05fc88068eafa5ae23b0f85d5c4644570099f1ca"
+    },
+    "server-version/frontend/src/modules/composite/CompositeReportPage.tsx": {
+      "before": "57538bcd7dcc34173155390d6ad6e5c24f79a8fa",
+      "after": "1ad396c39bae9ea13a12c069b8741e886acc63ea"
+    },
+    "server-version/frontend/src/modules/reporting/__tests__/QuestionnaireResult.test.tsx": {
+      "before": "dc231cf7fc6e84f6447094a7e21d2b5dcc056ad9",
+      "after": "6b288a7d5fb193fbbe37d9d2b25c6bee918577dd"
+    },
+    "server-version/frontend/src/modules/situational/__tests__/SituationalRunner.test.tsx": {
+      "before": "fffbd87c7bf6372032b09a942cf51d0a98e16f8d",
+      "after": "ff56e863e8898cb05aec93d89d6578786a085deb"
+    },
+    "server-version/frontend/src/modules/situational/pages/SituationalResult.tsx": {
+      "before": "5c8032a86743ea1b8a61f1a7d279a1b4a7069695",
+      "after": "b3408d89b33a53d90a9b61c522908801bdca4f8d"
+    },
+    "server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx": {
+      "before": "118c9de18846e4a834afb0afc36d4dbf4102411b",
+      "after": "6a6fb7b95ee42365e7976e6ef1f1847cdb16ced9"
+    },
+    "server-version/frontend/src/modules/situational/pages/SjtAuthoring.tsx": {
+      "before": "cfb561625eda9dc67087f77b68c160cf1dabdeeb",
+      "after": "b0a110fe3922e40a1d8f67a239da312b4c04cd6c"
+    },
+    "server-version/frontend/src/pages/CheckinList.tsx": {
+      "before": "fd8fb147344a535b0a2f06a3a7185288bb034a8a",
+      "after": "508b5447f6296a283ecc42ebee49566a623a1e18"
+    },
+    "server-version/frontend/src/pages/MyAssessments.tsx": {
+      "before": "a96c8b93a03a6275e361c3ca46f0bbd6e13f46ac",
+      "after": "81121f5556f4819b5954af3131af5551cd33e400"
+    },
+    "server-version/frontend/src/pages/__tests__/MyAssessments.test.tsx": {
+      "before": "ec14c62fba9c377d914a5b7f2a6383fac1ad1810",
+      "after": "a74c67fa32f44f89f90925ef68158e741cfdf383"
+    },
+    "server-version/frontend/src/pages/admin/MaterialGrants.tsx": {
+      "before": "7b5cdcb2e7bef7db8b9279c37d567c987e2de41b",
+      "after": "efb04c3bae25b2c6e3b8c8b9fb9892624b1bb429"
+    },
+    "server-version/frontend/src/pages/bundle/BundleProducts.tsx": {
+      "before": "4bfe38102a5ee2f5963d7c22bad2931dbda0b88c",
+      "after": "5edd1d1d7d4476410cd69f4bbb050541c6a9093e"
+    },
+    "server-version/frontend/src/pages/bundle/__tests__/BundleProducts.training.test.tsx": {
+      "before": null,
+      "after": "459826b7375dc93d8a3ec2f6f78a459b7115ce96"
+    },
+    "server-version/frontend/src/pages/bundle/authorized-questionnaires.css": {
+      "before": null,
+      "after": "61e909375bbf5dbf9f1d3d03958bb961d09dc730"
+    },
+    "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": {
+      "before": "26dd76c97884a3cbf05c2911631f6c4b196dfbea",
+      "after": "5cdddedb5c40c905265bbbec4194475cc9cad67b"
+    },
+    "server-version/frontend/src/pages/questionnaire/TrainingContentSelection.tsx": {
+      "before": "e415725b578644385a1a16f2a7c737949af3812c",
+      "after": "bd27f02cb0604da25fbe1a2f3872f78d8cf37ca1"
+    },
+    "server-version/frontend/src/pages/questionnaire/TrainingReportStudio.tsx": {
+      "before": "47d58c818d954838304cd5e2e38cd2ba096d29b1",
+      "after": "c6046150afa70fb42e586ecf767b3c7d7e61aa4c"
+    },
+    "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx": {
+      "before": "3d154c36a2b4279e32468291443884565ac96325",
+      "after": "5d1af891ea6ffb28e74898ae72839464ad149466"
+    },
+    "server-version/frontend/src/pages/questionnaire/questionnaire-training-editor.css": {
+      "before": "1494c5cf5b403d32dcfa283c902d1a9b981a589a",
+      "after": "16ed5eb49aa81678c9d45466fd3b998a9aa0b26c"
+    },
+    "server-version/frontend/src/pages/questionnaire/trainingContentRecovery.ts": {
+      "before": null,
+      "after": "b7c4d3eb6cfde6aa0f34090d7ed2a0733a457a98"
+    },
+    "server-version/frontend/src/pages/student/AssignmentSubmit.tsx": {
+      "before": "f59dd455eefe9e875541ea5b4311efa19a8c8af7",
+      "after": "7b12c1387f385a97626aef5f015fad8d0dfe7965"
+    },
+    "server-version/frontend/src/pages/student/CheckinSubmit.tsx": {
+      "before": "a0c11fc60a199e2faf9c4ba76eddfa618480d941",
+      "after": "b2aa739b6105b0445e6e081113bcf86cb59fcf33"
+    },
+    "server-version/frontend/src/pages/student/QuestionnaireAssessment.tsx": {
+      "before": "2e8fe4f172c942d875bbdc8fd384456235a49ef8",
+      "after": "9a52c0264d6a44d8ec7a65f4eeada6925d489a50"
+    },
+    "server-version/frontend/src/pages/student/QuestionnaireResult.tsx": {
+      "before": "cc8cab14ed9cf3da8803a9e88540f5086756c215",
+      "after": "aac6b7c8e41d7b1115d32315fddfda612dba3793"
+    },
+    "server-version/frontend/src/pages/student/ScaleAssessment.tsx": {
+      "before": "d77bc87083e039b45c245cc91b89ff36974938d9",
+      "after": "0cdd1b6819fc270939c6404f8854875f52cc7515"
+    },
+    "server-version/frontend/src/pages/student/ScaleResult.tsx": {
+      "before": "3861adbfae514574eb0f1a10d2417a22be237686",
+      "after": "4ff02fa221f12760a23ebe4ee54c86f64ac5839b"
+    },
+    "server-version/frontend/src/training/CheckinRecurrenceFields.test.tsx": {
+      "before": null,
+      "after": "55b20193dd5020db5554b29bb23ad8a6bcc5875f"
+    },
+    "server-version/frontend/src/training/CheckinRecurrenceFields.tsx": {
+      "before": null,
+      "after": "d1e63a414d8530d2f312ce3a7e22ae6353fcb703"
+    },
+    "server-version/frontend/src/training/TrainingCheckinSchedules.test.tsx": {
+      "before": null,
+      "after": "648909401cd3a726b795761d8b38c8f99184bef1"
+    },
+    "server-version/frontend/src/training/TrainingCheckinSchedules.tsx": {
+      "before": null,
+      "after": "f6b0cab4370daed8ef31e2a0ca1d57731f321b79"
+    },
+    "server-version/frontend/src/training/TrainingContextBack.test.tsx": {
+      "before": "4d355290cec28c92c7de8de5460e36a282e16241",
+      "after": "f7c9935f83355bc08240ea3c58bc3aff06111a86"
+    },
+    "server-version/frontend/src/training/TrainingContextBack.tsx": {
+      "before": "0ef635e346104ac0e2470fa909a2bd37277ba198",
+      "after": "814eb1f13d0656fe4ebb7d1a750d659dce359c7f"
+    },
+    "server-version/frontend/src/training/TrainingCourseAssessments.test.tsx": {
+      "before": "2763de0f9edfb59717092ab5b7b03ac697c66953",
+      "after": "31441ec4eaf92b90b857947e4604645d6d10be0f"
+    },
+    "server-version/frontend/src/training/TrainingCourseAssessments.tsx": {
+      "before": "c7c9ef4d03f166f08dc55f3829144e9bec31248b",
+      "after": "acad3a9a6926d943601ccfcda823e76f032b7e99"
+    },
+    "server-version/frontend/src/training/TrainingCoursePages.test.tsx": {
+      "before": "7b71a7c4a64b8e9af481aba25a7f7f88765a9311",
+      "after": "00f04a924db8eeb06e1d13069e0606afc0c5b57f"
+    },
+    "server-version/frontend/src/training/TrainingLearnerCourse.tsx": {
+      "before": "8f8746c58d52f553a0f1cfbfbd14c53a88b654e9",
+      "after": "f3135d02e4576dbb63776565ff40375802ccf14a"
+    },
+    "server-version/frontend/src/training/TrainingLearnerNavigation.test.tsx": {
+      "before": null,
+      "after": "3eb85a1d1d62d4d8d65c95d8bd90cec54ba2172a"
+    },
+    "server-version/frontend/src/training/TrainingLearnerNavigationBoundary.tsx": {
+      "before": null,
+      "after": "a25b5f465e31862932e0402b9f6844fd80a340c7"
+    },
+    "server-version/frontend/src/training/TrainingLibrary.test.tsx": {
+      "before": null,
+      "after": "6cb1082bb063116b8fb35d67f94f1480ce8c9cd2"
+    },
+    "server-version/frontend/src/training/TrainingLibrary.tsx": {
+      "before": null,
+      "after": "f436c91dff56214e96b1fe8dcf2a56a4993aac35"
+    },
+    "server-version/frontend/src/training/TrainingTrainerCourse.tsx": {
+      "before": "9a8441b8e432c142a13282f77d0c88d249f9b2c5",
+      "after": "e4c1e9e6606cd298b0288a10c90ea22d78f05608"
+    },
+    "server-version/frontend/src/training/TrainingTrainerHome.formal.test.tsx": {
+      "before": "3fe08358eb5028aaf69e82b84956e9aa3ffb6d6b",
+      "after": "1836ac1a84739a989ba3b98e7c7abf423519e114"
+    },
+    "server-version/frontend/src/training/TrainingTrainerHome.tsx": {
+      "before": "cacc1b83cdeb0645996dc267eba3ad572700b908",
+      "after": "eb51e63d257306c57087d4cbc0cc7707a3569301"
+    },
+    "server-version/frontend/src/training/TrainingWorkspaceTabs.tsx": {
+      "before": null,
+      "after": "2002294b7f1b47db820b3ed1a49faff6b32b7897"
+    },
+    "server-version/frontend/src/training/checkinRecurrence.ts": {
+      "before": null,
+      "after": "1aa6e128c2d4e902a7c64fee987481f6ff2aaaec"
+    },
+    "server-version/frontend/src/training/context.test.ts": {
+      "before": "cf4334490cc0af6f779533cb934c2c265d12af6e",
+      "after": "30c7c9cb4472876ac4d7de1dcf65ef84e1867ebf"
+    },
+    "server-version/frontend/src/training/context.ts": {
+      "before": "1112bb89b168b5b9eb8c3bfd9e006066b8f2b841",
+      "after": "cc3a366470bd950e3032c8f05a107937a35d4a8f"
+    },
+    "server-version/frontend/src/training/courseNavigation.ts": {
+      "before": "e7e8fe34cab59ad5798ba1b76b576afb1cfdd132",
+      "after": "ddcae2042606ce2e39b1b492ce2fed97933c68ec"
+    },
+    "server-version/frontend/src/training/learnerNavigation.ts": {
+      "before": null,
+      "after": "1fdf8483cdf0b8998a494825727e5f8e3afb535d"
+    },
+    "server-version/frontend/src/training/pendingToolRequests.test.ts": {
+      "before": null,
+      "after": "3a468ee0a5960836d3be66fa52f7878954790d05"
+    },
+    "server-version/frontend/src/training/pendingToolRequests.ts": {
+      "before": null,
+      "after": "898bab6da03f34bdc5b94f52eb3c5630bfb4d7a1"
+    },
+    "server-version/frontend/src/training/training-checkin-schedules.css": {
+      "before": null,
+      "after": "1132a5537432566d4dc895520582e50ee7cccc4d"
+    },
+    "server-version/frontend/src/training/training-course-management.css": {
+      "before": "5cb98d8199d3174cd1ddac45b935ff78fd19558e",
+      "after": "fd57f12a55c6893d38840bc98b6e593dc6c6e5d0"
+    },
+    "server-version/frontend/src/training/training-workspace.css": {
+      "before": null,
+      "after": "342a8cc42fcb200d8896e92960241745839b603b"
+    },
+    "server-version/frontend/src/types/index.ts": {
+      "before": "dbd766a39ac786674f8f684ed3e2bd1de41cb7de",
+      "after": "757793744bb5170f66517169ad21d4495fa9c10b"
+    }
+  },
+  "controls": [
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/training-workspace-integrated-backend.sh",
+    ".github/scripts/training-workspace-integrated-bindings.json",
+    ".github/scripts/training-workspace-integrated-build.sh",
+    ".github/scripts/training-workspace-integrated-checks.mjs",
+    ".github/scripts/training-workspace-integrated-evidence.mjs",
+    ".github/scripts/training-workspace-integrated-recovery.mjs",
+    ".github/scripts/training-workspace-scope.mjs",
+    ".github/scripts/training-workspace-scope.test.mjs",
+    ".github/workflows/ci-training-workspace-integrated.yml",
+    ".github/workflows/ci-training-workspace.yml",
+    ".github/workflows/ci.yml"
+  ],
+  "backendTests": [
+    "src/__tests__/controllers/checkinSchedule.test.ts",
+    "src/__tests__/controllers/courseLibrary.test.ts",
+    "src/__tests__/controllers/generalQuestionnaire-copy-authorization.test.ts",
+    "src/__tests__/measurement-content/runtime-table-policy.test.ts",
+    "src/__tests__/services/assetStorage-retention.test.ts",
+    "src/__tests__/services/assetStorage.test.ts",
+    "src/__tests__/services/checkinScheduleRunner.test.ts",
+    "src/__tests__/services/checkinScheduleTiming.test.ts",
+    "src/__tests__/services/workspaceMedia.test.ts",
+    "src/__tests__/situational/sjt-course-grants.test.ts"
+  ],
+  "frontendTests": [
+    "src/components/__tests__/AssessmentToolPicker.test.tsx",
+    "src/components/__tests__/MediaSelector.test.tsx",
+    "src/components/app-shell/__tests__/shell.test.tsx",
+    "src/modules/cognitive/__tests__/CognitiveRunner.fe07a.test.tsx",
+    "src/modules/reporting/__tests__/QuestionnaireResult.test.tsx",
+    "src/modules/situational/__tests__/SituationalRunner.test.tsx",
+    "src/pages/__tests__/MyAssessments.test.tsx",
+    "src/pages/bundle/__tests__/BundleProducts.training.test.tsx",
+    "src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
+    "src/training/CheckinRecurrenceFields.test.tsx",
+    "src/training/TrainingCheckinSchedules.test.tsx",
+    "src/training/TrainingContextBack.test.tsx",
+    "src/training/TrainingCourseAssessments.test.tsx",
+    "src/training/TrainingCoursePages.test.tsx",
+    "src/training/TrainingLearnerNavigation.test.tsx",
+    "src/training/TrainingLibrary.test.tsx",
+    "src/training/TrainingTrainerHome.formal.test.tsx",
+    "src/training/context.test.ts",
+    "src/training/pendingToolRequests.test.ts"
+  ],
+  "postgresTests": [
+    "src/__tests__/integration/checkinSchedule.postgres.integration.test.ts",
+    "src/__tests__/training-workspace.postgres.integration.test.ts",
+    "src/__tests__/training-workspace-governance.postgres.integration.test.ts",
+    "src/__tests__/situational/sjt-version-allocation.postgres.integration.test.ts"
+  ],
+  "unchangedGeneratorInputs": [
+    "server-version/backend/scripts/generate-scale-instruments.ts",
+    "server-version/backend/scripts/scale-onboarding-check.mjs",
+    "server-version/backend/scripts/scale-onboarding-boundaries.json",
+    "server-version/backend/scripts/check-scale-source-qualification.ts",
+    "server-version/backend/scripts/generate-situational-instruments.mjs",
+    "server-version/backend/src/scripts/bundle-onboarding.ts",
+    "server-version/backend/src/scripts/situational-onboarding-check.ts",
+    "server-version/backend/src/modules/scale",
+    "server-version/backend/src/modules/assessment-governance",
+    "server-version/backend/src/modules/assessment-bundle",
+    "server-version/backend/src/modules/situational/onboarding",
+    "server-version/backend/src/modules/situational/instruments",
+    "server-version/backend/src/modules/cognitive",
+    "server-version/backend/src/modules/situational/situation-package.registry.ts",
+    "server-version/backend/src/modules/situational/onboarding/instruments.generated.ts"
+  ]
+}

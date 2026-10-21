@@ -1,3 +1,4 @@
+import { useTrainingLearnerNavigation } from '../../../training/learnerNavigation'
 import { TrainingCheckpointPanel } from '../../composite/TrainingCheckpointPanel'
 import { situationalCheckpointAnswers, situationalCheckpointUnsupported } from '../training-checkpoint-adapter'
 import { OnlineAnswerField } from '../OnlineAnswerField'
@@ -7,7 +8,7 @@ import { situationalHistoryIdentities, invalidateChangedSituationalHistory } fro
 import { researchEventsFromTrials, missingResearchExposureEvents, appendResearchEvents, currentResponseStage, eventTime, researchCapture, researchEnabled, restoreResearchAnswers, type SituationalResearchEvent } from '../research'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CheckCircle2, ChevronLeft, ChevronRight, CircleAlert, Loader2, Send } from 'lucide-react'
-import { useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
+import { useLocation, useParams, useSearchParams } from 'react-router-dom'
 import {
   AssessmentShell,
   type AssessmentInteractionReadiness,
@@ -102,8 +103,9 @@ export interface SchoolEmbeddedSituationalProps {
 const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({campus}) => {
   const { instrumentKey, attemptId:routeAttemptId } = useParams<{ instrumentKey?: string; attemptId?: string }>()
   const attemptId=campus?.attemptId||routeAttemptId
-  const navigate = useNavigate()
   const location = useLocation()
+  const learner = useTrainingLearnerNavigation()
+  const navigate = learner.navigate
   const [searchParams] = useSearchParams()
   const routeContext = useMemo(() => {
     const normal=resolveSituationalRunnerRouteContext({
@@ -177,6 +179,9 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
 
   useEffect(() => {
     let cancelled = false
+    setLoading(true)
+    setData(null)
+    setError(null)
     const load = async () => {
       if (!client) {
         setError('综合测评情境化槽位信息缺失，请返回后重新进入')
@@ -197,9 +202,11 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
         const response = attemptId
           ? await client.resume(attemptId)
           : await client.start({ instrumentKey: decodeURIComponent(instrumentKey as string) })
+        if (cancelled) return
         const next = withOnlineRunner(apiDataOrThrow(response))
         if (next.attempt.status === 'COMPLETED') {
           await finalDraftStore.delete(situationalDraftKey(next.attempt.id)).catch(() => undefined)
+          if (cancelled) return
           if(campus)campus.onCompleted()
           else navigate(embeddedCompletionPath || `${situationalBasePath()}/attempts/${next.attempt.id}/result`, { replace: true })
           return
@@ -208,13 +215,13 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
         const storedResponses = await readSituationalDraft(next.attempt)
         const restoredEvents = researchEnabled(next) ? researchEventsFromTrials(await finalDraftStore.listTrials(situationalDraftKey(next.attempt.id))) : []
         const restoredResponses = restoreResearchAnswers(next, storedResponses, restoredEvents)
-        researchEventsRef.current = restoredEvents
-        setResearchEvents(restoredEvents)
         const locked = meta.status !== 'DRAFT' || Boolean(meta.sealedSubmission)
         const localResponses = !locked
           ? await pruneSituationalDraftResponses(next.attempt, next.instrument.definition, restoredResponses)
           : restoredResponses
         if (cancelled) return
+        researchEventsRef.current = restoredEvents
+        setResearchEvents(restoredEvents)
         responsesRef.current = localResponses
         setData(next)
         setResponses(localResponses)
@@ -650,7 +657,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
   }
 
   if (loading) return <div className="flex min-h-[360px] items-center justify-center text-gray-500"><Loader2 className="mr-2 h-5 w-5 animate-spin" />加载冻结题面…</div>
-  if (error || !data || !currentScene) return <div className="mx-auto max-w-xl rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700"><CircleAlert className="mx-auto mb-3 h-8 w-8" /><p role="alert">{error || '题包内容暂时无法加载'}</p><button type="button" onClick={() => campus ? campus.onCompleted() : navigate(embeddedCompletionPath || (publicMode ? '/' : situationalBasePath()))} className="mt-5 min-h-11 rounded-lg bg-white px-4 py-2 text-sm font-medium text-red-700 shadow-sm">返回上一页</button></div>
+  if (error || !data || !currentScene) return <div className="mx-auto max-w-xl rounded-xl border border-red-200 bg-red-50 p-6 text-center text-red-700"><CircleAlert className="mx-auto mb-3 h-8 w-8" /><p role="alert">{error || '题包内容暂时无法加载'}</p><button type="button" onClick={() => campus ? campus.onCompleted() : navigate(embeddedCompletionPath || (publicMode ? '/' : situationalBasePath()))} className="mt-5 min-h-11 rounded-lg bg-white px-4 py-2 text-sm font-medium text-red-700 shadow-sm">{learner.enabled ? embeddedCompletionPath ? '继续整份测评' : learner.backLabel : '返回上一页'}</button></div>
 
   const renderStimulus = () => {
     const textBlock = currentScene.stimulus.text

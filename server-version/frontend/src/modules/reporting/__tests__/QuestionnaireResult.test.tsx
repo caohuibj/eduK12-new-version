@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { act, fireEvent, render, screen } from '@testing-library/react'
+import { Link, MemoryRouter, Route, Routes } from 'react-router-dom'
 import QuestionnaireResult from '../../../pages/student/QuestionnaireResult'
 import PublicQuestionnaireResult from '../../../pages/public/PublicQuestionnaireResult'
 
@@ -80,6 +80,33 @@ describe('Questionnaire Scale report UI matrix', () => {
     expect(await screen.findByText('学习问卷')).toBeTruthy()
     expect(screen.getByText('不构成医学诊断。')).toBeTruthy()
     expect(screen.queryByText(/averageScore|overallScore|总体评价|聚合测评报告/)).toBeNull()
+  })
+
+  it('clears the previous authenticated report when the next record cannot be read', async () => {
+    mockClient.get.mockResolvedValueOnce({ code: 0, data: report }).mockResolvedValueOnce({ code: 404 })
+    render(<MemoryRouter initialEntries={['/student/questionnaires/result/first']}>
+      <Link to="/student/questionnaires/result/second">Next report</Link>
+      <Routes><Route path="/student/questionnaires/result/:assessmentId" element={<QuestionnaireResult />} /></Routes>
+    </MemoryRouter>)
+    expect(await screen.findByText('学习问卷')).toBeTruthy()
+    fireEvent.click(screen.getByRole('link', { name: 'Next report' }))
+    expect(await screen.findByText('报告不存在或暂时无法读取')).toBeTruthy()
+    expect(screen.queryByText('学习问卷')).toBeNull()
+  })
+
+  it('ignores a late authenticated report after switching records', async () => {
+    let resolveFirst!: (value: unknown) => void
+    const first = new Promise(resolve => { resolveFirst = resolve })
+    mockClient.get.mockReturnValueOnce(first).mockResolvedValueOnce({ code: 0, data: { ...report, questionnaireName: '当前问卷' } })
+    render(<MemoryRouter initialEntries={['/student/questionnaires/result/first']}>
+      <Link to="/student/questionnaires/result/second">Next report</Link>
+      <Routes><Route path="/student/questionnaires/result/:assessmentId" element={<QuestionnaireResult />} /></Routes>
+    </MemoryRouter>)
+    fireEvent.click(screen.getByRole('link', { name: 'Next report' }))
+    expect(await screen.findByText('当前问卷')).toBeTruthy()
+    await act(async () => { resolveFirst({ code: 0, data: report }); await first })
+    expect(screen.getByText('当前问卷')).toBeTruthy()
+    expect(screen.queryByText('学习问卷')).toBeNull()
   })
 
   it('does not leave a missing public session id in an infinite loading state', async () => {

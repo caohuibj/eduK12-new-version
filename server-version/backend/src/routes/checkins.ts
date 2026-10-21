@@ -5,6 +5,7 @@ import { notFound } from '../utils/response'
 import rateLimit from 'express-rate-limit'
 import { UserRole } from '../types'
 import { checkinController, submissionImageUpload } from '../controllers/checkinController'
+import { checkinScheduleController } from '../controllers/checkinScheduleController'
 import { authenticate, requireRole, requireTeacher } from '../middleware/auth'
 import { config } from '../config'
 import { createRedisRateLimiter } from '../middleware/redisRateLimit'
@@ -105,6 +106,10 @@ router.get('/my', authenticate, checkinController.myCheckins)
 
 // 打卡标签（必须在 /:id 之前）
 router.get('/tags', authenticate, checkinController.getTags)
+
+router.get('/schedules', authenticate, requireTeacher, checkinScheduleController.list)
+router.post('/schedules', authenticate, requireTeacher, checkinScheduleController.create)
+router.post('/schedules/:scheduleId/stop', authenticate, requireTeacher, checkinScheduleController.stop)
 
 router.get('/', authenticate, checkinController.list)
 router.post('/', authenticate, requireTeacher, hideCampusCreation, checkinController.create)

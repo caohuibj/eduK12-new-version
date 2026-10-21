@@ -167,6 +167,18 @@ const assertEligibleTeacher = async (teacherId: string) => {
 }
 
 const assertGrantableResource = async (resourceType: MaterialResourceType, resourceId: string) => {
+  if (resourceType === MaterialResourceType.FORM_TEMPLATE) {
+    const form = await prisma.questionnaire.findFirst({where:{id:resourceId,type:'GENERAL',status:'PUBLISHED',creator:{accountDomain:{in:['LEGACY','TRAINING']}},questionnaireScales:{none:{}}},select:{id:true}})
+    if (!form) throw grantBadRequest('只能授权已发布的独立表单；含量表的组合内容需分别取得量表授权')
+    return
+  }
+  if (resourceType === MaterialResourceType.MEDIA_ASSET) {
+    const { mediaLibraryFilter } = await import('./workspaceMedia')
+    const { Prisma } = await import('@prisma/client')
+    const rows = await prisma.$queryRaw<{ id: string }[]>(Prisma.sql`SELECT a.id FROM stored_assets a JOIN users u ON u.id=a.owner_id WHERE a.id=${resourceId} AND a.access_scope IN ('PRIVATE','PUBLIC') AND ${mediaLibraryFilter}`)
+    if (!rows.length) throw grantBadRequest('只能授权媒体库中的独立文件，不能授权课程私有附件或证据文件')
+    return
+  }
   if (resourceType === MaterialResourceType.SCALE) {
     const scale = await prisma.scale.findUnique({ where: { id: resourceId } })
     if (!scale) throw grantNotFound('量表不存在')
@@ -207,7 +219,14 @@ const attachResource = async (grant: {
 }) => {
   let resourceMissing = false
   let resource: { id: string; name: string; status?: string } | null = null
-  if (grant.resourceType === MaterialResourceType.SCALE) {
+  if (grant.resourceType === MaterialResourceType.FORM_TEMPLATE) {
+    resource = await prisma.questionnaire.findUnique({where:{id:grant.resourceId},select:{id:true,name:true,status:true}})
+    resourceMissing = !resource
+  } else if (grant.resourceType === MaterialResourceType.MEDIA_ASSET) {
+    const asset = await prisma.storedAsset.findUnique({ where: { id: grant.resourceId }, select: { id: true, originalName: true, deletedAt: true } })
+    resource = asset && !asset.deletedAt ? { id: asset.id, name: asset.originalName || '未命名媒体' } : null
+    resourceMissing = !resource
+  } else if (grant.resourceType === MaterialResourceType.SCALE) {
     const scale = await prisma.scale.findUnique({ where: { id: grant.resourceId }, select: { id: true, name: true, status: true } })
     resource = scale
     resourceMissing = !scale

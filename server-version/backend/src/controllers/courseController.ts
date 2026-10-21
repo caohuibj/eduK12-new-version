@@ -49,6 +49,9 @@ const getPaginationParams = (req: Request) => {
  */
 const deleteCourseWithAssetReferences = async (courseId: string) => {
   await prisma.$transaction(async (tx) => {
+    // Serialize with recurring publication before collecting polymorphic refs.
+    // A later cascade cannot clean refs for a child omitted from this snapshot.
+    await tx.$queryRaw`SELECT id FROM courses WHERE id = ${courseId} FOR UPDATE`
     const assignments = await tx.assignment.findMany({
       where: { courseId },
       select: { id: true },
@@ -57,9 +60,13 @@ const deleteCourseWithAssetReferences = async (courseId: string) => {
       where: { courseId },
       select: { id: true },
     })
+    const schedules = await tx.checkinSchedule.findMany({ where: { courseId }, select: { id: true } })
 
     const assignmentIds = assignments.map(({ id }) => id)
     const checkinIds = checkins.map(({ id }) => id)
+    if (schedules.length) {
+      await tx.assetReference.deleteMany({ where: { entityType: 'CheckinSchedule', entityId: { in: schedules.map(({ id }) => id) } } })
+    }
     const submissions = checkinIds.length > 0
       ? await tx.checkinSubmission.findMany({
         where: { checkinId: { in: checkinIds } },
@@ -115,10 +122,11 @@ export const courseController = {
       if (!canReadLegacyContent(userRole)) return forbidden(res, '当前角色不能访问旧课程列表')
       const { status = 'all' } = req.query
       const excludeLibrary = req.query.excludeLibrary === 'true'
+      const keyword = typeof req.query.keyword === 'string' ? req.query.keyword.trim().slice(0,200) : ''
       const { page, pageSize, skip } = getPaginationParams(req)
 
       // 构建缓存键
-      const cacheKey = `courses:list:${userRole}:${userId}:${status}:${page}:${pageSize}:${excludeLibrary ? 'courses' : 'all'}`
+      const cacheKey = `courses:list:${userRole}:${userId}:${status}:${page}:${pageSize}:${excludeLibrary ? 'courses' : 'all'}:${encodeURIComponent(keyword)}`
       
       // 尝试从缓存获取
       const cached = cache.get(cacheKey)
@@ -129,6 +137,7 @@ export const courseController = {
 
       let where: any = { courseType: { not: 'CAMPUS_ACTIVITY' } }
       if (excludeLibrary) where.isLibrary = false
+      if (keyword) where.OR = [{title:{contains:keyword,mode:'insensitive'}},{description:{contains:keyword,mode:'insensitive'}},{courseCode:{contains:keyword,mode:'insensitive'}}]
 
       if (status !== 'all') {
         where.status = status

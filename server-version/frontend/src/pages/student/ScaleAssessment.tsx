@@ -1,7 +1,8 @@
+import { useTrainingLearnerNavigation } from '../../training/learnerNavigation'
 import { isTrainingHost } from '../../training/context'
 import { useScaleAutoAdvance } from '../../hooks/useScaleAutoAdvance'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import apiClient, { sessionFetch } from '../../api/client'
 import { CheckCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 import { AssessmentShell } from '../../components/assessment-shell'
@@ -129,7 +130,8 @@ const isFinalAttemptConflict = (error: unknown) => {
 
 const ScaleAssessment: React.FC = () => {
   const { scaleId } = useParams<{ scaleId: string }>()
-  const navigate = useNavigate()
+  const learner = useTrainingLearnerNavigation()
+  const navigate = learner.navigate
   const [loading, setLoading] = useState(true)
   const [contextInput, setContextInput] = useState<Partial<Record<ScaleContextKey, string>>>()
   const [requiredContextKeys, setRequiredContextKeys] = useState<ScaleContextKey[] | null>(null)
@@ -521,7 +523,7 @@ const ScaleAssessment: React.FC = () => {
   if (!scale || !assessment) {
     return (
       <ProductPage width="assessment">
-        <ProductStatus kind="error" title="无法开始量表">{completionNotice ?? '量表不存在、未发布或尚未安装有效定义。'}</ProductStatus>
+        <ProductStatus kind="error" title="无法开始量表" actions={learner.enabled ? <ProductButton onClick={() => navigate(learner.backHref)}>{learner.backLabel}</ProductButton> : undefined}>{completionNotice ?? '量表不存在、未发布或尚未安装有效定义。'}</ProductStatus>
       </ProductPage>
     )
   }

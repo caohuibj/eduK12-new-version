@@ -25,6 +25,7 @@ export default function TrainingContextBack({ role }: { role: Role | undefined }
     </section>
   }
   const studentRoot = role === 'STUDENT'
+  if (studentRoot && /^\/student\/(?:assignments|checkins|scales|questionnaires|cognitive|composite|situational)\//.test(path)) return null
   const search=new URLSearchParams(location.search)
   const returnTo=internalReturnTo(search.get('returnTo'))
   const hintedCourse=search.get('courseId')
@@ -35,6 +36,7 @@ export default function TrainingContextBack({ role }: { role: Role | undefined }
     return <nav className="training-context-trail" aria-label="当前位置"><Link to={home}>我的课程</Link><span>/</span><Link to={parent}>{safeCourse?'返回当前课程':'返回上一层'}</Link><span>/</span><span aria-current="page">{routeTitle(path)}</span></nav>
   }
 
+  if (role==='TEACHER' && /^\/(media-library|toolkit)(\/|$)/.test(path)) return null
   if (path === '/student' || path === '/dashboard') return null
   // The two purpose-built Training Course pages have their own back link.
   if (studentRoot && /^\/student\/courses\/[^/]+$/.test(path)) return null

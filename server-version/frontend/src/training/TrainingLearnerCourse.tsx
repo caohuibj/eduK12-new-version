@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
-import { Link, useParams } from 'react-router-dom'
+import { Link, useParams, useSearchParams } from 'react-router-dom'
 import apiClient from '../api/client'
 import { useCognitiveEnabled } from '../contexts/CapabilitiesContext'
 import type { Assignment, Checkin, Course } from '../types'
 import { loadCourseAssessments, type CourseAssessmentResult } from './courseAssessments'
+import { learnerSection, withLearnerCourse } from './learnerNavigation'
 
 type Section = 'assignments' | 'checkins' | 'assessments'
 type SectionState<T> = { loading: boolean; error: string | null; rows: T[] }
@@ -14,7 +15,15 @@ const message = (error: unknown) => error instanceof Error ? error.message : '�
 export default function TrainingLearnerCourse() {
   const { courseId } = useParams<{ courseId: string }>()
   const cognitiveEnabled = useCognitiveEnabled()
-  const [section, setSection] = useState<Section>('assignments')
+  const [search, setSearch] = useSearchParams()
+  const section = learnerSection(search.get('section'))
+  const setSection = (value: Section) => setSearch(previous => {
+    const next = new URLSearchParams(previous)
+    next.set('section', value)
+    return next
+  }, { replace: true })
+  const taskHref = (target: string, taskSection: Section = 'assessments') =>
+    withLearnerCourse(target, courseId ? { courseId, section: taskSection } : null)
   const [epoch, setEpoch] = useState(0)
   const [course, setCourse] = useState<Course | null>(null)
   const [courseLoading, setCourseLoading] = useState(true)
@@ -30,7 +39,6 @@ export default function TrainingLearnerCourse() {
     let alive = true
     if (!courseId) { setCourse(null); setCourseError('课程链接缺少必要信息'); setCourseLoading(false); return }
     const encoded = encodeURIComponent(courseId)
-    setSection('assignments')
     setCourse(null)
     setCourseError(null)
     setCourseLoading(true)
@@ -121,7 +129,7 @@ export default function TrainingLearnerCourse() {
                       : draft ? '继续练习' : '完成练习'
                     return <article className="training-task-item" key={task.id}>
                       <div><h2>{task.title}</h2><p>{task.description || '请阅读练习要求后提交。'}</p><span>{state}</span></div>
-                      <Link to={'/student/assignments/' + encodeURIComponent(task.id) + '?courseId=' + encodeURIComponent(course.id)} className="training-row-action">{action}<ArrowRight size={16} aria-hidden="true" /></Link>
+                      <Link to={taskHref('/student/assignments/' + encodeURIComponent(task.id), 'assignments')} className="training-row-action">{action}<ArrowRight size={16} aria-hidden="true" /></Link>
                     </article>
                   })}</div>}
           </section>}
@@ -134,7 +142,7 @@ export default function TrainingLearnerCourse() {
                     const expired = Boolean(task.endTime && Date.parse(task.endTime) < Date.now())
                     return <article className="training-task-item" key={task.id}>
                       <div><h2>{task.title}</h2><p>{task.description || '按要求完成本次打卡。'}</p><span>{done ? '已打卡' : expired ? '已截止' : '待完成'}</span></div>
-                      <Link to={'/student/checkins/' + encodeURIComponent(task.id) + '?courseId=' + encodeURIComponent(course.id)} className="training-row-action">{done ? '查看记录' : expired ? '查看打卡' : '去打卡'}<ArrowRight size={16} aria-hidden="true" /></Link>
+                      <Link to={taskHref('/student/checkins/' + encodeURIComponent(task.id), 'checkins')} className="training-row-action">{done ? '查看记录' : expired ? '查看打卡' : '去打卡'}<ArrowRight size={16} aria-hidden="true" /></Link>
                     </article>
                   })}</div>}
           </section>}
@@ -151,9 +159,9 @@ export default function TrainingLearnerCourse() {
                     <article className="training-task-item" key={task.key}>
                       <div><span className="training-task-type">{task.typeLabel}</span><h2>{task.name}</h2><p>{task.description || '进入后可查看作答要求。'}</p><span>{task.status}</span>{task.taskSatisfactionLabel && <p>{task.taskSatisfactionLabel}</p>}</div>
                       <div className="training-task-actions">
-                        {task.href ? <Link className="training-row-action" to={task.href}>{task.action}<ArrowRight size={16} aria-hidden="true" /></Link>
+                        {task.href ? <Link className="training-row-action" to={taskHref(task.href)}>{task.action}<ArrowRight size={16} aria-hidden="true" /></Link>
                           : <span className="training-task-disabled">{task.action}</span>}
-                        {task.reportHref && <Link className="training-task-report" to={task.reportHref}>查看上次反馈</Link>}
+                        {task.reportHref && <Link className="training-task-report" to={taskHref(task.reportHref)}>查看上次反馈</Link>}
                       </div>
                     </article>)}</div>}
                   <p className="training-science-note">测评是否可以开始、继续或查看反馈，以测评实际规则及当前授权为准。</p>

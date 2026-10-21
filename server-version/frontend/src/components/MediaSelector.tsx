@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 import { X, Video, Image as ImageIcon, Link as LinkIcon, Upload, Search, Check, FileVideo, AlertCircle, FileText } from 'lucide-react'
 import apiClient from '../api/client'
+import { isTrainingHost } from '../training/context'
 import { ensureCsrfToken, sessionAxios } from '../api/client'
 import type { Video as VideoType, Document as DocumentType } from '../types'
 import { isSafeExternalMediaUrl } from '../utils/mediaUtils'
@@ -30,12 +31,13 @@ interface MediaSelectorProps {
   onClose: () => void
   onSelect: (item: MediaItem) => void
   type: 'video' | 'image' | 'document' | 'all'
+  initialTab?: 'library' | 'upload'
 }
 
-const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect, type }) => {
+const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect, type, initialTab = 'library' }) => {
   const isImageMode = type === 'image'
   const isDocumentMode = type === 'document'
-  const [activeTab, setActiveTab] = useState<'library' | 'external' | 'upload'>('library')
+  const [activeTab, setActiveTab] = useState<'library' | 'external' | 'upload'>(initialTab)
   const [videos, setVideos] = useState<VideoType[]>([])
   const [images, setImages] = useState<ImageItem[]>([])
   const [documents, setDocuments] = useState<DocumentType[]>([])
@@ -69,7 +71,9 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
     setSelectedImage(null)
     setSelectedDocument(null)
     try {
-      const response = await apiClient.get(isDocumentMode ? '/documents' : isImageMode ? '/uploads/images' : '/videos', { params: { page: nextPage, pageSize: 40, keyword: searchKeyword } })
+      const training = isTrainingHost()
+      const response = await apiClient.get(training ? '/training-workspace/media' : isDocumentMode ? '/documents' : isImageMode ? '/uploads/images' : '/videos', { params: { page: nextPage, pageSize: 40, keyword: searchKeyword, ...(training?{kind:isDocumentMode?'document':isImageMode?'image':'video'}:{}) } })
+      if (training && response.code===0) response.data.list=response.data.list.map((row:any)=>({...row,title:row.name,filename:row.id,fileName:row.name,fileSize:row.size,originalAssetId:row.assetId,processedAssetId:null,status:'COMPLETED'}))
       if (response.code !== 0) throw new Error(response.message || '素材库加载失败')
       if (request !== requestRef.current) return
       setPage(nextPage); setHasMore(Boolean(response.data.hasMore))

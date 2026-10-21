@@ -1,8 +1,9 @@
+import { useTrainingLearnerNavigation } from '../../training/learnerNavigation'
 import { useCursorList } from '../../hooks/useCursorList'
 import { isTrainingHost } from '../../training/context'
 import ModalSurface from '../../components/shared-ui/ModalSurface'
 import React, { useState, useEffect, useRef } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams } from 'react-router-dom'
 import { ArrowLeft, Clock, Camera, Image, Loader2, CheckCircle, Users, Eye, X, ZoomIn, FileText } from 'lucide-react'
 import apiClient from '../../api/client'
 import { sanitizeHtml } from '../../utils/sanitize'
@@ -47,8 +48,9 @@ const normalizeSubmissionImages = (images: CheckinSubmissionImage[] | undefined)
 
 const CheckinSubmit: React.FC = () => {
   const { checkinId } = useParams<{ checkinId: string }>()
-  const navigate = useNavigate()
   const [checkin, setCheckin] = useState<Checkin | null>(null)
+  const learner = useTrainingLearnerNavigation({ courseId: checkin?.courseId, section: 'checkins' })
+  const navigate = learner.navigate
   const [submission, setSubmission] = useState<CheckinSubmission | null>(null)
   const [content, setContent] = useState('')
   const [images, setImages] = useState<CheckinSubmissionImage[]>([])
@@ -240,7 +242,7 @@ const CheckinSubmit: React.FC = () => {
         <ProductStatus
           kind="warning"
           title="打卡不存在"
-          actions={<ProductButton variant="primary" onClick={() => navigate('/student')}>返回学生首页</ProductButton>}
+          actions={<ProductButton variant="primary" onClick={() => navigate('/student')}>{learner.enabled ? learner.backLabel : '返回学生首页'}</ProductButton>}
         >
           当前打卡可能已被移除，或您没有访问权限。
         </ProductStatus>
@@ -262,7 +264,7 @@ const CheckinSubmit: React.FC = () => {
     >
       <ProductButton className="student-submit-back" onClick={() => navigate(-1)}>
         <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-        返回
+        {learner.enabled ? learner.backLabel : '返回'}
       </ProductButton>
 
       <PageHeader

@@ -15,7 +15,13 @@ env:
   TZ: UTC
   NODE_OPTIONS: --max-old-space-size=3072
 jobs:
+  integrated:
+    if: fromJSON(inputs.plan).candidate == 'mac-integrated'
+    uses: ./.github/workflows/ci-training-workspace-integrated.yml
+    with:
+      plan: ${{ inputs.plan }}
   component:
+    if: fromJSON(inputs.plan).candidate != 'mac-integrated'
     name: ${{ matrix.component }} affected contracts
     runs-on: ubuntu-24.04
     timeout-minutes: 15

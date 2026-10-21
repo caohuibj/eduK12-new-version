@@ -13,6 +13,7 @@ import { publicSjtOnlineMetadata, normalizeSjtOnlineResponses } from '../modules
 import { readSjtWorkbook, locateSjtWorkbookIssues } from '../modules/situational/authoring/workbook'
 import {
   createSjtDraft,
+  forkSjtDraftVersion,
   getSjtDraft,
   listSjtDrafts,
   requestSjtReview,
@@ -158,6 +159,7 @@ router.get(
     )
   }),
 )
+router.post('/drafts/:id/version', handle(async (req,res)=>{z.object({}).strict().parse(req.body||{});send(res,await forkSjtDraftVersion(actor(req),req.params.id))}))
 router.post('/validate', uploadPrincipalRateLimit, uploadHandler(false))
 router.post('/drafts', uploadPrincipalRateLimit, uploadHandler(true))
 router.post('/online/drafts', uploadPrincipalRateLimit, handle(async (req, res) => {

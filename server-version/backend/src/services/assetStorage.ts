@@ -412,6 +412,8 @@ export const validateAssetReferencesForCourse = async (params: {
   if (!assetIds.length) return references
 
   const db = params.db || prisma
+  // Match retention's stable asset order before any per-asset grant lock.
+  if (params.db) await lockStoredAssetRows(db, assetIds)
   const assets = await db.storedAsset.findMany({
     where: { id: { in: assetIds } },
     select: {
@@ -432,9 +434,11 @@ export const validateAssetReferencesForCourse = async (params: {
     if (!asset || asset.deletedAt) throw new AssetReferenceValidationError()
 
     const isAdmin = params.role === UserRole.ADMIN
-    if (!asset.ownerId || !legacyOwners.has(asset.ownerId)) throw new AssetReferenceValidationError()
+    if (!asset.ownerId) throw new AssetReferenceValidationError()
+    if (isAdmin && !legacyOwners.has(asset.ownerId)) throw new AssetReferenceValidationError()
     if (!isAdmin && asset.ownerId !== params.ownerId) {
-      throw new AssetReferenceValidationError('只能引用自己上传的附件')
+      const { hasMediaAssetGrant } = await import('./workspaceMedia')
+      if (!await hasMediaAssetGrant(params.ownerId, asset.id, db)) throw new AssetReferenceValidationError('只能引用自己上传或明确授权的媒体')
     }
     if (asset.accessScope === 'PUBLIC_CHECKIN') {
       throw new AssetReferenceValidationError()
@@ -644,6 +648,7 @@ export const hydrateAssetReferenceBatch = async (
 }
 
 export const canReadPrivateAsset = async (asset: {
+  id?: string
   ownerId: string | null
   accessScope: string
   scopeId: string | null
@@ -654,6 +659,10 @@ export const canReadPrivateAsset = async (asset: {
   if (asset.accessScope === 'PUBLIC_CHECKIN') return false
   if (asset.accessScope === 'PUBLIC') return true
   if (asset.ownerId && asset.ownerId === actor.userId) return true
+  if (asset.id && actor.userId && actor.role === UserRole.TEACHER) {
+    const { hasMediaAssetGrant } = await import('./workspaceMedia')
+    if (await hasMediaAssetGrant(actor.userId, asset.id)) return true
+  }
   if (asset.accessScope === 'PRIVATE' && actor.role !== UserRole.ADMIN) return false
   if (asset.ownerId) {
     const owners = await legacyAssetOwnerIds([asset.ownerId])
