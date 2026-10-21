@@ -11,6 +11,12 @@ const files=plan.tests[component];assert(Array.isArray(files)&&files.length>0);
 assert.equal(new Set(files).size,files.length);
 assert(files.every(f=>/^src\/[A-Za-z0-9_./-]+\.test\.tsx?$/.test(f)));
 const evidence=process.env.GOVERNANCE_EVIDENCE;assert(evidence);mkdirSync(evidence,{recursive:true});
+if(component!=='postgres'){
+ const prior=JSON.parse(readFileSync(resolve(evidence,'prior-contracts.json')));
+ assert.equal(prior.status,'ACCEPTED_PRIOR_CONTRACTS_ONLY');assert.equal(prior.sourceRun,39610102026);
+ assert.deepEqual(prior.suites.map(s=>s.file).sort(),[...plan.priorContracts[component]].sort());
+ assert(prior.suites.every(s=>s.passed>0));assert.equal(prior.passed,component==='backend'?161:159);
+}
 const run=args=>execFileSync(process.execPath,args,{stdio:'inherit',timeout:300000});
 if(component==='frontend'){
  run(['node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit']);

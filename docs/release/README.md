@@ -628,3 +628,15 @@ produced a successful image and therefore must compile the repaired source befor
 its missing checks. Original CodeQL completion remains attributable to its old
 source; only actual changed JS/TS/Python inputs receive new analysis. No failed
 job or old report is rewritten as successful.
+
+Governance PR326 second-run continuation preserves the failed run 39610102026.
+Its unchanged 16 backend suites (161 assertions) and 18 frontend suites (159
+assertions) are accepted only from the pinned official report archives, with
+reviewed component-input and mock boundaries. The repaired readonly frontend
+suite runs again, together with application types, its targeted lint, and the
+first runtime scan; original frontend image bytes are restored without a new
+compile. The real backend wrapper fix requires a new backend build, nine failed
+suites, five existing direct binding/FINAL/report/reinterpretation suites, and
+the new wrapper-binding suite. PostgreSQL, restoration, connected browser and
+runtime scans have not passed previously and remain required. Only changed
+SAST inputs are analyzed after verifying the second run's official completion.

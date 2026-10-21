@@ -168,7 +168,7 @@ function trainingDefinition(image,video) {
     responseSets:[{key:'default',options:[{value:1,label:'数值一',score:1},{value:'1',label:'字符串一',score:2}]}],
     items:[{itemCode:'content',content:'Training typed scored content',purpose:'CONTENT',images:[{asset:image,altText:'Training question image',order:0}],video},{itemCode:'attention',content:'请选择字符串一',purpose:'ATTENTION_CHECK',attentionTarget:'1'},{itemCode:'social',content:'我从不撒谎',purpose:'SOCIAL_DESIRABILITY'}].map((item,sortOrder)=>({...item,type:'single',required:true,sortOrder,responseSetKey:'default',randomizeOptions:false})),
     scoring:{scoringVersion:'2.0.0',itemRules:[{itemCode:'content',transform:{type:'identity'}}],defaultMissingPolicy:{type:'complete_required'},scores:[{key:'total',type:'total',label:'总分',direction:'descriptive',canonical:true,displayPrecision:2,source:{type:'items',items:[{itemCode:'content',weight:1}],aggregation:'sum'}}]},
-    report:{reportVersion:'2.0.0',primaryScoreKeys:['total'],scoreOrder:['total'],interpretations:[],limitations:[],disclaimer:'Synthetic descriptive feedback only',rawScoreFeedback:feedback('total',image,'TRAINING LIBRARY FEEDBACK')},referencePolicy:{type:'none'}}
+    report:{reportVersion:'2.0.0',primaryScoreKeys:['total'],scoreOrder:['total'],interpretations:[{scoreKey:'total',headline:'Total score',source:{type:'score_only'},summary:'Synthetic descriptive result',bands:[],guidance:[]}],limitations:[],disclaimer:'Synthetic descriptive feedback only',rawScoreFeedback:feedback('total',image,'TRAINING LIBRARY FEEDBACK')},referencePolicy:{type:'none'}}
 }
 async function authorTraining(author) {
   phase('training-api-authoring')

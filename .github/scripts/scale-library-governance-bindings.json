@@ -28,19 +28,19 @@
     },
     "server-version/backend/src/__tests__/composite/addItem.service.test.ts": {
       "before": "b9f5c76c43ee9abfd3767dd09cd1f43f86a31d0a",
-      "after": "27df22c5e752cd0abbe4db71d4185e4ebe4bbced"
+      "after": "a3d3ca99f0aa1e9d62fcb5a16e4903655310666f"
     },
     "server-version/backend/src/__tests__/composite/analysis-protocol.service.test.ts": {
       "before": "da83a6e68d222267b86347a9777a0878b4dfbac3",
-      "after": "7f189d17d3f83bdb825cdebe6ce995c658100b7e"
+      "after": "b798041fd01c07a7b7fe56c7d95e9cff97312398"
     },
     "server-version/backend/src/__tests__/composite/report-package.service.test.ts": {
       "before": "2bb2edb96a772becc77fb2959bd77640c11ff7b3",
-      "after": "9ed37bc5dcf38eef7a3e5917353334184799975c"
+      "after": "90efe41a43649aa66ac9af605a896b5d551d7025"
     },
     "server-version/backend/src/__tests__/composite/training-content-service.test.ts": {
       "before": "64d441578d138eb4df304ecb9588b8071156958e",
-      "after": "3f0a77533814f0e724cbb539082a868f2a0a36e5"
+      "after": "3d48d012089c2d41a2bf3af9c1b10e9a17bb5efc"
     },
     "server-version/backend/src/__tests__/composite/training-flow-materialization-reuse.test.ts": {
       "before": "30e0b6fb3bf681dcfe800549c77d3840be570083",
@@ -100,7 +100,7 @@
     },
     "server-version/backend/src/__tests__/scale/scale-controller-v2.test.ts": {
       "before": "a8daf61f7848e96891d85e83e62c61a257e9b13d",
-      "after": "8920a8f9bb43a25cc37ff468d14b04158a02c631"
+      "after": "9ac1111858268d8f146bcb95c3ac16dd27e6bf5a"
     },
     "server-version/backend/src/__tests__/scale/scale-copy.postgres.integration.test.ts": {
       "before": "2294294f67bd61189de898d3a633b2028c2113e0",
@@ -124,7 +124,7 @@
     },
     "server-version/backend/src/__tests__/survey/catalog-scale-presentation.contract.test.ts": {
       "before": null,
-      "after": "67fdcb497b6fa61bd55c396955cf755fe47f778f"
+      "after": "51372f92daa0c04075cc80706d46e976c2b67cb8"
     },
     "server-version/backend/src/__tests__/survey/catalog.sources.contract.test.ts": {
       "before": "063ed438f7bfa98081c7a690aea30893459c8adf",
@@ -132,7 +132,7 @@
     },
     "server-version/backend/src/__tests__/survey/public-scale-media.test.ts": {
       "before": null,
-      "after": "81f8dc6cd856088de969c74d703b019d0a6c18fb"
+      "after": "f3e0a1cb7351300ee5618f59e46183058bd100e7"
     },
     "server-version/backend/src/__tests__/survey/research-request-local-final.contract.test.ts": {
       "before": "b0443fcab36a5b0b25c7ea32b0faa0547b5ebe78",
@@ -248,7 +248,7 @@
     },
     "server-version/backend/src/modules/scale-library-governance/training-source.ts": {
       "before": null,
-      "after": "c045fdcba1cfbab3dde977f253a204920b845005"
+      "after": "2d1d41081f5c0c8f2fa0e12ebb8dc72155da169c"
     },
     "server-version/backend/src/modules/scale-library-governance/unified-catalog-model.ts": {
       "before": null,
@@ -424,7 +424,7 @@
     },
     "server-version/e2e/scale-library-governance-browser.cjs": {
       "before": null,
-      "after": "4158a182be5073234fb6e39f0f3ed3baec99a6b1"
+      "after": "50b694556c9fa212c745a49384d08b19c5dabd76"
     },
     "server-version/e2e/scale-library-governance-proxy.cjs": {
       "before": null,
@@ -524,7 +524,7 @@
     },
     "server-version/frontend/src/pages/__tests__/ScaleEdit.readonly.test.tsx": {
       "before": "f13805ec7a20b82b0916c2b1e5f2348a726e6795",
-      "after": "16b1b1c0f15b2fc50f93c4ab0f00b8a2b93cd7af"
+      "after": "de8ff8ec5aac3b84e59a274a5e86e59295b13b5d"
     },
     "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx": {
       "before": null,
@@ -621,6 +621,30 @@
     "server-version/frontend/src/survey/measurement-publication.ts": {
       "before": null,
       "after": "0313e57f9f2b552a34dd28f53d57f6fcecede1b1"
+    },
+    "server-version/backend/src/__tests__/composite/training-release-query.fixture.ts": {
+      "before": null,
+      "after": "4a9a628395f37bc4652dcf1847c6bcac41d8998e"
+    },
+    "server-version/backend/src/__tests__/scale-library-governance/wrapper-content-binding.test.ts": {
+      "before": null,
+      "after": "32ae108444e4d32d918d53429adaddcaca18d6ba"
+    },
+    "server-version/backend/src/modules/composite/training-content-binding.ts": {
+      "before": "5316e2b2384b5d6b31464796ca9dd2dd2d7c96bb",
+      "after": "72979a0cbd58d7d73b7f90bbd3538698f4b875fc"
+    },
+    "server-version/backend/src/modules/composite/training-content-final.ts": {
+      "before": "1a1fb49f055d814b273bc54db1a98e9a7f5ff97a",
+      "after": "150ec1a2d9aa44c7d593cfc6dc7eda75cd41299c"
+    },
+    "server-version/backend/src/modules/composite/training-content-report.ts": {
+      "before": "52a5a4fea77835bdffbe46403d4517d76aaf9778",
+      "after": "f026d701e70916e26853866cd92d6b75a72de2aa"
+    },
+    "server-version/backend/src/modules/questionnaire-product/reinterpretation.service.ts": {
+      "before": "082348f0ee5f99c624d1792eeb2b7f6bbe8426d2",
+      "after": "9a60b98bf2333619322e588c670c1fa3f3363ad3"
     }
   },
   "tests": {
@@ -630,6 +654,37 @@
       "src/__tests__/composite/analysis-protocol.service.test.ts",
       "src/__tests__/composite/report-package.service.test.ts",
       "src/__tests__/composite/training-content-service.test.ts",
+      "src/__tests__/scale/scale-controller-v2.test.ts",
+      "src/__tests__/scale/scale-presentation.test.ts",
+      "src/__tests__/survey/catalog-scale-presentation.contract.test.ts",
+      "src/__tests__/survey/public-scale-media.test.ts",
+      "src/__tests__/measurement-content/training-content-binding.test.ts",
+      "src/__tests__/measurement-content/registered-resource-content.test.ts",
+      "src/__tests__/measurement-content/training-content-final.test.ts",
+      "src/__tests__/measurement-content/training-content-report.test.ts",
+      "src/__tests__/measurement-content/training-reinterpretation.test.ts",
+      "src/__tests__/scale-library-governance/wrapper-content-binding.test.ts"
+    ],
+    "frontend": [
+      "src/pages/__tests__/ScaleEdit.readonly.test.tsx"
+    ],
+    "postgres": [
+      "src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts",
+      "src/__tests__/scale-library-governance/governance.postgres.integration.test.ts",
+      "src/__tests__/scale-library-governance/media.postgres.integration.test.ts",
+      "src/__tests__/scale/scale-copy.postgres.integration.test.ts"
+    ]
+  },
+  "frontendLint": [
+    "src/pages/__tests__/ScaleEdit.readonly.test.tsx"
+  ],
+  "browserProfileTrustApproved": true,
+  "productReference": "cd148f9be5d80e51c2e469ccedf88f65e6de4c30",
+  "priorContracts": {
+    "run": 39610102026,
+    "head": "0152447ae08beefc04ffffa9601dd33295d3c33e",
+    "checkout": "5efd35f29e2cebcf75369415d34cb353ce75187f",
+    "backend": [
       "src/__tests__/composite/training-flow-materialization-reuse.test.ts",
       "src/__tests__/composite/training-flow-scale-authorization.test.ts",
       "src/__tests__/controllers/scaleListSource.test.ts",
@@ -641,14 +696,10 @@
       "src/__tests__/scale-library-governance/unified-catalog.test.ts",
       "src/__tests__/scale-library-governance/wrapper-privacy.test.ts",
       "src/__tests__/scale/scale-access.test.ts",
-      "src/__tests__/scale/scale-controller-v2.test.ts",
       "src/__tests__/scale/scale-governance-boundaries.test.ts",
-      "src/__tests__/scale/scale-presentation.test.ts",
       "src/__tests__/scale/scale-publication-guard.test.ts",
       "src/__tests__/services/materialGrant.test.ts",
-      "src/__tests__/survey/catalog-scale-presentation.contract.test.ts",
       "src/__tests__/survey/catalog.sources.contract.test.ts",
-      "src/__tests__/survey/public-scale-media.test.ts",
       "src/__tests__/survey/research-request-local-final.contract.test.ts"
     ],
     "frontend": [
@@ -660,7 +711,6 @@
       "src/components/scale-governance/TrainingScaleVersions.test.tsx",
       "src/pages/__tests__/ScaleEdit.authoring.test.tsx",
       "src/pages/__tests__/ScaleEdit.copy-publish.test.tsx",
-      "src/pages/__tests__/ScaleEdit.readonly.test.tsx",
       "src/pages/admin/ScaleLibraryGovernance.test.tsx",
       "src/pages/student/__tests__/ScaleAssessment.provenance.test.tsx",
       "src/survey/SurveyBuilder.publication.test.tsx",
@@ -672,63 +722,78 @@
       "src/survey/SurveyWaveStudio.content.test.tsx",
       "src/survey/measurement-publication.test.ts"
     ],
-    "postgres": [
-      "src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts",
-      "src/__tests__/scale-library-governance/governance.postgres.integration.test.ts",
-      "src/__tests__/scale-library-governance/media.postgres.integration.test.ts",
-      "src/__tests__/scale/scale-copy.postgres.integration.test.ts"
-    ]
-  },
-  "frontendLint": [
-    "src/App.tsx",
-    "src/admin/AdminContentPermissions.test.tsx",
-    "src/admin/AdminContentPermissions.tsx",
-    "src/admin/AdminEntrances.tsx",
-    "src/admin/contentRequestRecovery.ts",
-    "src/api/adminContent.ts",
-    "src/api/scaleLibraryGovernance.ts",
-    "src/components/FinalCompositeAssessment.tsx",
-    "src/components/WholeCompositeQuestionnaire.tsx",
-    "src/components/__tests__/FinalCompositePresentationReuse.test.tsx",
-    "src/components/__tests__/TrainingFlowSurface.test.tsx",
-    "src/components/questionnaire/ScalePlayer.tsx",
-    "src/components/scale-governance/ScaleLibraryMediaPreview.test.tsx",
-    "src/components/scale-governance/ScaleLibraryMediaPreview.tsx",
-    "src/components/scale-governance/TrainingScaleLibrarySubmission.test.tsx",
-    "src/components/scale-governance/TrainingScaleLibrarySubmission.tsx",
-    "src/components/scale-governance/TrainingScaleVersions.test.tsx",
-    "src/components/scale-governance/TrainingScaleVersions.tsx",
-    "src/components/scale-governance/useScaleLibrarySubmission.ts",
-    "src/modules/composite/types.ts",
-    "src/pages/ScaleEdit.tsx",
-    "src/pages/__tests__/ScaleEdit.authoring.test.tsx",
-    "src/pages/__tests__/ScaleEdit.copy-publish.test.tsx",
-    "src/pages/__tests__/ScaleEdit.readonly.test.tsx",
-    "src/pages/admin/ScaleLibraryGovernance.test.tsx",
-    "src/pages/admin/ScaleLibraryGovernance.tsx",
-    "src/pages/student/ScaleAssessment.tsx",
-    "src/pages/student/__tests__/ScaleAssessment.provenance.test.tsx",
-    "src/survey/SurveyApp.tsx",
-    "src/survey/SurveyBuilder.publication.test.tsx",
-    "src/survey/SurveyBuilder.tsx",
-    "src/survey/SurveyCatalogScaleMedia.test.tsx",
-    "src/survey/SurveyCatalogScaleMedia.tsx",
-    "src/survey/SurveyParticipantImage.test.tsx",
-    "src/survey/SurveyParticipantImage.tsx",
-    "src/survey/SurveyPublicApp.final.test.tsx",
-    "src/survey/SurveyPublicApp.tsx",
-    "src/survey/SurveyReportStudio.tsx",
-    "src/survey/SurveyScaleLibrarySubmission.test.tsx",
-    "src/survey/SurveyScaleLibrarySubmission.tsx",
-    "src/survey/SurveyScaleVersions.tsx",
-    "src/survey/SurveyTimedScale.test.tsx",
-    "src/survey/SurveyTimedScale.tsx",
-    "src/survey/SurveyWaveStudio.content.test.tsx",
-    "src/survey/SurveyWaveStudio.tsx",
-    "src/survey/builder.types.ts",
-    "src/survey/measurement-publication.test.ts",
-    "src/survey/measurement-publication.ts"
-  ],
-  "browserProfileTrustApproved": true,
-  "productReference": "051907b4b173518818f28e44712ffc80d8bef11e"
+    "originalInventory": {
+      "backend": [
+        "src/__tests__/assessment-runtime/shared-scale-runtime.test.ts",
+        "src/__tests__/composite/addItem.service.test.ts",
+        "src/__tests__/composite/analysis-protocol.service.test.ts",
+        "src/__tests__/composite/report-package.service.test.ts",
+        "src/__tests__/composite/training-content-service.test.ts",
+        "src/__tests__/composite/training-flow-materialization-reuse.test.ts",
+        "src/__tests__/composite/training-flow-scale-authorization.test.ts",
+        "src/__tests__/controllers/scaleListSource.test.ts",
+        "src/__tests__/measurement-content/scale-authoring-lineage.test.ts",
+        "src/__tests__/measurement-content/survey-measurement-publication.test.ts",
+        "src/__tests__/scale-library-governance/contracts.test.ts",
+        "src/__tests__/scale-library-governance/media.authorization.test.ts",
+        "src/__tests__/scale-library-governance/media.test.ts",
+        "src/__tests__/scale-library-governance/unified-catalog.test.ts",
+        "src/__tests__/scale-library-governance/wrapper-privacy.test.ts",
+        "src/__tests__/scale/scale-access.test.ts",
+        "src/__tests__/scale/scale-controller-v2.test.ts",
+        "src/__tests__/scale/scale-governance-boundaries.test.ts",
+        "src/__tests__/scale/scale-presentation.test.ts",
+        "src/__tests__/scale/scale-publication-guard.test.ts",
+        "src/__tests__/services/materialGrant.test.ts",
+        "src/__tests__/survey/catalog-scale-presentation.contract.test.ts",
+        "src/__tests__/survey/catalog.sources.contract.test.ts",
+        "src/__tests__/survey/public-scale-media.test.ts",
+        "src/__tests__/survey/research-request-local-final.contract.test.ts"
+      ],
+      "frontend": [
+        "src/admin/AdminContentPermissions.test.tsx",
+        "src/components/__tests__/FinalCompositePresentationReuse.test.tsx",
+        "src/components/__tests__/TrainingFlowSurface.test.tsx",
+        "src/components/scale-governance/ScaleLibraryMediaPreview.test.tsx",
+        "src/components/scale-governance/TrainingScaleLibrarySubmission.test.tsx",
+        "src/components/scale-governance/TrainingScaleVersions.test.tsx",
+        "src/pages/__tests__/ScaleEdit.authoring.test.tsx",
+        "src/pages/__tests__/ScaleEdit.copy-publish.test.tsx",
+        "src/pages/__tests__/ScaleEdit.readonly.test.tsx",
+        "src/pages/admin/ScaleLibraryGovernance.test.tsx",
+        "src/pages/student/__tests__/ScaleAssessment.provenance.test.tsx",
+        "src/survey/SurveyBuilder.publication.test.tsx",
+        "src/survey/SurveyCatalogScaleMedia.test.tsx",
+        "src/survey/SurveyParticipantImage.test.tsx",
+        "src/survey/SurveyPublicApp.final.test.tsx",
+        "src/survey/SurveyScaleLibrarySubmission.test.tsx",
+        "src/survey/SurveyTimedScale.test.tsx",
+        "src/survey/SurveyWaveStudio.content.test.tsx",
+        "src/survey/measurement-publication.test.ts"
+      ],
+      "postgres": [
+        "src/__tests__/integration/instrument-final-submit.postgres.integration.test.ts",
+        "src/__tests__/scale-library-governance/governance.postgres.integration.test.ts",
+        "src/__tests__/scale-library-governance/media.postgres.integration.test.ts",
+        "src/__tests__/scale/scale-copy.postgres.integration.test.ts"
+      ]
+    },
+    "allowedBackendChanges": [
+      "server-version/backend/src/__tests__/composite/addItem.service.test.ts",
+      "server-version/backend/src/__tests__/composite/analysis-protocol.service.test.ts",
+      "server-version/backend/src/__tests__/composite/report-package.service.test.ts",
+      "server-version/backend/src/__tests__/composite/training-content-service.test.ts",
+      "server-version/backend/src/__tests__/composite/training-release-query.fixture.ts",
+      "server-version/backend/src/__tests__/scale-library-governance/wrapper-content-binding.test.ts",
+      "server-version/backend/src/__tests__/scale/scale-controller-v2.test.ts",
+      "server-version/backend/src/__tests__/survey/catalog-scale-presentation.contract.test.ts",
+      "server-version/backend/src/__tests__/survey/public-scale-media.test.ts",
+      "server-version/backend/src/modules/composite/training-content-binding.ts",
+      "server-version/backend/src/modules/composite/training-content-final.ts",
+      "server-version/backend/src/modules/composite/training-content-report.ts",
+      "server-version/backend/src/modules/questionnaire-product/reinterpretation.service.ts",
+      "server-version/backend/src/modules/scale-library-governance/training-source.ts"
+    ],
+    "reviewedBoundary": "16 unchanged suites: materialization overrides encryption key; request-local FINAL mocks encryption/identity; materialGrant and list controllers mock config; remaining pure schema/hash/compiler/media/Scale authorization paths do not consume the added cognitive/encryption/pseudonym environment keys. Changed exact wrapper binding/final/report/reinterpretation paths are covered by six additional direct suites, not those reused contracts."
+  }
 }

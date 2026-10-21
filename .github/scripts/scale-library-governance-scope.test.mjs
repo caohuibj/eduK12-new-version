@@ -104,3 +104,25 @@ for value in ['failure','skipped',None]:
 job['id']=119241597740;job['conclusion']='success';m.official('sast',read)
 `],{stdio:'pipe'});
 });
+
+test('partial failed-run reports admit only exact unchanged passing suites',async()=>{
+ const {execFileSync}=await import('node:child_process');
+ execFileSync('python3',['-B','-c',`
+import importlib.util,copy
+spec=importlib.util.spec_from_file_location('resume','.github/scripts/scale-library-governance-resume.py')
+m=importlib.util.module_from_spec(spec);spec.loader.exec_module(m)
+p={'frontend':['src/unchanged.test.ts'],'originalInventory':{'frontend':['src/unchanged.test.ts','src/repaired.test.ts']}}
+r={'success':False,'numFailedTests':4,'testResults':[{'name':'/app/src/unchanged.test.ts','status':'passed','assertionResults':[{'status':'passed'} for _ in range(159)]},{'name':'/app/src/repaired.test.ts','assertionResults':[{'status':'failed'}]}]}
+assert m.validate_prior_report('frontend',r,p)[1]==159
+for kind in ['failed','suite-failed','missing','false-green','duplicate']:
+ bad=copy.deepcopy(r)
+ if kind=='failed':bad['testResults'][0]['assertionResults'][0]['status']='failed'
+ if kind=='suite-failed':bad['testResults'][0]['status']='failed'
+ if kind=='missing':bad['testResults'].pop()
+ if kind=='false-green':bad['success']=True
+ if kind=='duplicate':bad['testResults'].append(copy.deepcopy(bad['testResults'][0]))
+ try:m.validate_prior_report('frontend',bad,p)
+ except AssertionError:pass
+ else:raise AssertionError('invalid partial report accepted: '+kind)
+`],{stdio:'pipe'});
+});

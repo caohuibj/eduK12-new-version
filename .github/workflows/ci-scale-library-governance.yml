@@ -67,6 +67,12 @@ jobs:
       - name: compile once and preserve exact builder and runtime bytes
         if: matrix.component == 'backend'
         run: bash .github/scripts/scale-library-governance-build.sh ${{ matrix.component }}
+      - name: accept unchanged successful suites from the fixed failed second run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --no-tags --depth=1 origin 0152447ae08beefc04ffffa9601dd33295d3c33e
+          python3 -B .github/scripts/scale-library-governance-resume.py contracts ${{ matrix.component }}
       - name: selected missing contracts and frontend types/lint in the original builder
         shell: bash
         run: |
@@ -75,9 +81,14 @@ jobs:
           if [ '${{ matrix.component }}' = frontend ]; then
             image_head=f41811053761c25709f98d74f0abed7eb1c61711
             mounts=(-v "$GITHUB_WORKSPACE/server-version/cognitive-randomization-golden-v1.json:/cognitive-randomization-golden-v1.json:ro" -v "$GITHUB_WORKSPACE/server-version/backend/src/modules/cognitive/generated/identities.json:/backend/src/modules/cognitive/generated/identities.json:ro")
-            for file in src/components/scale-governance/TrainingScaleLibrarySubmission.test.tsx src/survey/SurveyPublicApp.final.test.tsx; do mounts+=(-v "$GITHUB_WORKSPACE/server-version/frontend/$file:/app/$file:ro"); done
+            for file in src/pages/__tests__/ScaleEdit.readonly.test.tsx src/components/scale-governance/TrainingScaleLibrarySubmission.test.tsx src/survey/SurveyPublicApp.final.test.tsx; do mounts+=(-v "$GITHUB_WORKSPACE/server-version/frontend/$file:/app/$file:ro"); done
           fi
-          docker run --rm "${mounts[@]}" -e CI=true -e NODE_ENV=test -e TZ=UTC \
+          test_env=()
+          if [ '${{ matrix.component }}' = backend ]; then
+            # Public synthetic test-only keys, never used by the isolated runtime or production.
+            test_env=(-e COGNITIVE_MODULE_ENABLED=true -e DATA_ENCRYPTION_KEY=aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa -e DATA_PSEUDONYM_KEY=bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb)
+          fi
+          docker run --rm "${mounts[@]}" "${test_env[@]}" -e CI=true -e NODE_ENV=test -e TZ=UTC \
             -e DATABASE_URL=postgresql://unused:unused@127.0.0.1:1/unused \
             -e GITHUB_WORKSPACE="$GITHUB_WORKSPACE" -e GOVERNANCE_EVIDENCE=/evidence \
             -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
