@@ -1,15 +1,21 @@
-import {useEffect,useState} from 'react'
+import {useEffect,useRef,useState} from 'react'
 import {AssessmentVideoPlayer} from '../modules/assessment-media/AssessmentVideoPlayer'
 import type {AssessmentVideoPresentationV1,AssessmentVideoCapabilitySources} from '../modules/assessment-media/types'
 import {SurveyParticipantImage,type SurveyImageProof} from './SurveyParticipantImage'
 import type {SurveyPublicImage} from './builder.types'
 export type SurveyScaleMedia={images?:SurveyPublicImage[];video?:AssessmentVideoPresentationV1}
-export function SurveyCatalogScaleMedia({item,proof,instrumentKey,itemKey,complete=false,onComplete,readOnly=false}:{
+export function SurveyCatalogScaleMedia({item,proof,instrumentKey,itemKey,complete=false,onComplete,readOnly=false,onImagesReadyChange}:{
   item:SurveyScaleMedia;proof:SurveyImageProof;instrumentKey:string;itemKey:string;
-  complete?:boolean;onComplete?:()=>void;readOnly?:boolean
+  complete?:boolean;onComplete?:()=>void;readOnly?:boolean;onImagesReadyChange?:(ready:boolean)=>void
 }){
   const [sources,setSources]=useState<AssessmentVideoCapabilitySources|null>(null)
   const [error,setError]=useState(''),[retry,setRetry]=useState(0)
+  const loadedImages=useRef<Record<string,boolean>>({})
+  const imageIdentity=(image:SurveyPublicImage)=>image.asset.assetId+':'+image.asset.contentHash
+  const imageReady=(image:SurveyPublicImage,ready:boolean)=>{
+    loadedImages.current[imageIdentity(image)]=ready
+    onImagesReadyChange?.((item.images??[]).every(candidate=>loadedImages.current[imageIdentity(candidate)]===true))
+  }
   const video=item.video
   useEffect(()=>{
     setSources(null);setError('')
@@ -26,7 +32,7 @@ export function SurveyCatalogScaleMedia({item,proof,instrumentKey,itemKey,comple
     return()=>controller.abort()
   },[proof.publicId,proof.attemptId,proof.accessCredential,proof.researchCode,instrumentKey,itemKey,video,retry])
   return <div>
-    {item.images?.map(image=><SurveyParticipantImage key={image.asset.assetId} image={image} proof={proof}/>)}
+    {item.images?.map(image=><SurveyParticipantImage key={imageIdentity(image)} image={image} proof={proof} onReadyChange={ready=>imageReady(image,ready)}/>)}
     {video&&(sources?<AssessmentVideoPlayer presentation={video} sources={sources}
       requiredViewing={!readOnly} viewingComplete={complete} onViewingComplete={onComplete}
       onRetry={()=>setRetry(value=>value+1)}/>:<p role="status">{error||'正在读取已授权视频…'}{error&&<button type="button" onClick={()=>setRetry(value=>value+1)}>重试</button>}</p>)}

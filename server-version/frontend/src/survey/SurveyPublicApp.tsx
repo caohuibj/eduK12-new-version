@@ -102,10 +102,10 @@ const publicApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
   if(!result.ok||envelope.code!==0||!envelope.data)throw new SurveyPublicApiError(envelope.message||'操作未完成',result.status)
   return envelope.data
 }
-export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purpose='SURVEY',readOnly=false,videoComplete,onVideoComplete}:{unit:Unit;answer:Record<string,Answer>;
+export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purpose='SURVEY',readOnly=false,videoComplete,onVideoComplete,imageReady,onImageReadyChange}:{unit:Unit;answer:Record<string,Answer>;
   onChange:(name:string,value:Answer)=>void;proof?:SurveyImageProof;
   pageIndex:number;onPageChange:(next:number)=>void;
-  purpose?:'SURVEY'|'HUITEACHER';readOnly?:boolean;videoComplete?:Record<string,boolean>;onVideoComplete?:(itemKey:string)=>void}){
+  purpose?:'SURVEY'|'HUITEACHER';readOnly?:boolean;videoComplete?:Record<string,boolean>;onVideoComplete?:(itemKey:string)=>void;imageReady?:Record<string,boolean>;onImageReadyChange?:(itemKey:string,ready:boolean)=>void}){
   const [pageError,setPageError]=useState('')
 
   const shownFormKeys=unit.kind==='FORM'
@@ -162,14 +162,14 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
             selected,o.optionKey,e.target.checked,q.exclusiveOptionKeys))}/> {o.label}</label>
     }):options.map(o=><label className="block my-2 text-sm" key={o.optionKey}>
       <input type="radio" name={unit.instrumentKey+'-'+q.itemKey}
-        checked={answer[q.itemKey]===o.optionKey}
+        checked={answer[q.itemKey]===o.optionKey} disabled={unit.kind==='SCALE'&&!!q.images?.length&&imageReady?.[q.itemKey]!==true}
         onChange={()=>onChange(q.itemKey,o.optionKey)}/> {o.label}</label>)
   const item=(q:Question)=>{
     if(shownFormKeys&&!shownFormKeys.has(q.itemKey))return null
     return <fieldset disabled={readOnly} className="border rounded-lg p-4 my-4 bg-white scroll-mt-4"
       id={'survey-answer-'+unit.instrumentKey+'-'+q.itemKey} tabIndex={-1} key={q.itemKey}>
       <legend className="font-medium text-sm">{q.prompt}{q.required?' *':''}</legend>
-      {unit.kind==='SCALE'&&proof&&<SurveyCatalogScaleMedia item={q} proof={proof} instrumentKey={unit.instrumentKey} itemKey={q.itemKey} complete={videoComplete?.[q.itemKey]} onComplete={()=>onVideoComplete?.(q.itemKey)} readOnly={readOnly}/>}
+      {unit.kind==='SCALE'&&proof&&<SurveyCatalogScaleMedia item={q} proof={proof} instrumentKey={unit.instrumentKey} itemKey={q.itemKey} complete={videoComplete?.[q.itemKey]} onComplete={()=>onVideoComplete?.(q.itemKey)} onImagesReadyChange={ready=>onImageReadyChange?.(q.itemKey,ready)} readOnly={readOnly}/>}
       {q.image&&proof&&<SurveyParticipantImage image={q.image} proof={proof}/>}
       {q.type==='MULTIPLE'&&q.maxSelections!==undefined&&<p className="text-xs mb-2">
         请选 {q.minSelections??1} 至 {q.maxSelections} 项。</p>}
@@ -254,6 +254,7 @@ export default function SurveyPublicApp(){
   const [formPages,setFormPages]=useState<Record<string,number>>({})
   const [scalePages,setScalePages]=useState<Record<string,number>>({})
   const [videoCompletions,setVideoCompletions]=useState<Record<string,boolean>>({})
+  const [imageReadiness,setImageReadiness]=useState<Record<string,boolean>>({})
   const [toolStep,setToolStep]=useState(0)
   const [itemTimings,setItemTimings]=useState<SurveyWaveScaleTimings>({})
   const timingTrackers=useRef<Record<string,SurveyScaleTimingTracker>>({})
@@ -572,6 +573,7 @@ export default function SurveyPublicApp(){
       }
       return true
     }
+    if(flowUnit.kind==='SCALE'&&!mountedScaleImagesReady(flowUnit))return false
     if(flowUnit.kind==='SCALE')return (flowUnit.items??[]).every(q=>
       (!q.required||typeof existing[q.itemKey]==='string'&&(existing[q.itemKey] as string).length>0)&&(!q.video||Object.prototype.hasOwnProperty.call(lockedAnswers,flowUnit.instrumentKey)||videoCompletions[videoKey(flowUnit,q.itemKey)]===true))
     return (flowUnit.scenes?.flatMap(scene=>scene.questions)??flowUnit.questions??[]).every(q=>{
@@ -625,6 +627,19 @@ export default function SurveyPublicApp(){
     }))
   }
   const videoKey=(unit:Unit,itemKey:string)=>[attemptId,task?.definitionDigest,unit.instrumentKey,itemKey].join(':')
+  const imageReadyFor=(unit:Unit,item:Question)=>!item.images?.length||imageReadiness[videoKey(unit,item.itemKey)]===true
+  // Gate mounted stimuli, not an invented historical browser-viewing record.
+  // Restored answers and unmounted earlier timed items retain their existing semantics.
+  const mountedScaleImagesReady=(unit:Unit)=>{
+    if(Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey))return true
+    if((currentFlow||timedSequence)&&flowUnit?.instrumentKey!==unit.instrumentKey)return true
+    const items=unit.items??[]
+    const shown=unit.presentationMode==='ONE_BY_ONE'?items.slice(Math.min(own(scalePages,unit.instrumentKey)??0,Math.max(0,items.length-1)),Math.min(own(scalePages,unit.instrumentKey)??0,Math.max(0,items.length-1))+1):items
+    return shown.every(item=>imageReadyFor(unit,item))
+  }
+  const markImagesReady=(unit:Unit,itemKey:string,ready:boolean)=>setImageReadiness(old=>{
+    const key=videoKey(unit,itemKey);return old[key]===ready?old:{...old,[key]:ready}
+  })
   const markVideoComplete=(unit:Unit,itemKey:string)=>setVideoCompletions(old=>({...old,[videoKey(unit,itemKey)]:true}))
   const renderSurveyTask=(unit:Unit)=>{
     if(unit.kind==='COGNITIVE')return <SurveyCognitiveUnit key={unit.instrumentKey} publicId={publicId} attemptId={attemptId}
@@ -644,7 +659,8 @@ export default function SurveyPublicApp(){
         unit={{instrumentKey:unit.instrumentKey,title:unit.title,
           items:(unit.items??[]).map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required,responseOptions:q.responseOptions})),
           responseOptions:unit.responseOptions??[]}}
-        renderMedia={itemKey=>{const item=unit.items?.find(q=>q.itemKey===itemKey);return item?<SurveyCatalogScaleMedia key={videoKey(unit,itemKey)} item={item} proof={{publicId,attemptId,accessCredential,...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode}:{})}} instrumentKey={unit.instrumentKey} itemKey={itemKey} complete={videoCompletions[videoKey(unit,itemKey)]} onComplete={()=>markVideoComplete(unit,itemKey)} readOnly={Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)}/>:null}}
+        imagesReady={mountedScaleImagesReady(unit)}
+        renderMedia={itemKey=>{const item=unit.items?.find(q=>q.itemKey===itemKey);return item?<SurveyCatalogScaleMedia key={videoKey(unit,itemKey)} item={item} proof={{publicId,attemptId,accessCredential,...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode}:{})}} instrumentKey={unit.instrumentKey} itemKey={itemKey} complete={videoCompletions[videoKey(unit,itemKey)]} onComplete={()=>markVideoComplete(unit,itemKey)} onImagesReadyChange={ready=>markImagesReady(unit,itemKey,ready)} readOnly={Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)}/>:null}}
         answer={own(answers,unit.instrumentKey)??{}}
         tracker={timingFor(unit)} paused={finalSealed}
         readOnly={Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)}
@@ -655,6 +671,7 @@ export default function SurveyPublicApp(){
     // Lock answer controls, not pagination: recovery starts at page zero and
     // must still let participants review a locked multi-page prerequisite.
     return <fieldset key={unit.instrumentKey} className="min-w-0 border-0 p-0"><TaskForm unit={unit}
+      imageReady={Object.fromEntries((unit.items??[]).map(q=>[q.itemKey,imageReadyFor(unit,q)]))} onImageReadyChange={(itemKey,ready)=>markImagesReady(unit,itemKey,ready)}
       videoComplete={Object.fromEntries((unit.items??[]).map(q=>[q.itemKey,videoCompletions[videoKey(unit,q.itemKey)]]))} onVideoComplete={itemKey=>markVideoComplete(unit,itemKey)}
       readOnly={Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)}
       pageIndex={own(formPages,unit.instrumentKey)??0}
@@ -673,6 +690,7 @@ export default function SurveyPublicApp(){
       setError('请完成当前工具后再提交');return
     }
     if(!finalRequest.current&&task.units.some(unit=>unit.kind==='SCALE'&&!Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)&&(currentFlow===null||currentFlow===undefined||currentFlow.visibleUnitKeys.includes(unit.instrumentKey))&&unit.items?.some(q=>q.video&&!videoCompletions[videoKey(unit,q.itemKey)]))){setError('请完整观看量表题目中的视频后再提交');return}
+    if(!finalRequest.current&&task.units.some(unit=>unit.kind==='SCALE'&&!mountedScaleImagesReady(unit))){setError('请等待当前量表图片加载完成；加载失败时请重试图片');return}
     finalInFlight.current=true
     void run(async()=>{
     // Match the frozen conditional form. An earlier selection change must
@@ -996,7 +1014,7 @@ export default function SurveyPublicApp(){
           <p>工具完成、临时暂存与整轮正式提交分别确认；这份提示不代替提交时的完整检查。</p>
         </aside>}
         {finalSealed&&<p role="status" className={message('')}>本次答案已封存。结果未确认时请重试原提交，暂不能修改答案。</p>}
-        {(finalSealed||finalFlowStep)&&<button className={action('btn-primary')} disabled={busy||cognitiveRunning||(!finalSealed&&!task.flow&&!task.units.every(unit=>{
+        {(finalSealed||finalFlowStep)&&<button className={action('btn-primary')} disabled={busy||cognitiveRunning||(!finalSealed&&task.units.some(unit=>unit.kind==='SCALE'&&!mountedScaleImagesReady(unit)))||(!finalSealed&&!task.flow&&!task.units.every(unit=>{
           if(unit.kind!=='FORM')return true
           const vis=visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],
             own(answers,unit.instrumentKey)??{})
