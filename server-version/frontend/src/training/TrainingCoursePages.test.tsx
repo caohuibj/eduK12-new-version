@@ -34,6 +34,7 @@ beforeEach(() => {
   loadAssessments.mockReset()
   get.mockImplementation((url: string) => {
     if (url === '/courses/course-1') return Promise.resolve({ code: 0, data: course })
+    if (url === '/checkins/schedules?courseId=course-1') return Promise.resolve({ code: 0, data: { list: [] } })
     if ((url === '/courses/course-1/assignments' || url.startsWith('/assignments?view=summary&courseId=course-1&'))) return Promise.resolve({ code: 0, data: { list: [{ id: 'a-1', title: '课程练习', status: 'PUBLISHED', submitted: false }] } })
     if ((url === '/courses/course-1/checkins' || url.startsWith('/checkins?view=summary&courseId=course-1&'))) return Promise.resolve({ code: 0, data: { list: [{ id: 'c-1', title: '每周打卡', status: 'PUBLISHED', submitted: false }] } })
     if (url.startsWith('/courses/course-1/training-assessments?includeManaged=true&view=summary&')) return Promise.resolve({ code: 0, data: { list: [
@@ -58,7 +59,7 @@ describe('course-first training workspaces', () => {
       : original(url))
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     expect(await screen.findByRole('heading', { name: '保留原题名：我的作业' })).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: '练习' })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: '学习' })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.queryByRole('button', { name: '作业' })).toBeNull()
     expect(screen.getByRole('link', { name: /发布练习/ })).toHaveAttribute('href', expect.stringContaining('/assignments?create=true&courseId=course-1'))
     expect(screen.getByRole('link', { name: '复用练习' })).toBeInTheDocument()
@@ -137,7 +138,7 @@ describe('course-first training workspaces', () => {
     expect(screen.getByRole('button', { name: '测评' })).toHaveAttribute('aria-pressed', 'true')
     expect(await screen.findByRole('link', { name: /发布测评/ })).toHaveAttribute('href', expect.stringContaining('/questionnaire-products/new?courseId=course-1&returnTo='))
     expect(get.mock.calls.some(([url]) => url.includes('training-analysis'))).toBe(false)
-    fireEvent.click(screen.getByRole('button', { name: '练习' }))
+    fireEvent.click(screen.getByRole('button', { name: '学习' }))
     expect(await screen.findByRole('link', { name: /发布练习/ })).toBeVisible()
     expect(get.mock.calls.some(([url]) => url.includes('training-analysis'))).toBe(false)
   })

@@ -8,6 +8,8 @@ import TrainingCourseEditorTabs from '../training/TrainingCourseEditorTabs'
 import '../training/training-task-editor.css'
 import TrainingTaskReusePicker from '../training/TrainingTaskReusePicker'
 import { checkinReuseContent } from '../training/taskReuse'
+import CheckinRecurrenceFields from '../training/CheckinRecurrenceFields'
+import { localDateTime, recurrencePayload, type CheckinRecurrence } from '../training/checkinRecurrence'
 import React, { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { Plus, Camera, Trash2, Users, Video, Image as ImageIcon, Download, X, FileText } from 'lucide-react'
@@ -50,6 +52,7 @@ interface DocumentItem {
 }
 
 interface CheckinFormData {
+  schedule?: CheckinRecurrence
   description?: string
   courseId: string
   title: string
@@ -241,15 +244,19 @@ const CheckinListContent: React.FC = () => {
         videos: formData.videos.length > 0 ? formData.videos : undefined,
         images: formData.images.length > 0 ? formData.images : undefined,
         documents: formData.documents.length > 0 ? formData.documents : undefined,
-        endTime: formData.endTime || undefined,
+        endTime: formData.endTime ? new Date(formData.endTime).toISOString() : undefined,
         allowViewOthers: formData.allowViewOthers,
         tags: formData.tags,
       }
-      const response = await apiClient.post('/checkins', data)
+      const recurring = isTrainingHost() && formData.schedule
+      const response = recurring
+        ? await apiClient.post('/checkins/schedules', { template: { ...data, endTime: undefined }, ...recurrencePayload(recurring) })
+        : await apiClient.post('/checkins', data)
       if (response.code !== 0) throw new Error(response.message || '保存失败')
       if (response.code === 0) {
         setShowModal(false)
         resetForm()
+        if (recurring) success('周期打卡已设置，可在课程打卡页查看和停止后续发布')
         setFilterRevision(value=>value+1)
         if (focusId || requestedCourseId !== data.courseId || ['search','tags','from','to','page'].some(key=>searchParams.has(key))) {
           const next=new URLSearchParams(searchParams)
@@ -275,7 +282,7 @@ const CheckinListContent: React.FC = () => {
         description: formData.description || '',
         content: formData.content,
         ...buildAttachmentUpdateFields(formData),
-        endTime: formData.endTime || undefined,
+        endTime: formData.endTime ? new Date(formData.endTime).toISOString() : null,
         allowViewOthers: formData.allowViewOthers,
         tags: formData.tags,
       }
@@ -406,7 +413,7 @@ const CheckinListContent: React.FC = () => {
       videos: (checkin.videos as VideoItem[]) || [],
       images: (checkin.images as ImageItem[]) || [],
       documents: (checkin.documents as DocumentItem[]) || [],
-      endTime: checkin.endTime ? new Date(checkin.endTime).toISOString().slice(0, 16) : '',
+      endTime: checkin.endTime ? localDateTime(checkin.endTime) : '',
       allowViewOthers: checkin.allowViewOthers || false,
       tags: checkin.tags || [],
     })
@@ -696,8 +703,9 @@ const CheckinListContent: React.FC = () => {
                 </select>
               </div>
 
-              {/* End Time */}
-              <div>
+              {isTrainingHost() && !editingCheckin && <CheckinRecurrenceFields value={formData.schedule} onChange={schedule => setFormData({ ...formData, schedule })} />}
+              {/* Each scheduled occurrence gets its own deadline. */}
+              {!formData.schedule && <div>
                 <label htmlFor="CheckinList-field-103" className="label">截止时间</label>
                 <input id="CheckinList-field-103"
                   type="datetime-local"
@@ -706,7 +714,7 @@ const CheckinListContent: React.FC = () => {
                   className="input w-full"
                 />
                 <p className="text-xs text-gray-500 mt-1">{isTrainingHost() ? '设置后，学员需在截止时间前完成打卡' : '设置后，学生需在截止时间前完成打卡'}</p>
-              </div>
+              </div>}
 
               {/* Tags */}
               <div>
@@ -736,7 +744,7 @@ const CheckinListContent: React.FC = () => {
               </div>
               {/* Actions */}
             </div>
-            <div className="staff-dialog__actions"><span className="training-task-editor__footer-note">{editingCheckin ? '编辑完成后保存修改。' : '发布后，课程学员即可查看。'}</span>
+            <div className="staff-dialog__actions"><span className="training-task-editor__footer-note">{editingCheckin ? editingCheckin.scheduleId ? '仅修改本期内容，周期模板保持原样。' : '编辑完成后保存修改。' : formData.schedule ? '每期独立发布，已有提交不会复制到新一期。' : '发布后，课程学员即可查看。'}</span>
               <ProductButton
                 type="button"
                 onClick={editorGuard.close}
@@ -744,7 +752,7 @@ const CheckinListContent: React.FC = () => {
                 取消
               </ProductButton>
               <ProductButton type="submit" variant="primary">
-                {editorGuard.busy ? '保存中...' : editingCheckin ? '保存修改' : isTrainingHost() ? '发布打卡' : '创建打卡'}
+                {editorGuard.busy ? '保存中...' : editingCheckin ? '保存修改' : formData.schedule ? '设置周期打卡' : isTrainingHost() ? '发布打卡' : '创建打卡'}
               </ProductButton>
             </div>
             </fieldset>

@@ -44,6 +44,7 @@ model User {
   teacherApproved                     Boolean                          @default(true) @map("teacher_approved")
   checkinSubmissions                  CheckinSubmission[]
   checkins                            Checkin[]                        @relation("CheckinCreator")
+  checkinSchedules                    CheckinSchedule[]
   courseStudents                      CourseStudent[]
   createdCourses                      Course[]                         @relation("CourseCreator")
   submissions                         Submission[]
@@ -338,6 +339,7 @@ model Course {
   isLibrary            Boolean               @default(false) @map("is_library")
   assignments          Assignment[]
   checkins             Checkin[]
+  checkinSchedules     CheckinSchedule[]
   students             CourseStudent[]
   creator              User                  @relation("CourseCreator", fields: [creatorId], references: [id])
   coverAsset           StoredAsset?          @relation("CourseCoverAsset", fields: [coverAssetId], references: [id], onDelete: SetNull)
@@ -482,14 +484,43 @@ model Checkin {
   updatedAt       DateTime             @updatedAt @map("updated_at")
   tags            String[]             @default([])
   allowAnonymous  Boolean              @default(false) @map("allow_anonymous")
+  scheduleId      String?              @map("schedule_id")
+  scheduledFor    DateTime?            @map("scheduled_for")
+  schedule        CheckinSchedule?     @relation(fields: [scheduleId], references: [id], onDelete: SetNull)
   submissions     CheckinSubmission[]
   accessTokens    CheckinAccessToken[]
   course          Course               @relation(fields: [courseId], references: [id], onDelete: Cascade)
   creator         User                 @relation("CheckinCreator", fields: [creatorId], references: [id])
 
   @@map("checkins")
+  @@unique([scheduleId, scheduledFor])
   @@index([courseId, createdAt(sort: Desc), id(sort: Desc)])
   @@index([tags], type: Gin)
+}
+
+// Durable content snapshot. Published occurrences and submissions remain independent.
+model CheckinSchedule {
+  id             String    @id @default(uuid())
+  courseId       String    @map("course_id")
+  creatorId      String    @map("creator_id")
+  template       Json
+  intervalDays   Int       @map("interval_days")
+  durationHours  Int       @map("duration_hours")
+  firstPublishAt DateTime  @map("first_publish_at")
+  nextPublishAt  DateTime? @map("next_publish_at")
+  endsAt         DateTime? @map("ends_at")
+  timezone       String
+  active         Boolean   @default(true)
+  publishedCount Int       @default(0) @map("published_count")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+  course         Course    @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  creator        User      @relation(fields: [creatorId], references: [id])
+  checkins       Checkin[]
+
+  @@index([active, nextPublishAt])
+  @@index([courseId, createdAt(sort: Desc)])
+  @@map("checkin_schedules")
 }
 
 model CheckinSubmission {

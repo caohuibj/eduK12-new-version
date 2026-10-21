@@ -17,6 +17,6 @@ export async function managementTaskList(req: Request, res: Response, kind: 'ass
     course: { select: { id: true, title: true, creatorId: true } }, _count: { select: { submissions: true } } } as const
   const [list,total] = kind === 'assignment'
     ? await Promise.all([prisma.assignment.findMany({ where, select: { ...common, deadline: true, status: true }, orderBy: [{createdAt:'desc'},{id:'desc'}], skip: (parsed.page-1)*parsed.pageSize, take: parsed.pageSize }), prisma.assignment.count({where})])
-    : await Promise.all([prisma.checkin.findMany({ where, select: { ...common, endTime: true, allowAnonymous: true }, orderBy: [{createdAt:'desc'},{id:'desc'}], skip: (parsed.page-1)*parsed.pageSize, take: parsed.pageSize }), prisma.checkin.count({where})])
+    : await Promise.all([prisma.checkin.findMany({ where, select: { ...common, endTime: true, allowAnonymous: true, scheduleId: true, scheduledFor: true }, orderBy: [{createdAt:'desc'},{id:'desc'}], skip: (parsed.page-1)*parsed.pageSize, take: parsed.pageSize }), prisma.checkin.count({where})])
   return success(res, { list: list.map(row => ({...row, summary:true})), total, page: parsed.page, pageSize: parsed.pageSize })
 }

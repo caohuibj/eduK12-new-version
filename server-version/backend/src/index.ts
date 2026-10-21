@@ -1,4 +1,5 @@
 import { cleanupExpiredTrainingCheckpoints } from './modules/composite/training-checkpoint.service'
+import { startCheckinScheduleScheduler } from './services/checkinScheduleService'
 import { organizationInvitationsRouter } from './modules/organization/invitations'
 import { adminPermissionsRouter, adminSecurityRouter } from './modules/admin-permissions/routes'
 import {formalReferenceRouter,surveyFormalReferenceRouter} from './modules/measurement-content/formal-reference.routes'
@@ -407,6 +408,7 @@ app.use(errorHandler)
 // The HTTP listener is deliberately started only after required dependencies
 // have initialized. This keeps PM2/Docker from declaring a process ready while
 // classroom broadcasts are silently running without cross-process delivery.
+let stopCheckinSchedules: (() => void) | null = null
 let exportCleanupTimer: ReturnType<typeof setInterval> | null = null
 let submissionReceiptCleanupTimer: ReturnType<typeof setInterval> | null = null
 let serverListening = false
@@ -415,6 +417,7 @@ let shutdownStarted = false
 const gracefulShutdown = async (signal: string, exitCode = 0) => {
   if (shutdownStarted) return
   shutdownStarted = true
+  stopCheckinSchedules?.()
   if (exportCleanupTimer) clearInterval(exportCleanupTimer)
   if (submissionReceiptCleanupTimer) clearInterval(submissionReceiptCleanupTimer)
   logger.info(`${signal} signal received: closing HTTP server`)
@@ -481,6 +484,8 @@ const startServer = async (): Promise<void> => {
   // stale-video reconciliation. Producers still enqueue through config/queue.
   logger.info('Effective runtime resource config', effectiveRuntimeResourceConfig())
   await startBackgroundWorkers(config.backgroundWorkersEnabled)
+  // Lightweight durable publication is independent of heavy media/export consumers.
+  stopCheckinSchedules = startCheckinScheduleScheduler()
 
   // ExportArtifact cleanup is metadata-driven: only exact expired objects are
   // removed, never an exploratory directory scan. Keep one bounded hourly task

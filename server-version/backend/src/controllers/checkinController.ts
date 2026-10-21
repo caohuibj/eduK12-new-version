@@ -30,6 +30,7 @@ import {
 import { config } from '../config'
 import { detectMimeType } from '../utils/fileValidator'
 import { createAttachmentSchema, isLegacyUploadReference } from '../utils/attachmentSchema'
+import { createCheckinSchema } from '../utils/checkinSchema'
 import { MAX_TOKEN_USES } from '../constants'
 import { hashIdempotencyKey, hashIdempotencyPayload } from '../utils/idempotency'
 import {
@@ -40,19 +41,6 @@ import {
 
 const attachmentSchema = createAttachmentSchema(config.legacyUploadsEnabled)
 const attachmentsSchema = z.array(attachmentSchema).max(100)
-
-const createCheckinSchema = z.object({
-  courseId: z.string().min(1, '课程ID不能为空'),
-  title: z.string().min(1, '打卡标题不能为空'),
-  description: z.string().optional(),
-  content: z.string().optional(),
-  tags: z.array(z.string().max(20)).max(10).optional(),
-  videos: attachmentsSchema.optional().nullable().default([]),
-  images: attachmentsSchema.optional().nullable().default([]),
-  documents: attachmentsSchema.optional().nullable().default([]),
-  endTime: z.union([z.string(), z.null()]).optional(),
-  allowViewOthers: z.boolean().optional().default(false),
-})
 
 const updateCheckinSchema = z.object({
   title: z.string().min(1, '打卡标题不能为空').optional(),

@@ -57,9 +57,13 @@ const deleteCourseWithAssetReferences = async (courseId: string) => {
       where: { courseId },
       select: { id: true },
     })
+    const schedules = await tx.checkinSchedule.findMany({ where: { courseId }, select: { id: true } })
 
     const assignmentIds = assignments.map(({ id }) => id)
     const checkinIds = checkins.map(({ id }) => id)
+    if (schedules.length) {
+      await tx.assetReference.deleteMany({ where: { entityType: 'CheckinSchedule', entityId: { in: schedules.map(({ id }) => id) } } })
+    }
     const submissions = checkinIds.length > 0
       ? await tx.checkinSubmission.findMany({
         where: { checkinId: { in: checkinIds } },
