@@ -1,3 +1,4 @@
+import { matchRawScoreFeedback } from '../scale/raw-score-feedback'
 import type {SurveyFinalInterpretation} from './final-interpretation.service'
 import { normalizeSurveySjtAnswers,scoreResearchSjtAnswers,SurveySjtAnswerError } from './sjt-runtime'
 import type { SurveyCognitiveReference } from './cognitive.definition'
@@ -79,7 +80,13 @@ const scaleResult=(unit:ResearchFrozenUnit,answers:AnswerMap,computeScore=true):
   const result=scoreScale(unit.compiledDefinition as ScaleDefinitionV2,nativeAnswers)
   if(result.quality.status==='invalid')invalid('scoring','量表数据不足以计算研究得分')
   return {instrumentKey:unit.instrumentKey,kind:'SCALE',sourceDigest:unit.sourceDigest,
-    scoringDigest:unit.scoringDigest,rawAnswers:raw,missing:[],privateScoring:result}
+    scoringDigest:unit.scoringDigest,rawAnswers:raw,missing:[],privateScoring:{...result,
+      ...((unit.compiledDefinition as ScaleDefinitionV2).report?.rawScoreFeedback ? {rawScoreFeedback:result.scores.flatMap(score=>{
+        if(score.status!=='calculated')return []
+        const match=matchRawScoreFeedback((unit.compiledDefinition as ScaleDefinitionV2).report.rawScoreFeedback,score.key,score.value)
+        return match?[match]:[]
+      })}:{}),
+    }}
 }
 const sjtResult=(unit:ResearchFrozenUnit,answers:AnswerMap,computeScore=true):FrozenUnitResult=>{
   if((unit.displayDefinition as {schemaVersion:number}).schemaVersion===2){

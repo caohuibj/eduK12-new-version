@@ -96,6 +96,7 @@ router.post('/attempts/:attemptId/bundle-retry', authenticate, respondentAttempt
 router.get('/attempts/:attemptId/report-status', authenticate, respondentAttemptAccess, relationalGenericReportGuard, compositeController.reportStatus)
 router.post('/attempts/:attemptId/report-retry', authenticate, respondentAttemptAccess, relationalGenericReportGuard, compositeController.retryReport)
 router.get('/attempts/:attemptId/report', authenticate, respondentAttemptAccess, relationalGenericReportGuard, compositeController.report)
+router.get('/attempts/:attemptId/report/assets/:assetId', authenticate, respondentAttemptAccess, relationalGenericReportGuard, compositeController.report)
 router.get('/attempts/:attemptId/analysis-export', authenticate, requireRole(UserRole.STUDENT), relationalGenericReportGuard, compositeController.analysisExport)
 router.get('/attempts/:attemptId/snapshots', authenticate, requireTeacher, compositeController.snapshots)
 router.post('/attempts/:attemptId/reanalyze', authenticate, requireAdmin, compositeController.reanalyze)
@@ -137,6 +138,7 @@ router.get('/:id/export/files/:fileName', authenticate, requireTeacher, composit
 router.get('/:id/attempts', authenticate, requireTeacher, compositeController.listAttempts)
 router.get('/:id/attempts/:attemptId/report-status', authenticate, requireTeacher, relationalGenericReportGuard, compositeController.teacherReportStatus)
 router.get('/:id/attempts/:attemptId/report', authenticate, requireTeacher, relationalGenericReportGuard, compositeController.teacherReport)
+router.get('/:id/attempts/:attemptId/report/assets/:assetId', authenticate, requireTeacher, relationalGenericReportGuard, compositeController.teacherReport)
 router.get('/:id/attempts/:attemptId/analysis-export', authenticate, requireTeacher, relationalGenericReportGuard, compositeController.teacherAnalysisExport)
 
 router.post('/:id/attempts', authenticate, requireRole(UserRole.STUDENT), compositeController.startAttempt)

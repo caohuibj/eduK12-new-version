@@ -1,3 +1,5 @@
+import { previewScaleRawScoreFeedback } from '../scale/raw-score-feedback-preview'
+import { compileResearchScale } from './builder.compiler'
 import {catalogSnapshotsForDrafts,compileCatalogUnit,researcherCatalog} from './catalog.service'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
@@ -8,7 +10,7 @@ import { previewBulk, applyBulk, BulkImportError, type BulkInput } from './build
 import { dryRunSurveyForm, SurveyFinalValidationError } from './final.compute'
 
 import {
-  surveyKindSchema, surveyKeySchema, assertSurveyDraft, initialSurveyDefinition,
+  surveyKindSchema, surveyKeySchema, assertSurveyDraft, initialSurveyDefinition, SurveyDraftError,
   type SurveyKind, type SurveyDraft,
 } from './builder.definition'
 
@@ -176,11 +178,16 @@ export async function validateDraftForPreview(userId:string,projectId:string,id:
 }
 
 /** Researcher-only simulated scoring: produces no SurveyParticipant or FINAL rows. */
-export async function simulateSurveyDraft(userId:string,projectId:string,id:string,answers:PreviewAnswers) {
+export async function simulateSurveyDraft(userId:string,projectId:string,id:string,answers:PreviewAnswers|undefined,rawScores?:Record<string,number>) {
   return prisma.$transaction(async tx=>{
     await authorizedProject(tx,userId,projectId,false)
     const row=await findDraft(tx,projectId,id)
     if(row.catalogGrantId)fail(409,'来源授权工具为只读；使用冻结研究版本进行预览')
+    if(rawScores){
+      if(row.kind!=='SCALE')fail(400,'原始分反馈预览只用于量表')
+      try{return {id,revision:row.revision,...previewScaleRawScoreFeedback(compileResearchScale(row.title,row.definition),rawScores)}}
+      catch(cause){if(cause instanceof SurveyDraftError)throw cause;return fail(400,cause instanceof Error?cause.message:'模拟分数不合法')}
+    }
     return {id,revision:row.revision,...previewResearchInstrument({
       kind:surveyKindSchema.parse(row.kind),instrumentKey:row.instrumentKey,
       title:row.title,definition:row.definition,answers,

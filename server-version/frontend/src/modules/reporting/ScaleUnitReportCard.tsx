@@ -8,7 +8,7 @@ export type SafeScaleUnitReport = LegacySafeScaleUnitReport & {
   reason?: 'POLICY_UNAVAILABLE' | 'RESULT_UNAVAILABLE'
 }
 
-const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport }> = ({ report }) => {
+const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport; loadReportImage?: (assetId: string) => Promise<Blob> }> = ({ report, loadReportImage }) => {
   if (report.reportKind === 'unavailable') {
     return (
       <p className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800" data-testid="scale-report-unavailable">
@@ -32,7 +32,7 @@ const ScaleUnitReportCard: React.FC<{ report: SafeScaleUnitReport }> = ({ report
     return <EducationalFeedback content={report.educationalFeedback} />
   }
 
-  return <LegacyScaleUnitReportCard report={report} />
+  return <LegacyScaleUnitReportCard loadReportImage={loadReportImage} report={report.reportKind === 'scores' ? { ...report, rawScoreFeedback: undefined } : report} />
 }
 
 export default ScaleUnitReportCard

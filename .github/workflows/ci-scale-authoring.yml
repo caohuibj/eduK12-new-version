@@ -1,0 +1,389 @@
+name: Scale authoring bounded acceptance
+# Ordinary work/scale-authoring-feedback-20261021 pushes never activate CI.
+# The publisher creates this exact activation branch only after final review.
+on:
+  push:
+    branches: [ci/scale-authoring-feedback-20261021]
+permissions:
+  contents: read
+  actions: read
+concurrency:
+  group: scale-authoring-${{ github.ref }}
+  cancel-in-progress: false
+env:
+  CI: 'true'
+  TZ: UTC
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  scope:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - run: node .github/scripts/scale-authoring-scope.mjs scope
+      - name: verify fixed successful backend and PostgreSQL evidence (fail closed on changed inputs)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B .github/scripts/scale-authoring-reuse.py verify
+      - uses: actions/upload-artifact@v4
+        with:
+          name: scale-scope-${{ github.sha }}
+          path: |
+            scale-authoring-evidence/scope.json
+            scale-authoring-evidence/backend-reuse.json
+            scale-authoring-evidence/frontend-resume.json
+            scale-authoring-evidence/reused-current-frontend-reports/*.json
+            scale-authoring-evidence/reused-backend-reports/*.json
+            scale-authoring-evidence/reused-frontend-reports/*.json
+            scale-authoring-evidence/reused-postgres/postgres.json
+            scale-authoring-evidence/reused-postgres/cleanup.json
+          retention-days: 3
+          if-no-files-found: error
+  build:
+    needs: scope
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [frontend]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - run: bash server-version/scripts/ci-disk-preflight.sh
+      - name: restore successful compiled frontend and exact locked tools (no compiler/test/audit repeat)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 -B .github/scripts/scale-authoring-reuse.py restore-frontend
+          (cd scale-authoring-evidence; sha256sum -c frontend-build.sha256)
+          tar -xzf scale-authoring-evidence/frontend-build.tgz -C server-version/frontend
+          python3 -B .github/scripts/scale-authoring-reuse.py frontend-bytes
+      - name: exact affected contracts, types, lint and dependency audit
+        env:
+          NODE_ENV: test
+          DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+          DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+          JWT_SECRET: isolated-ci-scale-authoring-test-secret-20261021
+          ASSET_SIGNING_SECRET: isolated-ci-scale-authoring-asset-secret-20261021
+        run: |
+          # This is the exact official Debian/Node base digest used by the successful producer.
+          docker run --rm -i --user "$(id -u):$(id -g)" -e HOME=/tmp -e CI -e NODE_ENV -e GITHUB_WORKSPACE -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE" -w "$GITHUB_WORKSPACE/server-version/frontend" node:24.21.0-bookworm-slim@sha256:d6aa754f16b3197301076f047b5def2f02ea1dbbc2ca920407d46d7ec7f87b20 bash -eu <<'CHECKS'
+            node -e "if(process.version!==\"v24.21.0\")throw new Error(\"Wrong restored tool host\")"
+            node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit
+            mapfile -t lint < <(node -e 'for(const f of require(process.env.GITHUB_WORKSPACE+"/.github/scripts/scale-authoring-bindings.json").frontendLint)console.log(f)')
+            node node_modules/eslint/bin/eslint.js "${lint[@]}"
+          CHECKS
+          printf '{"typecheck":"PASS","lint":"PASS","sourceRun":39565491980,"compilerRepeated":false,"testsRepeated":false,"auditRepeated":false}\n' > scale-authoring-evidence/frontend-resume-checks.json
+      - name: assemble runtime only from unchanged compiler bytes, then verify every output file
+        run: |
+          set -euo pipefail
+          context="$(mktemp -d)"
+          trap 'rm -rf "$context"' EXIT
+          cp -a server-version/frontend/dist "$context/dist"
+          cp server-version/frontend/nginx.conf "$context/nginx.conf"
+          RUNTIME_CONTEXT="$context" python3 - <<'PYRUNTIME'
+          import os
+          from pathlib import Path
+          original=Path('server-version/frontend/Dockerfile').read_text()
+          marker='FROM nginx:1.31.6-alpine3.24-slim AS runtime'
+          assert original.count(marker)==1
+          runtime=marker+original.split(marker,1)[1]
+          copy='COPY --from=build /app/dist /usr/share/nginx/html'
+          assert runtime.count(copy)==1
+          runtime=runtime.replace(copy,'COPY dist /usr/share/nginx/html')
+          assert 'npm ' not in runtime and 'FROM node' not in runtime
+          (Path(os.environ['RUNTIME_CONTEXT'])/'Dockerfile').write_text(runtime)
+          PYRUNTIME
+          docker build --label "org.opencontainers.image.revision=$GITHUB_SHA" -t "scale-authoring-frontend-runtime:$GITHUB_SHA" "$context"
+          id="$(docker create "scale-authoring-frontend-runtime:$GITHUB_SHA")"
+          trap 'docker rm -f "$id" >/dev/null; rm -rf "$context"' EXIT
+          mkdir "$context/assembled"
+          docker cp "$id:/usr/share/nginx/html/." "$context/assembled/"
+          ASSEMBLED="$context/assembled" python3 - <<'PYOUTPUT'
+          import hashlib,json,os
+          from pathlib import Path
+          output=json.loads(Path('scale-authoring-evidence/frontend-runtime-output.json').read_text())
+          for name,digest in output['files'].items():
+              file=Path(os.environ['ASSEMBLED'])/name
+              assert file.is_file() and hashlib.sha256(file.read_bytes()).hexdigest()==digest,name
+          Path('scale-authoring-evidence/frontend-runtime-reassembly.json').write_text(json.dumps({'sourceRun':39565491980,'sourceHead':'9b289945f5c782b98027ff7228c344c362247e17','candidateHead':os.environ['GITHUB_SHA'],'compilerRepeated':False,'runtimeReassembled':True,'allOriginalCompilerHashesMatch':True},indent=2))
+          PYOUTPUT
+          docker image inspect "scale-authoring-frontend-runtime:$GITHUB_SHA" --format '{{json .}}' > scale-authoring-evidence/frontend-reassembled-image.json
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: existing runtime HIGH and CRITICAL threshold
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: scale-authoring-${{ matrix.component }}-runtime:${{ github.sha }}
+          format: json
+          output: scale-authoring-evidence/${{ matrix.component }}-runtime-scan.json
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+          cache: 'false'
+          skip-setup-trivy: true
+      - name: retain lightweight diagnostic reports independently
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scale-${{ matrix.component }}-reports-${{ github.sha }}
+          path: scale-authoring-evidence/${{ matrix.component }}-*.json
+          retention-days: 3
+          if-no-files-found: error
+      - name: retain exact built inputs (no consumer recompilation)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: scale-${{ matrix.component }}-${{ github.sha }}
+          path: scale-authoring-evidence/${{ matrix.component }}-*
+          retention-days: 3
+          if-no-files-found: error
+          compression-level: 0
+  browser:
+    needs: [scope, build]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      DATABASE_URL_ADMIN: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      INSTRUMENT_FINAL_INTEGRATION_DATABASE_URL: postgresql://ptool:ptool123@localhost:5432/ptool?schema=public
+      REDIS_URL: redis://localhost:6379
+      PORT: '3000'
+      SOCKET_REDIS_REQUIRED: 'true'
+      COOKIE_SECURE: 'true'
+      CORS_ORIGIN: https://training.eduk12.top,https://survey.eduk12.top
+      TRUST_PROXY_HOPS: '1'
+      SURVEY_WORKSPACE_ENABLED: 'true'
+      SURVEY_PUBLICATION_ENABLED: 'true'
+      SURVEY_ANALYTICS_ENABLED: 'true'
+      COGNITIVE_MODULE_ENABLED: 'true'
+      BACKGROUND_WORKERS_ENABLED: 'false'
+      HEAVY_PROCESSING_ENABLED: 'false'
+      VIDEO_PROCESSING_ENABLED: 'false'
+      LOG_LEVEL: warn
+      ASSET_MIGRATION_COMPLETE: 'false'
+      SCALE_AUTHORING_ISOLATED: '1'
+      SCALE_AUTHORING_ACCEPTANCE: '1'
+      MEASUREMENT_BROWSER_ISOLATED: '1'
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: ptool
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U ptool -d ptool" --health-interval 5s --health-timeout 5s --health-retries 10
+      redis:
+        image: redis:7.4.11-bookworm
+        ports: ['6379:6379']
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: restore only the fixed successful backend artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B .github/scripts/scale-authoring-reuse.py restore
+      - uses: actions/download-artifact@v4
+        with:
+          name: scale-frontend-${{ github.sha }}
+          path: scale-authoring-evidence
+      - name: verify original backend and current frontend artifacts
+        run: |
+          set -euo pipefail
+          for component in backend frontend; do
+            expected_head=9b289945f5c782b98027ff7228c344c362247e17; expected_run=39565491980
+            if [ "$component" = backend ]; then expected_head=48defee0aecbc36138ad624f729b9a7cbb634efc; expected_run=39560427570; fi
+            test "$(cat scale-authoring-evidence/$component-head.txt)" = "$expected_head"
+            test "$(cat scale-authoring-evidence/$component-run.txt)" = "$expected_run"
+            (cd scale-authoring-evidence; sha256sum -c "$component-build.sha256")
+            tar -xzf "scale-authoring-evidence/$component-build.tgz" -C "server-version/$component"
+          done
+          (cd scale-authoring-evidence; sha256sum -c backend-images.sha256)
+          gzip -dc scale-authoring-evidence/backend-images.tgz | docker load
+          for target in builder runtime; do
+            original="scale-authoring-backend-$target:48defee0aecbc36138ad624f729b9a7cbb634efc"
+            docker tag "$original" "scale-authoring-backend-$target:$GITHUB_SHA"
+            test "$(docker image inspect "$original" --format '{{.Id}}')" = "$(docker image inspect "scale-authoring-backend-$target:$GITHUB_SHA" --format '{{.Id}}')"
+          done
+          test -f server-version/backend/dist/index.js
+          test -f server-version/frontend/dist/index.html
+      - name: prepare official browser and native runtime libraries
+        run: |
+          node server-version/backend/node_modules/playwright-core/cli.js install --with-deps chromium
+          sudo apt-get install -y --no-install-recommends libnss3-tools
+          npm ci --prefix .github/release-tools
+      - name: create disposable private paths and fresh encryption keys
+        run: |
+          python3 - <<'PY'
+          import json,os,secrets
+          from pathlib import Path
+          private=Path(os.environ['RUNNER_TEMP'])/'scale-authoring-private'
+          private.mkdir(mode=0o700)
+          values={'SCALE_AUTHORING_FIXTURE_FILE':private/'fixture.json','MEASUREMENT_BROWSER_FIXTURE_DIR':private,'SCALE_AUTHORING_EVIDENCE_DIR':Path(os.environ['GITHUB_WORKSPACE'])/'scale-authoring-evidence/browser','SCALE_AUTHORING_BACKEND_ROOT':Path(os.environ['GITHUB_WORKSPACE'])/'server-version/backend','UPLOAD_DIR':private/'uploads','EXPORT_DIR':private/'exports','CREDENTIAL_HANDOFF_DIR':private/'credentials'}
+          for key in ['JWT_SECRET','DATA_ENCRYPTION_KEY','DATA_PSEUDONYM_KEY','ASSET_SIGNING_SECRET','SURVEY_MFA_ENCRYPTION_KEY']:
+            values[key]=secrets.token_hex(32);print('::add-mask::'+values[key])
+          for key in ['SCALE_AUTHORING_EVIDENCE_DIR','UPLOAD_DIR','EXPORT_DIR','CREDENTIAL_HANDOFF_DIR']: Path(values[key]).mkdir(parents=True,exist_ok=True,mode=0o700)
+          with open(os.environ['GITHUB_ENV'],'a') as output:
+            for k,v in values.items():output.write(f'{k}={v}\n')
+          PY
+      - name: initialize empty synthetic schema only
+        run: |
+          bash .github/scripts/scale-authoring-backend.sh node scripts/pr24-migration-preflight.mjs
+          bash .github/scripts/scale-authoring-backend.sh node node_modules/prisma/build/index.js migrate deploy
+      - name: seed browser prerequisites and restricted API role
+        run: |
+          set +e
+          bash .github/scripts/scale-authoring-backend.sh node --import tsx scripts/scale-authoring-browser-fixture.ts > "$RUNNER_TEMP/scale-authoring-private/fixture.private.log" 2>&1
+          status=$?
+          set -e
+          FIXTURE_EXIT="$status" python3 - <<'PYDIAG'
+          import json,os,re
+          from pathlib import Path
+          text=(Path(os.environ['RUNNER_TEMP'])/'scale-authoring-private'/'fixture.private.log').read_text()
+          for line in text.splitlines():
+              if line.startswith('::add-mask::'): print(line)
+          matches=re.findall(r'Synthetic scale prerequisite failed: (AssertionError|Error|TypeError|PrismaClientKnownRequestError|PrismaClientInitializationError)\b',text)
+          status=int(os.environ['FIXTURE_EXIT'])
+          report={'phase':'synthetic-fixture-and-restricted-runtime-role','exitStatus':status,'errorName':matches[-1] if matches else None,'message':'Fixture and restricted runtime-role prerequisites completed' if status==0 else 'Synthetic fixture or restricted runtime-role prerequisite failed; raw SQL and credential-bearing output withheld'}
+          Path('scale-authoring-evidence/fixture-diagnostic.json').write_text(json.dumps(report,indent=2))
+          print(json.dumps(report))
+          PYDIAG
+          exit "$status"
+      - name: require current explicit private-profile trust approval
+        run: |
+          node -e "if(require('./.github/scripts/scale-authoring-bindings.json').browserProfileTrustApproved!==true)throw new Error('This round profile-only CA approval is still pending; no TLS trust action executed')"
+          echo 'MEASUREMENT_BROWSER_EPHEMERAL_CA_APPROVED=true' >> "$GITHUB_ENV"
+      - name: isolated profile-only test TLS (never system trust)
+        run: python3 -B .github/scripts/measurement-browser-ci.py tls
+      - name: serve exact compiled backend and frontend through existing loopback proxy
+        run: |
+          set -euo pipefail
+          bash .github/scripts/scale-authoring-backend.sh serve
+          nohup setsid node server-version/e2e/measurement-browser-proxy.cjs > "$RUNNER_TEMP/scale-authoring-private/proxy.private.log" 2>&1 &
+          echo $! > "$RUNNER_TEMP/scale-proxy.pid"
+          for attempt in $(seq 1 60); do
+            if curl --fail --silent --max-time 2 http://127.0.0.1:3000/ready >/dev/null && curl --noproxy '*' --fail --silent --max-time 2 --cacert "$MEASUREMENT_BROWSER_TLS_CA" --resolve training.eduk12.top:3189:127.0.0.1 https://training.eduk12.top:3189/ >/dev/null; then exit 0; fi
+            sleep 1
+          done
+          python3 - <<'PYREADY'
+          import json,os,subprocess
+          from pathlib import Path
+          result=subprocess.run(['docker','inspect','scale-authoring-api','--format','{{json .State}}'],text=True,capture_output=True)
+          try: state=json.loads(result.stdout)
+          except (ValueError,TypeError):state={}
+          report={'phase':'compiled-api-and-loopback-https-readiness','exitStatus':1,'message':'Compiled API or loopback HTTPS proxy did not become ready within the bounded wait','apiContainerStatus':state.get('Status'),'apiExitCode':state.get('ExitCode'),'apiOOMKilled':state.get('OOMKilled')}
+          for name,url in [('api','http://127.0.0.1:3000/ready'),('proxy','https://training.eduk12.top:3189/')]:
+              args=['curl','--noproxy','*','--silent','--max-time','2','--output','/dev/null','--write-out','%{http_code}']
+              if name=='proxy':args+=['--cacert',os.environ['MEASUREMENT_BROWSER_TLS_CA'],'--resolve','training.eduk12.top:3189:127.0.0.1']
+              response=subprocess.run(args+[url],text=True,capture_output=True)
+              report[name+'CurlExit']=response.returncode;report[name+'HttpStatus']=response.stdout if response.stdout.isdigit() else 'unavailable'
+          Path('scale-authoring-evidence/readiness-diagnostic.json').write_text(json.dumps(report,indent=2));print(json.dumps(report))
+          PYREADY
+          echo '::error::Compiled services failed readiness; see sanitized readiness-diagnostic.json'
+          exit 1
+      - name: real two-entry editing, final feedback and visual checks
+        run: |
+          node server-version/e2e/scale-authoring-feedback-browser.cjs
+          node .github/scripts/scale-authoring-scope.mjs browser-report
+      - name: stop this run processes and clear private credentials
+        if: always()
+        run: |
+          set +e
+          status=0
+          containers="$(docker ps -a --format '{{.Names}}')" || status=1
+          if grep -qx scale-authoring-api <<< "$containers"; then docker rm -f scale-authoring-api >/dev/null || status=1; fi
+          remaining="$(docker ps -a --format '{{.Names}}')" || status=1
+          if grep -qx scale-authoring-api <<< "$remaining"; then status=1; fi
+          file="$RUNNER_TEMP/scale-proxy.pid"
+          if [ -f "$file" ]; then
+            pid="$(cat "$file")"
+            if [[ "$pid" =~ ^[0-9]+$ ]] && [ "$pid" -gt 1 ]; then
+              kill -- -"$pid" 2>/dev/null
+              for attempt in $(seq 1 10); do kill -0 -- -"$pid" 2>/dev/null || break; sleep 0.2; done
+              if kill -0 -- -"$pid" 2>/dev/null; then kill -KILL -- -"$pid" 2>/dev/null; sleep 0.2; fi
+              if kill -0 -- -"$pid" 2>/dev/null; then status=1; fi
+            else status=1; fi
+          fi
+          rm -rf "$RUNNER_TEMP/scale-authoring-private" || status=1
+          test ! -e "$RUNNER_TEMP/scale-authoring-private" || status=1
+          mkdir -p scale-authoring-evidence
+          printf '{"exitStatus":%s,"privateMaterialRemoved":%s}\n' "$status" "$([ ! -e "$RUNNER_TEMP/scale-authoring-private" ] && echo true || echo false)" > scale-authoring-evidence/cleanup.json
+          exit "$status"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scale-browser-${{ github.sha }}
+          path: |
+            scale-authoring-evidence/fixture-diagnostic.json
+            scale-authoring-evidence/readiness-diagnostic.json
+            scale-authoring-evidence/cleanup.json
+            scale-authoring-evidence/browser/
+          retention-days: 3
+          if-no-files-found: error
+  sast:
+    needs: scope
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          fetch-depth: 0
+      - name: require original full analysis and exact changed source boundary
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B .github/scripts/scale-authoring-reuse.py sast-boundary
+      - uses: github/codeql-action/init@ce5e7eeac396d720fe2d802714996c8ce561e311
+        with:
+          languages: javascript-typescript
+          config: 'paths: [server-version/frontend/src/pages/__tests__/ScaleEdit.authoring.test.tsx, server-version/frontend/src/pages/__tests__/ScaleEdit.persistence-boundaries.test.tsx]'
+          ram: 3500
+          threads: 2
+      - uses: github/codeql-action/analyze@ce5e7eeac396d720fe2d802714996c8ce561e311
+        with:
+          upload: never
+          upload-database: false
+          output: scale-authoring-evidence/sarif
+      - name: verify same original CodeQL tool and query pack
+        run: python3 -B .github/scripts/scale-authoring-reuse.py sast-tools
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scale-sast-${{ github.sha }}
+          path: |
+            scale-authoring-evidence/sarif
+            scale-authoring-evidence/sast-input-boundary.json
+          retention-days: 3
+          if-no-files-found: error
+  ready:
+    needs: [scope, build, browser, sast]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: exact selected jobs must all succeed (not merge/deploy permission)
+        env:
+          RESULTS: ${{ toJSON(needs) }}
+        run: |
+          node -e "const n=JSON.parse(process.env.RESULTS);for(const [k,v] of Object.entries(n))if(v.result!=='success')throw new Error(k+': '+v.result);console.log('Bounded scale authoring checks passed; no merge or production authorization')"

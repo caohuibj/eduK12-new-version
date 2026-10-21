@@ -207,6 +207,26 @@ describe('bounded Scale reader export integration', () => {
     expect(compositeExportService.exportToCSV(data)).toBe(compositeExportService.exportToCSV(baseline))
   })
 
+  it('retains authorized quality raw answers and codebook but never exports an item score', async () => {
+    const graph = fixture()
+    Object.assign(graph.template.items[0].scale.definition.items[0], {
+      purpose: 'ATTENTION_CHECK', content: '点击 always', attentionTarget: 'always', responseSetKey: 'likert',
+    })
+    Object.assign(graph.template.items[0].scale.definition, {
+      responseSets: [{key:'likert',options:[{value:'never',label:'从不',score:0},{value:'always',label:'总是',score:1}]}],
+    })
+    mocks.graph.mockResolvedValue(graph)
+    const data = await compositeExportService.getExportData(graph.template.id, {detail:'full'})
+    expect(data.rows[0]).toMatchObject({S001_Q_V_a1:'never',S001_Q_S_a1:null})
+    expect(JSON.parse(data.rows[0].S001_Q_META_a1 as string)).toMatchObject({
+      itemCode:'a1',purpose:'ATTENTION_CHECK',attentionTarget:'always',prompt:'点击 always',
+      options:[{value:'never',label:'从不'},{value:'always',label:'总是'}],scored:false,
+    })
+    // The second attempt was never assigned this scale: no response or metadata leakage.
+    expect(data.rows[1].S001_Q_V_a1).toBeNull()
+    expect(data.rows[1].S001_Q_META_a1).toBeNull()
+  })
+
   it('does not construct or prepare a reader before governed-export authorization succeeds', async () => {
     mocks.db.$queryRaw.mockResolvedValueOnce([{ id: 'governed-execution' }])
     await expect(compositeExportService.getExportData('composite-reader')).rejects.toMatchObject({ statusCode: 403 })

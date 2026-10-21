@@ -6,7 +6,7 @@ import { SurveyFlowStudio,type FormQuestionInfo } from './SurveyFlowStudio'
 import type { FlowDraft } from './flow.client'
 import { SurveyStudyPreview } from './SurveyStudyPreview'
 import type { CognitivePreviewSnapshot } from './ResearchCognitivePreview'
-import type { FormDraft, ResearchDraft } from './builder.types'
+import type { FormDraft, ResearchDraft, ScaleDraft } from './builder.types'
 import { useInstrumentLibrary, type InstrumentLibrary } from './instrument-library'
 
 type RawFeedbackChoice={metricKeys:string[];release:'AFTER_FINAL'|'AFTER_COLLECTION'}
@@ -403,7 +403,11 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
   const feedbackTools=Object.values(details).filter(d=>
     editing?.instrumentIds.includes(d.id)&&form.instrumentIds.includes(d.id)&&
     ['SCALE','SJT'].includes(d.kind)&&!d.catalogGrantId&&!d.readOnly)
-    .map(d=>({...d,metrics:flowMetrics.filter(metric=>metric.instrumentKey===d.instrumentKey)}))
+    .map(d=>{
+      const totalScore=d.kind==='SCALE'?(d.definition as ScaleDraft).totalScore:undefined
+      return {...d,metrics:[...flowMetrics.filter(metric=>metric.instrumentKey===d.instrumentKey),
+        ...(totalScore?[{instrumentKey:d.instrumentKey,scoreKey:totalScore.key,label:totalScore.label}]:[])]}
+    })
   const feedbackInvalid=Object.entries(participantFeedback).some(([id,choice])=>{
     const tool=feedbackTools.find(tool=>tool.id===id)
     return !tool||!choice.metricKeys.length||choice.metricKeys.some(key=>!tool.metrics.some(metric=>metric.scoreKey===key))

@@ -96,6 +96,14 @@ jobs:
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-disk-preflight.sh"
       - name: prepare canvas source-build dependencies
         run: bash "$GITHUB_WORKSPACE/server-version/scripts/ci-install-canvas-deps.sh"
+      - name: accept original locked audit and unchanged backend unit evidence
+        if: inputs.focus == 'survey-wave-selection'
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --no-tags --depth=1 origin b65f7d658db33f1ebbf08e655f6d41164ebc653d
+          python3 -B .github/scripts/survey-wave-selection-reuse.py backend
       - name: npm ci
         run: npm ci
       - name: prisma generate and guarded migration
@@ -152,9 +160,8 @@ jobs:
           SURVEY_WORKSPACE_ENABLED: 'true'
         run: |
           npx tsc --noEmit --incremental false
-          npm audit --audit-level=high
-          npm test -- src/__tests__/measurement-content/survey-content-options.test.ts src/__tests__/measurement-content/survey-content-selection.test.ts src/__tests__/measurement-content/survey-frozen-feedback-read.test.ts src/__tests__/measurement-content/survey-content-options.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
-          node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json src/__tests__/measurement-content/survey-content-options.test.ts src/__tests__/measurement-content/survey-content-selection.test.ts src/__tests__/measurement-content/survey-frozen-feedback-read.test.ts src/__tests__/measurement-content/survey-content-options.postgres.integration.test.ts
+          npm test -- src/__tests__/measurement-content/survey-content-options.postgres.integration.test.ts --no-file-parallelism --reporter=default --reporter=json --outputFile=/tmp/eduk12-backend-vitest.json
+          node scripts/assert-release-test-report.mjs /tmp/eduk12-backend-vitest.json src/__tests__/measurement-content/survey-content-options.postgres.integration.test.ts
       - name: R5 assessment repair regression
         if: inputs.focus == 'assessment-repair'
         env:

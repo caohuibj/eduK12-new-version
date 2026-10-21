@@ -7,8 +7,8 @@ export type SurveyImageProof={
 /** A binary POST exchanges the person's current bearer proof for frozen
  * bytes without ever putting the secret in URL, query or browser history.
  */
-export function SurveyParticipantImage({image,proof}:{
-  image:SurveyPublicImage;proof:SurveyImageProof
+export function SurveyParticipantImage({image,proof,purpose='stimulus'}:{
+  image:SurveyPublicImage;proof:SurveyImageProof;purpose?:'stimulus'|'report'
 }){
   const [url,setUrl]=useState(''),[error,setError]=useState('')
   useEffect(()=>{
@@ -17,7 +17,7 @@ export function SurveyParticipantImage({image,proof}:{
     setUrl('');setError('')
     const endpoint='/api/public/survey/r/'+encodeURIComponent(proof.publicId)
       +'/attempts/'+encodeURIComponent(proof.attemptId)
-      +'/images/'+encodeURIComponent(image.asset.assetId)
+      +(purpose==='report'?'/report-images/':'/images/')+encodeURIComponent(image.asset.assetId)
     void fetch(endpoint,{
       method:'POST',credentials:'omit',cache:'no-store',signal:controller.signal,
       headers:{'Content-Type':'application/json'},
@@ -42,7 +42,7 @@ export function SurveyParticipantImage({image,proof}:{
       if(objectUrl)URL.revokeObjectURL(objectUrl)
     }
   },[
-    image.asset.assetId,image.asset.contentHash,image.asset.mimeType,
+    purpose,image.asset.assetId,image.asset.contentHash,image.asset.mimeType,
     proof.publicId,proof.attemptId,proof.accessCredential,proof.researchCode,
   ])
   return <figure className="my-3">

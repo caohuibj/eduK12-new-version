@@ -12,6 +12,8 @@ import {referenceEntryKey} from '../../modules/measurement-content/reference-can
 import {canonicalHash} from '../../modules/assessment-runtime/canonical'
 import type {AssessmentReferenceEntry} from '../../modules/assessment-reference/reference'
 import type {ScaleDraft} from '../../modules/survey/builder.definition'
+import type {ResearchFrozenPublication} from '../../modules/survey/publication.service'
+import type {ScaleDefinitionV2} from '../../modules/scale/scale-definition'
 
 const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL')
 const suite=url?describe:describe.skip
@@ -21,12 +23,18 @@ const key=()=>randomUUID().replaceAll('-','')
 const definition:ScaleDraft={schemaVersion:1,respondentType:'participant_self_report',aggregation:'mean',
  responseOptions:[1,2,3].map(score=>({optionKey:'o'+score,label:String(score),score})),
  dimensions:[{dimensionKey:'motivation',label:'动机',direction:'descriptive'}],
- items:[{itemKey:'itemone',prompt:'我喜欢学习',required:true,reverse:false,dimensionKeys:['motivation']}]}
+ totalScore:{key:'total',label:'自编总分',itemKeys:['itemone'],aggregation:'sum'},
+ rawScoreFeedback:{schemaVersion:1,rules:[{scoreKey:'total',ranges:[
+  {key:'lower',min:1,max:2,includeMax:false,text:'作者低分区间反馈'},
+  {key:'upper',min:2,max:3,includeMax:true,text:'作者高分区间反馈'}]}]},
+ items:[{itemKey:'itemone',prompt:'我喜欢学习',required:true,reverse:false,dimensionKeys:['motivation']},
+  {itemKey:'attention',prompt:'请选择第二项',required:true,reverse:false,dimensionKeys:[],purpose:'ATTENTION_CHECK',attentionTarget:'o2'},
+  {itemKey:'social',prompt:'我从不撒谎',required:true,reverse:false,dimensionKeys:[],purpose:'SOCIAL_DESIRABILITY'}]}
 const flags={publication:process.env.SURVEY_PUBLICATION_ENABLED,workspace:process.env.SURVEY_WORKSPACE_ENABLED}
 const restore=(name:string,value:string|undefined)=>{if(value===undefined)delete process.env[name];else process.env[name]=value}
 const scope=()=>({kind:'PRIVATE',ownerId:owner,product:'SURVEY',resourceId:project})
 const pointer=()=>({releaseId:measurement.releaseId,contentHash:measurement.contentHash})
-const entry=()=>({instrumentVersion:'1',scoringVersion:'1',scoreKey:measurement.metricKeys[0],referenceKind:'descriptive_sample',
+const entry=()=>({instrumentVersion:'1',scoringVersion:'1',scoreKey:'total',referenceKind:'descriptive_sample',
  population:{description:'Synthetic research sample'},statistics:{mean:2},source:{citation:'Synthetic fixture'}})
 async function report(overrides:Record<string,unknown>={}){
  return db.$transaction(tx=>publishContentRelease(tx,{family:'SCALE',layer:'REPORT',key:'selection:'+key(),version:'1',
@@ -78,7 +86,7 @@ suite('Survey Wave private content options / real isolated PostgreSQL',()=>{
   const source=await db.$queryRaw<Array<{content:Record<string,unknown>}>>(Prisma.sql`SELECT content FROM measurement_content_releases WHERE id=${measurement.releaseId}`)
   const alternate=await db.$transaction(tx=>publishContentRelease(tx,{family:'SCALE',layer:'MEASUREMENT',key:'alternate:'+key(),version:'1',scope:scope(),assetRefs:[],sourceReleaseId:null,provenance:{fixture:true},content:{...source[0].content,measurementHash:'e'.repeat(64)}},owner))
   await report({content:{projectionVersion:1,measurements:[{releaseId:alternate.releaseId,contentHash:alternate.contentHash}],metricKeys:measurement.metricKeys,audience:'researcher',language:'zh-CN',generatorVersion:'1',template:{title:'Wrong measurement'}}})
-  const reference=await db.$transaction(tx=>publishContentRelease(tx,{family:'SCALE',layer:'REFERENCE',key:'reference:'+key(),version:'1',scope:scope(),assetRefs:[],sourceReleaseId:null,provenance:{fixture:true},content:{projectionVersion:1,measurement:pointer(),entries:[{metricKey:measurement.metricKeys[0],referenceKind:'descriptive_sample',definition:entry()}],evidence:{fixture:true}}},owner))
+  const reference=await db.$transaction(tx=>publishContentRelease(tx,{family:'SCALE',layer:'REFERENCE',key:'reference:'+key(),version:'1',scope:scope(),assetRefs:[],sourceReleaseId:null,provenance:{fixture:true},content:{projectionVersion:1,measurement:pointer(),entries:[{metricKey:'total',referenceKind:'descriptive_sample',definition:entry()}],evidence:{fixture:true}}},owner))
   const before=await state()
   const result=await listSurveyContentOptions(owner,project,w.id,{instrumentId:instrument,layer:'REPORT'})
   expect(result.options.map(x=>x.releaseId)).toEqual([selected.releaseId])
@@ -100,12 +108,52 @@ suite('Survey Wave private content options / real isolated PostgreSQL',()=>{
   await expect(prepareWave(owner,project,w.id,w.revision,[{instrumentId:instrument,reportReleaseId:stale.releaseId,references:[]}])).rejects.toThrow()
   expect(await state()).toEqual(before)
   const selected=await report()
-  const reference=await db.$transaction(tx=>publishContentRelease(tx,{family:'SCALE',layer:'REFERENCE',key:'freeze-reference:'+key(),version:'1',scope:scope(),assetRefs:[],sourceReleaseId:null,provenance:{fixture:true},content:{projectionVersion:1,measurement:pointer(),entries:[{metricKey:measurement.metricKeys[0],referenceKind:'descriptive_sample',definition:entry()}],evidence:{fixture:true}}},owner))
-  await prepareWave(owner,project,w.id,w.revision,[{instrumentId:instrument,reportReleaseId:selected.releaseId,references:[{releaseId:reference.releaseId,entryKey:referenceEntryKey(entry() as AssessmentReferenceEntry),priority:1}]}])
+  const reference=await db.$transaction(tx=>publishContentRelease(tx,{family:'SCALE',layer:'REFERENCE',key:'freeze-reference:'+key(),version:'1',scope:scope(),assetRefs:[],sourceReleaseId:null,provenance:{fixture:true},content:{projectionVersion:1,measurement:pointer(),entries:[{metricKey:'total',referenceKind:'descriptive_sample',definition:entry()}],evidence:{fixture:true}}},owner))
+  const participantFeedback={policyVersion:'SURVEY_RAW_METRICS_V1' as const,mode:'DESCRIPTIVE' as const,metricKeys:['total'],release:'AFTER_FINAL' as const}
+  await prepareWave(owner,project,w.id,w.revision,[{instrumentId:instrument,reportReleaseId:selected.releaseId,references:[{releaseId:reference.releaseId,entryKey:referenceEntryKey(entry() as AssessmentReferenceEntry),priority:1}]}],[{instrumentId:instrument,feedback:participantFeedback}])
   const frozen=await getWave(owner,project,w.id)
   expect(frozen).toMatchObject({frozenContentSelections:[{draftId:instrument,measurementRelease:pointer(),contentSelection:{reportRelease:{releaseId:selected.releaseId,contentHash:selected.contentHash},referencePolicy:{choices:[{releaseId:reference.releaseId,contentHash:reference.contentHash,priority:1}]}}}]})
+  expect(frozen.frozenParticipantFeedback).toEqual([expect.objectContaining({draftId:instrument,participantFeedback})])
   const publication=await db.surveyPublication.findUniqueOrThrow({where:{id:frozen.publicationId!}})
   expect(canonicalHash(publication.compiledSnapshot)).toBe(publication.definitionDigest)
+  const snapshot=publication.compiledSnapshot as unknown as ResearchFrozenPublication
+  const unit=snapshot.units.find(candidate=>candidate.draftId===instrument)!
+  const compiled=unit.compiledDefinition as ScaleDefinitionV2
+  const display=unit.displayDefinition as ScaleDraft
+  expect(measurement.metricKeys).toEqual(expect.arrayContaining(['motivation','total']))
+  expect(display.totalScore).toEqual(definition.totalScore)
+  expect(display.rawScoreFeedback).toEqual(definition.rawScoreFeedback)
+  expect(compiled.report.rawScoreFeedback).toEqual(definition.rawScoreFeedback)
+  expect(unit.participantFeedback).toEqual(participantFeedback)
+  expect(unit.scoringDigest).toBe(canonicalHash(compiled.scoring))
+  expect(unit.sourceDigest).toBe(canonicalHash({kind:'SCALE',definition:display}))
+  expect(compiled.scoring.scores).toEqual(expect.arrayContaining([
+   expect.objectContaining({key:'total',source:{type:'items',items:[{itemCode:'itemone',weight:1}],aggregation:'sum'}}),
+  ]))
+  expect(compiled.scoring.itemRules.map(rule=>rule.itemCode)).toEqual(['itemone'])
+  for(const score of compiled.scoring.scores){
+   expect(score.source.type).toBe('items')
+   if(score.source.type==='items')expect(score.source.items.map(item=>item.itemCode)).toEqual(['itemone'])
+  }
+  expect(display.items.filter(item=>item.purpose)).toEqual(definition.items.filter(item=>item.purpose))
+  expect(unit.contentSelection).toMatchObject({
+   reportRelease:{releaseId:selected.releaseId,contentHash:selected.contentHash},
+   referencePolicy:{choices:[{releaseId:reference.releaseId,contentHash:reference.contentHash,priority:1}]},
+  })
+  // Editing the still-authorable draft must not overwrite the already-frozen
+  // measurement, private report/reference selection, or participant feedback.
+  const edited=structuredClone(definition)
+  edited.rawScoreFeedback!.rules[0].ranges[0].text='仅供后续版本的新反馈'
+  edited.items[1].attentionTarget='o3'
+  edited.totalScore!.aggregation='mean'
+  await updateDraft(owner,project,instrument,{revision:1,title:'后续草稿版本',definition:edited})
+  const afterEdit=await db.surveyPublication.findUniqueOrThrow({where:{id:publication.id}})
+  expect(afterEdit.compiledSnapshot).toEqual(publication.compiledSnapshot)
+  expect(afterEdit.definitionDigest).toBe(publication.definitionDigest)
+  expect(canonicalHash(afterEdit.compiledSnapshot)).toBe(afterEdit.definitionDigest)
+  const frozenAfterEdit=await getWave(owner,project,w.id)
+  expect(frozenAfterEdit.frozenContentSelections).toEqual(frozen.frozenContentSelections)
+  expect(frozenAfterEdit.frozenParticipantFeedback).toEqual(frozen.frozenParticipantFeedback)
   const saved=await state();await getWave(owner,project,w.id)
   await expect(listSurveyContentOptions(owner,project,w.id,{instrumentId:instrument,layer:'REPORT'})).rejects.toThrow()
   expect(await state()).toEqual(saved)

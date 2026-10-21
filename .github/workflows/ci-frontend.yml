@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 env:
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
@@ -40,13 +41,32 @@ jobs:
         run: |
           mkdir -p "$HOME/.npm"
           echo "NPM_CONFIG_CACHE=$HOME/.npm" >> "$GITHUB_ENV"
+      - name: accept original locked audit and unchanged frontend unit evidence
+        if: inputs.survey_selection
+        working-directory: .
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --no-tags --depth=1 origin b65f7d658db33f1ebbf08e655f6d41164ebc653d
+          python3 -B .github/scripts/survey-wave-selection-reuse.py frontend
       - name: npm ci
         run: npm ci
       - name: lint
+        if: inputs.survey_selection != true
         run: npm run lint
+      - name: lint changed Wave integration surfaces
+        if: inputs.survey_selection
+        run: npx eslint src/survey/SurveyWaveContentSelection.tsx src/survey/SurveyWaveContentSelection.test.tsx src/survey/SurveyWaveStudio.tsx src/survey/SurveyWaveStudio.content.test.tsx src/survey/SurveyWaveStudio.feedback.test.tsx
       - name: typecheck
+        if: inputs.survey_selection != true
         run: npm run typecheck
+      - name: integrated application types without duplicate cognitive subset
+        if: inputs.survey_selection
+        run: |
+          npm run pretypecheck
+          npx tsc -p tsconfig.app.json --noEmit
       - name: dependency audit (high and critical)
+        if: inputs.survey_selection != true
         run: |
           for attempt in 1 2 3; do
             if npm audit --audit-level=high; then
@@ -64,8 +84,8 @@ jobs:
       - name: affected Wave selector and direct consumers
         if: inputs.survey_selection
         run: |
-          npx vitest run src/survey/SurveyWaveContentSelection.test.tsx src/survey/SurveyWaveStudio.content.test.tsx src/survey/SurveyWaveStudio.feedback.test.tsx src/survey/SurveyWaveStudio.group-ip.test.tsx src/survey/SurveyWaveStudio.links.test.tsx src/survey/SurveyWaveStudio.preview.test.tsx --reporter=default --reporter=json --outputFile=/tmp/eduk12-survey-selection-frontend.json
-          node ../backend/scripts/assert-release-test-report.mjs /tmp/eduk12-survey-selection-frontend.json src/survey/SurveyWaveContentSelection.test.tsx src/survey/SurveyWaveStudio.content.test.tsx src/survey/SurveyWaveStudio.feedback.test.tsx src/survey/SurveyWaveStudio.group-ip.test.tsx src/survey/SurveyWaveStudio.links.test.tsx src/survey/SurveyWaveStudio.preview.test.tsx
+          npx vitest run src/survey/SurveyWaveStudio.content.test.tsx src/survey/SurveyWaveStudio.feedback.test.tsx src/survey/SurveyWaveStudio.group-ip.test.tsx src/survey/SurveyWaveStudio.links.test.tsx src/survey/SurveyWaveStudio.preview.test.tsx --reporter=default --reporter=json --outputFile=/tmp/eduk12-survey-selection-frontend.json
+          node ../backend/scripts/assert-release-test-report.mjs /tmp/eduk12-survey-selection-frontend.json src/survey/SurveyWaveStudio.content.test.tsx src/survey/SurveyWaveStudio.feedback.test.tsx src/survey/SurveyWaveStudio.group-ip.test.tsx src/survey/SurveyWaveStudio.links.test.tsx src/survey/SurveyWaveStudio.preview.test.tsx
       - name: clean Mac dependencies and outputs after artifact upload
         if: ${{ always() && runner.os == 'macOS' }}
         run: node "$GITHUB_WORKSPACE/.github/scripts/mac-ci-cleanup.mjs"

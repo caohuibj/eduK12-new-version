@@ -1,3 +1,4 @@
+import { matchRawScoreFeedback, rawScoreFeedbackMatchSchema, type RawScoreFeedbackMatch } from './raw-score-feedback'
 import {
   hashScaleDefinition,
   scaleDirectionSchema,
@@ -44,6 +45,7 @@ export interface ScaleResultV2 {
   itemScores: ScaleScoringOutput['itemScores']
   scores: ScaleScoreValue[]
   references: ResolvedScaleReference[]
+  rawScoreFeedback?: RawScoreFeedbackMatch[]
   interpretations: ScaleInterpretationResult[]
   caveats: string[]
   disclaimer: string
@@ -117,6 +119,7 @@ const scaleResultV2Schema = z.object({
     referenceVersions: z.array(z.string().min(1)),
     assessmentContext: scaleAssessmentContextSchema,
   }).passthrough(),
+  rawScoreFeedback: z.array(rawScoreFeedbackMatchSchema).optional(),
   quality: scaleQualitySchema,
   itemScores: z.array(scaleItemScoreSchema),
   scores: z.array(scaleScoreSchema).min(1),
@@ -355,6 +358,10 @@ export const buildScaleResult = (input: {
     itemScores: scoring.itemScores,
     scores: scoring.scores,
     references,
+    ...(input.definition.report.rawScoreFeedback ? { rawScoreFeedback: scoring.scores.flatMap(score => {
+      const match = score.status === 'calculated' ? matchRawScoreFeedback(input.definition.report.rawScoreFeedback, score.key, score.value) : null
+      return match ? [match] : []
+    }) } : {}),
     interpretations,
     caveats: caveatsFor(input.definition, scoring, references),
     disclaimer: input.definition.report.disclaimer,

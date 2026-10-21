@@ -1,3 +1,4 @@
+import {rawLongExport,rawWideExport} from '../../modules/survey/analytics.raw-export'
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
 import {selectSurveyFixtureRecord,surveyFixtureSql} from './survey-source-select.fixture'
 import {prisma} from '../../config/database'
@@ -15,7 +16,7 @@ const choices=[{optionKey:'a',label:'A'},{optionKey:'b',label:'B'}]
 const question=(itemKey:string,extra:Partial<FormQuestion>={}):FormQuestion=>({
   itemKey,type:'NUMBER',prompt:itemKey,required:false,options:[],rows:[],...extra,
 })
-function fixture(participants=3){
+function fixture(participants=3,quality=false){
   const form:FormDraft={schemaVersion:2,pages:[{pageKey:'page',title:'Synthetic',questions:[
     question('zero'),question('blank',{type:'SHORT_TEXT'}),question('note',{type:'LONG_TEXT'}),
     question('multi',{type:'MULTIPLE',options:choices}),
@@ -32,6 +33,10 @@ function fixture(participants=3){
     responseOptions:choices.map((o,i)=>({...o,score:i+1})),
     dimensions:[{dimensionKey:'total',label:'Total',direction:'descriptive'}],
     items:['one','two','three'].map(itemKey=>({itemKey,prompt:itemKey,required:true,reverse:false,dimensionKeys:['total']}))}
+  if (quality) scale.items.push(
+    {itemKey:'attention',prompt:'点击 B, "确认"',required:true,reverse:false,dimensionKeys:[],purpose:'ATTENTION_CHECK',attentionTarget:'b'},
+    {itemKey:'social',prompt:'我从不撒谎',required:true,reverse:false,dimensionKeys:[],purpose:'SOCIAL_DESIRABILITY'},
+  )
   const sjt:SjtDraft={schemaVersion:1,respondentType:'student_self_report',scenarioKey:'scene',title:'Scene',stimulus:'Synthetic',
     author:'Researcher',sourceNote:'Synthetic',licenseStatus:'self_authored',redistribution:'allowed',
     metrics:[{metricKey:'total',label:'Total',direction:'descriptive'}],questions:[
@@ -49,7 +54,7 @@ function fixture(participants=3){
   const result=computeSurveyFinal(snapshot,{form:{zero:0,blank:'',note:'private text',multi:['b','a'],rank:['b','a'],
     total:{a:0,b:10},time:'09:30','grid:first':'a',grid_first:7,'matrix:row':['a','b'],
     choose:'b','choose:other':'private other',choose_other:8,refused:{_surveyRefusal:true}},
-    scale:{one:'a',two:'b',three:'a'},sjt:{single:'b',multiple:['b','a']}})
+    scale:{one:'a',two:'b',three:'a',...(quality?{attention:'a',social:'b'}:{})},sjt:{single:'b',multiple:['b','a']}})
   const publication={id:'synthetic-publication',projectId:owner.projectId,version:4,
     compiledSnapshot:snapshot,definitionDigest:canonicalHash(snapshot)}
   const wave={id:owner.waveIds[0],projectId:owner.projectId,ordinal:1,status:'OPEN',revision:1,publicationId:publication.id}
@@ -120,6 +125,29 @@ describe('Request-local frozen Survey raw descriptors',()=>{
     expect.soft(counts.optionMaps.map(counter=>counter.mock.calls.length)).toEqual(counts.optionMaps.map(()=>0))
     expect(tx.surveyWaveFinal.findMany).not.toHaveBeenCalled()
     expect(prisma.$transaction).toHaveBeenCalledTimes(2)
+  })
+  it('restores and exports quality raw answers independently of scored items with an author codebook',async()=>{
+    const {result}=fixture(1,true)
+    const scale=result.units.find(unit=>unit.instrumentKey==='scale')!
+    expect(scale.rawAnswers).toMatchObject({attention:'a',social:'b'})
+    const scoredItems=(scale.privateScoring as {itemScores:Array<{itemCode:string}>}).itemScores.map(item=>item.itemCode)
+    expect(scoredItems).not.toContain('attention')
+    expect(scoredItems).not.toContain('social')
+    const source=await loadSurveySource({...owner,includeWideSchema:true})
+    expect(source.raw.find(row=>row.itemKey==='attention')).toMatchObject({value:'a',missingReason:null})
+    expect(source.raw.find(row=>row.itemKey==='social')).toMatchObject({value:'b',missingReason:null})
+    expect(source.codebook.find(row=>row.itemKey==='attention')).toMatchObject({
+      purpose:'ATTENTION_CHECK',attentionTarget:'b',prompt:'点击 B, "确认"',
+      options:[{code:'a',label:'A'},{code:'b',label:'B'}],
+    })
+    expect(source.codebook.find(row=>row.itemKey==='social')).toMatchObject({purpose:'SOCIAL_DESIRABILITY'})
+    expect(source.codebook.find(row=>row.itemKey==='social')).not.toHaveProperty('attentionTarget')
+    const long=rawLongExport(owner.projectId,source),wide=rawWideExport(owner.projectId,source)
+    expect(long.csv).toContain('"item_purpose"')
+    expect(long.csv).toContain('"ATTENTION_CHECK"')
+    expect(wide.codebook).toEqual(long.codebook)
+    expect(wide.csv).toContain(source.codebook.find(row=>row.itemKey==='attention')!.columnKey)
+    expect(JSON.stringify({long,wide})).not.toMatch(/attentionAccuracy|lieScore|passFail/)
   })
   it('indexes missing entries once per participant unit and retains first occurrence and matrix fallback',async()=>{
     const {result,rewriteResult}=fixture(2)

@@ -338,3 +338,25 @@ it('preserves raw and labelled form values in the safe HTTP report envelope', ()
   const output = projectCompositeCollectionReport(input, 'participant')
   expect(output.backgroundValues).toEqual([{ itemId: 'color', type: 'FORM', kind: 'background', label: '颜色', value: 'blue', displayValue: '蓝色' }])
 })
+
+
+describe('matched Scale feedback survives final composite projection', () => {
+  it.each(['unit', 'result'] as const)('projects frozen %s feedback only to the permitted audience', source => {
+    const input = makeInput() as any
+    const unit = input.report.unitReports[1]
+    const matches = [{ scoreKey: 'D1', rangeKey: 'high', text: '作者反馈' }]
+    unit.assessmentId = 'actual-scale-assessment'
+    unit.result = { ...unit.result, method: { ...unit.result.method, reportAudience: 'student' } }
+    if (source === 'unit') unit.rawScoreFeedback = matches
+    else unit.result.rawScoreFeedback = matches
+    const participant = projectCompositeReport({ ...input, audience: 'participant' })
+    expect(participant.unitReports[1]).toMatchObject({ rawScoreFeedback: matches, assessmentId: 'actual-scale-assessment' })
+    for (const audience of ['teacher', 'researcher'] as const) {
+      const projected = projectCompositeReport({ ...input, audience })
+      expect(projected.unitReports[1]).not.toHaveProperty('rawScoreFeedback')
+      expect(projected.unitReports[1]).not.toHaveProperty('assessmentId')
+    }
+    const collection = projectCompositeCollectionReport(input.report, 'participant')
+    expect(collection.unitReports[1]).toMatchObject({ rawScoreFeedback: matches, assessmentId: 'actual-scale-assessment' })
+  })
+})

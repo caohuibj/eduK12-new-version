@@ -1,6 +1,7 @@
 import {test} from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,readdirSync} from 'node:fs';
+import {spawnSync} from 'node:child_process';
 import {surveyWaveSelectionScope,requireSurveyWaveSelectionScope,surveyWaveSelectionFiles,surveyWaveSelectionTools} from './content-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const entry=file=>({file,status:'M',oldMode:'100644',newMode:'100644'});
@@ -37,4 +38,24 @@ test('existing jobs run focused checks and browser consumes actual runtime; no d
  assert.match(backend,/survey-content-options.postgres.integration.test.ts/);assert.match(backend,/assert-release-test-report.mjs/);assert.match(backend,/npx tsc --noEmit --incremental false/);
  const frontend=readFileSync(new URL('../workflows/ci-frontend.yml',import.meta.url),'utf8');assert.match(frontend,/if: inputs.survey_selection != true/);assert.match(frontend,/assert-release-test-report.mjs/);
  const images=readFileSync(new URL('../workflows/ci-images.yml',import.meta.url),'utf8');assert.match(images,/node .github\/scripts\/survey-wave-selection-browser.mjs/);
+});
+
+test('integrated Wave reuses only unchanged evidence and generates valid mixed-language directory scope',()=>{
+ const ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+ assert.match(ci,/scenario == 'survey-wave-selection' && 'javascript-typescript,python'/);
+ assert.match(ci,/scenario == 'survey-wave-selection' && steps.wave-codeql-config.outputs.config/);
+ const block=ci.split('      - name: bound Wave integration analysis to Survey and changed controls\n')[1].split('      - name: initialize CodeQL')[0];
+ const source=block.split('        run: |\n')[1].split('\n').map(line=>line.replace(/^          /,'')).join('\n');
+ const result=spawnSync(process.execPath,['-e',source.replace("fs.appendFileSync(process.env.GITHUB_OUTPUT, `config=${JSON.stringify(config)}\\n`);","console.log('CONFIG='+JSON.stringify(config));")],{encoding:'utf8'});
+ assert.equal(result.status,0,result.stderr);
+ const config=JSON.parse(result.stdout.split('\n').find(line=>line.startsWith('CONFIG=')).slice(7));
+ assert.deepEqual(config.paths,['server-version/backend/src/modules/survey','server-version/backend/src/__tests__/measurement-content','server-version/frontend/src/survey','.github/scripts']);
+ assert.deepEqual(readdirSync('.github/scripts').filter(name=>name.endsWith('.py')&&!config['paths-ignore'].includes('.github/scripts/'+name)).sort(),['survey-wave-selection-reuse.py','survey-wave-selection-reuse.test.py']);
+ const backend=readFileSync(new URL('../workflows/ci-backend-regression.yml',import.meta.url),'utf8');
+ const selected=backend.split('      - name: bounded Survey Wave options and authoritative freeze contracts')[1].split('      - name: R5 assessment repair regression')[0];
+ assert.doesNotMatch(selected,/npm audit|survey-content-options.test.ts|survey-content-selection.test.ts|survey-frozen-feedback-read.test.ts/);
+ assert.match(selected,/survey-content-options.postgres.integration.test.ts/);
+ const frontend=readFileSync(new URL('../workflows/ci-frontend.yml',import.meta.url),'utf8');
+ assert.match(frontend,/survey-wave-selection-reuse.py frontend/);assert.doesNotMatch(frontend,/vitest run src\/survey\/SurveyWaveContentSelection.test.tsx/);
+ assert.match(frontend,/integrated application types without duplicate cognitive subset/);
 });

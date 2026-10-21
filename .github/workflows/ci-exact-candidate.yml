@@ -1,4 +1,4 @@
-name: Exact two-candidate qualification
+name: Exact reviewed candidate qualification
 on:
   workflow_call:
     inputs:
@@ -195,9 +195,34 @@ jobs:
     uses: ./.github/workflows/ci-training-mac-qualification.yml
     with:
       plan: ${{ inputs.plan }}
+  scale:
+    name: fixed official scale authoring evidence admission
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && fromJSON(inputs.plan).candidate == 'scale-authoring'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - run: node -e "require('node:fs').writeFileSync('exact-candidate-plan.json',JSON.stringify(JSON.parse(process.env.EXACT_PLAN)))"
+      - name: admit original complete official evidence without application execution
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python3 -B .github/scripts/scale-authoring-admission.py exact-candidate-plan.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: scale-authoring-pr-admission-${{ github.sha }}
+          path: scale-authoring-pr-admission.json
+          if-no-files-found: error
+          retention-days: 3
   ready:
     name: exact selected qualification result
-    needs: [admission, browser, runtime, mac]
+    needs: [admission, browser, runtime, mac, scale]
     if: always()
     runs-on: ubuntu-24.04
     timeout-minutes: 1
@@ -209,7 +234,7 @@ jobs:
           const assert=require('node:assert/strict');
           const results=JSON.parse(process.env.RESULTS);
           const plan=JSON.parse(process.env.EXACT_PLAN);
-          assert.deepEqual(Object.keys(results).sort(),['admission','browser','mac','runtime']);
-          const selected=plan.candidate==='training-mac'?['mac']:['admission','browser','runtime'];
+          assert.deepEqual(Object.keys(results).sort(),['admission','browser','mac','runtime','scale']);
+          const selected=plan.candidate==='scale-authoring'?['scale']:plan.candidate==='training-mac'?['mac']:['admission','browser','runtime'];
           for(const [name,row] of Object.entries(results)) assert.equal(row.result,selected.includes(name)?'success':'skipped',name);
           JS

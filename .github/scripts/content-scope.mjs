@@ -106,11 +106,12 @@ export function frontendPerformanceScope(entries, read) {
 export const surveyWaveSelectionFiles = new Set([
   ...['content-options.service.ts','content-selection.ts','waves.routes.ts','waves.service.ts'].map(f => modules+'survey/'+f),
   ...['survey-content-options.test.ts','survey-frozen-feedback-read.test.ts','survey-content-options.postgres.integration.test.ts'].map(f => 'server-version/backend/src/__tests__/measurement-content/'+f),
-  ...['SurveyWaveContentSelection.tsx','SurveyWaveContentSelection.test.tsx','SurveyWaveStudio.tsx','SurveyWaveStudio.content.test.tsx'].map(f => frontendSrc+'survey/'+f),
+  ...['SurveyWaveContentSelection.tsx','SurveyWaveContentSelection.test.tsx','SurveyWaveStudio.tsx','SurveyWaveStudio.content.test.tsx','SurveyWaveStudio.feedback.test.tsx'].map(f => frontendSrc+'survey/'+f),
 ]);
 export const surveyWaveSelectionTools = new Set([
   '.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs',
   '.github/scripts/survey-wave-selection.test.mjs','.github/scripts/survey-wave-selection-browser.mjs',
+  '.github/scripts/survey-wave-selection-reuse.py','.github/scripts/survey-wave-selection-reuse.test.py',
   '.github/scripts/maintenance-routing.test.mjs',
   '.github/workflows/ci.yml','.github/workflows/ci-backend-regression.yml',
   '.github/workflows/ci-frontend.yml','.github/workflows/ci-images.yml','docs/release/README.md',

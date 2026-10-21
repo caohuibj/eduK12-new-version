@@ -476,10 +476,11 @@ describe('participant stored raw feedback display',()=>{
     taskValue={...taskValue,status:'COMPLETED'}
     generalReply=()=>response({kind:'DESCRIPTIVE',text:'感谢参与',disclaimer:'受控指标',completedAt:'2026-10-17T00:00:00Z',measurements:[{
       feedbackKind:'RAW_METRICS',instrumentKey:family.toLowerCase(),title:family+' 工具',measurementReleaseId:'release',quality:'interpretable',
-      metrics:[{key:'total',label:'原始总分',value:7,unit:null,status:'OK'}],
+      metrics:[{key:'total',label:'原始总分',value:7,unit:null,status:'OK'}],rawScoreFeedback:[{scoreKey:'total',rangeKey:'r',text:'服务器冻结匹配的区间说明'}],
     }]})
     render(<SurveyPublicApp/>);fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
     expect(await screen.findByText('原始总分：7（OK）')).toBeInTheDocument()
+    expect(screen.getByText('服务器冻结匹配的区间说明')).toBeInTheDocument()
     expect(screen.getByText(/受控原始指标 · 质量状态/)).toBeInTheDocument()
     expect(screen.queryByText(/7 ms|试点测量/)).toBeNull()
     expect(generalCalls()).toHaveLength(1)
