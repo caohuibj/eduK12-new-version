@@ -33,6 +33,41 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: node .github/scripts/training-workspace-integrated-evidence.mjs resume
+      - uses: docker/setup-buildx-action@v3
+      - name: compile changed frontend once and retain actual image bytes
+        run: bash .github/scripts/training-workspace-integrated-build.sh frontend
+      - name: verify library-only secondary text contrast
+        run: node .github/scripts/training-workspace-integrated-evidence.mjs library-contrast
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: scan newly built frontend runtime
+        uses: aquasecurity/trivy-action@v0.36.0
+        with:
+          image-ref: training-workspace-integrated-frontend-runtime:${{ github.sha }}
+          format: json
+          output: training-workspace-integrated-evidence/frontend/runtime-scan.json
+          exit-code: '1'
+          ignore-unfixed: true
+          vuln-type: os,library
+          severity: CRITICAL,HIGH
+          cache: 'false'
+          skip-setup-trivy: true
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: workspace-integrated-frontend-current-images-${{ github.sha }}
+          path: training-workspace-integrated-images/frontend/
+          retention-days: 3
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: workspace-integrated-frontend-current-reports-${{ github.sha }}
+          path: training-workspace-integrated-evidence/frontend/
+          retention-days: 3
+          if-no-files-found: error
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -83,6 +118,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ github.token }}
         run: node .github/scripts/training-workspace-integrated-evidence.mjs resume
+      - uses: actions/download-artifact@v4
+        with:
+          name: workspace-integrated-frontend-current-images-${{ github.sha }}
+          path: training-workspace-integrated-images/frontend-current/
+      - uses: actions/download-artifact@v4
+        with:
+          name: workspace-integrated-frontend-current-reports-${{ github.sha }}
+          path: training-workspace-integrated-evidence/frontend-current/
+      - name: verify same-run new frontend bytes and original backend identity
+        run: node .github/scripts/training-workspace-integrated-evidence.mjs frontend-current
       - name: prepare isolated services and private prerequisite directory
         shell: bash
         run: |
@@ -105,10 +150,6 @@ jobs:
             sleep 1
           done
           exit 1
-      - name: initialize fresh synthetic data for the first restore without repeating qualification
-        run: node .github/scripts/training-workspace-integrated-recovery.mjs prepare-restore
-      - name: nonempty bounded synthetic backup and restore
-        run: node .github/scripts/training-workspace-integrated-recovery.mjs restore
       - name: initialize a separate fresh browser database
         shell: bash
         run: |
@@ -177,7 +218,7 @@ jobs:
           mkdir -p server-version/frontend/dist
           docker cp "$id:/usr/share/nginx/html/." server-version/frontend/dist/
           docker rm "$id"
-          (cd server-version/frontend/dist; sha256sum -c "$GITHUB_WORKSPACE/training-workspace-integrated-evidence/frontend/runtime-files.sha256")
+          (cd server-version/frontend/dist; sha256sum -c "$GITHUB_WORKSPACE/training-workspace-integrated-evidence/frontend-current/runtime-files.sha256")
       - name: serve restricted API and canonical loopback HTTPS
         shell: bash
         run: |

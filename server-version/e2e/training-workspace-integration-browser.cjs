@@ -124,7 +124,7 @@ async function proof(page,name,target){
   // Only the pinned local axe script is injected. Never intercept business API responses.
   const url=fixture.trainingUrl+'/__workspace_axe.js',route=r=>r.fulfill({contentType:'application/javascript',body:axe})
   await page.route(url,route);try{await page.addScriptTag({url})}finally{await page.unroute(url,route)}
-  const audit=await page.evaluate(async()=>{const result=await window.axe.run({include:['main']},{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}});return {passes:result.passes.length,violations:result.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.length}))}})
+  const audit=await page.evaluate(async()=>{const result=await window.axe.run({include:['main']},{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}});return {passes:result.passes.length,violations:result.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.length,details:v.nodes.map(n=>({target:n.target.map(t=>String(t).replace(/\[[^\]]*\]/g,'[attribute]').replace(/[A-Za-z0-9_-]{24,}/g,'redacted').slice(0,200)),contrast:n.any.filter(c=>c.id==='color-contrast').map(c=>({foreground:c.data?.fgColor,background:c.data?.bgColor,ratio:c.data?.contrastRatio,expected:c.data?.expectedContrastRatio}))}))}))}})
   assert(audit.passes>0);evidence.accessibility.push({name,width,...audit});save();assert.deepEqual(audit.violations,[],'Accessibility violations')
  }
  await page.setViewportSize({width:1440,height:960})

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "base": "eb08515a26cc4637cbcb57a8859fec757a5b8b34",
-  "product": "43d89082769d4b7c45cd11abb0abadc3bd8511c3",
+  "product": "d5b703f96fdd478c3e8256c29b1fcbf43e696f85",
   "browserProfileTrustApproved": true,
   "source": {
     "docs/training-authorized-tool-picker-local.md": {
@@ -154,7 +154,7 @@
     },
     "server-version/e2e/training-workspace-integration-browser.cjs": {
       "before": null,
-      "after": "aec7d55d599ff676925907105ab413e417a0255f"
+      "after": "a843adb57bb7549b776b98413dfdbcb7d6f847ec"
     },
     "server-version/frontend/src/App.tsx": {
       "before": "12796764967dbefc152c31e59fc1bccc677b1dc3",
@@ -426,7 +426,7 @@
     },
     "server-version/frontend/src/training/training-workspace.css": {
       "before": null,
-      "after": "a4eb663ad04cfeb07b8027943581e394f8b26a3a"
+      "after": "3113cea93db46e5fb1b668f6fd639dcd767dd45d"
     },
     "server-version/frontend/src/types/index.ts": {
       "before": "dbd766a39ac786674f8f684ed3e2bd1de41cb7de",
