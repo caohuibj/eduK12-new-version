@@ -1,5 +1,6 @@
 import example from '../modules/situational/authoring/examples/teacher-demonstration.json'
 import {randomUUID} from 'node:crypto'
+import {requireIsolatedReleaseDatabase} from './integration/integration-env'
 import {beforeAll,afterAll,describe,it,expect,vi} from 'vitest'
 vi.mock('../modules/cognitive/assignment.service',()=>({listPublishedConfigs:async()=>[]}))
 vi.mock('../modules/situational/situational-release.service',()=>({listSituationalResourceSummaries:async()=>[]}))
@@ -18,8 +19,12 @@ async function call(path:string,userId:string,query:any={},body:any={},params:an
 }
 suite('Training library real metadata and permission boundaries',()=>{
   beforeAll(async()=>{
-    const url=new URL(process.env.DATABASE_URL!)
-    if(url.hostname!=='127.0.0.1'||url.port!=='5549'||url.pathname!=='/eduk12_mac_work_20261021')throw new Error('Explicit local fixture database required')
+    const selected=process.env.RELEASE_INTEGRATION_DATABASE_URL
+    if(selected) requireIsolatedReleaseDatabase(selected)
+    else {
+      const url=new URL(process.env.DATABASE_URL!)
+      if(url.hostname!=='127.0.0.1'||url.port!=='5549'||url.pathname!=='/eduk12_mac_work_20261021')throw new Error('Explicit local fixture database required')
+    }
     db=(await import('../config/database')).prisma
     const config=(await import('../config')).config
     expect(config.materialGrantsEnabled).toBe(true)
@@ -57,10 +62,12 @@ suite('Training library real metadata and permission boundaries',()=>{
     expect(await canReadPrivateAsset(asset,{userId:viewer,role:'TEACHER'})).toBe(true)
     const args:any={values:{media:[{assetId,url:`/api/assets/${assetId}/file`}]},ownerId:viewer,role:'TEACHER',courseId:randomUUID()}
     expect(await validateAssetReferencesForCourse(args)).toHaveLength(1)
+    expect(await db.$transaction(tx=>validateAssetReferencesForCourse({...args,db:tx}))).toHaveLength(1)
     expect(await canReadPrivateAsset(await db.storedAsset.findUniqueOrThrow({where:{id:hidden}}),{userId:viewer,role:'TEACHER'})).toBe(false)
     await db.materialGrant.deleteMany({where:{teacherId:viewer,resourceId:assetId}})
     expect(await canReadPrivateAsset(asset,{userId:viewer,role:'TEACHER'})).toBe(false)
     await expect(validateAssetReferencesForCourse(args)).rejects.toThrow()
+    await expect(db.$transaction(tx=>validateAssetReferencesForCourse({...args,db:tx}))).rejects.toThrow()
   })
   it('searches and paginates owned/granted tools without loading foreign drafts or scoring JSON',async()=>{
     for(const [creatorId,name,status] of [[owner,'Needle tool A','DRAFT'],[owner,'Needle tool B','PUBLISHED'],[other,'Foreign tool','DRAFT']] as const){const row=await db.scale.create({data:{creatorId,name,status,code:randomUUID(),definition:{private:'must not leak'}}});scales.push(row.id)}

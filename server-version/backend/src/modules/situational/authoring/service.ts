@@ -120,10 +120,25 @@ export async function forkSjtDraftVersion(actor: SjtAuthorActor, id: string) {
     const template = source.template as Record<string, any>
     const parts = String(template.instrumentVersion).split('.').map(Number)
     if (parts.length!==3 || parts.some(value=>!Number.isSafeInteger(value)||value<0)) throw problem('来源版本号无效')
-    const next = {...template,instrumentVersion:`${parts[0]}.${parts[1]}.${parts[2]+1}`}
+    // Release identities are global, including retired versions. Serialize forks
+    // across source rows/authors without returning anyone else's draft metadata.
+    // No other writer takes this lock, so source -> key introduces no reverse
+    // row-lock dependency; publication still enforces its unique release identity.
+    await tx.$queryRaw`SELECT 1 AS locked FROM pg_advisory_xact_lock(hashtext(${"sjt-version:" + template.instrumentKey}))`
+    const used = await tx.$queryRaw<Array<{version:string}>>`SELECT template->>'instrumentVersion' AS version
+      FROM sjt_author_drafts WHERE template->>'instrumentKey'=${template.instrumentKey}
+      UNION SELECT instrument_version AS version FROM sjt_author_releases WHERE instrument_key=${template.instrumentKey}`
+    let patch=parts[2]
+    for(const row of used){
+      if(!/^\d+\.\d+\.\d+$/.test(row.version))continue
+      const candidate=row.version.split('.').map(Number)
+      if(candidate.every(value=>Number.isSafeInteger(value))&&candidate[0]===parts[0]&&candidate[1]===parts[1])patch=Math.max(patch,candidate[2])
+    }
+    if(!Number.isSafeInteger(patch+1))throw problem('版本号已达到上限，请使用新的内容版本')
+    const next = {...template,instrumentVersion:`${parts[0]}.${parts[1]}.${patch+1}`}
     const compiled = compileSjtAuthorDocument(next)
     assertAdaptedVersion(source.adaptationSource,compiled.template)
-    const mediaOptions=await adaptationMediaOptions(tx,source,false)
+    const mediaOptions=await adaptationMediaOptions(tx,source,true)
     await assertSjtAuthorMedia(tx,actor.userId,compiled.template,mediaOptions)
     const row=await tx.sjtAuthorDraft.create({data:{ownerId:actor.userId,template:json(compiled.template),contentDigest:compiled.contentDigest,
       authorizationPolicy:source.authorizationPolicy,adaptationSource:source.adaptationSource===null?Prisma.DbNull:json(source.adaptationSource)}})

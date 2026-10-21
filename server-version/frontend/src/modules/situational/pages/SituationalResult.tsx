@@ -27,6 +27,9 @@ const SituationalResult: React.FC = () => {
 
   useEffect(() => {
     let cancelled = false
+    setLoading(true)
+    setData(null)
+    setError(null)
     if (!attemptId) {
       setError('测评记录标识缺失')
       setLoading(false)
@@ -35,6 +38,7 @@ const SituationalResult: React.FC = () => {
 
     void situationalApi.result(attemptId)
       .then((response) => {
+        if (cancelled) return
         if (response.code !== 0) throw Object.assign(new Error(response.message), { code: response.code })
         if (!response.data.result && !response.data.feedbackDeferred) {
           const context = learnerCourseContext(search, response.data.trainingPersistence?.courseId)

@@ -49,6 +49,9 @@ const getPaginationParams = (req: Request) => {
  */
 const deleteCourseWithAssetReferences = async (courseId: string) => {
   await prisma.$transaction(async (tx) => {
+    // Serialize with recurring publication before collecting polymorphic refs.
+    // A later cascade cannot clean refs for a child omitted from this snapshot.
+    await tx.$queryRaw`SELECT id FROM courses WHERE id = ${courseId} FOR UPDATE`
     const assignments = await tx.assignment.findMany({
       where: { courseId },
       select: { id: true },

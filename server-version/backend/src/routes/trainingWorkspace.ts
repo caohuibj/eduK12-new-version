@@ -7,6 +7,7 @@ import { success, error } from '../utils/response'
 import { signKnownAsset } from '../services/assetStorage'
 import { mediaGrantFilter, mediaLibraryFilter } from '../services/workspaceMedia'
 import { config } from '../config'
+import { libraryReadableScaleIds } from '../modules/scale-library-governance/readers'
 import { listPublishedConfigs } from '../modules/cognitive/assignment.service'
 import { listSituationalResourceSummaries } from '../modules/situational/situational-release.service'
 import { bundleProductService } from '../modules/bundle-product/service'
@@ -64,8 +65,8 @@ router.patch('/media/:id/name', handle(async req => {
 // expose only descriptors, never scoring definitions, responses or reports.
 router.get('/tools', handle(async req => {
   const q=workspaceQuery.parse(req.query), actor=req.user.userId
-  const [cognitive,situational,bundles] = await Promise.all([
-    listPublishedConfigs(actor,req.user.role), listSituationalResourceSummaries(actor), bundleProductService.catalog(req.user),
+  const [cognitive,situational,bundles,library] = await Promise.all([
+    listPublishedConfigs(actor,req.user.role), listSituationalResourceSummaries(actor), bundleProductService.catalog(req.user), libraryReadableScaleIds(actor),
   ])
   const extra = [
     ...cognitive.map(row=>({id:row.id,kind:'cognitive',name:row.name,version:row.configVersion,href:'/cognitive-assignments'})),
@@ -74,9 +75,18 @@ router.get('/tools', handle(async req => {
   ].map(row=>Prisma.sql`SELECT ${row.id}::text AS id,${row.kind}::text AS kind,${row.name}::text AS name,NULL::text AS description,
     'PUBLISHED'::text AS status,${row.version}::text AS version,NULL::text AS "ownerId",NULL::timestamptz AS "updatedAt",${row.href}::text AS href,false AS "canUpdateVersion"`)
   const rows=Prisma.sql`
-    SELECT s.id,'scale'::text AS kind,s.name,s.description,s.status::text AS status,s.instrument_version AS version,s.creator_id AS "ownerId",s.updated_at AS "updatedAt",'/scales/'||s.id AS href,(s.creator_id=${actor} AND s.status='PUBLISHED' AND s.instrument_class='CUSTOM_DESCRIPTIVE' AND s.definition #>> '{license,status}'='self_authored' AND s.definition #>> '{license,redistribution}'='allowed') AS "canUpdateVersion"
-      FROM scales s JOIN users u ON u.id=s.creator_id WHERE u.account_domain IN ('LEGACY','TRAINING') AND (s.creator_id=${actor}
-      OR (${config.materialGrantsEnabled} AND s.status='PUBLISHED' AND EXISTS (SELECT 1 FROM material_grants g WHERE g.teacher_id=${actor} AND g.resource_type::text='SCALE' AND g.resource_id=s.id)))
+    SELECT s.id,'scale'::text AS kind,s.name,s.description,s.status::text AS status,s.instrument_version AS version,
+      CASE WHEN s.library_entry_id IS NULL THEN s.creator_id ELSE NULL END AS "ownerId",s.updated_at AS "updatedAt",'/scales/'||s.id AS href,
+      (s.library_entry_id IS NULL AND s.creator_id=${actor} AND s.status='PUBLISHED' AND s.instrument_class='CUSTOM_DESCRIPTIVE' AND s.definition #>> '{license,status}'='self_authored' AND s.definition #>> '{license,redistribution}'='allowed') AS "canUpdateVersion"
+      FROM scales s JOIN users u ON u.id=s.creator_id WHERE
+      -- Approved wrappers are exact immutable versions, independent of the author's
+      -- account domain and private source. Only the central reader authorizes them.
+      (s.library_entry_id IS NOT NULL AND s.status='PUBLISHED' AND s.id=ANY(${library.ids}::text[]))
+      OR (s.library_entry_id IS NULL AND u.account_domain IN ('LEGACY','TRAINING') AND (s.creator_id=${actor}
+        OR (${config.materialGrantsEnabled} AND s.status='PUBLISHED' AND EXISTS (
+          SELECT 1 FROM material_grants g WHERE g.teacher_id=${actor} AND g.resource_type::text='SCALE' AND g.resource_id=s.id
+          AND (g.legacy_scale_grant OR NOT EXISTS (SELECT 1 FROM scale_library_entries e
+            JOIN scale_library_submissions submission ON submission.id=e.submission_id WHERE submission.source_id=s.id))))))
     UNION ALL SELECT f.id,'form',f.name,f.description,f.status::text,NULL,f.creator_id,f.updated_at,'/general-questionnaires/'||f.id||'/edit',(f.creator_id=${actor} AND f.status='PUBLISHED')
       FROM questionnaires f JOIN users u ON u.id=f.creator_id WHERE f.type='GENERAL' AND u.account_domain IN ('LEGACY','TRAINING')
       AND (f.creator_id=${actor} OR (${config.materialGrantsEnabled} AND f.status='PUBLISHED'

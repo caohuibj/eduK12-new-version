@@ -28,17 +28,21 @@ const QuestionnaireResult: React.FC = () => {
   }, [assessmentId])
 
   useEffect(() => {
+    let cancelled = false
+    setLoading(true)
+    setResult(null)
     const fetchResult = async () => {
       try {
         const response = await apiClient.get<CollectionQuestionnaireResponse>(`/questionnaires/assessments/${assessmentId}/report`)
-        if (response.code === 0 && response.data) setResult(response.data)
+        if (!cancelled && response.code === 0 && response.data) setResult(response.data)
       } catch (err) {
         console.error('获取报告失败', err)
       } finally {
-        setLoading(false)
+        if (!cancelled) setLoading(false)
       }
     }
     void fetchResult()
+    return () => { cancelled = true }
   }, [assessmentId])
 
   if (loading) {

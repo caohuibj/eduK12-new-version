@@ -15,7 +15,7 @@ import { success, error, forbidden, notFound, instrumentError } from '../utils/r
 import { serializeQuestionnaireAccessToken, tokenService } from '../services/tokenService'
 import { logger } from '../utils/logger'
 import { UserRole } from '../types'
-import { canUseScale, grantedResourceIds } from '../services/materialGrant'
+import { canUseScale, grantedResourceIds, MaterialGrantError } from '../services/materialGrant'
 import { z } from 'zod'
 import { validateContextFormItem, validateContextFormItems } from '../modules/assessment-context'
 import { questionnaireAuthorizationService as questionnaireAuth } from '../services/questionnaireAuthorizationService'
@@ -842,12 +842,32 @@ export const generalQuestionnaireController = {
       const grantedForm = original.status === 'PUBLISHED' && original.questionnaireScales.length === 0
         && (await grantedResourceIds(userId, 'FORM_TEMPLATE')).includes(original.id)
         && !!await prisma.user.findFirst({where:{id:original.creatorId,accountDomain:{in:['LEGACY','TRAINING']}},select:{id:true}})
-      if (!(await canManageGeneral(req, original)) && !grantedForm) {
+      const managesOriginal = await canManageGeneral(req, original)
+      if (!managesOriginal && !grantedForm) {
         return forbidden(res, '无权限复制此问卷')
       }
 
       // 使用事务创建新问卷
       const newQuestionnaire = await prisma.$transaction(async (tx) => {
+        if (!managesOriginal) {
+          // New template use must not race a grant revocation or deprecation.
+          const admitted = await tx.$queryRaw<Array<{id: string}>>`SELECT q.id FROM questionnaires q
+            JOIN users u ON u.id=q.creator_id
+            JOIN material_grants g ON g.resource_id=q.id AND g.resource_type::text='FORM_TEMPLATE'
+            WHERE q.id=${original.id} AND g.teacher_id=${userId} AND q.type='GENERAL' AND q.status='PUBLISHED'
+              AND u.account_domain IN ('LEGACY','TRAINING')
+              AND NOT EXISTS (SELECT 1 FROM questionnaire_scales s WHERE s.questionnaire_id=q.id)
+            FOR SHARE OF q, g`
+          if (!admitted.length) throw new MaterialGrantError('表单使用授权已失效', 403)
+        }
+        // A copy is NEW use, not a continuation of the source's frozen delivery.
+        // Ownership of the form never conveys an independent scale grant.
+        for (const binding of original.questionnaireScales) {
+          const scale = await tx.scale.findUnique({ where: { id: binding.scaleId } })
+          if (!scale || !await canUseScale(userId, userRole as UserRole, scale, tx)) {
+            throw new MaterialGrantError('无权限复制问卷中的量表，请先取得当前版本的使用授权', 403)
+          }
+        }
         // 创建问卷
         const questionnaire = await tx.questionnaire.create({
           data: {
@@ -916,6 +936,7 @@ export const generalQuestionnaireController = {
 
       return success(res, newQuestionnaire, '问卷复制成功')
     } catch (err: any) {
+      if (err instanceof MaterialGrantError) return forbidden(res, err.message)
       logger.error('泛化问卷复制错误', err)
 
       // 处理唯一性冲突

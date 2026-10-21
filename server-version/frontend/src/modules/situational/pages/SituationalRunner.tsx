@@ -179,6 +179,9 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
 
   useEffect(() => {
     let cancelled = false
+    setLoading(true)
+    setData(null)
+    setError(null)
     const load = async () => {
       if (!client) {
         setError('综合测评情境化槽位信息缺失，请返回后重新进入')
@@ -199,9 +202,11 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
         const response = attemptId
           ? await client.resume(attemptId)
           : await client.start({ instrumentKey: decodeURIComponent(instrumentKey as string) })
+        if (cancelled) return
         const next = withOnlineRunner(apiDataOrThrow(response))
         if (next.attempt.status === 'COMPLETED') {
           await finalDraftStore.delete(situationalDraftKey(next.attempt.id)).catch(() => undefined)
+          if (cancelled) return
           if(campus)campus.onCompleted()
           else navigate(embeddedCompletionPath || `${situationalBasePath()}/attempts/${next.attempt.id}/result`, { replace: true })
           return
@@ -210,13 +215,13 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
         const storedResponses = await readSituationalDraft(next.attempt)
         const restoredEvents = researchEnabled(next) ? researchEventsFromTrials(await finalDraftStore.listTrials(situationalDraftKey(next.attempt.id))) : []
         const restoredResponses = restoreResearchAnswers(next, storedResponses, restoredEvents)
-        researchEventsRef.current = restoredEvents
-        setResearchEvents(restoredEvents)
         const locked = meta.status !== 'DRAFT' || Boolean(meta.sealedSubmission)
         const localResponses = !locked
           ? await pruneSituationalDraftResponses(next.attempt, next.instrument.definition, restoredResponses)
           : restoredResponses
         if (cancelled) return
+        researchEventsRef.current = restoredEvents
+        setResearchEvents(restoredEvents)
         responsesRef.current = localResponses
         setData(next)
         setResponses(localResponses)
