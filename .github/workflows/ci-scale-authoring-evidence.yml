@@ -1,0 +1,91 @@
+name: Scale authoring one-time failure evidence
+# Read only the immutable failed run. No checkout, dependency install or test execution.
+on:
+  push:
+    branches: [ci/scale-authoring-evidence-20261021]
+permissions:
+  actions: read
+concurrency:
+  group: scale-authoring-failure-evidence-20261021
+  cancel-in-progress: false
+jobs:
+  extract:
+    if: github.repository == 'caohuibj/eduK12-new-version'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - name: verify fixed original run and artifact identity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python3 - <<'PYCODE'
+          import json, os, urllib.request
+          base = 'https://api.github.com/repos/caohuibj/eduK12-new-version/actions/'
+          def read(path):
+              request = urllib.request.Request(base + path, headers={'Authorization': 'Bearer ' + os.environ['GH_TOKEN'], 'Accept': 'application/vnd.github+json', 'X-GitHub-Api-Version': '2022-11-28'})
+              with urllib.request.urlopen(request, timeout=30) as response:
+                  return json.load(response)
+          run = read('runs/39558243343')
+          assert run['id'] == 39558243343 and run['run_attempt'] == 1
+          assert run['head_sha'] == 'b0e3e6fba710374da58f96d66d2940e6f2edb1bf'
+          # Other original jobs may still be running; the fixed backend job below must have failed.
+          assert run['conclusion'] in (None, 'failure')
+          artifact = read('artifacts/12326244145')
+          assert artifact['id'] == 12326244145 and not artifact['expired']
+          assert artifact['workflow_run']['id'] == 39558243343
+          assert artifact['workflow_run']['head_sha'] == run['head_sha']
+          assert artifact['name'] == 'scale-backend-' + run['head_sha']
+          assert artifact['size_in_bytes'] == 923919123
+          assert artifact['digest'] == 'sha256:be9f706c0dec0a57ad85542b66d99d08dfdadc89ca37b27ac092558325015dd0'
+          job = read('jobs/119083091372')
+          assert job['run_id'] == run['id'] and job['conclusion'] == 'failure'
+          print('Fixed original failed run, job and artifact identity verified')
+          PYCODE
+      - name: download only original failed backend artifact
+        uses: actions/download-artifact@v4
+        with:
+          repository: caohuibj/eduK12-new-version
+          run-id: '39558243343'
+          artifact-ids: '12326244145'
+          github-token: ${{ github.token }}
+          merge-multiple: true
+          path: original-evidence
+      - name: extract small synthetic-test report and failure summary
+        run: |
+          python3 - <<'PY'
+          import json
+          from pathlib import Path
+          source = Path('original-evidence/backend-tests.json')
+          if not source.is_file() or source.is_symlink():
+              raise SystemExit('Expected original backend-tests.json is missing')
+          if source.stat().st_size > 10 * 1024 * 1024:
+              raise SystemExit('Unexpected test report size; stop rather than emit large content')
+          report = json.loads(source.read_text())
+          if report.get('success') is not False:
+              raise SystemExit('Source report does not describe the expected failed run')
+          if not isinstance(report.get('testResults'), list) or not report['testResults']:
+              raise SystemExit('Source report has no collected test suites')
+          failures = []
+          for suite in report.get('testResults', []):
+              failed = [a for a in suite.get('assertionResults', []) if a.get('status') == 'failed']
+              for assertion in failed:
+                  failures.append({'file': suite.get('name'), 'test': assertion.get('fullName'), 'messages': assertion.get('failureMessages', [])})
+              if suite.get('status') == 'failed' and not failed:
+                  failures.append({'file': suite.get('name'), 'message': suite.get('message'), 'assertions': len(suite.get('assertionResults', []))})
+          if not failures:
+              raise SystemExit('Source report contains no failed suite or assertion evidence')
+          out = Path('small-evidence'); out.mkdir()
+          # Original report contains only this run's synthetic contract fixtures.
+          (out / 'backend-tests.json').write_bytes(source.read_bytes())
+          summary = {'sourceRun': 39558243343, 'sourceArtifact': 12326244145, 'sourceHead': 'b0e3e6fba710374da58f96d66d2940e6f2edb1bf', 'failedSuites': report.get('numFailedTestSuites'), 'failedTests': report.get('numFailedTests'), 'failures': failures}
+          text = json.dumps(summary, ensure_ascii=False, indent=2)
+          (out / 'failure-summary.json').write_text(text + '\n')
+          print(text[:60000])
+          PY
+      - name: retain small original report separately
+        uses: actions/upload-artifact@v4
+        with:
+          name: scale-backend-failure-report-39558243343
+          path: small-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
