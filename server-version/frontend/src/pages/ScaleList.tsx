@@ -70,6 +70,12 @@ const ScaleList: React.FC = () => {
   const [scales, setScales] = useState<Scale[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [page, setPage] = useState(0)
+  const [total, setTotal] = useState(0)
+  const [loadingMore, setLoadingMore] = useState(false)
+  const [moreError, setMoreError] = useState<string | null>(null)
+  const listEpoch = useRef(0)
+  const listBusy = useRef(false)
   const [availableTags, setAvailableTags] = useState<string[]>([])
   const [selectedTags, setSelectedTags] = useState<string[]>([])
   const [showExportModal, setShowExportModal] = useState(false)
@@ -89,24 +95,40 @@ const ScaleList: React.FC = () => {
   const exportGuard = useEditorGuard({ open: showExportModal, value: exportOptions, externalBusy: exportLoading, onClose: () => setShowExportModal(false) })
 
   useEffect(() => {
-    fetchScales()
-    fetchTags()
+    void fetchScales()
+    void fetchTags()
+    return () => { listEpoch.current++ }
   }, [])
 
-  const fetchScales = async () => {
+  const fetchScales = async (nextPage = 1) => {
+    const append = nextPage > 1
+    if (append && listBusy.current) return
+    const epoch = ++listEpoch.current
+    listBusy.current = true
+    if (append) setLoadingMore(true)
+    else { setLoading(true); setLoadingMore(false); setScales([]); setPage(0); setTotal(0) }
+    setError(null)
+    setMoreError(null)
     try {
-      setLoading(true)
-      setError(null)
-      const response = await apiClient.get<{ list: Scale[]; total: number }>('/scales?page=1&pageSize=100')
-      if (response.code === 0) {
-        setScales(response.data.list)
-      } else {
-        setError(response.message)
-      }
-    } catch (fetchError: any) {
-      setError(fetchError.message || '获取量表列表失败')
+      const response = await apiClient.get<{ list: Scale[]; total: number }>(`/scales?page=${nextPage}&pageSize=100`)
+      if (epoch !== listEpoch.current) return
+      if (response.code !== 0) throw new Error(response.message || '获取量表列表失败')
+      setScales(current => append
+        ? [...new Map([...current, ...response.data.list].map(scale => [scale.id, scale])).values()]
+        : response.data.list)
+      setPage(nextPage)
+      setTotal(response.data.total)
+    } catch (fetchError: unknown) {
+      if (epoch !== listEpoch.current) return
+      const message = fetchError instanceof Error ? fetchError.message : '获取量表列表失败'
+      if (append) setMoreError(message)
+      else setError(message)
     } finally {
-      setLoading(false)
+      if (epoch === listEpoch.current) {
+        listBusy.current = false
+        setLoading(false)
+        setLoadingMore(false)
+      }
     }
   }
 
@@ -127,7 +149,7 @@ const ScaleList: React.FC = () => {
     try {
       const response = await apiClient.delete(`/scales/${id}`)
       if (response.code === 0) {
-        setScales(current => current.filter(scale => scale.id !== id))
+        void fetchScales()
       } else {
         showMessage(response.message)
       }
@@ -297,7 +319,7 @@ const ScaleList: React.FC = () => {
           <Link to="/scales/new" className="text-action hover:text-action/80">创建第一个量表</Link>
         </div>
       ) : filteredScales.length === 0 ? (
-        <div className="rounded-lg bg-white py-12 text-center shadow text-gray-500">没有符合当前标签筛选条件的量表。</div>
+        <div className="rounded-lg bg-white py-12 text-center shadow text-gray-500">已加载的量表中没有符合当前标签筛选条件的量表。</div>
       ) : (
         <div className={`overflow-hidden rounded-lg bg-white shadow ${isTrainingHost() ? "training-record-table" : ""}`}>
           <div className="overflow-x-auto">
@@ -399,6 +421,14 @@ const ScaleList: React.FC = () => {
           </div>
         </div>
       )}
+
+      {!loading && !error && <section aria-label="量表列表分页" className="space-y-2">
+        <p role="status" className="text-sm text-gray-500">已加载 {scales.length} 条，共 {total} 条。{selectedTags.length > 0 && '标签筛选适用于已加载量表；继续加载可查看其他匹配版本。'}</p>
+        {moreError && <p role="alert" className="text-red-700">后续量表加载失败：{moreError}。已加载内容保留。</p>}
+        {(page * 100 < total || moreError) && <button type="button" className="btn-secondary" disabled={loadingMore} onClick={() => void fetchScales(page + 1)}>
+          {loadingMore ? '正在加载更多量表…' : moreError ? '重试加载更多量表' : '加载更多量表'}
+        </button>}
+      </section>}
 
       {showExportModal && exportPreview && (
         <ModalSurface open onClose={exportGuard.close} className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4">

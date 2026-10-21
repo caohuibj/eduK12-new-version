@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react'
 import { ArrowRight, Menu, X } from 'lucide-react'
 import { SchoolMark } from './SchoolMark'
 import { schoolFeatures } from './school-features'
-import campusArtwork from './huischool-campus-sunlight.png'
+import campusArtwork from './huischool-campus-sunlight.webp'
 import './school-landing.css'
 
 export type SchoolRegistrationEntry =

@@ -16,7 +16,7 @@
 .hs-main.hs-main-workspace:not(.hs-runner *) { width:min(1200px,calc(100% - 64px));padding:28px 0 48px; }
 .hs-main-workspace>section:not(.hs-runner *) { min-width:0; }
 .hs-workspace-welcome:not(.hs-runner *) { position:relative;isolation:isolate;padding:30px 34px;border:1px solid #dae3c9;border-radius:22px;overflow:hidden;background:#eef5df; }
-.hs-workspace-welcome:not(.hs-runner *):before { content:'';position:absolute;inset:0;z-index:-2;background:url('./huischool-campus-sunlight.png') center 46% / cover;opacity:.6; }
+.hs-workspace-welcome:not(.hs-runner *):before { content:'';position:absolute;inset:0;z-index:-2;background:url('./huischool-campus-sunlight.webp') center 46% / cover;opacity:.6; }
 .hs-workspace-welcome:not(.hs-runner *):after { content:'';position:absolute;inset:0;z-index:-1;background:linear-gradient(90deg,#fffff3ed 0%,#fffff3bd 48%,#fffff32b 100%); }
 .hs-workspace-welcome>div:not(.hs-runner *) { max-width:680px; }
 .hs-workspace .hs-workspace-welcome h1:not(.hs-runner *) { font-family:var(--hs-serif);font-weight:650;font-size:32px;line-height:1.4;margin:0 0 8px;overflow-wrap:anywhere; }
