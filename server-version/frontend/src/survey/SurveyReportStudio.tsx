@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { publishSurveyMeasurement } from './measurement-publication'
 
 export interface ReportLeaveRisk {dirty:boolean;pending:boolean;busy:boolean}
 type ReferenceKind='normative_distribution'|'criterion_threshold'|'descriptive_sample'|'theoretical_range'
@@ -99,7 +100,7 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
   useEffect(()=>{if(active&&!initialRequested.current){initialRequested.current=true;void load()}},[active,load]) // Project-keyed workspace retains edits while switching tabs.
   const publishMeasurement=()=>void run(async()=>{
     const source=nativeInstruments.find(row=>row.id===nativeId);if(!source)throw new Error('请选择本项目可发布的测量')
-    const result=await reportApi<{releaseId:string}>('/projects/'+encodeURIComponent(projectId)+'/instruments/'+encodeURIComponent(source.id)+'/measurement-release','POST',{revision:source.revision})
+    const result=await publishSurveyMeasurement(reportApi,projectId,source)
     setNotice('测量版本已发布，可用于编制报告；未开启被试采集。')
     const choices=await reportApi<Measurement[]>(base+'/measurements');setMeasurements(choices);setMeasurementId(result.releaseId)
   })

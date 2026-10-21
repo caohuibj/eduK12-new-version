@@ -34,6 +34,10 @@ export function isContentGrant(value: unknown): value is AdminContentGrant {
     if (scope.scopeId === 'situational-registry' && scope.resourceKind === 'measurement') allowed = ['measurement.publish']
     if (scope.scopeId === 'reference-governance' && scope.resourceKind === 'reference') allowed = ['reference.review', 'reference.publish']
   }
+  if (scope.scopeKind === 'PLATFORM' && scope.scopeId === 'scale-library-governance') {
+    if (scope.product === 'TRAINING' && scope.resourceKind === 'catalog') allowed = ['catalog.manage']
+    if (scope.resourceKind === 'material') allowed = ['material.distribute']
+  }
   return value.capabilities.every(capability => allowed.includes(capability))
 }
 export function isContentMetadata(value: unknown): value is AdminContentGrantMetadata {

@@ -39,7 +39,8 @@ export type CognitiveDraft={schemaVersion:1;templateKey:'gonogo-software-frame-v
 export type Definition=FormDraft|ScaleDraft|SjtDraft|CognitiveDraft
 export type ResearchDraft={
   id:string;projectId:string;instrumentKey:string;kind:Kind;title:string;
-  definition:Definition;revision:number;status:'DRAFT'|'ARCHIVED';
+  definition:Definition;revision:number;status:'DRAFT'|'PUBLISHED'|'ARCHIVED';
+  authoringFamilyId?:string|null;authoringVersion?:number|null;sourceDraftId?:string|null;measurementReleaseId?:string|null;
   updatedAt:string;createdAt:string;catalogGrantId?:string|null;readOnly?:boolean;
   sourceProvenance?:import('./ResearchCatalog').CatalogProvenance
 }

@@ -486,10 +486,10 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
             <textarea className="input block w-full" rows={3} value={form.generalText}
               onChange={e=>setForm({...form,generalText:e.target.value})}/></label>
           <fieldset className="border p-3 rounded-lg"><legend className="font-semibold text-sm">本波次使用的研究工具</legend>
-            {tools.filter(t=>t.status==='DRAFT').map(t=><label key={t.id} className="block text-sm my-2">
+            {tools.filter(t=>t.status==='DRAFT'||(t.kind==='SCALE'&&t.status==='PUBLISHED')).map(t=><label key={t.id} className="block text-sm my-2">
               <input type="checkbox" checked={form.instrumentIds.includes(t.id)}
                 onChange={e=>toggle(t.id,e.target.checked)}/> {t.kind} · {t.title}</label>)}
-            {!tools.filter(t=>t.status==='DRAFT').length&&<p className="text-xs">请先通过 Builder 创建研究工具。</p>}
+            {!tools.filter(t=>t.status==='DRAFT'||(t.kind==='SCALE'&&t.status==='PUBLISHED')).length&&<p className="text-xs">请先通过 Builder 创建研究工具。</p>}
           <div className="flex items-center justify-between text-xs gap-2">
             <button type="button" className="btn-secondary" disabled={busy||toolPage<=1}
               onClick={()=>void act(()=>refreshTools(toolPage-1))}>工具上一页</button>

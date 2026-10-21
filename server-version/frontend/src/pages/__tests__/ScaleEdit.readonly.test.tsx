@@ -55,7 +55,7 @@ describe('ScaleEdit frozen definition and request ownership', () => {
     const view = render(editor())
     await screen.findByLabelText('量表名称')
     expect(screen.queryByRole('button', { name: '保存草稿' })).not.toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: '发布描述性量表' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: '发布自用（描述性量表）' })).not.toBeInTheDocument()
     for (const tab of ['基本信息', '响应选项', '题目', '计分', '报告文案']) {
       await user.click(screen.getByRole('button', { name: tab }))
       const controls = view.container.querySelectorAll('section input, section textarea, section select, section button')
@@ -181,7 +181,7 @@ describe('ScaleEdit frozen definition and request ownership', () => {
     api.get.mockResolvedValueOnce(ok(scale())).mockResolvedValueOnce(ok(scale({ status: 'PUBLISHED' })))
     const user = userEvent.setup()
     render(editor())
-    await user.click(await screen.findByRole('button', { name: '发布描述性量表' }))
+    await user.click(await screen.findByRole('button', { name: '发布自用（描述性量表）' }))
     await screen.findByText(/量表状态已变更，当前定义只读/)
     expect(api.post).not.toHaveBeenCalled()
     expect(screen.getByLabelText('量表名称')).toBeDisabled()
@@ -192,7 +192,7 @@ describe('ScaleEdit frozen definition and request ownership', () => {
     api.post.mockReturnValue(pending.promise)
     const user = userEvent.setup()
     render(editor())
-    await user.click(await screen.findByRole('button', { name: '发布描述性量表' }))
+    await user.click(await screen.findByRole('button', { name: '发布自用（描述性量表）' }))
     await waitFor(() => expect(api.post).toHaveBeenCalledWith('/scales/scale-1/publish', {}))
     expect(screen.getByRole('button', { name: '保存基本信息' })).toBeDisabled()
     expect(screen.getByRole('button', { name: '保存草稿' })).toBeDisabled()
@@ -207,7 +207,7 @@ describe('ScaleEdit frozen definition and request ownership', () => {
     api.get.mockImplementation((url: string) => Promise.resolve(ok(scale(url.endsWith('scale-2') ? { id: 'scale-2', name: '另一量表' } : {}))))
     const user = userEvent.setup()
     const view = render(editor())
-    const button = action === 'basic' ? '保存基本信息' : action === 'definition' ? '保存草稿' : '发布描述性量表'
+    const button = action === 'basic' ? '保存基本信息' : action === 'definition' ? '保存草稿' : '发布自用（描述性量表）'
     await user.click(await screen.findByRole('button', { name: button }))
     route.id = 'scale-2'
     view.rerender(editor())
@@ -225,7 +225,7 @@ describe('ScaleEdit frozen definition and request ownership', () => {
     api.get.mockResolvedValueOnce(ok(scale())).mockReturnValueOnce(pending.promise).mockResolvedValueOnce(ok(scale({ id: 'scale-2', name: '另一量表' })))
     const user = userEvent.setup()
     const view = render(editor())
-    await user.click(await screen.findByRole('button', { name: '发布描述性量表' }))
+    await user.click(await screen.findByRole('button', { name: '发布自用（描述性量表）' }))
     await waitFor(() => expect(api.get).toHaveBeenCalledTimes(2))
     route.id = 'scale-2'
     view.rerender(editor())
