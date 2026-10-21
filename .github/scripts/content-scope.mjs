@@ -1,3 +1,4 @@
+import {compositeCsvMemoryPlan,compositeCsvMemoryOutputs} from './composite-csv-memory-scope.mjs';
 import {trainingWorkspacePlan,trainingWorkspaceOutputs} from './training-workspace-scope.mjs';
 import {exactCandidatePlan,exactCandidateOutputs} from './exact-candidate-scope.mjs';
 import {trainingFunctionalPlan} from './training-functional.mjs';
@@ -290,6 +291,14 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     console.log(JSON.stringify(output));
     if(process.env.GITHUB_OUTPUT) appendFileSync(process.env.GITHUB_OUTPUT,
       Object.entries(output).map(([key,value])=>`${key}=${value}\n`).join(''));
+    process.exit(0);
+  }
+  const csv = compositeCsvMemoryPlan(event === 'workflow_dispatch' ? [] : changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  if((process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME)==='work/composite-csv-memory-20261021'&&!csv)throw Error('CSV memory candidate drift: full-platform fallback is not authorized');
+  if(csv){
+    const output={...compositeCsvMemoryOutputs(csv),...Object.fromEntries(Object.entries(runnerPlan({scenario:'composite-csv-memory'})).map(([k,v])=>[k,Array.isArray(v)?JSON.stringify(v):v]))};
+    console.log(JSON.stringify(output));
+    if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));
     process.exit(0);
   }
   rejectSurveyManual();
