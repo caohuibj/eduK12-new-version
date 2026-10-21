@@ -39,7 +39,7 @@ describe('Training scale authoring additions', () => {
     await user.click(screen.getByRole('button', { name: '插入注意力题' }))
     await user.click(screen.getByRole('button', { name: '插入社会赞许性题（测谎题）' }))
     const target = screen.getByRole('combobox', { name: /目标选项/ })
-    await user.selectOptions(target, screen.getByRole('option', { name: '总是', exact: true }))
+    await user.selectOptions(target, screen.getByRole('option', { name: /^总是$/ }))
     await user.click(screen.getByRole('button', { name: '保存题目' }))
     await waitFor(() => expect(stored.items).toHaveLength(4))
     const attention = stored.items[2], social = stored.items[3]
