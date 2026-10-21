@@ -1,3 +1,26 @@
+## Frontend startup / catalog paging scope (2026-10-21)
+
+This bounded `frontend-performance` scenario admits only the named product-entry,
+ScaleList paging, School image/reference files and the explicit control files in
+`frontendPerformanceScope`. The full raw diff, normal modes and actual WebP
+container are checked; unknown paths, deleted originals, dependency/config,
+backend, database, scientific or authorization changes cannot enter this lane.
+The stable merge gate recomputes this boundary and requires real success from
+scope, the unchanged frontend lint/types/audit/full tests, frontend-build with
+rendered multi-product/paging smoke, frontend-only production image/security
+checks, and frontend plus changed-control JavaScript/TypeScript CodeQL. Draft,
+skipped, missing, failed and cancelled required jobs cannot qualify. Browser
+fixtures are synthetic UI contracts, not fresh backend authorization evidence.
+
+The existing production artifact feeds the browser check in its producer job;
+no browser/backend/DB/media/performance/Ops jobs are started. The existing Docker
+security job retains its separate frontend compilation rather than adding a new
+runtime packaging or evidence-admission system. Local exploratory results are
+reported honestly and are not substituted for formal CI success. Main push
+reclassifies the same complete diff without repeating PR application checks.
+Five minutes is the progress-report threshold, not a promise that downloads or
+CodeQL will finish within five minutes. This scope does not authorize deployment.
+
 # 应用发布、CI 与验收统一规则
 
 ## 两个收尾候选的限定本地证据接纳（等待精确候选审查）
