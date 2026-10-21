@@ -1,3 +1,4 @@
+import {SurveyWaveContentSelection,type WaveContentSelection,type FrozenWaveContent} from './SurveyWaveContentSelection'
 import { productOrigins, surveyRecruitmentUrl } from '../products/origins'
 import { useCallback, useRef, useEffect,useState,type FormEvent } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
@@ -5,7 +6,7 @@ import { SurveyFlowStudio,type FormQuestionInfo } from './SurveyFlowStudio'
 import type { FlowDraft } from './flow.client'
 import { SurveyStudyPreview } from './SurveyStudyPreview'
 import type { CognitivePreviewSnapshot } from './ResearchCognitivePreview'
-import type { FormDraft, ResearchDraft } from './builder.types'
+import type { FormDraft, ResearchDraft, ScaleDraft } from './builder.types'
 import { useInstrumentLibrary, type InstrumentLibrary } from './instrument-library'
 
 type RawFeedbackChoice={metricKeys:string[];release:'AFTER_FINAL'|'AFTER_COLLECTION'}
@@ -15,6 +16,7 @@ type InstrumentDetails=Instrument&{catalogGrantId?:string|null;readOnly?:boolean
 type Project={id:string;collectionMode:'LINKED_WAVES'|'SINGLE_UNLINKED';status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED';revision:number}
 type GroupIpPolicy={schemaVersion:1;timeZone:string;activationDate?:string}
 type Wave={
+  frozenContentSelections?:FrozenWaveContent[]
   frozenParticipantFeedback?:{draftId:string;instrumentKey:string;title:string;participantFeedback:({mode:'GENERAL'|'DESCRIPTIVE'}&RawFeedbackChoice)|null}[]
   id:string;projectId:string;title:string;ordinal:number;status:'DRAFT'|'OPEN'|'PAUSED'|'CLOSED';
   revision:number;instrumentIds:string[];publicationId:string|null;
@@ -58,7 +60,7 @@ const surveyApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
   })
   const result=await r.json() as ApiResult<T>
   if(!r.ok||result.code!==0||result.data===null)
-    throw new Error(result.message||'请求失败')
+    throw Object.assign(new Error(result.message||'请求失败'),{status:r.status})
   return result.data
 }
 const message=(e:unknown)=>e instanceof Error?e.message:'研究波次操作失败'
@@ -87,6 +89,11 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
   const {list:tools,page:toolPage,refresh:refreshTools,error:toolsError,loading:toolsLoading,revision:instrumentsRevision}=useInstrumentLibrary(projectId,instrumentLibrary)
   const [details,setDetails]=useState<Record<string,InstrumentDetails>>({})
   const [participantFeedback,setParticipantFeedback]=useState<Record<string,RawFeedbackChoice>>({})
+  const [contentSelections,setContentSelections]=useState<WaveContentSelection[]>([])
+  const [pendingFreeze,setPendingFreeze]=useState<{projectId:string;waveId:string;body:{revision:number;contentSelections?:WaveContentSelection[];participantFeedback?:unknown[]};canRetry:boolean}|null>(null)
+  const freezeLock=useRef(false)
+  const activePending=pendingFreeze?.projectId===projectId?pendingFreeze:null
+
   const [detailsError,setDetailsError]=useState(''),[detailsRetry,setDetailsRetry]=useState(0)
   const [wavePage,setWavePage]=useState(1),[waveError,setWaveError]=useState('')
   const [project,setProject]=useState<Project|null>(null)
@@ -126,6 +133,14 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
     return()=>{projects.current++;selections.current++;previews.current++}
   },[refreshWaves,refreshProject])
   useEffect(()=>{setParticipantFeedback({})},[path,instrumentsRevision,form.instrumentIds])
+  const contentScope=JSON.stringify([path,editing?.id,editing?.revision,instrumentsRevision,form.instrumentIds])
+  useEffect(()=>{
+    setContentSelections(previous=>{if(previous.length&&!editing?.publicationId)setNotice('波次或工具已更新，未冻结的报告／参考选择已清空，请重新核对选择。');return []})
+  },[contentScope])
+  useEffect(()=>{if(!activePending)return;const guard=(event:BeforeUnloadEvent)=>{event.preventDefault();event.returnValue=''}
+    window.addEventListener('beforeunload',guard);return()=>window.removeEventListener('beforeunload',guard)
+  },[activePending])
+
   useEffect(()=>{
     let current=true
     const previous=detailReads.current
@@ -227,8 +242,51 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
     setReady(result)
     setNotice(result.ok?'研究内容预检通过；发布阶段仍须通过运行时和权限门禁':'当前波次尚不满足发布条件')
   })}
+  const verifyFreeze=async(pending:NonNullable<typeof pendingFreeze>,rejectedMessage?:string)=>{
+    const epoch=projectEpoch.current,selection=selectionEpoch.current
+    const fresh=await surveyApi<Wave>(path+'/waves/'+pending.waveId)
+    if(epoch!==projectEpoch.current||selection!==selectionEpoch.current)return
+    if(fresh.publicationId){
+      setEditing(fresh);setPendingFreeze(null);setReady(null);setFlowAnalytics(null);setError('')
+      setNotice('服务器已冻结此波次。下方显示实际冻结版本，请核对；不会替换为当前最新版本。')
+      await refresh()
+    }else if(fresh.revision===pending.body.revision){
+      if(rejectedMessage){setPendingFreeze(null);setError(rejectedMessage+'；已核对波次仍未冻结，原报告／参考选择保留，可修正后重新提交。');return}
+      setPendingFreeze({...pending,canRetry:true});setError('当前尚未读取到冻结结果，可核对或重试原修订及完全相同的选择；不能改选后重试。')
+    }else{
+      setPendingFreeze(null);setEditing(fresh);setReady(null)
+      setError('波次修订已变化，本次冻结尚未确认。请核对当前波次后重新选择，不沿用旧请求。')
+    }
+  }
+  const freezeWave=(retry=false)=>{
+    if(!editing||freezeLock.current||busy||(!retry&&activePending))return
+    const pending=retry?activePending:{projectId,waveId:editing.id,canRetry:false,body:{revision:editing.revision,
+      ...(contentSelections.length?{contentSelections:structuredClone(contentSelections)}:{}),
+      ...(Object.keys(participantFeedback).length?{participantFeedback:Object.entries(participantFeedback).map(([instrumentId,choice])=>({instrumentId,feedback:{policyVersion:'SURVEY_RAW_METRICS_V1',mode:'DESCRIPTIVE',...choice}}))}:{}),
+    }}
+    if(!pending||retry&&!pending.canRetry)return
+    freezeLock.current=true;setPendingFreeze({...pending,canRetry:false})
+    void act(async()=>{
+      const epoch=projectEpoch.current,selection=selectionEpoch.current
+      let accepted=false
+      try{
+        await surveyApi(path+'/waves/'+pending.waveId+'/prepare','POST',pending.body);accepted=true
+        if(epoch!==projectEpoch.current||selection!==selectionEpoch.current)return
+        await verifyFreeze(pending)
+      }catch(cause){
+        if(epoch!==projectEpoch.current||selection!==selectionEpoch.current)return
+        const status=(cause as {status?:number}).status
+        if(!accepted&&!retry&&status!==undefined&&status>=400&&status<500){
+          setPendingFreeze(null);setError(message(cause)+'；原报告／参考选择保留，请核对后重新提交。');return
+        }
+        setError('冻结结果尚未确认，请先读取服务器状态，不要改选或重复创建。')
+        try{await verifyFreeze(pending,!accepted&&retry&&status===409?message(cause):undefined)}catch{setError('冻结结果与状态读取均未确认。原请求保留，请重试核对；不要更换版本。')}
+      }finally{freezeLock.current=false}
+    })
+  }
   const lifecycle=(operation:'prepare'|'open'|'pause'|'resume'|'close'|'hard-stop')=>{
     if(!editing)return
+    if(operation==='prepare'){freezeWave();return}
     const wave=editing
     if(operation==='open'&&!productOrigins()){setError('当前地址不支持生成招募链接');return}
     if(['close','hard-stop'].includes(operation)&&
@@ -240,9 +298,6 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
       if(operation==='open')setShareLink('')
       const result=await surveyApi<{researchUrl?:string}>(path+'/waves/'+wave.id+'/'+operation,'POST',{
         revision:wave.revision,
-        ...(operation==='prepare'&&Object.keys(participantFeedback).length?{participantFeedback:Object.entries(participantFeedback).map(([instrumentId,choice])=>({
-          instrumentId,feedback:{policyVersion:'SURVEY_RAW_METRICS_V1',mode:'DESCRIPTIVE',...choice},
-        }))}:{}),
       })
       if(epoch!==projectEpoch.current)return
       if(selection!==selectionEpoch.current){await refresh();return}
@@ -257,8 +312,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
       setEditing(fresh);await refresh()
       if(epoch!==projectEpoch.current||selection!==selectionEpoch.current)return
       setReady(null);setFlowAnalytics(null)
-      setNotice(operation==='prepare'?'已冻结此波次的研究定义，下一步可正式开放':
-        operation==='open'?'已创建一次性招募链接，请通过受控渠道交付':
+      setNotice(operation==='open'?'已创建一次性招募链接，请通过受控渠道交付':
           '波次状态已更新')
     })
   }
@@ -349,7 +403,11 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
   const feedbackTools=Object.values(details).filter(d=>
     editing?.instrumentIds.includes(d.id)&&form.instrumentIds.includes(d.id)&&
     ['SCALE','SJT'].includes(d.kind)&&!d.catalogGrantId&&!d.readOnly)
-    .map(d=>({...d,metrics:flowMetrics.filter(metric=>metric.instrumentKey===d.instrumentKey)}))
+    .map(d=>{
+      const totalScore=d.kind==='SCALE'?(d.definition as ScaleDraft).totalScore:undefined
+      return {...d,metrics:[...flowMetrics.filter(metric=>metric.instrumentKey===d.instrumentKey),
+        ...(totalScore?[{instrumentKey:d.instrumentKey,scoreKey:totalScore.key,label:totalScore.label}]:[])]}
+    })
   const feedbackInvalid=Object.entries(participantFeedback).some(([id,choice])=>{
     const tool=feedbackTools.find(tool=>tool.id===id)
     return !tool||!choice.metricKeys.length||choice.metricKeys.some(key=>!tool.metrics.some(metric=>metric.scoreKey===key))
@@ -369,6 +427,11 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
     {toolsError&&<div role="alert" className="bg-red-50 border-l-4 border-red-600 p-3">{toolsError}
       <button type="button" className="btn-secondary" disabled={toolsLoading} onClick={()=>void act(()=>refreshTools(toolPage))}>重试波次工具列表</button></div>}
     {notice&&<p role="status" className="bg-teal-50 border-l-4 border-teal-600 p-3">{notice}</p>}
+    {activePending&&<div role="status" className="border rounded p-3"><p>此波次冻结结果待核对，原修订和报告／参考选择已锁定。刷新页面后须读取该波次实际冻结摘要，不应重新选择版本。</p>
+      <button type="button" className="btn-secondary" disabled={busy} onClick={()=>void act(()=>verifyFreeze(activePending))}>核对原冻结请求</button>
+      {activePending.canRetry&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>freezeWave(true)}>重试原冻结请求</button>}
+    </div>}
+    <fieldset disabled={!!activePending} className="min-w-0 border-0 p-0 space-y-4">
     {project&&<div className="border rounded-lg bg-slate-50 p-3 space-y-3">
       <div className="flex justify-between gap-3 flex-wrap items-center">
         <p className="text-sm">整体研究状态：<strong>{project.status}</strong></p>
@@ -556,6 +619,10 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
               {feedbackInvalid&&<p role="alert" className="text-sm">启用的反馈须至少选择一个当前有效指标。</p>}
             </>}
           </section>
+          <SurveyWaveContentSelection key={contentScope} base={path+'/waves/'+editing.id} revision={editing.revision}
+            tools={Object.values(details).filter(tool=>editing.instrumentIds.includes(tool.id)&&form.instrumentIds.includes(tool.id))}
+            request={surveyApi} value={contentSelections} onChange={setContentSelections} disabled={busy||!!activePending}
+            published={!!editing.publicationId} frozen={editing.frozenContentSelections}/>
           <div className="flex flex-wrap gap-2">
             {editing.status==='DRAFT'&&!editing.publicationId&&<>
               <button type="button" className="btn-secondary" disabled={busy} onClick={preflight}>检查知情同意与所有工具</button>
@@ -666,5 +733,6 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
         </div>}
       </div>
     </div>
+    </fieldset>
   </section>
 }

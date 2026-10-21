@@ -37,6 +37,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.scenario === 'survey-wave-selection') return ['scope','backend-regression','frontend','docker','codeql'];
   if(scope.scenario === 'frontend-performance') return ['scope','frontend','frontend-build','docker','codeql'];
   if(scope.application_route==='exact-candidate') return ['scope','exact-candidate','codeql'];
   if (scope.application_route === 'survey-mac-ui') return ['scope','survey-mac-ui','codeql'];
@@ -90,6 +91,12 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if (scope.scenario === 'survey-wave-selection') {
+    if (draft || scope.application_route !== 'legacy' || scope.codeql !== 'true'
+      || scope.runner_profile !== 'hosted' || scope.media_selection !== '[]' || scope.media_groups !== '[]'
+      || ['maintenance','content','presentation','frontend','frontend_test','frontend_build','documentation','ui_required','visual_hosted',...Object.keys(acceptanceJobs)].some(k => scope[k] !== 'false')) failed.push('scope');
+    return [...new Set(failed)];
+  }
   if (scope.scenario === 'frontend-performance') {
     if (draft || scope.application_route !== 'legacy' || scope.frontend !== 'true'
       || scope.frontend_build !== 'true' || scope.codeql !== 'true'
@@ -286,6 +293,13 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const needs = readNeeds();
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if (needs.scope?.outputs?.scenario === 'survey-wave-selection') {
+    try {
+      const {changedEntries,surveyWaveSelectionScope} = await import('./content-scope.mjs');
+      if (process.env.CI_FORCE_FULL === 'true' || process.env.CI_EVENT !== 'pull_request'
+        || !surveyWaveSelectionScope(changedEntries(process.env.CI_BASE_SHA))) failed.push('recomputed-survey-wave-selection-scope');
+    } catch { failed.push('recomputed-survey-wave-selection-scope'); }
+  }
   // Recompute the complete raw-diff boundary, rather than trusting scope outputs.
   if (needs.scope?.outputs?.scenario === 'frontend-performance') {
     try {

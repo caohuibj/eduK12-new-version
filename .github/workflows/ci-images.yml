@@ -3,6 +3,9 @@ name: CI production image step
 on:
   workflow_call:
     inputs:
+      survey_selection:
+        type: boolean
+        default: false
       frontend_only:
         type: boolean
         default: false
@@ -95,6 +98,16 @@ jobs:
         run: bash "$GITHUB_WORKSPACE/.github/scripts/build-ci-images.sh"
       - name: verify production Nginx static asset MIME and security headers
         run: node scripts/frontend-nginx-static-smoke.mjs server-version-frontend:latest
+      - name: install pinned browser for the changed Wave UI
+        if: inputs.survey_selection
+        working-directory: .
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+      - name: Wave selection smoke on this production frontend image
+        if: inputs.survey_selection
+        working-directory: .
+        run: node .github/scripts/survey-wave-selection-browser.mjs
       - name: scan backend image (high and critical)
         if: inputs.frontend_only != true
         uses: aquasecurity/trivy-action@v0.36.0
@@ -121,3 +134,10 @@ jobs:
           skip-setup-trivy: true
           cache-dir: ${{ steps.runner-cache.outputs.trivy_cache }}
 
+      - uses: actions/upload-artifact@v4
+        if: always() && inputs.survey_selection
+        with:
+          name: survey-wave-selection-browser-${{ github.sha }}
+          path: survey-wave-selection-browser-report/
+          if-no-files-found: error
+          retention-days: 3
