@@ -36,7 +36,7 @@
     },
     ".github/workflows/ci-scale-authoring-browser-diagnostic.yml": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "9d36343bb73ac3da7181ef52bdb5bb976191f9b7"
+      "after": "8150ca62d2396161c2c499d3ed42b871fb731a9f"
     },
     ".github/workflows/ci-scale-authoring-evidence.yml": {
       "before": "0000000000000000000000000000000000000000",
@@ -284,11 +284,11 @@
     },
     "server-version/e2e/scale-authoring-feedback-browser.cjs": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "8a645dbfeec2523dc4ebfb15a8a6642144d32d5f"
+      "after": "cfff405dd9b6b09cadab8376a0f84937e1c2354b"
     },
     "server-version/e2e/scale-authoring-feedback-browser.test.cjs": {
       "before": "0000000000000000000000000000000000000000",
-      "after": "0f51358b7bb04b80497962c8187338e0e0878b5c"
+      "after": "92116cc24beea62c23661b64e144c5a14fdf150c"
     },
     "server-version/frontend/src/modules/composite/CompositeReportPage.tsx": {
       "before": "ececf212fdaeb80af244be4317908fe0e49c6623",
