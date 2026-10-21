@@ -1,0 +1,1349 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "sec-sjt-zh-hans",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalogOrder": 1010,
+  "definition": {
+    "schemaVersion": 2,
+    "respondentType": "participant_judgment",
+    "source": {
+      "title": "SEC-SJT 中文工作初译（DRAFT，非验证中文版）",
+      "citation": "Wolf, D., Schneider, S., & Schütz, A. (2020). Inventar und Situational Judgement Test zur Erfassung sozial-emotionaler Kompetenz(en) (SEC-I und SEC-SJT). Otto-Friedrich-Universität Bamberg. https://doi.org/10.20378/irb-48863 原题本PDF20–26页；原key PDF39页及评分工作簿BD41:BM41。原作：Daniel Wolf, Sarah Schneider, Astrid Schütz (2020), Otto-Friedrich-Universität Bamberg. https://doi.org/10.20378/irb-48863 。材料及本中文工作初译/数字改编采用CC BY-SA4.0 https://creativecommons.org/licenses/by-sa/4.0/ ，不是仓库MIT。修改：原SEC-SJT子集提取、AI辅助中文工作初译、逐题数字分页、平台留空说明及描述性报告；非原作者认可或验证的中文版，未声称人工双语审校。",
+      "url": "https://fis.uni-bamberg.de/entities/publication/b64e469f-1bea-488c-8ac7-186222773827",
+      "publicationYear": 2020
+    },
+    "license": {
+      "status": "verified",
+      "redistribution": "allowed",
+      "note": "原作：Daniel Wolf, Sarah Schneider, Astrid Schütz (2020), Otto-Friedrich-Universität Bamberg. https://doi.org/10.20378/irb-48863 。材料及本中文工作初译/数字改编采用CC BY-SA4.0 https://creativecommons.org/licenses/by-sa/4.0/ ，不是仓库MIT。修改：原SEC-SJT子集提取、AI辅助中文工作初译、逐题数字分页、平台留空说明及描述性报告；非原作者认可或验证的中文版，未声称人工双语审校。 原手册PDF4明确manual/materials/scoringfile均为BY-SA；不得由根MIT覆盖内容许可。"
+    },
+    "sampling": {
+      "strategy": "BRANCH_REACHABLE"
+    },
+    "scenes": [
+      {
+        "sceneKey": "SEC-SJT-PRACTICE",
+        "title": "独立练习（不计分）",
+        "sortOrder": 0,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "平台说明（新增，不是原作者指导语）：可以留空或退出；任一正式题缺答，本次不计算总分。界面的“可选”表示允许留空，不表示少答仍可评分。练习必须选择一项以熟悉操作，但不计分，没有练习答案key。原纸本每页2题，本数字草案每页1题，是分页改编，不声称与原纸本等同。无硬性限时，可以休息；本版是未经中文验证的工作初译。\n\n原指导语（中文工作初译）：\n人与人并不一样：大家的做法不总是相同，会体验到不同的情绪，表达情绪的方式不同，对别人情绪的反应也不同。\n\n接下来的几页有一些问题。回答每个问题时，请想象自己身处题目描述的情境。在每道题中，选出你认为最好的回答。每道题始终只能选择一个回答，并在它旁边打勾。\n\n你觉得没有哪个回答好吗？那就勾选其中对你来说还算最好的那个。\n\n下面是一个例子：\nSabrina 已经完成了今天的全部工作任务。她很疲惫。快到她下班的时间了。她的同事 Anton 还有很多事情要做。Sabrina 应该怎么做，才能让 Anton 感觉好一些？"
+        },
+        "primaryConstruct": "practice-unscored",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "NORM_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "prompt": "独立练习，不计分。请选择一个回答以熟悉操作；不提供正确答案反馈。",
+            "options": [
+              {
+                "optionKey": "1",
+                "label": "回家。"
+              },
+              {
+                "optionKey": "2",
+                "label": "问 Anton：“你需要帮助吗？我能为你做点什么吗？”"
+              },
+              {
+                "optionKey": "3",
+                "label": "对 Anton 说：“如果你抓紧一点，肯定能赶在下班前做完。”"
+              },
+              {
+                "optionKey": "4",
+                "label": "对 Anton 说：“我也遇到过事情很多的时候。你会做完的！”"
+              },
+              {
+                "optionKey": "5",
+                "label": "告诉 Anton，她晚上还打算做什么。"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "SEC-SJT-01",
+        "title": "正式题1",
+        "sortOrder": 1,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "原练习后说明（中文工作初译，纸本分页措辞保留）：\n你会选择哪个回答？你明白要做什么了吗？\n\n每页有 2 道题。如果中途需要休息，你随时都可以暂停。\n\n你还有什么问题吗？\n\n如果你没有其他问题，就从下一页开始。\n\n平台说明（新增，不是原作者指导语）：可以留空或退出；任一正式题缺答，本次不计算总分。界面的“可选”表示允许留空，不表示少答仍可评分。练习必须选择一项以熟悉操作，但不计分，没有练习答案key。原纸本每页2题，本数字草案每页1题，是分页改编，不声称与原纸本等同。无硬性限时，可以休息；本版是未经中文验证的工作初译。\n\nBeate 生男朋友的气。她的男朋友不知道为什么。Beate 的男朋友应该怎么做，才能让 Beate 感觉好一些？"
+        },
+        "primaryConstruct": "sec-sjt-key-match",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "NORM_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "sec-sjt-key-match",
+            "prompt": "对你来说，哪个回答最好？请勾选你认为最好的回答。你觉得没有哪个回答好吗？那就勾选其中对你来说还算最好的那个。",
+            "options": [
+              {
+                "optionKey": "1",
+                "label": "逗 Beate 笑。"
+              },
+              {
+                "optionKey": "2",
+                "label": "不打扰 Beate。"
+              },
+              {
+                "optionKey": "3",
+                "label": "问 Beate：“你为什么生气？”"
+              },
+              {
+                "optionKey": "4",
+                "label": "对 Beate 说：“别这么大惊小怪！”"
+              },
+              {
+                "optionKey": "5",
+                "label": "对 Beate 说：“你没有理由生气。”"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "SEC-SJT-02",
+        "title": "正式题2",
+        "sortOrder": 2,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "Pascal 告诉 Julian，他和女朋友吵架了。Pascal 因此很难过。Julian 应该怎么做，才能让 Pascal 感觉好一些？"
+        },
+        "primaryConstruct": "sec-sjt-key-match",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "NORM_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "sec-sjt-key-match",
+            "prompt": "对你来说，哪个回答最好？请勾选你认为最好的回答。你觉得没有哪个回答好吗？那就勾选其中对你来说还算最好的那个。",
+            "options": [
+              {
+                "optionKey": "1",
+                "label": "对 Pascal 说：“这是你女朋友的错。告诉她，她让你难过了。”"
+              },
+              {
+                "optionKey": "2",
+                "label": "对 Pascal 说：“别这么大惊小怪！”"
+              },
+              {
+                "optionKey": "3",
+                "label": "质问 Pascal 的女朋友。"
+              },
+              {
+                "optionKey": "4",
+                "label": "和 Pascal 一起做些事情，让他想想别的事。"
+              },
+              {
+                "optionKey": "5",
+                "label": "对 Pascal 说：“等等吧。会好起来的！”"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "SEC-SJT-03",
+        "title": "正式题3",
+        "sortOrder": 3,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "Uwe 因为自己的工作受到了表扬。他把一项确实很难的任务完成得很好。Uwe 有什么感受？"
+        },
+        "primaryConstruct": "sec-sjt-key-match",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "NORM_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "sec-sjt-key-match",
+            "prompt": "对你来说，哪个回答最好？请勾选你认为最好的回答。你觉得没有哪个回答好吗？那就勾选其中对你来说还算最好的那个。",
+            "options": [
+              {
+                "optionKey": "1",
+                "label": "满意"
+              },
+              {
+                "optionKey": "2",
+                "label": "自豪"
+              },
+              {
+                "optionKey": "3",
+                "label": "无所谓"
+              },
+              {
+                "optionKey": "4",
+                "label": "惊讶"
+              },
+              {
+                "optionKey": "5",
+                "label": "松了一口气"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "SEC-SJT-04",
+        "title": "正式题4",
+        "sortOrder": 4,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "Henrik 约好和 Amelie 见面。他到达见面地点时，Amelie 正耷拉着肩膀坐在长椅上。Henrik 应该怎么做，才能让 Amelie 感觉好一些？"
+        },
+        "primaryConstruct": "sec-sjt-key-match",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "NORM_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "sec-sjt-key-match",
+            "prompt": "对你来说，哪个回答最好？请勾选你认为最好的回答。你觉得没有哪个回答好吗？那就勾选其中对你来说还算最好的那个。",
+            "options": [
+              {
+                "optionKey": "1",
+                "label": "问 Amelie：“一切都好吗？”"
+              },
+              {
+                "optionKey": "2",
+                "label": "假装什么也没注意到。如果有什么不对劲，Amelie 自己会说的。"
+              },
+              {
+                "optionKey": "3",
+                "label": "问 Amelie：“你怎么这副样子？”"
+              },
+              {
+                "optionKey": "4",
+                "label": "问 Amelie：“你是不是更想一个人待着？”"
+              },
+              {
+                "optionKey": "5",
+                "label": "向 Amelie 讲述自己这一天有多累。"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "SEC-SJT-05",
+        "title": "正式题5",
+        "sortOrder": 5,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "教练经常批评 Max。Max 觉得这不公平。Max 应该怎么做，才能让自己感觉好一些？"
+        },
+        "primaryConstruct": "sec-sjt-key-match",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "NORM_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "sec-sjt-key-match",
+            "prompt": "对你来说，哪个回答最好？请勾选你认为最好的回答。你觉得没有哪个回答好吗？那就勾选其中对你来说还算最好的那个。",
+            "options": [
+              {
+                "optionKey": "1",
+                "label": "等着。教练总有一天会不再批评 Max。"
+              },
+              {
+                "optionKey": "2",
+                "label": "为自己辩护。谁都不该这么频繁地受到批评。"
+              },
+              {
+                "optionKey": "3",
+                "label": "找另一支队伍，这样就不用再见到这位教练了。"
+              },
+              {
+                "optionKey": "4",
+                "label": "对教练说：“我觉得自己受到了不公平的对待。”"
+              },
+              {
+                "optionKey": "5",
+                "label": "对教练说：“如果我继续受到批评，我就去找另一支队伍。”"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "SEC-SJT-06",
+        "title": "正式题6",
+        "sortOrder": 6,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "Ulla 知道，她的同事 Michael 很频繁地感到难过。今天，Michael 看起来特别难过。Ulla 应该怎么做，才能让 Michael 感觉好一些？"
+        },
+        "primaryConstruct": "sec-sjt-key-match",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "NORM_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "sec-sjt-key-match",
+            "prompt": "对你来说，哪个回答最好？请勾选你认为最好的回答。你觉得没有哪个回答好吗？那就勾选其中对你来说还算最好的那个。",
+            "options": [
+              {
+                "optionKey": "1",
+                "label": "什么也不做。Michael 总有一天会自己好起来的。"
+              },
+              {
+                "optionKey": "2",
+                "label": "和她的上司谈谈这件事。也许他能帮助 Michael。"
+              },
+              {
+                "optionKey": "3",
+                "label": "问 Michael：“一切都好吗？我能为你做点什么吗？”"
+              },
+              {
+                "optionKey": "4",
+                "label": "逗 Michael 笑。"
+              },
+              {
+                "optionKey": "5",
+                "label": "问 Michael：“你怎么现在又难过了？”"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "SEC-SJT-07",
+        "title": "正式题7",
+        "sortOrder": 7,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "Hanno 的朋友 Sebastian 过生日。Sebastian 过生日这天一定要去电影院。Hanno 不想去电影院。Hanno 应该怎么做，才能让 Sebastian 感觉好一些？"
+        },
+        "primaryConstruct": "sec-sjt-key-match",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "NORM_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "sec-sjt-key-match",
+            "prompt": "对你来说，哪个回答最好？请勾选你认为最好的回答。你觉得没有哪个回答好吗？那就勾选其中对你来说还算最好的那个。",
+            "options": [
+              {
+                "optionKey": "1",
+                "label": "对 Sebastian 说：“我不想去电影院。如果你不想做别的事，那我就待在家里。”"
+              },
+              {
+                "optionKey": "2",
+                "label": "一起去，但对 Sebastian 说：“我这么做只是因为今天是你的生日。下次我们要做我想做的事。”"
+              },
+              {
+                "optionKey": "3",
+                "label": "一起去，让 Sebastian 高兴。"
+              },
+              {
+                "optionKey": "4",
+                "label": "想一个好借口，这样就不用一起去了。"
+              },
+              {
+                "optionKey": "5",
+                "label": "说服 Sebastian 做点别的事。"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "SEC-SJT-08",
+        "title": "正式题8",
+        "sortOrder": 8,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "在一场重要的比赛中，Tobias 开始和队里的其他人争吵。Tobias 觉得自己受到了不公平的对待，他很生气，情绪也很激动。Tobias 应该怎么做，才能让自己感觉好一些？"
+        },
+        "primaryConstruct": "sec-sjt-key-match",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "NORM_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "sec-sjt-key-match",
+            "prompt": "对你来说，哪个回答最好？请勾选你认为最好的回答。你觉得没有哪个回答好吗？那就勾选其中对你来说还算最好的那个。",
+            "options": [
+              {
+                "optionKey": "1",
+                "label": "他回家去，让其他人看看，没有他，他们要怎么赢得比赛。"
+              },
+              {
+                "optionKey": "2",
+                "label": "对队友说：“你们向我道歉，我才会继续比赛。”"
+              },
+              {
+                "optionKey": "3",
+                "label": "他继续比赛。比赛结束后，他找其他人谈谈，对他们说：“我觉得自己受到了不公平的对待。”"
+              },
+              {
+                "optionKey": "4",
+                "label": "他故意表现得很差。这样队友就会明白，他们不能这样对待他。"
+              },
+              {
+                "optionKey": "5",
+                "label": "他把比赛打完。在接下来的几周里，他去找一支新的队伍。"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "SEC-SJT-09",
+        "title": "正式题9",
+        "sortOrder": 9,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "Lukas 一定要当团队负责人。有些工作任务，Lukas 并不擅长。最后，Felix 当上了团队负责人。Felix 已经在这家公司工作很久了。Lukas 很失望。Lukas 应该怎么做，才能让自己感觉好一些？"
+        },
+        "primaryConstruct": "sec-sjt-key-match",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "NORM_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "sec-sjt-key-match",
+            "prompt": "对你来说，哪个回答最好？请勾选你认为最好的回答。你觉得没有哪个回答好吗？那就勾选其中对你来说还算最好的那个。",
+            "options": [
+              {
+                "optionKey": "1",
+                "label": "心想：“有些任务我并不擅长。所以，由 Felix 当团队负责人更好。”"
+              },
+              {
+                "optionKey": "2",
+                "label": "心想：“Felix 值得这个职位。毕竟，他已经在这家公司工作很久了。”"
+              },
+              {
+                "optionKey": "3",
+                "label": "试着换个团队。这样他就可以避开 Felix。"
+              },
+              {
+                "optionKey": "4",
+                "label": "对上司说：“这不公平。Felix 当上团队负责人，只是因为他在这家公司工作很久了。可是我一定要当团队负责人。”"
+              },
+              {
+                "optionKey": "5",
+                "label": "仔细观察 Felix。他总会有做错事的时候。到那时，Lukas 就可以对上司说：“应该由我来当团队负责人！”"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "sceneKey": "SEC-SJT-10",
+        "title": "正式题10",
+        "sortOrder": 10,
+        "stimulus": {
+          "type": "TEXT_V1",
+          "text": "上司批评了 Simone 的工作。Simone 已经努力了，而且对结果很满意。她不理解这些批评，感到很难过。Simone 应该怎么做，才能让自己感觉好一些？"
+        },
+        "primaryConstruct": "sec-sjt-key-match",
+        "secondaryConstructs": [],
+        "situationFeatures": {},
+        "channels": [
+          {
+            "channelKey": "choice",
+            "purpose": "NORM_JUDGMENT",
+            "responseType": "SINGLE_CHOICE",
+            "scoredConstruct": "sec-sjt-key-match",
+            "prompt": "对你来说，哪个回答最好？请勾选你认为最好的回答。你觉得没有哪个回答好吗？那就勾选其中对你来说还算最好的那个。",
+            "options": [
+              {
+                "optionKey": "1",
+                "label": "她不让别人看出自己的情绪。"
+              },
+              {
+                "optionKey": "2",
+                "label": "她对上司说：“我真的已经努力了。这不公平！”"
+              },
+              {
+                "optionKey": "3",
+                "label": "她问上司：“下次我可以在哪些方面做得更好？”"
+              },
+              {
+                "optionKey": "4",
+                "label": "她以后不再那么努力了。反正努力也没用。"
+              },
+              {
+                "optionKey": "5",
+                "label": "她和自己的女性朋友们谈论上司有多不公平。"
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "flow": {
+      "strategy": "BRANCHING_DAG_V1",
+      "entryNodeKey": "SEC-SJT-PRACTICE",
+      "nodes": [
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "SEC-SJT-PRACTICE",
+          "sceneKey": "SEC-SJT-PRACTICE",
+          "motherSceneKey": "SEC-SJT-PRACTICE",
+          "roundKey": "sec-sjt",
+          "stepKey": "0",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "RAW_ONLY",
+              "required": true
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "SEC-SJT-01"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "SEC-SJT-01",
+          "sceneKey": "SEC-SJT-01",
+          "motherSceneKey": "SEC-SJT-01",
+          "roundKey": "sec-sjt",
+          "stepKey": "1",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": false
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "SEC-SJT-02"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "SEC-SJT-02",
+          "sceneKey": "SEC-SJT-02",
+          "motherSceneKey": "SEC-SJT-02",
+          "roundKey": "sec-sjt",
+          "stepKey": "2",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": false
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "SEC-SJT-03"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "SEC-SJT-03",
+          "sceneKey": "SEC-SJT-03",
+          "motherSceneKey": "SEC-SJT-03",
+          "roundKey": "sec-sjt",
+          "stepKey": "3",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": false
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "SEC-SJT-04"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "SEC-SJT-04",
+          "sceneKey": "SEC-SJT-04",
+          "motherSceneKey": "SEC-SJT-04",
+          "roundKey": "sec-sjt",
+          "stepKey": "4",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": false
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "SEC-SJT-05"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "SEC-SJT-05",
+          "sceneKey": "SEC-SJT-05",
+          "motherSceneKey": "SEC-SJT-05",
+          "roundKey": "sec-sjt",
+          "stepKey": "5",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": false
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "SEC-SJT-06"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "SEC-SJT-06",
+          "sceneKey": "SEC-SJT-06",
+          "motherSceneKey": "SEC-SJT-06",
+          "roundKey": "sec-sjt",
+          "stepKey": "6",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": false
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "SEC-SJT-07"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "SEC-SJT-07",
+          "sceneKey": "SEC-SJT-07",
+          "motherSceneKey": "SEC-SJT-07",
+          "roundKey": "sec-sjt",
+          "stepKey": "7",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": false
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "SEC-SJT-08"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "SEC-SJT-08",
+          "sceneKey": "SEC-SJT-08",
+          "motherSceneKey": "SEC-SJT-08",
+          "roundKey": "sec-sjt",
+          "stepKey": "8",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": false
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "SEC-SJT-09"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "SEC-SJT-09",
+          "sceneKey": "SEC-SJT-09",
+          "motherSceneKey": "SEC-SJT-09",
+          "roundKey": "sec-sjt",
+          "stepKey": "9",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": false
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "SEC-SJT-10"
+          }
+        },
+        {
+          "nodeType": "SCENE",
+          "nodeKey": "SEC-SJT-10",
+          "sceneKey": "SEC-SJT-10",
+          "motherSceneKey": "SEC-SJT-10",
+          "roundKey": "sec-sjt",
+          "stepKey": "10",
+          "channelPolicies": [
+            {
+              "channelKey": "choice",
+              "measurementRole": "SCORED",
+              "required": false
+            }
+          ],
+          "transition": {
+            "type": "NEXT",
+            "nextNodeKey": "terminal"
+          }
+        },
+        {
+          "nodeType": "TERMINAL",
+          "nodeKey": "terminal"
+        }
+      ]
+    },
+    "scoring": {
+      "scoringVersion": "sec-sjt-original-key-sum-1",
+      "model": {
+        "contractVersion": "situational-model-v1",
+        "modelKey": "AUTHOR_KEY_SUM",
+        "modelVersion": "1",
+        "expertKey": [
+          {
+            "sceneKey": "SEC-SJT-01",
+            "channelKey": "choice",
+            "optionKey": "1",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-01",
+            "channelKey": "choice",
+            "optionKey": "2",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-01",
+            "channelKey": "choice",
+            "optionKey": "3",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "SEC-SJT-01",
+            "channelKey": "choice",
+            "optionKey": "4",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-01",
+            "channelKey": "choice",
+            "optionKey": "5",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-02",
+            "channelKey": "choice",
+            "optionKey": "1",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-02",
+            "channelKey": "choice",
+            "optionKey": "2",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-02",
+            "channelKey": "choice",
+            "optionKey": "3",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-02",
+            "channelKey": "choice",
+            "optionKey": "4",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "SEC-SJT-02",
+            "channelKey": "choice",
+            "optionKey": "5",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-03",
+            "channelKey": "choice",
+            "optionKey": "1",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-03",
+            "channelKey": "choice",
+            "optionKey": "2",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "SEC-SJT-03",
+            "channelKey": "choice",
+            "optionKey": "3",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-03",
+            "channelKey": "choice",
+            "optionKey": "4",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-03",
+            "channelKey": "choice",
+            "optionKey": "5",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-04",
+            "channelKey": "choice",
+            "optionKey": "1",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "SEC-SJT-04",
+            "channelKey": "choice",
+            "optionKey": "2",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-04",
+            "channelKey": "choice",
+            "optionKey": "3",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-04",
+            "channelKey": "choice",
+            "optionKey": "4",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-04",
+            "channelKey": "choice",
+            "optionKey": "5",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-05",
+            "channelKey": "choice",
+            "optionKey": "1",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-05",
+            "channelKey": "choice",
+            "optionKey": "2",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-05",
+            "channelKey": "choice",
+            "optionKey": "3",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-05",
+            "channelKey": "choice",
+            "optionKey": "4",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "SEC-SJT-05",
+            "channelKey": "choice",
+            "optionKey": "5",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-06",
+            "channelKey": "choice",
+            "optionKey": "1",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-06",
+            "channelKey": "choice",
+            "optionKey": "2",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-06",
+            "channelKey": "choice",
+            "optionKey": "3",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "SEC-SJT-06",
+            "channelKey": "choice",
+            "optionKey": "4",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-06",
+            "channelKey": "choice",
+            "optionKey": "5",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-07",
+            "channelKey": "choice",
+            "optionKey": "1",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-07",
+            "channelKey": "choice",
+            "optionKey": "2",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-07",
+            "channelKey": "choice",
+            "optionKey": "3",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "SEC-SJT-07",
+            "channelKey": "choice",
+            "optionKey": "4",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-07",
+            "channelKey": "choice",
+            "optionKey": "5",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-08",
+            "channelKey": "choice",
+            "optionKey": "1",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-08",
+            "channelKey": "choice",
+            "optionKey": "2",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-08",
+            "channelKey": "choice",
+            "optionKey": "3",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "SEC-SJT-08",
+            "channelKey": "choice",
+            "optionKey": "4",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-08",
+            "channelKey": "choice",
+            "optionKey": "5",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-09",
+            "channelKey": "choice",
+            "optionKey": "1",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-09",
+            "channelKey": "choice",
+            "optionKey": "2",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "SEC-SJT-09",
+            "channelKey": "choice",
+            "optionKey": "3",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-09",
+            "channelKey": "choice",
+            "optionKey": "4",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-09",
+            "channelKey": "choice",
+            "optionKey": "5",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-10",
+            "channelKey": "choice",
+            "optionKey": "1",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-10",
+            "channelKey": "choice",
+            "optionKey": "2",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-10",
+            "channelKey": "choice",
+            "optionKey": "3",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 1
+          },
+          {
+            "sceneKey": "SEC-SJT-10",
+            "channelKey": "choice",
+            "optionKey": "4",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          },
+          {
+            "sceneKey": "SEC-SJT-10",
+            "channelKey": "choice",
+            "optionKey": "5",
+            "metricKey": "sec-sjt-raw-total",
+            "contribution": 0
+          }
+        ]
+      },
+      "choiceScores": [],
+      "publishedMetrics": [
+        {
+          "key": "sec-sjt-raw-total",
+          "label": "SEC-SJT正式题原始总分",
+          "construct": "sec-sjt-key-match",
+          "channelKey": "choice",
+          "direction": "descriptive",
+          "role": "primary",
+          "displayPrecision": 0
+        }
+      ]
+    },
+    "report": {
+      "reportVersion": "sec-sjt-descriptive-1",
+      "primaryMetricKeys": [
+        "sec-sjt-raw-total"
+      ],
+      "metricOrder": [
+        "sec-sjt-raw-total"
+      ],
+      "interpretations": [
+        {
+          "metricKey": "sec-sjt-raw-total",
+          "headline": "仅在10正式题全部有效作答时计算",
+          "summary": "数值为正式题中与原作者key匹配的题数，范围0–10；不是健康、能力等级或道德优劣。若显示“—”，表示本次不计算总分，而不是0分。",
+          "bands": [],
+          "guidance": []
+        }
+      ],
+      "limitations": [
+        "原版在德国 15 岁 0 个月至 24 岁 11 个月、有（亚）临床认知或心理障碍、尤其处于学习障碍支持及职业准备情境的青年中开发和常模化。便利样本为 306 人，内部一致性 α = .65，信度有限。本中文工作初译没有中国 K12 常模或本地效度证据。",
+        "不套用德国百分位，不使用原版 ≤5 分建议生成中文筛查结论，也不提供“正常／异常”“健康／不健康”等自动标签。",
+        "原适用人群年龄15岁0个月至24岁11个月，具有（亚）临床认知或心理障碍，特别是学习障碍支持/职业准备人群，不泛称普通青年或中国K12验证。",
+        "独立练习不计分；唯一原始总分0–10只计10正式题与原key的匹配数，不是健康、人格、现实行为或道德优劣程度。",
+        "任一正式题缺答则唯一总分null，不填0、不插补、不折算。有效但未匹配原key的回答记0，不与缺答混淆。",
+        "平台说明（新增，不是原作者指导语）：可以留空或退出；任一正式题缺答，本次不计算总分。界面的“可选”表示允许留空，不表示少答仍可评分。练习必须选择一项以熟悉操作，但不计分，没有练习答案key。原纸本每页2题，本数字草案每页1题，是分页改编，不声称与原纸本等同。无硬性限时，可以休息；本版是未经中文验证的工作初译。"
+      ],
+      "disclaimer": "平台新增描述性说明：原版在德国 15 岁 0 个月至 24 岁 11 个月、有（亚）临床认知或心理障碍、尤其处于学习障碍支持及职业准备情境的青年中开发和常模化。便利样本为 306 人，内部一致性 α = .65，信度有限。本中文工作初译没有中国 K12 常模或本地效度证据。不套用德国百分位，不使用原版 ≤5 分建议生成中文筛查结论，也不提供“正常／异常”“健康／不健康”等自动标签。原适用人群年龄15岁0个月至24岁11个月，具有（亚）临床认知或心理障碍，特别是学习障碍支持/职业准备人群，不泛称普通青年或中国K12验证。独立练习不计分；唯一原始总分0–10只计10正式题与原key的匹配数，不是健康、人格、现实行为或道德优劣程度。任一正式题缺答则唯一总分null，不填0、不插补、不折算。有效但未匹配原key的回答记0，不与缺答混淆。平台说明（新增，不是原作者指导语）：可以留空或退出；任一正式题缺答，本次不计算总分。界面的“可选”表示允许留空，不表示少答仍可评分。练习必须选择一项以熟悉操作，但不计分，没有练习答案key。原纸本每页2题，本数字草案每页1题，是分页改编，不声称与原纸本等同。无硬性限时，可以休息；本版是未经中文验证的工作初译。原作：Daniel Wolf, Sarah Schneider, Astrid Schütz (2020), Otto-Friedrich-Universität Bamberg. https://doi.org/10.20378/irb-48863 。材料及本中文工作初译/数字改编采用CC BY-SA4.0 https://creativecommons.org/licenses/by-sa/4.0/ ，不是仓库MIT。修改：原SEC-SJT子集提取、AI辅助中文工作初译、逐题数字分页、平台留空说明及描述性报告；非原作者认可或验证的中文版，未声称人工双语审校。"
+    },
+    "referencePolicy": {
+      "type": "none"
+    }
+  },
+  "goldenCases": [
+    {
+      "name": "right",
+      "responses": [
+        {
+          "sceneKey": "SEC-SJT-PRACTICE",
+          "channelKey": "choice",
+          "responseValue": "1"
+        },
+        {
+          "sceneKey": "SEC-SJT-01",
+          "channelKey": "choice",
+          "responseValue": "3"
+        },
+        {
+          "sceneKey": "SEC-SJT-02",
+          "channelKey": "choice",
+          "responseValue": "4"
+        },
+        {
+          "sceneKey": "SEC-SJT-03",
+          "channelKey": "choice",
+          "responseValue": "2"
+        },
+        {
+          "sceneKey": "SEC-SJT-04",
+          "channelKey": "choice",
+          "responseValue": "1"
+        },
+        {
+          "sceneKey": "SEC-SJT-05",
+          "channelKey": "choice",
+          "responseValue": "4"
+        },
+        {
+          "sceneKey": "SEC-SJT-06",
+          "channelKey": "choice",
+          "responseValue": "3"
+        },
+        {
+          "sceneKey": "SEC-SJT-07",
+          "channelKey": "choice",
+          "responseValue": "3"
+        },
+        {
+          "sceneKey": "SEC-SJT-08",
+          "channelKey": "choice",
+          "responseValue": "3"
+        },
+        {
+          "sceneKey": "SEC-SJT-09",
+          "channelKey": "choice",
+          "responseValue": "2"
+        },
+        {
+          "sceneKey": "SEC-SJT-10",
+          "channelKey": "choice",
+          "responseValue": "3"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "sec-sjt-raw-total"
+        ],
+        "metrics": {
+          "sec-sjt-raw-total": 10
+        }
+      }
+    },
+    {
+      "name": "wrong",
+      "responses": [
+        {
+          "sceneKey": "SEC-SJT-PRACTICE",
+          "channelKey": "choice",
+          "responseValue": "1"
+        },
+        {
+          "sceneKey": "SEC-SJT-01",
+          "channelKey": "choice",
+          "responseValue": "4"
+        },
+        {
+          "sceneKey": "SEC-SJT-02",
+          "channelKey": "choice",
+          "responseValue": "5"
+        },
+        {
+          "sceneKey": "SEC-SJT-03",
+          "channelKey": "choice",
+          "responseValue": "3"
+        },
+        {
+          "sceneKey": "SEC-SJT-04",
+          "channelKey": "choice",
+          "responseValue": "2"
+        },
+        {
+          "sceneKey": "SEC-SJT-05",
+          "channelKey": "choice",
+          "responseValue": "5"
+        },
+        {
+          "sceneKey": "SEC-SJT-06",
+          "channelKey": "choice",
+          "responseValue": "4"
+        },
+        {
+          "sceneKey": "SEC-SJT-07",
+          "channelKey": "choice",
+          "responseValue": "4"
+        },
+        {
+          "sceneKey": "SEC-SJT-08",
+          "channelKey": "choice",
+          "responseValue": "4"
+        },
+        {
+          "sceneKey": "SEC-SJT-09",
+          "channelKey": "choice",
+          "responseValue": "3"
+        },
+        {
+          "sceneKey": "SEC-SJT-10",
+          "channelKey": "choice",
+          "responseValue": "4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "sec-sjt-raw-total"
+        ],
+        "metrics": {
+          "sec-sjt-raw-total": 0
+        }
+      }
+    },
+    {
+      "name": "mixed",
+      "responses": [
+        {
+          "sceneKey": "SEC-SJT-PRACTICE",
+          "channelKey": "choice",
+          "responseValue": "1"
+        },
+        {
+          "sceneKey": "SEC-SJT-01",
+          "channelKey": "choice",
+          "responseValue": "3"
+        },
+        {
+          "sceneKey": "SEC-SJT-02",
+          "channelKey": "choice",
+          "responseValue": "5"
+        },
+        {
+          "sceneKey": "SEC-SJT-03",
+          "channelKey": "choice",
+          "responseValue": "2"
+        },
+        {
+          "sceneKey": "SEC-SJT-04",
+          "channelKey": "choice",
+          "responseValue": "2"
+        },
+        {
+          "sceneKey": "SEC-SJT-05",
+          "channelKey": "choice",
+          "responseValue": "4"
+        },
+        {
+          "sceneKey": "SEC-SJT-06",
+          "channelKey": "choice",
+          "responseValue": "4"
+        },
+        {
+          "sceneKey": "SEC-SJT-07",
+          "channelKey": "choice",
+          "responseValue": "3"
+        },
+        {
+          "sceneKey": "SEC-SJT-08",
+          "channelKey": "choice",
+          "responseValue": "4"
+        },
+        {
+          "sceneKey": "SEC-SJT-09",
+          "channelKey": "choice",
+          "responseValue": "2"
+        },
+        {
+          "sceneKey": "SEC-SJT-10",
+          "channelKey": "choice",
+          "responseValue": "4"
+        }
+      ],
+      "expected": {
+        "quality": "interpretable",
+        "metricKeys": [
+          "sec-sjt-raw-total"
+        ],
+        "metrics": {
+          "sec-sjt-raw-total": 5
+        }
+      }
+    },
+    {
+      "name": "all-formal-missing",
+      "responses": [
+        {
+          "sceneKey": "SEC-SJT-PRACTICE",
+          "channelKey": "choice",
+          "responseValue": "1"
+        }
+      ],
+      "expected": {
+        "quality": "invalid",
+        "metricKeys": [
+          "sec-sjt-raw-total"
+        ],
+        "metrics": {
+          "sec-sjt-raw-total": null
+        }
+      }
+    }
+  ]
+}
