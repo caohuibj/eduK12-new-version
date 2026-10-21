@@ -7,6 +7,7 @@ import { getScalePackage } from '../../modules/scale/scale-package.registry'
 import {
   buildScaleLibraryReadModel,
   filterScaleLibraryEntries,
+  scaleLibraryClassificationFilterSchema,
   isScaleLibraryPublicPayloadSafe,
 } from '../../modules/scale/library/scale-library-read-model'
 
@@ -201,5 +202,36 @@ describe('Wave 0 Scale Library read model', () => {
     expect(sdqParent.source.citation).toContain('Goodman R.')
     expect(sdqParent.governance?.evidence).toHaveLength(1)
     expect(model.entries.flatMap((entry) => entry.governance?.evidence ?? [])).toHaveLength(3)
+  })
+})
+
+
+describe('discovery-only construct classification', () => {
+  it('matches primary or secondary domains and requires an exact overlap token with AND semantics', () => {
+    const base = buildWave0ReadModel().entries[0]
+    const secondary = { ...base, construct: { ...base.construct, primaryDomain: 'WELL_BEING' as const, secondaryDomains: ['SELF_REGULATION' as const], constructOverlapTags: ['attention', 'working-memory'] } }
+    const primary = { ...base, construct: { ...base.construct, primaryDomain: 'SELF_REGULATION' as const, secondaryDomains: [], constructOverlapTags: ['other'] } }
+    expect(filterScaleLibraryEntries([secondary, primary], { constructDomain: 'SELF_REGULATION' })).toEqual([secondary, primary])
+    expect(filterScaleLibraryEntries([secondary, primary], { constructDomain: 'SELF_REGULATION', overlapTag: 'attention' })).toEqual([secondary])
+    expect(filterScaleLibraryEntries([secondary, primary], { overlapTag: 'attent' })).toEqual([])
+    expect(filterScaleLibraryEntries([secondary, primary], { overlapTag: 'Attention' })).toEqual([])
+    expect(filterScaleLibraryEntries([secondary, primary], { overlapTag: 'unknown-token' })).toEqual([])
+    expect(filterScaleLibraryEntries([secondary, primary], { primaryDomain: 'SELF_REGULATION' })).toEqual([primary])
+    expect(filterScaleLibraryEntries([secondary, primary], { secondaryDomain: 'SELF_REGULATION' })).toEqual([secondary])
+    const selected = filterScaleLibraryEntries([secondary], { overlapTag: 'attention' })[0]
+    expect(selected).toBe(secondary)
+    expect(selected.identity).toBe(base.identity)
+    expect(selected.rights).toBe(base.rights)
+    expect(selected.availability).toBe(base.availability)
+  })
+
+  it('rejects invalid domain, blank/oversized tokens and repeated or nested filter values', () => {
+    for (const input of [
+      { constructDomain: 'UNKNOWN' }, { constructDomain: '' }, { constructDomain: ['WELL_BEING'] },
+      { overlapTag: '' }, { overlapTag: '  ' }, { overlapTag: 'x'.repeat(121) },
+      { overlapTag: ['attention'] }, { overlapTag: { value: 'attention' } },
+    ]) expect(scaleLibraryClassificationFilterSchema.safeParse(input).success).toBe(false)
+    expect(scaleLibraryClassificationFilterSchema.parse({ overlapTag: 'unknown-token' })).toEqual({ overlapTag: 'unknown-token' })
+    expect(scaleLibraryClassificationFilterSchema.parse({})).toEqual({})
   })
 })

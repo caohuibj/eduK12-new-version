@@ -3,6 +3,7 @@ import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, BookOpen, CheckCircle, Clock, ExternalLink, FileText, Filter, Lock, Play, ShieldAlert } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
+import { ScaleLibraryClassification, SCALE_CONSTRUCT_DOMAIN_OPTIONS as DOMAIN_OPTIONS } from '../components/scale-governance/ScaleLibraryClassification'
 import {
   getScaleLibrary,
   getScaleLibraryEntry,
@@ -11,17 +12,6 @@ import {
   type ScaleLibraryFilters,
   type ScaleLibraryListResponse,
 } from '../api/scaleLibrary'
-
-const DOMAIN_OPTIONS = [
-  ['WELL_BEING', '身心健康'],
-  ['EXECUTIVE_FUNCTION', '执行功能'],
-  ['SELF_REGULATION', '自我调节'],
-  ['SELF_EFFICACY', '自我效能'],
-  ['SOCIAL_EMOTIONAL', '社会情绪'],
-  ['BEHAVIORAL_DIFFICULTIES', '行为与困难'],
-  ['PARENT_OBSERVATION', '家长观察'],
-  ['TEACHER_OBSERVATION', '教师观察'],
-] as const
 
 const RESPONDENT_OPTIONS = [
   ['SELF', '自评'],
@@ -51,11 +41,12 @@ const respondentLabel = (value: string): string => RESPONDENT_OPTIONS.find(([key
 const domainLabel = (value: string): string => DOMAIN_OPTIONS.find(([key]) => key === value)?.[1] ?? value
 const filterLabels: Partial<Record<keyof ScaleLibraryFilters, string>> = {
   keyword: '关键词', respondent: '作答者', availability: '可用性', primaryDomain: '主要构念',
+  constructDomain: '构念分类', overlapTag: '交叉标签',
   locale: '内容语言', intendedUse: '用途', minAge: '年龄下界', maxAge: '年龄上界', minGrade: '年级下界', maxGrade: '年级上界',
 }
 const filterValueLabel = (key: string, value: string | number): string => {
   if (key === 'respondent') return respondentLabel(String(value))
-  if (key === 'primaryDomain') return domainLabel(String(value))
+  if (key === 'primaryDomain' || key === 'constructDomain') return domainLabel(String(value))
   if (key === 'availability') return statusLabel[value as ScaleLibraryAvailabilityStatus] ?? String(value)
   if (key === 'intendedUse') return USE_OPTIONS.find(([option]) => option === value)?.[1] ?? String(value)
   if (key === 'locale' && value === 'zh-CN') return '中文（简体）'
@@ -105,8 +96,8 @@ const ScaleCard: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => (
     </div>
 
     <p className="mt-4 text-sm leading-6 text-gray-700">{entry.construct.constructDefinition}</p>
+    <ScaleLibraryClassification construct={entry.construct} />
     <div className="mt-4 flex flex-wrap gap-2 text-sm text-gray-600">
-      <span className="rounded bg-gray-100 px-2 py-1">{domainLabel(entry.construct.primaryDomain)}</span>
       {entry.applicability.respondentTypes.map((respondent) => (
         <span key={respondent} className="rounded bg-gray-100 px-2 py-1">{respondentLabel(respondent)}</span>
       ))}
@@ -183,11 +174,15 @@ const FilterPanel: React.FC<{
         <summary className="min-h-11 cursor-pointer py-3 text-sm font-medium text-gray-700">更多筛选</summary>
         <div className="mt-2 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <label className="text-sm text-gray-700">
-          主要构念
-          <select value={filters.primaryDomain ?? ''} onChange={(event) => update('primaryDomain', event.target.value)} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2">
+          构念分类（主要或次要）
+          <select value={filters.constructDomain ?? ''} onChange={(event) => update('constructDomain', event.target.value)} className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2">
             <option value="">全部</option>
             {DOMAIN_OPTIONS.map(([key, label]) => <option key={key} value={key}>{label}</option>)}
           </select>
+        </label>
+        <label className="text-sm text-gray-700">
+          交叉标签（精确匹配）
+          <input maxLength={120} value={filters.overlapTag ?? ''} onChange={(event) => update('overlapTag', event.target.value)} placeholder="输入目录中的完整标签" className="mt-1 w-full rounded-md border border-gray-300 px-3 py-2" />
         </label>
         <label className="text-sm text-gray-700">
           内容语言
@@ -275,6 +270,7 @@ const DetailPage: React.FC<{ entry: ScaleLibraryEntry }> = ({ entry }) => {
       <div className="mt-6 grid gap-5 lg:grid-cols-2">
         <Section title="测量内容">
           <p>{entry.construct.constructDefinition}</p>
+          <ScaleLibraryClassification construct={entry.construct} />
           <dl className="mt-3 grid gap-2 sm:grid-cols-2">
             <div><dt className="text-gray-500">主要构念</dt><dd>{domainLabel(entry.construct.primaryDomain)}</dd></div>
             <div><dt className="text-gray-500">构念层级</dt><dd>{entry.construct.constructLevel}</dd></div>
@@ -365,6 +361,7 @@ const ScaleLibrary: React.FC = () => {
     const request = ++loadRequest.current
     setLoading(true)
     setError(null)
+    setDetail(null)
     if (isDetail && instrumentKey && instrumentVersion) {
       getScaleLibraryEntry(instrumentKey, instrumentVersion, {
         locale: appliedFilters.locale,
@@ -396,7 +393,12 @@ const ScaleLibrary: React.FC = () => {
 
   const entries = listData?.entries ?? []
   const activeFilters = Object.entries(appliedFilters).filter(([, value]) => value !== undefined && value !== '')
-  const clearFilters = () => { setFilters({}); setAppliedFilters({}) }
+  const applyFilters = (next: ScaleLibraryFilters) => {
+    loadRequest.current += 1
+    setDetail(null); setListData(null); setLoading(true); setError(null)
+    setAppliedFilters({ ...next })
+  }
+  const clearFilters = () => { setFilters({}); applyFilters({}) }
   return (
     <div className="hui-scale-library">
       <div className="mb-6">
@@ -406,14 +408,14 @@ const ScaleLibrary: React.FC = () => {
       <FilterPanel
         filters={filters}
         onChange={setFilters}
-        onApply={() => setAppliedFilters(filters)}
+        onApply={() => applyFilters(filters)}
         onClear={clearFilters}
       />
       {activeFilters.length > 0 && <div className="mb-4 flex flex-wrap gap-2" aria-label="已应用筛选">
         {activeFilters.map(([key, value]) => <button key={key} type="button"
           className="min-h-11 max-w-full break-words rounded-lg border border-slate-300 bg-white px-3 py-2 text-left text-sm text-slate-700"
           aria-label={`移除${filterLabels[key as keyof ScaleLibraryFilters] ?? key}：${filterValueLabel(key, value!)}`}
-          onClick={() => { setFilters({ ...filters, [key]: undefined }); setAppliedFilters({ ...appliedFilters, [key]: undefined }) }}>
+          onClick={() => { setFilters({ ...filters, [key]: undefined }); applyFilters({ ...appliedFilters, [key]: undefined }) }}>
           {filterLabels[key as keyof ScaleLibraryFilters] ?? key}：{filterValueLabel(key, value!)} <span aria-hidden="true">×</span>
         </button>)}
       </div>}

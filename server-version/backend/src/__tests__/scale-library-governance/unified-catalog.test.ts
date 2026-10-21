@@ -1,4 +1,13 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi, beforeEach } from 'vitest'
+vi.mock('../../config/database', () => ({ prisma: { $transaction: (callback: (tx: unknown) => unknown) => callback({}) } }))
+vi.mock('../../modules/scale-library-governance/authority', () => ({ libraryActor: vi.fn().mockResolvedValue({ systemAdmin: true }) }))
+vi.mock('../../modules/scale/library/standard-catalog-reader', () => ({ readStandardScaleLibraryForActor: vi.fn() }))
+vi.mock('../../modules/scale-library-governance/service', () => ({ listEntries: vi.fn() }))
+import { readStandardScaleLibraryForActor } from '../../modules/scale/library/standard-catalog-reader'
+import { listEntries } from '../../modules/scale-library-governance/service'
+import { readUnifiedCatalog, readUnifiedStandardCatalogEntry } from '../../modules/scale-library-governance/unified-catalog'
+import { scaleLibraryController } from '../../controllers/scaleLibraryController'
+import type { Request, Response } from 'express'
 import { buildUnifiedScaleLibraryReadModel } from '../../modules/scale/library/catalog-only-read-model'
 import {
   authoredCatalogRecord, combinePlatformCatalog, platformCatalogPagePlan, standardCatalogRecord,
@@ -98,5 +107,59 @@ describe('bounded unified catalog pagination', () => {
     const base = buildUnifiedScaleLibraryReadModel().entries[0]
     expect(platformCatalogPagePlan([base], 1, 1)).toMatchObject({ authoredOffset: 0, authoredLimit: 0, standardHasMore: false })
     expect(platformCatalogPagePlan([base], 2, 1)).toMatchObject({ standardPage: [], authoredOffset: 0, authoredLimit: 1 })
+  })
+})
+
+
+describe('classification across the complete actor-visible catalog', () => {
+  beforeEach(() => {
+    vi.mocked(listEntries).mockReset()
+    vi.mocked(readStandardScaleLibraryForActor).mockReset()
+  })
+
+  it.each(['TRAINING', 'SURVEY'] as const)('filters before pagination without fetching unknown authored classification for %s', async product => {
+    const model = buildUnifiedScaleLibraryReadModel()
+    const base = model.entries[0]
+    const entries = ['a', 'b', 'c', 'd'].map((key, index) => ({
+      ...base, identity: { ...base.identity, instrumentKey: key },
+      construct: { ...base.construct, primaryDomain: 'WELL_BEING' as const, secondaryDomains: ['SELF_REGULATION' as const], constructOverlapTags: index ? ['attention'] : [] },
+    }))
+    vi.mocked(readStandardScaleLibraryForActor).mockResolvedValue({ ...model, entries })
+    const first = await readUnifiedCatalog('actor', product, { page: 1, pageSize: 2, constructDomain: 'SELF_REGULATION', overlapTag: 'attention' })
+    expect(first.list.map(row => row.title)).toHaveLength(2)
+    expect(first.list.map(row => row.exactVersion)).toEqual(entries.slice(1, 3).map(row => ({ origin: 'STANDARD_REGISTRY', instrumentKey: row.identity.instrumentKey, instrumentVersion: row.identity.instrumentVersion })))
+    expect(first.hasMore).toBe(true)
+    const second = await readUnifiedCatalog('actor', product, { page: 2, pageSize: 2, overlapTag: 'attention' })
+    expect(second.list).toHaveLength(1)
+    expect(second.hasMore).toBe(false)
+    const empty = await readUnifiedCatalog('actor', product, { page: 1, pageSize: 2, overlapTag: 'unknown-token' })
+    expect(empty.list).toEqual([])
+    expect(empty.hasMore).toBe(false)
+    expect(listEntries).not.toHaveBeenCalled()
+    const detail = await readUnifiedStandardCatalogEntry('actor', product, entries[1].identity.instrumentKey, entries[1].identity.instrumentVersion)
+    expect(detail.entry).toEqual(first.list[0])
+    expect(detail.entry.authorization.rights).toEqual(base.rights)
+
+    vi.mocked(listEntries).mockResolvedValue({ list: [authored()], hasMore: false })
+    const reset = await readUnifiedCatalog('actor', product, { page: 3, pageSize: 2 })
+    expect(listEntries).toHaveBeenCalledWith('actor', undefined, { offset: 0, limit: 2 })
+    expect(reset.list[0].origin).toBe('AUTHORED')
+  })
+
+  it('rejects invalid classifications before reading either source', async () => {
+    for (const filter of [{ constructDomain: 'UNKNOWN' }, { overlapTag: '' }, { overlapTag: 'x'.repeat(121) }]) {
+      await expect(readUnifiedCatalog('actor', 'TRAINING', { page: 1, pageSize: 2, ...filter } as never)).rejects.toMatchObject({ statusCode: 400 })
+    }
+    expect(readStandardScaleLibraryForActor).not.toHaveBeenCalled()
+    expect(listEntries).not.toHaveBeenCalled()
+  })
+
+  it('returns HTTP 400 for malformed legacy discovery filter queries rather than silently ignoring them', async () => {
+    for (const query of [{ constructDomain: 'UNKNOWN' }, { constructDomain: ['WELL_BEING'] }, { overlapTag: '' }, { overlapTag: ['attention'] }, { overlapTag: 'x'.repeat(121) }]) {
+      const res = { status: vi.fn().mockReturnThis(), json: vi.fn() }
+      await scaleLibraryController.list({ user: { userId: 'actor', role: 'ADMIN' }, query } as unknown as Request, res as unknown as Response)
+      expect(res.status).toHaveBeenCalledWith(400)
+    }
+    expect(readStandardScaleLibraryForActor).not.toHaveBeenCalled()
   })
 })

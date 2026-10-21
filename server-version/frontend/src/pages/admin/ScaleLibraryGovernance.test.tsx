@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ScaleLibraryGovernance from './ScaleLibraryGovernance'
@@ -53,9 +53,55 @@ describe('Scale library system review versus entrance distribution', () => {
     expect(api.catalogDetail).toHaveBeenCalledWith(standard)
     fireEvent.click(screen.getByRole('button', { name: '目录下一页' }))
     await screen.findByText('后续目录记录 · 标准量表（只读）')
-    expect(api.catalog).toHaveBeenCalledWith(2)
+    expect(api.catalog).toHaveBeenCalledWith(2, 25, {})
     expect(screen.getByRole('button', { name: '目录下一页' })).toBeDisabled()
     expect(screen.getByRole('button', { name: '目录上一页' })).toBeEnabled()
+  })
+  it('resets classification filters to page one and ignores superseded list and exact-detail responses', async () => {
+    const standard = { catalogId: 'standard:key:1', origin: 'STANDARD_REGISTRY', title: '跨构念标准原版', exactVersion: { origin: 'STANDARD_REGISTRY', instrumentKey: 'key', instrumentVersion: '1' }, availability: { status: 'RESTRICTED', reasons: [] }, standard: { construct: { primaryDomain: 'WELL_BEING', secondaryDomains: ['RESILIENCE', 'WELL_BEING', 'RESILIENCE'], constructDefinition: '原版构念', constructLevel: 'SPECIFIC_CONSTRUCT', constructOverlapTags: ['stress', 'stress'] }, rights: { status: 'APPROVED' }, evidence: { coverageText: '原科学记录' } } }
+    let resolveOldList!: (value: unknown) => void
+    let resolveOldDetail!: (value: unknown) => void
+    api.catalog.mockImplementation((page: number, _pageSize: number, filters: { overlapTag?: string }) => {
+      if (filters.overlapTag === 'stale') return new Promise(resolve => { resolveOldList = resolve })
+      return Promise.resolve({ schemaVersion: 1, page, pageSize: 25, hasMore: !filters.overlapTag && page === 1, list: filters.overlapTag === 'current' ? [] : [standard] })
+    })
+    api.catalogDetail.mockImplementation(() => new Promise(resolve => { resolveOldDetail = resolve }))
+    render(<MemoryRouter><ScaleLibraryGovernance /></MemoryRouter>)
+    await screen.findByText('跨构念标准原版 · 标准量表（只读）')
+    const classifications = within(screen.getByRole('group', { name: '构念与交叉标签' }))
+    expect(classifications.getAllByLabelText('构念：身心健康')).toHaveLength(1)
+    expect(classifications.getAllByLabelText('构念：心理韧性')).toHaveLength(1)
+    expect(classifications.getAllByLabelText('交叉标签：stress')).toHaveLength(1)
+    fireEvent.click(screen.getByRole('button', { name: '目录下一页' }))
+    await waitFor(() => expect(api.catalog).toHaveBeenLastCalledWith(2, 25, {}))
+    await screen.findByText('跨构念标准原版 · 标准量表（只读）')
+    fireEvent.click(screen.getByRole('button', { name: '查看标准精确版本详情' }))
+    await waitFor(() => expect(api.catalogDetail).toHaveBeenCalledWith(standard))
+    fireEvent.change(screen.getByLabelText('构念分类（主要或次要）'), { target: { value: 'RESILIENCE' } })
+    const overlap = screen.getByLabelText('交叉标签（精确匹配）')
+    expect(overlap).toHaveAttribute('maxlength', '120')
+    fireEvent.change(overlap, { target: { value: 'stale' } })
+    fireEvent.click(screen.getByRole('button', { name: '应用分类筛选' }))
+    await waitFor(() => expect(api.catalog).toHaveBeenLastCalledWith(1, 25, { constructDomain: 'RESILIENCE', overlapTag: 'stale' }))
+    expect(screen.getByText('目录第 1 页')).toBeInTheDocument()
+    expect(screen.queryByText('跨构念标准原版 · 标准量表（只读）')).not.toBeInTheDocument()
+    expect(screen.queryByText('正在读取精确目录详情…')).not.toBeInTheDocument()
+    fireEvent.change(overlap, { target: { value: 'current' } })
+    fireEvent.click(screen.getByRole('button', { name: '应用分类筛选' }))
+    await screen.findByText('本页没有可见量表。')
+    expect(api.catalog).toHaveBeenLastCalledWith(1, 25, { constructDomain: 'RESILIENCE', overlapTag: 'current' })
+    await act(async () => {
+      resolveOldList({ schemaVersion: 1, page: 1, pageSize: 25, hasMore: true, list: [standard] })
+      resolveOldDetail({ entry: standard })
+    })
+    expect(screen.queryByText('跨构念标准原版 · 标准量表（只读）')).not.toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: '公共量表精确版本详情' })).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '目录下一页' })).toBeDisabled()
+    fireEvent.click(screen.getByRole('button', { name: '清除分类筛选' }))
+    await waitFor(() => expect(api.catalog).toHaveBeenLastCalledWith(1, 25, {}))
+    await screen.findByText('跨构念标准原版 · 标准量表（只读）')
+    expect(screen.getByLabelText('构念分类（主要或次要）')).toHaveValue('')
+    expect(overlap).toHaveValue('')
   })
   it('requires inspecting frozen content before approval', async () => {
     api.capabilities.mockResolvedValue({ systemAdmin: true, canReview: true, reviewGrants: [], distributionGrants: [] })
