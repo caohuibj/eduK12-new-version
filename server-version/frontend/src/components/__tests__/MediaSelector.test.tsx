@@ -3,11 +3,22 @@ import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import MediaSelector from '../MediaSelector'
 
-const { get, post } = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn() }))
+const { get, post,training } = vi.hoisted(() => ({ get: vi.fn(), post: vi.fn(),training:{enabled:false} }))
+vi.mock('../../training/context',()=>({isTrainingHost:()=>training.enabled}))
 vi.mock('../../api/client', () => ({ default: { get }, ensureCsrfToken: vi.fn(), sessionAxios: { post } }))
 
 describe('MediaSelector', () => {
-  beforeEach(() => { get.mockReset(); post.mockReset(); get.mockResolvedValue({ code: 0, data: { list: [] } }) })
+  beforeEach(() => { training.enabled=false;get.mockReset(); post.mockReset(); get.mockResolvedValue({ code: 0, data: { list: [] } }) })
+
+  it('selects an explicitly authorized Training media asset with its immutable file identity',async()=>{
+    training.enabled=true
+    get.mockResolvedValue({code:0,data:{list:[{id:'granted-file',assetId:'granted-file',name:'授权视频',kind:'video',size:1024,url:'/clip.mp4',source:'granted'}],hasMore:false}})
+    const onSelect=vi.fn(),user=userEvent.setup()
+    render(<MediaSelector isOpen onClose={vi.fn()} onSelect={onSelect} type="video"/>)
+    await user.click(await screen.findByRole('button',{name:/^授权视频/}));await user.click(screen.getByRole('button',{name:'选择'}))
+    expect(get).toHaveBeenCalledWith('/training-workspace/media',{params:{page:1,pageSize:40,keyword:'',kind:'video'}})
+    expect(onSelect).toHaveBeenCalledWith(expect.objectContaining({assetId:'granted-file',url:'/clip.mp4',title:'授权视频'}))
+  })
 
   it('selects a library record with the keyboard and preserves its asset identity', async () => {
     get.mockResolvedValue({ code: 0, data: { list: [{ id: 'video-1', title: 'Sample video', fileSize: 1024, processedAssetId: 'asset-1', url: '/clip.mp4' }] } })

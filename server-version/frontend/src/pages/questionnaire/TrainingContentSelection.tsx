@@ -1,16 +1,12 @@
+import {selectionKey,record,validSelection,savedPending,type ReferenceSelection,type ReportSelection,type Kind,type Pending} from './trainingContentRecovery'
 import { useEffect, useRef, useState } from 'react'
 import { sessionFetch } from '../../api/client'
 import { usePageEditorGuard } from '../../components/shared-ui/usePageEditorGuard'
 
 type Choice = { releaseId: string; entryKey: string; version: string; metricKey: string; referenceKind: string; scope: 'PRIVATE' | 'PLATFORM'; population: { description: string }; limitations: string[] }
 type Unit = { itemId: string; family: string; measurementReleaseId: string; choices: Choice[]; reports: Array<{ releaseId: string; version: string; title: string | null; audience: string }> }
-type ReferenceSelection = { schemaVersion: 1; units: Array<{ itemId: string; choices: Array<{ releaseId: string; entryKey: string; priority: number }> }> }
-type ReportSelection = { schemaVersion: 1; units: Array<{ itemId: string; reportReleaseId: string }> }
-type Kind = 'reference' | 'report'
-type Selection = ReferenceSelection | ReportSelection | null
 type Risk = { dirty: boolean; pending: boolean; busy: boolean }
 type Detail = { id: string; revision: number; trainingReferenceSelectionDraft?: ReferenceSelection | null; trainingReportSelectionDraft?: ReportSelection | null; [key: string]: unknown }
-type Pending = { actorId: string; compositeId: string; kind: Kind; revision: number; selection: Selection; uncertain: boolean }
 type Props = { actorId: string; detail: Detail; disabled?: boolean; recoveryDisabled?: boolean; onSaved: (detail: Detail) => void; onRiskChange: (risk: Risk) => void }
 // JSONB may reorder object keys, while selection array order remains exact. This is comparison, not a client authority hash.
 function ordered(value: unknown): unknown {
@@ -20,29 +16,7 @@ function ordered(value: unknown): unknown {
 }
 const equal = (a: unknown, b: unknown) => JSON.stringify(ordered(a ?? null)) === JSON.stringify(ordered(b ?? null))
 const field = (kind: Kind) => kind === 'reference' ? 'trainingReferenceSelectionDraft' : 'trainingReportSelectionDraft'
-const selectionKey = (releaseId: string, entryKey: string) => JSON.stringify([releaseId, entryKey])
 const emptyRisk: Risk = { dirty: false, pending: false, busy: false }
-const record = (value: unknown): value is Record<string, any> => !!value && typeof value === 'object' && !Array.isArray(value)
-function validSelection(value: unknown, kind: Kind): value is Selection {
-  if (value === null) return true
-  if (!record(value) || value.schemaVersion !== 1 || !Array.isArray(value.units) || value.units.length > 1000) return false
-  const items = new Set<string>()
-  let count = 0
-  return value.units.every((unit: unknown) => {
-    if (!record(unit) || typeof unit.itemId !== 'string' || !unit.itemId || items.has(unit.itemId)) return false
-    items.add(unit.itemId)
-    if (kind === 'report') return typeof unit.reportReleaseId === 'string' && !!unit.reportReleaseId
-    if (!Array.isArray(unit.choices) || unit.choices.length > 100 || (count += unit.choices.length) > 1000) return false
-    const choices = new Set<string>()
-    return unit.choices.every((choice: unknown) => {
-      if (!record(choice) || typeof choice.releaseId !== 'string' || !choice.releaseId || typeof choice.entryKey !== 'string' || !choice.entryKey || !Number.isSafeInteger(choice.priority)) return false
-      const key = selectionKey(choice.releaseId, choice.entryKey)
-      if (choices.has(key)) return false
-      choices.add(key)
-      return true
-    })
-  })
-}
 function validDetail(value: unknown, id: string): value is Detail {
   // These fields are omitted for actors without current ownership. Missing is not a verified clear.
   return record(value) && value.id === id && Number.isSafeInteger(value.revision) && value.revision >= 0
@@ -60,14 +34,6 @@ function validUnits(value: unknown): value is { schemaVersion: 1; units: Unit[] 
       && Array.isArray(choice.limitations) && choice.limitations.every((text: unknown) => typeof text === 'string'))
       && unit.reports.every((report: unknown) => record(report) && ['releaseId', 'version', 'audience'].every(key => typeof report[key] === 'string') && (report.title === null || typeof report.title === 'string'))
   })
-}
-function savedPending(key: string, actorId: string, compositeId: string): Pending | null {
-  try {
-    const value: unknown = JSON.parse(sessionStorage.getItem(key) || 'null')
-    return record(value) && value.actorId === actorId && value.compositeId === compositeId && ['reference', 'report'].includes(value.kind)
-      && Number.isSafeInteger(value.revision) && value.revision >= 0 && validSelection(value.selection, value.kind)
-      ? { actorId, compositeId, kind: value.kind, revision: value.revision, selection: value.selection, uncertain: true } : null
-  } catch { return null }
 }
 function Guard({ risk }: { risk: Risk }) {
   return usePageEditorGuard(null, { dirty: risk.dirty, busy: risk.pending || risk.busy }).confirmation
@@ -189,7 +155,7 @@ function SelectionWorkspace({ actorId, detail, disabled = false, recoveryDisable
   })
   const unavailable = (report?.units ?? []).some(saved => !units.some(unit => unit.itemId === saved.itemId && unit.reports.some(choice => choice.releaseId === saved.reportReleaseId)))
     || (reference?.units ?? []).some(saved => saved.choices.some(choice => !units.some(unit => unit.itemId === saved.itemId && unit.choices.some(available => available.releaseId === choice.releaseId && available.entryKey === choice.entryKey))))
-  return <section aria-label="投放报告与参考选择" className="my-5 rounded border p-4 space-y-3">
+  return <section id="tool-references" aria-label="投放报告与参考选择" className="my-5 rounded border p-4 space-y-3">
     {(dirty || pending || busy) && <Guard risk={risk} />}<h2 className="text-xl font-semibold">投放报告与参考选择</h2>
     <p>只选择已发布且与当前测量版本兼容的内容。参考候选在投放发布时固定，开始测量时按冻结上下文匹配；缺少必要信息或匹配冲突时不输出比较。</p>
     {error && <p role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}

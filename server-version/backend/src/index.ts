@@ -60,6 +60,7 @@ import { effectiveRuntimeResourceConfig } from './config/runtimeResources'
 // 导入路由
 import legacyArchiveRoutes from './modules/legacy-archive/routes'
 import authRoutes from './routes/auth'
+import trainingWorkspaceRoutes from './routes/trainingWorkspace'
 import campusAuthRoutes from './modules/campus/auth.routes'
 import huiteacherAuthRoutes from './modules/huiteacher/auth.routes'
 import huiteacherAdmissionRoutes from './modules/huiteacher/admission.routes'
@@ -362,6 +363,7 @@ app.use('/api/organization-invitations', organizationInvitationsRouter)
 app.use('/api/organizations', organizationRoutes)
 app.use('/api/my-assessments', assessmentInboxRoutes)
 app.use('/api/admin/material-grants', authenticate, requireAdmin, materialGrantRoutes)
+app.use('/api/training-workspace', trainingWorkspaceRoutes)
 app.use('/api/admin/instrument-authorizations', authenticate, requireAdmin, instrumentAuthorizationRoutes)
 app.use('/api/courses', courseRoutes)
 app.use('/api/assignments', assignmentRoutes)

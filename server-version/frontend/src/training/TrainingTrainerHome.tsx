@@ -2,11 +2,9 @@ import TrainingCourseCode from './TrainingCourseCode'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { ArrowRight, ChevronDown, ChevronUp, Plus } from 'lucide-react'
 import { Link } from 'react-router-dom'
-import { useAuth } from '../contexts/AuthContext'
 import apiClient from '../api/client'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import type { Course } from '../types'
-import FormalReferenceStudio from './FormalReferenceStudio'
 import './training-trainer-home.css'
 
 const PAGE_SIZES = [2, 6, 10]
@@ -58,7 +56,6 @@ function CourseDescription({ description, id }: { description: string; id: strin
 
 /** The course is the training workspace. Resources and reports live inside it. */
 export default function TrainingTrainerHome() {
-  const { user } = useAuth()
   const [courses, setCourses] = useState<Course[]>([])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState('')
@@ -67,6 +64,8 @@ export default function TrainingTrainerHome() {
   const [mutationNotice, setMutationNotice] = useState('')
   const [createOpen, setCreateOpen] = useState(false)
   const [title, setTitle] = useState('')
+  const [keyword,setKeyword] = useState('')
+  const [search,setSearch] = useState('')
   const [description, setDescription] = useState('')
   const [createError, setCreateError] = useState('')
   const [creating, setCreating] = useState(false)
@@ -77,7 +76,7 @@ export default function TrainingTrainerHome() {
     setLoading(true)
     setLoadError('')
     void apiClient.get<{ list: Course[]; total?: number }>(
-      `/courses?status=${query.status}&page=${query.page}&pageSize=${query.pageSize}&excludeLibrary=true`,
+      `/courses?status=${query.status}&page=${query.page}&pageSize=${query.pageSize}&excludeLibrary=true${keyword?'&keyword='+encodeURIComponent(keyword):''}`,
     ).then(result => {
       if (!active) return
       if (result.code !== 0 || !Array.isArray(result.data?.list)) throw new Error(result.message || '无法读取课程')
@@ -97,7 +96,7 @@ export default function TrainingTrainerHome() {
       if (active) setLoading(false)
     })
     return () => { active = false }
-  }, [query])
+  }, [query,keyword])
 
   const pageCount = Math.max(1, Math.ceil(total / query.pageSize))
   const pageNumbers = [...new Set([1, query.page - 1, query.page, query.page + 1, pageCount])]
@@ -138,6 +137,7 @@ export default function TrainingTrainerHome() {
       </div>
       <button type="button" className="training-action" onClick={() => { setCreateError(''); setCreateOpen(true) }}><Plus size={18} aria-hidden="true" />创建课程</button>
     </header>
+    <form className="training-library-toolbar" role="search" onSubmit={event=>{event.preventDefault();setKeyword(search.trim());setQuery(current=>({...current,page:1}))}}><input aria-label="检索课程" placeholder="搜索课程名称、介绍或课程码" value={search} onChange={event=>setSearch(event.target.value)}/><button type="submit">检索</button></form>
     {mutationNotice && <p className="training-message" role="status">{mutationNotice}</p>}
     <section className="training-course-section" aria-labelledby="trainer-courses">
       <div className="training-trainer-course-controls">
@@ -196,7 +196,6 @@ export default function TrainingTrainerHome() {
         </div>
       </nav>}
     </section>
-    {user?.id&&<FormalReferenceStudio key={user.id+':formal-governance'} actorId={user.id}/>}
     {createOpen && <ModalSurface open={createOpen} onClose={() => { if (!creating) setCreateOpen(false) }} initialFocusRef={titleRef} className="training-dialog-backdrop">
       <section role="dialog" aria-modal="true" aria-labelledby="training-create-title" className="training-dialog" tabIndex={-1}>
         <h2 id="training-create-title">创建课程</h2>

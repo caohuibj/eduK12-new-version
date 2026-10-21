@@ -7,6 +7,7 @@ import { FormChoiceEditor } from './FormChoiceEditor'
 import { choiceError, emptyChoices, filledChoices, type ChoiceDraft } from './formChoices'
 import { TrainingContentSelection } from './TrainingContentSelection'
 import { TrainingReportStudio } from './TrainingReportStudio'
+import { hasPendingTrainingToolRequest } from '../../training/pendingToolRequests'
 import { TypedFormExportActions } from '../../modules/composite/TypedFormExportActions'
 import { StructuredFormConstraints } from '../../modules/assessment-core/form/StructuredFormConstraints'
 import { BasicFormConstraints } from '../../modules/assessment-core/form/BasicFormConstraints'
@@ -321,6 +322,7 @@ export function QuestionnaireProductEdit() {
   const reportRisk = useRef({dirty:false,pending:false,busy:false})
   const [reportState,setReportState]=useState(reportRisk.current)
   const reportBlocked=reportState.dirty||reportState.pending||reportState.busy
+  const externalToolPending=Boolean(trainingDesign&&!location.pathname.startsWith('/toolkit/compositions/')&&user?.id&&hasPendingTrainingToolRequest(user.id,id))
   const reportRiskChanged = React.useCallback((risk: {dirty:boolean;pending:boolean;busy:boolean}) => { reportRisk.current = risk;setReportState(risk) }, [])
   const [measurementNotice,setMeasurementNotice]=useState('')
   const measurementRecoveryKey='training-cognitive-publication:'+JSON.stringify([user?.id??'',id])
@@ -400,6 +402,7 @@ export function QuestionnaireProductEdit() {
     return () => { active = false }
   }, [id, preselectedScaleId, preselectedCourseId, user?.id])
   const action = async (fn: () => Promise<void>, measurementRecovery = false) => {
+    if(externalToolPending){setError('请先在工具包中核对未确认的参数／报告请求，再修改组合测评。');return}
     if(pendingMeasurement&&!measurementRecovery){setError('请先恢复或明确结束原认知发布请求，再修改组合测评。');return}
     const scopeEpoch=measurementScope.current.epoch
     if (selectionRisk.current.busy || (!measurementRecovery && (selectionRisk.current.dirty || selectionRisk.current.pending))) { setError('请先保存报告／参考选择或核对未确认请求，再修改组合测评。'); return }
@@ -866,9 +869,9 @@ export function QuestionnaireProductEdit() {
     </div>{trainingDesign && feedbackSettings}</div>
     {detail && draft && !trainingDesign && <div className="questionnaire-delivery-footer"><p role="status">{dirty ? '设置有未保存的修改' : '设置已保存'}</p><ProductButton variant={dirty ? 'primary' : 'secondary'} disabled={busy || !dirty} onClick={() => void save()}>保存投放设置</ProductButton><a href="#questionnaire-publish">前往正式发布 ↑</a></div>}
   </fieldset>
-  const authoringLocked=!!pendingMeasurement||selectionBlocked||reportBlocked
+  const authoringLocked=!!pendingMeasurement||selectionBlocked||reportBlocked||externalToolPending
   const scientificTools=<>
-      {detail && ((draft && cognitiveEnabled && detail.items?.some((item: any) => item.type === 'COGNITIVE')) || pendingMeasurement) && <section className="my-4 rounded border p-4" aria-label="认知测量版本发布">
+      {detail && ((draft && cognitiveEnabled && detail.items?.some((item: any) => item.type === 'COGNITIVE')) || pendingMeasurement) && <section id="tool-measurement" className="my-4 rounded border p-4" aria-label="认知测量版本发布">
         <h2 className="font-semibold">固定当前认知配置</h2>
         <p>仅将当前草稿中允许调整的受控认知参数冻结为精确私有测量版本。不转换量表或静态情境判断，不发布组合投放，也不启动作答。</p>
         <ProductButton disabled={busy || dirty || reportBlocked || selectionBlocked || !!pendingMeasurement || !draft || !cognitiveEnabled} onClick={() => publishCognitiveMeasurement({actorId:user!.id,id,revision:detail.revision,hadUnknownOutcome:false,itemIds:detail.items.filter((item:any)=>item.type==='COGNITIVE').map((item:any)=>item.id)})}>发布当前认知配置版本</ProductButton>
@@ -1381,6 +1384,17 @@ export function QuestionnaireProductEdit() {
     ['测评名称已填写', Boolean(name.trim())], ['至少添加一个内容单元', units.length > 0],
     ['已选择投放范围', kind === 'GENERAL' || courseIds.length > 0], ['完成发布前检查', savedPreflight],
   ] as const
+  const workspaceMeasured = Boolean(detail?.items?.some((item:any)=>item.type!=='FORM'))
+  const needsToolRecovery=Boolean(user?.id&&hasPendingTrainingToolRequest(user.id,id))
+  const toolkitConfiguration = trainingDesign && location.pathname.startsWith('/toolkit/compositions/')
+  if (toolkitConfiguration) return <div className="training-tool-config">
+    <header><Link to="/toolkit">← 返回工具包</Link><h1>{detail?.name || '组合测评'} · 配置与报告</h1><p>集中管理当前组合测评的认知参数、参考与报告。课程私有设置仍绑定原课程及测量版本。</p>
+      <nav aria-label="工具配置"><a href={workspaceMeasured?'#tool-measurement':base+'/'+id}>内容与参数</a>{(workspaceMeasured||needsToolRecovery)&&<><a href="#tool-references">参考与阈值</a><a href="#tool-reports">报告模板</a></>}<Link to={base+'/'+id}>版本与投放设置 ↗</Link></nav>
+    </header>{feedback}{error&&<p role="alert">{error}</p>}{!detail&&<p role="status">正在读取工具配置…</p>}
+    {detail&&<section><h2>当前版本</h2><p>{labels[detail.status]} · 修订 {detail.revision} · {detail.items?.length||0} 个内容单元</p><p>发布报告不会改写历史分数。新配置仅在后续明确发布的投放中使用。</p></section>}
+    {(workspaceMeasured||needsToolRecovery)&&scientificTools}
+    {detail&&!draft&&<p>已发布版本的配置保持冻结；需要修订内容时，请从工具包创建新版本草稿。</p>}
+  </div>
   if (trainingDesign) return (
     <ProductPage width="management" className="hui-questionnaire-products training-form-management qt-editor">
       <Link className="qt-breadcrumb" to={assessmentContextHref('/questionnaires',location.pathname,location.search)}>组合测评 <span>/</span> {draft ? '编制草稿' : '查看测评'}</Link>
@@ -1388,7 +1402,7 @@ export function QuestionnaireProductEdit() {
         description="从内容编排到发布，按步骤完成一份课程测评。"
         actions={<><span className="qt-draft-status">{busy ? '正在处理…' : dirty ? '有未保存的修改' : labels[detail?.status] || '新建草稿'}</span>{draft && <ProductButton variant="primary" disabled={authoringLocked || busy || (id !== 'new' && !dirty)} onClick={() => void save()}><Save size={16} />{id === 'new' ? '创建草稿' : '保存全部设置'}</ProductButton>}</>} />
       {feedback}
-      {scientificTools}
+      {detail&&(workspaceMeasured||externalToolPending)&&<section className="qt-advanced"><h2>工具配置与报告</h2><p>{detail.items?.length||0} 项内容 · 单独报告方案{detail.trainingReportSelectionDraft?.units?.length?'已选择':'未选择'} · 参考{detail.trainingReferenceSelectionDraft?.units?.length?'已选择':'未选择'}</p><p>{externalToolPending?'有一项参数／报告请求尚未确认，请在工具包核对后继续修改。':'当前内容单元、测量版本及报告方案沿用已保存的设置。'}</p><Link to={'/toolkit/compositions/'+id}>在工具包中管理参数、参考与报告 →</Link></section>}
       {pendingMeasurement&&<p role="status">请先恢复或明确结束原认知发布请求，再修改组合测评。</p>}
       <nav aria-label="编制步骤" className="qt-steps">
         {editorSteps.map(([key,label,hint], index) => <a key={key} href={'#'+key}

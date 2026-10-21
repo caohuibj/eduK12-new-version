@@ -733,6 +733,8 @@ enum AssessmentReferenceStatus {
 }
 
 enum MaterialResourceType {
+  MEDIA_ASSET
+  FORM_TEMPLATE
   ASSESSMENT_BUNDLE
   SCALE
   COGNITIVE_CONFIG

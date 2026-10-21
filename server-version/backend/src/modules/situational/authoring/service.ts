@@ -110,6 +110,28 @@ export async function listSjtDrafts(actor: SjtAuthorActor) {
     }
   })
 }
+/** A new content draft, never an in-place edit of a reviewed release. */
+export async function forkSjtDraftVersion(actor: SjtAuthorActor, id: string) {
+  return prisma.$transaction(async tx => {
+    await tx.$queryRaw`SELECT id FROM sjt_author_drafts WHERE id=${id} FOR UPDATE`
+    const source = await tx.sjtAuthorDraft.findUnique({where:{id}})
+    if (!source || source.ownerId !== actor.userId) throw problem('只能更新自己编制的工具',403)
+    if (source.status !== 'PUBLISHED') throw problem('仅已发布工具需要创建新版本')
+    const template = source.template as Record<string, any>
+    const parts = String(template.instrumentVersion).split('.').map(Number)
+    if (parts.length!==3 || parts.some(value=>!Number.isSafeInteger(value)||value<0)) throw problem('来源版本号无效')
+    const next = {...template,instrumentVersion:`${parts[0]}.${parts[1]}.${parts[2]+1}`}
+    const compiled = compileSjtAuthorDocument(next)
+    assertAdaptedVersion(source.adaptationSource,compiled.template)
+    const mediaOptions=await adaptationMediaOptions(tx,source,false)
+    await assertSjtAuthorMedia(tx,actor.userId,compiled.template,mediaOptions)
+    const row=await tx.sjtAuthorDraft.create({data:{ownerId:actor.userId,template:json(compiled.template),contentDigest:compiled.contentDigest,
+      authorizationPolicy:source.authorizationPolicy,adaptationSource:source.adaptationSource===null?Prisma.DbNull:json(source.adaptationSource)}})
+    await tx.sjtAuthorAudit.create({data:{draftId:row.id,actorId:actor.userId,revision:1,action:'VERSION_COPY',contentDigest:compiled.contentDigest,
+      template:json(compiled.template),authorizationPolicy:source.authorizationPolicy,note:`来源草稿 ${source.id}；原发布版本保持不变`}})
+    return row
+  })
+}
 export async function getSjtDraft(actor: SjtAuthorActor, id: string) {
   const draft = await prisma.sjtAuthorDraft.findUnique({
     where: { id },

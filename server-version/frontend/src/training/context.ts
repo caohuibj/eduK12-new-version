@@ -23,10 +23,8 @@ export function trainingNavigation(role?: Role): NavigationItem[] {
   ]
   if (role === 'TEACHER') return [
     { path: '/dashboard', label: '我的课程', aliases: ['/courses'], section: 'teaching' },
-    { path: '/questionnaires', label: '全部测评', aliases: ['/questionnaire-products','/composite-assessments'], section: 'assessment' },
-    { path: '/assessment-templates', label: '测评模板', section: 'assessment' },
-    { path: '/assignments', label: '练习管理', section: 'teaching' },
-    { path: '/checkins', label: '打卡管理', section: 'teaching' },
+    { path: '/media-library', label: '媒体库', aliases: ['/videos','/images','/documents'], section: 'teaching' },
+    { path: '/toolkit', label: '工具包', aliases: ['/scales','/general-questionnaires','/sjt-authoring','/cognitive-assignments','/assessment-templates','/bundle-products'], section: 'assessment' },
     { path: '/profile', label: '我的账户', section: 'account' },
   ]
   return []
