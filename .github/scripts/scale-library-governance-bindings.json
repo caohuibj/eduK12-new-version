@@ -428,7 +428,7 @@
     },
     "server-version/e2e/scale-library-governance-proxy.cjs": {
       "before": null,
-      "after": "0f0ba631cb2bd39e47a0697b67a0d8722e0b8add"
+      "after": "db494ce9077a1449f6c488db3af950b7140e6b41"
     },
     "server-version/frontend/src/App.tsx": {
       "before": "f34f496ab454c022c2bbb7101faecc87f16fcd79",

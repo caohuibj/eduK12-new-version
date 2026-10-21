@@ -189,26 +189,58 @@ jobs:
       - name: serve restricted API, isolated video worker and canonical loopback HTTPS
         shell: bash
         run: |
-          bash .github/scripts/scale-library-governance-backend.sh serve
-          bash .github/scripts/scale-library-governance-backend.sh worker
+          python3 -B - <<'PYTLS'
+          import base64,os
+          from pathlib import Path
+          private=Path(os.environ['RUNNER_TEMP'])/'scale-library-governance-private'
+          target=private/'proxy-tls.env'
+          with target.open('x') as output:
+            target.chmod(0o600)
+            for kind in ['KEY','CERT']:
+              source=Path(os.environ['MEASUREMENT_BROWSER_TLS_'+kind]).resolve()
+              assert source.parent==private/'tls'
+              output.write('GOVERNANCE_PROXY_TLS_'+kind+'_BASE64='+base64.b64encode(source.read_bytes()).decode('ascii')+'\n')
+          PYTLS
+          startup_failed=0
+          bash .github/scripts/scale-library-governance-backend.sh serve || startup_failed=1
+          bash .github/scripts/scale-library-governance-backend.sh worker || startup_failed=1
           docker run -d --name scale-library-governance-proxy --network host --user 0 --cap-drop ALL --cap-add NET_BIND_SERVICE \
-            -e GITHUB_ACTIONS=true -e GITHUB_SHA -e GITHUB_RUN_ID -e MEASUREMENT_BROWSER_ISOLATED=1 -e MEASUREMENT_BROWSER_EPHEMERAL_CA_APPROVED=true -e MEASUREMENT_BROWSER_TLS_KEY -e MEASUREMENT_BROWSER_TLS_CERT \
-            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" -v "$RUNNER_TEMP/scale-library-governance-private:$RUNNER_TEMP/scale-library-governance-private:ro" \
-            "scale-library-governance-backend-runtime:$SCALE_GOVERNANCE_BACKEND_IMAGE_HEAD" node "$GITHUB_WORKSPACE/server-version/e2e/scale-library-governance-proxy.cjs"
+            -e GITHUB_ACTIONS=true -e GITHUB_SHA -e GITHUB_RUN_ID -e MEASUREMENT_BROWSER_ISOLATED=1 -e MEASUREMENT_BROWSER_EPHEMERAL_CA_APPROVED=true --env-file "$RUNNER_TEMP/scale-library-governance-private/proxy-tls.env" \
+            -v "$GITHUB_WORKSPACE:$GITHUB_WORKSPACE:ro" \
+            "scale-library-governance-backend-runtime:$SCALE_GOVERNANCE_BACKEND_IMAGE_HEAD" node "$GITHUB_WORKSPACE/server-version/e2e/scale-library-governance-proxy.cjs" || startup_failed=1
           for attempt in $(seq 1 60); do
+            if [ "$startup_failed" = 1 ]; then break; fi
             if curl --fail --silent --max-time 2 http://127.0.0.1:3000/ready >/dev/null && curl --noproxy '*' --fail --silent --max-time 2 --cacert "$MEASUREMENT_BROWSER_TLS_CA" --resolve training.eduk12.top:443:127.0.0.1 https://training.eduk12.top/__governance_ci_identity >/dev/null; then exit 0; fi
             sleep 1
           done
           python3 -B - <<'PYREADY'
-          import json,subprocess
+          import json,re,subprocess
           from pathlib import Path
-          states={}
+          states={};diagnostics={}
           for name in ['scale-library-governance-api','scale-library-governance-worker','scale-library-governance-proxy']:
             p=subprocess.run(['docker','inspect',name,'--format','{{json .State}}'],capture_output=True,text=True)
             try:s=json.loads(p.stdout)
             except ValueError:s={}
             states[name]={k:s.get(k) for k in ['Status','ExitCode','OOMKilled']}
-          report={'phase':'isolated-runtime-and-canonical-https-readiness','status':'FAIL','containerStates':states,'credentialsSent':False}
+            raw=subprocess.run(['docker','logs','--tail','100',name],capture_output=True,text=True)
+            text=raw.stdout+'\n'+raw.stderr
+            records=[]
+            for line in text.splitlines():
+              if line.startswith('GOVERNANCE_PROCESS_DIAGNOSTIC '):
+                try: records.append(json.loads(line.split(' ',1)[1]))
+                except (ValueError,IndexError): pass
+            record=records[-1] if records else {}
+            names=re.findall(r'\b([A-Za-z][A-Za-z0-9]{0,70}Error|Error)(?: \[|:)',text)
+            codes=re.findall(r'\b(ERR_[A-Z_]{1,70}|EACCES|ENOENT|EADDRINUSE|EADDRNOTAVAIL|ECONNREFUSED|EPERM|MODULE_NOT_FOUND)\b',text)
+            error_name=record.get('errorName',names[-1] if names else 'ProcessWithoutStructuredDiagnostic')
+            error_code=record.get('errorCode',codes[-1] if codes else 'UNCLASSIFIED')
+            phase=record.get('phase','runtime-process-readiness')
+            frames=[{'file':m[0],'line':int(m[1]),'column':int(m[2])} for m in re.findall(r'/([A-Za-z0-9_.-]+\.(?:[cm]?js|ts)):(\d+):(\d+)\)?(?:\n|$)',text)][:6]
+            if records:
+              frames=[f for f in record.get('frames',[]) if isinstance(f,dict) and isinstance(f.get('file'),str) and re.fullmatch(r'[A-Za-z0-9_.-]+\.(?:[cm]?js|ts)',f['file']) and type(f.get('line')) is int and type(f.get('column')) is int]
+              frames=[{k:f[k] for k in ['file','line','column']} for f in frames[:6]]
+            diagnostics[name]={'phase':phase if isinstance(phase,str) and re.fullmatch(r'[a-z-]{1,100}',phase) else 'invalid-phase','errorName':error_name if isinstance(error_name,str) and re.fullmatch(r'[A-Za-z][A-Za-z0-9]{0,70}',error_name) else 'UnknownError','errorCode':error_code if isinstance(error_code,str) and re.fullmatch(r'ERR_[A-Z_]{1,70}|E[A-Z]{2,30}|MODULE_NOT_FOUND|UNCLASSIFIED',error_code) else 'UNCLASSIFIED','frames':frames,'privateDetailsWithheld':True}
+          report={'phase':'isolated-runtime-and-canonical-https-readiness','status':'FAIL','containerStates':states,'processDiagnostics':diagnostics,'credentialsSent':False}
           Path('scale-library-governance-evidence/readiness-diagnostic.json').write_text(json.dumps(report));print(json.dumps(report))
           PYREADY
           echo '::error::Isolated API or canonical proxy readiness failed; no browser credentials sent'
