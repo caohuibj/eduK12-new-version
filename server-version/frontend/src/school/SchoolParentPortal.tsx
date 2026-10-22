@@ -1,4 +1,4 @@
-import { useEffect,useState,type FormEvent } from 'react'
+import { useCallback,useEffect,useMemo,useRef,useState,type FormEvent } from 'react'
 import type { SchoolApi } from './SchoolRecovery'
 
 type ParentLink={id:string;status:string;approvedAt:string|null}
@@ -52,16 +52,33 @@ export function SchoolParentLinks({api,role,organizationId}:{
   const [busy,setBusy]=useState(false)
   const [error,setError]=useState('')
   const [notice,setNotice]=useState('')
-  const reload=async()=>setLinks(await api<ParentLinks>('/parent-links'))
+  const [loading,setLoading]=useState(false)
+  const [readError,setReadError]=useState('')
+  const scope=useMemo(()=>({pending:false}),[api,role,organizationId])
+  const currentScope=useRef<typeof scope|null>(scope)
+  currentScope.current=scope
+  const reload=useCallback(async()=>{
+    if(currentScope.current!==scope||scope.pending)return
+    scope.pending=true;setLoading(true);setReadError('')
+    try{
+      const [l,c]=await Promise.all([
+        api<ParentLinks>('/parent-links'),
+        api<Consent>('/parent-links/consent'),
+      ])
+      if(currentScope.current===scope){setLinks(l);setConsent(c)}
+    }catch(e){
+      if(currentScope.current===scope)setReadError(e instanceof Error?e.message:'无法读取亲子关系')
+    }finally{
+      scope.pending=false
+      if(currentScope.current===scope)setLoading(false)
+    }
+  },[api,scope])
   useEffect(()=>{
-    let current=true
-    void Promise.all([
-      api<ParentLinks>('/parent-links'),
-      api<Consent>('/parent-links/consent'),
-    ]).then(([l,c])=>{if(current){setLinks(l);setConsent(c)}})
-      .catch(e=>{if(current)setError(e instanceof Error?e.message:'无法读取亲子关系')})
-    return()=>{current=false}
-  },[api,role])
+    currentScope.current=scope
+    setLinks(null);setConsent(null);setInvite(null);setClaim('');setError('');setNotice('')
+    void reload()
+    return()=>{currentScope.current=null}
+  },[reload,scope])
   async function execute(task:()=>Promise<void>){
     setBusy(true);setError('');setNotice('')
     try{await task()}catch(e){setError(e instanceof Error?e.message:'关联操作未完成')}
@@ -73,8 +90,11 @@ export function SchoolParentLinks({api,role,organizationId}:{
       当前列表不包含任何个人量表分数、心理报告或其他学生的信息。</p>
     {error&&<p className="hs-alert" role="alert">{error}</p>}
     {notice&&<p className="hs-message" role="status">{notice}</p>}
+    {readError&&<p className="hs-alert" role="alert">{readError}</p>}
+    <button disabled={busy||loading} onClick={()=>void reload()}>{loading?'正在读取…':readError?'重试读取关系':'刷新关系'}</button>
+    {loading&&<p role="status">正在读取家校关系…</p>}
     {role==='STUDENT'&&<div className="hs-actions">
-      <button disabled={busy||!organizationId} onClick={()=>void execute(async()=>{
+      <button disabled={busy||loading||!organizationId} onClick={()=>void execute(async()=>{
         const result=await api<{inviteCode:string;expiresAt:string}>('/parent-links/invitations','POST',{
           organizationId,
         })
@@ -86,17 +106,17 @@ export function SchoolParentLinks({api,role,organizationId}:{
     {role==='PARENT'&&<div className="hs-actions">
       <label className="hs-field"><span>已有校园账号，追加关联其他孩子</span>
         <input value={claim} onChange={e=>setClaim(e.target.value)} autoComplete="off"/></label>
-      <button disabled={busy||claim.length!==24} onClick={()=>void execute(async()=>{
+      <button disabled={busy||loading||claim.length!==24} onClick={()=>void execute(async()=>{
         await api('/parent-links/claims','POST',{inviteCode:claim})
         setClaim('');await reload();setNotice('关联申请已发送，等待孩子确认。')
       })}>申请关联</button>
     </div>}
-    {!links?<p>正在读取…</p>:links.list.length===0?<p>目前没有亲子关联记录。</p>:
+    {!links?null:links.list.length===0?!loading&&!readError&&<p>目前没有亲子关联记录。</p>:
       <div>{links.list.map(link=><div className="hs-task-card" key={link.id}>
         <p>关联状态：{link.status==='PENDING'?'等待孩子确认':
           link.status==='ACTIVE'?'有效亲子关系':'关系已撤销'}</p>
         {role==='STUDENT'&&link.status==='PENDING'&&
-          <button disabled={busy||!consent} onClick={()=>void execute(async()=>{
+          <button disabled={busy||loading||!consent} onClick={()=>void execute(async()=>{
             if(!window.confirm('确认此邀请码确实交给你要关联的监护人，并知晓报告不自动公开？'))return
             await api('/parent-links/'+link.id+'/approve','POST',{
               consentVersion:consent!.version,
@@ -104,7 +124,7 @@ export function SchoolParentLinks({api,role,organizationId}:{
             await reload();setNotice('已确认。个人报告仍受独立披露权限控制。')
           })}>确认监护人关系</button>}
         {link.status!=='REVOKED'&&
-          <button disabled={busy} onClick={()=>void execute(async()=>{
+          <button disabled={busy||loading} onClick={()=>void execute(async()=>{
             if(!window.confirm('撤销此亲子关系并停止新的关联授权？'))return
             await api('/parent-links/'+link.id+'/revoke','POST',{reason:'已由本人撤销校园亲子关联'})
             await reload();setNotice('关联已撤销。')

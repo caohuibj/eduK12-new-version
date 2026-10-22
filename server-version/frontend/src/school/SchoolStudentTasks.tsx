@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { EducationScalePersonalReport, type EducationScalePersonalReportData } from '../components/education-tools/EducationScalePersonalReport'
 import type { SchoolApi } from './SchoolRecovery'
 import { SchoolCompositeRunner,type CampusExecutionRef } from './SchoolCompositeRunner'
@@ -38,19 +38,33 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
   const [studentReference,setStudentReference]=useState<string|null>(null)
   const [feedback,setFeedback]=useState<{executionId:string;title:string;data:StudentFinalFeedback}|null>(null)
   const feedbackEpoch=useRef(0)
-  const load=async(targetPage=page)=>{
-    feedbackEpoch.current+=1;setFeedback(null)
-    const result=await api<TaskPage>('/my/activity-tasks?page='+targetPage+'&pageSize=25')
-    setItems(result);setPage(targetPage)
-  }
+  const [loading,setLoading]=useState(false)
+  const [listError,setListError]=useState('')
+  const [retryPage,setRetryPage]=useState(1)
+  const scope=useMemo(()=>({pending:false}),[api])
+  const currentScope=useRef<typeof scope|null>(scope)
+  currentScope.current=scope
+  const load=useCallback(async(targetPage:number)=>{
+    if(currentScope.current!==scope||scope.pending)return
+    scope.pending=true;setLoading(true);setListError('');setRetryPage(targetPage)
+    try{
+      const result=await api<TaskPage>('/my/activity-tasks?page='+targetPage+'&pageSize=25')
+      if(currentScope.current===scope){setItems(result);setPage(targetPage)}
+    }catch(err){
+      if(currentScope.current===scope)setListError(err instanceof Error?err.message:'活动待办暂不可用')
+    }finally{
+      scope.pending=false
+      if(currentScope.current===scope)setLoading(false)
+    }
+  },[api,scope])
   useEffect(()=>{
-    let active=true
-    feedbackEpoch.current+=1;setFeedback(null)
-    void api<TaskPage>('/my/activity-tasks?page=1&pageSize=25')
-      .then(result=>{if(active)setItems(result)})
-      .catch(err=>{if(active)setError(err instanceof Error?err.message:'活动待办暂不可用')})
-    return ()=>{active=false;feedbackEpoch.current+=1}
-  },[api])
+    currentScope.current=scope
+    feedbackEpoch.current+=1;setFeedback(null);setItems(null);setPage(1)
+    setSelected(null);setDetails(null);setAnswer('');setExecution(null);setError('');setNotice('')
+    setStudentReference(null);setBusy(false)
+    void load(1)
+    return ()=>{currentScope.current=null;feedbackEpoch.current+=1}
+  },[load,scope])
   useEffect(()=>{
     let live=true
     void api<{reference:string}>('/my/student-reference')
@@ -64,18 +78,19 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
     try{
       const segment=task.kind==='CHECKIN'?'checkins':'assignments'
       const d=await api<TaskDetails>(`/activities/${task.activityId}/${segment}/${task.id}`)
+      if(currentScope.current!==scope)return
       setSelected(task);setDetails(d);setAnswer(d.mySubmission?.content??'')
-    }catch(err){setError(err instanceof Error?err.message:'活动材料不可访问')}
-    finally{setBusy(false)}
+    }catch(err){if(currentScope.current===scope)setError(err instanceof Error?err.message:'活动材料不可访问')}
+    finally{if(currentScope.current===scope)setBusy(false)}
   }
   const showFeedback=async(task:SchoolTask)=>{
     const token=++feedbackEpoch.current
     setFeedback(null);setError('')
     try{
       const data=await api<StudentFinalFeedback>('/reports/student/executions/'+task.id)
-      if(token===feedbackEpoch.current)setFeedback({executionId:task.id,title:task.title,data})
+      if(currentScope.current===scope&&token===feedbackEpoch.current)setFeedback({executionId:task.id,title:task.title,data})
     }catch(err){
-      if(token===feedbackEpoch.current)setError(err instanceof Error?err.message:'该测评目前没有允许查看的个人反馈')
+      if(currentScope.current===scope&&token===feedbackEpoch.current)setError(err instanceof Error?err.message:'该测评目前没有允许查看的个人反馈')
     }
   }
   const submit=async()=>{
@@ -98,10 +113,11 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
     {studentReference&&<p>我的校园观察编号：<strong>{studentReference}</strong>。仅在需要老师核对正式观察任务时提供，不要分享登录密码。</p>}
     {error&&<p className="hs-alert" role="alert">{error}</p>}
     {notice&&<p className="hs-message" role="status">{notice}</p>}
-    <button disabled={busy} onClick={()=>void load(page).catch(err=>
-      setError(err instanceof Error?err.message:'刷新失败'))}>刷新待办</button>
-    {!items?<p>正在读取校园活动…</p>:
-      items.list.length===0?<p>目前没有开放给你的活动。你不需要采取任何操作。</p>:
+    {listError&&<p className="hs-alert" role="alert">{listError}</p>}
+    <button disabled={busy||loading} onClick={()=>void load(listError?retryPage:page)}>{loading?'正在读取…':listError?'重试读取待办':'刷新待办'}</button>
+    {loading&&<p role="status">正在读取校园活动…</p>}
+    {!items?null:
+      items.list.length===0?!loading&&!listError&&<p>目前没有开放给你的活动。你不需要采取任何操作。</p>:
       <div className="hs-task-list">
         {items.list.map(task=><article className="hs-task-card" key={task.kind+task.id}>
           <small>{task.activityTitle} · {kinds[task.kind]}</small>
@@ -127,9 +143,9 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
         </article>)}
       </div>}
     {items&&<div className="hs-actions">
-      <button disabled={page<=1||busy} onClick={()=>void load(page-1)}>上一页</button>
+      <button disabled={page<=1||busy||loading} onClick={()=>void load(page-1)}>上一页</button>
       <span>第 {page} 页 · 共 {items.total} 个任务</span>
-      <button disabled={!items.hasMore||busy} onClick={()=>void load(page+1)}>下一页</button>
+      <button disabled={!items.hasMore||busy||loading} onClick={()=>void load(page+1)}>下一页</button>
       {items.truncated&&<span>部分历史任务较多，请联系学校管理员。</span>}
     </div>}
     {feedback&&<div className="hs-task-detail" role="region" aria-label="获准的个人测评反馈">
