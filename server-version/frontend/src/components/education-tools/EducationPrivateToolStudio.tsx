@@ -1,3 +1,4 @@
+import {EducationPrivateScaleSharing} from './EducationPrivateScaleSharing'
 import {createEducationPrivateImageAdapter} from './educationPrivateImageAdapter'
 import {EducationQuestionImageField} from './EducationQuestionImageField'
 import {useCallback,useEffect,useMemo,useRef,useState} from 'react'
@@ -34,6 +35,9 @@ function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftS
  const [validation,setValidation]=useState<PrivateToolValidation|null>(null)
  const [versions,setVersions]=useState<PrivateToolVersion[]>([])
  const [versionsCursor,setVersionsCursor]=useState<string|null>(null)
+ const [sharingVersion,setSharingVersion]=useState<PrivateToolVersion|null>(null)
+ const [sharingState,setSharingState]=useState<PrivateDraftState>({dirty:false,writing:false})
+ const sharingStateRef=useRef(sharingState);sharingStateRef.current=sharingState
  const [tab,setTab]=useState<'responses'|'items'|'scores'|'report'>('responses')
  const [previewing,setPreviewing]=useState(false)
  const [answers,setAnswers]=useState<Record<string,ProfessionalAnswer>>({})
@@ -43,13 +47,13 @@ function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftS
  const imageAdapter=useMemo(()=>toolId?createEducationPrivateImageAdapter({api,entry,actorId,organizationId,toolId}):undefined,[api,entry,actorId,organizationId,toolId])
  const onUploadBusy=useCallback((uploading:boolean)=>{if(!alive.current)return;mediaPending.current=Math.max(0,mediaPending.current+(uploading?1:-1));setMediaCount(mediaPending.current)},[])
  const dirty=tool?fingerprint(tool)!==saved:Boolean(title.trim())
- const dirtyRef=useRef(dirty);dirtyRef.current=dirty
+ const dirtyRef=useRef(dirty);dirtyRef.current=dirty||sharingState.dirty
  useEffect(()=>{alive.current=true;return()=>{alive.current=false;epoch.current+=1;locked.current=false}},[])
- useEffect(()=>{onDraftStateChange?.({dirty,writing:busy||mediaCount>0})},[dirty,busy,mediaCount,onDraftStateChange])
+ useEffect(()=>{onDraftStateChange?.({dirty:dirty||sharingState.dirty,writing:busy||mediaCount>0||sharingState.writing})},[dirty,busy,mediaCount,sharingState,onDraftStateChange])
  useEffect(()=>()=>{onDraftStateChange?.({dirty:false,writing:false})},[onDraftStateChange])
- useEffect(()=>{const guard=(event:BeforeUnloadEvent)=>{if(dirtyRef.current||locked.current||mediaPending.current>0){event.preventDefault();event.returnValue=''}};window.addEventListener('beforeunload',guard);return()=>window.removeEventListener('beforeunload',guard)},[])
+ useEffect(()=>{const guard=(event:BeforeUnloadEvent)=>{if(dirtyRef.current||locked.current||mediaPending.current>0||sharingStateRef.current.writing){event.preventDefault();event.returnValue=''}};window.addEventListener('beforeunload',guard);return()=>window.removeEventListener('beforeunload',guard)},[])
  const operate=useCallback(async(work:(current:()=>boolean)=>Promise<void>)=>{
-  if(locked.current||mediaPending.current>0)return
+  if(locked.current||mediaPending.current>0||sharingStateRef.current.writing)return
   locked.current=true;setBusy(true);setError('');setNotice('');setIssues([])
   const generation=epoch.current
   const current=()=>alive.current&&generation===epoch.current
@@ -62,8 +66,8 @@ function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftS
   setList(old=>mergeById(next?old:[],result.list));setCursor(result.nextCursor);setUncertainCreate(false)
  }),[api,base,operate])
  useEffect(()=>{void refreshList()},[refreshList])
- const mayLeave=()=>!locked.current&&mediaPending.current===0&&(!dirtyRef.current||window.confirm('当前草稿尚未保存，确定放弃修改吗？'))
- const apply=(value:PrivateTool)=>{setTool(value);setSaved(fingerprint(value));setValidation(null);setPreviewing(false);setAnswers({});setPreviewResult(null);setTab('responses')}
+ const mayLeave=()=>!locked.current&&!sharingStateRef.current.writing&&mediaPending.current===0&&(!dirtyRef.current||window.confirm('当前草稿尚未保存，确定放弃修改吗？'))
+ const apply=(value:PrivateTool)=>{setSharingVersion(null);setSharingState({dirty:false,writing:false});setTool(value);setSaved(fingerprint(value));setValidation(null);setPreviewing(false);setAnswers({});setPreviewResult(null);setTab('responses')}
  const open=(id:string)=>{
   if(!mayLeave())return
   void operate(async current=>{
@@ -130,20 +134,28 @@ function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftS
   {error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
   {issues.length>0&&<ul aria-label="定义检查结果">{issues.map((issue,index)=><li key={index}>{issue.path}：{issue.message}</li>)}</ul>}
   {!tool?<>
-   <div className="education-private-toolbar"><label>工具名称<input value={title} maxLength={200} disabled={busy||mediaCount>0||uncertainCreate} onChange={event=>setTitle(event.target.value)}/></label><label>类型<select value={kind} disabled={busy||mediaCount>0||uncertainCreate} onChange={event=>setKind(event.target.value as PrivateToolKind)}><option value="SCALE">量表</option><option value="FORM">表单</option></select></label><button type="button" disabled={busy||mediaCount>0||uncertainCreate||!title.trim()} onClick={create}>创建私有工具</button><button type="button" disabled={busy||mediaCount>0} onClick={()=>void refreshList()}>重新读取列表</button></div>
+   <div className="education-private-toolbar"><label>工具名称<input value={title} maxLength={200} disabled={busy||mediaCount>0||sharingState.writing||uncertainCreate} onChange={event=>setTitle(event.target.value)}/></label><label>类型<select value={kind} disabled={busy||mediaCount>0||sharingState.writing||uncertainCreate} onChange={event=>setKind(event.target.value as PrivateToolKind)}><option value="SCALE">量表</option><option value="FORM">表单</option></select></label><button type="button" disabled={busy||mediaCount>0||sharingState.writing||uncertainCreate||!title.trim()} onClick={create}>创建私有工具</button><button type="button" disabled={busy||mediaCount>0||sharingState.writing} onClick={()=>void refreshList()}>重新读取列表</button></div>
    {uncertainCreate&&<p role="alert">创建结果尚未确认，已暂停重复创建。请重新读取列表，核对是否已有本次工具，再决定是否创建。</p>}
    {busy&&<p role="status">正在读取或保存，请稍候…</p>}
    {!list.length&&!busy&&<p>暂无私有工具，可先创建一份量表或表单。</p>}
-   <div className="education-private-list">{list.map(item=><article key={item.id}><h3>{item.title}</h3><p>{item.kind==='SCALE'?'量表':'表单'} · 草稿修订 {item.revision} · 作者私有</p><button type="button" disabled={busy||mediaCount>0} onClick={()=>open(item.id)}>编辑 {item.title}</button></article>)}</div>
-   {cursor&&<button type="button" disabled={busy||mediaCount>0} onClick={()=>void refreshList(cursor)}>加载更多工具</button>}
+   <div className="education-private-list">{list.map(item=><article key={item.id}><h3>{item.title}</h3><p>{item.kind==='SCALE'?'量表':'表单'} · 草稿修订 {item.revision} · 作者私有</p><button type="button" disabled={busy||mediaCount>0||sharingState.writing} onClick={()=>open(item.id)}>编辑 {item.title}</button></article>)}</div>
+   {cursor&&<button type="button" disabled={busy||mediaCount>0||sharingState.writing} onClick={()=>void refreshList(cursor)}>加载更多工具</button>}
   </>:<>
-   <div className="education-private-toolbar"><button type="button" disabled={busy||mediaCount>0} onClick={back}>返回我的工具</button><button type="button" disabled={busy||mediaCount>0} onClick={()=>open(tool.id)}>重新读取草稿</button><span role="status">{mediaCount>0?'正在上传图片，完成后可保存':busy?'正在处理，请稍候':dirty?'有未保存修改':'草稿已保存'} · 修订 {tool.revision}</span></div>
-   <label>工具名称<input value={tool.title} maxLength={200} disabled={busy||mediaCount>0} onChange={event=>{if(!locked.current)setTool({...tool,title:event.target.value})}}/></label>
-   <div className="education-private-toolbar"><button type="button" disabled={busy||mediaCount>0||!tool.title.trim()} onClick={()=>void save()}>保存草稿</button><button type="button" disabled={busy||mediaCount>0||dirty} onClick={check}>检查定义</button><button type="button" disabled={busy||mediaCount>0||!checked} onClick={()=>{setPreviewing(value=>!value);setPreviewResult(null)}}>{previewing?'返回编辑':'试填预览'}</button><button type="button" disabled={busy||mediaCount>0||!checked} onClick={freeze}>固定私有版本</button></div>
-   {previewing&&checked?<><p>使用已保存定义进行试填，不创建被试任务、不保存正式作答。</p><fieldset disabled={busy||mediaCount>0}><PrivateToolPreview imageAdapter={imageAdapter} tool={tool} answers={answers} onAnswer={(key,value)=>{setAnswers(old=>({...old,[key]:value}));setPreviewResult(null)}}/></fieldset><button type="button" disabled={busy||mediaCount>0} onClick={preview}>检查试填结果</button>{previewResult!==null&&<details open><summary>服务端预览结果</summary><pre>{JSON.stringify(previewResult,null,2)}</pre></details>}</>
-    :tool.kind==='SCALE'?<><nav className="education-private-tabs" aria-label="量表编辑分区">{([['responses','响应选项'],['items','题目'],['scores','计分'],['report','报告文案']] as const).map(([key,label])=><button type="button" key={key} disabled={busy||mediaCount>0} aria-pressed={tab===key} onClick={()=>setTab(key)}>{label}</button>)}</nav><fieldset disabled={mediaCount>0}><ScaleDefinitionEditor definition={tool.definition as ScaleDefinition} setDefinition={value=>editDefinition(typeof value==='function'?value(tool.definition as ScaleDefinition):value)} activeTab={tab} readOnly={false} controlsDisabled={busy} saveDefinition={save} mediaEnabled={Boolean(imageAdapter)} imageAdapter={imageAdapter} mediaUploadCount={mediaCount} onUploadBusy={onUploadBusy}/></fieldset></>
-    :<fieldset disabled={busy||mediaCount>0}><ResearchFormEditor value={tool.definition as FormDraft} onChange={editDefinition} renderImageField={imageAdapter?props=><EducationQuestionImageField {...props} adapter={imageAdapter} onBusy={onUploadBusy} disabled={busy}/>:undefined}/></fieldset>}
-   <details><summary>当前显示的固定版本（{versions.length}）</summary>{versionsCursor&&<p>当前仅显示部分固定版本，不代表完整历史。每次最多读取 50 条，可继续加载历史；下方也会显示本次新固定的版本。</p>}{versions.length?versions.map(version=><p key={version.id}>{version.title} · 源修订 {version.sourceRevision} · 固定私有版本</p>):<p>当前未显示固定版本。保存并通过检查后可固定当前定义。</p>}{versionsCursor&&<button type="button" disabled={busy||mediaCount>0} onClick={loadMoreVersions}>加载更多固定版本</button>}<p>固定版本不会被后续草稿修改覆盖，也不会自动授予其他人使用权。</p></details>
+   <div className="education-private-toolbar"><button type="button" disabled={busy||mediaCount>0||sharingState.writing} onClick={back}>返回我的工具</button><button type="button" disabled={busy||mediaCount>0||sharingState.writing} onClick={()=>open(tool.id)}>重新读取草稿</button><span role="status">{mediaCount>0?'正在上传图片，完成后可保存':busy?'正在处理，请稍候':dirty?'有未保存修改':'草稿已保存'} · 修订 {tool.revision}</span></div>
+   <label>工具名称<input value={tool.title} maxLength={200} disabled={busy||mediaCount>0||sharingState.writing} onChange={event=>{if(!locked.current)setTool({...tool,title:event.target.value})}}/></label>
+   <div className="education-private-toolbar"><button type="button" disabled={busy||mediaCount>0||sharingState.writing||!tool.title.trim()} onClick={()=>void save()}>保存草稿</button><button type="button" disabled={busy||mediaCount>0||sharingState.writing||dirty} onClick={check}>检查定义</button><button type="button" disabled={busy||mediaCount>0||sharingState.writing||!checked} onClick={()=>{setPreviewing(value=>!value);setPreviewResult(null)}}>{previewing?'返回编辑':'试填预览'}</button><button type="button" disabled={busy||mediaCount>0||sharingState.writing||!checked} onClick={freeze}>固定私有版本</button></div>
+   {previewing&&checked?<><p>使用已保存定义进行试填，不创建被试任务、不保存正式作答。</p><fieldset disabled={busy||mediaCount>0||sharingState.writing}><PrivateToolPreview imageAdapter={imageAdapter} tool={tool} answers={answers} onAnswer={(key,value)=>{setAnswers(old=>({...old,[key]:value}));setPreviewResult(null)}}/></fieldset><button type="button" disabled={busy||mediaCount>0||sharingState.writing} onClick={preview}>检查试填结果</button>{previewResult!==null&&<details open><summary>服务端预览结果</summary><pre>{JSON.stringify(previewResult,null,2)}</pre></details>}</>
+    :tool.kind==='SCALE'?<><nav className="education-private-tabs" aria-label="量表编辑分区">{([['responses','响应选项'],['items','题目'],['scores','计分'],['report','报告文案']] as const).map(([key,label])=><button type="button" key={key} disabled={busy||mediaCount>0||sharingState.writing} aria-pressed={tab===key} onClick={()=>setTab(key)}>{label}</button>)}</nav><fieldset disabled={mediaCount>0||sharingState.writing}><ScaleDefinitionEditor definition={tool.definition as ScaleDefinition} setDefinition={value=>editDefinition(typeof value==='function'?value(tool.definition as ScaleDefinition):value)} activeTab={tab} readOnly={false} controlsDisabled={busy||sharingState.writing} saveDefinition={save} mediaEnabled={Boolean(imageAdapter)} imageAdapter={imageAdapter} mediaUploadCount={mediaCount} onUploadBusy={onUploadBusy}/></fieldset></>
+    :<fieldset disabled={busy||mediaCount>0||sharingState.writing}><ResearchFormEditor value={tool.definition as FormDraft} onChange={editDefinition} renderImageField={imageAdapter?props=><EducationQuestionImageField {...props} adapter={imageAdapter} onBusy={onUploadBusy} disabled={busy}/>:undefined}/></fieldset>}
+   <details><summary>当前显示的固定版本（{versions.length}）</summary>{versionsCursor&&<p>当前仅显示部分固定版本，不代表完整历史。每次最多读取 50 条，可继续加载历史；下方也会显示本次新固定的版本。</p>}{versions.length?versions.map(version=><div key={version.id}><p>{version.title} · 源修订 {version.sourceRevision} · 固定私有版本</p>{tool.kind==='SCALE'&&<button type="button" disabled={busy||mediaCount>0||sharingState.writing} onClick={()=>{
+    if(sharingVersion?.id===version.id)return
+    if(sharingState.dirty&&!window.confirm('切换入库申请版本将放弃尚未提交的申请内容，是否继续？'))return
+    setSharingVersion(version);setSharingState({dirty:false,writing:false})
+   }}>申请入库 / 查看申请 · 修订 {version.sourceRevision}</button>}</div>):<p>当前未显示固定版本。保存并通过检查后可固定当前定义。</p>}{versionsCursor&&<button type="button" disabled={busy||mediaCount>0||sharingState.writing} onClick={loadMoreVersions}>加载更多固定版本</button>}<p>固定版本不会被后续草稿修改覆盖，也不会自动授予其他人使用权。</p></details>
+   {tool.kind==='SCALE'&&sharingVersion&&<><button type="button" disabled={sharingState.writing} onClick={()=>{
+    if(sharingState.dirty&&!window.confirm('关闭入库申请将放弃尚未提交的申请内容，是否继续？'))return
+    setSharingVersion(null);setSharingState({dirty:false,writing:false})
+   }}>关闭入库申请</button><EducationPrivateScaleSharing api={api} entry={entry} organizationId={organizationId} actorId={actorId} toolId={tool.id} version={sharingVersion} disabled={busy||mediaCount>0} onDraftStateChange={setSharingState}/></>}
   </>}
  </section>
 }
