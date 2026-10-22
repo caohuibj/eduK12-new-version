@@ -1,0 +1,56 @@
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor .qt-form-template-workspace {
+  display: grid;
+  gap: 24px;
+  min-width: 0;
+  border: 0;
+  margin: 24px 0 0;
+  padding: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor .questionnaire-basic-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor .questionnaire-basic-grid > label:first-child,
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor .questionnaire-basic-grid > [role="alert"] { grid-column: 1 / -1; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor .qt-panel-heading h2 {
+  font-size: 24px;
+}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor .qt-panel-body label {
+  font-size: 16px;
+}
+.hui-training .qt-form-template-picker {
+  display: grid;
+  gap: 14px;
+  padding: 22px;
+  margin-bottom: 24px;
+  border: 1px solid #cddbc9;
+  border-radius: 16px;
+  background: #f4f8f1;
+}
+.hui-training .qt-form-template-picker h3 {
+  margin: 0;
+  font-size: 20px;
+  color: #254e40;
+}
+.hui-training .qt-form-template-picker p {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #617264;
+}
+.hui-training .qt-form-template-picker > button {
+  justify-self: start;
+}
+@media (max-width: 680px) {
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor .questionnaire-basic-grid { grid-template-columns: minmax(0, 1fr); }
+  .hui-training .qt-form-template-picker { padding: 16px; }
+  .hui-training .qt-form-template-editor .qt-unit-editor { grid-template-columns: minmax(0, 1fr); }
+}

@@ -1,0 +1,36 @@
+/* Training-only media dialogs. Shared upload and modal behavior stays intact. */
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .staff-modal-backdrop:has(.training-media-picker, .training-media-preview-dialog, .training-media-rename-dialog) { background: #142a24a6; backdrop-filter: blur(4px); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-media-picker, .training-media-preview-dialog, .training-media-rename-dialog) { width: min(100%, 820px); max-height: 90dvh; overflow: hidden; border: 1px solid #d5e0d2; border-radius: 18px; background: #fff; box-shadow: 0 24px 80px #122c2933; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-media-preview-dialog { width: min(100%, 1040px); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-media-picker, .training-media-preview-dialog, .training-media-rename-dialog) .staff-dialog__header { align-items: center; flex: none; padding: 22px 26px; border-color: #e0e7dc; background: #fff; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-media-picker, .training-media-preview-dialog, .training-media-rename-dialog) .staff-dialog__header > div { min-width: 0; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-media-picker, .training-media-preview-dialog, .training-media-rename-dialog) .staff-dialog__header h2 { color: #213f33; font: 600 24px/1.4 var(--training-serif); overflow-wrap: anywhere; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-media-picker, .training-media-preview-dialog, .training-media-rename-dialog) .staff-dialog__description { margin-top: 7px; color: #60736a; font-size: 14px; line-height: 1.7; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-media-picker, .training-media-preview-dialog, .training-media-rename-dialog) .staff-icon-button { flex: none; width: 38px; height: 38px; border: 1px solid #e0e7dc; border-radius: 50%; background: #f6f8f2; color: #526a5d; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-media-picker-tabs { display: flex; flex: none; gap: 6px; padding: 12px 26px; border-color: #e0e7dc; background: #f8faf5; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-media-picker-tabs button { min-height: 42px; padding: 9px 14px; gap: 8px; border: 1px solid transparent; border-radius: 8px; background: transparent; color: #60736a; font-family: inherit; font-size: 14px; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-media-picker-tabs button[aria-pressed=true] { border-color: #d5e0cf; background: #e8efe2; color: #28553c; font-weight: 600; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-media-picker-content, .training-media-preview-dialog .staff-dialog__body) { min-height: 0; padding: 24px 26px; overflow-y: auto; overscroll-behavior: contain; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-media-upload-zone { display: grid; place-content: center; min-height: 250px; padding: 32px 24px; border: 1px dashed #b8cbb0; border-radius: 12px; background: #f7faf3; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-media-upload-zone svg { color: #688164; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-media-upload-zone .btn-secondary { min-height: 42px; padding: 10px 20px; border-color: #285b49; background: #285b49; color: #fff; font-size: 14px; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-media-upload-zone p { color: #60736a; font-size: 14px; line-height: 1.7; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-media-picker, .training-media-preview-dialog, .training-media-rename-dialog) .staff-dialog__actions { flex: none; gap: 12px; padding: 16px 26px; border-color: #e0e7dc; background: #f8faf5; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-media-picker, .training-media-preview-dialog, .training-media-rename-dialog) .staff-dialog__actions button { min-width: 94px; min-height: 42px; border-radius: 8px; font-size: 14px; }
+.hui-training .training-media-preview-stage { display: grid; place-items: center; min-height: 200px; overflow: hidden; border: 1px solid #dce4d6; border-radius: 12px; background: #f1f5ec; }
+.hui-training .training-media-preview-stage.is-video { background: #17251f; }
+.hui-training .training-media-preview-stage .training-library-preview { display: block; width: 100%; max-width: 100%; max-height: 60dvh; margin: auto; object-fit: contain; }
+.hui-training .training-media-preview-stage .training-library-document { display: block; width: 100%; height: 60dvh; border: 0; background: #fff; }
+@media (max-width: 600px) {
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-media-picker, .training-media-preview-dialog, .training-media-rename-dialog) { max-height: 94dvh; border-radius: 14px; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-media-picker, .training-media-preview-dialog, .training-media-rename-dialog) :is(.staff-dialog__header, .staff-dialog__body, .training-media-picker-content) { padding: 18px 16px; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-media-picker, .training-media-preview-dialog, .training-media-rename-dialog) .staff-dialog__header h2 { font-size: 21px; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-media-picker-tabs { padding: 10px 12px; gap: 4px; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-media-picker-tabs button { padding: 8px 6px; gap: 5px; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-media-upload-zone { min-height: 220px; padding: 24px 14px; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell :is(.training-media-picker, .training-media-preview-dialog, .training-media-rename-dialog) .staff-dialog__actions { padding: 14px 16px; }
+}
+
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-media-rename-dialog { width: min(100%, 520px); border-color: #bfceb9; }
+.hui-training .training-media-rename-dialog .training-library-rename { color: #3d5948; font-size: 14px; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-media-rename-dialog .training-library-rename input { width: 100%; min-height: 46px; border: 1px solid #b9cbb2; border-radius: 8px; background: #fff; font-size: 16px; }

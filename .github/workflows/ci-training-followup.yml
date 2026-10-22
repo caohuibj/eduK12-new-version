@@ -1,0 +1,93 @@
+name: Training follow-up affected checks
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  CI_EVENT: pull_request
+  TZ: UTC
+  NODE_OPTIONS: --max-old-space-size=3072
+jobs:
+  frontend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      PLAN: ${{ inputs.plan }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: admit original frontend checks and exact compiled bytes
+        run: node .github/scripts/training-followup-reuse.mjs frontend
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: training-followup-frontend-${{ github.sha }}
+          path: training-followup-evidence
+          retention-days: 3
+          if-no-files-found: error
+      - uses: actions/upload-artifact@v4
+        with:
+          name: training-followup-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+          retention-days: 3
+          if-no-files-found: error
+  browser:
+    needs: frontend
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: training-followup-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+      - name: pinned Chromium tools
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+      - name: affected desktop, tablet and mobile layouts on the same build
+        run: node .github/scripts/training-followup-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: training-followup-browser-${{ github.sha }}
+          path: training-followup-evidence
+          retention-days: 3
+          if-no-files-found: error
+  forms:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      PLAN: ${{ inputs.plan }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: admit original backend types, migration and seven form authority contracts
+        run: node .github/scripts/training-followup-reuse.mjs backend
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: training-followup-forms-${{ github.sha }}
+          path: training-followup-evidence
+          retention-days: 3
+          if-no-files-found: error

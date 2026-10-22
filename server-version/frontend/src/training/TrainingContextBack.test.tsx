@@ -17,11 +17,16 @@ describe('Training deep-page return context', () => {
   })
   it('rejects malformed course hint and uses the proper home', () => {
     mount('/assignments?courseId=bad%2Fother', 'TEACHER')
-    expect(screen.getByRole('link', { name: /返回我的课程/ })).toHaveAttribute('href', '/dashboard')
+    expect(screen.getByRole('link', { name: /返回课程/ })).toHaveAttribute('href', '/dashboard')
   })
   it('does not duplicate the existing course-level back navigation', () => {
     mount('/student/courses/course-1', 'STUDENT')
     expect(screen.queryByRole('link')).toBeNull()
+  })
+  it('returns the independent teacher scale list to tools', () => {
+    mount('/scales', 'TEACHER')
+    expect(screen.getByRole('link', { name: '返回工具' })).toHaveAttribute('href', '/toolkit')
+    expect(screen.queryByRole('link', { name: '返回课程' })).not.toBeInTheDocument()
   })
   it('retains the exact filtered course section from an editor',()=>{
     mount('/questionnaire-products/q?courseId=c&returnTo='+encodeURIComponent('/courses/c/detail?section=assessments&assessments_page=3&assessments_tags=前测'),'TEACHER')

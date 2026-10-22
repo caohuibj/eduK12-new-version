@@ -981,7 +981,7 @@ describe('Training toolkit separation',()=>{
     mount('tool');await screen.findByDisplayValue('工具迁移测试')
     expect(screen.queryByRole('region',{name:'认知测量版本发布'})).not.toBeInTheDocument()
     expect(screen.queryByRole('region',{name:'投放报告与参考选择'})).not.toBeInTheDocument()
-    expect(screen.getByRole('link',{name:'在工具包中管理参数、参考与报告 →'})).toHaveAttribute('href','/toolkit/compositions/tool')
+    expect(screen.getByRole('link',{name:'在工具中管理参数、参考与报告 →'})).toHaveAttribute('href','/toolkit/compositions/tool')
     expect(within(screen.getByRole('complementary',{name:'编制概览'})).getByRole('region',{name:'工具配置与报告'})).toBeInTheDocument()
     fireEvent.change(screen.getByDisplayValue('工具迁移测试'),{target:{value:'修改名称'}})
     expect(screen.getByRole('button',{name:'保存全部设置'})).toBeDisabled()
