@@ -1,9 +1,10 @@
+import { surveySectionMeta } from './survey-section-meta'
 import type { KeyboardEvent } from 'react'
-export type WorkspaceSection='settings'|'tools'|'reports'|'publish'|'data'
+export type WorkspaceSection='settings'|'reports'|'publish'|'data'
 const sections:[WorkspaceSection,string,string][]=[
-  ['settings','研究设置','名称、说明与采集方式'],['tools','研究工具','编题、导入与试答'],
-  ['reports','私有报告','模板、合成预览与版本'],
-  ['publish','发布与采集','波次、知情同意与链接'],['data','研究数据','质量、分析与导出'],
+  ['settings','研究设置','名称、说明与采集方式'],
+  ['publish','发布与采集','问卷内容、波次与采集链接'],
+  ['reports','私有报告','研究者专用报告模板、预览与版本'],['data','数据','质量、分析与导出'],
 ]
 export function SurveyWorkspaceNav({active,onChange,title,onReturn}:{active:WorkspaceSection;
   onChange:(section:WorkspaceSection)=>void;title:string;onReturn?:()=>void}){
@@ -16,16 +17,16 @@ export function SurveyWorkspaceNav({active,onChange,title,onReturn}:{active:Work
     event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus()
   }
   return <header className="survey-workspace-nav">
-    {onReturn&&<button type="button" className="survey-context-back" onClick={onReturn}>← 返回研究列表（保留编辑）</button>}
-    <p className="survey-workspace-eyebrow">当前研究</p><h2 id="survey-current-project-heading" tabIndex={-1}>{title}</h2>
-    <p>按研究设置、工具编制、报告编制、发布采集和数据整理逐步完成。切换分区会保留本页未保存的编辑；离开页面前请保存。</p>
-    <div role="tablist" aria-label="研究工作分区">
-      {sections.map(([key,label,hint],index)=><button key={key} type="button" role="tab"
+    <div className="survey-project-context"><div><h1 id="survey-current-project-heading" tabIndex={-1} title={title}>{title}</h1><span className="survey-editor-note" aria-hidden="true">切换分区保留编辑</span></div>
+      {onReturn&&<button type="button" className="survey-context-back" aria-label="← 返回研究列表（保留编辑）" title="返回研究列表，保留当前编辑" onClick={onReturn}>← 返回列表</button>}</div>
+    <p id="survey-editing-note" className="sr-only">切换分区会保留本页未保存的编辑；离开页面前请保存。</p>
+    <div role="tablist" aria-label="研究工作分区" aria-describedby="survey-editing-note">
+      {sections.map(([key,label,hint],index)=>{const Icon=surveySectionMeta[key].icon;return <button key={key} type="button" role="tab"
         id={'survey-workspace-tab-'+key} aria-controls={'survey-workspace-'+key}
-        aria-selected={active===key} aria-label={label} tabIndex={active===key?0:-1}
+        aria-selected={active===key} aria-label={label} title={hint} tabIndex={active===key?0:-1}
         onKeyDown={event=>navigate(event,index)} onClick={()=>onChange(key)}>
-        <span className="survey-workflow-number" aria-hidden="true">0{index+1}</span><strong>{label}</strong><span>{hint}</span>
-      </button>)}
+        <span className="survey-tab-icon" aria-hidden="true"><Icon size={18} strokeWidth={1.6}/></span><strong>{label}</strong>
+      </button>})}
     </div>
   </header>
 }

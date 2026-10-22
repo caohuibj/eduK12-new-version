@@ -61,6 +61,36 @@ function fixture({published=false,emptyMeasurements=false,extraBlocks=false,crea
 afterEach(()=>{cleanup();vi.unstubAllGlobals();vi.restoreAllMocks();document.cookie='huisurvey_research_csrf=; Max-Age=0'})
 async function openDraft(){fireEvent.click(await screen.findByRole('button',{name:'feedback · 1 · 草稿'}));await screen.findByLabelText('报告标题')}
 describe('project private report studio',()=>{
+  it('retains the expanded report layout for custom Training transport paths',async()=>{
+    fixture();render(<SurveyReportStudio projectId="project1" basePath="/projects/project1/report-drafts"/>);await openDraft()
+    expect(screen.getByRole('article',{name:'报告区块 2'}).querySelector('details')).toBeNull()
+    expect(screen.getByLabelText('指标显示名称')).toBeVisible()
+    expect(screen.getByRole('heading',{name:'项目私有报告'}).closest('header')).not.toHaveClass('is-compact')
+  })
+
+  it('retains edits when switching collapsed blocks and opens newly added content',async()=>{
+    const f=fixture();render(<SurveyReportStudio projectId="project1"/>);await openDraft()
+    const first=screen.getByRole('article',{name:'报告区块 1'}),second=screen.getByRole('article',{name:'报告区块 2'})
+    expect(first.querySelector('details')).toHaveAttribute('open')
+    expect(second.querySelector('details')).not.toHaveAttribute('open')
+    fireEvent.change(screen.getByLabelText('段落文字'),{target:{value:'折叠前修改的段落'}})
+    fireEvent.click(second.querySelector('summary')!)
+    await waitFor(()=>expect(second.querySelector('details')).toHaveAttribute('open'))
+    await waitFor(()=>expect(first.querySelector('details')).not.toHaveAttribute('open'))
+    fireEvent.change(screen.getByLabelText('指标显示名称'),{target:{value:'学习投入'}})
+    fireEvent.click(screen.getByRole('button',{name:'添加参考解释'}))
+    const added=screen.getByRole('article',{name:'报告区块 3'})
+    expect(added.querySelector('details')).toHaveAttribute('open')
+    fireEvent.change(screen.getByLabelText('参考分段标识'),{target:{value:'approved-band'}})
+    fireEvent.click(first.querySelector('summary')!)
+    await waitFor(()=>expect(first.querySelector('details')).toHaveAttribute('open'))
+    expect(screen.getByLabelText('段落文字')).toHaveValue('折叠前修改的段落')
+    fireEvent.click(screen.getByRole('button',{name:'保存报告草稿'}));await screen.findByText('报告草稿已保存。')
+    expect(f.writes.find(w=>w.path===base+'/draft1')!.body.payload.template.blocks).toEqual(expect.arrayContaining([
+      {type:'TEXT',text:'折叠前修改的段落'},expect.objectContaining({type:'METRIC',label:'学习投入'}),expect.objectContaining({type:'REFERENCE_BAND',bandKey:'approved-band'}),
+    ]))
+  })
+
   it('loads lazily, joins StrictMode initialization and retains edits while hidden',async()=>{
     const f=fixture(),view=render(<StrictMode><SurveyReportStudio projectId="project1" active={false}/></StrictMode>)
     expect(f.fetcher).not.toHaveBeenCalled()

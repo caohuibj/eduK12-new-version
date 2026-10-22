@@ -1,3 +1,4 @@
+import { SurveyAppearanceControl } from './SurveyAppearance'
 import { SurveyBrand } from './SurveyBrand'
 import { surveyFeatures } from './survey-features'
 import './survey-landing.css'
@@ -9,7 +10,7 @@ export function SurveyPublicHeader({signedIn=false}:{signedIn?:boolean}) {
     <SurveyBrand />
     <nav aria-label="研究平台导航"><a href="/#survey-features">产品功能</a>
       <a href={signedIn?'/workspace':'/login'}>{signedIn?'研究工作台':'研究者入口'}</a>
-      {adminUrl&&<a className="survey-admin-entry-link" href={adminUrl}>管理员入口</a>}</nav>
+      {adminUrl&&<a className="survey-admin-entry-link" href={adminUrl}>管理员入口</a>}<SurveyAppearanceControl/></nav>
   </header>
 }
 

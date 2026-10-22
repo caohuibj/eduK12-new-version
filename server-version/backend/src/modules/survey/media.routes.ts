@@ -1,3 +1,5 @@
+import {SurveyBuilderError} from './builder.service'
+import {authorizeToolOwner,ownedTemplate} from './tool-library.service'
 import { Prisma } from '@prisma/client'
 import type { Request,Response,NextFunction } from 'express'
 import { prisma } from '../../config/database'
@@ -12,22 +14,25 @@ import { success,error } from '../../utils/response'
 import { z } from 'zod'
 import { surveyMimeTypes,surveyMaxImageBytes,SurveyMediaError } from './media.references'
 
+import {assetScope} from './media.references'
 type Tx=Prisma.TransactionClient
 const limit=surveyMaxImageBytes
 const types=surveyMimeTypes
 const fail=(statusCode:number,message:string):never=>{throw new SurveyMediaError(statusCode,message)}
 const id=z.string().uuid()
+export function createSurveyMediaRouter(toolLibrary=false){
 const router=Router()
 router.use('/:pid/assets',authenticateSurvey)
 const handle=(fn:(req:Request,res:Response)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
   try{const result=await fn(req,res);if(!res.headersSent)success(res,result)}
   catch(e){
-    if(e instanceof SurveyMediaError)error(res,e.message,-1,e.statusCode)
+    if(e instanceof SurveyMediaError||e instanceof SurveyBuilderError)error(res,e.message,-1,e.statusCode)
     else if(e instanceof z.ZodError)error(res,'素材参数不合法',-1,400)
     else next(e)
   }
 }
 async function owner(tx:Tx,userId:string,projectId:string){
+  if(toolLibrary){await authorizeToolOwner(tx,userId);const tool=await ownedTemplate(tx,userId,projectId);if(tool.status!=='DRAFT')fail(409,'工具已归档');return}
   const rows=await tx.$queryRaw<Array<{id:string}>>`
     SELECT p.id FROM survey_projects p
       JOIN users u ON u.id=p.owner_user_id
@@ -47,7 +52,7 @@ router.get('/:pid/assets',handle(async req=>{
   return prisma.$transaction(async tx=>{
     await owner(tx,uid,pid)
     const rows=await tx.storedAsset.findMany({where:{
-      ownerId:uid,scopeId:pid,accessScope:'PRIVATE',mimeType:{in:types},
+      ownerId:uid,...assetScope(pid,toolLibrary),accessScope:'PRIVATE',mimeType:{in:types},
       deletedAt:null,sizeBytes:{lte:limit},
     },orderBy:[{createdAt:'desc'},{id:'desc'}],take:40,
     select:{id:true,sha256:true,mimeType:true,originalName:true,sizeBytes:true}})
@@ -65,7 +70,7 @@ router.post('/:pid/assets',uploadPrincipalRateLimit,
       buffer:file.buffer,originalName:file.originalname,
       mimeType:(file as typeof file & {detectedMimeType:string}).detectedMimeType,
       ownerId:userId,accessScope:'PRIVATE',scopeId:projectId,
-      initialReference:{entityType:'SurveyProject',entityId:projectId,field:'image-library'},
+      initialReference:{entityType:toolLibrary?'SurveyToolTemplate':'SurveyProject',entityId:projectId,field:'image-library'},
     })
     return success(res,{assetId:stored.id,contentHash:stored.sha256,
       mimeType:stored.mimeType,originalName:stored.originalName,sizeBytes:stored.sizeBytes})
@@ -76,7 +81,7 @@ router.get('/:pid/assets/:assetId/preview',async(req,res,next)=>{
     const asset=await prisma.$transaction(async tx=>{
       await owner(tx,userId,projectId)
       const item=await tx.storedAsset.findFirst({where:{id:id.parse(req.params.assetId),
-        ownerId:userId,scopeId:projectId,accessScope:'PRIVATE',deletedAt:null,sizeBytes:{lte:limit}},
+        ownerId:userId,...assetScope(projectId,toolLibrary),accessScope:'PRIVATE',deletedAt:null,sizeBytes:{lte:limit}},
         select:{id:true,sha256:true,mimeType:true}})
       if(!item||!types.includes(item.mimeType as (typeof types)[number]))fail(404,'研究图片不可用')
       return item!
@@ -87,8 +92,11 @@ router.get('/:pid/assets/:assetId/preview',async(req,res,next)=>{
       assetId:asset.id,contentHash:asset.sha256,mimeType:asset.mimeType as (typeof types)[number],
     },res})
   }catch(e){
-    if(e instanceof SurveyMediaError)return error(res,e.message,-1,e.statusCode)
+    if(e instanceof SurveyMediaError||e instanceof SurveyBuilderError)return error(res,e.message,-1,e.statusCode)
     next(e)
   }
 })
-export const surveyMediaRouter=router
+return router
+}
+export const surveyMediaRouter=createSurveyMediaRouter()
+export const surveyToolMediaRouter=createSurveyMediaRouter(true)

@@ -1,4 +1,5 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { SurveySectionHeader } from './SurveySectionHeader'
+import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { publishSurveyMeasurement } from './measurement-publication'
 
 export interface ReportLeaveRisk {dirty:boolean;pending:boolean;busy:boolean}
@@ -51,6 +52,11 @@ function PreviewBlock({value}:{value:unknown}){
   return null
 }
 
+function ReportBlockPanel({plain,plainTitle,expanded,onExpand,heading,children}:{plain:boolean;plainTitle:string;expanded:boolean;onExpand:()=>void;heading:ReactNode;children:ReactNode}){
+  if(plain)return <><strong>{plainTitle}</strong>{children}</>
+  return <details className="survey-report-block" open={expanded} onToggle={event=>{if(event.currentTarget.open)onExpand()}}><summary className="survey-report-block-heading">{heading}</summary>{children}</details>
+}
+
 export type ReportTransport=<T>(path:string,method?:string,body?:unknown)=>Promise<T>
 export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,onLeaveRiskChange,transport=reportApi,basePath,nativePublishing=true,audiences=['researcher','student','parent','teacher'],recoveryKey}:{projectId:string;projectStatus?:string;active?:boolean;onLeaveRiskChange?:(risk:ReportLeaveRisk)=>void;transport?:ReportTransport;basePath?:string;nativePublishing?:boolean;audiences?:Payload['audience'][];recoveryKey?:string}){
   const base=basePath??('/projects/'+encodeURIComponent(projectId)+'/report-drafts')
@@ -61,6 +67,7 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
   const [nativeInstruments,setNativeInstruments]=useState<NativeInstrument[]>([]),[nativeId,setNativeId]=useState(''),[nativePage,setNativePage]=useState(1),[nativeCount,setNativeCount]=useState(0),[showNative,setShowNative]=useState(false)
   const [page,setPage]=useState(1),[selected,setSelected]=useState<Draft|null>(null),[dirty,setDirty]=useState(false)
   const [measurementId,setMeasurementId]=useState(''),[reportKey,setReportKey]=useState(''),[version,setVersion]=useState('1')
+  const [expandedBlock,setExpandedBlock]=useState<number|null>(0)
   const [copyVersion,setCopyVersion]=useState(''),[publicationNote,setPublicationNote]=useState('')
   const [scenario,setScenario]=useState<Scenario>('INTERPRETABLE'),[preview,setPreview]=useState<Preview|null>(null)
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[listError,setListError]=useState('')
@@ -114,12 +121,12 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
   const afterWrite=()=>loadList(1).catch(()=>{})
   const choose=(id:string)=>void run(async()=>{
     if(dirty&&!window.confirm('当前报告有未保存内容，确定放弃并切换？'))return
-    const row=await reportApi<Draft>(base+'/'+encodeURIComponent(id));setSelected(row);setDirty(false);setPreview(null);setPublicationNote('');setCopyVersion('')
+    const row=await reportApi<Draft>(base+'/'+encodeURIComponent(id));setSelected(row);setExpandedBlock(0);setDirty(false);setPreview(null);setPublicationNote('');setCopyVersion('')
   })
   const create=async(request:Create)=>{
     setPendingCreate(request)
     const row=await reportApi<Draft>(base,'POST',request)
-    setPendingCreate(null);setSelected(row);setDirty(false);setPreview(null);setPublicationNote('');setCopyVersion('')
+    setPendingCreate(null);setSelected(row);setExpandedBlock(0);setDirty(false);setPreview(null);setPublicationNote('');setCopyVersion('')
     setNotice('报告草稿已创建，尚未发布。');await afterWrite()
   }
   const startCreate=()=>void run(async()=>{
@@ -140,6 +147,7 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
     const metricKey=selected.payload.metricKeys[0]||''
     const block:Block=type==='TEXT'?{type,text:'新段落'}:type==='METRIC'?{type,metricKey,display:'RAW'}:
       {type,metricKey,referenceKind:'descriptive_sample',bandKey:'',text:'',guidance:[]}
+    setExpandedBlock(selected.payload.template.blocks.length)
     change({...selected.payload,template:{...selected.payload.template,blocks:[...selected.payload.template.blocks,block]}})
   }
   const save=()=>{if(!selected||!dirty)return;const snapshot=selected;void run(async()=>{
@@ -154,14 +162,21 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
     const result=await reportApi<{releaseId:string}>(base+'/'+selected.id+'/publish','POST',{revision:selected.revision,publicationNote:publicationNote.trim()})
     setSelected({...selected,state:'PUBLISHED',published_release_id:result.releaseId});setNotice('报告版本已发布。已有报告与原始分数未被改写。');await afterWrite()
   })}
-  return <section className="survey-studio-surface bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="项目私有报告">
-    <header><h2 className="text-xl font-semibold">项目私有报告</h2><p>选择本项目测量发布版本，编制描述性报告。参考区块只引用已有参考类型与分段标识，不创建阈值或常模。</p></header>
+  const refreshAction=<button type="button" className="btn-secondary" disabled={busy} onClick={()=>void load()}>刷新报告与测量列表</button>
+  return <section className="survey-report-surface survey-studio-surface bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="项目私有报告">
+    <SurveySectionHeader compact={!basePath} section="reports" title="项目私有报告" goal={!basePath?'可选：编制本研究专用的结果报告模板，供研究者查看与解释测量结果。':undefined} actions={!basePath?refreshAction:undefined} policyLabel="用途与操作说明">{basePath?<p>参考区块只引用已有参考类型与分段标识，不创建阈值或常模。</p>:<div className="survey-report-guide">
+      <p><strong>什么时候需要？</strong>需要把量表等测量的指标、解释文字和局限说明组织成统一报告时使用。只收集问卷或导出原始数据时，可以跳过。</p>
+      <ol><li>先点击“发布或更新测量版本”，为研究内支持的量表保存测量版本；这一步不会开放招募。</li><li>选择测量版本创建报告草稿，编写文字与指标，保存后用合成情境预览。</li><li>填写发布说明并发布报告版本，再到“发布与采集 → 研究者报告与参考版本”读取、选用该精确版本；随研究定义冻结。</li></ol>
+      <p><strong>谁能看到？</strong>当前仅供研究者读取；模板中的“受众”是用途标注，不授予其他角色访问权，也不会自动把报告发给被试。被试原始指标反馈在“发布与采集”中单独配置。</p>
+      <p><strong>功能边界：</strong>合成预览不读取真实答卷、不生成正式个人报告；参考解释只引用已批准的参考分段，不在这里建立阈值、常模或修改计分规则。普通 Form 不绑定测量报告。</p>
+    </div>}</SurveySectionHeader>
+    {!basePath&&<p className="survey-report-purpose">报告是可选的结果展示模板，不是问卷本身；不设置报告也可以采集与导出数据。展开“用途与操作说明”查看完整流程。</p>}
     {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
     {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}
     {listError&&<p role="alert">列表加载失败：{listError}。已成功的写入无需重做。</p>}
-    <button type="button" className="btn-secondary" disabled={busy} onClick={()=>void load()}>刷新报告与测量列表</button>
     {loadingLists&&<p role="status">正在加载测量版本与报告，请稍候…</p>}
-    <fieldset disabled={busy||!!pendingCreate} className="border rounded p-3 space-y-3"><legend>创建报告草稿</legend>
+    {basePath&&refreshAction}
+    <fieldset id="survey-report-create" tabIndex={-1} disabled={busy||!!pendingCreate} className="survey-report-create survey-task-card space-y-3"><legend>创建报告草稿</legend>
       <label className="block">测量发布版本<select className="input block w-full" value={measurementId} onChange={e=>setMeasurementId(e.target.value)}>
         <option value="">请选择</option>{measurements.map(m=><option key={m.id} value={m.id}>{m.key} · {m.version} · {m.family} · {m.status}</option>)}</select></label>
       {measurementsLoaded&&!loadingLists&&!error&&!measurements.length&&<p>暂无本项目获准的测量发布版本。{nativePublishing?'可在下方显式发布自编测量或获准的只读量表；目录原版内容不会改写。':'请先在测量编制入口完成发布并核对内容授权。'}</p>}
@@ -181,24 +196,25 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
     {pendingCreate&&<div role="status"><p>本次创建尚未确认。重试会沿用同一请求与内容。</p>
       <button type="button" className="btn-secondary" disabled={busy} onClick={startCreate}>重试本次创建</button>
       <button type="button" className="btn-secondary" disabled={busy} onClick={()=>{if(window.confirm('创建可能已经成功，请先刷新列表核对。仍要放弃本次请求？'))setPendingCreate(null)}}>放弃本次创建请求</button></div>}
-    <div className="grid md:grid-cols-[220px_minmax(0,1fr)] gap-5">
-      <nav aria-label="报告草稿与版本" className="space-y-2">{list.map(row=><button type="button" key={row.id} className="btn-secondary block w-full text-left" aria-pressed={selected?.id===row.id} disabled={busy||!!pendingCreate} onClick={()=>choose(row.id)}>{row.reportKey} · {row.version} · {row.state==='PUBLISHED'?'已发布':'草稿'}</button>)}
+    <div id="survey-report-editor" tabIndex={-1} className="survey-report-layout grid md:grid-cols-[220px_minmax(0,1fr)] gap-5">
+      <nav id="survey-report-list" tabIndex={-1} aria-label="报告草稿与版本" className="survey-tool-rail space-y-2"><h3 className="survey-rail-title">报告草稿与版本</h3>{list.map(row=><button type="button" key={row.id} className="btn-secondary block w-full text-left" aria-pressed={selected?.id===row.id} disabled={busy||!!pendingCreate} onClick={()=>choose(row.id)}>{row.reportKey} · {row.version} · {row.state==='PUBLISHED'?'已发布':'草稿'}</button>)}
         {listLoading&&<p role="status">正在加载报告列表…</p>}
         {listLoaded&&!listLoading&&!listError&&!list.length&&<p>暂无报告草稿</p>}
-        <div className="flex gap-2"><button type="button" className="btn-secondary" disabled={busy||page<=1} onClick={()=>void run(()=>loadList(page-1))}>上一页</button>
+        <div className="survey-rail-pagination"><button type="button" className="btn-secondary" disabled={busy||page<=1} onClick={()=>void run(()=>loadList(page-1))}>上一页</button>
           <span>第 {page} 页</span><button type="button" className="btn-secondary" disabled={busy||list.length<25} onClick={()=>void run(()=>loadList(page+1))}>下一页</button></div>
       </nav>
-      {selected&&<div className="space-y-4 min-w-0"><h3 className="font-semibold">{selected.report_key} · {selected.version} · 修订 {selected.revision}</h3>
+      {!selected&&<div className="survey-task-empty"><h3>选择一个报告版本，继续编制</h3><p>从左侧打开草稿或已发布版本；没有草稿时，先在上方选择测量版本创建。</p><p>已发布内容保持只读，修订需明确复制为新版本。</p></div>}
+      {selected&&<div className="survey-report-editor space-y-4 min-w-0">{basePath?<h3 className="font-semibold">{selected.report_key} · {selected.version} · 修订 {selected.revision}</h3>:<header className="survey-report-editor-heading"><h3>{selected.report_key} · {selected.version} · 修订 {selected.revision}</h3><span className="survey-workflow-status">{dirty?'未保存':selected.state==='PUBLISHED'?'已发布 · 只读':'草稿'}</span></header>}
         <p style={{overflowWrap:'anywhere'}}>测量：{measurement?.key||selected.payload.measurementReleaseId} {measurement?.version||''}</p>
         {selected.state==='PUBLISHED'&&<p>已发布版本只读。修改内容请明确复制为新版本。</p>}
-        <fieldset disabled={busy||readOnly||!!pendingCreate} className="space-y-3 min-w-0"><legend>报告内容</legend>
+        <div className="survey-report-composer"><fieldset disabled={busy||readOnly||!!pendingCreate} className="survey-report-content space-y-3 min-w-0"><legend>报告内容</legend>
           <label className="block">报告标题<input className="input block w-full" value={selected.payload.template.title||''} onChange={e=>change({...selected.payload,template:{...selected.payload.template,title:e.target.value||undefined}})}/></label>
           <label className="block">受众<select className="input block" value={selected.payload.audience} onChange={e=>change({...selected.payload,audience:e.target.value as Payload['audience']})}>
             {audiences.map(audience=><option key={audience} value={audience}>{{researcher:'研究者',student:'学生',parent:'家长',teacher:'教师'}[audience]}</option>)}</select></label>
           <label className="block">语言<input className="input block" maxLength={240} value={selected.payload.language} onChange={e=>change({...selected.payload,language:e.target.value})}/></label>
           <p>可引用指标：{selected.payload.metricKeys.join('、')}。测量身份与指标集合随此草稿固定。</p>
           {selected.payload.template.blocks.map((block,index)=><article key={index} className="border rounded p-3 space-y-2" aria-label={'报告区块 '+(index+1)}>
-            <strong>区块 {index+1} · {block.type}</strong>
+            <ReportBlockPanel plain={!!basePath} plainTitle={'区块 '+(index+1)+' · '+block.type} expanded={expandedBlock===index} onExpand={()=>setExpandedBlock(index)} heading={<><strong>区块 {index+1} · {basePath?block.type:{TEXT:'文字段落',METRIC:'研究指标',REFERENCE_BAND:'参考解释',ASSET:'素材',CHART:'图表'}[block.type]}</strong><span className="survey-workflow-status">{['TEXT','METRIC','REFERENCE_BAND'].includes(block.type)?(basePath?'可编辑':'点击编辑'):'只读保留'}</span><span className="survey-report-block-snippet">{block.type==='TEXT'?block.text:block.type==='METRIC'?(block.label||block.metricKey):block.type==='REFERENCE_BAND'?(block.text||block.metricKey):block.type==='ASSET'?block.alt:block.caption||'图表区块'}</span></>}><div className="survey-report-block-body">
             {block.type==='TEXT'?<label className="block">段落文字<textarea className="input block w-full" value={block.text} onChange={e=>replaceBlock(index,{...block,text:e.target.value})}/></label>:
               block.type==='METRIC'||block.type==='REFERENCE_BAND'?<>
                 <label className="block">指标<select className="input block" value={block.metricKey} onChange={e=>replaceBlock(index,{...block,metricKey:e.target.value})}>{selected.payload.metricKeys.map(key=><option key={key} value={key}>{key}</option>)}</select></label>
@@ -211,21 +227,22 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
                   <label className="block">建议（每行一条）<textarea className="input block w-full" value={block.guidance.join('\n')} onChange={e=>replaceBlock(index,{...block,guidance:e.target.value.split('\n')})}/></label>
                 </>}
               </>:<p>此 {block.type} 区块在当前编辑器中只读，保存和复制会原样保留。</p>}
-            {(block.type==='TEXT'||block.type==='METRIC'||block.type==='REFERENCE_BAND')&&<button type="button" className="btn-secondary" onClick={()=>change({...selected.payload,template:{...selected.payload.template,blocks:selected.payload.template.blocks.filter((_,i)=>i!==index)}})}>删除区块 {index+1}</button>}
-          </article>)}
-          <div className="flex flex-wrap gap-2"><button type="button" className="btn-secondary" onClick={()=>addBlock('TEXT')}>添加文字段落</button>
+            {(block.type==='TEXT'||block.type==='METRIC'||block.type==='REFERENCE_BAND')&&<button type="button" className="btn-secondary" onClick={()=>{setExpandedBlock(0);change({...selected.payload,template:{...selected.payload.template,blocks:selected.payload.template.blocks.filter((_,i)=>i!==index)}})}}>删除区块 {index+1}</button>}
+          </div></ReportBlockPanel></article>)}
+          <div className="survey-report-add-blocks flex flex-wrap gap-2"><span>添加内容</span><button type="button" className="btn-secondary" onClick={()=>addBlock('TEXT')}>添加文字段落</button>
             <button type="button" className="btn-secondary" onClick={()=>addBlock('METRIC')}>添加指标</button><button type="button" className="btn-secondary" onClick={()=>addBlock('REFERENCE_BAND')}>添加参考解释</button></div>
           <label className="block">局限说明（每行一条）<textarea className="input block w-full" value={selected.payload.template.limitations.join('\n')} onChange={e=>change({...selected.payload,template:{...selected.payload.template,limitations:e.target.value.split('\n')}})}/></label>
           <label className="block">免责声明<textarea className="input block w-full" value={selected.payload.template.disclaimer||''} onChange={e=>change({...selected.payload,template:{...selected.payload.template,disclaimer:e.target.value||undefined}})}/></label>
-          <button type="button" className="btn-primary" disabled={!dirty} onClick={save}>保存报告草稿</button>
+          <div className="survey-workflow-save">{!basePath&&<span>{dirty?'内容有修改，请先保存':'当前内容已保存'}</span>}<button type="button" className="btn-primary" disabled={!dirty} onClick={save}>保存报告草稿</button></div>
         </fieldset>
-        <fieldset disabled={busy||dirty||!!pendingCreate} className="border rounded p-3 space-y-2"><legend>合成预览</legend>
+        <aside className="survey-report-release" aria-label="报告预览与发布">
+        <fieldset disabled={busy||dirty||!!pendingCreate} className="survey-workflow-group border rounded p-3 space-y-2"><legend>合成预览</legend>
           <p>使用合成数据，不读取真实答卷，不生成正式报告。</p>
           <label>预览情境<select className="input block" value={scenario} onChange={e=>{setScenario(e.target.value as Scenario);setPreview(null)}}><option value="INTERPRETABLE">可解释的合成情境</option><option value="NO_REFERENCE">无参考</option><option value="INVALID">质量无效</option></select></label>
           <button type="button" className="btn-secondary" onClick={simulate}>预览合成报告</button>
         </fieldset>
         {dirty&&<p role="status">请先保存修改，再预览或发布。</p>}
-        {preview&&<section className="border rounded p-3 space-y-2" aria-label="合成报告预览"><h4>{preview.report.title}</h4><p>合成样例 · 修订 {preview.revision}</p>{preview.report.blocks.map((block,index)=><PreviewBlock key={index} value={block}/>)}{preview.report.limitations.map((line,index)=><p key={index}>{line}</p>)}<p>{preview.report.disclaimer}</p></section>}
+        {preview&&<section className="survey-report-preview border rounded p-3 space-y-2" aria-label="合成报告预览"><h4>{preview.report.title}</h4><p>合成样例 · 修订 {preview.revision}</p>{preview.report.blocks.map((block,index)=><PreviewBlock key={index} value={block}/>)}{preview.report.limitations.map((line,index)=><p key={index}>{line}</p>)}<p>{preview.report.disclaimer}</p></section>}
         {selected.state==='DRAFT'?<fieldset disabled={busy||dirty||!!pendingCreate} className="space-y-2"><legend>发布此版本</legend>
           <label>发布说明<textarea className="input block w-full" minLength={3} maxLength={4000} value={publicationNote} onChange={e=>setPublicationNote(e.target.value)}/></label>
           <p>发布后本版本不可编辑；不会覆盖原始分数或已有报告。</p><button type="button" className="btn-primary" disabled={publicationNote.trim().length<3} onClick={publish}>发布报告版本</button>
@@ -233,6 +250,7 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
           <label>新报告版本号<input className="input block" maxLength={240} value={copyVersion} onChange={e=>setCopyVersion(e.target.value)}/></label>
           <button type="button" className="btn-primary" disabled={!copyVersion.trim()||copyVersion.trim()===selected.version} onClick={copy}>复制已发布报告为新草稿</button>
         </fieldset>}
+        </aside></div>
       </div>}
     </div>
   </section>

@@ -1,3 +1,5 @@
+import {surveyWorkspacePlan,surveyWorkspaceOutputs} from './survey-workspace-scope.mjs';
+import {trainingAppearancePlan,trainingAppearanceOutputs} from './training-appearance-scope.mjs';
 import {surveyCloudPlan,surveyCloudOutputs} from './survey-cloud-scope.mjs';
 import {authenticatorPlan,authenticatorOutputs} from './admin-authenticator-scope.mjs';
 import {surveyExperiencePlan} from './survey-experience-scope.mjs';
@@ -43,6 +45,8 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='survey-workspace')return ['scope','survey-workspace','codeql'];
+  if(scope.application_route==='training-appearance')return ['scope','training-appearance','codeql'];
   if(scope.application_route==='survey-cloud')return ['scope','survey-cloud','codeql'];
   if(scope.application_route==='admin-authenticator')return ['scope','admin-authenticator','codeql'];
   if(scope.application_route==='survey-experience')return ['scope','survey-experience','codeql'];
@@ -103,6 +107,14 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='survey-workspace'){
+    try{const p=JSON.parse(scope.survey_workspace_plan);if(draft||Object.entries(surveyWorkspaceOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+    return [...new Set(failed)];
+  }
+  if(scope.application_route==='training-appearance'){
+    try{const p=JSON.parse(scope.training_appearance_plan);if(draft||Object.entries(trainingAppearanceOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+    return [...new Set(failed)];
+  }
   if(scope.application_route==='survey-cloud'){
     try{const p=JSON.parse(scope.survey_cloud_plan);if(draft||Object.entries(surveyCloudOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
     return [...new Set(failed)];
@@ -329,6 +341,18 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const needs = readNeeds();
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.application_route==='survey-workspace'){
+    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');
+      const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.survey_workspace_plan);
+      if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(surveyWorkspacePlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-survey-workspace-plan');
+    }catch{failed.push('recomputed-survey-workspace-plan');}
+  }
+  if(needs.scope?.outputs?.application_route==='training-appearance'){
+    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');
+      const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.training_appearance_plan);
+      if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(trainingAppearancePlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-training-appearance-plan');
+    }catch{failed.push('recomputed-training-appearance-plan');}
+  }
   if(needs.scope?.outputs?.application_route==='survey-cloud'){
     try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');
       const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.survey_cloud_plan);

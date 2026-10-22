@@ -31,10 +31,10 @@ export function ResearchCatalog({projectId,api,busy,onImport}:{projectId:string;
     {loading&&<p role="status">正在加载授权目录…</p>}
     <label className="block text-sm">筛选当前页授权工具<input type="search" className="input block w-full" value={query} onChange={event=>setQuery(event.target.value)} placeholder="输入当前页的工具名称"/></label>
     {!loading&&!error&&list.length>0&&<p role="status" className="text-sm">当前页显示 {filtered.length} / {list.length} 项；仅筛选已加载的本页，不搜索其他页。</p>}
-    {filtered.map(grant=><article key={grant.id} className="border rounded-lg p-3 space-y-2">
+    <div className="survey-catalog-grid">{filtered.map(grant=><article key={grant.id} className="border rounded-lg p-3 space-y-2">
       <h4 className="font-medium">{grant.title}</h4><p className="text-sm">{grant.kind} · 版本 {grant.sourceRef.sourceVersion}</p><details><summary>查看来源与使用限制：{grant.title}</summary><SourceProvenance source={grant.sourceRef} provenance={grant.sourceProvenance}/></details>
       <button type="button" className="btn-secondary" disabled={busy||loading} onClick={()=>void onImport(grant)}>导入此版本：{grant.title}</button>
-    </article>)}
+    </article>)}</div>
     <div className="flex gap-3 items-center text-sm"><button type="button" className="btn-secondary" disabled={busy||loading||page<=1} onClick={()=>void load(page-1)}>目录上一页</button>
       <span>目录第 {page} 页</span><button type="button" className="btn-secondary" disabled={busy||loading||list.length<25} onClick={()=>void load(page+1)}>目录下一页</button>
       <button type="button" className="btn-secondary" disabled={busy||loading} onClick={()=>void load(page)}>刷新授权目录</button></div>

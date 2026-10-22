@@ -34,7 +34,7 @@ describe('administrator login flow',()=>{
     })
   it('returns the committed administrator identity to Survey governance',async()=>{
     mount('/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
-    expect(screen.getByRole('link',{name:'Huisurvey 首页'}).querySelector('img')).toHaveAttribute('src','/survey/huisurvey-w2-emblem.svg')
+    expect(screen.getByRole('link',{name:'Research 首页'}).querySelector('img')).toHaveAttribute('src','/survey/huisurvey-w2-emblem.svg')
     expect(screen.getByText('让研究有序开展，边界清晰可见。')).toBeVisible()
     submit()
     expect(await screen.findByText('destination:/admin/survey-researchers')).toBeInTheDocument()

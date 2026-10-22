@@ -1,0 +1,101 @@
+{
+  "schema": 1,
+  "base": "9e019c98568d9250a31346cc89d3ae272e9414dd",
+  "product": "80f02f4f138791b9349ff6994159f5fa671fe2ba",
+  "source": {
+    "docs/training-appearance-artwork-20261022.json": {
+      "before": null,
+      "after": "2fa2406463b3354a1c07c4aac0ec3af8f6313220"
+    },
+    "docs/training-appearance-local-20261022.md": {
+      "before": null,
+      "after": "4ec34b787a96ef06a0f8526128e1c9a0786b23b0"
+    },
+    "server-version/frontend/src/components/app-shell/AppShell.tsx": {
+      "before": "7cfbcab38071b439f89fb05ba4ffd27b9a8e7df2",
+      "after": "10892d06f07adcebb28ef71dc18236f544fd6202"
+    },
+    "server-version/frontend/src/pages/student/StudentProfile.tsx": {
+      "before": "88f2cbf8fd99e9a61b9e187f566a7def3f7afd26",
+      "after": "ec8897fef173db021a36dd3d7b0dc4b6b8ea0c8d"
+    },
+    "server-version/frontend/src/pages/teacher/TeacherProfile.tsx": {
+      "before": "ed9c24c22eae2c61c18611ea96d183f7d14a31b7",
+      "after": "a4b175dd8acc66a5e40cb1c3b5003108e51915e9"
+    },
+    "server-version/frontend/src/training/TrainingAppearance.test.tsx": {
+      "before": null,
+      "after": "efe0dd46e899bb4b80a3745f409c157d668e9b9f"
+    },
+    "server-version/frontend/src/training/TrainingAppearance.tsx": {
+      "before": null,
+      "after": "51084fb1d2972625b739f3bfe22936524f40a0f3"
+    },
+    "server-version/frontend/src/training/TrainingBrand.tsx": {
+      "before": "258558b1d5f95bf328f437417be637293817ad24",
+      "after": "b8fc008e1e849eed099a0279f0493f624038ee7a"
+    },
+    "server-version/frontend/src/training/appearance.ts": {
+      "before": null,
+      "after": "e3a163c92edadae9b8df9f5b3f7baa7e94ae1761"
+    },
+    "server-version/frontend/src/training/appearanceContext.ts": {
+      "before": null,
+      "after": "97fa88213e48366effe3c3b21a35ecce88c3a6c2"
+    },
+    "server-version/frontend/src/training/training-appearance.css": {
+      "before": null,
+      "after": "8738545011e1349a06749a32c1543b343d59f149"
+    },
+    "server-version/frontend/src/training/training-logo-dark.svg": {
+      "before": null,
+      "after": "9bbcb123899dc96f7776eed4df7d18c93dae2334"
+    },
+    "server-version/frontend/src/training/training-moonlit-landscape.webp": {
+      "before": null,
+      "after": "581ea389b131e8d111134582df52b849e7977714"
+    }
+  },
+  "controls": [
+    ".github/scripts/training-appearance-bindings.json",
+    ".github/scripts/training-appearance-scope.mjs",
+    ".github/scripts/training-appearance-checks.mjs",
+    ".github/scripts/training-appearance.test.mjs",
+    ".github/workflows/ci-training-appearance.yml",
+    ".github/workflows/ci.yml",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    ".github/evidence/training-appearance/reviewed-local.json",
+    "docs/release/README.md"
+  ],
+  "controlBefore": {
+    ".github/scripts/training-appearance-bindings.json": null,
+    ".github/scripts/training-appearance-scope.mjs": null,
+    ".github/scripts/training-appearance-checks.mjs": null,
+    ".github/scripts/training-appearance.test.mjs": null,
+    ".github/workflows/ci-training-appearance.yml": null,
+    ".github/workflows/ci.yml": "7e13019b51dc94c1392e58bdee433326f46a68bd",
+    ".github/scripts/content-scope.mjs": "6a3b0c1197f742f988a40bf6ecfef58ddce60dd2",
+    ".github/scripts/merge-gate.mjs": "00a638d8b572748cf13164f2e629cd3ceebf5091",
+    ".github/evidence/training-appearance/reviewed-local.json": null,
+    "docs/release/README.md": "9b7062c9c62b17f72a8dfea4204efdddcc55b94b"
+  },
+  "components": {
+    "frontend": "07e9a85bcc285a3ff04425759cede7393dc426c7",
+    "backend": "73dc1454d3257dfb70924b8f6d3dd282bf9b4b54"
+  },
+  "protectedInputs": {
+    "server-version/frontend/package.json": "84089551a17c85d00f03a36081fe78e6374f0716",
+    "server-version/frontend/package-lock.json": "70318f94fe631d8292f567cf421f97e7d5613b31",
+    "server-version/backend/package.json": "033398f6361b0e4217226ae00f2edc2ed3380ecd",
+    "server-version/backend/package-lock.json": "73607721290dd28f1c6f85d5e12d5d517926ede3",
+    "server-version/backend/prisma/schema.prisma": "8609c6c3b333d1f45e26e08d343e976eede0ffa4",
+    "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22",
+    "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
+    ".github/config/acceptance-scopes.json": "3e712ad61188aac0ec9af4cc4ca99496bde186df",
+    ".github/scripts/runner-preflight.mjs": "fb653555233774a0797ebea3552fd4d71e8c54a6"
+  },
+  "evidence": {
+    ".github/evidence/training-appearance/reviewed-local.json": "611d09e332d53353acb527eff1804bec6c9d99378373e712bd8711dba247bed4"
+  }
+}
