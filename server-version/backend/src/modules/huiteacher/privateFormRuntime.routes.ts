@@ -26,12 +26,27 @@ const wrap=(work:(req:Request)=>Promise<unknown>)=>asyncHandler(async(req,res)=>
 })
 type Task={executionId:string;runId:string;organizationId:string;eventId:string;eventTitle:string;eventStatus:string;formTitle:string;
  status:string;runStatus:string;runtimeBindingKind:string|null;runtimeBindingRef:string|null}
-/** Exact current task list, not the author's private-tool catalogue. */
-export async function listOwnTeacherPrivateFormTasks(actorUserId:string,filter?:{executionId?:string;attemptId?:string}){
- return prisma.$queryRaw<Task[]>(Prisma.sql`
+type TaskRow=Task&{cursorCreatedAt:string}
+const pageQuery=z.object({cursor:z.string().min(1).max(1024).optional(),pageSize:z.coerce.number().int().min(1).max(100).default(50)}).strict()
+const cursorSchema=z.object({v:z.literal(1),actorUserId:uuid,createdAt:z.string().datetime({precision:6}),executionId:uuid}).strict()
+type TaskCursor=z.infer<typeof cursorSchema>
+function decodeCursor(value:string,actorUserId:string):TaskCursor{
+ try{
+  const bytes=Buffer.from(value,'base64url')
+  if(bytes.toString('base64url')!==value)throw new Error('Noncanonical cursor')
+  const cursor=cursorSchema.parse(JSON.parse(bytes.toString('utf8')))
+  if(cursor.actorUserId!==actorUserId)throw new Error('Cursor scope mismatch')
+  return cursor
+ }catch{throw new ZodError([{code:'custom',path:['cursor'],message:'表单任务分页位置无效，请刷新列表'}])}
+}
+const withoutCursor=({cursorCreatedAt:_cursor,...task}:TaskRow):Task=>task
+/** Every page uses the same current actor/source authority predicates as exact task access. */
+async function queryOwnTasks(actorUserId:string,filter:{executionId?:string;attemptId?:string;cursor?:TaskCursor;limit:number}){
+ return prisma.$queryRaw<TaskRow[]>(Prisma.sql`
   SELECT e.id AS "executionId",e.run_id AS "runId",e.organization_id AS "organizationId",event.id AS "eventId",
    event.title AS "eventTitle",event.status AS "eventStatus",c.name AS "formTitle",e.status,r.status AS "runStatus",
-   e.runtime_binding_kind AS "runtimeBindingKind",e.runtime_binding_ref AS "runtimeBindingRef"
+   e.runtime_binding_kind AS "runtimeBindingKind",e.runtime_binding_ref AS "runtimeBindingRef",
+   to_char(e.created_at AT TIME ZONE 'UTC','YYYY-MM-DD"T"HH24:MI:SS.US"Z"') AS "cursorCreatedAt"
   FROM assessment_run_executions e JOIN assessment_runs r ON r.id=e.run_id AND r.organization_id=e.organization_id
   JOIN assessment_run_tracks t ON t.id=e.track_id AND t.run_id=e.run_id AND t.organization_id=e.organization_id
   JOIN huiteacher_evaluation_run_links link ON link.run_id=e.run_id AND link.organization_id=e.organization_id
@@ -51,7 +66,18 @@ export async function listOwnTeacherPrivateFormTasks(actorUserId:string,filter?:
         AND completed_parent.assignment_ref=a.id AND completed_parent.user_id=${actorUserId} AND completed_parent.status='COMPLETED')))
    ${filter?.executionId?Prisma.sql`AND e.id=${filter.executionId}`:Prisma.empty}
    ${filter?.attemptId?Prisma.sql`AND e.runtime_binding_kind='COMPOSITE' AND e.runtime_binding_ref=${filter.attemptId}`:Prisma.empty}
-  ORDER BY e.created_at DESC,e.id DESC LIMIT 101`)
+  ${filter.cursor?Prisma.sql`AND (e.created_at,e.id)<(${filter.cursor.createdAt}::timestamptz,${filter.cursor.executionId}::text)`:Prisma.empty}
+  ORDER BY e.created_at DESC,e.id DESC LIMIT ${filter.limit}`)
+}
+/** Existing exact execution/attempt callers keep their array contract and authority checks. */
+export async function listOwnTeacherPrivateFormTasks(actorUserId:string,filter?:{executionId?:string;attemptId?:string}){
+ return (await queryOwnTasks(actorUserId,{...filter,limit:101})).map(withoutCursor)
+}
+export async function listOwnTeacherPrivateFormTaskPage(actorUserId:string,raw:unknown={}){
+ const input=pageQuery.parse(raw),cursor=input.cursor?decodeCursor(input.cursor,actorUserId):undefined
+ const rows=await queryOwnTasks(actorUserId,{cursor,limit:input.pageSize+1}),page=rows.slice(0,input.pageSize),last=page[page.length-1]
+ return {list:page.map(withoutCursor),nextCursor:rows.length>input.pageSize&&last
+  ?Buffer.from(JSON.stringify({v:1,actorUserId,createdAt:last.cursorCreatedAt,executionId:last.executionId} satisfies TaskCursor)).toString('base64url'):null}
 }
 async function own(actorUserId:string,filter:{executionId?:string;attemptId?:string}){
  const [row]=await listOwnTeacherPrivateFormTasks(actorUserId,filter)
@@ -67,7 +93,7 @@ const requireAttempt:RequestHandler=(req,res,next)=>{
 const finalConsent:RequestHandler=(req,_res,next)=>{
  void relationalRuntimeConsentAuthority.assertCompositeFinal(req.params.attemptId,req.user!.userId).then(()=>next()).catch(next)
 }
-router.get('/my-private-form-tasks',authenticateHuiteacher,wrap(async req=>({list:await listOwnTeacherPrivateFormTasks(req.user!.userId)})))
+router.get('/my-private-form-tasks',authenticateHuiteacher,wrap(async req=>listOwnTeacherPrivateFormTaskPage(req.user!.userId,req.query)))
 router.post('/run-executions/:executionId/start-private-form',authenticateHuiteacher,wrap(async req=>{
  const executionId=uuid.parse(req.params.executionId)
  const task=await own(req.user!.userId,{executionId})

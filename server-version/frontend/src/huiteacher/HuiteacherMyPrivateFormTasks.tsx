@@ -14,20 +14,26 @@ function assertAttempt(state:CompositeAttemptState,id:string){
 }
 export function HuiteacherMyPrivateFormTasks(props:{api:Api;actorKey:string}){return <PrivateFormSession key={props.actorKey} {...props}/>}
 function PrivateFormSession({api,actorKey}:{api:Api;actorKey:string}){
- const [listing,setListing]=useState<{api:Api;rows:Task[]}|null>(null),[busy,setBusy]=useState(false),[message,setMessage]=useState('')
+ const [listing,setListing]=useState<{api:Api;actorKey:string;rows:Task[];nextCursor:string|null}|null>(null),[busy,setBusy]=useState(false),[message,setMessage]=useState('')
  const [active,setActive]=useState<{api:Api;task:Task;attempt:CompositeAttemptState|null}|null>(null)
  const [completed,setCompleted]=useState<string[]>([])
- const epoch=useRef(0),listEpoch=useRef(0),alive=useRef(true),locked=useRef(false),currentApi=useRef(api),activeRef=useRef(active)
- currentApi.current=api;activeRef.current=active
- const tasks=listing?.api===api?listing.rows:[],visible=active?.api===api?active:null
- const refresh=useCallback(async()=>{
-  if(!alive.current||currentApi.current!==api)return
+ const epoch=useRef(0),listEpoch=useRef(0),alive=useRef(true),locked=useRef(false),currentApi=useRef(api),currentActor=useRef(actorKey),activeRef=useRef(active)
+ currentApi.current=api;currentActor.current=actorKey;activeRef.current=active
+ const currentListing=listing?.api===api&&listing.actorKey===actorKey?listing:null
+ const tasks=currentListing?.rows??[],visible=active?.api===api?active:null
+ const fetchPage=useCallback(async(cursor?:string)=>{
+  if(!alive.current||currentApi.current!==api||currentActor.current!==actorKey)return
   const token=epoch.current,request=++listEpoch.current
-  const data=await api<{list:Task[]}>('/my-private-form-tasks')
-  if(!alive.current||currentApi.current!==api||token!==epoch.current||request!==listEpoch.current)return
-  if(!Array.isArray(data.list))throw Error('表单任务列表响应无效，请重新读取。')
-  setListing({api,rows:data.list})
- },[api])
+  const data=await api<{list:Task[];nextCursor?:string|null}>('/my-private-form-tasks'+(cursor?'?cursor='+encodeURIComponent(cursor):''))
+  if(!alive.current||currentApi.current!==api||currentActor.current!==actorKey||token!==epoch.current||request!==listEpoch.current)return
+  if(!Array.isArray(data.list)||(data.nextCursor!=null&&typeof data.nextCursor!=='string'))throw Error('表单任务列表响应无效，请重新读取。')
+  setListing(old=>{
+   if(cursor&&(!old||old.api!==api||old.actorKey!==actorKey||old.nextCursor!==cursor))return old
+   const rows=Array.from(new Map([...(cursor&&old?old.rows:[]),...data.list].map(task=>[task.executionId,task])).values())
+   return {api,actorKey,rows,nextCursor:data.nextCursor??null}
+  })
+ },[api,actorKey])
+ const refresh=useCallback(()=>fetchPage(),[fetchPage])
  useEffect(()=>{
   alive.current=true;epoch.current++;setActive(null);setListing(null);setCompleted([]);setBusy(false);setMessage('');locked.current=false
   const token=epoch.current
@@ -78,10 +84,11 @@ function PrivateFormSession({api,actorKey}:{api:Api;actorKey:string}){
   <p>完成分配给本人的固定版本表单，按分节逐步作答并提交；表单只记录作答，不生成量表分数。</p>
   <button type="button" disabled={busy} onClick={()=>void work(async()=>{await refresh()})}>刷新自编表单任务</button>
   {message&&<p role="status" className="ht-notice">{message}</p>}
-  {listing?.api===api&&!tasks.length&&<p className="ht-empty">暂无分配给本人的自编表单任务。</p>}
+  {currentListing&&!tasks.length&&<p className="ht-empty">暂无分配给本人的自编表单任务。</p>}
   <div className="ht-event-list">{tasks.map(task=><article className="ht-event" key={task.executionId}><strong>{task.formTitle}</strong><p>{task.eventTitle}</p>
    {completed.includes(task.executionId)||task.status==='COMPLETED'?<span className="ht-tag">已完成正式提交</span>:canOpen(task)?<button type="button" disabled={busy||Boolean(visible)} onClick={()=>open(task)}>{task.runStatus==='CLOSED'?'继续已有表单':'打开本人表单'}</button>:<p className="ht-muted">当前活动或任务未开放新的作答。</p>}
   </article>)}</div>
+  {currentListing?.nextCursor&&<button type="button" disabled={busy} onClick={()=>void work(async()=>{await fetchPage(currentListing.nextCursor!)})}>加载更多表单任务</button>}
   {visible&&<div className="ht-task"><h3>正在完成：{visible.task.formTitle}</h3>
    {!visible.attempt&&<><button type="button" disabled={busy} onClick={()=>void work(async()=>{await reload()})}>重新读取当前表单</button><button type="button" disabled={busy} onClick={leave}>返回任务列表</button></>}
    {visible.attempt?.status==='ABANDONED'&&<><p>本次作答已终止，不能继续提交。</p><button type="button" onClick={leave}>返回任务列表</button></>}
