@@ -26,12 +26,39 @@ export function decodeLocal(bytes){
  return {schema:1,status:'ACCEPTED_REVIEWED_LOCAL',ciExecuted:false,signed:false,localEvidenceSha256:sha(bytes),newPassed:162,priorApplicablePassed:19,limitations:record.limitations,types:'local exit 0',lint:'local exit 0 with disclosed warnings'};
 }
 function files(dir,prefix=''){return Object.fromEntries(readdirSync(dir).sort().flatMap(name=>{const path=dir+'/'+name,key=prefix+name;return statSync(path).isDirectory()?Object.entries(files(path,key+'/')):[[key,sha(readFileSync(path))]];}));}
+async function restorePrior(){
+ const p=binding.prior;assert.equal(process.env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');assert.ok(process.env.GH_TOKEN);const api='https://api.github.com/repos/'+process.env.GITHUB_REPOSITORY;
+ const get=async suffix=>{const r=await fetch(api+suffix,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'}});assert.equal(r.status,200,'Official API '+suffix);return r;};
+ const original=await(await get('/actions/runs/'+p.run)).json();assert.equal(original.head_sha,p.head);assert.equal(original.run_attempt,p.attempt);assert.equal(original.conclusion,'failure');assert.equal(original.status,'completed');
+ const job=await(await get('/actions/jobs/'+p.job)).json();assert.equal(job.run_id,p.run);assert.equal(job.conclusion,'failure');for(const name of ['compile frontend once and preserve builder plus runtime bytes','current dependency audit (no previous audit claimed)','scan exact produced runtime image'])assert.equal(job.steps.find(s=>s.name===name)?.conclusion,'success',name);
+ assert.equal(execFileSync('git',['diff','--name-only',p.head,'HEAD','--','server-version','.github/release-tools'],{encoding:'utf8'}).trim(),'','Original build/source/dependency closure drift');
+ mkdirSync(out+'/prior',{recursive:true});
+ for(const[k,a]of Object.entries(p.artifacts)){
+  const m=await(await get('/actions/artifacts/'+a.id)).json();assert.equal(m.expired,false);assert.equal(m.workflow_run.id,p.run);assert.equal(m.name,a.name);assert.equal(m.size_in_bytes,a.bytes);assert.equal(m.digest,'sha256:'+a.sha256);
+  const zip=Buffer.from(await(await get('/actions/artifacts/'+a.id+'/zip')).arrayBuffer());assert.equal(zip.length,a.bytes);assert.equal(sha(zip),a.sha256);const dest=out+'/prior/'+k;mkdirSync(dest,{recursive:true});writeFileSync(dest+'.zip',zip);
+  run('python3',['-c',`import zipfile, pathlib, sys, stat
+z=zipfile.ZipFile(sys.argv[1]); root=pathlib.Path(sys.argv[2]); assert z.testzip() is None
+for i in z.infolist():
+ p=pathlib.PurePosixPath(i.filename); assert not p.is_absolute() and '..' not in p.parts and not stat.S_ISLNK(i.external_attr>>16)
+z.extractall(root)
+`,dest+'.zip',dest]);
+ }
+ const reports=out+'/prior/reports';for(const[name,digest]of Object.entries(p.reports))assert.equal(sha(readFileSync(reports+'/'+name)),digest,name);
+ const oldBrowser=JSON.parse(readFileSync(reports+'/browser/browser.json'));assert.equal(oldBrowser.status,'failed','Never relabel the prior failed browser');
+ const audit=JSON.parse(readFileSync(reports+'/audit.json'));assert.equal(audit.metadata.vulnerabilities.high,0);assert.equal(audit.metadata.vulnerabilities.critical,0);const scan=JSON.parse(readFileSync(reports+'/runtime-scan.json'));assert.equal(scan.ArtifactName,'survey-experience-runtime:'+p.checkout);assert.equal(scan.Metadata.ImageID,p.images[1].id);for(const r of scan.Results||[])for(const v of r.Vulnerabilities||[])assert.ok(!['HIGH','CRITICAL'].includes(v.Severity)||!v.FixedVersion);
+ const tar=out+'/prior/images/images.tar.gz';assert.equal(sha(readFileSync(tar)),p.tarSHA256);run('docker',['load','--input',tar]);const imgs=JSON.parse(execFileSync('docker',['image','inspect',...p.images.flatMap(i=>i.tags)],{encoding:'utf8'}));assert.equal(imgs.length,p.images.length);for(let i=0;i<imgs.length;i++){assert.equal(imgs[i].Id,p.images[i].id);assert.deepEqual(imgs[i].RepoTags,p.images[i].tags);assert.equal(imgs[i].Config.Labels['org.opencontainers.image.revision'],p.checkout);}
+ mkdirSync(out+'/runtime',{recursive:true});const id=execFileSync('docker',['create','survey-experience-runtime:'+p.checkout],{encoding:'utf8'}).trim();try{run('docker',['cp',id+':/usr/share/nginx/html/.',out+'/runtime/']);}finally{run('docker',['rm',id]);}
+ for(const name of ['build.json','runtime-files.json','images.json','images.sha256'])writeFileSync(out+'/'+name,readFileSync(reports+'/'+name));const actual=files(out+'/runtime');for(const[k,v]of Object.entries(JSON.parse(readFileSync(out+'/runtime-files.json'))))assert.equal(actual[k],v,k);
+ writeFileSync(out+'/prior-admission.json',JSON.stringify({status:'ACCEPTED_SUCCESSFUL_BUILD_AUDIT_SCAN_ONLY',originalRun:p.run,originalHead:p.head,originalRunConclusion:'failure',originalJobConclusion:'failure',imageRevision:p.checkout,currentScriptRevision:process.env.GITHUB_SHA,browser:'original failure retained; current browser must execute',compileRepeated:false,priorSastAccepted:false},null,2));
+}
+
 async function main(mode){
  mkdirSync(out,{recursive:true});
  if(mode==='admit'){
   const {changedEntries}=await import('./content-scope.mjs');const p=JSON.parse(process.env.PLAN);const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();assert.deepEqual(p,surveyExperiencePlan(changedEntries(p.base,head),p.base,head));
   writeFileSync(out+'/local-admission.json',JSON.stringify(decodeLocal(readFileSync('.github/scripts/survey-experience-local.json')),null,2));return;
  }
+ if(mode==='restore-prior'){await restorePrior();return;}
  if(mode==='build'){
   const head=process.env.GITHUB_SHA;assert.match(head,/^[a-f0-9]{40}$/);const builder='survey-experience-builder:'+head,runtime='survey-experience-runtime:'+head;
   for(const target of ['build','runtime'])run('docker',['build','--target',target,'--build-arg','NPM_REGISTRY=https://registry.npmjs.org','--build-arg','VITE_COGNITIVE_MODULE_ENABLED=true','--label','org.opencontainers.image.revision='+head,'-t',target==='build'?builder:runtime,'server-version/frontend']);

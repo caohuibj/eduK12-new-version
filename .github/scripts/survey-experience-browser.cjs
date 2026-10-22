@@ -74,13 +74,28 @@ async function main(){
     const result=await page.evaluate(()=>{const el=document.activeElement,s=getComputedStyle(el);return {tag:el.tagName,focusVisible:el.matches(':focus-visible'),outlineStyle:s.outlineStyle,outlineWidth:s.outlineWidth};});
     report.keyboardFocus.push({name,width,...result});assert.equal(result.focusVisible,true);assert.notEqual(result.outlineStyle,'none');assert.ok(parseFloat(result.outlineWidth)>0);
   }
+  // Wrap only locator calls for diagnostics. Forward arguments and results unchanged;
+  // no retry, fallback selector, forced action or assertion suppression.
+  const locatorFactories=new Set(['locator','getByRole','getByLabel','getByText','filter','first','last','nth']);
+  const locatorActions=new Set(['click','fill','selectOption','check','focus','waitFor','count','inputValue','getAttribute','isChecked','isDisabled','evaluate']);
+  function trackedLocator(locator){return new Proxy(locator,{get(target,key){
+    const value=Reflect.get(target,key);if(typeof value!=='function')return value;
+    return (...args)=>{
+      if(locatorActions.has(key))selector={operation:String(key),locator:target.toString().slice(0,600)};
+      const result=value.apply(target,args);return locatorFactories.has(key)?trackedLocator(result):result;
+    };
+  }});}
+  function trackedPage(page){return new Proxy(page,{get(target,key){
+    const value=Reflect.get(target,key);if(typeof value!=='function')return value;
+    return (...args)=>{const result=value.apply(target,args);return locatorFactories.has(key)?trackedLocator(result):result;};
+  }});}
   async function scene(width,{media=false}={}){
     const context=await browser.newContext({viewport:{width,height:1000},reducedMotion:'reduce',serviceWorkers:'block',acceptDownloads:true});
     const state={requests:[],finals:[],exports:0,downloads:0,overviewMode:'ok',reportMode:'ok',overviewGate:null,reportGate:null,imageGate:media?deferred():null};
     // HTTP has no secure-context randomUUID. Supply only the standards-equivalent
     // ID primitive, not secure-context grants, permissions, app state or handlers.
     await context.addInitScript(()=>{if(!crypto.randomUUID)Object.defineProperty(crypto,'randomUUID',{value:()=>{const b=crypto.getRandomValues(new Uint8Array(16));b[6]=(b[6]&15)|64;b[8]=(b[8]&63)|128;const h=Array.from(b,x=>x.toString(16).padStart(2,'0')).join('');return [h.slice(0,8),h.slice(8,12),h.slice(12,16),h.slice(16,20),h.slice(20)].join('-');}});});
-    const page=await context.newPage();activePage=page;page.setDefaultTimeout(10000);
+    const page=trackedPage(await context.newPage());activePage=page;page.setDefaultTimeout(10000);
     page.on('pageerror',()=>report.pageErrors.push({phase,code:'PAGE_ERROR'}));
     await context.route('**/*',async route=>{
       const request=route.request(),u=new URL(request.url()),key=request.method()+' '+u.pathname+u.search;
@@ -180,7 +195,7 @@ async function main(){
       await tab(p,'发布与采集');await p.getByRole('heading',{name:'当前阶段：尚未保存草稿',exact:true}).waitFor();await p.getByRole('button',{name:/T1 · 合成草稿波次/}).click();await p.getByRole('heading',{name:'当前阶段：草稿，尚未冻结',exact:true}).waitFor();
       await p.getByText('请先运行检查，通过后才能冻结。',{exact:true}).waitFor();
       await tab(p,'研究数据');await p.getByText('本项目暂无研究波次。请先在发布入口创建并保存波次。',{exact:true}).waitFor();
-      const exportPanel=p.getByRole('heading',{name:'匿名科研数据导出',exact:true}).locator('..');await exportPanel.getByLabel('数据格式',{exact:true}).selectOption('RAW_LONG');
+      const exportPanel=p.getByRole('heading',{name:'匿名科研数据导出',exact:true}).locator('..');const format=exportPanel.getByLabel(/^数据格式/);assert.equal(await format.count(),1,'one label-associated export format');await format.selectOption('RAW_LONG');assert.equal(await format.inputValue(),'RAW_LONG');
       assert.equal(v.state.exports,0);await exportPanel.getByLabel('最新 TOTP 动态验证码').fill('123456');await click(p,'完成五分钟内二次认证');await click(p,'创建受控导出');await p.getByRole('region',{name:'当前导出批次'}).waitFor();assert.equal(v.state.exports,1);assert.equal(v.state.downloads,0);
       const download=p.waitForEvent('download');await click(p,'下载 CSV');const file=await download;assert.equal(await file.failure(),null);await p.getByText('CSV：已发起，请核对保存',{exact:true}).waitFor();assert.equal(v.state.downloads,1);assert.equal(v.state.exports,1);
       await layout(p,'researcher-data-'+width,width);await v.close();

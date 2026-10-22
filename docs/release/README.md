@@ -694,3 +694,13 @@ real publication, database correctness, or media processing. No TLS exception,
 backend, PostgreSQL, restore or platform suite is involved. Original merge
 gate, scope and CodeQL requirements remain mandatory. This is not a general
 unsigned-local-result trust mechanism and changes no older candidate route.
+
+The first official run `39704148772` retained a successful production build,
+audit and runtime scan but failed during the synthetic browser journey. Its
+overall and frontend-job failures remain failures. A continuation pins that
+run/head/attempt, official ZIP digests, inner archive digest, original image
+IDs/tags/labels and successful step identities; it restores those exact bytes
+and reruns only the browser. The full frontend/backend fixture/tool inputs
+must remain byte-identical. No earlier CodeQL execution is claimed: the first
+run omitted the new route from the existing job condition, now corrected, and
+actual relevant SAST success remains mandatory before merge.

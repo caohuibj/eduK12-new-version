@@ -7,6 +7,7 @@ on:
         required: true
 permissions:
   contents: read
+  actions: read
 jobs:
   frontend:
     runs-on: ubuntu-24.04
@@ -26,24 +27,10 @@ jobs:
           registry-url: https://registry.npmjs.org
       - name: verify exact candidate and explicitly approved unsigned local results
         run: node .github/scripts/survey-experience-candidate.mjs admit
-      - uses: docker/setup-buildx-action@v3
-      - name: compile frontend once and preserve builder plus runtime bytes
-        run: node .github/scripts/survey-experience-candidate.mjs build
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: survey-experience-images-${{ github.sha }}
-          path: survey-experience-images/
-          if-no-files-found: error
-          retention-days: 7
-      - name: current dependency audit (no previous audit claimed)
-        run: node .github/scripts/survey-experience-candidate.mjs audit
-      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
-        with:
-          version: v0.70.0
-          cache: false
-      - name: scan exact produced runtime image
-        run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output survey-experience-evidence/runtime-scan.json survey-experience-runtime:${{ github.sha }}
+      - name: restore exact successful prior build audit and scan without recompilation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/survey-experience-candidate.mjs restore-prior
       - name: install existing pinned release tools and official Chromium
         run: |
           npm ci --prefix .github/release-tools --registry=https://registry.npmjs.org
@@ -67,5 +54,6 @@ jobs:
             survey-experience-evidence/*.json
             survey-experience-evidence/*.sha256
             survey-experience-evidence/browser/
+            survey-experience-evidence/prior/reports/
           if-no-files-found: error
           retention-days: 7

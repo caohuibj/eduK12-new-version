@@ -106,5 +106,51 @@
     "server-version/cognitive-randomization-golden-v1.json": "5b3cb7c11138044ad6a85626e74004bea2a3e62a",
     "server-version/backend/src/modules/cognitive/generated/identities.json": "dc7aa603721cdea46de7e0ed93f04ba9679a02e4",
     ".github/release-tools/package-lock.json": "b7731f8e3b798e08d1693a9c7b108405d183f45e"
+  },
+  "prior": {
+    "run": 39704148772,
+    "attempt": 1,
+    "head": "97a50f958082acbcdfde118dee683305a1007b68",
+    "job": 119580192647,
+    "conclusion": "failure",
+    "checkout": "1849aef3ab540963d38aba19324d61755c5f2633",
+    "artifacts": {
+      "images": {
+        "id": 12394446626,
+        "name": "survey-experience-images-1849aef3ab540963d38aba19324d61755c5f2633",
+        "bytes": 395419062,
+        "sha256": "5548fc44d424927f2821268040af43fc49b8e8a39bb7b7cdb30ad278e740ebe1"
+      },
+      "reports": {
+        "id": 12393438961,
+        "name": "survey-experience-evidence-1849aef3ab540963d38aba19324d61755c5f2633",
+        "bytes": 750666,
+        "sha256": "ee4f6b548ed509a04af54357a724d0f1bb3c22a65a60d97174919b8fc3bcd3b6"
+      }
+    },
+    "reports": {
+      "build.json": "5e12e8cebcecec554b206dc9afbf091f25f25f5a56ce631889d053cc55e44c22",
+      "runtime-scan.json": "8ef8f0adf9de8c5b66f06d80ee5695ae439c4d1ba659cdd56f678f4963557c1e",
+      "runtime-files.json": "0758a5a78f11201eb9d8de65ab179dac0dc4ab5e402688d0a8139825828cf730",
+      "images.json": "b6828136df459712f8072df0981137d62d7b83172e706a28a8521a3e450fef02",
+      "local-admission.json": "c574fd270909b64af30e3c1f5371ac2a336c8c1d0352c0ea7d3f2f9d22c36d28",
+      "audit.json": "3836a1b5d9e8d3de51bd5e8765c7b4cf223783e32163480a3bb6946f54a7ab6f",
+      "images.sha256": "1d8c5f6cc5326f105afe6995fca3ce902f71d1b6c953d304903ceceff20dba9f"
+    },
+    "images": [
+      {
+        "id": "sha256:c0028f9fd76f9c3d19feb01fed0d914cc025a1133267a49bce36a6a7ad96a396",
+        "tags": [
+          "survey-experience-builder:1849aef3ab540963d38aba19324d61755c5f2633"
+        ]
+      },
+      {
+        "id": "sha256:c594c392433d2c83a50cda1d3475eb69424fe31ac06272cccbc0c52f13007ccd",
+        "tags": [
+          "survey-experience-runtime:1849aef3ab540963d38aba19324d61755c5f2633"
+        ]
+      }
+    ],
+    "tarSHA256": "76a56bbaf8ace8979f2dfb89dcedc9449d4b33e74de97f626a89cc9066c8cf5b"
   }
 }
