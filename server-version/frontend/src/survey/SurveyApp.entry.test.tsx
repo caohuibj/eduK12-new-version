@@ -37,14 +37,14 @@ describe('Survey public entry and existing authentication transitions', () => {
     render(<SurveyApp />)
     expect(await screen.findByRole('link', { name: '进入研究工作台' })).toHaveAttribute('href', '/workspace')
     expect(fetcher.mock.calls).toHaveLength(1)
-    expect(screen.queryByRole('heading', { name: '我的研究' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: '研究工作台' })).not.toBeInTheDocument()
   })
 
   it('keeps direct workspace access behind the existing session lookup', async () => {
     window.history.replaceState(null, '', '/workspace')
     render(<SurveyApp />)
     expect(await screen.findByRole('heading', { name: '研究者登录' })).toBeInTheDocument()
-    expect(screen.queryByRole('heading', { name: '我的研究' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: '研究工作台' })).not.toBeInTheDocument()
   })
 
   it.each(['/features/research-projects', '/features/research-tools', '/features/research-participation', '/features/research-data'])(
@@ -75,10 +75,10 @@ describe('Survey public entry and existing authentication transitions', () => {
     fireEvent.change(screen.getByLabelText('密码'), { target: { value: 'test-password' } })
     fireEvent.click(screen.getByRole('button', { name: '进入双因素验证' }))
     await screen.findByRole('heading', { name: '双因素验证' })
-    expect(screen.queryByRole('heading', { name: '我的研究' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: '研究工作台' })).not.toBeInTheDocument()
     fireEvent.change(screen.getByLabelText('动态验证码／恢复码'), { target: { value: '123456' } })
     fireEvent.click(screen.getByRole('button', { name: '验证并登录' }))
-    expect(await screen.findByRole('heading', { name: '我的研究' })).toBeInTheDocument()
+    expect(await screen.findByRole('heading', { name: '研究工作台' })).toBeInTheDocument()
   })
 
   it.each([['/claim', '激活研究者身份', '/auth/claim'], ['/reset-password', '恢复 Survey 密码', '/auth/reset-password']])(
@@ -105,7 +105,7 @@ describe('Survey public entry and existing authentication transitions', () => {
       expect(window.location.pathname).toBe('/')
       fireEvent.change(screen.getByLabelText('动态验证码／恢复码'), { target: { value: '123456' } })
       fireEvent.click(screen.getByRole('button', { name: '验证并登录' }))
-      expect(await screen.findByRole('heading', { name: '我的研究' })).toBeInTheDocument()
+      expect(await screen.findByRole('heading', { name: '研究工作台' })).toBeInTheDocument()
       expect(screen.queryByRole('link', { name: '研究者登录' })).not.toBeInTheDocument()
     },
   )

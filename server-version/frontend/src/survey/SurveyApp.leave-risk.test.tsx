@@ -37,7 +37,7 @@ beforeEach(()=>{
 })
 afterEach(()=>{vi.restoreAllMocks();vi.unstubAllGlobals()})
 async function openTool(){
-  await screen.findByRole('heading',{name:'我的研究'})
+  await screen.findByRole('heading',{name:'研究工作台'})
   selectStudy(0)
   fireEvent.click(screen.getByRole('tab',{name:'研究工具'}))
   fireEvent.change(screen.getByLabelText('合成草稿'),{target:{value:'不能丢失'}})
@@ -75,7 +75,7 @@ describe('researcher workspace leave protection',()=>{
   })
   it('protects project settings and browser reload, but same-project selection does not erase edits',async()=>{
     render(<SurveyApp/>)
-    await screen.findByRole('heading',{name:'我的研究'})
+    await screen.findByRole('heading',{name:'研究工作台'})
     selectStudy(0)
     fireEvent.change(screen.getByLabelText('研究名称'),{target:{value:'本地修改'}})
     selectStudy(0)
@@ -98,7 +98,7 @@ describe('researcher workspace leave protection',()=>{
       return base(url)
     })
     render(<SurveyApp/>)
-    await screen.findByRole('heading',{name:'我的研究'})
+    await screen.findByRole('heading',{name:'研究工作台'})
     fireEvent.click(screen.getByRole('button',{name:/^下一页$/}))
     // A read alone does not prevent logout.
     expect(screen.getByRole('button',{name:'退出'})).toBeEnabled()
@@ -119,7 +119,7 @@ describe('researcher workspace leave protection',()=>{
     const base=fetcher.getMockImplementation()!
     fetcher.mockImplementation((url:string)=>url.endsWith('/auth/capabilities')&&fail?Promise.reject(new Error('offline')):base(url))
     render(<SurveyApp/>)
-    await screen.findByRole('heading',{name:'我的研究'})
+    await screen.findByRole('heading',{name:'研究工作台'})
     selectStudy(0)
     fireEvent.click(screen.getByRole('tab',{name:'研究数据'}))
     expect(await screen.findByRole('alert')).toHaveTextContent('这不代表功能未开通')
