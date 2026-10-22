@@ -1,0 +1,1995 @@
+{
+  "kind": "New index of existing evidence only; no checks executed",
+  "logs": [
+    {
+      "publishedLog": "logs/assessment-layout-filter-tests.sanitized-v1.log",
+      "originalSHA256": "cdb1c78512fdb6481c000c7ae7a5a9f8049763767b734bb8fb3110969d060a84",
+      "originalBytes": 295,
+      "records": [
+        {
+          "report": "reports/assessment-layout-result.json",
+          "commandsAsRecorded": {
+            "command": "vitest run src/training/TrainingCatalogControls.test.tsx src/training/TrainingCoursePages.test.tsx -t \"single header filter|Catalog\" --maxWorkers=1"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed | 1 skipped (2)",
+        "Tests  1 passed | 15 skipped (16)"
+      ]
+    },
+    {
+      "publishedLog": "logs/assessment-layout-legacy-filter-tests.sanitized-v1.log",
+      "originalSHA256": "080b8bb2a7893248ce005f4640eca0153deaa0f2b324eab0e6f0b838a1bdb4f4",
+      "originalBytes": 279,
+      "records": [
+        {
+          "report": "reports/assessment-layout-result.json",
+          "commandsAsRecorded": {
+            "command": "vitest run src/training/TrainingCatalogControls.test.tsx -t \"applies server filters\" --maxWorkers=1"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed (1)",
+        "Tests  1 passed | 2 skipped (3)"
+      ]
+    },
+    {
+      "publishedLog": "logs/assessment-layout-lint.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/assessment-layout-result.json",
+          "commandsAsRecorded": {
+            "command": "eslint src/training/TrainingCatalogControls.tsx src/training/TrainingTrainerCourse.tsx src/training/TrainingCoursePages.test.tsx"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/assessment-layout-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/assessment-layout-result.json",
+          "commandsAsRecorded": {
+            "command": "tsc -p tsconfig.app.json --noEmit"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/course-assignment-merge-existing-tests.sanitized-v1.log",
+      "originalSHA256": "ed52be3737fa29e6f41cf0459beb67e9851e1bb15d621ad70d42dcd3e83b54b8",
+      "originalBytes": 271,
+      "records": [
+        {
+          "report": "reports/course-task-unification-result.json",
+          "commandsAsRecorded": {
+            "command": "vitest run src/training/TrainingCoursePages.test.tsx src/pages/__tests__/AssignmentList.states.test.tsx src/training/TrainingCourseEditorTabs.test.tsx --maxWorkers=1"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  3 passed (3)",
+        "Tests  17 passed (17)"
+      ]
+    },
+    {
+      "publishedLog": "logs/course-assignment-merge-lint-first.sanitized-v1.log",
+      "originalSHA256": "2f69348ebb4738c5e44b11cc59b42afcd3527adadc1eab2da5bf9e22054fb59a",
+      "originalBytes": 1399,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": false,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/course-assignment-merge-types-first.sanitized-v1.log",
+      "originalSHA256": "15fedaf11f4c873fb5f71c73f9103b806613d40ce439b8db4dc8a56fcde9b417",
+      "originalBytes": 382,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "src/training/TrainingTrainerCourse.tsx(101,240): error TS2367: This comparison appears to be unintentional because the types '\"checkins\" | \"assessments\"' and '\"assignments\"' have no overlap.",
+        "src/training/TrainingTrainerCourse.tsx(122,269): error TS2367: This comparison appears to be unintentional because the types '\"checkins\" | \"assessments\"' and '\"assignments\"' have no overlap."
+      ]
+    },
+    {
+      "publishedLog": "logs/course-assignment-merge-workflow-tests.sanitized-v1.log",
+      "originalSHA256": "f7c02d54e902105322912d431f5cf6708c37ad1fd23d27debdf52be612f93f59",
+      "originalBytes": 91789,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 failed (1)",
+        "Tests  4 failed | 1 passed (5)",
+        "⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯",
+        "FAIL  src/pages/__tests__/AssignmentList.course-workspace.test.tsx > Unified course exercise management > opens authorized editing and submissions inside the same course URL",
+        "FAIL  src/pages/__tests__/AssignmentList.course-workspace.test.tsx > Unified course exercise management > retains the visible authenticated Excel export without navigating away",
+        "FAIL  src/pages/__tests__/AssignmentList.course-workspace.test.tsx > Unified course exercise management > publishes in the current course and clears old task/filter focus before refreshing its list",
+        "FAIL  src/pages/__tests__/AssignmentList.course-workspace.test.tsx > Unified course exercise management > rejects a focused exercise from another course and offers no edit/export actions"
+      ]
+    },
+    {
+      "publishedLog": "logs/course-checkin-owner-retry.sanitized-v1.log",
+      "originalSHA256": "fdb3c4fc3d93395007ff51c31a1d0beb56c0d1a1f0b866c1af98b655028d90a8",
+      "originalBytes": 280,
+      "records": [
+        {
+          "report": "reports/course-task-unification-result.json",
+          "commandsAsRecorded": {
+            "command": "vitest run src/pages/__tests__/CheckinList.course-workspace.test.tsx -t \"rejects a focused\" --maxWorkers=1"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed (1)",
+        "Tests  1 passed | 5 skipped (6)"
+      ]
+    },
+    {
+      "publishedLog": "logs/course-footer-code-lint.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/course-footer-boxes-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "course-footer-code-lint.log",
+              "node_modules/eslint/bin/eslint.js",
+              "src/training/TrainingTrainerHome.tsx"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/course-footer-code-tests.sanitized-v1.log",
+      "originalSHA256": "ea46590bef34a824d0f11d23b5c27a0c1ba71473371d0f32abfab39f60fc9850",
+      "originalBytes": 271,
+      "records": [
+        {
+          "report": "reports/course-footer-boxes-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "course-footer-code-tests.log",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "src/training/TrainingCourseCode.test.tsx",
+              "src/training/TrainingTrainerHome.pagination.test.tsx",
+              "--maxWorkers=1"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  2 passed (2)",
+        "Tests  13 passed (13)"
+      ]
+    },
+    {
+      "publishedLog": "logs/course-footer-code-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/course-footer-boxes-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "course-footer-code-types.log",
+              "node_modules/typescript/bin/tsc",
+              "-p",
+              "tsconfig.app.json",
+              "--noEmit"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/course-overview-lint.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/course-overview-result.json",
+          "commandsAsRecorded": {
+            "command": "node_modules/eslint/bin/eslint.js src/training/TrainingTrainerCourse.tsx"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/course-overview-tests.sanitized-v1.log",
+      "originalSHA256": "23ecae9bbe8cbca25e66f6c0090b01f548dbd74ad1f0a0a3e6c88764f7f744fa",
+      "originalBytes": 271,
+      "records": [
+        {
+          "report": "reports/course-overview-result.json",
+          "commandsAsRecorded": {
+            "command": "node_modules/vitest/vitest.mjs run src/training/TrainingCoursePages.test.tsx --maxWorkers=1"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed (1)",
+        "Tests  12 passed (12)"
+      ]
+    },
+    {
+      "publishedLog": "logs/course-overview-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/course-overview-result.json",
+          "commandsAsRecorded": {
+            "command": "node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/course-task-legacy-create.sanitized-v1.log",
+      "originalSHA256": "bc853a165a703cd87e5cd3100c06e278d4283ae95051237136a3b9731455b51a",
+      "originalBytes": 283,
+      "records": [
+        {
+          "report": "reports/course-task-unification-result.json",
+          "commandsAsRecorded": {
+            "command": "vitest run src/pages/__tests__/AssignmentList.course-workspace.test.tsx src/pages/__tests__/CheckinList.course-workspace.test.tsx -t \"keeps legacy create\" --maxWorkers=1"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  2 passed (2)",
+        "Tests  2 passed | 11 skipped (13)"
+      ]
+    },
+    {
+      "publishedLog": "logs/course-task-parent-integration.sanitized-v1.log",
+      "originalSHA256": "3359af4ed938a6f52f112615931236b948606d668feb3b1f9e4911f0a755e5d2",
+      "originalBytes": 282,
+      "records": [
+        {
+          "report": "reports/course-task-unification-result.json",
+          "commandsAsRecorded": {
+            "command": "vitest run src/training/TrainingCoursePages.test.tsx -t \"trainer publishing links\" --maxWorkers=1"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed (1)",
+        "Tests  1 passed | 11 skipped (12)"
+      ]
+    },
+    {
+      "publishedLog": "logs/course-task-workspace-final-test-lint.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/course-task-unification-result.json",
+          "commandsAsRecorded": {
+            "command": "eslint src/pages/__tests__/AssignmentList.course-workspace.test.tsx src/pages/__tests__/CheckinList.course-workspace.test.tsx"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/course-task-workspace-final-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/course-task-unification-result.json",
+          "commandsAsRecorded": {
+            "command": "tsc -p tsconfig.app.json --noEmit"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/course-task-workspace-lint.sanitized-v1.log",
+      "originalSHA256": "6c9b9fdc6d31aa0754a5660dbbc3cbf7ada4fbcce1b47bc3609bbcb12b441d25",
+      "originalBytes": 2755,
+      "records": [
+        {
+          "report": "reports/course-task-unification-result.json",
+          "commandsAsRecorded": {
+            "command": "eslint src/pages/AssignmentList.tsx src/pages/CheckinList.tsx src/training/TrainingTrainerCourse.tsx src/training/TrainingCoursePages.test.tsx src/pages/__tests__/AssignmentList.course-workspace.test.tsx src/pages/__tests__/CheckinList.course-workspace.test.tsx"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/course-task-workspace-types-fixed.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/course-task-workspace-types.sanitized-v1.log",
+      "originalSHA256": "ab3c7f72f2741c9ccaa7324a9b18f31d6bd511863ee4d89db19fcb9203801f50",
+      "originalBytes": 12441,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "src/pages/__tests__/AssignmentList.course-workspace.test.tsx(36,71): error TS2769: No overload matches this call.",
+        "src/pages/__tests__/AssignmentList.course-workspace.test.tsx(44,64): error TS2769: No overload matches this call.",
+        "src/pages/__tests__/AssignmentList.course-workspace.test.tsx(57,76): error TS2769: No overload matches this call.",
+        "src/pages/__tests__/AssignmentList.course-workspace.test.tsx(66,59): error TS2769: No overload matches this call.",
+        "src/pages/__tests__/AssignmentList.course-workspace.test.tsx(67,64): error TS2769: No overload matches this call.",
+        "src/pages/__tests__/AssignmentList.course-workspace.test.tsx(72,72): error TS2769: No overload matches this call.",
+        "src/pages/__tests__/AssignmentList.course-workspace.test.tsx(75,59): error TS2769: No overload matches this call.",
+        "src/pages/__tests__/AssignmentList.course-workspace.test.tsx(82,57): error TS2769: No overload matches this call.",
+        "src/pages/__tests__/AssignmentList.course-workspace.test.tsx(83,57): error TS2769: No overload matches this call.",
+        "src/pages/__tests__/CheckinList.course-workspace.test.tsx(36,71): error TS2769: No overload matches this call.",
+        "src/pages/__tests__/CheckinList.course-workspace.test.tsx(44,64): error TS2769: No overload matches this call.",
+        "src/pages/__tests__/CheckinList.course-workspace.test.tsx(57,76): error TS2769: No overload matches this call.",
+        "src/pages/__tests__/CheckinList.course-workspace.test.tsx(66,59): error TS2769: No overload matches this call.",
+        "src/pages/__tests__/CheckinList.course-workspace.test.tsx(67,64): error TS2769: No overload matches this call.",
+        "src/pages/__tests__/CheckinList.course-workspace.test.tsx(72,72): error TS2769: No overload matches this call.",
+        "src/pages/__tests__/CheckinList.course-workspace.test.tsx(75,59): error TS2769: No overload matches this call.",
+        "src/pages/__tests__/CheckinList.course-workspace.test.tsx(80,59): error TS2769: No overload matches this call.",
+        "src/pages/__tests__/CheckinList.course-workspace.test.tsx(81,64): error TS2769: No overload matches this call."
+      ]
+    },
+    {
+      "publishedLog": "logs/course-task-workspace-workflows.sanitized-v1.log",
+      "originalSHA256": "913773d425467323b2aecbf945e95c42cf4cc1f2b1ade28df27f571c54f7e783",
+      "originalBytes": 12918,
+      "records": [
+        {
+          "report": "reports/course-task-unification-result.json",
+          "commandsAsRecorded": {
+            "command": "vitest run src/pages/__tests__/AssignmentList.course-workspace.test.tsx src/pages/__tests__/CheckinList.course-workspace.test.tsx --maxWorkers=1"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 1
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 failed | 1 passed (2)",
+        "Tests  1 failed | 10 passed (11)",
+        "⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯",
+        "FAIL  src/pages/__tests__/CheckinList.course-workspace.test.tsx > Unified course check-in management > rejects a focused check-in from another course and offers no edit/export actions"
+      ]
+    },
+    {
+      "publishedLog": "logs/course-toolbar-filter-retry.sanitized-v1.log",
+      "originalSHA256": "3b4aa59ab8553d675b692988b3dd538d781ea4ada54fa98c32e954b000b215b4",
+      "originalBytes": 283,
+      "records": [
+        {
+          "report": "reports/course-toolbar-result.json",
+          "commandsAsRecorded": {
+            "command": "vitest run src/training/TrainingCoursePages.test.tsx -t \"single header filter\" --maxWorkers=1"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed (1)",
+        "Tests  1 passed | 12 skipped (13)"
+      ]
+    },
+    {
+      "publishedLog": "logs/course-toolbar-filter-tests.sanitized-v1.log",
+      "originalSHA256": "29fb91c486c3dbb2b7dc65d888e1cde73971fe30087367ea8b00748181dceba8",
+      "originalBytes": 22271,
+      "records": [
+        {
+          "report": "reports/course-toolbar-result.json",
+          "commandsAsRecorded": {
+            "command": "vitest run src/training/TrainingCoursePages.test.tsx -t \"single header filter|trainer publishing links\" --maxWorkers=1"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 1
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 1 passed | 11 skipped (13)",
+        "⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯",
+        "FAIL  src/training/TrainingCoursePages.test.tsx > course-first training workspaces > applies the single header filter only to the current course section"
+      ]
+    },
+    {
+      "publishedLog": "logs/course-toolbar-final-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/course-toolbar-result.json",
+          "commandsAsRecorded": {
+            "command": "tsc -p tsconfig.app.json --noEmit"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/course-toolbar-lint.sanitized-v1.log",
+      "originalSHA256": "6c9b9fdc6d31aa0754a5660dbbc3cbf7ada4fbcce1b47bc3609bbcb12b441d25",
+      "originalBytes": 2755,
+      "records": [
+        {
+          "report": "reports/course-toolbar-result.json",
+          "commandsAsRecorded": {
+            "command": "eslint src/training/TrainingTrainerCourse.tsx src/training/TrainingCheckinSchedules.tsx src/training/TrainingCoursePages.test.tsx src/pages/AssignmentList.tsx src/pages/CheckinList.tsx"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/course-toolbar-schedules-tests.sanitized-v1.log",
+      "originalSHA256": "c8791cb862bf97110ba057e8d0862242dc8061ba4c93736e7c67f7c9047986b5",
+      "originalBytes": 269,
+      "records": [
+        {
+          "report": "reports/course-toolbar-result.json",
+          "commandsAsRecorded": {
+            "command": "vitest run src/training/TrainingCheckinSchedules.test.tsx --maxWorkers=1"
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed (1)",
+        "Tests  4 passed (4)"
+      ]
+    },
+    {
+      "publishedLog": "logs/course-toolbar-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/form-template-backend-types-final.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/form-template-backend-types-first.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/form-template-backend-types-instructions.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/form-template-edit-preservation-final.sanitized-v1.log",
+      "originalSHA256": "7ed924cbfb5137928bafa08589e2eeec86908eaa4a37aa6d93ec26b9b54aed7f",
+      "originalBytes": 281,
+      "records": [
+        {
+          "report": "reports/form-template-result.json",
+          "commandsAsRecorded": {},
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed (1)",
+        "Tests  2 passed | 3 skipped (5)"
+      ]
+    },
+    {
+      "publishedLog": "logs/form-template-empty-conversion-final.sanitized-v1.log",
+      "originalSHA256": "d057457760a45ab4cff9adadca39a689a271c9888a152cff0ad84a269a53c676",
+      "originalBytes": 275,
+      "records": [
+        {
+          "report": "reports/form-template-result.json",
+          "commandsAsRecorded": {},
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed (1)",
+        "Tests  1 passed | 5 skipped (6)"
+      ]
+    },
+    {
+      "publishedLog": "logs/form-template-final-ui.sanitized-v1.log",
+      "originalSHA256": "244a88627549c315a240cf92a06bac3e2020b53e188980cb74eb7bdfcd4f2748",
+      "originalBytes": 272,
+      "records": [
+        {
+          "report": "reports/form-template-result.json",
+          "commandsAsRecorded": {},
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  2 passed (2)",
+        "Tests  81 passed (81)"
+      ]
+    },
+    {
+      "publishedLog": "logs/form-template-frozen-backend-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/form-template-result.json",
+          "commandsAsRecorded": {},
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/form-template-frozen-lint.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/form-template-result.json",
+          "commandsAsRecorded": {},
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/form-template-frozen-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/form-template-result.json",
+          "commandsAsRecorded": {},
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/form-template-integration-after-migration.sanitized-v1.log",
+      "originalSHA256": "0aa7abc25d8d2f8215838f2e1a52011950cb515c73fc07171c01838d40a638ca",
+      "originalBytes": 1067,
+      "records": [
+        {
+          "report": "reports/form-template-result.json",
+          "commandsAsRecorded": {},
+          "exitsAsRecorded": {
+            "exitCode": 1
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 3 passed | 1 skipped (5)",
+        "⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯",
+        "FAIL  src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL > copies the whole typed form atomically, remaps conditional keys and keeps source/delivery data independent"
+      ]
+    },
+    {
+      "publishedLog": "logs/form-template-integration-content-final.sanitized-v1.log",
+      "originalSHA256": "59467c41461e8a3670120328c0d9d89b484a07bd2038e117b56b3fbd28efe6e7",
+      "originalBytes": 264,
+      "records": [
+        {
+          "report": "reports/form-template-result.json",
+          "commandsAsRecorded": {},
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed (1)",
+        "Tests  5 passed (5)"
+      ]
+    },
+    {
+      "publishedLog": "logs/form-template-integration-first.sanitized-v1.log",
+      "originalSHA256": "c6678c91fa8c63808c1020d4d8a7c8fb5859fbaa3b4e28df1ac7e93fb3c1ba2b",
+      "originalBytes": 4824,
+      "records": [
+        {
+          "report": "reports/form-template-result.json",
+          "commandsAsRecorded": {},
+          "exitsAsRecorded": {
+            "exitCode": 1
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 failed (1)",
+        "Tests  5 skipped (5)",
+        "FAIL  src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL",
+        "FAIL  src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL"
+      ]
+    },
+    {
+      "publishedLog": "logs/form-template-integration-loopback.sanitized-v1.log",
+      "originalSHA256": "2fd9382bd3ea5c5926dcbccfc33e33eacd55fa4b5a6b0188fbc59d64f9343e57",
+      "originalBytes": 14649,
+      "records": [
+        {
+          "report": "reports/form-template-result.json",
+          "commandsAsRecorded": {},
+          "exitsAsRecorded": {
+            "exitCode": 1
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 failed (1)",
+        "Tests  4 failed | 1 passed (5)",
+        "⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯",
+        "FAIL  src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL > persists empty templates, edits metadata, rejects delivery and non-form content",
+        "FAIL  src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL > copies the whole typed form atomically, remaps conditional keys and keeps source/delivery data independent",
+        "FAIL  src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL > rechecks source ownership and rejects a mixed questionnaire without partial writes",
+        "FAIL  src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL > creates a reusable copy once under retries, without changing an existing questionnaire"
+      ]
+    },
+    {
+      "publishedLog": "logs/form-template-lint-complete.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/form-template-lint-first.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/form-template-picker-final.sanitized-v1.log",
+      "originalSHA256": "54fd353aa61ff65ccf60d37d5e6c5c69e2644c13dff42c1b86f74d11ec919b9e",
+      "originalBytes": 280,
+      "records": [
+        {
+          "report": "reports/form-template-result.json",
+          "commandsAsRecorded": {},
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed (1)",
+        "Tests  2 passed | 3 skipped (5)"
+      ]
+    },
+    {
+      "publishedLog": "logs/form-template-question-edit-final.sanitized-v1.log",
+      "originalSHA256": "516f85039e87ed82f8bfbf64c3fd072acfce2419e47b39e45c76b73a72d2c053",
+      "originalBytes": 281,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed (1)",
+        "Tests  2 passed | 3 skipped (5)"
+      ]
+    },
+    {
+      "publishedLog": "logs/form-template-typed-copy-adjusted.sanitized-v1.log",
+      "originalSHA256": "207668ef0f101e9bc4f08a82e6a4fe16d2832233f334e855f1d238ae2b0f539f",
+      "originalBytes": 1756,
+      "records": [
+        {
+          "report": "reports/form-template-result.json",
+          "commandsAsRecorded": {},
+          "exitsAsRecorded": {
+            "exitCode": 1
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 failed (1)",
+        "Tests  1 failed | 4 skipped (5)",
+        "⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯",
+        "FAIL  src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL > copies the whole typed form atomically, remaps conditional keys and keeps source/delivery data independent"
+      ]
+    },
+    {
+      "publishedLog": "logs/form-template-typed-copy-final.sanitized-v1.log",
+      "originalSHA256": "b71f105768c2248d711dd7123ed2067b4fb9cfd5f0a86e6070b348a8a0d9630c",
+      "originalBytes": 275,
+      "records": [
+        {
+          "report": "reports/form-template-result.json",
+          "commandsAsRecorded": {},
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed (1)",
+        "Tests  1 passed | 4 skipped (5)"
+      ]
+    },
+    {
+      "publishedLog": "logs/form-template-types-complete.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/form-template-types-final.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/form-template-types-first.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/form-template-ui-adjusted-tests.sanitized-v1.log",
+      "originalSHA256": "84d6059c8d8a2c5cc3ae190d80956084297ef227ae116c654c4843cfe53ed42c",
+      "originalBytes": 283,
+      "records": [
+        {
+          "report": "reports/form-template-result.json",
+          "commandsAsRecorded": {},
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  2 passed (2)",
+        "Tests  3 passed | 88 skipped (91)"
+      ]
+    },
+    {
+      "publishedLog": "logs/form-template-ui-first.sanitized-v1.log",
+      "originalSHA256": "d31e4a9219f362798267e892367a9bba9353554521c6cdd3b2ce4811d3b19f9e",
+      "originalBytes": 40080,
+      "records": [
+        {
+          "report": "reports/form-template-result.json",
+          "commandsAsRecorded": {},
+          "exitsAsRecorded": {
+            "exitCode": 1
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  2 failed | 1 passed (3)",
+        "Tests  2 failed | 92 passed (94)",
+        "⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯",
+        "FAIL  src/training/TrainingLibrary.test.tsx > routes a plain form directly to content editing without report controls",
+        "FAIL  src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training toolkit separation > hides advanced controls in course editing while retaining an unconfirmed selection guard"
+      ]
+    },
+    {
+      "publishedLog": "logs/media-dialog-final-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/media-dialog-scale-return-lint.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/media-dialog-scale-return-tests.sanitized-v1.log",
+      "originalSHA256": "f1b2b83630b3a90d58918c6aaac9227b9e65b92542c35e68cddfc724f947296b",
+      "originalBytes": 271,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  4 passed (4)",
+        "Tests  39 passed (39)"
+      ]
+    },
+    {
+      "publishedLog": "logs/media-dialog-scale-return-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/media-rename-final-lint.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/media-rename-final-tests.sanitized-v1.log",
+      "originalSHA256": "7220430702265791aaa264e42859d4bde36d29cd18a1fb41531b72b94c10312c",
+      "originalBytes": 283,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed (1)",
+        "Tests  3 passed | 10 skipped (13)"
+      ]
+    },
+    {
+      "publishedLog": "logs/scale-author-compact-save-tests.sanitized-v1.log",
+      "originalSHA256": "5e698a35e21f423d0ba3572e3e23fe8f8b0a0f547191dca07ece1ed851a8d3f2",
+      "originalBytes": 283,
+      "records": [
+        {
+          "report": "reports/scale-author-paste-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "[LOCAL_RUNTIME]/run-local-check.py",
+              "frontend",
+              "scale-author-compact-save-tests.log",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "src/pages/__tests__/ScaleEdit.copy-publish.test.tsx",
+              "-t",
+              "copies once, edits|exposes an exact visibility",
+              "--maxWorkers=1"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCodeObserved": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed (1)",
+        "Tests  2 passed | 23 skipped (25)"
+      ]
+    },
+    {
+      "publishedLog": "logs/scale-author-final-lint.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/scale-author-paste-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "[LOCAL_RUNTIME]/run-local-check.py",
+              "frontend",
+              "scale-author-final-lint.log",
+              "node_modules/eslint/bin/eslint.js",
+              "src/pages/ScaleEdit.tsx",
+              "src/pages/scaleAuthoringInput.ts",
+              "src/pages/__tests__/ScaleEdit.paste.test.tsx",
+              "src/pages/__tests__/ScaleEdit.authoring.test.tsx",
+              "src/pages/__tests__/ScaleEdit.copy-publish.test.tsx",
+              "src/pages/__tests__/ScaleEdit.scoring-save.test.tsx"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCodeObserved": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/scale-author-final-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/scale-author-paste-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "[LOCAL_RUNTIME]/run-local-check.py",
+              "frontend",
+              "scale-author-final-types.log",
+              "node_modules/typescript/bin/tsc",
+              "-p",
+              "tsconfig.app.json",
+              "--noEmit"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCodeObserved": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/scale-author-paste-lint.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/scale-author-paste-tests.sanitized-v1.log",
+      "originalSHA256": "e89daf9b722e24d6be4130a337cca7a154dddab3bcbc3fa44abf08f9da0acaa2",
+      "originalBytes": 271,
+      "records": [
+        {
+          "report": "reports/scale-author-paste-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "[LOCAL_RUNTIME]/run-local-check.py",
+              "frontend",
+              "scale-author-paste-tests.log",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "src/pages/__tests__/ScaleEdit.paste.test.tsx",
+              "src/pages/__tests__/ScaleEdit.authoring.test.tsx",
+              "src/pages/__tests__/ScaleEdit.persistence-boundaries.test.tsx",
+              "src/pages/__tests__/ScaleEdit.copy-publish.test.tsx",
+              "src/pages/__tests__/ScaleEdit.readonly.test.tsx",
+              "src/pages/__tests__/ScaleEdit.scoring-save.test.tsx",
+              "--maxWorkers=1"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCodeObserved": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  6 passed (6)",
+        "Tests  68 passed (68)"
+      ]
+    },
+    {
+      "publishedLog": "logs/scale-author-paste-types-final.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/scale-author-paste-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/scale-author-reverse-implicit-test.sanitized-v1.log",
+      "originalSHA256": "af2202097c3dac477aaa6aee46d30a487e3d664bdcbf8ece79990ee8fac3a1e1",
+      "originalBytes": 281,
+      "records": [
+        {
+          "report": "reports/scale-author-paste-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "[LOCAL_RUNTIME]/run-local-check.py",
+              "frontend",
+              "scale-author-reverse-implicit-test.log",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "src/pages/__tests__/ScaleEdit.paste.test.tsx",
+              "-t",
+              "adds an explicit reverse rule",
+              "--maxWorkers=1"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCodeObserved": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed (1)",
+        "Tests  1 passed | 6 skipped (7)"
+      ]
+    },
+    {
+      "publishedLog": "logs/scale-scoring-ui-lint.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/scale-scoring-ui-result.json",
+          "commandsAsRecorded": {
+            "wrapperCommand": [
+              "python3",
+              "[LOCAL_RUNTIME]/run-local-check.py",
+              "frontend",
+              "scale-scoring-ui-lint.log",
+              "node_modules/eslint/bin/eslint.js",
+              "src/pages/ScaleEdit.tsx",
+              "src/pages/__tests__/ScaleEdit.scoring-save.test.tsx"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCodeObservedInToolResult": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/scale-scoring-ui-tests.sanitized-v1.log",
+      "originalSHA256": "a980104a97b5e3d00e4081055c9b831fbea038d8cc1e7f0b1c20846bbcd91fe3",
+      "originalBytes": 271,
+      "records": [
+        {
+          "report": "reports/scale-scoring-ui-result.json",
+          "commandsAsRecorded": {
+            "wrapperCommand": [
+              "python3",
+              "[LOCAL_RUNTIME]/run-local-check.py",
+              "frontend",
+              "scale-scoring-ui-tests.log",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "src/pages/__tests__/ScaleEdit.scoring-save.test.tsx",
+              "src/pages/__tests__/ScaleEdit.readonly.test.tsx",
+              "--maxWorkers=1"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCodeObservedInToolResult": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  2 passed (2)",
+        "Tests  27 passed (27)"
+      ]
+    },
+    {
+      "publishedLog": "logs/scale-scoring-ui-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/scale-scoring-ui-result.json",
+          "commandsAsRecorded": {
+            "wrapperCommand": [
+              "python3",
+              "[LOCAL_RUNTIME]/run-local-check.py",
+              "frontend",
+              "scale-scoring-ui-types.log",
+              "node_modules/typescript/bin/tsc",
+              "-p",
+              "tsconfig.app.json",
+              "--noEmit"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCodeObservedInToolResult": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/teacher-header-lint.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/teacher-header-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "teacher-header-lint.log",
+              "node_modules/eslint/bin/eslint.js",
+              "src/components/app-shell/AppShell.tsx",
+              "src/components/app-shell/__tests__/shell.test.tsx"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/teacher-header-shell-tests.sanitized-v1.log",
+      "originalSHA256": "80f81300cac0a7437322a0b5ca478fa2f15409ea9872fe415affbe45d74b4eb7",
+      "originalBytes": 271,
+      "records": [
+        {
+          "report": "reports/teacher-header-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "teacher-header-shell-tests.log",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "src/components/app-shell/__tests__/shell.test.tsx",
+              "--maxWorkers=1"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed (1)",
+        "Tests  48 passed (48)"
+      ]
+    },
+    {
+      "publishedLog": "logs/teacher-header-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/teacher-header-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "teacher-header-types.log",
+              "node_modules/typescript/bin/tsc",
+              "-p",
+              "tsconfig.app.json",
+              "--noEmit"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/workspace-cards-lint.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/workspace-cards-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "workspace-cards-lint.log",
+              "node_modules/eslint/bin/eslint.js",
+              "src/training/TrainingLibrary.tsx",
+              "src/training/TrainingTrainerHome.tsx",
+              "src/training/TrainingWorkspaceTabs.tsx",
+              "src/training/TrainingTrainerCourse.tsx",
+              "src/training/TrainingContextBack.tsx",
+              "src/training/context.ts",
+              "src/training/context.test.ts",
+              "src/training/TrainingContextBack.test.tsx",
+              "src/training/TrainingLibrary.test.tsx",
+              "src/components/app-shell/__tests__/shell.test.tsx",
+              "src/pages/questionnaire/QuestionnaireProducts.tsx"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/workspace-cards-tests.sanitized-v1.log",
+      "originalSHA256": "3587d36706db003fa7d08841b7cc043db8080dabe121548ce14f015b61d5acb4",
+      "originalBytes": 272,
+      "records": [
+        {
+          "report": "reports/workspace-cards-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "workspace-cards-tests.log",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "src/training/TrainingLibrary.test.tsx",
+              "src/training/TrainingTrainerHome.pagination.test.tsx",
+              "src/training/TrainingTrainerHome.formal.test.tsx",
+              "src/training/context.test.ts",
+              "src/training/TrainingContextBack.test.tsx",
+              "src/components/app-shell/__tests__/shell.test.tsx",
+              "--maxWorkers=1"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  6 passed (6)",
+        "Tests  76 passed (76)"
+      ]
+    },
+    {
+      "publishedLog": "logs/workspace-cards-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/workspace-cards-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "workspace-cards-types.log",
+              "node_modules/typescript/bin/tsc",
+              "-p",
+              "tsconfig.app.json",
+              "--noEmit"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/workspace-description-course-recheck.sanitized-v1.log",
+      "originalSHA256": "14e740d8a0dfd63d02a8d003f752df62acd2410276f2d7c0346e1ff111e6546d",
+      "originalBytes": 283,
+      "records": [
+        {
+          "report": "reports/workspace-description-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "workspace-description-course-recheck.log",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "src/training/TrainingTrainerHome.pagination.test.tsx",
+              "-t",
+              "complete introduction",
+              "--maxWorkers=1"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 passed (1)",
+        "Tests  1 passed | 10 skipped (11)"
+      ]
+    },
+    {
+      "publishedLog": "logs/workspace-description-final-lint.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/workspace-description-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "workspace-description-final-lint.log",
+              "node_modules/eslint/bin/eslint.js",
+              "src/training/TrainingCardDescription.tsx"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/workspace-description-final-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/workspace-description-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "workspace-description-final-types.log",
+              "node_modules/typescript/bin/tsc",
+              "-p",
+              "tsconfig.app.json",
+              "--noEmit"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/workspace-description-lint.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/workspace-description-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "workspace-description-lint.log",
+              "node_modules/eslint/bin/eslint.js",
+              "src/training/TrainingLibrary.tsx",
+              "src/training/TrainingLibrary.test.tsx",
+              "src/training/TrainingTrainerHome.tsx",
+              "src/training/TrainingTrainerHome.pagination.test.tsx",
+              "src/training/TrainingCardDescription.tsx"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/workspace-description-tests.sanitized-v1.log",
+      "originalSHA256": "4963804d10a26312788ddb7cdb34583154bf7776b1288ff194e879c521fe0575",
+      "originalBytes": 19240,
+      "records": [
+        {
+          "report": "reports/workspace-description-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "workspace-description-tests.log",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "src/training/TrainingLibrary.test.tsx",
+              "src/training/TrainingTrainerHome.pagination.test.tsx",
+              "--maxWorkers=1"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 1
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  1 failed | 1 passed (2)",
+        "Tests  1 failed | 23 passed (24)",
+        "⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯",
+        "FAIL  src/training/TrainingTrainerHome.pagination.test.tsx > keeps the complete introduction available on hover and on explicit expansion"
+      ]
+    },
+    {
+      "publishedLog": "logs/workspace-description-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [],
+      "exactArgvStatus": "not recorded as an exact per-log command in available reports",
+      "exitStatus": "not independently recorded here; log summary alone is not an exit code",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/workspace-heading-lint.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/workspace-heading-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "workspace-heading-lint.log",
+              "node_modules/eslint/bin/eslint.js",
+              "src/training/TrainingTrainerHome.tsx",
+              "src/training/TrainingLibrary.tsx"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/workspace-heading-tests.sanitized-v1.log",
+      "originalSHA256": "ed7e6433c1838abffaaee4953c6c7d73d67490be36bd7306a612ffca18f9d712",
+      "originalBytes": 271,
+      "records": [
+        {
+          "report": "reports/workspace-heading-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "workspace-heading-tests.log",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "src/training/TrainingLibrary.test.tsx",
+              "src/training/TrainingTrainerHome.pagination.test.tsx",
+              "src/training/TrainingTrainerHome.formal.test.tsx",
+              "--maxWorkers=1"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  3 passed (3)",
+        "Tests  20 passed (20)"
+      ]
+    },
+    {
+      "publishedLog": "logs/workspace-heading-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/workspace-heading-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "workspace-heading-types.log",
+              "node_modules/typescript/bin/tsc",
+              "-p",
+              "tsconfig.app.json",
+              "--noEmit"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/workspace-tabs-paging-lint.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/workspace-tabs-paging-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "workspace-tabs-paging-lint.log",
+              "node_modules/eslint/bin/eslint.js",
+              "src/training/TrainingLibrary.tsx",
+              "src/training/TrainingLibrary.test.tsx",
+              "src/training/TrainingTrainerHome.tsx"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    },
+    {
+      "publishedLog": "logs/workspace-tabs-paging-tests.sanitized-v1.log",
+      "originalSHA256": "45b2c964153c0c71be54d94dccf5105c5a50157ae6b1810c981c64708db582c6",
+      "originalBytes": 271,
+      "records": [
+        {
+          "report": "reports/workspace-tabs-paging-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "workspace-tabs-paging-tests.log",
+              "node_modules/vitest/vitest.mjs",
+              "run",
+              "src/training/TrainingLibrary.test.tsx",
+              "src/training/TrainingTrainerHome.pagination.test.tsx",
+              "--maxWorkers=1"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": false,
+      "originalPassFailSummary": [
+        "Test Files  2 passed (2)",
+        "Tests  21 passed (21)"
+      ]
+    },
+    {
+      "publishedLog": "logs/workspace-tabs-paging-types.sanitized-v1.log",
+      "originalSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "originalBytes": 0,
+      "records": [
+        {
+          "report": "reports/workspace-tabs-paging-result.json",
+          "commandsAsRecorded": {
+            "command": [
+              "python3",
+              "../eduk12-local-runtime/run-local-check.py",
+              "frontend",
+              "workspace-tabs-paging-types.log",
+              "node_modules/typescript/bin/tsc",
+              "-p",
+              "tsconfig.app.json",
+              "--noEmit"
+            ]
+          },
+          "exitsAsRecorded": {
+            "exitCode": 0
+          },
+          "executionIdentity": "Historical local record, not new execution or signed CI proof."
+        }
+      ],
+      "exactArgvStatus": "recorded",
+      "exitStatus": "recorded separately",
+      "emptyLog": true,
+      "originalPassFailSummary": []
+    }
+  ],
+  "inputReferences": [
+    "snapshot.json",
+    "form-template-input-comparison.json",
+    "reports/form-template-frozen-input.json"
+  ],
+  "limits": "No reconstruction of missing argv or fabricated exits. Read original reports for incremental scope and source input identities."
+}

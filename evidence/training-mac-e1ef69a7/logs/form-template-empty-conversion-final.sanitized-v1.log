@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 [REPOSITORY]/server-version/backend
+
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 5 skipped (6)
+   Start at  09:50:08
+   Duration  3.87s (transform 2.56s, setup 0ms, import 63ms, tests 3.72s, environment 0ms)
+

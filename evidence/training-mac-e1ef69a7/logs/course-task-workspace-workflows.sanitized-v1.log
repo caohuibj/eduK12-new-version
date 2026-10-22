@@ -1,0 +1,125 @@
+
+ RUN  v4.1.11 [REPOSITORY]/server-version/frontend
+
+ ❯ src/pages/__tests__/CheckinList.course-workspace.test.tsx (6 tests | 1 failed) 2347ms
+     × rejects a focused check-in from another course and offers no edit/export actions 1014ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 10 passed (11)
+     Errors  1 error
+   Start at  10:19:16
+   Duration  8.09s (transform 490ms, setup 381ms, import 3.12s, tests 2.64s, environment 1.66s)
+
+Error: Uncaught [TypeError: Cannot read properties of undefined (reading 'map')]
+    at reportException ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/helpers/runtime-script-errors.js:66:24)
+    at innerInvokeEventListeners ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:353:9)
+    at invokeEventListeners ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:286:3)
+    at HTMLUnknownElementImpl._dispatch ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:233:9)
+    at HTMLUnknownElementImpl.dispatchEvent ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:104:17)
+    at HTMLUnknownElement.dispatchEvent ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/generated/EventTarget.js:241:34)
+    at Object.invokeGuardedCallbackDev ([REPOSITORY]/server-version/frontend/node_modules/react-dom/cjs/react-dom.development.js:4213:16)
+    at invokeGuardedCallback ([REPOSITORY]/server-version/frontend/node_modules/react-dom/cjs/react-dom.development.js:4277:31)
+    at beginWork$1 ([REPOSITORY]/server-version/frontend/node_modules/react-dom/cjs/react-dom.development.js:27490:7)
+    at performUnitOfWork ([REPOSITORY]/server-version/frontend/node_modules/react-dom/cjs/react-dom.development.js:26599:12) TypeError: Cannot read properties of undefined (reading 'map')
+    at TrainingCheckinSchedules ([REPOSITORY]/server-version/frontend/src/training/TrainingCheckinSchedules.tsx:36:11)
+    at renderWithHooks ([REPOSITORY]/server-version/frontend/node_modules/react-dom/cjs/react-dom.development.js:15486:18)
+    at updateFunctionComponent ([REPOSITORY]/server-version/frontend/node_modules/react-dom/cjs/react-dom.development.js:19617:20)
+    at beginWork ([REPOSITORY]/server-version/frontend/node_modules/react-dom/cjs/react-dom.development.js:21640:16)
+    at HTMLUnknownElement.callCallback ([REPOSITORY]/server-version/frontend/node_modules/react-dom/cjs/react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/generated/EventListener.js:26:30)
+    at innerInvokeEventListeners ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:350:25)
+    at invokeEventListeners ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:286:3)
+    at HTMLUnknownElementImpl._dispatch ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:233:9)
+    at HTMLUnknownElementImpl.dispatchEvent ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:104:17)
+Error: Uncaught [TypeError: Cannot read properties of undefined (reading 'map')]
+    at reportException ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/helpers/runtime-script-errors.js:66:24)
+    at innerInvokeEventListeners ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:353:9)
+    at invokeEventListeners ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:286:3)
+    at HTMLUnknownElementImpl._dispatch ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:233:9)
+    at HTMLUnknownElementImpl.dispatchEvent ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:104:17)
+    at HTMLUnknownElement.dispatchEvent ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/generated/EventTarget.js:241:34)
+    at Object.invokeGuardedCallbackDev ([REPOSITORY]/server-version/frontend/node_modules/react-dom/cjs/react-dom.development.js:4213:16)
+    at invokeGuardedCallback ([REPOSITORY]/server-version/frontend/node_modules/react-dom/cjs/react-dom.development.js:4277:31)
+    at beginWork$1 ([REPOSITORY]/server-version/frontend/node_modules/react-dom/cjs/react-dom.development.js:27490:7)
+    at performUnitOfWork ([REPOSITORY]/server-version/frontend/node_modules/react-dom/cjs/react-dom.development.js:26599:12) TypeError: Cannot read properties of undefined (reading 'map')
+    at TrainingCheckinSchedules ([REPOSITORY]/server-version/frontend/src/training/TrainingCheckinSchedules.tsx:36:11)
+    at renderWithHooks ([REPOSITORY]/server-version/frontend/node_modules/react-dom/cjs/react-dom.development.js:15486:18)
+    at updateFunctionComponent ([REPOSITORY]/server-version/frontend/node_modules/react-dom/cjs/react-dom.development.js:19617:20)
+    at beginWork ([REPOSITORY]/server-version/frontend/node_modules/react-dom/cjs/react-dom.development.js:21640:16)
+    at HTMLUnknownElement.callCallback ([REPOSITORY]/server-version/frontend/node_modules/react-dom/cjs/react-dom.development.js:4164:14)
+    at HTMLUnknownElement.callTheUserObjectsOperation ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/generated/EventListener.js:26:30)
+    at innerInvokeEventListeners ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:350:25)
+    at invokeEventListeners ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:286:3)
+    at HTMLUnknownElementImpl._dispatch ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:233:9)
+    at HTMLUnknownElementImpl.dispatchEvent ([REPOSITORY]/server-version/frontend/node_modules/jsdom/lib/jsdom/living/events/EventTarget-impl.js:104:17)
+stderr | src/pages/__tests__/CheckinList.course-workspace.test.tsx > Unified course check-in management > rejects a focused check-in from another course and offers no edit/export actions
+The above error occurred in the <TrainingCheckinSchedules> component:
+
+    at TrainingCheckinSchedules ([REPOSITORY]/server-version/frontend/src/training/TrainingCheckinSchedules.tsx:8:37)
+    at section
+    at CheckinListContent ([REPOSITORY]/server-version/frontend/src/pages/CheckinList.tsx:58:31)
+    at CheckinList ([REPOSITORY]/server-version/frontend/src/pages/CheckinList.tsx:36:24)
+    at RenderedRoute (file://[REPOSITORY]/server-version/frontend/node_modules/react-router/dist/development/chunk-BV7QT456.mjs:6309:26)
+    at Routes (file://[REPOSITORY]/server-version/frontend/node_modules/react-router/dist/development/chunk-BV7QT456.mjs:7195:3)
+    at Router (file://[REPOSITORY]/server-version/frontend/node_modules/react-router/dist/development/chunk-BV7QT456.mjs:7134:13)
+    at MemoryRouter (file://[REPOSITORY]/server-version/frontend/node_modules/react-router/dist/development/chunk-BV7QT456.mjs:7044:3)
+
+Consider adding an error boundary to your tree to customize error handling behavior.
+Visit https://reactjs.org/link/error-boundaries to learn more about error boundaries.
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/pages/__tests__/CheckinList.course-workspace.test.tsx > Unified course check-in management > rejects a focused check-in from another course and offers no edit/export actions
+TestingLibraryElementError: Unable to find an element with the text: 无法管理此课程的打卡. This could be because the text is broken up by multiple elements. In this case, you can provide a function for your text matcher to make your matcher more flexible.
+
+Ignored nodes: comments, script, style
+<body
+  style=""
+>
+  <div />
+</body>
+
+Ignored nodes: comments, script, style
+<body
+  style=""
+>
+  <div />
+</body>
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/pages/__tests__/CheckinList.course-workspace.test.tsx:96:25
+     94|     api.get.mockResolvedValue({ code: 0, data: { ...full, courseId: 'f…
+     95|     mount('&checkinId=task')
+     96|     expect(await screen.findByText('无法管理此课程的打卡')).toBeInTheDocument()
+       |                         ^
+     97|     expect(screen.queryByRole('button', { name: '编辑打卡', exact: true })…
+     98|     expect(screen.queryByRole('button', { name: '导出提交', exact: true })…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
+⎯⎯⎯⎯⎯⎯ Unhandled Errors ⎯⎯⎯⎯⎯⎯
+
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.
+
+⎯⎯⎯⎯⎯ Uncaught Exception ⎯⎯⎯⎯⎯
+TypeError: Cannot read properties of undefined (reading 'map')
+ ❯ TrainingCheckinSchedules src/training/TrainingCheckinSchedules.tsx:36:11
+
+ ❯ renderWithHooks node_modules/react-dom/cjs/react-dom.development.js:15486:18
+ ❯ updateFunctionComponent node_modules/react-dom/cjs/react-dom.development.js:19617:20
+ ❯ beginWork node_modules/react-dom/cjs/react-dom.development.js:21640:16
+ ❯ beginWork$1 node_modules/react-dom/cjs/react-dom.development.js:27465:14
+ ❯ performUnitOfWork node_modules/react-dom/cjs/react-dom.development.js:26599:12
+ ❯ workLoopSync node_modules/react-dom/cjs/react-dom.development.js:26505:5
+ ❯ renderRootSync node_modules/react-dom/cjs/react-dom.development.js:26473:7
+ ❯ recoverFromConcurrentError node_modules/react-dom/cjs/react-dom.development.js:25889:20
+ ❯ performSyncWorkOnRoot node_modules/react-dom/cjs/react-dom.development.js:26135:20
+
+This error originated in "src/pages/__tests__/CheckinList.course-workspace.test.tsx" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.
+The latest test that might've caused the error is "rejects a focused check-in from another course and offers no edit/export actions". It might mean one of the following:
+- The error was thrown, while Vitest was running this test.
+- If the error occurred after the test had been completed, this was the last documented test before it was thrown.
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+

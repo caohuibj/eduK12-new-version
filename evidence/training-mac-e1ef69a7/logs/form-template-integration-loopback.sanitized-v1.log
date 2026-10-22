@@ -1,0 +1,149 @@
+
+ RUN  v4.1.11 [REPOSITORY]/server-version/backend
+
+stdout | src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL > persists empty templates, edits metadata, rejects delivery and non-form content
+prisma:error 
+Invalid `prisma.compositeAssessment.create()` invocation:
+
+
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "23514", message: "new row for relation \"composite_assessments\" violates check constraint \"questionnaire_collection_only\"", severity: "ERROR", detail: Some("Failing row contains ([REDACTED_DATABASE_ROW])."), column: None, hint: None }), transient: false })
+
+stdout | src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL > copies the whole typed form atomically, remaps conditional keys and keeps source/delivery data independent
+prisma:error 
+Invalid `prisma.compositeAssessment.create()` invocation:
+
+
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "23514", message: "new row for relation \"composite_assessments\" violates check constraint \"questionnaire_collection_only\"", severity: "ERROR", detail: Some("Failing row contains ([REDACTED_DATABASE_ROW])."), column: None, hint: None }), transient: false })
+
+stdout | src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL > rechecks source ownership and rejects a mixed questionnaire without partial writes
+prisma:error 
+Invalid `prisma.compositeAssessment.create()` invocation:
+
+
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "23514", message: "new row for relation \"composite_assessments\" violates check constraint \"questionnaire_collection_only\"", severity: "ERROR", detail: Some("Failing row contains ([REDACTED_DATABASE_ROW])."), column: None, hint: None }), transient: false })
+
+stdout | src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL > creates a reusable copy once under retries, without changing an existing questionnaire
+prisma:error 
+Invalid `prisma.compositeAssessment.create()` invocation:
+
+
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "23514", message: "new row for relation \"composite_assessments\" violates check constraint \"questionnaire_collection_only\"", severity: "ERROR", detail: Some("Failing row contains ([REDACTED_DATABASE_ROW])."), column: None, hint: None }), transient: false })
+
+ ❯ src/__tests__/questionnaire/form-templates.postgres.integration.test.ts (5 tests | 4 failed) 3594ms
+     × persists empty templates, edits metadata, rejects delivery and non-form content 20ms
+     × copies the whole typed form atomically, remaps conditional keys and keeps source/delivery data independent 4ms
+     × rechecks source ownership and rejects a mixed questionnaire without partial writes 3ms
+     × creates a reusable copy once under retries, without changing an existing questionnaire 30ms
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 1 passed (5)
+   Start at  09:40:42
+   Duration  3.80s (transform 2.22s, setup 0ms, import 63ms, tests 3.59s, environment 0ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL > persists empty templates, edits metadata, rejects delivery and non-form content
+PrismaClientUnknownRequestError: 
+Invalid `prisma.compositeAssessment.create()` invocation:
+
+
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "23514", message: "new row for relation \"composite_assessments\" violates check constraint \"questionnaire_collection_only\"", severity: "ERROR", detail: Some("Failing row contains ([REDACTED_DATABASE_ROW])."), column: None, hint: None }), transient: false })
+ ❯ $n.handleRequestError node_modules/@prisma/client/runtime/library.js:121:7505
+ ❯ $n.handleAndLogRequestError node_modules/@prisma/client/runtime/library.js:121:6623
+ ❯ $n.request node_modules/@prisma/client/runtime/library.js:121:6307
+ ❯ l node_modules/@prisma/client/runtime/library.js:130:9633
+ ❯ src/config/database.ts:43:14
+     41|     const startedAt = process.hrtime.bigint()
+     42|     try {
+     43|       return await next(params)
+       |              ^
+     44|     } catch (error: any) {
+     45|       recordPrismaError(error?.code)
+ ❯ prisma.$transaction.timeout src/modules/questionnaire-product/service.ts:206:17
+ ❯ Proxy._transactionWithCallback node_modules/@prisma/client/runtime/library.js:130:8000
+ ❯ Module.createFormTemplate src/modules/questionnaire-product/service.ts:198:14
+ ❯ src/__tests__/questionnaire/form-templates.postgres.integration.test.ts:32:18
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL > copies the whole typed form atomically, remaps conditional keys and keeps source/delivery data independent
+PrismaClientUnknownRequestError: 
+Invalid `prisma.compositeAssessment.create()` invocation:
+
+
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "23514", message: "new row for relation \"composite_assessments\" violates check constraint \"questionnaire_collection_only\"", severity: "ERROR", detail: Some("Failing row contains ([REDACTED_DATABASE_ROW])."), column: None, hint: None }), transient: false })
+ ❯ $n.handleRequestError node_modules/@prisma/client/runtime/library.js:121:7505
+ ❯ $n.handleAndLogRequestError node_modules/@prisma/client/runtime/library.js:121:6623
+ ❯ $n.request node_modules/@prisma/client/runtime/library.js:121:6307
+ ❯ l node_modules/@prisma/client/runtime/library.js:130:9633
+ ❯ src/config/database.ts:43:14
+     41|     const startedAt = process.hrtime.bigint()
+     42|     try {
+     43|       return await next(params)
+       |              ^
+     44|     } catch (error: any) {
+     45|       recordPrismaError(error?.code)
+ ❯ prisma.$transaction.timeout src/modules/questionnaire-product/service.ts:206:17
+ ❯ Proxy._transactionWithCallback node_modules/@prisma/client/runtime/library.js:130:8000
+ ❯ Module.createFormTemplate src/modules/questionnaire-product/service.ts:198:14
+ ❯ src/__tests__/questionnaire/form-templates.postgres.integration.test.ts:43:16
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL > rechecks source ownership and rejects a mixed questionnaire without partial writes
+PrismaClientUnknownRequestError: 
+Invalid `prisma.compositeAssessment.create()` invocation:
+
+
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "23514", message: "new row for relation \"composite_assessments\" violates check constraint \"questionnaire_collection_only\"", severity: "ERROR", detail: Some("Failing row contains ([REDACTED_DATABASE_ROW])."), column: None, hint: None }), transient: false })
+ ❯ $n.handleRequestError node_modules/@prisma/client/runtime/library.js:121:7505
+ ❯ $n.handleAndLogRequestError node_modules/@prisma/client/runtime/library.js:121:6623
+ ❯ $n.request node_modules/@prisma/client/runtime/library.js:121:6307
+ ❯ l node_modules/@prisma/client/runtime/library.js:130:9633
+ ❯ src/config/database.ts:43:14
+     41|     const startedAt = process.hrtime.bigint()
+     42|     try {
+     43|       return await next(params)
+       |              ^
+     44|     } catch (error: any) {
+     45|       recordPrismaError(error?.code)
+ ❯ prisma.$transaction.timeout src/modules/questionnaire-product/service.ts:206:17
+ ❯ Proxy._transactionWithCallback node_modules/@prisma/client/runtime/library.js:130:8000
+ ❯ Module.createFormTemplate src/modules/questionnaire-product/service.ts:198:14
+ ❯ src/__tests__/questionnaire/form-templates.postgres.integration.test.ts:71:25
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL > creates a reusable copy once under retries, without changing an existing questionnaire
+PrismaClientUnknownRequestError: 
+Invalid `prisma.compositeAssessment.create()` invocation:
+
+
+Error occurred during query execution:
+ConnectorError(ConnectorError { user_facing_error: None, kind: QueryError(PostgresError { code: "23514", message: "new row for relation \"composite_assessments\" violates check constraint \"questionnaire_collection_only\"", severity: "ERROR", detail: Some("Failing row contains ([REDACTED_DATABASE_ROW])."), column: None, hint: None }), transient: false })
+ ❯ $n.handleRequestError node_modules/@prisma/client/runtime/library.js:121:7505
+ ❯ $n.handleAndLogRequestError node_modules/@prisma/client/runtime/library.js:121:6623
+ ❯ $n.request node_modules/@prisma/client/runtime/library.js:121:6307
+ ❯ l node_modules/@prisma/client/runtime/library.js:130:9633
+ ❯ src/config/database.ts:43:14
+     41|     const startedAt = process.hrtime.bigint()
+     42|     try {
+     43|       return await next(params)
+       |              ^
+     44|     } catch (error: any) {
+     45|       recordPrismaError(error?.code)
+ ❯ prisma.$transaction.timeout src/modules/questionnaire-product/service.ts:206:17
+ ❯ Proxy._transactionWithCallback node_modules/@prisma/client/runtime/library.js:130:8000
+ ❯ Module.createFormTemplate src/modules/questionnaire-product/service.ts:198:14
+ ❯ src/__tests__/questionnaire/form-templates.postgres.integration.test.ts:98:19
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+

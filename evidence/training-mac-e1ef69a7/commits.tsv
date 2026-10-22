@@ -1,0 +1,17 @@
+5811faab3bad0602e782f79c9c34e8c92bf3c765	cfa87d288e0795561e517873ebdaef6afc4c414e	fix(training): clarify score editor controls and improve layout
+0ce052e095bd09648c6a1430e48570d46747e725	5811faab3bad0602e782f79c9c34e8c92bf3c765	feat(training): streamline scale metadata and plain-text authoring
+35e55f30efc409ab40852596a89b0db68f92089b	0ce052e095bd09648c6a1430e48570d46747e725	ui(training): move teacher workspace navigation into header
+f1743142e4c38d6dac96f1ab7fdfdfd38c336c18	35e55f30efc409ab40852596a89b0db68f92089b	ui(training): compact workspace search and adjust desktop spacing
+61f0d74903d50245db0294531e219c662207c3a7	f1743142e4c38d6dac96f1ab7fdfdfd38c336c18	ui(training): unify workspace cards and simplify section names
+1133cb6ef51586b18f87fee041dd1f760a04c3b9	61f0d74903d50245db0294531e219c662207c3a7	ui(training): align filter tabs and use nine-item library pages
+56423f3aeda3f3547f07b50bd0b472eaea6a31cd	1133cb6ef51586b18f87fee041dd1f760a04c3b9	ui(training): expand truncated descriptions and lighten cards
+8e077441b910a4c4fad5b94459083082b79d1547	56423f3aeda3f3547f07b50bd0b472eaea6a31cd	ui(training): move course code into compact card footer
+24d787465f59e16d8ccc60627cc7086df73f520b	8e077441b910a4c4fad5b94459083082b79d1547	ui(training): frame course footer details across screen sizes
+b363ce0a149e3ac5d42fe56d48d43b0a39031e12	24d787465f59e16d8ccc60627cc7086df73f520b	ui(training): refine media dialogs and return scale editors to tools
+d6ecbe3da1c37f7592c651a3bd3f35c7fb198931	b363ce0a149e3ac5d42fe56d48d43b0a39031e12	feat(training): add independent reusable form templates
+a8aaf8cac138c2e3dc8bb65e70cc0487a60636bb	d6ecbe3da1c37f7592c651a3bd3f35c7fb198931	ui(training): keep standalone form layout clear across screen sizes
+66c257c91dfc67285775e6487288f9cd8897cdc8	a8aaf8cac138c2e3dc8bb65e70cc0487a60636bb	ui(training): compact course header and arrange task cards responsively
+7e33a150430bc75eeaffb4650eb5675378383a3d	66c257c91dfc67285775e6487288f9cd8897cdc8	ui(training): remove redundant course breadcrumb and tighten header spacing
+2e8029111548d7520ffddc43d03c906f095461e6	7e33a150430bc75eeaffb4650eb5675378383a3d	ui(training): unify course exercise and check-in management
+24a525c2c21c3deadc80e75a73ba0ce4a34a7292	2e8029111548d7520ffddc43d03c906f095461e6	ui(training): align course filters with tabs and hide empty schedules
+e1ef69a778d6200e73d3125adf7dc373ec7883ee	24a525c2c21c3deadc80e75a73ba0ce4a34a7292	fix(training): prevent course assessment layout overlap

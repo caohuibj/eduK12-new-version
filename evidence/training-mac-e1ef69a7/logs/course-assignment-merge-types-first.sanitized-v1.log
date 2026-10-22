@@ -1,0 +1,2 @@
+src/training/TrainingTrainerCourse.tsx(101,240): error TS2367: This comparison appears to be unintentional because the types '"checkins" | "assessments"' and '"assignments"' have no overlap.
+src/training/TrainingTrainerCourse.tsx(122,269): error TS2367: This comparison appears to be unintentional because the types '"checkins" | "assessments"' and '"assignments"' have no overlap.

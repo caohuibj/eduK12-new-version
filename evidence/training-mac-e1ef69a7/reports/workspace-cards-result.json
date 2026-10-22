@@ -1,0 +1,79 @@
+{
+  "head": "61f0d74903d50245db0294531e219c662207c3a7",
+  "sourceBlobs": {
+    "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx": "56b8d4c21a51d371201096de15ea5d0ec05c76da",
+    "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": "75a06b25b6cd17a2a7f85ab473f4c445d7d2f610",
+    "server-version/frontend/src/training/TrainingContextBack.test.tsx": "65e640456852a7ddf488d3c9a25b54be3b022d5d",
+    "server-version/frontend/src/training/TrainingContextBack.tsx": "52057441e3e24a3094cea31ea4ab0b00a6575155",
+    "server-version/frontend/src/training/TrainingLibrary.test.tsx": "9f54c94b1ade4fb595dad6ff8eb20b416ce673a8",
+    "server-version/frontend/src/training/TrainingLibrary.tsx": "1be8d645d0a80553249fe892a4a302545e9939dc",
+    "server-version/frontend/src/training/TrainingTrainerCourse.tsx": "d18b107d8c9641a20d0ae7d8da87be45aa975180",
+    "server-version/frontend/src/training/TrainingTrainerHome.tsx": "0e8840265348b8df5fb8f902e50b9c61e00267c1",
+    "server-version/frontend/src/training/TrainingWorkspaceTabs.tsx": "0747acc24c38ea80cb4f3fbf4b14cbff526589b6",
+    "server-version/frontend/src/training/context.test.ts": "cef65430ac42e35709d705db961b2a824a6111ec",
+    "server-version/frontend/src/training/context.ts": "9a04fce6764c2d12c73120055821b8c2fa51a070",
+    "server-version/frontend/src/training/training-workspace-cards.css": "39e1e2d7b717388b112774e823d3c4b7e879e2c6"
+  },
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "workspace-cards-tests.log",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/training/TrainingLibrary.test.tsx",
+        "src/training/TrainingTrainerHome.pagination.test.tsx",
+        "src/training/TrainingTrainerHome.formal.test.tsx",
+        "src/training/context.test.ts",
+        "src/training/TrainingContextBack.test.tsx",
+        "src/components/app-shell/__tests__/shell.test.tsx",
+        "--maxWorkers=1"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/workspace-cards-tests.log",
+      "sha256": "3587d36706db003fa7d08841b7cc043db8080dabe121548ce14f015b61d5acb4"
+    },
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "workspace-cards-types.log",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.app.json",
+        "--noEmit"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/workspace-cards-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "workspace-cards-lint.log",
+        "node_modules/eslint/bin/eslint.js",
+        "src/training/TrainingLibrary.tsx",
+        "src/training/TrainingTrainerHome.tsx",
+        "src/training/TrainingWorkspaceTabs.tsx",
+        "src/training/TrainingTrainerCourse.tsx",
+        "src/training/TrainingContextBack.tsx",
+        "src/training/context.ts",
+        "src/training/context.test.ts",
+        "src/training/TrainingContextBack.test.tsx",
+        "src/training/TrainingLibrary.test.tsx",
+        "src/components/app-shell/__tests__/shell.test.tsx",
+        "src/pages/questionnaire/QuestionnaireProducts.tsx"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/workspace-cards-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "notes": "76 local tests; original tool outputs reported exit 0. Final follow-up changes affect CSS only. Not CI or signed execution.",
+  "browser": "Real local teacher read-only pages: course/media/tools desktop 1280, all three tablet 768, tools mobile 390. Shared 22px serif card titles and 24px padding desktop; two columns desktop/tablet, single column mobile; no horizontal/action overflow. Screenshots workspace-cards-{courses,media,tools,mobile}.png. No data edits."
+}

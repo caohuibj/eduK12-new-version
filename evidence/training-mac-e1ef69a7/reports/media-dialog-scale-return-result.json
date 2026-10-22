@@ -1,0 +1,30 @@
+{
+  "head": "b363ce0a149e3ac5d42fe56d48d43b0a39031e12",
+  "sourceGitBlobs": {
+    "server-version/frontend/src/components/MediaSelector.tsx": "50a93cceb767f2c5e92620ad0a69d2ffc31d138a",
+    "server-version/frontend/src/components/staff-ui/ManagementDialog.tsx": "8eaedd3870c8c79019d9346d75fc40c453ca08bb",
+    "server-version/frontend/src/pages/ScaleEdit.tsx": "217b3609d6af4019f313fb58f8262a79650a7ebd",
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.authoring.test.tsx": "7f7ec3273cfa533d94d8c5de2c43540dad45e636",
+    "server-version/frontend/src/training/TrainingContextBack.test.tsx": "4baf8d4a8d20654280ac932f2c2c2dd5cd4825b8",
+    "server-version/frontend/src/training/TrainingContextBack.tsx": "7b2451a3736b40c5434684733c1fea371b9b35c7",
+    "server-version/frontend/src/training/TrainingLibrary.tsx": "a92cadae0091662be0092116018b8e0138d50700",
+    "server-version/frontend/src/training/training-media-dialogs.css": "2f6277ca598ea5a4a75a652a8d8a109b367989e5"
+  },
+  "checks": "39 tests in 4 files passed; final rename-only 3 tests passed (10 filtered); frontend types and affected lint exit 0. Original commands are preserved in conversation; logs below are original.",
+  "logs": {
+    "media-dialog-scale-return-tests.log": "f1b2b83630b3a90d58918c6aaac9227b9e65b92542c35e68cddfc724f947296b",
+    "media-dialog-scale-return-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "media-dialog-scale-return-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "media-rename-final-tests.log": "7220430702265791aaa264e42859d4bde36d29cd18a1fb41531b72b94c10312c",
+    "media-dialog-final-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "media-rename-final-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "browserScreenshots": [
+    "media-preview-desktop.png",
+    "media-upload-desktop.png",
+    "media-upload-mobile.png",
+    "media-rename-mobile.png"
+  ],
+  "browserScope": "Read-only real user dialogs and scale return href; no actual upload, rename or successful playback claim.",
+  "evidenceType": "Local evidence; no CI attestation"
+}

@@ -1,0 +1,462 @@
+{
+  "schemaVersion": 1,
+  "files": {
+    "files.txt": {
+      "bytes": 3417,
+      "sha256": "ad15a8514a9a866725680ac135c37f515a5bcfa60f4d22d5fdd650541c393cf6"
+    },
+    "manifest-v1.json": {
+      "bytes": 155930,
+      "sha256": "4c212b63d6266285ae6cddd4751633b8ccf1335b94fd13bd35a82c00112730eb"
+    },
+    "push-trigger-review.json": {
+      "bytes": 5497,
+      "sha256": "a0be126122ef7c32e46954f209d0244e2e58843193b6ece4eb78b59432f8ea78"
+    },
+    "form-template-input-comparison.json": {
+      "bytes": 4653,
+      "sha256": "6c424af29a3cc545d1a7168a2c7ecef56733704e8d73e6985cdd18d15942f801"
+    },
+    "snapshot.json": {
+      "bytes": 20811,
+      "sha256": "54ed5fc6f15c0e70aeaf081248f121d43bd612960e89239a7f21611485e5fb8b"
+    },
+    "README.md": {
+      "bytes": 3552,
+      "sha256": "8ca65ccab082cd6d45de29f9d26a7dcd73776006ea226b2c0a58ad04d6c13eb7"
+    },
+    "commands-as-recorded.json": {
+      "bytes": 36636,
+      "sha256": "3b742021a7274af03395fa511477d733f3257fbaaa5de8bff4dfc02ab0b3807b"
+    },
+    "commits.tsv": {
+      "bytes": 2485,
+      "sha256": "5fab3e8f29467a45ab635a00ac43e26a298546d554cf3144ac72835e1b37a5dc"
+    },
+    "remote-verification.json": {
+      "bytes": 350,
+      "sha256": "3c14c93c17e97c9c5fc7ccb7b5c2594db219892c009a07221036d05c71aefd9b"
+    },
+    "command-coverage.json": {
+      "bytes": 79570,
+      "sha256": "f046f610ce0b64ac8f1c298c63fdea78791a80847a3392d20ee516dbcff5c8be"
+    },
+    "logs/workspace-tabs-paging-tests.sanitized-v1.log": {
+      "bytes": 227,
+      "sha256": "57a760e9843b505dcb7d6163b3c3362b0e4adab860028e3b1952e45b1f973d21"
+    },
+    "logs/course-overview-lint.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/form-template-integration-loopback.sanitized-v1.log": {
+      "bytes": 10449,
+      "sha256": "bcc0e905da3b56d259b11b84e24d5971810b53794b24ae840dbd6a8a5ca42ded"
+    },
+    "logs/workspace-description-final-lint.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/course-task-workspace-lint.sanitized-v1.log": {
+      "bytes": 2667,
+      "sha256": "20968103049bdcae7aef5c6c75dcda28a61bb3b3b097ea1ed4d89aeed8e27353"
+    },
+    "logs/form-template-lint-first.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/form-template-empty-conversion-final.sanitized-v1.log": {
+      "bytes": 231,
+      "sha256": "d5a8bd23eed1a5c11432c7e5220f0dc681adff39d7a6d6fbb31be57687fb9469"
+    },
+    "logs/scale-author-reverse-implicit-test.sanitized-v1.log": {
+      "bytes": 237,
+      "sha256": "6c7833ae0822583a3b0239beb3b8e70ca42ce10f7d83ccaa9bcd5be05aa41aef"
+    },
+    "logs/scale-author-paste-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/workspace-description-tests.sanitized-v1.log": {
+      "bytes": 13892,
+      "sha256": "bbd54c84f818f57c42326aa9d47039e940011fe071abe1962fa62583692ae2b1"
+    },
+    "logs/scale-scoring-ui-lint.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/form-template-question-edit-final.sanitized-v1.log": {
+      "bytes": 237,
+      "sha256": "cd0c739fcf351761975e3afad3491a391684c3ff450db1811bb0301bb36c3842"
+    },
+    "logs/workspace-description-final-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/form-template-frozen-lint.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/form-template-ui-adjusted-tests.sanitized-v1.log": {
+      "bytes": 239,
+      "sha256": "a6949a9d5c8775aa100e5acf722f4dd92488bd7d1a61cde22d7a58cfd75f4803"
+    },
+    "logs/media-dialog-scale-return-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/course-assignment-merge-types-first.sanitized-v1.log": {
+      "bytes": 382,
+      "sha256": "15fedaf11f4c873fb5f71c73f9103b806613d40ce439b8db4dc8a56fcde9b417"
+    },
+    "logs/course-overview-tests.sanitized-v1.log": {
+      "bytes": 227,
+      "sha256": "78bab6f81447b570a43dee82298487bc039d3921c1d5affb1b19aa59b0a1c63b"
+    },
+    "logs/media-rename-final-lint.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/form-template-integration-after-migration.sanitized-v1.log": {
+      "bytes": 1023,
+      "sha256": "9b644951f5ca1effcc5bce8e4ba63e39500c614c5b3b02a0eb284ee27b4717ae"
+    },
+    "logs/form-template-backend-types-final.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/media-rename-final-tests.sanitized-v1.log": {
+      "bytes": 239,
+      "sha256": "ee7690a06df0aede7202e89c3bce4cd943ed1e9d55537e0414930c8bd7462339"
+    },
+    "logs/scale-author-final-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/course-assignment-merge-existing-tests.sanitized-v1.log": {
+      "bytes": 227,
+      "sha256": "946a3eaae4c4ca7ad7098da2e77f5fdf99b4af22d1b039e41ea51a25e29ac580"
+    },
+    "logs/teacher-header-shell-tests.sanitized-v1.log": {
+      "bytes": 227,
+      "sha256": "3b035bdea007bd4129ccdabfb5d218745038edf72cbf19b36b85be7e2c28636f"
+    },
+    "logs/course-toolbar-schedules-tests.sanitized-v1.log": {
+      "bytes": 225,
+      "sha256": "3062fddb2baa0803fd095a93e85aa94b39cda68a1fc4b12ff90e3c088ba1f0fa"
+    },
+    "logs/workspace-cards-lint.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/assessment-layout-legacy-filter-tests.sanitized-v1.log": {
+      "bytes": 235,
+      "sha256": "8cab03df22408ea0285bee5938660093f982c66ee2c609046a1b1f2ab7f4022f"
+    },
+    "logs/form-template-typed-copy-final.sanitized-v1.log": {
+      "bytes": 231,
+      "sha256": "66e4c246f3849fb9f4569ba87980f49703feef4a52edeaf5e65d350cbfd4eec3"
+    },
+    "logs/workspace-heading-tests.sanitized-v1.log": {
+      "bytes": 227,
+      "sha256": "0debc501630ff28ecdb9eaa8ff7652a26d1dbcea22902a26b9297eebe411086e"
+    },
+    "logs/course-toolbar-final-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/course-toolbar-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/form-template-typed-copy-adjusted.sanitized-v1.log": {
+      "bytes": 1712,
+      "sha256": "e8e1b92eb19a34830679723eef9ff5f1ee1ab10b0bc16fce33dd45019513c757"
+    },
+    "logs/form-template-backend-types-first.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/scale-author-paste-types-final.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/form-template-integration-first.sanitized-v1.log": {
+      "bytes": 4604,
+      "sha256": "e1b41b13358579456931c65aa96db3f2685387ad0e2fd9125a81fe2b8db64909"
+    },
+    "logs/form-template-integration-content-final.sanitized-v1.log": {
+      "bytes": 220,
+      "sha256": "6bd2c16edd4dfe6583b2ca46e54bdf1c48614ba2ed224d43ea7e868b8b270b8d"
+    },
+    "logs/form-template-frozen-backend-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/course-footer-code-tests.sanitized-v1.log": {
+      "bytes": 227,
+      "sha256": "6fb71bd343509875b57636341f86892dcb6f334d2805f7c0a86e09f218813a35"
+    },
+    "logs/workspace-description-lint.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/media-dialog-scale-return-lint.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/workspace-heading-lint.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/workspace-cards-tests.sanitized-v1.log": {
+      "bytes": 228,
+      "sha256": "f1d49222d7ea3adb81f1025901c438e4ac354f6e8cbeca18f4d386473944c980"
+    },
+    "logs/scale-scoring-ui-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/workspace-description-course-recheck.sanitized-v1.log": {
+      "bytes": 239,
+      "sha256": "d5d4b29099833d8cb32d1649262573d794f335058d610de011b2634fb0521499"
+    },
+    "logs/course-task-workspace-types-fixed.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/course-task-workspace-final-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/workspace-heading-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/form-template-types-complete.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/course-task-legacy-create.sanitized-v1.log": {
+      "bytes": 239,
+      "sha256": "a399cba0aeacc10920e639838c3782df150529f01796f55f34b56aae9544b9ca"
+    },
+    "logs/course-task-workspace-types.sanitized-v1.log": {
+      "bytes": 12441,
+      "sha256": "ab3c7f72f2741c9ccaa7324a9b18f31d6bd511863ee4d89db19fcb9203801f50"
+    },
+    "logs/workspace-tabs-paging-lint.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/form-template-types-final.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/form-template-frozen-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/form-template-picker-final.sanitized-v1.log": {
+      "bytes": 236,
+      "sha256": "09bf5d27b7ed8cc36d49e3c3a37a5012509fb364787fb0fbc4cb37235698c1e9"
+    },
+    "logs/course-footer-code-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/scale-author-final-lint.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/assessment-layout-filter-tests.sanitized-v1.log": {
+      "bytes": 251,
+      "sha256": "a62373663e5a1d5618b64a7915090cb8b1029fa6886c36d747e6b6cb3746e086"
+    },
+    "logs/workspace-cards-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/course-checkin-owner-retry.sanitized-v1.log": {
+      "bytes": 236,
+      "sha256": "a421a591a660648202484ff467baf89a3708d14cc3b8b403ae652c6d55d361e6"
+    },
+    "logs/course-assignment-merge-workflow-tests.sanitized-v1.log": {
+      "bytes": 62285,
+      "sha256": "bd3f2dc63973be10c65872c1d0d910f2fb94009523c2aac04fcf9bd77cdda8bf"
+    },
+    "logs/scale-scoring-ui-tests.sanitized-v1.log": {
+      "bytes": 227,
+      "sha256": "71e0b52167a307b4ea9b4be8db212133addf5172fca75992aeadc791851ca19b"
+    },
+    "logs/media-dialog-final-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/teacher-header-lint.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/course-toolbar-filter-tests.sanitized-v1.log": {
+      "bytes": 15507,
+      "sha256": "03c0b731ed902515c5da666dca208a351e175ba465e12452173392c92e60df10"
+    },
+    "logs/workspace-tabs-paging-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/form-template-edit-preservation-final.sanitized-v1.log": {
+      "bytes": 237,
+      "sha256": "1ba79ae0c42694e5a47820de4b57835f0d08c6f46ceec6aab7ba0be207a68ffc"
+    },
+    "logs/course-assignment-merge-lint-first.sanitized-v1.log": {
+      "bytes": 1355,
+      "sha256": "4f996ad0598f74a0bea86135cd9f2885fdcb1700489d91d36ab85f0935404f73"
+    },
+    "logs/form-template-final-ui.sanitized-v1.log": {
+      "bytes": 228,
+      "sha256": "a4e67f24f9380054714b12f8d4fdf51646c4cdf39ac81395bb64bf72ff7e2bc5"
+    },
+    "logs/scale-author-compact-save-tests.sanitized-v1.log": {
+      "bytes": 239,
+      "sha256": "22b4eb3bc2465be6148f6576c8f948ef71a5c5ce3e7a96cf5cda765a90df3a52"
+    },
+    "logs/course-footer-code-lint.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/course-task-parent-integration.sanitized-v1.log": {
+      "bytes": 238,
+      "sha256": "a6fd1ed26437861353b34eb82d052bee18552c13bbaaa173cd5f6ec0588319fd"
+    },
+    "logs/course-task-workspace-workflows.sanitized-v1.log": {
+      "bytes": 10686,
+      "sha256": "61dad2be3e35f84f6f871234b898e493f2f59886e99ad74be5d0e538432875cf"
+    },
+    "logs/scale-author-paste-tests.sanitized-v1.log": {
+      "bytes": 227,
+      "sha256": "73ad0af45469eae9673322b8b2f8c1a43c68c1c500fb5d5441f17c60a025b3ad"
+    },
+    "logs/workspace-description-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/assessment-layout-lint.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/course-toolbar-lint.sanitized-v1.log": {
+      "bytes": 2667,
+      "sha256": "20968103049bdcae7aef5c6c75dcda28a61bb3b3b097ea1ed4d89aeed8e27353"
+    },
+    "logs/course-task-workspace-final-test-lint.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/form-template-lint-complete.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/media-dialog-scale-return-tests.sanitized-v1.log": {
+      "bytes": 227,
+      "sha256": "54b35fce5a0cc0b637f57f399e4f6e0b122f6d978c522ec1431d04fb16d58e87"
+    },
+    "logs/course-overview-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/form-template-ui-first.sanitized-v1.log": {
+      "bytes": 27764,
+      "sha256": "045d11cbdfa8fbc44f17ae14a25e48634c28a6ee9553962a9249c4a059cecc8b"
+    },
+    "logs/teacher-header-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/form-template-backend-types-instructions.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/scale-author-paste-lint.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/assessment-layout-types.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "logs/course-toolbar-filter-retry.sanitized-v1.log": {
+      "bytes": 239,
+      "sha256": "e88bd8c39a57ad472fe3e59fa82d69cab15dc86a9a924897aa045dc530f49262"
+    },
+    "logs/form-template-types-first.sanitized-v1.log": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "reports/form-template-layout-result.json": {
+      "bytes": 1019,
+      "sha256": "deea46e66cf126e7683d521c5efb73d8dec3ea1e33e39a7ccb5052af7f9f6eb4"
+    },
+    "reports/course-toolbar-result.json": {
+      "bytes": 3248,
+      "sha256": "e435855dbb5413391ba7552e2021c51dcb817d2eee43f6419898b27eef301ca0"
+    },
+    "reports/workspace-heading-result.json": {
+      "bytes": 2444,
+      "sha256": "76d812bfc116701644831c273894c76b8332f1034daa31e767d0732cfccdd6c3"
+    },
+    "reports/scale-author-paste-result.json": {
+      "bytes": 4854,
+      "sha256": "dc5830ad537f189315032c037183b7b8a4d88b891ff9192cd90b36c031050ee2"
+    },
+    "reports/workspace-cards-result.json": {
+      "bytes": 4044,
+      "sha256": "1cfa9e50312405b0ae10a6baa4e771d4617c35b3f0364bb448b2265421e967f4"
+    },
+    "reports/workspace-tabs-paging-result.json": {
+      "bytes": 2758,
+      "sha256": "d3af86933b412a89792ef0de06c1c9ece3f2e2064d2b8c287b6699b0fd723888"
+    },
+    "reports/scale-scoring-ui-result.json": {
+      "bytes": 2593,
+      "sha256": "384bc13052973b50aaaeb71db10bbcab2f91d708003eabf9fd402cc9ed39085a"
+    },
+    "reports/media-dialog-scale-return-result.json": {
+      "bytes": 2190,
+      "sha256": "3373d6e5370e4818b1193cbeaf71a9eb8f9350c2101869572133117235ae1229"
+    },
+    "reports/form-template-frozen-input.json": {
+      "bytes": 2751,
+      "sha256": "c2b0834ae478eab426f9464db34ff55bced5716a9ead5adb00630963b819667a"
+    },
+    "reports/workspace-description-result.json": {
+      "bytes": 4176,
+      "sha256": "fc3ecdb050c4f40ad5fd77eac439dd5a383189bf09d6983d4c547ae52b943caa"
+    },
+    "reports/course-task-unification-result.json": {
+      "bytes": 7286,
+      "sha256": "beed1f9a77a91d65e2ac516ccb439a89e6227c24155629f5c42e4ad68ce79482"
+    },
+    "reports/teacher-header-result.json": {
+      "bytes": 2398,
+      "sha256": "af580f837ec3dd706115446e155507ad6927935a1777a06371d5ca4fea09ee94"
+    },
+    "reports/course-overview-result.json": {
+      "bytes": 2115,
+      "sha256": "67fd5735e45e133f7ac30e8b823a3c79b1e1a660b7a977ec3c7f58b2f9b7f49f"
+    },
+    "reports/assessment-layout-result.json": {
+      "bytes": 2690,
+      "sha256": "c0473504a15f050223855379e8da61fae655bdd6b33db1e5c9a7ff2ede605203"
+    },
+    "reports/course-footer-boxes-result.json": {
+      "bytes": 2264,
+      "sha256": "c3ef8942cbf81828a8261b1a58ba0e944a6f5b3dc3ce8dcca16e8d7743bf9580"
+    },
+    "reports/form-template-result.json": {
+      "bytes": 6440,
+      "sha256": "95b102c186bcbb62948bcb4341b56addbfb371470d556e117da75b715648b00d"
+    }
+  },
+  "indexExcludesItself": true
+}

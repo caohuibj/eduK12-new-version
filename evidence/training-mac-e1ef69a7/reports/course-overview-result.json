@@ -1,0 +1,60 @@
+{
+  "baseHead": "a8aaf8cac138c2e3dc8bb65e70cc0487a60636bb",
+  "files": {
+    "server-version/frontend/src/training/TrainingTrainerCourse.tsx": "75ed3357376799adc1cc4ddd16344f4570d1d98b28b13b844efa8eb133d17245",
+    "server-version/frontend/src/training/training-course-overview.css": "871d340aa58956b1b69d00d043dc721c31572d81b924aff50a3113a8a5f6f7e4"
+  },
+  "head": "66c257c91dfc67285775e6487288f9cd8897cdc8",
+  "clean": true,
+  "checks": [
+    {
+      "command": "node_modules/vitest/vitest.mjs run src/training/TrainingCoursePages.test.tsx --maxWorkers=1",
+      "exitCode": 0,
+      "result": "12 passed",
+      "log": "course-overview-tests.log",
+      "logSHA256": "23ecae9bbe8cbca25e66f6c0090b01f548dbd74ad1f0a0a3e6c88764f7f744fa"
+    },
+    {
+      "command": "node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+      "exitCode": 0,
+      "log": "course-overview-types.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": "node_modules/eslint/bin/eslint.js src/training/TrainingTrainerCourse.tsx",
+      "exitCode": 0,
+      "log": "course-overview-lint.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "browser": {
+    "1280": {
+      "columns": 2,
+      "cardWidth": 566.5,
+      "contentWidth": 1265,
+      "courseCode": "right of title, same header row"
+    },
+    "1600": {
+      "columns": 3,
+      "cardWidth": 408.66,
+      "contentWidth": 1585
+    },
+    "390": {
+      "columns": 1,
+      "cardWidth": 309,
+      "contentWidth": 375
+    },
+    "320": {
+      "columns": 1,
+      "cardWidth": 239,
+      "contentWidth": 305
+    },
+    "scope": "Read-only authenticated course management and task-list pages; no edits to courses/tasks and no clipboard changes."
+  },
+  "screenshots": [
+    "course-overview-management-desktop.png",
+    "course-overview-cards-desktop.png",
+    "course-overview-cards-mobile.png"
+  ],
+  "scope": "TrainingTrainerCourse TSX and isolated course CSS only; no backend, database, API contract, dependencies, push, CI or production."
+}

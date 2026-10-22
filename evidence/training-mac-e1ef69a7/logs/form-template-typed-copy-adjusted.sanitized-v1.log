@@ -1,0 +1,41 @@
+
+ RUN  v4.1.11 [REPOSITORY]/server-version/backend
+
+ ❯ src/__tests__/questionnaire/form-templates.postgres.integration.test.ts (5 tests | 1 failed | 4 skipped) 4558ms
+     × copies the whole typed form atomically, remaps conditional keys and keeps source/delivery data independent 144ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 4 skipped (5)
+   Start at  09:44:50
+   Duration  4.80s (transform 3.13s, setup 0ms, import 118ms, tests 4.56s, environment 0ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL > copies the whole typed form atomically, remaps conditional keys and keeps source/delivery data independent
+ZodError: [
+  {
+    "code": "unrecognized_keys",
+    "keys": [
+      "itemKey"
+    ],
+    "path": [
+      "item",
+      "formDefinition"
+    ],
+    "message": "Unrecognized key(s) in object: 'itemKey'"
+  }
+]
+ ❯ Object.get error [as error] node_modules/zod/v3/types.js:39:31
+ ❯ ZodObject.parse node_modules/zod/v3/types.js:114:22
+ ❯ Module.updateFormItem src/modules/questionnaire-product/service.ts:345:41
+    343| }
+    344| export async function updateFormItem(actor: Actor, id: string, itemId:…
+    345|   const { revision, item } = itemSchema.parse(raw)
+       |                                         ^
+    346|   return mutate(actor, id, revision, async (tx, row) => {
+    347|     if (row.productKind !== 'FORM_TEMPLATE') throw compositeBadRequest…
+ ❯ src/__tests__/questionnaire/form-templates.postgres.integration.test.ts:65:35
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

@@ -1,0 +1,35 @@
+{
+  "baseHead": "b363ce0a149e3ac5d42fe56d48d43b0a39031e12",
+  "branch": "feat/scale-score-editor-ui-20261022",
+  "sourceSHA256": {
+    "server-version/backend/prisma/schema.prisma": "e9d04fcfa3c8c89bc9c2a7a2fcbcf7242c68ee75c64e955f2156e9754c4eabc9",
+    "server-version/backend/src/modules/composite/composite.service.ts": "d4e8e7eb03093416d45e27a125642e9aa867c89aba6f6a568571169caa4eb1fc",
+    "server-version/backend/src/modules/questionnaire-product/routes.ts": "2b06f6ece3fc967b4e5e01b9115acb2f2359a46abda01984d94050a88d20f56a",
+    "server-version/backend/src/modules/questionnaire-product/service.ts": "4e343dd023ba92d8dc358e20fe01fca874cbdfa5881c3c778c1b6f48466d975c",
+    "server-version/backend/src/routes/trainingWorkspace.ts": "2bfe1ac6f013eb048da558e91ad3204262cff148d2fc03a2b744536abca847b9",
+    "server-version/frontend/src/App.tsx": "1d1f1b9541a51cd41bd80f6c3c1a6b48c064a948486eeaa1bdb9369d2b1f9088",
+    "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": "0b6ede06fd93584f44c950e23500f3ab74ccc92c1c943d00b135e001505091d6",
+    "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx": "e9d47b9f86640bc198cdb4fd366fca33c8f15191373b84dd6d571d2eb33abf3f",
+    "server-version/frontend/src/training/TrainingLibrary.test.tsx": "be15c285c99f1d8b4439033676f826e08f2b1e2849f445c395a7507740e0e5c4",
+    "server-version/frontend/src/training/TrainingLibrary.tsx": "7bd28defd1f4bee83cc30a5a7cd53c2bc1839d4cdfa143cdf57c97262147b90f",
+    "server-version/backend/prisma/migrations/20261022090000_private_form_templates/migration.sql": "6b221dc457e018aef17092b9415326140a72454dd238890961871b1734dd2dc8",
+    "server-version/backend/src/__tests__/questionnaire/form-templates.postgres.integration.test.ts": "1351c8d5d112e38c64746b3acbaa14f38d670eb7bac5ad4b0626095893259523",
+    "server-version/backend/src/modules/questionnaire-product/form-template-content.ts": "0723687d6d801228c2b6da3bd66820d0cebfe4223a9f038ed1432c3e2eaea9fb",
+    "server-version/frontend/src/pages/questionnaire/FormTemplatePicker.tsx": "ce2a3c177e96e930929c99f72b2bab593583d39af5d4c67749bba6af7c406fc1",
+    "server-version/frontend/src/pages/questionnaire/__tests__/FormTemplates.test.tsx": "d1371bb69e43f2b467e931c0f14418323898de7694ab48753bd33c28a298f725",
+    "server-version/frontend/src/pages/questionnaire/form-template-editor.css": "ae0f0e2191e64231f654364e81b030f02250521ec3a4b65e5cef566370129581"
+  },
+  "evidenceType": "Local development evidence, not CI attestation",
+  "tools": {
+    "frontend": {
+      "typescript": "5.6.3",
+      "vitest": "4.1.11",
+      "eslint": "9.39.3"
+    },
+    "backend": {
+      "typescript": "5.9.3",
+      "vitest": "4.1.11",
+      "@prisma/client": "5.22.0"
+    }
+  }
+}

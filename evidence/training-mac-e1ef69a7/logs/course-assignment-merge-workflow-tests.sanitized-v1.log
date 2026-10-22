@@ -1,0 +1,2388 @@
+
+ RUN  v4.1.11 [REPOSITORY]/server-version/frontend
+
+ ❯ src/pages/__tests__/AssignmentList.course-workspace.test.tsx (5 tests | 4 failed) 3367ms
+     × opens authorized editing and submissions inside the same course URL 1194ms
+     × retains the visible authenticated Excel export without navigating away 1016ms
+     × publishes in the current course and clears old task/filter focus before refreshing its list 129ms
+     × rejects a focused exercise from another course and offers no edit/export actions 1006ms
+
+ Test Files  1 failed (1)
+      Tests  4 failed | 1 passed (5)
+   Start at  10:14:57
+   Duration  4.52s (transform 269ms, setup 202ms, import 355ms, tests 3.37s, environment 494ms)
+
+stderr | src/pages/__tests__/AssignmentList.course-workspace.test.tsx > Unified course exercise management > retains the visible authenticated Excel export without navigating away
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+Warning: The current testing environment is not configured to support act(...)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 4 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/pages/__tests__/AssignmentList.course-workspace.test.tsx > Unified course exercise management > opens authorized editing and submissions inside the same course URL
+TestingLibraryElementError: Unable to find role="dialog" and name "练习提交管理"
+
+Ignored nodes: comments, script, style
+<body
+  style="overflow: hidden;"
+>
+  <div>
+    <section
+      aria-label="课程练习管理"
+      class="training-assignment-workspace"
+    >
+      <div
+        class="training-assignment-toolbar"
+      >
+        <div>
+          <button
+            class="hui-button hui-button--primary"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-plus"
+              fill="none"
+              height="17"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="17"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5 12h14"
+              />
+              <path
+                d="M12 5v14"
+              />
+            </svg>
+            发布练习
+          </button>
+          <button
+            class="hui-button hui-button--secondary"
+            type="button"
+          >
+            复用练习
+          </button>
+        </div>
+        <p>
+          在当前课程内编辑、查看提交和导出数据。
+        </p>
+      </div>
+      <details
+        class="training-catalog-disclosure"
+      >
+        <summary>
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-search"
+            fill="none"
+            height="16"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="m21 21-4.34-4.34"
+            />
+            <circle
+              cx="11"
+              cy="11"
+              r="8"
+            />
+          </svg>
+          <strong>
+            检索与筛选
+          </strong>
+          <small>
+            标题 · 标签 · 时间
+          </small>
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-chevron-down"
+            fill="none"
+            height="15"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="15"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="m6 9 6 6 6-6"
+            />
+          </svg>
+        </summary>
+        <form
+          aria-label="练习检索"
+          class="training-catalog-filter"
+        >
+          <label
+            class="catalog-title-search"
+          >
+            标题
+            <input
+              aria-label="搜索练习"
+              maxlength="200"
+              placeholder="输入练习标题"
+              type="search"
+              value=""
+            />
+          </label>
+          <label>
+            标签（全部匹配）
+            <input
+              maxlength="209"
+              placeholder="多个标签用逗号分隔"
+              value=""
+            />
+          </label>
+          <label>
+            时间依据
+            <select>
+              <option
+                value="created"
+              >
+                创建时间
+              </option>
+              <option
+                value="deadline"
+              >
+                截止时间
+              </option>
+            </select>
+          </label>
+          <label>
+            开始日期
+            <input
+              type="date"
+              value=""
+            />
+          </label>
+          <label>
+            结束日期
+            <input
+              type="date"
+              value=""
+            />
+          </label>
+          <div
+            class="catalog-filter-actions"
+          >
+            <button
+              type="submit"
+            >
+              查询
+            </button>
+            <button
+              type="button"
+            >
+              清除筛选
+            </button>
+          </div>
+          <small>
+            筛选所有记录；日期按当前设备时区，包含结束日。点击“查询”后更新。
+          </small>
+        </form>
+      </details>
+      <div
+        class="training-item-list training-course-task-grid"
+      >
+        <article
+          aria-labelledby="assignment-title-task"
+          class="training-task-item training-course-task-card"
+          id="assignment-record-task"
+          tabindex="-1"
+        >
+          <div
+            class="training-course-task-card-top"
+          >
+            <span>
+              练习
+            </span>
+            <span
+              class="training-course-task-status"
+            >
+              已发布
+            </span>
+          </div>
+          <h2
+            id="assignment-title-task"
+          >
+            <button
+              class="training-assignment-title"
+            >
+              课程练习
+            </button>
+          </h2>
+          <dl
+            class="training-assignment-facts"
+          >
+            <div>
+              <dt>
+                截止时间
+              </dt>
+              <dd>
+                无截止时间
+              </dd>
+            </div>
+            <div>
+              <dt>
+                提交数量
+              </dt>
+              <dd>
+                3
+                 份
+              </dd>
+            </div>
+          </dl>
+          <footer
+            class="training-assignment-card-actions"
+          >
+            <button
+              class="hui-button hui-button--primary"
+              type="button"
+            >
+              查看提交
+            </button>
+            <button
+              class="hui-button hui-button--secondary"
+              type="button"
+            >
+              编辑练习
+            </button>
+            <button
+              class="hui-button hui-button--secondary"
+              type="button"
+            >
+              导出提交
+            </button>
+            <div
+              class="staff-more-actions staff-more-actions--right"
+            >
+              <button
+                aria-expanded="false"
+                aria-label="课程练习 的更多操作"
+                class="staff-more-actions__trigger"
+                type="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-ellipsis"
+                  fill="none"
+                  height="18"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="1"
+                  />
+                  <circle
+                    cx="19"
+                    cy="12"
+                    r="1"
+                  />
+                  <circle
+                    cx="5"
+                    cy="12"
+                    r="1"
+                  />
+                </svg>
+              </button>
+            </div>
+          </footer>
+        </article>
+      </div>
+      <nav
+        aria-label="练习分页"
+        class="training-catalog-pagination"
+      >
+        <label>
+          每页
+          <select
+            aria-label="每页数量"
+          >
+            <option
+              value="10"
+            >
+              10
+               条
+            </option>
+            <option
+              value="20"
+            >
+              20
+               条
+            </option>
+            <option
+              value="50"
+            >
+              50
+               条
+            </option>
+          </select>
+        </label>
+        <span
+          role="status"
+        >
+          共 
+          1
+           条 · 第 
+          1
+           / 
+          1
+           页
+        </span>
+        <button
+          disabled=""
+          type="button"
+        >
+          上一页
+        </button>
+        <button
+          disabled=""
+          type="button"
+        >
+          下一页
+        </button>
+      </nav>
+      <dialog
+        class="hui-modal-surface staff-modal-backdrop"
+        open=""
+        role="presentation"
+      >
+        <div
+          aria-labelledby="assignment-submissions-title"
+          aria-modal="true"
+          class="staff-dialog staff-dialog--wide"
+          role="dialog"
+          tabindex="-1"
+        >
+          <div
+            class="staff-dialog__header"
+          >
+            <div>
+              <h2
+                id="assignment-submissions-title"
+              >
+                练习提交列表
+              </h2>
+              <p
+                class="staff-dialog__description"
+              >
+                课程练习
+              </p>
+            </div>
+            <button
+              aria-label="关闭练习提交列表"
+              class="staff-icon-button"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-x w-5 h-5"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M18 6 6 18"
+                />
+                <path
+                  d="m6 6 12 12"
+                />
+              </svg>
+            </button>
+          </div>
+          <div
+            class="staff-dialog__body"
+          >
+            <div
+              class="staff-toolbar staff-submission-toolbar"
+            >
+              <div
+                class="flex items-center space-x-4"
+              >
+                <span
+                  class="text-sm text-gray-500"
+                >
+                  共 
+                  0
+                   份提交
+                </span>
+                <span
+                  class="text-sm text-green-600"
+                >
+                  0
+                   已批改
+                </span>
+                <span
+                  class="text-sm text-orange-500"
+                >
+                  0
+                   待批改
+                </span>
+              </div>
+            </div>
+            <div
+              class="text-center py-12"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-clipboard-list w-16 h-16 text-gray-300 mx-auto mb-4"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  height="4"
+                  rx="1"
+                  ry="1"
+                  width="8"
+                  x="8"
+                  y="2"
+                />
+                <path
+                  d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+                />
+                <path
+                  d="M12 11h4"
+                />
+                <path
+                  d="M12 16h4"
+                />
+                <path
+                  d="M8 11h.01"
+                />
+                <path
+                  d="M8 16h.01"
+                />
+              </svg>
+              <p
+                class="text-gray-500"
+              >
+                暂无提交
+              </p>
+            </div>
+          </div>
+        </div>
+      </dialog>
+    </section>
+    <output
+      data-testid="route"
+    >
+      /courses/course/detail?section=assignments
+    </output>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body
+  style="overflow: hidden;"
+>
+  <div>
+    <section
+      aria-label="课程练习管理"
+      class="training-assignment-workspace"
+    >
+      <div
+        class="training-assignment-toolbar"
+      >
+        <div>
+          <button
+            class="hui-button hui-button--primary"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-plus"
+              fill="none"
+              height="17"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="17"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5 12h14"
+              />
+              <path
+                d="M12 5v14"
+              />
+            </svg>
+            发布练习
+          </button>
+          <button
+            class="hui-button hui-button--secondary"
+            type="button"
+          >
+            复用练习
+          </button>
+        </div>
+        <p>
+          在当前课程内编辑、查看提交和导出数据。
+        </p>
+      </div>
+      <details
+        class="training-catalog-disclosure"
+      >
+        <summary>
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-search"
+            fill="none"
+            height="16"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="m21 21-4.34-4.34"
+            />
+            <circle
+              cx="11"
+              cy="11"
+              r="8"
+            />
+          </svg>
+          <strong>
+            检索与筛选
+          </strong>
+          <small>
+            标题 · 标签 · 时间
+          </small>
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-chevron-down"
+            fill="none"
+            height="15"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="15"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="m6 9 6 6 6-6"
+            />
+          </svg>
+        </summary>
+        <form
+          aria-label="练习检索"
+          class="training-catalog-filter"
+        >
+          <label
+            class="catalog-title-search"
+          >
+            标题
+            <input
+              aria-label="搜索练习"
+              maxlength="200"
+              placeholder="输入练习标题"
+              type="search"
+              value=""
+            />
+          </label>
+          <label>
+            标签（全部匹配）
+            <input
+              maxlength="209"
+              placeholder="多个标签用逗号分隔"
+              value=""
+            />
+          </label>
+          <label>
+            时间依据
+            <select>
+              <option
+                value="created"
+              >
+                创建时间
+              </option>
+              <option
+                value="deadline"
+              >
+                截止时间
+              </option>
+            </select>
+          </label>
+          <label>
+            开始日期
+            <input
+              type="date"
+              value=""
+            />
+          </label>
+          <label>
+            结束日期
+            <input
+              type="date"
+              value=""
+            />
+          </label>
+          <div
+            class="catalog-filter-actions"
+          >
+            <button
+              type="submit"
+            >
+              查询
+            </button>
+            <button
+              type="button"
+            >
+              清除筛选
+            </button>
+          </div>
+          <small>
+            筛选所有记录；日期按当前设备时区，包含结束日。点击“查询”后更新。
+          </small>
+        </form>
+      </details>
+      <div
+        class="training-item-list training-course-task-grid"
+      >
+        <article
+          aria-labelledby="assignment-title-task"
+          class="training-task-item training-course-task-card"
+          id="assignment-record-task"
+          tabindex="-1"
+        >
+          <div
+            class="training-course-task-card-top"
+          >
+            <span>
+              练习
+            </span>
+            <span
+              class="training-course-task-status"
+            >
+              已发布
+            </span>
+          </div>
+          <h2
+            id="assignment-title-task"
+          >
+            <button
+              class="training-assignment-title"
+            >
+              课程练习
+            </button>
+          </h2>
+          <dl
+            class="training-assignment-facts"
+          >
+            <div>
+              <dt>
+                截止时间
+              </dt>
+              <dd>
+                无截止时间
+              </dd>
+            </div>
+            <div>
+              <dt>
+                提交数量
+              </dt>
+              <dd>
+                3
+                 份
+              </dd>
+            </div>
+          </dl>
+          <footer
+            class="training-assignment-card-actions"
+          >
+            <button
+              class="hui-button hui-button--primary"
+              type="button"
+            >
+              查看提交
+            </button>
+            <button
+              class="hui-button hui-button--secondary"
+              type="button"
+            >
+              编辑练习
+            </button>
+            <button
+              class="hui-button hui-button--secondary"
+              type="button"
+            >
+              导出提交
+            </button>
+            <div
+              class="staff-more-actions staff-more-actions--right"
+            >
+              <button
+                aria-expanded="false"
+                aria-label="课程练习 的更多操作"
+                class="staff-more-actions__trigger"
+                type="button"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-ellipsis"
+                  fill="none"
+                  height="18"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <circle
+                    cx="12"
+                    cy="12"
+                    r="1"
+                  />
+                  <circle
+                    cx="19"
+                    cy="12"
+                    r="1"
+                  />
+                  <circle
+                    cx="5"
+                    cy="12"
+                    r="1"
+                  />
+                </svg>
+              </button>
+            </div>
+          </footer>
+        </article>
+      </div>
+      <nav
+        aria-label="练习分页"
+        class="training-catalog-pagination"
+      >
+        <label>
+          每页
+          <select
+            aria-label="每页数量"
+          >
+            <option
+              value="10"
+            >
+              10
+               条
+            </option>
+            <option
+              value="20"
+            >
+              20
+               条
+            </option>
+            <option
+              value="50"
+            >
+              50
+               条
+            </option>
+          </select>
+        </label>
+        <span
+          role="status"
+        >
+          共 
+          1
+           条 · 第 
+          1
+           / 
+          1
+           页
+        </span>
+        <button
+          disabled=""
+          type="button"
+        >
+          上一页
+        </button>
+        <button
+          disabled=""
+          type="button"
+        >
+          下一页
+        </button>
+      </nav>
+      <dialog
+        class="hui-modal-surface staff-modal-backdrop"
+        open=""
+        role="presentation"
+      >
+        <div
+          aria-labelledby="assignment-submissions-title"
+          aria-modal="true"
+          class="staff-dialog staff-dialog--wide"
+          role="dialog"
+          tabindex="-1"
+        >
+          <div
+            class="staff-dialog__header"
+          >
+            <div>
+              <h2
+                id="assignment-submissions-title"
+              >
+                练习提交列表
+              </h2>
+              <p
+                class="staff-dialog__description"
+              >
+                课程练习
+              </p>
+            </div>
+            <button
+              aria-label="关闭练习提交列表"
+              class="staff-icon-button"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-x w-5 h-5"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M18 6 6 18"
+                />
+                <path
+                  d="m6 6 12 12"
+                />
+              </svg>
+            </button>
+          </div>
+          <div
+            class="staff-dialog__body"
+          >
+            <div
+              class="staff-toolbar staff-submission-toolbar"
+            >
+              <div
+                class="flex items-center space-x-4"
+              >
+                <span
+                  class="text-sm text-gray-500"
+                >
+                  共 
+                  0
+                   份提交
+                </span>
+                <span
+                  class="text-sm text-green-600"
+                >
+                  0
+                   已批改
+                </span>
+                <span
+                  class="text-sm text-orange-500"
+                >
+                  0
+                   待批改
+                </span>
+              </div>
+            </div>
+            <div
+              class="text-center py-12"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-clipboard-list w-16 h-16 text-gray-300 mx-auto mb-4"
+                fill="none"
+                height="24"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  height="4"
+                  rx="1"
+                  ry="1"
+                  width="8"
+                  x="8"
+                  y="2"
+                />
+                <path
+                  d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"
+                />
+                <path
+                  d="M12 11h4"
+                />
+                <path
+                  d="M12 16h4"
+                />
+                <path
+                  d="M8 11h.01"
+                />
+                <path
+                  d="M8 16h.01"
+                />
+              </svg>
+              <p
+                class="text-gray-500"
+              >
+                暂无提交
+              </p>
+            </div>
+          </div>
+        </div>
+      </dialog>
+    </section>
+    <output
+      data-testid="route"
+    >
+      /courses/course/detail?section=assignments
+    </output>
+  </div>
+</body>
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/pages/__tests__/AssignmentList.course-workspace.test.tsx:45:25
+     43|     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeI…
+     44|     fireEvent.click(screen.getByRole('button', { name: '查看提交', exact: …
+     45|     expect(await screen.findByRole('dialog', { name: '练习提交管理' })).toBe…
+       |                         ^
+     46|     expect(api.get).toHaveBeenCalledWith('/assignments/task/submission…
+     47|     expect(screen.getByTestId('route')).toHaveTextContent('/courses/co…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/4]⎯
+
+ FAIL  src/pages/__tests__/AssignmentList.course-workspace.test.tsx > Unified course exercise management > retains the visible authenticated Excel export without navigating away
+TestingLibraryElementError: Unable to find role="button" and name "导出提交"
+
+Ignored nodes: comments, script, style
+<body
+  style=""
+>
+  <div>
+    <section
+      aria-label="课程练习管理"
+      class="training-assignment-workspace"
+    >
+      <div
+        class="training-assignment-toolbar"
+      >
+        <div>
+          <button
+            class="hui-button hui-button--primary"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-plus"
+              fill="none"
+              height="17"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="17"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5 12h14"
+              />
+              <path
+                d="M12 5v14"
+              />
+            </svg>
+            发布练习
+          </button>
+          <button
+            class="hui-button hui-button--secondary"
+            type="button"
+          >
+            复用练习
+          </button>
+        </div>
+        <p>
+          在当前课程内编辑、查看提交和导出数据。
+        </p>
+      </div>
+      <details
+        class="training-catalog-disclosure"
+      >
+        <summary>
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-search"
+            fill="none"
+            height="16"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="m21 21-4.34-4.34"
+            />
+            <circle
+              cx="11"
+              cy="11"
+              r="8"
+            />
+          </svg>
+          <strong>
+            检索与筛选
+          </strong>
+          <small>
+            标题 · 标签 · 时间
+          </small>
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-chevron-down"
+            fill="none"
+            height="15"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="15"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="m6 9 6 6 6-6"
+            />
+          </svg>
+        </summary>
+        <form
+          aria-label="练习检索"
+          class="training-catalog-filter"
+        >
+          <label
+            class="catalog-title-search"
+          >
+            标题
+            <input
+              aria-label="搜索练习"
+              maxlength="200"
+              placeholder="输入练习标题"
+              type="search"
+              value=""
+            />
+          </label>
+          <label>
+            标签（全部匹配）
+            <input
+              maxlength="209"
+              placeholder="多个标签用逗号分隔"
+              value=""
+            />
+          </label>
+          <label>
+            时间依据
+            <select>
+              <option
+                value="created"
+              >
+                创建时间
+              </option>
+              <option
+                value="deadline"
+              >
+                截止时间
+              </option>
+            </select>
+          </label>
+          <label>
+            开始日期
+            <input
+              type="date"
+              value=""
+            />
+          </label>
+          <label>
+            结束日期
+            <input
+              type="date"
+              value=""
+            />
+          </label>
+          <div
+            class="catalog-filter-actions"
+          >
+            <button
+              type="submit"
+            >
+              查询
+            </button>
+            <button
+              type="button"
+            >
+              清除筛选
+            </button>
+          </div>
+          <small>
+            筛选所有记录；日期按当前设备时区，包含结束日。点击“查询”后更新。
+          </small>
+        </form>
+      </details>
+      <div
+        class="hui-status hui-status--pending"
+      >
+        <span
+          aria-hidden="true"
+          class="hui-status__symbol"
+        >
+          …
+        </span>
+        <div
+          class="hui-status__body"
+        >
+          <strong
+            class="hui-status__title"
+          >
+            正在加载练习
+          </strong>
+          <div
+            class="hui-status__description"
+          >
+            正在读取练习和提交概况。
+          </div>
+        </div>
+      </div>
+      <nav
+        aria-label="练习分页"
+        class="training-catalog-pagination"
+      >
+        <label>
+          每页
+          <select
+            aria-label="每页数量"
+          >
+            <option
+              value="10"
+            >
+              10
+               条
+            </option>
+            <option
+              value="20"
+            >
+              20
+               条
+            </option>
+            <option
+              value="50"
+            >
+              50
+               条
+            </option>
+          </select>
+        </label>
+        <span
+          role="status"
+        >
+          共 
+          0
+           条 · 第 
+          1
+           / 
+          1
+           页
+        </span>
+        <button
+          disabled=""
+          type="button"
+        >
+          上一页
+        </button>
+        <button
+          disabled=""
+          type="button"
+        >
+          下一页
+        </button>
+      </nav>
+    </section>
+    <output
+      data-testid="route"
+    >
+      /courses/course/detail?section=assignments
+    </output>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body
+  style=""
+>
+  <div>
+    <section
+      aria-label="课程练习管理"
+      class="training-assignment-workspace"
+    >
+      <div
+        class="training-assignment-toolbar"
+      >
+        <div>
+          <button
+            class="hui-button hui-button--primary"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-plus"
+              fill="none"
+              height="17"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="17"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5 12h14"
+              />
+              <path
+                d="M12 5v14"
+              />
+            </svg>
+            发布练习
+          </button>
+          <button
+            class="hui-button hui-button--secondary"
+            type="button"
+          >
+            复用练习
+          </button>
+        </div>
+        <p>
+          在当前课程内编辑、查看提交和导出数据。
+        </p>
+      </div>
+      <details
+        class="training-catalog-disclosure"
+      >
+        <summary>
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-search"
+            fill="none"
+            height="16"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="16"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="m21 21-4.34-4.34"
+            />
+            <circle
+              cx="11"
+              cy="11"
+              r="8"
+            />
+          </svg>
+          <strong>
+            检索与筛选
+          </strong>
+          <small>
+            标题 · 标签 · 时间
+          </small>
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-chevron-down"
+            fill="none"
+            height="15"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="15"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="m6 9 6 6 6-6"
+            />
+          </svg>
+        </summary>
+        <form
+          aria-label="练习检索"
+          class="training-catalog-filter"
+        >
+          <label
+            class="catalog-title-search"
+          >
+            标题
+            <input
+              aria-label="搜索练习"
+              maxlength="200"
+              placeholder="输入练习标题"
+              type="search"
+              value=""
+            />
+          </label>
+          <label>
+            标签（全部匹配）
+            <input
+              maxlength="209"
+              placeholder="多个标签用逗号分隔"
+              value=""
+            />
+          </label>
+          <label>
+            时间依据
+            <select>
+              <option
+                value="created"
+              >
+                创建时间
+              </option>
+              <option
+                value="deadline"
+              >
+                截止时间
+              </option>
+            </select>
+          </label>
+          <label>
+            开始日期
+            <input
+              type="date"
+              value=""
+            />
+          </label>
+          <label>
+            结束日期
+            <input
+              type="date"
+              value=""
+            />
+          </label>
+          <div
+            class="catalog-filter-actions"
+          >
+            <button
+              type="submit"
+            >
+              查询
+            </button>
+            <button
+              type="button"
+            >
+              清除筛选
+            </button>
+          </div>
+          <small>
+            筛选所有记录；日期按当前设备时区，包含结束日。点击“查询”后更新。
+          </small>
+        </form>
+      </details>
+      <div
+        class="hui-status hui-status--pending"
+      >
+        <span
+          aria-hidden="true"
+          class="hui-status__symbol"
+        >
+          …
+        </span>
+        <div
+          class="hui-status__body"
+        >
+          <strong
+            class="hui-status__title"
+          >
+            正在加载练习
+          </strong>
+          <div
+            class="hui-status__description"
+          >
+            正在读取练习和提交概况。
+          </div>
+        </div>
+      </div>
+      <nav
+        aria-label="练习分页"
+        class="training-catalog-pagination"
+      >
+        <label>
+          每页
+          <select
+            aria-label="每页数量"
+          >
+            <option
+              value="10"
+            >
+              10
+               条
+            </option>
+            <option
+              value="20"
+            >
+              20
+               条
+            </option>
+            <option
+              value="50"
+            >
+              50
+               条
+            </option>
+          </select>
+        </label>
+        <span
+          role="status"
+        >
+          共 
+          0
+           条 · 第 
+          1
+           / 
+          1
+           页
+        </span>
+        <button
+          disabled=""
+          type="button"
+        >
+          上一页
+        </button>
+        <button
+          disabled=""
+          type="button"
+        >
+          下一页
+        </button>
+      </nav>
+    </section>
+    <output
+      data-testid="route"
+    >
+      /courses/course/detail?section=assignments
+    </output>
+  </div>
+</body>
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/pages/__tests__/AssignmentList.course-workspace.test.tsx:57:56
+     55|     vi.spyOn(HTMLAnchorElement.prototype, 'click').mockImplementation(…
+     56|     api.sessionFetch.mockResolvedValue({ ok: true, blob: async () => n…
+     57|     await act(async () => fireEvent.click(await screen.findByRole('but…
+       |                                                        ^
+     58|     await waitFor(() => expect(filenames).toEqual(['课程练习_提交数据.xlsx']))
+     59|     expect(api.sessionFetch).toHaveBeenCalledExactlyOnceWith('/api/ass…
+ ❯ node_modules/@testing-library/react/dist/act-compat.js:47:24
+ ❯ act node_modules/react/cjs/react.development.js:2512:16
+ ❯ Proxy.<anonymous> node_modules/@testing-library/react/dist/act-compat.js:46:25
+ ❯ src/pages/__tests__/AssignmentList.course-workspace.test.tsx:57:11
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/4]⎯
+
+ FAIL  src/pages/__tests__/AssignmentList.course-workspace.test.tsx > Unified course exercise management > publishes in the current course and clears old task/filter focus before refreshing its list
+TestingLibraryElementError: Unable to find an accessible element with the role "button" and name "创建练习"
+
+Here are the accessible roles:
+
+  navigation:
+
+  Name "课程管理内容":
+  <nav
+    aria-label="课程管理内容"
+    class="training-section-switch training-course-tabs"
+  />
+
+  --------------------------------------------------
+  link:
+
+  Name "学习":
+  <a
+    aria-current="page"
+    class="training-section-tab"
+    data-discover="true"
+    href="/courses/course/detail?section=assignments&assignmentId=task&assignments_search=old"
+  />
+
+  Name "打卡":
+  <a
+    class="training-section-tab"
+    data-discover="true"
+    href="/courses/course/detail?section=checkins&assignmentId=task&assignments_search=old"
+  />
+
+  Name "测评":
+  <a
+    class="training-section-tab"
+    data-discover="true"
+    href="/courses/course/detail?section=assessments&assignmentId=task&assignments_search=old"
+  />
+
+  Name "课程管理":
+  <a
+    class="training-section-tab"
+    data-discover="true"
+    href="/courses/course/detail?section=management&assignmentId=task&assignments_search=old"
+  />
+
+  --------------------------------------------------group:
+
+  Name "":
+  <fieldset
+    class="contents"
+  />
+
+  --------------------------------------------------
+  heading:
+
+  Name "发布练习":
+  <h2
+    id="assignment-editor-title"
+  />
+
+  Name "编辑内容":
+  <h3 />
+
+  Name "题目设置":
+  <h3 />
+
+  Name "附件与资料":
+  <h3 />
+
+  Name "发布设置":
+  <h3 />
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  <p
+    class="staff-dialog__description"
+  />
+
+  Name "":
+  <p
+    class="staff-help"
+  />
+
+  --------------------------------------------------
+  region:
+
+  Name "练习内容编辑":
+  <section
+    aria-label="练习内容编辑"
+    class="training-task-editor__section"
+  />
+
+  Name "练习题目设置":
+  <section
+    aria-label="练习题目设置"
+    class="training-task-editor__section"
+  />
+
+  Name "练习附件资料":
+  <section
+    aria-label="练习附件资料"
+    class="training-task-editor__section"
+  />
+
+  --------------------------------------------------
+  banner:
+
+  Name "":
+  <header
+    class="training-task-editor__section-heading"
+  />
+
+  Name "":
+  <header
+    class="training-task-editor__section-heading"
+  />
+
+  Name "":
+  <header
+    class="training-task-editor__section-heading"
+  />
+
+  Name "":
+  <header
+    class="training-task-editor__section-heading"
+  />
+
+  --------------------------------------------------
+  textbox:
+
+  Name "练习标题 *":
+  <input
+    class="input w-full"
+    id="AssignmentList-field-102"
+    placeholder="请输入练习标题"
+    required=""
+    type="text"
+    value="新练习"
+  />
+
+  Name "":
+  <input
+    class="flex-1 min-w-[120px] outline-hidden text-sm"
+    maxlength="20"
+    placeholder="输入标签后按回车添加"
+    type="text"
+    value=""
+  />
+
+  --------------------------------------------------
+  button:
+
+  Name "添加视频":
+  <button
+    class="text-sm text-action hover:text-action-hover flex items-center"
+    type="button"
+  />
+
+  Name "添加图片":
+  <button
+    class="text-sm text-action hover:text-action-hover flex items-center"
+    type="button"
+  />
+
+  Name "添加文档":
+  <button
+    class="text-sm text-action hover:text-action-hover flex items-center"
+    type="button"
+  />
+
+  Name "取消":
+  <button
+    class="hui-button hui-button--secondary"
+    type="button"
+  />
+
+  Name "发布练习":
+  <button
+    class="hui-button hui-button--primary"
+    type="submit"
+  />
+
+  --------------------------------------------------
+  complementary:
+
+  Name "练习发布设置":
+  <aside
+    aria-label="练习发布设置"
+    class="training-task-editor__settings"
+  />
+
+  --------------------------------------------------
+  combobox:
+
+  Name "选择课程 *":
+  <select
+    class="input w-full"
+    id="AssignmentList-field-101"
+    required=""
+  />
+
+  --------------------------------------------------
+  option:
+
+  Name "请选择课程":
+  <option
+    value=""
+  />
+
+  Name "当前课程":
+  <option
+    value="course"
+  />
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+<form
+  aria-busy="false"
+  aria-labelledby="assignment-editor-title"
+  aria-modal="true"
+  class="staff-dialog staff-dialog--wide training-task-editor"
+  role="dialog"
+  tabindex="-1"
+>
+  <div
+    class="training-editor-course-tabs"
+  >
+    <nav
+      aria-label="课程管理内容"
+      class="training-section-switch training-course-tabs"
+    >
+      <a
+        aria-current="page"
+        class="training-section-tab"
+        data-discover="true"
+        href="/courses/course/detail?section=assignments&assignmentId=task&assignments_search=old"
+      >
+        学习
+      </a>
+      <a
+        class="training-section-tab"
+        data-discover="true"
+        href="/courses/course/detail?section=checkins&assignmentId=task&assignments_search=old"
+      >
+        打卡
+      </a>
+      <a
+        class="training-section-tab"
+        data-discover="true"
+        href="/courses/course/detail?section=assessments&assignmentId=task&assignments_search=old"
+      >
+        测评
+      </a>
+      <a
+        class="training-section-tab"
+        data-discover="true"
+        href="/courses/course/detail?section=management&assignmentId=task&assignments_search=old"
+      >
+        课程管理
+      </a>
+    </nav>
+  </div>
+  <fieldset
+    class="contents"
+  >
+    <div
+      class="staff-dialog__header"
+    >
+      <div>
+        <h2
+          id="assignment-editor-title"
+        >
+          发布练习
+        </h2>
+        <p
+          class="staff-dialog__description"
+        >
+          编写任务内容，按需添加题目和资料，再确认发布设置。
+        </p>
+      </div>
+    </div>
+    <div
+      class="staff-dialog__body staff-form training-task-editor__body"
+    >
+      <div
+        class="training-task-editor__layout"
+      >
+        <div
+          class="training-task-editor__main"
+        >
+          <section
+            aria-label="练习内容编辑"
+            class="training-task-editor__section"
+          >
+            <header
+              class="training-task-editor__section-heading"
+            >
+              <h3>
+                编辑内容
+              </h3>
+              <span>
+                标题与任务说明
+              </span>
+            </header>
+            <div>
+              <label
+                class="label"
+                for="AssignmentList-field-102"
+              >
+                练习标题 *
+              </label>
+              <input
+                class="input w-full"
+                id="AssignmentList-field-102"
+                placeholder="请输入练习标题"
+                required=""
+                type="text"
+                value="新练习"
+              />
+            </div>
+            <div>
+              <label
+                class="label"
+              >
+                练习内容
+              </label>
+            </div>
+          </section>
+          <section
+            aria-label="练习题目设置"
+            class="training-task-editor__section"
+          >
+            <header
+              class="training-task-editor__section-heading"
+            >
+              <h3>
+                题目设置
+              </h3>
+              <span>
+                0
+                 道题
+              </span>
+            </header>
+            <div />
+          </section>
+          <section
+            aria-label="练习附件资料"
+            class="training-task-editor__section"
+          >
+            <header
+              class="training-task-editor__section-heading"
+            >
+              <h3>
+                附件与资料
+              </h3>
+              <span>
+                选填
+              </span>
+            </header>
+            <div
+              class="training-task-editor__attachments"
+            >
+              <div>
+                <div
+                  class="flex items-center justify-between mb-2"
+                >
+                  <label
+                    class="label mb-0"
+                  >
+                    视频
+                  </label>
+                  <button
+                    class="text-sm text-action hover:text-action-hover flex items-center"
+                    type="button"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="lucide lucide-video w-4 h-4 mr-1"
+                      fill="none"
+                      height="24"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                      width="24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="m16 13 5.223 3.482a.5.5 0 0 0 .777-.416V7.87a.5.5 0 0 0-.752-.432L16 10.5"
+                      />
+                      <rect
+                        height="12"
+                        rx="2"
+                        width="14"
+                        x="2"
+                        y="6"
+                      />
+                    </svg>
+                    添加视频
+                  </button>
+                </div>
+              </div>
+              <div>
+                <div
+                  class="flex items-center justify-between mb-2"
+                >
+                  <label
+                    class="label mb-0"
+                  >
+                    图片
+                  </label>
+                  <button
+                    class="text-sm text-action hover:text-action-hover flex items-center"
+                    type="button"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="lucide lucide-image w-4 h-4 mr-1"
+                      fill="none"
+                      height="24"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                      width="24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <rect
+                        height="18"
+                        rx="2"
+                        ry="2"
+                        width="18"
+                        x="3"
+                        y="3"
+                      />
+                      <circle
+                        cx="9"
+                        cy="9"
+                        r="2"
+                      />
+                      <path
+                        d="m21 15-3.086-3.086a2 2 0 0 0-2.828 0L6 21"
+                      />
+                    </svg>
+                    添加图片
+                  </button>
+                </div>
+              </div>
+              <div>
+                <div
+                  class="flex items-center justify-between mb-2"
+                >
+                  <label
+                    class="label mb-0"
+                  >
+                    文档
+                  </label>
+                  <button
+                    class="text-sm text-action hover:text-action-hover flex items-center"
+                    type="button"
+                  >
+                    <svg
+                      aria-hidden="true"
+                      class="lucide lucide-file-text w-4 h-4 mr-1"
+                      fill="none"
+                      height="24"
+                      stroke="currentColor"
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                      width="24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z"
+                      />
+                      <path
+                        d="M14 2v5a1 1 0 0 0 1 1h5"
+                      />
+                      <path
+                        d="M10 9H8"
+                      />
+                      <path
+                        d="M16 13H8"
+                      />
+                      <path
+                        d="M16 17H8"
+                      />
+                    </svg>
+                    添加文档
+                  </button>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+        <aside
+          aria-label="练习发布设置"
+          class="training-task-editor__settings"
+        >
+          <header
+            class="training-task-editor__section-heading"
+          >
+            <h3>
+              发布设置
+            </h3>
+          </header>
+          <div>
+            <label
+              class="label"
+              for="AssignmentList-field-101"
+            >
+              选择课程 *
+            </label>
+            <select
+              class="input w-full"
+              id="AssignmentList-field-101"
+              required=""
+            >
+              <option
+                value=""
+              >
+                请选择课程
+              </option>
+              <option
+                value="course"
+              >
+                当前课程
+              </option>
+            </select>
+          </div>
+          <div>
+            <label
+              class="label"
+              for="AssignmentList-field-103"
+            >
+              截止时间
+            </label>
+            <input
+              class="input w-full"
+              id="AssignmentList-field-103"
+              type="datetime-local"
+              value=""
+            />
+          </div>
+          <p
+            class="staff-help"
+          >
+            截止时间按当前设备时区输入：
+            Asia/Tokyo · UTC+9
+            。
+          </p>
+          <div>
+            <label
+              class="label"
+            >
+              标签
+            </label>
+            <div
+              class="w-full"
+            >
+              <div
+                class="border border-gray-300 rounded-md p-2 flex flex-wrap gap-2 min-h-[42px] focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-transparent"
+              >
+                <input
+                  class="flex-1 min-w-[120px] outline-hidden text-sm"
+                  maxlength="20"
+                  placeholder="输入标签后按回车添加"
+                  type="text"
+                  value=""
+                />
+              </div>
+              <div
+                class="text-xs text-gray-500 mt-1"
+              >
+                0
+                /
+                10
+                 个标签，每个标签最多
+                20
+                字符
+              </div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+    <div
+      class="staff-dialog__actions"
+    >
+      <span
+        class="training-task-editor__footer-note"
+      >
+        发布后，课程学员即可查看。
+      </span>
+      <button
+        class="hui-button hui-button--secondary"
+        type="button"
+      >
+        取消
+      </button>
+      <button
+        class="hui-button hui-button--primary"
+        type="submit"
+      >
+        发布练习
+      </button>
+    </div>
+  </fieldset>
+</form>
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/pages/__tests__/AssignmentList.course-workspace.test.tsx:71:36
+     69|     fireEvent.change(within(dialog).getByLabelText('练习标题 *'), { target…
+     70|     api.post.mockResolvedValue({ code: 0, data: { id: 'new' } })
+     71|     fireEvent.click(within(dialog).getByRole('button', { name: '创建练习',…
+       |                                    ^
+     72|     await waitFor(() => expect(api.post).toHaveBeenCalledWith('/assign…
+     73|     await waitFor(() => expect(screen.getByTestId('route').textContent…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/4]⎯
+
+ FAIL  src/pages/__tests__/AssignmentList.course-workspace.test.tsx > Unified course exercise management > rejects a focused exercise from another course and offers no edit/export actions
+TestingLibraryElementError: Unable to find role="alert"
+
+Ignored nodes: comments, script, style
+<body
+  style=""
+>
+  <div>
+    <section
+      aria-label="课程练习管理"
+      class="training-assignment-workspace"
+    >
+      <div
+        class="training-assignment-toolbar"
+      >
+        <div>
+          <button
+            class="hui-button hui-button--primary"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-plus"
+              fill="none"
+              height="17"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="17"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5 12h14"
+              />
+              <path
+                d="M12 5v14"
+              />
+            </svg>
+            发布练习
+          </button>
+          <button
+            class="hui-button hui-button--secondary"
+            type="button"
+          >
+            复用练习
+          </button>
+        </div>
+        <p>
+          在当前课程内编辑、查看提交和导出数据。
+        </p>
+      </div>
+      <div
+        class="training-assignment-focused"
+      >
+        <span>
+          已定位到这份练习
+        </span>
+        <button
+          class="hui-button hui-button--secondary"
+          type="button"
+        >
+          显示全部练习
+        </button>
+      </div>
+      <div
+        class="hui-status hui-status--error"
+      >
+        <span
+          aria-hidden="true"
+          class="hui-status__symbol"
+        >
+          ×
+        </span>
+        <div
+          class="hui-status__body"
+        >
+          <strong
+            class="hui-status__title"
+          >
+            练习列表加载失败
+          </strong>
+          <div
+            class="hui-status__description"
+          >
+            无法管理此课程的练习
+          </div>
+          <div
+            class="hui-status__actions"
+          >
+            <button
+              class="hui-button hui-button--secondary"
+              type="button"
+            >
+              重试
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <output
+      data-testid="route"
+    >
+      /courses/course/detail?section=assignments&assignmentId=task
+    </output>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body
+  style=""
+>
+  <div>
+    <section
+      aria-label="课程练习管理"
+      class="training-assignment-workspace"
+    >
+      <div
+        class="training-assignment-toolbar"
+      >
+        <div>
+          <button
+            class="hui-button hui-button--primary"
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-plus"
+              fill="none"
+              height="17"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="17"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5 12h14"
+              />
+              <path
+                d="M12 5v14"
+              />
+            </svg>
+            发布练习
+          </button>
+          <button
+            class="hui-button hui-button--secondary"
+            type="button"
+          >
+            复用练习
+          </button>
+        </div>
+        <p>
+          在当前课程内编辑、查看提交和导出数据。
+        </p>
+      </div>
+      <div
+        class="training-assignment-focused"
+      >
+        <span>
+          已定位到这份练习
+        </span>
+        <button
+          class="hui-button hui-button--secondary"
+          type="button"
+        >
+          显示全部练习
+        </button>
+      </div>
+      <div
+        class="hui-status hui-status--error"
+      >
+        <span
+          aria-hidden="true"
+          class="hui-status__symbol"
+        >
+          ×
+        </span>
+        <div
+          class="hui-status__body"
+        >
+          <strong
+            class="hui-status__title"
+          >
+            练习列表加载失败
+          </strong>
+          <div
+            class="hui-status__description"
+          >
+            无法管理此课程的练习
+          </div>
+          <div
+            class="hui-status__actions"
+          >
+            <button
+              class="hui-button hui-button--secondary"
+              type="button"
+            >
+              重试
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+    <output
+      data-testid="route"
+    >
+      /courses/course/detail?section=assignments&assignmentId=task
+    </output>
+  </div>
+</body>
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/pages/__tests__/AssignmentList.course-workspace.test.tsx:80:25
+     78|     api.get.mockResolvedValue({ code: 0, data: { ...full, courseId: 'f…
+     79|     mount('&assignmentId=task')
+     80|     expect(await screen.findByRole('alert')).toHaveTextContent('无法管理此课…
+       |                         ^
+     81|     expect(screen.queryByRole('button', { name: '编辑练习', exact: true })…
+     82|     expect(screen.queryByRole('button', { name: '导出提交', exact: true })…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/4]⎯
+

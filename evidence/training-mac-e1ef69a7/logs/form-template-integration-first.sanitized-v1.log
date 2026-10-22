@@ -1,0 +1,93 @@
+
+ RUN  v4.1.11 [REPOSITORY]/server-version/backend
+
+stdout | src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL
+prisma:error 
+Invalid `db.user.create()` invocation in
+[REPOSITORY]/server-version/backend/src/__tests__/questionnaire/form-templates.postgres.integration.test.ts:21:56
+
+  18 if (url.hostname !== '127.0.0.1' || url.port !== '5549' || url.pathname !== '/eduk12_mac_work_20261021') throw new Error('Explicit local synthetic fixture database required')
+  19 db = (await import('../../config/database')).prisma
+  20 service = await import('../../modules/questionnaire-product/service')
+→ 21 for (const person of [actor, other]) await db.user.create(
+Can't reach database server at `127.0.0.1:5549`
+
+Please make sure your database server is running at `127.0.0.1:5549`.
+
+stdout | src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL
+prisma:error 
+Invalid `db.materialGrant.deleteMany()` invocation in
+[REPOSITORY]/server-version/backend/src/__tests__/questionnaire/form-templates.postgres.integration.test.ts:25:28
+
+  22 }, 30000)
+  23 afterAll(async () => {
+  24   if (!db) return
+→ 25   await db.materialGrant.deleteMany(
+Can't reach database server at `127.0.0.1:5549`
+
+Please make sure your database server is running at `127.0.0.1:5549`.
+
+ ❯ src/__tests__/questionnaire/form-templates.postgres.integration.test.ts (5 tests | 5 skipped) 10280ms
+
+ Test Files  1 failed (1)
+      Tests  5 skipped (5)
+   Start at  09:38:44
+   Duration  10.55s (transform 7.21s, setup 0ms, import 125ms, tests 10.28s, environment 0ms)
+
+
+⎯⎯⎯⎯⎯⎯ Failed Suites 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL
+PrismaClientInitializationError: 
+Invalid `db.user.create()` invocation in
+[REPOSITORY]/server-version/backend/src/__tests__/questionnaire/form-templates.postgres.integration.test.ts:21:56
+
+  18 if (url.hostname !== '127.0.0.1' || url.port !== '5549' || url.pathname !== '/eduk12_mac_work_20261021') throw new Error('Explicit local synthetic fixture database required')
+  19 db = (await import('../../config/database')).prisma
+  20 service = await import('../../modules/questionnaire-product/service')
+→ 21 for (const person of [actor, other]) await db.user.create(
+Can't reach database server at `127.0.0.1:5549`
+
+Please make sure your database server is running at `127.0.0.1:5549`.
+ ❯ $n.handleRequestError node_modules/@prisma/client/runtime/library.js:121:7615
+ ❯ $n.handleAndLogRequestError node_modules/@prisma/client/runtime/library.js:121:6623
+ ❯ $n.request node_modules/@prisma/client/runtime/library.js:121:6307
+ ❯ l node_modules/@prisma/client/runtime/library.js:130:9633
+ ❯ src/config/database.ts:43:14
+     41|     const startedAt = process.hrtime.bigint()
+     42|     try {
+     43|       return await next(params)
+       |              ^
+     44|     } catch (error: any) {
+     45|       recordPrismaError(error?.code)
+ ❯ src/__tests__/questionnaire/form-templates.postgres.integration.test.ts:21:42
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL
+PrismaClientInitializationError: 
+Invalid `db.materialGrant.deleteMany()` invocation in
+[REPOSITORY]/server-version/backend/src/__tests__/questionnaire/form-templates.postgres.integration.test.ts:25:28
+
+  22 }, 30000)
+  23 afterAll(async () => {
+  24   if (!db) return
+→ 25   await db.materialGrant.deleteMany(
+Can't reach database server at `127.0.0.1:5549`
+
+Please make sure your database server is running at `127.0.0.1:5549`.
+ ❯ $n.handleRequestError node_modules/@prisma/client/runtime/library.js:121:7615
+ ❯ $n.handleAndLogRequestError node_modules/@prisma/client/runtime/library.js:121:6623
+ ❯ $n.request node_modules/@prisma/client/runtime/library.js:121:6307
+ ❯ l node_modules/@prisma/client/runtime/library.js:130:9633
+ ❯ src/config/database.ts:43:14
+     41|     const startedAt = process.hrtime.bigint()
+     42|     try {
+     43|       return await next(params)
+       |              ^
+     44|     } catch (error: any) {
+     45|       recordPrismaError(error?.code)
+ ❯ src/__tests__/questionnaire/form-templates.postgres.integration.test.ts:25:5
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

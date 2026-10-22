@@ -1,0 +1,59 @@
+{
+  "head": "f1743142e4c38d6dac96f1ab7fdfdfd38c336c18",
+  "sourceBlobs": {
+    "server-version/frontend/src/training/TrainingLibrary.tsx": "1ed1c02e0a9ca24cf86ff18b68f07275af08b39f",
+    "server-version/frontend/src/training/TrainingTrainerHome.tsx": "b76f347e7fe21abe80d047da3036d96a39df064e",
+    "server-version/frontend/src/training/training-workspace-header.css": "fef5b9bed05bb55135ac9b1c449ffd5e3eb9c0c4",
+    "server-version/frontend/src/training/training-workspace-heading.css": "da4dd477aabf5113355172aa6125bc086a114421"
+  },
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "workspace-heading-tests.log",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/training/TrainingLibrary.test.tsx",
+        "src/training/TrainingTrainerHome.pagination.test.tsx",
+        "src/training/TrainingTrainerHome.formal.test.tsx",
+        "--maxWorkers=1"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/workspace-heading-tests.log",
+      "sha256": "ed7e6433c1838abffaaee4953c6c7d73d67490be36bd7306a612ffca18f9d712"
+    },
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "workspace-heading-types.log",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.app.json",
+        "--noEmit"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/workspace-heading-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "workspace-heading-lint.log",
+        "node_modules/eslint/bin/eslint.js",
+        "src/training/TrainingTrainerHome.tsx",
+        "src/training/TrainingLibrary.tsx"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/workspace-heading-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "notes": "Local executions, original tools reported exit 0; 20 tests. Final follow-up edits affected CSS only. No CI/signing claimed.",
+  "browser": "Read-only real local teacher pages: course/media/tools desktop at 1280, course/tools at 390, media/tools at 768. Desktop search 340px; no horizontal overflow; screenshots workspace-heading-{courses,media,tools}.png"
+}

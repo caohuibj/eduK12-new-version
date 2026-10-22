@@ -1,0 +1,52 @@
+{
+  "baseHead": "2e8029111548d7520ffddc43d03c906f095461e6",
+  "scope": "Course header catalog layout and no-schedule empty hint only, frontend. Existing export, grading, scheduling API, data and server unchanged.",
+  "files": {
+    "server-version/frontend/src/pages/AssignmentList.tsx": "935fe60ff081fd2b0ea70abe613484716ecddf4ff42c4dc1eaeb23a52be5fb17",
+    "server-version/frontend/src/pages/CheckinList.tsx": "65c5bf5d4a1a709ef242bcfc13f4213b691afc1b29eb953a46de03d5d0096e75",
+    "server-version/frontend/src/training/TrainingCheckinSchedules.tsx": "82b3e8ff860ef7da2e219ec3ba73850827b34a82595cd4ec97b9299a7b283fa4",
+    "server-version/frontend/src/training/TrainingCoursePages.test.tsx": "c215e652f9e210159d4c7d11044a717d7caff995b3855ab55e88142fdd993515",
+    "server-version/frontend/src/training/TrainingTrainerCourse.tsx": "6374bcac2b0b5de3bca4d9febeb27cfb8249ffb2bac5d178e187a3795a48a7b4",
+    "server-version/frontend/src/training/training-course-overview.css": "8c5f488f9ffa83bddf9835e9c6e51579ac542beb679d17f71512ceef114365c0"
+  },
+  "checks": [
+    {
+      "command": "vitest run src/training/TrainingCoursePages.test.tsx -t \"single header filter|trainer publishing links\" --maxWorkers=1",
+      "exitCode": 1,
+      "result": "1 passed, new filter case timed out waiting for first lazy CheckinList import (default 1000ms); failure retained",
+      "log": "course-toolbar-filter-tests.log"
+    },
+    {
+      "command": "vitest run src/training/TrainingCoursePages.test.tsx -t \"single header filter\" --maxWorkers=1",
+      "exitCode": 0,
+      "result": "1 passed, 12 filtered; waitFor timeout only raised to 5000ms, existing assertions retained",
+      "log": "course-toolbar-filter-retry.log"
+    },
+    {
+      "command": "vitest run src/training/TrainingCheckinSchedules.test.tsx --maxWorkers=1",
+      "exitCode": 0,
+      "result": "4 passed; existing schedules render and stop permission/failed-action handling retained",
+      "log": "course-toolbar-schedules-tests.log"
+    },
+    {
+      "command": "tsc -p tsconfig.app.json --noEmit",
+      "exitCode": 0,
+      "log": "course-toolbar-final-types.log"
+    },
+    {
+      "command": "eslint src/training/TrainingTrainerCourse.tsx src/training/TrainingCheckinSchedules.tsx src/training/TrainingCoursePages.test.tsx src/pages/AssignmentList.tsx src/pages/CheckinList.tsx",
+      "exitCode": 0,
+      "result": "0 errors / 8 pre-existing hook warnings",
+      "log": "course-toolbar-lint.log"
+    }
+  ],
+  "logSHA256": {
+    "course-toolbar-filter-tests.log": "29fb91c486c3dbb2b7dc65d888e1cde73971fe30087367ea8b00748181dceba8",
+    "course-toolbar-filter-retry.log": "3b4aa59ab8553d675b692988b3dd538d781ea4ada54fa98c32e954b000b215b4",
+    "course-toolbar-schedules-tests.log": "c8791cb862bf97110ba057e8d0862242dc8061ba4c93736e7c67f7c9047986b5",
+    "course-toolbar-final-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "course-toolbar-lint.log": "6c9b9fdc6d31aa0754a5660dbbc3cbf7ada4fbcce1b47bc3609bbcb12b441d25"
+  },
+  "browser": "Unavailable this turn: CUA tool removed from active tool inventory following execution connection interruption. No rendered screenshot or browser visual verification claimed.",
+  "remoteActions": false
+}

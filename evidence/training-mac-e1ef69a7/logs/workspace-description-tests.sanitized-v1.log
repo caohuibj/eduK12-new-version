@@ -1,0 +1,415 @@
+
+ RUN  v4.1.11 [REPOSITORY]/server-version/frontend
+
+ ❯ src/training/TrainingTrainerHome.pagination.test.tsx (11 tests | 1 failed) 699ms
+   × keeps the complete introduction available on hover and on explicit expansion 27ms
+
+ Test Files  1 failed | 1 passed (2)
+      Tests  1 failed | 23 passed (24)
+   Start at  08:56:54
+   Duration  3.43s (transform 268ms, setup 257ms, import 459ms, tests 1.42s, environment 809ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/training/TrainingTrainerHome.pagination.test.tsx > keeps the complete introduction available on hover and on explicit expansion
+TestingLibraryElementError: Unable to find an element with the title: 完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。.
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="training-home training-trainer-home"
+    >
+      <header
+        class="training-home-header training-workspace-heading"
+      >
+        <div>
+          <h1
+            id="trainer-courses"
+          >
+            课程
+          </h1>
+          <p
+            class="training-home-subtitle"
+          >
+            管理课程内容，邀请学员参与学习。
+          </p>
+        </div>
+        <form
+          class="training-workspace-search"
+          role="search"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-search"
+            fill="none"
+            height="18"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="18"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="m21 21-4.34-4.34"
+            />
+            <circle
+              cx="11"
+              cy="11"
+              r="8"
+            />
+          </svg>
+          <input
+            aria-label="检索课程"
+            placeholder="搜索课程名称、介绍或课程码"
+            value=""
+          />
+          <button
+            type="submit"
+          >
+            检索
+          </button>
+        </form>
+        <button
+          class="training-action"
+          type="button"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-plus"
+            fill="none"
+            height="18"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="18"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M5 12h14"
+            />
+            <path
+              d="M12 5v14"
+            />
+          </svg>
+          创建课程
+        </button>
+      </header>
+      <section
+        aria-labelledby="trainer-courses"
+        class="training-course-section"
+      >
+        <div
+          class="training-trainer-course-controls training-workspace-filter-bar"
+        >
+          <fieldset
+            class="training-trainer-course-filters"
+          >
+            <legend>
+              课程状态
+            </legend>
+            <div
+              class="training-workspace-filters"
+            >
+              <button
+                aria-pressed="true"
+                type="button"
+              >
+                全部
+              </button>
+              <button
+                aria-pressed="false"
+                type="button"
+              >
+                已发布
+              </button>
+              <button
+                aria-pressed="false"
+                type="button"
+              >
+                已完结
+              </button>
+            </div>
+          </fieldset>
+          <label
+            class="training-trainer-page-size"
+          >
+            每页显示
+            <select
+              aria-label="每页课程数"
+            >
+              <option
+                value="2"
+              >
+                2
+                 个
+              </option>
+              <option
+                value="6"
+              >
+                6
+                 个
+              </option>
+              <option
+                value="10"
+              >
+                10
+                 个
+              </option>
+            </select>
+          </label>
+        </div>
+        <div
+          class="training-trainer-course-grid training-workspace-grid"
+        >
+          <article
+            aria-labelledby="trainer-course-course-0"
+            class="training-trainer-course-card training-workspace-card"
+          >
+            <div
+              class="training-workspace-card-top"
+            >
+              <span
+                class="training-workspace-card-kind"
+              >
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-book-open"
+                  fill="none"
+                  height="18"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="18"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 7v14"
+                  />
+                  <path
+                    d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"
+                  />
+                </svg>
+                课程
+              </span>
+              <span
+                class="training-trainer-course-state training-workspace-card-badge is-draft"
+              >
+                草稿
+              </span>
+            </div>
+            <div
+              class="training-trainer-card-heading"
+            >
+              <h3
+                class="training-workspace-card-title"
+                id="trainer-course-course-0"
+              >
+                <a
+                  data-discover="true"
+                  href="/courses/course-0/detail"
+                  title="研修课程1"
+                >
+                  研修课程1
+                </a>
+              </h3>
+            </div>
+            <div
+              class="training-card-description training-trainer-course-intro"
+            >
+              <p
+                class="training-card-description-text training-trainer-course-description"
+                id="trainer-course-description-course-0"
+              >
+                完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。完整课程介绍。
+              </p>
+              <button
+                aria-controls="trainer-course-description-course-0"
+                aria-expanded="false"
+                class="training-card-description-toggle"
+                type="button"
+              >
+                显示更多
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-chevron-down"
+                  fill="none"
+                  height="14"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="14"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="m6 9 6 6 6-6"
+                  />
+                </svg>
+              </button>
+            </div>
+            <div
+              aria-label="研修课程1的课程码"
+              class="training-inline-course-code is-compact"
+              role="group"
+            >
+              <small>
+                课程码
+              </small>
+              <div>
+                <code>
+                  CODE0
+                </code>
+                <button
+                  aria-label="复制「研修课程1」课程码"
+                  type="button"
+                >
+                  <svg
+                    aria-hidden="true"
+                    class="lucide lucide-copy"
+                    fill="none"
+                    height="15"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="15"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <rect
+                      height="14"
+                      rx="2"
+                      ry="2"
+                      width="14"
+                      x="8"
+                      y="8"
+                    />
+                    <path
+                      d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                    />
+                  </svg>
+                  复制
+                </button>
+              </div>
+            </div>
+            <div
+              class="training-trainer-card-footer training-workspace-card-footer"
+            >
+              <div
+                class="training-trainer-course-details training-workspace-card-meta"
+              >
+                <span>
+                  0
+                   位学员
+                </span>
+                <time
+                  datetime="2026-10-21T01:00:00Z"
+                >
+                  创建于 
+                  2026/10/21
+                </time>
+              </div>
+              <div
+                class="training-workspace-card-actions"
+              >
+                <a
+                  class="training-workspace-card-primary"
+                  data-discover="true"
+                  href="/courses/course-0/detail"
+                >
+                  管理课程 
+                  <svg
+                    aria-hidden="true"
+                    class="lucide lucide-arrow-right"
+                    fill="none"
+                    height="16"
+                    stroke="currentColor"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                    width="16"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      d="M5 12h14"
+                    />
+                    <path
+                      d="m12 5 7 7-7 7"
+                    />
+                  </svg>
+                </a>
+              </div>
+            </div>
+          </article>
+        </div>
+        <nav
+          aria-label="课程分页"
+          class="training-trainer-pagination"
+        >
+          <p
+            aria-live="polite"
+          >
+            共 
+            1
+             门课程 · 第 
+            1
+             / 
+            1
+             页
+          </p>
+          <div
+            class="training-trainer-page-buttons"
+          >
+            <button
+              disabled=""
+              type="button"
+            >
+              上一页
+            </button>
+            <span
+              class="training-trainer-page-number"
+            >
+              <button
+                aria-current="page"
+                aria-label="第 1 页"
+                type="button"
+              >
+                1
+              </button>
+            </span>
+            <button
+              disabled=""
+              type="button"
+            >
+              下一页
+            </button>
+          </div>
+        </nav>
+      </section>
+    </div>
+  </div>
+</body>
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/training/TrainingTrainerHome.pagination.test.tsx:109:30
+    107|   show()
+    108|   const expand = await screen.findByRole('button', { name: '显示更多' })
+    109|   const description = screen.getByTitle(introduction)
+       |                              ^
+    110|   expect(description).toHaveTextContent(introduction)
+    111|   fireEvent.click(expand)
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

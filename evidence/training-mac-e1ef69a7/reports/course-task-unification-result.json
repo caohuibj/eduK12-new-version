@@ -1,0 +1,110 @@
+{
+  "baseHead": "7e33a150430bc75eeaffb4650eb5675378383a3d",
+  "scope": "Training teacher course exercise/check-in management frontend only. No backend, schema, dependencies, CI or remote operations.",
+  "files": {
+    "server-version/frontend/src/pages/AssignmentList.tsx": "5c6ff2ed5efe2879db994d9668d40800ee0c357a484bc0718b0ca870a845e8e1",
+    "server-version/frontend/src/pages/CheckinList.tsx": "ea39f57f77f2f181b653bfc60518ae1ecabed74b10644e5aca009bbae66f5c4b",
+    "server-version/frontend/src/training/TrainingTrainerCourse.tsx": "f94f7cebe15fcaf8a006d288ee70a384faca29c0c520dcd44c4ebda440ae8681",
+    "server-version/frontend/src/training/TrainingCoursePages.test.tsx": "1f2c24e2dc5ca24fc121bdab4860a58b9b332d6804b45915d810e4b833c308e8",
+    "server-version/frontend/src/pages/__tests__/AssignmentList.course-workspace.test.tsx": "b0bbec5073cff5c6b07b4e6feec49467d23d275f4f4fe0f04e962284752127a2",
+    "server-version/frontend/src/pages/__tests__/CheckinList.course-workspace.test.tsx": "e753ce9ab71943e78ac35b4f88e14d638d375cba83355c208b21120f09779a18",
+    "server-version/frontend/src/training/training-assignment-workspace.css": "0fa66be7f41c84d8216083f874a318cbe0074e43c436b88de824f222853a38da"
+  },
+  "logs": {
+    "course-assignment-merge-existing-tests.log": "ed52be3737fa29e6f41cf0459beb67e9851e1bb15d621ad70d42dcd3e83b54b8",
+    "course-assignment-merge-workflow-tests.log": "f7c02d54e902105322912d431f5cf6708c37ad1fd23d27debdf52be612f93f59",
+    "course-task-workspace-workflows.log": "913773d425467323b2aecbf945e95c42cf4cc1f2b1ade28df27f571c54f7e783",
+    "course-checkin-owner-retry.log": "fdb3c4fc3d93395007ff51c31a1d0beb56c0d1a1f0b866c1af98b655028d90a8",
+    "course-task-parent-integration.log": "3359af4ed938a6f52f112615931236b948606d668feb3b1f9e4911f0a755e5d2",
+    "course-task-legacy-create.log": "bc853a165a703cd87e5cd3100c06e278d4283ae95051237136a3b9731455b51a",
+    "course-task-workspace-final-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "course-task-workspace-lint.log": "6c9b9fdc6d31aa0754a5660dbbc3cbf7ada4fbcce1b47bc3609bbcb12b441d25",
+    "course-task-workspace-final-test-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  },
+  "checks": [
+    {
+      "command": "vitest run src/training/TrainingCoursePages.test.tsx src/pages/__tests__/AssignmentList.states.test.tsx src/training/TrainingCourseEditorTabs.test.tsx --maxWorkers=1",
+      "exitCode": 0,
+      "result": "17 passed before check-in embedding; replaced only affected trainer publishing case with successful targeted integration below",
+      "log": "course-assignment-merge-existing-tests.log"
+    },
+    {
+      "command": "vitest run src/pages/__tests__/AssignmentList.course-workspace.test.tsx src/pages/__tests__/CheckinList.course-workspace.test.tsx --maxWorkers=1",
+      "exitCode": 1,
+      "result": "10 passed / 1 failed. Foreign-course fixture incorrectly returned a record for schedule endpoint. Preserved original failure; product unchanged.",
+      "log": "course-task-workspace-workflows.log"
+    },
+    {
+      "command": "vitest run src/pages/__tests__/CheckinList.course-workspace.test.tsx -t \"rejects a focused\" --maxWorkers=1",
+      "exitCode": 0,
+      "result": "1 passed / 5 filtered; corrected only schedule mock shape",
+      "log": "course-checkin-owner-retry.log"
+    },
+    {
+      "command": "vitest run src/training/TrainingCoursePages.test.tsx -t \"trainer publishing links\" --maxWorkers=1",
+      "exitCode": 0,
+      "result": "1 passed / 11 filtered; course tabs and embedded publishing/export integration",
+      "log": "course-task-parent-integration.log"
+    },
+    {
+      "command": "vitest run src/pages/__tests__/AssignmentList.course-workspace.test.tsx src/pages/__tests__/CheckinList.course-workspace.test.tsx -t \"keeps legacy create\" --maxWorkers=1",
+      "exitCode": 0,
+      "result": "2 passed / 11 filtered; newly added legacy create redirects",
+      "log": "course-task-legacy-create.log"
+    },
+    {
+      "command": "tsc -p tsconfig.app.json --noEmit",
+      "exitCode": 0,
+      "log": "course-task-workspace-final-types.log"
+    },
+    {
+      "command": "eslint src/pages/AssignmentList.tsx src/pages/CheckinList.tsx src/training/TrainingTrainerCourse.tsx src/training/TrainingCoursePages.test.tsx src/pages/__tests__/AssignmentList.course-workspace.test.tsx src/pages/__tests__/CheckinList.course-workspace.test.tsx",
+      "exitCode": 0,
+      "result": "0 errors, 8 existing hook-effect warnings, unchanged effect pattern verified against HEAD",
+      "log": "course-task-workspace-lint.log"
+    },
+    {
+      "command": "eslint src/pages/__tests__/AssignmentList.course-workspace.test.tsx src/pages/__tests__/CheckinList.course-workspace.test.tsx",
+      "exitCode": 0,
+      "result": "final new/modified tests, 0 warnings",
+      "log": "course-task-workspace-final-test-lint.log"
+    }
+  ],
+  "limitations": [
+    "New test files had unsupported ByRoleOptions exact removed (default role name matcher is already exact); runtime assertions unchanged. Earlier label/async act fixture failures retained in original logs.",
+    "CSS-only specificity and tablet action layout fixed after runtime tests; reviewed in browser, no repeat of unaffected application tests.",
+    "Export verified with mocked authenticated response, object URL, filename and download cleanup; did not download real learner data.",
+    "Real local teacher browser opened both editing/submissions/reuse dialogs without saving. Existing course has no submissions: grading nonempty UI not browser-tested.",
+    "No current-main synchronization or formal CI admission claimed."
+  ],
+  "browser": {
+    "1280": "2 card columns; exercise edit/submissions/reuse and current URL verified",
+    "1600": "3 card columns; check-in layout verified",
+    "768": "2 card columns, 2-column action buttons after specificity fix",
+    "390": "single card column, 2-column actions, no document horizontal overflow",
+    "320": "single card column, no document horizontal overflow",
+    "legacy": "Exercise and check-in old detail links redirect to matching course section and focus exact authorized record; show-all restores list",
+    "recurring": "Existing schedule panel kept; synthetic recurring POST refreshes panel immediately"
+  },
+  "toolVersions": {
+    "node": "v24.21.0",
+    "vitest": "4.1.11",
+    "typescript": "5.6.3",
+    "eslint": "9.39.3"
+  },
+  "screenshots": [
+    "course-task-unified-exercises-desktop.png",
+    "course-task-unified-exercises-mobile.png",
+    "course-task-unified-checkins-desktop.png",
+    "course-task-unified-checkins-mobile.png"
+  ],
+  "head": "2e8029111548d7520ffddc43d03c906f095461e6",
+  "branch": "feat/scale-score-editor-ui-20261022",
+  "clean": true,
+  "screenshotsSHA256": {
+    "course-task-unified-exercises-desktop.png": "f5fe2c9b364c6b58039833e349dcf44adbaf550cbf617c0e16857659ec290ff3",
+    "course-task-unified-exercises-mobile.png": "675ddc35a2fa59f5225fae15ecb5a52bbd8ec5c52745eba423ea01c94018cfb7",
+    "course-task-unified-checkins-desktop.png": "94d1d302150fda2de717fd1290a65f0e52a7b45e18eddfe2ef944e9db973fbd4",
+    "course-task-unified-checkins-mobile.png": "d3a93c29b8ce41e8f45a0164f660fd548bdee023dac99793be9d66d289f5ae2b"
+  }
+}

@@ -1,0 +1,70 @@
+{
+  "head": "35e55f30efc409ab40852596a89b0db68f92089b",
+  "execution": "Mac local; original command tool outputs confirmed exit 0; not CI or signed evidence",
+  "sourceBlobs": {
+    "server-version/frontend/src/components/app-shell/AppShell.tsx": "355d2115af940a9aadab5e2539dcafc4ce457b84",
+    "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx": "d07ea3cf7abd80717ea5eab4f047e2230bf914ac",
+    "server-version/frontend/src/training/training-workspace-header.css": "7ca5348bdf4224ec95dee6e3631e856985273f1e"
+  },
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "teacher-header-shell-tests.log",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/components/app-shell/__tests__/shell.test.tsx",
+        "--maxWorkers=1"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/teacher-header-shell-tests.log",
+      "sha256": "80f81300cac0a7437322a0b5ca478fa2f15409ea9872fe415affbe45d74b4eb7"
+    },
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "teacher-header-types.log",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.app.json",
+        "--noEmit"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/teacher-header-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "teacher-header-lint.log",
+        "node_modules/eslint/bin/eslint.js",
+        "src/components/app-shell/AppShell.tsx",
+        "src/components/app-shell/__tests__/shell.test.tsx"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/teacher-header-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "browser": {
+    "source": "Real local teacher session; read-only dashboard, no data edits",
+    "widths": [
+      1280,
+      1101,
+      768,
+      390
+    ],
+    "result": "Desktop single header row; tablet/mobile second navigation row; one teacher nav; no horizontal overflow",
+    "screenshots": [
+      "teacher-header-desktop.png",
+      "teacher-header-tablet.png",
+      "teacher-header-mobile.png"
+    ]
+  }
+}

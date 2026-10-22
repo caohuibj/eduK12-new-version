@@ -1,0 +1,130 @@
+{
+  "sourceFinalCommit": "0ce052e095bd09648c6a1430e48570d46747e725",
+  "branch": "feat/scale-score-editor-ui-20261022",
+  "localOnly": true,
+  "noBackendChanges": true,
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "[LOCAL_RUNTIME]/run-local-check.py",
+        "frontend",
+        "scale-author-paste-tests.log",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/pages/__tests__/ScaleEdit.paste.test.tsx",
+        "src/pages/__tests__/ScaleEdit.authoring.test.tsx",
+        "src/pages/__tests__/ScaleEdit.persistence-boundaries.test.tsx",
+        "src/pages/__tests__/ScaleEdit.copy-publish.test.tsx",
+        "src/pages/__tests__/ScaleEdit.readonly.test.tsx",
+        "src/pages/__tests__/ScaleEdit.scoring-save.test.tsx",
+        "--maxWorkers=1"
+      ],
+      "exitCodeObserved": 0,
+      "result": {
+        "passed": 68
+      },
+      "log": "[LOCAL_RUNTIME]/logs/scale-author-paste-tests.log",
+      "logSHA256": "e89daf9b722e24d6be4130a337cca7a154dddab3bcbc3fa44abf08f9da0acaa2"
+    },
+    {
+      "command": [
+        "python3",
+        "[LOCAL_RUNTIME]/run-local-check.py",
+        "frontend",
+        "scale-author-reverse-implicit-test.log",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/pages/__tests__/ScaleEdit.paste.test.tsx",
+        "-t",
+        "adds an explicit reverse rule",
+        "--maxWorkers=1"
+      ],
+      "exitCodeObserved": 0,
+      "result": {
+        "passed": 1,
+        "filtered": 6
+      },
+      "log": "[LOCAL_RUNTIME]/logs/scale-author-reverse-implicit-test.log",
+      "logSHA256": "af2202097c3dac477aaa6aee46d30a487e3d664bdcbf8ece79990ee8fac3a1e1"
+    },
+    {
+      "command": [
+        "python3",
+        "[LOCAL_RUNTIME]/run-local-check.py",
+        "frontend",
+        "scale-author-compact-save-tests.log",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/pages/__tests__/ScaleEdit.copy-publish.test.tsx",
+        "-t",
+        "copies once, edits|exposes an exact visibility",
+        "--maxWorkers=1"
+      ],
+      "exitCodeObserved": 0,
+      "result": {
+        "passed": 2,
+        "filtered": 23
+      },
+      "log": "[LOCAL_RUNTIME]/logs/scale-author-compact-save-tests.log",
+      "logSHA256": "5e698a35e21f423d0ba3572e3e23fe8f8b0a0f547191dca07ece1ed851a8d3f2"
+    },
+    {
+      "command": [
+        "python3",
+        "[LOCAL_RUNTIME]/run-local-check.py",
+        "frontend",
+        "scale-author-final-types.log",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.app.json",
+        "--noEmit"
+      ],
+      "exitCodeObserved": 0,
+      "result": {},
+      "log": "[LOCAL_RUNTIME]/logs/scale-author-final-types.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "python3",
+        "[LOCAL_RUNTIME]/run-local-check.py",
+        "frontend",
+        "scale-author-final-lint.log",
+        "node_modules/eslint/bin/eslint.js",
+        "src/pages/ScaleEdit.tsx",
+        "src/pages/scaleAuthoringInput.ts",
+        "src/pages/__tests__/ScaleEdit.paste.test.tsx",
+        "src/pages/__tests__/ScaleEdit.authoring.test.tsx",
+        "src/pages/__tests__/ScaleEdit.copy-publish.test.tsx",
+        "src/pages/__tests__/ScaleEdit.scoring-save.test.tsx"
+      ],
+      "exitCodeObserved": 0,
+      "result": {},
+      "log": "[LOCAL_RUNTIME]/logs/scale-author-final-lint.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "sourceGitBlobs": {
+    "server-version/frontend/src/pages/ScaleEdit.css": "34df7dca5c47e9208074548a93e8dd5511265f66",
+    "server-version/frontend/src/pages/ScaleEdit.tsx": "314483c0efe4da0750596711c1fc04df6d842520",
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.authoring.test.tsx": "953131ebbe26d0d429c64459fb2737552e7487ee",
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.copy-publish.test.tsx": "39175129adb7c4103431bcbca29eb41a09cdb9ff",
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.paste.test.tsx": "160772ee8a04c709513912de3adfe4ad0d839361",
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.scoring-save.test.tsx": "3904dc06cbf058f9912770a21dfed78d1fa1ae6b",
+    "server-version/frontend/src/pages/scaleAuthoringInput.ts": "b2bc4f397c7b5fb9b3d95879a239abb562ba3ee8"
+  },
+  "browser": {
+    "syntheticData": true,
+    "desktopWidth": 1280,
+    "mobileWidth": 390,
+    "horizontalOverflow": false,
+    "mobileTabsSingleRow": true,
+    "sourceCollapsedInitially": true,
+    "userRecordsModified": false
+  },
+  "limits": [
+    "68-case run preceded final narrow implicit-reverse and saved-label adjustments; only the new reverse case and two affected save cases were rerun.",
+    "Current logs/command record is local evidence, not signed or formally admitted CI evidence."
+  ]
+}

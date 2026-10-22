@@ -1,0 +1,1148 @@
+
+ RUN  v4.1.11 [REPOSITORY]/server-version/frontend
+
+ ❯ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx (77 tests | 1 failed) 9487ms
+     × hides advanced controls in course editing while retaining an unconfirmed selection guard 305ms
+ ❯ src/training/TrainingLibrary.test.tsx (13 tests | 1 failed) 1491ms
+   × routes a plain form directly to content editing without report controls 1011ms
+
+ Test Files  2 failed | 1 passed (3)
+      Tests  2 failed | 92 passed (94)
+   Start at  09:39:36
+   Duration  17.62s (transform 1.48s, setup 1.02s, import 1.82s, tests 11.18s, environment 2.87s)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/training/TrainingLibrary.test.tsx > routes a plain form directly to content editing without report controls
+TestingLibraryElementError: Unable to find role="link" and name "编辑"
+
+Ignored nodes: comments, script, style
+<body
+  style=""
+>
+  <div>
+    <div
+      class="training-library"
+    >
+      <header
+        class="training-library-heading training-workspace-heading"
+      >
+        <div>
+          <h1>
+            工具
+          </h1>
+          <p>
+            编制和管理教学工具，按授权使用测验与组合测评。
+          </p>
+        </div>
+        <form
+          class="training-workspace-search"
+          role="search"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-search"
+            fill="none"
+            height="18"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="18"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="m21 21-4.34-4.34"
+            />
+            <circle
+              cx="11"
+              cy="11"
+              r="8"
+            />
+          </svg>
+          <input
+            aria-label="检索工具"
+            placeholder="搜索工具名称或介绍"
+            value=""
+          />
+          <button
+            type="submit"
+          >
+            检索
+          </button>
+        </form>
+        <details
+          class="training-library-create"
+        >
+          <summary>
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-plus"
+              fill="none"
+              height="18"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5 12h14"
+              />
+              <path
+                d="M12 5v14"
+              />
+            </svg>
+            编制工具
+          </summary>
+          <div>
+            <a
+              data-discover="true"
+              href="/scales"
+            >
+              编制量表
+            </a>
+            <a
+              data-discover="true"
+              href="/toolkit/forms/new"
+            >
+              编制表单
+            </a>
+            <a
+              data-discover="true"
+              href="/sjt-authoring"
+            >
+              编制情境判断
+            </a>
+            <a
+              data-discover="true"
+              href="/questionnaire-products/new"
+            >
+              编制组合测评
+            </a>
+          </div>
+        </details>
+      </header>
+      <div
+        class="training-library-filter training-workspace-filter-bar"
+      >
+        <div
+          aria-label="资源类型"
+          class="training-workspace-filters"
+          role="group"
+        >
+          <button
+            aria-pressed="true"
+          >
+            全部
+          </button>
+          <button
+            aria-pressed="false"
+          >
+            量表
+          </button>
+          <button
+            aria-pressed="false"
+          >
+            表单
+          </button>
+          <button
+            aria-pressed="false"
+          >
+            情境判断
+          </button>
+          <button
+            aria-pressed="false"
+          >
+            认知测验
+          </button>
+          <button
+            aria-pressed="false"
+          >
+            组合测评
+          </button>
+        </div>
+        <div
+          class="training-library-filter-meta"
+        >
+          <label>
+            来源
+            <select
+              aria-label="资源来源"
+            >
+              <option
+                value="all"
+              >
+                全部来源
+              </option>
+              <option
+                value="owned"
+              >
+                我编制的
+              </option>
+              <option
+                value="granted"
+              >
+                已获授权
+              </option>
+            </select>
+          </label>
+          <span>
+            共 1 项
+          </span>
+        </div>
+      </div>
+      <div
+        class="training-library-grid training-workspace-grid"
+      >
+        <article
+          aria-labelledby="resource-form-composition-own"
+          class="training-library-card training-workspace-card"
+        >
+          <div
+            class="training-workspace-card-top"
+          >
+            <span
+              class="training-workspace-card-kind"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-wrench"
+                fill="none"
+                height="18"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="18"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"
+                />
+              </svg>
+              表单内容
+            </span>
+            <span
+              class="training-workspace-card-badge"
+            >
+              我编制的
+            </span>
+          </div>
+          <h2
+            class="training-workspace-card-title"
+            id="resource-form-composition-own"
+            title="我的工具"
+          >
+            我的工具
+          </h2>
+          <span
+            class="training-workspace-card-status is-draft"
+          >
+            草稿
+          </span>
+          <footer
+            class="training-workspace-card-footer"
+          >
+            <div
+              class="training-workspace-card-meta"
+            >
+              <span>
+                修订
+                 
+                1.0.0
+              </span>
+            </div>
+            <div
+              class="training-workspace-card-actions"
+            >
+              <button
+                class="training-workspace-card-primary"
+              >
+                存为独立表单
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-arrow-right"
+                  fill="none"
+                  height="16"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5 12h14"
+                  />
+                  <path
+                    d="m12 5 7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+          </footer>
+        </article>
+      </div>
+      <p
+        class="training-library-footnote"
+      >
+        更新已发布的工具会创建独立草稿。课程继续使用原版本；获授权的工具按许可使用。
+      </p>
+      <details
+        class="training-library-governance"
+      >
+        <summary>
+          参考、阈值与报告管理
+        </summary>
+        <p>
+          课程私有配置请进入上方组合测评的“配置与报告”；下方管理可复用的参考内容。
+        </p>
+      </details>
+    </div>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body
+  style=""
+>
+  <div>
+    <div
+      class="training-library"
+    >
+      <header
+        class="training-library-heading training-workspace-heading"
+      >
+        <div>
+          <h1>
+            工具
+          </h1>
+          <p>
+            编制和管理教学工具，按授权使用测验与组合测评。
+          </p>
+        </div>
+        <form
+          class="training-workspace-search"
+          role="search"
+        >
+          <svg
+            aria-hidden="true"
+            class="lucide lucide-search"
+            fill="none"
+            height="18"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            viewBox="0 0 24 24"
+            width="18"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="m21 21-4.34-4.34"
+            />
+            <circle
+              cx="11"
+              cy="11"
+              r="8"
+            />
+          </svg>
+          <input
+            aria-label="检索工具"
+            placeholder="搜索工具名称或介绍"
+            value=""
+          />
+          <button
+            type="submit"
+          >
+            检索
+          </button>
+        </form>
+        <details
+          class="training-library-create"
+        >
+          <summary>
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-plus"
+              fill="none"
+              height="18"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="18"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M5 12h14"
+              />
+              <path
+                d="M12 5v14"
+              />
+            </svg>
+            编制工具
+          </summary>
+          <div>
+            <a
+              data-discover="true"
+              href="/scales"
+            >
+              编制量表
+            </a>
+            <a
+              data-discover="true"
+              href="/toolkit/forms/new"
+            >
+              编制表单
+            </a>
+            <a
+              data-discover="true"
+              href="/sjt-authoring"
+            >
+              编制情境判断
+            </a>
+            <a
+              data-discover="true"
+              href="/questionnaire-products/new"
+            >
+              编制组合测评
+            </a>
+          </div>
+        </details>
+      </header>
+      <div
+        class="training-library-filter training-workspace-filter-bar"
+      >
+        <div
+          aria-label="资源类型"
+          class="training-workspace-filters"
+          role="group"
+        >
+          <button
+            aria-pressed="true"
+          >
+            全部
+          </button>
+          <button
+            aria-pressed="false"
+          >
+            量表
+          </button>
+          <button
+            aria-pressed="false"
+          >
+            表单
+          </button>
+          <button
+            aria-pressed="false"
+          >
+            情境判断
+          </button>
+          <button
+            aria-pressed="false"
+          >
+            认知测验
+          </button>
+          <button
+            aria-pressed="false"
+          >
+            组合测评
+          </button>
+        </div>
+        <div
+          class="training-library-filter-meta"
+        >
+          <label>
+            来源
+            <select
+              aria-label="资源来源"
+            >
+              <option
+                value="all"
+              >
+                全部来源
+              </option>
+              <option
+                value="owned"
+              >
+                我编制的
+              </option>
+              <option
+                value="granted"
+              >
+                已获授权
+              </option>
+            </select>
+          </label>
+          <span>
+            共 1 项
+          </span>
+        </div>
+      </div>
+      <div
+        class="training-library-grid training-workspace-grid"
+      >
+        <article
+          aria-labelledby="resource-form-composition-own"
+          class="training-library-card training-workspace-card"
+        >
+          <div
+            class="training-workspace-card-top"
+          >
+            <span
+              class="training-workspace-card-kind"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-wrench"
+                fill="none"
+                height="18"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="18"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.106-3.105c.32-.322.863-.22.983.218a6 6 0 0 1-8.259 7.057l-7.91 7.91a1 1 0 0 1-2.999-3l7.91-7.91a6 6 0 0 1 7.057-8.259c.438.12.54.662.219.984z"
+                />
+              </svg>
+              表单内容
+            </span>
+            <span
+              class="training-workspace-card-badge"
+            >
+              我编制的
+            </span>
+          </div>
+          <h2
+            class="training-workspace-card-title"
+            id="resource-form-composition-own"
+            title="我的工具"
+          >
+            我的工具
+          </h2>
+          <span
+            class="training-workspace-card-status is-draft"
+          >
+            草稿
+          </span>
+          <footer
+            class="training-workspace-card-footer"
+          >
+            <div
+              class="training-workspace-card-meta"
+            >
+              <span>
+                修订
+                 
+                1.0.0
+              </span>
+            </div>
+            <div
+              class="training-workspace-card-actions"
+            >
+              <button
+                class="training-workspace-card-primary"
+              >
+                存为独立表单
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-arrow-right"
+                  fill="none"
+                  height="16"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M5 12h14"
+                  />
+                  <path
+                    d="m12 5 7 7-7 7"
+                  />
+                </svg>
+              </button>
+            </div>
+          </footer>
+        </article>
+      </div>
+      <p
+        class="training-library-footnote"
+      >
+        更新已发布的工具会创建独立草稿。课程继续使用原版本；获授权的工具按许可使用。
+      </p>
+      <details
+        class="training-library-governance"
+      >
+        <summary>
+          参考、阈值与报告管理
+        </summary>
+        <p>
+          课程私有配置请进入上方组合测评的“配置与报告”；下方管理可复用的参考内容。
+        </p>
+      </details>
+    </div>
+  </div>
+</body>
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/training/TrainingLibrary.test.tsx:85:22
+     83| it('routes a plain form directly to content editing without report con…
+     84|  mocks.get.mockResolvedValue({code:0,data:{list:[{...own,kind:'form-co…
+     85|  expect(await screen.findByRole('link',{name:'编辑'})).toHaveAttribute('…
+       |                      ^
+     86|  expect(screen.queryByRole('link',{name:'配置与报告'})).not.toBeInTheDocume…
+     87| })
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx > Training toolkit separation > hides advanced controls in course editing while retaining an unconfirmed selection guard
+TestingLibraryElementError: Unable to find an accessible element with the role "link" and name "在工具包中管理参数、参考与报告 →"
+
+Here are the accessible roles:
+
+  link:
+
+  Name "组合测评 / 编制草稿":
+  <a
+    class="qt-breadcrumb"
+    data-discover="true"
+    href="/questionnaires?returnTo=%2Fquestionnaire-products%2Ftool"
+  />
+
+  Name "01 基本信息 名称与作答说明":
+  <a
+    aria-current="step"
+    href="#questionnaire-basic"
+  />
+
+  Name "02 内容与顺序 添加并编排测评":
+  <a
+    href="#questionnaire-content"
+  />
+
+  Name "03 投放设置 课程、时间与反馈":
+  <a
+    href="#questionnaire-delivery"
+  />
+
+  Name "04 检查与发布 核对后再正式发布":
+  <a
+    href="#questionnaire-publish"
+  />
+
+  Name "在工具中管理参数、参考与报告 →":
+  <a
+    data-discover="true"
+    href="/toolkit/compositions/tool"
+  />
+
+  --------------------------------------------------
+  banner:
+
+  Name "":
+  <header
+    class="hui-page-header"
+  />
+
+  Name "":
+  <header
+    class="qt-panel-heading"
+  />
+
+  --------------------------------------------------
+  heading:
+
+  Name "编制组合测评":
+  <h1
+    class="hui-page-header__title"
+  />
+
+  Name "基本信息":
+  <h2 />
+
+  Name "工具迁移测试":
+  <h2 />
+
+  Name "发布准备":
+  <h3 />
+
+  Name "工具配置与报告":
+  <h3 />
+
+  Name "先把测评介绍清楚":
+  <h3 />
+
+  --------------------------------------------------
+  button:
+
+  Name "保存全部设置":
+  <button
+    class="hui-button hui-button--primary"
+    disabled=""
+    type="button"
+  />
+
+  Name "保存设置":
+  <button
+    class="hui-button hui-button--secondary"
+    disabled=""
+    type="button"
+  />
+
+  Name "上一步":
+  <button
+    class="hui-button hui-button--secondary"
+    disabled=""
+    type="button"
+  />
+
+  Name "保存全部修改":
+  <button
+    class="hui-button hui-button--secondary"
+    disabled=""
+    type="button"
+  />
+
+  Name "下一步：内容与顺序":
+  <button
+    class="hui-button hui-button--primary"
+    type="button"
+  />
+
+  --------------------------------------------------
+  navigation:
+
+  Name "编制步骤":
+  <nav
+    aria-label="编制步骤"
+    class="qt-steps"
+  />
+
+  --------------------------------------------------
+  strong:
+
+  Name "":
+  <strong />
+
+  Name "":
+  <strong />
+
+  Name "":
+  <strong />
+
+  Name "":
+  <strong />
+
+  --------------------------------------------------
+  group:
+
+  Name "组合测评编辑":
+  <fieldset
+    aria-label="组合测评编辑"
+    disabled=""
+    style="border: 0px; padding: 0px; margin: 0px; min-width: 0;"
+  />
+
+  Name "":
+  <fieldset
+    class="questionnaire-basic-grid my-4 rounded border p-4"
+    id="questionnaire-basic"
+  />
+
+  --------------------------------------------------
+  region:
+
+  Name "基本信息步骤":
+  <section
+    aria-label="基本信息步骤"
+    class="qt-panel"
+  />
+
+  Name "工具配置与报告":
+  <section
+    aria-label="工具配置与报告"
+    class="qt-tool-summary"
+  />
+
+  --------------------------------------------------
+  paragraph:
+
+  Name "":
+  <p />
+
+  Name "":
+  <p
+    class="qt-note"
+  />
+
+  Name "":
+  <p />
+
+  Name "":
+  <p />
+
+  --------------------------------------------------
+  textbox:
+
+  Name "测评名称":
+  <input
+    aria-invalid="false"
+    class="input w-full"
+    id="questionnaire-product-name"
+    maxlength="200"
+    placeholder="例如：第一期教师研修 · 课前测评"
+    required=""
+    value="工具迁移测试"
+  />
+
+  Name "描述":
+  <textarea
+    class="input w-full"
+  />
+
+  Name "指导语":
+  <textarea
+    class="input w-full"
+  />
+
+  --------------------------------------------------
+  complementary:
+
+  Name "编制概览":
+  <aside
+    aria-label="编制概览"
+    class="qt-sidebar"
+  />
+
+  --------------------------------------------------
+  term:
+
+  Name "":
+  <dt />
+
+  Name "":
+  <dt />
+
+  Name "":
+  <dt />
+
+  Name "":
+  <dt />
+
+  Name "":
+  <dt />
+
+  Name "":
+  <dt />
+
+  --------------------------------------------------
+  definition:
+
+  Name "":
+  <dd />
+
+  Name "":
+  <dd />
+
+  Name "":
+  <dd />
+
+  Name "":
+  <dd />
+
+  Name "":
+  <dd />
+
+  Name "":
+  <dd />
+
+  --------------------------------------------------
+  progressbar:
+
+  Name "发布准备完成度":
+  <progress
+    aria-label="发布准备完成度"
+    max="4"
+    value="3"
+  />
+
+  --------------------------------------------------
+  list:
+
+  Name "":
+  <ul />
+
+  --------------------------------------------------
+  listitem:
+
+  Name "":
+  <li
+    class="is-ready"
+  />
+
+  Name "":
+  <li
+    class="is-ready"
+  />
+
+  Name "":
+  <li
+    class="is-ready"
+  />
+
+  Name "":
+  <li
+    class=""
+  />
+
+  --------------------------------------------------
+  status:
+
+  Name "":
+  <p
+    class="qt-tool-pending"
+    role="status"
+  />
+
+  Name "":
+  <span
+    role="status"
+  />
+
+  --------------------------------------------------
+  contentinfo:
+
+  Name "":
+  <footer
+    class="qt-footer"
+  />
+
+  --------------------------------------------------
+
+Ignored nodes: comments, script, style
+<body
+  style=""
+>
+  <div>
+    <div
+      class="hui-product hui-page hui-page--management hui-questionnaire-products training-form-management qt-editor"
+    >
+      <a
+        class="qt-breadcrumb"
+        data-discover="true"
+        href="/questionnaires?returnTo=%2Fquestionnaire-products%2Ftool"
+      >
+        组合测评 
+        <span>
+          /
+        </span>
+         
+        编制草稿
+      </a>
+      <header
+        class="hui-page-header"
+      >
+        <div
+          class="hui-page-header__text"
+        >
+          <h1
+            class="hui-page-header__title"
+          >
+            编制组合测评
+          </h1>
+          <div
+            class="hui-page-header__description"
+          >
+            从内容编排到发布，按步骤完成一份课程测评。
+          </div>
+        </div>
+        <div
+          class="hui-page-header__actions"
+        >
+          <span
+            class="qt-draft-status"
+          >
+            草稿
+          </span>
+          <button
+            class="hui-button hui-button--primary"
+            disabled=""
+            type="button"
+          >
+            <svg
+              aria-hidden="true"
+              class="lucide lucide-save"
+              fill="none"
+              height="16"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              viewBox="0 0 24 24"
+              width="16"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M15.2 3a2 2 0 0 1 1.4.6l3.8 3.8a2 2 0 0 1 .6 1.4V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"
+              />
+              <path
+                d="M17 21v-7a1 1 0 0 0-1-1H8a1 1 0 0 0-1 1v7"
+              />
+              <path
+                d="M7 3v4a1 1 0 0 0 1 1h7"
+              />
+            </svg>
+            保存全部设置
+          </button>
+        </div>
+      </header>
+      <nav
+        aria-label="编制步骤"
+        class="qt-steps"
+      >
+        <a
+          aria-current="step"
+          href="#questionnaire-basic"
+        >
+          <span
+            class="qt-step-number"
+          >
+            01
+          </span>
+          <span>
+            <strong>
+              基本信息
+            </strong>
+            <small>
+              名称与作答说明
+            </small>
+          </span>
+        </a>
+        <a
+          href="#questionnaire-content"
+        >
+          <span
+            class="qt-step-number"
+          >
+            02
+          </span>
+          <span>
+            <strong>
+              内容与顺序
+            </strong>
+            <small>
+              添加并编排测评
+            </small>
+          </span>
+        </a>
+        <a
+          href="#questionnaire-delivery"
+        >
+          <span
+            class="qt-step-number"
+          >
+            03
+          </span>
+          <span>
+            <strong>
+              投放设置
+            </strong>
+            <small>
+              课程、时间与反馈
+            </small>
+          </span>
+        </a>
+        <a
+          href="#questionnaire-publish"
+        >
+          <span
+            class="qt-step-number"
+          >
+            04
+          </span>
+          <span>
+            <strong>
+              检查与发布
+            </strong>
+            <small>
+              核对后再正式发布
+            </small>
+          </span>
+        </a>
+      </nav>
+      <fieldset
+        aria-label="组合测评编辑"
+        disabled=""
+        style="border: 0px; padding: 0px; margin: 0px; min-width: 0;"
+      >
+        <div
+          class="qt-workspace"
+        >
+          <div
+            class="qt-main"
+          >
+            <section
+              aria-label="基本信息步骤"
+              class="qt-panel"
+            >
+              <header
+                class="qt-panel-heading"
+              >
+                <small>
+                  STEP 01 / 04
+                </small>
+                <h2>
+                  基本信息
+                </h2>
+                <p>
+                  先让学员知道，这份测评是什么、如何参与。
+                </p>
+              </header>
+              <div
+                class="qt-panel-body"
+              >
+                <fieldset
+                  class="questionnaire-basic-grid my-4 rounded border p-4"
+                  id="questionnaire-basic"
+                >
+                  <label
+                    class="block"
+                  >
+                    测评名称
+                    <input
+                      aria-invalid="false"
+                      class="input w-full"
+                      id="questionnaire-product-name"
+                      maxlength="200"
+          ...
+ ❯ Object.getElementError node_modules/@testing-library/dom/dist/config.js:37:19
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:76:38
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:52:17
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:95:19
+ ❯ src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx:984:19
+    982|     expect(screen.queryByRole('region',{name:'认知测量版本发布'})).not.toBeInT…
+    983|     expect(screen.queryByRole('region',{name:'投放报告与参考选择'})).not.toBeIn…
+    984|     expect(screen.getByRole('link',{name:'在工具包中管理参数、参考与报告 →'})).toHave…
+       |                   ^
+    985|     expect(within(screen.getByRole('complementary',{name:'编制概览'})).get…
+    986|     fireEvent.change(screen.getByDisplayValue('工具迁移测试'),{target:{value…
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+

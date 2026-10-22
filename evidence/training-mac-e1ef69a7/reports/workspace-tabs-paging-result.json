@@ -1,0 +1,60 @@
+{
+  "head": "1133cb6ef51586b18f87fee041dd1f760a04c3b9",
+  "sourceBlobs": {
+    "server-version/frontend/src/training/TrainingLibrary.test.tsx": "3a9ea04b8bd6192d4067848388a87062cc08b83e",
+    "server-version/frontend/src/training/TrainingLibrary.tsx": "184a0200e8fe9d8a6c77d8a538ea6ee422f1f773",
+    "server-version/frontend/src/training/TrainingTrainerHome.tsx": "f9a11af5f08296a0150c5ce3e4e4560ab98a6c20",
+    "server-version/frontend/src/training/training-workspace-cards.css": "db9634d428af863413ec3d287873b3c4a7fa16f8",
+    "server-version/frontend/src/training/training-workspace-heading.css": "4fc5b6bce9c48ce35d631fe46a64b75622891a05"
+  },
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "workspace-tabs-paging-tests.log",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/training/TrainingLibrary.test.tsx",
+        "src/training/TrainingTrainerHome.pagination.test.tsx",
+        "--maxWorkers=1"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/workspace-tabs-paging-tests.log",
+      "sha256": "45b2c964153c0c71be54d94dccf5105c5a50157ae6b1810c981c64708db582c6"
+    },
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "workspace-tabs-paging-types.log",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.app.json",
+        "--noEmit"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/workspace-tabs-paging-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "workspace-tabs-paging-lint.log",
+        "node_modules/eslint/bin/eslint.js",
+        "src/training/TrainingLibrary.tsx",
+        "src/training/TrainingLibrary.test.tsx",
+        "src/training/TrainingTrainerHome.tsx"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/workspace-tabs-paging-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "notes": "21 local tests and app types/lint exit 0 recorded by original tool output. Later changes affect CSS only. Not CI or signed evidence.",
+  "browser": "Read-only real local teacher pages: tools 9 cards on pages 1 and 2, 3 desktop columns, media 3 desktop columns, courses 2 columns and retained page size 6. Identical 14px / 8px 16px / green filter styles checked across course/tools; course-to-tool and tool-to-course navigation retains compact 340px search. 390px course/tool single column no overflow. Screenshot workspace-tabs-tools-nine.png."
+}

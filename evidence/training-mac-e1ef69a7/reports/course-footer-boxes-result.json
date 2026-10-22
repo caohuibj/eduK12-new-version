@@ -1,0 +1,55 @@
+{
+  "head": "24d787465f59e16d8ccc60627cc7086df73f520b",
+  "sourceBlobs": {
+    "server-version/frontend/src/training/TrainingTrainerHome.tsx": "52f6be0bec0a85fd723b233dd8773972aa1cbd66",
+    "server-version/frontend/src/training/training-workspace-cards.css": "530f978dcd192dd427e54d0b2ced4aeed9e9607d"
+  },
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "course-footer-code-tests.log",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/training/TrainingCourseCode.test.tsx",
+        "src/training/TrainingTrainerHome.pagination.test.tsx",
+        "--maxWorkers=1"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/course-footer-code-tests.log",
+      "sha256": "ea46590bef34a824d0f11d23b5c27a0c1ba71473371d0f32abfab39f60fc9850"
+    },
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "course-footer-code-types.log",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.app.json",
+        "--noEmit"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/course-footer-code-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "course-footer-code-lint.log",
+        "node_modules/eslint/bin/eslint.js",
+        "src/training/TrainingTrainerHome.tsx"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/course-footer-code-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "notes": "13 local tests, types and lint executed before parent commit 8e077441; subsequent final commit only changes CSS. No repeated application checks, no CI or signed evidence.",
+  "browser": "Read-only local dashboard. Desktop 1280 three framed footer cells; 768 and 390 and 320 cells retain equal y and increasing x (metadata, code, action), no horizontal overflow. At 768 course code height equals lineHeight 21px after spacing correction. Screenshots course-footer-boxes-{desktop,tablet,mobile}.png."
+}

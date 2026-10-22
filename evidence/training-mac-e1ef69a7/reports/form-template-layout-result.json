@@ -1,0 +1,28 @@
+{
+  "head": "a8aaf8cac138c2e3dc8bb65e70cc0487a60636bb",
+  "parent": "d6ecbe3da1c37f7592c651a3bd3f35c7fb198931",
+  "scope": "CSS specificity for independent form authoring only",
+  "sourceSHA256": "c42974fee4dd544664eabe17d723e9cef9698d4d4643cc353f57a45b430cbaca",
+  "checks": {
+    "gitDiffCheck": "passed",
+    "browser1280": {
+      "columns": 2,
+      "labelFontPx": 16,
+      "outerPaddingPx": 0,
+      "outerBorderPx": 0,
+      "contentWidth": 1265
+    },
+    "browser390": {
+      "columns": 1,
+      "contentWidth": 375,
+      "noHorizontalOverflow": true
+    },
+    "noBusinessRetest": "CSS-only follow-up; d6ecbe3d business checks retained"
+  },
+  "screenshots": {
+    "form-template-create-desktop.png": "5fc3c273b35b9049153a5f934f91d888bfd2b6557c6430bb55dcda67ef527678",
+    "form-template-create-mobile.png": "591042832a180fdca4149c0b56c09b8752bc7e47989f29a040f753a5b0f62e27",
+    "form-template-picker-desktop.png": "526075af1abad36e2171b340b33cac1112d2e15779f0bcc9cbd90d0cf07bfbcf"
+  },
+  "clean": true
+}

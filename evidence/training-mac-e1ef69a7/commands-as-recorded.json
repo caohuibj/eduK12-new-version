@@ -1,0 +1,853 @@
+[
+  {
+    "evidence": "[LOCAL_RUNTIME]/evidence/scale-scoring-ui-result.json",
+    "head": "5811faab3bad0602e782f79c9c34e8c92bf3c765",
+    "checksAsRecorded": [
+      {
+        "wrapperCommand": [
+          "python3",
+          "[LOCAL_RUNTIME]/run-local-check.py",
+          "frontend",
+          "scale-scoring-ui-tests.log",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/pages/__tests__/ScaleEdit.scoring-save.test.tsx",
+          "src/pages/__tests__/ScaleEdit.readonly.test.tsx",
+          "--maxWorkers=1"
+        ],
+        "exitCodeObservedInToolResult": 0,
+        "log": "[LOCAL_RUNTIME]/logs/scale-scoring-ui-tests.log",
+        "logSHA256": "a980104a97b5e3d00e4081055c9b831fbea038d8cc1e7f0b1c20846bbcd91fe3",
+        "result": {
+          "passed": 27,
+          "testFiles": 2
+        }
+      },
+      {
+        "wrapperCommand": [
+          "python3",
+          "[LOCAL_RUNTIME]/run-local-check.py",
+          "frontend",
+          "scale-scoring-ui-types.log",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.app.json",
+          "--noEmit"
+        ],
+        "exitCodeObservedInToolResult": 0,
+        "log": "[LOCAL_RUNTIME]/logs/scale-scoring-ui-types.log",
+        "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "result": {}
+      },
+      {
+        "wrapperCommand": [
+          "python3",
+          "[LOCAL_RUNTIME]/run-local-check.py",
+          "frontend",
+          "scale-scoring-ui-lint.log",
+          "node_modules/eslint/bin/eslint.js",
+          "src/pages/ScaleEdit.tsx",
+          "src/pages/__tests__/ScaleEdit.scoring-save.test.tsx"
+        ],
+        "exitCodeObservedInToolResult": 0,
+        "log": "[LOCAL_RUNTIME]/logs/scale-scoring-ui-lint.log",
+        "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+        "result": {}
+      }
+    ],
+    "recordedLogs": null,
+    "limitation": "Original record; strings or missing argv are not reconstructed into exact commands. No new execution."
+  },
+  {
+    "evidence": "[LOCAL_RUNTIME]/evidence/scale-author-paste-result.json",
+    "head": "0ce052e095bd09648c6a1430e48570d46747e725",
+    "checksAsRecorded": [
+      {
+        "command": [
+          "python3",
+          "[LOCAL_RUNTIME]/run-local-check.py",
+          "frontend",
+          "scale-author-paste-tests.log",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/pages/__tests__/ScaleEdit.paste.test.tsx",
+          "src/pages/__tests__/ScaleEdit.authoring.test.tsx",
+          "src/pages/__tests__/ScaleEdit.persistence-boundaries.test.tsx",
+          "src/pages/__tests__/ScaleEdit.copy-publish.test.tsx",
+          "src/pages/__tests__/ScaleEdit.readonly.test.tsx",
+          "src/pages/__tests__/ScaleEdit.scoring-save.test.tsx",
+          "--maxWorkers=1"
+        ],
+        "exitCodeObserved": 0,
+        "result": {
+          "passed": 68
+        },
+        "log": "[LOCAL_RUNTIME]/logs/scale-author-paste-tests.log",
+        "logSHA256": "e89daf9b722e24d6be4130a337cca7a154dddab3bcbc3fa44abf08f9da0acaa2"
+      },
+      {
+        "command": [
+          "python3",
+          "[LOCAL_RUNTIME]/run-local-check.py",
+          "frontend",
+          "scale-author-reverse-implicit-test.log",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/pages/__tests__/ScaleEdit.paste.test.tsx",
+          "-t",
+          "adds an explicit reverse rule",
+          "--maxWorkers=1"
+        ],
+        "exitCodeObserved": 0,
+        "result": {
+          "passed": 1,
+          "filtered": 6
+        },
+        "log": "[LOCAL_RUNTIME]/logs/scale-author-reverse-implicit-test.log",
+        "logSHA256": "af2202097c3dac477aaa6aee46d30a487e3d664bdcbf8ece79990ee8fac3a1e1"
+      },
+      {
+        "command": [
+          "python3",
+          "[LOCAL_RUNTIME]/run-local-check.py",
+          "frontend",
+          "scale-author-compact-save-tests.log",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/pages/__tests__/ScaleEdit.copy-publish.test.tsx",
+          "-t",
+          "copies once, edits|exposes an exact visibility",
+          "--maxWorkers=1"
+        ],
+        "exitCodeObserved": 0,
+        "result": {
+          "passed": 2,
+          "filtered": 23
+        },
+        "log": "[LOCAL_RUNTIME]/logs/scale-author-compact-save-tests.log",
+        "logSHA256": "5e698a35e21f423d0ba3572e3e23fe8f8b0a0f547191dca07ece1ed851a8d3f2"
+      },
+      {
+        "command": [
+          "python3",
+          "[LOCAL_RUNTIME]/run-local-check.py",
+          "frontend",
+          "scale-author-final-types.log",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.app.json",
+          "--noEmit"
+        ],
+        "exitCodeObserved": 0,
+        "result": {},
+        "log": "[LOCAL_RUNTIME]/logs/scale-author-final-types.log",
+        "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "python3",
+          "[LOCAL_RUNTIME]/run-local-check.py",
+          "frontend",
+          "scale-author-final-lint.log",
+          "node_modules/eslint/bin/eslint.js",
+          "src/pages/ScaleEdit.tsx",
+          "src/pages/scaleAuthoringInput.ts",
+          "src/pages/__tests__/ScaleEdit.paste.test.tsx",
+          "src/pages/__tests__/ScaleEdit.authoring.test.tsx",
+          "src/pages/__tests__/ScaleEdit.copy-publish.test.tsx",
+          "src/pages/__tests__/ScaleEdit.scoring-save.test.tsx"
+        ],
+        "exitCodeObserved": 0,
+        "result": {},
+        "log": "[LOCAL_RUNTIME]/logs/scale-author-final-lint.log",
+        "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "recordedLogs": null,
+    "limitation": "Original record; strings or missing argv are not reconstructed into exact commands. No new execution."
+  },
+  {
+    "evidence": "[LOCAL_RUNTIME]/evidence/teacher-header-result.json",
+    "head": "35e55f30efc409ab40852596a89b0db68f92089b",
+    "checksAsRecorded": [
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "teacher-header-shell-tests.log",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/components/app-shell/__tests__/shell.test.tsx",
+          "--maxWorkers=1"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/teacher-header-shell-tests.log",
+        "sha256": "80f81300cac0a7437322a0b5ca478fa2f15409ea9872fe415affbe45d74b4eb7"
+      },
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "teacher-header-types.log",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.app.json",
+          "--noEmit"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/teacher-header-types.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "teacher-header-lint.log",
+          "node_modules/eslint/bin/eslint.js",
+          "src/components/app-shell/AppShell.tsx",
+          "src/components/app-shell/__tests__/shell.test.tsx"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/teacher-header-lint.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "recordedLogs": null,
+    "limitation": "Original record; strings or missing argv are not reconstructed into exact commands. No new execution."
+  },
+  {
+    "evidence": "[LOCAL_RUNTIME]/evidence/workspace-heading-result.json",
+    "head": "f1743142e4c38d6dac96f1ab7fdfdfd38c336c18",
+    "checksAsRecorded": [
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "workspace-heading-tests.log",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/training/TrainingLibrary.test.tsx",
+          "src/training/TrainingTrainerHome.pagination.test.tsx",
+          "src/training/TrainingTrainerHome.formal.test.tsx",
+          "--maxWorkers=1"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/workspace-heading-tests.log",
+        "sha256": "ed7e6433c1838abffaaee4953c6c7d73d67490be36bd7306a612ffca18f9d712"
+      },
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "workspace-heading-types.log",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.app.json",
+          "--noEmit"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/workspace-heading-types.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "workspace-heading-lint.log",
+          "node_modules/eslint/bin/eslint.js",
+          "src/training/TrainingTrainerHome.tsx",
+          "src/training/TrainingLibrary.tsx"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/workspace-heading-lint.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "recordedLogs": null,
+    "limitation": "Original record; strings or missing argv are not reconstructed into exact commands. No new execution."
+  },
+  {
+    "evidence": "[LOCAL_RUNTIME]/evidence/workspace-cards-result.json",
+    "head": "61f0d74903d50245db0294531e219c662207c3a7",
+    "checksAsRecorded": [
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "workspace-cards-tests.log",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/training/TrainingLibrary.test.tsx",
+          "src/training/TrainingTrainerHome.pagination.test.tsx",
+          "src/training/TrainingTrainerHome.formal.test.tsx",
+          "src/training/context.test.ts",
+          "src/training/TrainingContextBack.test.tsx",
+          "src/components/app-shell/__tests__/shell.test.tsx",
+          "--maxWorkers=1"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/workspace-cards-tests.log",
+        "sha256": "3587d36706db003fa7d08841b7cc043db8080dabe121548ce14f015b61d5acb4"
+      },
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "workspace-cards-types.log",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.app.json",
+          "--noEmit"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/workspace-cards-types.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "workspace-cards-lint.log",
+          "node_modules/eslint/bin/eslint.js",
+          "src/training/TrainingLibrary.tsx",
+          "src/training/TrainingTrainerHome.tsx",
+          "src/training/TrainingWorkspaceTabs.tsx",
+          "src/training/TrainingTrainerCourse.tsx",
+          "src/training/TrainingContextBack.tsx",
+          "src/training/context.ts",
+          "src/training/context.test.ts",
+          "src/training/TrainingContextBack.test.tsx",
+          "src/training/TrainingLibrary.test.tsx",
+          "src/components/app-shell/__tests__/shell.test.tsx",
+          "src/pages/questionnaire/QuestionnaireProducts.tsx"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/workspace-cards-lint.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "recordedLogs": null,
+    "limitation": "Original record; strings or missing argv are not reconstructed into exact commands. No new execution."
+  },
+  {
+    "evidence": "[LOCAL_RUNTIME]/evidence/workspace-tabs-paging-result.json",
+    "head": "1133cb6ef51586b18f87fee041dd1f760a04c3b9",
+    "checksAsRecorded": [
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "workspace-tabs-paging-tests.log",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/training/TrainingLibrary.test.tsx",
+          "src/training/TrainingTrainerHome.pagination.test.tsx",
+          "--maxWorkers=1"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/workspace-tabs-paging-tests.log",
+        "sha256": "45b2c964153c0c71be54d94dccf5105c5a50157ae6b1810c981c64708db582c6"
+      },
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "workspace-tabs-paging-types.log",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.app.json",
+          "--noEmit"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/workspace-tabs-paging-types.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "workspace-tabs-paging-lint.log",
+          "node_modules/eslint/bin/eslint.js",
+          "src/training/TrainingLibrary.tsx",
+          "src/training/TrainingLibrary.test.tsx",
+          "src/training/TrainingTrainerHome.tsx"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/workspace-tabs-paging-lint.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "recordedLogs": null,
+    "limitation": "Original record; strings or missing argv are not reconstructed into exact commands. No new execution."
+  },
+  {
+    "evidence": "[LOCAL_RUNTIME]/evidence/workspace-description-result.json",
+    "head": "56423f3aeda3f3547f07b50bd0b472eaea6a31cd",
+    "checksAsRecorded": [
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "workspace-description-tests.log",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/training/TrainingLibrary.test.tsx",
+          "src/training/TrainingTrainerHome.pagination.test.tsx",
+          "--maxWorkers=1"
+        ],
+        "exitCode": 1,
+        "log": "[LOCAL_RUNTIME]/logs/workspace-description-tests.log",
+        "sha256": "4963804d10a26312788ddb7cdb34583154bf7776b1288ff194e879c521fe0575"
+      },
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "workspace-description-course-recheck.log",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/training/TrainingTrainerHome.pagination.test.tsx",
+          "-t",
+          "complete introduction",
+          "--maxWorkers=1"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/workspace-description-course-recheck.log",
+        "sha256": "14e740d8a0dfd63d02a8d003f752df62acd2410276f2d7c0346e1ff111e6546d"
+      },
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "workspace-description-final-types.log",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.app.json",
+          "--noEmit"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/workspace-description-final-types.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "workspace-description-lint.log",
+          "node_modules/eslint/bin/eslint.js",
+          "src/training/TrainingLibrary.tsx",
+          "src/training/TrainingLibrary.test.tsx",
+          "src/training/TrainingTrainerHome.tsx",
+          "src/training/TrainingTrainerHome.pagination.test.tsx",
+          "src/training/TrainingCardDescription.tsx"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/workspace-description-lint.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "workspace-description-final-lint.log",
+          "node_modules/eslint/bin/eslint.js",
+          "src/training/TrainingCardDescription.tsx"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/workspace-description-final-lint.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "recordedLogs": null,
+    "limitation": "Original record; strings or missing argv are not reconstructed into exact commands. No new execution."
+  },
+  {
+    "evidence": "[LOCAL_RUNTIME]/evidence/course-footer-boxes-result.json",
+    "head": "24d787465f59e16d8ccc60627cc7086df73f520b",
+    "checksAsRecorded": [
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "course-footer-code-tests.log",
+          "node_modules/vitest/vitest.mjs",
+          "run",
+          "src/training/TrainingCourseCode.test.tsx",
+          "src/training/TrainingTrainerHome.pagination.test.tsx",
+          "--maxWorkers=1"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/course-footer-code-tests.log",
+        "sha256": "ea46590bef34a824d0f11d23b5c27a0c1ba71473371d0f32abfab39f60fc9850"
+      },
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "course-footer-code-types.log",
+          "node_modules/typescript/bin/tsc",
+          "-p",
+          "tsconfig.app.json",
+          "--noEmit"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/course-footer-code-types.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": [
+          "python3",
+          "../eduk12-local-runtime/run-local-check.py",
+          "frontend",
+          "course-footer-code-lint.log",
+          "node_modules/eslint/bin/eslint.js",
+          "src/training/TrainingTrainerHome.tsx"
+        ],
+        "exitCode": 0,
+        "log": "[LOCAL_RUNTIME]/logs/course-footer-code-lint.log",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "recordedLogs": null,
+    "limitation": "Original record; strings or missing argv are not reconstructed into exact commands. No new execution."
+  },
+  {
+    "evidence": "[LOCAL_RUNTIME]/evidence/media-dialog-scale-return-result.json",
+    "head": "b363ce0a149e3ac5d42fe56d48d43b0a39031e12",
+    "checksAsRecorded": "39 tests in 4 files passed; final rename-only 3 tests passed (10 filtered); frontend types and affected lint exit 0. Original commands are preserved in conversation; logs below are original.",
+    "recordedLogs": {
+      "media-dialog-scale-return-tests.log": "f1b2b83630b3a90d58918c6aaac9227b9e65b92542c35e68cddfc724f947296b",
+      "media-dialog-scale-return-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "media-dialog-scale-return-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "media-rename-final-tests.log": "7220430702265791aaa264e42859d4bde36d29cd18a1fb41531b72b94c10312c",
+      "media-dialog-final-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "media-rename-final-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "limitation": "Original record; strings or missing argv are not reconstructed into exact commands. No new execution."
+  },
+  {
+    "evidence": "[LOCAL_RUNTIME]/evidence/form-template-result.json",
+    "head": "d6ecbe3da1c37f7592c651a3bd3f35c7fb198931",
+    "checksAsRecorded": {
+      "frontendTypes": "python3 ../eduk12-local-runtime/run-local-check.py frontend form-template-frozen-types.log node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+      "backendTypes": "python3 ../eduk12-local-runtime/run-local-check.py backend form-template-frozen-backend-types.log node_modules/typescript/bin/tsc --noEmit",
+      "lint": "node_modules/eslint/bin/eslint.js src/App.tsx src/training/TrainingLibrary.tsx src/training/TrainingLibrary.test.tsx src/pages/questionnaire/QuestionnaireProducts.tsx src/pages/questionnaire/FormTemplatePicker.tsx src/pages/questionnaire/__tests__/FormTemplates.test.tsx src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
+      "frontendBroad": "node_modules/vitest/vitest.mjs run src/pages/questionnaire/__tests__/FormTemplates.test.tsx src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx --maxWorkers=1",
+      "frontendFinalEdit": "node_modules/vitest/vitest.mjs run src/pages/questionnaire/__tests__/FormTemplates.test.tsx -t \"stored typed|existing question\" --maxWorkers=1",
+      "frontendPicker": "node_modules/vitest/vitest.mjs run src/pages/questionnaire/__tests__/FormTemplates.test.tsx -t \"searches form|failed source\" --maxWorkers=1",
+      "postgres": "FORM_TEMPLATE_INTEGRATION=1; node_modules/vitest/vitest.mjs run src/__tests__/questionnaire/form-templates.postgres.integration.test.ts --maxWorkers=1; final added empty case selected with -t \"empty legacy\""
+    },
+    "recordedLogs": [
+      {
+        "file": "form-template-ui-first.log",
+        "exitCode": 1,
+        "summary": "Initial incremental frontend run: 92 passed, 2 failed; old entry and old wording expectations corrected.",
+        "sha256": "d31e4a9219f362798267e892367a9bba9353554521c6cdd3b2ce4811d3b19f9e"
+      },
+      {
+        "file": "form-template-ui-adjusted-tests.log",
+        "exitCode": 0,
+        "summary": "3 affected frontend expectations passed; remaining cases filtered.",
+        "sha256": "84d6059c8d8a2c5cc3ae190d80956084297ef227ae116c654c4843cfe53ed42c"
+      },
+      {
+        "file": "form-template-final-ui.log",
+        "exitCode": 0,
+        "summary": "81 passed before final edit-key and picker refinements; retain unaffected coverage only.",
+        "sha256": "244a88627549c315a240cf92a06bac3e2020b53e188980cb74eb7bdfcd4f2748"
+      },
+      {
+        "file": "form-template-edit-preservation-final.log",
+        "exitCode": 0,
+        "summary": "2 final question editing cases passed; 3 filtered.",
+        "sha256": "7ed924cbfb5137928bafa08589e2eeec86908eaa4a37aa6d93ec26b9b54aed7f"
+      },
+      {
+        "file": "form-template-picker-final.log",
+        "exitCode": 0,
+        "summary": "2 final picker cases passed; 3 filtered.",
+        "sha256": "54fd353aa61ff65ccf60d37d5e6c5c69e2644c13dff42c1b86f74d11ec919b9e"
+      },
+      {
+        "file": "form-template-integration-first.log",
+        "exitCode": 1,
+        "summary": "Sandbox could not connect to loopback database; no fixture writes occurred.",
+        "sha256": "c6678c91fa8c63808c1020d4d8a7c8fb5859fbaa3b4e28df1ac7e93fb3c1ba2b"
+      },
+      {
+        "file": "form-template-integration-loopback.log",
+        "exitCode": 1,
+        "summary": "Local database CHECK rejected unregistered private kind; 1 permission case passed, 4 failed; fixed by bounded migration.",
+        "sha256": "2fd9382bd3ea5c5926dcbccfc33e33eacd55fa4b5a6b0188fbc59d64f9343e57"
+      },
+      {
+        "file": "form-template-integration-after-migration.log",
+        "exitCode": 1,
+        "summary": "3 passed, 1 failed, 1 filtered; failed test used wrong teacher API nesting.",
+        "sha256": "0aa7abc25d8d2f8215838f2e1a52011950cb515c73fc07171c01838d40a638ca"
+      },
+      {
+        "file": "form-template-typed-copy-adjusted.log",
+        "exitCode": 1,
+        "summary": "Strict API rejected client itemKey; frontend corrected to keep stable identity server-owned.",
+        "sha256": "207668ef0f101e9bc4f08a82e6a4fe16d2832233f334e855f1d238ae2b0f539f"
+      },
+      {
+        "file": "form-template-typed-copy-final.log",
+        "exitCode": 0,
+        "summary": "Typed copy/edit case passed before instruction/orphan-section preservation.",
+        "sha256": "b71f105768c2248d711dd7123ed2067b4fb9cfd5f0a86e6070b348a8a0d9630c"
+      },
+      {
+        "file": "form-template-integration-content-final.log",
+        "exitCode": 0,
+        "summary": "5 affected PostgreSQL cases passed after instruction/orphan-section changes.",
+        "sha256": "59467c41461e8a3670120328c0d9d89b484a07bd2038e117b56b3fbd28efe6e7"
+      },
+      {
+        "file": "form-template-empty-conversion-final.log",
+        "exitCode": 0,
+        "summary": "1 added empty legacy conversion case passed; 5 previously passed cases filtered.",
+        "sha256": "d057457760a45ab4cff9adadca39a689a271c9888a152cff0ad84a269a53c676"
+      },
+      {
+        "file": "form-template-frozen-types.log",
+        "exitCode": 0,
+        "summary": "Frontend application types; frozen source snapshot.",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "form-template-frozen-backend-types.log",
+        "exitCode": 0,
+        "summary": "Backend types; frozen source snapshot.",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "file": "form-template-frozen-lint.log",
+        "exitCode": 0,
+        "summary": "Seven affected frontend TS/TSX files; frozen source snapshot.",
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "limitation": "Original record; strings or missing argv are not reconstructed into exact commands. No new execution."
+  },
+  {
+    "evidence": "[LOCAL_RUNTIME]/evidence/form-template-frozen-input.json",
+    "head": "b363ce0a149e3ac5d42fe56d48d43b0a39031e12",
+    "checksAsRecorded": [],
+    "recordedLogs": null,
+    "limitation": "Original record; strings or missing argv are not reconstructed into exact commands. No new execution."
+  },
+  {
+    "evidence": "[LOCAL_RUNTIME]/evidence/form-template-layout-result.json",
+    "head": "a8aaf8cac138c2e3dc8bb65e70cc0487a60636bb",
+    "checksAsRecorded": {
+      "gitDiffCheck": "passed",
+      "browser1280": {
+        "columns": 2,
+        "labelFontPx": 16,
+        "outerPaddingPx": 0,
+        "outerBorderPx": 0,
+        "contentWidth": 1265
+      },
+      "browser390": {
+        "columns": 1,
+        "contentWidth": 375,
+        "noHorizontalOverflow": true
+      },
+      "noBusinessRetest": "CSS-only follow-up; d6ecbe3d business checks retained"
+    },
+    "recordedLogs": null,
+    "limitation": "Original record; strings or missing argv are not reconstructed into exact commands. No new execution."
+  },
+  {
+    "evidence": "[LOCAL_RUNTIME]/evidence/course-overview-result.json",
+    "head": "66c257c91dfc67285775e6487288f9cd8897cdc8",
+    "checksAsRecorded": [
+      {
+        "command": "node_modules/vitest/vitest.mjs run src/training/TrainingCoursePages.test.tsx --maxWorkers=1",
+        "exitCode": 0,
+        "result": "12 passed",
+        "log": "course-overview-tests.log",
+        "logSHA256": "23ecae9bbe8cbca25e66f6c0090b01f548dbd74ad1f0a0a3e6c88764f7f744fa"
+      },
+      {
+        "command": "node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+        "exitCode": 0,
+        "log": "course-overview-types.log",
+        "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "command": "node_modules/eslint/bin/eslint.js src/training/TrainingTrainerCourse.tsx",
+        "exitCode": 0,
+        "log": "course-overview-lint.log",
+        "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    ],
+    "recordedLogs": null,
+    "limitation": "Original record; strings or missing argv are not reconstructed into exact commands. No new execution."
+  },
+  {
+    "evidence": "[LOCAL_RUNTIME]/evidence/course-task-unification-result.json",
+    "head": "2e8029111548d7520ffddc43d03c906f095461e6",
+    "checksAsRecorded": [
+      {
+        "command": "vitest run src/training/TrainingCoursePages.test.tsx src/pages/__tests__/AssignmentList.states.test.tsx src/training/TrainingCourseEditorTabs.test.tsx --maxWorkers=1",
+        "exitCode": 0,
+        "result": "17 passed before check-in embedding; replaced only affected trainer publishing case with successful targeted integration below",
+        "log": "course-assignment-merge-existing-tests.log"
+      },
+      {
+        "command": "vitest run src/pages/__tests__/AssignmentList.course-workspace.test.tsx src/pages/__tests__/CheckinList.course-workspace.test.tsx --maxWorkers=1",
+        "exitCode": 1,
+        "result": "10 passed / 1 failed. Foreign-course fixture incorrectly returned a record for schedule endpoint. Preserved original failure; product unchanged.",
+        "log": "course-task-workspace-workflows.log"
+      },
+      {
+        "command": "vitest run src/pages/__tests__/CheckinList.course-workspace.test.tsx -t \"rejects a focused\" --maxWorkers=1",
+        "exitCode": 0,
+        "result": "1 passed / 5 filtered; corrected only schedule mock shape",
+        "log": "course-checkin-owner-retry.log"
+      },
+      {
+        "command": "vitest run src/training/TrainingCoursePages.test.tsx -t \"trainer publishing links\" --maxWorkers=1",
+        "exitCode": 0,
+        "result": "1 passed / 11 filtered; course tabs and embedded publishing/export integration",
+        "log": "course-task-parent-integration.log"
+      },
+      {
+        "command": "vitest run src/pages/__tests__/AssignmentList.course-workspace.test.tsx src/pages/__tests__/CheckinList.course-workspace.test.tsx -t \"keeps legacy create\" --maxWorkers=1",
+        "exitCode": 0,
+        "result": "2 passed / 11 filtered; newly added legacy create redirects",
+        "log": "course-task-legacy-create.log"
+      },
+      {
+        "command": "tsc -p tsconfig.app.json --noEmit",
+        "exitCode": 0,
+        "log": "course-task-workspace-final-types.log"
+      },
+      {
+        "command": "eslint src/pages/AssignmentList.tsx src/pages/CheckinList.tsx src/training/TrainingTrainerCourse.tsx src/training/TrainingCoursePages.test.tsx src/pages/__tests__/AssignmentList.course-workspace.test.tsx src/pages/__tests__/CheckinList.course-workspace.test.tsx",
+        "exitCode": 0,
+        "result": "0 errors, 8 existing hook-effect warnings, unchanged effect pattern verified against HEAD",
+        "log": "course-task-workspace-lint.log"
+      },
+      {
+        "command": "eslint src/pages/__tests__/AssignmentList.course-workspace.test.tsx src/pages/__tests__/CheckinList.course-workspace.test.tsx",
+        "exitCode": 0,
+        "result": "final new/modified tests, 0 warnings",
+        "log": "course-task-workspace-final-test-lint.log"
+      }
+    ],
+    "recordedLogs": {
+      "course-assignment-merge-existing-tests.log": "ed52be3737fa29e6f41cf0459beb67e9851e1bb15d621ad70d42dcd3e83b54b8",
+      "course-assignment-merge-workflow-tests.log": "f7c02d54e902105322912d431f5cf6708c37ad1fd23d27debdf52be612f93f59",
+      "course-task-workspace-workflows.log": "913773d425467323b2aecbf945e95c42cf4cc1f2b1ade28df27f571c54f7e783",
+      "course-checkin-owner-retry.log": "fdb3c4fc3d93395007ff51c31a1d0beb56c0d1a1f0b866c1af98b655028d90a8",
+      "course-task-parent-integration.log": "3359af4ed938a6f52f112615931236b948606d668feb3b1f9e4911f0a755e5d2",
+      "course-task-legacy-create.log": "bc853a165a703cd87e5cd3100c06e278d4283ae95051237136a3b9731455b51a",
+      "course-task-workspace-final-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "course-task-workspace-lint.log": "6c9b9fdc6d31aa0754a5660dbbc3cbf7ada4fbcce1b47bc3609bbcb12b441d25",
+      "course-task-workspace-final-test-lint.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "limitation": "Original record; strings or missing argv are not reconstructed into exact commands. No new execution."
+  },
+  {
+    "evidence": "[LOCAL_RUNTIME]/evidence/course-toolbar-result.json",
+    "head": "2e8029111548d7520ffddc43d03c906f095461e6",
+    "checksAsRecorded": [
+      {
+        "command": "vitest run src/training/TrainingCoursePages.test.tsx -t \"single header filter|trainer publishing links\" --maxWorkers=1",
+        "exitCode": 1,
+        "result": "1 passed, new filter case timed out waiting for first lazy CheckinList import (default 1000ms); failure retained",
+        "log": "course-toolbar-filter-tests.log"
+      },
+      {
+        "command": "vitest run src/training/TrainingCoursePages.test.tsx -t \"single header filter\" --maxWorkers=1",
+        "exitCode": 0,
+        "result": "1 passed, 12 filtered; waitFor timeout only raised to 5000ms, existing assertions retained",
+        "log": "course-toolbar-filter-retry.log"
+      },
+      {
+        "command": "vitest run src/training/TrainingCheckinSchedules.test.tsx --maxWorkers=1",
+        "exitCode": 0,
+        "result": "4 passed; existing schedules render and stop permission/failed-action handling retained",
+        "log": "course-toolbar-schedules-tests.log"
+      },
+      {
+        "command": "tsc -p tsconfig.app.json --noEmit",
+        "exitCode": 0,
+        "log": "course-toolbar-final-types.log"
+      },
+      {
+        "command": "eslint src/training/TrainingTrainerCourse.tsx src/training/TrainingCheckinSchedules.tsx src/training/TrainingCoursePages.test.tsx src/pages/AssignmentList.tsx src/pages/CheckinList.tsx",
+        "exitCode": 0,
+        "result": "0 errors / 8 pre-existing hook warnings",
+        "log": "course-toolbar-lint.log"
+      }
+    ],
+    "recordedLogs": {
+      "course-toolbar-filter-tests.log": "29fb91c486c3dbb2b7dc65d888e1cde73971fe30087367ea8b00748181dceba8",
+      "course-toolbar-filter-retry.log": "3b4aa59ab8553d675b692988b3dd538d781ea4ada54fa98c32e954b000b215b4",
+      "course-toolbar-schedules-tests.log": "c8791cb862bf97110ba057e8d0862242dc8061ba4c93736e7c67f7c9047986b5",
+      "course-toolbar-final-types.log": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "course-toolbar-lint.log": "6c9b9fdc6d31aa0754a5660dbbc3cbf7ada4fbcce1b47bc3609bbcb12b441d25"
+    },
+    "limitation": "Original record; strings or missing argv are not reconstructed into exact commands. No new execution."
+  },
+  {
+    "evidence": "[LOCAL_RUNTIME]/evidence/assessment-layout-result.json",
+    "head": "24a525c2c21c3deadc80e75a73ba0ce4a34a7292",
+    "checksAsRecorded": [
+      {
+        "log": "assessment-layout-types.log",
+        "command": "tsc -p tsconfig.app.json --noEmit",
+        "exitCode": 0,
+        "result": "pass",
+        "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "log": "assessment-layout-lint.log",
+        "command": "eslint src/training/TrainingCatalogControls.tsx src/training/TrainingTrainerCourse.tsx src/training/TrainingCoursePages.test.tsx",
+        "exitCode": 0,
+        "result": "0 errors / 0 warnings",
+        "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      {
+        "log": "assessment-layout-filter-tests.log",
+        "command": "vitest run src/training/TrainingCatalogControls.test.tsx src/training/TrainingCoursePages.test.tsx -t \"single header filter|Catalog\" --maxWorkers=1",
+        "exitCode": 0,
+        "result": "1 passed / 15 filtered; Catalog did not match other case names",
+        "logSHA256": "cdb1c78512fdb6481c000c7ae7a5a9f8049763767b734bb8fb3110969d060a84"
+      },
+      {
+        "log": "assessment-layout-legacy-filter-tests.log",
+        "command": "vitest run src/training/TrainingCatalogControls.test.tsx -t \"applies server filters\" --maxWorkers=1",
+        "exitCode": 0,
+        "result": "1 passed / 2 filtered",
+        "logSHA256": "080b8bb2a7893248ce005f4640eca0153deaa0f2b324eab0e6f0b838a1bdb4f4"
+      }
+    ],
+    "recordedLogs": null,
+    "limitation": "Original record; strings or missing argv are not reconstructed into exact commands. No new execution."
+  }
+]

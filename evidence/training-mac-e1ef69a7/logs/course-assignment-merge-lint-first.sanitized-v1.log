@@ -1,0 +1,9 @@
+
+[REPOSITORY]/server-version/frontend/src/pages/AssignmentList.tsx
+  153:58  warning  The ref value 'loadSequence.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'loadSequence.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+  154:6   warning  React Hook useEffect has a missing dependency: 'fetchCourses'. Either include it or remove the dependency array                                                                                                                                                          react-hooks/exhaustive-deps
+  156:74  warning  The ref value 'loadSequence.current' will likely have changed by the time this effect cleanup function runs. If this ref points to a node rendered by React, copy 'loadSequence.current' to a variable inside the effect, and use that variable in the cleanup function  react-hooks/exhaustive-deps
+  156:89  warning  React Hook useEffect has a missing dependency: 'fetchAssignments'. Either include it or remove the dependency array                                                                                                                                                      react-hooks/exhaustive-deps
+
+✖ 4 problems (0 errors, 4 warnings)
+

@@ -1,0 +1,9 @@
+
+ RUN  v4.1.11 [REPOSITORY]/server-version/frontend
+
+
+ Test Files  4 passed (4)
+      Tests  39 passed (39)
+   Start at  09:14:43
+   Duration  6.36s (transform 435ms, setup 533ms, import 821ms, tests 3.01s, environment 1.48s)
+

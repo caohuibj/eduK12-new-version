@@ -1,0 +1,118 @@
+{
+  "head": "d6ecbe3da1c37f7592c651a3bd3f35c7fb198931",
+  "branch": "feat/scale-score-editor-ui-20261022",
+  "clean": true,
+  "recordedAtUTC": "2026-10-22T00:55:35.949960+00:00",
+  "inputSnapshot": "form-template-frozen-input.json",
+  "finalSourceMatchesFrozenSnapshot": true,
+  "evidenceType": "Incremental local development evidence; not signed CI attestation. Historical pre-freeze source hashes were not captured at execution; do not present every historical test as a full run on final HEAD.",
+  "logs": [
+    {
+      "file": "form-template-ui-first.log",
+      "exitCode": 1,
+      "summary": "Initial incremental frontend run: 92 passed, 2 failed; old entry and old wording expectations corrected.",
+      "sha256": "d31e4a9219f362798267e892367a9bba9353554521c6cdd3b2ce4811d3b19f9e"
+    },
+    {
+      "file": "form-template-ui-adjusted-tests.log",
+      "exitCode": 0,
+      "summary": "3 affected frontend expectations passed; remaining cases filtered.",
+      "sha256": "84d6059c8d8a2c5cc3ae190d80956084297ef227ae116c654c4843cfe53ed42c"
+    },
+    {
+      "file": "form-template-final-ui.log",
+      "exitCode": 0,
+      "summary": "81 passed before final edit-key and picker refinements; retain unaffected coverage only.",
+      "sha256": "244a88627549c315a240cf92a06bac3e2020b53e188980cb74eb7bdfcd4f2748"
+    },
+    {
+      "file": "form-template-edit-preservation-final.log",
+      "exitCode": 0,
+      "summary": "2 final question editing cases passed; 3 filtered.",
+      "sha256": "7ed924cbfb5137928bafa08589e2eeec86908eaa4a37aa6d93ec26b9b54aed7f"
+    },
+    {
+      "file": "form-template-picker-final.log",
+      "exitCode": 0,
+      "summary": "2 final picker cases passed; 3 filtered.",
+      "sha256": "54fd353aa61ff65ccf60d37d5e6c5c69e2644c13dff42c1b86f74d11ec919b9e"
+    },
+    {
+      "file": "form-template-integration-first.log",
+      "exitCode": 1,
+      "summary": "Sandbox could not connect to loopback database; no fixture writes occurred.",
+      "sha256": "c6678c91fa8c63808c1020d4d8a7c8fb5859fbaa3b4e28df1ac7e93fb3c1ba2b"
+    },
+    {
+      "file": "form-template-integration-loopback.log",
+      "exitCode": 1,
+      "summary": "Local database CHECK rejected unregistered private kind; 1 permission case passed, 4 failed; fixed by bounded migration.",
+      "sha256": "2fd9382bd3ea5c5926dcbccfc33e33eacd55fa4b5a6b0188fbc59d64f9343e57"
+    },
+    {
+      "file": "form-template-integration-after-migration.log",
+      "exitCode": 1,
+      "summary": "3 passed, 1 failed, 1 filtered; failed test used wrong teacher API nesting.",
+      "sha256": "0aa7abc25d8d2f8215838f2e1a52011950cb515c73fc07171c01838d40a638ca"
+    },
+    {
+      "file": "form-template-typed-copy-adjusted.log",
+      "exitCode": 1,
+      "summary": "Strict API rejected client itemKey; frontend corrected to keep stable identity server-owned.",
+      "sha256": "207668ef0f101e9bc4f08a82e6a4fe16d2832233f334e855f1d238ae2b0f539f"
+    },
+    {
+      "file": "form-template-typed-copy-final.log",
+      "exitCode": 0,
+      "summary": "Typed copy/edit case passed before instruction/orphan-section preservation.",
+      "sha256": "b71f105768c2248d711dd7123ed2067b4fb9cfd5f0a86e6070b348a8a0d9630c"
+    },
+    {
+      "file": "form-template-integration-content-final.log",
+      "exitCode": 0,
+      "summary": "5 affected PostgreSQL cases passed after instruction/orphan-section changes.",
+      "sha256": "59467c41461e8a3670120328c0d9d89b484a07bd2038e117b56b3fbd28efe6e7"
+    },
+    {
+      "file": "form-template-empty-conversion-final.log",
+      "exitCode": 0,
+      "summary": "1 added empty legacy conversion case passed; 5 previously passed cases filtered.",
+      "sha256": "d057457760a45ab4cff9adadca39a689a271c9888a152cff0ad84a269a53c676"
+    },
+    {
+      "file": "form-template-frozen-types.log",
+      "exitCode": 0,
+      "summary": "Frontend application types; frozen source snapshot.",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "form-template-frozen-backend-types.log",
+      "exitCode": 0,
+      "summary": "Backend types; frozen source snapshot.",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "file": "form-template-frozen-lint.log",
+      "exitCode": 0,
+      "summary": "Seven affected frontend TS/TSX files; frozen source snapshot.",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "browser": {
+    "desktopCreate": "form-template-create-desktop.png",
+    "mobileCreate": "form-template-create-mobile.png",
+    "existingSourcePicker": "form-template-picker-desktop.png",
+    "scope": "Read-only real teacher UI; no user uploads, renames, saves, imports or delivery publication executed. Actual form mutations verified with isolated synthetic PostgreSQL fixtures.",
+    "mobile390NoHorizontalOverflow": true
+  },
+  "migration": "private-form-templates-local-migration.json",
+  "checks": {
+    "frontendTypes": "python3 ../eduk12-local-runtime/run-local-check.py frontend form-template-frozen-types.log node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit",
+    "backendTypes": "python3 ../eduk12-local-runtime/run-local-check.py backend form-template-frozen-backend-types.log node_modules/typescript/bin/tsc --noEmit",
+    "lint": "node_modules/eslint/bin/eslint.js src/App.tsx src/training/TrainingLibrary.tsx src/training/TrainingLibrary.test.tsx src/pages/questionnaire/QuestionnaireProducts.tsx src/pages/questionnaire/FormTemplatePicker.tsx src/pages/questionnaire/__tests__/FormTemplates.test.tsx src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx",
+    "frontendBroad": "node_modules/vitest/vitest.mjs run src/pages/questionnaire/__tests__/FormTemplates.test.tsx src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx --maxWorkers=1",
+    "frontendFinalEdit": "node_modules/vitest/vitest.mjs run src/pages/questionnaire/__tests__/FormTemplates.test.tsx -t \"stored typed|existing question\" --maxWorkers=1",
+    "frontendPicker": "node_modules/vitest/vitest.mjs run src/pages/questionnaire/__tests__/FormTemplates.test.tsx -t \"searches form|failed source\" --maxWorkers=1",
+    "postgres": "FORM_TEMPLATE_INTEGRATION=1; node_modules/vitest/vitest.mjs run src/__tests__/questionnaire/form-templates.postgres.integration.test.ts --maxWorkers=1; final added empty case selected with -t \"empty legacy\""
+  }
+}

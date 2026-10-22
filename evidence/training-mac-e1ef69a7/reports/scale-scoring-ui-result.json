@@ -1,0 +1,74 @@
+{
+  "sourceFinalCommit": "5811faab3bad0602e782f79c9c34e8c92bf3c765",
+  "sourceParent": "cfa87d288e0795561e517873ebdaef6afc4c414e",
+  "branch": "feat/scale-score-editor-ui-20261022",
+  "localOnly": true,
+  "checks": [
+    {
+      "wrapperCommand": [
+        "python3",
+        "[LOCAL_RUNTIME]/run-local-check.py",
+        "frontend",
+        "scale-scoring-ui-tests.log",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/pages/__tests__/ScaleEdit.scoring-save.test.tsx",
+        "src/pages/__tests__/ScaleEdit.readonly.test.tsx",
+        "--maxWorkers=1"
+      ],
+      "exitCodeObservedInToolResult": 0,
+      "log": "[LOCAL_RUNTIME]/logs/scale-scoring-ui-tests.log",
+      "logSHA256": "a980104a97b5e3d00e4081055c9b831fbea038d8cc1e7f0b1c20846bbcd91fe3",
+      "result": {
+        "passed": 27,
+        "testFiles": 2
+      }
+    },
+    {
+      "wrapperCommand": [
+        "python3",
+        "[LOCAL_RUNTIME]/run-local-check.py",
+        "frontend",
+        "scale-scoring-ui-types.log",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.app.json",
+        "--noEmit"
+      ],
+      "exitCodeObservedInToolResult": 0,
+      "log": "[LOCAL_RUNTIME]/logs/scale-scoring-ui-types.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {}
+    },
+    {
+      "wrapperCommand": [
+        "python3",
+        "[LOCAL_RUNTIME]/run-local-check.py",
+        "frontend",
+        "scale-scoring-ui-lint.log",
+        "node_modules/eslint/bin/eslint.js",
+        "src/pages/ScaleEdit.tsx",
+        "src/pages/__tests__/ScaleEdit.scoring-save.test.tsx"
+      ],
+      "exitCodeObservedInToolResult": 0,
+      "log": "[LOCAL_RUNTIME]/logs/scale-scoring-ui-lint.log",
+      "logSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "result": {}
+    }
+  ],
+  "sourceBlobs": {
+    "server-version/frontend/src/pages/ScaleEdit.css": "0ad8c11f76904efe99b2889a5a7966bf75f8df3c",
+    "server-version/frontend/src/pages/ScaleEdit.tsx": "2516f544686823c99b4d52d9316391512bd58944",
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.scoring-save.test.tsx": "c0745fa5ab442552862fcdd82e60fa54e1966624"
+  },
+  "browser": {
+    "syntheticData": true,
+    "desktopViewport": 1280,
+    "mobileViewport": 390,
+    "mobileOverflow": false,
+    "titleFontPx": 24,
+    "inputFontPx": 16,
+    "userDataModified": false
+  },
+  "note": "Local record assembled from observed execution results; not signed CI evidence. Last CSS-only min-height adjustment was browser checked after code checks."
+}

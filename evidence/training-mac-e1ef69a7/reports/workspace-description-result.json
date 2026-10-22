@@ -1,0 +1,93 @@
+{
+  "head": "56423f3aeda3f3547f07b50bd0b472eaea6a31cd",
+  "sourceBlobs": {
+    "server-version/frontend/src/training/TrainingCardDescription.tsx": "51bbe35e2dd113e0a43a0ca4f8e6e015585a404d",
+    "server-version/frontend/src/training/TrainingLibrary.test.tsx": "7844b05b462bf424712bbe11ad4c41a26138afb3",
+    "server-version/frontend/src/training/TrainingLibrary.tsx": "3aff2524ef2d354adac5f422b3d6d8f58cf5ad08",
+    "server-version/frontend/src/training/TrainingTrainerHome.pagination.test.tsx": "ddee80d8d18b646b5e6f067fd110aaa1a6a09abd",
+    "server-version/frontend/src/training/TrainingTrainerHome.tsx": "feb1cff6acc5cbd0d5f21111b1dcd18b6043668a",
+    "server-version/frontend/src/training/training-workspace-cards.css": "a19714aa02c89258690c225d22ec24eaf14a755b"
+  },
+  "checks": [
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "workspace-description-tests.log",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/training/TrainingLibrary.test.tsx",
+        "src/training/TrainingTrainerHome.pagination.test.tsx",
+        "--maxWorkers=1"
+      ],
+      "exitCode": 1,
+      "log": "[LOCAL_RUNTIME]/logs/workspace-description-tests.log",
+      "sha256": "4963804d10a26312788ddb7cdb34583154bf7776b1288ff194e879c521fe0575"
+    },
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "workspace-description-course-recheck.log",
+        "node_modules/vitest/vitest.mjs",
+        "run",
+        "src/training/TrainingTrainerHome.pagination.test.tsx",
+        "-t",
+        "complete introduction",
+        "--maxWorkers=1"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/workspace-description-course-recheck.log",
+      "sha256": "14e740d8a0dfd63d02a8d003f752df62acd2410276f2d7c0346e1ff111e6546d"
+    },
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "workspace-description-final-types.log",
+        "node_modules/typescript/bin/tsc",
+        "-p",
+        "tsconfig.app.json",
+        "--noEmit"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/workspace-description-final-types.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "workspace-description-lint.log",
+        "node_modules/eslint/bin/eslint.js",
+        "src/training/TrainingLibrary.tsx",
+        "src/training/TrainingLibrary.test.tsx",
+        "src/training/TrainingTrainerHome.tsx",
+        "src/training/TrainingTrainerHome.pagination.test.tsx",
+        "src/training/TrainingCardDescription.tsx"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/workspace-description-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    {
+      "command": [
+        "python3",
+        "../eduk12-local-runtime/run-local-check.py",
+        "frontend",
+        "workspace-description-final-lint.log",
+        "node_modules/eslint/bin/eslint.js",
+        "src/training/TrainingCardDescription.tsx"
+      ],
+      "exitCode": 0,
+      "log": "[LOCAL_RUNTIME]/logs/workspace-description-final-lint.log",
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  ],
+  "failureHistory": "Initial invocation: 23 tests passed, one failed due missing legacy description title tooltip. Restored tooltip without weakening test. Targeted previously failing case then passed, ten unrelated cases filtered. Types repeated after component correction; component lint repeated; other lint inputs unchanged. Historical runs are local evidence, not signed or CI success.",
+  "browser": "Real local teacher tool page, read-only expansion/collapse at 1280: collapsed height 50 / scrollHeight 76; expanded height 76 / scrollHeight 76. Pure white card rgb(255,255,255). Mobile 390 expanded full text and no horizontal overflow. Screenshots workspace-description-{expanded,collapsed}.png."
+}

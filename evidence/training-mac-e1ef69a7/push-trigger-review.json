@@ -1,0 +1,74 @@
+[
+  {
+    "ref": "e1ef69a778d6200e73d3125adf7dc373ec7883ee",
+    "file": ".github/workflows/ci-measurement-browser.yml",
+    "eventBlock": "push:\n    branches: [ci/measurement-browser-20261020]",
+    "blob": "7cb29900ff7a09dc55f3ec29a49a439054840e0a"
+  },
+  {
+    "ref": "e1ef69a778d6200e73d3125adf7dc373ec7883ee",
+    "file": ".github/workflows/ci-scale-authoring-browser-diagnostic.yml",
+    "eventBlock": "push:\n    branches: [ci/scale-authoring-browser-diagnostic-20261021]",
+    "blob": "ef96d95cfae1b8bac3b3d97ab067ed019ffb777e"
+  },
+  {
+    "ref": "e1ef69a778d6200e73d3125adf7dc373ec7883ee",
+    "file": ".github/workflows/ci-scale-authoring-evidence.yml",
+    "eventBlock": "push:\n    branches: [ci/scale-authoring-evidence-20261021]",
+    "blob": "708f60d2591d773c7f6fba9716cbe48a72431005"
+  },
+  {
+    "ref": "e1ef69a778d6200e73d3125adf7dc373ec7883ee",
+    "file": ".github/workflows/ci-scale-authoring.yml",
+    "eventBlock": "push:\n    branches: [ci/scale-authoring-feedback-20261021]",
+    "blob": "15d0c2dea4ad0278b045407c385a99f7017a4d42"
+  },
+  {
+    "ref": "e1ef69a778d6200e73d3125adf7dc373ec7883ee",
+    "file": ".github/workflows/ci-shared-assessment-foundation.yml",
+    "eventBlock": "push:\n    branches: [fix/shared-assessment-foundation-20261017]",
+    "blob": "f30319dc21eab64c7cab21016b6ffb6ab3909765"
+  },
+  {
+    "ref": "e1ef69a778d6200e73d3125adf7dc373ec7883ee",
+    "file": ".github/workflows/ci.yml",
+    "eventBlock": "push:\n    branches:\n      - main\n  pull_request:\n    types: [opened, synchronize, reopened, ready_for_review]\n    branches:\n      - main\n      - 'refactor/unified-runtime-v32-unit'\n      - 'content/cognitive-expansion'\n  workflow_dispatch:\n    inputs:\n      runner_profile:\n        type: choice\n        options: [hosted]\n        default: hosted\n        description: 'Use GitHub-hosted Ubuntu for every CI job'\n      step_probe:\n        type: choice\n        options: [none, images, cognitive, frontend, backend, backend-regression, assessment-repair, reporting, browser, media, ui, ui-chromium, qa-ui, ops, maintenance, perf]\n        default: none\n        description: 'Run one CI component without full CI or CodeQL'\n      probe_frontend_only:\n        type: boolean\n        default: false\n        description: 'Image probe: frontend only; false builds backend/worker/frontend'\n      complete_training:\n        type: boolean\n        default: false\n        description: 'Approved frozen Training evidence receipt; no application tests rerun'\n      full_acceptance:\n        type: boolean\n        default: false\n        description: 'Explicitly opt into whole-platform CI; otherwise choose a step_probe'",
+    "blob": "34748e929c82cc257adac9129e00add5204f961c"
+  },
+  {
+    "ref": "abade96de544593d0fe67453e4c48a0b478cbe67",
+    "file": ".github/workflows/ci-measurement-browser.yml",
+    "eventBlock": "push:\n    branches: [ci/measurement-browser-20261020]",
+    "blob": "7cb29900ff7a09dc55f3ec29a49a439054840e0a"
+  },
+  {
+    "ref": "abade96de544593d0fe67453e4c48a0b478cbe67",
+    "file": ".github/workflows/ci-scale-authoring-browser-diagnostic.yml",
+    "eventBlock": "push:\n    branches: [ci/scale-authoring-browser-diagnostic-20261021]",
+    "blob": "ef96d95cfae1b8bac3b3d97ab067ed019ffb777e"
+  },
+  {
+    "ref": "abade96de544593d0fe67453e4c48a0b478cbe67",
+    "file": ".github/workflows/ci-scale-authoring-evidence.yml",
+    "eventBlock": "push:\n    branches: [ci/scale-authoring-evidence-20261021]",
+    "blob": "708f60d2591d773c7f6fba9716cbe48a72431005"
+  },
+  {
+    "ref": "abade96de544593d0fe67453e4c48a0b478cbe67",
+    "file": ".github/workflows/ci-scale-authoring.yml",
+    "eventBlock": "push:\n    branches: [ci/scale-authoring-feedback-20261021]",
+    "blob": "15d0c2dea4ad0278b045407c385a99f7017a4d42"
+  },
+  {
+    "ref": "abade96de544593d0fe67453e4c48a0b478cbe67",
+    "file": ".github/workflows/ci-shared-assessment-foundation.yml",
+    "eventBlock": "push:\n    branches: [fix/shared-assessment-foundation-20261017]",
+    "blob": "f30319dc21eab64c7cab21016b6ffb6ab3909765"
+  },
+  {
+    "ref": "abade96de544593d0fe67453e4c48a0b478cbe67",
+    "file": ".github/workflows/ci.yml",
+    "eventBlock": "push:\n    branches:\n      - main\n  pull_request:\n    types: [opened, synchronize, reopened, ready_for_review]\n    branches:\n      - main\n      - 'refactor/unified-runtime-v32-unit'\n      - 'content/cognitive-expansion'\n  workflow_dispatch:\n    inputs:\n      runner_profile:\n        type: choice\n        options: [hosted]\n        default: hosted\n        description: 'Use GitHub-hosted Ubuntu for every CI job'\n      step_probe:\n        type: choice\n        options: [none, images, cognitive, frontend, backend, backend-regression, assessment-repair, reporting, browser, media, ui, ui-chromium, qa-ui, ops, maintenance, perf]\n        default: none\n        description: 'Run one CI component without full CI or CodeQL'\n      probe_frontend_only:\n        type: boolean\n        default: false\n        description: 'Image probe: frontend only; false builds backend/worker/frontend'\n      complete_training:\n        type: boolean\n        default: false\n        description: 'Approved frozen Training evidence receipt; no application tests rerun'\n      full_acceptance:\n        type: boolean\n        default: false\n        description: 'Explicitly opt into whole-platform CI; otherwise choose a step_probe'",
+    "blob": "60c71a1647835e9d6c32b4c1f16e4d6a6a11d57e"
+  }
+]

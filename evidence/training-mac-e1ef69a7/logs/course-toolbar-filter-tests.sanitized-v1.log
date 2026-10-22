@@ -1,0 +1,528 @@
+
+ RUN  v4.1.11 [REPOSITORY]/server-version/frontend
+
+ ❯ src/training/TrainingCoursePages.test.tsx (13 tests | 1 failed | 11 skipped) 2034ms
+     × applies the single header filter only to the current course section 1731ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 1 passed | 11 skipped (13)
+   Start at  10:32:45
+   Duration  4.79s (transform 1.13s, setup 569ms, import 1.15s, tests 2.03s, environment 888ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/training/TrainingCoursePages.test.tsx > course-first training workspaces > applies the single header filter only to the current course section
+TestingLibraryElementError: Unable to find role="heading" and name "每周打卡"
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="training-detail training-trainer-course"
+    >
+      <header
+        class="training-detail-header training-course-hero"
+      >
+        <div
+          class="training-course-hero-main"
+        >
+          <h1>
+            教师专业发展培训
+          </h1>
+          <div
+            class="training-course-meta"
+          >
+            <span>
+              12
+               名学员
+            </span>
+            <span>
+              课程状态：
+              已发布
+            </span>
+          </div>
+        </div>
+        <div
+          aria-label="教师专业发展培训的课程码"
+          class="training-inline-course-code"
+          role="group"
+        >
+          <small>
+            课程码 · 邀请学员
+          </small>
+          <div>
+            <code>
+              ABCD12
+            </code>
+            <button
+              aria-label="复制「教师专业发展培训」课程码"
+              type="button"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-copy"
+                fill="none"
+                height="15"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="15"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  height="14"
+                  rx="2"
+                  ry="2"
+                  width="14"
+                  x="8"
+                  y="8"
+                />
+                <path
+                  d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                />
+              </svg>
+              复制
+            </button>
+          </div>
+        </div>
+      </header>
+      <div
+        class="training-course-layout training-course-layout--full"
+      >
+        <div
+          class="training-course-work"
+        >
+          <header
+            class="training-course-toolbar"
+          >
+            <nav
+              aria-label="课程管理内容"
+              class="training-section-switch training-course-tabs"
+            >
+              <button
+                aria-pressed="false"
+                class="training-section-tab"
+                type="button"
+              >
+                学习
+              </button>
+              <button
+                aria-pressed="true"
+                class="training-section-tab"
+                type="button"
+              >
+                打卡
+              </button>
+              <button
+                aria-pressed="false"
+                class="training-section-tab"
+                type="button"
+              >
+                测评
+              </button>
+              <button
+                aria-pressed="false"
+                class="training-section-tab"
+                type="button"
+              >
+                课程管理
+              </button>
+            </nav>
+            <details
+              class="training-catalog-disclosure"
+            >
+              <summary>
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-search"
+                  fill="none"
+                  height="16"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="m21 21-4.34-4.34"
+                  />
+                  <circle
+                    cx="11"
+                    cy="11"
+                    r="8"
+                  />
+                </svg>
+                <strong>
+                  检索与筛选
+                </strong>
+                <small>
+                  标题 · 标签 · 时间
+                </small>
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-chevron-down"
+                  fill="none"
+                  height="15"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="15"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="m6 9 6 6 6-6"
+                  />
+                </svg>
+              </summary>
+              <form
+                aria-label="打卡检索"
+                class="training-catalog-filter"
+              >
+                <label
+                  class="catalog-title-search"
+                >
+                  标题
+                  <input
+                    aria-label="搜索打卡"
+                    maxlength="200"
+                    placeholder="输入打卡标题"
+                    type="search"
+                    value=""
+                  />
+                </label>
+                <label>
+                  标签（全部匹配）
+                  <input
+                    maxlength="209"
+                    placeholder="多个标签用逗号分隔"
+                    value=""
+                  />
+                </label>
+                <label>
+                  时间依据
+                  <select>
+                    <option
+                      value="created"
+                    >
+                      创建时间
+                    </option>
+                    <option
+                      value="deadline"
+                    >
+                      截止时间
+                    </option>
+                  </select>
+                </label>
+                <label>
+                  开始日期
+                  <input
+                    type="date"
+                    value=""
+                  />
+                </label>
+                <label>
+                  结束日期
+                  <input
+                    type="date"
+                    value=""
+                  />
+                </label>
+                <div
+                  class="catalog-filter-actions"
+                >
+                  <button
+                    type="submit"
+                  >
+                    查询
+                  </button>
+                  <button
+                    type="button"
+                  >
+                    清除筛选
+                  </button>
+                </div>
+                <small>
+                  筛选所有记录；日期按当前设备时区，包含结束日。点击“查询”后更新。
+                </small>
+              </form>
+            </details>
+          </header>
+          <p
+            role="status"
+          >
+            正在读取打卡管理…
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+
+Ignored nodes: comments, script, style
+<body>
+  <div>
+    <div
+      class="training-detail training-trainer-course"
+    >
+      <header
+        class="training-detail-header training-course-hero"
+      >
+        <div
+          class="training-course-hero-main"
+        >
+          <h1>
+            教师专业发展培训
+          </h1>
+          <div
+            class="training-course-meta"
+          >
+            <span>
+              12
+               名学员
+            </span>
+            <span>
+              课程状态：
+              已发布
+            </span>
+          </div>
+        </div>
+        <div
+          aria-label="教师专业发展培训的课程码"
+          class="training-inline-course-code"
+          role="group"
+        >
+          <small>
+            课程码 · 邀请学员
+          </small>
+          <div>
+            <code>
+              ABCD12
+            </code>
+            <button
+              aria-label="复制「教师专业发展培训」课程码"
+              type="button"
+            >
+              <svg
+                aria-hidden="true"
+                class="lucide lucide-copy"
+                fill="none"
+                height="15"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                viewBox="0 0 24 24"
+                width="15"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <rect
+                  height="14"
+                  rx="2"
+                  ry="2"
+                  width="14"
+                  x="8"
+                  y="8"
+                />
+                <path
+                  d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"
+                />
+              </svg>
+              复制
+            </button>
+          </div>
+        </div>
+      </header>
+      <div
+        class="training-course-layout training-course-layout--full"
+      >
+        <div
+          class="training-course-work"
+        >
+          <header
+            class="training-course-toolbar"
+          >
+            <nav
+              aria-label="课程管理内容"
+              class="training-section-switch training-course-tabs"
+            >
+              <button
+                aria-pressed="false"
+                class="training-section-tab"
+                type="button"
+              >
+                学习
+              </button>
+              <button
+                aria-pressed="true"
+                class="training-section-tab"
+                type="button"
+              >
+                打卡
+              </button>
+              <button
+                aria-pressed="false"
+                class="training-section-tab"
+                type="button"
+              >
+                测评
+              </button>
+              <button
+                aria-pressed="false"
+                class="training-section-tab"
+                type="button"
+              >
+                课程管理
+              </button>
+            </nav>
+            <details
+              class="training-catalog-disclosure"
+            >
+              <summary>
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-search"
+                  fill="none"
+                  height="16"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="16"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="m21 21-4.34-4.34"
+                  />
+                  <circle
+                    cx="11"
+                    cy="11"
+                    r="8"
+                  />
+                </svg>
+                <strong>
+                  检索与筛选
+                </strong>
+                <small>
+                  标题 · 标签 · 时间
+                </small>
+                <svg
+                  aria-hidden="true"
+                  class="lucide lucide-chevron-down"
+                  fill="none"
+                  height="15"
+                  stroke="currentColor"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  viewBox="0 0 24 24"
+                  width="15"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="m6 9 6 6 6-6"
+                  />
+                </svg>
+              </summary>
+              <form
+                aria-label="打卡检索"
+                class="training-catalog-filter"
+              >
+                <label
+                  class="catalog-title-search"
+                >
+                  标题
+                  <input
+                    aria-label="搜索打卡"
+                    maxlength="200"
+                    placeholder="输入打卡标题"
+                    type="search"
+                    value=""
+                  />
+                </label>
+                <label>
+                  标签（全部匹配）
+                  <input
+                    maxlength="209"
+                    placeholder="多个标签用逗号分隔"
+                    value=""
+                  />
+                </label>
+                <label>
+                  时间依据
+                  <select>
+                    <option
+                      value="created"
+                    >
+                      创建时间
+                    </option>
+                    <option
+                      value="deadline"
+                    >
+                      截止时间
+                    </option>
+                  </select>
+                </label>
+                <label>
+                  开始日期
+                  <input
+                    type="date"
+                    value=""
+                  />
+                </label>
+                <label>
+                  结束日期
+                  <input
+                    type="date"
+                    value=""
+                  />
+                </label>
+                <div
+                  class="catalog-filter-actions"
+                >
+                  <button
+                    type="submit"
+                  >
+                    查询
+                  </button>
+                  <button
+                    type="button"
+                  >
+                    清除筛选
+                  </button>
+                </div>
+                <small>
+                  筛选所有记录；日期按当前设备时区，包含结束日。点击“查询”后更新。
+                </small>
+              </form>
+            </details>
+          </header>
+          <p
+            role="status"
+          >
+            正在读取打卡管理…
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+ ❯ waitForWrapper node_modules/@testing-library/dom/dist/wait-for.js:163:27
+ ❯ node_modules/@testing-library/dom/dist/query-helpers.js:86:33
+ ❯ src/training/TrainingCoursePages.test.tsx:200:18
+    198|   it('applies the single header filter only to the current course sect…
+    199|     mount('/courses/course-1/detail?section=checkins', '/courses/:cour…
+    200|     await screen.findByRole('heading', { name: '每周打卡' })
+       |                  ^
+    201|     expect(screen.getAllByText('检索与筛选')).toHaveLength(1)
+    202|     fireEvent.click(screen.getByText('检索与筛选'))
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+

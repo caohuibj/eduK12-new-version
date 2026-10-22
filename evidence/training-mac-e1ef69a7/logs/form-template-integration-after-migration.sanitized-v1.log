@@ -1,0 +1,21 @@
+
+ RUN  v4.1.11 [REPOSITORY]/server-version/backend
+
+ ❯ src/__tests__/questionnaire/form-templates.postgres.integration.test.ts (5 tests | 1 failed | 1 skipped) 3737ms
+     × copies the whole typed form atomically, remaps conditional keys and keeps source/delivery data independent 32ms
+
+ Test Files  1 failed (1)
+      Tests  1 failed | 3 passed | 1 skipped (5)
+   Start at  09:42:57
+   Duration  3.90s (transform 2.36s, setup 0ms, import 62ms, tests 3.74s, environment 0ms)
+
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/__tests__/questionnaire/form-templates.postgres.integration.test.ts > Independent reusable form definitions on local PostgreSQL > copies the whole typed form atomically, remaps conditional keys and keeps source/delivery data independent
+TypeError: Cannot read properties of undefined (reading 'itemKey')
+ ❯ src/__tests__/questionnaire/form-templates.postgres.integration.test.ts:46:346
+
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/1]⎯
+
