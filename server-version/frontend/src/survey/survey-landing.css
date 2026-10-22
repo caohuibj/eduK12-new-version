@@ -45,27 +45,25 @@
 .survey-landing-header nav .survey-admin-entry-link { border: 1px solid #adc5d0; border-radius: 2rem; padding: .45rem 1rem; background: #f4f9fbbf; }
 
 .survey-brand {
+  --survey-brand-emblem: 66px;
+  --survey-brand-wordmark: 160px;
   display: inline-flex;
   align-items: center;
   gap: 12px;
   width: fit-content;
+  flex-shrink: 0;
   color: #234a65;
   text-decoration: none;
 }
 
 .survey-brand img {
-  width: 58px;
+  display: block;
   height: auto;
   flex-shrink: 0;
-  mix-blend-mode: multiply;
 }
 
-.survey-brand span {
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: 29px;
-  font-weight: 600;
-  letter-spacing: -.025em;
-}
+.survey-brand .survey-brand__emblem { width: var(--survey-brand-emblem); mix-blend-mode: multiply; }
+.survey-brand .survey-brand__wordmark { width: var(--survey-brand-wordmark); }
 
 .survey-landing-main {
   position: relative;
@@ -267,9 +265,7 @@
 
 @media (max-width: 600px) {
   .survey-landing-header { padding: 25px 7%; }
-  .survey-brand { gap: 9px; }
-  .survey-brand img { width: 48px; }
-  .survey-brand span { font-size: 26px; }
+  .survey-brand { --survey-brand-emblem: 52px; --survey-brand-wordmark: 136px; gap: 9px; }
   .survey-landing-main { min-height: 0; align-content: start; padding-top: 24px; padding-bottom: 24px; gap: 32px; }
   .survey-landing-copy { width: 100%; padding: 29px 24px 32px; border-radius: 14px; background: rgba(249, 252, 253, .7); }
   .survey-landing-copy h1 { font-size: clamp(32px, 9.5vw, 43px); line-height: 1.55; letter-spacing: .05em; }
@@ -293,8 +289,7 @@
 }
 
 @media (max-width: 360px) {
-  .survey-landing-header .survey-brand img, .survey-entry-header .survey-brand img { width: 36px; }
-  .survey-landing-header .survey-brand span, .survey-entry-header .survey-brand span { font-size: 22px; }
+  .survey-landing-header .survey-brand, .survey-entry-header .survey-brand { --survey-brand-emblem: 44px; --survey-brand-wordmark: 120px; }
   .survey-feature-strip { grid-template-columns: minmax(0, 1fr); }
   .survey-feature-link + .survey-feature-link { border-left: 0; border-top: 1px solid var(--survey-line); }
 }

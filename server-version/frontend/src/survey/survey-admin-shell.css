@@ -10,8 +10,7 @@
   font-family: -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif;
 }
 .hui-survey-admin-shell .hui-app-header { border-bottom: 1px solid #cfdee4; box-shadow: none; }
-.hui-survey-admin-shell .hui-app-header .survey-brand { font-size: 1.5rem; }
-.hui-survey-admin-shell .hui-app-header .survey-brand img { width: 48px; }
+.hui-survey-admin-shell .hui-app-header .survey-brand { --survey-brand-emblem: 48px; --survey-brand-wordmark: 128px; gap: 9px; }
 .hui-app.hui-survey-admin-shell .hui-navigation { background: #214855; }
 .hui-app.hui-survey-admin-shell .hui-navigation .hui-nav-group a { color: #e5f0f3; }
 .hui-app.hui-survey-admin-shell .hui-navigation .hui-nav-group a[aria-current='page'] { color: #175d57; border-color: #b6d5d0; background: #e7f4f1; }
