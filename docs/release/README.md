@@ -776,3 +776,34 @@ schema 未由本批修改，不重新审计依赖、创建 DB、跑迁移或重�
 每组件八分钟，CodeQL 保留既有时限。这里的编译产物不授予生产部署资格。
 稳定 `merge gate / ready PR` 仍要求 scope、完整 training-workspace 和 codeql
 真实 success，并重算实际 checkout 的计划；draft、缺失、跳过或失败均拒绝。
+
+
+## Survey 云端全链路视觉与操作修订（2026-10-22）
+
+用户已要求推送并合并当前获批实施、真实 Form 验收及本地最终 review 的修订。
+本次仅 `survey-cloud-flow-visual-20261022` 的 `survey-cloud` 精确路线：
+基线 `61bb4cc1534fcb02869b27973794001021826de0`，集成产品提交
+`ae7e6551684a82b7357ebea9ed61107f547c301a`，32 个前端文件与完整前后端
+component tree、依赖/配置及明列控制/证据文件绑定。未知路径、模式、base、
+源码或证据漂移直接失败，缺标记不回退全平台；手动 full/probe 拒绝。
+
+本次有限接纳当前对话已审阅的 unsigned local 原报告：明确
+`reviewed-local-evidence`、`originalExecutionSigned=false`、`ciExecuted=false`；
+原失败 2 项、过滤、修订后运行和重叠计数全部保留，不编造总通过数或补签。
+实际临时身份只在本隔离节点使用，24 个真实桌面/窄屏状态及 1 份 Form 的
+2 个 FINAL 不构成完整科学测评验证；临时账号/入口和招募已按批准方案停用。
+受限凭据、真实用户数据和私有浏览器会话不上传。历史报告的原始压缩字节及
+摘要逐项核对；本地类型结果不冒充新 main 集成后的结果。
+
+主要执行位置为 Actions：因 PR #334 改变 AppShell 输入，仅该外壳契约文件、
+该文件及其测试 lint、集成前端 app types、缺失的一次前端生产编译，以及
+本批前端/控制的 JS/TS CodeQL 新执行。其余未受影响的本地契约不重复。
+本批没有改变 backend、schema 或依赖锁；不创建数据库、不跑迁移/媒体/压力/
+全量回归，也不重建或扫描生产镜像。本路线只授予本次 PR 合并资格，不提供
+生产镜像或部署资格。scope 与 admission 五分钟，前端缺失项八分钟，CodeQL
+使用既有时限；约五分钟报告实际等待阶段，不追加无关验证。
+
+稳定 `merge gate / ready PR` 重算完整 checkout 与实际 PR source tree，要求
+scope、全部 survey-cloud 内部作业和 codeql 实际 success；draft、缺失、跳过、
+取消和失败均拒绝。精确 main 合并 push 仅分类，不重复应用检查或自动部署。
+旧候选的路线、签名用途和其他门禁不变。

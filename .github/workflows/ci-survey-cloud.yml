@@ -1,0 +1,77 @@
+name: Survey cloud bounded merge checks
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  CI_EVENT: pull_request
+  CI_HEAD_REF: survey-cloud-flow-visual-20261022
+  CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+  CI_PR_REPOSITORY: caohuibj/eduK12-new-version
+  NODE_OPTIONS: --max-old-space-size=4096
+jobs:
+  admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      PLAN: ${{ inputs.plan }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify immutable inputs and reviewed local records without repeating unchanged checks
+        run: node .github/scripts/survey-cloud-checks.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: survey-cloud-admission-${{ github.sha }}
+          path: survey-cloud-evidence
+          if-no-files-found: error
+          retention-days: 3
+  frontend:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    env:
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/frontend/package-lock.json
+      - name: install official locked compiler dependencies
+        working-directory: server-version/frontend
+        run: npm ci --ignore-scripts
+      - name: only contracts whose shared shell inputs changed with main
+        working-directory: server-version/frontend
+        run: node node_modules/vitest/vitest.mjs run src/components/app-shell/__tests__/shell.test.tsx --maxWorkers=2 --reporter=json --outputFile=../../survey-cloud-evidence/integrated-shell.json
+      - name: lint changed integration inputs and typecheck the integrated application
+        working-directory: server-version/frontend
+        run: |
+          node node_modules/eslint/bin/eslint.js src/components/app-shell/AppShell.tsx src/components/app-shell/__tests__/shell.test.tsx
+          node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit
+      - name: compile the frontend exactly once
+        working-directory: server-version/frontend
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: survey-cloud-frontend-${{ github.sha }}
+          path: |
+            server-version/frontend/dist
+            survey-cloud-evidence
+          if-no-files-found: error
+          retention-days: 3
