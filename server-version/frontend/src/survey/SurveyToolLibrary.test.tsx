@@ -81,6 +81,29 @@ describe('independent Survey toolkit and study selection',()=>{
   expect(await screen.findByRole('alert')).toHaveTextContent('名称保存未确认');expect(screen.getByLabelText('工具名称')).toBeVisible();expect(screen.getByLabelText('工具名称')).toHaveValue('待保存量表')
   fireEvent.click(screen.getByRole('button',{name:'工具集'}));expect(window.confirm).toHaveBeenCalled();expect(screen.getByLabelText('工具名称')).toHaveValue('待保存量表')
  })
+ it('blocks both scale save actions while bulk text is unapplied and retains it when leaving is cancelled',async()=>{
+  vi.spyOn(window,'confirm').mockReturnValue(false)
+  render(<SurveyToolLibrary/>);fireEvent.click(await screen.findByRole('button',{name:'编制工具'}));fireEvent.click(screen.getByRole('button',{name:/^量表\s+设置/}));await screen.findByRole('heading',{name:'未命名量表'})
+  fireEvent.change(screen.getByLabelText('量表施测呈现模式'),{target:{value:'ONE_BY_ONE'}})
+  fireEvent.click(screen.getByRole('tab',{name:'题目'}));fireEvent.click(screen.getByText('批量录入与辅助题'))
+  fireEvent.change(screen.getByLabelText('题干批量内容'),{target:{value:'尚未应用的题目'}})
+  expect(screen.getByRole('button',{name:'保存量表'})).toBeDisabled();expect(screen.getByRole('button',{name:'保存当前草稿'})).toBeDisabled()
+  const beforeUnload=new Event('beforeunload',{cancelable:true});window.dispatchEvent(beforeUnload);expect(beforeUnload.defaultPrevented).toBe(true)
+  fireEvent.click(screen.getByRole('button',{name:'工具集'}));expect(window.confirm).toHaveBeenCalledOnce();expect(screen.getByLabelText('题干批量内容')).toHaveValue('尚未应用的题目')
+  fireEvent.click(screen.getByRole('button',{name:'追加题目'}));fireEvent.click(screen.getByRole('button',{name:'保存当前草稿'}))
+  await waitFor(()=>expect(screen.getByRole('button',{name:'保存量表'})).toBeDisabled())
+  const writes=vi.mocked(fetch).mock.calls.filter(([,init])=>init?.method==='PATCH')
+  expect(JSON.parse(String(writes[writes.length-1][1]?.body))).toMatchObject({definition:{presentationMode:'ONE_BY_ONE',items:[{prompt:'尚未应用的题目'}]}})
+ })
+ it('keeps archived scale tabs browsable without enabling edits or advanced imports',async()=>{
+  const original=vi.mocked(fetch).getMockImplementation()!
+  vi.mocked(fetch).mockImplementation((url,init)=>String(url).endsWith('/tool-library/'+tid)?reply({...form,kind:'SCALE',status:'ARCHIVED',definition:{schemaVersion:1,respondentType:'participant_self_report',aggregation:'mean',items:[],dimensions:[],responseOptions:[]}}):original(url,init))
+  window.history.replaceState(null,'','/workspace/tools?tool='+tid);render(<SurveyToolLibrary/>);await screen.findByRole('tab',{name:'题目'})
+  fireEvent.click(screen.getByRole('tab',{name:'题目'}));expect(screen.getByRole('tab',{name:'题目'})).toHaveAttribute('aria-selected','true')
+  expect(screen.getByRole('button',{name:'增加题目'})).toBeDisabled();expect(screen.getByRole('button',{name:'保存量表'})).toBeDisabled()
+  fireEvent.click(screen.getByText('批量录入题目'));expect(screen.getByLabelText('待导入内容')).toBeDisabled()
+  fireEvent.click(screen.getByRole('tab',{name:'报告反馈'}));expect(screen.getByRole('tab',{name:'报告反馈'})).toHaveAttribute('aria-selected','true')
+ })
  it('retries an unconfirmed direct creation with the same identity and blocks other kinds',async()=>{
   const original=vi.mocked(fetch).getMockImplementation()!;let fail=true
   vi.mocked(fetch).mockImplementation((url,init)=>String(url).endsWith('/tool-library')&&init?.method==='POST'&&fail?Promise.reject(new Error('响应未确认')):original(url,init))

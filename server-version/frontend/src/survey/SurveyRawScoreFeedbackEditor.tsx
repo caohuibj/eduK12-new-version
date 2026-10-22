@@ -6,7 +6,7 @@ import { SurveyImageField } from './SurveyImageField'
 import { matchRawScoreFeedback, validateRawScoreFeedback } from '../modules/scale/rawScoreFeedback'
 import type { RawScoreFeedbackContent, RawScoreFeedbackRule } from '../modules/scale/rawScoreFeedback'
 
-export function SurveyRawScoreFeedbackEditor({value,onChange,projectId}:{value:ScaleDraft;onChange:(next:ScaleDraft)=>void;projectId?:string}){
+export function SurveyRawScoreFeedbackEditor({value,onChange,projectId,compact=false}:{value:ScaleDraft;onChange:(next:ScaleDraft)=>void;projectId?:string;compact?:boolean}){
   const [sample,setSample]=useState(0)
   const scores=[...value.dimensions.map(d=>({key:d.dimensionKey,label:d.label})),...(value.totalScore?[value.totalScore]:[])]
   const rules=value.rawScoreFeedback?.rules??[]
@@ -19,8 +19,9 @@ export function SurveyRawScoreFeedbackEditor({value,onChange,projectId}:{value:S
     <SurveyImageField presentationOnly projectId={projectId} onChange={next=>{if(next)change({...content,images:[...(content.images??[]),{asset:next.asset,altText:next.altText,...(next.caption?{caption:next.caption}:{}),order:Math.max(-1,...(content.images??[]).map(image=>image.order))+1}]})}}/>
   </div>
   return <section className="border rounded-xl p-4 space-y-4 bg-white">
-    <h3 className="font-semibold">原始分区间反馈</h3>
-    <p className="text-xs text-slate-600">仅描述本次原始分，不提供常模或诊断。区间左闭右开，最后一个可包含上限；空档使用兜底文字。参与者仅在研究发布策略允许时收到服务器已匹配的反馈。</p>
+    <header className={compact?'survey-scale-panel-heading':undefined}><div><h3 className="font-semibold">原始分区间反馈</h3>{compact&&<p>为维度分或总分设置描述性反馈，并在下方模拟核对。</p>}</div>{compact&&<span>{rules.length} 个指标</span>}</header>
+    {compact?<details className="survey-scale-help"><summary>区间、兜底与被试可见范围说明</summary><p>仅描述本次原始分，不提供常模或诊断。区间左闭右开，最后一个可包含上限；空档使用兜底文字。参与者仅在研究发布策略允许时收到服务器已匹配的反馈。</p></details>:<p className="text-xs text-slate-600">仅描述本次原始分，不提供常模或诊断。区间左闭右开，最后一个可包含上限；空档使用兜底文字。参与者仅在研究发布策略允许时收到服务器已匹配的反馈。</p>}
+    {compact&&!rules.length&&<p className="survey-scale-empty">{scores.length?'还没有反馈规则。点击“新增指标反馈”，选择指标后设置分数区间与文字。':'先在“计分”分区添加维度或总分，再设置对应的区间反馈。'}</p>}
     {issues.length>0&&<ul role="alert" className="text-sm text-red-700">{issues.map(issue=><li key={issue}>{issue}</li>)}</ul>}
     {rules.map((rule,index)=>{
       const ruleIssues=validateRawScoreFeedback({schemaVersion:1,rules:rules.filter(candidate=>candidate.scoreKey===rule.scoreKey)},scores.map(score=>score.key))
