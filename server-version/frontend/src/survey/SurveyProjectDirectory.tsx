@@ -1,4 +1,5 @@
-import { ArrowUpRight, FolderOpen, Plus } from 'lucide-react'
+import { useEffect, useRef, useState } from 'react'
+import { ArrowUpRight, FolderOpen, Plus, Search } from 'lucide-react'
 
 export type SurveyProject = {
   id:string; title:string; description:string; collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES'
@@ -13,6 +14,9 @@ export function SurveyProjectDirectory({projects,selectedId,page,busy,loading,er
   onChoose:(project:SurveyProject)=>void; onArchive:(project:SurveyProject)=>void; onPage:(page:number)=>void
   onRefresh:()=>void; onCreate:()=>void
 }) {
+  const [searchOpen,setSearchOpen]=useState(false)
+  const searchInput=useRef<HTMLInputElement>(null)
+  useEffect(()=>{if(searchOpen)searchInput.current?.focus()},[searchOpen])
   const needle=query.trim().toLocaleLowerCase()
   const visible=projects.filter(project=>(!needle||(project.title+' '+project.description).toLocaleLowerCase().includes(needle))
     &&(!status||project.status===status))
@@ -23,10 +27,16 @@ export function SurveyProjectDirectory({projects,selectedId,page,busy,loading,er
         <h1 id="survey-projects-heading" tabIndex={-1}>我的研究</h1>
         <p>从研究设置到工具、采集与数据，在同一项目中继续。</p>
       </div>
-      <button type="button" className="btn-primary" disabled={busy||loading} onClick={onCreate}><Plus size={18} aria-hidden="true"/>新建研究</button>
+      <div className="survey-directory-actions">
+        <button type="button" className="btn-secondary survey-directory-search-toggle" aria-label="研究检索"
+          aria-expanded={searchOpen} aria-controls="survey-directory-search" data-filtered={!!(query||status)}
+          onClick={()=>setSearchOpen(open=>!open)}><Search size={18} aria-hidden="true"/>研究检索
+          {(query||status)&&<span className="survey-filter-indicator" aria-hidden="true">已筛选</span>}</button>
+        <button type="button" className="btn-primary" disabled={busy||loading} onClick={onCreate}><Plus size={18} aria-hidden="true"/>新建研究</button>
+      </div>
     </header>
-    <div className="survey-directory-toolbar" role="search" aria-label="筛选本页研究">
-      <label>筛选本页研究<input className="input" type="search" value={query} placeholder="研究名称或说明"
+    <div id="survey-directory-search" className="survey-directory-toolbar" role="search" aria-label="筛选本页研究" hidden={!searchOpen}>
+      <label>筛选本页研究<input ref={searchInput} className="input" type="search" value={query} placeholder="研究名称或说明"
         onChange={event=>onQuery(event.target.value)}/></label>
       <label>本页状态<select className="input" value={status} onChange={event=>onStatus(event.target.value)}>
         <option value="">全部状态</option>{Object.entries(statusLabels).map(([value,label])=><option key={value} value={value}>{label}</option>)}

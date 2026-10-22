@@ -17,11 +17,15 @@
 .survey-entry .survey-session-actions { font-size: .875rem; }
 .survey-project-directory { min-width: 0; }
 .survey-directory-heading { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 1.25rem; padding: 0 0 1.5rem; }
-.survey-directory-heading > div { min-width: 0; flex: 1 1 18rem; }
+.survey-directory-heading > div:first-child { min-width: 0; flex: 1 1 18rem; }
 .survey-directory-heading h1 { margin: .3rem 0 .6rem; font-family: 'Songti SC','STSong','Noto Serif CJK SC',serif; font-size: clamp(1.8rem,3vw,2.4rem); font-weight: 600; letter-spacing: .035em; line-height: 1.45; }
-.survey-directory-heading > button { display: inline-flex; gap: .5rem; align-items: center; border-radius: .65rem; flex: none; }
-.survey-directory-heading > div > p:last-child { font-size: .875rem; color: #476271; }
+.survey-directory-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .65rem; }
+.survey-directory-actions > button { display: inline-flex; gap: .5rem; align-items: center; border-radius: .65rem; flex: none; }
+.survey-directory-heading > div:first-child > p:last-child { font-size: .875rem; color: #476271; }
+.survey-researcher .survey-directory-search-toggle[aria-expanded='true'],.survey-researcher .survey-directory-search-toggle[data-filtered='true'] { background: #eaf4f5; border-color: #7ba5b3; }
+.survey-filter-indicator { font-size: .7rem; color: #36586a; }
 .survey-directory-toolbar { display: flex; flex-wrap: wrap; gap: .8rem; align-items: end; padding: 1rem; border: 1px solid #d1e0e6; border-radius: .85rem; background: #fff; }
+.survey-directory-toolbar[hidden] { display: none; }
 .survey-directory-toolbar label { display: grid; gap: .4rem; color: #36586a; font-size: .875rem; font-weight: 600; }
 .survey-directory-toolbar label:first-child { flex: 1 1 16rem; }
 .survey-directory-toolbar input { width: 100%; }
@@ -79,7 +83,7 @@
   .survey-directory-toolbar label { flex: 1 1 100%; }
   .survey-directory-toolbar > button { flex: 1 1 9rem; }
   .survey-directory-heading { padding: 0 0 1.25rem; gap: 1rem; }
-  .survey-directory-heading > button { width: auto; }
+  .survey-directory-actions > button { width: auto; }
   .survey-directory-count { padding: .8rem .2rem; }
   .survey-directory-empty { margin: .25rem 0 1rem; padding: 1rem; }
   .survey-session-actions { gap: .65rem; }
