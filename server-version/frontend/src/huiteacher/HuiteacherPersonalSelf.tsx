@@ -1,4 +1,4 @@
-import { useCallback,useEffect,useState } from 'react'
+import { useCallback,useEffect,useRef,useState } from 'react'
 type Api=<T>(path:string,method?:string,data?:unknown)=>Promise<T>
 type Catalog={resourceId:string;title:string;version:string;scientificMaturity:'PILOT'}
 type AttemptSummary={assessmentId:string;resourceId:string;title:string;
@@ -31,31 +31,46 @@ function store(id:string,hash:string,answers:Record<string,string|number>){
   }catch{/* Browser private mode */}
 }
 export function HuiteacherPersonalSelf({api}:{api:Api}){
-  const [catalog,setCatalog]=useState<Catalog[]>([])
-  const [attempts,setAttempts]=useState<AttemptSummary[]>([])
+  const [catalogRows,setCatalog]=useState<Catalog[]>([])
+  const [attemptRows,setAttempts]=useState<AttemptSummary[]>([])
   const [active,setActive]=useState<Attempt|null>(null)
   const [answers,setAnswers]=useState<Record<string,string|number>>({})
   const [reports,setReports]=useState<Record<string,Report>>({})
   const [busy,setBusy]=useState(false)
   const [notice,setNotice]=useState('')
   const [submissionId,setSubmissionId]=useState('')
+  const listSource=useRef({api,endpoint:'/personal-scale'})
+  const listRequest=useRef(0)
+  const [listState,setListState]=useState<{api:Api;endpoint:string;pending:boolean;error:string;loaded:boolean}>(
+    {api,endpoint:'/personal-scale',pending:true,error:'',loaded:false})
+  listSource.current={api,endpoint:'/personal-scale'}
+  const listCurrent=listState.api===api&&listState.endpoint==='/personal-scale'
+  const listPending=!listCurrent||listState.pending
+  const listError=listCurrent?listState.error:''
+  const listReady=listCurrent&&listState.loaded
+  const catalog=listReady?catalogRows:[]
+  const attempts=listReady?attemptRows:[]
   const refresh=useCallback(async()=>{
-    const [resources,list]=await Promise.all([
-      api<{list:Catalog[]}>('/personal-scale/catalog'),
-      api<{list:AttemptSummary[]}>('/personal-scale/assessments'),
-    ])
-    setCatalog(resources.list);setAttempts(list.list)
+    if(listSource.current.api!==api||listSource.current.endpoint!=='/personal-scale')return
+    const request=++listRequest.current
+    const valid=()=>request===listRequest.current&&listSource.current.api===api&&listSource.current.endpoint==='/personal-scale'
+    setListState(old=>({api,endpoint:'/personal-scale',pending:true,error:'',loaded:old.api===api&&old.endpoint==='/personal-scale'&&old.loaded}))
+    try{
+      const [resources,list]=await Promise.all([
+        api<{list:Catalog[]}>('/personal-scale/catalog'),
+        api<{list:AttemptSummary[]}>('/personal-scale/assessments'),
+      ])
+      if(!valid())return
+      setCatalog(resources.list);setAttempts(list.list)
+      setListState({api,endpoint:'/personal-scale',pending:false,error:'',loaded:true})
+    }catch(error){
+      if(valid())setListState(old=>({...old,pending:false,error:error instanceof Error?error.message:'任务列表读取失败，请重试。'}))
+    }
   },[api])
   useEffect(()=>{
-    let active=true
-    void Promise.all([
-      api<{list:Catalog[]}>('/personal-scale/catalog'),
-      api<{list:AttemptSummary[]}>('/personal-scale/assessments'),
-    ]).then(([resources,list])=>{
-      if(active){setCatalog(resources.list);setAttempts(list.list)}
-    }).catch(e=>{if(active)setNotice(e instanceof Error?e.message:'无法读取个人发展授权')})
-    return()=>{active=false}
-  },[api])
+    void refresh()
+    return()=>{listRequest.current+=1}
+  },[refresh])
   useEffect(()=>{
     if(active?.status==='IN_PROGRESS')store(active.assessmentId,active.definitionHash,answers)
   },[active,answers])
@@ -114,14 +129,19 @@ export function HuiteacherPersonalSelf({api}:{api:Api}){
   return <section className="ht-panel" aria-label="教师个人自主发展测评">
     <h2>我的专业发展 · 个人自主测评</h2>
     <p>使用同一教育账号，无须学校开通 Huiteacher。只有平台正式授予本人许可的原创 Pilot 量表可用；个人报告不提供给学校管理者。</p>
+    {listPending&&<p role="status">正在读取任务列表，请稍候…</p>}
+    {listError&&<div role="alert" className="ht-notice"><p>任务列表读取失败，请重试。</p><p>{listError}</p>
+      <button type="button" disabled={listPending} onClick={()=>void refresh()}>重试读取任务列表</button>
+    </div>}
     {notice&&<p className="ht-notice" role="status">{notice}</p>}
     <h3>本人获授权的量表</h3>
-    {!catalog.length?<p className="ht-empty">暂未获得个人测评工具授权。可继续使用学校安排的其他评价任务。</p>:
+    {listReady&&!listPending&&!listError&&!catalog.length?<p className="ht-empty">暂未获得个人测评工具授权。可继续使用学校安排的其他评价任务。</p>:
       <div className="ht-event-list">{catalog.map(x=><div key={x.resourceId} className="ht-event">
         <strong>{x.title}</strong><span className="ht-tag">Pilot · {x.version}</span>
         <button disabled={busy} onClick={()=>begin(x.resourceId)}>开始／继续自主测评</button>
       </div>)}</div>}
     <h3>我的个人测评记录</h3>
+    {listReady&&!listPending&&!listError&&!attempts.length&&<p className="ht-empty">暂无个人测评记录。</p>}
     <div className="ht-event-list">{attempts.map(x=><article className="ht-event" key={x.assessmentId}>
       <strong>{x.title}</strong><span className="ht-tag">{x.status}</span>
       <div className="ht-inline">

@@ -24,7 +24,7 @@ type Start={state:'STARTED'|'IN_PROGRESS'|'WITHHELD';
   runtimeBindingKind?:string;runtimeBindingRef?:string}
 
 export function HuiteacherMyScaleTasks({api}:{api:Api}){
-  const [tasks,setTasks]=useState<Task[]>([])
+  const [taskRows,setTasks]=useState<Task[]>([])
   const [selected,setSelected]=useState<Task|null>(null)
   const [attempt,setAttempt]=useState<CompositeAttemptState|null>(null)
   const mediaTransport=useMemo(()=>{
@@ -60,18 +60,37 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
   const [reportBusy,setReportBusy]=useState(false)
   const reportEpoch=useRef(0)
   const [message,setMessage]=useState('')
+  const listSource=useRef({api,endpoint:'/my-scale-tasks'})
+  const listRequest=useRef(0)
+  const [listState,setListState]=useState<{api:Api;endpoint:string;pending:boolean;error:string;loaded:boolean}>(
+    {api,endpoint:'/my-scale-tasks',pending:true,error:'',loaded:false})
+  listSource.current={api,endpoint:'/my-scale-tasks'}
+  const listCurrent=listState.api===api&&listState.endpoint==='/my-scale-tasks'
+  const listPending=!listCurrent||listState.pending
+  const listError=listCurrent?listState.error:''
+  const listReady=listCurrent&&listState.loaded
+  const tasks=listReady?taskRows:[]
   const refresh=useCallback(async()=>{
-    reportEpoch.current+=1;setReports({});setReportBusy(false)
-    const data=await api<{list:Task[]}>('/my-scale-tasks')
-    setTasks(data.list)
+    if(listSource.current.api!==api||listSource.current.endpoint!=='/my-scale-tasks')return
+    const request=++listRequest.current
+    const valid=()=>request===listRequest.current&&listSource.current.api===api&&listSource.current.endpoint==='/my-scale-tasks'
+    setListState(old=>({api,endpoint:'/my-scale-tasks',pending:true,error:'',loaded:old.api===api&&old.endpoint==='/my-scale-tasks'&&old.loaded}))
+    try{
+      const data=await api<{list:Task[]}>('/my-scale-tasks')
+      if(!valid())return
+      setTasks(data.list)
+      setListState({api,endpoint:'/my-scale-tasks',pending:false,error:'',loaded:true})
+    }catch(error){
+      if(valid())setListState(old=>({...old,pending:false,error:error instanceof Error?error.message:'任务列表读取失败，请重试。'}))
+    }
   },[api])
   useEffect(()=>{
-    let mounted=true
+    void refresh()
+    return()=>{listRequest.current+=1}
+  },[refresh])
+  useEffect(()=>{
     reportEpoch.current+=1;setReports({});setReportBusy(false)
-    void api<{list:Task[]}>('/my-scale-tasks').then(data=>{
-      if(mounted)setTasks(data.list)
-    }).catch(e=>{if(mounted)setMessage(e instanceof Error?e.message:'评价任务读取失败')})
-    return ()=>{mounted=false;reportEpoch.current+=1}
+    return()=>{reportEpoch.current+=1}
   },[api])
   const work=(task:()=>Promise<void>)=>{
     setLoading(true);setMessage('')
@@ -140,8 +159,12 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
     <h2>教师个人发展评价</h2>
     <p>正式计分仅来自经过独立发布、学校授权的教师自评量表。
       个人结果仅由本人获取，学校管理者不能代查。</p>
+    {listPending&&<p role="status">正在读取任务列表，请稍候…</p>}
+    {listError&&<div role="alert" className="ht-notice"><p>任务列表读取失败，请重试。</p><p>{listError}</p>
+      <button type="button" disabled={listPending} onClick={()=>void refresh()}>重试读取任务列表</button>
+    </div>}
     {message&&<p role="status" className="ht-notice">{message}</p>}
-    {!tasks.length?<p className="ht-empty">目前尚未安排经过授权的教师个人 Scale 测评。</p>:
+    {listReady&&!listPending&&!listError&&!tasks.length?<p className="ht-empty">目前尚未安排经过授权的教师个人 Scale 测评。</p>:
       <div className="ht-event-list">{tasks.map(item=><article className="ht-event" key={item.executionId}>
         <strong>{item.title}</strong> <span className="ht-tag">{item.status}</span>
         <p>{item.eventTitle}</p>
