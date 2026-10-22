@@ -19,7 +19,7 @@ test('all actual workflows select only this standalone graph for the acceptance 
 out=[]
 for p in pathlib.Path(sys.argv[1]).iterdir():
  if p.suffix not in ['.yml','.yaml']: continue
- d=yaml.safe_load(p.read_text()); on=d.get('on',d.get(True)); out.append({'file':p.name,'on':on,'jobs':list(d.get('jobs',{}))})
+ d=yaml.safe_load(p.read_text()); on=d.get('on',d.get(True)); out.append({'file':p.name,'on':on,'jobs':[k for k,v in d.get('jobs',{}).items() if v.get('if') != '\${{ false }}']})
 print(json.dumps(out))`;
  const all=JSON.parse(execFileSync('python',['-c',code,directory],{encoding:'utf8'}));
  assert(all.length>=58);
@@ -32,10 +32,10 @@ print(json.dumps(out))`;
   if(push.branches.includes(branch))selected.push(w);
  }
  assert.deepEqual(selected.map(w=>w.file),['ci-school-teacher-browser.yml']);
- assert.deepEqual(selected[0].jobs,['browser']);
+ assert.deepEqual(selected[0].jobs,['launch-diagnostic']);
  assert(!Object.hasOwn(selected[0].on,'workflow_call'));
 });
-test('fixed official build reuse runs only consumer and never recompiles',()=>{
+test('retained fixed official build consumer never recompiles',()=>{
  assert(!flow.includes('ci-frontend-build.yml'));assert(!flow.includes('typescript/bin/tsc'));assert(!flow.includes('npm run build'));assert(!flow.includes('needs:'));
  assert(flow.includes('school-teacher-browser-control.mjs restore'));assert(flow.includes('fetch-depth: 0'));assert(flow.includes('GH_TOKEN: ${{ github.token }}'));
  assert(!flow.includes('ci-artifact.mjs write'));assert(!flow.includes('actions/download-artifact'));
@@ -43,7 +43,7 @@ test('fixed official build reuse runs only consumer and never recompiles',()=>{
 test('isolated services and public-only evidence, with no deployment or secrets inheritance',()=>{
  assert(flow.includes('postgres:16.15-bookworm'));assert(flow.includes('school_teacher_browser_ci_test'));
  assert(!/secrets: inherit|secrets\.|environment:|id-token: write|contents: write|ignoreHTTPSErrors|NODE_TLS_REJECT_UNAUTHORIZED/.test(flow));
- assert.equal((flow.match(/path: school-teacher-evidence/g)||[]).length,1);
+ assert.deepEqual(flow.split('\n').filter(line=>line.trim().startsWith('path:')).map(line=>line.trim()),['path: school-teacher-evidence/browser-launch.json','path: school-teacher-evidence']);
  assert(flow.includes('if: always()'));assert(flow.includes('school-teacher-browser-control.mjs cleanup'));
 });
 
@@ -182,4 +182,21 @@ test('both real product startups are required and restore diagnostics cannot exp
  for(const mutate of [r=>r.startups.pop(),r=>r.startups[0].corsOrigin='https://wrong.invalid',r=>r.startups[1].ready=false,r=>r.startups[0].phase='STARTING']){const r=structuredClone(s.report);mutate(r);assert.throws(()=>verifyReport(r,s.identity,png));}
  const diagnostic=safeReuseFailure(new Error('https://example.invalid/?sig=secret-marker'));
  assert.match(diagnostic,/Diagnostic SHA256 [0-9a-f]{64}$/);assert(!diagnostic.includes('secret-marker'));assert(!diagnostic.includes('https:'));
+});
+
+
+test('launch-only candidate starts no services and cannot claim full browser acceptance',()=>{
+ const parsed=JSON.parse(execFileSync('python',['-c','import yaml,json,sys; print(json.dumps(yaml.safe_load(sys.stdin.read())))'],{input:flow,encoding:'utf8'}));
+ const job=parsed.jobs['launch-diagnostic'];assert.deepEqual(job.permissions,{contents:'read'});assert.equal(parsed.jobs.browser.if,'${{ false }}');
+ assert(!job.services);assert(!job.needs);assert(!job.env);assert.equal(job['runs-on'],'ubuntu-24.04');
+ assert.equal(job.if,"${{ github.event_name == 'push' && github.repository == 'caohuibj/eduK12-new-version' && github.ref == 'refs/heads/ci/school-teacher-browser-20261022' && !github.event.deleted }}");
+ const commands=job.steps.filter(s=>s.run).map(s=>s.run);
+ assert.deepEqual(commands,[
+ 'node .github/scripts/school-teacher-browser-control.mjs preflight',
+ 'npm ci --ignore-scripts --prefix .github/release-tools',
+ 'node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium',
+ 'node server-version/e2e/school-teacher-browser.cjs --launch-diagnostic']);
+ const upload=job.steps.find(s=>s.uses==='actions/upload-artifact@v4');assert.equal(upload.if,'always()');assert.equal(upload.with.path,'school-teacher-evidence/browser-launch.json');
+ for(const command of commands)assert(!/migrate|seed|restore|prisma|backend|ci-artifact|mjs report/.test(command));
+ assert(!JSON.stringify(job).includes('GH_TOKEN'));assert(!JSON.stringify(job).includes('secrets.'));
 });

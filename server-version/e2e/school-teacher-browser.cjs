@@ -26,7 +26,7 @@ const path = require('node:path')
 const http = require('node:http')
 const { spawn } = require('node:child_process')
 const { randomUUID, createHmac } = require('node:crypto')
-const { readFixture, backend, repo, sha } = require('./school-teacher-fixture.cjs')
+const { readFixture, sourceIdentity, backend, repo, sha } = require('./school-teacher-fixture.cjs')
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 const origins = { SCHOOL: 'https://school.eduk12.top', TEACHER: 'https://teacher.eduk12.top' }
 const prefixes = { SCHOOL: '/api/campus', TEACHER: '/api/huiteacher' }
@@ -77,6 +77,106 @@ function classifyStartupLog(text) {
     ['PORT_IN_USE', 'EADDRINUSE'],
   ]
   return markers.filter(([, marker]) => text.includes(marker)).map(([code]) => code)
+}
+
+function classifyBrowserLaunchError(error) {
+  const text = String(error)
+  const patterns = {
+    sandboxUnavailable: /No usable sandbox/i.test(text),
+    namespaceDenied: /(?:Failed to move to new namespace|Failed to (?:unshare|create)[^\n]*namespace)[^\n]*(?:Operation not permitted|Permission denied)/i.test(text),
+    appArmorDenied: /apparmor\s*=\s*["']?DENIED\b|AppArmor (?:denied|denial)\b/i.test(text),
+    executableMissing: /Executable doesn't exist at|spawn [^\n]* ENOENT/.test(text),
+    sharedLibraryMissing: /error while loading shared libraries|cannot open shared object file/i.test(text),
+    hostDependenciesMissing: /Host system is missing dependencies to run browsers/i.test(text),
+    rootSandboxUnsupported: /Running as root without --no-sandbox is not supported/i.test(text),
+    processClosed: /Target page, context or browser has been closed|Browser closed/i.test(text),
+    launchTimeout: /Timeout [0-9]+ms exceeded/i.test(text),
+  }
+  const codeFor = { sandboxUnavailable: 'SANDBOX_UNAVAILABLE', namespaceDenied: 'NAMESPACE_DENIED', appArmorDenied: 'APPARMOR_DENIAL_MARKER',
+    executableMissing: 'EXECUTABLE_MISSING', sharedLibraryMissing: 'SHARED_LIBRARY_MISSING', hostDependenciesMissing: 'HOST_DEPENDENCIES_MISSING',
+    rootSandboxUnsupported: 'ROOT_SANDBOX_UNSUPPORTED', processClosed: 'PROCESS_CLOSED', launchTimeout: 'LAUNCH_TIMEOUT' }
+  const codes = Object.entries(patterns).filter(([, matched]) => matched).map(([key]) => codeFor[key])
+  const allowedErrnos = ['ENOENT', 'EACCES', 'EPERM', 'ENOMEM', 'EMFILE']
+  const errno = allowedErrnos.includes(error?.code) ? error.code : /\b(?:spawn|errno|code)\b[^\n]*?\b(ENOENT|EACCES|EPERM|ENOMEM|EMFILE)\b/.exec(text)?.[1]
+  if (errno) codes.push('SPAWN_' + errno)
+  const exit = /process did exit: exitCode=(-?\d+)\b/.exec(text)?.[1]
+  const exitCode = exit !== undefined && Number.isSafeInteger(Number(exit)) ? Number(exit) : null
+  const signal = /process did exit:[^\n]*?signal=(SIGABRT|SIGSEGV|SIGTRAP|SIGKILL|SIGTERM|SIGILL|SIGBUS)\b/.exec(text)?.[1] || null
+  return { codes: codes.length ? codes : ['UNKNOWN_LAUNCH_FAILURE'], patterns, spawnErrno: errno || null, exitCode, signal, errorHash: sha(text) }
+}
+
+function browserLaunchEnvironment(read = file => fs.readFileSync(file, 'utf8'), facts = process) {
+  const optional = file => { try { return read(file).trim() } catch { return null } }
+  const integer = file => { const text = optional(file); return text !== null && /^\d{1,15}$/.test(text) && Number.isSafeInteger(Number(text)) ? Number(text) : null }
+  const release = optional('/etc/os-release') || ''
+  const osField = name => {
+    const value = release.split('\n').find(line => line.startsWith(name + '='))?.slice(name.length + 1).replace(/^"|"$/g, '')
+    return name === 'ID' ? (['ubuntu', 'debian'].includes(value) ? value : null)
+      : value && /^\d+(?:\.\d+){0,2}$/.test(value) ? value : null
+  }
+  const appArmor = optional('/sys/module/apparmor/parameters/enabled')
+  const uid = typeof facts.geteuid === 'function' ? facts.geteuid() : null
+  return { platform: ['linux', 'darwin', 'win32'].includes(facts.platform) ? facts.platform : 'other',
+    architecture: ['x64', 'arm64'].includes(facts.arch) ? facts.arch : 'other', nodeVersion: /^v\d+\.\d+\.\d+$/.test(facts.version) ? facts.version : null,
+    effectiveUid: Number.isSafeInteger(uid) && uid >= 0 ? uid : null,
+    osId: osField('ID'), osVersion: osField('VERSION_ID'),
+    appArmorEnabled: appArmor === 'Y' ? true : appArmor === 'N' ? false : null,
+    restrictUnprivilegedUserNamespaces: integer('/proc/sys/kernel/apparmor_restrict_unprivileged_userns'),
+    unprivilegedUserNamespacesEnabled: integer('/proc/sys/kernel/unprivileged_userns_clone'),
+    maxUserNamespaces: integer('/proc/sys/user/max_user_namespaces') }
+}
+
+function validateLaunchDiagnosticContext(env, event) {
+  for (const key of ['CI', 'GITHUB_ACTIONS']) assert.equal(env[key], 'true')
+  assert.equal(env.GITHUB_REPOSITORY, 'caohuibj/eduK12-new-version')
+  assert.equal(env.GITHUB_REF, 'refs/heads/ci/school-teacher-browser-20261022')
+  assert.equal(env.GITHUB_EVENT_NAME, 'push')
+  assert.equal(event.deleted, false)
+  assert.match(env.GITHUB_RUN_ID || '', /^\d+$/)
+}
+
+async function runLaunchDiagnostic() {
+  // Deliberately before, and independent of, readFixture/build restore/DB seed.
+  // This mode cannot establish any School/Teacher product acceptance result.
+  validateLaunchDiagnosticContext(process.env, JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH, 'utf8')))
+  const source = sourceIdentity(), out = path.join(repo, 'school-teacher-evidence')
+  fs.mkdirSync(out, { recursive: true })
+  const report = { schemaVersion: 1, scope: 'browser-launch-only', acceptance: false, source, runId: process.env.GITHUB_RUN_ID,
+    status: 'RUNNING', stage: 'playwright-load', flags: { headless: true, chromiumSandbox: true },
+    environment: browserLaunchEnvironment(), executable: null, browserVersion: null, diagnostic: null }
+  let browser
+  try {
+    const base = path.join(repo, '.github/release-tools/node_modules/playwright-core')
+    const { chromium } = require(base)
+    const version = JSON.parse(fs.readFileSync(path.join(base, 'package.json'), 'utf8')).version
+    report.playwrightVersion = /^\d+\.\d+\.\d+$/.test(version) ? version : null
+    const file = chromium.executablePath()
+    let exists = false, executable = false, mode = null
+    try { const stat = fs.statSync(file); exists = stat.isFile(); mode = stat.mode & 0o777 } catch { /* Record only booleans. */ }
+    try { fs.accessSync(file, fs.constants.X_OK); executable = true } catch { /* Never print paths or OS errors. */ }
+    report.executable = { defaultExecutableExists: exists, defaultExecutableAccessible: executable, permissionMode: mode,
+      note: 'Public default executable metadata; headless mode may select the separately installed headless shell.' }
+    const registry = JSON.parse(fs.readFileSync(path.join(base, 'browsers.json'), 'utf8')).browsers
+    report.packageBrowserExpectations = registry.filter(row => ['chromium', 'chromium-headless-shell'].includes(row.name))
+      .map(row => ({ name: row.name, version: /^\d+(?:\.\d+){3}$/.test(row.browserVersion) ? row.browserVersion : null,
+        revision: /^\d+$/.test(String(row.revision)) ? String(row.revision) : null }))
+    report.stage = 'browser-launch'
+    // Exactly the journey's existing settings. No fallback, certificate bypass,
+    // alternate runner/browser, sandbox change or security-setting mutation.
+    browser = await chromium.launch({ headless: true, chromiumSandbox: true })
+    assert.equal(browser.isConnected(), true, 'Launched browser must remain connected')
+    const browserVersion = browser.version()
+    report.browserVersion = /^\d+(?:\.\d+){3}$/.test(browserVersion) ? browserVersion : null
+    report.stage = 'browser-close'
+    await browser.close(); browser = undefined
+    report.status = 'LAUNCH_READY'; report.stage = 'complete'
+  } catch (error) {
+    report.status = 'FAILED'; report.diagnostic = classifyBrowserLaunchError(error)
+  } finally {
+    if (browser) { try { await browser.close() } catch { /* Preserve the first safe diagnostic. */ } }
+    fs.writeFileSync(path.join(out, 'browser-launch.json'), JSON.stringify(report, null, 2) + '\n')
+  }
+  return report.status === 'LAUNCH_READY' ? 0 : 1
 }
 
 function totp(secret, step = Math.floor(Date.now() / 30000)) {
@@ -636,8 +736,19 @@ async function run() {
   }
 }
 
-if (require.main === module) run().catch(error => {
-  console.error('School/Teacher acceptance did not complete; see sanitized browser.json if present. Error digest: ' + sha(String(error)))
-  process.exitCode = 1
-})
-module.exports = { totp, backendEnvironment, validateBuildReuse, validateBuildManifest, classifyStartupLog }
+function browserCliMode(args) {
+  if (args.length === 0) return 'journey'
+  assert.deepEqual(args, ['--launch-diagnostic'], 'Unknown browser command; no action was started')
+  return 'launch-diagnostic'
+}
+
+if (require.main === module) {
+  const task = Promise.resolve().then(() => browserCliMode(process.argv.slice(2)) === 'launch-diagnostic'
+    ? runLaunchDiagnostic().then(code => { process.exitCode = code }) : run())
+  task.catch(error => {
+    console.error('School/Teacher diagnostic or acceptance did not complete; inspect its sanitized report if present. Error digest: ' + sha(String(error)))
+    process.exitCode = 1
+  })
+}
+module.exports = { totp, backendEnvironment, validateBuildReuse, validateBuildManifest, classifyStartupLog,
+  classifyBrowserLaunchError, browserLaunchEnvironment, runLaunchDiagnostic, browserCliMode, validateLaunchDiagnosticContext }
