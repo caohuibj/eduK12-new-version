@@ -1,3 +1,4 @@
+import { educationSchoolScaleReportRouter, educationTeacherScaleReportRouter } from './modules/reporting/education-scale-report.routes'
 import {trainingScaleLibraryGovernanceRouter,surveyScaleLibraryGovernanceRouter} from './modules/scale-library-governance/routes'
 import { cleanupExpiredTrainingCheckpoints } from './modules/composite/training-checkpoint.service'
 import { startCheckinScheduleScheduler } from './services/checkinScheduleService'
@@ -330,6 +331,7 @@ app.use('/api/huiteacher',huiteacherRunRoutes)
 app.use('/api/huiteacher',huiteacherFormRuntimeRoutes)
 app.use('/api/huiteacher',huiteacherGroupReportRoutes)
 app.use('/api/huiteacher',huiteacherScaleRuntimeRoutes)
+app.use('/api/huiteacher',educationTeacherScaleReportRouter)
 app.use('/api/huiteacher',huiteacherPersonalScaleRoutes)
 app.use('/api/huiteacher',huiteacherObserverRoutes)
 app.use('/api/huiteacher',huiteacherConsensusRoutes)
@@ -352,6 +354,7 @@ app.use('/api/campus', campusReportRoutes)
 app.use('/api/campus', campusReportPrivacyRoutes)
 app.use('/api/campus', campusPeerRoutes)
 app.use('/api/campus', campusCompositeRoutes)
+app.use('/api/campus', educationSchoolScaleReportRouter)
 app.use('/api/parent-links', parentLinksRouter)
 app.use('/api/parents', parentsRouter)
 app.use('/api/parent-accounts', parentAccountsRouter)

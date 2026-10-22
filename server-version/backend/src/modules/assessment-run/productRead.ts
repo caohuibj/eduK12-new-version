@@ -1,3 +1,4 @@
+import { boundCompositeContinuationSql } from './boundCompositeContinuation'
 import { Prisma } from '@prisma/client'
 import { currentRunPopulationAuthoritySql } from './currentPopulationAuthority'
 import { prisma } from '../../config/database'
@@ -153,19 +154,40 @@ export async function readAssessmentRunProduct(
 }
 
 /** Exact respondent tasks with their assigned subject; no peer respondents, answers or scores. */
-export async function listAssignedRunTasks(userId: string, options?: { runIds?: string[] }) {
+export async function listAssignedRunTasks(userId: string, options?: {
+  runIds?: string[]
+  /** Campus inbox only: restore an already bound attempt, never new admission. */
+  preserveBoundSchoolContinuation?: boolean
+}) {
   if(options?.runIds && options.runIds.length===0) return { list:[], truncated:false }
   const runScope=options?.runIds
     ? Prisma.sql`AND r."id" IN (${Prisma.join(options.runIds)})`
     : Prisma.empty
+  const schoolScope = options?.preserveBoundSchoolContinuation
+    ? Prisma.sql`(EXISTS (SELECT 1 FROM "campus_activity_runs" ar
+        JOIN "campus_activities" activity ON activity."organization_id"=ar."organization_id"
+          AND activity."course_id"=ar."course_id" AND activity."status"='OPEN'
+        WHERE ar."organization_id"=e."organization_id" AND ar."run_id"=e."run_id")
+      AND NOT EXISTS (SELECT 1 FROM "huiteacher_evaluation_run_links" h
+        WHERE h."organization_id"=e."organization_id" AND h."run_id"=e."run_id"))`
+    : Prisma.sql`FALSE`
+  const schoolContinuation = options?.preserveBoundSchoolContinuation
+    ? Prisma.sql`(${schoolScope} AND r."status" IN ('PUBLISHED','CLOSED')
+      AND ${boundCompositeContinuationSql(Prisma.sql`e."id"`, userId)})`
+    : Prisma.sql`FALSE`
+  const closedScope = options?.preserveBoundSchoolContinuation
+    ? Prisma.sql`AND (r."status" <> 'CLOSED' OR NOT ${schoolScope} OR ${schoolContinuation})`
+    : Prisma.empty
   const list = await prisma.$queryRaw<Array<{
+    __boundSchoolContinuation: boolean;
     executionId: string; organizationId: string; runId: string; runName: string;
     subjectUserId: string; subjectRole: string; subjectName: string; respondentRole: string; relationship: string; perspective: string; deadline: Date | null;
     runStatus: string; status: string; claimState: string | null;
     resourceFamily: string; resourceKey: string; resourceVersion: string;
     governedReport: boolean; reportAttemptId: string | null; consentRequired: boolean; consentPurpose: string | null; consentVisibility: string | null;
   }>>`
-    SELECT e."id" AS "executionId", e."organization_id" AS "organizationId", e."run_id" AS "runId",
+    SELECT ${schoolContinuation} AS "__boundSchoolContinuation",
+      e."id" AS "executionId", e."organization_id" AS "organizationId", e."run_id" AS "runId",
       r."name" AS "runName", r."status" AS "runStatus", r."intake_deadline" AS "deadline",
       subject."user_id" AS "subjectUserId", subject."actor_role" AS "subjectRole", subject_user."username" AS "subjectName", respondent."actor_role" AS "respondentRole",
       a."relationship_kind" AS "relationship", a."perspective" AS "perspective",
@@ -173,6 +195,7 @@ export async function listAssignedRunTasks(userId: string, options?: { runIds?: 
       CASE WHEN ca."status" = 'COMPLETED' THEN 'COMPLETED'
         WHEN r."status" = 'CANCELLED' THEN 'CANCELLED'
         WHEN e."status" IN ('REVOKED', 'EXPIRED', 'CANCELLED', 'COMPLETED') THEN e."status"
+        WHEN ${schoolContinuation} AND r."status" IN ('PUBLISHED','CLOSED') THEN 'STARTED'
         WHEN r."status" = 'CLOSED' OR r."intake_deadline" <= statement_timestamp() THEN 'EXPIRED'
         ELSE e."status" END AS "status",
       c."state" AS "claimState", t."resource_family" AS "resourceFamily",
@@ -196,11 +219,17 @@ export async function listAssignedRunTasks(userId: string, options?: { runIds?: 
     LEFT JOIN "assessment_attempt_consents" consent ON consent."id" = a."consent_id"
     WHERE respondent."user_id" = ${userId}
       ${runScope}
+      ${closedScope}
       AND ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)}
       AND NOT EXISTS (SELECT 1 FROM "organization_access_denies" d
         WHERE d."organization_id" = e."organization_id" AND d."user_id" = ${userId}
           AND d."lifted_at" IS NULL AND d."permission" IN ('*', 'RUN_START'))
     ORDER BY e."created_at" DESC, e."id" DESC LIMIT 101
   `
-  return { list: list.slice(0, 100), truncated: list.length > 100 }
+  return {
+    list: list.slice(0, 100).map(({__boundSchoolContinuation,...task})=>({
+      ...task,...(__boundSchoolContinuation?{canResumeExisting:true}:{}),
+    })),
+    truncated: list.length > 100,
+  }
 }

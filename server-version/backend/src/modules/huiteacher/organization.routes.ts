@@ -1,3 +1,5 @@
+import { educationPrivateToolRouter } from '../education-tools/private-tool.routes'
+import { educationToolAuthoringCapabilitiesHandler } from '../education-tools/capabilities.handler'
 import { Router } from 'express'
 import { z, ZodError } from 'zod'
 import { prisma } from '../../config/database'
@@ -9,6 +11,7 @@ import { listEducationProductMemberships } from '../organization/educationProduc
 import { requireTeacherProductAdmin, requireRecentTeacherMfa, requireTeacherProductMember } from './authority'
 
 const router=Router()
+router.use('/organizations/:organizationId/private-tools',authenticateHuiteacher,educationPrivateToolRouter('TEACHER'))
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 const id=z.string().uuid()
 const wrap=(fn:(req:any,res:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
@@ -20,6 +23,8 @@ const wrap=(fn:(req:any,res:any)=>Promise<unknown>)=>asyncHandler(async(req,res)
     throw e
   }
 })
+router.get('/organizations/:organizationId/tool-authoring-capabilities', authenticateHuiteacher,
+  educationToolAuthoringCapabilitiesHandler('TEACHER'))
 router.get('/organizations',authenticateHuiteacher,wrap(async(req,res)=>{
   return success(res,{
     list:await listEducationProductMemberships(req.user!.userId,'HUITEACHER'),

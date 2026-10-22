@@ -46,7 +46,7 @@ export const acceptRunExecutionConsent = async (input: { executionId: string; ac
   prisma.$transaction(async (tx) => {
     const envelope = await lockExecutionEnvelope(tx, input.executionId)
     if (envelope.respondentUserId !== input.actorUserId) throw new RunStartAdmissionError('RUN_EXECUTION_ACTOR', 'only the assigned respondent may accept consent', 403)
-    await assertCurrentRunStartAuthority(tx, input.executionId)
+    await assertCurrentRunStartAuthority(tx, input.executionId, {accountMode:'DETECT_EDUCATION_LIBRARY'})
     const rows = await tx.$queryRaw<Array<{ assignmentId: string }>>`
       SELECT e."relational_assignment_id" AS "assignmentId" FROM "assessment_run_executions" e
       JOIN "assessment_runs" r ON r."id" = e."run_id"

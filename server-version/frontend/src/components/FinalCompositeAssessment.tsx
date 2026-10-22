@@ -51,6 +51,10 @@ export interface FinalCompositeAssessmentProps {
   onRestart?: () => Promise<void> | void
   cognitiveRecovery?: { reason: 'LOCAL_DRAFT_EXPIRED'; restarting: boolean; restartError: string | null }
   /** School-only canonical Run transport; the legacy API remains unchanged. */
+  mediaTransport?: {
+    loadImage: (path:string)=>Promise<Blob>
+    loadVideoCapability: (path:string)=>Promise<import('../modules/assessment-media/types').AssessmentVideoCapabilitySources>
+  }
   campusMode?: boolean
   campusVideoLoader?: (path:string)=>Promise<import('../modules/assessment-media/types').AssessmentVideoCapabilitySources>
 }
@@ -79,7 +83,7 @@ const responseError = (response: ApiResponse<unknown>) => {
   return error
 }
 
-const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ state, publicMode = false, recoveryToken, submitFormSection, submitScale, onReload, onExit, onCompleted, onEnterCognitive, onEnterSituational, onRestart, cognitiveRecovery, campusMode=false, campusVideoLoader }) => {
+const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ state, publicMode = false, recoveryToken, submitFormSection, submitScale, onReload, onExit, onCompleted, onEnterCognitive, onEnterSituational, onRestart, cognitiveRecovery, campusMode=false, campusVideoLoader, mediaTransport }) => {
   const item = state.currentItem
   const expiredCognitive = item?.type === 'COGNITIVE' && cognitiveRecovery?.reason === 'LOCAL_DRAFT_EXPIRED'
   const [sectionIndex, setSectionIndex] = useState(0)
@@ -123,6 +127,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     } else {
       throw new Error('当前单元不支持视觉内容')
     }
+    if(mediaTransport)return mediaTransport.loadImage(path)
     const publicCapability = recoveryToken || (typeof window === 'undefined' ? '' : window.sessionStorage.getItem(`composite:recovery:attempt:${state.id}`) || '')
     if (publicMode && !publicCapability) throw new Error('缺少综合测评恢复凭据')
     const schoolPath=campusMode
@@ -131,9 +136,10 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     const response = await sessionFetch(schoolPath, publicMode ? { headers: { 'X-Recovery-Token': publicCapability } } : undefined)
     if (!response.ok) throw new Error(`视觉内容加载失败 (${response.status})`)
     return response.blob()
-  }, [item, publicMode, recoveryToken, sectionId, state.id, campusMode])
+  }, [item, publicMode, recoveryToken, sectionId, state.id, campusMode, mediaTransport])
 
   const loadCompositeVideoCapability = useCallback(async (path: string) => {
+    if(mediaTransport)return mediaTransport.loadVideoCapability(path)
     if(campusMode){
       if(!campusVideoLoader)throw new Error('校园视觉测评尚无视频授权客户端')
       return campusVideoLoader(path.replace(
@@ -143,7 +149,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     const publicCapability = recoveryToken || (typeof window === 'undefined' ? '' : window.sessionStorage.getItem(`composite:recovery:attempt:${state.id}`) || '')
     if (!publicCapability) throw new Error('缺少综合测评恢复凭据')
     return requestAssessmentVideoCapabilities(path, { headers: { 'X-Recovery-Token': publicCapability } })
-  }, [publicMode, recoveryToken, state.id, campusMode, campusVideoLoader])
+  }, [publicMode, recoveryToken, state.id, campusMode, campusVideoLoader, mediaTransport])
 
   useEffect(() => {
     setSectionIndex(0)

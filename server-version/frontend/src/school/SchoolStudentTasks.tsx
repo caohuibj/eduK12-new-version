@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { EducationScalePersonalReport, type EducationScalePersonalReportData } from '../components/education-tools/EducationScalePersonalReport'
 import type { SchoolApi } from './SchoolRecovery'
 import { SchoolCompositeRunner,type CampusExecutionRef } from './SchoolCompositeRunner'
 
@@ -7,10 +8,11 @@ type SchoolTask={
   kind:'ASSIGNMENT'|'READING'|'CHECKIN'|'MEASUREMENT'
   title:string;status:'PENDING'|'COMPLETED'|'EXPIRED'|'IN_PROGRESS'|'UNAVAILABLE'
   deadline:string|null;href:string|null
+  canResumeExisting?:boolean
   consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
 }
 type TaskPage={list:SchoolTask[];total:number;hasMore:boolean;truncated:boolean;page:number}
-type StudentFinalFeedback={mode:string;state:'WITHHELD'|'COMPLETED'|'READY';message?:string}
+type StudentFinalFeedback=EducationScalePersonalReportData
 type TaskDetails={
   id:string;title:string;description?:string|null;content?:string|null
   mySubmission?:{content?:string|null;status:string}|null
@@ -43,10 +45,11 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
   }
   useEffect(()=>{
     let active=true
+    feedbackEpoch.current+=1;setFeedback(null)
     void api<TaskPage>('/my/activity-tasks?page=1&pageSize=25')
       .then(result=>{if(active)setItems(result)})
       .catch(err=>{if(active)setError(err instanceof Error?err.message:'活动待办暂不可用')})
-    return ()=>{active=false}
+    return ()=>{active=false;feedbackEpoch.current+=1}
   },[api])
   useEffect(()=>{
     let live=true
@@ -112,7 +115,7 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
                   if(!parts){setError('正式测评路径无效，请刷新后重试');return}
                   setExecution({organizationId:parts[1],courseId:parts[2],
                     runId:parts[3],executionId:parts[4],
-                    consentRequired:task.consentRequired,
+                    resumeExisting:task.canResumeExisting===true,consentRequired:task.consentRequired,
                     consentPurpose:task.consentPurpose,
                     consentVisibility:task.consentVisibility})
                 }}>开始／继续官方测评</button>:
@@ -131,6 +134,8 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
     </div>}
     {feedback&&<div className="hs-task-detail" role="region" aria-label="获准的个人测评反馈">
       <h3>{feedback.title} · 我的反馈</h3>
+      {feedback.data.kind!==undefined?<EducationScalePersonalReport key={feedback.executionId} data={feedback.data}
+        api={api} executionId={feedback.executionId} entry="SCHOOL"/>:<>
       {feedback.data.state==='COMPLETED'&&
         <p>你的作答已完成。当前测评仅允许展示完成状态，不提供分数或诊断。</p>}
       {feedback.data.state==='WITHHELD'&&
@@ -138,6 +143,7 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
       {feedback.data.state==='READY'&&
         <p>结果已经生成，但针对学生的逐工具解释尚未完成科学与适龄内容审核，因此这里不会直接展示指标代码、分数或诊断推论。</p>}
       {feedback.data.message&&<p className="hs-multiline">{feedback.data.message}</p>}
+      </>}
       <button onClick={()=>{feedbackEpoch.current+=1;setFeedback(null)}}>关闭我的反馈</button>
     </div>}
     {execution&&<SchoolCompositeRunner api={api} execution={execution}

@@ -13,7 +13,7 @@ export function canReadSchoolClasses(access:SchoolAccess|null):boolean {
 }
 
 /** Presentation only: mounted features retain their existing API and capability gates. */
-export function schoolNavigation(role:string,status:string,access:SchoolAccess|null,parentReports:boolean):SchoolNavigationItem[]{
+export function schoolNavigation(role:string,status:string,access:SchoolAccess|null,parentReports:boolean,canAuthorPrivateTools=false):SchoolNavigationItem[]{
  const items:SchoolNavigationItem[]=[{id:'overview',label:'校园概览',group:'校园空间',description:'从这里进入你的校园功能。',icon:House}]
  const add=(id:string,label:string,group:string,description:string,icon:LucideIcon)=>items.push({id,label,group,description,icon})
  const admin=access?.orgRole==='ORG_ADMIN'&&access.canGovern===true
@@ -31,6 +31,7 @@ export function schoolNavigation(role:string,status:string,access:SchoolAccess|n
   add('peer','参与授权','家校陪伴','查看和管理家校观察的参与授权。',Users)
   if(parentReports)add('parent-reports','家长报告','家校陪伴','查看经过独立批准并向你披露的报告。',BookOpen)
  }else if(role==='TEACHER'||role==='ADMIN'){
+  if(canAuthorPrivateTools)add('private-tools','我的工具','校园活动','编制本人私有量表和表单，检查并固定版本。',BookOpen)
   if(access){
    if(access.personas.includes('TEACHER'))add('tasks','学生观察任务','校园活动','查看你的教师观察任务。',ClipboardList)
    add('activities','活动管理','校园活动','查看校园活动、任务与参与安排。',CalendarDays)

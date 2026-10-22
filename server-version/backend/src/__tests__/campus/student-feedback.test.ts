@@ -1,5 +1,6 @@
 import {beforeEach,describe,expect,it,vi} from 'vitest'
-const m=vi.hoisted(()=>({read:vi.fn()}))
+const m=vi.hoisted(()=>({read:vi.fn(),library:vi.fn(async()=>null)}))
+vi.mock('../../modules/reporting/education-scale-personal-report.service',()=>({readEducationRespondentScaleReport:m.library}))
 vi.mock('../../modules/reporting/respondentSummary',()=>({readRespondentRunSummary:m.read}))
 import {publishedCampusStudentNarratives,readCampusStudentFeedback} from '../../modules/campus/student-feedback'
 

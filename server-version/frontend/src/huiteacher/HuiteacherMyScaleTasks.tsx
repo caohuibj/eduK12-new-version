@@ -1,14 +1,16 @@
-import { useCallback,useEffect,useState } from 'react'
+import { useCallback,useEffect,useMemo,useRef,useState } from 'react'
+import {isCapabilitySources} from '../modules/assessment-media/video-capability-client'
 import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
+import { EducationScalePersonalReport, type EducationScalePersonalReportData, type EducationReportApi } from '../components/education-tools/EducationScalePersonalReport'
 import type { CompositeAttemptState } from '../modules/composite/types'
 
-type Api=<T>(path:string,method?:string,input?:unknown)=>Promise<T>
+type Api=EducationReportApi
 type Task={
   executionId:string;eventId:string;eventTitle:string;runId:string;
   organizationId:string;status:string;runtimeBindingRef:string|null;
   resourceKey:string;title:string;runStatus:string
 }
-type Summary={
+type Summary=EducationScalePersonalReportData&{
   state:'WITHHELD'|'COMPLETED'|'READY';mode?:string;
   title?:string;scientificMaturity?:'PILOT';
   metrics?:Array<{
@@ -25,19 +27,51 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
   const [tasks,setTasks]=useState<Task[]>([])
   const [selected,setSelected]=useState<Task|null>(null)
   const [attempt,setAttempt]=useState<CompositeAttemptState|null>(null)
+  const mediaTransport=useMemo(()=>{
+    if(!attempt?.currentItem||attempt.currentItem.type!=='SCALE')return undefined
+    const attemptId=encodeURIComponent(attempt.id)
+    const itemId=encodeURIComponent(attempt.currentItem.id)
+    const prefix=`/api/composite-assessments/attempts/${attemptId}/items/${itemId}/scale/`
+    const scopedPath=(path:string,kind:'image'|'video')=>{
+      if(!path.startsWith(prefix))throw new Error('视觉内容不属于当前冻结测评单元')
+      const suffix=path.slice(prefix.length)
+      const match=(kind==='image'?/^assets\/([^/]+)\/content$/:/^items\/([^/]+)\/video-capability$/).exec(suffix)
+      if(!match)throw new Error('视觉内容路径无效')
+      let segment:string
+      try{segment=decodeURIComponent(match[1])}catch{throw new Error('视觉内容路径无效')}
+      if(!segment||segment==='.'||segment==='..'||/[\\/?#]/.test(segment)||encodeURIComponent(segment)!==match[1])throw new Error('视觉内容路径无效')
+      return `/composite-attempts/${attemptId}/items/${itemId}/scale/${suffix}`
+    }
+    return {
+      loadImage:async(path:string)=>{
+        const blob=await api<Blob>(scopedPath(path,'image'),'GET',undefined,{responseType:'blob'})
+        if(!(blob instanceof Blob))throw new Error('视觉内容响应无效')
+        return blob
+      },
+      loadVideoCapability:async(path:string)=>{
+        const data=await api<unknown>(scopedPath(path,'video'),'POST',{})
+        if(!isCapabilitySources(data))throw new Error('视频授权响应无效')
+        return data
+      },
+    }
+  },[api,attempt])
   const [reports,setReports]=useState<Record<string,Summary>>({})
   const [loading,setLoading]=useState(false)
+  const [reportBusy,setReportBusy]=useState(false)
+  const reportEpoch=useRef(0)
   const [message,setMessage]=useState('')
   const refresh=useCallback(async()=>{
+    reportEpoch.current+=1;setReports({});setReportBusy(false)
     const data=await api<{list:Task[]}>('/my-scale-tasks')
     setTasks(data.list)
   },[api])
   useEffect(()=>{
     let mounted=true
+    reportEpoch.current+=1;setReports({});setReportBusy(false)
     void api<{list:Task[]}>('/my-scale-tasks').then(data=>{
       if(mounted)setTasks(data.list)
     }).catch(e=>{if(mounted)setMessage(e instanceof Error?e.message:'评价任务读取失败')})
-    return ()=>{mounted=false}
+    return ()=>{mounted=false;reportEpoch.current+=1}
   },[api])
   const work=(task:()=>Promise<void>)=>{
     setLoading(true);setMessage('')
@@ -50,6 +84,10 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
     return value
   }
   const open=(item:Task)=>work(async()=>{
+    if(item.runStatus!=='PUBLISHED'
+      &&!(item.runStatus==='CLOSED'&&item.status==='STARTED'&&item.runtimeBindingRef)){
+      throw new Error('任务已结束，不能建立新的作答。')
+    }
     let attemptId=item.runtimeBindingRef
     if(!attemptId){
       const started=await api<Start>(
@@ -68,11 +106,26 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
     await load(attemptId)
     await refresh()
   })
-  const showReport=(item:Task)=>work(async()=>{
-    const data=await api<Summary>(
-      '/run-executions/'+item.executionId+'/personal-summary')
-    setReports(prev=>({...prev,[item.executionId]:data}))
-  })
+  const closeReport=(executionId:string)=>{
+    reportEpoch.current+=1;setReportBusy(false)
+    setReports(previous=>{
+      const next={...previous};delete next[executionId];return next
+    })
+  }
+  const showReport=async(item:Task)=>{
+    closeReport(item.executionId)
+    const token=++reportEpoch.current
+    setReportBusy(true);setMessage('')
+    try{
+      const data=await api<Summary>(
+        '/run-executions/'+item.executionId+'/personal-summary')
+      if(token===reportEpoch.current)setReports(previous=>({...previous,[item.executionId]:data}))
+    }catch(error){
+      if(token===reportEpoch.current)setMessage(error instanceof Error?error.message:'当前报告暂不可读取，请重试。')
+    }finally{
+      if(token===reportEpoch.current)setReportBusy(false)
+    }
+  }
   const reload=async()=>{
     if(!attempt)return
     await load(attempt.id)
@@ -93,17 +146,21 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
         <strong>{item.title}</strong> <span className="ht-tag">{item.status}</span>
         <p>{item.eventTitle}</p>
         <div className="ht-inline">
-          {item.status!=='COMPLETED'&&item.runStatus==='PUBLISHED'&&
-            <button type="button" disabled={loading}
-              onClick={()=>open(item)}>进入本人自评</button>}
-          {item.status!=='COMPLETED'&&item.runStatus!=='PUBLISHED'&&
+          {item.status!=='COMPLETED'&&(item.runStatus==='PUBLISHED'
+            ||(item.runStatus==='CLOSED'&&item.status==='STARTED'&&Boolean(item.runtimeBindingRef)))&&
+            <button type="button" disabled={loading||reportBusy}
+              onClick={()=>open(item)}>{item.runStatus==='CLOSED'?'继续已有自评':'进入本人自评'}</button>}
+          {item.status!=='COMPLETED'&&item.runStatus!=='PUBLISHED'
+            &&!(item.runStatus==='CLOSED'&&item.status==='STARTED'&&item.runtimeBindingRef)&&
             <p className="ht-muted">任务已结束或不再接受新的 START，不能重新开始。</p>}
-          {item.status==='COMPLETED'&&<button type="button" disabled={loading}
-            onClick={()=>showReport(item)}>查看本人反馈</button>}
+          {item.status==='COMPLETED'&&<button type="button" disabled={loading||reportBusy}
+            onClick={()=>void showReport(item)}>查看本人反馈</button>}
         </div>
         {reports[item.executionId]&&<div className="ht-personal-report">
           <h4>本人描述性反馈</h4>
-          {reports[item.executionId].state!=='READY'
+          {reports[item.executionId].kind!==undefined?<EducationScalePersonalReport
+            data={reports[item.executionId]} api={api} executionId={item.executionId} entry="TEACHER"/>:
+          reports[item.executionId].state!=='READY'
             ?<p>当前报告尚未获准显示。</p>
             :<>
               <p className="ht-muted">{reports[item.executionId].explanation}</p>
@@ -123,13 +180,16 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
               {reports[item.executionId].disclaimer&&<p className="ht-muted">
                 {reports[item.executionId].disclaimer}</p>}
             </>}
+          <button type="button" onClick={()=>closeReport(item.executionId)}>关闭本人反馈</button>
         </div>}
       </article>)}</div>}
     {selected&&attempt&&attempt.status!=='COMPLETED'&&<div className="ht-task">
       <h3>正在完成：{selected.title}</h3>
       <FinalCompositeAssessment
+        key={`${attempt.id}:${attempt.currentItem?.id??''}:${attempt.currentItem?.definitionHash??''}`}
         state={attempt}
         campusMode={false}
+        mediaTransport={mediaTransport}
         submitScale={submitScale}
         submitFormSection={async()=>{throw new Error('教师 Scale 任务不存在 Form Section')}}
         onReload={reload}

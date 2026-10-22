@@ -1,5 +1,9 @@
+import {HuiteacherMyPrivateFormTasks} from './HuiteacherMyPrivateFormTasks'
+import {SCHOOL_HOST} from '../school/context'
+import {EducationPrivateToolStudio} from '../components/education-tools/EducationPrivateToolStudio'
+import {usePrivateToolCapability,type PrivateDraftState} from '../components/education-tools/privateToolClient'
 import {HuiteacherMyGrowth} from './HuiteacherMyGrowth'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import './huiteacher.css'
 import { HuiteacherFormStudio } from './HuiteacherFormStudio'
@@ -22,14 +26,14 @@ type Me={id:string;username:string;role:string;organizations:Scope[];product:'HU
 type Unit={id:string;unitKind:'GRADE'|'CLASS';name:string;parentUnitId:string|null}
 type Mfa={mfaRequired:true;enrolled:boolean}
 type Screen='home'|'join'|'login'|'mfa'|'register'|'student'|'expert'|'workspace'
-type WorkspaceTab='teacher'|'school'|'expert'|'platform'
+type WorkspaceTab='teacher'|'school'|'expert'|'platform'|'private-tools'
 
 function cookie(name:string){
   const part=document.cookie.split('; ').find(x=>x.startsWith(name+'='))
   if(!part)return ''
   try{return decodeURIComponent(part.slice(name.length+1))}catch{return ''}
 }
-async function teacherApi<T>(path:string,method='GET',data?:unknown):Promise<T>{
+async function teacherApi<T>(path:string,method='GET',data?:unknown,options?:{responseType?:'blob'}):Promise<T>{
   const headers:Record<string,string>={}
   if(method!=='GET'){
     let csrf=cookie('huiteacher_csrf')
@@ -42,12 +46,14 @@ async function teacherApi<T>(path:string,method='GET',data?:unknown):Promise<T>{
     headers['X-CSRF-Token']=csrf
     headers['Content-Type']='application/json'
   }
+  if(data instanceof FormData)delete headers['Content-Type']
   const response=await fetch('/api/huiteacher'+path,{
     method,headers,credentials:'same-origin',
-    ...(data===undefined?{}:{body:JSON.stringify(data)}),
+    ...(data===undefined?{}:{body:data instanceof FormData?data:JSON.stringify(data)}),
   })
+  if(options?.responseType==='blob'&&response.ok)return await response.blob() as T
   const result=await response.json() as Envelope<T>
-  if(!response.ok||result.code!==0)throw new Error(result.message||'请求未能完成')
+  if(!response.ok||result.code!==0)throw Object.assign(new Error(result.message||'请求未能完成'),{code:result.code,data:result.data,status:response.status})
   return result.data
 }
 const Field=({label,value,set,type='text',required=true}:{
@@ -66,6 +72,23 @@ function Brand(){return <div className="ht-brand">
 export default function HuiteacherApp(){
   const appRoot=useRef<HTMLElement>(null)
   const [workspaceTab,setWorkspaceTab]=useState<WorkspaceTab>('teacher')
+  const [formDraftState,setFormDraftState]=useState({dirty:false,writing:false})
+  const privateDraft=useRef<PrivateDraftState>({dirty:false,writing:false})
+  const setPrivateDraftState=useCallback((state:PrivateDraftState)=>{privateDraft.current=state},[])
+  const canLeaveForm=()=>{
+    if(privateDraft.current.writing){setMessage('私有工具正在处理，请等待完成后再离开。');return false}
+    if(privateDraft.current.dirty&&!window.confirm('私有工具草稿尚未保存，确定放弃修改并离开吗？'))return false
+    if(formDraftState.writing){setMessage('表单正在保存或发布，请等待完成后再离开。');return false}
+    return !formDraftState.dirty||window.confirm('当前表单草稿尚未保存，确定放弃修改并离开吗？')
+  }
+  const changeWorkspaceTab=(next:WorkspaceTab)=>{
+    if(next===workspaceTab||!canLeaveForm())return
+    setWorkspaceTab(next)
+  }
+  const changeOrganization=(next:string)=>{
+    if(next===selectedOrg||!canLeaveForm())return
+    setSelectedOrg(next)
+  }
   const [screen,setScreen]=useState<Screen>(()=>['/login','/participate'].includes(window.location.pathname)?'login':'home')
   const [me,setMe]=useState<Me|null>(null)
   const [loading,setLoading]=useState(true)
@@ -101,6 +124,7 @@ export default function HuiteacherApp(){
   const [mfaEnrolled,setMfaEnrolled]=useState(true)
   const [recoveryCodes,setRecoveryCodes]=useState<string[]>([])
   const [selectedOrg,setSelectedOrg]=useState('')
+  const canAuthorPrivateTools=usePrivateToolCapability(teacherApi,selectedOrg,me&&!me.mustChangePassword?me.id:undefined)
   const [units,setUnits]=useState<Unit[]>([])
   const [members,setMembers]=useState<Array<{membershipId:string;loginName:string;role:string}>>([])
   const [newUnitName,setNewUnitName]=useState('')
@@ -149,7 +173,7 @@ export default function HuiteacherApp(){
     if(data.recoveryCodes?.length)setRecoveryCodes(data.recoveryCodes)
     else await reload()
   })
-  const changeScreen=(next:Screen)=>{setMessage('');setScreen(next)}
+  const changeScreen=(next:Screen)=>{if(!canLeaveForm())return;setMessage('');setScreen(next)}
   const org=me?.organizations.find(o=>o.organizationId===selectedOrg)??null
   useEffect(()=>{
     if(!me||!org||me.role==='STUDENT'){setUnits([]);setMembers([]);return}
@@ -231,10 +255,13 @@ export default function HuiteacherApp(){
     setMe(null);setSelectedOrg('');setScreen('login')
     setMessage('教育账号密码已修改，School 和 Teacher 需要分别重新登录')
   })
-  const logout=()=>run(async()=>{
+  const logout=()=>{
+    if(!canLeaveForm())return
+    run(async()=>{
     await teacherApi('/auth/logout','POST',{})
     setMe(null);setSelectedOrg('');setScreen('home');setMessage('')
-  })
+    })
+  }
   const publicHome=!me&&screen==='home'
   const publicAuth=!me&&screen!=='home'
   return <main ref={appRoot} className={`ht-app${!me?' ht-app-public':''}${publicHome?' ht-app-landing':''}`}>
@@ -331,7 +358,7 @@ export default function HuiteacherApp(){
         {me.organizations.length===0?<p className="ht-empty">{me.role==='STUDENT'
           ?'当前没有开通 Huiteacher 的学生评教任务；请使用本校正式邀请补齐学生资格。'
           :'当前没有开通 Huiteacher 的学校任务授权。若拥有个人 Scale 许可，可前往教师成长工作台。'}</p>:
-          <label className="ht-field"><span>当前学校</span><select value={selectedOrg} onChange={e=>setSelectedOrg(e.target.value)}>
+          <label className="ht-field"><span>当前学校管理范围</span><select value={selectedOrg} onChange={e=>changeOrganization(e.target.value)}>
             {me.organizations.map(o=><option key={o.organizationId} value={o.organizationId}>{o.organizationName}</option>)}
           </select></label>}
       </section>
@@ -339,25 +366,30 @@ export default function HuiteacherApp(){
       <>
       <nav className="ht-workspace-tabs" aria-label="Huiteacher 工作台">
         <button type="button" aria-pressed={workspaceTab==='teacher'}
-          onClick={()=>setWorkspaceTab('teacher')}>教师成长</button>
+          onClick={()=>changeWorkspaceTab('teacher')}>教师成长</button>
+        {canAuthorPrivateTools&&<button type="button" aria-pressed={workspaceTab==='private-tools'} onClick={()=>changeWorkspaceTab('private-tools')}>我的工具</button>}
         {me.organizations.some(o=>o.productAdmin)&&<button type="button"
           aria-pressed={workspaceTab==='school'}
-          onClick={()=>setWorkspaceTab('school')}>学校改进</button>}
+          onClick={()=>changeWorkspaceTab('school')}>学校改进</button>}
         <button type="button" aria-pressed={workspaceTab==='expert'}
-          onClick={()=>setWorkspaceTab('expert')}>专家实践</button>
+          onClick={()=>changeWorkspaceTab('expert')}>专家实践</button>
         <button type="button" aria-pressed={workspaceTab==='platform'}
-          onClick={()=>setWorkspaceTab('platform')}>平台治理入口</button>
+          onClick={()=>changeWorkspaceTab('platform')}>平台治理入口</button>
       </nav>
+      {workspaceTab==='private-tools'&&(canAuthorPrivateTools?<><aside className="ht-panel" aria-label="学生测评编制入口提示"><p className="ht-muted">此处自编工具用于 Teacher 教师测评。心理教师为学生编制量表、表单及发布活动，请前往 School 的“我的工具”和活动管理。学校须已开通 School，并授予本人对应权限；使用同一教育账号单独登录，两个入口的私有草稿与固定版本不会自动互通。</p><a href={`https://${SCHOOL_HOST}/login`} target="_blank" rel="noopener noreferrer">前往 School 编制学生测评</a></aside><EducationPrivateToolStudio key={`TEACHER:${me.id}:${selectedOrg}`} api={teacherApi} organizationId={selectedOrg} entry="TEACHER" actorId={me.id} onDraftStateChange={setPrivateDraftState}/></>:<section className="ht-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
       {workspaceTab==='teacher'&&<>
+        <p className="ht-notice">个人空间 · 显示本人各学校的任务与个人测评，不按上方学校筛选。</p>
         <HuiteacherPersonalSelf api={teacherApi}/>
         <HuiteacherMyFormTasks api={teacherApi}/>
-        <HuiteacherMyScaleTasks api={teacherApi}/>
+        <HuiteacherMyPrivateFormTasks key={`private-form:${me.id}`} actorKey={me.id} api={teacherApi}/>
+        <HuiteacherMyScaleTasks key={me.id} api={teacherApi}/>
         {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'
           &&<HuiteacherMyStudentFeedback api={teacherApi}/>}
         {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'
           &&<HuiteacherMyGrowth api={teacherApi}/>}
       </>}
       {workspaceTab==='school'&&org?.productAdmin&&<>
+      <p className="ht-notice">当前学校管理范围：{org.organizationName}。此处仅管理本校已授权的成员、工具与活动。</p>
       {import.meta.env.VITE_REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'&&<details className="ht-panel">
         <summary>评价与报告隐私偏好（只需设置一次）</summary>
         <ReportPrivacyPreferences key={org.organizationId} organizationId={org.organizationId}
@@ -398,10 +430,10 @@ export default function HuiteacherApp(){
       </section>}
         <HuiteacherClassRelationships key={'relations:'+org.organizationId}
           organizationId={org.organizationId} members={members} units={units} api={teacherApi}/>
-        <HuiteacherEvaluationStudio key={'targets:'+org.organizationId}
-          organizationId={org.organizationId} api={teacherApi}/>
+        <HuiteacherEvaluationStudio key={'targets:'+me.id+':'+org.organizationId}
+          organizationId={org.organizationId} api={teacherApi} canAuthorPrivateTools={canAuthorPrivateTools} actorKey={me.id}/>
         <HuiteacherFormStudio key={'forms:'+org.organizationId}
-          organizationId={org.organizationId} api={teacherApi}/>
+          organizationId={org.organizationId} api={teacherApi} onDraftStateChange={setFormDraftState}/>
       </>}
       {workspaceTab==='expert'&&<>
         <HuiteacherFieldWorkspace api={teacherApi}/>

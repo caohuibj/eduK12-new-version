@@ -1,4 +1,5 @@
-import { productionRunResourceAuthorityRegistry, type RunResourceAuthorityRegistry, type RunResourceFamily } from './resourceAuthority'
+import {readEducationScaleExecutionSource} from './educationScaleExecutionSource'
+import { relationalEntryToRunPolicy, productionRunResourceAuthorityRegistry, type RunResourceAuthorityRegistry, type RunResourceFamily } from './resourceAuthority'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -38,6 +39,9 @@ export const freezeRunExecutionScientificProvenanceInTransaction = async (
   registry: RunResourceAuthorityRegistry = productionRunResourceAuthorityRegistry,
 ): Promise<FrozenRunScientificRecord> => {
   const rows = await tx.$queryRaw<Array<{
+    organizationId:string
+    school:boolean
+    teacher:boolean
     resourceFamily: string
     resourceKey: string
     resourceVersion: string
@@ -48,7 +52,10 @@ export const freezeRunExecutionScientificProvenanceInTransaction = async (
     scientificProvenanceHash: string | null
     scientificFrozenAt: Date | null
   }>>`
-    SELECT t."resource_family" AS "resourceFamily", t."resource_key" AS "resourceKey",
+    SELECT e."organization_id" AS "organizationId",
+      EXISTS(SELECT 1 FROM campus_activity_runs school WHERE school.organization_id=e.organization_id AND school.run_id=e.run_id) AS school,
+      EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links teacher WHERE teacher.organization_id=e.organization_id AND teacher.run_id=e.run_id) AS teacher,
+      t."resource_family" AS "resourceFamily", t."resource_key" AS "resourceKey",
       t."resource_version" AS "resourceVersion", t."resource_policy_hash" AS "resourcePolicyHash",
       t."frozen_resource_policy" AS "frozenResourcePolicy", e."scientific_maturity" AS "scientificMaturity",
       e."scientific_provenance" AS "scientificProvenance",
@@ -73,7 +80,20 @@ export const freezeRunExecutionScientificProvenanceInTransaction = async (
   if (!row.resourcePolicyHash || !row.frozenResourcePolicy || typeof row.frozenResourcePolicy !== 'object') {
     throw new RunScientificProvenanceError('RUN_RESOURCE_POLICY_NOT_FROZEN', 'Run resource policy must be frozen before START', 409)
   }
-  const current = await registry.resolveExact({ family: row.resourceFamily as RunResourceFamily, key: row.resourceKey, version: row.resourceVersion })
+  // Private resources intentionally cannot enter the generic registry. Derive
+  // their baseline only from the exact immutable version bound to this real
+  // product execution, not author roles or a caller-supplied trusted flag.
+  const current = row.resourceKey.startsWith('private-scale:') ? await (async () => {
+    if(row.resourceFamily!=='SCALE'||row.school===row.teacher)
+      throw new RunScientificProvenanceError('RUN_PRIVATE_SOURCE_CONTEXT_INVALID','Private Scale requires its actual education workflow')
+    const source=await readEducationScaleExecutionSource(tx,{product:row.school?'SCHOOL':'TEACHER',
+      organizationId:row.organizationId,resourceKey:row.resourceKey,resourceVersion:row.resourceVersion,purpose:'EXISTING_EXECUTION'})
+    const policy=relationalEntryToRunPolicy(source.resourceEntry)
+    if(source.sourceKind!=='AUTHOR_PRIVATE'||canonicalHash(row.frozenResourcePolicy)!==row.resourcePolicyHash
+      ||canonicalHash(policy)!==row.resourcePolicyHash)
+      throw new RunScientificProvenanceError('RUN_PRIVATE_SOURCE_POLICY_MISMATCH','Private Scale source differs from the published frozen policy')
+    return policy
+  })() : await registry.resolveExact({ family: row.resourceFamily as RunResourceFamily, key: row.resourceKey, version: row.resourceVersion })
   const maturity = current.scientificMaturity
   if (typeof maturity !== 'string' || !MATURITIES.has(maturity as RunScientificMaturity)) {
     throw new RunScientificProvenanceError('RUN_SCIENCE_MATURITY_INVALID', 'frozen resource policy has no valid scientific maturity', 409)

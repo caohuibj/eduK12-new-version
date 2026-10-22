@@ -1,3 +1,4 @@
+import { listAssignedRunTasks } from '../../modules/assessment-run/productRead'
 import { prisma } from '../../config/database'
 import * as runtimeSecurity from '../../modules/assessment-runtime/security'
 import { randomUUID } from 'node:crypto'
@@ -228,6 +229,14 @@ suite('Teacher-only Survey Form V2 released resource → Run START → encrypted
     })).status).toBe('COMPLETED')
     const closed=await closeTeacherRun(key)
     expect(closed.status).toBe('CLOSED')
+    // Campus continuation is opt-in and SQL-bound to a campus Activity. Even
+    // accidentally passing it here cannot change Teacher FORM history.
+    const formTasks=await listAssignedRunTasks(admin.id,{runIds:[created.runId]})
+    expect(formTasks.list).toHaveLength(1)
+    expect(formTasks.list[0]).toMatchObject({resourceFamily:'FORM',status:'COMPLETED'})
+    expect(await listAssignedRunTasks(admin.id,{
+      runIds:[created.runId],preserveBoundSchoolContinuation:true,
+    })).toEqual(formTasks)
     await transitionHuiteacherEvent({
       organizationId:organization.id,actorUserId:admin.id,eventId:event.id,
       action:'CLOSE',expectedVersion:2,

@@ -6,6 +6,7 @@ type TeacherRunTask={
   executionId:string;runId:string;organizationId:string;activityId:string
   activityTitle:string;runTitle:string;studentReference:string
   status:string;deadline:string|null
+  canResumeExisting?:boolean
   consentRequired:boolean;consentPurpose:string|null;consentVisibility:string|null
 }
 type Inbox={list:TeacherRunTask[];truncated:boolean}
@@ -51,7 +52,7 @@ export function SchoolTeacherTasks({api,organizationId}:{api:SchoolApi;organizat
             <button disabled={busy} onClick={()=>setActive({
               organizationId:item.organizationId,courseId:item.activityId,
               runId:item.runId,executionId:item.executionId,
-              consentRequired:item.consentRequired,
+              resumeExisting:item.canResumeExisting===true,consentRequired:item.consentRequired,
               consentPurpose:item.consentPurpose,consentVisibility:item.consentVisibility,
             })}>开始／继续教师观察测评</button>}
           {item.status==='COMPLETED'&&<p>已完成。学生个人心理结果不会因教师作答自动开放。</p>}

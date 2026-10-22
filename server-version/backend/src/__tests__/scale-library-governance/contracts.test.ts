@@ -27,3 +27,29 @@ describe('exact scale library contracts',()=>{
   expect(snapshot.ref.sourceId).toBe('library:'+id)
  })
 })
+
+describe('education library scope foundation',()=>{
+ it('preserves legacy grants but rejects education scope smuggling into legacy products',()=>{
+  expect(distributionInput.parse({requestId:id,userId:id,product:'TRAINING'})).toMatchObject({scopeKind:'USER'})
+  for(const extra of [{organizationId:id},{scopeKind:'ORGANIZATION'},{scopeId:id}]){
+   expect(distributionInput.safeParse({requestId:id,userId:id,product:'SURVEY',...extra}).success).toBe(false)
+  }
+ })
+ it('requires explicit education product, organization and bounded target',()=>{
+  for(const product of ['SCHOOL','TEACHER']){
+   expect(distributionInput.safeParse({requestId:id,userId:id,product}).success).toBe(false)
+   expect(distributionInput.safeParse({requestId:id,userId:id,product,scopeKind:'USER',organizationId:id}).success).toBe(true)
+   expect(distributionInput.safeParse({requestId:id,product,scopeKind:'USER',organizationId:id}).success).toBe(false)
+   expect(distributionInput.safeParse({requestId:id,product,scopeKind:'ORGANIZATION',organizationId:id}).success).toBe(true)
+   expect(distributionInput.safeParse({requestId:id,userId:null,product,scopeKind:'ORGANIZATION',organizationId:id}).success).toBe(true)
+   expect(distributionInput.safeParse({requestId:id,userId:id,product,scopeKind:'ORGANIZATION',organizationId:id}).success).toBe(false)
+  }
+ })
+ it('does not advertise runnable education entrypoints before their adapters are connected',()=>{
+  const compiled=compileResearchScale('合成量表',display)
+  const compatibility=libraryCompatibility({product:'SURVEY',title:'合成量表',instrumentClass:'CUSTOM_DESCRIPTIVE',definition:display,compiledDefinition:compiled})
+  expect(compatibility.supportedEntrypoints).toEqual(['TRAINING','SURVEY'])
+  expect(compatibility.compatibilityReasons).toMatchObject({SCHOOL:'EDUCATION_LIBRARY_APPLICABILITY_REQUIRED',TEACHER:'EDUCATION_LIBRARY_APPLICABILITY_REQUIRED'})
+  expect(compatibility.educationDistribution).toMatchObject({status:'NOT_READY',canDistribute:false,contentCompatible:false})
+ })
+})

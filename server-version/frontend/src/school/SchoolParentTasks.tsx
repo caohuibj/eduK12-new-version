@@ -5,6 +5,7 @@ import { SchoolCompositeRunner,type CampusExecutionRef } from './SchoolComposite
 type ParentRunTask={
   executionId:string;runId:string;organizationId:string;activityId:string
   activityTitle:string;runTitle:string;status:string;deadline:string|null
+  canResumeExisting?:boolean
   consentRequired:boolean;consentPurpose:string|null;consentVisibility:string|null
 }
 export function SchoolParentTasks({api}:{api:SchoolApi}){
@@ -36,7 +37,7 @@ export function SchoolParentTasks({api}:{api:SchoolApi}){
           <button onClick={()=>setActive({
             organizationId:task.organizationId,courseId:task.activityId,
             runId:task.runId,executionId:task.executionId,
-            consentRequired:task.consentRequired,
+            resumeExisting:task.canResumeExisting===true,consentRequired:task.consentRequired,
             consentPurpose:task.consentPurpose,
             consentVisibility:task.consentVisibility,
           })}>开始／继续校园正式测评</button>}

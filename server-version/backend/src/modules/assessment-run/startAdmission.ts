@@ -175,6 +175,8 @@ export const loadRunExecutionStartAdmission = async (input: {
   if (assignment.respondentUserId !== input.actorUserId) {
     throw new RunStartAdmissionError('RUN_EXECUTION_ACTOR', 'assignment respondent does not match frozen Run respondent', 403)
   }
+  if(assignment.resourceKey.startsWith('private-form:'))
+    throw new RunStartAdmissionError('PRIVATE_FORM_ACTIVITY_RUNTIME_NOT_READY','Private form execution adapter is not ready',409)
   if (assignment.status === 'REVOKED' || assignment.status === 'EXPIRED' || assignment.status === 'COMPLETED') {
     throw new RunStartAdmissionError('RUN_ASSIGNMENT_NOT_STARTABLE', 'Run assignment is not startable', 409)
   }
