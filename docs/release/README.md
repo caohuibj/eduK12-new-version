@@ -751,3 +751,28 @@ scope、admin-authenticator（含全部内部作业）、codeql 实际成功；d
 完整组件 tree 以及解包后的实际编译文件摘要，复用原编译与审计，不重复运行。
 原应用 SAST 经官方元数据核验接纳；只对变化的 CI 控制脚本执行新的 JS/TS CodeQL。
 任何缺失/失效/漂移证据直接阻断，不回退重新构建或全平台检查。
+
+## Training 学员与编制页面的小范围后续（2026-10-22）
+
+用户批准 review、push、合并，并明确要求本批轻量 CI，复用有效本地结果。
+`work/training-student-20261022` 仅接纳 `training-student-bindings.json` 列出的
+25 个产品路径及明列控制/证据文件，以当前官方 main 为固定 base；整个前后端
+component tree、依赖、schema、配置和原始证据摘要绑定。未知路径、模式、base、
+组件或证据变化直接失败，不回退全平台。PR checkout 必须与实际 PR source tree
+一致；main 合并后只分类，不重复资格检查。手动 full/probe 对本分支拒绝。
+
+复用证据为经本次对话审阅的本地摘要及保留的原始日志，标为
+`reviewed-local-evidence`、`originalExecutionSigned=false`、`ciExecuted=false`。
+旧视频调用的失败清理 hook 和筛选重试保留原身份，只接纳实际通过部分；不同
+检查的数量可能重叠，不伪造总断言数。不上传用户作答、账号凭据或生产数据。
+本次明确接纳这些已审阅的有限历史断言，不扩大原 Ed25519 用途，也不称这些
+测试重新在 Actions 执行。浏览器替身数据不代表新后端权限端到端验收。
+
+缺失项在 Actions 一处补齐：新控制的范围/拒绝/证据篡改/严格汇总契约、合并后
+frontend app types、一次 frontend production build、backend types（仅生成
+Prisma client，不连接数据库）和变化源码/控制的 JS/TS CodeQL。锁文件和数据库
+schema 未由本批修改，不重新审计依赖、创建 DB、跑迁移或重建镜像，不运行全量
+单测/浏览器/媒体/性能/Ops。约五分钟报告实际等待阶段；admission 五分钟、编译
+每组件八分钟，CodeQL 保留既有时限。这里的编译产物不授予生产部署资格。
+稳定 `merge gate / ready PR` 仍要求 scope、完整 training-workspace 和 codeql
+真实 success，并重算实际 checkout 的计划；draft、缺失、跳过或失败均拒绝。

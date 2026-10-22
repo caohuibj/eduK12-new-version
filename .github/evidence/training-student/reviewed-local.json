@@ -1,0 +1,1068 @@
+{
+  "schema": 1,
+  "kind": "reviewed-local-evidence",
+  "originalExecutionSigned": false,
+  "ciExecuted": false,
+  "reviewedProduct": "17c9e3bda897862cd6625ed42feef26e785fcf68",
+  "reports": {
+    "training-fixes-validation.json": {
+      "originalReportSha256": "930cf1047c9d8b41bcd4495d3696835d1a3cd1d7517cb86089ae19aec54c26a3",
+      "originalReportIsPrivateLocal": true,
+      "reviewed": {
+        "scope": "Training student archived attempts and shared assessment video loading",
+        "base": "abade96de544593d0fe67453e4c48a0b478cbe67",
+        "baselineFailures": {
+          "video": "baseline-video.log: completion and replay both reproduced stuck loading",
+          "archived": "baseline-archived.log: published-only query rejected archived-history regression"
+        },
+        "passed": {
+          "frontendDistinctAssertions": 22,
+          "backendAvailabilityAssertions": 11,
+          "realPostgresScenarios": 4,
+          "frontendRuns": [
+            "fixed-frontend-01.log (19 passed, one test-hook cleanup failure)",
+            "fixed-frontend-remaining.log (failed hook repaired; one retry and two new cases passed)"
+          ],
+          "backendRuns": [
+            "fixed-backend-availability.log",
+            "archived-postgres-01.log (3 passed)",
+            "archived-emergency-postgres.log (one new case passed, previous three filtered)"
+          ],
+          "types": [
+            "fixed-backend-types.log",
+            "fixed-frontend-types.log"
+          ],
+          "changedFrontendLint": "fixed-frontend-lint.log",
+          "actualChromePlayback": {
+            "checks": {
+              "fullPlayback": {
+                "duration": 10,
+                "currentTime": 10,
+                "playbackRate": 1,
+                "ended": true,
+                "playedStart": 0,
+                "playedEnd": 10
+              },
+              "completionDoesNotReload": true,
+              "replayWithoutStuckLoading": true,
+              "changedSourceReadyAndRequiresViewing": true
+            },
+            "pageErrors": [],
+            "externalRequests": [],
+            "result": "PASS"
+          }
+        },
+        "limits": [
+          "Local development evidence; no CI or production qualification",
+          "Course membership was checked for list discovery; request authorization policies were not rewritten",
+          "Existing draft expiry/deadline and viewing-completion criteria unchanged",
+          "One initial permission-review timeout did not launch the PostgreSQL test; the single retry completed",
+          "Synthetic video harness removed; no media upload or processing worker ran"
+        ],
+        "head": "af93da3544faa3519907dad086bb46d7c581284d"
+      }
+    },
+    "composition-report-boundary-validation.json": {
+      "originalReportSha256": "c35f3231b841cf75c8b50701c26fceb0748224b742118c29d94943035c0ba8ec",
+      "originalReportIsPrivateLocal": true,
+      "reviewed": {
+        "commit": "7bb34e64b43f329f948f97d8c289b495bf466f6a",
+        "scope": "Restore ordinary questionnaire creation and distinguish fixed integrated-report bundles; strengthen service-layer immutability",
+        "checks": {
+          "frontendTargetedTests": 19,
+          "backendCompositeTests": 58,
+          "frontendAppTypecheck": "PASS",
+          "backendTypecheck": "PASS",
+          "changedFrontendLint": "PASS",
+          "diffWhitespace": "PASS",
+          "browserAndApi": {
+            "result": "PASS",
+            "reusedApiEvidence": "composition-report-boundary-api-and-initial-ui.json (successful API checks and completed cleanup only)",
+            "checks": {
+              "ordinaryCreateAndSave": true,
+              "fixedDefinitionUnchanged": true,
+              "fixedWritesDenied": [
+                {
+                  "path": "/composite-assessments/:fixedId",
+                  "status": 409
+                },
+                {
+                  "path": "/composite-assessments/:fixedId/form-sections",
+                  "status": 409
+                },
+                {
+                  "path": "/questionnaire-products/:fixedId/copy",
+                  "status": 400
+                },
+                {
+                  "path": "/questionnaire-products/:fixedId",
+                  "status": 404
+                }
+              ],
+              "ordinaryCreationMenu": true,
+              "cardTypesAndFixedActions": true,
+              "ordinaryCardEditor": true,
+              "mobileNoHorizontalOverflow": true
+            },
+            "cleanup": {
+              "created": 2,
+              "deleted": 2
+            }
+          }
+        },
+        "notes": [
+          "HTTP legacy composite route already blocks QUESTIONNAIRE and ASSESSMENT_BUNDLE writes; new checks additionally protect direct internal service calls.",
+          "Backend test process must start with COGNITIVE_MODULE_ENABLED=true; initial invocation omitted this fixture precondition and failed, corrected invocation passed all 58.",
+          "Initial browser fixture lacked an API envelope message field; corrected UI-only verification passed, reusing completed real API checks and exact cleanup evidence.",
+          "Fixed bundle fixture verified type/immutability boundaries; full integrated report generation was not rerun."
+        ],
+        "inputs": {
+          "server-version/backend/src/__tests__/composite/copy.service.test.ts": "eb371fec17f32bb54282d97cdf8f54046390e6eedefdf6aa92c41098262fb504",
+          "server-version/backend/src/modules/composite/composite.service.ts": "ac7b3154b5346ebbdc26589d4894f6aa39bc239d6b5a4d69df03f98404c23f34",
+          "server-version/backend/src/modules/composite/final-submit.service.ts": "729bf0a6c05f1e9c8d0cd0d15a11787b0d0f56349d3ac812a07ac9c641650672",
+          "server-version/frontend/src/training/TrainingLibrary.test.tsx": "bf887d1e62a6abb1fca4eb14babecf0aeb957b465029d6d1182825cd40608392",
+          "server-version/frontend/src/training/TrainingLibrary.tsx": "235335b8430dc1f429d76597ab37b8848a34831257745293006bf4e3e9d3a317",
+          "server-version/frontend/src/training/TrainingSjtAuthoringAccess.tsx": "2d4c8787a1cfe2c104ceed9178ab35e9d02bc46ab54979a67c90abefa8fc23a6"
+        }
+      }
+    },
+    "questionnaire-editor-validation.json": {
+      "originalReportSha256": "e227c180a12591139d867f340fa58f1912c20a8e049737119ff1c47b70be75e9",
+      "originalReportIsPrivateLocal": true,
+      "reviewed": {
+        "commit": "3e49e85beeddab725b502d2a199e1b87ed7461bb",
+        "scope": "Training questionnaire content-step UI and isolated local frontend cognitive build flag",
+        "checks": {
+          "targetedTests": {
+            "passed": 27,
+            "evidence": "26 passed in selected guided editor, automatic Form stages and independent Form tests; corrected one new empty-catalog selector and reran only that case successfully"
+          },
+          "frontendAppTypecheck": "PASS",
+          "changedFrontendLint": "PASS",
+          "diffWhitespace": "PASS",
+          "browser": {
+            "checks": {
+              "actualCognitiveEntryEnabled": true,
+              "actualEmptyCatalogExplained": true,
+              "mobileNoHorizontalOverflow": true,
+              "authorizedTaskFixtureSelectAndAdd": {
+                "revision": 0,
+                "cognitiveAssignmentId": "synthetic-cognitive",
+                "serverWriteIntercepted": true
+              },
+              "userQuestionnaireUnchanged": true
+            },
+            "pageErrors": [],
+            "result": "PASS"
+          }
+        },
+        "limitations": [
+          "Real local authorized published cognitive assignment catalog is empty, and published config catalog is empty. Selection/addition was verified using intercepted browser fixtures and existing revisioned API unit tests; no cognitive tasks were created or published."
+        ],
+        "inputs": {
+          "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": "54f68adc57506895cc4c5b0cf894131f7b93bb69425fefc394c20e0c83fab5d0",
+          "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx": "e69b4e47c391bd968787b15ee127db1d1ff7955a9d7edbe9eff7385e41216379",
+          "server-version/frontend/src/pages/questionnaire/questionnaire-content-editor.css": "7f8848a8b1c1128dc900531fa41f8390d551e39a86692a958ff6e7bb66982e5a"
+        }
+      }
+    },
+    "form-editor-browser-validation.json": {
+      "originalReportSha256": "d30d68b43f2bd8e1da5356f14b75627d405721f9d90cc796911e2fd7b5f9866d",
+      "originalReportIsPrivateLocal": true,
+      "reviewed": {
+        "checks": {
+          "actualForm": {
+            "metadataCollapsed": true,
+            "editorInFirstViewport": true,
+            "metadataPreserved": true,
+            "optionalRulesExpandable": true,
+            "choiceEditorAvailable": true
+          },
+          "mobileNoHorizontalOverflow": true,
+          "mobileEmptyEditorInFirstViewport": true,
+          "populatedFixture": {
+            "selectEditAndCancel": true,
+            "unsavedEditProtected": true,
+            "mobileNoHorizontalOverflow": true
+          },
+          "userFormUnchanged": true
+        },
+        "pageErrors": [],
+        "blockedWrites": [],
+        "result": "PASS"
+      }
+    },
+    "form-edge-validation.json": {
+      "originalReportSha256": "954bf50752fb9b44642e763df63e4dec3f70fba47e5086bd53cb39e7efd48f0d",
+      "originalReportIsPrivateLocal": true,
+      "reviewed": {
+        "checks": [
+          {
+            "width": 390,
+            "viewport": 390,
+            "scrollWidth": 390,
+            "page": {
+              "left": 16,
+              "right": 374,
+              "width": 358,
+              "visible": true
+            },
+            "info": {
+              "left": 16,
+              "right": 374,
+              "width": 358,
+              "visible": true
+            },
+            "content": {
+              "left": 16,
+              "right": 374,
+              "width": 358,
+              "visible": true
+            },
+            "builder": {
+              "left": 16,
+              "right": 374,
+              "width": 358,
+              "visible": true
+            },
+            "directory": {
+              "left": 0,
+              "right": 0,
+              "width": 0,
+              "visible": false
+            },
+            "editor": {
+              "left": 16,
+              "right": 374,
+              "width": 358,
+              "visible": true
+            },
+            "workspaceBackground": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 768,
+            "viewport": 768,
+            "scrollWidth": 768,
+            "page": {
+              "left": 24,
+              "right": 744,
+              "width": 720,
+              "visible": true
+            },
+            "info": {
+              "left": 24,
+              "right": 744,
+              "width": 720,
+              "visible": true
+            },
+            "content": {
+              "left": 24,
+              "right": 744,
+              "width": 720,
+              "visible": true
+            },
+            "builder": {
+              "left": 24,
+              "right": 744,
+              "width": 720,
+              "visible": true
+            },
+            "directory": {
+              "left": 24,
+              "right": 744,
+              "width": 720,
+              "visible": true
+            },
+            "editor": {
+              "left": 24,
+              "right": 744,
+              "width": 720,
+              "visible": true
+            },
+            "workspaceBackground": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 1024,
+            "viewport": 1024,
+            "scrollWidth": 1024,
+            "page": {
+              "left": 32,
+              "right": 992,
+              "width": 960,
+              "visible": true
+            },
+            "info": {
+              "left": 32,
+              "right": 992,
+              "width": 960,
+              "visible": true
+            },
+            "content": {
+              "left": 32,
+              "right": 992,
+              "width": 960,
+              "visible": true
+            },
+            "builder": {
+              "left": 32,
+              "right": 992,
+              "width": 960,
+              "visible": true
+            },
+            "directory": {
+              "left": 32,
+              "right": 291.4375,
+              "width": 259.4375,
+              "visible": true
+            },
+            "editor": {
+              "left": 313.4375,
+              "right": 992,
+              "width": 678.5625,
+              "visible": true
+            },
+            "workspaceBackground": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 1440,
+            "viewport": 1440,
+            "scrollWidth": 1440,
+            "page": {
+              "left": 80,
+              "right": 1360,
+              "width": 1280,
+              "visible": true
+            },
+            "info": {
+              "left": 80,
+              "right": 1360,
+              "width": 1280,
+              "visible": true
+            },
+            "content": {
+              "left": 80,
+              "right": 1360,
+              "width": 1280,
+              "visible": true
+            },
+            "builder": {
+              "left": 80,
+              "right": 1360,
+              "width": 1280,
+              "visible": true
+            },
+            "directory": {
+              "left": 80,
+              "right": 427.953125,
+              "width": 347.953125,
+              "visible": true
+            },
+            "editor": {
+              "left": 449.953125,
+              "right": 1360,
+              "width": 910.046875,
+              "visible": true
+            },
+            "workspaceBackground": "rgba(0, 0, 0, 0)"
+          },
+          {
+            "width": 1920,
+            "viewport": 1920,
+            "scrollWidth": 1920,
+            "page": {
+              "left": 320,
+              "right": 1600,
+              "width": 1280,
+              "visible": true
+            },
+            "info": {
+              "left": 320,
+              "right": 1600,
+              "width": 1280,
+              "visible": true
+            },
+            "content": {
+              "left": 320,
+              "right": 1600,
+              "width": 1280,
+              "visible": true
+            },
+            "builder": {
+              "left": 320,
+              "right": 1600,
+              "width": 1280,
+              "visible": true
+            },
+            "directory": {
+              "left": 320,
+              "right": 667.953125,
+              "width": 347.953125,
+              "visible": true
+            },
+            "editor": {
+              "left": 689.953125,
+              "right": 1600,
+              "width": 910.046875,
+              "visible": true
+            },
+            "workspaceBackground": "rgba(0, 0, 0, 0)"
+          }
+        ],
+        "result": "PASS"
+      }
+    },
+    "tool-picker-layout-validation.json": {
+      "originalReportSha256": "b5b0ee38d0f26e9f8c226c781428d1d786795faec9c960b5d39dfe49c52e2c5a",
+      "originalReportIsPrivateLocal": true,
+      "reviewed": {
+        "result": "PASS",
+        "checks": [
+          {
+            "label": "empty-desktop",
+            "width": 1440,
+            "height": 1000,
+            "panel": {
+              "left": 80,
+              "right": 1360,
+              "top": 50,
+              "bottom": 950,
+              "width": 1280,
+              "height": 900,
+              "center": 500
+            },
+            "input": {
+              "left": 156,
+              "right": 1315,
+              "top": 157.390625,
+              "bottom": 211.390625,
+              "width": 1159,
+              "height": 54,
+              "center": 184.390625
+            },
+            "icon": {
+              "left": 125,
+              "right": 144,
+              "top": 174.890625,
+              "bottom": 193.890625,
+              "width": 19,
+              "height": 19,
+              "center": 184.390625
+            },
+            "footer": {
+              "left": 108,
+              "right": 1332,
+              "top": 859,
+              "bottom": 922,
+              "width": 1224,
+              "height": 63,
+              "center": 890.5
+            },
+            "inputBorder": "0px",
+            "inputMargin": "0px",
+            "horizontalOverflow": false
+          },
+          {
+            "label": "empty-mobile",
+            "width": 390,
+            "height": 844,
+            "panel": {
+              "left": 10,
+              "right": 380,
+              "top": 14,
+              "bottom": 830,
+              "width": 370,
+              "height": 816,
+              "center": 422
+            },
+            "input": {
+              "left": 74,
+              "right": 347,
+              "top": 139.28125,
+              "bottom": 193.28125,
+              "width": 273,
+              "height": 54,
+              "center": 166.28125
+            },
+            "icon": {
+              "left": 43,
+              "right": 62,
+              "top": 156.78125,
+              "bottom": 175.78125,
+              "width": 19,
+              "height": 19,
+              "center": 166.28125
+            },
+            "footer": {
+              "left": 26,
+              "right": 364,
+              "top": 747,
+              "bottom": 810,
+              "width": 338,
+              "height": 63,
+              "center": 778.5
+            },
+            "inputBorder": "0px",
+            "inputMargin": "0px",
+            "horizontalOverflow": false
+          },
+          {
+            "label": "cards-desktop",
+            "width": 1440,
+            "height": 900,
+            "panel": {
+              "left": 80,
+              "right": 1360,
+              "top": 32,
+              "bottom": 868,
+              "width": 1280,
+              "height": 836,
+              "center": 450
+            },
+            "input": {
+              "left": 156,
+              "right": 1315,
+              "top": 139.390625,
+              "bottom": 193.390625,
+              "width": 1159,
+              "height": 54,
+              "center": 166.390625
+            },
+            "icon": {
+              "left": 125,
+              "right": 144,
+              "top": 156.890625,
+              "bottom": 175.890625,
+              "width": 19,
+              "height": 19,
+              "center": 166.390625
+            },
+            "footer": {
+              "left": 108,
+              "right": 1332,
+              "top": 777,
+              "bottom": 840,
+              "width": 1224,
+              "height": 63,
+              "center": 808.5
+            },
+            "inputBorder": "0px",
+            "inputMargin": "0px",
+            "horizontalOverflow": false
+          },
+          {
+            "label": "search-mobile",
+            "width": 390,
+            "height": 700,
+            "panel": {
+              "left": 10,
+              "right": 380,
+              "top": 14,
+              "bottom": 686,
+              "width": 370,
+              "height": 672,
+              "center": 350
+            },
+            "input": {
+              "left": 74,
+              "right": 347,
+              "top": 139.28125,
+              "bottom": 193.28125,
+              "width": 273,
+              "height": 54,
+              "center": 166.28125
+            },
+            "icon": {
+              "left": 43,
+              "right": 62,
+              "top": 156.78125,
+              "bottom": 175.78125,
+              "width": 19,
+              "height": 19,
+              "center": 166.28125
+            },
+            "footer": {
+              "left": 26,
+              "right": 364,
+              "top": 603,
+              "bottom": 666,
+              "width": 338,
+              "height": 63,
+              "center": 634.5
+            },
+            "inputBorder": "0px",
+            "inputMargin": "0px",
+            "horizontalOverflow": false
+          },
+          {
+            "label": "scale-desktop",
+            "width": 1440,
+            "height": 900,
+            "panel": {
+              "left": 80,
+              "right": 1360,
+              "top": 32,
+              "bottom": 868,
+              "width": 1280,
+              "height": 836,
+              "center": 450
+            },
+            "input": {
+              "left": 156,
+              "right": 1315,
+              "top": 139.390625,
+              "bottom": 193.390625,
+              "width": 1159,
+              "height": 54,
+              "center": 166.390625
+            },
+            "icon": {
+              "left": 125,
+              "right": 144,
+              "top": 156.890625,
+              "bottom": 175.890625,
+              "width": 19,
+              "height": 19,
+              "center": 166.390625
+            },
+            "footer": {
+              "left": 108,
+              "right": 1332,
+              "top": 777,
+              "bottom": 840,
+              "width": 1224,
+              "height": 63,
+              "center": 808.5
+            },
+            "inputBorder": "0px",
+            "inputMargin": "0px",
+            "horizontalOverflow": false
+          },
+          {
+            "label": "situational-desktop",
+            "width": 1440,
+            "height": 900,
+            "panel": {
+              "left": 80,
+              "right": 1360,
+              "top": 32,
+              "bottom": 868,
+              "width": 1280,
+              "height": 836,
+              "center": 450
+            },
+            "input": {
+              "left": 156,
+              "right": 1315,
+              "top": 139.390625,
+              "bottom": 193.390625,
+              "width": 1159,
+              "height": 54,
+              "center": 166.390625
+            },
+            "icon": {
+              "left": 125,
+              "right": 144,
+              "top": 156.890625,
+              "bottom": 175.890625,
+              "width": 19,
+              "height": 19,
+              "center": 166.390625
+            },
+            "footer": {
+              "left": 108,
+              "right": 1332,
+              "top": 777,
+              "bottom": 840,
+              "width": 1224,
+              "height": 63,
+              "center": 808.5
+            },
+            "inputBorder": "0px",
+            "inputMargin": "0px",
+            "horizontalOverflow": false
+          },
+          {
+            "label": "form-desktop",
+            "width": 1440,
+            "height": 900,
+            "panel": {
+              "left": 80,
+              "right": 1360,
+              "top": 32,
+              "bottom": 868,
+              "width": 1280,
+              "height": 836,
+              "center": 450
+            },
+            "input": {
+              "left": 156,
+              "right": 1315,
+              "top": 141.25,
+              "bottom": 195.25,
+              "width": 1159,
+              "height": 54,
+              "center": 168.25
+            },
+            "icon": {
+              "left": 125,
+              "right": 144,
+              "top": 158.75,
+              "bottom": 177.75,
+              "width": 19,
+              "height": 19,
+              "center": 168.25
+            },
+            "footer": {
+              "left": 108,
+              "right": 1332,
+              "top": 777,
+              "bottom": 840,
+              "width": 1224,
+              "height": 63,
+              "center": 808.5
+            },
+            "inputBorder": "0px",
+            "inputMargin": "0px",
+            "horizontalOverflow": false
+          },
+          {
+            "label": "bundle-scale-desktop",
+            "width": 1440,
+            "height": 900,
+            "panel": {
+              "left": 80,
+              "right": 1360,
+              "top": 32,
+              "bottom": 868,
+              "width": 1280,
+              "height": 836,
+              "center": 450
+            },
+            "input": {
+              "left": 156,
+              "right": 1315,
+              "top": 151.890625,
+              "bottom": 205.890625,
+              "width": 1159,
+              "height": 54,
+              "center": 178.890625
+            },
+            "icon": {
+              "left": 125,
+              "right": 144,
+              "top": 169.390625,
+              "bottom": 188.390625,
+              "width": 19,
+              "height": 19,
+              "center": 178.890625
+            },
+            "footer": {
+              "left": 108,
+              "right": 1332,
+              "top": 779,
+              "bottom": 840,
+              "width": 1224,
+              "height": 61,
+              "center": 809.5
+            },
+            "inputBorder": "0px",
+            "inputMargin": "0px",
+            "horizontalOverflow": false
+          }
+        ],
+        "pageErrors": []
+      }
+    },
+    "student-home-conditional-validation.json": {
+      "originalReportSha256": "40502ee109ff8a2a0bc4cb58ab3f19206eefaeb6098cf03c908b390cc57f954b",
+      "originalReportIsPrivateLocal": true,
+      "reviewed": {
+        "head": "4158f440a4296fe72415932a0635a06291fb814d",
+        "status": "passed",
+        "checks": [
+          {
+            "name": "desktop-empty",
+            "viewport": 1440,
+            "document": 1440,
+            "hero": {
+              "x": 124,
+              "y": 118.046875,
+              "w": 1192,
+              "h": 403.765625
+            },
+            "courses": null,
+            "guide": {
+              "x": 165,
+              "y": 373.71875,
+              "w": 1110,
+              "h": 111.09375
+            },
+            "guideInsideHero": true,
+            "cards": []
+          },
+          {
+            "name": "join-dialog-focus-escape",
+            "passed": true
+          },
+          {
+            "name": "mobile-empty",
+            "viewport": 390,
+            "document": 390,
+            "hero": {
+              "x": 16,
+              "y": 93,
+              "w": 358,
+              "h": 628.78125
+            },
+            "courses": null,
+            "guide": {
+              "x": 41,
+              "y": 383.1875,
+              "w": 308,
+              "h": 309.59375
+            },
+            "guideInsideHero": true,
+            "cards": []
+          },
+          {
+            "name": "narrow-empty",
+            "viewport": 320,
+            "document": 320,
+            "hero": {
+              "x": 16,
+              "y": 93,
+              "w": 288,
+              "h": 691.78125
+            },
+            "courses": null,
+            "guide": {
+              "x": 41,
+              "y": 383.1875,
+              "w": 238,
+              "h": 372.59375
+            },
+            "guideInsideHero": true,
+            "cards": []
+          },
+          {
+            "name": "join-error-retains-dialog",
+            "passed": true,
+            "mocked": true
+          },
+          {
+            "name": "desktop-single",
+            "viewport": 1440,
+            "document": 1440,
+            "hero": null,
+            "courses": {
+              "x": 124,
+              "y": 118.046875,
+              "w": 1192,
+              "h": 311.890625
+            },
+            "guide": null,
+            "guideInsideHero": false,
+            "cards": [
+              {
+                "w": 1192,
+                "overflow": false
+              }
+            ]
+          },
+          {
+            "name": "desktop-courses",
+            "viewport": 1440,
+            "document": 1440,
+            "hero": null,
+            "courses": {
+              "x": 124,
+              "y": 118.046875,
+              "w": 1192,
+              "h": 898.078125
+            },
+            "guide": null,
+            "guideInsideHero": false,
+            "cards": [
+              {
+                "w": 382.65625,
+                "overflow": false
+              },
+              {
+                "w": 382.671875,
+                "overflow": false
+              },
+              {
+                "w": 382.65625,
+                "overflow": false
+              },
+              {
+                "w": 382.65625,
+                "overflow": false
+              },
+              {
+                "w": 382.671875,
+                "overflow": false
+              },
+              {
+                "w": 382.65625,
+                "overflow": false
+              }
+            ]
+          },
+          {
+            "name": "cursor-pagination-preserves-courses",
+            "passed": true,
+            "mocked": true
+          },
+          {
+            "name": "tablet-courses",
+            "viewport": 768,
+            "document": 768,
+            "hero": null,
+            "courses": {
+              "x": 24,
+              "y": 82.046875,
+              "w": 720,
+              "h": 1592.265625
+            },
+            "guide": null,
+            "guideInsideHero": false,
+            "cards": [
+              {
+                "w": 349,
+                "overflow": false
+              },
+              {
+                "w": 349,
+                "overflow": false
+              },
+              {
+                "w": 349,
+                "overflow": false
+              },
+              {
+                "w": 349,
+                "overflow": false
+              },
+              {
+                "w": 349,
+                "overflow": false
+              },
+              {
+                "w": 349,
+                "overflow": false
+              },
+              {
+                "w": 349,
+                "overflow": false
+              }
+            ]
+          },
+          {
+            "name": "mobile-courses",
+            "viewport": 390,
+            "document": 390,
+            "hero": null,
+            "courses": {
+              "x": 16,
+              "y": 57,
+              "w": 358,
+              "h": 2646.6875
+            },
+            "guide": null,
+            "guideInsideHero": false,
+            "cards": [
+              {
+                "w": 358,
+                "overflow": false
+              },
+              {
+                "w": 358,
+                "overflow": false
+              },
+              {
+                "w": 358,
+                "overflow": false
+              },
+              {
+                "w": 358,
+                "overflow": false
+              },
+              {
+                "w": 358,
+                "overflow": false
+              },
+              {
+                "w": 358,
+                "overflow": false
+              },
+              {
+                "w": 358,
+                "overflow": false
+              }
+            ]
+          },
+          {
+            "name": "mobile-error",
+            "viewport": 390,
+            "document": 390,
+            "hero": null,
+            "courses": {
+              "x": 16,
+              "y": 93,
+              "w": 358,
+              "h": 326.640625
+            },
+            "guide": null,
+            "guideInsideHero": false,
+            "cards": []
+          },
+          {
+            "name": "error-retry-restores-page",
+            "passed": true,
+            "mocked": true
+          }
+        ],
+        "unitTests": {
+          "files": 2,
+          "passed": 14
+        },
+        "pageErrors": [],
+        "appTypecheck": "passed",
+        "inputs": {
+          "server-version/frontend/src/training/TrainingLearnerHome.tsx": "9c5bde57a9d3dcbabf5482a89c2162e04f9a375530cac320fa7cc032694255ff",
+          "server-version/frontend/src/training/TrainingScreens.test.tsx": "f5c06c8f2e2068ac725a20c5e40c7aec779b7fdbcc377218a26357554d3fee01",
+          "server-version/frontend/src/training/training-learner-home.css": "d0cc31c1b3c14d6ee4af74b8cb80db15f49047103c2cde6717b36e49bc01dc6c"
+        }
+      }
+    },
+    "student-navigation-validation.json": {
+      "originalReportSha256": "4e1cceed8658aface354ff3074cecddef9505d6ad8e7230aebe6abcbd1e74363",
+      "originalReportIsPrivateLocal": true,
+      "reviewed": {
+        "head": "e353ff2f1de01ff2e8ab9b96bac99d3789f549fe",
+        "status": "passed",
+        "checks": [
+          "actual checkin desktop and mobile: no global menu",
+          "account settings retained",
+          "mobile no horizontal overflow"
+        ],
+        "shellTests": {
+          "passed": 54
+        },
+        "changedRuntimeTsxLint": "passed",
+        "inputs": {
+          "server-version/frontend/src/components/app-shell/AppShell.tsx": "182f07d9ccf67da4603ff39ece8013937832a59d7de1c4a4fa2595290228f221",
+          "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx": "57215c641477225928abed9060e389dad0ece8271a87b2b6a8a2d59789e8863d"
+        }
+      }
+    }
+  },
+  "limits": [
+    "Original local summaries and successful named assertions were reviewed in the development conversation; this is a derived receipt, not a newly executed test reporter or signed historical execution.",
+    "The original video test invocation had one failed cleanup hook; only 19 passed cases and 3 successful targeted follow-up cases are admitted. Failure history is preserved.",
+    "Browser selection, pagination and course variants use synthetic response fixtures; no production authorization or fresh end-to-end backend qualification is claimed.",
+    "New main adds administrator Authenticator support. Integrated frontend app types and backend types run freshly; unrelated administrator tests and DB migration are not repeated.",
+    "No scoring, submission, report calculation, dependencies, schema or deployment changes originate in this Training patch."
+  ]
+}

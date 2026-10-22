@@ -15,6 +15,11 @@ env:
   TZ: UTC
   NODE_OPTIONS: --max-old-space-size=3072
 jobs:
+  student:
+    if: fromJSON(inputs.plan).candidate == 'student-followup'
+    uses: ./.github/workflows/ci-training-student.yml
+    with:
+      plan: ${{ inputs.plan }}
   integrated:
     if: fromJSON(inputs.plan).candidate == 'mac-integrated'
     uses: ./.github/workflows/ci-training-workspace-integrated.yml
@@ -26,7 +31,7 @@ jobs:
     with:
       plan: ${{ inputs.plan }}
   component:
-    if: fromJSON(inputs.plan).candidate != 'mac-followup' && fromJSON(inputs.plan).candidate != 'mac-integrated'
+    if: fromJSON(inputs.plan).candidate != 'student-followup' && fromJSON(inputs.plan).candidate != 'mac-followup' && fromJSON(inputs.plan).candidate != 'mac-integrated'
     name: ${{ matrix.component }} affected contracts
     runs-on: ubuntu-24.04
     timeout-minutes: 15
