@@ -92,7 +92,7 @@ export default function TrainingTrainerCourse() {
             <div className="training-course-layout training-course-layout--full"><div className="training-course-work">
             <header className="training-course-toolbar">
               <TrainingCourseTabs courseId={course.id} section={section} onSelect={setSection} />
-              {['assignments','checkins','assessments'].includes(section) && !query.get(section === 'assignments' ? 'assignmentId' : section === 'checkins' ? 'checkinId' : '') && <CatalogFilters key={section+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline={section!=='assessments'} label={section==='assignments'?'练习':section==='checkins'?'打卡':'测评'}/>}
+              {['assignments','checkins','assessments'].includes(section) && !query.get(section === 'assignments' ? 'assignmentId' : section === 'checkins' ? 'checkinId' : '') && <CatalogFilters inToolbar key={section+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline={section!=='assessments'} label={section==='assignments'?'练习':section==='checkins'?'打卡':'测评'}/>}
             </header>
             {section === 'assignments' && <Suspense fallback={<p role="status">正在读取练习管理…</p>}><CourseAssignmentWorkspace embeddedCourse={course}/></Suspense>}
 

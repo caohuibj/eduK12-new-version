@@ -206,7 +206,8 @@ describe('course-first training workspaces', () => {
     fireEvent.click(screen.getByRole('button', { name: '学习' }))
     await screen.findByRole('heading', { name: '课程练习' })
     expect(screen.getAllByText('检索与筛选')).toHaveLength(1)
-    expect(screen.getByRole('searchbox', { name: '搜索练习', hidden: true })).toHaveValue('')
+    fireEvent.click(screen.getByRole('button', { name: /检索与筛选/ }))
+    expect(screen.getByRole('searchbox', { name: '搜索练习' })).toHaveValue('')
   })
 
   it('trainer publishing links keep the exact course context', async () => {
