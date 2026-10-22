@@ -1,0 +1,119 @@
+name: School Teacher standalone browser diagnostic
+on:
+  push:
+    branches: ['ci/school-teacher-browser-20261022']
+permissions:
+  contents: read
+  actions: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  frontend:
+    if: ${{ github.event_name == 'push' && github.repository == 'caohuibj/eduK12-new-version' && github.ref == 'refs/heads/ci/school-teacher-browser-20261022' && !github.event.deleted }}
+    uses: ./.github/workflows/ci-frontend-build.yml
+    with:
+      runner_labels: '["ubuntu-24.04"]'
+      performance_smoke: false
+      ui_lab: false
+  backend:
+    if: ${{ github.event_name == 'push' && github.repository == 'caohuibj/eduK12-new-version' && github.ref == 'refs/heads/ci/school-teacher-browser-20261022' && !github.event.deleted }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: server-version/backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify standalone invocation and exact checkout
+        run: node ../../.github/scripts/school-teacher-browser-control.mjs preflight
+      - run: bash ../scripts/ci-install-canvas-deps.sh
+      - run: npm ci
+      - run: npx prisma generate
+      - name: emit backend once with production tsconfig (not full npm build or tests)
+        run: node node_modules/typescript/bin/tsc -p tsconfig.json
+      - run: node ../../.github/scripts/ci-artifact.mjs write backend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+          retention-days: 1
+          if-no-files-found: error
+  browser:
+    needs: [frontend, backend]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_DB: school_teacher_browser_ci_test
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: synthetic-actions-disposable
+        ports: ['5432/tcp']
+        options: >-
+          --health-cmd "pg_isready -U ptool -d school_teacher_browser_ci_test"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+      redis:
+        image: redis:7.4-bookworm
+        ports: ['6379/tcp']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      NODE_ENV: test
+      SCHOOL_TEACHER_ISOLATED_DB: '1'
+      DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+      SCHOOL_TEACHER_TEST_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+      REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports[6379] }}/0
+      CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+      SCHOOL_TEACHER_PRIVATE_DIR: ${{ runner.temp }}/school-teacher-private
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - run: node .github/scripts/school-teacher-browser-control.mjs preflight
+      - run: bash server-version/scripts/ci-install-canvas-deps.sh
+      - run: npm ci --prefix server-version/backend
+      - run: npx --prefix server-version/backend prisma generate --schema server-version/backend/prisma/schema.prisma
+      - run: npm ci --ignore-scripts --prefix .github/release-tools
+      - run: node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+      - uses: actions/download-artifact@v4
+        with:
+          name: backend-dist-${{ github.sha }}
+          path: server-version/backend/dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist-${{ github.sha }}
+          path: server-version/frontend/dist
+      - name: verify both same-run source and byte manifests
+        run: |
+          node .github/scripts/ci-artifact.mjs verify backend
+          node .github/scripts/ci-artifact.mjs verify frontend
+      - name: migrate disposable synthetic database
+        working-directory: server-version/backend
+        run: npx prisma migrate deploy
+      - name: seed synthetic identities and verify restricted runtime principal
+        run: |
+          umask 077
+          node server-version/e2e/school-teacher-fixture.cjs seed > "$RUNNER_TEMP/school-teacher-seed.log" 2>&1
+      - name: exercise real School and Teacher browser paths
+        env:
+          SCHOOL_TEACHER_ARTIFACTS_VERIFIED: '1'
+        run: node server-version/e2e/school-teacher-browser.cjs
+      - name: verify diagnostic report (not merge qualification)
+        run: node .github/scripts/school-teacher-browser-control.mjs report
+      - name: remove private test material
+        if: always()
+        run: node .github/scripts/school-teacher-browser-control.mjs cleanup
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: school-teacher-browser-evidence-${{ github.sha }}
+          path: school-teacher-evidence
+          retention-days: 7
+          if-no-files-found: error
