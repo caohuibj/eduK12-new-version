@@ -26,10 +26,31 @@ export function decodeLocal(bytes){
  return {schema:1,status:'ACCEPTED_REVIEWED_LOCAL',ciExecuted:false,signed:false,localEvidenceSha256:sha(bytes),newPassed:162,priorApplicablePassed:19,limitations:record.limitations,types:'local exit 0',lint:'local exit 0 with disclosed warnings'};
 }
 function files(dir,prefix=''){return Object.fromEntries(readdirSync(dir).sort().flatMap(name=>{const path=dir+'/'+name,key=prefix+name;return statSync(path).isDirectory()?Object.entries(files(path,key+'/')):[[key,sha(readFileSync(path))]];}));}
+async function restoreBrowserPrior(){
+ const p=binding.browserPrior,api='https://api.github.com/repos/'+process.env.GITHUB_REPOSITORY;
+ const get=async suffix=>{const r=await fetch(api+suffix,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'}});assert.equal(r.status,200,'Official API '+suffix);return r;};
+ const original=await(await get('/actions/runs/'+p.run)).json();assert.equal(original.head_sha,p.head);assert.equal(original.run_attempt,p.attempt);assert.equal(original.conclusion,'failure');assert.equal(original.status,'completed');
+ for(const[id,conclusion]of [[p.job,'failure'],[p.sastJob,'success']]){const job=await(await get('/actions/jobs/'+id)).json();assert.equal(job.run_id,p.run);assert.equal(job.status,'completed');assert.equal(job.conclusion,conclusion);}
+ const m=await(await get('/actions/artifacts/'+p.artifact.id)).json();assert.equal(m.workflow_run.id,p.run);assert.equal(m.expired,false);assert.equal(m.name,p.artifact.name);assert.equal(m.digest,'sha256:'+p.artifact.sha256);assert.equal(m.size_in_bytes,p.artifact.bytes);
+ const zip=Buffer.from(await(await get('/actions/artifacts/'+p.artifact.id+'/zip')).arrayBuffer());assert.equal(zip.length,p.artifact.bytes);assert.equal(sha(zip),p.artifact.sha256);writeFileSync(out+'/prior-browser.zip',zip);mkdirSync(out+'/prior-browser',{recursive:true});
+ run('python3',['-c',`import zipfile,pathlib,stat,sys
+z=zipfile.ZipFile(sys.argv[1]); assert z.testzip() is None
+for i in z.infolist():
+ p=pathlib.PurePosixPath(i.filename); assert not p.is_absolute() and '..' not in p.parts and not stat.S_ISLNK(i.external_attr>>16)
+z.extractall(sys.argv[2])
+`,out+'/prior-browser.zip',out+'/prior-browser']);
+ for(const[name,digest]of Object.entries(p.files))assert.equal(sha(readFileSync(out+'/prior-browser/'+name)),digest,name);
+ assert.equal(execFileSync('git',['diff','--name-only',p.head,'HEAD','--','server-version','.github/release-tools','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/scripts/survey-experience-scope.mjs'],{encoding:'utf8'}).trim(),'');
+ assert.equal(sha(readFileSync('.github/scripts/survey-experience-browser.cjs')),p.currentBrowserSHA256,'Reviewed media-only script changed');
+ const j=JSON.parse(readFileSync(out+'/prior-browser/browser/browser.json'));assert.equal(j.status,'failed');assert.equal(j.failure.phase,'participant-media');assert.equal(j.failure.name,'TimeoutError');assert.equal(j.sourceCommit,p.checkout);assert.equal(String(j.ciRunId),String(p.run));assert.deepEqual(j.networkFailures,[]);assert.deepEqual(j.pageErrors,[]);assert.deepEqual(j.checks,['researcher-1440','researcher-390','loading-error-empty','participant-1440','participant-390'].map(name=>({name,status:'passed'})));
+ assert.equal(j.runtimeManifestSha256,sha(readFileSync(out+'/runtime-files.json')));
+ writeFileSync(out+'/browser-prior-admission.json',JSON.stringify({originalRun:p.run,originalConclusion:'failure',originalReportSHA256:p.files['browser/browser.json'],acceptedChecks:j.checks.map(c=>c.name),currentExecution:['participant-media'],sameRunFullJourneyClaim:false,originalSastJob:p.sastJob,originalSastConclusion:'success'},null,2));
+}
+
 async function restorePrior(){
  const p=binding.prior;assert.equal(process.env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');assert.ok(process.env.GH_TOKEN);const api='https://api.github.com/repos/'+process.env.GITHUB_REPOSITORY;
  const get=async suffix=>{const r=await fetch(api+suffix,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'}});assert.equal(r.status,200,'Official API '+suffix);return r;};
- const original=await(await get('/actions/runs/'+p.run)).json();assert.equal(original.head_sha,p.head);assert.equal(original.run_attempt,p.attempt);assert.equal(original.conclusion,'failure');assert.equal(original.status,'completed');
+ const original=await(await get('/actions/runs/'+p.run)).json();assert.equal(original.head_sha,p.head);assert.equal(original.run_attempt,p.attempt);assert.equal(original.conclusion,'failure');assert.equal(original.status,'completed');assert.equal(original.status,'completed');
  const job=await(await get('/actions/jobs/'+p.job)).json();assert.equal(job.run_id,p.run);assert.equal(job.conclusion,'failure');for(const name of ['compile frontend once and preserve builder plus runtime bytes','current dependency audit (no previous audit claimed)','scan exact produced runtime image'])assert.equal(job.steps.find(s=>s.name===name)?.conclusion,'success',name);
  assert.equal(execFileSync('git',['diff','--name-only',p.head,'HEAD','--','server-version','.github/release-tools'],{encoding:'utf8'}).trim(),'','Original build/source/dependency closure drift');
  mkdirSync(out+'/prior',{recursive:true});
@@ -58,7 +79,7 @@ async function main(mode){
   const {changedEntries}=await import('./content-scope.mjs');const p=JSON.parse(process.env.PLAN);const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();assert.deepEqual(p,surveyExperiencePlan(changedEntries(p.base,head),p.base,head));
   writeFileSync(out+'/local-admission.json',JSON.stringify(decodeLocal(readFileSync('.github/scripts/survey-experience-local.json')),null,2));return;
  }
- if(mode==='restore-prior'){await restorePrior();return;}
+ if(mode==='restore-prior'){await restorePrior();await restoreBrowserPrior();return;}
  if(mode==='build'){
   const head=process.env.GITHUB_SHA;assert.match(head,/^[a-f0-9]{40}$/);const builder='survey-experience-builder:'+head,runtime='survey-experience-runtime:'+head;
   for(const target of ['build','runtime'])run('docker',['build','--target',target,'--build-arg','NPM_REGISTRY=https://registry.npmjs.org','--build-arg','VITE_COGNITIVE_MODULE_ENABLED=true','--label','org.opencontainers.image.revision='+head,'-t',target==='build'?builder:runtime,'server-version/frontend']);
@@ -76,12 +97,13 @@ async function main(mode){
  if(mode==='browser-report'){
   const j=JSON.parse(readFileSync(out+'/browser/browser.json')),build=JSON.parse(readFileSync(out+'/build.json'));
   assert.equal(j.status,'passed');assert.equal(j.scope,'synthetic-production-frontend-ui-only');assert.equal(j.sourceCommit,process.env.GITHUB_SHA);assert.equal(String(j.ciRunId),process.env.GITHUB_RUN_ID);
-  const {REQUIRED}=createRequire(import.meta.url)('./survey-experience-browser.cjs');assert.deepEqual(j.required,REQUIRED);assert.deepEqual(j.checks,REQUIRED.map(name=>({name,status:'passed'})));assert.deepEqual(j.networkFailures,[]);assert.deepEqual(j.pageErrors,[]);
+  const {REQUIRED}=createRequire(import.meta.url)('./survey-experience-browser.cjs');assert.deepEqual(j.required,REQUIRED);assert.deepEqual(j.executedRequired,['participant-media']);assert.deepEqual(j.checks,[{name:'participant-media',status:'passed'}]);assert.equal(j.sameRunFullJourneyClaim,false);assert.deepEqual(j.networkFailures,[]);assert.deepEqual(j.pageErrors,[]);
   const manifest=sha(readFileSync(out+'/runtime-files.json'));assert.equal(build.distManifestSHA256,manifest);assert.equal(j.runtimeManifestSha256,manifest);const served=files(out+'/runtime');for(const[k,v]of Object.entries(JSON.parse(readFileSync(out+'/runtime-files.json'))))assert.equal(served[k],v);
-  const matrix=['researcher-tools-1440','researcher-data-1440','researcher-tools-390','researcher-data-390','participant-1440','participant-390','participant-media-390'];assert.deepEqual(j.layouts.map(a=>a.name).sort(),matrix.sort());
-  for(const a of j.layouts){assert.equal(a.width,Number(a.name.split('-').at(-1)));assert.equal(a.overflow,false);assert.ok(a.passes>0);assert.deepEqual(a.violations,[]);const png=readFileSync(out+'/browser/screenshots/'+a.name+'.png');assert.deepEqual([...png.subarray(0,8)],[137,80,78,71,13,10,26,10]);}
-  assert.deepEqual(j.keyboardFocus.map(k=>[k.name,k.width,k.tag]),[['researcher-tabs',1440,'BUTTON'],['researcher-tabs',390,'BUTTON'],['participant-auto-next',1440,'FIELDSET'],['participant-auto-next',390,'FIELDSET']]);for(const k of j.keyboardFocus){assert.equal(k.focusVisible,true);assert.equal(k.outlineStyle,'solid');assert.ok(parseFloat(k.outlineWidth)>0);}
-  assert.equal(j.secureContextFeatures,'not-tested');assert.ok(j.browserVersion);writeFileSync(out+'/acceptance.json',JSON.stringify({status:'PASS',sourceCommit:process.env.GITHUB_SHA,run:process.env.GITHUB_RUN_ID,local:'explicitly reviewed unsigned evidence; no CI test rerun',browser:'new synthetic API UI only',runtimeManifestSHA256:manifest,sameRunBackendClaim:false},null,2));return;
+  const prior=JSON.parse(readFileSync(out+'/prior-browser/browser/browser.json'));const layouts=[...prior.layouts,...j.layouts];assert.equal(j.layouts.length,1);assert.equal(j.layouts[0].name,'participant-media-390');
+  const matrix=['researcher-tools-1440','researcher-data-1440','researcher-tools-390','researcher-data-390','participant-1440','participant-390','participant-media-390'];assert.deepEqual(layouts.map(a=>a.name).sort(),matrix.sort());
+  for(const a of layouts){assert.equal(a.width,Number(a.name.split('-').at(-1)));assert.equal(a.overflow,false);assert.ok(a.passes>0);assert.deepEqual(a.violations,[]);const png=readFileSync(out+(a.name==='participant-media-390'?'/browser':'/prior-browser/browser')+'/screenshots/'+a.name+'.png');assert.deepEqual([...png.subarray(0,8)],[137,80,78,71,13,10,26,10]);}
+  assert.deepEqual(j.keyboardFocus,[]);assert.deepEqual(prior.keyboardFocus.map(k=>[k.name,k.width,k.tag]),[['researcher-tabs',1440,'BUTTON'],['researcher-tabs',390,'BUTTON'],['participant-auto-next',1440,'FIELDSET'],['participant-auto-next',390,'FIELDSET']]);for(const k of prior.keyboardFocus){assert.equal(k.focusVisible,true);assert.equal(k.outlineStyle,'solid');assert.ok(parseFloat(k.outlineWidth)>0);}
+  assert.equal(j.secureContextFeatures,'not-tested');assert.ok(j.browserVersion);writeFileSync(out+'/acceptance.json',JSON.stringify({status:'PASS',sourceCommit:process.env.GITHUB_SHA,run:process.env.GITHUB_RUN_ID,local:'explicitly reviewed unsigned evidence; no CI test rerun',browser:'synthetic API UI only; mixed sources',reused:{run:binding.browserPrior.run,sourceCommit:binding.browserPrior.checkout,reportSHA256:binding.browserPrior.files['browser/browser.json'],checks:prior.checks.map(c=>c.name),screenshots:6},executed:{run:process.env.GITHUB_RUN_ID,sourceCommit:process.env.GITHUB_SHA,checks:['participant-media'],screenshots:1},runtimeManifestSHA256:manifest,sameRunFullJourneyClaim:false,sameRunBackendClaim:false},null,2));return;
  }
  throw Error('Unknown Survey mode');
 }

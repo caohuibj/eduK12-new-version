@@ -152,5 +152,30 @@
       }
     ],
     "tarSHA256": "76a56bbaf8ace8979f2dfb89dcedc9449d4b33e74de97f626a89cc9066c8cf5b"
+  },
+  "browserPrior": {
+    "run": 39705178007,
+    "head": "31071c4e501d96c4e90eece10a84171a8554b817",
+    "attempt": 1,
+    "checkout": "2ac6493e366633145a90914057e70ae4c2256780",
+    "job": 119583500308,
+    "sastJob": 119583500235,
+    "artifact": {
+      "id": 12393709554,
+      "name": "survey-experience-evidence-2ac6493e366633145a90914057e70ae4c2256780",
+      "bytes": 2762469,
+      "sha256": "7acb76a99d282ee4ba8e717409f4c15d72569ea283a7e9df51a31b48c86729a9"
+    },
+    "files": {
+      "browser/browser.json": "0283ca902cc30a8f6d6b87662a3c67ec8204851e3e5e3323ad8a2b215f12bf3d",
+      "browser/screenshots/participant-390.png": "dff8efb8087df7c3d806346dddcb8abb56a3de0282b8f4a6b3fed4861c9bcf0c",
+      "browser/screenshots/researcher-data-1440.png": "9400eeff6fc50d17a8ad44943cf01086b4d5a14dcfa4a90d761a7106d5669290",
+      "browser/screenshots/failure.png": "01cc05d8f9f7a196dfe1bba1c814bab196e163b8a34c04050ade1d94b1b56bc5",
+      "browser/screenshots/researcher-data-390.png": "b2f502d0b56d1c1648f26bcb9f3f64e2896dc7c79dc6469a1006d1370570c0b3",
+      "browser/screenshots/researcher-tools-1440.png": "95cf32c831556045a89921c67c643f255bd7d6917879ba18bd43a3bcdc33d7ed",
+      "browser/screenshots/researcher-tools-390.png": "43a9f214bfdaeb29310ec66517f82d0132a492b92944f52e9eeade5991f11739",
+      "browser/screenshots/participant-1440.png": "f07cb6b79bf31f6fa68c59c0b518cdd0805ab2cc4c1425b9df8a874aedd3ab78"
+    },
+    "currentBrowserSHA256": "cf64f9f5a290bf0529320e3275d71ab844f5643c0f85b746ea48a6f46695ac29"
   }
 }

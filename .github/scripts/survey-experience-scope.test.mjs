@@ -19,3 +19,8 @@ test('actual CodeQL job if and stable aggregate both include this route',()=>{co
 test('old routes not reclassified without this candidate marker',()=>{assert.equal(surveyExperiencePlan([{file:'README.md'}],binding.base,head,read,env),null);assert.ok(controls.includes('.github/scripts/content-scope.mjs'));});
 
 test('PR merge tree must equal exact proposed source tree',()=>{assert.throws(()=>surveyExperiencePlan(entries,binding.base,head,(cmd,key)=>key.endsWith('^{tree}')?(key.startsWith(head)?'merge-tree':'source-tree'):read(cmd,key),{...env,CI_SOURCE_HEAD:'c'.repeat(40)}));});
+
+test('media continuation has one fresh scene and explicit fixed original five-scene failure provenance',()=>{
+ const browser=readFileSync('.github/scripts/survey-experience-browser.cjs','utf8'),workflow=readFileSync('.github/workflows/ci-survey-experience.yml','utf8'),candidate=readFileSync('.github/scripts/survey-experience-candidate.mjs','utf8');
+ assert.match(workflow,/SURVEY_EXPERIENCE_ONLY: participant-media/);assert.match(browser,/if\(!only\)for\(const width/g);assert.match(browser,/sameRunFullJourneyClaim/);assert.match(candidate,/originalConclusion:'failure'/);assert.match(candidate,/sameRunFullJourneyClaim:false/);assert.match(candidate,/originalSastConclusion:'success'/);assert.equal(binding.browserPrior.run,39705178007);assert.equal(binding.browserPrior.sastJob,119583500235);assert.equal(Object.keys(binding.browserPrior.files).filter(n=>n.endsWith('.png')&&!n.endsWith('failure.png')).length,6);
+});

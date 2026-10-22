@@ -46,6 +46,10 @@ async function main(){
   fs.mkdirSync(path.join(evidence,'screenshots'),{recursive:true});
   assert.match(process.env.SURVEY_EXPERIENCE_DIST_MANIFEST_SHA256 || '',/^[a-f0-9]{64}$/);
   const report={sourceCommit:process.env.GITHUB_SHA,ciRunId:process.env.GITHUB_RUN_ID,runtimeManifestSha256:process.env.SURVEY_EXPERIENCE_DIST_MANIFEST_SHA256,secureContextFeatures:'not-tested',scope:'synthetic-production-frontend-ui-only',required:REQUIRED,checks:[],networkFailures:[],pageErrors:[],keyboardFocus:[],layouts:[],status:'running'};
+  const only=process.env.SURVEY_EXPERIENCE_ONLY||'';
+  assert.ok(['','participant-media'].includes(only),'only fixed media continuation supported');
+  const executedRequired=only?['participant-media']:REQUIRED;
+  report.executedRequired=executedRequired;report.sameRunFullJourneyClaim=!only;
   let phase='start', selector=null, browser, activePage, origin, videoBytes;
   const server=http.createServer((req,res)=>{
     // This server only serves the build. API requests must have been fulfilled by
@@ -177,7 +181,7 @@ async function main(){
     origin=`http://survey.eduk12.top:${server.address().port}`;
     browser=await chromium.launch({headless:true,...(process.env.CHROMIUM_EXECUTABLE?{executablePath:process.env.CHROMIUM_EXECUTABLE}:{}),args:['--host-resolver-rules=MAP survey.eduk12.top 127.0.0.1']});
     report.browserVersion=browser.version();report.originTransport='HTTP loopback; every resource fulfilled; no production traffic';report.randomUUID='HTTP-only standards polyfill using native getRandomValues';
-    for(const width of [1440,390])await check('researcher-'+width,async()=>{
+    if(!only)for(const width of [1440,390])await check('researcher-'+width,async()=>{
       const v=await scene(width),p=v.page;await openResearch(v);
       const title=p.getByLabel('研究名称',{exact:true});await title.fill('未保存的研究名称');
       let dismissed=0;p.on('dialog',async d=>{assert.equal(d.type(),'confirm');dismissed++;await d.dismiss();});
@@ -200,13 +204,13 @@ async function main(){
       const download=p.waitForEvent('download');await click(p,'下载 CSV');const file=await download;assert.equal(await file.failure(),null);await p.getByText('CSV：已发起，请核对保存',{exact:true}).waitFor();assert.equal(v.state.downloads,1);assert.equal(v.state.exports,1);
       await layout(p,'researcher-data-'+width,width);await v.close();
     });
-    await check('loading-error-empty',async()=>{
+    if(!only)await check('loading-error-empty',async()=>{
       const v=await scene(1440),p=v.page;v.state.overviewGate=deferred();v.state.overviewMode='error';await openResearch(v);await tab(p,'研究数据');await p.getByText('正在加载完成进度…',{exact:true}).waitFor();assert.equal(await p.getByText('本项目暂无研究波次。请先在发布入口创建并保存波次。',{exact:true}).count(),0);
       v.state.overviewGate.resolve();await p.getByRole('alert').filter({hasText:'完成进度加载失败'}).waitFor();v.state.overviewGate=null;v.state.overviewMode='ok';await click(p,'刷新完成进度');await p.getByText('本项目暂无研究波次。请先在发布入口创建并保存波次。',{exact:true}).waitFor();
       v.state.reportGate=deferred();v.state.reportMode='error';await tab(p,'私有报告');await p.getByText('正在加载测量版本与报告，请稍候…',{exact:true}).waitFor();assert.equal(await p.getByText('暂无报告草稿',{exact:true}).count(),0);v.state.reportGate.resolve();await p.getByRole('region',{name:'项目私有报告'}).getByRole('alert').waitFor();
       v.state.reportGate=null;v.state.reportMode='ok';await click(p,'刷新报告与测量列表');await p.getByText('暂无报告草稿',{exact:true}).waitFor();await v.close();
     });
-    for(const width of [1440,390])await check('participant-'+width,async()=>{
+    if(!only)for(const width of [1440,390])await check('participant-'+width,async()=>{
       const v=await scene(width),p=v.page;await openParticipant(v);
       await click(p,'提交本轮正式回答');await eventually(()=>p.locator('#survey-answer-scale-q1').evaluate(el=>el===document.activeElement),'missing required answer focused');assert.equal(v.state.finals.length,0);
       const first=p.getByRole('radio',{name:'同意',exact:true});await first.focus();await p.keyboard.press('ArrowRight');assert.equal(await p.locator('#survey-answer-scale-q1').count(),1);assert.equal(await p.getByRole('radio',{name:'不同意',exact:true}).isChecked(),true);
@@ -224,10 +228,10 @@ async function main(){
       const v=await scene(390,{media:true}),p=v.page;await openParticipant(v);assert.equal(await p.getByRole('radio',{name:'同意',exact:true}).isDisabled(),true);assert.equal(await p.getByRole('button',{name:'下一题',exact:true}).isDisabled(),true);
       v.state.imageGate.resolve();await eventually(async()=>!(await p.getByRole('radio',{name:'同意',exact:true}).isDisabled()),'actual image load enables answers');await p.getByRole('radio',{name:'同意',exact:true}).check();await p.locator('#survey-answer-scale-q2').waitFor();
       await p.getByRole('radio',{name:'同意',exact:true}).check();assert.equal(await p.locator('#survey-answer-scale-q2').count(),1,'incomplete video suppresses automatic next');
-      await click(p,'播放视频');await p.getByText('视频已完整观看。',{exact:true}).waitFor();assert.equal(await p.locator('#survey-answer-scale-q2').count(),1,'video completion alone does not advance');
+      await click(p,'播放视频');await p.getByText('视频已完整观看，可以继续。',{exact:true}).waitFor();assert.equal(await p.locator('#survey-answer-scale-q2').count(),1,'video completion alone does not advance');
       await layout(p,'participant-media-390',390);await click(p,'下一题');await p.locator('#survey-answer-scale-q3').waitFor();await v.close();
     });
-    assert.deepEqual(report.checks.map(x=>x.name),REQUIRED);report.status='passed';
+    assert.deepEqual(report.checks.map(x=>x.name),executedRequired);report.status='passed';
   }catch(error){report.status='failed';report.failure={phase,selector,name:error.name,code:error.code||'ASSERTION_OR_BROWSER_FAILURE'};if(activePage&&!activePage.isClosed())await activePage.screenshot({path:path.join(evidence,'screenshots','failure.png'),fullPage:true}).catch(()=>{});throw error;
   }finally{
     await browser?.close();await new Promise(resolve=>server.close(resolve));fs.writeFileSync(path.join(evidence,'browser.json'),JSON.stringify(report,null,2)+'\n');

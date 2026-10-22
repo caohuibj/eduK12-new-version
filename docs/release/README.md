@@ -704,3 +704,5 @@ and reruns only the browser. The full frontend/backend fixture/tool inputs
 must remain byte-identical. No earlier CodeQL execution is claimed: the first
 run omitted the new route from the existing job condition, now corrected, and
 actual relevant SAST success remains mandatory before merge.
+
+Survey PR continuation: run 39705178007 remains failed at the media-only text assertion. Its exact five successful UI scenes, six screenshots/axe layouts and four keyboard observations are separately accepted from the official immutable artifact; the next run executes only `participant-media`. The acceptance document identifies both runs and explicitly sets `sameRunFullJourneyClaim=false`. The original successful JavaScript/TypeScript analysis is pinned to its actual job; only the three changed JS control/browser files receive new SAST. Original build, audit and image scan are not repeated.
