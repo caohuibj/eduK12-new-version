@@ -111,3 +111,15 @@
 .survey-template-actions button { display:inline-flex; align-items:center; gap:.4rem; }
 @media(max-width:60rem){.survey-library-create-choices{grid-template-columns:minmax(0,1fr);padding:.75rem}.survey-library-create-choices>button{padding:.8rem 1rem}.survey-library-create-choices small{margin-top:.1rem}}
 @media(max-width:40rem){.survey-template-actions{width:100%;justify-content:flex-start}.survey-template-actions button{flex:1}}
+.survey-library-card-name { display:flex; align-items:start; gap:.5rem; margin:.85rem 0 .4rem; }
+.survey-library-card .survey-library-card-name h2 { flex:1; min-width:0; margin:0; }
+.survey-researcher .survey-library-rename { display:inline-flex; align-items:center; gap:.3rem; min-height:32px; padding:.25rem .4rem; border-radius:.4rem; color:#6c8a92; font-size:.7rem; white-space:nowrap; flex-shrink:0; }
+.survey-library-rename:hover { background:#eaf4f0; color:#347566; }
+.survey-library-rename-form { padding:.8rem; margin:.2rem 0 .85rem; border:1px solid #cfe2dd; border-radius:.6rem; background:#f0f8f4; }
+.survey-library-rename-form fieldset { border:0; padding:0; margin:0; min-width:0; }
+.survey-library-rename-form label { display:grid; gap:.4rem; color:#5c7d7f; font-size:.75rem; }
+.survey-library-rename-form .input { width:100%; margin:0; background:#fff; border-color:#c7dcd6; font-size:.9rem; }
+.survey-library-rename-form fieldset > div { display:flex; align-items:center; gap:.5rem; margin-top:.7rem; }
+.survey-researcher .survey-library-rename-form button { min-height:34px; padding:.4rem .75rem; font-size:.75rem; border-radius:.4rem; }
+.survey-library-rename-form p[role=alert] { color:#a35b50; font-size:.75rem; margin-top:.5rem; line-height:1.7; }
+@media(max-width:40rem){.survey-library-card-name{gap:.35rem}.survey-library-rename-form{padding:.7rem}}
