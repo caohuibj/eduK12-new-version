@@ -31,8 +31,11 @@ describe('research authoring navigation and accessible controls',()=>{
     expect(screen.getAllByRole('complementary',{name:'研究工具属性与题目导航'})).toHaveLength(1)
     const navigation=screen.getByRole('complementary',{name:'研究工具属性与题目导航'})
     expect(navigation).not.toHaveClass('hidden')
+    expect(navigation.querySelector('details')).not.toHaveAttribute('open')
+    const summary=navigation.querySelector('summary')!
+    expect(summary).toHaveTextContent('属性与题目导航')
+    fireEvent.click(summary)
     expect(navigation.querySelector('details')).toHaveAttribute('open')
-    expect(navigation.querySelector('summary')).toHaveTextContent('属性与题目导航（可收起）')
     expect(within(navigation).getByRole('link',{name:'导航目标题'})).toHaveAttribute('href','#survey-form-question')
     expect(document.querySelectorAll('#survey-form-question')).toHaveLength(1)
     expect(screen.getByRole('link',{name:'查看当前工具属性与题目导航'})).toHaveAttribute('href','#survey-tool-navigation')
