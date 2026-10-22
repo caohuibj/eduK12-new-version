@@ -355,6 +355,15 @@ jobs:
             const tree = execFileSync('git',['rev-parse',sha+':server-version/frontend'],{encoding:'utf8'}).trim();
             if (tree !== binding.frontendTree) throw new Error('Survey Mac frontendTree differs from reviewed binding');
           }
+      - name: fetch exact Training follow-up product object
+        if: (github.event_name == 'pull_request' && github.event.pull_request.head.ref == 'work/training-followup-integrated-20261022') || (github.event_name == 'push' && github.ref == 'refs/heads/main' && github.event.before == 'abade96de544593d0fe67453e4c48a0b478cbe67')
+        shell: node {0}
+        run: |
+          const {execFileSync} = require('node:child_process');
+          const {readFileSync} = require('node:fs');
+          const binding = JSON.parse(readFileSync('.github/scripts/training-followup-bindings.json','utf8'));
+          if (binding.product !== 'a0d7ef7d9496b685be159dcc10aacd2b23cb97c2') throw new Error('Unexpected Training follow-up product');
+          execFileSync('git',['fetch','--no-tags','--depth=1','origin',binding.product],{stdio:'inherit'});
       - id: documentation-scope
         name: select dependency-free documentation or tooling classification
         env:
