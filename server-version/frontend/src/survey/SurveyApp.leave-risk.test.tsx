@@ -120,7 +120,7 @@ describe('researcher workspace leave protection',()=>{
     render(<SurveyApp/>)
     await screen.findByRole('heading',{name:'研究工作台'})
     selectStudy(0)
-    fireEvent.click(screen.getByRole('tab',{name:'研究数据'}))
+    fireEvent.click(screen.getByRole('tab',{name:'数据'}))
     expect(await screen.findByRole('alert')).toHaveTextContent('这不代表功能未开通')
     fail=false;fireEvent.click(screen.getByRole('button',{name:'重试功能状态'}))
     await waitFor(()=>expect(screen.getByLabelText('研究数据状态')).toHaveTextContent('暂未在当前环境启用'))

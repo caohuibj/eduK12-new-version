@@ -4401,6 +4401,7 @@ model SurveyToolTemplate {
   title String
   definition Json
   revision Int @default(0)
+  completedRevision Int? @map("completed_revision")
   status String @default("DRAFT")
   creationDigest String @map("creation_digest")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)

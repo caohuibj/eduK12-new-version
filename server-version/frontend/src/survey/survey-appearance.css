@@ -19,6 +19,11 @@
    document/OS appearance changes and no timed participant stimulus inheritance. */
 .survey-appearance-root[data-survey-theme=dark] {
   color-scheme:dark;
+  --hui-ds-color-page:#0c1822;
+  --hui-ds-color-surface:#142633;
+  --hui-ds-color-line:#365365;
+  --hui-ds-color-ink:#dfedf5;
+  --hui-ds-color-muted:#91adbd;
   --survey-brand-ink:#dfedf5;
   --survey-brand-accent:#9ac8e2;
   --survey-brand-accent-strong:#b3d9ef;
@@ -67,9 +72,9 @@
 [data-survey-theme=dark] :is(.survey-enter,.btn-primary):hover:not(:disabled) { color:var(--survey-ui-on-action); background:var(--survey-brand-accent-strong); border-color:var(--survey-brand-accent-strong); }
 [data-survey-theme=dark] :is(input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea,.input) { color:var(--survey-ui-ink); background:var(--survey-ui-surface); border-color:var(--survey-brand-border-strong); }
 [data-survey-theme=dark] :is(input,textarea)::placeholder { color:var(--survey-ui-muted); opacity:1; }
-[data-survey-theme=dark] :is(.bg-white,.bg-slate-50,.bg-gray-50,.bg-blue-50) { background-color:var(--survey-ui-surface); }
-[data-survey-theme=dark] :is(.border-slate-200,.border-gray-200,.border-blue-200) { border-color:var(--survey-ui-line); }
-[data-survey-theme=dark] :is(.text-slate-800,.text-slate-900,.text-gray-900) { color:var(--survey-ui-ink); }
+[data-survey-theme=dark] :is(.bg-white,.bg-slate-50,.bg-gray-50,.bg-blue-50,.bg-sky-50) { background-color:var(--survey-ui-surface); }
+[data-survey-theme=dark] :is(.border-slate-200,.border-gray-200,.border-blue-200,.border-sky-200) { border-color:var(--survey-ui-line); }
+[data-survey-theme=dark] :is(.text-slate-800,.text-slate-900,.text-gray-900,.text-sky-900,.text-sky-800) { color:var(--survey-ui-ink); }
 [data-survey-theme=dark] :is(.text-slate-500,.text-slate-600,.text-slate-700,.text-gray-500,.text-gray-600,.text-gray-700) { color:var(--survey-ui-body); }
 [data-survey-theme=dark] :is(.bg-red-50,.bg-rose-50) { background-color:var(--survey-ui-danger-bg); }
 [data-survey-theme=dark] :is(.text-red-600,.text-red-700,.text-red-800) { color:var(--survey-ui-danger); }
@@ -88,3 +93,10 @@
 @media (forced-colors:active) {
   .survey-appearance-popover [aria-pressed=true] { outline:2px solid Highlight; }
 }
+
+/* Shared governance panels and hover surfaces opt into Survey tokens too. */
+[data-survey-theme=dark] .btn-secondary:hover:not(:disabled) { background:var(--survey-brand-soft); color:var(--survey-ui-ink); }
+[data-survey-theme=dark] .text-slate-400 { color:var(--survey-ui-muted); }
+[data-survey-theme=dark] :is(.border-red-600,.border-red-700) { border-color:var(--survey-ui-danger-line); }
+[data-survey-theme=dark] :is(.border-amber-200,.border-amber-400) { border-color:var(--survey-ui-warning-line); }
+[data-survey-theme=dark] input[type=file]::file-selector-button { background:var(--survey-brand-soft); color:var(--survey-ui-ink); border:1px solid var(--survey-brand-border-strong); border-radius:.4rem; padding:.5rem .75rem; margin-right:.6rem; }
