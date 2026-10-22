@@ -1,4 +1,5 @@
 import { FormTemplatePicker } from './FormTemplatePicker'
+import { FormTemplateWorkspace } from './FormTemplateWorkspace'
 import './form-template-editor.css'
 import { CatalogFilters, CatalogPagination } from '../../training/TrainingCatalogControls'
 import { useCatalogQuery } from '../../training/useCatalogQuery'
@@ -925,6 +926,57 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                         <p className="text-sm">{trainingDesign ? '条件显示只能引用同一答题阶段中前面的单选或多选题；开始新阶段后，不能引用上一阶段的题。' : '条件只引用同区段的前置单选、多选题。'}隐藏答案会清除；拒答独立记录，不计有效回答。已发布版本不可修改。</p>
                       </fieldset>}
   </>
+  const backgroundField = <label className="block">
+                        背景字段
+                        <select
+                          aria-label="背景字段" disabled={Boolean(editingFormItem)}
+                          className="input ml-2 max-w-full"
+                          value={contextKey}
+                          onChange={(e) => {
+                            setContext(e.target.value)
+                            setRequired(true)
+                            if (e.target.value) {
+                              setPolicyEnabled(false)
+                              setTargetFormSection('')
+                              setStartNewFormStage(false)
+                              setFormType(
+                                e.target.value === 'birthYearMonth'
+                                  ? 'year_month'
+                                  : 'single_choice',
+                              )
+                              setChoiceDrafts(contextOptionsForKey(e.target.value).map(choice => ({ ...choice, id: crypto.randomUUID() })))
+                              setOptions(
+                                serializeDelimitedOptions(
+                                  contextOptionsForKey(e.target.value),
+                                ),
+                              )
+                            }
+                          }}
+                        >
+                          <option value="">普通表单题</option>
+                          {[
+                            'birthYearMonth',
+                            'sexAtBirth',
+                            'gradeLevel',
+                            'primaryLanguage',
+                            'countryOrRegion',
+                          ].map((k) => (
+                            <option key={k} value={k}>
+                              {
+                                (
+                                  {
+                                    birthYearMonth: '出生年月',
+                                    sexAtBirth: '出生性别',
+                                    gradeLevel: '年级',
+                                    primaryLanguage: '主要语言',
+                                    countryOrRegion: '国家或地区',
+                                  } as any
+                                )[k]
+                              }
+                            </option>
+                          ))}
+                        </select>
+                      </label>
   const addContentControls = <>
     {trainingDesign && !formTemplate && draft && type === 'FORM' && <FormTemplatePicker excludeId={id} disabled={busy || dirty || authoringLocked} onImport={source => void action(async () => { hydrate(await request('/' + id + '/import-form', { revision: detail.revision, source })); setPreflight(null) })}/>}
               {draft && (
@@ -980,6 +1032,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                         题目文字
                         <input
                           id="form-template-question-label"
+                          placeholder={formTemplate ? '例如：本次课程中，你最想进一步了解什么？' : undefined}
                           value={formLabel}
                           onChange={(e) => setFormLabel(e.target.value)}
                         />
@@ -1030,6 +1083,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                             <p className="qt-form-hint">此选择在添加下一道题时生效，不会移动已有题目，也不会改变逐题显示方式。</p>
                           </section>
                           <p className="qt-form-hint">需要条件显示、拒答或互斥选项时，再为本题开启规则。普通题目无需开启。</p>
+                          {formTemplate && backgroundField}
                           {formRules}
                         </div>
                       </details> : formRules}
@@ -1048,57 +1102,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                           />
                         </label>
                       )}
-                      <label className="block">
-                        背景字段
-                        <select
-                          aria-label="背景字段" disabled={Boolean(editingFormItem)}
-                          className="input ml-2 max-w-full"
-                          value={contextKey}
-                          onChange={(e) => {
-                            setContext(e.target.value)
-                            setRequired(true)
-                            if (e.target.value) {
-                              setPolicyEnabled(false)
-                              setTargetFormSection('')
-                              setStartNewFormStage(false)
-                              setFormType(
-                                e.target.value === 'birthYearMonth'
-                                  ? 'year_month'
-                                  : 'single_choice',
-                              )
-                              setChoiceDrafts(contextOptionsForKey(e.target.value).map(choice => ({ ...choice, id: crypto.randomUUID() })))
-                              setOptions(
-                                serializeDelimitedOptions(
-                                  contextOptionsForKey(e.target.value),
-                                ),
-                              )
-                            }
-                          }}
-                        >
-                          <option value="">普通表单题</option>
-                          {[
-                            'birthYearMonth',
-                            'sexAtBirth',
-                            'gradeLevel',
-                            'primaryLanguage',
-                            'countryOrRegion',
-                          ].map((k) => (
-                            <option key={k} value={k}>
-                              {
-                                (
-                                  {
-                                    birthYearMonth: '出生年月',
-                                    sexAtBirth: '出生性别',
-                                    gradeLevel: '年级',
-                                    primaryLanguage: '主要语言',
-                                    countryOrRegion: '国家或地区',
-                                  } as any
-                                )[k]
-                              }
-                            </option>
-                          ))}
-                        </select>
-                      </label>
+                      {!formTemplate && backgroundField}
                       {type === 'FORM' && (
                         <label className="block">
                           <input
@@ -1431,14 +1435,11 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
     <PageHeader title={id === 'new' ? '编制表单' : '编辑表单'} description="把常用内容保存为独立表单，之后在组合问卷中整份选用。"
       actions={<><span className="qt-draft-status">{busy ? '正在保存…' : dirty ? '有未保存的修改' : detail ? `已保存 · 修订 ${detail.revision}` : '新建表单'}</span>{draft && <ProductButton variant="primary" disabled={authoringLocked || busy || (id !== 'new' && !dirty)} onClick={() => void save()}><Save size={16}/>{id === 'new' ? '创建草稿' : '保存表单信息'}</ProductButton>}</>}/>
     {feedback}{error && <p role="alert" className="qt-error">{error}</p>}
-    {id !== 'new' && !detail ? <p role="status">正在读取表单…</p> : <fieldset disabled={authoringLocked} className="qt-form-template-workspace">
-      <section className="qt-panel" aria-label="表单信息"><header className="qt-panel-heading"><h2>表单信息</h2><p>名称用于检索，指导语在问卷中展示。</p></header><div className="qt-panel-body">{basicSettings}</div></section>
-      {detail && <section className="qt-panel" aria-label="表单题目"><header className="qt-panel-heading"><h2>题目与区段</h2><p>沿用现有表单题型与规则。添加、移除和排序会即时保存。</p><span className="qt-count">{detail.items?.length || 0} 道题目</span></header><div className="qt-panel-body">
-        {dirty && <p role="status" className="qt-note">请先保存表单信息，再调整题目。</p>}{addContentControls}
-        {units.length > 0 ? <div className="qt-unit-editor">{unitList}<div className="qt-unit-config" aria-label="单元配置">{unitConfiguration}</div></div> : <p className="qt-note">先选择题型，添加第一道题目；支持李克特、矩阵及常用输入题。</p>}
-      </div></section>}
-      <p className="qt-note">表单保存在“工具 → 表单”，无需设置投放。组合问卷选用后获得独立副本，不会随此处后续编辑而改变。</p>
-    </fieldset>}
+    {id !== 'new' && !detail ? <p role="status">正在读取表单…</p> : <FormTemplateWorkspace key={id} isNew={id === 'new'} name={name} dirty={dirty} draft={draft} busy={busy} locked={authoringLocked}
+      sections={units} editingQuestionId={editingFormItem?.id} basicSettings={basicSettings} questionControls={addContentControls}
+      onEdit={editFormItem} onMove={(index, direction) => void move(index, direction)}
+      onRemove={itemId => void action(async () => hydrate(await request('/' + id + '/items/' + itemId + '/remove', { revision: detail.revision })))}
+      onRemoveSection={sectionId => void action(async () => hydrate(await request('/' + id + '/form-sections/' + sectionId + '/remove', { revision: detail.revision })))}/>}
   </ProductPage>
   if (trainingDesign) return (
     <ProductPage width="management" className="hui-questionnaire-products training-form-management qt-editor">
