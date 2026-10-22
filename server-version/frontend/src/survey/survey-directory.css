@@ -3,9 +3,12 @@
 .survey-researcher-header { max-width: 84rem; margin: auto; padding: 1rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
 .survey-researcher-header .survey-brand { --survey-brand-emblem: 48px; --survey-brand-wordmark: 136px; gap: 9px; }
 .survey-researcher-main { max-width: 84rem; margin: auto; padding: 2.5rem 2rem 4rem; }
-.survey-workspace--overview { display: grid; grid-template-columns: minmax(0,1fr) 340px; align-items: start; gap: 2rem; }
+.survey-workspace--create { max-width: 48rem; margin: 0 auto; }
+.survey-create-back { display: inline-flex; align-items: center; min-height: 44px; margin-bottom: 1rem; padding: .5rem 0; color: #36586a; font-size: .875rem; }
+.survey-create-back:hover { text-decoration: underline; text-underline-offset: 4px; }
 .survey-researcher .survey-project-settings { margin: 0; border-color: #d1e0e6; border-radius: 1rem; padding: 1.5rem; box-shadow: 0 5px 24px #234a6505; }
 .survey-project-settings > h2 { margin-top: .35rem; margin-bottom: 1.25rem; }
+.survey-project-settings > h1 { margin: .35rem 0 1.5rem; font-size: clamp(1.5rem,3vw,1.9rem); font-weight: 650; }
 .survey-project-settings .input { border-color: #91aab7; border-radius: .6rem; background: #fbfdfd; padding: .65rem .8rem; }
 .survey-project-settings form label { font-weight: 550; color: #36586a; }
 .survey-project-settings form label :is(input,textarea,select) { font-weight: 400; color: #203e4c; }
@@ -70,10 +73,7 @@
 .survey-researcher .survey-publish-surface [aria-label='当前发布阶段'] { background: #edf7f5; border-color: #b6d7ce; border-left: 4px solid #287e72; }
 .survey-researcher .survey-data-surface [aria-label='当前导出批次'] { border: 1px solid #93bcb7; background: #f2faf8; padding: 1.2rem; }
 .survey-mfa-panel { border-color: #c5dce1; box-shadow: 0 8px 32px #173b5008; }
-@media (max-width: 70rem) {
-  .survey-workspace--overview { grid-template-columns: minmax(0,1fr); }
-  .survey-workspace--overview > .survey-project-settings { max-width: 48rem; width: 100%; }
-}
+@media (min-width: 75rem) { .survey-project-grid { grid-template-columns: repeat(3,minmax(0,1fr)); } }
 @media (max-width: 40rem) {
   .survey-researcher-header { padding: .85rem 1rem; gap: .5rem; }
   .survey-researcher-header .survey-brand { --survey-brand-emblem: 38px; --survey-brand-wordmark: 108px; gap: 6px; }
