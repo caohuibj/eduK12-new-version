@@ -43,6 +43,28 @@ beforeEach(() => {
 })
 
 describe('course-scope measurement projection', () => {
+  it('retains archived multi-course work and feedback using the authorized task feed', async () => {
+    const fallback = get.getMockImplementation()!
+    get.mockImplementation((url: string) => url === '/composite-assessments/available'
+      ? Promise.resolve({ code: 0, data: { list: [{
+        ...composite('delivered', null), canStartNewAttempt: false, canContinue: true,
+        attempt: { id: 'existing', status: 'IN_PROGRESS', progress: 40 },
+        latestCompletedAttempt: { id: 'completed', status: 'COMPLETED', progress: 100 },
+      }] } }) : fallback(url))
+    const row = (await loadCourseAssessments(course, true)).items.find(item => item.key === 'composite:delivered')
+    expect(row).toMatchObject({ action: '继续测评', href: '/student/composite/attempts/existing', reportHref: '/student/composite/attempts/completed/report' })
+    expect(get).toHaveBeenCalledWith('/courses/my/tasks?page=1&pageSize=100&courseId=' + course)
+  })
+
+  it('retains archived completed feedback without offering another attempt', () => {
+    const [row] = projectCourseAssessments(course, [], [], [], [{
+      ...composite('archived', course), canStartNewAttempt: false,
+      attempt: { id: 'completed', status: 'COMPLETED', progress: 100 },
+      latestCompletedAttempt: { id: 'completed', status: 'COMPLETED', progress: 100 },
+    }])
+    expect(row).toMatchObject({ href: '/student/composite/attempts/completed/report', action: '查看反馈' })
+  })
+
   it('uses enrolled course scopes, retaining independent source ids without name-only merging', async () => {
     const result = await loadCourseAssessments(course, true)
     expect(result.errors).toEqual([])

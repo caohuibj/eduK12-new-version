@@ -651,12 +651,29 @@ describe('copyComposite', () => {
 })
 
 describe('library composites are not takeable', () => {
+  it('retains an archived own attempt without reopening admission', async () => {
+    mockPrisma.courseStudent.findMany.mockResolvedValue([{ courseId: 'course-t' }])
+    mockPrisma.compositeAssessment.findMany.mockResolvedValue([{
+      id: 'archived', status: 'ARCHIVED', name: '停止新作答', opensAt: null, expiresAt: null,
+      maxAttempts: 3, course: teacherCourse, items: [],
+    }])
+    mockPrisma.compositeAssessmentAttempt.findMany.mockResolvedValue([{
+      id: 'own-attempt', compositeAssessmentId: 'archived', status: 'IN_PROGRESS', progress: 40,
+    }])
+    const [row] = await listAvailableForStudent('student-1')
+    expect(row).toMatchObject({ canContinue: true, canStartNewAttempt: false, attempt: { id: 'own-attempt' } })
+    expect(mockPrisma.compositeAssessment.findMany.mock.calls[0][0].where.AND).toContainEqual({ OR: [
+      { status: 'PUBLISHED' },
+      { status: 'ARCHIVED', attempts: { some: { userId: 'student-1', status: { in: ['IN_PROGRESS', 'COMPLETED'] } } } },
+    ] })
+  })
+
   it('returns attempt counts and explicit availability windows for students', async () => {
     const now = Date.now()
     mockPrisma.courseStudent.findMany.mockResolvedValue([{ courseId: 'course-t' }])
     mockPrisma.compositeAssessment.findMany.mockResolvedValue([
       {
-        id: 'open-2', code: 'OPEN-2', name: '可重做', description: null, instruction: null,
+        id: 'open-2', status: 'PUBLISHED', code: 'OPEN-2', name: '可重做', description: null, instruction: null,
         opensAt: new Date(now - 60_000), expiresAt: new Date(now + 60_000), maxAttempts: 2,
         course: teacherCourse, items: [],
       },
@@ -717,7 +734,7 @@ describe('library composites are not takeable', () => {
     await listAvailableForStudent('student-1')
     expect(mockPrisma.compositeAssessment.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: expect.objectContaining({ status: 'PUBLISHED', OR: [
+        where: expect.objectContaining({ OR: [
           expect.objectContaining({ productKind: { in: ['LEGACY_COMPOSITE', 'ASSESSMENT_BUNDLE'] }, courseId: { in: ['library-1'] }, course: { isLibrary: false } }),
           expect.objectContaining({ productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: ['library-1'] }, course: { isLibrary: false } } } }),
         ] }),

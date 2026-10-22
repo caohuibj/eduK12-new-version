@@ -2241,7 +2241,12 @@ export const listAvailableForStudent = async (userId: string, now = Date.now()) 
   const courseIds = memberships.map((item) => item.courseId)
   if (!courseIds.length) return []
   const list = await prisma.compositeAssessment.findMany({
-    where: { status: 'PUBLISHED', OR: [
+    // Publication governs new starts. Archived deliveries remain discoverable
+    // only for this student's existing work, within their current course scope.
+    where: { AND: [{ OR: [
+      { status: 'PUBLISHED' },
+      { status: 'ARCHIVED', attempts: { some: { userId, status: { in: ['IN_PROGRESS', 'COMPLETED'] } } } },
+    ] }], OR: [
       { productKind: { in: ['LEGACY_COMPOSITE', 'ASSESSMENT_BUNDLE'] }, courseId: { in: courseIds }, course: { isLibrary: false } },
       { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: courseIds }, course: { isLibrary: false } } } },
     ] },
@@ -2336,7 +2341,7 @@ export const listAvailableForStudent = async (userId: string, now = Date.now()) 
       maxAttempts: item.maxAttempts,
       attemptsUsed,
       availability,
-      canStartNewAttempt: (config.cognitiveModuleEnabled || !item.items.some((child: any) => child.type === 'COGNITIVE')) && availability === 'OPEN' && !canContinue && attemptsUsed < item.maxAttempts,
+      canStartNewAttempt: item.status === 'PUBLISHED' && (config.cognitiveModuleEnabled || !item.items.some((child: any) => child.type === 'COGNITIVE')) && availability === 'OPEN' && !canContinue && attemptsUsed < item.maxAttempts,
       canContinue,
       admissionPaused: Boolean(admissionPaused),
       weightedVariants: item.trainingVariantFrozen != null,
