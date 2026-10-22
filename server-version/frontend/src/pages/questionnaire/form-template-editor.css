@@ -5,7 +5,8 @@
   border: 0;
   margin: 24px 0 0;
   padding: 0;
-  background: transparent;
+  /* The shared editor forces white onto every fieldset with !important. */
+  background: transparent !important;
   box-shadow: none;
 }
 .hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor {
