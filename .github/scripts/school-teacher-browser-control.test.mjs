@@ -82,3 +82,38 @@ test('backend cwd clean-tree guard checks repository-root source and controls',(
   }
  }finally{rmSync(root,{recursive:true,force:true});}
 });
+
+// GitHub's context availability table, not just YAML syntax:
+// https://docs.github.com/en/actions/reference/workflows-and-actions/contexts#context-availability
+function contextErrors(workflow){
+ const errors=[];
+ const base=['github','needs','strategy','matrix','vars','secrets','inputs'];
+ function visit(value,path){
+  if(value&&typeof value==='object'){for(const [key,v] of Object.entries(value))visit(v,[...path,key]);return;}
+  if(typeof value!=='string')return;
+  const expressions=[...value.matchAll(/\$\{\{([\s\S]*?)\}\}/g)];if(!expressions.length)return;
+  let allowed;
+  if(path[0]==='env')allowed=['github','secrets','inputs','vars'];
+  else if(path[0]==='jobs'&&path[2]==='env')allowed=base;
+  else if(path[0]==='jobs'&&path[2]==='if')allowed=['github','needs','vars','inputs'];
+  else if(path[0]==='jobs'&&path[2]==='with')allowed=['github','needs','strategy','matrix','inputs','vars'];
+  else if(path[0]==='jobs'&&path[2]==='steps')allowed=[...base,'job','runner','env','steps'];
+  else {errors.push('Unreviewed expression location '+path.join('.'));return;}
+  for(const [,expression] of expressions){
+   const unquoted=expression.replace(/'(?:[^']|'')*'/g,'');
+   for(const [,root] of unquoted.matchAll(/(?<![\w.])([A-Za-z_][A-Za-z0-9_]*)\s*(?=\.|\[)/g))if(!allowed.includes(root))errors.push(path.join('.')+':'+root);
+  }
+ }
+ visit(workflow,[]);return errors;
+}
+test('GitHub expression contexts reject job-level runtime values and allow step binding',()=>{
+ const doc=JSON.parse(execFileSync('python',['-c','import yaml,json,sys;print(json.dumps(yaml.safe_load(sys.stdin.read())))'],{input:flow,encoding:'utf8'}));
+ assert.deepEqual(contextErrors(doc),[]);
+ for(const value of ['${{ runner.temp }}','${{ job.services.postgres.ports[5432] }}']){
+  const bad=structuredClone(doc);bad.jobs.browser.env.TEST=value;assert(contextErrors(bad).length>0);
+ }
+ const binding=doc.jobs.browser.steps.find(s=>s.name==='bind isolated service endpoints after runner initialization');
+ assert.equal(Object.keys(binding.env).length,5);
+ for(const key of Object.keys(binding.env))assert(binding.run.includes(`"$${key}" >> "$GITHUB_ENV"`));
+ assert(!binding.run.includes('echo'));assert(!binding.run.includes('set -x'));
+});

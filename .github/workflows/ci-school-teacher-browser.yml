@@ -66,17 +66,25 @@ jobs:
     env:
       NODE_ENV: test
       SCHOOL_TEACHER_ISOLATED_DB: '1'
-      DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-      SCHOOL_TEACHER_TEST_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-      REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports[6379] }}/0
-      CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
-      SCHOOL_TEACHER_PRIVATE_DIR: ${{ runner.temp }}/school-teacher-private
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
       - run: node .github/scripts/school-teacher-browser-control.mjs preflight
+      - name: bind isolated service endpoints after runner initialization
+        env:
+          DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+          SCHOOL_TEACHER_TEST_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+          REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports[6379] }}/0
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          SCHOOL_TEACHER_PRIVATE_DIR: ${{ runner.temp }}/school-teacher-private
+        run: |
+          printf '%s=%s\n' DATABASE_URL "$DATABASE_URL" >> "$GITHUB_ENV"
+          printf '%s=%s\n' SCHOOL_TEACHER_TEST_DATABASE_URL "$SCHOOL_TEACHER_TEST_DATABASE_URL" >> "$GITHUB_ENV"
+          printf '%s=%s\n' REDIS_URL "$REDIS_URL" >> "$GITHUB_ENV"
+          printf '%s=%s\n' CI_POSTGRES_SERVICE_ID "$CI_POSTGRES_SERVICE_ID" >> "$GITHUB_ENV"
+          printf '%s=%s\n' SCHOOL_TEACHER_PRIVATE_DIR "$SCHOOL_TEACHER_PRIVATE_DIR" >> "$GITHUB_ENV"
       - run: bash server-version/scripts/ci-install-canvas-deps.sh
       - run: npm ci --prefix server-version/backend
       - run: npx --prefix server-version/backend prisma generate --schema server-version/backend/prisma/schema.prisma
