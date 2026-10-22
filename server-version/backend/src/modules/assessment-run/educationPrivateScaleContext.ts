@@ -52,3 +52,13 @@ export async function readPrivateScaleRunSourceForPreparation(tx:Prisma.Transact
  return readPrivateScaleRuntimeResource(tx,{key:input.resource.key,version:'1.0.0',purpose:'NEW_USE',context:{
   entry:workflow.product,organizationId:input.organizationId,principal:{userId:input.actorUserId,accountDomain:'SCHOOL'}}})
 }
+
+/** FORM source preparation shares the real workflow, not legacy TeacherForm
+ * licensing. Mutation authority is repeated under the publication locks. */
+export async function readPrivateFormRunSourceForPreparation(tx:Prisma.TransactionClient,input:{organizationId:string;runId:string;actorUserId:string;resource:{family:string;key:string;version:string}}){
+ if(input.resource.family!=='FORM'||input.resource.version!=='1.0.0')privateToolFail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID')
+ const workflow=await readEducationRunLibraryContext(tx,input)
+ if(!workflow)privateToolFail('PRIVATE_TOOL_WORKFLOW_REQUIRED',403)
+ return readPrivateFormRuntimeResource(tx,{key:input.resource.key,version:'1.0.0',purpose:'NEW_USE',context:{
+  entry:workflow.product,organizationId:input.organizationId,principal:{userId:input.actorUserId,accountDomain:'SCHOOL'}}})
+}

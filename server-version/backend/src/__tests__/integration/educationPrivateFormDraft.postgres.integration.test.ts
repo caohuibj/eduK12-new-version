@@ -61,7 +61,7 @@ async function effects(runId: string, ownerId: string) {
       (SELECT version FROM assessment_runs WHERE id=${runId}) AS "runVersion"`
   return row
 }
-suite('Private Form fixed-version draft attachment only, preserving source content', () => {
+suite('Private Form fixed-version draft attachment and read-only preview, preserving source content', () => {
   beforeAll(async () => {
     requireIsolatedReleaseDatabase(url!)
     process.env.DATA_ENCRYPTION_KEY ||= '55'.repeat(32)
@@ -70,7 +70,7 @@ suite('Private Form fixed-version draft attachment only, preserving source conte
     db = new PrismaClient({ datasources: { db: { url: url! } } }); await db.$connect()
   })
   afterAll(async () => { await db?.$disconnect() })
-  it.each(['SCHOOL', 'TEACHER'] as const)('%s uses the real product draft parent and CAS, rejects incompatible versions without changing source, and keeps publication closed', async product => {
+  it.each(['SCHOOL', 'TEACHER'] as const)('%s uses the real product draft parent and CAS, rejects incompatible versions without changing source, and leaves the activity unpublished', async product => {
     const { f, context, source, target, teacher, attach, body } = await fixture(product)
     const unsupported = definition()
     unsupported.pages[1].questions.push(unsupported.pages[0].questions.pop()!)
@@ -101,7 +101,9 @@ suite('Private Form fixed-version draft attachment only, preserving source conte
     expect(await db.scale.findUnique({ where: { code: 'education-private-scale:' + source.version.id } })).toBeNull()
     expect((await effects(f.runId, f.managerUserId))).toMatchObject({ tracks: 2n, runVersion: f.expectedVersion + 2 })
     const preview = () => product === 'TEACHER' ? previewTeacherRun({ ...teacher, expectedVersion: f.expectedVersion + 2 }) : f.preview()
-    await expect(preview()).rejects.toMatchObject({ code: 'PRIVATE_FORM_ACTIVITY_RUNTIME_NOT_READY' })
+    await preview()
+    expect(await db.compositeAssessment.findUniqueOrThrow({ where: { id: composite.id } })).toMatchObject({ status: 'DRAFT', publishedAt: null })
+    expect(await db.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: composite.id } })).toBe(0)
     expect(await db.$queryRaw`SELECT id FROM assessment_run_executions WHERE run_id=${f.runId}`).toEqual([])
     expect((await db.$queryRaw<Array<{ status: string }>>`SELECT status FROM assessment_runs WHERE id=${f.runId}`)[0].status).toBe('DRAFT')
   }, 90_000)

@@ -1,3 +1,5 @@
+import {readPrivateFormRuntimeResource} from '../education-tools/private-tool.form-runtime-resources'
+import {privateFormDraftResourcePolicy} from '../education-tools/private-tool.form-draft-policy'
 import {assertPrivateScaleRunWorkflow} from './educationPrivateScaleContext'
 import {readPrivateScaleRuntimeResource} from '../education-tools/private-tool.runtime-resources'
 import {relationalEntryToRunPolicy,type RunResourcePolicy} from './resourceAuthority'
@@ -39,9 +41,9 @@ export async function readEducationRunLibraryContext(tx:Prisma.TransactionClient
  * Return values are local transaction facts, not durable capabilities.
  */
 export async function assertEducationRunLibraryResources(tx:Prisma.TransactionClient,input:Scope&{resources:Ref[];purpose:'EDIT'|'PREVIEW'|'PUBLISH'}){
- const privateRefs=input.resources.filter(ref=>ref.key.startsWith('private-scale:'))
- if(privateRefs.some(ref=>ref.family!=='SCALE'||ref.version!=='1.0.0'))fail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID',409)
- if(!input.resources.some(ref=>ref.family==='SCALE'))return null
+ const privateRefs=input.resources.filter(ref=>ref.key.startsWith('private-scale:')||ref.key.startsWith('private-form:'))
+ if(privateRefs.some(ref=>ref.family!==(ref.key.startsWith('private-form:')?'FORM':'SCALE')||ref.version!=='1.0.0'))fail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID',409)
+ if(!input.resources.some(ref=>ref.family==='SCALE')&&!privateRefs.length)return null
  const initial=await readEducationRunLibraryContext(tx,input)
  if(!initial){
   if(input.resources.some(ref=>ref.key.startsWith('library-scale:'))||privateRefs.length)fail('EDUCATION_LIBRARY_EXPLICIT_WORKFLOW_REQUIRED',403)
@@ -76,8 +78,9 @@ export async function assertEducationRunLibraryResources(tx:Prisma.TransactionCl
  if(privateRefs.length){
   const editor=await assertPrivateScaleRunWorkflow(tx,input,current)
   for(const ref of [...privateRefs].sort((a,b)=>a.key.localeCompare(b.key))){
-   const source=await readPrivateScaleRuntimeResource(tx,{key:ref.key,version:'1.0.0',purpose:'NEW_USE',context:editor.context})
-   privateResourcePolicies.set(ref.key,relationalEntryToRunPolicy(source.resourceEntry))
+   const form=ref.key.startsWith('private-form:')
+   const source=await (form?readPrivateFormRuntimeResource:readPrivateScaleRuntimeResource)(tx,{key:ref.key,version:'1.0.0',purpose:'NEW_USE',context:editor.context})
+   privateResourcePolicies.set(ref.key,form?privateFormDraftResourcePolicy(source):relationalEntryToRunPolicy(source.resourceEntry))
   }
  }
  return {...current,privateResourcePolicies}

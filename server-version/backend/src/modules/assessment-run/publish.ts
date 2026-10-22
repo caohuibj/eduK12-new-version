@@ -1,4 +1,6 @@
-import {readPrivateScaleRunSourceForPreparation} from './educationPrivateScaleContext'
+import {sealPrivateFormRuntimeForPublication} from '../education-tools/private-tool.form-runtime-resources'
+import {privateFormDraftResourcePolicy} from '../education-tools/private-tool.form-draft-policy'
+import {readPrivateScaleRunSourceForPreparation,readPrivateFormRunSourceForPreparation} from './educationPrivateScaleContext'
 import {prelockEducationLibraryAdmissions,assertEducationLibraryAdmissionsUnchanged,assertEducationLibraryPopulationSupport,lockEducationLibraryPopulationFacts} from './educationLibraryPopulation'
 import {assertEducationRunLibraryResources} from './educationLibraryContext'
 import { matchesClassTarget } from '../assessment-policy/target'
@@ -166,7 +168,7 @@ const readDraftTracks = async (runId: string, organizationId: string, db:Tx=pris
 }
 
 const assertPreparedPrivatePolicies=(tracks:PreparedTrack[],education:Awaited<ReturnType<typeof assertEducationRunLibraryResources>>)=>{
- for(const track of tracks.filter(t=>t.resourceKey.startsWith('private-scale:'))){
+ for(const track of tracks.filter(t=>t.resourceKey.startsWith('private-scale:')||t.resourceKey.startsWith('private-form:'))){
   const current=education?.privateResourcePolicies.get(track.resourceKey)
   if(!current||canonicalHash(current)!==canonicalHash(track.resourcePolicy))
    throw new RunPublishError('PRIVATE_TOOL_RUNTIME_POLICY_CHANGED','Private fixed-version policy changed during preparation',409)
@@ -180,11 +182,10 @@ const prepareTracks = async (
   actorUserId: string,
 ): Promise<PreparedTrack[]> => {
   const tracks = await readDraftTracks(runId, organizationId)
-  if(tracks.some(track=>track.resourceKey.startsWith('private-form:')))
-    throw new RunPublishError('PRIVATE_FORM_ACTIVITY_RUNTIME_NOT_READY','Private form execution adapter is not ready',409)
   if (tracks.length === 0) throw new RunPublishError('RUN_TRACK_REQUIRED', 'Run requires at least one Track', 409)
   return Promise.all(tracks.map(async (track) => {
-    const privateSource=track.resourceKey.startsWith('private-scale:')?await readPrivateScaleRunSourceForPreparation(prisma,{organizationId,runId,actorUserId,resource:{family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion}}):null
+    const privateForm=track.resourceKey.startsWith('private-form:')
+    const privateSource=privateForm||track.resourceKey.startsWith('private-scale:')?await (privateForm?readPrivateFormRunSourceForPreparation:readPrivateScaleRunSourceForPreparation)(prisma,{organizationId,runId,actorUserId,resource:{family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion}}):null
     if(!privateSource)await assertRegisteredResourceUse({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion }, actorUserId, prisma, false, {organizationId,runId})
     if(teacherFormResourceId({
       family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion,
@@ -203,7 +204,7 @@ const prepareTracks = async (
       }))
     }
     registry.assertStartSupported(track.resourceFamily)
-    const resourcePolicy = privateSource?relationalEntryToRunPolicy(privateSource.resourceEntry):await registry.resolveExact({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion })
+    const resourcePolicy = privateSource?(privateForm?privateFormDraftResourcePolicy(privateSource):relationalEntryToRunPolicy(privateSource.resourceEntry)):await registry.resolveExact({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion })
     assertRunTrackNarrowing(resourcePolicy, track.requestedPolicy)
     requireSingle(track.requestedPolicy.subjectRoles, 'subjectRoles')
     requireSingle(track.requestedPolicy.respondentRoles, 'respondentRoles')
@@ -979,7 +980,7 @@ export const publishAssessmentRun = async (input: {
   })))
 
   return prisma.$transaction(async (tx) => {
-    const libraryBatch=preparedTracks.some(t=>t.resourceKey.startsWith('library-scale:')||t.resourceKey.startsWith('private-scale:'))
+    const libraryBatch=preparedTracks.some(t=>t.resourceKey.startsWith('library-scale:')||t.resourceKey.startsWith('private-scale:')||t.resourceKey.startsWith('private-form:'))
     if(libraryBatch)assertEducationLibraryPopulationSupport(preparedTracks)
     const admissions=libraryBatch?await prelockEducationLibraryAdmissions(tx,input):[]
     const education=await assertEducationRunLibraryResources(tx,{organizationId:input.organizationId,runId:input.runId,actorUserId:input.actorUserId,purpose:'PUBLISH',resources:preparedTracks.map(t=>({family:t.resourceFamily,key:t.resourceKey,version:t.resourceVersion}))})
@@ -1071,7 +1072,7 @@ export const publishAssessmentRun = async (input: {
 
     for (const track of preparedTracks) {
       // New library tracks were batch-authorized before the org lock. Never select another issuer here.
-      if(!track.resourceKey.startsWith('library-scale:')&&!track.resourceKey.startsWith('private-scale:'))
+      if(!track.resourceKey.startsWith('library-scale:')&&!track.resourceKey.startsWith('private-scale:')&&!track.resourceKey.startsWith('private-form:'))
       await assertRegisteredResourceUse({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion }, input.actorUserId, tx, true, {organizationId:input.organizationId,runId:input.runId})
       if(teacherFormResourceId({
         family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion,
@@ -1254,6 +1255,13 @@ export const publishAssessmentRun = async (input: {
         })
       }
     }
+    // Same transaction, after every relationship/authority check and all writes.
+    // Any subsequent failure rolls the native source sealing back with the Run.
+    for(const track of preparedTracks.filter(t=>t.resourceKey.startsWith('private-form:')).sort((a,b)=>a.resourceKey.localeCompare(b.resourceKey))){
+      const target=track.resourcePolicy.runtimeLaunchTarget
+      if(target?.kind!=='COMPOSITE')throw new RunPublishError('PRIVATE_FORM_RUNTIME_COMPOSITE_INVALID','Private FORM launch mismatch',409)
+      await sealPrivateFormRuntimeForPublication(tx,{key:track.resourceKey,compositeId:target.ref})
+    }
     const version = run.version + 1
     await tx.$executeRaw`
       UPDATE "assessment_runs"
@@ -1270,7 +1278,7 @@ export const publishAssessmentRun = async (input: {
       )
     `
     return { runId: input.runId, version, trackCount: preparedTracks.length, executionCount }
-  }, { isolationLevel: preparedTracks.some(t=>t.resourceKey.startsWith('library-scale:')||t.resourceKey.startsWith('private-scale:'))?Prisma.TransactionIsolationLevel.ReadCommitted:Prisma.TransactionIsolationLevel.Serializable })
+  }, { isolationLevel: preparedTracks.some(t=>t.resourceKey.startsWith('library-scale:')||t.resourceKey.startsWith('private-scale:')||t.resourceKey.startsWith('private-form:'))?Prisma.TransactionIsolationLevel.ReadCommitted:Prisma.TransactionIsolationLevel.Serializable })
 }
 
 /** Advisory, write-free population preview; publish repeats every authority check. */
@@ -1280,7 +1288,7 @@ export const previewAssessmentRun = async (input: {
 }) => {
   const prepared = await prepareTracks(input.runId, input.organizationId, input.resourceRegistry ?? productionRunResourceAuthorityRegistry, input.actorUserId)
   return prisma.$transaction(async tx => {
-    const libraryBatch=prepared.some(t=>t.resourceKey.startsWith('library-scale:')||t.resourceKey.startsWith('private-scale:'))
+    const libraryBatch=prepared.some(t=>t.resourceKey.startsWith('library-scale:')||t.resourceKey.startsWith('private-scale:')||t.resourceKey.startsWith('private-form:'))
     if(libraryBatch)assertEducationLibraryPopulationSupport(prepared)
     const admissions=libraryBatch?await prelockEducationLibraryAdmissions(tx,input):[]
     const education=await assertEducationRunLibraryResources(tx,{organizationId:input.organizationId,runId:input.runId,actorUserId:input.actorUserId,purpose:'PREVIEW',resources:prepared.map(t=>({family:t.resourceFamily,key:t.resourceKey,version:t.resourceVersion}))})
@@ -1325,5 +1333,5 @@ export const previewAssessmentRun = async (input: {
       tracks.push({ trackId: track.id, executionCount: pairs.length, subjectCount: new Set(pairs.map(pair => actorCacheKey(pair.subject))).size, respondentCount: new Set(pairs.map(pair => actorCacheKey(pair.respondent))).size, resourcePolicy: track.resourcePolicy })
     }
     return { runId: input.runId, version: input.expectedVersion, tracks }
-  }, { isolationLevel: prepared.some(t=>t.resourceKey.startsWith('library-scale:')||t.resourceKey.startsWith('private-scale:'))?Prisma.TransactionIsolationLevel.ReadCommitted:Prisma.TransactionIsolationLevel.RepeatableRead })
+  }, { isolationLevel: prepared.some(t=>t.resourceKey.startsWith('library-scale:')||t.resourceKey.startsWith('private-scale:')||t.resourceKey.startsWith('private-form:'))?Prisma.TransactionIsolationLevel.ReadCommitted:Prisma.TransactionIsolationLevel.RepeatableRead })
 }

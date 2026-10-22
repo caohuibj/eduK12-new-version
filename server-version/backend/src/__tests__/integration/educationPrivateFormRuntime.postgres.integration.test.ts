@@ -1,3 +1,4 @@
+import {copyComposite} from '../../modules/composite/composite.service'
 import {randomUUID} from 'node:crypto'
 import {Prisma,PrismaClient} from '@prisma/client'
 import {beforeAll,afterAll,describe,it,expect} from 'vitest'
@@ -36,7 +37,7 @@ async function frozen(c:PrivateToolContext,definition:unknown=form()){
 suite('Private Form internal fixed-version preparation, not publication',()=>{
  beforeAll(async()=>{requireIsolatedReleaseDatabase(url!);db=new PrismaClient({datasources:{db:{url:url!}}});await db.$connect()})
  afterAll(async()=>{await db?.$disconnect()})
- it('pins both entry sources, preserves pages and typed content, and idempotently prepares only an immutable non-runnable Composite',async()=>{
+ it('pins both entry sources, preserves pages and typed content, and idempotently prepares an immutable draft whose only lifecycle change is native publication',async()=>{
   const a=await actor()
   for(const entry of ['SCHOOL','TEACHER'] as const){
    const c={...a.context,entry},v=await frozen(c),input={versionId:v.id,contentHash:v.contentHash,administration:{population:entry==='SCHOOL'?'STUDENT':'TEACHER',responseMode:'SELF'}}
@@ -50,7 +51,13 @@ suite('Private Form internal fixed-version preparation, not publication',()=>{
    expect(composite.items.every(item=>item.type==='FORM'&&item.scaleId===null)).toBe(true)
    expect(await db.$queryRaw`SELECT id FROM registered_assessment_resources WHERE composite_id=${composite.id}`).toEqual([])
    expect(await db.scale.findMany({where:{code:'education-private-scale:'+v.id}})).toEqual([])
-   await expect(db.compositeAssessment.update({where:{id:composite.id},data:{status:'PUBLISHED',publishedAt:new Date()}})).rejects.toThrow('PRIVATE_FORM_COMPOSITE_IMMUTABLE')
+   // The publication transition is now allowed, but never a content rewrite or downgrade.
+   await db.compositeAssessment.update({where:{id:composite.id},data:{status:'PUBLISHED',publishedAt:new Date()}})
+   await expect(db.compositeAssessment.update({where:{id:composite.id},data:{status:'DRAFT',publishedAt:null}})).rejects.toThrow('PRIVATE_FORM_COMPOSITE_IMMUTABLE')
+   await expect(db.compositeAssessment.update({where:{id:composite.id},data:{name:'Rewritten'}})).rejects.toThrow('PRIVATE_FORM_COMPOSITE_IMMUTABLE')
+   const beforeCopy=await db.compositeAssessment.count({where:{createdBy:a.user.id}})
+   await expect(copyComposite(a.user.id,'TEACHER',composite.id,{})).rejects.toMatchObject({statusCode:403,message:'组织资源仅可通过对应的组织任务访问'})
+   expect(await db.compositeAssessment.count({where:{createdBy:a.user.id}})).toBe(beforeCopy)
    await expect(db.compositeAssessmentItem.update({where:{id:composite.items[0].id},data:{required:false}})).rejects.toThrow('PRIVATE_FORM_CHILD_IMMUTABLE')
    await expect(db.compositeFormSection.update({where:{id:composite.formSections[0].id},data:{title:'Rewrite'}})).rejects.toThrow('PRIVATE_FORM_CHILD_IMMUTABLE')
    await db.compositeAssessment.update({where:{id:composite.id},data:{revision:{increment:1}}})
@@ -69,7 +76,10 @@ suite('Private Form internal fixed-version preparation, not publication',()=>{
   await db.organizationCapabilityGrant.update({where:{id:a.capability.id},data:{revokedAt:new Date(),revokedByUserId:a.user.id}})
   await expect(transaction(tx=>preparePrivateFormRuntimeResource(tx,a.context,input))).rejects.toThrow()
   await expect(transaction(tx=>readPrivateFormRuntimeResource(tx,{key,version:'1.0.0',purpose:'NEW_USE',context:a.context}))).rejects.toThrow()
-  for(const purpose of ['HISTORY','EXISTING_EXECUTION'] as const)expect(await transaction(tx=>readPrivateFormRuntimeResource(tx,{key,version:'1.0.0',purpose}))).toMatchObject({identityOnly:true,canPublish:false})
+  expect(await transaction(tx=>readPrivateFormRuntimeResource(tx,{key,version:'1.0.0',purpose:'HISTORY'}))).toMatchObject({identityOnly:true,canPublish:false})
+  await expect(transaction(tx=>readPrivateFormRuntimeResource(tx,{key,version:'1.0.0',purpose:'EXISTING_EXECUTION'}))).rejects.toThrow('PRIVATE_FORM_RUNTIME_NOT_PUBLISHED')
+  await db.compositeAssessment.update({where:{id:prepared.compositeId},data:{status:'PUBLISHED',publishedAt:new Date()}})
+  expect(await transaction(tx=>readPrivateFormRuntimeResource(tx,{key,version:'1.0.0',purpose:'EXISTING_EXECUTION'}))).toMatchObject({identityOnly:true,canPublish:false})
  })
  it('refuses nonrepresentable conditions before writes, rejects forged child-source sealing, and rolls back caller failures',async()=>{
   const a=await actor(),draft=form()

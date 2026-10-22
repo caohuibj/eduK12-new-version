@@ -14,6 +14,11 @@ describe('Private FORM DRAFT policy is not published resource authority',()=>{
   expect(s).toEqual(before)
   expect(()=>relationalEntryToRunPolicy(s.resourceEntry)).toThrow('resource version is not published')
  })
+ it('can reuse a natively published fixed source for a later draft without granting publication rights',()=>{
+  const s=source();s.resourceEntry=privateFormResourceEntry(origin,'Synthetic',s.compositeId,'PUBLISHED')
+  expect(privateFormDraftResourcePolicy(s)).toEqual(relationalEntryToRunPolicy(s.resourceEntry))
+  expect(s.identityOnly).toBe(true);expect(s.canPublish).toBe(false)
+ })
  it('rejects mismatched parent, exact version identity, source hash, namespace and origin',()=>{
   const mutations=[(s:ReturnType<typeof source>)=>{s.compositeId=id(6)},
    (s:ReturnType<typeof source>)=>{s.origin={...s.origin,contentHash:'b'.repeat(64)}},
@@ -22,9 +27,8 @@ describe('Private FORM DRAFT policy is not published resource authority',()=>{
    (s:ReturnType<typeof source>)=>{s.resourceEntry.privateFormOrigin={...s.origin,organizationId:id(6)}}]
   for(const mutate of mutations){const s=source();mutate(s);expect(()=>privateFormDraftResourcePolicy(s)).toThrow('PRIVATE_FORM_DRAFT_IDENTITY_INVALID')}
  })
- it('does not accept a published entry or drop launch, initiation, target, or disclosure constraints',()=>{
-  const mutations=[(s:ReturnType<typeof source>)=>{s.resourceEntry.releaseStatus='PUBLISHED'},
-   (s:ReturnType<typeof source>)=>{s.resourceEntry.launchTarget=null},
+ it('does not drop launch, initiation, target, or disclosure constraints',()=>{
+  const mutations=[(s:ReturnType<typeof source>)=>{s.resourceEntry.launchTarget=null},
    (s:ReturnType<typeof source>)=>{s.resourceEntry.initiationModes=[]},
    (s:ReturnType<typeof source>)=>{s.resourceEntry.allowedTargetModes=['ALL_CLASS_TEACHERS']},
    (s:ReturnType<typeof source>)=>{s.resourceEntry.resultDisclosure!.audiences.RESPONDENT.mode='INDIVIDUAL_SUMMARY'}]
