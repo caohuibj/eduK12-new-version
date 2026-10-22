@@ -14,14 +14,14 @@ export function verifyLocalReports(load=name=>readFileSync('.github/evidence/adm
  const cases=new Set();let total=0;
  for(const[name,count,pending]of [['authenticator-backend-tests.json',40,0],['authenticator-frontend-tests.json',40,0],['authenticator-additional-boundaries.json',3,12]]){
   const r=reports[name];assert.equal(r.success,true);assert.equal(r.numFailedTests,0);assert.equal(r.numPassedTests,count);assert.equal(r.numPendingTests,pending);
-  let passed=0;
+  let passed=0,filtered=0;
   for(const suite of r.testResults)for(const test of suite.assertionResults){
-   if(test.status==='pending'){assert.equal(pending,12);continue;}
+   if(test.status==='skipped'){assert.equal(name,'authenticator-additional-boundaries.json');assert.equal(pending,12);filtered++;continue;}
    assert.equal(test.status,'passed');assert.deepEqual(test.failureMessages,[]);
    const file=suite.name.slice(suite.name.indexOf('/server-version/')+1),key=file+'::'+test.fullName;
    assert.ok(!cases.has(key),'Duplicate admitted assertion');cases.add(key);passed++;
   }
-  assert.equal(passed,count);total+=passed;
+  assert.equal(passed,count);assert.equal(filtered,pending);total+=passed;
  }
  assert.equal(total,83);assert.equal(reports['authenticator-frontend-lint-status.json'].exitCode,0);
  const storage=reports['authenticator-storage-roundtrip.json'];
