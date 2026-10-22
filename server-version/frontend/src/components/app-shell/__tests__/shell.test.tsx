@@ -84,8 +84,8 @@ describe('Training assessment presentation boundary', () => {
   })
 })
 
-describe('Training learner home header', () => {
-  it.each(['/student', '/student/'])('omits navigation on %s and keeps account settings and logout', path => {
+describe('Training learner header', () => {
+  it.each(['/student', '/student/', '/student/courses/course-1', '/student/checkins/checkin-1?courseId=course-1&courseSection=checkins', '/student/assignments/assignment-1', '/student/profile'])('omits navigation on %s and keeps account settings and logout', path => {
     presentation.training = true
     const view = render(<MemoryRouter initialEntries={[path]}><AppShell><h1>我的课程</h1></AppShell></MemoryRouter>)
     expect(view.container.querySelector('.training-workspace-menu')).toBeNull()
@@ -93,11 +93,7 @@ describe('Training learner home header', () => {
     expect(screen.getByRole('link', { name: /个人账号设置/ })).toHaveAttribute('href', '/student/profile')
     expect(screen.getByRole('button', { name: '退出登录' })).toBeEnabled()
   })
-  it('retains the student menu on course pages', () => {
-    presentation.training = true
-    const view = render(<MemoryRouter initialEntries={['/student/courses/course-1']}><AppShell><h1>课程内容</h1></AppShell></MemoryRouter>)
-    expect(view.container.querySelector('.training-workspace-menu')).not.toBeNull()
-  })
+
 })
 
 describe('Training teacher visual boundary', () => {
