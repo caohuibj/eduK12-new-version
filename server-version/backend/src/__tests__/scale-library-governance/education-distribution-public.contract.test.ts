@@ -1,3 +1,4 @@
+import {libraryCompatibility} from '../../modules/scale-library-governance/catalog-adapter'
 import {randomUUID} from 'node:crypto'
 import {describe,expect,it} from 'vitest'
 import {educationRecipientInput,educationPublicGrantInput} from '../../modules/scale-library-governance/education-distribution-public-contracts'
@@ -13,7 +14,7 @@ const compiled=compileEducationApplicability(declaration)
 const snapshot:LibrarySnapshot={title:'Synthetic',product:'SURVEY',instrumentClass:'CUSTOM_DESCRIPTIVE',definition,
  compiledDefinition:compileResearchScale('Synthetic',definition),educationApplicability:declaration,
  educationApplicabilityHash:compiled.contractHash,educationApplicabilityCompilerVersion:compiled.compilerVersion}
-describe('Education distribution contract, not a public enablement',()=>{
+describe('Education public distribution exact-product contract',()=>{
  it('requires exact release/hash and explicit org vs user scope without legacy field smuggling',()=>{
   const org={...exact,scopeKind:'ORGANIZATION' as const}
   expect(educationRecipientInput.parse(org).keyword).toBe('')
@@ -28,8 +29,13 @@ describe('Education distribution contract, not a public enablement',()=>{
  })
  it('separates content compatibility and final public readiness, with specific temporary reasons',()=>{
   expect(educationDistributionReadiness(snapshot,{approved:true,dependencyReleaseIds:[]})).toMatchObject({
-   contentCompatible:true,status:'NOT_READY',canDistribute:false,reason:'EDUCATION_LIBRARY_ADAPTER_NOT_READY'})
-  expect(()=>assertEducationPublicDistributionReady()).toThrow('ADAPTER_NOT_READY')
+   contentCompatible:true,status:'READY',canDistribute:true,reason:null})
+  expect(()=>assertEducationPublicDistributionReady()).not.toThrow()
+  const catalog=libraryCompatibility(snapshot,{approved:true,dependencyReleaseIds:[]})
+  expect(catalog.supportedEntrypoints).toContain('SCHOOL')
+  expect(catalog.compatibilityReasons.SCHOOL).toBeUndefined()
+  expect(catalog.supportedEntrypoints).not.toContain('TEACHER')
+  expect(catalog.compatibilityReasons.TEACHER).toBe('EDUCATION_LIBRARY_PRODUCT_VARIANT_ADAPTER_NOT_READY')
   expect(educationDistributionReadiness(snapshot).reason).toBe('EDUCATION_LIBRARY_APPROVAL_REQUIRED')
   expect(educationDistributionReadiness(snapshot,{approved:true,dependencyReleaseIds:[randomUUID()]}).reason).toBe('EDUCATION_LIBRARY_DEPENDENCY_ADAPTER_NOT_READY')
   const {educationApplicability:_a,educationApplicabilityHash:_h,educationApplicabilityCompilerVersion:_v,...missing}=snapshot
@@ -42,12 +48,12 @@ describe('Education distribution contract, not a public enablement',()=>{
    educationApplicabilityHash:compiled.contractHash,educationApplicabilityCompilerVersion:compiled.compilerVersion},
    {approved:true,dependencyReleaseIds:[]})
  }
- it('keeps all three student modes School-only while the public gate stays closed',()=>{
+ it('keeps all three student modes School-only without opening Teacher variants',()=>{
   for(const responseMode of ['SELF','PARENT_REPORT','TEACHER_REPORT']){
    const readiness=readyFor([{population:'STUDENT',responseMode}])
    expect(readiness.products.SCHOOL.contentCompatible).toBe(true)
    expect(readiness.products.TEACHER).toMatchObject({contentCompatible:false,canDistribute:false,reason:'EDUCATION_LIBRARY_PRODUCT_VARIANT_ADAPTER_NOT_READY'})
-   expect(readiness.products.SCHOOL.canDistribute).toBe(false)
+   expect(readiness.products.SCHOOL.canDistribute).toBe(true)
    expect(isSupportedEducationLibraryVariant('SCHOOL','STUDENT:'+responseMode)).toBe(true)
   }
  })
@@ -55,7 +61,7 @@ describe('Education distribution contract, not a public enablement',()=>{
   const readiness=readyFor([{population:'TEACHER',responseMode:'SELF'}])
   expect(readiness.products.TEACHER.contentCompatible).toBe(true)
   expect(readiness.products.SCHOOL.contentCompatible).toBe(false)
-  expect(readiness.products.TEACHER.canDistribute).toBe(false)
+  expect(readiness.products.TEACHER.canDistribute).toBe(true)
  })
  it('projects mixed declarations independently and keeps an unsupported teacher/student-rating declaration intact',()=>{
   const mixed=readyFor([{population:'STUDENT',responseMode:'PARENT_REPORT'},{population:'TEACHER',responseMode:'SELF'},

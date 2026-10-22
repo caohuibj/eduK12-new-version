@@ -18,7 +18,7 @@ const user=async(domain:'LEGACY'|'SURVEY'|'SCHOOL',extra:Record<string,unknown>=
 const query=()=>({product:'SCHOOL' as const,scopeKind:'USER' as const,organizationId,releaseId,contentHash})
 const read=(raw:unknown,actor=admin)=>db.$transaction(tx=>educationRecipientsInTransaction(tx,actor,entryId,raw))
 const grant=(raw:unknown)=>db.$transaction(tx=>grantEducationPublicUseInTransaction(tx,admin,entryId,raw),{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
-suite('Education admin distribution seams / isolated PostgreSQL, public gate closed',()=>{
+suite('Education admin distribution seams / isolated PostgreSQL, public entrypoints enabled',()=>{
  beforeAll(async()=>{
   requireIsolatedReleaseDatabase(url!);process.env.DATA_ENCRYPTION_KEY='a'.repeat(64);process.env.DATA_PSEUDONYM_KEY='b'.repeat(64)
   db=new PrismaClient({datasources:{db:{url:url!}}});await db.$connect()
@@ -70,12 +70,12 @@ suite('Education admin distribution seams / isolated PostgreSQL, public gate clo
   await expect(read({releaseId,contentHash,product:'SCHOOL',scopeKind:'ORGANIZATION',cursor:otherOrg})).rejects.toThrow('RECIPIENT_CURSOR_INVALID')
   expect(await db.scale.findUnique({where:{libraryEntryId:entryId}})).toBeNull()
  },120000)
- it('requires exact current distribution authority and fixed release/hash; public routes remain closed',async()=>{
+ it('requires exact current distribution authority and fixed release/hash; public entrypoints enforce the same tuple',async()=>{
   await expect(read(query(),owner)).rejects.toThrow()
   await expect(read({...query(),releaseId:randomUUID()})).rejects.toThrow('EXACT_VERSION_MISMATCH')
   await expect(read({...query(),contentHash:'f'.repeat(64)})).rejects.toThrow('EXACT_VERSION_MISMATCH')
-  await expect(recipients(admin,entryId,query())).rejects.toThrow('ADAPTER_NOT_READY')
-  await expect(grantUse(admin,entryId,{...query(),requestId:randomUUID(),userId:eligible[0]})).rejects.toThrow('ADAPTER_NOT_READY')
+  expect((await recipients(admin,entryId,query())).list).toHaveLength(25)
+  await expect(grantUse(admin,entryId,{...query(),contentHash:'f'.repeat(64),requestId:randomUUID(),userId:eligible[0]})).rejects.toThrow('EXACT_VERSION_MISMATCH')
  })
  it('controlled internal seam grants exact USER and ORGANIZATION scopes, rechecks current membership and preserves idempotence',async()=>{
   const request={...query(),requestId:randomUUID(),userId:eligible[0]}

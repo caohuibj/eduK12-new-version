@@ -6,19 +6,28 @@ import {getContentRelease} from '../measurement-content/repository'
 import {hashScaleDefinition} from '../scale/scale-definition'
 import {prepareTrainingContentSnapshot,trainingContentSnapshotSchema} from '../composite/training-content-binding'
 import {readLibraryScaleMeasurementSource} from './training-source'
-import {readFrozenEducationApplicability} from './education-applicability'
+import {readFrozenEducationApplicability,type EducationApplicabilityVariant} from './education-applicability'
+import {isSupportedEducationLibraryVariant} from './education-supported-variants'
 import {educationLibraryOriginSchema,educationLibraryResourceEntry,educationLibraryResourceKey,
   type EducationLibraryOrigin,type EducationLibraryResourceEntry} from './education-runtime-entry'
 import {assertLibraryAuthority} from './authority'
 import {loadEntry} from './service'
 import {assertScaleLibraryCollectionAllowed} from './collection-guard'
 import {readEducationLibraryUse,educationLibraryUseInput} from './education-use'
-import {educationLibraryEntry,educationLibraryProduct,fail} from './contracts'
+import {educationLibraryEntry,educationLibraryProduct,fail,type EducationLibraryProduct} from './contracts'
 
 const sourceInput=z.object({product:educationLibraryProduct,resourceKey:z.string().min(1).max(240),
   resourceVersion:z.literal('1.0.0'),purpose:z.enum(['NEW_USE','EXISTING_EXECUTION','HISTORY'])}).strict()
 type ResourceRow={id:string;resource_key:string;resource_version:string;scale_id:string;definition_hash:string;
   composite_id:string;entry:EducationLibraryResourceEntry;entry_hash:string;status:string}
+
+/** Runtime allocation projection only. Never rewrite the approved declaration
+ * or its contract hash; unsupported approved pairs may be adapted in the future. */
+export function runnableEducationLibraryVariants(product:EducationLibraryProduct,variants:readonly EducationApplicabilityVariant[]){
+  const runnable=variants.filter(variant=>isSupportedEducationLibraryVariant(product,variant.variantKey))
+  if(!runnable.length)fail('EDUCATION_LIBRARY_VARIANT_UNSUPPORTED')
+  return runnable
+}
 
 export async function assertEducationLibraryReadCommitted(tx:Prisma.TransactionClient){
   const [row]=await tx.$queryRaw<Array<{isolation:string}>>`SELECT current_setting('transaction_isolation') AS isolation`
@@ -127,6 +136,7 @@ export async function prepareEducationLibraryResources(tx:Prisma.TransactionClie
   const applicability=readFrozenEducationApplicability(submission.snapshot)
   if(!applicability)fail('EDUCATION_LIBRARY_APPLICABILITY_REQUIRED')
   if(submission.status!=='APPROVED'||entry.status!=='ACTIVE')fail('EDUCATION_LIBRARY_ENTRY_UNAVAILABLE')
+  const runnableVariants=runnableEducationLibraryVariants(input.product,applicability.variants)
   const release=await getContentRelease(tx,entry.release_id,true)
   if(!release||release.layer!=='MEASUREMENT'||release.family!=='SCALE'||release.status!=='PUBLISHED')fail('EDUCATION_LIBRARY_RELEASE_UNAVAILABLE')
   const dependencies:EducationLibraryOrigin['dependencies']=[]
@@ -148,7 +158,7 @@ export async function prepareEducationLibraryResources(tx:Prisma.TransactionClie
     measurementReleaseId:release.releaseId,libraryEntryId:entry.id}})
   await readLibraryScaleMeasurementSource(tx,scale,'NEW_USE')
   const resources=[]
-  for(const variant of applicability.variants){
+  for(const variant of runnableVariants){
     const origin:EducationLibraryOrigin={schemaVersion:1,adapterVersion:'1.0.0',entryId:entry.id,product:input.product,
       releaseId:release.releaseId,contentHash:release.contentHash,approvedSnapshotHash:submission.snapshot_hash,
       sourceDefinitionHash:canonicalHash(definition),applicabilityHash:applicability.contractHash,variantKey:variant.variantKey as EducationLibraryOrigin['variantKey'],dependencies}

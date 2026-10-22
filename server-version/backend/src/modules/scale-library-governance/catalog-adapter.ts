@@ -30,7 +30,7 @@ export function libraryCompatibility(snapshot:LibrarySnapshot,context?:{approved
   const educationDistribution=educationDistributionReadiness(snapshot,context)
   for(const product of ['SCHOOL','TEACHER'] as const){
    const readiness=educationDistribution.products[product]
-   if(readiness.canDistribute)supportedEntrypoints.push(product)
+   if(readiness.canDistribute){supportedEntrypoints.push(product);delete compatibilityReasons[product]}
    else compatibilityReasons[product]=readiness.reason!
   }
   return {supportedEntrypoints,compatibilityReasons,educationDistribution}

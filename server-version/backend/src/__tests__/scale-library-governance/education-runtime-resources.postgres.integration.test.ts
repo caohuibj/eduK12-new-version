@@ -40,7 +40,7 @@ suite('Education library registered resources / real isolated PostgreSQL',()=>{
   project=randomUUID();await db.surveyProject.create({data:{id:project,ownerUserId:owner,title:'Synthetic education library',collectionMode:'SINGLE_UNLINKED'}})
  })
  afterAll(async()=>{await db?.$disconnect()})
- it('atomically binds exact approved resources and scoped grants without opening public delivery',async()=>{
+ it('atomically binds exact approved resources and scoped grants, rejecting incomplete public identities',async()=>{
   const release=await db.$transaction(tx=>publishContentRelease(tx,scaleMeasurementRelease({localId:randomUUID(),version:'v1',instrumentVersion:'1',
    definition:compileResearchScale(metadata.title,definition),instrumentClass:'CUSTOM_DESCRIPTIVE',presentationMode:'ALL_AT_ONCE',
    scope:{kind:'PRIVATE',ownerId:owner,product:'SURVEY',resourceId:project},provenance:{authoringRelationship:'ORIGINAL',
@@ -54,12 +54,21 @@ suite('Education library registered resources / real isolated PostgreSQL',()=>{
   const member=(await db.user.create({data:{username:'edlibmember'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'SCHOOL'}})).id
   await db.organizationMembership.create({data:{id:randomUUID(),organizationId,userId:member}})
   const request={requestId:randomUUID(),product:'SCHOOL' as const,scopeKind:'USER' as const,organizationId,userId:member}
-  await expect(grantUse(admin,entryId,request)).rejects.toThrow('ADAPTER_NOT_READY')
+  // The internal command is not a valid public request: public distribution
+  // must receive the exact immutable release/hash, never infer the latest.
+  await expect(grantUse(admin,entryId,request)).rejects.toMatchObject({name:'ZodError',issues:[{
+   code:'invalid_union',unionErrors:expect.arrayContaining([expect.objectContaining({issues:expect.arrayContaining([
+    expect.objectContaining({code:'invalid_type',expected:'string',received:'undefined',path:['releaseId']}),
+    expect.objectContaining({code:'invalid_type',expected:'string',received:'undefined',path:['contentHash']}),
+   ])})]),
+  }]})
+  expect(await db.scale.findUnique({where:{libraryEntryId:entryId}})).toBeNull()
   // Deliberate transaction rollback must not leave resources or grants behind.
   await expect(db.$transaction(async tx=>{await grantEducationLibraryUseInTransaction(tx,admin,entryId,request);throw new Error('synthetic rollback')})).rejects.toThrow('synthetic rollback')
   expect(await db.scale.findUnique({where:{libraryEntryId:entryId}})).toBeNull()
   const granted=await db.$transaction(tx=>grantEducationLibraryUseInTransaction(tx,admin,entryId,request))
-  expect(granted.resources).toHaveLength(2)
+  expect(granted.resources).toHaveLength(1)
+  expect(granted.resources[0].resourceEntry.libraryOrigin.variantKey).toBe('STUDENT:SELF')
   const resource=granted.resources[0],ref={product:'SCHOOL' as const,resourceKey:resource.resourceEntry.applicability.resourceKey,resourceVersion:'1.0.0' as const}
   const repeated=await db.$transaction(tx=>grantEducationLibraryUseInTransaction(tx,admin,entryId,request))
   expect(repeated.grant.id).toBe(granted.grant.id)
@@ -101,6 +110,8 @@ suite('Education library registered resources / real isolated PostgreSQL',()=>{
 
   await expect(db.$transaction(tx=>readEducationLibraryRegisteredSource(tx,{...ref,product:'TEACHER',purpose:'HISTORY'}))).rejects.toThrow('IDENTITY_MISMATCH')
   const teacher=await db.$transaction(tx=>grantEducationLibraryUseInTransaction(tx,admin,entryId,{...request,requestId:randomUUID(),product:'TEACHER',scopeKind:'ORGANIZATION',userId:null}))
+  expect(teacher.resources).toHaveLength(1)
+  expect(teacher.resources[0].resourceEntry.libraryOrigin.variantKey).toBe('TEACHER:SELF')
   expect(teacher.resources[0].scaleId).toBe(resource.scaleId)
   expect(teacher.resources[0].compositeId).not.toBe(resource.compositeId)
   const [row]=await db.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM registered_assessment_resources WHERE resource_key=${ref.resourceKey} AND resource_version=${ref.resourceVersion}`)

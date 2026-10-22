@@ -6,7 +6,7 @@ import {assertLibraryAuthority} from './authority'
 import {event} from './service'
 import {type LibraryUseRow,useView} from './usage'
 
-/** Internal transaction adapter, deliberately NOT routed by public grantUse yet.
+/** Transaction adapter shared by the exact public distribution API.
  * The same transaction creates exact resources and grants; a failed target or
  * insert rolls back wrappers/Composites too. No Training material grant is made.
  */

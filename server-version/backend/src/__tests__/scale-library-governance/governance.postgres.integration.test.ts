@@ -235,11 +235,11 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
   const outcome=await observed;expect(outcome.ok).toBe(false)
   expect(JSON.stringify(outcome.error)).toMatch(/40001|P2034|serialize/i)
  })
- it('education foundation rejects distribution before adapters without creating a grant',async()=>{
-  const {entryId}=await approved()
+ it('education distribution rejects a version without approved applicability and creates no grant',async()=>{
+  const {entryId,release}=await approved()
   for(const product of ['SCHOOL','TEACHER']){
    const requestId=randomUUID()
-   await expect(grantUse(admin,entryId,{requestId,product,scopeKind:'USER',organizationId:randomUUID(),userId:reader})).rejects.toThrow('EDUCATION_LIBRARY_ADAPTER_NOT_READY')
+   await expect(grantUse(admin,entryId,{requestId,product,releaseId:release.releaseId,contentHash:release.contentHash,scopeKind:'USER',organizationId:randomUUID(),userId:reader})).rejects.toThrow('EDUCATION_LIBRARY_APPLICABILITY_REQUIRED')
    expect(await db.scaleLibraryUseGrant.findUnique({where:{id:requestId}})).toBeNull()
   }
  })
@@ -344,8 +344,8 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
   await expect(submit(owner,'SURVEY',{...request,requestId:randomUUID()})).rejects.toThrow()
   const entries=await listEntries(admin,approvedVersion.entryId!)
   expect(entries.list[0].educationApplicabilityHash).toBe(submission.educationApplicabilityHash)
-  expect(entries.list[0].supportedEntrypoints).not.toContain('SCHOOL')
-  expect(entries.list[0].supportedEntrypoints).not.toContain('TEACHER')
+  expect(entries.list[0].supportedEntrypoints).toContain('SCHOOL')
+  expect(entries.list[0].supportedEntrypoints).toContain('TEACHER')
  })
 
 })

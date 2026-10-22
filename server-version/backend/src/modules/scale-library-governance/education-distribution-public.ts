@@ -31,7 +31,7 @@ async function exactEntry(tx:Tx,actorId:string,entryId:string,input:ExactRequest
  await assertLibraryMediaReady(tx,entryId,submission.snapshot.mediaManifest)
  return {entry,submission}
 }
-/** INTERNAL seam only. Public callers remain behind the final closed gate.
+/** Exact public distribution preflight, called within the routed transaction.
  * Actual resource preparation and grant insertion stay in the already-reviewed
  * adapter transaction. The exact tuple is required, never an implicit latest. */
 export async function grantEducationPublicUseInTransaction(tx:Tx,actorId:string,entryId:string,raw:unknown){
@@ -64,7 +64,7 @@ function memberPredicate(organizationId:string,product:EducationLibraryProduct){
     AND NOT EXISTS(SELECT 1 FROM organization_access_denies d WHERE d.organization_id=o.id AND d.user_id=u.id
      AND d.lifted_at IS NULL AND d.permission IN ('*','EDUCATION_ACCESS',${educationLibraryEntry[product]+'_ACCESS'})))`
 }
-/** INTERNAL read seam. UUID anchors must still be eligible in the exact scoped
+/** Read-only public picker. UUID anchors must still be eligible in the exact scoped
  * query; a cursor is not authority and never opens a different organization. */
 export async function educationRecipientsInTransaction(tx:Tx,actorId:string,entryId:string,raw:unknown){
  const input=educationRecipientInput.parse(raw)

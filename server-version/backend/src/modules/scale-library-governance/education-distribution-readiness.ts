@@ -3,9 +3,9 @@ import {EDUCATION_LIBRARY_ADAPTER_NOT_READY,fail,type EducationLibraryProduct} f
 import {isSupportedEducationLibraryVariant} from './education-supported-variants'
 import type {LibrarySnapshot} from './source'
 
-// Deliberately closed until the final end-to-end acceptance. Not an environment
-// toggle, request parameter, content declaration, or new authorization role.
-export const educationPublicDistributionEnabled:boolean=false
+// Public distribution uses the same reviewed adapter and current authority checks.
+// This is not an environment toggle, request flag, or additional authorization role.
+export const educationPublicDistributionEnabled:boolean=true
 export function assertEducationPublicDistributionReady(){
  if(!educationPublicDistributionEnabled)fail(EDUCATION_LIBRARY_ADAPTER_NOT_READY,409)
 }
