@@ -1,0 +1,71 @@
+name: Survey experience exact frontend acceptance
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+jobs:
+  frontend:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      PLAN: ${{ inputs.plan }}
+      CI_EVENT: pull_request
+      CI_HEAD_REF: ${{ github.head_ref }}
+      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.21.0
+          registry-url: https://registry.npmjs.org
+      - name: verify exact candidate and explicitly approved unsigned local results
+        run: node .github/scripts/survey-experience-candidate.mjs admit
+      - uses: docker/setup-buildx-action@v3
+      - name: compile frontend once and preserve builder plus runtime bytes
+        run: node .github/scripts/survey-experience-candidate.mjs build
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: survey-experience-images-${{ github.sha }}
+          path: survey-experience-images/
+          if-no-files-found: error
+          retention-days: 7
+      - name: current dependency audit (no previous audit claimed)
+        run: node .github/scripts/survey-experience-candidate.mjs audit
+      - uses: aquasecurity/setup-trivy@3fb12ec12f41e471780db15c232d5dd185dcb514
+        with:
+          version: v0.70.0
+          cache: false
+      - name: scan exact produced runtime image
+        run: trivy image --exit-code 1 --ignore-unfixed --scanners vuln --severity HIGH,CRITICAL --format json --output survey-experience-evidence/runtime-scan.json survey-experience-runtime:${{ github.sha }}
+      - name: install existing pinned release tools and official Chromium
+        run: |
+          npm ci --prefix .github/release-tools --registry=https://registry.npmjs.org
+          node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+      - name: real Chromium desktop and mobile against production dist and synthetic API
+        env:
+          SURVEY_EXPERIENCE_DIST: ${{ github.workspace }}/survey-experience-evidence/runtime
+          SURVEY_EXPERIENCE_EVIDENCE: ${{ github.workspace }}/survey-experience-evidence/browser
+          PLAYWRIGHT_MODULE: ${{ github.workspace }}/.github/release-tools/node_modules/playwright-core
+          AXE_SCRIPT: ${{ github.workspace }}/.github/release-tools/node_modules/axe-core/axe.min.js
+        run: |
+          export SURVEY_EXPERIENCE_DIST_MANIFEST_SHA256="$(sha256sum survey-experience-evidence/runtime-files.json | cut -d ' ' -f1)"
+          node .github/scripts/survey-experience-browser.cjs
+      - name: validate actual browser result and scope of claims
+        run: node .github/scripts/survey-experience-candidate.mjs browser-report
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: survey-experience-evidence-${{ github.sha }}
+          path: |
+            survey-experience-evidence/*.json
+            survey-experience-evidence/*.sha256
+            survey-experience-evidence/browser/
+          if-no-files-found: error
+          retention-days: 7

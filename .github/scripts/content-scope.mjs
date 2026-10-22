@@ -1,3 +1,4 @@
+import {surveyExperiencePlan,surveyExperienceOutputs} from './survey-experience-scope.mjs';
 import {scaleLibraryGovernancePlan,scaleLibraryGovernanceOutputs} from './scale-library-governance-scope.mjs';
 import {compositeCsvMemoryPlan,compositeCsvMemoryOutputs} from './composite-csv-memory-scope.mjs';
 import {trainingWorkspacePlan,trainingWorkspaceOutputs} from './training-workspace-scope.mjs';
@@ -294,6 +295,9 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       Object.entries(output).map(([key,value])=>`${key}=${value}\n`).join(''));
     process.exit(0);
   }
+  const experience=surveyExperiencePlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  if((process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME)==='work/survey-experience-20261022'&&!experience)throw Error('Survey experience drift: no full-platform fallback');
+  if(experience){const output={...surveyExperienceOutputs(experience),...Object.fromEntries(Object.entries(runnerPlan({scenario:"survey-experience"})).map(([k,v])=>[k,Array.isArray(v)?JSON.stringify(v):v]))};console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const governance = scaleLibraryGovernancePlan(event === 'workflow_dispatch' ? [] : changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if((process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME)==='work/scale-library-governance-20261021'&&!governance)throw Error('Scale governance candidate drift: full-platform fallback is not authorized');
   if(governance){
