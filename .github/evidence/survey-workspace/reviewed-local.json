@@ -1375,7 +1375,7 @@
   ],
   "review": {
     "runtime": "Mac Node 24.21.0; original reports retained, including failures and filtered cases; cached dependencies were not historically signed",
-    "controlReceipt": "73 current negative/scope/topology contracts passed locally. CI does not repeat them; the only subsequent workflow edit removes that duplicate invocation. Scope, required checks, refusal assertions and protected inputs are unchanged. The live CLI recomputes the actual checkout plan and evidence bindings in Actions.",
+    "controlReceipt": "73 original scope/refusal/topology contracts passed locally and are retained without repetition. Official run 39814196927 completed seven new reuse contracts and one changed wiring case; exact original official log and successful stage are admitted separately without claiming the cancelled browser or parent run succeeded. Subsequent changed wiring and new compiled-artifact identity contracts run only in Actions.",
     "closure": "Current application changes reviewed against original local batches. Readiness controller and publication/media locks remain represented by PG reports; App consumers invalidated by theme wrapping were freshly checked, with stale renamed tab assertion repaired alone. CSS does not enter Vitest logic; nine current rendered studios were separately inspected. Corrected nullable Prisma declaration changes generated model metadata, not raw tool SQL semantics; current generation/types and disposable migration/restore remain mandatory in CI."
   },
   "limits": [

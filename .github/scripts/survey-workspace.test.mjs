@@ -47,13 +47,13 @@ test('leaves unrelated routing unchanged and classifies exact main post-merge wi
  assert.equal(surveyWorkspacePlan([],binding.base,head,read,{CI_EVENT:'pull_request',CI_HEAD_REF:'unrelated'}),null);
  assert.equal(plan({CI_EVENT:'push',CI_HEAD_REF:'main',CI_SOURCE_HEAD:undefined}).route,'survey-workspace');
 });
-test('wires missing compilers, rendered consumers and native restore without broad app repetition',()=>{
+test('wires compiled evidence, rendered consumers and native restore without broad app repetition',()=>{
  const ci=readFileSync('.github/workflows/ci.yml','utf8'),workflow=readFileSync('.github/workflows/ci-survey-workspace.yml','utf8');
  assert.match(ci,/uses: \.\/\.github\/workflows\/ci-survey-workspace.yml/);
  assert.match(ci,/survey_workspace_plan: \$\{\{ steps.scope.outputs.survey_workspace_plan \}\}/);
  assert.ok(ci.includes('training-appearance, survey-workspace,'));assert.ok(ci.includes('"work/survey-visual-20261022"'));
  assert.doesNotMatch(workflow,/docker build|npm run test|vitest.mjs|eslint.js/);
- assert.match(workflow,/tsc -p tsconfig.app.json --noEmit/);assert.equal((workflow.match(/npm run build/g)||[]).length,1);
+ assert.doesNotMatch(workflow,/tsc -p|npm run build/);assert.match(workflow,/survey-workspace-reuse.mjs frontend/);
  assert.doesNotMatch(workflow,/services:/);assert.match(workflow,/survey-workspace-reuse.mjs backend/);
  assert.match(workflow,/needs: frontend/);assert.match(workflow,/actions\/download-artifact@v4/);
  const migration=readFileSync('.github/scripts/survey-workspace-migration.mjs','utf8');

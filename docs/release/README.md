@@ -898,3 +898,24 @@ job `119939669432`。应用 SAST 来自成功 job `119939517555`，仅变化的 
 只接纳完整通过的七个 1440 场景；失败 data 与八个未执行 390 场景重新验收。
 报告显式为 sameRunFullJourneyClaim=false。未匹配、失效或篡改的证据停止，
 不暗中复跑整批或把原失败、缺失、跳过项目改成通过；不授予生产部署资格。
+
+续验 run `39814196927` 的浏览器尚未运行：官方原日志在下载九个额外字体包
+时于 `16:37:38 UTC` 取消，汇总列表曾滞后显示运行中；1316-byte browser
+artifact 只有继承的接纳记录，不是新的浏览器通过证明。保留该取消及旧失败。
+新续验不重复 apt `--with-deps`，仅安装相同锁定 Playwright 的官方 Chromium；
+先核 runner 的中文字体覆盖，缺失时仅从 Ubuntu 官方 HTTPS 源补固定版本
+WenQuanYi 字体包，以可信 runner apt 元数据摘要核验后解包至用户字体目录。
+中文字库缺失或摘要不符直接失败；记录实际字体路径，不改 runner 安全配置。
+
+该 run 的 frontend job `119948529906` 已成功完成修复后 CSS 的唯一编译。
+固定 source `340a952b77646c72eec2b437795d9b71f022b2c9`、完整 frontend tree、
+确切 compile 阶段、24 小时年龄与 artifact `12442170332` 的 ZIP SHA256
+`87ca934ed91875e59d31d8de723d4e3293a79e3c80023a61dbebc0a2d87ff7fd`，
+核验后仅恢复并记录同一 dist 的逐文件摘要，不重新编译或重验应用类型。
+原控制合同阶段的官方完整日志 SHA256
+`cafaf4c5fea9c5fb0bd5316ec502e5a15841f6c1086f8251406c9c9935552bc3`
+与固定 job/成功步骤核验后接纳未变化的六项；两项 wiring 已变化故重新执行，
+另首次运行两个编译产物身份/失败拒绝合同。已成功的 CodeQL job
+`119948366459` 覆盖未变的 scope/browser 控制文件，逐 blob 核验后复用；
+变化的 reuse、reuse.test、workspace.test 及消费新 helper 的 checks 控制接受新的 CodeQL。
+取消父 run 的状态原样记录，接纳成功步骤不授予其整条运行成功身份。
