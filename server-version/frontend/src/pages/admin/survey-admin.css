@@ -10,6 +10,25 @@
 .survey-admin-header { display: flex; flex-wrap: wrap; gap: 1.25rem; justify-content: space-between; align-items: start; padding: 1.5rem; border: 1px solid #c9dfdf; border-radius: 1rem; background: linear-gradient(130deg,#eef8f7,#f4f8ff); }
 .survey-admin-header > div { flex: 1 1 26rem; }
 .survey-admin-kicker { font-size: .75rem; font-weight: 700; letter-spacing: .1em; color: #176e69; }
+.survey-admin-stepup { padding: 1.25rem; border: 1px solid #cadce2; border-radius: 1rem; background: #f5fafb; }
+.survey-admin-stepup h2 { font-size: 1.1rem; }
+.survey-admin-stepup > p { margin-top: .4rem; color: #476271; font-size: .875rem; }
+.survey-admin-stepup form { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr) auto; gap: .8rem; align-items: end; margin-top: 1rem; }
+.survey-admin-stepup form > * { margin: 0; min-width: 0; }
+.survey-admin-stepup .input { display: block; width: 100%; margin-top: .35rem; }
+.survey-admin-stepup form > [role='status'] { grid-column: 1 / -1; }
+@media (max-width: 40rem) { .survey-admin-stepup form { grid-template-columns: minmax(0,1fr); } }
+.survey-admin-header .survey-brand { margin-bottom: 1.25rem; }
+.survey-admin-library { display: flex; flex-wrap: wrap; gap: 1rem; align-items: center; justify-content: space-between; padding: 1.25rem; border: 1px solid #c9dfdf; border-radius: .85rem; background: #f1f8f8; }
+.survey-admin-library > div { flex: 1 1 28rem; }
+.survey-admin-library h2 { font-size: 1.05rem; }
+.survey-admin-library p { margin-top: .35rem; font-size: .875rem; color: #476271; }
+.survey-admin-governance .staff-panel { border: 1px solid #cbdde3; border-radius: .9rem; background: #fff; }
+.survey-admin-governance article { border-color: #d0dfe5; border-radius: .75rem; }
+.survey-admin-governance :is(.hui-button,button) { min-height: 44px; }
+.survey-admin-governance :is(.flex,fieldset) { flex-wrap: wrap; }
+.survey-admin-governance label { display: block; margin-top: .75rem; }
+.survey-admin-governance .hui-button--primary { background: #176c67; border-color: #176c67; color: white; }
 .survey-admin-return { display: inline-flex; align-items: center; min-height: 44px; padding: .5rem .85rem; border: 1px solid #a9cbc9; border-radius: .6rem; background: white; color: #155e5a; }
 .survey-admin-tabs { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: .65rem; }
 .survey-admin-tabs button { min-height: 78px; padding: .8rem 1rem; border: 1px solid #cedee4; border-radius: .8rem; background: white; text-align: left; }

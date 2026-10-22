@@ -54,6 +54,9 @@ type AuthShellProps = {
   heroBullets?: readonly string[]
   registrationStep?: 'verify' | 'account' | 'submitted'
   trainingUnified?: boolean
+  brand?: ReactNode
+  className?: string
+  tagline?: string
 }
 
 export default function AuthShell({
@@ -69,6 +72,9 @@ export default function AuthShell({
   heroBullets,
   registrationStep,
   trainingUnified = false,
+  brand,
+  className = '',
+  tagline,
 }: AuthShellProps) {
   const { pathname } = useLocation()
   const authLink = useAuthLinks()
@@ -94,16 +100,16 @@ export default function AuthShell({
   )
 
   return (
-    <div className={`hui-auth-page hui-auth-page--${tone}${training ? ` hui-auth-page--training training-auth-refresh${accountStep && !submitted ? ' training-auth-account-step' : ''}` : ''}`}>
+    <div className={`hui-auth-page hui-auth-page--${tone}${training ? ` hui-auth-page--training training-auth-refresh${accountStep && !submitted ? ' training-auth-account-step' : ''}` : ''}${className?' '+className:''}`}>
       {training && <header className="training-auth-header">
         <Link to="/" className="hui-auth-brand" title="返回培训首页"><TrainingBrand /></Link>
         {backControl}
       </header>}
       <aside className="hui-auth-hero" aria-label={training ? "Huitraining 介绍" : "Huisurvey 介绍"}>
         <div className="hui-auth-hero__inner">
-          {!training && <Link to="/" className="hui-auth-brand" aria-label="返回 Huisurvey 入口">
+          {!training && (brand ?? <Link to="/" className="hui-auth-brand" aria-label="返回 Huisurvey 入口">
             <span className="hui-auth-brand__mark" aria-hidden="true" /><strong>Huisurvey</strong>
-          </Link>}
+          </Link>)}
 
           <div className="hui-auth-hero__copy">
             <span className="hui-auth-eyebrow"><Icon size={16} aria-hidden="true" />{training ? trainingWelcomeCopy.eyebrow : preset.label}</span>
@@ -146,7 +152,7 @@ export default function AuthShell({
             <div className="hui-auth-card__body">{children}</div>
           </div>
 
-          {!training && <p className="hui-auth-stage__tagline">Better Assessment. Healthier Students. Brighter Schools.</p>}
+          {!training && <p className="hui-auth-stage__tagline">{tagline??'Better Assessment. Healthier Students. Brighter Schools.'}</p>}
         </div>
       </section>
       {training && <footer className="training-auth-footer">

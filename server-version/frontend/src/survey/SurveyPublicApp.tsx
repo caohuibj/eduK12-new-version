@@ -90,7 +90,9 @@ const safePattern=/^[a-f0-9-]{36}$/i
 // A valid research key can equal a property inherited from Object.prototype.
 const own=<T,>(values:Record<string,T>,key:string):T|undefined=>
   Object.prototype.hasOwnProperty.call(values,key)?values[key]:undefined
-const parseError=(e:unknown)=>e instanceof Error?e.message:'研究访问失败，请重试'
+const parseError=(e:unknown)=>e instanceof TypeError&&/^(Failed to fetch|Load failed|NetworkError when attempting to fetch resource\.?)$/.test(e.message)
+  ?'网络连接未完成，服务器结果尚未确认。请检查网络，并按页面提示核对或重试。'
+  :e instanceof Error?e.message:'研究访问失败，请重试'
 class SurveyPublicApiError extends Error {
   constructor(message:string,readonly status:number){super(message)}
 }
@@ -879,11 +881,17 @@ export default function SurveyPublicApp(){
   const action=(base:string)=>cognitiveRunning?base:base+' survey-participant-action'
   return <div className="min-h-screen bg-slate-50 text-slate-800">
     {!cognitiveRunning&&<a className="survey-participant-skip" href="#survey-participant-content">跳至研究内容</a>}
-    <header className="border-b bg-white"><div className="max-w-3xl mx-auto p-5">
+    <header className="border-b bg-white"><div className={'max-w-3xl mx-auto p-5'+(!cognitiveRunning?' survey-participant-brand':'')}>
+      {!cognitiveRunning&&<img src="/survey/huisurvey-w2-emblem.svg" alt="" width="58" height="50"/>}
       <h1 className="text-2xl font-semibold">Huisurvey</h1>
       <p className="text-sm text-slate-500">观风知微 · 研究参与</p></div></header>
     <main id={cognitiveRunning?undefined:'survey-participant-content'} tabIndex={cognitiveRunning?undefined:-1}
       className="max-w-3xl mx-auto p-4 sm:p-7 space-y-5">
+      {!cognitiveRunning&&<ol className="survey-participant-steps" aria-label="研究参与步骤">
+        {['了解研究','确认同意','完成作答','提交回执'].map((label,index)=><li key={label}
+          aria-current={index===(general||completion?3:task?2:selectedWave?1:0)?'step':undefined}>
+          <span aria-hidden="true">0{index+1}</span>{label}</li>)}
+      </ol>}
       {busy&&<p role="status" aria-live="polite" aria-atomic="true">{busyLabel}</p>}
       {loading&&<p role="status">正在读取研究说明…</p>}
       {error&&<p role="alert" className={message('border-l-4 border-red-600 bg-red-50 p-3')}>{error}</p>}

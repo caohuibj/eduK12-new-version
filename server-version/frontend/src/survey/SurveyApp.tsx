@@ -9,14 +9,15 @@ import { SurveyWaveStudio } from './SurveyWaveStudio'
 import { SurveyAnalyticsWorkspace } from './SurveyAnalyticsWorkspace'
 import { SurveyWorkspaceNav,type WorkspaceSection } from './SurveyWorkspaceNav'
 import './survey-workspace.css'
+import './survey-directory.css'
 import { SurveyBrand } from './SurveyBrand'
 import { SurveyLanding } from './SurveyLanding'
 import { SurveyFeaturePage } from './SurveyFeaturePage'
 import { surveyFeatures } from './survey-features'
+import { SurveyProjectDirectory, type SurveyProject as Project } from './SurveyProjectDirectory'
 
 type Envelope<T>={code:number|string;message:string;data:T}
 type Researcher={id:string;username:string;mustChangePassword:boolean}
-type Project={id:string;title:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED';revision:number;firstPublishedAt?:string|null}
 const cookie=(name:string)=>document.cookie.split('; ').find(x=>x.startsWith(name+'='))?.split('=').slice(1).join('=')||''
 async function api<T>(path:string,method='GET',body?:unknown):Promise<T>{
   const headers:Record<string,string>={'Content-Type':'application/json'}
@@ -53,9 +54,12 @@ export default function SurveyApp(){
   const [invite,setInvite]=useState(readInvite),[uri,setUri]=useState(''),[recovery,setRecovery]=useState<string[]>([])
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   const [projects,setProjects]=useState<Project[]>([]),[selected,setSelected]=useState<Project|null>(null)
+  const projectCreationRequestId=useRef<string|null>(null)
   const reportLeaveRisk=useRef<ReportLeaveRisk>({dirty:false,pending:false,busy:false})
   const reportRiskChanged=useCallback((risk:ReportLeaveRisk)=>{reportLeaveRisk.current=risk},[])
   const [projectPage,setProjectPage]=useState(1)
+  const [projectsLoading,setProjectsLoading]=useState(false),[projectsError,setProjectsError]=useState('')
+  const [projectQuery,setProjectQuery]=useState(''),[projectFilter,setProjectFilter]=useState('')
   const [workspaceSection,setWorkspaceSection]=useState<WorkspaceSection>('settings')
   const builderLeaveRisk=useRef<BuilderLeaveRisk>({dirty:false,busy:false})
   const builderRiskChanged=useCallback((risk:BuilderLeaveRisk)=>{builderLeaveRisk.current=risk},[])
@@ -99,8 +103,12 @@ export default function SurveyApp(){
     }
   }
   const loadProjects=useCallback(async(page=1)=>{
-    const r=await api<{list:Project[]}>('/projects?page='+page)
-    setProjects(r.list);setProjectPage(page)
+    setProjectsLoading(true);setProjectsError('')
+    try{
+      const r=await api<{list:Project[]}>('/projects?page='+page)
+      setProjects(r.list);setProjectPage(page)
+    }catch(error){setProjectsError(error instanceof Error?error.message:'请求失败');throw error}
+    finally{setProjectsLoading(false)}
   },[])
   const refresh=useCallback(async(openWorkspace=false)=>{
     try{
@@ -110,8 +118,9 @@ export default function SurveyApp(){
       else {
         // A forced-password session is allowed to read /auth/me and change
         // its password, but has no permission to list research projects.
-        if(!me.mustChangePassword)await loadProjects()
         setScreen('work')
+        // A project read failure does not invalidate an already verified session.
+        if(!me.mustChangePassword)await loadProjects().catch(()=>{})
       }
     }catch{setUser(null);if(initial==='login')setScreen('login')}
     finally{setLoading(false)}
@@ -145,28 +154,53 @@ export default function SurveyApp(){
   })
   const changeAccountPassword=(oldPassword:string,newPassword:string,code?:string)=>{if(!mayLeaveWorkspace())return;void work(async()=>{
     await api('/auth/change-password','POST',{oldPassword,newPassword,code})
+    projectCreationRequestId.current=null
     setUser(null);setProjects([]);setSelected(null);setTitle('');setDescription('');setMode('SINGLE_UNLINKED');setScreen('login')
     setNotice('密码已修改，旧研究者会话已经失效，请重新登录')
   })}
   const logout=()=>{if(!mayLeaveWorkspace())return;void work(async()=>{
     await api('/auth/logout','POST',{})
+    projectCreationRequestId.current=null
     setUser(null);setProjects([]);setSelected(null);setTitle('');setDescription('');setMode('SINGLE_UNLINKED');setScreen('login')
   })}
-  const createProject=(e:FormEvent)=>{e.preventDefault();void work(async()=>{
-    const p=await api<Project>('/projects','POST',{requestId:crypto.randomUUID(),title,description,collectionMode:mode})
-    await loadProjects(1);setWorkspaceSection('settings');applyProject(p);setNotice('研究草稿已创建')
+  const createProject=(e:FormEvent)=>{e.preventDefault();if(workInFlight.current.writes>0)return;void work(async()=>{
+    // Keep the same server idempotency identity until an ACK or an explicit
+    // context change. A lost response must not create another project on retry.
+    const requestId=projectCreationRequestId.current??(projectCreationRequestId.current=crypto.randomUUID())
+    const p=await api<Project>('/projects','POST',{requestId,title,description,collectionMode:mode})
+    // A subsequent list read cannot undo a server-confirmed creation. Keep its
+    // editor/revision so a refresh failure cannot invite a duplicate creation.
+    setWorkspaceSection('settings');applyProject(p);focusSection('survey-current-project-heading')
+    await loadProjects(1).catch(()=>{});setNotice('研究草稿已创建')
   })}
-  const applyProject=(p:Project)=>{setSelected(p);setTitle(p.title);setDescription(p.description);setMode(p.collectionMode)}
-  const choose=(p:Project)=>{if(selected?.id===p.id)return;if(!mayLeaveWorkspace())return;setWorkspaceSection('settings');applyProject(p)}
+  const applyProject=(p:Project)=>{projectCreationRequestId.current=null;setSelected(p);setTitle(p.title);setDescription(p.description);setMode(p.collectionMode)}
+  const focusSection=(id:string)=>window.requestAnimationFrame(()=>{
+    const element=document.getElementById(id);element?.focus();element?.scrollIntoView?.({block:'start'})
+  })
+  const choose=(p:Project)=>{
+    if(selected?.id===p.id){focusSection('survey-current-project-heading');return}
+    if(!mayLeaveWorkspace())return
+    setWorkspaceSection('settings');applyProject(p);focusSection('survey-current-project-heading')
+  }
+  const newProject=()=>{
+    if(!mayLeaveWorkspace())return
+    projectCreationRequestId.current=null
+    setSelected(null);setTitle('');setDescription('');setMode('SINGLE_UNLINKED');setWorkspaceSection('settings')
+    builderLeaveRisk.current={dirty:false,busy:false};reportLeaveRisk.current={dirty:false,pending:false,busy:false}
+    focusSection('survey-project-settings-heading')
+  }
   const save=(e:FormEvent)=>{e.preventDefault();if(!selected)return;void work(async()=>{
     const p=await api<Project>('/projects/'+selected.id,'PATCH',
       {revision:selected.revision,title,description,collectionMode:mode})
-    applyProject(p);await loadProjects(projectPage);setNotice('研究草稿已保存')
+    applyProject(p);setProjects(current=>current.map(row=>row.id===p.id?p:row))
+    await loadProjects(projectPage).catch(()=>{});setNotice('研究草稿已保存')
   })}
   const toggle=(p:Project)=>void work(async()=>{
     const action=p.status==='ARCHIVED'?'restore':'archive'
     const result=await api<Project>('/projects/'+p.id+'/'+action,'POST',{revision:p.revision})
-    await loadProjects(projectPage);if(selected?.id===p.id){setSelected(current=>current?{...current,status:result.status,revision:result.revision}:current)}
+    setProjects(current=>current.map(row=>row.id===p.id?{...row,...result}:row))
+    setSelected(current=>current?.id===p.id?{...current,status:result.status,revision:result.revision}:current)
+    await loadProjects(projectPage).catch(()=>{});setNotice(action==='archive'?'研究已归档':'研究草稿已恢复')
   })
   const field=(label:string,value:string,change:(value:string)=>void,type='text')=>
     <label className="block my-3 text-sm">{label}<input className="input block mt-1 w-full" required
@@ -177,9 +211,10 @@ export default function SurveyApp(){
   const entryScreen=screen==='login'||screen==='claim'||screen==='reset'
   return <div className={entryScreen?'survey-entry':'survey-researcher min-h-screen bg-slate-50 text-slate-800'}>
     {entryScreen&&<a className="survey-skip-link" href="#survey-entry-content">跳至主要内容</a>}
-    <header className="border-b border-slate-200 bg-white"><div className={entryScreen?'survey-entry-header':'max-w-5xl mx-auto p-5 flex justify-between items-center'}>
+    <header className="border-b border-slate-200 bg-white"><div className={entryScreen?'survey-entry-header':'survey-researcher-header'}>
       <SurveyBrand/>
-      {user&&<button className="btn-secondary" disabled={writeBusy} onClick={logout}>退出</button>}
+      <div className="survey-session-actions"><span>{screen==='mfa'?'研究者身份验证':user?'研究者工作台':'研究者入口'}</span>
+        {user&&<button className="btn-secondary" disabled={writeBusy} onClick={logout}>退出</button>}</div>
     </div></header>
     <main id={entryScreen?'survey-entry-content':undefined} tabIndex={entryScreen?-1:undefined}
       className={entryScreen?'survey-entry-main':screen==='work'&&!user?.mustChangePassword
@@ -211,7 +246,7 @@ export default function SurveyApp(){
           ?<a href={surveyAdminLoginUrl()!}>系统管理员入口：研究者与工具授权</a>
           :<p>当前地址未配置管理员入口。</p>}</div>
       </section>}
-      {!loading&&screen==='mfa'&&<section className="bg-white rounded-xl border p-6 my-4 max-w-xl mx-auto">
+      {!loading&&screen==='mfa'&&<section className="survey-mfa-panel bg-white rounded-xl border p-6 my-4 max-w-xl mx-auto">
         <h2 className="text-xl font-semibold">{enrolled?'双因素验证':'绑定 TOTP 验证器'}</h2>
         {!enrolled&&!uri&&<button className="btn-primary" disabled={busy} onClick={setup}>生成二维码</button>}
         {uri&&<div className="my-4"><QRCodeSVG value={uri} size={180}/><p className="text-sm mt-2">验证器手动密钥：</p>
@@ -233,41 +268,29 @@ export default function SurveyApp(){
         <h2 className="font-semibold text-xl">首次登录 · 修改研究者密码</h2>
         <ProductPasswordChange product="survey" forced busy={busy} onChangePassword={changeAccountPassword}/>
       </section>}
-      {!loading&&user&&screen==='work'&&!user.mustChangePassword&&<div className="survey-workspace"><section className="bg-white rounded-xl border p-6 my-4">
-        <h1 className="text-xl font-semibold">我的研究</h1><p className="text-sm text-slate-500">研究者：{user.username}</p>
-        <details className="border rounded-lg p-4 my-4"><summary>账号安全 · 修改密码</summary>
+      {!loading&&user&&screen==='work'&&!user.mustChangePassword&&<div className="survey-workspace">
+        <SurveyProjectDirectory projects={projects} selectedId={selected?.id} username={user.username} page={projectPage}
+          busy={busy} loading={projectsLoading} error={projectsError} query={projectQuery} status={projectFilter}
+          onQuery={setProjectQuery} onStatus={setProjectFilter} onChoose={choose} onArchive={toggle}
+          onPage={page=>void work(()=>loadProjects(page),false)} onRefresh={()=>void work(()=>loadProjects(projectPage),false)} onCreate={newProject}/>
+        <details className="survey-account-settings border rounded-lg p-4 my-4"><summary>账号安全 · 修改密码</summary>
           <ProductPasswordChange product="survey" busy={busy} onChangePassword={changeAccountPassword}/>
         </details>
-        <div className="grid sm:grid-cols-2 gap-3 mt-4">{projects.map(p=><article className="survey-project-card rounded-lg border p-4" data-selected={selected?.id===p.id} key={p.id}>
-          <h3 className="font-semibold">{p.title}</h3><p className="text-sm">{({DRAFT:'草稿',ACTIVE:'采集中',PAUSED:'暂停',CLOSED:'已结束',ARCHIVED:'已归档'} as Record<string,string>)[p.status]||p.status} · {p.collectionMode==='LINKED_WAVES'?'多波次关联':'单次匿名'}</p>
-          <div className="flex flex-wrap gap-2 mt-3"><button className="btn-secondary" disabled={writeBusy} aria-pressed={selected?.id===p.id} onClick={()=>choose(p)}>查看/编辑</button>
-            <button className="btn-secondary" disabled={busy||(p.status==='DRAFT'&&!!p.firstPublishedAt)
-              ||(!['DRAFT','CLOSED'].includes(p.status)&&!(p.status==='ARCHIVED'&&!p.firstPublishedAt))} onClick={()=>toggle(p)}>
-              {p.status==='CLOSED'?'结束后归档':p.status==='DRAFT'?'归档草稿':
-                p.status==='ARCHIVED'?(p.firstPublishedAt?'终态归档不可恢复':'恢复草稿'):'采集中不可归档'}</button></div>
-        </article>)}</div>
-        <div className="flex items-center gap-4 mt-4 text-sm">
-          <button type="button" className="btn-secondary" disabled={busy||projectPage<=1}
-            onClick={()=>void work(()=>loadProjects(projectPage-1),false)}>上一页</button>
-          <span>项目第 {projectPage} 页</span>
-          <button type="button" className="btn-secondary" disabled={busy||projects.length<25}
-            onClick={()=>void work(()=>loadProjects(projectPage+1),false)}>下一页</button>
-        </div>
-        {projects.length===0&&projectPage===1&&<p>尚无研究项目。可以先创建研究草稿。</p>}
-      </section>{selected&&<SurveyWorkspaceNav active={workspaceSection} onChange={setWorkspaceSection} title={selected.title}/>}
+      {selected&&<SurveyWorkspaceNav active={workspaceSection} onChange={setWorkspaceSection} title={selected.title}
+        onReturn={()=>focusSection('survey-projects-heading')}/>}
       <section className="bg-white rounded-xl border p-6 my-4"
         id="survey-workspace-settings" role={selected?'tabpanel':undefined}
         aria-labelledby={selected?'survey-workspace-tab-settings':undefined}
         hidden={!!selected&&workspaceSection!=='settings'}>
-        <h2 className="text-xl font-semibold">{selected?'编辑研究草稿':'创建研究项目'}</h2>
+        <h2 id="survey-project-settings-heading" tabIndex={-1} className="text-xl font-semibold">{selected?'编辑研究草稿':'创建研究项目'}</h2>
         <form onSubmit={selected?save:createProject} aria-busy={busy}><fieldset disabled={busy} className="min-w-0 border-0 p-0">{field('研究名称',title,setTitle)}
           <label className="block my-3 text-sm">研究说明<textarea className="input block mt-1 w-full" rows={3} value={description} onChange={e=>setDescription(e.target.value)}/></label>
           <label className="block my-3 text-sm">采集方式<select className="input block mt-1 w-full" value={mode} onChange={e=>setMode(e.target.value as Project['collectionMode'])}>
             <option value="SINGLE_UNLINKED">单次独立匿名</option><option value="LINKED_WAVES">同一研究编号的多波次采集</option>
           </select></label><p className="text-sm text-slate-600">多波次研究必须在正式采集前告知被试：不同时间点的回答能够按研究编号关联。</p>
           <div className="flex flex-wrap gap-3 mt-4"><button className="btn-primary" disabled={busy||(selected!==null&&selected.status!=='DRAFT')}>{selected?'保存修改':'创建研究'}</button>
-            {selected&&<button type="button" className="btn-secondary" onClick={()=>{if(!mayLeaveWorkspace())return;setSelected(null);setTitle('');setDescription('');setMode('SINGLE_UNLINKED')}}>新建其他项目</button>}</div>
-        </fieldset></form><p className="text-sm text-slate-500 mt-4">研究工具编辑、研究专用发布、匿名参与与科研分析可按功能开关使用；正式生产开通须完成独立部署验收。</p>
+            {selected&&<button type="button" className="btn-secondary" onClick={newProject}>新建其他项目</button>}</div>
+        </fieldset></form><p className="text-sm text-slate-500 mt-4">创建和保存草稿不会开放招募。请在「发布与采集」检查工具与知情同意，冻结研究定义后再开放。</p>
       </section>{selected&&<><div id="survey-workspace-tools" role="tabpanel" aria-labelledby="survey-workspace-tab-tools" hidden={workspaceSection!=='tools'}><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id} projectStatus={selected.status} instrumentLibrary={instrumentLibrary} onLeaveRiskChange={builderRiskChanged}/></div>
         <div id="survey-workspace-reports" role="tabpanel" aria-labelledby="survey-workspace-tab-reports" hidden={workspaceSection!=='reports'}><SurveyReportStudio key={'reports-'+selected.id} projectId={selected.id} projectStatus={selected.status} active={workspaceSection==='reports'} onLeaveRiskChange={reportRiskChanged}/></div>
         <div id="survey-workspace-publish" role="tabpanel" aria-labelledby="survey-workspace-tab-publish" hidden={workspaceSection!=='publish'}><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary} onProjectChanged={projectChanged}/></div>

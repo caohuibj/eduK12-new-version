@@ -1,0 +1,164 @@
+import {fireEvent,render,screen,waitFor} from '@testing-library/react'
+import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
+import SurveyApp from './SurveyApp'
+
+vi.mock('./SurveyBuilder',()=>({SurveyBuilder:()=>null}))
+vi.mock('./SurveyReportStudio',()=>({SurveyReportStudio:()=>null}))
+vi.mock('./SurveyWaveStudio',()=>({SurveyWaveStudio:()=>null}))
+vi.mock('./SurveyAnalyticsWorkspace',()=>({SurveyAnalyticsWorkspace:()=>null}))
+const projects=[
+  {id:'draft',title:'学习体验研究',description:'第一项研究说明',status:'DRAFT',collectionMode:'SINGLE_UNLINKED',revision:1},
+  {id:'active',title:'长期跟踪研究',description:'第二项研究说明',status:'ACTIVE',collectionMode:'LINKED_WAVES',revision:2},
+]
+const reply=(data:unknown,ok=true)=>Promise.resolve({ok,json:async()=>({code:ok?0:503,data,message:ok?'ok':'研究列表暂不可用'})} as Response)
+beforeEach(()=>{
+  window.history.replaceState(null,'','/workspace')
+  vi.stubGlobal('fetch',vi.fn((url:string)=>{
+    if(url.endsWith('/auth/me'))return reply({id:'r',username:'研究者',mustChangePassword:false})
+    if(url.endsWith('/auth/capabilities'))return reply({analytics:true,publication:true})
+    if(url.includes('/projects?page='))return reply({list:projects})
+    throw new Error('Unexpected request '+url)
+  }))
+})
+afterEach(()=>{vi.restoreAllMocks();vi.unstubAllGlobals()})
+describe('Survey researcher directory and editing context',()=>{
+  it.each(['network','server','malformed'])(
+    'reuses the creation identity after a committed request with an uncertain %s response',async failure=>{
+      const stored=new Map<string,Record<string,unknown>>(),requests:Record<string,unknown>[]=[]
+      vi.stubGlobal('fetch',vi.fn((url:string,options?:RequestInit)=>{
+        if(url.endsWith('/auth/me'))return reply({id:'r',username:'研究者',mustChangePassword:false})
+        if(url.endsWith('/auth/capabilities'))return reply({analytics:true,publication:true})
+        if(url.endsWith('/auth/csrf'))return reply({csrfToken:'synthetic-csrf'})
+        if(url.includes('/projects?page='))return reply({list:[...stored.values()]})
+        if(url.endsWith('/projects')&&options?.method==='POST'){
+          const body=JSON.parse(String(options.body)) as Record<string,unknown>;requests.push(body)
+          const id=String(body.requestId)
+          if(!stored.has(id))stored.set(id,{...body,id,revision:1,status:'DRAFT'})
+          if(requests.length===1){
+            if(failure==='network')return Promise.reject(new TypeError('Failed to fetch'))
+            if(failure==='server')return reply(null,false)
+            return Promise.resolve({ok:true,json:async()=>{throw new SyntaxError('Unconfirmed response')}} as unknown as Response)
+          }
+          return reply(stored.get(id))
+        }
+        throw new Error('Unexpected request '+url)
+      }))
+      render(<SurveyApp/>)
+      await screen.findByRole('heading',{name:'我的研究'})
+      fireEvent.change(screen.getByLabelText('研究名称'),{target:{value:'回执待核对的研究'}})
+      fireEvent.click(screen.getByRole('button',{name:'创建研究'}))
+      await screen.findByRole('alert')
+      expect(stored.size).toBe(1)
+      expect(screen.getByLabelText('研究名称')).toHaveValue('回执待核对的研究')
+      fireEvent.click(screen.getByRole('button',{name:'创建研究'}))
+      await screen.findByText('研究草稿已创建')
+      expect(requests).toHaveLength(2)
+      expect(requests[1]).toEqual(requests[0])
+      expect(stored.size).toBe(1)
+      expect(screen.getByRole('heading',{name:'编辑研究草稿'})).toBeVisible()
+    })
+  it('focuses the selected study context and preserves its active section when reopening from the directory',async()=>{
+    render(<SurveyApp/>)
+    fireEvent.click((await screen.findAllByRole('button',{name:'查看/编辑'}))[0])
+    await waitFor(()=>expect(document.getElementById('survey-current-project-heading')).toHaveFocus())
+    fireEvent.click(screen.getByRole('tab',{name:'研究工具'}))
+    fireEvent.click(screen.getByRole('button',{name:'← 返回研究列表（保留编辑）'}))
+    await waitFor(()=>expect(screen.getByRole('heading',{name:'我的研究'})).toHaveFocus())
+    fireEvent.click(screen.getAllByRole('button',{name:'查看/编辑'})[0])
+    await waitFor(()=>expect(document.getElementById('survey-current-project-heading')).toHaveFocus())
+    expect(screen.getByRole('tab',{name:'研究工具'})).toHaveAttribute('aria-selected','true')
+    expect(document.getElementById('survey-current-project-heading')).toHaveTextContent('学习体验研究')
+  })
+  it('retains confirmed creation, revision and archive state when only list refresh fails',async()=>{
+    let failList=false
+    let current={...projects[0],id:'created',title:'新研究',revision:1}
+    const writes:{path:string;body:Record<string,unknown>}[]=[]
+    vi.stubGlobal('fetch',vi.fn((url:string,options?:RequestInit)=>{
+      if(url.endsWith('/auth/me'))return reply({id:'r',username:'研究者',mustChangePassword:false})
+      if(url.endsWith('/auth/capabilities'))return reply({analytics:true,publication:true})
+      if(url.endsWith('/auth/csrf'))return reply({csrfToken:'synthetic-csrf'})
+      if(url.includes('/projects?page='))return failList?reply(null,false):reply({list:[current]})
+      const body=JSON.parse(String(options?.body)) as Record<string,unknown>
+      writes.push({path:url,body});failList=true
+      if(url.endsWith('/projects'))return reply(current)
+      if(url.endsWith('/archive')){current={...current,status:'ARCHIVED',revision:current.revision+1};return reply(current)}
+      if(url.endsWith('/projects/created')){current={...current,title:String(body.title),revision:current.revision+1};return reply(current)}
+      throw new Error('Unexpected request '+url)
+    }))
+    render(<SurveyApp/>)
+    await screen.findByRole('heading',{name:'我的研究'})
+    fireEvent.change(screen.getByLabelText('研究名称'),{target:{value:current.title}})
+    fireEvent.click(screen.getByRole('button',{name:'创建研究'}))
+    expect(await screen.findByText('研究草稿已创建')).toBeVisible()
+    expect(screen.getByRole('alert')).toHaveTextContent('研究列表未能更新')
+    expect(screen.getByRole('heading',{name:'编辑研究草稿'})).toBeVisible()
+    expect(screen.queryByRole('button',{name:'创建研究'})).not.toBeInTheDocument()
+    expect(writes.filter(write=>write.path.endsWith('/projects'))).toHaveLength(1)
+    fireEvent.change(screen.getByLabelText('研究名称'),{target:{value:'已保存的新名称'}})
+    fireEvent.click(screen.getByRole('button',{name:'保存修改'}))
+    expect(await screen.findByText('研究草稿已保存')).toBeVisible()
+    expect(writes[writes.length-1]?.body).toMatchObject({revision:1,title:'已保存的新名称'})
+    expect(screen.getByRole('heading',{name:'已保存的新名称',level:3})).toBeVisible()
+    fireEvent.click(screen.getByRole('button',{name:'归档草稿'}))
+    expect(await screen.findByText('研究已归档')).toBeVisible()
+    expect(writes[writes.length-1]).toMatchObject({path:'/api/survey/projects/created/archive',body:{revision:2}})
+    expect(screen.getByRole('button',{name:'恢复草稿'})).toBeEnabled()
+    expect(screen.getByRole('button',{name:'保存修改'})).toBeDisabled()
+    failList=false;fireEvent.click(screen.getByRole('button',{name:'重试研究列表'}))
+    await waitFor(()=>expect(screen.queryByRole('alert')).not.toBeInTheDocument())
+    expect(writes).toHaveLength(3)
+  })
+
+  it('preserves the verified session on project failure and retries only the list',async()=>{
+    let failed=true
+    const fetcher=vi.fn((url:string,options?:RequestInit)=>{
+      if(options?.method&&options.method!=='GET')throw new Error('Directory retry must not write')
+      if(url.endsWith('/auth/me'))return reply({id:'r',username:'研究者',mustChangePassword:false})
+      if(url.endsWith('/auth/capabilities'))return reply({analytics:true,publication:true})
+      if(url.includes('/projects?page='))return failed?reply(null,false):reply({list:projects})
+      throw new Error('Unexpected request '+url)
+    })
+    vi.stubGlobal('fetch',fetcher)
+    render(<SurveyApp/>)
+    expect(await screen.findByRole('heading',{name:'我的研究'})).toBeVisible()
+    expect(screen.getByRole('alert')).toHaveTextContent('当前会话及已显示的研究会保留')
+    expect(screen.queryByRole('heading',{name:'研究者登录'})).not.toBeInTheDocument()
+    expect(screen.queryByText('从一项研究草稿开始')).not.toBeInTheDocument()
+    failed=false;fireEvent.click(screen.getByRole('button',{name:'重试研究列表'}))
+    expect(await screen.findByRole('heading',{name:'学习体验研究'})).toBeVisible()
+    expect(fetcher.mock.calls.filter(([url])=>url.endsWith('/auth/me'))).toHaveLength(1)
+    expect(fetcher.mock.calls.some(([,options])=>options?.method&&options.method!=='GET')).toBe(false)
+  })
+
+  it('keeps current-page filters and edits when returning to the directory',async()=>{
+    render(<SurveyApp/>)
+    await screen.findByRole('heading',{name:'我的研究'})
+    fireEvent.change(screen.getByRole('searchbox',{name:'筛选本页研究'}),{target:{value:'学习'}})
+    expect(screen.queryByRole('heading',{name:'长期跟踪研究'})).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button',{name:'查看/编辑'}))
+    fireEvent.change(screen.getByLabelText('研究名称'),{target:{value:'尚未保存的研究'}})
+    fireEvent.click(screen.getByRole('button',{name:'← 返回研究列表（保留编辑）'}))
+    await waitFor(()=>expect(screen.getByRole('heading',{name:'我的研究'})).toHaveFocus())
+    expect(screen.getByRole('searchbox',{name:'筛选本页研究'})).toHaveValue('学习')
+    expect(screen.getByLabelText('研究名称')).toHaveValue('尚未保存的研究')
+    expect(screen.getByRole('tab',{name:'研究设置'})).toHaveAttribute('aria-selected','true')
+  })
+
+  it('distinguishes a filtered empty page and protects edits before creating another project',async()=>{
+    const confirm=vi.spyOn(window,'confirm').mockReturnValue(false)
+    render(<SurveyApp/>)
+    await screen.findByRole('heading',{name:'我的研究'})
+    fireEvent.change(screen.getByLabelText('本页状态'),{target:{value:'CLOSED'}})
+    expect(screen.getByRole('heading',{name:'本页没有符合条件的研究'})).toBeVisible()
+    fireEvent.click(screen.getByRole('button',{name:'显示本页全部研究'}))
+    fireEvent.click(screen.getAllByRole('button',{name:'查看/编辑'})[0])
+    fireEvent.change(screen.getByLabelText('研究名称'),{target:{value:'不能丢失'}})
+    fireEvent.click(screen.getByRole('button',{name:'新建研究'}))
+    expect(confirm).toHaveBeenCalledOnce()
+    expect(screen.getByLabelText('研究名称')).toHaveValue('不能丢失')
+    confirm.mockReturnValue(true)
+    fireEvent.click(screen.getByRole('button',{name:'新建研究'}))
+    await waitFor(()=>expect(screen.getByRole('heading',{name:'创建研究项目'})).toHaveFocus())
+    expect(screen.getByLabelText('研究名称')).toHaveValue('')
+  })
+})

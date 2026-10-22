@@ -1,4 +1,5 @@
-import { productOrigins } from '../../products/origins'
+import { productOrigins, SURVEY_ADMIN_PATH } from '../../products/origins'
+import { SurveyBrand } from '../../survey/SurveyBrand'
 import { hasAdminEntry } from '../../admin/authority'
 import {adminNavigation,isAdminWorkspacePath,managementIdentityLabel} from '../../admin/navigation'
 import { RelationalAvailabilityProvider, useRelationalAvailability } from '../../contexts/RelationalAvailabilityContext'
@@ -36,6 +37,7 @@ import '../../training/training-teacher-visual.css'
 import '../../training/training-assessment-visual.css'
 import '../../training/training-account.css'
 import '../../training/training-workspace-header.css'
+import '../../survey/survey-admin-shell.css'
 
 function AppShellContent({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth()
@@ -44,6 +46,11 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const relational = useRelationalAvailability()
   const { organizations, total: organizationTotal, platformRole, allowedActions: directoryActions, active: activeOrganization, activeLoading: organizationLoading, activeError: organizationError, error: organizationListError, isLoading: organizationsLoading, refresh: refreshOrganizations, selectOrganization } = useOrganization()
   const location=useLocation(), navigate=useNavigate()
+  const origins=productOrigins()
+  // This exact route context selects presentation only. RouteAccess, existing
+  // navigation capabilities and server permissions remain authoritative.
+  const surveyAdmin=(hasAdminEntry(user,'SURVEY')||user?.platformRole==='SYSTEM_ADMIN')&&Boolean(origins)&&(location.pathname===SURVEY_ADMIN_PATH||
+    (location.pathname==='/admin/scale-library-governance'&&new URLSearchParams(location.search).get('workspace')==='survey'))
   const adminWorkspace=isAdminWorkspacePath(location.pathname)
   const trainingAdmin = user?.role === 'ADMIN' && (location.pathname === '/admin/training' || new URLSearchParams(location.search).get('workspace') === 'training')
   const organizationProductRoute=location.pathname==='/organizations'||location.pathname.startsWith('/organizations/')||(location.pathname==='/organization-tasks'||location.pathname==='/my-assessments')
@@ -73,7 +80,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
   if(!training&&(platformRole??user?.platformRole)==='SYSTEM_ADMIN')items.push({path:'/parent-accounts',label:'家长账号管理',section:'system'})
   if(!training&&parentPortalEnabled&&displayOrganization?.allowedActions.includes('PARENT_REPORT_PUBLICATION'))items.push({path:`/organizations/${encodeURIComponent(displayOrganization.organization.id)}/parent-reports`,label:'家长报告',section:'organization'})
   }
-  const trainingWorkspace=training&&mode==='standard'&&(user?.role==='TEACHER'||user?.role==='STUDENT')
+  const trainingWorkspace=training&&!surveyAdmin&&mode==='standard'&&(user?.role==='TEACHER'||user?.role==='STUDENT')
   const courseNavigation = trainingWorkspace && user?.role === 'TEACHER' && (location.pathname === '/dashboard' || Boolean(trainingCourseContext(location.pathname, location.search)))
   const identityLabel=user?`${user.nickname||user.username} · ${adminWorkspace?managementIdentityLabel(user):{STUDENT:training?'学员':'学生',TEACHER:training?'培训师':'教师',ADMIN:(platformRole??user.platformRole)==='SYSTEM_ADMIN'?'系统管理员':'Training 管理员',PARENT:'家长'}[user.role]}`:''
   const profilePath=user?.role==='STUDENT'?'/student/profile':'/profile'
@@ -84,11 +91,11 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const [openPath,setOpenPath]=useState<string|null>(null),[loggingOut,setLoggingOut]=useState(false),menuOpen=openPath===location.pathname
   const onNavigate=(path:string)=>{setOpenPath(null);if(path===location.pathname)mainRef.current?.focus()}
   useEffect(()=>{if(training||organizationError||!user||mode!=='standard'||activeOrganization||organizationLoading||organizations.length!==1)return;void selectOrganization(organizations[0].id)},[training,user,mode,activeOrganization,organizationLoading,organizations,selectOrganization,organizationError])
-  useEffect(()=>{if(mode==='display')return;document.title=`${title==='Huisurvey'?'':`${title} · `}${training?'Huitraining':'Huisurvey'}`;if(previousPath.current!==location.pathname&&mode!=='focused')mainRef.current?.focus();previousPath.current=location.pathname},[location.pathname,title,mode,training])
+  useEffect(()=>{if(mode==='display')return;document.title=`${title==='Huisurvey'?'':`${title} · `}${training&&!surveyAdmin?'Huitraining':'Huisurvey'}`;if(previousPath.current!==location.pathname&&mode!=='focused')mainRef.current?.focus();previousPath.current=location.pathname},[location.pathname,title,mode,training,surveyAdmin])
   if(mode==='display')return <>{children}</>
-  return <div className={`hui-app hui-app--${mode}${roleClass}${staffMode?' hui-app--staff':''}${assessmentSurfaceClass}${reportSurfaceClass}${studentSubmitClass}${entryMode?' hui-app--entry':''}${training?' hui-training':''}${trainingAssessmentVisual?' training-assessment-visual':''}${trainingWorkspace?' training-workspace-shell':''}${teacherVisual?' training-teacher-visual':''}`} data-shell-mode={mode}>
+  return <div className={`hui-app hui-app--${mode}${roleClass}${staffMode?' hui-app--staff':''}${assessmentSurfaceClass}${reportSurfaceClass}${studentSubmitClass}${entryMode?' hui-app--entry':''}${training&&!surveyAdmin?' hui-training':''}${surveyAdmin?' hui-survey-admin-shell':''}${trainingAssessmentVisual?' training-assessment-visual':''}${trainingWorkspace?' training-workspace-shell':''}${teacherVisual?' training-teacher-visual':''}`} data-shell-mode={mode}>
     <div className="hui-product"><a className="hui-skip" href="#hui-main" onClick={()=>mainRef.current?.focus()}>跳到主要内容</a></div>
-    {!entryMode&&<header className={`hui-product hui-app-header${trainingWorkspace&&user?.role==='TEACHER'?' training-teacher-header':''}`}>{mode==='focused'?<span className="hui-brand">{training ? <TrainingBrand /> : 'Huisurvey'}</span>:<Link className="hui-brand" to={homeFor(user?.role)}>{training?<TrainingBrand />:'Huisurvey'}</Link>}
+    {!entryMode&&<header className={`hui-product hui-app-header${trainingWorkspace&&user?.role==='TEACHER'?' training-teacher-header':''}`}>{surveyAdmin&&origins?<SurveyBrand href={origins.survey+'/'}/>:mode==='focused'?<span className="hui-brand">{training ? <TrainingBrand /> : 'Huisurvey'}</span>:<Link className="hui-brand" to={homeFor(user?.role)}>{training?<TrainingBrand />:'Huisurvey'}</Link>}
       {trainingWorkspace&&user?.role==='TEACHER'&&<TrainingWorkspaceTabs/>}
       {mode==='standard'&&!trainingWorkspace&&<ProductButton ref={toggleRef} className="hui-menu-toggle" aria-expanded={menuOpen} aria-controls="hui-navigation" onKeyDown={e=>{if(e.key==='Escape')setOpenPath(null)}} onClick={()=>setOpenPath(menuOpen?null:location.pathname)}><PanelLeft size={18} aria-hidden="true"/>导航菜单</ProductButton>}
       {trainingWorkspace&&user?.role!=='TEACHER'&&!courseNavigation&&<TrainingWorkspaceNav items={items} activePath={active?.path}/>}
@@ -100,11 +107,11 @@ function AppShellContent({ children }: { children: ReactNode }) {
         {user&&mode==='standard'&&<ProductButton className={trainingWorkspace?'training-account-logout':undefined} disabled={loggingOut} onClick={async()=>{setLoggingOut(true);try{await logout()}finally{setLoggingOut(false)}}}><LogOut size={trainingWorkspace?19:16} aria-hidden="true"/>{loggingOut?'正在退出…':'退出登录'}</ProductButton>}
       </div>
     </header>}
-    <div className="hui-app-body">{mode==='standard'&&!trainingWorkspace&&<nav id="hui-navigation" aria-label="主要导航" className={`hui-product hui-navigation ${menuOpen?'hui-navigation--open':''}`} onKeyDown={e=>{if(e.key==='Escape'){setOpenPath(null);toggleRef.current?.focus()}}}>{staffMode&&!training?<StaffNavigation items={items} activePath={active?.path} onNavigate={onNavigate}/>:items.map(item=><Link key={item.path} to={item.path} aria-current={active?.path===item.path?'page':undefined} onClick={()=>onNavigate(item.path)}>{item.label}</Link>)}</nav>}
+    <div className="hui-app-body">{mode==='standard'&&!trainingWorkspace&&<nav id="hui-navigation" aria-label="主要导航" className={`hui-product hui-navigation ${menuOpen?'hui-navigation--open':''}`} onKeyDown={e=>{if(e.key==='Escape'){setOpenPath(null);toggleRef.current?.focus()}}}>{staffMode&&(!training||surveyAdmin)?<StaffNavigation items={items} activePath={active?.path} onNavigate={onNavigate}/>:items.map(item=><Link key={item.path} to={item.path} aria-current={active?.path===item.path?'page':undefined} onClick={()=>onNavigate(item.path)}>{item.label}</Link>)}</nav>}
       <div className={`hui-app-content ${trainingAdmin ? 'hui-training-admin-content' : ''}`}>{mode==='standard'&&!trainingWorkspace&&<nav className="hui-product hui-breadcrumb" aria-label="当前位置"><ol>{breadcrumbs.map((crumb,index)=><li key={`${index}:${crumb.label}`}>{index>0&&<ChevronRight size={14} aria-hidden="true"/>}{crumb.path?<Link to={crumb.path}>{crumb.label}</Link>:<span aria-current="page">{crumb.label}</span>}</li>)}</ol></nav>}
-        <main id="hui-main" ref={mainRef} tabIndex={-1} data-training-family={teacherVisual ? teacherFamily : undefined} className={`hui-app-main ${(isAuthPath(location.pathname)||location.pathname==='/profile'||location.pathname==='/student/profile'||user?.mustChangePassword)?'hui-auth-content':''}`}><TrainingLearnerNavigationBoundary role={user?.role}>{training && mode==='standard' && <TrainingContextBack role={user?.role}/>} {!training && user && ['/student', '/parent', '/dashboard'].includes(location.pathname) && <AssessmentTaskShortcut key={user.id}/>} {organizationProductRoute?<OrganizationProductRoutes/>:staffWorkspace?<div className="hui-staff-workspace" data-staff-workspace="true">{children}</div>:children}</TrainingLearnerNavigationBoundary></main>
+        <main id="hui-main" ref={mainRef} tabIndex={-1} data-training-family={teacherVisual ? teacherFamily : undefined} className={`hui-app-main ${(isAuthPath(location.pathname)||location.pathname==='/profile'||location.pathname==='/student/profile'||user?.mustChangePassword)?'hui-auth-content':''}`}><TrainingLearnerNavigationBoundary role={user?.role}>{training && !surveyAdmin && mode==='standard' && <TrainingContextBack role={user?.role}/>} {!training && user && ['/student', '/parent', '/dashboard'].includes(location.pathname) && <AssessmentTaskShortcut key={user.id}/>} {organizationProductRoute?<OrganizationProductRoutes/>:staffWorkspace?<div className="hui-staff-workspace" data-staff-workspace="true">{children}</div>:children}</TrainingLearnerNavigationBoundary></main>
       </div>
-    </div>{!training&&!entryMode&&mode!=='focused'&&<Footer variant="light"/>}
+    </div>{(!training||surveyAdmin)&&!entryMode&&mode!=='focused'&&<Footer variant="light" productName={surveyAdmin?'Huisurvey · 观风知微':undefined}/>}
   </div>
 }
 export default function AppShell({children}:{children:ReactNode}) {

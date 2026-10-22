@@ -154,7 +154,7 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
     const result=await reportApi<{releaseId:string}>(base+'/'+selected.id+'/publish','POST',{revision:selected.revision,publicationNote:publicationNote.trim()})
     setSelected({...selected,state:'PUBLISHED',published_release_id:result.releaseId});setNotice('报告版本已发布。已有报告与原始分数未被改写。');await afterWrite()
   })}
-  return <section className="bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="项目私有报告">
+  return <section className="survey-studio-surface bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="项目私有报告">
     <header><h2 className="text-xl font-semibold">项目私有报告</h2><p>选择本项目测量发布版本，编制描述性报告。参考区块只引用已有参考类型与分段标识，不创建阈值或常模。</p></header>
     {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
     {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}

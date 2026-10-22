@@ -1,0 +1,65 @@
+export type SurveyProject = {
+  id:string; title:string; description:string; collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES'
+  status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED'; revision:number; firstPublishedAt?:string|null
+}
+const statusLabels = {DRAFT:'草稿',ACTIVE:'采集中',PAUSED:'暂停',CLOSED:'已结束',ARCHIVED:'已归档'}
+
+export function SurveyProjectDirectory({projects,selectedId,username,page,busy,loading,error,query,status,
+  onQuery,onStatus,onChoose,onArchive,onPage,onRefresh,onCreate}:{
+  projects:SurveyProject[]; selectedId?:string; username:string; page:number; busy:boolean; loading:boolean
+  error:string; query:string; status:string; onQuery:(value:string)=>void; onStatus:(value:string)=>void
+  onChoose:(project:SurveyProject)=>void; onArchive:(project:SurveyProject)=>void; onPage:(page:number)=>void
+  onRefresh:()=>void; onCreate:()=>void
+}) {
+  const needle=query.trim().toLocaleLowerCase()
+  const visible=projects.filter(project=>(!needle||(project.title+' '+project.description).toLocaleLowerCase().includes(needle))
+    &&(!status||project.status===status))
+  const clear=()=>{onQuery('');onStatus('')}
+  return <section className="survey-project-directory" aria-labelledby="survey-projects-heading">
+    <header className="survey-directory-heading">
+      <div><p className="survey-workspace-eyebrow">HUISURVEY · 研究者工作台</p>
+        <h1 id="survey-projects-heading" tabIndex={-1}>我的研究</h1>
+        <p>从研究设置到工具、采集与数据，在同一项目中继续。</p>
+        <p className="survey-researcher-identity">研究者：{username}</p>
+      </div>
+      <button type="button" className="btn-primary" disabled={busy||loading} onClick={onCreate}>新建研究</button>
+    </header>
+    <div className="survey-directory-toolbar" role="search" aria-label="筛选本页研究">
+      <label>筛选本页研究<input className="input" type="search" value={query} placeholder="研究名称或说明"
+        onChange={event=>onQuery(event.target.value)}/></label>
+      <label>本页状态<select className="input" value={status} onChange={event=>onStatus(event.target.value)}>
+        <option value="">全部状态</option>{Object.entries(statusLabels).map(([value,label])=><option key={value} value={value}>{label}</option>)}
+      </select></label>
+      {(query||status)&&<button type="button" className="btn-secondary" onClick={clear}>清除筛选</button>}
+      <button type="button" className="btn-secondary" disabled={busy||loading} onClick={onRefresh}>刷新本页研究</button>
+    </div>
+    {loading&&<p role="status" className="survey-workspace-message">正在读取研究列表，请稍候…</p>}
+    {error&&<div role="alert" className="survey-workspace-message survey-workspace-message--error">
+      <p>研究列表未能更新：{error}。当前会话及已显示的研究会保留。</p>
+      <button type="button" className="btn-secondary" disabled={busy||loading} onClick={onRefresh}>重试研究列表</button>
+    </div>}
+    {!loading&&!error&&<p className="survey-directory-count" role="status">第 {page} 页共 {projects.length} 项，当前显示 {visible.length} 项。筛选仅作用于本页。</p>}
+    <div className="survey-project-grid">{visible.map(project=><article className="survey-project-card" data-selected={selectedId===project.id} key={project.id}>
+      <div className="survey-project-meta"><span className="survey-project-status" data-status={project.status}>{statusLabels[project.status]||'状态待确认'}</span>
+        <span>{project.collectionMode==='LINKED_WAVES'?'多波次关联':'单次匿名'}</span></div>
+      <h3>{project.title}</h3><p className="survey-project-description">{project.description||'尚未填写研究说明，可在研究设置中补充。'}</p>
+      {selectedId===project.id&&<p className="survey-project-current">当前编辑中的研究</p>}
+      <div className="survey-project-actions"><button className="btn-secondary" disabled={busy} aria-pressed={selectedId===project.id} onClick={()=>onChoose(project)}>查看/编辑</button>
+        <button className="btn-secondary" disabled={busy||(project.status==='DRAFT'&&!!project.firstPublishedAt)
+          ||(!['DRAFT','CLOSED'].includes(project.status)&&!(project.status==='ARCHIVED'&&!project.firstPublishedAt))} onClick={()=>onArchive(project)}>
+          {project.status==='CLOSED'?'结束后归档':project.status==='DRAFT'?'归档草稿':
+            project.status==='ARCHIVED'?(project.firstPublishedAt?'终态归档不可恢复':'恢复草稿'):'采集中不可归档'}</button></div>
+    </article>)}</div>
+    {!loading&&!error&&!visible.length&&<div className="survey-directory-empty">
+      <h3>{projects.length?'本页没有符合条件的研究':page===1?'从一项研究草稿开始':'本页没有研究项目'}</h3>
+      <p>{projects.length?'可清除筛选查看本页内容，或使用分页查看其他研究。':page===1?'先填写研究名称与采集方式，再编制工具、配置波次并检查发布。':'可返回上一页继续查看已有研究。'}</p>
+      {projects.length?<button type="button" className="btn-secondary" onClick={clear}>显示本页全部研究</button>
+        :page===1&&<button type="button" className="btn-secondary" disabled={busy} onClick={onCreate}>填写第一项研究</button>}
+    </div>}
+    <nav className="survey-directory-pagination" aria-label="研究项目分页">
+      <button type="button" className="btn-secondary" disabled={busy||loading||page<=1} onClick={()=>onPage(page-1)}>上一页</button>
+      <span>项目第 {page} 页</span>
+      <button type="button" className="btn-secondary" disabled={busy||loading||projects.length<25} onClick={()=>onPage(page+1)}>下一页</button>
+    </nav>
+  </section>
+}

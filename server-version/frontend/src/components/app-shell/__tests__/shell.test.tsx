@@ -64,6 +64,60 @@ beforeEach(() => {
   sessionStorage.clear()
 })
 
+describe('Survey administrator presentation',()=>{
+  it.each(['/admin/survey-researchers','/admin/scale-library-governance?workspace=survey'])(
+    'keeps scoped management navigation on the canonical Training host at %s',path=>{
+      presentation.training=true
+      auth.user={id:'survey-manager',role:'STUDENT',businessRole:'STUDENT',username:'manager',platformRole:'STANDARD',entryGrants:[{entry:'SURVEY',version:1}]} as User
+      render(<MemoryRouter initialEntries={[path]}><AppShell><p>研究管理内容</p></AppShell></MemoryRouter>)
+      const navigation=screen.getByRole('navigation',{name:'主要导航'})
+      expect(navigation.querySelector('.hui-nav-group')).not.toBeNull()
+      expect(screen.getByRole('searchbox',{name:'查找管理页面'})).toBeInTheDocument()
+      expect(navigation).toHaveTextContent('Survey 研究管理')
+      expect(navigation).not.toHaveTextContent('Training 培训管理')
+      expect(navigation).not.toHaveTextContent('系统治理与入口授权')
+    })
+  it.each([
+    ['STUDENT','/admin/survey-researchers'],
+    ['TEACHER','/admin/survey-researchers'],
+    ['STUDENT','/admin/scale-library-governance?workspace=survey'],
+    ['TEACHER','/admin/scale-library-governance?workspace=survey'],
+  ])('uses independent Survey management authority for the %s business identity at %s',(role,path)=>{
+    presentation.training=true
+    auth.user={id:'entry-manager',role,businessRole:role,username:'manager',platformRole:'STANDARD',entryGrants:[{entry:'SURVEY',version:1}]} as User
+    const view=render(<MemoryRouter initialEntries={[path]}><AppShell><h1>获授权的研究管理页面</h1></AppShell></MemoryRouter>)
+    expect(view.container.querySelector('.hui-survey-admin-shell')).not.toBeNull()
+    expect(view.container.querySelector('.hui-training,.training-workspace-shell')).toBeNull()
+    expect(screen.getByRole('banner').querySelector('.survey-brand img')).toHaveAttribute('src','/survey/huisurvey-w2-emblem.svg')
+    expect(screen.getByRole('contentinfo')).toHaveTextContent('Huisurvey · 观风知微')
+    expect(screen.getByRole('main')).toContainElement(screen.getByRole('heading',{name:'获授权的研究管理页面'}))
+  })
+  it.each([
+    ['/admin/survey-researchers',false],
+    ['/admin/survey-researchers',true],
+    ['/admin/scale-library-governance?workspace=survey',false],
+    ['/admin/scale-library-governance?workspace=survey',true],
+  ])('retains Survey branding and the actual page on %s, Training host=%s',(path,training)=>{
+    presentation.training=training
+    auth.user={id:'survey-admin',role:'ADMIN',username:'manager',platformRole:'STANDARD',entryGrants:[{entry:'SURVEY',version:1}]} as User
+    const view=render(<MemoryRouter initialEntries={[path]}><AppShell><h1>既有管理内容</h1></AppShell></MemoryRouter>)
+    expect(view.container.querySelector('.hui-survey-admin-shell')).not.toBeNull()
+    expect(view.container.querySelector('.hui-training')).toBeNull()
+    expect(screen.getByRole('banner').querySelector('.survey-brand img')).toHaveAttribute('src','/survey/huisurvey-w2-emblem.svg')
+    expect(screen.getByRole('contentinfo')).toHaveTextContent('Huisurvey · 观风知微')
+    expect(screen.getByRole('main')).toContainElement(screen.getByRole('heading',{name:'既有管理内容'}))
+  })
+  it.each(['/admin/permissions?workspace=survey','/admin/training','/admin/scale-library-governance?workspace=training'])(
+    'does not restyle another management context at %s',path=>{
+      presentation.training=true
+      auth.user={id:'admin',role:'ADMIN',username:'manager',platformRole:'SYSTEM_ADMIN'} as User
+      const view=render(<MemoryRouter initialEntries={[path]}><AppShell><p>原管理内容</p></AppShell></MemoryRouter>)
+      expect(view.container.querySelector('.hui-survey-admin-shell')).toBeNull()
+      expect(view.container.querySelector('.hui-training')).not.toBeNull()
+      expect(screen.getByText('原管理内容')).toBeVisible()
+    })
+})
+
 describe('Training assessment presentation boundary', () => {
   it.each([
     '/student/scales/scale-1', '/student/questionnaires/questionnaire-1',

@@ -39,6 +39,19 @@ async function mount(){
 }
 afterEach(()=>vi.unstubAllGlobals())
 describe('recruitment capability display, clipboard and QR share one trusted URL',()=>{
+  it('keeps the issued link and supports manual copying after clipboard refusal without reissuing it',async()=>{
+    const api=fixture('http://survey.localhost:5173');api.writeText.mockRejectedValueOnce(new Error('clipboard denied'))
+    await mount();fireEvent.click(screen.getByRole('button',{name:'正式开放本轮'}))
+    const expected='http://survey.localhost:5173/r/public-id#entry=synthetic-token-1'
+    await screen.findByText(expected)
+    fireEvent.click(screen.getByRole('button',{name:'复制研究链接'}))
+    expect(await screen.findByRole('alert')).toHaveTextContent('请手动选择并复制下方研究链接')
+    expect(screen.getByText(expected)).toBeVisible()
+    fireEvent.click(screen.getByRole('button',{name:'复制研究链接'}))
+    await screen.findByText('研究链接已复制，请通过受控渠道分享。')
+    expect(api.writeText).toHaveBeenLastCalledWith(expected)
+    expect(api.fetcher.mock.calls.filter(([,init])=>init?.method==='POST')).toHaveLength(1)
+  })
   it.each([
     [{status:'DRAFT',publicationId:'pub1'},'已冻结，尚未开放'],
     [{status:'OPEN'},'波次已开放'],
