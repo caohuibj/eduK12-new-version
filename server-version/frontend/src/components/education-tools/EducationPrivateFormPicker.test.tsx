@@ -14,7 +14,7 @@ describe('private fixed-form picker',()=>{
   const api=vi.fn(async(path:string)=>{if(path.endsWith('&cursor=next%2Fpage')){if(++pages===1)throw Error('分页失败');return {list:[row,{...row,versionId:'second',title:'另一个固定版'}],nextCursor:null}}return {list:[row],nextCursor:'next/page'}})
   render(<EducationPrivateScalePicker {...baseProps} api={api as PrivateToolApi} onBusy={vi.fn()} onRefresh={vi.fn()}/>);await select()
   expect(api).toHaveBeenCalledWith('/organizations/org/private-tools/runtime-candidates?kind=FORM')
-  expect(screen.getByText(/可加入活动草稿，执行接入尚未完成/)).toBeInTheDocument()
+  expect(screen.getByText(/先加入活动草稿，再预览并发布/)).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button',{name:'继续加载我的表单'}));await screen.findByText('分页失败')
   expect(screen.getByLabelText('我的表单 · 固定版本')).toHaveValue('fixed')
   fireEvent.click(screen.getByRole('button',{name:'继续加载我的表单'}));await screen.findByRole('option',{name:/另一个固定版/})

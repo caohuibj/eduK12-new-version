@@ -53,7 +53,7 @@ export function EducationPrivateScalePicker({entry,organizationId,actorKey,scope
     ...(mode==='TEACHER_REPORT'?{targetPolicy:{mode:target}}:{})})
    saved=true
    if(!valid())return
-   setChoice('');setMode('');setTarget('');setNotice(kind==='FORM'?'已将本人固定表单版本加入活动草稿。执行接入尚未完成，加入草稿不等于已发布。':'已加入本人固定版本。请核对任务配置，再按现有流程预览和发布；是否可发布以服务器检查为准。')
+   setChoice('');setMode('');setTarget('');setNotice(kind==='FORM'?'已将本人固定表单版本加入活动草稿。请核对任务配置，再预览并发布；加入草稿不等于已发布。':'已加入本人固定版本。请核对任务配置，再按现有流程预览和发布；是否可发布以服务器检查为准。')
    await onRefresh()
   }catch(cause){if(valid()){
    setError((saved?'已添加，但任务配置刷新失败，请重新读取；不要重复添加。':'添加未确认，请先重新读取任务配置核对；不会自动重复提交。')+' '+privateToolError(cause))
@@ -72,7 +72,7 @@ export function EducationPrivateScalePicker({entry,organizationId,actorKey,scope
  const prefix=entry==='SCHOOL'?'hs':'ht'
  return <section className={entry==='SCHOOL'?'hs-task-detail':'ht-task'} aria-label={`我的${label}固定版本`}>
   <h4>我的{label}</h4><p>仅本人在当前入口和学校固定的{label}版本。编制权限不增加发布或个体报告读取权限；分享不在此处开放。</p>
-  {kind==='FORM'&&<p>可加入活动草稿，执行接入尚未完成。表单采用 Training 式分节、逐步呈现，不承诺保留 Survey 原分页视觉；不兼容的图片或跨页条件会明确列出，不会自动删减。</p>}
+  {kind==='FORM'&&<p>先加入活动草稿，再预览并发布。表单采用 Training 式分节、逐步呈现，不承诺保留 Survey 原分页视觉；不兼容的图片或跨页条件会明确列出，不会自动删减。</p>}
   <button disabled={disabled||loading||writing} onClick={()=>void load()}>读取我的固定{label}</button>
   {loading&&<p role="status">正在读取我的{label}…</p>}
   {error&&<p role="alert">{error}</p>}{notice&&<p role="status">{notice}</p>}
