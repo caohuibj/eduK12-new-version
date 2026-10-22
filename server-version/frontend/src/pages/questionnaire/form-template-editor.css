@@ -1,4 +1,4 @@
-.hui-training.hui-app.hui-app--standard .qt-editor .qt-form-template-workspace {
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor .qt-form-template-workspace {
   display: grid;
   gap: 24px;
   min-width: 0;
@@ -8,7 +8,7 @@
   background: transparent;
   box-shadow: none;
 }
-.hui-training.hui-app.hui-app--standard .qt-form-template-editor .questionnaire-basic-grid {
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor .questionnaire-basic-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 20px;
@@ -18,12 +18,12 @@
   background: transparent;
   box-shadow: none;
 }
-.hui-training .qt-form-template-editor .questionnaire-basic-grid > label:first-child,
-.hui-training .qt-form-template-editor .questionnaire-basic-grid > [role="alert"] { grid-column: 1 / -1; }
-.hui-training .qt-form-template-editor .qt-panel-heading h2 {
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor .questionnaire-basic-grid > label:first-child,
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor .questionnaire-basic-grid > [role="alert"] { grid-column: 1 / -1; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor .qt-panel-heading h2 {
   font-size: 24px;
 }
-.hui-training .qt-form-template-editor .qt-panel-body label {
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor .qt-panel-body label {
   font-size: 16px;
 }
 .hui-training .qt-form-template-picker {
@@ -50,7 +50,7 @@
   justify-self: start;
 }
 @media (max-width: 680px) {
-  .hui-training.hui-app.hui-app--standard .qt-form-template-editor .questionnaire-basic-grid { grid-template-columns: minmax(0, 1fr); }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor .questionnaire-basic-grid { grid-template-columns: minmax(0, 1fr); }
   .hui-training .qt-form-template-picker { padding: 16px; }
   .hui-training .qt-form-template-editor .qt-unit-editor { grid-template-columns: minmax(0, 1fr); }
 }
