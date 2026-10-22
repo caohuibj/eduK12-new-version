@@ -1,5 +1,5 @@
-.education-private-tools { --private-accent: #276760; --private-bg: #f3f7f3; display: grid; gap: 1.1rem; min-width: 0; }
-.education-private-tools--teacher { --private-accent: #345d7b; --private-bg: #f3f6fa; }
+.education-private-tools { --private-accent: #276760; --private-bg: #f3f7f3; --private-line: #dbe2e3; display: grid; gap: .85rem; min-width: 0; }
+.education-private-tools--teacher { --private-accent: var(--ht-copper, #944638); --private-bg: var(--ht-bg, #fbf4ed); --private-line: var(--ht-line, #e5d5ca); }
 .education-private-tools header h2 { margin: 0 0 .5rem; }
 .education-private-tools p { line-height: 1.7; }
 .education-private-tools .education-private-boundary { padding: 1rem; border-left: 3px solid var(--private-accent); background: var(--private-bg); border-radius: .6rem; }
@@ -19,3 +19,21 @@
 .education-private-tools pre { max-width: 100%; overflow: auto; background: var(--private-bg); padding: 1rem; }
 .education-private-tools details { border-top: 1px solid #dbe2e3; padding-top: 1rem; }
 @media(max-width:640px) { .education-private-tools .education-private-toolbar>* { flex: 1 1 100%; } .education-private-tools .staff-panel { padding: .8rem; } }
+
+.education-private-tools .education-private-heading { display: flex; align-items: start; justify-content: space-between; gap: .75rem; }
+.education-private-tools .education-private-heading h2 { margin-bottom: .25rem; }
+.education-private-tools .education-private-heading p,.education-private-tools .education-private-step-help { margin: 0; font-size: .9rem; }
+.education-private-tools .education-private-badge { flex-shrink: 0; padding: .25rem .6rem; border-radius: 1rem; color: var(--private-accent); background: var(--private-bg); font-size: .8rem; }
+.education-private-tools details.education-private-boundary { padding: .55rem .75rem; border-top: 0; }
+.education-private-tools .education-private-boundary summary { cursor: pointer; font-size: .85rem; }
+.education-private-tools .education-private-boundary p { margin: .4rem 0 0; font-size: .85rem; }
+.education-private-tools .education-private-navigation { align-items: center; }
+.education-private-tools .education-private-save-state { margin-left: auto; font-size: .85rem; }
+.education-private-tools .education-private-steps { display: flex; flex-wrap: wrap; gap: .4rem 1.25rem; list-style: none; padding: .55rem 0; margin: 0; border-block: 1px solid var(--private-line); color: var(--private-accent); font-size: .85rem; }
+.education-private-tools .education-private-title-field { max-width: 48rem; }
+.education-private-tools button.education-private-primary { background: var(--private-accent); color: #fff; border-color: var(--private-accent); }
+.education-private-tools .education-private-versions summary { cursor: pointer; font-weight: 600; }
+.education-private-tools .education-private-versions>.education-private-step-help { margin-top: .5rem; }
+.education-private-tools .education-private-version { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem 1rem; padding: .7rem 0; border-bottom: 1px solid var(--private-line); }
+.education-private-tools .education-private-version p { margin: .2rem 0 0; font-size: .85rem; }
+@media(max-width:640px) { .education-private-tools .education-private-save-state { margin-left: 0; } .education-private-tools .education-private-actions>* { flex: 1 1 calc(50% - .75rem); } .education-private-tools .education-private-navigation>* { flex: 0 1 auto; } }
