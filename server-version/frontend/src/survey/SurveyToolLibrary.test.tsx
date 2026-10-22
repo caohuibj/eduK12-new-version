@@ -44,7 +44,7 @@ describe('independent Survey toolkit and study selection',()=>{
  it.each([['表单','FORM'],['量表','SCALE'],['普通组合问卷','COMPOSITION']])('enters %s editing directly after choosing the type',async(label,kind)=>{
   render(<SurveyToolLibrary/>);fireEvent.click(await screen.findByRole('button',{name:'编制工具'}))
   fireEvent.click(within(screen.getByRole('group',{name:'选择要编制的工具'})).getByRole('button',{name:new RegExp('^'+label)}))
-  expect(await screen.findByRole('heading',{name:kind==='FORM'?'未命名表单':label+'编制'})).toBeVisible()
+  expect(await screen.findByRole('heading',{name:kind==='COMPOSITION'?label+'编制':'未命名'+label})).toBeVisible()
   expect(screen.getByLabelText('工具名称')).toHaveValue(kind==='COMPOSITION'?'未命名组合问卷':'未命名'+label)
   const writes=vi.mocked(fetch).mock.calls.filter(([url,init])=>String(url).endsWith('/tool-library')&&init?.method==='POST')
   expect(writes).toHaveLength(1);expect(JSON.parse(String(writes[0][1]?.body))).toMatchObject({kind})
@@ -61,6 +61,25 @@ describe('independent Survey toolkit and study selection',()=>{
   fireEvent.click(screen.getByRole('button',{name:'保存表单信息'}))
   await waitFor(()=>expect(screen.getByRole('textbox',{name:'题干'})).toBeEnabled())
   expect(screen.getByLabelText('工具名称')).toHaveValue('课堂反馈');expect(toggle).toHaveAttribute('aria-expanded','false');expect(screen.getByLabelText('工具名称')).not.toBeVisible()
+ })
+ it('uses compact scale naming while keeping a save action for unsaved scale content',async()=>{
+  render(<SurveyToolLibrary/>);fireEvent.click(await screen.findByRole('button',{name:'编制工具'}));fireEvent.click(screen.getByRole('button',{name:/^量表\s+设置/}));await screen.findByRole('heading',{name:'未命名量表'})
+  expect(screen.getByLabelText('工具名称')).not.toBeVisible();expect(screen.getByRole('button',{name:'保存量表'})).toBeDisabled()
+  fireEvent.click(screen.getByRole('button',{name:'编辑名称'}));expect(screen.getByLabelText('工具名称')).toHaveFocus()
+  fireEvent.change(screen.getByLabelText('工具名称'),{target:{value:'课堂体验量表'}});fireEvent.click(screen.getByRole('button',{name:'保存量表信息'}))
+  await waitFor(()=>expect(screen.getByLabelText('工具名称')).not.toBeVisible());expect(screen.getByRole('heading',{name:'课堂体验量表'})).toBeVisible()
+  fireEvent.change(screen.getByLabelText('量表施测呈现模式'),{target:{value:'ONE_BY_ONE'}})
+  expect(screen.getByRole('button',{name:'保存量表'})).toBeEnabled();expect(screen.getByRole('button',{name:'检查与试答'})).toBeDisabled()
+  fireEvent.click(screen.getByRole('button',{name:'保存量表'}));await waitFor(()=>expect(screen.getByRole('button',{name:'保存量表'})).toBeDisabled())
+  const writes=vi.mocked(fetch).mock.calls.filter(([,init])=>init?.method==='PATCH');expect(JSON.parse(String(writes[writes.length-1][1]?.body))).toMatchObject({title:'课堂体验量表',definition:{presentationMode:'ONE_BY_ONE'}})
+  expect(screen.getByRole('button',{name:'检查与试答'})).toBeEnabled()
+ })
+ it('keeps failed scale name edits available and preserves the leave confirmation',async()=>{
+  const base=vi.mocked(fetch).getMockImplementation()!;vi.mocked(fetch).mockImplementation((url,init)=>init?.method==='PATCH'?Promise.reject(new Error('名称保存未确认')):base(url,init));vi.spyOn(window,'confirm').mockReturnValue(false)
+  render(<SurveyToolLibrary/>);fireEvent.click(await screen.findByRole('button',{name:'编制工具'}));fireEvent.click(screen.getByRole('button',{name:/^量表\s+设置/}));await screen.findByRole('heading',{name:'未命名量表'})
+  fireEvent.click(screen.getByRole('button',{name:'编辑名称'}));fireEvent.change(screen.getByLabelText('工具名称'),{target:{value:'待保存量表'}});fireEvent.click(screen.getByRole('button',{name:'保存量表信息'}))
+  expect(await screen.findByRole('alert')).toHaveTextContent('名称保存未确认');expect(screen.getByLabelText('工具名称')).toBeVisible();expect(screen.getByLabelText('工具名称')).toHaveValue('待保存量表')
+  fireEvent.click(screen.getByRole('button',{name:'工具集'}));expect(window.confirm).toHaveBeenCalled();expect(screen.getByLabelText('工具名称')).toHaveValue('待保存量表')
  })
  it('retries an unconfirmed direct creation with the same identity and blocks other kinds',async()=>{
   const original=vi.mocked(fetch).getMockImplementation()!;let fail=true

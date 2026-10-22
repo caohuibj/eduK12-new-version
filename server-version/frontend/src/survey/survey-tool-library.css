@@ -109,6 +109,11 @@
 .survey-template-eyebrow { display:block; font-size:.65rem; letter-spacing:.12em; color:#75909b; margin-bottom:.3rem; }
 .survey-template-title { align-items:flex-end; padding-bottom:1.25rem; }
 .survey-template-actions button { display:inline-flex; align-items:center; gap:.4rem; }
+.survey-researcher .survey-tool-template.is-scale { padding:1rem 1.25rem 1.25rem; }
+.survey-researcher .survey-scale-save { min-height:38px; padding:.45rem .8rem; border-radius:.5rem; font-size:.8rem; white-space:nowrap; }
+.survey-researcher .is-scale .survey-template-fields { margin-top:.9rem; }
+.survey-researcher .is-scale .survey-library-help { margin-top:.6rem; padding-top:.4rem; font-size:.75rem; }
+@media(max-width:48rem){.survey-researcher .survey-tool-template.is-scale{padding:.85rem}}
 @media(max-width:60rem){.survey-library-create-choices{grid-template-columns:minmax(0,1fr);padding:.75rem}.survey-library-create-choices>button{padding:.8rem 1rem}.survey-library-create-choices small{margin-top:.1rem}}
 @media(max-width:40rem){.survey-template-actions{width:100%;justify-content:flex-start}.survey-template-actions button{flex:1}}
 .survey-library-card-name { display:flex; align-items:start; gap:.5rem; margin:.85rem 0 .4rem; }
