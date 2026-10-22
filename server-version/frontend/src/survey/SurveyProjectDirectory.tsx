@@ -22,11 +22,8 @@ export function SurveyProjectDirectory({projects,selectedId,page,busy,loading,er
     &&(!status||project.status===status))
   const clear=()=>{onQuery('');onStatus('')}
   return <section className="survey-project-directory" aria-labelledby="survey-projects-heading">
+    <h1 id="survey-projects-heading" tabIndex={-1} className="sr-only">我的研究</h1>
     <header className="survey-directory-heading">
-      <div><p className="survey-workspace-eyebrow">RESEARCH · 研究者工作台</p>
-        <h1 id="survey-projects-heading" tabIndex={-1}>我的研究</h1>
-        <p>从研究设置到工具、采集与数据，在同一项目中继续。</p>
-      </div>
       <div className="survey-directory-actions">
         <button type="button" className="btn-secondary survey-directory-search-toggle" aria-label="研究检索"
           aria-expanded={searchOpen} aria-controls="survey-directory-search" data-filtered={!!(query||status)}
@@ -49,7 +46,6 @@ export function SurveyProjectDirectory({projects,selectedId,page,busy,loading,er
       <p>研究列表未能更新：{error}。当前会话及已显示的研究会保留。</p>
       <button type="button" className="btn-secondary" disabled={busy||loading} onClick={onRefresh}>重试研究列表</button>
     </div>}
-    {!loading&&!error&&<p className="survey-directory-count" role="status">第 {page} 页共 {projects.length} 项，当前显示 {visible.length} 项。筛选仅作用于本页。</p>}
     <div className="survey-project-grid">{visible.map(project=><article className="survey-project-card" data-selected={selectedId===project.id} key={project.id}>
       <div className="survey-project-card-top"><span className="survey-project-icon"><FolderOpen size={23} strokeWidth={1.5} aria-hidden="true"/></span>
         <span className="survey-project-status" data-status={project.status}>{statusLabels[project.status]||'状态待确认'}</span></div>
@@ -68,10 +64,13 @@ export function SurveyProjectDirectory({projects,selectedId,page,busy,loading,er
       {projects.length?<button type="button" className="btn-secondary" onClick={clear}>显示本页全部研究</button>
         :page===1&&<button type="button" className="btn-secondary" disabled={busy} onClick={onCreate}>填写第一项研究</button>}
     </div>}
+    <footer className="survey-directory-footer">
+    {!loading&&!error&&<p className="survey-directory-count" role="status">第 {page} 页共 {projects.length} 项，当前显示 {visible.length} 项。筛选仅作用于本页。</p>}
     <nav className="survey-directory-pagination" aria-label="研究项目分页">
       <button type="button" className="btn-secondary" disabled={busy||loading||page<=1} onClick={()=>onPage(page-1)}>上一页</button>
       <span>项目第 {page} 页</span>
       <button type="button" className="btn-secondary" disabled={busy||loading||projects.length<25} onClick={()=>onPage(page+1)}>下一页</button>
     </nav>
+    </footer>
   </section>
 }

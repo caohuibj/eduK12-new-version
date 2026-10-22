@@ -18,6 +18,7 @@ import { surveyFeatures } from './survey-features'
 import { SurveyProjectDirectory, type SurveyProject as Project } from './SurveyProjectDirectory'
 import { SurveyResearcherAccount } from './SurveyResearcherAccount'
 import { SurveyCreateProjectDialog } from './SurveyCreateProjectDialog'
+import { SurveyResearchNavigation, SurveyResearchPlaceholder, type ResearchArea } from './SurveyResearchNavigation'
 
 type Envelope<T>={code:number|string;message:string;data:T}
 type Researcher={id:string;username:string;mustChangePassword:boolean}
@@ -42,6 +43,7 @@ async function api<T>(path:string,method='GET',body?:unknown):Promise<T>{
   return envelope.data
 }
 const readInvite=()=>new URLSearchParams(window.location.hash.slice(1)).get('token')||''
+const readResearchArea=():ResearchArea=>window.location.pathname==='/workspace/tools'?'tools':window.location.pathname==='/workspace/datasets'?'datasets':'studies'
 export default function SurveyApp(){
   // Keep the entry stable when activation removes its one-time token from the URL.
   const [initial]=useState<'home'|'feature'|'claim'|'reset'|'login'>(()=>
@@ -59,6 +61,7 @@ export default function SurveyApp(){
   const [projects,setProjects]=useState<Project[]>([]),[selected,setSelected]=useState<Project|null>(null)
   const [creating,setCreating]=useState(false)
   const [editorOpen,setEditorOpen]=useState(false)
+  const [researchArea,setResearchArea]=useState<ResearchArea>(readResearchArea)
   const projectCreationRequestId=useRef<string|null>(null)
   const reportLeaveRisk=useRef<ReportLeaveRisk>({dirty:false,pending:false,busy:false})
   const reportRiskChanged=useCallback((risk:ReportLeaveRisk)=>{reportLeaveRisk.current=risk},[])
@@ -179,12 +182,27 @@ export default function SurveyApp(){
     await loadProjects(1).catch(()=>{});setNotice('研究草稿已创建')
   })}
   const applyProject=(p:Project)=>{projectCreationRequestId.current=null;setCreating(false);setEditorOpen(true);setSelected(p);setTitle(p.title);setDescription(p.description);setMode(p.collectionMode)}
-  const focusSection=(id:string)=>window.requestAnimationFrame(()=>{
+  const focusSection=useCallback((id:string)=>window.requestAnimationFrame(()=>{
     const element=document.getElementById(id);element?.focus({preventScroll:true})
     if(id==='survey-current-project-heading'||id==='survey-projects-heading'){
       document.documentElement.scrollTop=0;document.body.scrollTop=0
     }else element?.scrollIntoView?.({block:'start'})
-  })
+  }),[])
+  const navigateResearchArea=(area:ResearchArea,path:string)=>{
+    setResearchArea(area)
+    if(area==='studies')setEditorOpen(false)
+    if(window.location.pathname!==path||window.location.hash)window.history.pushState(null,'',path)
+    focusSection(area==='studies'?'survey-projects-heading':'survey-'+area+'-heading')
+  }
+  useEffect(()=>{
+    const restore=()=>{
+      const area=readResearchArea();setResearchArea(area)
+      if(area==='studies')setEditorOpen(false)
+      focusSection(area==='studies'?'survey-projects-heading':'survey-'+area+'-heading')
+    }
+    window.addEventListener('popstate',restore)
+    return ()=>window.removeEventListener('popstate',restore)
+  },[focusSection])
   const choose=(p:Project)=>{
     if(selected?.id===p.id){setEditorOpen(true);focusSection('survey-current-project-heading');return}
     if(!mayLeaveWorkspace()){setEditorOpen(true);return}
@@ -227,8 +245,9 @@ export default function SurveyApp(){
   const entryScreen=screen==='login'||screen==='claim'||screen==='reset'
   return <div className={entryScreen?'survey-entry':'survey-researcher min-h-screen bg-slate-50 text-slate-800'}>
     {entryScreen&&<a className="survey-skip-link" href="#survey-entry-content">跳至主要内容</a>}
-    <header className="border-b border-slate-200 bg-white"><div className={entryScreen?'survey-entry-header':'survey-researcher-header'}>
+    <header className="border-b border-slate-200 bg-white"><div className={entryScreen?'survey-entry-header':'survey-researcher-header'+(user&&screen==='work'&&!user.mustChangePassword?' survey-researcher-header--navigation':'')}>
       <SurveyBrand/>
+      {user&&screen==='work'&&!user.mustChangePassword&&<SurveyResearchNavigation active={researchArea} onNavigate={navigateResearchArea}/>}
       <div className="survey-session-actions">{user&&screen==='work'
         ?<SurveyResearcherAccount username={user.username} busy={busy} writeBusy={writeBusy} error={error} onLogout={logout} onChangePassword={changeAccountPassword}/>
         :<span>{screen==='mfa'?'研究者身份验证':'研究者入口'}</span>}</div>
@@ -286,6 +305,7 @@ export default function SurveyApp(){
         <ProductPasswordChange product="survey" forced busy={busy} onChangePassword={changeAccountPassword}/>
       </section>}
       {!loading&&user&&screen==='work'&&!user.mustChangePassword&&<div className="survey-workspace">
+        <div hidden={researchArea!=='studies'}>
         <div hidden={editorOpen}><SurveyProjectDirectory projects={projects} selectedId={selected?.id} page={projectPage}
           busy={busy} loading={projectsLoading} error={projectsError} query={projectQuery} status={projectFilter}
           onQuery={setProjectQuery} onStatus={setProjectFilter} onChoose={choose} onArchive={toggle}
@@ -317,7 +337,8 @@ export default function SurveyApp(){
             ?<SurveyAnalyticsWorkspace actorId={user?.id} key={'analysis-'+selected.id} projectId={selected.id}/>
             :<section className="rounded-xl border bg-white p-4" aria-label="研究数据状态">
               研究数据分析暂未在当前环境启用；项目和研究工具仍可使用。
-            </section>}</div></>}</div>
+            </section>}</div></>}</div></div>
+        {researchArea!=='studies'&&<SurveyResearchPlaceholder area={researchArea}/>}
         <SurveyCreateProjectDialog open={creating} busy={busy} title={title} description={description} mode={mode} error={error}
           onTitle={setTitle} onDescription={setDescription} onMode={setMode} onClose={returnToProjects} onSubmit={createProject}/>
       </div>}
