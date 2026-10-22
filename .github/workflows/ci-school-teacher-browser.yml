@@ -9,41 +9,8 @@ env:
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
 jobs:
-  frontend:
-    if: ${{ github.event_name == 'push' && github.repository == 'caohuibj/eduK12-new-version' && github.ref == 'refs/heads/ci/school-teacher-browser-20261022' && !github.event.deleted }}
-    uses: ./.github/workflows/ci-frontend-build.yml
-    with:
-      runner_labels: '["ubuntu-24.04"]'
-      performance_smoke: false
-      ui_lab: false
-  backend:
-    if: ${{ github.event_name == 'push' && github.repository == 'caohuibj/eduK12-new-version' && github.ref == 'refs/heads/ci/school-teacher-browser-20261022' && !github.event.deleted }}
-    runs-on: ubuntu-24.04
-    timeout-minutes: 15
-    defaults:
-      run:
-        working-directory: server-version/backend
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-      - name: verify standalone invocation and exact checkout
-        run: node ../../.github/scripts/school-teacher-browser-control.mjs preflight
-      - run: bash ../scripts/ci-install-canvas-deps.sh
-      - run: npm ci
-      - run: npx prisma generate
-      - name: emit backend once with production tsconfig (not full npm build or tests)
-        run: node node_modules/typescript/bin/tsc -p tsconfig.json
-      - run: node ../../.github/scripts/ci-artifact.mjs write backend
-      - uses: actions/upload-artifact@v4
-        with:
-          name: backend-dist-${{ github.sha }}
-          path: server-version/backend/dist
-          retention-days: 1
-          if-no-files-found: error
   browser:
-    needs: [frontend, backend]
+    if: ${{ github.event_name == 'push' && github.repository == 'caohuibj/eduK12-new-version' && github.ref == 'refs/heads/ci/school-teacher-browser-20261022' && !github.event.deleted }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     services:
@@ -68,6 +35,8 @@ jobs:
       SCHOOL_TEACHER_ISOLATED_DB: '1'
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
@@ -90,18 +59,10 @@ jobs:
       - run: npx --prefix server-version/backend prisma generate --schema server-version/backend/prisma/schema.prisma
       - run: npm ci --ignore-scripts --prefix .github/release-tools
       - run: node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
-      - uses: actions/download-artifact@v4
-        with:
-          name: backend-dist-${{ github.sha }}
-          path: server-version/backend/dist
-      - uses: actions/download-artifact@v4
-        with:
-          name: frontend-dist-${{ github.sha }}
-          path: server-version/frontend/dist
-      - name: verify both same-run source and byte manifests
-        run: |
-          node .github/scripts/ci-artifact.mjs verify backend
-          node .github/scripts/ci-artifact.mjs verify frontend
+      - name: restore exact original successful builds (no compilation)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/school-teacher-browser-control.mjs restore
       - name: migrate disposable synthetic database
         working-directory: server-version/backend
         run: npx prisma migrate deploy

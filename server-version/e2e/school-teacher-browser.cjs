@@ -25,16 +25,59 @@ const fs = require('node:fs')
 const path = require('node:path')
 const http = require('node:http')
 const { spawn } = require('node:child_process')
-const { once } = require('node:events')
 const { randomUUID, createHmac } = require('node:crypto')
 const { readFixture, backend, repo, sha } = require('./school-teacher-fixture.cjs')
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 const origins = { SCHOOL: 'https://school.eduk12.top', TEACHER: 'https://teacher.eduk12.top' }
 const prefixes = { SCHOOL: '/api/campus', TEACHER: '/api/huiteacher' }
 const viewports = [{ width: 1440, height: 900 }, { width: 390, height: 844 }]
+const reusedBuildSource = { head: 'a541e986c85310b655f290df4a8090de75fb4c6e', run: '39795298845' }
 const mime = { '.html': 'text/html; charset=utf-8', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json',
   '.svg': 'image/svg+xml', '.png': 'image/png', '.webp': 'image/webp', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
   '.ico': 'image/x-icon', '.woff': 'font/woff', '.woff2': 'font/woff2', '.wasm': 'application/wasm' }
+
+function backendEnvironment(fixture, root, port, redisUrl, product, host = process.env) {
+  assert.ok(Object.hasOwn(origins, product), 'Use one reviewed product origin per backend process')
+  // Keep the production single-origin contract. Never concatenate origins or
+  // relax product Origin/CSRF checks for a synthetic browser transport.
+  return { PATH: host.PATH, HOME: host.HOME, TZ: 'UTC', NODE_ENV: 'production', PORT: String(port),
+    DATABASE_URL: fixture.runtimeUrl, REDIS_URL: redisUrl, CORS_ORIGIN: origins[product],
+    COOKIE_SECURE: 'true', TRUST_PROXY_HOPS: '1', ...fixture.secrets, UPLOAD_DIR: path.join(root, 'uploads'),
+    ASSET_MIGRATION_COMPLETE: 'true', BACKGROUND_WORKERS_ENABLED: 'false', HUITEACHER_WORKSPACE_ENABLED: 'true', SOCKET_REDIS_REQUIRED: 'false' }
+}
+
+function validateBuildReuse(receipt, identity, runId) {
+  assert.equal(receipt.status, 'VERIFIED_OFFICIAL_BUILDS')
+  assert.equal(receipt.currentHead, identity.head); assert.equal(receipt.currentRun, runId)
+  assert.equal(receipt.sourceHead, reusedBuildSource.head); assert.equal(receipt.sourceRun, reusedBuildSource.run)
+  assert.ok(receipt.components?.frontend && receipt.components?.backend)
+  return receipt
+}
+
+function validateBuildManifest(data, kind, identity, runId, reuse) {
+  assert.equal(data.schemaVersion, 1); assert.equal(data.kind, kind)
+  assert.equal(data.sha, reuse ? reuse.sourceHead : identity.head)
+  assert.equal(data.runId, reuse ? reuse.sourceRun : runId)
+  assert.match(data.contentDigest, /^[a-f0-9]{64}$/); assert.match(data.lockDigest, /^[a-f0-9]{64}$/)
+  if (reuse) assert.deepEqual(data, reuse.components[kind], 'Verified producer manifest must remain byte-for-byte represented')
+  return data
+}
+
+function classifyStartupLog(text) {
+  // Exact allowlisted markers only. Never return captured text, stack paths,
+  // connection strings, environment values, credentials, or request bodies.
+  const markers = [
+    ['CONFIG_CORS_ORIGIN_INVALID', 'CORS_ORIGIN must be one exact HTTP(S) origin'],
+    ['CONFIG_COOKIE_SECURE_REQUIRED', 'COOKIE_SECURE=true is required for HTTPS production'],
+    ['CONFIG_TRUST_PROXY_REQUIRED', 'TRUST_PROXY_HOPS must match the production single ingress'],
+    ['CONFIG_ASSET_MIGRATION_REQUIRED', 'ASSET_MIGRATION_COMPLETE=true is required before starting production'],
+    ['REDIS_INITIALIZATION_FAILED', 'CacheService Redis 初始化失败'],
+    ['MODULE_NOT_FOUND', "code: 'MODULE_NOT_FOUND'"],
+    ['NATIVE_MODULE_LOAD_FAILED', "code: 'ERR_DLOPEN_FAILED'"],
+    ['PORT_IN_USE', 'EADDRINUSE'],
+  ]
+  return markers.filter(([, marker]) => text.includes(marker)).map(([code]) => code)
+}
 
 function totp(secret, step = Math.floor(Date.now() / 30000)) {
   const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567'
@@ -63,42 +106,68 @@ async function run() {
   assert.ok(out !== root && !out.startsWith(root + path.sep) && !root.startsWith(out + path.sep), 'Never upload fixture secrets')
   fs.mkdirSync(path.join(out, 'screenshots'), { recursive: true })
   assert.equal(process.env.SCHOOL_TEACHER_ARTIFACTS_VERIFIED, '1', 'Reuse verified current-run artifacts; do not silently consume a local build')
-  const manifest = (kind, dir) => {
-    const data = JSON.parse(fs.readFileSync(path.join(dir, 'ci-build-manifest.json'), 'utf8'))
-    assert.equal(data.schemaVersion, 1); assert.equal(data.sha, fixture.identity.head)
-    assert.equal(data.runId, process.env.GITHUB_RUN_ID); assert.equal(data.kind, kind)
-    assert.match(data.contentDigest, /^[a-f0-9]{64}$/); assert.match(data.lockDigest, /^[a-f0-9]{64}$/)
-    return data
-  }
+  // Only the dedicated verifier may write this current-candidate receipt after
+  // checking the fixed official producer, archive, manifests and source closure.
+  // The receipt never rewrites the old producer SHA/run to the current candidate.
+  const reuseFile = path.join(repo, 'school-teacher-evidence/reused-builds.json')
+  const reuse = fs.existsSync(reuseFile)
+    ? validateBuildReuse(JSON.parse(fs.readFileSync(reuseFile, 'utf8')), fixture.identity, process.env.GITHUB_RUN_ID) : null
+  const manifest = (kind, dir) => validateBuildManifest(JSON.parse(fs.readFileSync(path.join(dir, 'ci-build-manifest.json'), 'utf8')),
+    kind, fixture.identity, process.env.GITHUB_RUN_ID, reuse)
   const report = { schemaVersion: 1, source: fixture.identity, inputs: { frontend: manifest('frontend', dist), backend: manifest('backend', path.join(backend, 'dist')) },
+    ...(reuse ? { buildReuse: reuse } : {}), startups: [],
     transport: 'Synthetic canonical-origin static documents; unmodified real loopback backend API responses. No public TLS/DNS/deployment assertion.',
     runtime: 'Official runtime-role-defaults/contract and release-schema checks; API never uses owner principal.',
     coverage: [], screenshots: [], keyboard: [], errors: [], notCovered: ['Real media upload/storage/delivery and report images', 'Parent/teacher-observer/revocation matrix',
       'Public deployment TLS, DNS, reverse proxy', 'MFA enrollment UI visuals (real enrollment API is used)', 'Manual construction of every question (real saved definition template API is used)'],
     sessions: [], status: 'RUNNING' }
-  let browser, app, lastSafeSession, stage = 'backend-start'
-  const privateLog = fs.openSync(path.join(root, 'backend.log'), 'wx', 0o600)
-  try {
-    // Do not inherit production credentials, external storage, mail or telemetry.
-    const env = { PATH: process.env.PATH, HOME: process.env.HOME, TZ: 'UTC', NODE_ENV: 'production', PORT: String(port),
-      DATABASE_URL: fixture.runtimeUrl, REDIS_URL: redis.href, CORS_ORIGIN: Object.values(origins).join(','),
-      COOKIE_SECURE: 'true', TRUST_PROXY_HOPS: '1', ...fixture.secrets, UPLOAD_DIR: path.join(root, 'uploads'),
-      ASSET_MIGRATION_COMPLETE: 'true', BACKGROUND_WORKERS_ENABLED: 'false', HUITEACHER_WORKSPACE_ENABLED: 'true', SOCKET_REDIS_REQUIRED: 'false' }
+  let browser, app, privateLog, lastSafeSession, stage = 'SCHOOL-backend-start'
+  async function stopBackend() {
+    const current = app
+    if (current?.pid && current.exitCode === null && current.signalCode === null) {
+      const exited = new Promise(resolve => current.once('exit', resolve))
+      current.kill('SIGTERM')
+      await Promise.race([exited, pause(10000)])
+      if (current.exitCode === null && current.signalCode === null) { current.kill('SIGKILL'); await exited }
+    }
+    if (privateLog !== undefined) { fs.closeSync(privateLog); privateLog = undefined }
+    app = undefined
+  }
+  async function startBackend(product) {
+    await stopBackend()
+    stage = product + '-backend-start'
+    const logPath = path.join(root, 'backend-' + product.toLowerCase() + '.log')
+    privateLog = fs.openSync(logPath, 'wx', 0o600)
+    const env = backendEnvironment(fixture, root, port, redis.href, product)
+    const startup = { product, corsOrigin: env.CORS_ORIGIN, ready: false, phase: 'PRODUCTION_ENTRYPOINT' }
+    report.startups.push(startup)
     app = spawn(process.execPath, ['dist/index.js'], { cwd: backend, env, stdio: ['ignore', privateLog, privateLog] })
-    let spawnError = false
-    app.once('error', () => { spawnError = true })
-    let ready = false
+    let spawnError = false, spawnCode = null
+    app.once('error', error => { spawnError = true; spawnCode = ['EACCES', 'ENOENT', 'EPERM'].includes(error.code) ? error.code : 'OTHER' })
+    const fail = code => {
+      const fd = fs.openSync(logPath, 'r'), bytes = Buffer.alloc(Math.min(fs.fstatSync(fd).size, 65536))
+      try { fs.readSync(fd, bytes, 0, bytes.length, 0) } finally { fs.closeSync(fd) }
+      startup.phase = code
+      startup.diagnostic = { code, exitCode: app.exitCode, signal: app.signalCode, spawnCode,
+        knownCauses: classifyStartupLog(bytes.toString('utf8')), boundedLogDigest: sha(bytes) }
+      throw new Error(product + ':' + code)
+    }
     for (let i = 0; i < 90; i++) {
-      assert.equal(app.exitCode, null, 'Isolated restricted backend exited before readiness; private log retained')
-      assert.equal(spawnError, false, 'Unable to start isolated backend')
-      ready = await new Promise(resolve => {
+      if (spawnError) fail('BACKEND_SPAWN_FAILED')
+      if (app.exitCode !== null || app.signalCode !== null) fail('BACKEND_EXIT_BEFORE_READY')
+      startup.ready = await new Promise(resolve => {
         const req = http.get({ hostname: '127.0.0.1', port, path: '/ready', timeout: 1000 }, res => { res.resume(); resolve(res.statusCode === 200) })
         req.on('error', () => resolve(false)); req.on('timeout', () => req.destroy())
       })
-      if (ready) break
+      if (startup.ready) { startup.phase = 'READY'; return }
       await pause(500)
     }
-    assert.ok(ready, 'Isolated backend readiness timed out')
+    fail('BACKEND_READINESS_TIMEOUT')
+  }
+  try {
+    // Do not inherit production credentials, external storage, mail or telemetry.
+    await startBackend('SCHOOL')
+    stage = 'browser-launch'
     // Never fall back to --no-sandbox or certificate bypass after a failure.
     browser = await chromium.launch({ headless: true, chromiumSandbox: true })
 
@@ -506,6 +575,9 @@ async function run() {
     }
 
     for (const product of ['SCHOOL', 'TEACHER']) {
+      // All School browser sessions have closed before replacing its process.
+      // Each product gets the unchanged production exact-origin configuration.
+      if (product === 'TEACHER') await startBackend(product)
       const f = fixture.products[product]
       stage = product + '-author-login'
       const author = await session(product, f.author, 'author')
@@ -559,12 +631,7 @@ async function run() {
     throw new Error('School/Teacher browser acceptance failed at ' + stage + '; see sanitized evidence, not fixture secrets')
   } finally {
     if (browser) await browser.close()
-    if (app?.pid && app.exitCode === null) {
-      app.kill('SIGTERM')
-      await Promise.race([once(app, 'exit'), pause(10000)])
-      if (app.exitCode === null) { app.kill('SIGKILL'); await once(app, 'exit') }
-    }
-    fs.closeSync(privateLog)
+    await stopBackend()
     fs.writeFileSync(path.join(out, 'browser.json'), JSON.stringify(report, null, 2))
   }
 }
@@ -573,4 +640,4 @@ if (require.main === module) run().catch(error => {
   console.error('School/Teacher acceptance did not complete; see sanitized browser.json if present. Error digest: ' + sha(String(error)))
   process.exitCode = 1
 })
-module.exports = { totp }
+module.exports = { totp, backendEnvironment, validateBuildReuse, validateBuildManifest, classifyStartupLog }
