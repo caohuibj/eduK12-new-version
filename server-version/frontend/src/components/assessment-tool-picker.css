@@ -9,17 +9,28 @@
 .hui-modal-surface.assessment-tool-modal { padding: 0; color: #253f35; background: transparent; }
 .hui-modal-surface.assessment-tool-modal[open] { display: grid; place-items: center; }
 dialog.hui-modal-surface.assessment-tool-modal::backdrop { background: #152d2a80; }
-.assessment-tool-dialog { width: min(960px, calc(100vw - 32px)); max-height: min(840px, calc(100dvh - 48px)); overflow: auto; padding: 28px; outline: none; border-radius: 16px; background: #faf9f5; box-shadow: 0 24px 100px #172d3240; }
+.assessment-tool-dialog { display: flex; flex-direction: column; box-sizing: border-box; width: min(1280px, calc(100vw - 48px)); height: min(900px, calc(100dvh - 64px)); min-height: 0; overflow: hidden; padding: 28px; outline: none; border-radius: 16px; background: #faf9f5; box-shadow: 0 24px 100px #172d3240; }
+.assessment-tool-dialog > header, .assessment-tool-search, .assessment-tool-count, .assessment-tool-dialog > footer { flex-shrink: 0; }
 .assessment-tool-dialog > header { display: flex; justify-content: space-between; align-items: flex-start; gap: 20px; }
 .assessment-tool-dialog h2 { font-size: 25px; font-weight: 650; line-height: 1.4; margin: 0; }
 .assessment-tool-dialog header p { margin-top: 8px; color: #657568; font-size: 14px; line-height: 1.7; }
 .assessment-tool-close { display: grid; place-items: center; flex-shrink: 0; width: 42px; height: 42px; border: 1px solid #d9e1d5; border-radius: 9px; background: #fff; }
-.assessment-tool-search { display: flex; align-items: center; gap: 12px; margin-top: 24px; padding: 0 15px; min-height: 50px; border: 1px solid #bfcfbe; border-radius: 9px; background: #fff; }
-.assessment-tool-search input { flex: 1; width: 0; min-width: 0; border: 0; outline: none; box-shadow: none; background: transparent; color: #253f35; font-size: 16px; padding: 12px 0; }
+.assessment-tool-search { display: flex; align-items: center; box-sizing: border-box; gap: 12px; margin-top: 24px; padding: 0 16px; min-height: 56px; border: 1px solid #bfcfbe; border-radius: 9px; background: #fff; }
+.assessment-tool-search > svg { flex-shrink: 0; }
+/* Keep the editor's generic input border, margin and padding out of this compound search field. */
+.assessment-tool-dialog .assessment-tool-search > input,
+.hui-training.hui-app--standard.training-workspace-shell .assessment-tool-modal .assessment-tool-dialog .assessment-tool-search > input,
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .assessment-tool-modal .assessment-tool-dialog .assessment-tool-search > input {
+  box-sizing: border-box; flex: 1; width: 0; min-width: 0; max-width: none; height: 54px; min-height: 0;
+  margin: 0; padding: 12px 0; border: 0; border-radius: 0; outline: none; box-shadow: none;
+  background: transparent; color: #253f35; font-size: 16px; line-height: 1.5;
+}
 .assessment-tool-search:focus-within { outline: 2px solid #3a6955; outline-offset: 2px; }
 .assessment-tool-search input:focus-visible { outline: none !important; box-shadow: none !important; }
-.assessment-tool-count { margin: 15px 0; color: #657568; font-size: 13px; }
-.assessment-tool-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 13px; }
+.assessment-tool-count,
+.hui-training.hui-app--standard.training-workspace-shell .qt-editor.qt-editor .assessment-tool-dialog .assessment-tool-count { margin: 15px 0; color: #657568; font-size: 13px; }
+.assessment-tool-grid { flex: 1; min-height: 0; overflow: auto; overscroll-behavior: contain; display: grid; align-content: start; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-auto-rows: max-content; gap: 13px; padding: 5px; }
+.assessment-tool-grid:empty { display: none; }
 .assessment-tool-card { display: flex; flex-direction: column; align-items: stretch; min-width: 0; gap: 12px; padding: 18px; text-align: left; border: 1px solid #d5dfcf; border-radius: 11px; background: #fff; }
 .assessment-tool-card:hover,.assessment-tool-card.is-selected { border-color: #3a6955; background: #f0f6ed; }
 .assessment-tool-card strong { font-size: 17px; line-height: 1.6; color: #253f35; overflow-wrap: anywhere; }
@@ -27,11 +38,11 @@ dialog.hui-modal-surface.assessment-tool-modal::backdrop { background: #152d2a80
 .assessment-tool-card-kind { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; font-size: 12px; color: #45684e; }
 .assessment-tool-card-kind > span { display: inline-flex; align-items: center; gap: 4px; }
 .assessment-tool-card-meta { margin-top: auto; color: #657568; font-size: 12px; line-height: 1.6; overflow-wrap: anywhere; }
-.assessment-tool-empty { padding: 45px 18px; text-align: center; line-height: 1.8; color: #657568; }
+.assessment-tool-empty { flex: 1; min-height: 0; overflow: auto; display: grid; place-items: center; padding: 24px 18px; text-align: center; line-height: 1.8; color: #657568; }
 .assessment-tool-dialog > footer { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 14px; border-top: 1px solid #dce4d6; margin-top: 22px; padding-top: 18px; color: #657568; font-size: 13px; }
 .assessment-tool-dialog footer > div { display: flex; gap: 10px; }
 .assessment-tool-dialog footer button { display: inline-flex; gap: 5px; align-items: center; justify-content: center; min-height: 42px; padding: 8px 12px; border: 1px solid #d1dccd; border-radius: 8px; background: #fff; color: #294b3f; }
 .assessment-tool-dialog button:disabled,.assessment-tool-trigger:disabled { opacity: .5; cursor: not-allowed; }
 .assessment-tool-dialog button:focus-visible,.assessment-tool-trigger:focus-visible { outline: 2px solid #294b3f; outline-offset: 3px; }
 @media(max-width: 760px) { .assessment-tool-grid { grid-template-columns: repeat(2,minmax(0,1fr)); } }
-@media(max-width: 480px) { .assessment-tool-dialog { width: calc(100vw - 20px); border-radius: 12px; padding: 20px 16px; max-height: calc(100dvh - 28px); }.assessment-tool-grid { grid-template-columns: minmax(0,1fr); }.assessment-tool-dialog h2 { font-size: 22px; } }
+@media(max-width: 480px) { .assessment-tool-dialog { width: calc(100vw - 20px); height: calc(100dvh - 28px); border-radius: 12px; padding: 20px 16px; }.assessment-tool-grid { grid-template-columns: minmax(0,1fr); }.assessment-tool-dialog h2 { font-size: 22px; } }
