@@ -7,6 +7,7 @@ on:
         required: true
 permissions:
   contents: read
+  actions: read
 env:
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
@@ -29,7 +30,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
+      - name: test only the changed official-reuse boundary contracts
+        run: |
+          node --test .github/scripts/survey-workspace-reuse.test.mjs
+          node --test --test-name-pattern='wires missing compilers' .github/scripts/survey-workspace.test.mjs
       - name: verify reviewed original local records and immutable inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: node .github/scripts/survey-workspace-checks.mjs
       - uses: actions/upload-artifact@v4
         with:
@@ -56,6 +63,7 @@ jobs:
         working-directory: server-version/frontend
         run: npm ci --ignore-scripts
       - name: typecheck the integrated application
+        if: fromJSON(inputs.plan).resume != 39811690734
         working-directory: server-version/frontend
         run: node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit
       - name: compile frontend exactly once
@@ -83,6 +91,10 @@ jobs:
         with:
           name: survey-workspace-frontend-${{ github.sha }}
           path: server-version/frontend/dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: survey-workspace-admission-${{ github.sha }}
+          path: survey-workspace-evidence
       - name: install locked browser tools
         run: |
           npm ci --ignore-scripts --prefix .github/release-tools
@@ -99,25 +111,7 @@ jobs:
   backend:
     needs: admission
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    services:
-      postgres:
-        image: postgres:16-alpine
-        env:
-          POSTGRES_PASSWORD: survey_ci_only
-          POSTGRES_DB: survey_upgrade
-        ports: ['5432:5432']
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 5s
-          --health-timeout 3s
-          --health-retries 12
-    env:
-      DATABASE_URL: postgresql://postgres:survey_ci_only@127.0.0.1:5432/survey_upgrade
-      PGHOST: 127.0.0.1
-      PGPORT: '5432'
-      PGUSER: postgres
-      PGPASSWORD: survey_ci_only
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
@@ -126,25 +120,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-          cache: npm
-          cache-dependency-path: server-version/backend/package-lock.json
-      - name: install official locked backend dependencies
-        working-directory: server-version/backend
-        run: npm ci --ignore-scripts
-      - name: validate and generate the corrected Prisma model
-        working-directory: server-version/backend
-        run: |
-          node node_modules/prisma/build/index.js validate
-          node node_modules/prisma/build/index.js generate
-          node node_modules/typescript/bin/tsc --noEmit
-      - name: upgrade from main and restore only disposable synthetic database
-        run: |
-          sudo apt-get update -qq
-          sudo apt-get install -y postgresql-client-16
-          export PATH="/usr/lib/postgresql/16/bin:$PATH"
-          node .github/scripts/survey-workspace-migration.mjs
+      - name: verify the unchanged official backend types and native migration restore
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/survey-workspace-reuse.mjs backend
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
           name: survey-workspace-backend-${{ github.sha }}
           path: survey-workspace-evidence

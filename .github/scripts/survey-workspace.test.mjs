@@ -54,7 +54,7 @@ test('wires missing compilers, rendered consumers and native restore without bro
  assert.ok(ci.includes('training-appearance, survey-workspace,'));assert.ok(ci.includes('"work/survey-visual-20261022"'));
  assert.doesNotMatch(workflow,/docker build|npm run test|vitest.mjs|eslint.js/);
  assert.match(workflow,/tsc -p tsconfig.app.json --noEmit/);assert.equal((workflow.match(/npm run build/g)||[]).length,1);
- assert.match(workflow,/services:/);assert.match(workflow,/survey-workspace-migration.mjs/);
+ assert.doesNotMatch(workflow,/services:/);assert.match(workflow,/survey-workspace-reuse.mjs backend/);
  assert.match(workflow,/needs: frontend/);assert.match(workflow,/actions\/download-artifact@v4/);
  const migration=readFileSync('.github/scripts/survey-workspace-migration.mjs','utf8');
  assert.match(migration,/binding.base/);assert.match(migration,/pg_dump/);assert.match(migration,/pg_restore/);

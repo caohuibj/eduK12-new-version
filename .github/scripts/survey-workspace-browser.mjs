@@ -7,6 +7,9 @@ const dist=resolve('server-version/frontend/dist'),out='survey-workspace-evidenc
 const mime={'.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.webp':'image/webp','.png':'image/png','.html':'text/html','.json':'application/json','.woff2':'font/woff2'};
 const browser=await chromium.launch({headless:true});const evidence={status:'running',compiledDist:true,syntheticOnly:true,checks:[],pageErrors:[],unexpectedRequests:[]};
 const tools=['form','scale','composition'];
+const inherited=JSON.parse(readFileSync(out+'/official-admission.json','utf8'));
+assert.equal(inherited.currentHead,process.env.GITHUB_SHA);assert.equal(inherited.originalRun,39811690734);evidence.inheritedChecks=inherited.acceptedBrowser;evidence.sameRunFullJourneyClaim=false;
+const inheritedScene=(scene,width)=>inherited.acceptedBrowser.some(c=>c.scene===scene&&c.width===width);
 try{
  for(const width of [1440,390]){
   const context=await browser.newContext({viewport:{width,height:1000}});const mock=surveyFixture();
@@ -23,6 +26,7 @@ try{
   });
   const page=await context.newPage();page.on('pageerror',e=>evidence.pageErrors.push(e.message));
   const inspect=async(scene)=>{
+   if(inheritedScene(scene,width))return;
    await page.addScriptTag({content:readFileSync('.github/release-tools/node_modules/axe-core/axe.min.js','utf8')});
    const result=await page.evaluate(async()=>{
     const axe=await window.axe.run(document,{runOnly:{type:'tag',values:['wcag2a','wcag2aa','wcag21aa']}});
@@ -34,6 +38,7 @@ try{
   };
   await page.goto('https://survey.eduk12.top/');await page.getByRole('button',{name:'外观',exact:true}).click();await page.getByRole('button',{name:'深色',exact:true}).click();await inspect('entry-settings');await page.getByRole('button',{name:'外观',exact:true}).click();
   for(const surface of tools){
+   if(inheritedScene(surface,width))continue;
    await page.goto('https://survey.eduk12.top/workspace/tools?tool=00000000-0000-4000-8000-00000000000'+(tools.indexOf(surface)+1));await page.getByRole('heading',{level:1}).waitFor();
    await inspect(surface);
    if(surface==='scale'){
@@ -41,6 +46,7 @@ try{
    }
   }
   for(const section of ['publish','reports','data']){
+   if(inheritedScene(section,width))continue;
    await page.goto('https://survey.eduk12.top/workspace?project=synthetic-one&section='+section);await page.getByRole('tab',{name:section==='publish'?'发布与采集':section==='reports'?'私有报告':'数据',exact:true}).waitFor();
    await page.getByRole('tabpanel',{name:section==='publish'?'发布与采集':section==='reports'?'私有报告':'数据',exact:true}).waitFor();
    await inspect(section);

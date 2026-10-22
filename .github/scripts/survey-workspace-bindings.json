@@ -1,6 +1,6 @@
 {
   "base": "468040dcfcab3a70a6030c177775fd4e04b05a83",
-  "product": "c92b4b5e2655eb9db684d20c3019062eab22faec",
+  "product": "5c436ee5603cae7605448e8bfcc056680902142f",
   "source": {
     "docs/survey-tool-library-local-20261022.md": {
       "before": null,
@@ -320,7 +320,7 @@
     },
     "server-version/frontend/src/survey/survey-appearance.css": {
       "before": null,
-      "after": "da51a98a377bd11daa104ad31235611cbd1e5905"
+      "after": "fbea5dc569015dd2b1c9bc89389ed641cd33c8b0"
     },
     "server-version/frontend/src/survey/survey-composition-studio.css": {
       "before": null,
@@ -388,6 +388,8 @@
     }
   },
   "controls": [
+    ".github/scripts/survey-workspace-reuse.mjs",
+    ".github/scripts/survey-workspace-reuse.test.mjs",
     ".github/scripts/survey-workspace-bindings.json",
     ".github/scripts/survey-workspace-scope.mjs",
     ".github/scripts/survey-workspace-checks.mjs",
@@ -403,6 +405,8 @@
     "docs/release/README.md"
   ],
   "controlBefore": {
+    ".github/scripts/survey-workspace-reuse.mjs": null,
+    ".github/scripts/survey-workspace-reuse.test.mjs": null,
     ".github/scripts/survey-workspace-bindings.json": null,
     ".github/scripts/survey-workspace-scope.mjs": null,
     ".github/scripts/survey-workspace-checks.mjs": null,
@@ -418,7 +422,7 @@
     "docs/release/README.md": "f5d207f95c355ce59720fbd6c8eccf177c559e74"
   },
   "components": {
-    "frontend": "38dafc10495e77aea0254c708adf557144f2d500",
+    "frontend": "8c630ef847312f270245e3dae10f835ce41c0a59",
     "backend": "41ed84b236a10fd999d19462bea0e19486cb3250"
   },
   "protectedInputs": {
@@ -434,6 +438,12 @@
     ".github/release-tools/package-lock.json": "b7731f8e3b798e08d1693a9c7b108405d183f45e"
   },
   "evidence": {
-    ".github/evidence/survey-workspace/reviewed-local.json": "3db08f5003ce3ce9fb58d8ad44750471a9a59b36d8b5ffb304f605c9cb11eac5"
+    ".github/evidence/survey-workspace/reviewed-local.json": "dbb5c42c723c08ba1844b959f113695dd0178aad56e34fc8812be0ebba1f1f10"
+  },
+  "resume": {
+    "run": 39811690734,
+    "source": "90ca44116069071224ffcef735680fd708955df4",
+    "merge": "fcab9f9a9e77700a51f19eaedbaabfcdbae1e6b6",
+    "backendTree": "41ed84b236a10fd999d19462bea0e19486cb3250"
   }
 }

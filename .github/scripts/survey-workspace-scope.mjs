@@ -37,7 +37,7 @@ export function surveyWorkspacePlan(entries,base,head,read=git,env=process.env){
  }
  for(const [component,tree]of Object.entries(binding.components))assert.equal(read('rev-parse',head+':server-version/'+component),tree,'Application tree drift: '+component);
  for(const [file,blob]of Object.entries(binding.protectedInputs))assert.equal(read('rev-parse',head+':'+file),blob,'Protected input drift: '+file);
- return {schema:1,route:'survey-workspace',base,head,product:binding.product,components:binding.components,changes:entries};
+ return {schema:1,route:'survey-workspace',base,head,resume:binding.resume?.run??null,product:binding.product,components:binding.components,changes:entries};
 }
 
 export function surveyWorkspaceOutputs(plan){

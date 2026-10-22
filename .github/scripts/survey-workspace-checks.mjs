@@ -1,3 +1,4 @@
+import {verifyOfficial} from './survey-workspace-reuse.mjs';
 import assert from 'node:assert/strict';
 import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
@@ -34,11 +35,12 @@ export function verifyLocalEvidence(read=file=>readFileSync(file)){
  assert.equal(reports['survey-integrated-workspace-recheck.json'].numPassedTests,1);
  return {status:'REVIEWED_LOCAL_EVIDENCE',ciExecuted:false,originalExecutionSigned:false,countsAreNotAdditive:true,acceptedUniqueCases:record.acceptedCases.length,originalFailuresRetained:true,limits:record.limits};
 }
-function main(){
+async function main(){
  assert.equal(process.version,'v24.21.0');const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
  assert.deepEqual(surveyWorkspacePlan(changedEntries(binding.base,head),binding.base,head),JSON.parse(process.env.PLAN));
  mkdirSync('survey-workspace-evidence',{recursive:true});
  const receipt={...verifyLocalEvidence(),head,components:binding.components};
+ await verifyOfficial('admission');
  writeFileSync('survey-workspace-evidence/local-admission.json',JSON.stringify(receipt,null,2));console.log(JSON.stringify(receipt));
 }
-if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url))main();
+if(process.argv[1]&&resolve(process.argv[1])===fileURLToPath(import.meta.url))await main();
