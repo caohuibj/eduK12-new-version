@@ -1,0 +1,229 @@
+name: School Teacher exact affected qualification
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+env:
+  CI: 'true'
+  PLAN: ${{ inputs.plan }}
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+jobs:
+  admission:
+    if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: authenticate frozen scope and individually reviewed local cases
+        run: node .github/scripts/school-teacher-checks.mjs admission
+      - name: verify only new control contracts
+        run: node --test .github/scripts/school-teacher.test.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: school-teacher-admission-${{ github.sha }}
+          path: school-teacher-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+  frontend:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 12
+    env:
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      NODE_OPTIONS: --max-old-space-size=4096
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/frontend/package-lock.json
+      - working-directory: server-version/frontend
+        run: npm ci --ignore-scripts
+      - name: run only frozen affected checks then compile once and bind dist
+        run: node .github/scripts/school-teacher-checks.mjs frontend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: school-teacher-frontend-${{ github.sha }}
+          path: server-version/frontend/dist
+          if-no-files-found: error
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: school-teacher-frontend-checks-${{ github.sha }}
+          path: school-teacher-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+      - name: remove private diagnostics
+        if: always()
+        run: node .github/scripts/school-teacher-checks.mjs cleanup
+  connected:
+    needs: [admission, frontend]
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_DB: school_teacher_browser_ci_test
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: synthetic-actions-disposable
+        ports: ['5432/tcp']
+        options: >-
+          --health-cmd "pg_isready -U ptool -d school_teacher_browser_ci_test"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+      redis:
+        image: redis:7.4-bookworm
+        ports: ['6379/tcp']
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      NODE_ENV: test
+      SCHOOL_TEACHER_ISOLATED_DB: '1'
+      PRISMA_SKIP_POSTINSTALL_GENERATE: 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: bind disposable endpoints after service initialization
+        env:
+          DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+          SCHOOL_TEACHER_TEST_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+          RELEASE_INTEGRATION_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
+          REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports[6379] }}/0
+          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
+          SCHOOL_TEACHER_PRIVATE_DIR: ${{ runner.temp }}/school-teacher-private
+        run: |
+          for key in DATABASE_URL SCHOOL_TEACHER_TEST_DATABASE_URL RELEASE_INTEGRATION_DATABASE_URL REDIS_URL CI_POSTGRES_SERVICE_ID SCHOOL_TEACHER_PRIVATE_DIR; do
+            printf '%s=%s\n' "$key" "${!key}" >> "$GITHUB_ENV"
+          done
+      - run: npm ci --ignore-scripts --prefix .github/release-tools
+      - name: inspect this runner Chrome, no automatic install or fallback
+        run: node server-version/e2e/school-teacher-chrome.cjs preflight
+      - run: bash server-version/scripts/ci-install-canvas-deps.sh
+      - working-directory: server-version/backend
+        run: npm ci
+      - working-directory: server-version/backend
+        run: |
+          node node_modules/prisma/build/index.js validate --schema prisma/schema.prisma
+          node node_modules/prisma/build/index.js generate --schema prisma/schema.prisma
+      - name: compile affected backend exactly once without full npm lifecycle
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+        run: node .github/scripts/school-teacher-checks.mjs backend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: school-teacher-backend-${{ github.sha }}
+          path: server-version/backend/dist
+          if-no-files-found: error
+          retention-days: 3
+      - name: prove nonempty exact-base upgrade with synthetic frozen baseline rows
+        run: node .github/scripts/school-teacher-checks.mjs migrate
+      - name: run deduplicated affected service and real PostgreSQL cases
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+        run: node .github/scripts/school-teacher-checks.mjs postgres
+      - uses: actions/download-artifact@v4
+        with:
+          name: school-teacher-frontend-${{ github.sha }}
+          path: server-version/frontend/dist
+      - name: verify both compiled artifacts against this SHA, run and lock
+        run: |
+          node .github/scripts/ci-artifact.mjs verify frontend
+          node .github/scripts/ci-artifact.mjs verify backend
+      - name: seed restricted synthetic browser identities without exposing private output
+        run: node .github/scripts/school-teacher-checks.mjs seed
+      - name: execute real School Teacher journey with sandboxed official Chrome
+        env:
+          SCHOOL_TEACHER_ARTIFACTS_VERIFIED: '1'
+        run: node server-version/e2e/school-teacher-browser.cjs
+      - name: require exact original and new UI assertion matrices
+        run: node .github/scripts/school-teacher-checks.mjs browser-report
+      - name: prove nonempty current schema restore retains affected facts
+        run: node .github/scripts/school-teacher-checks.mjs restore
+      - name: remove private test material on every outcome
+        if: always()
+        run: node .github/scripts/school-teacher-checks.mjs cleanup
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: school-teacher-connected-${{ github.sha }}
+          path: |
+            school-teacher-evidence/*.json
+            school-teacher-evidence/screenshots/*.png
+          if-no-files-found: error
+          retention-days: 3
+  security:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: retain HIGH CRITICAL production dependency threshold without rebuilding
+        run: node .github/scripts/school-teacher-checks.mjs audit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: school-teacher-audit-${{ github.sha }}
+          path: school-teacher-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+      - if: always()
+        run: node .github/scripts/school-teacher-checks.mjs cleanup
+  qualified:
+    needs: [admission, frontend, connected, security]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: recompute full candidate and reject every missing skipped or failed job
+        env:
+          NEEDS_JSON: ${{ toJSON(needs) }}
+        run: node .github/scripts/school-teacher-checks.mjs aggregate
+      - uses: actions/upload-artifact@v4
+        if: failure()
+        with:
+          name: school-teacher-qualification-failure-${{ github.sha }}
+          path: school-teacher-evidence/*.json
+          if-no-files-found: error
+          retention-days: 3
+      - if: always()
+        run: node .github/scripts/school-teacher-checks.mjs cleanup
+# Called by the exact School/Teacher route; stable gate requires this workflow and actual CodeQL.
+# Existing Survey workspace routing and its continuation evidence must remain unchanged.
+# Stable merge gate must require scope, this entire workflow and actual CodeQL success.
+# No production image/OS-scan or deployment qualification is claimed.

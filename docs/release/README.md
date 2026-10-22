@@ -919,3 +919,33 @@ WenQuanYi 字体包，以可信 runner apt 元数据摘要核验后解包至用�
 `119948366459` 覆盖未变的 scope/browser 控制文件，逐 blob 核验后复用；
 变化的 reuse、reuse.test、workspace.test 及消费新 helper 的 checks 控制接受新的 CodeQL。
 取消父 run 的状态原样记录，接纳成功步骤不授予其整条运行成功身份。
+
+
+### School/Teacher one-shot affected qualification (2026-10-22)
+
+`work/school-teacher-review-20261022` uses its own `school-teacher` route, not
+an extension of A/B, reviewed-candidate, Training or Survey approval. The route
+requires the frozen Survey-integrated base, retrievable product anchor and exact
+complete raw diff. Unknown paths, modes, source trees, draft PRs, manual/full/probe
+fallback, missing evidence and skipped jobs are rejected. Bindings remain disabled
+until independent final review is complete. Actual PR source comes from the event;
+a local-only merge SHA is never an Actions product anchor.
+
+The four required groups are admission, frontend, connected and security. The
+connected group generates Prisma once, compiles the affected backend once, proves
+nonempty exact-base migration preservation using synthetic rows, runs only frozen
+affected assertions, consumes same-SHA/same-run verified frontend/backend manifests,
+executes the real restricted-principal School/Teacher browser journey with the
+Chrome sandbox retained, and proves nonempty restore plus the existing runtime-role
+and release-schema contracts. Existing business screenshot/session/keyboard matrices
+are not replaced by the separately reported brand/theme/layout observations.
+
+Historical local assertions are admitted only after individual source-closure
+review. Original failure, filtering and unsigned execution identities remain;
+CI validates the frozen safe index, not a historical signature or raw report.
+Reports expose allowlisted cases/statuses, diagnostic source locations and hashes,
+not DSNs, credentials or private fixture output. Raw logs exist only temporarily
+on the isolated runner and are not a persistent archive. The stable merge gate
+also requires actual CodeQL success over the affected application and controls.
+No public deployment, TLS/DNS, production media delivery or universal platform
+regression coverage is claimed by this bounded route.

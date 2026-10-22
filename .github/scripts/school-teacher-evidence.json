@@ -1,0 +1,110 @@
+{
+  "schemaVersion": 1,
+  "acceptedGroups": [
+    {
+      "group": "brand-refresh-direct-svg",
+      "reviewStatus": "INDEPENDENTLY_REVIEWED",
+      "originalExecutionSigned": false,
+      "ciExecuted": false,
+      "reports": [
+        {
+          "sha256": "8b9e342df8b25f482ba18d829ab370b5bffc5bc0211bb04f8266b05142f28767",
+          "invocationSuccess": true,
+          "cases": [
+            {
+              "name": "Teacher vector identity preserves B3 and exposes one accessible two-line wordmark",
+              "status": "passed"
+            },
+            {
+              "name": "Teacher vector identity contains real outlined letters, a scalable viewBox and themeable fill",
+              "status": "passed"
+            },
+            {
+              "name": "School approved A1 vector identity renders the original emblem and a two-line themeable vector wordmark",
+              "status": "passed"
+            },
+            {
+              "name": "School approved A1 vector identity reuses the same emblem wherever the hero emblem is displayed",
+              "status": "passed"
+            }
+          ]
+        }
+      ],
+      "inputClosure": {
+        "files": [
+          {
+            "path": "server-version/frontend/package-lock.json",
+            "blob": "70318f94fe631d8292f567cf421f97e7d5613b31"
+          },
+          {
+            "path": "server-version/frontend/package.json",
+            "blob": "84089551a17c85d00f03a36081fe78e6374f0716"
+          },
+          {
+            "path": "server-version/frontend/public/huiteacher/huiteacher-b3-emblem.svg",
+            "blob": "02c0f77ba4027269f95fac23f156f088898ad9c3"
+          },
+          {
+            "path": "server-version/frontend/src/huiteacher/TeacherBrand.test.tsx",
+            "blob": "bb254c965b53bfb9155c051c7e26513f898362fa"
+          },
+          {
+            "path": "server-version/frontend/src/huiteacher/TeacherBrand.tsx",
+            "blob": "272c4cb49552e52c4fa782b7c3b12a143892f7be"
+          },
+          {
+            "path": "server-version/frontend/src/huiteacher/teacher-wordmark.svg",
+            "blob": "292d067fc6128f3039fe18c2aee2a7373834bb43"
+          },
+          {
+            "path": "server-version/frontend/src/school/SchoolMark.test.tsx",
+            "blob": "89b031ae9b4393e89616b63b22b09a76989651f2"
+          },
+          {
+            "path": "server-version/frontend/src/school/SchoolMark.tsx",
+            "blob": "0ed6b7ebf8847e0067135e640a7a23f5f763b003"
+          },
+          {
+            "path": "server-version/frontend/src/school/huischool-a1-emblem.svg",
+            "blob": "a2ab84ee2b253f6994f6aa6b8a73e4a97c30dfb0"
+          },
+          {
+            "path": "server-version/frontend/src/school/huischool-wordmark.svg",
+            "blob": "89b7f877db6cd7c1188e7dfbd99fa07f5131150e"
+          },
+          {
+            "path": "server-version/frontend/src/test/setup.ts",
+            "blob": "3217d9d84ea1285cf3495e27669a88e3fe7d2cf3"
+          },
+          {
+            "path": "server-version/frontend/tsconfig.app.json",
+            "blob": "990a9f4222f2330106b8141fe5658283326e49df"
+          },
+          {
+            "path": "server-version/frontend/vitest.config.ts",
+            "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+          }
+        ],
+        "sha256": "65a3eef15782e2fd944f52edd4d9a2175d2b3ac3111b2c5e26ffa040cb670c94"
+      },
+      "admittedCaseKeys": [
+        "8b9e342df8b25f482ba18d829ab370b5bffc5bc0211bb04f8266b05142f28767:0",
+        "8b9e342df8b25f482ba18d829ab370b5bffc5bc0211bb04f8266b05142f28767:1",
+        "8b9e342df8b25f482ba18d829ab370b5bffc5bc0211bb04f8266b05142f28767:2",
+        "8b9e342df8b25f482ba18d829ab370b5bffc5bc0211bb04f8266b05142f28767:3"
+      ],
+      "reviewSha256": "c65743de9afd2c595c52afe2ae1b8f153d94de834d38a7ae75eeaef7c4e3965b",
+      "reviewRecord": {
+        "decision": "INDEPENDENTLY_REVIEWED",
+        "scope": "Four direct SVG component identity tests only; excludes browser external SVG rendering and Vite build",
+        "originalReportSha256": "8b9e342df8b25f482ba18d829ab370b5bffc5bc0211bb04f8266b05142f28767",
+        "sourceFreezeSha256": "dad5bae827fee0eb9feb4bd89dd3a34b3e16338d7467d09f45cd5b3321c82ba1",
+        "inputClosureSha256": "65a3eef15782e2fd944f52edd4d9a2175d2b3ac3111b2c5e26ffa040cb670c94",
+        "originalExecutionSigned": false,
+        "ciExecuted": false,
+        "originalRawVerifiedByCI": false,
+        "rawEvidence": "Not published. Original local reports are temporary, unsigned evidence and are not available after their local retention ends."
+      }
+    }
+  ]
+}
