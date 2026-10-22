@@ -51,7 +51,7 @@ export async function createTemplate(userId:string,input:{requestId:string;kind:
   return prisma.$transaction(async tx=>{
     await authorizeToolOwner(tx,userId)
     const digest=canonicalHash(input)
-    const definition=input.kind==='COMPOSITION'?{schemaVersion:1,items:[]}:initialSurveyDefinition(input.kind)
+    const definition=input.kind==='COMPOSITION'?{schemaVersion:1,items:[]}:input.kind==='FORM'?{schemaVersion:2,pages:[]}:initialSurveyDefinition(input.kind)
     // INSERT conflict is resolved only against the same owner and exact original request.
     await tx.$executeRaw`INSERT INTO survey_tool_templates(id,owner_user_id,kind,title,definition,creation_digest)
       VALUES (${input.requestId},${userId},${input.kind},${input.title},${json(definition)}::jsonb,${digest}) ON CONFLICT(id) DO NOTHING`

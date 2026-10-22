@@ -28,9 +28,19 @@ suite('Survey independent tool library — isolated local synthetic records',()=
  it('creates a private form without a project association and replays only the exact original request',async()=>{
   const tool=await newTool('FORM');formId=tool.id
   expect(tool).not.toHaveProperty('projectId')
+  expect(tool.definition).toEqual({schemaVersion:2,pages:[]})
   expect(await createTemplate(uid,{requestId:formId,kind:'FORM',title:'FORM'})).toMatchObject({id:formId,revision:0})
   await expect(createTemplate(uid,{requestId:formId,kind:'SCALE',title:'FORM'})).rejects.toMatchObject({statusCode:409})
   expect(await listTemplates(uid,{page:1,query:'FORM',kind:'FORM'})).toMatchObject({total:1})
+ })
+ it('new forms use V2 date and text formatting without an upgrade step',async()=>{
+  const tool=await newTool('FORM','扩展题型验收')
+  const definition={...tool.definition,pages:[{pageKey:'schedule',title:'时间安排',questions:[{itemKey:'date',type:'DATE',prompt:'参与日期',required:true,options:[],rows:[]},{itemKey:'email',type:'SHORT_TEXT',prompt:'邮箱',required:false,options:[],rows:[],textValidation:'EMAIL'}]}]}
+  await saveTemplate(uid,tool.id,{revision:0,title:tool.title,definition})
+  expect(await getTemplate(uid,tool.id)).toMatchObject({definition:{schemaVersion:2}})
+  expect(await inspectTemplate(uid,tool.id)).toMatchObject({ok:true})
+  expect(await dryRunTemplate(uid,tool.id,{date:'2026-10-22',email:'test@example.invalid'})).toMatchObject({ok:true})
+  expect(await dryRunTemplate(uid,tool.id,{date:'not-a-date',email:'invalid'})).toMatchObject({ok:false})
  })
  it('denies other owners and incomplete researcher qualification',async()=>{
   await expect(prisma.$transaction(tx=>ownedTemplate(tx,other,formId))).rejects.toMatchObject({statusCode:404})
