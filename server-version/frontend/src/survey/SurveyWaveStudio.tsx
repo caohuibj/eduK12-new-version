@@ -412,6 +412,8 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
     const tool=feedbackTools.find(tool=>tool.id===id)
     return !tool||!choice.metricKeys.length||choice.metricKeys.some(key=>!tool.metrics.some(metric=>metric.scoreKey===key))
   })
+  const stage=activePending?'冻结结果待核对':!editing?'尚未保存草稿':editing.hardStopAt?'已紧急终止':editing.status==='CLOSED'?'已结束招募':editing.status==='PAUSED'?'已暂停新参与':editing.status==='OPEN'?'波次已开放':editing.publicationId?'已冻结，尚未开放':'草稿，尚未冻结'
+  const nextStep=activePending?'请先核对原冻结请求，不要重复创建或重新选择版本。':busy?'正在等待本次操作结果；请勿据此重复提交或开始下一步。':!editing?'填写本轮内容并保存草稿，再检查研究定义。':editing.hardStopAt?'已停止本轮作答，请到研究数据查看既有记录。':editing.status==='CLOSED'?'不再招募；在途作答仍以服务端完成窗口为准。':editing.status==='PAUSED'?'需要继续招募时可恢复开放；在途作答遵循原完成窗口。':editing.status==='OPEN'?'核对招募链接后再分享；是否允许新参与仍受项目状态、时间窗口和配额约束。':editing.publicationId?'确认冻结内容后，可显式正式开放本轮。':'先保存内容，再检查知情同意与所有工具，通过后冻结研究定义。'
   return <section className="border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-5" aria-label="研究波次">
     <header><h2 className="text-xl font-semibold">研究波次 · T1 / T2 / T3</h2>
       <p className="text-sm text-slate-600">
@@ -419,6 +421,11 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
           ?'本项目用同一随机研究编号关联 T1、T2、T3 等波次；被试需保存私密恢复凭证。'
           :'本项目每轮均为独立匿名作答，不生成跨波次关联研究编号，也不允许个人纵向匹配。'}
         波次正式发布后，题目、评分和知情同意即被冻结；改变测量内容应建立新波次。</p></header>
+    <section aria-label="当前发布阶段" className="rounded-lg border bg-slate-50 p-3 space-y-2">
+      <h3 className="font-semibold">当前阶段：{stage}</h3>
+      <p className="text-sm">{nextStep}</p>
+      {busy&&<p role="status" className="text-sm">正在处理本次操作，请等待结果后再继续。</p>}
+    </section>
     {error&&<p role="alert" className="bg-red-50 border-l-4 border-red-600 p-3">{error}</p>}
     {waveError&&<div role="alert" className="bg-red-50 border-l-4 border-red-600 p-3">{waveError}
       <button type="button" className="btn-secondary" disabled={busy} onClick={()=>void act(()=>refreshWaves(wavePage))}>重试波次列表</button></div>}
@@ -486,10 +493,10 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
             <textarea className="input block w-full" rows={3} value={form.generalText}
               onChange={e=>setForm({...form,generalText:e.target.value})}/></label>
           <fieldset className="border p-3 rounded-lg"><legend className="font-semibold text-sm">本波次使用的研究工具</legend>
-            {tools.filter(t=>t.status==='DRAFT').map(t=><label key={t.id} className="block text-sm my-2">
+            {tools.filter(t=>t.status==='DRAFT'||(t.kind==='SCALE'&&t.status==='PUBLISHED')).map(t=><label key={t.id} className="block text-sm my-2">
               <input type="checkbox" checked={form.instrumentIds.includes(t.id)}
                 onChange={e=>toggle(t.id,e.target.checked)}/> {t.kind} · {t.title}</label>)}
-            {!tools.filter(t=>t.status==='DRAFT').length&&<p className="text-xs">请先通过 Builder 创建研究工具。</p>}
+            {!tools.filter(t=>t.status==='DRAFT'||(t.kind==='SCALE'&&t.status==='PUBLISHED')).length&&<p className="text-xs">请先通过 Builder 创建研究工具。</p>}
           <div className="flex items-center justify-between text-xs gap-2">
             <button type="button" className="btn-secondary" disabled={busy||toolPage<=1}
               onClick={()=>void act(()=>refreshTools(toolPage-1))}>工具上一页</button>
@@ -626,7 +633,8 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
           <div className="flex flex-wrap gap-2">
             {editing.status==='DRAFT'&&!editing.publicationId&&<>
               <button type="button" className="btn-secondary" disabled={busy} onClick={preflight}>检查知情同意与所有工具</button>
-              <button type="button" className="btn-secondary" disabled={busy||!ready?.ok||feedbackInvalid} onClick={()=>lifecycle('prepare')}>冻结研究定义</button>
+              <button type="button" className="btn-secondary" aria-describedby="survey-freeze-reason" disabled={busy||!ready?.ok||feedbackInvalid} onClick={()=>lifecycle('prepare')}>冻结研究定义</button>
+              <p id="survey-freeze-reason" className="w-full text-sm text-slate-600">{busy?'本次操作尚未完成，暂不能冻结。':!ready?'请先运行检查，通过后才能冻结。':!ready.ok?'检查尚未通过，请按检查结果修正后重新检查。':feedbackInvalid?'已启用的反馈须至少选择一个当前有效指标，才能冻结。':'检查已通过，可冻结当前研究定义；冻结不等于开放招募。'}</p>
             </>}
             {editing.status==='DRAFT'&&editing.publicationId&&
               <button type="button" className="btn-primary" disabled={busy} onClick={()=>lifecycle('open')}>正式开放本轮</button>}

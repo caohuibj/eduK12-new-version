@@ -1,6 +1,6 @@
 import { TrainingLearnerNavigationBoundary } from './TrainingLearnerNavigationBoundary'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { Link, MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { learnerCourseContext, withLearnerCourse, useTrainingLearnerNavigation } from './learnerNavigation'
 
@@ -95,7 +95,7 @@ describe('Training learner course navigation', () => {
     expect(screen.getByLabelText('address')).toHaveTextContent('/scale-library')
   })
 
-  it.each(['/my-assessments', '/relational/attempts/assigned', '/student/cognitive/sessions/old/result', '/student/scales/result/old', '/student/questionnaires/result/old'])('keeps authorized task/report deep link %s', path => {
+  it.each(['/my-assessments', '/organizations/org-1', '/relational/attempts/assigned', '/public/composite/attempts/old', '/student/scales/assigned', '/student/questionnaires/assigned', '/student/cognitive/assignments/assigned', '/student/composite/attempts/assigned', '/student/composite/situational/assigned', '/student/cognitive/sessions/old/result', '/student/scales/result/old', '/student/questionnaires/result/old'])('keeps authorized task/report deep link %s', path => {
     mount(path, <p>原有授权页面</p>)
     expect(screen.getByText('原有授权页面')).toBeInTheDocument()
     expect(screen.getByLabelText('address')).toHaveTextContent(path)
@@ -127,6 +127,37 @@ describe('Training learner course navigation', () => {
     expect(await screen.findByRole('link', { name: '继续整份测评' })).toHaveAttribute('href', '/student/composite/attempts/parent-real?courseId=course-real&courseSection=assessments')
     expect(screen.queryByRole('link', { name: '返回题包' })).toBeNull()
     expect(mocks.situationalResult).toHaveBeenCalledTimes(1)
+  })
+
+  it('ignores a late incomplete situational report after leaving for another course', async () => {
+    let resolveResult!: (value: unknown) => void
+    const pending = new Promise(resolve => { resolveResult = resolve })
+    mocks.situationalResult.mockReturnValueOnce(pending)
+    mount('/student/situational/attempts/old/result', <>
+      <Link to="/student/courses/new-course?section=checkins">Leave report</Link>
+      <SituationalResult />
+    </>)
+    fireEvent.click(screen.getByRole('link', { name: 'Leave report' }))
+    await act(async () => {
+      resolveResult({ code: 0, data: { attempt: { compositeAttemptId: 'old-parent', status: 'IN_PROGRESS', instrumentKey: 'pilot' }, trainingPersistence: { courseId: 'old-course' } } })
+      await pending
+    })
+    expect(screen.getByLabelText('address')).toHaveTextContent('/student/courses/new-course?section=checkins')
+  })
+
+  it('clears deferred feedback and its old parent when switching to an unavailable situational report', async () => {
+    mocks.situationalResult.mockResolvedValueOnce({ code: 0, data: { feedbackDeferred: true, attempt: { compositeAttemptId: 'old-parent', status: 'COMPLETED' }, trainingPersistence: { courseId: 'old-course' } } })
+      .mockResolvedValueOnce({ code: 404, message: 'Not found' })
+    mount('/student/situational/attempts/old/result', <>
+      <Link to="/student/situational/attempts/missing/result?courseId=new-course">Next report</Link>
+      <SituationalResult />
+    </>)
+    expect(await screen.findByRole('link', { name: '继续整份测评' })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('link', { name: 'Next report' }))
+    expect(await screen.findByText('报告暂时无法打开')).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: '继续整份测评' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '返回当前课程' }))
+    expect(screen.getByLabelText('address')).toHaveTextContent('/student/courses/new-course?section=assessments')
   })
 
   it('returns an incomplete situational result to its existing parent instead of a new standalone instrument', async () => {

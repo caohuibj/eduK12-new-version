@@ -1,3 +1,7 @@
+import {authorizedSurveyMediaSnapshot,frozenSurveyScaleImage,issueOwnSurveyScaleVideo} from './public-scale-media'
+import {AssessmentMediaCapabilityError} from '../assessment-media/assessment-media-capability'
+import {AssessmentAssetValidationError} from '../assessment-media/assessment-asset'
+import { ScaleLibraryError } from '../scale-library-governance/contracts'
 import { Router,type Request,type Response,type NextFunction } from 'express'
 import { z } from 'zod'
 import { prisma } from '../../config/database'
@@ -6,7 +10,7 @@ import { success,error } from '../../utils/response'
 import { SurveyWaveError } from './waves.service'
 import { SurveyFinalError,submitResearchFinal,readGeneralForOwnAttempt } from './final.service'
 import { screenOutResearchAttempt } from './flow.screen-out.service'
-import { SurveyAssignmentError,ensureSurveyFlowAssignment,assignedSurveySnapshot } from './flow.assignment'
+import { SurveyAssignmentError } from './flow.assignment'
 import { readSurveyCheckpoint,saveSurveyCheckpoint,clearSurveyCheckpoint,SurveyCheckpointError } from './checkpoint.service'
 import { ResearchIdentityError,revokeLinkedResearchAccess,withdrawLinkedResearchData,withdrawSingleResearchAttempt } from './identity.service'
 import { SurveyFinalValidationError } from './final.compute'
@@ -52,6 +56,7 @@ const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Res
       return error(res,e.message,-1,e.statusCode)
     if(e instanceof SurveyFinalValidationError)return error(res,e.path+'：'+e.message,-1,400)
     if(e instanceof SurveyAssignmentError)return error(res,e.message,-1,409)
+    if(e instanceof ScaleLibraryError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof SurveyCheckpointError)return error(res,e.message,-1,e.statusCode)
     next(e)
   }
@@ -124,29 +129,22 @@ publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/images/:assetId',
   async(req,res,next)=>{
     try{
       const params=proof.parse(req.body)
-      const own=await admission.verifiedSurveyAttempt({
-        publicId:id.parse(req.params.publicId),
-        attemptId:id.parse(req.params.attemptId),
-        ...params,
+      const {own,selected}=await authorizedSurveyMediaSnapshot({
+        publicId:id.parse(req.params.publicId),attemptId:id.parse(req.params.attemptId),...params,
       })
-      if(!['STARTED','COMPLETED'].includes(own.status))return res.status(404).end()
       const assetId=id.parse(req.params.assetId)
-      const assignment=own.compiledSnapshot.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'
-        ?await prisma.$transaction(tx=>ensureSurveyFlowAssignment(tx,{
-          projectId:own.projectId,waveId:own.waveId,attemptId:own.attemptId,
-          participantId:own.participantId,researchCode:params.researchCode,
-          accessCredential:params.accessCredential,snapshot:own.compiledSnapshot,
-        })):null
-      const selected=assignment?assignedSurveySnapshot(own.compiledSnapshot,assignment):own.compiledSnapshot
       const refs=surveyImageRefs(selected.units.map(u=>({
         kind:u.kind,definition:u.displayDefinition,
       })))
-      const frozen=refs.find(x=>x.asset.assetId===assetId)
-      if(!frozen)return res.status(404).end()
+      const scaleReference=frozenSurveyScaleImage(selected,assetId)
+      const reference=refs.find(x=>x.asset.assetId===assetId)?.asset??scaleReference
+      if(!reference)return res.status(404).end()
+      if(scaleReference&&!await prisma.assetReference.findFirst({where:{assetId,
+        entityType:'SurveyResearchPublication',entityId:own.publicationId,field:'media'},select:{id:true}}))return res.status(404).end()
       res.setHeader('Cache-Control','private, no-store, max-age=0')
       res.setHeader('X-Content-Type-Options','nosniff')
       return await serveAssessmentImageContent({
-        reference:frozen.asset as AssessmentStaticImageAssetIdentityV1,res,
+        reference:reference as AssessmentStaticImageAssetIdentityV1,res,
       })
     }catch(e){
       if(e instanceof z.ZodError||e instanceof SurveyWaveError
@@ -155,6 +153,22 @@ publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/images/:assetId',
       next(e)
     }
   })
+
+/** Native video GET/Range cannot carry the recovery proof. Exchange it here,
+ * after frozen-task membership and retention checks, for existing signed media capabilities. */
+publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/scale-media/:instrumentKey/:itemKey/video-capabilities',async(req,res,next)=>{
+  try{
+    const key=z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)
+    const sources=await issueOwnSurveyScaleVideo({publicId:id.parse(req.params.publicId),attemptId:id.parse(req.params.attemptId),...proof.parse(req.body)},
+      key.parse(req.params.instrumentKey),key.parse(req.params.itemKey))
+    return success(res,sources)
+  }catch(e){
+    if(e instanceof z.ZodError||e instanceof SurveyWaveError||e instanceof ResearchIdentityError||
+      e instanceof SurveyAssignmentError||e instanceof AssessmentMediaCapabilityError||e instanceof AssessmentAssetValidationError)
+      return res.status(404).end()
+    next(e)
+  }
+})
 
 /** Reuse the exact current report disclosure check. A valid attempt alone is
  * insufficient: only image identities in its released saved feedback qualify. */

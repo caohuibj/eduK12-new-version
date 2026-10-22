@@ -57,7 +57,7 @@ beforeEach(()=>{
   mocks.verified.mockImplementation(async()=>known)
   mocks.attempt.mockImplementation(async()=>current)
   mocks.person.mockResolvedValue({id:'participant'})
-  mocks.lock.mockResolvedValue([{id:'locked'}])
+  mocks.lock.mockImplementation(async (sql:any)=>String(sql?.sql??sql).includes('scale_library_emergency_stops')?[]:[{id:'locked'}])
   mocks.transaction.mockImplementation(async(callback:any)=>callback({
     $queryRaw:mocks.lock,surveyWaveAttempt:{findFirst:mocks.attempt,updateMany:mocks.updateAttempt},
     surveyParticipant:{findFirst:mocks.person},surveyWaveFinal:{findUnique:mocks.final,create:mocks.createFinal},

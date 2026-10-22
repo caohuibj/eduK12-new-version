@@ -1,3 +1,4 @@
+import {readSurveyScalePresentation,scalePresentationOptions} from './catalog-scale.presentation'
 import {decodeSurveyAttemptContentBinding} from './content-binding.service'
 import {checkedStoredSurveyInterpretation,type SurveyStoredInterpretationObservation} from './analytics.interpretation-export'
 import {frozenVariantConfiguration,type SurveyVariantAudit,type SurveyVariantConfiguration} from './analytics.variant'
@@ -144,10 +145,9 @@ const frozenRawItems=(frozen:ResearchFrozenUnit,includeOptions:boolean):readonly
       }
     }
   }else if(frozen.kind==='SCALE'){
-    const draft=frozen.displayDefinition as ScaleDraft
-    const options=optionsFor(draft.responseOptions)
+    const draft=readSurveyScalePresentation(frozen.displayDefinition)
     for(const q of draft.items)add({itemKey:q.itemKey,prompt:q.prompt,responseType:'LIKERT',
-      options,answerKey:q.itemKey,
+      options:optionsFor(scalePresentationOptions(draft,q)),answerKey:q.itemKey,
       ...(q.purpose ? { qualityMetadata: { purpose: q.purpose,
         ...(q.purpose === 'ATTENTION_CHECK' && q.attentionTarget !== undefined
           ? { attentionTarget: q.attentionTarget } : {}) } } : {})})

@@ -1,10 +1,11 @@
+import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
 import { requiredScaleContextKeys } from './policy/context-preflight'
 import { withSerializableScaleTransaction } from './deployment/transactions'
 import { prisma } from '../../config/database'
 import { InstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import { ageMonthsAt, hashAssessmentContext, type AssessmentContextV1, type AssessmentContextValues } from '../assessment-context/context'
 import { persistFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../assessment-runtime/runtime-snapshot'
-import { canStudentAccessScale } from './scale-access'
+import { canStudentAccessScale, canStartLibraryCourseScale } from './scale-access'
 import { retainFrozenScaleAssessmentImages } from './scale-image-retention'
 import { loadStoredScaleAdmission, standaloneAdmissionPersistenceForRuntime } from './scale-admission.service'
 import { encryptScaleAnswers, scaleDefinitionFromRecord } from './scale-workflow.service'
@@ -62,19 +63,21 @@ export const restartStandaloneScaleAssessmentWithPolicy = async (assessmentId: s
             definition: true,
             status: true,
             visibility: true,
+            libraryEntryId: true,
           },
         },
       },
     })
     if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
     if (current.userId !== userId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限重启此量表测评', 403)
+    await assertTrainingScaleCollectionAllowed(tx, [current.scaleId])
     if (current.questionnaireAssessmentId || current.compositeAttemptId) {
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '嵌入式量表必须重启所属问卷或综合测评', 409)
     }
     if (current.status !== 'IN_PROGRESS') {
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '只有进行中的量表测评可以重启', 409)
     }
-    if (!(await canStudentAccessScale(current.scale, userId, tx))) {
+    if (!(await canStudentAccessScale(current.scale, userId, tx)) || !(await canStartLibraryCourseScale(current.scale, userId, tx))) {
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表当前不可用于新的测评轮次', 403)
     }
 

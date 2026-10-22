@@ -25,6 +25,7 @@ export interface ScalePlayerProps {
   submitDisabled?: boolean
   position: number
   total: number
+  hideNavigation?: boolean
   autoAdvance?: boolean
   scopeKey?: string
   onChange: (value: ScalePlayerValue) => void | boolean | Promise<void | boolean>
@@ -51,6 +52,7 @@ export function ScalePlayer({
   submitLabel = '提交整份量表',
   submitting = false,
   autoAdvance = false,
+  hideNavigation = false,
   scopeKey = '',
 }: ScalePlayerProps) {
   const automatic = autoAdvance && item.type === 'single'
@@ -89,15 +91,15 @@ export function ScalePlayer({
       </div>
 
       <div className="mt-6 flex flex-wrap justify-between gap-3">
-        <button
+        {!hideNavigation && <button
           type="button"
           onClick={() => void onPrevious()}
           disabled={position <= 1 || navigationControlsDisabled}
           className="btn-secondary min-h-11"
         >
           <ChevronLeft className="inline h-4 w-4" />上一题
-        </button>
-        {position < total && onNext ? (
+        </button>}
+        {!hideNavigation && position < total && onNext ? (
           <button
             type="button"
             onClick={() => void onNext()}

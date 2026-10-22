@@ -1,3 +1,4 @@
+import { assertSurveyScaleCollectionAllowed } from './scale-collection-guard'
 import { surveySjtQuestions } from './sjt-structure'
 import { assertSurveyCognitiveLockedAnswers } from './cognitive.results'
 import { randomUUID } from 'node:crypto'
@@ -160,6 +161,7 @@ export async function saveSurveyCheckpoint(proof:Proof,input:{
   const known=await context(proof)
   return prisma.$transaction(async tx=>{
     const {policy,wave,snapshot}=await access(tx,proof,known)
+    await assertSurveyScaleCollectionAllowed(tx,snapshot)
     const answers=validCheckpointAnswers(snapshot,input.answers)
     let itemTimings:SurveyScaleTimings|undefined
     try{

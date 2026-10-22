@@ -55,6 +55,7 @@
     "campus_student_enrollments": "RUNTIME_RW",
     "campus_student_recoveries": "RUNTIME_RW",
     "checkin_access_tokens": "RUNTIME_RW",
+    "checkin_schedules": "RUNTIME_RW",
     "checkin_submission_idempotency_receipts": "RUNTIME_RW",
     "checkin_submissions": "RUNTIME_RW",
     "checkins": "RUNTIME_RW",
@@ -233,6 +234,12 @@
     "survey_report_drafts": "RUNTIME_RW",
     "training_reference_requests": "RUNTIME_RW",
     "training_report_drafts": "RUNTIME_RW",
-    "training_interpretation_artifacts": "RUNTIME_RW"
+    "training_interpretation_artifacts": "RUNTIME_RW",
+    "scale_library_submissions": "RUNTIME_RW",
+    "scale_library_entries": "RUNTIME_RW",
+    "scale_library_use_grants": "RUNTIME_RW",
+    "scale_library_events": "RUNTIME_RW",
+    "scale_library_emergency_stops": "RUNTIME_RW",
+    "scale_library_media": "RUNTIME_RW"
   }
 }

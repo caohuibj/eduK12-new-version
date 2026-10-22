@@ -80,9 +80,10 @@ export async function createExportArtifact(params: {
   })
 }
 
-export async function authorizeExportDownload(actor: ExportActor, artifact: { createdBy: string; anonymized: boolean; expiresAt: Date; resourceType: string; resourceId: string; storageKey: string }, resource: { creatorId?: string } | null): Promise<boolean> {
+export async function authorizeExportDownload(actor: ExportActor, artifact: { createdBy: string; anonymized: boolean; expiresAt: Date; resourceType: string; resourceId: string; storageKey: string }, resource: { creatorId?: string; libraryEntryId?: string | null } | null): Promise<boolean> {
   if (artifact.expiresAt <= new Date()) return false
   if (!resource) return false
+  if (artifact.resourceType === 'SCALE' && resource.libraryEntryId) return false
   if (actor.role !== UserRole.ADMIN && artifact.createdBy !== actor.userId) return false
   if (!artifact.anonymized && actor.role !== UserRole.ADMIN) return false
   if (actor.role !== UserRole.ADMIN && resource.creatorId && resource.creatorId !== actor.userId) return false
@@ -110,7 +111,7 @@ export async function resolveArtifactForDownload(artifactId: string, actor: Expo
   if (artifact.resourceType !== 'SCALE' && artifact.resourceType !== 'QUESTIONNAIRE') return { artifact: null, filePath: null, reason: 'not-found' as const }
   if (artifact.status !== ExportArtifactStatus.READY) return { artifact: null, filePath: null, reason: artifact.status === ExportArtifactStatus.PROCESSING ? 'processing' as const : 'failed' as const }
   const resource = artifact.resourceType === 'SCALE'
-    ? await prisma.scale.findUnique({ where: { id: artifact.resourceId }, select: { creatorId: true } })
+    ? await prisma.scale.findUnique({ where: { id: artifact.resourceId }, select: { creatorId: true, libraryEntryId: true } })
     : await prisma.questionnaire.findUnique({ where: { id: artifact.resourceId }, select: { creatorId: true } })
   if (!(await authorizeExportDownload(actor, artifact, resource))) return { artifact: null, filePath: null, reason: 'forbidden' as const }
   let filePath: string
@@ -128,7 +129,7 @@ export async function getExportArtifactStatus(artifactId: string, actor: ExportA
   if (!artifact) return { artifact: null, reason: 'not-found' as const }
   if (artifact.resourceType !== 'SCALE' && artifact.resourceType !== 'QUESTIONNAIRE') return { artifact: null, reason: 'not-found' as const }
   const resource = artifact.resourceType === 'SCALE'
-    ? await prisma.scale.findUnique({ where: { id: artifact.resourceId }, select: { creatorId: true } })
+    ? await prisma.scale.findUnique({ where: { id: artifact.resourceId }, select: { creatorId: true, libraryEntryId: true } })
     : await prisma.questionnaire.findUnique({ where: { id: artifact.resourceId }, select: { creatorId: true } })
   if (!(await authorizeExportDownload(actor, artifact, resource))) return { artifact: null, reason: 'forbidden' as const }
   return {

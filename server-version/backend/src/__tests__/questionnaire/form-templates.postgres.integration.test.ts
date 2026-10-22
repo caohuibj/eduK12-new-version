@@ -1,6 +1,8 @@
 import { randomUUID } from 'node:crypto'
-import { afterAll, beforeAll, describe, expect, it } from 'vitest'
-import { UserRole } from '@prisma/client'
+import { afterAll, beforeAll, describe, expect, it, vi } from 'vitest'
+import { PrismaClient, UserRole } from '@prisma/client'
+
+import { integrationDatabaseUrl, requireIsolatedReleaseDatabase } from '../integration/integration-env'
 
 const suite = process.env.FORM_TEMPLATE_INTEGRATION === '1' ? describe : describe.skip
 let db: typeof import('../../config/database')['prisma']
@@ -14,8 +16,12 @@ const target = () => service.create(actor, { name: '合成组合问卷', questio
 
 suite('Independent reusable form definitions on local PostgreSQL', () => {
   beforeAll(async () => {
-    const url = new URL(process.env.DATABASE_URL!)
-    if (url.hostname !== '127.0.0.1' || url.port !== '5549' || url.pathname !== '/eduk12_mac_work_20261021') throw new Error('Explicit local synthetic fixture database required')
+    if (process.env.RELEASE_INTEGRATION_DATABASE_URL || process.env.CI === 'true' || process.env.RELEASE_VERIFY_LOCAL === 'true') {
+      requireIsolatedReleaseDatabase(integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL')!)
+    } else {
+      const url = new URL(process.env.DATABASE_URL!)
+      if (url.hostname !== '127.0.0.1' || url.port !== '5549' || url.pathname !== '/eduk12_mac_work_20261021') throw new Error('Explicit local synthetic fixture database required')
+    }
     db = (await import('../../config/database')).prisma
     service = await import('../../modules/questionnaire-product/service')
     for (const person of [actor, other]) await db.user.create({ data: { id: person.userId, username: 'form-template-fixture-' + person.userId, passwordHash: 'synthetic-only', role: 'TEACHER', accountDomain: 'TRAINING', teacherApproved: true } })
@@ -93,6 +99,77 @@ suite('Independent reusable form definitions on local PostgreSQL', () => {
     await expect(service.importFormTemplate(actor, questionnaire.id, { revision: 1, source })).rejects.toThrow(/没有此表单/)
     expect((await service.detail(actor, questionnaire.id)).revision).toBe(1)
   })
+  it('serializes new legacy form use with exact grant revocation without partial writes', async () => {
+    const legacy = await db.questionnaire.create({ data: { code: randomUUID(), name: '并发表单', type: 'GENERAL', status: 'PUBLISHED', creatorId: other.userId, formItems: { create: { type: 'text_input', label: '合成反馈', required: true, position: 0 } } } })
+    const questionnaire = await target()
+    const source = { id: legacy.id, kind: 'LEGACY' as const }
+    const grant = await db.materialGrant.create({ data: { teacherId: actor.userId, resourceType: 'FORM_TEMPLATE', resourceId: legacy.id, grantedBy: other.userId } })
+    const peer = new PrismaClient()
+    let release!: () => void
+    const barrier = new Promise<void>(resolve => { release = resolve })
+    let locked!: (pid: number) => void
+    const lockReady = new Promise<number>(resolve => { locked = resolve })
+    const transaction = db.$transaction.bind(db)
+    const spy = vi.spyOn(db, '$transaction').mockImplementationOnce(((callback: any, options: any) => transaction(async tx => {
+      const wrapped = new Proxy(tx, { get(target, key) {
+        if (key !== '$queryRaw') return Reflect.get(target, key)
+        return async (...args: any[]) => {
+          const result = await (target.$queryRaw as any)(...args)
+          const sql = Array.isArray(args[0]) ? args[0].join('') : args[0]?.sql ?? ''
+          if (sql.includes('FROM material_grants') && sql.includes('FOR SHARE')) {
+            const [session] = await target.$queryRaw<Array<{ pid: number }>>`SELECT pg_backend_pid() AS pid`
+            locked(session.pid)
+            await barrier
+          }
+          return result
+        }
+      } })
+      return callback(wrapped)
+    }, options)) as any)
+    const copying = service.importFormTemplate(actor, questionnaire.id, { revision: 0, source })
+    // Observe failures immediately so an early rejection cannot leave an unhandled promise.
+    const copied = copying.then(value => ({ value }), error => ({ error }))
+    let revoking: Promise<unknown> | undefined
+    try {
+      const copyPid = await Promise.race([lockReady, copied.then(() => { throw new Error('Copy ended before the grant lock barrier') })])
+      let started!: (pid: number) => void
+      const writerReady = new Promise<number>(resolve => { started = resolve })
+      revoking = peer.$transaction(async tx => {
+        const [session] = await tx.$queryRaw<Array<{ pid: number }>>`SELECT pg_backend_pid() AS pid`
+        started(session.pid)
+        await tx.materialGrant.delete({ where: { id: grant.id } })
+      }, { timeout: 15000 })
+      const revoked = revoking.then(() => 'committed', () => 'failed')
+      const writerPid = await Promise.race([writerReady, revoked.then(() => { throw new Error('Revocation ended before the writer barrier') })])
+      const deadline = Date.now() + 5000
+      let blocked = false
+      while (Date.now() < deadline) {
+        const [state] = await peer.$queryRaw<Array<{ blocked: boolean }>>`SELECT ${copyPid}::int = ANY(pg_blocking_pids(${writerPid}::int)) AS blocked`
+        if (state.blocked) { blocked = true; break }
+        if (await Promise.race([revoked, Promise.resolve('pending')]) !== 'pending') break
+        await new Promise(resolve => setTimeout(resolve, 20))
+      }
+      expect(blocked).toBe(true)
+      expect(await peer.compositeAssessmentItem.count({ where: { compositeAssessmentId: questionnaire.id } })).toBe(0)
+      release()
+      expect((await copying).items).toHaveLength(1)
+      await revoking
+      // Revocation committed first for every subsequent copy: no target metadata,
+      // sections, items, or revision may be partially changed. Existing copy stays valid.
+      const rejectedTarget = await target()
+      const before = await db.compositeAssessment.findUnique({ where: { id: rejectedTarget.id }, include: { items: true, formSections: true } })
+      await expect(service.importFormTemplate(actor, rejectedTarget.id, { revision: 0, source })).rejects.toThrow(/没有此表单/)
+      expect(await db.compositeAssessment.findUnique({ where: { id: rejectedTarget.id }, include: { items: true, formSections: true } })).toEqual(before)
+      await expect(service.createFormTemplate(actor, { name: '拒绝创建', requestId: randomUUID(), source })).rejects.toThrow(/没有此表单/)
+      expect(await db.compositeAssessment.count({ where: { createdBy: actor.userId, name: '拒绝创建' } })).toBe(0)
+      expect((await service.detail(actor, questionnaire.id)).items).toHaveLength(1)
+    } finally {
+      release()
+      spy.mockRestore()
+      await Promise.allSettled([copied, ...(revoking ? [revoking] : [])])
+      await peer.$disconnect()
+    }
+  }, 30000)
   it('converts an empty legacy form into an editable independent form without changing its source', async () => {
     const empty = await db.questionnaire.create({ data: { code: randomUUID(), name: '尚未录题的常用表单', type: 'GENERAL', status: 'DRAFT', creatorId: actor.userId } })
     const copied = await service.createFormTemplate(actor, { name: empty.name, requestId: randomUUID(), source: { id: empty.id, kind: 'LEGACY' } })

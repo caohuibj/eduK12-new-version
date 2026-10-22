@@ -1,4 +1,4 @@
-import { act,fireEvent,render,screen,waitFor } from '@testing-library/react'
+import { act,fireEvent,render,screen } from '@testing-library/react'
 import { afterEach,beforeEach,describe,expect,it,vi } from 'vitest'
 import { clearSurveyCognitiveSessions } from './survey-cognitive-local'
 vi.mock('./survey-cognitive-local',()=>({rememberSurveyCognitiveSession:vi.fn(),clearSurveyCognitiveSessions:vi.fn().mockResolvedValue(true)}))
@@ -11,8 +11,11 @@ vi.mock('./SurveyCognitiveUnit',()=>({SurveyCognitiveUnit:(props:any)=>{harness.
   <p>认知组件测试替身，未测量真实反应时间</p></section>}}))
 const pid='11111111-1111-4111-8111-111111111111',aid='22222222-2222-4222-8222-222222222222'
 const response=(data:unknown)=>Promise.resolve({ok:true,status:200,json:async()=>({code:0,data})} as Response)
+const originalScrollIntoView=HTMLElement.prototype.scrollIntoView
 let task:any,finals:any[],failFirst:boolean,generalReads:number
 beforeEach(()=>{
+  // jsdom has no scrolling implementation; retain real focus behavior.
+  HTMLElement.prototype.scrollIntoView=vi.fn()
   window.history.replaceState(null,'',`/r/${pid}`);sessionStorage.clear();harness.cognitive=null;finals=[];failFirst=false;generalReads=0
   sessionStorage.setItem(`huisurvey:v1:single:${pid}`,JSON.stringify({attemptId:aid,accessCredential:'a'.repeat(43),createdAt:Date.now()}))
   task={attemptId:aid,waveId:'wave',status:'STARTED',definitionDigest:'a'.repeat(64),reportMode:'GENERAL_ONLY',units:[
@@ -31,9 +34,30 @@ beforeEach(()=>{
     throw new Error('Unexpected '+url)
   }))
 })
-afterEach(()=>{vi.unstubAllGlobals();vi.restoreAllMocks()})
+afterEach(()=>{
+  vi.unstubAllGlobals();vi.restoreAllMocks()
+  if(originalScrollIntoView)HTMLElement.prototype.scrollIntoView=originalScrollIntoView
+  else delete (HTMLElement.prototype as Partial<HTMLElement>).scrollIntoView
+})
 async function open(){render(<SurveyPublicApp/>);fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}));await screen.findByRole('radio',{name:'符合'})}
 describe('Survey parent/child boundary and feedback',()=>{
+  it('shows the device reminder only after the task confirms cognitive content and hides it while running',async()=>{
+    render(<SurveyPublicApp/>)
+    const restore=await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'})
+    expect(screen.queryByRole('complementary',{name:'本轮认知任务设备提示'})).toBeNull()
+    fireEvent.click(restore)
+    await screen.findByRole('radio',{name:'符合'})
+    expect(screen.getByRole('complementary',{name:'本轮认知任务设备提示'})).toHaveTextContent('不能保证跨设备继续')
+    fireEvent.click(screen.getByRole('radio',{name:'符合'}))
+    fireEvent.click(screen.getByRole('button',{name:'确认当前工具，继续'}))
+    fireEvent.click(screen.getByRole('button',{name:'模拟开始认知'}))
+    expect(screen.queryByRole('complementary',{name:'本轮认知任务设备提示'})).toBeNull()
+  })
+  it('does not show cognitive requirements for a form-only task',async()=>{
+    task.units=task.units.filter((unit:any)=>unit.kind==='FORM')
+    await open()
+    expect(screen.queryByRole('complementary',{name:'本轮认知任务设备提示'})).toBeNull()
+  })
   it('locks prior answers, blocks outer navigation while running, and seals exact child refs on parent retry',async()=>{
     failFirst=true;await open();fireEvent.click(screen.getByRole('radio',{name:'符合'}));fireEvent.click(screen.getByRole('button',{name:'确认当前工具，继续'}))
     expect(harness.cognitive.priorAnswers).toEqual({form:{q:'yes'}})
@@ -44,7 +68,7 @@ describe('Survey parent/child boundary and feedback',()=>{
     fireEvent.click(screen.getByRole('button',{name:'确认当前工具，继续'}));fireEvent.click(screen.getByRole('button',{name:'提交本轮正式回答'}))
     await screen.findByText('结果尚不确定');expect(finals[0].answers).toEqual({form:{q:'yes'},cog:{}})
     expect(finals[0].cognitiveReferences).toHaveLength(1)
-    fireEvent.click(screen.getByRole('button',{name:'提交本轮正式回答'}));await screen.findByText('本轮研究已提交')
+    fireEvent.click(screen.getByRole('button',{name:'重试原提交'}));await screen.findByText('本轮研究已提交')
     expect(finals[1]).toEqual(finals[0]);expect(generalReads).toBe(1)
     expect(screen.getByText('Go 命中率：80.0%（available）')).toBeInTheDocument()
     expect(screen.queryByText('可信回执')).toBeNull()

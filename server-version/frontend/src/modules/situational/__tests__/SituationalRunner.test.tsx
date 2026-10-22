@@ -1,6 +1,6 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { MemoryRouter, Route, Routes } from 'react-router-dom'
+import { Link, MemoryRouter, Route, Routes } from 'react-router-dom'
 import SituationalRunner from '../pages/SituationalRunner'
 import { finalDraftStore } from '../../../services/persistence/finalDraftStore'
 import { ensureSituationalDraft, situationalDraftKey } from '../draft'
@@ -145,6 +145,81 @@ describe('Situational text runner', () => {
     embeddedClient.resume.mockResolvedValue({ code: 0, message: 'ok', data: embeddedData })
     embeddedClient.submit.mockResolvedValue({ code: 0, message: 'ok', data: completedData(embeddedData) })
     embeddedClient.result.mockResolvedValue({ code: 0, message: 'ok', data: completedData(embeddedData) })
+  })
+
+  it('does not redirect after leaving while a completed start response is pending', async () => {
+    let resolveStart!: (value: Awaited<ReturnType<typeof situationalApi.start>>) => void
+    const pending = new Promise<Awaited<ReturnType<typeof situationalApi.start>>>(resolve => { resolveStart = resolve })
+    vi.mocked(situationalApi.start).mockReturnValueOnce(pending)
+    render(<MemoryRouter initialEntries={['/student/situational/pilot']}>
+      <Link to="/student/courses/course-1">Leave task</Link>
+      <Routes>
+        <Route path="/student/situational/:instrumentKey" element={<SituationalRunner />} />
+        <Route path="/student/courses/:courseId" element={<p>Current course</p>} />
+        <Route path="/student/situational/attempts/:attemptId/result" element={<p>Stale result</p>} />
+      </Routes>
+    </MemoryRouter>)
+    fireEvent.click(screen.getByRole('link', { name: 'Leave task' }))
+    const deleteDraft = vi.spyOn(finalDraftStore, 'delete')
+    await act(async () => { resolveStart({ code: 0, message: 'ok', data: completedData() }); await pending })
+    expect(deleteDraft).not.toHaveBeenCalled()
+    expect(screen.getByText('Current course')).toBeInTheDocument()
+    expect(screen.queryByText('Stale result')).toBeNull()
+  })
+
+  it('hides the previous task while a same-component route change is loading', async () => {
+    let resolveNext!: (value: Awaited<ReturnType<typeof situationalApi.start>>) => void
+    const pending = new Promise<Awaited<ReturnType<typeof situationalApi.start>>>(resolve => { resolveNext = resolve })
+    vi.mocked(situationalApi.start).mockResolvedValueOnce({ code: 0, message: 'ok', data: startData() }).mockReturnValueOnce(pending)
+    render(<MemoryRouter initialEntries={['/student/situational/pilot']}>
+      <Link to="/student/situational/next">Next task</Link>
+      <Routes><Route path="/student/situational/:instrumentKey" element={<SituationalRunner />} /></Routes>
+    </MemoryRouter>)
+    expect(await screen.findByLabelText('选择 A')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('link', { name: 'Next task' }))
+    expect(screen.getByText('加载冻结题面…')).toBeInTheDocument()
+    expect(screen.queryByLabelText('选择 A')).toBeNull()
+    const next = startData()
+    next.attempt.id = 'ui-child'
+    next.attemptId = 'ui-child'
+    next.instrument.definition.scenes[0]!.stimulus = { type: 'TEXT_V1', text: '新任务题面' }
+    await act(async () => { resolveNext({ code: 0, message: 'ok', data: next }); await pending })
+    expect(await screen.findByText('新任务题面')).toBeInTheDocument()
+  })
+
+  it('does not apply deferred local research recovery to a newer route attempt', async () => {
+    const old = stagedStartData()
+    const next = stagedStartData()
+    next.attempt.id = 'ui-child'
+    next.attemptId = 'ui-child'
+    next.instrument.definition.scenes[0]!.stimulus = { type: 'TEXT_V1', text: '新研究任务' }
+    let resolveTrials!: (value: Awaited<ReturnType<typeof finalDraftStore.listTrials>>) => void
+    const pending = new Promise<Awaited<ReturnType<typeof finalDraftStore.listTrials>>>(resolve => { resolveTrials = resolve })
+    const readTrials = finalDraftStore.listTrials.bind(finalDraftStore)
+    const trials = vi.spyOn(finalDraftStore, 'listTrials').mockImplementation(key => key === 'situational:ui-attempt' ? pending : readTrials(key))
+    vi.mocked(situationalApi.start).mockResolvedValueOnce({ code: 0, message: 'ok', data: old }).mockResolvedValueOnce({ code: 0, message: 'ok', data: next })
+    render(<MemoryRouter initialEntries={['/student/situational/pilot']}>
+      <Link to="/student/situational/next">Next task</Link>
+      <Routes><Route path="/student/situational/:instrumentKey" element={<SituationalRunner />} /></Routes>
+    </MemoryRouter>)
+    await waitFor(() => expect(trials).toHaveBeenCalledWith('situational:ui-attempt'))
+    fireEvent.click(screen.getByRole('link', { name: 'Next task' }))
+    expect(await screen.findByText('新研究任务')).toBeInTheDocument()
+    expect(screen.queryByText('你有多确定？')).toBeNull()
+    await waitFor(async () => {
+      const currentTrials = await readTrials('situational:ui-child')
+      expect(currentTrials.some(trial => {
+        const payload = trial.payload as { events?: SituationalResearchEvent[] }
+        return payload.events?.some(event => event.type === 'NODE_EXPOSED')
+      })).toBe(true)
+    })
+    await act(async () => {
+      resolveTrials([{ draftKey: 'situational:ui-attempt', trialIndex: 0, createdAt: Date.now(), payload: { type: 'STAGE_CONFIRMED', nodeKey: 'node', stageKey: 'choice', historyIdentity: situationalHistoryIdentities(next.instrument.definition, {})['S1']!, relativeTimeMs: 1 } }])
+      await pending
+    })
+    expect(screen.getByText('新研究任务')).toBeInTheDocument()
+    expect(screen.queryByText('你有多确定？')).toBeNull()
+    expect(screen.getByLabelText('选择 A')).toBeInTheDocument()
   })
 
   it('renders text, supports choice/continuous boundaries, fixed scene progress, navigation, and one final request', async () => {

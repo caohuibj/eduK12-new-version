@@ -1,4 +1,4 @@
-import { useEffect,useState } from 'react'
+import { useEffect,useLayoutEffect,useRef,useState } from 'react'
 import type { SurveyPublicImage } from './builder.types'
 
 export type SurveyImageProof={
@@ -7,14 +7,17 @@ export type SurveyImageProof={
 /** A binary POST exchanges the person's current bearer proof for frozen
  * bytes without ever putting the secret in URL, query or browser history.
  */
-export function SurveyParticipantImage({image,proof,purpose='stimulus'}:{
-  image:SurveyPublicImage;proof:SurveyImageProof;purpose?:'stimulus'|'report'
+export function SurveyParticipantImage({image,proof,purpose='stimulus',onReadyChange}:{
+  image:SurveyPublicImage;proof:SurveyImageProof;purpose?:'stimulus'|'report';onReadyChange?:(ready:boolean)=>void
 }){
-  const [url,setUrl]=useState(''),[error,setError]=useState('')
+  const [url,setUrl]=useState(''),[error,setError]=useState(''),[retry,setRetry]=useState(0)
+  const readyCallback=useRef(onReadyChange);readyCallback.current=onReadyChange
+  // Clear an earlier mount's ready flag before the new image can be interacted with.
+  useLayoutEffect(()=>{readyCallback.current?.(false)},[purpose,image.asset.assetId,image.asset.contentHash,image.asset.mimeType,proof.publicId,proof.attemptId,proof.accessCredential,proof.researchCode,retry])
   useEffect(()=>{
     const controller=new AbortController()
     let objectUrl=''
-    setUrl('');setError('')
+    setUrl('');setError('');readyCallback.current?.(false)
     const endpoint='/api/public/survey/r/'+encodeURIComponent(proof.publicId)
       +'/attempts/'+encodeURIComponent(proof.attemptId)
       +(purpose==='report'?'/report-images/':'/images/')+encodeURIComponent(image.asset.assetId)
@@ -43,12 +46,14 @@ export function SurveyParticipantImage({image,proof,purpose='stimulus'}:{
     }
   },[
     purpose,image.asset.assetId,image.asset.contentHash,image.asset.mimeType,
-    proof.publicId,proof.attemptId,proof.accessCredential,proof.researchCode,
+    proof.publicId,proof.attemptId,proof.accessCredential,proof.researchCode,retry,
   ])
   return <figure className="my-3">
     {url?<img src={url} className="max-w-full max-h-80 object-contain rounded-lg border"
-      alt={image.altText} loading="lazy"/>:
+      alt={image.altText} loading="lazy" onLoad={()=>readyCallback.current?.(true)}
+      onError={()=>{readyCallback.current?.(false);setUrl('');setError('图片解码失败，请重试')}}/>:
       <p className="text-xs text-slate-600" role="status">{error||'正在读取已授权研究图片…'}</p>}
+    {error&&<button type="button" className="btn-secondary" onClick={()=>{readyCallback.current?.(false);setRetry(value=>value+1)}}>重试图片</button>}
     {image.caption&&<figcaption className="text-xs mt-2">{image.caption}</figcaption>}
   </figure>
 }

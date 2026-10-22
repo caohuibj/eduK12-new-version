@@ -37,7 +37,7 @@ export async function listSurveyContentOptions(actorId:string,projectId:string,w
     if(!wave)throw new SurveyWaveError(404,'研究波次不存在')
     if(wave.status!=='DRAFT'||wave.publicationId)fail('波次已冻结或不可编辑，请查看冻结版本')
     if(!Array.isArray(wave!.instrumentIds)||!wave!.instrumentIds.includes(input.instrumentId))fail('研究工具不在此波次中')
-    const draft=await tx.surveyInstrumentDraft.findFirst({where:{id:input.instrumentId,projectId,status:'DRAFT'}})
+    const draft=await tx.surveyInstrumentDraft.findFirst({where:{id:input.instrumentId,projectId,status:{in:['DRAFT','PUBLISHED']}}})
     if(!draft)fail('研究工具不存在或已归档')
     if(draft!.kind==='FORM')fail('普通表单不选择测量报告或参考版本')
     const sources=await catalogSnapshotsForDrafts(tx,actorId,draft!.catalogGrantId?[draft!.catalogGrantId]:[])

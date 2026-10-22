@@ -15,11 +15,13 @@ const { mockPrisma } = vi.hoisted(() => ({
     },
     user: { findUnique: vi.fn(), findMany: vi.fn() },
     $transaction: vi.fn(),
+    $queryRaw: vi.fn(),
     scale: { findUnique: vi.fn() },
     cognitiveTestConfig: { findUnique: vi.fn() },
   },
 }))
 
+vi.mock('../../modules/scale-library-governance/readers',()=>({libraryReadableScaleIds:vi.fn(async(userId:string)=>({systemAdmin:userId==='admin-1',ids:[]}))}))
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 vi.mock('../../config', () => ({
   config: {
@@ -50,6 +52,7 @@ const otherDraft = { id: 'scale-draft', creatorId: 'admin-1', status: 'DRAFT' }
 beforeEach(() => {
   vi.clearAllMocks()
   flags.materialGrantsEnabled = true
+  mockPrisma.$queryRaw.mockResolvedValue([])
   mockPrisma.materialGrant.findUnique.mockResolvedValue(null)
   mockPrisma.materialGrant.findMany.mockResolvedValue([])
   mockPrisma.$transaction.mockImplementation(async (fn: (tx: typeof mockPrisma) => unknown) => fn(mockPrisma))
@@ -132,8 +135,9 @@ describe('scaleSource / scaleWhereForViewer', () => {
     await expect(scaleWhereForViewer('teacher-1', TEACHER, { status: 'PUBLISHED' })).resolves.toEqual({
       status: 'PUBLISHED',
       OR: [
-        { creatorId: 'teacher-1' },
-        { id: { in: ['scale-other'] }, status: 'PUBLISHED' },
+        { creatorId: 'teacher-1', libraryEntryId: null },
+        { id: { in: ['scale-other'] }, status: 'PUBLISHED', libraryEntryId: null },
+        { id: { in: [] }, status: 'PUBLISHED' },
       ],
     })
   })

@@ -12,6 +12,9 @@ import { ResearchAuthoringGuide,ResearchImportGuide } from './ResearchAuthoringG
 import { ResearchIssueList } from './ResearchIssueList'
 import { authoringIssueTarget,type AuthoringIssue,type ImportIssueContext } from './authoring-issue-location'
 import './survey-workspace.css'
+import { publishSurveyMeasurement } from './measurement-publication'
+import { SurveyScaleLibrarySubmission } from './SurveyScaleLibrarySubmission'
+import { SurveyScaleVersions } from './SurveyScaleVersions'
 import { useInstrumentLibrary, type InstrumentLibrary } from './instrument-library'
 
 type Envelope<T>={code:number|string;message:string;data:T|null}
@@ -47,15 +50,24 @@ async function api<T>(path:string,method='GET',payload?:unknown):Promise<T>{
   return data.data as T
 }
 const displayKind:Record<Kind,string>={FORM:'Form · 表单',SCALE:'Scale · 量表',SJT:'SJT · 情境判断',COGNITIVE:'Cognitive · 认知任务'}
-export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;instrumentLibrary?:InstrumentLibrary}){
+const toolStatus=(status:string)=>({DRAFT:'草稿',PUBLISHED:'已发布',ARCHIVED:'已归档'} as Record<string,string>)[status]||status
+const kindLabel:Record<Kind,string>={FORM:'表单',SCALE:'量表',SJT:'情境判断',COGNITIVE:'认知任务'}
+const directionLabel=(direction:string)=>({descriptive:'仅描述',higher_is_more:'越高代表越多',higher_is_better:'越高越好',higher_is_worse:'越高越差',bipolar:'双极方向'} as Record<string,string>)[direction]||direction
+export type BuilderLeaveRisk={dirty:boolean;busy:boolean}
+export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary,onLeaveRiskChange}:{projectId:string;projectStatus?:string;instrumentLibrary?:InstrumentLibrary;onLeaveRiskChange?:(risk:BuilderLeaveRisk)=>void}){
   const prefix='/projects/'+encodeURIComponent(projectId)+'/instruments'
   const {list:instruments,page:instrumentPage,refresh:refreshList,error:listError,loading:listLoading}=useInstrumentLibrary(projectId,instrumentLibrary)
   const [active,setActive]=useState<ResearchDraft|null>(null),[dirty,setDirty]=useState(false)
-  const readOnly=Boolean(active?.readOnly||active?.catalogGrantId)
+  const licensedReadOnly=Boolean(active?.readOnly||active?.catalogGrantId)
+  const readOnly=licensedReadOnly||active?.status==='PUBLISHED'
+  const measurementWritable=['DRAFT','ACTIVE'].includes(projectStatus)
+  const [publishedReleaseId,setPublishedReleaseId]=useState('')
+  const [showLibrarySubmission,setShowLibrarySubmission]=useState(false)
   const editGeneration=useRef(0)
   const editorRoot=useRef<HTMLDivElement>(null)
   const [apiIssues,setApiIssues]=useState<AuthoringIssue[]>([])
   const [newKind,setNewKind]=useState<Kind>('FORM'),[newTitle,setNewTitle]=useState('')
+  const [leaveBusy,setLeaveBusy]=useState(false)
   const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState('')
   const [preview,setPreview]=useState<Preview|null>(null),[showPreview,setShowPreview]=useState(false)
   const [answerReview,setAnswerReview]=useState<{ok:boolean;issues:Issue[];
@@ -67,36 +79,39 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
   const [bulk,setBulk]=useState<{batch:BulkBatch;result:BulkResult}|null>(null)
   const [undo,setUndo]=useState<{definition:Definition;title:string}|null>(null)
   useEffect(()=>{setActive(null);setPreview(null);setError('');setBulk(null)},[projectId])
-  const run=async(task:()=>Promise<void>)=>{
-    setBusy(true);setError('');setNotice('');setApiIssues([])
+  const hasUnsaved=dirty||!!newTitle.trim()||!!bulkText.trim()
+  useEffect(()=>{onLeaveRiskChange?.({dirty:hasUnsaved,busy:leaveBusy})},[hasUnsaved,leaveBusy,onLeaveRiskChange])
+  useEffect(()=>()=>onLeaveRiskChange?.({dirty:false,busy:false}),[onLeaveRiskChange])
+  const run=async(task:()=>Promise<void>,writes=true)=>{
+    setLeaveBusy(writes);setBusy(true);setError('');setNotice('');setApiIssues([])
     try{await task()}catch(e){setError(e instanceof Error?e.message:'操作失败');if(e instanceof BuilderApiError)setApiIssues(e.issues)}
-    finally{setBusy(false)}
+    finally{setBusy(false);setLeaveBusy(false)}
   }
   // The write is already acknowledged. List failures have their own retry UI
   // and must never invite another create/import with a fresh request ID.
   const refreshAfterWrite=(page:number)=>refreshList(page,true).catch(()=>{})
   const clearReview=()=>{
-    setPreview(null);setShowPreview(false);setAnswerReview(null);setPreviewFocus(null)
-    setBulk(null);setUndo(null);setBulkTargetPageKey('')
+    setPublishedReleaseId('');setShowLibrarySubmission(false);setPreview(null);setShowPreview(false);setAnswerReview(null);setPreviewFocus(null)
+    setBulk(null);setBulkText('');setUndo(null);setBulkTargetPageKey('')
   }
   const select=async(id:string)=>{
     await run(async()=>{
-      if(dirty&&!window.confirm('当前草稿存在未保存内容。确定放弃并切换研究工具？'))return
+      if((dirty||!!bulkText.trim())&&!window.confirm('当前草稿存在未保存内容。确定放弃并切换研究工具？'))return
       const r=await api<ResearchDraft>(prefix+'/'+id)
       setActive(r);setDirty(false);clearReview()
-    })
+    },false)
   }
   const create=(event:FormEvent)=>{event.preventDefault();void run(async()=>{
-    if(dirty&&!window.confirm('当前草稿存在未保存内容。确定放弃并创建另一份研究工具？'))return
+    if((dirty||!!bulkText.trim())&&!window.confirm('当前草稿存在未保存内容。确定放弃并创建另一份研究工具？'))return
     const item=await api<ResearchDraft>(prefix,'POST',{
       requestId:crypto.randomUUID(),instrumentKey:researchKey('i'),kind:newKind,title:newTitle.trim(),
     })
     setActive(item);setDirty(false);clearReview();setNewTitle('')
-    setNotice('已创建研究专用草稿，尚未进入正式测评目录')
+    setNotice('已创建私有研究草稿；进入共用库需另行申请并经管理员审批')
     await refreshAfterWrite(1)
   })}
   const importCatalog=(grant:CatalogGrant)=>run(async()=>{
-    if(dirty&&!window.confirm('当前草稿存在未保存内容。确定放弃并导入原版工具？'))return
+    if((dirty||!!bulkText.trim())&&!window.confirm('当前草稿存在未保存内容。确定放弃并导入原版工具？'))return
     const item=await api<ResearchDraft>('/projects/'+encodeURIComponent(projectId)+'/catalog/'+encodeURIComponent(grant.id)+'/import','POST',{
       requestId:crypto.randomUUID(),instrumentKey:researchKey('i'),title:grant.title,
     })
@@ -122,17 +137,29 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
     setDirty(changedWhileSaving);setPreview(null);setBulk(null);setUndo(null)
     await refreshAfterWrite(instrumentPage)
     setNotice(changedWhileSaving?'本次草稿已保存；保存期间产生的新修改仍待保存。'
-      :'草稿已保存；发布冻结将在研究波次阶段执行')
+      :'草稿已保存；可在编制区发布测量版本，波次冻结另行进行')
+  })}
+  const publishMeasurement=()=>{if(!active||dirty||!measurementWritable||active.status==='ARCHIVED')return;void run(async()=>{
+    const result=await publishSurveyMeasurement(api,projectId,active)
+    setPublishedReleaseId(result.releaseId)
+    if(active.kind==='SCALE'&&!licensedReadOnly)setActive({...active,status:'PUBLISHED',measurementReleaseId:result.releaseId})
+    await refreshAfterWrite(instrumentPage)
+    setNotice('测量版本已发布供本项目自用；未创建波次、启动采集或进入共用库。')
+  })}
+  const revise=()=>{if(!active||active.kind!=='SCALE'||licensedReadOnly||active.status!=='PUBLISHED'||dirty)return;void run(async()=>{
+    const next=await api<ResearchDraft>(prefix+'/'+encodeURIComponent(active.id)+'/revise','POST',{revision:active.revision})
+    setActive(next);setDirty(false);clearReview();await refreshAfterWrite(instrumentPage)
+    setNotice('已建立下一版本草稿；原发布版本、报告和波次保持不变。')
   })}
   const validate=()=>{if(!active||readOnly||dirty)return;void run(async()=>{
     const result=await api<Preview>(prefix+'/'+active.id+'/validate','POST',{})
     setPreview(result);setShowPreview(result.ok)
     setNotice(result.ok?'结构与研究性计分编译已通过；这是非正式试答预览':'请先修正提示的结构问题')
-  })}
+  },false)}
   const simulate=(answers:Record<string,unknown>)=>{if(!active||readOnly||dirty)return;void run(async()=>{
     const r=await api<Preview>(prefix+'/'+active.id+'/preview','POST',{answers})
     setPreview(r);setNotice(r.ok?'已根据后台现有计分器模拟计算，不会生成正式答卷':'模拟未通过，请检查作答和规则')
-  })}
+  },false)}
   const validateFormAnswers=(answers:Record<string,unknown>)=>{
     if(!active||readOnly||dirty||active.kind!=='FORM')return
     void run(async()=>{
@@ -142,9 +169,10 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
       setNotice(result.ok?'正式 Form 校验通过；未产生正式答卷':'请修正高亮题目后再试提交')
       const first=result.issues[0]?.path.match(/^answers\.([a-z][a-z0-9_-]*)/i)?.[1]
       setPreviewFocus(first?{itemKey:first,sequence:++previewFocusSequence.current}:null)
-    })
+    },false)
   }
   const duplicate=()=>{if(!active)return;void run(async()=>{
+    if(bulkText.trim()&&!window.confirm('存在尚未导入的文本。确定放弃并切换到工具副本？'))return
     const r=await api<ResearchDraft>(prefix+'/'+active.id+'/copy','POST',{
       requestId:crypto.randomUUID(),instrumentKey:researchKey('i'),title:active.title+'（副本）',
     })
@@ -153,6 +181,7 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
     await refreshAfterWrite(1)
   })}
   const archive=()=>{if(!active)return;void run(async()=>{
+    if(bulkText.trim()&&!window.confirm('存在尚未导入的文本。确定放弃并归档当前工具？'))return
     await api(prefix+'/'+active.id+'/archive','POST',{revision:active.revision})
     setActive(null);setDirty(false);clearReview()
     await refreshAfterWrite(instrumentPage);setNotice('草稿已归档')
@@ -163,13 +192,13 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
     const result=await api<BulkResult>(prefix+'/'+active.id+'/bulk-import/preview','POST',batch)
     setBulk({batch,result})
     setNotice(result.ok?'请检查以下题目，确认后再提交（不会提前写入数据）':'输入含错误，未写入任何题目')
-  })}
+  },false)}
   const bulkApply=()=>{if(!active||readOnly||!bulk||dirty||!bulk.result.ok)return;void run(async()=>{
     const before={definition:structuredClone(active.definition),title:active.title}
     const updated=await api<ResearchDraft>(prefix+'/'+active.id+'/bulk-import/apply','POST',{
       revision:active.revision,digest:bulk.result.digest,batch:bulk.batch,
     })
-    setUndo(before);setActive(updated);setDirty(false);setBulk(null);setPreview(null)
+    setUndo(before);setActive(updated);setDirty(false);setBulk(null);setBulkText('');setPreview(null)
     await refreshAfterWrite(instrumentPage);setNotice('整批题目已导入。若需撤销，可使用撤销本次导入。')
   })}
   const undoImport=()=>{if(!active||readOnly||!undo)return;void run(async()=>{
@@ -209,16 +238,17 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
   }
   return <section className="survey-builder-shell bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="Survey Research Builder">
     <header><h2 className="text-xl font-semibold">研究工具 · Builder</h2>
-      <p className="text-sm text-slate-600">创建表单、心理量表、情境测验和受控认知任务。研究工具仅限本人项目；不进入正式科学量表目录。</p>
+      <p className="text-sm text-slate-600">创建表单、心理量表、情境测验和受控认知任务。自编工具默认私有，供本项目使用；量表可另行申请进入共用库，须经系统管理员审批。</p>
     </header>
     {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{apiIssues.length?'工具还有待修正字段，请按下方提示定位。':error}</p>}
     {active&&<ResearchIssueList draft={active} issues={apiIssues} onLocate={locateIssue}/>}
     <ResearchAuthoringGuide/>
     {listError&&<div role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{listError}
-      <button type="button" className="btn-secondary" disabled={listLoading} onClick={()=>void run(()=>refreshList(instrumentPage))}>重试研究工具列表</button></div>}
+      <button type="button" className="btn-secondary" disabled={listLoading} onClick={()=>void run(()=>refreshList(instrumentPage),false)}>重试研究工具列表</button></div>}
     {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}
     <fieldset disabled={busy} className="min-w-0 border-0 p-0 space-y-5" aria-label="研究工具操作">
-    <ResearchCatalog projectId={projectId} api={api} busy={busy} onImport={importCatalog}/>
+    <a className="survey-catalog-jump" href="#survey-authorized-catalog">已有授权工具？前往原版工具目录导入</a>
+    <a className="survey-catalog-jump" href="#survey-tool-navigation">查看当前工具属性与题目导航</a>
     <form className="flex flex-wrap gap-3 items-end border-b pb-4" onSubmit={create}>
       <label className="text-sm">工具类型
         <select className="input block" value={newKind} onChange={e=>setNewKind(e.target.value as Kind)}>
@@ -232,26 +262,27 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
     <div className="grid md:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[200px_minmax(0,1fr)_250px] gap-5">
       <nav aria-label="当前项目研究工具" className="space-y-2">
         <h3 className="font-semibold text-sm">工具列表</h3>
-        {!instruments.length&&<p className="text-xs text-slate-500">暂无工具草稿</p>}
+        {listLoading&&<p role="status" className="text-sm">正在加载研究工具…</p>}
+        {!listLoading&&!listError&&!instruments.length&&<p className="text-sm text-slate-500">本页暂无工具。可在上方创建草稿，或前往下方授权目录导入。</p>}
         <div className="flex items-center justify-between gap-2 text-xs mb-3">
           <button type="button" className="btn-secondary" disabled={busy||instrumentPage<=1}
-            onClick={()=>void run(()=>refreshList(instrumentPage-1))}>上一页</button>
+            onClick={()=>void run(()=>refreshList(instrumentPage-1),false)}>上一页</button>
           <span>第 {instrumentPage} 页</span>
           <button type="button" className="btn-secondary" disabled={busy||instruments.length<25}
-            onClick={()=>void run(()=>refreshList(instrumentPage+1))}>下一页</button>
+            onClick={()=>void run(()=>refreshList(instrumentPage+1),false)}>下一页</button>
         </div>
         {instruments.map(item=><button type="button" key={item.id}
           className={'block w-full text-left rounded-lg border p-3 '+(active?.id===item.id?'border-sky-700 bg-sky-50':'bg-white')}
-          onClick={()=>void select(item.id)} disabled={busy}>
+          aria-current={active?.id===item.id?true:undefined} onClick={()=>void select(item.id)} disabled={busy}>
           <strong className="block text-sm break-words">{item.title}</strong>
-          <span className="text-xs text-slate-600">{item.kind} · v{item.revision} · {item.status==='DRAFT'?'草稿':'已归档'}</span>
+          <span className="text-xs text-slate-600">{item.kind} · {kindLabel[item.kind]||item.kind} · 修订 {item.revision} · {toolStatus(item.status)}</span>
         </button>)}
       </nav>
       <div className="min-w-0 space-y-4">
-      {!active&&<div className="border border-dashed rounded-xl p-6 text-sm text-slate-600">选择工具后可编辑题目、检查结构并预览作答。正式发布在下方研究波次中进行。</div>}
+      {!active&&<div className="border border-dashed rounded-xl p-6 text-sm text-slate-600">选择工具后可编辑题目、检查结构并预览作答。量表等测量工具可在此发布自用版本；研究波次另行选择版本并冻结采集。</div>}
       {active&&<><div className="rounded-xl bg-slate-50 border p-4 space-y-3">
         <p className="text-xs">{displayKind[active.kind]} · 工具标识 <code>{active.instrumentKey}</code> · 修订 {active.revision} {dirty?'· 未保存':''}</p>
-        {readOnly&&<SourceProvenance provenance={active.sourceProvenance}/>}
+        {licensedReadOnly&&<SourceProvenance provenance={active.sourceProvenance}/>}
         <label className="text-sm block">研究工具名称
           <input className="input block w-full" value={active.title} readOnly={readOnly} maxLength={200} onChange={e=>{
             if(readOnly)return
@@ -265,6 +296,19 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
           <button className="btn-secondary" type="button" disabled={busy||dirty||active.status==='ARCHIVED'} onClick={archive}>归档</button>
           {undo&&<button className="btn-secondary" type="button" disabled={busy||dirty} onClick={undoImport}>撤销本次导入</button>}
         </div>
+        {active.kind!=='FORM'&&(!readOnly||(active.kind==='SCALE'&&!!active.catalogGrantId))&&<section aria-label="测量版本发布" className="rounded-lg border border-sky-200 bg-sky-50 p-3 space-y-2">
+          <h3 className="font-semibold text-sky-900">发布测量版本 · 项目自用</h3>
+          <p className="text-sm text-slate-600">发布保存后的精确测量版本供报告及波次使用，不启动采集。波次冻结会锁定该次采集内容；申请进入共用库需另行提交审核。</p>
+          <button type="button" className="btn-primary" disabled={busy||dirty||active.status==='ARCHIVED'||!measurementWritable} onClick={publishMeasurement}>发布测量版本</button>
+          {!measurementWritable&&<p className="text-sm">项目已关闭或归档，不能发布新的测量版本。</p>}
+          {publishedReleaseId&&<p className="text-xs break-all">已发布版本标识：{publishedReleaseId}</p>}
+        </section>}
+        {active.kind==='SCALE'&&!licensedReadOnly&&<>
+          <SurveyScaleVersions key={active.id+'-'+active.revision+'-'+active.status} projectId={projectId} draft={active} transport={api}/>
+          {active.status==='PUBLISHED'&&<><p className="text-sm text-sky-900">已发布版本只读。修订会建立下一版本草稿，不覆盖原发布版本。</p><button type="button" className="btn-primary" disabled={busy||dirty||!measurementWritable} onClick={revise}>修订新版本</button></>}
+          <button type="button" className="btn-secondary" onClick={()=>setShowLibrarySubmission(value=>!value)}>{showLibrarySubmission?'收起共用库申请':'申请进入共用库'}</button>
+          {showLibrarySubmission&&<SurveyScaleLibrarySubmission key={active.id} sourceId={active.id}/>}
+        </>}
         {dirty&&<p className="text-xs text-amber-700">请先保存。若另一个标签已经更新，服务器将拒绝旧 revision 的覆盖，本地内容不会被自动清除。</p>}
       </div>
       {!readOnly&&active.status==='DRAFT'&&<div ref={editorRoot} id="survey-authoring-definition" tabIndex={-1} className="survey-authoring-target">
@@ -329,15 +373,16 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
       </>}
       </div>
       <aside aria-label="研究工具属性与题目导航"
-        className="hidden xl:block min-w-0 self-start sticky top-4 max-h-[85vh] overflow-auto rounded-xl bg-slate-50 border p-4 space-y-3">
-        <h3 className="font-semibold">属性与题目导航</h3>
+        id="survey-tool-navigation" tabIndex={-1} className="survey-tool-navigation min-w-0 self-start rounded-xl bg-slate-50 border p-4">
+        <details open><summary className="font-semibold">属性与题目导航（可收起）</summary>
+        <div className="space-y-3">
         {!active&&<p className="text-xs text-slate-600">选择工具后显示其内容结构和保存状态。</p>}
         {active&&<>
           <p className="text-sm break-words font-medium">{active.title}</p>
           <dl className="text-xs space-y-2">
             <div><dt className="inline">类型：</dt><dd className="inline">{displayKind[active.kind]}</dd></div>
             <div><dt className="inline">修订：</dt><dd className="inline">v{active.revision}{dirty?'（未保存）':''}</dd></div>
-            <div><dt className="inline">状态：</dt><dd className="inline">{active.status}</dd></div>
+            <div><dt className="inline">状态：</dt><dd className="inline">{toolStatus(active.status)}</dd></div>
             <div><dt className="inline">工具编码：</dt><dd className="break-all">{active.instrumentKey}</dd></div>
           </dl>
           {!readOnly&&<div className="flex flex-col gap-2">
@@ -357,7 +402,7 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
           {!readOnly&&active.kind==='SCALE'&&<>
             <h4 className="text-sm font-semibold">维度与问题</h4>
             {(active.definition as ScaleDraft).dimensions.map(dim=>
-              <p className="text-xs" key={dim.dimensionKey}>{dim.label||dim.dimensionKey} · {dim.direction}</p>)}
+              <p className="text-xs" key={dim.dimensionKey}>{dim.label||dim.dimensionKey} · {directionLabel(dim.direction)}</p>)}
             {(active.definition as ScaleDraft).items.map(q=><a className="block text-xs underline break-words"
               href={'#survey-scale-'+q.itemKey} key={q.itemKey}>{q.prompt.slice(0,35)||'未填写题干'}</a>)}
           </>}
@@ -372,11 +417,13 @@ export function SurveyBuilder({projectId,instrumentLibrary}:{projectId:string;in
           {preview&&!preview.ok&&<p role="alert" className="text-xs text-red-700">
             结构未通过，先处理 {preview.issues.length} 项错误。目录不代表研究科学效度验证。
           </p>}
-          <p className="text-xs text-slate-600">左列切换研究工具；中列编辑题目；本列查看属性和快速定位。
-            手机端全部设置保持在题目内可访问，不依赖拖拽。</p>
+          <p className="text-xs text-slate-600">在工具列表切换工具，在编制区编辑题目；此处查看属性并快速定位。
+            手机端同样可展开题目导航，全部设置无需拖拽即可操作。</p>
         </>}
+        </div></details>
       </aside>
     </div>
+    <ResearchCatalog projectId={projectId} api={api} busy={busy} onImport={importCatalog}/>
     </fieldset>
   </section>
 }

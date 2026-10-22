@@ -1,3 +1,6 @@
+import {surveyExperiencePlan,surveyExperienceOutputs} from './survey-experience-scope.mjs';
+import {scaleLibraryGovernancePlan,scaleLibraryGovernanceOutputs} from './scale-library-governance-scope.mjs';
+import {compositeCsvMemoryPlan,compositeCsvMemoryOutputs} from './composite-csv-memory-scope.mjs';
 import {trainingWorkspacePlan,trainingWorkspaceOutputs} from './training-workspace-scope.mjs';
 import {exactCandidatePlan,exactCandidateOutputs} from './exact-candidate-scope.mjs';
 import {trainingFunctionalPlan} from './training-functional.mjs';
@@ -292,6 +295,25 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       Object.entries(output).map(([key,value])=>`${key}=${value}\n`).join(''));
     process.exit(0);
   }
+  const experience=surveyExperiencePlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  if((process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME)==='work/survey-experience-20261022'&&!experience)throw Error('Survey experience drift: no full-platform fallback');
+  if(experience){const output={...surveyExperienceOutputs(experience),...Object.fromEntries(Object.entries(runnerPlan({scenario:"survey-experience"})).map(([k,v])=>[k,Array.isArray(v)?JSON.stringify(v):v]))};console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
+  const governance = scaleLibraryGovernancePlan(event === 'workflow_dispatch' ? [] : changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  if((process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME)==='work/scale-library-governance-20261021'&&!governance)throw Error('Scale governance candidate drift: full-platform fallback is not authorized');
+  if(governance){
+    const output={...scaleLibraryGovernanceOutputs(governance),...Object.fromEntries(Object.entries(runnerPlan({scenario:'scale-library-governance'})).map(([k,v])=>[k,Array.isArray(v)?JSON.stringify(v):v]))};
+    console.log(JSON.stringify(output));
+    if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));
+    process.exit(0);
+  }
+  const csv = compositeCsvMemoryPlan(event === 'workflow_dispatch' ? [] : changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  if((process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME)==='work/composite-csv-memory-20261021'&&!csv)throw Error('CSV memory candidate drift: full-platform fallback is not authorized');
+  if(csv){
+    const output={...compositeCsvMemoryOutputs(csv),...Object.fromEntries(Object.entries(runnerPlan({scenario:'composite-csv-memory'})).map(([k,v])=>[k,Array.isArray(v)?JSON.stringify(v):v]))};
+    console.log(JSON.stringify(output));
+    if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));
+    process.exit(0);
+  }
   rejectSurveyManual();
   // Admission is also checked in job.if before checkout.
   if (event === 'pull_request' && process.env.CI_PR_REPOSITORY !== process.env.GITHUB_REPOSITORY)
@@ -301,7 +323,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     throw new Error('Choose a step_probe for component CI, or explicitly set full_acceptance=true for whole-platform CI');
   const entries = event === 'workflow_dispatch' ? [] : changedEntries(base);
   const workspace=trainingWorkspacePlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if((process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME)==='fix/training-course-pagination-20261021'&&!workspace)throw Error('Frozen Training workspace drift: unrelated platform fallback is not authorized');
+  if(['fix/training-course-pagination-20261021','backup/mac-training-workspace-20261022'].includes(process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME)&&!workspace)throw Error('Frozen Training workspace drift: unrelated platform fallback is not authorized');
   if(workspace){
     const output={...trainingWorkspaceOutputs(workspace),...Object.fromEntries(Object.entries(runnerPlan({scenario:'training-workspace'})).map(([k,v])=>[k,Array.isArray(v)?JSON.stringify(v):v]))};
     console.log(JSON.stringify(output));

@@ -1,3 +1,5 @@
+import { ScaleLibraryError } from '../scale-library-governance/contracts'
+import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
 import { loadScaleAnswers } from './scale-workflow.service'
 import { standaloneContextSchema } from './scale-context-input'
 import { withSerializableScaleTransaction } from './deployment/transactions'
@@ -6,7 +8,7 @@ import { z } from 'zod'
 import { prisma } from '../../config/database'
 import { error, forbidden, instrumentError, notFound, success } from '../../utils/response'
 import { logger } from '../../utils/logger'
-import { canStudentAccessScale } from './scale-access'
+import { canStudentAccessScale, canStartLibraryCourseScale } from './scale-access'
 import {
   ageMonthsAt,
   hashAssessmentContext,
@@ -88,6 +90,7 @@ const scaleSelect = {
   estimatedTime: true,
   status: true,
   visibility: true,
+  libraryEntryId: true,
   instrumentVersion: true,
   instrumentClass: true,
   definition: true,
@@ -117,6 +120,7 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
       // Resume is governed by the already-frozen admission. Current product
       // access, deployment and grant state are new-start controls and must not
       // retroactively invalidate an in-flight attempt.
+      await prisma.$transaction(tx => assertTrainingScaleCollectionAllowed(tx, [existing.scaleId]))
       if (existing.runtimeGeneration === 'UNIFIED_V1') await activateScaleAdmission({ ...existing, scale } as any)
       const stored = (await loadScaleAnswers(existing.answers, existing))
       if (stored.decryptError) return error(res, '测评答案无法读取，请联系管理员')
@@ -133,6 +137,10 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
         if (!currentScale || !(await canStudentAccessScale(currentScale, userId, tx))) {
           throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表不存在', 404)
         }
+        if (!(await canStartLibraryCourseScale(currentScale, userId, tx))) {
+          throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '课程量表使用授权已失效', 403)
+        }
+        await assertTrainingScaleCollectionAllowed(tx, [currentScale.id])
         const deployment = await resolveScaleStartDeployment({ db: tx, scale: currentScale, requestedMode: 'STANDALONE' })
         if (req.user?.role !== 'STUDENT' && (deployment.kind !== 'MANAGED_V2' || !deployment.runtimePolicy.applicability.respondentTypes.includes('SELF'))) {
           throw new InstrumentFinalSubmitError('STALE_ATTEMPT', 'This content does not authorize governed self-report starts', 403)
@@ -214,6 +222,7 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
     if (stored.decryptError) return error(res, '测评答案无法读取，请联系管理员')
     return success(res, (await responseEnvelope(assessment, scale)), '测评已开始')
   } catch (err) {
+    if (err instanceof ScaleLibraryError) return error(res, err.message, -1, err.statusCode)
     if (err instanceof InstrumentFinalSubmitError) return instrumentError(res, err.code, err.message, err.statusCode)
     logger.error('开始 v2 量表测评错误', err)
     return error(res, err instanceof Error ? err.message : '开始测评失败')

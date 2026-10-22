@@ -64,8 +64,10 @@ const publicScale = {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPrisma.$queryRaw.mockResolvedValue([])
   process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
   mockPrisma.$transaction.mockImplementation(async (callback: (tx: typeof mockPrisma) => unknown) => callback(mockPrisma))
+  mockPrisma.scale.findMany.mockResolvedValue([{id:'scale-1',measurementReleaseId:null}])
   mockPrisma.assessment.updateMany.mockResolvedValue({ count: 1 })
 })
 
@@ -107,6 +109,12 @@ describe('Scale v2 controller boundaries', () => {
     mockPrisma.scale.findMany.mockResolvedValue([{ ...publicScale, copySource }])
     mockPrisma.scale.count.mockResolvedValue(1)
     mockPrisma.materialGrant.findMany.mockResolvedValue([{ resourceId: 'scale-1' }])
+    mockPrisma.$queryRaw.mockImplementation(async (query: any) => {
+      const sql=Array.from(query.strings ?? query).join(' ')
+      if(sql.includes('FROM users'))return [{id:userId,platform_role:null,account_domain:'TRAINING',role,teacher_approved:true,expires_at:null}]
+      if(sql.includes('clock_timestamp() AS now'))return [{now:new Date()}]
+      return [] // No platform library grants/wrappers in this legacy provenance fixture.
+    })
     const res = makeRes()
     await scaleController.list(makeReq({ user: { userId, role } }) as any, res)
     expect(res.statusCode).toBe(200)
@@ -147,7 +155,7 @@ describe('Scale v2 controller boundaries', () => {
 
   it('keeps an assessment in progress when a required item is missing', async () => {
     mockPrisma.assessment.findUnique.mockResolvedValue({
-      id: 'assessment-1',
+      id: 'assessment-1', scaleId: 'scale-1',
       userId: 'student-1',
       status: 'IN_PROGRESS',
       answers: [{ itemCode: 'ADEXI-01', responseValue: 'never' }],
@@ -178,7 +186,7 @@ describe('Scale v2 controller boundaries', () => {
       return responseSet?.options[0]?.value
     }
     mockPrisma.assessment.findUnique.mockResolvedValue({
-      id: 'assessment-1',
+      id: 'assessment-1', scaleId: 'scale-1',
       userId: 'student-1',
       status: 'IN_PROGRESS',
       answers: encryptScaleAnswers([]),
@@ -224,7 +232,7 @@ describe('Scale v2 controller boundaries', () => {
     const responseSet = definition.responseSets.find((set) => set.key === item.responseSetKey)
     const responseValue = responseSet?.options[0]?.value
     mockPrisma.assessment.findUnique.mockResolvedValue({
-      id: 'assessment-1',
+      id: 'assessment-1', scaleId: 'scale-1',
       userId: 'student-1',
       status: 'IN_PROGRESS',
       answers: encryptScaleAnswers([{ itemCode: item.itemCode, responseValue, changeCount: 4 }]),
@@ -264,7 +272,7 @@ describe('Scale v2 controller boundaries', () => {
     const currentValue = responseSet?.options[0]?.value
     const nextValue = responseSet?.options.find((option) => option.value !== currentValue)?.value
     mockPrisma.assessment.findUnique.mockResolvedValue({
-      id: 'assessment-1',
+      id: 'assessment-1', scaleId: 'scale-1',
       userId: 'student-1',
       status: 'IN_PROGRESS',
       answers: encryptScaleAnswers([{ itemCode: item.itemCode, responseValue: currentValue, revision: 2 }]),

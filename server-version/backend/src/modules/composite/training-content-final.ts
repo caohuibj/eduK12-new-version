@@ -9,7 +9,7 @@ import type {CanonicalUnitResultEnvelopeV1} from '../assessment-runtime/unit-res
 import {getContentRelease,type StoredRelease} from '../measurement-content/repository'
 import {ContentReleaseError} from '../measurement-content/release'
 import {interpretContentBinding,FinalInterpretationIdentityError,type FinalInterpretation} from '../measurement-content/final-interpretation'
-import {trainingContentSnapshotSchema,trainingMeasurementSourceScopeMatches} from './training-content-binding'
+import {trainingContentSnapshotSchema,trainingMeasurementSourceScopeMatchesForConsumer} from './training-content-binding'
 
 const text=z.string().min(1).max(240),hash=z.string().regex(/^[a-f0-9]{64}$/)
 const bindingSchema=z.object({schemaVersion:z.literal(1),compositeId:text,attemptId:text,epoch:z.number().int().positive(),
@@ -63,7 +63,8 @@ export async function prepareTrainingFinalReceipt(tx:Prisma.TransactionClient,in
       if(scope.kind!=='PRIVATE'||scope.product!=='TRAINING'||scope.ownerId!==parent.compositeAssessment.createdBy||scope.resourceId!==binding.compositeId)fail()
     }else if(release.layer==='MEASUREMENT'){
       const matching=binding.units.filter(u=>u.measurement.releaseId===id)
-      if(!matching.length||matching.some(u=>release!.family!==u.family||!trainingMeasurementSourceScopeMatches(release!,u.source)))fail()
+      if(!matching.length)fail()
+      for(const unit of matching)if(release.family!==unit.family||!await trainingMeasurementSourceScopeMatchesForConsumer(tx,release,unit.source))fail()
     }else if(release.layer==='REFERENCE'){
       const matching=binding.units.filter(u=>referenceBinding?.units.find(r=>r.itemId===u.itemId)?.references.some(r=>r.status==='SELECTED'&&r.releaseId===id))
       if(!matching.length)fail()

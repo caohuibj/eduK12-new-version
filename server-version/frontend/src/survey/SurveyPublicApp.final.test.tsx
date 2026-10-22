@@ -25,10 +25,10 @@ async function openTask(){
   const view=render(<SurveyPublicApp/>)
   fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
   await screen.findByRole('radio',{name:'同意'})
-  await waitFor(()=>expect(screen.getByRole('button',{name:'提交本轮正式回答'})).toBeEnabled())
+  await waitFor(()=>expect(screen.getByRole('button',{name:/^(提交本轮正式回答|重试原提交)$/})).toBeEnabled())
   return view
 }
-const submit=()=>fireEvent.click(screen.getByRole('button',{name:'提交本轮正式回答'}))
+const submit=()=>fireEvent.click(screen.getByRole('button',{name:/^(提交本轮正式回答|重试原提交)$/}))
 beforeEach(()=>{
   HTMLElement.prototype.scrollIntoView=vi.fn()
   sessionStorage.clear()
@@ -71,6 +71,36 @@ const firstSuccess=(overrides:Record<string,unknown>={})=>({
 const generalCalls=()=>vi.mocked(fetch).mock.calls.filter(([url])=>String(url).endsWith('/general'))
 
 describe('Survey first-success GENERAL receipt consumption',()=>{
+  it('blocks all-at-once image answers and FINAL until actual decode, and keeps restored choices through failure/retry',async()=>{
+    const image={asset:{assetId:'stimulus',contentHash:'b'.repeat(64),mimeType:'image/png'},altText:'Required stimulus'}
+    taskOverrides={units:[{...task.units[0],presentationMode:'ALL_AT_ONCE',items:[{...task.units[0].items[0],images:[image]}]}]}
+    const originalFetch=fetch
+    const create=URL.createObjectURL,revoke=URL.revokeObjectURL
+    URL.createObjectURL=vi.fn().mockReturnValue('blob:stimulus');URL.revokeObjectURL=vi.fn()
+    vi.stubGlobal('fetch',vi.fn((url:string,init?:RequestInit)=>url.endsWith('/images/stimulus')
+      ?Promise.resolve(new Response(new Blob(['image'], { type: 'image/png' }), { status: 200, headers: { 'Content-Type': 'image/png' } }))
+      :originalFetch(url,init)))
+    try{
+      render(<SurveyPublicApp/>)
+      fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+      const picture=await screen.findByAltText('Required stimulus')
+      expect(screen.getByRole('radio',{name:'同意'})).toBeDisabled()
+      expect(screen.getByRole('button',{name:'提交本轮正式回答'})).toBeDisabled()
+      fireEvent.load(picture)
+      fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+      fireEvent.error(picture)
+      expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
+      expect(screen.getByRole('radio',{name:'同意'})).toBeDisabled()
+      expect(screen.getByRole('button',{name:'提交本轮正式回答'})).toBeDisabled()
+      expect(finalCalls).toHaveLength(0)
+      fireEvent.click(screen.getByRole('button',{name:'重试图片'}))
+      fireEvent.load(await screen.findByAltText('Required stimulus'))
+      expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
+      expect(screen.getByRole('button',{name:'提交本轮正式回答'})).toBeEnabled()
+      submit()
+      await waitFor(()=>expect(finalCalls).toHaveLength(1))
+    }finally{URL.createObjectURL=create;URL.revokeObjectURL=revoke}
+  })
   it('renders the controlled first-success receipt without another HTTP request or persisting it',async()=>{
     finalReply=()=>response(firstSuccess())
     generalReply=()=>Promise.reject(new Error('First success must not read GENERAL'))
@@ -256,12 +286,60 @@ describe('Survey authoritative FINAL and timing lifecycle',()=>{
     expect(vi.mocked(fetch).mock.calls.filter(([url])=>String(url).endsWith('/general'))).toHaveLength(0)
   })
 
+
+  it('announces recovery while the task request is pending',async()=>{
+    const originalFetch=fetch
+    let resolve!:(value:Response)=>void
+    vi.stubGlobal('fetch',vi.fn((url:string,init?:RequestInit)=>url.endsWith('/task')
+      ?new Promise<Response>(done=>{resolve=done}):originalFetch(url,init)))
+    render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+    expect(screen.getByRole('button',{name:'正在恢复…'})).toBeDisabled()
+    expect(screen.getByText('正在恢复本次作答，请稍候…')).toHaveAttribute('aria-live','polite')
+    await act(async()=>resolve(await response(taskValue)))
+    await screen.findByRole('radio',{name:'同意'})
+    expect(screen.queryByText('正在恢复本次作答，请稍候…')).toBeNull()
+  })
+  it('focuses the missing SJT question using the existing required rule',async()=>{
+    taskOverrides={units:[{kind:'SJT',instrumentKey:'sjt',title:'情境工具',questions:[
+      {questionKey:'choice',prompt:'请选择处理方式',required:true,options:[{optionKey:'yes',label:'同意'}]},
+    ]},task.units[0]]}
+    render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+    fireEvent.click(await screen.findByRole('button',{name:'确认当前工具，继续'}))
+    await waitFor(()=>expect(document.getElementById('survey-answer-sjt-choice')).toHaveFocus())
+    expect(finalCalls).toHaveLength(0)
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    fireEvent.click(screen.getByRole('button',{name:'确认当前工具，继续'}))
+    await waitFor(()=>expect(screen.getByText('本轮研究作答')).toHaveFocus())
+    fireEvent.click(screen.getByRole('button',{name:'上一工具'}))
+    expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
+  })
+  it('returns to the first missing timed item without discarding other answers',async()=>{
+    taskValue.units[0].items.push({itemKey:'q2',prompt:'第二题',required:true})
+    await openTask()
+    fireEvent.click(screen.getByRole('button',{name:'下一题'}))
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    submit()
+    await waitFor(()=>expect(document.getElementById('survey-answer-scale-q1')).toHaveFocus())
+    expect(finalCalls).toHaveLength(0)
+    fireEvent.click(screen.getByRole('button',{name:'下一题'}))
+    expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
+  })
+  it('keeps optional timed items optional when locating incomplete answers',async()=>{
+    taskValue.units[0].items[0].required=false
+    await openTask();submit()
+    await screen.findByText('感谢参与')
+    expect(finalCalls).toHaveLength(1)
+  })
   it('retries exact sealed answers and timing after an uncertain response',async()=>{
     finalReply=()=>Promise.reject(new Error('网络中断'))
     await openTask()
     now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
     await screen.findByRole('alert')
     expect(finalCalls).toHaveLength(1)
+    expect(screen.getByRole('button',{name:'重试原提交'})).toBeEnabled()
+    expect(screen.getByText(/本次答案已封存，尚未确认提交结果/)).toBeInTheDocument()
     now=9000
     submit()
     await waitFor(()=>expect(finalCalls).toHaveLength(2))
@@ -310,7 +388,9 @@ describe('Survey authoritative FINAL and timing lifecycle',()=>{
     await openTask()
     now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
     expect(screen.getByRole('radio',{name:'不同意'})).toBeDisabled()
-    fireEvent.submit(screen.getByRole('button',{name:'提交本轮正式回答'}).closest('form')!)
+    expect(screen.getByRole('button',{name:'正在提交…'})).toBeDisabled()
+    expect(screen.getByText('正在提交，请勿刷新或重复操作…')).toHaveAttribute('role','status')
+    fireEvent.submit(screen.getByRole('button',{name:'正在提交…'}).closest('form')!)
     expect(finalCalls).toHaveLength(1)
     await act(async()=>{resolve(await response({status:'COMPLETED'}))})
     await screen.findByText('感谢参与')

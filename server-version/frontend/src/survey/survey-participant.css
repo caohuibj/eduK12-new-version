@@ -75,3 +75,11 @@ section[aria-label='认知任务设备检查'] :is(input, button):focus-visible 
   .survey-answer-panel :focus-visible,
   .survey-participant-skip:focus { outline-color: Highlight; }
 }
+
+/* Wave choices are entry UI only, never an ancestor of a cognitive stimulus. */
+.survey-wave-row > div { min-width: 0; overflow-wrap: anywhere; }
+.survey-wave-row > button { flex-shrink: 0; }
+@media (max-width: 600px) {
+  .survey-wave-row { flex-direction: column; align-items: stretch; }
+  .survey-wave-row > button { width: 100%; }
+}

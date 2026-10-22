@@ -9,7 +9,7 @@ import {referenceEntryKey} from '../measurement-content/reference-candidate'
 import {selectFrozenReferencePolicy,type FrozenReferencePolicy,type VerifiedReferenceForSelection} from '../measurement-content/reference-policy'
 import {interpretContentBinding,type FinalInterpretation,type FinalInterpretationUnit} from '../measurement-content/final-interpretation'
 import {renderDeclaredReport,DECLARATIVE_REPORT_GENERATOR} from '../measurement-content/report-renderer'
-import {trainingMeasurementSourceScopeMatches} from '../composite/training-content-binding'
+import {trainingMeasurementSourceScopeMatchesForConsumer} from '../composite/training-content-binding'
 import {trainingReportDisclosureAllowed,type TrainingMetricDisclosure} from '../composite/training-metric-disclosure'
 import type {AssessmentReferenceEntry,ReferenceContext} from '../assessment-reference/reference'
 import {authorizeTrainingReinterpretation,recheckTrainingReinterpretationAuthority,trainingInterpretationSource,readTrainingInterpretationFacts,readTrainingInterpretationDisclosure,
@@ -108,7 +108,7 @@ export async function createTrainingReinterpretation(context:TrainingReinterpret
   if(prior){if(prior.request_hash!==requestHash||prior.created_by!==c.actorId)interpretationFail('REQUEST_CONFLICT');return response(tx,c,parent,prior)}
   const source=trainingInterpretationSource(parent,input.itemId),reader=releaseReader(tx),measurement=await reader.read(source.unit.measurement.releaseId)
   if(measurement.layer!=='MEASUREMENT'||measurement.family!==source.unit.family||measurement.contentHash!==source.unit.measurement.contentHash
-   ||measurement.content.measurementHash!==source.unit.measurement.measurementHash||!trainingMeasurementSourceScopeMatches(measurement,source.unit.source)
+   ||measurement.content.measurementHash!==source.unit.measurement.measurementHash||!await trainingMeasurementSourceScopeMatchesForConsumer(tx,measurement,source.unit.source)
    ||measurement.status==='REVOKED')return interpretationFail('MEASUREMENT_UNAVAILABLE')
   let previous:TrainingInterpretationArtifact['previous']={kind:'FINAL_RECEIPT',hash:parent.trainingContentInterpretationHash!}
   if(input.previousArtifactId){

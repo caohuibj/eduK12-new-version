@@ -281,6 +281,8 @@ describe('course isLibrary', () => {
     const res = makeRes()
     await courseController.delete(makeReq() as any, res)
 
+    expect(mockPrisma.$queryRaw.mock.calls[0][0].join('')).toContain('FOR UPDATE')
+    expect(mockPrisma.$queryRaw.mock.invocationCallOrder[0]).toBeLessThan(mockPrisma.checkin.findMany.mock.invocationCallOrder[0])
     expect(mockPrisma.assetReference.deleteMany).toHaveBeenCalledWith({
       where: { entityType: 'Course', entityId: 'course-1' },
     })

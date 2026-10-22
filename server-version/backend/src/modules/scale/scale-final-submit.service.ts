@@ -1,3 +1,5 @@
+import { canStartLibraryCourseScale } from './scale-access'
+import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
 import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
 import { loadScaleAnswers } from './scale-workflow.service'
 import { Prisma } from '@prisma/client'
@@ -433,6 +435,7 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput) => {
       }
     }
     if (current.status !== 'IN_PROGRESS') throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评已结束', 409)
+    await assertTrainingScaleCollectionAllowed(tx, [assessment.scaleId])
     const completedAt = new Date()
     const totalTime = Math.max(0, completedAt.getTime() - new Date(assessment.startedAt).getTime())
     const updated = await tx.assessment.updateMany({
@@ -632,12 +635,15 @@ export const restartStandaloneScaleAssessment = async (assessmentId: string, use
             instrumentClass: true,
             definition: true,
             status: true,
+            visibility: true,
+            libraryEntryId: true,
           },
         },
       },
     })
     if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
     if (current.userId !== userId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限重启此量表测评', 403)
+    await assertTrainingScaleCollectionAllowed(tx,[current.scaleId])
     if (current.questionnaireAssessmentId || current.compositeAttemptId) {
       throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '嵌入式量表必须重启所属问卷或综合测评', 409)
     }
@@ -647,6 +653,9 @@ export const restartStandaloneScaleAssessment = async (assessmentId: string, use
 
     if (current.scale.status !== 'PUBLISHED') {
       throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '量表已不再可用于新测评', 409)
+    }
+    if (!(await canStartLibraryCourseScale(current.scale, userId, tx))) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '课程量表使用授权已失效', 403)
     }
     const definition = scaleDefinitionFromRecord(current.scale)
     const runtimeSnapshot = await freezeScaleRuntimeAtAttemptStart(tx as any, {

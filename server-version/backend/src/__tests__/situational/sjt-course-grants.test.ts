@@ -265,3 +265,27 @@ describe('C13 grant administration and adaptation', () => {
     expect(db.sjtAuthorDraft.updateMany).not.toHaveBeenCalled()
   })
 })
+
+describe('version copy retains current ADAPT authorization through commit', () => {
+  it('locks the exact source grant and rejects a revocation observed under that lock before writing a copy', async () => {
+    const receipt = { policy: 'COURSE_GRANT_V1', grantId: grant.id, grantVersion: grant.version,
+      permission: 'ADAPT', releaseId: release.id, ...exactInput, courseId: scope.courseId, granteeTeacherId: scope.teacherId,
+      purpose: scope.purpose, validFrom: grant.validFrom.toISOString(), expiresAt: grant.expiresAt.toISOString(), admittedAt: now.toISOString() }
+    const adapted = { ...sourceDraft, id: 'adapted-published', ownerId: actor.userId,
+      template: { ...template, instrumentVersion: '2.0.0' },
+      adaptationSource: { protocol: 'sjt-adaptation-v1', receipt, sourceDraftId: sourceDraft.id, sourceAuthorId: 'author' } }
+    db.sjtAuthorDraft.findUnique.mockImplementation(({where}) => where.id === adapted.id ? adapted : sourceDraft)
+    db.sjtReleaseGrant.findMany.mockResolvedValue([{ ...grant, permission: 'ADAPT' }])
+    db.$queryRaw.mockImplementation(async (sql: any) => {
+      if (sqlText(sql).includes('sjt_release_grants')) {
+        db.sjtReleaseGrant.findMany.mockResolvedValue([{ ...grant, permission: 'ADAPT', status: 'REVOKED' }])
+      }
+      return []
+    })
+    const {forkSjtDraftVersion} = await import('../../modules/situational/authoring/service')
+    await expect(forkSjtDraftVersion(actor, adapted.id)).rejects.toMatchObject({statusCode: 403})
+    expect(db.$queryRaw.mock.calls.some(([sql]) => sqlText(sql).includes('sjt_release_grants'))).toBe(true)
+    expect(db.sjtAuthorDraft.create).not.toHaveBeenCalled()
+    expect(db.sjtAuthorAudit.create).not.toHaveBeenCalled()
+  })
+})

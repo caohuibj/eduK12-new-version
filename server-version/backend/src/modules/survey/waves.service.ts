@@ -65,7 +65,7 @@ async function validateDraftRefs(tx:Tx,pid:string,ids:string[]){
   if(!ids.length)return
   const rows=await tx.surveyInstrumentDraft.findMany({where:{projectId:pid,id:{in:ids}},
     select:{id:true,status:true}})
-  if(rows.length!==ids.length||rows.some(x=>x.status!=='DRAFT'))
+  if(rows.length!==ids.length||rows.some(x=>!['DRAFT','PUBLISHED'].includes(x.status)))
     fail(403,'有研究工具不属于当前项目或已归档')
 }
 export async function listWaves(uid:string,pid:string,page:number){
@@ -265,9 +265,11 @@ export async function preflightWave(uid:string,pid:string,wid:string){
   try{
     await prisma.$transaction(async tx=>{
       await ownProject(tx,uid,pid,false)
-      await assertSurveyMediaOwned(tx,uid,pid,input.drafts.map(d=>({
-        kind:surveyKindSchema.parse(d.kind),definition:d.definition,
-      })))
+      await assertSurveyMediaOwned(tx,uid,pid,input.drafts.map(d=>{
+        const unit=d.catalogGrantId?compileCatalogUnit(d,input.catalogSources.get(d.catalogGrantId)!):null
+        return {kind:surveyKindSchema.parse(d.kind),definition:d.definition,
+          ...(unit?{compiledDefinition:unit.compiledDefinition,sourceProvenance:unit.sourceProvenance}:{})}
+      }))
     })
     checks.push({key:'media',ok:true,issues:[]})
   }catch(e){

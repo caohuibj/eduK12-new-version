@@ -67,6 +67,7 @@ router.post('/', authenticate, requireTeacher, scaleController.create)
 
 // Only explicitly eligible authored published sources can create a new identity.
 router.post('/:id/copy', authenticate, requireTeacher, scaleController.copy)
+router.post('/:id/revise', authenticate, requireTeacher, scaleController.revise)
 
 // 更新量表
 router.put('/:id', authenticate, requireTeacher, scaleController.update)
@@ -114,3 +115,7 @@ router.get('/:scaleId/export/preview', authenticate, requireTeacher, scaleContro
 router.post('/:scaleId/export', authenticate, requireTeacher, scaleController.exportScaleData)
 
 export default router
+
+router.post('/:id/public-delivery', authenticate, requireTeacher, scaleController.publicDelivery)
+
+router.get('/:id/versions', authenticate, requireTeacher, scaleController.versions)

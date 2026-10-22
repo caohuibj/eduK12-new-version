@@ -11,12 +11,19 @@ export type CheckinTemplate = {
 
 /** Row lock + occurrence unique key make retries and multiple API processes safe. */
 export async function publishDueCheckinSchedule(tx: Prisma.TransactionClient, id: string, now: Date) {
+  // Lock the parent before its child, matching course deletion/cascade order.
+  // The initial lookup is only a locator; all mutable state is read again below.
+  const target = await tx.checkinSchedule.findUnique({ where: { id }, select: { courseId: true, creatorId: true } })
+  if (!target) return null
+  await tx.$queryRaw`SELECT id FROM courses WHERE id = ${target.courseId} FOR UPDATE`
   await tx.$queryRaw`SELECT id FROM checkin_schedules WHERE id = ${id} FOR UPDATE`
+  // A completed account revocation must be visible before publishing. Keep the
+  // eligibility row stable through the occurrence/reference/cursor commit.
+  await tx.$queryRaw`SELECT id FROM users WHERE id = ${target.creatorId} FOR SHARE`
   const schedule = await tx.checkinSchedule.findUnique({ where: { id }, include: { creator: { select: {
     id: true, role: true, accountDomain: true, isActive: true, isFrozen: true, teacherApproved: true, expiresAt: true,
   } } } })
   if (!schedule?.active || !schedule.nextPublishAt || schedule.nextPublishAt > now) return null
-  await tx.$queryRaw`SELECT id FROM courses WHERE id = ${schedule.courseId} FOR UPDATE`
   const course = await tx.course.findUnique({ where: { id: schedule.courseId }, select: { id: true, creatorId: true, status: true, courseType: true } })
   const owner = schedule.creator
   if (!course || course.status !== 'PUBLISHED' || course.courseType === 'CAMPUS_ACTIVITY'

@@ -29,6 +29,42 @@ import fs from 'node:fs/promises'
 
 process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
 
+describe('CSV serialization compatibility', () => {
+  it('keeps exact default bytes, column and row order without modifying input', () => {
+    const fields = [
+      { name: 'text', label: 'Text', type: 'string' as const },
+      { name: 'number', label: 'Number', type: 'numeric' as const },
+      { name: 'date', label: 'Date', type: 'date' as const },
+      { name: 'missing', label: 'Missing', type: 'string' as const },
+    ]
+    const rows = [
+      { number: -2.5, text: ' \t=1', date: '-2026' },
+      { text: '\u200B=1', number: 0, date: null },
+      { text: '中文,"字"\n尾', number: null, date: undefined },
+    ]
+    rows.forEach(Object.freeze)
+    fields.forEach(Object.freeze)
+    Object.freeze(rows)
+    Object.freeze(fields)
+    const data = Object.freeze({ fields, rows })
+    const expected = 'text,number,date,missing\n\' \t=1,-2.5,-2026,\n\u200B=1,0,,\n"中文,""字""\n尾",,,'
+    expect(exportCognitiveToCSV(data)).toBe(expected)
+    expect(exportCognitiveToCSV(data, undefined)).toBe(expected)
+    expect(exportCognitiveToCSV(data, value => value)).toBe(expected)
+    expect(rows[0].text).toBe(' \t=1')
+  })
+
+  it('applies the optional transform before unchanged formula protection and quoting', () => {
+    const field = { name: 'text', label: 'Text', type: 'string' as const }
+    const row = Object.freeze({ text: 'original' })
+    const transform = vi.fn(() => '=SUM(1,"2")\n')
+    expect(exportCognitiveToCSV({ fields: [field], rows: [row] }, transform))
+      .toBe('text\n"\'=SUM(1,""2"")\n"')
+    expect(transform).toHaveBeenCalledExactlyOnceWith('original', field)
+    expect(row.text).toBe('original')
+  })
+})
+
 it('does not label a mixed-version column with only the first frozen unit or enum', () => {
   const fields = new ExportFieldBuilder()
   const name = fields.add('M_value', 'Frozen metric', 'numeric', undefined, 2, { unit: 'ms', allowedValues: [1, 2] })

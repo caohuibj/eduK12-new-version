@@ -18,7 +18,7 @@ export function SurveyWorkspaceNav({active,onChange,title}:{active:WorkspaceSect
   return <header className="survey-workspace-nav">
     <p className="survey-workspace-eyebrow">当前研究</p><h2>{title}</h2>
     <p>按研究设置、工具编制、报告编制、发布采集和数据整理逐步完成。切换分区会保留本页未保存的编辑；离开页面前请保存。</p>
-    <div role="tablist" aria-label="研究工作分区" style={{gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))'}}>
+    <div role="tablist" aria-label="研究工作分区">
       {sections.map(([key,label,hint],index)=><button key={key} type="button" role="tab"
         id={'survey-workspace-tab-'+key} aria-controls={'survey-workspace-'+key}
         aria-selected={active===key} aria-label={label} tabIndex={active===key?0:-1}

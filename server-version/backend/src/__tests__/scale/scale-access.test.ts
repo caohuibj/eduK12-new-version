@@ -3,6 +3,7 @@ import { CourseStudentStatus } from '@prisma/client'
 
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
+    scale: { findUnique: vi.fn().mockResolvedValue({legacyPublicAccess:true,instrumentClass:'CUSTOM_DESCRIPTIVE',publicDistributionGrantId:null}) },
     courseStudent: { findFirst: vi.fn() },
   },
 }))

@@ -1,3 +1,4 @@
+import {SurveyCatalogScaleMedia,type SurveyScaleMedia} from './SurveyCatalogScaleMedia'
 import { BasicFormAnswer } from '../modules/assessment-core/form/BasicFormAnswer'
 import { cleanupExpiredSurveyCognitiveDrafts } from './survey-cognitive-retention'
 import { clearSurveyCognitiveSessions,rememberSurveyCognitiveSession } from './survey-cognitive-local'
@@ -24,7 +25,7 @@ type Wave={id:string;title:string;ordinal:number;status:string;consentText:strin
   groupIpPolicy?:{schemaVersion:1;timeZone:string;activationDate?:string}|null;groupIpActivatedAt?:string|null}
 type StudyInfo={project:{name:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:string};waves:Wave[];scopeWaveId?:string|null}
 type Choice={optionKey:string;label:string;nonanswerReason?:'DECLINED'|'UNABLE_TO_JUDGE'}
-type Question={itemKey:string;questionKey?:string;type:string;prompt:string;image?:SurveyPublicImage;required:boolean;
+type Question=SurveyScaleMedia&{responseOptions?:Choice[];itemKey:string;questionKey?:string;type:string;prompt:string;image?:SurveyPublicImage;required:boolean;
   options:Choice[];rows?:{rowKey:string;label:string}[];allowRefusal?:boolean;displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string};
   min?:number;max?:number;integerOnly?:boolean;step?:number;precision?:number;
   maxLength?:number;minSelections?:number;maxSelections?:number;
@@ -101,10 +102,10 @@ const publicApi=async <T,>(path:string,method='GET',body?:unknown):Promise<T>=>{
   if(!result.ok||envelope.code!==0||!envelope.data)throw new SurveyPublicApiError(envelope.message||'操作未完成',result.status)
   return envelope.data
 }
-export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purpose='SURVEY',readOnly=false}:{unit:Unit;answer:Record<string,Answer>;
+export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purpose='SURVEY',readOnly=false,videoComplete,onVideoComplete,imageReady,onImageReadyChange}:{unit:Unit;answer:Record<string,Answer>;
   onChange:(name:string,value:Answer)=>void;proof?:SurveyImageProof;
   pageIndex:number;onPageChange:(next:number)=>void;
-  purpose?:'SURVEY'|'HUITEACHER';readOnly?:boolean}){
+  purpose?:'SURVEY'|'HUITEACHER';readOnly?:boolean;videoComplete?:Record<string,boolean>;onVideoComplete?:(itemKey:string)=>void;imageReady?:Record<string,boolean>;onImageReadyChange?:(itemKey:string,ready:boolean)=>void}){
   const [pageError,setPageError]=useState('')
 
   const shownFormKeys=unit.kind==='FORM'
@@ -161,13 +162,14 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
             selected,o.optionKey,e.target.checked,q.exclusiveOptionKeys))}/> {o.label}</label>
     }):options.map(o=><label className="block my-2 text-sm" key={o.optionKey}>
       <input type="radio" name={unit.instrumentKey+'-'+q.itemKey}
-        checked={answer[q.itemKey]===o.optionKey}
+        checked={answer[q.itemKey]===o.optionKey} disabled={unit.kind==='SCALE'&&!!q.images?.length&&imageReady?.[q.itemKey]!==true}
         onChange={()=>onChange(q.itemKey,o.optionKey)}/> {o.label}</label>)
   const item=(q:Question)=>{
     if(shownFormKeys&&!shownFormKeys.has(q.itemKey))return null
     return <fieldset disabled={readOnly} className="border rounded-lg p-4 my-4 bg-white scroll-mt-4"
       id={'survey-answer-'+unit.instrumentKey+'-'+q.itemKey} tabIndex={-1} key={q.itemKey}>
       <legend className="font-medium text-sm">{q.prompt}{q.required?' *':''}</legend>
+      {unit.kind==='SCALE'&&proof&&<SurveyCatalogScaleMedia item={q} proof={proof} instrumentKey={unit.instrumentKey} itemKey={q.itemKey} complete={videoComplete?.[q.itemKey]} onComplete={()=>onVideoComplete?.(q.itemKey)} onImagesReadyChange={ready=>onImageReadyChange?.(q.itemKey,ready)} readOnly={readOnly}/>}
       {q.image&&proof&&<SurveyParticipantImage image={q.image} proof={proof}/>}
       {q.type==='MULTIPLE'&&q.maxSelections!==undefined&&<p className="text-xs mb-2">
         请选 {q.minSelections??1} 至 {q.maxSelections} 项。</p>}
@@ -217,12 +219,12 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
       {pageError&&<p role="alert" className="text-sm text-red-700 my-2">{pageError}</p>}
       <nav aria-label="问卷分页" className="flex justify-between gap-3 mt-4">
         <button type="button" className="btn-secondary" disabled={currentIndex===0}
-          onClick={()=>{setPageError('');onPageChange(Math.max(0,currentIndex-1))}}>上一页</button>
+          onClick={()=>{setPageError('');onPageChange(Math.max(0,currentIndex-1));window.requestAnimationFrame(()=>document.getElementById('survey-page-'+unit.instrumentKey)?.focus())}}>上一页</button>
         <button type="button" className="btn-secondary"
           disabled={!activePage||currentIndex>=visiblePages.length-1} onClick={nextPage}>下一页</button>
       </nav>
     </div>}
-    {unit.kind==='SCALE'&&unit.items?.map(q=>item({...q,type:'LIKERT',options:unit.responseOptions||[]}))}
+    {unit.kind==='SCALE'&&unit.items?.map(q=>item({...q,type:'LIKERT',options:q.responseOptions??unit.responseOptions??[]}))}
     {unit.kind==='SJT'&&(unit.scenes??[{sceneKey:'legacy',title:unit.scenarioTitle,stimulus:unit.stimulus,image:unit.image,questions:unit.questions??[]}]).map(scene=><section key={scene.sceneKey} aria-label={'情境 '+scene.title} className="mt-4 space-y-3">
       <h4 className="font-medium">{scene.title}</h4><p className="whitespace-pre-wrap text-sm">{scene.stimulus}</p>
       {scene.image&&proof&&<SurveyParticipantImage image={scene.image} proof={proof}/>}
@@ -245,12 +247,15 @@ export default function SurveyPublicApp(){
   })
   const [info,setInfo]=useState<StudyInfo|null>(null),[loading,setLoading]=useState(true)
   const [error,setError]=useState(''),[busy,setBusy]=useState(false)
+  const [busyLabel,setBusyLabel]=useState('')
   const [researchCode,setResearchCode]=useState(''),[accessCredential,setAccessCredential]=useState('')
   const [proofReceived,setProofReceived]=useState(false),[home,setHome]=useState<Wave[]|null>(null)
   const [selectedWave,setSelectedWave]=useState<Wave|null>(null),[agreed,setAgreed]=useState(false)
   const [task,setTask]=useState<Task|null>(null),[answers,setAnswers]=useState<Record<string,Record<string,Answer>>>({})
   const [formPages,setFormPages]=useState<Record<string,number>>({})
   const [scalePages,setScalePages]=useState<Record<string,number>>({})
+  const [videoCompletions,setVideoCompletions]=useState<Record<string,boolean>>({})
+  const [imageReadiness,setImageReadiness]=useState<Record<string,boolean>>({})
   const [toolStep,setToolStep]=useState(0)
   const [itemTimings,setItemTimings]=useState<SurveyWaveScaleTimings>({})
   const timingTrackers=useRef<Record<string,SurveyScaleTimingTracker>>({})
@@ -261,6 +266,8 @@ export default function SurveyPublicApp(){
   const [general,setGeneral]=useState<General|null>(null),[notice,setNotice]=useState('')
   const [finalSealed,setFinalSealed]=useState(false)
   const [cognitiveRunning,setCognitiveRunning]=useState(false)
+  const cognitiveRunningRef=useRef(false)
+  cognitiveRunningRef.current=cognitiveRunning
   const [cognitiveSessions,setCognitiveSessions]=useState<SurveyCognitiveSessionInfo[]>([])
   const knownCognitiveSessions=useRef(new Map<string,{attemptId:string;researchCode:string}>())
   const rememberCognitive=(parentId:string,childId:string)=>{knownCognitiveSessions.current.set(childId,{attemptId:parentId,researchCode});rememberSurveyCognitiveSession(publicId,parentId,childId,researchCode)}
@@ -317,7 +324,7 @@ export default function SurveyPublicApp(){
         liveTimings[key]=tracker.snapshot()
       }
       if(!saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,draftState.current.answers,liveTimings))
-        setNotice('本标签页临时保存失败（空间或权限不足）。刷新、关闭页面可能丢失未提交答案；如已开放服务器加密暂存，请主动保存，或完成本次 FINAL。')
+        setNotice('本标签页临时保存失败（空间或权限不足）。刷新、关闭页面可能丢失未提交答案；如已开放服务器加密暂存，请主动保存，或完成本轮正式提交。')
     }
     const timeout=window.setTimeout(()=>flush(),450)
     const leaving=()=>flush(true)
@@ -351,41 +358,47 @@ export default function SurveyPublicApp(){
       .finally(()=>{if(current&&request===requests.current)setLoading(false)})
     return()=>{current=false;requests.current++}
   },[base,publicId,infoEntryToken])
-  const run=async(task:()=>Promise<void>)=>{
-    setError('');setNotice('');setBusy(true)
+  const focusStep=()=>window.requestAnimationFrame(()=>{if(!cognitiveRunningRef.current)document.getElementById('survey-task-step')?.focus()})
+  const revealAnswer=(unit:Unit,itemKey?:string)=>{
+    if(cognitiveRunningRef.current)return
+    const activeTask=taskState.current
+    if(!activeTask)return
+    if(unit.kind==='FORM'){
+      const visible=visibleFormKeys(unit.pages?.flatMap(page=>page.questions)??[],own(answers,unit.instrumentKey)??{})
+      const pages=unit.pages?.filter(page=>page.questions.some(q=>visible.has(q.itemKey)))??[]
+      const index=itemKey?pages.findIndex(page=>page.questions.some(q=>q.itemKey===itemKey)):-1
+      if(index>=0)setFormPages(previous=>({...previous,[unit.instrumentKey]:index}))
+    }else if(unit.kind==='SCALE'&&itemKey){
+      const index=unit.items?.findIndex(item=>item.itemKey===itemKey)??-1
+      if(index>=0)setScalePages(previous=>({...previous,[unit.instrumentKey]:index}))
+    }
+    if(activeTask.flow){
+      const route=resolveClientSurveyFlow(activeTask.flow,activeTask.units,answers)
+      const step=route.blocks.findIndex(block=>block.kind==='INSTRUMENT'&&block.instrumentKey===unit.instrumentKey)
+      if(step>=0)setFlowStep(step)
+    }else setToolStep(activeTask.units.findIndex(candidate=>candidate.instrumentKey===unit.instrumentKey))
+    window.requestAnimationFrame(()=>{
+      if(cognitiveRunningRef.current)return
+      const target=(itemKey?document.getElementById('survey-answer-'+unit.instrumentKey+'-'+itemKey):null)
+        ??document.getElementById('survey-page-'+unit.instrumentKey)??document.getElementById('survey-task-step')
+      target?.focus();target?.scrollIntoView({block:'center'})
+    })
+  }
+  const run=async(task:()=>Promise<void>,label='正在处理，请稍候…')=>{
+    setError('');setNotice('');setBusyLabel(label);setBusy(true)
     try{await task()}catch(e){
       const message=parseError(e);setError(message)
-      // FINAL qualifies the failing Form by instrumentKey: different Forms
-      // may intentionally share copied itemKeys within the same Wave.
+      // Locate a server-rejected answer without changing validation or payloads.
       const location=message.match(/answers\.([a-z][a-z0-9_-]*)(?:\.([a-z][a-z0-9_-]*))?/i)
       const instrumentKey=location?.[2]?location[1]:undefined
       const itemKey=location?.[2]||location?.[1]
-      const targetUnit=itemKey?taskState.current?.units.find(unit=>unit.kind==='FORM'&&
-        (!instrumentKey||unit.instrumentKey===instrumentKey)&&unit.pages?.some(
-          page=>page.questions.some(q=>q.itemKey===itemKey))):undefined
-      if(targetUnit&&itemKey){
-        const current=own(answers,targetUnit.instrumentKey)??{}
-        const visible=visibleFormKeys(targetUnit.pages?.flatMap(p=>p.questions)||[],current)
-        const pages=targetUnit.pages?.filter(p=>p.questions.some(q=>visible.has(q.itemKey)))||[]
-        const index=pages.findIndex(p=>p.questions.some(q=>q.itemKey===itemKey))
-        if(index>=0)setFormPages(prev=>({...prev,[targetUnit.instrumentKey]:index}))
-        // A rejected answer may belong to a tool that is no longer mounted.
-        // Reveal its exact frozen Flow block/tool before focusing its page.
-        const activeTask=taskState.current
-        if(activeTask?.flow){
-          const route=resolveClientSurveyFlow(activeTask.flow,activeTask.units,answers)
-          const step=route.blocks.findIndex(block=>block.kind==='INSTRUMENT'&&
-            block.instrumentKey===targetUnit.instrumentKey)
-          if(step>=0)setFlowStep(step)
-        }else if(activeTask){
-          setToolStep(activeTask.units.findIndex(unit=>unit.instrumentKey===targetUnit.instrumentKey))
-        }
-        window.setTimeout(()=>{
-          const target=document.getElementById('survey-answer-'+targetUnit.instrumentKey+'-'+itemKey)
-          target?.focus();target?.scrollIntoView({block:'center'})
-        },0)
-      }
-    }finally{setBusy(false)}
+      const targetUnit=itemKey?taskState.current?.units.find(unit=>
+        (!instrumentKey||unit.instrumentKey===instrumentKey)&&(
+          unit.pages?.some(page=>page.questions.some(q=>q.itemKey===itemKey))||
+          unit.items?.some(q=>q.itemKey===itemKey)||
+          (unit.scenes?.flatMap(scene=>scene.questions)??unit.questions)?.some(q=>q.questionKey===itemKey))):undefined
+      if(targetUnit&&itemKey)revealAnswer(targetUnit,itemKey)
+    }finally{setBusy(false);setBusyLabel('')}
   }
   const recoverWithoutInvitation=()=>void run(async()=>{
     // Existing participant rights do not depend on an unexpired invitation.
@@ -405,14 +418,14 @@ export default function SurveyPublicApp(){
     })
     setResearchCode(x=>x.trim().toUpperCase());setAccessCredential(x=>x.trim())
     setHome(data.waves);setProofReceived(false)
-  })}
+  },'正在读取你的波次任务…')}
   const join=(wave:Wave)=>void run(async()=>{
     const result=await publicApi<{researchCode:string;accessCredential:string}>(
       base+'/waves/'+wave.id+'/join','POST',{entryToken,consent:true,consentVersion:wave.consentVersion})
     setResearchCode(result.researchCode);setAccessCredential(result.accessCredential)
     discardEntry()
     setProofReceived(true);setNotice('此研究编号与私密恢复凭证只显示在当前设备页面，请分别妥善保存。')
-  })
+  },'正在领取研究编号，请勿重复操作…')
   const chooseWave=(wave:Wave)=>{setSelectedWave(wave);setAgreed(false);setTask(null);setGeneral(null);setCompletion(null);setWithdrawn(false);setRevoked(false)}
   const readCompletion=async(id:string,proof:{accessCredential:string;researchCode?:string})=>{
     const result=await publicApi<General>(base+'/attempts/'+id+'/general','POST',proof)
@@ -432,7 +445,7 @@ export default function SurveyPublicApp(){
     try{sessionStorage.removeItem(singleStorageKey(publicId))}catch{/* private session unavailable */}
     setAttemptId(id);setSingleResume(null);setTask(null);setCompletion(null);setGeneral(null)
     setScreenedOut(true)
-    setNotice('本轮研究筛选已结束。未生成正式 FINAL，未将筛选答案保存为正式测量记录。')
+    setNotice('本轮研究筛选已结束。未生成正式答卷（FINAL），未将筛选答案保存为正式测量记录。')
   }
   const loadTask=async(id:string,code:string,secret:string)=>{
     const data=await publicApi<Task>(base+'/attempts/'+id+'/task','POST',{
@@ -506,7 +519,7 @@ export default function SurveyPublicApp(){
     setAccessCredential(singleResume.accessCredential)
     setNotice('正在恢复本设备尚在有效期内的单次匿名研究作答。')
     await loadTask(singleResume.attemptId,'',singleResume.accessCredential)
-  })}
+  },'正在恢复本次作答，请稍候…')}
   const start=()=>{if(!selectedWave||!agreed)return;void run(async()=>{
     const wave=selectedWave
     if(info?.project.collectionMode==='LINKED_WAVES'&&wave.attempt){
@@ -535,7 +548,7 @@ export default function SurveyPublicApp(){
       setNotice('本设备此标签页可在两小时内尝试恢复；离开或关闭标签前仍建议完成作答。它不会产生跨波次研究编号。')
       await loadTask(started.attemptId,'',started.accessCredential)
     }
-  })}
+  },'正在读取本轮作答，请勿重复开始…')}
   const currentFlow=task?.flow?resolveClientSurveyFlow(task.flow,task.units,answers):null
   const flowBlock=currentFlow?.blocks[Math.min(flowStep,Math.max(0,currentFlow.blocks.length-1))]
   // One-by-one studies must not render multiple Scale timers simultaneously.
@@ -548,15 +561,16 @@ export default function SurveyPublicApp(){
   const finalFlowStep=currentFlow
     ?flowStep>=currentFlow.blocks.length-1
     :!timedSequence||toolStep>=task!.units.length-1
-  const canAdvanceFlow=():boolean=>{
+  const canAdvanceFlow=(focusMissing=false):boolean=>{
+    const incomplete=(itemKey?:string)=>{if(focusMissing&&flowUnit)revealAnswer(flowUnit,itemKey);return false}
     if(cognitiveRunning)return false
     if(!flowUnit)return true
-    if(flowUnit.kind==='COGNITIVE')return cognitiveReferences.some(ref=>ref.slotKey===flowUnit.instrumentKey)
+    if(flowUnit.kind==='COGNITIVE')return cognitiveReferences.some(ref=>ref.slotKey===flowUnit.instrumentKey)||incomplete()
     const existing=own(answers,flowUnit.instrumentKey)??{}
     if(flowUnit.kind==='FORM'){
       const visible=visibleFormKeys(flowUnit.pages?.flatMap(page=>page.questions)??[],existing)
       const pages=flowUnit.pages?.filter(page=>page.questions.some(q=>visible.has(q.itemKey)))??[]
-      if((own(formPages,flowUnit.instrumentKey)??0)<pages.length-1)return false
+      if((own(formPages,flowUnit.instrumentKey)??0)<pages.length-1)return incomplete()
       for(const page of pages)for(const question of page.questions){
         if(!visible.has(question.itemKey)||!question.required)continue
         const keys=['MATRIX','MATRIX_MULTIPLE'].includes(question.type)
@@ -564,13 +578,14 @@ export default function SurveyPublicApp(){
         for(const key of keys){
           const value=existing[key]
           if(value===undefined||value===null||value===''||
-            (Array.isArray(value)&&!value.length))return false
+            (Array.isArray(value)&&!value.length))return incomplete(question.itemKey)
         }
       }
       return true
     }
+    if(flowUnit.kind==='SCALE'&&!mountedScaleImagesReady(flowUnit))return incomplete(flowUnit.items?.[own(scalePages,flowUnit.instrumentKey)??0]?.itemKey)
     if(flowUnit.kind==='SCALE')return (flowUnit.items??[]).every(q=>
-      typeof existing[q.itemKey]==='string'&&(existing[q.itemKey] as string).length>0)
+      (!q.required||typeof existing[q.itemKey]==='string'&&(existing[q.itemKey] as string).length>0)&&(!q.video||Object.prototype.hasOwnProperty.call(lockedAnswers,flowUnit.instrumentKey)||videoCompletions[videoKey(flowUnit,q.itemKey)]===true)||incomplete(q.itemKey))
     return (flowUnit.scenes?.flatMap(scene=>scene.questions)??flowUnit.questions??[]).every(q=>{
       const answer=existing[q.questionKey]
       // Optional means it can be empty, not that a supplied partial selection
@@ -579,21 +594,22 @@ export default function SurveyPublicApp(){
         q.responseType==='MULTIPLE'&&Array.isArray(answer)&&answer.length===0))return true
       if(q.allowRefusal&&isRefusal(answer))return true
       if(q.responseType==='MULTIPLE'){
-        if(!Array.isArray(answer)||new Set(answer).size!==answer.length)return false
+        if(!Array.isArray(answer)||new Set(answer).size!==answer.length)return incomplete(q.questionKey)
         const selected=q.options.filter(option=>answer.includes(option.optionKey))
-        if(selected.length!==answer.length)return false
-        if(selected.some(option=>option.nonanswerReason))return selected.length===1
-        if(selected.length>1&&selected.some(option=>q.exclusiveOptionKeys?.includes(option.optionKey)))return false
-        return selected.length>=(q.minSelections??1)&&selected.length<=(q.maxSelections??q.options.length)
+        if(selected.length!==answer.length)return incomplete(q.questionKey)
+        if(selected.some(option=>option.nonanswerReason))return selected.length===1||incomplete(q.questionKey)
+        if(selected.length>1&&selected.some(option=>q.exclusiveOptionKeys?.includes(option.optionKey)))return incomplete(q.questionKey)
+        return selected.length>=(q.minSelections??1)&&selected.length<=(q.maxSelections??q.options.length)||incomplete(q.questionKey)
       }
-      return typeof answer==='string'&&q.options.some(option=>option.optionKey===answer)
+      return typeof answer==='string'&&q.options.some(option=>option.optionKey===answer)||incomplete(q.questionKey)
     })
   }
   const advanceFlow=()=>{
-    if(!canAdvanceFlow()){setError('请完成当前工具的必答内容和全部页，再进入下一步骤');return}
+    if(!canAdvanceFlow(true)){setError('请完成当前工具的必答内容和全部页，再进入下一步骤');return}
     setError('')
     if(currentFlow)setFlowStep(i=>Math.min(i+1,currentFlow.blocks.length-1))
     else if(timedSequence)setToolStep(i=>Math.min(i+1,task!.units.length-1))
+    focusStep()
   }
   const updateAnswer=(unit:Unit,key:string,value:Answer)=>setAnswers(previous=>{
     if(finalRequest.current||completedAttempts.current.has(attemptId)||Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey))return previous
@@ -621,6 +637,21 @@ export default function SurveyPublicApp(){
       return [u.instrumentKey,u.kind==='FORM'?sanitizeFormAnswers(u.pages?.flatMap(p=>p.questions)??[],raw):raw]
     }))
   }
+  const videoKey=(unit:Unit,itemKey:string)=>[attemptId,task?.definitionDigest,unit.instrumentKey,itemKey].join(':')
+  const imageReadyFor=(unit:Unit,item:Question)=>!item.images?.length||imageReadiness[videoKey(unit,item.itemKey)]===true
+  // Gate mounted stimuli, not an invented historical browser-viewing record.
+  // Restored answers and unmounted earlier timed items retain their existing semantics.
+  const mountedScaleImagesReady=(unit:Unit)=>{
+    if(Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey))return true
+    if((currentFlow||timedSequence)&&flowUnit?.instrumentKey!==unit.instrumentKey)return true
+    const items=unit.items??[]
+    const shown=unit.presentationMode==='ONE_BY_ONE'?items.slice(Math.min(own(scalePages,unit.instrumentKey)??0,Math.max(0,items.length-1)),Math.min(own(scalePages,unit.instrumentKey)??0,Math.max(0,items.length-1))+1):items
+    return shown.every(item=>imageReadyFor(unit,item))
+  }
+  const markImagesReady=(unit:Unit,itemKey:string,ready:boolean)=>setImageReadiness(old=>{
+    const key=videoKey(unit,itemKey);return old[key]===ready?old:{...old,[key]:ready}
+  })
+  const markVideoComplete=(unit:Unit,itemKey:string)=>setVideoCompletions(old=>({...old,[videoKey(unit,itemKey)]:true}))
   const renderSurveyTask=(unit:Unit)=>{
     if(unit.kind==='COGNITIVE')return <SurveyCognitiveUnit key={unit.instrumentKey} publicId={publicId} attemptId={attemptId}
       instrumentKey={unit.instrumentKey} title={unit.title} request={publicApi}
@@ -637,8 +668,14 @@ export default function SurveyPublicApp(){
     if(unit.kind==='SCALE'&&unit.presentationMode==='ONE_BY_ONE')
       return <fieldset key={unit.instrumentKey} className="border-0 p-0 min-w-0"><SurveyTimedScale
         unit={{instrumentKey:unit.instrumentKey,title:unit.title,
-          items:(unit.items??[]).map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required})),
+          items:(unit.items??[]).map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required,responseOptions:q.responseOptions})),
           responseOptions:unit.responseOptions??[]}}
+        imagesReady={mountedScaleImagesReady(unit)}
+        autoAdvanceReady={(()=>{
+          const item=unit.items?.[Math.min(own(scalePages,unit.instrumentKey)??0,Math.max(0,(unit.items?.length??0)-1))]
+          return !item?.video||Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)||videoCompletions[videoKey(unit,item.itemKey)]===true
+        })()}
+        renderMedia={itemKey=>{const item=unit.items?.find(q=>q.itemKey===itemKey);return item?<SurveyCatalogScaleMedia key={videoKey(unit,itemKey)} item={item} proof={{publicId,attemptId,accessCredential,...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode}:{})}} instrumentKey={unit.instrumentKey} itemKey={itemKey} complete={videoCompletions[videoKey(unit,itemKey)]} onComplete={()=>markVideoComplete(unit,itemKey)} onImagesReadyChange={ready=>markImagesReady(unit,itemKey,ready)} readOnly={Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)}/>:null}}
         answer={own(answers,unit.instrumentKey)??{}}
         tracker={timingFor(unit)} paused={finalSealed}
         readOnly={Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)}
@@ -649,6 +686,8 @@ export default function SurveyPublicApp(){
     // Lock answer controls, not pagination: recovery starts at page zero and
     // must still let participants review a locked multi-page prerequisite.
     return <fieldset key={unit.instrumentKey} className="min-w-0 border-0 p-0"><TaskForm unit={unit}
+      imageReady={Object.fromEntries((unit.items??[]).map(q=>[q.itemKey,imageReadyFor(unit,q)]))} onImageReadyChange={(itemKey,ready)=>markImagesReady(unit,itemKey,ready)}
+      videoComplete={Object.fromEntries((unit.items??[]).map(q=>[q.itemKey,videoCompletions[videoKey(unit,q.itemKey)]]))} onVideoComplete={itemKey=>markVideoComplete(unit,itemKey)}
       readOnly={Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)}
       pageIndex={own(formPages,unit.instrumentKey)??0}
       onPageChange={next=>setFormPages(current=>({...current,[unit.instrumentKey]:next}))}
@@ -662,9 +701,11 @@ export default function SurveyPublicApp(){
     if(!finalRequest.current&&(currentFlow||timedSequence)&&!finalFlowStep){
       setError('请按顺序完成当前研究步骤');return
     }
-    if(!finalRequest.current&&(currentFlow||timedSequence)&&!canAdvanceFlow()){
+    if(!finalRequest.current&&(currentFlow||timedSequence)&&!canAdvanceFlow(true)){
       setError('请完成当前工具后再提交');return
     }
+    if(!finalRequest.current&&task.units.some(unit=>unit.kind==='SCALE'&&!Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)&&(currentFlow===null||currentFlow===undefined||currentFlow.visibleUnitKeys.includes(unit.instrumentKey))&&unit.items?.some(q=>q.video&&!videoCompletions[videoKey(unit,q.itemKey)]))){setError('请完整观看量表题目中的视频后再提交');return}
+    if(!finalRequest.current&&task.units.some(unit=>unit.kind==='SCALE'&&!mountedScaleImagesReady(unit))){setError('请等待当前量表图片加载完成；加载失败时请重试图片');return}
     finalInFlight.current=true
     void run(async()=>{
     // Match the frozen conditional form. An earlier selection change must
@@ -745,7 +786,7 @@ export default function SurveyPublicApp(){
       setGeneral(receipt)
       setNotice('提交成功。以下为本次提交时确认的完成回执。')
     }else await readCompletion(attemptId,proof)
-  }).finally(()=>{finalInFlight.current=false})}
+  },'正在提交，请勿刷新或重复操作…').finally(()=>{finalInFlight.current=false})}
   const saveCheckpoint=()=>{if(!task?.checkpointPolicy?.enabled||!attemptId)return
     if(checkpointOverwritePending&&!window.confirm(
       '确认用当前本地答案替换另一设备保存的服务器 Checkpoint？此操作不能恢复被覆盖的未提交草稿。',
@@ -778,7 +819,7 @@ export default function SurveyPublicApp(){
       setCheckpointRevision(saved.revision)
       setCheckpointOverwritePending(false)
       setNotice('已加密暂存未完成答案，至 '+new Date(saved.expiresAt).toLocaleString('zh-CN')+
-        ' 有效。这不是正式 FINAL；另一设备更改后须重新读取以避免覆盖。')
+        ' 有效。这不是正式答卷（FINAL）；另一设备更改后须重新读取以避免覆盖。')
     })
   }
   const revokeAccess=()=>{if(info?.project.collectionMode!=='LINKED_WAVES'||!researchCode||!accessCredential)return
@@ -843,6 +884,7 @@ export default function SurveyPublicApp(){
       <p className="text-sm text-slate-500">观风知微 · 研究参与</p></div></header>
     <main id={cognitiveRunning?undefined:'survey-participant-content'} tabIndex={cognitiveRunning?undefined:-1}
       className="max-w-3xl mx-auto p-4 sm:p-7 space-y-5">
+      {busy&&<p role="status" aria-live="polite" aria-atomic="true">{busyLabel}</p>}
       {loading&&<p role="status">正在读取研究说明…</p>}
       {error&&<p role="alert" className={message('border-l-4 border-red-600 bg-red-50 p-3')}>{error}</p>}
       {notice&&<p role="status" className={message('border-l-4 border-teal-600 bg-teal-50 p-3')}>{notice}</p>}
@@ -880,7 +922,7 @@ export default function SurveyPublicApp(){
             onChange={e=>setResearchCode(e.target.value)} autoComplete="off" placeholder="R-…"/></label>
           <label>私密恢复凭证<input className="input block w-full" type="password" autoComplete="off"
             value={accessCredential} onChange={e=>setAccessCredential(e.target.value)}/></label>
-          <button className={action('btn-primary')} disabled={busy||!researchCode||!accessCredential}>读取我的波次任务</button>
+          <button className={action('btn-primary')} disabled={busy||!researchCode||!accessCredential}>{busyLabel==='正在读取你的波次任务…'?'正在读取…':'读取我的波次任务'}</button>
         </form>
         <button type="button" className={action('btn-secondary mt-3')} disabled={busy||!researchCode||!accessCredential}
           onClick={withdraw}>持原有研究凭证申请数据撤回（包括已撤销访问者）</button>
@@ -898,7 +940,7 @@ export default function SurveyPublicApp(){
           <h3 className="font-semibold">恢复本次单次匿名作答</h3>
           <p className="text-sm my-2">仅此浏览器标签可尝试恢复短期作答；不建立跨波次身份。公共设备请在完成后关闭标签。</p>
           <button className={action('btn-secondary')} type="button" disabled={busy} onClick={resumeSingle}>
-            恢复本次作答／查看已完成回执</button>
+            {busyLabel==='正在恢复本次作答，请稍候…'?'正在恢复…':'恢复本次作答／查看已完成回执'}</button>
         </section>}
       {home&&!task&&!general&&!completion&&info.project.collectionMode==='LINKED_WAVES'&&
         <button type="button" className={action('btn-secondary')} disabled={busy} onClick={revokeAccess}>
@@ -912,7 +954,7 @@ export default function SurveyPublicApp(){
             onChange={event=>setEntryToken(event.target.value.trim())}
             placeholder="输入研究邀请凭证"/>
         </label>}
-        {(home||info.waves).map(wave=><div key={wave.id} className="border-b py-3 flex items-center justify-between gap-3">
+        {(home||info.waves).map(wave=><div key={wave.id} className="survey-wave-row border-b py-3 flex items-center justify-between gap-3">
           <div><strong>第 {wave.ordinal} 轮 · {wave.title}</strong>
             <p className="text-sm text-slate-500">{wave.status==='OPEN'?'开放采集中':wave.status==='CLOSED'?'已结束':'尚未开放'}
               {wave.attempt?' · '+(wave.attempt.status==='COMPLETED'?'已完成':wave.attempt.status==='SCREENED_OUT'?'已筛除':'进行中'):''}</p>
@@ -933,20 +975,25 @@ export default function SurveyPublicApp(){
             onClick={()=>join(selectedWave)}>首次参加 · 领取随机研究编号</button>}
           <button className={action('btn-primary')} disabled={busy||!agreed||
             (info.project.collectionMode==='LINKED_WAVES'?(!researchCode||!accessCredential):!validEntry)}
-            onClick={start}>{selectedWave.attempt?.status==='COMPLETED'?'查看完成情况':'开始或恢复本轮作答'}</button>
+            onClick={start}>{busyLabel==='正在读取本轮作答，请勿重复开始…'?'正在读取本轮…':selectedWave.attempt?.status==='COMPLETED'?'查看完成情况':'开始或恢复本轮作答'}</button>
         </div>}
       </section>}
       {task&&!general&&<form className="space-y-5" onSubmit={submit}>
         <fieldset disabled={busy||finalSealed} className="space-y-5 min-w-0 border-0 p-0">
-        <div className={panel('bg-white border rounded-xl p-4')}><h3 className="font-semibold">本轮研究作答</h3>
+        <div className={panel('bg-white border rounded-xl p-4')}><h3 id="survey-task-step" tabIndex={-1} className="font-semibold">本轮研究作答</h3>
           <p className="text-sm text-slate-500">请按实际情况回答。研究内部计分不作为个人诊断反馈。</p>
           <p className="text-xs text-slate-500 mt-2">{task.checkpointPolicy?.enabled&&!cognitiveRunning
             ?'本标签页会短期暂存未提交答案。若需在其他设备恢复，请先主动保存加密临时进度，并保管原有私密凭证。公共电脑建议完成后立即退出。'
             :<>未提交答案仅在当前浏览器标签页暂存，至多两小时；
               关闭标签、使用其他设备或清理浏览器数据后无法恢复。公共电脑建议完成后立即退出。</>}</p></div>
+        {!cognitiveRunning&&task.units.some(unit=>unit.kind==='COGNITIVE')&&<aside className="survey-submit-guide" aria-label="本轮认知任务设备提示">
+          <h3>本轮包含认知任务</h3>
+          <p>现有任务需要桌面／笔记本电脑和实体键盘，正式进入时仍须完成设备与本机暂存检查。此处只是提前提醒，不代表已通过检查。</p>
+          <p>请先核对本研究的恢复方式，再决定是否更换设备；单次匿名作答只能在原浏览器标签页恢复，不能保证跨设备继续。</p>
+        </aside>}
         {task.checkpointPolicy?.enabled&&<section className={panel('bg-white border rounded-xl p-4 space-y-2')}>
           <p className="text-sm">此研究启用了可选服务器加密暂存：您可主动保存尚未完成的内容。
-            每次最多 64KB，保存期 {task.checkpointPolicy.ttlHours} 小时；不计入研究 FINAL。</p>
+            每次最多 64KB，保存期 {task.checkpointPolicy.ttlHours} 小时；不计入正式研究答卷（FINAL）。</p>
           <button type="button" className={action('btn-secondary')} disabled={busy||cognitiveRunning} onClick={saveCheckpoint}>
             保存加密临时进度（第 {checkpointRevision+1} 版）</button>
           <p className="text-xs text-slate-500">研究者不会通过此按钮获得正式作答，取消、撤回或最终提交后将按策略清理。
@@ -964,8 +1011,8 @@ export default function SurveyPublicApp(){
           {flowBlock?.kind==='END'&&<section className={panel('bg-white border rounded-xl p-5')}>
             <h4 className="font-semibold">{flowBlock.title||'本轮流程结束'}</h4>
             <p className="text-sm">{flowBlock.termination==='SCREEN_OUT'
-              ?'当前路径为资格筛除，不形成测量 FINAL。'
-              :'后续研究工具按冻结规则不予呈现，并标记为 NOT_SHOWN。'}</p>
+              ?'当前路径为资格筛除，不形成正式测量答卷（FINAL）。'
+              :'按本轮已固定的流程，后续研究工具无需作答（未呈现，NOT_SHOWN）。'}</p>
           </section>}
           {!finalFlowStep&&<button type="button" className={action('btn-secondary')} disabled={busy||cognitiveRunning}
             onClick={advanceFlow}>确认当前步骤，继续研究</button>}
@@ -974,7 +1021,7 @@ export default function SurveyPublicApp(){
           {renderSurveyTask(flowUnit)}
           <nav aria-label="研究工具导航" className="flex flex-wrap gap-3">
             <button type="button" className={action('btn-secondary')} disabled={toolStep===0||cognitiveRunning}
-              onClick={()=>{setError('');setToolStep(i=>Math.max(0,i-1))}}>上一工具</button>
+              onClick={()=>{setError('');setToolStep(i=>Math.max(0,i-1));focusStep()}}>上一工具</button>
             {!finalFlowStep&&<button type="button" className={action('btn-secondary')} disabled={cognitiveRunning}
               onClick={advanceFlow}>确认当前工具，继续</button>}
           </nav>
@@ -987,18 +1034,18 @@ export default function SurveyPublicApp(){
             :'请检查所有必答题、矩阵每一行及全部页面。只有服务器确认整轮提交后，才会显示完成回执。'}</p>
           <p>工具完成、临时暂存与整轮正式提交分别确认；这份提示不代替提交时的完整检查。</p>
         </aside>}
-        {finalSealed&&<p role="status" className={message('')}>本次答案已封存。结果未确认时请重试原提交，暂不能修改答案。</p>}
-        {(finalSealed||finalFlowStep)&&<button className={action('btn-primary')} disabled={busy||cognitiveRunning||(!finalSealed&&!task.flow&&!task.units.every(unit=>{
+        {finalSealed&&<p role="status" className={message('')}>本次答案已封存，尚未确认提交结果。请使用下方按钮重试原提交，不会创建另一份答卷；暂不能修改答案，请勿刷新或关闭页面。</p>}
+        {(finalSealed||finalFlowStep)&&<button className={action('btn-primary')} disabled={busy||cognitiveRunning||(!finalSealed&&task.units.some(unit=>unit.kind==='SCALE'&&!mountedScaleImagesReady(unit)))||(!finalSealed&&!task.flow&&!task.units.every(unit=>{
           if(unit.kind!=='FORM')return true
           const vis=visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],
             own(answers,unit.instrumentKey)??{})
           const pages=(unit.pages||[]).filter(p=>p.questions.some(q=>vis.has(q.itemKey)))
           return (own(formPages,unit.instrumentKey)??0)>=pages.length-1
-        }))}>{currentFlow?.termination==='SCREEN_OUT'?'完成资格筛选':'提交本轮正式回答'}</button>}
+        }))}>{busy&&finalInFlight.current?'正在提交…':finalSealed?'重试原提交':currentFlow?.termination==='SCREEN_OUT'?'完成资格筛选':'提交本轮正式回答'}</button>}
       </form>}
       {screenedOut&&!task&&<section className={panel('bg-white border rounded-xl p-5 space-y-3')}>
         <h2 className="text-lg font-semibold">本轮资格筛选已结束</h2>
-        <p className="text-sm">未产生完整研究 FINAL；筛选路径不会作为有效测量样本统计。</p>
+        <p className="text-sm">未产生完整正式研究答卷（FINAL）；筛选路径不会作为有效测量样本统计。</p>
         {info.project.collectionMode==='LINKED_WAVES'
           ?<button type="button" className={action('btn-secondary')} disabled={busy}
               onClick={returnHome}>返回我的研究波次</button>

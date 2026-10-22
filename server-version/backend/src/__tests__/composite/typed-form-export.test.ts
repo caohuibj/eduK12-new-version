@@ -17,6 +17,45 @@ const project=(type:string,value:any,extra:Record<string,unknown>={},metadata?:a
 }
 beforeEach(()=>{vi.clearAllMocks();process.env.DATA_ENCRYPTION_KEY='a'.repeat(64);db.$queryRaw.mockResolvedValue([]);db.compositeAssessmentAttempt.count.mockResolvedValue(2)})
 describe('C07 typed CSV and dictionary independent values',()=>{
+ it.each([
+  ['\u200B=1', "'\u200B=1"],
+  ['\u202E@cmd', "'\u202E@cmd"],
+  [' \t=1', "' \t=1"],
+  ['\n+cmd', '"\'\n+cmd"'],
+  ['=SUM(1,"2")\n', '"\'=SUM(1,""2"")\n"'],
+  ['中文,"字"\n尾', '"中文,""字""\n尾"'],
+  ["'=1", "'=1"],
+  [null, ''],
+  [undefined, ''],
+  ['', ''],
+ ])('guards raw typed TEXT %s without changing legacy cells or input', (value, expected)=>{
+  const {fields}=project('SINGLE',null,{options})
+  expect(fields[0].formSource?.encoding).toBe('TEXT')
+  const row=Object.freeze({F001_value:value,F001_state:null,legacy:'\u200B=1',number:-2.5})
+  const data={assessmentId:'id',assessmentName:'n',detail:'full' as const,trialCount:0,
+   fields:[...fields,{name:'legacy',label:'Legacy',type:'string' as const},{name:'number',label:'Number',type:'numeric' as const}],rows:[row]}
+  data.fields.forEach(Object.freeze);Object.freeze(data.fields);Object.freeze(data.rows);Object.freeze(data)
+  const bytes=`F001_value,F001_state,legacy,number\n${expected},,\u200B=1,-2.5`
+  expect(exportToCSV(data)).toBe(bytes);expect(exportToCSV(data)).toBe(bytes)
+  expect(row.F001_value).toBe(value)
+ })
+ it('preserves missing typed cells, numeric zero and null, and row/column order',()=>{
+  const {fields}=project('NUMBER',null)
+  const data={assessmentId:'id',assessmentName:'n',detail:'full' as const,trialCount:0,fields,
+   rows:[{F001_state:'ANSWERED',F001_value:0},{F001_value:-2.5},{F001_value:null},{}]}
+  expect(exportToCSV(data)).toBe('F001_value,F001_state\n0,ANSWERED\n-2.5,\n,\n,')
+ })
+ it('preserves name-based protection for duplicate typed, legacy and numeric columns',()=>{
+  const {fields}=project('SINGLE',null,{options})
+  const data={assessmentId:'id',assessmentName:'n',detail:'full' as const,trialCount:0,
+   fields:[fields[0],{name:'F001_value',label:'Legacy',type:'string' as const},{name:'F001_value',label:'Numeric',type:'numeric' as const}],
+   rows:[{F001_value:'\u202E=1'}]}
+  expect(exportToCSV(data)).toBe("F001_value,F001_value,F001_value\n'\u202E=1,'\u202E=1,'\u202E=1")
+ })
+ it.each([{},[],NaN,Infinity,-Infinity])('still rejects invalid typed text scalar %s',value=>{
+  const {fields}=project('SINGLE',null,{options})
+  expect(()=>exportToCSV({assessmentId:'id',assessmentName:'n',detail:'full',trialCount:0,fields,rows:[{F001_value:value}]})).toThrow()
+ })
  it.each([0,-2.5,-12.34567891,1e308,null])('preserves number %s without string conversion',value=>{
   const {fields,row}=project('NUMBER',value);expect(row).toEqual({F001_value:value,F001_state:null});expect(fields[0].type).toBe('numeric')
  })

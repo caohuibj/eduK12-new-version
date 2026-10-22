@@ -1,0 +1,25 @@
+{
+  "base": "bcacf2430784533d117299b72e83f281a8f85c31",
+  "source": {
+    "server-version/backend/src/modules/cognitive/export.service.ts": {
+      "before": "1a9ed89c15badd8f55097f27cbaa7cd8f2e83ea6",
+      "after": "d071a57c1e6322054368b9d882963bbf00c4bea3"
+    },
+    "server-version/backend/src/modules/composite/composite-export.service.ts": {
+      "before": "608f506b8ebe86525e07a85090c6e22b4ef20107",
+      "after": "61b81d1dde8f556d41358f79ebfa9c8819f6ac17"
+    },
+    "server-version/backend/src/__tests__/cognitive/export.service.test.ts": {
+      "before": "d6ac1c67481c6abd5e7750b43d50ef917c0db494",
+      "after": "d2fce7c5078547850d3537aec1a3048807eeb6b8"
+    },
+    "server-version/backend/src/__tests__/composite/typed-form-export.test.ts": {
+      "before": "876a62820da916c3ecbef452d04228c9d7bc8b82",
+      "after": "7b506f25e8764041dc877eccb40135b2a51433a2"
+    },
+    "server-version/backend/src/__tests__/composite/composite-analysis-export.service.test.ts": {
+      "before": "3705eb59768a6ead83f020840b1aa721c9b9176b",
+      "after": "9dedc157eeb5c142aaa0fcb90a0a00636af06e0a"
+    }
+  }
+}

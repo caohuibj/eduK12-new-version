@@ -1,3 +1,4 @@
+import {trainingScaleLibraryGovernanceRouter,surveyScaleLibraryGovernanceRouter} from './modules/scale-library-governance/routes'
 import { cleanupExpiredTrainingCheckpoints } from './modules/composite/training-checkpoint.service'
 import { startCheckinScheduleScheduler } from './services/checkinScheduleService'
 import { organizationInvitationsRouter } from './modules/organization/invitations'
@@ -288,6 +289,7 @@ app.use('/api/auth', authRoutes)
 app.use('/api/admin/security', adminSecurityRouter)
 app.use('/api/admin/permissions', adminPermissionsRouter)
 app.use('/api/training/reference-governance',formalReferenceRouter)
+app.use('/api/training/scale-library-governance',trainingScaleLibraryGovernanceRouter)
 const surveyFeatureGuard: express.RequestHandler = (_req,res,next) => {
   if (process.env.SURVEY_WORKSPACE_ENABLED !== 'true') return res.status(404).json({code:-1,message:'Survey 尚未启用',data:null})
   next()
@@ -295,6 +297,7 @@ const surveyFeatureGuard: express.RequestHandler = (_req,res,next) => {
 validateSurveyStartupConfig()
 app.use('/api/survey', surveyFeatureGuard, surveyOriginGuard)
 app.use('/api/survey/reference-governance',surveyFormalReferenceRouter)
+app.use('/api/survey/scale-library-governance',surveyScaleLibraryGovernanceRouter)
 app.use('/api/survey/auth', surveyAuthRouter)
 app.use('/api/survey/projects', surveyBuilderRouter)
 app.use('/api/survey/projects', surveyReportDraftsRouter)

@@ -17,8 +17,14 @@ export async function readFormSource(tx: Tx, actor: Actor, source: FormSource) {
     const row = await tx.questionnaire.findUnique({ where: { id: source.id }, include: { creator: true, questionnaireScales: true, formItems: true, formSections: true } })
     if (!row || row.type !== 'GENERAL' || row.questionnaireScales.length || !['LEGACY', 'TRAINING'].includes(row.creator.accountDomain)) throw compositeNotFound('可复用表单不存在')
     if (row.creatorId !== actor.userId && actor.role !== 'ADMIN') {
-      const grant = config.materialGrantsEnabled && row.status === 'PUBLISHED' && await tx.materialGrant.findFirst({ where: { teacherId: actor.userId, resourceType: 'FORM_TEMPLATE', resourceId: row.id } })
-      if (!grant) throw compositeForbidden('当前没有此表单的使用授权')
+      // New template use must not race revocation; hold the exact grant until
+      // the same transaction has committed the independent content copy.
+      const grants = config.materialGrantsEnabled && row.status === 'PUBLISHED'
+        ? await tx.$queryRaw<Array<{ id: string }>>`SELECT id FROM material_grants
+            WHERE teacher_id=${actor.userId} AND resource_type::text='FORM_TEMPLATE' AND resource_id=${row.id}
+            FOR SHARE`
+        : []
+      if (!grants.length) throw compositeForbidden('当前没有此表单的使用授权')
       // A form-content grant does not grant the author's private attachments.
       const assets = new Set<string>()
       const visit = (value: any) => {

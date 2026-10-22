@@ -412,6 +412,8 @@ export const validateAssetReferencesForCourse = async (params: {
   if (!assetIds.length) return references
 
   const db = params.db || prisma
+  // Match retention's stable asset order before any per-asset grant lock.
+  if (params.db) await lockStoredAssetRows(db, assetIds)
   const assets = await db.storedAsset.findMany({
     where: { id: { in: assetIds } },
     select: {
@@ -436,7 +438,7 @@ export const validateAssetReferencesForCourse = async (params: {
     if (isAdmin && !legacyOwners.has(asset.ownerId)) throw new AssetReferenceValidationError()
     if (!isAdmin && asset.ownerId !== params.ownerId) {
       const { hasMediaAssetGrant } = await import('./workspaceMedia')
-      if (!await hasMediaAssetGrant(params.ownerId, asset.id)) throw new AssetReferenceValidationError('只能引用自己上传或明确授权的媒体')
+      if (!await hasMediaAssetGrant(params.ownerId, asset.id, db)) throw new AssetReferenceValidationError('只能引用自己上传或明确授权的媒体')
     }
     if (asset.accessScope === 'PUBLIC_CHECKIN') {
       throw new AssetReferenceValidationError()

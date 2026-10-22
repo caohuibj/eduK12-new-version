@@ -9,7 +9,8 @@ const initial={id:'w1',projectId:'p1',title:'版本波次',ordinal:1,status:'DRA
  consentText:'本次研究的参与说明与知情同意材料，至少二十字。',generalText:'谢谢',consentVersion:1,linkageNoticeConfirmed:false,
  opensAt:null,closesAt:null,finishUntil:null,quotaStarts:null,startsCount:0,allowNewParticipants:false,hardStopAt:null}
 const frozen=[{draftId:'tool',title:'冻结测量甲',instrumentKey:'scale',measurementRelease:{releaseId:'measurement',contentHash:'hash',measurementHash:'hash'},contentSelection:{referencePolicy:{policyVersion:'v1',measurementReleaseId:'measurement',choices:[]},reportRelease:{releaseId:'report-old',contentHash:'hash'}}}]
-function fixture(mode:'ok'|'conflict'|'unknown'|'accepted-unknown'|'unknown-conflict'='ok'){
+function fixture(mode:'ok'|'conflict'|'unknown'|'accepted-unknown'|'unknown-conflict'='ok',toolStatus='DRAFT'){
+ const currentTool={...tool,status:toolStatus}
  let wave={...initial,frozenContentSelections:undefined as typeof frozen|undefined},posts=0
  const requests:{url:string;body:any}[]=[]
  const response=(data:unknown)=>({ok:true,status:200,json:async()=>({code:0,data})})
@@ -17,8 +18,8 @@ function fixture(mode:'ok'|'conflict'|'unknown'|'accepted-unknown'|'unknown-conf
   const url=String(input),body=init?.body?JSON.parse(String(init.body)):undefined;requests.push({url,body})
   if(url.endsWith('/auth/csrf'))return response({csrfToken:'csrf'})
   if(url.includes('/waves?page='))return response({list:[wave,{...wave,id:'w2',ordinal:2}]})
-  if(url.includes('/instruments?page='))return response({list:[tool]})
-  if(url.includes('/instruments/'))return response(tool)
+  if(url.includes('/instruments?page='))return response({list:[currentTool]})
+  if(url.includes('/instruments/'))return response(currentTool)
   if(url.includes('/content-options?'))return response({instrumentId:'tool',instrumentKey:'scale',draftRevision:2,waveRevision:3,measurement:{releaseId:'measurement',contentHash:'hash',version:'m1'},layer:'REPORT',page:1,pageSize:25,hasMore:false,options:[{releaseId:'report-old',key:'私有报告',version:'v1',contentHash:'hash',status:'PUBLISHED',audience:'parent',language:'zh'}]})
   if(url.endsWith('/preflight'))return response({ok:true,publicationReady:true,checks:[]})
   if(url.endsWith('/prepare')){
@@ -44,6 +45,18 @@ async function choose(){
 }
 afterEach(()=>vi.unstubAllGlobals())
 describe('Survey Wave report selection freeze boundary',()=>{
+ it('keeps published self-authored scales selectable for explicit wave freezing',async()=>{
+  const requests=fixture('ok','PUBLISHED');render(<SurveyWaveStudio projectId="p1"/>);await choose()
+  expect(screen.getByLabelText('SCALE · 测量甲')).toBeChecked()
+  fireEvent.click(screen.getByRole('button',{name:'冻结研究定义'}))
+  await screen.findByText('报告版本：report-old')
+  expect(requests.find(row=>row.url.endsWith('/prepare'))?.body.contentSelections[0].instrumentId).toBe('tool')
+ })
+ it('does not offer archived scales for new wave selection',async()=>{
+  fixture('ok','ARCHIVED');render(<SurveyWaveStudio projectId="p1"/>)
+  fireEvent.click(await screen.findByRole('button',{name:/T1 · 版本波次/}))
+  expect(screen.queryByLabelText('SCALE · 测量甲')).not.toBeInTheDocument()
+ })
  it('sends exact selections separately from participant feedback and displays frozen server identities',async()=>{
   const requests=fixture();render(<SurveyWaveStudio projectId="p1"/>);await choose()
   fireEvent.click(screen.getByRole('button',{name:'冻结研究定义'}))

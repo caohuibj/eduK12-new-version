@@ -10,6 +10,7 @@ const { mockPrisma } = vi.hoisted(() => ({
 }))
 
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
+vi.mock('../../modules/scale-library-governance/readers', () => ({ canReadLibraryScale: vi.fn().mockResolvedValue(false), libraryReadableScaleIds: vi.fn().mockResolvedValue({ systemAdmin: false, ids: [] }) }))
 vi.mock('../../config', () => ({ config: { materialGrantsEnabled: true, cognitiveModuleEnabled: true, uploadDir: '/tmp/eduk12-controller-test-uploads' } }))
 
 import { scaleController } from '../../controllers/scaleController'

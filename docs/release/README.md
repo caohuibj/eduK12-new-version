@@ -557,3 +557,152 @@ backend-regression, frontend, docker and CodeQL success; skipped/missing/failed,
 cancelled and draft candidates cannot qualify. Main push reclassifies only,
 without rerunning these PR checks. Five minutes is a progress/diagnosis threshold,
 not a guarantee for first downloads or scanning. This change does not deploy.
+
+## Frozen Composite CSV memory batch (2026-10-21)
+
+`work/composite-csv-memory-20261021` admits only its fixed main base, five exact
+backend source/test blobs and named CI controls. Unknown input, dependency,
+permission, database, frontend, mode or base changes fail closed, never fall back
+to platform CI. The original merge gate requires scope, this backend candidate,
+and changed JavaScript/TypeScript CodeQL to actually succeed.
+
+GitHub is the sole application-check location: one full backend TypeScript build,
+precise CSV safety/default/typed/ZIP contracts, runtime assembly from the same
+cached build with byte comparison, and the actual runtime HIGH/CRITICAL scan.
+Both built images are saved in a separate compressed image artifact; small
+reports retain their archive digest, so a later failure does not lose build bytes.
+Unchanged generated-instrument checks follow the existing campus build policy.
+No database, browser, frontend, worker process, deployment or load test runs.
+The unchanged locked audit is read from its original official successful job,
+with package/lock equality; missing or changed evidence stops rather than reruns.
+The diagnostic extracts exact baseline/candidate function AST declarations plus
+csvValue and protectCsvCell dependencies. It proves equal full CSV bytes on one
+1,000-by-100 synthetic table and reports retained preparation/output heap and
+replacement-row/property counts. It is an isolated function microbenchmark, not
+full-service execution, production peak memory or proven end-to-end speedup.
+Main push only classifies the merged diff; it does not replay application checks.
+Five minutes triggers a progress update, not a promise of scan/download duration.
+
+## Scale library governance bounded candidate (2026-10-21)
+
+The fixed governance branch admits only its frozen complete product/blob inventory
+and reviewed control paths against base `aabbe049`. Unknown paths, source/base
+drift, unusual modes and manual full/probe requests fail closed, never platform
+fallback. The stable gate requires scope, governance acceptance and actual
+JavaScript/TypeScript plus Python CodeQL success. Existing candidate routes and
+branch protection are unchanged.
+
+GitHub is the sole application-check execution location: one backend and one
+frontend compilation, affected contract inventories, app types/changed-file lint,
+actual runtime scans, four real PostgreSQL suites, old-schema synthetic upgrade,
+and a nonempty synthetic database dump/independent restore of this feature's
+dependency closure. This is not production disaster-recovery or attachment-backup
+qualification. Identical package/lock audits retain their fixed official prior
+run/job source and explicitly do not claim a new vulnerability lookup.
+
+Two actual production-UI journeys exercise opposite entrypoints, exact approval,
+readonly use, original scoring/typed quality answers, ordinary revoke versus
+emergency stop/replay, unified catalog and image/video delivery. The synthetic
+video uses the same compiled backend with isolated DB/Redis and a bounded worker;
+no accepted media/release/session is faked. Synthetic admin uses real WebAuthn
+with a virtual authenticator, not physical-key acceptance. This round's explicit
+approval covers only disposable browser-profile CA trust and loopback HTTPS;
+no host system trust, production routing or certificate-error bypass is used.
+
+Builder/runtime image bytes are archived immediately and separately from small
+reports/screenshots, including when later checks fail. Private credentials, DB
+dumps, raw server logs and capability URLs are excluded from public artifacts;
+owned services and private files are removed on every outcome. Plan roughly
+10–15 minutes for the new connected scope, reporting the actual waiting step
+after five minutes; failures invalidate only their consumed inputs and do not
+authorize full-platform retries. No deployment is included.
+
+Governance round-1 continuation retains run `39605768918` as failed. Its frontend
+compile step succeeded and the complete builder/runtime archive is accepted only
+with fixed official artifact digests, original image IDs/revision and unchanged
+frontend production/config/lock inputs. Exactly two repaired test files are
+mounted read-only into that original builder for the previously failed types and
+unexecuted lint/contracts; the original runtime receives its first scan. No Vite
+compile, image relabeling or successful-test replay is involved. Backend never
+produced a successful image and therefore must compile the repaired source before
+its missing checks. Original CodeQL completion remains attributable to its old
+source; only actual changed JS/TS/Python inputs receive new analysis. No failed
+job or old report is rewritten as successful.
+
+Governance PR326 second-run continuation preserves the failed run 39610102026.
+Its unchanged 16 backend suites (161 assertions) and 18 frontend suites (159
+assertions) are accepted only from the pinned official report archives, with
+reviewed component-input and mock boundaries. The repaired readonly frontend
+suite runs again, together with application types, its targeted lint, and the
+first runtime scan; original frontend image bytes are restored without a new
+compile. The real backend wrapper fix requires a new backend build, nine failed
+suites, five existing direct binding/FINAL/report/reinterpretation suites, and
+the new wrapper-binding suite. PostgreSQL, restoration, connected browser and
+runtime scans have not passed previously and remain required. Only changed
+SAST inputs are analyzed after verifying the second run's official completion.
+
+The next fixed continuation accepts run 39614240900's complete frontend
+qualification and its original image bytes without compiling, testing, scanning
+or re-uploading the frontend archive again. Backend copy-lock SQL and governance
+trigger repairs invalidate backend compilation and image scan, but not the
+mocked/pure unit paths already passed. Those reports remain explicitly sourced
+from their original runs. The ordinary instrument FINAL PostgreSQL suite's 13
+passing assertions do not execute either changed SQL path; only the three failed
+PG suites run again. Migration upgrade/legacy-byte validation uses the new SQL;
+nonempty recovery and the two browser journeys still require actual execution.
+
+Run 39616852296 passed the repaired 29 PostgreSQL assertions, exact legacy
+upgrade checks and nonempty synthetic restore; its failed account-fixture step
+is not relabeled successful. A diagnostic-only continuation restores both
+original scanned images and runs only fresh browser-database preparation and
+previously unexecuted fixture/browser work. The checkout fixture's current SHA
+and the old backend image revision are recorded separately. Error reporting
+retains safe class/code/phase and basename/line frames, never raw messages,
+Prisma metadata, bootstrap output, credentials or private stderr. The fixture's
+business statements are compared unchanged after removing phase markers and its
+error-handler-only diagnostic tail. Image labels are never rewritten.
+
+### Survey experience exact candidate, 2026-10-22
+
+Only `work/survey-experience-20261022` against base `c0519207` may use the
+`survey-experience` route. Its full frontend tree, 24 changed source blobs and
+external fixture/tool-lock inputs are pinned. Unknown paths, modes, branch,
+base or source-tree drift fail closed, never fall back to platform CI.
+
+For this candidate only, the user explicitly approved acceptance of the
+reviewed **unsigned local** reports. `survey-experience-local.json` retains
+compressed original reports and hashes, including the initial environment
+failure and the failed first aggregate; neither is rewritten as a success.
+The accepted evidence is 162 second-batch assertions and 19 applicable earlier
+assertions, local application types and changed-file lint. Catalog's last
+case renders Builder's unchanged read-only catalog snapshot branch; App tests
+mock changed children, and FormPagination consumes unchanged FORM rendering.
+The reports are not CI executions or cryptographically authenticated results.
+Existing cached package versions matched the lock, but cached package bytes
+were not reverified against tarball integrity; the three downloaded packages
+were verified. The temporary Vitest configuration only preserved symlink
+identity. Hook dependency warnings remain disclosed. No local browser, build,
+audit or scan result is claimed.
+
+The required `survey-experience` job independently verifies the exact inputs
+and report bytes, compiles Vite once, assembles the runtime from that cached
+build, archives both real images separately, performs fresh dependency audit
+and runtime vulnerability scan, and runs real Chromium desktop/mobile,
+keyboard and axe checks over the extracted production dist. All API responses
+are synthetic fixtures: this proves UI behavior, not server authorization,
+real publication, database correctness, or media processing. No TLS exception,
+backend, PostgreSQL, restore or platform suite is involved. Original merge
+gate, scope and CodeQL requirements remain mandatory. This is not a general
+unsigned-local-result trust mechanism and changes no older candidate route.
+
+The first official run `39704148772` retained a successful production build,
+audit and runtime scan but failed during the synthetic browser journey. Its
+overall and frontend-job failures remain failures. A continuation pins that
+run/head/attempt, official ZIP digests, inner archive digest, original image
+IDs/tags/labels and successful step identities; it restores those exact bytes
+and reruns only the browser. The full frontend/backend fixture/tool inputs
+must remain byte-identical. No earlier CodeQL execution is claimed: the first
+run omitted the new route from the existing job condition, now corrected, and
+actual relevant SAST success remains mandatory before merge.
+
+Survey PR continuation: run 39705178007 remains failed at the media-only text assertion. Its exact five successful UI scenes, six screenshots/axe layouts and four keyboard observations are separately accepted from the official immutable artifact; the next run executes only `participant-media`. The acceptance document identifies both runs and explicitly sets `sameRunFullJourneyClaim=false`. The original successful JavaScript/TypeScript analysis is pinned to its actual job; only the three changed JS control/browser files receive new SAST. Original build, audit and image scan are not repeated.

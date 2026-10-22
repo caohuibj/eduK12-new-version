@@ -1,3 +1,4 @@
+import {readSurveyScalePresentation,scalePresentationOptions} from './catalog-scale.presentation'
 import { matchRawScoreFeedback } from '../scale/raw-score-feedback'
 import type {SurveyFinalInterpretation} from './final-interpretation.service'
 import { normalizeSurveySjtAnswers,scoreResearchSjtAnswers,SurveySjtAnswerError } from './sjt-runtime'
@@ -12,7 +13,7 @@ import { resolveSurveySjtAnswer } from './sjt-selection'
 import {validateSurveyScaleTimings,type SurveyScaleTimings} from './timing.definition'
 import { executeSurveyFlow,SurveyFlowExecutionError,type SurveyExecutionTrace } from './flow.runtime'
 import type { SurveyFlowAssignment } from './flow.assignment'
-import { assertSurveyDraft, type FormDraft, type ScaleDraft, type SjtDraft, type SjtDraftV2 } from './builder.definition'
+import { assertSurveyDraft, type FormDraft, type SjtDraft, type SjtDraftV2 } from './builder.definition'
 import type { ResearchFrozenPublication, ResearchFrozenUnit } from './publication.service'
 import type { ScaleDefinitionV2 } from '../scale/scale-definition'
 import type { SituationDefinitionV2 } from '../situational/situation-branching'
@@ -59,18 +60,22 @@ export function dryRunSurveyForm(definition:unknown,answers:unknown){
   return normalizeFormAnswers(normalized,safeObject(answers,'answers'))
 }
 const scaleResult=(unit:ResearchFrozenUnit,answers:AnswerMap,computeScore=true):FrozenUnitResult=>{
-  const display=assertSurveyDraft('SCALE',unit.displayDefinition,true) as ScaleDraft
+  const display=readSurveyScalePresentation(unit.displayDefinition)
   const allowed=new Set(display.items.map(q=>q.itemKey))
   for(const k of Object.keys(answers))if(!allowed.has(k))invalid('answers.'+k,'无效量表题目')
   const raw:Record<string,string>={}
+  const missing:MissingItem[]=[]
   for(const item of display.items){
     const value=answers[item.itemKey]
-    if(typeof value!=='string'||!display.responseOptions.some(o=>o.optionKey===value))
+    if((value===undefined||value===null||value==='')&&!item.required){
+      missing.push({itemKey:item.itemKey,reason:'SHOWN_MISSING'});continue
+    }
+    if(typeof value!=='string'||!scalePresentationOptions(display,item).some(o=>o.optionKey===value))
       invalid('answers.'+item.itemKey,'研究量表必须完整选择有效的响应选项')
     raw[item.itemKey]=value as string
   }
   if(!computeScore)return {instrumentKey:unit.instrumentKey,kind:'SCALE',sourceDigest:unit.sourceDigest,
-    scoringDigest:unit.scoringDigest,rawAnswers:raw,missing:[],privateScoring:null}
+    scoringDigest:unit.scoringDigest,rawAnswers:raw,missing,privateScoring:null}
   const mapping=unit.sourceAnswerMapping
   const nativeAnswers:Record<string,string|number>=mapping?Object.fromEntries(Object.entries(raw).map(([key,value])=>{
     const originalItem=mapping.items[key],originalValue=mapping.options[value]
@@ -80,7 +85,7 @@ const scaleResult=(unit:ResearchFrozenUnit,answers:AnswerMap,computeScore=true):
   const result=scoreScale(unit.compiledDefinition as ScaleDefinitionV2,nativeAnswers)
   if(result.quality.status==='invalid')invalid('scoring','量表数据不足以计算研究得分')
   return {instrumentKey:unit.instrumentKey,kind:'SCALE',sourceDigest:unit.sourceDigest,
-    scoringDigest:unit.scoringDigest,rawAnswers:raw,missing:[],privateScoring:{...result,
+    scoringDigest:unit.scoringDigest,rawAnswers:raw,missing,privateScoring:{...result,
       ...((unit.compiledDefinition as ScaleDefinitionV2).report?.rawScoreFeedback ? {rawScoreFeedback:result.scores.flatMap(score=>{
         if(score.status!=='calculated')return []
         const match=matchRawScoreFeedback((unit.compiledDefinition as ScaleDefinitionV2).report.rawScoreFeedback,score.key,score.value)

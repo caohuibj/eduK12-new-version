@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { publishSurveyMeasurement } from './measurement-publication'
 
 export interface ReportLeaveRisk {dirty:boolean;pending:boolean;busy:boolean}
 type ReferenceKind='normative_distribution'|'criterion_threshold'|'descriptive_sample'|'theoretical_range'
@@ -55,6 +56,8 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
   const base=basePath??('/projects/'+encodeURIComponent(projectId)+'/report-drafts')
   const reportApi=transport
   const [measurements,setMeasurements]=useState<Measurement[]>([]),[list,setList]=useState<Summary[]>([])
+  const [measurementsLoaded,setMeasurementsLoaded]=useState(false),[listLoaded,setListLoaded]=useState(false)
+  const [loadingLists,setLoadingLists]=useState(false),[listLoading,setListLoading]=useState(false)
   const [nativeInstruments,setNativeInstruments]=useState<NativeInstrument[]>([]),[nativeId,setNativeId]=useState(''),[nativePage,setNativePage]=useState(1),[nativeCount,setNativeCount]=useState(0),[showNative,setShowNative]=useState(false)
   const [page,setPage]=useState(1),[selected,setSelected]=useState<Draft|null>(null),[dirty,setDirty]=useState(false)
   const [measurementId,setMeasurementId]=useState(''),[reportKey,setReportKey]=useState(''),[version,setVersion]=useState('1')
@@ -83,8 +86,10 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
   const measurement=measurements.find(m=>m.id===selected?.payload.measurementReleaseId)
   const run=useCallback(async(fn:()=>Promise<void>)=>{setBusy(true);setError('');setNotice('');try{await fn()}catch(e){setError(errorMessage(e))}finally{setBusy(false)}},[])
   const loadList=useCallback(async(nextPage:number)=>{
-    try{const rows=await reportApi<Summary[]>(base+'?page='+nextPage);setList(rows);setPage(nextPage);setListError('')}
+    setListLoading(true)
+    try{const rows=await reportApi<Summary[]>(base+'?page='+nextPage);setList(rows);setPage(nextPage);setListError('');setListLoaded(true)}
     catch(e){setListError(errorMessage(e));throw e}
+    finally{setListLoading(false)}
   },[base,reportApi])
   const loadNative=useCallback(async(nextPage:number)=>{
     const result=await reportApi<{list:NativeInstrument[]}>('/projects/'+encodeURIComponent(projectId)+'/instruments?page='+nextPage)
@@ -92,14 +97,17 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
     setNativeInstruments(native);setNativeCount(result.list.length);setNativePage(nextPage);setNativeId(native[0]?.id||'')
   },[projectId,reportApi])
   const load=useCallback(()=>run(async()=>{
-    const choices=await reportApi<Measurement[]>(base+'/measurements');setMeasurements(choices)
-    setMeasurementId(current=>current||choices[0]?.id||'');await loadList(1)
-    if(nativePublishing&&!choices.length){await loadNative(1);setShowNative(true)}
+    setLoadingLists(true)
+    try{
+      const choices=await reportApi<Measurement[]>(base+'/measurements');setMeasurements(choices);setMeasurementsLoaded(true)
+      setMeasurementId(current=>current||choices[0]?.id||'');await loadList(1)
+      if(nativePublishing&&!choices.length){await loadNative(1);setShowNative(true)}
+    }finally{setLoadingLists(false)}
   }),[base,loadList,loadNative,run,nativePublishing,reportApi])
   useEffect(()=>{if(active&&!initialRequested.current){initialRequested.current=true;void load()}},[active,load]) // Project-keyed workspace retains edits while switching tabs.
   const publishMeasurement=()=>void run(async()=>{
     const source=nativeInstruments.find(row=>row.id===nativeId);if(!source)throw new Error('请选择本项目可发布的测量')
-    const result=await reportApi<{releaseId:string}>('/projects/'+encodeURIComponent(projectId)+'/instruments/'+encodeURIComponent(source.id)+'/measurement-release','POST',{revision:source.revision})
+    const result=await publishSurveyMeasurement(reportApi,projectId,source)
     setNotice('测量版本已发布，可用于编制报告；未开启被试采集。')
     const choices=await reportApi<Measurement[]>(base+'/measurements');setMeasurements(choices);setMeasurementId(result.releaseId)
   })
@@ -152,10 +160,11 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
     {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}
     {listError&&<p role="alert">列表加载失败：{listError}。已成功的写入无需重做。</p>}
     <button type="button" className="btn-secondary" disabled={busy} onClick={()=>void load()}>刷新报告与测量列表</button>
+    {loadingLists&&<p role="status">正在加载测量版本与报告，请稍候…</p>}
     <fieldset disabled={busy||!!pendingCreate} className="border rounded p-3 space-y-3"><legend>创建报告草稿</legend>
       <label className="block">测量发布版本<select className="input block w-full" value={measurementId} onChange={e=>setMeasurementId(e.target.value)}>
         <option value="">请选择</option>{measurements.map(m=><option key={m.id} value={m.id}>{m.key} · {m.version} · {m.family} · {m.status}</option>)}</select></label>
-      {!measurements.length&&<p>暂无本项目获准的测量发布版本。{nativePublishing?'可在下方显式发布自编测量或获准的只读量表；目录原版内容不会改写。':'请先在测量编制入口完成发布并核对内容授权。'}</p>}
+      {measurementsLoaded&&!loadingLists&&!error&&!measurements.length&&<p>暂无本项目获准的测量发布版本。{nativePublishing?'可在下方显式发布自编测量或获准的只读量表；目录原版内容不会改写。':'请先在测量编制入口完成发布并核对内容授权。'}</p>}
       <label>报告系列标识<input className="input block" maxLength={168} value={reportKey} onChange={e=>setReportKey(e.target.value)}/></label>
       <label>报告版本<input className="input block" maxLength={240} value={version} onChange={e=>setVersion(e.target.value)}/></label>
       <button type="button" className="btn-primary" disabled={!measurementId||!reportKey.trim()||!version.trim()} onClick={startCreate}>创建报告草稿</button>
@@ -174,7 +183,8 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
       <button type="button" className="btn-secondary" disabled={busy} onClick={()=>{if(window.confirm('创建可能已经成功，请先刷新列表核对。仍要放弃本次请求？'))setPendingCreate(null)}}>放弃本次创建请求</button></div>}
     <div className="grid md:grid-cols-[220px_minmax(0,1fr)] gap-5">
       <nav aria-label="报告草稿与版本" className="space-y-2">{list.map(row=><button type="button" key={row.id} className="btn-secondary block w-full text-left" aria-pressed={selected?.id===row.id} disabled={busy||!!pendingCreate} onClick={()=>choose(row.id)}>{row.reportKey} · {row.version} · {row.state==='PUBLISHED'?'已发布':'草稿'}</button>)}
-        {!list.length&&<p>暂无报告草稿</p>}
+        {listLoading&&<p role="status">正在加载报告列表…</p>}
+        {listLoaded&&!listLoading&&!listError&&!list.length&&<p>暂无报告草稿</p>}
         <div className="flex gap-2"><button type="button" className="btn-secondary" disabled={busy||page<=1} onClick={()=>void run(()=>loadList(page-1))}>上一页</button>
           <span>第 {page} 页</span><button type="button" className="btn-secondary" disabled={busy||list.length<25} onClick={()=>void run(()=>loadList(page+1))}>下一页</button></div>
       </nav>

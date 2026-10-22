@@ -1,3 +1,4 @@
+import { ScaleLibraryError } from '../scale-library-governance/contracts'
 import { standaloneContextSchema } from './scale-context-input'
 import type { Request, Response } from 'express'
 import { forbidden, instrumentError, success, error } from '../../utils/response'
@@ -35,6 +36,7 @@ export const restartStandaloneScaleAssessmentWithPolicyController = async (req: 
       },
     }, '量表测评已重启')
   } catch (err) {
+    if (err instanceof ScaleLibraryError) return error(res, err.message, -1, err.statusCode)
     if (isInstrumentFinalSubmitError(err)) return instrumentError(res, err.code, err.message, err.statusCode)
     logger.error('重启量表测评错误', err)
     return error(res, err instanceof Error ? err.message : '重启量表测评失败')

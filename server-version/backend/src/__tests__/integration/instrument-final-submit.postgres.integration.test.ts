@@ -154,6 +154,7 @@ const createScaleFixture = async (size: number, suffix = randomUUID().slice(0, 8
       creatorId: userId,
       status: 'PUBLISHED',
       visibility: 'PUBLIC',
+      legacyPublicAccess: true, // Synthetic pre-governance public fixture, not a new platform approval.
       instrumentClass: 'CUSTOM_DESCRIPTIVE',
       instrumentVersion: '2.0.0',
       definition: definition as unknown as Prisma.InputJsonValue,
