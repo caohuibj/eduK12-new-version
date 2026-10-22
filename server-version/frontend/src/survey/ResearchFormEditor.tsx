@@ -11,8 +11,9 @@ const types:Record<FormQuestion['type'],string>={
   DATE:'日期',TIME:'时间',RANK_ORDER:'排序',SLIDER:'滑块',
   CONSTANT_SUM:'恒定总和',MATRIX_MULTIPLE:'矩阵多选',
 }
-export function ResearchFormEditor({value,onChange,projectId,renderImageField}:{value:FormDraft;
-  onChange:(next:FormDraft)=>void;projectId?:string;renderImageField?:(props:{image?:FormQuestion['image'];onChange:(image:FormQuestion['image'])=>void})=>ReactNode}){
+export type FormEditorFocus={pageKey:string;itemKey:string|null}
+export function ResearchFormEditor({value,onChange,projectId,renderImageField,focusedItem,variant}:{value:FormDraft;
+  onChange:(next:FormDraft)=>void;projectId?:string;focusedItem?:FormEditorFocus;variant?:'education';renderImageField?:(props:{image?:FormQuestion['image'];onChange:(image:FormQuestion['image'])=>void})=>ReactNode}){
   const setPage=(index:number,update:(p:FormDraft['pages'][number])=>FormDraft['pages'][number])=>{
     const pages=value.pages.map((p,i)=>i===index?update(p):p)
     onChange({...value,pages})
@@ -28,26 +29,27 @@ export function ResearchFormEditor({value,onChange,projectId,renderImageField}:{
   }
   return <div className="space-y-5">
     <div className="flex flex-wrap gap-2 items-center">
-      <h3 className="font-semibold">Form 问卷页面 · V{value.schemaVersion}</h3>
+      <h3 className="font-semibold">{variant==='education'?'表单区段':'Form 问卷页面'} · V{value.schemaVersion}</h3>
       <span className={fieldCount>500?'text-red-700 text-sm':'text-slate-600 text-sm'}
         role={fieldCount>500?'alert':undefined}>作答字段 {fieldCount}/500（矩阵每行及其他填写各计 1）</span>
       {value.schemaVersion===1&&<button type="button" className="btn-secondary"
         onClick={()=>onChange({...value,schemaVersion:2})}>
         升级为 Form V2（生成新冻结版本）</button>}
       <button type="button" className="btn-secondary" onClick={()=>onChange({...value,pages:[...value.pages,
-        {pageKey:researchKey('p'),title:'第 '+(value.pages.length+1)+' 页',questions:[]}]})}>新增分页</button>
+        {pageKey:researchKey('p'),title:'第 '+(value.pages.length+1)+(variant==='education'?' 区段':' 页'),questions:[]}]})}>{variant==='education'?'新增区段':'新增分页'}</button>
     </div>
-    {value.pages.map((page,pi)=><section className="rounded-xl border p-4 bg-white space-y-4" key={page.pageKey}>
+    {value.pages.map((page,pi)=>focusedItem&&focusedItem.pageKey!==page.pageKey?null:<section className="rounded-xl border p-4 bg-white space-y-4" key={page.pageKey}>
       <header className="flex items-center gap-2">
-        <input className="input flex-1" aria-label={'第 '+(pi+1)+' 页标题'} value={page.title}
+        <input className="input flex-1" aria-label={'第 '+(pi+1)+(variant==='education'?' 区段标题':' 页标题')} value={page.title}
           onChange={e=>setPage(pi,p=>({...p,title:e.target.value}))}/>
-        <button className="btn-secondary" type="button" disabled={pi===0} aria-label="上移分页"
+        <button className="btn-secondary" type="button" disabled={pi===0} aria-label={variant==='education'?'上移区段':'上移分页'}
           onClick={()=>{const copy=value.pages.slice();[copy[pi],copy[pi-1]]=[copy[pi-1],copy[pi]];onChange({...value,pages:copy})}}>↑</button>
-        <button className="btn-secondary" type="button" disabled={pi===value.pages.length-1} aria-label="下移分页"
+        <button className="btn-secondary" type="button" disabled={pi===value.pages.length-1} aria-label={variant==='education'?'下移区段':'下移分页'}
           onClick={()=>{const copy=value.pages.slice();[copy[pi],copy[pi+1]]=[copy[pi+1],copy[pi]];onChange({...value,pages:copy})}}>↓</button>
-        <button type="button" className="btn-secondary" onClick={()=>onChange({...value,pages:value.pages.filter((_,i)=>i!==pi)})}>删除页</button>
+        <button type="button" className="btn-secondary" onClick={()=>onChange({...value,pages:value.pages.filter((_,i)=>i!==pi)})}>{variant==='education'?'删除区段':'删除页'}</button>
       </header>
       {page.questions.map((q,qi)=>{
+        if(focusedItem&&focusedItem.itemKey!==q.itemKey)return null
         const previous=[...value.pages.slice(0,pi).flatMap(p=>p.questions),...page.questions.slice(0,qi)]
           .filter(q=>['SINGLE','MULTIPLE','LIKERT'].includes(q.type))
         return <article key={q.itemKey} id={'survey-form-'+q.itemKey} tabIndex={-1}
@@ -181,6 +183,6 @@ export function ResearchFormEditor({value,onChange,projectId,renderImageField}:{
           onClick={()=>setPage(pi,p=>({...p,questions:[...p.questions,newQuestion(type as FormQuestion['type'])]}))}>
           + {title}</button>)}</div>
     </section>)}
-    {!value.pages.length&&<p className="text-sm text-slate-500">先新增一个分页，再添加题目；也可使用批量导入自动创建第一页。</p>}
+    {!value.pages.length&&<p className="text-sm text-slate-500">{variant==='education'?'先新增一个区段，再添加题目。':'先新增一个分页，再添加题目；也可使用批量导入自动创建第一页。'}</p>}
   </div>
 }
