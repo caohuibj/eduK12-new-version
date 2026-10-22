@@ -74,5 +74,11 @@
         "sha256": "a2e95e6a83293305270d5b777cf8c78617b5c08406072c5fd4ff08da367edacc"
       }
     ]
+  },
+  "darkWordmark": {
+    "filename": "research-wordmark-dark.svg",
+    "derivedFrom": "research-wordmark.svg",
+    "processing": "Vector paths unchanged; fill #234a65 to #dfedf5, #537b8d to #9fc5d8 for approved dark palette",
+    "sha256": "f165b4dbc220b7b0e8ef04b00d784bceb85b055ea2549e84cf8770e1ef64aa36"
   }
 }

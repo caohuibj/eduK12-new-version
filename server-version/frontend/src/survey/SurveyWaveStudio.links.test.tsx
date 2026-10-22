@@ -60,7 +60,8 @@ describe('recruitment capability display, clipboard and QR share one trusted URL
     [{status:'CLOSED',hardStopAt:'2026-01-01T00:00:00Z'},'已紧急终止'],
   ])('describes persisted wave state without issuing actions: %s',async(overrides,label)=>{
     const api=fixture('http://survey.localhost:5173',false,overrides as WaveOverride);await mount()
-    expect(screen.getByRole('heading',{name:'当前阶段：'+label})).toBeInTheDocument()
+    expect(screen.getByText('当前阶段：'+label).closest('summary')).toBeInTheDocument()
+    expect(screen.getByText('当前阶段：'+label).closest('details')).not.toHaveAttribute('open')
     expect(api.fetcher.mock.calls.filter(([,init])=>init?.method==='POST')).toHaveLength(0)
   })
 

@@ -71,8 +71,13 @@ const sjt:SjtDraft={
 let toolIds:{form:string;scale:string;sjt:string}
 async function instrument(kind:'FORM'|'SCALE'|'SJT',definition:FormDraft|ScaleDraft|SjtDraft,targetProjectId=projectId){
   const id=randomUUID()
-  await createDraft(ownerId,targetProjectId,{requestId:id,kind,instrumentKey:key('res'),title:kind+' 自编研究'})
-  await updateDraft(ownerId,targetProjectId,id,{revision:0,title:kind+' 自编研究',definition})
+  if(kind==='SJT'){
+    // Historical protocol fixture: new self-authoring is closed, while stored FINALs remain readable.
+    await db.surveyInstrumentDraft.create({data:{id,projectId:targetProjectId,kind,instrumentKey:key('res'),title:'SJT 历史合成定义',definition:definition as any,revision:1}})
+  }else{
+    await createDraft(ownerId,targetProjectId,{requestId:id,kind,instrumentKey:key('res'),title:kind+' 自编研究'})
+    await updateDraft(ownerId,targetProjectId,id,{revision:0,title:kind+' 自编研究',definition})
+  }
   return id
 }
 async function wave(title:string,ids:string[],allowNewParticipants=false,checkpoint=false,targetProjectId=projectId){
@@ -314,9 +319,11 @@ suite('Survey ResearchOnly T1/T2 real PostgreSQL FINAL contract',()=>{
     sjtChanged.questions[0].options.push({
       optionKey:'athree',label:'先记下要点',contributions:{effort:1,support:2},
     })
-    await updateDraft(ownerId,projectId,toolIds.sjt,{
+    await expect(updateDraft(ownerId,projectId,toolIds.sjt,{
       revision:sjtBefore.revision,title:sjtBefore.title,definition:sjtChanged,
-    })
+    })).rejects.toMatchObject({statusCode:403})
+    // Model a historical multiple-selection definition without reopening the public authoring API.
+    await db.surveyInstrumentDraft.update({where:{id:toolIds.sjt},data:{definition:sjtChanged as any,revision:{increment:1}}})
     const w3=await wave('T3 再测',[toolIds.form,toolIds.scale,toolIds.sjt])
     const started=await startLinkedWave({
       publicId,waveId:w3.id,...link,consent:true,consentVersion:1,

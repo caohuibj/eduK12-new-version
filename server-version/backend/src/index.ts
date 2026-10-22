@@ -16,6 +16,9 @@ import { validateSurveyStartupConfig } from './modules/survey/startup.config'
 import { surveyAuthRouter } from './modules/survey/auth.routes'
 import { surveyProjectsRouter } from './modules/survey/projects.routes'
 import { surveyReportDraftsRouter } from './modules/survey/report-drafts.routes'
+import { surveyToolLibraryRouter } from './modules/survey/tool-library.routes'
+import { surveyToolMediaRouter } from './modules/survey/media.routes'
+import { surveyMaterialLibraryRouter } from './modules/survey/material-library.routes'
 import { surveyBuilderRouter } from './modules/survey/builder.routes'
 import { surveyMediaRouter } from './modules/survey/media.routes'
 import { surveyWavesRouter } from './modules/survey/waves.routes'
@@ -299,6 +302,9 @@ app.use('/api/survey', surveyFeatureGuard, surveyOriginGuard)
 app.use('/api/survey/reference-governance',surveyFormalReferenceRouter)
 app.use('/api/survey/scale-library-governance',surveyScaleLibraryGovernanceRouter)
 app.use('/api/survey/auth', surveyAuthRouter)
+app.use('/api/survey/tool-library', surveyToolLibraryRouter)
+app.use('/api/survey/tool-media', surveyToolMediaRouter)
+app.use('/api/survey/media-library', surveyMaterialLibraryRouter)
 app.use('/api/survey/projects', surveyBuilderRouter)
 app.use('/api/survey/projects', surveyReportDraftsRouter)
 app.use('/api/survey/projects', surveyMediaRouter)

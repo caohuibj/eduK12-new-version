@@ -2,7 +2,7 @@ import type {LibraryMediaManifest} from './media'
 import {Prisma} from '@prisma/client'
 import {getContentRelease,type StoredRelease} from '../measurement-content/repository'
 import {prepareRelease} from '../measurement-content/release'
-import {scaleMeasurementRelease} from '../measurement-content/scale'
+import {scaleMeasurementRelease,scopedScaleKey} from '../measurement-content/scale'
 import {hashScaleDefinition,type ScaleDefinitionV2} from '../scale/scale-definition'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {compileResearchScale} from '../survey/builder.compiler'
@@ -40,8 +40,16 @@ export async function submissionSource(tx:Prisma.TransactionClient,actorId:strin
       instrumentVersion:release.content.instrumentVersion,definition:compiled,instrumentClass:'CUSTOM_DESCRIPTIVE',scope:release.scope,
       presentationMode:(definition as {presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE'}).presentationMode??'ALL_AT_ONCE'}))
     if(expected.contentHash!==release.contentHash)fail('量表不可变编制快照不一致')
-    const [project]=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM survey_projects WHERE id=${release.scope.resourceId} AND owner_user_id=${actorId} FOR SHARE`)
-    if(!project)fail('无权提交该研究项目量表',403)
+    if(release.provenance.authoringSource==='SURVEY_TOOL_TEMPLATE'){
+      // Only the server's standalone publication path emits this namespace.
+      // Historic snapshots are checked against their immutable release, not today's draft.
+      if(release.scope.resourceId!==sourceId||release.key!==scopedScaleKey(release.scope,sourceId))fail('工具发布来源不一致',403)
+      const [tool]=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM survey_tool_templates WHERE id=${sourceId} AND owner_user_id=${actorId} AND kind='SCALE' FOR SHARE`)
+      if(!tool)fail('无权提交该工具集量表',403)
+    }else{
+      const [project]=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM survey_projects WHERE id=${release.scope.resourceId} AND owner_user_id=${actorId} FOR SHARE`)
+      if(!project)fail('无权提交该研究项目量表',403)
+    }
   }
   snapshot.snapshotOrigin=stored?'PUBLISHED_PROVENANCE':'APPLICATION_CAPTURE'
   snapshot.definitionHash=canonicalHash(snapshot.definition)

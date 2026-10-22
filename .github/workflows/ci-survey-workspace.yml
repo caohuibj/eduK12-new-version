@@ -1,0 +1,149 @@
+name: Survey workspace bounded merge checks
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  CI_EVENT: pull_request
+  CI_HEAD_REF: work/survey-visual-20261022
+  CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+  CI_PR_REPOSITORY: caohuibj/eduK12-new-version
+  NODE_OPTIONS: --max-old-space-size=4096
+jobs:
+  admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      PLAN: ${{ inputs.plan }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: test only the changed official-reuse boundary contracts
+        run: |
+          node --test --test-name-pattern='compiled' .github/scripts/survey-workspace-reuse.test.mjs
+          node --test --test-name-pattern='wires compiled evidence' .github/scripts/survey-workspace.test.mjs
+      - name: verify reviewed original local records and immutable inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/survey-workspace-checks.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: survey-workspace-admission-${{ github.sha }}
+          path: survey-workspace-evidence
+          if-no-files-found: error
+          retention-days: 3
+  frontend:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify and restore the exact successful CSS compilation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/survey-workspace-reuse.mjs frontend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: survey-workspace-frontend-${{ github.sha }}
+          path: server-version/frontend/dist
+          if-no-files-found: error
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: survey-workspace-frontend-reuse-${{ github.sha }}
+          path: survey-workspace-evidence/official-frontend.json
+          if-no-files-found: error
+          retention-days: 3
+  browser:
+    needs: frontend
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: survey-workspace-frontend-${{ github.sha }}
+          path: server-version/frontend/dist
+      - uses: actions/download-artifact@v4
+        with:
+          name: survey-workspace-admission-${{ github.sha }}
+          path: survey-workspace-evidence
+      - name: install locked browser tools
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          node .github/release-tools/node_modules/playwright-core/cli.js install chromium
+      - name: require Chinese fonts and install only a missing signed package
+        timeout-minutes: 3
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "$(fc-list :lang=zh file)" ]]; then
+            font_metadata="$(apt-cache show fonts-wqy-zenhei=0.9.45-8)"
+            font_path="$(awk '/^Filename: /{print $2;exit}' <<< "$font_metadata")"
+            font_sha="$(awk '/^SHA256: /{print $2;exit}' <<< "$font_metadata")"
+            [[ "$font_path" == pool/universe/f/fonts-wqy-zenhei/fonts-wqy-zenhei_0.9.45-8_all.deb ]]
+            [[ "$font_sha" =~ ^[a-f0-9]{64}$ ]]
+            font_package="$RUNNER_TEMP/survey-font.deb"
+            curl --proto '=https' --tlsv1.2 --fail --location --show-error --max-time 60 --retry 1 "https://archive.ubuntu.com/ubuntu/$font_path" -o "$font_package"
+            printf '%s  %s\n' "$font_sha" "$font_package" | sha256sum --check
+            dpkg-deb --extract "$font_package" "$RUNNER_TEMP/survey-font"
+            mkdir -p "$HOME/.local/share/fonts/survey-ci"
+            find "$RUNNER_TEMP/survey-font/usr/share/fonts" -name '*.ttc' -exec cp '{}' "$HOME/.local/share/fonts/survey-ci/" \;
+            fc-cache -f "$HOME/.local/share/fonts/survey-ci"
+          fi
+          [[ -n "$(fc-list :lang=zh file)" ]]
+          fc-match -f '%{family}\n%{file}\n' ':lang=zh' > survey-workspace-evidence/chinese-font.txt
+      - name: verify compiled Survey entry, studios, application and study sections
+        run: node .github/scripts/survey-workspace-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: survey-workspace-browser-${{ github.sha }}
+          path: survey-workspace-evidence
+          if-no-files-found: error
+          retention-days: 3
+  backend:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify the unchanged official backend types and native migration restore
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/survey-workspace-reuse.mjs backend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: survey-workspace-backend-${{ github.sha }}
+          path: survey-workspace-evidence
+          if-no-files-found: error
+          retention-days: 3

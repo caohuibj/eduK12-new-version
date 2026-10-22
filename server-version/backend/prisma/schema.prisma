@@ -9,6 +9,8 @@ datasource db {
 }
 
 model User {
+  surveyToolTemplates SurveyToolTemplate[]
+  surveyToolSelections SurveyToolSelection[]
   scaleLibrarySubmissions ScaleLibrarySubmission[]
   scaleLibraryReceivedGrants ScaleLibraryUseGrant[] @relation("LibraryGrantRecipient")
   scaleLibraryIssuedGrants ScaleLibraryUseGrant[] @relation("LibraryGrantIssuer")
@@ -2978,6 +2980,7 @@ model SurveyMfaRecoveryCode {
   @@map("survey_mfa_recovery_codes")
 }
 model SurveyProject {
+  toolSelections SurveyToolSelection[]
   referenceRequests SurveyReferenceRequest[]
   reportDrafts SurveyReportDraft[]
   instruments    SurveyInstrumentDraft[]
@@ -4387,4 +4390,33 @@ model ScaleLibraryMedia {
  state String @default("READY")
  @@unique([entryId,assetId])
  @@map("scale_library_media")
+}
+
+// Independent private Survey templates; study selection creates a fixed project copy.
+model SurveyToolTemplate {
+  owner User @relation(fields:[ownerUserId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  id String @id
+  ownerUserId String @map("owner_user_id")
+  kind String
+  title String
+  definition Json
+  revision Int @default(0)
+  completedRevision Int? @map("completed_revision")
+  status String @default("DRAFT")
+  creationDigest String @map("creation_digest")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@index([ownerUserId,status,updatedAt(sort: Desc),id],map:"survey_tool_templates_owner_idx")
+  @@map("survey_tool_templates")
+}
+model SurveyToolSelection {
+  owner User @relation(fields:[ownerUserId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  project SurveyProject @relation(fields:[projectId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+  id String @id
+  ownerUserId String @map("owner_user_id")
+  projectId String @map("project_id")
+  requestDigest String @map("request_digest")
+  instrumentIds Json @map("instrument_ids")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+  @@map("survey_tool_selections")
 }

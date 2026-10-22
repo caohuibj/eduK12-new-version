@@ -1,3 +1,4 @@
+import {surveyAssetBase} from './tool-library-api'
 import { BasicFormAnswer } from '../modules/assessment-core/form/BasicFormAnswer'
 import { useEffect, useRef, useState } from 'react'
 import type { ResearchDraft, FormDraft, ScaleDraft, SjtDraft, FormQuestion, SurveyImage } from './builder.types'
@@ -76,7 +77,7 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath,focus
   const picture=(image?:SurveyImage)=>image&&<figure className="my-3">
     <img className="max-h-72 object-contain max-w-full rounded border"
       loading="lazy" alt={image.altText}
-      src={'/api/survey/projects/'+draft.projectId+'/assets/'+image.asset.assetId+'/preview'}/>
+      src={surveyAssetBase(draft.projectId)+'/'+encodeURIComponent(image.asset.assetId)+'/preview'}/>
     {image.caption&&<figcaption className="text-xs mt-1">{image.caption}</figcaption>}
   </figure>
   const question=(q:FormQuestion)=>{

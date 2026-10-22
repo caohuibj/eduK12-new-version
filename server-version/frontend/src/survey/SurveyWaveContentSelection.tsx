@@ -12,9 +12,9 @@ const problem=(error:unknown)=>error instanceof Error?error.message:'版本目�
 const identity=(releaseId:string,entryKey:string)=>JSON.stringify([releaseId,entryKey])
 
 export function SurveyWaveContentSelection({base,revision,tools,request,value,onChange,disabled=false,frozen,published}:Props){
-  return <section aria-label="研究者报告与参考版本" className="border rounded-lg p-3 space-y-3">
+  return <section aria-label="研究者报告与参考版本" className="survey-wave-content-selection survey-workflow-group border rounded-lg p-3 space-y-3">
     <h4 className="font-semibold">研究者报告与参考版本</h4>
-    <p className="text-sm">仅供当前研究者读取；模板标注的预期受众不授予学生、家长或教师访问权，也不改变上方被试原始指标反馈。</p>
+    <details className="survey-workflow-help"><summary>适用范围与访问说明</summary><p className="text-sm">仅供当前研究者读取；模板标注的预期受众不授予学生、家长或教师访问权，也不改变上方被试原始指标反馈。</p></details>
     {published?<>
       <p>版本选择已随研究定义冻结，只读，不随新版本更新。</p>
       {frozen===undefined?<p role="status">尚未取得已冻结版本摘要，请刷新核对；不能从当前草稿推断。</p>:frozen.map(unit=><article key={unit.draftId} className="border-t pt-2 break-words">

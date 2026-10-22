@@ -78,6 +78,7 @@ export async function createDraft(userId:string,projectId:string,raw:{
   requestId:string;instrumentKey:string;kind:SurveyKind;title:string;
 }){
   const kind=surveyKindSchema.parse(raw.kind)
+  if(!['FORM','SCALE'].includes(kind))fail(403,'SJT 与认知测验暂不开放自建，请选用已授权的固定版本')
   const instrumentKey=surveyKeySchema.parse(raw.instrumentKey)
   const initial=initialSurveyDefinition(kind)
   return prisma.$transaction(async tx=>{
@@ -106,6 +107,7 @@ export async function updateDraft(userId:string,projectId:string,id:string,
     await authorizedProject(tx,userId,projectId,true)
     const row=await findDraft(tx,projectId,id)
     if(row.catalogGrantId)fail(409,'来源授权工具为只读，不能编辑定义')
+    if(!['FORM','SCALE'].includes(row.kind))fail(403,'SJT 与认知测验暂不开放自建编辑')
     if(row.status!=='DRAFT'||row.revision!==input.revision)fail(409,'草稿版本已变化，请获取最新内容后再保存')
     const definition=assertSurveyDraft(surveyKindSchema.parse(row.kind),input.definition)
     const changed=await tx.surveyInstrumentDraft.updateMany({
@@ -124,6 +126,7 @@ export async function copyDraft(userId:string,projectId:string,id:string,input:{
   return prisma.$transaction(async tx=>{
     await authorizedProject(tx,userId,projectId,true)
     const from=await findDraft(tx,projectId,id)
+    if(!from.catalogGrantId&&!['FORM','SCALE'].includes(from.kind))fail(403,'SJT 与认知测验暂不开放复制自建')
     await catalogSnapshotsForDrafts(tx,userId,from.catalogGrantId?[from.catalogGrantId]:[])
     const prior=await tx.surveyInstrumentDraft.findUnique({where:{id:input.requestId}})
     if(prior){

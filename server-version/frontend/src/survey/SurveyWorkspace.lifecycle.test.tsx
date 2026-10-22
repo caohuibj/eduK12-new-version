@@ -48,7 +48,7 @@ describe('Survey workspace in-flight editing and request scope',()=>{
     const acceptedValues=[(title as HTMLInputElement).value,(prompt as HTMLInputElement).value]
     draft={...draft,title:'已保存名称',revision:2}
     await act(async()=>pending.resolve(await response(draft)))
-    await screen.findByText('草稿已保存；发布冻结将在研究波次阶段执行')
+    await screen.findByText('表单草稿已保存；请到「发布与采集」选择本表单，检查并冻结波次。')
     // A successful ACK must never erase any edit the UI allowed while waiting.
     expect([(title as HTMLInputElement).value,(prompt as HTMLInputElement).value]).toEqual(acceptedValues)
     expect(acceptedValues).toEqual(['已保存名称','原始题干'])
@@ -97,7 +97,7 @@ describe('Survey workspace in-flight editing and request scope',()=>{
     expect(patches[1]).toMatchObject({revision:2,definition:{pages:[{questions:[{
       image:{asset:{assetId:'new-image'}},
     }]}]}})
-    await screen.findByText('草稿已保存；发布冻结将在研究波次阶段执行')
+    await screen.findByText('表单草稿已保存；请到「发布与采集」选择本表单，检查并冻结波次。')
     expect(screen.getByRole('button',{name:'保存草稿'})).toBeDisabled()
   })
 

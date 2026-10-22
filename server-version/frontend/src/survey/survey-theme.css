@@ -1,0 +1,35 @@
+/* Survey brand colors follow the existing Research wordmark and blue emblem.
+   Prefixed tokens alone are global; controls opt in on Survey surfaces only. */
+:root {
+  --survey-brand-ink: #234a65;
+  --survey-brand-accent: #2b6f8c;
+  --survey-brand-accent-strong: #235975;
+  --survey-brand-muted: #526f80;
+  --survey-brand-soft: #eaf3f8;
+  --survey-brand-subtle: #f5f9fc;
+  --survey-brand-canvas: #fbfdff;
+  --survey-brand-line: #d4e3ec;
+  --survey-brand-border: #bfd6e3;
+  --survey-brand-border-strong: #8bb2c8;
+  --survey-brand-on-dark: #edf6fc;
+  --survey-brand-focus: #2b718d;
+}
+
+:is(.survey-researcher,.survey-entry,.survey-admin,.survey-admin-auth,.hui-survey-admin-shell,.survey-participant-panel,.survey-answer-panel,.survey-participant-action,.survey-account-panel,.survey-create-panel,.survey-material-dialog,.survey-builder-shell) {
+  --hui-ds-color-action: var(--survey-brand-accent);
+  --hui-ds-color-action-hover: var(--survey-brand-accent-strong);
+  --hui-ds-color-focus: var(--survey-brand-focus);
+}
+:is(.survey-researcher,.survey-admin) :is(input[type='checkbox'],input[type='radio']) {
+  accent-color: var(--survey-brand-accent);
+}
+:is(.survey-researcher,.survey-admin) .bg-teal-50,
+.survey-participant-message.bg-teal-50 { background-color: var(--survey-brand-soft); }
+:is(.survey-researcher,.survey-admin) .border-teal-600,
+:is(.survey-participant-message,.survey-participant-panel).border-teal-600 { border-color: var(--survey-brand-accent); }
+@media (hover:hover) {
+  :is(.survey-researcher,.survey-admin) .btn-primary:hover:not(:disabled) {
+    background-color: var(--survey-brand-accent-strong);
+    border-color: var(--survey-brand-accent-strong);
+  }
+}

@@ -842,3 +842,80 @@ CLI 用例继承真实 PR 环境而失败；仅隔离测试子进程的分支变
 Actions 重新核官方 run/job/source/branch/步骤、24 小时有效期及两个完整 Git tree，
 核原配置后接纳此成功扫描并保存 receipt，不重复扫描。元数据不可用、过期或
 输入不同直接失败，不回退重扫、不把原父 run 的失败改为成功。
+
+
+## Survey 独立工具与昼夜外观限定合并（2026-10-23）
+
+`work/survey-visual-20261022` 基于已合并 Training #337 的官方 main
+`468040dcfcab3a70a6030c177775fd4e04b05a83`，仅使用 `survey-workspace`
+精确候选路线。完整产品 blob、组件 tree、依赖/配置和逐项控制文件绑定；
+未知路径、模式、base、source tree 或证据漂移拒绝，不回退全平台。原有
+Training 和云端 School/Teacher 路线保持独立，不更改权限或分支保护。
+
+接纳当前对话逐批审查的 unsigned local 原报告，固定原始 gzip 字节和摘要，
+标记 reviewed-local-evidence / originalExecutionSigned=false / ciExecuted=false。
+按唯一 file/case 选择真实 passed 断言，保留原始失败与过滤，不相加历次总数。
+主题外壳改变影响的工作台消费者已补验；旧“研究数据”名称断言只修复后重验
+该失败项。编制页九个当前深色状态另有可见文字对比度、白底和溢出记录。
+这些不是本轮 Actions 执行，也不代表所有页面或真实用户人工验收。
+
+本机 73 项范围/拒绝/证据篡改/严格汇总合同已通过，原始记录接纳后不在 CI 重复。
+GitHub 为缺失资格的主要执行位置：实际 checkout 的完整范围与证据重算，
+集成 frontend app types，一次 frontend production build；浏览器独立消费
+同一 dist，检查入口、三个独立编制器、共用库申请及发布/报告/数据在
+390/1440 宽度的深色、溢出和 WCAG。请求严格使用合成 DTO，未知接口失败，
+不声称这些页面桩证明后端授权。后端仅生成/校验修正后的 Prisma 模型与类型，
+将官方 main 的干净隔离 schema 升级到本候选，并在同一临时 Postgres service
+用无登录合成行校验完成状态约束、默认未完成、基线保留及原生 dump/restore。
+已有真实本地 PG 权限、固定修订、撤权/附件同意和原子回滚报告不重复执行。
+变化应用与 CI 控制仍执行 JS/TS CodeQL。依赖锁、科学计分与生产配置未变，
+不运行平台全套、媒体/压力检查或重型镜像构建；本路线不授予生产部署资格。
+
+范围/接纳五分钟，编译/页面/迁移分别设置有限时限。稳定 ready gate 必须
+scope、完整 survey-workspace 嵌套工作流和 CodeQL 实际 success；草稿、缺失、
+跳过、取消和失败均拒绝，实际 checkout 重算计划。main 合并仅分类，不能
+把原始失败改写为成功，也不自动部署或合并其他产品。
+
+
+Survey 当前候选续验保留 run `39811690734` 的整体失败：正式浏览器在
+1440 的数据表头发现 `bg-slate-100` 对比度 1.53:1。仅为该深色 utility
+加入原有 surface 映射；其余应用 JS/TS、后端、fixture、迁移执行器及依赖
+配置保持完全一致。绑定只允许反向移除这一精确 CSS 片段后等于原始完整
+文件，其他应用差异拒绝复用。前端新 CSS 编译一次，旧类型证明继续接纳。
+
+续验核对同一官方 run/head/attempt、固定 job、确切成功阶段和 24 小时有效期。
+后端 job `119939669541` 的类型及隔离升级/恢复成功，artifact `12440287737`
+ZIP SHA256 `58145d0c0f73c83516d3b21ba14020834c18c7f87d0bddf244c353cbc31f1d8a`
+及内部真实结果再核对后复用，不启动数据库或重复编译。前端类型来自成功
+job `119939669432`。应用 SAST 来自成功 job `119939517555`，仅变化的 JS
+控制执行新 CodeQL；新接纳边界的七个拒绝/过期合同及一个变化 wiring 合同
+在 CI 首次执行，不重复已核验的原通用合同。
+
+官方失败浏览器 artifact `12440726926` 的 ZIP SHA256
+`b76aa6bc7e4d1b3609018ff96d04bc8ec916b577054199c775eea65ee9d8cfd7`，
+内部 browser.json SHA256
+`4c8bda31b276e1f241419066055b2eca030e479939738bb66a8923e8b8961d07`。
+只接纳完整通过的七个 1440 场景；失败 data 与八个未执行 390 场景重新验收。
+报告显式为 sameRunFullJourneyClaim=false。未匹配、失效或篡改的证据停止，
+不暗中复跑整批或把原失败、缺失、跳过项目改成通过；不授予生产部署资格。
+
+续验 run `39814196927` 的浏览器尚未运行：官方原日志在下载九个额外字体包
+时于 `16:37:38 UTC` 取消，汇总列表曾滞后显示运行中；1316-byte browser
+artifact 只有继承的接纳记录，不是新的浏览器通过证明。保留该取消及旧失败。
+新续验不重复 apt `--with-deps`，仅安装相同锁定 Playwright 的官方 Chromium；
+先核 runner 的中文字体覆盖，缺失时仅从 Ubuntu 官方 HTTPS 源补固定版本
+WenQuanYi 字体包，以可信 runner apt 元数据摘要核验后解包至用户字体目录。
+中文字库缺失或摘要不符直接失败；记录实际字体路径，不改 runner 安全配置。
+
+该 run 的 frontend job `119948529906` 已成功完成修复后 CSS 的唯一编译。
+固定 source `340a952b77646c72eec2b437795d9b71f022b2c9`、完整 frontend tree、
+确切 compile 阶段、24 小时年龄与 artifact `12442170332` 的 ZIP SHA256
+`87ca934ed91875e59d31d8de723d4e3293a79e3c80023a61dbebc0a2d87ff7fd`，
+核验后仅恢复并记录同一 dist 的逐文件摘要，不重新编译或重验应用类型。
+原控制合同阶段的官方完整日志 SHA256
+`cafaf4c5fea9c5fb0bd5316ec502e5a15841f6c1086f8251406c9c9935552bc3`
+与固定 job/成功步骤核验后接纳未变化的六项；两项 wiring 已变化故重新执行，
+另首次运行两个编译产物身份/失败拒绝合同。已成功的 CodeQL job
+`119948366459` 覆盖未变的 scope/browser 控制文件，逐 blob 核验后复用；
+变化的 reuse、reuse.test、workspace.test 及消费新 helper 的 checks 控制接受新的 CodeQL。
+取消父 run 的状态原样记录，接纳成功步骤不授予其整条运行成功身份。

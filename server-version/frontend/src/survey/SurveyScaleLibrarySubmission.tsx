@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ScaleLibraryMediaPreview } from '../components/scale-governance/ScaleLibraryMediaPreview'
 import { useScaleLibrarySubmission } from '../components/scale-governance/useScaleLibrarySubmission'
 import { submissionStatusLabel, type SubmissionMetadata } from '../api/scaleLibraryGovernance'
@@ -8,10 +8,11 @@ const fields:{key:keyof SubmissionMetadata;label:string}[]=[
   {key:'copyright',label:'版权与共享许可'},{key:'applicability',label:'用途与适用范围'},
   {key:'scoringDescription',label:'计分说明'},{key:'reportDescription',label:'报告说明'},
 ]
-export function SurveyScaleLibrarySubmission({sourceId}:{sourceId:string}){
+export function SurveyScaleLibrarySubmission({sourceId,initialReleaseId='',onBusyChange}:{sourceId:string;initialReleaseId?:string;onBusyChange?:(busy:boolean)=>void}){
   const {source,submissions,loading,busy,error,status,refresh,submit,withdraw}=useScaleLibrarySubmission('SURVEY',sourceId)
-  const [releaseId,setReleaseId]=useState(''),[supplement,setSupplement]=useState<Partial<SubmissionMetadata>>({})
+  const [releaseId,setReleaseId]=useState(initialReleaseId),[supplement,setSupplement]=useState<Partial<SubmissionMetadata>>({})
   const [mediaConsentKey,setMediaConsentKey]=useState('')
+  useEffect(()=>{onBusyChange?.(busy);return()=>onBusyChange?.(false)},[busy,onBusyChange])
   const [withdrawReasons,setWithdrawReasons]=useState<Record<string,string>>({})
   const release=source?.releases.find(row=>row.releaseId===releaseId)
   const manifest=release?.mediaManifest
