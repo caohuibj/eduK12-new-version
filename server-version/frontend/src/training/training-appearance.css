@@ -1,0 +1,167 @@
+/* Training only. No global .dark class, image inversion or layout overrides. */
+.hui-training .training-appearance-settings {
+  margin-block:24px;padding:24px;border:1px solid var(--training-border);border-radius:12px;
+  background:var(--training-surface);color:var(--training-ink);
+}
+.hui-training .training-appearance-settings h2 { display:flex;align-items:center;gap:9px;font-size:18px;font-weight:600;margin:0; }
+.hui-training .training-appearance-settings p { font-size:13px;line-height:1.8;color:var(--training-muted);margin-top:10px; }
+.hui-training .training-appearance-settings fieldset { padding:0;border:0;margin:18px 0 0;min-width:0; }
+.hui-training .training-appearance-options { display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px; }
+.hui-training .training-appearance-option { display:flex;align-items:center;gap:12px;padding:16px 13px;border:1px solid var(--training-border);border-radius:9px;min-width:0;cursor:pointer; }
+.hui-training .training-appearance-option>svg { flex:none;color:var(--training-muted); }
+.hui-training .training-appearance-option>span { flex:1;min-width:0; }
+.hui-training .training-appearance-option strong { display:block;font-size:14px;font-weight:600; }
+.hui-training .training-appearance-option small { display:block;font-size:12px;line-height:1.7;color:var(--training-muted);margin-top:4px; }
+.hui-training .training-appearance-option input { flex:none;width:16px;height:16px;accent-color:var(--training-bamboo); }
+.hui-training .training-appearance-option:has(input:checked) { border-color:var(--training-bamboo);background:color-mix(in srgb,var(--training-bamboo) 9%,var(--training-surface)); }
+.hui-training .training-appearance-option:focus-within { outline:2px solid var(--training-bamboo);outline-offset:3px; }
+.hui-training .training-appearance-warning { color:var(--hui-ds-status-warning-text)!important; }
+@media(max-width:700px) {
+ .hui-training .training-appearance-settings { padding:20px; }
+ .hui-training .training-appearance-options { grid-template-columns:1fr;gap:9px; }
+ .hui-training .training-appearance-option { min-height:72px; }
+}
+
+@media screen {
+.hui-training.hui-app[data-training-theme="dark"]:not(:has([data-cognitive-task-root]))[data-shell-mode] {
+ color-scheme:dark;
+ --training-theme-paper:#141a17;--training-theme-surface:#1c2420;--training-theme-ink:#e5e9df;--training-theme-action:#bdd1a4;--training-theme-line:#354339;
+ --training-paper:var(--training-theme-paper);--training-surface:var(--training-theme-surface);--training-ink:var(--training-theme-ink);
+ --training-muted:#a7b2a5;--training-bamboo:#bdd1a4;--training-border:#354339;--training-vermilion:#e8a28f;
+ --training-raised:#253029;--training-input:#17201a;--training-on-accent:#1c2b20;
+ --tt-paper:var(--training-paper);--tt-surface:var(--training-surface);--tt-ink:var(--training-ink);--tt-muted:var(--training-muted);--tt-line:var(--training-border);--tt-green:var(--training-bamboo);--tt-soft:#2b392b;
+ --hui-ds-color-page:var(--training-paper);--hui-ds-color-page-strong:var(--training-paper);--hui-ds-color-page-elevated:var(--training-paper);
+ --hui-ds-color-surface:var(--training-surface);--hui-ds-color-ink:var(--training-ink);--hui-ds-color-muted:var(--training-muted);--hui-ds-color-line:var(--training-border);--hui-ds-color-soft:#2b392b;
+ --hui-ds-color-action:var(--training-bamboo);--hui-ds-color-action-rgb:189 209 164;--hui-ds-color-action-hover:#cdddb9;--hui-ds-color-focus:var(--training-bamboo);
+ --hui-ds-color-success:#aed0a1;--hui-ds-color-success-strong:#aed0a1;--hui-ds-color-warning:#e0c68e;--hui-ds-color-danger:#f0a79b;
+ --hui-ds-status-success-bg:#23382c;--hui-ds-status-success-border:#4c6c56;--hui-ds-status-success-text:#bddbb4;
+ --hui-ds-status-warning-bg:#393322;--hui-ds-status-warning-border:#7b693e;--hui-ds-status-warning-text:#e7cc92;
+ --hui-ds-status-error-bg:#3b2825;--hui-ds-status-error-border:#87574b;--hui-ds-status-error-text:#f0b3a5;
+ --hui-ds-status-pending-bg:#26323c;--hui-ds-status-pending-border:#506a7e;--hui-ds-status-pending-text:#b4d1e9;
+ --hui-ds-role-staff-ink:var(--training-ink);--hui-ds-role-staff-muted:var(--training-muted);--hui-ds-role-staff-line:var(--training-border);--hui-ds-role-staff-page:var(--training-paper);--hui-ds-role-staff-accent:var(--training-bamboo);
+ --hui-ds-role-runner-line:var(--training-border);
+ --staff-ink:var(--training-ink);--staff-muted:var(--training-muted);--staff-line:var(--training-border);--staff-accent:var(--training-bamboo);--staff-accent-hover:#cdddb9;--staff-surface:var(--training-surface);--staff-bg:var(--training-paper);
+ --student-ink:var(--training-ink);--student-muted:var(--training-muted);--student-line:var(--training-border);--student-page:var(--training-paper);--student-soft:#2b392b;--student-blue:var(--training-bamboo);--student-blue-hover:#cdddb9;--student-green:#aed0a1;--student-surface:var(--training-surface);
+ --runner-ink:var(--training-ink);--runner-muted:var(--training-muted);--runner-line:var(--training-border);--runner-page:var(--training-paper);--runner-soft:#2b392b;--runner-blue:var(--training-bamboo);--runner-blue-hover:#cdddb9;--runner-green:#aed0a1;--runner-surface:var(--training-surface);
+ color:var(--training-ink);background:var(--training-paper);
+}
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .hui-product {
+ --hui-color-text:var(--training-ink);--hui-color-muted:var(--training-muted);--hui-color-surface:var(--training-surface);
+ --hui-color-background:var(--training-paper);--hui-color-border:var(--training-border);--hui-color-action:var(--training-bamboo);--hui-color-action-hover:#cdddb9;--hui-color-focus:var(--training-bamboo);
+}
+/* Legacy Training styles contain literal light colours. These adapters override
+ * colour only, keeping geometry, semantic chart marks and all media intact. */
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.hui-app-header,.hui-navigation,.hui-breadcrumb,.card,.staff-panel,.staff-toolbar,.staff-catalog-card,.staff-course-card,.staff-detail-header,.hui-page-header,.hui-discovery-card,.training-side-panel,.training-course-item,.training-course-work,.training-dialog,.staff-dialog,.training-library-filter,.training-tool-card,.training-form-surface,.questionnaire-unit-card,.questionnaire-product-card,.student-submit-info,.student-submit-response,.student-submit-feedback,.runner-panel,.runner-question,.runner-card,.runner-summary) {
+ background:var(--training-surface)!important;color:var(--training-ink)!important;border-color:var(--training-border)!important;box-shadow:none;
+}
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.training-home,.training-detail,.training-library,.training-form-surface,.training-section-switch,.hui-auth-stage,.hui-app-main,.hui-app--assessment-runner) { background-color:var(--training-paper)!important;color:var(--training-ink); }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(h1,h2,h3,h4,label,legend,th,.text-gray-700,.text-gray-800,.text-gray-900,.text-slate-700,.text-slate-800,.hui-page-header__title,.staff-detail-title,.training-account-link,.training-task-item,.training-course-text h3,.training-library-filter label) { color:var(--training-ink)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.text-gray-400,.text-gray-500,.text-gray-600,.text-slate-500,.text-slate-600,.training-home-subtitle,.training-back,.training-context-back,.training-course-description,.training-task-item p,.training-course-text small,.training-section-header p,.staff-help,.staff-muted,.hui-page-header__description,.runner-muted,.training-account-logout,.training-assignment-facts dt) { color:var(--training-muted)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),select,textarea,.input,.ql-toolbar,.ql-container,.ql-editor,.questionnaire-unit-trigger) { background-color:var(--training-input)!important;color:var(--training-ink)!important;border-color:var(--training-border)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(input,textarea)::placeholder { color:#91a08d!important;opacity:1; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(input,textarea,select):disabled { background-color:var(--training-raised)!important;color:var(--training-muted)!important;opacity:1; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(input[type=radio],input[type=checkbox]) { accent-color:var(--training-bamboo); }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.bg-white,.bg-gray-50,.bg-gray-100,.bg-slate-50,.bg-slate-100,.training-assignment-facts,.training-assignment-focused,.student-submit-meta,.student-submit-deadline,.runner-context,.runner-intro,.runner-progress,.training-course-settings) { background-color:var(--training-raised)!important;color:var(--training-ink)!important;border-color:var(--training-border)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(td,th,.training-task-item,.training-course-card-bottom,.training-assignment-item,.training-section-switch,.training-workspace-tabs,.training-filter-bar,.staff-list-row,.staff-dialog__header,.staff-dialog__footer) { border-color:var(--training-border)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.training-action,.btn-primary,.hui-button--primary,.runner-submit,.training-portal-login--primary) { background:var(--training-bamboo)!important;border-color:var(--training-bamboo)!important;color:var(--training-on-accent)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.training-action--quiet,.btn-secondary,.hui-button--secondary,.training-row-action,.training-portal-register) { background:var(--training-surface)!important;border-color:var(--training-border)!important;color:var(--training-bamboo)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.training-action,.btn-primary,.hui-button--primary):hover:not(:disabled) { background:#cdddb9!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.training-action--quiet,.btn-secondary,.hui-button--secondary):hover:not(:disabled) { background:var(--training-raised)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.training-workspace-tabs a,.training-section-switch button) { color:var(--training-muted)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.training-workspace-tabs a[aria-current=page],.training-section-switch button[aria-pressed=true]) { color:var(--training-bamboo)!important;border-color:var(--training-bamboo)!important;background:#2b392b!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.bg-green-50,.bg-green-100,.learner-enrolled,.learner-course-count,.staff-badge,.runner-choice[aria-checked=true]) { background:var(--hui-ds-status-success-bg)!important;color:var(--hui-ds-status-success-text)!important;border-color:var(--hui-ds-status-success-border)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.bg-red-50,.bg-red-100,.training-error,.text-red-500,.text-red-600,.text-red-700) { background-color:var(--hui-ds-status-error-bg)!important;color:var(--hui-ds-status-error-text)!important;border-color:var(--hui-ds-status-error-border)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.bg-yellow-50,.bg-amber-50) { background:var(--hui-ds-status-warning-bg)!important;color:var(--hui-ds-status-warning-text)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .hui-modal-surface { background-color:rgb(5 10 7 / 75%);color:var(--training-ink); }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .hui-modal-surface :is([role=dialog],.training-join-dialog,.tool-selection-dialog,.training-dialog) { background:var(--training-surface)!important;color:var(--training-ink)!important;border-color:var(--training-border)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(button,a,input,select,textarea):focus-visible { outline-color:var(--training-bamboo); }
+
+/* The approved moonlit artwork is a separate, already-dark asset. */
+.hui-training.hui-app--standard.hui-app--student.training-workspace-shell[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-learner-home {
+ --learner-ink:var(--training-ink);--learner-muted:var(--training-muted);--learner-line:var(--training-border);--learner-green:var(--training-bamboo);
+}
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-learner-home .learner-home-welcome { background:var(--training-surface)!important;border-color:var(--training-border)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-learner-home .learner-welcome-art {
+ width:76%!important;opacity:1!important;background:linear-gradient(90deg,#1c2420 0%,#1c2420a0 30%,#1c242000 64%),url('./training-moonlit-landscape.webp') 74% 40%/cover!important;
+}
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-learner-home :is(.learner-home-guide,.learner-home-state,.training-course-text) { background:var(--training-surface)!important;border-color:var(--training-border)!important;color:var(--training-ink)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-learner-home :is(.training-eyebrow,.learner-home-guide h2,.learner-home-guide h3,.training-course-card-bottom,.training-course-text .learner-enrolled) { color:var(--training-bamboo)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-learner-home :is(.learner-home-guide p,.learner-home-guide li p,.learner-welcome-copy .training-home-subtitle) { color:var(--training-muted)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-learner-home .learner-guide-icon { background:#2b392b!important;color:var(--training-bamboo)!important;border-color:var(--training-border)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-course-cover { background-image:linear-gradient(0deg,#14201960,transparent),url('./training-moonlit-landscape.webp')!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-course-cover>span { background:#1c2420e8!important;border-color:var(--training-border)!important;color:var(--training-ink)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-portal { background:var(--training-paper);color:var(--training-ink); }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-portal::before { background-image:url('./training-moonlit-landscape.webp'); }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-portal::after { background:linear-gradient(90deg,#141a17c0,#141a1720 75%); }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-portal :is(h1,.training-portal-description,.training-portal-footer) { color:var(--training-ink)!important; }
+@media(max-width:700px) {
+ .hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-learner-home .learner-welcome-art { width:100%!important;background-position:80% center!important; }
+}
+@media print {
+ .hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) { color-scheme:light; }
+}
+/* Native radios must not inherit the legacy profile text-input geometry. */
+.hui-training .training-appearance-option input[type=radio] {
+ appearance:auto!important;padding:0!important;min-height:16px!important;height:16px!important;width:16px!important;
+ background:transparent!important;box-shadow:none!important;border:0!important;outline-offset:3px;
+}
+.hui-training.hui-app--standard.training-workspace-shell :is(.hui-teacher-profile,.hui-student-profile) > .training-appearance-settings { grid-column:1/-1; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-account-link:is(:hover,[aria-current=page]) { background:var(--training-raised)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.training-workspace-search,.training-library-card,.training-library-create>div,.training-reference-studio,.training-library-filters,.training-library-pagination,.training-library-card footer) { background:var(--training-surface)!important;color:var(--training-ink)!important;border-color:var(--training-border)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.training-workspace-search button,.training-library-icon,.training-library-badge,.training-library-card footer a,.training-library-card footer button) { background:var(--training-raised)!important;color:var(--training-bamboo)!important;border-color:var(--training-border)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.training-workspace-heading p,.training-library-empty,.training-library-meta,.training-library-description,.training-library-kind,.training-library-note,.training-library-governance p,.training-library-policy-note,.training-library-filters button,.training-library-count) { color:var(--training-muted)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.training-library-create>summary,.training-library-filters button[aria-pressed=true]) { background:var(--training-bamboo)!important;color:var(--training-on-accent)!important;border-color:var(--training-bamboo)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-library-card footer { border-color:var(--training-border)!important; }
+@media(max-width:700px) {
+ .hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-learner-home .learner-home-welcome { display:flex;flex-direction:column; }
+ .hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-learner-home .learner-welcome-copy { max-width:100%; }
+ .hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-learner-home .learner-welcome-art {
+  position:relative!important;inset:auto!important;z-index:0;width:calc(100% + 48px)!important;height:190px;flex:none;
+  margin:22px -24px 0;mask-image:linear-gradient(180deg,transparent,#000 18%,#000 90%,transparent);
+  background:url('./training-moonlit-landscape.webp') 78% 38%/cover!important;
+ }
+ .hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-learner-home .learner-home-guide { margin-top:0; }
+}
+
+/* Active cognitive stimuli retain the entire original light presentation,
+ * including when embedded in a composite runner. :has updates before paint;
+ * no observer/timer may briefly recolour a scientific stimulus. */
+.hui-training[data-training-theme="dark"]:has([data-cognitive-task-root]) .training-brand-lockup { content:url('./training-logo.svg'); }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.training-library-filter>div,.training-library-footnote,.training-workspace-card-meta,.training-workspace-card-kind,.training-workspace-filter-bar) { color:var(--training-muted)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-workspace-card-badge { background:var(--training-raised)!important;color:var(--training-bamboo)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is([data-assessment-shell-header],[data-assessment-shell-content]>section,[data-assessment-shell-navigation]>section,[data-assessment-shell-navigation]>nav) { background:var(--training-surface)!important;border-color:var(--training-border)!important;color:var(--training-ink)!important; }
+
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.training-library-filter button,.training-library-filter-meta>span) { color:var(--training-muted)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-library-filter button[aria-pressed=true] { background:var(--training-bamboo)!important;color:var(--training-on-accent)!important;border-color:var(--training-bamboo)!important; }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .training-workspace-card-kind svg { color:var(--training-bamboo); }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .ql-stroke { stroke:var(--training-ink); }
+.hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .ql-fill { fill:var(--training-ink); }
+}
+/* Appearance preferences affect viewing; printed documents retain light paper. */
+@media print {
+ .hui-training .training-brand-lockup { content:url('./training-logo.svg'); }
+}
+@media screen {
+ /* Authoring has an intentionally strong legacy selector; match its local
+  * tokens without changing the approved question/option editor geometry. */
+ .hui-training.hui-app--standard.training-workspace-shell[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .qt-editor.qt-editor {
+  --training-paper:var(--training-theme-paper);--training-surface:var(--training-theme-surface);--training-ink:var(--training-theme-ink);--training-bamboo:var(--training-theme-action);--training-border:var(--training-theme-line);
+  --qt-ink:var(--training-ink);--qt-muted:var(--training-muted);--qt-line:var(--training-border);--qt-green:var(--training-bamboo);
+  background:var(--training-paper)!important;color:var(--training-ink)!important;
+ }
+ .hui-training.hui-app--standard.training-workspace-shell[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .qt-editor.qt-editor :is(fieldset,.qt-form-info,.qt-form-directory,.qt-form-question-editor,.qt-advanced,.qt-steps,.qt-question-card,.qt-context-panel,.qt-section,.qt-panel,.qt-summary,.qt-help,.qt-note,.qt-choice-bulk,.qt-delivery-intro) { background:var(--training-surface)!important;color:var(--training-ink)!important;border-color:var(--training-border)!important; }
+ .hui-training.hui-app--standard.training-workspace-shell[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .qt-editor.qt-editor .hui-page-header { background:transparent!important; }
+ .hui-training.hui-app--standard.training-workspace-shell[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .qt-editor.qt-editor :is(.qt-form-info>summary,.qt-choice-preview,.qt-choice-toolbar,.qt-choice-row,.qt-steps a[aria-current=step],.qt-form-directory button[aria-pressed=true]) { background:var(--training-raised)!important;color:var(--training-ink)!important;border-color:var(--training-border)!important; }
+ .hui-training.hui-app--standard.training-workspace-shell[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .qt-editor.qt-editor :is(.qt-step-number,.qt-type-badge,.qt-form-directory-item,.qt-form-status,.qt-outline-badge,.qt-help,.qt-muted) { color:var(--training-muted)!important; }
+}
+
+@media screen {
+ .hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) :is(.scale-edit-meta,.staff-segmented,.scale-edit-page .hui-page-header a) { background:var(--training-surface)!important;border-color:var(--training-border)!important;color:var(--training-ink)!important; }
+ .hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .staff-segmented button { background:var(--training-raised)!important;color:var(--training-muted)!important;border-color:var(--training-border)!important; }
+ .hui-training[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .staff-segmented :is(button.active,button[aria-selected=true],button[aria-pressed=true]) { background:var(--training-bamboo)!important;color:var(--training-on-accent)!important; }
+}
+@media screen {
+ .hui-training.hui-app--standard.training-workspace-shell[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .qt-editor.qt-editor :is(.qt-footer,.qt-empty) { background:var(--training-surface)!important;border-color:var(--training-border)!important;color:var(--training-muted)!important; }
+ .hui-training.hui-app--standard.training-workspace-shell[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .qt-editor.qt-editor :is(p,small,.qt-steps a,.qt-steps a strong,.qt-empty,.qt-form-directory-footer,.qt-summary li) { color:var(--training-muted)!important; }
+ .hui-training.hui-app--standard.training-workspace-shell[data-training-theme="dark"]:not(:has([data-cognitive-task-root])) .qt-editor.qt-editor .qt-steps a[aria-current=step] strong { color:var(--training-ink)!important; }
+}

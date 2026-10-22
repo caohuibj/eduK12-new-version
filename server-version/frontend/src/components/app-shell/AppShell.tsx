@@ -16,6 +16,8 @@ import Footer from '../Footer'
 import { ProductButton } from '../product-ui'
 import StaffNavigation from './StaffNavigation'
 import { isTrainingHost, trainingNavigation } from '../../training/context'
+import { TrainingAppearanceProvider } from '../../training/TrainingAppearance'
+import { useTrainingAppearance } from '../../training/appearanceContext'
 import TrainingBrand from '../../training/TrainingBrand'
 import TrainingWorkspaceTabs from '../../training/TrainingWorkspaceTabs'
 import TrainingContextBack from '../../training/TrainingContextBack'
@@ -35,11 +37,13 @@ import '../../training/training-teacher-visual.css'
 import '../../training/training-assessment-visual.css'
 import '../../training/training-account.css'
 import '../../training/training-workspace-header.css'
+import '../../training/training-appearance.css'
 import '../../survey/survey-admin-shell.css'
 
 function AppShellContent({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth()
   const training = isTrainingHost()
+  const appearance = useTrainingAppearance()
   const { cognitiveEnabled: cognitive, parentPortalEnabled } = useCapabilities()
   const relational = useRelationalAvailability()
   const { organizations, total: organizationTotal, platformRole, allowedActions: directoryActions, active: activeOrganization, activeLoading: organizationLoading, activeError: organizationError, error: organizationListError, isLoading: organizationsLoading, refresh: refreshOrganizations, selectOrganization } = useOrganization()
@@ -90,7 +94,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
   useEffect(()=>{if(training||organizationError||!user||mode!=='standard'||activeOrganization||organizationLoading||organizations.length!==1)return;void selectOrganization(organizations[0].id)},[training,user,mode,activeOrganization,organizationLoading,organizations,selectOrganization,organizationError])
   useEffect(()=>{if(mode==='display')return;document.title=`${title==='Huisurvey'?'':`${title} · `}${training&&!surveyAdmin?'Huitraining':'Huisurvey'}`;if(previousPath.current!==location.pathname&&mode!=='focused')mainRef.current?.focus();previousPath.current=location.pathname},[location.pathname,title,mode,training,surveyAdmin])
   if(mode==='display')return <>{children}</>
-  return <div className={`hui-app hui-app--${mode}${roleClass}${staffMode?' hui-app--staff':''}${assessmentSurfaceClass}${reportSurfaceClass}${studentSubmitClass}${entryMode?' hui-app--entry':''}${training&&!surveyAdmin?' hui-training':''}${surveyAdmin?' hui-survey-admin-shell':''}${trainingAssessmentVisual?' training-assessment-visual':''}${trainingWorkspace?' training-workspace-shell':''}${teacherVisual?' training-teacher-visual':''}`} data-shell-mode={mode}>
+  return <div className={`hui-app hui-app--${mode}${roleClass}${staffMode?' hui-app--staff':''}${assessmentSurfaceClass}${reportSurfaceClass}${studentSubmitClass}${entryMode?' hui-app--entry':''}${training&&!surveyAdmin?' hui-training':''}${surveyAdmin?' hui-survey-admin-shell':''}${trainingAssessmentVisual?' training-assessment-visual':''}${trainingWorkspace?' training-workspace-shell':''}${teacherVisual?' training-teacher-visual':''}`} data-shell-mode={mode} data-training-theme={training && !surveyAdmin ? appearance.theme : undefined}>
     <div className="hui-product"><a className="hui-skip" href="#hui-main" onClick={()=>mainRef.current?.focus()}>跳到主要内容</a></div>
     {!entryMode&&<header className={`hui-product hui-app-header${trainingWorkspace&&user?.role==='TEACHER'?' training-teacher-header':''}`}>{surveyAdmin&&origins?<SurveyBrand href={origins.survey+'/'}/>:mode==='focused'?<span className="hui-brand">{training ? <TrainingBrand /> : 'Huisurvey'}</span>:<Link className="hui-brand" to={homeFor(user?.role)}>{training?<TrainingBrand />:'Huisurvey'}</Link>}
       {trainingWorkspace&&user?.role==='TEACHER'&&<TrainingWorkspaceTabs/>}
@@ -118,9 +122,9 @@ export default function AppShell({children}:{children:ReactNode}) {
   // irrelevant discovery. Host context changes presentation, not API authority.
   const requiresOrganization = /^\/(organizations(?:\/|$)|organization-tasks(?:\/|$)|my-assessments(?:\/|$)|organization-invitations(?:\/|$))/.test(pathname)
   const requiresRelational = /^\/(relational(?:\/|$)|parent(?:\/|$)|student\/parent-links(?:\/|$))/.test(pathname)
-  return <AccountViewProvider view={accountView(pathname,search)}><OrganizationProvider suspended={training && !requiresOrganization}>
+  return <AccountViewProvider view={accountView(pathname,search)}><TrainingAppearanceProvider><OrganizationProvider suspended={training && !requiresOrganization}>
     <RelationalAvailabilityProvider suspended={training && !requiresRelational}>
       <AppShellContent>{children}</AppShellContent>
     </RelationalAvailabilityProvider>
-  </OrganizationProvider></AccountViewProvider>
+  </OrganizationProvider></TrainingAppearanceProvider></AccountViewProvider>
 }
