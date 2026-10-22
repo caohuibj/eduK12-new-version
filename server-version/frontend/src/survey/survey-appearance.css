@@ -72,7 +72,7 @@
 [data-survey-theme=dark] :is(.survey-enter,.btn-primary):hover:not(:disabled) { color:var(--survey-ui-on-action); background:var(--survey-brand-accent-strong); border-color:var(--survey-brand-accent-strong); }
 [data-survey-theme=dark] :is(input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea,.input) { color:var(--survey-ui-ink); background:var(--survey-ui-surface); border-color:var(--survey-brand-border-strong); }
 [data-survey-theme=dark] :is(input,textarea)::placeholder { color:var(--survey-ui-muted); opacity:1; }
-[data-survey-theme=dark] :is(.bg-white,.bg-slate-50,.bg-gray-50,.bg-blue-50,.bg-sky-50) { background-color:var(--survey-ui-surface); }
+[data-survey-theme=dark] :is(.bg-white,.bg-slate-50,.bg-slate-100,.bg-gray-50,.bg-blue-50,.bg-sky-50) { background-color:var(--survey-ui-surface); }
 [data-survey-theme=dark] :is(.border-slate-200,.border-gray-200,.border-blue-200,.border-sky-200) { border-color:var(--survey-ui-line); }
 [data-survey-theme=dark] :is(.text-slate-800,.text-slate-900,.text-gray-900,.text-sky-900,.text-sky-800) { color:var(--survey-ui-ink); }
 [data-survey-theme=dark] :is(.text-slate-500,.text-slate-600,.text-slate-700,.text-gray-500,.text-gray-600,.text-gray-700) { color:var(--survey-ui-body); }
