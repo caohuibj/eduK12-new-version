@@ -48,7 +48,52 @@ function trustedExecutable(stat) {
     Number.isSafeInteger(stat.mode) && (stat.mode & 0o111) !== 0 && (stat.mode & 0o022) === 0
 }
 
-function preflightChrome({ repo = path.resolve(__dirname, '../..'), env = process.env, deps = {} } = {}) {
+function chromeFileDiagnostic(io, target, operation, reason, stat) {
+  // Only fixed public installation paths and numeric metadata can leave this
+  // diagnostic. Never return exception text, resolved targets or file contents.
+  const diagnostic = { target, operation, reason,
+    uid: Number.isSafeInteger(stat?.uid) ? stat.uid : null,
+    gid: Number.isSafeInteger(stat?.gid) ? stat.gid : null,
+    permissionMode: Number.isSafeInteger(stat?.mode) ? stat.mode & 0o7777 : null,
+    fileHeaderKind: 'OTHER', headerRead: 'NOT_APPLICABLE' }
+  if ([CHROME_BINARY, CHROME_SANDBOX].includes(target) && stat?.isFile() && !stat.isSymbolicLink()) {
+    let fd
+    diagnostic.headerRead = 'FAILED'
+    try {
+      fd = io.openSync(target, fs.constants.O_RDONLY | fs.constants.O_NOFOLLOW | fs.constants.O_NONBLOCK)
+      const bytes = Buffer.alloc(4), count = io.readSync(fd, bytes, 0, 4, 0)
+      diagnostic.headerRead = 'READ'
+      if (count === 4 && bytes.equals(Buffer.from([0x7f, 0x45, 0x4c, 0x46]))) diagnostic.fileHeaderKind = 'ELF'
+      else if (count >= 2 && bytes[0] === 0x23 && bytes[1] === 0x21) diagnostic.fileHeaderKind = 'SCRIPT'
+    } catch { /* Diagnostic reads never authorize execution or leak errors. */ }
+    finally { if (fd !== undefined) { try { io.closeSync(fd) } catch {} } }
+  }
+  return diagnostic
+}
+
+function checkChromePath(io, target, executable, diagnostics) {
+  let stat, operation = 'lstat'
+  const bad = reason => diagnostics ? chromeFileDiagnostic(io, target, operation, reason, stat) : { untrusted: true }
+  try {
+    stat = io.lstatSync(target)
+    if (stat.isSymbolicLink()) return bad('SYMLINK')
+    if (executable ? !stat.isFile() : !stat.isDirectory()) return bad(executable ? 'NOT_FILE' : 'NOT_DIRECTORY')
+    if (stat.uid !== 0) return bad('NOT_ROOT_OWNED')
+    if (executable && !Number.isSafeInteger(stat.mode)) return bad('INVALID_MODE')
+    if ((stat.mode & 0o022) !== 0) return bad('GROUP_OR_WORLD_WRITABLE')
+    if (executable && (stat.mode & 0o111) === 0) return bad('NOT_EXECUTABLE')
+    operation = 'realpath'
+    if (io.realpathSync(target) !== target) return bad('REALPATH_MISMATCH')
+    if (executable) { operation = 'access'; io.accessSync(target, fs.constants.X_OK) }
+    return { stat }
+  } catch (error) {
+    const diagnostic = bad('READ_OR_ACCESS_FAILED')
+    if (diagnostics) diagnostic.osErrorCode = ['ENOENT', 'EACCES', 'EPERM', 'ELOOP', 'ENOTDIR', 'EIO'].includes(error?.code) ? error.code : 'UNKNOWN'
+    return diagnostic
+  }
+}
+
+function preflightChrome({ repo = path.resolve(__dirname, '../..'), env = process.env, diagnostics = false, deps = {} } = {}) {
   // Injection is for pure tests. Production callers supply only repo/env.
   const io = deps.fs || fs, run = deps.spawnSync || spawnSync, facts = deps.process || process
   const loadRegistry = deps.loadRegistry || (file => require(file).registry)
@@ -73,16 +118,15 @@ function preflightChrome({ repo = path.resolve(__dirname, '../..'), env = proces
 
     code = 'CHROME_FILE_UNTRUSTED'
     for (const directory of ['/opt', '/opt/google', '/opt/google/chrome']) {
-      const stat = io.lstatSync(directory)
-      if (!stat.isDirectory() || stat.isSymbolicLink() || stat.uid !== 0 || (stat.mode & 0o022) !== 0 || io.realpathSync(directory) !== directory)
-        return fail(code)
+      const checked = checkChromePath(io, directory, false, diagnostics)
+      if (!checked.stat) return diagnostics ? Object.freeze({ ok: false, code, diagnostic: checked }) : fail(code)
     }
     const files = []
     for (const file of [CHROME_BINARY, CHROME_SANDBOX]) {
       code = file === CHROME_BINARY ? 'CHROME_FILE_UNTRUSTED' : 'CHROME_SANDBOX_FILE_UNTRUSTED'
-      const stat = io.lstatSync(file)
-      if (!trustedExecutable(stat) || io.realpathSync(file) !== file) return fail(code)
-      io.accessSync(file, fs.constants.X_OK)
+      const checked = checkChromePath(io, file, true, diagnostics)
+      if (!checked.stat) return diagnostics ? Object.freeze({ ok: false, code, diagnostic: checked }) : fail(code)
+      const { stat } = checked
       code = 'CHROME_PACKAGE_OWNERSHIP_MISMATCH'
       if (!ownsChromeFile(query('/usr/bin/dpkg-query', ['-S', file]), file)) return fail(code)
       files.push({ path: file, rootOwned: true, executable: true, groupOrWorldWritable: false,
@@ -226,6 +270,8 @@ const CJK_SAMPLES = Object.freeze({
 const FONT_LIST = '/usr/bin/fc-list'
 const FONT_FORMAT = '%{postscriptname}\t%{file}\t%{index}\t%{charset}\n'
 const FONT_ROOT = '/usr/share/fonts'
+const PREPARED_FONT_SUFFIX = '.local/share/fonts/school-teacher-ci/wqy-zenhei.ttc'
+const PREPARED_FONT_PACKAGE_URL = 'https://archive.ubuntu.com/ubuntu/pool/universe/f/fonts-wqy-zenhei/fonts-wqy-zenhei_0.9.45-8_all.deb'
 const FONT_MAX_OUTPUT = 4 * 1024 * 1024
 const FONT_MAX_ROWS = 2048
 const FONT_MAX_SIZE = 64 * 1024 * 1024
@@ -263,7 +309,58 @@ function parseFontCharset(text) {
 const fontCovers = (font, text) => Array.from(text, char => char.codePointAt(0)).every(point =>
   font.charset.some(([start, end]) => point >= start && point <= end))
 
-function validateCjkInventory(inventory) {
+function validPreparedFontReceipt(receipt, binding) {
+  return fontRecord(receipt, ['schemaVersion', 'scope', 'currentHead', 'ciRunId', 'package', 'version', 'architecture',
+    'metadataSource', 'packageUrl', 'debSha256', 'copiedFontSha256', 'relativeSuffix']) &&
+    receipt.schemaVersion === 1 && receipt.scope === 'official-cjk-font-preparation' &&
+    typeof receipt.currentHead === 'string' && /^[a-f0-9]{40}$/.test(receipt.currentHead) &&
+    typeof receipt.ciRunId === 'string' && /^[1-9][0-9]{0,19}$/.test(receipt.ciRunId) &&
+    receipt.package === 'fonts-wqy-zenhei' && receipt.version === '0.9.45-8' && receipt.architecture === 'all' &&
+    receipt.metadataSource === 'apt-cache:fonts-wqy-zenhei=0.9.45-8' && receipt.packageUrl === PREPARED_FONT_PACKAGE_URL &&
+    typeof receipt.debSha256 === 'string' && /^[a-f0-9]{64}$/.test(receipt.debSha256) &&
+    typeof receipt.copiedFontSha256 === 'string' && /^[a-f0-9]{64}$/.test(receipt.copiedFontSha256) &&
+    receipt.relativeSuffix === PREPARED_FONT_SUFFIX &&
+    (binding === undefined || (receipt.currentHead === binding?.currentHead && receipt.ciRunId === binding?.ciRunId))
+}
+
+function readPreparedFont(io, facts, repo, env, file) {
+  const uid = facts.getuid?.(), euid = facts.geteuid?.(), home = env.HOME
+  if (!Number.isSafeInteger(uid) || uid <= 0 || euid !== uid || typeof home !== 'string' ||
+      !path.isAbsolute(home) || path.normalize(home) !== home || home === '/' ||
+      file !== path.join(home, PREPARED_FONT_SUFFIX)) throw new Error('PREPARED_FONT_PATH_INVALID')
+  // Only this exact file is eligible. All ancestors must be non-symlink and
+  // non-writable by other users; HOME and its descendants must be owned by us.
+  for (let parent = path.dirname(file); parent !== '/'; parent = path.dirname(parent)) {
+    const stat = io.lstatSync(parent), inHome = parent === home || parent.startsWith(home + '/')
+    if (!stat.isDirectory() || stat.isSymbolicLink() || !Number.isSafeInteger(stat.mode) ||
+        (stat.mode & 0o022) !== 0 || (inHome ? stat.uid !== uid : ![0, uid].includes(stat.uid)) ||
+        io.realpathSync(parent) !== parent) throw new Error('PREPARED_FONT_DIRECTORY_UNTRUSTED')
+  }
+  const trustedFile = (name, maxSize) => {
+    const stat = io.lstatSync(name)
+    if (!stat.isFile() || stat.isSymbolicLink() || stat.uid !== uid || stat.nlink !== 1 ||
+        !Number.isSafeInteger(stat.mode) || (stat.mode & 0o7022) !== 0 || (stat.mode & 0o444) === 0 ||
+        !Number.isSafeInteger(stat.size) || stat.size <= 0 || stat.size > maxSize || io.realpathSync(name) !== name)
+      throw new Error('PREPARED_FONT_FILE_UNTRUSTED')
+    return stat
+  }
+  const root = io.realpathSync(repo), receiptPath = path.join(root, 'school-teacher-evidence/official-font-preparation.json')
+  const evidenceDirectory = path.dirname(receiptPath), evidenceStat = io.lstatSync(evidenceDirectory)
+  if (!evidenceStat.isDirectory() || evidenceStat.isSymbolicLink() || io.realpathSync(evidenceDirectory) !== evidenceDirectory)
+    throw new Error('PREPARED_FONT_RECEIPT_UNTRUSTED')
+  trustedFile(receiptPath, 4096)
+  const receiptText = io.readFileSync(receiptPath, 'utf8')
+  if (!safeText(receiptText, 4096)) throw new Error('PREPARED_FONT_RECEIPT_INVALID')
+  const receipt = JSON.parse(receiptText)
+  if (!validPreparedFontReceipt(receipt, { currentHead: env.GITHUB_SHA, ciRunId: env.GITHUB_RUN_ID }))
+    throw new Error('PREPARED_FONT_RECEIPT_INVALID')
+  const stat = trustedFile(file, FONT_MAX_SIZE), bytes = io.readFileSync(file)
+  if (!Buffer.isBuffer(bytes) || bytes.length !== stat.size || digest(bytes) !== receipt.copiedFontSha256)
+    throw new Error('PREPARED_FONT_DIGEST_MISMATCH')
+  return { stat, preparedFont: { receipt, ownerUid: uid } }
+}
+
+function validateCjkInventory(inventory, binding) {
   // Pure shape/coverage verification only. It does not attest to this machine;
   // inspectCjkFonts must run in the same job as the actual sandboxed Chrome.
   try {
@@ -274,11 +371,17 @@ function validateCjkInventory(inventory) {
       return fail('CJK_INVENTORY_INVALID')
     const names = new Set()
     for (const font of inventory.fonts) {
-      if (!fontRecord(font, ['postScriptName', 'path', 'faceIndex', 'charset', 'rootOwned', 'groupOrWorldWritable', 'permissionMode', 'sizeBytes']) ||
-          !safePostScriptName(font.postScriptName) || names.has(font.postScriptName) || !safeFontPath(font.path) ||
+      const prepared = Object.hasOwn(font, 'preparedFont')
+      const keys = ['postScriptName', 'path', 'faceIndex', 'charset', 'rootOwned', 'groupOrWorldWritable', 'permissionMode', 'sizeBytes']
+      if (prepared) keys.push('preparedFont')
+      if (!fontRecord(font, keys) || !safePostScriptName(font.postScriptName) || names.has(font.postScriptName) ||
+          (prepared ? font.path !== PREPARED_FONT_SUFFIX || font.rootOwned !== false ||
+            !fontRecord(font.preparedFont, ['receipt', 'ownerUid']) || !validPreparedFontReceipt(font.preparedFont.receipt, binding) ||
+            !Number.isSafeInteger(font.preparedFont.ownerUid) || font.preparedFont.ownerUid <= 0 :
+            !safeFontPath(font.path) || font.rootOwned !== true) ||
           !Number.isSafeInteger(font.faceIndex) || font.faceIndex < 0 || font.faceIndex > 0x7fffffff ||
           !validFontCharset(font.charset) || !Object.values(CJK_SAMPLES).some(sample => fontCovers(font, sample.text)) ||
-          font.rootOwned !== true || font.groupOrWorldWritable !== false ||
+          font.groupOrWorldWritable !== false ||
           !Number.isSafeInteger(font.permissionMode) || font.permissionMode < 0 || font.permissionMode > 0o777 ||
           (font.permissionMode & 0o022) !== 0 || (font.permissionMode & 0o444) === 0 ||
           !Number.isSafeInteger(font.sizeBytes) || font.sizeBytes <= 0 || font.sizeBytes > FONT_MAX_SIZE)
@@ -291,8 +394,8 @@ function validateCjkInventory(inventory) {
   } catch { return fail('CJK_INVENTORY_INVALID') }
 }
 
-function inspectCjkFonts({ env = process.env, deps = {} } = {}) {
-  const io = deps.fs || fs, run = deps.spawnSync || spawnSync
+function inspectCjkFonts({ repo = path.resolve(__dirname, '../..'), env = process.env, deps = {} } = {}) {
+  const io = deps.fs || fs, run = deps.spawnSync || spawnSync, facts = deps.process || process
   let code = 'CJK_FONT_ENV_INVALID'
   try {
     if (!env || typeof env !== 'object' || Array.isArray(env)) return fail(code)
@@ -320,10 +423,10 @@ function inspectCjkFonts({ env = process.env, deps = {} } = {}) {
       maxBuffer: FONT_MAX_OUTPUT, stdio: ['ignore', 'pipe', 'pipe'],
       env: queryEnv })
     if (!result || result.error || result.signal || result.status !== 0 ||
-        !safeText(result.stdout, FONT_MAX_OUTPUT) || !result.stdout.endsWith('\n')) return fail(code)
+        !safeText(result.stdout, FONT_MAX_OUTPUT) || (result.stdout !== '' && !result.stdout.endsWith('\n'))) return fail(code)
     code = 'CJK_FONT_INVENTORY_INVALID'
-    const rows = result.stdout.slice(0, -1).split('\n')
-    if (!rows.length || rows.length > FONT_MAX_ROWS) return fail(code)
+    const rows = result.stdout === '' ? [] : result.stdout.slice(0, -1).split('\n')
+    if (rows.length > FONT_MAX_ROWS) return fail(code)
     const fonts = [], names = new Map(), identities = new Map(), conflictingNames = new Set()
     for (const row of rows) {
       const fields = row.split('\t')
@@ -341,16 +444,24 @@ function inspectCjkFonts({ env = process.env, deps = {} } = {}) {
       // Ignore irrelevant Latin/bitmap/emoji faces before examining identity or
       // paths. Only fonts capable of a complete fixed sample enter this gate.
       if (!Object.values(CJK_SAMPLES).some(sample => fontCovers({ charset }, sample.text))) continue
-      if (!safePostScriptName(postScriptName) || !safeFontPath(file) || !/^(?:0|[1-9]\d{0,9})$/.test(index) ||
+      const prepared = typeof env.HOME === 'string' && path.isAbsolute(env.HOME) && file === path.join(env.HOME, PREPARED_FONT_SUFFIX)
+      if (!safePostScriptName(postScriptName) || (!safeFontPath(file) && !prepared) || !/^(?:0|[1-9]\d{0,9})$/.test(index) ||
           Number(index) > 0x7fffffff) return fail(code)
       code = 'CJK_FONT_FILE_UNTRUSTED'
-      for (let parent = path.dirname(file); parent !== '/'; parent = path.dirname(parent)) directory(parent)
-      const stat = io.lstatSync(file)
-      if (!stat.isFile() || stat.isSymbolicLink() || stat.uid !== 0 || io.realpathSync(file) !== file ||
+      let stat, preparedFont
+      if (prepared) {
+        code = 'CJK_PREPARED_FONT_UNTRUSTED'
+        ;({ stat, preparedFont } = readPreparedFont(io, facts, repo, env, file))
+      } else {
+        for (let parent = path.dirname(file); parent !== '/'; parent = path.dirname(parent)) directory(parent)
+        stat = io.lstatSync(file)
+        if (!stat.isFile() || stat.isSymbolicLink() || stat.uid !== 0 || io.realpathSync(file) !== file ||
           !Number.isSafeInteger(stat.mode) || (stat.mode & 0o7022) !== 0 || (stat.mode & 0o444) === 0 ||
           !Number.isSafeInteger(stat.size) || stat.size <= 0 || stat.size > FONT_MAX_SIZE) return fail(code)
-      const font = { postScriptName, path: file, faceIndex: Number(index), charset,
-        rootOwned: true, groupOrWorldWritable: false, permissionMode: stat.mode & 0o777, sizeBytes: stat.size }
+      }
+      const font = { postScriptName, path: prepared ? PREPARED_FONT_SUFFIX : file, faceIndex: Number(index), charset,
+        rootOwned: !prepared, groupOrWorldWritable: false, permissionMode: stat.mode & 0o777, sizeBytes: stat.size,
+        ...(prepared ? { preparedFont } : {}) }
       code = 'CJK_FONT_IDENTITY_AMBIGUOUS'
       if (names.has(postScriptName)) {
         if (JSON.stringify(names.get(postScriptName)) !== JSON.stringify(font)) return fail(code)
@@ -362,7 +473,8 @@ function inspectCjkFonts({ env = process.env, deps = {} } = {}) {
     const inventory = Object.freeze({ ok: true, code: 'CJK_FONT_PREFLIGHT_READY', schemaVersion: 1,
       scope: 'preinstalled-cjk-fonts', acceptance: false, browserLaunched: false, fonts })
     const validated = validateCjkInventory(inventory)
-    return validated.ok ? inventory : validated
+    return validated.ok ? inventory : Object.freeze({ ...validated,
+      diagnostic: { stage: 'final-inventory-validation', parsedRowCount: rows.length, candidateFontCount: fonts.length } })
   } catch { return fail(code) }
 }
 
@@ -412,7 +524,7 @@ if (require.main === module) {
   } else {
     const repo = path.resolve(__dirname, '../..')
     result = { schemaVersion: 1, scope: 'chrome-and-cjk-preflight', acceptance: false,
-      chrome: preflightChrome({ repo }), fonts: inspectCjkFonts() }
+      chrome: preflightChrome({ repo, diagnostics: true }), fonts: inspectCjkFonts({ repo }) }
     try { writePreflightEvidence(repo, result) } catch { result = fail('CHROME_PREFLIGHT_EVIDENCE_WRITE_FAILED') }
     // Missing font evidence must not prevent the independent business journey.
     // Final report acceptance still requires complete CJK rendering evidence.

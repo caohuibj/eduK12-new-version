@@ -269,22 +269,60 @@ function createUiChecks({ report, out, axeSource, getFontInventory }) {
   return { prepare, theme, publicChecks, preference, workspace, schoolManagementAnchor, supplement }
 }
 
-function verifyReport(report, { head, tree, runId, frontend, backend }, readScreenshot) {
-  assert.equal(report.schemaVersion, 1); assert.equal(report.status, 'PASSED'); assert.deepEqual(report.errors, [])
+// A single completed official producer may supply unchanged frontend bytes.
+// The control job authenticates the official job/ZIP; this consumer independently
+// binds its receipt to this checkout/run and the actual FE tree, lock and dist.
+// Do not rewrite the original manifest to impersonate a current-run build.
+const OFFICIAL_FRONTEND = Object.freeze({
+  originalRun: 39870012962, originalHead: '81947063451c5a5e2ee028ee41256671b19ef201',
+  originalCheckout: 'dadcef2d497ed51f4d75458c12b46bbb2fc6d82b', originalJob: 120141983273,
+  originalArtifact: 12466106464, originalArtifactSha256: 'bdfeec8e3b06220e5a611d607caa167badcdf6c9dd35827ea2c379fd6b352b35',
+  frontendTree: 'c1e34b8fdd1a0127a155a208187a8c6bb2f8760f',
+})
+function validateOfficialFrontendReceipt(receipt, { head, runId, frontend, frontendTree, frontendLockDigest, frontendContentDigest }) {
+  assert.deepEqual(Object.keys(receipt).sort(), ['schemaVersion', 'status', 'currentHead', 'currentRun',
+    ...Object.keys(OFFICIAL_FRONTEND), 'manifest'].sort())
+  assert.equal(receipt.schemaVersion, 1); assert.equal(receipt.status, 'VERIFIED_OFFICIAL_FRONTEND_BUILD')
+  assert.equal(receipt.currentHead, head); assert.equal(receipt.currentRun, runId)
+  assert.match(head, /^[a-f0-9]{40}$/); assert.match(runId, /^\d+$/)
+  for (const [key, expected] of Object.entries(OFFICIAL_FRONTEND)) assert.equal(receipt[key], expected)
+  assert.equal(frontendTree, OFFICIAL_FRONTEND.frontendTree)
+  assert.deepEqual(receipt.manifest, frontend)
+  assert.deepEqual(Object.keys(frontend).sort(), ['schemaVersion', 'kind', 'sha', 'runId', 'contentDigest', 'lockDigest'].sort())
+  assert.equal(frontend.schemaVersion, 1); assert.equal(frontend.kind, 'frontend')
+  assert.equal(frontend.sha, OFFICIAL_FRONTEND.originalCheckout)
+  assert.equal(frontend.runId, String(OFFICIAL_FRONTEND.originalRun))
+  assert.match(frontendLockDigest, /^[a-f0-9]{64}$/); assert.match(frontendContentDigest, /^[a-f0-9]{64}$/)
+  assert.equal(frontend.lockDigest, frontendLockDigest); assert.equal(frontend.contentDigest, frontendContentDigest)
+  return receipt
+}
+function validateReportBuildInputs(report, options) {
+  const { head, tree, runId, frontend, backend, officialFrontendReuse } = options
   assert.deepEqual(report.source, { head, tree }); assert.equal(report.runId, runId)
   assert.match(head, /^[a-f0-9]{40}$/); assert.match(tree, /^[a-f0-9]{40}$/); assert.match(runId, /^\d+$/)
-  assert.equal(Object.hasOwn(report, 'buildReuse'), false, 'No historical-build identity substitution')
+  assert.equal(Object.hasOwn(report, 'buildReuse'), false, 'No historical diagnostic-build identity substitution')
+  if (officialFrontendReuse !== undefined) {
+    assert.deepEqual(report.officialFrontendReuse, officialFrontendReuse)
+    validateOfficialFrontendReceipt(officialFrontendReuse, options)
+  } else assert.equal(Object.hasOwn(report, 'officialFrontendReuse'), false, 'Never trust only report-supplied reuse evidence')
   for (const [kind, expected] of Object.entries({ frontend, backend })) {
     const m = report.inputs[kind]
     assert.deepEqual(m, expected); assert.equal(m.schemaVersion, 1); assert.equal(m.kind, kind)
-    assert.equal(m.sha, head); assert.equal(m.runId, runId)
+    assert.equal(m.sha, kind === 'frontend' && officialFrontendReuse ? OFFICIAL_FRONTEND.originalCheckout : head)
+    assert.equal(m.runId, kind === 'frontend' && officialFrontendReuse ? String(OFFICIAL_FRONTEND.originalRun) : runId)
     assert.match(m.contentDigest, /^[a-f0-9]{64}$/); assert.match(m.lockDigest, /^[a-f0-9]{64}$/)
   }
+  return { ok: true, code: 'BROWSER_BUILD_INPUTS_VERIFIED' }
+}
+function verifyReport(report, options, readScreenshot) {
+  const { head, tree, runId } = options
+  assert.equal(report.schemaVersion, 1); assert.equal(report.status, 'PASSED'); assert.deepEqual(report.errors, [])
+  validateReportBuildInputs(report, options)
   assert.deepEqual(report.startups, products.map(product => ({ product,
     corsOrigin: `https://${product.toLowerCase()}.eduk12.top`, ready: true, phase: 'READY' })))
   assert.deepEqual(require('./school-teacher-chrome.cjs').validateChromeEvidence(report.chrome), { ok: true, code: 'CHROME_EVIDENCE_VERIFIED' })
   assert.equal(report.chrome.launchedVersion, report.chrome.preflight.package.browserVersion)
-  assert.deepEqual(validateCjkInventory(report.chrome.fonts), { ok: true, code: 'CJK_INVENTORY_VERIFIED' })
+  assert.deepEqual(validateCjkInventory(report.chrome.fonts, { currentHead: head, ciRunId: runId }), { ok: true, code: 'CJK_INVENTORY_VERIFIED' })
 
   const expectedCoverage = products.flatMap(product => ['author-SCALE', 'author-FORM', 'fixed-version-preview-publish',
     `separate-${product === 'SCHOOL' ? 'STUDENT' : 'TEACHER'}-SELF-SCALE`, `separate-${product === 'SCHOOL' ? 'STUDENT' : 'TEACHER'}-SELF-FORM`].map(check => product + ':' + check))
@@ -396,4 +434,4 @@ function verifyReport(report, { head, tree, runId, frontend, backend }, readScre
     notCovered: [...report.notCovered, ...ui.notCovered] }
 }
 
-module.exports = { cjkSampleIds, validateUiFontEvidence, readRenderedCjk, appearanceKeys, imageMode, validateSelectedImages, createUiChecks, verifyReport, products, darkStates, originalShots }
+module.exports = { OFFICIAL_FRONTEND, validateOfficialFrontendReceipt, validateReportBuildInputs, cjkSampleIds, validateUiFontEvidence, readRenderedCjk, appearanceKeys, imageMode, validateSelectedImages, createUiChecks, verifyReport, products, darkStates, originalShots }
