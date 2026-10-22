@@ -1,0 +1,10 @@
+.training-toolbar { display:flex; gap:var(--space-sm); margin-bottom:var(--space-md); flex-wrap:wrap; }
+.training-toolbar hui-button { flex:1; min-width:200rpx; }
+.training-course,.training-task,.training-welcome { display:flex; flex-direction:column; gap:var(--space-sm); padding:var(--space-lg); background:var(--color-surface); border:1rpx solid var(--color-border); border-radius:var(--radius-card); margin-bottom:var(--space-md); overflow-wrap:anywhere; }
+.training-welcome { background:var(--color-soft); }
+.training-eyebrow { color:var(--color-primary); font-size:var(--type-small); }
+.training-heading { color:var(--color-text); font-size:var(--type-heading); font-weight:600; line-height:1.4; }
+.training-copy { display:block; color:var(--color-muted); font-size:var(--type-body); line-height:1.7; }
+.training-course-action { color:var(--color-primary); font-size:var(--type-body); margin-top:var(--space-md); }
+.training-steps { display:flex; flex-direction:column; gap:var(--space-md); margin-top:var(--space-md); color:var(--color-text); font-size:var(--type-body); }
+.training-empty { display:flex; flex-direction:column; gap:var(--space-sm); padding:var(--space-xl) var(--space-md); color:var(--color-text); font-size:var(--type-body); text-align:center; }

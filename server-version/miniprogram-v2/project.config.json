@@ -1,7 +1,7 @@
 {
   "appid": "touristappid",
-  "projectname": "Huisurvey-v2",
-  "description": "Huisurvey 四角色客户端 v2（开发验收）",
+  "projectname": "Training-student-native",
+  "description": "Training 原生学员客户端（开发验收）",
   "compileType": "miniprogram",
   "miniprogramRoot": "./",
   "libVersion": "3.7.12",

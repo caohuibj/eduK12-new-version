@@ -1,7 +1,7 @@
 Page({
- data:{kind:'student',tabs:[{key:'student',label:'学生注册'},{key:'teacher',label:'教师注册'}],username:'',password:'',nickname:'',code:'',status:'ready',errorMessage:'',done:false},
+ data:{kind:'student',tabs:[{key:'student',label:'学员注册'}],username:'',password:'',nickname:'',code:'',status:'ready',errorMessage:'',done:false},
  change(event){const key=event.currentTarget.dataset.field;if(['username','password','nickname','code'].includes(key))this.setData({[key]:event.detail.value})},
- select(event){if(this.data.status==='submitting')return;if(['student','teacher'].includes(event.detail.key))this.setData({kind:event.detail.key,code:'',errorMessage:''})},
+ select(event){if(this.data.status==='submitting')return;if(event.detail.key==='student')this.setData({kind:event.detail.key,code:'',errorMessage:''})},
  async submit(){
   if(this.data.status==='submitting')return
   const {kind,username,password,nickname,code}=this.data

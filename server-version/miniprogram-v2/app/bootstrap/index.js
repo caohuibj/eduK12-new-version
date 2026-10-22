@@ -9,13 +9,13 @@ const { createSession } = require('../session/index')
 const { createDraftStore } = require('../../core/drafts/index')
 const { createPrivacy } = require('../../core/privacy/index')
 const { createMedia } = require('../../core/media/index')
-function createRuntime(platform, origin) {
+function createRuntime(platform, origin, options = {}) {
   const config = createConfig(origin); const storage = createStorage(platform, origin)
   const jar = createCookieJar(storage); const network = createNetwork(platform); const telemetry = createTelemetry()
   let session
   const api = createApiClient({platform, config, jar, network, telemetry, onExpired: epoch => session.expire(epoch)})
-  const account = createAccountService(api)
-  session = createSession({account, jar, telemetry, clearPrivateData:()=>storage.clearDrafts()})
+  const account = createAccountService(api, options)
+  session = createSession({account, jar, telemetry, studentOnly: options.studentOnly, clearPrivateData:()=>storage.clearDrafts()})
   const drafts=createDraftStore(storage,session,()=>jar.epoch())
   const privacy=createPrivacy(platform),media=createMedia(platform,privacy)
   let previousOwner=null

@@ -19,12 +19,14 @@ const FEATURES = {
 }
 const ROLE_ITEMS = {STUDENT: ['home','tasks','courses','assessments','profile'], PARENT: ['home','children','childReports','assessments','profile'], TEACHER: ['home','courses','students','assessments','profile'], ADMIN: ['home','organizations','users','catalog','profile']}
 function navigationFor(session) {
+  if (session.product === 'training-student') return []
   return (ROLE_ITEMS[session.activeRole] || []).filter(key => !FEATURES[key].capability || session.capabilities[FEATURES[key].capability]).map(key => Object.assign({key}, FEATURES[key]))
 }
 function navigate(platform, session, key) {
+  if(session.product==='training-student' && !['home','profile'].includes(key)) throw new ApiError('forbidden','请从课程进入学习任务')
   const item = Object.entries(FEATURES).filter(([,f])=>!f.capability||session.capabilities[f.capability]).map(([key,f])=>Object.assign({key},f)).find(item => item.key === key)
   if (!item) throw new ApiError('forbidden', '此入口不可用')
   return platform.reLaunch({url: item.path})
 }
-function shortcutsFor(session){return Object.entries(FEATURES).filter(([key,f])=>!['home','profile'].includes(key)&&!navigationFor(session).some(item=>item.key===key)&&f.capability&&session.capabilities[f.capability]).map(([key,f])=>Object.assign({key},f))}
+function shortcutsFor(session){if(session.product==='training-student')return [];return Object.entries(FEATURES).filter(([key,f])=>!['home','profile'].includes(key)&&!navigationFor(session).some(item=>item.key===key)&&f.capability&&session.capabilities[f.capability]).map(([key,f])=>Object.assign({key},f))}
 module.exports = { FEATURES, navigationFor, navigate,shortcutsFor }

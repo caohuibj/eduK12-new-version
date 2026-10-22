@@ -1,0 +1,8 @@
+<hui-page title="{{title}}" description="{{description}}" status="{{status}}" error-message="{{errorMessage}}" bindretry="retry">
+<hui-tabs items="{{tabs}}" active="{{section}}" bindchange="switchSection"/>
+<hui-feedback wx:for="{{errors}}" wx:key="*this" kind="error" message="{{item}}"/>
+<hui-button wx:if="{{errors.length}}" secondary bindpress="retry">重新读取测评</hui-button>
+<view wx:if="{{!items.length && !errors.length}}" class="training-empty"><text>培训师还没有发布{{section === 'assignments' ? '练习' : section === 'checkins' ? '打卡' : '测评'}}。</text><text class="training-copy">发布后会显示在这里。</text></view>
+<view wx:for="{{items}}" wx:key="key" class="training-task"><text class="training-eyebrow">{{item.typeLabel || item.status}}</text><text class="training-heading">{{item.name}}</text><text class="training-copy">{{item.description}}</text><text wx:if="{{item.typeLabel}}" class="training-copy">{{item.status}}</text><text wx:if="{{item.taskSatisfactionLabel}}" class="training-copy">{{item.taskSatisfactionLabel}}</text><hui-button wx:if="{{item.href}}" data-key="{{item.key}}" bindpress="select">{{item.action}}</hui-button><hui-button wx:if="{{item.reportHref}}" secondary data-key="{{item.key}}" bindpress="report">查看已完成反馈</hui-button></view>
+<hui-button secondary bindpress="home">返回我的课程</hui-button>
+</hui-page>

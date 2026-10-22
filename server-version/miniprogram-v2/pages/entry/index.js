@@ -2,7 +2,7 @@ const { parseEntry, resolveEntry } = require('../../app/entry/index')
 const { destination } = require('../../app/router/index')
 Page({
  data:{status:'loading',title:'Huisurvey',description:'正在准备您的工作区',errorMessage:''},
- onLoad(options){const app=getApp();if(!app.runtime)return;if(options.kind||options.q||options.scene){try{app.pendingEntry=parseEntry(options,app.runtime.config.origin)}catch(error){app.entryError=error.message}}},
+ onLoad(options){const app=getApp();if(!app.runtime)return;if(options.kind||options.q||options.scene){try{app.pendingEntry=(app.runtime.training?require('../../app/training/entry').parseEntry:parseEntry)(options,app.runtime.config.origin)}catch(error){app.entryError=error.message}}},
  onShow(){this.enter()},
  async enter(){
   const app=getApp(),sequence=this.sequence=(this.sequence||0)+1;this.setData({status:'loading',errorMessage:''})
@@ -12,7 +12,7 @@ Page({
    if(this.closed||sequence!==this.sequence)return
    const session=app.runtime.session.get()
    if(!app.pendingEntry){wx.reLaunch({url:destination(session)});return}
-   const entry=app.pendingEntry,result=await resolveEntry(entry,session,app.runtime.domains)
+   const entry=app.pendingEntry,result=app.runtime.training?await require('../../app/training/entry').resolveEntry(entry,session,app.runtime.training):await resolveEntry(entry,session,app.runtime.domains)
    if(this.closed||sequence!==this.sequence||app.pendingEntry!==entry)return
    if(result.status==='unavailable'){this.setData({status:'ready',message:result.message});return}
    if(result.status==='ready')app.pendingEntry=null

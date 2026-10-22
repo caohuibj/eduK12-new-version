@@ -6,7 +6,9 @@
     "test": "node --test tests/*.test.cjs",
     "check": "node scripts/check.cjs",
     "verify": "npm run check && npm test",
-    "release:check": "node scripts/release-readiness.cjs"
+    "release:check": "node scripts/release-readiness.cjs",
+    "test:training": "node --test tests/training-student.test.cjs",
+    "check:training-projection": "node scripts/sync-training-assessments.cjs --check"
   },
   "engines": {
     "node": "24.21.0"

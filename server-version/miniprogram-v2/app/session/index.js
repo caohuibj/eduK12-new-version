@@ -1,13 +1,14 @@
 const { resolveRole } = require('../router/index')
 const { resolveCapabilities } = require('../capabilities/index')
-function createSession({account, jar, telemetry, clearPrivateData = async () => {}}) {
-  let state = {status: 'idle', user: null, capabilities: {}, runtime: {}}
+function createSession({account, jar, telemetry, clearPrivateData = async () => {}, studentOnly = false}) {
+  const product = studentOnly ? 'training-student' : undefined
+  let state = {product, status: 'idle', user: null, capabilities: {}, runtime: {}}
   let flight = null; const listeners = new Set()
   const publish = value => { state = value; listeners.forEach(listener => listener(state)) }
   async function expire(expectedEpoch) {
     if (expectedEpoch !== undefined && expectedEpoch !== jar.epoch()) return
     flight = null
-    publish({status: 'ready', user: null, capabilities: {}, runtime: {}})
+    publish({product, status: 'ready', user: null, capabilities: {}, runtime: {}})
     telemetry.clear(); await jar.clear()
   }
   async function refresh() {
@@ -18,11 +19,20 @@ function createSession({account, jar, telemetry, clearPrivateData = async () => 
       try {
         const [user, runtime] = await Promise.all([account.me(), account.capabilities()])
         if (epoch !== jar.epoch()) return state
-        const role = resolveRole(user); const capabilities = resolveCapabilities(user.mobile)
-        publish({status: 'ready', user, capabilities, runtime, availableRoles: role.availableRoles, activeRole: role.activeRole})
+        if (studentOnly && (!user || user.role !== 'STUDENT' || !['LEGACY','TRAINING'].includes(user.accountDomain))) {
+          const error = new Error('此小程序仅供 Training 学员使用，请使用学员账号登录'); error.trainingIdentity = true; throw error
+        }
+        const role = resolveRole(user)
+        let capabilities = resolveCapabilities(user.mobile)
+        if (studentOnly) {
+          const allowed = ['canReadProfile','canReadOwnAssessments','canUseAssessmentRuntime','canReadStudentTasks','canReadCourses','canReadAssignments','canReadCheckins']
+          capabilities = Object.freeze(Object.fromEntries(Object.entries(capabilities).map(([key,value]) => [key,allowed.includes(key) && value])))
+        }
+        publish({product, status: 'ready', user, capabilities, runtime, availableRoles: role.availableRoles, activeRole: role.activeRole})
         return state
       } catch (error) {
         if (epoch !== jar.epoch()) return state
+        if (studentOnly && (error.trainingIdentity || error.kind === 'capabilityMismatch')) {await expire(epoch); await clearPrivateData(); throw error}
         if (error.status === 401) { await expire(epoch); return state }
         publish(Object.assign({}, state, {status: 'error', error})); throw error
       }
