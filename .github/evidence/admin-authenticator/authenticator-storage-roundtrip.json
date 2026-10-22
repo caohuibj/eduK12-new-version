@@ -1,0 +1,13 @@
+{
+  "scope": "Only synthetic users and encrypted administrator TOTP data, not platform recovery qualification",
+  "steps": {
+    "create": 0,
+    "schema": 0,
+    "dump": 0,
+    "restore": 0
+  },
+  "credentialCount": 14,
+  "restoredCipherAndReplayStateMatch": true,
+  "negativeStepRejectedWithoutChanges": true,
+  "completedUTC": "2026-10-22T02:48:00.264742+00:00"
+}

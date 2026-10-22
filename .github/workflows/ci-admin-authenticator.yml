@@ -1,0 +1,129 @@
+name: Authenticator bounded merge checks
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  CI_EVENT: pull_request
+  CI_HEAD_REF: work/admin-authenticator-main-20261022
+  CI_PR_REPOSITORY: caohuibj/eduK12-new-version
+  NODE_OPTIONS: --max-old-space-size=4096
+jobs:
+  admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      PLAN: ${{ inputs.plan }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify exact product and reviewed historical local assertions
+        run: node .github/scripts/admin-authenticator-checks.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: admin-authenticator-admission-${{ github.sha }}
+          path: admin-authenticator-evidence
+          if-no-files-found: error
+          retention-days: 3
+  integrated:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [backend, frontend]
+    services:
+      postgres:
+        image: ${{ matrix.component == 'backend' && 'postgres:16' || '' }}
+        env:
+          POSTGRES_USER: synthetic
+          POSTGRES_PASSWORD: synthetic_ci_only
+          POSTGRES_DB: authenticator_ci
+        ports: ['5432:5432']
+        options: --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql://synthetic:synthetic_ci_only@127.0.0.1:5432/authenticator_ci
+      JWT_SECRET: synthetic-ci-only-not-a-production-secret
+      PRISMA_MIGRATIONS_ALLOW_OWNER_FALLBACK: 'true'
+    defaults:
+      run:
+        working-directory: server-version/${{ matrix.component }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/${{ matrix.component }}/package-lock.json
+      - name: install frozen dependencies from official registry
+        run: npm ci
+      - name: audit actual production dependency closure at HIGH threshold
+        run: npm audit --omit=dev --audit-level=high
+      - name: integrated administrator schema and one backend compilation
+        if: matrix.component == 'backend'
+        run: |
+          npx --no-install prisma generate
+          npx --no-install prisma validate
+          npx --no-install prisma migrate deploy
+          npx --no-install tsc
+          test -s dist/modules/admin-permissions/totp.js
+      - name: integrated app types and one frontend compilation
+        if: matrix.component == 'frontend'
+        run: |
+          npx --no-install tsc -p tsconfig.app.json --noEmit
+          npx --no-install vite build
+          test -s dist/index.html
+      - name: record current source and compiled tree digests
+        shell: node {0}
+        env:
+          COMPONENT: ${{ matrix.component }}
+        run: |
+          const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto'),cp=require('node:child_process');
+          const files=[];function walk(p){for(const n of fs.readdirSync(p)){const f=path.join(p,n);if(fs.statSync(f).isDirectory())walk(f);else files.push(f);}}walk('dist');
+          if(!files.length)throw Error('Empty compiled output');
+          const digest=crypto.createHash('sha256');for(const f of files.sort()){digest.update(f);digest.update(fs.readFileSync(f));}
+          const report={head:cp.execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),component:process.env.COMPONENT,compiledFiles:files.length,compiledTreeSha256:digest.digest('hex'),productionDependenciesAudit:'passed HIGH/CRITICAL threshold',deploymentImageQualified:false};
+          fs.mkdirSync('../../admin-authenticator-evidence',{recursive:true});fs.writeFileSync('../../admin-authenticator-evidence/'+process.env.COMPONENT+'-integrated.json',JSON.stringify(report,null,2));
+      - uses: actions/upload-artifact@v4
+        with:
+          name: admin-authenticator-${{ matrix.component }}-${{ github.sha }}
+          path: |
+            admin-authenticator-evidence
+            server-version/${{ matrix.component }}/dist
+          if-no-files-found: error
+          retention-days: 3
+  browser:
+    needs: integrated
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: admin-authenticator-frontend-${{ github.sha }}
+      - name: install only pinned browser tools
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+      - name: exact compiled binding and login UI at desktop and mobile widths
+        run: node .github/scripts/admin-authenticator-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: admin-authenticator-browser-${{ github.sha }}
+          path: admin-authenticator-evidence
+          if-no-files-found: error
+          retention-days: 3
