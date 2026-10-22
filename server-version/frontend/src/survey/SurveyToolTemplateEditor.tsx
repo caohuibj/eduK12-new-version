@@ -1,5 +1,5 @@
-import {useEffect,useRef,useState,type ReactNode} from 'react'
-import {ArrowLeft,Plus} from 'lucide-react'
+import {useEffect,useRef,useState} from 'react'
+import {ArrowLeft,Plus,Pencil} from 'lucide-react'
 import {toolLibraryApi as api,ToolLibraryError,libraryKindLabel,type LibraryTool,type ToolRef} from './tool-library-api'
 import {ResearchFormEditor} from './ResearchFormEditor'
 import {ResearchScaleEditor} from './ResearchScaleEditor'
@@ -9,7 +9,6 @@ import type {FormDraft,ScaleDraft,ResearchDraft} from './builder.types'
 import type {BuilderLeaveRisk} from './SurveyBuilder'
 import type {CatalogGrant} from './ResearchCatalog'
 
-function TemplateInfo({form,title,children}:{form:boolean;title:string;children:ReactNode}){const [open,setOpen]=useState(()=>title.startsWith('未命名'));return form?<details className="survey-template-info" open={open} onToggle={event=>setOpen(event.currentTarget.open)}><summary><span><strong>{title}</strong><small>基本信息 · 工具名称</small></span><span>编辑信息</span></summary>{children}</details>:<>{children}</>}
 type Review={ok:boolean;issues:{path?:string;line?:number;message:string}[];score?:{scores?:{key:string;value:number|null;status:string}[]}|null;unitCount?:number}
 type Batch={batchId:string;format:'TEXT'|'CSV';content:string}
 type Bulk={revision:number;digest:string;ok:boolean;count:number;issues:{line:number;message:string}[]}
@@ -17,11 +16,11 @@ export function SurveyToolTemplateEditor({id,onReturn,onLeaveRiskChange}:{id:str
   const [tool,setTool]=useState<LibraryTool|null>(null),[dirty,setDirty]=useState(false),[busy,setBusy]=useState(false),[loading,setLoading]=useState(true)
   const [error,setError]=useState(''),[issues,setIssues]=useState<Review['issues']>([]),[notice,setNotice]=useState(''),[review,setReview]=useState<Review|null>(null),[preview,setPreview]=useState(false)
   const [bulkText,setBulkText]=useState(''),[bulkFormat,setBulkFormat]=useState<'TEXT'|'CSV'>('CSV'),[bulk,setBulk]=useState<{batch:Batch;result:Bulk}|null>(null)
-  const [formRisk,setFormRisk]=useState(false)
+  const [formRisk,setFormRisk]=useState(false),[nameOpen,setNameOpen]=useState(false)
   const [picker,setPicker]=useState(false),[reload,setReload]=useState(0)
   const lock=useRef(false),editGeneration=useRef(0)
   const risk=dirty||!!bulkText.trim()||formRisk
-  useEffect(()=>{let current=true;setLoading(true);setError('');void api<LibraryTool>('/tool-library/'+encodeURIComponent(id)).then(result=>{if(current){setTool(result);setDirty(false)}}).catch(cause=>{if(current)setError(cause.message)}).finally(()=>{if(current)setLoading(false)});return()=>{current=false}},[id,reload])
+  useEffect(()=>{let current=true;setLoading(true);setError('');void api<LibraryTool>('/tool-library/'+encodeURIComponent(id)).then(result=>{if(current){setTool(result);setDirty(false);setNameOpen(result.title.startsWith('未命名'))}}).catch(cause=>{if(current)setError(cause.message)}).finally(()=>{if(current)setLoading(false)});return()=>{current=false}},[id,reload])
   useEffect(()=>{onLeaveRiskChange?.({dirty:risk,busy});return()=>onLeaveRiskChange?.({dirty:false,busy:false})},[risk,busy,onLeaveRiskChange])
   useEffect(()=>{const warn=(event:BeforeUnloadEvent)=>{if(risk||busy){event.preventDefault();event.returnValue=''}};window.addEventListener('beforeunload',warn);return()=>window.removeEventListener('beforeunload',warn)},[risk,busy])
   useEffect(()=>{if(!notice)return;const timer=window.setTimeout(()=>setNotice(''),5000);return()=>window.clearTimeout(timer)},[notice])
@@ -35,23 +34,30 @@ export function SurveyToolTemplateEditor({id,onReturn,onLeaveRiskChange}:{id:str
   if(!tool)return <section className="survey-tool-library"><button className="btn-secondary" onClick={onReturn}>返回工具集</button><p role="alert">{error||'工具不可用'}</p><button className="btn-secondary" onClick={()=>setReload(value=>value+1)}>重新读取</button></section>
   const draft=tool.kind!=='COMPOSITION'?{...tool,kind:tool.kind,definition:tool.definition,projectId:'tool:'+id,instrumentKey:'library_tool',createdAt:tool.updatedAt} as ResearchDraft:null
   const items:ToolRef[]=tool.kind==='COMPOSITION'?tool.definition.items:[]
-  return <section className="survey-tool-template" aria-label="独立工具编辑">
-    <header className="survey-template-heading"><button type="button" className="survey-template-back" disabled={busy} onClick={leave}><ArrowLeft size={17}/>工具集</button><span>{dirty||formRisk?'有未保存的修改':'已保存'} · 修订 {tool.revision}</span></header>
+  const readOnly=tool.status!=='DRAFT'
+  const titleFields=<div className="survey-template-title"><label>工具名称<input className="input" disabled={busy||readOnly||formRisk} maxLength={200} value={tool.title} onChange={event=>{editGeneration.current++;setTool({...tool,title:event.target.value});setDirty(true)}}/></label><div className="survey-template-actions"><button type="button" className="btn-primary" disabled={busy||readOnly||!dirty||!tool.title.trim()||formRisk} onClick={save}>{tool.kind==='FORM'?'保存表单信息':'保存工具'}</button></div></div>
+  const usageHelp=<details className="survey-library-help"><summary>编制与使用说明</summary><p>此工具由你独立管理，不属于具体研究。保存后可在研究的“发布与采集”中选用；每次选用保留当时的修订，不同步覆盖已有研究。</p><p>{tool.kind==='COMPOSITION'?'普通组合问卷组合已有表单、量表及已授权测评，不生成打包综合报告；研究内仍需配置波次、顺序和反馈策略。':tool.kind==='FORM'?'题目添加、编辑、移除及排序成功后即保存。完成后通过检查与试答核对内容。':'完成题目设置后保存并检查，再通过模拟作答核对内容。量表可设置维度、反向题、总分与原始分区间反馈；研究的报告和发布策略仍单独管理。'}</p></details>
+  return <section className={'survey-tool-template'+(tool.kind==='FORM'?' is-form':'')} aria-label="独立工具编辑">
+    {tool.kind==='FORM'?<header className="survey-form-toolbar">
+      <div className="survey-form-toolbar-row"><button type="button" className="survey-template-back" disabled={busy} onClick={leave}><ArrowLeft size={17}/>工具集</button><span className="survey-form-toolbar-divider" aria-hidden="true"/>
+        <div className="survey-form-toolbar-name"><span className="survey-form-type-label">表单</span><h1 title={tool.title}>{tool.title}</h1><button type="button" className="survey-form-rename" aria-label="编辑名称" aria-expanded={nameOpen} aria-controls="survey-form-name-fields" disabled={busy||readOnly||formRisk} onClick={()=>setNameOpen(value=>!value)}><Pencil size={15}/></button></div>
+        <span className="survey-form-toolbar-status">{dirty||formRisk?'未保存':'已保存'}<small>修订 {tool.revision}</small></span><button type="button" className="btn-secondary survey-form-check" disabled={busy||readOnly||risk} onClick={check}>检查与试答</button>
+      </div>
+      <div id="survey-form-name-fields" className="survey-form-name-fields" hidden={!nameOpen}>{titleFields}</div>
+    </header>:<header className="survey-template-heading"><button type="button" className="survey-template-back" disabled={busy} onClick={leave}><ArrowLeft size={17}/>工具集</button><span>{dirty?'有未保存的修改':'已保存'} · 修订 {tool.revision}</span></header>}
     {error&&<div role="alert" className="survey-library-error">{error}</div>}
     {!!issues.length&&<ul className="survey-library-issues" role="alert">{issues.map((issue,index)=><li key={index}>{issue.path||issue.line&&'第 '+issue.line+' 行'}：{issue.message}</li>)}</ul>}
     <fieldset disabled={busy||tool.status!=='DRAFT'} className="survey-template-fields">
-    <header className="survey-template-form-heading"><span className="survey-template-eyebrow">RESEARCH · 工具编制</span><h1>{libraryKindLabel[tool.kind]}编制</h1><button type="button" className="btn-secondary" disabled={risk} onClick={check}>检查与试答</button></header>
-    <TemplateInfo form={tool.kind==='FORM'} title={tool.title}>
-      <div className="survey-template-title"><label>工具名称<input className="input" disabled={formRisk} maxLength={200} value={tool.title} onChange={event=>{editGeneration.current++;setTool({...tool,title:event.target.value});setDirty(true)}}/></label><div className="survey-template-actions"><button type="button" className="btn-primary" disabled={!dirty||!tool.title.trim()||formRisk} onClick={save}>{tool.kind==='FORM'?'保存表单信息':'保存工具'}</button></div></div>
-    </TemplateInfo>
+    {tool.kind!=='FORM'&&<><header className="survey-template-form-heading"><span className="survey-template-eyebrow">RESEARCH · 工具编制</span><h1>{libraryKindLabel[tool.kind]}编制</h1><button type="button" className="btn-secondary" disabled={risk} onClick={check}>检查与试答</button></header>{titleFields}</>}
     {notice&&<p role="status" className="survey-library-notice">{notice}</p>}
-    <details className="survey-library-help"><summary>编制与使用说明</summary><p>此工具由你独立管理，不属于具体研究。保存后可在研究的“发布与采集”中选用；每次选用保留当时的修订，不同步覆盖已有研究。</p><p>{tool.kind==='COMPOSITION'?'普通组合问卷组合已有表单、量表及已授权测评，不生成打包综合报告；研究内仍需配置波次、顺序和反馈策略。':'完成题目设置后保存并检查，再通过模拟作答核对内容。量表可设置维度、反向题、总分与原始分区间反馈；研究的报告和发布策略仍单独管理。'}</p></details>
+    {tool.kind!=='FORM'&&usageHelp}
     {tool.kind==='FORM'&&<ResearchFormEditor value={tool.definition as FormDraft} onChange={change} projectId={'tool:'+id} appearance="studio" onCommit={commitForm} onDraftRiskChange={setFormRisk} disabled={dirty}/>}
     {tool.kind==='SCALE'&&<ResearchScaleEditor value={tool.definition as ScaleDraft} onChange={change} projectId={'tool:'+id}/>}
     {tool.kind==='COMPOSITION'&&<section className="survey-composition"><header><h2>工具顺序</h2><button type="button" className="btn-secondary" onClick={()=>setPicker(value=>!value)}><Plus size={17}/>添加已有工具</button></header><p className="survey-library-muted">各工具保留自己的计分与结果，不提供打包综合报告。</p>{!items.length&&<p className="survey-library-empty">尚未添加工具。先编制表单或量表，或选用已获授权的测评。</p>}
       <ol>{items.map((item,index)=><li key={item.source+item.id}><span className="survey-composition-order">{index+1}</span><div><strong>{(item as ToolRef&{title?:string}).title||'已选工具'}</strong><small>{item.source==='owned'?'我编制的 · 修订 '+item.revision:'已获授权 · 固定版本'}</small></div><button type="button" disabled={index===0} aria-label={'上移工具 '+(index+1)} onClick={()=>{const next=[...items];[next[index-1],next[index]]=[next[index],next[index-1]];change({...tool.definition,items:next})}}>↑</button><button type="button" disabled={index===items.length-1} aria-label={'下移工具 '+(index+1)} onClick={()=>{const next=[...items];[next[index+1],next[index]]=[next[index],next[index+1]];change({...tool.definition,items:next})}}>↓</button><button type="button" onClick={()=>change({...tool.definition,items:items.filter((_,i)=>i!==index)})}>移除</button></li>)}</ol>
       {picker&&<CompositionToolPicker selected={items} onChoose={item=>change({...tool.definition,items:[...items,item]})}/>}
     </section>}
+    {tool.kind==='FORM'&&usageHelp}
     {draft&&<details className="survey-library-help"><summary>批量录入题目</summary><ResearchImportGuide draft={draft} onUse={text=>{if(!bulkText.trim()||window.confirm('替换尚未导入的文本？')){setBulkText(text);setBulkFormat('CSV');setBulk(null)}}}/><label>输入格式<select className="input" value={bulkFormat} onChange={event=>{setBulkFormat(event.target.value as 'TEXT'|'CSV');setBulk(null)}}><option value="CSV">CSV</option><option value="TEXT">多行文本</option></select></label><label>待导入内容<textarea className="input" rows={7} value={bulkText} onChange={event=>{setBulkText(event.target.value);setBulk(null)}}/></label><button type="button" className="btn-secondary" disabled={dirty||formRisk||!bulkText.trim()} onClick={()=>void run(async()=>{const batch:Batch={batchId:crypto.randomUUID(),format:bulkFormat,content:bulkText};const result=await api<Bulk>('/tool-library/'+id+'/bulk-import/preview','POST',batch);setBulk({batch,result});setIssues(result.issues)})}>解析并预览</button>{bulk&&<div><p>候选题数：{bulk.result.count}</p><button type="button" className="btn-primary" disabled={dirty||formRisk||!bulk.result.ok||bulk.result.revision!==tool.revision} onClick={()=>void run(async()=>{const result=await api<LibraryTool>('/tool-library/'+id+'/bulk-import/apply','POST',{revision:bulk.result.revision,digest:bulk.result.digest,batch:bulk.batch});setTool(result);setBulk(null);setBulkText('');setReview(null);setPreview(false);setNotice('题目已整批导入。')})}>确认导入</button></div>}</details>}
     {review?.ok&&tool.kind==='COMPOSITION'&&<p role="status">组合结构通过，共 {review.unitCount} 个工具。</p>}
     {draft&&review?.ok&&!risk&&<details className="survey-library-help" open={preview} onToggle={event=>setPreview(event.currentTarget.open)}><summary>模拟作答（不产生正式答卷）</summary>{preview&&<ResearchPreview draft={draft} onSimulate={answers=>void run(async()=>{const result=await api<Review>('/tool-library/'+id+'/preview','POST',{answers});setReview(result);setIssues(result.issues)})} onValidateForm={answers=>void run(async()=>{const result=await api<Review>('/tool-library/'+id+'/form-dry-run','POST',{answers});setIssues(result.issues??[]);setNotice(result.ok?'表单试提交通过。':'请修正作答。')})}/>} {review.score?.scores?.map(score=><p key={score.key}>{score.key}：{score.value??'不可计算'}</p>)}</details>}

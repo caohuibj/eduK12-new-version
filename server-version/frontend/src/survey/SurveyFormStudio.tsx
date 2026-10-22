@@ -35,9 +35,8 @@ export function SurveyFormStudio({value,onCommit,onDraftRiskChange,disabled=fals
   const working={...value,pages:page?value.pages.map(p=>p===page?{...p,questions:editing||p.questions.some(q=>q.itemKey===question.itemKey)?p.questions.map(q=>q.itemKey===(editing??question.itemKey)?question:q):[...p.questions,question]}:p):[{...workingPage,questions:[question]}]}
   const visibleFields=value.pages.flatMap(p=>p.questions).reduce((n,q)=>n+(['MATRIX','MATRIX_MULTIPLE'].includes(q.type)?q.rows.length:1)+(q.otherOptionKey?1:0),0)
   return <section className="survey-form-studio" aria-label="表单编制工作区">
-    <header className="survey-form-content-heading"><div><span className="survey-template-eyebrow">编制表单</span><h2>题目编辑 <span>{count} 道题目</span></h2><p>从目录选择已有题目，或在编辑区添加新题。</p></div><span className="survey-form-save-note">添加、移除与排序成功后即保存</span></header>
+    <header className="survey-form-content-heading"><h2>题目编辑 <span>{count} 道题目</span></h2><span className="survey-form-save-note">操作成功后即保存</span></header>
     {disabled&&<p className="survey-library-notice" role="status">表单信息尚未保存，请先保存表单信息，再编辑题目。</p>}
-    {value.schemaVersion===1&&<details className="survey-form-compatibility"><summary>旧版兼容表单 · 扩展题型说明</summary><p>旧版保留原有题型。启用扩展题型后可使用日期、时间、排序、滑块、恒定总和、矩阵多选，以及其他填写、互斥选项和输入格式限制。新建表单默认具备这些能力。</p><p>只更新此工具草稿；已有研究或冻结发布的内容不会被改写。</p><button type="button" className="btn-secondary" disabled={blocked||risk} onClick={()=>void commit({...value,schemaVersion:2})}>启用扩展题型</button></details>}
     {error&&<p className="survey-library-error" role="alert">{error}</p>}
     <div className="survey-form-builder">
       <aside className="survey-form-directory" aria-label="表单题目目录"><header><List size={17}/><strong>题目目录</strong><span>{count}</span></header>
@@ -57,5 +56,6 @@ export function SurveyFormStudio({value,onCommit,onDraftRiskChange,disabled=fals
         <p className="survey-form-field-budget">已保存作答字段 {visibleFields}/500 · 矩阵每行和其他填写各计 1 个字段</p>
       </section>
     </div>
+    {value.schemaVersion===1&&<details className="survey-form-compatibility"><summary>旧版兼容表单 · 扩展题型说明</summary><p>旧版保留原有题型。启用扩展题型后可使用日期、时间、排序、滑块、恒定总和、矩阵多选，以及其他填写、互斥选项和输入格式限制。新建表单默认具备这些能力。</p><p>只更新此工具草稿；已有研究或冻结发布的内容不会被改写。</p><button type="button" className="btn-secondary" disabled={blocked||risk} onClick={()=>void commit({...value,schemaVersion:2})}>启用扩展题型</button></details>}
   </section>
 }
