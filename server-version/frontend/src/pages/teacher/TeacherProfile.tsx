@@ -1,3 +1,4 @@
+import TrainingAppearanceSettings from '../../training/TrainingAppearance'
 import { isTrainingHost } from '../../training/context'
 import React, { useEffect, useState } from 'react'
 import { CheckCircle, Eye, EyeOff, Loader2, Lock, Save, User } from 'lucide-react'
@@ -121,6 +122,8 @@ const TeacherProfile: React.FC = () => {
   return (
     <ProductPage width="reading" className="hui-teacher-profile space-y-6">
       <PageHeader title={isTrainingHost() ? "我的账户" : "个人资料"} description="管理显示姓名与登录密码。" />
+
+      <TrainingAppearanceSettings />
 
       {loadError && (
         <div role="alert" className="rounded-lg border border-red-200 bg-red-50 p-4 text-red-700">
