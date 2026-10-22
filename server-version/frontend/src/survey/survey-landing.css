@@ -195,13 +195,7 @@
 .survey-feature-link:hover { background: var(--survey-ui-glass, rgba(255, 255, 255, .45)); }
 .survey-feature-arrow { margin-left: auto; font-size: 17px; }
 .survey-feature-page { min-height: 100svh; }
-.survey-feature-content { max-width: 820px; margin: 0 auto; padding: 45px 40px 80px; }
 .survey-back { display: flex; align-items: center; width: fit-content; min-height: 44px; color: var(--survey-body); font-size: 16px; margin-bottom: 24px; text-underline-offset: 4px; }
-.survey-feature-content h1 { font-family: 'Songti SC', 'STSong', serif; font-size: 42px; font-weight: 400; line-height: 1.5; margin: 20px 0; }
-.survey-feature-intro { font-size: 18px; line-height: 1.9; }
-.survey-feature-content ul { margin: 32px 0; padding-left: 24px; list-style: disc; }
-.survey-feature-content li { margin: 12px 0; line-height: 1.9; color: var(--survey-body); }
-.survey-feature-note { margin-top: 32px; padding: 22px 24px; border-left: 2px solid var(--survey-brand-border-strong); background: var(--survey-brand-soft); color: var(--survey-ui-body, #36586a); font-size: 14px; line-height: 1.9; }
 
 .survey-skip-link {
   position: absolute;
@@ -281,9 +275,6 @@
   .survey-feature-link h2 { font-size: 16px; }
   .survey-feature-link p { font-size: 14px; letter-spacing: 0; }
   .survey-feature-arrow { display: none; }
-  .survey-feature-content { padding: 25px 7% 60px; }
-  .survey-feature-content h1 { font-size: 34px; }
-  .survey-feature-intro { font-size: 16px; }
   .survey-entry-header { padding: 20px 16px; }
   .survey-entry-main { padding: 24px 16px 48px; }
   .survey-entry-panel { padding: 24px 20px; }

@@ -1,31 +1,106 @@
 import { ClipboardList, FolderOpen, ScanLine, ChartNoAxesCombined } from 'lucide-react'
 
-/** Summarized from the current Survey implementation, not a promise of deployment. */
+/** Public descriptions reflect implemented researcher workflows, not scientific qualification. */
 export const surveyFeatures = [
   {
-    path: '/features/research-projects', title: '研究项目', description: '组织项目与研究波次', icon: FolderOpen,
-    introduction: '以研究项目组织工具、波次和数据，让每一次探索有迹可循。',
-    points: ['在同一项目内管理研究说明、工具、采集波次和数据。', '选择单次独立匿名，或事先告知关联方式的多波次采集。', '按研究进程发布、暂停、结束与归档，保留已冻结内容的版本。'],
-    note: '研究者仅由管理员邀请开通，登录时需要双因素验证。研究数据限本人及明确授权的项目范围。',
+    key: 'projects', path: '/features/research-projects', title: '研究项目', icon: FolderOpen,
+    description: '以项目组织研究，以波次连接每一次观察。',
+    tags: ['独立匿名 / 多波次', '固定发布版本'],
+    introduction: '让研究问题、采集安排与回答数据，在同一条清晰的研究路径上衔接。',
+    overview: '项目是组织研究的空间。先说明研究目的和参与方式，再按需要安排一次或多次采集；每次发布都有明确的内容与版本。',
+    capabilities: [
+      { title: '围绕问题建立项目', body: '集中维护研究名称、介绍、采集方式与知情同意内容。研究说明和参与流程一起准备，便于清楚地告诉参与者这项研究要做什么。' },
+      { title: '按研究设计组织波次', body: '单次研究可使用独立匿名采集；需要追踪变化时，可选择明确告知关联方式的多波次研究，以研究内编号连接不同时间的回答。' },
+      { title: '让发布内容有据可查', body: '研究中选用工具的具体修订，开放前检查并冻结波次内容。后续工具编辑不会悄悄改变已发布的版本，便于回看采集依据。' },
+    ],
+    steps: [
+      { title: '说明研究', body: '填写基本信息，选择采集方式，准备知情同意。' },
+      { title: '安排内容', body: '在发布与采集中选入可用工具，安排顺序与波次。' },
+      { title: '检查后发布', body: '核对内容与参与流程，再生成本波次的参与入口。' },
+    ],
+    questions: [
+      { question: '工具必须先建在一个研究里吗？', answer: '不需要。工具在独立工具集中编制和维护；研究在发布与采集中选用已经完成编制的自建工具，或正式授权的可用工具。' },
+      { question: '匿名研究和多波次研究有什么区别？', answer: '独立匿名采集不连接其他波次。多波次研究通过研究内编号关联回答，属于假名化研究，需要提前向参与者说明关联方式，不能把它描述为完全匿名。' },
+    ],
+    note: '研究者账号通过管理员邀请开通。项目访问、研究操作与数据读取遵循现有的身份和授权范围。',
+    related: '/features/research-participation',
   },
   {
-    path: '/features/research-tools', title: '研究工具', description: '表单、量表、情境与认知', icon: ClipboardList,
-    introduction: '选择适合研究问题的工具，在编制、预览和修订中逐步完善内容。',
-    points: ['Form 表单：编制题目、选项与分页，支持批量录入。', 'Scale 量表与 SJT 情境判断：设置条目、维度或情境，保留研究性计分定义。', '认知测验：使用受控模板；刺激呈现、时序和输入采集由既有测验程序执行。', '先做结构检查和试答预览，再在发布时冻结工具版本与评分来源。'],
-    note: '自编工具用于研究探索，不因可以发布就获得正式科学资格；涉及外部内容和图片时仍需相应授权。',
+    key: 'tools', path: '/features/research-tools', title: '研究工具', icon: ClipboardList,
+    description: '独立编制表单、量表与组合问卷，再选入研究。',
+    tags: ['授权使用 / 自主编制', '素材与版本管理'],
+    introduction: '把工具认真做好，再带入不同的研究。',
+    overview: '工具集独立于研究项目。授权工具和自主编制工具分别管理，表单、量表与普通组合问卷都有对应的编制界面，完成后再由研究选用。',
+    capabilities: [
+      { title: '用合适的方式组织问题', body: '表单支持题目、选项、分页、条件显示与图片；量表支持条目、维度、反向题和研究性计分设置；普通组合问卷按顺序组织已有工具。' },
+      { title: '编制与正式选用分开', body: '先保存、检查并试答，再标记完成编制。草稿不进入研究的可选列表；后续修改会使完成标记失效，须再次检查确认。' },
+      { title: '把素材与共享管理清楚', body: '素材库分别管理自主上传与授权使用的视频、图片和文档。自建量表可以提交固定版本申请进入共用库，连同版权说明和附件共享同意进入审核。' },
+    ],
+    steps: [
+      { title: '选择工具类型', body: '从表单、量表或普通组合问卷开始，也可使用已获授权的工具。' },
+      { title: '编制、检查与试答', body: '完成内容与设置，预览参与者看到的实际流程。' },
+      { title: '完成并选入研究', body: '标记完成编制，由研究选用对应修订；修改后重新确认。' },
+    ],
+    questions: [
+      { question: '认知测验和 SJT 也可以自己新建吗？', answer: '目前不开放研究者自建认知测验与 SJT。此类工具通过已有的受控模板与授权范围提供；参数、刺激呈现、计分和报告资格仍遵循对应工具的控制流程。' },
+      { question: '自建工具会自动成为平台公共内容吗？', answer: '不会。自主编制与自主上传的内容保持在研究者自己的管理范围。当前自建量表可主动申请进入共用库，只有通过版本、版权及附件同意等审核后才按批准范围共享。表单和普通组合问卷的公共入库申请尚未开放。' },
+    ],
+    note: '自编和可发布不等于已经获得正式科学资格。量表计分、解释和外部内容使用仍需有适用的研究依据与授权。',
+    related: '/features/research-projects',
   },
   {
-    path: '/features/research-participation', title: '发布与参与', description: '知情同意与链接采集', icon: ScanLine,
-    introduction: '通过独立研究邀请链接参与，先了解研究，再决定是否作答。',
-    points: ['以研究波次安排发布、招募和收集，开放前检查并冻结内容。', '参与者通常无需平台注册账户，经研究邀请链接了解研究并确认知情同意。', '按当前研究设置提供恢复入口；暂存、工具完成和整轮正式提交分别确认。', '完成后提供完成确认与非诊断性的通用反馈。'],
-    note: '单次匿名不关联其他波次；多波次以研究内编号连接回答，属于假名化研究，须明确告知关联方式。研究发布按环境开通情况提供。',
+    key: 'participation', path: '/features/research-participation', title: '发布与参与', icon: ScanLine,
+    description: '清楚说明研究，让参与者知情、自愿地作答。',
+    tags: ['独立参与链接', '知情同意与提交确认'],
+    introduction: '从了解研究开始，让每一步参与都有清楚的指引。',
+    overview: '发布以研究波次为单位。研究者准备工具与参与说明，参与者通过独立邀请链接进入，先了解研究，再决定是否继续。',
+    capabilities: [
+      { title: '只发布准备好的内容', body: '从已经完成编制的自建工具或正式授权工具中选择内容，确定顺序，再检查波次。开放时固定实际使用的工具和评分来源，避免采集中发生隐性变化。' },
+      { title: '让知情同意先于作答', body: '参与者通常无需注册平台账号。进入邀请链接后先阅读研究说明与知情同意，再开始填写；匿名方式、关联方式和研究用途由研究者事先说明。' },
+      { title: '区分保存、完成与提交', body: '按研究设置提供恢复入口，暂存回答、完成一个工具和正式提交整轮研究分别确认。可按研究需要配置私有报告内容，并检查合成样例的展示效果。' },
+    ],
+    steps: [
+      { title: '准备并检查', body: '选好工具、顺序、波次设置与参与说明，完成发布检查。' },
+      { title: '邀请参与', body: '分享研究的参与链接，由参与者自行阅读并确认知情同意。' },
+      { title: '采集与反馈', body: '记录正式提交，查看完成进度，按研究配置提供反馈。' },
+    ],
+    questions: [
+      { question: '参与者需要注册或登录平台吗？', answer: '通常不需要。参与者通过具体研究提供的邀请链接进入。能否恢复填写以及如何关联波次，取决于研究设置和已告知的参与方式。' },
+      { question: '私有报告是自动生成的诊断报告吗？', answer: '不是。私有报告是研究者在项目内，为指定测量版本编制的反馈内容，可用合成样例预览。它引用已有的计分或参考定义，不负责自动创建常模、阈值，也不把研究结果转化为个人诊断。' },
+    ],
+    note: '参与入口的开放、暂停与使用范围由具体研究和当前环境的权限决定。公开介绍页不提供真实研究招募或参与链接。',
+    related: '/features/research-data',
   },
   {
-    path: '/features/research-data', title: '数据与分析', description: '项目内统计与受控导出', icon: ChartNoAxesCombined,
-    introduction: '在项目内查看研究进度、回答与描述统计，按波次整理和导出数据。',
-    points: ['查看项目与波次的采集进度，区分完成、缺失、拒答和撤回等状态。', '查看逐题描述统计；符合条件的多波次研究可按研究内编号关联。', '通过受控导出获取 CSV、变量编码字典与 Manifest，保留批次和来源说明。'],
-    note: '数据分析与导出按当前环境和权限提供。敏感导出需要近期双因素验证；统计结果不自动构成个人诊断或因果结论。',
+    key: 'data', path: '/features/research-data', title: '数据与分析', icon: ChartNoAxesCombined,
+    description: '查看采集进度，保留质量复核与数据来源。',
+    tags: ['描述统计与复核', 'CSV / 编码字典 / Manifest'],
+    introduction: '不只看见结果，也能回到结果的来处。',
+    overview: '研究数据页连接完成进度、样本质量复核、逐题描述统计和受控导出。在分析之前，先分清数据来自哪里、处于什么状态，以及采用了哪些复核决定。',
+    capabilities: [
+      { title: '按波次了解采集进度', body: '查看完成、有效分析、质量排除与撤回等状态；在符合研究设计和授权条件时，通过研究内编号关联多波次回答。' },
+      { title: '让质量复核留下记录', body: '对符合条件的已完成样本进行纳入或排除复核，说明原因并保留历史。质量排除属于分析政策，不改写原始正式提交。' },
+      { title: '连同解释一起导出', body: '受控导出提供回答数据、变量编码字典与批次来源清单。按研究范围选择数据；敏感导出要求近期双因素验证，包含自由文本时还需明确确认。' },
+    ],
+    steps: [
+      { title: '先看完成情况', body: '确认波次、正式提交和撤回状态，了解数据范围。' },
+      { title: '复核并查看统计', body: '记录质量决定，再查看逐题描述统计和探索性结果。' },
+      { title: '按范围导出', body: '确认身份、波次与用途，连同编码字典和来源清单保存。' },
+    ],
+    questions: [
+      { question: '排除样本会删除原始回答吗？', answer: '质量复核中的排除不删除原始正式提交，而是形成可追溯的分析决定。撤回是另一套状态与处理流程，不能用质量排除替代。' },
+      { question: '拿到 CSV 就可以脱离研究范围使用吗？', answer: '导出仍受项目授权、参与者知情同意与研究用途约束。建议将 CSV、编码字典和 Manifest 一起保存；描述统计与探索性结果本身不构成个人诊断或因果结论。' },
+    ],
+    note: '数据读取、统计与导出均受当前环境、项目权限和研究状态控制。这里的示意内容不包含任何真实参与者数据。',
+    related: '/features/research-tools',
   },
 ] as const
 
 export type SurveyFeature = (typeof surveyFeatures)[number]
+
+export const surveyResearchFlow = [
+  { title: '编制工具', description: '独立管理表单、量表与组合问卷。', path: '/features/research-tools' },
+  { title: '组织研究', description: '说明研究目的，安排内容与波次。', path: '/features/research-projects' },
+  { title: '邀请参与', description: '检查后发布，让参与者知情作答。', path: '/features/research-participation' },
+  { title: '理解数据', description: '复核样本，查看统计与受控导出。', path: '/features/research-data' },
+] as const
