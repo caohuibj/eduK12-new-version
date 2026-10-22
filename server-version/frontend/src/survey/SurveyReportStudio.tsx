@@ -1,3 +1,4 @@
+import { SurveySectionHeader } from './SurveySectionHeader'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { publishSurveyMeasurement } from './measurement-publication'
 
@@ -154,14 +155,14 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
     const result=await reportApi<{releaseId:string}>(base+'/'+selected.id+'/publish','POST',{revision:selected.revision,publicationNote:publicationNote.trim()})
     setSelected({...selected,state:'PUBLISHED',published_release_id:result.releaseId});setNotice('报告版本已发布。已有报告与原始分数未被改写。');await afterWrite()
   })}
-  return <section className="survey-studio-surface bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="项目私有报告">
-    <header><h2 className="text-xl font-semibold">项目私有报告</h2><p>选择本项目测量发布版本，编制描述性报告。参考区块只引用已有参考类型与分段标识，不创建阈值或常模。</p></header>
+  return <section className="survey-report-surface survey-studio-surface bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="项目私有报告">
+    <SurveySectionHeader section="reports" title="项目私有报告"><p>参考区块只引用已有参考类型与分段标识，不创建阈值或常模。</p></SurveySectionHeader>
     {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
     {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}
     {listError&&<p role="alert">列表加载失败：{listError}。已成功的写入无需重做。</p>}
     <button type="button" className="btn-secondary" disabled={busy} onClick={()=>void load()}>刷新报告与测量列表</button>
     {loadingLists&&<p role="status">正在加载测量版本与报告，请稍候…</p>}
-    <fieldset disabled={busy||!!pendingCreate} className="border rounded p-3 space-y-3"><legend>创建报告草稿</legend>
+    <fieldset id="survey-report-create" tabIndex={-1} disabled={busy||!!pendingCreate} className="survey-report-create survey-task-card space-y-3"><legend>创建报告草稿</legend>
       <label className="block">测量发布版本<select className="input block w-full" value={measurementId} onChange={e=>setMeasurementId(e.target.value)}>
         <option value="">请选择</option>{measurements.map(m=><option key={m.id} value={m.id}>{m.key} · {m.version} · {m.family} · {m.status}</option>)}</select></label>
       {measurementsLoaded&&!loadingLists&&!error&&!measurements.length&&<p>暂无本项目获准的测量发布版本。{nativePublishing?'可在下方显式发布自编测量或获准的只读量表；目录原版内容不会改写。':'请先在测量编制入口完成发布并核对内容授权。'}</p>}
@@ -181,14 +182,15 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
     {pendingCreate&&<div role="status"><p>本次创建尚未确认。重试会沿用同一请求与内容。</p>
       <button type="button" className="btn-secondary" disabled={busy} onClick={startCreate}>重试本次创建</button>
       <button type="button" className="btn-secondary" disabled={busy} onClick={()=>{if(window.confirm('创建可能已经成功，请先刷新列表核对。仍要放弃本次请求？'))setPendingCreate(null)}}>放弃本次创建请求</button></div>}
-    <div className="grid md:grid-cols-[220px_minmax(0,1fr)] gap-5">
-      <nav aria-label="报告草稿与版本" className="space-y-2">{list.map(row=><button type="button" key={row.id} className="btn-secondary block w-full text-left" aria-pressed={selected?.id===row.id} disabled={busy||!!pendingCreate} onClick={()=>choose(row.id)}>{row.reportKey} · {row.version} · {row.state==='PUBLISHED'?'已发布':'草稿'}</button>)}
+    <div id="survey-report-editor" tabIndex={-1} className="survey-report-layout grid md:grid-cols-[220px_minmax(0,1fr)] gap-5">
+      <nav id="survey-report-list" tabIndex={-1} aria-label="报告草稿与版本" className="survey-tool-rail space-y-2"><h3 className="survey-rail-title">报告草稿与版本</h3>{list.map(row=><button type="button" key={row.id} className="btn-secondary block w-full text-left" aria-pressed={selected?.id===row.id} disabled={busy||!!pendingCreate} onClick={()=>choose(row.id)}>{row.reportKey} · {row.version} · {row.state==='PUBLISHED'?'已发布':'草稿'}</button>)}
         {listLoading&&<p role="status">正在加载报告列表…</p>}
         {listLoaded&&!listLoading&&!listError&&!list.length&&<p>暂无报告草稿</p>}
-        <div className="flex gap-2"><button type="button" className="btn-secondary" disabled={busy||page<=1} onClick={()=>void run(()=>loadList(page-1))}>上一页</button>
+        <div className="survey-rail-pagination"><button type="button" className="btn-secondary" disabled={busy||page<=1} onClick={()=>void run(()=>loadList(page-1))}>上一页</button>
           <span>第 {page} 页</span><button type="button" className="btn-secondary" disabled={busy||list.length<25} onClick={()=>void run(()=>loadList(page+1))}>下一页</button></div>
       </nav>
-      {selected&&<div className="space-y-4 min-w-0"><h3 className="font-semibold">{selected.report_key} · {selected.version} · 修订 {selected.revision}</h3>
+      {!selected&&<div className="survey-task-empty"><h3>选择一个报告版本，继续编制</h3><p>从左侧打开草稿或已发布版本；没有草稿时，先在上方选择测量版本创建。</p><p>已发布内容保持只读，修订需明确复制为新版本。</p></div>}
+      {selected&&<div className="survey-report-editor space-y-4 min-w-0"><h3 className="font-semibold">{selected.report_key} · {selected.version} · 修订 {selected.revision}</h3>
         <p style={{overflowWrap:'anywhere'}}>测量：{measurement?.key||selected.payload.measurementReleaseId} {measurement?.version||''}</p>
         {selected.state==='PUBLISHED'&&<p>已发布版本只读。修改内容请明确复制为新版本。</p>}
         <fieldset disabled={busy||readOnly||!!pendingCreate} className="space-y-3 min-w-0"><legend>报告内容</legend>

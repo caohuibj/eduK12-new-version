@@ -1,3 +1,4 @@
+import { SurveySectionHeader } from './SurveySectionHeader'
 import {SurveyPrivateReferenceStudio} from './SurveyPrivateReferenceStudio'
 import {SurveyStoredReportReader} from './SurveyStoredReportReader'
 import { useEffect,useRef,useState,type FormEvent } from 'react'
@@ -389,17 +390,15 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
     }
   },isCurrent)}
   return <section className="survey-studio-surface survey-data-surface border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-4" aria-label="研究数据">
-    <header><h2 className="text-xl font-semibold">研究数据 · Wave Analytics</h2>
-      <p className="text-sm text-slate-600">完成与配对统计只来源于可核对的加密 Survey FINAL；研究编号数不等于经过实名验证的自然人数。</p></header>
+    <SurveySectionHeader section="data" title="研究数据" showNavigation={!!overview}>
+      <p className="text-sm text-slate-600">完成与配对统计只来源于可核对的加密 Survey FINAL；研究编号数不等于经过实名验证的自然人数。</p></SurveySectionHeader>
     {error&&(!downloadIssue||!ticket)&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
     {message&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{message}</p>}
-    <fieldset disabled={busy} className="min-w-0 border-0 p-0 space-y-4" aria-label="研究数据操作">
+    <fieldset id="survey-data-overview" tabIndex={-1} disabled={busy} className="min-w-0 border-0 p-0 space-y-4" aria-label="研究数据操作">
     <button className="btn-secondary" disabled={busy||overviewLoading} onClick={()=>void execute(reload)}>刷新完成进度</button>
     {overviewLoading&&<p role="status">正在加载完成进度…</p>}
     {overviewError&&<p role="alert">完成进度加载失败：{overviewError}。请使用“刷新完成进度”重试。{overview?'下方保留上次成功读取的数据，可能不是最新状态。':''}</p>}
     {!overviewLoading&&!overviewError&&overview?.waves.length===0&&<p>本项目暂无研究波次。请先在发布入口创建并保存波次。</p>}
-    {overview&&waveId&&<SurveyPrivateReferenceStudio actorId={actorId} key={'reference:'+actorId+':'+projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>}
-    {overview&&waveId&&<SurveyStoredReportReader actorId={actorId} key={projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>}
     {overview&&<><div className="overflow-x-auto" tabIndex={0} role="region" aria-label="研究波次完成统计"><table className="w-full text-sm border-collapse">
       <thead><tr className="bg-slate-100"><th className="p-2 text-left">波次</th><th className="p-2">状态</th>
         <th className="p-2">已启动</th><th className="p-2">完成 FINAL</th>
@@ -413,7 +412,7 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
         <td className="p-2 text-center">{w.uniqueLinkedCodes??'不可关联'}</td>
         <td className="p-2 text-center">{w.excluded}</td></tr>)}</tbody></table></div>
       <p className="text-xs text-slate-600">{overview.note} 质量排除是可审计的分析政策，不修改加密原始 FINAL；参与者撤回另行处理。</p>
-      <section className="border rounded-xl p-4 space-y-3" aria-label="科研样本质量复核">
+      <section id="survey-data-quality" tabIndex={-1} className="survey-task-card space-y-3" aria-label="科研样本质量复核">
         <h3 className="font-semibold">科研样本质量复核</h3>
         <p className="text-xs text-slate-600">只列出本人项目已完成且未撤回的 FINAL。审核决定可恢复，必须注明理由并留痕。</p>
         <label className="block text-sm">本次复核理由（必填）
@@ -486,7 +485,7 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
           <p className="sm:col-span-3 text-xs">{paired.note} 量表配对得分只能在确定可比的工具版本下进一步计算。</p>
         </div>}
       </div>}
-      <div className="border rounded-xl p-4 space-y-4">
+      <div id="survey-data-statistics" tabIndex={-1} className="survey-task-card space-y-4">
         <h3 className="font-semibold">逐题与描述性统计</h3>
         <div className="flex flex-wrap gap-3 items-end">
           <label className="text-sm">波次
@@ -605,7 +604,7 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
           </p>}
         </div>}
       </div>
-      <div className="border rounded-xl p-4 space-y-4">
+      <div id="survey-data-export" tabIndex={-1} className="survey-task-card survey-export-card space-y-4">
         <h3 className="font-semibold">匿名科研数据导出</h3>
         <p className="text-sm">导出可能包含自由文本或研究编号，请确认研究用途与数据保存规定。分批时请保留全部 CSV、Codebook、Manifest。</p>
         <ol aria-label="导出操作步骤" className="list-decimal pl-5 text-sm space-y-1">
@@ -700,6 +699,12 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
             FINAL 页可合并，独立参与状态页按研究编号与波次关联；不要将两类 CSV 直接拼接。</p>}
         </div>}
       </div>
+      {waveId&&<details className="survey-data-advanced">
+        <summary>参考版本与历史报告 · 高级工具</summary>
+        <p>需要编制项目样本参考或查看已保存报告时，再展开以下工具。</p>
+        <SurveyPrivateReferenceStudio actorId={actorId} key={'reference:'+actorId+':'+projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>
+        <SurveyStoredReportReader actorId={actorId} key={projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>
+      </details>}
     </>}
     </fieldset>
   </section>

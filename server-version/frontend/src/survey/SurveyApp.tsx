@@ -1,3 +1,4 @@
+import { SurveySectionHeader } from './SurveySectionHeader'
 import { surveyAdminLoginUrl } from '../products/origins'
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
@@ -297,16 +298,15 @@ export default function SurveyApp(){
         id="survey-workspace-settings" role={selected?'tabpanel':undefined}
         aria-labelledby={selected?'survey-workspace-tab-settings':undefined}
         hidden={!!selected&&workspaceSection!=='settings'}>
-        <p className="survey-workspace-eyebrow">RESEARCH · 项目设置</p>
-        <h2 id="survey-project-settings-heading" tabIndex={-1} className="text-xl font-semibold">编辑研究草稿</h2>
-        <form onSubmit={selected?save:createProject} aria-busy={busy}><fieldset disabled={busy} className="min-w-0 border-0 p-0">{field('研究名称',title,setTitle)}
+        <SurveySectionHeader section="settings" title={selected.status==='DRAFT'?'编辑研究草稿':'研究设置'} goal={selected.status==='DRAFT'?undefined:'查看研究的基本信息与采集方式；当前状态下设置保持只读。'} headingId="survey-project-settings-heading"/>
+        <div className="survey-settings-state" data-status={selected.status}><strong>{{DRAFT:"草稿 · 可编辑",ACTIVE:"采集中",PAUSED:"已暂停",CLOSED:"已结束",ARCHIVED:"已归档"}[selected.status]}</strong><p>{selected.status==='DRAFT'?'完成基本设置后保存，再前往研究工具分区编题或导入。':'当前研究设置只读；可在其他分区查看工具、管理采集或整理数据，具体操作仍受当前状态限制。'}</p></div>
+        <form id="survey-project-basics" tabIndex={-1} onSubmit={save} aria-busy={busy}><fieldset disabled={busy||selected.status!=='DRAFT'} className="min-w-0 border-0 p-0">{field('研究名称',title,setTitle)}
           <label className="block my-3 text-sm">研究说明<textarea className="input block mt-1 w-full" rows={3} value={description} onChange={e=>setDescription(e.target.value)}/></label>
-          <label className="block my-3 text-sm">采集方式<select className="input block mt-1 w-full" value={mode} onChange={e=>setMode(e.target.value as Project['collectionMode'])}>
+          <label id="survey-project-collection" tabIndex={-1} className="block my-3 text-sm">采集方式<select className="input block mt-1 w-full" value={mode} onChange={e=>setMode(e.target.value as Project['collectionMode'])}>
             <option value="SINGLE_UNLINKED">单次独立匿名</option><option value="LINKED_WAVES">同一研究编号的多波次采集</option>
           </select></label><p className="text-sm text-slate-600">多波次研究必须在正式采集前告知被试：不同时间点的回答能够按研究编号关联。</p>
-          <div className="flex flex-wrap gap-3 mt-4"><button className="btn-primary" disabled={busy||(selected!==null&&selected.status!=='DRAFT')}>{selected?'保存修改':'创建研究'}</button>
-            {selected&&<button type="button" className="btn-secondary" onClick={newProject}>新建其他项目</button>}</div>
-        </fieldset></form><p className="text-sm text-slate-500 mt-4">创建和保存草稿不会开放招募。请在「发布与采集」检查工具与知情同意，冻结研究定义后再开放。</p>
+          <div id="survey-project-save" tabIndex={-1} className="survey-settings-save flex flex-wrap gap-3 mt-4"><button className="btn-primary" disabled={busy||selected.status!=='DRAFT'}>保存修改</button></div>
+        </fieldset></form><div className="survey-settings-next"><button type="button" className="btn-secondary" onClick={()=>setWorkspaceSection('tools')}>{selected.status==='DRAFT'?'下一步：编制研究工具 →':'查看研究工具 →'}</button><button type="button" className="survey-settings-new" disabled={busy} onClick={newProject}>新建其他项目</button></div><p className="text-sm text-slate-500 mt-4">创建和保存草稿不会开放招募。请在「发布与采集」检查工具与知情同意，冻结研究定义后再开放。</p>
       </section>}{selected&&<><div id="survey-workspace-tools" role="tabpanel" aria-labelledby="survey-workspace-tab-tools" hidden={workspaceSection!=='tools'}><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id} projectStatus={selected.status} instrumentLibrary={instrumentLibrary} onLeaveRiskChange={builderRiskChanged}/></div>
         <div id="survey-workspace-reports" role="tabpanel" aria-labelledby="survey-workspace-tab-reports" hidden={workspaceSection!=='reports'}><SurveyReportStudio key={'reports-'+selected.id} projectId={selected.id} projectStatus={selected.status} active={workspaceSection==='reports'} onLeaveRiskChange={reportRiskChanged}/></div>
         <div id="survey-workspace-publish" role="tabpanel" aria-labelledby="survey-workspace-tab-publish" hidden={workspaceSection!=='publish'}><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary} onProjectChanged={projectChanged}/></div>

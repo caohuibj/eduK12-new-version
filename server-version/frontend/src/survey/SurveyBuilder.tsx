@@ -1,3 +1,4 @@
+import { SurveySectionHeader } from './SurveySectionHeader'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { ResearchCatalog, SourceProvenance, type CatalogGrant } from './ResearchCatalog'
 import { ResearchFormEditor } from './ResearchFormEditor'
@@ -238,9 +239,9 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
     })
   }
   return <section className="survey-builder-shell survey-studio-surface bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="Survey Research Builder">
-    <header><h2 className="text-xl font-semibold">研究工具 · Builder</h2>
+    <SurveySectionHeader section="tools" title="研究工具">
       <p className="text-sm text-slate-600">创建表单、心理量表、情境测验和受控认知任务。自编工具默认私有，供本项目使用；量表可另行申请进入共用库，须经系统管理员审批。</p>
-    </header>
+    </SurveySectionHeader>
     {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{apiIssues.length?'工具还有待修正字段，请按下方提示定位。':error}</p>}
     {active&&<ResearchIssueList draft={active} issues={apiIssues} onLocate={locateIssue}/>}
     <ResearchAuthoringGuide/>
@@ -248,9 +249,9 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
       <button type="button" className="btn-secondary" disabled={listLoading} onClick={()=>void run(()=>refreshList(instrumentPage),false)}>重试研究工具列表</button></div>}
     {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}
     <fieldset disabled={busy} className="min-w-0 border-0 p-0 space-y-5" aria-label="研究工具操作">
-    <a className="survey-catalog-jump" href="#survey-authorized-catalog">已有授权工具？前往原版工具目录导入</a>
     <a className="survey-catalog-jump" href="#survey-tool-navigation">查看当前工具属性与题目导航</a>
-    <form className="flex flex-wrap gap-3 items-end border-b pb-4" onSubmit={create}>
+    <form id="survey-tool-create" tabIndex={-1} className="survey-tool-create survey-task-card flex flex-wrap gap-3 items-end" onSubmit={create}>
+      <div className="survey-task-caption"><h3>新建自编工具</h3><p>选择类型并命名，建立草稿后再编制题目。</p></div>
       <label className="text-sm">工具类型
         <select className="input block" value={newKind} onChange={e=>setNewKind(e.target.value as Kind)}>
           {Object.entries(displayKind).map(([key,label])=><option key={key} value={key}>{label}</option>)}
@@ -260,12 +261,12 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
           onChange={e=>setNewTitle(e.target.value)} placeholder="如：学习动机前测"/></label>
       <button disabled={busy||!newTitle.trim()} className="btn-primary">创建草稿</button>
     </form>
-    <div className="grid md:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[200px_minmax(0,1fr)_250px] gap-5">
-      <nav aria-label="当前项目研究工具" className="space-y-2">
+    <div id="survey-tool-editor" tabIndex={-1} className="survey-tool-layout grid md:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[200px_minmax(0,1fr)_250px] gap-5">
+      <nav aria-label="当前项目研究工具" className="survey-tool-rail space-y-2">
         <h3 className="font-semibold text-sm">工具列表</h3>
         {listLoading&&<p role="status" className="text-sm">正在加载研究工具…</p>}
         {!listLoading&&!listError&&!instruments.length&&<p className="text-sm text-slate-500">本页暂无工具。可在上方创建草稿，或前往下方授权目录导入。</p>}
-        <div className="flex items-center justify-between gap-2 text-xs mb-3">
+        <div className="survey-rail-pagination mb-3">
           <button type="button" className="btn-secondary" disabled={busy||instrumentPage<=1}
             onClick={()=>void run(()=>refreshList(instrumentPage-1),false)}>上一页</button>
           <span>第 {instrumentPage} 页</span>
@@ -280,7 +281,7 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
         </button>)}
       </nav>
       <div className="min-w-0 space-y-4">
-      {!active&&<div className="border border-dashed rounded-xl p-6 text-sm text-slate-600">选择工具后可编辑题目、检查结构并预览作答。量表等测量工具可在此发布自用版本；研究波次另行选择版本并冻结采集。</div>}
+      {!active&&<div className="survey-task-empty"><h3>从左侧选择工具，开始编制</h3><p>还没有工具？可在上方创建草稿，或到授权目录导入原版工具。</p><ol><li>编辑题目并保存草稿</li><li>完成结构检查与模拟作答</li><li>到发布与采集分区选择工具、冻结波次</li></ol></div>}
       {active&&<><div className="rounded-xl bg-slate-50 border p-4 space-y-3">
         <p className="text-xs">{displayKind[active.kind]} · 工具标识 <code>{active.instrumentKey}</code> · 修订 {active.revision} {dirty?'· 未保存':''}</p>
         {licensedReadOnly&&<SourceProvenance provenance={active.sourceProvenance}/>}
