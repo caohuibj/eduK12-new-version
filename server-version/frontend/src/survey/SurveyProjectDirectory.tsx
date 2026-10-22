@@ -1,12 +1,14 @@
+import { ArrowUpRight, FolderOpen, Plus } from 'lucide-react'
+
 export type SurveyProject = {
   id:string; title:string; description:string; collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES'
   status:'DRAFT'|'ACTIVE'|'PAUSED'|'CLOSED'|'ARCHIVED'; revision:number; firstPublishedAt?:string|null
 }
 const statusLabels = {DRAFT:'草稿',ACTIVE:'采集中',PAUSED:'暂停',CLOSED:'已结束',ARCHIVED:'已归档'}
 
-export function SurveyProjectDirectory({projects,selectedId,username,page,busy,loading,error,query,status,
+export function SurveyProjectDirectory({projects,selectedId,page,busy,loading,error,query,status,
   onQuery,onStatus,onChoose,onArchive,onPage,onRefresh,onCreate}:{
-  projects:SurveyProject[]; selectedId?:string; username:string; page:number; busy:boolean; loading:boolean
+  projects:SurveyProject[]; selectedId?:string; page:number; busy:boolean; loading:boolean
   error:string; query:string; status:string; onQuery:(value:string)=>void; onStatus:(value:string)=>void
   onChoose:(project:SurveyProject)=>void; onArchive:(project:SurveyProject)=>void; onPage:(page:number)=>void
   onRefresh:()=>void; onCreate:()=>void
@@ -17,12 +19,11 @@ export function SurveyProjectDirectory({projects,selectedId,username,page,busy,l
   const clear=()=>{onQuery('');onStatus('')}
   return <section className="survey-project-directory" aria-labelledby="survey-projects-heading">
     <header className="survey-directory-heading">
-      <div><p className="survey-workspace-eyebrow">HUISURVEY · 研究者工作台</p>
+      <div><p className="survey-workspace-eyebrow">RESEARCH · 研究者工作台</p>
         <h1 id="survey-projects-heading" tabIndex={-1}>我的研究</h1>
         <p>从研究设置到工具、采集与数据，在同一项目中继续。</p>
-        <p className="survey-researcher-identity">研究者：{username}</p>
       </div>
-      <button type="button" className="btn-primary" disabled={busy||loading} onClick={onCreate}>新建研究</button>
+      <button type="button" className="btn-primary" disabled={busy||loading} onClick={onCreate}><Plus size={18} aria-hidden="true"/>新建研究</button>
     </header>
     <div className="survey-directory-toolbar" role="search" aria-label="筛选本页研究">
       <label>筛选本页研究<input className="input" type="search" value={query} placeholder="研究名称或说明"
@@ -40,12 +41,13 @@ export function SurveyProjectDirectory({projects,selectedId,username,page,busy,l
     </div>}
     {!loading&&!error&&<p className="survey-directory-count" role="status">第 {page} 页共 {projects.length} 项，当前显示 {visible.length} 项。筛选仅作用于本页。</p>}
     <div className="survey-project-grid">{visible.map(project=><article className="survey-project-card" data-selected={selectedId===project.id} key={project.id}>
-      <div className="survey-project-meta"><span className="survey-project-status" data-status={project.status}>{statusLabels[project.status]||'状态待确认'}</span>
-        <span>{project.collectionMode==='LINKED_WAVES'?'多波次关联':'单次匿名'}</span></div>
+      <div className="survey-project-card-top"><span className="survey-project-icon"><FolderOpen size={23} strokeWidth={1.5} aria-hidden="true"/></span>
+        <span className="survey-project-status" data-status={project.status}>{statusLabels[project.status]||'状态待确认'}</span></div>
+      <p className="survey-project-meta">{project.collectionMode==='LINKED_WAVES'?'多波次关联':'单次匿名'}</p>
       <h3>{project.title}</h3><p className="survey-project-description">{project.description||'尚未填写研究说明，可在研究设置中补充。'}</p>
       {selectedId===project.id&&<p className="survey-project-current">当前编辑中的研究</p>}
-      <div className="survey-project-actions"><button className="btn-secondary" disabled={busy} aria-pressed={selectedId===project.id} onClick={()=>onChoose(project)}>查看/编辑</button>
-        <button className="btn-secondary" disabled={busy||(project.status==='DRAFT'&&!!project.firstPublishedAt)
+      <div className="survey-project-actions"><button className="survey-project-open" disabled={busy} aria-pressed={selectedId===project.id} onClick={()=>onChoose(project)}>查看/编辑<ArrowUpRight size={17} aria-hidden="true"/></button>
+        <button className="survey-project-archive" disabled={busy||(project.status==='DRAFT'&&!!project.firstPublishedAt)
           ||(!['DRAFT','CLOSED'].includes(project.status)&&!(project.status==='ARCHIVED'&&!project.firstPublishedAt))} onClick={()=>onArchive(project)}>
           {project.status==='CLOSED'?'结束后归档':project.status==='DRAFT'?'归档草稿':
             project.status==='ARCHIVED'?(project.firstPublishedAt?'终态归档不可恢复':'恢复草稿'):'采集中不可归档'}</button></div>

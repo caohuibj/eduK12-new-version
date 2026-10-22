@@ -15,6 +15,7 @@ import { SurveyLanding } from './SurveyLanding'
 import { SurveyFeaturePage } from './SurveyFeaturePage'
 import { surveyFeatures } from './survey-features'
 import { SurveyProjectDirectory, type SurveyProject as Project } from './SurveyProjectDirectory'
+import { SurveyResearcherAccount } from './SurveyResearcherAccount'
 
 type Envelope<T>={code:number|string;message:string;data:T}
 type Researcher={id:string;username:string;mustChangePassword:boolean}
@@ -213,12 +214,13 @@ export default function SurveyApp(){
     {entryScreen&&<a className="survey-skip-link" href="#survey-entry-content">跳至主要内容</a>}
     <header className="border-b border-slate-200 bg-white"><div className={entryScreen?'survey-entry-header':'survey-researcher-header'}>
       <SurveyBrand/>
-      <div className="survey-session-actions"><span>{screen==='mfa'?'研究者身份验证':user?'研究者工作台':'研究者入口'}</span>
-        {user&&<button className="btn-secondary" disabled={writeBusy} onClick={logout}>退出</button>}</div>
+      <div className="survey-session-actions">{user&&screen==='work'
+        ?<SurveyResearcherAccount username={user.username} busy={busy} writeBusy={writeBusy} error={error} onLogout={logout} onChangePassword={changeAccountPassword}/>
+        :<span>{screen==='mfa'?'研究者身份验证':'研究者入口'}</span>}</div>
     </div></header>
     <main id={entryScreen?'survey-entry-content':undefined} tabIndex={entryScreen?-1:undefined}
       className={entryScreen?'survey-entry-main':screen==='work'&&!user?.mustChangePassword
-        ?'max-w-7xl mx-auto px-4 py-8':'max-w-4xl mx-auto px-4 py-8'}>
+        ?'survey-researcher-main':'max-w-4xl mx-auto px-4 py-8'}>
       {loading&&<p role="status">正在核对研究者会话…</p>}
       {error&&<p role="alert" className="p-4 border-l-4 border-red-600 bg-red-50">{error}</p>}
       {notice&&<p role="status" className="p-4 border-l-4 border-teal-600 bg-teal-50">{notice}</p>}
@@ -268,20 +270,18 @@ export default function SurveyApp(){
         <h2 className="font-semibold text-xl">首次登录 · 修改研究者密码</h2>
         <ProductPasswordChange product="survey" forced busy={busy} onChangePassword={changeAccountPassword}/>
       </section>}
-      {!loading&&user&&screen==='work'&&!user.mustChangePassword&&<div className="survey-workspace">
-        <SurveyProjectDirectory projects={projects} selectedId={selected?.id} username={user.username} page={projectPage}
+      {!loading&&user&&screen==='work'&&!user.mustChangePassword&&<div className={`survey-workspace${selected?'':' survey-workspace--overview'}`}>
+        <SurveyProjectDirectory projects={projects} selectedId={selected?.id} page={projectPage}
           busy={busy} loading={projectsLoading} error={projectsError} query={projectQuery} status={projectFilter}
           onQuery={setProjectQuery} onStatus={setProjectFilter} onChoose={choose} onArchive={toggle}
           onPage={page=>void work(()=>loadProjects(page),false)} onRefresh={()=>void work(()=>loadProjects(projectPage),false)} onCreate={newProject}/>
-        <details className="survey-account-settings border rounded-lg p-4 my-4"><summary>账号安全 · 修改密码</summary>
-          <ProductPasswordChange product="survey" busy={busy} onChangePassword={changeAccountPassword}/>
-        </details>
       {selected&&<SurveyWorkspaceNav active={workspaceSection} onChange={setWorkspaceSection} title={selected.title}
         onReturn={()=>focusSection('survey-projects-heading')}/>}
-      <section className="bg-white rounded-xl border p-6 my-4"
+      <section className="survey-project-settings bg-white rounded-xl border p-6 my-4"
         id="survey-workspace-settings" role={selected?'tabpanel':undefined}
         aria-labelledby={selected?'survey-workspace-tab-settings':undefined}
         hidden={!!selected&&workspaceSection!=='settings'}>
+        <p className="survey-workspace-eyebrow">{selected?'RESEARCH · 项目设置':'开始一项新研究'}</p>
         <h2 id="survey-project-settings-heading" tabIndex={-1} className="text-xl font-semibold">{selected?'编辑研究草稿':'创建研究项目'}</h2>
         <form onSubmit={selected?save:createProject} aria-busy={busy}><fieldset disabled={busy} className="min-w-0 border-0 p-0">{field('研究名称',title,setTitle)}
           <label className="block my-3 text-sm">研究说明<textarea className="input block mt-1 w-full" rows={3} value={description} onChange={e=>setDescription(e.target.value)}/></label>

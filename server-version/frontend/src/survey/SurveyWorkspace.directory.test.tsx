@@ -1,4 +1,4 @@
-import {fireEvent,render,screen,waitFor} from '@testing-library/react'
+import {fireEvent,render,screen,waitFor,within} from '@testing-library/react'
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
 import SurveyApp from './SurveyApp'
 
@@ -22,6 +22,48 @@ beforeEach(()=>{
 })
 afterEach(()=>{vi.restoreAllMocks();vi.unstubAllGlobals()})
 describe('Survey researcher directory and editing context',()=>{
+  it('opens account settings from the header and returns to an unchanged research draft without requests',async()=>{
+    render(<SurveyApp/>)
+    fireEvent.click((await screen.findAllByRole('button',{name:'查看/编辑'}))[0])
+    await waitFor(()=>expect(document.getElementById('survey-current-project-heading')).toHaveFocus())
+    fireEvent.change(screen.getByLabelText('研究名称'),{target:{value:'尚未保存的项目名称'}})
+    const fetcher=vi.mocked(fetch),before=fetcher.mock.calls.length
+    const trigger=screen.getByRole('button',{name:'研究者，个人账号设置'})
+    expect(trigger.closest('header')).toBeInTheDocument()
+    trigger.focus();fireEvent.click(trigger)
+    const dialog=screen.getByRole('dialog',{name:'个人信息与安全'})
+    expect(within(dialog).getByText('研究者登录名')).toBeVisible()
+    expect(within(dialog).getByLabelText('验证器动态验证码（6 位）')).toBeRequired()
+    expect(within(dialog).getByRole('button',{name:'确认修改密码'})).toBeDisabled()
+    fireEvent.keyDown(dialog,{key:'Escape'})
+    await waitFor(()=>expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(trigger).toHaveFocus()
+    expect(screen.getByLabelText('研究名称')).toHaveValue('尚未保存的项目名称')
+    expect(fetcher.mock.calls).toHaveLength(before)
+  })
+
+  it('keeps failed password verification in the account dialog and preserves the research session',async()=>{
+    const existing=vi.mocked(fetch).getMockImplementation()!
+    vi.stubGlobal('fetch',vi.fn((url:string,options?:RequestInit)=>{
+      if(url.endsWith('/auth/csrf'))return reply({csrfToken:'synthetic-csrf'})
+      if(url.endsWith('/auth/change-password'))return Promise.resolve({ok:false,json:async()=>({code:400,message:'动态验证码无效'})} as Response)
+      return existing(url,options)
+    }))
+    render(<SurveyApp/>)
+    await screen.findByRole('heading',{name:'我的研究'})
+    fireEvent.click(screen.getByRole('button',{name:'研究者，个人账号设置'}))
+    const dialog=screen.getByRole('dialog',{name:'个人信息与安全'})
+    fireEvent.change(within(dialog).getByLabelText('当前密码'),{target:{value:'SyntheticOld123'}})
+    fireEvent.change(within(dialog).getByLabelText('新密码'),{target:{value:'SyntheticNew123'}})
+    fireEvent.change(within(dialog).getByLabelText('验证器动态验证码（6 位）'),{target:{value:'123456'}})
+    fireEvent.click(within(dialog).getByRole('button',{name:'确认修改密码'}))
+    expect(await within(dialog).findByRole('alert')).toHaveTextContent('动态验证码无效')
+    const request=vi.mocked(fetch).mock.calls.find(([url])=>String(url).endsWith('/auth/change-password'))
+    expect(JSON.parse(String(request?.[1]?.body))).toEqual({oldPassword:'SyntheticOld123',newPassword:'SyntheticNew123',code:'123456'})
+    expect(screen.getByRole('heading',{name:'我的研究'})).toBeInTheDocument()
+    expect(screen.queryByRole('heading',{name:'研究者登录'})).not.toBeInTheDocument()
+  })
+
   it.each(['network','server','malformed'])(
     'reuses the creation identity after a committed request with an uncertain %s response',async failure=>{
       const stored=new Map<string,Record<string,unknown>>(),requests:Record<string,unknown>[]=[]
