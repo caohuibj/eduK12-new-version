@@ -1,9 +1,10 @@
+import {SurveyToolLibrary} from './SurveyToolLibrary'
 import './survey-sections.css'
 import { surveyAdminLoginUrl } from '../products/origins'
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { ProductPasswordChange } from '../components/account/ProductPasswordChange'
-import { SurveyBuilder, type BuilderLeaveRisk } from './SurveyBuilder'
+import { type BuilderLeaveRisk } from './SurveyBuilder'
 import { SurveyReportStudio, type ReportLeaveRisk } from './SurveyReportStudio'
 import { createInstrumentLibrary } from './instrument-library'
 import { SurveyWaveStudio } from './SurveyWaveStudio'
@@ -47,7 +48,7 @@ const readResearchArea=():ResearchArea=>window.location.pathname==='/workspace/t
 const readStudyLocation=()=>{
   const params=new URLSearchParams(window.location.search),section=params.get('section')
   return {id:window.location.pathname==='/workspace'?params.get('project'):null,
-    section:(['settings','tools','reports','publish','data'].includes(section||'')?section:'settings') as WorkspaceSection}
+    section:(section==='tools'?'publish':['settings','reports','publish','data'].includes(section||'')?section:'settings') as WorkspaceSection}
 }
 export default function SurveyApp(){
   // Keep the entry stable when activation removes its one-time token from the URL.
@@ -76,6 +77,9 @@ export default function SurveyApp(){
   const [creating,setCreating]=useState(false)
   const [editorOpen,setEditorOpen]=useState(false)
   const [researchArea,setResearchArea]=useState<ResearchArea>(readResearchArea)
+  const [toolLibraryVisited,setToolLibraryVisited]=useState(()=>readResearchArea()==='tools')
+  const toolLibraryRisk=useRef<BuilderLeaveRisk>({dirty:false,busy:false})
+  const toolLibraryRiskChanged=useCallback((risk:BuilderLeaveRisk)=>{toolLibraryRisk.current=risk},[])
   const projectCreationRequestId=useRef<string|null>(null)
   const reportLeaveRisk=useRef<ReportLeaveRisk>({dirty:false,pending:false,busy:false})
   const reportRiskChanged=useCallback((risk:ReportLeaveRisk)=>{reportLeaveRisk.current=risk},[])
@@ -96,15 +100,15 @@ export default function SurveyApp(){
   const [title,setTitle]=useState(''),[description,setDescription]=useState('')
   const [mode,setMode]=useState<Project['collectionMode']>('SINGLE_UNLINKED')
   const settingsDirty=selected?title!==selected.title||description!==selected.description||mode!==selected.collectionMode:!!title.trim()||!!description.trim()||mode!=='SINGLE_UNLINKED'
-  const mayLeaveWorkspace=()=>{
+  const mayLeaveWorkspace=(includeLibrary=false)=>{
     const report=reportLeaveRisk.current,builder=builderLeaveRisk.current
-    if(workInFlight.current.writes>0||builder.busy||report.pending||report.busy){setError('当前操作尚未确认，请等待完成或核对结果后再离开项目。');return false}
-    return !(settingsDirty||builder.dirty||report.dirty)||window.confirm('当前研究有未保存的修改（研究设置、工具或报告）。确定放弃这些修改并离开？')
+    if((includeLibrary&&toolLibraryRisk.current.busy)||workInFlight.current.writes>0||builder.busy||report.pending||report.busy){setError('当前操作尚未确认，请等待完成或核对结果后再离开项目。');return false}
+    return !((includeLibrary&&toolLibraryRisk.current.dirty)||settingsDirty||builder.dirty||report.dirty)||window.confirm('当前研究有未保存的修改（研究设置、工具或报告）。确定放弃这些修改并离开？')
   }
   useEffect(()=>{
     const warn=(event:BeforeUnloadEvent)=>{
       const report=reportLeaveRisk.current,builder=builderLeaveRisk.current
-      if(screen==='work'&&(settingsDirty||builder.dirty||builder.busy||report.dirty||report.pending||report.busy||writeBusy)){
+      if(screen==='work'&&(toolLibraryRisk.current.dirty||toolLibraryRisk.current.busy||settingsDirty||builder.dirty||builder.busy||report.dirty||report.pending||report.busy||writeBusy)){
         event.preventDefault();event.returnValue=''
       }
     }
@@ -192,14 +196,14 @@ export default function SurveyApp(){
     if(r.recoveryCodes?.length){setRecovery(r.recoveryCodes);setNotice('恢复码仅显示一次，请安全保存')}
     else await refresh(true)
   })
-  const changeAccountPassword=(oldPassword:string,newPassword:string,code?:string)=>{if(!mayLeaveWorkspace())return;void work(async()=>{
+  const changeAccountPassword=(oldPassword:string,newPassword:string,code?:string)=>{if(!mayLeaveWorkspace(true))return;void work(async()=>{
     await api('/auth/change-password','POST',{oldPassword,newPassword,code})
     cancelStudyRestore()
     projectCreationRequestId.current=null
     setUser(null);setProjects([]);setSelected(null);setCreating(false);setEditorOpen(false);setTitle('');setDescription('');setMode('SINGLE_UNLINKED');setScreen('login')
     setNotice('密码已修改，旧研究者会话已经失效，请重新登录')
   })}
-  const logout=()=>{if(!mayLeaveWorkspace())return;void work(async()=>{
+  const logout=()=>{if(!mayLeaveWorkspace(true))return;void work(async()=>{
     await api('/auth/logout','POST',{})
     cancelStudyRestore()
     projectCreationRequestId.current=null
@@ -224,6 +228,7 @@ export default function SurveyApp(){
   }),[])
   const navigateResearchArea=(area:ResearchArea,path:string)=>{
     setResearchArea(area)
+    if(area==='tools')setToolLibraryVisited(true)
     if(area==='studies')setEditorOpen(false)
     if(window.location.pathname!==path||window.location.hash)window.history.pushState(null,'',path)
     focusSection(area==='studies'?'survey-projects-heading':'survey-'+area+'-heading')
@@ -234,6 +239,7 @@ export default function SurveyApp(){
       // Same-page hash navigation also emits popstate; keep the editor open.
       if(area===researchArea)return
       setResearchArea(area)
+      if(area==='tools')setToolLibraryVisited(true)
       if(area==='studies')setEditorOpen(false)
       focusSection(area==='studies'?'survey-projects-heading':'survey-'+area+'-heading')
     }
@@ -245,6 +251,7 @@ export default function SurveyApp(){
     const url=new URL(window.location.href)
     if(researchArea==='studies')url.pathname='/workspace'
     if(researchArea==='studies'&&editorOpen&&selectedProjectId){
+      if(url.searchParams.get('section')==='tools')url.hash='survey-wave-content'
       url.searchParams.set('project',selectedProjectId);url.searchParams.set('section',workspaceSection)
     }else{url.searchParams.delete('project');url.searchParams.delete('section')}
     if(url.href!==window.location.href)window.history.replaceState(null,'',url.pathname+url.search+url.hash)
@@ -364,7 +371,7 @@ export default function SurveyApp(){
         id="survey-workspace-settings" role={selected?'tabpanel':undefined}
         aria-labelledby={selected?'survey-workspace-tab-settings':undefined}
         hidden={!!selected&&workspaceSection!=='settings'}>
-        <header className="survey-settings-heading"><div><h2 id="survey-project-settings-heading" tabIndex={-1}>{selected.status==='DRAFT'?'编辑研究草稿':'研究设置'}</h2><p>{selected.status==='DRAFT'?'完善基本信息，保存后继续编制研究工具。':'当前研究设置只读；工具、采集与数据仍按研究状态管理。'}</p></div>
+        <header className="survey-settings-heading"><div><h2 id="survey-project-settings-heading" tabIndex={-1}>{selected.status==='DRAFT'?'编辑研究草稿':'研究设置'}</h2><p>{selected.status==='DRAFT'?'完善基本信息，保存后配置问卷与采集。':'当前研究设置只读；工具、采集与数据仍按研究状态管理。'}</p></div>
           <span className="survey-settings-status" data-status={selected.status}>{{DRAFT:'草稿 · 可编辑',ACTIVE:'采集中',PAUSED:'已暂停',CLOSED:'已结束',ARCHIVED:'已归档'}[selected.status]}</span></header>
         <form id="survey-project-basics" tabIndex={-1} onSubmit={save} aria-busy={busy} className="survey-settings-form">
           <fieldset disabled={busy||selected.status!=='DRAFT'} className="survey-settings-fields">
@@ -379,13 +386,12 @@ export default function SurveyApp(){
           </fieldset>
           <div id="survey-project-save" tabIndex={-1} className="survey-settings-actions">
             <div className="survey-settings-save"><button type="submit" className="btn-primary" disabled={busy||selected.status!=='DRAFT'}>保存修改</button>{notice==='研究草稿已保存'&&<p role="status" className="survey-settings-feedback">{notice}</p>}</div>
-            <div className="survey-settings-secondary"><button type="button" className="btn-secondary" onClick={()=>setWorkspaceSection('tools')}>{selected.status==='DRAFT'?'编制研究工具 →':'查看研究工具 →'}</button><button type="button" className="survey-settings-new" disabled={busy} onClick={newProject}>新建其他项目</button></div>
+            <div className="survey-settings-secondary"><button type="button" className="btn-secondary" onClick={()=>setWorkspaceSection('publish')}>{selected.status==='DRAFT'?'配置问卷与采集 →':'查看问卷与采集 →'}</button><button type="button" className="survey-settings-new" disabled={busy} onClick={newProject}>新建其他项目</button></div>
           </div>
         </form>
         <p className="survey-settings-help">保存仅更新草稿，不会开放招募。请在「发布与采集」检查工具与知情同意，冻结后再开放。</p>
-      </section>}{selected&&<><div id="survey-workspace-tools" role="tabpanel" aria-labelledby="survey-workspace-tab-tools" hidden={workspaceSection!=='tools'}><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id} projectStatus={selected.status} instrumentLibrary={instrumentLibrary} onLeaveRiskChange={builderRiskChanged}/></div>
-        <div id="survey-workspace-reports" role="tabpanel" aria-labelledby="survey-workspace-tab-reports" hidden={workspaceSection!=='reports'}><SurveyReportStudio key={'reports-'+selected.id} projectId={selected.id} projectStatus={selected.status} active={workspaceSection==='reports'} onLeaveRiskChange={reportRiskChanged}/></div>
-        <div id="survey-workspace-publish" role="tabpanel" aria-labelledby="survey-workspace-tab-publish" hidden={workspaceSection!=='publish'}><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary} onProjectChanged={projectChanged}/></div>
+      </section>}{selected&&<><div id="survey-workspace-reports" role="tabpanel" aria-labelledby="survey-workspace-tab-reports" hidden={workspaceSection!=='reports'}><SurveyReportStudio key={'reports-'+selected.id} projectId={selected.id} projectStatus={selected.status} active={workspaceSection==='reports'} onLeaveRiskChange={reportRiskChanged}/></div>
+        <div id="survey-workspace-publish" role="tabpanel" aria-labelledby="survey-workspace-tab-publish" hidden={workspaceSection!=='publish'}><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary} onProjectChanged={projectChanged} onLeaveRiskChange={builderRiskChanged} onNavigateLibrary={()=>navigateResearchArea('tools','/workspace/tools')}/></div>
         <div id="survey-workspace-data" role="tabpanel" aria-labelledby="survey-workspace-tab-data" hidden={workspaceSection!=='data'}>
           {capabilitiesState==='loading'?<section className="rounded-xl border bg-white p-4" role="status">正在确认研究数据功能…</section>
             :capabilitiesState==='error'?<section className="rounded-xl border bg-white p-4" aria-label="研究数据状态"><p role="alert">无法确认研究数据功能，请重试；这不代表功能未开通。</p><button type="button" className="btn-secondary" onClick={()=>void loadCapabilities()}>重试功能状态</button></section>
@@ -394,7 +400,8 @@ export default function SurveyApp(){
             :<section className="rounded-xl border bg-white p-4" aria-label="研究数据状态">
               研究数据分析暂未在当前环境启用；项目和研究工具仍可使用。
             </section>}</div></>}</div></div>
-        {researchArea!=='studies'&&<SurveyResearchPlaceholder area={researchArea}/>}
+        {toolLibraryVisited&&<div hidden={researchArea!=='tools'}><SurveyToolLibrary visible={researchArea==='tools'} onLeaveRiskChange={toolLibraryRiskChanged}/></div>}
+        {researchArea==='datasets'&&<SurveyResearchPlaceholder area="datasets"/>}
         <SurveyCreateProjectDialog open={creating} busy={busy} title={title} description={description} mode={mode} error={error}
           onTitle={setTitle} onDescription={setDescription} onMode={setMode} onClose={returnToProjects} onSubmit={createProject}/>
       </div>}

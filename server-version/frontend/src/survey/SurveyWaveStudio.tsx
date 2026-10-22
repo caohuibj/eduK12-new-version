@@ -1,14 +1,15 @@
-import { SurveySectionHeader } from './SurveySectionHeader'
+import {SurveyProjectTools} from './SurveyProjectTools'
+import type {BuilderLeaveRisk} from './SurveyBuilder'
 import {SurveyWaveContentSelection,type WaveContentSelection,type FrozenWaveContent} from './SurveyWaveContentSelection'
 import { productOrigins, surveyRecruitmentUrl } from '../products/origins'
-import { useCallback, useRef, useEffect,useState,type FormEvent } from 'react'
+import { useCallback, useRef, useEffect,useState,useMemo,type FormEvent } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { SurveyFlowStudio,type FormQuestionInfo } from './SurveyFlowStudio'
 import type { FlowDraft } from './flow.client'
 import { SurveyStudyPreview } from './SurveyStudyPreview'
 import type { CognitivePreviewSnapshot } from './ResearchCognitivePreview'
 import type { FormDraft, ResearchDraft, ScaleDraft } from './builder.types'
-import { useInstrumentLibrary, type InstrumentLibrary } from './instrument-library'
+import { useInstrumentLibrary, createInstrumentLibrary, type InstrumentLibrary } from './instrument-library'
 
 type RawFeedbackChoice={metricKeys:string[];release:'AFTER_FINAL'|'AFTER_COLLECTION'}
 type ApiResult<T>={code:number|string;message:string;data:T|null}
@@ -82,12 +83,17 @@ const localTime=(raw:string|null)=>{
 const groupTime=(raw:string,timeZone:string)=>new Date(raw).toLocaleString('zh-CN',{
   timeZone,year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,
 })
-export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:{
-  projectId:string;instrumentLibrary?:InstrumentLibrary;onProjectChanged?:(project:Project)=>void
+export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,onLeaveRiskChange,onNavigateLibrary}:{
+  projectId:string;instrumentLibrary?:InstrumentLibrary;onProjectChanged?:(project:Project)=>void;onLeaveRiskChange?:(risk:BuilderLeaveRisk)=>void;onNavigateLibrary?:()=>void
 }){
   const path='/projects/'+encodeURIComponent(projectId)
+  const [toolRisk,setToolRisk]=useState<BuilderLeaveRisk>({dirty:false,busy:false})
+  const toolRiskChanged=useCallback((risk:BuilderLeaveRisk)=>setToolRisk(risk),[])
+  const [librarySelectionDirty,setLibrarySelectionDirty]=useState(false)
+  const importContext=useRef({project:0,selection:0})
   const [waves,setWaves]=useState<Wave[]>([])
-  const {list:tools,page:toolPage,refresh:refreshTools,error:toolsError,loading:toolsLoading,revision:instrumentsRevision}=useInstrumentLibrary(projectId,instrumentLibrary)
+  const sharedLibrary=useMemo(()=>instrumentLibrary??createInstrumentLibrary(projectId),[instrumentLibrary,projectId])
+  const {list:tools,page:toolPage,refresh:refreshTools,error:toolsError,loading:toolsLoading,revision:instrumentsRevision}=useInstrumentLibrary(projectId,sharedLibrary)
   const [details,setDetails]=useState<Record<string,InstrumentDetails>>({})
   const [participantFeedback,setParticipantFeedback]=useState<Record<string,RawFeedbackChoice>>({})
   const [contentSelections,setContentSelections]=useState<WaveContentSelection[]>([])
@@ -101,6 +107,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
   const [editing,setEditing]=useState<Wave|null>(null),[form,setForm]=useState<FormState>(initial)
   const [ready,setReady]=useState<Preflight|null>(null),[busy,setBusy]=useState(false)
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
+  useEffect(()=>{onLeaveRiskChange?.({dirty:toolRisk.dirty||librarySelectionDirty,busy:toolRisk.busy||busy});return()=>onLeaveRiskChange?.({dirty:false,busy:false})},[onLeaveRiskChange,toolRisk,librarySelectionDirty,busy])
   const [shareLink,setShareLink]=useState('')
   const copyShareLink=async()=>{
     if(!shareLink)return
@@ -135,7 +142,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
   useEffect(()=>{
     const projects=projectEpoch,selections=selectionEpoch,previews=previewEpoch
     const epoch=++projects.current
-    previewEpoch.current++;selectionEpoch.current++;setStudyPreview(null);setEditing(null);setReady(null);setShareLink('');setForm(initial());setDetails({})
+    previewEpoch.current++;selectionEpoch.current++;setStudyPreview(null);setEditing(null);setReady(null);setShareLink('');setForm(initial());setDetails({});setLibrarySelectionDirty(false)
     setWaves([]);setWavePage(1);setProject(null);setError('');setNotice('');setBusy(false)
     void Promise.all([refreshWaves(1),refreshProject()]).catch(e=>{if(epoch===projectEpoch.current)setError(message(e))})
     return()=>{projects.current++;selections.current++;previews.current++}
@@ -181,13 +188,14 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
     try{await pending}catch(e){if(epoch===projectEpoch.current&&selection===selectionEpoch.current)setError(message(e))}
     finally{if(epoch===projectEpoch.current&&request===actionRequest.current)setBusy(false)}
   }
-  const select=(wave:Wave)=>void act(async()=>{
+  const mayChangeWave=()=>!(librarySelectionDirty||toolRisk.dirty)||window.confirm('当前问卷内容或兼容工具有未保存修改，确定放弃并切换波次？')
+  const select=(wave:Wave)=>{if(!mayChangeWave())return;void act(async()=>{
     const selection=++selectionEpoch.current,epoch=projectEpoch.current
     setParticipantFeedback({})
     previewEpoch.current++;setStudyPreview(null)
     const detail=await surveyApi<Wave>(path+'/waves/'+wave.id)
     if(selection!==selectionEpoch.current||epoch!==projectEpoch.current)return
-    setEditing(detail);setReady(null);setShareLink('');setFlowAnalytics(null);setCategoryKey('');setScoreSelection('')
+    setEditing(detail);setLibrarySelectionDirty(false);setReady(null);setShareLink('');setFlowAnalytics(null);setCategoryKey('');setScoreSelection('')
     setForm({
       title:detail.title,consentText:detail.consentText,generalText:detail.generalText,
       linkageNoticeConfirmed:detail.linkageNoticeConfirmed,
@@ -200,7 +208,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
       checkpointPolicy:detail.checkpointPolicy??null,
       groupIpPolicy:detail.groupIpPolicy??null,
     })
-  })
+  })}
   const previewStudy=()=>void act(async()=>{
     const epoch=++previewEpoch.current,saved=structuredClone(form)
     setStudyPreview(null)
@@ -238,7 +246,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
       :await surveyApi<Wave>(path+'/waves','POST',{...body,requestId:crypto.randomUUID()})
     if(epoch!==projectEpoch.current)return
     if(selection===selectionEpoch.current){
-      setEditing(wave);setReady(null);setFlowAnalytics(null)
+      setEditing(wave);setReady(null);setFlowAnalytics(null);setLibrarySelectionDirty(false)
       setNotice('波次草稿已保存；冻结定义和正式开放需要分别确认')
     }
     await refreshWaves(wavePage)
@@ -423,17 +431,17 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
   const stage=activePending?'冻结结果待核对':!editing?'尚未保存草稿':editing.hardStopAt?'已紧急终止':editing.status==='CLOSED'?'已结束招募':editing.status==='PAUSED'?'已暂停新参与':editing.status==='OPEN'?'波次已开放':editing.publicationId?'已冻结，尚未开放':'草稿，尚未冻结'
   const nextStep=activePending?'请先核对原冻结请求，不要重复创建或重新选择版本。':busy?'正在等待本次操作结果；请勿据此重复提交或开始下一步。':!editing?'填写本轮内容并保存草稿，再检查研究定义。':editing.hardStopAt?'已停止本轮作答，请到研究数据查看既有记录。':editing.status==='CLOSED'?'不再招募；在途作答仍以服务端完成窗口为准。':editing.status==='PAUSED'?'需要继续招募时可恢复开放；在途作答遵循原完成窗口。':editing.status==='OPEN'?'核对招募链接后再分享；是否允许新参与仍受项目状态、时间窗口和配额约束。':editing.publicationId?'确认冻结内容后，可显式正式开放本轮。':'先保存内容，再检查知情同意与所有工具，通过后冻结研究定义。'
   return <section className="survey-studio-surface survey-publish-surface border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-5" aria-label="研究波次">
-    <SurveySectionHeader section="publish" title="发布与采集">
+    <header className="survey-library-heading"><h2 className="text-xl font-semibold">发布与采集</h2><details className="survey-publish-help"><summary>采集与版本说明</summary>
       <p className="text-sm text-slate-600">
         {project?.collectionMode==='LINKED_WAVES'
           ?'本项目用同一随机研究编号关联 T1、T2、T3 等波次；被试需保存私密恢复凭证。'
           :'本项目每轮均为独立匿名作答，不生成跨波次关联研究编号，也不允许个人纵向匹配。'}
-        波次正式发布后，题目、评分和知情同意即被冻结；改变测量内容应建立新波次。</p></SurveySectionHeader>
-    <section id="survey-publish-stage" tabIndex={-1} aria-label="当前发布阶段" className="rounded-lg border bg-slate-50 p-3 space-y-2">
-      <h3 className="font-semibold">当前阶段：{stage}</h3>
+        波次正式发布后，题目、评分和知情同意即被冻结；改变测量内容应建立新波次。</p></details></header>
+    <details id="survey-publish-stage" tabIndex={-1} aria-label="当前发布阶段" className="survey-publish-stage">
+      <summary>当前阶段：{stage}</summary>
       <p className="text-sm">{nextStep}</p>
       {busy&&<p role="status" className="text-sm">正在处理本次操作，请等待结果后再继续。</p>}
-    </section>
+    </details>
     {error&&<p role="alert" className="bg-red-50 border-l-4 border-red-600 p-3">{error}</p>}
     {waveError&&<div role="alert" className="bg-red-50 border-l-4 border-red-600 p-3">{waveError}
       <button type="button" className="btn-secondary" disabled={busy} onClick={()=>void act(()=>refreshWaves(wavePage))}>重试波次列表</button></div>}
@@ -446,10 +454,10 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
       <button type="button" className="btn-secondary" disabled={busy} onClick={()=>void act(()=>verifyFreeze(activePending))}>核对原冻结请求</button>
       {activePending.canRetry&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>freezeWave(true)}>重试原冻结请求</button>}
     </div>}
-    <fieldset disabled={!!activePending} className="min-w-0 border-0 p-0 space-y-4">
-    {project&&<div className="border rounded-lg bg-slate-50 p-3 space-y-3">
+    <fieldset disabled={!!activePending||toolRisk.busy} className="min-w-0 border-0 p-0 space-y-4">
+    {project&&<div className="survey-wave-project-status border rounded-lg bg-slate-50">
       <div className="flex justify-between gap-3 flex-wrap items-center">
-        <p className="text-sm">整体研究状态：<strong>{project.status}</strong></p>
+        <p className="text-sm">研究状态：<strong>{{DRAFT:'草稿',ACTIVE:'采集中',PAUSED:'已暂停',CLOSED:'已结束',ARCHIVED:'已归档'}[project.status]}</strong></p>
         <div className="flex flex-wrap gap-2">
           {project.status==='ACTIVE'&&<button type="button" className="btn-secondary"
             disabled={busy} onClick={()=>transitionProject('pause')}>暂停整个研究</button>}
@@ -459,26 +467,37 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
             disabled={busy} onClick={()=>transitionProject('close')}>结束整个研究</button>}
         </div>
       </div>
-      <p className="text-xs text-slate-600">暂停停止新的研究参与者准入；已开始的合法答卷仍遵循有限的完成窗口。关闭研究不会物理删除既有数据。</p>
+      <details><summary>状态说明</summary><p className="text-xs text-slate-600">暂停停止新的研究参与者准入；已开始的合法答卷仍遵循有限的完成窗口。关闭研究不会物理删除既有数据。</p></details>
     </div>}
     <div className="survey-wave-layout grid md:grid-cols-[220px_minmax(0,1fr)] gap-5">
       <nav id="survey-wave-list" tabIndex={-1} aria-label="研究波次列表" className="survey-tool-rail space-y-2"><h3 className="survey-rail-title">研究波次</h3>
         <button className="btn-secondary w-full" type="button" onClick={()=>{
-          previewEpoch.current++;selectionEpoch.current++;setParticipantFeedback({});setDetails({});setStudyPreview(null);setEditing(null);setForm(initial());setReady(null);setShareLink('')
+          if(!mayChangeWave())return
+          previewEpoch.current++;selectionEpoch.current++;setParticipantFeedback({});setDetails({});setStudyPreview(null);setEditing(null);setForm(initial());setReady(null);setShareLink('');setLibrarySelectionDirty(false)
         }}>新建波次</button>
-        <div className="survey-rail-pagination">
+        {(wavePage>1||waves.length>=25)&&<div className="survey-rail-pagination">
           <button type="button" className="btn-secondary" disabled={busy||wavePage<=1}
             onClick={()=>void act(()=>refreshWaves(wavePage-1))}>上一页</button>
           <span>波次第 {wavePage} 页</span>
           <button type="button" className="btn-secondary" disabled={busy||waves.length<25}
             onClick={()=>void act(()=>refreshWaves(wavePage+1))}>下一页</button>
-        </div>
+        </div>}
         {waves.map(w=><button type="button" key={w.id} disabled={busy}
           className={'block w-full rounded-lg border text-left p-3 '+(w.id===editing?.id?'bg-sky-50 border-sky-700':'bg-white')}
           onClick={()=>select(w)}><strong className="block text-sm">{'T'+w.ordinal+' · '+w.title}</strong>
           <span className="text-xs">{w.status} {w.publicationId?' · 已冻结':''}</span></button>)}
       </nav>
       <div id="survey-wave-editor" tabIndex={-1} className="survey-wave-editor space-y-4 min-w-0">
+        {(!editing||editing.status==='DRAFT'&&!editing.publicationId)&&<SurveyProjectTools projectId={projectId} projectStatus={project?.status||'DRAFT'} instrumentLibrary={sharedLibrary}
+          selectedTools={form.instrumentIds.map(id=>flowTools.find(tool=>tool.id===id)).filter((tool):tool is typeof flowTools[number]=>!!tool)}
+          onReorder={ids=>{if(form.flowDefinition&&!window.confirm('调整内容会重置当前流程与实验组配额，继续？'))return;setForm(old=>({...old,instrumentIds:ids,flowDefinition:null,quotaPolicy:null}));setLibrarySelectionDirty(true);setReady(null);setStudyPreview(null)}}
+          onLeaveRiskChange={toolRiskChanged} onNavigateLibrary={onNavigateLibrary||(()=>{window.location.assign('/workspace/tools')})}
+          onBeforeSelect={()=>{if(busy||activePending)return false;if(form.flowDefinition&&!window.confirm('添加工具会重置当前问卷的流程与实验组配额，请随后重新编排。继续？'))return false;importContext.current={project:projectEpoch.current,selection:selectionEpoch.current};return true}}
+          onSelected={async ids=>{
+            if(importContext.current.project!==projectEpoch.current||importContext.current.selection!==selectionEpoch.current){setNotice('工具已加入本研究；当前波次已切换，请在当前问卷中重新选择。');return}
+            setForm(old=>({...old,instrumentIds:[...old.instrumentIds,...ids.filter(id=>!old.instrumentIds.includes(id))],flowDefinition:null,quotaPolicy:null}))
+            setLibrarySelectionDirty(true);setReady(null);setStudyPreview(null)
+          }}/>}
         {(!editing||editing.status==='DRAFT'&&!editing.publicationId)&&<form className="survey-wave-form survey-task-card space-y-4" onSubmit={save}>
           <h3 className="font-semibold">{editing?'修改未发布波次':'创建波次草稿'}</h3>
           <button type="button" className="btn-secondary" disabled={busy||!form.instrumentIds.length} onClick={previewStudy}>预览整轮研究流程</button>
@@ -500,11 +519,11 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
           <label className="block text-sm">通用完成反馈（不显示个人分数）
             <textarea className="input block w-full" rows={3} value={form.generalText}
               onChange={e=>setForm({...form,generalText:e.target.value})}/></label>
-          <fieldset className="border p-3 rounded-lg"><legend className="font-semibold text-sm">本波次使用的研究工具</legend>
+          <details className="survey-library-help survey-existing-tools"><summary>选用本研究已加入的工具</summary><fieldset className="border p-3 rounded-lg"><legend className="font-semibold text-sm">本波次使用的研究工具</legend>
             {tools.filter(t=>t.status==='DRAFT'||(t.kind==='SCALE'&&t.status==='PUBLISHED')).map(t=><label key={t.id} className="block text-sm my-2">
               <input type="checkbox" checked={form.instrumentIds.includes(t.id)}
                 onChange={e=>toggle(t.id,e.target.checked)}/> {t.kind} · {t.title}</label>)}
-            {!tools.filter(t=>t.status==='DRAFT'||(t.kind==='SCALE'&&t.status==='PUBLISHED')).length&&<p className="text-xs">请先通过 Builder 创建研究工具。</p>}
+            {!tools.filter(t=>t.status==='DRAFT'||(t.kind==='SCALE'&&t.status==='PUBLISHED')).length&&<p className="text-xs">从上方工具集添加问卷内容，或勾选已加入本研究的工具。</p>}
           <div className="flex items-center justify-between text-xs gap-2">
             <button type="button" className="btn-secondary" disabled={busy||toolPage<=1}
               onClick={()=>void act(()=>refreshTools(toolPage-1))}>工具上一页</button>
@@ -512,7 +531,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
             <button type="button" className="btn-secondary" disabled={busy||tools.length<25}
               onClick={()=>void act(()=>refreshTools(toolPage+1))}>工具下一页</button>
           </div>
-          </fieldset>
+          </fieldset></details>
           <SurveyFlowStudio value={form.flowDefinition}
             onChange={flowDefinition=>setForm(old=>({...old,flowDefinition,
               quotaPolicy:flowDefinition?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'?null:old.quotaPolicy}))}

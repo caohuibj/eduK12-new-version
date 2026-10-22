@@ -10,14 +10,13 @@ function selectStudy(index:number){
   fireEvent.click(screen.getAllByRole('button',{name:'查看/编辑'})[index])
 }
 
-vi.mock('./SurveyBuilder',()=>({SurveyBuilder:({projectId,onLeaveRiskChange}:{projectId:string;onLeaveRiskChange:(risk:BuilderLeaveRisk)=>void})=>{
+vi.mock('./SurveyWaveStudio',()=>({SurveyWaveStudio:({projectId,onLeaveRiskChange}:{projectId:string;onLeaveRiskChange:(risk:BuilderLeaveRisk)=>void})=>{
   const [value,setValue]=useState(''),[busy,setBusy]=useState(false)
   useEffect(()=>{onLeaveRiskChange({dirty:!!value,busy})},[value,busy,onLeaveRiskChange])
   useEffect(()=>()=>onLeaveRiskChange({dirty:false,busy:false}),[onLeaveRiskChange])
   return <><label>合成草稿<input value={value} onChange={event=>setValue(event.target.value)}/></label><p>工具项目：{projectId}</p><button onClick={()=>setBusy(x=>!x)}>切换合成写入状态</button></>
 }}))
 vi.mock('./SurveyReportStudio',()=>({SurveyReportStudio:()=>null}))
-vi.mock('./SurveyWaveStudio',()=>({SurveyWaveStudio:()=>null}))
 vi.mock('./SurveyAnalyticsWorkspace',()=>({SurveyAnalyticsWorkspace:()=> <p>合成研究数据</p>}))
 const projects=['第一项研究','第二项研究'].map((title,index)=>({id:'p'+index,title,description:'',collectionMode:'SINGLE_UNLINKED',status:'DRAFT',revision:1}))
 const reply=(data:unknown)=>Promise.resolve({ok:true,json:async()=>({code:0,data})} as Response)
@@ -39,7 +38,7 @@ afterEach(()=>{vi.restoreAllMocks();vi.unstubAllGlobals()})
 async function openTool(){
   await screen.findByRole('heading',{name:'研究工作台'})
   selectStudy(0)
-  fireEvent.click(screen.getByRole('tab',{name:'研究工具'}))
+  fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}))
   fireEvent.change(screen.getByLabelText('合成草稿'),{target:{value:'不能丢失'}})
 }
 describe('researcher workspace leave protection',()=>{
@@ -53,7 +52,7 @@ describe('researcher workspace leave protection',()=>{
     expect(screen.getByLabelText('研究名称')).toHaveValue('第一项研究')
     fireEvent.click(screen.getByRole('button',{name:'退出'}))
     expect(fetcher.mock.calls.some(([url])=>url.endsWith('/auth/logout'))).toBe(false)
-    fireEvent.click(screen.getByRole('tab',{name:'研究工具'}))
+    fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}))
     expect(screen.getByLabelText('合成草稿')).toHaveValue('不能丢失')
     expect(window.confirm).toHaveBeenCalledTimes(3)
   })
@@ -61,7 +60,7 @@ describe('researcher workspace leave protection',()=>{
     render(<SurveyApp/>);await openTool();vi.mocked(window.confirm).mockReturnValue(true)
     selectStudy(1)
     expect(screen.getByLabelText('研究名称')).toHaveValue('第二项研究')
-    fireEvent.click(screen.getByRole('tab',{name:'研究工具'}))
+    fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}))
     expect(screen.getByLabelText('合成草稿')).toHaveValue('')
     expect(screen.getByText('工具项目：p1')).toBeVisible()
   })

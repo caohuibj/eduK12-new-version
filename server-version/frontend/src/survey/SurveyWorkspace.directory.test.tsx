@@ -3,7 +3,7 @@ import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
 import SurveyApp from './SurveyApp'
 import {SurveyProjectDirectory,type SurveyProject} from './SurveyProjectDirectory'
 
-vi.mock('./SurveyBuilder',()=>({SurveyBuilder:()=>null}))
+vi.mock('./SurveyProjectTools',()=>({SurveyProjectTools:()=>null}))
 vi.mock('./SurveyReportStudio',()=>({SurveyReportStudio:()=>null}))
 vi.mock('./SurveyWaveStudio',()=>({SurveyWaveStudio:()=>null}))
 vi.mock('./SurveyAnalyticsWorkspace',()=>({SurveyAnalyticsWorkspace:()=>null}))
@@ -17,6 +17,7 @@ beforeEach(()=>{
   vi.stubGlobal('fetch',vi.fn((url:string)=>{
     if(url.endsWith('/auth/me'))return reply({id:'r',username:'研究者',mustChangePassword:false})
     if(url.endsWith('/auth/capabilities'))return reply({analytics:true,publication:true})
+    if(url.includes('/tool-library?'))return reply({list:[],total:0})
     if(url.includes('/projects?page='))return reply({list:projects})
     throw new Error('Unexpected request '+url)
   }))
@@ -47,12 +48,12 @@ describe('Survey researcher directory and editing context',()=>{
     vi.stubGlobal('fetch',vi.fn((url:string,options?:RequestInit)=>url.endsWith('/projects/draft')?reply(projects[0]):base(url,options)))
     const page=render(<SurveyApp/>)
     fireEvent.click((await screen.findAllByRole('button',{name:'查看/编辑'}))[0])
-    fireEvent.click(screen.getByRole('tab',{name:'研究工具'}))
+    fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}))
     fireEvent.change(screen.getByLabelText('研究名称'),{target:{value:'未保存的本地名称'}})
-    await waitFor(()=>expect(new URLSearchParams(window.location.search).get('section')).toBe('tools'))
+    await waitFor(()=>expect(new URLSearchParams(window.location.search).get('section')).toBe('publish'))
     expect(new URLSearchParams(window.location.search).get('project')).toBe('draft')
     page.unmount();render(<SurveyApp/>)
-    expect(await screen.findByRole('tab',{name:'研究工具'})).toHaveAttribute('aria-selected','true')
+    expect(await screen.findByRole('tab',{name:'发布与采集'})).toHaveAttribute('aria-selected','true')
     expect(screen.getByLabelText('研究名称')).toHaveValue(projects[0].title)
     expect(screen.getByRole('heading',{name:projects[0].title,level:1})).toBeVisible()
     const calls=vi.mocked(fetch).mock.calls.map(([url])=>String(url))
@@ -163,7 +164,7 @@ describe('Survey researcher directory and editing context',()=>{
     expect(onChoose).not.toHaveBeenCalled();expect(onArchive).not.toHaveBeenCalled()
   })
 
-  it('switches header destinations without requests or losing study filters and unsaved editor content',async()=>{
+  it('loads the independent toolkit once and switches header destinations without losing study filters and unsaved editor content',async()=>{
     const confirm=vi.spyOn(window,'confirm').mockReturnValue(false)
     render(<SurveyApp/>)
     await screen.findByRole('heading',{name:'研究工作台'})
@@ -174,7 +175,7 @@ describe('Survey researcher directory and editing context',()=>{
     fireEvent.change(screen.getByRole('searchbox',{name:'筛选本页研究'}),{target:{value:'学习'}})
     fireEvent.click(screen.getByRole('button',{name:'查看/编辑'}))
     fireEvent.change(screen.getByLabelText('研究名称'),{target:{value:'未保存的名称'}})
-    fireEvent.click(screen.getByRole('tab',{name:'研究工具'}))
+    fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}))
     const requests=vi.mocked(fetch).mock.calls.length
     fireEvent.click(within(navigation).getByRole('link',{name:'工具集'}))
     expect(await screen.findByRole('heading',{name:'工具集'})).toBeVisible()
@@ -190,17 +191,19 @@ describe('Survey researcher directory and editing context',()=>{
     await waitFor(()=>expect(screen.getByRole('heading',{name:'研究工作台'})).toHaveFocus())
     expect(screen.getByRole('searchbox',{name:'筛选本页研究'})).toHaveValue('学习')
     fireEvent.click(screen.getByRole('button',{name:'查看/编辑'}))
-    expect(screen.getByRole('tab',{name:'研究工具'})).toHaveAttribute('aria-selected','true')
+    expect(screen.getByRole('tab',{name:'发布与采集'})).toHaveAttribute('aria-selected','true')
     expect(screen.getByLabelText('研究名称')).toHaveValue('未保存的名称')
-    expect(vi.mocked(fetch).mock.calls).toHaveLength(requests)
+    expect(vi.mocked(fetch).mock.calls).toHaveLength(requests+1)
+    expect(vi.mocked(fetch).mock.calls.filter(([url])=>String(url).includes('/tool-library?'))).toHaveLength(1)
     expect(confirm).not.toHaveBeenCalled()
   })
 
-  it.each([['tools','工具集'],['datasets','数据集']])('opens the authenticated empty %s page directly',async(area,label)=>{
+  it.each([['tools','工具集'],['datasets','数据集']])('opens the authenticated %s page directly',async(area,label)=>{
     window.history.replaceState(null,'','/workspace/'+area)
     render(<SurveyApp/>)
     expect(await screen.findByRole('heading',{name:label})).toBeVisible()
-    expect(screen.getByText('内容即将加入')).toBeVisible()
+    if(area==='tools')expect(screen.getByRole('button',{name:'编制工具'})).toBeVisible()
+    else expect(screen.getByText('内容即将加入')).toBeVisible()
     expect(screen.queryByRole('button',{name:'新建研究'})).not.toBeInTheDocument()
     expect(within(screen.getByRole('navigation',{name:'研究工作台导航'})).getByRole('link',{name:label})).toHaveAttribute('aria-current','page')
   })
@@ -324,12 +327,12 @@ describe('Survey researcher directory and editing context',()=>{
     render(<SurveyApp/>)
     fireEvent.click((await screen.findAllByRole('button',{name:'查看/编辑'}))[0])
     await waitFor(()=>expect(document.getElementById('survey-current-project-heading')).toHaveFocus())
-    fireEvent.click(screen.getByRole('tab',{name:'研究工具'}))
+    fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}))
     fireEvent.click(screen.getByRole('button',{name:'← 返回研究列表（保留编辑）'}))
     await waitFor(()=>expect(screen.getByRole('heading',{name:'研究工作台'})).toHaveFocus())
     fireEvent.click(screen.getAllByRole('button',{name:'查看/编辑'})[0])
     await waitFor(()=>expect(document.getElementById('survey-current-project-heading')).toHaveFocus())
-    expect(screen.getByRole('tab',{name:'研究工具'})).toHaveAttribute('aria-selected','true')
+    expect(screen.getByRole('tab',{name:'发布与采集'})).toHaveAttribute('aria-selected','true')
     expect(document.getElementById('survey-current-project-heading')).toHaveTextContent('学习体验研究')
   })
   it('retains confirmed creation, revision and archive state when only list refresh fails',async()=>{

@@ -11,6 +11,9 @@ function selectStudy(index:number){
   fireEvent.click(screen.getAllByRole('button',{name:'查看/编辑'})[index])
 }
 
+// Preserve the existing project-builder/studio request contracts in isolation.
+// The new tool-library selection integration has separate component coverage.
+vi.mock('./SurveyProjectTools',async()=>{const {SurveyBuilder}=await import('./SurveyBuilder');return {SurveyProjectTools:SurveyBuilder}})
 vi.mock('./SurveyAnalyticsWorkspace',()=>({SurveyAnalyticsWorkspace:()=>null}))
 vi.mock('./SurveyFlowStudio',()=>({SurveyFlowStudio:({questions}:{questions:{prompt:string}[]})=>
   <output aria-label="flow questions">{questions.map(question=>question.prompt).join(',')}</output>}))
@@ -88,8 +91,8 @@ function fixture({many=false,empty=false,waveCount=1}={}){
   }
 }
 const base='/api/survey/projects/p1'
-const builder=()=>{fireEvent.click(screen.getByRole('tab',{name:'研究工具'}));return within(screen.getByRole('region',{name:'Survey Research Builder'}))}
-const studio=()=>{const tab=screen.queryByRole('tab',{name:'发布与采集'});if(tab)fireEvent.click(tab);return within(screen.getByRole('region',{name:'研究波次'}))}
+const builder=()=>{fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}));return within(screen.getByRole('region',{name:'Survey Research Builder'}))}
+const studio=()=>{const tab=screen.queryByRole('tab',{name:'发布与采集'});if(tab)fireEvent.click(tab);const region=screen.getByRole('region',{name:'研究波次'});const existing=within(region).queryByText('选用本研究已加入的工具');if(existing&&!existing.closest('details')?.open)fireEvent.click(existing);return within(region)}
 async function openWorkspace(strict=false){
   window.history.replaceState(null,'','/workspace')
   render(strict?<StrictMode><SurveyApp/></StrictMode>:<SurveyApp/>)
@@ -102,9 +105,9 @@ afterEach(()=>{vi.unstubAllGlobals();window.history.replaceState(null,'','/')})
 describe('shared Survey workspace instruments requests',()=>{
   it('loads one instruments page for real Builder and WaveStudio, including StrictMode replay and empty results',async()=>{
     const api=fixture({empty:true});await openWorkspace(true)
-    await screen.findByText('本页暂无工具。可在上方创建草稿，或前往下方授权目录导入。')
+    await screen.findByText('本页暂无工具。可从工具集加入本研究。')
     await waitFor(()=>expect(api.count(base+'/instruments?page=1')).toBe(1))
-    expect(studio().getByText('请先通过 Builder 创建研究工具。')).toBeInTheDocument()
+    expect(studio().getByText('从上方工具集添加问卷内容，或勾选已加入本研究的工具。')).toBeInTheDocument()
   })
 
   it('refreshes both lists once after create and catalog import, preserving unsaved wave fields',async()=>{
@@ -158,7 +161,7 @@ describe('shared Survey workspace instruments requests',()=>{
     fireEvent.click(list.getByRole('button',{name:/^工具1 FORM/}))
     fireEvent.change(await builder().findByLabelText('研究工具名称'),{target:{value:'跨页保存'}})
     fireEvent.click(builder().getByRole('button',{name:'保存草稿'}))
-    await builder().findByText('草稿已保存；可在编制区发布测量版本，波次冻结另行进行')
+    await builder().findByText('表单草稿已保存；请到「发布与采集」选择本表单，检查并冻结波次。')
     expect(api.count(base+'/instruments?page=1')).toBe(3)
     expect(api.count(base+'/instruments?page=2')).toBe(2)
     fireEvent.click(within(studio().getByRole('navigation',{name:'研究波次列表'})).getByRole('button',{name:'下一页'}))
@@ -285,16 +288,18 @@ describe('shared Survey workspace instruments requests',()=>{
   })
 
   it('loads the newly selected wave details when a Builder save invalidates a pending wave selection',async()=>{
+    const confirm=vi.spyOn(window,'confirm').mockReturnValue(true)
     const api=fixture();await openWorkspace()
     fireEvent.click(await builder().findByRole('button',{name:/^工具1 FORM/}))
     fireEvent.change(await builder().findByLabelText('题干'),{target:{value:'选择期间更新题干'}})
     const pending=api.defer(base+'/waves/w1')
     fireEvent.click(studio().getByRole('button',{name:/T1 · 波次 1/}))
     fireEvent.click(builder().getByRole('button',{name:'保存草稿'}))
-    await builder().findByText('草稿已保存；可在编制区发布测量版本，波次冻结另行进行')
+    await builder().findByText('表单草稿已保存；请到「发布与采集」选择本表单，检查并冻结波次。')
     await act(async()=>pending.resolve(response(wave())))
     await waitFor(()=>expect(studio().getByLabelText('flow questions')).toHaveTextContent('选择期间更新题干'))
     expect(api.count(base+'/instruments/tool1')).toBe(2)
+    confirm.mockRestore()
   })
 
   it('keeps both selected tool details when a new checkbox is added during mutation revalidation',async()=>{
@@ -309,7 +314,7 @@ describe('shared Survey workspace instruments requests',()=>{
     fireEvent.change(await builder().findByLabelText('题干'),{target:{value:'工具一的新题干'}})
     const pending=api.defer(base+'/instruments/tool1')
     fireEvent.click(builder().getByRole('button',{name:'保存草稿'}))
-    await builder().findByText('草稿已保存；可在编制区发布测量版本，波次冻结另行进行')
+    await builder().findByText('表单草稿已保存；请到「发布与采集」选择本表单，检查并冻结波次。')
     fireEvent.click(studio().getByRole('checkbox',{name:'FORM · 工具2'}))
     await waitFor(()=>expect(api.count(base+'/instruments/tool2')).toBe(1))
     await act(async()=>pending.resolve(response(api.drafts.get('tool1'))))
@@ -405,8 +410,8 @@ describe('S04 workspace section navigation',()=>{
     expect(builder().getByLabelText('研究工具名称')).toHaveValue('未保存工具')
     expect(builder().getByLabelText('题干')).toHaveValue('未保存题干')
     expect(builder().getByRole('button',{name:'保存草稿'})).toBeEnabled()
-    const tools=screen.getByRole('tab',{name:'研究工具'});tools.focus()
-    fireEvent.keyDown(tools,{key:'ArrowRight'})
+    const settings=screen.getByRole('tab',{name:'研究设置'});settings.focus()
+    fireEvent.keyDown(settings,{key:'ArrowRight'})
     expect(screen.getByRole('tab',{name:'私有报告'})).toHaveFocus()
     expect(screen.getByRole('tab',{name:'私有报告'})).toHaveAttribute('aria-selected','true')
     fireEvent.keyDown(screen.getByRole('tab',{name:'私有报告'}),{key:'ArrowRight'})

@@ -50,7 +50,7 @@
 .survey-report-editor { padding: 1.25rem; border: 1px solid #d5e3e9; border-radius: .9rem; }
 .survey-report-editor > h3 { padding-bottom: .8rem; border-bottom: 1px solid #dce8ed; color: #2b576c; font-size: 1rem; }
 .survey-report-editor article[aria-label^='报告区块'] { border-left: 3px solid #97bccb; background: #f8fbfc; border-radius: .65rem; padding: 1rem; }
-.survey-publish-surface #survey-publish-stage { padding: 1.2rem 1.4rem; border-radius: .85rem; border-color: #b7d7ce; background: #edf7f4; }
+.survey-publish-surface #survey-publish-stage { padding: .3rem .8rem; border-radius: .5rem; border-color: #dce7eb; background: #f6fafb; }
 .survey-publish-surface #survey-publish-stage > h3 { color: #216359; font-size: 1.05rem; }
 .survey-wave-form > h3 { color: #2b576c; font-size: 1.15rem; margin-bottom: .5rem; }
 .survey-wave-form > label { display: block; font-weight: 550; color: #365b6e; }
@@ -123,7 +123,7 @@
   .survey-researcher .survey-project-editor .survey-workspace-nav h1 { font-size: 1.05rem; }
   .survey-editor-note { display: none; }
   .survey-project-context { gap: .5rem; }
-  .survey-researcher .survey-project-editor .survey-workspace-nav [role='tablist'] { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)) minmax(0,1.25fr) minmax(0,1fr); overflow: visible; gap: 0; padding: 0; }
+  .survey-researcher .survey-project-editor .survey-workspace-nav [role='tablist'] { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)) minmax(0,1.25fr) minmax(0,1fr); overflow: visible; gap: 0; padding: 0; }
   .survey-researcher .survey-project-editor .survey-workspace-nav [role='tab'] { padding: .4rem 0; min-height: 44px; min-width: 0; font-size: .75rem; line-height: 1.35; }
   .survey-researcher .survey-project-editor .survey-workspace-nav [role='tab'] strong { white-space: nowrap; }
   .survey-researcher .survey-project-editor .survey-workspace-nav .survey-tab-icon { display: none; }

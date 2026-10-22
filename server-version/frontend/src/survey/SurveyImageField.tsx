@@ -1,3 +1,4 @@
+import {surveyAssetBase} from './tool-library-api'
 import { useEffect,useId,useRef,useState } from 'react'
 import type { SurveyImage } from './builder.types'
 
@@ -12,7 +13,8 @@ export function SurveyImageField({projectId,image,onChange,presentationOnly=fals
   const [libraryOpen,setLibraryOpen]=useState(false),[libraryLoading,setLibraryLoading]=useState(false)
   const [libraryError,setLibraryError]=useState('')
   const libraryId=useId(),libraryRequest=useRef<AbortController|null>(null)
-  const base='/api/survey/projects/'+encodeURIComponent(projectId)+'/assets'
+  const base=surveyAssetBase(projectId)
+  const scopeLabel=projectId.startsWith('tool:')?'工具素材库':'本项目素材库'
   const currentBase=useRef(base),mounted=useRef(true)
   const latestOnChange=useRef(onChange)
   latestOnChange.current=onChange
@@ -78,7 +80,7 @@ export function SurveyImageField({projectId,image,onChange,presentationOnly=fals
   }
   return <fieldset className="border rounded-lg p-3 space-y-3">
     <legend className="text-sm font-semibold">授权静态研究图片（可选）</legend>
-    <p className="text-xs text-slate-600">仅本项目上传并在冻结发布前校验所有权、文件摘要和版权。不得使用任意外链图片、动态脚本或含隐私的人脸材料。</p>
+    <p className="text-xs text-slate-600">图片在选用和发布前校验所有权、文件摘要和版权。不得使用任意外链图片、动态脚本或含隐私的人脸材料。</p>
     {error&&<p role="alert" className="text-red-700 text-sm">{error}</p>}
     <label className="text-sm block">选择图片上传
       <input type="file" accept="image/png,image/jpeg,image/webp" disabled={busy}
@@ -87,13 +89,13 @@ export function SurveyImageField({projectId,image,onChange,presentationOnly=fals
     </label>
     <button type="button" className="btn-secondary" disabled={busy}
       aria-expanded={libraryOpen} aria-controls={libraryId} onClick={toggleLibrary}>
-      {libraryOpen?'收起本项目素材库':'打开本项目素材库'}</button>
+      {libraryOpen?'收起'+scopeLabel:'打开'+scopeLabel}</button>
     <div id={libraryId} hidden={!libraryOpen} className="space-y-2">{libraryOpen&&<>
-    {libraryLoading&&<p role="status" className="text-sm">正在读取本项目素材库…</p>}
+    {libraryLoading&&<p role="status" className="text-sm">正在读取{scopeLabel}…</p>}
     {libraryError&&<><p role="alert" className="text-red-700 text-sm">{libraryError}</p>
       <button type="button" className="btn-secondary" disabled={busy||libraryLoading}
         onClick={()=>void loadLibrary()}>重试读取素材库</button></>}
-    <label className="text-sm block">从本项目素材库选择
+    <label className="text-sm block">从{scopeLabel}选择
       <select className="input block w-full" value={image?.asset.assetId||''}
         disabled={busy||libraryLoading||!!libraryError}
         onChange={e=>{

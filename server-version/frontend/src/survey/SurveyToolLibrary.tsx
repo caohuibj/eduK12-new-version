@@ -1,0 +1,71 @@
+import {useCallback,useEffect,useRef,useState} from 'react'
+import {Plus,Search,Wrench,ArrowRight,FileText,SlidersHorizontal,Layers} from 'lucide-react'
+import {toolLibraryApi as api,libraryKindLabel,type LibraryTool,type ToolRef} from './tool-library-api'
+import type {CatalogGrant} from './ResearchCatalog'
+import {SourceProvenance} from './ResearchCatalog'
+import {SurveyToolTemplateEditor} from './SurveyToolTemplateEditor'
+import type {BuilderLeaveRisk} from './SurveyBuilder'
+import './survey-tool-library.css'
+
+type Props={visible?:boolean;projectId?:string;onSelected?:(ids:string[])=>Promise<void>;onBeforeSelect?:()=>boolean;targetLabel?:string;onLeaveRiskChange?:(risk:BuilderLeaveRisk)=>void;onNavigateLibrary?:()=>void}
+export function SurveyToolLibrary({visible=true,projectId,onSelected,onBeforeSelect,targetLabel, onLeaveRiskChange,onNavigateLibrary}:Props){
+  const [source,setSource]=useState<'owned'|'granted'>('owned'),[list,setList]=useState<LibraryTool[]>([]),[grants,setGrants]=useState<CatalogGrant[]>([])
+  const [kind,setKind]=useState(''),[query,setQuery]=useState(''),[search,setSearch]=useState(''),[page,setPage]=useState(1),[total,setTotal]=useState(0)
+  const [loading,setLoading]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[generation,setGeneration]=useState(0)
+  const [active,setActive]=useState<string|null>(()=>!projectId?new URLSearchParams(window.location.search).get('tool'):null)
+  const [creating,setCreating]=useState(false),[newKind,setNewKind]=useState<LibraryTool['kind']>('FORM'),[newTitle,setNewTitle]=useState('')
+  const createRequest=useRef<string|null>(null),selectRequest=useRef<{key:string;requestId:string}|null>(null)
+  const writeLock=useRef(false),readEpoch=useRef(0)
+  const load=useCallback(async()=>{const epoch=++readEpoch.current;setLoading(true);setError('');
+    try{
+      if(source==='owned'){const result=await api<{list:LibraryTool[];total:number}>('/tool-library?page='+page+'&kind='+kind+'&query='+encodeURIComponent(query));if(epoch===readEpoch.current){setList(result.list);setTotal(result.total)}}
+      else{const result=await api<{list:CatalogGrant[]}>('/tool-library/catalog?page='+page);if(epoch===readEpoch.current)setGrants(result.list)}
+    }catch(cause){if(epoch===readEpoch.current)setError(cause instanceof Error?cause.message:'工具集读取失败')}
+    finally{if(epoch===readEpoch.current)setLoading(false)}
+  },[source,page,kind,query])
+  useEffect(()=>{const epoch=readEpoch;if(!active)void load();return()=>{epoch.current++}},[load,generation,active])
+  useEffect(()=>{if(!notice)return;const timer=window.setTimeout(()=>setNotice(''),5000);return()=>window.clearTimeout(timer)},[notice])
+  useEffect(()=>{if(active)return;onLeaveRiskChange?.({dirty:creating&&!!newTitle.trim(),busy});return()=>onLeaveRiskChange?.({dirty:false,busy:false})},[active,busy,creating,newTitle,onLeaveRiskChange])
+  useEffect(()=>{if(projectId||!visible)return;const url=new URL(window.location.href);if(active)url.searchParams.set('tool',active);else url.searchParams.delete('tool');if(url.href!==window.location.href)window.history.replaceState(null,'',url.pathname+url.search+url.hash)},[active,projectId,visible])
+  const open=(id:string|null)=>{
+    setActive(id);setError('')
+    if(!projectId){const url=new URL(window.location.href);if(id)url.searchParams.set('tool',id);else url.searchParams.delete('tool');window.history.replaceState(null,'',url.pathname+url.search+url.hash)}
+  }
+  const create=async()=>{
+    if(writeLock.current)return;writeLock.current=true;setBusy(true);setError('')
+    const requestId=createRequest.current??(createRequest.current=crypto.randomUUID())
+    try{const tool=await api<LibraryTool>('/tool-library','POST',{requestId,kind:newKind,title:newTitle.trim()});createRequest.current=null;setCreating(false);setNewTitle('');open(tool.id)}
+    catch(cause){setError(cause instanceof Error?cause.message:'创建失败')}
+    finally{setBusy(false);writeLock.current=false}
+  }
+  const select=async(tool:ToolRef)=>{
+    if(!projectId||writeLock.current||onBeforeSelect?.()===false)return;const key=JSON.stringify(tool)
+    if(selectRequest.current&&selectRequest.current.key!==key){setError('上次选用结果尚未确认，请先重试同一工具。');return}
+    writeLock.current=true;setBusy(true);setError('');setNotice('')
+    const request=selectRequest.current?.key===key?selectRequest.current:{key,requestId:crypto.randomUUID()};selectRequest.current=request
+    try{
+      const result=await api<{instrumentIds:string[]}>('/tool-library/select/'+encodeURIComponent(projectId),'POST',{requestId:request.requestId,tool})
+      // ACK is final; list failure must never cause another selection with a fresh request.
+      setNotice(targetLabel?'已加入当前问卷（'+result.instrumentIds.length+' 个工具）。请核对顺序并保存波次草稿。':'已加入本研究（'+result.instrumentIds.length+' 个工具）。请在「发布与采集」选择并安排顺序。')
+      selectRequest.current=null
+      await onSelected?.(result.instrumentIds).catch(()=>{})
+    }catch(cause){setError(cause instanceof Error?cause.message:'选用失败')}
+    finally{setBusy(false);writeLock.current=false}
+  }
+  if(active&&!projectId)return <SurveyToolTemplateEditor id={active} onReturn={()=>open(null)} onLeaveRiskChange={onLeaveRiskChange}/>
+  return <section className={'survey-tool-library'+(projectId?' is-picker':'')} aria-label={projectId?'选用研究工具':'独立工具集'}>
+    <header className="survey-library-heading"><div><h1 id={projectId?'survey-tool-picker-heading':'survey-tools-heading'} tabIndex={-1}>{projectId?'选用研究工具':'工具集'}</h1><p>{projectId?'从工具集中选用；本研究保留选用时的内容修订。':'独立编制与管理工具，在不同研究中重复选用。'}</p></div>
+      {projectId?<button type="button" className="btn-secondary" onClick={onNavigateLibrary}>前往工具集 <ArrowRight size={16}/></button>:<button type="button" className="btn-primary" aria-expanded={creating} onClick={()=>setCreating(value=>!value)}><Plus size={17}/>编制工具</button>}
+    </header>
+    {!projectId&&creating&&<form className="survey-library-create" onSubmit={event=>{event.preventDefault();void create()}}><label>工具类型<select className="input" value={newKind} disabled={busy||!!createRequest.current} onChange={event=>setNewKind(event.target.value as LibraryTool['kind'])}><option value="FORM">表单 Form</option><option value="SCALE">量表 Scale</option><option value="COMPOSITION">普通组合问卷</option></select></label><label>工具名称<input className="input" required maxLength={200} value={newTitle} disabled={busy||!!createRequest.current} onChange={event=>setNewTitle(event.target.value)}/></label><button className="btn-primary" disabled={busy||!newTitle.trim()}>创建草稿</button><button type="button" className="btn-secondary" disabled={busy} onClick={()=>{if(!newTitle.trim()||window.confirm('放弃尚未创建的工具信息？')){setCreating(false);setNewTitle('');createRequest.current=null}}}>取消</button></form>}
+    <div className="survey-library-toolbar"><div className="survey-library-sources" role="group" aria-label="工具来源"><button type="button" aria-pressed={source==='owned'} onClick={()=>{setSource('owned');setPage(1)}}>我编制的</button><button type="button" aria-pressed={source==='granted'} onClick={()=>{setSource('granted');setPage(1)}}>已获授权</button></div>
+      {source==='owned'&&<><label className="survey-library-kind"><SlidersHorizontal size={16}/><select aria-label="筛选工具类型" value={kind} onChange={event=>{setKind(event.target.value);setPage(1)}}><option value="">全部类型</option><option value="FORM">表单</option><option value="SCALE">量表</option><option value="COMPOSITION">普通组合问卷</option></select></label><form role="search" onSubmit={event=>{event.preventDefault();setQuery(search.trim());setPage(1)}}><Search size={17}/><input aria-label="检索工具" placeholder="搜索工具名称" value={search} onChange={event=>setSearch(event.target.value)}/><button type="submit">检索</button></form></>}
+    </div>
+    {error&&<div role="alert" className="survey-library-error">{error}<button type="button" disabled={loading||busy} onClick={()=>setGeneration(value=>value+1)}>重新读取列表</button></div>}
+    {notice&&<p role="status" className="survey-library-notice">{notice}</p>}
+    {loading?<p role="status" className="survey-library-empty">正在读取工具…</p>:<div className="survey-library-grid">{source==='owned'?list.map(tool=>{const Icon=tool.kind==='FORM'?FileText:tool.kind==='SCALE'?SlidersHorizontal:Layers;return <article key={tool.id} className="survey-library-card"><div className="survey-library-card-top"><span><Icon size={17}/>{libraryKindLabel[tool.kind]}</span><small>我编制的</small></div><h2>{tool.title}</h2><p>{tool.kind==='COMPOSITION'?'按顺序组合已有工具，各测评分别处理结果。':tool.kind==='SCALE'?'维度、计分及原始分区间反馈。':'分页、题目与条件显示。'}</p><footer><span>修订 {tool.revision}</span>{projectId?<button className="btn-secondary" disabled={busy} onClick={()=>void select({source:'owned',id:tool.id,revision:tool.revision})}>{targetLabel||'加入本研究'} <ArrowRight size={16}/></button>:<button className="btn-secondary" onClick={()=>open(tool.id)}>编辑 <ArrowRight size={16}/></button>}</footer></article>}):grants.map(grant=><article key={grant.id} className="survey-library-card"><div className="survey-library-card-top"><span><Wrench size={17}/>{libraryKindLabel[grant.kind]}</span><small>已获授权</small></div><h2>{grant.title}</h2><p>原版固定版本 · {grant.sourceRef.sourceVersion}</p><details><summary>来源与使用限制</summary><SourceProvenance source={grant.sourceRef} provenance={grant.sourceProvenance}/></details><footer><span>内容与计分只读</span>{projectId?<button className="btn-secondary" disabled={busy} onClick={()=>void select({source:'granted',id:grant.id})}>{targetLabel||'加入本研究'} <ArrowRight size={16}/></button>:<span>进入研究后选用</span>}</footer></article>)}</div>}
+    {!loading&&!error&&(source==='owned'?!list.length:!grants.length)&&<div className="survey-library-empty"><Wrench size={28}/><h2>{source==='owned'?'暂无符合条件的工具':'暂无已授权工具'}</h2><p>{source==='owned'?(projectId?'前往工具集编制，或切换到已获授权。':'点击“编制工具”，创建第一份表单、量表或普通组合问卷。'):'由管理员按具体工具及版本授予使用权限。'}</p></div>}
+    <footer className="survey-library-pagination"><span>{source==='owned'?'共 '+total+' 项 · ':''}第 {page} 页</span><button className="btn-secondary" disabled={busy||loading||page<=1} onClick={()=>setPage(value=>value-1)}>上一页</button><button className="btn-secondary" disabled={busy||loading||(source==='owned'?page*12>=total:grants.length<25)} onClick={()=>setPage(value=>value+1)}>下一页</button></footer>
+    <details className="survey-library-help"><summary>选用、版本与开放范围说明</summary><p>工具集不属于任何具体研究。加入研究时复制保存的精确修订，后续工具集修改不影响已有研究。普通组合问卷不提供打包综合报告；选用后在发布与采集安排工具顺序和反馈策略。</p><p>表单、量表和普通组合问卷支持自建。SJT 与认知测验暂不开放自建，仅可按授权使用原版固定版本。授权撤销后不能继续导入或冻结新版本。</p></details>
+  </section>
+}

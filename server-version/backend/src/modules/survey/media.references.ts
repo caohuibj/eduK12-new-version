@@ -8,6 +8,8 @@ import { retainAssessmentAssetReferences } from '../assessment-media/assessment-
 import { ASSESSMENT_STATIC_IMAGE_MIME_TYPES } from '../assessment-media/assessment-image'
 import type { SurveyKind,FormDraft,AnySjtDraft } from './builder.definition'
 
+// Imported private images are retained for this exact same-owner destination.
+export const assetScope=(scopeId:string,toolLibrary=false)=>({OR:[{scopeId},{references:{some:{entityType:toolLibrary?'SurveyToolTemplate':'SurveyProject',entityId:scopeId,field:'tool-library'}}}]})
 type Tx=Prisma.TransactionClient
 export const surveyMaxImageBytes=2*1024*1024
 export const surveyMimeTypes=[...ASSESSMENT_STATIC_IMAGE_MIME_TYPES]
@@ -30,7 +32,7 @@ export const surveyImageRefs=(units:readonly UnitDef[]):ImageIdentity[]=>units.f
   return []
 })
 
-export async function assertSurveyMediaOwned(tx:Tx,userId:string,projectId:string,units:readonly UnitDef[]){
+export async function assertSurveyMediaOwned(tx:Tx,userId:string,projectId:string,units:readonly UnitDef[],toolLibrary=false){
   const nativeUnits:UnitDef[]=[]
   const libraryRefs:Array<{assetId:string;contentHash:string;mimeType:string}>=[]
   for(const unit of units){
@@ -45,7 +47,7 @@ export async function assertSurveyMediaOwned(tx:Tx,userId:string,projectId:strin
   const ids=[...new Set(refs.map(r=>r.asset.assetId))]
   if(!ids.length)return libraryRefs
   if(ids.length>30)fail(400,'单次研究发布最多引用 30 个静态图片')
-  const assets=await tx.storedAsset.findMany({where:{id:{in:ids},ownerId:userId,scopeId:projectId,
+  const assets=await tx.storedAsset.findMany({where:{id:{in:ids},ownerId:userId,...assetScope(projectId,toolLibrary),
     accessScope:'PRIVATE',deletedAt:null},select:{
     id:true,mimeType:true,sha256:true,sizeBytes:true,
   }})

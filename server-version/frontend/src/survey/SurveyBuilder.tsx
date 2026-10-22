@@ -1,3 +1,4 @@
+import {toolLibraryApi} from './tool-library-api'
 import { SurveySectionHeader } from './SurveySectionHeader'
 import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { ResearchCatalog, SourceProvenance, type CatalogGrant } from './ResearchCatalog'
@@ -55,17 +56,18 @@ const toolStatus=(status:string)=>({DRAFT:'草稿',PUBLISHED:'已发布',ARCHIVE
 const kindLabel:Record<Kind,string>={FORM:'表单',SCALE:'量表',SJT:'情境判断',COGNITIVE:'认知任务'}
 const directionLabel=(direction:string)=>({descriptive:'仅描述',higher_is_more:'越高代表越多',higher_is_better:'越高越好',higher_is_worse:'越高越差',bipolar:'双极方向'} as Record<string,string>)[direction]||direction
 export type BuilderLeaveRisk={dirty:boolean;busy:boolean}
-export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary,onLeaveRiskChange}:{projectId:string;projectStatus?:string;instrumentLibrary?:InstrumentLibrary;onLeaveRiskChange?:(risk:BuilderLeaveRisk)=>void}){
+export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary,onLeaveRiskChange,legacyOnly=false}:{projectId:string;projectStatus?:string;legacyOnly?:boolean;instrumentLibrary?:InstrumentLibrary;onLeaveRiskChange?:(risk:BuilderLeaveRisk)=>void}){
   const prefix='/projects/'+encodeURIComponent(projectId)+'/instruments'
   const {list:instruments,page:instrumentPage,refresh:refreshList,error:listError,loading:listLoading}=useInstrumentLibrary(projectId,instrumentLibrary)
   const [active,setActive]=useState<ResearchDraft|null>(null),[dirty,setDirty]=useState(false)
   const licensedReadOnly=Boolean(active?.readOnly||active?.catalogGrantId)
-  const readOnly=licensedReadOnly||active?.status==='PUBLISHED'
+  const readOnly=legacyOnly||licensedReadOnly||active?.status==='PUBLISHED'
   const measurementWritable=['DRAFT','ACTIVE'].includes(projectStatus)
   const [publishedReleaseId,setPublishedReleaseId]=useState('')
   const [showLibrarySubmission,setShowLibrarySubmission]=useState(false)
   const editGeneration=useRef(0)
   const editorRoot=useRef<HTMLDivElement>(null)
+  const libraryCopyRequest=useRef<{key:string;id:string}|null>(null)
   const [apiIssues,setApiIssues]=useState<AuthoringIssue[]>([])
   const [newKind,setNewKind]=useState<Kind>('FORM'),[newTitle,setNewTitle]=useState('')
   const [leaveBusy,setLeaveBusy]=useState(false)
@@ -102,6 +104,12 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
       setActive(r);setDirty(false);clearReview()
     },false)
   }
+  const saveToLibrary=()=>{if(!active)return;void run(async()=>{
+    const key=active.id+':'+active.revision
+    const request=libraryCopyRequest.current?.key===key?libraryCopyRequest.current:{key,id:crypto.randomUUID()};libraryCopyRequest.current=request
+    await toolLibraryApi('/tool-library/from-project/'+encodeURIComponent(projectId)+'/'+encodeURIComponent(active.id),'POST',{requestId:request.id})
+    setNotice('已存入首页工具集，可独立编制并用于其他研究；本研究保持原样。')
+  })}
   const create=(event:FormEvent)=>{event.preventDefault();void run(async()=>{
     if((dirty||!!bulkText.trim())&&!window.confirm('当前草稿存在未保存内容。确定放弃并创建另一份研究工具？'))return
     const item=await api<ResearchDraft>(prefix,'POST',{
@@ -239,18 +247,18 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
     })
   }
   return <section className="survey-builder-shell survey-studio-surface bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="Survey Research Builder">
-    <SurveySectionHeader section="tools" title="研究工具">
+    {!legacyOnly&&<SurveySectionHeader section="tools" title="研究工具">
       <p className="text-sm text-slate-600">创建表单、心理量表、情境测验和受控认知任务。自编工具默认私有，供本项目使用；量表可另行申请进入共用库，须经系统管理员审批。</p>
-    </SurveySectionHeader>
+    </SurveySectionHeader>}
     {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{apiIssues.length?'工具还有待修正字段，请按下方提示定位。':error}</p>}
     {active&&<ResearchIssueList draft={active} issues={apiIssues} onLocate={locateIssue}/>}
-    <ResearchAuthoringGuide/>
+    {!legacyOnly&&<ResearchAuthoringGuide/>}
     {listError&&<div role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{listError}
       <button type="button" className="btn-secondary" disabled={listLoading} onClick={()=>void run(()=>refreshList(instrumentPage),false)}>重试研究工具列表</button></div>}
     {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}
     <fieldset disabled={busy} className="min-w-0 border-0 p-0 space-y-5" aria-label="研究工具操作">
-    <a className="survey-catalog-jump" href="#survey-tool-navigation">查看当前工具属性与题目导航</a>
-    <form id="survey-tool-create" tabIndex={-1} className="survey-tool-create survey-task-card flex flex-wrap gap-3 items-end" onSubmit={create}>
+    {!legacyOnly&&<a className="survey-catalog-jump" href="#survey-tool-navigation">查看当前工具属性与题目导航</a>}
+    {!legacyOnly&&<form id="survey-tool-create" tabIndex={-1} className="survey-tool-create survey-task-card flex flex-wrap gap-3 items-end" onSubmit={create}>
       <div className="survey-task-caption"><h3>新建自编工具</h3><p>选择类型并命名，建立草稿后再编制题目。</p></div>
       <label className="text-sm">工具类型
         <select className="input block" value={newKind} onChange={e=>setNewKind(e.target.value as Kind)}>
@@ -260,12 +268,12 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
         <input className="input block w-full" required maxLength={200} value={newTitle}
           onChange={e=>setNewTitle(e.target.value)} placeholder="如：学习动机前测"/></label>
       <button disabled={busy||!newTitle.trim()} className="btn-primary">创建草稿</button>
-    </form>
+    </form>}
     <div id="survey-tool-editor" tabIndex={-1} className="survey-tool-layout grid md:grid-cols-[220px_minmax(0,1fr)] xl:grid-cols-[200px_minmax(0,1fr)_250px] gap-5">
       <nav aria-label="当前项目研究工具" className="survey-tool-rail space-y-2">
         <h3 className="font-semibold text-sm">工具列表</h3>
         {listLoading&&<p role="status" className="text-sm">正在加载研究工具…</p>}
-        {!listLoading&&!listError&&!instruments.length&&<p className="text-sm text-slate-500">本页暂无工具。可在上方创建草稿，或前往下方授权目录导入。</p>}
+        {!listLoading&&!listError&&!instruments.length&&<p className="text-sm text-slate-500">本页暂无工具。可从工具集加入本研究。</p>}
         <div className="survey-rail-pagination mb-3">
           <button type="button" className="btn-secondary" disabled={busy||instrumentPage<=1}
             onClick={()=>void run(()=>refreshList(instrumentPage-1),false)}>上一页</button>
@@ -281,7 +289,7 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
         </button>)}
       </nav>
       <div className="min-w-0 space-y-4">
-      {!active&&<div className="survey-task-empty"><h3>从左侧选择工具，开始编制</h3><p>还没有工具？可在上方创建草稿，或到授权目录导入原版工具。</p><ol><li>编辑题目并保存草稿</li><li>完成结构检查与模拟作答</li><li>到发布与采集分区选择工具、冻结波次</li></ol></div>}
+      {!active&&<div className="survey-task-empty"><h3>从左侧选择已加入的工具</h3><p>新工具请到首页工具集编制，再加入本研究。</p>{legacyOnly?<p>这里仅查看选用内容。需要修订时，先存入独立工具集，再将新修订加入问卷。</p>:<ol><li>编辑题目并保存草稿</li><li>完成结构检查与模拟作答</li><li>到发布与采集分区选择工具、冻结波次</li></ol>}</div>}
       {active&&<><div className="rounded-xl bg-slate-50 border p-4 space-y-3">
         <p className="text-xs">{displayKind[active.kind]} · 工具标识 <code>{active.instrumentKey}</code> · 修订 {active.revision} {dirty?'· 未保存':''}</p>
         {licensedReadOnly&&<SourceProvenance provenance={active.sourceProvenance}/>}
@@ -292,9 +300,10 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
             setActive(d=>d?{...d,title:e.target.value}:d);setDirty(true);setPreview(null);setApiIssues([])
           }}/></label>
         <div className="flex flex-wrap gap-2">
+          {legacyOnly&&!licensedReadOnly&&['FORM','SCALE'].includes(active.kind)&&<button className="btn-secondary" type="button" disabled={busy||dirty} onClick={saveToLibrary}>存入独立工具集</button>}
           {!readOnly&&<button className="btn-primary" type="button" disabled={busy||!dirty||active.status==='ARCHIVED'} onClick={save}>保存草稿</button>}
           {!readOnly&&<button className="btn-secondary" type="button" disabled={busy||dirty} onClick={validate}>结构检查与编译预览</button>}
-          <button className="btn-secondary" type="button" disabled={busy||dirty} onClick={duplicate}>复制为新工具</button>
+          {!legacyOnly&&<button className="btn-secondary" type="button" disabled={busy||dirty} onClick={duplicate}>复制为新工具</button>}
           <button className="btn-secondary" type="button" disabled={busy||dirty||active.status==='ARCHIVED'} onClick={archive}>归档</button>
           {undo&&<button className="btn-secondary" type="button" disabled={busy||dirty} onClick={undoImport}>撤销本次导入</button>}
         </div>
@@ -307,12 +316,13 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
         </section>}
         {active.kind==='SCALE'&&!licensedReadOnly&&<>
           <SurveyScaleVersions key={active.id+'-'+active.revision+'-'+active.status} projectId={projectId} draft={active} transport={api}/>
-          {active.status==='PUBLISHED'&&<><p className="text-sm text-sky-900">已发布版本只读。修订会建立下一版本草稿，不覆盖原发布版本。</p><button type="button" className="btn-primary" disabled={busy||dirty||!measurementWritable} onClick={revise}>修订新版本</button></>}
+          {!legacyOnly&&active.status==='PUBLISHED'&&<><p className="text-sm text-sky-900">已发布版本只读。修订会建立下一版本草稿，不覆盖原发布版本。</p><button type="button" className="btn-primary" disabled={busy||dirty||!measurementWritable} onClick={revise}>修订新版本</button></>}
           <button type="button" className="btn-secondary" onClick={()=>setShowLibrarySubmission(value=>!value)}>{showLibrarySubmission?'收起共用库申请':'申请进入共用库'}</button>
           {showLibrarySubmission&&<SurveyScaleLibrarySubmission key={active.id} sourceId={active.id}/>}
         </>}
         {dirty&&<p className="text-xs text-amber-700">请先保存。若另一个标签已经更新，服务器将拒绝旧 revision 的覆盖，本地内容不会被自动清除。</p>}
       </div>
+      {legacyOnly&&['FORM','SCALE'].includes(active.kind)&&<details className="survey-library-help"><summary>查看选用内容（只读）</summary><ResearchPreview draft={active} hideSimulation onSimulate={()=>{}}/></details>}
       {!readOnly&&active.status==='DRAFT'&&<div ref={editorRoot} id="survey-authoring-definition" tabIndex={-1} className="survey-authoring-target">
         {active.kind==='FORM'&&<ResearchFormEditor key={active.id} value={active.definition as FormDraft} onChange={change} projectId={projectId}/>}
         {active.kind==='SCALE'&&<ResearchScaleEditor key={active.id} value={active.definition as ScaleDraft} onChange={change} projectId={projectId}/>}
@@ -376,7 +386,7 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
       </div>
       <aside aria-label="研究工具属性与题目导航"
         id="survey-tool-navigation" tabIndex={-1} className="survey-tool-navigation min-w-0 self-start rounded-xl bg-slate-50 border p-4">
-        <details open><summary className="font-semibold">属性与题目导航（可收起）</summary>
+        <details><summary className="font-semibold">属性与题目导航</summary>
         <div className="space-y-3">
         {!active&&<p className="text-xs text-slate-600">选择工具后显示其内容结构和保存状态。</p>}
         {active&&<>
@@ -425,7 +435,7 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
         </div></details>
       </aside>
     </div>
-    <ResearchCatalog projectId={projectId} api={api} busy={busy} onImport={importCatalog}/>
+    {!legacyOnly&&<ResearchCatalog projectId={projectId} api={api} busy={busy} onImport={importCatalog}/>}
     </fieldset>
   </section>
 }
