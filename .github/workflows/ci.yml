@@ -374,10 +374,13 @@ jobs:
           node --input-type=module <<'JS'
           import {appendFileSync} from 'node:fs';
           import {changedEntries,classifyChanges} from './.github/scripts/content-scope.mjs';
+          import {trainingFollowupPlan} from './.github/scripts/training-followup-scope.mjs';
+          import {execFileSync} from 'node:child_process';
           import {toolingOnly} from './server-version/scripts/release/policy.mjs';
           const entries=process.env.CI_EVENT==='workflow_dispatch'?[]:changedEntries(process.env.CI_BASE_SHA);
           const docs=classifyChanges(entries,process.env.CI_FORCE_FULL==='true').documentation;
-          const lightweight=process.env.CI_FORCE_FULL!=='true' && (docs||toolingOnly(entries));
+          const followup=process.env.CI_EVENT==='pull_request' && trainingFollowupPlan(entries,process.env.CI_BASE_SHA,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+          const lightweight=process.env.CI_FORCE_FULL!=='true' && (docs||toolingOnly(entries)||Boolean(followup));
           appendFileSync(process.env.GITHUB_OUTPUT,`documentation=${docs}\nlightweight=${lightweight}\n`);
           JS
       - name: install pinned release classification tools
