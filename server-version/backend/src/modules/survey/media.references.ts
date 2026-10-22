@@ -8,8 +8,9 @@ import { retainAssessmentAssetReferences } from '../assessment-media/assessment-
 import { ASSESSMENT_STATIC_IMAGE_MIME_TYPES } from '../assessment-media/assessment-image'
 import type { SurveyKind,FormDraft,AnySjtDraft } from './builder.definition'
 
-// Imported private images are retained for this exact same-owner destination.
-export const assetScope=(scopeId:string,toolLibrary=false)=>({OR:[{scopeId},{references:{some:{entityType:toolLibrary?'SurveyToolTemplate':'SurveyProject',entityId:scopeId,field:'tool-library'}}}]})
+// Project/tool imports stay scoped. Independent library images are reusable only
+// with the same ownerId and PRIVATE filters enforced by every caller.
+export const assetScope=(scopeId:string,toolLibrary=false)=>({OR:[{scopeId},{references:{some:{entityType:toolLibrary?'SurveyToolTemplate':'SurveyProject',entityId:scopeId,field:'tool-library'}}},{references:{some:{entityType:'SurveyResearcherMedia',field:'library'}}}]})
 type Tx=Prisma.TransactionClient
 export const surveyMaxImageBytes=2*1024*1024
 export const surveyMimeTypes=[...ASSESSMENT_STATIC_IMAGE_MIME_TYPES]

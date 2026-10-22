@@ -1,10 +1,10 @@
-import { Database, FolderOpen, Wrench } from 'lucide-react'
+import { Images, FolderOpen, Wrench } from 'lucide-react'
 
-export type ResearchArea='studies'|'tools'|'datasets'
+export type ResearchArea='studies'|'tools'|'media'
 const areas=[
   ['studies','/workspace','我的研究',FolderOpen],
   ['tools','/workspace/tools','工具集',Wrench],
-  ['datasets','/workspace/datasets','数据集',Database],
+  ['media','/workspace/media','素材库',Images],
 ] as const
 
 export function SurveyResearchNavigation({active,onNavigate}:{active:ResearchArea;onNavigate:(area:ResearchArea,path:string)=>void}){
@@ -15,13 +15,4 @@ export function SurveyResearchNavigation({active,onNavigate}:{active:ResearchAre
         event.preventDefault();onNavigate(key,path)
       }}><Icon size={20} strokeWidth={1.6} aria-hidden="true"/>{label}</a>)}
   </nav>
-}
-
-export function SurveyResearchPlaceholder({area}:{area:Exclude<ResearchArea,'studies'>}){
-  const Icon=area==='tools'?Wrench:Database
-  return <section className="survey-research-placeholder" aria-labelledby={'survey-'+area+'-heading'}>
-    <span className="survey-placeholder-icon"><Icon size={32} strokeWidth={1.3} aria-hidden="true"/></span>
-    <h1 id={'survey-'+area+'-heading'} tabIndex={-1}>{area==='tools'?'工具集':'数据集'}</h1>
-    <p>内容即将加入</p>
-  </section>
 }

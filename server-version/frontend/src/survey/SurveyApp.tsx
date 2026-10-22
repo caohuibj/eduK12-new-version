@@ -1,4 +1,5 @@
 import {SurveyToolLibrary} from './SurveyToolLibrary'
+import {SurveyMaterialLibrary} from './SurveyMaterialLibrary'
 import './survey-sections.css'
 import { surveyAdminLoginUrl } from '../products/origins'
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
@@ -19,7 +20,7 @@ import { surveyFeatures } from './survey-features'
 import { SurveyProjectDirectory, type SurveyProject as Project } from './SurveyProjectDirectory'
 import { SurveyResearcherAccount } from './SurveyResearcherAccount'
 import { SurveyCreateProjectDialog } from './SurveyCreateProjectDialog'
-import { SurveyResearchNavigation, SurveyResearchPlaceholder, type ResearchArea } from './SurveyResearchNavigation'
+import { SurveyResearchNavigation, type ResearchArea } from './SurveyResearchNavigation'
 
 type Envelope<T>={code:number|string;message:string;data:T}
 type Researcher={id:string;username:string;mustChangePassword:boolean}
@@ -44,7 +45,7 @@ async function api<T>(path:string,method='GET',body?:unknown):Promise<T>{
   return envelope.data
 }
 const readInvite=()=>new URLSearchParams(window.location.hash.slice(1)).get('token')||''
-const readResearchArea=():ResearchArea=>window.location.pathname==='/workspace/tools'?'tools':window.location.pathname==='/workspace/datasets'?'datasets':'studies'
+const readResearchArea=():ResearchArea=>window.location.pathname==='/workspace/tools'?'tools':['/workspace/media','/workspace/datasets'].includes(window.location.pathname)?'media':'studies'
 const readStudyLocation=()=>{
   const params=new URLSearchParams(window.location.search),section=params.get('section')
   return {id:window.location.pathname==='/workspace'?params.get('project'):null,
@@ -78,6 +79,9 @@ export default function SurveyApp(){
   const [editorOpen,setEditorOpen]=useState(false)
   const [researchArea,setResearchArea]=useState<ResearchArea>(readResearchArea)
   const [toolLibraryVisited,setToolLibraryVisited]=useState(()=>readResearchArea()==='tools')
+  const [materialLibraryVisited,setMaterialLibraryVisited]=useState(()=>readResearchArea()==='media')
+  const materialLibraryRisk=useRef<BuilderLeaveRisk>({dirty:false,busy:false})
+  const materialLibraryRiskChanged=useCallback((risk:BuilderLeaveRisk)=>{materialLibraryRisk.current=risk},[])
   const toolLibraryRisk=useRef<BuilderLeaveRisk>({dirty:false,busy:false})
   const toolLibraryRiskChanged=useCallback((risk:BuilderLeaveRisk)=>{toolLibraryRisk.current=risk},[])
   const projectCreationRequestId=useRef<string|null>(null)
@@ -108,7 +112,7 @@ export default function SurveyApp(){
   useEffect(()=>{
     const warn=(event:BeforeUnloadEvent)=>{
       const report=reportLeaveRisk.current,builder=builderLeaveRisk.current
-      if(screen==='work'&&(toolLibraryRisk.current.dirty||toolLibraryRisk.current.busy||settingsDirty||builder.dirty||builder.busy||report.dirty||report.pending||report.busy||writeBusy)){
+      if(screen==='work'&&(materialLibraryRisk.current.dirty||materialLibraryRisk.current.busy||toolLibraryRisk.current.dirty||toolLibraryRisk.current.busy||settingsDirty||builder.dirty||builder.busy||report.dirty||report.pending||report.busy||writeBusy)){
         event.preventDefault();event.returnValue=''
       }
     }
@@ -227,8 +231,11 @@ export default function SurveyApp(){
     }else element?.scrollIntoView?.({block:'start'})
   }),[])
   const navigateResearchArea=(area:ResearchArea,path:string)=>{
+    if(materialLibraryRisk.current.busy){setError('素材操作正在进行，请等待结果确认后再离开。');return}
+    if(materialLibraryRisk.current.dirty&&!window.confirm('素材库有未保存的修改或待上传文件，确定离开？'))return
     setResearchArea(area)
     if(area==='tools')setToolLibraryVisited(true)
+    if(area==='media')setMaterialLibraryVisited(true)
     if(area==='studies')setEditorOpen(false)
     if(window.location.pathname!==path||window.location.hash)window.history.pushState(null,'',path)
     focusSection(area==='studies'?'survey-projects-heading':'survey-'+area+'-heading')
@@ -240,6 +247,7 @@ export default function SurveyApp(){
       if(area===researchArea)return
       setResearchArea(area)
       if(area==='tools')setToolLibraryVisited(true)
+      if(area==='media')setMaterialLibraryVisited(true)
       if(area==='studies')setEditorOpen(false)
       focusSection(area==='studies'?'survey-projects-heading':'survey-'+area+'-heading')
     }
@@ -401,7 +409,7 @@ export default function SurveyApp(){
               研究数据分析暂未在当前环境启用；项目和研究工具仍可使用。
             </section>}</div></>}</div></div>
         {toolLibraryVisited&&<div hidden={researchArea!=='tools'}><SurveyToolLibrary visible={researchArea==='tools'} onLeaveRiskChange={toolLibraryRiskChanged}/></div>}
-        {researchArea==='datasets'&&<SurveyResearchPlaceholder area="datasets"/>}
+        {materialLibraryVisited&&<div hidden={researchArea!=='media'}><SurveyMaterialLibrary visible={researchArea==='media'} onLeaveRiskChange={materialLibraryRiskChanged}/></div>}
         <SurveyCreateProjectDialog open={creating} busy={busy} title={title} description={description} mode={mode} error={error}
           onTitle={setTitle} onDescription={setDescription} onMode={setMode} onClose={returnToProjects} onSubmit={createProject}/>
       </div>}

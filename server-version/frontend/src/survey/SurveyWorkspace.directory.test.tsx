@@ -17,7 +17,7 @@ beforeEach(()=>{
   vi.stubGlobal('fetch',vi.fn((url:string)=>{
     if(url.endsWith('/auth/me'))return reply({id:'r',username:'研究者',mustChangePassword:false})
     if(url.endsWith('/auth/capabilities'))return reply({analytics:true,publication:true})
-    if(url.includes('/tool-library?'))return reply({list:[],total:0})
+    if(url.includes('/tool-library?')||url.includes('/media-library?'))return reply({list:[],total:0})
     if(url.includes('/projects?page='))return reply({list:projects})
     throw new Error('Unexpected request '+url)
   }))
@@ -169,7 +169,7 @@ describe('Survey researcher directory and editing context',()=>{
     render(<SurveyApp/>)
     await screen.findByRole('heading',{name:'研究工作台'})
     const navigation=screen.getByRole('navigation',{name:'研究工作台导航'})
-    expect(within(navigation).getAllByRole('link').map(link=>link.textContent)).toEqual(['我的研究','工具集','数据集'])
+    expect(within(navigation).getAllByRole('link').map(link=>link.textContent)).toEqual(['我的研究','工具集','素材库'])
     expect(within(navigation).getByRole('link',{name:'我的研究'})).toHaveAttribute('aria-current','page')
     fireEvent.click(screen.getByRole('button',{name:'研究检索'}))
     fireEvent.change(screen.getByRole('searchbox',{name:'筛选本页研究'}),{target:{value:'学习'}})
@@ -181,9 +181,9 @@ describe('Survey researcher directory and editing context',()=>{
     expect(await screen.findByRole('heading',{name:'工具集'})).toBeVisible()
     expect(window.location.pathname).toBe('/workspace/tools')
     expect(within(navigation).getByRole('link',{name:'工具集'})).toHaveAttribute('aria-current','page')
-    fireEvent.click(within(navigation).getByRole('link',{name:'数据集'}))
-    expect(await screen.findByRole('heading',{name:'数据集'})).toBeVisible()
-    expect(window.location.pathname).toBe('/workspace/datasets')
+    fireEvent.click(within(navigation).getByRole('link',{name:'素材库'}))
+    expect(await screen.findByRole('heading',{name:'素材库'})).toBeVisible()
+    expect(window.location.pathname).toBe('/workspace/media')
     window.history.replaceState(null,'','/workspace/tools')
     fireEvent.popState(window)
     expect(await screen.findByRole('heading',{name:'工具集'})).toBeVisible()
@@ -193,22 +193,22 @@ describe('Survey researcher directory and editing context',()=>{
     fireEvent.click(screen.getByRole('button',{name:'查看/编辑'}))
     expect(screen.getByRole('tab',{name:'发布与采集'})).toHaveAttribute('aria-selected','true')
     expect(screen.getByLabelText('研究名称')).toHaveValue('未保存的名称')
-    expect(vi.mocked(fetch).mock.calls).toHaveLength(requests+1)
+    expect(vi.mocked(fetch).mock.calls).toHaveLength(requests+2)
     expect(vi.mocked(fetch).mock.calls.filter(([url])=>String(url).includes('/tool-library?'))).toHaveLength(1)
     expect(confirm).not.toHaveBeenCalled()
   })
 
-  it.each([['tools','工具集'],['datasets','数据集']])('opens the authenticated %s page directly',async(area,label)=>{
+  it.each([['tools','工具集'],['media','素材库'],['datasets','素材库']])('opens the authenticated %s page directly',async(area,label)=>{
     window.history.replaceState(null,'','/workspace/'+area)
     render(<SurveyApp/>)
     expect(await screen.findByRole('heading',{name:label})).toBeVisible()
     if(area==='tools')expect(screen.getByRole('button',{name:'编制工具'})).toBeVisible()
-    else expect(screen.getByText('内容即将加入')).toBeVisible()
+    else expect(screen.getByRole('group',{name:'素材类型'})).toBeVisible()
     expect(screen.queryByRole('button',{name:'新建研究'})).not.toBeInTheDocument()
     expect(within(screen.getByRole('navigation',{name:'研究工作台导航'})).getByRole('link',{name:label})).toHaveAttribute('aria-current','page')
   })
 
-  it.each(['tools','datasets'])('keeps direct %s access behind researcher authentication',async area=>{
+  it.each(['tools','media','datasets'])('keeps direct %s access behind researcher authentication',async area=>{
     window.history.replaceState(null,'','/workspace/'+area)
     vi.stubGlobal('fetch',vi.fn(()=>reply(null,false)))
     render(<SurveyApp/>)
