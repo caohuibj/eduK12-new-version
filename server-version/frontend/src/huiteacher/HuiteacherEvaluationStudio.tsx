@@ -9,6 +9,8 @@ const mergeRows=<T extends {id:string}>(old:T[],next:T[])=>Array.from(new Map([.
 type Target={id:string;name:string;kind:string;status:string;subjectUserId:string|null}
 type Event={id:string;targetId:string;kind:string;title:string;status:string;version:number}
 type Run={eventId:string;runId:string;status:string;version:number;name?:string;trackCount?:number}
+type RunPreview={runId:string;version:number;tracks:Array<{trackId:string;executionCount:number;subjectCount:number;respondentCount:number;resourcePolicy:unknown}>}
+type PreviewSnapshot={data:RunPreview;base:string;api:Api;actorKey:string;eventVersion:number;eventStatus:string}
 type Form={id:string;title:string;definitionDigest:string;status:'PUBLISHED'|'DRAFT'}
 type TeacherScale={id:string;key:string;version:string;title:string;hash:string;
   visibilityPolicyKey?:string;personalReportAvailable?:boolean}
@@ -52,6 +54,12 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
   const [targets,setTargets]=useState<Target[]>([])
   const [events,setEvents]=useState<Event[]>([])
   const [runMap,setRunMap]=useState<Record<string,Run>>({})
+  const [previews,setPreviews]=useState<Record<string,PreviewSnapshot>>({})
+  const previewEpoch=useRef(0)
+  const previewContext=useRef({base,api,actorKey,events,runMap})
+  previewContext.current={base,api,actorKey,events,runMap}
+  const invalidatePreviews=()=>{previewEpoch.current++;setPreviews({})}
+  const privateBusy=(value:boolean)=>{if(value)invalidatePreviews();setWorking(value)}
   const [releasedForms,setReleasedForms]=useState<Form[]>([])
   const [releasedScales,setReleasedScales]=useState<Record<string,TeacherScale[]>>({})
   const [scaleCursor,setScaleCursor]=useState<Record<string,string|null>>({})
@@ -113,6 +121,7 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
   useEffect(()=>{
     const generation=++scopeGeneration.current
     setTargets([]);setEvents([]);setTargetCursor(null);setEventCursor(null)
+    previewEpoch.current++;setPreviews({})
     setRunMap({});setProgress({});setReports({});setReleasedForms([]);setReleasedScales({})
     setScaleChoice({});setScaleCursor({});setScaleLoading({});setScaleError({});scaleRequest.current={}
     setFormChoice({});setEventTargetId('');setNotice('');setFormsError('')
@@ -124,10 +133,12 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     })
     return ()=>{scopeGeneration.current++}
   },[base,api,loadTargets,loadEvents])
+  useEffect(()=>{previewEpoch.current++;setPreviews({})},[actorKey])
   const actionPending=useRef(false)
   const perform=(fn:()=>Promise<void>)=>{
     if(actionPending.current)return
     actionPending.current=true
+    invalidatePreviews()
     setWorking(true);setNotice('')
     void fn().catch(e=>setNotice(e instanceof Error?e.message:'操作失败'))
       .finally(()=>{actionPending.current=false;setWorking(false)})
@@ -162,8 +173,9 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     setFormsError('');setNotice('已刷新本校已发布表单；未完成授权的资源不会进入正式任务。')
   })
   const fetchRun=async(event:Event)=>{
+    const generation=scopeGeneration.current
     const run=await api<Run>(base+'/evaluation-events/'+event.id+'/run')
-    setRunMap(old=>({...old,[event.id]:run}))
+    if(generation===scopeGeneration.current&&previewContext.current.base===base&&previewContext.current.api===api) setRunMap(old=>({...old,[event.id]:run}))
     return run
   }
   const reloadScales=async(event:Event,cursor?:string)=>{
@@ -235,15 +247,25 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
     setNotice('教师群体表单已加入评价任务；完成后只公开达到隐私阈值的群体描述统计。')
   })
   const previewRun=(event:Event)=>perform(async()=>{
+    const token=previewEpoch.current
+    const current=()=>{const context=previewContext.current;const latest=context.events.find(row=>row.id===event.id)
+      return token===previewEpoch.current&&context.base===base&&context.api===api&&context.actorKey===actorKey&&latest?.version===event.version&&latest.status===event.status}
     const run=await fetchRun(event)
-    await api(base+'/evaluation-events/'+event.id+'/run/preview','POST',
-      {expectedVersion:run.version})
-    setNotice('本次任务的参与资格、版本及内容策略已完成预览。')
+    if(!current())return
+    const data=await api<RunPreview>(base+'/evaluation-events/'+event.id+'/run/preview','POST',
+      {expectedVersion:run.version}).catch(error=>{if(current())throw error;return null})
+    if(!current()||!data)return
+    const latest=previewContext.current.runMap[event.id]
+    if(latest?.runId!==run.runId||latest.version!==run.version||latest.status!=='DRAFT')return
+    if(data.runId!==run.runId||data.version!==run.version||!Array.isArray(data.tracks)||data.tracks.some(track=>
+      !track.trackId||[track.executionCount,track.subjectCount,track.respondentCount].some(count=>!Number.isSafeInteger(count)||count<0)))throw new Error('预览版本或人数响应无效，请重新预览任务配置。')
+    setPreviews(old=>({...old,[event.id]:{data,base,api,actorKey,eventVersion:event.version,eventStatus:event.status}}))
+    setNotice('预览已生成，人数以对应工具为单位；发布时仍会重新校验当前资格。')
   })
   const publishRun=(event:Event)=>perform(async()=>{
     const run=await fetchRun(event)
     if(event.status!=='OPEN')throw new Error('请先开放评价活动')
-    if(!window.confirm('确认向本校当前符合资格的教师分配 Form 任务吗？'))return
+    if(!window.confirm('确认按当前固定版本配置，向本校符合资格的教师分配测评任务吗？发布时将重新校验参与资格。'))return
     const publication=await api<{executionCount:number;version:number}>(
       base+'/evaluation-events/'+event.id+'/run/publish','POST',
       {expectedVersion:run.version})
@@ -367,13 +389,21 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
       </div>
       {runMap[event.id]&&<div>
         <p>任务状态：{statusLabel(runMap[event.id].status)} · 已配置工具 {runMap[event.id].trackCount??0} 项</p>
+        {(()=>{const snapshot=previews[event.id],run=runMap[event.id]
+          if(!snapshot||snapshot.base!==base||snapshot.api!==api||snapshot.actorKey!==actorKey||snapshot.eventVersion!==event.version||snapshot.eventStatus!==event.status||snapshot.data.runId!==run.runId||snapshot.data.version!==run.version||run.status!=='DRAFT')return null
+          return <section className="ht-panel" aria-label="任务配置预览"><h4>任务配置预览 · 版本 {snapshot.data.version}</h4>
+            <p>预计作答任务：{snapshot.data.tracks.reduce((total,track)=>total+track.executionCount,0)} 个</p>
+            <p className="ht-muted">人数仅在各工具内去重，同一教师可能参与多个工具；不将各工具人数相加视为独立人数。发布时仍会重新校验资格。</p>
+            <ul>{snapshot.data.tracks.map((track,index)=><li key={track.trackId}>工具 {index+1}：被测者 {track.subjectCount} 人 · 作答者 {track.respondentCount} 人 · 作答任务 {track.executionCount} 个</li>)}</ul>
+          </section>
+        })()}
         <details><summary>任务技术详情</summary><p>Assessment Run：<code>{runMap[event.id].runId}</code> · {runMap[event.id].status} · Track 数量：{runMap[event.id].trackCount??0}</p></details>
         {runMap[event.id].status==='DRAFT'&&<>
           {canAuthorPrivateTools&&actorKey&&<EducationPrivateScalePicker
             key={`private:${actorKey}:${organizationId}:${event.id}:${runMap[event.id].runId}`}
             entry="TEACHER" organizationId={organizationId} actorKey={actorKey} scopeKey={`${event.id}:${runMap[event.id].runId}`}
             api={api} endpoint={base+'/evaluation-events/'+event.id+'/run/tracks'} expectedVersion={runMap[event.id].version}
-            disabled={working} onBusy={setWorking} onRefresh={async()=>{
+            disabled={working} onBusy={privateBusy} onRefresh={async()=>{
               const generation=scopeGeneration.current
               const run=await api<Run>(base+'/evaluation-events/'+event.id+'/run')
               if(generation===scopeGeneration.current&&scaleScope.current.base===base&&scaleScope.current.api===api)setRunMap(old=>({...old,[event.id]:run}))
@@ -382,7 +412,7 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
             key={`private-form:${actorKey}:${organizationId}:${event.id}:${runMap[event.id].runId}`}
             entry="TEACHER" organizationId={organizationId} actorKey={actorKey} scopeKey={`${event.id}:${runMap[event.id].runId}`}
             api={api} endpoint={base+'/evaluation-events/'+event.id+'/run/tracks'} expectedVersion={runMap[event.id].version}
-            disabled={working} onBusy={setWorking} onRefresh={async()=>{
+            disabled={working} onBusy={privateBusy} onRefresh={async()=>{
               const generation=scopeGeneration.current
               const run=await api<Run>(base+'/evaluation-events/'+event.id+'/run')
               if(generation===scopeGeneration.current&&scaleScope.current.base===base&&scaleScope.current.api===api)setRunMap(old=>({...old,[event.id]:run}))
