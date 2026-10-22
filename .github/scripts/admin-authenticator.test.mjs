@@ -1,3 +1,4 @@
+import {verifyOfficialSource} from './admin-authenticator-reuse.mjs';
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {readFileSync} from 'node:fs';
@@ -42,6 +43,15 @@ test('admits 83 unique historical assertions, never the 12 filtered ones',()=>{
 });
 test('altered historical reports cannot be admitted',()=>assert.throws(()=>verifyLocalReports(name=>Buffer.concat([readFileSync('.github/evidence/admin-authenticator/'+name),Buffer.from(' ')]))));
 test('workflow has no duplicated application tests or production image claim',()=>{
- const ci=readFileSync('.github/workflows/ci-admin-authenticator.yml','utf8');assert.ok(!ci.includes('vitest'));assert.ok(ci.includes('npm audit --omit=dev --audit-level=high'));assert.ok(ci.includes('prisma migrate deploy'));assert.ok(ci.includes('tsc'));assert.ok(ci.includes('deploymentImageQualified:false'));
+ const ci=readFileSync('.github/workflows/ci-admin-authenticator.yml','utf8');assert.ok(!ci.includes('vitest'));assert.ok(ci.includes('node .github/scripts/admin-authenticator-reuse.mjs'));assert.ok(!ci.includes('vite build'));assert.ok(!ci.includes('prisma migrate deploy'));
  const main=readFileSync('.github/workflows/ci.yml','utf8');assert.ok(main.includes('needs: [scope, admin-authenticator,'));assert.ok(main.includes("application_route == 'admin-authenticator'"));
+});
+
+test('official reuse rejects wrong run, failed audit, foreign repository and expired source',()=>{
+ const b=bindings.officialReuse,s=b.frontend,now=Date.now();
+ const run={id:b.runId,head_sha:b.head,event:'pull_request',path:'.github/workflows/ci.yml',head_repository:{full_name:'caohuibj/eduK12-new-version'},pull_requests:[{number:333}]};
+ const job={id:s.jobId,run_id:b.runId,name:s.jobName,status:'completed',conclusion:'success',completed_at:new Date(now-60000).toISOString(),steps:[{name:'integrated app types and one frontend compilation',conclusion:'success'},{name:'audit actual production dependency closure at HIGH threshold',conclusion:'success'}]};
+ verifyOfficialSource(run,job,'frontend',now);
+ for(const override of [{id:1},{head_sha:'a'.repeat(40)},{head_repository:{full_name:'external/repo'}},{event:'workflow_dispatch'},{pull_requests:[]}])assert.throws(()=>verifyOfficialSource({...run,...override},job,'frontend',now));
+ for(const override of [{conclusion:'failure'},{completed_at:new Date(now-25*3600000).toISOString()},{steps:job.steps.slice(0,1)}])assert.throws(()=>verifyOfficialSource(run,{...job,...override},'frontend',now));
 });

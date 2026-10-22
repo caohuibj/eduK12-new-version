@@ -155,7 +155,8 @@
     ".github/evidence/admin-authenticator/authenticator-frontend-tests.json",
     ".github/evidence/admin-authenticator/authenticator-additional-boundaries.json",
     ".github/evidence/admin-authenticator/authenticator-frontend-lint-status.json",
-    ".github/evidence/admin-authenticator/authenticator-storage-roundtrip.json"
+    ".github/evidence/admin-authenticator/authenticator-storage-roundtrip.json",
+    ".github/scripts/admin-authenticator-reuse.mjs"
   ],
   "reports": {
     "authenticator-backend-tests.json": "bd29c93417dc6cd4d795bcaae2bdae3116e2d96c4f95c9f71e25cd8d86a1dec3",
@@ -459,5 +460,32 @@
     40,
     3
   ],
-  "qualification": "PR merge only; no deployment or production image qualification"
+  "qualification": "PR merge only; no deployment or production image qualification",
+  "officialReuse": {
+    "runId": 39718477428,
+    "head": "f1d988e600284abd83704d2a49bf264d4ba324c0",
+    "merge": "19ed0e7617fa84bf5061d257b756ebe78e21b3ac",
+    "frontend": {
+      "jobId": 119627040423,
+      "jobName": "admin-authenticator / integrated (frontend)",
+      "artifact": {
+        "id": 12400725295,
+        "name": "admin-authenticator-frontend-19ed0e7617fa84bf5061d257b756ebe78e21b3ac",
+        "digest": "sha256:09f84c188a33b0e1fe6563aa2de4be7555b62995330b1120129eb488f9de6208"
+      }
+    },
+    "backend": {
+      "jobId": 119626272870,
+      "jobName": "admin-authenticator / integrated (backend)",
+      "artifact": {
+        "id": 12400366004,
+        "name": "admin-authenticator-backend-19ed0e7617fa84bf5061d257b756ebe78e21b3ac",
+        "digest": "sha256:4d6d118bf3280448978f0c4170b98c8e8c1011fc2829e7bb7ed94b8a8b76d87e"
+      }
+    },
+    "sast": {
+      "jobId": 119626272837,
+      "jobName": "codeql (javascript/typescript SAST)"
+    }
+  }
 }

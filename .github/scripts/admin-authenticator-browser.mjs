@@ -36,7 +36,7 @@ try{
   });
   for(const[route,title,button]of [['/admin/login','管理员登录','管理员登录'],['/admin/security/enroll','绑定管理员验证方式','生成绑定二维码']]){
    await page.goto('https://training.eduk12.top'+route);await page.getByRole('heading',{name:title,exact:true}).waitFor();
-   assert.equal(await page.getByLabel('验证方式',{exact:true}).inputValue(),'TOTP');
+   assert.equal(await page.getByRole('combobox',{name:/^验证方式/}).inputValue(),'TOTP');
    await page.getByRole('button',{name:button,exact:true}).waitFor();
    const code=page.getByLabel('Authenticator 六位动态码',{exact:true});
    if(route==='/admin/login'){assert.equal(await code.getAttribute('pattern'),'[0-9]{6}');assert.equal(await code.getAttribute('autocomplete'),'one-time-code');}
@@ -50,4 +50,4 @@ try{
  }
  assert.equal(checks.length,4);assert.deepEqual(unexpected,[]);assert.deepEqual(errors,[]);
  await writeFile(resolve(directory,'browser.json'),JSON.stringify({status:'PASS',checks,unexpected,errors,scope:'compiled UI only; protocol evidence is reviewed local API tests',productionAccess:false},null,2));
-}finally{await browser?.close();server.closeAllConnections();await new Promise(done=>server.close(done));}
+}catch(error){const pages=browser?.contexts().flatMap(context=>context.pages())||[];const page=pages.at(-1);if(page){await page.screenshot({path:resolve(directory,'failure.png'),fullPage:true});await writeFile(resolve(directory,'failure.txt'),String(error)+'\n'+await page.locator('body').innerText());}throw error;}finally{await browser?.close();server.closeAllConnections();await new Promise(done=>server.close(done));}
