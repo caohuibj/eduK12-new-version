@@ -502,7 +502,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
         {(!editing||editing.status==='DRAFT'&&!editing.publicationId)&&<form className="survey-wave-form survey-task-card space-y-4" onSubmit={save}>
           <div className="survey-wave-draft-heading"><h3>{editing?'修改未发布波次':'创建波次草稿'}</h3>
           <button type="button" className="btn-secondary" disabled={busy||!form.instrumentIds.length} onClick={previewStudy}>预览整轮研究流程</button></div>
-          <label className="block text-sm">波次标题<input className="input block w-full" required
+          <fieldset className="survey-workflow-group survey-wave-basics"><legend>参与者看到的内容</legend><label className="block text-sm">波次标题<input className="input block w-full" required
             value={form.title} onChange={e=>setForm({...form,title:e.target.value})}/></label>
           <label className="block text-sm">参与说明与知情同意
             <textarea className="input block w-full" rows={6} required minLength={20}
@@ -520,6 +520,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
           <label className="block text-sm">通用完成反馈（不显示个人分数）
             <textarea className="input block w-full" rows={3} value={form.generalText}
               onChange={e=>setForm({...form,generalText:e.target.value})}/></label>
+          </fieldset>
           <details className="survey-library-help survey-existing-tools"><summary>选用本研究已加入的工具</summary><fieldset className="border p-3 rounded-lg"><legend className="font-semibold text-sm">本波次使用的研究工具</legend>
             {tools.filter(t=>t.status==='DRAFT'||(t.kind==='SCALE'&&t.status==='PUBLISHED')).map(t=><label key={t.id} className="block text-sm my-2">
               <input type="checkbox" checked={form.instrumentIds.includes(t.id)}
@@ -533,11 +534,13 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
               onClick={()=>void act(()=>refreshTools(toolPage+1))}>工具下一页</button>
           </div>
           </fieldset></details>
+<details className="survey-workflow-disclosure" open={!!form.flowDefinition}><summary><span>实验与流程</span><span className="survey-workflow-summary">{form.flowDefinition?'已配置':'可选 · 默认按工具顺序作答'}</span></summary>
           <SurveyFlowStudio value={form.flowDefinition}
             onChange={flowDefinition=>setForm(old=>({...old,flowDefinition,
               quotaPolicy:flowDefinition?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'?null:old.quotaPolicy}))}
             tools={flowTools} selectedIds={form.instrumentIds} questions={flowQuestions}
-            collectionMode={project?.collectionMode??'SINGLE_UNLINKED'}/>
+            collectionMode={project?.collectionMode??'SINGLE_UNLINKED'}/></details>
+          <details className="survey-workflow-disclosure" open={!!(form.quotaPolicy||form.checkpointPolicy||form.groupIpPolicy)}><summary><span>采集策略</span><span className="survey-workflow-summary">配额 · 临时保存 · 集体作答</span></summary><div className="survey-wave-policies">
           <fieldset className="border rounded-xl p-4 space-y-2">
             <legend className="text-sm font-semibold">实验组条件配额（可选）</legend>
             <label className="text-sm flex gap-2">
@@ -589,7 +592,8 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
               结束时间留空时，开放后 48 小时自动结束；填写时须在 48 小时内，可提前截止。到期无宽限，暂停或恢复不延长窗口。</p>
             <p className="text-xs text-slate-600">仅在本轮时间窗内取消同 IP 请求限额；邀请凭证、知情同意、身份验证、总名额和实验组配额仍有效。</p>
           </fieldset>
-          <div className="grid sm:grid-cols-2 gap-3">
+          </div></details>
+          <fieldset className="survey-workflow-group survey-wave-schedule"><legend>时间与名额</legend><div className="grid sm:grid-cols-2 gap-3">
             <label className="block text-sm">计划开放时间<input type="datetime-local" className="input block w-full"
               disabled={!!form.groupIpPolicy} value={form.groupIpPolicy?'':form.opensAt} onChange={e=>setForm({...form,opensAt:e.target.value})}/></label>
             <label className="block text-sm">结束新参与时间<input type="datetime-local" className="input block w-full"
@@ -601,12 +605,12 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
           <label className="block text-sm"><input type="checkbox" checked={form.allowNewParticipants}
             onChange={e=>setForm({...form,allowNewParticipants:e.target.checked})}/>
             允许在本轮新领取研究编号并中途加入（T2+ 默认关闭）</label>
-          <button type="submit" className="btn-primary" disabled={busy||!form.title||form.consentText.length<20}>
-            {editing?'保存波次草稿':'创建波次'}</button>
+          </fieldset><div className="survey-workflow-save"><span>保存草稿后，再检查与冻结</span><button type="submit" className="btn-primary" disabled={busy||!form.title||form.consentText.length<20}>
+            {editing?'保存波次草稿':'创建波次'}</button></div>
         </form>}
         {studyPreview&&<SurveyStudyPreview drafts={studyPreview.drafts} cognitiveSnapshots={studyPreview.snapshots} flow={studyPreview.flow} consentText={studyPreview.consentText} generalText={studyPreview.generalText} onClose={()=>{previewEpoch.current++;setStudyPreview(null)}}/>}
-        {editing&&<div className="rounded-lg border p-4 space-y-4">
-          <h3 className="font-semibold">T{editing.ordinal} · {editing.title}</h3>
+        {editing&&<div className="survey-wave-publishing rounded-lg border p-4 space-y-4">
+          <div className="survey-workflow-heading"><h3 className="font-semibold">T{editing.ordinal} · {editing.title}</h3><span className="survey-workflow-status">检查与发布</span></div>
           <p className="text-sm">状态：{editing.status} · revision {editing.revision} · 已启动 {editing.startsCount}
             {editing.quotaStarts!==null?'/'+editing.quotaStarts:''}</p>
           <p className="text-sm">公开发布使用独立研究权限和冻结定义；是否可发布由当前环境的权限与配置决定。</p>
@@ -622,7 +626,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
               <p className="text-xs text-slate-600">开放后最长 48 小时，到期自动结束且无宽限；暂停或恢复不会续期。邀请、同意、身份与名额限制仍有效。</p>
             </>}
           </section>}
-          <section className="border rounded-lg p-3 space-y-3" aria-label="受控原始指标反馈">
+          <section className="survey-workflow-group border rounded-lg p-3 space-y-3" aria-label="受控原始指标反馈">
             <h4 className="font-semibold">被试原始指标反馈（默认关闭）</h4>
             {editing.publicationId?<div className="text-sm space-y-2"><p>反馈设置已随研究定义冻结，不可修改。</p>
                 {editing.frozenParticipantFeedback?editing.frozenParticipantFeedback.map(item=><p key={item.draftId}>
@@ -658,7 +662,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
             tools={Object.values(details).filter(tool=>editing.instrumentIds.includes(tool.id)&&form.instrumentIds.includes(tool.id))}
             request={surveyApi} value={contentSelections} onChange={setContentSelections} disabled={busy||!!activePending}
             published={!!editing.publicationId} frozen={editing.frozenContentSelections}/>
-          <div className="flex flex-wrap gap-2">
+          <div className="survey-wave-lifecycle flex flex-wrap gap-2">
             {editing.status==='DRAFT'&&!editing.publicationId&&<>
               <button type="button" className="btn-secondary" disabled={busy} onClick={preflight}>检查知情同意与所有工具</button>
               <button type="button" className="btn-secondary" aria-describedby="survey-freeze-reason" disabled={busy||!ready?.ok||feedbackInvalid} onClick={()=>lifecycle('prepare')}>冻结研究定义</button>
@@ -670,15 +674,15 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
             {editing.status==='PAUSED'&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>lifecycle('resume')}>恢复开放</button>}
             {editing.status==='CLOSED'&&!editing.hardStopAt&&editing.finishUntil
               &&new Date(editing.finishUntil).getTime()>Date.now()&&
-              <button type="button" className="btn-secondary" disabled={busy}
+              <button type="button" className="btn-secondary survey-workflow-danger" disabled={busy}
                 onClick={()=>lifecycle('hard-stop')}>紧急终止剩余在途作答</button>}
             {['OPEN','PAUSED'].includes(editing.status)&&<>
               <button type="button" className="btn-secondary" disabled={busy}
                 onClick={()=>entryToken('rotate')}>轮换招募链接</button>
-              <button type="button" className="btn-secondary" disabled={busy}
+              <button type="button" className="btn-secondary survey-workflow-danger" disabled={busy}
                 onClick={()=>entryToken('revoke')}>撤销全部招募链接</button>
-              <button type="button" className="btn-secondary" disabled={busy} onClick={()=>lifecycle('close')}>结束招募</button>
-              <button type="button" className="btn-secondary" disabled={busy} onClick={()=>lifecycle('hard-stop')}>紧急终止</button>
+              <button type="button" className="btn-secondary survey-workflow-danger" disabled={busy} onClick={()=>lifecycle('close')}>结束招募</button>
+              <button type="button" className="btn-secondary survey-workflow-danger" disabled={busy} onClick={()=>lifecycle('hard-stop')}>紧急终止</button>
             </>}
           </div>
           {editing.publicationId&&editing.flowDefinition&&<section className="border rounded-lg p-4 space-y-3">
@@ -749,14 +753,14 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
                 已撤回的分组身份不再可逆向关联，不应将历史配额数强行加总为当前分析 N。</p>
             </div>}
           </section>}
-          {ready&&<div className="rounded-lg border p-3 space-y-2">
+          {ready&&<div className="survey-preflight-result rounded-lg border p-3 space-y-2" data-ok={ready.ok}>
             <p className="font-semibold text-sm">{ready.ok?'结构预检通过':'结构预检失败'}</p>
             {ready.checks.map(c=><div key={c.key} className="text-sm">
               <p>{c.key}：{c.ok?'通过':'需要修订'}</p>
               {c.issues.map((m,i)=><p role="alert" key={i} className="text-red-700">{m}</p>)}
             </div>)}
           </div>}
-          {shareLink&&<div className="rounded-lg border p-3">
+          {shareLink&&<div className="survey-recruitment-link rounded-lg border p-3">
             <p>本次开放的一次性招募链接（只显示本次）：</p>
             <code className="block break-all text-sm my-3">{shareLink}</code>
             <div className="w-fit border rounded-lg bg-white p-3">

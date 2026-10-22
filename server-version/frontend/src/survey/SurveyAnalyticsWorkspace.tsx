@@ -414,7 +414,7 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
       <section id="survey-data-quality" tabIndex={-1} className="survey-task-card space-y-3" aria-label="科研样本质量复核">
         <h3 className="font-semibold">科研样本质量复核</h3>
         <p className="text-xs text-slate-600">只列出本人项目已完成且未撤回的 FINAL。审核决定可恢复，必须注明理由并留痕。</p>
-        <label className="block text-sm">本次复核理由（必填）
+        <label className="survey-quality-reason block text-sm">本次复核理由（必填）
           <textarea className="input block w-full" maxLength={1000} value={qualityReason}
             onChange={e=>setQualityReason(e.target.value)} placeholder="例如：注意力题未通过；或重新检查后符合纳入标准"/>
         </label>
@@ -422,9 +422,9 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
         {qualityError&&<div role="alert"><p>质量复核列表加载失败：{qualityError}。{qualityRows.length?'下方保留上次成功读取的记录。':''}</p>
           <button type="button" className="btn-secondary" disabled={busy||qualityLoading} onClick={()=>void execute(()=>loadQuality())}>重试质量复核列表</button></div>}
         {!qualityLoading&&!qualityError&&!qualityRows.length&&<p>此页暂无可复核的已完成答卷。</p>}
-        {qualityRows.map(row=><div className="flex flex-wrap justify-between gap-3 border-b py-2" key={row.attemptId}>
+        {qualityRows.map(row=><div className="survey-quality-record flex flex-wrap justify-between gap-3 border-b py-2" key={row.attemptId}>
           <div className="text-xs"><code>{row.attemptCode}</code>
-            <p>{row.researchCode??'独立匿名作答'} · {row.verdict==='EXCLUDED'?'当前排除':'当前纳入'}</p>
+            <p>{row.researchCode??'独立匿名作答'} · <span className="survey-quality-verdict" data-verdict={row.verdict}>{row.verdict==='EXCLUDED'?'当前排除':'当前纳入'}</span></p>
             <p>{row.reason??'尚无人工质量复核'} · {new Date(row.completedAt).toLocaleString('zh-CN')}</p>
           </div>
           <div className="flex flex-wrap gap-2">
@@ -458,7 +458,7 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
             </div>
           </div>}
         </div>)}
-        <div className="flex gap-3 items-center text-sm">
+        <div className="survey-workflow-pagination flex gap-3 items-center text-sm">
           <button className="btn-secondary" disabled={busy||qualityPage<=1}
             onClick={()=>void execute(()=>loadQuality(qualityPage-1))}>上一页</button>
           第 {qualityPage} 页
@@ -494,8 +494,7 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
           <button type="button" className="btn-secondary" disabled={busy||!waveId} onClick={loadItems}>
             查看此波次题目频数与探索性得分</button>
         </div>
-        <div className="border-t pt-4 space-y-3">
-          <h4 className="font-medium text-sm">大样本单题统计（至多 6000 份有效 FINAL）</h4>
+        <details className="survey-workflow-disclosure survey-bounded-statistics"><summary><span>大样本单题统计</span><span className="survey-workflow-summary">至多 6000 份有效 FINAL · 按需读取</span></summary><div className="survey-workflow-disclosure-body space-y-3">
           <p className="text-xs text-slate-600">先读取冻结变量字典，再选择一个非敏感题目。
             后台按 200 份分页，仅累积受控频数、缺失和数值统计；全部页校验通过后才返回结果。
             本入口不自动展示敏感自由文本。</p>
@@ -524,8 +523,8 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
             <p className="text-xs text-slate-500">已核对全部有效 FINAL ·
               数据截止 {new Date(boundedItem.sourceCutOff).toLocaleString('zh-CN')} · {boundedItem.note}</p>
           </div>}
-        </div>
-        {itemStats&&<div className="space-y-4">
+        </div></details>
+        {itemStats&&<div className="survey-statistics-results space-y-4">
           <p className="text-xs">{itemStats.note}</p>
           <div className="overflow-x-auto"><table className="w-full text-sm">
             <thead><tr><th className="text-left p-2">题目</th><th>有效回答 N</th><th>频数 / 缺失</th><th>数值均值</th></tr></thead>
@@ -606,19 +605,19 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
       <div id="survey-data-export" tabIndex={-1} className="survey-task-card survey-export-card space-y-4">
         <h3 className="font-semibold">匿名科研数据导出</h3>
         <p className="text-sm">导出可能包含自由文本或研究编号，请确认研究用途与数据保存规定。分批时请保留全部 CSV、Codebook、Manifest。</p>
-        <ol aria-label="导出操作步骤" className="list-decimal pl-5 text-sm space-y-1">
+        <details className="survey-workflow-help"><summary>导出流程说明</summary><ol aria-label="导出操作步骤" className="list-decimal pl-5 text-sm space-y-1">
           <li>完成二次认证，再选择数据范围与格式。</li>
           <li>手动创建受控导出，核对当前批次。</li>
           <li>分别下载三份文件，并在浏览器下载列表确认保存。</li>
-        </ol>
+        </ol></details>
         <details className="rounded-lg border p-3 text-sm"><summary className="cursor-pointer font-medium">批次限制与文件合并说明</summary><p className="mt-2">每批至多 250 份 FINAL、2MB，复杂量表会按安全预算自动缩小批次；RAW_WAVE 以及选定单波次的 RAW_LONG / SCORE_LONG 可按签名游标连续分批。全部波次 Wide 与未限定波次的 Long 仍适用 250 FINAL 上限；新单波次分页的有效 FINAL 与非 FINAL 参与状态使用不同 CSV 结构，后者每人每波次一行，按研究编号和波次关联而非直接拼接。分批时请保留全部 CSV、Codebook、Manifest。</p></details>
-        <form className="flex flex-wrap gap-3 items-end" onSubmit={stepUp}>
+        <section className="survey-export-step" aria-label="导出身份确认"><h4><span aria-hidden="true">1</span>确认身份</h4><form className="flex flex-wrap gap-3 items-end" onSubmit={stepUp}>
           <label className="text-sm">最新 TOTP 动态验证码
             <input className="input block" inputMode="numeric" type="password" autoComplete="off"
               value={otp} onChange={e=>setOtp(e.target.value)} placeholder="6 位验证码"/></label>
           <button className="btn-secondary" disabled={busy||otp.length<6}>完成五分钟内二次认证</button>
-        </form>
-        <div className="flex flex-wrap gap-3 items-end">
+        </form></section>
+        <section className="survey-export-step" aria-label="导出数据范围"><h4><span aria-hidden="true">2</span>选择数据与范围</h4><div className="survey-export-filters flex flex-wrap gap-3 items-end">
           <label className="text-sm">数据格式
             <select className="input block" value={format} onChange={e=>{setFormat(e.target.value as ExportFormat);invalidateExport()}}>
               {Object.entries(kindOptions).filter(([kind])=>
@@ -644,8 +643,7 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
               value={completedBefore} onChange={e=>{setCompletedBefore(e.target.value);invalidateExport()}}/></label>
             <p className="text-xs">{format==='INTERPRETATION_LONG'?'留空表示不限制。仅按 FINAL 完成时间筛选已保存解释。':'留空表示不限制。按完成时间分段；未 FINAL 的记录可能重复出现，合并时请按研究编号和状态去重。'}</p>
           </div>}
-          <button type="button" className="btn-primary" disabled={busy||waiting||['RAW_WAVE','COGNITIVE_TRIAL_LONG','INTERPRETATION_LONG'].includes(format)&&!waveId}
-            onClick={()=>createExport()}>创建受控导出</button>
+
         </div>
         {retryUntil>0&&<p role="status" className="text-sm text-amber-800">
           {waiting?'服务器要求等待至 '+new Date(retryUntil).toLocaleString('zh-CN')
@@ -664,7 +662,10 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
             onChange={e=>{setIncludeFreeText(e.target.checked);invalidateExport()}}/>
           包含自由文本原始回答（可能含姓名、班级或间接身份线索）。默认不导出，需要确认本项目知情同意覆盖该用途，并妥善控制保存与共享。
         </label>}
-        {ticket&&<div role="region" aria-label="当前导出批次" className="border rounded-lg p-3 space-y-2">
+        <div className="survey-export-create-action"><button type="button" className="btn-primary" disabled={busy||waiting||['RAW_WAVE','COGNITIVE_TRIAL_LONG','INTERPRETATION_LONG'].includes(format)&&!waveId}
+            onClick={()=>createExport()}>创建受控导出</button></div>
+        </section>
+        {ticket&&<div role="region" aria-label="当前导出批次" className="survey-export-step survey-export-batch border rounded-lg p-3 space-y-2"><h4><span aria-hidden="true">3</span>下载与核对文件</h4>
           <p className="text-sm">导出 {ticket.format} · 第 {ticket.pageNumber||1} 批 · {ticket.manifest.rowCount} 行 ·
             {ticket.manifest.columnCount} 列</p>
           <p className="text-xs">到期：{new Date(ticket.expiresAt).toLocaleString('zh-CN')}</p>
@@ -685,7 +686,7 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
             <button type="button" className="btn-secondary" disabled={busy||waiting}
               onClick={()=>createExport('restart')}>重新开始完整导出（新水位）</button>
           </div>}
-          <div className="flex flex-wrap gap-2">{downloadParts.map(([part,label])=><div key={part}>
+          <div className="survey-export-files flex flex-wrap gap-2">{downloadParts.map(([part,label])=><div key={part} data-started={!!downloadsStarted[part]}>
             <button type="button" className="btn-secondary" disabled={busy||waiting||needsRecovery||continuationStopped} onClick={()=>download(part)}>
               {downloadsStarted[part]?'重新发起 ':'下载 '}{label}</button>
             <p className="text-xs">{label}：{downloadsStarted[part]?'已发起，请核对保存':'尚未发起'}</p>
