@@ -61,4 +61,19 @@ describe('education execution purpose and account-lock boundary',()=>{
   expect(population).toContain('private_release.content_hash=registered.entry')
  })
 
+ it('cannot use bound FINAL intake semantics for an unverified legacy/public source',async()=>{
+  const p=accountProbe([[{id:'execution',privateForm:false}]])
+  await expect(assertCurrentRunStartAuthority(p.tx,'execution',{accountMode:'DETECT_EDUCATION_LIBRARY',operation:'BOUND_FINAL'}))
+   .rejects.toMatchObject({code:'RUN_BOUND_FINAL_SOURCE_REQUIRED'})
+  expect(p.sql).toHaveLength(1)
+ })
+ it.each([false,true])('only DB-bound FORM FINAL may finish after the new-intake deadline (final=%s)',async(final)=>{
+  const p=accountProbe([[{id:'execution',privateForm:true}],[{valid:true}],[{organizationId:'org',active:true}],
+   [{valid:true,denied:false}],[],[{kind:'SELF',ref:null,facts:{}}],[{accountsCurrent:true,populationCurrent:true,intakeOpen:false}]])
+  const call=assertCurrentRunStartAuthority(p.tx,'execution',{accountMode:'DETECT_EDUCATION_LIBRARY',...(final?{operation:'BOUND_FINAL' as const}:{})})
+  if(final)await expect(call).resolves.toBeUndefined()
+  else await expect(call).rejects.toMatchObject({code:'RUN_INTAKE_CLOSED'})
+  expect(p.sql[1]).not.toContain('FOR SHARE OF u')
+ })
+
 })

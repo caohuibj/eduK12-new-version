@@ -1,3 +1,4 @@
+import {privateFormTrackIdentitySql} from './educationPrivateFormIdentitySql'
 import {privateScaleRegistryIdentitySql} from './educationPrivateScaleIdentitySql'
 import { Prisma } from '@prisma/client'
 import { currentRunActorAuthoritySql, currentWindowSql, type RunAuthorityPurpose } from './currentActorAuthority'
@@ -89,6 +90,10 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql, purpos
         (relation.relationship_kind='SELF'
         AND subject.actor_role='TEACHER' AND respondent.actor_role='TEACHER'
         AND subject.user_id=respondent.user_id
+        AND NOT EXISTS(SELECT 1 FROM assessment_run_tracks private_form_track
+          WHERE private_form_track.id=x.track_id AND private_form_track.organization_id=x.organization_id
+           AND private_form_track.run_id=x.run_id AND private_form_track.resource_key LIKE 'private-form:%'
+           AND NOT ${privateFormTrackIdentitySql({track:Prisma.sql`private_form_track`,organizationId:Prisma.sql`org.id`,product:'TEACHER'})})
         AND NOT EXISTS(SELECT 1 FROM assessment_run_tracks private_track
           WHERE private_track.id=x.track_id AND private_track.organization_id=x.organization_id
             AND private_track.run_id=x.run_id AND private_track.resource_key LIKE 'private-scale:%'
@@ -191,6 +196,11 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql, purpos
               OR ${privateScaleRegistryIdentitySql({registered:Prisma.sql`registered`,organizationId:Prisma.sql`org.id`,product:'SCHOOL'})})
             AND registered.entry->'applicability'->>'resourceKind'='SCALE')
     )`}
+    AND NOT EXISTS(SELECT 1 FROM assessment_run_tracks school_form
+      WHERE school_form.id=x.track_id AND school_form.organization_id=x.organization_id
+       AND school_form.run_id=x.run_id AND school_form.resource_family='FORM'
+       AND school_form.resource_key LIKE 'private-form:%'
+       AND NOT ${privateFormTrackIdentitySql({track:Prisma.sql`school_form`,organizationId:Prisma.sql`org.id`,product:'SCHOOL'})})
     AND EXISTS(SELECT 1 FROM campus_activity_runs ar
       JOIN campus_activities activity ON activity.course_id=ar.course_id
         AND activity.organization_id=ar.organization_id

@@ -11,8 +11,6 @@ import { addTeacherPrivateFormRunTrack, previewTeacherRun, publishTeacherRun } f
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { previewAssessmentRun, publishAssessmentRun } from '../../modules/assessment-run/publish'
 import { preparePrivateFormRuntimeResource } from '../../modules/education-tools/private-tool.form-runtime-resources'
-import { startAssessmentRunExecution } from '../../modules/assessment-run/startExecution'
-import { loadRunExecutionStartAdmission } from '../../modules/assessment-run/startAdmission'
 import { revokeUse } from '../../modules/scale-library-governance/distribution'
 const url = integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL'), suite = url ? describe : describe.skip
 let db: PrismaClient
@@ -78,18 +76,13 @@ async function unchanged(x: Awaited<ReturnType<typeof fixture>>, baseline: Await
   expect(await state(x.f.runId)).toMatchObject({ status: 'DRAFT', version: x.key.expectedVersion, executions: 0n, relationships: 0n, actors: 0n })
   expect(await db.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: baseline.id } })).toBe(0)
 }
-async function closedStart(x: Awaited<ReturnType<typeof fixture>>, parentId: string) {
-  const [execution] = await db.$queryRaw<Array<{ id: string; binding: string | null }>>`
-    SELECT id, runtime_binding_ref AS binding FROM assessment_run_executions WHERE run_id=${x.f.runId} AND track_id=${x.track.id}`
-  expect(execution.binding).toBeNull()
-  await expect(startAssessmentRunExecution({ executionId: execution.id, actorUserId: x.f.participantUserId })).rejects.toMatchObject({
-    code: 'PRIVATE_FORM_ACTIVITY_RUNTIME_NOT_READY' })
-  await expect(loadRunExecutionStartAdmission({ executionId: execution.id, actorUserId: x.f.participantUserId }))
-    .rejects.toMatchObject({ code: 'PRIVATE_FORM_ACTIVITY_RUNTIME_NOT_READY' })
+async function assertUnstarted(x: Awaited<ReturnType<typeof fixture>>, parentId: string) {
+  const [execution] = await db.$queryRaw<Array<{ status: string; binding: string | null }>>`
+    SELECT status, runtime_binding_ref AS binding FROM assessment_run_executions WHERE run_id=${x.f.runId} AND track_id=${x.track.id}`
+  expect(execution).toMatchObject({ status: 'ASSIGNED', binding: null })
   expect(await db.compositeAssessmentAttempt.count({ where: { compositeAssessmentId: parentId } })).toBe(0)
-  expect((await db.$queryRaw<Array<{ binding: string | null }>>`SELECT runtime_binding_ref AS binding FROM assessment_run_executions WHERE id=${execution.id}`)[0].binding).toBeNull()
 }
-suite('Private Form real preview and atomic fixed-version publication, before runtime activation', () => {
+suite('Private Form real preview and atomic fixed-version publication, before task START', () => {
   beforeAll(async () => {
     requireIsolatedReleaseDatabase(url!)
     process.env.DATA_ENCRYPTION_KEY ||= '55'.repeat(32)
@@ -132,7 +125,7 @@ suite('Private Form real preview and atomic fixed-version publication, before ru
     expect(preparedAgain.compositeId).toBe(sealed.id)
     expect(await parent(x.track.resourceKey)).toEqual(sealed)
     expect(await db.$queryRaw`SELECT id FROM registered_assessment_resources WHERE composite_id=${sealed.id}`).toEqual([])
-    await closedStart(x, sealed.id)
+    await assertUnstarted(x, sealed.id)
   }, 90_000)
   it('publishes public/private Form together, while revoking the public grant rejects the whole next mixed publication without sealing', async () => {
     const good = await fixture('SCHOOL', true), before = await parent(good.track.resourceKey)

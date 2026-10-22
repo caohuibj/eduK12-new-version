@@ -1,3 +1,4 @@
+import huiteacherPrivateFormRuntimeRoutes from './modules/huiteacher/privateFormRuntime.routes'
 import { educationSchoolScaleReportRouter, educationTeacherScaleReportRouter } from './modules/reporting/education-scale-report.routes'
 import {trainingScaleLibraryGovernanceRouter,surveyScaleLibraryGovernanceRouter} from './modules/scale-library-governance/routes'
 import { cleanupExpiredTrainingCheckpoints } from './modules/composite/training-checkpoint.service'
@@ -329,6 +330,7 @@ app.use('/api/huiteacher',huiteacherEvaluationRoutes)
 app.use('/api/huiteacher',huiteacherFormsRoutes)
 app.use('/api/huiteacher',huiteacherRunRoutes)
 app.use('/api/huiteacher',huiteacherFormRuntimeRoutes)
+app.use('/api/huiteacher',huiteacherPrivateFormRuntimeRoutes)
 app.use('/api/huiteacher',huiteacherGroupReportRoutes)
 app.use('/api/huiteacher',huiteacherScaleRuntimeRoutes)
 app.use('/api/huiteacher',educationTeacherScaleReportRouter)

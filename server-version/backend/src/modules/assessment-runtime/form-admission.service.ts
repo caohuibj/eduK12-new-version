@@ -309,7 +309,12 @@ export const activateCompositeFormAdmission = async (input: {
   const stored = await loadStoredFormAdmission(input.child)
   if (stored) return stored
   const parent = await loadTrainingChildAdmissionParent(input.parent.id, selectedParent)
-  if(input.definition.items.some(item=>item.formPolicy!=null) && (parent.compositeAssessment.productKind!=="QUESTIONNAIRE" || parent.assignmentRef || parent.compositeAssessment.reportPackageKey || parent.compositeAssessment.analysisProtocolKey)) throw new InstrumentFinalSubmitError("INSTRUMENT_NOT_AVAILABLE","Form V3 不支持此任务组合",422)
+  if(input.definition.items.some(item=>item.formPolicy!=null) && (parent.compositeAssessment.productKind!=="QUESTIONNAIRE" || parent.assignmentRef || parent.compositeAssessment.reportPackageKey || parent.compositeAssessment.analysisProtocolKey)) {
+    if(parent.compositeAssessment.productKind!=="ORGANIZATION_RESOURCE"||!parent.assignmentRef||parent.compositeAssessment.reportPackageKey||parent.compositeAssessment.analysisProtocolKey)
+      throw new InstrumentFinalSubmitError("INSTRUMENT_NOT_AVAILABLE","Form V3 不支持此任务组合",422)
+    const {assertPrivateFormParentSource}=await import('../assessment-run/educationPrivateFormExecution')
+    await assertPrivateFormParentSource(parent.id)
+  }
   if (parent.runtimeGeneration !== 'UNIFIED_V1') {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评运行时版本不匹配，请重启测评', 409)
   }

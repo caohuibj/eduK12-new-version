@@ -2693,7 +2693,13 @@ const createAttempt = async (
   }
   let feedbackBinding: TrainingFeedbackBinding | null = null
   let persistenceBinding: { publicationIdentity: Record<string, unknown>; courseId: string; roundId: string | null; cutoffs: Array<Date | null> } | null = null
-  if(composite.items.some((item:any)=>item.formPolicy!=null) && (composite.productKind!=='QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || relationalIdentity || composite.reportPackageKey || composite.analysisProtocolKey)) throw compositeBadRequest('Form V3 只支持普通问卷的统一 FINAL 运行时')
+  if(composite.items.some((item:any)=>item.formPolicy!=null) && (composite.productKind!=='QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || relationalIdentity || composite.reportPackageKey || composite.analysisProtocolKey)) {
+    if(composite.productKind!=='ORGANIZATION_RESOURCE'||!composite.creationKey?.startsWith('private-form:')||!relationalIdentity||!userId
+      ||composite.deliveryMode==='LEGACY'||composite.reportPackageKey||composite.analysisProtocolKey)
+      throw compositeBadRequest('Form V3 只支持普通问卷的统一 FINAL 运行时')
+    const {readPrivateFormExecutionSource}=await import('../assessment-run/educationPrivateFormExecution')
+    await readPrivateFormExecutionSource(db as Prisma.TransactionClient,{assignmentRef:relationalIdentity.assignmentRef,compositeId:composite.id,actorUserId:userId})
+  }
   if (['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
     // Serialize new admission against archive; never trust the pre-lock read.
     await db.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR UPDATE', composite.id)

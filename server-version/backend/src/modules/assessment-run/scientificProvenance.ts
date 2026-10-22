@@ -1,3 +1,4 @@
+import {readPrivateFormExecutionSource} from './educationPrivateFormExecution'
 import {readEducationScaleExecutionSource} from './educationScaleExecutionSource'
 import { relationalEntryToRunPolicy, productionRunResourceAuthorityRegistry, type RunResourceAuthorityRegistry, type RunResourceFamily } from './resourceAuthority'
 import { Prisma } from '@prisma/client'
@@ -83,7 +84,9 @@ export const freezeRunExecutionScientificProvenanceInTransaction = async (
   // Private resources intentionally cannot enter the generic registry. Derive
   // their baseline only from the exact immutable version bound to this real
   // product execution, not author roles or a caller-supplied trusted flag.
-  const current = row.resourceKey.startsWith('private-scale:') ? await (async () => {
+  const current = row.resourceKey.startsWith('private-form:')
+    ? relationalEntryToRunPolicy((await readPrivateFormExecutionSource(tx,{executionId})).resourceEntry)
+    : row.resourceKey.startsWith('private-scale:') ? await (async () => {
     if(row.resourceFamily!=='SCALE'||row.school===row.teacher)
       throw new RunScientificProvenanceError('RUN_PRIVATE_SOURCE_CONTEXT_INVALID','Private Scale requires its actual education workflow')
     const source=await readEducationScaleExecutionSource(tx,{product:row.school?'SCHOOL':'TEACHER',
