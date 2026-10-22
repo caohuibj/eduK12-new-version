@@ -19,6 +19,9 @@ export function SchoolProtectedReportStudio({api,organizationId}:{
   api:SchoolApi;organizationId:string
 }){
   const [catalog,setCatalog]=useState<Catalog|null>(null)
+  const [catalogLoading,setCatalogLoading]=useState(true)
+  const [catalogError,setCatalogError]=useState('')
+  const [catalogRequest,setCatalogRequest]=useState(0)
   const [choice,setChoice]=useState('')
   const [spec,setSpec]=useState('')
   const [busy,setBusy]=useState(false)
@@ -26,12 +29,13 @@ export function SchoolProtectedReportStudio({api,organizationId}:{
   const [error,setError]=useState('')
   useEffect(()=>{
     let live=true
+    setCatalogLoading(true);setCatalogError('');setBusy(false)
     setCatalog(null);setChoice('');setSpec('');setResult(null);setError('')
     void api<Catalog>('/reports/protected/catalog?organizationId='+encodeURIComponent(organizationId))
       .then(data=>{if(live)setCatalog(data)})
-      .catch(err=>{if(live)setError(problem(err))})
+      .catch(err=>{if(live)setCatalogError(problem(err)||'报告目录不可用')}).finally(()=>{if(live)setCatalogLoading(false)})
     return ()=>{live=false}
-  },[api,organizationId])
+  },[api,organizationId,catalogRequest])
   const source=choice?catalog?.sources[Number(choice)-1]:undefined
   const selectedSpec=catalog?.specs.find(item=>item.specId===spec)
   const generate=async()=>{
@@ -54,7 +58,11 @@ export function SchoolProtectedReportStudio({api,organizationId}:{
     <p>需要不少于五名独立有效评价者，并满足已发布科学方案的每项指标门槛。
       不满足条件时报告会被抑制；不同观察视角不得直接求平均或形成诊断结论。</p>
     {error&&<p role="alert" className="hs-alert">{error}</p>}
-    {catalog===null?<p>正在核查当前专业关系与已发布内容…</p>:<>
+    {catalogLoading&&<p role="status">正在核查当前专业关系与已发布内容…</p>}
+    {catalogError&&<div><p role="alert" className="hs-alert">{catalogError}</p>
+      <button disabled={catalogLoading} onClick={()=>{setCatalogLoading(true);setCatalogError('');setCatalogRequest(value=>value+1)}}>重新读取报告目录</button>
+    </div>}
+    {catalog&&<>
       <label className="hs-field"><span>合法个案与观察来源</span>
         <select value={choice} disabled={busy} onChange={e=>{setChoice(e.target.value);setResult(null)}}>
           <option value="">选择已结束的校园正式观察</option>
@@ -78,7 +86,7 @@ export function SchoolProtectedReportStudio({api,organizationId}:{
     {result&&<section className="hs-task-detail" role="region" aria-label="受保护报告生成结果">
       <h3>个案观察编号：{result.subjectReference}</h3>
       {result.status==='AVAILABLE'
-        ?<p>已生成满足当前权限与保护规则的报告。需要查看具体内容，请在上方“已获授权的专业报告”工作区刷新并再次核验权限。</p>
+        ?<p>已生成满足当前权限与保护规则的报告。需要查看具体内容，请从工作台“专业报告”入口重新核验权限后查看。</p>
         :<p>当前结果已被抑制，不满足披露门槛，不能以人数、原始答案或评价者明细补充展示。</p>}
       <p>完成生成不意味着学生、家长、任课教师或者其他工作人员获得了报告查看权限。</p>
       <button onClick={()=>setResult(null)}>关闭状态</button>

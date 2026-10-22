@@ -1,5 +1,5 @@
 import { describe,expect,it,vi } from 'vitest'
-import { fireEvent,render,screen,waitFor } from '@testing-library/react'
+import { act,fireEvent,render,screen,waitFor } from '@testing-library/react'
 import { SchoolGroupReports } from './SchoolGroupReports'
 import type { SchoolApi } from './SchoolRecovery'
 
@@ -78,5 +78,41 @@ describe('Huischool school-only aggregate workbench',()=>{
         organizationId:org,runId:run,trackId:track,specId:spec,
       }))
     }finally{window.confirm=confirm}
+  })
+})
+
+
+describe('SchoolGroupReports catalogue request recovery',()=>{
+  it('replaces pending state with an error and retries only the catalogue GET',async()=>{
+    let reject!:(reason:Error)=>void
+    const pending=new Promise<never>((_resolve,no)=>{reject=no})
+    let requests=0
+    const api=vi.fn(async(_path:string,_method?:string)=>++requests===1?pending:catalog)
+    render(<SchoolGroupReports api={api as SchoolApi} organizationId={org}/>)
+    expect(screen.getByText('正在核查校园报告权限与已发布方案…')).toBeInTheDocument()
+    expect(screen.queryByRole('button',{name:'重新读取报告目录'})).not.toBeInTheDocument()
+    await act(async()=>reject(Error('目录读取失败，请重试')))
+    expect(await screen.findByRole('alert')).toHaveTextContent('目录读取失败，请重试')
+    expect(screen.queryByText('正在核查校园报告权限与已发布方案…')).not.toBeInTheDocument()
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button',{name:'重新读取报告目录'}))
+    await screen.findByRole('option',{name:new RegExp(catalog.specs[0].title)})
+    expect(screen.queryByText('目录读取失败，请重试')).not.toBeInTheDocument()
+    expect(api.mock.calls).toEqual([
+      ['/reports/groups/catalog?organizationId='+org],['/reports/groups/catalog?organizationId='+org],
+    ])
+  })
+  it('does not restore a previous school catalogue from a late response',async()=>{
+    let resolve!:(value:typeof catalog)=>void
+    const pending=new Promise<typeof catalog>(yes=>{resolve=yes})
+    const api=vi.fn(async(path:string)=>path.endsWith('organizationId='+org)?pending:{sources:[],specs:[],truncated:false})
+    const view=render(<SchoolGroupReports api={api as SchoolApi} organizationId={org}/>)
+    expect(screen.getByText('正在核查校园报告权限与已发布方案…')).toBeInTheDocument()
+    view.rerender(<SchoolGroupReports api={api as SchoolApi} organizationId="new-school"/>)
+    await waitFor(()=>expect(screen.queryByText('正在核查校园报告权限与已发布方案…')).not.toBeInTheDocument())
+    await act(async()=>resolve(catalog))
+    expect(screen.queryByRole('option',{name:new RegExp(catalog.specs[0].title)})).not.toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(api).toHaveBeenLastCalledWith('/reports/groups/catalog?organizationId=new-school')
   })
 })

@@ -20,6 +20,9 @@ export function SchoolIndividualLongitudinalStudio({api,organizationId}:{
   api:SchoolApi;organizationId:string
 }){
   const [catalog,setCatalog]=useState<Catalog|null>(null)
+  const [catalogLoading,setCatalogLoading]=useState(true)
+  const [catalogError,setCatalogError]=useState('')
+  const [catalogRequest,setCatalogRequest]=useState(0)
   const [subject,setSubject]=useState('')
   const [sources,setSources]=useState<Sources|null>(null)
   const [selected,setSelected]=useState<string[]>([])
@@ -30,13 +33,14 @@ export function SchoolIndividualLongitudinalStudio({api,organizationId}:{
   const epoch=useRef(0)
   useEffect(()=>{
     const t=++epoch.current
+    setCatalogLoading(true);setCatalogError('');setBusy(false)
     setCatalog(null);setSubject('');setSources(null);setSelected([]);setSpec('')
     setResult(null);setError('')
     void api<Catalog>('/reports/longitudinal/catalog?organizationId='+encodeURIComponent(organizationId))
       .then(x=>{if(t===epoch.current)setCatalog(x)})
-      .catch(e=>{if(t===epoch.current)setError(message(e))})
+      .catch(e=>{if(t===epoch.current)setCatalogError(message(e))}).finally(()=>{if(t===epoch.current)setCatalogLoading(false)})
     return ()=>{epoch.current+=1}
-  },[api,organizationId])
+  },[api,organizationId,catalogRequest])
   const chooseSubject=async(next:string)=>{
     const t=++epoch.current
     setSubject(next);setSelected([]);setSources(null);setResult(null);setError('')
@@ -73,7 +77,11 @@ export function SchoolIndividualLongitudinalStudio({api,organizationId}:{
     <p>仅针对本人当前授权的学生个案，选择同一工具的两次及以上正式测量。
       每个指标与相邻版本均需要独立的科学可比性证据；平台不依据同名维度推断变化，也不自动给家长或任课教师授权。</p>
     {error&&<p role="alert" className="hs-alert">{error}</p>}
-    {!catalog?<p>正在核验心理服务关系和可用科学方案…</p>:<>
+    {catalogLoading&&<p role="status">正在核验心理服务关系和可用科学方案…</p>}
+    {catalogError&&<div><p role="alert" className="hs-alert">{catalogError}</p>
+      <button disabled={catalogLoading} onClick={()=>{setCatalogLoading(true);setCatalogError('');setCatalogRequest(value=>value+1)}}>重新读取报告目录</button>
+    </div>}
+    {catalog&&<>
       <label className="hs-field"><span>当前心理服务学生的匿名观察编号</span>
         <select value={subject} disabled={busy} onChange={e=>void chooseSubject(e.target.value)}>
           <option value="">选择本人当前服务个案</option>

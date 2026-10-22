@@ -13,6 +13,9 @@ export function SchoolGroupLongitudinal({api,organizationId}:{
   api:SchoolApi;organizationId:string
 }){
   const [catalog,setCatalog]=useState<Catalog|null>(null)
+  const [catalogLoading,setCatalogLoading]=useState(true)
+  const [catalogError,setCatalogError]=useState('')
+  const [catalogRequest,setCatalogRequest]=useState(0)
   const [selected,setSelected]=useState<string[]>([])
   const [specId,setSpecId]=useState('')
   const [report,setReport]=useState<Report|null>(null)
@@ -20,12 +23,13 @@ export function SchoolGroupLongitudinal({api,organizationId}:{
   const [error,setError]=useState('')
   useEffect(()=>{
     let active=true
+    setCatalogLoading(true);setCatalogError('');setBusy(false)
     setCatalog(null);setSelected([]);setSpecId('');setReport(null);setError('')
     void api<Catalog>('/reports/groups/longitudinal/catalog?organizationId='+encodeURIComponent(organizationId))
       .then(data=>{if(active)setCatalog(data)})
-      .catch(e=>{if(active)setError(e instanceof Error?e.message:'报告目录不可用')})
+      .catch(e=>{if(active)setCatalogError(e instanceof Error&&e.message?e.message:'报告目录不可用')}).finally(()=>{if(active)setCatalogLoading(false)})
     return ()=>{active=false}
-  },[api,organizationId])
+  },[api,organizationId,catalogRequest])
   const picked=catalog?.sources.filter(s=>selected.includes(id(s)))??[]
   const groups=new Set(picked.map(s=>s.resource.family+':'+s.resource.key))
   const chosen=catalog?.specs.find(s=>s.specId===specId)
@@ -49,7 +53,11 @@ export function SchoolGroupLongitudinal({api,organizationId}:{
       所有 Run 与活动均须结束，且每次至少有十名不同学生；任一波次人数不同、个体不一致或可比性证据缺失都会拒绝。</p>
     <p>这不是教师绩效报告，不支持学生对教师的个人评价发布，不对学生或家长自动开放。</p>
     {error&&<p role="alert" className="hs-alert">{error}</p>}
-    {!catalog?<p>正在核对当前学校的正式波次与科学方案…</p>:<>
+    {catalogLoading&&<p role="status">正在核对当前学校的正式波次与科学方案…</p>}
+    {catalogError&&<div><p role="alert" className="hs-alert">{catalogError}</p>
+      <button disabled={catalogLoading} onClick={()=>{setCatalogLoading(true);setCatalogError('');setCatalogRequest(value=>value+1)}}>重新读取报告目录</button>
+    </div>}
+    {catalog&&<>
       <label className="hs-field"><span>纵向分析科学方案</span>
         <select value={specId} disabled={busy} onChange={e=>{setSpecId(e.target.value);setReport(null)}}>
           <option value="">选择独立审核的正式方案</option>
