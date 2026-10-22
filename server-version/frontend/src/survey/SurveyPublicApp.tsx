@@ -324,7 +324,7 @@ export default function SurveyPublicApp(){
         liveTimings[key]=tracker.snapshot()
       }
       if(!saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,draftState.current.answers,liveTimings))
-        setNotice('本标签页临时保存失败（空间或权限不足）。刷新、关闭页面可能丢失未提交答案；如已开放服务器加密暂存，请主动保存，或完成本次 FINAL。')
+        setNotice('本标签页临时保存失败（空间或权限不足）。刷新、关闭页面可能丢失未提交答案；如已开放服务器加密暂存，请主动保存，或完成本轮正式提交。')
     }
     const timeout=window.setTimeout(()=>flush(),450)
     const leaving=()=>flush(true)
@@ -445,7 +445,7 @@ export default function SurveyPublicApp(){
     try{sessionStorage.removeItem(singleStorageKey(publicId))}catch{/* private session unavailable */}
     setAttemptId(id);setSingleResume(null);setTask(null);setCompletion(null);setGeneral(null)
     setScreenedOut(true)
-    setNotice('本轮研究筛选已结束。未生成正式 FINAL，未将筛选答案保存为正式测量记录。')
+    setNotice('本轮研究筛选已结束。未生成正式答卷（FINAL），未将筛选答案保存为正式测量记录。')
   }
   const loadTask=async(id:string,code:string,secret:string)=>{
     const data=await publicApi<Task>(base+'/attempts/'+id+'/task','POST',{
@@ -671,6 +671,10 @@ export default function SurveyPublicApp(){
           items:(unit.items??[]).map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required,responseOptions:q.responseOptions})),
           responseOptions:unit.responseOptions??[]}}
         imagesReady={mountedScaleImagesReady(unit)}
+        autoAdvanceReady={(()=>{
+          const item=unit.items?.[Math.min(own(scalePages,unit.instrumentKey)??0,Math.max(0,(unit.items?.length??0)-1))]
+          return !item?.video||Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)||videoCompletions[videoKey(unit,item.itemKey)]===true
+        })()}
         renderMedia={itemKey=>{const item=unit.items?.find(q=>q.itemKey===itemKey);return item?<SurveyCatalogScaleMedia key={videoKey(unit,itemKey)} item={item} proof={{publicId,attemptId,accessCredential,...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode}:{})}} instrumentKey={unit.instrumentKey} itemKey={itemKey} complete={videoCompletions[videoKey(unit,itemKey)]} onComplete={()=>markVideoComplete(unit,itemKey)} onImagesReadyChange={ready=>markImagesReady(unit,itemKey,ready)} readOnly={Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)}/>:null}}
         answer={own(answers,unit.instrumentKey)??{}}
         tracker={timingFor(unit)} paused={finalSealed}
@@ -815,7 +819,7 @@ export default function SurveyPublicApp(){
       setCheckpointRevision(saved.revision)
       setCheckpointOverwritePending(false)
       setNotice('已加密暂存未完成答案，至 '+new Date(saved.expiresAt).toLocaleString('zh-CN')+
-        ' 有效。这不是正式 FINAL；另一设备更改后须重新读取以避免覆盖。')
+        ' 有效。这不是正式答卷（FINAL）；另一设备更改后须重新读取以避免覆盖。')
     })
   }
   const revokeAccess=()=>{if(info?.project.collectionMode!=='LINKED_WAVES'||!researchCode||!accessCredential)return
@@ -950,7 +954,7 @@ export default function SurveyPublicApp(){
             onChange={event=>setEntryToken(event.target.value.trim())}
             placeholder="输入研究邀请凭证"/>
         </label>}
-        {(home||info.waves).map(wave=><div key={wave.id} className="border-b py-3 flex items-center justify-between gap-3">
+        {(home||info.waves).map(wave=><div key={wave.id} className="survey-wave-row border-b py-3 flex items-center justify-between gap-3">
           <div><strong>第 {wave.ordinal} 轮 · {wave.title}</strong>
             <p className="text-sm text-slate-500">{wave.status==='OPEN'?'开放采集中':wave.status==='CLOSED'?'已结束':'尚未开放'}
               {wave.attempt?' · '+(wave.attempt.status==='COMPLETED'?'已完成':wave.attempt.status==='SCREENED_OUT'?'已筛除':'进行中'):''}</p>
@@ -982,9 +986,14 @@ export default function SurveyPublicApp(){
             ?'本标签页会短期暂存未提交答案。若需在其他设备恢复，请先主动保存加密临时进度，并保管原有私密凭证。公共电脑建议完成后立即退出。'
             :<>未提交答案仅在当前浏览器标签页暂存，至多两小时；
               关闭标签、使用其他设备或清理浏览器数据后无法恢复。公共电脑建议完成后立即退出。</>}</p></div>
+        {!cognitiveRunning&&task.units.some(unit=>unit.kind==='COGNITIVE')&&<aside className="survey-submit-guide" aria-label="本轮认知任务设备提示">
+          <h3>本轮包含认知任务</h3>
+          <p>现有任务需要桌面／笔记本电脑和实体键盘，正式进入时仍须完成设备与本机暂存检查。此处只是提前提醒，不代表已通过检查。</p>
+          <p>请先核对本研究的恢复方式，再决定是否更换设备；单次匿名作答只能在原浏览器标签页恢复，不能保证跨设备继续。</p>
+        </aside>}
         {task.checkpointPolicy?.enabled&&<section className={panel('bg-white border rounded-xl p-4 space-y-2')}>
           <p className="text-sm">此研究启用了可选服务器加密暂存：您可主动保存尚未完成的内容。
-            每次最多 64KB，保存期 {task.checkpointPolicy.ttlHours} 小时；不计入研究 FINAL。</p>
+            每次最多 64KB，保存期 {task.checkpointPolicy.ttlHours} 小时；不计入正式研究答卷（FINAL）。</p>
           <button type="button" className={action('btn-secondary')} disabled={busy||cognitiveRunning} onClick={saveCheckpoint}>
             保存加密临时进度（第 {checkpointRevision+1} 版）</button>
           <p className="text-xs text-slate-500">研究者不会通过此按钮获得正式作答，取消、撤回或最终提交后将按策略清理。
@@ -1002,8 +1011,8 @@ export default function SurveyPublicApp(){
           {flowBlock?.kind==='END'&&<section className={panel('bg-white border rounded-xl p-5')}>
             <h4 className="font-semibold">{flowBlock.title||'本轮流程结束'}</h4>
             <p className="text-sm">{flowBlock.termination==='SCREEN_OUT'
-              ?'当前路径为资格筛除，不形成测量 FINAL。'
-              :'后续研究工具按冻结规则不予呈现，并标记为 NOT_SHOWN。'}</p>
+              ?'当前路径为资格筛除，不形成正式测量答卷（FINAL）。'
+              :'按本轮已固定的流程，后续研究工具无需作答（未呈现，NOT_SHOWN）。'}</p>
           </section>}
           {!finalFlowStep&&<button type="button" className={action('btn-secondary')} disabled={busy||cognitiveRunning}
             onClick={advanceFlow}>确认当前步骤，继续研究</button>}
@@ -1036,7 +1045,7 @@ export default function SurveyPublicApp(){
       </form>}
       {screenedOut&&!task&&<section className={panel('bg-white border rounded-xl p-5 space-y-3')}>
         <h2 className="text-lg font-semibold">本轮资格筛选已结束</h2>
-        <p className="text-sm">未产生完整研究 FINAL；筛选路径不会作为有效测量样本统计。</p>
+        <p className="text-sm">未产生完整正式研究答卷（FINAL）；筛选路径不会作为有效测量样本统计。</p>
         {info.project.collectionMode==='LINKED_WAVES'
           ?<button type="button" className={action('btn-secondary')} disabled={busy}
               onClick={returnHome}>返回我的研究波次</button>

@@ -50,6 +50,9 @@ async function api<T>(path:string,method='GET',payload?:unknown):Promise<T>{
   return data.data as T
 }
 const displayKind:Record<Kind,string>={FORM:'Form · 表单',SCALE:'Scale · 量表',SJT:'SJT · 情境判断',COGNITIVE:'Cognitive · 认知任务'}
+const toolStatus=(status:string)=>({DRAFT:'草稿',PUBLISHED:'已发布',ARCHIVED:'已归档'} as Record<string,string>)[status]||status
+const kindLabel:Record<Kind,string>={FORM:'表单',SCALE:'量表',SJT:'情境判断',COGNITIVE:'认知任务'}
+const directionLabel=(direction:string)=>({descriptive:'仅描述',higher_is_more:'越高代表越多',higher_is_better:'越高越好',higher_is_worse:'越高越差',bipolar:'双极方向'} as Record<string,string>)[direction]||direction
 export type BuilderLeaveRisk={dirty:boolean;busy:boolean}
 export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary,onLeaveRiskChange}:{projectId:string;projectStatus?:string;instrumentLibrary?:InstrumentLibrary;onLeaveRiskChange?:(risk:BuilderLeaveRisk)=>void}){
   const prefix='/projects/'+encodeURIComponent(projectId)+'/instruments'
@@ -245,6 +248,7 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
     {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}
     <fieldset disabled={busy} className="min-w-0 border-0 p-0 space-y-5" aria-label="研究工具操作">
     <a className="survey-catalog-jump" href="#survey-authorized-catalog">已有授权工具？前往原版工具目录导入</a>
+    <a className="survey-catalog-jump" href="#survey-tool-navigation">查看当前工具属性与题目导航</a>
     <form className="flex flex-wrap gap-3 items-end border-b pb-4" onSubmit={create}>
       <label className="text-sm">工具类型
         <select className="input block" value={newKind} onChange={e=>setNewKind(e.target.value as Kind)}>
@@ -271,7 +275,7 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
           className={'block w-full text-left rounded-lg border p-3 '+(active?.id===item.id?'border-sky-700 bg-sky-50':'bg-white')}
           aria-current={active?.id===item.id?true:undefined} onClick={()=>void select(item.id)} disabled={busy}>
           <strong className="block text-sm break-words">{item.title}</strong>
-          <span className="text-xs text-slate-600">{item.kind} · 修订 {item.revision} · {item.status==='DRAFT'?'草稿':item.status==='PUBLISHED'?'已发布':'已归档'}</span>
+          <span className="text-xs text-slate-600">{item.kind} · {kindLabel[item.kind]||item.kind} · 修订 {item.revision} · {toolStatus(item.status)}</span>
         </button>)}
       </nav>
       <div className="min-w-0 space-y-4">
@@ -369,15 +373,16 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
       </>}
       </div>
       <aside aria-label="研究工具属性与题目导航"
-        className="hidden xl:block min-w-0 self-start sticky top-4 max-h-[85vh] overflow-auto rounded-xl bg-slate-50 border p-4 space-y-3">
-        <h3 className="font-semibold">属性与题目导航</h3>
+        id="survey-tool-navigation" tabIndex={-1} className="survey-tool-navigation min-w-0 self-start rounded-xl bg-slate-50 border p-4">
+        <details open><summary className="font-semibold">属性与题目导航（可收起）</summary>
+        <div className="space-y-3">
         {!active&&<p className="text-xs text-slate-600">选择工具后显示其内容结构和保存状态。</p>}
         {active&&<>
           <p className="text-sm break-words font-medium">{active.title}</p>
           <dl className="text-xs space-y-2">
             <div><dt className="inline">类型：</dt><dd className="inline">{displayKind[active.kind]}</dd></div>
             <div><dt className="inline">修订：</dt><dd className="inline">v{active.revision}{dirty?'（未保存）':''}</dd></div>
-            <div><dt className="inline">状态：</dt><dd className="inline">{({DRAFT:'草稿',PUBLISHED:'已发布',ARCHIVED:'已归档'} as Record<string,string>)[active.status]||active.status}</dd></div>
+            <div><dt className="inline">状态：</dt><dd className="inline">{toolStatus(active.status)}</dd></div>
             <div><dt className="inline">工具编码：</dt><dd className="break-all">{active.instrumentKey}</dd></div>
           </dl>
           {!readOnly&&<div className="flex flex-col gap-2">
@@ -397,7 +402,7 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
           {!readOnly&&active.kind==='SCALE'&&<>
             <h4 className="text-sm font-semibold">维度与问题</h4>
             {(active.definition as ScaleDraft).dimensions.map(dim=>
-              <p className="text-xs" key={dim.dimensionKey}>{dim.label||dim.dimensionKey} · {dim.direction}</p>)}
+              <p className="text-xs" key={dim.dimensionKey}>{dim.label||dim.dimensionKey} · {directionLabel(dim.direction)}</p>)}
             {(active.definition as ScaleDraft).items.map(q=><a className="block text-xs underline break-words"
               href={'#survey-scale-'+q.itemKey} key={q.itemKey}>{q.prompt.slice(0,35)||'未填写题干'}</a>)}
           </>}
@@ -412,9 +417,10 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
           {preview&&!preview.ok&&<p role="alert" className="text-xs text-red-700">
             结构未通过，先处理 {preview.issues.length} 项错误。目录不代表研究科学效度验证。
           </p>}
-          <p className="text-xs text-slate-600">左列切换研究工具；中列编辑题目；本列查看属性和快速定位。
-            手机端全部设置保持在题目内可访问，不依赖拖拽。</p>
+          <p className="text-xs text-slate-600">在工具列表切换工具，在编制区编辑题目；此处查看属性并快速定位。
+            手机端同样可展开题目导航，全部设置无需拖拽即可操作。</p>
         </>}
+        </div></details>
       </aside>
     </div>
     <ResearchCatalog projectId={projectId} api={api} busy={busy} onImport={importCatalog}/>

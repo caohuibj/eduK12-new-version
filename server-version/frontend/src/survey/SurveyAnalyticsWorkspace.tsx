@@ -114,6 +114,8 @@ const downloadBlob=(filename:string,value:string,mime:string)=>{
 }
 export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;actorId?:string}){
   const [overview,setOverview]=useState<Overview|null>(null)
+  const [overviewLoading,setOverviewLoading]=useState(true),[overviewError,setOverviewError]=useState('')
+  const [qualityLoading,setQualityLoading]=useState(true),[qualityError,setQualityError]=useState('')
   const [baseline,setBaseline]=useState(''),[followup,setFollowup]=useState('')
   const [paired,setPaired]=useState<Matched|null>(null)
   const [itemStats,setItemStats]=useState<WaveItems|null>(null)
@@ -178,17 +180,24 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
     setBoundedVariables([]);setBoundedItemKey('');setBoundedItem(null)
   }
   const reload=async()=>{
-    const res=await api<Overview>(base+'/analytics/overview')
-    if(currentProject.current!==projectId)return
-    setOverview(res)
-    const ordered=res.waves
-    changeWave(ordered[0]?.id??'')
-    if(ordered[0])setBaseline(ordered[0].id)
-    if(ordered[1])setFollowup(ordered[1].id)
+    setOverviewLoading(true);setOverviewError('')
+    try{
+      const res=await api<Overview>(base+'/analytics/overview')
+      if(currentProject.current!==projectId||!mounted.current)return
+      setOverview(res)
+      const ordered=res.waves
+      changeWave(ordered[0]?.id??'')
+      if(ordered[0])setBaseline(ordered[0].id)
+      if(ordered[1])setFollowup(ordered[1].id)
+    }catch(e){
+      if(currentProject.current===projectId&&mounted.current)setOverviewError(e instanceof Error?e.message:'完成进度尚不可用')
+      throw e
+    }finally{if(currentProject.current===projectId&&mounted.current)setOverviewLoading(false)}
   }
   useEffect(()=>{
     mounted.current=true
     setOverview(null);setError('');setPaired(null)
+    setOverviewLoading(true);setOverviewError('');setQualityLoading(true);setQualityError('')
     exportEpoch.current++;currentTicket.current=null
     setTicket(null);setExportRequest(null);setDownloadsStarted({});setDownloadIssue(null)
     setTicketUnavailable(false);setContinuationStopped(false)
@@ -206,8 +215,15 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
     finally{operationInFlight.current=false;setBusy(false)}
   }
   const loadQuality=async(page=qualityPage)=>{
-    const data=await api<{list:QualityRow[]}>(base+'/analytics/quality/attempts?page='+page)
-    setQualityRows(data.list);setQualityPage(page);setQualityHistory(null)
+    setQualityLoading(true);setQualityError('')
+    try{
+      const data=await api<{list:QualityRow[]}>(base+'/analytics/quality/attempts?page='+page)
+      if(currentProject.current!==projectId||!mounted.current)return
+      setQualityRows(data.list);setQualityPage(page);setQualityHistory(null)
+    }catch(e){
+      if(currentProject.current===projectId&&mounted.current)setQualityError(e instanceof Error?e.message:'质量复核列表尚不可用')
+      throw e
+    }finally{if(currentProject.current===projectId&&mounted.current)setQualityLoading(false)}
   }
   const openQualityHistory=(row:QualityRow,page=1)=>void execute(async()=>{
     const data=await api<{list:QualityAudit[];page:number}>(
@@ -378,7 +394,10 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
     {error&&(!downloadIssue||!ticket)&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
     {message&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{message}</p>}
     <fieldset disabled={busy} className="min-w-0 border-0 p-0 space-y-4" aria-label="研究数据操作">
-    <button className="btn-secondary" disabled={busy} onClick={()=>void execute(reload)}>刷新完成进度</button>
+    <button className="btn-secondary" disabled={busy||overviewLoading} onClick={()=>void execute(reload)}>刷新完成进度</button>
+    {overviewLoading&&<p role="status">正在加载完成进度…</p>}
+    {overviewError&&<p role="alert">完成进度加载失败：{overviewError}。请使用“刷新完成进度”重试。{overview?'下方保留上次成功读取的数据，可能不是最新状态。':''}</p>}
+    {!overviewLoading&&!overviewError&&overview?.waves.length===0&&<p>本项目暂无研究波次。请先在发布入口创建并保存波次。</p>}
     {overview&&waveId&&<SurveyPrivateReferenceStudio actorId={actorId} key={'reference:'+actorId+':'+projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>}
     {overview&&waveId&&<SurveyStoredReportReader actorId={actorId} key={projectId+':'+waveId} projectId={projectId} waveId={waveId} request={api}/>}
     {overview&&<><div className="overflow-x-auto" tabIndex={0} role="region" aria-label="研究波次完成统计"><table className="w-full text-sm border-collapse">
@@ -401,6 +420,10 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
           <textarea className="input block w-full" maxLength={1000} value={qualityReason}
             onChange={e=>setQualityReason(e.target.value)} placeholder="例如：注意力题未通过；或重新检查后符合纳入标准"/>
         </label>
+        {qualityLoading&&<p role="status">正在加载质量复核列表…</p>}
+        {qualityError&&<div role="alert"><p>质量复核列表加载失败：{qualityError}。{qualityRows.length?'下方保留上次成功读取的记录。':''}</p>
+          <button type="button" className="btn-secondary" disabled={busy||qualityLoading} onClick={()=>void execute(()=>loadQuality())}>重试质量复核列表</button></div>}
+        {!qualityLoading&&!qualityError&&!qualityRows.length&&<p>此页暂无可复核的已完成答卷。</p>}
         {qualityRows.map(row=><div className="flex flex-wrap justify-between gap-3 border-b py-2" key={row.attemptId}>
           <div className="text-xs"><code>{row.attemptCode}</code>
             <p>{row.researchCode??'独立匿名作答'} · {row.verdict==='EXCLUDED'?'当前排除':'当前纳入'}</p>
@@ -584,7 +607,13 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
       </div>
       <div className="border rounded-xl p-4 space-y-4">
         <h3 className="font-semibold">匿名科研数据导出</h3>
-        <p className="text-sm">导出可能包含自由文本或研究编号，请确认研究用途与数据保存规定。每批至多 250 份 FINAL、2MB，复杂量表会按安全预算自动缩小批次；RAW_WAVE 以及选定单波次的 RAW_LONG / SCORE_LONG 可按签名游标连续分批。全部波次 Wide 与未限定波次的 Long 仍适用 250 FINAL 上限；新单波次分页的有效 FINAL 与非 FINAL 参与状态使用不同 CSV 结构，后者每人每波次一行，按研究编号和波次关联而非直接拼接。分批时请保留全部 CSV、Codebook、Manifest。</p>
+        <p className="text-sm">导出可能包含自由文本或研究编号，请确认研究用途与数据保存规定。分批时请保留全部 CSV、Codebook、Manifest。</p>
+        <ol aria-label="导出操作步骤" className="list-decimal pl-5 text-sm space-y-1">
+          <li>完成二次认证，再选择数据范围与格式。</li>
+          <li>手动创建受控导出，核对当前批次。</li>
+          <li>分别下载三份文件，并在浏览器下载列表确认保存。</li>
+        </ol>
+        <details className="rounded-lg border p-3 text-sm"><summary className="cursor-pointer font-medium">批次限制与文件合并说明</summary><p className="mt-2">每批至多 250 份 FINAL、2MB，复杂量表会按安全预算自动缩小批次；RAW_WAVE 以及选定单波次的 RAW_LONG / SCORE_LONG 可按签名游标连续分批。全部波次 Wide 与未限定波次的 Long 仍适用 250 FINAL 上限；新单波次分页的有效 FINAL 与非 FINAL 参与状态使用不同 CSV 结构，后者每人每波次一行，按研究编号和波次关联而非直接拼接。分批时请保留全部 CSV、Codebook、Manifest。</p></details>
         <form className="flex flex-wrap gap-3 items-end" onSubmit={stepUp}>
           <label className="text-sm">最新 TOTP 动态验证码
             <input className="input block" inputMode="numeric" type="password" autoComplete="off"

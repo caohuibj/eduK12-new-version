@@ -45,3 +45,7 @@
   .survey-builder-shell { padding: 1rem; }
   .survey-researcher .input,.survey-builder-shell .input { font-size: 1rem; }
 }
+.survey-tool-navigation { scroll-margin-top: 1rem; }
+.survey-tool-navigation summary { min-height: 44px; cursor: pointer; color: #23495c; }
+.survey-tool-navigation:target { outline: 3px solid #16746e; outline-offset: 3px; }
+@media (min-width: 80rem) { .survey-tool-navigation { position: sticky; top: 1rem; max-height: 85vh; overflow-y: auto; } }

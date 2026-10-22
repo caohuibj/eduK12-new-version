@@ -65,13 +65,13 @@ export function ResearchScaleEditor({value,onChange,projectId}:{value:ScaleDraft
       {value.items.map((q,i)=><article className="border bg-slate-50 rounded-lg p-3 space-y-3 scroll-mt-4"
           id={'survey-scale-'+q.itemKey} tabIndex={-1} key={q.itemKey}>
         <div className="flex gap-2 items-center"><strong className="text-sm">题 {i+1}</strong>
-          <button type="button" className="btn-secondary" disabled={i===0}
+          <button type="button" className="btn-secondary" aria-label={'上移第 '+(i+1)+' 题'} disabled={i===0}
             onClick={()=>{const items=value.items.slice();[items[i],items[i-1]]=[items[i-1],items[i]];onChange({...value,items})}}>↑</button>
-          <button type="button" className="btn-secondary" disabled={i===value.items.length-1}
+          <button type="button" className="btn-secondary" aria-label={'下移第 '+(i+1)+' 题'} disabled={i===value.items.length-1}
             onClick={()=>{const items=value.items.slice();[items[i],items[i+1]]=[items[i+1],items[i]];onChange({...value,items})}}>↓</button>
-          <button type="button" className="btn-secondary" onClick={()=>onChange({...value,items:[
+          <button type="button" className="btn-secondary" aria-label={'复制第 '+(i+1)+' 题'} onClick={()=>onChange({...value,items:[
             ...value.items.slice(0,i+1),{...q,itemKey:researchKey('q'),dimensionKeys:[...q.dimensionKeys]},...value.items.slice(i+1)]})}>复制</button>
-          <button type="button" className="btn-secondary" onClick={()=>onChange({...value,items:value.items.filter((_,k)=>k!==i),totalScore:value.totalScore?{...value.totalScore,itemKeys:value.totalScore.itemKeys.filter(k=>k!==q.itemKey)}:undefined})}>删除</button>
+          <button type="button" className="btn-secondary" aria-label={'删除第 '+(i+1)+' 题'} onClick={()=>onChange({...value,items:value.items.filter((_,k)=>k!==i),totalScore:value.totalScore?{...value.totalScore,itemKeys:value.totalScore.itemKeys.filter(k=>k!==q.itemKey)}:undefined})}>删除</button>
         </div>
         <label className="block text-sm">题目用途
           <select className="input block w-full" aria-label={'题目用途 '+(i+1)} value={q.purpose??'CONTENT'} onChange={e=>{

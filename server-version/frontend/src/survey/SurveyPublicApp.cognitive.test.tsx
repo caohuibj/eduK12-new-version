@@ -41,6 +41,23 @@ afterEach(()=>{
 })
 async function open(){render(<SurveyPublicApp/>);fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}));await screen.findByRole('radio',{name:'符合'})}
 describe('Survey parent/child boundary and feedback',()=>{
+  it('shows the device reminder only after the task confirms cognitive content and hides it while running',async()=>{
+    render(<SurveyPublicApp/>)
+    const restore=await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'})
+    expect(screen.queryByRole('complementary',{name:'本轮认知任务设备提示'})).toBeNull()
+    fireEvent.click(restore)
+    await screen.findByRole('radio',{name:'符合'})
+    expect(screen.getByRole('complementary',{name:'本轮认知任务设备提示'})).toHaveTextContent('不能保证跨设备继续')
+    fireEvent.click(screen.getByRole('radio',{name:'符合'}))
+    fireEvent.click(screen.getByRole('button',{name:'确认当前工具，继续'}))
+    fireEvent.click(screen.getByRole('button',{name:'模拟开始认知'}))
+    expect(screen.queryByRole('complementary',{name:'本轮认知任务设备提示'})).toBeNull()
+  })
+  it('does not show cognitive requirements for a form-only task',async()=>{
+    task.units=task.units.filter((unit:any)=>unit.kind==='FORM')
+    await open()
+    expect(screen.queryByRole('complementary',{name:'本轮认知任务设备提示'})).toBeNull()
+  })
   it('locks prior answers, blocks outer navigation while running, and seals exact child refs on parent retry',async()=>{
     failFirst=true;await open();fireEvent.click(screen.getByRole('radio',{name:'符合'}));fireEvent.click(screen.getByRole('button',{name:'确认当前工具，继续'}))
     expect(harness.cognitive.priorAnswers).toEqual({form:{q:'yes'}})
