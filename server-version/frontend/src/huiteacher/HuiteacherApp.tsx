@@ -19,6 +19,10 @@ import { ReportPrivacyPreferences } from '../components/report-privacy/ReportPri
 import { ProductPasswordChange } from '../components/account/ProductPasswordChange'
 import { HuiteacherLanding } from './HuiteacherLanding'
 import './huiteacher-landing.css'
+import TeacherBrand from './TeacherBrand'
+import { useProductTheme } from '../components/product-theme/useProductTheme'
+import { ProductThemeControl } from '../components/product-theme/ProductThemeControl'
+import './huiteacher-theme.css'
 
 type Envelope<T>={code:string|number;message:string;data:T}
 type Scope={organizationId:string;organizationName:string;membershipId:string;orgRole:string;productAdmin:boolean}
@@ -63,11 +67,6 @@ const Field=({label,value,set,type='text',required=true}:{
   autoCapitalize="none" spellCheck={false}
   autoComplete={type==='password'?(label==='设置密码'?'new-password':'current-password'):label.includes('账号')?'username':'off'}/></label>
 
-function Brand(){return <div className="ht-brand">
-  <img className="ht-brand-symbol ht-brand-b3" src="/huiteacher/huiteacher-b3-emblem.svg"
-    width="56" height="64" alt=""/>
-  <strong>Huiteacher</strong>
-</div>}
 
 export default function HuiteacherApp(){
   const appRoot=useRef<HTMLElement>(null)
@@ -91,6 +90,7 @@ export default function HuiteacherApp(){
   }
   const [screen,setScreen]=useState<Screen>(()=>['/login','/participate'].includes(window.location.pathname)?'login':'home')
   const [me,setMe]=useState<Me|null>(null)
+  const appearance=useProductTheme('teacher',me?.id)
   const [loading,setLoading]=useState(true)
   const [working,setWorking]=useState(false)
   useEffect(()=>{
@@ -98,7 +98,7 @@ export default function HuiteacherApp(){
     const icon=document.querySelector<HTMLLinkElement>('link[rel="icon"]')
     const previousIcon=icon?.getAttribute('href')
     const previousType=icon?.getAttribute('type')
-    document.title='Huiteacher · 教师发展与学校改进'
+    document.title='Teacher · 教师发展与学校改进'
     if(icon){icon.href='/huiteacher/huiteacher-b3-emblem.svg';icon.type='image/svg+xml'}
     return ()=>{
       document.title=previousTitle
@@ -264,11 +264,12 @@ export default function HuiteacherApp(){
   }
   const publicHome=!me&&screen==='home'
   const publicAuth=!me&&screen!=='home'
-  return <main ref={appRoot} className={`ht-app${!me?' ht-app-public':''}${publicHome?' ht-app-landing':''}`}>
+  return <main ref={appRoot} className={`ht-app${!me?' ht-app-public':''}${publicHome?' ht-app-landing':''}`} data-theme={appearance.theme}>
     <header className="ht-topbar">
-      {me?<Brand/>:<button type="button" className="ht-brand-home" aria-label="Huiteacher 首页"
-        onClick={()=>changeScreen('home')}><Brand/></button>}
+      {me?<TeacherBrand/>:<button type="button" className="ht-brand-home" aria-label="Teacher 首页"
+        onClick={()=>changeScreen('home')}><TeacherBrand/></button>}
       <nav aria-label="产品导航">
+        <ProductThemeControl appearance={appearance} product="Teacher"/>
         {!me&&<>
           {!publicHome&&<button className="ht-home-entry" type="button" onClick={()=>changeScreen('home')}>首页</button>}
           <button type="button" aria-current={screen==='login'?'page':undefined} onClick={()=>changeScreen('login')}>登录</button>
@@ -281,7 +282,7 @@ export default function HuiteacherApp(){
     {message&&<p role="status" className="ht-notice">{message}</p>}
     <div className={publicAuth?'ht-auth-surface':'ht-page-content'}>
     {loading?<section className="ht-panel ht-session-loading" aria-live="polite"><p>正在检查教育账号登录状态…</p></section>:
-    publicHome?<HuiteacherLanding onEnter={()=>changeScreen('login')}/>:
+    publicHome?<HuiteacherLanding theme={appearance.theme} onEnter={()=>changeScreen('login')}/>:
     !me&&screen==='join'?<section className="ht-panel ht-form-panel">
       <h1>受邀创建教育账号</h1>
       <p>选择与你收到的邀请相符的身份，<br/>我们会引导你完成注册。</p>
@@ -293,7 +294,7 @@ export default function HuiteacherApp(){
       <p className="ht-muted">邀请码由学校或项目提供。</p>
       <div className="ht-auth-switch">已有教育账号？<button type="button" onClick={()=>changeScreen('login')}>直接登录</button></div>
     </section>:
-    !me&&screen==='login'?<section className="ht-panel ht-form-panel"><h1>登录 Huiteacher</h1>
+    !me&&screen==='login'?<section className="ht-panel ht-form-panel"><h1>登录 Teacher</h1>
       <p>使用已有教育账号，进入你的发展空间。</p>
       <form onSubmit={e=>{e.preventDefault();login()}}>
         <Field label="教育账号" value={username} set={setUsername}/>
@@ -364,7 +365,7 @@ export default function HuiteacherApp(){
       </section>
       {me.role==='STUDENT'?<HuiteacherMyFormTasks student api={teacherApi}/>:
       <>
-      <nav className="ht-workspace-tabs" aria-label="Huiteacher 工作台">
+      <nav className="ht-workspace-tabs" aria-label="Teacher 工作台">
         <button type="button" aria-pressed={workspaceTab==='teacher'}
           onClick={()=>changeWorkspaceTab('teacher')}>教师成长</button>
         {canAuthorPrivateTools&&<button type="button" aria-pressed={workspaceTab==='private-tools'} onClick={()=>changeWorkspaceTab('private-tools')}>我的工具</button>}
@@ -396,7 +397,7 @@ export default function HuiteacherApp(){
           scenarios={['TEACHER_STUDENT_EVALUATION','TEACHER_ADULT_FORM_GROUP']} api={teacherApi}/>
       </details>}
       {org&&<section className="ht-panel">
-        <h2>{org.organizationName}</h2><p>{org.productAdmin?'已获得本校 Huiteacher 管理权限':'已获得本校 Huiteacher 参与权限'}</p>
+        <h2>{org.organizationName}</h2><p>{org.productAdmin?'已获得本校 Teacher 管理权限':'已获得本校 Teacher 参与权限'}</p>
         {me.role!=='STUDENT'&&<><h3>年级与班级</h3><div className="ht-units">{units.map(u=><span key={u.id} className="ht-tag">{u.unitKind==='GRADE'?'年级':'班级'} · {u.name}</span>)}</div></>}
         {me.role!=='STUDENT'&&org.productAdmin&&<div className="ht-admin">
           <div className="ht-inline"><Field label="近期 MFA 验证码" value={mfaCode} set={setMfaCode}/>
@@ -413,7 +414,7 @@ export default function HuiteacherApp(){
             </select></label>}
             <button disabled={working||!newUnitName||newUnitType==='CLASS'&&!newUnitParent} onClick={createUnit}>创建</button></div>
           <h3>学生身份与班级关系</h3>
-          <p>Teacher 学生加入是共享教育身份的基础成员授权；不会产生 Huischool 心理健康的班级审批。</p>
+          <p>Teacher 学生加入是共享教育身份的基础成员授权；不会产生 School 心理健康的班级审批。</p>
           <label className="ht-field"><span>班级</span><select value={classId} onChange={e=>setClassId(e.target.value)}>
             <option value="">请选择班级</option>{units.filter(u=>u.unitKind==='CLASS').map(u=><option key={u.id} value={u.id}>{u.name}</option>)}
           </select></label>
@@ -451,6 +452,6 @@ export default function HuiteacherApp(){
       </>}
     </div>:null}
     </div>
-    <footer className="ht-footer">{publicHome?`© ${new Date().getFullYear()} Huiteacher`:'Huiteacher · 教师发展与学校改进'}</footer>
+    <footer className="ht-footer">{publicHome?`© ${new Date().getFullYear()} Teacher`:'Teacher · 教师发展与学校改进'}</footer>
   </main>
 }

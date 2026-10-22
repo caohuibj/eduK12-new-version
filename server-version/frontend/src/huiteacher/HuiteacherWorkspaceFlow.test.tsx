@@ -160,6 +160,6 @@ describe('Teacher form draft navigation',()=>{
     fireEvent.click(screen.getByRole('button',{name:'教师成长'}))
     expect(await screen.findByText(/个人空间 · 显示本人各学校/)).toBeInTheDocument()
     expect(screen.getByText('本人跨学校表单任务')).toBeInTheDocument()
-    expect(within(screen.getByRole('navigation',{name:'Huiteacher 工作台'})).getByRole('button',{name:'教师成长'})).toHaveAttribute('aria-pressed','true')
+    expect(within(screen.getByRole('navigation',{name:'Teacher 工作台'})).getByRole('button',{name:'教师成长'})).toHaveAttribute('aria-pressed','true')
   })
 })

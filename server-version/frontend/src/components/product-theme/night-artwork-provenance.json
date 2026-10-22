@@ -1,0 +1,34 @@
+{
+  "generator": "built-in image_gen",
+  "method": "lighting-weather edit of the existing daytime bitmap; originals preserved",
+  "conversion": "ImageMagick WebP quality 82; 768px responsive derivative quality 80",
+  "assets": [
+    {
+      "source": "src/school/huischool-campus-sunlight.webp",
+      "output": "src/school/huischool-campus-moonlight.webp",
+      "dimensions": "1536x1024",
+      "description": "Campus tree, four seated students and school retained; moonlight and warm windows replace sunlight.",
+      "sourceSha256": "abf99c956cf3812208bbae1bdc979db32e326096a7cecd2780a1ea9462aed1cb",
+      "outputSha256": "979079a5cf09c782e1443462ab1c6886cfad6347dd6d857d8b61b916f8cf6b96",
+      "bytes": 258152
+    },
+    {
+      "source": "public/huiteacher/educator-journal.webp",
+      "output": "public/huiteacher/educator-journal-moonlight.webp",
+      "dimensions": "1536x1024",
+      "description": "Journal, pencil, vase and notebook retained; moonlit desk, classroom sketch and small campus photo.",
+      "sourceSha256": "2803c29b230fa7613024f936d81c09bb7e9a7fb1e3e922d294d68d3f6d282b05",
+      "outputSha256": "c77ddf9c337941b40c1bc8533169480ba2097cd365ca01c3c7a088803cb51ebe",
+      "bytes": 203212
+    },
+    {
+      "source": "public/huiteacher/educator-journal.webp",
+      "output": "public/huiteacher/educator-journal-moonlight-small.webp",
+      "dimensions": "768x512",
+      "description": "Responsive derivative of the generated moonlit journal.",
+      "sourceSha256": "2803c29b230fa7613024f936d81c09bb7e9a7fb1e3e922d294d68d3f6d282b05",
+      "outputSha256": "ce308690682b32890bb2b836fa9fff77c0ee8f6ea69202678c4c7d07cbcc3cc9",
+      "bytes": 47442
+    }
+  ]
+}

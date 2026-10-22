@@ -3,6 +3,8 @@ import {usePrivateToolCapability,type PrivateDraftState} from '../components/edu
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import './school.css'
 import './school-workspace.css'
+import { useProductTheme } from '../components/product-theme/useProductTheme'
+import { ProductThemeControl } from '../components/product-theme/ProductThemeControl'
 import { SchoolMark } from './SchoolMark'
 import { SchoolWorkspaceShell, SchoolWorkspaceOverview } from './SchoolWorkspaceShell'
 import { canReadSchoolClasses, schoolNavigation, workspacePage, workspacePath } from './school-navigation'
@@ -24,6 +26,8 @@ import { SchoolParentRegistration, SchoolParentLinks } from './SchoolParentPorta
 import { SchoolParentTasks } from './SchoolParentTasks'
 import { SchoolPeerConsent } from './SchoolPeerConsent'
 import { SchoolStudentFeedback, SchoolStudentReportConsent, SchoolParentReports, SchoolReportOfficer, SchoolDisclosureOfficers, SchoolProfessionalReports } from './SchoolReports'
+
+import './school-theme.css'
 
 type CampusUser={id:string;username:string;role:string;accountDomain:'SCHOOL';mustChangePassword:boolean}
 type CampusOrg={id:string;name:string;orgRole:string}
@@ -69,6 +73,7 @@ const field=(label:string,value:string,onChange:(v:string)=>void,type='text')=>(
 export default function SchoolApp(){
   const [page,setPage]=useState(()=>workspacePage(window.location.pathname))
   const [user,setUser]=useState<CampusUser|null>(null)
+  const appearance=useProductTheme('school',user?.id)
   const [loading,setLoading]=useState(true)
   const [screen,setScreen]=useState<'home'|'code'|'recruit'|'feature'|'login'|'register'|'staff'|'recover'|'parent'|'mfa'|'workspace'>(()=>
     ['/register','/staff/register','/parent/register'].includes(window.location.pathname)?'code':
@@ -150,7 +155,7 @@ export default function SchoolApp(){
     setPage(id);setError('');setNotice('');window.scrollTo({top:0,behavior:'instant'})
   }
 
-  useEffect(()=>{const previous=document.title;document.title=screen==='feature'&&activeFeature?`${activeFeature.title} | Huischool`:'Huischool';return()=>{document.title=previous}},[screen,activeFeature])
+  useEffect(()=>{const previous=document.title;document.title=screen==='feature'&&activeFeature?`${activeFeature.title} | School`:'School';return()=>{document.title=previous}},[screen,activeFeature])
   useEffect(()=>{
     if(!user||user.mustChangePassword){setCampusParentReportEnabled(false);return}
     let live=true
@@ -339,12 +344,13 @@ export default function SchoolApp(){
   const publicHome=!user&&screen==='home'
   const publicAuth=!user&&['login','code','register','staff','parent','recover','mfa'].includes(screen)
 
-  return <div className={`hs-app${user?' hs-workspace':''}`}>
+  return <div className={`hs-app${user?' hs-workspace':''}`} data-theme={appearance.theme}>
     <a className="hs-skip-link" href="#hs-main">跳到主要内容</a>
     {!user?<SchoolPublicHeader onHome={()=>goPublic('home')} onLogin={()=>goPublic('login')}
-      onRegister={()=>goPublic('code')} onExplore={explore} home={publicHome}/>:<header className="hs-header">
+      onRegister={()=>goPublic('code')} onExplore={explore} home={publicHome} appearance={appearance}/>:<header className="hs-header">
       <a href="/workspace" className="hs-workspace-brand" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('overview')}}><SchoolMark/></a>
       <nav aria-label="校园导航">
+        <ProductThemeControl appearance={appearance} product="School"/>
         <span className="hs-account">{user.username}</span><button onClick={()=>void logOut()}>退出</button>
       </nav>
     </header>}
@@ -352,7 +358,7 @@ export default function SchoolApp(){
       {error&&<p className="hs-alert" role="alert">{error}</p>}
       {notice&&<p className="hs-message" role="status">{notice}</p>}
       {loading?<p>正在核对校园会话…</p>:null}
-      {!loading&&publicHome&&<SchoolLanding onJoin={()=>goPublic('recruit')}/>}
+      {!loading&&publicHome&&<SchoolLanding theme={appearance.theme} onJoin={()=>goPublic('recruit')}/>}
       {!loading&&!user&&screen==='code'&&<SchoolCodeRegistration api={api} onResolved={codeResolved} onLogin={()=>goPublic('login')}/>}
       {!loading&&!user&&screen==='feature'&&activeFeature&&<section className="hs-feature-blank" aria-label={`${activeFeature.title}介绍页面`}>
         <h1 className="hs-visually-hidden">{activeFeature.title}</h1>
@@ -360,7 +366,7 @@ export default function SchoolApp(){
       {!loading&&!user&&screen==='recruit'&&<section className="hs-recruit-blank" aria-label="学校招募页面"><h1 className="hs-visually-hidden">学校招募</h1></section>}
       {!loading&&!user&&['register','staff','parent'].includes(screen)&&<button className="hs-auth-back" type="button" onClick={()=>goPublic('code')}>← 更换注册码</button>}
       {!loading&&!user&&screen==='login'&&<section className="hs-panel hs-narrow">
-        <p className="hs-section-kicker">欢迎回到 Huischool</p>
+        <p className="hs-section-kicker">欢迎回到 School</p>
         <h1>校园账号登录</h1>
         <p className="hs-auth-intro">使用校园用户名和密码登录，进入你的校园空间。</p>
         <form onSubmit={e=>void signIn(e)}>
@@ -526,6 +532,6 @@ export default function SchoolApp(){
         {['admission','recovery'].includes(page)&&!classId&&(schoolAdmin||psychologyStaff)&&<section className="hs-panel"><h2>先选择一个班级</h2><p>在上方选择学校和班级后，继续处理该班级的事务。</p></section>}
       </SchoolWorkspaceShell>}
     </main>
-    <footer className="hs-footer">Huischool · 科学支持 · 专业陪伴 · 健康成长</footer>
+    <footer className="hs-footer">School · 科学支持 · 专业陪伴 · 健康成长</footer>
   </div>
 }
