@@ -1,0 +1,55 @@
+.survey-researcher .survey-tool-template.is-composition { padding:1rem 1.25rem 1.25rem; }
+.is-composition .survey-template-fields { margin-top:1rem; }
+.survey-composition-studio { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(19rem,1fr); gap:1.1rem; align-items:start; }
+.survey-composition-catalog,.survey-composition-outline { min-width:0; padding:1.1rem; border:1px solid var(--survey-brand-line); border-radius:.8rem; background:#fff; }
+.survey-composition-step { display:flex; align-items:start; gap:.65rem; margin-bottom:1rem; }
+.survey-composition-step>span { display:grid; place-items:center; flex-shrink:0; width:30px; height:30px; border-radius:.5rem; background:var(--survey-brand-soft); color:var(--survey-brand-accent); font-size:.7rem; font-weight:600; }
+.survey-composition-step>div { flex:1; min-width:0; }
+.survey-researcher .survey-composition-step h2 { margin:0; color:var(--survey-brand-ink); font-size:.95rem; font-weight:600; }
+.survey-composition-step p { color:var(--survey-brand-muted); font-size:.72rem; line-height:1.75; margin-top:.25rem; }
+.survey-composition-step>small { color:var(--survey-brand-muted); font-size:.7rem; white-space:nowrap; padding-top:.25rem; }
+.survey-composition-types { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.6rem; margin-bottom:1.4rem; }
+.survey-researcher .survey-composition-types>button { display:flex; align-items:center; gap:.65rem; padding:.75rem; text-align:left; border:1px solid var(--survey-brand-line); border-radius:.6rem; background:var(--survey-brand-canvas); color:var(--survey-brand-muted); }
+.survey-composition-types button svg { flex-shrink:0; }
+.survey-composition-types button span { min-width:0; }
+.survey-composition-types strong { display:block; font-size:.82rem; font-weight:600; }
+.survey-composition-types small { display:block; font-size:.66rem; margin-top:.25rem; line-height:1.6; }
+.survey-researcher .survey-composition-types>button[aria-pressed=true] { border-color:var(--survey-brand-border-strong); background:var(--survey-brand-soft); color:var(--survey-brand-accent-strong); box-shadow:inset 0 0 0 1px var(--survey-brand-border-strong); }
+.survey-composition-filter { display:flex; flex-wrap:wrap; gap:.65rem; justify-content:space-between; align-items:center; margin-bottom:.7rem; }
+.survey-composition-filter>[role=group] { display:flex; gap:.2rem; padding:.2rem; border-radius:.5rem; background:var(--survey-brand-subtle); }
+.survey-composition-filter [role=group] button { padding:.4rem .65rem; min-height:36px; font-size:.72rem; color:var(--survey-brand-muted); border:1px solid transparent; border-radius:.4rem; }
+.survey-composition-filter [role=group] button[aria-pressed=true] { background:#fff; color:var(--survey-brand-accent-strong); border-color:var(--survey-brand-line); font-weight:600; }
+.survey-composition-filter form { display:flex; align-items:center; gap:.4rem; flex:1; min-width:11rem; border:1px solid var(--survey-brand-line); border-radius:.5rem; padding:0 .55rem; color:var(--survey-brand-muted); }
+.survey-composition-filter form input { width:100%; min-width:0; background:transparent; font-size:.75rem; }
+.survey-composition-filter form button { font-size:.7rem; min-height:36px; flex-shrink:0; color:var(--survey-brand-accent); }
+.survey-composition-page-note { font-size:.68rem; line-height:1.7; color:var(--survey-brand-muted); margin:.6rem 0; }
+.survey-composition-candidates { display:grid; gap:.6rem; margin-top:.8rem; }
+.survey-composition-candidates article { display:flex; align-items:center; gap:.7rem; padding:.85rem; border:1px solid var(--survey-brand-line); border-radius:.6rem; background:var(--survey-brand-canvas); }
+.survey-composition-candidates article>div { flex:1; min-width:0; }
+.survey-composition-candidates h3 { font-size:.8rem; color:var(--survey-brand-ink); font-weight:600; line-height:1.7; overflow-wrap:anywhere; }
+.survey-composition-candidates p { font-size:.65rem; color:var(--survey-brand-muted); margin-top:.3rem; }
+.survey-researcher .survey-composition-candidates .btn-secondary { display:flex; align-items:center; gap:.3rem; padding:.4rem .6rem; min-height:36px; border-radius:.45rem; font-size:.7rem; white-space:nowrap; }
+.survey-composition-pagination { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:.55rem; padding-top:1rem; margin-top:1rem; border-top:1px solid var(--survey-brand-line); color:var(--survey-brand-muted); font-size:.65rem; }
+.survey-researcher .survey-composition-pagination .btn-secondary,.survey-composition-refresh { padding:.3rem .5rem; min-height:32px; font-size:.7rem; border-radius:.4rem; }
+.survey-composition-outline { position:sticky; top:1rem; background:var(--survey-brand-subtle); }
+.survey-composition-outline ol { list-style:none; display:grid; gap:.6rem; padding:0; margin:0; }
+.survey-composition-outline li { display:flex; align-items:start; gap:.6rem; padding:.8rem; border:1px solid var(--survey-brand-line); border-radius:.6rem; background:#fff; }
+.survey-composition-position { color:var(--survey-brand-accent); font-size:.72rem; padding-top:.15rem; }
+.survey-composition-outline li>div:first-of-type { flex:1; min-width:0; }
+.survey-composition-outline li strong { display:block; font-size:.8rem; font-weight:600; color:var(--survey-brand-ink); line-height:1.7; overflow-wrap:anywhere; }
+.survey-composition-outline li small { display:block; font-size:.65rem; color:var(--survey-brand-muted); margin-top:.3rem; }
+.survey-composition-outline-actions { display:flex; flex-wrap:wrap; gap:.1rem; max-width:4.2rem; justify-content:flex-end; flex-shrink:0; }
+.survey-researcher .survey-composition-outline-actions button { display:grid; place-items:center; width:30px; min-height:30px; padding:.3rem; border-radius:.35rem; color:var(--survey-brand-muted); }
+.survey-composition-outline-actions button:hover:not(:disabled) { background:var(--survey-brand-soft); color:var(--survey-brand-accent); }
+.survey-composition-outline-note { padding-top:1rem; margin-top:1rem; border-top:1px solid var(--survey-brand-line); font-size:.7rem; line-height:1.8; color:var(--survey-brand-muted); }
+.survey-composition-outline-note strong { color:var(--survey-brand-accent-strong); font-weight:550; }
+.survey-composition-outline-note p { margin-top:.25rem; }
+.survey-composition-empty { display:grid; justify-items:center; padding:1.6rem .7rem; text-align:center; color:var(--survey-brand-muted); border:1px dashed var(--survey-brand-border); border-radius:.6rem; background:var(--survey-brand-canvas); font-size:.75rem; line-height:1.8; }
+.survey-composition-empty h3 { margin:.6rem 0 .25rem; font-size:.85rem; color:var(--survey-brand-ink); font-weight:550; }
+.survey-composition-empty p { max-width:24rem; font-size:.7rem; }
+.survey-composition-limit { padding:.7rem; margin-top:.8rem; border-radius:.4rem; color:var(--survey-brand-accent-strong); background:var(--survey-brand-soft); font-size:.7rem; line-height:1.7; }
+.survey-composition-footer { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.75rem; padding:1rem 0; margin-top:1rem; border-top:1px solid var(--survey-brand-line); }
+.survey-composition-footer p { font-size:.72rem; color:var(--survey-brand-muted); line-height:1.8; }
+.survey-researcher .survey-composition-footer .btn-primary { min-height:38px; padding:.45rem .85rem; border-radius:.5rem; font-size:.8rem; }
+@media(max-width:65rem){.survey-composition-studio{grid-template-columns:minmax(0,1fr)}.survey-composition-outline{position:static}.survey-composition-outline-actions{max-width:none}}
+@media(max-width:40rem){.survey-researcher .survey-tool-template.is-composition{padding:.85rem}.survey-composition-catalog,.survey-composition-outline{padding:.8rem}.survey-composition-types{gap:.4rem}.survey-researcher .survey-composition-types>button{padding:.6rem;gap:.4rem}.survey-composition-types small{font-size:.6rem}.survey-composition-candidates article{flex-wrap:wrap;padding:.7rem}.survey-composition-candidates article>.btn-secondary{margin-left:auto}.survey-composition-filter form{flex-basis:100%}.survey-composition-footer .btn-primary{margin-left:auto}.survey-composition-step{gap:.5rem}.survey-composition-step>small{white-space:normal}}

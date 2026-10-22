@@ -44,7 +44,7 @@ describe('independent Survey toolkit and study selection',()=>{
  it.each([['表单','FORM'],['量表','SCALE'],['普通组合问卷','COMPOSITION']])('enters %s editing directly after choosing the type',async(label,kind)=>{
   render(<SurveyToolLibrary/>);fireEvent.click(await screen.findByRole('button',{name:'编制工具'}))
   fireEvent.click(within(screen.getByRole('group',{name:'选择要编制的工具'})).getByRole('button',{name:new RegExp('^'+label)}))
-  expect(await screen.findByRole('heading',{name:kind==='COMPOSITION'?label+'编制':'未命名'+label})).toBeVisible()
+  expect(await screen.findByRole('heading',{name:kind==='COMPOSITION'?'未命名组合问卷':'未命名'+label})).toBeVisible()
   expect(screen.getByLabelText('工具名称')).toHaveValue(kind==='COMPOSITION'?'未命名组合问卷':'未命名'+label)
   const writes=vi.mocked(fetch).mock.calls.filter(([url,init])=>String(url).endsWith('/tool-library')&&init?.method==='POST')
   expect(writes).toHaveLength(1);expect(JSON.parse(String(writes[0][1]?.body))).toMatchObject({kind})
