@@ -62,3 +62,17 @@
   .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
   .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-actions .training-action { justify-content: center; min-width: 0; padding: 10px 8px; font-size: 15px; }
 }
+
+/* Share the course heading row with its existing catalog controls. */
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar { position: relative; min-width: 0; border-bottom: 1px solid #dce5d8; border-radius: 10px 10px 0 0; background: #fcfdf9; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar > .training-course-tabs { border-bottom: 0; background: transparent; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar > .training-catalog-disclosure { margin: 0 16px 16px; }
+@media (min-width: 1024px) {
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-work { overflow: visible; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar { display: flex; align-items: center; gap: 24px; padding-right: 20px; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar > .training-course-tabs { flex: 1; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar > .training-catalog-disclosure { flex: 0 0 300px; margin: 0; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar .training-catalog-disclosure > summary { min-height: 42px; padding: 9px 12px; font-size: 14px; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar .training-catalog-disclosure[open] > summary { border-bottom: 0; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar .training-catalog-filter { position: absolute; top: calc(100% + 8px); right: 20px; width: min(720px, calc(100vw - 80px)); box-sizing: border-box; z-index: 5; border: 1px solid #dce5d8; border-radius: 12px; background: #fff; box-shadow: 0 8px 30px #24463720; }
+}

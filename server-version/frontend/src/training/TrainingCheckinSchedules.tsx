@@ -29,10 +29,10 @@ export default function TrainingCheckinSchedules({ courseId }: { courseId: strin
     } catch (cause) { setError(cause instanceof Error ? cause.message : '停止失败，请重试') }
     finally { setBusy(null) }
   }
+  if (!error && rows.length === 0) return null
   return <section className="training-checkin-schedules" aria-label="周期打卡任务">
     <header><h2>周期打卡</h2><span>{loading ? '正在读取…' : `${rows.filter(row => row.active).length} 个进行中`}</span></header>
     {error && <p role="alert">{error} <button type="button" onClick={() => setRevision(value => value + 1)}>重试</button></p>}
-    {!loading && !error && rows.length === 0 && <p>发布打卡时选择“周期打卡”，即可按设定间隔自动发布。</p>}
     {rows.map(row => <article key={row.id}><div><h3>{row.title}<span>{row.active ? '进行中' : '已停止 / 已结束'}</span></h3><p>每 {row.intervalDays % 7 === 0 ? `${row.intervalDays / 7} 周` : `${row.intervalDays} 天`} · 每期 {row.durationHours} 小时 · 已发布 {row.publishedCount} 期</p><p>{row.active && row.nextPublishAt ? `下次：${date(row.nextPublishAt, row.timezone)}（${row.timezone}）` : '后续发布已结束'}{row.endsAt && ` · 结束：${date(row.endsAt, row.timezone)}`}</p></div>{row.active && <button type="button" disabled={busy !== null} onClick={() => void stop(row)}>{busy === row.id ? '停止中…' : '停止后续发布'}</button>}</article>)}
     {feedback}
   </section>

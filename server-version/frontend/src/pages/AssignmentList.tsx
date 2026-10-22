@@ -603,7 +603,7 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
       {embeddedCourse && focusId && <div className="training-assignment-focused"><span>已定位到这份练习</span><ProductButton onClick={() => { const next=new URLSearchParams(searchParams);next.delete('assignmentId');setSearchParams(next,{replace:true}) }}>显示全部练习</ProductButton></div>}
       {feedback}
       {openingDetail && <p role="status">正在读取练习完整内容…</p>}
-      {!focusId && <CatalogFilters key={filterRevision+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline label="练习"/>}
+      {!embeddedCourse && !focusId && <CatalogFilters key={filterRevision+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline label="练习"/>}
       {loading ? <ProductStatus kind="pending" title="正在加载练习">正在读取练习和提交概况。</ProductStatus>
       : loadError ? <ProductStatus kind="error" title="练习列表加载失败" actions={<ProductButton onClick={() => void fetchAssignments()}>重试</ProductButton>}>{loadError}</ProductStatus>
       : filteredAssignments.length === 0 ? <ProductStatus kind="info" title="暂无匹配练习">可以调整筛选条件，或布置第一份练习。</ProductStatus>

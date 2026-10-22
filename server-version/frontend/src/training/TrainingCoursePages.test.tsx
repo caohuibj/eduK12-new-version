@@ -195,6 +195,20 @@ describe('course-first training workspaces', () => {
     expect(post).not.toHaveBeenCalledWith('/courses/course-1/end', {})
   })
 
+  it('applies the single header filter only to the current course section', async () => {
+    mount('/courses/course-1/detail?section=checkins', '/courses/:courseId/detail', TrainingTrainerCourse)
+    await screen.findByRole('heading', { name: '每周打卡' }, { timeout: 5000 })
+    expect(screen.getAllByText('检索与筛选')).toHaveLength(1)
+    fireEvent.click(screen.getByText('检索与筛选'))
+    fireEvent.change(screen.getByRole('searchbox', { name: '搜索打卡' }), { target: { value: '每周' } })
+    fireEvent.click(screen.getByRole('button', { name: '查询' }))
+    await waitFor(() => expect(get.mock.calls.some(([url]) => url.startsWith('/checkins?view=summary&courseId=course-1&') && new URLSearchParams(url.split('?')[1]).get('search') === '每周')).toBe(true))
+    fireEvent.click(screen.getByRole('button', { name: '学习' }))
+    await screen.findByRole('heading', { name: '课程练习' })
+    expect(screen.getAllByText('检索与筛选')).toHaveLength(1)
+    expect(screen.getByRole('searchbox', { name: '搜索练习', hidden: true })).toHaveValue('')
+  })
+
   it('trainer publishing links keep the exact course context', async () => {
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()

@@ -523,7 +523,7 @@ const CheckinListContent: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
       {embeddedCourse && focusId && <div className="training-assignment-focused"><span>已定位到这项打卡</span><ProductButton onClick={() => { const next=new URLSearchParams(searchParams);next.delete('checkinId');setSearchParams(next,{replace:true}) }}>显示全部打卡</ProductButton></div>}
       {feedback}
       {openingDetail && <p role="status">正在读取打卡完整内容…</p>}
-      {!focusId && <CatalogFilters key={filterRevision+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline label="打卡"/>}
+      {!embeddedCourse && !focusId && <CatalogFilters key={filterRevision+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline label="打卡"/>}
       {loading ? <ProductStatus kind="pending" title="正在加载打卡">正在读取打卡和参与概况。</ProductStatus>
       : loadError ? <ProductStatus kind="error" title="打卡列表加载失败" actions={<ProductButton onClick={() => void fetchCheckins()}>重试</ProductButton>}>{loadError}</ProductStatus>
       : filteredCheckins.length === 0 ? <ProductStatus kind="info" title="暂无匹配打卡">可以调整筛选条件，或创建第一项打卡。</ProductStatus>
