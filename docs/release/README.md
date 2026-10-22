@@ -833,3 +833,12 @@ CodeQL 保留既有时限；超时报告实际等待项，不追加检查。
 稳定 merge gate / ready PR 重算实际差异，必须 scope、完整 training-appearance
 及 codeql 全部实际 success；draft、missing、skipped、cancelled、failed 均阻断。
 此范围只授予本次合并资格，不提供服务器部署资格。
+
+本路线保留首次 CI run `39805784823` 的失败：70 个控制断言通过，3 个通用
+CLI 用例继承真实 PR 环境而失败；仅隔离测试子进程的分支变量后复验，正式
+接纳和禁止回退仍使用真实环境。前端编译当时尚未执行，不能称原 run 成功。
+同一 run 的 CodeQL job `119918625032` 已真实成功；当前前端与全部控制脚本
+树、CodeQL initialize/analyze 的版本、语言、路径、查询与资源设置均逐字相同。
+Actions 重新核官方 run/job/source/branch/步骤、24 小时有效期及两个完整 Git tree，
+核原配置后接纳此成功扫描并保存 receipt，不重复扫描。元数据不可用、过期或
+输入不同直接失败，不回退重扫、不把原父 run 的失败改为成功。

@@ -879,7 +879,56 @@ jobs:
           const paths=[...Object.keys(b.source),...b.controls].filter(x=>/\.[cm]?[jt]sx?$/.test(x));
           if(paths.length<10)throw Error('Missing changed SAST inputs');
           fs.appendFileSync(process.env.GITHUB_OUTPUT,`config=${JSON.stringify({paths})}\n`);
+      - name: admit the exact successful Training appearance SAST without rescanning unchanged inputs
+        if: needs.scope.outputs.application_route == 'training-appearance'
+        id: appearance-codeql-reuse
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: node {0}
+        run: |
+          const assert = require('node:assert/strict');
+          const fs = require('node:fs');
+          const {execFileSync} = require('node:child_process');
+          const {createHash} = require('node:crypto');
+          const source = '1a0fc0f2c447c334e2ae02c8dacc438720073ef2';
+          const repo = 'caohuibj/eduK12-new-version', runId = 39805784823, jobId = 119918625032;
+          assert.equal(process.env.GITHUB_REPOSITORY, repo);
+          const api = async path => {
+            const r = await fetch(`https://api.github.com/repos/${repo}/${path}`, {headers:{Authorization:`Bearer ${process.env.GH_TOKEN}`,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}});
+            assert.equal(r.status,200,'Official SAST metadata unavailable');return r.json();
+          };
+          (async()=>{
+            const run = await api(`actions/runs/${runId}`), job = await api(`actions/jobs/${jobId}`);
+            assert.equal(run.event,'pull_request');assert.equal(run.path,'.github/workflows/ci.yml');
+            assert.equal(run.head_sha,source);assert.equal(run.head_branch,'work/training-appearance-20261022');
+            assert.equal(job.run_id,runId);assert.equal(job.head_sha,source);
+            assert.equal(job.name,'codeql (javascript/typescript SAST)');
+            assert.equal(job.status,'completed');assert.equal(job.conclusion,'success');
+            const age = Date.now()-Date.parse(job.completed_at);assert.ok(age>=0&&age<24*60*60*1000,'Original SAST is expired');
+            for(const name of ['initialize CodeQL','analyze with CodeQL'])assert.ok(job.steps.some(s=>s.name===name&&s.status==='completed'&&s.conclusion==='success'),'Original SAST stage missing');
+            execFileSync('git',['fetch','--no-tags','--depth=1','origin',source],{stdio:'inherit'});
+            const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+            const trees={};for(const path of ['server-version/frontend','.github/scripts']){
+              const before=git('rev-parse',`${source}:${path}`),current=git('rev-parse',`HEAD:${path}`);
+              assert.equal(current,before,'SAST input tree changed: '+path);trees[path]=current;
+            }
+            const previous=execFileSync('git',['show',`${source}:.github/workflows/ci.yml`],{encoding:'utf8'}),current=fs.readFileSync('.github/workflows/ci.yml','utf8');
+            const stage=(text,name)=>{
+              const section=text.slice(text.indexOf('  codeql:\n'),text.indexOf('\n  miniprogram:\n'));
+              const begin=section.indexOf(`      - name: ${name}\n`);assert.ok(begin>=0);
+              const next=section.indexOf('\n      - ',begin+1);
+              return section.slice(begin,next<0?undefined:next).replace(/^\s+if: steps\.appearance-codeql-reuse\.outputs\.reused != 'true'\n/gm,'').trim();
+            };
+            const stages={};for(const name of ['initialize CodeQL','analyze with CodeQL']){
+              const original=stage(previous,name),now=stage(current,name);assert.equal(now,original,'CodeQL version, paths, languages, queries or resource settings changed');
+              stages[name]=createHash('sha256').update(now).digest('hex');
+            }
+            fs.mkdirSync('training-appearance-evidence',{recursive:true});
+            fs.writeFileSync('training-appearance-evidence/sast-reuse.json',JSON.stringify({kind:'official-successful-component-reuse',originalRun:runId,originalJob:jobId,source,currentHead:git('rev-parse','HEAD'),trees,stages,originalCompletedAt:job.completed_at,currentScanExecuted:false,parentRunConclusion:run.conclusion},null,2));
+            fs.appendFileSync(process.env.GITHUB_OUTPUT,'reused=true\n');
+          })().catch(e=>{console.error(e.message);process.exitCode=1;});
       - name: initialize CodeQL
+        if: steps.appearance-codeql-reuse.outputs.reused != 'true'
         uses: github/codeql-action/init@v3
         with:
           languages: ${{ needs.scope.outputs.scenario == 'survey-wave-selection' && 'javascript-typescript,python' || contains(fromJSON('["shared-asset-storage","survey-candidate","reviewed-candidate","survey-mac-ui","exact-candidate","scale-library-governance"]'), needs.scope.outputs.application_route) && 'javascript-typescript,python' || 'javascript-typescript' }}
@@ -889,6 +938,7 @@ jobs:
           ram: 3500
           threads: 2
       - name: analyze with CodeQL
+        if: steps.appearance-codeql-reuse.outputs.reused != 'true'
         uses: github/codeql-action/analyze@v3
         with:
           # This repository has not enabled GitHub code scanning yet. Keep the
@@ -896,6 +946,14 @@ jobs:
           # uploading results to an unavailable code-scanning endpoint.
           upload: never
           upload-database: false
+      - name: retain official Training SAST reuse receipt
+        if: steps.appearance-codeql-reuse.outputs.reused == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: training-appearance-sast-reuse-${{ github.sha }}
+          path: training-appearance-evidence/sast-reuse.json
+          if-no-files-found: error
+          retention-days: 3
 
   miniprogram:
     name: mini program / foundation contract and page smoke

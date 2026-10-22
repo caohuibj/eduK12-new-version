@@ -30,7 +30,9 @@ jobs:
         with:
           node-version: '24.21.0'
       - name: current routing and strict aggregate contracts (no application test repetition)
-        run: node --test .github/scripts/training-appearance.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs
+        # Generic CLI fixtures supply their own synthetic event and branch.
+        # The next admission step retains the real PR environment unchanged.
+        run: env -u CI_HEAD_REF -u CI_SOURCE_HEAD -u GITHUB_HEAD_REF -u GITHUB_REF_NAME node --test .github/scripts/training-appearance.test.mjs .github/scripts/content-scope.test.mjs .github/scripts/content-workflows.test.mjs .github/scripts/ci-topology.test.mjs
       - name: verify immutable inputs and reviewed local records without repeating unchanged checks
         run: node .github/scripts/training-appearance-checks.mjs
       - uses: actions/upload-artifact@v4
