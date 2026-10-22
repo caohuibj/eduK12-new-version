@@ -8,7 +8,7 @@ import { Appearance, useTrainingAppearance } from './appearanceContext'
 
 function read(key: string, enabled: boolean): TrainingAppearance {
   if (!enabled) return 'light'
-  try { return parseAppearance(localStorage.getItem(key)) } catch { return 'light' }
+  try { return parseAppearance(localStorage.getItem(key)) } catch { return 'auto' }
 }
 export function TrainingAppearanceProvider({ children }: { children: ReactNode }) {
   const enabled = isTrainingHost()

@@ -5,7 +5,7 @@ export function appearanceKey(userId?: string): string {
   return 'training:appearance:v1:' + (userId ? encodeURIComponent(userId) : 'guest')
 }
 export function parseAppearance(value: string | null): TrainingAppearance {
-  return value === 'dark' || value === 'auto' ? value : 'light'
+  return value === 'light' || value === 'dark' || value === 'auto' ? value : 'auto'
 }
 export function appearanceTheme(mode: TrainingAppearance, now = new Date()): TrainingTheme {
   return mode === 'auto' ? (now.getHours() >= 7 && now.getHours() < 19 ? 'light' : 'dark') : mode
