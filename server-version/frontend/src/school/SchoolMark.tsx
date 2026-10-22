@@ -1,16 +1,18 @@
 import a1Emblem from './huischool-a1-emblem.svg'
-import a1Wordmark from './huischool-wordmark.svg'
+import schoolWordmark from './huischool-wordmark.svg'
 
-/** A1 emblem traced from the approved original; existing Baskerville wordmark outlined as SVG. Both have transparent negative space.
- * Original source retained in huischool-a1-source.png; unrelated B3/W2 artwork is untouched.
- */
+/** Preserve the approved A1 artwork; the two-line wordmark is outlined SVG. */
 export function HuischoolA1Emblem({ className }: { className: string }) {
   return <img className={className} src={a1Emblem} alt="" aria-hidden="true"/>
 }
 export function SchoolMark() {
-  return <div className="hs-brand" aria-label="Huischool">
+  return <div className="hs-brand" aria-label="School @eduk12.top">
     <HuischoolA1Emblem className="hs-brand-icon"/>
-    <img className="hs-brand-wordmark" src={a1Wordmark} alt="Huischool"/>
+    <svg className="hs-brand-wordmark" viewBox="0 0 400 150" width="135" height="51"
+      role="img" aria-label="School @eduk12.top" focusable="false"
+      style={{ color: 'var(--hs-brand-ink, var(--hs-ink, #204c38))' }}>
+      <use href={`${schoolWordmark}#school-wordmark`}/>
+    </svg>
   </div>
 }
 export function SchoolHeroMark() {
