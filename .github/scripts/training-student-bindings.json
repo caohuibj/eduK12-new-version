@@ -1,0 +1,155 @@
+{
+  "schema": 1,
+  "base": "97b86a92cf077009e915575a9554452cc4dd3d0f",
+  "product": "17c9e3bda897862cd6625ed42feef26e785fcf68",
+  "source": {
+    "server-version/backend/src/__tests__/composite/copy.service.test.ts": {
+      "before": "b971423231a44c67c32552e17f8bd2460c01838e",
+      "after": "72775cfe911cc781d6aa5974360b48ed4d5e457e"
+    },
+    "server-version/backend/src/__tests__/composite/student-archived-availability.postgres.integration.test.ts": {
+      "before": null,
+      "after": "953d36f802fc12b0d47ca30957327ad5f25c1445"
+    },
+    "server-version/backend/src/modules/composite/composite.service.ts": {
+      "before": "15194d66a709b3b1c76334d5c7efd31b92cd5eb7",
+      "after": "d498f080b51eeb12a972c47777241341636a9908"
+    },
+    "server-version/backend/src/modules/composite/final-submit.service.ts": {
+      "before": "e609818f92d390211b1b1e066796e360ee9d35e2",
+      "after": "c0b8490ab930336eab8737799682b53ae9592f2c"
+    },
+    "server-version/docs/frontend-convergence/routes.md": {
+      "before": "d198d6c24a5d00007f11194a4ce128b9d620a06d",
+      "after": "4f5b363d79c4cd617ad43b91100eb501ba753931"
+    },
+    "server-version/frontend/src/App.tsx": {
+      "before": "36ea18bde0e6e590308ce80b2165f02ac0264f1a",
+      "after": "310dbc9cdc248e49494f45920de4e5f119774c25"
+    },
+    "server-version/frontend/src/components/app-shell/AppShell.tsx": {
+      "before": "355d2115af940a9aadab5e2539dcafc4ce457b84",
+      "after": "b0c103418a81640a123b4c0260ef75fa5e10134e"
+    },
+    "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx": {
+      "before": "56b8d4c21a51d371201096de15ea5d0ec05c76da",
+      "after": "637c1838e70bed49cda9b0d8d62c38b7c7940594"
+    },
+    "server-version/frontend/src/components/assessment-tool-picker.css": {
+      "before": "5ea971b9b5da1034940555c1d6e84a4e8e5f18e7",
+      "after": "c892662604199b74beed3b670d7a8d5935eb9157"
+    },
+    "server-version/frontend/src/modules/assessment-media/AssessmentVideoPlayer.tsx": {
+      "before": "c8c9df60d75fe609ddedecdaf5d575995fc851b5",
+      "after": "d5a6cc7c19a5da393297b49658fb6b81ffe68b57"
+    },
+    "server-version/frontend/src/modules/assessment-media/__tests__/AssessmentVideoPlayer.test.tsx": {
+      "before": "e9005a3fe2e7465a14b95aa3051ddd1d90be5248",
+      "after": "10010b9a7252184097d7b1c068a4f918f7fd237c"
+    },
+    "server-version/frontend/src/pages/questionnaire/FormTemplateWorkspace.tsx": {
+      "before": null,
+      "after": "8b05066d9bcc4e5dbdf3245588df37f3bdcae8f8"
+    },
+    "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": {
+      "before": "b4010cb975ce138d43e0536f8b8689dd9811ac30",
+      "after": "5c6d01d3b6642ec4f590d625e3489dd7a9e9c53d"
+    },
+    "server-version/frontend/src/pages/questionnaire/__tests__/FormTemplates.test.tsx": {
+      "before": "694cff7f928d1975689c1b057fe4641d1acf37d0",
+      "after": "6a7e602b381e9ba065ccc68e15fbe8c2d9d4aef6"
+    },
+    "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx": {
+      "before": "1159da7e4f19e6b7847210071577da2450909a5a",
+      "after": "f3321a83fccd8eae437f7c916fd6dea25d2f6448"
+    },
+    "server-version/frontend/src/pages/questionnaire/form-template-editor.css": {
+      "before": "2040f5bbf25959b0477f76ed729ea97288515069",
+      "after": "4d6d1b9635ee7435d94e342f674e6640836dd97c"
+    },
+    "server-version/frontend/src/pages/questionnaire/questionnaire-content-editor.css": {
+      "before": null,
+      "after": "adcb9cf79cf13663d307d37e5ded14b7e8ff2063"
+    },
+    "server-version/frontend/src/training/TrainingLearnerHome.tsx": {
+      "before": "29eaa82670e8a7b004e06888a9965e97573c7f22",
+      "after": "b1887d53b5f37248a9bbbe8e0fde91e20cd82b89"
+    },
+    "server-version/frontend/src/training/TrainingLibrary.test.tsx": {
+      "before": "f546ee16b0afb1bbda4eac48ac6103360631b575",
+      "after": "891389aeb698a680730f74830afc6f7ee55c3c64"
+    },
+    "server-version/frontend/src/training/TrainingLibrary.tsx": {
+      "before": "18cca3d3a685c48870f0f51f8775b741b9784b5e",
+      "after": "b87d4b9e01783d5f09b316d37a363ac58d9577a6"
+    },
+    "server-version/frontend/src/training/TrainingScreens.test.tsx": {
+      "before": "8c1f8cf989364a8eaf0bd9a097bee6190aedf44c",
+      "after": "086af52e56969154bf287566aec42e47f5c8545b"
+    },
+    "server-version/frontend/src/training/TrainingSjtAuthoringAccess.test.tsx": {
+      "before": null,
+      "after": "a2159c53c9ebb17dec6c39a64913d321d1a2600c"
+    },
+    "server-version/frontend/src/training/TrainingSjtAuthoringAccess.tsx": {
+      "before": null,
+      "after": "5d3759ed557ee0bd7112627553d95d802963b020"
+    },
+    "server-version/frontend/src/training/courseAssessments.test.ts": {
+      "before": "b9f129c36c21a2e03741c7b8f08e93aa55c38ec1",
+      "after": "c593f76290c4fb8e81a19db58a213e7757fc3a01"
+    },
+    "server-version/frontend/src/training/training-learner-home.css": {
+      "before": "1346edec697502f0e812c07bef7eeb48a9fc970a",
+      "after": "daa247fe1e262e5953c23961c08b9753c015f32d"
+    }
+  },
+  "controls": [
+    ".github/scripts/training-student-bindings.json",
+    ".github/scripts/training-student-scope.mjs",
+    ".github/scripts/training-student-checks.mjs",
+    ".github/scripts/training-student.test.mjs",
+    ".github/workflows/ci-training-student.yml",
+    ".github/scripts/training-workspace-scope.mjs",
+    ".github/workflows/ci-training-workspace.yml",
+    ".github/workflows/ci.yml",
+    "docs/release/README.md",
+    ".github/evidence/training-student/archived-emergency-postgres.json",
+    ".github/evidence/training-student/archived-postgres-01.json",
+    ".github/evidence/training-student/fixed-backend-availability.json",
+    ".github/evidence/training-student/fixed-frontend-01.json",
+    ".github/evidence/training-student/fixed-frontend-remaining.json",
+    ".github/evidence/training-student/reviewed-local.json"
+  ],
+  "controlBefore": {
+    ".github/scripts/training-workspace-scope.mjs": "3ee471bca8afd120b717fe0d956ff075c447aadd",
+    ".github/workflows/ci-training-workspace.yml": "e087b12b016c506c20855713d0ee5fb87890c4d4",
+    ".github/workflows/ci.yml": "e79a168cb58c0b1599f280ce6a448b49525475f1",
+    "docs/release/README.md": "95b94d3b313194f0a45cf901b9d63a76bfb552ae"
+  },
+  "components": {
+    "frontend": "e03d2f0e5c5179ebce68297897a257dec7e2d53f",
+    "backend": "73dc1454d3257dfb70924b8f6d3dd282bf9b4b54"
+  },
+  "protectedInputs": {
+    "server-version/frontend/package.json": "84089551a17c85d00f03a36081fe78e6374f0716",
+    "server-version/frontend/package-lock.json": "70318f94fe631d8292f567cf421f97e7d5613b31",
+    "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
+    "server-version/frontend/tsconfig.cognitive.json": "910e97700f25652bc1d80ada47e176cbd51c2fbe",
+    "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22",
+    "server-version/backend/package.json": "033398f6361b0e4217226ae00f2edc2ed3380ecd",
+    "server-version/backend/package-lock.json": "73607721290dd28f1c6f85d5e12d5d517926ede3",
+    "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
+    "server-version/backend/prisma": "dd403eeb91d9471a9995447ec01c7c82041c48d9",
+    "AGENTS.md": "f590736fbd299dba10f646d657d8d4b798cd14fd",
+    ".github/config/acceptance-scopes.json": "3e712ad61188aac0ec9af4cc4ca99496bde186df"
+  },
+  "evidence": {
+    ".github/evidence/training-student/fixed-frontend-remaining.json": "393ea2dede9155611e20919c220c51cf027167f7ae7643857bf1044ae736990f",
+    ".github/evidence/training-student/reviewed-local.json": "9c3aa645ca9d0dd4f2314e234acf9f9a0da2ee70c7fc5024bd1bd2483b4f1798",
+    ".github/evidence/training-student/fixed-frontend-01.json": "7dc8a2e0de9511196c219df8d922019fb24e94c4f0c8cb2205e0ccea3cf465b0",
+    ".github/evidence/training-student/archived-postgres-01.json": "e3aa7ee2e8d57da7a78c693fdddcba89795387953286b98602111351cb71cf34",
+    ".github/evidence/training-student/archived-emergency-postgres.json": "5d26320612cca085fcbfdae8f6244d9afee13d0f0ee83bddd3da722f1c04b906",
+    ".github/evidence/training-student/fixed-backend-availability.json": "e85425f322fbf924e95d7dba8febe813124be84465797513cea384964f7b6336"
+  }
+}

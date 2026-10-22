@@ -1,12 +1,95 @@
 .hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor .qt-form-template-workspace {
   display: grid;
-  gap: 24px;
+  gap: 26px;
   min-width: 0;
   border: 0;
   margin: 24px 0 0;
   padding: 0;
-  background: transparent;
+  /* The shared editor forces white onto every fieldset with !important. */
+  background: transparent !important;
   box-shadow: none;
+}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor {
+  --form-border: #dce4da;
+  --form-muted: #68796d;
+}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-info {
+  border: 1px solid var(--form-border); border-radius: 12px; background: #fff;
+}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-info > summary {
+  display: flex; align-items: center; gap: 13px; padding: 17px 22px; cursor: pointer; list-style: none; color: #315b47;
+}
+.qt-form-info > summary::-webkit-details-marker { display: none; }
+.qt-form-info-title { display: grid; gap: 3px; min-width: 0; flex: 1; }
+.qt-form-info-title strong { overflow-wrap: anywhere; font-size: 16px; }
+.qt-form-info-title small { color: var(--form-muted); font-size: 12px; }
+.qt-form-info-action { display: flex; align-items: center; gap: 8px; white-space: nowrap; font-size: 13px; }
+.qt-form-info[open] .qt-form-info-action svg { transform: rotate(180deg); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-info-fields { padding: 22px; border-top: 1px solid var(--form-border); }
+.qt-form-info-fields > p:first-child { margin-bottom: 18px; }
+.qt-form-content-heading { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-content { background: transparent; border: 0; padding: 0; box-shadow: none; }
+.qt-form-eyebrow { display: block; margin-bottom: 7px; color: #77896c; font-size: 10px; letter-spacing: 1.8px; font-weight: 650; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-content-heading h2 { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; font-size: 24px; margin: 0; }
+.qt-form-content-heading h2 > span { font-family: inherit; font-size: 12px; font-weight: 500; color: #58704f; background: #eaf0e2; border-radius: 20px; padding: 5px 11px; }
+.qt-form-content-heading p { font-size: 14px; color: var(--form-muted); margin-top: 8px; }
+.qt-form-save-note { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--form-muted); padding-bottom: 3px; }
+.qt-form-save-note > span { width: 6px; height: 6px; background: #648865; border-radius: 50%; }
+.qt-form-builder { display: grid; grid-template-columns: minmax(250px, .65fr) minmax(0, 1.7fr); align-items: start; gap: 22px; }
+.qt-form-builder > * { min-width: 0; }
+.qt-form-directory { border: 1px solid var(--form-border); border-radius: 12px; background: #f0f3eb; overflow: hidden; }
+.qt-form-directory > header { display: flex; align-items: center; gap: 8px; padding: 18px; border-bottom: 1px solid var(--form-border); color: #45634c; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-directory h3 { flex: 1; font-size: 14px; margin: 0; }
+.qt-form-directory > header > span { color: var(--form-muted); font-size: 12px; }
+.qt-form-directory-empty { display: grid; justify-items: center; text-align: center; padding: 42px 18px 32px; color: #7a8d72; }
+.qt-form-directory-empty strong { font-size: 15px; color: #4d634f; margin-top: 13px; }
+.qt-form-directory-empty p { font-size: 13px; line-height: 1.9; margin-top: 8px; }
+.qt-form-directory-help { border-top: 1px solid var(--form-border); margin: 0; padding: 14px 18px; font-size: 12px; line-height: 1.8; color: var(--form-muted); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-sections,
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-questions { list-style: none; padding: 0; margin: 0; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-sections { padding: 12px; max-height: 620px; overflow: auto; }
+.qt-form-section-heading { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 7px; padding: 3px; }
+.qt-form-section-heading strong { font-size: 12px; color: var(--form-muted); overflow-wrap: anywhere; }
+.qt-form-order-actions { display: flex; gap: 2px; flex-shrink: 0; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-order-actions .hui-button,
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-remove { min-height: 32px; min-width: 32px; padding: 6px; background: transparent; border-color: transparent; color: #6e806d; }
+.qt-form-questions > li { display: flex; align-items: center; gap: 2px; margin-bottom: 7px; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-question { display: flex; align-items: start; gap: 10px; text-align: left; flex: 1; min-width: 0; padding: 13px 11px; background: #fff; border: 1px solid var(--form-border); border-radius: 8px; color: #304a3c; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-question[aria-pressed=true] { border-color: #70966b; background: #e7eedf; opacity: 1; }
+.qt-form-question > span:nth-child(2) { display: grid; gap: 5px; flex: 1; min-width: 0; }
+.qt-form-question strong { font-size: 13px; line-height: 1.7; overflow-wrap: anywhere; font-weight: 550; }
+.qt-form-question small { font-size: 11px; color: var(--form-muted); font-weight: 400; }
+.qt-form-question-number { background: #f0f3eb; border-radius: 4px; min-width: 23px; padding: 3px; text-align: center; font-size: 11px; line-height: 1.6; }
+.qt-form-question > svg { margin-top: 5px; flex-shrink: 0; }
+.qt-form-question-editor { border: 1px solid var(--form-border); border-radius: 12px; background: #fff; overflow: hidden; }
+.qt-form-question-editor > header { display: flex; align-items: start; gap: 13px; padding: 22px 26px; border-bottom: 1px solid #e8ede4; }
+.qt-form-editor-icon { display: grid; place-items: center; border-radius: 9px; width: 39px; height: 39px; flex-shrink: 0; background: #edf2e6; color: #517347; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-question-editor h3 { font-size: 19px; margin: 0 0 6px; }
+.qt-form-question-editor > header p { color: var(--form-muted); font-size: 13px; line-height: 1.7; }
+.qt-form-question-fields { padding: 24px 26px; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-question-fields > fieldset { border: 0; padding: 0; margin: 0; display: grid; gap: 18px; background: transparent; box-shadow: none; }
+.qt-form-question-fields > fieldset > legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-question-fields label { margin: 0; font-size: 14px; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-question-fields :is(input:not([type=checkbox]), select, textarea) { margin: 7px 0 0; width: 100%; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-question-fields > fieldset > .hui-button { justify-self: start; min-width: 130px; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-help { font-size: 12px; line-height: 1.8; color: var(--form-muted); margin-top: 14px; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-library-note { margin: 0; }
+.qt-form-info summary:focus-visible { outline: 2px solid #638456; outline-offset: 3px; border-radius: 12px; }
+@media (max-width: 850px) {
+  .qt-form-builder { grid-template-columns: minmax(0, 1fr); }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-sections { max-height: 270px; }
+  .qt-form-directory-empty { padding: 18px; }
+  .qt-form-directory-empty svg, .qt-form-directory-empty br { display: none; }
+  .qt-form-directory-empty strong { margin-top: 0; }
+  .qt-form-directory-empty p { margin-top: 4px; }
+}
+@media (max-width: 540px) {
+  .qt-form-directory:has(.qt-form-directory-empty) { display: none; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-form-template-editor .qt-form-info > summary { padding: 15px; gap: 10px; }
+  .qt-form-info-action { font-size: 12px; gap: 4px; }
+  .qt-form-info-title small { font-size: 11px; }
+  .qt-form-question-editor > header, .qt-form-question-fields { padding: 19px 16px; }
+  .qt-form-content-heading { gap: 10px; }
 }
 .hui-training.hui-app.hui-app--standard.training-workspace-shell .qt-editor.qt-form-template-editor .questionnaire-basic-grid {
   display: grid;

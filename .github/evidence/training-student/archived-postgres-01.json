@@ -1,0 +1,4 @@
+{
+  "originalSha256": "a7be3b3a303639af958dec991cbc837691c6c2e3d740f4f80fb58c0a1a0fa0dc",
+  "originalText": "\n RUN  v4.1.11 /Users/Qiang/Documents/Codex/2026-10-22/task-2/eduK12-training-student/server-version/backend\n\n\n Test Files  1 passed (1)\n      Tests  3 passed (3)\n   Start at  11:56:41\n   Duration  6.40s (transform 3.89s, setup 0ms, import 45ms, tests 6.25s, environment 0ms)\n\n"
+}

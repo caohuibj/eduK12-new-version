@@ -6,6 +6,7 @@ import AppShell from './components/app-shell/AppShell'
 import { ProductButton, ProductPage, ProductStatus } from './components/product-ui'
 import { RouteAccess, RouteLoading } from './components/app-shell/RouteAccess'
 import { isTrainingHost } from './training/context'
+import TrainingSjtAuthoringAccess from './training/TrainingSjtAuthoringAccess'
 
 // Portal & Auth Pages
 import Portal from './pages/Portal'
@@ -681,7 +682,7 @@ function AppRoutes() {
               </StudentProtectedRoute>
             }
           />
-          <Route path="/sjt-authoring" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><SjtAuthoring /></ProtectedRoute>} />
+          <Route path="/sjt-authoring" element={<ProtectedRoute roles={['TEACHER', 'ADMIN']}><TrainingSjtAuthoringAccess><SjtAuthoring /></TrainingSjtAuthoringAccess></ProtectedRoute>} />
           <Route path="/teacher/situational" element={<ProtectedRoute roles={['TEACHER']}><SituationalHome /></ProtectedRoute>} />
           <Route path="/teacher/situational/history" element={<ProtectedRoute roles={['TEACHER']}><SituationalHistory /></ProtectedRoute>} />
           <Route path="/teacher/situational/:instrumentKey" element={<ProtectedRoute roles={['TEACHER']}><SituationalRunner /></ProtectedRoute>} />

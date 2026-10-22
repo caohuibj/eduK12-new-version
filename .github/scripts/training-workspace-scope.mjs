@@ -1,3 +1,4 @@
+import {studentPlan} from './training-student-scope.mjs';
 import {trainingFollowupPlan} from './training-followup-scope.mjs';
 import {execFileSync} from 'node:child_process';
 import {readFileSync,existsSync} from 'node:fs';
@@ -23,6 +24,7 @@ export function integratedWorkspacePlan(entries,base,head,read=git){
  return {schema:1,route:'training-workspace',candidate:'mac-integrated',base,head,sourceCount:Object.keys(b.source).length,changes:entries};
 }
 export function trainingWorkspacePlan(entries,base,head,read=git){
+ const student=studentPlan(entries,base,head,read);if(student)return student;
  const followup=trainingFollowupPlan(entries,base,head,read);if(followup)return followup;
  const integrated=integratedWorkspacePlan(entries,base,head,read);if(integrated)return integrated;
  const marker=entries.find(e=>e.file===bindingPath);

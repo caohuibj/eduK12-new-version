@@ -80,6 +80,11 @@ export const AssessmentVideoPlayer = ({
     setBuffering(false)
     setError(false)
     setPlaying(false)
+  }, [sources.videoUrl])
+
+  // Updating the durable viewing marker does not reload the media element,
+  // so it must not wait for a second loadedmetadata/canplay event.
+  useEffect(() => {
     setCompletionPersistError(null)
     completionCandidateRef.current = false
     internalSeekRef.current = false
