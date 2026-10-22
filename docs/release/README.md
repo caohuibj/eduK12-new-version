@@ -940,9 +940,9 @@ Chrome sandbox retained, and proves nonempty restore plus the existing runtime-r
 and release-schema contracts. Existing business screenshot/session/keyboard matrices
 are not replaced by the separately reported brand/theme/layout observations.
 
-Historical local assertions are admitted only after individual source-closure
-review. Original failure, filtering and unsigned execution identities remain;
-CI validates the frozen safe index, not a historical signature or raw report.
+No historical local assertions are admitted after the frontend dependency patch.
+The four direct brand/SVG assertions run against the final dependency inputs in CI.
+Original unsigned local reports remain local and are not relabeled as CI results.
 Reports expose allowlisted cases/statuses, diagnostic source locations and hashes,
 not DSNs, credentials or private fixture output. Raw logs exist only temporarily
 on the isolated runner and are not a persistent archive. The stable merge gate

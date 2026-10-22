@@ -5,8 +5,8 @@
   "branch": "work/school-teacher-review-20261022",
   "enabled": true,
   "base": "4dd9f1340fef2bc3df2d066b9bf7712bc2eb3c66",
-  "productHead": "98bfe89ca5d6487b284b531c6310c76b2f77380a",
-  "frontendTree": "7668052f9159b9e49b20263de1fe104feb5b1747",
+  "productHead": "2474801b49ac69dde2d45903f42cfa4cc1092e4b",
+  "frontendTree": "c1e34b8fdd1a0127a155a208187a8c6bb2f8760f",
   "backendTree": "1d3a5ac4e2d2b5e73d8563f15c191eaaf0893bf8",
   "source": {
     ".github/scripts/school-teacher-browser-control.mjs": {
@@ -1336,6 +1336,14 @@
     "server-version/frontend/src/survey/SurveyScaleLibrarySubmission.tsx": {
       "before": "24ce4fa78809f2e4c82b8370f171993486d2a17e",
       "after": "f9d5d9b4299b66aa2e1f2d2a18e798871d4beb02"
+    },
+    "server-version/frontend/package.json": {
+      "before": "84089551a17c85d00f03a36081fe78e6374f0716",
+      "after": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda"
+    },
+    "server-version/frontend/package-lock.json": {
+      "before": "70318f94fe631d8292f567cf421f97e7d5613b31",
+      "after": "38d624d2dd610673f9392a89af7290682862e2b0"
     }
   },
   "controlBefore": {
@@ -1374,11 +1382,11 @@
     "server-version/e2e/school-teacher-ui.test.cjs",
     "server-version/e2e/school-teacher-font.test.cjs"
   ],
-  "evidenceSha256": "22b8d7cba0b9e8568dff1c4db21b12ab58d8d1af1a061f6adf7d0f5b0e5c7ff6",
+  "evidenceSha256": "db20d58fbafe0178969fa8ab3d13cde454131630bfe772beada344f6b4df37db",
   "review": {
     "completed": true,
     "originalExecutionSigned": false,
-    "note": "Independent exact route/control, five-table seed, twelve-table restore and restricted-runtime review completed. Only four direct SVG component tests are admitted as reviewed unsigned historical local evidence; application qualification awaits the real current-source CI jobs."
+    "note": "Exact route, five-table seed, twelve-table restore and restricted-runtime review retained. Second-run control delta independently reviewed and pure controls/source inventory verified. No historical local assertions admitted after dependency input change; all 23 selected frontend assertions and actual application qualification require final current-source CI."
   },
   "requiredJobs": [
     "admission",
@@ -1399,7 +1407,8 @@
       "types": true,
       "lintFiles": [
         "src/components/education-tools/EducationPrivateFormEditor.tsx",
-        "src/components/scale-governance/EducationApplicabilitySubmission.tsx"
+        "src/survey/ResearchFormEditor.tsx",
+        "src/survey/SurveyScaleLibrarySubmission.tsx"
       ],
       "batches": [
         {
@@ -1417,7 +1426,7 @@
             "files": [
               {
                 "path": "server-version/frontend/package-lock.json",
-                "blob": "70318f94fe631d8292f567cf421f97e7d5613b31"
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
               },
               {
                 "path": "server-version/frontend/src/components/education-tools/EducationPrivateFormEditor.test.tsx",
@@ -1428,7 +1437,7 @@
                 "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
               }
             ],
-            "sha256": "5301c786959c75c8695932c17ecfa2599bf3fe06b54dc0b23674b3a6a1384678"
+            "sha256": "988480df14f175bac70007ec09ba43c7dee45b2763d577800d4a7d6c3d00f240"
           }
         },
         {
@@ -1445,7 +1454,7 @@
             "files": [
               {
                 "path": "server-version/frontend/package-lock.json",
-                "blob": "70318f94fe631d8292f567cf421f97e7d5613b31"
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
               },
               {
                 "path": "server-version/frontend/src/components/education-tools/EducationPrivateToolImages.test.tsx",
@@ -1456,7 +1465,7 @@
                 "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
               }
             ],
-            "sha256": "f771f42e3a6adb5bc670b44c49e82b219fc6c7705b862c9ab582e6389c5bfb80"
+            "sha256": "b25d560ded16f73c86c95157218b0c4d9be8517a9bf019367726403b74fd13c9"
           },
           "namePattern": "^(?:private studio scoped static image integration preserves form image rights when editing its alt text and caption before save)$"
         },
@@ -1475,7 +1484,7 @@
             "files": [
               {
                 "path": "server-version/frontend/package-lock.json",
-                "blob": "70318f94fe631d8292f567cf421f97e7d5613b31"
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
               },
               {
                 "path": "server-version/frontend/src/survey/ResearchFormStudio.test.tsx",
@@ -1486,7 +1495,7 @@
                 "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
               }
             ],
-            "sha256": "e044cc857917bc6e85b29f015fbdece56fad50ade7d2af2e3222e08cfdc40f48"
+            "sha256": "c08a6c769453ecf2ec1e4104110a2d607436c3c526ac5514d673c12a7beb001c"
           }
         },
         {
@@ -1509,7 +1518,7 @@
             "files": [
               {
                 "path": "server-version/frontend/package-lock.json",
-                "blob": "70318f94fe631d8292f567cf421f97e7d5613b31"
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
               },
               {
                 "path": "server-version/frontend/src/survey/SurveyBuilder.test.tsx",
@@ -1520,7 +1529,7 @@
                 "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
               }
             ],
-            "sha256": "5e5db81ab6a71e95954c3f22455187b41ed01a48e03584d7b129eff36296e561"
+            "sha256": "4928564dfb7d92d7979fa416c26c15ec306c80219632d20ae1409678451765b5"
           },
           "namePattern": "^(?:Survey Research Builder editing widgets builds pages, stable question IDs, choices and optional display logic without JSON authoring)$"
         },
@@ -1543,7 +1552,7 @@
             "files": [
               {
                 "path": "server-version/frontend/package-lock.json",
-                "blob": "70318f94fe631d8292f567cf421f97e7d5613b31"
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
               },
               {
                 "path": "server-version/frontend/src/components/scale-governance/EducationApplicabilitySubmission.test.tsx",
@@ -1554,7 +1563,7 @@
                 "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
               }
             ],
-            "sha256": "2edf63966f4735134fa80342315cd50f068f3e3022af02f657131a941a97a609"
+            "sha256": "5c2c627df95924163e930326c023d7605a706a87e2fab7696320e47158e53a2c"
           },
           "namePattern": "^(?:SURVEY exact applicability application does not invent an administration when the optional declaration has no rows|SURVEY exact applicability application blocks half rows and duplicates, and submits only explicit valid pairs|SURVEY exact applicability application keeps cancelled release switches intact and discards confirmed rows even on a round trip)$"
         },
@@ -1574,7 +1583,7 @@
             "files": [
               {
                 "path": "server-version/frontend/package-lock.json",
-                "blob": "70318f94fe631d8292f567cf421f97e7d5613b31"
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
               },
               {
                 "path": "server-version/frontend/src/survey/SurveyToolHelp.test.tsx",
@@ -1585,7 +1594,7 @@
                 "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
               }
             ],
-            "sha256": "84cfff04a3a5d3b4f969dac26969c454b3f50236beed1bae243632f21370b7b4"
+            "sha256": "edda109eb68746e2a67d8dcfb5ff5586ebcbf5fe90a52bdff570e1105d842d78"
           },
           "namePattern": "^(?:Survey tool import and management guidance offers two operations, publishes the saved exact revision and submits through existing governance)$"
         },
@@ -1609,7 +1618,7 @@
             "files": [
               {
                 "path": "server-version/frontend/package-lock.json",
-                "blob": "70318f94fe631d8292f567cf421f97e7d5613b31"
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
               },
               {
                 "path": "server-version/frontend/src/survey/SurveyScaleLibrarySubmission.test.tsx",
@@ -1620,7 +1629,108 @@
                 "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
               }
             ],
-            "sha256": "a584c723feed2f9dcbb3935eb5abf8c648a984ecc1e88a238a886e4614233907"
+            "sha256": "5a7022065090b2c01955daf7921364b43a4306d77bd89415ddde3b9a97dcce24"
+          }
+        },
+        {
+          "files": [
+            "src/huiteacher/TeacherBrand.test.tsx",
+            "src/school/SchoolMark.test.tsx"
+          ],
+          "expectedPassed": [
+            "Teacher vector identity preserves B3 and exposes one accessible two-line wordmark",
+            "Teacher vector identity contains real outlined letters, a scalable viewBox and themeable fill",
+            "School approved A1 vector identity renders the original emblem and a two-line themeable vector wordmark",
+            "School approved A1 vector identity reuses the same emblem wherever the hero emblem is displayed"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/package.json",
+                "blob": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda"
+              },
+              {
+                "path": "server-version/frontend/public/huiteacher/huiteacher-b3-emblem.svg",
+                "blob": "02c0f77ba4027269f95fac23f156f088898ad9c3"
+              },
+              {
+                "path": "server-version/frontend/src/huiteacher/TeacherBrand.test.tsx",
+                "blob": "bb254c965b53bfb9155c051c7e26513f898362fa"
+              },
+              {
+                "path": "server-version/frontend/src/huiteacher/TeacherBrand.tsx",
+                "blob": "272c4cb49552e52c4fa782b7c3b12a143892f7be"
+              },
+              {
+                "path": "server-version/frontend/src/huiteacher/teacher-wordmark.svg",
+                "blob": "292d067fc6128f3039fe18c2aee2a7373834bb43"
+              },
+              {
+                "path": "server-version/frontend/src/school/SchoolMark.test.tsx",
+                "blob": "89b031ae9b4393e89616b63b22b09a76989651f2"
+              },
+              {
+                "path": "server-version/frontend/src/school/SchoolMark.tsx",
+                "blob": "0ed6b7ebf8847e0067135e640a7a23f5f763b003"
+              },
+              {
+                "path": "server-version/frontend/src/school/huischool-a1-emblem.svg",
+                "blob": "a2ab84ee2b253f6994f6aa6b8a73e4a97c30dfb0"
+              },
+              {
+                "path": "server-version/frontend/src/school/huischool-wordmark.svg",
+                "blob": "89b7f877db6cd7c1188e7dfbd99fa07f5131150e"
+              },
+              {
+                "path": "server-version/frontend/src/test/setup.ts",
+                "blob": "3217d9d84ea1285cf3495e27669a88e3fe7d2cf3"
+              },
+              {
+                "path": "server-version/frontend/tsconfig.app.json",
+                "blob": "990a9f4222f2330106b8141fe5658283326e49df"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "f8ea01e836c517fb33e9609eb94c131e63b961f75f16d47a5d678b5d7c7336e9"
+          }
+        },
+        {
+          "files": [
+            "src/utils/__tests__/sanitize.test.ts"
+          ],
+          "expectedPassed": [
+            "sanitizeHtml removes script, event handler, javascript URL, SVG, and style payloads",
+            "sanitizeHtml preserves ordinary formatting text"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/src/utils/__tests__/sanitize.test.ts",
+                "blob": "5e9daad84849071cb7419a4a46459da8fffc3c19"
+              },
+              {
+                "path": "server-version/frontend/src/utils/sanitize.ts",
+                "blob": "3f5631698a1f898ddf58ba52a87f96a71683f5df"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              }
+            ],
+            "sha256": "c42b26c10b543643c7752dac809926a1fd2bd153cf3baa7cb07b020713124d43"
           }
         }
       ]
@@ -2070,7 +2180,9 @@
           ],
           "expectedFiltered": [
             "Education authoring source is an exact private version, not a Training alias catalog projections never expose exact attachment manifests or authored content, while protected submission views preserve consent identity",
-            "Education authoring source is an exact private version, not a Training alias expands source products without expanding organization-free distribution"
+            "Education authoring source is an exact private version, not a Training alias expands source products without expanding organization-free distribution",
+            "Education authoring source is an exact private version, not a Training alias preserves SCHOOL source, tool and immutable version provenance",
+            "Education authoring source is an exact private version, not a Training alias preserves TEACHER source, tool and immutable version provenance"
           ],
           "inputClosure": {
             "files": [

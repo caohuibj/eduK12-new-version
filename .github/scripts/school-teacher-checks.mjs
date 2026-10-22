@@ -81,11 +81,34 @@ export function reviewedCases(group){
   }
  }assert.deepEqual(consumed.sort(),[...group.admittedCaseKeys].sort(),'Missing reviewed case record');return accepted;
 }
+export function requireNoHistoricalAcceptance(evidence){assert.deepEqual(evidence,{schemaVersion:1,acceptedGroups:[]},'No historical assertions admitted after dependency inputs changed');}
+export function auditComponents(components,run,emit){
+ assert.deepEqual(components,['frontend','backend'],'Both exact component audits required');
+ const results=[];for(const component of components){try{run(component);results.push({component,status:'PASSED'})}catch{results.push({component,status:'FAILED'})}}
+ const passed=results.every(r=>r.status==='PASSED');emit({status:passed?'PASSED':'FAILED',threshold:'HIGH/CRITICAL',components:results});
+ assert(passed,'One or more component audits failed; inspect each safe component receipt');return results;
+}
+export function verifyExecutionInputs(b,read=path=>readFileSync(resolve(path),'utf8')){
+ const paths=new Set(['.github/scripts/ci-artifact.mjs','.github/release-tools/package.json','.github/release-tools/package-lock.json','server-version/scripts/ci-install-canvas-deps.sh',
+  'server-version/frontend/tsconfig.app.json','server-version/frontend/vitest.config.ts','server-version/frontend/src/test/setup.ts','server-version/frontend/vite.config.ts',
+  'server-version/backend/tsconfig.json','server-version/backend/vitest.config.ts','server-version/backend/prisma/schema.prisma',
+  'server-version/backend/scripts/runtime-table-policy.json','server-version/backend/scripts/runtime-role-defaults.sql','server-version/backend/scripts/runtime-role-contract.mjs','server-version/backend/scripts/release-schema-contract.mjs',
+  'server-version/backend/src/modules/survey/builder.compiler.ts','server-version/backend/src/config/database.ts','server-version/backend/src/utils/password.ts','server-version/backend/src/modules/organization/structure.ts','server-version/backend/src/modules/campus/admission.service.ts','server-version/backend/src/services/cacheService.ts',
+  'server-version/e2e/school-teacher-fixture.cjs','server-version/e2e/school-teacher-browser.cjs','server-version/e2e/school-teacher-chrome.cjs','server-version/e2e/school-teacher-ui.cjs',b.execution.browserHelper]);
+ for(const component of ['frontend','backend']){
+  const prefix='server-version/'+component+'/';paths.add(prefix+'package.json');paths.add(prefix+'package-lock.json');
+  for(const batch of b.execution[component].batches){for(const f of batch.files)paths.add(prefix+f);for(const f of batch.inputClosure.files)paths.add(f.path)}
+ }
+ for(const f of b.execution.frontend.lintFiles)paths.add('server-version/frontend/'+f);
+ for(const p of paths){assert(typeof p==='string'&&!p.startsWith('/')&&!p.split('/').includes('..'));assert(read(p).length>0,'Missing or empty configured source: '+p)}
+ const frontend=JSON.parse(read('server-version/frontend/package.json')),backend=JSON.parse(read('server-version/backend/package.json'));
+ assert.equal(frontend.scripts?.build,'vite build','Frontend build script changed');assert.equal(backend.scripts?.['db:generate'],'prisma generate','Backend client generation script changed');
+ assert.equal(sha256(b.execution.migration.baselineFixtureSql),b.execution.migration.baselineFixtureSha256);
+ return {sourcePathsChecked:paths.size,npmScriptsChecked:2,inlineBaselineFixtureHashVerified:true};
+}
 function admission(b,plan){
- const evidence=JSON.parse(readFileSync('.github/scripts/school-teacher-evidence.json','utf8'));const accepted=[];
- assert(Array.isArray(evidence.acceptedGroups)&&evidence.acceptedGroups.length>0,'No reviewed historical selection');
- for(const group of evidence.acceptedGroups){verifyClosure(group.inputClosure);accepted.push(...reviewedCases(group));}
- assert(accepted.length>0);receipt('admission',{status:'PASSED',plan,ciExecuted:false,originalExecutionSigned:false,originalRawVerifiedByCI:false,countsAreNotAdditive:true,acceptedCases:accepted});
+ const evidence=JSON.parse(readFileSync('.github/scripts/school-teacher-evidence.json','utf8'));requireNoHistoricalAcceptance(evidence);
+ const inputs=verifyExecutionInputs(b);receipt('admission',{status:'PASSED',plan,inputs,historicalAcceptedCases:0,acceptedCases:[]});
 }
 function batches(component,selected){const cwd=resolve('server-version',component);assert(Array.isArray(selected));for(const [i,b] of selected.entries()){
  assert(Array.isArray(b.files)&&b.files.length);for(const f of b.files)assert(/^src\/.+\.test\.tsx?$/.test(f)&&!f.split('/').includes('..'));
@@ -134,7 +157,7 @@ async function main(){const phase=process.argv[2];if(phase==='cleanup'){cleanup(
  else if(phase==='seed'){databaseGuard();command('browser-fixture',process.execPath,['server-version/e2e/school-teacher-fixture.cjs','seed']);}
  else if(phase==='restore')await restore(b);
  else if(phase==='browser-report'){const module=await import(pathToFileURL(resolve(b.execution.browserHelper))),helper=module.default||module;assert.equal(typeof helper.verifyReport,'function');const report=JSON.parse(readFileSync(join(out,'browser.json'))),frontend=JSON.parse(readFileSync('server-version/frontend/dist/ci-build-manifest.json')),backend=JSON.parse(readFileSync('server-version/backend/dist/ci-build-manifest.json'));const result=helper.verifyReport(report,{head:plan.head,tree:plan.sourceTree,runId:process.env.GITHUB_RUN_ID,frontend,backend},file=>{assert(/^screenshots\/[a-z0-9-]+\.png$/.test(file));return readFileSync(join(out,file))});receipt('browser-acceptance',result);}
- else if(phase==='audit'){for(const component of b.execution.auditComponents){assert(['frontend','backend'].includes(component));auditComponent(component)}receipt('audit',{status:'PASSED',threshold:'HIGH/CRITICAL',components:b.execution.auditComponents})}
+ else if(phase==='audit')auditComponents(b.execution.auditComponents,auditComponent,result=>receipt('audit',result));
  else if(phase==='aggregate')requireSuccess(plan,JSON.parse(process.env.NEEDS_JSON));
  else throw Error('Unknown phase');
 }

@@ -25,7 +25,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - name: authenticate frozen scope and individually reviewed local cases
+      - name: authenticate frozen scope and all configured source inputs
         run: node .github/scripts/school-teacher-checks.mjs admission
       - name: verify only new control contracts
         run: node --test .github/scripts/school-teacher.test.mjs
