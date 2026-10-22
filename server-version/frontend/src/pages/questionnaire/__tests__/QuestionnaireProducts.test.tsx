@@ -727,6 +727,22 @@ describe('Training questionnaire guided editor', () => {
     fireEvent.click(screen.getByRole('button', { name: '添加到测评' }))
     await waitFor(() => expect(api.post).toHaveBeenCalledExactlyOnceWith('/questionnaire-products/guided/items', { revision: 7, item: { type, required: true, ...itemFields } }))
   })
+  it('keeps the cognitive type discoverable but disabled when capability is unavailable', async () => {
+    capabilities.enabled = false
+    mount('guided', '#questionnaire-content')
+    expect(await screen.findByRole('button', { name: '认知测验' })).toBeDisabled()
+    expect(screen.getByText('认知测验暂不可用，当前无法添加。已有问卷内容会保留。')).toBeInTheDocument()
+    expect(api.post).not.toHaveBeenCalled()
+  })
+  it('explains an empty cognitive catalog without inventing an available task', async () => {
+    mount('guided', '#questionnaire-content')
+    fireEvent.click(await screen.findByRole('button', { name: '认知测验' }))
+    expect(screen.getByText('暂无可加入的认知测验。需要当前账号可用、已发布的认知任务，其配置也须已发布。')).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '添加到测评' })).toBeDisabled()
+    fireEvent.click(screen.getByRole('button', { name: /^选择认知测验/ }))
+    expect(screen.getByRole('dialog')).toHaveTextContent('共 0 项可用工具')
+    expect(api.post).not.toHaveBeenCalled()
+  })
   it('keeps unsaved metadata across steps and saves through the existing revision contract', async () => {
     mount('guided')
     await screen.findByDisplayValue('步骤测评')

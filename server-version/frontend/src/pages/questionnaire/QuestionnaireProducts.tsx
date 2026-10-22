@@ -31,6 +31,7 @@ import AssessmentToolPicker from '../../components/AssessmentToolPicker'
 import LocalDateTimeInput, { localDateTimeValue, parseLocalDateTime } from '../../components/LocalDateTimeInput'
 import './questionnaire-products.css'
 import './questionnaire-training-editor.css'
+import './questionnaire-content-editor.css'
 import { ArrowLeft, ArrowRight, BookOpen, Brain, Check, ClipboardList, Layers, ListChecks, Route, Save, Clock3, HardDrive, ShieldCheck, Shuffle, Link as LinkIcon } from 'lucide-react'
 import { TrainingVariantEditor } from './TrainingVariantEditor'
 import { TrainingFlowEditor, trainingFlowEditorId } from './TrainingFlowEditor'
@@ -977,17 +978,25 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                           ))}
                         </select>
                       </label>
+  const formTemplatePicker = trainingDesign && !formTemplate && draft && type === 'FORM' && <FormTemplatePicker excludeId={id} disabled={busy || dirty || authoringLocked} onImport={source => void action(async () => { hydrate(await request('/' + id + '/import-form', { revision: detail.revision, source })); setPreflight(null) })}/>
   const addContentControls = <>
-    {trainingDesign && !formTemplate && draft && type === 'FORM' && <FormTemplatePicker excludeId={id} disabled={busy || dirty || authoringLocked} onImport={source => void action(async () => { hydrate(await request('/' + id + '/import-form', { revision: detail.revision, source })); setPreflight(null) })}/>}
               {draft && (
                 <fieldset
                   disabled={busy || dirty || authoringLocked}
                   className="space-y-3 border rounded p-4"
                 >
-                  <legend>{editingFormItem ? '编辑表单题目' : formTemplate ? '添加表单题目' : '添加内容'}</legend>{trainingDesign && !formTemplate && <div className="qt-type-tabs" role="group" aria-label="内容类型">{([
-      ['SCALE','量表',BookOpen], ...(cognitiveEnabled ? [['COGNITIVE','认知测验',Brain] as const] : []),
-      ['SITUATIONAL','情境判断',Route], ['FORM','自定义表单',ClipboardList],
-    ] as Array<[string,string,typeof BookOpen]>).map(([value,label,Icon]) => <button type="button" key={String(value)} disabled={busy || dirty || authoringLocked} aria-pressed={type === value} onClick={() => { setType(String(value)); setSelected('') }}><Icon size={18} />{String(label)}</button>)}</div>}
+                  <legend>{editingFormItem ? '编辑表单题目' : formTemplate ? '添加表单题目' : '添加内容'}</legend>{trainingDesign && !formTemplate && <>
+                    <div className="qt-content-task-heading"><span>01</span><div><h3>选择内容类型</h3><p>选用已发布且有权限的工具，或编写表单题。</p></div></div>
+                    <div className="qt-type-tabs" role="group" aria-label="内容类型">{([
+                      ['SCALE','量表',BookOpen,'分别计分与反馈',catalog.scales.length],
+                      ['COGNITIVE','认知测验',Brain,'选用已有任务，保留冻结配置',catalog.cognitive.length],
+                      ['SITUATIONAL','情境判断',Route,'使用获授权的固定版本',catalog.situational.length],
+                      ['FORM','自定义表单',ClipboardList,'收集背景信息或课程反馈',null],
+                    ] as Array<[string,string,typeof BookOpen,string,number|null]>).map(([value,label,Icon,hint,count]) => <button type="button" key={value} aria-label={label} disabled={busy || dirty || authoringLocked || (value === 'COGNITIVE' && !cognitiveEnabled)} aria-pressed={type === value} onClick={() => { setType(value); setSelected('') }}><Icon size={21} aria-hidden="true"/><span><strong>{label}</strong><small>{value === 'COGNITIVE' && !cognitiveEnabled ? '当前环境未开启' : hint}</small></span>{count !== null && <span className="qt-type-count">{count}</span>}</button>)}</div>
+                    {!cognitiveEnabled && <p className="qt-content-availability">认知测验暂不可用，当前无法添加。已有问卷内容会保留。</p>}
+                    <div className="qt-content-task-heading"><span>02</span><div><h3>{type === 'FORM' ? '编写或选用表单' : `选择${labels[type]}`}</h3><p>{type === 'COGNITIVE' ? '仅选用已发布且当前账号可用的任务；此处不修改认知任务配置。' : type === 'FORM' ? '添加自定义题目，或将已有表单整份加入。' : '选择工具后，点击“添加到测评”保存到本问卷。'}</p></div></div>
+                  </>}
+                  {formTemplatePicker}
                   <label hidden={trainingDesign}>
                     测评类型
                     <select
@@ -1009,7 +1018,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                     </select>
                   </label>
                   {type !== 'FORM' ? (
-                    trainingDesign ? <AssessmentToolPicker options={choices} value={selected} onChange={setSelected} label={labels[type]} disabled={busy || dirty || authoringLocked} /> : <label className="block">
+                    trainingDesign ? <><AssessmentToolPicker options={choices} value={selected} onChange={setSelected} label={labels[type]} disabled={busy || dirty || authoringLocked} />{!choices.length && <p className="qt-content-empty-catalog" role="status">{type === 'COGNITIVE' ? '暂无可加入的认知测验。需要当前账号可用、已发布的认知任务，其配置也须已发布。' : `暂无可加入的${labels[type]}。请确认工具已发布且当前账号有使用权限。`}</p>}</> : <label className="block">
                       选择测评
                       <select
                         aria-label="选择测评"
@@ -1465,13 +1474,13 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
               <header className="qt-panel-heading"><small>STEP 01 / 04</small><h2>基本信息</h2><p>先让学员知道，这份测评是什么、如何参与。</p></header>
               <div className="qt-panel-body">{basicSettings}<p className="qt-note">各项测评独立反馈，报告为单项结果合集。当前支持网页作答。</p></div>
             </section>
-            {detail && <section className="qt-panel" hidden={stepIndex !== 1} aria-label="内容与顺序步骤">
-              <header className="qt-panel-heading"><small>STEP 02 / 04</small><h2 id="questionnaire-content" tabIndex={-1}>内容与顺序</h2><p>选择需要的测评内容，按学员实际作答顺序编排。</p><span className="qt-count">{units.length} 个内容单元</span></header>
+            {detail && <section className="qt-panel qt-composition-content" hidden={stepIndex !== 1} aria-label="内容与顺序步骤">
+              <header className="qt-panel-heading"><small>STEP 02 / 04</small><h2 id="questionnaire-content" tabIndex={-1}>编排问卷内容</h2><p>先选择工具并添加，再按学员的作答顺序排列。各测评单独出报告。</p><span className="qt-count">{units.length} 个内容单元</span></header>
               <div className="qt-panel-body">
                 {dirty && <p role="status" className="qt-note">设置尚未保存，请先保存设置再调整内容或发布。</p>}
                 {addContentControls}
-                <div className="qt-section-title"><h3>作答顺序</h3><span>使用上下箭头调整顺序</span></div>
-                {units.length ? <div className="qt-unit-editor">{unitList}<div className="qt-unit-config" aria-label="单元配置">{unitConfiguration}</div></div> : <div className="qt-empty"><Layers size={28} /><h3>这份测评还没有内容</h3><p>先选择上方已发布资源并添加，再调整作答顺序。</p></div>}
+                <div className="qt-section-title qt-content-order-heading"><div className="qt-content-task-heading"><span>03</span><div><h3>作答顺序</h3><p>添加后的内容会出现在这里。</p></div></div><span>使用上下箭头调整顺序</span></div>
+                {units.length ? <div className="qt-unit-editor">{unitList}<div className="qt-unit-config" aria-label="单元配置">{unitConfiguration}</div></div> : <div className="qt-empty"><Layers size={28} /><h3>从第一个内容开始</h3><p>在上方选择类型和工具，点击“添加到测评”。添加成功后会显示在这里。</p></div>}
               </div>
             </section>}
             <section className="qt-panel" hidden={stepIndex !== 2} aria-label="投放设置步骤">
