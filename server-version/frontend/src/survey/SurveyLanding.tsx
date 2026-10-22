@@ -50,15 +50,6 @@ export function SurveyLanding({ signedIn = false }: { signedIn?: boolean }) {
           </div>
           <p className="survey-public-access"><Check size={14} aria-hidden="true"/>研究者邀请开通 · 双因素验证登录</p>
         </div>
-        <div className="survey-landing-art" aria-hidden="true">
-          <img src="/survey/wind-observation.webp"
-            srcSet="/survey/wind-observation-small.webp 768w, /survey/wind-observation.webp 1536w"
-            sizes="(max-width: 700px) 130vw, 65vw" width="1536" height="1024"
-            alt="" loading="eager" fetchPriority="high" decoding="async"/>
-          <div className="survey-hero-orbit survey-hero-orbit--one"/>
-          <div className="survey-hero-orbit survey-hero-orbit--two"/>
-          <div className="survey-hero-caption"><span>OBSERVE</span><i/>CONNECT<i/><span>UNDERSTAND</span></div>
-        </div>
       </section>
 
       <section className="survey-public-features" id="survey-features" aria-labelledby="survey-features-title" tabIndex={-1}>

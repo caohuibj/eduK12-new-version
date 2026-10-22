@@ -152,20 +152,6 @@
   outline-offset: 5px;
 }
 
-.survey-landing-art {
-  position: absolute;
-  z-index: 0;
-  top: 50%;
-  right: -8%;
-  width: 112%;
-  transform: translateY(-52%);
-  pointer-events: none;
-  mix-blend-mode: multiply;
-  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 88%, transparent);
-}
-
-.survey-landing-art img { display: block; width: 100%; height: auto; }
-
 .survey-landing-footer {
   width: min(100%, 1440px);
   margin: 0 auto;
@@ -248,10 +234,6 @@
   .survey-landing-copy h1 { font-size: 52px; line-height: 1.45; }
   .survey-landing-copy p { margin-top: 22px; }
   .survey-enter { margin-top: 28px; }
-  .survey-landing-art {
-    right: -35%;
-    width: 170%;
-  }
   .survey-landing-footer { padding: 22px 7% 28px; }
   .survey-feature-strip { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .survey-feature-link { min-height: 112px; }
@@ -267,7 +249,6 @@
   .survey-landing-copy h1 { font-size: clamp(32px, 9.5vw, 43px); line-height: 1.55; letter-spacing: .05em; }
   .survey-landing-copy p { margin-top: 21px; font-size: 16px; line-height: 1.8; letter-spacing: .02em; }
   .survey-enter { min-height: 52px; margin-top: 28px; padding: 13px 22px 13px 25px; gap: 27px; }
-  .survey-landing-art { right: -88%; width: 266%; top: 55%; }
   .survey-landing-footer { padding-top: 12px; padding-bottom: 26px; font-size: 14px; }
   .survey-landing-header nav a { font-size: 16px; }
   .survey-feature-link { min-height: 112px; padding: 16px 12px; gap: 8px; }
