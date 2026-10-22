@@ -1,6 +1,7 @@
 import {Prisma} from '@prisma/client'
 import {readEducationRunLibraryContext,lockAndAssertEducationRunWorkflow} from './educationLibraryContext'
 import {assertEducationLibraryReadCommitted} from '../scale-library-governance/education-runtime-resources'
+import {readPrivateFormRuntimeResource} from '../education-tools/private-tool.form-runtime-resources'
 import {readPrivateScaleRuntimeResource} from '../education-tools/private-tool.runtime-resources'
 import {privateToolFail,type PrivateToolContext} from '../education-tools/private-tool.contracts'
 
@@ -32,6 +33,13 @@ export async function assertPrivateScaleRunResource(tx:Prisma.TransactionClient,
  const editor=await assertPrivateScaleRunEditor(tx,input)
  if(input.resource.version!=='1.0.0')privateToolFail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID')
  const source=await readPrivateScaleRuntimeResource(tx,{key:input.resource.key,version:'1.0.0',purpose:'NEW_USE',context:editor.context})
+ return {...editor,source}
+}
+
+export async function assertPrivateFormRunResource(tx:Prisma.TransactionClient,input:{organizationId:string;runId:string;actorUserId:string;resource:{key:string;version:string}}){
+ const editor=await assertPrivateScaleRunEditor(tx,input)
+ if(input.resource.version!=='1.0.0')privateToolFail('PRIVATE_TOOL_RUNTIME_RESOURCE_INVALID')
+ const source=await readPrivateFormRuntimeResource(tx,{key:input.resource.key,version:'1.0.0',purpose:'NEW_USE',context:editor.context})
  return {...editor,source}
 }
 

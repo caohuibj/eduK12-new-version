@@ -1,4 +1,4 @@
-import {addPrivateScaleRunTrack} from '../education-tools/private-tool.run-adapter'
+import {addPrivateScaleRunTrack,addPrivateFormRunTrack} from '../education-tools/private-tool.run-adapter'
 import {listEducationLibraryResourcePage} from '../scale-library-governance/education-catalog'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import { prisma } from '../../config/database'
@@ -114,6 +114,12 @@ export async function addTeacherPrivateRunTrack(input:Key,raw:unknown){
   const link=await activeLink(input)
   if(link.eventStatus!=='DRAFT'||link.runStatus!=='DRAFT')fail('HUITEACHER_RUN_NOT_DRAFT')
   return addPrivateScaleRunTrack({organizationId:input.organizationId,runId:link.runId,actorUserId:input.actorUserId,
+    parent:{kind:'TEACHER_EVENT',id:input.eventId}},raw)
+}
+export async function addTeacherPrivateFormRunTrack(input:Key,raw:unknown){
+  const link=await activeLink(input)
+  if(link.eventStatus!=='DRAFT'||link.runStatus!=='DRAFT')fail('HUITEACHER_RUN_NOT_DRAFT')
+  return addPrivateFormRunTrack({organizationId:input.organizationId,runId:link.runId,actorUserId:input.actorUserId,
     parent:{kind:'TEACHER_EVENT',id:input.eventId}},raw)
 }
 export async function previewTeacherRun(input:Key&{expectedVersion:number}){

@@ -1,3 +1,4 @@
+import {privateToolSharingRouter} from './private-tool.sharing.routes'
 import {educationPrivateToolMediaRouter} from './private-tool.media.routes'
 import {Router,type Request} from 'express'
 import {z} from 'zod'
@@ -30,9 +31,13 @@ export function educationPrivateToolRouter(entry:EducationToolEntry){
   }
  })
  router.use(educationPrivateToolMediaRouter(context))
+ router.use(privateToolSharingRouter(context))
  router.get('/',handle(req=>service.listPrivateTools(context(req),cursor(req))))
  router.post('/',handle(req=>service.createPrivateTool(context(req),req.body)))
- router.get('/runtime-candidates',handle(req=>service.listPrivateScaleRuntimeCandidates(context(req),cursor(req))))
+ router.get('/runtime-candidates',handle(req=>{
+  const query=z.object({cursor:privateToolId.optional(),kind:z.enum(['SCALE','FORM']).default('SCALE')}).strict().parse(req.query)
+  return (query.kind==='FORM'?service.listPrivateFormRuntimeCandidates:service.listPrivateScaleRuntimeCandidates)(context(req),query.cursor)
+ }))
  router.get('/:toolId',handle(req=>service.readPrivateTool(context(req),toolId(req))))
  router.put('/:toolId',handle(req=>service.updatePrivateTool(context(req),toolId(req),req.body)))
  router.post('/:toolId/validate',handle(req=>{z.object({}).strict().parse(req.body??{});return service.validatePrivateTool(context(req),toolId(req))}))

@@ -10,11 +10,11 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {getContentRelease} from '../measurement-content/repository'
 import {libraryActor,libraryCapabilities,assertLibraryAuthority} from './authority'
 import {loadEntry,event} from './service'
-import {distributionInput,legacyDistributionInput,transitionInput,fail,type LibraryProduct,type LibrarySourceProduct} from './contracts'
+import {distributionInput,legacyDistributionInput,transitionInput,fail,type LibraryProduct,type LegacyLibraryProduct} from './contracts'
 import {libraryCatalogSnapshot,libraryCompatibility} from './catalog-adapter'
 import {assertScaleLibraryCollectionAllowed} from './collection-guard'
 import {type LibraryUseRow,useView} from './usage'
-async function target(tx:Prisma.TransactionClient,userId:string,product:LibrarySourceProduct){
+async function target(tx:Prisma.TransactionClient,userId:string,product:LegacyLibraryProduct){
   const user=await libraryActor(tx,userId)
   if(product==='TRAINING'){
     if(!['TRAINING','LEGACY'].includes(user.account_domain)||user.role!=='TEACHER'||!user.teacher_approved)fail('目标不是有效的 Training 教师',403)

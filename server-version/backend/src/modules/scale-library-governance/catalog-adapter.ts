@@ -8,6 +8,8 @@ export function libraryCatalogSnapshot(entryId:string,release:{releaseId:string;
   const ref={kind:'SCALE' as const,sourceId:'library:'+entryId,sourceVersion:release.version}
   let native:CatalogSourceSnapshot
   switch(snapshot.product){
+    case 'SCHOOL':
+    case 'TEACHER':
     case 'TRAINING':
       native=adaptCatalogScale(ref,snapshot.title,snapshot.compiledDefinition,{instrumentClass:'CUSTOM_DESCRIPTIVE'})
       break

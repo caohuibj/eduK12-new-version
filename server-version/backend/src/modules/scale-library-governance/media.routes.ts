@@ -12,7 +12,7 @@ import {libraryActor,libraryCapabilities} from './authority'
 import {submissionSource,validateLibraryDependencies} from './source'
 import {assertLibraryUseGrantCurrent} from './usage'
 import {readSubmission,loadEntry} from './service'
-import {fail,ScaleLibraryError,type LibrarySourceProduct} from './contracts'
+import {fail,ScaleLibraryError,type LegacyLibraryProduct} from './contracts'
 import {assertLibraryMediaManifest,buildLibraryMediaManifest,assertLibraryMediaReady,type LibraryMediaManifest} from './media'
 
 const id=z.string().uuid()
@@ -24,7 +24,7 @@ const wrap=(fn:(req:Request,res:Response)=>Promise<unknown>)=>async(req:Request,
 }
 /** Mount only behind the parent's authenticated product-domain router. No download,
  * redistribution, arbitrary asset-ID lookup, or anonymous catalog route is exposed. */
-export function libraryMediaRouter(product:LibrarySourceProduct){
+export function libraryMediaRouter(product:LegacyLibraryProduct){
   const router=Router()
   const manifestFor=async(req:Request,kind:'sources'|'submissions'|'entries',metadataOnly=false):Promise<LibraryMediaManifest>=>{
     const principal=req.user?.userId

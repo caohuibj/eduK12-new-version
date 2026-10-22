@@ -180,6 +180,8 @@ const prepareTracks = async (
   actorUserId: string,
 ): Promise<PreparedTrack[]> => {
   const tracks = await readDraftTracks(runId, organizationId)
+  if(tracks.some(track=>track.resourceKey.startsWith('private-form:')))
+    throw new RunPublishError('PRIVATE_FORM_ACTIVITY_RUNTIME_NOT_READY','Private form execution adapter is not ready',409)
   if (tracks.length === 0) throw new RunPublishError('RUN_TRACK_REQUIRED', 'Run requires at least one Track', 409)
   return Promise.all(tracks.map(async (track) => {
     const privateSource=track.resourceKey.startsWith('private-scale:')?await readPrivateScaleRunSourceForPreparation(prisma,{organizationId,runId,actorUserId,resource:{family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion}}):null

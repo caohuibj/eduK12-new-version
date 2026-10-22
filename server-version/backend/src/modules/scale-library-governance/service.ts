@@ -9,7 +9,7 @@ import {libraryCompatibility} from './catalog-adapter'
 import {libraryActor,libraryCapabilities,assertLibraryAuthority} from './authority'
 import {submissionSource,validateLibraryDependencies,type LibrarySnapshot} from './source'
 import {assertScaleLibraryCollectionAllowed} from './collection-guard'
-import {submissionInput,transitionInput,reviewInput,entryStatusInput,fail,type LibrarySourceProduct} from './contracts'
+import {submissionInput,transitionInput,reviewInput,entryStatusInput,fail,legacyLibraryProduct,type LibrarySourceProduct,type LegacyLibraryProduct} from './contracts'
 type Tx=Prisma.TransactionClient
 export type SubmissionRow={id:string;release_id:string;product:LibrarySourceProduct;source_id:string;author_id:string;metadata:Prisma.JsonValue;
   dependency_release_ids:string[];snapshot:LibrarySnapshot;snapshot_hash:string;status:string;version:number;reason:string|null;created_at:Date;updated_at:Date}
@@ -23,7 +23,9 @@ export function sourceMetadataDefaults(snapshot:LibrarySnapshot){
 }
 export const submissionView=(row:SubmissionRow)=>({id:row.id,releaseId:row.release_id,sourceProduct:row.product,product:row.product,sourceId:row.source_id,
   ...libraryCompatibility(row.snapshot,{approved:row.status==='APPROVED',dependencyReleaseIds:row.dependency_release_ids}),educationApplicability:row.snapshot.educationApplicability??null,educationApplicabilityHash:readFrozenEducationApplicability(row.snapshot)?.contractHash??null,mediaManifest:row.snapshot.mediaManifest,metadata:row.metadata,snapshotOrigin:row.snapshot.snapshotOrigin,definitionHash:row.snapshot.definitionHash,dependencyReleaseIds:row.dependency_release_ids,status:row.status,version:row.version,reason:row.reason,createdAt:row.created_at})
-export const entryView=(row:EntryRow,submission:SubmissionRow)=>({...submissionView(submission),id:row.id,submissionId:row.submission_id,
+// Catalog discovery is not media authorization. Exact manifests remain on
+// owner/reviewer submission detail and the separately authorized media endpoints.
+export const entryView=(row:EntryRow,submission:SubmissionRow)=>({...submissionView(submission),mediaManifest:undefined,id:row.id,submissionId:row.submission_id,
   status:row.status,version:row.version,releaseVersion:row.release_version,contentHash:row.content_hash,reason:row.reason,createdAt:row.created_at})
 export async function event(tx:Tx,actorId:string,action:string,reason:string,submissionId:string|null,entryId:string|null,details:unknown={}){
   await tx.$executeRaw(Prisma.sql`INSERT INTO scale_library_events(id,actor_id,action,reason,submission_id,entry_id,details)
@@ -37,7 +39,8 @@ export async function loadEntry(tx:Tx,id:string,write=false){
   return {entry:rows[0],submission}
 }
 export const readCapabilities=(actorId:string)=>prisma.$transaction(tx=>libraryCapabilities(tx,actorId))
-export async function readSources(actorId:string,product:LibrarySourceProduct,sourceId:string){
+export async function readSources(actorId:string,product:LegacyLibraryProduct,sourceId:string){
+  legacyLibraryProduct.parse(product)
   return prisma.$transaction(async tx=>{
     await libraryActor(tx,actorId)
     const rows=await tx.$queryRaw<Array<{id:string;version:string;content_hash:string;published_at:Date;provenance:Record<string,unknown>}>>(Prisma.sql`
@@ -56,33 +59,36 @@ export async function readSources(actorId:string,product:LibrarySourceProduct,so
     return {sourceId,product,releases,defaults:{title,author:'',copyright:'',applicability:'',scoringDescription:'',reportDescription:''}}
   })
 }
-export async function submit(actorId:string,product:LibrarySourceProduct,raw:unknown){
+export async function submit(actorId:string,product:LegacyLibraryProduct,raw:unknown){
+  legacyLibraryProduct.parse(product)
+  return prisma.$transaction(tx=>submitInTransaction(tx,actorId,product,raw))
+}
+/** Shared submission core; current source authority belongs in this same transaction. */
+export async function submitInTransaction(tx:Tx,actorId:string,product:LibrarySourceProduct,raw:unknown){
   const input=submissionInput.parse(raw)
-  return prisma.$transaction(async tx=>{
-    await libraryActor(tx,actorId)
-    const source=await submissionSource(tx,actorId,product,input.releaseId)
-    const dependencies=await validateLibraryDependencies(tx,actorId,source.release,input.dependencyReleaseIds)
-    const manifest=await buildLibraryMediaManifest(tx,actorId,source.snapshot,source.release,dependencies)
-    assertLibraryMediaConsent(manifest,input.mediaConsent)
-    source.snapshot.mediaManifest=manifest
-    if(input.educationApplicability){
-      const declared=compileEducationApplicability(input.educationApplicability)
-      source.snapshot.educationApplicability=declared.declaration
-      source.snapshot.educationApplicabilityHash=declared.contractHash
-      source.snapshot.educationApplicabilityCompilerVersion=declared.compilerVersion
-    }
-    await assertScaleLibraryCollectionAllowed(tx,[input.releaseId],product==='TRAINING'?[source.sourceId]:[])
-    const [prior]=await tx.$queryRaw<SubmissionRow[]>(Prisma.sql`SELECT * FROM scale_library_submissions WHERE id=${input.requestId} FOR SHARE`)
-    if(prior){if(prior.author_id!==actorId||prior.release_id!==input.releaseId||canonicalHash(prior.metadata)!==canonicalHash(input.metadata)||canonicalHash(prior.dependency_release_ids)!==canonicalHash(input.dependencyReleaseIds)||canonicalHash(prior.snapshot.educationApplicability??null)!==canonicalHash(input.educationApplicability??null))fail('请求编号已用于其他申请')
-      return submissionView(prior)}
-    const [row]=await tx.$queryRaw<SubmissionRow[]>(Prisma.sql`INSERT INTO scale_library_submissions
-      (id,release_id,product,source_id,author_id,metadata,dependency_release_ids,snapshot,snapshot_hash)
-      VALUES(${input.requestId},${input.releaseId},${product},${source.sourceId},${actorId},${JSON.stringify(input.metadata)}::jsonb,
-        ${input.dependencyReleaseIds}::text[],${JSON.stringify(source.snapshot)}::jsonb,${canonicalHash(source.snapshot)}) RETURNING *`)
-    await retainLibrarySubmissionMedia(tx,row.id,manifest)
-    await event(tx,actorId,'SUBMITTED','作者申请进入平台共用库',row.id,null,{releaseId:input.releaseId})
-    return submissionView(row)
-  })
+  await libraryActor(tx,actorId)
+  const source=await submissionSource(tx,actorId,product,input.releaseId)
+  const dependencies=await validateLibraryDependencies(tx,actorId,source.release,input.dependencyReleaseIds)
+  const manifest=await buildLibraryMediaManifest(tx,actorId,source.snapshot,source.release,dependencies)
+  assertLibraryMediaConsent(manifest,input.mediaConsent)
+  source.snapshot.mediaManifest=manifest
+  if(input.educationApplicability){
+    const declared=compileEducationApplicability(input.educationApplicability)
+    source.snapshot.educationApplicability=declared.declaration
+    source.snapshot.educationApplicabilityHash=declared.contractHash
+    source.snapshot.educationApplicabilityCompilerVersion=declared.compilerVersion
+  }
+  await assertScaleLibraryCollectionAllowed(tx,[input.releaseId],product==='TRAINING'?[source.sourceId]:[])
+  const [prior]=await tx.$queryRaw<SubmissionRow[]>(Prisma.sql`SELECT * FROM scale_library_submissions WHERE id=${input.requestId} FOR SHARE`)
+  if(prior){if(prior.author_id!==actorId||prior.product!==product||prior.source_id!==source.sourceId||prior.release_id!==input.releaseId||canonicalHash(prior.metadata)!==canonicalHash(input.metadata)||canonicalHash(prior.dependency_release_ids)!==canonicalHash(input.dependencyReleaseIds)||canonicalHash(prior.snapshot.educationApplicability??null)!==canonicalHash(input.educationApplicability??null))fail('请求编号已用于其他申请')
+    return submissionView(prior)}
+  const [row]=await tx.$queryRaw<SubmissionRow[]>(Prisma.sql`INSERT INTO scale_library_submissions
+    (id,release_id,product,source_id,author_id,metadata,dependency_release_ids,snapshot,snapshot_hash)
+    VALUES(${input.requestId},${input.releaseId},${product},${source.sourceId},${actorId},${JSON.stringify(input.metadata)}::jsonb,
+      ${input.dependencyReleaseIds}::text[],${JSON.stringify(source.snapshot)}::jsonb,${canonicalHash(source.snapshot)}) RETURNING *`)
+  await retainLibrarySubmissionMedia(tx,row.id,manifest)
+  await event(tx,actorId,'SUBMITTED','作者申请进入平台共用库',row.id,null,{releaseId:input.releaseId})
+  return submissionView(row)
 }
 export async function listSubmissions(actorId:string,sourceId?:string){
   return prisma.$transaction(async tx=>{
@@ -195,7 +201,8 @@ export async function readSubmission(actorId:string,id:string,grantId?:string){
  })
 }
 
-export async function prepareMediaManifest(actorId:string,product:LibrarySourceProduct,input:{releaseId:string;dependencyReleaseIds:string[]}){
+export async function prepareMediaManifest(actorId:string,product:LegacyLibraryProduct,input:{releaseId:string;dependencyReleaseIds:string[]}){
+ legacyLibraryProduct.parse(product)
  return prisma.$transaction(async tx=>{
   await libraryActor(tx,actorId)
   const source=await submissionSource(tx,actorId,product,input.releaseId)

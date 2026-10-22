@@ -1,8 +1,10 @@
 import {educationApplicabilitySchema} from './education-applicability'
 import {z} from 'zod'
 export const libraryProduct=z.enum(['TRAINING','SURVEY','SCHOOL','TEACHER'])
-// Current authoring adapters only; education authoring will join through its own adapter.
-export const librarySourceProduct=z.enum(['TRAINING','SURVEY'])
+// Authoring origin is distinct from legacy, organization-free use authority.
+export const legacyLibraryProduct=z.enum(['TRAINING','SURVEY'])
+export type LegacyLibraryProduct=z.infer<typeof legacyLibraryProduct>
+export const librarySourceProduct=z.enum(['TRAINING','SURVEY','SCHOOL','TEACHER'])
 export type LibrarySourceProduct=z.infer<typeof librarySourceProduct>
 export const educationLibraryProduct=z.enum(['SCHOOL','TEACHER'])
 export type EducationLibraryProduct=z.infer<typeof educationLibraryProduct>
@@ -21,7 +23,7 @@ export const transitionInput=z.object({expectedVersion:z.number().int().positive
 export const reviewInput=transitionInput.extend({decision:z.enum(['APPROVE','RETURN']),grantId:z.string().uuid().optional()}).strict()
 export const entryStatusInput=transitionInput.extend({status:z.enum(['WITHDRAWN','EMERGENCY_DISABLED']),grantId:z.string().uuid().optional()}).strict()
 const distributionBase={requestId:z.string().uuid(),grantId:z.string().uuid().optional(),expectedGrantVersion:z.number().int().positive().optional()}
-export const legacyDistributionInput=z.object({...distributionBase,userId:z.string().uuid(),product:librarySourceProduct,
+export const legacyDistributionInput=z.object({...distributionBase,userId:z.string().uuid(),product:legacyLibraryProduct,
   scopeKind:z.literal('USER').default('USER')}).strict()
 export const educationDistributionInput=z.union([
   z.object({...distributionBase,product:educationLibraryProduct,scopeKind:z.literal('USER'),organizationId:z.string().uuid(),userId:z.string().uuid()}).strict(),

@@ -1,3 +1,5 @@
+import {compilePrivateFormRuntime} from './private-tool.form-runtime-adapter'
+import {EducationPrivateToolError} from './private-tool.contracts'
 import {randomUUID} from 'node:crypto'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
@@ -169,5 +171,29 @@ export async function listPrivateScaleRuntimeCandidates(c:PrivateToolContext,cur
    ...(cursor?{cursor:{id:cursor},skip:1}:{}),take:51,
    select:{id:true,toolId:true,title:true,sourceRevision:true,contentHash:true,createdAt:true}})
   return {list:rows.slice(0,50).map(({id,...row})=>({...row,versionId:id})),nextCursor:rows.length>50?rows[49].id:null,...boundary}
+ })
+}
+
+/** Fixed FORM versions remain selectable as author artifacts; incompatible
+ * runtime features are reported explicitly, never stripped from the source. */
+export async function listPrivateFormRuntimeCandidates(c:PrivateToolContext,cursor?:string){
+ if(cursor)privateToolId.parse(cursor)
+ return transact(async tx=>{
+  await authorized(tx,c)
+  const where={...scope(c),kind:'FORM' as const}
+  if(cursor&&!await tx.educationPrivateToolVersion.findFirst({where:{id:cursor,...where},select:{id:true}}))
+   privateToolFail('PRIVATE_TOOL_CURSOR_INVALID',400)
+  const rows=await tx.educationPrivateToolVersion.findMany({where,orderBy:[{createdAt:'desc'},{id:'desc'}],
+   ...(cursor?{cursor:{id:cursor},skip:1}:{}),take:51,
+   select:{id:true,toolId:true,title:true,sourceRevision:true,contentHash:true,createdAt:true,definition:true}})
+  const list=rows.slice(0,50).map(({id,definition,...row})=>{
+   let compatibility:{compatible:boolean;code:string|null;issues:unknown[]}={compatible:true,code:null,issues:[]}
+   try{compilePrivateFormRuntime(definition)}catch(error){
+    if(!(error instanceof EducationPrivateToolError))throw error
+    compatibility={compatible:false,code:error.code,issues:error.issues}
+   }
+   return {...row,versionId:id,compatibility}
+  })
+  return {list,nextCursor:rows.length>50?rows[49].id:null,...boundary}
  })
 }

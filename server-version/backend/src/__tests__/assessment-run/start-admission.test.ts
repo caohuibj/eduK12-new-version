@@ -83,6 +83,13 @@ describe('Run START consent lineage admission', () => {
 
 describe('Private runtime retains actual respondent and consent admission',()=>{
  const execution={executionId:'execution-1',organizationId:'org-1',runId:'run-1',trackId:'track-1',executionStatus:'ASSIGNED',runStatus:'PUBLISHED',relationalAssignmentId:'assignment-1',policyDomain:'ORGANIZATION_RUN',respondentUserId:'parent-1',runtimeBindingKind:null,runtimeBindingRef:null}
+ it('holds private FORM execution until its dedicated runtime is connected, after actual respondent validation',async()=>{
+  const tx={$queryRaw:vi.fn().mockResolvedValue([execution])} as any
+  const assignments={findById:vi.fn().mockResolvedValue(assignment({resourceKind:'FORM',resourceKey:'private-form:SCHOOL:fixed:STUDENT:PARENT_REPORT'})),resolveAcceptedConsent:vi.fn()}
+  await expect(loadRunExecutionStartAdmission({tx,executionId:'execution-1',actorUserId:'parent-1',assignments})).rejects.toMatchObject({code:'PRIVATE_FORM_ACTIVITY_RUNTIME_NOT_READY'})
+  expect(assignments.resolveAcceptedConsent).not.toHaveBeenCalled()
+  await expect(loadRunExecutionStartAdmission({tx,executionId:'execution-1',actorUserId:'other',assignments})).rejects.toMatchObject({code:'RUN_EXECUTION_ACTOR'})
+ })
  it('does not bypass required consent for a persisted private assignment',async()=>{
   const tx={$queryRaw:vi.fn().mockResolvedValue([execution])} as any
   const assignments={findById:vi.fn().mockResolvedValue(assignment({resourceKind:'SCALE',resourceKey:'private-scale:SCHOOL:fixed:STUDENT:PARENT_REPORT'})),resolveAcceptedConsent:vi.fn().mockResolvedValue(null)}

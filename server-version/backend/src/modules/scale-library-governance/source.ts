@@ -1,3 +1,4 @@
+import {educationSubmissionSource} from './education-source'
 import type {FrozenEducationApplicability} from './education-applicability'
 import type {LibraryMediaManifest} from './media'
 import {Prisma} from '@prisma/client'
@@ -9,13 +10,13 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {compileResearchScale} from '../survey/builder.compiler'
 import {assertSurveyDraft} from '../survey/builder.definition'
 import {fail,librarySourceProduct,type LibrarySourceProduct} from './contracts'
-export type LibrarySnapshot=FrozenEducationApplicability & {title:string;product:LibrarySourceProduct;instrumentClass:'CUSTOM_DESCRIPTIVE';definition:unknown;compiledDefinition:ScaleDefinitionV2;snapshotOrigin?:'PUBLISHED_PROVENANCE'|'APPLICATION_CAPTURE';definitionHash?:string;mediaManifest?:LibraryMediaManifest}
+export type LibrarySnapshot=FrozenEducationApplicability & {title:string;product:LibrarySourceProduct;instrumentClass:'CUSTOM_DESCRIPTIVE';definition:unknown;compiledDefinition:ScaleDefinitionV2;snapshotOrigin?:'PUBLISHED_PROVENANCE'|'APPLICATION_CAPTURE';definitionHash?:string;mediaManifest?:LibraryMediaManifest;educationSource?:{toolId:string;versionId:string;entry:'SCHOOL'|'TEACHER';organizationId:string;contentHash:string}}
 export async function submissionSource(tx:Prisma.TransactionClient,actorId:string,product:LibrarySourceProduct,releaseId:string){
   librarySourceProduct.parse(product)
   const release=await getContentRelease(tx,releaseId,true)
   if(!release||release.layer!=='MEASUREMENT'||release.family!=='SCALE'||release.status!=='PUBLISHED'||release.scope.kind!=='PRIVATE'||
     release.scope.ownerId!==actorId||release.scope.product!==product)fail('只能提交本人独立编制的精确已发布量表版本',403)
-  const sourceId=release.key.split(':').slice(-1)[0]
+  let sourceId=release.key.split(':').slice(-1)[0]
   const stored=release.provenance.authoringSnapshot as Partial<LibrarySnapshot>|undefined
   let snapshot:LibrarySnapshot
   if(product==='TRAINING'){
@@ -44,6 +45,9 @@ export async function submissionSource(tx:Prisma.TransactionClient,actorId:strin
     if(expected.contentHash!==release.contentHash)fail('量表不可变编制快照不一致')
     const [project]=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM survey_projects WHERE id=${release.scope.resourceId} AND owner_user_id=${actorId} FOR SHARE`)
     if(!project)fail('无权提交该研究项目量表',403)
+  }else if(product==='SCHOOL'||product==='TEACHER'){
+    const education=await educationSubmissionSource(tx,actorId,product,release)
+    sourceId=education.sourceId;snapshot=education.snapshot
   }else fail('SCALE_LIBRARY_SOURCE_ADAPTER_NOT_READY',409)
   snapshot.snapshotOrigin=stored?'PUBLISHED_PROVENANCE':'APPLICATION_CAPTURE'
   snapshot.definitionHash=canonicalHash(snapshot.definition)

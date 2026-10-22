@@ -1,4 +1,4 @@
-import {privateRunTrackInput} from '../education-tools/private-tool.run-contract'
+import {privateToolRunTrackInput} from '../education-tools/private-tool.run-contract'
 import { Router } from 'express'
 import { z,ZodError } from 'zod'
 import { asyncHandler } from '../../middleware/asyncHandler'
@@ -6,7 +6,7 @@ import { authenticateHuiteacher } from '../../middleware/auth'
 import { success } from '../../utils/response'
 import { requireTeacherProductAdmin,requireRecentTeacherMfa } from './authority'
 import {
-  HuiteacherRunError,addTeacherRunTrack,addTeacherPrivateRunTrack,previewTeacherRun,publishTeacherRun,
+  HuiteacherRunError,addTeacherRunTrack,addTeacherPrivateRunTrack,addTeacherPrivateFormRunTrack,previewTeacherRun,publishTeacherRun,
   progressTeacherRun,closeTeacherRun,cancelTeacherRun,listTeacherAvailableScales,
 } from './run.service'
 
@@ -64,8 +64,10 @@ router.get(base+'/released-scales',authenticateHuiteacher,requireTeacherProductA
 router.post(base+'/tracks',authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(async(req,res)=>{
     const scope={...keys.parse(req.params),actorUserId:req.user!.userId}
-    if(req.body&&Object.prototype.hasOwnProperty.call(req.body,'privateScale'))
-      return success(res,await addTeacherPrivateRunTrack(scope,privateRunTrackInput.parse(req.body)))
+    if(req.body&&(Object.prototype.hasOwnProperty.call(req.body,'privateScale')||Object.prototype.hasOwnProperty.call(req.body,'privateForm'))){
+      const selected=privateToolRunTrackInput.parse(req.body)
+      return success(res,await ('privateForm' in selected?addTeacherPrivateFormRunTrack:addTeacherPrivateRunTrack)(scope,selected))
+    }
     return success(res,await addTeacherRunTrack({...scope,...track.parse(req.body)}))
   }))
 router.post(base+'/preview',authenticateHuiteacher,requireTeacherProductAdmin,
