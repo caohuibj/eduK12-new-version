@@ -24,6 +24,7 @@ const loginSchema = z.object({
   username: z.string().min(1, '用户名不能为空').max(320),
   password: z.string().min(1, '密码不能为空').max(PASSWORD_MAX_LENGTH),
   expectedRole: z.enum(['STUDENT', 'TEACHER']).optional(),
+  adminAuthMethod: z.enum(['TOTP', 'SECURITY_KEY']).optional(),
 }).strict()
 
 // Precomputed synthetic cost-10 hash, matching hashPassword. Never authenticate
@@ -69,7 +70,7 @@ export const authController = {
       const result = loginSchema.safeParse(req.body)
       if (!result.success) return failedLogin()
 
-      const { username, password, expectedRole } = result.data
+      const { username, password, expectedRole, adminAuthMethod } = result.data
       req.body = result.data
       const user = await withLoginPasswordVerification(async () => {
         const current = await prisma.user.findUnique({ where: { username } })
@@ -84,8 +85,8 @@ export const authController = {
       const currentPrincipal = await loadCurrentPrincipal(user.id)
       if (!currentPrincipal) return failedLogin()
       if (needsAdminKey(currentPrincipal)) {
-        if (expectedRole || res.locals?.trainingEntrance) return error(res, '请使用独立管理员入口和安全密钥登录', -1, 403)
-        return success(res, await beginAdminLogin(req, res, user.id, undefined, currentPrincipal))
+        if (expectedRole || res.locals?.trainingEntrance) return error(res, '请使用独立管理员入口完成双因素登录', -1, 403)
+        return success(res, await beginAdminLogin(req, res, user.id, undefined, currentPrincipal, adminAuthMethod))
       }
 
       // This flag is set only by the dedicated server-side training entrance.

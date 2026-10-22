@@ -8,6 +8,7 @@
     "admin_entry_grants": "RUNTIME_RW",
     "admin_security_challenges": "RUNTIME_RW",
     "admin_security_keys": "RUNTIME_RW",
+    "admin_totp_credentials": "RUNTIME_RW",
     "anonymous_studies": "RUNTIME_RW",
     "anonymous_study_attempts": "RUNTIME_RW",
     "anonymous_study_participants": "RUNTIME_RW",
