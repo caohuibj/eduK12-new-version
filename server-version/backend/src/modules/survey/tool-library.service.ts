@@ -10,16 +10,18 @@ import {previewResearchInstrument,type PreviewAnswers} from './builder.compiler'
 import {previewBulk,applyBulk,type BulkInput} from './builder.import'
 import {dryRunSurveyForm,SurveyFinalValidationError} from './final.compute'
 import {researcherCatalog,catalogSnapshotsForDrafts} from './catalog.service'
-import {assertSurveyMediaOwned} from './media.references'
+import {assertSurveyMediaOwned,SurveyMediaError} from './media.references'
+import {CatalogSourceError} from './catalog.sources'
+import {SurveyGovernanceError} from './governance.service'
 
 type Tx=Prisma.TransactionClient
 export const toolKind=z.enum(['FORM','SCALE','COMPOSITION'])
 export const toolReference=z.object({source:z.enum(['owned','granted']),id:z.string().uuid(),revision:z.number().int().nonnegative().optional(),title:z.string().max(200).optional()}).strict()
 export const compositionDefinition=z.object({schemaVersion:z.literal(1),items:z.array(toolReference).max(20)}).strict()
 export type ToolReference=z.infer<typeof toolReference>
-export type Template={id:string;owner_user_id:string;kind:'FORM'|'SCALE'|'COMPOSITION';title:string;definition:any;revision:number;status:string;creation_digest:string;created_at:Date;updated_at:Date}
+export type Template={id:string;owner_user_id:string;kind:'FORM'|'SCALE'|'COMPOSITION';title:string;definition:any;revision:number;completed_revision:number|null;status:string;creation_digest:string;created_at:Date;updated_at:Date}
 const fail=(status:number,message:string):never=>{throw new SurveyBuilderError(status,message)}
-const view=(row:Template)=>({id:row.id,kind:row.kind,title:row.title,definition:row.definition,revision:row.revision,status:row.status,createdAt:row.created_at,updatedAt:row.updated_at})
+const view=(row:Template)=>({id:row.id,kind:row.kind,title:row.title,definition:row.definition,revision:row.revision,status:row.status,readiness:row.status==='DRAFT'&&row.completed_revision===row.revision?'READY':'DRAFT',completedRevision:row.completed_revision,createdAt:row.created_at,updatedAt:row.updated_at})
 export async function authorizeToolOwner(tx:Tx,userId:string){
   const rows=await tx.$queryRaw<Array<{expires_at:Date|null;checked_at:Date}>>`
     WITH locked AS MATERIALIZED (
@@ -31,19 +33,28 @@ export async function authorizeToolOwner(tx:Tx,userId:string){
     ) SELECT locked.*,clock_timestamp() AS checked_at FROM locked`
   if(!rows[0]||(rows[0].expires_at&&rows[0].expires_at<=rows[0].checked_at))fail(403,'研究者资格不可用')
 }
-export async function ownedTemplate(tx:Tx,userId:string,id:string,lock=false){
-  const rows=await tx.$queryRaw<Template[]>`SELECT * FROM survey_tool_templates WHERE id=${id} AND owner_user_id=${userId} ${lock?Prisma.sql`FOR SHARE`:Prisma.empty}`
+export async function ownedTemplate(tx:Tx,userId:string,id:string,lock:boolean|'update'=false){
+  const rows=await tx.$queryRaw<Template[]>`SELECT * FROM survey_tool_templates WHERE id=${id} AND owner_user_id=${userId} ${lock==='update'?Prisma.sql`FOR UPDATE`:lock?Prisma.sql`FOR SHARE`:Prisma.empty}`
   if(!rows.length)fail(404,'工具不存在')
   return rows[0]
 }
 const json=(value:unknown)=>JSON.stringify(value)
-export async function listTemplates(userId:string,input:{page:number;query:string;kind:string}){
+export async function listTemplates(userId:string,input:{page:number;query:string;kind:string;selectableOnly?:boolean}){
   return prisma.$transaction(async tx=>{
     await authorizeToolOwner(tx,userId)
-    const filter=Prisma.sql`owner_user_id=${userId} AND status='DRAFT' AND (${input.kind}='' OR kind=${input.kind}) AND position(lower(${input.query}) in lower(title))>0`
-    const list=await tx.$queryRaw<Template[]>`SELECT id,kind,title,revision,status,created_at,updated_at FROM survey_tool_templates WHERE ${filter} ORDER BY updated_at DESC,id LIMIT 12 OFFSET ${(input.page-1)*12}`
+    const filter=Prisma.sql`owner_user_id=${userId} AND status='DRAFT' AND (${!input.selectableOnly} OR completed_revision=revision) AND (${input.kind}='' OR kind=${input.kind}) AND position(lower(${input.query}) in lower(title))>0`
+    const list=await tx.$queryRaw<Template[]>`SELECT id,kind,title,revision,completed_revision,status,created_at,updated_at FROM survey_tool_templates WHERE ${filter} ORDER BY updated_at DESC,id LIMIT 12 OFFSET ${(input.page-1)*12}`
     const [count]=await tx.$queryRaw<Array<{total:bigint}>>`SELECT count(*) AS total FROM survey_tool_templates WHERE ${filter}`
-    return {list:list.map(view),total:Number(count.total),page:input.page,pageSize:12}
+    const available:Template[]=[]
+    if(input.selectableOnly){
+      // At most this page's twelve candidates are checked. Never expose invalid
+      // bundles or stale media/grants as selectable; pagination follows candidates.
+      for(const candidate of list){
+        try{const current=await ownedTemplate(tx,userId,candidate.id,true);await assertTemplateComplete(tx,userId,current);available.push({...current,definition:undefined})}
+        catch(cause){if(cause instanceof SurveyBuilderError||cause instanceof SurveyDraftError||cause instanceof SurveyMediaError||cause instanceof CatalogSourceError||cause instanceof SurveyGovernanceError)continue;throw cause}
+      }
+    }
+    return {list:(input.selectableOnly?available:list).map(view),total:Number(count.total),page:input.page,pageSize:12,hasMore:input.page*12<Number(count.total)}
   })
 }
 export async function getTemplate(userId:string,id:string){return prisma.$transaction(async tx=>{await authorizeToolOwner(tx,userId);return view(await ownedTemplate(tx,userId,id))})}
@@ -70,7 +81,7 @@ export async function saveTemplate(userId:string,id:string,input:{revision:numbe
     const definition=definitionFor(row.kind,input.definition)
     // Validate reference ownership even for an unfinished composition; no nested bundles.
     if(row.kind==='COMPOSITION')await resolveItems(tx,userId,compositionDefinition.parse(definition).items,false)
-    const changed=await tx.$executeRaw`UPDATE survey_tool_templates SET title=${input.title},definition=${json(definition)}::jsonb,revision=revision+1,updated_at=clock_timestamp()
+    const changed=await tx.$executeRaw`UPDATE survey_tool_templates SET title=${input.title},definition=${json(definition)}::jsonb,revision=revision+1,completed_revision=NULL,updated_at=clock_timestamp()
       WHERE id=${id} AND owner_user_id=${userId} AND revision=${input.revision} AND status='DRAFT'`
     if(changed!==1)fail(409,'工具版本或状态已变化，请重新读取；本地修改仍保留')
     return view(await ownedTemplate(tx,userId,id))
@@ -78,7 +89,7 @@ export async function saveTemplate(userId:string,id:string,input:{revision:numbe
 }
 export async function archiveTemplate(userId:string,id:string,revision:number){return prisma.$transaction(async tx=>{
   await authorizeToolOwner(tx,userId)
-  const changed=await tx.$executeRaw`UPDATE survey_tool_templates SET status='ARCHIVED',revision=revision+1,updated_at=clock_timestamp() WHERE id=${id} AND owner_user_id=${userId} AND revision=${revision} AND status='DRAFT'`
+  const changed=await tx.$executeRaw`UPDATE survey_tool_templates SET status='ARCHIVED',revision=revision+1,completed_revision=NULL,updated_at=clock_timestamp() WHERE id=${id} AND owner_user_id=${userId} AND revision=${revision} AND status='DRAFT'`
   if(changed!==1)fail(409,'工具状态或版本已变化')
   return {archived:true}
 })}
@@ -101,6 +112,7 @@ async function resolveItems(tx:Tx,userId:string,items:ToolReference[],ready:bool
       if(item.revision!==row.revision)fail(409,'选用的工具已更新，请重新选择当前修订')
       const kind=z.enum(['FORM','SCALE']).parse(row.kind)
       if(ready){
+        if(row.completed_revision!==row.revision)fail(409,'工具尚未完成编制，请在工具集中完成当前修订后选用')
         const check=previewResearchInstrument({kind,instrumentKey:'library_tool',title:row.title,definition:row.definition})
         if(!check.ok)throw new SurveyDraftError(check.issues)
         await assertSurveyMediaOwned(tx,userId,row.id,[{kind,definition:row.definition}],true)
@@ -110,6 +122,24 @@ async function resolveItems(tx:Tx,userId:string,items:ToolReference[],ready:bool
   }
   return result
 }
+async function assertTemplateComplete(tx:Tx,userId:string,row:Template,requireCompleted=true){
+  if(row.status!=='DRAFT'||requireCompleted&&row.completed_revision!==row.revision)fail(409,'工具尚未完成当前修订')
+  if(row.kind==='COMPOSITION')return resolveItems(tx,userId,compositionDefinition.parse(row.definition).items,true)
+  const check=previewResearchInstrument({kind:row.kind,instrumentKey:'library_tool',title:row.title,definition:row.definition})
+  if(!check.ok)throw new SurveyDraftError(check.issues)
+  await assertSurveyMediaOwned(tx,userId,row.id,[{kind:row.kind,definition:row.definition}],true)
+}
+export async function completeTemplate(userId:string,id:string,revision:number){return prisma.$transaction(async tx=>{
+  await authorizeToolOwner(tx,userId)
+  const row=await ownedTemplate(tx,userId,id,'update')
+  if(row.revision!==revision)fail(409,'工具已更新，请重新读取当前修订后完成编制')
+  await assertTemplateComplete(tx,userId,row,false)
+  const changed=await tx.$executeRaw`UPDATE survey_tool_templates SET completed_revision=revision,updated_at=clock_timestamp()
+    WHERE id=${id} AND owner_user_id=${userId} AND revision=${revision} AND status='DRAFT'`
+  if(changed!==1)fail(409,'工具状态或修订已变化')
+  await authorizeToolOwner(tx,userId)
+  return view(await ownedTemplate(tx,userId,id))
+})}
 export async function catalogTemplates(userId:string,page:number){return prisma.$transaction(async tx=>{await authorizeToolOwner(tx,userId);return researcherCatalog(tx,userId,page)})}
 export async function inspectTemplate(userId:string,id:string,answers?:PreviewAnswers){return prisma.$transaction(async tx=>{
   await authorizeToolOwner(tx,userId);const row=await ownedTemplate(tx,userId,id)
@@ -129,7 +159,7 @@ export async function bulkTemplate(userId:string,id:string,batch:BulkInput,apply
   const candidate=previewBulk(batch,kind,(row.definition as {schemaVersion:1|2}).schemaVersion)
   if(!apply){if(candidate.ok)applyBulk(kind,row.definition,batch,candidate.digest);return {...candidate,revision:row.revision}}
   const definition=applyBulk(kind,row.definition,batch,apply.digest)
-  const changed=await tx.$executeRaw`UPDATE survey_tool_templates SET definition=${json(definition)}::jsonb,revision=revision+1,updated_at=clock_timestamp() WHERE id=${id} AND owner_user_id=${userId} AND status='DRAFT' AND revision=${apply.revision}`
+  const changed=await tx.$executeRaw`UPDATE survey_tool_templates SET definition=${json(definition)}::jsonb,revision=revision+1,completed_revision=NULL,updated_at=clock_timestamp() WHERE id=${id} AND owner_user_id=${userId} AND status='DRAFT' AND revision=${apply.revision}`
   if(changed!==1)fail(409,'工具已变化，请重新预览导入')
   return view(await ownedTemplate(tx,userId,id))
 })}
@@ -146,7 +176,7 @@ export async function selectTemplate(userId:string,projectId:string,input:{reque
     let refs=[input.tool]
     if(input.tool.source==='owned'){
       const row=await ownedTemplate(tx,userId,input.tool.id,true)
-      if(row.status!=='DRAFT'||row.revision!==input.tool.revision)fail(409,'工具已更新，请重新读取后选用')
+      if(row.status!=='DRAFT'||row.revision!==input.tool.revision||row.completed_revision!==row.revision)fail(409,'工具尚未完成编制或已更新，请在工具集中完成当前修订后重新选用')
       if(row.kind==='COMPOSITION')refs=compositionDefinition.parse(row.definition).items
     }
     const units=await resolveItems(tx,userId,refs,true),ids:string[]=[]

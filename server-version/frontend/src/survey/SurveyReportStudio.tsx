@@ -164,7 +164,13 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
   })}
   const refreshAction=<button type="button" className="btn-secondary" disabled={busy} onClick={()=>void load()}>刷新报告与测量列表</button>
   return <section className="survey-report-surface survey-studio-surface bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="项目私有报告">
-    <SurveySectionHeader compact={!basePath} section="reports" title="项目私有报告" actions={!basePath?refreshAction:undefined}><p>参考区块只引用已有参考类型与分段标识，不创建阈值或常模。</p></SurveySectionHeader>
+    <SurveySectionHeader compact={!basePath} section="reports" title="项目私有报告" goal={!basePath?'可选：编制本研究专用的结果报告模板，供研究者查看与解释测量结果。':undefined} actions={!basePath?refreshAction:undefined} policyLabel="用途与操作说明">{basePath?<p>参考区块只引用已有参考类型与分段标识，不创建阈值或常模。</p>:<div className="survey-report-guide">
+      <p><strong>什么时候需要？</strong>需要把量表等测量的指标、解释文字和局限说明组织成统一报告时使用。只收集问卷或导出原始数据时，可以跳过。</p>
+      <ol><li>先点击“发布或更新测量版本”，为研究内支持的量表保存测量版本；这一步不会开放招募。</li><li>选择测量版本创建报告草稿，编写文字与指标，保存后用合成情境预览。</li><li>填写发布说明并发布报告版本，再到“发布与采集 → 研究者报告与参考版本”读取、选用该精确版本；随研究定义冻结。</li></ol>
+      <p><strong>谁能看到？</strong>当前仅供研究者读取；模板中的“受众”是用途标注，不授予其他角色访问权，也不会自动把报告发给被试。被试原始指标反馈在“发布与采集”中单独配置。</p>
+      <p><strong>功能边界：</strong>合成预览不读取真实答卷、不生成正式个人报告；参考解释只引用已批准的参考分段，不在这里建立阈值、常模或修改计分规则。普通 Form 不绑定测量报告。</p>
+    </div>}</SurveySectionHeader>
+    {!basePath&&<p className="survey-report-purpose">报告是可选的结果展示模板，不是问卷本身；不设置报告也可以采集与导出数据。展开“用途与操作说明”查看完整流程。</p>}
     {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
     {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}
     {listError&&<p role="alert">列表加载失败：{listError}。已成功的写入无需重做。</p>}

@@ -28,10 +28,11 @@ const handle=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respons
 }
 const uid=(req:Request)=>req.user!.userId
 surveyToolLibraryRouter.get('/catalog',handle(req=>library.catalogTemplates(uid(req),page.parse(req.query.page))))
-surveyToolLibraryRouter.get('/',handle(req=>library.listTemplates(uid(req),{page:page.parse(req.query.page),query:z.string().trim().max(200).default('').parse(req.query.query),kind:z.enum(['','FORM','SCALE','COMPOSITION']).default('').parse(req.query.kind)})))
+surveyToolLibraryRouter.get('/',handle(req=>library.listTemplates(uid(req),{page:page.parse(req.query.page),query:z.string().trim().max(200).default('').parse(req.query.query),kind:z.enum(['','FORM','SCALE','COMPOSITION']).default('').parse(req.query.kind),selectableOnly:z.enum(['true','false']).default('false').parse(req.query.selectable)==='true'})))
 surveyToolLibraryRouter.post('/',handle(req=>library.createTemplate(uid(req),z.object({requestId:id,kind:library.toolKind,title}).strict().parse(req.body))))
 surveyToolLibraryRouter.get('/:tid',handle(req=>library.getTemplate(uid(req),id.parse(req.params.tid))))
 surveyToolLibraryRouter.patch('/:tid',handle(req=>library.saveTemplate(uid(req),id.parse(req.params.tid),z.object({revision,title,definition:z.record(z.unknown())}).strict().parse(req.body))))
+surveyToolLibraryRouter.post('/:tid/complete',handle(req=>library.completeTemplate(uid(req),id.parse(req.params.tid),z.object({revision}).strict().parse(req.body).revision)))
 surveyToolLibraryRouter.post('/:tid/archive',handle(req=>library.archiveTemplate(uid(req),id.parse(req.params.tid),z.object({revision}).strict().parse(req.body).revision)))
 surveyToolLibraryRouter.post('/:tid/measurement-release',handle(req=>publishToolMeasurement(uid(req),id.parse(req.params.tid),z.object({revision}).strict().parse(req.body).revision)))
 surveyToolLibraryRouter.post('/:tid/validate',handle(req=>library.inspectTemplate(uid(req),id.parse(req.params.tid))))

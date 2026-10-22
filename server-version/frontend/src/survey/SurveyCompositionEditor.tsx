@@ -10,7 +10,7 @@ const kinds=[
   {key:'COGNITIVE',label:'认知测验',hint:'选用已授权的固定版本',Icon:Brain},
   {key:'SJT',label:'情境判断',hint:'选用已授权的固定版本',Icon:Route},
 ] as const
-type Candidate={id:string;title:string;kind:string;revision?:number;status?:string;sourceRef?:CatalogGrant['sourceRef']}
+type Candidate={id:string;title:string;kind:string;revision?:number;status?:string;readiness?:'DRAFT'|'READY';sourceRef?:CatalogGrant['sourceRef']}
 
 export function SurveyCompositionEditor({items,onChange}:{items:ToolRef[];onChange:(items:ToolRef[])=>void}){
   const [kind,setKind]=useState<typeof kinds[number]['key']>('SCALE')
@@ -20,11 +20,11 @@ export function SurveyCompositionEditor({items,onChange}:{items:ToolRef[];onChan
   const [loading,setLoading]=useState(true),[error,setError]=useState('')
   const ownedAllowed=kind==='FORM'||kind==='SCALE'
   const requestKey=JSON.stringify([source,page,source==='owned'?kind:'',source==='owned'?query:'',generation])
-  const requestPath=source==='owned'?'/tool-library?page='+page+'&kind='+kind+'&query='+encodeURIComponent(query):'/tool-library/catalog?page='+page
+  const requestPath=source==='owned'?'/tool-library?page='+page+'&kind='+kind+'&query='+encodeURIComponent(query)+'&selectable=true':'/tool-library/catalog?page='+page
   useEffect(()=>{
     let current=true;setLoading(true);setError('')
     const request=api<{list:Candidate[];total?:number}>(requestPath)
-    void request.then(data=>{if(current)setResult({key:requestKey,rows:data.list.filter(row=>kinds.some(k=>k.key===row.kind)),total:data.total??data.list.length,hasMore:data.total!==undefined?page*12<data.total:data.list.length===25})})
+    void request.then(data=>{if(current)setResult({key:requestKey,rows:data.list.filter(row=>kinds.some(k=>k.key===row.kind)&&(source!=='owned'||row.readiness==='READY')),total:data.total??data.list.length,hasMore:data.total!==undefined?page*12<data.total:data.list.length===25})})
       .catch(cause=>{if(current)setError(cause instanceof Error?cause.message:'工具列表读取失败')})
       .finally(()=>{if(current)setLoading(false)})
     return()=>{current=false}
@@ -48,7 +48,7 @@ export function SurveyCompositionEditor({items,onChange}:{items:ToolRef[];onChan
       </div>
       {source==='granted'&&<p className="survey-composition-page-note">类型和名称仅筛选当前页授权目录，可翻页继续查找。</p>}
       {error?<div role="alert" className="survey-library-error">{error}<button type="button" className="btn-secondary" onClick={()=>setGeneration(value=>value+1)}>重新读取工具</button></div>:!ready?<p role="status" className="survey-composition-empty">正在读取工具…</p>:<>
-        {!rows.length&&<div className="survey-composition-empty"><Layers size={26}/><h3>暂无可选{libraryKindLabel[kind]}</h3><p>{source==='owned'?'可先在工具集中编制并保存，或切换到“已获授权”。':'本页没有匹配项，可清空检索、翻页或向管理员确认授权。'}</p></div>}
+        {!rows.length&&<div className="survey-composition-empty"><Layers size={26}/><h3>暂无可选{libraryKindLabel[kind]}</h3><p>{source==='owned'?'可先在工具集中保存并完成编制，或切换到“已获授权”。':'本页没有匹配项，可清空检索、翻页或向管理员确认授权。'}</p></div>}
         <div className="survey-composition-candidates">{rows.map(row=>{const included=items.some(item=>item.source===source&&item.id===row.id),unavailable=!!row.status&&row.status!==(source==='owned'?'DRAFT':'ACTIVE');return <article key={row.id}><div><h3>{row.title}</h3><p>{source==='owned'?'我编制的 · 修订 '+row.revision:'已获授权 · 版本 '+(row.sourceRef?.sourceVersion??'固定版本')}</p></div><button type="button" className="btn-secondary" disabled={included||items.length>=20||unavailable} aria-label={(included?'已添加：':'添加到问卷：')+row.title} onClick={()=>add(row)}>{included?<Check size={16}/>:<Plus size={16}/>}<span>{included?'已添加':'添加到问卷'}</span></button></article>})}</div>
       </>}
       <footer className="survey-composition-pagination"><button type="button" className="btn-secondary" disabled={!ready||page<=1} onClick={()=>setPage(value=>value-1)}>上一页</button><span>第 {page} 页{ready&&source==='owned'?' · 共 '+result.total+' 项':''}</span><button type="button" className="btn-secondary" disabled={!ready||!result.hasMore} onClick={()=>setPage(value=>value+1)}>下一页</button><button type="button" className="survey-composition-refresh" disabled={!ready} onClick={()=>setGeneration(value=>value+1)}>重新读取</button></footer>

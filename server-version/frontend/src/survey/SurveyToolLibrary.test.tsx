@@ -9,7 +9,7 @@ vi.mock('./SurveyReportStudio',()=>({SurveyReportStudio:()=>null}))
 vi.mock('./SurveyWaveStudio',()=>({SurveyWaveStudio:()=>null}))
 vi.mock('./SurveyAnalyticsWorkspace',()=>({SurveyAnalyticsWorkspace:()=>null}))
 const tid='b8b5019d-4c3f-44f3-96ab-c4c2f82ec95e'
-const form={id:tid,kind:'FORM',title:'学习背景表单',revision:2,status:'DRAFT',updatedAt:'2026-10-22T08:00:00Z',definition:{schemaVersion:1,pages:[]}}
+const form={id:tid,kind:'FORM',title:'学习背景表单',revision:2,status:'DRAFT',readiness:'READY',completedRevision:2,updatedAt:'2026-10-22T08:00:00Z',definition:{schemaVersion:1,pages:[]}}
 const reply=(data:unknown)=>Promise.resolve({ok:true,json:async()=>({code:0,data})} as Response)
 let failSelect=false,selected=false
 beforeEach(()=>{window.history.replaceState(null,'','/workspace/tools');failSelect=false;selected=false;vi.stubGlobal('fetch',vi.fn((url:string,init?:RequestInit)=>{
@@ -19,7 +19,8 @@ beforeEach(()=>{window.history.replaceState(null,'','/workspace/tools');failSele
  if(url.includes('/projects?page='))return reply({list:[]})
  if(url.includes('/tool-library/catalog'))return reply({list:[{id:'grant',title:'原版认知测验',kind:'COGNITIVE',sourceRef:{sourceVersion:'1',kind:'COGNITIVE',sourceId:'source'}}]})
  if(url.includes('/tool-library?'))return reply({list:[form],total:1})
- if(url.endsWith('/tool-library/'+tid)&&init?.method==='PATCH'){const data=JSON.parse(String(init.body));return reply({...form,...data,revision:data.revision+1})}
+ if(url.endsWith('/tool-library/'+tid+'/complete'))return reply({...form,readiness:'READY',completedRevision:2})
+ if(url.endsWith('/tool-library/'+tid)&&init?.method==='PATCH'){const data=JSON.parse(String(init.body));return reply({...form,...data,revision:data.revision+1,readiness:'DRAFT',completedRevision:null})}
  if(url.endsWith('/tool-library/'+tid))return reply(form)
  if(/\/tool-library\/[a-f0-9-]{36}$/.test(url)){const id=url.split('/').pop();const call=vi.mocked(fetch).mock.calls.find(([endpoint,opts])=>String(endpoint).endsWith('/tool-library')&&opts?.method==='POST'&&JSON.parse(String(opts.body)).requestId===id);if(call){const data=JSON.parse(String(call[1]?.body));return reply({...form,id,kind:data.kind,title:data.title,revision:0,definition:data.kind==='FORM'?{schemaVersion:2,pages:[]}:data.kind==='COMPOSITION'?{schemaVersion:1,items:[]}:{schemaVersion:1,items:[],responseOptions:[],dimensions:[],aggregation:'mean',respondentType:'participant_self_report'},...(init?.method==='PATCH'?{...JSON.parse(String(init.body)),revision:1}:{})})}}
  if(url.endsWith('/tool-library')&&init?.method==='POST'){const body=JSON.parse(String(init.body));return reply({...form,id:body.requestId,kind:body.kind,title:body.title,revision:0,definition:body.kind==='FORM'?{schemaVersion:2,pages:[]}:body.kind==='COMPOSITION'?{schemaVersion:1,items:[]}:{schemaVersion:1,items:[],responseOptions:[],dimensions:[],aggregation:'mean',respondentType:'participant_self_report'}})}
@@ -30,6 +31,24 @@ beforeEach(()=>{window.history.replaceState(null,'','/workspace/tools');failSele
 }))})
 afterEach(()=>{vi.restoreAllMocks();vi.unstubAllGlobals()})
 describe('independent Survey toolkit and study selection',()=>{
+ it('hides unfinished authoring drafts in the study picker',async()=>{
+  const original=vi.mocked(fetch).getMockImplementation()!
+  vi.mocked(fetch).mockImplementation((url,init)=>String(url).includes('/tool-library?')?reply({list:[form,{...form,id:'unfinished',title:'未完成问卷',readiness:'DRAFT',completedRevision:null}],total:2}):original(url,init))
+  render(<SurveyToolLibrary projectId="p"/>);await screen.findByRole('heading',{name:'学习背景表单'})
+  expect(screen.queryByRole('heading',{name:'未完成问卷'})).toBeNull()
+  expect(vi.mocked(fetch).mock.calls.some(([url])=>String(url).includes('selectable=true'))).toBe(true)
+ })
+ it('completes the saved revision explicitly and requires recompletion after edits',async()=>{
+  const original=vi.mocked(fetch).getMockImplementation()!
+  vi.mocked(fetch).mockImplementation((url,init)=>String(url).endsWith('/tool-library/'+tid)&&(!init?.method||init.method==='GET')?reply({...form,readiness:'DRAFT',completedRevision:null}):original(url,init))
+  window.history.replaceState(null,'','/workspace/tools?tool='+tid);render(<SurveyToolLibrary/>);await screen.findByRole('button',{name:'完成编制'})
+  fireEvent.click(screen.getByRole('button',{name:'完成编制'}));await screen.findByRole('button',{name:'已完成编制'})
+  expect(JSON.parse(String(vi.mocked(fetch).mock.calls.find(([url])=>String(url).endsWith('/complete'))![1]?.body))).toEqual({revision:2})
+  fireEvent.click(screen.getByRole('button',{name:'编辑名称'}));fireEvent.change(screen.getByLabelText('工具名称'),{target:{value:'修订后的问卷'}})
+  expect(screen.getByRole('button',{name:'完成编制'})).toBeDisabled()
+  fireEvent.click(screen.getByRole('button',{name:'保存表单信息'}));await waitFor(()=>expect(screen.getByRole('button',{name:'完成编制'})).toBeEnabled())
+ })
+
  it('presents owned and granted libraries with collapsed help and only supported creation kinds',async()=>{
   render(<SurveyToolLibrary/>);expect(await screen.findByRole('heading',{name:'学习背景表单'})).toBeVisible()
   expect(screen.getByText('选用、版本与开放范围说明').closest('details')).not.toHaveAttribute('open')

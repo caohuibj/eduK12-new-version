@@ -16,6 +16,6 @@ export async function toolLibraryApi<T>(path:string,method='GET',body?:unknown):
 }
 export type ToolSource='owned'|'granted'
 export type ToolRef={source:ToolSource;id:string;revision?:number;title?:string}
-export type LibraryTool={id:string;title:string;kind:'FORM'|'SCALE'|'COMPOSITION';revision:number;status:string;definition:any;updatedAt:string}
+export type LibraryTool={id:string;title:string;kind:'FORM'|'SCALE'|'COMPOSITION';revision:number;status:string;readiness?:'DRAFT'|'READY';completedRevision?:number|null;definition:any;updatedAt:string}
 export const libraryKindLabel={FORM:'表单',SCALE:'量表',COMPOSITION:'普通组合问卷',SJT:'情境判断',COGNITIVE:'认知测验'}
 export const surveyAssetBase=(id:string)=>id.startsWith('tool:')?'/api/survey/tool-media/'+encodeURIComponent(id.slice(5))+'/assets':'/api/survey/projects/'+encodeURIComponent(id)+'/assets'

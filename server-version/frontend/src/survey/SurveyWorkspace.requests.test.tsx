@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import { StrictMode,type ComponentProps } from 'react'
 import { act,fireEvent,render,screen,waitFor,within } from '@testing-library/react'
 import { afterEach,describe,expect,it,vi } from 'vitest'
 import SurveyApp from './SurveyApp'
@@ -13,6 +13,7 @@ function selectStudy(index:number){
 
 // Preserve the existing project-builder/studio request contracts in isolation.
 // The new tool-library selection integration has separate component coverage.
+vi.mock('./SurveyWaveStudio',async importOriginal=>{const module=await importOriginal<typeof import('./SurveyWaveStudio')>();return {...module,SurveyWaveStudio:(props:ComponentProps<typeof module.SurveyWaveStudio>)=><module.SurveyWaveStudio {...props} onNavigateLibrary={undefined}/>}})
 vi.mock('./SurveyProjectTools',async()=>{const {SurveyBuilder}=await import('./SurveyBuilder');return {SurveyProjectTools:SurveyBuilder}})
 vi.mock('./SurveyAnalyticsWorkspace',()=>({SurveyAnalyticsWorkspace:()=>null}))
 vi.mock('./SurveyFlowStudio',()=>({SurveyFlowStudio:({questions}:{questions:{prompt:string}[]})=>
@@ -401,7 +402,7 @@ describe('S04 workspace section navigation',()=>{
     fireEvent.change(builder().getByLabelText('题干'),{target:{value:'未保存题干'}})
     const requests=api.fetcher.mock.calls.length
     await act(async()=>{
-      fireEvent.click(screen.getByRole('tab',{name:'研究数据'}))
+      fireEvent.click(screen.getByRole('tab',{name:'数据'}))
       fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}))
       fireEvent.click(screen.getByRole('tab',{name:'研究设置'}))
     })
@@ -412,13 +413,13 @@ describe('S04 workspace section navigation',()=>{
     expect(builder().getByRole('button',{name:'保存草稿'})).toBeEnabled()
     const settings=screen.getByRole('tab',{name:'研究设置'});settings.focus()
     fireEvent.keyDown(settings,{key:'ArrowRight'})
-    expect(screen.getByRole('tab',{name:'私有报告'})).toHaveFocus()
-    expect(screen.getByRole('tab',{name:'私有报告'})).toHaveAttribute('aria-selected','true')
-    fireEvent.keyDown(screen.getByRole('tab',{name:'私有报告'}),{key:'ArrowRight'})
     expect(screen.getByRole('tab',{name:'发布与采集'})).toHaveFocus()
     expect(screen.getByRole('tab',{name:'发布与采集'})).toHaveAttribute('aria-selected','true')
-    fireEvent.keyDown(screen.getByRole('tab',{name:'发布与采集'}),{key:'End'})
-    expect(screen.getByRole('tab',{name:'研究数据'})).toHaveFocus()
+    fireEvent.keyDown(screen.getByRole('tab',{name:'发布与采集'}),{key:'ArrowRight'})
+    expect(screen.getByRole('tab',{name:'私有报告'})).toHaveFocus()
+    expect(screen.getByRole('tab',{name:'私有报告'})).toHaveAttribute('aria-selected','true')
+    fireEvent.keyDown(screen.getByRole('tab',{name:'私有报告'}),{key:'End'})
+    expect(screen.getByRole('tab',{name:'数据'})).toHaveFocus()
     expect(screen.getByRole('region',{name:'研究数据状态'})).toBeVisible()
     expect(api.fetcher.mock.calls).toHaveLength(requests)
   })

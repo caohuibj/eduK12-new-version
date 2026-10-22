@@ -45,6 +45,14 @@ async function choose(){
 }
 afterEach(()=>vi.unstubAllGlobals())
 describe('Survey Wave report selection freeze boundary',()=>{
+ it('does not offer unselected draft tools in the independent-library workspace',async()=>{
+  fixture('ok','DRAFT');render(<SurveyWaveStudio projectId="p1" onNavigateLibrary={()=>{}}/>);
+  await screen.findByRole('button',{name:/T1 · 版本波次/})
+  expect(screen.queryByLabelText('SCALE · 测量甲')).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button',{name:/T1 · 版本波次/}));await choose()
+  expect(screen.getByLabelText('SCALE · 测量甲')).toBeChecked()
+ })
+
  it('keeps published self-authored scales selectable for explicit wave freezing',async()=>{
   const requests=fixture('ok','PUBLISHED');render(<SurveyWaveStudio projectId="p1"/>);await choose()
   expect(screen.getByLabelText('SCALE · 测量甲')).toBeChecked()

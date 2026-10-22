@@ -2,7 +2,7 @@ import {createDraft} from '../../modules/survey/builder.service'
 import {randomUUID} from 'node:crypto'
 import {beforeAll,afterAll,describe,it,expect} from 'vitest'
 import {prisma} from '../../config/database'
-import {createTemplate,saveTemplate,getTemplate,listTemplates,inspectTemplate,selectTemplate,ownedTemplate,copyProjectTool,bulkTemplate,dryRunTemplate,archiveTemplate,toolKind} from '../../modules/survey/tool-library.service'
+import {createTemplate,saveTemplate,getTemplate,listTemplates,inspectTemplate,selectTemplate,ownedTemplate,copyProjectTool,bulkTemplate,dryRunTemplate,archiveTemplate,completeTemplate,toolKind} from '../../modules/survey/tool-library.service'
 import {assertSurveyMediaOwned} from '../../modules/survey/media.references'
 const enabled=process.env.SURVEY_TOOL_LIBRARY_ACCEPTANCE==='1'
 const suite=enabled?describe:describe.skip
@@ -61,11 +61,23 @@ suite('Survey independent tool library — isolated local synthetic records',()=
   expect(await inspectTemplate(uid,scaleId,{i1:'o5'})).toMatchObject({ok:true})
   await expect(saveTemplate(uid,scaleId,{revision:1,title:'错误反馈',definition:{...definition,rawScoreFeedback:{schemaVersion:1,rules:[{scoreKey:'missing',ranges:[]}]}}})).rejects.toHaveProperty('issues')
  })
+ it('requires explicit completion, excludes drafts, and invalidates readiness on edit',async()=>{
+  const empty=await newTool('FORM','未完成合成表单')
+  await expect(completeTemplate(uid,empty.id,0)).rejects.toHaveProperty('issues')
+  await expect(selectTemplate(uid,pid,{requestId:randomUUID(),tool:{source:'owned',id:formId,revision:1}})).rejects.toMatchObject({statusCode:409})
+  await expect(completeTemplate(other,formId,1)).rejects.toMatchObject({statusCode:403})
+  await expect(completeTemplate(uid,formId,0)).rejects.toMatchObject({statusCode:409})
+  expect(await completeTemplate(uid,formId,1)).toMatchObject({revision:1,completedRevision:1,readiness:'READY'})
+  const ready=await listTemplates(uid,{page:1,kind:'FORM',query:'背景表单',selectableOnly:true})
+  expect(ready.list.map(row=>row.id)).toContain(formId)
+  expect((await listTemplates(uid,{page:1,kind:'FORM',query:'未完成合成表单',selectableOnly:true})).list).toHaveLength(0)
+ })
  it('copies the selected revision into a study and keeps the study unchanged by later template edits',async()=>{
   const requestId=randomUUID(),tool={source:'owned' as const,id:formId,revision:1}
   const result=await selectTemplate(uid,pid,{requestId,tool});expect(result.instrumentIds).toHaveLength(1)
   expect(await selectTemplate(uid,pid,{requestId,tool})).toMatchObject({instrumentIds:result.instrumentIds,replayed:true})
   await saveTemplate(uid,formId,{revision:1,title:'后来修订',definition:{...form,pages:[{...form.pages[0],title:'新版'}]}})
+  expect(await getTemplate(uid,formId)).toMatchObject({readiness:'DRAFT',completedRevision:null,revision:2})
   const projectCopy=await prisma.surveyInstrumentDraft.findUniqueOrThrow({where:{id:result.instrumentIds[0]}})
   expect(projectCopy.title).toBe('背景表单');expect(projectCopy.definition).toMatchObject({pages:[{title:'背景'}]})
   await expect(selectTemplate(uid,pid,{requestId:randomUUID(),tool})).rejects.toMatchObject({statusCode:409})
@@ -73,13 +85,22 @@ suite('Survey independent tool library — isolated local synthetic records',()=
  it('keeps normal composition order and separate project units; rejects nested or stale components',async()=>{
   const group=await newTool('COMPOSITION');groupId=group.id
   const items=[{source:'owned',id:scaleId,revision:1,title:'专注量表'},{source:'owned',id:formId,revision:2,title:'后来修订'}]
+  await completeTemplate(uid,scaleId,1);await completeTemplate(uid,formId,2)
   await saveTemplate(uid,groupId,{revision:0,title:'普通组合',definition:{schemaVersion:1,items}})
   expect(await inspectTemplate(uid,groupId)).toMatchObject({ok:true,unitCount:2})
+  await completeTemplate(uid,groupId,1)
   const result=await selectTemplate(uid,pid,{requestId:randomUUID(),tool:{source:'owned',id:groupId,revision:1}})
   const rows=await prisma.surveyInstrumentDraft.findMany({where:{id:{in:result.instrumentIds}}})
   expect(result.instrumentIds.map(id=>rows.find(row=>row.id===id)?.kind)).toEqual(['SCALE','FORM'])
   await expect(saveTemplate(uid,groupId,{revision:1,title:'嵌套',definition:{schemaVersion:1,items:[{source:'owned',id:groupId,revision:1}]}})).rejects.toMatchObject({statusCode:409})
   await expect(saveTemplate(uid,groupId,{revision:1,title:'过时',definition:{schemaVersion:1,items:[{source:'owned',id:formId,revision:0}]}})).rejects.toMatchObject({statusCode:409})
+ })
+ it('hides a completed composition when a referenced revision changes',async()=>{
+  const before=await listTemplates(uid,{page:1,kind:'COMPOSITION',query:'普通组合',selectableOnly:true});expect(before.list.map(row=>row.id)).toContain(groupId)
+  const scale=await getTemplate(uid,scaleId)
+  await saveTemplate(uid,scaleId,{revision:scale.revision,title:scale.title,definition:scale.definition})
+  const after=await listTemplates(uid,{page:1,kind:'COMPOSITION',query:'普通组合',selectableOnly:true});expect(after.list.map(row=>row.id)).not.toContain(groupId)
+  await expect(selectTemplate(uid,pid,{requestId:randomUUID(),tool:{source:'owned',id:groupId,revision:1}})).rejects.toMatchObject({statusCode:409})
  })
  it('does not allow self-authored cognitive/SJT or forged/revoked grants',async()=>{
   expect(toolKind.safeParse('SJT').success).toBe(false);expect(toolKind.safeParse('COGNITIVE').success).toBe(false)
@@ -104,8 +125,17 @@ suite('Survey independent tool library — isolated local synthetic records',()=
   const definition={...form,pages:[{...form.pages[0],questions:[{...form.pages[0].questions[0],image:{asset,altText:'示意',rightsStatus:'self_authored',rightsNote:'本地合成测试图'}}]}]}
   await saveTemplate(uid,tool.id,{revision:0,title:'含图表单',definition})
   await expect(prisma.$transaction(tx=>assertSurveyMediaOwned(tx,uid,pid,[{kind:'FORM',definition}]))).rejects.toMatchObject({statusCode:403})
+  await completeTemplate(uid,tool.id,1)
   await selectTemplate(uid,pid,{requestId:randomUUID(),tool:{source:'owned',id:tool.id,revision:1}})
   expect(await prisma.$transaction(tx=>assertSurveyMediaOwned(tx,uid,pid,[{kind:'FORM',definition}]))).toEqual([asset])
+ })
+ it('invalidates completion after a bulk edit',async()=>{
+  const tool=await newTool('FORM','合成批量修订检查')
+  await saveTemplate(uid,tool.id,{revision:0,title:tool.title,definition:form});await completeTemplate(uid,tool.id,1)
+  const batch={batchId:randomUUID(),format:'CSV' as const,content:'type,prompt,required,options\nSINGLE,新增问题,true,甲||乙'}
+  const preview=await bulkTemplate(uid,tool.id,batch)
+  expect(await bulkTemplate(uid,tool.id,batch,{revision:1,digest:preview.digest})).toMatchObject({revision:2,readiness:'DRAFT',completedRevision:null})
+  await expect(selectTemplate(uid,pid,{requestId:randomUUID(),tool:{source:'owned',id:tool.id,revision:2}})).rejects.toMatchObject({statusCode:409})
  })
  it('uses existing bulk parsing with a revision-bound atomic apply and archive protection',async()=>{
   const tool=await newTool('FORM'),batch={batchId:randomUUID(),format:'CSV' as const,content:'type,prompt,required,options\nSINGLE,喜欢什么,true,甲||乙'}

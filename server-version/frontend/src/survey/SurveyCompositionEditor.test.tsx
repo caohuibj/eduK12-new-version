@@ -5,8 +5,8 @@ import {SurveyCompositionEditor} from './SurveyCompositionEditor'
 import {SurveyToolTemplateEditor} from './SurveyToolTemplateEditor'
 import type {ToolRef} from './tool-library-api'
 
-const scale={id:'scale-a',title:'学习投入量表',kind:'SCALE',revision:3,status:'DRAFT'}
-const form={id:'form-a',title:'学习背景表单',kind:'FORM',revision:5,status:'DRAFT'}
+const scale={id:'scale-a',title:'学习投入量表',kind:'SCALE',revision:3,status:'DRAFT',readiness:'READY'}
+const form={id:'form-a',title:'学习背景表单',kind:'FORM',revision:5,status:'DRAFT',readiness:'READY'}
 const cognitive={id:'grant-c',title:'注意力任务',kind:'COGNITIVE',status:'ACTIVE',sourceRef:{kind:'COGNITIVE',sourceId:'original-c',sourceVersion:'2'}}
 const sjt={id:'grant-s',title:'课堂情境判断',kind:'SJT',status:'ACTIVE',sourceRef:{kind:'SJT',sourceId:'original-s',sourceVersion:'4'}}
 const reply=(data:unknown)=>Promise.resolve({ok:true,json:async()=>({code:0,data})} as Response)

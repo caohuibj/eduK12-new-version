@@ -3,8 +3,8 @@ import type { KeyboardEvent } from 'react'
 export type WorkspaceSection='settings'|'reports'|'publish'|'data'
 const sections:[WorkspaceSection,string,string][]=[
   ['settings','研究设置','名称、说明与采集方式'],
-  ['reports','私有报告','模板、合成预览与版本'],
-  ['publish','发布与采集','问卷内容、波次与采集链接'],['data','研究数据','质量、分析与导出'],
+  ['publish','发布与采集','问卷内容、波次与采集链接'],
+  ['reports','私有报告','研究者专用报告模板、预览与版本'],['data','数据','质量、分析与导出'],
 ]
 export function SurveyWorkspaceNav({active,onChange,title,onReturn}:{active:WorkspaceSection;
   onChange:(section:WorkspaceSection)=>void;title:string;onReturn?:()=>void}){

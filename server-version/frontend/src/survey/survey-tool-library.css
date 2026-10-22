@@ -156,3 +156,6 @@
 .survey-tool-application form textarea { min-height:5rem; font-size:.8rem; }
 .survey-tool-application form select { font-size:.8rem; }
 @media(max-width:40rem){.survey-tool-application form fieldset{grid-template-columns:minmax(0,1fr)}}
+
+.survey-researcher .survey-form-complete { min-height:36px; padding:.4rem .8rem; white-space:nowrap; font-size:.8rem; }
+.survey-researcher .survey-tool-completion-hint { margin:.6rem 0 1rem; padding:.6rem .85rem; border:1px solid var(--survey-brand-line); border-radius:.5rem; background:var(--survey-brand-subtle); color:var(--survey-brand-muted); font-size:.8rem; line-height:1.8; }
