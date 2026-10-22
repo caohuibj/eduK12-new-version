@@ -4,6 +4,7 @@ import { SurveyCatalogGrants } from './SurveyCatalogGrants'
 import { ProductPage } from '../../components/product-ui'
 import AdminStepUp from '../../admin/AdminStepUp'
 import './survey-admin.css'
+import { SurveyBrand } from '../../survey/SurveyBrand'
 type Envelope<T>={code:number|string;message:string;data:T}
 type Researcher={id:string;username:string;status:string;createdAt:string}
 type Invitation={id:string;kind:'INVITE';createdBy:string;createdAt:string;expiresAt:string;
@@ -106,11 +107,16 @@ export default function SurveyResearchersAdmin(){
   const cancelled=(context:string)=>{setError('');setNotice('已取消'+context+'，未提交变更。')}
   const copyLink=async()=>{try{await navigator.clipboard.writeText(link);setError('');setNotice(linkContext+'链接已复制到剪贴板。')}
     catch{setError('未能写入剪贴板，请手动选择复制此链接。')}}
-  return <ProductPage width="management"><AdminStepUp/><div className="survey-admin">
-    <header className="survey-admin-header"><div><p className="survey-admin-kicker">HUISURVEY · 系统管理</p>
+  return <ProductPage width="management"><div className="survey-admin">
+    <header className="survey-admin-header"><div>{origins&&<SurveyBrand href={origins.survey+'/'}/>}<p className="survey-admin-kicker">HUISURVEY · 系统管理</p>
       <h1>研究者与工具授权</h1><p>管理研究者资格、一次性邀请与工具的精确授权版本，不自动授予科研原始答案访问权。</p></div>
       {origins&&<a className="survey-admin-return" href={origins.survey+'/'}>返回 Survey 入口</a>}
     </header>
+    <section className="survey-admin-stepup" aria-labelledby="survey-admin-stepup-heading">
+      <h2 id="survey-admin-stepup-heading">敏感操作身份验证</h2>
+      <p>查看列表无需再次验证；提交邀请、资格或授权变更时，后台仍核对最近五分钟的双因素证明。</p>
+      <AdminStepUp/>
+    </section>
     <nav role="tablist" aria-label="Survey 管理分区" className="survey-admin-tabs">
       {sections.map(([key,title,description],index)=><button type="button" role="tab" key={key}
         id={'survey-admin-tab-'+key} aria-controls={'survey-admin-panel-'+key} aria-selected={section===key}
@@ -119,6 +125,10 @@ export default function SurveyResearchersAdmin(){
           if(next===null)return;event.preventDefault();setSection(sections[next][0]);document.getElementById('survey-admin-tab-'+sections[next][0])?.focus()
         }}><strong>{title}</strong><span>{description}</span></button>)}
     </nav>
+    <aside className="survey-admin-library" aria-label="公库与审批入口">
+      <div><h2>公库与审批</h2><p>本页管理研究者与原版工具授权；公库收录、版本审核和使用分配在既有工作台按当前权限提供。</p></div>
+      <a className="survey-admin-return" href="/admin/scale-library-governance?workspace=survey">查看公库与可用审批</a>
+    </aside>
     {error&&<p role="alert" className="border-l-4 border-red-600 p-3">{error}</p>}
     {notice&&<p role="status" className="border-l-4 border-teal-600 p-3">{notice}</p>}
     <div className="survey-admin-verification"><label>当前管理员密码（敏感操作再次验证）

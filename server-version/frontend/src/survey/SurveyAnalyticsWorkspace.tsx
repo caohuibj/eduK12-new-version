@@ -388,7 +388,7 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
       setDownloadIssue(e instanceof Error?e.message:'文件下载结果未确认，请核对浏览器下载列表。');throw e
     }
   },isCurrent)}
-  return <section className="border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-4" aria-label="研究数据">
+  return <section className="survey-studio-surface survey-data-surface border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-4" aria-label="研究数据">
     <header><h2 className="text-xl font-semibold">研究数据 · Wave Analytics</h2>
       <p className="text-sm text-slate-600">完成与配对统计只来源于可核对的加密 Survey FINAL；研究编号数不等于经过实名验证的自然人数。</p></header>
     {error&&(!downloadIssue||!ticket)&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}

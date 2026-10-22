@@ -10,6 +10,12 @@ const response = (data: unknown, ok = true, message = '请先登录') =>
   Promise.resolve({ ok, json: async () => ({ code: ok ? 0 : 401, message, data }) } as Response)
 
 describe('Survey public entry and existing authentication transitions', () => {
+  it('makes both role destinations visible without adding administrator controls to the public page',()=>{
+    render(<SurveyApp/>)
+    expect(screen.getByRole('link',{name:'研究者入口'})).toHaveAttribute('href','/login')
+    expect(screen.getByRole('link',{name:'管理员入口'}).getAttribute('href')).toMatch(/\/admin\/login\?returnTo=%2Fadmin%2Fsurvey-researchers$/)
+    expect(screen.queryByRole('button',{name:'生成研究者邀请'})).not.toBeInTheDocument()
+  })
   beforeEach(() => {
     window.history.replaceState(null, '', '/')
     vi.stubGlobal('fetch', vi.fn(() => response(null, false)))

@@ -1,11 +1,17 @@
 import {useState} from 'react'
-import {Link} from 'react-router-dom'
+import {Link,useLocation} from 'react-router-dom'
 import {QRCodeSVG} from 'qrcode.react'
 import AuthShell from '../components/auth/AuthShell'
 import {beginTotpEnrollment,confirmTotpEnrollment,enrollSecurityKey} from './securityKey'
 import api from '../api/client'
+import {productOrigins,SURVEY_ADMIN_PATH} from '../products/origins'
+import {SurveyBrand} from '../survey/SurveyBrand'
+import '../survey/survey-admin-auth.css'
 
 export default function AdminKeyEnrollment(){
+  const location=useLocation(),origins=productOrigins()
+  const surveyEntry=Boolean(origins&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH)
+  const loginPath='/admin/login'+(surveyEntry?'?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH):'')
   const [username,setUsername]=useState(''),[password,setPassword]=useState(''),[ticket,setTicket]=useState('')
   const [method,setMethod]=useState<'TOTP'|'SECURITY_KEY'>('TOTP')
   const [uri,setUri]=useState(''),[code,setCode]=useState('')
@@ -26,7 +32,12 @@ export default function AdminKeyEnrollment(){
     catch(error){setUri('');setMessage((error instanceof Error?error.message:'验证未完成')+'；请重新填写登记信息开始绑定。')}
     finally{setCode('');setBusy(false)}
   }
-  return <AuthShell tone="admin" title="绑定管理员验证方式" description="使用受控后台提供的短期登记票据，完成管理员双因素绑定">
+  return <AuthShell tone="admin" title="绑定管理员验证方式" description="使用受控后台提供的短期登记票据，完成管理员双因素绑定"
+    {...(surveyEntry&&origins?{
+      brand:<SurveyBrand href={origins.survey+'/'}/>,className:'survey-admin-auth',backTo:loginPath,backLabel:'返回 Survey 管理员登录',
+      heroTitle:'为研究管理建立安全入口。',heroDescription:'绑定验证器后，使用现有账号、密码与动态码进入获授权的研究管理工作台。',
+      heroBullets:['仅使用受控登记票据','保留现有账号与入口权限','绑定后返回原管理入口'],tagline:'观风知微 · 心理与教育测量研究平台',
+    }:{})}>
     <p>可以使用微软 Authenticator 等手机验证器。绑定完成后，登录仍需账号密码与六位动态码。</p>
     {!registered&&!uri&&<form className="space-y-4" onSubmit={e=>{e.preventDefault();void setup()}}>
       <label>验证方式<select className="input" value={method} disabled={busy} onChange={e=>{setMethod(e.target.value as typeof method);setMessage('')}}>
@@ -50,6 +61,6 @@ export default function AdminKeyEnrollment(){
     </section>}
     <p role="status">{message}</p>
     <p>无法访问已绑定的验证器？请通过受控后台恢复账号后重新绑定。</p>
-    <Link to="/admin/login">前往管理员登录</Link>
+    <Link to={loginPath}>前往管理员登录</Link>
   </AuthShell>
 }

@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+import { SurveyBrand } from '../../survey/SurveyBrand'
+import { productOrigins } from '../../products/origins'
+import './survey-admin.css'
 import { governanceApi, submissionStatusLabel, type GovernanceCatalogRecord, type GovernanceCapabilities, type GovernanceEntry, type GovernanceProduct, type GovernanceSubmission, type GovernanceUseGrant } from '../../api/scaleLibraryGovernance'
 import { ScaleLibraryMediaPreview } from '../../components/scale-governance/ScaleLibraryMediaPreview'
 import { ProductPage, PageHeader } from '../../components/product-ui'
@@ -10,6 +13,9 @@ const entryLabels = { ACTIVE: '已收录', WITHDRAWN: '已下架', EMERGENCY_DIS
 type Person = { id: string; username: string; name?: string; status?: string; isActive?: boolean }
 const covers = (releaseIds: string[], releaseId: string) => releaseIds.includes(releaseId)
 export default function ScaleLibraryGovernance() {
+  const location=useLocation()
+  const surveyContext=new URLSearchParams(location.search).get('workspace')==='survey'
+  const origins=productOrigins()
   const [catalogPage, setCatalogPage] = useState(1), [catalogHasMore, setCatalogHasMore] = useState(false)
   const [catalog, setCatalog] = useState<GovernanceCatalogRecord[]>([]), [catalogDetail, setCatalogDetail] = useState<GovernanceCatalogRecord | null>(null), [catalogDetailLoading, setCatalogDetailLoading] = useState(false)
   const [capabilities, setCapabilities] = useState<GovernanceCapabilities | null>(null)
@@ -87,7 +93,10 @@ export default function ScaleLibraryGovernance() {
     pendingGrant.current = null
     const response = await api.grants(selected.id); if (mounted.current) setGrants(response.list)
   }
-  return <ProductPage><PageHeader title="公共量表库与授权治理" description="统一汇总标准量表与获批自编量表；精确版本、科学身份和授权规则分别保留。" />
+  return <ProductPage><div className={surveyContext?'survey-admin survey-admin-governance':undefined}>
+    {surveyContext&&origins&&<header className="survey-admin-header"><div><SurveyBrand href={origins.survey+'/'}/><p className="survey-admin-kicker">HUISURVEY · 公库与审批</p></div>
+      <Link className="survey-admin-return" to="/admin/survey-researchers">返回研究者与工具授权</Link></header>}
+    <PageHeader title="公共量表库与授权治理" description="统一汇总标准量表与获批自编量表；精确版本、科学身份和授权规则分别保留。" />
     <section className="staff-panel staff-panel--padded p-5 space-y-2"><h2>两类权限分别管理</h2><p>系统级审核与明确范围的审核委托，负责是否收录；入口分配权限只负责已批准版本的使用授权，不能代替入库审核。</p><p>批准入库不等于全平台可用，不构成标准科学量表认证。使用授权仅可使用原版，不授予修改、改编或转授权权限。</p>{capabilities?.systemAdmin && <Link to="/admin/permissions">查看系统权限与委托范围</Link>}<p>本页按后端实时能力提供操作；入口管理员身份本身不授予审核权。</p></section>
     {loading && <p role="status">正在核对治理权限…</p>}{error && <p role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}
     <button type="button" className="hui-button hui-button--secondary" disabled={busy || loading} onClick={() => void refresh()}>刷新状态</button>
@@ -102,5 +111,5 @@ export default function ScaleLibraryGovernance() {
     </section>{selected && <section className="staff-panel staff-panel--padded p-5 mt-4" aria-label="精确版本使用授权"><h2>{selected.metadata.title} · 只读使用授权</h2><p className="break-all">版本 {selected.releaseId}。授权不包含改编；旧问卷不会自动升级。</p>{!grantLoaded && <p role="status">尚未确认现有授权，请重新读取该版本授权后再分配。</p>}<fieldset disabled={busy || loading || !grantLoaded || selected.status !== 'ACTIVE'}><label>目标入口<select className="input block" value={product} onChange={event => { lookupGeneration.current++; setProduct(event.target.value as GovernanceProduct); setPeople([]); setUserId('') }}><option value="TRAINING" disabled={!selected.supportedEntrypoints?.includes('TRAINING')}>Training</option><option value="SURVEY" disabled={!selected.supportedEntrypoints?.includes('SURVEY')}>Survey</option></select></label>{(['TRAINING', 'SURVEY'] as const).filter(target => !selected.supportedEntrypoints?.includes(target)).map(target => <p key={target}>{target}：{selected.compatibilityReasons?.[target] || '当前版本不支持此入口，不能分配使用。'}</p>)}{canDistribute(selected, product) ? <><label>查找授权账号<input className="input block" value={keyword} onChange={event => setKeyword(event.target.value)}/></label><button type="button" className="hui-button hui-button--secondary" onClick={() => void loadPeople(1)}>读取可见授权对象</button><label>授权对象<select className="input block" value={userId} onChange={event => setUserId(event.target.value)}><option value="">请选择已核对的账号</option>{people.map(person => <option key={person.id} value={person.id}>{person.name || person.username} · {person.username} · {person.id}</option>)}</select></label>{people.length > 0 && <div><button type="button" disabled={peoplePage <= 1} onClick={() => void loadPeople(peoplePage - 1)}>对象上一页</button><button type="button" disabled={!peopleHasMore} onClick={() => void loadPeople(peoplePage + 1)}>对象下一页</button></div>}<button type="button" className="hui-button hui-button--primary" disabled={!userId} onClick={() => void run(assign, '已分配精确版本的只读使用授权。')}>授予所选账号只读使用</button></> : <p>当前账号没有此版本在该入口的分配权限。</p>}</fieldset>
       {grants.map(grant => <article key={grant.id} className="border rounded p-3 mt-2"><p>{grant.product} · {grant.userId} · {grant.status}</p>{canDistribute(selected, grant.product) && grant.status === 'ACTIVE' && <button type="button" className="hui-button hui-button--secondary" disabled={busy || !reason.trim()} onClick={() => void run(async () => { await api.revoke(grant, reason.trim()); const response = await api.grants(selected.id); if (mounted.current) setGrants(response.list) }, '授权已撤销；历史记录保留。')}>撤销新增使用权限</button>}</article>)}
     </section>}</>}
-  </ProductPage>
+  </div></ProductPage>
 }

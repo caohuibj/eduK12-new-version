@@ -41,6 +41,8 @@
 }
 .survey-landing-header nav a { display: inline-flex; align-items: center; min-height: 44px; color: var(--survey-action); font-size: 16px; padding: 10px 0 10px 12px; text-decoration: none; }
 .survey-landing-header nav a:hover { text-decoration: underline; text-underline-offset: 5px; }
+.survey-landing-header nav { display: flex; flex-wrap: wrap; align-items: center; column-gap: 1.1rem; row-gap: .25rem; }
+.survey-landing-header nav .survey-admin-entry-link { border: 1px solid #adc5d0; border-radius: 2rem; padding: .45rem 1rem; background: #f4f9fbbf; }
 
 .survey-brand {
   display: inline-flex;
