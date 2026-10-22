@@ -1386,7 +1386,7 @@
   "review": {
     "completed": true,
     "originalExecutionSigned": false,
-    "note": "Exact route, five-table seed, twelve-table restore and restricted-runtime review retained. Second-run control delta independently reviewed and pure controls/source inventory verified. No historical local assertions admitted after dependency input change; all 23 selected frontend assertions and actual application qualification require final current-source CI."
+    "note": "No local historical evidence is admitted. Fixed third-run official artifacts may prove only the original successful frontend subchecks and two-component audit with unchanged exact component inputs; the frontend parent job remains failed. Missing 13 frontend assertions, fresh build, all connected qualification and current changed-control SAST remain mandatory."
   },
   "requiredJobs": [
     "admission",
@@ -1512,7 +1512,7 @@
             "Survey Research Builder editing widgets records nonuniform contribution weights per SJT option and construct",
             "Survey Research Builder editing widgets distinguishes literal REFUSED text from structured refusal and supports matrix row refusal",
             "Survey Research Builder editing widgets offers preview of a form without creating real responses",
-            "Survey Research Builder editing widgets C05 shared structured constraints preserve Survey V2 total zero and row choice bounds"
+            "C05 shared structured constraints preserve Survey V2 total zero and row choice bounds"
           ],
           "inputClosure": {
             "files": [
@@ -2234,7 +2234,20 @@
       "frontend",
       "backend"
     ],
-    "browserHelper": "server-version/e2e/school-teacher-browser.cjs"
+    "browserHelper": "server-version/e2e/school-teacher-browser.cjs",
+    "officialResume": {
+      "run": 39867718449,
+      "head": "dcbc58483c6b6ce8a81526ddbc124a8b1c1c993c",
+      "checkout": "81ee1f6d6a097e0c9e0aca3da05582f614325878",
+      "frontendJob": 120134202466,
+      "auditJob": 120134202442,
+      "sastJob": 120134095190,
+      "frontendArtifact": 12465090917,
+      "frontendDigest": "7663300255799eff7bd3e8f4ac7f79fef42e3ad62af40da66d5f947876241451",
+      "auditArtifact": 12464502959,
+      "auditDigest": "dac8363a31ff8e8a05809ec80d9b31929624e0be9a9f06bc549d2fb0e66fda1b",
+      "workflowSha256": "3711b141411280f2775ba9475d72b4011ecbfd664789b5228114eefee58331d7"
+    }
   },
   "blockers": []
 }

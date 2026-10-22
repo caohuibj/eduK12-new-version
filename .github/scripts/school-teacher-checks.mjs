@@ -7,6 +7,61 @@ import {createRequire} from 'node:module';
 import {binding,actualPlan,requireSuccess,sha256,git} from './school-teacher-scope.mjs';
 const out=resolve('school-teacher-evidence');
 function receipt(name,value){mkdirSync(out,{recursive:true});writeFileSync(join(out,name+'.json'),JSON.stringify(value,null,2)+'\n')}
+const RESUME={run:39867718449,head:'dcbc58483c6b6ce8a81526ddbc124a8b1c1c993c',checkout:'81ee1f6d6a097e0c9e0aca3da05582f614325878',frontendJob:120134202466,auditJob:120134202442,sastJob:120134095190,frontendArtifact:12465090917,frontendDigest:'7663300255799eff7bd3e8f4ac7f79fef42e3ad62af40da66d5f947876241451',auditArtifact:12464502959,auditDigest:'dac8363a31ff8e8a05809ec80d9b31929624e0be9a9f06bc549d2fb0e66fda1b',workflowSha256:'3711b141411280f2775ba9475d72b4011ecbfd664789b5228114eefee58331d7'};
+const C05='C05 shared structured constraints preserve Survey V2 total zero and row choice bounds';
+const fullSastPaths='paths: [server-version/backend/src, server-version/frontend/src, server-version/e2e, .github/scripts]';
+const controlSastPaths='paths: [.github/scripts/school-teacher-checks.mjs, .github/scripts/school-teacher.test.mjs, .github/scripts/school-teacher-bindings.json]';
+export function verifyOfficialJob(run,job,kind,now=Date.now()){
+ assert.equal(run.id,RESUME.run);assert.equal(run.head_sha,RESUME.head);assert.equal(run.head_branch,'work/school-teacher-review-20261022');assert.equal(run.path,'.github/workflows/ci.yml');assert.equal(run.event,'pull_request');assert.equal(run.run_attempt,1);assert.equal(run.status,'completed');assert.equal(run.conclusion,'failure');assert(run.pull_requests.some(p=>p.number===338));
+ assert.equal(job.id,RESUME[kind+'Job']);assert.equal(job.run_id,RESUME.run);assert.equal(job.head_sha,RESUME.head);assert.equal(job.status,'completed');assert.equal(job.conclusion,kind==='frontend'?'failure':'success');
+ const names={frontend:'school-teacher / frontend',audit:'school-teacher / security',sast:'codeql (javascript/typescript SAST)'};assert.equal(job.name,names[kind]);const age=now-Date.parse(job.completed_at);assert(Number.isFinite(age)&&age>=0&&age<=86400000,'Official evidence expired');
+ const stages=kind==='sast'?['initialize CodeQL','analyze with CodeQL']:kind==='audit'?['retain HIGH CRITICAL production dependency threshold without rebuilding']:['prepare exact backend contracts for frontend types without native lifecycle builds'];
+ for(const name of stages)assert(job.steps.some(s=>s.name===name&&s.status==='completed'&&s.conclusion==='success'),'Required original stage missing');
+ if(kind==='frontend')assert(job.steps.some(s=>s.name==='run only frozen affected checks then compile once and bind dist'&&s.conclusion==='failure'),'Original frontend failure must remain explicit');
+}
+export function verifyResumeInputs(b,read=git){
+ assert.deepEqual(b.execution.officialResume,RESUME);assert.equal(read('rev-parse',RESUME.head+'^{tree}'),read('rev-parse',RESUME.checkout+'^{tree}'));
+ const inputs={};for(const path of ['server-version/frontend','server-version/backend','server-version/e2e']){inputs[path]=read('rev-parse',RESUME.checkout+':'+path);assert.equal(read('rev-parse','HEAD:'+path),inputs[path],'Previously checked component input changed: '+path)}
+ const previous=JSON.parse(read('show',RESUME.checkout+':.github/scripts/school-teacher-bindings.json'));
+ const old=structuredClone(previous.execution.frontend);old.batches[3].expectedFiltered=old.batches[3].expectedFiltered.map(s=>s==='Survey Research Builder editing widgets '+C05?C05:s);assert.deepEqual(b.execution.frontend,old,'Only the corrected filtered C05 title may differ from the successful command selections');
+ return inputs;
+}
+function successfulCommand(record,stage){assert.equal(record.stage,stage);assert.equal(record.exitCode,0);assert.equal(record.signal,null);assert.equal(record.status,'COMMAND_SUCCEEDED');assert.match(record.rawSha256,/^[a-f0-9]{64}$/)}
+export function verifyCompletedFrontend(read,b){
+ for(const stage of ['frontend-types','frontend-lint'])successfulCommand(read('command-'+stage+'.json'),stage);
+ const verified=[];for(let i=0;i<4;i++){
+  successfulCommand(read('command-frontend-tests-'+i+'.json'),'frontend-tests-'+i);const actual=read('frontend-tests-'+i+'-actual.json'),batch=b.execution.frontend.batches[i];assert.equal(actual.invocationSuccess,true);assert.match(actual.rawSha256,/^[a-f0-9]{64}$/);
+  const known=[...batch.expectedPassed,...batch.expectedFiltered],cases=actual.cases.map(c=>{const keys=Object.keys(c).sort();assert.deepEqual(keys,c.name?['name','status']:['status','unreviewedNameSha256']);const matches=c.name?[c.name]:known.filter(n=>sha256(n)===c.unreviewedNameSha256);assert.equal(matches.length,1,'Unknown or ambiguous original case identity');assert(known.includes(matches[0]));return {fullName:matches[0],status:c.status}});
+  const result=verifyTestReport({success:true,numFailedTests:cases.filter(c=>c.status==='failed').length,testResults:[{assertionResults:cases}]},batch);verified.push(result);
+  if(i<3){const original=read('frontend-tests-'+i+'.json');assert.equal(original.sourceHead,RESUME.checkout);assert.equal(original.reportSha256,actual.rawSha256);assert.equal(original.wholeInvocationSucceeded,true);assert.deepEqual([...original.caseNames].sort(),[...result.caseNames].sort())}
+ }
+ const failure=read('phase-frontend-failure.json');assert.equal(failure.phase,'frontend');assert.equal(failure.status,'FAILED');assert.equal(verified.reduce((n,r)=>n+r.passed,0),10);assert.equal(verified.reduce((n,r)=>n+r.filtered,0),8);return {types:true,lint:true,passed:10,filtered:8,batches:verified,originalJobConclusion:'failure',originalJobQualified:false};
+}
+export function verifyCompletedAudit(read){
+ const results={};for(const component of ['frontend','backend']){const command=read('command-'+component+'-audit.json');successfulCommand(command,component+'-audit');const report=read(component+'-audit-summary.json');assert.equal(report.rawSha256,command.rawSha256);assert.equal(report.stage,component+'-audit');assert.equal(report.threshold,'HIGH/CRITICAL');requireNpmAuditSuccess(report.exitCode,report);results[component]={counts:report.counts,originalRawSha256:report.rawSha256}}
+ assert.deepEqual(read('audit.json'),{status:'PASSED',threshold:'HIGH/CRITICAL',components:[{component:'frontend',status:'PASSED'},{component:'backend',status:'PASSED'}]});return results;
+}
+export function verifySastConfig(original,current){
+ const stage=(text,name)=>{const start=text.indexOf('      - name: '+name+'\n');assert(start>=0);const end=text.indexOf('\n      - ',start+1);return text.slice(start,end<0?undefined:end)};
+ assert(stage(original,'initialize CodeQL').includes("application_route == 'school-teacher' && '"+fullSastPaths+"'"));
+ assert.equal(stage(current,'initialize CodeQL'),stage(original,'initialize CodeQL').replace(fullSastPaths,controlSastPaths),'SAST language/query/action/resource configuration changed');assert.equal(stage(current,'analyze with CodeQL'),stage(original,'analyze with CodeQL'));
+}
+export function verifySastLog(log){assert(log.includes('config: '+fullSastPaths));assert(log.includes('languages: javascript-typescript'));assert(new RegExp('\\n[0-9T:.-]+Z '+RESUME.checkout+'(?:\\r?\\n|$)').test(log),'Original actual SAST checkout differs');}
+async function officialApi(path,binary=false){assert(process.env.GH_TOKEN,'Official Actions read token required');const response=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version'+path,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}});assert.equal(response.status,200,'Official evidence unavailable');return binary?Buffer.from(await response.arrayBuffer()):response.json()}
+async function readOfficialArtifact(kind){
+ const id=RESUME[kind+'Artifact'],digest=RESUME[kind+'Digest'],meta=await officialApi('/actions/artifacts/'+id);assert.equal(meta.id,id);assert.equal(meta.expired,false);assert.equal(meta.digest,'sha256:'+digest);assert.equal(meta.workflow_run.id,RESUME.run);assert.equal(meta.workflow_run.head_sha,RESUME.head);assert.equal(meta.name,'school-teacher-'+(kind==='frontend'?'frontend-checks':'audit')+'-'+RESUME.checkout);
+ const bytes=await officialApi('/actions/artifacts/'+id+'/zip',true);assert.equal(sha256(bytes),digest,'Original ZIP digest changed');const file=join(privateRoot(),'official-'+kind+'.zip');writeFileSync(file,bytes,{mode:0o600});const list=spawnSync('unzip',['-Z1',file],{encoding:'utf8'});assert.equal(list.status,0);const names=list.stdout.trim().split('\n');assert.equal(names.length,new Set(names).size);assert(names.every(n=>/^[a-z0-9-]+\.json$/.test(n)));
+ return name=>{assert(names.includes(name),'Missing original receipt '+name);const result=spawnSync('unzip',['-p',file,name],{encoding:'utf8',maxBuffer:4*1024*1024});assert.equal(result.status,0);return JSON.parse(result.stdout)};
+}
+async function reuseOfficial(kind,b){
+ const inputs=verifyResumeInputs(b),run=await officialApi('/actions/runs/'+RESUME.run),job=await officialApi('/actions/jobs/'+RESUME[kind+'Job']);verifyOfficialJob(run,job,kind);
+ const result={kind:'official-successful-subcheck-reuse',originalRun:RESUME.run,originalHead:RESUME.head,originalCheckout:RESUME.checkout,originalJob:job.id,originalParentConclusion:'failure',originalJobConclusion:job.conclusion,currentHead:git('rev-parse','HEAD'),inputs};
+ if(kind==='frontend')result.completed=verifyCompletedFrontend(await readOfficialArtifact(kind),b);
+ else if(kind==='audit')result.completed=verifyCompletedAudit(await readOfficialArtifact(kind));
+ else{assert.equal(kind,'sast');const original=git('show',RESUME.checkout+':.github/workflows/ci.yml');assert.equal(sha256(original+'\n'),RESUME.workflowSha256,'Original workflow bytes changed');verifySastConfig(original,readFileSync('.github/workflows/ci.yml','utf8').trimEnd());const logs=(await officialApi('/actions/jobs/'+RESUME.sastJob+'/logs',true)).toString('utf8');verifySastLog(logs);result.originalJobLogSha256=sha256(logs);assert.deepEqual(git('diff','--name-only',RESUME.checkout,'HEAD','--','.github/scripts').split('\n'),['.github/scripts/school-teacher-bindings.json','.github/scripts/school-teacher-checks.mjs','.github/scripts/school-teacher.test.mjs']);result.applicationScannedAgain=false;result.currentChangedControlScanRequired=true;}
+ receipt('official-'+kind+'-reuse',result);return result;
+}
+
 function privateRoot(){assert(process.env.RUNNER_TEMP);const root=realpathSync(process.env.RUNNER_TEMP),p=join(root,'school-teacher-checks-private');if(!existsSync(p))mkdirSync(p,{mode:0o700});assert.equal(realpathSync(p),p);return p}
 export function safeDiagnostic(raw){const text=String(raw),locations=[...text.matchAll(/(?:server-version\/)?(?:src|scripts|prisma)\/[A-Za-z0-9_./-]+\.(?:[cm]?[jt]sx?|prisma)(?::\d+(?::\d+)?|\(\d+,\d+\))/g)].map(m=>m[0]),codes=[...text.matchAll(/\berror TS\d{4,5}\b/g)].map(m=>m[0]);return {rawSha256:sha256(text),codeLocations:[...new Set(locations)].slice(0,100),compilerCodes:[...new Set(codes)],rawRetainedAfterRunnerDestruction:false};}
 function command(stage,exe,args,cwd=process.cwd(),env=process.env){
@@ -110,7 +165,7 @@ function admission(b,plan){
  const evidence=JSON.parse(readFileSync('.github/scripts/school-teacher-evidence.json','utf8'));requireNoHistoricalAcceptance(evidence);
  const inputs=verifyExecutionInputs(b);receipt('admission',{status:'PASSED',plan,inputs,historicalAcceptedCases:0,acceptedCases:[]});
 }
-function batches(component,selected){const cwd=resolve('server-version',component);assert(Array.isArray(selected));for(const [i,b] of selected.entries()){
+function batches(component,selected,offset=0){const cwd=resolve('server-version',component);assert(Array.isArray(selected));for(const [index,b] of selected.entries()){const i=index+offset;
  assert(Array.isArray(b.files)&&b.files.length);for(const f of b.files)assert(/^src\/.+\.test\.tsx?$/.test(f)&&!f.split('/').includes('..'));
  assert(b.expectedPassed?.length>0&&Array.isArray(b.expectedFiltered));verifyClosure(b.inputClosure);
  const file=join(privateRoot(),component+'-'+i+'.json'),args=['node_modules/vitest/vitest.mjs','run',...b.files,'--maxWorkers=1','--no-file-parallelism','--reporter=json','--outputFile='+file];
@@ -118,10 +173,8 @@ function batches(component,selected){const cwd=resolve('server-version',componen
  try{command(component+'-tests-'+i,process.execPath,args,cwd)}finally{if(existsSync(file)){const raw=readFileSync(file),report=JSON.parse(raw),known=new Set([...b.expectedPassed,...b.expectedFiltered]);receipt(component+'-tests-'+i+'-actual',{rawSha256:sha256(raw),invocationSuccess:report.success===true,cases:report.testResults.flatMap(s=>s.assertionResults||[]).map(c=>({...known.has(c.fullName)?{name:c.fullName}:{unreviewedNameSha256:sha256(String(c.fullName))},status:['passed','failed','pending','skipped','todo'].includes(c.status)?c.status:'UNKNOWN'})),rawRetainedAfterRunnerDestruction:false})}}
  const raw=readFileSync(file);receipt(component+'-tests-'+i,{...verifyTestReport(JSON.parse(raw),b),reportSha256:sha256(raw),sourceHead:git('rev-parse','HEAD')});
  }}
-function frontend(b){const cwd=resolve('server-version/frontend'),p=b.execution.frontend;assert(typeof p.types==='boolean');if(p.types)command('frontend-types',process.execPath,['node_modules/typescript/bin/tsc','-p','tsconfig.app.json','--noEmit'],cwd);
- for(const f of p.lintFiles)assert(/^src\/.+\.(tsx?|jsx?)$/.test(f)&&!f.split('/').includes('..'));
- if(p.lintFiles.length)command('frontend-lint',process.execPath,['node_modules/eslint/bin/eslint.js',...p.lintFiles],cwd);
- batches('frontend',p.batches);command('frontend-build','npm',['run','build'],cwd);command('frontend-manifest',process.execPath,['.github/scripts/ci-artifact.mjs','write','frontend']);receipt('frontend',{status:'PASSED',freshBuild:true,typesExecuted:p.types});
+async function frontend(b){const cwd=resolve('server-version/frontend'),p=b.execution.frontend;await reuseOfficial('frontend',b);
+ batches('frontend',p.batches.slice(4),4);command('frontend-build','npm',['run','build'],cwd);command('frontend-manifest',process.execPath,['.github/scripts/ci-artifact.mjs','write','frontend']);receipt('frontend',{status:'PASSED',freshBuild:true,typesExecuted:false,typesAndLintOfficiallyReused:true,previousPassedCasesReused:10,currentCasesRequired:13});
 }
 function databaseGuard(){
  assert.equal(process.env.CI,'true');assert.equal(process.env.GITHUB_ACTIONS,'true');assert.equal(process.env.NODE_ENV,'test');
@@ -150,14 +203,15 @@ async function restore(b){databaseGuard();const {Client}=createRequire(resolve('
 function cleanup(){const root=realpathSync(process.env.RUNNER_TEMP);for(const name of ['school-teacher-private','school-teacher-checks-private','school-teacher-seed.log']){const p=join(root,name);if(existsSync(p)){assert.equal(realpathSync(p),p);rmSync(p,{recursive:true})}}receipt('cleanup',{privateMaterialRemoved:true})}
 async function main(){const phase=process.argv[2];if(phase==='cleanup'){cleanup();return}assert.equal(process.version,'v24.21.0');const b=binding(),plan=actualPlan();assert.deepEqual(plan,JSON.parse(process.env.PLAN));
  if(phase==='admission')admission(b,plan);
- else if(phase==='frontend')frontend(b);
+ else if(phase==='frontend')await frontend(b);
  else if(phase==='backend'){assert.equal(b.backendBuildDecision,'fresh-once');command('backend-compile',process.execPath,['node_modules/typescript/bin/tsc','-p','tsconfig.json'],resolve('server-version/backend'));command('backend-manifest',process.execPath,['.github/scripts/ci-artifact.mjs','write','backend']);}
  else if(phase==='migrate')await migrate(b);
  else if(phase==='postgres'){databaseGuard();assert(b.execution.backend.batches.length>0);batches('backend',b.execution.backend.batches)}
  else if(phase==='seed'){databaseGuard();command('browser-fixture',process.execPath,['server-version/e2e/school-teacher-fixture.cjs','seed']);}
  else if(phase==='restore')await restore(b);
  else if(phase==='browser-report'){const module=await import(pathToFileURL(resolve(b.execution.browserHelper))),helper=module.default||module;assert.equal(typeof helper.verifyReport,'function');const report=JSON.parse(readFileSync(join(out,'browser.json'))),frontend=JSON.parse(readFileSync('server-version/frontend/dist/ci-build-manifest.json')),backend=JSON.parse(readFileSync('server-version/backend/dist/ci-build-manifest.json'));const result=helper.verifyReport(report,{head:plan.head,tree:plan.sourceTree,runId:process.env.GITHUB_RUN_ID,frontend,backend},file=>{assert(/^screenshots\/[a-z0-9-]+\.png$/.test(file));return readFileSync(join(out,file))});receipt('browser-acceptance',result);}
- else if(phase==='audit')auditComponents(b.execution.auditComponents,auditComponent,result=>receipt('audit',result));
+ else if(phase==='audit')await reuseOfficial('audit',b);
+ else if(phase==='sast-reuse')await reuseOfficial('sast',b);
  else if(phase==='aggregate')requireSuccess(plan,JSON.parse(process.env.NEEDS_JSON));
  else throw Error('Unknown phase');
 }

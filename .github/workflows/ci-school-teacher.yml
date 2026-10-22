@@ -7,6 +7,7 @@ on:
         required: true
 permissions:
   contents: read
+  actions: read
 env:
   CI: 'true'
   PLAN: ${{ inputs.plan }}
@@ -57,13 +58,17 @@ jobs:
             server-version/backend/package-lock.json
       - working-directory: server-version/frontend
         run: npm ci --ignore-scripts
-      - name: prepare exact backend contracts for frontend types without native lifecycle builds
+      - name: retain exact dependency environment without native lifecycle builds
         working-directory: server-version/backend
         run: |
           npm ci --ignore-scripts
           npm run db:generate
-      - name: run only frozen affected checks then compile once and bind dist
-        run: node .github/scripts/school-teacher-checks.mjs frontend
+      - name: verify completed official frontend subchecks then run missing cases and compile once
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --no-tags --depth=1 origin dcbc58483c6b6ce8a81526ddbc124a8b1c1c993c 81ee1f6d6a097e0c9e0aca3da05582f614325878
+          node .github/scripts/school-teacher-checks.mjs frontend
       - uses: actions/upload-artifact@v4
         with:
           name: school-teacher-frontend-${{ github.sha }}
@@ -193,8 +198,12 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - name: retain HIGH CRITICAL production dependency threshold without rebuilding
-        run: node .github/scripts/school-teacher-checks.mjs audit
+      - name: verify original successful two-component audit and unchanged dependency inputs
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --no-tags --depth=1 origin dcbc58483c6b6ce8a81526ddbc124a8b1c1c993c 81ee1f6d6a097e0c9e0aca3da05582f614325878
+          node .github/scripts/school-teacher-checks.mjs audit
       - uses: actions/upload-artifact@v4
         if: always()
         with:
