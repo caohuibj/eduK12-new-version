@@ -1,0 +1,108 @@
+import {useState} from 'react'
+import {cleanup,fireEvent,render,screen,waitFor,within} from '@testing-library/react'
+import {afterEach,describe,expect,it,vi} from 'vitest'
+import HuiteacherApp from './HuiteacherApp'
+
+vi.mock('./HuiteacherPersonalSelf',()=>({HuiteacherPersonalSelf:()=> <p>本人个人测评</p>}))
+vi.mock('./HuiteacherMyFormTasks',()=>({HuiteacherMyFormTasks:function FormTask(){
+ const [answer,setAnswer]=useState('')
+ return <label>未提交答案<input value={answer} onChange={event=>setAnswer(event.target.value)}/></label>
+}}))
+vi.mock('./HuiteacherMyPrivateFormTasks',()=>({HuiteacherMyPrivateFormTasks:()=> <p>本人私有表单</p>}))
+vi.mock('./HuiteacherMyScaleTasks',()=>({HuiteacherMyScaleTasks:()=> <p>本人量表</p>}))
+vi.mock('./HuiteacherMyStudentFeedback',()=>({HuiteacherMyStudentFeedback:()=> <p>本人学生反馈</p>}))
+vi.mock('./HuiteacherMyGrowth',()=>({HuiteacherMyGrowth:()=> <p>本人成长记录</p>}))
+vi.mock('./HuiteacherClassRelationships',()=>({HuiteacherClassRelationships:()=> <p>学校班级关系内容</p>}))
+vi.mock('./HuiteacherEvaluationStudio',()=>({HuiteacherEvaluationStudio:()=> <p>学校评价内容</p>}))
+vi.mock('./HuiteacherFormStudio',()=>({HuiteacherFormStudio:()=> <p>学校表单内容</p>}))
+const reply=(data:unknown)=>({ok:true,json:async()=>({code:0,message:'成功',data})})
+const organization=(id:string,productAdmin=false)=>({organizationId:id,organizationName:'学校 '+id,productAdmin})
+function session(organizations:ReturnType<typeof organization>[],role='TEACHER'){
+ const fetch=vi.fn(async(url:string,_options?:RequestInit)=>{
+  if(url.endsWith('/auth/me'))return reply({id:'actor',username:'Teacher',role,mustChangePassword:false,organizations})
+  if(url.endsWith('/tool-authoring-capabilities'))return reply({canAuthor:false,authorableToolKinds:[]})
+  return reply({list:[]})
+ })
+ vi.stubGlobal('fetch',fetch)
+ return fetch
+}
+afterEach(()=>{cleanup();vi.restoreAllMocks();vi.unstubAllGlobals();vi.unstubAllEnvs()})
+
+describe('Teacher compact workspace',()=>{
+ it('starts account details closed for members and keeps edited password and invitation inputs mounted across school changes',async()=>{
+  session([organization('a'),organization('b')])
+  render(<HuiteacherApp/>)
+  const summary=await screen.findByText('账号与学校邀请')
+  const details=summary.closest('details')!
+  expect(details).not.toHaveAttribute('open')
+  expect(screen.getByLabelText('当前学校管理范围')).toHaveValue('a')
+  fireEvent.click(summary)
+  await waitFor(()=>expect(details).toHaveAttribute('open'))
+  fireEvent.click(screen.getByText('账号安全 · 修改密码'))
+  fireEvent.change(screen.getByLabelText('新密码'),{target:{value:'draft-pass-123'}})
+  fireEvent.change(screen.getByLabelText('已收到的学校邀请代码'),{target:{value:'draft-invite'}})
+  fireEvent.change(screen.getByLabelText('当前学校管理范围'),{target:{value:'b'}})
+  expect(details).toHaveAttribute('open')
+  expect(screen.getByLabelText('新密码')).toHaveValue('draft-pass-123')
+  expect(screen.getByLabelText('已收到的学校邀请代码')).toHaveValue('draft-invite')
+ })
+ it('starts joining expanded for a user without school membership',async()=>{
+  session([])
+  render(<HuiteacherApp/>)
+  expect((await screen.findByText('账号与学校邀请')).closest('details')).toHaveAttribute('open')
+  expect(screen.getByLabelText('已收到的学校邀请代码')).toBeVisible()
+  expect(screen.queryByLabelText('当前学校管理范围')).not.toBeInTheDocument()
+ })
+ it('jumps between mounted personal sections without losing an answer or filtering by school',async()=>{
+  const fetch=session([organization('a'),organization('b')])
+  vi.stubEnv('VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED','false')
+  vi.stubEnv('VITE_HUITEACHER_IMPROVEMENT_ENABLED','false')
+  render(<HuiteacherApp/>)
+  const nav=await screen.findByRole('navigation',{name:'个人任务分区'})
+  expect(screen.getByText(/显示本人各学校的任务与个人测评，不按上方学校筛选/)).toBeInTheDocument()
+  fireEvent.change(screen.getByLabelText('未提交答案'),{target:{value:'尚未提交的回答'}})
+  fireEvent.click(within(nav).getByRole('link',{name:'量表任务'}))
+  expect(screen.getByRole('region',{name:'量表任务'})).toHaveFocus()
+  fireEvent.click(within(nav).getByRole('link',{name:'表单任务'}))
+  expect(screen.getByRole('region',{name:'表单任务'})).toHaveFocus()
+  fireEvent.change(screen.getByLabelText('当前学校管理范围'),{target:{value:'b'}})
+  expect(screen.getByLabelText('未提交答案')).toHaveValue('尚未提交的回答')
+  expect(within(nav).queryByRole('link',{name:'学生反馈'})).not.toBeInTheDocument()
+  expect(within(nav).queryByRole('link',{name:'我的成长'})).not.toBeInTheDocument()
+  expect(fetch.mock.calls.some(([,options])=>options?.method&&options.method!=='GET')).toBe(false)
+ })
+ it('exposes feedback and growth anchors only alongside their enabled sections',async()=>{
+  session([organization('a')])
+  vi.stubEnv('VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED','true')
+  vi.stubEnv('VITE_HUITEACHER_IMPROVEMENT_ENABLED','true')
+  render(<HuiteacherApp/>)
+  const nav=await screen.findByRole('navigation',{name:'个人任务分区'})
+  for(const name of ['学生反馈','我的成长']){
+   const link=within(nav).getByRole('link',{name})
+   expect(link).toHaveAttribute('href',`#${screen.getByRole('region',{name}).id}`)
+  }
+ })
+ it('keeps school management jumps inside the existing administrator boundary',async()=>{
+  session([organization('a',true),organization('b')])
+  render(<HuiteacherApp/>)
+  fireEvent.click(await screen.findByRole('button',{name:'学校改进'}))
+  const nav=screen.getByRole('navigation',{name:'学校管理分区'})
+  for(const link of within(nav).getAllByRole('link')){
+   const target=screen.getByRole('region',{name:link.textContent!})
+   expect(link).toHaveAttribute('href',`#${target.id}`)
+   fireEvent.click(link)
+   expect(target).toHaveFocus()
+  }
+  fireEvent.change(screen.getByLabelText('当前学校管理范围'),{target:{value:'b'}})
+  expect(screen.queryByRole('navigation',{name:'学校管理分区'})).not.toBeInTheDocument()
+  expect(screen.queryByText('学校表单内容')).not.toBeInTheDocument()
+ })
+ it('does not expose teacher or management anchors to a student',async()=>{
+  session([organization('a')],'STUDENT')
+  render(<HuiteacherApp/>)
+  await screen.findByRole('heading',{name:'我的教育发展空间'})
+  expect(screen.queryByRole('navigation',{name:'个人任务分区'})).not.toBeInTheDocument()
+  expect(screen.queryByRole('navigation',{name:'学校管理分区'})).not.toBeInTheDocument()
+  expect(screen.getByLabelText('未提交答案')).toBeInTheDocument()
+ })
+})

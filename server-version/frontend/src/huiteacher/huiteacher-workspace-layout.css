@@ -1,0 +1,21 @@
+/* Workspace structure only. Product appearance remains owned by the theme. */
+.ht-app .ht-workspace-header{padding:16px 20px}
+.ht-workspace-heading{display:flex;align-items:center;justify-content:space-between;gap:12px 24px;flex-wrap:wrap}
+.ht-workspace-heading h1{font-size:clamp(1.35rem,3vw,1.7rem);margin:0 0 4px}
+.ht-workspace-heading p{margin:0;color:var(--ht-quiet);font-size:.9rem}
+.ht-workspace-heading>.ht-field{margin:0;flex:0 1 320px;max-width:100%}
+.ht-workspace-account{margin-top:12px;border-top:1px solid var(--ht-line)}
+.ht-workspace-account>summary{min-height:44px;padding:12px 0;cursor:pointer;color:var(--ht-quiet);font-size:.9rem}
+.ht-workspace-account>.ht-panel{padding:12px 16px;box-shadow:none}
+.ht-workspace-jumps{display:flex;gap:6px;flex-wrap:wrap;padding:8px;border:1px solid var(--ht-line);border-radius:12px;background:var(--ht-paper)}
+.ht-workspace-jumps a{display:inline-flex;align-items:center;min-height:44px;padding:8px 14px;border-radius:8px;color:var(--ht-ink);text-decoration:none;font-size:.9rem;font-weight:600}
+.ht-workspace-jumps a:hover{background:var(--ht-bg);color:var(--ht-copper)}
+.ht-workspace-jumps a:focus-visible,.ht-workspace-account summary:focus-visible,.ht-workspace-section:focus-visible{outline:2px solid var(--ht-copper);outline-offset:3px}
+.ht-workspace-section{min-width:0;scroll-margin-top:24px}
+.ht-workspace>.ht-notice{margin:0;max-width:none;font-size:.9rem;padding:10px 14px}
+@media(max-width:640px){
+ .ht-app .ht-workspace-header{padding:14px}
+ .ht-workspace-heading>.ht-field{flex-basis:100%}
+ .ht-workspace-jumps{gap:4px}
+ .ht-workspace-jumps a{padding:8px 10px}
+}

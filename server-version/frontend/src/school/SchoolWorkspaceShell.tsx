@@ -27,7 +27,7 @@ export function SchoolWorkspaceShell({items,page,onNavigate,context,children}:{i
    {groups.map(group=><div className="hs-nav-group" key={group}><p>{group}</p>{items.filter(i=>i.group===group).map(item=><a key={item.id} href={workspaceHref(item.id)} aria-current={page===item.id?'page':undefined} onClick={e=>navigate(e,item.id)}><item.icon size={18} aria-hidden="true"/><span>{item.label}</span></a>)}</div>)}
   </nav>
   <div ref={content} tabIndex={-1} className="hs-workspace-content">
-   {page!=='overview'&&<div className="hs-workspace-page-heading"><a href={workspaceHref('overview')} onClick={e=>navigate(e,'overview')}><ArrowLeft size={16} aria-hidden="true"/>返回概览</a><p className="hs-section-kicker">{active?.group??'校园空间'}</p><h1>{active?.label??'暂不可用的校园功能'}</h1><p>{active?.description??'该入口当前不在你的授权范围内，请返回概览选择可用功能。'}</p></div>}
+   {page!=='overview'&&<div className="hs-workspace-page-heading"><div className="hs-workspace-trail"><a href={workspaceHref('overview')} onClick={e=>navigate(e,'overview')}><ArrowLeft size={16} aria-hidden="true"/>返回概览</a><p className="hs-section-kicker">{active?.group??'校园空间'}</p></div><h1>{active?.label??'暂不可用的校园功能'}</h1><p>{active?.description??'该入口当前不在你的授权范围内，请返回概览选择可用功能。'}</p></div>}
    {context}
    {active?children:<section className="hs-panel"><h2>当前无法进入此功能</h2><p>学校授权或账号状态变化后，可用功能也会相应更新。</p><a className="hs-workspace-inline-link" href={workspaceHref('overview')} onClick={e=>navigate(e,'overview')}>查看可用功能 <ArrowRight size={16}/></a></section>}
   </div>
@@ -35,13 +35,15 @@ export function SchoolWorkspaceShell({items,page,onNavigate,context,children}:{i
 }
 
 export function SchoolWorkspaceOverview({username,items,onNavigate,pending}:{username:string;items:SchoolNavigationItem[];onNavigate:(id:string)=>void;pending?:ReactNode}){
- const groups=[...new Set(items.filter(i=>!['overview','account'].includes(i.id)).map(i=>i.group))]
+ // Use actual authorized entries; a group label must never disguise a different destination.
+ const priority=['tasks','activities','feedback','family','classes','group-reports','private-tools']
+ const primary=priority.flatMap(id=>items.filter(item=>item.id===id)).slice(0,4)
+ const shortcuts=[...primary,...items.filter(item=>item.id==='account')]
  return <>
   <div className="hs-workspace-welcome"><div><p className="hs-eyebrow">HUISCHOOL · 校园工作台</p><h1>欢迎，{username}</h1><p>从今天的校园活动开始，让每一次参与与陪伴都有温度。</p></div></div>
   {pending}
-  <section className="hs-overview-section" aria-label="可用功能"><h2>从这里开始</h2><div className="hs-workspace-shortcuts">{[...groups,'账号'].map(group=>{
-   const item=items.find(i=>i.group===group)!
-   return <a href={workspaceHref(item.id)} key={group} onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();onNavigate(item.id)}}><item.icon size={24} aria-hidden="true"/><h3>{group==='账号'?'我的账号':group}</h3><p>{item.description}</p><span>{group==='账号'?'查看账号':`进入${item.label}`} <ArrowRight size={16}/></span></a>
+  <section className="hs-overview-section" aria-label="可用功能"><h2>从这里开始</h2><div className="hs-workspace-shortcuts">{shortcuts.map(item=>{
+   return <a href={workspaceHref(item.id)} key={item.id} onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();onNavigate(item.id)}}><item.icon size={24} aria-hidden="true"/><h3>{item.label}</h3><p>{item.description}</p><span>{`进入${item.label}`} <ArrowRight size={16}/></span></a>
   })}</div></section>
  </>
 }
