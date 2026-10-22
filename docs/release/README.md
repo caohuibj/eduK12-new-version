@@ -842,3 +842,36 @@ CLI 用例继承真实 PR 环境而失败；仅隔离测试子进程的分支变
 Actions 重新核官方 run/job/source/branch/步骤、24 小时有效期及两个完整 Git tree，
 核原配置后接纳此成功扫描并保存 receipt，不重复扫描。元数据不可用、过期或
 输入不同直接失败，不回退重扫、不把原父 run 的失败改为成功。
+
+
+## Survey 独立工具与昼夜外观限定合并（2026-10-23）
+
+`work/survey-visual-20261022` 基于已合并 Training #337 的官方 main
+`468040dcfcab3a70a6030c177775fd4e04b05a83`，仅使用 `survey-workspace`
+精确候选路线。完整产品 blob、组件 tree、依赖/配置和逐项控制文件绑定；
+未知路径、模式、base、source tree 或证据漂移拒绝，不回退全平台。原有
+Training 和云端 School/Teacher 路线保持独立，不更改权限或分支保护。
+
+接纳当前对话逐批审查的 unsigned local 原报告，固定原始 gzip 字节和摘要，
+标记 reviewed-local-evidence / originalExecutionSigned=false / ciExecuted=false。
+按唯一 file/case 选择真实 passed 断言，保留原始失败与过滤，不相加历次总数。
+主题外壳改变影响的工作台消费者已补验；旧“研究数据”名称断言只修复后重验
+该失败项。编制页九个当前深色状态另有可见文字对比度、白底和溢出记录。
+这些不是本轮 Actions 执行，也不代表所有页面或真实用户人工验收。
+
+本机 73 项范围/拒绝/证据篡改/严格汇总合同已通过，原始记录接纳后不在 CI 重复。
+GitHub 为缺失资格的主要执行位置：实际 checkout 的完整范围与证据重算，
+集成 frontend app types，一次 frontend production build；浏览器独立消费
+同一 dist，检查入口、三个独立编制器、共用库申请及发布/报告/数据在
+390/1440 宽度的深色、溢出和 WCAG。请求严格使用合成 DTO，未知接口失败，
+不声称这些页面桩证明后端授权。后端仅生成/校验修正后的 Prisma 模型与类型，
+将官方 main 的干净隔离 schema 升级到本候选，并在同一临时 Postgres service
+用无登录合成行校验完成状态约束、默认未完成、基线保留及原生 dump/restore。
+已有真实本地 PG 权限、固定修订、撤权/附件同意和原子回滚报告不重复执行。
+变化应用与 CI 控制仍执行 JS/TS CodeQL。依赖锁、科学计分与生产配置未变，
+不运行平台全套、媒体/压力检查或重型镜像构建；本路线不授予生产部署资格。
+
+范围/接纳五分钟，编译/页面/迁移分别设置有限时限。稳定 ready gate 必须
+scope、完整 survey-workspace 嵌套工作流和 CodeQL 实际 success；草稿、缺失、
+跳过、取消和失败均拒绝，实际 checkout 重算计划。main 合并仅分类，不能
+把原始失败改写为成功，也不自动部署或合并其他产品。
