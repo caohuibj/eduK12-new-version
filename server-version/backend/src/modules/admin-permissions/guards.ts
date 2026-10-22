@@ -16,6 +16,6 @@ export const requireSystemAdmin: RequestHandler = (req, res, next) => {
 export const requireRecentAdminKey: RequestHandler = (req, res, next) => {
   const age = Date.now() / 1000 - (req.user?.adminVerifiedAt ?? 0)
   if (!Number.isFinite(age) || age < 0 || age > ADMIN_STEP_UP_SECONDS)
-    return res.status(403).json({ code: 'ADMIN_KEY_STEP_UP_REQUIRED', message: '敏感操作需要重新验证安全密钥' })
+    return res.status(403).json({ code: 'ADMIN_KEY_STEP_UP_REQUIRED', message: '敏感操作需要重新完成管理员双因素验证' })
   next()
 }

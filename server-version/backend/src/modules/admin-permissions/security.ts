@@ -13,8 +13,20 @@ export { ADMIN_SESSION_SECONDS, ADMIN_STEP_UP_SECONDS, needsAdminKey, validAdmin
 
 const challengeCookie = 'eduk12_admin_challenge'
 export const adminSecretHash = (value: string) => createHash('sha256').update(value).digest('hex')
+export type AdminAuthenticationMethod = 'TOTP' | 'SECURITY_KEY'
+export function adminAuthOrigin() {
+  const origin = process.env.ADMIN_AUTH_ORIGIN || process.env.ADMIN_WEBAUTHN_ORIGIN
+  if (!origin) throw new AdminPermissionError(503, '管理员认证来源尚未配置')
+  let url: URL
+  try { url = new URL(origin) } catch { throw new AdminPermissionError(503, '管理员认证来源配置无效') }
+  const local = process.env.NODE_ENV !== 'production' && url.hostname === 'localhost'
+  if (url.origin !== origin || (!local && origin !== 'https://training.eduk12.top')
+    || (local && !['http:', 'https:'].includes(url.protocol)))
+    throw new AdminPermissionError(503, '管理员认证来源配置无效')
+  return origin
+}
 export function adminWebAuthnConfig() {
-  const origin = process.env.ADMIN_WEBAUTHN_ORIGIN
+  const origin = adminAuthOrigin()
   const rpID = process.env.ADMIN_WEBAUTHN_RP_ID
   if (!origin || !rpID) throw new AdminPermissionError(503, '管理安全密钥尚未配置')
   const url = new URL(origin)
@@ -30,8 +42,8 @@ function setChallengeCookie(req: Request, res: Response, secret: string) {
   const secure = req.secure || process.env.NODE_ENV === 'production'
   res.append('Set-Cookie', `${challengeCookie}=${secret}; Path=/api; HttpOnly; SameSite=Strict; Max-Age=300${secure ? '; Secure' : ''}`)
 }
-async function rememberChallenge(req: Request, res: Response, input: {
-  userId: string; tokenVersion: number; challenge: string; purpose: 'LOGIN' | 'STEP_UP' | 'REGISTER'
+export async function rememberChallenge(req: Request, res: Response, input: {
+  userId: string; tokenVersion: number; challenge: string; purpose: 'LOGIN' | 'STEP_UP' | 'REGISTER' | 'TOTP_LOGIN' | 'TOTP_STEP_UP' | 'TOTP_REGISTER'
   sessionId?: string; enrollmentHash?: string
 }) {
   const secret = randomBytes(32).toString('base64url')
@@ -45,11 +57,21 @@ async function rememberChallenge(req: Request, res: Response, input: {
   setChallengeCookie(req, res, secret)
 }
 
-export async function beginAdminLogin(req: Request, res: Response, userId: string, sessionId?: string, authenticatedPrincipal?: CurrentPrincipal) {
-  const { rpID } = adminWebAuthnConfig()
+export async function beginAdminLogin(req: Request, res: Response, userId: string, sessionId?: string, authenticatedPrincipal?: CurrentPrincipal, method?: AdminAuthenticationMethod) {
+  adminAuthOrigin()
   const principal = authenticatedPrincipal ?? await loadCurrentPrincipal(userId)
   if (!principal || principal.userId!==userId || inactiveAccountMessage(principal) || !['LEGACY', 'TRAINING'].includes(principal.accountDomain) || !needsAdminKey(principal))
     throw new AdminPermissionError(403, '管理账号不可用')
+  if (method !== 'SECURITY_KEY') {
+    const enrolled = await prisma.adminTotpCredential.findUnique({ where: { userId }, select: { userId: true } })
+    if (enrolled) {
+      await rememberChallenge(req, res, { userId, tokenVersion: principal.tokenVersion, challenge: '',
+        purpose: sessionId ? 'TOTP_STEP_UP' : 'TOTP_LOGIN', sessionId })
+      return { adminTotpRequired: true as const }
+    }
+    if (method === 'TOTP') throw new AdminPermissionError(403, '请先使用受控登记票据绑定 Authenticator')
+  }
+  const { rpID } = adminWebAuthnConfig()
   const keys = await prisma.adminSecurityKey.findMany({ where: { userId } })
   if (!keys.length) throw new AdminPermissionError(403, '请先通过受控后台登记安全密钥')
   const options = await generateAuthenticationOptions({ rpID, userVerification: 'required',
@@ -76,7 +98,7 @@ async function consumeChallenge(req: Request, purposes: string[]) {
   return challenge
 }
 
-async function issueAdminSession(req: Request, res: Response, userId: string, expectedVersion: number, sessionId: string = randomUUID()) {
+export async function issueAdminSession(req: Request, res: Response, userId: string, expectedVersion: number, sessionId: string = randomUUID()) {
   const principal = await loadCurrentPrincipal(userId)
   if (!principal || inactiveAccountMessage(principal) || principal.tokenVersion !== expectedVersion || !needsAdminKey(principal))
     throw new AdminPermissionError(403, '管理权限已变化，请重新登录')

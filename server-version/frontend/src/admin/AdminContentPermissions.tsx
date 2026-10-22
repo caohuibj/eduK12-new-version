@@ -95,7 +95,7 @@ function ContentPermissions({actorId}:{actorId:string}){
       }else {
         const unknown=hadUnknown||failure.unknown
         setHadUnknown(unknown);retain(request!,unknown)
-        setError(message+'；请求编号及内容已保留，可重新验证安全密钥后重试，或读取同编号元数据核对并结束请求。')
+        setError(message+'；请求编号及内容已保留，可重新完成管理员双因素验证后重试，或读取同编号元数据核对并结束请求。')
       }
     }finally{inFlight.current=false;setBusy(false)}
   }
@@ -136,7 +136,7 @@ function ContentPermissions({actorId}:{actorId:string}){
       if(!request.hadUnknown&&failure.definiteRejection){
         try{sessionStorage.removeItem('admin-content-revoke:'+actorId);setRevocation(null);setError(failure.message+'；本次撤销明确未执行，请重新读取当前授权。');setRow(null)}
         catch{retainRevocation(request);setError('无法清理撤销记录，请保留原请求核对。')}
-      }else{retainRevocation({...request,hadUnknown:request.hadUnknown||failure.unknown});setError(failure.message+'；撤销尚未确认，原授权 UUID、版本和原因已锁定。可重新验证安全密钥后重试同一撤销，或读取已撤销状态核对。')}
+      }else{retainRevocation({...request,hadUnknown:request.hadUnknown||failure.unknown});setError(failure.message+'；撤销尚未确认，原授权 UUID、版本和原因已锁定。可重新完成管理员双因素验证后重试同一撤销，或读取已撤销状态核对。')}
     }finally{inFlight.current=false;setBusy(false)}
   }
   function finishRevoked(){
@@ -147,7 +147,7 @@ function ContentPermissions({actorId}:{actorId:string}){
   }
   return <section aria-labelledby="content-permissions-title" style={{overflowWrap:'anywhere'}}><h2 id="content-permissions-title">精确内容授权</h2>
     <p>Survey 支持项目参考与指定 FINAL 重新解释；Training 支持课程报告、参考、指定已完成作答重新解释，以及独立平台参考治理与已安装 SJT 发布。后台复核当前身份、资格、真实所有权和资源归属；管理身份不自动授予科学能力或其他入口身份。</p>
-    <p>签发、读取和撤销前，请使用上方安全密钥重新验证。资源栏只接受实际 UUID，不提供样本或报告浏览。</p>
+    <p>签发、读取和撤销前，请在上方完成管理员双因素验证。资源栏只接受实际 UUID，不提供样本或报告浏览。</p>
     <AdminStaticSjtPublication actorId={actorId} onPrepareGrant={prepareSjtGrant} grantReceipt={sjtGrant} grantLocked={busy||Boolean(pending)||Boolean(revocation)||issued||recoveryBlocked}/>
     <fieldset disabled={busy||Boolean(pending)||Boolean(revocation)||issued||recoveryBlocked}><legend>新根授权</legend>
       <label>产品授权范围<select value={product} onChange={e=>{setProduct(e.target.value as 'SURVEY'|'TRAINING');setProject('');setResources('');setCaps([]);setDelegate(false);setPurpose('report')}}><option value="SURVEY">Survey 项目与共用库分发</option><option value="TRAINING">Training 课程与平台内容</option></select></label>

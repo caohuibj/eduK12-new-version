@@ -719,3 +719,35 @@ Survey PR continuation: run 39705178007 remains failed at the media-only text as
 The first integrated run `39714107823` passed frontend lint/types, all 118 selected assertions, one build, all seven form PostgreSQL cases and CodeQL. Its browser job failed at the independent-form entry because the fixture used an HTTP production hostname; the screenshot shows the page error boundary and no unexpected API requests. Use HTTPS for the same intercepted synthetic hostname, with no certificate or crypto bypass. Preserve the failed browser artifact `12398228523`; do not call the original overall run successful.
 
 Only official successful component jobs `119612363208` and `119612363279` are admitted by `training-followup-reuse.mjs`. It binds the source SHA/merge, complete component tree, unchanged check program, fixed Actions run/job identities, exact completed successful stages, a 24-hour lifetime, complete non-skipped assertion reports, original command receipts and artifact ZIP digests. The frontend consumer extracts the original compiled bytes; it does not rebuild. There is no fallback to re-executing application checks on missing or mismatched evidence. The new browser fixture and admission controls still require real current scope tests and CodeQL. No database service starts for evidence admission. The current exact Training merge gate uses only Node and skips the unrelated classification package install; gate assertions remain unchanged.
+
+## 管理员 Authenticator 的精确定向合并门禁（2026-10-22）
+
+用户批准 PR #333 仅为本次管理员手机 TOTP 修订补齐定向检查并合并。
+`work/admin-authenticator-main-20261022` 固定 main 基线
+`c77db302ae6ad60366618fb57bf845f17acaf24d`，产品提交
+`83234f5cfc914e8c4d70d60020a57cea286a9e20`。完整 raw diff、33 个产品 blob、
+前后端完整 tree、历史直接消费者及配置输入均精确绑定；仅允许绑定列出的 CI 控制和
+五份原始本地报告。未知路径、删除、模式变化、源码或 base 漂移均拒绝；此分支的
+manual/full/probe 入口明确拒绝，不回退平台全量。main push 只分类，不重复应用检查。
+
+原 40 后端、40 前端和 3 个追加边界断言按原报告摘要、唯一 case 和当前源码审阅接纳，
+追加报告中 12 个过滤项不计为新通过。报告明确为 reviewed-historical-local，未签署原执行、
+未在 CI 重跑；原生 Mac 使用 Node 24.21.0、PostgreSQL 16.15、Redis 8.4.0。
+保留原前端 lint 与 14 份合成 TOTP 密文/重放状态的定向恢复证据，不声称全平台恢复资格。
+不复用新 main 输入已变化的全组件类型结果：Actions 只执行集成后的 Prisma 生成/校验、
+干净隔离库迁移、后端编译一次、前端应用类型与编译一次、生产依赖 HIGH/CRITICAL 审计、
+同一前端编译的绑定/登录两页面在 390/1440 宽度的键盘/溢出/WCAG 检查，及受影响代码和
+控制工具的 CodeQL。UI 桩不冒充实际认证协议；协议证明来自已审阅的本地真实 API 测试及
+用户亲自完成的绑定、登录和授权流程。无生产访问或部署，无重复完整测试或重型镜像构建。
+此路线仅授予 PR 合并资格，不生成生产镜像，不授予生产 runtime/OS 镜像扫描或部署资格；
+部署仍须另行准备并扫描实际候选镜像。`merge gate / ready PR` 重新计算完整计划，要求
+scope、admin-authenticator（含全部内部作业）、codeql 实际成功；draft、缺失、跳过、失败
+或与实际 checkout 不符均不能合并。
+
+本路线继续保留 run `39718477428` 的原失败：前端首次审计为 npm 官方接口 503，
+仅重试该失败作业；之后前后端编译/类型/迁移/审计与应用 CodeQL 均实际成功。
+浏览器原失败为下拉框可访问名称的精确定位问题，未接纳为成功。后续只修改定位器，
+固定原 run/head/merge、成功 job 身份、24 小时有效期、两个 artifact ID/ZIP SHA256、
+完整组件 tree 以及解包后的实际编译文件摘要，复用原编译与审计，不重复运行。
+原应用 SAST 经官方元数据核验接纳；只对变化的 CI 控制脚本执行新的 JS/TS CodeQL。
+任何缺失/失效/漂移证据直接阻断，不回退重新构建或全平台检查。

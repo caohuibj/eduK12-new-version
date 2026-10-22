@@ -8,7 +8,7 @@ import React, {
   useMemo,
   type ReactNode,
 } from 'react'
-import { authApi, type LoginRequest } from '../api/auth'
+import { authApi, type LoginRequest, type AdminMfaInput } from '../api/auth'
 import {
   clearReauthReturn,
   isAuthPath,
@@ -26,7 +26,7 @@ interface AuthContextType {
   clearReauthentication: () => void
   isAuthenticated: boolean
   isLoading: boolean
-  login: (username: string, password: string, expectedRole?: LoginRequest['expectedRole'], entrance?: 'admin') => Promise<User | undefined>
+  login: (username: string, password: string, expectedRole?: LoginRequest['expectedRole'], entrance?: 'admin', mfa?: AdminMfaInput) => Promise<User | undefined>
   setAuthenticatedUser: (userData: User) => void
   logout: () => Promise<void>
   setUser: (user: User | null) => void
@@ -232,14 +232,14 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
     }
   }, [replaceIdentity])
 
-  const login = async (username: string, password: string, expectedRole?: LoginRequest['expectedRole'], entrance?: 'admin') => {
+  const login = async (username: string, password: string, expectedRole?: LoginRequest['expectedRole'], entrance?: 'admin', mfa?: AdminMfaInput) => {
     const requestEpoch = ++authEpochRef.current
     localLoginPending.current = requestEpoch
     try {
       await authApi.csrf()
       if (requestEpoch !== authEpochRef.current) return
       const data = { username, password, ...(expectedRole ? { expectedRole } : {}) }
-      const response = await (entrance ? authApi.login(data, entrance) : authApi.login(data))
+      const response = await (entrance ? mfa ? authApi.login(data, entrance, mfa) : authApi.login(data, entrance) : authApi.login(data))
       if (requestEpoch !== authEpochRef.current) return
       if (response.code === 0 && response.data) {
         lastAuthTransitionAtRef.current = Date.now()

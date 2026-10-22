@@ -1,0 +1,89 @@
+name: Authenticator bounded merge checks
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  CI_EVENT: pull_request
+  CI_HEAD_REF: work/admin-authenticator-main-20261022
+  CI_PR_REPOSITORY: caohuibj/eduK12-new-version
+  NODE_OPTIONS: --max-old-space-size=4096
+jobs:
+  admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      PLAN: ${{ inputs.plan }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify exact product and reviewed historical local assertions
+        run: node .github/scripts/admin-authenticator-checks.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: admin-authenticator-admission-${{ github.sha }}
+          path: admin-authenticator-evidence
+          if-no-files-found: error
+          retention-days: 3
+  integrated:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/${{ matrix.component }}/package-lock.json
+      - name: verify original successful official job and restore exact compiled bytes
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/admin-authenticator-reuse.mjs ${{ matrix.component }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: admin-authenticator-${{ matrix.component }}-${{ github.sha }}
+          path: |
+            admin-authenticator-evidence
+            server-version/${{ matrix.component }}/dist
+          if-no-files-found: error
+          retention-days: 3
+  browser:
+    needs: integrated
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: admin-authenticator-frontend-${{ github.sha }}
+      - name: install only pinned browser tools
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+      - name: exact compiled binding and login UI at desktop and mobile widths
+        run: node .github/scripts/admin-authenticator-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: success() || failure()
+        with:
+          name: admin-authenticator-browser-${{ github.sha }}
+          path: admin-authenticator-evidence
+          if-no-files-found: error
+          retention-days: 3

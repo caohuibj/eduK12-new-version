@@ -29,7 +29,7 @@ export async function changeEntryGrant(input: {
   actorUserId: string; targetUserId: string; entry: AdminEntry
   active: boolean; expectedVersion: number; reason: string; actorSession: AdminSessionProof
 }) {
-  if (!validAdminProof(input.actorSession, ADMIN_STEP_UP_SECONDS)) throw new AdminPermissionError(403, '授权变更需要最近的安全密钥验证')
+  if (!validAdminProof(input.actorSession, ADMIN_STEP_UP_SECONDS)) throw new AdminPermissionError(403, '授权变更需要最近的管理员双因素验证')
   return prisma.$transaction(async tx => {
     // Stable user lock order serializes grants and account deactivation without
     // a global lock. The actor is rechecked after locking, inside this mutation.

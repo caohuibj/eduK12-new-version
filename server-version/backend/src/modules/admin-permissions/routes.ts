@@ -13,7 +13,8 @@ import { getSessionToken } from '../../utils/authCookies'
 import { verifyToken } from '../../utils/jwt'
 import { success, error } from '../../utils/response'
 import { ADMIN_ENTRIES, AdminPermissionError, changeEntryGrant } from './service'
-import { beginAdminRegistration, finishAdminRegistration, beginAdminLogin, finishAdminAuthentication, adminWebAuthnConfig } from './security'
+import { beginAdminRegistration, finishAdminRegistration, beginAdminLogin, finishAdminAuthentication, adminAuthOrigin } from './security'
+import { beginAdminTotpRegistration, finishAdminTotp, adminTotpAttemptLimiter } from './totp'
 import { requireRecentAdminKey, requireSystemAdmin } from './guards'
 
 const handle = (work: (req: Request, res: Response) => Promise<unknown>) => async (req: Request, res: Response, next: NextFunction) => {
@@ -28,7 +29,7 @@ const handle = (work: (req: Request, res: Response) => Promise<unknown>) => asyn
 }
 const originGuard = (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { origin } = adminWebAuthnConfig()
+    const origin = adminAuthOrigin()
     if (req.get('Origin') !== origin && (req.get('Origin') || !['GET','HEAD','OPTIONS'].includes(req.method)))
       return error(res, '管理操作需要受信任的来源', -1, 403)
     if (req.get('Sec-Fetch-Site') === 'cross-site') return error(res, '管理操作不能跨站发起', -1, 403)
@@ -58,16 +59,33 @@ adminSecurityRouter.post('/registration/options', loginRateLimit, withLoginAccou
 })))
 adminSecurityRouter.post('/registration/verify', handle(req => finishAdminRegistration(req, registration.parse(req.body).response)))
 adminSecurityRouter.post('/authentication/verify', handle((req, res) => finishAdminAuthentication(req, res, assertion.parse(req.body).response)))
+adminSecurityRouter.post('/totp/registration/options', loginRateLimit, withLoginAccountFailureThrottle(handle(async (req, res) => {
+  const input = z.object({ username: z.string().min(1).max(320), password: z.string().min(1).max(128), enrollmentToken: z.string().length(43) }).strict().parse(req.body)
+  const user = await prisma.user.findUnique({ where: { username: input.username } })
+  const ok = await withLoginPasswordVerification(() => comparePassword(input.password, user?.passwordHash ?? '$2a$10$fuhNGsB2Z5/iwZtxlw1usOIb5sbX2OzkV/cccQJRbkSpHu2ZPql.a'))
+  if (!ok || !user) { await recordLoginFailure(req); throw new AdminPermissionError(403, '登记凭据无效') }
+  return beginAdminTotpRegistration(req, res, user.id, input.enrollmentToken)
+})))
+const totpCode = z.object({ code: z.string().regex(/^\d{6}$/) }).strict()
+// Even malformed OTPs reach the service and consume their one-use challenge.
+const readTotpCode = (req: Request) => totpCode.safeParse(req.body).success ? (req.body as { code: string }).code : ''
+adminSecurityRouter.post('/totp/registration/verify', adminTotpAttemptLimiter, handle((req, res) => finishAdminTotp(req, res, readTotpCode(req), 'REGISTER')))
+adminSecurityRouter.post('/totp/authentication/verify', adminTotpAttemptLimiter, handle((req, res) => finishAdminTotp(req, res, readTotpCode(req), 'LOGIN')))
 adminSecurityRouter.post('/step-up/options', authenticate, handle((req, res) => {
-  z.object({}).strict().parse(req.body)
+  const input = z.object({ method: z.enum(['TOTP', 'SECURITY_KEY']).optional() }).strict().parse(req.body)
   const claims = verifyToken(getSessionToken(req)!)!
   if (!claims.adminSessionId) throw new AdminPermissionError(403, '当前会话不可重新认证')
-  return beginAdminLogin(req, res, req.user!.userId, claims.adminSessionId)
+  return beginAdminLogin(req, res, req.user!.userId, claims.adminSessionId, undefined, input.method)
 }))
 adminSecurityRouter.post('/step-up/verify', authenticate, handle((req, res) => {
   const claims = verifyToken(getSessionToken(req)!)!
   if (!claims.adminSessionId) throw new AdminPermissionError(403, '当前会话不可重新认证')
   return finishAdminAuthentication(req, res, assertion.parse(req.body).response, claims.adminSessionId)
+}))
+adminSecurityRouter.post('/totp/step-up/verify', authenticate, adminTotpAttemptLimiter, handle((req, res) => {
+  const claims = verifyToken(getSessionToken(req)!)!
+  if (!claims.adminSessionId) throw new AdminPermissionError(403, '当前会话不可重新认证')
+  return finishAdminTotp(req, res, readTotpCode(req), 'STEP_UP', claims.adminSessionId)
 }))
 
 export const adminPermissionsRouter = Router()

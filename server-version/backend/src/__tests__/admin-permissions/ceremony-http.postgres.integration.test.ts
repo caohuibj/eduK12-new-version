@@ -6,7 +6,7 @@ import {spawnSync} from 'node:child_process'
 import {afterAll,beforeAll,describe,expect,it} from 'vitest'
 import {isoCBOR} from '@simplewebauthn/server/helpers'
 const suite=process.env.ADMIN_PERMISSIONS_ISOLATED_TEST==='1'?describe:describe.skip
-const origin='http://localhost:5174',base='http://127.0.0.1:3100'
+const origin=process.env.ADMIN_AUTH_ORIGIN||'http://localhost:5174',base=process.env.ADMIN_SECURITY_TEST_BASE_URL||'http://127.0.0.1:3100'
 const b64=(value:Buffer|Uint8Array)=>Buffer.from(value).toString('base64url')
 const hash=(value:string|Buffer)=>createHash('sha256').update(value).digest()
 function key(){const pair=generateKeyPairSync('ec',{namedCurve:'prime256v1'}),jwk=pair.publicKey.export({format:'jwk'})
@@ -79,7 +79,7 @@ suite('actual API password/key/step-up/recovery ceremonies (synthetic crypto)',(
       input:JSON.stringify({action:'RECOVER',username:f.user.username,reason:'synthetic controlled recovery validation'})})
     expect(result.status).toBe(0)
     const report=JSON.parse(result.stdout.trim().split('\n').at(-1)!)
-    expect(report).toMatchObject({action:'RECOVER',loginRequiresSecurityKey:true,privateHandoffCreated:true})
+    expect(report).toMatchObject({action:'RECOVER',loginRequiresMfa:true,privateHandoffCreated:true})
     expect(report).not.toHaveProperty('enrollmentToken');expect(report).not.toHaveProperty('session')
     expect(await db.adminSecurityKey.count({where:{userId:f.user.id}})).toBe(0)
     expect((await f.client.call('/api/admin/permissions/accounts')).status).toBe(401)

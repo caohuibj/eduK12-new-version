@@ -38,7 +38,10 @@ async function main() {
           throw new Error('Active management authority required; recovery never grants authority')
         user = await tx.user.update({ where: { id: user.id }, data: { tokenVersion: { increment: 1 }, ...(passwordHash ? { passwordHash } : {}) } })
         await tx.adminSecurityChallenge.deleteMany({ where: { userId: user.id } })
-        if (input.action === 'RECOVER') await tx.adminSecurityKey.deleteMany({ where: { userId: user.id } })
+        if (input.action === 'RECOVER') {
+          await tx.adminSecurityKey.deleteMany({ where: { userId: user.id } })
+          await tx.adminTotpCredential.deleteMany({ where: { userId: user.id } })
+        }
       }
       await tx.adminSecurityChallenge.create({ data: { idHash: adminSecretHash(token), userId: user.id, purpose: 'ENROLLMENT',
         challenge: '', tokenVersion: user.tokenVersion, expiresAt: new Date(Date.now() + 900_000) } })
@@ -46,7 +49,7 @@ async function main() {
         action: input.action, reason: input.reason } })
       return user.id
     })
-    console.log(JSON.stringify({ userId, action: input.action, privateHandoffCreated: true, loginRequiresSecurityKey: true }))
+    console.log(JSON.stringify({ userId, action: input.action, privateHandoffCreated: true, loginRequiresMfa: true, loginRequiresSecurityKey: false }))
   } catch (e) { unlinkSync(handoff); throw e }
 }
 void main().catch(() => { console.error('受控后台操作失败；请检查输入与私有配置，未输出秘密'); process.exitCode = 1 }).finally(() => prisma.$disconnect())
