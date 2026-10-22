@@ -9,8 +9,34 @@ env:
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
 jobs:
-  browser:
+  # This candidate diagnoses launch only. It does not execute or qualify journeys.
+  launch-diagnostic:
+    permissions:
+      contents: read
     if: ${{ github.event_name == 'push' && github.repository == 'caohuibj/eduK12-new-version' && github.ref == 'refs/heads/ci/school-teacher-browser-20261022' && !github.event.deleted }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - run: node .github/scripts/school-teacher-browser-control.mjs preflight
+      - run: npm ci --ignore-scripts --prefix .github/release-tools
+      - run: node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
+      - name: diagnose unchanged Chromium launch only (not browser acceptance)
+        run: node server-version/e2e/school-teacher-browser.cjs --launch-diagnostic
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: school-teacher-launch-diagnostic-${{ github.sha }}
+          path: school-teacher-evidence/browser-launch.json
+          retention-days: 7
+          if-no-files-found: error
+  # Retained unchanged for a separately authorized full consumer continuation.
+  # A skipped job creates no PostgreSQL/Redis services and executes no preparation.
+  browser:
+    if: ${{ false }}
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     services:
