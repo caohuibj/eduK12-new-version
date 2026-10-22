@@ -19,6 +19,48 @@ function command(stage,exe,args,cwd=process.cwd(),env=process.env){
 export function inspectHistoricalCase(group,report,index,bytes){assert.equal(group.originalExecutionSigned,false);assert.equal(group.ciExecuted,false);assert.equal(sha256(bytes),report.sha256);
  const parsed=JSON.parse(bytes),actual=parsed.testResults.flatMap(s=>s.assertionResults||[])[index],saved=report.cases[index];assert(actual&&saved);
  assert.deepEqual({name:actual.fullName,status:actual.status},saved);return {caseName:saved.name,status:saved.status,invocationSuccess:parsed.success===true,originalExecutionSigned:false,ciExecuted:false,admitted:false};}
+const auditSeverities=['info','low','moderate','high','critical'];
+const npmErrorCodes=new Set(['ENOLOCK','EAUDITNOLOCK','ENOAUDIT','EUSAGE','EJSONPARSE','ENOTFOUND','ECONNRESET','ECONNREFUSED','ETIMEDOUT','EAI_AGAIN','EINTEGRITY','E400','E401','E402','E403','E404','E405','E408','E409','E413','E429','E500','E502','E503','E504']);
+function safeAuditRange(value){
+ if(typeof value!=='string'||value.length>200)return null;
+ const token=/^(?:[<>=~^]{1,2})?(?:v?\d+|[xX*])(?:\.(?:\d+|[xX*])){0,2}(?:-[0-9A-Za-z.-]{1,40})?(?:\+[0-9A-Za-z.-]{1,40})?$/;
+ return value.replace(/([<>=~^]+)\s+/g,'$1').trim().split(/\s+/).every(s=>s==='||'||s==='-'||token.test(s))?value:null;
+}
+export function safeNpmAudit(raw,allowedPackages){
+ let parsed;try{parsed=JSON.parse(raw)}catch{return {format:'OUTPUT_UNPARSEABLE',errorCode:'OUTPUT_UNPARSEABLE',counts:null,vulnerabilities:[]}};
+ if(!parsed||typeof parsed!=='object')return {format:'OUTPUT_UNPARSEABLE',errorCode:'OUTPUT_UNPARSEABLE',counts:null,vulnerabilities:[]};
+ const c=parsed.metadata?.vulnerabilities,counts=c&&[...auditSeverities,'total'].every(k=>Number.isSafeInteger(c[k])&&c[k]>=0)?Object.fromEntries([...auditSeverities,'total'].map(k=>[k,c[k]])):null;
+ const errorCode=parsed.error?(npmErrorCodes.has(parsed.error.code)?parsed.error.code:'UNRECOGNIZED_ERROR'):null;
+ const vulnerabilities=[];
+ for(const [name,v] of Object.entries(parsed.vulnerabilities||{})){
+  if(!/^(?:@[a-z0-9][a-z0-9._-]*\/)?[a-z0-9][a-z0-9._-]*$/i.test(name)||!allowedPackages.has(name)||!v||typeof v!=='object'||!auditSeverities.includes(v.severity))continue;
+  const advisories=[];
+  for(const a of Array.isArray(v.via)?v.via:[]){
+   if(!a||typeof a!=='object')continue;
+   const entry={};if(Number.isSafeInteger(a.source)&&a.source>0)entry.source=a.source;
+   const ghsa=typeof a.url==='string'&&a.url.match(/^https:\/\/github\.com\/advisories\/(GHSA-[a-z0-9]{4}-[a-z0-9]{4}-[a-z0-9]{4})$/i);if(ghsa)entry.advisoryId=ghsa[1];
+   if(auditSeverities.includes(a.severity))entry.severity=a.severity;
+   const range=safeAuditRange(a.range);if(range!==null)entry.range=range;
+   if(entry.source||entry.advisoryId)advisories.push(entry);
+  }
+  vulnerabilities.push({name,severity:v.severity,range:safeAuditRange(v.range),advisories});
+ }
+ return {format:parsed.auditReportVersion===2?'NPM_AUDIT_V2':'UNRECOGNIZED_FORMAT',errorCode,counts,vulnerabilities};
+}
+export function requireNpmAuditSuccess(exitCode,report){
+ assert.equal(exitCode,0,'npm audit returned a nonzero result');assert.equal(report.format,'NPM_AUDIT_V2');assert.equal(report.errorCode,null);assert(report.counts);
+ assert.equal(report.counts.total,auditSeverities.reduce((sum,k)=>sum+report.counts[k],0));assert.equal(report.counts.high,0);assert.equal(report.counts.critical,0);
+}
+function auditComponent(component){
+ const cwd=resolve('server-version',component),stage=component+'-audit';
+ const result=spawnSync('npm',['audit','--package-lock-only','--omit=dev','--audit-level=high','--json'],{cwd,env:process.env,encoding:'utf8',maxBuffer:32*1024*1024,timeout:12*60*1000});
+ const raw=(result.stdout||'')+(result.stderr||'');writeFileSync(join(privateRoot(),stage+'.log'),raw,{mode:0o600});
+ receipt('command-'+stage,{stage,exitCode:result.status,signal:result.signal||null,status:result.status===0?'COMMAND_SUCCEEDED':'COMMAND_FAILED',...safeDiagnostic(raw)});
+ const lock=JSON.parse(readFileSync(join(cwd,'package-lock.json'),'utf8')),names=new Set(Object.keys(lock.packages||{}).filter(p=>p.includes('node_modules/')).map(p=>p.split('node_modules/').at(-1)));
+ const diagnostic=safeNpmAudit(result.stdout||'',names);receipt(stage+'-summary',{stage,exitCode:result.status,threshold:'HIGH/CRITICAL',...diagnostic,rawSha256:sha256(raw),rawRetainedAfterRunnerDestruction:false});
+ requireNpmAuditSuccess(result.status,diagnostic);
+}
+
 export function requireReviewedCase(group,report,index,r){assert.equal(group.reviewStatus,'INDEPENDENTLY_REVIEWED');assert.match(group.reviewSha256||'',/^[a-f0-9]{64}$/);assert(group.inputClosure&&/^[a-f0-9]{64}$/.test(group.inputClosure.sha256||''));assert.equal(r.status,'passed');assert(group.admittedCaseKeys.includes(report.sha256+':'+index));return {...r,admitted:true,historicalKind:'reviewed-historical-local'};}
 export function verifyTestReport(report,batch){
  assert.equal(report.success,true);assert.equal(report.numFailedTests,0);const cases=report.testResults.flatMap(s=>s.assertionResults||[]);
@@ -92,7 +134,7 @@ async function main(){const phase=process.argv[2];if(phase==='cleanup'){cleanup(
  else if(phase==='seed'){databaseGuard();command('browser-fixture',process.execPath,['server-version/e2e/school-teacher-fixture.cjs','seed']);}
  else if(phase==='restore')await restore(b);
  else if(phase==='browser-report'){const module=await import(pathToFileURL(resolve(b.execution.browserHelper))),helper=module.default||module;assert.equal(typeof helper.verifyReport,'function');const report=JSON.parse(readFileSync(join(out,'browser.json'))),frontend=JSON.parse(readFileSync('server-version/frontend/dist/ci-build-manifest.json')),backend=JSON.parse(readFileSync('server-version/backend/dist/ci-build-manifest.json'));const result=helper.verifyReport(report,{head:plan.head,tree:plan.sourceTree,runId:process.env.GITHUB_RUN_ID,frontend,backend},file=>{assert(/^screenshots\/[a-z0-9-]+\.png$/.test(file));return readFileSync(join(out,file))});receipt('browser-acceptance',result);}
- else if(phase==='audit'){for(const component of b.execution.auditComponents){assert(['frontend','backend'].includes(component));command(component+'-audit','npm',['audit','--package-lock-only','--omit=dev','--audit-level=high'],resolve('server-version',component))}receipt('audit',{status:'PASSED',threshold:'HIGH/CRITICAL',components:b.execution.auditComponents})}
+ else if(phase==='audit'){for(const component of b.execution.auditComponents){assert(['frontend','backend'].includes(component));auditComponent(component)}receipt('audit',{status:'PASSED',threshold:'HIGH/CRITICAL',components:b.execution.auditComponents})}
  else if(phase==='aggregate')requireSuccess(plan,JSON.parse(process.env.NEEDS_JSON));
  else throw Error('Unknown phase');
 }

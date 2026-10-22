@@ -52,9 +52,16 @@ jobs:
         with:
           node-version: '24.21.0'
           cache: npm
-          cache-dependency-path: server-version/frontend/package-lock.json
+          cache-dependency-path: |
+            server-version/frontend/package-lock.json
+            server-version/backend/package-lock.json
       - working-directory: server-version/frontend
         run: npm ci --ignore-scripts
+      - name: prepare exact backend contracts for frontend types without native lifecycle builds
+        working-directory: server-version/backend
+        run: |
+          npm ci --ignore-scripts
+          npm run db:generate
       - name: run only frozen affected checks then compile once and bind dist
         run: node .github/scripts/school-teacher-checks.mjs frontend
       - uses: actions/upload-artifact@v4

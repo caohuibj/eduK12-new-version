@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {validateCandidate,requireSuccess,sha256,rawDiffFingerprint,BRANCH,REPOSITORY,JOBS,schoolTeacherPlan,schoolTeacherOutputs} from './school-teacher-scope.mjs';
-import {inspectHistoricalCase,requireReviewedCase,verifyTestReport,safeDiagnostic,reviewedCases} from './school-teacher-checks.mjs';
+import {inspectHistoricalCase,requireReviewedCase,verifyTestReport,safeDiagnostic,reviewedCases,safeNpmAudit,requireNpmAuditSuccess} from './school-teacher-checks.mjs';
 const draft=JSON.parse(readFileSync(new URL('./school-teacher-bindings.json',import.meta.url)));
 const fixture=()=>{const evidence=Buffer.from('{}'), b={...draft,enabled:true,blockers:[],base:'1'.repeat(40),productHead:'2'.repeat(40),frontendTree:'4'.repeat(40),backendTree:'5'.repeat(40),source:{'server-version/frontend/src/example.ts':{before:'6'.repeat(40),after:'7'.repeat(40)}},controlBefore:{'.github/scripts/school-teacher-bindings.json':null},evidenceSha256:sha256(evidence),review:{completed:true,originalExecutionSigned:false},backendBuildDecision:'fresh-once',backendBuildReason:'Final generated client changed',backendBuildInputsChanged:['server-version/backend/prisma/schema.prisma'],execution:{...draft.execution,finalized:true}};
  const o={event:'pull_request',branch:BRANCH,repository:REPOSITORY,draft:false,forceFull:false,base:b.base,sourceHead:'8'.repeat(40),checkoutHead:'9'.repeat(40),sourceTree:'a'.repeat(40),checkoutTree:'a'.repeat(40),frontendTree:b.frontendTree,backendTree:b.backendTree,productFrontendTree:b.frontendTree,productBackendTree:b.backendTree,entries:[{file:'server-version/frontend/src/example.ts',oldMode:'100644',newMode:'100644',oldBlob:'6'.repeat(40),newBlob:'7'.repeat(40),status:'M'},{file:'.github/scripts/school-teacher-bindings.json',oldMode:'000000',newMode:'100644',oldBlob:'0'.repeat(40),newBlob:'b'.repeat(40),status:'A'}]};return {b,o,evidence}};
@@ -59,3 +59,40 @@ for(const change of [{CI_FORCE_FULL:'true'},{CI_IS_DRAFT:'true'},{CI_PR_REPOSITO
 test('school route exact postmerge main classifies without accepting a different branch',()=>{const f=routeFixture();assert.equal(schoolTeacherPlan(f.o.entries,f.b.base,f.o.checkoutHead,f.read,{...f.env,CI_EVENT:'push',CI_HEAD_REF:'main'},f.b,f.evidence).head,f.o.checkoutHead);assert.throws(()=>schoolTeacherPlan(f.o.entries,f.b.base,f.o.checkoutHead,f.read,{...f.env,CI_EVENT:'push',CI_HEAD_REF:BRANCH},f.b,f.evidence))});
 test('school route outputs disable unrelated Situational acceptance but retain real CodeQL',()=>{const p={route:'school-teacher'},o=schoolTeacherOutputs(p,{accept_media:true});assert.equal(o.situational,false);assert.equal(o.run_performance_tests,false);assert.equal(o.accept_media,false);assert.equal(o.codeql,true);assert.equal(o.application_route,'school-teacher');assert.equal(o.school_teacher_plan,JSON.stringify(p))});
 test('school route integration preserves existing Survey route and exact gate recheck',()=>{const scope=readFileSync(new URL('./content-scope.mjs',import.meta.url),'utf8'),gate=readFileSync(new URL('./merge-gate.mjs',import.meta.url),'utf8'),ci=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');assert(scope.indexOf('const schoolTeacher=')<scope.indexOf('const surveyWorkspace='));assert(scope.includes('surveyWorkspaceOutputs(surveyWorkspace)'));assert(gate.includes("return ['scope','school-teacher','codeql']"));assert(gate.includes('recomputed-school-teacher-plan'));assert(gate.includes('recomputed-survey-workspace-plan'));assert(ci.includes('uses: ./.github/workflows/ci-survey-workspace.yml'));assert(ci.includes('uses: ./.github/workflows/ci-school-teacher.yml'));assert(ci.includes('work/school-teacher-review-20261022'));assert(ci.includes("application_route == 'school-teacher' && 'paths: [server-version/backend/src, server-version/frontend/src, server-version/e2e, .github/scripts]'"))});
+
+test('School Teacher CodeQL entry requires a ready pull request and preserves required SAST',()=>{
+ const workflow=readFileSync(new URL('../workflows/ci.yml',import.meta.url),'utf8');
+ const job=workflow.slice(workflow.indexOf('\n  codeql:\n'));
+ const line=job.split('\n').find(line=>line.startsWith('    if: '));
+ assert(line?.startsWith('    if: ${{ ')&&line.endsWith(' }}'));
+ const expression=line.slice('    if: ${{ '.length,-' }}'.length);
+ const evaluate=new Function('github','needs','vars','cancelled','fromJSON','contains','return ('+expression+');');
+ const permits=(event,draft,route,cancelled=false)=>evaluate({event_name:event,event:{pull_request:{draft}}},{scope:{outputs:{application_route:route,codeql:'true',scenario:'school-teacher'}}},{CI_FORCE_FULL:'false'},()=>cancelled,JSON.parse,(haystack,needle)=>haystack.includes(needle));
+ assert.equal(permits('pull_request',false,'school-teacher'),true);
+ assert.equal(permits('pull_request',true,'school-teacher'),false);
+ for(const event of ['push','workflow_dispatch'])assert.equal(permits(event,false,'school-teacher'),false);
+ assert.equal(permits('pull_request',false,'school-teacher',true),false);
+ assert.equal(permits('pull_request',false,'unrelated-route'),false);
+ for(const route of ['survey-workspace','training-appearance','legacy'])assert.equal(permits('pull_request',false,route),true);
+ const gate=readFileSync(new URL('./merge-gate.mjs',import.meta.url),'utf8');
+ assert(gate.includes("if(scope.application_route==='school-teacher')return ['scope','school-teacher','codeql'];"));
+ assert(gate.includes("filter(name => needs[name]?.result !== 'success')"));
+});
+
+const syntheticAudit=(severity='high')=>({auditReportVersion:2,metadata:{vulnerabilities:{info:0,low:0,moderate:0,high:severity==='high'?1:0,critical:0,total:severity==='high'?1:0}},vulnerabilities:severity==='high'?{fixture:{name:'fixture',severity:'high',range:'>=1.0.0 <2.0.0',via:[{source:123,url:'https://github.com/advisories/GHSA-abcd-efgh-ijkl',severity:'high',range:'<2.0.0'}]}}:{}});
+test('audit JSON preserves public package advisory severity and HIGH CRITICAL failure',()=>{const r=safeNpmAudit(JSON.stringify(syntheticAudit()),new Set(['fixture']));assert.equal(r.vulnerabilities[0].name,'fixture');assert.equal(r.vulnerabilities[0].range,'>=1.0.0 <2.0.0');assert.equal(r.vulnerabilities[0].advisories[0].advisoryId,'GHSA-abcd-efgh-ijkl');assert.throws(()=>requireNpmAuditSuccess(1,r));assert.throws(()=>requireNpmAuditSuccess(0,r));const clean=safeNpmAudit(JSON.stringify(syntheticAudit('none')),new Set());assert.doesNotThrow(()=>requireNpmAuditSuccess(0,clean));assert.throws(()=>requireNpmAuditSuccess(1,clean))});
+test('audit JSON excludes arbitrary messages credentials environment URLs and unknown packages',()=>{const input=syntheticAudit();input.error={code:'E401',summary:'token=private',detail:'postgresql://private'};input.environment='private';input.vulnerabilities.fixture.range='https://private';input.vulnerabilities.fixture.via=[{source:42,url:'https://github.com/advisories/GHSA-abcd-efgh-ijkl?token=private',title:'private',severity:'high',range:'password=private'}];input.vulnerabilities.private={severity:'high',range:'*'};const r=safeNpmAudit(JSON.stringify(input),new Set(['fixture']));assert.equal(r.errorCode,'E401');assert.equal(r.vulnerabilities.length,1);assert.equal(r.vulnerabilities[0].range,null);assert.deepEqual(r.vulnerabilities[0].advisories,[{source:42,severity:'high'}]);assert(!JSON.stringify(r).includes('private'));input.error.code='E_PRIVATE_TOKEN';assert.equal(safeNpmAudit(JSON.stringify(input),new Set(['fixture'])).errorCode,'UNRECOGNIZED_ERROR');assert.throws(()=>requireNpmAuditSuccess(0,r))});
+test('audit JSON rejects unparseable absent counts and inconsistent successful output',()=>{for(const raw of ['not json','null','{}',JSON.stringify({auditReportVersion:2,metadata:{vulnerabilities:{high:0}}})])assert.throws(()=>requireNpmAuditSuccess(0,safeNpmAudit(raw,new Set())));const invalid=syntheticAudit('none');invalid.metadata.vulnerabilities.total=3;assert.throws(()=>requireNpmAuditSuccess(0,safeNpmAudit(JSON.stringify(invalid),new Set())))});
+
+test('Frontend cross-tree types prepare backend dependencies and generated client before checks',()=>{
+ const workflow=readFileSync(new URL('../workflows/ci-school-teacher.yml',import.meta.url),'utf8');
+ const job=workflow.slice(workflow.indexOf('\n  frontend:\n'),workflow.indexOf('\n  connected:\n'));
+ const prep=job.indexOf('working-directory: server-version/backend');
+ const checks=job.indexOf('school-teacher-checks.mjs frontend');
+ assert(prep>0&&checks>prep);
+ const commands=job.slice(prep,checks);
+ assert(commands.includes('npm ci --ignore-scripts\n          npm run db:generate'));
+ assert.equal((job.match(/npm run db:generate/g)||[]).length,1);
+ assert(!/prisma migrate|checks.mjs backend|vitest/.test(job));
+ assert(job.includes('server-version/frontend/package-lock.json')&&job.includes('server-version/backend/package-lock.json'));
+});
