@@ -50,7 +50,7 @@ function supported(grant:Pick<ContentGrantInput,'scope'|'capabilities'>){
      grant.scope.resourceKind==='data'&&grant.capabilities.length===1&&grant.capabilities[0]==='data.reinterpret')
 }
 type UserRow={id:string;token_version:number;platform_role:string;account_domain:string;role:string;teacher_approved:boolean;is_active:boolean;is_frozen:boolean;must_change_password:boolean;expires_at:Date|null}
-function assertProof(proof:AdminSessionProof){if(!validAdminProof(proof,ADMIN_STEP_UP_SECONDS))deny('内容授权变更需要最近的安全密钥验证')}
+function assertProof(proof:AdminSessionProof){if(!validAdminProof(proof,ADMIN_STEP_UP_SECONDS))deny('内容授权变更需要最近的管理员双因素验证')}
 async function lockActor(tx:Prisma.TransactionClient,actorId:string,proof:AdminSessionProof,targetId?:string){
   // SHARE is intentional: consumers hold User SHARE alongside grant SHARE.
   // Never hold User UPDATE while waiting for a grant held by those consumers.

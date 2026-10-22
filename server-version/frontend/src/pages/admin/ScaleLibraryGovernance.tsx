@@ -1,7 +1,10 @@
 import { EducationLibraryDistributionPicker, educationDistributionReason } from '../../components/scale-governance/EducationLibraryDistributionPicker'
 import {EducationApplicabilitySummary} from '../../components/scale-governance/EducationApplicabilityFields'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
+import { SurveyBrand } from '../../survey/SurveyBrand'
+import { productOrigins } from '../../products/origins'
+import './survey-admin.css'
 import { governanceApi, submissionStatusLabel, type GovernanceCatalogRecord, type GovernanceCapabilities, type GovernanceEntry, type GovernanceTargetProduct, type EducationDistributionProduct, type GovernanceSubmission, type GovernanceUseGrant } from '../../api/scaleLibraryGovernance'
 import { ScaleLibraryMediaPreview } from '../../components/scale-governance/ScaleLibraryMediaPreview'
 import { ProductPage, PageHeader } from '../../components/product-ui'
@@ -20,6 +23,9 @@ const targetReady=(entry:GovernanceEntry,target:GovernanceTargetProduct)=>{
 const targetLabels={TRAINING:'Training',SURVEY:'Survey',SCHOOL:'School',TEACHER:'Teacher'}
 const covers = (releaseIds: string[], releaseId: string) => releaseIds.includes(releaseId)
 export default function ScaleLibraryGovernance() {
+  const location=useLocation()
+  const surveyContext=new URLSearchParams(location.search).get('workspace')==='survey'
+  const origins=productOrigins()
   const [catalogPage, setCatalogPage] = useState(1), [catalogHasMore, setCatalogHasMore] = useState(false)
   const [catalog, setCatalog] = useState<GovernanceCatalogRecord[]>([]), [catalogDetail, setCatalogDetail] = useState<GovernanceCatalogRecord | null>(null), [catalogDetailLoading, setCatalogDetailLoading] = useState(false)
   const [capabilities, setCapabilities] = useState<GovernanceCapabilities | null>(null)
@@ -97,7 +103,10 @@ export default function ScaleLibraryGovernance() {
     pendingGrant.current = null
     const response = await api.grants(selected.id); if (mounted.current) setGrants(response.list)
   }
-  return <ProductPage><PageHeader title="公共量表库与授权治理" description="统一汇总标准量表与获批自编量表；精确版本、科学身份和授权规则分别保留。" />
+  return <ProductPage><div className={surveyContext?'survey-admin survey-admin-governance':undefined}>
+    {surveyContext&&origins&&<header className="survey-admin-header"><div><SurveyBrand href={origins.survey+'/'}/><p className="survey-admin-kicker">HUISURVEY · 公库与审批</p></div>
+      <Link className="survey-admin-return" to="/admin/survey-researchers">返回研究者与工具授权</Link></header>}
+    <PageHeader title="公共量表库与授权治理" description="统一汇总标准量表与获批自编量表；精确版本、科学身份和授权规则分别保留。" />
     <section className="staff-panel staff-panel--padded p-5 space-y-2"><h2>两类权限分别管理</h2><p>系统级审核与明确范围的审核委托，负责是否收录；入口分配权限只负责已批准版本的使用授权，不能代替入库审核。</p><p>批准入库不等于全平台可用，不构成标准科学量表认证。使用授权仅可使用原版，不授予修改、改编或转授权权限。</p>{capabilities?.systemAdmin && <Link to="/admin/permissions">查看系统权限与委托范围</Link>}<p>本页按后端实时能力提供操作；入口管理员身份本身不授予审核权。</p></section>
     {loading && <p role="status">正在核对治理权限…</p>}{error && <p role="alert">{error}</p>}{notice && <p role="status">{notice}</p>}
     <button type="button" className="hui-button hui-button--secondary" disabled={busy || loading} onClick={() => void refresh()}>刷新状态</button>
@@ -143,5 +152,5 @@ export default function ScaleLibraryGovernance() {
         },'授权已撤销；历史记录保留。')}>撤销新增使用权限</button>}
       </article>)}
     </section>}</>}
-  </ProductPage>
+  </div></ProductPage>
 }

@@ -5,7 +5,7 @@ export function SurveyFeaturePage({ feature, signedIn }: { feature: SurveyFeatur
   const Icon = feature.icon
   return <div className="survey-feature-page">
     <a className="survey-skip-link" href="#survey-feature-content">跳至主要内容</a>
-    <SurveyPublicHeader />
+    <SurveyPublicHeader signedIn={signedIn}/>
     <main id="survey-feature-content" className="survey-feature-content" tabIndex={-1}>
       <a className="survey-back" href="/#survey-features">返回平台介绍</a>
       <Icon size={36} strokeWidth={1.4} aria-hidden="true" />

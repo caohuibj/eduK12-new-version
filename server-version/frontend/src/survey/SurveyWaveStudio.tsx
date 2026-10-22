@@ -101,6 +101,13 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
   const [ready,setReady]=useState<Preflight|null>(null),[busy,setBusy]=useState(false)
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   const [shareLink,setShareLink]=useState('')
+  const copyShareLink=async()=>{
+    if(!shareLink)return
+    try{
+      await navigator.clipboard.writeText(shareLink)
+      setError('');setNotice('研究链接已复制，请通过受控渠道分享。')
+    }catch{setError('无法写入剪贴板，请手动选择并复制下方研究链接。')}
+  }
   const previewEpoch=useRef(0),projectEpoch=useRef(0),selectionEpoch=useRef(0)
   const waveRequest=useRef(0),projectRequest=useRef(0),actionRequest=useRef(0)
   const detailReads=useRef({path,revision:instrumentsRevision,selection:0,requests:new Map<string,Promise<InstrumentDetails>>()})
@@ -414,7 +421,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
   })
   const stage=activePending?'冻结结果待核对':!editing?'尚未保存草稿':editing.hardStopAt?'已紧急终止':editing.status==='CLOSED'?'已结束招募':editing.status==='PAUSED'?'已暂停新参与':editing.status==='OPEN'?'波次已开放':editing.publicationId?'已冻结，尚未开放':'草稿，尚未冻结'
   const nextStep=activePending?'请先核对原冻结请求，不要重复创建或重新选择版本。':busy?'正在等待本次操作结果；请勿据此重复提交或开始下一步。':!editing?'填写本轮内容并保存草稿，再检查研究定义。':editing.hardStopAt?'已停止本轮作答，请到研究数据查看既有记录。':editing.status==='CLOSED'?'不再招募；在途作答仍以服务端完成窗口为准。':editing.status==='PAUSED'?'需要继续招募时可恢复开放；在途作答遵循原完成窗口。':editing.status==='OPEN'?'核对招募链接后再分享；是否允许新参与仍受项目状态、时间窗口和配额约束。':editing.publicationId?'确认冻结内容后，可显式正式开放本轮。':'先保存内容，再检查知情同意与所有工具，通过后冻结研究定义。'
-  return <section className="border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-5" aria-label="研究波次">
+  return <section className="survey-studio-surface survey-publish-surface border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-5" aria-label="研究波次">
     <header><h2 className="text-xl font-semibold">研究波次 · T1 / T2 / T3</h2>
       <p className="text-sm text-slate-600">
         {project?.collectionMode==='LINKED_WAVES'
@@ -734,7 +741,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged}:
             <div className="w-fit border rounded-lg bg-white p-3">
               <QRCodeSVG value={shareLink} size={168} title="研究参与招募二维码"/>
             </div>
-            <button type="button" className="btn-secondary" onClick={()=>void navigator.clipboard.writeText(shareLink)}>
+            <button type="button" className="btn-secondary" onClick={()=>void copyShareLink()}>
               复制研究链接</button>
             <p className="text-xs mt-2">链接中包含招募能力，勿上传到公开日志。被试的私密恢复凭证并不在此链接中。</p>
           </div>}

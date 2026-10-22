@@ -14,6 +14,7 @@ function mount(path='/admin/login'){
 function submit(){
   fireEvent.change(screen.getByLabelText('管理员账号'),{target:{value:'synthetic-admin'}})
   fireEvent.change(screen.getByLabelText('密码'),{target:{value:'synthetic-password'}})
+  fireEvent.change(screen.getByLabelText('Authenticator 六位动态码'),{target:{value:'123456'}})
   fireEvent.click(screen.getByRole('button',{name:'管理员登录'}))
 }
 beforeEach(()=>{
@@ -29,10 +30,13 @@ describe('administrator login flow',()=>{
       mount(path);submit()
       expect(await screen.findByText('destination:/admin/permissions')).toBeInTheDocument()
       expect(csrf).toHaveBeenCalledTimes(1)
-      expect(login).toHaveBeenCalledExactlyOnceWith({username:'synthetic-admin',password:'synthetic-password'},'admin')
+      expect(login).toHaveBeenCalledExactlyOnceWith({username:'synthetic-admin',password:'synthetic-password'},'admin',{method:'TOTP',code:'123456'})
     })
   it('returns the committed administrator identity to Survey governance',async()=>{
-    mount('/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers');submit()
+    mount('/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
+    expect(screen.getByRole('link',{name:'Huisurvey 首页'}).querySelector('img')).toHaveAttribute('src','/survey/huisurvey-w2-emblem.svg')
+    expect(screen.getByText('让研究有序开展，边界清晰可见。')).toBeVisible()
+    submit()
     expect(await screen.findByText('destination:/admin/survey-researchers')).toBeInTheDocument()
   })
   it.each([['TEACHER','/admin/entrances'],['STUDENT','/admin/entrances'],['PARENT','/admin/entrances']])(
@@ -46,6 +50,7 @@ describe('administrator login flow',()=>{
     mount();submit()
     expect(await screen.findByRole('alert')).toHaveTextContent('密码错误')
     await waitFor(()=>expect(screen.getByRole('button',{name:'管理员登录'})).toBeEnabled())
+    fireEvent.change(screen.getByLabelText('Authenticator 六位动态码'),{target:{value:'123456'}})
     fireEvent.click(screen.getByRole('button',{name:'管理员登录'}))
     expect(await screen.findByText('destination:/admin/permissions')).toBeInTheDocument()
     expect(login).toHaveBeenCalledTimes(2);expect(csrf).toHaveBeenCalledTimes(2)

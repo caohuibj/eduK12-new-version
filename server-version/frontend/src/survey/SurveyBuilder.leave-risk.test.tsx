@@ -4,6 +4,28 @@ import { SurveyBuilder } from './SurveyBuilder'
 const response=(data:unknown)=>Promise.resolve({ok:true,json:async()=>({code:0,data})} as Response)
 afterEach(()=>{vi.restoreAllMocks();vi.unstubAllGlobals()})
 describe('builder leave-risk signals',()=>{
+  it('directs a saved Form to wave publication instead of an unavailable measurement-release action',async()=>{
+    let draft={id:'form-draft',projectId:'p',instrumentKey:'form',kind:'FORM',title:'私有表单',revision:1,status:'DRAFT',definition:{schemaVersion:1,pages:[]}}
+    const fetcher=vi.fn((url:string,init?:RequestInit)=>{
+      if(url.endsWith('/csrf'))return response({csrfToken:'synthetic'})
+      if(url.endsWith('/assets'))return response({assets:[]})
+      if(url.endsWith('/instruments?page=1'))return response({list:[draft]})
+      if(url.endsWith('/instruments/form-draft')){
+        if(init?.method==='PATCH'){draft={...draft,...JSON.parse(String(init.body)),revision:2}}
+        return response(draft)
+      }
+      return response({list:[]})
+    })
+    vi.stubGlobal('fetch',fetcher)
+    render(<SurveyBuilder projectId="p"/>)
+    fireEvent.click(await screen.findByRole('button',{name:/私有表单.*FORM/}))
+    fireEvent.change(await screen.findByLabelText('研究工具名称'),{target:{value:'表单修订'}})
+    fireEvent.click(screen.getByRole('button',{name:'保存草稿'}))
+    expect(await screen.findByText('表单草稿已保存；请到「发布与采集」选择本表单，检查并冻结波次。')).toBeVisible()
+    expect(screen.queryByRole('button',{name:'发布测量版本'})).not.toBeInTheDocument()
+    expect(fetcher.mock.calls.filter(([,init])=>init?.method==='PATCH')).toHaveLength(1)
+    expect(fetcher.mock.calls.some(([url])=>url.endsWith('/measurement-release'))).toBe(false)
+  })
   it('reports unsaved draft inputs and a pending write, then clears acknowledged edits',async()=>{
     const risk=vi.fn()
     let resolve!:(value:Response)=>void

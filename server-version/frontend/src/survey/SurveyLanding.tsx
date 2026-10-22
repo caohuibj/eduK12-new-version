@@ -1,18 +1,22 @@
 import { SurveyBrand } from './SurveyBrand'
 import { surveyFeatures } from './survey-features'
 import './survey-landing.css'
+import { surveyAdminLoginUrl } from '../products/origins'
 
-export function SurveyPublicHeader() {
+export function SurveyPublicHeader({signedIn=false}:{signedIn?:boolean}) {
+  const adminUrl=surveyAdminLoginUrl()
   return <header className="survey-landing-header">
     <SurveyBrand />
-    <nav aria-label="研究平台导航"><a href="/#survey-features">产品功能</a></nav>
+    <nav aria-label="研究平台导航"><a href="/#survey-features">产品功能</a>
+      <a href={signedIn?'/workspace':'/login'}>{signedIn?'研究工作台':'研究者入口'}</a>
+      {adminUrl&&<a className="survey-admin-entry-link" href={adminUrl}>管理员入口</a>}</nav>
   </header>
 }
 
 export function SurveyLanding({ signedIn = false }: { signedIn?: boolean }) {
   return <div className="survey-landing">
     <a className="survey-skip-link" href="#survey-intro">跳至主要内容</a>
-    <SurveyPublicHeader />
+    <SurveyPublicHeader signedIn={signedIn}/>
     <main className="survey-landing-main" id="survey-intro" tabIndex={-1}>
       <div className="survey-landing-copy">
         <h1><span>风过有迹，</span><span>细微可察。</span></h1>

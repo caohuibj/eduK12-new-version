@@ -43,8 +43,19 @@ export async function enrollSecurityKey(username: string, password: string, enro
   if (!credential) throw new Error('安全密钥登记未完成，请重试。')
   return api.post('/admin/security/registration/verify', { response: serialize(credential as PublicKeyCredential) })
 }
-export async function reauthenticateAdmin() {
-  const options = await api.post<{ options: Record<string, unknown> }>('/admin/security/step-up/options', {})
-  const response = await assertSecurityKey(options.data!.options)
+export async function beginTotpEnrollment(username: string, password: string, enrollmentToken: string) {
+  return api.post<{otpauthUri:string}>('/admin/security/totp/registration/options',{username,password,enrollmentToken})
+}
+export async function confirmTotpEnrollment(code: string) {
+  return api.post<{registered:true}>('/admin/security/totp/registration/verify',{code})
+}
+export async function reauthenticateAdmin(code?: string, method: 'TOTP' | 'SECURITY_KEY' = 'SECURITY_KEY') {
+  const options = await api.post<{ options?: Record<string, unknown>; adminTotpRequired?:true }>('/admin/security/step-up/options', {method})
+  if(options.data?.adminTotpRequired){
+    if(!code||!/^\d{6}$/.test(code))throw new Error('请输入 Authenticator 中的六位动态码')
+    return api.post<{user:User}>('/admin/security/totp/step-up/verify',{code})
+  }
+  if(!options.data?.options)throw new Error('管理员验证暂不可用')
+  const response = await assertSecurityKey(options.data.options)
   return api.post<{ user: User }>('/admin/security/step-up/verify', { response })
 }

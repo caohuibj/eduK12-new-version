@@ -346,6 +346,20 @@ describe('Survey authoritative FINAL and timing lifecycle',()=>{
     expect(finalCalls[1]).toEqual(finalCalls[0])
     expect(screen.getByRole('radio',{name:'不同意'})).toBeDisabled()
   })
+  it.each(['Failed to fetch','Load failed','NetworkError when attempting to fetch resource.'])(
+    'explains native network failure %s while retaining the exact sealed retry',async nativeMessage=>{
+      let calls=0
+      finalReply=()=>++calls===1?Promise.reject(new TypeError(nativeMessage)):response(firstSuccess())
+      await openTask()
+      now=1100;fireEvent.click(screen.getByRole('radio',{name:'同意'}));submit()
+      expect(await screen.findByRole('alert')).toHaveTextContent('网络连接未完成，服务器结果尚未确认。请检查网络，并按页面提示核对或重试。')
+      expect(screen.getByRole('button',{name:'重试原提交'})).toBeEnabled()
+      expect(screen.getByRole('radio',{name:'不同意'})).toBeDisabled()
+      now=9000;submit()
+      await screen.findByText('感谢参与')
+      expect(finalCalls).toHaveLength(2)
+      expect(finalCalls[1]).toEqual(finalCalls[0])
+    })
   it('keeps completion authoritative when General fails and retries only the receipt',async()=>{
     generalReply=()=>Promise.reject(new Error('回执暂不可用'))
     await openTask()

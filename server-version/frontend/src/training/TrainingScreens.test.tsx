@@ -1,4 +1,4 @@
-import { render, screen, fireEvent } from '@testing-library/react'
+import { render, screen, fireEvent, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -49,6 +49,42 @@ describe('training presentation and course-first entry', () => {
     expect(link).toHaveAttribute('href', '/student/courses/course-1')
     expect(screen.queryByText('认知测评')).toBeNull()
     expect(get).toHaveBeenCalledWith('/courses/my')
+    expect(screen.getByRole('heading', { level: 1, name: '我的课程' })).toBeInTheDocument()
+    expect(screen.queryByRole('complementary', { name: '学习三步走' })).toBeNull()
+    expect(screen.queryByText(/你好，小李/)).toBeNull()
+  })
+
+  it('shows first-course guidance in the welcome image only after an empty result', async () => {
+    get.mockResolvedValue({ code: 0, data: { list: [] } })
+    render(<MemoryRouter><TrainingLearnerHome /></MemoryRouter>)
+    expect(screen.queryByRole('complementary', { name: '学习三步走' })).toBeNull()
+    const heading = await screen.findByRole('heading', { level: 1, name: '你的第一门课程，从这里开始' })
+    const hero = heading.closest('.learner-home-welcome')!
+    expect(hero).toContainElement(screen.getByRole('complementary', { name: '学习三步走' }))
+    expect(within(hero as HTMLElement).getByRole('button', { name: '加入课程' })).toBeEnabled()
+    expect(screen.queryByRole('heading', { name: '我的课程' })).toBeNull()
+  })
+
+  it('does not mistake a course load failure for a new learner', async () => {
+    get.mockRejectedValue(new Error('连接失败'))
+    render(<MemoryRouter><TrainingLearnerHome /></MemoryRouter>)
+    await screen.findByRole('alert')
+    expect(screen.queryByRole('complementary', { name: '学习三步走' })).toBeNull()
+    expect(screen.getByRole('button', { name: '重试' })).toBeEnabled()
+  })
+
+  it('replaces onboarding with courses after joining the first course', async () => {
+    get.mockResolvedValueOnce({ code: 0, data: { list: [] } })
+      .mockResolvedValue({ code: 0, data: { list: [course] } })
+    render(<MemoryRouter><TrainingLearnerHome /></MemoryRouter>)
+    await screen.findByRole('complementary', { name: '学习三步走' })
+    fireEvent.click(screen.getByRole('button', { name: '加入课程' }))
+    fireEvent.change(screen.getByRole('textbox', { name: '课程码' }), { target: { value: 'ABC123' } })
+    fireEvent.submit(screen.getByRole('dialog').querySelector('form')!)
+    await screen.findByRole('link', { name: /成长研修/ })
+    expect(screen.queryByRole('complementary', { name: '学习三步走' })).toBeNull()
+    expect(screen.queryByText(/你好，小李/)).toBeNull()
+    expect(post).toHaveBeenCalledWith('/courses/join', { courseCode: 'ABC123' })
   })
 
   it('trainer home omits library courses and routes to owned course management', async () => {

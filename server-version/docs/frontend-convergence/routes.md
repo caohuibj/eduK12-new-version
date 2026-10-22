@@ -1,6 +1,6 @@
 # Frontend route inventory
 
-Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 145 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
+Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 150 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
 
 | Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |
 |---|---|---|---|---|---|---|---|
@@ -33,6 +33,10 @@ Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx
 | /relational/composite/situational/:attemptId | SituationalRunner | Authenticated; exact server resource authority | — | AppShell (outside guards) | focused | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
 | /assessment-workbench | AssessmentWorkbench | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /assessment-templates | AssessmentTemplates | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /media-library | TrainingLibrary | TEACHER | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /toolkit | TrainingLibrary | TEACHER | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /toolkit/forms/:id | QuestionnaireProductEdit | TEACHER | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /toolkit/compositions/:id | QuestionnaireProductEdit | TEACHER | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /assessment-management | AssessmentManagement | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /dashboard | TrainingTrainerHome | TEACHER | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /courses | CourseList | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
@@ -52,6 +56,7 @@ Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx
 | /general-questionnaires/:id/edit | GeneralQuestionnaireEdit | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /bundle-products | BundleProducts | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /admin/security/enroll | AdminKeyEnrollment | Public / unguarded | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /admin/scale-library-governance | ScaleLibraryGovernance | Authenticated; current authority overview | — | AppShell (outside guards) | standard | FE-02 + FE-03C | FE-02 chrome; domain UI retained |
 | /admin/permissions | AdminPermissions | SYSTEM_ADMIN; current security-key session | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /admin/entrances | AdminEntrances | Authenticated; current authority overview | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /admin/survey-researchers | SurveyAdminOrigin | Explicit admin entry: ['SURVEY'] | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
@@ -94,7 +99,7 @@ Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx
 | /student/checkins | StudentCheckins | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /student/checkins/:checkinId | CheckinSubmit | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /student/profile | StudentProfile | STUDENT | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
-| /sjt-authoring | SjtAuthoring | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /sjt-authoring | TrainingSjtAuthoringAccess | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /teacher/situational | SituationalHome | TEACHER | — | AppShell (outside guards) | standard | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
 | /teacher/situational/history | SituationalHistory | TEACHER | — | AppShell (outside guards) | standard | FE-02 + FE-06 | FE-02 chrome; domain UI retained |
 | /teacher/situational/:instrumentKey | SituationalRunner | TEACHER | — | AppShell (outside guards) | focused | FE-02 + FE-06 | FE-02 chrome; domain UI retained |

@@ -340,10 +340,11 @@ const assertDraft = (composite: { status: string }) => {
 }
 
 const assertCollectionOnlyEditing = (composite: {
+  productKind?: string
   analysisProtocolKey?: string | null
   reportPackageKey?: string | null
 }) => {
-  if (composite.analysisProtocolKey || composite.reportPackageKey) {
+  if (composite.productKind === 'ASSESSMENT_BUNDLE' || composite.analysisProtocolKey || composite.reportPackageKey) {
     throw compositeConflict('固定分析协议的模块不能单独添加、移除或排序')
   }
 }
@@ -1134,6 +1135,7 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
   const selfCopy = source.createdBy === userId
   const libraryCopy = isAdminLibraryTemplate(source)
   if (!selfCopy && !libraryCopy) throw compositeForbidden('不能复制此综合测评')
+  if (source.productKind === 'ASSESSMENT_BUNDLE') throw compositeConflict('固定测评包不能复制为可编辑问卷，请使用原固定版本创建投放')
 
   const hasPackageKey = Boolean(source.reportPackageKey)
   const hasPackageVersion = Boolean(source.reportPackageVersion)
@@ -1461,6 +1463,7 @@ export const updateComposite = async (userId: string, role: UserRole, id: string
     ? (['expiresAt', 'publicEnabled', 'copyable'] as const)
     : (['expiresAt', 'publicEnabled'] as const)
   const publicWindowOnly = providedKeys.length > 0 && providedKeys.every((key) => (publicWindowKeys as readonly string[]).includes(key))
+  if (existing.productKind === 'ASSESSMENT_BUNDLE' && !publicWindowOnly) throw compositeConflict('固定测评包不能通过普通问卷编辑入口修改')
   if (existing.status !== 'DRAFT' && !publicWindowOnly) {
     throw compositeConflict('已发布的综合测评只能调整公开有效期')
   }
@@ -1509,6 +1512,7 @@ export const setCompositeAnalysisProtocol = async (
   assertTeacher(role)
   const composite = await loadComposite(id, true)
   assertOwner(composite, userId, role)
+  if (composite.productKind === 'ASSESSMENT_BUNDLE') throw compositeConflict('固定测评包的分析规则不能修改')
   if (composite.productKind === 'QUESTIONNAIRE') throw compositeBadRequest('问卷只提供独立结果，不能绑定综合报告')
   assertDraft(composite)
   if (composite.reportPackageKey) {
@@ -1574,6 +1578,7 @@ export const setCompositeReportPackage = async (
   assertTeacher(role)
   const composite = await loadComposite(id, true)
   assertOwner(composite, userId, role)
+  if (composite.productKind === 'ASSESSMENT_BUNDLE') throw compositeConflict('固定测评包的综合报告定义不能修改')
   if (composite.productKind === 'QUESTIONNAIRE') throw compositeBadRequest('问卷只提供独立结果，不能绑定综合报告')
   assertDraft(composite)
 
@@ -2242,7 +2247,12 @@ export const listAvailableForStudent = async (userId: string, now = Date.now()) 
   const courseIds = memberships.map((item) => item.courseId)
   if (!courseIds.length) return []
   const list = await prisma.compositeAssessment.findMany({
-    where: { status: 'PUBLISHED', OR: [
+    // Publication governs new starts. Archived deliveries remain discoverable
+    // only for this student's existing work, within their current course scope.
+    where: { AND: [{ OR: [
+      { status: 'PUBLISHED' },
+      { status: 'ARCHIVED', attempts: { some: { userId, status: { in: ['IN_PROGRESS', 'COMPLETED'] } } } },
+    ] }], OR: [
       { productKind: { in: ['LEGACY_COMPOSITE', 'ASSESSMENT_BUNDLE'] }, courseId: { in: courseIds }, course: { isLibrary: false } },
       { productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: courseIds }, course: { isLibrary: false } } } },
     ] },
@@ -2337,7 +2347,7 @@ export const listAvailableForStudent = async (userId: string, now = Date.now()) 
       maxAttempts: item.maxAttempts,
       attemptsUsed,
       availability,
-      canStartNewAttempt: (config.cognitiveModuleEnabled || !item.items.some((child: any) => child.type === 'COGNITIVE')) && availability === 'OPEN' && !canContinue && attemptsUsed < item.maxAttempts,
+      canStartNewAttempt: item.status === 'PUBLISHED' && (config.cognitiveModuleEnabled || !item.items.some((child: any) => child.type === 'COGNITIVE')) && availability === 'OPEN' && !canContinue && attemptsUsed < item.maxAttempts,
       canContinue,
       admissionPaused: Boolean(admissionPaused),
       weightedVariants: item.trainingVariantFrozen != null,

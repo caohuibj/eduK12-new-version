@@ -52,7 +52,7 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
       return unauthorized(res, '认证令牌已失效，请重新登录')
     }
     const management = needsAdminKey(principal!) && ['LEGACY','TRAINING'].includes(principal!.accountDomain)
-    if (management && !validAdminProof(payload)) return unauthorized(res, '请使用安全密钥完成管理员登录')
+    if (management && !validAdminProof(payload)) return unauthorized(res, '请完成管理员双因素登录')
 
     // A domain mismatch cannot be fixed by a client-supplied hostname or
     // JWT role. Historical JWTs without an audience remain legacy-only.
@@ -105,7 +105,7 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
       && req.originalUrl.split('?')[0]!=='/api/auth/logout'
       && (principal!.platformRole === 'SYSTEM_ADMIN' || /^\/api\/(platform\/|users(?:\/|$)|admin\/permissions(?:\/|$)|auth\/(change-password|extend-account))/.test(req.originalUrl))
       && !validAdminProof(payload, ADMIN_STEP_UP_SECONDS)) {
-      return res.status(403).json({ code: 'ADMIN_KEY_STEP_UP_REQUIRED', message: '敏感操作需要重新验证安全密钥' })
+      return res.status(403).json({ code: 'ADMIN_KEY_STEP_UP_REQUIRED', message: '敏感操作需要重新完成管理员双因素验证' })
     }
 
     const allowedWhileChangingPassword = new Set([
@@ -116,6 +116,7 @@ const authenticateProduct = async (req: Request, res: Response, next: NextFuncti
       '/api/auth/csrf',
       '/api/admin/security/step-up/options',
       '/api/admin/security/step-up/verify',
+      '/api/admin/security/totp/step-up/verify',
       '/api/campus/auth/me',
       '/api/campus/auth/logout',
       '/api/huiteacher/auth/me',

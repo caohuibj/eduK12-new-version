@@ -1,0 +1,14 @@
+/* Opted in only for the existing, trusted Survey administrator return target. */
+.survey-admin-auth { --auth-accent: #176c67; --auth-accent-soft: #e4f2f0; --auth-ink: #173b50; }
+.survey-admin-auth .hui-auth-hero {
+  background: linear-gradient(150deg,rgba(239,247,249,.96),rgba(229,243,245,.82)), url('/survey/wind-observation-small.webp') center / cover;
+  border-color: #ccdfe4;
+}
+.survey-admin-auth .hui-auth-hero::before,.survey-admin-auth .hui-auth-hero::after { display: none; }
+.survey-admin-auth .hui-auth-hero__title { font-family: 'Songti SC','STSong','Noto Serif CJK SC',serif; font-weight: 500; line-height: 1.55; letter-spacing: .035em; }
+.survey-admin-auth .survey-brand { margin-bottom: 2rem; }
+.survey-admin-auth .hui-auth-card { border-color: #cbdde2; box-shadow: 0 16px 48px #234a650c; }
+.survey-admin-auth .hui-auth-card .btn-primary { background: #234a65; border-color: #234a65; }
+.survey-admin-auth .hui-auth-note { background: #eef7f7; border-color: #b7d7d5; color: #234a65; }
+.survey-admin-auth :is(a,button,input):focus-visible { outline: 3px solid #0f6b68; outline-offset: 4px; }
+.survey-admin-auth .hui-auth-back { color: #36586a; }

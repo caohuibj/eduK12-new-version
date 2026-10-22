@@ -125,6 +125,14 @@ model User {
 // ==================== Organization / Reporting V2.1 identity authority ====================
 // PostgreSQL-only partial/expression indexes, CHECK constraints, and the
 // append-only audit trigger remain authoritative in the handwritten migrations.
+model AdminTotpCredential {
+  userId       String   @id @map("user_id")
+  secretCipher String   @map("secret_cipher")
+  lastUsedStep BigInt   @default(-1) @map("last_used_step")
+  enabledAt    DateTime @default(now()) @map("enabled_at") @db.Timestamptz(6)
+  @@map("admin_totp_credentials")
+}
+
 model AdminSecurityKey {
   id        String @id
   userId    String @map("user_id")

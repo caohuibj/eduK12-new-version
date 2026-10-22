@@ -1,0 +1,173 @@
+{
+  "schema": 1,
+  "base": "61bb4cc1534fcb02869b27973794001021826de0",
+  "product": "ae7e6551684a82b7357ebea9ed61107f547c301a",
+  "source": {
+    "server-version/frontend/src/admin/AdminKeyEnrollment.tsx": {
+      "before": "cbdd9623f690d0cb5333f03b8090791f18bc0b1c",
+      "after": "9f643fa187a3964ac8840f20455ec3a1367ee4fb"
+    },
+    "server-version/frontend/src/admin/SurveyAdminEnrollmentContext.test.tsx": {
+      "before": null,
+      "after": "c24a49ef526db53998ccba02ccf4f661c96ae8c4"
+    },
+    "server-version/frontend/src/components/Footer.tsx": {
+      "before": "a061c26c7be789c799b7959f244b9c3bae008e89",
+      "after": "6979b76a83eb9a5ab6999e5344f5b8f45610d46b"
+    },
+    "server-version/frontend/src/components/app-shell/AppShell.tsx": {
+      "before": "b0c103418a81640a123b4c0260ef75fa5e10134e",
+      "after": "7cfbcab38071b439f89fb05ba4ffd27b9a8e7df2"
+    },
+    "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx": {
+      "before": "637c1838e70bed49cda9b0d8d62c38b7c7940594",
+      "after": "941e5db60ec7820fe7de941aef55b69bcf550397"
+    },
+    "server-version/frontend/src/components/auth/AuthShell.tsx": {
+      "before": "a307800f851c06846d07a3b0bc04c847eed8cbe1",
+      "after": "48bb0e4fc553f9a642c05a7ba33a8540f4028b50"
+    },
+    "server-version/frontend/src/pages/AdminLogin.test.tsx": {
+      "before": "86eac0d90a16537993c68c31f3f5647177617678",
+      "after": "450dff9e5c487200c3e507bb2adb9b389d16175d"
+    },
+    "server-version/frontend/src/pages/AdminLogin.tsx": {
+      "before": "6e04a9eda18a10562fc7c11359ececa48f52e256",
+      "after": "fb3eb1db372af974a75421806f53335b1b4bc6cd"
+    },
+    "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.tsx": {
+      "before": "a6ee33dfb3af938a588e64ebf22e2dfe6ad11559",
+      "after": "bd34009e79d9c37bdf184572839127d0ece679b7"
+    },
+    "server-version/frontend/src/pages/admin/SurveyResearchersAdmin.tsx": {
+      "before": "6a7ed83c98b4b976efa54dfdd7525a0ec13ce06b",
+      "after": "4a2450db25c757d6327fe10b2dd69b69e7133849"
+    },
+    "server-version/frontend/src/pages/admin/survey-admin.css": {
+      "before": "ca694a75d2ff16e87ac5e0c88f12acd27f1c3c53",
+      "after": "65fff1439b07b0245bddb38667a13c0f6d7ef580"
+    },
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx": {
+      "before": "1dbd09df2749e1909520403a5e662eb4268ea810",
+      "after": "47137dbc0616465b89df4845116e78f4fb8e48d9"
+    },
+    "server-version/frontend/src/survey/SurveyApp.entry.test.tsx": {
+      "before": "5c96f593ff69e0ebd896294046a158cc294cef28",
+      "after": "2a47559021e89b7e3d561042f23bb42dc4614954"
+    },
+    "server-version/frontend/src/survey/SurveyApp.tsx": {
+      "before": "cdd654c10491666f199b0ba024e5c4379939f9f0",
+      "after": "6a6e8a7210410ed4305e85a0a185e89269ad0759"
+    },
+    "server-version/frontend/src/survey/SurveyBrand.tsx": {
+      "before": "4a93792b92c87393428a99a6e53ba27738bcef3f",
+      "after": "5caa0bae7c330d250897f65bd784abbade8f7c81"
+    },
+    "server-version/frontend/src/survey/SurveyBuilder.leave-risk.test.tsx": {
+      "before": "cec79eae76aba9544c9019460be323656227c35e",
+      "after": "ed86bdea1f83493d5837cab26cb7c3b29f876f36"
+    },
+    "server-version/frontend/src/survey/SurveyBuilder.tsx": {
+      "before": "744cf9fc8209752b8a524b46ee72f96b0475e4f2",
+      "after": "85825aca9748b13dfd462ac51f1f79a4991f1ef6"
+    },
+    "server-version/frontend/src/survey/SurveyFeaturePage.tsx": {
+      "before": "ba6396da9a09aa94733e04fd8c035d311034867f",
+      "after": "1f566dcc232efb0a116df71327ce924ed15a99bf"
+    },
+    "server-version/frontend/src/survey/SurveyLanding.tsx": {
+      "before": "419ef0ea0ba65dceb6930dcd3900dce838a183fb",
+      "after": "ef2f3f531581f09066ba162a2ba904ba3e11eae5"
+    },
+    "server-version/frontend/src/survey/SurveyProjectDirectory.tsx": {
+      "before": null,
+      "after": "52a58f8137582cf60703f04f4338e8f7a99f730b"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx": {
+      "before": "f65defcb94c7da59dcf6fdd80901c28ac75196eb",
+      "after": "cb59e4ac10453054ad905afebec9d5cd010bff4e"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "before": "b8f8abbb3bb956bcdee0ba402f3f69d9f76f0874",
+      "after": "bdde652a56a76cc808a0c49bea135b616d0922e8"
+    },
+    "server-version/frontend/src/survey/SurveyReportStudio.tsx": {
+      "before": "057f1bda39e03a6f4c689c7ba0016fe8fbb9bce7",
+      "after": "d8a3d95c5a12f841ad8f709c15d781c562cf4713"
+    },
+    "server-version/frontend/src/survey/SurveyWaveStudio.links.test.tsx": {
+      "before": "e28032d6c3297d7f77ca49a63c587d9c57e10179",
+      "after": "ac82c455b8189b3bf837cf7ad94eee77d48ca939"
+    },
+    "server-version/frontend/src/survey/SurveyWaveStudio.tsx": {
+      "before": "e46d82a04e3d0efd56a947abfabdf163bd2e8abc",
+      "after": "288262a2abca042467cd12cb82ccc79db471ac20"
+    },
+    "server-version/frontend/src/survey/SurveyWorkspace.directory.test.tsx": {
+      "before": null,
+      "after": "b613706392f17b7d19ccf0902ba643153c6025c3"
+    },
+    "server-version/frontend/src/survey/SurveyWorkspaceNav.tsx": {
+      "before": "a9cc597b1deb17ed8957f54023eb63eec1d31f94",
+      "after": "f816fa60d9479f4c671ca78d472c5072e050ab7b"
+    },
+    "server-version/frontend/src/survey/survey-admin-auth.css": {
+      "before": null,
+      "after": "d8b45f793d3e82cd301edb8caa7157b8dc2009b5"
+    },
+    "server-version/frontend/src/survey/survey-admin-shell.css": {
+      "before": null,
+      "after": "740a3c1116719b006e293095897e160006419c4d"
+    },
+    "server-version/frontend/src/survey/survey-directory.css": {
+      "before": null,
+      "after": "b9f49cf6eb74821c7f9124b7a01a2566f9358d24"
+    },
+    "server-version/frontend/src/survey/survey-landing.css": {
+      "before": "c7ad64b3fa5df6ab7b1e23df5f849847263b6957",
+      "after": "755272bb08543a873bc5692c17d28f80ec7c80ad"
+    },
+    "server-version/frontend/src/survey/survey-participant.css": {
+      "before": "cf2e242a6fa93539a8bfc965773c080da85edc35",
+      "after": "16da1cc4281c52824a728099f3fa85b94a68d37a"
+    }
+  },
+  "controls": [
+    ".github/scripts/survey-cloud-bindings.json",
+    ".github/scripts/survey-cloud-scope.mjs",
+    ".github/scripts/survey-cloud-checks.mjs",
+    ".github/scripts/survey-cloud.test.mjs",
+    ".github/evidence/survey-cloud/reviewed-local.json",
+    ".github/workflows/ci-survey-cloud.yml",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    ".github/workflows/ci.yml",
+    "docs/release/README.md"
+  ],
+  "controlBefore": {
+    ".github/scripts/survey-cloud-bindings.json": null,
+    ".github/scripts/survey-cloud-scope.mjs": null,
+    ".github/scripts/survey-cloud-checks.mjs": null,
+    ".github/scripts/survey-cloud.test.mjs": null,
+    ".github/evidence/survey-cloud/reviewed-local.json": null,
+    ".github/workflows/ci-survey-cloud.yml": null,
+    ".github/scripts/content-scope.mjs": "7d9e374393d666acc55870157614eb251196541f",
+    ".github/scripts/merge-gate.mjs": "5ef5fec7bdfb687fe7944c9bb7638dd8b61ee7b5",
+    ".github/workflows/ci.yml": "97950d656a7ec52822dcb55ec337bafd94587c69",
+    "docs/release/README.md": "a8384a84996abfdabff64eb55d5e1aab863c7fa0"
+  },
+  "components": {
+    "frontend": "d872b94ac91f36f5e681d11fa79d00e5cc5016a3",
+    "backend": "73dc1454d3257dfb70924b8f6d3dd282bf9b4b54"
+  },
+  "protectedInputs": {
+    "server-version/frontend/package.json": "84089551a17c85d00f03a36081fe78e6374f0716",
+    "server-version/frontend/package-lock.json": "70318f94fe631d8292f567cf421f97e7d5613b31",
+    "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7",
+    "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
+    ".github/release-tools/package-lock.json": "b7731f8e3b798e08d1693a9c7b108405d183f45e"
+  },
+  "evidence": {
+    ".github/evidence/survey-cloud/reviewed-local.json": "1962007d7aba40b1c529590c8f3c9772d0cf9eaeb4b28c027234cc5145474a6e"
+  }
+}

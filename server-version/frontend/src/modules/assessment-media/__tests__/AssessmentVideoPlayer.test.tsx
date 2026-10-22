@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import AssessmentVideoPlayer from '../AssessmentVideoPlayer'
 import type { AssessmentVideoPresentationV1 } from '../types'
 
@@ -45,6 +45,8 @@ const setFullPlayedCoverage = (video: HTMLVideoElement, duration = 10) => {
 }
 
 describe('AssessmentVideoPlayer', () => {
+  beforeEach(() => { vi.spyOn(HTMLMediaElement.prototype, 'pause').mockImplementation(() => undefined) })
+  afterEach(() => vi.restoreAllMocks())
   it('uses native streaming URLs directly and exposes poster, captions, transcript, and controls', () => {
     render(<AssessmentVideoPlayer presentation={presentation} sources={sources} />)
     const video = screen.getByLabelText('测评示例视频') as HTMLVideoElement
@@ -72,6 +74,44 @@ describe('AssessmentVideoPlayer', () => {
     expect(screen.getByText('缓冲视频中…')).toBeInTheDocument()
     fireEvent.playing(video)
     expect(screen.queryByText('缓冲视频中…')).not.toBeInTheDocument()
+  })
+
+  it('keeps a ready video ready when the saved completion marker changes', () => {
+    const onViewingComplete = vi.fn().mockResolvedValue(undefined)
+    const { rerender } = render(<AssessmentVideoPlayer presentation={presentation} sources={sources} requiredViewing onViewingComplete={onViewingComplete} />)
+    const video = screen.getByLabelText('测评示例视频') as HTMLVideoElement
+    fireEvent.loadedMetadata(video)
+    setFullPlayedCoverage(video)
+    fireEvent.ended(video)
+    expect(onViewingComplete).toHaveBeenCalledTimes(1)
+    rerender(<AssessmentVideoPlayer presentation={presentation} sources={sources} requiredViewing viewingComplete onViewingComplete={onViewingComplete} />)
+    expect(screen.getByText('视频已完整观看，可以继续。')).toBeInTheDocument()
+    expect(screen.queryByText('加载视频中…')).not.toBeInTheDocument()
+  })
+
+  it('replays the completed source without waiting for another metadata event', async () => {
+    const play = vi.spyOn(HTMLMediaElement.prototype, 'play').mockResolvedValue(undefined)
+    const { rerender } = render(<AssessmentVideoPlayer presentation={presentation} sources={sources} requiredViewing />)
+    const video = screen.getByLabelText('测评示例视频') as HTMLVideoElement
+    fireEvent.loadedMetadata(video)
+    Object.defineProperty(video, 'ended', { configurable: true, value: true })
+    video.currentTime = 10
+    rerender(<AssessmentVideoPlayer presentation={presentation} sources={sources} requiredViewing viewingComplete />)
+    fireEvent.click(screen.getByRole('button', { name: '播放视频' }))
+    await waitFor(() => expect(play).toHaveBeenCalledTimes(1))
+    expect(video.currentTime).toBe(0)
+    expect(screen.queryByText('加载视频中…')).not.toBeInTheDocument()
+    play.mockRestore()
+  })
+
+  it('resets loading only for a changed media source and clears it on readiness', () => {
+    const { rerender } = render(<AssessmentVideoPlayer presentation={presentation} sources={sources} viewingComplete />)
+    const video = screen.getByLabelText('测评示例视频')
+    fireEvent.loadedMetadata(video)
+    rerender(<AssessmentVideoPlayer presentation={presentation} sources={{ ...sources, videoUrl: '/another-video' }} viewingComplete />)
+    expect(screen.getByText('加载视频中…')).toBeInTheDocument()
+    fireEvent.canPlay(video)
+    expect(screen.queryByText('加载视频中…')).not.toBeInTheDocument()
   })
 
   it('provides explicit retry without anti-download or developer-tool interception semantics', async () => {

@@ -2,9 +2,10 @@ import React from 'react'
 
 interface FooterProps {
   variant?: 'light' | 'dark'
+  productName?: string
 }
 
-const Footer: React.FC<FooterProps> = ({ variant = 'light' }) => {
+const Footer: React.FC<FooterProps> = ({ variant = 'light', productName = '培训管理平台' }) => {
   const isDark = variant === 'dark'
 
   return (
@@ -14,7 +15,7 @@ const Footer: React.FC<FooterProps> = ({ variant = 'light' }) => {
       } border-t ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
     >
       <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-sm">
-        <span>© {new Date().getFullYear()} 培训管理平台</span>
+        <span>© {new Date().getFullYear()} {productName}</span>
         <span className="hidden sm:inline">|</span>
         <a
           href="https://beian.miit.gov.cn/"

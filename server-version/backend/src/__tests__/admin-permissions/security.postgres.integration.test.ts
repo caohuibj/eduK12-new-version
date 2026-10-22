@@ -38,7 +38,7 @@ async function enroll(userId:string,k=key()){
 suite('WebAuthn cryptographic boundaries, real PostgreSQL (synthetic keys)',()=>{
   beforeAll(async()=>{
     if(!new URL(process.env.DATABASE_URL!).pathname.startsWith('/eduk12_admin_permissions_'))throw new Error('Disposable DB required')
-    process.env.ADMIN_WEBAUTHN_RP_ID='localhost';process.env.ADMIN_WEBAUTHN_ORIGIN='http://localhost:5174'
+    process.env.ADMIN_WEBAUTHN_RP_ID='localhost';process.env.ADMIN_WEBAUTHN_ORIGIN='http://localhost:5174';process.env.ADMIN_AUTH_ORIGIN='http://localhost:5174'
     db=(await import('../../config/database')).prisma;security=await import('../../modules/admin-permissions/security')
   })
   afterAll(()=>db?.$disconnect())

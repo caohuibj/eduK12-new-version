@@ -137,7 +137,8 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
     setDirty(changedWhileSaving);setPreview(null);setBulk(null);setUndo(null)
     await refreshAfterWrite(instrumentPage)
     setNotice(changedWhileSaving?'本次草稿已保存；保存期间产生的新修改仍待保存。'
-      :'草稿已保存；可在编制区发布测量版本，波次冻结另行进行')
+      :snapshot.kind==='FORM'?'表单草稿已保存；请到「发布与采集」选择本表单，检查并冻结波次。'
+        :'草稿已保存；可在编制区发布测量版本，波次冻结另行进行')
   })}
   const publishMeasurement=()=>{if(!active||dirty||!measurementWritable||active.status==='ARCHIVED')return;void run(async()=>{
     const result=await publishSurveyMeasurement(api,projectId,active)
@@ -236,7 +237,7 @@ export function SurveyBuilder({projectId,projectStatus='DRAFT',instrumentLibrary
       }
     })
   }
-  return <section className="survey-builder-shell bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="Survey Research Builder">
+  return <section className="survey-builder-shell survey-studio-surface bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="Survey Research Builder">
     <header><h2 className="text-xl font-semibold">研究工具 · Builder</h2>
       <p className="text-sm text-slate-600">创建表单、心理量表、情境测验和受控认知任务。自编工具默认私有，供本项目使用；量表可另行申请进入共用库，须经系统管理员审批。</p>
     </header>
