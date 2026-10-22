@@ -121,11 +121,11 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta}:FieldsPr
             <button type="button" className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,options:[...x.options,newOption()]}))}>增加选项</button>
           </div>}
           {questionKey&&mediaFields}
-          {(!questionKey||value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type))&&<FormSettings compact={!!questionKey} title="其他填写与互斥选项">
+          {(!questionKey||value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type))&&<FormSettings compact={!!questionKey} title="选项补充设置">
           {value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type)&&
             <div className="border rounded-lg p-3 space-y-3">
-              <label className="block text-sm">其他，请填写（不选则不记录文本）
-                <select className="input block w-full" value={q.otherOptionKey??''}
+              <label className="block text-sm">选择后填写文字
+                <select className="input block w-full" aria-describedby={'survey-form-'+q.itemKey+'-other-help'} value={q.otherOptionKey??''}
                   onChange={e=>setQuestion(pi,qi,x=>({...x,
                     otherOptionKey:e.target.value||undefined,
                     otherMaxLength:e.target.value?(x.otherMaxLength??300):undefined}))}>
@@ -134,15 +134,17 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta}:FieldsPr
                     {o.label||o.optionKey}</option>)}
                 </select>
               </label>
+              <p className="survey-form-setting-note" id={'survey-form-'+q.itemKey+'-other-help'}>为选中的选项附加文字输入框，例如“其他，请说明”。被试选择该选项后可补充文字，未选择时不记录这段文字。</p>
               {q.otherOptionKey&&<label className="block text-sm">其他文字长度上限
                 <input className="input block w-full" type="number" min="1" max="2000" step="1"
                   value={q.otherMaxLength??300}
                   onChange={e=>setQuestion(pi,qi,x=>({...x,otherMaxLength:Number(e.target.value)}))}/>
               </label>}
               {q.type==='MULTIPLE'&&<fieldset className="space-y-2">
-                <legend className="text-sm">互斥选项（选中后排除其他所有选项）</legend>
+                <legend className="text-sm">不可与其他选项同时选择</legend>
+                <p className="survey-form-setting-note" id={'survey-form-'+q.itemKey+'-exclusive-help'}>例如“以上均无”：被试选中它后，其他已选选项会被取消。此设置仅用于多选题。</p>
                 {q.options.map(o=><label className="flex items-center gap-2 text-sm" key={o.optionKey}>
-                  <input type="checkbox" checked={q.exclusiveOptionKeys?.includes(o.optionKey)??false}
+                  <input type="checkbox" aria-describedby={'survey-form-'+q.itemKey+'-exclusive-help'} checked={q.exclusiveOptionKeys?.includes(o.optionKey)??false}
                     onChange={e=>setQuestion(pi,qi,x=>({...x,
                       exclusiveOptionKeys:e.target.checked?
                         [...(x.exclusiveOptionKeys??[]),o.optionKey]:
@@ -173,9 +175,11 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta}:FieldsPr
             </select></label>}
           </div></FormSettings>}
           {(!questionKey||previous.length>0)&&<FormSettings compact={!!questionKey} title="条件显示">
-          {previous.length>0&&<div className="grid sm:grid-cols-2 gap-3">
-            <label className="block text-sm">显示条件
-              <select className="input block w-full" value={q.displayIf?.itemKey||''}
+          {previous.length>0&&<div className="space-y-3">
+            <p className="survey-form-setting-note" id={'survey-form-'+q.itemKey+'-condition-help'}>满足以下条件时显示本题。例如：前题“是否参加过培训”选择“是”，才显示本题“参加过哪些培训”。选择“始终显示”则不受前题答案影响。</p>
+            <div className="grid sm:grid-cols-2 gap-3">
+            <label className="block text-sm">依据哪道题
+              <select className="input block w-full" aria-describedby={'survey-form-'+q.itemKey+'-condition-help'} value={q.displayIf?.itemKey||''}
                 onChange={e=>{const item=previous.find(a=>a.itemKey===e.target.value)
                   setQuestion(pi,qi,x=>({...x,displayIf:item?{itemKey:item.itemKey,operator:item.type==='MULTIPLE'?'INCLUDES':'EQUALS',optionKey:item.options[0]?.optionKey||''}:undefined}))
                 }}>
@@ -183,13 +187,15 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta}:FieldsPr
                 {previous.map(item=><option value={item.itemKey} key={item.itemKey}>{item.prompt||item.itemKey}</option>)}
               </select>
             </label>
-            {q.displayIf&&<label className="block text-sm">前题选项
-              <select className="input block w-full" value={q.displayIf.optionKey}
+            {q.displayIf&&<label className="block text-sm">选中哪个选项
+              <select className="input block w-full" aria-describedby={'survey-form-'+q.itemKey+'-condition-result'} value={q.displayIf.optionKey}
                 onChange={e=>setQuestion(pi,qi,x=>({...x,displayIf:{...q.displayIf!,optionKey:e.target.value}}))}>
                 {(previous.find(item=>item.itemKey===q.displayIf?.itemKey)?.options||[]).map(o=>
                   <option key={o.optionKey} value={o.optionKey}>{o.label||o.optionKey}</option>)}
               </select>
             </label>}
+            </div>
+            <p className="survey-form-setting-note" id={'survey-form-'+q.itemKey+'-condition-result'}>前题为多选时，包含指定选项即可显示。未作答或条件不满足时，本题隐藏，其答案不计入提交结果。</p>
           </div>}
           </FormSettings>}
         </article>

@@ -168,6 +168,7 @@
 .survey-researcher .is-form .survey-form-question :is(input,select,textarea):focus { border-color:#74a99a; }
 .survey-researcher .is-form .survey-form-commit-actions { display:flex; align-items:center; gap:.6rem; padding:.8rem; border:1px solid #dce9e2; border-radius:.6rem; background:#f0f7f3; }
 .survey-form-save-caption { margin-left:auto; font-size:.7rem; color:#82998c; }
+.survey-form-setting-note { margin:.35rem 0 0; color:#6c8580; font-size:.75rem; line-height:1.8; }
 .survey-researcher .is-form .survey-form-field-budget { color:#90a49b; padding-top:.1rem; font-size:.7rem; }
 @media(max-width:40rem){.survey-form-save-caption{flex-basis:100%;margin-left:0}.survey-researcher .is-form .survey-form-question-settings > :not(summary){margin:.7rem}}
 @media(prefers-reduced-motion:reduce){.survey-researcher .is-form .survey-form-directory li > button{transition:none}}
