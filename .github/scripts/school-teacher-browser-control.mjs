@@ -1,8 +1,10 @@
 import assert from 'node:assert/strict';
+import {createHash} from 'node:crypto';
 import {readFileSync,writeFileSync,mkdirSync,realpathSync,existsSync,rmSync} from 'node:fs';
 import {resolve,join,dirname} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
+import {verifyReceipt,expectedManifest,restoreBuilds} from './school-teacher-browser-reuse.mjs';
 export const branch='ci/school-teacher-browser-20261022';
 export function allowed(env,event){
  return env.GITHUB_EVENT_NAME==='push' && env.GITHUB_REPOSITORY==='caohuibj/eduK12-new-version' && env.GITHUB_REF==='refs/heads/'+branch && event.deleted===false;
@@ -18,11 +20,14 @@ export function preflight(env=process.env){
  assertCleanTree();
  return {sourceCommit:head,ciRunId:env.GITHUB_RUN_ID,mergeQualification:false};
 }
+export function safeReuseFailure(error){return 'Official build restore refused; no rebuild fallback. Diagnostic SHA256 '+createHash('sha256').update(String(error)).digest('hex');}
 export const shots=['scale-author-preview','form-author-editor','form-author-preview','fixed-version-selection-preview','scale-answer','personal-fixed-version-report','typed-single-restored','typed-multiple','typed-matrix-row-refusal','form-completed-no-score'];
-export function verifyReport(report,{head,tree,runId,frontend,backend},readScreenshot){
+export function verifyReport(report,{head,tree,runId,frontend,backend,reuse},readScreenshot){
  assert.equal(report.schemaVersion,1);assert.equal(report.status,'PASSED');assert.deepEqual(report.errors,[]);
  assert.deepEqual(report.source,{head,tree});
- for(const kind of ['frontend','backend']){const m=report.inputs[kind];assert.deepEqual(m,kind==='frontend'?frontend:backend);assert.equal(m.sha,head);assert.equal(m.runId,runId);assert.equal(m.kind,kind);}
+ assert.deepEqual(report.startups,[{product:'SCHOOL',corsOrigin:'https://school.eduk12.top',ready:true,phase:'READY'},{product:'TEACHER',corsOrigin:'https://teacher.eduk12.top',ready:true,phase:'READY'}]);
+ verifyReceipt(reuse,head,runId);assert.deepEqual(report.buildReuse,reuse);
+ for(const kind of ['frontend','backend']){const m=report.inputs[kind];assert.deepEqual(m,kind==='frontend'?frontend:backend);assert.deepEqual(m,expectedManifest(kind));}
  const expected=[];
  for(const product of ['SCHOOL','TEACHER'])for(const check of ['author-SCALE','author-FORM','fixed-version-preview-publish',`separate-${product==='SCHOOL'?'STUDENT':'TEACHER'}-SELF-SCALE`,`separate-${product==='SCHOOL'?'STUDENT':'TEACHER'}-SELF-FORM`])expected.push(product+':'+check);
  expected.push('TEACHER:ordinary-psychology-author-real-API');
@@ -47,13 +52,16 @@ export function verifyReport(report,{head,tree,runId,frontend,backend},readScree
   for(const c of s.consoleErrors)assert(c.network&&s.failedResponses.some(f=>f.path===c.path&&s.expectedFailures.includes(f.path+':'+f.status)));
  }
  assert(report.notCovered.some(s=>/storage/i.test(s)));assert(report.notCovered.some(s=>/TLS/.test(s)));
- return {schemaVersion:1,status:'PASSED',sourceCommit:head,tree,ciRunId:runId,mergeQualification:false,scope:'Standalone School/Teacher synthetic browser diagnostic',coverage:11,screenshots:40,notCovered:report.notCovered};
+ return {schemaVersion:1,status:'PASSED',sourceCommit:head,tree,ciRunId:runId,mergeQualification:false,scope:'Standalone School/Teacher synthetic browser diagnostic',coverage:11,screenshots:40,buildReuse:reuse,notCovered:report.notCovered};
 }
 
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
- const command=process.argv[2];assert(['preflight','report','cleanup'].includes(command));
+ const command=process.argv[2];assert(['preflight','report','cleanup','restore'].includes(command));
  const identity=preflight();
- if(command==='cleanup'){
+ if(command==='restore'){
+  try{await restoreBuilds(identity);console.log('Verified original successful builds; original browser failure retained; browser must execute.');}
+  catch(error){console.error(safeReuseFailure(error));process.exitCode=1;}
+ }else if(command==='cleanup'){
   const root=realpathSync(process.env.RUNNER_TEMP),target=resolve(process.env.SCHOOL_TEACHER_PRIVATE_DIR);
   assert.equal(target,join(root,'school-teacher-private'));assert.equal(realpathSync(dirname(target)),root);
   if(existsSync(target)){assert.equal(realpathSync(target),target);rmSync(target,{recursive:true});}
@@ -65,7 +73,8 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
   const backend=JSON.parse(readFileSync(join(workspace,'server-version/backend/dist/ci-build-manifest.json'),'utf8'));
   const report=JSON.parse(readFileSync(join(out,'browser.json'),'utf8'));
   const tree=execFileSync('git',['rev-parse','HEAD^{tree}'],{encoding:'utf8'}).trim();
-  const accepted=verifyReport(report,{head:identity.sourceCommit,tree,runId:identity.ciRunId,frontend,backend},file=>readFileSync(join(out,file)));
+  const reuse=JSON.parse(readFileSync(join(out,'reused-builds.json'),'utf8'));
+  const accepted=verifyReport(report,{head:identity.sourceCommit,tree,runId:identity.ciRunId,frontend,backend,reuse},file=>readFileSync(join(out,file)));
   writeFileSync(join(out,'acceptance.json'),JSON.stringify(accepted,null,2)+'\n');
  }
 }
