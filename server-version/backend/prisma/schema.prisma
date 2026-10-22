@@ -1248,6 +1248,7 @@ model CompositeAssessment {
   trainingTimingPolicy Json? @map("training_timing_policy")
   timingExportEnabled Boolean @default(false) @map("timing_export_enabled")
   compositionTemplates AssessmentCompositionTemplate[]
+  // FORM_TEMPLATE is a private editable definition; DB constraint prevents delivery.
   productKind         String @default("LEGACY_COMPOSITE") @map("product_kind")
   questionnaireType   QuestionnaireType? @map("questionnaire_type")
   revision            Int @default(0)

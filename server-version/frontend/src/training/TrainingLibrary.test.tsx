@@ -80,10 +80,18 @@ it('does not present a failed request as an empty library',async()=>{
  mocks.get.mockRejectedValue(new Error('连接中断'));show();expect(await screen.findByRole('alert')).toHaveTextContent('连接中断');expect(screen.queryByText('暂无符合条件的工具')).not.toBeInTheDocument()
 })
 
-it('routes a plain form directly to content editing without report controls',async()=>{
- mocks.get.mockResolvedValue({code:0,data:{list:[{...own,kind:'form-composition',status:'DRAFT'}],total:1}});show()
- expect(await screen.findByRole('link',{name:'编辑'})).toHaveAttribute('href','/questionnaire-products/own')
+it('routes an independent form to its form editor without report controls',async()=>{
+ mocks.get.mockResolvedValue({code:0,data:{list:[{...own,kind:'form-template',status:'DRAFT',href:'/toolkit/forms/own'}],total:1}});show()
+ expect(await screen.findByRole('link',{name:'编辑'})).toHaveAttribute('href','/toolkit/forms/own')
  expect(screen.queryByRole('link',{name:'配置与报告'})).not.toBeInTheDocument()
+})
+it('copies existing form content into an independent form without changing its original questionnaire',async()=>{
+ mocks.get.mockResolvedValue({code:0,data:{list:[{...own,kind:'form-composition',version:'4',status:'DRAFT'}],total:1}})
+ mocks.post.mockResolvedValue({code:0,data:{id:'saved-form'}})
+ render(<MemoryRouter initialEntries={['/toolkit']}><Routes><Route path="/toolkit" element={<TrainingLibrary area="tools"/>}/><Route path="/toolkit/forms/:id" element={<p>独立表单编辑</p>}/></Routes></MemoryRouter>)
+ fireEvent.click(await screen.findByRole('button',{name:'存为独立表单'}))
+ expect(await screen.findByText('独立表单编辑')).toBeInTheDocument()
+ expect(mocks.post).toHaveBeenCalledExactlyOnceWith('/questionnaire-products/form-templates',expect.objectContaining({name:'我的工具',source:{id:'own',kind:'COMPOSITE',revision:4}}))
 })
 
 it('automatically dismisses a successful rename after five seconds',async()=>{

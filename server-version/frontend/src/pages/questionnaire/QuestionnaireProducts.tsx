@@ -1,3 +1,5 @@
+import { FormTemplatePicker } from './FormTemplatePicker'
+import './form-template-editor.css'
 import { CatalogFilters, CatalogPagination } from '../../training/TrainingCatalogControls'
 import { useCatalogQuery } from '../../training/useCatalogQuery'
 import { TrainingQuestionnaireList } from './TrainingQuestionnaireList'
@@ -206,7 +208,7 @@ type PendingCognitivePublication={actorId:string;id:string;revision:number;itemI
 function readPendingCognitivePublication(key:string,actorId:string,id:string):PendingCognitivePublication|null{
   try{const value=JSON.parse(sessionStorage.getItem(key)||'null');return value&&value.actorId===actorId&&value.id===id&&Number.isSafeInteger(value.revision)&&value.revision>=0&&Array.isArray(value.itemIds)&&value.itemIds.length>0&&value.itemIds.every((item:unknown)=>typeof item==='string')?{...value,hadUnknownOutcome:value.hadUnknownOutcome!==false}:null}catch{return null}
 }
-export function QuestionnaireProductEdit() {
+export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplate?: boolean } = {}) {
   const trainingDesign = isTrainingHost()
   const cognitiveEnabled = useCognitiveEnabled()
   const { user } = useAuth()
@@ -214,8 +216,8 @@ export function QuestionnaireProductEdit() {
   const { id = 'new' } = useParams()
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const preselectedScaleId = searchParams.get('scaleId')
-  const preselectedCourseId = searchParams.get('courseId')
+  const preselectedScaleId = formTemplate ? null : searchParams.get('scaleId')
+  const preselectedCourseId = formTemplate ? null : searchParams.get('courseId')
   const [detail, setDetail] = useState<any>(null)
   const [catalog, setCatalog] = useState<any>({
     scales: [],
@@ -226,7 +228,7 @@ export function QuestionnaireProductEdit() {
   const [name, setName] = useState('')
   const [instruction, setInstruction] = useState('')
   const [description, setDescription] = useState('')
-  const [kind, setKind] = useState('COURSE')
+  const [kind, setKind] = useState(formTemplate ? 'GENERAL' : 'COURSE')
   const [courseIds, setCourseIds] = useState<string[]>([])
   const [publicEnabled, setPublic] = useState(false)
   const [feedbackMode, setFeedbackMode] = useState<TrainingFeedbackPolicy['mode']>('IMMEDIATE')
@@ -244,12 +246,13 @@ export function QuestionnaireProductEdit() {
   const [maxAttempts, setMaxAttempts] = useState(1)
   const [expiresAt, setExpiry] = useState('')
   const [opensAt, setOpens] = useState('')
-  const [type, setType] = useState('SCALE')
+  const [type, setType] = useState(formTemplate ? 'FORM' : 'SCALE')
   const [selected, setSelected] = useState('')
   useEffect(() => {
     if (!cognitiveEnabled && type === 'COGNITIVE') { setType('SCALE'); setSelected('') }
   }, [cognitiveEnabled, type])
 
+  const [editingFormItem, setEditingFormItem] = useState<any>(null)
   const [formLabel, setFormLabel] = useState('')
   const [editingUnit, setEditingUnit] = useState('')
   const location = useLocation()
@@ -304,16 +307,30 @@ export function QuestionnaireProductEdit() {
     const first = orderedFormItems.findIndex((item: any) => item.formSectionId === section.id)
     return first >= 0 && orderedFormItems.slice(first).every((item: any) => item.type === 'FORM' && item.formSectionId === section.id)
   })
-  const effectiveFormSection = trainingDesign
+  const effectiveFormSection = editingFormItem ? editingFormItem.formSectionId : trainingDesign
     ? !startNewFormStage && !contextKey ? currentFormStage?.id ?? '' : ''
     : targetFormSection
   const conditionSources = (detail?.formSections?.find((section: any) => section.id === effectiveFormSection)?.items ?? [])
-    .filter((item: any) => ['SINGLE', 'MULTIPLE'].includes(item.formDefinition?.type))
+    .filter((item: any) => ['SINGLE', 'MULTIPLE'].includes(item.formDefinition?.type) && (!editingFormItem || (item.formSectionPosition ?? item.position) < (editingFormItem.formSectionPosition ?? editingFormItem.position)))
   const selectNewFormStage = (enabled: boolean) => {
     setStartNewFormStage(enabled)
     setFormConstraints(previous => ({ ...previous, displayIf: undefined }))
   }
   const [required, setRequired] = useState(true)
+  const editFormItem = (item: any) => {
+    setEditingFormItem(item); setType('FORM'); setFormLabel(item.formLabel); setFormType(item.formType)
+    setRequired(item.required); setContext(item.contextKey || '')
+    const constraints = {...(item.formDefinition || {})}; delete constraints.itemKey; setFormConstraints(constraints)
+    setPolicyEnabled(Boolean(item.formPolicy)); setRequiredRefusal(item.formPolicy?.requiredRefusal || 'BLOCK_SUBMIT'); setHiddenRequired(item.formPolicy?.hiddenRequired || 'EXEMPT')
+    setAdvancedFormOpen(Boolean(item.formPolicy)); setStartNewFormStage(false)
+    const choices = item.formDefinition?.options?.map((option: any) => ({value:option.optionKey,label:option.label})) || item.formOptions || []
+    setChoiceDrafts(choices.length ? choices.map((option: any) => ({...option,id:crypto.randomUUID()})) : emptyChoices('option'))
+    const rows = item.formDefinition?.rows || []
+    setMatrixDrafts(rows.length ? rows.map((row: any) => ({id:crypto.randomUUID(),value:row.rowKey,label:row.label})) : emptyChoices('row'))
+    requestAnimationFrame(() => document.querySelector<HTMLInputElement>('#form-template-question-label')?.focus())
+  }
+  const cancelFormEdit = () => { setEditingFormItem(null); setFormLabel(''); setFormConstraints({}); setContext(''); setPolicyEnabled(false); setRequired(true); setChoiceDrafts(emptyChoices('option')); setMatrixDrafts(emptyChoices('row')) }
+
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
   const selectionRisk = useRef({dirty:false,pending:false,busy:false})
@@ -344,7 +361,10 @@ export function QuestionnaireProductEdit() {
   const [expiryError, setExpiryError] = useState('')
   const [requestId] = useState(() => crypto.randomUUID())
   const hydrate = (row: any) => {
-    setDetail(row)
+    const formItems = new Map<string, any>((row.formSections || []).flatMap((section:any) => (section.items || []).map((item:any) => [item.id, {...item,formSectionId:section.id}])))
+    // Teacher item summaries nest Form fields; section definitions carry the
+    // complete authoring payload and stable stage identity.
+    setDetail({...row,items:(row.items || []).map((item:any) => item.type === 'FORM' ? {...item,...formItems.get(item.id)} : item)})
     setName(row.name)
     setInstruction(row.instruction || '')
     setDescription(row.description || '')
@@ -375,8 +395,8 @@ export function QuestionnaireProductEdit() {
     let active = true
     setDetail(null)
     setError('')
-    request('/resources')
-      .then(async row => {
+    const resourcesRequest = formTemplate ? Promise.resolve({scales:[],cognitive:[],situational:[],courses:[]}) : request('/resources')
+    resourcesRequest.then(async row => {
         if (!active) return
         const courses: Array<{ id: string; title: string }> = row.courses || []
         const supplemental = id === 'new'
@@ -399,9 +419,14 @@ export function QuestionnaireProductEdit() {
         }
       })
       .catch((e) => { if (active) setError(message(e)) })
-    if (id !== 'new') void request('/' + id).then(row => { if (active) hydrate(row) }).catch(e => { if (active) setError(message(e)) })
+    if (id !== 'new') void request('/' + id).then(row => {
+      if (!active) return
+      if (formTemplate && row.productKind !== 'FORM_TEMPLATE') throw new Error('请从工具列表将此内容存为独立表单，原问卷保持不变。')
+      if (!formTemplate && row.productKind === 'FORM_TEMPLATE') { navigate('/toolkit/forms/' + id, { replace: true }); return }
+      hydrate(row)
+    }).catch(e => { if (active) setError(message(e)) })
     return () => { active = false }
-  }, [id, preselectedScaleId, preselectedCourseId, user?.id])
+  }, [id, preselectedScaleId, preselectedCourseId, user?.id, formTemplate, navigate])
   const action = async (fn: () => Promise<void>, measurementRecovery = false) => {
     if(externalToolPending){setError('请先在工具中核对未确认的参数／报告请求，再修改组合测评。');return}
     if(pendingMeasurement&&!measurementRecovery){setError('请先恢复或明确结束原认知发布请求，再修改组合测评。');return}
@@ -525,12 +550,8 @@ export function QuestionnaireProductEdit() {
     }
     return action(async () => {
       if (id === 'new') {
-        const row = await request('', {
-          ...metadata(),
-          questionnaireType: kind,
-          requestId,
-        })
-        { const next=new URLSearchParams(location.search);if(preselectedScaleId)next.set('scaleId',preselectedScaleId);navigate(base+'/'+row.id+(next.size?'?'+next.toString():'')+(trainingDesign?'#questionnaire-content':''),{replace:true}) }
+        const row = await request(formTemplate ? '/form-templates' : '', formTemplate ? {name:name.trim(),description,instruction,requestId} : { ...metadata(), questionnaireType: kind, requestId })
+        { const next=new URLSearchParams(location.search);if(preselectedScaleId)next.set('scaleId',preselectedScaleId);navigate((formTemplate?'/toolkit/forms':base)+'/'+row.id+(next.size?'?'+next.toString():'')+(trainingDesign?'#questionnaire-content':''),{replace:true}) }
       } else {
         let row = detail
         // Disable first so delivery can leave Training without an active config.
@@ -591,17 +612,18 @@ export function QuestionnaireProductEdit() {
         Object.assign(item, {
           formLabel,
           formType,
-          ...(typedFormType ? { formDefinition: { ...formConstraints, type: typedFormType, prompt: formLabel, required, options: [...structuredOptionTypes,'SINGLE','MULTIPLE'].includes(typedFormType) ? formOptions.map(option => ({ optionKey: option.value, label: option.label })) : [], rows: ['MATRIX', 'MATRIX_MULTIPLE'].includes(typedFormType) ? formRows.map(row => ({ rowKey: row.value, label: row.label })) : [], ...(typedFormType === 'CONSTANT_SUM' ? { total: formConstraints.total ?? 100 } : {}), ...(typedFormType === 'TIME' ? { timeZone: formConstraints.timeZone ?? 'Asia/Shanghai' } : {}) } } : {}),
+          ...(typedFormType ? { formDefinition: { ...formConstraints, type: typedFormType, prompt: formLabel, required, options: [...structuredOptionTypes,'SINGLE','MULTIPLE'].includes(typedFormType) ? formOptions.map(option => ({ ...(editingFormItem?.formDefinition?.options?.find((old:any) => old.optionKey === option.value) || {}), optionKey: option.value, label: option.label })) : [], rows: ['MATRIX', 'MATRIX_MULTIPLE'].includes(typedFormType) ? formRows.map(row => ({ ...(editingFormItem?.formDefinition?.rows?.find((old:any) => old.rowKey === row.value) || {}), rowKey: row.value, label: row.label })) : [], ...(typedFormType === 'CONSTANT_SUM' ? { total: formConstraints.total ?? 100 } : {}), ...(typedFormType === 'TIME' ? { timeZone: formConstraints.timeZone ?? 'Asia/Shanghai' } : {}) } } : {}),
           ...(policyEnabled ? {formPolicy:{version:3,requiredRefusal,hiddenRequired}}:{}),
           contextKey: contextKey || null,
           formOptions: ['single_choice', 'multiple_choice'].includes(formType)
-            ? formOptions
+            ? formOptions.map(option => ({ ...(editingFormItem?.formOptions?.find((old:any) => old.value === option.value) || {}), ...option }))
             : null,
         })
       hydrate(
-        await request('/' + id + '/items', { revision: detail.revision, item, ...(type==='FORM'&&effectiveFormSection?{formSectionId:effectiveFormSection}:{}) }),
+        await request('/' + id + (editingFormItem ? '/form-items/' + editingFormItem.id : '/items'), { revision: detail.revision, item, ...(!editingFormItem&&type==='FORM'&&effectiveFormSection?{formSectionId:effectiveFormSection}:{}) }, editingFormItem ? 'put' : 'post'),
       )
       setSelected('')
+      if (editingFormItem) cancelFormEdit()
       setFormLabel('')
       if (trainingDesign) {
         setStartNewFormStage(false)
@@ -904,12 +926,13 @@ export function QuestionnaireProductEdit() {
                       </fieldset>}
   </>
   const addContentControls = <>
+    {trainingDesign && !formTemplate && draft && type === 'FORM' && <FormTemplatePicker excludeId={id} disabled={busy || dirty || authoringLocked} onImport={source => void action(async () => { hydrate(await request('/' + id + '/import-form', { revision: detail.revision, source })); setPreflight(null) })}/>}
               {draft && (
                 <fieldset
                   disabled={busy || dirty || authoringLocked}
                   className="space-y-3 border rounded p-4"
                 >
-                  <legend>添加内容</legend>{trainingDesign && <div className="qt-type-tabs" role="group" aria-label="内容类型">{([
+                  <legend>{editingFormItem ? '编辑表单题目' : formTemplate ? '添加表单题目' : '添加内容'}</legend>{trainingDesign && !formTemplate && <div className="qt-type-tabs" role="group" aria-label="内容类型">{([
       ['SCALE','量表',BookOpen], ...(cognitiveEnabled ? [['COGNITIVE','认知测验',Brain] as const] : []),
       ['SITUATIONAL','情境判断',Route], ['FORM','自定义表单',ClipboardList],
     ] as Array<[string,string,typeof BookOpen]>).map(([value,label,Icon]) => <button type="button" key={String(value)} disabled={busy || dirty || authoringLocked} aria-pressed={type === value} onClick={() => { setType(String(value)); setSelected('') }}><Icon size={18} />{String(label)}</button>)}</div>}
@@ -956,6 +979,7 @@ export function QuestionnaireProductEdit() {
                       <label className="block">
                         题目文字
                         <input
+                          id="form-template-question-label"
                           value={formLabel}
                           onChange={(e) => setFormLabel(e.target.value)}
                         />
@@ -997,7 +1021,7 @@ export function QuestionnaireProductEdit() {
                       {trainingDesign ? <details className="qt-advanced qt-form-advanced" open={advancedFormOpen} onToggle={event => setAdvancedFormOpen(event.currentTarget.open)}>
                         <summary>高级答题规则<span>可选</span></summary>
                         <div className="qt-advanced-body">
-                          <section className="qt-form-stage" aria-label="答题阶段设置">
+                          <section hidden={Boolean(editingFormItem)} className="qt-form-stage" aria-label="答题阶段设置">
                             <h3>分段提交</h3>
                             <p>同一阶段内逐题作答，完成后统一提交。普通题目会自动接在当前连续的表单题后面。</p>
                             <p role="status">{contextKey ? '背景信息使用专用阶段，不与普通表单题混合。' : startNewFormStage ? '下一题将开始新的答题阶段，完成后单独提交。' : currentFormStage ? `当前阶段：${currentFormStage.title}（${currentFormStage.items.length} 题）。` : '当前没有可继续的表单阶段，下一题会自动新建。'}</p>
@@ -1027,7 +1051,7 @@ export function QuestionnaireProductEdit() {
                       <label className="block">
                         背景字段
                         <select
-                          aria-label="背景字段"
+                          aria-label="背景字段" disabled={Boolean(editingFormItem)}
                           className="input ml-2 max-w-full"
                           value={contextKey}
                           onChange={(e) => {
@@ -1088,8 +1112,8 @@ export function QuestionnaireProductEdit() {
                     </>
                   )}
                   <ProductButton variant={trainingDesign ? 'primary' : 'secondary'} disabled={trainingDesign && (busy || dirty || (type === 'FORM' ? !formLabel.trim() : !selected))} onClick={() => void add()}>
-                    添加到测评
-                  </ProductButton>
+                    {editingFormItem ? '保存题目修改' : formTemplate ? '添加题目' : '添加到测评'}
+                  </ProductButton>{editingFormItem && <ProductButton disabled={busy} onClick={cancelFormEdit}>取消编辑</ProductButton>}
                 </fieldset>
               )}
   </>
@@ -1140,9 +1164,10 @@ export function QuestionnaireProductEdit() {
                       v.items.map((item: any) => (
                         <div key={item.id}>
                           <span>{item.formLabel || item.label} · {item.required === false ? '选填' : '必填'}</span>
+                          {formTemplate && draft && <ProductButton disabled={busy || dirty || authoringLocked} onClick={() => editFormItem({...item,formSectionId:v.id})}>编辑此题</ProductButton>}
                           {draft && (
                             <ProductButton
-                              disabled={busy || dirty || authoringLocked}
+                              disabled={busy || dirty || authoringLocked || Boolean(editingFormItem)}
                               className="ml-3"
                               onClick={() =>
                                 void action(async () =>
@@ -1174,7 +1199,7 @@ export function QuestionnaireProductEdit() {
             className="questionnaire-basic-grid my-4 rounded border p-4"
           >
             <label className="block">
-              测评名称
+              {formTemplate ? '表单名称' : '测评名称'}
               <input
                 id="questionnaire-product-name"
                 required
@@ -1184,7 +1209,7 @@ export function QuestionnaireProductEdit() {
                   nameError ? 'questionnaire-product-name-error' : undefined
                 }
                 className="input w-full"
-                placeholder="例如：第一期教师研修 · 课前测评"
+                placeholder={formTemplate ? '例如：课前需求、课后反馈、学习记录' : '例如：第一期教师研修 · 课前测评'}
                 value={name}
                 onChange={(e) => {
                   setName(e.target.value)
@@ -1213,7 +1238,7 @@ export function QuestionnaireProductEdit() {
                 onChange={(e) => setInstruction(e.target.value)}
               />
             </label>
-            {draft && <ProductButton variant={id === 'new' || dirty ? 'primary' : 'secondary'} disabled={authoringLocked || busy || (id !== 'new' && !dirty)} onClick={() => void save()}>
+            {!formTemplate && draft && <ProductButton variant={id === 'new' || dirty ? 'primary' : 'secondary'} disabled={authoringLocked || busy || (id !== 'new' && !dirty)} onClick={() => void save()}>
               {id === 'new' ? '创建草稿' : '保存设置'}
             </ProductButton>}
           </fieldset>
@@ -1401,6 +1426,20 @@ export function QuestionnaireProductEdit() {
     {externalToolPending&&<p role="status" className="qt-tool-pending">有一项参数／报告请求尚未确认，请在工具核对后继续修改。</p>}
     <Link to={'/toolkit/compositions/'+id}>在工具中管理参数、参考与报告 →</Link>
   </section>
+  if (formTemplate) return <ProductPage width="management" className="hui-questionnaire-products training-form-management qt-editor qt-form-template-editor">
+    <Link className="qt-breadcrumb" to="/toolkit?kind=form">← 返回工具 · 表单</Link>
+    <PageHeader title={id === 'new' ? '编制表单' : '编辑表单'} description="把常用内容保存为独立表单，之后在组合问卷中整份选用。"
+      actions={<><span className="qt-draft-status">{busy ? '正在保存…' : dirty ? '有未保存的修改' : detail ? `已保存 · 修订 ${detail.revision}` : '新建表单'}</span>{draft && <ProductButton variant="primary" disabled={authoringLocked || busy || (id !== 'new' && !dirty)} onClick={() => void save()}><Save size={16}/>{id === 'new' ? '创建草稿' : '保存表单信息'}</ProductButton>}</>}/>
+    {feedback}{error && <p role="alert" className="qt-error">{error}</p>}
+    {id !== 'new' && !detail ? <p role="status">正在读取表单…</p> : <fieldset disabled={authoringLocked} className="qt-form-template-workspace">
+      <section className="qt-panel" aria-label="表单信息"><header className="qt-panel-heading"><h2>表单信息</h2><p>名称用于检索，指导语在问卷中展示。</p></header><div className="qt-panel-body">{basicSettings}</div></section>
+      {detail && <section className="qt-panel" aria-label="表单题目"><header className="qt-panel-heading"><h2>题目与区段</h2><p>沿用现有表单题型与规则。添加、移除和排序会即时保存。</p><span className="qt-count">{detail.items?.length || 0} 道题目</span></header><div className="qt-panel-body">
+        {dirty && <p role="status" className="qt-note">请先保存表单信息，再调整题目。</p>}{addContentControls}
+        {units.length > 0 ? <div className="qt-unit-editor">{unitList}<div className="qt-unit-config" aria-label="单元配置">{unitConfiguration}</div></div> : <p className="qt-note">先选择题型，添加第一道题目；支持李克特、矩阵及常用输入题。</p>}
+      </div></section>}
+      <p className="qt-note">表单保存在“工具 → 表单”，无需设置投放。组合问卷选用后获得独立副本，不会随此处后续编辑而改变。</p>
+    </fieldset>}
+  </ProductPage>
   if (trainingDesign) return (
     <ProductPage width="management" className="hui-questionnaire-products training-form-management qt-editor">
       <Link className="qt-breadcrumb" to={assessmentContextHref('/questionnaires',location.pathname,location.search)}>组合测评 <span>/</span> {draft ? '编制草稿' : '查看测评'}</Link>

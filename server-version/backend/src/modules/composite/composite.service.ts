@@ -241,7 +241,8 @@ const assertTeacher = (role: UserRole) => {
   if (!isTeacherOrAdmin(role)) throw compositeForbidden('需要教师权限')
 }
 
-const assertOwner = (resource: { createdBy: string | null; productKind?: string }, userId: string, role: UserRole) => {
+const assertOwner = (resource: { createdBy: string | null; productKind?: string }, userId: string, role: UserRole, allowFormTemplate = false) => {
+  if (resource.productKind === 'FORM_TEMPLATE' && !allowFormTemplate) throw compositeForbidden('独立表单不直接投放，请在组合问卷中选用')
   if (resource.productKind === 'ORGANIZATION_RESOURCE') throw compositeForbidden('组织资源请通过测量资源管理与组织报告入口操作')
   if (role === UserRole.ADMIN) return
   if (role !== UserRole.TEACHER || resource.createdBy !== userId) {
@@ -1007,7 +1008,7 @@ export const getCompositeForTeacher = async (userId: string, role: UserRole, id:
   const { ensureCompositeFormSections, listCompositeFormSections } = await import('./final-submit.service')
   await ensureCompositeFormSections(id)
   const composite = await loadComposite(id, true)
-  assertOwner(composite, userId, role)
+  assertOwner(composite, userId, role, true)
   const situationalMetadata = await loadSituationalReleaseMetadata(composite.items.filter((item: any) => item.type === 'SITUATIONAL').map(situationalItemIdentity))
   const counts = await loadAttemptCountsByCompositeIds([composite.id], userId, role)
   const [contentUnits, formSections] = await Promise.all([
