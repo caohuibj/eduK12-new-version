@@ -2,7 +2,7 @@ import { surveyAdminLoginUrl } from '../products/origins'
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { ProductPasswordChange } from '../components/account/ProductPasswordChange'
-import { SurveyBuilder } from './SurveyBuilder'
+import { SurveyBuilder, type BuilderLeaveRisk } from './SurveyBuilder'
 import { SurveyReportStudio, type ReportLeaveRisk } from './SurveyReportStudio'
 import { createInstrumentLibrary } from './instrument-library'
 import { SurveyWaveStudio } from './SurveyWaveStudio'
@@ -46,6 +46,8 @@ export default function SurveyApp(){
   const activeFeature=surveyFeatures.find(feature=>feature.path===window.location.pathname)
   const [screen,setScreen]=useState<'home'|'feature'|'claim'|'reset'|'login'|'mfa'|'work'>(initial)
   const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[enrolled,setEnrolled]=useState(true)
+  const [writeBusy,setWriteBusy]=useState(false)
+  const workInFlight=useRef({total:0,writes:0})
   const [user,setUser]=useState<Researcher|null>(null)
   const [username,setUsername]=useState(''),[password,setPassword]=useState(''),[code,setCode]=useState('')
   const [invite,setInvite]=useState(readInvite),[uri,setUri]=useState(''),[recovery,setRecovery]=useState<string[]>([])
@@ -53,13 +55,11 @@ export default function SurveyApp(){
   const [projects,setProjects]=useState<Project[]>([]),[selected,setSelected]=useState<Project|null>(null)
   const reportLeaveRisk=useRef<ReportLeaveRisk>({dirty:false,pending:false,busy:false})
   const reportRiskChanged=useCallback((risk:ReportLeaveRisk)=>{reportLeaveRisk.current=risk},[])
-  const mayLeaveReport=()=>{
-    const risk=reportLeaveRisk.current
-    if(risk.pending||risk.busy){setError('报告请求尚未确认，请先回到私有报告完成或核对原请求，再离开项目。');return false}
-    return !risk.dirty||window.confirm('报告有未保存的修改。确定放弃这些修改并离开项目？')
-  }
   const [projectPage,setProjectPage]=useState(1)
   const [workspaceSection,setWorkspaceSection]=useState<WorkspaceSection>('settings')
+  const builderLeaveRisk=useRef<BuilderLeaveRisk>({dirty:false,busy:false})
+  const builderRiskChanged=useCallback((risk:BuilderLeaveRisk)=>{builderLeaveRisk.current=risk},[])
+  const [capabilitiesState,setCapabilitiesState]=useState<'loading'|'ready'|'error'>('loading')
   const [available,setAvailable]=useState<{analytics:boolean;publication:boolean}|null>(null)
   const selectedProjectId=selected?.id
   const instrumentLibrary=useMemo(()=>selectedProjectId?createInstrumentLibrary(selectedProjectId):undefined,[selectedProjectId])
@@ -69,8 +69,35 @@ export default function SurveyApp(){
   },[])
   const [title,setTitle]=useState(''),[description,setDescription]=useState('')
   const [mode,setMode]=useState<Project['collectionMode']>('SINGLE_UNLINKED')
-  const work=async(fn:()=>Promise<void>)=>{setBusy(true);setError('');setNotice('')
-    try{await fn()}catch(e){setError(e instanceof Error?e.message:'请求失败')}finally{setBusy(false)}}
+  const settingsDirty=selected?title!==selected.title||description!==selected.description||mode!==selected.collectionMode:!!title.trim()||!!description.trim()||mode!=='SINGLE_UNLINKED'
+  const mayLeaveWorkspace=()=>{
+    const report=reportLeaveRisk.current,builder=builderLeaveRisk.current
+    if(workInFlight.current.writes>0||builder.busy||report.pending||report.busy){setError('当前操作尚未确认，请等待完成或核对结果后再离开项目。');return false}
+    return !(settingsDirty||builder.dirty||report.dirty)||window.confirm('当前研究有未保存的修改（研究设置、工具或报告）。确定放弃这些修改并离开？')
+  }
+  useEffect(()=>{
+    const warn=(event:BeforeUnloadEvent)=>{
+      const report=reportLeaveRisk.current,builder=builderLeaveRisk.current
+      if(screen==='work'&&(settingsDirty||builder.dirty||builder.busy||report.dirty||report.pending||report.busy||writeBusy)){
+        event.preventDefault();event.returnValue=''
+      }
+    }
+    window.addEventListener('beforeunload',warn)
+    return ()=>window.removeEventListener('beforeunload',warn)
+  },[screen,settingsDirty,writeBusy])
+  const loadCapabilities=useCallback(async()=>{
+    setCapabilitiesState('loading')
+    try{setAvailable(await api<{analytics:boolean;publication:boolean}>('/auth/capabilities'));setCapabilitiesState('ready')}
+    catch{setCapabilitiesState('error')}
+  },[])
+  const work=async(fn:()=>Promise<void>,writes=true)=>{
+    workInFlight.current.total++;if(writes)workInFlight.current.writes++
+    setWriteBusy(workInFlight.current.writes>0);setBusy(true);setError('');setNotice('')
+    try{await fn()}catch(e){setError(e instanceof Error?e.message:'请求失败')}finally{
+      workInFlight.current.total--;if(writes)workInFlight.current.writes--
+      setBusy(workInFlight.current.total>0);setWriteBusy(workInFlight.current.writes>0)
+    }
+  }
   const loadProjects=useCallback(async(page=1)=>{
     const r=await api<{list:Project[]}>('/projects?page='+page)
     setProjects(r.list);setProjectPage(page)
@@ -92,9 +119,8 @@ export default function SurveyApp(){
   useEffect(()=>{document.title=activeFeature?activeFeature.title+' | Huisurvey':'Huisurvey · 观风知微';void refresh()},[refresh,activeFeature])
   useEffect(()=>{
     if(initial==='home'||initial==='feature')return
-    void api<{analytics:boolean;publication:boolean}>('/auth/capabilities')
-      .then(setAvailable).catch(()=>setAvailable(null))
-  },[initial])
+    void loadCapabilities()
+  },[initial,loadCapabilities])
   const login=(e:FormEvent)=>{e.preventDefault();void work(async()=>{
     const r=await api<{enrolled:boolean}>('/auth/login','POST',{username,password})
     setEnrolled(r.enrolled);setScreen('mfa');setPassword('');setUri('');setCode('')
@@ -117,29 +143,30 @@ export default function SurveyApp(){
     if(r.recoveryCodes?.length){setRecovery(r.recoveryCodes);setNotice('恢复码仅显示一次，请安全保存')}
     else await refresh(true)
   })
-  const changeAccountPassword=(oldPassword:string,newPassword:string,code?:string)=>{if(!mayLeaveReport())return;void work(async()=>{
+  const changeAccountPassword=(oldPassword:string,newPassword:string,code?:string)=>{if(!mayLeaveWorkspace())return;void work(async()=>{
     await api('/auth/change-password','POST',{oldPassword,newPassword,code})
-    setUser(null);setProjects([]);setSelected(null);setScreen('login')
+    setUser(null);setProjects([]);setSelected(null);setTitle('');setDescription('');setMode('SINGLE_UNLINKED');setScreen('login')
     setNotice('密码已修改，旧研究者会话已经失效，请重新登录')
   })}
-  const logout=()=>{if(!mayLeaveReport())return;void work(async()=>{
+  const logout=()=>{if(!mayLeaveWorkspace())return;void work(async()=>{
     await api('/auth/logout','POST',{})
-    setUser(null);setProjects([]);setSelected(null);setScreen('login')
+    setUser(null);setProjects([]);setSelected(null);setTitle('');setDescription('');setMode('SINGLE_UNLINKED');setScreen('login')
   })}
   const createProject=(e:FormEvent)=>{e.preventDefault();void work(async()=>{
     const p=await api<Project>('/projects','POST',{requestId:crypto.randomUUID(),title,description,collectionMode:mode})
-    await loadProjects(1);choose(p);setNotice('研究草稿已创建')
+    await loadProjects(1);setWorkspaceSection('settings');applyProject(p);setNotice('研究草稿已创建')
   })}
-  const choose=(p:Project)=>{if(selected?.id!==p.id){if(!mayLeaveReport())return;setWorkspaceSection('settings');}setSelected(p);setTitle(p.title);setDescription(p.description);setMode(p.collectionMode)}
+  const applyProject=(p:Project)=>{setSelected(p);setTitle(p.title);setDescription(p.description);setMode(p.collectionMode)}
+  const choose=(p:Project)=>{if(selected?.id===p.id)return;if(!mayLeaveWorkspace())return;setWorkspaceSection('settings');applyProject(p)}
   const save=(e:FormEvent)=>{e.preventDefault();if(!selected)return;void work(async()=>{
     const p=await api<Project>('/projects/'+selected.id,'PATCH',
       {revision:selected.revision,title,description,collectionMode:mode})
-    choose(p);await loadProjects(projectPage);setNotice('研究草稿已保存')
+    applyProject(p);await loadProjects(projectPage);setNotice('研究草稿已保存')
   })}
   const toggle=(p:Project)=>void work(async()=>{
     const action=p.status==='ARCHIVED'?'restore':'archive'
     const result=await api<Project>('/projects/'+p.id+'/'+action,'POST',{revision:p.revision})
-    await loadProjects(projectPage);if(selected?.id===p.id)choose(result)
+    await loadProjects(projectPage);if(selected?.id===p.id){setSelected(current=>current?{...current,status:result.status,revision:result.revision}:current)}
   })
   const field=(label:string,value:string,change:(value:string)=>void,type='text')=>
     <label className="block my-3 text-sm">{label}<input className="input block mt-1 w-full" required
@@ -148,11 +175,11 @@ export default function SurveyApp(){
   if(screen==='feature'&&activeFeature)return <SurveyFeaturePage feature={activeFeature} signedIn={user!==null}/>
   // Entry styling deliberately stops before MFA, the workspace and all timed tasks.
   const entryScreen=screen==='login'||screen==='claim'||screen==='reset'
-  return <div className={entryScreen?'survey-entry':'min-h-screen bg-slate-50 text-slate-800'}>
+  return <div className={entryScreen?'survey-entry':'survey-researcher min-h-screen bg-slate-50 text-slate-800'}>
     {entryScreen&&<a className="survey-skip-link" href="#survey-entry-content">跳至主要内容</a>}
     <header className="border-b border-slate-200 bg-white"><div className={entryScreen?'survey-entry-header':'max-w-5xl mx-auto p-5 flex justify-between items-center'}>
       <SurveyBrand/>
-      {user&&<button className="btn-secondary" disabled={busy} onClick={logout}>退出</button>}
+      {user&&<button className="btn-secondary" disabled={writeBusy} onClick={logout}>退出</button>}
     </div></header>
     <main id={entryScreen?'survey-entry-content':undefined} tabIndex={entryScreen?-1:undefined}
       className={entryScreen?'survey-entry-main':screen==='work'&&!user?.mustChangePassword
@@ -207,13 +234,13 @@ export default function SurveyApp(){
         <ProductPasswordChange product="survey" forced busy={busy} onChangePassword={changeAccountPassword}/>
       </section>}
       {!loading&&user&&screen==='work'&&!user.mustChangePassword&&<div className="survey-workspace"><section className="bg-white rounded-xl border p-6 my-4">
-        <h2 className="text-xl font-semibold">我的研究</h2><p className="text-sm text-slate-500">Researcher：{user.username}</p>
+        <h1 className="text-xl font-semibold">我的研究</h1><p className="text-sm text-slate-500">研究者：{user.username}</p>
         <details className="border rounded-lg p-4 my-4"><summary>账号安全 · 修改密码</summary>
           <ProductPasswordChange product="survey" busy={busy} onChangePassword={changeAccountPassword}/>
         </details>
-        <div className="grid sm:grid-cols-2 gap-3 mt-4">{projects.map(p=><article className="rounded-lg border p-4" key={p.id}>
+        <div className="grid sm:grid-cols-2 gap-3 mt-4">{projects.map(p=><article className="survey-project-card rounded-lg border p-4" data-selected={selected?.id===p.id} key={p.id}>
           <h3 className="font-semibold">{p.title}</h3><p className="text-sm">{({DRAFT:'草稿',ACTIVE:'采集中',PAUSED:'暂停',CLOSED:'已结束',ARCHIVED:'已归档'} as Record<string,string>)[p.status]||p.status} · {p.collectionMode==='LINKED_WAVES'?'多波次关联':'单次匿名'}</p>
-          <div className="flex flex-wrap gap-2 mt-3"><button className="btn-secondary" onClick={()=>choose(p)}>查看/编辑</button>
+          <div className="flex flex-wrap gap-2 mt-3"><button className="btn-secondary" disabled={writeBusy} aria-pressed={selected?.id===p.id} onClick={()=>choose(p)}>查看/编辑</button>
             <button className="btn-secondary" disabled={busy||(p.status==='DRAFT'&&!!p.firstPublishedAt)
               ||(!['DRAFT','CLOSED'].includes(p.status)&&!(p.status==='ARCHIVED'&&!p.firstPublishedAt))} onClick={()=>toggle(p)}>
               {p.status==='CLOSED'?'结束后归档':p.status==='DRAFT'?'归档草稿':
@@ -221,10 +248,10 @@ export default function SurveyApp(){
         </article>)}</div>
         <div className="flex items-center gap-4 mt-4 text-sm">
           <button type="button" className="btn-secondary" disabled={busy||projectPage<=1}
-            onClick={()=>void work(()=>loadProjects(projectPage-1))}>上一页</button>
+            onClick={()=>void work(()=>loadProjects(projectPage-1),false)}>上一页</button>
           <span>项目第 {projectPage} 页</span>
           <button type="button" className="btn-secondary" disabled={busy||projects.length<25}
-            onClick={()=>void work(()=>loadProjects(projectPage+1))}>下一页</button>
+            onClick={()=>void work(()=>loadProjects(projectPage+1),false)}>下一页</button>
         </div>
         {projects.length===0&&projectPage===1&&<p>尚无研究项目。可以先创建研究草稿。</p>}
       </section>{selected&&<SurveyWorkspaceNav active={workspaceSection} onChange={setWorkspaceSection} title={selected.title}/>}
@@ -233,19 +260,21 @@ export default function SurveyApp(){
         aria-labelledby={selected?'survey-workspace-tab-settings':undefined}
         hidden={!!selected&&workspaceSection!=='settings'}>
         <h2 className="text-xl font-semibold">{selected?'编辑研究草稿':'创建研究项目'}</h2>
-        <form onSubmit={selected?save:createProject}>{field('研究名称',title,setTitle)}
+        <form onSubmit={selected?save:createProject} aria-busy={busy}><fieldset disabled={busy} className="min-w-0 border-0 p-0">{field('研究名称',title,setTitle)}
           <label className="block my-3 text-sm">研究说明<textarea className="input block mt-1 w-full" rows={3} value={description} onChange={e=>setDescription(e.target.value)}/></label>
           <label className="block my-3 text-sm">采集方式<select className="input block mt-1 w-full" value={mode} onChange={e=>setMode(e.target.value as Project['collectionMode'])}>
             <option value="SINGLE_UNLINKED">单次独立匿名</option><option value="LINKED_WAVES">同一研究编号的多波次采集</option>
           </select></label><p className="text-sm text-slate-600">多波次研究必须在正式采集前告知被试：不同时间点的回答能够按研究编号关联。</p>
           <div className="flex flex-wrap gap-3 mt-4"><button className="btn-primary" disabled={busy||(selected!==null&&selected.status!=='DRAFT')}>{selected?'保存修改':'创建研究'}</button>
-            {selected&&<button type="button" className="btn-secondary" onClick={()=>{if(!mayLeaveReport())return;setSelected(null);setTitle('');setDescription('')}}>新建其他项目</button>}</div>
-        </form><p className="text-sm text-slate-500 mt-4">研究工具编辑、研究专用发布、匿名参与与科研分析可按功能开关使用；正式生产开通须完成独立部署验收。</p>
-      </section>{selected&&<><div id="survey-workspace-tools" role="tabpanel" aria-labelledby="survey-workspace-tab-tools" hidden={workspaceSection!=='tools'}><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id} projectStatus={selected.status} instrumentLibrary={instrumentLibrary}/></div>
+            {selected&&<button type="button" className="btn-secondary" onClick={()=>{if(!mayLeaveWorkspace())return;setSelected(null);setTitle('');setDescription('');setMode('SINGLE_UNLINKED')}}>新建其他项目</button>}</div>
+        </fieldset></form><p className="text-sm text-slate-500 mt-4">研究工具编辑、研究专用发布、匿名参与与科研分析可按功能开关使用；正式生产开通须完成独立部署验收。</p>
+      </section>{selected&&<><div id="survey-workspace-tools" role="tabpanel" aria-labelledby="survey-workspace-tab-tools" hidden={workspaceSection!=='tools'}><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id} projectStatus={selected.status} instrumentLibrary={instrumentLibrary} onLeaveRiskChange={builderRiskChanged}/></div>
         <div id="survey-workspace-reports" role="tabpanel" aria-labelledby="survey-workspace-tab-reports" hidden={workspaceSection!=='reports'}><SurveyReportStudio key={'reports-'+selected.id} projectId={selected.id} projectStatus={selected.status} active={workspaceSection==='reports'} onLeaveRiskChange={reportRiskChanged}/></div>
         <div id="survey-workspace-publish" role="tabpanel" aria-labelledby="survey-workspace-tab-publish" hidden={workspaceSection!=='publish'}><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary} onProjectChanged={projectChanged}/></div>
         <div id="survey-workspace-data" role="tabpanel" aria-labelledby="survey-workspace-tab-data" hidden={workspaceSection!=='data'}>
-          {available?.analytics
+          {capabilitiesState==='loading'?<section className="rounded-xl border bg-white p-4" role="status">正在确认研究数据功能…</section>
+            :capabilitiesState==='error'?<section className="rounded-xl border bg-white p-4" aria-label="研究数据状态"><p role="alert">无法确认研究数据功能，请重试；这不代表功能未开通。</p><button type="button" className="btn-secondary" onClick={()=>void loadCapabilities()}>重试功能状态</button></section>
+            :available?.analytics
             ?<SurveyAnalyticsWorkspace actorId={user?.id} key={'analysis-'+selected.id} projectId={selected.id}/>
             :<section className="rounded-xl border bg-white p-4" aria-label="研究数据状态">
               研究数据分析暂未在当前环境启用；项目和研究工具仍可使用。

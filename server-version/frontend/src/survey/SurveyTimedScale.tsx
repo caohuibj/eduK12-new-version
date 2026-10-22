@@ -38,7 +38,7 @@ export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,on
     <p className="survey-answer-guide">请选择符合实际情况的一项。可用“上一题”和“下一题”检查答案；切换题目不代表正式提交。</p>
     <progress className="w-full" max={Math.max(1,unit.items.length)}
       value={index+1} aria-label="量表施测进度"/>
-    <fieldset className="rounded-lg border bg-white p-4 space-y-2">
+    <fieldset id={'survey-answer-'+unit.instrumentKey+'-'+current.itemKey} tabIndex={-1} className="rounded-lg border bg-white p-4 space-y-2">
       <legend className="font-medium">{current.prompt}{current.required?' *':''}</legend>
       {renderMedia?.(current.itemKey)}
       {(current.responseOptions??unit.responseOptions).map(option=><label key={option.optionKey}

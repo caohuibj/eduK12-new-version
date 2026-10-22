@@ -32,7 +32,7 @@ export function ResearchScaleEditor({value,onChange,projectId}:{value:ScaleDraft
     </section>
     <section className="border rounded-xl p-4 space-y-3 bg-white">
       <h3 className="font-semibold">维度（研究描述性得分，不提供常模）</h3>
-      {value.dimensions.map((dim,i)=><div className="flex items-center gap-3" key={dim.dimensionKey}>
+      {value.dimensions.map((dim,i)=><div className="survey-scale-dimension flex flex-wrap items-center gap-3" key={dim.dimensionKey}>
         <input className="input flex-1" aria-label={'维度 '+(i+1)} value={dim.label}
           onChange={e=>onChange({...value,dimensions:value.dimensions.map(x=>x.dimensionKey===dim.dimensionKey?{...x,label:e.target.value}:x)})}/>
         <select className="input" aria-label={'维度方向 '+(i+1)} value={dim.direction}

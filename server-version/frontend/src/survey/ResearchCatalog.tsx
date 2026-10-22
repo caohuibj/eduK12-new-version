@@ -16,19 +16,23 @@ export function SourceProvenance({source,provenance}:{source?:CatalogSourceRef;p
 }
 export function ResearchCatalog({projectId,api,busy,onImport}:{projectId:string;api:CatalogApi;busy:boolean;onImport:(grant:CatalogGrant)=>Promise<void>}){
   const [list,setList]=useState<CatalogGrant[]>([]),[page,setPage]=useState(1),[error,setError]=useState(''),[loading,setLoading]=useState(false)
+  const [query,setQuery]=useState('')
+  const filtered=list.filter(grant=>grant.title.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))
   const load=async(next=1)=>{setLoading(true);setError('');try{
     const data=await api<{list:CatalogGrant[]}>('/projects/'+encodeURIComponent(projectId)+'/catalog?page='+next)
-    setList(data.list);setPage(next)
+    setList(data.list);setPage(next);setQuery('')
   }catch(e){setError(e instanceof Error?e.message:'授权目录无法加载')}finally{setLoading(false)}}
   useEffect(()=>{setList([]);setPage(1);void load()},[projectId])
-  return <section className="border rounded-xl p-4 space-y-3" aria-label="授权原版工具目录">
+  return <section id="survey-authorized-catalog" tabIndex={-1} className="survey-catalog border rounded-xl p-4 space-y-3" aria-label="授权原版工具目录">
     <h3 className="font-semibold">导入已授权的原版工具</h3>
     <p className="text-sm text-slate-600">仅列出系统管理员授予您的明确版本；导入后不能编辑原版内容或计分。撤销授权后不能再次导入或冻结发布，既有已发布研究不受影响。</p>
     {error&&<p role="alert">{error}</p>}
     {!loading&&!error&&!list.length&&<p className="text-sm">暂无可导入的授权工具。请联系系统管理员确认具体工具与版本。</p>}
     {loading&&<p role="status">正在加载授权目录…</p>}
-    {list.map(grant=><article key={grant.id} className="border rounded-lg p-3 space-y-2">
-      <h4 className="font-medium">{grant.title}</h4><SourceProvenance source={grant.sourceRef} provenance={grant.sourceProvenance}/>
+    <label className="block text-sm">筛选当前页授权工具<input type="search" className="input block w-full" value={query} onChange={event=>setQuery(event.target.value)} placeholder="输入当前页的工具名称"/></label>
+    {!loading&&!error&&list.length>0&&<p role="status" className="text-sm">当前页显示 {filtered.length} / {list.length} 项；仅筛选已加载的本页，不搜索其他页。</p>}
+    {filtered.map(grant=><article key={grant.id} className="border rounded-lg p-3 space-y-2">
+      <h4 className="font-medium">{grant.title}</h4><p className="text-sm">{grant.kind} · 版本 {grant.sourceRef.sourceVersion}</p><details><summary>查看来源与使用限制：{grant.title}</summary><SourceProvenance source={grant.sourceRef} provenance={grant.sourceProvenance}/></details>
       <button type="button" className="btn-secondary" disabled={busy||loading} onClick={()=>void onImport(grant)}>导入此版本：{grant.title}</button>
     </article>)}
     <div className="flex gap-3 items-center text-sm"><button type="button" className="btn-secondary" disabled={busy||loading||page<=1} onClick={()=>void load(page-1)}>目录上一页</button>
