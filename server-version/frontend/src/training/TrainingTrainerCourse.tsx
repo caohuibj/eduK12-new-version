@@ -1,3 +1,5 @@
+import TrainingCardDescription from './TrainingCardDescription'
+import './training-course-overview.css'
 import TrainingCourseCode from './TrainingCourseCode'
 import TrainingCourseTabs from './TrainingCourseTabs'
 import TrainingCheckinSchedules from './TrainingCheckinSchedules'
@@ -85,12 +87,14 @@ export default function TrainingTrainerCourse() {
       : courseError || !course ? <div role="alert" className="training-message">无法读取课程：{courseError || '请确认课程状态'}<button type="button" onClick={retry}>重试</button></div>
         : !owned ? <div role="alert" className="training-message">当前账号不是这门课程的创建者，无法在培训版管理此课程。<Link to="/dashboard">课程</Link></div>
           : <>
-            <header className="training-detail-header">
-              <div className="training-course-title-row"><h1>{course.title}</h1><TrainingCourseCode key={course.id+course.courseCode} code={course.courseCode} title={course.title}/></div>
-              <div className="training-course-meta">
-                <span>{course.studentCount ?? 0} 名学员</span>
-                <span>课程状态：{course.status === 'PUBLISHED' ? '已发布' : course.status === 'DRAFT' ? '草稿' : '已完结'}</span>
+            <header className="training-detail-header training-course-hero">
+              <div className="training-course-hero-main"><h1>{course.title}</h1>
+                <div className="training-course-meta">
+                  <span>{course.studentCount ?? 0} 名学员</span>
+                  <span>课程状态：{course.status === 'PUBLISHED' ? '已发布' : course.status === 'DRAFT' ? '草稿' : '已完结'}</span>
+                </div>
               </div>
+              <TrainingCourseCode key={course.id+course.courseCode} code={course.courseCode} title={course.title}/>
             </header>
             <div className="training-course-layout training-course-layout--full"><div className="training-course-work">
             <TrainingCourseTabs courseId={course.id} section={section} onSelect={setSection} />
@@ -100,10 +104,14 @@ export default function TrainingTrainerCourse() {
               <div className="training-course-actions"><Link to={'/assignments?create=true&courseId=' + encoded + returnContext} className="training-action">＋ 发布练习</Link><Link to={'/assignments?reuse=true&courseId=' + encoded + returnContext} className="training-action training-action--quiet">复用练习</Link></div>
               {assignments.loading ? <p role="status">正在读取练习…</p> : assignments.error ? <div role="alert">读取练习失败：{assignments.error}<button type="button" onClick={retry}>重试</button></div>
                 : assignments.rows.length === 0 ? <p className="training-empty-small">{filtered?'没有符合当前条件的练习。':'还没有布置练习。'}</p>
-                  : <div className="training-item-list">{assignments.rows.map(task =>
-                    <article className="training-task-item" key={task.id}>
-                      <div><h2>{task.title}</h2><p>{task.description || '课程练习'}</p><span>{task.status === 'PUBLISHED' ? '已发布' : '草稿'}</span></div>
-                      <Link to={'/assignments?id=' + encodeURIComponent(task.id) + '&courseId=' + encoded + returnContext} className="training-row-action">查看管理<ArrowRight size={16} aria-hidden="true" /></Link>
+                  : <div className="training-item-list training-course-task-grid">{assignments.rows.map(task =>
+                    <article className="training-task-item training-course-task-card" key={task.id} aria-labelledby={'course-assignment-'+task.id}>
+                      <div className="training-course-task-card-top"><span>练习</span><span className="training-course-task-status">{task.status === 'PUBLISHED' ? '已发布' : '草稿'}</span></div>
+                      <h2 id={'course-assignment-'+task.id}>{task.title}</h2>
+                      {task.description && <TrainingCardDescription id={'course-assignment-description-'+task.id} description={task.description}/>}
+                      <footer><div className="training-course-task-meta">{task._count && <span>{task._count.submissions} 份提交</span>}<span>{task.deadline ? '截止 '+new Date(task.deadline).toLocaleDateString('zh-CN') : '未设截止时间'}</span></div>
+                        <Link to={'/assignments?id=' + encodeURIComponent(task.id) + '&courseId=' + encoded + returnContext} className="training-row-action">查看管理<ArrowRight size={16} aria-hidden="true" /></Link>
+                      </footer>
                     </article>)}</div>}
             </section>}
 
@@ -112,10 +120,14 @@ export default function TrainingTrainerCourse() {
               <TrainingCheckinSchedules courseId={course.id} />
               {checkins.loading ? <p role="status">正在读取打卡…</p> : checkins.error ? <div role="alert">读取打卡失败：{checkins.error}<button type="button" onClick={retry}>重试</button></div>
                 : checkins.rows.length === 0 ? <p className="training-empty-small">{filtered?'没有符合当前条件的打卡。':'还没有布置打卡。'}</p>
-                  : <div className="training-item-list">{checkins.rows.map(task =>
-                    <article className="training-task-item" key={task.id}>
-                      <div><h2>{task.title}</h2><p>{task.description || '课程打卡'}</p><span>{task.status === 'DRAFT' ? '草稿' : '已发布'}{task.scheduleId && task.scheduledFor ? ` · 周期打卡 · ${new Date(task.scheduledFor).toLocaleString('zh-CN')}` : ''}</span></div>
-                      <Link to={'/checkins?id=' + encodeURIComponent(task.id) + '&courseId=' + encoded + returnContext} className="training-row-action">查看管理<ArrowRight size={16} aria-hidden="true" /></Link>
+                  : <div className="training-item-list training-course-task-grid">{checkins.rows.map(task =>
+                    <article className="training-task-item training-course-task-card" key={task.id} aria-labelledby={'course-checkin-'+task.id}>
+                      <div className="training-course-task-card-top"><span>{task.scheduleId ? '周期打卡' : '打卡'}</span><span className="training-course-task-status">{task.status === 'DRAFT' ? '草稿' : '已发布'}</span></div>
+                      <h2 id={'course-checkin-'+task.id}>{task.title}</h2>
+                      {task.description && <TrainingCardDescription id={'course-checkin-description-'+task.id} description={task.description}/>}
+                      <footer><div className="training-course-task-meta">{task._count && <span>{task._count.submissions} 份提交</span>}{task.scheduleId && task.scheduledFor && <span>{new Date(task.scheduledFor).toLocaleString('zh-CN')}</span>}</div>
+                        <Link to={'/checkins?id=' + encodeURIComponent(task.id) + '&courseId=' + encoded + returnContext} className="training-row-action">查看管理<ArrowRight size={16} aria-hidden="true" /></Link>
+                      </footer>
                     </article>)}</div>}
             </section>}
 
