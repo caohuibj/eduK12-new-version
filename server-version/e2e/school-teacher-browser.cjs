@@ -27,6 +27,8 @@ const http = require('node:http')
 const { spawn } = require('node:child_process')
 const { randomUUID, createHmac } = require('node:crypto')
 const { readFixture, sourceIdentity, backend, repo, sha } = require('./school-teacher-fixture.cjs')
+const { createUiChecks, verifyReport } = require('./school-teacher-ui.cjs')
+const { preflightChrome, verifyChromeSandbox, inspectCjkFonts, CHROME_LAUNCH_OPTIONS } = require('./school-teacher-chrome.cjs')
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 const origins = { SCHOOL: 'https://school.eduk12.top', TEACHER: 'https://teacher.eduk12.top' }
 const prefixes = { SCHOOL: '/api/campus', TEACHER: '/api/huiteacher' }
@@ -206,22 +208,22 @@ async function run() {
   assert.ok(out !== root && !out.startsWith(root + path.sep) && !root.startsWith(out + path.sep), 'Never upload fixture secrets')
   fs.mkdirSync(path.join(out, 'screenshots'), { recursive: true })
   assert.equal(process.env.SCHOOL_TEACHER_ARTIFACTS_VERIFIED, '1', 'Reuse verified current-run artifacts; do not silently consume a local build')
-  // Only the dedicated verifier may write this current-candidate receipt after
-  // checking the fixed official producer, archive, manifests and source closure.
-  // The receipt never rewrites the old producer SHA/run to the current candidate.
-  const reuseFile = path.join(repo, 'school-teacher-evidence/reused-builds.json')
-  const reuse = fs.existsSync(reuseFile)
-    ? validateBuildReuse(JSON.parse(fs.readFileSync(reuseFile, 'utf8')), fixture.identity, process.env.GITHUB_RUN_ID) : null
+  // Updated UI and integrated backend require fresh, exact-current-source builds.
+  // Historical diagnostic reuse helpers remain exported for their frozen tests,
+  // but the formal journey neither consumes nor accepts an old reuse receipt.
+  assert.equal(fs.existsSync(path.join(out, 'reused-builds.json')), false, 'Fresh current-source artifacts required')
   const manifest = (kind, dir) => validateBuildManifest(JSON.parse(fs.readFileSync(path.join(dir, 'ci-build-manifest.json'), 'utf8')),
-    kind, fixture.identity, process.env.GITHUB_RUN_ID, reuse)
-  const report = { schemaVersion: 1, source: fixture.identity, inputs: { frontend: manifest('frontend', dist), backend: manifest('backend', path.join(backend, 'dist')) },
-    ...(reuse ? { buildReuse: reuse } : {}), startups: [],
+    kind, fixture.identity, process.env.GITHUB_RUN_ID, null)
+  const report = { schemaVersion: 1, source: fixture.identity, runId: process.env.GITHUB_RUN_ID,
+    inputs: { frontend: manifest('frontend', dist), backend: manifest('backend', path.join(backend, 'dist')) },
+    startups: [], chrome: null, ui: {},
     transport: 'Synthetic canonical-origin static documents; unmodified real loopback backend API responses. No public TLS/DNS/deployment assertion.',
     runtime: 'Official runtime-role-defaults/contract and release-schema checks; API never uses owner principal.',
     coverage: [], screenshots: [], keyboard: [], errors: [], notCovered: ['Real media upload/storage/delivery and report images', 'Parent/teacher-observer/revocation matrix',
       'Public deployment TLS, DNS, reverse proxy', 'MFA enrollment UI visuals (real enrollment API is used)', 'Manual construction of every question (real saved definition template API is used)'],
     sessions: [], status: 'RUNNING' }
-  let browser, app, privateLog, lastSafeSession, stage = 'SCHOOL-backend-start'
+  const ui = createUiChecks({ report: report.ui, out, axeSource, getFontInventory: () => report.chrome.fonts })
+  let browser, app, privateLog, lastSafeSession, stage = 'chrome-preflight'
   async function stopBackend() {
     const current = app
     if (current?.pid && current.exitCode === null && current.signalCode === null) {
@@ -265,18 +267,31 @@ async function run() {
     fail('BACKEND_READINESS_TIMEOUT')
   }
   try {
+    // Read-only installed-channel verification. Never install or fall back.
+    const preflight = preflightChrome({ repo })
+    report.chrome = { options: CHROME_LAUNCH_OPTIONS, preflight, sandbox: null, launchedVersion: null }
+    assert.equal(preflight.ok, true, 'Official Chrome preflight failed')
+    stage = 'cjk-font-preflight'
+    report.chrome.fonts = inspectCjkFonts()
+    // Font limitations are recorded, not a reason to skip the real business journey.
+    stage = 'browser-launch'
+    browser = await chromium.launch(CHROME_LAUNCH_OPTIONS)
+    report.chrome.launchedVersion = browser.version()
+    assert.equal(report.chrome.launchedVersion, preflight.package.browserVersion, 'Launched official Chrome must match inspected installed version')
+    stage = 'browser-sandbox-evidence'
+    report.chrome.sandbox = await verifyChromeSandbox(browser)
+    assert.equal(report.chrome.sandbox.ok, true, 'Runtime sandbox evidence missing or unsafe')
     // Do not inherit production credentials, external storage, mail or telemetry.
     await startBackend('SCHOOL')
-    stage = 'browser-launch'
-    // Never fall back to --no-sandbox or certificate bypass after a failure.
-    browser = await chromium.launch({ headless: true, chromiumSandbox: true })
 
-    async function session(product, user, label) {
+    async function session(product, user, label, options = {}) {
       lastSafeSession = null
       const origin = origins[product], prefix = prefixes[product]
-      const context = await browser.newContext({ viewport: viewports[0], reducedMotion: 'reduce', serviceWorkers: 'block' })
-      const audit = { product, actor: label, pageErrors: [], consoleErrors: [], unexpectedRequests: [], failedResponses: [], requestFailures: [] }
-      report.sessions.push(audit)
+      const context = await browser.newContext({ viewport: options.anonymous ? { width: 320, height: 844 } : viewports[0], reducedMotion: 'reduce', serviceWorkers: 'block' })
+      const appearanceKeys = await ui.prepare(context, product, user, options.mode)
+      const audit = { product, actor: label, pageErrors: [], consoleErrors: [], unexpectedRequests: [], failedResponses: [], requestFailures: [],
+        staticRequests: [], staticResponses: [], apiMutations: [] }
+      ;(options.anonymous ? report.ui.sessions : report.sessions).push(audit)
       const expectedFailures = new Set([prefix + '/auth/me:401'])
       await context.routeWebSocket('**/*', socket => {
         audit.unexpectedRequests.push('WebSocket:' + new URL(socket.url()).origin)
@@ -322,9 +337,19 @@ async function run() {
       page.on('pageerror', error => audit.pageErrors.push({ name: error.name, hash: sha(error.message) }))
       page.on('console', msg => { if (msg.type() === 'error') audit.consoleErrors.push({ hash: sha(msg.text()),
         network: /^Failed to load resource:/.test(msg.text()), path: msg.location().url ? new URL(msg.location().url, origin).pathname : '' }) })
-      page.on('response', res => { if (res.status() >= 400) audit.failedResponses.push({ path: new URL(res.url()).pathname, status: res.status() }) })
+      page.on('request', req => {
+        const url = new URL(req.url())
+        if (url.origin === origin && !url.pathname.startsWith('/api/')) audit.staticRequests.push(url.origin + url.pathname)
+        if (url.origin === origin && url.pathname.startsWith('/api/') && !['GET', 'HEAD'].includes(req.method()))
+          audit.apiMutations.push({ path: url.pathname, method: req.method() })
+      })
+      page.on('response', res => {
+        const url = new URL(res.url())
+        if (res.status() >= 400) audit.failedResponses.push({ path: url.pathname, status: res.status() })
+        if (url.origin === origin && !url.pathname.startsWith('/api/')) audit.staticResponses.push({ path: url.pathname, status: res.status() })
+      })
       page.on('requestfailed', req => { if (req.failure()?.errorText !== 'net::ERR_ABORTED') audit.requestFailures.push({ path: new URL(req.url()).pathname, error: req.failure()?.errorText }) })
-      const s = { product, prefix, origin, page, context, audit, expectedFailures, authenticated: false }
+      const s = { product, prefix, origin, page, context, audit, expectedFailures, appearanceKeys, authenticated: false }
       s.api = async (uri, method = 'GET', data, statuses = [200]) => {
         for (const status of statuses.filter(status => status >= 400)) expectedFailures.add(prefix + uri.split('?')[0] + ':' + status)
         const result = await page.evaluate(async ({ endpoint, csrfPath, method, data }) => {
@@ -348,7 +373,21 @@ async function run() {
         const body = await response.json(); assert.equal(body.code, 0, `${method} ${uri} application error`)
         return body.data
       }
+      s.close = async () => {
+        await page.waitForLoadState('networkidle')
+        audit.expectedFailures = [...expectedFailures]
+        assert.deepEqual(audit.failedResponses.filter(row => !expectedFailures.has(row.path + ':' + row.status)), [], 'No unexpected HTTP errors')
+        assert.deepEqual(audit.consoleErrors.filter(row => !row.network || !audit.failedResponses.some(response =>
+          response.path === row.path && expectedFailures.has(response.path + ':' + response.status))), [], 'No unexpected browser console errors')
+        await context.close()
+      }
+      if (options.anonymous) {
+        await page.goto(origin + '/')
+        return s
+      }
       await page.goto(origin + '/login')
+      await page.locator((product === 'SCHOOL' ? '.hs-app' : '.ht-app') + '[data-theme="light"]').waitFor()
+      s.guestThemeVerified = true
       await page.getByLabel(product === 'SCHOOL' ? '用户名' : '教育账号', { exact: true }).fill(user.username)
       await page.getByLabel('密码', { exact: true }).fill(user.password)
       const form = page.locator('form').filter({ has: page.getByLabel('密码', { exact: true }) })
@@ -366,25 +405,19 @@ async function run() {
       const cookies = (await context.cookies(origin)).filter(c => c.name === (product === 'SCHOOL' ? 'huischool_session' : 'huiteacher_session'))
       assert.equal(cookies.length, 1); assert.equal(cookies[0].secure, true); assert.equal(cookies[0].httpOnly, true)
       await page.reload(); s.authenticated = true; lastSafeSession = s
+      await ui.preference(s)
       s.stepUp = async () => {
         assert.ok(s.mfaSecret, 'Privileged action must retain the real verified MFA challenge')
         if (Math.floor(Date.now() / 30000) === s.mfaStep) await pause(30000 - Date.now() % 30000 + 50)
         s.mfaStep = Math.floor(Date.now() / 30000)
         await s.api('/auth/mfa/step-up', 'POST', { code: totp(s.mfaSecret, s.mfaStep) })
       }
-      s.close = async () => {
-        await page.waitForLoadState('networkidle')
-        audit.expectedFailures = [...expectedFailures]
-        assert.deepEqual(audit.failedResponses.filter(row => !expectedFailures.has(row.path + ':' + row.status)), [], 'No unexpected HTTP errors')
-        assert.deepEqual(audit.consoleErrors.filter(row => !row.network || !audit.failedResponses.some(response =>
-          response.path === row.path && expectedFailures.has(response.path + ':' + response.status))), [], 'No unexpected browser console errors')
-        await context.close()
-      }
       return s
     }
 
     async function shot(s, name) {
       assert.equal(s.authenticated, true, 'No authentication/MFA screenshots')
+      assert.equal(await s.page.locator(s.product === 'SCHOOL' ? '.hs-app' : '.ht-app').getAttribute('data-theme'), 'light', 'Stable light baseline')
       for (const viewport of viewports) {
         await s.page.setViewportSize(viewport)
         await s.page.evaluate(async () => { await document.fonts.ready; await Promise.all([...document.images].map(image => image.decode())) })
@@ -411,6 +444,7 @@ async function run() {
         assert.deepEqual(accessibility.violations, [], `${name} WCAG A/AA browser violations at ${viewport.width}`)
       }
       await s.page.setViewportSize(viewports[0])
+      await ui.supplement(s, name)
     }
     async function keyboardCheck(s, locator, pressed = false) {
       await locator.focus(); await locator.press('Space')
@@ -421,7 +455,7 @@ async function run() {
     }
     async function toolsPage(s, f) {
       if (s.product === 'SCHOOL') await s.page.goto(s.origin + '/workspace/private-tools?organizationId=' + f.organizationId)
-      else await s.page.getByRole('navigation', { name: 'Huiteacher 工作台' }).getByRole('button', { name: '我的工具', exact: true }).click()
+      else await s.page.getByRole('navigation', { name: 'Teacher 工作台' }).getByRole('button', { name: '我的工具', exact: true }).click()
       await s.page.getByRole('region', { name: '我的私有工具', exact: true }).waitFor()
     }
     async function previewForm(s) {
@@ -504,8 +538,9 @@ async function run() {
         return s.page
       }
       await s.page.reload()
-      await s.page.getByRole('navigation', { name: 'Huiteacher 工作台' }).getByRole('button', { name: '学校改进', exact: true }).click()
-      const event = s.page.locator('article.ht-event').filter({ has: s.page.locator('strong').filter({ hasText: w.title }) })
+      await s.page.getByRole('navigation', { name: 'Teacher 工作台' }).getByRole('button', { name: '学校改进', exact: true }).click()
+      await ui.schoolManagementAnchor(s)
+      const event = s.page.getByRole('region', { name: '评价活动', exact: true }).locator('article.ht-event').filter({ has: s.page.locator('strong').filter({ hasText: w.title }) })
       await event.getByRole('button', { name: '查看任务配置', exact: true }).click()
       return event
     }
@@ -679,8 +714,11 @@ async function run() {
       // Each product gets the unchanged production exact-origin configuration.
       if (product === 'TEACHER') await startBackend(product)
       const f = fixture.products[product]
+      stage = product + '-public-theme-layout'
+      await ui.publicChecks(session, product)
       stage = product + '-author-login'
       const author = await session(product, f.author, 'author')
+      stage = product + '-workspace-layout'; await ui.workspace(author)
       const capability = await author.api('/organizations/' + f.organizationId + '/tool-authoring-capabilities')
       assert.equal(capability.canAuthor, true)
       if (product === 'SCHOOL') {
@@ -712,13 +750,15 @@ async function run() {
     await psych.api(base + '/evaluation-targets', 'POST', { kind: 'ORGANIZATION', name: '不得提升发布权限' }, [403])
     report.coverage.push({ product: 'TEACHER', check: 'ordinary-psychology-author-real-API', compiled: true, publicationAuthorityNotElevated: true })
     await psych.close()
-    for (const audit of report.sessions) {
+    for (const audit of [...report.sessions, ...report.ui.sessions]) {
       assert.deepEqual(audit.pageErrors, [], 'No browser application exceptions')
       assert.deepEqual(audit.unexpectedRequests, [], 'No external or cross-product traffic')
       assert.deepEqual(audit.requestFailures, [], 'No failed transport')
       // Exact expected denials were checked by each session's close method.
     }
+    stage = 'final-evidence-verification'
     report.status = 'PASSED'
+    verifyReport(report, { ...fixture.identity, runId: process.env.GITHUB_RUN_ID, ...report.inputs }, file => fs.readFileSync(path.join(out, file)))
   } catch (error) {
     report.status = 'FAILED'; report.errors.push({ stage, name: error.name, messageHash: sha(String(error)),
       note: 'No raw auth-bearing exception/body/trace is published. Inspect the failing stage and status records.' })
@@ -751,4 +791,4 @@ if (require.main === module) {
   })
 }
 module.exports = { totp, backendEnvironment, validateBuildReuse, validateBuildManifest, classifyStartupLog,
-  classifyBrowserLaunchError, browserLaunchEnvironment, runLaunchDiagnostic, browserCliMode, validateLaunchDiagnosticContext }
+  classifyBrowserLaunchError, browserLaunchEnvironment, runLaunchDiagnostic, browserCliMode, validateLaunchDiagnosticContext, verifyReport }
