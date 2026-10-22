@@ -192,6 +192,9 @@ services:
       SURVEY_ANALYTICS_ENABLED: ${SURVEY_ANALYTICS_ENABLED:-false}
       CAMPUS_MFA_ENCRYPTION_KEY: ${CAMPUS_MFA_ENCRYPTION_KEY:-}
       SURVEY_MFA_ENCRYPTION_KEY: ${SURVEY_MFA_ENCRYPTION_KEY:-}
+      # Administrator Authenticator secrets belong only to the API.
+      ADMIN_AUTH_ORIGIN: ${ADMIN_AUTH_ORIGIN:-https://training.eduk12.top}
+      ADMIN_MFA_ENCRYPTION_KEY: ${ADMIN_MFA_ENCRYPTION_KEY:-}
       # Teacher-only feature gates. All remain CLOSED until approved host,
       # exact candidate and isolated School/Teacher security acceptance.
       HUITEACHER_WORKSPACE_ENABLED: ${HUITEACHER_WORKSPACE_ENABLED:-false}
