@@ -1,3 +1,4 @@
+import {HuiteacherMyPrivateFormTasks} from './HuiteacherMyPrivateFormTasks'
 import {SCHOOL_HOST} from '../school/context'
 import {EducationPrivateToolStudio} from '../components/education-tools/EducationPrivateToolStudio'
 import {usePrivateToolCapability,type PrivateDraftState} from '../components/education-tools/privateToolClient'
@@ -380,6 +381,7 @@ export default function HuiteacherApp(){
         <p className="ht-notice">个人空间 · 显示本人各学校的任务与个人测评，不按上方学校筛选。</p>
         <HuiteacherPersonalSelf api={teacherApi}/>
         <HuiteacherMyFormTasks api={teacherApi}/>
+        <HuiteacherMyPrivateFormTasks key={`private-form:${me.id}`} actorKey={me.id} api={teacherApi}/>
         <HuiteacherMyScaleTasks key={me.id} api={teacherApi}/>
         {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'
           &&<HuiteacherMyStudentFeedback api={teacherApi}/>}
