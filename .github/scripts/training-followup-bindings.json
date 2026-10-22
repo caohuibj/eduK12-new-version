@@ -213,6 +213,7 @@
     ".github/scripts/training-followup-scope.mjs",
     ".github/scripts/training-followup-scope.test.mjs",
     ".github/scripts/training-followup-checks.mjs",
+    ".github/scripts/training-followup-reuse.mjs",
     ".github/scripts/training-followup-browser.mjs",
     ".github/scripts/training-workspace-scope.mjs",
     ".github/workflows/ci-training-workspace.yml",
@@ -234,5 +235,36 @@
     "head": "99d9cd2f5bf7cba9b56374c4ca52579cd33a26dc",
     "path": "evidence/training-mac-e1ef69a7",
     "status": "historical review evidence, not retroactively signed CI success"
+  },
+  "reuse": {
+    "runId": 39714107823,
+    "head": "32f0ec32c167e3d3dbe14492b25fe5b52159406f",
+    "merge": "8b795025433a1201fed118bf2c99f543722ed2fb",
+    "checkerBlob": "6469e46ea61f22a8a5ce39ce501a4d59f4ab8893",
+    "frontend": {
+      "jobId": 119612363208,
+      "jobName": "training-workspace / followup / frontend",
+      "passed": 118,
+      "report": {
+        "id": 12398278275,
+        "name": "training-followup-frontend-8b795025433a1201fed118bf2c99f543722ed2fb",
+        "digest": "sha256:6f073bcfe53eca0ec32cdea7efefdac89968c6245d75a75665a20210fcdefea3"
+      },
+      "build": {
+        "id": 12398288321,
+        "name": "training-followup-dist-8b795025433a1201fed118bf2c99f543722ed2fb",
+        "digest": "sha256:2a8370064036915b54338bba40fcc3e98f36fc85d60afab15dcb292c2640caf8"
+      }
+    },
+    "backend": {
+      "jobId": 119612363279,
+      "jobName": "training-workspace / followup / forms",
+      "passed": 7,
+      "report": {
+        "id": 12398840121,
+        "name": "training-followup-forms-8b795025433a1201fed118bf2c99f543722ed2fb",
+        "digest": "sha256:b10b64b46abd8000670e72e68b95461034ffc3aa5efc110e9302e0f61c09c80e"
+      }
+    }
   }
 }
