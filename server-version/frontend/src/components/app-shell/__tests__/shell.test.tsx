@@ -84,6 +84,22 @@ describe('Training assessment presentation boundary', () => {
   })
 })
 
+describe('Training learner home header', () => {
+  it.each(['/student', '/student/'])('omits navigation on %s and keeps account settings and logout', path => {
+    presentation.training = true
+    const view = render(<MemoryRouter initialEntries={[path]}><AppShell><h1>我的课程</h1></AppShell></MemoryRouter>)
+    expect(view.container.querySelector('.training-workspace-menu')).toBeNull()
+    expect(screen.queryByRole('navigation', { name: '主要导航' })).toBeNull()
+    expect(screen.getByRole('link', { name: /个人账号设置/ })).toHaveAttribute('href', '/student/profile')
+    expect(screen.getByRole('button', { name: '退出登录' })).toBeEnabled()
+  })
+  it('retains the student menu on course pages', () => {
+    presentation.training = true
+    const view = render(<MemoryRouter initialEntries={['/student/courses/course-1']}><AppShell><h1>课程内容</h1></AppShell></MemoryRouter>)
+    expect(view.container.querySelector('.training-workspace-menu')).not.toBeNull()
+  })
+})
+
 describe('Training teacher visual boundary', () => {
   it.each(['/student/cognitive', '/scale-library/tool/v1'])('redirects a Training student discovery route before its page mounts: %s', async path => {
     presentation.training = true
