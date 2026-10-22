@@ -1,24 +1,24 @@
 .survey-account-actions { display: flex; align-items: center; gap: 1.1rem; }
 .survey-account-actions button { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; min-width: 44px; min-height: 44px; padding: .5rem .65rem; border-radius: .6rem; color: #36586a; background: transparent; border: 0; }
-.survey-account-actions button:hover { background: #eaf3f5; color: #234a65; }
+.survey-account-actions button:hover { background: var(--survey-brand-soft); color: #234a65; }
 .survey-account-trigger span { max-width: 220px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .survey-account-actions svg { flex: none; }
 .survey-account-backdrop { position: fixed; inset: 0; width: 100%; height: 100%; max-width: none; max-height: none; padding: 1.5rem; margin: 0; border: 0; background: transparent; color: #203e4c; }
 .survey-account-backdrop[open] { display: grid; place-items: center; }
 .survey-account-backdrop::backdrop { background: #173b506b; backdrop-filter: blur(3px); }
-.survey-account-panel { width: min(100%,36rem); max-height: calc(100dvh - 3rem); overflow-y: auto; overscroll-behavior: contain; border: 1px solid #cadde5; border-radius: 1.25rem; background: #fff; padding: 1.75rem; box-shadow: 0 24px 80px #173b5033; }
+.survey-account-panel { width: min(100%,36rem); max-height: calc(100dvh - 3rem); overflow-y: auto; overscroll-behavior: contain; border: 1px solid var(--survey-brand-border); border-radius: 1.25rem; background: #fff; padding: 1.75rem; box-shadow: 0 24px 80px #173b5033; }
 .survey-account-panel:focus { outline: none; }
 .survey-account-panel > header { display: flex; justify-content: space-between; gap: 1rem; align-items: start; margin-bottom: 1.5rem; }
 .survey-account-panel h2 { font-size: 1.5rem; font-weight: 650; margin-top: .35rem; }
-.survey-account-close { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid #d7e4e9; border-radius: .65rem; background: #f7fbfc; color: #36586a; flex: none; }
-.survey-account-identity { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 1rem; padding: 1rem 1.2rem; border: 1px solid #d6e5eb; border-radius: .8rem; background: #f0f7f9; }
+.survey-account-close { display: grid; place-items: center; width: 44px; height: 44px; border: 1px solid var(--survey-brand-line); border-radius: .65rem; background: var(--survey-brand-subtle); color: #36586a; flex: none; }
+.survey-account-identity { display: grid; grid-template-columns: minmax(0,1fr) auto; gap: 1rem; padding: 1rem 1.2rem; border: 1px solid var(--survey-brand-line); border-radius: .8rem; background: var(--survey-brand-soft); }
 .survey-account-identity dt { font-size: .8rem; color: #526a78; }
 .survey-account-identity dd { margin: .3rem 0 0; font-weight: 600; overflow-wrap: anywhere; }
 .survey-account-password { padding-top: 1.6rem; }
 .survey-account-password h3 { display: flex; align-items: center; gap: .5rem; font-size: 1.05rem; font-weight: 650; }
 .survey-account-password > p { color: #526a78; font-size: .875rem; margin: .5rem 0 1.25rem; }
 .survey-account-password > .survey-account-error { color: #923333; background: #fff5f4; border-left: 3px solid #b43c35; padding: .8rem; border-radius: .4rem; }
-.survey-account-panel .input { border: 1px solid #91aab7; border-radius: .6rem; padding: .65rem .8rem; background: #fbfdfd; }
+.survey-account-panel .input { border: 1px solid #91aab7; border-radius: .6rem; padding: .65rem .8rem; background: var(--survey-brand-canvas); }
 .survey-account-panel form > p { color: #526a78; line-height: 1.7; }
 .survey-account-panel form > button { margin-top: .5rem; border-radius: .65rem; }
 @media (max-width: 40rem) {

@@ -1,3 +1,5 @@
+@import './survey-theme.css';
+
 /* Survey peripheral surfaces only. Never attach these classes to a cognitive
    runner, focus stage, or its ancestors. SurveyPublicApp removes peripheral
    sibling opt-ins while cognitiveRunning; the formal ancestor baseline is checked. */
@@ -41,7 +43,7 @@
 .survey-participant-panel :is(a, button, input, textarea, select):focus-visible,
 .survey-answer-panel :is(a, button, input, textarea, select, fieldset):focus-visible,
 .survey-participant-action:focus-visible {
-  outline: 3px solid #0f6b68;
+  outline: 3px solid var(--survey-brand-focus);
   outline-offset: 3px;
   box-shadow: none;
 }
@@ -50,20 +52,20 @@
 .survey-answer-panel [role='alert'] { padding: 16px; border-radius: 8px; font-size: 16px; line-height: 1.65; overflow-wrap: anywhere; }
 .survey-participant-message[role='alert'],
 .survey-answer-panel [role='alert'] { color: #9f2635; border-left: 4px solid #9f2635; background: #fff3f3; }
-.survey-submit-guide { padding: 20px; border: 1px solid #cbd9e0; border-left: 4px solid #75a8b3; }
+.survey-submit-guide { padding: 20px; border: 1px solid #cbd9e0; border-left: 4px solid var(--survey-brand-border-strong); }
 .survey-submit-guide h3 { margin: 0 0 10px; font-size: 18px; font-weight: 600; }
 .survey-submit-guide p { margin: 8px 0 0; color: #476271; font-size: 14px; }
-.survey-completion-state { color: #0f6b68; font-size: 14px; font-weight: 600; }
+.survey-completion-state { color: var(--survey-brand-accent-strong); font-size: 14px; font-weight: 600; }
 .survey-participant-brand { display: grid; grid-template-columns: 58px 1fr; align-items: center; column-gap: .85rem; }
 .survey-participant-brand img { grid-row: 1 / 3; width: 58px; height: auto; }
 .survey-participant-brand h1 { font-family: Georgia,'Times New Roman',serif; color: #234a65; letter-spacing: -.025em; }
-.survey-participant-steps { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: .5rem; padding: .75rem; border: 1px solid #cfdee4; border-radius: .8rem; background: #fff; color: #476271; list-style: none; }
+.survey-participant-steps { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: .5rem; padding: .75rem; border: 1px solid var(--survey-brand-line); border-radius: .8rem; background: #fff; color: #476271; list-style: none; }
 .survey-participant-steps li { padding: .5rem; font-size: .875rem; border-radius: .5rem; }
 .survey-participant-steps li span { display: block; margin-bottom: .2rem; font-size: .7rem; letter-spacing: .1em; }
-.survey-participant-steps [aria-current='step'] { background: #eaf5f3; color: #175d57; font-weight: 600; }
-.survey-participant-panel:has(.survey-completion-state) { border-top: 4px solid #287e72; background: #f7fcfa; }
+.survey-participant-steps [aria-current='step'] { background: var(--survey-brand-soft); color: var(--survey-brand-accent-strong); font-weight: 600; }
+.survey-participant-panel:has(.survey-completion-state) { border-top: 4px solid var(--survey-brand-accent); background: var(--survey-brand-subtle); }
 .survey-participant-skip { position: fixed; top: 10px; left: 10px; z-index: 60; padding: 12px 18px; transform: translateY(-200%); color: #fff; background: #234a65; border-radius: 8px; }
-.survey-participant-skip:focus { transform: translateY(0); outline: 3px solid #0f6b68; outline-offset: 3px; }
+.survey-participant-skip:focus { transform: translateY(0); outline: 3px solid var(--survey-brand-focus); outline-offset: 3px; }
 
 /* The device gate unmounts before CognitiveRunner is rendered. It is never an
    ancestor of a timed stimulus, and its existing key/storage checks are unchanged. */
@@ -71,7 +73,7 @@ section[aria-label='认知任务设备检查'] { border-color: #cbd9e0; font-siz
 section[aria-label='认知任务设备检查'] :is(p, label) { font-size: 14px; line-height: 1.65; }
 section[aria-label='认知任务设备检查'] .input { min-height: 44px; font-size: 16px; border-color: #718895; }
 section[aria-label='认知任务设备检查'] button { min-height: 44px; font-size: 16px; background: #234a65; }
-section[aria-label='认知任务设备检查'] :is(input, button):focus-visible { outline: 3px solid #0f6b68; outline-offset: 3px; box-shadow: none; }
+section[aria-label='认知任务设备检查'] :is(input, button):focus-visible { outline: 3px solid var(--survey-brand-focus); outline-offset: 3px; box-shadow: none; }
 
 @media (max-width: 600px) {
   .survey-participant-steps { grid-template-columns: repeat(2,minmax(0,1fr)); }
