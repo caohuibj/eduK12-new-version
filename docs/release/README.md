@@ -807,3 +807,29 @@ component tree、依赖/配置及明列控制/证据文件绑定。未知路径�
 scope、全部 survey-cloud 内部作业和 codeql 实际 success；draft、缺失、跳过、
 取消和失败均拒绝。精确 main 合并 push 仅分类，不重复应用检查或自动部署。
 旧候选的路线、签名用途和其他门禁不变。
+
+
+## Training 月夜外观的精确合并范围（2026-10-23）
+
+用户要求推送并合并当前外观修订。本路线固定官方 main
+`9e019c98568d9250a31346cc89d3ae272e9414dd` 与产品提交
+`80f02f4f` 的 13 个产品路径，仅允许绑定明列的 10 个 CI/证据/文档控制路径。
+绑定完整前后端 tree、源 blob、依赖/配置及原报告压缩字节和摘要；未知路径、
+模式、base、source/merge tree 或证据漂移均失败，不回退全平台。
+手动 full/probe 拒绝，main 合并 push 仅分类，不重复应用检查或部署。
+
+本地报告接纳明确标为 reviewed-local-evidence，originalExecutionSigned=false、
+ciExecuted=false。最新默认外观 13 项，较早共享壳 67 项及被替代的外观 11 项
+不能相加；原定位失败和两次低对比失败保留身份。共享壳结构与导入未受默认值
+后续影响，不声称该 67 项在默认值改动后重跑。浏览器原报告只接纳对应完成项；
+可选 generic localhost 登录探针未完成，临时 DOM 状态探针不冒充真实测评。
+不提交凭据、业务数据或用户截图，不补签历史执行。
+
+Actions 一处运行新增控制范围/拒绝/证据/严格汇总契约、当前前端 app types、
+一次 production build 与变化源码/控制的 JS/TS CodeQL。已有本地断言和 lint
+不重复；后端、DB、迁移、媒体、依赖锁未变化，不启动这些检查、审计或镜像重建。
+本地只核对范围和语法，CI 验收预算约五分钟预警，接纳五分钟、前端八分钟，
+CodeQL 保留既有时限；超时报告实际等待项，不追加检查。
+稳定 merge gate / ready PR 重算实际差异，必须 scope、完整 training-appearance
+及 codeql 全部实际 success；draft、missing、skipped、cancelled、failed 均阻断。
+此范围只授予本次合并资格，不提供服务器部署资格。
