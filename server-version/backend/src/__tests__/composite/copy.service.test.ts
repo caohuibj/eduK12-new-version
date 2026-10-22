@@ -34,7 +34,15 @@ import {
   publishComposite,
   startUserAttempt,
   updateComposite,
+  addItem,
+  removeItem,
+  removeEmptyFormSection,
+  reorderItems,
+  reorderCompositeContentUnits,
+  setCompositeAnalysisProtocol,
+  setCompositeReportPackage,
 } from '../../modules/composite/composite.service'
+import { createCompositeFormSection, updateCompositeFormSection, reorderCompositeFormSections, reorderCompositeFormSectionItems, assignCompositeFormItemToSection } from '../../modules/composite/final-submit.service'
 import { decryptCognitivePayload, encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 
 const TEACHER = UserRole.TEACHER
@@ -830,5 +838,36 @@ describe('Training timed start recovery boundary', () => {
     mockPrisma.compositeAssessmentAttempt.findFirst.mockResolvedValue({id:'attempt-1'})
     await expect(startUserAttempt('student-1','source-1')).rejects.toMatchObject({statusCode:403})
     expect(mockPrisma.compositeAssessmentAttempt.findFirst).not.toHaveBeenCalled()
+  })
+})
+
+describe('fixed integrated-report bundles reject ordinary authoring', () => {
+  const changes = [
+    ['metadata', () => updateComposite('teacher-1', TEACHER, 'fixed', { name: 'changed' })],
+    ['legacy copy', () => copyComposite('teacher-1', TEACHER, 'fixed', { courseId: 'course-t' })],
+    ['add item', () => addItem('teacher-1', TEACHER, 'fixed', { type: 'FORM', required: true, formType: 'text_input', formLabel: 'new' })],
+    ['remove item', () => removeItem('teacher-1', TEACHER, 'fixed', 'item')],
+    ['remove section', () => removeEmptyFormSection('teacher-1', TEACHER, 'fixed', 'section')],
+    ['reorder items', () => reorderItems('teacher-1', TEACHER, 'fixed', [])],
+    ['reorder content', () => reorderCompositeContentUnits('teacher-1', TEACHER, 'fixed', [])],
+    ['analysis protocol', () => setCompositeAnalysisProtocol('teacher-1', TEACHER, 'fixed', { analysisProtocol: null })],
+    ['report package', () => setCompositeReportPackage('teacher-1', TEACHER, 'fixed', { reportPackage: null })],
+    ['create section', () => createCompositeFormSection('fixed', { title: 'new' })],
+    ['update section', () => updateCompositeFormSection('fixed', 'section', { title: 'changed' })],
+    ['reorder sections', () => reorderCompositeFormSections('fixed', [])],
+    ['reorder section items', () => reorderCompositeFormSectionItems('fixed', 'section', [])],
+    ['move item between sections', () => assignCompositeFormItemToSection('fixed', 'section', 'item', 0)],
+  ] as const
+  it.each(changes)('rejects %s even for an owned draft with no legacy report keys', async (_name, change) => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(libraryTemplate({ id: 'fixed', productKind: 'ASSESSMENT_BUNDLE', status: 'DRAFT', createdBy: 'teacher-1', creator: { role: TEACHER }, courseId: 'course-t', course: teacherCourse, items: [], reportPackageKey: null, analysisProtocolKey: null }))
+    await expect(change()).rejects.toMatchObject({ statusCode: 409 })
+    expect(mockPrisma.compositeAssessment.create).not.toHaveBeenCalled()
+    expect(mockPrisma.compositeAssessment.update).not.toHaveBeenCalled()
+    expect(mockPrisma.cognitiveAssignment.create).not.toHaveBeenCalled()
+  })
+  it.each([{ reportPackageKey: 'fixed-report' }, { analysisProtocolKey: 'fixed-analysis' }])('also keeps legacy fixed-report sections immutable: %j', async report => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue({ status: 'DRAFT', productKind: 'LEGACY_COMPOSITE', ...report })
+    await expect(createCompositeFormSection('fixed', { title: 'new' })).rejects.toMatchObject({ statusCode: 409 })
+    expect(mockPrisma.compositeAssessment.update).not.toHaveBeenCalled()
   })
 })

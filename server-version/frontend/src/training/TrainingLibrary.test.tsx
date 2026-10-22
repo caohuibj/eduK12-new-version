@@ -12,13 +12,13 @@ const grant={id:'grant',name:'授权工具',kind:'scale',source:'granted',status
 beforeEach(()=>{vi.clearAllMocks();mocks.get.mockResolvedValue({code:0,data:{list:[],total:0}})})
 afterEach(()=>{vi.useRealTimers();vi.restoreAllMocks()})
 function show(area:'media'|'tools'='tools',entry='/toolkit'){return render(<MemoryRouter initialEntries={[entry]}><Routes><Route path="/toolkit" element={<TrainingLibrary area={area}/>}/><Route path="/scales/:id" element={<p>量表编辑页</p>}/></Routes></MemoryRouter>)}
-it('offers only scale and form creation in the tool menu',async()=>{
+it('offers scale, form and ordinary questionnaire creation in the tool menu',async()=>{
  show();await screen.findByText('暂无符合条件的工具')
  fireEvent.click(screen.getByText('编制工具',{selector:'summary'}))
  expect(screen.getByRole('link',{name:'编制量表'})).toHaveAttribute('href','/scales/new')
  expect(screen.getByRole('link',{name:'编制表单'})).toHaveAttribute('href','/toolkit/forms/new')
  expect(screen.queryByRole('link',{name:'编制情境判断'})).not.toBeInTheDocument()
- expect(screen.queryByRole('link',{name:'编制组合测评'})).not.toBeInTheDocument()
+ expect(screen.getByRole('link',{name:'创建普通组合问卷'})).toHaveAttribute('href','/questionnaire-products/new')
 })
 it('keeps SJT and cognitive descriptors without authoring or version actions',async()=>{
  const rows=[{...own,id:'sjt-draft',name:'情境草稿',kind:'sjt-draft',status:'DRAFT',href:'/sjt-authoring?draftId=sjt-draft'},
@@ -34,6 +34,16 @@ it('opens existing composition content for editing and retains its report config
  mocks.get.mockResolvedValue({code:0,data:{list:[{...own,id:'composition',name:'组合问卷',kind:'composition',status:'DRAFT',href:'/toolkit/compositions/composition'}],total:1}});show()
  expect(await screen.findByRole('link',{name:'编辑组合问卷'})).toHaveAttribute('href','/questionnaire-products/composition')
  expect(screen.getByRole('link',{name:'配置与报告'})).toHaveAttribute('href','/toolkit/compositions/composition')
+})
+it.each(['DRAFT','PUBLISHED'])('keeps a %s integrated-report bundle out of all editing and version actions',async status=>{
+ mocks.get.mockResolvedValue({code:0,data:{list:[{...own,id:'fixed',name:'综合报告包',kind:'bundle',status,href:'/questionnaire-products/fixed'}],total:1}});show()
+ const card=within(await screen.findByRole('article',{name:'综合报告包'}))
+ expect(card.getByText('打包组合问卷 · 综合报告')).toBeInTheDocument()
+ expect(card.getByText('综合报告 · 测评内容与分析规则固定')).toBeInTheDocument()
+ expect(card.getByRole('link',{name:'查看与使用'})).toHaveAttribute('href','/bundle-products')
+ expect(card.queryByRole('link',{name:/编辑|配置与报告/})).not.toBeInTheDocument()
+ expect(card.queryByRole('button',{name:'更新版本'})).not.toBeInTheDocument()
+ expect(mocks.post).not.toHaveBeenCalled()
 })
 it.each(['media','tools'] as const)('expands and collapses a truncated %s description without opening the resource',async area=>{
  vi.spyOn(HTMLElement.prototype,'scrollHeight','get').mockReturnValue(100)
