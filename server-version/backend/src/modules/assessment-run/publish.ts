@@ -1,5 +1,10 @@
+import {readPrivateScaleRunSourceForPreparation} from './educationPrivateScaleContext'
+import {prelockEducationLibraryAdmissions,assertEducationLibraryAdmissionsUnchanged,assertEducationLibraryPopulationSupport,lockEducationLibraryPopulationFacts} from './educationLibraryPopulation'
+import {assertEducationRunLibraryResources} from './educationLibraryContext'
 import { matchesClassTarget } from '../assessment-policy/target'
 import { campusRunParticipantScope } from '../campus/activity.runScope'
+import { resolveOwnSchoolActivityPublisher } from '../campus/activity.publisher'
+import { permitsOwnSchoolActivityPair } from '../campus/activity.publisher-policy'
 import {schoolPrivacyV2Enabled,reviewedGeneralResources,generalRunApproved,
   type SchoolActivityPurpose} from '../campus/privacyV2'
 import { teacherFormResourceId,assertTeacherFormRunUse } from '../huiteacher/formRunResource'
@@ -25,6 +30,7 @@ import {
   type RunResourcePolicy,
   type RunTrackNarrowingRequest,
   assertRunTrackNarrowing,
+  relationalEntryToRunPolicy,
   productionRunResourceAuthorityRegistry,
 } from './resourceAuthority'
 import {
@@ -92,6 +98,7 @@ type PublisherAuthority = {
   isOrgAdmin: boolean
   teacherPersona: boolean
   counselorPersona: boolean
+  schoolPsychologyPublisher: boolean
   teacherClassIds: Set<string>
   teacherStudentMembershipIds: Set<string>
   counselorClientMembershipIds: Set<string>
@@ -135,8 +142,8 @@ const parseSelector = (value: unknown): RunPopulationSelectorV1 => {
   throw new RunPublishError('RUN_SELECTOR_INVALID', `unsupported selector kind: ${String(selector.kind)}`, 400)
 }
 
-const readDraftTracks = async (runId: string, organizationId: string): Promise<DraftTrack[]> => {
-  const rows = await prisma.$queryRaw<Array<{
+const readDraftTracks = async (runId: string, organizationId: string, db:Tx=prisma): Promise<DraftTrack[]> => {
+  const rows = await db.$queryRaw<Array<{
     id: string
     organizationId: string
     runId: string
@@ -158,6 +165,14 @@ const readDraftTracks = async (runId: string, organizationId: string): Promise<D
   return rows.map((row) => ({ ...row, subjectSelector: parseSelector(row.subjectSelector), respondentSelector: parseSelector(row.respondentSelector) }))
 }
 
+const assertPreparedPrivatePolicies=(tracks:PreparedTrack[],education:Awaited<ReturnType<typeof assertEducationRunLibraryResources>>)=>{
+ for(const track of tracks.filter(t=>t.resourceKey.startsWith('private-scale:'))){
+  const current=education?.privateResourcePolicies.get(track.resourceKey)
+  if(!current||canonicalHash(current)!==canonicalHash(track.resourcePolicy))
+   throw new RunPublishError('PRIVATE_TOOL_RUNTIME_POLICY_CHANGED','Private fixed-version policy changed during preparation',409)
+ }
+}
+
 const prepareTracks = async (
   runId: string,
   organizationId: string,
@@ -167,7 +182,8 @@ const prepareTracks = async (
   const tracks = await readDraftTracks(runId, organizationId)
   if (tracks.length === 0) throw new RunPublishError('RUN_TRACK_REQUIRED', 'Run requires at least one Track', 409)
   return Promise.all(tracks.map(async (track) => {
-    await assertRegisteredResourceUse({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion }, actorUserId, prisma, false, {organizationId,runId})
+    const privateSource=track.resourceKey.startsWith('private-scale:')?await readPrivateScaleRunSourceForPreparation(prisma,{organizationId,runId,actorUserId,resource:{family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion}}):null
+    if(!privateSource)await assertRegisteredResourceUse({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion }, actorUserId, prisma, false, {organizationId,runId})
     if(teacherFormResourceId({
       family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion,
     })){
@@ -185,7 +201,7 @@ const prepareTracks = async (
       }))
     }
     registry.assertStartSupported(track.resourceFamily)
-    const resourcePolicy = await registry.resolveExact({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion })
+    const resourcePolicy = privateSource?relationalEntryToRunPolicy(privateSource.resourceEntry):await registry.resolveExact({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion })
     assertRunTrackNarrowing(resourcePolicy, track.requestedPolicy)
     requireSingle(track.requestedPolicy.subjectRoles, 'subjectRoles')
     requireSingle(track.requestedPolicy.respondentRoles, 'respondentRoles')
@@ -755,6 +771,9 @@ const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserI
   `
   const teacherPersona = personas.some((row) => row.persona === 'TEACHER')
   const counselorPersona = personas.some((row) => row.persona === 'COUNSELOR')
+  const ownSchoolPublisher=owner.productDomain==='SCHOOL'&&!owner.isTeacherRun
+    ?await resolveOwnSchoolActivityPublisher(tx,{organizationId,actorUserId,runId}):null
+  const schoolPsychologyPublisher=ownSchoolPublisher?.membershipId===membership.id
   const teacherRows = teacherPersona ? await tx.$queryRaw<Array<{ classUnitId: string; studentMembershipId: string }>>`
     SELECT DISTINCT sa."class_unit_id" AS "classUnitId", sc."membership_id" AS "studentMembershipId"
     FROM "organization_staff_class_assignments" sa
@@ -785,6 +804,7 @@ const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserI
       :membership.orgRole === 'ORG_ADMIN',
     teacherPersona: teacherPersona && teacherRows.length > 0,
     counselorPersona: counselorPersona && clientRows.length > 0,
+    schoolPsychologyPublisher,
     teacherClassIds: new Set(teacherRows.map((row) => row.classUnitId)),
     teacherStudentMembershipIds: new Set(teacherRows.map((row) => row.studentMembershipId).filter(Boolean)),
     counselorClientMembershipIds: new Set(clientRows.map((row) => row.clientMembershipId)),
@@ -797,7 +817,7 @@ const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserI
     throw new RunPublishError('HUITEACHER_PUBLISH_ADMIN_REVOKED',
       'current Teacher product administrator grant is required',403)
   }
-  if (!authority.isOrgAdmin && !authority.teacherPersona && !authority.counselorPersona) {
+  if (!authority.isOrgAdmin && !authority.teacherPersona && !authority.counselorPersona && !authority.schoolPsychologyPublisher) {
     throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'publisher requires ORG_ADMIN, TEACHER, or COUNSELOR authority', 403)
   }
   return authority
@@ -806,11 +826,19 @@ const loadPublisherAuthority = async (tx: Tx, organizationId: string, actorUserI
 const assertPublisherScope = (authority: PublisherAuthority, actorUserId: string, pair: PopulationPair, policy?: RunResourcePolicy): void => {
   if (policy?.initiationModes) {
     const modes = policy.initiationModes
-    const permitted = authority.isOrgAdmin ? modes.includes('ORG_ASSIGN') : (authority.teacherPersona && modes.includes('CLASS_ASSIGN')) || (authority.counselorPersona && modes.includes('PROFESSIONAL_ASSIGN'))
+    const permitted = authority.isOrgAdmin ? modes.includes('ORG_ASSIGN') : ((authority.teacherPersona||authority.schoolPsychologyPublisher) && modes.includes('CLASS_ASSIGN')) || (authority.schoolPsychologyPublisher && modes.includes('RELATED_OBSERVER_ASSIGN')) || (authority.counselorPersona && modes.includes('PROFESSIONAL_ASSIGN'))
     if (!permitted) throw new RunPublishError('RUN_INITIATION_FORBIDDEN', 'Content policy does not permit this delivery authority', 403)
   }
   if (authority.isOrgAdmin) return
   let allowed = false
+  if(authority.schoolPsychologyPublisher){
+    // Current owner permission and approved same-school students were resolved above.
+    // Observer pairs come from canonical parent/class relationship rows, not client roles.
+    allowed=permitsOwnSchoolActivityPair(pair,policy?.initiationModes)
+    if(!allowed)throw new RunPublishError('RUN_PUBLISH_SCOPE',
+      'School psychologist may publish selected students self reports or related parent/homeroom teacher reports',403)
+    return
+  }
   if (authority.teacherPersona && (!policy?.initiationModes || policy.initiationModes.includes('CLASS_ASSIGN'))) {
     if (pair.relationshipKind === 'SELF') {
       const member = pair.subject.provenanceKind === 'ORG_MEMBER' ? pair.subject : null
@@ -915,6 +943,19 @@ export interface PublishedRunResult {
   executionCount: number
 }
 
+async function resolveLibraryPopulationSet(tx:Tx,input:{organizationId:string;runId:string;actorUserId:string},tracks:PreparedTrack[],campusSelected:Set<string>|null,publish:boolean,admissions:string[],publisherMembershipId:string){
+  assertEducationLibraryPopulationSupport(tracks)
+  await assertEducationLibraryAdmissionsUnchanged(tx,input,admissions)
+  const before=await Promise.all(tracks.map(track=>resolvePairs(tx,input.organizationId,track,campusSelected)))
+  const labelIds=tracks.flatMap(track=>[track.subjectSelector,track.respondentSelector].flatMap(selector=>selector.kind==='LABELS'?selector.labelIds:[]))
+  await lockEducationLibraryPopulationFacts(tx,{organizationId:input.organizationId,pairs:before.flat(),labelIds,additionalMemberIds:[publisherMembershipId]})
+  const selected=await campusRunParticipantScope(tx,{...input,publish})
+  const after=await Promise.all(tracks.map(track=>resolvePairs(tx,input.organizationId,track,selected)))
+  const fingerprint=(sets:PopulationPair[][])=>canonicalHash(sets.map(pairs=>pairs.map(pair=>({...pair,scopeClassUnitIds:[...pair.scopeClassUnitIds].sort()})).sort((a,b)=>canonicalHash(a).localeCompare(canonicalHash(b)))))
+  if(fingerprint(before)!==fingerprint(after))throw new RunPublishError('RUN_POPULATION_CHANGED_RETRY','Selected population changed; refresh and retry',409)
+  return new Map(tracks.map((track,index)=>[track.id,after[index]]))
+}
+
 export const publishAssessmentRun = async (input: {
   organizationId: string
   runId: string
@@ -936,6 +977,11 @@ export const publishAssessmentRun = async (input: {
   })))
 
   return prisma.$transaction(async (tx) => {
+    const libraryBatch=preparedTracks.some(t=>t.resourceKey.startsWith('library-scale:')||t.resourceKey.startsWith('private-scale:'))
+    if(libraryBatch)assertEducationLibraryPopulationSupport(preparedTracks)
+    const admissions=libraryBatch?await prelockEducationLibraryAdmissions(tx,input):[]
+    const education=await assertEducationRunLibraryResources(tx,{organizationId:input.organizationId,runId:input.runId,actorUserId:input.actorUserId,purpose:'PUBLISH',resources:preparedTracks.map(t=>({family:t.resourceFamily,key:t.resourceKey,version:t.resourceVersion}))})
+    assertPreparedPrivatePolicies(preparedTracks,education)
     const organizations = await tx.$queryRaw<Array<{ status: string }>>`
       SELECT "status" FROM "organizations" WHERE "id" = ${input.organizationId} FOR UPDATE
     `
@@ -953,11 +999,14 @@ export const publishAssessmentRun = async (input: {
         AND "permission" IN ('*', 'ORGANIZATION_GOVERNANCE', 'ASSESSMENT_DELIVERY', 'ASSESSMENT_RUN_PUBLISH', 'RUN_PUBLISH')
     `
     if (denies.length) throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'explicit deny prevents Run publication', 403)
-    const authority = await loadPublisherAuthority(tx, input.organizationId, input.actorUserId, input.runId)
+    let authority = await loadPublisherAuthority(tx, input.organizationId, input.actorUserId, input.runId)
     if (!authority.isOrgAdmin && run.createdByUserId !== input.actorUserId) {
       throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'scoped professionals may publish only their own assessment campaigns', 403)
     }
     if (run.status === 'PUBLISHED') {
+      if(authority.schoolPsychologyPublisher)await campusRunParticipantScope(tx,{
+        organizationId:input.organizationId,runId:input.runId,actorUserId:input.actorUserId,publish:true,
+      })
       const countRows = await tx.$queryRaw<Array<{ count: number }>>`
         SELECT COUNT(*)::int AS "count" FROM "assessment_run_executions" WHERE "run_id" = ${input.runId}
       `
@@ -1009,10 +1058,18 @@ export const publishAssessmentRun = async (input: {
       organizationId:input.organizationId,runId:input.runId,
       actorUserId:input.actorUserId,publish:true,
     })
+    const libraryPairs=libraryBatch?await resolveLibraryPopulationSet(tx,input,preparedTracks,campusSelected,true,admissions,authority.membershipId):null
+    if(libraryBatch)authority=await loadPublisherAuthority(tx,input.organizationId,input.actorUserId,input.runId)
     const actorCache = new Map<string, string>()
+    // Relationships are Run-scoped, whereas policies, episodes and assignments
+    // remain Track-scoped. Reuse only an identical frozen relationship within
+    // this locked publication transaction; never overwrite immutable facts.
+    const relationshipCache = new Map<string, { id: string; snapshotHash: string }>()
     let executionCount = 0
 
     for (const track of preparedTracks) {
+      // New library tracks were batch-authorized before the org lock. Never select another issuer here.
+      if(!track.resourceKey.startsWith('library-scale:')&&!track.resourceKey.startsWith('private-scale:'))
       await assertRegisteredResourceUse({ family: track.resourceFamily, key: track.resourceKey, version: track.resourceVersion }, input.actorUserId, tx, true, {organizationId:input.organizationId,runId:input.runId})
       if(teacherFormResourceId({
         family:track.resourceFamily,key:track.resourceKey,version:track.resourceVersion,
@@ -1037,7 +1094,7 @@ export const publishAssessmentRun = async (input: {
         SET "frozen_resource_policy" = ${frozenPolicyJson}::jsonb, "resource_policy_hash" = ${policyHash}
         WHERE "id" = ${track.id} AND "run_id" = ${input.runId}
       `
-      const pairs = await resolvePairs(tx, input.organizationId, track, campusSelected)
+      const pairs = libraryPairs?.get(track.id)??await resolvePairs(tx, input.organizationId, track, campusSelected)
       if (pairs.length === 0) throw new RunPublishError('RUN_EMPTY_POPULATION', `Track ${track.id} resolved no eligible actor pairs`, 409)
       if(studentFormResourceId({family:track.resourceFamily,
         key:track.resourceKey,version:track.resourceVersion})&&pairs.length<teacherResourceMinimum())
@@ -1065,15 +1122,27 @@ export const publishAssessmentRun = async (input: {
           facts: pair.facts,
         })
         const relationshipSnapshotHash = canonicalHash({ schema: 'RelationalRelationshipSnapshotV1', snapshot: relationalSnapshot })
-        const runRelationship = await insertRunRelationshipSnapshot(tx, {
-          organizationId: input.organizationId,
-          runId: input.runId,
-          relationshipKind: pair.relationshipKind,
-          relationshipRef: pair.relationshipRef,
-          subjectActorSnapshotId,
-          respondentActorSnapshotId,
-          snapshotPayload: relationalSnapshot,
-        })
+        const relationshipKey = JSON.stringify([
+          subjectActorSnapshotId, respondentActorSnapshotId,
+          pair.relationshipKind, pair.relationshipRef ?? '',
+        ])
+        let runRelationship = relationshipCache.get(relationshipKey)
+        if (runRelationship && runRelationship.snapshotHash !== canonicalHash(relationalSnapshot)) {
+          throw new RunPublishError('RUN_RELATIONSHIP_SNAPSHOT_CONFLICT',
+            'Tracks resolved different facts for the same Run relationship', 409)
+        }
+        if (!runRelationship) {
+          runRelationship = await insertRunRelationshipSnapshot(tx, {
+            organizationId: input.organizationId,
+            runId: input.runId,
+            relationshipKind: pair.relationshipKind,
+            relationshipRef: pair.relationshipRef,
+            subjectActorSnapshotId,
+            respondentActorSnapshotId,
+            snapshotPayload: relationalSnapshot,
+          })
+          relationshipCache.set(relationshipKey, runRelationship)
+        }
         const allocation = await getOrCreateOrganizationEpisodeAllocationInTransaction(tx, {
           organizationId: input.organizationId,
           runId: input.runId,
@@ -1199,7 +1268,7 @@ export const publishAssessmentRun = async (input: {
       )
     `
     return { runId: input.runId, version, trackCount: preparedTracks.length, executionCount }
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.Serializable })
+  }, { isolationLevel: preparedTracks.some(t=>t.resourceKey.startsWith('library-scale:')||t.resourceKey.startsWith('private-scale:'))?Prisma.TransactionIsolationLevel.ReadCommitted:Prisma.TransactionIsolationLevel.Serializable })
 }
 
 /** Advisory, write-free population preview; publish repeats every authority check. */
@@ -1209,6 +1278,11 @@ export const previewAssessmentRun = async (input: {
 }) => {
   const prepared = await prepareTracks(input.runId, input.organizationId, input.resourceRegistry ?? productionRunResourceAuthorityRegistry, input.actorUserId)
   return prisma.$transaction(async tx => {
+    const libraryBatch=prepared.some(t=>t.resourceKey.startsWith('library-scale:')||t.resourceKey.startsWith('private-scale:'))
+    if(libraryBatch)assertEducationLibraryPopulationSupport(prepared)
+    const admissions=libraryBatch?await prelockEducationLibraryAdmissions(tx,input):[]
+    const education=await assertEducationRunLibraryResources(tx,{organizationId:input.organizationId,runId:input.runId,actorUserId:input.actorUserId,purpose:'PREVIEW',resources:prepared.map(t=>({family:t.resourceFamily,key:t.resourceKey,version:t.resourceVersion}))})
+    assertPreparedPrivatePolicies(prepared,education)
     const organizations = await tx.$queryRaw<Array<{ status: string }>>`
       SELECT "status" FROM "organizations" WHERE "id" = ${input.organizationId} FOR SHARE
     `
@@ -1218,13 +1292,20 @@ export const previewAssessmentRun = async (input: {
       FROM "assessment_runs" WHERE "organization_id" = ${input.organizationId} AND "id" = ${input.runId} FOR SHARE
     `
     if (runs[0]?.status !== 'DRAFT' || runs[0]?.version !== input.expectedVersion) throw new RunPublishError('RUN_STATE_CONFLICT', 'Run changed; refresh before preview', 409)
+    // The caller's expected version cannot validate an earlier, separately read
+    // track set. Run SHARE prevents draft mutations while checking that set.
+    if(libraryBatch){
+      const current=await readDraftTracks(input.runId,input.organizationId,tx)
+      const identity=(rows:DraftTrack[])=>canonicalHash(rows.map(({id,resourceFamily,resourceKey,resourceVersion,subjectSelector,respondentSelector,requestedPolicy})=>({id,resourceFamily,resourceKey,resourceVersion,subjectSelector,respondentSelector,requestedPolicy})))
+      if(identity(current)!==identity(prepared))throw new RunPublishError('RUN_STATE_CONFLICT','Run Tracks changed before preview',409)
+    }
     const denies = await tx.$queryRaw<Array<{ id: string }>>`
       SELECT "id" FROM "organization_access_denies" WHERE "organization_id" = ${input.organizationId}
         AND "user_id" = ${input.actorUserId} AND "lifted_at" IS NULL
         AND "permission" IN ('*', 'ORGANIZATION_GOVERNANCE', 'ASSESSMENT_DELIVERY', 'ASSESSMENT_RUN_PUBLISH', 'RUN_PUBLISH')
     `
     if (denies.length) throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'explicit deny prevents Run preview', 403)
-    const authority = await loadPublisherAuthority(tx, input.organizationId, input.actorUserId, input.runId)
+    let authority = await loadPublisherAuthority(tx, input.organizationId, input.actorUserId, input.runId)
     if (!authority.isOrgAdmin && runs[0].createdByUserId !== input.actorUserId) {
       throw new RunPublishError('RUN_PUBLISH_FORBIDDEN', 'scoped professionals may preview only their own assessment campaigns', 403)
     }
@@ -1232,13 +1313,15 @@ export const previewAssessmentRun = async (input: {
       organizationId:input.organizationId,runId:input.runId,
       actorUserId:input.actorUserId,publish:false,
     })
+    const libraryPairs=libraryBatch?await resolveLibraryPopulationSet(tx,input,prepared,campusSelected,false,admissions,authority.membershipId):null
+    if(libraryBatch)authority=await loadPublisherAuthority(tx,input.organizationId,input.actorUserId,input.runId)
     const tracks = []
     for (const track of prepared) {
-      const pairs = await resolvePairs(tx, input.organizationId, track, campusSelected)
+      const pairs = libraryPairs?.get(track.id)??await resolvePairs(tx, input.organizationId, track, campusSelected)
       if (pairs.length === 0) throw new RunPublishError('RUN_EMPTY_POPULATION', 'Track resolved no eligible actor pairs', 409)
       for (const pair of pairs) assertPublisherScope(authority, input.actorUserId, pair, track.resourcePolicy)
       tracks.push({ trackId: track.id, executionCount: pairs.length, subjectCount: new Set(pairs.map(pair => actorCacheKey(pair.subject))).size, respondentCount: new Set(pairs.map(pair => actorCacheKey(pair.respondent))).size, resourcePolicy: track.resourcePolicy })
     }
     return { runId: input.runId, version: input.expectedVersion, tracks }
-  }, { isolationLevel: Prisma.TransactionIsolationLevel.RepeatableRead })
+  }, { isolationLevel: prepared.some(t=>t.resourceKey.startsWith('library-scale:')||t.resourceKey.startsWith('private-scale:'))?Prisma.TransactionIsolationLevel.ReadCommitted:Prisma.TransactionIsolationLevel.RepeatableRead })
 }

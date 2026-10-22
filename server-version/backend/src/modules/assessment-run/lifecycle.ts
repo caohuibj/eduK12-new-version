@@ -1,5 +1,7 @@
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
+import type { AuthenticatedPrincipal } from '../../types'
+import { lockAndAssertCampusActivityPublisher } from '../campus/activity.service'
 
 export class RunLifecycleError extends Error {
   constructor(public readonly code: string, message: string, public readonly statusCode = 409) {
@@ -105,8 +107,21 @@ const expireUnstarted = async (tx: Tx, row: ExecutionLifecycleRow, mode: 'CLOSE'
 export const closeAssessmentRun = async (input: {
   organizationId: string
   runId: string
+  schoolActivity?:{actor:AuthenticatedPrincipal;courseId:string}
 }): Promise<{ status: 'CLOSED' }> => prisma.$transaction(async (tx) => {
   const run = await lockRunEnvelope(tx, input.organizationId, input.runId)
+  if(input.schoolActivity){
+    await lockAndAssertCampusActivityPublisher(tx,{
+      actor:input.schoolActivity.actor,organizationId:input.organizationId,
+      courseId:input.schoolActivity.courseId,runId:input.runId,
+    })
+    const links=await tx.$queryRaw<Array<{found:boolean}>>`
+      SELECT EXISTS(SELECT 1 FROM "campus_activity_runs"
+        WHERE "organization_id"=${input.organizationId} AND "course_id"=${input.schoolActivity.courseId}
+          AND "run_id"=${input.runId}) AS "found"
+    `
+    if(!links[0]?.found)throw new RunLifecycleError('ACTIVITY_RUN_NOT_LINKED','Run is not bound to this activity',403)
+  }
   if (run.status === 'CLOSED') return { status: 'CLOSED' as const }
   if (run.status !== 'PUBLISHED') {
     throw new RunLifecycleError('RUN_STATE_CONFLICT', 'only a PUBLISHED Run can be closed', 409)
@@ -125,8 +140,21 @@ export const closeAssessmentRun = async (input: {
 export const cancelAssessmentRun = async (input: {
   organizationId: string
   runId: string
+  schoolActivity?:{actor:AuthenticatedPrincipal;courseId:string}
 }): Promise<{ status: 'CANCELLED' }> => prisma.$transaction(async (tx) => {
   const run = await lockRunEnvelope(tx, input.organizationId, input.runId)
+  if(input.schoolActivity){
+    await lockAndAssertCampusActivityPublisher(tx,{
+      actor:input.schoolActivity.actor,organizationId:input.organizationId,
+      courseId:input.schoolActivity.courseId,runId:input.runId,
+    })
+    const links=await tx.$queryRaw<Array<{found:boolean}>>`
+      SELECT EXISTS(SELECT 1 FROM "campus_activity_runs"
+        WHERE "organization_id"=${input.organizationId} AND "course_id"=${input.schoolActivity.courseId}
+          AND "run_id"=${input.runId}) AS "found"
+    `
+    if(!links[0]?.found)throw new RunLifecycleError('ACTIVITY_RUN_NOT_LINKED','Run is not bound to this activity',403)
+  }
   if (run.status === 'CANCELLED') return { status: 'CANCELLED' as const }
   if (run.status !== 'PUBLISHED') {
     throw new RunLifecycleError('RUN_STATE_CONFLICT', 'only a PUBLISHED Run can be cancelled', 409)

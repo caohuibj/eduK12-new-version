@@ -1,3 +1,4 @@
+import {readPrivateRuntimeScaleSource,assertPrivateRuntimeCompositeIdentity} from '../education-tools/private-tool.runtime-source'
 import {readLibraryScaleMeasurementSource} from '../scale-library-governance/training-source'
 import {trainingReferencePolicySchema} from './training-reference-selection'
 import {readStaticSjtMeasurementForStart,recheckStaticSjtConsumerLicense} from '../situational/static-measurement-release'
@@ -19,7 +20,8 @@ import { situationalReleaseKey, type ResolvedSituationalRelease } from '../situa
 
 const text=z.string().min(1).max(240),digest=z.string().regex(/^[a-f0-9]{64}$/)
 const sourceSchema=z.object({kind:z.enum(['SCALE','COGNITIVE_CONFIG','SJT_AUTHOR_RELEASE','STATIC_SJT_REGISTRY']),id:text,ownerId:text.optional(),
-  libraryEntryId:z.string().uuid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+  libraryEntryId:z.string().uuid().optional(),privateVersionId:z.string().uuid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+ if(source.privateVersionId&&(source.kind!=='SCALE'||source.libraryEntryId!==undefined))ctx.addIssue({code:'custom',message:'Private Scale identity cannot alias library or other families'})
  if(source.libraryEntryId&&source.kind!=='SCALE')ctx.addIssue({code:'custom',message:'Library identity is only valid for Scale'})
  if(source.kind==='STATIC_SJT_REGISTRY'?(!z.string().uuid().safeParse(source.id).success||source.ownerId!==undefined||!source.instrumentKey||!source.instrumentVersion||source.assignmentId!==undefined):!source.ownerId)
   ctx.addIssue({code:'custom',message:'Exact source identity required'})
@@ -168,9 +170,19 @@ async function readExactLibrarySource(db:Prisma.TransactionClient,release:Stored
  * entry marker or a widened PRIVATE scope. Their existing lifecycle/stop policy
  * remains at each collection or historical-report boundary. */
 export async function trainingMeasurementSourceScopeMatchesForConsumer(db:Prisma.TransactionClient,release:Stored,source:Unit['source']){
+ if(source.privateVersionId){await readExactPrivateSource(db,release,source);return true}
  if(!source.libraryEntryId)return trainingMeasurementSourceScopeMatches(release,source)
  await readExactLibrarySource(db,release,source,'FROZEN_IDENTITY')
  return true
+}
+async function readExactPrivateSource(db:Prisma.TransactionClient,release:Stored,source:Unit['source']){
+ if(source.kind!=='SCALE'||!source.privateVersionId||source.libraryEntryId)fail('SCOPE_DENIED')
+ const scale=await db.scale.findUnique({where:{id:source.id}})
+ if(!scale||scale.creatorId!==source.ownerId)fail('SCOPE_DENIED')
+ const identity=await readPrivateRuntimeScaleSource(db,scale,source.privateVersionId)
+ if(identity.release.releaseId!==release.releaseId||identity.release.contentHash!==release.contentHash
+  ||canonicalHash(identity.release.scope)!==canonicalHash(release.scope))fail('SOURCE_MISMATCH')
+ return identity
 }
 function assertScope(release:Stored,source:Unit['source']){
  if(!trainingMeasurementSourceScopeMatches(release,source))fail('SCOPE_DENIED')
@@ -209,9 +221,11 @@ export async function prepareTrainingContentAttemptBinding(db:Prisma.Transaction
     if(release.layer!=='MEASUREMENT'||release.family!==unit.family||release.status==='REVOKED'
       ||release.contentHash!==unit.measurement.contentHash||release.content.measurementHash!==unit.measurement.measurementHash)fail('BINDING_INVALID')
     const library=unit.source.libraryEntryId?await readExactLibrarySource(db,release,unit.source,'FROZEN_IDENTITY'):null
-    if(!library)assertScope(release,unit.source)
-    if(library&&canonicalHash(item.scale.definition)!==canonicalHash(library.definition))fail('SOURCE_MISMATCH')
-    const expected=projectActualMeasurement(item,release,input.resolvedSituational,Boolean(library))
+    const privateSource=unit.source.privateVersionId?await readExactPrivateSource(db,release,unit.source):null
+    if(privateSource)await assertPrivateRuntimeCompositeIdentity(db,input.compositeId,unit.source.id,unit.source.privateVersionId!)
+    if(!library&&!privateSource)assertScope(release,unit.source)
+    if((library||privateSource)&&canonicalHash(item.scale.definition)!==canonicalHash((library??privateSource)!.definition))fail('SOURCE_MISMATCH')
+    const expected=projectActualMeasurement(item,release,input.resolvedSituational,Boolean(library||privateSource))
     if(expected.family!==unit.family||prepareRelease(expected).contentHash!==unit.measurement.contentHash
       ||canonicalHash(expected.content)!==canonicalHash(release.content))fail('SOURCE_MISMATCH')
   }

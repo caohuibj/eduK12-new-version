@@ -1,3 +1,4 @@
+import { readEducationRespondentScaleReport } from '../reporting/education-scale-personal-report.service'
 import { prisma } from '../../config/database'
 import { readRespondentRunSummary } from '../reporting/respondentSummary'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
@@ -19,6 +20,8 @@ function denied():never {throw new TeacherScaleReportError('HUITEACHER_PERSONAL_
 export async function readTeacherPersonalScaleReport(input:{
   actorUserId:string;executionId:string
 }){
+  const libraryReport = await readEducationRespondentScaleReport({ ...input, product: 'TEACHER' })
+  if (libraryReport) return libraryReport
   const records=await prisma.$queryRaw<Array<{
     organizationId:string;resourceKey:string;resourceVersion:string;
     definitionHash:string;scaleDefinition:unknown;title:string;

@@ -9,7 +9,7 @@ export const releaseStatus = z.enum(['PUBLISHED', 'SUPERSEDED', 'RETIRED', 'REVO
 const text = z.string().trim().min(1).max(240)
 const digest = z.string().regex(/^[a-f0-9]{64}$/)
 export const contentScope = z.discriminatedUnion('kind', [
-  z.object({ kind: z.literal('PRIVATE'), ownerId: text, product: z.enum(['TRAINING', 'SURVEY']), resourceId: text }).strict(),
+  z.object({ kind: z.literal('PRIVATE'), ownerId: text, product: z.enum(['TRAINING', 'SURVEY', 'SCHOOL', 'TEACHER']), resourceId: text }).strict(),
   z.object({ kind: z.literal('SHARED'), ownerId: text, product: z.enum(['TRAINING', 'SURVEY', 'SCHOOL', 'TEACHER']), resourceId: text }).strict(),
   z.object({ kind: z.literal('PLATFORM'), ownerId: text.optional() }).strict(),
 ])

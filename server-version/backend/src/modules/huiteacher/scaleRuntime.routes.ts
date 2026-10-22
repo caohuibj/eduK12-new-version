@@ -1,3 +1,8 @@
+import {privateScaleRegistryIdentitySql} from '../assessment-run/educationPrivateScaleIdentitySql'
+import { teacherLibraryExecutionBindingMatches } from './libraryScaleExecution'
+import { compositeImageController } from '../composite/composite-image.controller'
+import { compositeVideoController } from '../composite/composite-video.controller'
+import { boundCompositeContinuationSql } from '../assessment-run/boundCompositeContinuation'
 import { Router,type Request,type Response,type NextFunction,type RequestHandler } from 'express'
 import { z,ZodError } from 'zod'
 import { Prisma } from '@prisma/client'
@@ -32,8 +37,8 @@ const wrap=(work:(req:Request)=>Promise<unknown>)=>asyncHandler(async(req,res)=>
   }
 })
 
-type Allowed={executionId:string;organizationId:string;runId:string;attemptId:string|null}
-async function ownScaleExecution(input:{actorUserId:string;executionId?:string;attemptId?:string})
+type Allowed={executionId:string;organizationId:string;runId:string;attemptId:string|null;resourceKey:string;resourceVersion:string;assignmentId:string}
+async function ownScaleExecution(input:{actorUserId:string;executionId?:string;attemptId?:string;itemId?:string;purpose?:'COLLECTION'|'REPORT_READ'})
   :Promise<Allowed|null>{
   const executionFilter=input.executionId
     ?Prisma.sql`AND execution."id"=${input.executionId}`
@@ -43,14 +48,18 @@ async function ownScaleExecution(input:{actorUserId:string;executionId?:string;a
     SELECT execution."id" AS "executionId",
       execution."organization_id" AS "organizationId",
       execution."run_id" AS "runId",
-      execution."runtime_binding_ref" AS "attemptId"
+      execution."runtime_binding_ref" AS "attemptId",
+      execution."relational_assignment_id" AS "assignmentId",
+      track."resource_key" AS "resourceKey", track."resource_version" AS "resourceVersion"
     FROM "assessment_run_executions" execution
     JOIN "assessment_run_tracks" track
       ON track."id"=execution."track_id"
       AND track."organization_id"=execution."organization_id"
       AND track."run_id"=execution."run_id"
       AND track."resource_family"='SCALE'
-      AND track."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL'
+      AND (track."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL'
+        OR track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF'
+        OR track."resource_key" LIKE 'private-scale:TEACHER:%:TEACHER:SELF')
     JOIN "users" actual_respondent
       ON actual_respondent."id"=${input.actorUserId}
       AND actual_respondent."account_domain"='SCHOOL'
@@ -70,11 +79,18 @@ async function ownScaleExecution(input:{actorUserId:string;executionId?:string;a
     JOIN "huiteacher_evaluation_run_links" link
       ON link."organization_id"=execution."organization_id"
       AND link."run_id"=execution."run_id"
-    WHERE ${currentRunPopulationAuthoritySql(Prisma.sql`execution."id"`)}
+    WHERE CASE WHEN (track."resource_key" LIKE 'library-scale:%' OR track."resource_key" LIKE 'private-scale:%') AND ${input.purpose === 'REPORT_READ'}
+      THEN ${currentRunPopulationAuthoritySql(Prisma.sql`execution."id"`, 'REPORT_READ')}
+      ELSE ${currentRunPopulationAuthoritySql(Prisma.sql`execution."id"`)} END
       ${executionFilter}
     LIMIT 1
   `)
-  return rows[0]??null
+  const row=rows[0]
+  if(!row)return null
+  if((row.resourceKey.startsWith('library-scale:')||row.resourceKey.startsWith('private-scale:')) && !await teacherLibraryExecutionBindingMatches(prisma,{
+    ...row,actorUserId:input.actorUserId,itemId:input.itemId,purpose:input.purpose,
+  }))return null
+  return row
 }
 async function requireScaleAttempt(req:Request,res:Response,next:NextFunction){
   try{
@@ -82,7 +98,7 @@ async function requireScaleAttempt(req:Request,res:Response,next:NextFunction){
     if(!req.user||req.user.accountDomain!=='SCHOOL')
       return notFound(res,'教师测评记录不存在')
     const proof=await ownScaleExecution({
-      actorUserId:req.user.userId,attemptId,
+      actorUserId:req.user.userId,attemptId,itemId:req.params.itemId,
     })
     if(!proof)return notFound(res,'教师测评记录不存在')
     const scope=await resolveEducationProductMemberScope({
@@ -93,8 +109,7 @@ async function requireScaleAttempt(req:Request,res:Response,next:NextFunction){
     next()
   }catch(e){next(e)}
 }
-router.get('/my-scale-tasks',authenticateHuiteacher,wrap(async req=>{
-  const userId=req.user!.userId
+export async function listOwnTeacherScaleTasks(userId:string){
   const rows=await prisma.$queryRaw<Array<{
     executionId:string;eventId:string;eventTitle:string;runId:string;
     organizationId:string;status:string;runtimeBindingRef:string|null;
@@ -115,7 +130,9 @@ router.get('/my-scale-tasks',authenticateHuiteacher,wrap(async req=>{
       ON track."organization_id"=e."organization_id"
       AND track."run_id"=e."run_id" AND track."id"=e."track_id"
       AND track."resource_family"='SCALE'
-      AND track."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL'
+      AND (track."resource_key" LIKE 'teacher-scale:%:INDIVIDUAL'
+        OR track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF'
+        OR track."resource_key" LIKE 'private-scale:TEACHER:%:TEACHER:SELF')
     JOIN "registered_assessment_resources" registered
       ON registered."resource_key"=track."resource_key"
       AND registered."resource_version"=track."resource_version"
@@ -158,26 +175,40 @@ router.get('/my-scale-tasks',authenticateHuiteacher,wrap(async req=>{
       AND persona."persona"='TEACHER' AND persona."revoked_at" IS NULL
     WHERE e."status" IN ('ASSIGNED','STARTED','COMPLETED')
       AND (e."status"='COMPLETED' OR
-        (event."status"='OPEN' AND run."status"='PUBLISHED'
+        (event."status"='OPEN' AND (run."status"='PUBLISHED'
+          OR (run."status"='CLOSED' AND ${boundCompositeContinuationSql(Prisma.sql`e."id"`,userId)}
+            AND ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)}))
           AND registered."status"='PUBLISHED'
-          AND EXISTS (
+          AND (EXISTS (
             SELECT 1 FROM "education_teacher_scale_licenses" license
             WHERE license."organization_id"=e."organization_id"
               AND license."resource_id"=registered."id"
               AND license."status"='ACTIVE'
-          )
+          ) OR (track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF'
+            AND registered."entry"->'libraryOrigin'->>'product'='TEACHER'
+            AND registered."entry"->'libraryOrigin'->>'variantKey'='TEACHER:SELF')
+          OR ${privateScaleRegistryIdentitySql({registered:Prisma.sql`registered`,organizationId:Prisma.sql`e.organization_id`,product:'TEACHER'})})
         ))
       AND NOT EXISTS(
         SELECT 1 FROM "organization_access_denies" deny
         WHERE deny."organization_id"=org."id" AND deny."user_id"=${userId}
           AND deny."lifted_at" IS NULL
           AND deny."permission" IN ('*','EDUCATION_ACCESS',
-            'HUITEACHER_ACCESS','RUN_START')
+            'HUITEACHER_ACCESS')
+          OR (deny."organization_id"=org."id" AND deny."user_id"=${userId}
+            AND deny."lifted_at" IS NULL AND deny."permission"='RUN_START'
+            AND NOT (e."status"='COMPLETED' AND (track."resource_key" LIKE 'library-scale:%:TEACHER:TEACHER:SELF'
+              OR track."resource_key" LIKE 'private-scale:TEACHER:%:TEACHER:SELF')))
       )
+    AND ((track."resource_key" NOT LIKE 'library-scale:%' AND track."resource_key" NOT LIKE 'private-scale:%') OR CASE WHEN e."status"='COMPLETED'
+        THEN ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`, 'REPORT_READ')}
+        ELSE ${currentRunPopulationAuthoritySql(Prisma.sql`e."id"`)} END)
     ORDER BY e."created_at" DESC,e."id" DESC LIMIT 101
   `
   return {list:rows.slice(0,100),truncated:rows.length>100}
-}))
+}
+router.get('/my-scale-tasks',authenticateHuiteacher,wrap(async req=>
+  listOwnTeacherScaleTasks(req.user!.userId)))
 router.post('/run-executions/:executionId/start-scale',
   authenticateHuiteacher,wrap(async req=>{
     const executionId=uuid.parse(req.params.executionId)
@@ -206,6 +237,10 @@ const requireTeacherCompositeFinalConsent: RequestHandler=(req,_res,next)=>{
       req.params.attemptId,req.user!.userId))
     .then(()=>next()).catch(next)
 }
+router.get('/composite-attempts/:attemptId/items/:itemId/scale/assets/:assetId/content',
+  authenticateHuiteacher,requireScaleAttempt,compositeImageController.authenticatedScaleImage)
+router.post('/composite-attempts/:attemptId/items/:itemId/scale/items/:itemCode/video-capability',
+  authenticateHuiteacher,requireScaleAttempt,compositeVideoController.authenticatedScaleVideo)
 router.post('/composite-attempts/:attemptId/items/:itemId/scale/submit',
   authenticateHuiteacher,requireScaleAttempt,requireTeacherCompositeFinalConsent,
   compositeController.submitFinalScale)
@@ -213,7 +248,7 @@ router.get('/run-executions/:executionId/personal-summary',
   authenticateHuiteacher,wrap(async req=>{
     const executionId=uuid.parse(req.params.executionId)
     const selected=await ownScaleExecution({
-      actorUserId:req.user!.userId,executionId,
+      actorUserId:req.user!.userId,executionId,purpose:'REPORT_READ',
     })
     if(!selected)return {mode:'NONE',state:'WITHHELD'}
     const scope=await resolveEducationProductMemberScope({

@@ -1,4 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import {EducationPrivateToolStudio} from '../components/education-tools/EducationPrivateToolStudio'
+import {usePrivateToolCapability,type PrivateDraftState} from '../components/education-tools/privateToolClient'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import './school.css'
 import './school-workspace.css'
 import { SchoolMark } from './SchoolMark'
@@ -8,6 +10,7 @@ import { schoolFeatures } from './school-features'
 import { SchoolLanding, SchoolPublicHeader, SchoolCodeRegistration, type SchoolRegistrationEntry } from './SchoolLanding'
 import { SchoolStudentRecovery, SchoolRecoveryOfficer } from './SchoolRecovery'
 import { SchoolActivityManager } from './SchoolActivityManager'
+import { schoolClassApprovalReasons } from './school-activity-workflow'
 import { ReportPrivacyPreferences } from '../components/report-privacy/ReportPrivacyPreferences'
 import { ProductPasswordChange } from '../components/account/ProductPasswordChange'
 import { SchoolStudentTasks } from './SchoolStudentTasks'
@@ -34,7 +37,7 @@ const cookie=(name:string)=>{
   const item=document.cookie.split('; ').find(value=>value.startsWith(key))
   return item?decodeURIComponent(item.slice(key.length)):null
 }
-async function api<T>(path:string,method='GET',payload?:unknown):Promise<T>{
+async function api<T>(path:string,method='GET',payload?:unknown,options?:{responseType?:'blob'}):Promise<T>{
   const headers:Record<string,string>={'Content-Type':'application/json'}
   if(method!=='GET'){
     let csrf=cookie('huischool_csrf')
@@ -47,12 +50,14 @@ async function api<T>(path:string,method='GET',payload?:unknown):Promise<T>{
     if(!csrf)throw new Error('安全令牌不可用')
     headers['X-CSRF-Token']=csrf
   }
+  if(payload instanceof FormData)delete headers['Content-Type']
   const response=await fetch('/api/campus'+path,{
     method,headers,credentials:'same-origin',
-    ...(payload===undefined?{}:{body:JSON.stringify(payload)}),
+    ...(payload===undefined?{}:{body:payload instanceof FormData?payload:JSON.stringify(payload)}),
   })
+  if(options?.responseType==='blob'&&response.ok)return await response.blob() as T
   const result=await response.json() as Envelope<T>
-  if(!response.ok||result.code!==0)throw new Error(result.message||'请求失败，请稍后重试')
+  if(!response.ok||result.code!==0)throw Object.assign(new Error(result.message||'请求失败，请稍后重试'),{code:result.code,data:result.data,status:response.status})
   return result.data
 }
 const field=(label:string,value:string,onChange:(v:string)=>void,type='text')=>(
@@ -82,6 +87,14 @@ export default function SchoolApp(){
   const [activationCode,setActivationCode]=useState('')
   const [inviteCode,setInviteCode]=useState('')
   const [schoolId,setSchoolId]=useState(new URLSearchParams(window.location.search).get('organizationId')??'')
+  const canAuthorPrivateTools=usePrivateToolCapability(api,schoolId,user&&!user.mustChangePassword?user.id:undefined)
+  const privateDraft=useRef<PrivateDraftState>({dirty:false,writing:false})
+  const setPrivateDraftState=useCallback((state:PrivateDraftState)=>{privateDraft.current=state},[])
+  const canLeavePrivateTools=()=>{
+    if(privateDraft.current.writing){setNotice('工具正在处理，请等待完成后再离开。');return false}
+    return !privateDraft.current.dirty||window.confirm('私有工具草稿尚未保存，确定放弃修改并离开吗？')
+  }
+  const acceptedWorkspaceUrl=useRef(window.location.href)
   const [classId,setClassId]=useState(new URLSearchParams(window.location.search).get('classUnitId')??'')
   const [mfaEnrolled,setMfaEnrolled]=useState(true)
   const [mfaCode,setMfaCode]=useState('')
@@ -116,6 +129,7 @@ export default function SchoolApp(){
   useEffect(()=>{void refresh()},[])
   useEffect(()=>{
     const pop=()=>{
+      if(!canLeavePrivateTools()){window.history.pushState(null,'',acceptedWorkspaceUrl.current);return}
       const query=new URLSearchParams(window.location.search)
       const organizationId=query.get('organizationId')
       if(organizationId)setSchoolId(organizationId)
@@ -125,7 +139,9 @@ export default function SchoolApp(){
     window.addEventListener('popstate',pop)
     return()=>window.removeEventListener('popstate',pop)
   },[])
+  useEffect(()=>{acceptedWorkspaceUrl.current=window.location.href},[page,schoolId,classId])
   const navigateWorkspace=(id:string)=>{
+    if(id===page||!canLeavePrivateTools())return
     const query=new URLSearchParams()
     if(schoolId)query.set('organizationId',schoolId)
     if(classId)query.set('classUnitId',classId)
@@ -225,6 +241,7 @@ export default function SchoolApp(){
     notify('密码已修改，所有 School／Teacher 会话失效，请重新登录')
   })}
   const logOut=()=>run(async()=>{
+    if(!canLeavePrivateTools())return
     // Do not claim logout or clear the UI on a failed server-side revocation.
     await api('/auth/logout','POST',{})
     setUser(null);setSummary(null);setIssuedCodes([]);setRecoveryCodes([])
@@ -246,6 +263,7 @@ export default function SchoolApp(){
     setSummary(await api<Summary>(`/organizations/${schoolId}/classes/${classId}/summary`))
   })
   const changeSchool=(id:string)=>{
+    if(id===schoolId||!canLeavePrivateTools())return
     const query=new URLSearchParams(window.location.search)
     if(id)query.set('organizationId',id)
     else query.delete('organizationId')
@@ -397,8 +415,8 @@ export default function SchoolApp(){
         <h1>首次登录 · 修改密码</h1>
         <ProductPasswordChange product="school" forced busy={working} onChangePassword={changeAccountPassword}/>
       </section>}
-      {!loading&&user&&screen==='workspace'&&!user.mustChangePassword&&recoveryCodes.length===0&&<SchoolWorkspaceShell page={page} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled)} onNavigate={navigateWorkspace} context={page!=='overview'&&page!=='account'&&(user.role==='TEACHER'||user.role==='ADMIN')?<section className="hs-workspace-context" aria-label="当前学校和班级">{(schoolAdmin||psychologyStaff)&&<a className="hs-context-security" href="/workspace/account" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('account')}}>账号安全验证 →</a>}<label><span>当前学校</span><select value={schoolId} onChange={e=>changeSchool(e.target.value)}><option value="">请选择学校</option>{orgs.map(org=><option key={org.id} value={org.id}>{org.name}</option>)}</select></label>{['classes','admission','recovery'].includes(page)&&<label><span>当前班级</span><select value={classId} onChange={e=>void changeClass(e.target.value)}><option value="">请选择班级</option>{units.filter(x=>x.unitKind==='CLASS').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label>}</section>:undefined}>
-        {page==='overview'&&<SchoolWorkspaceOverview username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled)} onNavigate={navigateWorkspace} pending={user.role==='STUDENT'&&studentStatus!=='APPROVED'?<section className="hs-panel"><h2>我的校园活动</h2><p>{studentStatus==='PENDING_CLASS_APPROVAL'?'账号已注册，正在等待班级整体审批。':'目前暂无可参加的校园活动。请向学校确认注册及审批状态。'}</p><p>尚未审批的账号不能进入历史课程、校园测评或学生报告。</p></section>:undefined}/>}
+      {!loading&&user&&screen==='workspace'&&!user.mustChangePassword&&recoveryCodes.length===0&&<SchoolWorkspaceShell page={page} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} context={page!=='overview'&&page!=='account'&&(user.role==='TEACHER'||user.role==='ADMIN')?<section className="hs-workspace-context" aria-label="当前学校和班级">{(schoolAdmin||psychologyStaff)&&<a className="hs-context-security" href="/workspace/account" onClick={e=>{if(e.button!==0||e.metaKey||e.ctrlKey||e.shiftKey||e.altKey)return;e.preventDefault();navigateWorkspace('account')}}>账号安全验证 →</a>}<label><span>当前学校</span><select value={schoolId} onChange={e=>changeSchool(e.target.value)}><option value="">请选择学校</option>{orgs.map(org=><option key={org.id} value={org.id}>{org.name}</option>)}</select></label>{['classes','admission','recovery'].includes(page)&&<label><span>当前班级</span><select value={classId} onChange={e=>void changeClass(e.target.value)}><option value="">请选择班级</option>{units.filter(x=>x.unitKind==='CLASS').map(x=><option key={x.id} value={x.id}>{x.name}</option>)}</select></label>}</section>:undefined}>
+        {page==='overview'&&<SchoolWorkspaceOverview username={user.username} items={schoolNavigation(user.role,studentStatus,access,campusParentReportEnabled,canAuthorPrivateTools)} onNavigate={navigateWorkspace} pending={user.role==='STUDENT'&&studentStatus!=='APPROVED'?<section className="hs-panel"><h2>我的校园活动</h2><p>{studentStatus==='PENDING_CLASS_APPROVAL'?'账号已注册，正在等待班级整体审批。':'目前暂无可参加的校园活动。请向学校确认注册及审批状态。'}</p><p>尚未审批的账号不能进入历史课程、校园测评或学生报告。</p></section>:undefined}/>}
         {page==='account'&&<section className="hs-panel"><h2>校园账号</h2><p>用户名：{user.username}</p>
           <p>你使用的是独立校园账号。可用功能由学校授权决定。</p>
           <h3>修改密码</h3>
@@ -418,7 +436,7 @@ export default function SchoolApp(){
         </section>}
         {user.role==='STUDENT'?
           studentStatus==='APPROVED'?<>
-            {page==='tasks'&&<SchoolStudentTasks api={api}/>}
+            {page==='tasks'&&<SchoolStudentTasks key={user.id} api={api}/>}
             {page==='feedback'&&<SchoolStudentFeedback api={api}/>}
             {page==='family'&&<SchoolParentLinks api={api} role="STUDENT" organizationId={schoolId}/>}
             {page==='sharing'&&campusParentReportEnabled&&<SchoolStudentReportConsent api={api}/>}
@@ -448,10 +466,14 @@ export default function SchoolApp(){
               disabled={working||!summary||summary.status!=='CLOSED'
                 ||summary.rosterExpectedCount!==summary.eligibleCount||summary.eligibleCount!==summary.registeredCount||summary.unresolvedIncidents!==0}
               onClick={()=>void approve()}>心理教师 · 确认整班身份审批</button>}
+            {psychologyStaff&&schoolClassApprovalReasons(summary).length>0&&<ul aria-label="班级审批待办">
+              {schoolClassApprovalReasons(summary).map(reason=><li key={reason}>{reason}</li>)}
+            </ul>}
             {schoolAdmin&&issuedCodes.length>0&&<div className="hs-secret"><p>以下注册码只在本次操作显示，请分别安全交付给学生：</p>{issuedCodes.map(code=><code key={code}>{code}</code>)}</div>}
           </section>}
           {page==='recovery'&&(schoolAdmin||psychologyStaff)&&schoolId&&classId&&
             <SchoolRecoveryOfficer key={classPath} api={api} classPath={classPath}/>}
+          {page==='private-tools'&&schoolId&&(canAuthorPrivateTools?<EducationPrivateToolStudio key={`SCHOOL:${user.id}:${schoolId}`} api={api} organizationId={schoolId} entry="SCHOOL" actorId={user.id} onDraftStateChange={setPrivateDraftState}/>:<section className="hs-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
           {page==='tasks'&&(user.role==='TEACHER'||user.role==='ADMIN')&&schoolId&&access?.personas.includes('TEACHER')&&<SchoolTeacherTasks key={'SchoolTeacherTasks:'+schoolId} api={api} organizationId={schoolId}/>}
           {page==='relationships'&&schoolAdmin&&schoolId&&<SchoolRelationships key={'SchoolRelationships:'+schoolId} api={api} organizationId={schoolId} classes={units}/>}
           {import.meta.env.VITE_REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'
@@ -462,8 +484,8 @@ export default function SchoolApp(){
                 scenarios={['SCHOOL_GENERAL_EDUCATION_GROUP','SCHOOL_SENSITIVE_WELLBEING_GROUP']}/>
             </details>}
           {page==='activities'&&schoolId&&access&&<SchoolActivityManager
-            key={'SchoolActivityManager:'+schoolId} api={api} organizationId={schoolId}
-            isAdmin={schoolAdmin} classes={units}/>}
+            key={'SchoolActivityManager:'+user?.id+':'+schoolId} api={api} organizationId={schoolId}
+            isAdmin={schoolAdmin} classes={units} canAuthorPrivateTools={canAuthorPrivateTools} actorKey={user?.id}/>}
           {page==='group-reports'&&(schoolAdmin||(psychologyStaff&&access?.capabilities.includes('PSYCHOLOGY_STAFF')))&&schoolId
             &&!access?.explicitDenies.some(x=>['*','REPORT_READ','ORG_GROUP_REPORT_V1'].includes(x))
             &&<SchoolGroupReports key={'SchoolGroupReports:'+schoolId} api={api} organizationId={schoolId}/>}

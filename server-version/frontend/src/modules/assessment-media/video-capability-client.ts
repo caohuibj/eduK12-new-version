@@ -2,7 +2,7 @@ import type { ApiResponse } from '../../types'
 import { sessionFetch } from '../../api/client'
 import type { AssessmentVideoCapabilitySources } from './types'
 
-const isCapabilitySources = (value: unknown): value is AssessmentVideoCapabilitySources => {
+export const isCapabilitySources = (value: unknown): value is AssessmentVideoCapabilitySources => {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false
   const source = value as Record<string, unknown>
   if (typeof source.videoUrl !== 'string' || !source.videoUrl) return false

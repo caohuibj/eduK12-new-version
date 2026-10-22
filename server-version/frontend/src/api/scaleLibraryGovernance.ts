@@ -6,13 +6,20 @@ export type GovernanceMediaManifest = { schemaVersion: 1; releaseIds: string[]; 
 export type GovernanceMediaConsent = { manifestHash: string; shareWithAuthorizedUsers: true }
 export type GovernanceMediaContext = { kind: 'sources' | 'submissions' | 'entries'; id: string; releaseId?: string }
 export type GovernanceProduct = 'TRAINING' | 'SURVEY'
+export type EducationDistributionProduct = 'SCHOOL' | 'TEACHER'
+export type GovernanceTargetProduct = GovernanceProduct | EducationDistributionProduct
+export type EducationDistributionReadiness = { status: 'NOT_READY' | 'READY'; canDistribute: boolean; contentCompatible: boolean; reason: string | null }
+export type EducationApplicability = { schemaVersion: 1; administrations: { population: 'STUDENT' | 'TEACHER'; responseMode: 'SELF' | 'PARENT_REPORT' | 'TEACHER_REPORT' | 'STUDENT_REPORT' }[] }
 export type SubmissionMetadata = { title: string; author: string; copyright: string; applicability: string; scoringDescription: string; reportDescription: string }
-export type GovernanceCompatibility = { supportedEntrypoints: GovernanceProduct[]; compatibilityReasons?: Partial<Record<GovernanceProduct, string>> }
-export type GovernanceSubmission = GovernanceCompatibility & { id: string; releaseId: string; product: GovernanceProduct; sourceId: string; version: number; metadata: SubmissionMetadata; dependencyReleaseIds: string[]; status: 'SUBMITTED' | 'WITHDRAWN' | 'RETURNED' | 'APPROVED'; reason?: string; createdAt: string }
-export type GovernanceEntry = Omit<GovernanceSubmission, 'status'> & { submissionId: string; status: 'ACTIVE' | 'WITHDRAWN' | 'EMERGENCY_DISABLED' }
-export type GovernanceCapabilities = { systemAdmin: boolean; canReview: boolean; reviewGrants: { grantId: string; releaseIds: string[] }[]; distributionGrants: { grantId: string; product: GovernanceProduct; releaseIds: string[] }[] }
+export type GovernanceCompatibility = { supportedEntrypoints: GovernanceTargetProduct[]; compatibilityReasons?: Partial<Record<GovernanceTargetProduct, string>>; educationDistribution?: EducationDistributionReadiness & { products?: Record<EducationDistributionProduct, EducationDistributionReadiness> } }
+export type GovernanceSubmission = GovernanceCompatibility & { id: string; releaseId: string; product: GovernanceProduct; sourceId: string; version: number; metadata: SubmissionMetadata; educationApplicability?: EducationApplicability | null; educationApplicabilityHash?: string | null; dependencyReleaseIds: string[]; status: 'SUBMITTED' | 'WITHDRAWN' | 'RETURNED' | 'APPROVED'; reason?: string; createdAt: string }
+export type GovernanceEntry = Omit<GovernanceSubmission, 'status'> & { submissionId: string; contentHash?: string; releaseVersion?: string; status: 'ACTIVE' | 'WITHDRAWN' | 'EMERGENCY_DISABLED' }
+export type GovernanceCapabilities = { systemAdmin: boolean; canReview: boolean; reviewGrants: { grantId: string; releaseIds: string[] }[]; distributionGrants: { grantId: string; product: GovernanceTargetProduct; releaseIds: string[] }[] }
 export type GovernanceSource = { sourceId: string; product: GovernanceProduct; releases: (GovernanceCompatibility & { releaseId: string; version: string; contentHash: string; publishedAt: string; title: string; mediaManifest: GovernanceMediaManifest; defaults?: SubmissionMetadata; eligible: boolean; unavailableReason?: string })[]; defaults: SubmissionMetadata }
-export type GovernanceUseGrant = { id: string; userId: string; product: GovernanceProduct; version: number; status: string }
+export type GovernanceUseGrant = { id: string; userId: string | null; product: GovernanceTargetProduct; version: number; status: string; scopeKind?: 'USER' | 'ORGANIZATION'; organizationId?: string | null }
+export type EducationRecipientRequest = { product: EducationDistributionProduct; releaseId: string; contentHash: string; keyword?: string; cursor?: string; grantId?: string } & ({ scopeKind: 'ORGANIZATION' } | { scopeKind: 'USER'; organizationId: string })
+export type EducationRecipientPage = { list: { id: string; name?: string; username?: string }[]; nextCursor: string | null; scopeKind: 'ORGANIZATION' | 'USER'; product: EducationDistributionProduct; organizationId?: string }
+export type EducationGrantRequest = { product: EducationDistributionProduct; releaseId: string; contentHash: string; organizationId: string; requestId: string; grantId?: string; expectedGrantVersion?: number } & ({ scopeKind: 'ORGANIZATION'; userId: null } | { scopeKind: 'USER'; userId: string })
 
 export type GovernanceCatalogRecord = {
   catalogId: string; title: string; origin: 'STANDARD_REGISTRY' | 'AUTHORED'; instrumentClass: 'STANDARD' | 'CUSTOM_DESCRIPTIVE';
@@ -49,13 +56,19 @@ export const governanceApi = (product: GovernanceProduct) => ({
   capabilities: () => request<GovernanceCapabilities>(product, '/capabilities'),
   source: (sourceId: string) => request<GovernanceSource>(product, '/sources/' + encodeURIComponent(sourceId)),
   submissions: (sourceId?: string) => request<{ list: GovernanceSubmission[] }>(product, '/submissions' + (sourceId ? '?sourceId=' + encodeURIComponent(sourceId) : '')),
-  submit: (releaseId: string, metadata: SubmissionMetadata, requestId: string, mediaConsent?: GovernanceMediaConsent) => request<GovernanceSubmission>(product, '/submissions', { releaseId, metadata, requestId, dependencyReleaseIds: [], ...(mediaConsent ? { mediaConsent } : {}) }),
+  submit: (releaseId: string, metadata: SubmissionMetadata, requestId: string, mediaConsent?: GovernanceMediaConsent, educationApplicability?: EducationApplicability) => request<GovernanceSubmission>(product, '/submissions', { releaseId, metadata, requestId, dependencyReleaseIds: [], ...(mediaConsent ? { mediaConsent } : {}), ...(educationApplicability ? { educationApplicability } : {}) }),
   withdraw: (row: GovernanceSubmission, reason: string) => request<GovernanceSubmission>(product, '/submissions/' + encodeURIComponent(row.id) + '/withdraw', { expectedVersion: row.version, reason }),
   submissionDetail: (id: string) => request<GovernanceSubmission & { snapshot: Record<string, unknown>; mediaManifest: GovernanceMediaManifest; release: { releaseId: string; version: string; contentHash: string }; dependencies: unknown[] }>(product, '/submissions/' + encodeURIComponent(id)),
   review: (row: GovernanceSubmission, decision: 'APPROVE' | 'RETURN', reason: string, grantId?: string) => request<GovernanceSubmission>(product, '/submissions/' + encodeURIComponent(row.id) + '/review', { expectedVersion: row.version, decision, reason, ...(grantId ? { grantId } : {}) }),
   entries: () => request<{ list: GovernanceEntry[] }>(product, '/entries'),
   setStatus: (row: GovernanceEntry, status: 'WITHDRAWN' | 'EMERGENCY_DISABLED', reason: string, grantId?: string) => request<GovernanceEntry>(product, '/entries/' + encodeURIComponent(row.id) + '/status', { expectedVersion: row.version, status, reason, ...(grantId ? { grantId } : {}) }),
   recipients: (entryId: string, targetProduct: GovernanceProduct, page = 1, keyword = '', grantId?: string) => request<{ list: { id: string; username: string; name?: string }[]; page: number; hasMore: boolean }>(product, '/entries/' + encodeURIComponent(entryId) + '/recipients?' + new URLSearchParams({ product: targetProduct, page: String(page), keyword, ...(grantId ? { grantId } : {}) }).toString()),
+  educationRecipients: (entryId: string, input: EducationRecipientRequest) => {
+    const query = new URLSearchParams()
+    for (const [key, value] of Object.entries(input)) if (typeof value === 'string') query.set(key, value)
+    return request<EducationRecipientPage>(product, '/entries/' + encodeURIComponent(entryId) + '/recipients?' + query.toString())
+  },
+  educationGrant: (entryId: string, input: EducationGrantRequest) => request<GovernanceUseGrant>(product, '/entries/' + encodeURIComponent(entryId) + '/grants', input),
   grants: (entryId: string) => request<{ list: GovernanceUseGrant[] }>(product, '/entries/' + encodeURIComponent(entryId) + '/grants'),
   grant: (entryId: string, userId: string, targetProduct: GovernanceProduct, requestId: string, grantId?: string, expectedGrantVersion?: number) => request<GovernanceUseGrant>(product, '/entries/' + encodeURIComponent(entryId) + '/grants', { userId, product: targetProduct, requestId, ...(grantId ? { grantId } : {}), ...(expectedGrantVersion === undefined ? {} : { expectedGrantVersion }) }),
   revoke: (row: GovernanceUseGrant, reason: string) => request<GovernanceUseGrant>(product, '/grants/' + encodeURIComponent(row.id) + '/revoke', { expectedVersion: row.version, reason }),

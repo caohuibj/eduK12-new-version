@@ -1,10 +1,11 @@
+import {privateScaleRegistryIdentitySql} from './educationPrivateScaleIdentitySql'
 import { Prisma } from '@prisma/client'
-import { currentRunActorAuthoritySql, currentWindowSql } from './currentActorAuthority'
+import { currentRunActorAuthoritySql, currentWindowSql, type RunAuthorityPurpose } from './currentActorAuthority'
 
 /** Shared current population gate. Intake deadlines do not remove own history.
  * executionId is a static SQL expression supplied by the caller, never user SQL.
  */
-export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql): Prisma.Sql => Prisma.sql`
+export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql, purpose: RunAuthorityPurpose = 'COLLECTION'): Prisma.Sql => Prisma.sql`
  EXISTS (
   SELECT 1 FROM assessment_run_executions x JOIN organizations org ON org.id=x.organization_id
   JOIN assessment_run_relationship_snapshots relation ON relation.id=x.relationship_snapshot_id
@@ -16,7 +17,7 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql): Prism
     WHERE actor.id IN (x.subject_actor_snapshot_id,x.respondent_actor_snapshot_id)
       AND NOT (${currentRunActorAuthoritySql({ userId: Prisma.sql`actor.user_id`, organizationId: Prisma.sql`org.id`,
         provenance: Prisma.sql`actor.provenance_kind`, membershipId: Prisma.sql`actor.membership_id`,
-        personaGrantId: Prisma.sql`actor.snapshot_payload->>'personaGrantId'`, role: Prisma.sql`actor.actor_role` })})
+        personaGrantId: Prisma.sql`actor.snapshot_payload->>'personaGrantId'`, role: Prisma.sql`actor.actor_role` }, purpose)})
    )
    AND (relation.relationship_kind='SELF'
     OR (relation.relationship_kind='PARENT_CHILD' AND EXISTS (
@@ -88,6 +89,12 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql): Prism
         (relation.relationship_kind='SELF'
         AND subject.actor_role='TEACHER' AND respondent.actor_role='TEACHER'
         AND subject.user_id=respondent.user_id
+        AND NOT EXISTS(SELECT 1 FROM assessment_run_tracks private_track
+          WHERE private_track.id=x.track_id AND private_track.organization_id=x.organization_id
+            AND private_track.run_id=x.run_id AND private_track.resource_key LIKE 'private-scale:%'
+            AND NOT EXISTS(SELECT 1 FROM registered_assessment_resources private_registered
+              WHERE private_registered.resource_key=private_track.resource_key AND private_registered.resource_version=private_track.resource_version
+                AND ${privateScaleRegistryIdentitySql({registered:Prisma.sql`private_registered`,organizationId:Prisma.sql`org.id`,product:'TEACHER'})}))
         -- A scored Teacher Scale needs an ACTIVE exact tenant license for
         -- START/unfinished execution. A finished respondent's own report
         -- remains readable from its verified frozen source after license
@@ -117,7 +124,9 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql): Prism
           SELECT 1 FROM organization_access_denies deny
           WHERE deny.organization_id=org.id
             AND deny.user_id=respondent.user_id AND deny.lifted_at IS NULL
-            AND deny.permission IN ('*','EDUCATION_ACCESS','HUITEACHER_ACCESS','RUN_START')
+            AND ${purpose === 'REPORT_READ'
+                ? Prisma.sql`deny.permission IN ('*','EDUCATION_ACCESS','HUITEACHER_ACCESS','REPORT_READ','PARTICIPANT_REPORT_READ')`
+                : Prisma.sql`deny.permission IN ('*','EDUCATION_ACCESS','HUITEACHER_ACCESS','RUN_START')`}
         )
         )
         OR (
@@ -160,7 +169,9 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql): Prism
             SELECT 1 FROM organization_access_denies deny
             WHERE deny.organization_id=org.id
               AND deny.user_id=respondent.user_id AND deny.lifted_at IS NULL
-              AND deny.permission IN ('*','EDUCATION_ACCESS','HUITEACHER_ACCESS','RUN_START')
+              AND ${purpose === 'REPORT_READ'
+                ? Prisma.sql`deny.permission IN ('*','EDUCATION_ACCESS','HUITEACHER_ACCESS','REPORT_READ','PARTICIPANT_REPORT_READ')`
+                : Prisma.sql`deny.permission IN ('*','EDUCATION_ACCESS','HUITEACHER_ACCESS','RUN_START')`}
           )
         )
         )
@@ -168,11 +179,23 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql): Prism
    ) OR (
     NOT EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links h
       WHERE h.organization_id=org.id AND h.run_id=x.run_id)
+    AND ${purpose === 'REPORT_READ' ? Prisma.sql`TRUE` : Prisma.sql`NOT EXISTS (
+      SELECT 1 FROM assessment_run_tracks school_scale
+      WHERE school_scale.id=x.track_id AND school_scale.organization_id=x.organization_id
+        AND school_scale.run_id=x.run_id AND school_scale.resource_family='SCALE'
+        AND NOT EXISTS (SELECT 1 FROM registered_assessment_resources registered
+          WHERE registered.resource_key=school_scale.resource_key
+            AND registered.resource_version=school_scale.resource_version
+            AND ((registered.resource_key LIKE 'library-scale:%:SCHOOL:%'
+              AND registered.entry->'libraryOrigin'->>'product'='SCHOOL')
+              OR ${privateScaleRegistryIdentitySql({registered:Prisma.sql`registered`,organizationId:Prisma.sql`org.id`,product:'SCHOOL'})})
+            AND registered.entry->'applicability'->>'resourceKind'='SCALE')
+    )`}
     AND EXISTS(SELECT 1 FROM campus_activity_runs ar
       JOIN campus_activities activity ON activity.course_id=ar.course_id
         AND activity.organization_id=ar.organization_id
       WHERE ar.organization_id=org.id AND ar.run_id=x.run_id
-        AND activity.status='OPEN')
+        AND ${purpose === 'REPORT_READ' ? Prisma.sql`(activity.status IN ('OPEN','PAUSED','CLOSED') AND x.status='COMPLETED')` : Prisma.sql`activity.status='OPEN'`})
     AND EXISTS(
       SELECT 1 FROM assessment_run_actor_snapshots student_actor
       WHERE student_actor.id IN (x.subject_actor_snapshot_id,x.respondent_actor_snapshot_id)
@@ -184,7 +207,7 @@ export const currentRunPopulationAuthoritySql = (executionId: Prisma.Sql): Prism
         AND NOT EXISTS(
           SELECT 1 FROM campus_activity_runs ar
           JOIN campus_activities activity ON activity.course_id=ar.course_id
-            AND activity.organization_id=ar.organization_id AND activity.status='OPEN'
+            AND activity.organization_id=ar.organization_id AND ${purpose === 'REPORT_READ' ? Prisma.sql`(activity.status IN ('OPEN','PAUSED','CLOSED') AND x.status='COMPLETED')` : Prisma.sql`activity.status='OPEN'`}
           JOIN campus_activity_participants member ON member.course_id=ar.course_id
             AND member.organization_id=ar.organization_id AND member.status='ACTIVE'
             AND member.membership_id=student_actor.membership_id

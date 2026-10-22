@@ -1,3 +1,8 @@
+import {assertPrivateScaleRunResource} from './educationPrivateScaleContext'
+import {privateRunTrackInput,assertPrivateRunSelection} from '../education-tools/private-tool.run-contract'
+import {assertRunTrackNarrowing,relationalEntryToRunPolicy} from './resourceAuthority'
+import {assertEducationLibraryPopulationSupport} from './educationLibraryPopulation'
+import {assertEducationRunLibraryResources} from './educationLibraryContext'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -94,12 +99,30 @@ export async function addAssessmentRunTrackDraft(input: {
   subjectSelector?: unknown
   respondentSelector?: unknown
   requestedPolicy: RunTrackNarrowingRequest
+  actorUserId?: string
+  expectedVersion?: number
   // Trusted product adapter can bind draft + track in the same transaction.
   tx?: Tx
 }): Promise<AssessmentRunTrackRecord> {
   const work=async (tx:Tx) => {
-    const runs = await tx.$queryRaw<Array<{ status: AssessmentRunStatus }>>`
-      SELECT "status" FROM "assessment_runs"
+    if(input.resource.key.startsWith('library-scale:'))assertEducationLibraryPopulationSupport([input])
+    if(input.resource.key.startsWith('private-scale:')){
+      if(input.resource.family!=='SCALE'||!input.actorUserId||!input.expectedVersion)
+        throw new AssessmentRunRepositoryError('PRIVATE_TOOL_DRAFT_CONTEXT_REQUIRED','Private draft editor and expected version required',403)
+      const checked=await assertPrivateScaleRunResource(tx,{...input,actorUserId:input.actorUserId})
+      const [population,responseMode]=checked.source.origin.variantKey.split(':')
+      const selected=privateRunTrackInput.parse({expectedVersion:input.expectedVersion,
+        privateScale:{versionId:checked.source.origin.versionId,contentHash:checked.source.origin.contentHash,administration:{population,responseMode}},
+        subjectSelector:input.subjectSelector,respondentSelector:input.respondentSelector,targetPolicy:input.requestedPolicy.targetPolicy})
+      assertPrivateRunSelection(selected)
+      if(checked.context.entry==='SCHOOL'&&!checked.schoolAdmin&&responseMode==='TEACHER_REPORT'&&selected.targetPolicy?.mode!=='HOMEROOM_TEACHER')
+        throw new AssessmentRunRepositoryError('PRIVATE_TOOL_HOMEROOM_TARGET_REQUIRED','Psychology drafts require explicit homeroom target',403)
+      assertEducationLibraryPopulationSupport([input])
+      assertRunTrackNarrowing(relationalEntryToRunPolicy(checked.source.resourceEntry),input.requestedPolicy)
+    }else if(input.actorUserId)await assertEducationRunLibraryResources(tx,{...input,actorUserId:input.actorUserId,resources:[input.resource],purpose:'EDIT'})
+    else if(input.resource.key.startsWith('library-scale:'))throw new AssessmentRunRepositoryError('EDUCATION_LIBRARY_ACTOR_REQUIRED','Current editor required',403)
+    const runs = await tx.$queryRaw<Array<{ status: AssessmentRunStatus; version:number }>>`
+      SELECT "status", "version" FROM "assessment_runs"
       WHERE "organization_id" = ${input.organizationId} AND "id" = ${input.runId}
       FOR UPDATE
     `
@@ -107,6 +130,8 @@ export async function addAssessmentRunTrackDraft(input: {
     if (runs[0].status !== 'DRAFT') {
       throw new AssessmentRunRepositoryError('RUN_STATE_CONFLICT', 'Only DRAFT Run may be edited', 409)
     }
+    if(input.expectedVersion!==undefined&&runs[0].version!==input.expectedVersion)
+      throw new AssessmentRunRepositoryError('RUN_VERSION_CONFLICT','Draft version changed',409)
     const id = randomUUID()
     const subjectJson = JSON.stringify(input.subjectSelector ?? {})
     const respondentJson = JSON.stringify(input.respondentSelector ?? {})
@@ -132,7 +157,7 @@ export async function addAssessmentRunTrackDraft(input: {
     `
     return rows[0]
   }
-  return input.tx?work(input.tx):prisma.$transaction(work)
+  return input.tx?work(input.tx):prisma.$transaction(work,{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
 }
 
 export async function lockRun(tx: Tx, organizationId: string, runId: string): Promise<AssessmentRunRecord> {

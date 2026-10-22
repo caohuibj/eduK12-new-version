@@ -1,0 +1,21 @@
+.education-private-tools { --private-accent: #276760; --private-bg: #f3f7f3; display: grid; gap: 1.1rem; min-width: 0; }
+.education-private-tools--teacher { --private-accent: #345d7b; --private-bg: #f3f6fa; }
+.education-private-tools header h2 { margin: 0 0 .5rem; }
+.education-private-tools p { line-height: 1.7; }
+.education-private-tools .education-private-boundary { padding: 1rem; border-left: 3px solid var(--private-accent); background: var(--private-bg); border-radius: .6rem; }
+.education-private-tools .education-private-toolbar,.education-private-tools .education-private-tabs { display: flex; gap: .75rem; align-items: end; flex-wrap: wrap; }
+.education-private-tools label { display: grid; gap: .4rem; }
+.education-private-tools input:not([type=checkbox]):not([type=radio]),.education-private-tools textarea,.education-private-tools select { max-width: 100%; min-height: 2.5rem; padding: .6rem .75rem; border: 1px solid #c4d0d0; border-radius: .55rem; background: #fff; color: inherit; font: inherit; }
+.education-private-tools button { padding: .65rem .95rem; border: 1px solid var(--private-accent); border-radius: .65rem; color: var(--private-accent); background: white; cursor: pointer; }
+.education-private-tools button[aria-pressed=true] { background: var(--private-accent); color: white; }
+.education-private-tools button:disabled { opacity: .5; cursor: not-allowed; }
+.education-private-tools :focus-visible { outline: 3px solid var(--private-accent); outline-offset: 3px; }
+.education-private-tools fieldset { min-width: 0; border: 0; margin: 0; padding: 0; }
+.education-private-tools .education-private-list { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,16rem),1fr)); gap: 1rem; }
+.education-private-tools .education-private-list article,.education-private-tools .staff-panel { padding: 1.25rem; border: 1px solid #dbe2e3; border-radius: .85rem; background: #fff; }
+.education-private-tools .education-private-preview fieldset { margin-bottom: 1rem; padding: 1rem; border: 1px solid #dbe2e3; border-radius: .75rem; }
+.education-private-tools .education-private-preview label { display: flex; align-items: center; gap: .5rem; margin: .5rem 0; }
+.education-private-tools [role=alert] { color: #963f3a; }
+.education-private-tools pre { max-width: 100%; overflow: auto; background: var(--private-bg); padding: 1rem; }
+.education-private-tools details { border-top: 1px solid #dbe2e3; padding-top: 1rem; }
+@media(max-width:640px) { .education-private-tools .education-private-toolbar>* { flex: 1 1 100%; } .education-private-tools .staff-panel { padding: .8rem; } }

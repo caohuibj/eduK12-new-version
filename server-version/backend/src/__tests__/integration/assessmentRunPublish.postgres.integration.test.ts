@@ -7,6 +7,8 @@ import { createAssessmentRunDraft, addAssessmentRunTrackDraft } from '../../modu
 import { publishAssessmentRun } from '../../modules/assessment-run/publish'
 import { RunResourceAuthorityRegistry, type RunResourceAuthorityAdapter } from '../../modules/assessment-run/resourceAuthority'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
+import { createOrganizationUnit } from '../../modules/organization/structure'
+import { assignStaffToClass, assignStudentToClass } from '../../modules/organization/classRelationships'
 
 const DB_URL = integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL', 'PR26_INTEGRATION_DATABASE_URL', 'COGNITIVE_INTEGRATION_DB_URL')
 const suite = DB_URL ? describe : describe.skip
@@ -55,6 +57,143 @@ suite('Assessment Run atomic publish (real PostgreSQL)', () => {
     await db.$connect()
   })
   afterAll(async () => db.$disconnect())
+
+  it('reuses one frozen SELF relationship across two Tracks without sharing their executions or policies', async () => {
+    const owner = await createUser('multi-owner')
+    const student = await createUser('multi-student')
+    const org = await createOrganization({ name: `multi SELF ${suffix}`, meta: { actorUserId: owner.id, commandKey: key('multi-org') } })
+    const organizationId = org.organization.id
+    const member = await createMembership({ organizationId, userId: student.id, meta: { actorUserId: owner.id, commandKey: key('multi-member') } })
+    await grantPersona({ organizationId, membershipId: member.id, persona: 'STUDENT', meta: { actorUserId: owner.id, commandKey: key('multi-persona') } })
+    const run = await createAssessmentRunDraft({ organizationId, name: 'two SELF tools', createdByUserId: owner.id })
+    for (const resourceKey of ['self-first', 'self-second']) {
+      await addAssessmentRunTrackDraft({ organizationId, runId: run.id,
+        resource: { family: 'BUNDLE', key: resourceKey, version: '1.0.0' },
+        subjectSelector: { kind: 'MEMBERSHIP_IDS', membershipIds: [member.id] },
+        respondentSelector: { kind: 'MEMBERSHIP_IDS', membershipIds: [member.id] }, requestedPolicy })
+    }
+    const publish = () => publishAssessmentRun({ organizationId, runId: run.id, actorUserId: owner.id, expectedVersion: 3, resourceRegistry: registry })
+    expect(await publish()).toMatchObject({ trackCount: 2, executionCount: 2 })
+    const readGraph = () => db.$queryRaw<Array<{
+      id: string; relationshipId: string; assignmentId: string; episodeId: string;
+      resourceKey: string; policyHash: string; payload: unknown; snapshotHash: string;
+    }>>`
+      SELECT e.id, e.relationship_snapshot_id AS "relationshipId", a.id AS "assignmentId",
+        a.episode_id AS "episodeId", a.resource_key AS "resourceKey", t.resource_policy_hash AS "policyHash",
+        r.snapshot_payload AS payload, r.snapshot_hash AS "snapshotHash"
+      FROM assessment_run_executions e
+      JOIN relational_assessment_assignments a ON a.id=e.relational_assignment_id
+      JOIN assessment_run_tracks t ON t.id=e.track_id
+      JOIN assessment_run_relationship_snapshots r ON r.id=e.relationship_snapshot_id
+      WHERE e.run_id=${run.id} ORDER BY a.resource_key
+    `
+    const before = await readGraph()
+    expect(before).toHaveLength(2)
+    expect(new Set(before.map(row => row.relationshipId)).size).toBe(1)
+    expect(new Set(before.map(row => row.assignmentId)).size).toBe(2)
+    expect(new Set(before.map(row => row.episodeId)).size).toBe(2)
+    expect(new Set(before.map(row => row.policyHash)).size).toBe(2)
+    expect(before.map(row => row.resourceKey)).toEqual(['self-first', 'self-second'])
+    for (const row of before) expect(row.snapshotHash).toBe(canonicalHash(row.payload))
+    expect(await publish()).toMatchObject({ trackCount: 2, executionCount: 2 })
+    expect(await readGraph()).toEqual(before)
+  })
+
+  it('reuses repeated observer relationships but keeps SELF and other parents separate', async () => {
+    const owner = await createUser('observer-owner')
+    const child = await createUser('observer-child')
+    const parents = [await createUser('parent-a'), await createUser('parent-b')]
+    const org = await createOrganization({ name: `multi observer ${suffix}`, meta: { actorUserId: owner.id, commandKey: key('observer-org') } })
+    const organizationId = org.organization.id
+    const member = await createMembership({ organizationId, userId: child.id, meta: { actorUserId: owner.id, commandKey: key('observer-member') } })
+    await grantPersona({ organizationId, membershipId: member.id, persona: 'STUDENT', meta: { actorUserId: owner.id, commandKey: key('observer-persona') } })
+    const relationships = []
+    for (const parent of parents) relationships.push(await db.parentStudentRelationship.create({ data: {
+      parentUserId: parent.id, studentUserId: child.id, status: 'ACTIVE', approvedAt: new Date(), approvedByUserId: owner.id,
+    } }))
+    const observerPolicy = { ...requestedPolicy, respondentRoles: ['PARENT'], relationshipKinds: ['PARENT_CHILD'],
+      perspectives: ['OBSERVER_REPORT'], visibilityPolicyKey: 'observer_private_respondent_v1' }
+    const mixedRegistry = new RunResourceAuthorityRegistry([{ ...testAdapter, async resolveExact(ref) {
+      const policy = ref.key === 'mixed-self' ? requestedPolicy : observerPolicy
+      return { ...await testAdapter.resolveExact(ref), ...policy, applicabilityHash: canonicalHash({ ref, policy }) }
+    } }])
+    const run = await createAssessmentRunDraft({ organizationId, name: 'mixed observers', createdByUserId: owner.id })
+    for (const resourceKey of ['mixed-self', 'observer-first', 'observer-second']) {
+      await addAssessmentRunTrackDraft({ organizationId, runId: run.id,
+        resource: { family: 'BUNDLE', key: resourceKey, version: '1.0.0' },
+        subjectSelector: { kind: 'MEMBERSHIP_IDS', membershipIds: [member.id] },
+        respondentSelector: resourceKey === 'mixed-self'
+          ? { kind: 'MEMBERSHIP_IDS', membershipIds: [member.id] } : { kind: 'RELATED_PARENT' },
+        requestedPolicy: resourceKey === 'mixed-self' ? requestedPolicy : observerPolicy })
+    }
+    expect(await publishAssessmentRun({ organizationId, runId: run.id, actorUserId: owner.id, expectedVersion: 4, resourceRegistry: mixedRegistry }))
+      .toMatchObject({ trackCount: 3, executionCount: 5 })
+    const rows = await db.$queryRaw<Array<{ id: string; kind: string; ref: string | null; executions: number; assignments: number }>>`
+      SELECT r.id, r.relationship_kind AS kind, r.relationship_ref AS ref,
+        count(e.id)::int AS executions, count(DISTINCT e.relational_assignment_id)::int AS assignments
+      FROM assessment_run_relationship_snapshots r
+      JOIN assessment_run_executions e ON e.relationship_snapshot_id=r.id
+      WHERE r.run_id=${run.id} GROUP BY r.id
+    `
+    expect(rows).toHaveLength(3)
+    expect(rows.find(row => row.kind === 'SELF')).toMatchObject({ ref: null, executions: 1, assignments: 1 })
+    for (const relationship of relationships) {
+      expect(rows.find(row => row.ref === relationship.id)).toMatchObject({ kind: 'PARENT_CHILD', executions: 2, assignments: 2 })
+    }
+    const episodes = await db.$queryRaw<Array<{ count: number }>>`
+      SELECT count(*)::int AS count FROM organization_episode_allocations WHERE run_id=${run.id}
+    `
+    expect(episodes[0].count).toBe(3)
+  })
+
+  it('rejects conflicting frozen facts for the same relationship and rolls back every Track', async () => {
+    const owner = await createUser('conflict-owner')
+    const student = await createUser('conflict-student')
+    const teacher = await createUser('conflict-teacher')
+    const org = await createOrganization({ name: `relationship conflict ${suffix}`, meta: { actorUserId: owner.id, commandKey: key('conflict-org') } })
+    const organizationId = org.organization.id
+    const studentMember = await createMembership({ organizationId, userId: student.id, meta: { actorUserId: owner.id, commandKey: key('conflict-student') } })
+    const teacherMember = await createMembership({ organizationId, userId: teacher.id, meta: { actorUserId: owner.id, commandKey: key('conflict-teacher') } })
+    await grantPersona({ organizationId, membershipId: studentMember.id, persona: 'STUDENT', meta: { actorUserId: owner.id, commandKey: key('conflict-student-persona') } })
+    await grantPersona({ organizationId, membershipId: teacherMember.id, persona: 'TEACHER', meta: { actorUserId: owner.id, commandKey: key('conflict-teacher-persona') } })
+    const grade = await createOrganizationUnit({ organizationId, unitKind: 'GRADE', name: 'Grade' })
+    const classroom = await createOrganizationUnit({ organizationId, unitKind: 'CLASS', name: 'Class', parentUnitId: grade.id })
+    await assignStudentToClass({ organizationId, membershipId: studentMember.id, classUnitId: classroom.id })
+    await assignStaffToClass({ organizationId, membershipId: teacherMember.id, classUnitId: classroom.id, staffRole: 'TEACHING' })
+    const observerPolicy = { ...requestedPolicy, respondentRoles: ['TEACHER'], relationshipKinds: ['CLASS_TEACHER_STUDENT'],
+      perspectives: ['OBSERVER_REPORT'], visibilityPolicyKey: 'observer_assigning_teacher_v1' }
+    const classRegistry = new RunResourceAuthorityRegistry([{ ...testAdapter, async resolveExact(ref) {
+      return { ...await testAdapter.resolveExact(ref), ...observerPolicy, allowedTargetModes: ['COURSE_TEACHER'] as const }
+    } }])
+    const run = await createAssessmentRunDraft({ organizationId, name: 'conflicting class contexts', createdByUserId: owner.id })
+    // Same class relationship, but two different course facts. The database's
+    // Run-scoped relationship key cannot represent both snapshots, so fail
+    // explicitly instead of silently retaining the first Track's context.
+    for (const courseIndex of [1, 2]) {
+      const course = await db.course.create({ data: {
+        title: `Course ${courseIndex}`, courseCode: randomUUID(), creatorId: teacher.id,
+        status: 'PUBLISHED', students: { create: { studentId: student.id, status: 'ACTIVE' } },
+      } })
+      await addAssessmentRunTrackDraft({ organizationId, runId: run.id,
+        resource: { family: 'BUNDLE', key: `conflict-${courseIndex}`, version: '1.0.0' },
+        subjectSelector: { kind: 'MEMBERSHIP_IDS', membershipIds: [studentMember.id] },
+        respondentSelector: { kind: 'MEMBERSHIP_IDS', membershipIds: [teacherMember.id] },
+        requestedPolicy: { ...observerPolicy, targetPolicy: { mode: 'COURSE_TEACHER', courseId: course.id } } })
+    }
+    await expect(publishAssessmentRun({ organizationId, runId: run.id, actorUserId: owner.id,
+      expectedVersion: 3, resourceRegistry: classRegistry }))
+      .rejects.toMatchObject({ code: 'RUN_RELATIONSHIP_SNAPSHOT_CONFLICT', statusCode: 409 })
+    const rows = await db.$queryRaw<Array<{ status: string; relationships: number; actors: number; executions: number; allocations: number; frozenTracks: number }>>`
+      SELECT status,
+        (SELECT count(*)::int FROM assessment_run_relationship_snapshots WHERE run_id=${run.id}) AS relationships,
+        (SELECT count(*)::int FROM assessment_run_actor_snapshots WHERE run_id=${run.id}) AS actors,
+        (SELECT count(*)::int FROM assessment_run_executions WHERE run_id=${run.id}) AS executions,
+        (SELECT count(*)::int FROM organization_episode_allocations WHERE run_id=${run.id}) AS allocations,
+        (SELECT count(*)::int FROM assessment_run_tracks WHERE run_id=${run.id} AND frozen_resource_policy IS NOT NULL) AS "frozenTracks"
+      FROM assessment_runs WHERE id=${run.id}
+    `
+    expect(rows[0]).toEqual({ status: 'DRAFT', relationships: 0, actors: 0, executions: 0, allocations: 0, frozenTracks: 0 })
+  })
 
   it('publishes an immutable SELF graph once and repeated publish does not duplicate side effects', async () => {
     const owner = await createUser('owner')

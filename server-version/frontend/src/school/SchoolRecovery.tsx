@@ -1,6 +1,6 @@
 import { useState, type FormEvent } from 'react'
 
-export type SchoolApi = <T>(path: string, method?: string, payload?: unknown) => Promise<T>
+export type SchoolApi = <T>(path: string, method?: string, payload?: unknown, options?: { responseType?: 'blob' }) => Promise<T>
 
 type RecoveryReceipt = { username: string; recoveryCode: string; expiresAt: string }
 type Incident = { id: string; reason: string; createdAt: string }

@@ -1,3 +1,7 @@
+import {addPrivateScaleRunTrack} from '../education-tools/private-tool.run-adapter'
+import {privateRunTrackInput} from '../education-tools/private-tool.run-contract'
+import {prisma} from '../../config/database'
+import {listEducationLibraryResourcePage} from '../scale-library-governance/education-catalog'
 import { RelationalAssessmentError } from '../assessment-relational/errors'
 import { acceptRunExecutionConsent } from './consent'
 import { z } from 'zod'
@@ -64,19 +68,21 @@ const fail = (res: Response, err: unknown) => {
   throw err
 }
 
-export const assessmentRunController = {
-  async resources(req: Request, res: Response) {
+async function resourcesResponse(req: Request, res: Response, schoolActivity?:{organizationId:string;courseId:string}) {
     if (!req.user) return unauthorized(res)
     const entries = new Map<string, ReturnType<typeof relationalProductRegistry.listReleasedForRespondent>[number]>()
     for (const role of ['STUDENT', 'TEACHER', 'PARENT', 'COUNSELOR', 'CLIENT'] as const) {
       for (const entry of relationalProductRegistry.listReleasedForRespondent(role)) {
+        if(schoolActivity&&entry.applicability.resourceKind==='SCALE')continue
         const ref = entry.applicability
         entries.set(`${ref.resourceKind}:${ref.resourceKey}:${ref.resourceVersion}`, entry)
       }
     }
     try {
       const page = req.query.page === undefined ? 1 : Number(req.query.page)
-      const registered = await listReleasedRegisteredResourcePage(req.user.userId, req.user.role, page)
+      const registered = schoolActivity
+        ?await prisma.$transaction(tx=>listEducationLibraryResourcePage(tx,{product:'SCHOOL',organizationId:schoolActivity.organizationId,actorId:req.user!.userId,workflow:{kind:'ACTIVITY',id:schoolActivity.courseId},cursor:z.string().optional().parse(req.query.cursor)}))
+        :await listReleasedRegisteredResourcePage(req.user.userId, req.user.role, page)
       for (const entry of registered.entries) {
         const ref = entry.applicability
         entries.set(`${ref.resourceKind}:${ref.resourceKey}:${ref.resourceVersion}`, entry)
@@ -87,14 +93,22 @@ export const assessmentRunController = {
         productionRunResourceAuthorityRegistry.assertStartSupported(ref.resourceKind)
         // Entries are already release-checked; static adapters remain the
         // authority for static content. Registered entries need no second read.
-        const policy = ref.resourceKind === 'SCALE' && ref.resourceKey.startsWith('custom-scale:')
+        const policy = ref.resourceKind === 'SCALE' && (ref.resourceKey.startsWith('custom-scale:')||ref.resourceKey.startsWith('library-scale:'))
           ? relationalEntryToRunPolicy(entry)
           : await productionRunResourceAuthorityRegistry.resolveExact({ family: ref.resourceKind, key: ref.resourceKey, version: ref.resourceVersion })
-        list.push({ title: entry.title, ...policy })
+        // Runtime capability ceiling only; preserve the immutable source applicability hash.
+        const visiblePolicy=ref.resourceKey.startsWith('library-scale:')?{...policy,
+          relationshipKinds:policy.relationshipKinds.filter(kind=>kind!=='COURSE_TEACHER_STUDENT'),
+          ...(policy.allowedTargetModes?{allowedTargetModes:policy.allowedTargetModes.filter(mode=>mode!=='COURSE_TEACHER')}:{})}:policy
+        list.push({ title: entry.title, ...visiblePolicy })
       }
-      return success(res, { list, nextPage: registered.nextPage })
+      return success(res, { list, ...('nextCursor' in registered?{nextCursor:registered.nextCursor}:{nextPage:registered.nextPage}) })
     } catch (err) { return fail(res, err) }
-  },
+  }
+
+export const assessmentRunController = {
+  async resources(req:Request,res:Response){return resourcesResponse(req,res)},
+  async schoolActivityResources(req:Request,res:Response,scope:{organizationId:string;courseId:string}){return resourcesResponse(req,res,scope)},
   async assignedTasks(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     try { return success(res, await listAssignedRunTasks(req.user.userId)) }
@@ -149,6 +163,17 @@ export const assessmentRunController = {
 
   async addTrack(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
+    if(req.body&&Object.prototype.hasOwnProperty.call(req.body,'privateScale')){
+      if(!req.params.courseId)return error(res,'Private tools require the product activity route',-1,400)
+      const parsed=privateRunTrackInput.safeParse(req.body)
+      if(!parsed.success)return error(res,'Invalid private fixed-version track',-1,400)
+      try{return success(res,await addPrivateScaleRunTrack({organizationId:req.params.organizationId,runId:req.params.runId,actorUserId:req.user.userId,parent:{kind:'SCHOOL_ACTIVITY',id:req.params.courseId}},parsed.data))}
+      catch(err){return fail(res,err)}
+    }
+    if((typeof req.body?.resource?.key==='string'&&req.body.resource.key.startsWith('private-scale:'))
+      ||req.body&&Object.prototype.hasOwnProperty.call(req.body,'privateOrigin')
+      ||req.body?.resource&&Object.prototype.hasOwnProperty.call(req.body.resource,'privateOrigin'))
+      return error(res,'Private versions require the privateScale draft request',-1,400)
     const parsed = addTrackSchema.safeParse(req.body)
     if (!parsed.success) return error(res, parsed.error.errors[0].message, -1, 400)
     try {
@@ -158,6 +183,7 @@ export const assessmentRunController = {
         actorUserId: req.user.userId,
       })
       return success(res, await addAssessmentRunTrackDraft({
+        actorUserId:req.user.userId,
         organizationId: req.params.organizationId,
         runId: req.params.runId,
         resource: parsed.data.resource,
@@ -250,6 +276,8 @@ export const assessmentRunController = {
       return success(res, await closeAssessmentRun({
         organizationId: req.params.organizationId,
         runId: req.params.runId,
+        ...(req.user.accountDomain==='SCHOOL'&&req.params.courseId
+          ?{schoolActivity:{actor:req.user,courseId:req.params.courseId}}:{}),
       }))
     } catch (err) { return fail(res, err) }
   },
@@ -265,6 +293,8 @@ export const assessmentRunController = {
       return success(res, await cancelAssessmentRun({
         organizationId: req.params.organizationId,
         runId: req.params.runId,
+        ...(req.user.accountDomain==='SCHOOL'&&req.params.courseId
+          ?{schoolActivity:{actor:req.user,courseId:req.params.courseId}}:{}),
       }))
     } catch (err) { return fail(res, err) }
   },

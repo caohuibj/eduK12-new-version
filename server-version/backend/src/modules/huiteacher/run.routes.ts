@@ -1,3 +1,4 @@
+import {privateRunTrackInput} from '../education-tools/private-tool.run-contract'
 import { Router } from 'express'
 import { z,ZodError } from 'zod'
 import { asyncHandler } from '../../middleware/asyncHandler'
@@ -5,7 +6,7 @@ import { authenticateHuiteacher } from '../../middleware/auth'
 import { success } from '../../utils/response'
 import { requireTeacherProductAdmin,requireRecentTeacherMfa } from './authority'
 import {
-  HuiteacherRunError,addTeacherRunTrack,previewTeacherRun,publishTeacherRun,
+  HuiteacherRunError,addTeacherRunTrack,addTeacherPrivateRunTrack,previewTeacherRun,publishTeacherRun,
   progressTeacherRun,closeTeacherRun,cancelTeacherRun,listTeacherAvailableScales,
 } from './run.service'
 
@@ -58,12 +59,15 @@ const wrap=(fn:(req:any,res:any)=>Promise<unknown>)=>asyncHandler(async(req,res)
 const base='/organizations/:organizationId/evaluation-events/:eventId/run'
 router.get(base+'/released-scales',authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(async(req,res)=>success(res,await listTeacherAvailableScales({
-    ...keys.parse(req.params),actorUserId:req.user!.userId,
+    ...keys.parse(req.params),actorUserId:req.user!.userId,cursor:z.string().optional().parse(req.query.cursor),
   }))))
 router.post(base+'/tracks',authenticateHuiteacher,requireTeacherProductAdmin,
-  wrap(async(req,res)=>success(res,await addTeacherRunTrack({
-    ...keys.parse(req.params),actorUserId:req.user!.userId,...track.parse(req.body),
-  }))))
+  wrap(async(req,res)=>{
+    const scope={...keys.parse(req.params),actorUserId:req.user!.userId}
+    if(req.body&&Object.prototype.hasOwnProperty.call(req.body,'privateScale'))
+      return success(res,await addTeacherPrivateRunTrack(scope,privateRunTrackInput.parse(req.body)))
+    return success(res,await addTeacherRunTrack({...scope,...track.parse(req.body)}))
+  }))
 router.post(base+'/preview',authenticateHuiteacher,requireTeacherProductAdmin,
   wrap(async(req,res)=>success(res,await previewTeacherRun({
     ...keys.parse(req.params),actorUserId:req.user!.userId,...version.parse(req.body),

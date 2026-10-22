@@ -87,6 +87,8 @@
     "courses": "RUNTIME_RW",
     "documents": "RUNTIME_RW",
     "education_product_entitlements": "RUNTIME_RW",
+    "education_private_tool_versions": "RUNTIME_RW",
+    "education_private_tools": "RUNTIME_RW",
     "education_product_role_grants": "RUNTIME_RW",
     "education_report_policy_snapshots": "RUNTIME_RW",
     "education_report_privacy_preferences": "RUNTIME_RW",

@@ -4,9 +4,40 @@ import { prisma } from '../../config/database'
 import type { AuthenticatedPrincipal } from '../../types'
 import { CampusActivityError, lockAndAssertCampusActivityEditor } from './activity.service'
 import { appendAudit } from '../organization/service'
+import { resolveSchoolPsychologyScope } from './activity.publisher'
 
 const deny=(code:string,statusCode=409):never=>{throw new CampusActivityError(code,statusCode)}
 const sortedUnique=(values:string[])=>[...new Set(values)].sort()
+/** A picker is not an allocation grant: the write path rechecks current scope. */
+export async function listCampusActivityEligibleClasses(input:{
+  actor:AuthenticatedPrincipal;organizationId:string;courseId:string
+}){
+  return prisma.$transaction(async tx=>{
+    const {activity,context}=await lockAndAssertCampusActivityEditor(tx,input)
+    if(activity.status!=='DRAFT')deny('ACTIVITY_ALLOCATION_FROZEN')
+    const governor=context.orgRole==='ORG_ADMIN'&&context.canGovern
+    const psychologist=await resolveSchoolPsychologyScope(tx,{actorUserId:input.actor.userId,organizationId:input.organizationId})
+    const schoolScope=governor||psychologist?.membershipId===context.membershipId
+    const list=await tx.$queryRaw<Array<{id:string;name:string}>>(Prisma.sql`
+      SELECT unit."id",unit."name"
+      FROM "campus_class_admissions" a
+      JOIN "organization_units" unit ON unit."id"=a."class_unit_id"
+        AND unit."organization_id"=a."organization_id" AND unit."unit_kind"='CLASS'
+      WHERE a."organization_id"=${input.organizationId} AND a."status"='APPROVED'
+        ${schoolScope?Prisma.empty:Prisma.sql`AND EXISTS (
+          SELECT 1 FROM "organization_staff_class_assignments" staff
+          WHERE staff."organization_id"=a."organization_id"
+            AND staff."class_unit_id"=a."class_unit_id"
+            AND staff."membership_id"=${context.membershipId}
+            AND staff."valid_from"<=statement_timestamp()
+            AND (staff."valid_until" IS NULL OR staff."valid_until">statement_timestamp())
+        )`}
+      ORDER BY unit."name",unit."id"
+    `)
+    return {list}
+  })
+}
+
 export async function allocateCampusActivityParticipants(input:{
   actor:AuthenticatedPrincipal;organizationId:string;courseId:string
   classUnitIds:string[];membershipIds?:string[]
@@ -42,10 +73,10 @@ export async function allocateCampusActivityParticipants(input:{
         AND a."class_unit_id" IN (${Prisma.join(classes)})
     `)
     if(scope.length!==classes.length)deny('ACTIVITY_CLASS_NOT_APPROVED',403)
-    // Every class must be assigned to the contributor, unless the signer
-    // holds CURRENT school governance. A counselor role alone is not a
-    // school-wide student roster selector.
-    if(!(context.orgRole==='ORG_ADMIN'&&context.canGovern)){
+    // Qualified psychologists select approved pupils school-wide. Ordinary
+    // teachers retain their current teaching-class scope; COUNSELOR alone is not enough.
+    const psychologist=await resolveSchoolPsychologyScope(tx,{actorUserId:input.actor.userId,organizationId:input.organizationId})
+    if(!(context.orgRole==='ORG_ADMIN'&&context.canGovern)&&psychologist?.membershipId!==context.membershipId){
       const authority=await tx.$queryRaw<Array<{classUnitId:string}>>(Prisma.sql`
         SELECT DISTINCT "class_unit_id" AS "classUnitId"
         FROM "organization_staff_class_assignments"
@@ -75,6 +106,14 @@ export async function allocateCampusActivityParticipants(input:{
         AND sc."class_unit_id" IN (${Prisma.join(classes)})
         AND sc."valid_from"<=statement_timestamp()
         AND (sc."valid_until" IS NULL OR sc."valid_until">statement_timestamp())
+        ${psychologist?.membershipId===context.membershipId&&!(context.orgRole==='ORG_ADMIN'&&context.canGovern)?Prisma.sql`
+          AND u."role"='STUDENT' AND u."must_change_password"=FALSE
+          AND (u."expires_at" IS NULL OR u."expires_at">statement_timestamp())
+          AND pg."granted_at"<=statement_timestamp()
+          AND NOT EXISTS(SELECT 1 FROM "organization_access_denies" denied
+            WHERE denied."organization_id"=m."organization_id" AND denied."user_id"=m."user_id"
+              AND denied."lifted_at" IS NULL AND denied."permission" IN ('*','ACTIVITY_READ','RUN_START'))
+        `:Prisma.empty}
         ${members?Prisma.sql`AND m."id" IN (${Prisma.join(members)})`:Prisma.empty}
       ORDER BY m."id" LIMIT 501
     `)

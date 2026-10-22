@@ -1,3 +1,4 @@
+import type {ReactNode} from 'react'
 import { StructuredFormConstraints } from '../modules/assessment-core/form/StructuredFormConstraints'
 import { BasicFormConstraints } from '../modules/assessment-core/form/BasicFormConstraints'
 import type { FormDraft, FormQuestion } from './builder.types'
@@ -10,8 +11,8 @@ const types:Record<FormQuestion['type'],string>={
   DATE:'日期',TIME:'时间',RANK_ORDER:'排序',SLIDER:'滑块',
   CONSTANT_SUM:'恒定总和',MATRIX_MULTIPLE:'矩阵多选',
 }
-export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
-  onChange:(next:FormDraft)=>void;projectId?:string}){
+export function ResearchFormEditor({value,onChange,projectId,renderImageField}:{value:FormDraft;
+  onChange:(next:FormDraft)=>void;projectId?:string;renderImageField?:(props:{image?:FormQuestion['image'];onChange:(image:FormQuestion['image'])=>void})=>ReactNode}){
   const setPage=(index:number,update:(p:FormDraft['pages'][number])=>FormDraft['pages'][number])=>{
     const pages=value.pages.map((p,i)=>i===index?update(p):p)
     onChange({...value,pages})
@@ -87,7 +88,7 @@ export function ResearchFormEditor({value,onChange,projectId}:{value:FormDraft;
               允许明确选择「不愿回答」（单独记为 REFUSED）
             </label>
           </div>
-          {projectId ? <SurveyImageField projectId={projectId} image={q.image}
+          {renderImageField ? renderImageField({image:q.image,onChange:image=>setQuestion(pi,qi,x=>({...x,image}))}) : projectId ? <SurveyImageField projectId={projectId} image={q.image}
             onChange={image=>setQuestion(pi,qi,x=>({...x,image}))}/>
             : q.image ? <p className="text-sm" role="status">
               此图片来自研究项目，Huiteacher 暂不复用研究者媒体权限。

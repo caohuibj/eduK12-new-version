@@ -1,3 +1,5 @@
+import { listOwnTeacherScaleTasks } from '../../modules/huiteacher/scaleRuntime.routes'
+import { listAssignedRunTasks } from '../../modules/assessment-run/productRead'
 import { randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
 import { beforeAll,afterAll,describe,expect,it } from 'vitest'
@@ -27,7 +29,7 @@ import {
   readHuiteacherEventRun,
 } from '../../modules/huiteacher/evaluation.service'
 import {
-  addTeacherRunTrack,publishTeacherRun,
+  addTeacherRunTrack,publishTeacherRun,closeTeacherRun,
 } from '../../modules/huiteacher/run.service'
 import { startAssessmentRunExecution } from '../../modules/assessment-run/startExecution'
 import { submitScaleAssessmentFinal } from '../../modules/scale/scale-final-submit.service'
@@ -246,6 +248,35 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
     expect(started.state).toBe('STARTED')
     if(started.state!=='STARTED')throw new Error('Scale START is not started')
     expect(started.runtimeBindingKind).toBe('COMPOSITE')
+    // A genuine START binding survives closing new admission, without changing
+    // the default reader or granting access to an unstarted teacher execution.
+    await closeTeacherRun(scope)
+    expect((await listAssignedRunTasks(other.id)).list.find(x=>x.executionId===execution.id)?.status)
+      .toBe('EXPIRED')
+    expect((await listOwnTeacherScaleTasks(other.id)).list).toEqual(expect.arrayContaining([
+      expect.objectContaining({executionId:execution.id,status:'STARTED',runStatus:'CLOSED',
+        runtimeBindingRef:started.runtimeBindingRef}),
+    ]))
+    expect((await listOwnTeacherScaleTasks(manager.id)).list).toHaveLength(0)
+    // The School-only opt-in must not turn a Teacher-bound run into a campus continuation.
+    expect(await listAssignedRunTasks(other.id,{preserveBoundSchoolContinuation:true}))
+      .toEqual(await listAssignedRunTasks(other.id))
+    await changeTeacherScaleLicense({organizationId:school.id,resourceId:resource.id,
+      actorUserId:admin.id,action:'REVOKE'})
+    expect((await listOwnTeacherScaleTasks(other.id)).list).toHaveLength(0)
+    await changeTeacherScaleLicense({organizationId:school.id,resourceId:resource.id,
+      actorUserId:admin.id,action:'GRANT'})
+    expect((await listOwnTeacherScaleTasks(other.id)).list).toHaveLength(1)
+    await db.$executeRaw`UPDATE organization_memberships SET valid_until=clock_timestamp() WHERE id=${member.id}`
+    expect((await listOwnTeacherScaleTasks(other.id)).list).toHaveLength(0)
+    await db.organizationMembership.update({where:{id:member.id},data:{validUntil:null}})
+    const deny=await db.organizationAccessDeny.create({data:{
+      id:randomUUID(),organizationId:school.id,userId:other.id,permission:'RUN_START',
+      reason:'synthetic continuation directory test',deniedByUserId:manager.id,
+    }})
+    expect((await listOwnTeacherScaleTasks(other.id)).list).toHaveLength(0)
+    await db.organizationAccessDeny.update({where:{id:deny.id},data:{liftedAt:new Date(),liftedByUserId:manager.id}})
+    expect((await listOwnTeacherScaleTasks(other.id)).list).toHaveLength(1)
     const child=await db.assessment.findFirstOrThrow({
       where:{compositeAttemptId:started.runtimeBindingRef},
     })
@@ -275,6 +306,31 @@ suite('Huiteacher PR3: independently released adult self Scale and respondent-on
     await expect(readTeacherPersonalScaleReport({
       actorUserId:manager.id,executionId:execution.id,
     })).rejects.toThrow()
+
+    // Closing the enclosing Event is stronger than closing admission: an
+    // unfinished bound self-assessment disappears, completed history remains.
+    const followEvent=await createHuiteacherEvent({organizationId:school.id,actorUserId:manager.id,
+      targetId:target.id,kind:'ASSESSMENT',title:'Bound continuation event boundary'})
+    const followScope={organizationId:school.id,actorUserId:manager.id,eventId:followEvent.id}
+    await createHuiteacherEventRunDraft({...followScope,name:'Event close boundary'})
+    await addTeacherRunTrack({...followScope,resource:ref,
+      subjectSelector:{kind:'ALL_CURRENT'},respondentSelector:{kind:'ALL_CURRENT'},
+      requestedPolicy:{subjectRoles:['TEACHER'],respondentRoles:['TEACHER'],relationshipKinds:['SELF'],
+        perspectives:['SELF_REPORT'],analysisMode:'INDIVIDUAL_ONLY',minimumRespondents:null,
+        visibilityPolicyKey:'HUITEACHER_ADULT_SELF_PILOT_V1'}})
+    await transitionHuiteacherEvent({...followScope,action:'OPEN',expectedVersion:1})
+    const followState=await readHuiteacherEventRun(followScope)
+    await publishTeacherRun({...followScope,expectedVersion:followState.version})
+    const followTask=(await listOwnTeacherScaleTasks(other.id)).list.find(t=>t.eventId===followEvent.id)!
+    expect(followTask).toBeTruthy()
+    expect((await startAssessmentRunExecution({executionId:followTask.executionId,actorUserId:other.id})).state)
+      .toBe('STARTED')
+    await closeTeacherRun(followScope)
+    expect((await listOwnTeacherScaleTasks(other.id)).list.some(t=>t.eventId===followEvent.id)).toBe(true)
+    await transitionHuiteacherEvent({...followScope,action:'CLOSE',expectedVersion:2})
+    const afterEventClose=(await listOwnTeacherScaleTasks(other.id)).list
+    expect(afterEventClose.some(t=>t.eventId===followEvent.id)).toBe(false)
+    expect(afterEventClose.find(t=>t.executionId===execution.id)?.status).toBe('COMPLETED')
 
     await changeTeacherScaleLicense({
       organizationId:school.id,resourceId:resource.id,

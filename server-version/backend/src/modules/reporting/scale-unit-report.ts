@@ -128,15 +128,21 @@ const externalBase = (report: ScaleUnitReport) => ({
   totalTime: report.totalTime ?? null,
 })
 
+/** Content selection only. A caller must derive this from a verified frozen
+ * report definition. It never changes viewer audience or disclosure powers. */
+export interface ScaleUnitReportProjectionOptions {
+  contentAudience: NonNullable<ScaleResultV2['method']['reportAudience']>
+}
+
 /** Strict audience-safe serializer for ScaleUnitReport, including stored aggregates. */
-export const projectScaleUnitReport = (report: ScaleUnitReport, context: ScaleProjectionContext): any => {
+export const projectScaleUnitReport = (report: ScaleUnitReport, context: ScaleProjectionContext, options?: ScaleUnitReportProjectionOptions): any => {
   const base = externalBase(report)
   if (context.frozenPolicy.disposition === 'UNKNOWN') {
     return { ...base, reportKind: 'unavailable', reason: 'POLICY_UNAVAILABLE' }
   }
   if (report.decryptError) return { ...base, reportKind: 'unavailable', reason: 'RESULT_UNAVAILABLE', decryptError: true }
   const capabilities = { ...resolveEffectiveScaleDisclosure(context) }
-  const expectedAudience = ['respondent','subject'].includes(context.audience) ? 'student' : context.audience === 'teacher' ? 'teacher' : null
+  const expectedAudience = options?.contentAudience ?? (['respondent','subject'].includes(context.audience) ? 'student' : context.audience === 'teacher' ? 'teacher' : null)
   const allowRawFeedback = capabilities.individualInterpretations && (!report.method?.reportAudience || report.method.reportAudience === expectedAudience)
   const rich = capabilities.references
     || capabilities.individualInterpretations

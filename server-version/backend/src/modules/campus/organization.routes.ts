@@ -1,3 +1,5 @@
+import { educationPrivateToolRouter } from '../education-tools/private-tool.routes'
+import { educationToolAuthoringCapabilitiesHandler } from '../education-tools/capabilities.handler'
 import { Router } from 'express'
 import { z, ZodError } from 'zod'
 import { prisma } from '../../config/database'
@@ -16,7 +18,10 @@ import { readCampusRelationshipDirectory, appointCampusCounselorClient, endCampu
 // Reuse the existing Organization structure and relationship services, never
 // the legacy /api/organizations entrypoint or its training session cookie.
 const router=Router()
+router.use('/organizations/:organizationId/private-tools',authenticateSchool,educationPrivateToolRouter('SCHOOL'))
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
+router.get('/organizations/:organizationId/tool-authoring-capabilities', authenticateSchool,
+  educationToolAuthoringCapabilitiesHandler('SCHOOL'))
 router.get('/organizations',authenticateSchool,organizationController.listAccessible)
 router.get('/organizations/:organizationId/context',authenticateSchool,organizationController.readContext)
 router.get('/organizations/:organizationId/units',authenticateSchool,requireCampusClassRead,organizationAdminController.listUnits)
