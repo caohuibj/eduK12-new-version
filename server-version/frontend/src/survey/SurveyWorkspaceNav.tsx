@@ -17,15 +17,15 @@ export function SurveyWorkspaceNav({active,onChange,title,onReturn}:{active:Work
     event.currentTarget.parentElement?.querySelectorAll<HTMLButtonElement>('[role="tab"]')[next]?.focus()
   }
   return <header className="survey-workspace-nav">
-    <div className="survey-project-context"><div><p className="survey-workspace-eyebrow">RESEARCH · 研究编辑</p><h1 id="survey-current-project-heading" tabIndex={-1}>{title}</h1></div>
-      {onReturn&&<button type="button" className="survey-context-back" onClick={onReturn}>← 返回研究列表（保留编辑）</button>}</div>
-    <p>切换分区会保留本页未保存的编辑；离开页面前请保存。</p>
-    <div role="tablist" aria-label="研究工作分区">
-      {sections.map(([key,label,hint])=>{const Icon=surveySectionMeta[key].icon;return <button key={key} type="button" role="tab"
+    <div className="survey-project-context"><div><h1 id="survey-current-project-heading" tabIndex={-1} title={title}>{title}</h1><span className="survey-editor-note" aria-hidden="true">切换分区保留编辑</span></div>
+      {onReturn&&<button type="button" className="survey-context-back" aria-label="← 返回研究列表（保留编辑）" title="返回研究列表，保留当前编辑" onClick={onReturn}>← 返回列表</button>}</div>
+    <p id="survey-editing-note" className="sr-only">切换分区会保留本页未保存的编辑；离开页面前请保存。</p>
+    <div role="tablist" aria-label="研究工作分区" aria-describedby="survey-editing-note">
+      {sections.map(([key,label,hint],index)=>{const Icon=surveySectionMeta[key].icon;return <button key={key} type="button" role="tab"
         id={'survey-workspace-tab-'+key} aria-controls={'survey-workspace-'+key}
-        aria-selected={active===key} aria-label={label} tabIndex={active===key?0:-1}
-        onKeyDown={event=>navigate(event,sections.findIndex(([section])=>section===key))} onClick={()=>onChange(key)}>
-        <span className="survey-tab-icon" aria-hidden="true"><Icon size={20} strokeWidth={1.6}/></span><strong>{label}</strong><span>{hint}</span>
+        aria-selected={active===key} aria-label={label} title={hint} tabIndex={active===key?0:-1}
+        onKeyDown={event=>navigate(event,index)} onClick={()=>onChange(key)}>
+        <span className="survey-tab-icon" aria-hidden="true"><Icon size={18} strokeWidth={1.6}/></span><strong>{label}</strong>
       </button>})}
     </div>
   </header>
