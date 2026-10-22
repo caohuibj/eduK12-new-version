@@ -383,6 +383,16 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
               const data=await api<{run:Run}>(path+'/runs/'+activeRun.id)
               if(resourceContext.current.scope===context.scope&&resourceContext.current.api===context.api){setActiveRun(data.run);setPreview(null)}
             }}/>}
+          {canAuthorPrivateTools&&actorKey&&<EducationPrivateScalePicker kind="FORM"
+            key={`private-form:${actorKey}:${organizationId}:${selected.courseId}:${activeRun.id}`}
+            entry="SCHOOL" organizationId={organizationId} actorKey={actorKey} scopeKey={`${selected.courseId}:${activeRun.id}`}
+            api={api} endpoint={path+'/runs/'+activeRun.id+'/tracks'} expectedVersion={activeRun.version}
+            disabled={busy} homeroomOnly={!isAdmin&&selected.capabilities?.ownPsychologyPublisher===true}
+            onBusy={setBusy} onRefresh={async()=>{
+              const context=resourceContext.current
+              const data=await api<{run:Run}>(path+'/runs/'+activeRun.id)
+              if(resourceContext.current.scope===context.scope&&resourceContext.current.api===context.api){setActiveRun(data.run);setPreview(null)}
+            }}/>}
           <button disabled={busy||resourceLoading} onClick={()=>void showResources()}>查看已发布、受授权的测评资源</button>
           {resourceLoading&&<p role="status">正在读取授权测评资源…</p>}
           {resourceError&&<div><p role="alert">{resourceError} 已配置的测评项目不受影响。</p>

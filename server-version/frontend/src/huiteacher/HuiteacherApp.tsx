@@ -1,3 +1,4 @@
+import {SCHOOL_HOST} from '../school/context'
 import {EducationPrivateToolStudio} from '../components/education-tools/EducationPrivateToolStudio'
 import {usePrivateToolCapability,type PrivateDraftState} from '../components/education-tools/privateToolClient'
 import {HuiteacherMyGrowth} from './HuiteacherMyGrowth'
@@ -374,7 +375,7 @@ export default function HuiteacherApp(){
         <button type="button" aria-pressed={workspaceTab==='platform'}
           onClick={()=>changeWorkspaceTab('platform')}>平台治理入口</button>
       </nav>
-      {workspaceTab==='private-tools'&&(canAuthorPrivateTools?<EducationPrivateToolStudio key={`TEACHER:${me.id}:${selectedOrg}`} api={teacherApi} organizationId={selectedOrg} entry="TEACHER" actorId={me.id} onDraftStateChange={setPrivateDraftState}/>:<section className="ht-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
+      {workspaceTab==='private-tools'&&(canAuthorPrivateTools?<><aside className="ht-panel" aria-label="学生测评编制入口提示"><p className="ht-muted">此处自编工具用于 Teacher 教师测评。心理教师为学生编制量表、表单及发布活动，请前往 School 的“我的工具”和活动管理。学校须已开通 School，并授予本人对应权限；使用同一教育账号单独登录，两个入口的私有草稿与固定版本不会自动互通。</p><a href={`https://${SCHOOL_HOST}/login`} target="_blank" rel="noopener noreferrer">前往 School 编制学生测评</a></aside><EducationPrivateToolStudio key={`TEACHER:${me.id}:${selectedOrg}`} api={teacherApi} organizationId={selectedOrg} entry="TEACHER" actorId={me.id} onDraftStateChange={setPrivateDraftState}/></>:<section className="ht-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
       {workspaceTab==='teacher'&&<>
         <p className="ht-notice">个人空间 · 显示本人各学校的任务与个人测评，不按上方学校筛选。</p>
         <HuiteacherPersonalSelf api={teacherApi}/>

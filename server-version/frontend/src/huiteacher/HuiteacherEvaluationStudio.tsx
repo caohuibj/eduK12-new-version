@@ -378,6 +378,15 @@ export function HuiteacherEvaluationStudio({organizationId,api,canAuthorPrivateT
               const run=await api<Run>(base+'/evaluation-events/'+event.id+'/run')
               if(generation===scopeGeneration.current&&scaleScope.current.base===base&&scaleScope.current.api===api)setRunMap(old=>({...old,[event.id]:run}))
             }}/>}
+          {canAuthorPrivateTools&&actorKey&&<EducationPrivateScalePicker kind="FORM"
+            key={`private-form:${actorKey}:${organizationId}:${event.id}:${runMap[event.id].runId}`}
+            entry="TEACHER" organizationId={organizationId} actorKey={actorKey} scopeKey={`${event.id}:${runMap[event.id].runId}`}
+            api={api} endpoint={base+'/evaluation-events/'+event.id+'/run/tracks'} expectedVersion={runMap[event.id].version}
+            disabled={working} onBusy={setWorking} onRefresh={async()=>{
+              const generation=scopeGeneration.current
+              const run=await api<Run>(base+'/evaluation-events/'+event.id+'/run')
+              if(generation===scopeGeneration.current&&scaleScope.current.base===base&&scaleScope.current.api===api)setRunMap(old=>({...old,[event.id]:run}))
+            }}/>}
           <div className="ht-inline"><button disabled={working||scaleLoading[event.id]} onClick={()=>void reloadScales(event)}>
             查询本校授权的教师自评 Scale
           </button></div>
