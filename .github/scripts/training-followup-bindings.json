@@ -1,0 +1,238 @@
+{
+  "schema": 1,
+  "base": "abade96de544593d0fe67453e4c48a0b478cbe67",
+  "product": "a0d7ef7d9496b685be159dcc10aacd2b23cb97c2",
+  "components": {
+    "frontend": "0e10d627a5797f11d238206bb128ac6d3c89bcc5",
+    "backend": "7c2de214f6f7ade40ed4f1d68258a41e1a62586c"
+  },
+  "source": {
+    "server-version/backend/prisma/migrations/20261022090000_private_form_templates/migration.sql": {
+      "before": null,
+      "after": "d301be9a5cda82a08875d116d630ac5965c14f6b"
+    },
+    "server-version/backend/prisma/schema.prisma": {
+      "before": "e525bd1952aac26cba5ebfec80be0b519a02a017",
+      "after": "7beb879a9b14f517e27f17804365101c61172690"
+    },
+    "server-version/backend/src/__tests__/questionnaire/form-templates.postgres.integration.test.ts": {
+      "before": null,
+      "after": "0e962a59281fd4ee3426b859bf2addd1dbb70403"
+    },
+    "server-version/backend/src/modules/composite/composite.service.ts": {
+      "before": "46f32bff98701bbad3eb98bdf4acb3cfad8e4c6c",
+      "after": "15194d66a709b3b1c76334d5c7efd31b92cd5eb7"
+    },
+    "server-version/backend/src/modules/questionnaire-product/form-template-content.ts": {
+      "before": null,
+      "after": "701883bf6501c266324f00a99d22e2bc97264792"
+    },
+    "server-version/backend/src/modules/questionnaire-product/routes.ts": {
+      "before": "16b5d244a6bb187af1710c40be271aebce811a53",
+      "after": "04bd4daaf5e97261b17baa03921e9a456037d6af"
+    },
+    "server-version/backend/src/modules/questionnaire-product/service.ts": {
+      "before": "f2b4fe9f65950f75de19358d6aaafa639d558e64",
+      "after": "9b2a802f04b4f87133464ea6c67298059ddf1992"
+    },
+    "server-version/backend/src/routes/trainingWorkspace.ts": {
+      "before": "e759e5b9ee1fd119cd6242a44a46c95c211e563a",
+      "after": "a98f617bb18e1965c1d5a3d593e9a3561aaf819a"
+    },
+    "server-version/frontend/src/App.tsx": {
+      "before": "444db0b50ecce188f300840b4f16fa782ea96e19",
+      "after": "36ea18bde0e6e590308ce80b2165f02ac0264f1a"
+    },
+    "server-version/frontend/src/components/MediaSelector.tsx": {
+      "before": "89cbfeaa2686b8e7aad0891633fc1e5da68e66fa",
+      "after": "50a93cceb767f2c5e92620ad0a69d2ffc31d138a"
+    },
+    "server-version/frontend/src/components/app-shell/AppShell.tsx": {
+      "before": "f2633799fce2bbe1344a79181d85c6b21e1b3b99",
+      "after": "355d2115af940a9aadab5e2539dcafc4ce457b84"
+    },
+    "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx": {
+      "before": "1253d76a69128531445467fec05a089955784a62",
+      "after": "56b8d4c21a51d371201096de15ea5d0ec05c76da"
+    },
+    "server-version/frontend/src/components/staff-ui/ManagementDialog.tsx": {
+      "before": "8b50f18f3cccc579bce0870629f19c1abfd0dd38",
+      "after": "8eaedd3870c8c79019d9346d75fc40c453ca08bb"
+    },
+    "server-version/frontend/src/pages/AssignmentList.tsx": {
+      "before": "cfeeb3fffecd7f8be1a94368c3401662645a52d3",
+      "after": "2f3dbde3095fa768263138e25911598b9e66d840"
+    },
+    "server-version/frontend/src/pages/CheckinList.tsx": {
+      "before": "508b5447f6296a283ecc42ebee49566a623a1e18",
+      "after": "b8b79532fd2bfaa6c9b9530153a8298d1e887470"
+    },
+    "server-version/frontend/src/pages/ScaleEdit.css": {
+      "before": "f46501b63d1288f7ae3afdbcd18e85a433903d36",
+      "after": "34df7dca5c47e9208074548a93e8dd5511265f66"
+    },
+    "server-version/frontend/src/pages/ScaleEdit.tsx": {
+      "before": "28d40565108dc8a79a6fcbe106db7701feb8fc52",
+      "after": "670130744479511f42eef7f46c1e661498de669c"
+    },
+    "server-version/frontend/src/pages/__tests__/AssignmentList.course-workspace.test.tsx": {
+      "before": null,
+      "after": "f027322135be8dc71409b3b1b3dc6ca38ff0778b"
+    },
+    "server-version/frontend/src/pages/__tests__/CheckinList.course-workspace.test.tsx": {
+      "before": null,
+      "after": "36a907329a8868363168fc5121a77d6db84f420c"
+    },
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.authoring.test.tsx": {
+      "before": "b76a37b9d0834127b8082a102e4d51abad2e9a7b",
+      "after": "5e9ae099abffed383c79e8b99f698078868c1697"
+    },
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.copy-publish.test.tsx": {
+      "before": "dc627fcde89cd619b75501a2e19c40b846f280e3",
+      "after": "e5f7b089027698efb55d836152e8eedb93b97e09"
+    },
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.paste.test.tsx": {
+      "before": null,
+      "after": "160772ee8a04c709513912de3adfe4ad0d839361"
+    },
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.scoring-save.test.tsx": {
+      "before": "f851a1dcc1b54b0e8ade2e5aa22a728bc6376878",
+      "after": "3904dc06cbf058f9912770a21dfed78d1fa1ae6b"
+    },
+    "server-version/frontend/src/pages/questionnaire/FormTemplatePicker.tsx": {
+      "before": null,
+      "after": "fb5b895dec81f5345f3980d0eceb702e17ecc642"
+    },
+    "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": {
+      "before": "5cdddedb5c40c905265bbbec4194475cc9cad67b",
+      "after": "b4010cb975ce138d43e0536f8b8689dd9811ac30"
+    },
+    "server-version/frontend/src/pages/questionnaire/__tests__/FormTemplates.test.tsx": {
+      "before": null,
+      "after": "694cff7f928d1975689c1b057fe4641d1acf37d0"
+    },
+    "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx": {
+      "before": "5d1af891ea6ffb28e74898ae72839464ad149466",
+      "after": "1159da7e4f19e6b7847210071577da2450909a5a"
+    },
+    "server-version/frontend/src/pages/questionnaire/form-template-editor.css": {
+      "before": null,
+      "after": "2040f5bbf25959b0477f76ed729ea97288515069"
+    },
+    "server-version/frontend/src/pages/scaleAuthoringInput.ts": {
+      "before": null,
+      "after": "b2bc4f397c7b5fb9b3d95879a239abb562ba3ee8"
+    },
+    "server-version/frontend/src/training/TrainingCardDescription.tsx": {
+      "before": null,
+      "after": "51bbe35e2dd113e0a43a0ca4f8e6e015585a404d"
+    },
+    "server-version/frontend/src/training/TrainingCatalogControls.tsx": {
+      "before": "e2ae4b6e132c3603ec45a456a956addb41879d32",
+      "after": "79e7456e99affb92923440a6601a8b3c19d5453f"
+    },
+    "server-version/frontend/src/training/TrainingCheckinSchedules.tsx": {
+      "before": "f6b0cab4370daed8ef31e2a0ca1d57731f321b79",
+      "after": "7a2b94fe61dfa2915231dfd05288e1c1d967c942"
+    },
+    "server-version/frontend/src/training/TrainingContextBack.test.tsx": {
+      "before": "f7c9935f83355bc08240ea3c58bc3aff06111a86",
+      "after": "4baf8d4a8d20654280ac932f2c2c2dd5cd4825b8"
+    },
+    "server-version/frontend/src/training/TrainingContextBack.tsx": {
+      "before": "814eb1f13d0656fe4ebb7d1a750d659dce359c7f",
+      "after": "7b2451a3736b40c5434684733c1fea371b9b35c7"
+    },
+    "server-version/frontend/src/training/TrainingCoursePages.test.tsx": {
+      "before": "00f04a924db8eeb06e1d13069e0606afc0c5b57f",
+      "after": "53475365c7ea34251c30ed9700746ebb626578d6"
+    },
+    "server-version/frontend/src/training/TrainingLibrary.test.tsx": {
+      "before": "6cb1082bb063116b8fb35d67f94f1480ce8c9cd2",
+      "after": "f546ee16b0afb1bbda4eac48ac6103360631b575"
+    },
+    "server-version/frontend/src/training/TrainingLibrary.tsx": {
+      "before": "f436c91dff56214e96b1fe8dcf2a56a4993aac35",
+      "after": "18cca3d3a685c48870f0f51f8775b741b9784b5e"
+    },
+    "server-version/frontend/src/training/TrainingTrainerCourse.tsx": {
+      "before": "e4c1e9e6606cd298b0288a10c90ea22d78f05608",
+      "after": "630fd268c2d2c8312c2bbb4a5f82f88d9473371c"
+    },
+    "server-version/frontend/src/training/TrainingTrainerHome.pagination.test.tsx": {
+      "before": "5e78fb532b6a25d8655c8d15d63189318fbf8741",
+      "after": "ddee80d8d18b646b5e6f067fd110aaa1a6a09abd"
+    },
+    "server-version/frontend/src/training/TrainingTrainerHome.tsx": {
+      "before": "eb51e63d257306c57087d4cbc0cc7707a3569301",
+      "after": "52f6be0bec0a85fd723b233dd8773972aa1cbd66"
+    },
+    "server-version/frontend/src/training/TrainingWorkspaceTabs.tsx": {
+      "before": "2002294b7f1b47db820b3ed1a49faff6b32b7897",
+      "after": "0747acc24c38ea80cb4f3fbf4b14cbff526589b6"
+    },
+    "server-version/frontend/src/training/context.test.ts": {
+      "before": "30c7c9cb4472876ac4d7de1dcf65ef84e1867ebf",
+      "after": "cef65430ac42e35709d705db961b2a824a6111ec"
+    },
+    "server-version/frontend/src/training/context.ts": {
+      "before": "cc3a366470bd950e3032c8f05a107937a35d4a8f",
+      "after": "9a04fce6764c2d12c73120055821b8c2fa51a070"
+    },
+    "server-version/frontend/src/training/training-assignment-workspace.css": {
+      "before": null,
+      "after": "a7eaed616c5aeb8fc2968e29ff5c4c73f2cbe41d"
+    },
+    "server-version/frontend/src/training/training-course-assessments.css": {
+      "before": "fc9261cc4341269dcb614deae60b7d4a9b79bb4c",
+      "after": "5b12c661f293683a67c86f867847ff72a9c8fd3a"
+    },
+    "server-version/frontend/src/training/training-course-overview.css": {
+      "before": null,
+      "after": "9060e4185ffe3f8a89584d96fb5f3957b22be1f4"
+    },
+    "server-version/frontend/src/training/training-media-dialogs.css": {
+      "before": null,
+      "after": "2f6277ca598ea5a4a75a652a8d8a109b367989e5"
+    },
+    "server-version/frontend/src/training/training-workspace-cards.css": {
+      "before": null,
+      "after": "530f978dcd192dd427e54d0b2ced4aeed9e9607d"
+    },
+    "server-version/frontend/src/training/training-workspace-header.css": {
+      "before": null,
+      "after": "fef5b9bed05bb55135ac9b1c449ffd5e3eb9c0c4"
+    },
+    "server-version/frontend/src/training/training-workspace-heading.css": {
+      "before": null,
+      "after": "4fc5b6bce9c48ce35d631fe46a64b75622891a05"
+    }
+  },
+  "controls": [
+    ".github/scripts/training-followup-bindings.json",
+    ".github/scripts/training-followup-scope.mjs",
+    ".github/scripts/training-followup-scope.test.mjs",
+    ".github/scripts/training-followup-checks.mjs",
+    ".github/scripts/training-followup-browser.mjs",
+    ".github/scripts/training-workspace-scope.mjs",
+    ".github/workflows/ci-training-workspace.yml",
+    ".github/workflows/ci-training-followup.yml",
+    ".github/workflows/ci.yml",
+    ".github/scripts/content-scope.mjs",
+    "docs/release/README.md"
+  ],
+  "frontendTests": [
+    "src/pages/__tests__/ScaleEdit.authoring.test.tsx",
+    "src/pages/__tests__/ScaleEdit.copy-publish.test.tsx",
+    "src/pages/questionnaire/__tests__/FormTemplates.test.tsx",
+    "src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx"
+  ],
+  "backendTests": [
+    "src/__tests__/questionnaire/form-templates.postgres.integration.test.ts"
+  ],
+  "localEvidence": {
+    "head": "99d9cd2f5bf7cba9b56374c4ca52579cd33a26dc",
+    "path": "evidence/training-mac-e1ef69a7",
+    "status": "historical review evidence, not retroactively signed CI success"
+  }
+}
