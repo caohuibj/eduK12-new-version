@@ -148,3 +148,26 @@
 .survey-researcher .is-form .survey-form-current-editor > fieldset { padding:.85rem; }
 .survey-form-options { padding:.7rem; }
 }
+/* A consistent authoring surface for questions, media and advanced answer rules. */
+.survey-researcher .is-form .survey-form-current-editor { box-shadow:0 3px 14px #345a6608; border-color:#d3e4e5; }
+.survey-researcher .is-form .survey-form-directory { border-color:#d9e6e6; background:#f4f8f7; }
+.survey-researcher .is-form .survey-form-directory > header { padding:.8rem 1rem; background:#edf4f2; }
+.survey-researcher .is-form .survey-form-directory li > button { transition:background-color .15s,border-color .15s; }
+.survey-researcher .is-form .survey-form-directory li > button:hover:not(:disabled) { background:#f4fbf7; border-color:#b1d1c5; }
+.survey-researcher .is-form .survey-form-directory li > button[aria-pressed=true] { background:#e4f2eb; border-color:#76aa96; box-shadow:inset 3px 0 #589681; }
+.survey-researcher .is-form .survey-form-order-actions button:hover:not(:disabled),.survey-researcher .is-form .survey-form-item-actions button:hover:not(:disabled) { background:#e5efeb; color:#437c6b; }
+.survey-researcher .is-form .survey-form-question-settings { padding:0; border:1px solid #e0e9e9; border-radius:.55rem; background:#fbfdfc; overflow:hidden; }
+.survey-researcher .is-form .survey-form-question-settings > summary { display:flex; align-items:center; gap:.5rem; padding:.7rem .85rem; margin:0; color:#62807d; font-size:.8rem; list-style:none; }
+.survey-form-question-settings > summary::-webkit-details-marker { display:none; }
+.survey-researcher .is-form .survey-form-question-settings > summary::after { content:'+'; margin-left:auto; color:#91a9a1; font-size:1rem; font-weight:400; }
+.survey-researcher .is-form .survey-form-question-settings[open] > summary { background:#edf5f1; color:#3d7567; border-bottom:1px solid #dfeae4; }
+.survey-researcher .is-form .survey-form-question-settings[open] > summary::after { content:'−'; }
+.survey-researcher .is-form .survey-form-question-settings > :not(summary) { margin:.85rem; }
+.survey-researcher .is-form .survey-form-question-settings label { font-size:.8rem; }
+.survey-researcher .is-form .survey-form-question-settings :is(input,select,textarea).input { margin-top:.3rem; background:#fff; border-color:#d6e4e0; }
+.survey-researcher .is-form .survey-form-question :is(input,select,textarea):focus { border-color:#74a99a; }
+.survey-researcher .is-form .survey-form-commit-actions { display:flex; align-items:center; gap:.6rem; padding:.8rem; border:1px solid #dce9e2; border-radius:.6rem; background:#f0f7f3; }
+.survey-form-save-caption { margin-left:auto; font-size:.7rem; color:#82998c; }
+.survey-researcher .is-form .survey-form-field-budget { color:#90a49b; padding-top:.1rem; font-size:.7rem; }
+@media(max-width:40rem){.survey-form-save-caption{flex-basis:100%;margin-left:0}.survey-researcher .is-form .survey-form-question-settings > :not(summary){margin:.7rem}}
+@media(prefers-reduced-motion:reduce){.survey-researcher .is-form .survey-form-directory li > button{transition:none}}

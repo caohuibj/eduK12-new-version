@@ -64,6 +64,27 @@ describe('Survey image library explicit bounded reads',()=>{
     expect(fetcher.mock.calls.some(([url,init])=>url.endsWith('/assets')&&init?.method!=='POST')).toBe(false)
   })
 
+  it('offers a visible upload action, reports progress and prevents overlapping selections',async()=>{
+    const user=userEvent.setup(),pending=deferred<Response>(),changed=vi.fn()
+    const fetcher=vi.fn((url:string)=>url.endsWith('/csrf')?response({csrfToken:'synthetic-csrf'}):pending.promise)
+    vi.stubGlobal('fetch',fetcher)
+    render(<SurveyImageField projectId="tool:synthetic-tool" onChange={changed}/>)
+    const picker=screen.getByLabelText('选择图片上传'),click=vi.spyOn(picker as HTMLInputElement,'click').mockImplementation(()=>{})
+    expect(picker).not.toBeVisible();await user.click(screen.getByRole('button',{name:'上传图片'}));expect(click).toHaveBeenCalledOnce();expect(fetcher).not.toHaveBeenCalled()
+    await user.upload(picker,new File(['bytes'],'test-photo.png',{type:'image/png'}))
+    expect(await screen.findByRole('button',{name:'正在上传…'})).toBeDisabled();expect(screen.getByRole('button',{name:'打开工具素材库'})).toBeDisabled();expect(screen.getByRole('status')).toHaveTextContent('正在上传：test-photo.png')
+    await act(async()=>{pending.resolve(await response(asset('uploaded')))})
+    await waitFor(()=>expect(screen.getByRole('button',{name:'上传图片'})).toBeEnabled());expect(screen.getByRole('status')).toHaveTextContent('已上传：test-photo.png');expect(changed).toHaveBeenCalledOnce()
+    expect(fetcher.mock.calls.some(([url])=>url==='/api/survey/tool-media/synthetic-tool/assets')).toBe(true)
+  })
+  it('keeps file restrictions and restores the upload action after an error',async()=>{
+    const user=userEvent.setup({applyAccept:false}),changed=vi.fn(),fetcher=vi.fn((url:string)=>url.endsWith('/csrf')?response({csrfToken:'synthetic-csrf'}):response(null,403))
+    vi.stubGlobal('fetch',fetcher);render(<SurveyImageField projectId="project-b" onChange={changed}/>)
+    await user.upload(screen.getByLabelText('选择图片上传'),new File(['bad'],'image.svg',{type:'image/svg+xml'}))
+    expect(await screen.findByRole('alert')).toHaveTextContent('只允许不超过 2MB');expect(fetcher).not.toHaveBeenCalled()
+    await user.upload(screen.getByLabelText('选择图片上传'),new File(['bytes'],'image.png',{type:'image/png'}))
+    expect(await screen.findByRole('alert')).toHaveTextContent('素材库无权访问');expect(screen.getByRole('button',{name:'上传图片'})).toBeEnabled();expect(screen.queryByRole('status')).not.toBeInTheDocument();expect(changed).not.toHaveBeenCalled()
+  })
   it.each(['success','failure'])('ignores late project-A library %s after switching to project B',async(outcome)=>{
     const user=userEvent.setup(),pending=deferred<Response>()
     const fetcher=vi.fn((url:string)=>url.includes('/project-a/')?pending.promise:response({assets:[asset('b')]}))

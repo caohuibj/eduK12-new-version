@@ -52,7 +52,7 @@ export function SurveyFormStudio({value,onCommit,onDraftRiskChange,disabled=fals
       <section className="survey-form-current-editor" aria-label={editing?'当前题目编辑区':'新题目编辑区'}><header><span>{editing?<Pencil size={20}/>:<Plus size={20}/>}</span><div><h3>{editing?'编辑题目':'添加新题'}</h3></div><details className="survey-form-compose-help"><summary>操作说明</summary><p>{editing?'修改后点击“保存题目修改”；取消编辑会放弃本次修改。':'选择题型，填写题干和选项，再点击“添加题目”。'}</p></details></header>
         <fieldset disabled={blocked||!!renaming}><legend className="sr-only">{editing?'编辑题目':'添加新题'}</legend>
           {renderQuestion(working,next=>{const updated=next.pages.flatMap(p=>p.questions).find(q=>q.itemKey===question.itemKey);if(updated){editGeneration.current++;setQuestion(updated);setChanged(true)}},question.itemKey,pageControl)}
-          <div className="survey-form-commit-actions"><button type="button" className="btn-primary" disabled={!question.prompt.trim()||editing!==null&&!changed} onClick={()=>void submit()}>{busy?'正在保存…':editing?'保存题目修改':'添加题目'}</button>{risk&&<button type="button" className="btn-secondary" onClick={reset}>{editing?'取消编辑':'清空新题'}</button>}</div>
+          <div className="survey-form-commit-actions"><button type="button" className="btn-primary" disabled={!question.prompt.trim()||editing!==null&&!changed} onClick={()=>void submit()}>{busy?'正在保存…':editing?'保存题目修改':'添加题目'}</button>{risk&&<button type="button" className="btn-secondary" onClick={reset}>{editing?'取消编辑':'清空新题'}</button>}<span className="survey-form-save-caption">{editing?'保存当前题目的修改':'添加后即保存到表单'}</span></div>
         </fieldset>
         <p className="survey-form-field-budget">已保存作答字段 {visibleFields}/500 · 矩阵每行和其他填写各计 1 个字段</p>
       </section>

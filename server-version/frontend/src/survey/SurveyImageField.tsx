@@ -1,3 +1,5 @@
+import {Upload,Image as ImageIcon,FolderOpen,LoaderCircle} from 'lucide-react'
+import './survey-image-field.css'
 import {surveyAssetBase} from './tool-library-api'
 import { useEffect,useId,useRef,useState } from 'react'
 import type { SurveyImage } from './builder.types'
@@ -11,7 +13,8 @@ export function SurveyImageField({projectId,image,onChange,presentationOnly=fals
 }){
   const [library,setLibrary]=useState<Stored[]>([]),[busy,setBusy]=useState(false),[error,setError]=useState('')
   const [libraryOpen,setLibraryOpen]=useState(false),[libraryLoading,setLibraryLoading]=useState(false)
-  const [libraryError,setLibraryError]=useState('')
+  const [libraryError,setLibraryError]=useState(''),[uploadStatus,setUploadStatus]=useState('')
+  const fileInput=useRef<HTMLInputElement>(null)
   const libraryId=useId(),libraryRequest=useRef<AbortController|null>(null)
   const base=surveyAssetBase(projectId)
   const scopeLabel=projectId.startsWith('tool:')?'工具素材库':'本项目素材库'
@@ -22,7 +25,7 @@ export function SurveyImageField({projectId,image,onChange,presentationOnly=fals
   useEffect(()=>{
     mounted.current=true
     setLibrary([]);setLibraryOpen(false);setLibraryLoading(false);setLibraryError('')
-    setBusy(false);setError('')
+    setBusy(false);setError('');setUploadStatus('')
     return()=>{mounted.current=false;libraryRequest.current?.abort()}
   },[base])
   const loadLibrary=async()=>{
@@ -49,10 +52,11 @@ export function SurveyImageField({projectId,image,onChange,presentationOnly=fals
     }
   }
   const upload=async(file:File)=>{
+    setUploadStatus('')
     if(!['image/jpeg','image/png','image/webp'].includes(file.type)||file.size>2*1024*1024||!file.size){
       setError('只允许不超过 2MB 的 JPEG/PNG/WebP 静态图片');return
     }
-    setBusy(true);setError('')
+    setBusy(true);setError('');setUploadStatus('正在上传：'+file.name)
     const current=()=>mounted.current&&currentBase.current===base
     try{
       let csrf=cookie()
@@ -71,26 +75,30 @@ export function SurveyImageField({projectId,image,onChange,presentationOnly=fals
       if(!current())return
       const media=output.data
       setLibrary(xs=>[media,...xs.filter(x=>x.assetId!==media.assetId)])
+      setUploadStatus('已上传：'+file.name)
       latestOnChange.current({asset:{
         assetId:media.assetId,contentHash:media.contentHash,mimeType:media.mimeType,
       },altText:file.name.replace(/\.[^.]+$/,'').slice(0,300)||'研究图片',
         rightsStatus:'unknown',rightsNote:''})
-    }catch(e){if(current())setError(e instanceof Error?e.message:'图片上传失败')}
+    }catch(e){if(current()){setError(e instanceof Error?e.message:'图片上传失败');setUploadStatus('')}}
     finally{if(current())setBusy(false)}
   }
-  return <fieldset className="border rounded-lg p-3 space-y-3">
-    <legend className="text-sm font-semibold">授权静态研究图片（可选）</legend>
-    <p className="text-xs text-slate-600">图片在选用和发布前校验所有权、文件摘要和版权。不得使用任意外链图片、动态脚本或含隐私的人脸材料。</p>
-    {error&&<p role="alert" className="text-red-700 text-sm">{error}</p>}
-    <label className="text-sm block">选择图片上传
-      <input type="file" accept="image/png,image/jpeg,image/webp" disabled={busy}
-        className="block mt-1 max-w-full"
-        onChange={e=>{const f=e.target.files?.[0];if(f)void upload(f);e.target.value=''}}/>
-    </label>
-    <button type="button" className="btn-secondary" disabled={busy}
-      aria-expanded={libraryOpen} aria-controls={libraryId} onClick={toggleLibrary}>
-      {libraryOpen?'收起'+scopeLabel:'打开'+scopeLabel}</button>
-    <div id={libraryId} hidden={!libraryOpen} className="space-y-2">{libraryOpen&&<>
+  return <fieldset className="survey-image-field">
+    <legend><ImageIcon size={16} aria-hidden="true"/>研究图片 <small>可选</small></legend>
+    <div className="survey-image-actions">
+      <input ref={fileInput} type="file" aria-label="选择图片上传" accept="image/png,image/jpeg,image/webp" disabled={busy} hidden
+        onChange={event=>{const file=event.target.files?.[0];if(file)void upload(file);event.target.value=''}}/>
+      <button type="button" className="btn-primary survey-image-upload" disabled={busy} onClick={()=>fileInput.current?.click()}>
+        {busy?<LoaderCircle size={18} className="survey-image-spinner" aria-hidden="true"/>:<Upload size={18} aria-hidden="true"/>}{busy?'正在上传…':image?'更换图片':'上传图片'}
+      </button>
+      <button type="button" className="btn-secondary survey-image-library-toggle" disabled={busy}
+        aria-expanded={libraryOpen} aria-controls={libraryId} onClick={toggleLibrary}><FolderOpen size={17} aria-hidden="true"/>
+        {libraryOpen?'收起'+scopeLabel:'打开'+scopeLabel}</button>
+    </div>
+    <p className="survey-image-file-hint">PNG、JPG、WebP · 单张不超过 2 MB</p>
+    {uploadStatus&&<p role="status" className="survey-image-status">{uploadStatus}</p>}
+    {error&&<p role="alert" className="survey-image-error">{error}</p>}
+    <div id={libraryId} hidden={!libraryOpen} className="survey-image-library space-y-2">{libraryOpen&&<>
     {libraryLoading&&<p role="status" className="text-sm">正在读取{scopeLabel}…</p>}
     {libraryError&&<><p role="alert" className="text-red-700 text-sm">{libraryError}</p>
       <button type="button" className="btn-secondary" disabled={busy||libraryLoading}
@@ -111,16 +119,17 @@ export function SurveyImageField({projectId,image,onChange,presentationOnly=fals
       </select>
     </label>
     </>}</div>
-    {image&&<div className="space-y-2">
-      <img src={base+'/'+encodeURIComponent(image.asset.assetId)+'/preview'}
+    {image&&<div className="survey-image-details">
+      <div className="survey-image-preview"><img src={base+'/'+encodeURIComponent(image.asset.assetId)+'/preview'}
         alt={image.altText||'研究图片预览'} loading="lazy"
-        className="max-w-full max-h-56 object-contain rounded border"/>
-      <label className="text-sm block">替代文字（屏幕阅读器可读，必填）
-        <input className="input block w-full" value={image.altText} maxLength={300}
-          onChange={e=>onChange({...image,altText:e.target.value})}/></label>
-      <label className="text-sm block">图片说明（可选）
-        <input className="input block w-full" maxLength={1000} value={image.caption||''}
-          onChange={e=>onChange({...image,caption:e.target.value})}/></label>
+        className="max-w-full max-h-56 object-contain rounded border"/></div>
+      <div className="survey-image-information">
+      <div className="survey-image-control"><label className="text-sm block">替代文字（屏幕阅读器可读，必填）
+        <input className="input block w-full" value={image.altText} maxLength={300} aria-describedby={libraryId+'-alt-hint'} placeholder="简要描述图片内容"
+          onChange={e=>onChange({...image,altText:e.target.value})}/></label><small id={libraryId+'-alt-hint'}>供屏幕阅读器朗读，通常不显示在题面上。</small></div>
+      <div className="survey-image-control"><label className="text-sm block">图片说明（可选）
+        <input className="input block w-full" maxLength={1000} value={image.caption||''} aria-describedby={libraryId+'-caption-hint'} placeholder="需要展示给被试的图片说明"
+          onChange={e=>onChange({...image,caption:e.target.value})}/></label><small id={libraryId+'-caption-hint'}>显示在图片下方，被试可见。</small></div>
       {!presentationOnly&&<><label className="text-sm block">图片版权状态
         <select className="input block w-full" value={image.rightsStatus}
           onChange={e=>onChange({...image,rightsStatus:e.target.value as SurveyImage['rightsStatus']})}>
@@ -128,13 +137,14 @@ export function SurveyImageField({projectId,image,onChange,presentationOnly=fals
           <option value="self_authored">项目研究者原创</option>
           <option value="authorized">已取得本次研究展示授权</option>
         </select></label>
-      <label className="text-sm block">版权／授权凭据说明（必填）
-        <textarea className="input block w-full" maxLength={2000} rows={2}
+      <label className="text-sm block survey-image-wide">版权／授权凭据说明（必填）
+        <textarea className="input block w-full" maxLength={2000} rows={2} placeholder="说明原创情况，或本次研究展示授权的来源与范围"
           value={image.rightsNote}
           onChange={e=>onChange({...image,rightsNote:e.target.value})}/>
       </label>
       </>}
-      <button className="btn-secondary" type="button" onClick={()=>onChange(undefined)}>从此题移除图片引用</button>
+      </div>{!presentationOnly&&<p className="survey-image-file-hint">版权信息用于发布校验，不展示在被试题面上。</p>}<button className="survey-image-remove" type="button" onClick={()=>onChange(undefined)}>从此题移除图片引用</button>
     </div>}
+    <details className="survey-image-guidance"><summary>图片要求与使用说明</summary><p>图片在选用和发布前校验所有权、文件摘要和版权。不得使用任意外链图片、动态脚本或含隐私的人脸材料。</p></details>
   </fieldset>
 }
