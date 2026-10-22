@@ -5,6 +5,12 @@ import SurveyApp from './SurveyApp'
 import { SurveyWaveStudio } from './SurveyWaveStudio'
 import type { ResearchDraft } from './builder.types'
 
+function selectStudy(index:number){
+  const back=screen.queryByRole('button',{name:'← 返回研究列表（保留编辑）'})
+  if(back)fireEvent.click(back)
+  fireEvent.click(screen.getAllByRole('button',{name:'查看/编辑'})[index])
+}
+
 vi.mock('./SurveyAnalyticsWorkspace',()=>({SurveyAnalyticsWorkspace:()=>null}))
 vi.mock('./SurveyFlowStudio',()=>({SurveyFlowStudio:({questions}:{questions:{prompt:string}[]})=>
   <output aria-label="flow questions">{questions.map(question=>question.prompt).join(',')}</output>}))
@@ -184,7 +190,7 @@ describe('shared Survey workspace instruments requests',()=>{
 
   it('does not apply an old project list after selecting another project',async()=>{
     const api=fixture(),pending=api.defer(base+'/instruments?page=1');await openWorkspace()
-    fireEvent.click(screen.getAllByRole('button',{name:'查看/编辑'})[1])
+    selectStudy(1)
     await studio().findByRole('checkbox',{name:'FORM · 工具1'})
     await act(async()=>pending.resolve(response({list:[draft('old','旧项目工具')]})))
     expect(studio().queryByRole('checkbox',{name:'FORM · 旧项目工具'})).toBeNull()
@@ -420,14 +426,14 @@ describe('Private report cross-project leave protection',()=>{
     fireEvent.click(await screen.findByRole('button',{name:'feedback · 1 · 草稿'}))
     fireEvent.change(await screen.findByLabelText('报告标题'),{target:{value:'不能静默丢失的报告'}})
     const confirm=vi.spyOn(window,'confirm').mockReturnValue(false)
-    fireEvent.click(screen.getAllByRole('button',{name:'查看/编辑'})[1])
+    selectStudy(1)
     expect(screen.getByLabelText('报告标题')).toHaveValue('不能静默丢失的报告')
     fireEvent.click(screen.getByRole('tab',{name:'研究设置'}))
     fireEvent.click(screen.getByRole('button',{name:'新建其他项目'}))
     expect(screen.getByRole('tab',{name:'私有报告'})).toBeInTheDocument()
     expect(confirm).toHaveBeenCalledTimes(2)
     confirm.mockReturnValue(true)
-    fireEvent.click(screen.getAllByRole('button',{name:'查看/编辑'})[1])
+    selectStudy(1)
     expect(screen.getByLabelText('研究名称')).toHaveValue('研究 p2')
     expect(screen.queryByLabelText('报告标题')).toBeNull()
     confirm.mockRestore()
@@ -441,11 +447,11 @@ describe('Private report cross-project leave protection',()=>{
     const create=api.defer(base+'/report-drafts','POST')
     fireEvent.click(screen.getByRole('button',{name:'创建报告草稿'}))
     await waitFor(()=>expect(api.count(base+'/report-drafts','POST')).toBe(1))
-    fireEvent.click(screen.getAllByRole('button',{name:'查看/编辑'})[1])
+    selectStudy(1)
     expect(screen.getByRole('tab',{name:'私有报告'})).toHaveAttribute('aria-selected','true')
     await act(async()=>create.resolve(response(null,false)))
     await screen.findByRole('button',{name:'重试本次创建'})
-    fireEvent.click(screen.getAllByRole('button',{name:'查看/编辑'})[1])
+    selectStudy(1)
     expect(screen.getByRole('button',{name:'重试本次创建'})).toBeInTheDocument()
     fireEvent.click(screen.getByRole('tab',{name:'研究设置'}))
     fireEvent.click(screen.getByRole('button',{name:'新建其他项目'}))

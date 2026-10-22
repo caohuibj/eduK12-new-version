@@ -17,7 +17,7 @@ export function SurveyWorkspaceNav({active,onChange,title,onReturn}:{active:Work
   }
   return <header className="survey-workspace-nav">
     {onReturn&&<button type="button" className="survey-context-back" onClick={onReturn}>← 返回研究列表（保留编辑）</button>}
-    <p className="survey-workspace-eyebrow">当前研究</p><h2 id="survey-current-project-heading" tabIndex={-1}>{title}</h2>
+    <p className="survey-workspace-eyebrow">RESEARCH · 研究编辑</p><h1 id="survey-current-project-heading" tabIndex={-1}>{title}</h1>
     <p>按研究设置、工具编制、报告编制、发布采集和数据整理逐步完成。切换分区会保留本页未保存的编辑；离开页面前请保存。</p>
     <div role="tablist" aria-label="研究工作分区">
       {sections.map(([key,label,hint],index)=><button key={key} type="button" role="tab"

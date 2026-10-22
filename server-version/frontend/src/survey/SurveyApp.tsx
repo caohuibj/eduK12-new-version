@@ -16,6 +16,7 @@ import { SurveyFeaturePage } from './SurveyFeaturePage'
 import { surveyFeatures } from './survey-features'
 import { SurveyProjectDirectory, type SurveyProject as Project } from './SurveyProjectDirectory'
 import { SurveyResearcherAccount } from './SurveyResearcherAccount'
+import { SurveyCreateProjectDialog } from './SurveyCreateProjectDialog'
 
 type Envelope<T>={code:number|string;message:string;data:T}
 type Researcher={id:string;username:string;mustChangePassword:boolean}
@@ -56,6 +57,7 @@ export default function SurveyApp(){
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
   const [projects,setProjects]=useState<Project[]>([]),[selected,setSelected]=useState<Project|null>(null)
   const [creating,setCreating]=useState(false)
+  const [editorOpen,setEditorOpen]=useState(false)
   const projectCreationRequestId=useRef<string|null>(null)
   const reportLeaveRisk=useRef<ReportLeaveRisk>({dirty:false,pending:false,busy:false})
   const reportRiskChanged=useCallback((risk:ReportLeaveRisk)=>{reportLeaveRisk.current=risk},[])
@@ -157,13 +159,13 @@ export default function SurveyApp(){
   const changeAccountPassword=(oldPassword:string,newPassword:string,code?:string)=>{if(!mayLeaveWorkspace())return;void work(async()=>{
     await api('/auth/change-password','POST',{oldPassword,newPassword,code})
     projectCreationRequestId.current=null
-    setUser(null);setProjects([]);setSelected(null);setCreating(false);setTitle('');setDescription('');setMode('SINGLE_UNLINKED');setScreen('login')
+    setUser(null);setProjects([]);setSelected(null);setCreating(false);setEditorOpen(false);setTitle('');setDescription('');setMode('SINGLE_UNLINKED');setScreen('login')
     setNotice('密码已修改，旧研究者会话已经失效，请重新登录')
   })}
   const logout=()=>{if(!mayLeaveWorkspace())return;void work(async()=>{
     await api('/auth/logout','POST',{})
     projectCreationRequestId.current=null
-    setUser(null);setProjects([]);setSelected(null);setCreating(false);setTitle('');setDescription('');setMode('SINGLE_UNLINKED');setScreen('login')
+    setUser(null);setProjects([]);setSelected(null);setCreating(false);setEditorOpen(false);setTitle('');setDescription('');setMode('SINGLE_UNLINKED');setScreen('login')
   })}
   const createProject=(e:FormEvent)=>{e.preventDefault();if(workInFlight.current.writes>0)return;void work(async()=>{
     // Keep the same server idempotency identity until an ACK or an explicit
@@ -175,22 +177,24 @@ export default function SurveyApp(){
     setWorkspaceSection('settings');applyProject(p);focusSection('survey-current-project-heading')
     await loadProjects(1).catch(()=>{});setNotice('研究草稿已创建')
   })}
-  const applyProject=(p:Project)=>{projectCreationRequestId.current=null;setCreating(false);setSelected(p);setTitle(p.title);setDescription(p.description);setMode(p.collectionMode)}
+  const applyProject=(p:Project)=>{projectCreationRequestId.current=null;setCreating(false);setEditorOpen(true);setSelected(p);setTitle(p.title);setDescription(p.description);setMode(p.collectionMode)}
   const focusSection=(id:string)=>window.requestAnimationFrame(()=>{
-    const element=document.getElementById(id);element?.focus();element?.scrollIntoView?.({block:'start'})
+    const element=document.getElementById(id);element?.focus({preventScroll:true})
+    if(id==='survey-current-project-heading'||id==='survey-projects-heading'){
+      document.documentElement.scrollTop=0;document.body.scrollTop=0
+    }else element?.scrollIntoView?.({block:'start'})
   })
   const choose=(p:Project)=>{
-    if(selected?.id===p.id){focusSection('survey-current-project-heading');return}
-    if(!mayLeaveWorkspace())return
+    if(selected?.id===p.id){setEditorOpen(true);focusSection('survey-current-project-heading');return}
+    if(!mayLeaveWorkspace()){setEditorOpen(true);return}
     setWorkspaceSection('settings');applyProject(p);focusSection('survey-current-project-heading')
   }
   const newProject=()=>{
     if(!mayLeaveWorkspace())return
     projectCreationRequestId.current=null
     setError('');setNotice('')
-    setCreating(true);setSelected(null);setTitle('');setDescription('');setMode('SINGLE_UNLINKED');setWorkspaceSection('settings')
+    setCreating(true);setEditorOpen(false);setSelected(null);setTitle('');setDescription('');setMode('SINGLE_UNLINKED');setWorkspaceSection('settings')
     builderLeaveRisk.current={dirty:false,busy:false};reportLeaveRisk.current={dirty:false,pending:false,busy:false}
-    focusSection('survey-project-settings-heading')
   }
   const returnToProjects=()=>{
     if(!mayLeaveWorkspace())return
@@ -199,6 +203,7 @@ export default function SurveyApp(){
     setCreating(false);setTitle('');setDescription('');setMode('SINGLE_UNLINKED')
     focusSection('survey-projects-heading')
   }
+  const showProjectList=()=>{setEditorOpen(false);focusSection('survey-projects-heading')}
   const save=(e:FormEvent)=>{e.preventDefault();if(!selected)return;void work(async()=>{
     const p=await api<Project>('/projects/'+selected.id,'PATCH',
       {revision:selected.revision,title,description,collectionMode:mode})
@@ -231,7 +236,7 @@ export default function SurveyApp(){
       className={entryScreen?'survey-entry-main':screen==='work'&&!user?.mustChangePassword
         ?'survey-researcher-main':'max-w-4xl mx-auto px-4 py-8'}>
       {loading&&<p role="status">正在核对研究者会话…</p>}
-      {error&&<p role="alert" className="p-4 border-l-4 border-red-600 bg-red-50">{error}</p>}
+      {error&&!creating&&<p role="alert" className="p-4 border-l-4 border-red-600 bg-red-50">{error}</p>}
       {notice&&<p role="status" className="p-4 border-l-4 border-teal-600 bg-teal-50">{notice}</p>}
       {!loading&&(screen==='claim'||screen==='reset')&&<section className="survey-entry-panel">
         <a className="survey-back" href="/">返回首页</a>
@@ -279,21 +284,21 @@ export default function SurveyApp(){
         <h2 className="font-semibold text-xl">首次登录 · 修改研究者密码</h2>
         <ProductPasswordChange product="survey" forced busy={busy} onChangePassword={changeAccountPassword}/>
       </section>}
-      {!loading&&user&&screen==='work'&&!user.mustChangePassword&&<div className={`survey-workspace${creating?' survey-workspace--create':''}`}>
-        {!creating&&<SurveyProjectDirectory projects={projects} selectedId={selected?.id} page={projectPage}
+      {!loading&&user&&screen==='work'&&!user.mustChangePassword&&<div className="survey-workspace">
+        <div hidden={editorOpen}><SurveyProjectDirectory projects={projects} selectedId={selected?.id} page={projectPage}
           busy={busy} loading={projectsLoading} error={projectsError} query={projectQuery} status={projectFilter}
           onQuery={setProjectQuery} onStatus={setProjectFilter} onChoose={choose} onArchive={toggle}
-          onPage={page=>void work(()=>loadProjects(page),false)} onRefresh={()=>void work(()=>loadProjects(projectPage),false)} onCreate={newProject}/>}
-      {creating&&<button type="button" className="survey-create-back" disabled={writeBusy} onClick={returnToProjects}>← 返回研究列表</button>}
+          onPage={page=>void work(()=>loadProjects(page),false)} onRefresh={()=>void work(()=>loadProjects(projectPage),false)} onCreate={newProject}/></div>
+      <div className="survey-project-editor" hidden={!editorOpen}>
+      {editorOpen&&projectsError&&<div role="alert" className="survey-workspace-message survey-workspace-message--error"><p>研究列表未能更新：{projectsError}。当前研究及修改会保留。</p><button type="button" className="btn-secondary" disabled={busy} onClick={()=>void work(()=>loadProjects(projectPage),false)}>重试研究列表</button></div>}
       {selected&&<SurveyWorkspaceNav active={workspaceSection} onChange={setWorkspaceSection} title={selected.title}
-        onReturn={()=>focusSection('survey-projects-heading')}/>}
-      {(selected||creating)&&<section className="survey-project-settings bg-white rounded-xl border p-6 my-4"
+        onReturn={showProjectList}/>}
+      {selected&&<section className="survey-project-settings bg-white rounded-xl border p-6 my-4"
         id="survey-workspace-settings" role={selected?'tabpanel':undefined}
         aria-labelledby={selected?'survey-workspace-tab-settings':undefined}
         hidden={!!selected&&workspaceSection!=='settings'}>
-        <p className="survey-workspace-eyebrow">{selected?'RESEARCH · 项目设置':'开始一项新研究'}</p>
-        {selected?<h2 id="survey-project-settings-heading" tabIndex={-1} className="text-xl font-semibold">编辑研究草稿</h2>
-          :<h1 id="survey-project-settings-heading" tabIndex={-1}>创建研究项目</h1>}
+        <p className="survey-workspace-eyebrow">RESEARCH · 项目设置</p>
+        <h2 id="survey-project-settings-heading" tabIndex={-1} className="text-xl font-semibold">编辑研究草稿</h2>
         <form onSubmit={selected?save:createProject} aria-busy={busy}><fieldset disabled={busy} className="min-w-0 border-0 p-0">{field('研究名称',title,setTitle)}
           <label className="block my-3 text-sm">研究说明<textarea className="input block mt-1 w-full" rows={3} value={description} onChange={e=>setDescription(e.target.value)}/></label>
           <label className="block my-3 text-sm">采集方式<select className="input block mt-1 w-full" value={mode} onChange={e=>setMode(e.target.value as Project['collectionMode'])}>
@@ -312,6 +317,9 @@ export default function SurveyApp(){
             ?<SurveyAnalyticsWorkspace actorId={user?.id} key={'analysis-'+selected.id} projectId={selected.id}/>
             :<section className="rounded-xl border bg-white p-4" aria-label="研究数据状态">
               研究数据分析暂未在当前环境启用；项目和研究工具仍可使用。
-            </section>}</div></>}</div>}
+            </section>}</div></>}</div>
+        <SurveyCreateProjectDialog open={creating} busy={busy} title={title} description={description} mode={mode} error={error}
+          onTitle={setTitle} onDescription={setDescription} onMode={setMode} onClose={returnToProjects} onSubmit={createProject}/>
+      </div>}
     </main></div>
 }
