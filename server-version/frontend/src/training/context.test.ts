@@ -13,9 +13,9 @@ describe('training edition is presentation only', () => {
   it('shows the exact role-appropriate training navigation', () => {
     expect(trainingNavigation('STUDENT').map(item => item.label)).toEqual(['我的课程', '我的账户'])
     expect(trainingNavigation('TEACHER').map(({ path, label }) => ({ path, label }))).toEqual([
-      { path: '/dashboard', label: '我的课程' },
-      { path: '/media-library', label: '媒体库' },
-      { path: '/toolkit', label: '工具包' },
+      { path: '/dashboard', label: '课程' },
+      { path: '/media-library', label: '媒体' },
+      { path: '/toolkit', label: '工具' },
       { path: '/profile', label: '我的账户' },
     ])
     expect(trainingNavigation('ADMIN')).toEqual([])

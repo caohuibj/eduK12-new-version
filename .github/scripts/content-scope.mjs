@@ -323,7 +323,7 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
     throw new Error('Choose a step_probe for component CI, or explicitly set full_acceptance=true for whole-platform CI');
   const entries = event === 'workflow_dispatch' ? [] : changedEntries(base);
   const workspace=trainingWorkspacePlan(entries,base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
-  if(['fix/training-course-pagination-20261021','backup/mac-training-workspace-20261022'].includes(process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME)&&!workspace)throw Error('Frozen Training workspace drift: unrelated platform fallback is not authorized');
+  if(['fix/training-course-pagination-20261021','backup/mac-training-workspace-20261022','work/training-followup-integrated-20261022'].includes(process.env.CI_HEAD_REF||process.env.GITHUB_HEAD_REF||process.env.GITHUB_REF_NAME)&&!workspace)throw Error('Frozen Training workspace drift: unrelated platform fallback is not authorized');
   if(workspace){
     const output={...trainingWorkspaceOutputs(workspace),...Object.fromEntries(Object.entries(runnerPlan({scenario:'training-workspace'})).map(([k,v])=>[k,Array.isArray(v)?JSON.stringify(v):v]))};
     console.log(JSON.stringify(output));

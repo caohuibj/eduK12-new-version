@@ -123,9 +123,24 @@ describe('Training teacher visual boundary', () => {
     expect(screen.getByRole('button', { name: '既有操作' })).toBeEnabled()
     expect(screen.queryByRole('navigation', { name: '主要导航' })).toBeNull()
     const workspace = screen.getByRole('navigation', { name: '教师工作台' })
-    expect(workspace).toHaveTextContent('我的课程')
-    expect(workspace).toHaveTextContent('媒体库')
-    expect(workspace).toHaveTextContent('工具包')
+    expect(screen.getByRole('banner')).toContainElement(workspace)
+    expect(screen.getByRole('main')).not.toContainElement(workspace)
+    expect(workspace).toHaveTextContent('课程')
+    expect(workspace).toHaveTextContent('媒体')
+    expect(workspace).toHaveTextContent('工具')
+  })
+  it.each([
+    ['/dashboard', '课程'], ['/media-library', '媒体'], ['/toolkit', '工具'],
+  ])('keeps one active workspace link with account actions in the header: %s', (path, label) => {
+    presentation.training = true
+    auth.user = { id: 't1', role: 'TEACHER', username: 'trainer' } as User
+    render(<MemoryRouter initialEntries={[path]}><AppShell><p>工作台内容</p></AppShell></MemoryRouter>)
+    const header = screen.getByRole('banner')
+    const workspace = screen.getByRole('navigation', { name: '教师工作台' })
+    expect(workspace.querySelectorAll('[aria-current="page"]')).toHaveLength(1)
+    expect(screen.getByRole('link', { name: label })).toHaveAttribute('aria-current', 'page')
+    expect(header).toContainElement(screen.getByRole('link', { name: /个人账号设置/ }))
+    expect(header).toContainElement(screen.getByRole('button', { name: '退出登录' }))
   })
   it.each([
     ['STUDENT', true, '/student'],

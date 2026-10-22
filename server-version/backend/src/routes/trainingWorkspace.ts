@@ -88,12 +88,12 @@ router.get('/tools', handle(async req => {
           AND (g.legacy_scale_grant OR NOT EXISTS (SELECT 1 FROM scale_library_entries e
             JOIN scale_library_submissions submission ON submission.id=e.submission_id WHERE submission.source_id=s.id))))))
     UNION ALL SELECT f.id,'form',f.name,f.description,f.status::text,NULL,f.creator_id,f.updated_at,'/general-questionnaires/'||f.id||'/edit',(f.creator_id=${actor} AND f.status='PUBLISHED')
-      FROM questionnaires f JOIN users u ON u.id=f.creator_id WHERE f.type='GENERAL' AND u.account_domain IN ('LEGACY','TRAINING')
+      FROM questionnaires f JOIN users u ON u.id=f.creator_id WHERE f.type='GENERAL' AND NOT EXISTS(SELECT 1 FROM questionnaire_scales s WHERE s.questionnaire_id=f.id) AND u.account_domain IN ('LEGACY','TRAINING')
       AND (f.creator_id=${actor} OR (${config.materialGrantsEnabled} AND f.status='PUBLISHED'
         AND NOT EXISTS(SELECT 1 FROM questionnaire_scales s WHERE s.questionnaire_id=f.id)
         AND EXISTS(SELECT 1 FROM material_grants g WHERE g.teacher_id=${actor} AND g.resource_type::text='FORM_TEMPLATE' AND g.resource_id=f.id)))
-    UNION ALL SELECT c.id,CASE WHEN EXISTS(SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=c.id AND i.type='FORM') AND NOT EXISTS(SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=c.id AND i.type<>'FORM') THEN 'form-composition' ELSE 'composition' END,c.name,c.description,c.status::text,c.revision::text,c.created_by,c.updated_at,'/toolkit/compositions/'||c.id,(c.status='PUBLISHED')
-      FROM composite_assessments c WHERE c.product_kind='QUESTIONNAIRE' AND c.created_by=${actor} AND c.status<>'ARCHIVED'
+    UNION ALL SELECT c.id,CASE WHEN c.product_kind='FORM_TEMPLATE' THEN 'form-template' WHEN EXISTS(SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=c.id AND i.type='FORM') AND NOT EXISTS(SELECT 1 FROM composite_assessment_items i WHERE i.composite_assessment_id=c.id AND i.type<>'FORM') THEN 'form-composition' ELSE 'composition' END,c.name,c.description,c.status::text,c.revision::text,c.created_by,c.updated_at,CASE WHEN c.product_kind='FORM_TEMPLATE' THEN '/toolkit/forms/'||c.id ELSE '/toolkit/compositions/'||c.id END,(c.status='PUBLISHED')
+      FROM composite_assessments c WHERE c.product_kind IN ('QUESTIONNAIRE','FORM_TEMPLATE') AND c.created_by=${actor} AND c.status<>'ARCHIVED'
     UNION ALL SELECT s.id,'sjt-draft',COALESCE(s.template->>'title','情境判断'),NULL,s.status,s.template->>'instrumentVersion',s.owner_id,s.updated_at,'/sjt-authoring?draftId='||s.id,(s.status='PUBLISHED')
       FROM sjt_author_drafts s WHERE s.owner_id=${actor}
     UNION ALL SELECT r.id,'situational',COALESCE(r.package #>> '{definition,source,title}',r.instrument_key),NULL,r.status,r.instrument_version,NULL,r.created_at,'/teacher/situational',false
@@ -106,7 +106,7 @@ router.get('/tools', handle(async req => {
           AND c.creator_id=g.grantee_teacher_id AND c.course_type='TRAINING_COURSE' AND NOT c.is_library)
     ${extra.length ? Prisma.sql`UNION ALL ${Prisma.join(extra,' UNION ALL ')}`:Prisma.empty}`
   const where=Prisma.sql`POSITION(LOWER(${q.keyword}) IN LOWER(r.name||' '||COALESCE(r.description,'')))>0
-    AND (${q.kind}='all' OR r.kind=${q.kind} OR (${q.kind}='form' AND r.kind='form-composition') OR (${q.kind}='situational' AND r.kind='sjt-draft') OR (${q.kind}='composition' AND r.kind='bundle'))
+    AND (${q.kind}='all' OR r.kind=${q.kind} OR (${q.kind}='form' AND r.kind IN ('form-composition','form-template')) OR (${q.kind}='situational' AND r.kind='sjt-draft') OR (${q.kind}='composition' AND r.kind='bundle'))
     AND (${q.source}='all' OR (${q.source}='owned' AND r."ownerId"=${actor}) OR (${q.source}='granted' AND r."ownerId" IS DISTINCT FROM ${actor}))`
   const [list,count]=await prisma.$transaction([
     prisma.$queryRaw<any[]>(Prisma.sql`WITH r AS (${rows}) SELECT * FROM r WHERE ${where} ORDER BY "updatedAt" DESC NULLS LAST,kind,id LIMIT ${q.pageSize} OFFSET ${(q.page-1)*q.pageSize}`),

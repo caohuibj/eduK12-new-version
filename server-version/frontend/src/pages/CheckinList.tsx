@@ -11,7 +11,11 @@ import { checkinReuseContent } from '../training/taskReuse'
 import CheckinRecurrenceFields from '../training/CheckinRecurrenceFields'
 import { localDateTime, recurrencePayload, type CheckinRecurrence } from '../training/checkinRecurrence'
 import React, { useState, useEffect, useRef } from 'react'
-import { useSearchParams } from 'react-router-dom'
+import { Navigate, useLocation, useSearchParams } from 'react-router-dom'
+import TrainingCardDescription from '../training/TrainingCardDescription'
+import TrainingCheckinSchedules from '../training/TrainingCheckinSchedules'
+import { trainingCourseContext } from '../training/courseNavigation'
+import '../training/training-assignment-workspace.css'
 import { Plus, Camera, Trash2, Users, Video, Image as ImageIcon, Download, X, FileText } from 'lucide-react'
 import apiClient from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
@@ -80,30 +84,40 @@ interface CheckinSubmission {
 }
 
 // A changed deep-link/auth identity must never display the previous record or editor.
-const CheckinList: React.FC = () => {
+type CheckinListProps = { embeddedCourse?: Course }
+const CheckinList: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
   const { user } = useAuth()
   const [params] = useSearchParams()
-  return <CheckinListContent key={JSON.stringify([user?.id, user?.role, params.get('courseId'), params.get('id')])} />
+  const location = useLocation()
+  const context = trainingCourseContext(location.pathname, location.search)
+  if (!embeddedCourse && isTrainingHost() && user?.role === 'TEACHER' && context) {
+    const next = new URLSearchParams({ section: 'checkins' })
+    for (const key of ['search','tags','from','to','dateField','page','pageSize']) if (params.has(key)) next.set('checkins_'+key, params.get(key)!)
+    for (const key of ['create','reuse']) if (params.get(key) === 'true') next.set(key, 'true')
+    if (params.get('id')) next.set('checkinId', params.get('id')!)
+    return <Navigate replace to={'/courses/'+encodeURIComponent(context.courseId)+'/detail?'+next.toString()}/>
+  }
+  return <CheckinListContent embeddedCourse={embeddedCourse} key={JSON.stringify([user?.id, user?.role, embeddedCourse?.id || params.get('courseId'), params.get(embeddedCourse ? 'checkinId' : 'id')])} />
 }
 
-const CheckinListContent: React.FC = () => {
+const CheckinListContent: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
   const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
-  const requestedCourseId = searchParams.get('courseId')
+  const requestedCourseId = embeddedCourse?.id || searchParams.get('courseId')
   const [showReuse, setShowReuse] = useState(false)
   const canReuse = isTrainingHost() && user?.role === 'TEACHER'
-  const focusId = searchParams.get('id')
+  const focusId = searchParams.get(embeddedCourse ? 'checkinId' : 'id')
   const { feedback, confirm, success, error: showError, info } = useStaffFeedback()
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const [checkins, setCheckins] = useState<Checkin[]>([])
-  const [courses, setCourses] = useState<Course[]>([])
+  const [courses, setCourses] = useState<Course[]>(embeddedCourse ? [embeddedCourse] : [])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const mounted = useRef(true)
   const loadSequence = useRef(0)
   const detailSequence = useRef(0)
   const [openingDetail,setOpeningDetail]=useState(false)
-  const catalog = useCatalogQuery()
+  const catalog = useCatalogQuery(embeddedCourse ? 'checkins_' : '')
   const [filterRevision,setFilterRevision]=useState(0)
   const [total, setTotal] = useState(0)
   const [showModal, setShowModal] = useState(false)
@@ -138,7 +152,7 @@ const CheckinListContent: React.FC = () => {
   // Permit a course page to open the existing check-in editor with its
   // course preselected. Never accept a course not in the authorized roster.
   useEffect(() => {
-    const requested = searchParams.get('courseId')
+    const requested = requestedCourseId
     if (searchParams.get('create') !== 'true' || !requested) return
     if (!courses.some(course => course.id === requested)) return
     setEditingCheckin(null)
@@ -157,7 +171,7 @@ const CheckinListContent: React.FC = () => {
     const next = new URLSearchParams(searchParams)
     next.delete('create')
     setSearchParams(next, { replace: true })
-  }, [courses, searchParams, setSearchParams])
+  }, [courses, requestedCourseId, searchParams, setSearchParams])
 
   useEffect(() => {
     if (loading || !focusId) return
@@ -197,7 +211,7 @@ const CheckinListContent: React.FC = () => {
         }
         setCheckins([record])
       } else {
-        const path = '/checkins?view=summary&' + catalog.params + (requestedCourseId ? `&courseId=${encodeURIComponent(requestedCourseId)}` : '')
+        const path = embeddedCourse ? '/checkins?view=summary&courseId='+encodeURIComponent(embeddedCourse.id)+'&'+catalog.params : '/checkins?view=summary&' + catalog.params + (requestedCourseId ? `&courseId=${encodeURIComponent(requestedCourseId)}` : '')
         const response = await apiClient.get<{ list: Checkin[]; total: number }>(path)
         if (request !== loadSequence.current) return
         if (response.code !== 0) throw new Error(response.message || '获取打卡列表失败')
@@ -214,6 +228,7 @@ const CheckinListContent: React.FC = () => {
   }
 
   const fetchCourses = async () => {
+    if (embeddedCourse) return
     try {
       const response = await apiClient.get<{ list: Course[] }>('/courses')
       if (response.code === 0) {
@@ -258,10 +273,14 @@ const CheckinListContent: React.FC = () => {
         resetForm()
         if (recurring) success('周期打卡已设置，可在课程打卡页查看和停止后续发布')
         setFilterRevision(value=>value+1)
-        if (focusId || requestedCourseId !== data.courseId || ['search','tags','from','to','page'].some(key=>searchParams.has(key))) {
+        const prefix = embeddedCourse ? 'checkins_' : ''
+        if (focusId || requestedCourseId !== data.courseId || ['search','tags','from','to','page'].some(key=>searchParams.has(prefix+key))) {
           const next=new URLSearchParams(searchParams)
-          for(const key of ['id','create','search','tags','from','to','page'])next.delete(key)
-          next.set('courseId',data.courseId);setSearchParams(next,{replace:true})
+          next.delete(embeddedCourse ? 'checkinId' : 'id')
+          next.delete('create')
+          for (const key of ['search','tags','from','to','page']) next.delete(prefix+key)
+          if (!embeddedCourse) next.set('courseId',data.courseId)
+          setSearchParams(next,{replace:true})
         } else void fetchCheckins()
       }
     } catch (error: any) {
@@ -495,15 +514,27 @@ const CheckinListContent: React.FC = () => {
 
   const editorGuard = useEditorGuard({ open: showModal, value: formData, onClose: closeEditor })
 
+  const PageContainer = embeddedCourse ? 'section' : ProductPage
   return (
-    <ProductPage width="management" className="space-y-6">
-      <PageHeader title="打卡管理" description="集中查看课程打卡、参与情况和截止时间。" actions={<><ProductButton variant="primary" onClick={openCreateModal}><Plus className="w-4 h-4" aria-hidden="true" />创建打卡</ProductButton>{canReuse && <ProductButton onClick={() => setShowReuse(true)}>复用打卡</ProductButton>}</>} />
+    <PageContainer {...(embeddedCourse ? { 'aria-label':'课程打卡管理' } : { width: 'management' as const })} className={embeddedCourse ? 'training-assignment-workspace' : 'space-y-6'}>
+      {!embeddedCourse && <PageHeader title="打卡管理" description="集中查看课程打卡、参与情况和截止时间。" actions={<><ProductButton variant="primary" onClick={openCreateModal}><Plus className="w-4 h-4" aria-hidden="true" />创建打卡</ProductButton>{canReuse && <ProductButton onClick={() => setShowReuse(true)}>复用打卡</ProductButton>}</>} />}
+      {embeddedCourse && <div className="training-assignment-toolbar"><div><ProductButton variant="primary" onClick={openCreateModal}><Plus size={17} aria-hidden="true"/>发布打卡</ProductButton>{canReuse && <ProductButton onClick={() => setShowReuse(true)}>复用打卡</ProductButton>}</div><p>在当前课程内编辑、查看提交和导出数据。</p></div>}
+      {embeddedCourse && <TrainingCheckinSchedules key={filterRevision} courseId={embeddedCourse.id}/>}
+      {embeddedCourse && focusId && <div className="training-assignment-focused"><span>已定位到这项打卡</span><ProductButton onClick={() => { const next=new URLSearchParams(searchParams);next.delete('checkinId');setSearchParams(next,{replace:true}) }}>显示全部打卡</ProductButton></div>}
       {feedback}
       {openingDetail && <p role="status">正在读取打卡完整内容…</p>}
-      {!focusId && <CatalogFilters key={filterRevision+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline label="打卡"/>}
+      {!embeddedCourse && !focusId && <CatalogFilters key={filterRevision+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline label="打卡"/>}
       {loading ? <ProductStatus kind="pending" title="正在加载打卡">正在读取打卡和参与概况。</ProductStatus>
       : loadError ? <ProductStatus kind="error" title="打卡列表加载失败" actions={<ProductButton onClick={() => void fetchCheckins()}>重试</ProductButton>}>{loadError}</ProductStatus>
       : filteredCheckins.length === 0 ? <ProductStatus kind="info" title="暂无匹配打卡">可以调整筛选条件，或创建第一项打卡。</ProductStatus>
+      : embeddedCourse ? <div className="training-item-list training-course-task-grid">{filteredCheckins.map(checkin => <article id={`checkin-record-${checkin.id}`} tabIndex={-1} key={checkin.id} className="training-task-item training-course-task-card" aria-labelledby={'checkin-title-'+checkin.id}>
+        <div className="training-course-task-card-top"><span>{checkin.scheduleId ? '周期打卡' : '打卡'}</span>{checkin.status && <span className="training-course-task-status">{checkin.status==='PUBLISHED'?'已发布':'草稿'}</span>}</div>
+        <h2 id={'checkin-title-'+checkin.id}><button className="training-assignment-title" onClick={()=>void openEditModal(checkin)}>{checkin.title}</button></h2>
+        {checkin.description && <TrainingCardDescription id={'checkin-description-'+checkin.id} description={checkin.description}/>}
+        {checkin.tags?.length ? <div className="staff-inline-tags">{checkin.tags.slice(0,3).map((tag,index)=><TagBadge key={index} tag={tag}/>)}</div> : null}
+        <dl className="training-assignment-facts"><div><dt>截止时间</dt><dd>{checkin.endTime ? new Date(checkin.endTime).toLocaleString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '无截止时间'}</dd></div><div><dt>参与人数</dt><dd>{checkin._count?.submissions || 0} 人</dd></div>{checkin.scheduleId && checkin.scheduledFor && <div><dt>本期发布时间</dt><dd>{new Date(checkin.scheduledFor).toLocaleString('zh-CN')}</dd></div>}</dl>
+        <footer className="training-assignment-card-actions"><ProductButton variant="primary" onClick={()=>openSubmissionsModal(checkin)}>查看提交</ProductButton><ProductButton onClick={()=>void openEditModal(checkin)}>编辑打卡</ProductButton><ProductButton onClick={()=>void handleExport(checkin)}>导出提交</ProductButton><MoreActions label={`${checkin.title} 的更多操作`}><CheckinTokenManager checkinId={checkin.id} checkinTitle={checkin.title} allowAnonymous={checkin.allowAnonymous||false} onAllowAnonymousChange={value=>setCheckins(current=>current.map(item=>item.id===checkin.id?{...item,allowAnonymous:value}:item))}/><button type="button" onClick={()=>void handleClone(checkin)}>复制打卡</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(checkin)}>删除打卡</button></MoreActions></footer>
+      </article>)}</div>
       : <div className={`staff-table-container ${isTrainingHost() ? "staff-record-table" : ""}`}><table className="staff-table"><thead><tr><th>打卡</th><th>课程</th><th>截止时间</th><th>参与</th><th>公开参与</th><th className="text-right">操作</th></tr></thead><tbody>
         {filteredCheckins.map(checkin=><tr id={`checkin-record-${checkin.id}`} tabIndex={-1} key={checkin.id} className={focusId===checkin.id?'staff-target-row':''}>
           <td><button type="button" className="staff-record-button" onClick={()=>openEditModal(checkin)}>{checkin.title}</button>{checkin.tags?.length?<div className="staff-inline-tags">{checkin.tags.slice(0,2).map((tag,index)=><TagBadge key={index} tag={tag}/>)}</div>:null}</td>
@@ -884,7 +915,7 @@ const CheckinListContent: React.FC = () => {
         </ModalSurface>
       )}
       {editorGuard.confirmation}
-    </ProductPage>
+    </PageContainer>
   )
 }
 

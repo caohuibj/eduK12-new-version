@@ -1,3 +1,4 @@
+import { appendFormContent, readFormSource } from './form-template-content'
 import { parseCatalogFilters, sqlLike } from '../training-catalog/filters'
 import {attachTrainingReferenceSelection,listTrainingReferenceChoices,trainingReferenceSelectionSchema} from '../composite/training-reference-selection'
 import { assertCurrentTrainingContentOwner, attachTrainingReportSelection, trainingReportSelectionSchema } from '../composite/training-report-selection'
@@ -17,6 +18,7 @@ import { assertCognitiveCatalogConfiguration } from '../cognitive/assignment.ser
 import { Prisma, UserRole } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
+import { config } from '../../config'
 import { loadCurrentPrincipal } from '../organization/principal'
 import { inactiveAccountMessage } from '../../utils/accountStatus'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -173,7 +175,7 @@ async function validateTrainingVariants(tx: Tx, row: any) {
 }
 export async function detail(actor: Actor, id: string) {
   const row = await prisma.compositeAssessment.findUnique({ where: { id } })
-  if (!row || row.productKind !== 'QUESTIONNAIRE') throw compositeNotFound('新版问卷不存在')
+  if (!row || !['QUESTIONNAIRE', 'FORM_TEMPLATE'].includes(row.productKind)) throw compositeNotFound('新版问卷不存在')
   owner(actor, row)
   let reportSelection:unknown=undefined,referenceSelection:unknown=undefined
   if(row.createdBy===actor.userId){
@@ -186,6 +188,54 @@ export async function detail(actor: Actor, id: string) {
     });reportSelection=selections.report;referenceSelection=selections.reference}
   }
   return { ...await getCompositeForTeacher(actor.userId, actor.role, id), trainingReportSelectionDraft:reportSelection, trainingReferenceSelectionDraft:referenceSelection, supportedChannels: ['WEB'], reportMode: 'COLLECTION_ONLY' }
+}
+const formSourceSchema = z.object({ id: z.string().min(1), kind: z.enum(['COMPOSITE', 'LEGACY']), revision: z.number().int().nonnegative().optional() }).strict()
+export async function createFormTemplate(actor: Actor, raw: unknown) {
+  author(actor)
+  if (process.env.QUESTIONNAIRE_PRODUCTS_ENABLED === 'false') throw compositeConflict('暂未开放表单编制')
+  const input = z.object({ name: metadata.name, description: metadata.description, instruction: metadata.instruction, requestId: z.string().uuid(), source: formSourceSchema.optional() }).strict().parse(raw)
+  const creationKey = actor.userId + ':' + input.requestId, creationHash = canonicalHash({ formTemplate: input })
+  const id = await prisma.$transaction(async tx => {
+    await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${creationKey},0))`
+    const previous = await tx.compositeAssessment.findUnique({ where: { creationKey } })
+    if (previous) {
+      if (previous.creationHash !== creationHash) throw compositeConflict('创建请求已用于其他内容')
+      return previous.id
+    }
+    const source = input.source ? await readFormSource(tx, actor, input.source) : null
+    const row = await tx.compositeAssessment.create({ data: {
+      code: 'F-' + randomUUID(), productKind: 'FORM_TEMPLATE', questionnaireType: 'GENERAL', createdBy: actor.userId,
+      name: input.name, description: input.description ?? source?.description, instruction: input.instruction ?? source?.instruction, creationKey, creationHash,
+    } })
+    if (source?.items.length) {
+      await appendFormContent(tx, { ...row, items: [], formSections: [] }, source, false)
+      await ensureCompositeFormSections(row.id, tx)
+    }
+    return row.id
+  }, { timeout: 30000 })
+  return detail(actor, id)
+}
+export async function importFormTemplate(actor: Actor, id: string, raw: unknown) {
+  const input = z.object({ revision: z.number().int().nonnegative(), source: formSourceSchema }).strict().parse(raw)
+  if (input.source.kind === 'COMPOSITE' && input.source.id === id) throw compositeBadRequest('不能把表单加入自身')
+  return mutate(actor, id, input.revision, async (tx, row) => {
+    const source = await readFormSource(tx, actor, input.source)
+    await appendFormContent(tx, row, source)
+    await ensureCompositeFormSections(id, tx)
+  })
+}
+export async function formTemplateSources(actor: Actor) {
+  author(actor)
+  const owned = await prisma.compositeAssessment.findMany({ where: {
+    createdBy: actor.userId, productKind: { in: ['FORM_TEMPLATE', 'QUESTIONNAIRE'] }, status: { not: 'ARCHIVED' },
+    items: { some: { type: 'FORM' }, none: { type: { not: 'FORM' } } },
+    reportPackageKey: null, analysisProtocolKey: null,
+  }, select: { id: true, name: true, description: true, revision: true, updatedAt: true }, orderBy: [{ updatedAt: 'desc' }, { id: 'asc' }] })
+  const legacy = await prisma.questionnaire.findMany({ where: {
+    type: 'GENERAL', questionnaireScales: { none: {} }, formItems: { some: {} }, creator: { accountDomain: { in: ['LEGACY', 'TRAINING'] } },
+    OR: [{ creatorId: actor.userId }, ...(config.materialGrantsEnabled ? [{ status: 'PUBLISHED' as const, id: { in: (await prisma.materialGrant.findMany({ where: { teacherId: actor.userId, resourceType: 'FORM_TEMPLATE' }, select: { resourceId: true } })).map(grant => grant.resourceId) } }] : [])],
+  }, select: { id: true, name: true, description: true } })
+  return { list: [...owned.map(row => ({ ...row, kind: 'COMPOSITE' })), ...legacy.map(row => ({ ...row, kind: 'LEGACY' }))] }
 }
 export async function create(actor: Actor, raw: unknown) {
   author(actor)
@@ -215,7 +265,7 @@ export async function create(actor: Actor, raw: unknown) {
   try { id = await run() } catch (e: any) { if (e.code !== 'P2002') throw e; id = await run() }
   return detail(actor, id)
 }
-async function mutate(actor: Actor, id: string, revision: number, fn: (tx: Tx, row: any) => Promise<void>, draft = true, noOp?: (row: any) => boolean) {
+async function mutate(actor: Actor, id: string, revision: number, fn: (tx: Tx, row: any) => Promise<void>, draft = true, noOp?: (row: any) => boolean, allowFormTemplate = false) {
   author(actor)
   await prisma.$transaction(async tx => {
     await tx.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR UPDATE', id)
@@ -223,7 +273,7 @@ async function mutate(actor: Actor, id: string, revision: number, fn: (tx: Tx, r
       questionnaireCourses: true, items: { orderBy: { position: 'asc' }, include: { cognitiveAssignment: { include: { config: true } }, scale: true } },
       formSections: { orderBy: { position: 'asc' }, include: { items: true } },
     } })
-    if (!row || row.productKind !== 'QUESTIONNAIRE') throw compositeNotFound('新版问卷不存在')
+    if (!row || (row.productKind !== 'QUESTIONNAIRE' && !(allowFormTemplate && row.productKind === 'FORM_TEMPLATE'))) throw compositeNotFound('新版问卷不存在')
     owner(actor, row)
     if (row.reportPackageKey || row.analysisProtocolKey) throw compositeConflict('问卷必须只收集单项结果')
     if (noOp?.(row)) return
@@ -246,6 +296,7 @@ async function mutate(actor: Actor, id: string, revision: number, fn: (tx: Tx, r
 export async function update(actor: Actor, id: string, raw: unknown) {
   const input = editSchema.parse(raw); windowCheck(input)
   return mutate(actor, id, input.revision, async (tx, row) => {
+    if (row.productKind === 'FORM_TEMPLATE' && (input.courseIds.length || input.publicEnabled || input.opensAt || input.expiresAt || input.trainingFeedbackPolicy || input.trainingPersistencePolicy || input.trainingTimingEnabled)) throw compositeBadRequest('独立表单只保存内容，不设置投放或报告策略')
     await courses(tx, actor, input.courseIds, row.questionnaireType)
     await tx.questionnaireCourseDelivery.deleteMany({ where: { compositeId: id } })
     await tx.questionnaireCourseDelivery.createMany({ data: input.courseIds.map(courseId => ({ compositeId: id, courseId })) })
@@ -256,12 +307,13 @@ export async function update(actor: Actor, id: string, raw: unknown) {
       name: input.name, description: input.description ?? null, instruction: input.instruction ?? null,
       publicEnabled: input.publicEnabled, opensAt: date(input.opensAt), expiresAt: date(input.expiresAt),
     } })
-  })
+  }, true, undefined, true)
 }
 export async function addItem(actor: Actor, id: string, raw: unknown) {
   const { revision, item, formSectionId } = itemSchema.parse(raw)
   return mutate(actor, id, revision, async (tx, row) => {
-    await assertValidItem(item, actor.userId, actor.role, row, tx)
+    if (row.productKind === 'FORM_TEMPLATE' && item.type !== 'FORM') throw compositeBadRequest('独立表单只能加入表单题目')
+    await assertValidItem(item, actor.userId, actor.role, row.productKind === 'FORM_TEMPLATE' ? { ...row, productKind: 'QUESTIONNAIRE' } : row, tx)
     if (row.items.length >= 500) throw compositeBadRequest('问卷最多包含 500 个内容项')
     const position = Math.max(-1, ...row.items.map((v: any) => v.position), ...row.formSections.map((v: any) => v.position)) + 1
     const itemId = randomUUID()
@@ -287,7 +339,24 @@ export async function addItem(actor: Actor, id: string, raw: unknown) {
       contextKey: item.type === 'FORM' ? item.contextKey : null,
     } })
     await ensureCompositeFormSections(id, tx)
-  })
+  }, true, undefined, true)
+}
+export async function updateFormItem(actor: Actor, id: string, itemId: string, raw: unknown) {
+  const { revision, item } = itemSchema.parse(raw)
+  return mutate(actor, id, revision, async (tx, row) => {
+    if (row.productKind !== 'FORM_TEMPLATE') throw compositeBadRequest('此编辑入口只修改独立表单题目')
+    const previous = row.items.find((value: any) => value.id === itemId)
+    if (!previous || previous.type !== 'FORM' || item.type !== 'FORM') throw compositeNotFound('表单题目不存在')
+    if ((item.contextKey ?? null) !== previous.contextKey) throw compositeBadRequest('编辑已有题目时不能改变人口学字段绑定')
+    await assertValidItem(item, actor.userId, actor.role, { ...row, productKind: 'QUESTIONNAIRE' }, tx)
+    await tx.compositeAssessmentItem.update({ where: { id: itemId }, data: {
+      required: item.required, formType: item.formType, formLabel: item.formLabel,
+      formPlaceholder: item.formPlaceholder ?? previous.formPlaceholder,
+      formOptions: item.formOptions ?? Prisma.JsonNull,
+      formDefinition: item.formDefinition ? { ...item.formDefinition, itemKey: (previous.formDefinition as any)?.itemKey ?? 'q_' + itemId } as Prisma.InputJsonValue : Prisma.DbNull,
+      formPolicy: item.formPolicy ?? Prisma.DbNull,
+    } })
+  }, true, undefined, true)
 }
 export async function removeItem(actor: Actor, id: string, itemId: string, raw: unknown) {
   return mutate(actor, id, revisionSchema.parse(raw).revision, async (tx, row) => {
@@ -295,7 +364,7 @@ export async function removeItem(actor: Actor, id: string, itemId: string, raw: 
     if (!item) throw compositeNotFound('问卷内容项不存在')
     await tx.compositeAssessmentItem.delete({ where: { id: itemId } })
     if (item.formSectionId && !await tx.compositeAssessmentItem.count({ where: { formSectionId: item.formSectionId } })) await tx.compositeFormSection.delete({ where: { id: item.formSectionId } })
-  })
+  }, true, undefined, true)
 }
 export async function reorder(actor: Actor, id: string, raw: unknown) {
   const { revision, units } = orderSchema.parse(raw)
@@ -313,7 +382,7 @@ export async function reorder(actor: Actor, id: string, raw: unknown) {
       if (unit.type === 'FORM_SECTION') await tx.compositeFormSection.update({ where: { id: unit.id }, data: { position: base + i } })
       else await tx.compositeAssessmentItem.update({ where: { id: unit.id }, data: { position: base + i } })
     }
-  })
+  }, true, undefined, true)
 }
 
 export async function removeEmptySection(actor: Actor, id: string, sectionId: string, raw: unknown) {
@@ -322,7 +391,7 @@ export async function removeEmptySection(actor: Actor, id: string, sectionId: st
     if (!section) throw compositeNotFound('表单区段不存在')
     if (section.items.length) throw compositeConflict('区段中还有字段，请先移除字段')
     await tx.compositeFormSection.delete({ where: { id: sectionId } })
-  })
+  }, true, undefined, true)
 }
 const copiedCognitiveBinding = (item: any, row: any) => item.type === 'COGNITIVE' && item.cognitiveAssignment?.listedStandalone === false
   && item.cognitiveAssignment?.createdBy === row.createdBy && item.cognitiveAssignment?.courseId === null

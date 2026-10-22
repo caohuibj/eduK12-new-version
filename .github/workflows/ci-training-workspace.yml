@@ -20,8 +20,13 @@ jobs:
     uses: ./.github/workflows/ci-training-workspace-integrated.yml
     with:
       plan: ${{ inputs.plan }}
+  followup:
+    if: fromJSON(inputs.plan).candidate == 'mac-followup'
+    uses: ./.github/workflows/ci-training-followup.yml
+    with:
+      plan: ${{ inputs.plan }}
   component:
-    if: fromJSON(inputs.plan).candidate != 'mac-integrated'
+    if: fromJSON(inputs.plan).candidate != 'mac-followup' && fromJSON(inputs.plan).candidate != 'mac-integrated'
     name: ${{ matrix.component }} affected contracts
     runs-on: ubuntu-24.04
     timeout-minutes: 15
