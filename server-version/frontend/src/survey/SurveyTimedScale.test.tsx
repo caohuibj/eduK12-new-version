@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import {useRef,useState} from 'react'
 import {fireEvent,render,screen} from '@testing-library/react'
-import {describe,expect,it,vi} from 'vitest'
+import {afterEach,describe,expect,it,vi} from 'vitest'
 import {SurveyTimedScale} from './SurveyTimedScale'
 import {SurveyScaleTimingTracker} from './survey-scale-timing'
 const unit={instrumentKey:'scale',title:'学习状态',
@@ -20,6 +20,7 @@ function Harness(){
     <output data-testid="answers">{JSON.stringify(answers)}</output>
   </>
 }
+afterEach(()=>vi.restoreAllMocks())
 describe('Survey Scale participant one-by-one delivery',()=>{
   it('gates current image answers and forward navigation without deleting restored answers',()=>{
     const props={unit,answer:{first:'o2'},tracker:new SurveyScaleTimingTracker(),index:0,
@@ -55,12 +56,100 @@ describe('Survey Scale participant one-by-one delivery',()=>{
     expect(answer).toHaveBeenCalledWith('constructor','o2')
     expect(Object.prototype.hasOwnProperty.call(tracker.snapshot(),'constructor')).toBe(true)
   })
+  it('automatically advances after a new selection, but keeps the last item and backtracking answers',()=>{
+    render(<Harness/>)
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    expect(document.getElementById('survey-answer-scale-second')).toHaveFocus()
+    fireEvent.click(screen.getByRole('radio',{name:'不同意'}))
+    expect(screen.getByText('第二题 *')).toBeInTheDocument()
+    expect(screen.getByRole('button',{name:'下一题'})).toBeDisabled()
+    fireEvent.click(screen.getByRole('button',{name:'上一题'}))
+    expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    expect(screen.getByText('第一题 *')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('radio',{name:'不同意'}))
+    expect(screen.getByRole('radio',{name:'不同意'})).toBeChecked()
+    expect(screen.getByTestId('answers').textContent).toContain('"first":"o1"')
+  })
+  it('does not auto-advance arrow-key selection or leak its source into a later pointer choice',()=>{
+    render(<Harness/>)
+    const first=screen.getByRole('radio',{name:'不同意'}),second=screen.getByRole('radio',{name:'同意'})
+    first.focus()
+    fireEvent.keyDown(first,{key:'ArrowRight'})
+    // Model native radio navigation: focus changes before the selection event.
+    second.focus();fireEvent.click(second)
+    expect(screen.getByText('第一题 *')).toBeInTheDocument()
+    expect(second).toBeChecked()
+    fireEvent.pointerDown(first);fireEvent.click(first)
+    expect(document.getElementById('survey-answer-scale-second')).toHaveFocus()
+  })
+  it('moves focus off the radio after Space selection and cancels a repeated Space',()=>{
+    render(<Harness/>)
+    const option=screen.getByRole('radio',{name:'同意'})
+    option.focus();fireEvent.keyDown(option,{key:' '});fireEvent.click(option)
+    const next=document.getElementById('survey-answer-scale-second')!
+    expect(next).toHaveFocus()
+    expect(fireEvent.keyDown(next,{key:' ',repeat:true})).toBe(false)
+    expect(screen.getByTestId('answers').textContent).not.toContain('"second"')
+  })
+  it.each(['paused','readOnly','imagesReady'])('does not answer or advance when %s blocks interaction',flag=>{
+    const onAnswer=vi.fn(),onIndexChange=vi.fn()
+    render(<SurveyTimedScale unit={unit} answer={{}} tracker={new SurveyScaleTimingTracker()}
+      index={0} onIndexChange={onIndexChange} onAnswer={onAnswer} onTiming={()=>{}}
+      paused={flag==='paused'} readOnly={flag==='readOnly'} imagesReady={flag!=='imagesReady'}/>)
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    expect(onAnswer).not.toHaveBeenCalled();expect(onIndexChange).not.toHaveBeenCalled()
+  })
+  it('keeps video answers on the current item without auto-advancing when video later completes',()=>{
+    const change=vi.fn(),advance=vi.fn()
+    const props={unit,answer:{},tracker:new SurveyScaleTimingTracker(),index:0,
+      onAnswer:change,onIndexChange:advance,onTiming:()=>{}}
+    const {rerender}=render(<SurveyTimedScale {...props} autoAdvanceReady={false}/>)
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    expect(change).toHaveBeenCalledWith('first','o2');expect(advance).not.toHaveBeenCalled()
+    rerender(<SurveyTimedScale {...props} answer={{first:'o2'}} autoAdvanceReady/>)
+    expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
+    expect(advance).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button',{name:'下一题'}))
+    expect(advance).toHaveBeenCalledWith(1)
+  })
+  it('keeps native repeated arrow behavior on media volume controls',()=>{
+    render(<SurveyTimedScale unit={unit} answer={{}} tracker={new SurveyScaleTimingTracker()}
+      index={0} onAnswer={()=>{}} onIndexChange={()=>{}} onTiming={()=>{}}
+      renderMedia={()=><input type="range" aria-label="视频音量"/>}/>)
+    expect(fireEvent.keyDown(screen.getByRole('slider',{name:'视频音量'}),{key:'ArrowRight',repeat:true})).toBe(true)
+  })
+  it('points a final video item to the outer continue or submit action, not a disabled next question',()=>{
+    render(<SurveyTimedScale unit={unit} answer={{}} tracker={new SurveyScaleTimingTracker()}
+      index={1} onAnswer={()=>{}} onIndexChange={()=>{}} onTiming={()=>{}} autoAdvanceReady={false}/>)
+    expect(screen.getByText(/请看完视频后检查答案，再使用本工具后方/)).toBeInTheDocument()
+    expect(screen.queryByText(/请看完视频后按“下一题”继续/)).toBeNull()
+    expect(screen.getByRole('button',{name:'下一题'})).toBeDisabled()
+  })
+  it('records the selected item before advancing and keeps duration with its source item',()=>{
+    let now=100
+    vi.spyOn(performance,'now').mockImplementation(()=>now)
+    vi.spyOn(document,'hasFocus').mockReturnValue(true)
+    const tracker=new SurveyScaleTimingTracker(),events:string[]=[]
+    function TimingHost(){
+      const [answers,setAnswers]=useState<Record<string,string>>({}),[index,setIndex]=useState(0)
+      return <SurveyTimedScale unit={unit} answer={answers} tracker={tracker} index={index}
+        onAnswer={(key,value)=>{events.push('answer:'+key);setAnswers(old=>({...old,[key]:value}))}}
+        onTiming={()=>events.push('timing')}
+        onIndexChange={next=>{events.push('next');setIndex(next)}}/>
+    }
+    render(<TimingHost/>);events.length=0;now=1100
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    expect(events.slice(0,3)).toEqual(['answer:first','timing','next'])
+    now=2100;fireEvent.click(screen.getByRole('radio',{name:'不同意'}))
+    expect(tracker.snapshot().first).toMatchObject({firstResponseMs:1000,activeTimeMs:1000})
+    expect(tracker.snapshot().second).toMatchObject({firstResponseMs:1000,activeTimeMs:1000})
+  })
   it('shows only one question at a time, allows backtracking and preserves choices',()=>{
     render(<Harness/>)
     expect(screen.getByText(/第一题/)).toBeInTheDocument()
     expect(screen.queryByText(/第二题/)).toBeNull()
     fireEvent.click(screen.getByRole('radio',{name:'同意'}))
-    fireEvent.click(screen.getByRole('button',{name:'下一题'}))
     expect(screen.getByText(/第二题/)).toBeInTheDocument()
     expect(screen.queryByText(/第一题/)).toBeNull()
     fireEvent.click(screen.getByRole('button',{name:'上一题'}))

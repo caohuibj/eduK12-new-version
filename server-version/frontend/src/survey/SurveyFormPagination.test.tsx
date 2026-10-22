@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { fireEvent,render,screen } from '@testing-library/react'
+import { fireEvent,render,screen,waitFor } from '@testing-library/react'
 import { describe,expect,it } from 'vitest'
 import { TaskForm } from './SurveyPublicApp'
 import type { ProfessionalAnswer } from './ProfessionalFormAnswer'
@@ -54,7 +54,7 @@ describe('Survey real participant Form paging',()=>{
     expect(screen.getByRole('checkbox',{name:/我选择不回答这一题/})).toBeChecked()
   })
 
-  it('renders exactly one visible page and retains answers across navigation',()=>{
+  it('renders exactly one visible page and retains answers and focus across navigation',async()=>{
     render(<Host/>)
     expect(screen.getByText('第一页')).toBeInTheDocument()
     expect(screen.queryByText('第二页')).not.toBeInTheDocument()
@@ -66,11 +66,12 @@ describe('Survey real participant Form paging',()=>{
     fireEvent.click(screen.getByRole('radio',{name:'同意'}))
     expect(screen.getByRole('button',{name:'下一页'})).toBeEnabled()
     fireEvent.click(screen.getByRole('button',{name:'下一页'}))
-    expect(screen.getByText('第二页')).toBeInTheDocument()
+    await waitFor(()=>expect(screen.getByText('第二页')).toHaveFocus())
     expect(screen.queryByText('第一页')).not.toBeInTheDocument()
     expect(screen.getByTestId('page-number')).toHaveTextContent('1')
     fireEvent.change(screen.getByLabelText('补充说明'),{target:{value:'坚持完成'}})
     fireEvent.click(screen.getByRole('button',{name:'上一页'}))
+    await waitFor(()=>expect(screen.getByText('第一页')).toHaveFocus())
     expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
     expect(screen.getByTestId('page-answers')).toHaveTextContent('坚持完成')
   })
@@ -79,6 +80,7 @@ describe('Survey real participant Form paging',()=>{
     expect(screen.getByRole('button',{name:'下一页'})).toBeEnabled()
     fireEvent.click(screen.getByRole('button',{name:'下一页'}))
     expect(screen.getByRole('alert')).toHaveTextContent('先回答这一题')
+    expect(document.getElementById('survey-answer-form-source')).toHaveFocus()
     expect(screen.getByTestId('page-number')).toHaveTextContent('0')
     fireEvent.click(screen.getByRole('radio',{name:'同意'}))
     fireEvent.click(screen.getByRole('button',{name:'下一页'}))

@@ -661,3 +661,48 @@ retains safe class/code/phase and basename/line frames, never raw messages,
 Prisma metadata, bootstrap output, credentials or private stderr. The fixture's
 business statements are compared unchanged after removing phase markers and its
 error-handler-only diagnostic tail. Image labels are never rewritten.
+
+### Survey experience exact candidate, 2026-10-22
+
+Only `work/survey-experience-20261022` against base `c0519207` may use the
+`survey-experience` route. Its full frontend tree, 24 changed source blobs and
+external fixture/tool-lock inputs are pinned. Unknown paths, modes, branch,
+base or source-tree drift fail closed, never fall back to platform CI.
+
+For this candidate only, the user explicitly approved acceptance of the
+reviewed **unsigned local** reports. `survey-experience-local.json` retains
+compressed original reports and hashes, including the initial environment
+failure and the failed first aggregate; neither is rewritten as a success.
+The accepted evidence is 162 second-batch assertions and 19 applicable earlier
+assertions, local application types and changed-file lint. Catalog's last
+case renders Builder's unchanged read-only catalog snapshot branch; App tests
+mock changed children, and FormPagination consumes unchanged FORM rendering.
+The reports are not CI executions or cryptographically authenticated results.
+Existing cached package versions matched the lock, but cached package bytes
+were not reverified against tarball integrity; the three downloaded packages
+were verified. The temporary Vitest configuration only preserved symlink
+identity. Hook dependency warnings remain disclosed. No local browser, build,
+audit or scan result is claimed.
+
+The required `survey-experience` job independently verifies the exact inputs
+and report bytes, compiles Vite once, assembles the runtime from that cached
+build, archives both real images separately, performs fresh dependency audit
+and runtime vulnerability scan, and runs real Chromium desktop/mobile,
+keyboard and axe checks over the extracted production dist. All API responses
+are synthetic fixtures: this proves UI behavior, not server authorization,
+real publication, database correctness, or media processing. No TLS exception,
+backend, PostgreSQL, restore or platform suite is involved. Original merge
+gate, scope and CodeQL requirements remain mandatory. This is not a general
+unsigned-local-result trust mechanism and changes no older candidate route.
+
+The first official run `39704148772` retained a successful production build,
+audit and runtime scan but failed during the synthetic browser journey. Its
+overall and frontend-job failures remain failures. A continuation pins that
+run/head/attempt, official ZIP digests, inner archive digest, original image
+IDs/tags/labels and successful step identities; it restores those exact bytes
+and reruns only the browser. The full frontend/backend fixture/tool inputs
+must remain byte-identical. No earlier CodeQL execution is claimed: the first
+run omitted the new route from the existing job condition, now corrected, and
+actual relevant SAST success remains mandatory before merge.
+
+Survey PR continuation: run 39705178007 remains failed at the media-only text assertion. Its exact five successful UI scenes, six screenshots/axe layouts and four keyboard observations are separately accepted from the official immutable artifact; the next run executes only `participant-media`. The acceptance document identifies both runs and explicitly sets `sameRunFullJourneyClaim=false`. The original successful JavaScript/TypeScript analysis is pinned to its actual job; only the three changed JS control/browser files receive new SAST. Original build, audit and image scan are not repeated.

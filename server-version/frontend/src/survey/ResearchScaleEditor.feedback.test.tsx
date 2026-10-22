@@ -19,7 +19,7 @@ describe('Survey research scale quality and feedback',()=>{
   fireEvent.change(screen.getByLabelText('题目用途 1'),{target:{value:'SOCIAL_DESIRABILITY'}})
   expect(draft().items[0].attentionTarget).toBeUndefined()
   expect(draft().responseOptions).toEqual(initial.responseOptions)
-  fireEvent.click(screen.getByRole('button',{name:'复制'}))
+  fireEvent.click(screen.getByRole('button',{name:'复制第 1 题'}))
   expect(draft().items[1].itemKey).not.toBe('q')
   expect(draft().items[1].purpose).toBe('SOCIAL_DESIRABILITY')
  })

@@ -1,0 +1,181 @@
+{
+  "schema": 1,
+  "base": "c0519207ffda62685caf12cd5cd192af9f437db8",
+  "productHead": "a0582ab3cd27e872e981c12c534fef02c0d423b5",
+  "frontendTree": "89a2ee6c115c354b97c9e151fb88698706157ff9",
+  "source": {
+    "server-version/frontend/src/survey/ResearchAuthoringNavigation.test.tsx": {
+      "before": null,
+      "after": "23ad712d78985367555454e86c8e00051193b17d"
+    },
+    "server-version/frontend/src/survey/ResearchCatalog.test.tsx": {
+      "before": "aac2557ac7139d356b28bf6921e6c538020c84c1",
+      "after": "040ec863e39efc5f19681b01c5adca6531e7f5f2"
+    },
+    "server-version/frontend/src/survey/ResearchCatalog.tsx": {
+      "before": "751ce32b5e9d7e40ed8de49301c9f8af4b3b0d40",
+      "after": "afc26da807ba3e7042b72bc5ca51ec0e925f6d35"
+    },
+    "server-version/frontend/src/survey/ResearchScaleEditor.feedback.test.tsx": {
+      "before": "c0fd68075799a58a2cb67dfdf5132be82e1f5796",
+      "after": "934e83f514043a9ba522e9e01373beff76e4650f"
+    },
+    "server-version/frontend/src/survey/ResearchScaleEditor.tsx": {
+      "before": "09b87fe58fe7db04e3a760cf6c422a03ffce9120",
+      "after": "47d74b64f15f57a2170adfc9597b4d6b7a15ff41"
+    },
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx": {
+      "before": "3316d70d24b12fdb13246fc92f86797e7ee96bf9",
+      "after": "1dbd09df2749e1909520403a5e662eb4268ea810"
+    },
+    "server-version/frontend/src/survey/SurveyApp.leave-risk.test.tsx": {
+      "before": null,
+      "after": "4ac7eaed3623dc586294fcc83b2b6f1fdb53799b"
+    },
+    "server-version/frontend/src/survey/SurveyApp.tsx": {
+      "before": "52dea5de5cfc6e920ea7c650195f79c8bfb554d8",
+      "after": "cdd654c10491666f199b0ba024e5c4379939f9f0"
+    },
+    "server-version/frontend/src/survey/SurveyBuilder.leave-risk.test.tsx": {
+      "before": null,
+      "after": "cec79eae76aba9544c9019460be323656227c35e"
+    },
+    "server-version/frontend/src/survey/SurveyBuilder.tsx": {
+      "before": "666c507a60f85aaf63c9f6a12a9d24c8fbc7c312",
+      "after": "744cf9fc8209752b8a524b46ee72f96b0475e4f2"
+    },
+    "server-version/frontend/src/survey/SurveyFormPagination.test.tsx": {
+      "before": "47d3d5c61e4d6dda8cf8fb3b7ce39ead4339f018",
+      "after": "a74df0b60d3307f2e34a803fe03444a13d2aca00"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.cognitive.test.tsx": {
+      "before": "62f038d92291a41f5dd27d937ba21a9e4c177cab",
+      "after": "95ba964ffe2ddef1c0f6defcd7580ccf7de6d126"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx": {
+      "before": "36b4e5356280751d9add7800e34ce2dcba17e2af",
+      "after": "f65defcb94c7da59dcf6fdd80901c28ac75196eb"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "before": "459eb433e0aac6783774b6aa19413f868bad57a0",
+      "after": "b8f8abbb3bb956bcdee0ba402f3f69d9f76f0874"
+    },
+    "server-version/frontend/src/survey/SurveyReportStudio.tsx": {
+      "before": "d2c99a862db228f2a1201b8aa92639ade551dfe8",
+      "after": "057f1bda39e03a6f4c689c7ba0016fe8fbb9bce7"
+    },
+    "server-version/frontend/src/survey/SurveyTimedScale.test.tsx": {
+      "before": "be475748bc7d04a02d8247c199aaec03a64e6c45",
+      "after": "4e56188ef78068d54ac2e1dfd4fa0332c4b9ba18"
+    },
+    "server-version/frontend/src/survey/SurveyTimedScale.tsx": {
+      "before": "da93da175af2427544596104278b15426d14e303",
+      "after": "99a98c4fd6c0316c362db261b985d16cb857f9e8"
+    },
+    "server-version/frontend/src/survey/SurveyWaveStudio.links.test.tsx": {
+      "before": "23266986dd4f22b9807a5f4872309059ff1b4368",
+      "after": "e28032d6c3297d7f77ca49a63c587d9c57e10179"
+    },
+    "server-version/frontend/src/survey/SurveyWaveStudio.tsx": {
+      "before": "f8ec6dea0eca5d22b64bd3369f002fa01f830660",
+      "after": "e46d82a04e3d0efd56a947abfabdf163bd2e8abc"
+    },
+    "server-version/frontend/src/survey/SurveyWorkspace.loading.test.tsx": {
+      "before": null,
+      "after": "ad66f2b1e8ea5c9f8a873db185157aca0f7b9d91"
+    },
+    "server-version/frontend/src/survey/SurveyWorkspace.requests.test.tsx": {
+      "before": "ecc8cedfa39ffdf5cee069b66c99cb3becbdf95c",
+      "after": "e92a6071a5723c52c5a6bf240a0f6fe855f193ca"
+    },
+    "server-version/frontend/src/survey/SurveyWorkspaceNav.tsx": {
+      "before": "5adccc9bce2700c1bd0bf836e471a7a7f6410a45",
+      "after": "a9cc597b1deb17ed8957f54023eb63eec1d31f94"
+    },
+    "server-version/frontend/src/survey/survey-participant.css": {
+      "before": "30e5dc1328b1854967d48be316a2dfe169837565",
+      "after": "cf2e242a6fa93539a8bfc965773c080da85edc35"
+    },
+    "server-version/frontend/src/survey/survey-workspace.css": {
+      "before": "46d0e56e0be13cca97c1e2e8f8712d309acd4f58",
+      "after": "e76a6ac3f4c13c4ce8613c5de1887d9126263ef2"
+    }
+  },
+  "localEvidenceSHA256": "cca1b2323877cb50fbbc0dd34229f43e8f4d24bf95002ee42335b348b2868a5f",
+  "dependencyInputs": {
+    "server-version/cognitive-randomization-golden-v1.json": "5b3cb7c11138044ad6a85626e74004bea2a3e62a",
+    "server-version/backend/src/modules/cognitive/generated/identities.json": "dc7aa603721cdea46de7e0ed93f04ba9679a02e4",
+    ".github/release-tools/package-lock.json": "b7731f8e3b798e08d1693a9c7b108405d183f45e"
+  },
+  "prior": {
+    "run": 39704148772,
+    "attempt": 1,
+    "head": "97a50f958082acbcdfde118dee683305a1007b68",
+    "job": 119580192647,
+    "conclusion": "failure",
+    "checkout": "1849aef3ab540963d38aba19324d61755c5f2633",
+    "artifacts": {
+      "images": {
+        "id": 12394446626,
+        "name": "survey-experience-images-1849aef3ab540963d38aba19324d61755c5f2633",
+        "bytes": 395419062,
+        "sha256": "5548fc44d424927f2821268040af43fc49b8e8a39bb7b7cdb30ad278e740ebe1"
+      },
+      "reports": {
+        "id": 12393438961,
+        "name": "survey-experience-evidence-1849aef3ab540963d38aba19324d61755c5f2633",
+        "bytes": 750666,
+        "sha256": "ee4f6b548ed509a04af54357a724d0f1bb3c22a65a60d97174919b8fc3bcd3b6"
+      }
+    },
+    "reports": {
+      "build.json": "5e12e8cebcecec554b206dc9afbf091f25f25f5a56ce631889d053cc55e44c22",
+      "runtime-scan.json": "8ef8f0adf9de8c5b66f06d80ee5695ae439c4d1ba659cdd56f678f4963557c1e",
+      "runtime-files.json": "0758a5a78f11201eb9d8de65ab179dac0dc4ab5e402688d0a8139825828cf730",
+      "images.json": "b6828136df459712f8072df0981137d62d7b83172e706a28a8521a3e450fef02",
+      "local-admission.json": "c574fd270909b64af30e3c1f5371ac2a336c8c1d0352c0ea7d3f2f9d22c36d28",
+      "audit.json": "3836a1b5d9e8d3de51bd5e8765c7b4cf223783e32163480a3bb6946f54a7ab6f",
+      "images.sha256": "1d8c5f6cc5326f105afe6995fca3ce902f71d1b6c953d304903ceceff20dba9f"
+    },
+    "images": [
+      {
+        "id": "sha256:c0028f9fd76f9c3d19feb01fed0d914cc025a1133267a49bce36a6a7ad96a396",
+        "tags": [
+          "survey-experience-builder:1849aef3ab540963d38aba19324d61755c5f2633"
+        ]
+      },
+      {
+        "id": "sha256:c594c392433d2c83a50cda1d3475eb69424fe31ac06272cccbc0c52f13007ccd",
+        "tags": [
+          "survey-experience-runtime:1849aef3ab540963d38aba19324d61755c5f2633"
+        ]
+      }
+    ],
+    "tarSHA256": "76a56bbaf8ace8979f2dfb89dcedc9449d4b33e74de97f626a89cc9066c8cf5b"
+  },
+  "browserPrior": {
+    "run": 39705178007,
+    "head": "31071c4e501d96c4e90eece10a84171a8554b817",
+    "attempt": 1,
+    "checkout": "2ac6493e366633145a90914057e70ae4c2256780",
+    "job": 119583500308,
+    "sastJob": 119583500235,
+    "artifact": {
+      "id": 12393709554,
+      "name": "survey-experience-evidence-2ac6493e366633145a90914057e70ae4c2256780",
+      "bytes": 2762469,
+      "sha256": "7acb76a99d282ee4ba8e717409f4c15d72569ea283a7e9df51a31b48c86729a9"
+    },
+    "files": {
+      "browser/browser.json": "0283ca902cc30a8f6d6b87662a3c67ec8204851e3e5e3323ad8a2b215f12bf3d",
+      "browser/screenshots/participant-390.png": "dff8efb8087df7c3d806346dddcb8abb56a3de0282b8f4a6b3fed4861c9bcf0c",
+      "browser/screenshots/researcher-data-1440.png": "9400eeff6fc50d17a8ad44943cf01086b4d5a14dcfa4a90d761a7106d5669290",
+      "browser/screenshots/failure.png": "01cc05d8f9f7a196dfe1bba1c814bab196e163b8a34c04050ade1d94b1b56bc5",
+      "browser/screenshots/researcher-data-390.png": "b2f502d0b56d1c1648f26bcb9f3f64e2896dc7c79dc6469a1006d1370570c0b3",
+      "browser/screenshots/researcher-tools-1440.png": "95cf32c831556045a89921c67c643f255bd7d6917879ba18bd43a3bcdc33d7ed",
+      "browser/screenshots/researcher-tools-390.png": "43a9f214bfdaeb29310ec66517f82d0132a492b92944f52e9eeade5991f11739",
+      "browser/screenshots/participant-1440.png": "f07cb6b79bf31f6fa68c59c0b518cdd0805ab2cc4c1425b9df8a874aedd3ab78"
+    },
+    "currentBrowserSHA256": "cf64f9f5a290bf0529320e3275d71ab844f5643c0f85b746ea48a6f46695ac29"
+  }
+}

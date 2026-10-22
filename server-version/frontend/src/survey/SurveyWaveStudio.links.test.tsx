@@ -9,12 +9,13 @@ const wave={id:'w1',projectId:'p1',title:'链接测试',ordinal:1,status:'DRAFT'
   linkageNoticeConfirmed:false,opensAt:null,closesAt:'2027-01-01T00:00:00Z',finishUntil:null,quotaStarts:null,startsCount:0,
   allowNewParticipants:false,hardStopAt:null,groupIpPolicy:null,groupIpActivatedAt:null}
 const response=(data:unknown)=>({ok:true,json:async()=>({code:0,data})})
-function fixture(origin:string,bad=false){
+type WaveOverride=Partial<Omit<typeof wave,'hardStopAt'>>&{hardStopAt?:string|null}
+function fixture(origin:string,bad=false,overrides:WaveOverride={}){
   const original=window
   vi.stubGlobal('window',new Proxy(original,{get(target,key){return key==='location'?{origin}:Reflect.get(target,key)}}))
   const writeText=vi.fn().mockResolvedValue(undefined)
   Object.defineProperty(navigator,'clipboard',{value:{writeText},configurable:true})
-  let current={...wave},issued=0
+  let current={...wave,...overrides},issued=0
   const fetcher=vi.fn(async(input:RequestInfo|URL,_init?:RequestInit)=>{
     const url=String(input)
     if(url.endsWith('/auth/csrf'))return response({csrfToken:'synthetic-csrf'})
@@ -38,6 +39,18 @@ async function mount(){
 }
 afterEach(()=>vi.unstubAllGlobals())
 describe('recruitment capability display, clipboard and QR share one trusted URL',()=>{
+  it.each([
+    [{status:'DRAFT',publicationId:'pub1'},'已冻结，尚未开放'],
+    [{status:'OPEN'},'波次已开放'],
+    [{status:'PAUSED'},'已暂停新参与'],
+    [{status:'CLOSED'},'已结束招募'],
+    [{status:'CLOSED',hardStopAt:'2026-01-01T00:00:00Z'},'已紧急终止'],
+  ])('describes persisted wave state without issuing actions: %s',async(overrides,label)=>{
+    const api=fixture('http://survey.localhost:5173',false,overrides as WaveOverride);await mount()
+    expect(screen.getByRole('heading',{name:'当前阶段：'+label})).toBeInTheDocument()
+    expect(api.fetcher.mock.calls.filter(([,init])=>init?.method==='POST')).toHaveLength(0)
+  })
+
   it.each(['http://survey.localhost:5173','https://survey.eduk12.top'])(
     'uses the environment at %s for both open and rotate',async origin=>{
       const api=fixture(origin);await mount()
