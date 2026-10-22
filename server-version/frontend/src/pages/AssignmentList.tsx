@@ -1,3 +1,6 @@
+import TrainingCardDescription from '../training/TrainingCardDescription'
+import { trainingCourseContext } from '../training/courseNavigation'
+import '../training/training-assignment-workspace.css'
 import { CatalogFilters, CatalogPagination } from '../training/TrainingCatalogControls'
 import { useCatalogQuery } from '../training/useCatalogQuery'
 import { useEditorGuard } from '../components/shared-ui/useEditorGuard'
@@ -8,7 +11,7 @@ import TrainingTaskReusePicker from '../training/TrainingTaskReusePicker'
 import { assignmentReuseContent } from '../training/taskReuse'
 import React, { useState, useEffect, useRef } from 'react'
 import { Plus, Trash2, ClipboardList, FileText, Clock, Video, Image as ImageIcon, CheckSquare, Square, MessageSquare, Users, X } from 'lucide-react'
-import { useSearchParams } from 'react-router-dom'
+import { Navigate, useLocation, useSearchParams } from 'react-router-dom'
 import apiClient from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
 import { isTrainingHost } from '../training/context'
@@ -81,30 +84,40 @@ interface Submission {
 }
 
 // A changed deep-link/auth identity must never display the previous record or editor.
-const AssignmentList: React.FC = () => {
+type AssignmentListProps = { embeddedCourse?: Course }
+const AssignmentList: React.FC<AssignmentListProps> = ({ embeddedCourse }) => {
   const { user } = useAuth()
   const [params] = useSearchParams()
-  return <AssignmentListContent key={JSON.stringify([user?.id, user?.role, params.get('courseId'), params.get('id')])} />
+  const location = useLocation()
+  const context = trainingCourseContext(location.pathname, location.search)
+  if (!embeddedCourse && isTrainingHost() && user?.role === 'TEACHER' && context) {
+    const next = new URLSearchParams({ section: 'assignments' })
+    for (const key of ['search','tags','from','to','dateField','page','pageSize']) if (params.has(key)) next.set('assignments_'+key, params.get(key)!)
+    for (const key of ['create','reuse']) if (params.get(key) === 'true') next.set(key, 'true')
+    if (params.get('id')) next.set('assignmentId', params.get('id')!)
+    return <Navigate replace to={'/courses/'+encodeURIComponent(context.courseId)+'/detail?'+next.toString()}/>
+  }
+  return <AssignmentListContent embeddedCourse={embeddedCourse} key={JSON.stringify([user?.id, user?.role, embeddedCourse?.id || params.get('courseId'), params.get(embeddedCourse ? 'assignmentId' : 'id')])} />
 }
 
-const AssignmentListContent: React.FC = () => {
+const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }) => {
   const { user } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
-  const requestedCourseId = searchParams.get('courseId')
+  const requestedCourseId = embeddedCourse?.id || searchParams.get('courseId')
   const [showReuse, setShowReuse] = useState(false)
   const canReuse = isTrainingHost() && user?.role === 'TEACHER'
-  const focusId = searchParams.get('id')
+  const focusId = searchParams.get(embeddedCourse ? 'assignmentId' : 'id')
   const { feedback, confirm, success, error: showError, info } = useStaffFeedback()
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const [assignments, setAssignments] = useState<Assignment[]>([])
-  const [courses, setCourses] = useState<Course[]>([])
+  const [courses, setCourses] = useState<Course[]>(embeddedCourse ? [embeddedCourse] : [])
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const mounted = useRef(true)
   const loadSequence = useRef(0)
   const detailSequence = useRef(0)
   const [openingDetail,setOpeningDetail]=useState(false)
-  const catalog = useCatalogQuery()
+  const catalog = useCatalogQuery(embeddedCourse ? 'assignments_' : '')
   const [filterRevision,setFilterRevision]=useState(0)
   const [total, setTotal] = useState(0)
   const [showModal, setShowModal] = useState(false)
@@ -189,7 +202,7 @@ const AssignmentListContent: React.FC = () => {
         }
         setAssignments([record])
       } else {
-        const path = '/assignments?view=summary&' + catalog.params + (requestedCourseId ? `&courseId=${encodeURIComponent(requestedCourseId)}` : '')
+        const path = embeddedCourse ? '/assignments?view=summary&courseId='+encodeURIComponent(embeddedCourse.id)+'&'+catalog.params : '/assignments?view=summary&' + catalog.params + (requestedCourseId ? `&courseId=${encodeURIComponent(requestedCourseId)}` : '')
         const response = await apiClient.get<{ list: Assignment[]; total: number }>(path)
         if (request !== loadSequence.current) return
         if (response.code !== 0) throw new Error(response.message || '获取练习列表失败')
@@ -206,6 +219,7 @@ const AssignmentListContent: React.FC = () => {
   }
 
   const fetchCourses = async () => {
+    if (embeddedCourse) return
     try {
       const response = await apiClient.get<{ list: Course[] }>('/courses')
       if (response.code === 0) {
@@ -336,12 +350,13 @@ const AssignmentListContent: React.FC = () => {
         setFilterRevision(value=>value+1)
         // A record deep link reads only that record. Leave it after creating
         // so the teacher can see the new assignment in its course list.
-        if (searchParams.has('id') || requestedCourseId !== data.courseId || ['search','tags','from','to','page'].some(key=>searchParams.has(key))) {
+        const prefix = embeddedCourse ? 'assignments_' : ''
+        if (focusId || requestedCourseId !== data.courseId || ['search','tags','from','to','page'].some(key=>searchParams.has(prefix+key))) {
           const next = new URLSearchParams(searchParams)
-          next.delete('id')
+          next.delete(embeddedCourse ? 'assignmentId' : 'id')
           next.delete('create')
-          for (const key of ['search','tags','from','to','page']) next.delete(key)
-          next.set('courseId', data.courseId)
+          for (const key of ['search','tags','from','to','page']) next.delete(prefix+key)
+          if (!embeddedCourse) next.set('courseId', data.courseId)
           setSearchParams(next, { replace: true })
         } else {
           void fetchAssignments()
@@ -580,15 +595,26 @@ const AssignmentListContent: React.FC = () => {
 
   const editorGuard = useEditorGuard({ open: showModal, value: formData, onClose: closeEditor })
 
+  const PageContainer = embeddedCourse ? 'section' : ProductPage
   return (
-    <ProductPage width="management" className="space-y-6">
-      <PageHeader title="练习管理" description="集中查看课程练习、提交进度和截止时间。" actions={<><ProductButton variant="primary" onClick={openCreateModal}><Plus className="w-4 h-4" aria-hidden="true" />布置练习</ProductButton>{canReuse && <ProductButton onClick={() => setShowReuse(true)}>复用练习</ProductButton>}</>} />
+    <PageContainer {...(embeddedCourse ? { 'aria-label':'课程练习管理' } : { width: 'management' as const })} className={embeddedCourse ? 'training-assignment-workspace' : 'space-y-6'}>
+      {!embeddedCourse && <PageHeader title="练习管理" description="集中查看课程练习、提交进度和截止时间。" actions={<><ProductButton variant="primary" onClick={openCreateModal}><Plus className="w-4 h-4" aria-hidden="true" />布置练习</ProductButton>{canReuse && <ProductButton onClick={() => setShowReuse(true)}>复用练习</ProductButton>}</>} />}
+      {embeddedCourse && <div className="training-assignment-toolbar"><div><ProductButton variant="primary" onClick={openCreateModal}><Plus size={17} aria-hidden="true"/>发布练习</ProductButton>{canReuse && <ProductButton onClick={() => setShowReuse(true)}>复用练习</ProductButton>}</div><p>在当前课程内编辑、查看提交和导出数据。</p></div>}
+      {embeddedCourse && focusId && <div className="training-assignment-focused"><span>已定位到这份练习</span><ProductButton onClick={() => { const next=new URLSearchParams(searchParams);next.delete('assignmentId');setSearchParams(next,{replace:true}) }}>显示全部练习</ProductButton></div>}
       {feedback}
       {openingDetail && <p role="status">正在读取练习完整内容…</p>}
       {!focusId && <CatalogFilters key={filterRevision+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline label="练习"/>}
       {loading ? <ProductStatus kind="pending" title="正在加载练习">正在读取练习和提交概况。</ProductStatus>
       : loadError ? <ProductStatus kind="error" title="练习列表加载失败" actions={<ProductButton onClick={() => void fetchAssignments()}>重试</ProductButton>}>{loadError}</ProductStatus>
       : filteredAssignments.length === 0 ? <ProductStatus kind="info" title="暂无匹配练习">可以调整筛选条件，或布置第一份练习。</ProductStatus>
+      : embeddedCourse ? <div className="training-item-list training-course-task-grid">{filteredAssignments.map(assignment => <article id={`assignment-record-${assignment.id}`} tabIndex={-1} key={assignment.id} className="training-task-item training-course-task-card" aria-labelledby={'assignment-title-'+assignment.id}>
+        <div className="training-course-task-card-top"><span>练习</span>{assignment.status && <span className="training-course-task-status">{assignment.status==='PUBLISHED'?'已发布':'草稿'}</span>}</div>
+        <h2 id={'assignment-title-'+assignment.id}><button className="training-assignment-title" onClick={()=>void openEditModal(assignment)}>{assignment.title}</button></h2>
+        {assignment.description && <TrainingCardDescription id={'assignment-description-'+assignment.id} description={assignment.description}/>}
+        {assignment.tags?.length ? <div className="staff-inline-tags">{assignment.tags.slice(0,3).map((tag,index)=><TagBadge key={index} tag={tag}/>)}</div> : null}
+        <dl className="training-assignment-facts"><div><dt>截止时间</dt><dd>{formatDeadline(assignment.deadline)}</dd></div><div><dt>提交数量</dt><dd>{assignment._count?.submissions || 0} 份</dd></div></dl>
+        <footer className="training-assignment-card-actions"><ProductButton variant="primary" onClick={()=>openSubmissionsModal(assignment)}>查看提交</ProductButton><ProductButton onClick={()=>void openEditModal(assignment)}>编辑练习</ProductButton><ProductButton onClick={()=>void handleExport(assignment)}>导出提交</ProductButton><MoreActions label={`${assignment.title} 的更多操作`}><button type="button" onClick={()=>void handleClone(assignment)}>复制练习</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(assignment)}>删除练习</button></MoreActions></footer>
+      </article>)}</div>
       : <div className="staff-table-container staff-record-table"><table className="staff-table" aria-label="练习记录"><thead><tr><th scope="col">练习</th><th scope="col">课程</th><th scope="col">截止时间</th><th scope="col">提交</th><th scope="col">题目</th><th scope="col" className="text-right">操作</th></tr></thead><tbody>
         {filteredAssignments.map(assignment=><tr id={`assignment-record-${assignment.id}`} tabIndex={-1} key={assignment.id} className={focusId===assignment.id?'staff-target-row':''}>
           <td><button type="button" className="staff-record-button" onClick={()=>openEditModal(assignment)}>{assignment.title}</button>{assignment.tags?.length?<div className="staff-inline-tags">{assignment.tags.slice(0,2).map((tag,index)=><TagBadge key={index} tag={tag}/>)}</div>:null}</td>
@@ -1078,7 +1104,7 @@ const AssignmentListContent: React.FC = () => {
         </ModalSurface>
       )}
       {editorGuard.confirmation}
-    </ProductPage>
+    </PageContainer>
   )
 }
 

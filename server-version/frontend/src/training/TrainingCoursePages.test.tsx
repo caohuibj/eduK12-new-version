@@ -12,6 +12,10 @@ vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ user: { id: 'teach
 vi.mock('../components/staff-ui/useStaffFeedback', () => ({
   useStaffFeedback: () => ({ feedback: null, confirm, success: vi.fn(), error: vi.fn() }),
 }))
+vi.mock('./context', () => ({ isTrainingHost: () => true }))
+vi.mock('../components/RichTextEditor', () => ({ default: () => null }))
+vi.mock('../components/QuestionEditor', () => ({ default: () => null }))
+vi.mock('../components/MediaSelector', () => ({ default: () => null }))
 vi.mock('./courseAssessments', () => ({ loadCourseAssessments: loadAssessments }))
 
 import TrainingLearnerCourse from './TrainingLearnerCourse'
@@ -61,8 +65,8 @@ describe('course-first training workspaces', () => {
     expect(await screen.findByRole('heading', { name: '保留原题名：我的作业' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: '学习' })).toHaveAttribute('aria-pressed', 'true')
     expect(screen.queryByRole('button', { name: '作业' })).toBeNull()
-    expect(screen.getByRole('link', { name: /发布练习/ })).toHaveAttribute('href', expect.stringContaining('/assignments?create=true&courseId=course-1'))
-    expect(screen.getByRole('link', { name: '复用练习' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '发布练习' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: '复用练习' })).toBeInTheDocument()
   })
   it('learner sees only three task groups, reuses existing assignment and check-in routes', async () => {
     mount('/student/courses/course-1', '/student/courses/:courseId', TrainingLearnerCourse)
@@ -139,7 +143,7 @@ describe('course-first training workspaces', () => {
     expect(await screen.findByRole('link', { name: /发布测评/ })).toHaveAttribute('href', expect.stringContaining('/questionnaire-products/new?courseId=course-1&returnTo='))
     expect(get.mock.calls.some(([url]) => url.includes('training-analysis'))).toBe(false)
     fireEvent.click(screen.getByRole('button', { name: '学习' }))
-    expect(await screen.findByRole('link', { name: /发布练习/ })).toBeVisible()
+    expect(await screen.findByRole('button', { name: '发布练习' })).toBeVisible()
     expect(get.mock.calls.some(([url]) => url.includes('training-analysis'))).toBe(false)
   })
 
@@ -194,11 +198,15 @@ describe('course-first training workspaces', () => {
   it('trainer publishing links keep the exact course context', async () => {
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()
-    expect(await screen.findByRole('link', { name: /发布练习/ })).toHaveAttribute('href', expect.stringContaining('/assignments?create=true&courseId=course-1&returnTo='))
-    expect(await screen.findByRole('link', { name: /查看管理/ })).toHaveAttribute('href', expect.stringContaining('/assignments?id=a-1&courseId=course-1&returnTo='))
+    expect(await screen.findByRole('button', { name: '发布练习' })).toBeVisible()
+    expect(await screen.findByRole('button', { name: '查看提交' })).toBeVisible()
+    expect(screen.getByRole('button', { name: '导出提交' })).toBeVisible()
+    expect(screen.queryByRole('link', { name: /查看管理/ })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: '打卡' }))
-    expect(screen.getByRole('link', { name: /发布打卡/ })).toHaveAttribute('href', expect.stringContaining('/checkins?create=true&courseId=course-1&returnTo='))
-    expect(await screen.findByRole('link', { name: /查看管理/ })).toHaveAttribute('href', expect.stringContaining('/checkins?id=c-1&courseId=course-1&returnTo='))
+    expect(await screen.findByRole('button', { name: '发布打卡' })).toBeVisible()
+    expect(await screen.findByRole('button', { name: '查看提交' })).toBeVisible()
+    expect(screen.getByRole('button', { name: '导出提交' })).toBeVisible()
+    expect(screen.queryByRole('link', { name: /查看管理/ })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: '测评' }))
     expect(screen.getByRole('link', { name: /发布测评/ })).toHaveAttribute('href', expect.stringContaining('/questionnaire-products/new?courseId=course-1&returnTo='))
     expect(screen.queryByRole('link',{name:/管理学员/})).toBeNull()
