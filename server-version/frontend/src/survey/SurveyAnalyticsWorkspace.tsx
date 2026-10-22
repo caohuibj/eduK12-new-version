@@ -390,12 +390,11 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
     }
   },isCurrent)}
   return <section className="survey-studio-surface survey-data-surface border rounded-xl bg-white p-4 sm:p-6 my-5 space-y-4" aria-label="研究数据">
-    <SurveySectionHeader section="data" title="研究数据" showNavigation={!!overview}>
+    <SurveySectionHeader compact section="data" title="研究数据" showNavigation={!!overview} actions={<button className="btn-secondary" disabled={busy||overviewLoading} onClick={()=>void execute(reload)}>刷新完成进度</button>}>
       <p className="text-sm text-slate-600">完成与配对统计只来源于可核对的加密 Survey FINAL；研究编号数不等于经过实名验证的自然人数。</p></SurveySectionHeader>
     {error&&(!downloadIssue||!ticket)&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
     {message&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{message}</p>}
     <fieldset id="survey-data-overview" tabIndex={-1} disabled={busy} className="min-w-0 border-0 p-0 space-y-4" aria-label="研究数据操作">
-    <button className="btn-secondary" disabled={busy||overviewLoading} onClick={()=>void execute(reload)}>刷新完成进度</button>
     {overviewLoading&&<p role="status">正在加载完成进度…</p>}
     {overviewError&&<p role="alert">完成进度加载失败：{overviewError}。请使用“刷新完成进度”重试。{overview?'下方保留上次成功读取的数据，可能不是最新状态。':''}</p>}
     {!overviewLoading&&!overviewError&&overview?.waves.length===0&&<p>本项目暂无研究波次。请先在发布入口创建并保存波次。</p>}
