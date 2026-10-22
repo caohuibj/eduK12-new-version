@@ -4,23 +4,23 @@
 .survey-image-actions { display:flex; align-items:center; flex-wrap:wrap; gap:.6rem; }
 .survey-image-actions [hidden],.survey-image-library[hidden] { display:none!important; }
 .survey-image-actions > button { display:inline-flex; align-items:center; justify-content:center; gap:.45rem; }
-.survey-researcher .survey-image-actions .survey-image-upload { min-height:44px; padding:.6rem 1rem; border-radius:.5rem; color:#fff; background:var(--survey-brand-accent); border:1px solid var(--survey-brand-accent); font-size:.85rem; font-weight:550; box-shadow:0 2px 4px #2b6f8c12; }
+.survey-researcher .survey-image-actions .survey-image-upload { min-height:44px; padding:.6rem 1rem; border-radius:.5rem; color:var(--survey-ui-on-action, #fff); background:var(--survey-brand-accent); border:1px solid var(--survey-brand-accent); font-size:.85rem; font-weight:550; box-shadow:0 2px 4px #2b6f8c12; }
 .survey-researcher .survey-image-actions .survey-image-upload:hover:not(:disabled) { background:var(--survey-brand-accent-strong); border-color:var(--survey-brand-accent-strong); }
-.survey-researcher .survey-image-actions .survey-image-library-toggle { min-height:40px; padding:.5rem .75rem; border:1px solid var(--survey-brand-line); border-radius:.5rem; background:#fff; color:var(--survey-brand-muted); font-size:.75rem; }
+.survey-researcher .survey-image-actions .survey-image-library-toggle { min-height:40px; padding:.5rem .75rem; border:1px solid var(--survey-brand-line); border-radius:.5rem; background:var(--survey-ui-surface, #fff); color:var(--survey-brand-muted); font-size:.75rem; }
 .survey-image-file-hint { margin-top:.55rem; color:var(--survey-brand-muted); font-size:.7rem; line-height:1.7; }
 .survey-image-status,.survey-image-error { margin-top:.65rem; font-size:.75rem; line-height:1.7; overflow-wrap:anywhere; }
 .survey-image-status { color:var(--survey-brand-accent); }
-.survey-image-error { color:#a55349; background:#fff3ef; padding:.55rem .7rem; border-radius:.4rem; }
-.survey-image-library { margin-top:.85rem; padding:.8rem; border:1px solid var(--survey-brand-line); border-radius:.5rem; background:#fff; font-size:.8rem; }
+.survey-image-error { color:var(--survey-ui-danger, #a55349); background:var(--survey-ui-surface, #fff3ef); padding:.55rem .7rem; border-radius:.4rem; }
+.survey-image-library { margin-top:.85rem; padding:.8rem; border:1px solid var(--survey-brand-line); border-radius:.5rem; background:var(--survey-ui-surface, #fff); font-size:.8rem; }
 .survey-image-library label { display:grid; gap:.4rem; }
 .survey-image-details { display:grid; gap:.85rem; margin-top:1rem; }
-.survey-image-preview { display:grid; place-items:center; min-height:7rem; padding:.75rem; border:1px solid var(--survey-brand-line); border-radius:.6rem; background:repeating-conic-gradient(var(--survey-brand-soft) 0% 25%,#fff 0% 50%) 0 / 18px 18px; }
+.survey-image-preview { display:grid; place-items:center; min-height:7rem; padding:.75rem; border:1px solid var(--survey-brand-line); border-radius:.6rem; background:repeating-conic-gradient(var(--survey-brand-soft) 0% 25%,var(--survey-ui-surface, #fff) 0% 50%) 0 / 18px 18px; }
 .survey-image-preview img { max-height:12rem; border:0; border-radius:.35rem; }
 .survey-image-information { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.85rem; }
 .survey-image-information > label { display:grid; align-content:start; gap:.35rem; font-size:.75rem; color:var(--survey-brand-muted); }
-.survey-image-information :is(input,textarea,select).input { margin:0; font-size:.8rem; background:#fff; border-color:var(--survey-brand-line); }
+.survey-image-information :is(input,textarea,select).input { margin:0; font-size:.8rem; background:var(--survey-ui-surface, #fff); border-color:var(--survey-brand-line); }
 .survey-image-information .survey-image-wide { grid-column:1/-1; }
-.survey-researcher .survey-image-remove { justify-self:start; min-height:32px; padding:.2rem; color:#aa7163; font-size:.7rem; text-decoration:underline; text-underline-offset:3px; }
+.survey-researcher .survey-image-remove { justify-self:start; min-height:32px; padding:.2rem; color:var(--survey-ui-danger, #aa7163); font-size:.7rem; text-decoration:underline; text-underline-offset:3px; }
 .survey-image-guidance { margin-top:.75rem; padding-top:.6rem; border-top:1px solid var(--survey-brand-line); color:var(--survey-brand-muted); font-size:.7rem; }
 .survey-image-guidance summary { cursor:pointer; width:fit-content; }
 .survey-image-guidance p { margin-top:.45rem; line-height:1.8; }

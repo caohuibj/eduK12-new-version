@@ -1,3 +1,4 @@
+import { SurveyAppearance, SurveyAppearanceControl } from './SurveyAppearance'
 import {SurveyToolLibrary} from './SurveyToolLibrary'
 import {SurveyMaterialLibrary} from './SurveyMaterialLibrary'
 import './survey-sections.css'
@@ -52,6 +53,9 @@ const readStudyLocation=()=>{
     section:(section==='tools'?'publish':['settings','reports','publish','data'].includes(section||'')?section:'settings') as WorkspaceSection}
 }
 export default function SurveyApp(){
+  return <SurveyAppearance><SurveyApplication/></SurveyAppearance>
+}
+function SurveyApplication(){
   // Keep the entry stable when activation removes its one-time token from the URL.
   const [initial]=useState<'home'|'feature'|'claim'|'reset'|'login'>(()=>
     window.location.pathname==='/'?'home':window.location.pathname==='/claim'?'claim':window.location.pathname==='/reset-password'?'reset':
@@ -309,7 +313,7 @@ export default function SurveyApp(){
     <header className="border-b border-slate-200 bg-white"><div className={entryScreen?'survey-entry-header':'survey-researcher-header'+(user&&screen==='work'&&!user.mustChangePassword?' survey-researcher-header--navigation':'')}>
       <SurveyBrand/>
       {user&&screen==='work'&&!user.mustChangePassword&&<SurveyResearchNavigation active={researchArea} onNavigate={navigateResearchArea}/>}
-      <div className="survey-session-actions">{user&&screen==='work'
+      <div className="survey-session-actions"><SurveyAppearanceControl/>{user&&screen==='work'
         ?<SurveyResearcherAccount username={user.username} busy={busy} writeBusy={writeBusy} error={error} onLogout={logout} onChangePassword={changeAccountPassword}/>
         :<span>{screen==='mfa'?'研究者身份验证':'研究者入口'}</span>}</div>
     </div></header>

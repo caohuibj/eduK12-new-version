@@ -1,7 +1,7 @@
 .survey-researcher .survey-tool-template.is-composition { padding:1rem 1.25rem 1.25rem; }
 .is-composition .survey-template-fields { margin-top:1rem; }
 .survey-composition-studio { display:grid; grid-template-columns:minmax(0,1.4fr) minmax(19rem,1fr); gap:1.1rem; align-items:start; }
-.survey-composition-catalog,.survey-composition-outline { min-width:0; padding:1.1rem; border:1px solid var(--survey-brand-line); border-radius:.8rem; background:#fff; }
+.survey-composition-catalog,.survey-composition-outline { min-width:0; padding:1.1rem; border:1px solid var(--survey-brand-line); border-radius:.8rem; background:var(--survey-ui-surface, #fff); }
 .survey-composition-step { display:flex; align-items:start; gap:.65rem; margin-bottom:1rem; }
 .survey-composition-step>span { display:grid; place-items:center; flex-shrink:0; width:30px; height:30px; border-radius:.5rem; background:var(--survey-brand-soft); color:var(--survey-brand-accent); font-size:.7rem; font-weight:600; }
 .survey-composition-step>div { flex:1; min-width:0; }
@@ -18,7 +18,7 @@
 .survey-composition-filter { display:flex; flex-wrap:wrap; gap:.65rem; justify-content:space-between; align-items:center; margin-bottom:.7rem; }
 .survey-composition-filter>[role=group] { display:flex; gap:.2rem; padding:.2rem; border-radius:.5rem; background:var(--survey-brand-subtle); }
 .survey-composition-filter [role=group] button { padding:.4rem .65rem; min-height:36px; font-size:.72rem; color:var(--survey-brand-muted); border:1px solid transparent; border-radius:.4rem; }
-.survey-composition-filter [role=group] button[aria-pressed=true] { background:#fff; color:var(--survey-brand-accent-strong); border-color:var(--survey-brand-line); font-weight:600; }
+.survey-composition-filter [role=group] button[aria-pressed=true] { background:var(--survey-ui-surface, #fff); color:var(--survey-brand-accent-strong); border-color:var(--survey-brand-line); font-weight:600; }
 .survey-composition-filter form { display:flex; align-items:center; gap:.4rem; flex:1; min-width:11rem; border:1px solid var(--survey-brand-line); border-radius:.5rem; padding:0 .55rem; color:var(--survey-brand-muted); }
 .survey-composition-filter form input { width:100%; min-width:0; background:transparent; font-size:.75rem; }
 .survey-composition-filter form button { font-size:.7rem; min-height:36px; flex-shrink:0; color:var(--survey-brand-accent); }
@@ -33,7 +33,7 @@
 .survey-researcher .survey-composition-pagination .btn-secondary,.survey-composition-refresh { padding:.3rem .5rem; min-height:32px; font-size:.7rem; border-radius:.4rem; }
 .survey-composition-outline { position:sticky; top:1rem; background:var(--survey-brand-subtle); }
 .survey-composition-outline ol { list-style:none; display:grid; gap:.6rem; padding:0; margin:0; }
-.survey-composition-outline li { display:flex; align-items:start; gap:.6rem; padding:.8rem; border:1px solid var(--survey-brand-line); border-radius:.6rem; background:#fff; }
+.survey-composition-outline li { display:flex; align-items:start; gap:.6rem; padding:.8rem; border:1px solid var(--survey-brand-line); border-radius:.6rem; background:var(--survey-ui-surface, #fff); }
 .survey-composition-position { color:var(--survey-brand-accent); font-size:.72rem; padding-top:.15rem; }
 .survey-composition-outline li>div:first-of-type { flex:1; min-width:0; }
 .survey-composition-outline li strong { display:block; font-size:.8rem; font-weight:600; color:var(--survey-brand-ink); line-height:1.7; overflow-wrap:anywhere; }
