@@ -23,6 +23,11 @@ describe('Training deep-page return context', () => {
     mount('/student/courses/course-1', 'STUDENT')
     expect(screen.queryByRole('link')).toBeNull()
   })
+  it('returns the independent teacher scale list to tools', () => {
+    mount('/scales', 'TEACHER')
+    expect(screen.getByRole('link', { name: '返回工具' })).toHaveAttribute('href', '/toolkit')
+    expect(screen.queryByRole('link', { name: '返回课程' })).not.toBeInTheDocument()
+  })
   it('retains the exact filtered course section from an editor',()=>{
     mount('/questionnaire-products/q?courseId=c&returnTo='+encodeURIComponent('/courses/c/detail?section=assessments&assessments_page=3&assessments_tags=前测'),'TEACHER')
     expect(screen.getByRole('link',{name:'返回当前课程'})).toHaveAttribute('href','/courses/c/detail?section=assessments&assessments_page=3&assessments_tags=%E5%89%8D%E6%B5%8B')

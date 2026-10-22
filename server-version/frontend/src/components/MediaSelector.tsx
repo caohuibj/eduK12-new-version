@@ -6,6 +6,7 @@ import { ensureCsrfToken, sessionAxios } from '../api/client'
 import type { Video as VideoType, Document as DocumentType } from '../types'
 import { isSafeExternalMediaUrl } from '../utils/mediaUtils'
 import ModalSurface from './shared-ui/ModalSurface'
+import '../training/training-media-dialogs.css'
 
 export interface MediaItem {
   type: 'library' | 'external' | 'upload'
@@ -37,6 +38,7 @@ interface MediaSelectorProps {
 const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect, type, initialTab = 'library' }) => {
   const isImageMode = type === 'image'
   const isDocumentMode = type === 'document'
+  const training = isTrainingHost()
   const [activeTab, setActiveTab] = useState<'library' | 'external' | 'upload'>(initialTab)
   const [videos, setVideos] = useState<VideoType[]>([])
   const [images, setImages] = useState<ImageItem[]>([])
@@ -355,16 +357,16 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
 
   if (!isOpen) return null
 
-  const dialogTitle = isDocumentMode ? '选择文档' : isImageMode ? '选择图片' : '选择视频'
+  const dialogTitle = (training && activeTab === 'upload' ? '上传' : '选择') + (isDocumentMode ? '文档' : isImageMode ? '图片' : '视频')
 
   return (
     <ModalSurface open={isOpen} onClose={onClose} className="staff-modal-backdrop">
-      <div className="staff-dialog staff-dialog--wide hui-media-selector" tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="media-selector-title">
+      <div className={`staff-dialog staff-dialog--wide hui-media-selector${training ? ' training-media-picker' : ''}`} tabIndex={-1} role="dialog" aria-modal="true" aria-labelledby="media-selector-title">
         {/* Header */}
         <div className="staff-dialog__header">
           <div>
             <h2 id="media-selector-title">{dialogTitle}</h2>
-            <p className="staff-dialog__description">{isImageMode || isDocumentMode ? '从素材库选择，或上传新的素材。' : '从素材库选择、添加外部链接，或上传新的素材。'}</p>
+            <p className="staff-dialog__description">{training && activeTab === 'upload' ? '上传新的素材，完成后可在课程中使用。' : isImageMode || isDocumentMode ? '从素材库选择，或上传新的素材。' : '从素材库选择、添加外部链接，或上传新的素材。'}</p>
           </div>
           <button type="button" onClick={onClose} className="staff-icon-button" aria-label="关闭素材选择">
             <X className="w-5 h-5" aria-hidden="true" />
@@ -372,7 +374,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
         </div>
 
         {/* Tabs */}
-        <div className="flex border-b">
+        <div className="flex border-b training-media-picker-tabs">
           <button
             type="button"
             aria-pressed={activeTab === 'library'}
@@ -411,7 +413,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4">
+        <div className="flex-1 overflow-y-auto p-4 training-media-picker-content">
           {activeTab === 'library' && (
             <div className="space-y-4">
               <div className="relative">
@@ -580,7 +582,7 @@ const MediaSelector: React.FC<MediaSelectorProps> = ({ isOpen, onClose, onSelect
           {activeTab === 'upload' && (
             <div className="space-y-4">
               <div
-                className={`border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
+                className={`training-media-upload-zone border-2 border-dashed rounded-lg p-6 text-center transition-colors ${
                   uploadFile ? 'border-green-300 bg-green-50' : 'border-gray-300 hover:border-action'
                 } ${isUploading ? 'pointer-events-none opacity-50' : ''}`}
               >

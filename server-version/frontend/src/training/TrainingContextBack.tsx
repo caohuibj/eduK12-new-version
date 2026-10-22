@@ -37,6 +37,7 @@ export default function TrainingContextBack({ role }: { role: Role | undefined }
   }
 
   if (role==='TEACHER' && /^\/(media-library|toolkit)(\/|$)/.test(path)) return null
+  if (role==='TEACHER' && path==='/scales') return <Link className="training-context-back" to="/toolkit"><ArrowLeft size={16} aria-hidden="true"/>返回工具</Link>
   if (path === '/student' || path === '/dashboard') return null
   // The two purpose-built Training Course pages have their own back link.
   if (studentRoot && /^\/student\/courses\/[^/]+$/.test(path)) return null

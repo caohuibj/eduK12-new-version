@@ -3,6 +3,8 @@ import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 const api = vi.hoisted(() => ({ get: vi.fn(), put: vi.fn(), post: vi.fn(), upload: vi.fn(), csrf: vi.fn() }))
+const presentation = vi.hoisted(() => ({ training: false }))
+vi.mock('../../training/context', async importOriginal => ({ ...await importOriginal<typeof import('../../training/context')>(), isTrainingHost: () => presentation.training }))
 vi.mock('../../api/client', () => ({ default: api, ensureCsrfToken: api.csrf, sessionAxios: { post: api.upload } }))
 vi.mock('react-router-dom', async () => ({ ...await vi.importActual('react-router-dom'), useParams: () => ({ id: 'scale-1' }) }))
 import ScaleEdit from '../ScaleEdit'
@@ -15,11 +17,20 @@ const fixture = () => ({
 })
 let stored: any
 beforeEach(() => {
-  vi.clearAllMocks(); stored = fixture()
+  vi.clearAllMocks(); presentation.training = false; stored = fixture()
   api.get.mockImplementation(async () => ({ code: 0, data: { id: 'scale-1', code: 'custom', name: '量表', status: 'DRAFT', instrumentClass: 'CUSTOM_DESCRIPTIVE', definition: structuredClone(stored) } }))
   api.put.mockImplementation(async (_path, body) => { stored = structuredClone(body.definition); return { code: 0, data: { updatedAt: undefined } } })
 })
 describe('Training scale authoring additions', () => {
+  it.each([
+    [true, '/scales/scale-1', '返回工具', '/toolkit'],
+    [true, '/scales/scale-1?courseId=course-1', '返回当前课程', '/courses/course-1/detail?section=assessments'],
+    [false, '/scales/scale-1', '返回量表列表', '/scales'],
+  ] as const)('retains the appropriate return destination for %s / %s', async (training, path, label, target) => {
+    presentation.training = training
+    render(<MemoryRouter initialEntries={[path]}><ScaleEdit /></MemoryRouter>)
+    expect(await screen.findByRole('link', { name: label })).toHaveAttribute('href', target)
+  })
   it('orders and duplicates using new identity without changing existing scoring membership', async () => {
     const user = userEvent.setup(); render(<MemoryRouter><ScaleEdit /></MemoryRouter>)
     await user.click(await screen.findByRole('button', { name: '题目' }))

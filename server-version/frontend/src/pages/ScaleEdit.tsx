@@ -3,10 +3,12 @@ import { type RawScoreFeedback, type RawScoreFeedbackRule, validateRawScoreFeedb
 import { TrainingRawScoreFeedbackEditor } from './TrainingRawScoreFeedbackEditor'
 import ScaleCsvImport from './ScaleCsvImport'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ArrowDown, ArrowUp, ArrowLeft, CheckCircle, Copy, Eye, Plus, Save, Trash2 } from 'lucide-react'
 import apiClient from '../api/client'
 import { PageHeader, ProductPage, ProductStatus } from '../components/product-ui'
+import { isTrainingHost } from '../training/context'
+import { trainingCourseContext } from '../training/courseNavigation'
 import './ScaleEdit.css'
 
 type ResponseValue = string | number
@@ -164,6 +166,11 @@ const ScaleEdit: React.FC = () => {
 
 const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
   const navigate = useNavigate()
+  const location = useLocation()
+  const training = isTrainingHost()
+  const courseContext = training ? trainingCourseContext(location.pathname, location.search) : null
+  const returnPath = courseContext ? courseContext.returnTo || `/courses/${encodeURIComponent(courseContext.courseId)}/detail?section=assessments` : training ? '/toolkit' : '/scales'
+  const returnLabel = courseContext ? '返回当前课程' : training ? '返回工具' : '返回量表列表'
   const isNew = id === 'new'
   const [loading, setLoading] = useState(!isNew)
   const [saving, setSaving] = useState(false)
@@ -569,7 +576,7 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
         title={isNew ? '创建描述性量表' : scale.name || '量表编辑'}
         actions={(
           <div className="staff-inline-actions">
-            <Link to="/scales" className="staff-secondary-link"><ArrowLeft className="w-4 h-4" aria-hidden="true" />返回量表列表</Link>
+            <Link to={returnPath} className="staff-secondary-link"><ArrowLeft className="w-4 h-4" aria-hidden="true" />{returnLabel}</Link>
             {!isNew && <button onClick={() => void previewDefinition()} disabled={importing || mediaUploadCount > 0 || saving || copying || standard || accessBlocked || definitionDirty} title={definitionDirty ? '请先保存定义，再预览服务端计分' : '对已保存定义使用每题首个选项进行真实服务端计分'} className="hui-button hui-button--secondary"><Eye className="w-4 h-4" aria-hidden="true" />计分预览</button>}
             {canCopy && <button type="button" onClick={() => void copyAsDraft()} disabled={copying} aria-busy={copying} className="hui-button hui-button--primary scale-edit-copy"><Copy className="w-4 h-4" aria-hidden="true" />{copying ? '正在创建新草稿…' : '复制为新草稿'}</button>}
             {!readOnly && <button onClick={() => void (isNew ? saveBasic() : saveDraft())} disabled={saving || importing || mediaUploadCount > 0} className="hui-button hui-button--secondary"><Save className="w-4 h-4" aria-hidden="true" />保存草稿</button>}
