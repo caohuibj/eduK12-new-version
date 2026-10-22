@@ -34,7 +34,15 @@ import {
   publishComposite,
   startUserAttempt,
   updateComposite,
+  addItem,
+  removeItem,
+  removeEmptyFormSection,
+  reorderItems,
+  reorderCompositeContentUnits,
+  setCompositeAnalysisProtocol,
+  setCompositeReportPackage,
 } from '../../modules/composite/composite.service'
+import { createCompositeFormSection, updateCompositeFormSection, reorderCompositeFormSections, reorderCompositeFormSectionItems, assignCompositeFormItemToSection } from '../../modules/composite/final-submit.service'
 import { decryptCognitivePayload, encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 
 const TEACHER = UserRole.TEACHER
@@ -651,12 +659,29 @@ describe('copyComposite', () => {
 })
 
 describe('library composites are not takeable', () => {
+  it('retains an archived own attempt without reopening admission', async () => {
+    mockPrisma.courseStudent.findMany.mockResolvedValue([{ courseId: 'course-t' }])
+    mockPrisma.compositeAssessment.findMany.mockResolvedValue([{
+      id: 'archived', status: 'ARCHIVED', name: '停止新作答', opensAt: null, expiresAt: null,
+      maxAttempts: 3, course: teacherCourse, items: [],
+    }])
+    mockPrisma.compositeAssessmentAttempt.findMany.mockResolvedValue([{
+      id: 'own-attempt', compositeAssessmentId: 'archived', status: 'IN_PROGRESS', progress: 40,
+    }])
+    const [row] = await listAvailableForStudent('student-1')
+    expect(row).toMatchObject({ canContinue: true, canStartNewAttempt: false, attempt: { id: 'own-attempt' } })
+    expect(mockPrisma.compositeAssessment.findMany.mock.calls[0][0].where.AND).toContainEqual({ OR: [
+      { status: 'PUBLISHED' },
+      { status: 'ARCHIVED', attempts: { some: { userId: 'student-1', status: { in: ['IN_PROGRESS', 'COMPLETED'] } } } },
+    ] })
+  })
+
   it('returns attempt counts and explicit availability windows for students', async () => {
     const now = Date.now()
     mockPrisma.courseStudent.findMany.mockResolvedValue([{ courseId: 'course-t' }])
     mockPrisma.compositeAssessment.findMany.mockResolvedValue([
       {
-        id: 'open-2', code: 'OPEN-2', name: '可重做', description: null, instruction: null,
+        id: 'open-2', status: 'PUBLISHED', code: 'OPEN-2', name: '可重做', description: null, instruction: null,
         opensAt: new Date(now - 60_000), expiresAt: new Date(now + 60_000), maxAttempts: 2,
         course: teacherCourse, items: [],
       },
@@ -717,7 +742,7 @@ describe('library composites are not takeable', () => {
     await listAvailableForStudent('student-1')
     expect(mockPrisma.compositeAssessment.findMany).toHaveBeenCalledWith(
       expect.objectContaining({
-        where: expect.objectContaining({ status: 'PUBLISHED', OR: [
+        where: expect.objectContaining({ OR: [
           expect.objectContaining({ productKind: { in: ['LEGACY_COMPOSITE', 'ASSESSMENT_BUNDLE'] }, courseId: { in: ['library-1'] }, course: { isLibrary: false } }),
           expect.objectContaining({ productKind: 'QUESTIONNAIRE', questionnaireType: 'COURSE', questionnaireCourses: { some: { courseId: { in: ['library-1'] }, course: { isLibrary: false } } } }),
         ] }),
@@ -813,5 +838,36 @@ describe('Training timed start recovery boundary', () => {
     mockPrisma.compositeAssessmentAttempt.findFirst.mockResolvedValue({id:'attempt-1'})
     await expect(startUserAttempt('student-1','source-1')).rejects.toMatchObject({statusCode:403})
     expect(mockPrisma.compositeAssessmentAttempt.findFirst).not.toHaveBeenCalled()
+  })
+})
+
+describe('fixed integrated-report bundles reject ordinary authoring', () => {
+  const changes = [
+    ['metadata', () => updateComposite('teacher-1', TEACHER, 'fixed', { name: 'changed' })],
+    ['legacy copy', () => copyComposite('teacher-1', TEACHER, 'fixed', { courseId: 'course-t' })],
+    ['add item', () => addItem('teacher-1', TEACHER, 'fixed', { type: 'FORM', required: true, formType: 'text_input', formLabel: 'new' })],
+    ['remove item', () => removeItem('teacher-1', TEACHER, 'fixed', 'item')],
+    ['remove section', () => removeEmptyFormSection('teacher-1', TEACHER, 'fixed', 'section')],
+    ['reorder items', () => reorderItems('teacher-1', TEACHER, 'fixed', [])],
+    ['reorder content', () => reorderCompositeContentUnits('teacher-1', TEACHER, 'fixed', [])],
+    ['analysis protocol', () => setCompositeAnalysisProtocol('teacher-1', TEACHER, 'fixed', { analysisProtocol: null })],
+    ['report package', () => setCompositeReportPackage('teacher-1', TEACHER, 'fixed', { reportPackage: null })],
+    ['create section', () => createCompositeFormSection('fixed', { title: 'new' })],
+    ['update section', () => updateCompositeFormSection('fixed', 'section', { title: 'changed' })],
+    ['reorder sections', () => reorderCompositeFormSections('fixed', [])],
+    ['reorder section items', () => reorderCompositeFormSectionItems('fixed', 'section', [])],
+    ['move item between sections', () => assignCompositeFormItemToSection('fixed', 'section', 'item', 0)],
+  ] as const
+  it.each(changes)('rejects %s even for an owned draft with no legacy report keys', async (_name, change) => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue(libraryTemplate({ id: 'fixed', productKind: 'ASSESSMENT_BUNDLE', status: 'DRAFT', createdBy: 'teacher-1', creator: { role: TEACHER }, courseId: 'course-t', course: teacherCourse, items: [], reportPackageKey: null, analysisProtocolKey: null }))
+    await expect(change()).rejects.toMatchObject({ statusCode: 409 })
+    expect(mockPrisma.compositeAssessment.create).not.toHaveBeenCalled()
+    expect(mockPrisma.compositeAssessment.update).not.toHaveBeenCalled()
+    expect(mockPrisma.cognitiveAssignment.create).not.toHaveBeenCalled()
+  })
+  it.each([{ reportPackageKey: 'fixed-report' }, { analysisProtocolKey: 'fixed-analysis' }])('also keeps legacy fixed-report sections immutable: %j', async report => {
+    mockPrisma.compositeAssessment.findUnique.mockResolvedValue({ status: 'DRAFT', productKind: 'LEGACY_COMPOSITE', ...report })
+    await expect(createCompositeFormSection('fixed', { title: 'new' })).rejects.toMatchObject({ statusCode: 409 })
+    expect(mockPrisma.compositeAssessment.update).not.toHaveBeenCalled()
   })
 })

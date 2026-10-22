@@ -1,0 +1,83 @@
+name: Training student lightweight merge checks
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  CI_EVENT: pull_request
+  CI_HEAD_REF: work/training-student-20261022
+  CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+  CI_PR_REPOSITORY: caohuibj/eduK12-new-version
+  NODE_OPTIONS: --max-old-space-size=4096
+jobs:
+  admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      PLAN: ${{ inputs.plan }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify exact inputs and reviewed local evidence without rerunning application tests
+        run: node .github/scripts/training-student-checks.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: training-student-admission-${{ github.sha }}
+          path: training-student-evidence
+          if-no-files-found: error
+          retention-days: 3
+  compile:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    strategy:
+      fail-fast: false
+      matrix:
+        component: [frontend, backend]
+    env:
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      PRISMA_SKIP_POSTINSTALL_GENERATE: 'true'
+      DATABASE_URL: postgresql://synthetic:synthetic@127.0.0.1:1/synthetic
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/${{ matrix.component }}/package-lock.json
+      - name: install locked compiler dependencies from the official registry
+        working-directory: server-version/${{ matrix.component }}
+        run: npm ci --ignore-scripts
+      - name: integrated frontend app types and one production compilation
+        if: matrix.component == 'frontend'
+        working-directory: server-version/frontend
+        run: |
+          node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit
+          node scripts/product-route-inventory.mjs --check
+          npm run build
+      - name: integrated backend types only without connecting to a database
+        if: matrix.component == 'backend'
+        working-directory: server-version/backend
+        run: |
+          node node_modules/prisma/build/index.js generate
+          node node_modules/typescript/bin/tsc --noEmit
+      - uses: actions/upload-artifact@v4
+        if: matrix.component == 'frontend'
+        with:
+          name: training-student-frontend-${{ github.sha }}
+          path: server-version/frontend/dist
+          if-no-files-found: error
+          retention-days: 3

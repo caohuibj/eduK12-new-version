@@ -235,9 +235,10 @@ export const listCompositeFormItems = async (compositeId: string) => prisma.comp
 
 const withDraftSectionEdit = <T>(compositeId: string, edit: (tx: Prisma.TransactionClient) => Promise<T>) => prisma.$transaction(async tx => {
   await tx.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${compositeId} FOR UPDATE`
-  const row = await tx.compositeAssessment.findUnique({ where: { id: compositeId }, select: { status: true } })
+  const row = await tx.compositeAssessment.findUnique({ where: { id: compositeId }, select: { status: true, productKind: true, reportPackageKey: true, analysisProtocolKey: true } })
   if (!row) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评不存在', 404)
   if (row.status !== 'DRAFT') throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '已发布定义不能修改，请复制为新草稿', 409)
+  if (row.productKind === 'ASSESSMENT_BUNDLE' || row.reportPackageKey || row.analysisProtocolKey) throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '固定综合报告的内容与区段不能修改', 409)
   const result = await edit(tx)
   await tx.compositeAssessment.update({ where: { id: compositeId }, data: { revision: { increment: 1 } } })
   return result

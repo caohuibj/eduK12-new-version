@@ -1,4 +1,5 @@
 import { FormTemplatePicker } from './FormTemplatePicker'
+import { FormTemplateWorkspace } from './FormTemplateWorkspace'
 import './form-template-editor.css'
 import { CatalogFilters, CatalogPagination } from '../../training/TrainingCatalogControls'
 import { useCatalogQuery } from '../../training/useCatalogQuery'
@@ -30,6 +31,7 @@ import AssessmentToolPicker from '../../components/AssessmentToolPicker'
 import LocalDateTimeInput, { localDateTimeValue, parseLocalDateTime } from '../../components/LocalDateTimeInput'
 import './questionnaire-products.css'
 import './questionnaire-training-editor.css'
+import './questionnaire-content-editor.css'
 import { ArrowLeft, ArrowRight, BookOpen, Brain, Check, ClipboardList, Layers, ListChecks, Route, Save, Clock3, HardDrive, ShieldCheck, Shuffle, Link as LinkIcon } from 'lucide-react'
 import { TrainingVariantEditor } from './TrainingVariantEditor'
 import { TrainingFlowEditor, trainingFlowEditorId } from './TrainingFlowEditor'
@@ -925,130 +927,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                         <p className="text-sm">{trainingDesign ? '条件显示只能引用同一答题阶段中前面的单选或多选题；开始新阶段后，不能引用上一阶段的题。' : '条件只引用同区段的前置单选、多选题。'}隐藏答案会清除；拒答独立记录，不计有效回答。已发布版本不可修改。</p>
                       </fieldset>}
   </>
-  const addContentControls = <>
-    {trainingDesign && !formTemplate && draft && type === 'FORM' && <FormTemplatePicker excludeId={id} disabled={busy || dirty || authoringLocked} onImport={source => void action(async () => { hydrate(await request('/' + id + '/import-form', { revision: detail.revision, source })); setPreflight(null) })}/>}
-              {draft && (
-                <fieldset
-                  disabled={busy || dirty || authoringLocked}
-                  className="space-y-3 border rounded p-4"
-                >
-                  <legend>{editingFormItem ? '编辑表单题目' : formTemplate ? '添加表单题目' : '添加内容'}</legend>{trainingDesign && !formTemplate && <div className="qt-type-tabs" role="group" aria-label="内容类型">{([
-      ['SCALE','量表',BookOpen], ...(cognitiveEnabled ? [['COGNITIVE','认知测验',Brain] as const] : []),
-      ['SITUATIONAL','情境判断',Route], ['FORM','自定义表单',ClipboardList],
-    ] as Array<[string,string,typeof BookOpen]>).map(([value,label,Icon]) => <button type="button" key={String(value)} disabled={busy || dirty || authoringLocked} aria-pressed={type === value} onClick={() => { setType(String(value)); setSelected('') }}><Icon size={18} />{String(label)}</button>)}</div>}
-                  <label hidden={trainingDesign}>
-                    测评类型
-                    <select
-                      aria-label="测评类型"
-                      className="input ml-2 max-w-full"
-                      value={type}
-                      onChange={(e) => {
-                        setType(e.target.value)
-                        setSelected('')
-                      }}
-                    >
-                      {['SCALE', ...(cognitiveEnabled ? ['COGNITIVE'] : []), 'SITUATIONAL', 'FORM'].map(
-                        (t) => (
-                          <option key={t} value={t}>
-                            {labels[t]}
-                          </option>
-                        ),
-                      )}
-                    </select>
-                  </label>
-                  {type !== 'FORM' ? (
-                    trainingDesign ? <AssessmentToolPicker options={choices} value={selected} onChange={setSelected} label={labels[type]} disabled={busy || dirty || authoringLocked} /> : <label className="block">
-                      选择测评
-                      <select
-                        aria-label="选择测评"
-                        className="input ml-2 max-w-full"
-                        value={selected}
-                        onChange={(e) => setSelected(e.target.value)}
-                      >
-                        <option value="">请选择已发布测评</option>
-                        {choices.map((v: any) => (
-                          <option key={v.id} value={v.id}>
-                            {v.name}
-                            {v.profile ? ' · ' + v.profile : ''}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                  ) : (
-                    <>
-                      <label className="block">
-                        题目文字
-                        <input
-                          id="form-template-question-label"
-                          value={formLabel}
-                          onChange={(e) => setFormLabel(e.target.value)}
-                        />
-                      </label>
-                      <label className="block">
-                        题型
-                        <select
-                          aria-label="题型"
-                          className="input ml-2 max-w-full"
-                          value={formType}
-                          onChange={(e) => { setFormType(e.target.value); if(e.target.value==='year_month')setPolicyEnabled(false); setFormConstraints(e.target.value === 'slider' ? { min: 0, max: 100 } : {}); setOptions(''); setMatrixRows(''); setChoiceDrafts(emptyChoices('option')); setMatrixDrafts(emptyChoices('row')); if (typedFormTypes[e.target.value]) setContext('') }}
-                        >
-                          {[
-                            'text_input',
-                            'fill_blank',
-                            'single_choice',
-                            'multiple_choice',
-                            'year_month',
-                            'number', 'long_text', 'date', 'time', 'likert', 'matrix', 'matrix_multiple', 'rank_order', 'slider', 'constant_sum',
-                          ].map((t) => (
-                            <option key={t} value={t}>
-                              {
-                                (
-                                  {
-                                    text_input: '文本',
-                                    fill_blank: '填空',
-                                    single_choice: '单选',
-                                    multiple_choice: '多选',
-                                    year_month: '年月',
-                                    number: '数值', long_text: '长文本', date: '日期', time: '时间', likert: 'Likert', matrix: '矩阵单选', matrix_multiple: '矩阵多选', rank_order: '排序', slider: '滑块', constant_sum: '恒定总和',
-                                  } as any
-                                )[t]
-                              }
-                            </option>
-                          ))}
-                        </select>
-                      </label>
-                      {!trainingDesign && <label className="block">加入表单区段<select aria-label="加入表单区段" value={targetFormSection} onChange={e=>{setTargetFormSection(e.target.value);setFormConstraints(previous=>({...previous,displayIf:undefined}))}}><option value="">创建新区段</option>{(detail?.formSections??[]).filter((s:any)=>!s.contextSection).map((s:any)=><option key={s.id} value={s.id} disabled={Math.max(...(s.items??[]).map((i:any)=>i.position))!==Math.max(...(detail?.items??[]).map((i:any)=>i.position))}>{s.title}（{s.items?.length??0}题；仅尾部连续段可追加）</option>)}</select></label>}
-                      {trainingDesign ? <details className="qt-advanced qt-form-advanced" open={advancedFormOpen} onToggle={event => setAdvancedFormOpen(event.currentTarget.open)}>
-                        <summary>高级答题规则<span>可选</span></summary>
-                        <div className="qt-advanced-body">
-                          <section hidden={Boolean(editingFormItem)} className="qt-form-stage" aria-label="答题阶段设置">
-                            <h3>分段提交</h3>
-                            <p>同一阶段内逐题作答，完成后统一提交。普通题目会自动接在当前连续的表单题后面。</p>
-                            <p role="status">{contextKey ? '背景信息使用专用阶段，不与普通表单题混合。' : startNewFormStage ? '下一题将开始新的答题阶段，完成后单独提交。' : currentFormStage ? `当前阶段：${currentFormStage.title}（${currentFormStage.items.length} 题）。` : '当前没有可继续的表单阶段，下一题会自动新建。'}</p>
-                            {startNewFormStage ? <ProductButton disabled={busy || dirty || !currentFormStage || Boolean(contextKey)} onClick={() => selectNewFormStage(false)}>继续当前阶段</ProductButton>
-                              : <ProductButton disabled={busy || dirty || !currentFormStage || Boolean(contextKey)} onClick={() => selectNewFormStage(true)}>新增答题阶段</ProductButton>}
-                            <p className="qt-form-hint">此选择在添加下一道题时生效，不会移动已有题目，也不会改变逐题显示方式。</p>
-                          </section>
-                          <p className="qt-form-hint">需要条件显示、拒答或互斥选项时，再为本题开启规则。普通题目无需开启。</p>
-                          {formRules}
-                        </div>
-                      </details> : formRules}
-                      {typedFormType && <BasicFormConstraints question={{ ...formConstraints, type: typedFormType }} onChange={patch => setFormConstraints(previous => ({ ...previous, ...patch }))} />}
-                      {typedFormType && <StructuredFormConstraints question={{ ...formConstraints, type: typedFormType }} onChange={patch => setFormConstraints(previous => ({ ...previous, ...patch }))} />}
-                      {['matrix', 'matrix_multiple'].includes(formType) && (trainingDesign
-                        ? <FormChoiceEditor key={formType + '-rows'} title="矩阵行" prefix="row" choices={matrixDrafts} onChange={setMatrixDrafts} max={40} portableKeys />
-                        : <label className="block">矩阵行（编码=标签，以逗号分隔）<input value={matrixRows} onChange={e => setMatrixRows(e.target.value)} /></label>)}
-                      {(['single_choice', 'multiple_choice'].includes(formType) || structuredOptionTypes.includes(typedFormType)) && (trainingDesign
-                        ? <FormChoiceEditor key={formType + '-' + contextKey} title="选项" prefix="option" choices={choiceDrafts} onChange={changeChoices} max={30} portableKeys={Boolean(typedFormType)} />
-                        : <label className="block">
-                          选项（值=标签，以逗号分隔）
-                          <input
-                            value={options}
-                            onChange={(e) => setOptions(e.target.value)}
-                          />
-                        </label>
-                      )}
-                      <label className="block">
+  const backgroundField = <label className="block">
                         背景字段
                         <select
                           aria-label="背景字段" disabled={Boolean(editingFormItem)}
@@ -1099,6 +978,140 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                           ))}
                         </select>
                       </label>
+  const formTemplatePicker = trainingDesign && !formTemplate && draft && type === 'FORM' && <FormTemplatePicker excludeId={id} disabled={busy || dirty || authoringLocked} onImport={source => void action(async () => { hydrate(await request('/' + id + '/import-form', { revision: detail.revision, source })); setPreflight(null) })}/>
+  const addContentControls = <>
+              {draft && (
+                <fieldset
+                  disabled={busy || dirty || authoringLocked}
+                  className="space-y-3 border rounded p-4"
+                >
+                  <legend>{editingFormItem ? '编辑表单题目' : formTemplate ? '添加表单题目' : '添加内容'}</legend>{trainingDesign && !formTemplate && <>
+                    <div className="qt-content-task-heading"><span>01</span><div><h3>选择内容类型</h3><p>选用已发布且有权限的工具，或编写表单题。</p></div></div>
+                    <div className="qt-type-tabs" role="group" aria-label="内容类型">{([
+                      ['SCALE','量表',BookOpen,'分别计分与反馈',catalog.scales.length],
+                      ['COGNITIVE','认知测验',Brain,'选用已有任务，保留冻结配置',catalog.cognitive.length],
+                      ['SITUATIONAL','情境判断',Route,'使用获授权的固定版本',catalog.situational.length],
+                      ['FORM','自定义表单',ClipboardList,'收集背景信息或课程反馈',null],
+                    ] as Array<[string,string,typeof BookOpen,string,number|null]>).map(([value,label,Icon,hint,count]) => <button type="button" key={value} aria-label={label} disabled={busy || dirty || authoringLocked || (value === 'COGNITIVE' && !cognitiveEnabled)} aria-pressed={type === value} onClick={() => { setType(value); setSelected('') }}><Icon size={21} aria-hidden="true"/><span><strong>{label}</strong><small>{value === 'COGNITIVE' && !cognitiveEnabled ? '当前环境未开启' : hint}</small></span>{count !== null && <span className="qt-type-count">{count}</span>}</button>)}</div>
+                    {!cognitiveEnabled && <p className="qt-content-availability">认知测验暂不可用，当前无法添加。已有问卷内容会保留。</p>}
+                    <div className="qt-content-task-heading"><span>02</span><div><h3>{type === 'FORM' ? '编写或选用表单' : `选择${labels[type]}`}</h3><p>{type === 'COGNITIVE' ? '仅选用已发布且当前账号可用的任务；此处不修改认知任务配置。' : type === 'FORM' ? '添加自定义题目，或将已有表单整份加入。' : '选择工具后，点击“添加到测评”保存到本问卷。'}</p></div></div>
+                  </>}
+                  {formTemplatePicker}
+                  <label hidden={trainingDesign}>
+                    测评类型
+                    <select
+                      aria-label="测评类型"
+                      className="input ml-2 max-w-full"
+                      value={type}
+                      onChange={(e) => {
+                        setType(e.target.value)
+                        setSelected('')
+                      }}
+                    >
+                      {['SCALE', ...(cognitiveEnabled ? ['COGNITIVE'] : []), 'SITUATIONAL', 'FORM'].map(
+                        (t) => (
+                          <option key={t} value={t}>
+                            {labels[t]}
+                          </option>
+                        ),
+                      )}
+                    </select>
+                  </label>
+                  {type !== 'FORM' ? (
+                    trainingDesign ? <><AssessmentToolPicker options={choices} value={selected} onChange={setSelected} label={labels[type]} disabled={busy || dirty || authoringLocked} />{!choices.length && <p className="qt-content-empty-catalog" role="status">{type === 'COGNITIVE' ? '暂无可加入的认知测验。需要当前账号可用、已发布的认知任务，其配置也须已发布。' : `暂无可加入的${labels[type]}。请确认工具已发布且当前账号有使用权限。`}</p>}</> : <label className="block">
+                      选择测评
+                      <select
+                        aria-label="选择测评"
+                        className="input ml-2 max-w-full"
+                        value={selected}
+                        onChange={(e) => setSelected(e.target.value)}
+                      >
+                        <option value="">请选择已发布测评</option>
+                        {choices.map((v: any) => (
+                          <option key={v.id} value={v.id}>
+                            {v.name}
+                            {v.profile ? ' · ' + v.profile : ''}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                  ) : (
+                    <>
+                      <label className="block">
+                        题目文字
+                        <input
+                          id="form-template-question-label"
+                          placeholder={formTemplate ? '例如：本次课程中，你最想进一步了解什么？' : undefined}
+                          value={formLabel}
+                          onChange={(e) => setFormLabel(e.target.value)}
+                        />
+                      </label>
+                      <label className="block">
+                        题型
+                        <select
+                          aria-label="题型"
+                          className="input ml-2 max-w-full"
+                          value={formType}
+                          onChange={(e) => { setFormType(e.target.value); if(e.target.value==='year_month')setPolicyEnabled(false); setFormConstraints(e.target.value === 'slider' ? { min: 0, max: 100 } : {}); setOptions(''); setMatrixRows(''); setChoiceDrafts(emptyChoices('option')); setMatrixDrafts(emptyChoices('row')); if (typedFormTypes[e.target.value]) setContext('') }}
+                        >
+                          {[
+                            'text_input',
+                            'fill_blank',
+                            'single_choice',
+                            'multiple_choice',
+                            'year_month',
+                            'number', 'long_text', 'date', 'time', 'likert', 'matrix', 'matrix_multiple', 'rank_order', 'slider', 'constant_sum',
+                          ].map((t) => (
+                            <option key={t} value={t}>
+                              {
+                                (
+                                  {
+                                    text_input: '文本',
+                                    fill_blank: '填空',
+                                    single_choice: '单选',
+                                    multiple_choice: '多选',
+                                    year_month: '年月',
+                                    number: '数值', long_text: '长文本', date: '日期', time: '时间', likert: 'Likert', matrix: '矩阵单选', matrix_multiple: '矩阵多选', rank_order: '排序', slider: '滑块', constant_sum: '恒定总和',
+                                  } as any
+                                )[t]
+                              }
+                            </option>
+                          ))}
+                        </select>
+                      </label>
+                      {!trainingDesign && <label className="block">加入表单区段<select aria-label="加入表单区段" value={targetFormSection} onChange={e=>{setTargetFormSection(e.target.value);setFormConstraints(previous=>({...previous,displayIf:undefined}))}}><option value="">创建新区段</option>{(detail?.formSections??[]).filter((s:any)=>!s.contextSection).map((s:any)=><option key={s.id} value={s.id} disabled={Math.max(...(s.items??[]).map((i:any)=>i.position))!==Math.max(...(detail?.items??[]).map((i:any)=>i.position))}>{s.title}（{s.items?.length??0}题；仅尾部连续段可追加）</option>)}</select></label>}
+                      {trainingDesign ? <details className="qt-advanced qt-form-advanced" open={advancedFormOpen} onToggle={event => setAdvancedFormOpen(event.currentTarget.open)}>
+                        <summary>高级答题规则<span>可选</span></summary>
+                        <div className="qt-advanced-body">
+                          <section hidden={Boolean(editingFormItem)} className="qt-form-stage" aria-label="答题阶段设置">
+                            <h3>分段提交</h3>
+                            <p>同一阶段内逐题作答，完成后统一提交。普通题目会自动接在当前连续的表单题后面。</p>
+                            <p role="status">{contextKey ? '背景信息使用专用阶段，不与普通表单题混合。' : startNewFormStage ? '下一题将开始新的答题阶段，完成后单独提交。' : currentFormStage ? `当前阶段：${currentFormStage.title}（${currentFormStage.items.length} 题）。` : '当前没有可继续的表单阶段，下一题会自动新建。'}</p>
+                            {startNewFormStage ? <ProductButton disabled={busy || dirty || !currentFormStage || Boolean(contextKey)} onClick={() => selectNewFormStage(false)}>继续当前阶段</ProductButton>
+                              : <ProductButton disabled={busy || dirty || !currentFormStage || Boolean(contextKey)} onClick={() => selectNewFormStage(true)}>新增答题阶段</ProductButton>}
+                            <p className="qt-form-hint">此选择在添加下一道题时生效，不会移动已有题目，也不会改变逐题显示方式。</p>
+                          </section>
+                          <p className="qt-form-hint">需要条件显示、拒答或互斥选项时，再为本题开启规则。普通题目无需开启。</p>
+                          {formTemplate && backgroundField}
+                          {formRules}
+                        </div>
+                      </details> : formRules}
+                      {typedFormType && <BasicFormConstraints question={{ ...formConstraints, type: typedFormType }} onChange={patch => setFormConstraints(previous => ({ ...previous, ...patch }))} />}
+                      {typedFormType && <StructuredFormConstraints question={{ ...formConstraints, type: typedFormType }} onChange={patch => setFormConstraints(previous => ({ ...previous, ...patch }))} />}
+                      {['matrix', 'matrix_multiple'].includes(formType) && (trainingDesign
+                        ? <FormChoiceEditor key={formType + '-rows'} title="矩阵行" prefix="row" choices={matrixDrafts} onChange={setMatrixDrafts} max={40} portableKeys />
+                        : <label className="block">矩阵行（编码=标签，以逗号分隔）<input value={matrixRows} onChange={e => setMatrixRows(e.target.value)} /></label>)}
+                      {(['single_choice', 'multiple_choice'].includes(formType) || structuredOptionTypes.includes(typedFormType)) && (trainingDesign
+                        ? <FormChoiceEditor key={formType + '-' + contextKey} title="选项" prefix="option" choices={choiceDrafts} onChange={changeChoices} max={30} portableKeys={Boolean(typedFormType)} />
+                        : <label className="block">
+                          选项（值=标签，以逗号分隔）
+                          <input
+                            value={options}
+                            onChange={(e) => setOptions(e.target.value)}
+                          />
+                        </label>
+                      )}
+                      {!formTemplate && backgroundField}
                       {type === 'FORM' && (
                         <label className="block">
                           <input
@@ -1431,14 +1444,11 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
     <PageHeader title={id === 'new' ? '编制表单' : '编辑表单'} description="把常用内容保存为独立表单，之后在组合问卷中整份选用。"
       actions={<><span className="qt-draft-status">{busy ? '正在保存…' : dirty ? '有未保存的修改' : detail ? `已保存 · 修订 ${detail.revision}` : '新建表单'}</span>{draft && <ProductButton variant="primary" disabled={authoringLocked || busy || (id !== 'new' && !dirty)} onClick={() => void save()}><Save size={16}/>{id === 'new' ? '创建草稿' : '保存表单信息'}</ProductButton>}</>}/>
     {feedback}{error && <p role="alert" className="qt-error">{error}</p>}
-    {id !== 'new' && !detail ? <p role="status">正在读取表单…</p> : <fieldset disabled={authoringLocked} className="qt-form-template-workspace">
-      <section className="qt-panel" aria-label="表单信息"><header className="qt-panel-heading"><h2>表单信息</h2><p>名称用于检索，指导语在问卷中展示。</p></header><div className="qt-panel-body">{basicSettings}</div></section>
-      {detail && <section className="qt-panel" aria-label="表单题目"><header className="qt-panel-heading"><h2>题目与区段</h2><p>沿用现有表单题型与规则。添加、移除和排序会即时保存。</p><span className="qt-count">{detail.items?.length || 0} 道题目</span></header><div className="qt-panel-body">
-        {dirty && <p role="status" className="qt-note">请先保存表单信息，再调整题目。</p>}{addContentControls}
-        {units.length > 0 ? <div className="qt-unit-editor">{unitList}<div className="qt-unit-config" aria-label="单元配置">{unitConfiguration}</div></div> : <p className="qt-note">先选择题型，添加第一道题目；支持李克特、矩阵及常用输入题。</p>}
-      </div></section>}
-      <p className="qt-note">表单保存在“工具 → 表单”，无需设置投放。组合问卷选用后获得独立副本，不会随此处后续编辑而改变。</p>
-    </fieldset>}
+    {id !== 'new' && !detail ? <p role="status">正在读取表单…</p> : <FormTemplateWorkspace key={id} isNew={id === 'new'} name={name} dirty={dirty} draft={draft} busy={busy} locked={authoringLocked}
+      sections={units} editingQuestionId={editingFormItem?.id} basicSettings={basicSettings} questionControls={addContentControls}
+      onEdit={editFormItem} onMove={(index, direction) => void move(index, direction)}
+      onRemove={itemId => void action(async () => hydrate(await request('/' + id + '/items/' + itemId + '/remove', { revision: detail.revision })))}
+      onRemoveSection={sectionId => void action(async () => hydrate(await request('/' + id + '/form-sections/' + sectionId + '/remove', { revision: detail.revision })))}/>}
   </ProductPage>
   if (trainingDesign) return (
     <ProductPage width="management" className="hui-questionnaire-products training-form-management qt-editor">
@@ -1464,13 +1474,13 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
               <header className="qt-panel-heading"><small>STEP 01 / 04</small><h2>基本信息</h2><p>先让学员知道，这份测评是什么、如何参与。</p></header>
               <div className="qt-panel-body">{basicSettings}<p className="qt-note">各项测评独立反馈，报告为单项结果合集。当前支持网页作答。</p></div>
             </section>
-            {detail && <section className="qt-panel" hidden={stepIndex !== 1} aria-label="内容与顺序步骤">
-              <header className="qt-panel-heading"><small>STEP 02 / 04</small><h2 id="questionnaire-content" tabIndex={-1}>内容与顺序</h2><p>选择需要的测评内容，按学员实际作答顺序编排。</p><span className="qt-count">{units.length} 个内容单元</span></header>
+            {detail && <section className="qt-panel qt-composition-content" hidden={stepIndex !== 1} aria-label="内容与顺序步骤">
+              <header className="qt-panel-heading"><small>STEP 02 / 04</small><h2 id="questionnaire-content" tabIndex={-1}>编排问卷内容</h2><p>先选择工具并添加，再按学员的作答顺序排列。各测评单独出报告。</p><span className="qt-count">{units.length} 个内容单元</span></header>
               <div className="qt-panel-body">
                 {dirty && <p role="status" className="qt-note">设置尚未保存，请先保存设置再调整内容或发布。</p>}
                 {addContentControls}
-                <div className="qt-section-title"><h3>作答顺序</h3><span>使用上下箭头调整顺序</span></div>
-                {units.length ? <div className="qt-unit-editor">{unitList}<div className="qt-unit-config" aria-label="单元配置">{unitConfiguration}</div></div> : <div className="qt-empty"><Layers size={28} /><h3>这份测评还没有内容</h3><p>先选择上方已发布资源并添加，再调整作答顺序。</p></div>}
+                <div className="qt-section-title qt-content-order-heading"><div className="qt-content-task-heading"><span>03</span><div><h3>作答顺序</h3><p>添加后的内容会出现在这里。</p></div></div><span>使用上下箭头调整顺序</span></div>
+                {units.length ? <div className="qt-unit-editor">{unitList}<div className="qt-unit-config" aria-label="单元配置">{unitConfiguration}</div></div> : <div className="qt-empty"><Layers size={28} /><h3>从第一个内容开始</h3><p>在上方选择类型和工具，点击“添加到测评”。添加成功后会显示在这里。</p></div>}
               </div>
             </section>}
             <section className="qt-panel" hidden={stepIndex !== 2} aria-label="投放设置步骤">
