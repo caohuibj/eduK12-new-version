@@ -155,12 +155,12 @@ export default function TrainingTrainerHome() {
               <h3 id={`trainer-course-${course.id}`} className="training-workspace-card-title"><Link to={`/courses/${encodeURIComponent(course.id)}/detail`} title={course.title}>{course.title}</Link></h3>
             </div>
             <TrainingCardDescription course id={`trainer-course-description-${course.id}`} description={course.description || '管理学员、练习、打卡与课程测评'} />
-            <TrainingCourseCode key={course.id+course.courseCode} compact code={course.courseCode} title={course.title}/>
             <div className="training-trainer-card-footer training-workspace-card-footer">
               <div className="training-trainer-course-details training-workspace-card-meta">
                 {typeof course.studentCount === 'number' && <span>{course.studentCount} 位学员</span>}
                 {date && <time dateTime={course.createdAt}>创建于 {date}</time>}
               </div>
+              <TrainingCourseCode key={course.id+course.courseCode} compact code={course.courseCode} title={course.title}/>
               <div className="training-workspace-card-actions"><Link className="training-workspace-card-primary" to={`/courses/${encodeURIComponent(course.id)}/detail`}>管理课程 <ArrowRight size={16} aria-hidden="true" /></Link></div>
             </div>
           </article>
