@@ -1,4 +1,4 @@
-import { SurveySectionHeader } from './SurveySectionHeader'
+import './survey-sections.css'
 import { surveyAdminLoginUrl } from '../products/origins'
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
@@ -44,11 +44,19 @@ async function api<T>(path:string,method='GET',body?:unknown):Promise<T>{
 }
 const readInvite=()=>new URLSearchParams(window.location.hash.slice(1)).get('token')||''
 const readResearchArea=():ResearchArea=>window.location.pathname==='/workspace/tools'?'tools':window.location.pathname==='/workspace/datasets'?'datasets':'studies'
+const readStudyLocation=()=>{
+  const params=new URLSearchParams(window.location.search),section=params.get('section')
+  return {id:window.location.pathname==='/workspace'?params.get('project'):null,
+    section:(['settings','tools','reports','publish','data'].includes(section||'')?section:'settings') as WorkspaceSection}
+}
 export default function SurveyApp(){
   // Keep the entry stable when activation removes its one-time token from the URL.
   const [initial]=useState<'home'|'feature'|'claim'|'reset'|'login'>(()=>
     window.location.pathname==='/'?'home':window.location.pathname==='/claim'?'claim':window.location.pathname==='/reset-password'?'reset':
       surveyFeatures.some(feature=>feature.path===window.location.pathname)?'feature':'login')
+  const [initialStudy]=useState(readStudyLocation)
+  const studyRestoreEpoch=useRef(0)
+  const cancelStudyRestore=useCallback(()=>{studyRestoreEpoch.current++},[])
   const activeFeature=surveyFeatures.find(feature=>feature.path===window.location.pathname)
   const [screen,setScreen]=useState<'home'|'feature'|'claim'|'reset'|'login'|'mfa'|'work'>(initial)
   const [loading,setLoading]=useState(true),[busy,setBusy]=useState(false),[enrolled,setEnrolled]=useState(true)
@@ -58,6 +66,12 @@ export default function SurveyApp(){
   const [username,setUsername]=useState(''),[password,setPassword]=useState(''),[code,setCode]=useState('')
   const [invite,setInvite]=useState(readInvite),[uri,setUri]=useState(''),[recovery,setRecovery]=useState<string[]>([])
   const [error,setError]=useState(''),[notice,setNotice]=useState('')
+  const [saveNoticeVersion,setSaveNoticeVersion]=useState(0)
+  useEffect(()=>{
+    if(notice!=='研究草稿已保存')return
+    const timer=window.setTimeout(()=>setNotice(current=>current==='研究草稿已保存'?'':current),5000)
+    return ()=>window.clearTimeout(timer)
+  },[notice,saveNoticeVersion])
   const [projects,setProjects]=useState<Project[]>([]),[selected,setSelected]=useState<Project|null>(null)
   const [creating,setCreating]=useState(false)
   const [editorOpen,setEditorOpen]=useState(false)
@@ -119,6 +133,7 @@ export default function SurveyApp(){
     finally{setProjectsLoading(false)}
   },[])
   const refresh=useCallback(async(openWorkspace=false)=>{
+    const restoreEpoch=++studyRestoreEpoch.current
     try{
       const me=await api<Researcher>('/auth/me')
       setUser(me)
@@ -128,12 +143,29 @@ export default function SurveyApp(){
         // its password, but has no permission to list research projects.
         setScreen('work')
         // A project read failure does not invalidate an already verified session.
-        if(!me.mustChangePassword)await loadProjects().catch(()=>{})
+        if(!me.mustChangePassword){
+          await loadProjects().catch(()=>{})
+          if(initialStudy.id){
+            try{
+              const project=await api<Project>('/projects/'+encodeURIComponent(initialStudy.id))
+              if(restoreEpoch!==studyRestoreEpoch.current)return
+              setSelected(project);setTitle(project.title);setDescription(project.description);setMode(project.collectionMode)
+              setWorkspaceSection(initialStudy.section);setEditorOpen(true)
+            }catch(error){
+              if(restoreEpoch!==studyRestoreEpoch.current)return
+              setSelected(null);setEditorOpen(false)
+              setError('无法打开地址中的研究：'+(error instanceof Error?error.message:'请求失败')+'。请从研究列表重新选择。')
+            }
+          }
+        }
       }
     }catch{setUser(null);if(initial==='login')setScreen('login')}
     finally{setLoading(false)}
-  },[initial,loadProjects])
-  useEffect(()=>{document.title=activeFeature?activeFeature.title+' | Huisurvey':'Huisurvey · 观风知微';void refresh()},[refresh,activeFeature])
+  },[initial,initialStudy,loadProjects])
+  useEffect(()=>{
+    document.title=activeFeature?activeFeature.title+' | Huisurvey':'Huisurvey · 观风知微';void refresh()
+    return cancelStudyRestore
+  },[refresh,activeFeature,cancelStudyRestore])
   useEffect(()=>{
     if(initial==='home'||initial==='feature')return
     void loadCapabilities()
@@ -162,12 +194,14 @@ export default function SurveyApp(){
   })
   const changeAccountPassword=(oldPassword:string,newPassword:string,code?:string)=>{if(!mayLeaveWorkspace())return;void work(async()=>{
     await api('/auth/change-password','POST',{oldPassword,newPassword,code})
+    cancelStudyRestore()
     projectCreationRequestId.current=null
     setUser(null);setProjects([]);setSelected(null);setCreating(false);setEditorOpen(false);setTitle('');setDescription('');setMode('SINGLE_UNLINKED');setScreen('login')
     setNotice('密码已修改，旧研究者会话已经失效，请重新登录')
   })}
   const logout=()=>{if(!mayLeaveWorkspace())return;void work(async()=>{
     await api('/auth/logout','POST',{})
+    cancelStudyRestore()
     projectCreationRequestId.current=null
     setUser(null);setProjects([]);setSelected(null);setCreating(false);setEditorOpen(false);setTitle('');setDescription('');setMode('SINGLE_UNLINKED');setScreen('login')
   })}
@@ -196,13 +230,25 @@ export default function SurveyApp(){
   }
   useEffect(()=>{
     const restore=()=>{
-      const area=readResearchArea();setResearchArea(area)
+      const area=readResearchArea()
+      // Same-page hash navigation also emits popstate; keep the editor open.
+      if(area===researchArea)return
+      setResearchArea(area)
       if(area==='studies')setEditorOpen(false)
       focusSection(area==='studies'?'survey-projects-heading':'survey-'+area+'-heading')
     }
     window.addEventListener('popstate',restore)
     return ()=>window.removeEventListener('popstate',restore)
-  },[focusSection])
+  },[focusSection,researchArea])
+  useEffect(()=>{
+    if(loading||screen!=='work'||!user||user.mustChangePassword)return
+    const url=new URL(window.location.href)
+    if(researchArea==='studies')url.pathname='/workspace'
+    if(researchArea==='studies'&&editorOpen&&selectedProjectId){
+      url.searchParams.set('project',selectedProjectId);url.searchParams.set('section',workspaceSection)
+    }else{url.searchParams.delete('project');url.searchParams.delete('section')}
+    if(url.href!==window.location.href)window.history.replaceState(null,'',url.pathname+url.search+url.hash)
+  },[loading,screen,user,researchArea,editorOpen,selectedProjectId,workspaceSection])
   const choose=(p:Project)=>{
     if(selected?.id===p.id){setEditorOpen(true);focusSection('survey-current-project-heading');return}
     if(!mayLeaveWorkspace()){setEditorOpen(true);return}
@@ -227,7 +273,7 @@ export default function SurveyApp(){
     const p=await api<Project>('/projects/'+selected.id,'PATCH',
       {revision:selected.revision,title,description,collectionMode:mode})
     applyProject(p);setProjects(current=>current.map(row=>row.id===p.id?p:row))
-    await loadProjects(projectPage).catch(()=>{});setNotice('研究草稿已保存')
+    await loadProjects(projectPage).catch(()=>{});setNotice('研究草稿已保存');setSaveNoticeVersion(version=>version+1)
   })}
   const toggle=(p:Project)=>void work(async()=>{
     const action=p.status==='ARCHIVED'?'restore':'archive'
@@ -257,7 +303,7 @@ export default function SurveyApp(){
         ?'survey-researcher-main':'max-w-4xl mx-auto px-4 py-8'}>
       {loading&&<p role="status">正在核对研究者会话…</p>}
       {error&&!creating&&<p role="alert" className="p-4 border-l-4 border-red-600 bg-red-50">{error}</p>}
-      {notice&&<p role="status" className="p-4 border-l-4 border-teal-600 bg-teal-50">{notice}</p>}
+      {notice&&notice!=='研究草稿已保存'&&<p role="status" className="p-4 border-l-4 border-teal-600 bg-teal-50">{notice}</p>}
       {!loading&&(screen==='claim'||screen==='reset')&&<section className="survey-entry-panel">
         <a className="survey-back" href="/">返回首页</a>
         <h1>{screen==='claim'?'激活研究者身份':'恢复 Survey 密码'}</h1>
@@ -318,15 +364,25 @@ export default function SurveyApp(){
         id="survey-workspace-settings" role={selected?'tabpanel':undefined}
         aria-labelledby={selected?'survey-workspace-tab-settings':undefined}
         hidden={!!selected&&workspaceSection!=='settings'}>
-        <SurveySectionHeader section="settings" title={selected.status==='DRAFT'?'编辑研究草稿':'研究设置'} goal={selected.status==='DRAFT'?undefined:'查看研究的基本信息与采集方式；当前状态下设置保持只读。'} headingId="survey-project-settings-heading"/>
-        <div className="survey-settings-state" data-status={selected.status}><strong>{{DRAFT:"草稿 · 可编辑",ACTIVE:"采集中",PAUSED:"已暂停",CLOSED:"已结束",ARCHIVED:"已归档"}[selected.status]}</strong><p>{selected.status==='DRAFT'?'完成基本设置后保存，再前往研究工具分区编题或导入。':'当前研究设置只读；可在其他分区查看工具、管理采集或整理数据，具体操作仍受当前状态限制。'}</p></div>
-        <form id="survey-project-basics" tabIndex={-1} onSubmit={save} aria-busy={busy}><fieldset disabled={busy||selected.status!=='DRAFT'} className="min-w-0 border-0 p-0">{field('研究名称',title,setTitle)}
-          <label className="block my-3 text-sm">研究说明<textarea className="input block mt-1 w-full" rows={3} value={description} onChange={e=>setDescription(e.target.value)}/></label>
-          <label id="survey-project-collection" tabIndex={-1} className="block my-3 text-sm">采集方式<select className="input block mt-1 w-full" value={mode} onChange={e=>setMode(e.target.value as Project['collectionMode'])}>
-            <option value="SINGLE_UNLINKED">单次独立匿名</option><option value="LINKED_WAVES">同一研究编号的多波次采集</option>
-          </select></label><p className="text-sm text-slate-600">多波次研究必须在正式采集前告知被试：不同时间点的回答能够按研究编号关联。</p>
-          <div id="survey-project-save" tabIndex={-1} className="survey-settings-save flex flex-wrap gap-3 mt-4"><button className="btn-primary" disabled={busy||selected.status!=='DRAFT'}>保存修改</button></div>
-        </fieldset></form><div className="survey-settings-next"><button type="button" className="btn-secondary" onClick={()=>setWorkspaceSection('tools')}>{selected.status==='DRAFT'?'下一步：编制研究工具 →':'查看研究工具 →'}</button><button type="button" className="survey-settings-new" disabled={busy} onClick={newProject}>新建其他项目</button></div><p className="text-sm text-slate-500 mt-4">创建和保存草稿不会开放招募。请在「发布与采集」检查工具与知情同意，冻结研究定义后再开放。</p>
+        <header className="survey-settings-heading"><div><h2 id="survey-project-settings-heading" tabIndex={-1}>{selected.status==='DRAFT'?'编辑研究草稿':'研究设置'}</h2><p>{selected.status==='DRAFT'?'完善基本信息，保存后继续编制研究工具。':'当前研究设置只读；工具、采集与数据仍按研究状态管理。'}</p></div>
+          <span className="survey-settings-status" data-status={selected.status}>{{DRAFT:'草稿 · 可编辑',ACTIVE:'采集中',PAUSED:'已暂停',CLOSED:'已结束',ARCHIVED:'已归档'}[selected.status]}</span></header>
+        <form id="survey-project-basics" tabIndex={-1} onSubmit={save} aria-busy={busy} className="survey-settings-form">
+          <fieldset disabled={busy||selected.status!=='DRAFT'} className="survey-settings-fields">
+            <div className="survey-settings-basics">{field('研究名称',title,setTitle)}
+              <label>研究说明<textarea className="input" rows={4} value={description} onChange={e=>setDescription(e.target.value)} placeholder="说明研究目的、参与方式或适用范围"/></label></div>
+            <div id="survey-project-collection" tabIndex={-1} className="survey-settings-collection">
+              <label>采集方式<select className="input" value={mode} onChange={e=>setMode(e.target.value as Project['collectionMode'])}>
+                <option value="SINGLE_UNLINKED">单次独立匿名</option><option value="LINKED_WAVES">同一研究编号的多波次采集</option>
+              </select></label>
+              <p>{mode==='SINGLE_UNLINKED'?'每轮独立匿名作答，不关联不同时间点的回答。':'使用同一研究编号关联不同时间点的回答，须在正式采集前向被试明确告知。'}</p>
+            </div>
+          </fieldset>
+          <div id="survey-project-save" tabIndex={-1} className="survey-settings-actions">
+            <div className="survey-settings-save"><button type="submit" className="btn-primary" disabled={busy||selected.status!=='DRAFT'}>保存修改</button>{notice==='研究草稿已保存'&&<p role="status" className="survey-settings-feedback">{notice}</p>}</div>
+            <div className="survey-settings-secondary"><button type="button" className="btn-secondary" onClick={()=>setWorkspaceSection('tools')}>{selected.status==='DRAFT'?'编制研究工具 →':'查看研究工具 →'}</button><button type="button" className="survey-settings-new" disabled={busy} onClick={newProject}>新建其他项目</button></div>
+          </div>
+        </form>
+        <p className="survey-settings-help">保存仅更新草稿，不会开放招募。请在「发布与采集」检查工具与知情同意，冻结后再开放。</p>
       </section>}{selected&&<><div id="survey-workspace-tools" role="tabpanel" aria-labelledby="survey-workspace-tab-tools" hidden={workspaceSection!=='tools'}><SurveyBuilder key={'builder-'+selected.id} projectId={selected.id} projectStatus={selected.status} instrumentLibrary={instrumentLibrary} onLeaveRiskChange={builderRiskChanged}/></div>
         <div id="survey-workspace-reports" role="tabpanel" aria-labelledby="survey-workspace-tab-reports" hidden={workspaceSection!=='reports'}><SurveyReportStudio key={'reports-'+selected.id} projectId={selected.id} projectStatus={selected.status} active={workspaceSection==='reports'} onLeaveRiskChange={reportRiskChanged}/></div>
         <div id="survey-workspace-publish" role="tabpanel" aria-labelledby="survey-workspace-tab-publish" hidden={workspaceSection!=='publish'}><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary} onProjectChanged={projectChanged}/></div>
