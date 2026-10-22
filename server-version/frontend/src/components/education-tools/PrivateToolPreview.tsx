@@ -33,7 +33,7 @@ export function PrivateToolPreview({tool,answers,onAnswer,imageAdapter}:{tool:Pr
       :<ProfessionalFormAnswer question={q} answers={answers} onAnswer={onAnswer} prefix={`private-${tool.id}`}/>}
      <FormChoiceExtras question={q} answers={answers} onChange={onAnswer}/>
     </fieldset>
-    {q.allowRefusal&&<label><input type="checkbox" checked={refused} onChange={event=>onAnswer(q.itemKey,event.target.checked?{_surveyRefusal:true}:null)}/>不愿回答</label>}
+    {q.allowRefusal&&!['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<label><input type="checkbox" checked={refused} onChange={event=>onAnswer(q.itemKey,event.target.checked?{_surveyRefusal:true}:null)}/>不愿回答</label>}
    </fieldset>
   })}
  </section>)}</div>

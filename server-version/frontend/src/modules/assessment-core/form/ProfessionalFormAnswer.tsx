@@ -26,6 +26,10 @@ export function ProfessionalFormAnswer({question:q,answers,onAnswer,prefix}:{
             checked={answers[key]===o.optionKey} disabled={refused(answers[key])}
             onChange={()=>onAnswer(key,o.optionKey)}/>{o.label}
         </label>)}
+        {q.type==='MATRIX'&&q.allowRefusal&&<label className="flex gap-2 items-center text-sm">
+          <input type="checkbox" checked={refused(answers[key])}
+            onChange={event=>onAnswer(key,event.target.checked?{_surveyRefusal:true}:null)}/>
+          不愿回答本行</label>}
       </fieldset>
     })}</div>
   }

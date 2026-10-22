@@ -127,7 +127,13 @@ function PrivateToolSession({api,organizationId,entry,actorId='session',onDraftS
   setPreviewResult(result);setNotice('试填检查完成，未保存被试数据。')
  })}
  const back=()=>{if(!mayLeave())return;setTool(null);setSaved('');setValidation(null);setPreviewing(false);setPreviewResult(null);setVersions([]);setVersionsCursor(null);void refreshList()}
- const editDefinition=(definition:PrivateTool['definition'])=>{if(!locked.current&&tool){setTool({...tool,definition});setPreviewResult(null)}}
+ const editDefinition=(definition:PrivateTool['definition'])=>{if(!locked.current&&tool){
+  if(JSON.stringify(definition)!==JSON.stringify(tool.definition)){
+   setAnswers({});setValidation(null);setPreviewing(false)
+   if(Object.keys(answers).length)setNotice('定义已修改，旧版本试填答案已清除，请保存并重新检查后试填。不会影响正式作答数据。')
+  }
+  setTool({...tool,definition});setPreviewResult(null)
+ }}
  return <section className={`education-private-tools education-private-tools--${entry.toLowerCase()} ${entry==='SCHOOL'?'hs-panel':'ht-panel'}`} aria-label="我的私有工具">
   <header><h2>我的工具</h2><p>心理教师的量表与表单编制空间。草稿和固定版本默认仅作者本人可用，不扩大活动发布或报告读取权限。</p></header>
   <p className="education-private-boundary">支持题目静态图片与报告图片，图片的编辑与上传仅限作者；发布后，仅在对应获授权任务及允许查看的报告中读取固定版本的图片。视频、认知及 SJT 自编暂未开放。固定私有版本不等于发布给被试。</p>
