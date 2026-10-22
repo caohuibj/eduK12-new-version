@@ -3,7 +3,7 @@ import {ArrowDown,ArrowUp,Copy,FileText,List,Plus,Trash2,Pencil} from 'lucide-re
 import {newQuestion,researchKey,type FormDraft,type FormQuestion} from './builder.types'
 import './survey-form-studio.css'
 const labels:Record<FormQuestion['type'],string>={SINGLE:'单选',MULTIPLE:'多选',SHORT_TEXT:'短文本',LONG_TEXT:'长文本',NUMBER:'数值',LIKERT:'Likert',MATRIX:'矩阵',DATE:'日期',TIME:'时间',RANK_ORDER:'排序',SLIDER:'滑块',CONSTANT_SUM:'恒定总和',MATRIX_MULTIPLE:'矩阵多选'}
-type Props={value:FormDraft;onCommit:(next:FormDraft)=>Promise<boolean>;onDraftRiskChange?:(dirty:boolean)=>void;disabled?:boolean;renderQuestion:(value:FormDraft,onChange:(next:FormDraft)=>void,key:string)=>ReactNode}
+type Props={value:FormDraft;onCommit:(next:FormDraft)=>Promise<boolean>;onDraftRiskChange?:(dirty:boolean)=>void;disabled?:boolean;renderQuestion:(value:FormDraft,onChange:(next:FormDraft)=>void,key:string,pageControl:ReactNode)=>ReactNode}
 export function SurveyFormStudio({value,onCommit,onDraftRiskChange,disabled=false,renderQuestion}:Props){
   const [pageKey,setPageKey]=useState<string|null>(null),[editing,setEditing]=useState<string|null>(null),[question,setQuestion]=useState(()=>newQuestion('SINGLE'))
   const [renaming,setRenaming]=useState<{pageKey:string;title:string}|null>(null)
@@ -34,6 +34,7 @@ export function SurveyFormStudio({value,onCommit,onDraftRiskChange,disabled=fals
   const workingPage=page??{pageKey:'new_page',title:'第 1 页',questions:[]}
   const working={...value,pages:page?value.pages.map(p=>p===page?{...p,questions:editing||p.questions.some(q=>q.itemKey===question.itemKey)?p.questions.map(q=>q.itemKey===(editing??question.itemKey)?question:q):[...p.questions,question]}:p):[{...workingPage,questions:[question]}]}
   const visibleFields=value.pages.flatMap(p=>p.questions).reduce((n,q)=>n+(['MATRIX','MATRIX_MULTIPLE'].includes(q.type)?q.rows.length:1)+(q.otherOptionKey?1:0),0)
+  const pageControl=<label className="survey-form-target-page">所属分页<select className="input" disabled={!!editing||changed} value={page?.pageKey??''} onChange={event=>setPageKey(event.target.value)}>{value.pages.length?value.pages.map(p=><option key={p.pageKey} value={p.pageKey}>{p.title}</option>):<option value="">第 1 页（添加题目时创建）</option>}</select></label>
   return <section className="survey-form-studio" aria-label="表单编制工作区">
     <header className="survey-form-content-heading"><h2>题目编辑 <span>{count} 道题目</span></h2><span className="survey-form-save-note">操作成功后即保存</span></header>
     {disabled&&<p className="survey-library-notice" role="status">表单信息尚未保存，请先保存表单信息，再编辑题目。</p>}
@@ -48,9 +49,9 @@ export function SurveyFormStudio({value,onCommit,onDraftRiskChange,disabled=fals
         <p className="survey-form-directory-help">{risk?'保存或取消当前修改后，可选择其他题目。':'点击题目即可编辑；分页和题目顺序可用箭头调整。'}</p>
         <button type="button" className="survey-form-add-page" disabled={blocked||risk} onClick={()=>{const p={pageKey:researchKey('p'),title:'第 '+(value.pages.length+1)+' 页',questions:[]};void commit({...value,pages:[...value.pages,p]}).then(ok=>{if(ok)setPageKey(p.pageKey)})}}><Plus size={15}/>新增分页</button>
       </aside>
-      <section className="survey-form-current-editor" aria-label={editing?'当前题目编辑区':'新题目编辑区'}><header><span>{editing?<Pencil size={20}/>:<Plus size={20}/>}</span><div><h3>{editing?'编辑题目':'添加新题'}</h3><p>{editing?'修改后点击“保存题目修改”；取消编辑会放弃本次修改。':'填写题目文字，选择题型，最后点击“添加题目”。'}</p></div></header>
-        <fieldset disabled={blocked||!!renaming}><legend className="sr-only">{editing?'编辑题目':'添加新题'}</legend><label className="survey-form-target-page">所属分页<select className="input" disabled={!!editing||changed} value={page?.pageKey??''} onChange={event=>setPageKey(event.target.value)}>{value.pages.length?value.pages.map(p=><option key={p.pageKey} value={p.pageKey}>{p.title}</option>):<option value="">第 1 页（添加题目时创建）</option>}</select></label>
-          {renderQuestion(working,next=>{const updated=next.pages.flatMap(p=>p.questions).find(q=>q.itemKey===question.itemKey);if(updated){editGeneration.current++;setQuestion(updated);setChanged(true)}},question.itemKey)}
+      <section className="survey-form-current-editor" aria-label={editing?'当前题目编辑区':'新题目编辑区'}><header><span>{editing?<Pencil size={20}/>:<Plus size={20}/>}</span><div><h3>{editing?'编辑题目':'添加新题'}</h3></div><details className="survey-form-compose-help"><summary>操作说明</summary><p>{editing?'修改后点击“保存题目修改”；取消编辑会放弃本次修改。':'选择题型，填写题干和选项，再点击“添加题目”。'}</p></details></header>
+        <fieldset disabled={blocked||!!renaming}><legend className="sr-only">{editing?'编辑题目':'添加新题'}</legend>
+          {renderQuestion(working,next=>{const updated=next.pages.flatMap(p=>p.questions).find(q=>q.itemKey===question.itemKey);if(updated){editGeneration.current++;setQuestion(updated);setChanged(true)}},question.itemKey,pageControl)}
           <div className="survey-form-commit-actions"><button type="button" className="btn-primary" disabled={!question.prompt.trim()||editing!==null&&!changed} onClick={()=>void submit()}>{busy?'正在保存…':editing?'保存题目修改':'添加题目'}</button>{risk&&<button type="button" className="btn-secondary" onClick={reset}>{editing?'取消编辑':'清空新题'}</button>}</div>
         </fieldset>
         <p className="survey-form-field-budget">已保存作答字段 {visibleFields}/500 · 矩阵每行和其他填写各计 1 个字段</p>

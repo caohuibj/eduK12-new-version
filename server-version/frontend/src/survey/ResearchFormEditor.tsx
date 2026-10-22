@@ -13,12 +13,12 @@ const types:Record<FormQuestion['type'],string>={
   CONSTANT_SUM:'恒定总和',MATRIX_MULTIPLE:'矩阵多选',
 }
 function FormSettings({compact,title,children}:{compact:boolean;title:string;children:ReactNode}){return compact?<details className="survey-form-question-settings"><summary>{title}</summary>{children}</details>:<>{children}</>}
-type FieldsProps={value:FormDraft;onChange:(next:FormDraft)=>void;projectId?:string;questionKey?:string}
+type FieldsProps={value:FormDraft;onChange:(next:FormDraft)=>void;projectId?:string;questionKey?:string;questionMeta?:ReactNode}
 type Props=FieldsProps&({appearance:'studio';onCommit:(next:FormDraft)=>Promise<boolean>;onDraftRiskChange?:(dirty:boolean)=>void;disabled?:boolean}|{appearance?:'standard'})
 export function ResearchFormEditor(props:Props){
-  return props.appearance==='studio'?<SurveyFormStudio value={props.value} onCommit={props.onCommit} onDraftRiskChange={props.onDraftRiskChange} disabled={props.disabled} renderQuestion={(value,onChange,key)=><FormFields value={value} onChange={onChange} projectId={props.projectId} questionKey={key}/>}/>:<FormFields {...props}/>
+  return props.appearance==='studio'?<SurveyFormStudio value={props.value} onCommit={props.onCommit} onDraftRiskChange={props.onDraftRiskChange} disabled={props.disabled} renderQuestion={(value,onChange,key,pageControl)=><FormFields value={value} onChange={onChange} projectId={props.projectId} questionKey={key} questionMeta={pageControl}/>}/>:<FormFields {...props}/>
 }
-function FormFields({value,onChange,projectId,questionKey}:FieldsProps){
+function FormFields({value,onChange,projectId,questionKey,questionMeta}:FieldsProps){
   const setPage=(index:number,update:(p:FormDraft['pages'][number])=>FormDraft['pages'][number])=>{
     const pages=value.pages.map((p,i)=>i===index?update(p):p)
     onChange({...value,pages})
@@ -57,17 +57,28 @@ function FormFields({value,onChange,projectId,questionKey}:FieldsProps){
         const previous=[...value.pages.slice(0,pi).flatMap(p=>p.questions),...page.questions.slice(0,qi)]
           .filter(q=>['SINGLE','MULTIPLE','LIKERT'].includes(q.type))
         if(questionKey&&q.itemKey!==questionKey)return null
-        return <article key={q.itemKey} id={'survey-form-'+q.itemKey} tabIndex={-1}
-          className={questionKey?'survey-form-question space-y-4':'border rounded-lg p-3 bg-slate-50 space-y-3 scroll-mt-4'}>
-          <div className="flex flex-wrap gap-2 items-center">
-            <strong className="text-sm">{questionKey?'题型':'题目 '+(qi+1)}</strong>
-            <select className="input" aria-label="选择题型" value={q.type} onChange={e=>{
+        const typeControl=<select className="input" aria-label="选择题型" value={q.type} onChange={e=>{
               const type=e.target.value as FormQuestion['type']
               const fresh=newQuestion(type)
               setQuestion(pi,qi,old=>({...fresh,itemKey:old.itemKey,prompt:old.prompt,required:old.required,allowRefusal:old.allowRefusal}))
             }}>{Object.entries(types).filter(([kind])=>value.schemaVersion===2||
               !professionalTypes.has(kind as FormQuestion['type']))
               .map(([kind,name])=><option key={kind} value={kind}>{name}</option>)}</select>
+        const mediaFields=<FormSettings compact={!!questionKey} title="题目配图">
+          {projectId ? <SurveyImageField projectId={projectId} image={q.image}
+            onChange={image=>setQuestion(pi,qi,x=>({...x,image}))}/>
+            : q.image ? <p className="text-sm" role="status">
+              此图片来自研究项目，Huiteacher 暂不复用研究者媒体权限。
+              <button type="button" className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,image:undefined}))}>
+                移除图片
+              </button></p> : null}
+          </FormSettings>
+        return <article key={q.itemKey} id={'survey-form-'+q.itemKey} tabIndex={-1}
+          className={questionKey?'survey-form-question space-y-4':'border rounded-lg p-3 bg-slate-50 space-y-3 scroll-mt-4'}>
+          <div className={questionKey?'survey-form-question-meta':'flex flex-wrap gap-2 items-center'}>
+            {questionKey?questionMeta:<strong className="text-sm">题目 {qi+1}</strong>}
+            {questionKey?<label className="survey-form-type-control">题型{typeControl}</label>:typeControl}
+
             <button hidden={!!questionKey} type="button" className="btn-secondary" disabled={qi===0} onClick={()=>move(pi,qi,-1)}>上移</button>
             <button hidden={!!questionKey} type="button" className="btn-secondary" disabled={qi===page.questions.length-1} onClick={()=>move(pi,qi,1)}>下移</button>
             <button hidden={!!questionKey} type="button" className="btn-secondary" onClick={()=>{
@@ -82,41 +93,34 @@ function FormFields({value,onChange,projectId,questionKey}:FieldsProps){
             }}>复制</button>
             <button hidden={!!questionKey} type="button" className="btn-secondary" onClick={()=>setPage(pi,p=>({...p,questions:p.questions.filter((_,i)=>i!==qi)}))}>删除</button>
           </div>
-          <label className="block text-sm">题干
-            <textarea className="input w-full block" rows={2} value={q.prompt}
+          <label className={questionKey?'survey-form-prompt':'block text-sm'}>题干
+            <textarea className="input w-full block" rows={questionKey?3:2} placeholder={questionKey?'请输入题目内容':undefined} value={q.prompt}
               onChange={e=>setQuestion(pi,qi,x=>({...x,prompt:e.target.value}))}/>
           </label>
-          <div className="flex gap-4 flex-wrap">
+          <div className={questionKey?'survey-form-question-switches':'flex gap-4 flex-wrap'}>
             <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={q.required}
               onChange={e=>setQuestion(pi,qi,x=>({...x,required:e.target.checked}))}/>必答</label>
             <label className="inline-flex items-center gap-2 text-sm">
               <input type="checkbox" checked={q.allowRefusal===true}
                 onChange={e=>setQuestion(pi,qi,x=>({...x,allowRefusal:e.target.checked}))}/>
-              允许明确选择「不愿回答」（单独记为 REFUSED）
+              {questionKey?'允许选择“不愿回答”':'允许明确选择「不愿回答」（单独记为 REFUSED）'}
             </label>
           </div>
-          <FormSettings compact={!!questionKey} title="题目配图">
-          {projectId ? <SurveyImageField projectId={projectId} image={q.image}
-            onChange={image=>setQuestion(pi,qi,x=>({...x,image}))}/>
-            : q.image ? <p className="text-sm" role="status">
-              此图片来自研究项目，Huiteacher 暂不复用研究者媒体权限。
-              <button type="button" className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,image:undefined}))}>
-                移除图片
-              </button></p> : null}
-          </FormSettings>
-          {choiceTypes.has(q.type)&&<div className="space-y-2">
+          {!questionKey&&mediaFields}
+          {choiceTypes.has(q.type)&&<div className={questionKey?'survey-form-options space-y-2':'space-y-2'}>
             <p className="text-sm font-medium">选项</p>
-            {q.options.map((o,oi)=><div className="flex gap-2" key={o.optionKey}>
+            {q.options.map((o,oi)=><div className={questionKey?'survey-form-option-row':'flex gap-2'} key={o.optionKey}>{questionKey&&<span className="survey-form-option-number">{oi+1}</span>}
               <input className="input flex-1" aria-label={'选项 '+(oi+1)} value={o.label}
                 onChange={e=>setQuestion(pi,qi,x=>({...x,options:x.options.map(a=>a.optionKey===o.optionKey?{...a,label:e.target.value}:a)}))}/>
-              <button className="btn-secondary" type="button" onClick={()=>setQuestion(pi,qi,x=>({...x,
+              <button className="btn-secondary" aria-label={questionKey?'删除选项 '+(oi+1):undefined} type="button" onClick={()=>setQuestion(pi,qi,x=>({...x,
                 options:x.options.filter(a=>a.optionKey!==o.optionKey),
                 otherOptionKey:x.otherOptionKey===o.optionKey?undefined:x.otherOptionKey,
                 otherMaxLength:x.otherOptionKey===o.optionKey?undefined:x.otherMaxLength,
-                exclusiveOptionKeys:x.exclusiveOptionKeys?.filter(key=>key!==o.optionKey)}))}>删除</button>
+                exclusiveOptionKeys:x.exclusiveOptionKeys?.filter(key=>key!==o.optionKey)}))}>{questionKey?'×':'删除'}</button>
             </div>)}
             <button type="button" className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,options:[...x.options,newOption()]}))}>增加选项</button>
           </div>}
+          {questionKey&&mediaFields}
           {(!questionKey||value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type))&&<FormSettings compact={!!questionKey} title="其他填写与互斥选项">
           {value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type)&&
             <div className="border rounded-lg p-3 space-y-3">

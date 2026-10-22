@@ -52,15 +52,15 @@ describe('independent Survey toolkit and study selection',()=>{
   expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   if(kind==='FORM'){expect(screen.queryByText(/旧版兼容表单/)).not.toBeInTheDocument();expect(screen.getByRole('combobox',{name:'选择题型'}).querySelectorAll('option')).toHaveLength(13)}
  })
- it('keeps new form information open while renaming, then saves without blocking question editing',async()=>{
+ it('opens form naming only on request and closes it after saving without blocking questions',async()=>{
   render(<SurveyToolLibrary/>);fireEvent.click(await screen.findByRole('button',{name:'编制工具'}));fireEvent.click(screen.getByRole('button',{name:/^表单\s+编写/}));await screen.findByRole('heading',{name:'未命名表单'})
-  const toggle=screen.getByRole('button',{name:'编辑名称'});expect(toggle).toHaveAttribute('aria-expanded','true')
+  const toggle=screen.getByRole('button',{name:'编辑名称'});expect(toggle).toHaveAttribute('aria-expanded','false');expect(screen.getByLabelText('工具名称')).not.toBeVisible();fireEvent.click(toggle)
   fireEvent.change(screen.getByLabelText('工具名称'),{target:{value:'课堂反馈'}})
   expect(toggle).toHaveAttribute('aria-expanded','true');expect(screen.getByRole('button',{name:'保存表单信息'})).toBeVisible()
   expect(screen.getByRole('textbox',{name:'题干'})).toBeDisabled()
   fireEvent.click(screen.getByRole('button',{name:'保存表单信息'}))
   await waitFor(()=>expect(screen.getByRole('textbox',{name:'题干'})).toBeEnabled())
-  expect(screen.getByLabelText('工具名称')).toHaveValue('课堂反馈')
+  expect(screen.getByLabelText('工具名称')).toHaveValue('课堂反馈');expect(toggle).toHaveAttribute('aria-expanded','false');expect(screen.getByLabelText('工具名称')).not.toBeVisible()
  })
  it('retries an unconfirmed direct creation with the same identity and blocks other kinds',async()=>{
   const original=vi.mocked(fetch).getMockImplementation()!;let fail=true
