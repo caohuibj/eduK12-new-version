@@ -1,3 +1,4 @@
+import { lockAuthenticatedAdmission } from './authenticated-admission-lock'
 import {publicTrainingFormDefinition} from '../assessment-runtime/typed-form'
 import {assertTrainingMaterialsUsable,trainingFormMaterials,inspectTrainingMaterials} from '../assessment-media/training-materials'
 import { assertScalePublicationRights } from '../scale/scale-publication-guard'
@@ -2709,8 +2710,10 @@ const createAttempt = async (
     await readPrivateFormExecutionSource(db as Prisma.TransactionClient,{assignmentRef:relationalIdentity.assignmentRef,compositeId:composite.id,actorUserId:userId})
   }
   if (['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
-    // Serialize new admission against archive; never trust the pre-lock read.
-    await db.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR UPDATE', composite.id)
+    // A shared publication lock still fences archive, while independent
+    // authenticated admissions keep their own participant lock. Other entry
+    // paths retain their outer exclusive publication/token locks.
+    await db.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR SHARE', composite.id)
     const current = await db.compositeAssessment.findUnique({ where: { id: composite.id },
       select: { status: true, publicEnabled: true, opensAt: true, expiresAt: true,
         trainingPersistencePolicy: true, trainingPersistencePolicyHash: true,
@@ -3077,9 +3080,11 @@ export const startUserAttempt = async (userId: string, compositeId: string) => {
   for (let retry = 0; retry < 2; retry += 1) {
     try {
       const attempt = await prisma.$transaction(async (tx: Db) => {
-        // 所有登录学生的开始流程先锁住模板行，串行化“查询进行中记录/统计次数/创建记录”。
-        // 复合唯一索引作为第二道防线，避免未来新增入口绕过该锁时产生相同序号。
-        await tx.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${compositeId} FOR UPDATE`
+        if (composite.productKind === 'QUESTIONNAIRE' && composite.deliveryMode !== 'LEGACY') {
+          await lockAuthenticatedAdmission(tx, compositeId, userId)
+        } else {
+          await tx.$queryRaw`SELECT "id" FROM "composite_assessments" WHERE "id" = ${compositeId} FOR UPDATE`
+        }
         const existing = await tx.compositeAssessmentAttempt.findFirst({
           where: { compositeAssessmentId: compositeId, userId, status: 'IN_PROGRESS' },
           orderBy: { startedAt: 'desc' },

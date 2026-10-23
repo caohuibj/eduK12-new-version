@@ -26,7 +26,7 @@ describe('Training persistence publication/admission source contracts (not HTTP 
   })
 
   it('resolves policy/course under parent lock before optional flow and variant branches', () => {
-    const lock = admission.indexOf('FOR UPDATE')
+    const lock = admission.indexOf('FOR SHARE')
     const policyRead = admission.indexOf('readTrainingPersistencePolicy(current.trainingPersistencePolicy)')
     const course = admission.indexOf('const courseId = userId ? composite.deliveryCourseId')
     expect(lock).toBeGreaterThan(0)

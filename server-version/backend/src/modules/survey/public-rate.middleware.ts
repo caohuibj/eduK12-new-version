@@ -103,19 +103,22 @@ export function createSurveyPublicRateLimiter(options:{
     const scope=surveyGroupRateScope(req)
     if(!scope){await standard(req,res,next);return}
     let timer:ReturnType<typeof setTimeout>|undefined
+    let eligible=false
     try{
-      const eligible=await Promise.race([gate.run(()=>lookup(scope)),new Promise<never>((_,reject)=>{
+      eligible=await Promise.race([gate.run(()=>lookup(scope)),new Promise<never>((_,reject)=>{
         timer=setTimeout(()=>reject(new Error('Survey policy response deadline')),options.responseTimeoutMs??2000)
         timer.unref?.()
       })])
-      if(res.headersSent||res.writableEnded||res.destroyed)return
-      if(eligible){next();return}
-      await standard(req,res,next)
     }catch{
-      if(!res.headersSent&&!res.writableEnded&&!res.destroyed){
-        res.setHeader('Retry-After','1')
-        res.status(503).json({code:-1,message:'研究入口繁忙，请稍后重试'})
-      }
+      // Eligibility is only permission to bypass the ordinary shared IP bucket.
+      // An unavailable/overloaded lookup grants no exemption. Keep live SQL
+      // slots bounded and apply the stricter Redis limit rather than rejecting
+      // otherwise valid ordinary participants before their handler can run.
+      eligible=false
     }finally{if(timer)clearTimeout(timer)}
+    if(res.headersSent||res.writableEnded||res.destroyed)return
+    if(eligible){next();return}
+    // Exactly one ordinary budget decision; Redis failure still fails closed.
+    await standard(req,res,next)
   }
 }
