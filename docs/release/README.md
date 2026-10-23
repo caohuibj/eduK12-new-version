@@ -1032,3 +1032,9 @@ merge tree 不符直接拒绝；已知分支缺 marker 不回退 platform/manual
 保留首次 CI run `39938370582` 的 scope 失败：浅 checkout 未包含精确 PR source
 对象，尚未执行应用/接纳/lint/SAST。仅补精确只读 source fetch 和本路线 SAST
 选择条件，后续仍核 source/merge tree 一致，不回退重型检查或省略断言。
+
+第二轮 `39938691131` 保留 24 个通过控制及 1 个 main 场景夹具失败。修正仅
+修改该测试的环境赋值；接纳其中 21 个输入未变的官方通过断言，重新核 run/job/
+source、原日志 SHA256、逐 case 通过行及依赖源码相同；原 job 仍标 failure。
+CI 只执行失败项和证据哈希输入变化涉及的 3 项，共 4 项；不以原失败 job 授予
+整作业资格。新作业仍要求当前证据接纳、官方部分接纳、四项复验及 lint 真成功。

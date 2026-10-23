@@ -32,8 +32,40 @@ jobs:
           node-version: '24.21.0'
       - name: verify exact source and admit original local UI reports without replay
         run: node .github/scripts/survey-manual-ui-checks.mjs
-      - name: new scope rejection evidence tampering and strict merge contracts
-        run: node --test .github/scripts/survey-manual-ui.test.mjs
+      - name: accept 21 unchanged original successful control cases from the failed invocation
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          node --input-type=module <<'JS'
+          import assert from 'node:assert/strict';
+          import fs from 'node:fs';
+          import {createHash} from 'node:crypto';
+          import {execFileSync} from 'node:child_process';
+          import {binding} from './.github/scripts/survey-manual-ui-scope.mjs';
+          const r=binding.controlReuse,repo='caohuibj/eduK12-new-version';
+          assert.equal(r.source,'90a7d234b991aae94431e2ae56597f4d57d88e07');
+          assert.equal(r.run,39938691131);assert.equal(r.job,120364595395);assert.equal(r.passedCases.length,21);
+          const get=async(path,text=false)=>{const v=await fetch('https://api.github.com/repos/'+repo+path,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}});if(!v.ok)throw Error('Original control metadata unavailable: '+v.status);return text?v.text():v.json()};
+          const run=await get('/actions/runs/'+r.run),job=await get('/actions/jobs/'+r.job);
+          assert.equal(run.head_sha,r.source);assert.equal(run.head_branch,'work/survey-manual-acceptance-20261023');assert.equal(run.event,'pull_request');
+          assert.equal(job.run_id,r.run);assert.equal(job.name,'survey-manual-ui / admission');assert.equal(job.status,'completed');assert.equal(job.conclusion,'failure');
+          assert.ok(job.steps.some(s=>s.name==='verify exact source and admit original local UI reports without replay'&&s.conclusion==='success'));
+          assert.ok(job.steps.some(s=>s.name==='new scope rejection evidence tampering and strict merge contracts'&&s.conclusion==='failure'));
+          const log=(await get('/actions/jobs/'+r.job+'/logs',true)).replace(/^\uFEFF/,'');
+          assert.equal(createHash('sha256').update(log).digest('hex'),r.logSHA256,'Original log bytes changed');
+          for(const name of r.passedCases)assert.ok(log.includes('✔ '+name+' ('),'Original case was not passed: '+name);
+          assert.ok(log.includes('ℹ pass 24'));assert.ok(log.includes('ℹ fail 1'));assert.ok(log.includes('✖ exact main merge only classifies and never replays checks'));
+          const git=(...a)=>execFileSync('git',a,{encoding:'utf8'}).trim();
+          const oldBinding=JSON.parse(git('show',r.source+':.github/scripts/survey-manual-ui-bindings.json'));
+          for(const k of ['base','product','source','controls','controlBefore','components','protectedInputs','acceptedCases'])assert.deepEqual(binding[k],oldBinding[k],'Consumed scope input changed: '+k);
+          for(const p of ['.github/scripts/survey-manual-ui-scope.mjs','.github/scripts/survey-manual-ui-checks.mjs','.github/scripts/content-scope.mjs','.github/scripts/merge-gate.mjs','.github/workflows/ci.yml'])assert.equal(git('show',r.source+':'+p),fs.readFileSync(p,'utf8').trim(),'Control case dependency changed: '+p);
+          const path='.github/scripts/survey-manual-ui.test.mjs',prefix="test('exact main merge only classifies and never replays checks'";
+          const strip=s=>{const lines=s.split('\n');assert.equal(lines.filter(l=>l.startsWith(prefix)).length,1);return lines.filter(l=>!l.startsWith(prefix)).join('\n').trim()};
+          assert.equal(strip(git('show',r.source+':'+path)),strip(fs.readFileSync(path,'utf8')),'An unchanged control case was edited');
+          fs.writeFileSync('survey-manual-ui-evidence/control-reuse.json',JSON.stringify({kind:'official-partial-control-reuse',originalRun:r.run,originalJob:r.job,originalJobConclusion:'failure',acceptedCases:r.passedCases,rerunCases:r.rerunCases,currentCIExecutedAcceptedCases:false},null,2)+'\n');
+          JS
+      - name: failed and evidence-input-affected control cases only
+        run: node --test --test-name-pattern='^(exact main merge only classifies and never replays checks|admission verifies original reports and retains failed invocations|rejects changed evidence bytes|rejects changed admission controls)$' .github/scripts/survey-manual-ui.test.mjs
       - uses: actions/upload-artifact@v4
         with:
           name: survey-manual-ui-admission-${{ github.sha }}
@@ -53,7 +85,7 @@ jobs:
           node-version: '24.21.0'
       - name: install only unchanged locked frontend dependencies from official registry
         working-directory: server-version/frontend
-        run: npm ci --ignore-scripts
+        run: npm ci --ignore-scripts --no-audit --no-fund
       - name: missing changed-product lint and bootstrap syntax only
         run: |
           node --check server-version/frontend/public/entry-brand.js

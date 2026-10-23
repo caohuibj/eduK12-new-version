@@ -38,7 +38,7 @@ for(const [name,change]of [
  ['forced full platform',f=>{f.env.CI_FORCE_FULL='true'}],
 ])test('refuses '+name,()=>{const f=fixture();change(f);assert.throws(()=>f.plan())});
 test('refuses changed frozen main',()=>{const f=fixture();assert.throws(()=>surveyManualUIPlan(f.entries,'c'.repeat(40),f.head,f.read,f.env))});
-test('exact main merge only classifies and never replays checks',()=>{const f=fixture();f.env={CI_EVENT:'push',GITHUB_REF_NAME:'main'};const p=f.plan();assert.equal(p.postMerge,true);assert.equal(surveyManualUIOutputs(p).codeql,false)});
+test('exact main merge only classifies and never replays checks',()=>{const f=fixture();Object.assign(f.env,{CI_EVENT:'push',CI_HEAD_REF:'main',GITHUB_REF_NAME:'main'});const p=f.plan();assert.equal(p.postMerge,true);assert.equal(surveyManualUIOutputs(p).codeql,false)});
 test('only main may use push classification',()=>{const f=fixture();f.env.CI_EVENT='push';f.env.GITHUB_REF_NAME=branch;assert.throws(()=>f.plan())});
 test('admission verifies original reports and retains failed invocations',()=>{const r=verifyReviewedEvidence();assert.ok(r.acceptedUniqueCases>=80);assert.equal(r.ciExecuted,false);assert.equal(r.originalExecutionSigned,false);assert.equal(r.originalFailuresRetained,true)});
 test('rejects changed evidence bytes',()=>{assert.throws(()=>verifyReviewedEvidence(file=>file.endsWith('reviewed-local.json')?Buffer.from('{}'):readFileSync(file)))});

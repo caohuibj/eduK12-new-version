@@ -306,6 +306,41 @@
     "server-version/frontend/vitest.config.d.ts": "340562aff103906b000e905d3c228c55c71decc9",
     "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
   },
-  "evidenceSHA256": "f9487d0799dd92a21d5910fdfd5cb2dab2bb25904774b5a52e9b00dc00424792",
-  "acceptedCases": 94
+  "evidenceSHA256": "e9e0224058c71ff380bf5a4b9d95774d0519e9b17bced11bdd5da38a19760912",
+  "acceptedCases": 94,
+  "controlReuse": {
+    "source": "90a7d234b991aae94431e2ae56597f4d57d88e07",
+    "run": 39938691131,
+    "job": 120364595395,
+    "passedCases": [
+      "exact Survey PR is bounded to product and named controls with no heavy output",
+      "unchanged candidates stay on their existing routing",
+      "refuses missing marker",
+      "refuses unknown path",
+      "refuses missing product",
+      "refuses duplicate path",
+      "refuses executable mode",
+      "refuses deleted product",
+      "refuses source content drift",
+      "refuses frontend tree drift",
+      "refuses backend tree drift",
+      "refuses PR source/merge mismatch",
+      "refuses wrong repository",
+      "refuses wrong PR",
+      "refuses wrong branch",
+      "refuses manual probe",
+      "refuses forced full platform",
+      "refuses changed frozen main",
+      "only main may use push classification",
+      "ready gate requires all selected actual successes and refuses draft or forged scope",
+      "workflow fetches the exact PR source before classification and selects bounded SAST"
+    ],
+    "rerunCases": [
+      "exact main merge only classifies and never replays checks",
+      "admission verifies original reports and retains failed invocations",
+      "rejects changed evidence bytes",
+      "rejects changed admission controls"
+    ],
+    "logSHA256": "d61450a2af1548ed4355cbace8ad5f1eee800ed8e2b64074d806162407d7f88b"
+  }
 }

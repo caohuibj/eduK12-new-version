@@ -649,11 +649,11 @@
   "controlSHA256": {
     ".github/scripts/survey-manual-ui-scope.mjs": "a9477cf9b9f4894175e2e5cd811988af24c5ef42e5f5ad641662854dbeee9c68",
     ".github/scripts/survey-manual-ui-checks.mjs": "d5a8bac5f7f0a30f45733696a7f726d7ed602393d504b31cdae154b5d779ddd0",
-    ".github/scripts/survey-manual-ui.test.mjs": "4805561092c7787c74619777d41c1ed7c9f8556e699233c91d022c7a31cc6980",
+    ".github/scripts/survey-manual-ui.test.mjs": "3c1a14c178af91d02d5b40f510cb7d498c51e9b058aae6131ce76d916b425851",
     ".github/scripts/content-scope.mjs": "ce8ecab43bc90f2c5047aaf819ceccf38361defcf7c2429002ee1624ffd6502e",
     ".github/scripts/merge-gate.mjs": "138e8f81c6d4d481516a122fa7c502a1907d840044ddeafc71e32bd09d8b1280",
-    ".github/workflows/ci-survey-manual-ui.yml": "a95552036be861c1d1ce1811c8755d8de30265437d2a4971b6c23046f6b97138",
+    ".github/workflows/ci-survey-manual-ui.yml": "79ea508c71c17e496b29b1ce8ec01133cfaa2c684fbf688b7e7e13fbca7b000a",
     ".github/workflows/ci.yml": "65e5113c2577f167171c2a8d932e52718d67bdf2c9fe1e2a9a8113d2e24044fb",
-    "docs/release/README.md": "272c1ed3124edcee6b7c5dcbd037b85d3dd05181ac74a7f9ef072d0f2a1a4fc3"
+    "docs/release/README.md": "522ab1fe357c37e42c6d9ab653e572a2f9703a3c7f15ebce9fc49b1ca8ea0d9e"
   }
 }
