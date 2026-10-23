@@ -1,3 +1,6 @@
+import { simonSequence } from '../../modules/cognitive/tasks/simon/sequence'
+import { SURVEY_SIMON_TEMPLATE } from '../../modules/survey/cognitive.protocols'
+import { cognitiveTrialRows } from '../../modules/survey/analytics.cognitive'
 import { randomBytes,randomUUID } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
 import { beforeAll,afterAll,describe,expect,it,vi } from 'vitest'
@@ -48,12 +51,12 @@ suite('Survey cognitive PostgreSQL authority, immutability and serialized lifecy
     process.env.SURVEY_PUBLICATION_ENABLED=priorFlags.publication
     await db?.$disconnect()
   })
-  async function fixture(options:{linked?:boolean;conditional?:boolean;consentVersion?:number}={}):Promise<Fixture>{
+  async function fixture(options:{linked?:boolean;conditional?:boolean;consentVersion?:number;simon?:boolean}={}):Promise<Fixture>{
     const projectId=randomUUID(),waveId=randomUUID(),publicationId=randomUUID(),publicId=randomUUID(),attemptId=randomUUID()
     const units=[compileFrozenResearchUnit({id:randomUUID(),instrumentKey:'screen',title:'Eligibility',revision:1,kind:'FORM',
       definition:{schemaVersion:1,pages:[{pageKey:'p',title:'Eligibility',questions:[{itemKey:'eligible',type:'SINGLE',
         prompt:'Continue?',required:true,options:[{optionKey:'yes',label:'Yes'},{optionKey:'no',label:'No'}],rows:[]}]}]}}),
-      compileFrozenResearchUnit({id:randomUUID(),instrumentKey:'go',title:'Go/No-Go',revision:1,kind:'COGNITIVE',definition:initialCognitiveDefinition()})]
+      compileFrozenResearchUnit({id:randomUUID(),instrumentKey:'go',title:'Go/No-Go',revision:1,kind:'COGNITIVE',definition:{...initialCognitiveDefinition(),...(options.simon?{templateKey:SURVEY_SIMON_TEMPLATE}:{})}})]
     const mode=options.linked?'LINKED_WAVES':'SINGLE_UNLINKED'
     const snapshot:ResearchFrozenPublication={schemaVersion:1,purpose:'RESEARCH_ONLY',projectId,waveId,
       collectionMode:mode,consentVersion:1,linkageNoticeConfirmed:!!options.linked,
@@ -103,6 +106,39 @@ suite('Survey cognitive PostgreSQL authority, immutability and serialized lifecy
     expect(outcome.ok).toBe(false)
     expect(await db.surveyCognitiveResult.count({where:{attemptId:f.proof.attemptId}})).toBe(0)
   }
+  it('persists Simon 100-trial native results, signed/null metrics, exact parent FINAL and replay without changing Go/No-Go',async()=>{
+    const f=await fixture({simon:true}),session=await start(f)
+    expect(session.testType).toBe('simon')
+    const trials=simonSequence(session.randomSeed,100).map((stimulus,index)=>{
+      const {isiMs,...identity}=stimulus
+      const congruent=stimulus.stimulusSide===stimulus.requiredSide
+      return createTrialEnvelope({trialIndex:index,phase:'test',condition:congruent?'congruent':'incongruent',
+        startedAtPerfMs:index*3000,endedAtPerfMs:index*3000+2000,
+        payload:{...identity,responseSide:stimulus.requiredSide,rtMs:congruent?500:400,timeout:false,interrupted:false,
+          timing:{strategy:'double-raf-performance-v1',onsetPerfMs:index*3000,windowEndPerfMs:index*3000+2000,isiMs}}})
+    })
+    const input={submissionId:randomUUID(),attemptEpoch:session.attemptEpoch,definitionHash:session.definitionHash!,trials,administrationProvenance:provenance}
+    await expect(submitSurveyCognitiveFinal(f.proof,'go',session.sessionId,{...input,trials:trials.slice(0,99)})).rejects.toThrow('试次数')
+    const forged=structuredClone(input);forged.trials[0].payload.requiredSide=forged.trials[0].payload.requiredSide==='left'?'right':'left'
+    await expect(submitSurveyCognitiveFinal(f.proof,'go',session.sessionId,forged)).rejects.toThrow('冻结任务')
+    const receipts=await Promise.all([submitSurveyCognitiveFinal(f.proof,'go',session.sessionId,input),submitSurveyCognitiveFinal(f.proof,'go',session.sessionId,input)])
+    expect(receipts.filter(r=>r.replayed)).toHaveLength(1)
+    const reference=receipts[0].resultReference
+    const loaded=await db.$transaction(tx=>loadSurveyCognitiveResults(tx,{projectId:f.projectId,waveId:f.waveId,attemptId:f.proof.attemptId,publicationId:f.publicationId,references:[reference],includeRaw:true}))
+    expect(loaded[0].raw?.trials).toHaveLength(100)
+    expect(loaded[0].result.metrics.simonEffectMeanMs).toBe(-100)
+    expect(loaded[0].result).not.toHaveProperty('score')
+    const final={...f.proof,submissionId:randomUUID(),answers:{...priorAnswers,go:{}},cognitiveReferences:[reference]}
+    expect((await submitResearchFinal(final)).status).toBe('COMPLETED')
+    expect((await submitResearchFinal(final)).idempotent).toBe(true)
+    const parent=await db.surveyWaveFinal.findUniqueOrThrow({where:{attemptId:f.proof.attemptId}})
+    const exported=[...cognitiveTrialRows(f.snapshot.units[1],loaded[0] as any,{projectId:f.projectId,waveId:f.waveId,waveOrdinal:1,attemptId:f.proof.attemptId,researchCode:null,publicationId:f.publicationId,publicationVersion:1,completedAt:new Date().toISOString(),sourceFinalHash:parent.payloadHash} as any)]
+    expect(exported).toHaveLength(100);expect(exported.every(row=>row.simon?.correct)).toBe(true)
+    const stored=await db.surveyCognitiveResult.findUniqueOrThrow({where:{id:reference.resultId}})
+    await expect(db.$executeRaw`UPDATE survey_cognitive_results SET trial_count=120 WHERE id=${reference.resultId}`).rejects.toThrow('immutable')
+    const wrongParent=await fixture(),wrongSession=await start(wrongParent)
+    await expect(db.surveyCognitiveResult.create({data:{...stored,id:randomUUID(),sessionId:wrongSession.sessionId,projectId:wrongParent.projectId,waveId:wrongParent.waveId,attemptId:wrongParent.proof.attemptId,publicationId:wrongParent.publicationId,measurementDigest:wrongSession.surveyBinding.measurementDigest,trialCount:100}})).rejects.toThrow('frozen protocol')
+  })
   it('admits once with stable encrypted seed and returns safe recovery without private score/trials',async()=>{
     const f=await fixture(),[a,b]=await Promise.all([start(f),start(f)])
     expect(b.sessionId).toBe(a.sessionId);expect(b.randomSeed).toBe(a.randomSeed)

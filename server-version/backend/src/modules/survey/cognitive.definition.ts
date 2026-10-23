@@ -4,12 +4,12 @@ import { compileCognitiveRuntime } from '../assessment-runtime/compiler'
 import { createSessionConfigSnapshot,parseSessionConfigSnapshot } from '../cognitive/v2/session-snapshot'
 import type { SessionConfigSnapshot } from '../cognitive/v2/types'
 
-import { SURVEY_COGNITIVE_TEMPLATE, surveyCognitiveProtocol, surveyCognitiveTaskDefinition, type SurveyCognitiveTemplate } from './cognitive.protocols'
+import { SURVEY_COGNITIVE_TEMPLATE, SURVEY_SIMON_TEMPLATE, surveyCognitiveProtocol, surveyCognitiveTaskDefinition, type SurveyCognitiveTemplate } from './cognitive.protocols'
 export { SURVEY_COGNITIVE_TEMPLATE, SURVEY_GONOGO_CONFIG, surveyCognitiveTaskDefinition } from './cognitive.protocols'
 export const surveyCognitiveFeedbackSchema=z.object({
   policyVersion:z.literal('SURVEY_DESCRIPTIVE_V1').default('SURVEY_DESCRIPTIVE_V1'),
   mode:z.enum(['GENERAL','DESCRIPTIVE']).default('GENERAL'),
-  metricKeys:z.array(z.enum(['hitRate','goMedianRtMs'])).max(2).default([]),
+  metricKeys:z.array(z.enum(['hitRate','goMedianRtMs','accuracy','simonEffectMeanMs'])).max(2).default([]),
   release:z.enum(['AFTER_FINAL','AFTER_COLLECTION']).default('AFTER_FINAL'),
 }).strict().superRefine((value,ctx)=>{
   if(new Set(value.metricKeys).size!==value.metricKeys.length)
@@ -21,9 +21,13 @@ export const surveyCognitiveFeedbackSchema=z.object({
 })
 export const cognitiveDraftSchema=z.object({
   schemaVersion:z.literal(1),
-  templateKey:z.literal(SURVEY_COGNITIVE_TEMPLATE),
+  templateKey:z.enum([SURVEY_COGNITIVE_TEMPLATE,SURVEY_SIMON_TEMPLATE]),
   feedback:surveyCognitiveFeedbackSchema.default({policyVersion:'SURVEY_DESCRIPTIVE_V1',mode:'GENERAL',metricKeys:[],release:'AFTER_FINAL'}),
-}).strict()
+}).strict().superRefine((draft,ctx)=>{
+  const protocol=surveyCognitiveProtocol(draft.templateKey)
+  if(draft.feedback.metricKeys.some(key=>!Object.prototype.hasOwnProperty.call(protocol.feedbackMetrics,key)))
+    ctx.addIssue({code:'custom',path:['feedback','metricKeys'],message:'反馈指标不属于当前冻结认知协议'})
+})
 export type CognitiveDraft=z.infer<typeof cognitiveDraftSchema>
 export const initialCognitiveDefinition=():CognitiveDraft=>cognitiveDraftSchema.parse({schemaVersion:1,templateKey:SURVEY_COGNITIVE_TEMPLATE})
 export const validateCognitiveDraft=(_definition:CognitiveDraft,_forPreview:boolean):Array<{path:string;message:string;severity:'error'|'warning'}>=>[]
@@ -32,7 +36,7 @@ export interface FrozenSurveyCognitive {
   templateKey:SurveyCognitiveTemplate
   sessionSnapshot:SessionConfigSnapshot
   measurementDigest:string
-  timingPolicy:'software-frame-v1'
+  timingPolicy:'software-frame-v1'|'simon-software-frame-v1'
   devicePolicy:'DESKTOP_KEYBOARD'
   restartLimit:1
   maturity:'PILOT'

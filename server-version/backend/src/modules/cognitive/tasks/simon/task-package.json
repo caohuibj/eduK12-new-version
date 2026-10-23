@@ -1,0 +1,48 @@
+{
+  "schemaVersion": 1,
+  "task": "simon",
+  "executionModel": "NATIVE_V2",
+  "identities": [
+    {
+      "testType": "simon",
+      "engineVersion": "1.0.0",
+      "scoringVersion": "1.0.0"
+    }
+  ],
+  "backend": {
+    "file": "package.ts",
+    "export": "nativeDefinitions"
+  },
+  "frontend": [
+    {
+      "testType": "simon",
+      "engineVersion": "1.0.0",
+      "file": "server-version/frontend/src/modules/cognitive/tasks/simon/simon.registry.ts",
+      "export": "simonRegistryEntry"
+    }
+  ],
+  "catalog": {
+    "file": "governance.ts",
+    "export": "catalog"
+  },
+  "seeds": {
+    "file": "seeds.ts",
+    "export": "seeds",
+    "orders": [
+      null
+    ]
+  },
+  "presentation": {
+    "file": "participant-presentation.ts",
+    "export": "participantPresentations"
+  },
+  "scientific": {
+    "file": "scientific.ts",
+    "export": "scientificGovernance"
+  },
+  "acceptance": {
+    "frontendSuites": [
+      "src/modules/cognitive/__tests__/SimonTask.test.tsx"
+    ]
+  }
+}

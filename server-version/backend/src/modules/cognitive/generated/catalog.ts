@@ -23,6 +23,7 @@ import { catalog as task20 } from '../tasks/bart/governance'
 import { catalog as task21 } from '../tasks/wordlist/governance'
 import { catalog as task22 } from '../tasks/lexicaldecision/governance'
 import { catalog as task23 } from '../tasks/emotionrecognition/governance'
+import { catalog as task24 } from '../tasks/simon/governance'
 export const cognitiveCatalog = {
   'reaction': task0,
   'memory': task1,
@@ -48,4 +49,5 @@ export const cognitiveCatalog = {
   'wordlist': task21,
   'lexicaldecision': task22,
   'emotionrecognition': task23,
+  'simon': task24,
 }

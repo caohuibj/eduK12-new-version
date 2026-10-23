@@ -24,6 +24,7 @@ import { seeds as task21 } from '../tasks/bart/seeds'
 import { seeds as task22 } from '../tasks/wordlist/seeds'
 import { seeds as task23 } from '../tasks/lexicaldecision/seeds'
 import { seeds as task24 } from '../tasks/emotionrecognition/seeds'
+import { seeds as task25 } from '../tasks/simon/seeds'
 export const cognitiveSeeds = [
   task0[0],
   task1[0],
@@ -54,4 +55,5 @@ export const cognitiveSeeds = [
   task23[0],
   task24[0],
   task21[1],
+  task25[0],
 ]

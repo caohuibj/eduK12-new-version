@@ -4,6 +4,7 @@ export interface CognitiveTrialEnvelope {
   schemaVersion: 1
   trialIndex: number
   phase: CognitiveTrialPhase
+  condition?: string
   startedAtPerfMs: number
   endedAtPerfMs: number
   durationMs: number
@@ -38,7 +39,23 @@ const durationFromPayload = (payload: Record<string, unknown>): number => {
 export const wrapCognitiveTrial = (input: {
   trialIndex: number
   payload: Record<string, unknown>
+  identity?: { testType: string; engineVersion: string; scoringVersion: string; configVersion: string }
 }): CognitiveTrialEnvelope => {
+  if (input.identity?.testType === 'simon') {
+    if (input.identity.engineVersion !== '1.0.0' || input.identity.scoringVersion !== '1.0.0' || input.identity.configVersion !== '1.0.0') throw new Error('Unsupported Simon envelope identity')
+    const payload=input.payload
+    const timing=payload.timing as {strategy?:unknown;onsetPerfMs?:unknown;windowEndPerfMs?:unknown}|undefined
+    if(timing?.strategy!=='double-raf-performance-v1'||typeof timing.windowEndPerfMs!=='number'||!Number.isFinite(timing.windowEndPerfMs)||timing.windowEndPerfMs<0
+      ||(timing.onsetPerfMs!==null&&(typeof timing.onsetPerfMs!=='number'||!Number.isFinite(timing.onsetPerfMs)||timing.onsetPerfMs<0))) throw new Error('Missing Simon observed timing')
+    if(!['red','blue'].includes(String(payload.color))||!['red-left','blue-left'].includes(String(payload.mapping))||!['left','right'].includes(String(payload.stimulusSide))) throw new Error('Invalid Simon stimulus identity')
+    const requiredSide=(payload.color==='red')===(payload.mapping==='red-left')?'left':'right'
+    if(payload.requiredSide!==requiredSide)throw new Error('Invalid Simon response mapping')
+    const endedAtPerfMs=timing.windowEndPerfMs,startedAtPerfMs=timing.onsetPerfMs===null?endedAtPerfMs:timing.onsetPerfMs as number
+    if(endedAtPerfMs<startedAtPerfMs)throw new Error('Invalid Simon observed timing order')
+    return {schemaVersion:1,trialIndex:input.trialIndex,phase:'test',condition:payload.stimulusSide===requiredSide?'congruent':'incongruent',
+      startedAtPerfMs,endedAtPerfMs,durationMs:endedAtPerfMs-startedAtPerfMs,
+      flags:{timeout:payload.timeout===true,premature:false},qualityEvents:[],payload}
+  }
   const endedAtPerfMs = clockNow()
   const durationMs = durationFromPayload(input.payload)
   const startedAtPerfMs = Math.max(0, endedAtPerfMs - durationMs)

@@ -17,7 +17,7 @@ export interface SurveyCognitiveStoredResult {
   schemaVersion:1;sessionId:string;projectId:string;waveId:string;attemptId:string;publicationId:string;
   slotKey:string;epoch:number;measurementDigest:string;configHash:string;protocolSignature:string;
   testType:string;configVersion:string;engineVersion:string;scoringVersion:string;
-  timingPolicy:'software-frame-v1';maturity:'PILOT';referenceMode:'none';
+  timingPolicy:'software-frame-v1'|'simon-software-frame-v1';maturity:'PILOT';referenceMode:'none';
   metrics:Record<string,unknown>;quality:CognitiveScoreResult['quality'];audit:CognitiveScoreResult['audit'];
   administrationProvenance:AdministrationProvenanceV1;restartCount:number;rawHash:string;completedAt:string;
 }

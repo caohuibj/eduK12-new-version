@@ -1,3 +1,4 @@
+import { simonTrialSchema } from '../cognitive/tasks/simon/schema'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import type {TrialEnvelope} from '../cognitive/v2/types'
 import type {GonogoTrial} from '../cognitive/schemas/gonogo.trial'
@@ -36,6 +37,7 @@ export interface CognitiveTrialObservation extends CognitiveSourceMeta {
   timeout:boolean;premature:boolean;interrupted:boolean;qualityEvents:string[];
   qualityStatus:string;qualityFlags:Record<string,boolean>;qualityReasons:string[];
   administrationProvenance:unknown
+  simon?:{mapping:string;color:string;stimulusSide:string;requiredSide:string;correct:boolean|null;technicallyValid:boolean}
 }
 function invalid(message:string):never{throw new SurveyAnalyticsError(409,message)}
 /** Own a validated frozen copy for one source projection. Neither participant
@@ -98,10 +100,33 @@ export function prepareCognitiveProjection(frozen:ResearchFrozenUnit){
       ||child.raw.trials.length!==result.audit.trialCount)invalid('认知权威试次来源缺失或 epoch 不一致')
     const childCompletedAt=new Date(child.completedAt).toISOString()
     for(const trial of child.raw.trials){
-      const payload=trial.payload as GonogoTrial
-      if(!payload||!['go','nogo'].includes(payload.trialType)||typeof payload.responded!=='boolean'
-        ||(payload.rtMs!==null&&(!Number.isFinite(payload.rtMs)||payload.rtMs<0))
-        ||payload.responded!==(payload.rtMs!==null))invalid('认知冻结试次响应或时长无效')
+      let projection:{condition:string|null;stimulusCode:string;responded:boolean;response:string|null;rtMs:number|null;rtMissingReason:string|null;interrupted:boolean;simon?:CognitiveTrialObservation['simon']}
+      if(session.testType==='gonogo'){
+        const payload=trial.payload as GonogoTrial
+        if(!payload||!['go','nogo'].includes(payload.trialType)||typeof payload.responded!=='boolean'
+          ||(payload.rtMs!==null&&(!Number.isFinite(payload.rtMs)||payload.rtMs<0))
+          ||payload.responded!==(payload.rtMs!==null))invalid('认知冻结试次响应或时长无效')
+        projection={condition:trial.condition??null,stimulusCode:payload.trialType,responded:payload.responded,
+          response:payload.responded?'RESPONDED':null,rtMs:payload.rtMs,
+          rtMissingReason:payload.rtMs!==null?null:payload.trialType==='nogo'?'NO_GO_WITHHELD':'GO_OMISSION',interrupted:payload.interrupted}
+      }else if(session.testType==='simon'){
+        const parsed=simonTrialSchema.safeParse(trial.payload)
+        if(!parsed.success)invalid('Simon 冻结试次结构无效')
+        const payload=parsed.data!
+        const requiredSide=(payload.color==='red')===(payload.mapping==='red-left')?'left':'right'
+        if(payload.requiredSide!==requiredSide)invalid('Simon 冻结响应映射无效')
+        const condition=payload.stimulusSide===requiredSide?'congruent':'incongruent'
+        if(trial.condition!==condition)invalid('Simon 冻结条件与响应映射不一致')
+        const timing=payload.timing
+        if(!timing||trial.startedAtPerfMs!==(timing.onsetPerfMs??timing.windowEndPerfMs)||trial.endedAtPerfMs!==timing.windowEndPerfMs
+          ||Math.abs(trial.durationMs-(trial.endedAtPerfMs-trial.startedAtPerfMs))>1||trial.flags.timeout!==payload.timeout)invalid('Simon 冻结计时或超时标记不一致')
+        const timingInvalid=trial.durationMs<2000||timing.onsetPerfMs===null||timing.windowEndPerfMs-timing.onsetPerfMs<2000
+        const technicallyValid=!payload.interrupted&&!trial.qualityEvents.length&&!timingInvalid
+        projection={condition,stimulusCode:payload.color+'_'+payload.stimulusSide,responded:payload.responseSide!==null,
+          response:payload.responseSide,rtMs:payload.rtMs,rtMissingReason:payload.rtMs!==null?null:technicallyValid?'OMISSION':'TECHNICALLY_INVALID',
+          interrupted:!technicallyValid,simon:{mapping:payload.mapping,color:payload.color,stimulusSide:payload.stimulusSide,
+            requiredSide,correct:technicallyValid?payload.responseSide===requiredSide:null,technicallyValid}}
+      }else invalid('认知试次导出协议不支持')
       yield {...meta,sourceVerified:true,instrumentKey,
         sourceResultHash:child.reference.resultHash,epoch:child.reference.epoch,
         measurementDigest:definition.measurementDigest,configHash:result.configHash,
@@ -109,11 +134,9 @@ export function prepareCognitiveProjection(frozen:ResearchFrozenUnit){
         scoringVersion:result.scoringVersion,configVersion:result.configVersion,timingPolicy:result.timingPolicy,
         randomSeed:child.randomSeed,randomizationVersion:definition.sessionSnapshot.protocol.randomizationAlgorithmVersion,
         restartCount:result.restartCount,childCompletedAt,
-        phase:trial.phase,trialIndex:trial.trialIndex,condition:trial.condition??null,
-        stimulusCode:payload.trialType,responded:payload.responded,response:payload.responded?'RESPONDED':null,
-        rtMs:payload.rtMs,rtMissingReason:payload.rtMs!==null?null:payload.trialType==='nogo'?'NO_GO_WITHHELD':'GO_OMISSION',
+        phase:trial.phase,trialIndex:trial.trialIndex,...projection!,
         startedAtPerfMs:trial.startedAtPerfMs,endedAtPerfMs:trial.endedAtPerfMs,durationMs:trial.durationMs,
-        timeout:trial.flags.timeout,premature:trial.flags.premature,interrupted:payload.interrupted,
+        timeout:trial.flags.timeout,premature:trial.flags.premature,
         qualityEvents:[...trial.qualityEvents],qualityStatus:result.quality.state,
         qualityFlags:{...result.quality.flags},qualityReasons:[...result.quality.reasons],
         administrationProvenance:child.raw.administrationProvenance??result.administrationProvenance}

@@ -1,10 +1,18 @@
+import { SIMON_CONFIG } from '../cognitive/tasks/simon/schema'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { getCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
 
+export const SURVEY_SIMON_TEMPLATE = 'simon-software-frame-v1' as const
 export const SURVEY_COGNITIVE_TEMPLATE = 'gonogo-software-frame-v1' as const
 export const SURVEY_GONOGO_CONFIG = {totalTrials:120,nogoRatio:0.25,stimulusMs:800,isiMs:500,
   validRtFloorMs:100,report:{reportVersion:'1.0.0',referenceMode:'none' as const}}
 export const SURVEY_COGNITIVE_PROTOCOLS = {
+  [SURVEY_SIMON_TEMPLATE]: {
+    templateKey:SURVEY_SIMON_TEMPLATE,testType:'simon',engineVersion:'1.0.0',scoringVersion:'1.0.0',
+    configVersion:'1.0.0',config:SIMON_CONFIG,formalTrials:100,estimatedDurationSeconds:480,
+    timingPolicy:'simon-software-frame-v1',frozenAt:'2026-10-23T00:00:00.000Z',
+    feedbackMetrics:{accuracy:'本次正式任务正确率',simonEffectMeanMs:'不相容减相容平均用时差'},
+  },
   [SURVEY_COGNITIVE_TEMPLATE]: {
     templateKey:SURVEY_COGNITIVE_TEMPLATE,testType:'gonogo',engineVersion:'1.0.0',scoringVersion:'1.0.0',
     configVersion:'1.1.0',config:SURVEY_GONOGO_CONFIG,formalTrials:120,estimatedDurationSeconds:180,

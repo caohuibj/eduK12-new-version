@@ -375,7 +375,7 @@ export function useCognitiveSession(
       try {
         const session = stateRef.current.session
         const submittedPayload = session?.protocolSignature
-          ? wrapCognitiveTrial({ trialIndex: nextIndex, payload })
+          ? wrapCognitiveTrial({ trialIndex: nextIndex, payload, identity: session })
           : payload
         if (session?.deliveryMode === 'FINAL_ONLY') {
           const draftKey = cognitiveDraftKey(session)

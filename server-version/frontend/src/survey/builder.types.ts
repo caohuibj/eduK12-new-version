@@ -35,8 +35,8 @@ export type { SjtQuestion } from '../modules/assessment-core/sjt/types'
 export type SjtScene = import('../modules/assessment-core/sjt/types').SjtScene<SurveyImage>
 export type SjtDraftV2 = import('../modules/assessment-core/sjt/types').SjtDraftV2<SurveyImage>
 export type SjtDraft=SjtDraftV1|SjtDraftV2
-export type CognitiveDraft={schemaVersion:1;templateKey:'gonogo-software-frame-v1';
-  feedback:{mode:'GENERAL'|'DESCRIPTIVE';metricKeys:('hitRate'|'goMedianRtMs')[];
+export type CognitiveDraft={schemaVersion:1;templateKey:'gonogo-software-frame-v1'|'simon-software-frame-v1';
+  feedback:{mode:'GENERAL'|'DESCRIPTIVE';metricKeys:('hitRate'|'goMedianRtMs'|'accuracy'|'simonEffectMeanMs')[];
     release:'AFTER_FINAL'|'AFTER_COLLECTION'}}
 export type Definition=FormDraft|ScaleDraft|SjtDraft|CognitiveDraft
 export type ResearchDraft={

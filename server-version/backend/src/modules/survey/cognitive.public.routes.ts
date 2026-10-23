@@ -17,7 +17,7 @@ const start=proof.extend({priorAnswers:z.record(z.record(z.unknown())),
   administrationProvenance:administrationProvenanceV1Schema}).strict()
 const epoch=proof.extend({attemptEpoch:z.number().int().min(1).max(2)}).strict()
 const final=epoch.extend({submissionId:z.string().min(16).max(200),definitionHash:z.string().regex(/^[a-f0-9]{64}$/),
-  contextSnapshotHash:z.null().optional(),trials:z.array(z.unknown()).length(120),
+  contextSnapshotHash:z.null().optional(),trials:z.array(z.unknown()).min(100).max(120).refine(values=>values.length===100||values.length===120,'Unsupported controlled protocol trial count'),
   administrationProvenance:administrationProvenanceV1Schema}).strict()
 const identity=(req:Request,body:{accessCredential:string;researchCode?:string})=>({
   publicId:id.parse(req.params.publicId),attemptId:id.parse(req.params.attemptId),
