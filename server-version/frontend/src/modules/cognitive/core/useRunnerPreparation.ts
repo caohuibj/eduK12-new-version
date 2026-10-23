@@ -5,9 +5,10 @@ export function useRunnerPreparation(entry: CognitiveFrontendRegistryEntry | und
   const [result, setResult] = useState<{ entry?: CognitiveFrontendRegistryEntry; error?: string }>({})
   const [revision, setRevision] = useState(0)
   useEffect(() => {
+    if (!entry?.prepareRunner) return
     let current = true
     setResult({})
-    if (entry) void Promise.resolve().then(() => entry.prepareRunner?.()).then(() => {
+    void Promise.resolve().then(() => entry.prepareRunner!()).then(() => {
       if (current) setResult({ entry })
     }).catch(() => {
       if (current) setResult({ entry, error: '本次测验程序加载失败，请重试。' })
