@@ -90,3 +90,99 @@ it('accepts only persisted static registry provenance without inventing an owner
  Object.assign(f.input.parent.trainingContentBinding.units[0],{source});f.input.parent.trainingContentBindingHash=canonicalHash(f.input.parent.trainingContentBinding)
  f.measurement.scope={kind:'PLATFORM',ownerId:'fabricated'};await expect(prepareTrainingFinalReceipt({} as never,f.input)).rejects.toMatchObject({statusCode:409})
 })
+
+import * as contentBindingModule from '../../modules/composite/training-content-binding'
+import * as referenceSelectionModule from '../../modules/composite/training-reference-selection'
+import {referenceEntryKey} from '../../modules/measurement-content/reference-candidate'
+afterEach(()=>vi.restoreAllMocks())
+const referenceId='33333333-3333-4333-8333-333333333333'
+function sharedReleaseFixture(count=3){
+ const f=fixture(),parent:any=f.input.parent,binding=parent.trainingContentBinding
+ const entries=['total','other'].map(scoreKey=>({scoreKey,referenceKind:'descriptive_sample',evidenceLevel:'local_pilot',provenanceType:'local_observed',instrumentVersion:'1',scoringVersion:'1',population:{description:'Synthetic'},source:{citation:'Synthetic fixture only',sampleSize:20},statistics:{mean:2},limitations:['Synthetic']}))
+ const slots=entries.map(entry=>({metricKey:entry.scoreKey,referenceKind:entry.referenceKind,status:'SELECTED',releaseId:referenceId,contentHash:hash,entryKey:referenceEntryKey(entry as any)}))
+ const base=binding.units[0]
+ binding.units=Array.from({length:count},(_,i)=>({...base,itemId:`item-${i}`,referencePolicy:{policyVersion:'EXACT_POPULATION_PRIORITY_V1',measurementReleaseId:mId,choices:slots.map(({status,...slot})=>({...slot,priority:1}))}}))
+ parent.trainingContentBindingHash=canonicalHash(binding)
+ parent.trainingReferenceBinding={schemaVersion:1,attemptId:parent.id,epoch:1,contentBindingHash:parent.trainingContentBindingHash,contextHash:null,units:binding.units.map((u:any)=>({itemId:u.itemId,references:slots.map(s=>({...s}))}))}
+ parent.trainingReferenceBindingHash=canonicalHash(parent.trainingReferenceBinding)
+ f.input.verifiedPayloads=binding.units.map((u:any)=>({header:{slotKey:compositeItemSlotKey(u.itemId,'SCALE')},envelope:f.envelope}))
+ Object.assign(f.measurement.content,{instrumentVersion:'1',scoringVersion:'1'})
+ const reference:any={releaseId:referenceId,contentHash:hash,layer:'REFERENCE',family:'SCALE',status:'PUBLISHED',version:'1',scope:{kind:'PRIVATE',product:'TRAINING',ownerId:'owner',resourceId:'composite'},content:{measurement:{releaseId:mId,contentHash:hash},entries:entries.map(definition=>({metricKey:definition.scoreKey,referenceKind:definition.referenceKind,definition}))}}
+ mocks.get.mockImplementation(async(_tx,id)=>id===mId?f.measurement:id===rId?f.report:reference)
+ return {...f,parent,reference,rehash:()=>{parent.trainingContentBindingHash=canonicalHash(binding);parent.trainingReferenceBinding.contentBindingHash=parent.trainingContentBindingHash;parent.trainingReferenceBindingHash=canonicalHash(parent.trainingReferenceBinding)}}
+}
+describe('frozen release indexes retain validation and interpretation semantics',()=>{
+ it('preserves order and validates every matching unit on every read, once per release group rather than per duplicate slot',async()=>{
+  const f=sharedReleaseFixture(),scope=vi.spyOn(contentBindingModule,'trainingMeasurementSourceScopeMatchesForConsumer'),reference=vi.spyOn(referenceSelectionModule,'validateTrainingReferenceRelease')
+  const result=(await prepareTrainingFinalReceipt({} as never,f.input))!
+  expect(result.receipt.sources).toEqual([0,1,2].map(i=>({itemId:`item-${i}`,resultHash:f.envelope.resultHash})))
+  expect(result.receipt.interpretation.units.map(u=>({id:u.instrumentKey,references:u.references}))).toEqual([0,1,2].map(i=>({id:`item-${i}`,references:[
+   {metricKey:'total',referenceKind:'descriptive_sample',status:'AVAILABLE',values:{z:null,t:null,meanDifference:10,percentile:null,bandKey:null}},
+   {metricKey:'other',referenceKind:'descriptive_sample',status:'UNAVAILABLE',reason:'insufficient_data'}]})))
+  expect(scope).toHaveBeenCalledTimes(9)
+  expect(reference).toHaveBeenCalledTimes(18)
+  expect(reference.mock.calls.map(c=>c[1].unit.itemId)).toEqual(Array.from({length:6},()=>['item-0','item-1','item-2']).flat())
+  expect(reference.mock.calls.every(c=>c[1].purpose==='HISTORY'&&c[1].contentHash===hash)).toBe(true)
+  expect(mocks.get.mock.calls.map(c=>[c[1],c[2]])).toEqual([[mId,true],[referenceId,true],[rId,true]])
+ })
+ it.each(['source','family','hash'] as const)('rejects differing %s on another unit sharing a release',async kind=>{
+  const f=sharedReleaseFixture(),unit=f.parent.trainingContentBinding.units[1]
+  if(kind==='source')unit.source={...unit.source,id:'foreign'}
+  if(kind==='family'){unit.family='COGNITIVE';unit.source={kind:'COGNITIVE_CONFIG',id:'source',ownerId:'owner',assignmentId:'assignment'}}
+  if(kind==='hash')unit.measurement={...unit.measurement,contentHash:'b'.repeat(64)}
+  f.rehash()
+  await expect(prepareTrainingFinalReceipt({} as never,f.input)).rejects.toMatchObject({statusCode:409})
+ })
+ it('checks a different expected reference hash even when the release is cached',async()=>{
+  const f=sharedReleaseFixture()
+  f.parent.trainingContentBinding.units[0].referencePolicy.choices[1].contentHash='b'.repeat(64)
+  f.parent.trainingReferenceBinding.units[0].references[1].contentHash='b'.repeat(64)
+  f.rehash()
+  await expect(prepareTrainingFinalReceipt({} as never,f.input)).rejects.toMatchObject({statusCode:409})
+ })
+ it.each(['revoked','quality','not-executed','unavailable'] as const)('preserves %s stop guards without reading unused reference releases',async mode=>{
+  const f=sharedReleaseFixture(),reference=vi.spyOn(referenceSelectionModule,'validateTrainingReferenceRelease')
+  if(mode==='revoked')f.measurement.status='REVOKED'
+  if(mode==='quality')f.envelope.core.quality.status='invalid'
+  if(mode==='not-executed')f.input.verifiedPayloads=[]
+  if(mode==='unavailable'){
+   for(const unit of f.parent.trainingReferenceBinding.units)unit.references=unit.references.map((s:any)=>({metricKey:s.metricKey,referenceKind:s.referenceKind,status:'UNAVAILABLE',reason:'NO_MATCH'}))
+   f.rehash()
+  }
+  const result=(await prepareTrainingFinalReceipt({} as never,f.input))!
+  const reason={revoked:'MEASUREMENT_REVOKED',quality:'QUALITY_UNAVAILABLE','not-executed':'NOT_EXECUTED',unavailable:'NO_MATCH'}[mode]
+  for(const unit of result.receipt.interpretation.units)expect(unit.references).toEqual(['total','other'].map(metricKey=>({metricKey,referenceKind:'descriptive_sample',status:mode==='revoked'?'REVOKED':'UNAVAILABLE',reason})))
+  expect(reference).not.toHaveBeenCalled()
+  expect(mocks.get.mock.calls.map(c=>c[1])).toEqual([mId,rId])
+ })
+ it('retains validation for revoked references and rebuilds indexes each invocation',async()=>{
+  const f=sharedReleaseFixture(),reference=vi.spyOn(referenceSelectionModule,'validateTrainingReferenceRelease')
+  f.reference.status='REVOKED'
+  const first=(await prepareTrainingFinalReceipt({} as never,f.input))!
+  expect(first.receipt.interpretation.units.every(u=>u.references.every(r=>r.status==='REVOKED'))).toBe(true)
+  expect(reference).toHaveBeenCalledTimes(18)
+  f.parent.trainingContentBinding.units[2].source={...f.parent.trainingContentBinding.units[2].source,id:'changed-after-first-call'};f.rehash()
+  await expect(prepareTrainingFinalReceipt({} as never,f.input)).rejects.toMatchObject({statusCode:409})
+ })
+})
+
+it('does not reuse a successful measurement authority result on the next read',async()=>{
+ const f=sharedReleaseFixture(),scope=vi.spyOn(contentBindingModule,'trainingMeasurementSourceScopeMatchesForConsumer')
+ scope.mockResolvedValueOnce(true).mockResolvedValueOnce(true).mockResolvedValueOnce(true).mockResolvedValueOnce(false)
+ await expect(prepareTrainingFinalReceipt({} as never,f.input)).rejects.toMatchObject({statusCode:409})
+ expect(scope).toHaveBeenCalledTimes(4)
+})
+it('handles shared measurements without reference bindings and legacy null without release reads',async()=>{
+ const f=fixture(),binding=f.input.parent.trainingContentBinding,scope=vi.spyOn(contentBindingModule,'trainingMeasurementSourceScopeMatchesForConsumer')
+ binding.units=[0,1,2].map(i=>({...binding.units[0],itemId:`item-${i}`}))
+ f.input.parent.trainingContentBindingHash=canonicalHash(binding)
+ f.input.verifiedPayloads=binding.units.map(u=>({header:{slotKey:compositeItemSlotKey(u.itemId,'SCALE')},envelope:f.envelope}))
+ const result=(await prepareTrainingFinalReceipt({} as never,f.input))!
+ expect(result.receipt.schemaVersion).toBe(1)
+ expect(result.receipt.interpretation.units.map(u=>u.references)).toEqual([[],[],[]])
+ expect(scope).toHaveBeenCalledTimes(9)
+ expect(mocks.get.mock.calls.map(c=>c[1])).toEqual([mId,rId])
+ mocks.get.mockClear();scope.mockClear()
+ expect(await prepareTrainingFinalReceipt({} as never,{...f.input,parent:{...f.input.parent,trainingContentBinding:null,trainingContentBindingHash:null}})).toBeNull()
+ expect(mocks.get).not.toHaveBeenCalled();expect(scope).not.toHaveBeenCalled()
+})
