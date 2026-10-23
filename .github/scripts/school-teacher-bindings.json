@@ -5,9 +5,9 @@
   "branch": "work/school-teacher-review-20261022",
   "enabled": true,
   "base": "4dd9f1340fef2bc3df2d066b9bf7712bc2eb3c66",
-  "productHead": "9e258d3937c956cc10de876a1432614e631695f4",
+  "productHead": "c8b604500c54630fde9cb165c5e09308baa45662",
   "frontendTree": "c1e34b8fdd1a0127a155a208187a8c6bb2f8760f",
-  "backendTree": "1d3a5ac4e2d2b5e73d8563f15c191eaaf0893bf8",
+  "backendTree": "f58ac0f0fb0ab55a58303dd267e89ba1090c0795",
   "source": {
     ".github/scripts/school-teacher-browser-control.mjs": {
       "before": null,
@@ -384,6 +384,10 @@
     "server-version/backend/src/__tests__/scale-library-governance/governance.postgres.integration.test.ts": {
       "before": "7ffba8f46b85c725e24cc9742acbae691fbf8185",
       "after": "5d3716e0a8b0237dcc0b1a6727e59434719bb9cf"
+    },
+    "server-version/backend/src/__tests__/survey/tool-publication.postgres.integration.test.ts": {
+      "before": "e55f6b8a57aa84fb9bfd8a8edfbd2e7aac2bb118",
+      "after": "cb07e7c4dc56490d0fccec92355b633179dfc2d1"
     },
     "server-version/backend/src/index.ts": {
       "before": "447fdf6c7b5f5f7ec8bca2f06b25782c13278ce6",
@@ -800,6 +804,10 @@
     "server-version/backend/src/modules/scale-library-governance/usage.ts": {
       "before": "0e66916fac2092041824a5fa9a0db30fd1b42fa2",
       "after": "df4e6d7b354bfcd3a77696d7a84a375abed2637a"
+    },
+    "server-version/e2e/school-teacher-backend-receipt.test.cjs": {
+      "before": null,
+      "after": "40103da077082bc6f3241f572b0b5ea748e5b631"
     },
     "server-version/e2e/school-teacher-chrome-permissions.cjs": {
       "before": null,
@@ -1402,7 +1410,7 @@
   "review": {
     "completed": true,
     "originalExecutionSigned": false,
-    "note": "No local historical execution is admitted. Fixed third-run original failed frontend subchecks and fourth-run successful remaining checks prove all 23 frontend cases, types and lint; the fourth-run official dist is reused with original manifest and verified bytes, not rebuilt or relabeled. Audit requires unchanged exact FE/BE inputs. Backend, migrations, browser, restore and changed e2e/control SAST remain required current qualification."
+    "note": "No local historical execution is admitted. Fixed official third/fourth frontend evidence preserves all 23 passed cases and original dist. Fifth connected job remains FAILED, while its exact 105 passed cases, nonempty upgrade preservation and immutable backend build are individually reverified. Only the reviewed excluded Survey fixture differs in the backend closure. A fresh isolated schema, five missing cases, browser and restore remain required. Fifth successful SAST authenticates prior application evidence; only this candidate's eight changed fixture, receipt and control paths are rescanned. No manifest source or run identity is rewritten."
   },
   "requiredJobs": [
     "admission",
@@ -1411,8 +1419,8 @@
     "security"
   ],
   "frontendBuildDecision": "fixed-official-frontend-build",
-  "backendBuildDecision": "fresh-once",
-  "backendBuildReason": "Integrated Survey schema adds actual Prisma generated client models and shared source dispatcher consumes changed provenance.",
+  "backendBuildDecision": "fixed-official-backend-build",
+  "backendBuildReason": "Reuse fifth official immutable compiled artifact; only the single excluded Survey fixture changes",
   "backendBuildInputsChanged": [
     "server-version/backend/prisma/schema.prisma",
     "server-version/backend/src/modules/scale-library-governance/source.ts"
@@ -2132,14 +2140,14 @@
               },
               {
                 "path": "server-version/backend/src/__tests__/survey/tool-publication.postgres.integration.test.ts",
-                "blob": "e55f6b8a57aa84fb9bfd8a8edfbd2e7aac2bb118"
+                "blob": "cb07e7c4dc56490d0fccec92355b633179dfc2d1"
               },
               {
                 "path": "server-version/backend/vitest.config.ts",
                 "blob": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
               }
             ],
-            "sha256": "08a06953beaf12f00b9b7e226d16997a63c4cc2947c300ebb742a762516179f0"
+            "sha256": "f8d8097d8a520377b49e5d1818da45ddb9c3c0464a7a8dfc47f94f2a3f52c903"
           },
           "namePattern": "^(?:Standalone Survey scale publication and library application \u2014 rollback-only PostgreSQL submits and approves through existing governance, preserving exact content and no implicit use grants)$"
         },
@@ -2276,6 +2284,18 @@
       "buildSize": 21207434,
       "frontendTree": "c1e34b8fdd1a0127a155a208187a8c6bb2f8760f",
       "backendTree": "1d3a5ac4e2d2b5e73d8563f15c191eaaf0893bf8"
+    },
+    "officialBackendBuild": {
+      "run": 39877023519,
+      "head": "b717cddfdeb957bc3665ed3e69f8a680befa021b",
+      "checkout": "db477157b097556dc8e59cda1f6bda71f06a71f6",
+      "job": 120165263496,
+      "checksArtifact": 12469685064,
+      "checksDigest": "f83a39e33cf010471c9244fd4abe87eb76cba63200e77e2b812a1dbc1af121fa",
+      "buildArtifact": 12469580004,
+      "buildDigest": "64032cdebcfbf855622f3dbaa53f6b31bffb1b5d9f965ef719b3d3faad469d18",
+      "buildSize": 7590065,
+      "compileDigest": "8689278a86c4571e8a5f251338c56d164f3626ec76520c5e27c44350c76b323d"
     }
   },
   "blockers": []

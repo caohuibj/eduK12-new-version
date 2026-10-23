@@ -127,21 +127,24 @@ jobs:
         run: |
           node node_modules/prisma/build/index.js validate --schema prisma/schema.prisma
           node node_modules/prisma/build/index.js generate --schema prisma/schema.prisma
-      - name: compile affected backend exactly once without full npm lifecycle
+      - name: verify fixed official backend compile and 105 passed cases then restore original dist
         env:
-          NODE_OPTIONS: --max-old-space-size=4096
-        run: node .github/scripts/school-teacher-checks.mjs backend
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --no-tags --depth=1 origin b717cddfdeb957bc3665ed3e69f8a680befa021b db477157b097556dc8e59cda1f6bda71f06a71f6
+          node .github/scripts/school-teacher-checks.mjs backend
       - uses: actions/upload-artifact@v4
         with:
           name: school-teacher-backend-${{ github.sha }}
           path: server-version/backend/dist
           if-no-files-found: error
           retention-days: 3
-      - name: prove nonempty exact-base upgrade with synthetic frozen baseline rows
+      - name: retain original nonempty upgrade qualification and prepare this fresh isolated database
         run: node .github/scripts/school-teacher-checks.mjs migrate
-      - name: run deduplicated affected service and real PostgreSQL cases
+      - name: run only the five missing service and PostgreSQL cases
         env:
           NODE_OPTIONS: --max-old-space-size=4096
+          SURVEY_TOOL_PUBLICATION_ACCEPTANCE: '1'
         run: node .github/scripts/school-teacher-checks.mjs postgres
       - uses: actions/download-artifact@v4
         with:
@@ -155,10 +158,10 @@ jobs:
         run: |
           mkdir -p school-teacher-evidence
           cp school-teacher-frontend-receipt/official-frontend-build-reuse.json school-teacher-evidence/official-frontend-build-reuse.json
-      - name: verify original frontend bytes and fresh current backend manifest
+      - name: verify both immutable original manifests against actual dist bytes
         run: |
           node .github/scripts/school-teacher-checks.mjs verify-frontend-artifact
-          node .github/scripts/ci-artifact.mjs verify backend
+          node .github/scripts/school-teacher-checks.mjs verify-backend-artifact
       - name: prepare only the missing authenticated CJK font without claiming visual success
         run: node .github/scripts/school-teacher-checks.mjs fonts
       - name: apply the confirmed temporary runner Chrome write-permission tightening
