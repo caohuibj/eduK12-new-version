@@ -72,16 +72,37 @@ test('report cannot self-authorize backend reuse revive old diagnostic receipts 
   const v = sample(); v.options.backend.sha = v.options.head; v.report.officialBackendReuse = clone(v.options.officialBackendReuse)
   assert.throws(() => validateReportBuildInputs(v.report, v.options))
 })
-test('whole-backend digest omits exactly the one fixed fixture and preserves every other original row', () => {
+test('backend compile digest pins the new runtime policy and preserves all other nonfixture rows', () => {
   const line = (file, blob = 'a'.repeat(40)) => `100644 blob ${blob}\tserver-version/backend/${file}`
   const production = line('src/app.ts'), lock = line('package-lock.json'), schema = line('prisma/schema.prisma')
   const otherTest = line('src/__tests__/other.test.ts'), fixture = line(BACKEND_FIXTURE_EXCEPTION.replace('server-version/backend/', ''))
-  const rows = [lock, schema, otherTest, fixture, production], text = rows.join('\n') + '\n'
-  const expected = createHash('sha256').update([lock, schema, otherTest, production].join('\n') + '\n').digest('hex')
+  const policy = line('scripts/runtime-table-policy.json', 'ace85218711a03301aef8b4626f0cf9951cb7b4e')
+  const oldPolicy = policy.replace('ace85218711a03301aef8b4626f0cf9951cb7b4e', 'c7a33ee0e2d700ba39a9a99a82c6a5cb052a08f8')
+  const rows = [lock, schema, policy, otherTest, fixture, production], text = rows.join('\n') + '\n'
+  const expected = createHash('sha256').update([lock, schema, oldPolicy, otherTest, production].join('\n') + '\n').digest('hex')
+  assert.equal(computeBackendCompileDigest(text.replace(policy, oldPolicy), { historical: true }), expected)
+  assert.equal(computeBackendCompileDigest(text, { historical: true }), expected)
   assert.equal(computeBackendCompileDigest(text), expected)
   assert.equal(computeBackendCompileDigest(text.replace(fixture, fixture.replace('a'.repeat(40), 'b'.repeat(40)))), expected)
   for (const row of [lock, schema, otherTest, production])
     assert.notEqual(computeBackendCompileDigest(text.replace(row, row.replace('a'.repeat(40), 'c'.repeat(40)))), expected)
   for (const invalid of [text.replace(fixture + '\n', ''), text + fixture + '\n', text.slice(0, -1), text.replace('server-version/backend/src/app.ts', 'elsewhere/app.ts')])
     assert.throws(() => computeBackendCompileDigest(invalid))
+})
+
+test('runtime policy normalization rejects stale current unknown missing duplicate or wrong-mode inputs', () => {
+  const path = 'server-version/backend/scripts/runtime-table-policy.json'
+  const oldBlob = 'c7a33ee0e2d700ba39a9a99a82c6a5cb052a08f8', newBlob = 'ace85218711a03301aef8b4626f0cf9951cb7b4e'
+  const policy = `100644 blob ${newBlob}\t${path}`
+  const fixture = `100644 blob ${'a'.repeat(40)}\t${BACKEND_FIXTURE_EXCEPTION}`
+  const app = `100644 blob ${'b'.repeat(40)}\tserver-version/backend/src/app.ts`
+  const text = [policy, fixture, app].join('\n') + '\n'
+  assert.throws(() => computeBackendCompileDigest(text.replace(newBlob, oldBlob)))
+  for (const invalid of [text.replace(newBlob, 'c'.repeat(40)), text.replace(policy + '\n', ''),
+    text + policy + '\n', text.replace(policy, policy.replace('100644', '100755')),
+    text.replace(path, path + '.other')]) {
+    assert.throws(() => computeBackendCompileDigest(invalid))
+    assert.throws(() => computeBackendCompileDigest(invalid, { historical: true }))
+  }
+  assert.throws(() => computeBackendCompileDigest(text, { historical: 'true' }))
 })

@@ -296,9 +296,10 @@ function validateOfficialFrontendReceipt(receipt, { head, runId, frontend, front
   assert.equal(frontend.lockDigest, frontendLockDigest); assert.equal(frontend.contentDigest, frontendContentDigest)
   return receipt
 }
-// This completed compile produced an official artifact even though the later
-// connected job failed. Its failed job conclusion must remain explicit. Only
-// one tsc-excluded fixture is omitted from the otherwise whole-backend digest.
+// The original compiled artifact remains unchanged. The current runtime policy
+// is a separately pinned, noncompiled seed/role/restore input and must be new.
+// Only that exact old/new policy row is normalized for compiled-artifact reuse;
+// all other backend rows remain fixed except the one tsc-excluded fixture.
 const BACKEND_FIXTURE_EXCEPTION = 'server-version/backend/src/__tests__/survey/tool-publication.postgres.integration.test.ts'
 const OFFICIAL_BACKEND = Object.freeze({
   originalRun: 39877023519, originalHead: 'b717cddfdeb957bc3665ed3e69f8a680befa021b',
@@ -307,17 +308,26 @@ const OFFICIAL_BACKEND = Object.freeze({
   originalArtifactSha256: '64032cdebcfbf855622f3dbaa53f6b31bffb1b5d9f965ef719b3d3faad469d18',
   backendCompileDigest: '8689278a86c4571e8a5f251338c56d164f3626ec76520c5e27c44350c76b323d',
 })
-function computeBackendCompileDigest(lsTreeText) {
+function computeBackendCompileDigest(lsTreeText, { historical = false } = {}) {
+  assert.equal(typeof historical, 'boolean')
   assert.equal(typeof lsTreeText, 'string'); assert.ok(lsTreeText.endsWith('\n') && !lsTreeText.includes('\r'))
-  const rows = lsTreeText.slice(0, -1).split('\n'), seen = new Set()
-  let omitted = 0
-  const included = rows.filter(row => {
+  const rows = lsTreeText.slice(0, -1).split('\n'), seen = new Set(), included = []
+  const policyPath = 'server-version/backend/scripts/runtime-table-policy.json'
+  const oldPolicy = 'c7a33ee0e2d700ba39a9a99a82c6a5cb052a08f8', newPolicy = 'ace85218711a03301aef8b4626f0cf9951cb7b4e'
+  let omitted = 0, policies = 0
+  for (const row of rows) {
     assert.match(row, /^[0-7]{6} blob [a-f0-9]{40}\tserver-version\/backend\/[^\t]+$/)
     const file = row.split('\t')[1]; assert.equal(seen.has(file), false); seen.add(file)
-    if (file === BACKEND_FIXTURE_EXCEPTION) { omitted++; return false }
-    return true
-  })
-  assert.equal(omitted, 1); assert.ok(included.length > 0)
+    if (file === BACKEND_FIXTURE_EXCEPTION) { omitted++; continue }
+    if (file === policyPath) {
+      const [mode, type, blob] = row.split('\t')[0].split(' ')
+      assert.equal(mode, '100644'); assert.equal(type, 'blob')
+      assert.ok([oldPolicy, newPolicy].includes(blob), 'Only the exact reviewed runtime policy delta is allowed')
+      if (!historical) assert.equal(blob, newPolicy, 'Current seed/role/restore must use the reviewed new runtime policy')
+      included.push(`100644 blob ${oldPolicy}\t${policyPath}`); policies++
+    } else included.push(row)
+  }
+  assert.equal(omitted, 1); assert.equal(policies, 1); assert.ok(included.length > 0)
   return require('node:crypto').createHash('sha256').update(included.join('\n') + '\n').digest('hex')
 }
 function validateOfficialBackendReceipt(receipt, { head, runId, backend, backendCompileDigest, backendLockDigest, backendContentDigest }) {
