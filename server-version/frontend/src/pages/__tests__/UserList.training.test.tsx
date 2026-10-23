@@ -5,7 +5,8 @@ const api=vi.hoisted(()=>({get:vi.fn(),post:vi.fn()}))
 vi.mock('../../api/client',()=>({default:api}))
 const pending={id:'teacher-pending',username:'trainer_pending',nickname:'待审核培训师',role:'TEACHER',teacherApproved:false,isActive:true,createdAt:'2026-10-01T00:00:00Z'}
 const approved={id:'teacher-active',username:'trainer_active',nickname:'在用培训师',role:'TEACHER',teacherApproved:true,isActive:true,expiresAt:'2099-12-31T00:00:00Z'}
-const openActions=async(username='trainer_pending')=>{const row=(await screen.findByText(username)).closest('tr')!;fireEvent.click(within(row).getByText('管理操作',{selector:'summary'}));return row}
+const openCard=async(username='trainer_pending')=>{const card=(await screen.findByText(username)).closest<HTMLDetailsElement>('details.training-account-card')!;fireEvent.click(card.querySelector('summary')!);return card}
+const openActions=async(username='trainer_pending')=>{const card=await openCard(username);fireEvent.click(within(card).getByText('管理操作',{selector:'summary'}));return card}
 const student={id:'learner-1',username:'learner_test',nickname:'测试学员',role:'STUDENT',isActive:true}
 beforeEach(()=>{
  vi.clearAllMocks()
@@ -21,15 +22,15 @@ describe('Training account management',()=>{
   fireEvent.click(screen.getByRole('button',{name:'账号检索'}))
   fireEvent.change(screen.getByRole('searchbox'),{target:{value:'  trainer_pending  '}})
   fireEvent.click(screen.getByRole('button',{name:'查询'}))
-  await waitFor(()=>expect(api.get).toHaveBeenLastCalledWith('/users',{params:{role:'TEACHER',keyword:'trainer_pending',page:1,pageSize:20}}))
+  await waitFor(()=>expect(api.get).toHaveBeenLastCalledWith('/users',{params:{scope:'training-participants',role:'TEACHER',keyword:'trainer_pending',page:1,pageSize:20}}))
   expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
   expect(screen.getByText('关键词：trainer_pending')).toBeVisible()
   fireEvent.click(screen.getByRole('button',{name:'学员'}))
   expect(await screen.findByText('learner_test')).toBeInTheDocument()
-  expect(api.get).toHaveBeenLastCalledWith('/users',{params:{role:'STUDENT',keyword:'trainer_pending',page:1,pageSize:20}})
+  expect(api.get).toHaveBeenLastCalledWith('/users',{params:{scope:'training-participants',role:'STUDENT',keyword:'trainer_pending',page:1,pageSize:20}})
   expect(screen.queryByRole('button',{name:/通过培训师/})).not.toBeInTheDocument()
   fireEvent.click(screen.getByRole('button',{name:'清除筛选'}))
-  await waitFor(()=>expect(api.get).toHaveBeenLastCalledWith('/users',{params:{role:'STUDENT',keyword:undefined,page:1,pageSize:20}}))
+  await waitFor(()=>expect(api.get).toHaveBeenLastCalledWith('/users',{params:{scope:'training-participants',role:'STUDENT',keyword:undefined,page:1,pageSize:20}}))
   expect(api.post).not.toHaveBeenCalled()
  })
  it('requires deliberate approval, disables repeat actions while pending and refreshes after success',async()=>{
@@ -84,7 +85,7 @@ describe('Training account management',()=>{
   expect(screen.getByText('共 45 个培训师账号 · 第 1 / 3 页')).toBeInTheDocument()
   fireEvent.click(screen.getByRole('button',{name:'下一页'}))
   expect(await screen.findByText('page_2')).toBeInTheDocument()
-  expect(api.get).toHaveBeenLastCalledWith('/users',{params:{role:'TEACHER',keyword:undefined,page:2,pageSize:20}})
+  expect(api.get).toHaveBeenLastCalledWith('/users',{params:{scope:'training-participants',role:'TEACHER',keyword:undefined,page:2,pageSize:20}})
  })
  it('does not let an old teacher response overwrite a newer learner filter',async()=>{
   let resolve!: (value:unknown)=>void
@@ -105,11 +106,13 @@ describe('Training account management',()=>{
   expect(await screen.findByText('trainer_pending')).toBeInTheDocument()
  })
  it('retains complete account information with actions hidden until deliberately expanded',async()=>{
-  render(<UserList training/>);const row=(await screen.findByText('trainer_active')).closest('tr')!
+  render(<UserList training/>);const row=(await screen.findByText('trainer_active')).closest<HTMLDetailsElement>('details.training-account-card')!
   expect(screen.getByRole('button',{name:'账号检索'})).toHaveAttribute('aria-expanded','false')
   expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+  expect(within(row).getByText('teacher-active')).not.toBeVisible()
+  fireEvent.click(row.querySelector('summary')!)
   for(const value of ['trainer_active','在用培训师','正常','teacher-active'])expect(within(row).getByText(value)).toBeVisible()
-  expect(within(row).getByText('teacher-active').closest('td')).toHaveAttribute('data-label','账号 ID')
+  expect(within(row).getByText('teacher-active').closest('[data-label]')).toHaveAttribute('data-label','账号 ID')
   const action=within(row).getByText('管理操作',{selector:'summary'}),extend=within(row).getByText('延期 1 年')
   expect(extend).not.toBeVisible();expect(action.closest('details')).not.toHaveAttribute('open')
   fireEvent.click(action);expect(extend).toBeVisible()
@@ -128,12 +131,24 @@ describe('Training account management',()=>{
  })
  it('shows full learner identity and registration fields without teacher-only management controls',async()=>{
   render(<UserList training/>);fireEvent.click(screen.getByRole('button',{name:'学员'}))
-  const row=(await screen.findByText('learner_test')).closest('tr')!
+  const row=(await screen.findByText('learner_test')).closest<HTMLDetailsElement>('details.training-account-card')!
+  expect(within(row).getByText('learner-1')).not.toBeVisible()
+  fireEvent.click(row.querySelector('summary')!)
   for(const value of ['learner_test','测试学员','正常','learner-1'])expect(within(row).getByText(value)).toBeVisible()
-  expect(within(row).getByText('—').closest('td')).toHaveAttribute('data-label','注册时间')
+  expect(within(row).getByText('—').closest('[data-label]')).toHaveAttribute('data-label','注册时间')
   expect(within(row).queryByText('管理操作',{selector:'summary'})).not.toBeInTheDocument()
   expect(within(row).getByRole('button',{name:'复制 测试学员 的用户 ID'})).toBeVisible()
   expect(api.post).not.toHaveBeenCalled()
+ })
+
+ it('shows compact summaries by default and independently expands each account without fetching or writing',async()=>{
+  render(<UserList training/>);await screen.findByText('trainer_pending')
+  const first=screen.getByText('trainer_pending').closest<HTMLDetailsElement>('details.training-account-card')!,second=screen.getByText('trainer_active').closest<HTMLDetailsElement>('details.training-account-card')!
+  expect(first).not.toHaveAttribute('open');expect(second).not.toHaveAttribute('open')
+  expect(within(first).getByText('teacher-pending')).not.toBeVisible()
+  fireEvent.click(first.querySelector('summary')!);expect(within(first).getByText('teacher-pending')).toBeVisible();expect(second).not.toHaveAttribute('open')
+  fireEvent.click(first.querySelector('summary')!);expect(within(first).getByText('teacher-pending')).not.toBeVisible()
+  expect(api.get).toHaveBeenCalledTimes(1);expect(api.post).not.toHaveBeenCalled()
  })
 
 })

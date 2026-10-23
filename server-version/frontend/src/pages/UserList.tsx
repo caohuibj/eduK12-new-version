@@ -30,7 +30,7 @@ const UserList: React.FC<{training?:boolean}> = ({training=false}) => {
     try {
       setLoading(true);setError(null)
       const response=training
-        ?await apiClient.get('/users',{params:{role:serverRole,keyword:query||undefined,page,pageSize:20}})
+        ?await apiClient.get('/users',{params:{scope:'training-participants',role:serverRole,keyword:query||undefined,page,pageSize:20}})
         :await apiClient.get('/users')
       if(id!==requestId.current)return
       if(response.code===0){setUsers(response.data.list);setTotal(response.data.total??response.data.list.length)}
@@ -134,20 +134,22 @@ const UserList: React.FC<{training?:boolean}> = ({training=false}) => {
       {query&&<div className="training-supervision-filter-summary"><span>关键词：{query}</span><button type="button" disabled={busy} onClick={()=>{setSearchKeyword('');setQuery('');setPage(1)}}>清除筛选</button></div>}
       {error&&<div className="training-accounts-error" role="alert"><span>{error}</span><button type="button" onClick={()=>void fetchUsers()}>重新加载</button></div>}
       {loading?<p className="training-accounts-empty" role="status">正在加载账号列表…</p>:error?null:users.length===0?<div className="training-accounts-empty"><Users size={32} aria-hidden="true"/><h3>{query?'未找到匹配账号':'暂无'+(activeTab==='TEACHER'?'培训师':'学员')+'账号'}</h3><p>{query?'试试其他账号或姓名，或重置搜索条件。':'新注册账号会显示在这里。'}</p></div>:<>
-        <div className="training-accounts-table-wrap training-account-list-wrap" role="region" aria-label="账号列表" tabIndex={0}>
-          <table className="training-accounts-table training-account-list-table"><thead><tr><th>账号与姓名</th><th>状态</th>{activeTab==='TEACHER'&&<th>有效期</th>}<th>注册时间</th><th>账号 ID</th>{activeTab==='TEACHER'&&<th className="training-accounts-actions-cell">管理操作</th>}</tr></thead>
-          <tbody>{users.map(user=>{const state=status(user),name=user.nickname||user.username;return <tr key={user.id}>
-            <td data-label="账号与姓名"><strong>{user.username}</strong><small>{user.nickname||'未填写姓名'}</small></td>
-            <td data-label="账号状态"><span className={'training-accounts-status training-accounts-status--'+state.tone}>{state.label}</span></td>
-            {activeTab==='TEACHER'&&<td data-label="有效期"><span className={isExpired(user.expiresAt)?'training-accounts-expired':undefined}>{formatDate(user.expiresAt)}</span>{isExpired(user.expiresAt)&&<small className="training-accounts-expired">已过期</small>}</td>}
-            <td data-label="注册时间">{user.createdAt?new Date(user.createdAt).toLocaleDateString('zh-CN'):'—'}</td>
-            <td data-label="账号 ID" className="training-account-id-cell"><div className="training-account-id-value"><code>{user.id}</code><button type="button" onClick={()=>void copyUserId(user.id)} aria-label={`复制 ${name} 的用户 ID`}>复制 ID</button></div></td>
-            {activeTab==='TEACHER'&&<td data-label="管理操作" className="training-accounts-actions-cell"><details className="training-account-actions"><summary>管理操作<ChevronDown size={15} aria-hidden="true"/></summary><div className="training-account-actions-buttons">
-              {user.teacherApproved===false&&<button type="button" className="training-accounts-primary" disabled={Boolean(approvingUser||extendingUser)} aria-label={`通过培训师 ${name} 的注册审核`} onClick={()=>void handleApprove(user.id)}>{approvingUser===user.id?'正在审核…':'通过审核'}</button>}
-              {user.expiresAt?<button type="button" className="training-accounts-secondary" disabled={Boolean(approvingUser||extendingUser)} aria-label={`将培训师 ${name} 的账号延期 1 年`} onClick={()=>void handleExtend(user.id,12)}>{extendingUser===user.id?'正在延期…':'延期 1 年'}</button>:<span className="training-accounts-permanent">永久有效，无需延期</span>}
-            </div></details></td>}
-          </tr>})}</tbody></table>
-        </div>
+        <ul className="training-account-cards" aria-label="账号列表">
+          {users.map(user=>{const state=status(user),name=user.nickname||user.username;return <li key={user.id}><details className="training-account-card">
+            <summary><span className="training-account-card-name"><strong>{user.username}</strong><small>{user.nickname||'未填写姓名'}</small></span><span className={'training-accounts-status training-accounts-status--'+state.tone}>{state.label}</span><ChevronDown size={16} aria-hidden="true"/></summary>
+            <div className="training-account-card-details">
+              <dl>
+                {activeTab==='TEACHER'&&<div data-label="有效期"><dt>有效期</dt><dd className={isExpired(user.expiresAt)?'training-accounts-expired':undefined}>{formatDate(user.expiresAt)}{isExpired(user.expiresAt)&&' · 已过期'}</dd></div>}
+                <div data-label="注册时间"><dt>注册时间</dt><dd>{user.createdAt?new Date(user.createdAt).toLocaleDateString('zh-CN'):'—'}</dd></div>
+                <div data-label="账号 ID" className="training-account-card-id"><dt>账号 ID</dt><dd className="training-account-id-value"><code>{user.id}</code><button type="button" onClick={()=>void copyUserId(user.id)} aria-label={`复制 ${name} 的用户 ID`}>复制 ID</button></dd></div>
+              </dl>
+              {activeTab==='TEACHER'&&<details className="training-account-actions"><summary>管理操作<ChevronDown size={15} aria-hidden="true"/></summary><div className="training-account-actions-buttons">
+                {user.teacherApproved===false&&<button type="button" className="training-accounts-primary" disabled={busy} aria-label={`通过培训师 ${name} 的注册审核`} onClick={()=>void handleApprove(user.id)}>{approvingUser===user.id?'正在审核…':'通过审核'}</button>}
+                {user.expiresAt?<button type="button" className="training-accounts-secondary" disabled={busy} aria-label={`将培训师 ${name} 的账号延期 1 年`} onClick={()=>void handleExtend(user.id,12)}>{extendingUser===user.id?'正在延期…':'延期 1 年'}</button>:<span className="training-accounts-permanent">永久有效，无需延期</span>}
+              </div></details>}
+            </div>
+          </details></li>})}
+        </ul>
         <div className="training-accounts-pagination"><p>共 {total} 个{activeTab==='TEACHER'?'培训师':'学员'}账号 · 第 {page} / {pages} 页</p><div><button type="button" disabled={page<=1||busy} onClick={()=>setPage(current=>current-1)}>上一页</button><button type="button" disabled={page>=pages||busy} onClick={()=>setPage(current=>current+1)}>下一页</button></div></div>
       </>}
     </section>
