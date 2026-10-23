@@ -26,6 +26,13 @@ async function probeKeyboard(page) {
   if (path[0].tag === 'BODY') { await page.keyboard.press('Tab'); path.push(await page.evaluate(readKeyboardState)) }
   return { ...path[path.length - 1], start, path }
 }
+function classifyThemeFailure(error) {
+  const message = String(error?.message || '')
+  for (const [text, code] of [['Theme root missing', 'ROOT_MISSING'], ['Theme transitions did not settle within 2000ms', 'TRANSITIONS_TIMEOUT'], ['Non-finite theme transition', 'TRANSITION_NON_FINITE']]) {
+    if (message.includes(text)) return code
+  }
+  return 'UNKNOWN'
+}
 async function settleThemeTransitions(rootSelector) {
   const root = document.querySelector(rootSelector)
   if (!root) throw new Error('Theme root missing')
@@ -157,22 +164,38 @@ function createUiChecks({ report, out, axeSource, getFontInventory }) {
     return keys
   }
   async function theme(s, mode) {
-    await s.page.waitForLoadState('networkidle')
-    const count = s.audit.apiMutations.length
-    const control = s.page.getByRole('combobox', { name: names[s.product] + ' 外观', exact: true })
-    let menu = false
-    if (!await control.isVisible()) {
-      assert.equal(s.product, 'SCHOOL')
-      await s.page.getByRole('button', { name: '打开菜单', exact: true }).click(); menu = true
+    let phase = 'initial'
+    try {
+      phase = 'initial-network-idle'
+      await s.page.waitForLoadState('networkidle')
+      const count = s.audit.apiMutations.length
+      const control = s.page.getByRole('combobox', { name: names[s.product] + ' 外观', exact: true })
+      let menu = false
+      phase = 'control-visibility'
+      if (!await control.isVisible()) {
+        assert.equal(s.product, 'SCHOOL')
+        phase = 'open-menu'
+        await s.page.getByRole('button', { name: '打开菜单', exact: true }).click(); menu = true
+      }
+      phase = 'select-mode'
+      await control.selectOption(mode)
+      phase = 'theme-root'
+      await s.page.locator(roots[s.product] + `[data-theme="${mode}"]`).waitFor()
+      phase = 'control-value'
+      assert.equal(await control.inputValue(), mode)
+      phase = 'close-menu'
+      if (menu) await control.press('Escape')
+      phase = 'post-theme-network-idle'
+      await s.page.waitForLoadState('networkidle')
+      phase = 'settle-transitions'
+      const transitions = await s.page.evaluate(settleThemeTransitions, roots[s.product])
+      ;(report.themeTransitions ||= []).push({ product: s.product, mode, ...transitions })
+      phase = 'mutation-invariant'
+      assert.equal(s.audit.apiMutations.length, count, 'Appearance is local preference, not a business mutation')
+    } catch (error) {
+      ;(report.themeFailures ||= []).push({ product: s.product, mode, phase, code: classifyThemeFailure(error) })
+      throw error
     }
-    await control.selectOption(mode)
-    await s.page.locator(roots[s.product] + `[data-theme="${mode}"]`).waitFor()
-    assert.equal(await control.inputValue(), mode)
-    if (menu) await control.press('Escape')
-    await s.page.waitForLoadState('networkidle')
-    const transitions = await s.page.evaluate(settleThemeTransitions, roots[s.product])
-    ;(report.themeTransitions ||= []).push({ product: s.product, mode, ...transitions })
-    assert.equal(s.audit.apiMutations.length, count, 'Appearance is local preference, not a business mutation')
   }
   async function brand(s, mode) {
     const logo = s.page.getByRole('img', { name: names[s.product] + ' @eduk12.top', exact: true })
@@ -540,4 +563,4 @@ function verifyReport(report, options, readScreenshot) {
     notCovered: [...report.notCovered, ...ui.notCovered] }
 }
 
-module.exports = { readKeyboardState, probeKeyboard, settleThemeTransitions, OFFICIAL_BACKEND, BACKEND_FIXTURE_EXCEPTION, computeBackendCompileDigest, validateOfficialBackendReceipt, OFFICIAL_FRONTEND, validateOfficialFrontendReceipt, validateReportBuildInputs, cjkSampleIds, validateUiFontEvidence, prepareRenderedCjk, readRenderedCjk, appearanceKeys, imageMode, validateSelectedImages, createUiChecks, verifyReport, products, darkStates, originalShots }
+module.exports = { classifyThemeFailure, readKeyboardState, probeKeyboard, settleThemeTransitions, OFFICIAL_BACKEND, BACKEND_FIXTURE_EXCEPTION, computeBackendCompileDigest, validateOfficialBackendReceipt, OFFICIAL_FRONTEND, validateOfficialFrontendReceipt, validateReportBuildInputs, cjkSampleIds, validateUiFontEvidence, prepareRenderedCjk, readRenderedCjk, appearanceKeys, imageMode, validateSelectedImages, createUiChecks, verifyReport, products, darkStates, originalShots }

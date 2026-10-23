@@ -51,3 +51,13 @@ test('fresh upload preparation leaves the one-attempt browser seed directory abs
   const source=readFileSync(new URL('../../server-version/e2e/school-teacher-fixture.cjs',import.meta.url),'utf8');assert(source.includes('fs.mkdirSync(root, { mode: 0o700 })'));assert(source.includes("{ flag: 'wx', mode: 0o600 }"));
  }finally{rmSync(root,{recursive:true,force:true})}
 });
+
+test('theme failure diagnostics retain fixed phase classification without publishing exception contents',async()=>{
+ const {classifyThemeFailure}=await import('../../server-version/e2e/school-teacher-ui.cjs');
+ assert.equal(classifyThemeFailure(new Error('page.evaluate: Theme transitions did not settle within 2000ms\n private stack')), 'TRANSITIONS_TIMEOUT');
+ assert.equal(classifyThemeFailure(new Error('Theme root missing')), 'ROOT_MISSING');
+ assert.equal(classifyThemeFailure(new Error('Non-finite theme transition')), 'TRANSITION_NON_FINITE');
+ assert.equal(classifyThemeFailure(new Error('private token and arbitrary page text')), 'UNKNOWN');
+ const source=readFileSync(new URL('../../server-version/e2e/school-teacher-ui.cjs',import.meta.url),'utf8');
+ assert(source.includes('code: classifyThemeFailure(error)'));assert(source.includes('throw error'));
+});
