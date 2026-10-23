@@ -25,7 +25,7 @@ import {
   pruneUnreachableSituationalResponses,
   readSituationalDraft,
   responseKey,
-  sceneIsComplete,
+  situationalSceneIsComplete,
   situationalDraftKey,
   situationalErrorMessage,
   situationalReadyToSubmit,
@@ -267,21 +267,23 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
     return () => { cancelled = true }
   }, [attemptId, client, embeddedCompletionPath, instrumentKey, navigate, publicMode, recoveryToken, trainingSequential])
 
-  const scenes = useMemo(() => (
-    data ? reachableSituationalScenes(data.instrument.definition, responses) : []
-  ), [data, responses])
   const trajectory = useMemo(() => (
     data ? deriveReachableTrajectory(data.instrument.definition, responses) : { nodeKeys: [], sceneKeys: [], terminalNodeKey: null }
   ), [data, responses])
+  const scenes = useMemo(() => (
+    data ? reachableSituationalScenes(data.instrument.definition, responses, trajectory) : []
+  ), [data, responses, trajectory])
   const currentScene = scenes[currentIndex]
-  const responseSceneComplete = Boolean(data && currentScene && sceneIsComplete(data.instrument.definition, currentIndex, responses))
+  const completedScenes = useMemo(() => scenes.map(scene => situationalSceneIsComplete(scene, responses)), [scenes, responses])
+  const responseSceneComplete = completedScenes[currentIndex] ?? false
   const currentFlowNode = useMemo(() => {
     if (!data || data.instrument.definition.schemaVersion !== 2) return null
     const nodeKey = trajectory.nodeKeys[currentIndex]
     const node = data.instrument.definition.flow.nodes.find((candidate) => candidate.nodeKey === nodeKey)
     return node?.nodeType === 'SCENE' ? node : null
   }, [currentIndex, data, trajectory.nodeKeys])
-  const currentHistory = data && currentScene ? situationalHistoryIdentities(data.instrument.definition, responses)[currentScene.sceneKey] ?? '[]' : '[]'
+  const histories = useMemo(() => data ? situationalHistoryIdentities(data.instrument.definition, responses) : {}, [data, responses])
+  const currentHistory = currentScene ? histories[currentScene.sceneKey] ?? '[]' : '[]'
   const responseStage = currentResponseStage(currentFlowNode, currentHistory, researchEvents)
   const currentSceneComplete = responseSceneComplete && (!currentFlowNode?.responseStages || !responseStage)
   const visibleChannels = currentScene?.channels.filter(channel => !currentFlowNode?.responseStages || currentFlowNode.responseStages.some(stage => stage.channelKeys.includes(channel.channelKey) && (stage.stageKey === responseStage?.stageKey || researchEvents.some(e => e.type === 'STAGE_CONFIRMED' && e.nodeKey === currentFlowNode.nodeKey && e.stageKey === stage.stageKey && e.historyIdentity === currentHistory)))) ?? []
@@ -735,9 +737,9 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
             type="button"
             onClick={() => setCurrentIndex(index)}
             disabled={(trainingSequential && index !== currentIndex) || checkpointBusy || saving || submitting || (Boolean(responseStage) && index > currentIndex)}
-            aria-label={`情境 ${index + 1}${sceneIsComplete(data.instrument.definition, index, responses) ? '，已完成' : '，未完成'}`}
+            aria-label={`情境 ${index + 1}${completedScenes[index] ? '，已完成' : '，未完成'}`}
             aria-current={currentIndex === index ? 'step' : undefined}
-            className={`min-h-11 min-w-11 rounded-lg px-3 text-sm font-medium transition ${currentIndex === index ? 'bg-indigo-600 text-white' : sceneIsComplete(data.instrument.definition, index, responses) ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            className={`min-h-11 min-w-11 rounded-lg px-3 text-sm font-medium transition ${currentIndex === index ? 'bg-indigo-600 text-white' : completedScenes[index] ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
           >
             {index + 1}
           </button>

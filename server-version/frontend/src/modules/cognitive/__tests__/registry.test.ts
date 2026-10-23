@@ -11,10 +11,10 @@ import { LexicaldecisionTask } from '../tasks/lexicaldecision/LexicaldecisionTas
 import { EmotionrecognitionTask } from '../tasks/emotionrecognition/EmotionrecognitionTask'
 
 describe('cognitive frontend registry', () => {
-  it('resolves fake / 1.0.0 to the FakeTask runner', () => {
+  it('resolves fake / 1.0.0 to the FakeTask runner', async () => {
     const entry = resolveRunner('fake', '1.0.0')
     expect(entry).toBeDefined()
-    expect(entry?.RunnerComponent).toBe(FakeTask)
+    expect(await entry?.prepareRunner?.()).toBe(FakeTask)
   })
 
   it('resolves reaction / 1.0.0 to a config-aware Reaction runner', () => {
@@ -35,10 +35,10 @@ describe('cognitive frontend registry', () => {
     expect(resolveRunner('reaction', '9.9.9')).toBeUndefined()
   })
 
-  it('resolves Memory and Stroop without a latest-version fallback', () => {
-    expect(resolveRunner('memory', '1.0.0')?.RunnerComponent).toBe(MemoryTask)
+  it('resolves Memory and Stroop without a latest-version fallback', async () => {
+    expect(await resolveRunner('memory', '1.0.0')?.prepareRunner?.()).toBe(MemoryTask)
     expect(resolveRunner('memory', '1.0.0')?.completionMode).toBe('task')
-    expect(resolveRunner('stroop', '1.0.0')?.RunnerComponent).toBe(StroopTask)
+    expect(await resolveRunner('stroop', '1.0.0')?.prepareRunner?.()).toBe(StroopTask)
     expect(resolveRunner('stroop', '1.0.0')?.completionMode).toBe('task')
     expect(resolveRunner('memory', '9.9.9')).toBeUndefined()
     expect(resolveRunner('stroop', '9.9.9')).toBeUndefined()
@@ -53,20 +53,20 @@ describe('cognitive frontend registry', () => {
     expect(resolveRunner('unknown-task', '1.0.0')).toBeUndefined()
   })
 
-  it('resolves PR12 runners by exact testType and engineVersion', () => {
-    expect(resolveRunner('trailmaking', '1.0.0')?.RunnerComponent).toBe(TrailmakingTask)
-    expect(resolveRunner('reversallearning', '1.0.0')?.RunnerComponent).toBe(ReversallearningTask)
-    expect(resolveRunner('bart', '1.0.0')?.RunnerComponent).toBe(BartTask)
+  it('resolves PR12 runners by exact testType and engineVersion', async () => {
+    expect(await resolveRunner('trailmaking', '1.0.0')?.prepareRunner?.()).toBe(TrailmakingTask)
+    expect(await resolveRunner('reversallearning', '1.0.0')?.prepareRunner?.()).toBe(ReversallearningTask)
+    expect(await resolveRunner('bart', '1.0.0')?.prepareRunner?.()).toBe(BartTask)
     expect(resolveRunner('trailmaking', '9.9.9')).toBeUndefined()
     expect(resolveRunner('reversallearning', '9.9.9')).toBeUndefined()
     expect(resolveRunner('bart', '9.9.9')).toBeUndefined()
     expect(resolveRunner('bart', '1.0.0')?.reportDefinition.showProductIndex).toBe(false)
   })
 
-  it('resolves PR13 runners by exact testType and engineVersion', () => {
-    expect(resolveRunner('wordlist', '1.0.0')?.RunnerComponent).toBe(WordlistTask)
-    expect(resolveRunner('lexicaldecision', '1.0.0')?.RunnerComponent).toBe(LexicaldecisionTask)
-    expect(resolveRunner('emotionrecognition', '1.0.0')?.RunnerComponent).toBe(EmotionrecognitionTask)
+  it('resolves PR13 runners by exact testType and engineVersion', async () => {
+    expect(await resolveRunner('wordlist', '1.0.0')?.prepareRunner?.()).toBe(WordlistTask)
+    expect(await resolveRunner('lexicaldecision', '1.0.0')?.prepareRunner?.()).toBe(LexicaldecisionTask)
+    expect(await resolveRunner('emotionrecognition', '1.0.0')?.prepareRunner?.()).toBe(EmotionrecognitionTask)
     expect(resolveRunner('wordlist', '9.9.9')).toBeUndefined()
     expect(resolveRunner('lexicaldecision', '9.9.9')).toBeUndefined()
     expect(resolveRunner('emotionrecognition', '9.9.9')).toBeUndefined()

@@ -1,4 +1,5 @@
-import { StroopTask } from './StroopTask'
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
+const StroopTask = deferredCognitiveRunner(() => import('./StroopTask').then(module => module.StroopTask))
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
 
 export const stroopRegistryEntry: CognitiveFrontendRegistryEntry = {
@@ -6,7 +7,7 @@ export const stroopRegistryEntry: CognitiveFrontendRegistryEntry = {
   name: '干扰控制任务',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: StroopTask,
+  RunnerComponent: StroopTask, prepareRunner: StroopTask.prepare,
   completionMode: 'task',
   metricDefinitions: [
     { key: 'medianRtCongruent', label: '一致试次中位反应时', unit: 'ms', displayType: 'ms' },

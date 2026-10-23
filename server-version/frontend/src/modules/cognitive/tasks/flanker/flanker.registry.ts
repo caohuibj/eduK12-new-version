@@ -1,4 +1,5 @@
-import { FlankerTask } from './FlankerTask'
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
+const FlankerTask = deferredCognitiveRunner(() => import('./FlankerTask').then(module => module.FlankerTask))
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
 
 export const flankerRegistryEntry: CognitiveFrontendRegistryEntry = {
@@ -6,7 +7,7 @@ export const flankerRegistryEntry: CognitiveFrontendRegistryEntry = {
   name: 'Flanker 箭头干扰',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: FlankerTask,
+  RunnerComponent: FlankerTask, prepareRunner: FlankerTask.prepare,
   completionMode: 'task',
   metricDefinitions: [
     { key: 'flankerEffectMs', label: 'Flanker 干扰效应', unit: 'ms', displayType: 'ms' },

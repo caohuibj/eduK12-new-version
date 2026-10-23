@@ -1,0 +1,42 @@
+{
+  "kind": "recorded-local-native-indexeddb",
+  "ciExecuted": false,
+  "originalExecutionSigned": false,
+  "sourceGitBlob": "0e2ec6f9a84cf91791aa6f8ab203b976e963d0d8",
+  "sourceSHA256": "f038155970935dd911a848f59bc12a278fabeb90a80b29c119dbd25caba48a7e",
+  "sourceModuleSHA256": "7a2b6189b943a6e2a178aba6d307980c7c74c3e9e88b5e57db902aad2102fad3",
+  "harnessSHA256": "c89904b559eacad265e8e258f9239633c881fbc266b140df55575c4e978f878c",
+  "originalTestSourceSHA256": "fe31c60f7c4ec78f2f73ad80106476f2126a86b8173484e5d6c21d1c08984a7e",
+  "browser": "151.0.7922.173",
+  "startedAtEpoch": 1792769552.3729336,
+  "completedAtEpoch": 1792769553.814854,
+  "scope": "Exact abort/quota/commit assertions ported from the three existing native-IDB-only cases to real Chromium, plus two new answer/timing/seal cases. Original jsdom skips remain skips; not claimed as CI execution.",
+  "nativeIndexedDb": true,
+  "results": [
+    {
+      "name": "IndexedDB transaction failure boundaries rolls back old-only deletion, shared updates, new-only insertion, and timing on a late abort",
+      "status": "passed",
+      "durationMs": 73.19999999925494
+    },
+    {
+      "name": "IndexedDB transaction failure boundaries rolls back answer requests if the final metadata write throws",
+      "status": "passed",
+      "durationMs": 19.100000001490116
+    },
+    {
+      "name": "IndexedDB transaction failure boundaries resolves only after the transaction completion event",
+      "status": "passed",
+      "durationMs": 30.299999998882413
+    },
+    {
+      "name": "Native timed answer rolls back both values on metadata quota failure",
+      "status": "passed",
+      "durationMs": 7.800000000745058
+    },
+    {
+      "name": "Native following seal sees matching answer and timing and replays immutable FINAL",
+      "status": "passed",
+      "durationMs": 15.699999999254942
+    }
+  ]
+}

@@ -1136,6 +1136,66 @@ authorizes merge qualification only: no production deployment or production
 artifact/security certification is claimed. Report the actual waiting phase at
 about five minutes; do not append unrelated checks.
 
+## Training assessment performance exact qualification (2026-10-23)
+
+`work/training-assessment-performance-20261023` is based on main
+`54ed73fdbef60b3b8d4998984c624c98c6bc99cb`. Its new exact binding freezes
+all application/test/report blobs, both component trees, unchanged dependency and
+schema inputs, the actual PR source and checkout tree. Only the enumerated
+qualification controls can accompany that product. Unknown paths, modes, base or
+source drift, manual/full/probe requests fail without a platform fallback.
+
+Affected runner/media/persistence/selector tests, frontend types/lint and backend
+compilation execute once in Actions. The local default and cognitive-enabled
+Vite builds, real synthetic browser journeys and bounded CPU/query observations
+are retained as `reviewed-local-build-and-browser-observation`, `ciExecuted=false`,
+`originalExecutionSigned=false`. Input Git objects are reconstructed and reviewed
+at candidate freeze; complete historical node_modules bytes were not captured.
+Test-only preparation adjustments after compilation do not change compiled inputs;
+the manifest binds the non-test frontend inputs separately from the qualified full
+tree. This is not a generic signed execution framework or production image.
+
+The unchanged official HIGH/CRITICAL lock audits reuse the existing authenticated
+participant-access verifier, exact Actions run/job/artifact identities, matching
+package/lock/audit-program inputs, ZIP SHA-256 and 24-hour lifetime. New scope and
+refusal contracts and current application/control CodeQL remain required. The
+stable merge gate recomputes the complete plan and requires actual scope,
+Training assessment qualification and CodeQL success. Draft, missing, skipped,
+failed and cancelled selected results cannot qualify. Main merge only classifies
+the same diff. No full platform suite, image build, DB/migration/restore, media
+worker test, heavy load repetition or production deployment is selected. Report
+concrete waiting items at the five-minute threshold; do not add unrelated checks.
+
+The first Training assessment run (`39975935257`, source `4144a1d3`) retains its
+failed history: an overly broad workflow condition also selected the previous
+participant route, and frontend types lacked backend Zod/Prisma declarations used
+by the existing cross-tree examples. No frontend tests ran in that failed stage.
+The exact backend job completed compilation and all three selector assertions;
+the affected frontend lint stage also actually passed.
+
+The follow-up fixes only qualification wiring and supplies those missing type
+dependencies. It admits the exact successful backend job/artifact (ZIP digest,
+original report, complete same component, command program, PR/source identities
+and 24-hour lifetime) and the successful lint stage separately, retaining the
+parent and type failure. It does not recompile or rerun those successful inputs.
+The completed full application CodeQL job is verified by exact official metadata,
+source trees, original configuration and successful init/analyze steps; only the
+three new/changed qualification-control JavaScript files are then scanned anew.
+Types and the previously unexecuted affected assertions must still actually pass.
+No missing, failed or expired evidence triggers a full-check fallback.
+
+Run `39977819707` retains 230 actually passed frontend Node assertions, three
+failed assertions and three native-IDB-only jsdom skips. Successful assertions
+are reused only when the complete relative import closure, source blobs, locked
+tools, shared setup and configuration still match; affected/failed assertions run
+once in the follow-up. A native Chromium check ports the three abort/quota/commit
+assertions and adds two new answer/timing/seal assertions, all actually passed.
+The unsigned local record binds the store, original tests and retained harness;
+it is not relabeled as CI execution and does not turn the original skips green.
+Current qualification requires the complete 233 Node-assertion union plus those
+explicit native checks. Only the two affected application files and changed
+qualification controls receive fresh CodeQL; other inputs retain the original
+actual application scan. The failed history is preserved without a full rerun.
 ## School / Teacher visual frontend qualification (2026-10-23)
 
 For `work/school-teacher-visual-20261023` only, the user explicitly approved a
