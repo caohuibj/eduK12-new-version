@@ -23,6 +23,7 @@ interface Props {
   busy: boolean
   locked: boolean
   sections: FormSection[]
+  pendingChoiceEdit?: boolean
   editingQuestionId?: string
   basicSettings: ReactNode
   questionControls: ReactNode
@@ -39,9 +40,9 @@ const questionTypes: Record<string, string> = {
 }
 
 export function FormTemplateWorkspace({ isNew, name, dirty, draft, busy, locked, sections,
-  editingQuestionId, basicSettings, questionControls, onEdit, onMove, onRemove, onRemoveSection }: Props) {
+  editingQuestionId, pendingChoiceEdit=false, basicSettings, questionControls, onEdit, onMove, onRemove, onRemoveSection }: Props) {
   const [infoOpen, setInfoOpen] = useState(isNew)
-  const disabled = busy || dirty || locked
+  const disabled = busy || dirty || locked || pendingChoiceEdit
   const count = sections.reduce((total, section) => total + section.items.length, 0)
   return <fieldset disabled={locked} className="qt-form-template-workspace">
     <details className="qt-form-info" open={infoOpen} onToggle={event => setInfoOpen(event.currentTarget.open)}>

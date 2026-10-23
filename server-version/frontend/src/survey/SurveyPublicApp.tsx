@@ -1,3 +1,5 @@
+import {SurveyMaterialDisplay} from './SurveyMaterialDisplay'
+import type {PublicMaterial} from '../modules/assessment-media/material'
 import {SurveyCatalogScaleMedia,type SurveyScaleMedia} from './SurveyCatalogScaleMedia'
 import { BasicFormAnswer } from '../modules/assessment-core/form/BasicFormAnswer'
 import { cleanupExpiredSurveyCognitiveDrafts } from './survey-cognitive-retention'
@@ -25,14 +27,14 @@ type Wave={id:string;title:string;ordinal:number;status:string;consentText:strin
   groupIpPolicy?:{schemaVersion:1;timeZone:string;activationDate?:string}|null;groupIpActivatedAt?:string|null}
 type StudyInfo={project:{name:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:string};waves:Wave[];scopeWaveId?:string|null}
 type Choice={optionKey:string;label:string;nonanswerReason?:'DECLINED'|'UNABLE_TO_JUDGE'}
-type Question=SurveyScaleMedia&{responseOptions?:Choice[];itemKey:string;questionKey?:string;type:string;prompt:string;image?:SurveyPublicImage;required:boolean;
+type Question=SurveyScaleMedia&{materials?:PublicMaterial[];responseOptions?:Choice[];itemKey:string;questionKey?:string;type:string;prompt:string;image?:SurveyPublicImage;required:boolean;
   options:Choice[];rows?:{rowKey:string;label:string}[];allowRefusal?:boolean;displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string};
   min?:number;max?:number;integerOnly?:boolean;step?:number;precision?:number;
   maxLength?:number;minSelections?:number;maxSelections?:number;
   total?:number;timeZone?:string;textValidation?:'EMAIL'|'DIGITS'|'ALPHANUMERIC';
   otherOptionKey?:string;otherMaxLength?:number;exclusiveOptionKeys?:string[]}
 type SjtPublicQuestion={questionKey:string;prompt:string;responseType?:'SINGLE'|'MULTIPLE';required?:boolean;allowRefusal?:boolean;exclusiveOptionKeys?:string[];minSelections?:number;maxSelections?:number;options:Choice[]}
-type Unit={kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';instrumentKey:string;title:string;image?:SurveyPublicImage;
+type Unit={materials?:PublicMaterial[];kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';instrumentKey:string;title:string;image?:SurveyPublicImage;
   presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE';
   stimulus?:string;scenarioTitle?:string;
   pages?:{pageKey:string;title:string;description?:string;questions:Question[]}[];
@@ -172,6 +174,7 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
       id={'survey-answer-'+unit.instrumentKey+'-'+q.itemKey} tabIndex={-1} key={q.itemKey}>
       <legend className="font-medium text-sm">{q.prompt}{q.required?' *':''}</legend>
       {unit.kind==='SCALE'&&proof&&<SurveyCatalogScaleMedia item={q} proof={proof} instrumentKey={unit.instrumentKey} itemKey={q.itemKey} complete={videoComplete?.[q.itemKey]} onComplete={()=>onVideoComplete?.(q.itemKey)} onImagesReadyChange={ready=>onImageReadyChange?.(q.itemKey,ready)} readOnly={readOnly}/>}
+      {q.materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item} proof={proof}/>)}
       {q.image&&proof&&<SurveyParticipantImage image={q.image} proof={proof}/>}
       {q.type==='MULTIPLE'&&q.maxSelections!==undefined&&<p className="text-xs mb-2">
         请选 {q.minSelections??1} 至 {q.maxSelections} 项。</p>}
@@ -654,7 +657,7 @@ export default function SurveyPublicApp(){
     const key=videoKey(unit,itemKey);return old[key]===ready?old:{...old,[key]:ready}
   })
   const markVideoComplete=(unit:Unit,itemKey:string)=>setVideoCompletions(old=>({...old,[videoKey(unit,itemKey)]:true}))
-  const renderSurveyTask=(unit:Unit)=>{
+  const renderSurveyTaskBody=(unit:Unit)=>{
     if(unit.kind==='COGNITIVE')return <SurveyCognitiveUnit key={unit.instrumentKey} publicId={publicId} attemptId={attemptId}
       instrumentKey={unit.instrumentKey} title={unit.title} request={publicApi}
       proof={{accessCredential,...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode}:{})}}
@@ -699,6 +702,10 @@ export default function SurveyPublicApp(){
       answer={answers[unit.instrumentKey]||{}}
       onChange={(key,value)=>updateAnswer(unit,key,value)}/></fieldset>
   }
+  const renderSurveyTask=(unit:Unit)=><div key={unit.instrumentKey}>
+    {unit.materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item} proof={{publicId,attemptId,accessCredential,...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode}:{})}}/>)}
+    {renderSurveyTaskBody(unit)}
+  </div>
   const submit=(e:FormEvent)=>{e.preventDefault();if(!task||!attemptId||finalInFlight.current||cognitiveRunning)return;
     if(!finalRequest.current&&(currentFlow||timedSequence)&&!finalFlowStep){
       setError('请按顺序完成当前研究步骤');return
@@ -1081,6 +1088,7 @@ export default function SurveyPublicApp(){
             {measurement.metrics.map(metric=><p key={metric.key}>{metric.label}：{metric.value===null?'不可计算':measurement.feedbackKind==='RAW_METRICS'?String(metric.value):metric.unit==='ratio'?(metric.value*100).toFixed(1)+'%':metric.unit==='ms'?metric.value+' ms':String(metric.value)}（{metric.status}）</p>)}
             {measurement.feedbackKind==='RAW_METRICS'&&measurement.rawScoreFeedback?.map((feedback,index)=><section className="border-l-2 border-slate-300 pl-3 space-y-2" key={feedback.scoreKey+':'+index} aria-label="原始分描述性反馈">
               <p className="whitespace-pre-wrap text-sm">{feedback.text}</p>
+              {completion&&feedback.materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item} purpose="report" proof={{publicId,attemptId:completion.attemptId,...completion.proof}}/>)}
               {completion&&feedback.images?.map(image=><SurveyParticipantImage key={image.asset.assetId} image={image} purpose="report" proof={{publicId,attemptId:completion.attemptId,...completion.proof}}/>)}
             </section>)}
           </article>)}

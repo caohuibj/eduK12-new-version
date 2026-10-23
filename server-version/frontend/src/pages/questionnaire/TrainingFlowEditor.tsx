@@ -1,3 +1,4 @@
+import { TrainingFlowBlocks } from './TrainingFlowBlocks'
 import { Route } from 'lucide-react'
 import { ProductButton } from '../../components/product-ui'
 import { createTrainingFlow, enableTrainingMaterials, isMaterialFlowText, formatTrainingFlow, parseTrainingFlow, trainingFlowSources, trainingFlowUnitKey,
@@ -13,6 +14,8 @@ type Props = {
 }
 export function TrainingFlowEditor({ guided = false, maxAttempts, onMaxAttemptsChange, text, frozen, units, draft, eligible, busy, dirty, error, onChange, onSave, onError }: Props) {
   const enabled = Boolean(text.trim()), sources = trainingFlowSources(units)
+  let visualConfig: TrainingFlowConfig | null = frozen
+  if (draft) { try { visualConfig = parseTrainingFlow(text, units) } catch { visualConfig = null } }
   const materialsEnabled = draft ? isMaterialFlowText(text) : frozen?.schemaVersion === 2
   const addExperiment = (quota: boolean) => {
     try {
@@ -61,7 +64,9 @@ export function TrainingFlowEditor({ guided = false, maxAttempts, onMaxAttemptsC
         <p>材料组按权重分配，并始终在流程开头展示。配额统计已分配机会，不统计阅读、FINAL 或完成；SCREEN_OUT 不退还配额。满额组退出抽样后，其余组的实际概率会改变。</p>
         <p>KEEP_LINKED 仅对已登录者在同一授权所有者、课程与 experimentKey 范围内跨发布保留分组。匿名重启沿用原认领并轮换凭证；新链接不代表同一关联身份。RERANDOMIZE 在新的合法作答机会重新抽组。</p>
       </>}
-      {guided && <p className="qt-inline-notice">此功能需要配置流程规则。可先插入模板，再由熟悉规则的人员核对；开启后请保存，并在发布前完成检查。</p>}
+      {guided && <p className="qt-inline-notice">按顺序设置展示条件；只能引用此前的选择题。移动后若破坏条件依赖，原顺序会保留。材料文字与实验参数仍可在高级编辑中设置。</p>}
+      {visualConfig && <TrainingFlowBlocks config={visualConfig} units={units} disabled={!draft || busy} onChange={onChange} onError={onError} />}
+      {draft && enabled && !visualConfig && <p role="alert">流程暂不能可视化，请展开高级编辑修正规则；原内容已保留。</p>}
       <details className={guided ? 'qt-flow-code' : undefined} open={!guided || Boolean(error)}>
       <summary>{guided ? '编辑流程规则（高级 JSON）' : '流程规则'}</summary>
       <label className="block" htmlFor={trainingFlowEditorId}>流程 JSON（高级编辑）</label>

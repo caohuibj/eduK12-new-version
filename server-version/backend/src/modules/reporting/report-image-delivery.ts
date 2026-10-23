@@ -1,3 +1,5 @@
+import {materialSchema} from '../assessment-media/material'
+import {serveAssessmentMaterial} from '../assessment-media/material-delivery'
 import type { Response } from 'express'
 import { assessmentImagePresentationSchema } from '../assessment-media/assessment-image-presentation'
 import { serveAssessmentImageContent } from '../assessment-media/assessment-image-delivery'
@@ -11,7 +13,9 @@ export function projectedReportImage(report: unknown, assetId: string) {
   for (const unit of units) {
     if (!unit || typeof unit !== 'object' || unit.type !== 'SCALE' || !Array.isArray(unit.rawScoreFeedback)) continue
     for (const feedback of unit.rawScoreFeedback) {
-      if (!feedback || !Array.isArray(feedback.images)) continue
+      if(!feedback)continue
+      for(const material of feedback.materials??[]){const parsed=materialSchema.shape.asset.safeParse(material?.asset);if(parsed.success&&parsed.data.assetId===assetId)return parsed.data}
+      if (!Array.isArray(feedback.images)) continue
       for (const image of feedback.images) {
         const parsed = assessmentImagePresentationSchema.safeParse(image)
         if (parsed.success && parsed.data.asset.assetId === assetId) return parsed.data.asset
@@ -25,5 +29,6 @@ export async function serveProjectedReportImage(report: unknown, assetId: string
   res.setHeader('Referrer-Policy', 'no-referrer')
   const reference = projectedReportImage(report, assetId)
   if (!reference) return res.status(404).end()
-  return serveAssessmentImageContent({ reference, res })
+  if(['video/mp4','video/webm','application/pdf'].includes(reference.mimeType))return serveAssessmentMaterial(materialSchema.shape.asset.parse(reference),res)
+  return serveAssessmentImageContent({ reference:reference as Parameters<typeof serveAssessmentImageContent>[0]['reference'], res })
 }

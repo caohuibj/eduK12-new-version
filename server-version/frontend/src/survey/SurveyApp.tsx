@@ -175,9 +175,9 @@ function SurveyApplication(){
     finally{setLoading(false)}
   },[initial,initialStudy,loadProjects])
   useEffect(()=>{
-    document.title=activeFeature?activeFeature.title+' | Huisurvey':'Huisurvey · 观风知微';void refresh()
+    document.title=activeFeature?activeFeature.title+' | Research':initial==='home'?'Research · 观风知微':'Huisurvey · 观风知微';void refresh()
     return cancelStudyRestore
-  },[refresh,activeFeature,cancelStudyRestore])
+  },[refresh,activeFeature,cancelStudyRestore,initial])
   useEffect(()=>{
     if(initial==='home'||initial==='feature')return
     void loadCapabilities()

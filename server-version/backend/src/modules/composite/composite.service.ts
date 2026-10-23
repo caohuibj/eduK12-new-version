@@ -1,3 +1,5 @@
+import {publicTrainingFormDefinition} from '../assessment-runtime/typed-form'
+import {assertTrainingMaterialsUsable,trainingFormMaterials,inspectTrainingMaterials} from '../assessment-media/training-materials'
 import { assertScalePublicationRights } from '../scale/scale-publication-guard'
 import { assertTrainingScaleCollectionAllowed } from '../scale/scale-collection-guard'
 import { assertCompositeCourseScope } from './composite-course-scope'
@@ -640,6 +642,11 @@ export const assertValidItem = async (
   if (input.type === 'FORM') {
     if (!input.formType || !input.formLabel || supplied !== 1) {
       throw compositeBadRequest('表单模块必须提供 formType 和 formLabel')
+    }
+    if ((input as any).formDefinition?.materials?.length) {
+      const lists=[(input as any).formDefinition.materials]
+      if(prisma===defaultPrisma)await inspectTrainingMaterials(composite.createdBy??userId,lists)
+      else await assertTrainingMaterialsUsable(prisma as Prisma.TransactionClient,composite.createdBy??userId,lists,false)
     }
     if ((input as any).formDefinition != null) typedCompositeFormQuestion({ ...input, id: 'new', formDefinition: { itemKey: 'q_new', ...(input as any).formDefinition }, placeholder: input.formPlaceholder ?? null, contextKey: input.contextKey ?? null, position: input.position ?? 0, formSectionPosition: null } as any)
     if (input.formType === 'single_choice' || input.formType === 'multiple_choice') {
@@ -2143,6 +2150,7 @@ const publishCompositeInTransaction = async (userId: string, role: UserRole, id:
   const prepared = await prepareCompositePublication(userId, role, id, db, resolvedSituational)
   const publicationSource=await loadComposite(id,true,db)
   await assertScalePublicationRights(db as Prisma.TransactionClient,userId,role,publicationSource.items.filter((item:any)=>item.type==='SCALE').map((item:any)=>item.scaleId))
+  await assertTrainingMaterialsUsable(db as Prisma.TransactionClient,publicationSource.createdBy,trainingFormMaterials(publicationSource.formSections??[]))
   const published = await db.compositeAssessment.update({
     where: { id },
     data: {
@@ -3896,7 +3904,7 @@ const getUnifiedCompositeAttemptState = async (
       label: packageSlotLabels.get(item.position) ?? item.formLabel,
       placeholder: item.formPlaceholder,
       options: item.formOptions,
-      ...(item.formDefinition != null ? { formDefinition: item.formDefinition } : {}),
+      ...(item.formDefinition != null ? { formDefinition: publicTrainingFormDefinition(item.formDefinition) } : {}),
       ...(item.formPolicy != null ? { formPolicy: item.formPolicy } : {}),
       required: item.required !== false,
       contextKey: item.contextKey ?? null,
@@ -4620,7 +4628,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
       label: packageSlotLabels.get(item.position) ?? item.formLabel,
       placeholder: item.formPlaceholder,
       options: item.formOptions,
-      ...(item.formDefinition != null ? { formDefinition: item.formDefinition } : {}),
+      ...(item.formDefinition != null ? { formDefinition: publicTrainingFormDefinition(item.formDefinition) } : {}),
       ...(item.formPolicy != null ? { formPolicy: item.formPolicy } : {}),
       required: item.required,
       contextKey: item.contextKey ?? null,
@@ -4768,7 +4776,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
         label: packageSlotLabels.get(item.position) ?? item.formLabel,
         placeholder: item.formPlaceholder,
         options: item.formOptions,
-        ...(item.formDefinition != null ? { formDefinition: item.formDefinition } : {}),
+        ...(item.formDefinition != null ? { formDefinition: publicTrainingFormDefinition(item.formDefinition) } : {}),
       ...(item.formPolicy != null ? { formPolicy: item.formPolicy } : {}),
         required: item.required !== false,
         contextKey: item.contextKey ?? null,

@@ -1,3 +1,5 @@
+import type {PublicMaterial} from '../modules/assessment-media/material'
+import {TrainingMaterials} from '../modules/assessment-media/TrainingMaterialPicker'
 import { isTrainingHost } from '../training/context'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { FileText, Layers, Save } from 'lucide-react'
@@ -82,6 +84,7 @@ export interface FinalQuestionnaireScale {
       sortOrder: number
       responseSetKey: string
       randomizeOptions: boolean
+      materials?:PublicMaterial[]
       images?: unknown
       video?: unknown
       options: Array<{ value: ResponseValue; label: string }>
@@ -629,7 +632,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
             const imageItems = assessmentImageItems(item.images)
             const videoPresentation = scaleItemVideoPresentation(item)
             return (
-              <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${item.content} 视觉内容`}>
+              <div key={item.itemCode}><TrainingMaterials items={item.materials} loadAsset={loadAssessmentImage}/><AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${item.content} 视觉内容`}>
                 <ScaleFormVideoGate
                   presentation={videoPresentation}
                   loadSources={() => loadQuestionnaireVideoCapability(publicMode
@@ -659,7 +662,7 @@ const FinalQuestionnaireAssessment: React.FC<FinalQuestionnaireAssessmentProps> 
                     submitting={submitting}
                   />
                 </ScaleFormVideoGate>
-              </AssessmentImageGate>
+              </AssessmentImageGate></div>
             )
           })()}
         </div>

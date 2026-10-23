@@ -25,7 +25,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { lockCompositeAssetReferences, compositeSjtGrantScope, inspectCompositeSituationalItems, resolveCompositeSituationalItems, assertValidItem, getCompositeForTeacher, publishComposite, prepareCompositePublication, listAvailableForStudent } from '../composite/composite.service'
 import { compositeBadRequest, compositeConflict, compositeForbidden, compositeNotFound } from '../composite/composite.errors'
 import { mapCompositeSection, compositeFormSectionDefinitionHash } from '../assessment-runtime/form-section-definition'
-import { compositeFormSectionImageReferences, publishedFormMediaOwner, retainFormSectionImages } from '../assessment-runtime/form-image.adapter'
+import { compositeFormSectionImageReferences, compositeFormSectionMaterialReferences, publishedFormMediaOwner, retainFormSectionImages } from '../assessment-runtime/form-image.adapter'
 import { compositeFormSectionVideoPresentations, retainFormSectionVideos } from '../assessment-runtime/form-video.adapter'
 import { ensureCompositeFormSections } from '../composite/final-submit.service'
 import { addCompositeItemSchema } from '../composite/composite.schema'
@@ -562,7 +562,7 @@ export async function publish(actor: Actor, id: string, raw: unknown) {
     for (const section of row.formSections) {
       const definition = mapCompositeSection(section)
       const mediaOwner = publishedFormMediaOwner('COMPOSITE', id, compositeFormSectionDefinitionHash(definition))
-      await retainFormSectionImages({ owner: mediaOwner, references: compositeFormSectionImageReferences(definition), db: tx })
+      await retainFormSectionImages({ owner: mediaOwner, references: [...compositeFormSectionImageReferences(definition),...compositeFormSectionMaterialReferences(definition)], db: tx })
       await retainFormSectionVideos({ owner: mediaOwner, presentations: compositeFormSectionVideoPresentations(definition), db: tx })
     }
     if(row.trainingTimingPolicy){readTrainingTimingPolicy(row.trainingTimingPolicy);await tx.compositeAssessment.update({where:{id},data:{trainingTimingPolicy:await timingPolicy(tx,row,true)}})}

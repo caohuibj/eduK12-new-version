@@ -103,6 +103,7 @@ export function SurveyImageField({projectId,image,onChange,presentationOnly=fals
     {libraryError&&<><p role="alert" className="text-red-700 text-sm">{libraryError}</p>
       <button type="button" className="btn-secondary" disabled={busy||libraryLoading}
         onClick={()=>void loadLibrary()}>重试读取素材库</button></>}
+    {!libraryLoading&&!libraryError&&<p className="survey-image-file-hint">{library.length?'可复用本人素材库及其他自建工具中的图片；当前显示最近 40 张。':'没有可选图片。请在素材库上传，或在当前工具中上传图片后重新打开。'}</p>}
     <label className="text-sm block">从{scopeLabel}选择
       <select className="input block w-full" value={image?.asset.assetId||''}
         disabled={busy||libraryLoading||!!libraryError}

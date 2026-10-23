@@ -14,7 +14,7 @@ import type { ConditionalFormItem } from './form-visibility'
 type ExistingFormQuestion={
   itemKey:string;type:'SINGLE'|'MULTIPLE'|'SHORT_TEXT'|'LONG_TEXT'|'NUMBER'|'LIKERT'|'MATRIX'|
     'DATE'|'TIME'|'RANK_ORDER'|'SLIDER'|'CONSTANT_SUM'|'MATRIX_MULTIPLE';
-  prompt:string;image?:SurveyImage;required:boolean;allowRefusal?:boolean;
+  prompt:string;image?:SurveyImage;materials?:import('../modules/assessment-media/material').AssessmentMaterial[];required:boolean;allowRefusal?:boolean;
   options:{optionKey:string;label:string;score?:number}[];rows:{rowKey:string;label:string}[];
   min?:number;max?:number;integerOnly?:boolean;step?:number;precision?:number;
   maxLength?:number;total?:number;minSelections?:number;maxSelections?:number;
@@ -42,9 +42,10 @@ describe('shared Form compatibility entries',()=>{
 
   it('preserves the existing draft, answer and renderer type contracts',()=>{
     expectTypeOf<FormQuestion>().toEqualTypeOf<ExistingFormQuestion>()
-    expectTypeOf<FormDraft>().toEqualTypeOf<ExistingFormDraft>()
+    expectTypeOf<Omit<FormDraft,'materials'>>().toEqualTypeOf<ExistingFormDraft>()
     expectTypeOf<FormQuestion>().toEqualTypeOf<SharedFormQuestion<SurveyImage>>()
-    expectTypeOf<FormDraft>().toEqualTypeOf<SharedFormDraft<SurveyImage>>()
+    expectTypeOf<Omit<FormDraft,'materials'>>().toEqualTypeOf<SharedFormDraft<SurveyImage>>()
+    expectTypeOf<FormDraft['materials']>().toEqualTypeOf<import('../modules/assessment-media/material').AssessmentMaterial[]|undefined>()
     expectTypeOf<ProfessionalAnswer>().toEqualTypeOf<ExistingAnswer>()
     expectTypeOf<ProfessionalAnswer>().toEqualTypeOf<core.ProfessionalAnswer>()
     expectTypeOf<ProfessionalQuestion>().toEqualTypeOf<core.ProfessionalQuestion>()

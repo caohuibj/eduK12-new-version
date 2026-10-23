@@ -1,0 +1,134 @@
+name: Shared authoring exact candidate
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  CI_EVENT: pull_request
+  CI_HEAD_REF: work/shared-assessment-authoring-20261023
+  CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+  CI_PR_REPOSITORY: caohuibj/eduK12-new-version
+  NODE_OPTIONS: --max-old-space-size=4096
+jobs:
+  admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      PLAN: ${{ inputs.plan }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify exact candidate, original local reports and negative gate contracts
+        run: |
+          node .github/scripts/shared-authoring-checks.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shared-authoring-admission-${{ github.sha }}
+          path: shared-authoring-evidence
+          if-no-files-found: error
+          retention-days: 3
+  frontend:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: retain exact successful new-lock frontend audit types sanitizer and production dist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/shared-authoring-reuse.mjs frontend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shared-authoring-frontend-${{ github.sha }}
+          path: server-version/frontend/dist
+          if-no-files-found: error
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shared-authoring-frontend-reuse-${{ github.sha }}
+          path: shared-authoring-evidence/official-frontend.json
+          if-no-files-found: error
+          retention-days: 3
+  backend:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify exact official successful backend build audit migration and frozen chain
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/shared-authoring-reuse.mjs backend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shared-authoring-backend-reuse-${{ github.sha }}
+          path: shared-authoring-evidence/official-backend.json
+          if-no-files-found: error
+          retention-days: 3
+  browser:
+    needs: frontend
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: shared-authoring-frontend-${{ github.sha }}
+          path: server-version/frontend/dist
+      - name: install only pinned browser controls; use runner's installed Chrome
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          google-chrome --version
+          if ! fc-list :lang=zh file | grep -q .; then
+            sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=20 -o APT::Update::Error-Mode=any update
+            sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=20 install -y --no-install-recommends fonts-wqy-zenhei
+          fi
+          test -n "$(fc-list :lang=zh file)"
+      - name: first built-candidate authoring and landing short flow; Chrome sandbox enabled
+        run: node .github/scripts/shared-authoring-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shared-authoring-browser-${{ github.sha }}
+          path: shared-authoring-evidence/browser
+          if-no-files-found: error
+          retention-days: 3
+  qualified:
+    needs: [admission, frontend, backend, browser]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: every selected internal job must actually succeed
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: node -e 'const n=JSON.parse(process.env.NEEDS);for(const k of ["admission","frontend","backend","browser"])if(n[k]?.result!=="success")throw Error(k+" did not succeed")'

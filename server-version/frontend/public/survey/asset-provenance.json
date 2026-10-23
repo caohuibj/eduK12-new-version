@@ -80,5 +80,69 @@
     "derivedFrom": "research-wordmark.svg",
     "processing": "Vector paths unchanged; fill #234a65 to #dfedf5, #537b8d to #9fc5d8 for approved dark palette",
     "sha256": "f165b4dbc220b7b0e8ef04b00d784bceb85b055ea2549e84cf8770e1ef64aa36"
+  },
+  "publicHeroBackground": {
+    "concept": "研究的风场：纸页编制、连续波次与数据轨迹；装饰性艺术，非实际研究结果",
+    "processing": "Generated original day artwork and reference-preserving dark edit; Pillow 11.3.0 only resizes and exports WebP; no external imagery",
+    "variants": [
+      {
+        "mode": "light",
+        "generator": "built-in image_gen",
+        "sourceSha256": "4af2aea90ede469132706086d9b027de315919d66f54b2663a1fa1803faf4e02",
+        "sourceDimensions": [
+          1536,
+          1024
+        ],
+        "exports": [
+          {
+            "filename": "research-wind-light.webp",
+            "dimensions": [
+              1536,
+              1024
+            ],
+            "bytes": 70538,
+            "sha256": "1b7d6d7bf2891a050829aa3e1c2a9224f48f95d3806a25718804231b749b5ab7"
+          },
+          {
+            "filename": "research-wind-light-small.webp",
+            "dimensions": [
+              768,
+              512
+            ],
+            "bytes": 20686,
+            "sha256": "e21bf3dad3555e90662362db2e5a910adfd520439d7ee67efba86de80a4e01ca"
+          }
+        ]
+      },
+      {
+        "mode": "dark",
+        "generator": "built-in image_gen",
+        "sourceSha256": "a847e893212d559f5c9ec1559024618785af699c59fcd0907f34423b53f6eea2",
+        "sourceDimensions": [
+          1536,
+          1024
+        ],
+        "exports": [
+          {
+            "filename": "research-wind-dark.webp",
+            "dimensions": [
+              1536,
+              1024
+            ],
+            "bytes": 114718,
+            "sha256": "2293a4b06902bdb60560280525c57c81d736dc6dfdc5ef318e5b9000ae82a449"
+          },
+          {
+            "filename": "research-wind-dark-small.webp",
+            "dimensions": [
+              768,
+              512
+            ],
+            "bytes": 35678,
+            "sha256": "2f2e1032761039efe3e00482f8d0129935762b28d31388706f8965880127347e"
+          }
+        ]
+      }
+    ]
   }
 }

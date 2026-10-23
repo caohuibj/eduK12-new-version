@@ -1,3 +1,4 @@
+import {ownedScope} from './material-scope'
 import {SurveyBuilderError} from './builder.service'
 import {authorizeToolOwner,ownedTemplate} from './tool-library.service'
 import { Prisma } from '@prisma/client'
@@ -14,7 +15,6 @@ import { success,error } from '../../utils/response'
 import { z } from 'zod'
 import { surveyMimeTypes,surveyMaxImageBytes,SurveyMediaError } from './media.references'
 
-import {assetScope} from './media.references'
 type Tx=Prisma.TransactionClient
 const limit=surveyMaxImageBytes
 const types=surveyMimeTypes
@@ -51,11 +51,12 @@ router.get('/:pid/assets',handle(async req=>{
   const pid=id.parse(req.params.pid),uid=req.user!.userId
   return prisma.$transaction(async tx=>{
     await owner(tx,uid,pid)
-    const rows=await tx.storedAsset.findMany({where:{
-      ownerId:uid,...assetScope(pid,toolLibrary),accessScope:'PRIVATE',mimeType:{in:types},
-      deletedAt:null,sizeBytes:{lte:limit},
-    },orderBy:[{createdAt:'desc'},{id:'desc'}],take:40,
-    select:{id:true,sha256:true,mimeType:true,originalName:true,sizeBytes:true}})
+    const rows=await tx.$queryRaw<Array<{id:string;sha256:string;mimeType:string;originalName:string|null;sizeBytes:number}>>`
+      SELECT a.id,a.sha256,a.mime_type AS "mimeType",a.original_name AS "originalName",a.size_bytes AS "sizeBytes"
+      FROM stored_assets a WHERE a.deleted_at IS NULL AND a.mime_type=ANY(${[...types]}::text[])
+      AND a.size_bytes>0 AND a.size_bytes<=${limit} AND ${ownedScope(uid)}
+      ORDER BY a.created_at DESC,a.id DESC LIMIT 40`
+
     return {assets:rows.map(r=>({assetId:r.id,contentHash:r.sha256,
       mimeType:r.mimeType,originalName:r.originalName,sizeBytes:r.sizeBytes}))}
   })
@@ -81,9 +82,10 @@ router.get('/:pid/assets/:assetId/preview',async(req,res,next)=>{
     const asset=await prisma.$transaction(async tx=>{
       await owner(tx,userId,projectId)
       const item=await tx.storedAsset.findFirst({where:{id:id.parse(req.params.assetId),
-        ownerId:userId,...assetScope(projectId,toolLibrary),accessScope:'PRIVATE',deletedAt:null,sizeBytes:{lte:limit}},
+        ownerId:userId,accessScope:'PRIVATE',deletedAt:null,sizeBytes:{lte:limit}},
         select:{id:true,sha256:true,mimeType:true}})
-      if(!item||!types.includes(item.mimeType as (typeof types)[number]))fail(404,'研究图片不可用')
+      const allowed=await tx.$queryRaw<Array<{id:string}>>`SELECT a.id FROM stored_assets a WHERE a.id=${req.params.assetId} AND ${ownedScope(userId)}`
+      if(!allowed.length||!item||!types.includes(item.mimeType as (typeof types)[number]))fail(404,'研究图片不可用')
       return item!
     })
     res.setHeader('Cache-Control','no-store')

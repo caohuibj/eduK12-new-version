@@ -1,3 +1,6 @@
+import {authorizeSurveyMaterial} from './material.authorization'
+import {serveSurveyMaterial} from './material.delivery'
+import {SurveyMediaError} from './media.references'
 import {authorizedSurveyMediaSnapshot,frozenSurveyScaleImage,issueOwnSurveyScaleVideo} from './public-scale-media'
 import {AssessmentMediaCapabilityError} from '../assessment-media/assessment-media-capability'
 import {AssessmentAssetValidationError} from '../assessment-media/assessment-asset'
@@ -121,6 +124,21 @@ publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/withdraw-data',handle(
     attemptId:id.parse(req.params.attemptId),accessCredential:params.accessCredential,
   })
 }))
+
+/** Only selected frozen materials or actually released feedback are disclosed. */
+for(const purpose of ['materials','report-materials'] as const){
+  publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/'+purpose+'/:assetId',async(req,res,next)=>{
+    try{
+      const input={publicId:id.parse(req.params.publicId),attemptId:id.parse(req.params.attemptId),...proof.parse(req.body)}
+      const assetId=id.parse(req.params.assetId)
+      const reference=await authorizeSurveyMaterial(input,assetId,purpose)
+      return await serveSurveyMaterial(reference,res)
+    }catch(cause){
+      if(cause instanceof z.ZodError||cause instanceof SurveyWaveError||cause instanceof SurveyFinalError||cause instanceof ResearchIdentityError||cause instanceof SurveyAssignmentError||cause instanceof SurveyMediaError)return res.status(404).end()
+      next(cause)
+    }
+  })
+}
 
 /** POST because participant recovery credentials must never appear in URL,
  * query parameters or referer; response bytes are never publicly cacheable.

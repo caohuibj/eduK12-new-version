@@ -1,3 +1,4 @@
+import {compositeFormSectionMaterialReferences} from '../assessment-runtime/form-image.adapter'
 import type { Request, Response } from 'express'
 import { UserRole } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -65,7 +66,7 @@ const publishWithFormMedia = async (req: Request, res: Response) => {
       ownerIds.push(owner.entityId)
       await retainFormSectionImages({
         owner,
-        references: compositeFormSectionImageReferences(definition),
+        references: [...compositeFormSectionImageReferences(definition),...compositeFormSectionMaterialReferences(definition)],
       })
       await retainFormSectionVideos({
         owner,

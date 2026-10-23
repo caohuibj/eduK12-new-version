@@ -1,3 +1,5 @@
+import {SurveyMaterialPicker} from './SurveyMaterialPicker'
+import {SurveyMaterialDisplay} from './SurveyMaterialDisplay'
 import {useCallback,useEffect,useRef,useState} from 'react'
 import {ArrowLeft,Pencil} from 'lucide-react'
 import {toolLibraryApi as api,ToolLibraryError,libraryKindLabel,type LibraryTool,type ToolRef} from './tool-library-api'
@@ -58,6 +60,12 @@ export function SurveyToolTemplateEditor({id,onReturn,onLeaveRiskChange}:{id:str
     {notice&&tool.kind!=='SCALE'&&<p role="status" className="survey-library-notice">{notice}</p>}
     {tool.kind==='FORM'&&<ResearchFormEditor value={tool.definition as FormDraft} onChange={change} projectId={'tool:'+id} appearance="studio" onCommit={commitForm} onDraftRiskChange={setFormRisk} disabled={dirty}/>}
     {tool.kind==='COMPOSITION'&&<><SurveyCompositionEditor key={id} items={items} onChange={next=>change({...tool.definition,items:next})}/><footer className="survey-composition-footer"><p>添加、排序和移除后需保存；检查组合前请先保存全部修改。</p><button type="button" className="btn-primary" disabled={busy||readOnly||!dirty||!tool.title.trim()} onClick={save}>保存当前草稿</button></footer></>}
+    {tool.kind!=='COMPOSITION'&&<details className="survey-library-help"><summary>展示素材 · 图片、视频、文档{tool.definition.materials?.length?'（'+tool.definition.materials.length+'）':''}</summary>
+      <SurveyMaterialPicker value={tool.definition.materials} onChange={materials=>change({...tool.definition,materials})}/>
+      {tool.definition.materials?.map((item:import('../modules/assessment-media/material').AssessmentMaterial)=><SurveyMaterialDisplay key={item.asset.assetId} item={item}/>)}
+      <button type="button" className="btn-primary" disabled={busy||readOnly||!dirty||formRisk} onClick={save}>保存工具与素材</button>
+    </details>}
+    {tool.kind==='COMPOSITION'&&<p className="survey-library-help">组合问卷按各工具顺序呈现其展示素材。请在对应表单或量表内添加图片、视频、PDF，再保存并完成该修订；已有组合选用旧修订时需重新选择。</p>}
     {usageHelp}
     {draft&&<details className="survey-library-help survey-tool-import"><summary>批量录入题目</summary>
       <div className="survey-tool-import-guide"><h3>{tool.kind==='SCALE'?'使用 CSV 批量追加量表题目':'批量追加表单题目'}</h3><p>导入会追加题目，不覆盖已有内容。每批最多 200 题；请先保存当前修改，再解析预览。</p>

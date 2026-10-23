@@ -1,3 +1,5 @@
+import {parseFormBulkLines} from '../../modules/assessment-core/form/bulkLines'
+
 export type ChoiceDraft = { id: string; value: string; label: string }
 
 export const newChoice = (existing: ChoiceDraft[], prefix: string, label = ''): ChoiceDraft => {
@@ -30,17 +32,10 @@ export function choiceError(choices: ChoiceDraft[], max: number, portableKeys: b
 
 /** Plain text keeps commas and equals signs intact. Codes require explicit two-column mode. */
 export function parseChoicePaste(text: string, coded: boolean, existing: ChoiceDraft[], prefix: string): ChoiceDraft[] {
-  const lines = text.replace(/\r\n?/g, '\n').split('\n').filter(line => line.trim())
   const result: ChoiceDraft[] = []
-  for (const line of lines) {
-    const cells = line.split('\t')
-    if (coded ? cells.length !== 2 : cells.length !== 1) {
-      throw new Error(coded ? '请粘贴两列：第一列编码，第二列文字。' : '检测到多列内容。请只复制一列文字，或选择“编码 + 文字（两列）”。')
-    }
-    const label = (coded ? cells[1] : line).trim()
-    if (!label) throw new Error('每一项都需要填写文字。')
+  for (const {label,code} of parseFormBulkLines(text,coded)) {
     const choice = newChoice([...existing, ...result], prefix, label)
-    result.push(coded ? { ...choice, value: cells[0].trim() } : choice)
+    result.push(coded ? { ...choice, value: code! } : choice)
   }
   return result
 }

@@ -1,9 +1,12 @@
+import {SurveyMaterialPicker} from './SurveyMaterialPicker'
+import {SurveyFormChoiceList} from './SurveyFormChoiceList'
+import {referencedFormChoiceKeys} from '../modules/assessment-core/form/choiceSafety'
 import type { ReactNode } from 'react'
 import { SurveyFormStudio } from './SurveyFormStudio'
 import { StructuredFormConstraints } from '../modules/assessment-core/form/StructuredFormConstraints'
 import { BasicFormConstraints } from '../modules/assessment-core/form/BasicFormConstraints'
 import type { FormDraft, FormQuestion } from './builder.types'
-import { choiceTypes, professionalTypes, newOption, newQuestion, researchKey } from './builder.types'
+import { choiceTypes, professionalTypes, newQuestion, researchKey } from './builder.types'
 import { SurveyImageField } from './SurveyImageField'
 
 const types:Record<FormQuestion['type'],string>={
@@ -14,13 +17,13 @@ const types:Record<FormQuestion['type'],string>={
 }
 function FormSettings({compact,title,children}:{compact:boolean;title:string;children:ReactNode}){return compact?<details className="survey-form-question-settings"><summary>{title}</summary>{children}</details>:<>{children}</>}
 export type FormEditorFocus={pageKey:string;itemKey:string|null}
-type FieldsProps={value:FormDraft;onChange:(next:FormDraft)=>void;projectId?:string;questionKey?:string;questionMeta?:ReactNode;
+type FieldsProps={value:FormDraft;onChange:(next:FormDraft)=>void;projectId?:string;questionKey?:string;questionMeta?:ReactNode;renderMaterials?:(question:FormQuestion,onChange:(question:FormQuestion)=>void)=>ReactNode;bulkPending?:boolean;onPendingChange?:(id:string,pending:boolean)=>void;
   focusedItem?:FormEditorFocus;variant?:'education';renderImageField?:(props:{image?:FormQuestion['image'];onChange:(image:FormQuestion['image'])=>void})=>ReactNode}
 type Props=FieldsProps&({appearance:'studio';onCommit:(next:FormDraft)=>Promise<boolean>;onDraftRiskChange?:(dirty:boolean)=>void;disabled?:boolean}|{appearance?:'standard'})
 export function ResearchFormEditor(props:Props){
-  return props.appearance==='studio'?<SurveyFormStudio value={props.value} onCommit={props.onCommit} onDraftRiskChange={props.onDraftRiskChange} disabled={props.disabled} renderQuestion={(value,onChange,key,pageControl)=><FormFields value={value} onChange={onChange} projectId={props.projectId} questionKey={key} questionMeta={pageControl} focusedItem={props.focusedItem} variant={props.variant} renderImageField={props.renderImageField}/>}/>:<FormFields {...props}/>
+  return props.appearance==='studio'?<SurveyFormStudio value={props.value} onCommit={props.onCommit} onDraftRiskChange={props.onDraftRiskChange} disabled={props.disabled} renderQuestion={(value,onChange,key,pageControl,onPendingChange,bulkPending)=><FormFields value={value} onChange={onChange} projectId={props.projectId} questionKey={key} renderMaterials={props.renderMaterials} questionMeta={pageControl} bulkPending={bulkPending} onPendingChange={onPendingChange} focusedItem={props.focusedItem} variant={props.variant} renderImageField={props.renderImageField}/>}/>:<FormFields {...props}/>
 }
-function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedItem,variant,renderImageField}:FieldsProps){
+function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedItem,variant,renderImageField,renderMaterials,bulkPending,onPendingChange}:FieldsProps){
   const setPage=(index:number,update:(p:FormDraft['pages'][number])=>FormDraft['pages'][number])=>{
     const pages=value.pages.map((p,i)=>i===index?update(p):p)
     onChange({...value,pages})
@@ -39,28 +42,29 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedIt
       <h3 className="font-semibold">{variant==='education'?'表单区段':'Form 问卷页面'} · V{value.schemaVersion}</h3>
       <span className={fieldCount>500?'text-red-700 text-sm':'text-slate-600 text-sm'}
         role={fieldCount>500?'alert':undefined}>作答字段 {fieldCount}/500（矩阵每行及其他填写各计 1）</span>
-      {value.schemaVersion===1&&<button type="button" className="btn-secondary"
+      {value.schemaVersion===1&&<button type="button" disabled={bulkPending} className="btn-secondary"
         onClick={()=>onChange({...value,schemaVersion:2})}>
         升级为 Form V2（生成新冻结版本）</button>}
-      <button type="button" className="btn-secondary" onClick={()=>onChange({...value,pages:[...value.pages,
+      <button type="button" disabled={bulkPending} className="btn-secondary" onClick={()=>onChange({...value,pages:[...value.pages,
         {pageKey:researchKey('p'),title:'第 '+(value.pages.length+1)+(variant==='education'?' 区段':' 页'),questions:[]}]})}>{variant==='education'?'新增区段':'新增分页'}</button>
     </div>
     {value.pages.map((page,pi)=>focusedItem&&focusedItem.pageKey!==page.pageKey?null:<section className={questionKey?'survey-form-question-fields':'rounded-xl border p-4 bg-white space-y-4'} key={page.pageKey} hidden={!!questionKey&&!page.questions.some(q=>q.itemKey===questionKey)}>
       <header className="flex items-center gap-2" hidden={!!questionKey}>
         <input className="input flex-1" aria-label={'第 '+(pi+1)+(variant==='education'?' 区段标题':' 页标题')} value={page.title}
           onChange={e=>setPage(pi,p=>({...p,title:e.target.value}))}/>
-        <button className="btn-secondary" type="button" disabled={pi===0} aria-label={variant==='education'?'上移区段':'上移分页'}
+        <button className="btn-secondary" type="button" disabled={bulkPending||pi===0} aria-label={variant==='education'?'上移区段':'上移分页'}
           onClick={()=>{const copy=value.pages.slice();[copy[pi],copy[pi-1]]=[copy[pi-1],copy[pi]];onChange({...value,pages:copy})}}>↑</button>
-        <button className="btn-secondary" type="button" disabled={pi===value.pages.length-1} aria-label={variant==='education'?'下移区段':'下移分页'}
+        <button className="btn-secondary" type="button" disabled={bulkPending||pi===value.pages.length-1} aria-label={variant==='education'?'下移区段':'下移分页'}
           onClick={()=>{const copy=value.pages.slice();[copy[pi],copy[pi+1]]=[copy[pi+1],copy[pi]];onChange({...value,pages:copy})}}>↓</button>
-        <button type="button" className="btn-secondary" onClick={()=>onChange({...value,pages:value.pages.filter((_,i)=>i!==pi)})}>{variant==='education'?'删除区段':'删除页'}</button>
+        <button type="button" disabled={bulkPending} className="btn-secondary" onClick={()=>onChange({...value,pages:value.pages.filter((_,i)=>i!==pi)})}>{variant==='education'?'删除区段':'删除页'}</button>
       </header>
       {page.questions.map((q,qi)=>{
         if(focusedItem&&focusedItem.itemKey!==q.itemKey)return null
         const previous=[...value.pages.slice(0,pi).flatMap(p=>p.questions),...page.questions.slice(0,qi)]
           .filter(q=>['SINGLE','MULTIPLE','LIKERT'].includes(q.type))
         if(questionKey&&q.itemKey!==questionKey)return null
-        const typeControl=<select className="input" aria-label="选择题型" value={q.type} onChange={e=>{
+        const referencedOptions=referencedFormChoiceKeys(q,value.pages.flatMap(p=>p.questions))
+        const typeControl=<select className="input" aria-label="选择题型" disabled={bulkPending} value={q.type} onChange={e=>{
               const type=e.target.value as FormQuestion['type']
               const fresh=newQuestion(type)
               setQuestion(pi,qi,old=>({...fresh,itemKey:old.itemKey,prompt:old.prompt,required:old.required,allowRefusal:old.allowRefusal}))
@@ -72,7 +76,7 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedIt
             onChange={image=>setQuestion(pi,qi,x=>({...x,image}))}/>
             : q.image ? <p className="text-sm" role="status">
               此图片来自研究项目，Huiteacher 暂不复用研究者媒体权限。
-              <button type="button" className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,image:undefined}))}>
+              <button type="button" disabled={bulkPending} className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,image:undefined}))}>
                 移除图片
               </button></p> : null}
           </FormSettings>
@@ -82,9 +86,9 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedIt
             {questionKey?questionMeta:<strong className="text-sm">题目 {qi+1}</strong>}
             {questionKey?<label className="survey-form-type-control">题型{typeControl}</label>:typeControl}
 
-            <button hidden={!!questionKey} type="button" className="btn-secondary" disabled={qi===0} onClick={()=>move(pi,qi,-1)}>上移</button>
-            <button hidden={!!questionKey} type="button" className="btn-secondary" disabled={qi===page.questions.length-1} onClick={()=>move(pi,qi,1)}>下移</button>
-            <button hidden={!!questionKey} type="button" className="btn-secondary" onClick={()=>{
+            <button hidden={!!questionKey} type="button" className="btn-secondary" disabled={bulkPending||qi===0} onClick={()=>move(pi,qi,-1)}>上移</button>
+            <button hidden={!!questionKey} type="button" className="btn-secondary" disabled={bulkPending||qi===page.questions.length-1} onClick={()=>move(pi,qi,1)}>下移</button>
+            <button hidden={!!questionKey} type="button" disabled={bulkPending} className="btn-secondary" onClick={()=>{
               const copiedOptions=q.options.map(o=>({...o,optionKey:researchKey('o')}))
               const remap=new Map(q.options.map((o,i)=>[o.optionKey,copiedOptions[i].optionKey]))
               const clone:FormQuestion={...structuredClone(q),itemKey:researchKey('q'),
@@ -94,7 +98,7 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedIt
               setPage(pi,p=>({...p,questions:[
                 ...p.questions.slice(0,qi+1),clone,...p.questions.slice(qi+1)]}))
             }}>复制</button>
-            <button hidden={!!questionKey} type="button" className="btn-secondary" onClick={()=>setPage(pi,p=>({...p,questions:p.questions.filter((_,i)=>i!==qi)}))}>删除</button>
+            <button hidden={!!questionKey} type="button" disabled={bulkPending} className="btn-secondary" onClick={()=>setPage(pi,p=>({...p,questions:p.questions.filter((_,i)=>i!==qi)}))}>删除</button>
           </div>
           <label className={questionKey?'survey-form-prompt':'block text-sm'}>题干
             <textarea className="input w-full block" rows={questionKey?3:2} placeholder={questionKey?'请输入题目内容':undefined} value={q.prompt}
@@ -109,20 +113,9 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedIt
               {questionKey?'允许选择“不愿回答”':'允许明确选择「不愿回答」（单独记为 REFUSED）'}
             </label>
           </div>
+          {renderMaterials ? renderMaterials(q,next=>setQuestion(pi,qi,()=>next)) : projectId&&<details className="survey-form-question-settings"><summary>题目素材 · 图片、视频、文档</summary><SurveyMaterialPicker label="题目展示素材" value={q.materials} onChange={materials=>setQuestion(pi,qi,x=>({...x,materials}))}/></details>}
           {!questionKey&&mediaFields}
-          {choiceTypes.has(q.type)&&<div className={questionKey?'survey-form-options space-y-2':'space-y-2'}>
-            <p className="text-sm font-medium">选项</p>
-            {q.options.map((o,oi)=><div className={questionKey?'survey-form-option-row':'flex gap-2'} key={o.optionKey}>{questionKey&&<span className="survey-form-option-number">{oi+1}</span>}
-              <input className="input flex-1" aria-label={'选项 '+(oi+1)} value={o.label}
-                onChange={e=>setQuestion(pi,qi,x=>({...x,options:x.options.map(a=>a.optionKey===o.optionKey?{...a,label:e.target.value}:a)}))}/>
-              <button className="btn-secondary" aria-label={questionKey?'删除选项 '+(oi+1):undefined} type="button" onClick={()=>setQuestion(pi,qi,x=>({...x,
-                options:x.options.filter(a=>a.optionKey!==o.optionKey),
-                otherOptionKey:x.otherOptionKey===o.optionKey?undefined:x.otherOptionKey,
-                otherMaxLength:x.otherOptionKey===o.optionKey?undefined:x.otherMaxLength,
-                exclusiveOptionKeys:x.exclusiveOptionKeys?.filter(key=>key!==o.optionKey)}))}>{questionKey?'×':'删除'}</button>
-            </div>)}
-            <button type="button" className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,options:[...x.options,newOption()]}))}>增加选项</button>
-          </div>}
+          {choiceTypes.has(q.type)&&<SurveyFormChoiceList key={q.itemKey+q.type+'options'} question={q} kind="选项" limit={30} protectedKeys={referencedOptions} onPendingChange={onPendingChange} onChange={next=>setQuestion(pi,qi,()=>next)}/>}
           {questionKey&&mediaFields}
           {(!questionKey||value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type))&&<FormSettings compact={!!questionKey} title="选项补充设置">
           {value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type)&&
@@ -156,15 +149,7 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedIt
               </fieldset>}
             </div>}
           </FormSettings>}
-          {['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<div className="space-y-2">
-            <p className="text-sm font-medium">矩阵行</p>
-            {q.rows.map((row,ri)=><div key={row.rowKey} className="flex gap-2">
-              <input className="input flex-1" aria-label={'矩阵行 '+(ri+1)} value={row.label}
-                onChange={e=>setQuestion(pi,qi,x=>({...x,rows:x.rows.map(a=>a.rowKey===row.rowKey?{...a,label:e.target.value}:a)}))}/>
-              <button className="btn-secondary" type="button" onClick={()=>setQuestion(pi,qi,x=>({...x,rows:x.rows.filter(a=>a.rowKey!==row.rowKey)}))}>删除</button>
-            </div>)}
-            <button type="button" className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,rows:[...x.rows,{rowKey:researchKey('r'),label:'新行'}]}))}>增加矩阵行</button>
-          </div>}
+          {['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<SurveyFormChoiceList key={q.itemKey+q.type+'rows'} question={q} kind="矩阵行" limit={Math.min(40,500-fieldCount+q.rows.length)} onPendingChange={onPendingChange} onChange={next=>setQuestion(pi,qi,()=>next)}/>}
           {(!questionKey||['NUMBER','SLIDER','TIME','SHORT_TEXT','LONG_TEXT','CONSTANT_SUM','MULTIPLE','MATRIX_MULTIPLE'].includes(q.type))&&<FormSettings compact={!!questionKey} title="作答规则与格式"><div className="space-y-3">
           <BasicFormConstraints question={q} onChange={patch=>setQuestion(pi,qi,x=>({...x,...patch}))}/>
           {value.schemaVersion===2&&<StructuredFormConstraints question={q} onChange={patch=>setQuestion(pi,qi,x=>({...x,...patch}))}/>}
@@ -205,7 +190,7 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,focusedIt
       })}
       <div className="flex flex-wrap gap-2" hidden={!!questionKey}>{Object.entries(types).filter(([type])=>value.schemaVersion===2||
         !professionalTypes.has(type as FormQuestion['type'])).map(([type,title])=>
-        <button type="button" className="btn-secondary" key={type}
+        <button type="button" disabled={bulkPending} className="btn-secondary" key={type}
           onClick={()=>setPage(pi,p=>({...p,questions:[...p.questions,newQuestion(type as FormQuestion['type'])]}))}>
           + {title}</button>)}</div>
     </section>)}

@@ -1,3 +1,4 @@
+import {ownedScope} from './material-scope'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
 import {prisma} from '../../config/database'
@@ -17,19 +18,14 @@ export type MaterialQuery=z.infer<typeof materialQuery>
 type Tx=Prisma.TransactionClient
 const allowed=Object.values(materialKinds).flatMap(value=>[...value.types])
 // An owner match alone must never expose unrelated evidence or course attachments.
-const ownedScope=(userId:string)=>Prisma.sql`a.owner_id=${userId} AND a.access_scope='PRIVATE' AND (
-  EXISTS(SELECT 1 FROM asset_references r WHERE r.asset_id=a.id AND r.entity_type='SurveyResearcherMedia' AND r.entity_id=${userId} AND r.field='library')
-  OR EXISTS(SELECT 1 FROM survey_projects p WHERE p.owner_user_id=${userId} AND p.status IN ('DRAFT','ACTIVE') AND
-    (a.scope_id=p.id OR EXISTS(SELECT 1 FROM asset_references r WHERE r.asset_id=a.id AND r.entity_type='SurveyProject' AND r.entity_id=p.id)))
-  OR EXISTS(SELECT 1 FROM survey_tool_templates t WHERE t.owner_user_id=${userId} AND t.status='DRAFT' AND
-    (a.scope_id=t.id OR EXISTS(SELECT 1 FROM asset_references r WHERE r.asset_id=a.id AND r.entity_type='SurveyToolTemplate' AND r.entity_id=t.id))))`
-type Row={id:string;name:string;mimeType:string;size:number;updatedAt:Date;source:'owned'|'granted';entryId:string|null;boundTitle:string|null}
+
+type Row={id:string;contentHash:string;name:string;mimeType:string;size:number;updatedAt:Date;source:'owned'|'granted';entryId:string|null;boundTitle:string|null}
 export async function listSurveyMaterials(userId:string,input:MaterialQuery){
   return prisma.$transaction(async tx=>{
     await authorizeToolOwner(tx,userId)
-    const rows=Prisma.sql`SELECT a.id,COALESCE(a.original_name,'未命名素材') AS name,a.mime_type AS "mimeType",a.size_bytes AS size,a.created_at AS "updatedAt",'owned'::text AS source,NULL::text AS "entryId",NULL::text AS "boundTitle"
+    const rows=Prisma.sql`SELECT a.id,a.sha256 AS "contentHash",COALESCE(a.original_name,'未命名素材') AS name,a.mime_type AS "mimeType",a.size_bytes AS size,a.created_at AS "updatedAt",'owned'::text AS source,NULL::text AS "entryId",NULL::text AS "boundTitle"
       FROM stored_assets a WHERE a.deleted_at IS NULL AND a.mime_type=ANY(${allowed}::text[]) AND ${ownedScope(userId)}
-      UNION ALL SELECT a.id,COALESCE(a.original_name,'授权素材') AS name,a.mime_type AS "mimeType",a.size_bytes AS size,g.created_at AS "updatedAt",'granted'::text AS source,e.id AS "entryId",s.metadata->>'title' AS "boundTitle"
+      UNION ALL SELECT a.id,a.sha256 AS "contentHash",COALESCE(a.original_name,'授权素材') AS name,a.mime_type AS "mimeType",a.size_bytes AS size,g.created_at AS "updatedAt",'granted'::text AS source,e.id AS "entryId",s.metadata->>'title' AS "boundTitle"
       FROM scale_library_use_grants g JOIN scale_library_entries e ON e.id=g.entry_id
       JOIN scale_library_submissions s ON s.id=e.submission_id
       CROSS JOIN LATERAL jsonb_array_elements(s.snapshot->'mediaManifest'->'items') item

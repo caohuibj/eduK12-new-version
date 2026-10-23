@@ -1,7 +1,9 @@
+import {materialListSchema,publicMaterial} from '../assessment-media/material'
 import { z } from 'zod'
 import { assessmentImagePresentationListSchema } from '../assessment-media/assessment-image-presentation'
 
 const feedbackContent = z.object({
+  materials:materialListSchema.optional(),
   text: z.string().trim().min(1).max(16000),
   images: assessmentImagePresentationListSchema.optional(),
 }).strict()
@@ -36,8 +38,9 @@ export const rawScoreFeedbackSchema = z.object({
 export type RawScoreFeedback = z.infer<typeof rawScoreFeedbackSchema>
 export const rawScoreFeedbackMatchSchema = feedbackContent.extend({ scoreKey: z.string().min(1), rangeKey: z.string().min(1).nullable() }).strict()
 export type RawScoreFeedbackMatch = z.infer<typeof rawScoreFeedbackMatchSchema>
-export function projectRawScoreFeedback(matches: RawScoreFeedbackMatch[] | undefined, allowScoreDerivedLabels = true): RawScoreFeedbackMatch[] {
-  return (matches ?? []).flatMap(match => { const parsed = rawScoreFeedbackMatchSchema.safeParse(match); return parsed.success ? [{ ...parsed.data, rangeKey: allowScoreDerivedLabels ? parsed.data.rangeKey : null }] : [] })
+export type PublicRawScoreFeedbackMatch=Omit<RawScoreFeedbackMatch,'materials'>&{materials?:ReturnType<typeof publicMaterial>[]}
+export function projectRawScoreFeedback(matches: RawScoreFeedbackMatch[] | undefined, allowScoreDerivedLabels = true): PublicRawScoreFeedbackMatch[] {
+  return (matches ?? []).flatMap(match => { const parsed = rawScoreFeedbackMatchSchema.safeParse(match); return parsed.success ? [{ ...parsed.data, ...(parsed.data.materials?{materials:parsed.data.materials.map(publicMaterial)}:{}), rangeKey: allowScoreDerivedLabels ? parsed.data.rangeKey : null }] : [] })
 }
 /** Display selection only. Never rounds or modifies authoritative scores. */
 export function matchRawScoreFeedback(config: RawScoreFeedback | undefined, scoreKey: string, value: number | null): RawScoreFeedbackMatch | null {
@@ -47,7 +50,7 @@ export function matchRawScoreFeedback(config: RawScoreFeedback | undefined, scor
   const range = rule.ranges.find(candidate => value >= candidate.min && (value < candidate.max || (candidate.includeMax && value === candidate.max)))
   const content = range ?? rule.fallback
   if (!content) return null
-  return { scoreKey, rangeKey: range?.key ?? null, text: content.text, ...(content.images ? { images: content.images } : {}) }
+  return { scoreKey, rangeKey: range?.key ?? null, text: content.text, ...(content.images ? { images: content.images } : {}), ...(content.materials ? { materials:content.materials } : {}) }
 }
 export function rawScoreFeedbackBindingIssues(config: RawScoreFeedback | undefined, scoreKeys: readonly string[]) {
   return config?.rules.flatMap((rule, index) => scoreKeys.includes(rule.scoreKey) ? [] : [{ path: `report.rawScoreFeedback.rules.${index}.scoreKey`, message: '反馈引用了不存在的计分指标', severity: 'error' as const }]) ?? []

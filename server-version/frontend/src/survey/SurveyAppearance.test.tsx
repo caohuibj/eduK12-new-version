@@ -6,8 +6,11 @@ import { SurveyAppearance, SurveyAppearanceControl } from './SurveyAppearance'
 const root = () => document.querySelector('[data-survey-theme]')!
 function setup() { return render(<SurveyAppearance><SurveyAppearanceControl/><input aria-label="研究名称"/></SurveyAppearance>) }
 function choose(label: string) {
-  if (!screen.queryByRole('group', { name: '显示模式' })) fireEvent.click(screen.getByRole('button', { name: '外观' }))
-  fireEvent.click(screen.getByRole('button', { name: label }))
+  const modes: Record<string,string> = { '自动':'auto', '浅色':'light', '深色':'dark' }
+  for (let clicks = 0; clicks < 3 && root().getAttribute('data-survey-appearance') !== modes[label]; clicks++) {
+    fireEvent.click(screen.getByRole('button', { name: /^外观：/ }))
+  }
+  expect(root()).toHaveAttribute('data-survey-appearance', modes[label])
 }
 beforeEach(() => { localStorage.clear(); vi.useFakeTimers(); vi.setSystemTime(new Date(2026, 9, 23, 12)) })
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks() })
@@ -57,14 +60,24 @@ describe('Survey personal day/night appearance', () => {
     vi.spyOn(Storage.prototype,'setItem').mockImplementation(() => { throw new Error('unavailable') })
     setup(); choose('深色'); expect(root()).toHaveAttribute('data-survey-theme','dark')
   })
-  it('exposes selected mode, dismisses on Escape with focus return, and closes on outside click', () => {
-    setup(); choose('深色')
-    expect(screen.getByRole('button',{name:'深色'})).toHaveAttribute('aria-pressed','true')
-    fireEvent.keyDown(document,{key:'Escape'})
+  it('cycles auto, light, dark and back with one click each and exposes the next action without a menu', () => {
+    setup()
+    const button = screen.getByRole('button', { name:'外观：自动，点击切换为浅色' })
+    expect(button).toHaveAttribute('title', expect.stringContaining('7:00–19:00'))
+    button.focus()
+    fireEvent.click(button)
+    expect(root()).toHaveAttribute('data-survey-appearance','light')
+    expect(button).toHaveAccessibleName('外观：浅色，点击切换为深色')
+    fireEvent.click(button)
+    expect(root()).toHaveAttribute('data-survey-theme','dark')
+    expect(button).toHaveAccessibleName('外观：深色，点击切换为自动')
+    fireEvent.click(button)
+    expect(root()).toHaveAttribute('data-survey-appearance','auto')
+    expect(root()).toHaveAttribute('data-survey-theme','light')
+    expect(localStorage.getItem('survey.appearance')).toBe('auto')
+    expect(button).toHaveFocus()
     expect(screen.queryByRole('group')).not.toBeInTheDocument()
-    expect(screen.getByRole('button',{name:'外观'})).toHaveFocus()
-    fireEvent.click(screen.getByRole('button',{name:'外观'})); fireEvent.pointerDown(screen.getByLabelText('研究名称'))
-    expect(screen.queryByRole('group')).not.toBeInTheDocument()
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
   })
   it('removes clock polling when the Survey surface unmounts', () => {
     const view = setup(); expect(vi.getTimerCount()).toBe(1); view.unmount(); expect(vi.getTimerCount()).toBe(0)

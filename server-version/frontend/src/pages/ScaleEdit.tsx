@@ -1,11 +1,15 @@
+import {useFormPendingBuffers} from '../modules/assessment-core/form/useFormBulkDraft'
+import {usePageEditorGuard} from '../components/shared-ui/usePageEditorGuard'
+import {normalizedMaterialList} from '../modules/assessment-media/material'
+import {TrainingMaterialPicker,TrainingMaterialPreview} from '../modules/assessment-media/TrainingMaterialPicker'
 import { validateRawScoreFeedback } from '../modules/scale/rawScoreFeedback'
 import { ScaleDefinitionEditor } from './ScaleDefinitionEditor'
 import { type ScaleDefinition, emptyDefinition, normalizeDefinition, updateReportContract } from './scaleDefinitionEditorModel'
 import ScaleCsvImport from './ScaleCsvImport'
 import { TrainingScaleVersions } from '../components/scale-governance/TrainingScaleVersions'
 import { TrainingScaleLibrarySubmission } from '../components/scale-governance/TrainingScaleLibrarySubmission'
-import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import { Link, UNSAFE_DataRouterContext, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, CheckCircle, Copy, Eye, Save } from 'lucide-react'
 import apiClient from '../api/client'
 import { PageHeader, ProductPage, ProductStatus } from '../components/product-ui'
@@ -60,7 +64,13 @@ const ScaleEdit: React.FC = () => {
   return <ScaleEditor key={id || ''} id={id} />
 }
 
+function ScaleLeaveGuard({dirty,busy}:{dirty:boolean;busy:boolean}){
+  const guard=usePageEditorGuard(null,{dirty,busy})
+  return guard.confirmation
+}
 const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
+  const {hasPending:bulkPending,onPendingChange}=useFormPendingBuffers()
+  const dataRouter=useContext(UNSAFE_DataRouterContext)
   const navigate = useNavigate()
   const location = useLocation()
   const training = isTrainingHost()
@@ -147,7 +157,7 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
 
   const isCurrentOperation = (operation: number) => mountedRef.current && operationRef.current === operation
   const beginWrite = () => {
-    if (!mountedRef.current || loading || readOnlyRef.current || savingRef.current || importing || mediaUploadCount > 0) return null
+    if (bulkPending || !mountedRef.current || loading || readOnlyRef.current || savingRef.current || importing || mediaUploadCount > 0) return null
     savingRef.current = true
     setSaving(true)
     return ++operationRef.current
@@ -258,8 +268,10 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
     const qualityItems = (value: ScaleDefinition) => value.items.filter(item => item.purpose && item.purpose !== 'CONTENT').map(item => ({ itemCode: item.itemCode, purpose: item.purpose, attentionTarget: item.attentionTarget, responseSetKey: item.responseSetKey }))
     const feedbackContract = (value: ScaleDefinition) => {
       const images = (entries: import('../modules/scale/rawScoreFeedback').RawScoreFeedbackImage[] | undefined) => entries?.map(image => ({ asset: { assetId: image.asset.assetId, contentHash: image.asset.contentHash, mimeType: image.asset.mimeType }, altText: image.altText, caption: image.caption, order: image.order }))
-      return value.report.rawScoreFeedback?.rules.map(rule => ({ scoreKey: rule.scoreKey, ranges: rule.ranges.map(range => ({ key: range.key, min: range.min, max: range.max, includeMax: range.includeMax, text: range.text.trim(), images: images(range.images) })), fallback: rule.fallback ? { text: rule.fallback.text.trim(), images: images(rule.fallback.images) } : undefined })) ?? []
+      return value.report.rawScoreFeedback?.rules.map(rule => ({ scoreKey: rule.scoreKey, ranges: rule.ranges.map(range => ({ key: range.key, min: range.min, max: range.max, includeMax: range.includeMax, text: range.text.trim(), materials:normalizedMaterialList(range.materials), images: images(range.images) })), fallback: rule.fallback ? { text: rule.fallback.text.trim(), materials:normalizedMaterialList(rule.fallback.materials), images: images(rule.fallback.images) } : undefined })) ?? []
     }
+    const stimulusContract=(value:ScaleDefinition)=>value.items.map(item=>({key:item.itemCode,materials:normalizedMaterialList(item.materials)}))
+    if(JSON.stringify(stimulusContract(stored))!==JSON.stringify(stimulusContract(next)))throw new Error('保存后的题目素材与当前编辑不一致，未确认保存；当前编辑内容已保留')
     if (JSON.stringify(qualityItems(stored)) !== JSON.stringify(qualityItems(next)) || JSON.stringify(feedbackContract(stored)) !== JSON.stringify(feedbackContract(next))) throw new Error('保存后的题型或反馈配置与当前编辑不一致，未确认保存；当前编辑内容已保留')
     if ((stored.license.note ?? '') !== (next.license.note ?? '')) throw new Error('保存后的授权声明与当前编辑不一致，未确认保存；当前编辑内容已保留')
     setDefinition(stored)
@@ -330,6 +342,7 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
   }
 
   const previewDefinition = async () => {
+    if(bulkPending)return
     if (!scale.id || savingRef.current || mediaUploadCount > 0 || sortedItems.length === 0) return
     const operation = operationRef.current
     try {
@@ -362,15 +375,16 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
   const tabs: Array<[typeof activeTab, string]> = [['basic', '基本信息'], ['responses', '响应选项'], ['items', '题目'], ['scores', '计分'], ['report', '报告文案']]
   return (
     <ProductPage width="management" className="staff-editor-page scale-edit-page">
+      {dataRouter&&bulkPending&&<ScaleLeaveGuard dirty={bulkPending} busy={saving||copying||importing||mediaUploadCount>0}/>}
       <PageHeader
         title={isNew ? '创建描述性量表' : scale.name || '量表编辑'}
         actions={(
           <div className="staff-inline-actions">
-            <Link to={returnPath} className="staff-secondary-link"><ArrowLeft className="w-4 h-4" aria-hidden="true" />{returnLabel}</Link>
-            {!isNew && <button onClick={() => void previewDefinition()} disabled={importing || mediaUploadCount > 0 || saving || copying || standard || accessBlocked || definitionDirty} title={definitionDirty ? '请先保存定义，再预览服务端计分' : '对已保存定义使用每题首个选项进行真实服务端计分'} className="hui-button hui-button--secondary"><Eye className="w-4 h-4" aria-hidden="true" />计分预览</button>}
+            <Link to={returnPath} onClick={event=>{if(!dataRouter&&bulkPending&&!window.confirm('批量内容尚未应用，确定放弃并离开吗？'))event.preventDefault()}} className="staff-secondary-link"><ArrowLeft className="w-4 h-4" aria-hidden="true" />{returnLabel}</Link>
+            {!isNew && <button onClick={() => void previewDefinition()} disabled={bulkPending || importing || mediaUploadCount > 0 || saving || copying || standard || accessBlocked || definitionDirty} title={definitionDirty ? '请先保存定义，再预览服务端计分' : '对已保存定义使用每题首个选项进行真实服务端计分'} className="hui-button hui-button--secondary"><Eye className="w-4 h-4" aria-hidden="true" />计分预览</button>}
             {canCopy && <button type="button" onClick={() => void copyAsDraft()} disabled={copying} aria-busy={copying} className="hui-button hui-button--primary scale-edit-copy"><Copy className="w-4 h-4" aria-hidden="true" />{copying ? '正在创建新草稿…' : '另存为新量表'}</button>}
             {canRevise && <button type="button" onClick={() => void copyAsDraft('revise')} disabled={copying} className="hui-button hui-button--secondary">修订为新版本</button>}
-            {!readOnly && <button onClick={() => void (isNew ? saveBasic() : saveDraft())} disabled={saving || importing || mediaUploadCount > 0} className="hui-button hui-button--secondary"><Save className="w-4 h-4" aria-hidden="true" />保存草稿</button>}
+            {!readOnly && <button onClick={() => void (isNew ? saveBasic() : saveDraft())} disabled={bulkPending || saving || importing || mediaUploadCount > 0} className="hui-button hui-button--secondary"><Save className="w-4 h-4" aria-hidden="true" />保存草稿</button>}
           </div>
         )}
       />
@@ -380,7 +394,7 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
           <span>{scale.visibility === 'PUBLIC' ? '历史公开范围（兼容保留）' : scale.visibility === 'COURSE' ? '课程可用' : '隐藏'}</span>
           {!isNew && scale.id && <span>正式版本 v{scale.authoringVersion ?? 1} · 定义格式 {scale.instrumentVersion}</span>}
         </div>
-        <p className="scale-edit-save-state" role="status" aria-live="polite">{mediaUploadCount > 0 ? '正在上传反馈图片，完成后可保存或发布…' : copying ? '正在创建隐藏草稿…' : saving ? '正在保存，请稍候…' : hasConflict ? '状态已变更，本页编辑已保留，请核对后继续' : readOnly ? '当前版本不可编辑' : isNew ? '尚未创建，先保存基本信息' : basicDirty || definitionDirty ? [basicDirty && '基本信息待保存', definitionDirty && '题目与定义待保存'].filter(Boolean).join(' · ') : '草稿内容已保存'}</p>
+        <p className="scale-edit-save-state" role="status" aria-live="polite">{bulkPending ? '请先应用或清空批量内容，再保存或发布' : mediaUploadCount > 0 ? '正在上传反馈图片，完成后可保存或发布…' : copying ? '正在创建隐藏草稿…' : saving ? '正在保存，请稍候…' : hasConflict ? '状态已变更，本页编辑已保留，请核对后继续' : readOnly ? '当前版本不可编辑' : isNew ? '尚未创建，先保存基本信息' : basicDirty || definitionDirty ? [basicDirty && '基本信息待保存', definitionDirty && '题目与定义待保存'].filter(Boolean).join(' · ') : '草稿内容已保存'}</p>
       </div>
       <div className="scale-edit-meta-details">
         {!isNew && scale.code && <details><summary>系统信息</summary><p>量表编码：<code>{scale.code}</code></p></details>}
@@ -394,11 +408,11 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
 
       {activeTab === 'basic' && <section className="staff-panel scale-author-panel space-y-4"><p className="scale-edit-multiset-note">{isNew ? '请先保存基本信息创建草稿，再编制响应选项、题目、计分、授权声明与报告反馈。此步骤仅保存基本元数据，私有量表不会自动对全平台学生开放。' : '本区仅保存基本元数据；自有内容 / 授权声明请在“报告文案”中随量表定义保存。'}</p><div className="grid md:grid-cols-2 gap-4"><>{isNew && <label className="text-sm text-gray-700">量表编码<input disabled={controlsDisabled} value={scale.code} onChange={(event) => setScale({ ...scale, code: event.target.value })} className="input mt-1 w-full" /></label>}</><label className="text-sm text-gray-700">量表名称<input disabled={controlsDisabled} value={scale.name} onChange={(event) => setScale({ ...scale, name: event.target.value })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">预计用时（分钟）<input type="number" disabled={controlsDisabled} value={scale.estimatedTime ?? ''} onChange={(event) => setScale({ ...scale, estimatedTime: event.target.value ? Number(event.target.value) : null })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">可见性<select aria-label="可见性" disabled={controlsDisabled} value={scale.visibility} onChange={(event) => setScale({ ...scale, visibility: event.target.value as ScaleMeta['visibility'] })} className="input mt-1 w-full"><option value="HIDDEN">隐藏</option><option value="COURSE">课程可用</option>{scale.visibility === 'PUBLIC' && <option value="PUBLIC" disabled>历史公开范围（兼容保留，不可新增）</option>}</select></label></div><label className="block text-sm text-gray-700">说明<textarea disabled={controlsDisabled} value={scale.description || ''} onChange={(event) => setScale({ ...scale, description: event.target.value })} className="input mt-1 w-full min-h-24" /></label><label className="block text-sm text-gray-700">作答指导<textarea disabled={controlsDisabled} value={scale.instruction || ''} onChange={(event) => setScale({ ...scale, instruction: event.target.value })} className="input mt-1 w-full min-h-24" /></label><div className="flex justify-end"><button onClick={() => void saveBasic()} disabled={controlsDisabled || mediaUploadCount > 0} className="hui-button hui-button--primary"><Save className="w-4 h-4 inline mr-1" />保存基本信息</button></div></section>}
 
-      <ScaleDefinitionEditor definition={definition} setDefinition={setDefinition} activeTab={activeTab} readOnly={readOnly} controlsDisabled={controlsDisabled} saveDefinition={saveDefinition} mediaUploadCount={mediaUploadCount} onUploadBusy={onUploadBusy} importControl={!isNew && !standard && id && <ScaleCsvImport id={id} revision={updatedAtRef.current} disabled={readOnly || saving || copying || basicDirty || definitionDirty} onBusy={setImporting} onFailure={async failure => { await reportWriteError(failure, 'import', ++operationRef.current) }} onImported={value => { applyMetadata(value); const stored = normalizeDefinition(value.definition); setDefinition(stored); setSavedDefinition(JSON.stringify(stored)); setHasConflict(false) }} />} />
+      <ScaleDefinitionEditor onPendingChange={onPendingChange} renderItemMaterials={(item,change)=><TrainingMaterialPicker label="题目展示素材" value={item.materials} disabled={controlsDisabled} onChange={materials=>change({materials})}/>} renderFeedbackContent={(content,change)=><TrainingMaterialPicker label="反馈展示素材" value={content.materials} disabled={controlsDisabled} onChange={materials=>change({...content,materials})}/>} renderFeedbackPreview={content=>content.materials?.map(item=><TrainingMaterialPreview key={item.asset.assetId} item={item}/>)} definition={definition} setDefinition={setDefinition} activeTab={activeTab} readOnly={readOnly} controlsDisabled={controlsDisabled} saveDefinition={saveDefinition} mediaUploadCount={mediaUploadCount} onUploadBusy={onUploadBusy} importControl={!isNew && !standard && id && <ScaleCsvImport id={id} revision={updatedAtRef.current} disabled={bulkPending || readOnly || saving || copying || basicDirty || definitionDirty} onBusy={setImporting} onFailure={async failure => { await reportWriteError(failure, 'import', ++operationRef.current) }} onImported={value => { applyMetadata(value); const stored = normalizeDefinition(value.definition); setDefinition(stored); setSavedDefinition(JSON.stringify(stored)); setHasConflict(false) }} />} />
 
       {preview && <section className="staff-panel staff-panel--padded p-6 mt-5"><h2 className="font-semibold mb-3">服务端计分预览</h2><p className="scale-edit-multiset-note">使用已保存定义，每题选择首个响应选项。这是服务端计分结果，区别于报告编辑中的模拟分数呈现；被试实际可见内容仍由发布与披露设置决定。</p><pre className="text-xs bg-gray-50 rounded p-3 overflow-auto">{JSON.stringify(preview, null, 2)}</pre></section>}
       {!isNew && !standard && scale.id === id && <TrainingScaleLibrarySubmission key={scale.id + scale.status} sourceId={scale.id} />}
-      {!isNew && !readOnly && <div className="flex justify-end gap-2 mt-6"><button onClick={() => void validate()} disabled={saving || importing || mediaUploadCount > 0} className="hui-button hui-button--secondary">运行发布检查</button><button onClick={() => void publish()} disabled={saving || importing || mediaUploadCount > 0 || scale.status !== 'DRAFT'} className="hui-button hui-button--primary">发布自用（描述性量表）</button></div>}
+      {!isNew && !readOnly && <div className="flex justify-end gap-2 mt-6"><button onClick={() => void validate()} disabled={bulkPending || saving || importing || mediaUploadCount > 0} className="hui-button hui-button--secondary">运行发布检查</button><button onClick={() => void publish()} disabled={bulkPending || saving || importing || mediaUploadCount > 0 || scale.status !== 'DRAFT'} className="hui-button hui-button--primary">发布自用（描述性量表）</button></div>}
     </ProductPage>
   )
 }
