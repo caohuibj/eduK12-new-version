@@ -1,7 +1,7 @@
 name: School Teacher standalone browser diagnostic
 on:
   push:
-    branches: ['ci/school-teacher-browser-20261022']
+    branches: ['ci/school-teacher-console-20261023']
 permissions:
   contents: read
   actions: read
@@ -9,29 +9,40 @@ env:
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
 jobs:
-  # This candidate diagnoses launch only. It does not execute or qualify journeys.
+  # Anonymous static diagnosis only; never PR acceptance or real API qualification.
   launch-diagnostic:
     permissions:
       contents: read
-    if: ${{ github.event_name == 'push' && github.repository == 'caohuibj/eduK12-new-version' && github.ref == 'refs/heads/ci/school-teacher-browser-20261022' && !github.event.deleted }}
+      actions: read
+    if: ${{ github.event_name == 'push' && github.repository == 'caohuibj/eduK12-new-version' && github.ref == 'refs/heads/ci/school-teacher-console-20261023' && !github.event.deleted }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - run: node .github/scripts/school-teacher-browser-control.mjs preflight
       - run: npm ci --ignore-scripts --prefix .github/release-tools
-      - run: node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
-      - name: diagnose unchanged Chromium launch only (not browser acceptance)
-        run: node server-version/e2e/school-teacher-browser.cjs --launch-diagnostic
+      - name: restore exact official frontend bytes without building
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node server-version/e2e/school-teacher-anonymous-diagnostic.cjs restore
+      - name: narrow approved temporary Chrome write permissions
+        env:
+          SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-temporary-runner
+        run: node server-version/e2e/school-teacher-chrome-permissions.cjs tighten
+      - name: inspect anonymous static pages with official sandboxed Chrome
+        run: node server-version/e2e/school-teacher-anonymous-diagnostic.cjs run
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: school-teacher-launch-diagnostic-${{ github.sha }}
-          path: school-teacher-evidence/browser-launch.json
-          retention-days: 7
+          name: school-teacher-anonymous-diagnostic-${{ github.sha }}
+          path: |
+            school-anonymous-evidence/anonymous-console.json
+            school-teacher-evidence/chrome-permissions.json
+          retention-days: 3
           if-no-files-found: error
   # Retained unchanged for a separately authorized full consumer continuation.
   # A skipped job creates no PostgreSQL/Redis services and executes no preparation.
