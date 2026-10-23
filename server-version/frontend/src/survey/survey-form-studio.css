@@ -172,3 +172,20 @@
 .survey-researcher .is-form .survey-form-field-budget { color:var(--survey-brand-muted); padding-top:.1rem; font-size:.7rem; }
 @media(max-width:40rem){.survey-form-save-caption{flex-basis:100%;margin-left:0}.survey-researcher .is-form .survey-form-question-settings > :not(summary){margin:.7rem}}
 @media(prefers-reduced-motion:reduce){.survey-researcher .is-form .survey-form-directory li > button{transition:none}}
+.survey-form-bulk-lines { border-top:1px solid var(--survey-brand-line); margin-top:.65rem; font-size:.8rem; }
+.survey-form-bulk-lines > summary { display:flex; align-items:center; gap:.5rem; padding:.65rem .1rem; cursor:pointer; color:var(--survey-brand-accent); font-weight:550; }
+.survey-form-bulk-lines > summary::before { content:'+'; font-weight:400; }
+.survey-form-bulk-lines[open] > summary::before { content:'−'; }
+.survey-form-bulk-lines > summary::marker { content:''; }
+.survey-form-bulk-lines > summary::-webkit-details-marker { display:none; }
+.survey-form-bulk-lines > summary > span { margin-left:auto; font-size:.7rem; font-weight:400; color:var(--survey-brand-muted); }
+.survey-form-bulk-body { display:grid; gap:.65rem; padding-top:.15rem; }
+.survey-form-bulk-toolbar { display:flex; gap:.65rem; flex-wrap:wrap; align-items:end; }
+.survey-form-bulk-toolbar > label { display:grid; gap:.3rem; flex:1; min-width:10rem; }
+.survey-form-bulk-body p,.survey-form-bulk-footer > span { font-size:.75rem; line-height:1.7; color:var(--survey-brand-muted); margin:0; }
+.survey-researcher .is-form .survey-form-bulk-body :is(select,textarea).input { width:100%; margin:0; background:var(--survey-ui-surface,#fff); border-color:var(--survey-brand-line); }
+.survey-researcher .is-form .survey-form-bulk-body textarea { min-height:8rem; padding:.6rem .8rem; line-height:1.85; resize:vertical; }
+.survey-form-bulk-footer { display:flex; flex-wrap:wrap; gap:.5rem; align-items:center; }
+.survey-form-bulk-footer > span { flex:1; min-width:10rem; }
+.survey-researcher .is-form .survey-form-bulk-body button { min-height:34px; padding:.4rem .7rem; font-size:.75rem; border-radius:.4rem; }
+.survey-form-bulk-body .survey-form-bulk-error { color:var(--survey-ui-danger,#a04848); }
