@@ -1,0 +1,135 @@
+{
+  "schemaVersion": 1,
+  "identity": {
+    "instrumentKey": "ipip50_zh_cn_research",
+    "instrumentVersion": "1.0.0"
+  },
+  "catalog": {
+    "schemaVersion": 1,
+    "catalogManifestVersion": 1,
+    "catalogStatus": "CANDIDATE",
+    "scientificMaturity": "PILOT",
+    "identity": {
+      "canonicalName": "IPIP 50题大五因素标记 简体中文研究工作译稿（未验证）",
+      "abbreviation": "IPIP-50",
+      "instrumentFamily": "International Personality Item Pool Big-Five Factor Markers"
+    },
+    "construct": {
+      "primaryDomain": "PERSONALITY",
+      "secondaryDomains": [],
+      "constructDefinition": "五种独立人格倾向：外向性、宜人性、尽责性、情绪稳定性、智性/想象力。不是人格总分、类型、能力或品德评价。",
+      "constructLevel": "BROAD_DOMAIN",
+      "constructOverlapTags": [
+        "extraversion",
+        "agreeableness",
+        "conscientiousness",
+        "emotional_stability",
+        "intellect_imagination"
+      ]
+    },
+    "population": {
+      "minAge": 18,
+      "populationNotes": "成人自评研究候选范围；新中文AI译稿未验证，不推定未成年人适用性，不生成群体画像或高风险选拔结论，当前不可施测。",
+      "respondentTypes": [
+        "SELF"
+      ],
+      "developmentalEvidence": "UNKNOWN"
+    },
+    "administration": {
+      "itemCount": 50,
+      "estimatedMinutes": 10,
+      "administrationModes": [
+        "DIGITAL_SELF_ADMINISTERED"
+      ],
+      "timeFrame": "目前通常的自己；无固定日数或周数的回顾期。",
+      "requiredTraining": false,
+      "itemOrderLocked": true,
+      "responseFormatLocked": true,
+      "layoutConstraints": [
+        "本研究材料固定官网50题示例顺序和1–5准确程度锚点以便复核；官网不要求普遍统一顺序或标准化施测，不把本项目锁序误称作者要求。",
+        "原历史指导语的绝对保密承诺和同性别/近龄比较仅作来源证据；平台不承诺绝对保密，部署指导语适配必须独立版本化审查。",
+        "每维10题，正向原分、负向6-x，各自10–50；不合成总分，不插入注意力题。"
+      ]
+    },
+    "intendedUse": {
+      "intendedUses": [
+        {
+          "use": "RESEARCH",
+          "evidenceStatus": "EVIDENCE_UNKNOWN",
+          "notes": "仅文本、逐维计分和报告方案审查，不供实际施测；公有领域不等于已验证或平台已授权。"
+        }
+      ],
+      "forbiddenUses": [
+        "DIAGNOSIS",
+        "HIGH_STAKES_SELECTION",
+        "SCHOOL_RANKING",
+        "TEACHER_ACCOUNTABILITY",
+        "UNSUPPORTED_GROUP_COMPARISON"
+      ]
+    },
+    "evidence": [
+      {
+        "evidenceId": "ipip-goldberg-2006-project-methodology",
+        "evidenceType": "STRUCTURAL_VALIDITY",
+        "population": "Original IPIP project and adult research context; not validation of this exact Chinese working translation",
+        "locale": "en",
+        "territory": "US",
+        "studyDesign": "Primary project methodology/development overview. Does not establish exact correspondence of current website 50 items to a specific published validation subset.",
+        "rating": "UNKNOWN",
+        "citation": "Goldberg LR, Johnson JA, Eber HW, Hogan R, Ashton MC, Cloninger CR, Gough HG (2006). The international personality item pool and the future of public-domain personality measures. Journal of Research in Personality 40:84–96.",
+        "doi": "10.1016/j.jrp.2005.08.007",
+        "url": "https://ipip.ori.org/Goldberg_etal_2006_IPIP_JRP.pdf",
+        "notes": "Literature index only, article link only. No exact-form local validity, cutoffs, norms or percentile claims. Historical 1992 adjective markers are not these 50 sentence items."
+      }
+    ],
+    "referenceApplicability": []
+  },
+  "localization": {
+    "schemaVersion": 1,
+    "sourceLocale": "en",
+    "targetLocale": "zh-CN",
+    "localizationVersion": "1.0.0",
+    "translationSource": "New AI-assisted Simplified Chinese working translation from the official public-domain IPIP 50-item sample questionnaire and Big-Five scoring key; reviewed revisions preserved in docs/scale-instruments/research-drafts/ipip50/1.0.0/. Not an established validated Chinese version or author-endorsed translation.",
+    "adaptationMethod": "DIRECT_TRANSLATION",
+    "expertReviewStatus": "PENDING",
+    "cognitiveDebriefStatus": "NOT_ESTABLISHED",
+    "localEvidenceRefs": [],
+    "reviewStatus": "PENDING",
+    "notes": "AI 辅助生成的简体中文研究工作译稿，尚未验证。题项公有领域许可不代表原作者认可此译稿。仅供文本、计分和报告方案审查，不供实际施测或临床使用。 当前官网50题与2008论文50题子集逐项对应尚未独立建立；Xu100题和Jhu50题的证据不能转移给本AI译稿。 Official public-domain rights metadata: https://ipip.ori.org/newPermission.htm; no InstrumentAuthorization or human scientificReview created."
+  },
+  "candidatePreview": {
+    "status": "CATALOG_ONLY",
+    "source": {
+      "title": "IPIP 50-item Big-Five Factor Markers — unvalidated Simplified Chinese research working translation",
+      "citation": "International Personality Item Pool, Lewis R. Goldberg and colleagues; cite official item/key pages and relevant literature.",
+      "url": "https://ipip.ori.org/New_IPIP-50-item-scale.htm"
+    },
+    "reportPlan": {
+      "dimensionLabels": [
+        "外向性（独立10–50）",
+        "宜人性（独立10–50）",
+        "尽责性（独立10–50）",
+        "情绪稳定性（独立10–50）",
+        "智性/想象力（独立10–50）"
+      ],
+      "limitations": [
+        "AI 辅助生成的简体中文研究工作译稿，尚未验证。题项公有领域许可不代表原作者认可此译稿。仅供文本、计分和报告方案审查，不供实际施测或临床使用。",
+        "本次结果分别描述五种自我报告的人格倾向，每个维度10–50分。分数不是能力、品德或个人价值的评价，也不是诊断或固定人格类型。不同维度不相加成总分，不提供常模排名。当前简体中文为未经验证的 AI 初译，仅供材料审查。",
+        "有维度未完整作答，该维度不计算分数；完整维度仅作有限描述，不能视为完整人格画像。",
+        "高分不是更好，低分不是更差。情绪稳定性不能同向改称神经质；智性/想象力不是IQ或能力成绩。不推断性取向，不形成招聘、升学或其他高风险选拔建议。",
+        "不承诺绝对保密；施测前须另行落实真实的数据使用、访问、保存及退出说明。",
+        "只展示候选目录资料，不可开始、施测或生成实际报告；无总分、等级、临床阈值、常模或百分位。",
+        "公有领域许可仅为工具来源权利依据，非平台授权；现有score_only可承载描述性报告，qcReview可真实记录AI身份，未生成scientificReview。",
+        "现有 ADULT_SELF 与 audience=student 可合法组合；student 是 respondent/subject 的技术报告受众，不是未成年人年龄限制。具体调用的披露、成人文案与报告投影尚待验证，不能据此宣称已可施测；科学适用年龄限制仍保留。"
+      ],
+      "disclaimer": "仅研究候选，未注册可执行包，不可施测。AI中文译稿未验证，不以任何人格维度评价人的好坏或能力。"
+    },
+    "blockers": [
+      "EXECUTABLE_NOT_REGISTERED",
+      "LOCALIZATION_REVIEW_PENDING",
+      "EXACT_FORM_VALIDATION_MATCH_OPEN",
+      "VERSIONED_INSTRUCTIONS_AND_PRIVACY_REVIEW_REQUIRED",
+      "RESPONDENT_REPORT_PROJECTION_VERIFICATION_PENDING"
+    ]
+  }
+}

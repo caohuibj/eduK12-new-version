@@ -1,0 +1,880 @@
+{
+  "numTotalTestSuites": 2,
+  "numPassedTestSuites": 2,
+  "numFailedTestSuites": 0,
+  "numPendingTestSuites": 0,
+  "numTotalTests": 70,
+  "numPassedTests": 70,
+  "numFailedTests": 0,
+  "numPendingTests": 0,
+  "numTodoTests": 0,
+  "snapshot": {
+    "added": 0,
+    "failure": false,
+    "filesAdded": 0,
+    "filesRemoved": 0,
+    "filesRemovedList": [],
+    "filesUnmatched": 0,
+    "filesUpdated": 0,
+    "matched": 0,
+    "total": 0,
+    "unchecked": 0,
+    "uncheckedKeysByFile": [],
+    "unmatched": 0,
+    "updated": 0,
+    "didUpdate": false
+  },
+  "startTime": 1792774248843,
+  "success": true,
+  "testResults": [
+    {
+      "assertionResults": [
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 validates and compiles through existing package protocol without claiming scientific review",
+          "status": "passed",
+          "title": "validates and compiles through existing package protocol without claiming scientific review",
+          "duration": 19.482107000000042,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 binds all Chinese item texts to the reviewed source-to-translation audit",
+          "status": "passed",
+          "title": "binds all Chinese item texts to the reviewed source-to-translation audit",
+          "duration": 2.039495999999872,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 contains only original 50 content items and five independent sums with exact key membership",
+          "status": "passed",
+          "title": "contains only original 50 content items and five independent sums with exact key membership",
+          "duration": 1.5121129999999994,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 matches independent uniform 1 golden",
+          "status": "passed",
+          "title": "matches independent uniform 1 golden",
+          "duration": 0.8035680000000411,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 matches independent uniform 3 golden",
+          "status": "passed",
+          "title": "matches independent uniform 3 golden",
+          "duration": 0.7792610000001332,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 matches independent uniform 5 golden",
+          "status": "passed",
+          "title": "matches independent uniform 5 golden",
+          "duration": 0.7463820000000396,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 reaches all five independent endpoint sums 10",
+          "status": "passed",
+          "title": "reaches all five independent endpoint sums 10",
+          "duration": 0.8365369999999075,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 reaches all five independent endpoint sums 50",
+          "status": "passed",
+          "title": "reaches all five independent endpoint sums 50",
+          "duration": 0.5299769999999171,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 1 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 1 polarity against independent key",
+          "duration": 0.7086550000001353,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 2 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 2 polarity against independent key",
+          "duration": 0.8697369999999864,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 3 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 3 polarity against independent key",
+          "duration": 0.8908389999999144,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 4 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 4 polarity against independent key",
+          "duration": 0.6815750000000662,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 5 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 5 polarity against independent key",
+          "duration": 0.6985500000000684,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 6 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 6 polarity against independent key",
+          "duration": 0.7011140000001888,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 7 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 7 polarity against independent key",
+          "duration": 0.9657119999999395,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 8 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 8 polarity against independent key",
+          "duration": 0.9041189999998096,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 9 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 9 polarity against independent key",
+          "duration": 0.8708489999999074,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 10 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 10 polarity against independent key",
+          "duration": 0.6851000000001477,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 11 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 11 polarity against independent key",
+          "duration": 0.6961570000000847,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 12 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 12 polarity against independent key",
+          "duration": 0.6395410000000084,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 13 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 13 polarity against independent key",
+          "duration": 0.8781999999998789,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 14 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 14 polarity against independent key",
+          "duration": 0.7896069999999327,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 15 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 15 polarity against independent key",
+          "duration": 0.8070740000000569,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 16 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 16 polarity against independent key",
+          "duration": 0.7288750000000164,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 17 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 17 polarity against independent key",
+          "duration": 0.8033779999998387,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 18 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 18 polarity against independent key",
+          "duration": 0.7401030000000901,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 19 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 19 polarity against independent key",
+          "duration": 0.6654000000000906,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 20 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 20 polarity against independent key",
+          "duration": 0.6358460000001287,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 21 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 21 polarity against independent key",
+          "duration": 2.2129759999997987,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 22 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 22 polarity against independent key",
+          "duration": 0.5410340000000815,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 23 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 23 polarity against independent key",
+          "duration": 0.48487900000009176,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 24 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 24 polarity against independent key",
+          "duration": 0.4421750000001339,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 25 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 25 polarity against independent key",
+          "duration": 0.4721600000000308,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 26 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 26 polarity against independent key",
+          "duration": 0.4201109999999062,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 27 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 27 polarity against independent key",
+          "duration": 0.4994810000000598,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 28 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 28 polarity against independent key",
+          "duration": 0.456286000000091,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 29 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 29 polarity against independent key",
+          "duration": 0.43881899999996676,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 30 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 30 polarity against independent key",
+          "duration": 0.49225000000001273,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 31 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 31 polarity against independent key",
+          "duration": 0.43887999999992644,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 32 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 32 polarity against independent key",
+          "duration": 0.426089999999931,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 33 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 33 polarity against independent key",
+          "duration": 0.6526010000000042,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 34 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 34 polarity against independent key",
+          "duration": 0.3831559999998717,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 35 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 35 polarity against independent key",
+          "duration": 0.4150839999999789,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 36 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 36 polarity against independent key",
+          "duration": 0.4442780000001676,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 37 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 37 polarity against independent key",
+          "duration": 0.3516189999998005,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 38 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 38 polarity against independent key",
+          "duration": 0.4013129999998455,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 39 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 39 polarity against independent key",
+          "duration": 0.4251289999999699,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 40 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 40 polarity against independent key",
+          "duration": 0.633542000000034,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 41 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 41 polarity against independent key",
+          "duration": 0.6249599999998736,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 42 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 42 polarity against independent key",
+          "duration": 0.6335219999998571,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 43 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 43 polarity against independent key",
+          "duration": 0.6811439999999038,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 44 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 44 polarity against independent key",
+          "duration": 0.5841390000000501,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 45 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 45 polarity against independent key",
+          "duration": 0.7578090000001794,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 46 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 46 polarity against independent key",
+          "duration": 0.6185100000000148,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 47 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 47 polarity against independent key",
+          "duration": 0.7382000000000062,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 48 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 48 polarity against independent key",
+          "duration": 0.7046500000001288,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 49 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 49 polarity against independent key",
+          "duration": 0.6637770000002092,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 checks individual item 50 polarity against independent key",
+          "status": "passed",
+          "title": "checks individual item 50 polarity against independent key",
+          "duration": 0.7236780000000635,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 leaves only affected dimension null when item 1 is absent",
+          "status": "passed",
+          "title": "leaves only affected dimension null when item 1 is absent",
+          "duration": 1.5309919999999693,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 leaves only affected dimension null when item 2 is absent",
+          "status": "passed",
+          "title": "leaves only affected dimension null when item 2 is absent",
+          "duration": 1.3604350000000522,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 leaves only affected dimension null when item 3 is absent",
+          "status": "passed",
+          "title": "leaves only affected dimension null when item 3 is absent",
+          "duration": 1.3822079999999914,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 leaves only affected dimension null when item 4 is absent",
+          "status": "passed",
+          "title": "leaves only affected dimension null when item 4 is absent",
+          "duration": 1.2188920000000962,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 leaves only affected dimension null when item 5 is absent",
+          "status": "passed",
+          "title": "leaves only affected dimension null when item 5 is absent",
+          "duration": 1.5048320000000786,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 keeps all-empty results unscored and rejects invalid, unknown and duplicate answers",
+          "status": "passed",
+          "title": "keeps all-empty results unscored and rejects invalid, unknown and duplicate answers",
+          "duration": 2.829432999999881,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 keeps runner and adult report free of item transformations and raw answers",
+          "status": "passed",
+          "title": "keeps runner and adult report free of item transformations and raw answers",
+          "duration": 3.4504269999999906,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 enforces actual adult age 215 months",
+          "status": "passed",
+          "title": "enforces actual adult age 215 months",
+          "duration": 0.284748000000036,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 enforces actual adult age 216 months",
+          "status": "passed",
+          "title": "enforces actual adult age 216 months",
+          "duration": 0.12063199999988683,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 enforces actual adult age 720 months",
+          "status": "passed",
+          "title": "enforces actual adult age 720 months",
+          "duration": 0.07531300000005103,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 does not assume adult eligibility when age is absent",
+          "status": "passed",
+          "title": "does not assume adult eligibility when age is absent",
+          "duration": 0.12180299999999988,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        },
+        {
+          "ancestorTitles": [
+            "IPIP50 adult executable preparation 1.1.0"
+          ],
+          "fullName": "IPIP50 adult executable preparation 1.1.0 uses the real install planner and refuses activation without release, localization review and grants",
+          "status": "passed",
+          "title": "uses the real install planner and refuses activation without release, localization review and grants",
+          "duration": 2.8308360000000903,
+          "failureMessages": [],
+          "meta": {},
+          "tags": []
+        }
+      ],
+      "startTime": 1792774250162,
+      "endTime": 1792774250238.8308,
+      "status": "passed",
+      "message": "",
+      "name": "/workspace/scratch/5a77e8bdc1ae/eduk12_ipip50_20261023/server-version/backend/src/__tests__/scale/instruments/ipip50-ready.test.ts"
+    }
+  ]
+}

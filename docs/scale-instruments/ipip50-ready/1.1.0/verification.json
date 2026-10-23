@@ -1,0 +1,90 @@
+{
+  "schemaVersion": 1,
+  "status": "LOCAL_EXECUTABLE_DRAFT_CHECKED_NOT_DEPLOYED",
+  "baseCommit": "d33b70b14c4788b9d2c8f24914e7eee2458ee4c6",
+  "checkedAt": "2026-10-23T16:49:43Z",
+  "checks": [
+    {
+      "name": "targeted IPIP50 tests",
+      "command": "node node_modules/vitest/vitest.mjs run src/__tests__/scale/instruments/ipip50-ready.test.ts --maxWorkers=1 --reporter=json",
+      "exitCode": 0,
+      "passed": 70,
+      "failed": 0,
+      "rawResult": "test-results.json"
+    },
+    {
+      "name": "final backend TypeScript",
+      "command": "node --max-old-space-size=2048 node_modules/typescript/bin/tsc --noEmit",
+      "exitCode": 0,
+      "diagnostics": [],
+      "scope": "Full backend configured tsconfig; tests excluded by existing config."
+    },
+    {
+      "name": "content-only onboarding boundary",
+      "command": "node scripts/scale-onboarding-check.mjs",
+      "exitCode": 0
+    },
+    {
+      "name": "generated registration consistency",
+      "command": "node --import tsx scripts/generate-scale-instruments.ts --check",
+      "exitCode": 0
+    },
+    {
+      "name": "source qualification/scorer registrations",
+      "command": "node --import tsx scripts/check-scale-source-qualification.ts",
+      "exitCode": 0
+    },
+    {
+      "name": "legacy preservation",
+      "result": "All nine 1.0.0 files byte-identical to fa355ff2dcd859b57a4bf2e8bddd77f8d428e3cf"
+    },
+    {
+      "name": "whitespace",
+      "command": "git diff --check",
+      "exitCode": 0
+    }
+  ],
+  "priorAttempts": [
+    "Initial tsx CLI could not open IPC socket; used supported node --import tsx runner without IPC.",
+    "Initial Vitest command rejected unsupported minWorkers flag before executing; removed only unsupported CLI flag.",
+    "Initial backend tsc passed. A subsequent final-input tsc was killed with exit137 and no diagnostics during concurrent workload. Final coordinated 2048MiB run exited0; no failed attempt is counted as passed."
+  ],
+  "inputs": {
+    "server-version/backend/src/modules/scale/instruments/ipip50_zh_cn_research/1.1.0/source.json": "411011f6096aa3eec240c9b16d1ad935ee00afb194417e472a65f4305410161e",
+    "server-version/backend/src/modules/scale/instruments/ipip50_zh_cn_research/1.1.0/instrument.ts": "585f6cca6a8da1deaa5008b13d3b62677d22f3df1b89590d5a1dfcbe3ef312f7",
+    "server-version/backend/src/modules/scale/onboarding/instruments.generated.ts": "ea3e20c2d301221afe924f4499215755771a4dc921ee1c429a7eda20c52a7cbb",
+    "server-version/backend/src/__tests__/scale/instruments/ipip50-ready.test.ts": "5647ab4109ed3b818a9d18e51be1515a749e29a8ed1a39126babe58879e66c98",
+    "server-version/backend/package-lock.json": "e7ead36aea4702185f0dfcebc3089723258a402218b1addde09e03ec1c5e9b57",
+    "server-version/backend/tsconfig.json": "c79ccf595a80514e94936f1ffcd2fa09b57265f0c140d275c81770f494175143"
+  },
+  "dependencyEvidence": {
+    "packageLockMatchesPreservedArchive": true,
+    "node": "24.19.0",
+    "vitest": "4.1.11",
+    "limitation": "Reused existing cloud isolated dependency archive; no fresh install and no complete node_modules byte attestation."
+  },
+  "notExecuted": [
+    "CI",
+    "production publication or deployment",
+    "real database install/final-submit integration",
+    "real user data collection",
+    "human localization/scientific approval"
+  ],
+  "remainingActivationBlockers": [
+    "DRAFT release status",
+    "Localization review and expert review pending",
+    "No deployment authorization",
+    "Real privacy notice and entry-point display verification",
+    "No real isolated-database lifecycle acceptance"
+  ],
+  "evidenceClass": "local unsigned execution, not official CI qualification",
+  "independentReview": {
+    "result": "No blocker to executable DRAFT backup",
+    "clarifications": [
+      "Shared report exposes expectedItems/answeredItems dimension membership; hidden fields are raw item answers, item scores and positive/reverse transforms.",
+      "Researcher explanations suppressed by existing adult-self/student audience contract; respondent/subject retain explanations."
+    ],
+    "codeChangeRequired": false
+  },
+  "typeCheckReuse": "After the final successful tsc, only README and the excluded test display name/evidence changed. Production TypeScript/JSON/tsconfig/lock inputs are unchanged."
+}

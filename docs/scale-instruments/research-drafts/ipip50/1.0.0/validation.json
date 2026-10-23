@@ -1,0 +1,41 @@
+{
+  "schemaVersion": 1,
+  "status": "PASS",
+  "checkType": "SINGLE_LOCAL_PURE_JSON_SOURCE_DIFF_AND_MATH_CHECK",
+  "executionCount": 1,
+  "performedAt": "2026-10-21T18:04:57.772643+00:00",
+  "checks": [
+    "Frozen source SHA binding",
+    "English50 and five dimensional keys unchanged",
+    "Only Chinese item16 and28 changed, with explicit revision records",
+    "64 synthetic arithmetic, each missing item and invalid/duplicate cases passed",
+    "No grand total, clinical category or norm generated"
+  ],
+  "files": [
+    {
+      "path": "README.md",
+      "sha256": "06c4cadb237fbefff3b17c9eeb0a4145366c61f5d4a5842672fde6bd719fcb56"
+    },
+    {
+      "path": "content-draft.json",
+      "sha256": "9896befacfd50d42d5883a5b8c49d0379ac7eb9effa2b27346b6b33bd14c777c"
+    },
+    {
+      "path": "golden-fixtures.json",
+      "sha256": "df0c307620c3c1d632842afe275524304f47a080282c64d33f6a1b56ed83ab7e"
+    },
+    {
+      "path": "report-design.json",
+      "sha256": "83365011be9333c663e52a214440659de00e7e9ce00e6840fdf5defaacddb917"
+    },
+    {
+      "path": "scoring-contract.json",
+      "sha256": "19e84e8ea664702bfd65be9be45b3feaa9facbab2c2f79662fa82a47d901bd17"
+    },
+    {
+      "path": "source-and-rights.json",
+      "sha256": "0ebe4b8ebd9bcce1cda47563657b37ba38cb27b3db8f44dc00e45dfc18031d19"
+    }
+  ],
+  "limitations": "Not application/runtime test, deployment, human review, clinical or psychometric validation."
+}

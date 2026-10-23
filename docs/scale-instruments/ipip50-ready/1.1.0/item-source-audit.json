@@ -1,0 +1,467 @@
+{
+  "schemaVersion": 1,
+  "checkedAt": "2026-10-23",
+  "reviewer": "OpenAI AI-assisted source comparison; not human scientific review",
+  "sourceUrls": [
+    "https://ipip.ori.org/New_IPIP-50-item-scale.htm",
+    "https://ipip.ori.org/newBigFive5broadKey.htm",
+    "https://ipip.ori.org/newScoringInstructions.htm",
+    "https://ipip.ori.org/newPermission.htm"
+  ],
+  "method": "Direct official-page review of all 50 sample items and corresponding five 10-item keyed lists, not the alternate 20-item lists. Every English item, factor and polarity matches the preserved 1.0.0 content draft. No validation claims transferred from a different Chinese form.",
+  "matches": [
+    {
+      "number": 1,
+      "text": "Am the life of the party.",
+      "dimension": "Extraversion",
+      "key": "+",
+      "itemCode": "IPIP50-01",
+      "chineseWorkingTranslation": "我是聚会中活跃气氛的人。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 2,
+      "text": "Feel little concern for others.",
+      "dimension": "Agreeableness",
+      "key": "-",
+      "itemCode": "IPIP50-02",
+      "chineseWorkingTranslation": "我很少关心别人。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 3,
+      "text": "Am always prepared.",
+      "dimension": "Conscientiousness",
+      "key": "+",
+      "itemCode": "IPIP50-03",
+      "chineseWorkingTranslation": "我总是做好准备。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 4,
+      "text": "Get stressed out easily.",
+      "dimension": "Emotional Stability",
+      "key": "-",
+      "itemCode": "IPIP50-04",
+      "chineseWorkingTranslation": "我容易感到压力很大。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 5,
+      "text": "Have a rich vocabulary.",
+      "dimension": "Intellect/Imagination",
+      "key": "+",
+      "itemCode": "IPIP50-05",
+      "chineseWorkingTranslation": "我的词汇丰富。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 6,
+      "text": "Don't talk a lot.",
+      "dimension": "Extraversion",
+      "key": "-",
+      "itemCode": "IPIP50-06",
+      "chineseWorkingTranslation": "我的话不多。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 7,
+      "text": "Am interested in people.",
+      "dimension": "Agreeableness",
+      "key": "+",
+      "itemCode": "IPIP50-07",
+      "chineseWorkingTranslation": "我对他人感兴趣。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 8,
+      "text": "Leave my belongings around.",
+      "dimension": "Conscientiousness",
+      "key": "-",
+      "itemCode": "IPIP50-08",
+      "chineseWorkingTranslation": "我把自己的东西随处放。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 9,
+      "text": "Am relaxed most of the time.",
+      "dimension": "Emotional Stability",
+      "key": "+",
+      "itemCode": "IPIP50-09",
+      "chineseWorkingTranslation": "我大多数时候都很放松。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 10,
+      "text": "Have difficulty understanding abstract ideas.",
+      "dimension": "Intellect/Imagination",
+      "key": "-",
+      "itemCode": "IPIP50-10",
+      "chineseWorkingTranslation": "我理解抽象概念有困难。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 11,
+      "text": "Feel comfortable around people.",
+      "dimension": "Extraversion",
+      "key": "+",
+      "itemCode": "IPIP50-11",
+      "chineseWorkingTranslation": "和他人在一起时，我感到自在。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 12,
+      "text": "Insult people.",
+      "dimension": "Agreeableness",
+      "key": "-",
+      "itemCode": "IPIP50-12",
+      "chineseWorkingTranslation": "我会侮辱别人。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 13,
+      "text": "Pay attention to details.",
+      "dimension": "Conscientiousness",
+      "key": "+",
+      "itemCode": "IPIP50-13",
+      "chineseWorkingTranslation": "我留意细节。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 14,
+      "text": "Worry about things.",
+      "dimension": "Emotional Stability",
+      "key": "-",
+      "itemCode": "IPIP50-14",
+      "chineseWorkingTranslation": "我会为各种事情担忧。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 15,
+      "text": "Have a vivid imagination.",
+      "dimension": "Intellect/Imagination",
+      "key": "+",
+      "itemCode": "IPIP50-15",
+      "chineseWorkingTranslation": "我的想象力很生动。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 16,
+      "text": "Keep in the background.",
+      "dimension": "Extraversion",
+      "key": "-",
+      "itemCode": "IPIP50-16",
+      "chineseWorkingTranslation": "我保持低调，不让自己引人注目。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 17,
+      "text": "Sympathize with others' feelings.",
+      "dimension": "Agreeableness",
+      "key": "+",
+      "itemCode": "IPIP50-17",
+      "chineseWorkingTranslation": "我体谅他人的感受。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 18,
+      "text": "Make a mess of things.",
+      "dimension": "Conscientiousness",
+      "key": "-",
+      "itemCode": "IPIP50-18",
+      "chineseWorkingTranslation": "我把事情弄得一团糟。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 19,
+      "text": "Seldom feel blue.",
+      "dimension": "Emotional Stability",
+      "key": "+",
+      "itemCode": "IPIP50-19",
+      "chineseWorkingTranslation": "我很少感到低落。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 20,
+      "text": "Am not interested in abstract ideas.",
+      "dimension": "Intellect/Imagination",
+      "key": "-",
+      "itemCode": "IPIP50-20",
+      "chineseWorkingTranslation": "我对抽象概念不感兴趣。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 21,
+      "text": "Start conversations.",
+      "dimension": "Extraversion",
+      "key": "+",
+      "itemCode": "IPIP50-21",
+      "chineseWorkingTranslation": "我主动开始交谈。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 22,
+      "text": "Am not interested in other people's problems.",
+      "dimension": "Agreeableness",
+      "key": "-",
+      "itemCode": "IPIP50-22",
+      "chineseWorkingTranslation": "我对别人的问题不感兴趣。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 23,
+      "text": "Get chores done right away.",
+      "dimension": "Conscientiousness",
+      "key": "+",
+      "itemCode": "IPIP50-23",
+      "chineseWorkingTranslation": "我会马上做完日常杂务。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 24,
+      "text": "Am easily disturbed.",
+      "dimension": "Emotional Stability",
+      "key": "-",
+      "itemCode": "IPIP50-24",
+      "chineseWorkingTranslation": "我很容易心神不宁。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 25,
+      "text": "Have excellent ideas.",
+      "dimension": "Intellect/Imagination",
+      "key": "+",
+      "itemCode": "IPIP50-25",
+      "chineseWorkingTranslation": "我有很棒的想法。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 26,
+      "text": "Have little to say.",
+      "dimension": "Extraversion",
+      "key": "-",
+      "itemCode": "IPIP50-26",
+      "chineseWorkingTranslation": "我没什么话可说。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 27,
+      "text": "Have a soft heart.",
+      "dimension": "Agreeableness",
+      "key": "+",
+      "itemCode": "IPIP50-27",
+      "chineseWorkingTranslation": "我心肠软。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 28,
+      "text": "Often forget to put things back in their proper place.",
+      "dimension": "Conscientiousness",
+      "key": "-",
+      "itemCode": "IPIP50-28",
+      "chineseWorkingTranslation": "我常忘记把东西放回它们应放的位置。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 29,
+      "text": "Get upset easily.",
+      "dimension": "Emotional Stability",
+      "key": "-",
+      "itemCode": "IPIP50-29",
+      "chineseWorkingTranslation": "我容易心烦。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 30,
+      "text": "Do not have a good imagination.",
+      "dimension": "Intellect/Imagination",
+      "key": "-",
+      "itemCode": "IPIP50-30",
+      "chineseWorkingTranslation": "我的想象力不太好。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 31,
+      "text": "Talk to a lot of different people at parties.",
+      "dimension": "Extraversion",
+      "key": "+",
+      "itemCode": "IPIP50-31",
+      "chineseWorkingTranslation": "在聚会上，我会和许多不同的人交谈。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 32,
+      "text": "Am not really interested in others.",
+      "dimension": "Agreeableness",
+      "key": "-",
+      "itemCode": "IPIP50-32",
+      "chineseWorkingTranslation": "我并不怎么对他人感兴趣。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 33,
+      "text": "Like order.",
+      "dimension": "Conscientiousness",
+      "key": "+",
+      "itemCode": "IPIP50-33",
+      "chineseWorkingTranslation": "我喜欢井然有序。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 34,
+      "text": "Change my mood a lot.",
+      "dimension": "Emotional Stability",
+      "key": "-",
+      "itemCode": "IPIP50-34",
+      "chineseWorkingTranslation": "我的情绪经常变化。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 35,
+      "text": "Am quick to understand things.",
+      "dimension": "Intellect/Imagination",
+      "key": "+",
+      "itemCode": "IPIP50-35",
+      "chineseWorkingTranslation": "我理解事情很快。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 36,
+      "text": "Don't like to draw attention to myself.",
+      "dimension": "Extraversion",
+      "key": "-",
+      "itemCode": "IPIP50-36",
+      "chineseWorkingTranslation": "我不喜欢让别人注意到我。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 37,
+      "text": "Take time out for others.",
+      "dimension": "Agreeableness",
+      "key": "+",
+      "itemCode": "IPIP50-37",
+      "chineseWorkingTranslation": "我会抽出时间给别人。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 38,
+      "text": "Shirk my duties.",
+      "dimension": "Conscientiousness",
+      "key": "-",
+      "itemCode": "IPIP50-38",
+      "chineseWorkingTranslation": "我逃避自己的职责。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 39,
+      "text": "Have frequent mood swings.",
+      "dimension": "Emotional Stability",
+      "key": "-",
+      "itemCode": "IPIP50-39",
+      "chineseWorkingTranslation": "我的情绪常常起伏不定。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 40,
+      "text": "Use difficult words.",
+      "dimension": "Intellect/Imagination",
+      "key": "+",
+      "itemCode": "IPIP50-40",
+      "chineseWorkingTranslation": "我使用难懂的词语。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 41,
+      "text": "Don't mind being the center of attention.",
+      "dimension": "Extraversion",
+      "key": "+",
+      "itemCode": "IPIP50-41",
+      "chineseWorkingTranslation": "我不介意成为众人关注的焦点。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 42,
+      "text": "Feel others' emotions.",
+      "dimension": "Agreeableness",
+      "key": "+",
+      "itemCode": "IPIP50-42",
+      "chineseWorkingTranslation": "我能感受到他人的情绪。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 43,
+      "text": "Follow a schedule.",
+      "dimension": "Conscientiousness",
+      "key": "+",
+      "itemCode": "IPIP50-43",
+      "chineseWorkingTranslation": "我按日程安排做事。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 44,
+      "text": "Get irritated easily.",
+      "dimension": "Emotional Stability",
+      "key": "-",
+      "itemCode": "IPIP50-44",
+      "chineseWorkingTranslation": "我容易烦躁。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 45,
+      "text": "Spend time reflecting on things.",
+      "dimension": "Intellect/Imagination",
+      "key": "+",
+      "itemCode": "IPIP50-45",
+      "chineseWorkingTranslation": "我会花时间反思事情。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 46,
+      "text": "Am quiet around strangers.",
+      "dimension": "Extraversion",
+      "key": "-",
+      "itemCode": "IPIP50-46",
+      "chineseWorkingTranslation": "在陌生人面前，我很安静。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 47,
+      "text": "Make people feel at ease.",
+      "dimension": "Agreeableness",
+      "key": "+",
+      "itemCode": "IPIP50-47",
+      "chineseWorkingTranslation": "我让人感到自在。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 48,
+      "text": "Am exacting in my work.",
+      "dimension": "Conscientiousness",
+      "key": "+",
+      "itemCode": "IPIP50-48",
+      "chineseWorkingTranslation": "我对自己的工作要求严格。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 49,
+      "text": "Often feel blue.",
+      "dimension": "Emotional Stability",
+      "key": "-",
+      "itemCode": "IPIP50-49",
+      "chineseWorkingTranslation": "我经常感到低落。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    },
+    {
+      "number": 50,
+      "text": "Am full of ideas.",
+      "dimension": "Intellect/Imagination",
+      "key": "+",
+      "itemCode": "IPIP50-50",
+      "chineseWorkingTranslation": "我有很多想法。",
+      "comparison": "MATCH_OFFICIAL_SAMPLE_AND_10_ITEM_KEY"
+    }
+  ],
+  "sourceDraftSha256": "9896befacfd50d42d5883a5b8c49d0379ac7eb9effa2b27346b6b33bd14c777c",
+  "rights": "Official IPIP materials public domain for commercial and non-commercial use. Paper PDFs are not copied. This record is not deployment authorization.",
+  "translationStatus": "Independent AI-assisted Chinese working translation, unvalidated; no expert approval claimed."
+}
