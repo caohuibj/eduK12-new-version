@@ -113,7 +113,7 @@
 
 /* Contextual verification help remains available on hover and keyboard focus. */
 .survey-admin-security-anchor { position:relative; }
-.survey-admin-security-help { display:none; position:absolute; z-index:6; top:calc(100% + 6px); right:0; width:350px; max-width:calc(100vw - 48px); padding:16px; border:1px solid var(--survey-brand-line); border-radius:10px; color:var(--survey-brand-ink); background:var(--survey-brand-canvas); box-shadow:0 12px 32px #00000024; font-size:12px; }
+.survey-admin-security-help { display:none; pointer-events:none; position:absolute; z-index:6; top:calc(100% + 6px); right:0; width:350px; max-width:calc(100vw - 48px); padding:16px; border:1px solid var(--survey-brand-line); border-radius:10px; color:var(--survey-brand-ink); background:var(--survey-brand-canvas); box-shadow:0 12px 32px #00000024; font-size:12px; }
 .survey-admin-security-help::before { content:''; position:absolute; bottom:100%; left:0; right:0; height:8px; }
 .survey-admin-security-help strong { font-size:13px; }
 .survey-admin-header .survey-admin-security-help p { font-size:12px; margin:2px 0 10px; }
