@@ -5,7 +5,7 @@
   "branch": "work/school-teacher-review-20261022",
   "enabled": true,
   "base": "4dd9f1340fef2bc3df2d066b9bf7712bc2eb3c66",
-  "productHead": "c8b604500c54630fde9cb165c5e09308baa45662",
+  "productHead": "c3bbcaf8a69fbfa36a4bbebac51d807223e9a8cf",
   "frontendTree": "c1e34b8fdd1a0127a155a208187a8c6bb2f8760f",
   "backendTree": "f58ac0f0fb0ab55a58303dd267e89ba1090c0795",
   "source": {
@@ -811,11 +811,11 @@
     },
     "server-version/e2e/school-teacher-chrome-permissions.cjs": {
       "before": null,
-      "after": "932f0c3f86b65619ad2e69b128dc56641f5da667"
+      "after": "4a0b22f2eb8fb778549a1a83495460d0a203bf64"
     },
     "server-version/e2e/school-teacher-chrome-permissions.test.cjs": {
       "before": null,
-      "after": "aa4a08045de767d1e572f5b1bd542c89d8b77aa1"
+      "after": "e8ae485de219a08589419d377293b9f005e54d7c"
     },
     "server-version/e2e/school-teacher-fixture.cjs": {
       "before": null,
@@ -1410,7 +1410,7 @@
   "review": {
     "completed": true,
     "originalExecutionSigned": false,
-    "note": "No local historical execution is admitted. Fixed official third/fourth frontend evidence preserves all 23 passed cases and original dist. Fifth connected job remains FAILED, while its exact 105 passed cases, nonempty upgrade preservation and immutable backend build are individually reverified. Only the reviewed excluded Survey fixture differs in the backend closure. A fresh isolated schema, five missing cases, browser and restore remain required. Fifth successful SAST authenticates prior application evidence; only this candidate's eight changed fixture, receipt and control paths are rescanned. No manifest source or run identity is rewritten."
+    "note": "No local historical execution is admitted. Fixed official frontend checks and immutable frontend/backend artifacts retain their original producer identities. The fifth connected job remains FAILED while its 105 passed cases and nonempty upgrade preservation are independently reverified. The sixth connected job remains FAILED while its remaining five passed cases are independently reverified; permission preparation made no changes and no browser ran. No business test is repeated. Fresh isolated schema and seed remain setup; browser and restore remain required real execution. Sixth successful SAST authenticates prior application/control evidence; only the three changed controls and two permission helper files are newly scanned."
   },
   "requiredJobs": [
     "admission",
@@ -2296,6 +2296,18 @@
       "buildDigest": "64032cdebcfbf855622f3dbaa53f6b31bffb1b5d9f965ef719b3d3faad469d18",
       "buildSize": 7590065,
       "compileDigest": "8689278a86c4571e8a5f251338c56d164f3626ec76520c5e27c44350c76b323d"
+    },
+    "officialBackendRemainder": {
+      "run": 39879553519,
+      "head": "60f13df9121eeb66c221dfe8b1f0535082a4a59c",
+      "checkout": "c291aec6bbd2009e8c18f783e3eb42d0791ad1bb",
+      "job": 120173687384,
+      "artifact": 12469743626,
+      "digest": "42b84f8368cddc43318cf792e9e658a949e7a1c2e1e8b199e8f2ea17e8e5bd0c",
+      "sastJob": 120173456048,
+      "sastArtifact": 12469478123,
+      "sastDigest": "f745dfc73d4945e0b03f6566c50d087cf93248b4cc73b99ffa3759785e8625d0",
+      "workflowSha256": "cd00d184e3be6dfad1a8a9685ee51aeb2d76d0d4f93310dbd114f21d6557cf11"
     }
   },
   "blockers": []

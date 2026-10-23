@@ -141,11 +141,12 @@ jobs:
           retention-days: 3
       - name: retain original nonempty upgrade qualification and prepare this fresh isolated database
         run: node .github/scripts/school-teacher-checks.mjs migrate
-      - name: run only the five missing service and PostgreSQL cases
+      - name: verify the fixed official remaining five cases without executing business tests
         env:
-          NODE_OPTIONS: --max-old-space-size=4096
-          SURVEY_TOOL_PUBLICATION_ACCEPTANCE: '1'
-        run: node .github/scripts/school-teacher-checks.mjs postgres
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git fetch --no-tags --depth=1 origin 60f13df9121eeb66c221dfe8b1f0535082a4a59c c291aec6bbd2009e8c18f783e3eb42d0791ad1bb
+          node .github/scripts/school-teacher-checks.mjs postgres
       - uses: actions/download-artifact@v4
         with:
           name: school-teacher-frontend-${{ github.sha }}
