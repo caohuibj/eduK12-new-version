@@ -50,7 +50,7 @@ describe('Survey parent/child boundary and feedback',()=>{
     expect(screen.getByRole('complementary',{name:'本轮认知任务设备提示'})).toHaveTextContent('不能保证跨设备继续')
     fireEvent.click(screen.getByRole('radio',{name:'符合'}))
     fireEvent.click(screen.getByRole('button',{name:'确认当前工具，继续'}))
-    fireEvent.click(screen.getByRole('button',{name:'模拟开始认知'}))
+    fireEvent.click(await screen.findByRole('button',{name:'模拟开始认知'}))
     expect(screen.queryByRole('complementary',{name:'本轮认知任务设备提示'})).toBeNull()
   })
   it('does not show cognitive requirements for a form-only task',async()=>{

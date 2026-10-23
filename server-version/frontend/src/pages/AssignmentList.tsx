@@ -16,10 +16,11 @@ import apiClient from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
 import { isTrainingHost } from '../training/context'
 import { resolveTrainingCoursePrefill } from '../training/resolveCoursePrefill'
-import { sessionFetch } from '../api/client'
+import { useTaskExport } from '../hooks/useTaskExport'
 import QuestionEditor, { Question } from '../components/QuestionEditor'
 import RichTextEditor from '../components/RichTextEditor'
-import MediaSelector, { MediaItem } from '../components/MediaSelector'
+import MediaSelector from '../components/DeferredMediaSelector'
+import type { MediaItem } from '../components/MediaSelector'
 import TagInput from '../components/TagInput'
 import TagBadge from '../components/TagBadge'
 import {} from '../utils/sanitize'
@@ -109,6 +110,7 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
   const focusId = searchParams.get(embeddedCourse ? 'assignmentId' : 'id')
   const { feedback, confirm, success, error: showError, info } = useStaffFeedback()
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
+  const { exporting, exportTask } = useTaskExport(showMessage)
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [courses, setCourses] = useState<Course[]>(embeddedCourse ? [embeddedCourse] : [])
   const [loading, setLoading] = useState(true)
@@ -436,27 +438,8 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
     }
   }
 
-  const handleExport = async (assignment: Assignment) => {
-    try {
-      const response = await sessionFetch(`/api/assignments/${assignment.id}/export`)
-      
-      if (!response.ok) {
-        throw new Error('导出失败')
-      }
-      
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${assignment.title}_提交数据.xlsx`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
-    } catch (error: any) {
-      showMessage(error.message || '导出失败')
-    }
-  }
+  const handleExport = (assignment: Assignment) => exportTask(assignment.id,
+    `/api/assignments/${assignment.id}/export`, `${assignment.title}_提交数据.xlsx`)
 
   const openCreateModal = () => {
     resetForm()
@@ -613,7 +596,7 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
         {assignment.description && <TrainingCardDescription id={'assignment-description-'+assignment.id} description={assignment.description}/>}
         {assignment.tags?.length ? <div className="staff-inline-tags">{assignment.tags.slice(0,3).map((tag,index)=><TagBadge key={index} tag={tag}/>)}</div> : null}
         <dl className="training-assignment-facts"><div><dt>截止时间</dt><dd>{formatDeadline(assignment.deadline)}</dd></div><div><dt>提交数量</dt><dd>{assignment._count?.submissions || 0} 份</dd></div></dl>
-        <footer className="training-assignment-card-actions"><ProductButton variant="primary" onClick={()=>openSubmissionsModal(assignment)}>查看提交</ProductButton><ProductButton onClick={()=>void openEditModal(assignment)}>编辑练习</ProductButton><ProductButton onClick={()=>void handleExport(assignment)}>导出提交</ProductButton><MoreActions label={`${assignment.title} 的更多操作`}><button type="button" onClick={()=>void handleClone(assignment)}>复制练习</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(assignment)}>删除练习</button></MoreActions></footer>
+        <footer className="training-assignment-card-actions"><ProductButton variant="primary" onClick={()=>openSubmissionsModal(assignment)}>查看提交</ProductButton><ProductButton onClick={()=>void openEditModal(assignment)}>编辑练习</ProductButton><ProductButton disabled={exporting.has(assignment.id)} onClick={()=>void handleExport(assignment)}>{exporting.has(assignment.id)?'导出中…':'导出提交'}</ProductButton><MoreActions label={`${assignment.title} 的更多操作`}><button type="button" onClick={()=>void handleClone(assignment)}>复制练习</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(assignment)}>删除练习</button></MoreActions></footer>
       </article>)}</div>
       : <div className="staff-table-container staff-record-table"><table className="staff-table" aria-label="练习记录"><thead><tr><th scope="col">练习</th><th scope="col">课程</th><th scope="col">截止时间</th><th scope="col">提交</th><th scope="col">题目</th><th scope="col" className="text-right">操作</th></tr></thead><tbody>
         {filteredAssignments.map(assignment=><tr id={`assignment-record-${assignment.id}`} tabIndex={-1} key={assignment.id} className={focusId===assignment.id?'staff-target-row':''}>
@@ -622,7 +605,7 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
           <td data-label="截止时间">{formatDeadline(assignment.deadline)}</td>
           <td data-label="提交"><button type="button" className="staff-text-action" onClick={()=>openSubmissionsModal(assignment)}>{assignment._count?.submissions || 0} 份提交</button></td>
           <td data-label="题目">{(assignment as Assignment & {summary?:boolean}).summary ? '打开后查看' : assignment.questions?.length || 0}</td>
-          <td><div className="staff-table-actions"><ProductButton onClick={()=>openSubmissionsModal(assignment)}>查看提交</ProductButton><MoreActions label={`${assignment.title} 的更多操作`}><button type="button" onClick={()=>void handleExport(assignment)}>导出提交</button><button type="button" onClick={()=>void handleClone(assignment)}>复制练习</button><button type="button" onClick={()=>openEditModal(assignment)}>编辑练习</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(assignment)}>删除练习</button></MoreActions></div></td>
+          <td><div className="staff-table-actions"><ProductButton onClick={()=>openSubmissionsModal(assignment)}>查看提交</ProductButton><MoreActions label={`${assignment.title} 的更多操作`}><button type="button" disabled={exporting.has(assignment.id)} onClick={()=>void handleExport(assignment)}>{exporting.has(assignment.id)?'导出中…':'导出提交'}</button><button type="button" onClick={()=>void handleClone(assignment)}>复制练习</button><button type="button" onClick={()=>openEditModal(assignment)}>编辑练习</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(assignment)}>删除练习</button></MoreActions></div></td>
         </tr>)}
       </tbody></table></div>}
       {!focusId && <CatalogPagination selection={catalog.selection} onApply={catalog.apply} total={total} loading={loading} label="练习"/>}

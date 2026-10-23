@@ -1,5 +1,4 @@
 import {TrainingMaterialPicker} from '../../modules/assessment-media/TrainingMaterialPicker'
-import { FormTemplatePicker } from './FormTemplatePicker'
 import { FormTemplateWorkspace } from './FormTemplateWorkspace'
 import {useFormPendingBuffers} from '../../modules/assessment-core/form/useFormBulkDraft'
 import {referencedFormChoiceKeys} from '../../modules/assessment-core/form/choiceSafety'
@@ -11,10 +10,7 @@ import { assessmentContextHref } from '../../training/assessmentContextHref'
 import { DeliveryOptionCard } from './DeliveryOptionCard'
 import { FormChoiceEditor } from './FormChoiceEditor'
 import { choiceError, emptyChoices, filledChoices, type ChoiceDraft } from './formChoices'
-import { TrainingContentSelection } from './TrainingContentSelection'
-import { TrainingReportStudio } from './TrainingReportStudio'
 import { hasPendingTrainingToolRequest } from '../../training/pendingToolRequests'
-import { TypedFormExportActions } from '../../modules/composite/TypedFormExportActions'
 import { StructuredFormConstraints } from '../../modules/assessment-core/form/StructuredFormConstraints'
 import { BasicFormConstraints } from '../../modules/assessment-core/form/BasicFormConstraints'
 import type { FormQuestion } from '../../modules/assessment-core/form/types'
@@ -22,15 +18,13 @@ import type { TrainingFeedbackPolicy } from '../../modules/composite/types'
 import { isTrainingHost } from '../../training/context'
 import '../../training/training-form-surface.css'
 import { apiErrorMessage } from '../../utils/apiErrorMessage'
-import { PublicDeliveryManager } from '../../components/PublicDeliveryManager'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { lazy, Suspense, useEffect, useRef, useState } from 'react'
 import { Link, useNavigate, useParams, useSearchParams, useLocation } from 'react-router-dom'
 import apiClient from '../../api/client'
 import { resolveTrainingCoursePrefill } from '../../training/resolveCoursePrefill'
 import { useCognitiveEnabled } from '../../contexts/CapabilitiesContext'
 import { useAuth } from '../../contexts/AuthContext'
 import { useStaffFeedback } from '../../components/staff-ui/useStaffFeedback'
-import AssessmentToolPicker from '../../components/AssessmentToolPicker'
 import LocalDateTimeInput, { localDateTimeValue, parseLocalDateTime } from '../../components/LocalDateTimeInput'
 import './questionnaire-products.css'
 import './questionnaire-training-editor.css'
@@ -50,6 +44,13 @@ import {
   contextOptionsForKey,
   serializeDelimitedOptions,
 } from '../../modules/assessment-context/options'
+
+const TrainingContentSelection = lazy(() => import('./TrainingContentSelection').then(module => ({ default: module.TrainingContentSelection })))
+const TrainingReportStudio = lazy(() => import('./TrainingReportStudio').then(module => ({ default: module.TrainingReportStudio })))
+const PublicDeliveryManager = lazy(() => import('../../components/PublicDeliveryManager').then(module => ({ default: module.PublicDeliveryManager })))
+const FormTemplatePicker = lazy(() => import('./FormTemplatePicker').then(module => ({ default: module.FormTemplatePicker })))
+const AssessmentToolPicker = lazy(() => import('../../components/AssessmentToolPicker'))
+const TypedFormExportActions = lazy(() => import('../../modules/composite/TypedFormExportActions').then(module => ({ default: module.TypedFormExportActions })))
 
 const typedFormTypes: Record<string, FormQuestion<never>['type']> = {
   number: 'NUMBER', long_text: 'LONG_TEXT', date: 'DATE', time: 'TIME', likert: 'LIKERT',
@@ -920,8 +921,8 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
             <ProductButton disabled={busy || dirty || reportBlocked || selectionState.busy} onClick={()=>{rememberMeasurement(null);setMeasurementNotice('已按你的确认结束原请求恢复，未再次发布。')}}>已核对全部原认知项，结束恢复</ProductButton></div>}
         </div>}
       </section>}
-{detail && user?.id && draft && detail.questionnaireType === 'COURSE' && (detail.questionnaireCourses || []).some((link: any) => catalog.courses.some((course: any) => course.id === link.courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)) && <TrainingContentSelection key={JSON.stringify([user.id,detail.id])} actorId={user.id} detail={detail} disabled={busy||dirty||reportBlocked||!!pendingMeasurement} recoveryDisabled={busy||dirty||reportState.busy} onSaved={hydrate} onRiskChange={selectionRiskChanged}/>}
-      {detail && user?.id && detail.questionnaireType === 'COURSE' && (detail.questionnaireCourses || []).some((link: any) => catalog.courses.some((course: any) => course.id === link.courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)) && <TrainingReportStudio disabled={busy || dirty || selectionBlocked || !!pendingMeasurement} onLeaveRiskChange={reportRiskChanged} actorId={user.id} compositeId={detail.id} courses={(detail.questionnaireCourses || []).flatMap((link: any) => { const course = catalog.courses.find((row: any) => row.id === link.courseId && row.courseType === 'TRAINING_COURSE' && !row.isLibrary); return course ? [{id:course.id,title:course.title}] : [] })}/>}
+{detail && user?.id && draft && detail.questionnaireType === 'COURSE' && (detail.questionnaireCourses || []).some((link: any) => catalog.courses.some((course: any) => course.id === link.courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)) && <Suspense fallback={<p role="status">正在加载工具…</p>}><TrainingContentSelection key={JSON.stringify([user.id,detail.id])} actorId={user.id} detail={detail} disabled={busy||dirty||reportBlocked||!!pendingMeasurement} recoveryDisabled={busy||dirty||reportState.busy} onSaved={hydrate} onRiskChange={selectionRiskChanged}/></Suspense>}
+      {detail && user?.id && detail.questionnaireType === 'COURSE' && (detail.questionnaireCourses || []).some((link: any) => catalog.courses.some((course: any) => course.id === link.courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)) && <Suspense fallback={<p role="status">正在加载工具…</p>}><TrainingReportStudio disabled={busy || dirty || selectionBlocked || !!pendingMeasurement} onLeaveRiskChange={reportRiskChanged} actorId={user.id} compositeId={detail.id} courses={(detail.questionnaireCourses || []).flatMap((link: any) => { const course = catalog.courses.find((row: any) => row.id === link.courseId && row.courseType === 'TRAINING_COURSE' && !row.isLibrary); return course ? [{id:course.id,title:course.title}] : [] })}/></Suspense>}
   </>
   const formMaterials = formType!=='year_month'&&!contextKey&&<details><summary>题目素材 · 图片、视频、文档</summary><TrainingMaterialPicker label="题目展示素材" value={formConstraints.materials} disabled={busy||authoringLocked} onChange={materials=>{setFormConstraints(previous=>({...previous,materials}));if(materials.length)setPolicyEnabled(true)}}/></details>
   const formRules = <>
@@ -991,7 +992,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                           ))}
                         </select>
                       </label>
-  const formTemplatePicker = trainingDesign && !formTemplate && draft && type === 'FORM' && <FormTemplatePicker excludeId={id} disabled={busy || dirty || authoringLocked} onImport={source => void action(async () => { hydrate(await request('/' + id + '/import-form', { revision: detail.revision, source })); setPreflight(null) })}/>
+  const formTemplatePicker = trainingDesign && !formTemplate && draft && type === 'FORM' && <Suspense fallback={<p role="status">正在加载工具…</p>}><FormTemplatePicker excludeId={id} disabled={busy || dirty || authoringLocked} onImport={source => void action(async () => { hydrate(await request('/' + id + '/import-form', { revision: detail.revision, source })); setPreflight(null) })}/></Suspense>
   const addContentControls = <>
               {draft && (
                 <fieldset
@@ -1031,7 +1032,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                     </select>
                   </label>
                   {type !== 'FORM' ? (
-                    trainingDesign ? <><AssessmentToolPicker options={choices} value={selected} onChange={setSelected} label={labels[type]} disabled={busy || dirty || authoringLocked} />{!choices.length && <p className="qt-content-empty-catalog" role="status">{type === 'COGNITIVE' ? '暂无可加入的认知测验。需要当前账号可用、已发布的认知任务，其配置也须已发布。' : `暂无可加入的${labels[type]}。请确认工具已发布且当前账号有使用权限。`}</p>}</> : <label className="block">
+                    trainingDesign ? <><Suspense fallback={<p role="status">正在加载工具…</p>}><AssessmentToolPicker options={choices} value={selected} onChange={setSelected} label={labels[type]} disabled={busy || dirty || authoringLocked} /></Suspense>{!choices.length && <p className="qt-content-empty-catalog" role="status">{type === 'COGNITIVE' ? '暂无可加入的认知测验。需要当前账号可用、已发布的认知任务，其配置也须已发布。' : `暂无可加入的${labels[type]}。请确认工具已发布且当前账号有使用权限。`}</p>}</> : <label className="block">
                       选择测评
                       <select
                         aria-label="选择测评"
@@ -1303,7 +1304,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
   </>
 
   const publicDeliverySettings = detail?.publicEnabled && detail.status === 'PUBLISHED' && id && (
-                <PublicDeliveryManager
+                <Suspense fallback={<p role="status">正在加载工具…</p>}><PublicDeliveryManager
                   key={id}
                   guided={trainingDesign}
                   family="COMPOSITE"
@@ -1312,7 +1313,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                   groupIpEligible={detail.productKind === 'QUESTIONNAIRE' && detail.questionnaireType === 'COURSE' &&
                     detail.questionnaireCourses?.length === 1 && catalog.courses.some((course: {id: string; courseType?: string; isLibrary?: boolean}) =>
                       course.id === detail.questionnaireCourses[0].courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)}
-                />
+                /></Suspense>
               )
 
   const managementActions = detail && <>
@@ -1336,7 +1337,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                 <ProductButton disabled={busy} onClick={() => void exportAll()}>
                   导出独立报告（JSON）
                 </ProductButton>
-                {detail.items?.some((item:{form?:{formDefinition?:unknown}})=>item.form?.formDefinition!=null) && <TypedFormExportActions key={id} assessmentId={id} />}
+                {detail.items?.some((item:{form?:{formDefinition?:unknown}})=>item.form?.formDefinition!=null) && <Suspense fallback={<p role="status">正在加载工具…</p>}><TypedFormExportActions key={id} assessmentId={id} /></Suspense>}
                 {detail.status === 'PUBLISHED' && (
                   <ProductButton variant="danger"
                     disabled={busy || dirty || authoringLocked}

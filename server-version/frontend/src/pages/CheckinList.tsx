@@ -20,12 +20,12 @@ import { Plus, Camera, Trash2, Users, Video, Image as ImageIcon, Download, X, Fi
 import apiClient from '../api/client'
 import { useAuth } from '../contexts/AuthContext'
 import { resolveTrainingCoursePrefill } from '../training/resolveCoursePrefill'
-import { sessionFetch } from '../api/client'
+import { useTaskExport } from '../hooks/useTaskExport'
 import RichTextEditor from '../components/RichTextEditor'
-import MediaSelector, { MediaItem } from '../components/MediaSelector'
+import MediaSelector from '../components/DeferredMediaSelector'
+import type { MediaItem } from '../components/MediaSelector'
 import TagBadge from '../components/TagBadge'
 import TagInput from '../components/TagInput'
-import CheckinTokenManager from '../components/CheckinTokenManager'
 import {} from '../utils/sanitize'
 import { normalizeImageUrl, handleImageError } from '../utils/mediaUtils'
 import { buildAttachmentUpdateFields } from '../utils/attachmentUpdate'
@@ -33,6 +33,8 @@ import type { Checkin, Course } from '../types'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../components/product-ui'
 import MoreActions from '../components/staff-ui/MoreActions'
 import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
+
+const CheckinTokenManager = React.lazy(() => import('../components/CheckinTokenManager'))
 
 interface VideoItem {
   type: 'library' | 'external' | 'upload'
@@ -109,6 +111,7 @@ const CheckinListContent: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
   const focusId = searchParams.get(embeddedCourse ? 'checkinId' : 'id')
   const { feedback, confirm, success, error: showError, info } = useStaffFeedback()
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
+  const { exporting, exportTask } = useTaskExport(showMessage)
   const [checkins, setCheckins] = useState<Checkin[]>([])
   const [courses, setCourses] = useState<Course[]>(embeddedCourse ? [embeddedCourse] : [])
   const [loading, setLoading] = useState(true)
@@ -370,27 +373,8 @@ const CheckinListContent: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
     }
   }
 
-  const handleExport = async (checkin: Checkin) => {
-    try {
-      const response = await sessionFetch(`/api/checkins/${checkin.id}/export`)
-      
-      if (!response.ok) {
-        throw new Error('导出失败')
-      }
-      
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = `${checkin.title}_打卡数据.xlsx`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
-    } catch (error: any) {
-      showMessage(error.message || '导出失败')
-    }
-  }
+  const handleExport = (checkin: Checkin) => exportTask(checkin.id,
+    `/api/checkins/${checkin.id}/export`, `${checkin.title}_打卡数据.xlsx`)
 
   // 打开提交列表弹窗
   const openSubmissionsModal = (checkin: Checkin) => {
@@ -533,7 +517,7 @@ const CheckinListContent: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
         {checkin.description && <TrainingCardDescription id={'checkin-description-'+checkin.id} description={checkin.description}/>}
         {checkin.tags?.length ? <div className="staff-inline-tags">{checkin.tags.slice(0,3).map((tag,index)=><TagBadge key={index} tag={tag}/>)}</div> : null}
         <dl className="training-assignment-facts"><div><dt>截止时间</dt><dd>{checkin.endTime ? new Date(checkin.endTime).toLocaleString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '无截止时间'}</dd></div><div><dt>参与人数</dt><dd>{checkin._count?.submissions || 0} 人</dd></div>{checkin.scheduleId && checkin.scheduledFor && <div><dt>本期发布时间</dt><dd>{new Date(checkin.scheduledFor).toLocaleString('zh-CN')}</dd></div>}</dl>
-        <footer className="training-assignment-card-actions"><ProductButton variant="primary" onClick={()=>openSubmissionsModal(checkin)}>查看提交</ProductButton><ProductButton onClick={()=>void openEditModal(checkin)}>编辑打卡</ProductButton><ProductButton onClick={()=>void handleExport(checkin)}>导出提交</ProductButton><MoreActions label={`${checkin.title} 的更多操作`}><CheckinTokenManager checkinId={checkin.id} checkinTitle={checkin.title} allowAnonymous={checkin.allowAnonymous||false} onAllowAnonymousChange={value=>setCheckins(current=>current.map(item=>item.id===checkin.id?{...item,allowAnonymous:value}:item))}/><button type="button" onClick={()=>void handleClone(checkin)}>复制打卡</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(checkin)}>删除打卡</button></MoreActions></footer>
+        <footer className="training-assignment-card-actions"><ProductButton variant="primary" onClick={()=>openSubmissionsModal(checkin)}>查看提交</ProductButton><ProductButton onClick={()=>void openEditModal(checkin)}>编辑打卡</ProductButton><ProductButton disabled={exporting.has(checkin.id)} onClick={()=>void handleExport(checkin)}>{exporting.has(checkin.id)?'导出中…':'导出提交'}</ProductButton><MoreActions label={`${checkin.title} 的更多操作`}><React.Suspense fallback={<span role="status">正在加载公开参与管理…</span>}><CheckinTokenManager checkinId={checkin.id} checkinTitle={checkin.title} allowAnonymous={checkin.allowAnonymous||false} onAllowAnonymousChange={value=>setCheckins(current=>current.map(item=>item.id===checkin.id?{...item,allowAnonymous:value}:item))}/></React.Suspense><button type="button" onClick={()=>void handleClone(checkin)}>复制打卡</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(checkin)}>删除打卡</button></MoreActions></footer>
       </article>)}</div>
       : <div className={`staff-table-container ${isTrainingHost() ? "staff-record-table" : ""}`}><table className="staff-table"><thead><tr><th>打卡</th><th>课程</th><th>截止时间</th><th>参与</th><th>公开参与</th><th className="text-right">操作</th></tr></thead><tbody>
         {filteredCheckins.map(checkin=><tr id={`checkin-record-${checkin.id}`} tabIndex={-1} key={checkin.id} className={focusId===checkin.id?'staff-target-row':''}>
@@ -542,7 +526,7 @@ const CheckinListContent: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
           <td data-label="截止时间">{checkin.endTime ? new Date(checkin.endTime).toLocaleString('zh-CN',{month:'short',day:'numeric',hour:'2-digit',minute:'2-digit'}) : '无截止时间'}</td>
           <td data-label="参与"><button type="button" className="staff-text-action" onClick={()=>openSubmissionsModal(checkin)}>{checkin._count?.submissions || 0} 人参与</button></td>
           <td data-label="公开参与"><span className={`staff-badge ${checkin.allowAnonymous?'staff-badge--success':''}`}>{checkin.allowAnonymous?'已开启':'未开启'}</span></td>
-          <td><div className="staff-table-actions"><ProductButton onClick={()=>openSubmissionsModal(checkin)}>查看提交</ProductButton><MoreActions label={`${checkin.title} 的更多操作`}><CheckinTokenManager checkinId={checkin.id} checkinTitle={checkin.title} allowAnonymous={checkin.allowAnonymous||false} onAllowAnonymousChange={value=>setCheckins(current=>current.map(item=>item.id===checkin.id?{...item,allowAnonymous:value}:item))}/><button type="button" onClick={()=>void handleExport(checkin)}>导出数据</button><button type="button" onClick={()=>void handleClone(checkin)}>复制打卡</button><button type="button" onClick={()=>openEditModal(checkin)}>编辑打卡</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(checkin)}>删除打卡</button></MoreActions></div></td>
+          <td><div className="staff-table-actions"><ProductButton onClick={()=>openSubmissionsModal(checkin)}>查看提交</ProductButton><MoreActions label={`${checkin.title} 的更多操作`}><React.Suspense fallback={<span role="status">正在加载公开参与管理…</span>}><CheckinTokenManager checkinId={checkin.id} checkinTitle={checkin.title} allowAnonymous={checkin.allowAnonymous||false} onAllowAnonymousChange={value=>setCheckins(current=>current.map(item=>item.id===checkin.id?{...item,allowAnonymous:value}:item))}/></React.Suspense><button type="button" disabled={exporting.has(checkin.id)} onClick={()=>void handleExport(checkin)}>{exporting.has(checkin.id)?'导出中…':'导出数据'}</button><button type="button" onClick={()=>void handleClone(checkin)}>复制打卡</button><button type="button" onClick={()=>openEditModal(checkin)}>编辑打卡</button><button type="button" className="staff-danger-action" onClick={()=>void handleDelete(checkin)}>删除打卡</button></MoreActions></div></td>
         </tr>)}
       </tbody></table></div>}
       {!focusId && <CatalogPagination selection={catalog.selection} onApply={catalog.apply} total={total} loading={loading} label="打卡"/>}

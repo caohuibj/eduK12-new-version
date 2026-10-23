@@ -4,14 +4,14 @@ import { hasAdminEntry } from '../../admin/authority'
 import {adminNavigation,isAdminWorkspacePath,managementIdentityLabel} from '../../admin/navigation'
 import { RelationalAvailabilityProvider, useRelationalAvailability } from '../../contexts/RelationalAvailabilityContext'
 import AssessmentTaskShortcut from '../AssessmentTaskShortcut'
-import { useEffect, useRef, useState, type ReactNode } from 'react'
+import { lazy, Suspense, useEffect, useRef, useState, type ReactNode } from 'react'
 import { Link, matchPath, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronRight, LogOut, PanelLeft, UserRound } from 'lucide-react'
 import { AccountViewProvider,useAuth } from '../../contexts/AuthContext'
 import {accountView} from '../../admin/accountView'
 import { useCapabilities } from '../../contexts/CapabilitiesContext'
 import { OrganizationProvider, useOrganization } from '../../contexts/OrganizationContext'
-import OrganizationProductRoutes from '../../pages/organization/OrganizationProductRoutes'
+import { RouteLoading } from './RouteAccess'
 import Footer from '../Footer'
 import { ProductButton } from '../product-ui'
 import StaffNavigation from './StaffNavigation'
@@ -41,6 +41,9 @@ import '../../training/training-workspace-header.css'
 import '../../training/training-appearance.css'
 import '../../survey/survey-admin-shell.css'
 import SurveyAdminShell from '../../survey/SurveyAdminShell'
+
+// Organization reports and charts are only needed on organization routes.
+const OrganizationProductRoutes = lazy(() => import('../../pages/organization/OrganizationProductRoutes'))
 
 function AppShellContent({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth()
@@ -128,7 +131,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
     </header>}
     <div className="hui-app-body">{mode==='standard'&&!trainingWorkspace&&<nav id="hui-navigation" aria-label="主要导航" className={`hui-product hui-navigation ${menuOpen?'hui-navigation--open':''}`} onKeyDown={e=>{if(e.key==='Escape'){setOpenPath(null);toggleRef.current?.focus()}}}>{staffMode&&(!training||surveyAdmin)?<StaffNavigation items={items} activePath={active?.path} onNavigate={onNavigate}/>:items.map(item=><Link key={item.path} to={item.path} aria-current={active?.path===item.path?'page':undefined} onClick={()=>onNavigate(item.path)}>{item.label}</Link>)}</nav>}
       <div className={`hui-app-content ${trainingAdmin ? 'hui-training-admin-content' : ''}`}>{mode==='standard'&&!trainingWorkspace&&<nav className="hui-product hui-breadcrumb" aria-label="当前位置"><ol>{breadcrumbs.map((crumb,index)=><li key={`${index}:${crumb.label}`}>{index>0&&<ChevronRight size={14} aria-hidden="true"/>}{crumb.path?<Link to={crumb.path}>{crumb.label}</Link>:<span aria-current="page">{crumb.label}</span>}</li>)}</ol></nav>}
-        <main id="hui-main" ref={mainRef} tabIndex={-1} data-training-family={teacherVisual ? teacherFamily : undefined} className={`hui-app-main ${(isAuthPath(location.pathname)||location.pathname==='/profile'||location.pathname==='/student/profile'||user?.mustChangePassword)?'hui-auth-content':''}`}><TrainingLearnerNavigationBoundary role={user?.role}>{training && !surveyAdmin && mode==='standard' && <TrainingContextBack role={user?.role}/>} {!training && user && ['/student', '/parent', '/dashboard'].includes(location.pathname) && <AssessmentTaskShortcut key={user.id}/>} {organizationProductRoute?<OrganizationProductRoutes/>:staffWorkspace?<div className="hui-staff-workspace" data-staff-workspace="true">{children}</div>:children}</TrainingLearnerNavigationBoundary></main>
+        <main id="hui-main" ref={mainRef} tabIndex={-1} data-training-family={teacherVisual ? teacherFamily : undefined} className={`hui-app-main ${(isAuthPath(location.pathname)||location.pathname==='/profile'||location.pathname==='/student/profile'||user?.mustChangePassword)?'hui-auth-content':''}`}><TrainingLearnerNavigationBoundary role={user?.role}>{training && !surveyAdmin && mode==='standard' && <TrainingContextBack role={user?.role}/>} {!training && user && ['/student', '/parent', '/dashboard'].includes(location.pathname) && <AssessmentTaskShortcut key={user.id}/>} {organizationProductRoute?<Suspense fallback={<RouteLoading/>}><OrganizationProductRoutes/></Suspense>:staffWorkspace?<div className="hui-staff-workspace" data-staff-workspace="true">{children}</div>:children}</TrainingLearnerNavigationBoundary></main>
       </div>
     </div>{(!training||surveyAdmin)&&!entryMode&&mode!=='focused'&&<Footer variant="light" productName={surveyAdmin?'Huisurvey · 观风知微':undefined}/>}
   </div>

@@ -160,8 +160,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
   useEffect(() => {
     let alive = true
     let validation = 0
+    const pendingEpochs = new Set<number>()
     const validateSession = async (changed = false, initial = false) => {
       if (!changed && localLoginPending.current) return
+      // Focus and visibility commonly fire together. Share only an in-flight
+      // check for this identity epoch; identity-change notifications stay fresh.
+      if (!changed && pendingEpochs.has(authEpochRef.current)) return
       if (changed) {
         authEpochRef.current += 1
         lastAuthTransitionAtRef.current = Date.now()
@@ -170,6 +174,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
       }
       const requestEpoch = authEpochRef.current
       const sequence = ++validation
+      pendingEpochs.add(requestEpoch)
       try {
         const response = await authApi.me()
         if (
@@ -197,6 +202,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({
           replaceIdentity(null)
         }
       } finally {
+        pendingEpochs.delete(requestEpoch)
         if (alive && sequence === validation) setIsLoading(false)
       }
     }

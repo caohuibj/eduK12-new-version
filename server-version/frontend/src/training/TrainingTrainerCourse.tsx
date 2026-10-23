@@ -6,15 +6,16 @@ import { useCatalogQuery } from './useCatalogQuery'
 import { lazy, Suspense, useEffect, useState } from 'react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import apiClient from '../api/client'
-import TrainingCourseAssessments, { type CourseAssessment } from './TrainingCourseAssessments'
+import type { CourseAssessment } from './TrainingCourseAssessments'
 import { useAuth } from '../contexts/AuthContext'
-import TrainingCourseSettings from './TrainingCourseSettings'
 import { COURSE_ANALYSIS_ENABLED, resolveCourseSection, type CourseSection } from './courseNavigation'
 import type { Course } from '../types'
 
 const CourseAssignmentWorkspace = lazy(() => import('../pages/AssignmentList'))
 const CourseCheckinWorkspace = lazy(() => import('../pages/CheckinList'))
 const TrainingCourseAnalysis = lazy(() => import('./TrainingCourseAnalysis'))
+const TrainingCourseAssessments = lazy(() => import('./TrainingCourseAssessments'))
+const TrainingCourseSettings = lazy(() => import('./TrainingCourseSettings'))
 type Section = CourseSection
 type Collection<T> = { rows: T[]; loading: boolean; error: string | null }
 const pending = <T,>(): Collection<T> => ({ rows: [], loading: true, error: null })
@@ -98,12 +99,12 @@ export default function TrainingTrainerCourse() {
 
             {section === 'checkins' && <Suspense fallback={<p role="status">正在读取打卡管理…</p>}><CourseCheckinWorkspace embeddedCourse={course}/></Suspense>}
 
-            {section === 'assessments' && <TrainingCourseAssessments key={course.id} course={course} actorId={user?.id||''}
-              rows={assessments.rows} loading={assessments.loading} error={assessments.error} onRetry={retry} filtered={filtered}/>}
+            {section === 'assessments' && <Suspense fallback={<p role="status">正在读取测评管理…</p>}><TrainingCourseAssessments key={course.id} course={course} actorId={user?.id||''}
+              rows={assessments.rows} loading={assessments.loading} error={assessments.error} onRetry={retry} filtered={filtered}/></Suspense>}
             {section === 'assessments' && <CatalogPagination selection={catalog.selection} onApply={catalog.apply} total={collectionTotal} loading={assessments.loading} label="测评"/>}
             {COURSE_ANALYSIS_ENABLED && section === 'analysis' && <Suspense fallback={<p role="status">正在读取统计页面…</p>}><TrainingCourseAnalysis key={course.id} courseId={course.id} actorId={user?.id} /></Suspense>}
 
-            {section === 'management' && <TrainingCourseSettings key={course.id} course={course} onUpdated={retry} />}
+            {section === 'management' && <Suspense fallback={<p role="status">正在读取课程设置…</p>}><TrainingCourseSettings key={course.id} course={course} onUpdated={retry} /></Suspense>}
             </div></div>
           </>}
   </div>

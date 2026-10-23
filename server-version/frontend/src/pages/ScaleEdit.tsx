@@ -1,14 +1,12 @@
 import {useFormPendingBuffers} from '../modules/assessment-core/form/useFormBulkDraft'
 import {usePageEditorGuard} from '../components/shared-ui/usePageEditorGuard'
 import {normalizedMaterialList} from '../modules/assessment-media/material'
-import {TrainingMaterialPicker,TrainingMaterialPreview} from '../modules/assessment-media/TrainingMaterialPicker'
 import { validateRawScoreFeedback } from '../modules/scale/rawScoreFeedback'
-import { ScaleDefinitionEditor } from './ScaleDefinitionEditor'
 import { type ScaleDefinition, emptyDefinition, normalizeDefinition, updateReportContract } from './scaleDefinitionEditorModel'
 import ScaleCsvImport from './ScaleCsvImport'
 import { TrainingScaleVersions } from '../components/scale-governance/TrainingScaleVersions'
 import { TrainingScaleLibrarySubmission } from '../components/scale-governance/TrainingScaleLibrarySubmission'
-import React, { useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
+import React, { lazy, Suspense, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { Link, UNSAFE_DataRouterContext, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { ArrowLeft, CheckCircle, Copy, Eye, Save } from 'lucide-react'
 import apiClient from '../api/client'
@@ -16,6 +14,8 @@ import { PageHeader, ProductPage, ProductStatus } from '../components/product-ui
 import { isTrainingHost } from '../training/context'
 import { trainingCourseContext } from '../training/courseNavigation'
 import './ScaleEdit.css'
+
+const ScaleEditDefinition = lazy(() => import('./ScaleEditDefinition'))
 
 interface ScaleMeta {
   id: string
@@ -89,6 +89,8 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
   const [savedBasic, setSavedBasic] = useState(() => JSON.stringify(basicValues(emptyScale())))
   const [savedDefinition, setSavedDefinition] = useState(() => JSON.stringify(emptyDefinition()))
   const [activeTab, setActiveTab] = useState<'basic' | 'responses' | 'items' | 'scores' | 'report'>('basic')
+  // Once opened, retain the editor's unapplied paste buffers across tab changes.
+  const [definitionOpened, setDefinitionOpened] = useState(false)
   const [issues, setIssues] = useState<Array<{ path: string; message: string; severity?: string }>>([])
   const [preview, setPreview] = useState<any>(null)
 
@@ -404,11 +406,11 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
       {!isNew && !standard && scale.id === id && <TrainingScaleVersions key={`versions:${scale.id}:${scale.status}`} sourceId={scale.id} />}
       {scale.sourceScaleId && <div className="scale-edit-source"><strong>版本谱系</strong><p><Link to={`/scales/${scale.sourceScaleId}`}>查看来源工具 / 版本</Link> → 当前 v{scale.authoringVersion ?? 1}</p><p>修订沿用量表谱系，另存建立独立谱系。来源仅作追溯，旧任务和问卷不会自动升级。</p></div>}
       {issues.length > 0 && <div className="scale-edit-feedback mb-5 rounded-lg border p-4 bg-gray-50" role={issues.some(issue => issue.severity !== 'success') ? 'alert' : 'status'}><ul className="space-y-1 text-sm">{issues.map((issue, index) => <li key={`${issue.path}-${index}`} className={issue.severity === 'success' ? 'text-green-700' : 'text-red-700'}>{issue.severity === 'success' && <CheckCircle className="w-4 h-4 inline mr-1" />}{issue.path}：{issue.message}</li>)}</ul></div>}
-      <div className="staff-toolbar"><div className="staff-segmented scale-edit-tabs" role="group" aria-label="量表编辑分区">{tabs.map(([key, label]) => <button key={key} type="button" aria-pressed={activeTab === key} disabled={importing || (isNew && key !== 'basic')} title={isNew && key !== 'basic' ? '请先保存基本信息创建草稿' : undefined} onClick={() => { setActiveTab(key) }}>{label}</button>)}</div></div>
+      <div className="staff-toolbar"><div className="staff-segmented scale-edit-tabs" role="group" aria-label="量表编辑分区">{tabs.map(([key, label]) => <button key={key} type="button" aria-pressed={activeTab === key} disabled={importing || (isNew && key !== 'basic')} title={isNew && key !== 'basic' ? '请先保存基本信息创建草稿' : undefined} onClick={() => { if (key !== 'basic') setDefinitionOpened(true); setActiveTab(key) }}>{label}</button>)}</div></div>
 
       {activeTab === 'basic' && <section className="staff-panel scale-author-panel space-y-4"><p className="scale-edit-multiset-note">{isNew ? '请先保存基本信息创建草稿，再编制响应选项、题目、计分、授权声明与报告反馈。此步骤仅保存基本元数据，私有量表不会自动对全平台学生开放。' : '本区仅保存基本元数据；自有内容 / 授权声明请在“报告文案”中随量表定义保存。'}</p><div className="grid md:grid-cols-2 gap-4"><>{isNew && <label className="text-sm text-gray-700">量表编码<input disabled={controlsDisabled} value={scale.code} onChange={(event) => setScale({ ...scale, code: event.target.value })} className="input mt-1 w-full" /></label>}</><label className="text-sm text-gray-700">量表名称<input disabled={controlsDisabled} value={scale.name} onChange={(event) => setScale({ ...scale, name: event.target.value })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">预计用时（分钟）<input type="number" disabled={controlsDisabled} value={scale.estimatedTime ?? ''} onChange={(event) => setScale({ ...scale, estimatedTime: event.target.value ? Number(event.target.value) : null })} className="input mt-1 w-full" /></label><label className="text-sm text-gray-700">可见性<select aria-label="可见性" disabled={controlsDisabled} value={scale.visibility} onChange={(event) => setScale({ ...scale, visibility: event.target.value as ScaleMeta['visibility'] })} className="input mt-1 w-full"><option value="HIDDEN">隐藏</option><option value="COURSE">课程可用</option>{scale.visibility === 'PUBLIC' && <option value="PUBLIC" disabled>历史公开范围（兼容保留，不可新增）</option>}</select></label></div><label className="block text-sm text-gray-700">说明<textarea disabled={controlsDisabled} value={scale.description || ''} onChange={(event) => setScale({ ...scale, description: event.target.value })} className="input mt-1 w-full min-h-24" /></label><label className="block text-sm text-gray-700">作答指导<textarea disabled={controlsDisabled} value={scale.instruction || ''} onChange={(event) => setScale({ ...scale, instruction: event.target.value })} className="input mt-1 w-full min-h-24" /></label><div className="flex justify-end"><button onClick={() => void saveBasic()} disabled={controlsDisabled || mediaUploadCount > 0} className="hui-button hui-button--primary"><Save className="w-4 h-4 inline mr-1" />保存基本信息</button></div></section>}
 
-      <ScaleDefinitionEditor onPendingChange={onPendingChange} renderItemMaterials={(item,change)=><TrainingMaterialPicker label="题目展示素材" value={item.materials} disabled={controlsDisabled} onChange={materials=>change({materials})}/>} renderFeedbackContent={(content,change)=><TrainingMaterialPicker label="反馈展示素材" value={content.materials} disabled={controlsDisabled} onChange={materials=>change({...content,materials})}/>} renderFeedbackPreview={content=>content.materials?.map(item=><TrainingMaterialPreview key={item.asset.assetId} item={item}/>)} definition={definition} setDefinition={setDefinition} activeTab={activeTab} readOnly={readOnly} controlsDisabled={controlsDisabled} saveDefinition={saveDefinition} mediaUploadCount={mediaUploadCount} onUploadBusy={onUploadBusy} importControl={!isNew && !standard && id && <ScaleCsvImport id={id} revision={updatedAtRef.current} disabled={bulkPending || readOnly || saving || copying || basicDirty || definitionDirty} onBusy={setImporting} onFailure={async failure => { await reportWriteError(failure, 'import', ++operationRef.current) }} onImported={value => { applyMetadata(value); const stored = normalizeDefinition(value.definition); setDefinition(stored); setSavedDefinition(JSON.stringify(stored)); setHasConflict(false) }} />} />
+      {definitionOpened && <Suspense fallback={<p role="status">正在加载量表编辑器…</p>}><ScaleEditDefinition onPendingChange={onPendingChange} definition={definition} setDefinition={setDefinition} activeTab={activeTab} readOnly={readOnly} controlsDisabled={controlsDisabled} saveDefinition={saveDefinition} mediaUploadCount={mediaUploadCount} onUploadBusy={onUploadBusy} importControl={!isNew && !standard && id && <ScaleCsvImport id={id} revision={updatedAtRef.current} disabled={bulkPending || readOnly || saving || copying || basicDirty || definitionDirty} onBusy={setImporting} onFailure={async failure => { await reportWriteError(failure, 'import', ++operationRef.current) }} onImported={value => { applyMetadata(value); const stored = normalizeDefinition(value.definition); setDefinition(stored); setSavedDefinition(JSON.stringify(stored)); setHasConflict(false) }} />} /></Suspense>}
 
       {preview && <section className="staff-panel staff-panel--padded p-6 mt-5"><h2 className="font-semibold mb-3">服务端计分预览</h2><p className="scale-edit-multiset-note">使用已保存定义，每题选择首个响应选项。这是服务端计分结果，区别于报告编辑中的模拟分数呈现；被试实际可见内容仍由发布与披露设置决定。</p><pre className="text-xs bg-gray-50 rounded p-3 overflow-auto">{JSON.stringify(preview, null, 2)}</pre></section>}
       {!isNew && !standard && scale.id === id && <TrainingScaleLibrarySubmission key={`submission:${scale.id}:${scale.status}`} sourceId={scale.id} />}

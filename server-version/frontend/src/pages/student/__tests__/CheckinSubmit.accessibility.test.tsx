@@ -84,12 +84,12 @@ it.each([true, false])('opens the same authorized document with Enter and Space 
   await user.tab()
   expect(trigger).toHaveFocus()
   await user.keyboard('{Enter}')
-  expect(screen.getByRole('dialog', { name: doc.title })).toBeInTheDocument()
+  expect(await screen.findByRole('dialog', { name: doc.title })).toBeInTheDocument()
   expect(mocks.preview).toHaveBeenLastCalledWith(expect.objectContaining({ url: doc.url, title: doc.title, allowDownload: false, isOpen: true }))
   await user.click(screen.getByRole('button', { name: '关闭合成文档' }))
   trigger.focus()
   await user.keyboard(' ')
-  expect(screen.getByRole('dialog', { name: doc.title })).toBeInTheDocument()
+  expect(await screen.findByRole('dialog', { name: doc.title })).toBeInTheDocument()
   expect(mocks.post).not.toHaveBeenCalled()
 })
 
@@ -200,7 +200,7 @@ it.each([
     await user.click(screen.getByRole('button', { name: /等待期间查看的附件/ }))
     intendedFocus = await screen.findByRole('button', { name: '关闭合成文档' })
     intendedFocus.focus()
-    expect(screen.getByRole('dialog', { name: doc.title })).toBeInTheDocument()
+    expect(await screen.findByRole('dialog', { name: doc.title })).toBeInTheDocument()
   }
   await act(async () => reject({ status: 500, message: '延迟失败' }))
   const alert = await screen.findByRole('alert')
