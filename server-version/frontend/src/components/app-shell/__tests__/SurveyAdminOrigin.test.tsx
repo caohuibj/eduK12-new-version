@@ -9,6 +9,17 @@ function location(origin:string,search='') {
 }
 afterEach(() => vi.unstubAllGlobals())
 describe('Survey administration canonical origin boundary', () => {
+  it.each(['auto','light','dark'])('carries only the validated %s appearance alongside the fixed admin target', mode => {
+    const replace=location('http://survey.localhost:5173','?returnTo=%2Fadmin%2Fsurvey-researchers&appearance='+mode+'&password=do-not-copy&token=do-not-copy')
+    render(<SurveyAdminOrigin login><div>credentials</div></SurveyAdminOrigin>)
+    expect(replace).toHaveBeenCalledExactlyOnceWith('http://localhost:5173/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers&appearance='+mode)
+    expect(screen.queryByText('credentials')).not.toBeInTheDocument()
+  })
+  it('drops an invalid appearance hint during canonicalization', () => {
+    const replace=location('http://survey.localhost:5173','?returnTo=%2Fadmin%2Fsurvey-researchers&appearance=unknown')
+    render(<SurveyAdminOrigin login><div>credentials</div></SurveyAdminOrigin>)
+    expect(replace).toHaveBeenCalledExactlyOnceWith('http://localhost:5173/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
+  })
   it.each([false,true])('does not mount credentials or APIs on training.localhost (login=%s)', login => {
     const replace=location('http://training.localhost:5173','?returnTo=%2Fadmin%2Fsurvey-researchers&password=do-not-copy&token=do-not-copy')
     const child=vi.fn(()=><div>protected child</div>)

@@ -12,7 +12,7 @@ async function setup(){
   render(<MemoryRouter><AdminKeyEnrollment/></MemoryRouter>)
   fireEvent.change(screen.getByLabelText('管理账号'),{target:{value:'synthetic-admin'}})
   fireEvent.change(screen.getByLabelText('当前密码'),{target:{value:'Synthetic1!password'}})
-  fireEvent.change(screen.getByLabelText('受控登记票据'),{target:{value:'synthetic-private-ticket'}})
+  fireEvent.change(screen.getByLabelText('一次性绑定码'),{target:{value:'synthetic-private-ticket'}})
   fireEvent.click(screen.getByRole('button',{name:'生成绑定二维码'}))
   await screen.findByRole('heading',{name:'扫描二维码'})
 }
@@ -22,7 +22,7 @@ describe('administrator Authenticator binding and sensitive actions',()=>{
     expect(begin).toHaveBeenCalledExactlyOnceWith('synthetic-admin','Synthetic1!password','synthetic-private-ticket')
     expect(enroll).not.toHaveBeenCalled()
     expect(screen.queryByLabelText('当前密码')).toBeNull()
-    expect(screen.queryByLabelText('受控登记票据')).toBeNull()
+    expect(screen.queryByLabelText('一次性绑定码')).toBeNull()
     expect(screen.getByText('在微软 Authenticator 中选择“添加账号 → 其他账号”，扫描此二维码。')).toBeInTheDocument()
     fireEvent.change(screen.getByLabelText('Authenticator 六位动态码'),{target:{value:'123456'}})
     fireEvent.click(screen.getByRole('button',{name:'确认绑定'}))
@@ -39,7 +39,7 @@ describe('administrator Authenticator binding and sensitive actions',()=>{
     await screen.findByText(/请重新填写登记信息开始绑定/)
     expect(screen.queryByRole('heading',{name:'扫描二维码'})).toBeNull()
     expect(screen.getByLabelText('当前密码')).toHaveValue('')
-    expect(screen.getByLabelText('受控登记票据')).toHaveValue('')
+    expect(screen.getByLabelText('一次性绑定码')).toHaveValue('')
   })
   it('keeps sensitive actions behind an explicit new code and clears that code after verification',async()=>{
     render(<AdminStepUp/>)

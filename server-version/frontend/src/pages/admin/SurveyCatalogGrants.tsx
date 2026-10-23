@@ -4,7 +4,7 @@ import type { Kind } from '../../survey/builder.types'
 type Source={ref:CatalogSourceRef;title:string;available:boolean;unsupportedReason?:string;definitionDigest?:string}
 type SourcePage={list:Source[];page:number;hasMore:boolean;terminalReason:'PAGE_LIMIT_REACHED'|'END_OF_CATALOG'|null}
 const emptySourcePage:SourcePage={list:[],page:1,hasMore:false,terminalReason:null}
-export function SurveyCatalogGrants({api,password,researchers}:{api:CatalogApi;password:string;researchers:{id:string;username:string;status:string}[]}){
+export function SurveyCatalogGrants({api,password,researchers,ensureVerification}:{api:CatalogApi;password:string;researchers:{id:string;username:string;status:string}[];ensureVerification?:(context:string)=>boolean}){
   const [researcherId,setResearcherId]=useState(''),[kind,setKind]=useState<Kind>('SCALE')
   const [sourcePage,setSourcePage]=useState<SourcePage>(emptySourcePage),[grants,setGrants]=useState<CatalogGrant[]>([]),[grantPage,setGrantPage]=useState(1)
   const {list:sources,page,hasMore,terminalReason}=sourcePage
@@ -21,6 +21,7 @@ export function SurveyCatalogGrants({api,password,researchers}:{api:CatalogApi;p
     setQueried(true)
   }
   const loadGrants=async(id=researcherId,next=1)=>{const data=await api<{list:CatalogGrant[]}>('/researchers/'+encodeURIComponent(id)+'/tool-grants?page='+next);setGrants(data.list);setGrantPage(next)}
+  const canWrite=(context:string)=>ensureVerification?ensureVerification(context):Boolean(password)
   const grant=async(source:Source)=>{
     await api('/researchers/'+encodeURIComponent(researcherId)+'/tool-grants','POST',{currentPassword:password,source:source.ref})
     setNotice('已向 '+objectName+' 授权 '+source.title+' · 版本 '+source.ref.sourceVersion+'；研究者可在自己的项目中导入。')
@@ -46,7 +47,7 @@ export function SurveyCatalogGrants({api,password,researchers}:{api:CatalogApi;p
         <h3 className="font-semibold">{source.title}</h3><p className="survey-admin-object">{source.ref.kind} · <strong>版本 {source.ref.sourceVersion}</strong> · 授权给 {objectName}</p>
         <details><summary>查看来源编号与内容摘要</summary><p className="break-all">来源编号：{source.ref.sourceId}</p>{source.definitionDigest&&<p className="break-all">内容摘要：{source.definitionDigest}</p>}</details>
         {!source.available&&<p className="text-sm">不可授权：{source.unsupportedReason||'当前来源未提供可安全冻结的版本'}</p>}
-        <button type="button" className="btn-primary" disabled={busy||!password||!canGrant||!source.available} onClick={()=>void run(()=>grant(source))}>授权此版本：{source.title} · {source.ref.sourceVersion} → {objectName}</button>
+        <button type="button" className="btn-primary" disabled={busy||(!ensureVerification&&!password)||!canGrant||!source.available} onClick={()=>{if(canWrite('授权 '+source.title+' · 版本 '+source.ref.sourceVersion+' 给 '+objectName))void run(()=>grant(source))}}>授权此版本：{source.title} · {source.ref.sourceVersion} → {objectName}</button>
       </article>)}
       <div className="flex gap-3 items-center text-sm"><button type="button" className="btn-secondary" disabled={busy||page<=1} onClick={()=>void run(()=>loadSources(page-1))}>来源上一页</button><span>来源第 {page} 页</span><button type="button" className="btn-secondary" disabled={busy||!hasMore} onClick={()=>void run(()=>loadSources(page+1))}>来源下一页</button></div>
       {terminalReason==='PAGE_LIMIT_REACHED'&&<p role="status" className="text-sm">已到达来源目录浏览上限：每类最多显示前 1000 个版本，仍有更多版本未显示。</p>}
@@ -54,7 +55,8 @@ export function SurveyCatalogGrants({api,password,researchers}:{api:CatalogApi;p
       {researcherId&&<div className="space-y-3"><h3 className="font-semibold">{objectName} 的工具授权</h3>{!busy&&!error&&!grants.length&&<p>当前页暂无版本授权。</p>}{grants.map(item=><article key={item.id} className="survey-admin-card">
         <h4>{item.title}</h4><p className="survey-admin-object">研究者：{objectName} · <strong>版本 {item.sourceRef.sourceVersion}</strong> · {item.status==='ACTIVE'?'已授权':item.status==='REVOKED'?'已撤销':'状态待核对'}</p>
         <details><summary>来源与冻结摘要</summary><SourceProvenance source={item.sourceRef} provenance={item.sourceProvenance}/></details>
-        {item.status==='ACTIVE'&&<button type="button" className="btn-secondary" disabled={busy||!password} onClick={()=>{
+        {item.status==='ACTIVE'&&<button type="button" className="btn-secondary" disabled={busy||(!ensureVerification&&!password)} onClick={()=>{
+          if(!canWrite('撤销 '+objectName+' 的工具版本授权'))return
           if(window.confirm('撤销 '+objectName+' 的 '+item.title+' · 版本 '+item.sourceRef.sourceVersion+' 授权？将阻止新的导入及后续冻结发布；既有已发布和进行中的研究不受影响。'))void run(async()=>{
             await api('/tool-grants/'+encodeURIComponent(item.id)+'/revoke','POST',{currentPassword:password})
             setNotice(objectName+' 的 '+item.title+' · 版本 '+item.sourceRef.sourceVersion+' 授权已撤销。既有已发布研究不变。')

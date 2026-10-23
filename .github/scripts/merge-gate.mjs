@@ -1,3 +1,4 @@
+import {surveyManualUIPlan,surveyManualUIOutputs} from './survey-manual-ui-scope.mjs';
 import {sharedAuthoringPlan,sharedAuthoringOutputs} from './shared-authoring-scope.mjs';
 import {surveyWorkspacePlan,surveyWorkspaceOutputs} from './survey-workspace-scope.mjs';
 import {trainingAppearancePlan,trainingAppearanceOutputs} from './training-appearance-scope.mjs';
@@ -46,6 +47,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='survey-manual-ui')return ['scope','survey-manual-ui','codeql'];
   if(scope.application_route==='shared-authoring')return ['scope','shared-authoring','codeql'];
   if(scope.application_route==='survey-workspace')return ['scope','survey-workspace','codeql'];
   if(scope.application_route==='training-appearance')return ['scope','training-appearance','codeql'];
@@ -109,6 +111,10 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='survey-manual-ui'){
+    try{const p=JSON.parse(scope.survey_manual_ui_plan);if(draft||p.postMerge!==false||Object.entries(surveyManualUIOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+    return [...new Set(failed)];
+  }
   if(scope.application_route==='shared-authoring'){
     try{const p=JSON.parse(scope.shared_authoring_plan);if(draft||p.postMerge!==false||Object.entries(sharedAuthoringOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
     return [...new Set(failed)];
@@ -347,6 +353,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const needs = readNeeds();
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.application_route==='survey-manual-ui'){
+    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');
+      const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.survey_manual_ui_plan);
+      if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(surveyManualUIPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-survey-manual-ui-plan');
+    }catch{failed.push('recomputed-survey-manual-ui-plan');}
+  }
   if(needs.scope?.outputs?.application_route==='shared-authoring'){
     try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');
       const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.shared_authoring_plan);
