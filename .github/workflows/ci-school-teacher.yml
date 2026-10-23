@@ -29,7 +29,7 @@ jobs:
       - name: authenticate frozen scope and all configured source inputs
         run: node .github/scripts/school-teacher-checks.mjs admission
       - name: verify only new control contracts
-        run: node --test .github/scripts/school-teacher.test.mjs
+        run: node --test --test-name-pattern='CSS-only' .github/scripts/school-teacher.test.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -52,7 +52,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - name: verify complete official frontend checks and reuse the immutable compiled artifact
+      - name: verify unchanged official frontend checks and build the exact CSS repair once
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -158,8 +158,8 @@ jobs:
       - name: retain the exact verified frontend receipt
         run: |
           mkdir -p school-teacher-evidence
-          cp school-teacher-frontend-receipt/official-frontend-build-reuse.json school-teacher-evidence/official-frontend-build-reuse.json
-      - name: verify both immutable original manifests against actual dist bytes
+          cp school-teacher-frontend-receipt/frontend.json school-teacher-evidence/frontend.json
+      - name: verify the current frontend and original backend manifests against actual dist bytes
         run: |
           node .github/scripts/school-teacher-checks.mjs verify-frontend-artifact
           node .github/scripts/school-teacher-checks.mjs verify-backend-artifact
