@@ -33,7 +33,7 @@ describe('计分定义保存与回读', () => {
     const user = userEvent.setup()
     render(<MemoryRouter><ScaleEdit /></MemoryRouter>)
     await user.click(await screen.findByRole('button', { name: '计分' }))
-    expect(screen.getByText(/已纳入 3\/3 题 · 预计范围 1.0–5.0/)).toBeInTheDocument()
+    expect(await screen.findByText(/已纳入 3\/3 题 · 预计范围 1.0–5.0/)).toBeInTheDocument()
   })
   it('explicitly selects all three items, persists them, and keeps them selected after reopening', async () => {
     let stored: any = definition()
@@ -42,7 +42,7 @@ describe('计分定义保存与回读', () => {
     const user = userEvent.setup()
     const view = render(<MemoryRouter><ScaleEdit /></MemoryRouter>)
     await user.click(await screen.findByRole('button', { name: '计分' }))
-    await user.click(screen.getByRole('button', { name: '+ 总分' }))
+    await user.click(await screen.findByRole('button', { name: '+ 总分' }))
     for (const code of ['Q1', 'Q2', 'Q3']) {
       expect(screen.getByRole('button', { name: code })).toHaveAttribute('aria-pressed', 'false')
       await user.click(screen.getByRole('button', { name: code }))

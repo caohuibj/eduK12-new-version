@@ -1,8 +1,9 @@
-import { beforeEach, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({ fetch: vi.fn() }))
 vi.mock('../../api/client', () => ({ sessionFetch: mocks.fetch }))
 import { getExportIntentKey, clearExportIntentKey, requestExportIntent, waitForExportArtifacts, assertExportDownload, ExportJobFailedError } from '../exportJobs'
 beforeEach(() => { sessionStorage.clear(); mocks.fetch.mockReset() })
+afterEach(() => vi.useRealTimers())
 it('reuses the same intent after response loss but generates a fresh one after terminal conflict', async () => {
   const scope = 'cognitive:resource:summary'
   const key = getExportIntentKey(scope)
@@ -33,4 +34,24 @@ it('classifies expiry between READY polling and protected download as terminal',
   expect(() => assertExportDownload({ status: 404, ok: false } as Response)).toThrow(ExportJobFailedError)
   expect(() => assertExportDownload({ status: 503, ok: false } as Response)).not.toThrow(ExportJobFailedError)
   expect(() => assertExportDownload({ status: 200, ok: true } as Response)).not.toThrow()
+})
+
+it('polls only unfinished artifacts and retains the original file order and ready metadata', async () => {
+  vi.useFakeTimers()
+  const attempts = new Map<string, number>()
+  mocks.fetch.mockImplementation(async (path: string) => {
+    const count = (attempts.get(path) || 0) + 1
+    attempts.set(path, count)
+    const ready = path.includes('/fast/') || count === 3
+    return { status: 200, ok: true, json: async () => ({ code: 0, data: {
+      status: ready ? 'READY' : 'PROCESSING', fileName: ready ? 'generated-' + (path.includes('/fast/') ? 'fast' : 'slow') : 'pending',
+    } }) }
+  })
+  const artifacts = ['fast', 'slow'].map(id => ({ id, format: 'csv', fileName: id, downloadUrl: `/api/composite/${id}` }))
+  const result = waitForExportArtifacts(artifacts)
+  await vi.advanceTimersByTimeAsync(2000)
+  expect((await result).map(item => item.fileName)).toEqual(['generated-fast', 'generated-slow'])
+  expect(attempts.get('/api/composite/fast/status')).toBe(1)
+  expect(attempts.get('/api/composite/slow/status')).toBe(3)
+  expect(mocks.fetch).toHaveBeenCalledTimes(4)
 })

@@ -33,20 +33,27 @@ export const waitForExportArtifacts = async (
 ): Promise<ExportArtifactRef[]> => {
   if (artifacts.length === 0) throw new Error('导出任务未返回文件元数据')
   const deadline = Date.now() + timeoutMs
+  // READY artifacts need no further generation polling while sibling files finish.
+  // The authenticated download still checks current authority and expiry.
+  const ready = new Map<string, ExportArtifactRef & { status: string; errorCode?: string | null }>()
 
   while (Date.now() < deadline) {
     const states = await Promise.all(artifacts.map(async (artifact) => {
+      const cached = ready.get(artifact.id)
+      if (cached) return cached
       const response = await sessionFetch(`${artifact.downloadUrl}/status`, { cache: 'no-store', signal: AbortSignal.timeout(Math.min(15000, Math.max(1, deadline - Date.now()))) })
       if (response.status === 404 || response.status === 410) throw new ExportJobFailedError('导出文件已到期或不可用，请重新导出')
       if (!response.ok) throw new Error('无法读取导出任务状态')
       const payload = await response.json()
       if (payload?.code !== 0 || !payload?.data) throw new Error(payload?.message || '无法读取导出任务状态')
-      return {
+      const state = {
         ...artifact,
         ...payload.data,
         downloadUrl: payload.data.downloadUrl || artifact.downloadUrl,
         fileName: payload.data.fileName || artifact.fileName,
       } as ExportArtifactRef & { status: string; errorCode?: string | null }
+      if (state.status === 'READY') ready.set(artifact.id, state)
+      return state
     }))
 
     const failed = states.find((state) => state.status === 'FAILED')

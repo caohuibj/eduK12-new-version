@@ -1,0 +1,3705 @@
+{
+  "schema": 1,
+  "baseline_main": "3c8b0ad97f664b10fb0abcb5884606c18f9ac4be",
+  "baseline_optimization_head": "16ba12f1799bcaa050c08e807194cfb6426e6df5",
+  "candidate_application_hashes": {
+    "src/training/TrainingLibrary.tsx": "378fc81664c21b7b180b71d57e6828c90cdf3cf199543efa06b3f07ae7fdb8dc",
+    "src/pages/ScaleEdit.tsx": "ec8a2dfa06c3488d97bc60ed579e0d69929460a2a9bf73257dd154adf0389927",
+    "src/pages/ScaleEditDefinition.tsx": "64c9ba97d27641fa1e4165dec6d8c1366d83a4a910ccf08801c2cc095b63d74f",
+    "src/pages/questionnaire/QuestionnaireProducts.tsx": "7a7c568e075732eb4744b606862f14bdf20e3984081c8bc2fb6297f3ae711ec8",
+    "src/modules/composite/TypedFormExportActions.tsx": "75c3e48fbd1dd00519a9d9c1bf647ce9ee1acff0772ffb037ec70012cce02584",
+    "src/utils/exportJobs.ts": "bf847ee926a84a69da0fa153d914d086c26b870068809bf191d6df9818252bc0"
+  },
+  "profile": {
+    "browser": "Chromium 151.0.7922.173",
+    "frontend": "built Vite production artifacts, gzip-6, local loopback TLS",
+    "backend": "same Node 24.21 / tsx development process",
+    "database": "isolated eduk12_preview, synthetic data only",
+    "latency_ms": 100,
+    "download_mbps": 4,
+    "upload_mbps": 2,
+    "cpu_throttle": 4,
+    "samples_per_phase_per_version": 2,
+    "concurrency": 1,
+    "post_ready_settle_ms": 700,
+    "hardware_interval_ms": 500
+  },
+  "interpretation": {
+    "time": "navigation/click to asserted usable UI, no p95/p99 or capacity inference",
+    "bytes": "ResourceTiming.transferSize includes HTTP headers; cold authenticated entries use fresh contexts with actual synthetic teacher cookies; every phase repeats the same workflow",
+    "cpu": "service cgroup deltas overlap-interpolated across phase including 700 ms settle; window lengths differ; memory peaks are sampled",
+    "browser_rss": "sum across browser processes double-counts shared pages; TaskDuration retained as diagnostic only",
+    "tradeoff": "first scale definition opening defers approximately 20 KB compressed JavaScript; preserve mounted editor and pending text thereafter"
+  },
+  "checks": {
+    "initial": {
+      "total": 136,
+      "passed": 131,
+      "failed": 5,
+      "sha256": "d435c92a263e18f384fa848b26651a8ad8c73696cce11ecd60b7fad41bdc2987"
+    },
+    "recheck": {
+      "passed": 5,
+      "filtered": 13,
+      "failed": 0,
+      "sha256": "d55b3a44c5f47e83479d3b8a1cd1e67d2216807a98146c80c80c733b662ddb49"
+    },
+    "unique_cases_passed": 136,
+    "corrected_cases": [
+      "Scale plain-text authoring appends required items with explicit reverse markers and preserves old identities and score membership",
+      "Scale plain-text authoring pastes labels without changing numeric/string identities, existing scores, or another response set",
+      "Training scale persistence boundaries only accepts persistable metadata before creation, then enables definition authoring",
+      "计分定义保存与回读 explicitly selects all three items, persists them, and keeps them selected after reopening",
+      "计分定义保存与回读 shows included items and matches the unweighted mean range even with historical weights"
+    ],
+    "app_types": "passed, final direct tsc -p tsconfig.app.json --noEmit after asynchronous-test consumer edits; earlier successful type run retained separately",
+    "build": "passed, one build, 16.71 seconds",
+    "changed_lint": "passed, 0 errors and 0 warnings",
+    "not_run": [
+      "CI",
+      "full regression",
+      "backend build or tests",
+      "production deployment",
+      "background CSV/ZIP export worker completion",
+      "concurrent load or capacity tests"
+    ]
+  },
+  "summary": [
+    {
+      "phase": "teacher.login_cold",
+      "baseline": {
+        "n": 2,
+        "ready_ms": {
+          "median": 1398.36,
+          "min": 1392.24,
+          "max": 1404.48
+        },
+        "js_transfer_bytes": {
+          "median": 158963.0,
+          "min": 158963,
+          "max": 158963
+        },
+        "static_transfer_bytes": {
+          "median": 409217.0,
+          "min": 409217,
+          "max": 409217
+        },
+        "api_count": {
+          "median": 2.0,
+          "min": 2,
+          "max": 2
+        },
+        "js_heap_mib": {
+          "median": 5.26,
+          "min": 5.26,
+          "max": 5.26
+        }
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms": {
+          "median": 1451.14,
+          "min": 1406.93,
+          "max": 1495.35
+        },
+        "js_transfer_bytes": {
+          "median": 158863.0,
+          "min": 158863,
+          "max": 158863
+        },
+        "static_transfer_bytes": {
+          "median": 409117.0,
+          "min": 409117,
+          "max": 409117
+        },
+        "api_count": {
+          "median": 2.0,
+          "min": 2,
+          "max": 2
+        },
+        "js_heap_mib": {
+          "median": 5.275,
+          "min": 5.27,
+          "max": 5.28
+        }
+      },
+      "ready_reduction_percent": -3.8,
+      "js_transfer_reduction_percent": 0.1
+    },
+    {
+      "phase": "teacher.login_feedback",
+      "baseline": {
+        "n": 2,
+        "ready_ms": {
+          "median": 1037.75,
+          "min": 1018.99,
+          "max": 1056.51
+        },
+        "js_transfer_bytes": {
+          "median": 10033.0,
+          "min": 10033,
+          "max": 10033
+        },
+        "static_transfer_bytes": {
+          "median": 17625.0,
+          "min": 17625,
+          "max": 17625
+        },
+        "api_count": {
+          "median": 3.0,
+          "min": 3,
+          "max": 3
+        },
+        "js_heap_mib": {
+          "median": 5.675,
+          "min": 5.65,
+          "max": 5.7
+        }
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms": {
+          "median": 997.205,
+          "min": 985.14,
+          "max": 1009.27
+        },
+        "js_transfer_bytes": {
+          "median": 10029.0,
+          "min": 10029,
+          "max": 10029
+        },
+        "static_transfer_bytes": {
+          "median": 17621.0,
+          "min": 17621,
+          "max": 17621
+        },
+        "api_count": {
+          "median": 3.0,
+          "min": 3,
+          "max": 3
+        },
+        "js_heap_mib": {
+          "median": 5.7,
+          "min": 5.68,
+          "max": 5.72
+        }
+      },
+      "ready_reduction_percent": 3.9,
+      "js_transfer_reduction_percent": 0.0
+    },
+    {
+      "phase": "teacher.tools_cold",
+      "baseline": {
+        "n": 2,
+        "ready_ms": {
+          "median": 1943.045,
+          "min": 1844.09,
+          "max": 2042.0
+        },
+        "js_transfer_bytes": {
+          "median": 185591.0,
+          "min": 185591,
+          "max": 185591
+        },
+        "static_transfer_bytes": {
+          "median": 265299.0,
+          "min": 265299,
+          "max": 265299
+        },
+        "api_count": {
+          "median": 3.0,
+          "min": 3,
+          "max": 3
+        },
+        "js_heap_mib": {
+          "median": 5.69,
+          "min": 5.62,
+          "max": 5.76
+        }
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms": {
+          "median": 1955.18,
+          "min": 1943.72,
+          "max": 1966.64
+        },
+        "js_transfer_bytes": {
+          "median": 170389.0,
+          "min": 170389,
+          "max": 170389
+        },
+        "static_transfer_bytes": {
+          "median": 249401.0,
+          "min": 249401,
+          "max": 249401
+        },
+        "api_count": {
+          "median": 3.0,
+          "min": 3,
+          "max": 3
+        },
+        "js_heap_mib": {
+          "median": 5.715,
+          "min": 5.71,
+          "max": 5.72
+        }
+      },
+      "ready_reduction_percent": -0.6,
+      "js_transfer_reduction_percent": 8.2
+    },
+    {
+      "phase": "teacher.scale_new_cold",
+      "baseline": {
+        "n": 2,
+        "ready_ms": {
+          "median": 1926.105,
+          "min": 1906.18,
+          "max": 1946.03
+        },
+        "js_transfer_bytes": {
+          "median": 202895.0,
+          "min": 202895,
+          "max": 202895
+        },
+        "static_transfer_bytes": {
+          "median": 282647.0,
+          "min": 282647,
+          "max": 282647
+        },
+        "api_count": {
+          "median": 2.0,
+          "min": 2,
+          "max": 2
+        },
+        "js_heap_mib": {
+          "median": 5.33,
+          "min": 5.33,
+          "max": 5.33
+        }
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms": {
+          "median": 1957.095,
+          "min": 1900.68,
+          "max": 2013.51
+        },
+        "js_transfer_bytes": {
+          "median": 185255.0,
+          "min": 185255,
+          "max": 185255
+        },
+        "static_transfer_bytes": {
+          "median": 263763.0,
+          "min": 263763,
+          "max": 263763
+        },
+        "api_count": {
+          "median": 2.0,
+          "min": 2,
+          "max": 2
+        },
+        "js_heap_mib": {
+          "median": 5.24,
+          "min": 5.23,
+          "max": 5.25
+        }
+      },
+      "ready_reduction_percent": -1.6,
+      "js_transfer_reduction_percent": 8.7
+    },
+    {
+      "phase": "teacher.scale_create_feedback",
+      "baseline": {
+        "n": 2,
+        "ready_ms": {
+          "median": 470.685,
+          "min": 459.61,
+          "max": 481.76
+        },
+        "js_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "static_transfer_bytes": {
+          "median": 1071.0,
+          "min": 1071,
+          "max": 1071
+        },
+        "api_count": {
+          "median": 2.0,
+          "min": 2,
+          "max": 2
+        },
+        "js_heap_mib": {
+          "median": 5.265,
+          "min": 5.22,
+          "max": 5.31
+        }
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms": {
+          "median": 486.75,
+          "min": 484.26,
+          "max": 489.24
+        },
+        "js_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "static_transfer_bytes": {
+          "median": 1071.0,
+          "min": 1071,
+          "max": 1071
+        },
+        "api_count": {
+          "median": 2.0,
+          "min": 2,
+          "max": 2
+        },
+        "js_heap_mib": {
+          "median": 4.965,
+          "min": 4.96,
+          "max": 4.97
+        }
+      },
+      "ready_reduction_percent": -3.4,
+      "js_transfer_reduction_percent": null
+    },
+    {
+      "phase": "teacher.scale_items_first",
+      "baseline": {
+        "n": 2,
+        "ready_ms": {
+          "median": 82.86,
+          "min": 80.33,
+          "max": 85.39
+        },
+        "js_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "static_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "api_count": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "js_heap_mib": {
+          "median": 5.555,
+          "min": 5.51,
+          "max": 5.6
+        }
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms": {
+          "median": 325.41,
+          "min": 308.45,
+          "max": 342.37
+        },
+        "js_transfer_bytes": {
+          "median": 20473.0,
+          "min": 20473,
+          "max": 20473
+        },
+        "static_transfer_bytes": {
+          "median": 21717.0,
+          "min": 21717,
+          "max": 21717
+        },
+        "api_count": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "js_heap_mib": {
+          "median": 6.145,
+          "min": 6.14,
+          "max": 6.15
+        }
+      },
+      "ready_reduction_percent": -292.7,
+      "js_transfer_reduction_percent": null
+    },
+    {
+      "phase": "teacher.scale_save_feedback",
+      "baseline": {
+        "n": 2,
+        "ready_ms": {
+          "median": 379.535,
+          "min": 364.49,
+          "max": 394.58
+        },
+        "js_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "static_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "api_count": {
+          "median": 2.0,
+          "min": 2,
+          "max": 2
+        },
+        "js_heap_mib": {
+          "median": 7.27,
+          "min": 7.27,
+          "max": 7.27
+        }
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms": {
+          "median": 363.155,
+          "min": 361.38,
+          "max": 364.93
+        },
+        "js_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "static_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "api_count": {
+          "median": 2.0,
+          "min": 2,
+          "max": 2
+        },
+        "js_heap_mib": {
+          "median": 6.625,
+          "min": 6.62,
+          "max": 6.63
+        }
+      },
+      "ready_reduction_percent": 4.3,
+      "js_transfer_reduction_percent": null
+    },
+    {
+      "phase": "teacher.form_new_cold",
+      "baseline": {
+        "n": 2,
+        "ready_ms": {
+          "median": 2684.255,
+          "min": 2448.44,
+          "max": 2920.07
+        },
+        "js_transfer_bytes": {
+          "median": 276569.0,
+          "min": 276569,
+          "max": 276569
+        },
+        "static_transfer_bytes": {
+          "median": 381027.0,
+          "min": 381027,
+          "max": 381027
+        },
+        "api_count": {
+          "median": 2.0,
+          "min": 2,
+          "max": 2
+        },
+        "js_heap_mib": {
+          "median": 4.715,
+          "min": 4.7,
+          "max": 4.73
+        }
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms": {
+          "median": 2454.25,
+          "min": 2437.28,
+          "max": 2471.22
+        },
+        "js_transfer_bytes": {
+          "median": 241843.0,
+          "min": 241843,
+          "max": 241843
+        },
+        "static_transfer_bytes": {
+          "median": 333798.0,
+          "min": 333798,
+          "max": 333798
+        },
+        "api_count": {
+          "median": 2.0,
+          "min": 2,
+          "max": 2
+        },
+        "js_heap_mib": {
+          "median": 5.27,
+          "min": 4.66,
+          "max": 5.88
+        }
+      },
+      "ready_reduction_percent": 8.6,
+      "js_transfer_reduction_percent": 12.6
+    },
+    {
+      "phase": "teacher.form_create_feedback",
+      "baseline": {
+        "n": 2,
+        "ready_ms": {
+          "median": 349.625,
+          "min": 336.64,
+          "max": 362.61
+        },
+        "js_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "static_transfer_bytes": {
+          "median": 1071.0,
+          "min": 1071,
+          "max": 1071
+        },
+        "api_count": {
+          "median": 2.0,
+          "min": 2,
+          "max": 2
+        },
+        "js_heap_mib": {
+          "median": 5.84,
+          "min": 5.83,
+          "max": 5.85
+        }
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms": {
+          "median": 353.5,
+          "min": 320.28,
+          "max": 386.72
+        },
+        "js_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "static_transfer_bytes": {
+          "median": 1071.0,
+          "min": 1071,
+          "max": 1071
+        },
+        "api_count": {
+          "median": 2.0,
+          "min": 2,
+          "max": 2
+        },
+        "js_heap_mib": {
+          "median": 5.79,
+          "min": 5.77,
+          "max": 5.81
+        }
+      },
+      "ready_reduction_percent": -1.1,
+      "js_transfer_reduction_percent": null
+    },
+    {
+      "phase": "teacher.form_question_save_feedback",
+      "baseline": {
+        "n": 2,
+        "ready_ms": {
+          "median": 256.08,
+          "min": 251.27,
+          "max": 260.89
+        },
+        "js_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "static_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "api_count": {
+          "median": 1.0,
+          "min": 1,
+          "max": 1
+        },
+        "js_heap_mib": {
+          "median": 6.125,
+          "min": 6.06,
+          "max": 6.19
+        }
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms": {
+          "median": 275.59,
+          "min": 251.69,
+          "max": 299.49
+        },
+        "js_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "static_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "api_count": {
+          "median": 1.0,
+          "min": 1,
+          "max": 1
+        },
+        "js_heap_mib": {
+          "median": 6.065,
+          "min": 6.01,
+          "max": 6.12
+        }
+      },
+      "ready_reduction_percent": -7.6,
+      "js_transfer_reduction_percent": null
+    },
+    {
+      "phase": "teacher.report_json_export",
+      "baseline": {
+        "n": 2,
+        "ready_ms": {
+          "median": 299.65,
+          "min": 296.14,
+          "max": 303.16
+        },
+        "js_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "static_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "api_count": {
+          "median": 1.0,
+          "min": 1,
+          "max": 1
+        },
+        "js_heap_mib": {
+          "median": 6.785,
+          "min": 6.76,
+          "max": 6.81
+        }
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms": {
+          "median": 289.265,
+          "min": 281.78,
+          "max": 296.75
+        },
+        "js_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "static_transfer_bytes": {
+          "median": 0.0,
+          "min": 0,
+          "max": 0
+        },
+        "api_count": {
+          "median": 1.0,
+          "min": 1,
+          "max": 1
+        },
+        "js_heap_mib": {
+          "median": 6.38,
+          "min": 6.38,
+          "max": 6.38
+        }
+      },
+      "ready_reduction_percent": 3.5,
+      "js_transfer_reduction_percent": null
+    }
+  ],
+  "samples": [
+    {
+      "version": "baseline",
+      "sample": 1,
+      "phase": "teacher.login_cold",
+      "ready_ms": 1392.24,
+      "js_transfer_bytes": 158963,
+      "static_transfer_bytes": 409217,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 401,
+          "duration_ms": 103.99
+        },
+        {
+          "method": "GET",
+          "path": "/api/capabilities",
+          "status": 200,
+          "duration_ms": 104.77
+        }
+      ],
+      "loaded_js": [
+        "/entry-brand.js",
+        "/assets/index-CgU6Te9-.js",
+        "/assets/App-CQH7Zoum.js",
+        "/assets/learnerNavigation-Xjzqclnc.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/client-CilwE2xY.js",
+        "/assets/SurveyBrand-taGHoqRB.js",
+        "/assets/createLucideIcon-CDe7XYm-.js",
+        "/assets/sun-CH_n42TF.js",
+        "/assets/shield-check-DpnOJAt1.js",
+        "/assets/heart-handshake-B8WLb8GN.js",
+        "/assets/ProductButton-B0yQHHlu.js",
+        "/assets/ProductStatus-uPLoKVwy.js",
+        "/assets/sun-moon-gc28tX0i.js",
+        "/assets/TrainingLogin-Cp-393yC.js",
+        "/assets/LoginRecoveryNotice-gkM6Zn6q.js",
+        "/assets/useLoginReturn-BZ440bty.js",
+        "/assets/loader-circle-BZIVEKgR.js"
+      ],
+      "js_heap_mib": 5.26,
+      "renderer_task_seconds_diagnostic": 0.7012,
+      "hardware_window_seconds": 2.108,
+      "hardware": {
+        "backend": {
+          "observed_samples": 4,
+          "peak_memory_mib": 297.62,
+          "cpu_core_seconds_estimate": 0.0102,
+          "peak_cpu_one_core_percent_estimate": 1.21
+        },
+        "postgres": {
+          "observed_samples": 4,
+          "peak_memory_mib": 74.93,
+          "cpu_core_seconds_estimate": 0.0415,
+          "peak_cpu_one_core_percent_estimate": 8.32
+        },
+        "redis": {
+          "observed_samples": 4,
+          "peak_memory_mib": 4.13,
+          "cpu_core_seconds_estimate": 0.022,
+          "peak_cpu_one_core_percent_estimate": 3.73
+        },
+        "chromium": {
+          "observed_samples": 4,
+          "peak_memory_mib": 861.84
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 1,
+      "phase": "teacher.login_feedback",
+      "ready_ms": 1018.99,
+      "js_transfer_bytes": 10033,
+      "static_transfer_bytes": 17625,
+      "api_count": 3,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "duration_ms": 104.29
+        },
+        {
+          "method": "POST",
+          "path": "/api/auth/training-login",
+          "status": 200,
+          "duration_ms": 109.81
+        },
+        {
+          "method": "GET",
+          "path": "/api/courses",
+          "status": 200,
+          "duration_ms": 110.66
+        }
+      ],
+      "loaded_js": [
+        "/assets/TrainingTrainerHome-Cmapn-y9.js",
+        "/assets/TrainingCourseCode-CezSFj34.js",
+        "/assets/copy-JF6eACEt.js",
+        "/assets/TrainingCardDescription-CL-CcK6l.js",
+        "/assets/chevron-up-DV5T7sEm.js",
+        "/assets/ModalSurface-Co2ZUheQ.js",
+        "/assets/plus-CaG2_N6s.js",
+        "/assets/arrow-right-BHS61EOz.js"
+      ],
+      "js_heap_mib": 5.65,
+      "renderer_task_seconds_diagnostic": 0.5648,
+      "hardware_window_seconds": 1.727,
+      "hardware": {
+        "backend": {
+          "observed_samples": 3,
+          "peak_memory_mib": 306.82,
+          "cpu_core_seconds_estimate": 0.208,
+          "peak_cpu_one_core_percent_estimate": 18.12
+        },
+        "postgres": {
+          "observed_samples": 3,
+          "peak_memory_mib": 75.05,
+          "cpu_core_seconds_estimate": 0.0403,
+          "peak_cpu_one_core_percent_estimate": 7.88
+        },
+        "redis": {
+          "observed_samples": 3,
+          "peak_memory_mib": 4.23,
+          "cpu_core_seconds_estimate": 0.0231,
+          "peak_cpu_one_core_percent_estimate": 4.04
+        },
+        "chromium": {
+          "observed_samples": 3,
+          "peak_memory_mib": 892.43
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 1,
+      "phase": "teacher.tools_cold",
+      "ready_ms": 1844.09,
+      "js_transfer_bytes": 185591,
+      "static_transfer_bytes": 265299,
+      "api_count": 3,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 200,
+          "duration_ms": 105.93
+        },
+        {
+          "method": "GET",
+          "path": "/api/capabilities",
+          "status": 200,
+          "duration_ms": 106.35
+        },
+        {
+          "method": "GET",
+          "path": "/api/training-workspace/tools",
+          "status": 200,
+          "duration_ms": 110.58
+        }
+      ],
+      "loaded_js": [
+        "/entry-brand.js",
+        "/assets/index-CgU6Te9-.js",
+        "/assets/App-CQH7Zoum.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/learnerNavigation-Xjzqclnc.js",
+        "/assets/client-CilwE2xY.js",
+        "/assets/SurveyBrand-taGHoqRB.js",
+        "/assets/createLucideIcon-CDe7XYm-.js",
+        "/assets/sun-CH_n42TF.js",
+        "/assets/shield-check-DpnOJAt1.js",
+        "/assets/heart-handshake-B8WLb8GN.js",
+        "/assets/ProductButton-B0yQHHlu.js",
+        "/assets/ProductStatus-uPLoKVwy.js",
+        "/assets/sun-moon-gc28tX0i.js",
+        "/assets/TrainingLibrary-iFpE30Of.js",
+        "/assets/MediaSelector--q3_qrFy.js",
+        "/assets/mediaUtils-DcVDHCm8.js",
+        "/assets/ModalSurface-Co2ZUheQ.js",
+        "/assets/x-ClXCXOfY.js",
+        "/assets/file-text-kvCLVYjW.js",
+        "/assets/image-1DiPyVog.js",
+        "/assets/video-Cx_VJPya.js",
+        "/assets/link-nFK3VEhS.js",
+        "/assets/upload-CHwEAh82.js",
+        "/assets/check-DYK09_Sq.js",
+        "/assets/circle-alert-DHF5EFFv.js",
+        "/assets/file-play-BqYs4pm8.js",
+        "/assets/ManagementDialog-CfrWz-St.js",
+        "/assets/FormalReferenceStudio-CVQ6lf9z.js",
+        "/assets/TrainingCardDescription-CL-CcK6l.js",
+        "/assets/chevron-up-DV5T7sEm.js",
+        "/assets/plus-CaG2_N6s.js",
+        "/assets/arrow-right-BHS61EOz.js",
+        "/assets/pencil-DaWp2WQ7.js"
+      ],
+      "js_heap_mib": 5.62,
+      "renderer_task_seconds_diagnostic": 0.8299,
+      "hardware_window_seconds": 2.562,
+      "hardware": {
+        "backend": {
+          "observed_samples": 5,
+          "peak_memory_mib": 297.77,
+          "cpu_core_seconds_estimate": 0.0265,
+          "peak_cpu_one_core_percent_estimate": 2.8
+        },
+        "postgres": {
+          "observed_samples": 5,
+          "peak_memory_mib": 77.97,
+          "cpu_core_seconds_estimate": 0.0493,
+          "peak_cpu_one_core_percent_estimate": 5.47
+        },
+        "redis": {
+          "observed_samples": 5,
+          "peak_memory_mib": 4.29,
+          "cpu_core_seconds_estimate": 0.0241,
+          "peak_cpu_one_core_percent_estimate": 3.91
+        },
+        "chromium": {
+          "observed_samples": 5,
+          "peak_memory_mib": 863.97
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 1,
+      "phase": "teacher.scale_new_cold",
+      "ready_ms": 1946.03,
+      "js_transfer_bytes": 202895,
+      "static_transfer_bytes": 282647,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/capabilities",
+          "status": 200,
+          "duration_ms": 106.98
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 200,
+          "duration_ms": 111.11
+        }
+      ],
+      "loaded_js": [
+        "/entry-brand.js",
+        "/assets/index-CgU6Te9-.js",
+        "/assets/App-CQH7Zoum.js",
+        "/assets/learnerNavigation-Xjzqclnc.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/client-CilwE2xY.js",
+        "/assets/SurveyBrand-taGHoqRB.js",
+        "/assets/createLucideIcon-CDe7XYm-.js",
+        "/assets/sun-CH_n42TF.js",
+        "/assets/shield-check-DpnOJAt1.js",
+        "/assets/heart-handshake-B8WLb8GN.js",
+        "/assets/ProductButton-B0yQHHlu.js",
+        "/assets/ProductStatus-uPLoKVwy.js",
+        "/assets/sun-moon-gc28tX0i.js",
+        "/assets/ScaleEdit-BjCszcBU.js",
+        "/assets/useFormBulkDraft-TQoZC5pA.js",
+        "/assets/usePageEditorGuard-itT9v2LX.js",
+        "/assets/ManagementDialog-CfrWz-St.js",
+        "/assets/ModalSurface-Co2ZUheQ.js",
+        "/assets/x-ClXCXOfY.js",
+        "/assets/TrainingMaterialPicker-C6NVqxSk.js",
+        "/assets/AssessmentMaterialPicker-BM0forHG.js",
+        "/assets/AssessmentMaterialDisplay-DBOAdg4e.js",
+        "/assets/rawScoreFeedback-ByNtVFPQ.js",
+        "/assets/plus-CaG2_N6s.js",
+        "/assets/ScaleDefinitionEditor-5iB8kqBV.js",
+        "/assets/trash-2-RoYL_BfR.js",
+        "/assets/arrow-down-C5dJ69F2.js",
+        "/assets/copy-JF6eACEt.js",
+        "/assets/EducationApplicabilityFields-CnrFy8mI.js",
+        "/assets/scaleLibraryGovernance-C2RDNcJY.js",
+        "/assets/ScaleLibraryMediaPreview-Bcie1YLX.js",
+        "/assets/useScaleLibrarySubmission-LauLNqXY.js",
+        "/assets/PageHeader-CrSr8oy7.js",
+        "/assets/eye-BH4hTP9t.js",
+        "/assets/save-CZalrBXF.js",
+        "/assets/circle-check-big-D1u_GtfF.js"
+      ],
+      "js_heap_mib": 5.33,
+      "renderer_task_seconds_diagnostic": 0.7549,
+      "hardware_window_seconds": 2.662,
+      "hardware": {
+        "backend": {
+          "observed_samples": 5,
+          "peak_memory_mib": 297.77,
+          "cpu_core_seconds_estimate": 0.1421,
+          "peak_cpu_one_core_percent_estimate": 25.21
+        },
+        "postgres": {
+          "observed_samples": 5,
+          "peak_memory_mib": 75.52,
+          "cpu_core_seconds_estimate": 0.0603,
+          "peak_cpu_one_core_percent_estimate": 8.01
+        },
+        "redis": {
+          "observed_samples": 5,
+          "peak_memory_mib": 4.34,
+          "cpu_core_seconds_estimate": 0.0343,
+          "peak_cpu_one_core_percent_estimate": 4.1
+        },
+        "chromium": {
+          "observed_samples": 5,
+          "peak_memory_mib": 850.72
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 1,
+      "phase": "teacher.scale_create_feedback",
+      "ready_ms": 459.61,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 1071,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/scales",
+          "status": 200,
+          "duration_ms": 117.06
+        },
+        {
+          "method": "GET",
+          "path": "/api/scales/:id",
+          "status": 200,
+          "duration_ms": 110.45
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 5.22,
+      "renderer_task_seconds_diagnostic": 0.2698,
+      "hardware_window_seconds": 1.166,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 297.77,
+          "cpu_core_seconds_estimate": 0.0121,
+          "peak_cpu_one_core_percent_estimate": 1.74
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 75.66,
+          "cpu_core_seconds_estimate": 0.0156,
+          "peak_cpu_one_core_percent_estimate": 7.95
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 4.13,
+          "cpu_core_seconds_estimate": 0.0094,
+          "peak_cpu_one_core_percent_estimate": 3.91
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 872.5
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 1,
+      "phase": "teacher.scale_items_first",
+      "ready_ms": 85.39,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 0,
+      "api_count": 0,
+      "api": [],
+      "loaded_js": [],
+      "js_heap_mib": 5.51,
+      "renderer_task_seconds_diagnostic": 0.0825,
+      "hardware_window_seconds": 0.793,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 297.77,
+          "cpu_core_seconds_estimate": 0.0026,
+          "peak_cpu_one_core_percent_estimate": 0.43
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 75.66,
+          "cpu_core_seconds_estimate": 0.0235,
+          "peak_cpu_one_core_percent_estimate": 8.36
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 4.13,
+          "cpu_core_seconds_estimate": 0.0118,
+          "peak_cpu_one_core_percent_estimate": 3.79
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 879.05
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 1,
+      "phase": "teacher.scale_save_feedback",
+      "ready_ms": 394.58,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 0,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "PUT",
+          "path": "/api/scales/:id/definition",
+          "status": 200,
+          "duration_ms": 121.74
+        },
+        {
+          "method": "GET",
+          "path": "/api/scales/:id",
+          "status": 200,
+          "duration_ms": 112.37
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 7.27,
+      "renderer_task_seconds_diagnostic": 0.2478,
+      "hardware_window_seconds": 1.1,
+      "hardware": {
+        "backend": {
+          "observed_samples": 3,
+          "peak_memory_mib": 298.02,
+          "cpu_core_seconds_estimate": 0.0371,
+          "peak_cpu_one_core_percent_estimate": 27.63
+        },
+        "postgres": {
+          "observed_samples": 3,
+          "peak_memory_mib": 75.81,
+          "cpu_core_seconds_estimate": 0.0124,
+          "peak_cpu_one_core_percent_estimate": 8.6
+        },
+        "redis": {
+          "observed_samples": 3,
+          "peak_memory_mib": 4.2,
+          "cpu_core_seconds_estimate": 0.0053,
+          "peak_cpu_one_core_percent_estimate": 4.23
+        },
+        "chromium": {
+          "observed_samples": 3,
+          "peak_memory_mib": 890.77
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 1,
+      "phase": "teacher.form_new_cold",
+      "ready_ms": 2448.44,
+      "js_transfer_bytes": 276569,
+      "static_transfer_bytes": 381027,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 200,
+          "duration_ms": 107.65
+        },
+        {
+          "method": "GET",
+          "path": "/api/capabilities",
+          "status": 200,
+          "duration_ms": 107.18
+        }
+      ],
+      "loaded_js": [
+        "/entry-brand.js",
+        "/assets/index-CgU6Te9-.js",
+        "/assets/App-CQH7Zoum.js",
+        "/assets/learnerNavigation-Xjzqclnc.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/client-CilwE2xY.js",
+        "/assets/SurveyBrand-taGHoqRB.js",
+        "/assets/createLucideIcon-CDe7XYm-.js",
+        "/assets/sun-CH_n42TF.js",
+        "/assets/shield-check-DpnOJAt1.js",
+        "/assets/heart-handshake-B8WLb8GN.js",
+        "/assets/ProductButton-B0yQHHlu.js",
+        "/assets/ProductStatus-uPLoKVwy.js",
+        "/assets/sun-moon-gc28tX0i.js",
+        "/assets/QuestionnaireProducts-DJHVUlR_.js",
+        "/assets/TrainingMaterialPicker-C6NVqxSk.js",
+        "/assets/AssessmentMaterialPicker-BM0forHG.js",
+        "/assets/AssessmentMaterialDisplay-DBOAdg4e.js",
+        "/assets/AssessmentToolPicker-Bqv099mA.js",
+        "/assets/ModalSurface-Co2ZUheQ.js",
+        "/assets/x-ClXCXOfY.js",
+        "/assets/check-DYK09_Sq.js",
+        "/assets/chevron-left-TE0bB7kY.js",
+        "/assets/apiErrorMessage-CTY58dgc.js",
+        "/assets/file-text-kvCLVYjW.js",
+        "/assets/list-ordered-BSin-5hX.js",
+        "/assets/useFormBulkDraft-TQoZC5pA.js",
+        "/assets/arrow-down-C5dJ69F2.js",
+        "/assets/pencil-DaWp2WQ7.js",
+        "/assets/trash-2-RoYL_BfR.js",
+        "/assets/plus-CaG2_N6s.js",
+        "/assets/BasicFormConstraints-B-w1BWYi.js",
+        "/assets/useCatalogQuery-BKZHStMi.js",
+        "/assets/TrainingQuestionnaireList-C4UfjAb0.js",
+        "/assets/assessmentContextHref-BlWvVMn2.js",
+        "/assets/PageHeader-CrSr8oy7.js",
+        "/assets/api-EWQAQlVc.js",
+        "/assets/exportJobs-85E3Vfur.js",
+        "/assets/download-B4rB0Lyd.js",
+        "/assets/arrow-right-BHS61EOz.js",
+        "/assets/clipboard-list-DMBcJuL7.js",
+        "/assets/copy-JF6eACEt.js",
+        "/assets/usePageEditorGuard-itT9v2LX.js",
+        "/assets/ManagementDialog-CfrWz-St.js",
+        "/assets/SurveyReportStudio-BpPCaupw.js",
+        "/assets/SurveySectionHeader-D2jSqfhN.js",
+        "/assets/survey-section-meta-JDaFIgUb.js",
+        "/assets/measurement-publication-BJkBG6oj.js",
+        "/assets/PublicDeliveryManager-Dp_DY1_g.js",
+        "/assets/anonymousStudy-BwO4PdT8.js",
+        "/assets/publicCapabilityClient-CPBOQRdp.js",
+        "/assets/api-Dtspx_Qz.js",
+        "/assets/link-2-Bv6pciMl.js",
+        "/assets/refresh-cw-BDlApfFY.js",
+        "/assets/resolveCoursePrefill-YnIvUjfx.js",
+        "/assets/useStaffFeedback-DpjDNEYu.js",
+        "/assets/ConditionEditor-qL21fhd-.js",
+        "/assets/route-ciURUOPz.js",
+        "/assets/options-C0hjwGL8.js",
+        "/assets/link-nFK3VEhS.js",
+        "/assets/brain-Dz3A99LE.js",
+        "/assets/save-CZalrBXF.js",
+        "/assets/list-checks-DOw39Rhw.js"
+      ],
+      "js_heap_mib": 4.7,
+      "renderer_task_seconds_diagnostic": 0.9231,
+      "hardware_window_seconds": 3.171,
+      "hardware": {
+        "backend": {
+          "observed_samples": 6,
+          "peak_memory_mib": 297.97,
+          "cpu_core_seconds_estimate": 0.0307,
+          "peak_cpu_one_core_percent_estimate": 8.57
+        },
+        "postgres": {
+          "observed_samples": 6,
+          "peak_memory_mib": 75.99,
+          "cpu_core_seconds_estimate": 0.0916,
+          "peak_cpu_one_core_percent_estimate": 8.77
+        },
+        "redis": {
+          "observed_samples": 6,
+          "peak_memory_mib": 4.35,
+          "cpu_core_seconds_estimate": 0.0465,
+          "peak_cpu_one_core_percent_estimate": 4.32
+        },
+        "chromium": {
+          "observed_samples": 6,
+          "peak_memory_mib": 856.09
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 1,
+      "phase": "teacher.form_create_feedback",
+      "ready_ms": 336.64,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 1071,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/questionnaire-products/form-templates",
+          "status": 200,
+          "duration_ms": 112.7
+        },
+        {
+          "method": "GET",
+          "path": "/api/questionnaire-products/:id",
+          "status": 200,
+          "duration_ms": 109.63
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 5.83,
+      "renderer_task_seconds_diagnostic": 0.3101,
+      "hardware_window_seconds": 1.044,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 333.89,
+          "cpu_core_seconds_estimate": 0.1685,
+          "peak_cpu_one_core_percent_estimate": 21.87
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 76.28,
+          "cpu_core_seconds_estimate": 0.0159,
+          "peak_cpu_one_core_percent_estimate": 2.35
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 4.35,
+          "cpu_core_seconds_estimate": 0.0025,
+          "peak_cpu_one_core_percent_estimate": 0.26
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 876.76
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 1,
+      "phase": "teacher.form_question_save_feedback",
+      "ready_ms": 260.89,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 0,
+      "api_count": 1,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/questionnaire-products/:id/items",
+          "status": 200,
+          "duration_ms": 114.21
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 6.06,
+      "renderer_task_seconds_diagnostic": 0.205,
+      "hardware_window_seconds": 0.967,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 300.65,
+          "cpu_core_seconds_estimate": 0.0234,
+          "peak_cpu_one_core_percent_estimate": 12.92
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 77.36,
+          "cpu_core_seconds_estimate": 0.0437,
+          "peak_cpu_one_core_percent_estimate": 7.94
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 4.35,
+          "cpu_core_seconds_estimate": 0.0206,
+          "peak_cpu_one_core_percent_estimate": 3.91
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 885.86
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 1,
+      "phase": "teacher.report_json_export",
+      "ready_ms": 303.16,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 0,
+      "api_count": 1,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/questionnaire-products/:id/reports",
+          "status": 200,
+          "duration_ms": 193.73
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 6.76,
+      "renderer_task_seconds_diagnostic": 0.102,
+      "hardware_window_seconds": 1.011,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 308.64,
+          "cpu_core_seconds_estimate": 0.2115,
+          "peak_cpu_one_core_percent_estimate": 49.61
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 80.39,
+          "cpu_core_seconds_estimate": 0.0587,
+          "peak_cpu_one_core_percent_estimate": 13.76
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 3.75,
+          "cpu_core_seconds_estimate": 0.0183,
+          "peak_cpu_one_core_percent_estimate": 3.98
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 883.19
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 2,
+      "phase": "teacher.login_cold",
+      "ready_ms": 1404.48,
+      "js_transfer_bytes": 158963,
+      "static_transfer_bytes": 409217,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/capabilities",
+          "status": 200,
+          "duration_ms": 102.87
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 401,
+          "duration_ms": 106.88
+        }
+      ],
+      "loaded_js": [
+        "/entry-brand.js",
+        "/assets/index-CgU6Te9-.js",
+        "/assets/App-CQH7Zoum.js",
+        "/assets/learnerNavigation-Xjzqclnc.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/SurveyBrand-taGHoqRB.js",
+        "/assets/client-CilwE2xY.js",
+        "/assets/createLucideIcon-CDe7XYm-.js",
+        "/assets/sun-CH_n42TF.js",
+        "/assets/shield-check-DpnOJAt1.js",
+        "/assets/heart-handshake-B8WLb8GN.js",
+        "/assets/ProductButton-B0yQHHlu.js",
+        "/assets/ProductStatus-uPLoKVwy.js",
+        "/assets/sun-moon-gc28tX0i.js",
+        "/assets/TrainingLogin-Cp-393yC.js",
+        "/assets/LoginRecoveryNotice-gkM6Zn6q.js",
+        "/assets/useLoginReturn-BZ440bty.js",
+        "/assets/loader-circle-BZIVEKgR.js"
+      ],
+      "js_heap_mib": 5.26,
+      "renderer_task_seconds_diagnostic": 0.7488,
+      "hardware_window_seconds": 2.129,
+      "hardware": {
+        "backend": {
+          "observed_samples": 5,
+          "peak_memory_mib": 331.86,
+          "cpu_core_seconds_estimate": 0.0631,
+          "peak_cpu_one_core_percent_estimate": 17.21
+        },
+        "postgres": {
+          "observed_samples": 4,
+          "peak_memory_mib": 80.09,
+          "cpu_core_seconds_estimate": 0.0406,
+          "peak_cpu_one_core_percent_estimate": 8.1
+        },
+        "redis": {
+          "observed_samples": 4,
+          "peak_memory_mib": 4.39,
+          "cpu_core_seconds_estimate": 0.0306,
+          "peak_cpu_one_core_percent_estimate": 4.44
+        },
+        "chromium": {
+          "observed_samples": 4,
+          "peak_memory_mib": 858.43
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 2,
+      "phase": "teacher.login_feedback",
+      "ready_ms": 1056.51,
+      "js_transfer_bytes": 10033,
+      "static_transfer_bytes": 17625,
+      "api_count": 3,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "duration_ms": 105.77
+        },
+        {
+          "method": "POST",
+          "path": "/api/auth/training-login",
+          "status": 200,
+          "duration_ms": 110.11
+        },
+        {
+          "method": "GET",
+          "path": "/api/courses",
+          "status": 200,
+          "duration_ms": 108.85
+        }
+      ],
+      "loaded_js": [
+        "/assets/TrainingTrainerHome-Cmapn-y9.js",
+        "/assets/TrainingCourseCode-CezSFj34.js",
+        "/assets/copy-JF6eACEt.js",
+        "/assets/TrainingCardDescription-CL-CcK6l.js",
+        "/assets/chevron-up-DV5T7sEm.js",
+        "/assets/ModalSurface-Co2ZUheQ.js",
+        "/assets/plus-CaG2_N6s.js",
+        "/assets/arrow-right-BHS61EOz.js"
+      ],
+      "js_heap_mib": 5.7,
+      "renderer_task_seconds_diagnostic": 0.6121,
+      "hardware_window_seconds": 1.767,
+      "hardware": {
+        "backend": {
+          "observed_samples": 3,
+          "peak_memory_mib": 308.84,
+          "cpu_core_seconds_estimate": 0.0739,
+          "peak_cpu_one_core_percent_estimate": 16.54
+        },
+        "postgres": {
+          "observed_samples": 3,
+          "peak_memory_mib": 80.01,
+          "cpu_core_seconds_estimate": 0.0345,
+          "peak_cpu_one_core_percent_estimate": 8.75
+        },
+        "redis": {
+          "observed_samples": 3,
+          "peak_memory_mib": 4.19,
+          "cpu_core_seconds_estimate": 0.0188,
+          "peak_cpu_one_core_percent_estimate": 4.01
+        },
+        "chromium": {
+          "observed_samples": 3,
+          "peak_memory_mib": 890.41
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 2,
+      "phase": "teacher.tools_cold",
+      "ready_ms": 2042.0,
+      "js_transfer_bytes": 185591,
+      "static_transfer_bytes": 265299,
+      "api_count": 3,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/capabilities",
+          "status": 200,
+          "duration_ms": 106.59
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 200,
+          "duration_ms": 111.34
+        },
+        {
+          "method": "GET",
+          "path": "/api/training-workspace/tools",
+          "status": 200,
+          "duration_ms": 113.14
+        }
+      ],
+      "loaded_js": [
+        "/entry-brand.js",
+        "/assets/index-CgU6Te9-.js",
+        "/assets/App-CQH7Zoum.js",
+        "/assets/learnerNavigation-Xjzqclnc.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/client-CilwE2xY.js",
+        "/assets/SurveyBrand-taGHoqRB.js",
+        "/assets/createLucideIcon-CDe7XYm-.js",
+        "/assets/sun-CH_n42TF.js",
+        "/assets/shield-check-DpnOJAt1.js",
+        "/assets/heart-handshake-B8WLb8GN.js",
+        "/assets/ProductButton-B0yQHHlu.js",
+        "/assets/ProductStatus-uPLoKVwy.js",
+        "/assets/sun-moon-gc28tX0i.js",
+        "/assets/TrainingLibrary-iFpE30Of.js",
+        "/assets/MediaSelector--q3_qrFy.js",
+        "/assets/mediaUtils-DcVDHCm8.js",
+        "/assets/ModalSurface-Co2ZUheQ.js",
+        "/assets/x-ClXCXOfY.js",
+        "/assets/file-text-kvCLVYjW.js",
+        "/assets/image-1DiPyVog.js",
+        "/assets/video-Cx_VJPya.js",
+        "/assets/link-nFK3VEhS.js",
+        "/assets/upload-CHwEAh82.js",
+        "/assets/check-DYK09_Sq.js",
+        "/assets/circle-alert-DHF5EFFv.js",
+        "/assets/file-play-BqYs4pm8.js",
+        "/assets/ManagementDialog-CfrWz-St.js",
+        "/assets/FormalReferenceStudio-CVQ6lf9z.js",
+        "/assets/TrainingCardDescription-CL-CcK6l.js",
+        "/assets/chevron-up-DV5T7sEm.js",
+        "/assets/plus-CaG2_N6s.js",
+        "/assets/arrow-right-BHS61EOz.js",
+        "/assets/pencil-DaWp2WQ7.js"
+      ],
+      "js_heap_mib": 5.76,
+      "renderer_task_seconds_diagnostic": 0.9721,
+      "hardware_window_seconds": 2.76,
+      "hardware": {
+        "backend": {
+          "observed_samples": 5,
+          "peak_memory_mib": 308.92,
+          "cpu_core_seconds_estimate": 0.15,
+          "peak_cpu_one_core_percent_estimate": 25.94
+        },
+        "postgres": {
+          "observed_samples": 5,
+          "peak_memory_mib": 83.21,
+          "cpu_core_seconds_estimate": 0.0985,
+          "peak_cpu_one_core_percent_estimate": 8.87
+        },
+        "redis": {
+          "observed_samples": 5,
+          "peak_memory_mib": 4.26,
+          "cpu_core_seconds_estimate": 0.0251,
+          "peak_cpu_one_core_percent_estimate": 3.99
+        },
+        "chromium": {
+          "observed_samples": 5,
+          "peak_memory_mib": 865.24
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 2,
+      "phase": "teacher.scale_new_cold",
+      "ready_ms": 1906.18,
+      "js_transfer_bytes": 202895,
+      "static_transfer_bytes": 282647,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/capabilities",
+          "status": 200,
+          "duration_ms": 107.85
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 200,
+          "duration_ms": 111.35
+        }
+      ],
+      "loaded_js": [
+        "/entry-brand.js",
+        "/assets/index-CgU6Te9-.js",
+        "/assets/App-CQH7Zoum.js",
+        "/assets/learnerNavigation-Xjzqclnc.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/client-CilwE2xY.js",
+        "/assets/SurveyBrand-taGHoqRB.js",
+        "/assets/createLucideIcon-CDe7XYm-.js",
+        "/assets/sun-CH_n42TF.js",
+        "/assets/shield-check-DpnOJAt1.js",
+        "/assets/heart-handshake-B8WLb8GN.js",
+        "/assets/ProductButton-B0yQHHlu.js",
+        "/assets/ProductStatus-uPLoKVwy.js",
+        "/assets/sun-moon-gc28tX0i.js",
+        "/assets/ScaleEdit-BjCszcBU.js",
+        "/assets/useFormBulkDraft-TQoZC5pA.js",
+        "/assets/usePageEditorGuard-itT9v2LX.js",
+        "/assets/ManagementDialog-CfrWz-St.js",
+        "/assets/ModalSurface-Co2ZUheQ.js",
+        "/assets/x-ClXCXOfY.js",
+        "/assets/TrainingMaterialPicker-C6NVqxSk.js",
+        "/assets/AssessmentMaterialPicker-BM0forHG.js",
+        "/assets/AssessmentMaterialDisplay-DBOAdg4e.js",
+        "/assets/rawScoreFeedback-ByNtVFPQ.js",
+        "/assets/ScaleDefinitionEditor-5iB8kqBV.js",
+        "/assets/plus-CaG2_N6s.js",
+        "/assets/trash-2-RoYL_BfR.js",
+        "/assets/arrow-down-C5dJ69F2.js",
+        "/assets/copy-JF6eACEt.js",
+        "/assets/EducationApplicabilityFields-CnrFy8mI.js",
+        "/assets/scaleLibraryGovernance-C2RDNcJY.js",
+        "/assets/ScaleLibraryMediaPreview-Bcie1YLX.js",
+        "/assets/useScaleLibrarySubmission-LauLNqXY.js",
+        "/assets/PageHeader-CrSr8oy7.js",
+        "/assets/eye-BH4hTP9t.js",
+        "/assets/save-CZalrBXF.js",
+        "/assets/circle-check-big-D1u_GtfF.js"
+      ],
+      "js_heap_mib": 5.33,
+      "renderer_task_seconds_diagnostic": 0.8024,
+      "hardware_window_seconds": 2.622,
+      "hardware": {
+        "backend": {
+          "observed_samples": 6,
+          "peak_memory_mib": 309.15,
+          "cpu_core_seconds_estimate": 0.0155,
+          "peak_cpu_one_core_percent_estimate": 2.97
+        },
+        "postgres": {
+          "observed_samples": 6,
+          "peak_memory_mib": 82.97,
+          "cpu_core_seconds_estimate": 0.0495,
+          "peak_cpu_one_core_percent_estimate": 8.97
+        },
+        "redis": {
+          "observed_samples": 6,
+          "peak_memory_mib": 4.05,
+          "cpu_core_seconds_estimate": 0.0266,
+          "peak_cpu_one_core_percent_estimate": 3.94
+        },
+        "chromium": {
+          "observed_samples": 6,
+          "peak_memory_mib": 853.2
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 2,
+      "phase": "teacher.scale_create_feedback",
+      "ready_ms": 481.76,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 1071,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/scales",
+          "status": 200,
+          "duration_ms": 115.73
+        },
+        {
+          "method": "GET",
+          "path": "/api/scales/:id",
+          "status": 200,
+          "duration_ms": 111.02
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 5.31,
+      "renderer_task_seconds_diagnostic": 0.2971,
+      "hardware_window_seconds": 1.19,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 309.15,
+          "cpu_core_seconds_estimate": 0.1282,
+          "peak_cpu_one_core_percent_estimate": 23.2
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 83.18,
+          "cpu_core_seconds_estimate": 0.0429,
+          "peak_cpu_one_core_percent_estimate": 7.92
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 3.93,
+          "cpu_core_seconds_estimate": 0.0162,
+          "peak_cpu_one_core_percent_estimate": 3.94
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 874.95
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 2,
+      "phase": "teacher.scale_items_first",
+      "ready_ms": 80.33,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 0,
+      "api_count": 0,
+      "api": [],
+      "loaded_js": [],
+      "js_heap_mib": 5.6,
+      "renderer_task_seconds_diagnostic": 0.0812,
+      "hardware_window_seconds": 0.789,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 309.11,
+          "cpu_core_seconds_estimate": 0.0021,
+          "peak_cpu_one_core_percent_estimate": 0.38
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 82.86,
+          "cpu_core_seconds_estimate": 0.0002,
+          "peak_cpu_one_core_percent_estimate": 0.03
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 3.93,
+          "cpu_core_seconds_estimate": 0.0031,
+          "peak_cpu_one_core_percent_estimate": 1.47
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 881.59
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 2,
+      "phase": "teacher.scale_save_feedback",
+      "ready_ms": 364.49,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 0,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "PUT",
+          "path": "/api/scales/:id/definition",
+          "status": 200,
+          "duration_ms": 121.07
+        },
+        {
+          "method": "GET",
+          "path": "/api/scales/:id",
+          "status": 200,
+          "duration_ms": 111.36
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 7.27,
+      "renderer_task_seconds_diagnostic": 0.2285,
+      "hardware_window_seconds": 1.072,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 309.11,
+          "cpu_core_seconds_estimate": 0.0137,
+          "peak_cpu_one_core_percent_estimate": 1.95
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 83.11,
+          "cpu_core_seconds_estimate": 0.0521,
+          "peak_cpu_one_core_percent_estimate": 10.21
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 3.98,
+          "cpu_core_seconds_estimate": 0.0069,
+          "peak_cpu_one_core_percent_estimate": 3.06
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 891.28
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 2,
+      "phase": "teacher.form_new_cold",
+      "ready_ms": 2920.07,
+      "js_transfer_bytes": 276569,
+      "static_transfer_bytes": 381027,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/capabilities",
+          "status": 200,
+          "duration_ms": 105.38
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 200,
+          "duration_ms": 111.77
+        }
+      ],
+      "loaded_js": [
+        "/entry-brand.js",
+        "/assets/index-CgU6Te9-.js",
+        "/assets/App-CQH7Zoum.js",
+        "/assets/learnerNavigation-Xjzqclnc.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/client-CilwE2xY.js",
+        "/assets/SurveyBrand-taGHoqRB.js",
+        "/assets/createLucideIcon-CDe7XYm-.js",
+        "/assets/sun-CH_n42TF.js",
+        "/assets/shield-check-DpnOJAt1.js",
+        "/assets/heart-handshake-B8WLb8GN.js",
+        "/assets/ProductButton-B0yQHHlu.js",
+        "/assets/ProductStatus-uPLoKVwy.js",
+        "/assets/sun-moon-gc28tX0i.js",
+        "/assets/QuestionnaireProducts-DJHVUlR_.js",
+        "/assets/TrainingMaterialPicker-C6NVqxSk.js",
+        "/assets/AssessmentMaterialPicker-BM0forHG.js",
+        "/assets/AssessmentMaterialDisplay-DBOAdg4e.js",
+        "/assets/AssessmentToolPicker-Bqv099mA.js",
+        "/assets/ModalSurface-Co2ZUheQ.js",
+        "/assets/x-ClXCXOfY.js",
+        "/assets/check-DYK09_Sq.js",
+        "/assets/chevron-left-TE0bB7kY.js",
+        "/assets/apiErrorMessage-CTY58dgc.js",
+        "/assets/file-text-kvCLVYjW.js",
+        "/assets/list-ordered-BSin-5hX.js",
+        "/assets/useFormBulkDraft-TQoZC5pA.js",
+        "/assets/arrow-down-C5dJ69F2.js",
+        "/assets/pencil-DaWp2WQ7.js",
+        "/assets/trash-2-RoYL_BfR.js",
+        "/assets/plus-CaG2_N6s.js",
+        "/assets/BasicFormConstraints-B-w1BWYi.js",
+        "/assets/useCatalogQuery-BKZHStMi.js",
+        "/assets/TrainingQuestionnaireList-C4UfjAb0.js",
+        "/assets/assessmentContextHref-BlWvVMn2.js",
+        "/assets/PageHeader-CrSr8oy7.js",
+        "/assets/api-EWQAQlVc.js",
+        "/assets/exportJobs-85E3Vfur.js",
+        "/assets/download-B4rB0Lyd.js",
+        "/assets/arrow-right-BHS61EOz.js",
+        "/assets/clipboard-list-DMBcJuL7.js",
+        "/assets/copy-JF6eACEt.js",
+        "/assets/usePageEditorGuard-itT9v2LX.js",
+        "/assets/ManagementDialog-CfrWz-St.js",
+        "/assets/SurveyReportStudio-BpPCaupw.js",
+        "/assets/SurveySectionHeader-D2jSqfhN.js",
+        "/assets/survey-section-meta-JDaFIgUb.js",
+        "/assets/measurement-publication-BJkBG6oj.js",
+        "/assets/PublicDeliveryManager-Dp_DY1_g.js",
+        "/assets/anonymousStudy-BwO4PdT8.js",
+        "/assets/publicCapabilityClient-CPBOQRdp.js",
+        "/assets/api-Dtspx_Qz.js",
+        "/assets/link-2-Bv6pciMl.js",
+        "/assets/refresh-cw-BDlApfFY.js",
+        "/assets/resolveCoursePrefill-YnIvUjfx.js",
+        "/assets/useStaffFeedback-DpjDNEYu.js",
+        "/assets/ConditionEditor-qL21fhd-.js",
+        "/assets/route-ciURUOPz.js",
+        "/assets/options-C0hjwGL8.js",
+        "/assets/link-nFK3VEhS.js",
+        "/assets/brain-Dz3A99LE.js",
+        "/assets/save-CZalrBXF.js",
+        "/assets/list-checks-DOw39Rhw.js"
+      ],
+      "js_heap_mib": 4.73,
+      "renderer_task_seconds_diagnostic": 0.8699,
+      "hardware_window_seconds": 3.643,
+      "hardware": {
+        "backend": {
+          "observed_samples": 8,
+          "peak_memory_mib": 309.3,
+          "cpu_core_seconds_estimate": 0.1423,
+          "peak_cpu_one_core_percent_estimate": 24.34
+        },
+        "postgres": {
+          "observed_samples": 8,
+          "peak_memory_mib": 83.24,
+          "cpu_core_seconds_estimate": 0.0537,
+          "peak_cpu_one_core_percent_estimate": 9.59
+        },
+        "redis": {
+          "observed_samples": 8,
+          "peak_memory_mib": 4.28,
+          "cpu_core_seconds_estimate": 0.048,
+          "peak_cpu_one_core_percent_estimate": 4.46
+        },
+        "chromium": {
+          "observed_samples": 8,
+          "peak_memory_mib": 856.92
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 2,
+      "phase": "teacher.form_create_feedback",
+      "ready_ms": 362.61,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 1071,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/questionnaire-products/form-templates",
+          "status": 200,
+          "duration_ms": 108.44
+        },
+        {
+          "method": "GET",
+          "path": "/api/questionnaire-products/:id",
+          "status": 200,
+          "duration_ms": 108.16
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 5.85,
+      "renderer_task_seconds_diagnostic": 0.346,
+      "hardware_window_seconds": 1.072,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 309.55,
+          "cpu_core_seconds_estimate": 0.0458,
+          "peak_cpu_one_core_percent_estimate": 8.41
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 83.41,
+          "cpu_core_seconds_estimate": 0.0413,
+          "peak_cpu_one_core_percent_estimate": 9.59
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 3.93,
+          "cpu_core_seconds_estimate": 0.0025,
+          "peak_cpu_one_core_percent_estimate": 0.25
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 877.57
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 2,
+      "phase": "teacher.form_question_save_feedback",
+      "ready_ms": 251.27,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 0,
+      "api_count": 1,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/questionnaire-products/:id/items",
+          "status": 200,
+          "duration_ms": 114.2
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 6.19,
+      "renderer_task_seconds_diagnostic": 0.1943,
+      "hardware_window_seconds": 0.96,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 310.04,
+          "cpu_core_seconds_estimate": 0.0621,
+          "peak_cpu_one_core_percent_estimate": 21.87
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 83.91,
+          "cpu_core_seconds_estimate": 0.0207,
+          "peak_cpu_one_core_percent_estimate": 7.99
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 3.93,
+          "cpu_core_seconds_estimate": 0.0197,
+          "peak_cpu_one_core_percent_estimate": 3.74
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 885.39
+        }
+      }
+    },
+    {
+      "version": "baseline",
+      "sample": 2,
+      "phase": "teacher.report_json_export",
+      "ready_ms": 296.14,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 0,
+      "api_count": 1,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/questionnaire-products/:id/reports",
+          "status": 200,
+          "duration_ms": 157.76
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 6.81,
+      "renderer_task_seconds_diagnostic": 0.0852,
+      "hardware_window_seconds": 1.007,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 310.31,
+          "cpu_core_seconds_estimate": 0.1035,
+          "peak_cpu_one_core_percent_estimate": 19.98
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 88.02,
+          "cpu_core_seconds_estimate": 0.0655,
+          "peak_cpu_one_core_percent_estimate": 12.89
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 3.86,
+          "cpu_core_seconds_estimate": 0.0042,
+          "peak_cpu_one_core_percent_estimate": 4.38
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 885.65
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 1,
+      "phase": "teacher.login_cold",
+      "ready_ms": 1406.93,
+      "js_transfer_bytes": 158863,
+      "static_transfer_bytes": 409117,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 401,
+          "duration_ms": 105.65
+        },
+        {
+          "method": "GET",
+          "path": "/api/capabilities",
+          "status": 200,
+          "duration_ms": 105.98
+        }
+      ],
+      "loaded_js": [
+        "/entry-brand.js",
+        "/assets/index-Bwrp9pXR.js",
+        "/assets/App-DRJpyU06.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/learnerNavigation-DUxciU8r.js",
+        "/assets/client-CilwE2xY.js",
+        "/assets/SurveyBrand-C2jfHSRG.js",
+        "/assets/createLucideIcon-BWfSxJ5D.js",
+        "/assets/sun-DUIJCWz7.js",
+        "/assets/shield-check-Cc2fTlOr.js",
+        "/assets/heart-handshake-BLKnCGoe.js",
+        "/assets/ProductButton-DR_b8THv.js",
+        "/assets/ProductStatus-zh_GWgk2.js",
+        "/assets/sun-moon-C1Pv5TMC.js",
+        "/assets/TrainingLogin-VGkKbh9q.js",
+        "/assets/LoginRecoveryNotice-DhaJ0fAp.js",
+        "/assets/useLoginReturn-BNEvBdoL.js",
+        "/assets/loader-circle-B4SCWSGK.js"
+      ],
+      "js_heap_mib": 5.28,
+      "renderer_task_seconds_diagnostic": 0.763,
+      "hardware_window_seconds": 2.124,
+      "hardware": {
+        "backend": {
+          "observed_samples": 5,
+          "peak_memory_mib": 310.84,
+          "cpu_core_seconds_estimate": 0.0133,
+          "peak_cpu_one_core_percent_estimate": 16.75
+        },
+        "postgres": {
+          "observed_samples": 5,
+          "peak_memory_mib": 88.22,
+          "cpu_core_seconds_estimate": 0.0489,
+          "peak_cpu_one_core_percent_estimate": 9.3
+        },
+        "redis": {
+          "observed_samples": 5,
+          "peak_memory_mib": 4.25,
+          "cpu_core_seconds_estimate": 0.0268,
+          "peak_cpu_one_core_percent_estimate": 4.42
+        },
+        "chromium": {
+          "observed_samples": 5,
+          "peak_memory_mib": 871.3
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 1,
+      "phase": "teacher.login_feedback",
+      "ready_ms": 1009.27,
+      "js_transfer_bytes": 10029,
+      "static_transfer_bytes": 17621,
+      "api_count": 3,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "duration_ms": 105.61
+        },
+        {
+          "method": "POST",
+          "path": "/api/auth/training-login",
+          "status": 200,
+          "duration_ms": 114.38
+        },
+        {
+          "method": "GET",
+          "path": "/api/courses",
+          "status": 200,
+          "duration_ms": 107.33
+        }
+      ],
+      "loaded_js": [
+        "/assets/TrainingTrainerHome-FtETtiEk.js",
+        "/assets/TrainingCourseCode-DEw11EqI.js",
+        "/assets/copy-MYiOvZI9.js",
+        "/assets/TrainingCardDescription-s-MqR5KS.js",
+        "/assets/chevron-up-GqRvwdrg.js",
+        "/assets/ModalSurface-F4wpKFex.js",
+        "/assets/plus-CEUwmnzB.js",
+        "/assets/arrow-right-Clczjugd.js"
+      ],
+      "js_heap_mib": 5.68,
+      "renderer_task_seconds_diagnostic": 0.501,
+      "hardware_window_seconds": 1.718,
+      "hardware": {
+        "backend": {
+          "observed_samples": 3,
+          "peak_memory_mib": 326.09,
+          "cpu_core_seconds_estimate": 0.2041,
+          "peak_cpu_one_core_percent_estimate": 16.75
+        },
+        "postgres": {
+          "observed_samples": 3,
+          "peak_memory_mib": 88.21,
+          "cpu_core_seconds_estimate": 0.0365,
+          "peak_cpu_one_core_percent_estimate": 8.3
+        },
+        "redis": {
+          "observed_samples": 3,
+          "peak_memory_mib": 4.05,
+          "cpu_core_seconds_estimate": 0.0189,
+          "peak_cpu_one_core_percent_estimate": 4.1
+        },
+        "chromium": {
+          "observed_samples": 3,
+          "peak_memory_mib": 892.99
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 1,
+      "phase": "teacher.tools_cold",
+      "ready_ms": 1943.72,
+      "js_transfer_bytes": 170389,
+      "static_transfer_bytes": 249401,
+      "api_count": 3,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/capabilities",
+          "status": 200,
+          "duration_ms": 106.66
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 200,
+          "duration_ms": 110.32
+        },
+        {
+          "method": "GET",
+          "path": "/api/training-workspace/tools",
+          "status": 200,
+          "duration_ms": 111.9
+        }
+      ],
+      "loaded_js": [
+        "/entry-brand.js",
+        "/assets/index-Bwrp9pXR.js",
+        "/assets/App-DRJpyU06.js",
+        "/assets/learnerNavigation-DUxciU8r.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/client-CilwE2xY.js",
+        "/assets/SurveyBrand-C2jfHSRG.js",
+        "/assets/createLucideIcon-BWfSxJ5D.js",
+        "/assets/sun-DUIJCWz7.js",
+        "/assets/shield-check-Cc2fTlOr.js",
+        "/assets/heart-handshake-BLKnCGoe.js",
+        "/assets/ProductButton-DR_b8THv.js",
+        "/assets/ProductStatus-zh_GWgk2.js",
+        "/assets/sun-moon-C1Pv5TMC.js",
+        "/assets/TrainingLibrary-C69Rfb7v.js",
+        "/assets/ManagementDialog-DCuNcgZ9.js",
+        "/assets/ModalSurface-F4wpKFex.js",
+        "/assets/x-BYOH8qfd.js",
+        "/assets/TrainingCardDescription-s-MqR5KS.js",
+        "/assets/chevron-up-GqRvwdrg.js",
+        "/assets/plus-CEUwmnzB.js",
+        "/assets/upload-CmRYzLmo.js",
+        "/assets/image-hdJp1aEY.js",
+        "/assets/video-ja8Ky5Hl.js",
+        "/assets/file-text-BEnxaX3h.js",
+        "/assets/arrow-right-Clczjugd.js",
+        "/assets/pencil-D0knv6du.js"
+      ],
+      "js_heap_mib": 5.72,
+      "renderer_task_seconds_diagnostic": 0.9445,
+      "hardware_window_seconds": 2.662,
+      "hardware": {
+        "backend": {
+          "observed_samples": 6,
+          "peak_memory_mib": 310.87,
+          "cpu_core_seconds_estimate": 0.0413,
+          "peak_cpu_one_core_percent_estimate": 5.22
+        },
+        "postgres": {
+          "observed_samples": 6,
+          "peak_memory_mib": 83.87,
+          "cpu_core_seconds_estimate": 0.0733,
+          "peak_cpu_one_core_percent_estimate": 13.61
+        },
+        "redis": {
+          "observed_samples": 6,
+          "peak_memory_mib": 4.38,
+          "cpu_core_seconds_estimate": 0.048,
+          "peak_cpu_one_core_percent_estimate": 4.74
+        },
+        "chromium": {
+          "observed_samples": 6,
+          "peak_memory_mib": 861.42
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 1,
+      "phase": "teacher.scale_new_cold",
+      "ready_ms": 2013.51,
+      "js_transfer_bytes": 185255,
+      "static_transfer_bytes": 263763,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 200,
+          "duration_ms": 107.44
+        },
+        {
+          "method": "GET",
+          "path": "/api/capabilities",
+          "status": 200,
+          "duration_ms": 108.97
+        }
+      ],
+      "loaded_js": [
+        "/entry-brand.js",
+        "/assets/index-Bwrp9pXR.js",
+        "/assets/App-DRJpyU06.js",
+        "/assets/learnerNavigation-DUxciU8r.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/client-CilwE2xY.js",
+        "/assets/SurveyBrand-C2jfHSRG.js",
+        "/assets/createLucideIcon-BWfSxJ5D.js",
+        "/assets/sun-DUIJCWz7.js",
+        "/assets/shield-check-Cc2fTlOr.js",
+        "/assets/heart-handshake-BLKnCGoe.js",
+        "/assets/ProductButton-DR_b8THv.js",
+        "/assets/ProductStatus-zh_GWgk2.js",
+        "/assets/sun-moon-C1Pv5TMC.js",
+        "/assets/ScaleEdit-CFukmGO3.js",
+        "/assets/useFormBulkDraft-D4MEam-5.js",
+        "/assets/usePageEditorGuard-DnKJR_Ow.js",
+        "/assets/ManagementDialog-DCuNcgZ9.js",
+        "/assets/ModalSurface-F4wpKFex.js",
+        "/assets/x-BYOH8qfd.js",
+        "/assets/rawScoreFeedback-BhRRsO3Z.js",
+        "/assets/ScaleEdit-CSL-H9Yv.js",
+        "/assets/EducationApplicabilityFields-6HOZKRxI.js",
+        "/assets/scaleLibraryGovernance-C2RDNcJY.js",
+        "/assets/ScaleLibraryMediaPreview-JVaKfiek.js",
+        "/assets/useScaleLibrarySubmission-BNNl9xsb.js",
+        "/assets/PageHeader-cs3-aKoQ.js",
+        "/assets/eye-BDQZfA3V.js",
+        "/assets/copy-MYiOvZI9.js",
+        "/assets/save-BCYGdvU0.js",
+        "/assets/circle-check-big-DYSkytcN.js"
+      ],
+      "js_heap_mib": 5.25,
+      "renderer_task_seconds_diagnostic": 0.8963,
+      "hardware_window_seconds": 2.731,
+      "hardware": {
+        "backend": {
+          "observed_samples": 5,
+          "peak_memory_mib": 310.87,
+          "cpu_core_seconds_estimate": 0.1542,
+          "peak_cpu_one_core_percent_estimate": 28.19
+        },
+        "postgres": {
+          "observed_samples": 5,
+          "peak_memory_mib": 77.31,
+          "cpu_core_seconds_estimate": 0.0489,
+          "peak_cpu_one_core_percent_estimate": 9.68
+        },
+        "redis": {
+          "observed_samples": 5,
+          "peak_memory_mib": 5.58,
+          "cpu_core_seconds_estimate": 0.0268,
+          "peak_cpu_one_core_percent_estimate": 4.29
+        },
+        "chromium": {
+          "observed_samples": 5,
+          "peak_memory_mib": 850.57
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 1,
+      "phase": "teacher.scale_create_feedback",
+      "ready_ms": 489.24,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 1071,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/scales",
+          "status": 200,
+          "duration_ms": 113.5
+        },
+        {
+          "method": "GET",
+          "path": "/api/scales/:id",
+          "status": 200,
+          "duration_ms": 110.92
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 4.97,
+      "renderer_task_seconds_diagnostic": 0.2934,
+      "hardware_window_seconds": 1.196,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 310.79,
+          "cpu_core_seconds_estimate": 0.0143,
+          "peak_cpu_one_core_percent_estimate": 2.88
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 77.56,
+          "cpu_core_seconds_estimate": 0.0474,
+          "peak_cpu_one_core_percent_estimate": 8.44
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 3.96,
+          "cpu_core_seconds_estimate": 0.0118,
+          "peak_cpu_one_core_percent_estimate": 3.73
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 872.07
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 1,
+      "phase": "teacher.scale_items_first",
+      "ready_ms": 308.45,
+      "js_transfer_bytes": 20473,
+      "static_transfer_bytes": 21717,
+      "api_count": 0,
+      "api": [],
+      "loaded_js": [
+        "/assets/ScaleEditDefinition-DZW95eIk.js",
+        "/assets/TrainingMaterialPicker-CRYWrebC.js",
+        "/assets/AssessmentMaterialPicker-DonzVlBa.js",
+        "/assets/AssessmentMaterialDisplay-BDn5nPWN.js",
+        "/assets/ScaleDefinitionEditor-CAEqcdF-.js",
+        "/assets/RawScoreFeedbackFields-zDgbBCDM.js",
+        "/assets/plus-CEUwmnzB.js",
+        "/assets/trash-2-CYjyxCMS.js",
+        "/assets/arrow-up-BPnjw94d.js",
+        "/assets/arrow-down-BsMmlfmn.js"
+      ],
+      "js_heap_mib": 6.15,
+      "renderer_task_seconds_diagnostic": 0.1747,
+      "hardware_window_seconds": 1.017,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 310.79,
+          "cpu_core_seconds_estimate": 0.0027,
+          "peak_cpu_one_core_percent_estimate": 0.36
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 77.27,
+          "cpu_core_seconds_estimate": 0.0001,
+          "peak_cpu_one_core_percent_estimate": 0.01
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 3.76,
+          "cpu_core_seconds_estimate": 0.0104,
+          "peak_cpu_one_core_percent_estimate": 3.73
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 876.57
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 1,
+      "phase": "teacher.scale_save_feedback",
+      "ready_ms": 361.38,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 0,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "PUT",
+          "path": "/api/scales/:id/definition",
+          "status": 200,
+          "duration_ms": 120.61
+        },
+        {
+          "method": "GET",
+          "path": "/api/scales/:id",
+          "status": 200,
+          "duration_ms": 114.38
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 6.63,
+      "renderer_task_seconds_diagnostic": 0.2135,
+      "hardware_window_seconds": 1.068,
+      "hardware": {
+        "backend": {
+          "observed_samples": 3,
+          "peak_memory_mib": 311.0,
+          "cpu_core_seconds_estimate": 0.134,
+          "peak_cpu_one_core_percent_estimate": 23.62
+        },
+        "postgres": {
+          "observed_samples": 3,
+          "peak_memory_mib": 77.71,
+          "cpu_core_seconds_estimate": 0.0071,
+          "peak_cpu_one_core_percent_estimate": 8.74
+        },
+        "redis": {
+          "observed_samples": 3,
+          "peak_memory_mib": 3.81,
+          "cpu_core_seconds_estimate": 0.0208,
+          "peak_cpu_one_core_percent_estimate": 3.9
+        },
+        "chromium": {
+          "observed_samples": 3,
+          "peak_memory_mib": 896.68
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 1,
+      "phase": "teacher.form_new_cold",
+      "ready_ms": 2437.28,
+      "js_transfer_bytes": 241843,
+      "static_transfer_bytes": 333798,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/capabilities",
+          "status": 200,
+          "duration_ms": 105.52
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 200,
+          "duration_ms": 111.36
+        }
+      ],
+      "loaded_js": [
+        "/entry-brand.js",
+        "/assets/index-Bwrp9pXR.js",
+        "/assets/App-DRJpyU06.js",
+        "/assets/learnerNavigation-DUxciU8r.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/client-CilwE2xY.js",
+        "/assets/SurveyBrand-C2jfHSRG.js",
+        "/assets/createLucideIcon-BWfSxJ5D.js",
+        "/assets/sun-DUIJCWz7.js",
+        "/assets/shield-check-Cc2fTlOr.js",
+        "/assets/heart-handshake-BLKnCGoe.js",
+        "/assets/ProductButton-DR_b8THv.js",
+        "/assets/ProductStatus-zh_GWgk2.js",
+        "/assets/sun-moon-C1Pv5TMC.js",
+        "/assets/QuestionnaireProducts-D9AvYXz0.js",
+        "/assets/TrainingMaterialPicker-CRYWrebC.js",
+        "/assets/AssessmentMaterialPicker-DonzVlBa.js",
+        "/assets/AssessmentMaterialDisplay-BDn5nPWN.js",
+        "/assets/file-text-BEnxaX3h.js",
+        "/assets/list-ordered-Db87FerT.js",
+        "/assets/arrow-up-BPnjw94d.js",
+        "/assets/arrow-down-BsMmlfmn.js",
+        "/assets/pencil-D0knv6du.js",
+        "/assets/trash-2-CYjyxCMS.js",
+        "/assets/plus-CEUwmnzB.js",
+        "/assets/useFormBulkDraft-D4MEam-5.js",
+        "/assets/BasicFormConstraints-NMDboCZQ.js",
+        "/assets/useCatalogQuery-B4pv1VwO.js",
+        "/assets/TrainingQuestionnaireList-B9sG3Dg7.js",
+        "/assets/assessmentContextHref-CJwEIXCp.js",
+        "/assets/PageHeader-cs3-aKoQ.js",
+        "/assets/ModalSurface-F4wpKFex.js",
+        "/assets/api-EWQAQlVc.js",
+        "/assets/exportJobs-JzDZN-7x.js",
+        "/assets/download-u9_5o8fY.js",
+        "/assets/x-BYOH8qfd.js",
+        "/assets/arrow-right-Clczjugd.js",
+        "/assets/clipboard-list-DzJgIOv3.js",
+        "/assets/copy-MYiOvZI9.js",
+        "/assets/apiErrorMessage-CTY58dgc.js",
+        "/assets/resolveCoursePrefill-YnIvUjfx.js",
+        "/assets/useStaffFeedback-CEG-zcJr.js",
+        "/assets/ManagementDialog-DCuNcgZ9.js",
+        "/assets/LocalDateTimeInput-D5nydLx-.js",
+        "/assets/ConditionEditor-DHlEfyJe.js",
+        "/assets/route-l0OvRhqd.js",
+        "/assets/options-C0hjwGL8.js",
+        "/assets/link-CYBsOYzX.js",
+        "/assets/brain-Ygy308du.js",
+        "/assets/save-BCYGdvU0.js",
+        "/assets/check-DVy3XKCb.js",
+        "/assets/list-checks-BwbJwTgH.js"
+      ],
+      "js_heap_mib": 4.66,
+      "renderer_task_seconds_diagnostic": 0.9593,
+      "hardware_window_seconds": 3.153,
+      "hardware": {
+        "backend": {
+          "observed_samples": 6,
+          "peak_memory_mib": 310.9,
+          "cpu_core_seconds_estimate": 0.0746,
+          "peak_cpu_one_core_percent_estimate": 27.36
+        },
+        "postgres": {
+          "observed_samples": 6,
+          "peak_memory_mib": 77.74,
+          "cpu_core_seconds_estimate": 0.0678,
+          "peak_cpu_one_core_percent_estimate": 10.08
+        },
+        "redis": {
+          "observed_samples": 6,
+          "peak_memory_mib": 3.68,
+          "cpu_core_seconds_estimate": 0.0256,
+          "peak_cpu_one_core_percent_estimate": 3.91
+        },
+        "chromium": {
+          "observed_samples": 6,
+          "peak_memory_mib": 851.14
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 1,
+      "phase": "teacher.form_create_feedback",
+      "ready_ms": 386.72,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 1071,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/questionnaire-products/form-templates",
+          "status": 200,
+          "duration_ms": 113.12
+        },
+        {
+          "method": "GET",
+          "path": "/api/questionnaire-products/:id",
+          "status": 200,
+          "duration_ms": 107.49
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 5.81,
+      "renderer_task_seconds_diagnostic": 0.3449,
+      "hardware_window_seconds": 1.095,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 334.76,
+          "cpu_core_seconds_estimate": 0.1137,
+          "peak_cpu_one_core_percent_estimate": 27.36
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 77.89,
+          "cpu_core_seconds_estimate": 0.0321,
+          "peak_cpu_one_core_percent_estimate": 10.08
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 3.98,
+          "cpu_core_seconds_estimate": 0.0214,
+          "peak_cpu_one_core_percent_estimate": 4.09
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 872.69
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 1,
+      "phase": "teacher.form_question_save_feedback",
+      "ready_ms": 251.69,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 0,
+      "api_count": 1,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/questionnaire-products/:id/items",
+          "status": 200,
+          "duration_ms": 118.96
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 6.12,
+      "renderer_task_seconds_diagnostic": 0.1908,
+      "hardware_window_seconds": 0.961,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 310.86,
+          "cpu_core_seconds_estimate": 0.0321,
+          "peak_cpu_one_core_percent_estimate": 6.02
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 80.14,
+          "cpu_core_seconds_estimate": 0.0453,
+          "peak_cpu_one_core_percent_estimate": 8.73
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 3.98,
+          "cpu_core_seconds_estimate": 0.002,
+          "peak_cpu_one_core_percent_estimate": 0.23
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 881.68
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 1,
+      "phase": "teacher.report_json_export",
+      "ready_ms": 296.75,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 0,
+      "api_count": 1,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/questionnaire-products/:id/reports",
+          "status": 200,
+          "duration_ms": 163.42
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 6.38,
+      "renderer_task_seconds_diagnostic": 0.097,
+      "hardware_window_seconds": 1.008,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 310.8,
+          "cpu_core_seconds_estimate": 0.06,
+          "peak_cpu_one_core_percent_estimate": 20.93
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 82.49,
+          "cpu_core_seconds_estimate": 0.0549,
+          "peak_cpu_one_core_percent_estimate": 8.5
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 3.95,
+          "cpu_core_seconds_estimate": 0.0209,
+          "peak_cpu_one_core_percent_estimate": 4.07
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 886.87
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 2,
+      "phase": "teacher.login_cold",
+      "ready_ms": 1495.35,
+      "js_transfer_bytes": 158863,
+      "static_transfer_bytes": 409117,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 401,
+          "duration_ms": 104.96
+        },
+        {
+          "method": "GET",
+          "path": "/api/capabilities",
+          "status": 200,
+          "duration_ms": 107.68
+        }
+      ],
+      "loaded_js": [
+        "/entry-brand.js",
+        "/assets/index-Bwrp9pXR.js",
+        "/assets/App-DRJpyU06.js",
+        "/assets/learnerNavigation-DUxciU8r.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/client-CilwE2xY.js",
+        "/assets/SurveyBrand-C2jfHSRG.js",
+        "/assets/createLucideIcon-BWfSxJ5D.js",
+        "/assets/sun-DUIJCWz7.js",
+        "/assets/shield-check-Cc2fTlOr.js",
+        "/assets/heart-handshake-BLKnCGoe.js",
+        "/assets/ProductButton-DR_b8THv.js",
+        "/assets/ProductStatus-zh_GWgk2.js",
+        "/assets/sun-moon-C1Pv5TMC.js",
+        "/assets/TrainingLogin-VGkKbh9q.js",
+        "/assets/LoginRecoveryNotice-DhaJ0fAp.js",
+        "/assets/useLoginReturn-BNEvBdoL.js",
+        "/assets/loader-circle-B4SCWSGK.js"
+      ],
+      "js_heap_mib": 5.27,
+      "renderer_task_seconds_diagnostic": 0.8616,
+      "hardware_window_seconds": 2.209,
+      "hardware": {
+        "backend": {
+          "observed_samples": 5,
+          "peak_memory_mib": 336.09,
+          "cpu_core_seconds_estimate": 0.1415,
+          "peak_cpu_one_core_percent_estimate": 20.39
+        },
+        "postgres": {
+          "observed_samples": 5,
+          "peak_memory_mib": 83.72,
+          "cpu_core_seconds_estimate": 0.0358,
+          "peak_cpu_one_core_percent_estimate": 8.58
+        },
+        "redis": {
+          "observed_samples": 5,
+          "peak_memory_mib": 4.3,
+          "cpu_core_seconds_estimate": 0.0296,
+          "peak_cpu_one_core_percent_estimate": 4.67
+        },
+        "chromium": {
+          "observed_samples": 5,
+          "peak_memory_mib": 870.52
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 2,
+      "phase": "teacher.login_feedback",
+      "ready_ms": 985.14,
+      "js_transfer_bytes": 10029,
+      "static_transfer_bytes": 17621,
+      "api_count": 3,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/auth/csrf",
+          "status": 200,
+          "duration_ms": 103.22
+        },
+        {
+          "method": "POST",
+          "path": "/api/auth/training-login",
+          "status": 200,
+          "duration_ms": 109.05
+        },
+        {
+          "method": "GET",
+          "path": "/api/courses",
+          "status": 200,
+          "duration_ms": 107.26
+        }
+      ],
+      "loaded_js": [
+        "/assets/TrainingTrainerHome-FtETtiEk.js",
+        "/assets/TrainingCourseCode-DEw11EqI.js",
+        "/assets/copy-MYiOvZI9.js",
+        "/assets/TrainingCardDescription-s-MqR5KS.js",
+        "/assets/chevron-up-GqRvwdrg.js",
+        "/assets/ModalSurface-F4wpKFex.js",
+        "/assets/plus-CEUwmnzB.js",
+        "/assets/arrow-right-Clczjugd.js"
+      ],
+      "js_heap_mib": 5.72,
+      "renderer_task_seconds_diagnostic": 0.5158,
+      "hardware_window_seconds": 1.697,
+      "hardware": {
+        "backend": {
+          "observed_samples": 3,
+          "peak_memory_mib": 311.17,
+          "cpu_core_seconds_estimate": 0.0639,
+          "peak_cpu_one_core_percent_estimate": 17.06
+        },
+        "postgres": {
+          "observed_samples": 3,
+          "peak_memory_mib": 81.9,
+          "cpu_core_seconds_estimate": 0.0289,
+          "peak_cpu_one_core_percent_estimate": 8.58
+        },
+        "redis": {
+          "observed_samples": 3,
+          "peak_memory_mib": 4.37,
+          "cpu_core_seconds_estimate": 0.0166,
+          "peak_cpu_one_core_percent_estimate": 4.06
+        },
+        "chromium": {
+          "observed_samples": 3,
+          "peak_memory_mib": 892.23
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 2,
+      "phase": "teacher.tools_cold",
+      "ready_ms": 1966.64,
+      "js_transfer_bytes": 170389,
+      "static_transfer_bytes": 249401,
+      "api_count": 3,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/capabilities",
+          "status": 200,
+          "duration_ms": 105.05
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 200,
+          "duration_ms": 110.37
+        },
+        {
+          "method": "GET",
+          "path": "/api/training-workspace/tools",
+          "status": 200,
+          "duration_ms": 114.43
+        }
+      ],
+      "loaded_js": [
+        "/entry-brand.js",
+        "/assets/index-Bwrp9pXR.js",
+        "/assets/App-DRJpyU06.js",
+        "/assets/learnerNavigation-DUxciU8r.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/client-CilwE2xY.js",
+        "/assets/SurveyBrand-C2jfHSRG.js",
+        "/assets/createLucideIcon-BWfSxJ5D.js",
+        "/assets/sun-DUIJCWz7.js",
+        "/assets/shield-check-Cc2fTlOr.js",
+        "/assets/heart-handshake-BLKnCGoe.js",
+        "/assets/ProductButton-DR_b8THv.js",
+        "/assets/ProductStatus-zh_GWgk2.js",
+        "/assets/sun-moon-C1Pv5TMC.js",
+        "/assets/TrainingLibrary-C69Rfb7v.js",
+        "/assets/ManagementDialog-DCuNcgZ9.js",
+        "/assets/ModalSurface-F4wpKFex.js",
+        "/assets/x-BYOH8qfd.js",
+        "/assets/TrainingCardDescription-s-MqR5KS.js",
+        "/assets/chevron-up-GqRvwdrg.js",
+        "/assets/plus-CEUwmnzB.js",
+        "/assets/upload-CmRYzLmo.js",
+        "/assets/image-hdJp1aEY.js",
+        "/assets/video-ja8Ky5Hl.js",
+        "/assets/file-text-BEnxaX3h.js",
+        "/assets/arrow-right-Clczjugd.js",
+        "/assets/pencil-D0knv6du.js"
+      ],
+      "js_heap_mib": 5.71,
+      "renderer_task_seconds_diagnostic": 0.942,
+      "hardware_window_seconds": 2.691,
+      "hardware": {
+        "backend": {
+          "observed_samples": 5,
+          "peak_memory_mib": 311.17,
+          "cpu_core_seconds_estimate": 0.1349,
+          "peak_cpu_one_core_percent_estimate": 22.1
+        },
+        "postgres": {
+          "observed_samples": 6,
+          "peak_memory_mib": 85.5,
+          "cpu_core_seconds_estimate": 0.1016,
+          "peak_cpu_one_core_percent_estimate": 9.6
+        },
+        "redis": {
+          "observed_samples": 6,
+          "peak_memory_mib": 4.36,
+          "cpu_core_seconds_estimate": 0.0456,
+          "peak_cpu_one_core_percent_estimate": 4.46
+        },
+        "chromium": {
+          "observed_samples": 6,
+          "peak_memory_mib": 859.8
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 2,
+      "phase": "teacher.scale_new_cold",
+      "ready_ms": 1900.68,
+      "js_transfer_bytes": 185255,
+      "static_transfer_bytes": 263763,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/capabilities",
+          "status": 200,
+          "duration_ms": 106.38
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 200,
+          "duration_ms": 111.12
+        }
+      ],
+      "loaded_js": [
+        "/entry-brand.js",
+        "/assets/index-Bwrp9pXR.js",
+        "/assets/App-DRJpyU06.js",
+        "/assets/learnerNavigation-DUxciU8r.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/client-CilwE2xY.js",
+        "/assets/SurveyBrand-C2jfHSRG.js",
+        "/assets/createLucideIcon-BWfSxJ5D.js",
+        "/assets/sun-DUIJCWz7.js",
+        "/assets/shield-check-Cc2fTlOr.js",
+        "/assets/heart-handshake-BLKnCGoe.js",
+        "/assets/ProductButton-DR_b8THv.js",
+        "/assets/ProductStatus-zh_GWgk2.js",
+        "/assets/sun-moon-C1Pv5TMC.js",
+        "/assets/ScaleEdit-CFukmGO3.js",
+        "/assets/useFormBulkDraft-D4MEam-5.js",
+        "/assets/usePageEditorGuard-DnKJR_Ow.js",
+        "/assets/ManagementDialog-DCuNcgZ9.js",
+        "/assets/ModalSurface-F4wpKFex.js",
+        "/assets/x-BYOH8qfd.js",
+        "/assets/rawScoreFeedback-BhRRsO3Z.js",
+        "/assets/ScaleEdit-CSL-H9Yv.js",
+        "/assets/EducationApplicabilityFields-6HOZKRxI.js",
+        "/assets/scaleLibraryGovernance-C2RDNcJY.js",
+        "/assets/ScaleLibraryMediaPreview-JVaKfiek.js",
+        "/assets/useScaleLibrarySubmission-BNNl9xsb.js",
+        "/assets/PageHeader-cs3-aKoQ.js",
+        "/assets/eye-BDQZfA3V.js",
+        "/assets/copy-MYiOvZI9.js",
+        "/assets/save-BCYGdvU0.js",
+        "/assets/circle-check-big-DYSkytcN.js"
+      ],
+      "js_heap_mib": 5.23,
+      "renderer_task_seconds_diagnostic": 0.7611,
+      "hardware_window_seconds": 2.619,
+      "hardware": {
+        "backend": {
+          "observed_samples": 5,
+          "peak_memory_mib": 311.03,
+          "cpu_core_seconds_estimate": 0.0129,
+          "peak_cpu_one_core_percent_estimate": 1.48
+        },
+        "postgres": {
+          "observed_samples": 5,
+          "peak_memory_mib": 85.39,
+          "cpu_core_seconds_estimate": 0.0439,
+          "peak_cpu_one_core_percent_estimate": 8.69
+        },
+        "redis": {
+          "observed_samples": 5,
+          "peak_memory_mib": 3.99,
+          "cpu_core_seconds_estimate": 0.0247,
+          "peak_cpu_one_core_percent_estimate": 4.0
+        },
+        "chromium": {
+          "observed_samples": 5,
+          "peak_memory_mib": 849.07
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 2,
+      "phase": "teacher.scale_create_feedback",
+      "ready_ms": 484.26,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 1071,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/scales",
+          "status": 200,
+          "duration_ms": 112.98
+        },
+        {
+          "method": "GET",
+          "path": "/api/scales/:id",
+          "status": 200,
+          "duration_ms": 109.76
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 4.96,
+      "renderer_task_seconds_diagnostic": 0.3139,
+      "hardware_window_seconds": 1.191,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 311.27,
+          "cpu_core_seconds_estimate": 0.0172,
+          "peak_cpu_one_core_percent_estimate": 3.28
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 85.7,
+          "cpu_core_seconds_estimate": 0.0445,
+          "peak_cpu_one_core_percent_estimate": 8.14
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 3.85,
+          "cpu_core_seconds_estimate": 0.0238,
+          "peak_cpu_one_core_percent_estimate": 4.42
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 870.27
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 2,
+      "phase": "teacher.scale_items_first",
+      "ready_ms": 342.37,
+      "js_transfer_bytes": 20473,
+      "static_transfer_bytes": 21717,
+      "api_count": 0,
+      "api": [],
+      "loaded_js": [
+        "/assets/ScaleEditDefinition-DZW95eIk.js",
+        "/assets/TrainingMaterialPicker-CRYWrebC.js",
+        "/assets/AssessmentMaterialPicker-DonzVlBa.js",
+        "/assets/AssessmentMaterialDisplay-BDn5nPWN.js",
+        "/assets/ScaleDefinitionEditor-CAEqcdF-.js",
+        "/assets/RawScoreFeedbackFields-zDgbBCDM.js",
+        "/assets/plus-CEUwmnzB.js",
+        "/assets/trash-2-CYjyxCMS.js",
+        "/assets/arrow-up-BPnjw94d.js",
+        "/assets/arrow-down-BsMmlfmn.js"
+      ],
+      "js_heap_mib": 6.14,
+      "renderer_task_seconds_diagnostic": 0.2256,
+      "hardware_window_seconds": 1.051,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 311.35,
+          "cpu_core_seconds_estimate": 0.1322,
+          "peak_cpu_one_core_percent_estimate": 26.01
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 85.56,
+          "cpu_core_seconds_estimate": 0.0004,
+          "peak_cpu_one_core_percent_estimate": 0.06
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 3.85,
+          "cpu_core_seconds_estimate": 0.0023,
+          "peak_cpu_one_core_percent_estimate": 0.23
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 874.65
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 2,
+      "phase": "teacher.scale_save_feedback",
+      "ready_ms": 364.93,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 0,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "PUT",
+          "path": "/api/scales/:id/definition",
+          "status": 200,
+          "duration_ms": 121.69
+        },
+        {
+          "method": "GET",
+          "path": "/api/scales/:id",
+          "status": 200,
+          "duration_ms": 114.51
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 6.62,
+      "renderer_task_seconds_diagnostic": 0.219,
+      "hardware_window_seconds": 1.072,
+      "hardware": {
+        "backend": {
+          "observed_samples": 3,
+          "peak_memory_mib": 311.06,
+          "cpu_core_seconds_estimate": 0.0162,
+          "peak_cpu_one_core_percent_estimate": 2.95
+        },
+        "postgres": {
+          "observed_samples": 3,
+          "peak_memory_mib": 86.08,
+          "cpu_core_seconds_estimate": 0.0075,
+          "peak_cpu_one_core_percent_estimate": 8.73
+        },
+        "redis": {
+          "observed_samples": 3,
+          "peak_memory_mib": 3.92,
+          "cpu_core_seconds_estimate": 0.0036,
+          "peak_cpu_one_core_percent_estimate": 4.0
+        },
+        "chromium": {
+          "observed_samples": 3,
+          "peak_memory_mib": 889.63
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 2,
+      "phase": "teacher.form_new_cold",
+      "ready_ms": 2471.22,
+      "js_transfer_bytes": 241843,
+      "static_transfer_bytes": 333798,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/capabilities",
+          "status": 200,
+          "duration_ms": 108.03
+        },
+        {
+          "method": "GET",
+          "path": "/api/auth/me",
+          "status": 200,
+          "duration_ms": 111.1
+        }
+      ],
+      "loaded_js": [
+        "/entry-brand.js",
+        "/assets/index-Bwrp9pXR.js",
+        "/assets/App-DRJpyU06.js",
+        "/assets/learnerNavigation-DUxciU8r.js",
+        "/assets/context-DH9TJPZn.js",
+        "/assets/client-CilwE2xY.js",
+        "/assets/SurveyBrand-C2jfHSRG.js",
+        "/assets/createLucideIcon-BWfSxJ5D.js",
+        "/assets/sun-DUIJCWz7.js",
+        "/assets/shield-check-Cc2fTlOr.js",
+        "/assets/heart-handshake-BLKnCGoe.js",
+        "/assets/ProductButton-DR_b8THv.js",
+        "/assets/ProductStatus-zh_GWgk2.js",
+        "/assets/sun-moon-C1Pv5TMC.js",
+        "/assets/QuestionnaireProducts-D9AvYXz0.js",
+        "/assets/TrainingMaterialPicker-CRYWrebC.js",
+        "/assets/AssessmentMaterialPicker-DonzVlBa.js",
+        "/assets/AssessmentMaterialDisplay-BDn5nPWN.js",
+        "/assets/file-text-BEnxaX3h.js",
+        "/assets/list-ordered-Db87FerT.js",
+        "/assets/arrow-up-BPnjw94d.js",
+        "/assets/arrow-down-BsMmlfmn.js",
+        "/assets/pencil-D0knv6du.js",
+        "/assets/trash-2-CYjyxCMS.js",
+        "/assets/plus-CEUwmnzB.js",
+        "/assets/useFormBulkDraft-D4MEam-5.js",
+        "/assets/BasicFormConstraints-NMDboCZQ.js",
+        "/assets/useCatalogQuery-B4pv1VwO.js",
+        "/assets/TrainingQuestionnaireList-B9sG3Dg7.js",
+        "/assets/assessmentContextHref-CJwEIXCp.js",
+        "/assets/PageHeader-cs3-aKoQ.js",
+        "/assets/ModalSurface-F4wpKFex.js",
+        "/assets/api-EWQAQlVc.js",
+        "/assets/exportJobs-JzDZN-7x.js",
+        "/assets/download-u9_5o8fY.js",
+        "/assets/x-BYOH8qfd.js",
+        "/assets/arrow-right-Clczjugd.js",
+        "/assets/clipboard-list-DzJgIOv3.js",
+        "/assets/copy-MYiOvZI9.js",
+        "/assets/apiErrorMessage-CTY58dgc.js",
+        "/assets/resolveCoursePrefill-YnIvUjfx.js",
+        "/assets/useStaffFeedback-CEG-zcJr.js",
+        "/assets/ManagementDialog-DCuNcgZ9.js",
+        "/assets/LocalDateTimeInput-D5nydLx-.js",
+        "/assets/ConditionEditor-DHlEfyJe.js",
+        "/assets/route-l0OvRhqd.js",
+        "/assets/options-C0hjwGL8.js",
+        "/assets/link-CYBsOYzX.js",
+        "/assets/brain-Ygy308du.js",
+        "/assets/save-BCYGdvU0.js",
+        "/assets/check-DVy3XKCb.js",
+        "/assets/list-checks-BwbJwTgH.js"
+      ],
+      "js_heap_mib": 5.88,
+      "renderer_task_seconds_diagnostic": 0.8754,
+      "hardware_window_seconds": 3.191,
+      "hardware": {
+        "backend": {
+          "observed_samples": 6,
+          "peak_memory_mib": 311.09,
+          "cpu_core_seconds_estimate": 0.139,
+          "peak_cpu_one_core_percent_estimate": 24.37
+        },
+        "postgres": {
+          "observed_samples": 6,
+          "peak_memory_mib": 86.2,
+          "cpu_core_seconds_estimate": 0.044,
+          "peak_cpu_one_core_percent_estimate": 8.17
+        },
+        "redis": {
+          "observed_samples": 6,
+          "peak_memory_mib": 5.25,
+          "cpu_core_seconds_estimate": 0.0293,
+          "peak_cpu_one_core_percent_estimate": 2.59
+        },
+        "chromium": {
+          "observed_samples": 6,
+          "peak_memory_mib": 853.09
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 2,
+      "phase": "teacher.form_create_feedback",
+      "ready_ms": 320.28,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 1071,
+      "api_count": 2,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/questionnaire-products/form-templates",
+          "status": 200,
+          "duration_ms": 111.93
+        },
+        {
+          "method": "GET",
+          "path": "/api/questionnaire-products/:id",
+          "status": 200,
+          "duration_ms": 107.65
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 5.77,
+      "renderer_task_seconds_diagnostic": 0.3059,
+      "hardware_window_seconds": 1.028,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 311.09,
+          "cpu_core_seconds_estimate": 0.0384,
+          "peak_cpu_one_core_percent_estimate": 4.44
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 86.61,
+          "cpu_core_seconds_estimate": 0.0509,
+          "peak_cpu_one_core_percent_estimate": 9.34
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 4.05,
+          "cpu_core_seconds_estimate": 0.0234,
+          "peak_cpu_one_core_percent_estimate": 4.44
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 874.29
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 2,
+      "phase": "teacher.form_question_save_feedback",
+      "ready_ms": 299.49,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 0,
+      "api_count": 1,
+      "api": [
+        {
+          "method": "POST",
+          "path": "/api/questionnaire-products/:id/items",
+          "status": 200,
+          "duration_ms": 117.43
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 6.01,
+      "renderer_task_seconds_diagnostic": 0.2397,
+      "hardware_window_seconds": 1.005,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 311.34,
+          "cpu_core_seconds_estimate": 0.0242,
+          "peak_cpu_one_core_percent_estimate": 3.93
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 86.61,
+          "cpu_core_seconds_estimate": 0.0045,
+          "peak_cpu_one_core_percent_estimate": 0.76
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 3.87,
+          "cpu_core_seconds_estimate": 0.0025,
+          "peak_cpu_one_core_percent_estimate": 0.28
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 883.03
+        }
+      }
+    },
+    {
+      "version": "candidate",
+      "sample": 2,
+      "phase": "teacher.report_json_export",
+      "ready_ms": 281.78,
+      "js_transfer_bytes": 0,
+      "static_transfer_bytes": 0,
+      "api_count": 1,
+      "api": [
+        {
+          "method": "GET",
+          "path": "/api/questionnaire-products/:id/reports",
+          "status": 200,
+          "duration_ms": 157.37
+        }
+      ],
+      "loaded_js": [],
+      "js_heap_mib": 6.38,
+      "renderer_task_seconds_diagnostic": 0.1056,
+      "hardware_window_seconds": 0.99,
+      "hardware": {
+        "backend": {
+          "observed_samples": 2,
+          "peak_memory_mib": 311.47,
+          "cpu_core_seconds_estimate": 0.0596,
+          "peak_cpu_one_core_percent_estimate": 12.05
+        },
+        "postgres": {
+          "observed_samples": 2,
+          "peak_memory_mib": 87.59,
+          "cpu_core_seconds_estimate": 0.058,
+          "peak_cpu_one_core_percent_estimate": 10.68
+        },
+        "redis": {
+          "observed_samples": 2,
+          "peak_memory_mib": 4.05,
+          "cpu_core_seconds_estimate": 0.0196,
+          "peak_cpu_one_core_percent_estimate": 3.86
+        },
+        "chromium": {
+          "observed_samples": 2,
+          "peak_memory_mib": 886.34
+        }
+      }
+    }
+  ],
+  "json_exports": [
+    {
+      "version": "baseline",
+      "sample": 1,
+      "bytes": 26180,
+      "keys": [
+        "next",
+        "questionnaireId",
+        "reportMode",
+        "reports",
+        "schemaVersion"
+      ],
+      "rows": 7,
+      "sha256": "cf8c2a07ccce408df96cb1f2597ab2e0c8fde07edab4762d42013d8486410da5"
+    },
+    {
+      "version": "baseline",
+      "sample": 2,
+      "bytes": 26180,
+      "keys": [
+        "next",
+        "questionnaireId",
+        "reportMode",
+        "reports",
+        "schemaVersion"
+      ],
+      "rows": 7,
+      "sha256": "cf8c2a07ccce408df96cb1f2597ab2e0c8fde07edab4762d42013d8486410da5"
+    },
+    {
+      "version": "candidate",
+      "sample": 1,
+      "bytes": 26180,
+      "keys": [
+        "next",
+        "questionnaireId",
+        "reportMode",
+        "reports",
+        "schemaVersion"
+      ],
+      "rows": 7,
+      "sha256": "cf8c2a07ccce408df96cb1f2597ab2e0c8fde07edab4762d42013d8486410da5"
+    },
+    {
+      "version": "candidate",
+      "sample": 2,
+      "bytes": 26180,
+      "keys": [
+        "next",
+        "questionnaireId",
+        "reportMode",
+        "reports",
+        "schemaVersion"
+      ],
+      "rows": 7,
+      "sha256": "cf8c2a07ccce408df96cb1f2597ab2e0c8fde07edab4762d42013d8486410da5"
+    }
+  ],
+  "static_closures": {
+    "baseline": {
+      "TrainingLibrary.tsx": {
+        "entry": "assets/TrainingLibrary-iFpE30Of.js",
+        "static_gzip_bytes": 171765,
+        "static_chunks": 33
+      },
+      "ScaleEdit.tsx": {
+        "entry": "assets/ScaleEdit-BjCszcBU.js",
+        "static_gzip_bytes": 188545,
+        "static_chunks": 36
+      },
+      "QuestionnaireProducts.tsx": {
+        "entry": "assets/QuestionnaireProducts-DJHVUlR_.js",
+        "static_gzip_bytes": 252183,
+        "static_chunks": 62
+      }
+    },
+    "candidate": {
+      "TrainingLibrary.tsx": {
+        "entry": "assets/TrainingLibrary-C69Rfb7v.js",
+        "static_gzip_bytes": 159208,
+        "static_chunks": 26
+      },
+      "ScaleEdit.tsx": {
+        "entry": "assets/ScaleEdit-CFukmGO3.js",
+        "static_gzip_bytes": 172736,
+        "static_chunks": 30
+      },
+      "QuestionnaireProducts.tsx": {
+        "entry": "assets/QuestionnaireProducts-D9AvYXz0.js",
+        "static_gzip_bytes": 220748,
+        "static_chunks": 51
+      }
+    }
+  },
+  "raw_evidence": [
+    {
+      "file": "baseline-1.json",
+      "sha256": "962bcec21ab9e1db9430783e7886dee4a884a92031609fd51f64c0e3630cfc02",
+      "passed": true
+    },
+    {
+      "file": "baseline-2.json",
+      "sha256": "dcce1d6b81c29647b0b98813447ef44fb9a05c1d881c49f24bf0ec7b29e11085",
+      "passed": true
+    },
+    {
+      "file": "candidate-1.json",
+      "sha256": "d2071b3c31f294cdad2bae05b8635733d647c86858a6aebc73eb3b0e28435837",
+      "passed": true
+    },
+    {
+      "file": "candidate-2.json",
+      "sha256": "880db0db7a09709cf96991e76ee06d2bd285f7c60a4f2548eb791e8bf2f65bcc",
+      "passed": true
+    }
+  ],
+  "exploratory_failures": [
+    {
+      "file": "exploratory-baseline-1-invalid-draft.json",
+      "reason": "synthetic fixture missing mandatory score; actual server validation refused save"
+    },
+    {
+      "file": "exploratory-baseline-2-wrong-locator.json",
+      "reason": "browser harness used incorrect total-score button name; corrected without application changes"
+    }
+  ],
+  "artifact_manifests": {
+    "baseline": {
+      "file": "baseline-artifact.json",
+      "sha256": "0d02d9db2d31aae1d39eccbb6f8f20155b31357652776757e190e29c2ca0a89e"
+    },
+    "candidate": {
+      "file": "candidate-artifact.json",
+      "sha256": "6b9279d3ae5c13ca460355fb38165c06e8fd0100ad049254f78a70e0d463fdfd"
+    }
+  },
+  "harness_sha256": "3953ebf35e51ed65d57fb14be3472165de374db420fffe7a6161869b76e2469c"
+}

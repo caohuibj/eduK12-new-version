@@ -26,7 +26,7 @@ describe('Scale plain-text authoring', () => {
   it('appends required items with explicit reverse markers and preserves old identities and score membership', async () => {
     const user = userEvent.setup(); mount()
     await user.click(await screen.findByRole('button', { name: '题目' }))
-    fireEvent.change(screen.getByLabelText('题干批量内容'), { target: { value: '新题一\r\n\n新题二 [反向]\n(R) 新题三' } })
+    fireEvent.change(await screen.findByLabelText('题干批量内容'), { target: { value: '新题一\r\n\n新题二 [反向]\n(R) 新题三' } })
     expect(screen.getByText(/将追加 3 题，其中 2 题反向计分/)).toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: '追加题目' }))
     expect(api.put).not.toHaveBeenCalled()
@@ -47,7 +47,7 @@ describe('Scale plain-text authoring', () => {
     const user = userEvent.setup(); mount()
     await user.click(await screen.findByRole('button', { name: '响应选项' }))
     expect(screen.queryByPlaceholderText('稳定 value')).not.toBeInTheDocument()
-    fireEvent.change(screen.getByLabelText('选项批量内容'), { target: { value: '不同意\n一般\n同意' } })
+    fireEvent.change(await screen.findByLabelText('选项批量内容'), { target: { value: '不同意\n一般\n同意' } })
     await user.click(screen.getByRole('button', { name: '应用选项文字' }))
     await user.click(screen.getByRole('button', { name: '保存响应集' }))
     await screen.findByText(/已保存，并重新读取确认/)
