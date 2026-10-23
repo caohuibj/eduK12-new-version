@@ -13,6 +13,42 @@ const narrow = [{ width: 320, height: 844 }, { width: 390, height: 844 }]
 const darkStates = ['form-author-editor', 'typed-matrix-row-refusal', 'personal-fixed-version-report']
 const originalShots = ['scale-author-preview', 'form-author-editor', 'form-author-preview', 'fixed-version-selection-preview', 'scale-answer', 'personal-fixed-version-report', 'typed-single-restored', 'typed-multiple', 'typed-matrix-row-refusal', 'form-completed-no-score']
 
+function readKeyboardState() {
+  const el = document.activeElement, css = getComputedStyle(el), r = el.getBoundingClientRect()
+  return { tag: el.tagName, type: el.getAttribute('type'), role: el.getAttribute('role'),
+    visible: r.width > 0 && r.height > 0 && r.left >= -1 && r.right <= innerWidth + 1,
+    focusVisible: el.matches(':focus-visible'), ring: (css.outlineStyle !== 'none' && parseFloat(css.outlineWidth) > 0) || css.boxShadow !== 'none' }
+}
+async function probeKeyboard(page) {
+  const start = await page.evaluate(readKeyboardState), path = []
+  await page.keyboard.press('Tab'); path.push(await page.evaluate(readKeyboardState))
+  // A real Tab may cross browser chrome at the document boundary. Never force focus.
+  if (path[0].tag === 'BODY') { await page.keyboard.press('Tab'); path.push(await page.evaluate(readKeyboardState)) }
+  return { ...path[path.length - 1], start, path }
+}
+async function settleThemeTransitions(rootSelector) {
+  const root = document.querySelector(rootSelector)
+  if (!root) throw new Error('Theme root missing')
+  root.getBoundingClientRect() // Flush the new theme styles before enumerating transitions.
+  let timer, observed = 0
+  const properties = new Set()
+  const timeout = new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Theme transitions did not settle within 2000ms')), 2000) })
+  try {
+    await Promise.race([timeout, (async () => {
+      while (true) {
+        const active = root.getAnimations({ subtree: true }).filter(animation => animation instanceof CSSTransition && (animation.playState === 'running' || animation.pending))
+        if (!active.length) return
+        for (const animation of active) {
+          if (!Number.isFinite(animation.effect.getComputedTiming().endTime)) throw new Error('Non-finite theme transition')
+          observed++; properties.add(animation.transitionProperty)
+        }
+        await Promise.all(active.map(animation => animation.finished.catch(error => { if (error.name !== 'AbortError') throw error })))
+      }
+    })()])
+    return { settled: true, observed, properties: [...properties].sort() }
+  } finally { clearTimeout(timer) }
+}
+
 function appearanceKeys(product, id) {
   assert.ok(products.includes(product))
   const p = product.toLowerCase(), other = product === 'SCHOOL' ? 'teacher' : 'school'
@@ -134,6 +170,8 @@ function createUiChecks({ report, out, axeSource, getFontInventory }) {
     assert.equal(await control.inputValue(), mode)
     if (menu) await control.press('Escape')
     await s.page.waitForLoadState('networkidle')
+    const transitions = await s.page.evaluate(settleThemeTransitions, roots[s.product])
+    ;(report.themeTransitions ||= []).push({ product: s.product, mode, ...transitions })
     assert.equal(s.audit.apiMutations.length, count, 'Appearance is local preference, not a business mutation')
   }
   async function brand(s, mode) {
@@ -185,13 +223,10 @@ function createUiChecks({ report, out, axeSource, getFontInventory }) {
       report.fontIssues.push({ product: s.product, state, theme: mode, width: viewport.width,
         code: getFontInventory()?.ok === true ? 'CJK_RENDERING_UNPROVEN' : 'CJK_INVENTORY_UNPROVEN' })
     }
-    await s.page.keyboard.press('Tab')
-    const keyboard = await s.page.evaluate(() => { const el = document.activeElement, css = getComputedStyle(el), r = el.getBoundingClientRect(); return {
-      visible: r.width > 0 && r.height > 0 && r.left >= -1 && r.right <= innerWidth + 1,
-      focusVisible: el.matches(':focus-visible'), ring: (css.outlineStyle !== 'none' && parseFloat(css.outlineWidth) > 0) || css.boxShadow !== 'none' } })
+    const keyboard = await probeKeyboard(s.page)
     if (!await s.page.evaluate(() => Boolean(window.axe))) await s.page.addScriptTag({ content: axeSource })
     const accessibility = await s.page.evaluate(async () => { const a = await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } }); return {
-      violations: a.violations.map(v => ({ id: v.id, impact: v.impact, targets: v.nodes.map(n => n.target) })), passes: a.passes.length, incomplete: a.incomplete.map(v => v.id) } })
+      violations: a.violations.map(v => ({ id: v.id, impact: v.impact, targets: v.nodes.map(n => n.target), contrast: v.id === 'color-contrast' ? v.nodes.slice(0, 30).map(n => n.any.filter(check => check.id === 'color-contrast').map(check => ({ fgColor: check.data?.fgColor, bgColor: check.data?.bgColor, contrastRatio: check.data?.contrastRatio }))) : undefined })), passes: a.passes.length, incomplete: a.incomplete.map(v => v.id) } })
     const entry = { product: s.product, state, theme: mode, viewport, layout, keyboard, accessibility, brand: renderedBrand, fonts }
     if (screenshot) {
       entry.file = `screenshots/ui-${s.product.toLowerCase()}-${state}-${mode}-${viewport.width}.png`
@@ -290,10 +325,10 @@ function createUiChecks({ report, out, axeSource, getFontInventory }) {
 // binds its receipt to this checkout/run and the actual FE tree, lock and dist.
 // Do not rewrite the original manifest to impersonate a current-run build.
 const OFFICIAL_FRONTEND = Object.freeze({
-  originalRun: 39870012962, originalHead: '81947063451c5a5e2ee028ee41256671b19ef201',
-  originalCheckout: 'dadcef2d497ed51f4d75458c12b46bbb2fc6d82b', originalJob: 120141983273,
-  originalArtifact: 12466106464, originalArtifactSha256: 'bdfeec8e3b06220e5a611d607caa167badcdf6c9dd35827ea2c379fd6b352b35',
-  frontendTree: 'c1e34b8fdd1a0127a155a208187a8c6bb2f8760f',
+  originalRun: 39899292976, originalHead: '051d8eb0f869c166b09739132ff8ea8e9a666613',
+  originalCheckout: '6337343de882ba07999a47c1f5a2c71a58b1a597', originalJob: 120237022790,
+  originalArtifact: 12478381269, originalArtifactSha256: '9d5d62c0f6279092502b76a880fedfbb600b8a590395a6d3adde0432756c1f83',
+  frontendTree: '4c089c44c21c156f416879896c41ade98c40309a',
 })
 function validateOfficialFrontendReceipt(receipt, { head, runId, frontend, frontendTree, frontendLockDigest, frontendContentDigest }) {
   assert.deepEqual(Object.keys(receipt).sort(), ['schemaVersion', 'status', 'currentHead', 'currentRun',
@@ -505,4 +540,4 @@ function verifyReport(report, options, readScreenshot) {
     notCovered: [...report.notCovered, ...ui.notCovered] }
 }
 
-module.exports = { OFFICIAL_BACKEND, BACKEND_FIXTURE_EXCEPTION, computeBackendCompileDigest, validateOfficialBackendReceipt, OFFICIAL_FRONTEND, validateOfficialFrontendReceipt, validateReportBuildInputs, cjkSampleIds, validateUiFontEvidence, prepareRenderedCjk, readRenderedCjk, appearanceKeys, imageMode, validateSelectedImages, createUiChecks, verifyReport, products, darkStates, originalShots }
+module.exports = { readKeyboardState, probeKeyboard, settleThemeTransitions, OFFICIAL_BACKEND, BACKEND_FIXTURE_EXCEPTION, computeBackendCompileDigest, validateOfficialBackendReceipt, OFFICIAL_FRONTEND, validateOfficialFrontendReceipt, validateReportBuildInputs, cjkSampleIds, validateUiFontEvidence, prepareRenderedCjk, readRenderedCjk, appearanceKeys, imageMode, validateSelectedImages, createUiChecks, verifyReport, products, darkStates, originalShots }

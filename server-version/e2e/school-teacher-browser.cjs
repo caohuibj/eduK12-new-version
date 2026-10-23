@@ -28,7 +28,7 @@ const { spawn, execFileSync } = require('node:child_process')
 const { pathToFileURL } = require('node:url')
 const { randomUUID, createHmac } = require('node:crypto')
 const { readFixture, sourceIdentity, backend, repo, sha } = require('./school-teacher-fixture.cjs')
-const { prepareRenderedCjk, createUiChecks, verifyReport, validateOfficialFrontendReceipt, validateOfficialBackendReceipt, computeBackendCompileDigest } = require('./school-teacher-ui.cjs')
+const { probeKeyboard, prepareRenderedCjk, createUiChecks, verifyReport, validateOfficialFrontendReceipt, validateOfficialBackendReceipt, computeBackendCompileDigest } = require('./school-teacher-ui.cjs')
 const { preflightChrome, verifyChromeSandbox, inspectCjkFonts, CHROME_LAUNCH_OPTIONS } = require('./school-teacher-chrome.cjs')
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 const origins = { SCHOOL: 'https://school.eduk12.top', TEACHER: 'https://teacher.eduk12.top' }
@@ -476,16 +476,11 @@ async function run() {
             secretNodes: document.querySelectorAll('.ht-secret,.hs-secret,.ht-mfa-setup').length }
         })
         assert.equal(layout.secretNodes, 0, 'Do not capture authentication secrets')
-        await s.page.keyboard.press('Tab')
-        const keyboard = await s.page.evaluate(() => {
-          const element = document.activeElement, style = getComputedStyle(element), rect = element.getBoundingClientRect()
-          return { tag: element.tagName, focusVisible: element.matches(':focus-visible'),
-            visible: rect.width > 0 && rect.height > 0, ring: (style.outlineStyle !== 'none' && parseFloat(style.outlineWidth) > 0) || style.boxShadow !== 'none' }
-        })
+        const keyboard = await probeKeyboard(s.page)
         if (!await s.page.evaluate(() => Boolean(window.axe))) await s.page.addScriptTag({ content: axeSource })
         const accessibility = await s.page.evaluate(async () => {
           const result = await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } })
-          return { violations: result.violations.map(v => ({ id: v.id, impact: v.impact, targets: v.nodes.map(n => n.target) })),
+          return { violations: result.violations.map(v => ({ id: v.id, impact: v.impact, targets: v.nodes.map(n => n.target), contrast: v.id === 'color-contrast' ? v.nodes.slice(0, 30).map(n => n.any.filter(check => check.id === 'color-contrast').map(check => ({ fgColor: check.data?.fgColor, bgColor: check.data?.bgColor, contrastRatio: check.data?.contrastRatio }))) : undefined })),
             passes: result.passes.length, incomplete: result.incomplete.map(v => v.id) }
         })
         const file = `${s.product.toLowerCase()}-${name}-${viewport.width}.png`
