@@ -109,7 +109,7 @@
     },
     "server-version/frontend/src/pages/admin/education-admin-shell.css": {
       "before": null,
-      "after": "b7a09131b5f36af4fed0943be8d869c8eac1e32b",
+      "after": "f306611f1b5448c096d8032f915850c8cd167d61",
       "status": "A",
       "oldMode": "000000",
       "newMode": "100644"
@@ -174,7 +174,7 @@
     ".github/scripts/school-teacher-visual-reuse.mjs": null
   },
   "components": {
-    "frontend": "d1745d740c91be69e7184156e1c1d5094d9da62e",
+    "frontend": "8f06706ae6dd74d6527f00a493aafa3c441e0d95",
     "backend": "e82fa9e456d5b02c840f823ab7d03d6d47e4aeb4"
   },
   "protectedInputs": {

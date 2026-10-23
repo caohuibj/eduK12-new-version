@@ -50,7 +50,7 @@ test('ready gate requires all selected actual successes and refuses draft or for
 
 test('only real frontend execution qualifies and browser consumes the same official dist',()=>{
  const w=readFileSync('.github/workflows/ci-school-teacher-visual.yml','utf8');
- assert.equal((w.match(/npm run build/g)||[]).length,0);
+ assert.equal((w.match(/npm run build/g)||[]).length,1);
  for(const command of ['school-teacher-visual-reuse.mjs','school-teacher-visual-browser.cjs','google-chrome --version','if: always()'])assert.ok(w.includes(command),command);
  for(const forbidden of ['verifyReviewedEvidence','npm test','services:','prisma migrate','DATABASE_URL','secrets.','--no-sandbox','sysctl'])assert.ok(!w.includes(forbidden),forbidden);
  const b=readFileSync('.github/scripts/school-teacher-visual-browser.cjs','utf8');
@@ -90,37 +90,20 @@ test('official failed run only contributes exact successful frontend stages and 
  assert.throws(()=>verifyOfficial(run,job,sast,artifact,Date.parse('2026-10-27T00:00:00Z')));
 });
 test('reuse protects exact original merge, all other files, and old artifact identity',async()=>{
- const {original:o,verifyClosure,verifyMerge,verifyReceipt,manifest}=await import('./school-teacher-visual-reuse.mjs');
- const read=(cmd,ref)=>cmd==='diff'?'.github/scripts/school-teacher-visual-browser.cjs':ref.endsWith('^{tree}')?o.tree:ref.endsWith(':server-version/frontend')?binding.components.frontend:ref.endsWith(':server-version/backend')?binding.components.backend:ref.endsWith('ci-school-teacher-visual.yml')?'96243bb4328b896b1ee74c2b1ecc5e54debe9ba6':'d0b2cab09f6e829b89d9fa2c0e9bfbb68d89a5b2';
+ const {original:o,cssPolish,verifyClosure,verifyMerge,verifyReceipt,manifest}=await import('./school-teacher-visual-reuse.mjs');
+ const read=(cmd,ref,...rest)=>cmd==='diff'?(rest.includes('--')?cssPolish:'.github/scripts/school-teacher-visual-browser.cjs'):ref.endsWith('^{tree}')?o.tree:ref.endsWith(':server-version/frontend')?binding.components.frontend:ref.endsWith(':server-version/backend')?binding.components.backend:ref.endsWith('ci-school-teacher-visual.yml')?'96243bb4328b896b1ee74c2b1ecc5e54debe9ba6':'d0b2cab09f6e829b89d9fa2c0e9bfbb68d89a5b2';
  verifyClosure(read);assert.throws(()=>verifyClosure((cmd,...a)=>cmd==='diff'?'server-version/frontend/src/App.tsx':read(cmd,...a)));assert.throws(()=>verifyClosure(()=> 'wrong'));
  const merge={sha:o.merge,tree:{sha:o.tree},parents:[{sha:binding.base},{sha:o.head}]};verifyMerge(merge);assert.throws(()=>verifyMerge({...merge,parents:[]}));
- const receipt={kind:'official-frontend-stages-reuse',currentHead:'new',currentRun:'1',sourceHead:o.head,sourceRun:String(o.run),frontendReexecuted:false,originalRunConclusion:'failure',originalBrowserConclusion:'failure',originalCodeQLConclusion:'success',browserReused:false,artifact:manifest};verifyReceipt(receipt,'new',1);
- for(const patch of [{currentHead:'old'},{browserReused:true},{artifact:{...manifest,sha:'new'}},{originalRunConclusion:'success'}])assert.throws(()=>verifyReceipt({...receipt,...patch},'new',1));
+ const receipt={kind:'official-frontend-stages-reuse',currentHead:'new',currentRun:'1',sourceHead:o.head,sourceRun:String(o.run),semanticChecksReexecuted:false,originalRunConclusion:'failure',originalBrowserConclusion:'failure',originalCodeQLConclusion:'success',browserReused:false,buildReused:false,originalArtifact:manifest};verifyReceipt(receipt,'new',1);
+ for(const patch of [{currentHead:'old'},{browserReused:true},{originalArtifact:{...manifest,sha:'new'}},{originalRunConclusion:'success'}])assert.throws(()=>verifyReceipt({...receipt,...patch},'new',1));
 });
 
-test('actual ZIP extractor refuses traversal symlinks duplicates and absolute paths',async()=>{
- const {zipCheck,manifest}=await import('./school-teacher-visual-reuse.mjs');
- const {execFileSync}=await import('node:child_process');
- const {verifyManifest}=await import('./ci-artifact.mjs');
- const program=`import zipfile,tempfile,pathlib,subprocess,sys,stat
-code=sys.argv[1]
-with tempfile.TemporaryDirectory() as d:
- for kind in ['valid','traversal','absolute','symlink','duplicate']:
-  archive=pathlib.Path(d)/(kind+'.zip'); out=pathlib.Path(d)/kind
-  with zipfile.ZipFile(archive,'w') as z:
-   z.writestr('server-version/frontend/dist/ci-build-manifest.json','{}')
-   z.writestr('server-version/frontend/dist/index.html','compiled')
-   if kind=='traversal': z.writestr('../escape','bad')
-   if kind=='absolute': z.writestr('/tmp/escape','bad')
-   if kind=='duplicate': z.writestr('server-version/frontend/dist/index.html','bad')
-   if kind=='symlink':
-    i=zipfile.ZipInfo('server-version/frontend/dist/link'); i.create_system=3; i.external_attr=(stat.S_IFLNK|0o777)<<16; z.writestr(i,'/tmp/escape')
-  r=subprocess.run([sys.executable,'-c',code,str(archive),str(out)],capture_output=True)
-  assert (r.returncode==0)==(kind=='valid'),(kind,r.stderr)
-  if kind=='valid': assert (out/'index.html').read_text()=='compiled'
-`;
- execFileSync('python3',['-c',program,zipCheck],{stdio:'pipe'});
- verifyManifest(manifest,manifest,manifest.contentDigest);
- assert.throws(()=>verifyManifest(manifest,manifest,'tampered'));
- assert.throws(()=>verifyManifest({...manifest,sha:'new'},manifest,manifest.contentDigest));
+test('CSS polish is tightly scoped and current browser uses only the new dist',()=>{
+ const css=readFileSync('server-version/frontend/src/pages/admin/education-admin-shell.css','utf8');
+ for(const product of ['huischool','huiteacher'])assert.ok(css.includes(`a[href="/admin/login?returnTo=%2Fadmin%2F${product}"]+.education-admin-entry-back[href="/admin/login?returnTo=%2Fadmin%2F${product}"]`));
+ assert.ok(css.includes('.education-admin-entry-card .hui-product .hui-status--info'));
+ const b=readFileSync('.github/scripts/school-teacher-visual-browser.cjs','utf8');
+ assert.ok(b.includes('sha:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID'));
+ assert.ok(b.indexOf("await proof(product+'-admin-login'")<b.indexOf("name:'管理员登录',exact:true}).click()"));
+ assert.ok(b.includes('admin-login-invalid-viewport'));assert.ok(b.includes('Exactly one visible return-to-login link'));
 });

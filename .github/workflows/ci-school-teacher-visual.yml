@@ -46,10 +46,17 @@ jobs:
           assert.equal(p.postMerge,false);
           JS
           node --test .github/scripts/school-teacher-visual.test.mjs .github/scripts/training-manual-ui.test.mjs .github/scripts/survey-manual-ui.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/content-workflows.test.mjs
-      - name: verify original official frontend stages and restore exact production dist
+      - name: verify official unchanged semantic checks without reusing the old CSS build
         env:
           GH_TOKEN: ${{ github.token }}
         run: node .github/scripts/school-teacher-visual-reuse.mjs
+      - name: build the CSS-polished production frontend once
+        working-directory: server-version/frontend
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund
+          npm run build
+          node "$GITHUB_WORKSPACE/.github/scripts/ci-artifact.mjs" write frontend
+          node "$GITHUB_WORKSPACE/.github/scripts/ci-artifact.mjs" verify frontend
       - name: install pinned browser controls and use existing sandboxed official Chrome
         run: |
           npm ci --ignore-scripts --no-audit --no-fund --prefix .github/release-tools

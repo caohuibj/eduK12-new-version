@@ -16,9 +16,9 @@ async function run(){
  const axe=fs.readFileSync(path.join(root,'.github/release-tools/node_modules/axe-core/axe.min.js'),'utf8');
  const report={source:process.env.GITHUB_SHA,run:process.env.GITHUB_RUN_ID,scope:'synthetic-production-frontend-ui',checks:[],unexpected:[],pageErrors:[],status:'running'};
  const manifest=JSON.parse(fs.readFileSync(path.join(dist,'ci-build-manifest.json'),'utf8'));
- const {verifyReceipt,manifest:expected}=await import('./school-teacher-visual-reuse.mjs');
+ const {verifyReceipt}=await import('./school-teacher-visual-reuse.mjs');
  const receipt=JSON.parse(fs.readFileSync(path.join(out,'official-reuse.json'),'utf8'));verifyReceipt(receipt,process.env.GITHUB_SHA,process.env.GITHUB_RUN_ID);
- const {verifyManifest,treeDigest}=await import('./ci-artifact.mjs');verifyManifest(manifest,expected,treeDigest(dist));report.artifact=manifest;report.reuse=receipt;
+ const {verifyManifest,treeDigest}=await import('./ci-artifact.mjs');verifyManifest(manifest,{schemaVersion:1,sha:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID,kind:'frontend',lockDigest:receipt.originalArtifact.lockDigest},treeDigest(dist));report.artifact=manifest;report.reuse=receipt;
  let browser,page;
  const timeout=setTimeout(()=>{throw Error('Browser matrix exceeded 6 minutes')},360000);
  async function proof(name,width,theme){
@@ -105,13 +105,17 @@ async function run(){
     const destination=product==='School'?'/admin/huischool':'/admin/huiteacher';
     await page.goto(origins.admin+'/admin/login?returnTo='+encodeURIComponent(destination));
     await page.getByRole('heading',{name:product+' 管理员登录',exact:true}).waitFor();
+    await proof(product+'-admin-login',width,theme);
+    await page.screenshot({path:path.join(out,'screenshots',`${product}-admin-login-default-viewport-${width}-${theme}.png`),fullPage:false});
     await page.getByRole('button',{name:'管理员登录',exact:true}).click();
     assert.equal(await page.getByLabel('管理员账号',{exact:true}).evaluate(el=>el.validity.valueMissing),true);
-    await proof(product+'-admin-login',width,theme);
+    await page.screenshot({path:path.join(out,'screenshots',`${product}-admin-login-invalid-viewport-${width}-${theme}.png`),fullPage:false});
     await page.getByRole('link',{name:'首次绑定 Authenticator',exact:true}).click();
     await page.getByRole('heading',{name:'绑定管理员验证方式',exact:true}).waitFor();
     assert.equal(await page.getByRole('link',{name:'前往管理员登录',exact:true}).getAttribute('href'),'/admin/login?returnTo='+encodeURIComponent(destination));
+    assert.equal(await page.getByRole('link',{name:/管理员登录/}).count(),1,'Exactly one visible return-to-login link');
     await proof(product+'-admin-enrollment',width,theme);
+    await page.screenshot({path:path.join(out,'screenshots',`${product}-admin-enrollment-default-viewport-${width}-${theme}.png`),fullPage:false});
     state.adminSession=true;await page.goto(origins.admin+destination);
     await page.getByText(product+' · 管理员工作台',{exact:true}).waitFor();
     assert.equal(await page.locator('.education-admin-shell').getAttribute('data-theme'),theme);

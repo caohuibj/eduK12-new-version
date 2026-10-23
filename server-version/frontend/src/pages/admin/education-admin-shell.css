@@ -55,3 +55,10 @@
 @media(max-width:640px){.education-admin-entry-card{margin:4px auto;padding:24px 18px}.education-admin-entry .education-admin-account{width:auto;margin-left:auto;border:0;padding:0}}
 .education-admin-shell .product-theme-warning,.education-admin-shell .product-theme-control option{background:var(--ea-paper);color:var(--ea-ink)}
 .education-admin-entry-card .survey-admin-key-note{color:var(--ea-muted)}
+/* Education login recovery uses this entry's palette, including dark mode. */
+.education-admin-entry-card .hui-product .hui-status--info{background:var(--ea-bg);border-color:var(--ea-line);color:var(--ea-ink)}
+.education-admin-entry-card .hui-status--info .hui-status__symbol{color:var(--ea-action)}
+.education-admin-entry-card>a:not(.education-admin-entry-back){display:inline-flex;align-items:center;min-height:44px;margin-top:16px;font-size:13px}
+/* Hide only a second adjacent link with exactly the same known safe destination. */
+.education-admin-entry-card>a[href="/admin/login?returnTo=%2Fadmin%2Fhuischool"]+.education-admin-entry-back[href="/admin/login?returnTo=%2Fadmin%2Fhuischool"],
+.education-admin-entry-card>a[href="/admin/login?returnTo=%2Fadmin%2Fhuiteacher"]+.education-admin-entry-back[href="/admin/login?returnTo=%2Fadmin%2Fhuiteacher"]{display:none}
