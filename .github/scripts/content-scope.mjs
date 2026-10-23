@@ -1,4 +1,5 @@
 import {trainingAssessmentPlan,trainingAssessmentOutputs} from './training-assessment-scope.mjs';
+import {schoolTeacherVisualPlan,schoolTeacherVisualOutputs} from './school-teacher-visual-scope.mjs';
 import {participantAccessPlan,participantAccessOutputs} from './participant-access-scope.mjs';
 import {trainingManualUIPlan,trainingManualUIOutputs} from './training-manual-ui-scope.mjs';
 import {surveyManualUIPlan,surveyManualUIOutputs} from './survey-manual-ui-scope.mjs';
@@ -301,6 +302,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   if(trainingAssessment){const output=trainingAssessmentOutputs(trainingAssessment);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const participant=participantAccessPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(participant){const output=participantAccessOutputs(participant);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
+  const schoolTeacherVisual=schoolTeacherVisualPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  if(schoolTeacherVisual){const output=schoolTeacherVisualOutputs(schoolTeacherVisual);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const trainingManualUI=trainingManualUIPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(trainingManualUI){const output=trainingManualUIOutputs(trainingManualUI);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const surveyManualUI=surveyManualUIPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());

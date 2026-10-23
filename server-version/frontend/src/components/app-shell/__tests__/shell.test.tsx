@@ -430,3 +430,21 @@ it('routes anonymous direct Survey governance entry to administrator login witho
   expect(screen.getByRole('status')).toHaveTextContent('/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
   expect(screen.queryByText('governance')).not.toBeInTheDocument()
 })
+
+describe('School and Teacher administrator frames',()=>{
+ it.each([['HUISCHOOL','School','/admin/huischool'],['HUITEACHER','Teacher','/admin/huiteacher']] as const)('uses only the granted %s administration frame',async(entry,brand,path)=>{
+  auth.user={id:'education-manager',role:'TEACHER',businessRole:'TEACHER',username:'manager',platformRole:'STANDARD',entryGrants:[{entry,version:1}]} as User
+  const {container}=render(<MemoryRouter initialEntries={[path]}><AppShell><h1>产品治理内容</h1></AppShell></MemoryRouter>)
+  expect(container.querySelector('.education-admin-shell')).toHaveAttribute('data-product',brand)
+  expect(screen.getByRole('link',{name:`${brand} 管理员首页`})).toHaveAttribute('href',path)
+  expect(screen.getByText(`${brand} 管理员`)).toBeInTheDocument()
+  expect(screen.queryByRole('navigation',{name:'培训师工作台'})).not.toBeInTheDocument()
+  expect(screen.queryByText('研究者与授权')).not.toBeInTheDocument()
+  expect(screen.getByRole('heading',{name:'产品治理内容'})).toBeInTheDocument()
+ })
+ it('does not select the product frame for an ungranted deep link',()=>{
+  auth.user={id:'ordinary',role:'TEACHER',username:'teacher',entryGrants:[]} as User
+  const {container}=render(<MemoryRouter initialEntries={['/admin/huischool']}><AppShell><p>RouteAccess owns access</p></AppShell></MemoryRouter>)
+  expect(container.querySelector('.education-admin-shell')).toBeNull()
+ })
+})

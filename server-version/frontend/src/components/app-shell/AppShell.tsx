@@ -41,6 +41,8 @@ import '../../training/training-workspace-header.css'
 import '../../training/training-appearance.css'
 import '../../survey/survey-admin-shell.css'
 import SurveyAdminShell from '../../survey/SurveyAdminShell'
+import EducationAdminShell from '../../pages/admin/EducationAdminShell'
+import {educationEntry} from '../../pages/admin/education-entry'
 
 // Organization reports and charts are only needed on organization routes.
 const OrganizationProductRoutes = lazy(() => import('../../pages/organization/OrganizationProductRoutes'))
@@ -59,6 +61,8 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const surveyAdmin=(hasAdminEntry(user,'SURVEY')||user?.platformRole==='SYSTEM_ADMIN')&&Boolean(origins)&&(location.pathname===SURVEY_ADMIN_PATH||
     (location.pathname==='/admin/scale-library-governance'&&new URLSearchParams(location.search).get('workspace')==='survey'))
   const surveyAdminEntry=Boolean(origins)&&['/admin/login','/admin/security/enroll'].includes(location.pathname)&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH
+  const educationProduct=location.pathname==='/admin/huischool'?'School':location.pathname==='/admin/huiteacher'?'Teacher':null
+  const educationBrand=educationProduct??(['/admin/login','/admin/security/enroll'].includes(location.pathname)?educationEntry(location.search):null)
   const adminWorkspace=isAdminWorkspacePath(location.pathname)
   const trainingAdmin = user?.role === 'ADMIN' && (location.pathname === '/admin/training' || new URLSearchParams(location.search).get('workspace') === 'training')
   const organizationProductRoute=location.pathname==='/organizations'||location.pathname.startsWith('/organizations/')||(location.pathname==='/organization-tasks'||location.pathname==='/my-assessments')
@@ -102,13 +106,14 @@ function AppShellContent({ children }: { children: ReactNode }) {
   useEffect(()=>{
     if(mode==='display')return
     const surveyBrand=surveyAdmin||surveyAdminEntry
-    document.title=surveyBrand?'Research':`${title==='Huisurvey'?'':`${title} · `}${training?'Huitraining':'Huisurvey'}`
+    document.title=educationBrand?`${educationBrand} · 管理员工作台`:surveyBrand?'Research':`${title==='Huisurvey'?'':`${title} · `}${training?'Huitraining':'Huisurvey'}`
     const icon=document.head.querySelector<HTMLLinkElement>('link[rel="icon"]')
     if(surveyBrand)icon?.setAttribute('href','/survey/huisurvey-w2-emblem.svg')
     else if(icon?.getAttribute('href')==='/survey/huisurvey-w2-emblem.svg')icon.setAttribute('href','/vite.svg')
     if(previousPath.current!==location.pathname&&mode!=='focused')mainRef.current?.focus()
     previousPath.current=location.pathname
-  },[location.pathname,title,mode,training,surveyAdmin,surveyAdminEntry])
+  },[location.pathname,title,mode,training,surveyAdmin,surveyAdminEntry,educationBrand])
+  if(educationProduct&&user&&hasAdminEntry(user,educationProduct==='School'?'HUISCHOOL':'HUITEACHER'))return <EducationAdminShell product={educationProduct} userId={user.id} username={user.nickname||user.username} loggingOut={loggingOut} onLogout={async()=>{setLoggingOut(true);try{await logout()}finally{setLoggingOut(false)}}}>{children}</EducationAdminShell>
   if(surveyAdmin&&user)return <SurveyAdminShell username={user.nickname||user.username} loggingOut={loggingOut} onLogout={async()=>{setLoggingOut(true);try{await logout()}finally{setLoggingOut(false)}}}>{children}</SurveyAdminShell>
   if(mode==='display')return <>{children}</>
   return <div className={`hui-app hui-app--${mode}${roleClass}${staffMode?' hui-app--staff':''}${assessmentSurfaceClass}${reportSurfaceClass}${studentSubmitClass}${entryMode?' hui-app--entry':''}${training&&!surveyAdmin?' hui-training':''}${surveyAdmin?' hui-survey-admin-shell':''}${trainingAssessmentVisual?' training-assessment-visual':''}${trainingWorkspace?' training-workspace-shell':''}${teacherVisual?' training-teacher-visual':''}`} data-shell-mode={mode} data-training-theme={training && !surveyAdmin ? appearance.theme : undefined}>

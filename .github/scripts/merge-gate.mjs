@@ -1,4 +1,5 @@
 import {trainingAssessmentPlan,trainingAssessmentOutputs} from './training-assessment-scope.mjs';
+import {schoolTeacherVisualPlan,schoolTeacherVisualOutputs} from './school-teacher-visual-scope.mjs';
 import {participantAccessPlan,participantAccessOutputs} from './participant-access-scope.mjs';
 import {trainingManualUIPlan,trainingManualUIOutputs} from './training-manual-ui-scope.mjs';
 import {surveyManualUIPlan,surveyManualUIOutputs} from './survey-manual-ui-scope.mjs';
@@ -53,6 +54,8 @@ export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   if(scope.application_route==='training-assessment')return ['scope','training-assessment','codeql'];
   if(scope.application_route==='participant-access')return ['scope','participant-access','codeql'];
+  if(scope.application_route==='school-teacher-visual')return ['scope','school-teacher-visual','codeql'];
+
   if(scope.application_route==='training-manual-ui')return ['scope','training-manual-ui','codeql'];
   if(scope.application_route==='survey-manual-ui')return ['scope','survey-manual-ui','codeql'];
   if(scope.application_route==='shared-authoring')return ['scope','shared-authoring','codeql'];
@@ -125,6 +128,10 @@ export function failedChecks(needs, draft) {
   }
   if(scope.application_route==='participant-access'){
     try{const p=JSON.parse(scope.participant_access_plan);if(draft||p.postMerge!==false||p.route!=='participant-access'||Object.entries(participantAccessOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+    return [...new Set(failed)];
+  }
+  if(scope.application_route==='school-teacher-visual'){
+    try{const p=JSON.parse(scope.school_teacher_visual_plan);if(draft||p.route!=='school-teacher-visual'||p.postMerge!==false||Object.entries(schoolTeacherVisualOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
     return [...new Set(failed)];
   }
   if(scope.application_route==='training-manual-ui'){
@@ -388,6 +395,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.participant_access_plan);
       if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(participantAccessPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-participant-access-plan');
     }catch{failed.push('recomputed-participant-access-plan');}
+  }
+  if(needs.scope?.outputs?.application_route==='school-teacher-visual'){
+    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');
+      const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.school_teacher_visual_plan);
+      if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(schoolTeacherVisualPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-school-teacher-visual-plan');
+    }catch{failed.push('recomputed-school-teacher-visual-plan');}
   }
   if(needs.scope?.outputs?.application_route==='training-manual-ui'){
     try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');

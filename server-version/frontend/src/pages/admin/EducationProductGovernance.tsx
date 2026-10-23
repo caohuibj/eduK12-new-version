@@ -75,12 +75,12 @@ export default function EducationProductGovernance({product}:{product?:Product})
     <Link to="/admin/login">前往平台管理员登录</Link>
   </section>
   return <section className="epg-main" aria-label={title}>
-    <header><span>Huisurvey · {selectedProduct}</span>
+    <header><span>{selectedProduct==='HUISCHOOL'?'School':'Teacher'} · 管理员工作台</span>
       <h1>{title}</h1>
       <p>共享教育账号及组织基础信息，但两个产品分别开通、分别授权。
         管理员不能从本页面读取任何教师私人报告、学生心理数据或评教个人作答。</p>
     </header>
-    <AdminStepUp/>
+    <details className="epg-verification"><summary>管理员安全验证 <span>敏感操作前展开验证</span></summary><AdminStepUp/></details>
     <nav aria-label="平台治理导航" className="epg-actions">
       <Link to="/admin/entrances">管理入口</Link>
       {(['HUISCHOOL','HUITEACHER'] as const).filter(entry=>entry!==selectedProduct&&hasAdminEntry(user,entry)).map(entry=><Link key={entry} to={entryPaths[entry]}>{labels[entry]}管理</Link>)}

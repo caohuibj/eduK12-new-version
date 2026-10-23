@@ -1,0 +1,24 @@
+/* School / Teacher adapters only. Survey, Training and scientific stimuli are unchanged.
+   The editor responds to its actual canvas, including the School navigation rail. */
+:is(.hs-app,.ht-app) .education-private-tools{container:education-editor / inline-size;min-width:0}
+.hs-app .education-private-tools{--private-accent:var(--hs-primary);--private-bg:var(--hs-bg);--private-line:var(--hs-border);--entry-paper:var(--hs-surface);--entry-ink:var(--hs-ink);--entry-muted:var(--hs-muted)}
+.ht-app .education-private-tools{--entry-paper:var(--ht-paper);--entry-ink:var(--ht-ink);--entry-muted:var(--ht-quiet)}
+:is(.hs-app,.ht-app) .education-private-tools .education-private-heading{flex-wrap:wrap;gap:12px}
+:is(.hs-app,.ht-app) .education-private-tools .education-private-heading>div{flex:1 1 220px;min-width:0}
+:is(.hs-app,.ht-app) .education-private-tools :is(h2,h3,p,.education-private-save-state){overflow-wrap:anywhere}
+:is(.hs-app,.ht-app) .education-private-tools .education-private-toolbar>*{min-width:0;max-width:100%}
+:is(.hs-app,.ht-app) .education-private-tools .education-private-toolbar>label{flex:1 1 200px}
+:is(.hs-app,.ht-app) .education-private-tools .education-private-list article{display:flex;flex-direction:column;min-width:0;background:var(--entry-paper);border-color:var(--private-line)}
+:is(.hs-app,.ht-app) .education-private-tools .education-private-list article h3{margin:0 0 8px;font-size:18px;line-height:1.6}
+:is(.hs-app,.ht-app) .education-private-tools .education-private-list article>button{margin-top:auto;align-self:flex-start;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+:is(.hs-app,.ht-app) .education-private-tools .education-private-toolbar button{min-height:44px;white-space:normal;overflow-wrap:anywhere}
+:is(.hs-app,.ht-app) .education-private-tools .education-private-form-directory button{min-height:44px}
+@container education-editor (max-width:760px){
+ :is(.hs-app,.ht-app) .education-private-tools .education-private-form-layout{grid-template-columns:minmax(0,1fr)}
+ :is(.hs-app,.ht-app) .education-private-tools .education-private-form-directory{border-right:0;padding-right:0;padding-bottom:12px;border-bottom:1px solid var(--private-line)}
+}
+@container education-editor (max-width:480px){
+ :is(.hs-app,.ht-app) .education-private-tools .education-private-toolbar>label{flex-basis:100%}
+ :is(.hs-app,.ht-app) .education-private-tools .education-private-save-state{flex-basis:100%;margin-left:0}
+ :is(.hs-app,.ht-app) .education-private-tools .education-private-actions>button{flex:1 1 calc(50% - 12px)}
+}
