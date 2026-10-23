@@ -1,5 +1,6 @@
+import { Blob as NodeBlob } from 'node:buffer'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import ScaleUnitReportCard from '../ScaleUnitReportCard'
 import { toScaleUnitReport, type Assessment } from '../../../pages/student/ScaleResult'
 const fetcher = vi.hoisted(() => vi.fn())
@@ -46,4 +47,22 @@ describe('Training matched feedback display', () => {
     const scoresOnly = { ...input, report: { ...input.report!, kind: 'scores' } } as Assessment
     expect(toScaleUnitReport(scoresOnly).rawScoreFeedback).toBeUndefined()
   })
+})
+
+it.each(['image/png', 'video/mp4', 'application/pdf'] as const)('loads generic %s only through the granted report transport', async mimeType => {
+  const loader = vi.fn(async () => new NodeBlob(['synthetic'], { type: mimeType }) as unknown as Blob)
+  const material = { asset: { assetId: 'report-material', contentHash: 'a'.repeat(64), mimeType }, name: '获准报告素材', order: 0 }
+  const value = { ...report(), rawScoreFeedback: [{ scoreKey: 'total', rangeKey: 'a', text: '反馈正文', materials: [material] }] }
+  const view = render(<ScaleUnitReportCard report={value} loadReportImage={loader} />)
+  expect(loader).not.toHaveBeenCalled()
+  fireEvent.click(screen.getByRole('button', { name: mimeType.startsWith('image/') ? '查看图片' : mimeType.startsWith('video/') ? '查看视频' : '查看PDF 文档' }))
+  await waitFor(() => expect(loader).toHaveBeenCalledWith('report-material'))
+  if (mimeType === 'application/pdf') expect(await screen.findByTitle('获准报告素材')).toHaveAttribute('sandbox', '')
+  else if (mimeType.startsWith('image/')) expect(await screen.findByAltText('获准报告素材')).toHaveAttribute('src', 'blob:feedback')
+  else expect(await screen.findByLabelText('获准报告素材')).toHaveAttribute('controls')
+  expect(fetcher).not.toHaveBeenCalled()
+  loader.mockClear()
+  view.rerender(<ScaleUnitReportCard report={{ ...value, reportKind: 'scores' }} loadReportImage={loader} />)
+  expect(screen.queryByText('获准报告素材')).not.toBeInTheDocument()
+  expect(loader).not.toHaveBeenCalled()
 })

@@ -1,17 +1,11 @@
+import {ConditionEditor} from '../modules/assessment-core/flow/ConditionEditor'
+import {defaultPredicate,type FieldChoice} from '../modules/assessment-core/flow/conditions'
 import { researchKey } from './builder.types'
-import type { FlowBlock,FlowDraft,FlowField,FlowCondition } from './flow.client'
+import type { FlowBlock,FlowDraft,FlowField } from './flow.client'
 
 export type ToolInfo={id:string;instrumentKey:string;title:string;kind:string}
 export type FormQuestionInfo={instrumentKey:string;itemKey:string;prompt:string;type:string;
   options:{optionKey:string;label:string}[]}
-type FieldChoice={id:string;label:string;field:FlowField;
-  kind:'choice'|'choices'|'number'|'text'|'boolean';options:{key:string;label:string}[]}
-const defaultValue=(field:FieldChoice)=>field.kind==='number'?0:field.kind==='boolean'?true:
-  field.options[0]?.key??''
-const defaultPredicate=(fields:FieldChoice[]):FlowCondition=>({
-  op:fields[0]?.kind==='choices'?'INCLUDES':'EQUALS',field:fields[0]?.field??{source:'EMBEDDED',key:'placeholder'},
-  value:fields[0]?defaultValue(fields[0]):'',
-})
 const itemField=(x:FormQuestionInfo):FieldChoice|null=>{
   const kind:FieldChoice['kind']|null=['SINGLE','LIKERT'].includes(x.type)?'choice':
     x.type==='MULTIPLE'?'choices':['NUMBER','SLIDER'].includes(x.type)?'number':
@@ -21,73 +15,7 @@ const itemField=(x:FormQuestionInfo):FieldChoice|null=>{
     field:{source:'ANSWER',instrumentKey:x.instrumentKey,itemKey:x.itemKey},
     kind,options:x.options.map(o=>({key:o.optionKey,label:o.label}))}:null
 }
-function ConditionEditor({value,onChange,fields,depth=0}:{value:FlowCondition;
-  onChange:(next:FlowCondition)=>void;fields:FieldChoice[];depth?:number}){
-  const fieldId='field' in value?(value.field.source==='EMBEDDED'
-    ?'E:'+value.field.key:'A:'+value.field.instrumentKey+':'+value.field.itemKey):''
-  const selected=fields.find(f=>f.id===fieldId)??fields[0]
-  const comparisons=selected?.kind==='number'?['EQUALS','GT','GTE','LT','LTE','IS_MISSING']:
-    selected?.kind==='choices'?['INCLUDES','IS_MISSING']:
-    ['EQUALS','IS_MISSING']
-  const changeOp=(op:string)=>{
-    if(op==='AND'||op==='OR')onChange({op,terms:[defaultPredicate(fields),defaultPredicate(fields)]})
-    else if(op==='NOT')onChange({op,term:defaultPredicate(fields)})
-    else if(selected)onChange({op:op as 'EQUALS'|'INCLUDES'|'GT'|'GTE'|'LT'|'LTE'|'IS_MISSING',
-      field:selected.field,...(op==='IS_MISSING'?{}:{value:defaultValue(selected)})})
-  }
-  return <div className="rounded-lg border border-slate-200 p-3 space-y-2">
-    <label className="block text-xs">条件运算
-      <select className="input block w-full" aria-label="条件运算" value={value.op}
-        onChange={e=>changeOp(e.target.value)}>
-        {depth<5&&['AND','OR','NOT'].map(op=><option key={op} value={op}>
-          {op==='AND'?'全部满足（AND）':op==='OR'?'任意满足（OR）':'条件取反（NOT）'}</option>)}
-        {['EQUALS','INCLUDES','GT','GTE','LT','LTE','IS_MISSING'].map(op=>
-          <option key={op} value={op} disabled={!comparisons.includes(op)}>
-            {{EQUALS:'等于',INCLUDES:'多选包含',GT:'大于',GTE:'大于等于',LT:'小于',LTE:'小于等于',
-              IS_MISSING:'明确缺失／未回答'}[op as 'EQUALS']}</option>)}
-      </select>
-    </label>
-    {(value.op==='AND'||value.op==='OR')&&<div className="space-y-2">
-      {value.terms.map((term,index)=><div key={index} className="space-y-1">
-        <ConditionEditor value={term} depth={depth+1} fields={fields}
-          onChange={next=>onChange({...value,terms:value.terms.map((x,i)=>i===index?next:x)})}/>
-        <button className="btn-secondary text-xs" type="button" disabled={value.terms.length<=1}
-          onClick={()=>onChange({...value,terms:value.terms.filter((_,i)=>i!==index)})}>删除此条件</button>
-      </div>)}
-      <button className="btn-secondary" type="button" disabled={depth>=5||value.terms.length>=8}
-        onClick={()=>onChange({...value,terms:[...value.terms,defaultPredicate(fields)]})}>增加子条件</button>
-    </div>}
-    {value.op==='NOT'&&<ConditionEditor value={value.term} depth={depth+1}
-      fields={fields} onChange={term=>onChange({...value,term})}/>}
-    {!['AND','OR','NOT'].includes(value.op)&&'field' in value&&<>
-      <label className="block text-xs">条件来源（仅此前已完成的 Form 或静态变量）
-        <select className="input block w-full" aria-label="条件来源" value={fieldId}
-          onChange={e=>{
-            const field=fields.find(f=>f.id===e.target.value)
-            if(field)onChange({op:field.kind==='choices'?'INCLUDES':'EQUALS',
-              field:field.field,value:defaultValue(field)})
-          }}>
-          {fields.map(f=><option key={f.id} value={f.id}>{f.label}</option>)}
-        </select>
-      </label>
-      {value.op!=='IS_MISSING'&&selected&&<label className="block text-xs">比较值
-        {selected.kind==='choice'||selected.kind==='choices'
-          ?<select className="input block w-full" aria-label="条件比较值"
-            value={String(value.value??'')} onChange={e=>onChange({...value,value:e.target.value})}>
-            {selected.options.map(o=><option value={o.key} key={o.key}>{o.label}</option>)}
-          </select>
-          :selected.kind==='boolean'
-            ?<select className="input block w-full" aria-label="布尔条件比较值"
-              value={String(value.value)} onChange={e=>onChange({...value,value:e.target.value==='true'})}>
-              <option value="true">真</option><option value="false">假</option></select>
-            :<input className="input block w-full" aria-label="条件比较值"
-              type={selected.kind==='number'?'number':'text'} step="any"
-              value={String(value.value??'')} onChange={e=>onChange({...value,
-                value:selected.kind==='number'?Number(e.target.value):e.target.value})}/>}
-      </label>}
-    </>}
-  </div>
-}
+
 export function SurveyFlowStudio({value,onChange,tools,selectedIds,questions,collectionMode}:{
   value:FlowDraft|null;onChange:(next:FlowDraft|null)=>void;
   tools:ToolInfo[];selectedIds:string[];questions:FormQuestionInfo[];
@@ -113,7 +41,7 @@ export function SurveyFlowStudio({value,onChange,tools,selectedIds,questions,col
       const field=itemField(q)
       if(!field)return
       next={blockKey:researchKey('b'),kind,termination:'SCREEN_OUT',
-        when:{op:'EQUALS',field:field.field,value:defaultValue(field)}}
+        when:defaultPredicate([field])}
     }
     apply({...value,blocks:[...value.blocks,next]})
   }

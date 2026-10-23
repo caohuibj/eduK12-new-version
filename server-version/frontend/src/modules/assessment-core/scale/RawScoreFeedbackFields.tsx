@@ -28,7 +28,7 @@ export function RawScoreFeedbackFields({rule,disabled=false,onChange,appearance,
       const min=rule.ranges[rule.ranges.length-1]?.max??0
       onChange({...rule,ranges:[...rule.ranges.map(range=>({...range,includeMax:false})),{key:`range_${crypto.randomUUID().replace(/-/g,'')}`,min,max:min+1,includeMax:true,text:''}]})
     }}>{addLabel}</button>
-    <label className={survey?'flex gap-2 text-sm':'scale-feedback-fallback'}><input type="checkbox" disabled={disabled} checked={!!rule.fallback} onChange={event=>{
+    <label className={survey?'flex gap-2 text-sm':'scale-feedback-fallback'}><input type="checkbox" disabled={disabled||(!survey&&!rule.ranges.length)} checked={!!rule.fallback} onChange={event=>{
       const next={...rule};if(event.target.checked)next.fallback={text:''};else delete next.fallback;onChange(next)
     }}/>{fallbackLabel}</label>
     {rule.fallback&&<div className={survey?'space-y-2':undefined}>
