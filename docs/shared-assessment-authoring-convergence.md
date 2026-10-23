@@ -28,6 +28,32 @@
 
 现有 `ResearchScaleEditor` 对 `pages/scaleAuthoringInput` 的依赖应在第一批提取中移除，不能继续让产品页面成为另一产品的公共库。现有共享 Form 架构和兼容边界见 [shared-assessment-foundation-v1.md](shared-assessment-foundation-v1.md)。
 
+## 素材库也是共用编辑工具的一部分
+
+2026-10-23 用户补充：Training、Survey 编辑量表和表单时，都应能使用素材库内容。目标覆盖图片、视频、PDF 文档，并延伸到普通组合问卷；不能只有素材管理页面，编辑时却必须重新上传。同一账号有权独立复用的素材，不应按量表或表单分成互不相通的列表。两端保留自己的身份、素材归属与授权适配器，不因此把 Training 私有库与 Survey 私有库合并或开放跨账户读取。
+
+### 当前源码实际接入状态
+
+| 位置 | 已有支持 | 未完成范围 |
+| --- | --- | --- |
+| Survey 量表 / 表单 | `SurveyToolTemplateEditor` 已接入 `SurveyMaterialPicker`，可从本人可复用库选图片、MP4/WebM、PDF，按顺序在工具开始前展示；表单题目另有 `SurveyImageField` | 工具级展示不等于每个题干、每个选项均已支持三类附件；共享组件接入需明确使用位置，不把视频阅读作为计分或完成证据 |
+| Survey 量表反馈 / 组合问卷 | 原始分区间反馈可引用三类素材；普通组合问卷继承所选工具的素材，参加者读取由实际冻结内容及反馈开放规则决定 | 组合问卷独立的素材块编辑，以及包含新素材格式的公共库审核发布仍需分别接通，不能用工具内可预览代替 |
+| Training 素材库 | `/training-workspace/media` 已列出本人素材及精确独立授权的图片、视频、PDF；通用 `MediaSelector` 已消费该目录 | 该接口提供文件 ID 和临时 URL，未提供编辑定义需要的 `contentHash`；编辑适配器需取得服务端核验的不可变身份，不能把临时 URL 当作持久引用 |
+| Training 量表编制 | `TrainingFeedbackImageField` 有直接上传反馈图片；后台量表定义与冻结读取支持题目图片/视频及报告图片 | 反馈图片缺少从库选用入口，题目编辑 UI 未接素材选择；通用视频/PDF 的工具级或反馈展示缺少完整定义、冻结、发布与参加者链路，不能仅复用 Survey 选择器就开启 |
+| Training 表单编制 | 共享 typed Form 题目定义有图片字段；既有选项图片/视频读取与保留适配器服务于原结构 | `QuestionnaireProducts` 编制页未接素材入口；typed Form 与旧选项结构不同，需要逐一核对保存、复制、冻结及真实展示。PDF 与工具级展示仍需完整接入 |
+
+上述状态来自本分支源码核对，未进行本轮登录后的浏览器操作或数据库端到端验收。关键来源为 `server-version/frontend/src/survey/{SurveyMaterialPicker,SurveyToolTemplateEditor,SurveyRawScoreFeedbackEditor}.tsx`、`server-version/frontend/src/pages/{TrainingFeedbackImageField,ScaleEdit}.tsx`、`server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx`，以及后端 `routes/trainingWorkspace.ts`、`services/workspaceMedia.ts`、`modules/survey/{material-library.service,material-scope,media.references}.ts`、`modules/scale/scale-image-retention.ts` 和 `modules/assessment-runtime/form-image.adapter.ts`。
+
+### 接入约定与完成条件
+
+- **同一套选择与引用界面**：共用类型筛选、检索分页、已选列表、顺序、移除、说明/替代文字、使用依据、预览、重新读取与失效提示。素材管理入口由产品适配器提供，两端保留配色。共享 UI 只展示该位置及真实后端支持的素材类型。
+- **明确展示位置**：先共用工具开始前的展示素材与量表反馈素材，再逐项接入题目/选项位置。普通组合问卷必须保留所选版本的素材引用与顺序；是否增加独立素材块另按两端实际流程协议实现。
+- **可复用来源一致**：本人可复用上传和有效的独立素材授权由各自服务端判定。仅随授权量表附带的媒体继续绑定原量表精确版本，不显示成可以任意添加的素材。Training 当前报告图片只允许作者自有私有文件，不能因为目录包含授权文件就让选择器绕过此规则；开放更多来源需把使用、冻结与撤权契约一并实现。
+- **固定身份与文件能力**：持久化服务端确认的 `assetId + contentHash + mimeType`，保留原文件引用，不复制上传或保存预览 URL。类型、文件大小、版权依据、删除/授权状态按使用位置在服务端复核；不能把 Training 库中允许上传的文件都视为满足 Survey 编制限制。当前 Survey 图片 2 MiB、视频 50 MiB、PDF 20 MiB，每处至多 10 项；这些不是 Training 全局上传配额。
+- **整条链路验收**：两端分别验证从本人库/有效独立授权选用 → 保存重开 → 复制或组合选用 → 发布冻结 → 实际作答/获准报告展示；覆盖权限失效、身份/摘要/类型不符、超过大小限制、不可用文件和失败重试。确认未获准的报告素材不会提前进入题面允许列表，存量冻结版本不改写。保留播放、字幕及必要观看的原有语义，普通预览不冒充已观看完成。
+
+素材适配与不可变引用应先于需要它的共享反馈/组合控件完成，不能把“素材库可见”或“前端类型接受字段”当作整个编辑链路已打通。本轮仅补充核对结果和实施约定，没有把上述 Training 缺口标记为已完成。
+
 ## 分批收敛顺序与验收
 
 1. **量表编辑优先**：共享录入辅助函数、选项/题目卡片、计分摘要与计分卡片。先覆盖现有共同能力，新增计分模型另行具备完整持久化、计分和发布链路后启用。
