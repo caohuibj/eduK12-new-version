@@ -5,8 +5,8 @@
   "branch": "work/school-teacher-review-20261022",
   "enabled": true,
   "base": "69497181d569d4a5f7d61cdab108b977894cf9b3",
-  "productHead": "96ddac02b28022867f0ad7231aff36cb5516d93f",
-  "frontendTree": "c2408a4d95b81113136e12339a650fd76378cea2",
+  "productHead": "f9c60689c5993dad95649e129ecf3d22405afe87",
+  "frontendTree": "0d64b3ad6c651363f7dddc9e5c84204765f952db",
   "backendTree": "6333ccb8c84e49753531ac01ca30591496d4b127",
   "source": {
     ".github/scripts/school-teacher-browser-control.mjs": {
@@ -895,11 +895,11 @@
     },
     "server-version/frontend/src/components/education-tools/EducationMaterialPicker.tsx": {
       "before": "",
-      "after": "a8a09e49fbd909f9a171cc426efafcb3b94fb56b"
+      "after": "70c65987b8577e97b470e357aa5b180f120c3543"
     },
     "server-version/frontend/src/components/education-tools/EducationMaterials.test.tsx": {
       "before": "",
-      "after": "9d415ce2db8e125e2439470d00c7d151ef3528b4"
+      "after": "68378d194a04996211e4479332a1081b7641049c"
     },
     "server-version/frontend/src/components/education-tools/EducationPersonalReportConsumers.test.tsx": {
       "before": "",
@@ -1019,7 +1019,7 @@
     },
     "server-version/frontend/src/components/education-tools/education-private-tools.css": {
       "before": "",
-      "after": "b201a22096f47f2a4facf944bdc536e28719a9c0"
+      "after": "9628cb9dfd2d8ffda1041a6b328dbda4678ed72a"
     },
     "server-version/frontend/src/components/education-tools/educationPrivateImageAdapter.test.ts": {
       "before": "",
@@ -1781,10 +1781,10 @@
               },
               {
                 "path": "server-version/frontend/src/components/education-tools/EducationMaterials.test.tsx",
-                "blob": "9d415ce2db8e125e2439470d00c7d151ef3528b4"
+                "blob": "68378d194a04996211e4479332a1081b7641049c"
               }
             ],
-            "sha256": "7e2a1ae25dc39b0ae999a8f741b860d320a1105aeb180c8da836ffb82da186bd"
+            "sha256": "534ee2dc76157c91607112ff331613843fbee2655bd1429c981c4a65516489a8"
           }
         },
         {
