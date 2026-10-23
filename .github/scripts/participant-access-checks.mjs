@@ -6,7 +6,10 @@ import {execFileSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
 import {binding,participantAccessPlan} from './participant-access-scope.mjs';
 const sha=b=>createHash('sha256').update(b).digest('hex');
-const git=(...a)=>execFileSync('git',a,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+// Checkout and historical objects are immutable during one qualification process.
+// Share identical object reads across the per-case imported-source closures.
+const gitObjects=new Map();
+const git=(...a)=>{const key=JSON.stringify(a);if(!gitObjects.has(key))gitObjects.set(key,execFileSync('git',a,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim());return gitObjects.get(key);};
 const output='participant-access-evidence';
 const receipt=(name,data)=>{mkdirSync(output,{recursive:true});writeFileSync(`${output}/${name}.json`,JSON.stringify(data,null,2)+'\n');};
 export function verifyEvidence(read=readFileSync,resolve=git){
