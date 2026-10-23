@@ -104,6 +104,21 @@ function SurveyApplication(){
   const [capabilitiesState,setCapabilitiesState]=useState<'loading'|'ready'|'error'>('loading')
   const [available,setAvailable]=useState<{analytics:boolean;publication:boolean}|null>(null)
   const selectedProjectId=selected?.id
+  // Retain visited editors (including unsaved drafts), but do not mount other
+  // project panels merely because their tab is hidden. Never carry visits into
+  // another project or let an old project's panels issue new reads.
+  const [visitedPanels,setVisitedPanels]=useState<{projectId:string;sections:WorkspaceSection[]}>({projectId:'',sections:[]})
+  useEffect(()=>{
+    const active=editorOpen&&researchArea==='studies'&&workspaceSection!=='settings'
+    setVisitedPanels(previous=>{
+      const sections=previous.projectId===selectedProjectId?previous.sections:[]
+      if(previous.projectId===(selectedProjectId??'')&&(!active||sections.includes(workspaceSection)))return previous
+      return {projectId:selectedProjectId??'',sections:active?[...sections,workspaceSection]:sections}
+    })
+  },[selectedProjectId,editorOpen,researchArea,workspaceSection])
+  const panelVisited=(section:WorkspaceSection)=>
+    editorOpen&&researchArea==='studies'&&workspaceSection===section
+    ||visitedPanels.projectId===selectedProjectId&&visitedPanels.sections.includes(section)
   const instrumentLibrary=useMemo(()=>selectedProjectId?createInstrumentLibrary(selectedProjectId):undefined,[selectedProjectId])
   const projectChanged=useCallback((project:Pick<Project,'id'|'status'|'revision'|'collectionMode'>)=>{
     setSelected(current=>current?.id===project.id?{...current,...project}:current)
@@ -400,16 +415,16 @@ function SurveyApplication(){
           </div>
         </form>
         <p className="survey-settings-help">保存仅更新草稿，不会开放招募。请在「发布与采集」检查工具与知情同意，冻结后再开放。</p>
-      </section>}{selected&&<><div id="survey-workspace-publish" role="tabpanel" aria-labelledby="survey-workspace-tab-publish" hidden={workspaceSection!=='publish'}><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary} onProjectChanged={projectChanged} onLeaveRiskChange={builderRiskChanged} onNavigateLibrary={()=>navigateResearchArea('tools','/workspace/tools')}/></div>
-        <div id="survey-workspace-reports" role="tabpanel" aria-labelledby="survey-workspace-tab-reports" hidden={workspaceSection!=='reports'}><SurveyReportStudio key={'reports-'+selected.id} projectId={selected.id} projectStatus={selected.status} active={workspaceSection==='reports'} onLeaveRiskChange={reportRiskChanged}/></div>
+      </section>}{selected&&<><div id="survey-workspace-publish" role="tabpanel" aria-labelledby="survey-workspace-tab-publish" hidden={workspaceSection!=='publish'}>{panelVisited('publish')&&<SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary} onProjectChanged={projectChanged} onLeaveRiskChange={builderRiskChanged} onNavigateLibrary={()=>navigateResearchArea('tools','/workspace/tools')}/>}</div>
+        <div id="survey-workspace-reports" role="tabpanel" aria-labelledby="survey-workspace-tab-reports" hidden={workspaceSection!=='reports'}>{panelVisited('reports')&&<SurveyReportStudio key={'reports-'+selected.id} projectId={selected.id} projectStatus={selected.status} active={workspaceSection==='reports'} onLeaveRiskChange={reportRiskChanged}/>}</div>
         <div id="survey-workspace-data" role="tabpanel" aria-labelledby="survey-workspace-tab-data" hidden={workspaceSection!=='data'}>
-          {capabilitiesState==='loading'?<section className="rounded-xl border bg-white p-4" role="status">正在确认研究数据功能…</section>
+          {panelVisited('data')&&(capabilitiesState==='loading'?<section className="rounded-xl border bg-white p-4" role="status">正在确认研究数据功能…</section>
             :capabilitiesState==='error'?<section className="rounded-xl border bg-white p-4" aria-label="研究数据状态"><p role="alert">无法确认研究数据功能，请重试；这不代表功能未开通。</p><button type="button" className="btn-secondary" onClick={()=>void loadCapabilities()}>重试功能状态</button></section>
             :available?.analytics
             ?<SurveyAnalyticsWorkspace actorId={user?.id} key={'analysis-'+selected.id} projectId={selected.id}/>
             :<section className="rounded-xl border bg-white p-4" aria-label="研究数据状态">
               研究数据分析暂未在当前环境启用；项目和研究工具仍可使用。
-            </section>}</div></>}</div></div>
+            </section>)}</div></>}</div></div>
         {toolLibraryVisited&&<div hidden={researchArea!=='tools'}><SurveyToolLibrary visible={researchArea==='tools'} onLeaveRiskChange={toolLibraryRiskChanged}/></div>}
         {materialLibraryVisited&&<div hidden={researchArea!=='media'}><SurveyMaterialLibrary visible={researchArea==='media'} onLeaveRiskChange={materialLibraryRiskChanged}/></div>}
         <SurveyCreateProjectDialog open={creating} busy={busy} title={title} description={description} mode={mode} error={error}

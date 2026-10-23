@@ -70,7 +70,7 @@ beforeEach(()=>{
     if(url===base+'/analytics/quality/attempts?page=1'&&method==='GET')return response({list:[]})
     if(url===base+'/analytics/waves/'+waveId+'/items')return response({waveId,items:[],note:'仅为描述',completedFinals:3,fullCompletionAttempts:2,earlyCompletionAttempts:1,descriptiveScores:[{instrumentKey:'cog',scoreKey:'goMedianRtMs',validN:2,mean:320,sampleSd:20,unit:'ms',qualityCounts:{interpretable:1,limited:1},completionCounts:{COMPLETE:2},provenance:{kind:'COGNITIVE',measurementDigest:'digest-frozen',scoringVersion:'1.0.0',engineVersion:'1.0.0',timingPolicy:'software-frame-v1'}}]})
     if(url===base+'/exports'&&method==='POST')return response(responseTicket)
-    if(url===base+'/exports/'+ticketId+'/download'&&method==='GET')return downloadReply?downloadReply():response(artifact)
+    if(url.startsWith(base+'/exports/'+ticketId+'/download?part=')&&method==='GET'){const part=new URL(url,'http://localhost').searchParams.get('part')!;return downloadReply?downloadReply():response({id:artifact.id,format:artifact.format,[part]:artifact[part as 'csv'|'codebook'|'manifest']})}
     throw new Error('Unexpected request '+method+' '+url)
   }))
 })
@@ -157,15 +157,15 @@ describe('Survey analytics artifact downloads',()=>{
     expect(nextPage).toBeDisabled()
     expect(screen.getByRole('status')).toHaveTextContent('请在浏览器下载列表核对是否保存')
     expect(exportRequests()).toHaveLength(1)
-    expect(requests.filter(r=>r.url.endsWith('/download'))).toEqual([{
-      url:base+'/exports/'+ticketId+'/download',method:'GET',body:undefined,
+    expect(requests.filter(r=>r.url.includes('/download?part='))).toEqual([{
+      url:base+'/exports/'+ticketId+'/download?part=csv',method:'GET',body:undefined,
     }])
     for(const label of ['Codebook','Manifest']){
       fireEvent.click(screen.getByRole('button',{name:'下载 '+label}))
       await screen.findByRole('button',{name:'重新发起 '+label})
     }
     expect(nextPage).toBeEnabled()
-    expect(requests.filter(r=>r.url.endsWith('/download'))).toHaveLength(3)
+    expect(requests.filter(r=>r.url.includes('/download?part='))).toHaveLength(3)
     expect(downloads).toEqual([
       {filename:baseName+'.csv',url:'blob:survey-download-1',attached:true},
       {filename:baseName+'_codebook.json',url:'blob:survey-download-2',attached:true},
@@ -197,7 +197,7 @@ describe('Survey analytics artifact downloads',()=>{
       fireEvent.click(await screen.findByRole('button',{name:'下载 '+label}))
       await screen.findByRole('button',{name:'重新发起 '+label})
     }
-    const readsBefore=requests.filter(r=>r.url.endsWith('/download')).length
+    const readsBefore=requests.filter(r=>r.url.includes('/download?part=')).length
     responseTicket={...ticket,id:'next-export-3333',pageNumber:8,nextCursor:'next-signed-cursor'}
     fireEvent.click(screen.getByRole('button',{name:'生成下一批（请先核对本批文件）'}))
     await screen.findByText(/第 8 批有效 FINAL 已生成/)
@@ -205,7 +205,7 @@ describe('Survey analytics artifact downloads',()=>{
       {format:'RAW_WAVE',waveId,includeFreeText:false},
       {format:'RAW_WAVE',waveId,includeFreeText:false,cursor:'synthetic-next-page'},
     ])
-    expect(requests.filter(r=>r.url.endsWith('/download'))).toHaveLength(readsBefore)
+    expect(requests.filter(r=>r.url.includes('/download?part='))).toHaveLength(readsBefore)
     for(const label of ['CSV','Codebook','Manifest']){
       expect(screen.getByRole('button',{name:'下载 '+label})).toBeEnabled()
       expect(screen.getByText(label+'：尚未发起')).toBeInTheDocument()
@@ -232,7 +232,7 @@ describe('Survey analytics artifact downloads',()=>{
     fireEvent.click(screen.getByRole('button',{name:'下载 Codebook'}))
     await screen.findByRole('button',{name:'重新发起 Codebook'})
     expect(downloads.map(d=>d.filename)).toEqual([baseName+'_codebook.json'])
-    expect(requests.filter(r=>r.url.endsWith('/download'))).toHaveLength(2)
+    expect(requests.filter(r=>r.url.includes('/download?part='))).toHaveLength(2)
     expect(requests.filter(r=>r.method==='POST'&&r.url===base+'/exports')).toHaveLength(1)
     expect(screen.getByRole('button',{name:'生成下一批（请先核对本批文件）'})).toBeDisabled()
   })
@@ -260,7 +260,7 @@ describe('Survey analytics artifact downloads',()=>{
     expect(screen.getByText('CSV：尚未发起')).toBeInTheDocument()
     expect(screen.getByRole('button',{name:'生成下一批（请先核对本批文件）'})).toBeDisabled()
     expect(downloads).toHaveLength(1)
-    expect(requests.filter(r=>r.url.endsWith('/download'))).toHaveLength(1)
+    expect(requests.filter(r=>r.url.includes('/download?part='))).toHaveLength(1)
   })
 
   it('cleans a failed browser launch and allows an explicit original-file retry without false saved status',async()=>{

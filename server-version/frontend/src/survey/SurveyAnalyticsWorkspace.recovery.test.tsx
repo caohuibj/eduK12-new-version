@@ -26,7 +26,7 @@ const artifact=(ticket:Ticket)=>({id:ticket.id,format:ticket.format,csv:'"trial"
   codebook:{variables:[]},manifest:ticket.manifest})
 const posts=()=>requests.filter(r=>r.method==='POST'&&r.url.endsWith('/exports'))
 const last=<T,>(rows:T[])=>rows[rows.length-1]
-const reads=()=>requests.filter(r=>r.url.endsWith('/download'))
+const reads=()=>requests.filter(r=>r.url.includes('/download?part='))
 const card=()=>within(screen.getByRole('region',{name:'当前导出批次'}))
 const click=async(name:string|RegExp)=>{await act(async()=>{fireEvent.click(screen.getByRole('button',{name}))})}
 const tick=async(ms:number)=>{await act(async()=>{vi.advanceTimersByTime(ms)})}
@@ -71,7 +71,7 @@ beforeEach(()=>{
       const ticket=makeTicket(page);ticket.format=String(body?.format);tickets.set(ticket.id,ticket)
       return reply(ticket)
     }
-    if(url.endsWith('/download')){
+    if(url.includes('/download?part=')){
       const segments=url.split('/'),ticket=tickets.get(segments[segments.length-2])!
       readCount++
       return readReply?readReply(ticket):reply(artifact(ticket))
