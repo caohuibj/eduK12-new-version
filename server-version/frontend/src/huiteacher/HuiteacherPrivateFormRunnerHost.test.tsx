@@ -82,6 +82,7 @@ it('scopes local draft status and error colors to education dark appearance with
   const guard=':not([data-cognitive-task-root],[data-cognitive-task-root] *)'
   expect(css).toContain(`${selector}[role=status]${guard}{color:var(--${muted})}`)
   expect(css).toContain(`${selector}[role=alert]${guard}{color:#ffbbaa}`)
+  expect(css).toContain(`:is(.bg-blue-50,.bg-indigo-50,.bg-emerald-100,.bg-green-100)${guard}{background:var(--product-soft);border-color:var(--product-action);color:var(--product-ink)}`)
  }
  const component=readFileSync('src/components/FinalCompositeAssessment.tsx','utf8')
  expect(component).toContain(`role={localSaveStatus.state === 'error' ? 'alert' : 'status'} className="assessment-local-save-status mb-4 text-sm"`)

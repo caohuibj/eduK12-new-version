@@ -38,7 +38,7 @@ export function ParticipantFixture({entry,definition}:{entry:'school'|'teacher';
   <p>仅检查真实参与者组件的显示与交互；没有账号、数据库、请求或正式 FINAL。</p>
   <div className={entry==='teacher'?'ht-task':undefined}>
    <h3>正在完成：合成参与者表单</h3>
-   {complete?<><p role="status">合成表单演示已完成。这不是正式提交，没有产生 FINAL。</p><button type="button" onClick={()=>{setComplete(false);setSection(0);setPosition(0)}}>返回合成表单</button></>:<AssessmentShell title="合成参与者表单" eyebrow="综合测评"
+   {complete?(entry==='school'?<div role="status" className="hs-message"><h3>合成表单演示已完成</h3><p>这不是正式提交，没有产生 FINAL。</p><button type="button" onClick={()=>{setComplete(false);setSection(0);setPosition(0)}}>返回合成表单</button></div>:<><p role="status">合成表单演示已完成。这不是正式提交，没有产生 FINAL。</p><button type="button" onClick={()=>{setComplete(false);setSection(0);setPosition(0)}}>返回合成表单</button></>):<AssessmentShell title="合成参与者表单" eyebrow="综合测评"
     instructions={<div className="space-y-2"><p>当前单元：{page.title}</p><p>合成答案仅保存在本机诊断空间，完成按钮不会提交服务器。</p></div>}
     progress={{kind:'count',completed:section,total:definition.pages.length,label:'综合测评单元进度'}}
     navigation={<section aria-label="提交单元" className="rounded-xl border border-slate-200 bg-white p-4"><p className="mb-2 text-sm font-medium text-slate-600">提交单元</p><div className="flex flex-wrap gap-2">{definition.pages.map((item,i)=><span key={item.pageKey} className={`rounded px-3 py-1 text-sm ${i<section?'bg-green-100 text-green-700':i===section?'bg-blue-700 text-white':'bg-slate-100 text-slate-600'}`}>{i+1}. {item.title}</span>)}</div></section>}>
