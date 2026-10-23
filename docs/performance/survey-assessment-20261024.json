@@ -1,0 +1,336 @@
+{
+  "schema": 1,
+  "synthetic": true,
+  "measurementBaselineMain": "e3ebf626c39f57604362c7e4ce8d6a9d74e29c2f",
+  "integratedMain": "d33b70b14c4788b9d2c8f24914e7eee2458ee4c6",
+  "profile": {
+    "latency_ms": 100,
+    "download_bytes_per_second": 500000,
+    "upload_bytes_per_second": 250000,
+    "cpu_throttle": 4,
+    "survey_transport": "HTTPS with one ephemeral test certificate pinned only in measurement Chromium",
+    "training_transport": "HTTP loopback harness",
+    "settle_after_ready_ms": 700,
+    "resource_sample_interval_ms": 500
+  },
+  "metrics": [
+    {
+      "phase": "participant.cold",
+      "before": {
+        "samples": 2,
+        "readyMs": 1369.4,
+        "jsTransferBytes": 97057,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 1,
+        "rendererTaskSeconds": 0.5079,
+        "jsHeapBytes": 3424418
+      },
+      "after": {
+        "samples": 2,
+        "readyMs": 1233.86,
+        "jsTransferBytes": 89786,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 1,
+        "rendererTaskSeconds": 0.5456,
+        "jsHeapBytes": 3367354
+      }
+    },
+    {
+      "phase": "participant.open",
+      "before": {
+        "samples": 2,
+        "readyMs": 416.68,
+        "jsTransferBytes": 0,
+        "taskResponseDecodedBytes": 20293,
+        "httpRequests": 2,
+        "rendererTaskSeconds": 0.2067,
+        "jsHeapBytes": 4642246
+      },
+      "after": {
+        "samples": 2,
+        "readyMs": 345.32,
+        "jsTransferBytes": 0,
+        "taskResponseDecodedBytes": 5893,
+        "httpRequests": 2,
+        "rendererTaskSeconds": 0.188,
+        "jsHeapBytes": 4391788
+      }
+    },
+    {
+      "phase": "participant.answer60",
+      "before": {
+        "samples": 2,
+        "readyMs": 5058.93,
+        "jsTransferBytes": 0,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 0,
+        "rendererTaskSeconds": 1.839,
+        "jsHeapBytes": 5853432
+      },
+      "after": {
+        "samples": 2,
+        "readyMs": 5100.67,
+        "jsTransferBytes": 0,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 0,
+        "rendererTaskSeconds": 1.8032,
+        "jsHeapBytes": 6620152
+      }
+    },
+    {
+      "phase": "participant.next_tool",
+      "before": {
+        "samples": 2,
+        "readyMs": 67.06,
+        "jsTransferBytes": 0,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 0,
+        "rendererTaskSeconds": 0.0687,
+        "jsHeapBytes": 4031858
+      },
+      "after": {
+        "samples": 2,
+        "readyMs": 62.56,
+        "jsTransferBytes": 0,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 0,
+        "rendererTaskSeconds": 0.051,
+        "jsHeapBytes": 6896298
+      }
+    },
+    {
+      "phase": "participant.reload",
+      "before": {
+        "samples": 2,
+        "readyMs": 597.13,
+        "jsTransferBytes": 887,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 1,
+        "rendererTaskSeconds": 0.2915,
+        "jsHeapBytes": 6927786
+      },
+      "after": {
+        "samples": 2,
+        "readyMs": 584.57,
+        "jsTransferBytes": 887,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 1,
+        "rendererTaskSeconds": 0.3341,
+        "jsHeapBytes": 7249552
+      }
+    },
+    {
+      "phase": "participant.final_feedback",
+      "before": {
+        "samples": 2,
+        "readyMs": 310.58,
+        "jsTransferBytes": 0,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 1,
+        "rendererTaskSeconds": 0.1727,
+        "jsHeapBytes": 8914808
+      },
+      "after": {
+        "samples": 2,
+        "readyMs": 300.29,
+        "jsTransferBytes": 0,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 1,
+        "rendererTaskSeconds": 0.1774,
+        "jsHeapBytes": 8667554
+      }
+    },
+    {
+      "phase": "researcher.project_settings",
+      "before": {
+        "samples": 1,
+        "readyMs": 2903.65,
+        "jsTransferBytes": 292613,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 9,
+        "rendererTaskSeconds": 1.0182,
+        "jsHeapBytes": 6002500
+      },
+      "after": {
+        "samples": 1,
+        "readyMs": 1876.15,
+        "jsTransferBytes": 97104,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 4,
+        "rendererTaskSeconds": 0.7727,
+        "jsHeapBytes": 4053984
+      }
+    },
+    {
+      "phase": "researcher.publish",
+      "before": {
+        "samples": 1,
+        "readyMs": 204.28,
+        "jsTransferBytes": 0,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 0,
+        "rendererTaskSeconds": 0.2478,
+        "jsHeapBytes": 5986912
+      },
+      "after": {
+        "samples": 1,
+        "readyMs": 1450.14,
+        "jsTransferBytes": 161385,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 3,
+        "rendererTaskSeconds": 0.5064,
+        "jsHeapBytes": 5494000
+      }
+    },
+    {
+      "phase": "researcher.reports",
+      "before": {
+        "samples": 1,
+        "readyMs": 109.26,
+        "jsTransferBytes": 0,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 2,
+        "rendererTaskSeconds": 0.1659,
+        "jsHeapBytes": 6752784
+      },
+      "after": {
+        "samples": 1,
+        "readyMs": 299.92,
+        "jsTransferBytes": 8315,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 2,
+        "rendererTaskSeconds": 0.2666,
+        "jsHeapBytes": 5715000
+      }
+    },
+    {
+      "phase": "researcher.data",
+      "before": {
+        "samples": 1,
+        "readyMs": 187.97,
+        "jsTransferBytes": 0,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 0,
+        "rendererTaskSeconds": 0.2105,
+        "jsHeapBytes": 7488120
+      },
+      "after": {
+        "samples": 1,
+        "readyMs": 280.88,
+        "jsTransferBytes": 25925,
+        "taskResponseDecodedBytes": 0,
+        "httpRequests": 2,
+        "rendererTaskSeconds": 0.3781,
+        "jsHeapBytes": 6091536
+      }
+    }
+  ],
+  "exports": {
+    "sameTicketAndUnchangedFileHashes": true,
+    "beforeTotalResponseBytes": 275043,
+    "afterTotalResponseBytes": 91897,
+    "beforeMs": 983.1700000000001,
+    "afterMs": 971.44
+  },
+  "observedResources": {
+    "baseline": {
+      "chromium": {
+        "peakObservedBytes": 901644288,
+        "medianObservedBytes": 851832832,
+        "samples": 63,
+        "note": "Chrome RSS sums shared pages; Docker working set includes accumulated synthetic data and background health checks."
+      },
+      "eduk12-node-20261023-backend-1": {
+        "peakObservedBytes": 295006208,
+        "medianObservedBytes": 290947072,
+        "samples": 63,
+        "note": "Chrome RSS sums shared pages; Docker working set includes accumulated synthetic data and background health checks."
+      },
+      "eduk12-node-20261023-postgres-1": {
+        "peakObservedBytes": 81432576,
+        "medianObservedBytes": 74297344,
+        "samples": 63,
+        "note": "Chrome RSS sums shared pages; Docker working set includes accumulated synthetic data and background health checks."
+      },
+      "eduk12-node-20261023-redis-1": {
+        "peakObservedBytes": 4489216,
+        "medianObservedBytes": 4177920,
+        "samples": 63,
+        "note": "Chrome RSS sums shared pages; Docker working set includes accumulated synthetic data and background health checks."
+      }
+    },
+    "candidate": {
+      "chromium": {
+        "peakObservedBytes": 900452352,
+        "medianObservedBytes": 848134144,
+        "samples": 61,
+        "note": "Chrome RSS sums shared pages; Docker working set includes accumulated synthetic data and background health checks."
+      },
+      "eduk12-node-20261023-backend-1": {
+        "peakObservedBytes": 627191808,
+        "medianObservedBytes": 615661568,
+        "samples": 61,
+        "note": "Chrome RSS sums shared pages; Docker working set includes accumulated synthetic data and background health checks."
+      },
+      "eduk12-node-20261023-postgres-1": {
+        "peakObservedBytes": 77914112,
+        "medianObservedBytes": 73285632,
+        "samples": 61,
+        "note": "Chrome RSS sums shared pages; Docker working set includes accumulated synthetic data and background health checks."
+      },
+      "eduk12-node-20261023-redis-1": {
+        "peakObservedBytes": 5869568,
+        "medianObservedBytes": 4296704,
+        "samples": 61,
+        "note": "Chrome RSS sums shared pages; Docker working set includes accumulated synthetic data and background health checks."
+      }
+    }
+  },
+  "realBrowserExport": {
+    "synthetic": true,
+    "realAPI": true,
+    "freshMFA": true,
+    "errors": [],
+    "files": [
+      {
+        "part": "csv",
+        "bytes": 70377,
+        "sha256": "e370b1ead4df4bf60f45b097ddd0e7a064f68e07c12ffc29242c4b8cb45239b3",
+        "saved": true
+      },
+      {
+        "part": "codebook",
+        "bytes": 66485,
+        "sha256": "65318bce255fc1c5504859c63c1975014425661a42b995272cc01d172873dc3c",
+        "saved": true
+      },
+      {
+        "part": "manifest",
+        "bytes": 3012,
+        "sha256": "89efa44082a91a02eeb93d3b7907aacdd54ee91d088a4187e2bbd4ef2cea03e5",
+        "saved": true
+      }
+    ]
+  },
+  "limits": [
+    "Two independent participant contexts per version, one researcher context per version; bounded synthetic observations, not a concurrency/capacity claim.",
+    "Round-trip timing includes 100ms synthetic network latency; CPU throttle is 4x.",
+    "Two harness-only selector failures were retained separately and excluded from complete journey comparisons.",
+    "Participant answering HTTP requests were zero both before and after; CPU/heap and final submission show no stable general improvement.",
+    "First visits to deferred researcher tabs shift work from initial settings to the requested tab.",
+    "Measurements precede upstream PR344 integration; Survey runtime source files and backend were unchanged upstream. A final artifact is built once for the newly integrated frontend inputs.",
+    "Cognitive and SJT browser administrations are not newly measured in this round; affected component contracts cover their shared public entry behavior.",
+    "No production data, production deployment or heavy load test.",
+    "Candidate dev-backend working set includes a watch-restart/compiler warm-up: about 616 MB during the sample, later Docker idle observation 298.9 MiB. This is not a stable before/after resource comparison or a claim of memory improvement."
+  ],
+  "finalBuild": {
+    "primary": "local",
+    "node": "24.21.0",
+    "vite": "6.4.4",
+    "sourceBeforeDocumentation": "1beb019a53f5b67eab8d01d6585a553d0154e2b0",
+    "mode": "Vite production build, default flags",
+    "exitCode": 0,
+    "builtSeconds": 16.67,
+    "timingClaim": "Performance timings above use the earlier same Survey source; final integrated build is tracked separately."
+  }
+}
