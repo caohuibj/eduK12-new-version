@@ -5,7 +5,7 @@
   "branch": "work/school-teacher-review-20261022",
   "enabled": true,
   "base": "4dd9f1340fef2bc3df2d066b9bf7712bc2eb3c66",
-  "productHead": "6da860545274b41b9d37a894f73ac72a7e62c068",
+  "productHead": "5df52631cec5a76ff92b9f8b5157907eddc219e7",
   "frontendTree": "c1e34b8fdd1a0127a155a208187a8c6bb2f8760f",
   "backendTree": "7d7da5957de21f09dfd89bd097b4dc7c81a88ef3",
   "source": {
@@ -1410,7 +1410,7 @@
   "review": {
     "completed": true,
     "originalExecutionSigned": false,
-    "note": "No local historical execution is admitted. Fixed official frontend checks and immutable frontend/backend artifacts retain original producer identities. The fifth failed connected job supplies independently reverified 105 passed cases and nonempty upgrade preservation; the sixth failed connected job supplies five passed cases. No business test is repeated. The exact noncompiled runtime policy repair is normalized only for compiled-artifact reuse; current seed, role and restore checks use the new policy. Fresh schema, seed, font and narrowly authorized temporary permission preparation remain environment setup, not browser acceptance. Browser and restore remain required real execution. Eighth successful SAST authenticates prior application/control evidence; only the exact changed policy, seed, receipt and control paths are newly scanned. No prior failure is relabeled as a successful job."
+    "note": "No local historical execution is admitted. Fixed official frontend checks and immutable frontend/backend artifacts retain original producer identities. The fifth failed connected job supplies independently reverified 105 passed cases and nonempty upgrade preservation; the sixth failed connected job supplies five passed cases. No business test is repeated. The exact noncompiled runtime policy repair is normalized only for compiled-artifact reuse; current seed, role and restore checks use the new policy. Fresh schema, seed, font and narrowly authorized temporary permission preparation remain environment setup, not browser acceptance. Browser and restore remain required real execution. Eighth successful SAST authenticates prior application/control evidence; only the exact changed policy, seed, receipt, browser/font harness and control paths are newly scanned. The font inspector is initialized before navigation and reuses its CDP session; all console and rendered-font assertions remain strict. Cleanup failures cannot produce passing restore evidence. No prior failure is relabeled as a successful job."
   },
   "requiredJobs": [
     "admission",
