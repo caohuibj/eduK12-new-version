@@ -80,8 +80,13 @@ jobs:
       - name: check affected cognitive TypeScript for the first time
         working-directory: server-version/frontend
         run: node node_modules/typescript/bin/tsc -p tsconfig.cognitive.json --noEmit
-      - name: execute only affected runner media and persistence assertions
-        run: node .github/scripts/training-assessment-checks.mjs frontend
+      - name: lint only the two changed frontend inputs
+        working-directory: server-version/frontend
+        run: node node_modules/eslint/bin/eslint.js src/modules/cognitive/core/useRunnerPreparation.ts src/modules/assessment-media/__tests__/media-2.adapter.test.tsx
+      - name: reuse unchanged passed cases and execute only affected or previously failed assertions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/training-assessment-reuse.mjs frontend-cases
       - uses: actions/upload-artifact@v4
         if: always()
         with:

@@ -1,21 +1,21 @@
 {
   "schema": 1,
   "base": "54ed73fdbef60b3b8d4998984c624c98c6bc99cb",
-  "product": "a4a7ddf0ead89c1fcc6474797c3d4a8b1a4bcad0",
+  "product": "bba59b4ae55735bb9134986c57e9685773cf3ced",
   "source": {
     "docs/performance/training-assessment-20261023.json": {
       "status": "A",
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "d908fc5a72bf1063d4ddb2d09c0dbba9fcee9555"
+      "after": "d9e3f94f82ebb20e2f7dab182badb7b91edd9a8c"
     },
     "docs/performance/training-assessment-20261023.md": {
       "status": "A",
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "f2b04ec7c402d519b774113ec5628888b2d3dd84"
+      "after": "767f150e4fd9302e6e5acd6a86447a97c9bf9a54"
     },
     "server-version/backend/src/__tests__/questionnaire/scale-resources.test.ts": {
       "status": "A",
@@ -113,7 +113,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "ce24a47c70291d443ca6f5c7dff2f2623a3d977b",
-      "after": "9be955c3edc9bfffc4294d7f743a03d0451c116c"
+      "after": "30547ebbf29ece52725a8c77158c03c06b3ed07d"
     },
     "server-version/frontend/src/modules/assessment-media/deferred-media.tsx": {
       "status": "A",
@@ -176,7 +176,7 @@
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "593a40838d16b78fdb76813736ec72a34d349b18"
+      "after": "3153a9d8bd3dc4801cb802da8a61c1dd486ea353"
     },
     "server-version/frontend/src/modules/cognitive/pages/CognitiveRunner.tsx": {
       "status": "M",
@@ -425,6 +425,8 @@
     }
   },
   "controls": [
+    ".github/scripts/training-assessment-native-idb.js",
+    ".github/evidence/training-assessment/native-idb.json",
     ".github/scripts/training-assessment-reuse.mjs",
     ".github/scripts/training-assessment-reuse.test.mjs",
     ".github/scripts/training-assessment-scope.mjs",
@@ -445,7 +447,7 @@
     "docs/release/README.md": "e788796cfdaa6c9208c3df51f87cec8c3769785a"
   },
   "components": {
-    "frontend": "e96569b562d37d2d697bc8c238a60d4b1bcdd9e7",
+    "frontend": "6d624c2386f96b881cf0d1060656940a5f68b4af",
     "backend": "6ef1ba477c85aaeb40bbe7ad02b38e6df5cdd66a"
   },
   "protectedInputs": {
@@ -471,8 +473,9 @@
     "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22",
     "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
   },
-  "buildEvidenceSHA256": "ffd89f590c33356021ea274feb7580036f42ed6988d18bd6da51c5be75bd8026",
+  "buildEvidenceSHA256": "b99984e8b8365f22fe06469dc22255a78dac2033be975eb5a5397f0e1d1aaea0",
   "frontendBuildInputCount": 1061,
+  "nativeIdbSHA256": "ee4eedcb1535f2339d62a74b286a136a40eab519811a3505360843aa1de4a553",
   "checks": {
     "primary": "GitHub Actions; none of these tests/types/lint/backend-emitting compilation ran locally in this round",
     "frontendTestFiles": [

@@ -1183,3 +1183,16 @@ source trees, original configuration and successful init/analyze steps; only the
 three new/changed qualification-control JavaScript files are then scanned anew.
 Types and the previously unexecuted affected assertions must still actually pass.
 No missing, failed or expired evidence triggers a full-check fallback.
+
+Run `39977819707` retains 230 actually passed frontend Node assertions, three
+failed assertions and three native-IDB-only jsdom skips. Successful assertions
+are reused only when the complete relative import closure, source blobs, locked
+tools, shared setup and configuration still match; affected/failed assertions run
+once in the follow-up. A native Chromium check ports the three abort/quota/commit
+assertions and adds two new answer/timing/seal assertions, all actually passed.
+The unsigned local record binds the store, original tests and retained harness;
+it is not relabeled as CI execution and does not turn the original skips green.
+Current qualification requires the complete 233 Node-assertion union plus those
+explicit native checks. Only the two affected application files and changed
+qualification controls receive fresh CodeQL; other inputs retain the original
+actual application scan. The failed history is preserved without a full rerun.
