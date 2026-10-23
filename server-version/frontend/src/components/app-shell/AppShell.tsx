@@ -40,6 +40,7 @@ import '../../training/training-account.css'
 import '../../training/training-workspace-header.css'
 import '../../training/training-appearance.css'
 import '../../survey/survey-admin-shell.css'
+import SurveyAdminShell from '../../survey/SurveyAdminShell'
 
 function AppShellContent({ children }: { children: ReactNode }) {
   const { user, logout } = useAuth()
@@ -54,6 +55,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
   // navigation capabilities and server permissions remain authoritative.
   const surveyAdmin=(hasAdminEntry(user,'SURVEY')||user?.platformRole==='SYSTEM_ADMIN')&&Boolean(origins)&&(location.pathname===SURVEY_ADMIN_PATH||
     (location.pathname==='/admin/scale-library-governance'&&new URLSearchParams(location.search).get('workspace')==='survey'))
+  const surveyAdminEntry=Boolean(origins)&&['/admin/login','/admin/security/enroll'].includes(location.pathname)&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH
   const adminWorkspace=isAdminWorkspacePath(location.pathname)
   const trainingAdmin = user?.role === 'ADMIN' && (location.pathname === '/admin/training' || new URLSearchParams(location.search).get('workspace') === 'training')
   const organizationProductRoute=location.pathname==='/organizations'||location.pathname.startsWith('/organizations/')||(location.pathname==='/organization-tasks'||location.pathname==='/my-assessments')
@@ -94,7 +96,17 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const [openPath,setOpenPath]=useState<string|null>(null),[loggingOut,setLoggingOut]=useState(false),menuOpen=openPath===location.pathname
   const onNavigate=(path:string)=>{setOpenPath(null);if(path===location.pathname)mainRef.current?.focus()}
   useEffect(()=>{if(training||organizationError||!user||mode!=='standard'||activeOrganization||organizationLoading||organizations.length!==1)return;void selectOrganization(organizations[0].id)},[training,user,mode,activeOrganization,organizationLoading,organizations,selectOrganization,organizationError])
-  useEffect(()=>{if(mode==='display')return;document.title=`${title==='Huisurvey'?'':`${title} · `}${training&&!surveyAdmin?'Huitraining':'Huisurvey'}`;if(previousPath.current!==location.pathname&&mode!=='focused')mainRef.current?.focus();previousPath.current=location.pathname},[location.pathname,title,mode,training,surveyAdmin])
+  useEffect(()=>{
+    if(mode==='display')return
+    const surveyBrand=surveyAdmin||surveyAdminEntry
+    document.title=surveyBrand?'Research':`${title==='Huisurvey'?'':`${title} · `}${training?'Huitraining':'Huisurvey'}`
+    const icon=document.head.querySelector<HTMLLinkElement>('link[rel="icon"]')
+    if(surveyBrand)icon?.setAttribute('href','/survey/huisurvey-w2-emblem.svg')
+    else if(icon?.getAttribute('href')==='/survey/huisurvey-w2-emblem.svg')icon.setAttribute('href','/vite.svg')
+    if(previousPath.current!==location.pathname&&mode!=='focused')mainRef.current?.focus()
+    previousPath.current=location.pathname
+  },[location.pathname,title,mode,training,surveyAdmin,surveyAdminEntry])
+  if(surveyAdmin&&user)return <SurveyAdminShell username={user.nickname||user.username} loggingOut={loggingOut} onLogout={async()=>{setLoggingOut(true);try{await logout()}finally{setLoggingOut(false)}}}>{children}</SurveyAdminShell>
   if(mode==='display')return <>{children}</>
   return <div className={`hui-app hui-app--${mode}${roleClass}${staffMode?' hui-app--staff':''}${assessmentSurfaceClass}${reportSurfaceClass}${studentSubmitClass}${entryMode?' hui-app--entry':''}${training&&!surveyAdmin?' hui-training':''}${surveyAdmin?' hui-survey-admin-shell':''}${trainingAssessmentVisual?' training-assessment-visual':''}${trainingWorkspace?' training-workspace-shell':''}${teacherVisual?' training-teacher-visual':''}`} data-shell-mode={mode} data-training-theme={training && !surveyAdmin ? appearance.theme : undefined}>
     <div className="hui-product"><a className="hui-skip" href="#hui-main" onClick={()=>mainRef.current?.focus()}>跳到主要内容</a></div>
@@ -125,8 +137,9 @@ export default function AppShell({children}:{children:ReactNode}) {
   // irrelevant discovery. Host context changes presentation, not API authority.
   const requiresOrganization = /^\/(organizations(?:\/|$)|organization-tasks(?:\/|$)|my-assessments(?:\/|$)|organization-invitations(?:\/|$))/.test(pathname)
   const requiresRelational = /^\/(relational(?:\/|$)|parent(?:\/|$)|student\/parent-links(?:\/|$))/.test(pathname)
-  return <AccountViewProvider view={accountView(pathname,search)}><TrainingAppearanceProvider><OrganizationProvider suspended={training && !requiresOrganization}>
-    <RelationalAvailabilityProvider suspended={training && !requiresRelational}>
+  const surveyManagement=pathname===SURVEY_ADMIN_PATH||(pathname==='/admin/scale-library-governance'&&new URLSearchParams(search).get('workspace')==='survey')
+  return <AccountViewProvider view={accountView(pathname,search)}><TrainingAppearanceProvider><OrganizationProvider suspended={surveyManagement||(training && !requiresOrganization)}>
+    <RelationalAvailabilityProvider suspended={surveyManagement||(training && !requiresRelational)}>
       <AppShellContent>{children}</AppShellContent>
     </RelationalAvailabilityProvider>
   </OrganizationProvider></TrainingAppearanceProvider></AccountViewProvider>

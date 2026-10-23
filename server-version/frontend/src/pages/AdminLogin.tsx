@@ -1,6 +1,9 @@
 import SurveyAdminOrigin from '../components/app-shell/SurveyAdminOrigin'
 import { productOrigins, SURVEY_ADMIN_PATH } from '../products/origins'
-import { SurveyBrand } from '../survey/SurveyBrand'
+import SurveyAdminEntryShell from '../survey/SurveyAdminEntryShell'
+import { SurveyAdminAppearance } from '../survey/SurveyAdminAppearance'
+import { useSurveyAppearance } from '../survey/SurveyAppearance'
+import { surveyAppearanceHref } from '../survey/survey-appearance-links'
 import '../survey/survey-admin-auth.css'
 import LoginRecoveryNotice from '../components/app-shell/LoginRecoveryNotice'
 import AuthShell from '../components/auth/AuthShell'
@@ -17,12 +20,14 @@ const AdminLogin: React.FC = () => {
   const navigate = useNavigate()
   const location = useLocation()
   const { login } = useAuth()
+  const { mode } = useSurveyAppearance()
   const origins=productOrigins()
   const surveyEntry=Boolean(origins&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH)
   const trainingEntry=new URLSearchParams(location.search).get('returnTo')==='/admin/training'
   const homeOrigin=new URL(origins?.admin??window.location.origin)
   if(import.meta.env.DEV&&['localhost','127.0.0.1'].includes(homeOrigin.hostname))homeOrigin.hostname='training.localhost'
   const trainingHome=homeOrigin.origin+'/'
+  const Shell = surveyEntry ? SurveyAdminEntryShell : AuthShell
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [method, setMethod] = useState<'TOTP' | 'SECURITY_KEY'>('TOTP')
@@ -49,26 +54,18 @@ const AdminLogin: React.FC = () => {
   }
 
   return (
-    <AuthShell tone="admin" title={trainingEntry?'培训管理员登录':'管理员登录'} description={trainingEntry?'账号审核、课程监管与资源授权，从这里开始。':surveyEntry?'Survey · 研究者资格、邀请与工具授权':'密码与 Authenticator 动态码验证，按入口授权管理'}
+    <Shell tone="admin" title={trainingEntry?'培训管理员登录':'管理员登录'} description={trainingEntry?'账号审核、课程监管与资源授权，从这里开始。':surveyEntry?'Survey · 研究者资格、邀请与工具授权':'密码与 Authenticator 动态码验证，按入口授权管理'}
       {...(trainingEntry?{
         brand:<a className="hui-auth-brand" href={trainingHome} aria-label="Training 首页"><TrainingBrand /></a>,
         className:'training-admin-auth',backTo:trainingHome,backLabel:'返回 Training 首页',
         heroTitle:'培训有序，\n管理有据。',heroDescription:'在独立的培训管理空间，连接账号、课程与资源，让教与学各得其所。',
         heroBullets:['培训师审核与账号管理','培训课程监管与查询','教学素材与测评资源授权'],
         heroLabel:'Training 培训管理介绍',tagline:'仅限已获 Training 管理授权的账号',
-      }:{})}
-      {...(surveyEntry&&origins?{
-        brand:<SurveyBrand href={origins.survey+'/'}/>,className:'survey-admin-auth',
-        backTo:origins.survey+'/',backLabel:'返回 Survey 首页',
-        heroTitle:'让研究有序开展，边界清晰可见。',
-        heroDescription:'为研究者开通独立身份，核对工具的精确授权版本，让研究从清晰的起点开始。',
-        heroBullets:['研究者资格与安全恢复','一次性邀请与受控交付','工具对象与精确版本授权'],
-        tagline:'观风知微 · 心理与教育测量研究平台',
       }:{})}>
-      <div className="hui-auth-note mt-0 mb-5">
+      {!surveyEntry&&<div className="hui-auth-note mt-0 mb-5">
         <strong>{trainingEntry?'Training 管理身份':'管理员身份'}</strong>
         <div>{trainingEntry?'使用已获培训管理授权的账号、密码与手机验证器动态码登录。系统治理和其他产品管理分别授权。':'使用密码与手机验证器的六位动态码登录。微软 Authenticator 等兼容验证器均可使用；每个入口分别授权。'}</div>
-      </div>
+      </div>}
 
       <LoginRecoveryNotice />
       {error && (
@@ -111,14 +108,15 @@ const AdminLogin: React.FC = () => {
         </div>
 
         <label className="block">验证方式
-          <select className="input" value={method} disabled={loading} onChange={e=>{setMethod(e.target.value as typeof method);setCode('');setError('')}}>
-            <option value="TOTP">Authenticator 动态码</option><option value="SECURITY_KEY">已登记的安全密钥</option>
+          <select className="input" value={method} disabled={loading} aria-describedby={method==='SECURITY_KEY'?'admin-security-key-help':undefined} onChange={e=>{setMethod(e.target.value as typeof method);setCode('');setError('')}}>
+            <option value="TOTP">Authenticator 动态码</option><option value="SECURITY_KEY">已绑定的硬件安全密钥</option>
           </select>
         </label>
         {method==='TOTP'&&<label className="block" htmlFor="admin-totp-code">Authenticator 六位动态码
           <input id="admin-totp-code" className="input" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6}
             value={code} required disabled={loading} onChange={e=>setCode(e.target.value.replace(/\D/g,''))}/>
         </label>}
+        {method==='SECURITY_KEY'&&<p id="admin-security-key-help" className="survey-admin-key-note">连接已绑定的实体安全密钥，按提示输入密钥 PIN 或验证指纹。没有密钥时，可选 Authenticator 动态码。</p>}
 
         <button
           type="submit"
@@ -135,8 +133,10 @@ const AdminLogin: React.FC = () => {
           )}
         </button>
       </form>
-      <p className="mt-4"><Link to={trainingEntry?'/admin/security/enroll?returnTo=%2Fadmin%2Ftraining':surveyEntry?'/admin/security/enroll?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH):'/admin/security/enroll'}>首次绑定 Authenticator</Link></p>
-    </AuthShell>
+      {surveyEntry?<div className="survey-admin-auth-tools">
+        <Link to={surveyAppearanceHref('/admin/security/enroll?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH),mode)}>首次绑定 Authenticator</Link>
+      </div>:<p className="mt-4"><Link to={trainingEntry?'/admin/security/enroll?returnTo=%2Fadmin%2Ftraining':'/admin/security/enroll'}>首次绑定 Authenticator</Link></p>}
+    </Shell>
   )
 }
 
@@ -144,6 +144,6 @@ export default function AdminLoginEntry() {
   // Only known product aliases require canonicalization; other legacy admin entries retain their routes.
   const origins = productOrigins()
   return origins && origins.admin !== window.location.origin
-    ? <SurveyAdminOrigin login><AdminLogin /></SurveyAdminOrigin>
-    : <AdminLogin />
+    ? <SurveyAdminOrigin login><SurveyAdminAppearance><AdminLogin /></SurveyAdminAppearance></SurveyAdminOrigin>
+    : <SurveyAdminAppearance><AdminLogin /></SurveyAdminAppearance>
 }

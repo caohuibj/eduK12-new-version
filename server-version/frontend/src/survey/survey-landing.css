@@ -198,8 +198,18 @@
 
 /* Only the three non-timed entry states opt into this container. These rules
    never match the workspace, MFA or a participant/timed-task ancestor. */
-.survey-entry { min-height: 100svh; }
+.survey-entry {
+  --survey-entry-art:url('/survey/research-wind-light.webp');
+  --survey-entry-wash:#f3f8fb24;
+  min-height:100svh; display:flex; flex-direction:column;
+  background-image:linear-gradient(var(--survey-entry-wash),var(--survey-entry-wash)),var(--survey-entry-art);
+  background-size:cover; background-position:center top; background-repeat:no-repeat;
+}
+[data-survey-theme=dark] .survey-entry {
+  --survey-entry-art:url('/survey/research-wind-dark.webp'); --survey-entry-wash:#0e182124;
+}
 .survey-entry > header { background: var(--survey-page); border-color: var(--survey-line); }
+.survey-entry > .survey-entry-public-header { flex-shrink:0; background:transparent; border:0; }
 .survey-entry-header {
   display: flex;
   align-items: center;
@@ -209,9 +219,11 @@
   margin: 0 auto;
   padding: 24px 32px;
 }
-.survey-entry-main { max-width: 560px; margin: 0 auto; padding: 40px 24px 64px; }
-.survey-entry-panel { background: var(--survey-ui-surface, #fff); border: 1px solid var(--survey-line); border-radius: 14px; padding: 32px; }
+.survey-entry-main { flex:1; display:flex; flex-direction:column; justify-content:center; width:100%; max-width:560px; margin:0 auto; padding:24px; }
+.survey-entry-panel { background:var(--survey-ui-glass,#fbfdfff0); border:1px solid var(--survey-line); border-radius:14px; padding:28px; backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px); }
 .survey-entry-panel h1 { margin: 0 0 16px; color: var(--survey-ink); font-size: 28px; line-height: 1.4; font-weight: 600; }
+.survey-entry-heading { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; margin-bottom:12px; }
+.survey-entry-heading h1,.survey-entry-heading h2 { margin:0; }
 .survey-entry-intro { margin: 0 0 24px; color: var(--survey-body); }
 .survey-entry .survey-back { margin-bottom: 16px; }
 .survey-entry label { margin: 0 0 20px; font-size: 16px; line-height: 1.65; }
@@ -226,6 +238,24 @@
 .survey-entry :where(a, button, input):focus-visible { outline: 3px solid var(--survey-focus); outline-offset: 3px; }
 .survey-entry-main > [role='alert'], .survey-entry-main > [role='status'] { margin: 0 0 16px; padding: 16px; border-radius: 8px; font-size: 16px; }
 .survey-entry-main > [role='alert'] { color: var(--survey-ui-danger, #9f2635); border-color: var(--survey-ui-danger-line, #9f2635); }
+
+@media (min-width:1024px) {
+  .survey-entry .survey-entry-main { max-width:520px; padding:12px 24px 20px; }
+  .survey-entry .survey-entry-panel { padding:22px 26px; }
+  .survey-entry-panel h1 { font-size:26px; }
+  .survey-entry-heading { margin-bottom:10px; }
+  .survey-entry .survey-back { margin-bottom:6px; }
+  .survey-entry .survey-entry-intro { margin-bottom:14px; font-size:14px; line-height:1.6; }
+  .survey-entry label { margin-bottom:12px; font-size:14px; }
+  .survey-entry .input { margin-top:5px; }
+  .survey-entry .survey-entry-help { margin-top:12px; font-size:13px; line-height:1.6; }
+  .survey-entry .survey-entry-admin { margin-top:12px; padding-top:8px; font-size:13px; }
+}
+
+@media (max-width:700px) {
+  .survey-entry { --survey-entry-art:url('/survey/research-wind-light-small.webp'); }
+  [data-survey-theme=dark] .survey-entry { --survey-entry-art:url('/survey/research-wind-dark-small.webp'); }
+}
 
 @media (max-width: 1000px) {
   .survey-landing-header { padding: 32px 7%; }

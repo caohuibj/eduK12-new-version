@@ -12,9 +12,28 @@ function choose(label: string) {
   }
   expect(root()).toHaveAttribute('data-survey-appearance', modes[label])
 }
-beforeEach(() => { localStorage.clear(); vi.useFakeTimers(); vi.setSystemTime(new Date(2026, 9, 23, 12)) })
+beforeEach(() => { window.history.replaceState(null,'','/'); localStorage.clear(); vi.useFakeTimers(); vi.setSystemTime(new Date(2026, 9, 23, 12)) })
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks() })
 describe('Survey personal day/night appearance', () => {
+  it('adopts the linked appearance once while retaining the auth return target and fragment', () => {
+    localStorage.setItem('survey.appearance','light')
+    window.history.replaceState(null,'','/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers&appearance=dark#keep')
+    setup()
+    expect(root()).toHaveAttribute('data-survey-theme','dark')
+    expect(localStorage.getItem('survey.appearance')).toBe('dark')
+    expect(window.location.search).toBe('?returnTo=%2Fadmin%2Fsurvey-researchers')
+    expect(window.location.hash).toBe('#keep')
+    choose('浅色')
+    cleanup(); setup()
+    expect(root()).toHaveAttribute('data-survey-theme','light')
+  })
+  it('ignores an unknown linked appearance and retains the saved preference', () => {
+    localStorage.setItem('survey.appearance','dark')
+    window.history.replaceState(null,'','/?appearance=unknown')
+    setup()
+    expect(root()).toHaveAttribute('data-survey-theme','dark')
+    expect(window.location.search).toBe('?appearance=unknown')
+  })
   it.each([[6,59,'dark'],[7,0,'light'],[18,59,'light'],[19,0,'dark'],[0,0,'dark']] as const)('uses local clock at %s:%s', (hour, minute, theme) => {
     expect(surveyDaylight(new Date(2026, 9, 23, hour, minute))).toBe(theme)
   })

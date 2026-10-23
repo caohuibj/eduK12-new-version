@@ -63,7 +63,8 @@ describe('S05 administrator workspace',()=>{
   })
   it('retains verification input, selected object and type while keyboard sections add no requests',async()=>{
     const user=userEvent.setup(),{fetcher}=mount();await ready()
-    expect(screen.getByRole('link',{name:'返回 Survey 入口'})).toHaveAttribute('href','http://survey.localhost:5197/')
+    expect(document.querySelector('.survey-admin-security')).not.toHaveAttribute('open')
+    expect(screen.queryByRole('button',{name:'邀请研究者'})).toBeNull()
     fireEvent.change(password(),{target:{value:'synthetic-password'}})
     fireEvent.click(tab('工具授权'))
     fireEvent.change(screen.getByLabelText('授权给研究者'),{target:{value:'r0'}})
