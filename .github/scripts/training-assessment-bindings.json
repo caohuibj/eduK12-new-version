@@ -473,7 +473,7 @@
     "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22",
     "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
   },
-  "buildEvidenceSHA256": "b99984e8b8365f22fe06469dc22255a78dac2033be975eb5a5397f0e1d1aaea0",
+  "buildEvidenceSHA256": "3f8b887d9b1bc7c51b0fdc0f6755612d8e3daf5f1ec10489ae4789e969e7b89f",
   "frontendBuildInputCount": 1061,
   "nativeIdbSHA256": "ee4eedcb1535f2339d62a74b286a136a40eab519811a3505360843aa1de4a553",
   "checks": {

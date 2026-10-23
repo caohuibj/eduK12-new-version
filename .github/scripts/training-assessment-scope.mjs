@@ -13,7 +13,7 @@ export function trainingAssessmentPlan(entries,base,head,read=git,env=process.en
  assert.notEqual(env.CI_FORCE_FULL,'true','No full-platform fallback');assert.notEqual(env.CI_FULL_ACCEPTANCE,'true','No full acceptance');
  assert.equal(base,binding.base,'Frozen main changed');assert.match(head,/^[a-f0-9]{40}$/);
  assert.equal(binding.base,'54ed73fdbef60b3b8d4998984c624c98c6bc99cb');
- assert.equal(binding.product,'a4a7ddf0ead89c1fcc6474797c3d4a8b1a4bcad0');
+ assert.equal(binding.product,'bba59b4ae55735bb9134986c57e9685773cf3ced');
  if(env.CI_EVENT==='pull_request'){
   assert.equal(ref,branch);assert.equal(env.CI_PR_REPOSITORY||env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');
   assert.match(String(env.CI_PR_NUMBER),/^[1-9][0-9]*$/,'Actual PR number required');assert.match(env.CI_SOURCE_HEAD||'',/^[a-f0-9]{40}$/);
