@@ -1,4 +1,4 @@
-/* Pure tests only: in-memory files, injected subprocess/registry and fake DOM.
+/* Pure tests only: in-memory files, injected subprocess/public API and fake DOM.
  * No browser, app, database, package query, process or filesystem write occurs.
  * Prepared only; run separately when the exact candidate is authorized.
  */
@@ -13,7 +13,7 @@ const { CHROME_BINARY, CHROME_SANDBOX, CHROME_LAUNCH_OPTIONS, parseChromePackage
 const SECRET = 'synthetic-secret-that-must-never-be-serialized'
 const repo = '/synthetic/repo'
 const tools = path.join(repo, '.github/release-tools'), base = path.join(tools, 'node_modules/playwright-core')
-const registryFile = path.join(base, 'lib/server/registry/index.js')
+const apiFile = path.join(base, 'index.js')
 const packageOutput = 'google-chrome-stable\tinstall ok installed\tamd64\t123.4.5678.90-1\n'
 const versionOutput = 'Google Chrome 123.4.5678.90\n'
 const sandboxText = (layer = 'Namespace', pid = 'Yes', seccomp = 'Yes') =>
@@ -29,13 +29,13 @@ function fixture() {
       '': { dependencies: { 'playwright-core': '1.2.3' } },
       'node_modules/playwright-core': { version: '1.2.3', integrity: 'sha512-' + 'a'.repeat(86) + '==' },
     } })],
-    [path.join(base, 'package.json'), JSON.stringify({ name: 'playwright-core', version: '1.2.3' })],
-    [registryFile, '// synthetic registry source'],
+    [path.join(base, 'package.json'), JSON.stringify({ name: 'playwright-core', version: '1.2.3', exports: { '.': { require: './index.js' } } })],
+    [apiFile, '// synthetic public API source'],
   ])
   const stats = new Map(['/opt', '/opt/google', '/opt/google/chrome'].map(name => [name, directoryStat()]))
-  for (const file of [CHROME_BINARY, CHROME_SANDBOX, registryFile]) stats.set(file, fileStat())
+  for (const file of [CHROME_BINARY, CHROME_SANDBOX, apiFile]) stats.set(file, fileStat())
   const calls = [], realpaths = new Map()
-  const state = { packageOutput, versionOutput, channelPath: CHROME_BINARY, registryLoads: 0, commands: [] }
+  const state = { packageOutput, versionOutput, apiBrowserName: 'chromium', apiLoads: 0, commands: [] }
   const deps = {
     process: { platform: 'linux', arch: 'x64', getuid: () => 1001, geteuid: () => 1001 },
     fs: {
@@ -59,19 +59,16 @@ function fixture() {
       assert.equal(file, CHROME_BINARY); assert.deepEqual(args, ['--version'])
       return { status: 0, stdout: state.versionOutput }
     },
-    loadRegistry: file => {
-      assert.equal(file, registryFile); state.registryLoads++
-      return { findExecutable: name => {
-        assert.equal(name, 'chrome')
-        return { name: 'chrome', browserName: 'chromium', executablePath: () => state.channelPath }
-      } }
+    loadPlaywright: directory => {
+      assert.equal(directory, base); state.apiLoads++
+      return { chromium: { name: () => state.apiBrowserName, launch: () => { assert.fail('Pure preflight must never launch') } } }
     },
   }
   return { files, stats, calls, realpaths, state, deps, run: (env = { UNRELATED_SECRET: SECRET }) => preflightChrome({ repo, env, deps }) }
 }
 
 test('launch options are immutable, sandboxed Chrome with no flags or fallback', () => {
-  assert.deepEqual(CHROME_LAUNCH_OPTIONS, { channel: 'chrome', headless: true, chromiumSandbox: true })
+  assert.deepEqual(CHROME_LAUNCH_OPTIONS, { executablePath: CHROME_BINARY, headless: true, chromiumSandbox: true })
   assert.equal(Object.isFrozen(CHROME_LAUNCH_OPTIONS), true)
   assert.throws(() => { CHROME_LAUNCH_OPTIONS.chromiumSandbox = false }, TypeError)
 })
@@ -105,13 +102,13 @@ test('regular executable metadata rejects symlinks, nonroot ownership and writab
   assert.equal(trustedExecutable(fileStat({ mode: 0o104755 })), true)
 })
 
-test('preflight uses installed package, exact owned files and installed locked channel registry only', () => {
+test('preflight uses installed package, exact owned files and public API without private registry', () => {
   const f = fixture(), result = f.run()
   assert.equal(result.ok, true); assert.equal(result.code, 'CHROME_PREFLIGHT_READY')
   assert.equal(result.acceptance, false); assert.equal(result.browserLaunched, false)
   assert.equal(result.playwright.version, '1.2.3'); assert.equal(result.playwright.executablePath, CHROME_BINARY)
-  assert.match(result.playwright.registrySha256, /^[a-f0-9]{64}$/)
-  assert.equal(f.state.registryLoads, 1)
+  assert.match(result.playwright.publicApiSha256, /^[a-f0-9]{64}$/)
+  assert.equal(f.state.apiLoads, 1)
   assert.deepEqual(f.calls.map(call => [call.file, call.args[0]]), [
     ['/usr/bin/dpkg-query', '-W'], ['/usr/bin/dpkg-query', '-S'], ['/usr/bin/dpkg-query', '-S'], [CHROME_BINARY, '--version'],
   ])
@@ -132,7 +129,7 @@ test('sandbox helper installed mode is observed, not rewritten or forced to setu
 test('unsupported platform, root or environment overrides stop before any external read', () => {
   for (const facts of [{ platform: 'darwin' }, { arch: 'arm64' }, { getuid: () => 0 }, { geteuid: () => 0 }, { geteuid: undefined }]) {
     const f = fixture(); Object.assign(f.deps.process, facts)
-    assert.equal(f.run().ok, false); assert.equal(f.calls.length, 0); assert.equal(f.state.registryLoads, 0)
+    assert.equal(f.run().ok, false); assert.equal(f.calls.length, 0); assert.equal(f.state.apiLoads, 0)
   }
   for (const key of ['CHROME_DEVEL_SANDBOX', 'LD_PRELOAD', 'LD_LIBRARY_PATH', 'NODE_OPTIONS', 'NODE_PATH']) {
     const f = fixture(), result = f.run({ [key]: SECRET })
@@ -150,9 +147,14 @@ test('bad package/version/ownership, untrusted files or path drift fail closed w
     ['CHROME_SANDBOX_FILE_UNTRUSTED', f => { f.stats.set(CHROME_SANDBOX, fileStat({ uid: 1001 })) }],
     ['CHROME_FILE_UNTRUSTED', f => { f.realpaths.set('/opt/google', '/tmp/' + SECRET) }],
     ['CHROME_FILE_UNTRUSTED', f => { f.realpaths.set(CHROME_BINARY, '/tmp/' + SECRET) }],
-    ['CHROME_CHANNEL_PATH_MISMATCH', f => { f.state.channelPath = '/tmp/' + SECRET }],
-    ['CHROME_CHANNEL_REGISTRY_UNAVAILABLE', f => { f.realpaths.set(registryFile, '/tmp/' + SECRET) }],
-    ['CHROME_CHANNEL_REGISTRY_UNAVAILABLE', f => { f.deps.loadRegistry = () => { throw new Error(SECRET) } }],
+    ['CHROME_PLAYWRIGHT_API_UNAVAILABLE', f => { f.state.apiBrowserName = 'firefox' }],
+    ['CHROME_PLAYWRIGHT_API_UNAVAILABLE', f => { f.realpaths.set(apiFile, '/tmp/' + SECRET) }],
+    ['CHROME_PLAYWRIGHT_API_UNAVAILABLE', f => { f.files.delete(apiFile) }],
+    ['CHROME_PLAYWRIGHT_API_UNAVAILABLE', f => { f.files.set(path.join(base, 'package.json'), JSON.stringify({ name: 'playwright-core', version: '1.2.3' })) }],
+    ['CHROME_PLAYWRIGHT_API_UNAVAILABLE', f => { f.stats.set(apiFile, fileStat({ isSymbolicLink: () => true })) }],
+    ['CHROME_PLAYWRIGHT_API_UNAVAILABLE', f => { f.deps.loadPlaywright = () => ({}) }],
+    ['CHROME_PLAYWRIGHT_API_UNAVAILABLE', f => { f.deps.loadPlaywright = () => ({ chromium: { name: () => 'chromium' } }) }],
+    ['CHROME_PLAYWRIGHT_API_UNAVAILABLE', f => { f.deps.loadPlaywright = () => { throw new Error(SECRET) } }],
   ]
   for (const [code, change] of cases) {
     const f = fixture(); change(f)
@@ -161,11 +163,11 @@ test('bad package/version/ownership, untrusted files or path drift fail closed w
   }
 })
 
-test('missing/mismatched installed package or lock fails before registry evaluation', () => {
+test('missing/mismatched installed package or lock fails before public API evaluation', () => {
   for (const file of [path.join(tools, 'package.json'), path.join(tools, 'package-lock.json'), path.join(base, 'package.json')]) {
     const f = fixture(); f.files.set(file, JSON.stringify({ secret: SECRET, version: '9.9.9' }))
     assert.deepEqual(f.run(), { ok: false, code: 'CHROME_PLAYWRIGHT_LOCK_MISMATCH' })
-    assert.equal(f.state.registryLoads, 0)
+    assert.equal(f.state.apiLoads, 0)
   }
 })
 
@@ -233,6 +235,7 @@ test('report validation requires exact safe schema, package/path/mode/version fa
   assert.deepEqual(validateChromeEvidence(evidence()), { ok: true, code: 'CHROME_EVIDENCE_VERIFIED' })
   const mutations = [
     e => { e.options.chromiumSandbox = false }, e => { e.options.args = ['--no-sandbox'] },
+    e => { e.options.executablePath = '/tmp/other-browser' }, e => { delete e.options.executablePath; e.options.channel = 'chrome' },
     e => { e.preflight = { ok: true } }, e => { e.preflight.code = 'READY' },
     e => { e.preflight.nonroot = false }, e => { e.preflight.acceptance = true },
     e => { e.preflight.browserLaunched = true }, e => { e.preflight.platform = 'darwin' },
@@ -240,9 +243,10 @@ test('report validation requires exact safe schema, package/path/mode/version fa
     e => { e.preflight.files.pop() }, e => { e.preflight.files[0].path = '/tmp/' + SECRET },
     e => { e.preflight.files[0].permissionMode = 0o777 }, e => { e.preflight.files[0].setuid = true },
     e => { e.preflight.files[0].rootOwned = false }, e => { e.preflight.files[0].executable = false },
+    e => { e.preflight.playwright.browserType = 'firefox' }, e => { e.preflight.playwright.publicApiSha256 = SECRET },
     e => { e.preflight.playwright.lockSha256 = SECRET }, e => { e.preflight.playwright.version = SECRET },
     e => { e.preflight.playwright.lockSha256 = [e.preflight.playwright.lockSha256] },
-    e => { e.preflight.launchOptions.channel = 'chromium' }, e => { e.preflight.extra = SECRET },
+    e => { e.preflight.launchOptions.executablePath = '/tmp/chromium' }, e => { e.preflight.extra = SECRET },
     e => { e.sandbox = { ok: true } }, e => { e.sandbox.seccompBpf = false },
     e => { e.sandbox.pidNamespaces = false }, e => { e.sandbox.pidNamespaces = 'Yes' },
     e => { e.sandbox.raw = SECRET },

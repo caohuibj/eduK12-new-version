@@ -1,12 +1,12 @@
-/* Prepared Chrome-channel preflight, not a browser launch or installation.
+/* Prepared official-Chrome preflight, not a browser launch or installation.
  * CLI: node server-version/e2e/school-teacher-chrome.cjs preflight
- * Reads existing package/files/registry, Chrome --version and installed fontconfig; writes one
+ * Reads existing package/files/public API, Chrome --version and installed fontconfig; writes one
  * sanitized chrome-preflight.json. Success is NOT sandbox or journey acceptance.
  * No fallback, install, custom flags, permission changes or security changes.
  *
- * Primary references for the channel, package query and Linux sandbox rows:
+ * Primary references for the public launch options, package query and Linux sandbox rows:
  * https://playwright.dev/docs/browsers#google-chrome--microsoft-edge
- * https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/registry/index.ts
+ * https://playwright.dev/docs/api/class-browsertype#browser-type-launch
  * https://manpages.debian.org/bookworm/dpkg/dpkg-query.1.en.html
  * https://github.com/chromium/chromium/blob/main/sandbox/linux/README.md
  * https://github.com/chromium/chromium/blob/main/chrome/browser/resources/sandbox_internals/sandbox_internals.ts
@@ -20,7 +20,7 @@ const { createHash } = require('node:crypto')
 const CHROME_BINARY = '/opt/google/chrome/chrome'
 const CHROME_SANDBOX = '/opt/google/chrome/chrome-sandbox'
 const CHROME_PACKAGE = 'google-chrome-stable'
-const CHROME_LAUNCH_OPTIONS = Object.freeze({ channel: 'chrome', headless: true, chromiumSandbox: true })
+const CHROME_LAUNCH_OPTIONS = Object.freeze({ executablePath: CHROME_BINARY, headless: true, chromiumSandbox: true })
 const fail = code => Object.freeze({ ok: false, code })
 const digest = value => createHash('sha256').update(value).digest('hex')
 const safeText = (value, limit = 16384) => typeof value === 'string' && value.length <= limit
@@ -96,7 +96,7 @@ function checkChromePath(io, target, executable, diagnostics) {
 function preflightChrome({ repo = path.resolve(__dirname, '../..'), env = process.env, diagnostics = false, deps = {} } = {}) {
   // Injection is for pure tests. Production callers supply only repo/env.
   const io = deps.fs || fs, run = deps.spawnSync || spawnSync, facts = deps.process || process
-  const loadRegistry = deps.loadRegistry || (file => require(file).registry)
+  const loadPlaywright = deps.loadPlaywright || (directory => require(directory))
   let code = 'CHROME_PREFLIGHT_INPUT_INVALID'
   try {
     if (typeof repo !== 'string' || !path.isAbsolute(repo) || !env || typeof env !== 'object') return fail(code)
@@ -150,22 +150,21 @@ function preflightChrome({ repo = path.resolve(__dirname, '../..'), env = proces
         locked?.version !== installed.version || declared.dependencies?.['playwright-core'] !== installed.version ||
         lock.packages?.['']?.dependencies?.['playwright-core'] !== installed.version ||
         !/^sha512-[A-Za-z0-9+/]{86}==$/.test(locked.integrity || '')) return fail(code)
-    code = 'CHROME_CHANNEL_REGISTRY_UNAVAILABLE'
-    const registryFile = path.join(base, 'lib/server/registry/index.js')
-    if (io.realpathSync(base) !== base || io.realpathSync(registryFile) !== registryFile || !io.lstatSync(registryFile).isFile()) return fail(code)
-    const registrySource = io.readFileSync(registryFile, 'utf8')
-    // Read this installed, lock-version-matched registry, not bundled Chromium's
-    // chromium.executablePath(), a shell wrapper, PATH lookup or a guessed path.
-    const channel = loadRegistry(registryFile)?.findExecutable('chrome')
-    if (channel?.name !== 'chrome' || channel.browserName !== 'chromium' || typeof channel.executablePath !== 'function') return fail(code)
-    code = 'CHROME_CHANNEL_PATH_MISMATCH'
-    const channelPath = channel.executablePath()
-    if (channelPath !== CHROME_BINARY || io.realpathSync(channelPath) !== CHROME_BINARY) return fail(code)
+    code = 'CHROME_PLAYWRIGHT_API_UNAVAILABLE'
+    // Only the installed package's public require entry is read/loaded. The
+    // 1.62.1 distribution no longer ships lib/server/registry/index.js.
+    const apiFile = path.join(base, 'index.js')
+    if (installed.exports?.['.']?.require !== './index.js' || io.realpathSync(base) !== base ||
+        io.realpathSync(apiFile) !== apiFile || !io.lstatSync(apiFile).isFile() || io.lstatSync(apiFile).isSymbolicLink()) return fail(code)
+    const publicApiSource = io.readFileSync(apiFile, 'utf8'), chromium = loadPlaywright(base)?.chromium
+    if (typeof chromium?.name !== 'function' || chromium.name() !== 'chromium' || typeof chromium.launch !== 'function') return fail(code)
+    // launch uses the exact already package-owned/version-checked executable.
+    // No channel lookup, bundled-browser fallback or private registry dependency.
     return Object.freeze({ ok: true, code: 'CHROME_PREFLIGHT_READY', schemaVersion: 1,
       scope: 'preinstalled-chrome-preflight', acceptance: false, browserLaunched: false,
       platform: 'linux', architecture: 'x64', nonroot: true, package: pkg, files,
-      playwright: { version: installed.version, channel: 'chrome', executablePath: CHROME_BINARY,
-        lockSha256: digest(lockText), registrySha256: digest(registrySource) }, launchOptions: CHROME_LAUNCH_OPTIONS })
+      playwright: { version: installed.version, browserType: 'chromium', executablePath: CHROME_BINARY,
+        lockSha256: digest(lockText), publicApiSha256: digest(publicApiSource) }, launchOptions: CHROME_LAUNCH_OPTIONS })
   } catch { return fail(code) }
 }
 
@@ -222,8 +221,8 @@ function validateChromeEvidence({ options, preflight, sandbox } = {}) {
   // caller must produce this evidence anew in the same job as the actual launch.
   const record = (value, keys) => value !== null && typeof value === 'object' && !Array.isArray(value) &&
     Object.keys(value).length === keys.length && keys.every(key => Object.hasOwn(value, key))
-  const launch = value => record(value, ['channel', 'headless', 'chromiumSandbox']) &&
-    value.channel === 'chrome' && value.headless === true && value.chromiumSandbox === true
+  const launch = value => record(value, ['executablePath', 'headless', 'chromiumSandbox']) &&
+    value.executablePath === CHROME_BINARY && value.headless === true && value.chromiumSandbox === true
   try {
     if (!launch(options) || !record(preflight, ['ok', 'code', 'schemaVersion', 'scope', 'acceptance', 'browserLaunched',
       'platform', 'architecture', 'nonroot', 'package', 'files', 'playwright', 'launchOptions']) ||
@@ -245,10 +244,10 @@ function validateChromeEvidence({ options, preflight, sandbox } = {}) {
         file.setuid !== ((file.permissionMode & 0o4000) !== 0)) return fail('CHROME_EVIDENCE_INVALID')
     }
     const pw = preflight.playwright
-    if (!record(pw, ['version', 'channel', 'executablePath', 'lockSha256', 'registrySha256']) ||
-      typeof pw.version !== 'string' || !/^\d+\.\d+\.\d+$/.test(pw.version) || pw.channel !== 'chrome' || pw.executablePath !== CHROME_BINARY ||
-      typeof pw.lockSha256 !== 'string' || typeof pw.registrySha256 !== 'string' ||
-      !/^[a-f0-9]{64}$/.test(pw.lockSha256) || !/^[a-f0-9]{64}$/.test(pw.registrySha256)) return fail('CHROME_EVIDENCE_INVALID')
+    if (!record(pw, ['version', 'browserType', 'executablePath', 'lockSha256', 'publicApiSha256']) ||
+      typeof pw.version !== 'string' || !/^\d+\.\d+\.\d+$/.test(pw.version) || pw.browserType !== 'chromium' || pw.executablePath !== CHROME_BINARY ||
+      typeof pw.lockSha256 !== 'string' || typeof pw.publicApiSha256 !== 'string' ||
+      !/^[a-f0-9]{64}$/.test(pw.lockSha256) || !/^[a-f0-9]{64}$/.test(pw.publicApiSha256)) return fail('CHROME_EVIDENCE_INVALID')
     if (!record(sandbox, ['ok', 'code', 'seccompBpf', 'suidSandbox', 'pidNamespaces']) ||
       sandbox.ok !== true || sandbox.code !== 'CHROME_SANDBOX_VERIFIED' || sandbox.seccompBpf !== true ||
       typeof sandbox.suidSandbox !== 'boolean' || typeof sandbox.pidNamespaces !== 'boolean' ||

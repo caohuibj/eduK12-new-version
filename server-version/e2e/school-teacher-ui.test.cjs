@@ -41,7 +41,7 @@ function sample() {
     package: { name: 'google-chrome-stable', architecture: 'amd64', packageVersion: '151.0.1.2-1', browserVersion: '151.0.1.2' },
     files: ['/opt/google/chrome/chrome', '/opt/google/chrome/chrome-sandbox'].map(file => ({ path: file,
       rootOwned: true, executable: true, groupOrWorldWritable: false, permissionMode: 0o755, setuid: false })),
-    playwright: { version: '1.62.1', channel: 'chrome', executablePath: '/opt/google/chrome/chrome', lockSha256: 'e'.repeat(64), registrySha256: 'f'.repeat(64) },
+    playwright: { version: '1.62.1', browserType: 'chromium', executablePath: '/opt/google/chrome/chrome', lockSha256: 'e'.repeat(64), publicApiSha256: 'f'.repeat(64) },
     launchOptions: CHROME_LAUNCH_OPTIONS }, sandbox: { ok: true, code: 'CHROME_SANDBOX_VERIFIED', seccompBpf: true, suidSandbox: false, pidNamespaces: true } }
   chrome.fonts = { ok: true, code: 'CJK_FONT_PREFLIGHT_READY', schemaVersion: 1, scope: 'preinstalled-cjk-fonts',
     acceptance: false, browserLaunched: false, fonts: [{ postScriptName: 'SyntheticCjk-Regular',
