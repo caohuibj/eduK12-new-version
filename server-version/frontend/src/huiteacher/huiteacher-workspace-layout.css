@@ -19,3 +19,45 @@
  .ht-workspace-jumps{gap:4px}
  .ht-workspace-jumps a{padding:8px 10px}
 }
+
+/* Keep the working canvas stable on wide monitors and make long sections navigable.
+   Sections remain mounted so navigation never discards in-progress answers. */
+.ht-app .ht-workspace{width:min(1240px,100%);padding:28px clamp(16px,3vw,32px) 48px;gap:20px}
+.ht-workspace-body{display:grid;grid-template-columns:190px minmax(0,1fr);gap:24px;align-items:start;min-width:0}
+.ht-workspace-body>.ht-workspace-jumps{position:sticky;top:20px;display:grid;gap:4px;max-height:calc(100dvh - 40px);overflow:auto;padding:10px;margin:0;align-content:start}
+.ht-workspace-jumps a{overflow-wrap:anywhere;line-height:1.6}
+.ht-workspace-sections{display:grid;gap:20px;min-width:0}
+.ht-workspace-sections>.ht-panel{margin:0}
+.ht-workspace :is(h1,h2,h3,h4,p,.ht-tag,.ht-welcome){overflow-wrap:anywhere}
+.ht-workspace :is(h2,h3){line-height:1.5}
+.ht-workspace h2{font-size:clamp(1.2rem,2vw,1.45rem);margin-bottom:12px}
+.ht-workspace p{line-height:1.75}
+.ht-workspace .ht-panel{min-width:0;padding:24px;box-shadow:0 4px 20px #6e392006}
+.ht-workspace .ht-panel .ht-panel{box-shadow:none}
+.ht-workspace .ht-inline>*{min-width:0;max-width:100%}
+.ht-workspace .ht-inline>.ht-field{flex:1 1 200px}
+.ht-workspace button{min-height:44px;max-width:100%;white-space:normal;overflow-wrap:anywhere}
+.ht-workspace .ht-field :is(input,select,textarea){min-height:44px;font-size:16px}
+.ht-workspace .ht-field :is(input[type=checkbox],input[type=radio]){min-height:0;width:auto}
+.ht-app .ht-workspace-tabs{margin:0;gap:6px}
+.ht-app .ht-workspace-tabs button{flex:1 1 auto;min-width:0}
+.ht-app .ht-skip-link{position:absolute;left:16px;top:8px;transform:translateY(-200%);z-index:100;padding:12px 18px;border-radius:8px;background:var(--ht-paper);color:var(--ht-copper);border:2px solid currentColor}
+.ht-app .ht-skip-link:focus{transform:none}
+#ht-main-content:focus{outline:none}
+.ht-workspace a:focus-visible{outline:2px solid var(--ht-copper);outline-offset:3px}
+@media(max-width:1050px){
+ .ht-workspace-body{grid-template-columns:minmax(0,1fr);gap:16px}
+ .ht-workspace-body>.ht-workspace-jumps{position:static;display:flex;flex-wrap:wrap;max-height:none}
+}
+@media(max-width:640px){
+ .ht-app .ht-workspace{padding:20px 16px 32px;gap:16px}
+ .ht-workspace .ht-panel{padding:18px 16px}
+ .ht-workspace-sections{gap:16px}
+ .ht-workspace .ht-inline{align-items:stretch}
+ .ht-workspace .ht-inline>.ht-field{flex-basis:100%}
+ .ht-workspace .ht-inline button{margin-bottom:0}
+ .ht-workspace-jumps a{flex:1 1 calc(50% - 6px);padding:8px;font-size:13px}
+}
+
+.ht-workspace-jumps a[aria-current=location]{background:var(--ht-copper);color:var(--ht-on-primary,#fff)}
+.ht-workspace-section[hidden]{display:none}

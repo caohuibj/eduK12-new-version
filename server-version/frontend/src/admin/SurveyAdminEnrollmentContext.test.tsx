@@ -22,3 +22,13 @@ describe('Survey administrator enrollment return context',()=>{
     expect(screen.queryByRole('link',{name:'Research 首页'})).not.toBeInTheDocument()
   })
 })
+
+describe('education administrator enrollment context',()=>{
+ it.each([['School','/admin/huischool'],['Teacher','/admin/huiteacher']])('preserves %s branding and login target without changing enrollment requirements',(brand,path)=>{
+  render(<MemoryRouter initialEntries={['/admin/security/enroll?returnTo='+encodeURIComponent(path)]}><AdminKeyEnrollment/></MemoryRouter>)
+  expect(document.querySelector('.education-admin-entry')).toHaveAttribute('data-product',brand)
+  expect(screen.getByRole('link',{name:'前往管理员登录'})).toHaveAttribute('href','/admin/login?returnTo='+encodeURIComponent(path))
+  expect(screen.getByRole('link',{name:`返回 ${brand} 管理员登录`})).toHaveAttribute('href','/admin/login?returnTo='+encodeURIComponent(path))
+  expect(screen.getByLabelText('一次性绑定码')).toBeRequired()
+ })
+})

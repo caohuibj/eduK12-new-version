@@ -7,6 +7,8 @@ import { surveyAppearanceHref } from '../survey/survey-appearance-links'
 import '../survey/survey-admin-auth.css'
 import LoginRecoveryNotice from '../components/app-shell/LoginRecoveryNotice'
 import AuthShell from '../components/auth/AuthShell'
+import EducationAdminEntryShell from './admin/EducationAdminEntryShell'
+import {educationEntry} from './admin/education-entry'
 import React, { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
@@ -27,7 +29,8 @@ const AdminLogin: React.FC = () => {
   const homeOrigin=new URL(origins?.admin??window.location.origin)
   if(import.meta.env.DEV&&['localhost','127.0.0.1'].includes(homeOrigin.hostname))homeOrigin.hostname='training.localhost'
   const trainingHome=homeOrigin.origin+'/'
-  const Shell = surveyEntry ? SurveyAdminEntryShell : AuthShell
+  const educationProduct=educationEntry(location.search)
+  const Shell = educationProduct?EducationAdminEntryShell:surveyEntry ? SurveyAdminEntryShell : AuthShell
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [method, setMethod] = useState<'TOTP' | 'SECURITY_KEY'>('TOTP')
@@ -54,7 +57,7 @@ const AdminLogin: React.FC = () => {
   }
 
   return (
-    <Shell tone="admin" title={trainingEntry?'培训管理员登录':'管理员登录'} description={trainingEntry?'账号审核、课程监管与资源授权，从这里开始。':surveyEntry?'Survey · 研究者资格、邀请与工具授权':'密码与 Authenticator 动态码验证，按入口授权管理'}
+    <Shell tone="admin" title={educationProduct?`${educationProduct} 管理员登录`:trainingEntry?'培训管理员登录':'管理员登录'} description={educationProduct?'使用已获本产品管理授权的账号登录，管理学校开通与授权。':trainingEntry?'账号审核、课程监管与资源授权，从这里开始。':surveyEntry?'Survey · 研究者资格、邀请与工具授权':'密码与 Authenticator 动态码验证，按入口授权管理'}
       {...(trainingEntry?{
         brand:<a className="hui-auth-brand" href={trainingHome} aria-label="Training 首页"><TrainingBrand /></a>,
         className:'training-admin-auth',backTo:trainingHome,backLabel:'返回 Training 首页',
@@ -135,7 +138,7 @@ const AdminLogin: React.FC = () => {
       </form>
       {surveyEntry?<div className="survey-admin-auth-tools">
         <Link to={surveyAppearanceHref('/admin/security/enroll?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH),mode)}>首次绑定 Authenticator</Link>
-      </div>:<p className="mt-4"><Link to={trainingEntry?'/admin/security/enroll?returnTo=%2Fadmin%2Ftraining':'/admin/security/enroll'}>首次绑定 Authenticator</Link></p>}
+      </div>:<p className="mt-4"><Link to={educationProduct?`/admin/security/enroll?returnTo=${encodeURIComponent(educationProduct==='School'?'/admin/huischool':'/admin/huiteacher')}`:trainingEntry?'/admin/security/enroll?returnTo=%2Fadmin%2Ftraining':'/admin/security/enroll'}>首次绑定 Authenticator</Link></p>}
     </Shell>
   )
 }

@@ -95,3 +95,24 @@ describe('administrator login flow',()=>{
     expect(replace).toHaveBeenCalledExactlyOnceWith('http://localhost:5173/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
   })
 })
+
+describe('School and Teacher administrator presentation',()=>{
+ it.each([['HUISCHOOL','School','/admin/huischool'],['HUITEACHER','Teacher','/admin/huiteacher']] as const)('keeps %s branding and the authorized return through login',async(entry,brand,path)=>{
+  login.mockResolvedValue({code:0,data:{user:{id:'education-admin',username:'synthetic-admin',role:'TEACHER',platformRole:'STANDARD',entryGrants:[{entry,version:1}]}}})
+  mount('/admin/login?returnTo='+encodeURIComponent(path))
+  expect(screen.getByRole('heading',{name:`${brand} 管理员登录`})).toBeVisible()
+  expect(document.querySelector('.education-admin-entry')).toHaveAttribute('data-product',brand)
+  expect(screen.getByRole('link',{name:'首次绑定 Authenticator'})).toHaveAttribute('href','/admin/security/enroll?returnTo='+encodeURIComponent(path))
+  submit()
+  expect(await screen.findByText('destination:'+path)).toBeInTheDocument()
+ })
+ it.each(['/admin/huischool/extra','https://evil.test/admin/huischool','/admin/huiteacher?admin=true'])('does not brand or authorize an unrecognized return target %s',path=>{
+  mount('/admin/login?returnTo='+encodeURIComponent(path))
+  expect(document.querySelector('.education-admin-entry')).toBeNull()
+ })
+ it('does not grant School access because its branding was selected',async()=>{
+  login.mockResolvedValue({code:0,data:{user:{id:'ordinary',username:'ordinary',role:'TEACHER',platformRole:'STANDARD',entryGrants:[]}}})
+  mount('/admin/login?returnTo=%2Fadmin%2Fhuischool');submit()
+  expect(await screen.findByText('destination:/admin/entrances')).toBeInTheDocument()
+ })
+})
