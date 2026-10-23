@@ -853,7 +853,9 @@ export const checkinController = {
 
       // 检查打卡
       const checkin = await prisma.checkin.findUnique({
-        where: { id }
+        where: { id },
+        // Keep the fresh access/deadline read without loading task media/content.
+        select: { courseId: true, endTime: true },
       })
 
       if (!checkin) {

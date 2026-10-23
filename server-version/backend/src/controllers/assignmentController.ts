@@ -628,7 +628,9 @@ export const assignmentController = {
 
       // 检查练习是否存在
       const assignment = await prisma.assignment.findUnique({
-        where: { id }
+        where: { id },
+        // Submission gates do not consume the task body or attachment JSON.
+        select: { courseId: true, status: true, deadline: true },
       })
 
       if (!assignment) {
@@ -772,6 +774,7 @@ export const assignmentController = {
         const latestHistory = await tx.submissionHistory.findFirst({
           where: { submissionId: existing.id },
           orderBy: { version: 'desc' },
+          select: { version: true },
         })
         const newVersion = latestHistory ? latestHistory.version + 1 : 1
         await tx.submissionHistory.create({
