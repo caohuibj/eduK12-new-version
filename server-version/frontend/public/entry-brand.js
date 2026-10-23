@@ -9,7 +9,12 @@
     && ['/admin/login', '/admin/security/enroll'].includes(window.location.pathname)
     && new URLSearchParams(window.location.search).get('returnTo') === '/admin/survey-researchers'
   const survey = hostname === 'survey.eduk12.top' || (development && hostname === 'survey.localhost') || surveyAdminEntry
-  document.title = survey ? 'Research' : '慧育空间'
+  const trainingHost = hostname === 'training.eduk12.top' || (development && hostname === 'training.localhost')
+  const trainingAdminEntry = productOrigin && (window.location.pathname === '/admin/training'
+    || (['/admin/login', '/admin/security/enroll'].includes(window.location.pathname)
+      && new URLSearchParams(window.location.search).get('returnTo') === '/admin/training'))
+  const training = trainingHost || trainingAdminEntry
+  document.title = survey ? 'Research' : training ? 'Training' : '慧育空间'
   const icon = document.head.querySelector('link[rel="icon"]')
-  if (icon) icon.setAttribute('href', survey ? '/survey/huisurvey-w2-emblem.svg' : '/vite.svg')
+  if (icon) icon.setAttribute('href', survey ? '/survey/huisurvey-w2-emblem.svg' : training ? '/training/favicon.svg' : '/vite.svg')
 })()

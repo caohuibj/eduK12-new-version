@@ -97,15 +97,19 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const onNavigate=(path:string)=>{setOpenPath(null);if(path===location.pathname)mainRef.current?.focus()}
   useEffect(()=>{if(training||organizationError||!user||mode!=='standard'||activeOrganization||organizationLoading||organizations.length!==1)return;void selectOrganization(organizations[0].id)},[training,user,mode,activeOrganization,organizationLoading,organizations,selectOrganization,organizationError])
   useEffect(()=>{
-    if(mode==='display')return
+    const trainingBrand=training||location.pathname==='/admin/training'||(
+      ['/admin/login','/admin/security/enroll'].includes(location.pathname)
+      &&new URLSearchParams(location.search).get('returnTo')==='/admin/training')
+    if(mode==='display'&&!trainingBrand)return
     const surveyBrand=surveyAdmin||surveyAdminEntry
-    document.title=surveyBrand?'Research':`${title==='Huisurvey'?'':`${title} · `}${training?'Huitraining':'Huisurvey'}`
+    document.title=surveyBrand?'Research':trainingBrand?'Training':`${title==='Huisurvey'?'':`${title} · `}Huisurvey`
     const icon=document.head.querySelector<HTMLLinkElement>('link[rel="icon"]')
     if(surveyBrand)icon?.setAttribute('href','/survey/huisurvey-w2-emblem.svg')
-    else if(icon?.getAttribute('href')==='/survey/huisurvey-w2-emblem.svg')icon.setAttribute('href','/vite.svg')
+    else if(trainingBrand)icon?.setAttribute('href','/training/favicon.svg')
+    else if(['/survey/huisurvey-w2-emblem.svg','/training/favicon.svg'].includes(icon?.getAttribute('href')??''))icon?.setAttribute('href','/vite.svg')
     if(previousPath.current!==location.pathname&&mode!=='focused')mainRef.current?.focus()
     previousPath.current=location.pathname
-  },[location.pathname,title,mode,training,surveyAdmin,surveyAdminEntry])
+  },[location.pathname,location.search,title,mode,training,surveyAdmin,surveyAdminEntry])
   if(surveyAdmin&&user)return <SurveyAdminShell username={user.nickname||user.username} loggingOut={loggingOut} onLogout={async()=>{setLoggingOut(true);try{await logout()}finally{setLoggingOut(false)}}}>{children}</SurveyAdminShell>
   if(mode==='display')return <>{children}</>
   return <div className={`hui-app hui-app--${mode}${roleClass}${staffMode?' hui-app--staff':''}${assessmentSurfaceClass}${reportSurfaceClass}${studentSubmitClass}${entryMode?' hui-app--entry':''}${training&&!surveyAdmin?' hui-training':''}${surveyAdmin?' hui-survey-admin-shell':''}${trainingAssessmentVisual?' training-assessment-visual':''}${trainingWorkspace?' training-workspace-shell':''}${teacherVisual?' training-teacher-visual':''}`} data-shell-mode={mode} data-training-theme={training && !surveyAdmin ? appearance.theme : undefined}>
