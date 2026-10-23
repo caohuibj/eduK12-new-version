@@ -919,3 +919,31 @@ WenQuanYi 字体包，以可信 runner apt 元数据摘要核验后解包至用�
 `119948366459` 覆盖未变的 scope/browser 控制文件，逐 blob 核验后复用；
 变化的 reuse、reuse.test、workspace.test 及消费新 helper 的 checks 控制接受新的 CodeQL。
 取消父 run 的状态原样记录，接纳成功步骤不授予其整条运行成功身份。
+
+## PR #339 shared authoring candidate (2026-10-23 approval)
+
+Only `work/shared-assessment-authoring-20261023`, fixed main
+`4dd9f1340fef2bc3df2d066b9bf7712bc2eb3c66` and product
+`693fd489e626eec6b34869657b2b23c5faeae69a` may use `shared-authoring`.
+The full raw diff, modes, before/after blobs, component trees, protected
+lock/config inputs and actual PR source/merge tree are rechecked. The only
+deleted path is an identical-blob move to the shared scale directory. Unknown
+paths, base drift, missing markers and manual/full/probe requests fail closed.
+
+Approved unsigned local evidence is explicitly `reviewed-local-evidence`,
+`ciExecuted=false`, `originalExecutionSigned=false`. Original failures and
+filtered rechecks remain recorded. No retrospective execution signature or
+historical full node_modules byte identity is asserted. Current type checks,
+focused assertions and synthetic pages are admitted only as the listed case
+identities after source/config/callee review. They do not establish manual
+real-account acceptance. The missing current production compilations, actual
+frozen/participant/report material chain, built-frontend short flow, missing
+lock audits and new CodeQL execute in Actions.
+
+The stable `merge gate / ready PR` recomputes the complete checkout and requires
+scope, all nested shared-authoring jobs and CodeQL to actually succeed. Draft,
+missing, failed, cancelled and skipped required work cannot qualify. No unrelated
+platform regression, performance/load/media/Ops work, heavy image build,
+production access, deployment or branch-protection change is authorized.
+An exact post-merge main event classifies without repeating accepted work.
+Other branches retain their existing routes.

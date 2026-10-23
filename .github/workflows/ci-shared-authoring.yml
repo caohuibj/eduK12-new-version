@@ -1,0 +1,175 @@
+name: Shared authoring exact candidate
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  CI_EVENT: pull_request
+  CI_HEAD_REF: work/shared-assessment-authoring-20261023
+  CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+  CI_PR_REPOSITORY: caohuibj/eduK12-new-version
+  NODE_OPTIONS: --max-old-space-size=4096
+jobs:
+  admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      PLAN: ${{ inputs.plan }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify exact candidate, original local reports and negative gate contracts
+        run: |
+          node .github/scripts/shared-authoring-checks.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shared-authoring-admission-${{ github.sha }}
+          path: shared-authoring-evidence
+          if-no-files-found: error
+          retention-days: 3
+  frontend:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    env:
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/frontend/package-lock.json
+      - name: install official locked frontend dependencies
+        run: npm ci --ignore-scripts --prefix server-version/frontend
+      - name: missing frontend dependency security audit
+        run: npm audit --audit-level=high --prefix server-version/frontend
+      - name: compile the current frontend once; admit existing local types separately
+        run: npm run build --prefix server-version/frontend
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shared-authoring-frontend-${{ github.sha }}
+          path: server-version/frontend/dist
+          if-no-files-found: error
+          retention-days: 3
+  backend:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://ptool:ptool123@127.0.0.1:5432/shared_authoring_ci?schema=public
+      JWT_SECRET: shared-authoring-ci-only-12345678901234567890
+      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
+      COGNITIVE_MODULE_ENABLED: 'true'
+      MATERIAL_GRANTS_ENABLED: 'true'
+      REDIS_URL: redis://127.0.0.1:6379
+      UPLOAD_DIR: ${{ runner.temp }}/shared-authoring-uploads-${{ github.run_id }}-${{ github.run_attempt }}
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: ptool
+          POSTGRES_PASSWORD: ptool123
+          POSTGRES_DB: shared_authoring_ci
+        ports: ['5432:5432']
+        options: --health-cmd "pg_isready -U ptool -d shared_authoring_ci" --health-interval 5s --health-timeout 5s --health-retries 12
+      redis:
+        image: redis:7.4.9-bookworm
+        ports: ['6379:6379']
+        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 12
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/backend/package-lock.json
+      - name: install official locked backend dependencies and exact Prisma client
+        run: |
+          npm ci --ignore-scripts --prefix server-version/backend
+          cd server-version/backend
+          node node_modules/prisma/build/index.js generate
+      - name: missing backend dependency security audit
+        run: npm audit --audit-level=high --prefix server-version/backend
+      - name: compile current backend once without repeating accepted semantic types
+        working-directory: server-version/backend
+        run: node node_modules/typescript/bin/tsc --noCheck
+      - name: prepare only the disposable service database
+        working-directory: server-version/backend
+        run: node node_modules/prisma/build/index.js migrate deploy
+      - name: actual compiled publication, frozen participant and released-report material chain
+        run: node .github/scripts/shared-authoring-frozen.cjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shared-authoring-backend-${{ github.sha }}
+          path: |
+            server-version/backend/dist
+            shared-authoring-evidence
+          if-no-files-found: error
+          retention-days: 3
+      - name: remove only this job's disposable media files
+        if: always()
+        shell: bash
+        run: |
+          case "$UPLOAD_DIR" in "$RUNNER_TEMP"/shared-authoring-uploads-*) rm -rf -- "$UPLOAD_DIR" ;; *) exit 1 ;; esac
+  browser:
+    needs: frontend
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - uses: actions/download-artifact@v4
+        with:
+          name: shared-authoring-frontend-${{ github.sha }}
+          path: server-version/frontend/dist
+      - name: install only pinned browser controls; use runner's installed Chrome
+        run: |
+          npm ci --ignore-scripts --prefix .github/release-tools
+          google-chrome --version
+          if ! fc-list :lang=zh file | grep -q .; then
+            sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=20 -o APT::Update::Error-Mode=any update
+            sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=20 install -y --no-install-recommends fonts-wqy-zenhei
+          fi
+          test -n "$(fc-list :lang=zh file)"
+      - name: first built-candidate authoring and landing short flow; Chrome sandbox enabled
+        run: node .github/scripts/shared-authoring-browser.mjs
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shared-authoring-browser-${{ github.sha }}
+          path: shared-authoring-evidence/browser
+          if-no-files-found: error
+          retention-days: 3
+  qualified:
+    needs: [admission, frontend, backend, browser]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 2
+    steps:
+      - name: every selected internal job must actually succeed
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: node -e 'const n=JSON.parse(process.env.NEEDS);for(const k of ["admission","frontend","backend","browser"])if(n[k]?.result!=="success")throw Error(k+" did not succeed")'
