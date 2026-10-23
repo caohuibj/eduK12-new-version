@@ -1,6 +1,8 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {readFileSync} from 'node:fs';
+import {readFileSync,mkdtempSync,mkdirSync,existsSync,writeFileSync,rmSync} from 'node:fs';
+import {tmpdir} from 'node:os';
+import {join} from 'node:path';
 import {requireFreshQualification,requireSuccess,JOBS} from './school-teacher-scope.mjs';
 import {verifyFreshManifest,verifyTestReport,requireNoHistoricalAcceptance,safeTestFailure} from './school-teacher-checks.mjs';
 const fresh=()=>({qualification:'fresh-integrated-authoring',base:'69497181d569d4a5f7d61cdab108b977894cf9b3',frontendBuildDecision:'fresh-current-source',backendBuildDecision:'fresh-current-source',execution:{finalized:true,frontend:{types:true,batches:[{}]},backend:{batches:[{}]},auditComponents:['frontend','backend']}});
@@ -38,4 +40,14 @@ test('School CodeQL scans actual application while shared-authoring remains inde
 test('fresh failure diagnostics retain only known error types and tracked relative code locations',()=>{
  const result=safeTestFailure(["TypeError: secret TOKEN=never-publish\n at fn (/tmp/private/server-version/backend/src/modules/example.ts:12:4)\n at secret (/tmp/secret-user.ts:1:2)"],new Set(['src/modules/example.ts']));
  assert.deepEqual(result.errorTypes,['TypeError']);assert.deepEqual(result.codeLocations,['src/modules/example.ts:12:4']);assert(!JSON.stringify(result).includes('TOKEN'));assert(!JSON.stringify(result).includes('/tmp'));assert(!JSON.stringify(result).includes('secret-user'));assert.match(result.diagnosticSha256,/^[a-f0-9]{64}$/);
+});
+
+test('fresh upload preparation leaves the one-attempt browser seed directory absent',()=>{
+ const workflow=readFileSync(new URL('../workflows/ci-school-teacher.yml',import.meta.url),'utf8');
+ assert(workflow.includes('export UPLOAD_DIR="$RUNNER_TEMP/school-teacher-checks-private/uploads"'));assert(!workflow.includes('mkdir -p "$SCHOOL_TEACHER_PRIVATE_DIR'));
+ const root=mkdtempSync(join(tmpdir(),'school-fresh-path-contract-'));try{
+  const uploads=join(root,'school-teacher-checks-private','uploads'),seed=join(root,'school-teacher-private');mkdirSync(uploads,{recursive:true,mode:0o700});assert.equal(existsSync(seed),false);
+  mkdirSync(seed,{mode:0o700});writeFileSync(join(seed,'seed-started'),'synthetic one attempt',{flag:'wx',mode:0o600});assert.throws(()=>mkdirSync(seed,{mode:0o700}),{code:'EEXIST'});
+  const source=readFileSync(new URL('../../server-version/e2e/school-teacher-fixture.cjs',import.meta.url),'utf8');assert(source.includes('fs.mkdirSync(root, { mode: 0o700 })'));assert(source.includes("{ flag: 'wx', mode: 0o600 }"));
+ }finally{rmSync(root,{recursive:true,force:true})}
 });

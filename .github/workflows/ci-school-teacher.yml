@@ -120,11 +120,11 @@ jobs:
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
           SCHOOL_TEACHER_PRIVATE_DIR: ${{ runner.temp }}/school-teacher-private
         run: |
-          mkdir -p "$SCHOOL_TEACHER_PRIVATE_DIR/uploads"
-          chmod 700 "$SCHOOL_TEACHER_PRIVATE_DIR" "$SCHOOL_TEACHER_PRIVATE_DIR/uploads"
+          export UPLOAD_DIR="$RUNNER_TEMP/school-teacher-checks-private/uploads"
+          mkdir -p "$UPLOAD_DIR"
+          chmod 700 "$RUNNER_TEMP/school-teacher-checks-private" "$UPLOAD_DIR"
           export JWT_SECRET="$(node -e "process.stdout.write(require('node:crypto').randomBytes(48).toString('hex'))")"
           printf '::add-mask::%s\n' "$JWT_SECRET"
-          export UPLOAD_DIR="$SCHOOL_TEACHER_PRIVATE_DIR/uploads"
           for key in JWT_SECRET UPLOAD_DIR DATABASE_URL SCHOOL_TEACHER_TEST_DATABASE_URL RELEASE_INTEGRATION_DATABASE_URL REDIS_URL CI_POSTGRES_SERVICE_ID SCHOOL_TEACHER_PRIVATE_DIR; do
             printf '%s=%s\n' "$key" "${!key}" >> "$GITHUB_ENV"
           done
