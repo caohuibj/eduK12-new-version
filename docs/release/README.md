@@ -1001,3 +1001,30 @@ signed-in authoring states are distinct; the capabilities response and material
 `name` field match the actual adapters. Actual pseudo-element day/night art,
 mobile overflow, CSRF-bearing revision-bound save and exact material identity
 remain required. Previous successful application qualifications are unchanged.
+
+## Survey 手工验收前端修订的精确合并范围（2026-10-23）
+
+用户确认 Survey PR #340 先合并，再由 Training #341 基于新 main 集成；本路线
+固定 base `69497181d569d4a5f7d61cdab108b977894cf9b3` 与产品提交
+`3f6d028e73da799aba4994e311240eaa9d4d1aff` 的 36 个前端路径，另仅允许
+绑定明列的 CI/证据/本文档控制。完整 diff、模式、前后端 tree、依赖/配置、
+原报告压缩字节/哈希与控制程序哈希逐项核对。未知输入、base 漂移或 source /
+merge tree 不符直接拒绝；已知分支缺 marker 不回退 platform/manual/full。
+
+已完成的本地 UI、导航、类型、构建与六组浏览器短流程保留原身份，明确标为
+`reviewed-local-evidence`、`ciExecuted=false`、`originalExecutionSigned=false`。
+历史部分通过、过滤、失败清理回调、后续修复及两次说明层遮挡失败均按原报告
+保留，重叠断言不相加为同一轮。类型输入在 be73b6c6 → 3f6d028e 仅 CSS 变化；
+较早断言仅在人工核对具体消费者未受后续修订影响的范围接纳。环境与源码哈希
+是事后重建，未留存原执行完整 node_modules 字节清单，不补签或声称密码学运行
+绑定。本地产物构建只作为本次合并证据，不提供官方镜像、生产扫描或部署资格。
+浏览器使用隔离合成 API，不等同后端权限或真实数据库验收。
+
+缺失项的唯一执行位置为 Actions：精确范围/拒绝/证据篡改/严格汇总契约、
+变化 TS/TSX lint 与 bootstrap 语法、受影响前端及控制的 JS/TS CodeQL。
+不重跑已通过本地应用检查，不启动 backend、DB、迁移、全单测、媒体、性能、
+镜像构建/扫描或部署。依赖声明与锁文件未变，不以本路线扩大审计或产品权限。
+本地仅核控制语法、绑定与工作流结构，CI admission/lint 各五分钟，SAST 保留
+既有上限；约五分钟报告具体等待阶段。稳定 `merge gate / ready PR` 要求 scope、
+完整 survey-manual-ui 与 CodeQL 实际 success，重算完整 checkout；draft、缺失、
+跳过、取消、失败或输入漂移均阻断。精确 main push 只分类，不重复检查。

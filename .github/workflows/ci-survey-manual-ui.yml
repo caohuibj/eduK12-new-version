@@ -1,0 +1,76 @@
+name: Survey manual acceptance frontend qualification
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  CI_EVENT: pull_request
+  CI_HEAD_REF: work/survey-manual-acceptance-20261023
+  CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+  CI_PR_REPOSITORY: caohuibj/eduK12-new-version
+  CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+jobs:
+  admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      PLAN: ${{ inputs.plan }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify exact source and admit original local UI reports without replay
+        run: node .github/scripts/survey-manual-ui-checks.mjs
+      - name: new scope rejection evidence tampering and strict merge contracts
+        run: node --test .github/scripts/survey-manual-ui.test.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: survey-manual-ui-admission-${{ github.sha }}
+          path: survey-manual-ui-evidence
+          if-no-files-found: error
+          retention-days: 3
+  lint:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: install only unchanged locked frontend dependencies from official registry
+        working-directory: server-version/frontend
+        run: npm ci --ignore-scripts
+      - name: missing changed-product lint and bootstrap syntax only
+        run: |
+          node --check server-version/frontend/public/entry-brand.js
+          node --input-type=module <<'JS'
+          import {execFileSync} from 'node:child_process';
+          import {binding} from './.github/scripts/survey-manual-ui-scope.mjs';
+          const files=Object.keys(binding.source).filter(f=>/\.[jt]sx?$/.test(f)&&f.includes('/src/')).map(f=>f.replace('server-version/frontend/',''));
+          if(!files.length)throw Error('No changed lint inputs');
+          execFileSync(process.execPath,['node_modules/eslint/bin/eslint.js',...files],{cwd:'server-version/frontend',stdio:'inherit'});
+          JS
+  qualified:
+    needs: [admission, lint]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    steps:
+      - name: all selected frontend jobs must actually succeed
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: node -e 'const n=JSON.parse(process.env.NEEDS);for(const k of ["admission","lint"])if(n[k]?.result!=="success")throw Error(k+" did not succeed")'

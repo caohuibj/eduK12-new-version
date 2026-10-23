@@ -1,3 +1,4 @@
+import {surveyManualUIPlan,surveyManualUIOutputs} from './survey-manual-ui-scope.mjs';
 import {sharedAuthoringPlan,sharedAuthoringOutputs} from './shared-authoring-scope.mjs';
 import {surveyWorkspacePlan,surveyWorkspaceOutputs} from './survey-workspace-scope.mjs';
 import {trainingAppearancePlan,trainingAppearanceOutputs} from './training-appearance-scope.mjs';
@@ -292,6 +293,8 @@ export function runnerPlan({ profile = 'hosted', scenario = 'platform' } = {}) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const event = process.env.CI_EVENT;
   const base = process.env.CI_BASE_SHA;
+  const surveyManualUI=surveyManualUIPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  if(surveyManualUI){const output=surveyManualUIOutputs(surveyManualUI);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const sharedAuthoring=sharedAuthoringPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(sharedAuthoring){const output=sharedAuthoringOutputs(sharedAuthoring);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const surveyWorkspace=surveyWorkspacePlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
