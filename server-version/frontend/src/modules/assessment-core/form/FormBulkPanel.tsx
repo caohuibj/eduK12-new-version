@@ -47,6 +47,7 @@ export function FormBulkPanel({appearance,title,text,onTextChange,mode,onModeCha
       <button type="button" className={buttonClass(true)} disabled={!ready||!!error} onClick={onApply}>{applyLabel}</button>
       {secondary&&<button type="button" className={buttonClass()} onClick={secondary.onClick}>{secondary.label}</button>}
     </div>
-    {survey&&text.trim()&&(error?<p className="survey-form-bulk-error" role="alert">{error}</p>:pendingNote&&<p role="status">{pendingNote}</p>)}
+    {survey&&text.trim()&&error&&<p className="survey-form-bulk-error" role="alert">{error}</p>}
+    {text.trim()&&!error&&pendingNote&&<p className={survey?undefined:'qt-form-hint'} role="status">{pendingNote}</p>}
   </div>
 }

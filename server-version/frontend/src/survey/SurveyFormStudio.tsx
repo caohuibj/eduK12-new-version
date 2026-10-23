@@ -1,23 +1,22 @@
-import {useCallback,useEffect,useRef,useState,type ReactNode} from 'react'
+import {useEffect,useRef,useState,type ReactNode} from 'react'
 import {ArrowDown,ArrowUp,Copy,FileText,List,Plus,Trash2,Pencil} from 'lucide-react'
 import {newQuestion,researchKey,type FormDraft,type FormQuestion} from './builder.types'
 import './survey-form-studio.css'
+import {useFormPendingBuffers} from '../modules/assessment-core/form/useFormBulkDraft'
 const labels:Record<FormQuestion['type'],string>={SINGLE:'单选',MULTIPLE:'多选',SHORT_TEXT:'短文本',LONG_TEXT:'长文本',NUMBER:'数值',LIKERT:'Likert',MATRIX:'矩阵',DATE:'日期',TIME:'时间',RANK_ORDER:'排序',SLIDER:'滑块',CONSTANT_SUM:'恒定总和',MATRIX_MULTIPLE:'矩阵多选'}
 type Props={value:FormDraft;onCommit:(next:FormDraft)=>Promise<boolean>;onDraftRiskChange?:(dirty:boolean)=>void;disabled?:boolean;renderQuestion:(value:FormDraft,onChange:(next:FormDraft)=>void,key:string,pageControl:ReactNode,onPendingChange:(id:string,pending:boolean)=>void,bulkPending:boolean)=>ReactNode}
 export function SurveyFormStudio({value,onCommit,onDraftRiskChange,disabled=false,renderQuestion}:Props){
   const [pageKey,setPageKey]=useState<string|null>(null),[editing,setEditing]=useState<string|null>(null),[question,setQuestion]=useState(()=>newQuestion('SINGLE'))
   const [renaming,setRenaming]=useState<{pageKey:string;title:string}|null>(null)
   const [changed,setChanged]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState('')
-  const [pending,setPending]=useState<Record<string,boolean>>({})
-  const onPendingChange=useCallback((id:string,next:boolean)=>setPending(current=>current[id]===next?current:{...current,[id]:next}),[])
-  const hasPending=Object.values(pending).some(Boolean)
+  const {hasPending,onPendingChange,clear:clearPending}=useFormPendingBuffers()
   const lock=useRef(false),editGeneration=useRef(0)
   const page=value.pages.find(p=>p.pageKey===pageKey)??value.pages[0]
   const count=value.pages.reduce((n,p)=>n+p.questions.length,0)
   const risk=changed||!!editing||!!renaming||hasPending
   useEffect(()=>{onDraftRiskChange?.(risk);return()=>onDraftRiskChange?.(false)},[risk,onDraftRiskChange])
   const blocked=disabled||busy
-  const reset=()=>{setQuestion(newQuestion('SINGLE'));setEditing(null);setChanged(false);setError('');setPending({})}
+  const reset=()=>{setQuestion(newQuestion('SINGLE'));setEditing(null);setChanged(false);setError('');clearPending()}
   const commit=async(next:FormDraft)=>{if(lock.current||disabled)return false;lock.current=true;setBusy(true);setError('');try{return await onCommit(next)}catch(cause){setError(cause instanceof Error?cause.message:'保存失败，内容仍保留');return false}finally{setBusy(false);lock.current=false}}
   const pick=(p:FormDraft['pages'][number],q:FormQuestion)=>{if(blocked||risk)return;setPageKey(p.pageKey);setEditing(q.itemKey);setQuestion(structuredClone(q));setChanged(false);setError('')}
   const submit=async()=>{

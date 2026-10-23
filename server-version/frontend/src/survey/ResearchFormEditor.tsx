@@ -6,6 +6,7 @@ import type { FormDraft, FormQuestion } from './builder.types'
 import { choiceTypes, professionalTypes, newQuestion, researchKey } from './builder.types'
 import { SurveyImageField } from './SurveyImageField'
 import { SurveyFormChoiceList } from './SurveyFormChoiceList'
+import {referencedFormChoiceKeys} from '../modules/assessment-core/form/choiceSafety'
 
 const types:Record<FormQuestion['type'],string>={
   SINGLE:'单选',MULTIPLE:'多选',SHORT_TEXT:'短文本',LONG_TEXT:'长文本',
@@ -58,8 +59,7 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,bulkPendi
         const previous=[...value.pages.slice(0,pi).flatMap(p=>p.questions),...page.questions.slice(0,qi)]
           .filter(q=>['SINGLE','MULTIPLE','LIKERT'].includes(q.type))
         if(questionKey&&q.itemKey!==questionKey)return null
-        const referencedOptions=new Set([q.otherOptionKey,...(q.exclusiveOptionKeys??[]),...value.pages.flatMap(p=>p.questions).filter(item=>item.displayIf?.itemKey===q.itemKey).map(item=>item.displayIf?.optionKey)].filter(Boolean))
-        const minimumRetained=q.options.reduce((n,option,i)=>referencedOptions.has(option.optionKey)?i+1:n,0)
+        const referencedOptions=referencedFormChoiceKeys(q,value.pages.flatMap(p=>p.questions))
         const typeControl=<select className="input" aria-label="选择题型" disabled={bulkPending} value={q.type} onChange={e=>{
               const type=e.target.value as FormQuestion['type']
               const fresh=newQuestion(type)
@@ -110,7 +110,7 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,bulkPendi
             </label>
           </div>
           {!questionKey&&mediaFields}
-          {choiceTypes.has(q.type)&&<SurveyFormChoiceList key={q.itemKey+q.type+'options'} question={q} kind="选项" limit={30} minimumRetained={minimumRetained} onPendingChange={onPendingChange} onChange={next=>setQuestion(pi,qi,()=>next)}/>}
+          {choiceTypes.has(q.type)&&<SurveyFormChoiceList key={q.itemKey+q.type+'options'} question={q} kind="选项" limit={30} protectedKeys={referencedOptions} onPendingChange={onPendingChange} onChange={next=>setQuestion(pi,qi,()=>next)}/>}
           {questionKey&&mediaFields}
           {(!questionKey||value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type))&&<FormSettings compact={!!questionKey} title="选项补充设置">
           {value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type)&&

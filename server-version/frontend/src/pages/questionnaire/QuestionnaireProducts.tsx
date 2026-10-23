@@ -1,5 +1,7 @@
 import { FormTemplatePicker } from './FormTemplatePicker'
 import { FormTemplateWorkspace } from './FormTemplateWorkspace'
+import {useFormPendingBuffers} from '../../modules/assessment-core/form/useFormBulkDraft'
+import {referencedFormChoiceKeys} from '../../modules/assessment-core/form/choiceSafety'
 import './form-template-editor.css'
 import { CatalogFilters, CatalogPagination } from '../../training/TrainingCatalogControls'
 import { useCatalogQuery } from '../../training/useCatalogQuery'
@@ -284,6 +286,12 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
   const [options, setOptions] = useState('')
   const [choiceDrafts, setChoiceDrafts] = useState(() => emptyChoices('option'))
   const [matrixDrafts, setMatrixDrafts] = useState(() => emptyChoices('row'))
+  const {hasPending:hasPendingChoices,onPendingChange:choicePendingChanged,clear:clearPendingChoices}=useFormPendingBuffers()
+  const [formEditEpoch,setFormEditEpoch]=useState(0)
+  const definitionSources=[...(detail?.items??[]),...(detail?.formSections??[]).flatMap((section:{items?:unknown[]})=>section.items??[])]
+    .flatMap((item:{formDefinition?:FormQuestion<never>;form?:{formDefinition?:FormQuestion<never>}})=>item.formDefinition?[item.formDefinition]:item.form?.formDefinition?[item.form.formDefinition]:[])
+  const protectedChoiceKeys=referencedFormChoiceKeys({...formConstraints,itemKey:editingFormItem?.formDefinition?.itemKey},definitionSources)
+
   const formOptions = trainingDesign ? filledChoices(choiceDrafts) : parseDelimitedOptions(options)
   const formRows = trainingDesign ? filledChoices(matrixDrafts) : parseDelimitedOptions(matrixRows)
   const changeChoices = (next: ChoiceDraft[]) => {
@@ -320,6 +328,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
   }
   const [required, setRequired] = useState(true)
   const editFormItem = (item: any) => {
+    if(hasPendingChoices)return
     setEditingFormItem(item); setType('FORM'); setFormLabel(item.formLabel); setFormType(item.formType)
     setRequired(item.required); setContext(item.contextKey || '')
     const constraints = {...(item.formDefinition || {})}; delete constraints.itemKey; setFormConstraints(constraints)
@@ -331,7 +340,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
     setMatrixDrafts(rows.length ? rows.map((row: any) => ({id:crypto.randomUUID(),value:row.rowKey,label:row.label})) : emptyChoices('row'))
     requestAnimationFrame(() => document.querySelector<HTMLInputElement>('#form-template-question-label')?.focus())
   }
-  const cancelFormEdit = () => { setEditingFormItem(null); setFormLabel(''); setFormConstraints({}); setContext(''); setPolicyEnabled(false); setRequired(true); setChoiceDrafts(emptyChoices('option')); setMatrixDrafts(emptyChoices('row')) }
+  const cancelFormEdit = () => { clearPendingChoices();setFormEditEpoch(value=>value+1);setEditingFormItem(null); setFormLabel(''); setFormConstraints({}); setContext(''); setPolicyEnabled(false); setRequired(true); setChoiceDrafts(emptyChoices('option')); setMatrixDrafts(emptyChoices('row')) }
 
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
@@ -588,6 +597,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
   }
   const add = () =>
     action(async () => {
+      if(hasPendingChoices)throw new Error('请先应用或取消批量输入，再保存题目。')
       if (trainingDesign && type === 'FORM') {
         const hasChoices = ['single_choice', 'multiple_choice'].includes(formType) || structuredOptionTypes.includes(typedFormType)
         if (hasChoices) {
@@ -1050,6 +1060,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                         题型
                         <select
                           aria-label="题型"
+                          disabled={hasPendingChoices}
                           className="input ml-2 max-w-full"
                           value={formType}
                           onChange={(e) => { setFormType(e.target.value); if(e.target.value==='year_month')setPolicyEnabled(false); setFormConstraints(e.target.value === 'slider' ? { min: 0, max: 100 } : {}); setOptions(''); setMatrixRows(''); setChoiceDrafts(emptyChoices('option')); setMatrixDrafts(emptyChoices('row')); if (typedFormTypes[e.target.value]) setContext('') }}
@@ -1099,10 +1110,10 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                       {typedFormType && <BasicFormConstraints question={{ ...formConstraints, type: typedFormType }} onChange={patch => setFormConstraints(previous => ({ ...previous, ...patch }))} />}
                       {typedFormType && <StructuredFormConstraints question={{ ...formConstraints, type: typedFormType }} onChange={patch => setFormConstraints(previous => ({ ...previous, ...patch }))} />}
                       {['matrix', 'matrix_multiple'].includes(formType) && (trainingDesign
-                        ? <FormChoiceEditor key={formType + '-rows'} title="矩阵行" prefix="row" choices={matrixDrafts} onChange={setMatrixDrafts} max={40} portableKeys />
+                        ? <FormChoiceEditor key={formType + '-rows-'+formEditEpoch+'-'+(editingFormItem?.id??'new')} onPendingChange={choicePendingChanged} title="矩阵行" prefix="row" choices={matrixDrafts} onChange={setMatrixDrafts} max={40} portableKeys />
                         : <label className="block">矩阵行（编码=标签，以逗号分隔）<input value={matrixRows} onChange={e => setMatrixRows(e.target.value)} /></label>)}
                       {(['single_choice', 'multiple_choice'].includes(formType) || structuredOptionTypes.includes(typedFormType)) && (trainingDesign
-                        ? <FormChoiceEditor key={formType + '-' + contextKey} title="选项" prefix="option" choices={choiceDrafts} onChange={changeChoices} max={30} portableKeys={Boolean(typedFormType)} />
+                        ? <FormChoiceEditor key={formType + '-' + contextKey+'-'+formEditEpoch+'-'+(editingFormItem?.id??'new')} onPendingChange={choicePendingChanged} protectedKeys={protectedChoiceKeys} title="选项" prefix="option" choices={choiceDrafts} onChange={changeChoices} max={30} portableKeys={Boolean(typedFormType)} />
                         : <label className="block">
                           选项（值=标签，以逗号分隔）
                           <input
@@ -1124,9 +1135,9 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                       )}
                     </>
                   )}
-                  <ProductButton variant={trainingDesign ? 'primary' : 'secondary'} disabled={trainingDesign && (busy || dirty || (type === 'FORM' ? !formLabel.trim() : !selected))} onClick={() => void add()}>
+                  <ProductButton variant={trainingDesign ? 'primary' : 'secondary'} disabled={trainingDesign && (busy || dirty || hasPendingChoices || (type === 'FORM' ? !formLabel.trim() : !selected))} onClick={() => void add()}>
                     {editingFormItem ? '保存题目修改' : formTemplate ? '添加题目' : '添加到测评'}
-                  </ProductButton>{editingFormItem && <ProductButton disabled={busy} onClick={cancelFormEdit}>取消编辑</ProductButton>}
+                  </ProductButton>{hasPendingChoices&&<p className="qt-form-hint" role="status">请先应用或取消所有批量输入，再保存题目。</p>}{editingFormItem && <ProductButton disabled={busy} onClick={cancelFormEdit}>取消编辑</ProductButton>}
                 </fieldset>
               )}
   </>
@@ -1180,7 +1191,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                           {formTemplate && draft && <ProductButton disabled={busy || dirty || authoringLocked} onClick={() => editFormItem({...item,formSectionId:v.id})}>编辑此题</ProductButton>}
                           {draft && (
                             <ProductButton
-                              disabled={busy || dirty || authoringLocked || Boolean(editingFormItem)}
+                              disabled={busy || dirty || authoringLocked || Boolean(editingFormItem) || hasPendingChoices}
                               className="ml-3"
                               onClick={() =>
                                 void action(async () =>
@@ -1445,7 +1456,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
       actions={<><span className="qt-draft-status">{busy ? '正在保存…' : dirty ? '有未保存的修改' : detail ? `已保存 · 修订 ${detail.revision}` : '新建表单'}</span>{draft && <ProductButton variant="primary" disabled={authoringLocked || busy || (id !== 'new' && !dirty)} onClick={() => void save()}><Save size={16}/>{id === 'new' ? '创建草稿' : '保存表单信息'}</ProductButton>}</>}/>
     {feedback}{error && <p role="alert" className="qt-error">{error}</p>}
     {id !== 'new' && !detail ? <p role="status">正在读取表单…</p> : <FormTemplateWorkspace key={id} isNew={id === 'new'} name={name} dirty={dirty} draft={draft} busy={busy} locked={authoringLocked}
-      sections={units} editingQuestionId={editingFormItem?.id} basicSettings={basicSettings} questionControls={addContentControls}
+      sections={units} pendingChoiceEdit={hasPendingChoices} editingQuestionId={editingFormItem?.id} basicSettings={basicSettings} questionControls={addContentControls}
       onEdit={editFormItem} onMove={(index, direction) => void move(index, direction)}
       onRemove={itemId => void action(async () => hydrate(await request('/' + id + '/items/' + itemId + '/remove', { revision: detail.revision })))}
       onRemoveSection={sectionId => void action(async () => hydrate(await request('/' + id + '/form-sections/' + sectionId + '/remove', { revision: detail.revision })))}/>}

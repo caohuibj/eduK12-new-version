@@ -11,8 +11,44 @@ function Editor({ max = 30 }: { max?: number }) {
 }
 const input = (index: number) => screen.getByRole('textbox', { name: `选项 ${index} 文字` })
 const paste = (index: number, text: string) => fireEvent.paste(input(index), { clipboardData: { getData: () => text } })
+const protectedChoices=[{id:'a',value:'custom_a',label:'甲'},{id:'b',value:'custom_b',label:'其他'},{id:'c',value:'custom_c',label:'均无'}]
+function ProtectedEditor(){
+  const [choices,setChoices]=useState(protectedChoices)
+  return <><FormChoiceEditor title="选项" prefix="option" choices={choices} onChange={setChoices} max={30} portableKeys protectedKeys={['custom_c']}/><output data-testid="choices">{JSON.stringify(choices)}</output></>
+}
 
 describe('Training choice authoring', () => {
+  it('loads existing text for replacement and preserves custom codes and identities',()=>{
+    render(<ProtectedEditor/> )
+    fireEvent.click(screen.getByRole('button',{name:'批量粘贴选项'}))
+    fireEvent.click(screen.getByRole('button',{name:'载入现有选项'}))
+    expect(screen.getByLabelText('选项批量内容')).toHaveValue('甲\n其他\n均无')
+    fireEvent.change(screen.getByLabelText('选项批量内容'),{target:{value:'新甲\n新乙\n新丙'}})
+    fireEvent.click(screen.getByRole('button',{name:'应用 3 项'}))
+    const saved=JSON.parse(screen.getByTestId('choices').textContent||'[]')
+    expect(saved.map((row:{id:string;value:string})=>({id:row.id,value:row.value}))).toEqual(protectedChoices.map(({id,value})=>({id,value})))
+    expect(saved.map((row:{label:string})=>row.label)).toEqual(['新甲','新乙','新丙'])
+  })
+  it('blocks bulk removal of a referenced option and permits same-key edits',()=>{
+    render(<ProtectedEditor/> )
+    fireEvent.click(screen.getByRole('button',{name:'批量粘贴选项'}))
+    fireEvent.change(screen.getByLabelText('选项应用方式'),{target:{value:'replace'}})
+    fireEvent.change(screen.getByLabelText('选项批量内容'),{target:{value:'甲\n乙'}})
+    expect(screen.getByRole('alert')).toHaveTextContent('将移除被其他填写、互斥或条件显示引用的选项')
+    expect(screen.getByRole('button',{name:'应用 2 项'})).toBeDisabled()
+    fireEvent.change(screen.getByLabelText('选项批量内容'),{target:{value:'甲\n乙\n丙'}})
+    fireEvent.click(screen.getByRole('button',{name:'应用 3 项'}))
+    expect(input(3)).toHaveValue('丙')
+  })
+  it('protects referenced options from manual deletion and code changes',()=>{
+    render(<ProtectedEditor/> )
+    fireEvent.click(screen.getByRole('button',{name:'删除选项 3'}))
+    expect(screen.getByRole('alert')).toHaveTextContent('请保留这些行')
+    expect(input(3)).toHaveValue('均无')
+    fireEvent.click(screen.getByRole('button',{name:'编辑编码'}))
+    fireEvent.change(screen.getByLabelText('选项 3 编码'),{target:{value:'new_code'}})
+    expect(screen.getByLabelText('选项 3 编码')).toHaveValue('custom_c')
+  })
   it('moves focus with Enter, appends at the end and keeps composition Enter intact', async () => {
     render(<Editor />)
     fireEvent.keyDown(input(1), { key: 'Enter', isComposing: true })
