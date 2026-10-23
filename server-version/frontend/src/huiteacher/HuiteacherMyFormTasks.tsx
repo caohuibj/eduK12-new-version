@@ -45,24 +45,41 @@ const clearDraft=(task:Task)=>{
 }
 export function HuiteacherMyFormTasks({api,student=false}: {api:Api;student?:boolean}){
   const taskEndpoint=student?'/my-student-evaluations':'/my-form-tasks'
-  const [tasks,setTasks]=useState<Summary[]>([])
+  const [taskRows,setTasks]=useState<Summary[]>([])
   const [active,setActive]=useState<Task|null>(null)
   const [answers,setAnswers]=useState<Record<string,ProfessionalAnswer>>({})
   const [page,setPage]=useState(0)
   const [busy,setBusy]=useState(false)
   const [notice,setNotice]=useState('')
   const pendingSubmission=useRef<string>('')
+  const listSource=useRef({api,endpoint:taskEndpoint})
+  const listRequest=useRef(0)
+  const [listState,setListState]=useState<{api:Api;endpoint:string;pending:boolean;error:string;loaded:boolean}>(
+    {api,endpoint:taskEndpoint,pending:true,error:'',loaded:false})
+  listSource.current={api,endpoint:taskEndpoint}
+  const listCurrent=listState.api===api&&listState.endpoint===taskEndpoint
+  const listPending=!listCurrent||listState.pending
+  const listError=listCurrent?listState.error:''
+  const listReady=listCurrent&&listState.loaded
+  const tasks=listReady?taskRows:[]
   const refresh=useCallback(async()=>{
-    const result=await api<{list:Summary[]}>(taskEndpoint)
-    setTasks(result.list)
+    if(listSource.current.api!==api||listSource.current.endpoint!==taskEndpoint)return
+    const request=++listRequest.current
+    const valid=()=>request===listRequest.current&&listSource.current.api===api&&listSource.current.endpoint===taskEndpoint
+    setListState(old=>({api,endpoint:taskEndpoint,pending:true,error:'',loaded:old.api===api&&old.endpoint===taskEndpoint&&old.loaded}))
+    try{
+      const data=await api<{list:Summary[]}>(taskEndpoint)
+      if(!valid())return
+      setTasks(data.list)
+      setListState({api,endpoint:taskEndpoint,pending:false,error:'',loaded:true})
+    }catch(error){
+      if(valid())setListState(old=>({...old,pending:false,error:error instanceof Error?error.message:'任务列表读取失败，请重试。'}))
+    }
   },[api,taskEndpoint])
   useEffect(()=>{
-    let live=true
-    void api<{list:Summary[]}>(taskEndpoint).then(x=>{
-      if(live)setTasks(x.list)
-    }).catch(e=>{if(live)setNotice(e instanceof Error?e.message:'待办评价读取失败')})
-    return ()=>{live=false}
-  },[api,taskEndpoint])
+    void refresh()
+    return()=>{listRequest.current+=1}
+  },[refresh])
   useEffect(()=>{
     if(active&&active.status==='STARTED')storeDraft(active,answers)
   },[active,answers])
@@ -132,8 +149,12 @@ export function HuiteacherMyFormTasks({api,student=false}: {api:Api;student?:boo
     <p>{student
       ?'使用原有教育账号参与已获授权的教师评教。身份用于确认资格，教师不能查看逐人作答；这属于身份受保护评价，不是绝对匿名。'
       :'使用统一教育账号完成本人获授权的评价；与 Huischool 心理数据及 Survey 研究作答隔离。'}</p>
+    {listPending&&<p role="status">正在读取任务列表，请稍候…</p>}
+    {listError&&<div role="alert" className="ht-notice"><p>任务列表读取失败，请重试。</p><p>{listError}</p>
+      <button type="button" disabled={listPending} onClick={()=>void refresh()}>重试读取任务列表</button>
+    </div>}
     {notice&&<p role="status" className="ht-notice">{notice}</p>}
-    {tasks.length===0?<p className="ht-empty">{student?'暂无已分配的学生评教任务。':'暂无已分配的教师发展评价任务。'}</p>:
+    {listReady&&!listPending&&!listError&&tasks.length===0?<p className="ht-empty">{student?'暂无已分配的学生评教任务。':'暂无已分配的教师发展评价任务。'}</p>:
       <div className="ht-event-list">{tasks.map(item=><article className="ht-event" key={item.executionId}>
         <strong>{item.formTitle}</strong> <span className="ht-tag">{item.status}</span>
         <p>{item.eventTitle}{student&&item.teacherName?' · '+item.teacherName:''}</p>

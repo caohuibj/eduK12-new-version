@@ -1,6 +1,6 @@
 import {describe,it,expect,vi} from 'vitest'
-import {render,screen,fireEvent} from '@testing-library/react'
-import {SchoolWorkspaceShell} from './SchoolWorkspaceShell'
+import {render,screen,fireEvent,within} from '@testing-library/react'
+import {SchoolWorkspaceShell,SchoolWorkspaceOverview} from './SchoolWorkspaceShell'
 import {schoolNavigation,type SchoolAccess} from './school-navigation'
 const teacher:SchoolAccess={orgRole:'MEMBER',canGovern:false,personas:['TEACHER'],capabilities:[],explicitDenies:[]}
 const counselor:SchoolAccess={...teacher,personas:['COUNSELOR'],capabilities:['PSYCHOLOGY_STAFF','PARENT_REPORT_DISCLOSURE']}
@@ -38,5 +38,48 @@ describe('campus page navigation boundaries',()=>{
   fireEvent.keyDown(screen.getByRole('navigation',{name:'工作台功能导航'}),{key:'Escape'})
   expect(toggle).toHaveAttribute('aria-expanded','false')
   expect(toggle).toHaveFocus()
+ })
+})
+
+
+describe('campus overview shortcuts',()=>{
+ it('pairs each card title and destination with an authorized item, prioritizing activities over private tools',()=>{
+  const items=schoolNavigation('TEACHER','',teacher,true,true)
+  const navigate=vi.fn()
+  render(<SchoolWorkspaceOverview username="Teacher" items={items} onNavigate={navigate}/>)
+  const activity=screen.getByRole('heading',{name:'活动管理'}).closest('a')!
+  expect(activity).toHaveAttribute('href','/workspace/activities')
+  fireEvent.click(activity)
+  expect(navigate).toHaveBeenCalledWith('activities')
+  const tools=screen.getByRole('heading',{name:'我的工具'}).closest('a')!
+  expect(tools).toHaveAttribute('href','/workspace/private-tools')
+  for(const link of screen.getAllByRole('link')){
+   const label=within(link).getByRole('heading').textContent
+   const item=items.find(candidate=>candidate.label===label)!
+   expect(item).toBeDefined()
+   expect(link).toHaveAttribute('href',item.id==='overview'?'/workspace':`/workspace/${item.id}`)
+  }
+ })
+ it('keeps pending students limited to their actual account entry and preserves the pending explanation',()=>{
+  render(<SchoolWorkspaceOverview username="Student" items={schoolNavigation('STUDENT','PENDING_CLASS_APPROVAL',null,true)} onNavigate={vi.fn()} pending={<p>等待学校审批</p>}/>)
+  expect(screen.getByText('等待学校审批')).toBeInTheDocument()
+  expect(screen.getAllByRole('link')).toHaveLength(1)
+  expect(screen.getByRole('link')).toHaveAttribute('href','/workspace/account')
+  expect(screen.queryByRole('heading',{name:'我的校园任务'})).not.toBeInTheDocument()
+ })
+ it('does not invent an account entry when none is supplied',()=>{
+  const items=schoolNavigation('TEACHER','',teacher,true).filter(item=>item.id!=='account')
+  render(<SchoolWorkspaceOverview username="Teacher" items={items} onNavigate={vi.fn()}/>)
+  expect(screen.getAllByRole('link').some(link=>link.getAttribute('href')==='/workspace/account')).toBe(false)
+ })
+ it('retains the page h1, description, school context and return navigation in its compact header',()=>{
+  const items=schoolNavigation('TEACHER','',teacher,true)
+  const navigate=vi.fn()
+  render(<SchoolWorkspaceShell items={items} page="activities" onNavigate={navigate} context={<p>当前学校：学校 a</p>}><h2>已授权活动</h2></SchoolWorkspaceShell>)
+  expect(screen.getByRole('heading',{level:1,name:'活动管理'})).toBeInTheDocument()
+  expect(screen.getByText(items.find(item=>item.id==='activities')!.description)).toBeInTheDocument()
+  expect(screen.getByText('当前学校：学校 a')).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('link',{name:'返回概览'}))
+  expect(navigate).toHaveBeenCalledWith('overview')
  })
 })

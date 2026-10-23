@@ -7,17 +7,42 @@ import {publishToolMeasurement} from '../../modules/survey/tool-publication.serv
 import {readSources,submit,review} from '../../modules/scale-library-governance/service'
 import {submissionSource} from '../../modules/scale-library-governance/source'
 import {getContentRelease} from '../../modules/measurement-content/repository'
-const suite=process.env.SURVEY_TOOL_PUBLICATION_ACCEPTANCE==='1'?describe:describe.skip
+const actions=process.env.CI==='true'
+const suite=actions||process.env.SURVEY_TOOL_PUBLICATION_ACCEPTANCE==='1'?describe:describe.skip
 const metadata={title:'合成入库量表',author:'Synthetic author',copyright:'Self authored, redistribution allowed',applicability:'Synthetic only',scoringDescription:'Mean',reportDescription:'Descriptive only'}
 const rollback=new Error('SYNTHETIC_ROLLBACK')
-// All writes (including immutable facts) roll back; no account or permission is created.
-async function fixture(test:(tx:Prisma.TransactionClient,owner:string,admin:string)=>Promise<void>){
+// All writes, including synthetic CI identities and immutable facts, roll back.
+// The manual fixture still requires existing identities; CI never reads Mac credentials.
+function requireFixtureDatabase(){
+ if(process.env.NODE_ENV==='production')throw new Error('Production fixture execution forbidden')
  const url=new URL(process.env.DATABASE_URL!)
- expect([url.hostname,url.port,url.pathname]).toEqual(['127.0.0.1','5557','/survey_mac_manual_20261022'])
+ if(actions){
+  if(process.env.SURVEY_TOOL_PUBLICATION_ACCEPTANCE!=='1'||process.env.GITHUB_ACTIONS!=='true'||
+   process.env.NODE_ENV!=='test'||process.env.SCHOOL_TEACHER_ISOLATED_DB!=='1'||
+   !/^[a-f0-9]{64}$/.test(process.env.CI_POSTGRES_SERVICE_ID??'')||
+   url.protocol!=='postgresql:'||url.hostname!=='127.0.0.1'||!url.port||url.username!=='ptool'||
+   url.pathname!=='/school_teacher_browser_ci_test'||
+   process.env.DATABASE_URL!==process.env.SCHOOL_TEACHER_TEST_DATABASE_URL||
+   process.env.DATABASE_URL!==process.env.RELEASE_INTEGRATION_DATABASE_URL)
+   throw new Error('Explicit disposable School/Teacher Actions PostgreSQL service required')
+ }else expect([url.hostname,url.port,url.pathname]).toEqual(['127.0.0.1','5557','/survey_mac_manual_20261022'])
+}
+async function syntheticIdentities(tx:Prisma.TransactionClient){
+ const admin=await tx.user.create({data:{username:'pubadmin'+randomUUID(),passwordHash:'synthetic-not-a-login-hash',role:'ADMIN',platformRole:'SYSTEM_ADMIN',accountDomain:'LEGACY'}})
+ const owner=await tx.user.create({data:{username:'pubowner'+randomUUID(),passwordHash:'synthetic-not-a-login-hash',role:'STUDENT',accountDomain:'SURVEY'}})
+ const login='pub'+randomUUID().replaceAll('-','').slice(0,20)
+ await tx.surveyAccount.create({data:{userId:owner.id,loginName:login,normalizedLogin:login}})
+ await tx.surveyResearcherGrant.create({data:{userId:owner.id,status:'ACTIVE',grantedBy:admin.id}})
+ await tx.surveyMfaCredential.create({data:{userId:owner.id,enabled:true,secretCipher:'synthetic-not-an-mfa-secret'}})
+ return {owner,admin}
+}
+async function fixture(test:(tx:Prisma.TransactionClient,owner:string,admin:string)=>Promise<void>){
+ requireFixtureDatabase()
  const transaction=prisma.$transaction.bind(prisma)
  try{await transaction(async tx=>{
-  const [owner]=await tx.$queryRaw<Array<{id:string}>>`SELECT u.id FROM users u JOIN survey_researcher_grants g ON g.user_id=u.id JOIN survey_mfa_credentials m ON m.user_id=u.id WHERE u.account_domain='SURVEY' AND u.is_active AND NOT u.is_frozen AND NOT u.must_change_password AND g.status='ACTIVE' AND m.enabled AND (u.expires_at IS NULL OR u.expires_at>clock_timestamp()) ORDER BY u.id LIMIT 1`
-  const [admin]=await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM users WHERE platform_role='SYSTEM_ADMIN' AND account_domain IN ('LEGACY','TRAINING') AND is_active AND NOT is_frozen AND NOT must_change_password ORDER BY id LIMIT 1`
+  const synthetic=actions?await syntheticIdentities(tx):undefined
+  const [owner]=synthetic?[synthetic.owner]:await tx.$queryRaw<Array<{id:string}>>`SELECT u.id FROM users u JOIN survey_researcher_grants g ON g.user_id=u.id JOIN survey_mfa_credentials m ON m.user_id=u.id WHERE u.account_domain='SURVEY' AND u.is_active AND NOT u.is_frozen AND NOT u.must_change_password AND g.status='ACTIVE' AND m.enabled AND (u.expires_at IS NULL OR u.expires_at>clock_timestamp()) ORDER BY u.id LIMIT 1`
+  const [admin]=synthetic?[synthetic.admin]:await tx.$queryRaw<Array<{id:string}>>`SELECT id FROM users WHERE platform_role='SYSTEM_ADMIN' AND account_domain IN ('LEGACY','TRAINING') AND is_active AND NOT is_frozen AND NOT must_change_password ORDER BY id LIMIT 1`
   if(!owner||!admin)throw new Error('Existing synthetic researcher and platform administrator required; no new identity will be made')
   const nested=vi.spyOn(prisma,'$transaction').mockImplementation(((fn:(t:Prisma.TransactionClient)=>Promise<unknown>)=>fn(tx)) as typeof prisma.$transaction)
   try{await test(tx,owner.id,admin.id)}finally{nested.mockRestore()}

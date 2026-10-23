@@ -475,7 +475,7 @@ const submitCompositeFormSectionFinalImpl = async (input: SectionSubmitInput) =>
   const route = await measureRequestPhase('final_submit_admission', () => prisma.compositeAssessmentAttempt.findUnique({
     where: { id: input.attemptId },
     select: { ...TRAINING_VARIANT_PARENT_MARKER_SELECT, userId: true, recoveryTokenHash: true, runtimeGeneration: true,
-      compositeAssessment: { select: { ...TRAINING_VARIANT_DEFINITION_MARKER_SELECT, bundleInstance: true } } },
+      compositeAssessment: { select: { ...TRAINING_VARIANT_DEFINITION_MARKER_SELECT, productKind: true, bundleInstance: true } } },
   }))
   if (!route) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
   assertTrainingFormFinalPrincipal(route, input)

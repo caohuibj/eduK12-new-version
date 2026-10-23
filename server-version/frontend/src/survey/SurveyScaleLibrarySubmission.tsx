@@ -1,3 +1,4 @@
+import {EducationApplicabilityFields,EducationApplicabilitySummary,useEducationApplicabilityDraft} from '../components/scale-governance/EducationApplicabilityFields'
 import { useEffect, useState } from 'react'
 import { ScaleLibraryMediaPreview } from '../components/scale-governance/ScaleLibraryMediaPreview'
 import { useScaleLibrarySubmission } from '../components/scale-governance/useScaleLibrarySubmission'
@@ -14,6 +15,7 @@ export function SurveyScaleLibrarySubmission({sourceId,initialReleaseId='',onBus
   const [mediaConsentKey,setMediaConsentKey]=useState('')
   useEffect(()=>{onBusyChange?.(busy);return()=>onBusyChange?.(false)},[busy,onBusyChange])
   const [withdrawReasons,setWithdrawReasons]=useState<Record<string,string>>({})
+  const applicability=useEducationApplicabilityDraft(JSON.stringify([sourceId,releaseId]))
   const release=source?.releases.find(row=>row.releaseId===releaseId)
   const manifest=release?.mediaManifest
   const manifestReady=manifest?.schemaVersion===1&&Array.isArray(manifest.items)&&!!manifest.manifestHash
@@ -31,13 +33,14 @@ export function SurveyScaleLibrarySubmission({sourceId,initialReleaseId='',onBus
     {status&&<p role="status" className="text-sky-800">{status}</p>}
     <button className="btn-secondary" type="button" disabled={loading||busy} onClick={()=>void refresh()}>刷新发布版本与申请</button>
     {loading&&<p role="status">正在读取精确发布版本…</p>}
-    {source&&<form onSubmit={event=>{event.preventDefault();if(release?.eligible&&complete&&!alreadySubmitted&&mediaReady&&!busy&&!loading&&!error){
-      if(needsMediaConsent&&manifest)void submit(releaseId,metadata,{manifestHash:manifest.manifestHash,shareWithAuthorizedUsers:true})
-      else void submit(releaseId,metadata)
+    {source&&<form onSubmit={event=>{event.preventDefault();if(release?.eligible&&complete&&!alreadySubmitted&&mediaReady&&applicability.valid&&!busy&&!loading&&!error){
+      const consent=needsMediaConsent&&manifest?{manifestHash:manifest.manifestHash,shareWithAuthorizedUsers:true as const}:undefined
+      const request=applicability.value?submit(releaseId,metadata,consent,applicability.value):consent?submit(releaseId,metadata,consent):submit(releaseId,metadata)
+      void request?.then(ok=>{if(ok)applicability.clear()})
     }}}>
       <fieldset disabled={busy||loading||!!error} className="space-y-3">
         <label className="block text-sm">申请的测量发布版本
-          <select className="input block w-full" value={releaseId} onChange={event=>{setReleaseId(event.target.value);setSupplement({});setMediaConsentKey('')}}>
+          <select className="input block w-full" value={releaseId} onChange={event=>{if(!applicability.confirmDiscard())return;applicability.clear();setReleaseId(event.target.value);setSupplement({});setMediaConsentKey('')}}>
             <option value="">请选择精确版本</option>
             {source.releases.map(row=><option key={row.releaseId} value={row.releaseId} disabled={!row.eligible}>{row.title} · {row.version}{row.eligible?'':' · 不可申请'}</option>)}
           </select>
@@ -71,14 +74,16 @@ export function SurveyScaleLibrarySubmission({sourceId,initialReleaseId='',onBus
           <textarea className="input block w-full" required maxLength={4000} disabled={!release} readOnly={!!defaults?.[key]?.trim()}
             value={metadata[key]} onChange={event=>setSupplement(value=>({...value,[key]:event.target.value}))}/>
         </label>)}
+        <EducationApplicabilityFields product="SURVEY" rows={applicability.rows} onChange={applicability.setRows} valid={applicability.valid} disabled={!release||alreadySubmitted}/>
         {alreadySubmitted&&<p>此精确版本已有待审核或已批准的申请，不重复提交。</p>}
-        <button className="btn-primary" type="submit" disabled={!release?.eligible||!complete||alreadySubmitted||!mediaReady}>提交此版本的入库申请</button>
+        <button className="btn-primary" type="submit" disabled={!release?.eligible||!complete||alreadySubmitted||!mediaReady||!applicability.valid}>提交此版本的入库申请</button>
       </fieldset>
     </form>}
     <ul className="space-y-3" aria-label="共用库申请记录">
       {submissions.map(row=><li key={row.id} className="border rounded-lg p-3 space-y-2">
         <p>{row.metadata.title} · {submissionStatusLabel[row.status]}</p>
         <p className="text-xs break-all">精确版本：{row.releaseId}</p>
+        <EducationApplicabilitySummary value={row.educationApplicability} hash={row.educationApplicabilityHash}/>
         {row.reason&&<p className="text-sm">处理说明：{row.reason}</p>}
         {row.status==='SUBMITTED'&&<div className="space-y-2">
           <label className="block text-sm">撤回说明<input className="input block w-full" maxLength={4000} value={withdrawReasons[row.id]||''} onChange={event=>setWithdrawReasons(value=>({...value,[row.id]:event.target.value}))}/></label>

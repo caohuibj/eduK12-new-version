@@ -1,5 +1,6 @@
 import type { Prisma } from '@prisma/client'
 import { CampusActivityError } from './activity.service'
+import { resolveOwnSchoolActivityPublisher, ownSchoolActivityPopulationIsCurrent } from './activity.publisher'
 
 /** A SCHOOL Run is always scoped to one Activity. Legacy runs retain their
  * existing delivery semantics. The result is used only as a narrowing input,
@@ -80,7 +81,13 @@ export async function campusRunParticipantScope(tx:Prisma.TransactionClient,inpu
   `
   const a=rows[0]
   if(!a)throw new CampusActivityError('CAMPUS_RUN_MUST_HAVE_ACTIVITY',403)
-  if(input.publish&&(!a.admin||a.status!=='OPEN'))
+  const own=!a.admin?await resolveOwnSchoolActivityPublisher(tx,{
+    actorUserId:input.actorUserId,organizationId:input.organizationId,courseId:a.courseId,runId:input.runId,
+  }):null
+  if(own&&!await ownSchoolActivityPopulationIsCurrent(tx,{
+    organizationId:input.organizationId,courseId:a.courseId,membershipId:own.membershipId,
+  }))throw new CampusActivityError('ACTIVITY_PUBLISH_CLASS_SCOPE',403)
+  if(input.publish&&((!a.admin&&!own)||a.status!=='OPEN'))
     throw new CampusActivityError('CAMPUS_RUN_REQUIRES_OPEN_GOVERNED_ACTIVITY',403)
   if(!['DRAFT','SUBMITTED','OPEN'].includes(a.status))
     throw new CampusActivityError('CAMPUS_ACTIVITY_INACTIVE',409)

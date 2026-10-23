@@ -5,6 +5,7 @@ import type { AuthenticatedPrincipal } from '../../types'
 import { resolveOrganizationAccessContext, contextHasCapability } from '../organization/access'
 import type { OrganizationAccessContext } from '../organization/access'
 import { appendAudit } from '../organization/service'
+import { resolveOwnSchoolActivityPublisher, ownSchoolActivityPopulationIsCurrent, resolveSchoolPsychologyScope } from './activity.publisher'
 
 type Tx=Prisma.TransactionClient
 export type ActivityStatus='DRAFT'|'SUBMITTED'|'OPEN'|'PAUSED'|'CLOSED'
@@ -33,7 +34,11 @@ const isSchoolAdmin=(ctx:OrganizationAccessContext)=>
 const isProfessional=(ctx:OrganizationAccessContext)=>
   ctx.personas.includes('COUNSELOR')&&contextHasCapability(ctx,'PSYCHOLOGY_STAFF')
 async function canPrepareActivity(tx:Tx,ctx:OrganizationAccessContext){
-  if(isSchoolAdmin(ctx)||isProfessional(ctx))return true
+  if(isSchoolAdmin(ctx))return true
+  if(isProfessional(ctx)){
+    const scope=await resolveSchoolPsychologyScope(tx,{actorUserId:ctx.userId,organizationId:ctx.organizationId})
+    if(scope?.membershipId===ctx.membershipId)return true
+  }
   if(!ctx.personas.includes('TEACHER'))return false
   const rows=await tx.$queryRaw<Array<{allowed:boolean}>>`
     SELECT EXISTS(
@@ -150,12 +155,34 @@ export async function readCampusActivity(input:{
       SELECT COUNT(*)::int AS "count" FROM "campus_activity_participants"
       WHERE "course_id"=${a.courseId} AND "status"='ACTIVE'
     `
-    const runs=await tx.$queryRaw<Array<{runId:string;status:string;name:string}>>`
-      SELECT ar."run_id" AS "runId",r."status",r."name"
+    const runs=await tx.$queryRaw<Array<{runId:string;status:string;name:string;createdByUserId:string}>>`
+      SELECT ar."run_id" AS "runId",r."status",r."name",r."created_by_user_id" AS "createdByUserId"
       FROM "campus_activity_runs" ar JOIN "assessment_runs" r ON r."id"=ar."run_id"
       WHERE ar."course_id"=${a.courseId} ORDER BY ar."created_at",ar."run_id"
     `
-    return {...a,participantCount:participants[0]?.count??0,runs}
+    const own=await resolveOwnSchoolActivityPublisher(tx,{
+      actorUserId:input.actor.userId,organizationId:a.organizationId,courseId:a.courseId,
+    })
+    const govern=isSchoolAdmin(ctx)
+    const canControl=govern||own!==null
+    const capabilities={
+      canSubmit:a.status==='DRAFT',
+      canOpen:canControl&&a.status==='SUBMITTED',
+      canPause:canControl&&a.status==='OPEN',
+      canResume:canControl&&a.status==='PAUSED',
+      canClose:canControl&&['SUBMITTED','OPEN','PAUSED'].includes(a.status),
+      canPublishRun:canControl&&a.status==='OPEN',
+      ownPsychologyPublisher:own!==null,
+    }
+    return {...a,participantCount:participants[0]?.count??0,capabilities,
+      runs:runs.map(({createdByUserId,...run})=>{
+        const manage=govern||(own!==null&&createdByUserId===input.actor.userId)
+        return {...run,capabilities:{
+          canPublish:manage&&a.status==='OPEN'&&run.status==='DRAFT',
+          canClose:manage&&run.status==='PUBLISHED',canCancel:manage&&run.status==='PUBLISHED',
+        }}
+      })}
+
   })
 }
 export async function updateCampusActivity(input:{
@@ -215,8 +242,14 @@ export async function changeCampusActivityStatus(input:{
     const ctx=await currentSchoolContext(tx,input.actor,input.organizationId)
     const a=await lockSchoolActivity(tx,input.organizationId,input.courseId)
     if(a.version!==input.expectedVersion)deny('ACTIVITY_VERSION_CONFLICT')
+    let ownPublisher:Awaited<ReturnType<typeof resolveOwnSchoolActivityPublisher>>=null
     if(input.action==='SUBMIT')await requireEditor(tx,ctx,a)
-    else await requireGovernor(ctx)
+    else if(!isSchoolAdmin(ctx)){
+      ownPublisher=await resolveOwnSchoolActivityPublisher(tx,{
+        actorUserId:input.actor.userId,organizationId:a.organizationId,courseId:a.courseId,
+      })
+      if(!ownPublisher)deny('ACTIVITY_GOVERNANCE_REQUIRED',403)
+    }
     const transitions:Record<typeof input.action,{from:ActivityStatus[];to:ActivityStatus}>={
       SUBMIT:{from:['DRAFT'],to:'SUBMITTED'},
       OPEN:{from:['SUBMITTED'],to:'OPEN'},
@@ -227,6 +260,9 @@ export async function changeCampusActivityStatus(input:{
     const transition=transitions[input.action]
     if(!transition.from.includes(a.status))deny('ACTIVITY_STATE_CONFLICT')
     if(input.action==='OPEN'||input.action==='RESUME'){
+      if(ownPublisher&&!await ownSchoolActivityPopulationIsCurrent(tx,{
+        organizationId:a.organizationId,courseId:a.courseId,membershipId:ownPublisher.membershipId,
+      }))deny('ACTIVITY_PUBLISH_CLASS_SCOPE',403)
       // A frozen participant list is not a person roster: recheck current
       // enrollment/membership/class approval before opening/reopening.
       const rows=await tx.$queryRaw<Array<{selected:number;current:number;contents:number}>>`
@@ -323,4 +359,20 @@ export async function assertCampusActivityGovernor(input:{
     const a=await lockSchoolActivity(tx,input.organizationId,input.courseId)
     return {activity:a,context:ctx}
   })
+}
+
+/** Own psychologist lifecycle authorization, separate from organization governance. */
+export async function lockAndAssertCampusActivityPublisher(tx:Tx,input:{
+  actor:AuthenticatedPrincipal;organizationId:string;courseId:string;runId?:string
+}){
+  const context=await currentSchoolContext(tx,input.actor,input.organizationId)
+  const activity=await lockSchoolActivity(tx,input.organizationId,input.courseId)
+  if(!isSchoolAdmin(context)){
+    const own=await resolveOwnSchoolActivityPublisher(tx,{
+      actorUserId:input.actor.userId,organizationId:input.organizationId,
+      courseId:input.courseId,runId:input.runId,
+    })
+    if(!own)deny('ACTIVITY_PUBLISHER_REQUIRED',403)
+  }
+  return {activity,context}
 }

@@ -256,6 +256,10 @@ const assertOwner = (resource: { createdBy: string | null; productKind?: string 
 
 const parseDate = (value: string | null | undefined) => (value ? new Date(value) : null)
 
+const assertNotOrganizationResourceGenericEntry = (resource: {productKind?:string|null}) => {
+  if(resource.productKind==='ORGANIZATION_RESOURCE') throw compositeForbidden('组织资源仅可通过对应的组织任务访问')
+}
+
 const loadComposite = async (id: string, includeItems = false, db: Db = prisma) => {
   const composite = await db.compositeAssessment.findUnique({
     where: { id },
@@ -1137,6 +1141,7 @@ export const copyComposite = async (userId: string, role: UserRole, sourceId: st
     },
   })
   if (!source) throw compositeNotFound()
+  assertNotOrganizationResourceGenericEntry(source)
   if(source.trainingFlowDraft!=null||source.trainingFlowFrozen!=null)throw compositeBadRequest('条件流程请使用问卷专用复制入口')
   if(source.trainingVariantDraft!=null||source.trainingVariantFrozen!=null)throw compositeBadRequest('概率分卷请使用问卷专用复制入口')
   const selfCopy = source.createdBy === userId
@@ -2371,6 +2376,7 @@ export const listAvailableForStudent = async (userId: string, now = Date.now()) 
 }
 
 const assertStudentEligibility = async (composite: any, userId: string) => {
+  assertNotOrganizationResourceGenericEntry(composite)
   if (composite.status !== 'PUBLISHED') throw compositeBadRequest('综合测评尚未发布')
   if (composite.productKind === 'QUESTIONNAIRE') {
     if (composite.questionnaireType !== 'COURSE') throw compositeForbidden('此问卷请通过公开链接访问')
@@ -2695,7 +2701,13 @@ const createAttempt = async (
   }
   let feedbackBinding: TrainingFeedbackBinding | null = null
   let persistenceBinding: { publicationIdentity: Record<string, unknown>; courseId: string; roundId: string | null; cutoffs: Array<Date | null> } | null = null
-  if(composite.items.some((item:any)=>item.formPolicy!=null) && (composite.productKind!=='QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || relationalIdentity || composite.reportPackageKey || composite.analysisProtocolKey)) throw compositeBadRequest('Form V3 只支持普通问卷的统一 FINAL 运行时')
+  if(composite.items.some((item:any)=>item.formPolicy!=null) && (composite.productKind!=='QUESTIONNAIRE' || composite.deliveryMode==='LEGACY' || relationalIdentity || composite.reportPackageKey || composite.analysisProtocolKey)) {
+    if(composite.productKind!=='ORGANIZATION_RESOURCE'||!composite.creationKey?.startsWith('private-form:')||!relationalIdentity||!userId
+      ||composite.deliveryMode==='LEGACY'||composite.reportPackageKey||composite.analysisProtocolKey)
+      throw compositeBadRequest('Form V3 只支持普通问卷的统一 FINAL 运行时')
+    const {readPrivateFormExecutionSource}=await import('../assessment-run/educationPrivateFormExecution')
+    await readPrivateFormExecutionSource(db as Prisma.TransactionClient,{assignmentRef:relationalIdentity.assignmentRef,compositeId:composite.id,actorUserId:userId})
+  }
   if (['QUESTIONNAIRE', 'ASSESSMENT_BUNDLE'].includes(composite.productKind)) {
     // Serialize new admission against archive; never trust the pre-lock read.
     await db.$queryRawUnsafe('SELECT "id" FROM "composite_assessments" WHERE "id" = $1 FOR UPDATE', composite.id)
@@ -3184,6 +3196,7 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
       compositeAssessment: {
         select: {
           id: true,
+          productKind: true,
           publicEnabled: true,
           status: true,
           opensAt: true,
@@ -3204,7 +3217,8 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
         compositeAssessment: {
           select: {
             id: true,
-            publicEnabled: true,
+            productKind: true,
+          publicEnabled: true,
             status: true,
             opensAt: true,
             expiresAt: true,
@@ -3217,6 +3231,7 @@ const findPublicToken = async (tokenValue: string, db: Db = prisma) => {
     if (token?.tokenHash && token.tokenHash !== tokenHash) token = null
   }
   if (!token) throw compositeNotFound('公开链接不存在')
+  assertNotOrganizationResourceGenericEntry(token.compositeAssessment)
   if (!token.compositeAssessment.publicEnabled || token.compositeAssessment.status !== 'PUBLISHED') throw compositeForbidden('综合测评未开放公开参与')
   assertNotLibraryComposite(token.compositeAssessment, '库课程上的综合测评不能公开作答')
   assertSupportedComposite(token.compositeAssessment, false, false)

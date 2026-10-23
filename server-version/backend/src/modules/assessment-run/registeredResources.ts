@@ -1,3 +1,6 @@
+import {readEducationRunLibraryContext,assertEducationRunLibraryResources} from './educationLibraryContext'
+import {readEducationLibraryRegisteredSource} from '../scale-library-governance/education-runtime-resources'
+import {educationLibraryResourceProduct} from '../scale-library-governance/education-runtime-entry'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -57,7 +60,13 @@ export function descriptiveResourceEntry(input: { scaleId: string; name: string;
   return entry
 }
 
+const rejectPrivateResource = (row: Pick<Row, 'resource_key' | 'entry'>): void => {
+  if (row.resource_key.startsWith('private-scale:') || (row.entry && 'privateOrigin' in row.entry))
+    reportingFail('RESOURCE_PRIVATE_LANE_REQUIRED', '作者私有量表仅可通过其独立任务接口使用', 409)
+}
+
 const checkedEntry = (row: Row): RelationalProductEntryV1 => {
+  rejectPrivateResource(row)
   if (canonicalHash(row.entry) !== row.entry_hash || row.entry.applicability.resourceKey !== row.resource_key || row.entry.applicability.resourceVersion !== row.resource_version || row.entry.launchTarget?.compositeAssessmentId !== row.composite_id) {
     return reportingFail('RESOURCE_INTEGRITY', '测量资源注册记录校验失败', 409)
   }
@@ -71,6 +80,8 @@ export async function registerDescriptiveResource(actor: Actor, scaleId: string,
     await tx.$queryRaw`SELECT id FROM scales WHERE id=${scaleId} FOR UPDATE`
     const scale = await tx.scale.findUnique({ where: { id: scaleId } })
     if (!scale) return reportingFail('RESOURCE_NOT_FOUND', '量表不存在', 404)
+    if (scale.code?.startsWith('education-private-scale:')) return reportingFail('RESOURCE_PRIVATE_LANE_REQUIRED', '作者私有量表不能转为旧注册资源', 409)
+    if (scale.libraryEntryId) return reportingFail('RESOURCE_LIBRARY_LANE_REQUIRED', '共用库量表须使用其固定版本入口，不能转为旧注册资源', 409)
     const isTeacher=mode==='TEACHER_INDIVIDUAL'
     const definition=validateDescriptiveResourceScale(scale,
       isTeacher?'teacher_self_report':'participant_self_report')
@@ -122,6 +133,9 @@ export async function transitionDescriptiveResource(actor: Actor, id: string, ac
   return prisma.$transaction(async tx => {
     const row = (await tx.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources WHERE id=${id} FOR UPDATE`)[0]
     if (!row) return reportingFail('RESOURCE_NOT_FOUND', '资源不存在', 404)
+    rejectPrivateResource(row)
+    if (row.resource_key.startsWith('library-scale:') || 'libraryOrigin' in row.entry)
+      return reportingFail('RESOURCE_LIBRARY_LANE_REQUIRED', '共用库资源随公库精确版本管理，不使用旧独立审核流程', 409)
     const expected = { review: 'DRAFT', publish: 'REVIEWED', retire: 'PUBLISHED' }[action]
     if (row.status !== expected) return reportingFail('RESOURCE_STATE_CONFLICT', '资源状态已变化，请刷新后再试', 409)
     checkedEntry(row)
@@ -155,7 +169,9 @@ export async function transitionDescriptiveResource(actor: Actor, id: string, ac
 export async function listRegisteredResources(actor: Actor, page = 1) {
   admin(actor)
   if (!Number.isSafeInteger(page) || page < 1 || page > 100000) reportingFail('RESOURCE_PAGE_INVALID', '资源页码无效', 400)
-  const list = await prisma.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources ORDER BY created_at DESC,id LIMIT 101 OFFSET ${(page - 1) * 100}`
+  const list = await prisma.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources
+    WHERE resource_key NOT LIKE 'private-scale:%' AND NOT (entry ? 'privateOrigin')
+    ORDER BY created_at DESC,id LIMIT 101 OFFSET ${(page - 1) * 100}`
   return { list: list.slice(0, 100).map(row => ({ ...row, entry: checkedEntry(row) })), truncated: list.length > 100, nextPage: list.length > 100 ? page + 1 : null }
 }
 
@@ -164,7 +180,7 @@ export async function listRegisteredResources(actor: Actor, page = 1) {
 export async function listRegistrationCandidates(actor:Actor,page=1){
   admin(actor)
   if(!Number.isSafeInteger(page)||page<1||page>100000)reportingFail('RESOURCE_PAGE_INVALID','资源页码无效',400)
-  const rows=await prisma.scale.findMany({where:{status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE'},
+  const rows=await prisma.scale.findMany({where:{status:'PUBLISHED',instrumentClass:'CUSTOM_DESCRIPTIVE',NOT:{code:{startsWith:'education-private-scale:'}}},
     select:{id:true,name:true,status:true,instrumentClass:true},orderBy:{id:'asc'},skip:(page-1)*100,take:101})
   return {list:rows.slice(0,100),nextPage:rows.length>100?page+1:null}
 }
@@ -178,8 +194,13 @@ export async function readPublishedRegisteredResource(actor: Actor, id: string) 
 
 /** Static content stays authoritative; registered content uses an exact, persisted identity. */
 export async function resolveReleasedRelationalEntry(ref: { resourceKind: string; resourceKey: string; resourceVersion: string }, db: Prisma.TransactionClient | typeof prisma = prisma) {
+  if(ref.resourceKey.startsWith('private-scale:')) reportingFail('RESOURCE_PRIVATE_LANE_REQUIRED','作者私有量表须使用独立任务接口',409)
   const staticEntry = relationalProductRegistry.findExact(ref as Parameters<typeof relationalProductRegistry.findExact>[0])
   if (staticEntry) return staticEntry
+  if(ref.resourceKind==='SCALE'&&ref.resourceKey.startsWith('library-scale:')){
+    const source=await readEducationLibraryRegisteredSource(db,{product:educationLibraryResourceProduct(ref.resourceKey),resourceKey:ref.resourceKey,resourceVersion:ref.resourceVersion,purpose:'EXISTING_EXECUTION'})
+    return source.resourceEntry
+  }
   if (ref.resourceKind !== 'SCALE' || !(ref.resourceKey.startsWith('custom-scale:') || ref.resourceKey.startsWith('teacher-scale:'))) return null
   const row = (await db.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources WHERE resource_key=${ref.resourceKey} AND resource_version=${ref.resourceVersion} AND status='PUBLISHED' LIMIT 1`)[0]
   return row ? checkedEntry(row) : null
@@ -187,8 +208,13 @@ export async function resolveReleasedRelationalEntry(ref: { resourceKind: string
 
 /** Retirement stops new delivery; frozen reports still require all current subject/organization grants. */
 export async function resolveHistoricalRelationalEntry(ref: { resourceKind: string; resourceKey: string; resourceVersion: string }, db: Prisma.TransactionClient | typeof prisma = prisma) {
+  if(ref.resourceKey.startsWith('private-scale:')) reportingFail('RESOURCE_PRIVATE_LANE_REQUIRED','作者私有量表须使用独立任务接口',409)
   const staticEntry = relationalProductRegistry.findExact(ref as Parameters<typeof relationalProductRegistry.findExact>[0])
   if (staticEntry) return staticEntry
+  if(ref.resourceKind==='SCALE'&&ref.resourceKey.startsWith('library-scale:')){
+    const source=await readEducationLibraryRegisteredSource(db,{product:educationLibraryResourceProduct(ref.resourceKey),resourceKey:ref.resourceKey,resourceVersion:ref.resourceVersion,purpose:'HISTORY'})
+    return source.resourceEntry
+  }
   if (ref.resourceKind !== 'SCALE' || !(ref.resourceKey.startsWith('custom-scale:') || ref.resourceKey.startsWith('teacher-scale:'))) return null
   const row = (await db.$queryRaw<Row[]>`SELECT * FROM registered_assessment_resources WHERE resource_key=${ref.resourceKey} AND resource_version=${ref.resourceVersion} AND status IN ('PUBLISHED','RETIRED') LIMIT 1`)[0]
   return row ? checkedEntry(row) : null
@@ -204,7 +230,9 @@ export async function listReleasedRegisteredResourcePage(userId: string, role: U
   // are read in the same statement, without per-resource DB lookups.
   const rows = await prisma.$queryRaw<Row[]>`SELECT resource.* FROM registered_assessment_resources resource
     JOIN scales scale ON scale.id=resource.scale_id AND scale.status='PUBLISHED' AND scale.definition_hash=resource.definition_hash
-    WHERE resource.status='PUBLISHED' AND (${role === UserRole.ADMIN} OR scale.creator_id=${userId}
+    WHERE resource.status='PUBLISHED' AND resource.resource_key NOT LIKE 'library-scale:%'
+      AND NOT (resource.entry ? 'libraryOrigin')
+      AND resource.resource_key NOT LIKE 'private-scale:%' AND NOT (resource.entry ? 'privateOrigin') AND (${role === UserRole.ADMIN} OR scale.creator_id=${userId}
       OR (${config.materialGrantsEnabled} AND EXISTS (SELECT 1 FROM material_grants grant_row
         WHERE grant_row.teacher_id=${userId} AND grant_row.resource_type='SCALE' AND grant_row.resource_id=scale.id)))
     ORDER BY resource.created_at DESC,resource.id LIMIT 101 OFFSET ${(page - 1) * 100}`
@@ -212,6 +240,19 @@ export async function listReleasedRegisteredResourcePage(userId: string, role: U
 }
 
 export async function assertRegisteredResourceUse(ref: { family: string; key: string; version: string }, userId: string, db: Prisma.TransactionClient | typeof prisma = prisma, lock = false, teacherRunScope?:{ organizationId:string;runId:string }) {
+  if(ref.key.startsWith('private-scale:')) reportingFail('RESOURCE_PRIVATE_LANE_REQUIRED','作者私有量表须使用独立任务接口',409)
+  if(ref.family==='SCALE'&&ref.key.startsWith('library-scale:')){
+    if(!teacherRunScope||lock) return reportingFail('EDUCATION_LIBRARY_BATCH_AUTHORITY_REQUIRED','公库量表必须在任务事务开始时统一校验授权',403)
+    const check=(tx:Prisma.TransactionClient)=>assertEducationRunLibraryResources(tx,{...teacherRunScope,actorUserId:userId,resources:[ref],purpose:'PREVIEW'})
+    if(db===prisma)await prisma.$transaction(check,{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
+    else await check(db)
+    return
+  }
+  if(teacherRunScope&&ref.family==='SCALE'){
+    const context=await readEducationRunLibraryContext(db,teacherRunScope)
+    if(context&&!(context.product==='TEACHER'&&ref.key.startsWith('teacher-scale:')))
+      return reportingFail('SCHOOL_EXPLICIT_LIBRARY_GRANT_REQUIRED','教育任务需要对应入口的正式量表授权',403)
+  }
   if (ref.family==='SCALE'&&ref.key.startsWith('teacher-scale:')){
     if(!teacherRunScope) return reportingFail('RESOURCE_TEACHER_RUN_SCOPE_REQUIRED',
       '教师自评量表只能用于经授权的 Teacher 评价任务',403)

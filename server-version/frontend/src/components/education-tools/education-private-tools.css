@@ -1,0 +1,61 @@
+.education-private-tools { --private-accent: #276760; --private-bg: #f3f7f3; --private-line: #dbe2e3; display: grid; grid-template-columns: minmax(0, 1fr); gap: .85rem; min-width: 0; }
+.education-private-tools--teacher { --private-accent: var(--ht-copper, #944638); --private-bg: var(--ht-bg, #fbf4ed); --private-line: var(--ht-line, #e5d5ca); }
+.education-private-tools header h2 { margin: 0 0 .5rem; }
+.education-private-tools p { line-height: 1.7; }
+.education-private-tools .education-private-boundary { padding: 1rem; border-left: 3px solid var(--private-accent); background: var(--private-bg); border-radius: .6rem; }
+.education-private-tools .education-private-toolbar,.education-private-tools .education-private-tabs { display: flex; gap: .75rem; align-items: end; flex-wrap: wrap; }
+.education-private-tools label { display: grid; gap: .4rem; }
+.education-private-tools input:not([type=checkbox]):not([type=radio]),.education-private-tools textarea,.education-private-tools select { max-width: 100%; min-height: 2.5rem; padding: .6rem .75rem; border: 1px solid #c4d0d0; border-radius: .55rem; background: #fff; color: inherit; font: inherit; }
+.education-private-tools button { padding: .65rem .95rem; border: 1px solid var(--private-accent); border-radius: .65rem; color: var(--private-accent); background: white; cursor: pointer; }
+.education-private-tools button[aria-pressed=true] { background: var(--private-accent); color: white; }
+.education-private-tools button:disabled { opacity: .5; cursor: not-allowed; }
+.education-private-tools :focus-visible { outline: 3px solid var(--private-accent); outline-offset: 3px; }
+.education-private-tools fieldset { min-width: 0; border: 0; margin: 0; padding: 0; }
+.education-private-tools .education-private-list { display: grid; grid-template-columns: repeat(auto-fit,minmax(min(100%,16rem),1fr)); gap: 1rem; }
+.education-private-tools .education-private-list article,.education-private-tools .staff-panel { padding: 1.25rem; border: 1px solid #dbe2e3; border-radius: .85rem; background: #fff; }
+.education-private-tools .education-private-preview fieldset { margin-bottom: 1rem; padding: 1rem; border: 1px solid #dbe2e3; border-radius: .75rem; }
+.education-private-tools .education-private-preview label { display: flex; align-items: center; gap: .5rem; margin: .5rem 0; }
+.education-private-tools [role=alert] { color: #963f3a; }
+.education-private-tools pre { max-width: 100%; white-space: pre-wrap; overflow-wrap: anywhere; overflow: auto; background: var(--private-bg); padding: 1rem; }
+.education-private-tools details { border-top: 1px solid #dbe2e3; padding-top: 1rem; }
+@media(max-width:640px) { .education-private-tools .education-private-toolbar>* { flex: 1 1 100%; } .education-private-tools .staff-panel { padding: .8rem; } }
+
+.education-private-tools .education-private-heading { display: flex; align-items: start; justify-content: space-between; gap: .75rem; }
+.education-private-tools .education-private-heading h2 { margin-bottom: .25rem; }
+.education-private-tools .education-private-heading p,.education-private-tools .education-private-step-help { margin: 0; font-size: .9rem; }
+.education-private-tools .education-private-badge { flex-shrink: 0; padding: .25rem .6rem; border-radius: 1rem; color: var(--private-accent); background: var(--private-bg); font-size: .8rem; }
+.education-private-tools details.education-private-boundary { padding: .55rem .75rem; border-top: 0; }
+.education-private-tools .education-private-boundary summary { cursor: pointer; font-size: .85rem; }
+.education-private-tools .education-private-boundary p { margin: .4rem 0 0; font-size: .85rem; }
+.education-private-tools .education-private-navigation { align-items: center; }
+.education-private-tools .education-private-save-state { margin-left: auto; font-size: .85rem; }
+.education-private-tools .education-private-steps { display: flex; flex-wrap: wrap; gap: .4rem 1.25rem; list-style: none; padding: .55rem 0; margin: 0; border-block: 1px solid var(--private-line); color: var(--private-accent); font-size: .85rem; }
+.education-private-tools .education-private-title-field { max-width: 48rem; }
+.education-private-tools button.education-private-primary { background: var(--private-accent); color: #fff; border-color: var(--private-accent); }
+.education-private-tools .education-private-versions summary { cursor: pointer; font-weight: 600; }
+.education-private-tools .education-private-versions>.education-private-step-help { margin-top: .5rem; }
+.education-private-tools .education-private-version { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: .5rem 1rem; padding: .7rem 0; border-bottom: 1px solid var(--private-line); }
+.education-private-tools .education-private-version p { margin: .2rem 0 0; font-size: .85rem; }
+@media(max-width:640px) { .education-private-tools .education-private-save-state { margin-left: 0; } .education-private-tools .education-private-actions>* { flex: 1 1 calc(50% - .75rem); } .education-private-tools .education-private-navigation>* { flex: 0 1 auto; } }
+
+.education-private-tools .education-private-form-layout { display: grid; grid-template-columns: minmax(11rem, 15rem) minmax(0, 1fr); gap: 1rem; margin-top: .65rem; align-items: start; }
+.education-private-tools .education-private-form-directory { min-width: 0; padding-right: .8rem; border-right: 1px solid var(--private-line); }
+.education-private-tools .education-private-form-directory h3 { margin: 0 0 .5rem; font-size: .95rem; }
+.education-private-tools .education-private-form-directory ol { list-style: none; margin: 0; padding: 0; }
+.education-private-tools .education-private-form-directory li { margin-bottom: .35rem; }
+.education-private-tools .education-private-form-directory li ol { padding-left: .6rem; margin-top: .35rem; }
+.education-private-tools .education-private-form-directory button { width: 100%; display: flex; align-items: baseline; justify-content: space-between; gap: .35rem; padding: .4rem .55rem; font-size: .85rem; text-align: left; overflow-wrap: anywhere; }
+.education-private-tools .education-private-form-directory small { font-size: .75rem; flex-shrink: 0; }
+.education-private-tools .education-private-form-directory p { margin: .25rem 0; font-size: .8rem; }
+.education-private-tools .education-private-form-fields { min-width: 0; }
+@media(max-width:760px) { .education-private-tools .education-private-form-layout { grid-template-columns: minmax(0, 1fr); } .education-private-tools .education-private-form-directory { border-right: 0; padding-right: 0; padding-bottom: .65rem; border-bottom: 1px solid var(--private-line); } }
+
+/* Keep School workspace state backgrounds paired with readable foregrounds.
+   Product dark-theme rules retain their higher-specificity color pairs. */
+.hs-workspace .education-private-tools button[aria-pressed=true] { color: var(--hs-ink); }
+.hs-workspace .education-private-tools button.education-private-primary { background: var(--private-accent); color: #fff; }
+
+/* Native file controls must shrink inside the upload label's grid track. */
+.education-private-tools .scale-feedback-upload,.education-private-tools .education-material-upload { min-width: 0; grid-template-columns: minmax(0, 1fr); }
+.education-private-tools .scale-feedback-upload input[type=file],.education-private-tools .education-material-upload input[type=file] { width: 100%; min-width: 0; box-sizing: border-box; }
+@media(max-width:640px) { .education-private-tools .education-private-form-fields header { flex-wrap: wrap; } .education-private-tools .education-private-form-fields header input { flex-basis: 100%; min-width: 0; } }

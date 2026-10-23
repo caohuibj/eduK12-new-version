@@ -1,3 +1,6 @@
+import { Prisma } from '@prisma/client'
+import { boundCompositeContinuationSql } from '../assessment-run/boundCompositeContinuation'
+import { currentRunPopulationAuthoritySql } from '../assessment-run/currentPopulationAuthority'
 import { prisma } from '../../config/database'
 import type { AuthenticatedPrincipal } from '../../types'
 import { listAssignedRunTasks } from '../assessment-run/productRead'
@@ -37,7 +40,9 @@ export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, o
     JOIN education_product_entitlements ent ON ent.organization_id=org.id
       AND ent.product='HUISCHOOL' AND ent.status='ACTIVE'
     JOIN assessment_runs run ON run.id=e.run_id AND run.organization_id=e.organization_id
-      AND run.status='PUBLISHED'
+      AND (run.status='PUBLISHED' OR (run.status='CLOSED'
+        AND ${boundCompositeContinuationSql(Prisma.sql`e.id`,actor.userId)}
+        AND ${currentRunPopulationAuthoritySql(Prisma.sql`e.id`)}))
     JOIN organization_memberships teacher ON teacher.id=r.membership_id
       AND teacher.organization_id=e.organization_id AND teacher.user_id=${actor.userId}
       AND teacher.valid_from<=statement_timestamp()
@@ -86,6 +91,7 @@ export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, o
   if(!allowed.length)return {list:[],truncated:candidates.length>100}
   const official=await listAssignedRunTasks(actor.userId,{
     runIds:[...new Set(allowed.map(t=>t.runId))],
+    preserveBoundSchoolContinuation:true,
   })
   const byExecution=new Map(allowed.map(row=>[row.executionId,row]))
   const list=official.list.flatMap(row=>{
@@ -99,7 +105,7 @@ export async function listCampusTeacherRunTasks(actor: AuthenticatedPrincipal, o
       activityTitle:access.activityTitle,runTitle:row.runName,
       studentReference:campusStudentReference(access.organizationId,access.studentUserId),
       status:row.status,deadline:row.deadline?.toISOString()??null,
-      consentRequired:row.consentRequired,consentPurpose:row.consentPurpose,
+      canResumeExisting:row.canResumeExisting,consentRequired:row.consentRequired,consentPurpose:row.consentPurpose,
       consentVisibility:row.consentVisibility,
     }]
   })

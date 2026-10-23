@@ -23,11 +23,31 @@ const memberScopes = async (input:{
   actorUserId:string
   product:EducationProduct
   organizationId?:string
+  requiredCapability?:'PSYCHOLOGY_STAFF'
 },db:Database):Promise<EducationProductMemberScope[]>=>{
   const accessDeny = input.product+'_ACCESS'
   const adminDeny = input.product+'_ADMIN'
   const orgFilter=input.organizationId
     ? Prisma.sql`AND o."id"=${input.organizationId}`
+    : Prisma.empty
+  // A professional identity belongs to this exact membership, not to the
+  // user's platform role or a grant held in another school. Keep the whole
+  // decision in the same statement as account/product/membership validity.
+  const professionalFilter=input.requiredCapability==='PSYCHOLOGY_STAFF'
+    ? Prisma.sql`AND EXISTS (
+        SELECT 1 FROM "organization_persona_grants" persona
+        WHERE persona."organization_id"=o."id" AND persona."membership_id"=m."id"
+          AND persona."persona"='COUNSELOR' AND persona."revoked_at" IS NULL
+      ) AND EXISTS (
+        SELECT 1 FROM "organization_capability_grants" capability
+        WHERE capability."organization_id"=o."id" AND capability."membership_id"=m."id"
+          AND capability."capability"='PSYCHOLOGY_STAFF' AND capability."revoked_at" IS NULL
+      ) AND NOT EXISTS (
+        SELECT 1 FROM "organization_access_denies" professional_deny
+        WHERE professional_deny."organization_id"=o."id" AND professional_deny."user_id"=u."id"
+          AND professional_deny."lifted_at" IS NULL
+          AND professional_deny."permission"='PSYCHOLOGY_STAFF'
+      )`
     : Prisma.empty
   const limit=input.organizationId?1:100
   const rows=await db.$queryRaw<Array<Omit<EducationProductMemberScope,'product'>>>(Prisma.sql`
@@ -66,6 +86,7 @@ const memberScopes = async (input:{
       AND (u."expires_at" IS NULL OR u."expires_at">statement_timestamp())
     WHERE o."product_domain"='SCHOOL' AND o."status"='ACTIVE'
       ${orgFilter}
+      ${professionalFilter}
       AND NOT EXISTS(
         SELECT 1 FROM "organization_access_denies" deny
         WHERE deny."organization_id"=o."id" AND deny."user_id"=u."id"
@@ -82,6 +103,7 @@ export async function resolveEducationProductMemberScope(input:{
   actorUserId:string
   organizationId:string
   product:EducationProduct
+  requiredCapability?:'PSYCHOLOGY_STAFF'
 },db:Database=prisma):Promise<EducationProductMemberScope|null>{
   return (await memberScopes(input,db))[0]??null
 }

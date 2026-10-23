@@ -7,7 +7,7 @@ import { success, forbidden, notFound } from '../../utils/response'
 import { assessmentRunController } from '../assessment-run/run.controller'
 import { CampusActivityError,assertCampusActivityEditor } from './activity.service'
 import {
-  assertCampusActivityRunEditor,assertCampusActivityRunGovernor,
+  assertCampusActivityRunEditor,assertCampusActivityRunPublisher,
   createCampusActivityRunDraft,bindCampusActivityRun,
 } from './activity.runs'
 import { prisma } from '../../config/database'
@@ -34,7 +34,7 @@ const wrap=(fn:(req:any,res:any)=>Promise<any>)=>asyncHandler(async(req,res)=>{
 router.get('/organizations/:organizationId/activities/:courseId/run-resources',
   authenticateSchool,wrap(async(req,res)=>{
     await assertCampusActivityEditor({actor:req.user!,...path.parse(req.params)})
-    return assessmentRunController.resources(req,res)
+    return assessmentRunController.schoolActivityResources(req,res,path.parse(req.params))
   })
 )
 
@@ -84,8 +84,8 @@ router.post('/organizations/:organizationId/activities/:courseId/runs/:runId/pre
 )
 router.post('/organizations/:organizationId/activities/:courseId/runs/:runId/publish',
   authenticateSchool,requireRecentSchoolMfa,wrap(async(req,res)=>{
-    const result=await assertCampusActivityRunGovernor({actor:req.user!,...runPath.parse(req.params)})
-    if(result.activity.status!=='OPEN')return forbidden(res,'须由学校管理员正式开放活动后再发布测评')
+    const result=await assertCampusActivityRunPublisher({actor:req.user!,...runPath.parse(req.params)})
+    if(result.activity.status!=='OPEN')return forbidden(res,'须先开放活动后再发布测评')
     return assessmentRunController.publish(req,res)
   })
 )
@@ -97,13 +97,13 @@ router.get('/organizations/:organizationId/activities/:courseId/runs/:runId/prog
 )
 router.post('/organizations/:organizationId/activities/:courseId/runs/:runId/close',
   authenticateSchool,requireRecentSchoolMfa,wrap(async(req,res)=>{
-    await assertCampusActivityRunGovernor({actor:req.user!,...runPath.parse(req.params)})
+    await assertCampusActivityRunPublisher({actor:req.user!,...runPath.parse(req.params)})
     return assessmentRunController.close(req,res)
   })
 )
 router.post('/organizations/:organizationId/activities/:courseId/runs/:runId/cancel',
   authenticateSchool,requireRecentSchoolMfa,wrap(async(req,res)=>{
-    await assertCampusActivityRunGovernor({actor:req.user!,...runPath.parse(req.params)})
+    await assertCampusActivityRunPublisher({actor:req.user!,...runPath.parse(req.params)})
     return assessmentRunController.cancel(req,res)
   })
 )

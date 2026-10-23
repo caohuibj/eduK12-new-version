@@ -1,3 +1,6 @@
+import {educationLibraryRuntimeContext} from '../../modules/scale-library-governance/education-runtime-context'
+import {readEducationLibraryExistingWrapperIdentity} from '../../modules/scale-library-governance/education-runtime-source'
+import {readEducationLibraryUse} from '../../modules/scale-library-governance/education-use'
 import {hashScaleDefinition} from '../../modules/scale/scale-definition'
 import {catalogSnapshotsForDrafts} from '../../modules/survey/catalog.service'
 import {canUseScale,createGrant} from '../../services/materialGrant'
@@ -232,4 +235,117 @@ suite('Scale library governance / real isolated PostgreSQL',()=>{
   const outcome=await observed;expect(outcome.ok).toBe(false)
   expect(JSON.stringify(outcome.error)).toMatch(/40001|P2034|serialize/i)
  })
+ it('education distribution rejects a version without approved applicability and creates no grant',async()=>{
+  const {entryId,release}=await approved()
+  for(const product of ['SCHOOL','TEACHER']){
+   const requestId=randomUUID()
+   await expect(grantUse(admin,entryId,{requestId,product,releaseId:release.releaseId,contentHash:release.contentHash,scopeKind:'USER',organizationId:randomUUID(),userId:reader})).rejects.toThrow('EDUCATION_LIBRARY_APPLICABILITY_REQUIRED')
+   expect(await db.scaleLibraryUseGrant.findUnique({where:{id:requestId}})).toBeNull()
+  }
+ })
+ it('education foundation enforces organization scopes, immutable identity and independent active grants',async()=>{
+  const {entryId,release}=await approved()
+  const member=(await db.user.create({data:{username:'libschool'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'SCHOOL'}})).id
+  const org=randomUUID(),otherOrg=randomUUID(),membership=randomUUID()
+  for(const organizationId of [org,otherOrg]){
+   await db.organization.create({data:{id:organizationId,name:'Synthetic library school',productDomain:'SCHOOL',createdByUserId:admin}})
+   await db.educationProductEntitlement.create({data:{organizationId,product:'HUISCHOOL',grantedByUserId:admin}})
+  }
+  await db.organizationMembership.create({data:{id:membership,organizationId:org,userId:member}})
+  const userGrant=randomUUID(),orgGrant=randomUUID()
+  const insert=(id:string,product:string,scopeKind:string,organizationId:string|null,userId:string|null)=>db.$executeRaw(Prisma.sql`
+   INSERT INTO scale_library_use_grants(id,entry_id,product,scope_kind,organization_id,user_id,issuer_id)
+   VALUES(${id},${entryId},${product},${scopeKind},${organizationId},${userId},${admin})`)
+  // These rows are synthetic DB fixtures, not a product grant path.
+  await insert(userGrant,'SCHOOL','USER',org,member)
+  await insert(orgGrant,'SCHOOL','ORGANIZATION',org,null)
+  await expect(insert(randomUUID(),'SCHOOL','USER',org,member)).rejects.toThrow()
+  await expect(insert(randomUUID(),'SCHOOL','ORGANIZATION',org,null)).rejects.toThrow()
+  for(const args of [
+   ['SCHOOL','USER',null,member],['SCHOOL','USER',org,null],['SCHOOL','ORGANIZATION',org,member],
+   ['SURVEY','USER',org,reader],['TRAINING','ORGANIZATION',null,null],
+  ] as const)await expect(insert(randomUUID(),args[0],args[1],args[2],args[3])).rejects.toThrow()
+  await expect(db.$executeRaw(Prisma.sql`UPDATE scale_library_use_grants SET organization_id=${otherOrg} WHERE id=${userGrant}`)).rejects.toThrow()
+  await expect(db.$executeRaw(Prisma.sql`UPDATE scale_library_use_grants SET scope_kind='ORGANIZATION',user_id=NULL WHERE id=${userGrant}`)).rejects.toThrow()
+  const input={entryId,releaseId:release.releaseId,contentHash:release.contentHash,organizationId:org,actorId:member,product:'SCHOOL' as const}
+  const read=(patch:Partial<typeof input>={})=>db.$transaction(tx=>readEducationLibraryUse(tx,{...input,...patch}))
+  expect(await read()).toMatchObject({grantId:userGrant,scopeKind:'USER',runtimeStatus:'EDUCATION_LIBRARY_ADAPTER_NOT_READY',canPublish:false})
+  await db.educationProductEntitlement.create({data:{organizationId:org,product:'HUITEACHER',grantedByUserId:admin}})
+  const readTeacher=()=>db.$transaction(tx=>readEducationLibraryUse(tx,{...input,product:'TEACHER'}))
+  await expect(readTeacher()).rejects.toThrow('USE_GRANT_REQUIRED')
+  const teacherGrant=randomUUID()
+  await insert(teacherGrant,'TEACHER','USER',org,member)
+  expect(await readTeacher()).toMatchObject({product:'TEACHER',grantId:teacherGrant})
+  await revokeUse(admin,teacherGrant,{expectedVersion:1,reason:'Synthetic Teacher grant revoked'})
+  await expect(readTeacher()).rejects.toThrow('USE_GRANT_REQUIRED')
+  await expect(read({contentHash:'0'.repeat(64)})).rejects.toThrow('EXACT_VERSION_MISMATCH')
+  await expect(read({releaseId:randomUUID()})).rejects.toThrow('EXACT_VERSION_MISMATCH')
+  await expect(read({organizationId:otherOrg})).rejects.toThrow('MEMBERSHIP_REQUIRED')
+  await revokeUse(admin,userGrant,{expectedVersion:1,reason:'Synthetic user grant revoked'})
+  expect(await read()).toMatchObject({grantId:orgGrant,scopeKind:'ORGANIZATION'})
+  await expect(db.$transaction(tx=>assertLibraryUseGrantCurrent(tx,{entryId,userId:member,product:'TRAINING'}))).rejects.toThrow()
+  const deny=randomUUID()
+  await db.organizationAccessDeny.create({data:{id:deny,organizationId:org,userId:member,permission:'HUISCHOOL_ACCESS',reason:'Synthetic deny',deniedByUserId:admin}})
+  await expect(read()).rejects.toThrow('MEMBERSHIP_REQUIRED')
+  await db.organizationAccessDeny.update({where:{id:deny},data:{liftedAt:new Date(),liftedByUserId:admin}})
+  await db.organizationMembership.update({where:{id:membership},data:{validUntil:new Date(),endedByUserId:admin,endReason:'Synthetic ended'}})
+  await expect(read()).rejects.toThrow('MEMBERSHIP_REQUIRED')
+ })
+
+ it('education runtime identity reads real wrappers without granting education use',async()=>{
+  const {entryId,release}=await approved()
+  const member=(await db.user.create({data:{username:'libidentity'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'SCHOOL'}})).id
+  const org=randomUUID()
+  await db.organization.create({data:{id:org,name:'Synthetic identity school',productDomain:'SCHOOL',createdByUserId:admin}})
+  for(const product of ['HUISCHOOL','HUITEACHER'] as const)
+   await db.educationProductEntitlement.create({data:{organizationId:org,product,grantedByUserId:admin}})
+  await db.organizationMembership.create({data:{id:randomUUID(),organizationId:org,userId:member}})
+  const reference={entryId,releaseId:release.releaseId,contentHash:release.contentHash}
+  const scope={product:'SCHOOL' as const,organizationId:org,actorId:member}
+  const context=educationLibraryRuntimeContext(scope,reference,'READ')
+  const read=(patch:Partial<typeof context>={})=>db.$transaction(tx=>readEducationLibraryExistingWrapperIdentity(tx,{...context,...patch}))
+  await expect(read()).rejects.toThrow('EXISTING_WRAPPER_REQUIRED')
+  const teacher=(await db.user.create({data:{username:'libwrapper'+randomUUID().slice(0,8),passwordHash:'synthetic',role:'TEACHER',teacherApproved:true,accountDomain:'TRAINING'}})).id
+  await grantUse(admin,entryId,{requestId:randomUUID(),userId:teacher,product:'TRAINING'})
+  for(const product of ['SCHOOL','TEACHER'] as const){
+   const resolved=await read({product})
+   expect(resolved).toMatchObject({identityOnly:true,runtimeStatus:'EDUCATION_LIBRARY_ADAPTER_NOT_READY',canDistribute:false,canPublish:false})
+   expect(resolved.wrapper.libraryEntryId).toBe(entryId)
+   expect(resolved.release.releaseId).toBe(release.releaseId)
+   expect(resolved.definition).toEqual(compileResearchScale(metadata.title,definition))
+   await expect(db.$transaction(tx=>readEducationLibraryUse(tx,{...scope,...reference,product}))).rejects.toThrow('USE_GRANT_REQUIRED')
+  }
+  await expect(read({contentHash:'0'.repeat(64)})).rejects.toThrow('EXACT_VERSION_MISMATCH')
+  await expect(read({releaseId:randomUUID()})).rejects.toThrow('WRAPPER_IDENTITY_MISMATCH')
+  await db.user.update({where:{id:owner},data:{isFrozen:true}})
+  try{expect((await read()).release.releaseId).toBe(release.releaseId)}
+  finally{await db.user.update({where:{id:owner},data:{isFrozen:false}})}
+  await changeEntryStatus(admin,entryId,{expectedVersion:1,status:'WITHDRAWN',reason:'Synthetic identity withdrawal'})
+  await expect(read()).rejects.toThrow('CONTENT_SCALE_LIBRARY_IDENTITY_MISMATCH')
+ })
+
+ it('freezes education applicability with the approved exact library version',async()=>{
+  const release=await source(),requestId=randomUUID()
+  const educationApplicability={schemaVersion:1,administrations:[{population:'STUDENT',responseMode:'SELF'},{population:'TEACHER',responseMode:'SELF'}]}
+  const request={requestId,releaseId:release.releaseId,metadata,educationApplicability}
+  const submission=await submit(owner,'SURVEY',request)
+  expect(submission.educationApplicability).toEqual(educationApplicability)
+  expect(submission.educationApplicabilityHash).toMatch(/^[a-f0-9]{64}$/)
+  const repeated=await submit(owner,'SURVEY',{...request,educationApplicability:{...educationApplicability,administrations:[...educationApplicability.administrations].reverse()}})
+  expect(repeated.id).toBe(submission.id)
+  await expect(submit(owner,'SURVEY',{...request,educationApplicability:{schemaVersion:1,administrations:[{population:'STUDENT',responseMode:'PARENT_REPORT'}]}})).rejects.toThrow('请求编号已用于其他申请')
+  const approvedVersion=await review(admin,submission.id,{expectedVersion:1,decision:'APPROVE',reason:'Explicit applicability approved with this version'})
+  const detail=await readSubmission(owner,submission.id)
+  expect(detail.educationApplicability).toEqual(educationApplicability)
+  expect(detail.educationApplicabilityHash).toBe(submission.educationApplicabilityHash)
+  expect(detail.snapshot.educationApplicability).toEqual(educationApplicability)
+  expect(detail.release.releaseId).toBe(release.releaseId)
+  await expect(db.$executeRaw(Prisma.sql`UPDATE scale_library_submissions SET snapshot=jsonb_set(snapshot,'{educationApplicability}','{}'::jsonb) WHERE id=${submission.id}`)).rejects.toThrow()
+  await expect(submit(owner,'SURVEY',{...request,requestId:randomUUID()})).rejects.toThrow()
+  const entries=await listEntries(admin,approvedVersion.entryId!)
+  expect(entries.list[0].educationApplicabilityHash).toBe(submission.educationApplicabilityHash)
+  expect(entries.list[0].supportedEntrypoints).toContain('SCHOOL')
+  expect(entries.list[0].supportedEntrypoints).toContain('TEACHER')
+ })
+
 })

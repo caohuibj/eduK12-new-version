@@ -2,7 +2,7 @@ import {Prisma} from '@prisma/client'
 import {assertContentAuthority} from '../measurement-content/content-authority.repository'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {assertEntryAdmin} from '../admin-permissions/service'
-import {fail,LIBRARY_SCOPE,type LibraryProduct} from './contracts'
+import {fail,LIBRARY_SCOPE,libraryAdminEntry,type LibraryProduct} from './contracts'
 export async function libraryActor(tx:Prisma.TransactionClient,actorId:string){
   const [u]=await tx.$queryRaw<Array<{id:string;platform_role:string;account_domain:string;role:string;teacher_approved:boolean;expires_at:Date|null}>>(Prisma.sql`
     SELECT id,platform_role::text,account_domain,role::text,teacher_approved,expires_at FROM users
@@ -16,7 +16,7 @@ export async function assertLibraryAuthority(tx:Prisma.TransactionClient,actorId
   if(!['TRAINING','LEGACY'].includes(user.account_domain))fail('平台内容管理需使用平台账号',403)
   if(user.systemAdmin)return {grantId:null,version:0}
   if(!grantId)fail('缺少精确版本的平台授权',403)
-  if(capability==='material.distribute')await assertEntryAdmin(tx,actorId,product)
+  if(capability==='material.distribute')await assertEntryAdmin(tx,actorId,libraryAdminEntry[product])
   const result=await assertContentAuthority(tx,{actorId,grantId:grantId!,capability,
     scope:{product,scopeKind:'PLATFORM',scopeId:LIBRARY_SCOPE,resourceKind:capability==='catalog.manage'?'catalog':'material',resourceKeys:[releaseId]}})
   return result

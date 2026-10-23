@@ -1,0 +1,150 @@
+/* Pure injected objects only: never runs chmod, sudo, Git, dpkg or a browser. */
+'use strict'
+const { test } = require('node:test')
+const assert = require('node:assert/strict')
+const { createHash } = require('node:crypto')
+const { tightenChromePermissions } = require('./school-teacher-chrome-permissions.cjs')
+const ROOT = '/opt/google/chrome', REPO = '/synthetic/repo', HEAD = 'a'.repeat(40)
+const MD5 = '/var/lib/dpkg/info/google-chrome-stable.md5sums', LIST = MD5.replace('.md5sums', '.list')
+const md5 = b => createHash('md5').update(b).digest('hex')
+function fixture() {
+  const env = { CI: 'true', GITHUB_ACTIONS: 'true', RUNNER_ENVIRONMENT: 'github-hosted', RUNNER_OS: 'Linux', RUNNER_ARCH: 'X64',
+    ImageOS: 'ubuntu24', GITHUB_REPOSITORY: 'caohuibj/eduK12-new-version', GITHUB_EVENT_NAME: 'pull_request', GITHUB_REF: 'refs/pull/338/merge',
+    GITHUB_HEAD_REF: 'work/school-teacher-review-20261022', SCHOOL_TEACHER_CHROME_TIGHTEN: 'confirmed-temporary-runner',
+    GITHUB_SHA: HEAD, GITHUB_RUN_ID: '40000000001', GITHUB_WORKSPACE: REPO }
+  const items = new Map(), calls = [], state = { sudoError: false, incorrectMode: false, afterChange: null }
+  let ino = 1
+  function add(file, kind, mode, contents = Buffer.from('synthetic:' + file)) {
+    items.set(file, { kind, dev: 1, ino: ino++, uid: 0, gid: 0, mode: (kind === 'directory' ? 0o40000 : 0o100000) | mode,
+      nlink: kind === 'directory' ? 2 : 1, contents, size: kind === 'directory' ? 4096 : contents.length })
+  }
+  for (const d of ['/', '/usr', '/usr/bin', '/var', '/var/lib', '/var/lib/dpkg', '/var/lib/dpkg/info']) add(d, 'directory', 0o755)
+  for (const p of ['/usr/bin/git', '/usr/bin/dpkg-query', '/usr/bin/sudo', '/usr/bin/chmod']) add(p, 'file', p.endsWith('/sudo') ? 0o4755 : 0o755)
+  for (const d of ['/opt', '/opt/google', ROOT, ROOT + '/locales']) add(d, 'directory', 0o777)
+  for (const p of [ROOT + '/chrome', ROOT + '/chrome-sandbox', ROOT + '/google-chrome', ROOT + '/locales/zh-CN.pak'])
+    add(p, 'file', p.endsWith('chrome-sandbox') ? 0o4777 : 0o777)
+  add('/opt/unrelated-tool', 'file', 0o777)
+  add('/usr/bin/google-chrome-stable', 'symlink', 0o777); items.get('/usr/bin/google-chrome-stable').redirect = ROOT + '/google-chrome'
+  const tracked = [...items.keys()].filter(p => p === '/opt' || p === '/opt/google' || p === ROOT || p.startsWith(ROOT + '/'))
+  add('/usr/share/doc/google-chrome-stable/copyright', 'file', 0o777)
+  const outside = '/usr/share/doc/google-chrome-stable/copyright'
+  const list = '/.\n/etc/cron.daily/google-chrome\n/usr/bin/google-chrome-stable\n' + outside + '\n' + tracked.join('\n') + '\n'
+  const hashes = [...tracked, outside].filter(p => items.get(p).kind === 'file').map(p => md5(items.get(p).contents) + '  ' + p.slice(1)).join('\n') + '\n'
+  add(LIST, 'file', 0o644, Buffer.from(list)); add(MD5, 'file', 0o644, Buffer.from(hashes))
+  const fs = {
+    lstatSync(file) {
+      const row = items.get(file); if (!row) throw Object.assign(new Error('synthetic private exception'), { code: 'ENOENT' })
+      return { ...row, isDirectory: () => row.kind === 'directory', isFile: () => row.kind === 'file', isSymbolicLink: () => row.kind === 'symlink' }
+    },
+    realpathSync(file) { const row = items.get(file); return row?.redirect || file },
+    readlinkSync(file) { return items.get(file).redirect },
+    readFileSync(file, encoding) { const b = items.get(file).contents; return encoding ? b.toString(encoding) : Buffer.from(b) },
+    readdirSync(file) { return [...items.keys()].filter(p => p.startsWith(file + '/') && !p.slice(file.length + 1).includes('/')).map(p => p.slice(file.length + 1)) },
+  }
+  const process = { platform: 'linux', arch: 'x64', getuid: () => 1001, geteuid: () => 1001 }
+  const spawnSync = (command, args, options) => {
+    calls.push({ command, args, options })
+    if (command === '/usr/bin/git') return { status: 0, stdout: args[0] === 'rev-parse' ? HEAD + '\n' : '' }
+    if (command === '/usr/bin/dpkg-query') return { status: 0, stdout: args[0] === '-W'
+      ? 'google-chrome-stable\tinstall ok installed\tamd64\t155.0.8059.39-1\n' : MD5 + '\n' }
+    assert.equal(command, '/usr/bin/sudo'); assert.deepEqual(args.slice(0, 4), ['-n', '/usr/bin/chmod', 'go-w', '--'])
+    assert.equal(args.length, 5)
+    if (state.sudoError) return { status: 1, stderr: 'synthetic private exception' }
+    const row = items.get(args[4]); row.mode = state.incorrectMode ? (row.mode & ~0o022) | 0o2000 : row.mode & ~0o022
+    state.afterChange?.(args[4]); return { status: 0, stdout: '' }
+  }
+  return { items, env, calls, state, process, add, run: () => tightenChromePermissions({ repo: REPO, env, deps: { fs, spawnSync, process } }) }
+}
+const mutations = f => f.calls.filter(c => c.command === '/usr/bin/sudo')
+test('only approved parents and verified Chrome package entries lose go write with all other bits preserved', () => {
+  const f = fixture(), before = new Map([...f.items].map(([p, r]) => [p, { ...r }]))
+  const r = f.run(); assert.equal(r.status, 'PERMISSIONS_TIGHTENED'); assert.equal(r.acceptance, false); assert.equal(r.browserLaunched, false)
+  assert.match(r.consistencyScope, /not cryptographic/); assert.equal(mutations(f).length, 8)
+  for (const call of mutations(f)) {
+    const p = call.args[4]; assert.ok(p === '/opt' || p === '/opt/google' || p === ROOT || p.startsWith(ROOT + '/'))
+    assert.equal(f.items.get(p).mode, before.get(p).mode & ~0o022)
+    for (const key of ['uid', 'gid', 'ino', 'dev']) assert.equal(f.items.get(p)[key], before.get(p)[key])
+  }
+  assert.equal(f.items.get(ROOT + '/chrome-sandbox').mode & 0o4000, 0o4000)
+  assert.equal(f.items.get('/opt/unrelated-tool').mode, before.get('/opt/unrelated-tool').mode)
+  for (const p of ['/usr/bin/google-chrome-stable', '/usr/share/doc/google-chrome-stable/copyright'])
+    assert.equal(f.items.get(p).mode, before.get(p).mode)
+  const presentCron = fixture(); presentCron.add('/etc/cron.daily/google-chrome', 'symlink', 0o777)
+  presentCron.items.get('/etc/cron.daily/google-chrome').redirect = ROOT + '/cron/google-chrome'
+  assert.equal(presentCron.run().status, 'PERMISSIONS_TIGHTENED')
+  assert.equal(mutations(presentCron).some(c => c.args[4] === '/etc/cron.daily/google-chrome'), false)
+})
+test('wrong CI approval repository PR identity root user or loader override stops before permission actions', () => {
+  for (const change of [f => delete f.env.SCHOOL_TEACHER_CHROME_TIGHTEN, f => { f.env.GITHUB_REF = 'refs/pull/339/merge' },
+    f => { f.env.GITHUB_REPOSITORY = 'other/repo' }, f => { f.env.RUNNER_ENVIRONMENT = 'self-hosted' },
+    f => { f.env.GITHUB_SHA = 'b'.repeat(40) }, f => { f.env.LD_PRELOAD = 'synthetic secret' },
+    f => { f.process.getuid = () => 0 }, f => { f.env.GITHUB_WORKSPACE = '/other' }]) {
+    const f = fixture(); change(f); const r = f.run(); assert.equal(r.status, 'FAILED'); assert.equal(mutations(f).length, 0)
+  }
+})
+test('changed bytes malformed or duplicate manifests and missing recorded runtime entries never mutate', () => {
+  for (const change of [f => { f.items.get(ROOT + '/chrome').contents[0] ^= 1 },
+    f => { f.items.get(MD5).contents = Buffer.from('bad\n') },
+    f => { f.items.get(LIST).contents = Buffer.from(f.items.get(LIST).contents.toString() + ROOT + '\n') },
+    f => { f.items.get(LIST).contents = Buffer.from(f.items.get(LIST).contents.toString() + '/opt/google/chrome/../escape\n') },
+    f => { f.items.delete(ROOT + '/locales/zh-CN.pak') },
+    f => { f.items.get('/usr/share/doc/google-chrome-stable/copyright').contents[0] ^= 1 },
+    f => { f.items.delete('/usr/share/doc/google-chrome-stable/copyright') }]) {
+    const f = fixture(); change(f); const r = f.run(); assert.equal(r.status, 'FAILED'); assert.equal(mutations(f).length, 0)
+  }
+})
+test('symlinks nonroot files hardlinks special files and unexpected runtime additions stop without following paths', () => {
+  for (const change of [f => { f.items.get(ROOT + '/chrome').kind = 'symlink' }, f => { f.items.get('/opt').kind = 'symlink' },
+    f => { f.items.get(ROOT + '/chrome').uid = 1001 }, f => { f.items.get(ROOT + '/chrome').nlink = 2 },
+    f => { f.items.get(ROOT + '/chrome').kind = 'fifo' }, f => f.add(ROOT + '/untracked', 'file', 0o777),
+    f => { f.items.get('/usr/bin/google-chrome-stable').redirect = '/untrusted/target' },
+    f => { f.items.get('/var/lib/dpkg/info').mode |= 0o022 }, f => { f.items.get('/usr/bin/chmod').mode |= 0o022 }]) {
+    const f = fixture(); change(f); const r = f.run(); assert.equal(r.status, 'FAILED'); assert.equal(mutations(f).length, 0)
+  }
+})
+test('a failed command or wrong post-mode stops and reports uncertain partial mutation without rollback', () => {
+  for (const key of ['sudoError', 'incorrectMode']) {
+    const f = fixture(); f.state[key] = true; const r = f.run()
+    assert.equal(r.status, 'FAILED'); assert.equal(r.permissionChangeAttempted, true)
+    assert.equal(r.outcome, 'PARTIAL_OR_UNCERTAIN_STOPPED'); assert.equal(mutations(f).length, 1)
+    assert.equal(JSON.stringify(r).includes('synthetic private exception'), false)
+  }
+})
+test('final rewalk catches added files and byte changes and already-tight entries perform no chmod', () => {
+  for (const action of [f => f.add(ROOT + '/new-after-check', 'file', 0o777), f => { f.items.get(ROOT + '/chrome').contents[0] ^= 1 }]) {
+    const f = fixture(); let once = false
+    f.state.afterChange = () => { if (!once) { once = true; action(f) } }
+    assert.equal(f.run().status, 'FAILED')
+  }
+  const f = fixture(); for (const [p, row] of f.items) if (p === '/opt' || p === '/opt/google' || p === ROOT || p.startsWith(ROOT + '/')) row.mode &= ~0o022
+  assert.equal(f.run().status, 'PERMISSIONS_TIGHTENED'); assert.equal(mutations(f).length, 0)
+})
+
+// New exact regression only; earlier six tests are unchanged.
+test('official stable manpage alias is read-only and requires exact relative target with verified package bytes', () => {
+  const alias = '/usr/share/man/man1/google-chrome.1.gz', target = '/usr/share/man/man1/google-chrome-stable.1.gz'
+  const setup = () => {
+    const f = fixture(); f.add(alias, 'symlink', 0o777); f.items.get(alias).redirect = 'google-chrome-stable.1.gz'
+    f.add(target, 'file', 0o777)
+    const list = f.items.get(LIST), hashes = f.items.get(MD5)
+    list.contents = Buffer.from(list.contents.toString() + alias + '\n' + target + '\n'); list.size = list.contents.length
+    hashes.contents = Buffer.from(hashes.contents.toString() + md5(f.items.get(target).contents) + '  ' + target.slice(1) + '\n'); hashes.size = hashes.contents.length
+    return f
+  }
+  const good = setup(), before = [good.items.get(alias).mode, good.items.get(target).mode]
+  assert.equal(good.run().status, 'PERMISSIONS_TIGHTENED')
+  assert.deepEqual([good.items.get(alias).mode, good.items.get(target).mode], before)
+  assert.equal(mutations(good).some(c => [alias, target].includes(c.args[4])), false)
+  for (const alter of [f => { f.items.get(alias).redirect = '/etc/alternatives/google-chrome' },
+    f => { f.items.get(alias).uid = 1001 }, f => { f.items.get(target).uid = 1001 },
+    f => { f.items.get(target).kind = 'symlink' }, f => { f.items.get(target).kind = 'directory' }, f => { f.items.get(target).contents[0] ^= 1 },
+    f => { f.items.delete(target) }, f => { f.items.get(LIST).contents = Buffer.from(f.items.get(LIST).contents.toString().replace(target + '\n', '')) },
+    f => { f.items.get(MD5).contents = Buffer.from(f.items.get(MD5).contents.toString().split('\n').filter(line => !line.endsWith(target.slice(1))).join('\n')) }]) {
+    const bad = setup(); alter(bad); const report = bad.run()
+    assert.equal(report.status, 'FAILED'); assert.equal(report.permissionChangeAttempted, false); assert.equal(mutations(bad).length, 0)
+  }
+  const unexpected = setup(); unexpected.items.get(alias).redirect = '/private/unexpected-target'
+  const report = unexpected.run()
+  assert.deepEqual(report.pathFacts, { uid: 0, gid: 0, permissionMode: 0o777, type: 'SYMLINK', expectedRelativeTargetMatches: false, targetListed: true, targetHashRecorded: true })
+  assert.equal(JSON.stringify(report).includes('/private/unexpected-target'), false)
+})

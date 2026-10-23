@@ -1,3 +1,5 @@
+import {readPrivateFormExecutionSource} from './educationPrivateFormExecution'
+import { assertEducationLibraryExecutionSource } from './educationLibraryExecution'
 import {assertTrainingPrivateReferenceAdmissionCurrent} from '../composite/training-private-reference-use'
 import { Prisma } from '@prisma/client'
 import { randomUUID } from 'node:crypto'
@@ -198,7 +200,11 @@ const startTransactionalComposite = async (input: {
   // Re-check current PR1 membership, class approval and PR2 Activity gates
   // **under the second transaction's locks** before creating any attempt.
   // Idempotent reconciliation of an already-created attempt remains above.
-  await assertCurrentRunStartAuthority(tx, input.executionId)
+  await assertCurrentRunStartAuthority(tx, input.executionId, {accountMode:'DETECT_EDUCATION_LIBRARY'})
+  if (admission.assignment.resourceKey.startsWith('library-scale:')||admission.assignment.resourceKey.startsWith('private-scale:')) {
+    await assertEducationLibraryExecutionSource(tx, {executionId: input.executionId, compositeId: input.launch.runtimeTargetRef})
+  }
+  if(admission.assignment.resourceKey.startsWith('private-form:'))await readPrivateFormExecutionSource(tx,{executionId:input.executionId,compositeId:input.launch.runtimeTargetRef,actorUserId:input.actorUserId})
   const state=await tx.$queryRaw<Array<{runStatus:string}>>`
     SELECT r."status" AS "runStatus"
     FROM "assessment_run_executions" e

@@ -52,7 +52,7 @@ export async function releasedTeacherScaleEntry(db:Db,ref:{
     FOR SHARE OF r,scale
   `
   const r=rows[0]
-  if(!r||r.scaleStatus!=='PUBLISHED'||r.scaleHash!==r.definitionHash
+  if(!r||(r.entry&&'privateOrigin' in r.entry)||r.scaleStatus!=='PUBLISHED'||r.scaleHash!==r.definitionHash
     ||!r.reviewedByUserId||!r.reviewedAt||!r.publishedAt
     ||r.reviewedByUserId===r.createdByUserId
     ||r.reviewedByUserId===r.scaleCreatorId

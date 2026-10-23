@@ -1,11 +1,37 @@
+import {privateFormTrackIdentitySql} from './educationPrivateFormIdentitySql'
+import {privateScaleRegistryIdentitySql} from './educationPrivateScaleIdentitySql'
 import { Prisma } from '@prisma/client'
 import { currentWindowSql } from './currentActorAuthority'
 import { currentRunPopulationAuthoritySql } from './currentPopulationAuthority'
 import { RunStartAdmissionError } from './startAdmission'
 
 /** Called with Organization SHARE -> Run SHARE -> Execution UPDATE held. */
-export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClient, executionId: string): Promise<void> => {
+export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClient, executionId: string, options?: { accountMode: 'DETECT_EDUCATION_LIBRARY'; operation?:'BOUND_FINAL' }): Promise<void> => {
   const fail = (code: string) => { throw new RunStartAdmissionError(code, 'current Run START authority is no longer valid', 403) }
+  // Verified public-library and author-private executions use query-time account checks. Do not acquire a
+  // user lock after org: account-reset writers acquire user UPDATE before org.
+  // This server-only mode is never accepted from a request, and actual legacy
+  // tracks retain the old lock even when a caller requests detection.
+  const library = options?.accountMode === 'DETECT_EDUCATION_LIBRARY' ? await tx.$queryRaw<Array<{id:string;privateForm:boolean}>>`
+    SELECT e.id,(t.resource_family='FORM' AND t.resource_key LIKE 'private-form:%') AS "privateForm" FROM assessment_run_executions e JOIN assessment_run_tracks t
+      ON t.id=e.track_id AND t.organization_id=e.organization_id AND t.run_id=e.run_id
+    LEFT JOIN registered_assessment_resources r ON r.resource_key=t.resource_key AND r.resource_version=t.resource_version
+    WHERE e.id=${executionId} AND ((t.resource_family='SCALE' AND (
+      (t.resource_key LIKE 'library-scale:%' AND r.entry->'libraryOrigin'->>'product' IN ('SCHOOL','TEACHER'))
+      OR (${privateScaleRegistryIdentitySql({registered:Prisma.sql`r`,organizationId:Prisma.sql`e.organization_id`,product:'SCHOOL'})}
+        AND EXISTS(SELECT 1 FROM campus_activity_runs school WHERE school.organization_id=e.organization_id AND school.run_id=e.run_id)
+        AND NOT EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links teacher WHERE teacher.organization_id=e.organization_id AND teacher.run_id=e.run_id))
+      OR (${privateScaleRegistryIdentitySql({registered:Prisma.sql`r`,organizationId:Prisma.sql`e.organization_id`,product:'TEACHER'})}
+        AND EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links teacher WHERE teacher.organization_id=e.organization_id AND teacher.run_id=e.run_id)
+        AND NOT EXISTS(SELECT 1 FROM campus_activity_runs school WHERE school.organization_id=e.organization_id AND school.run_id=e.run_id))))
+      OR (${privateFormTrackIdentitySql({track:Prisma.sql`t`,organizationId:Prisma.sql`e.organization_id`,product:'SCHOOL'})}
+       AND EXISTS(SELECT 1 FROM campus_activity_runs school WHERE school.organization_id=e.organization_id AND school.run_id=e.run_id)
+       AND NOT EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links teacher WHERE teacher.organization_id=e.organization_id AND teacher.run_id=e.run_id))
+      OR (${privateFormTrackIdentitySql({track:Prisma.sql`t`,organizationId:Prisma.sql`e.organization_id`,product:'TEACHER'})}
+       AND EXISTS(SELECT 1 FROM huiteacher_evaluation_run_links teacher WHERE teacher.organization_id=e.organization_id AND teacher.run_id=e.run_id)
+       AND NOT EXISTS(SELECT 1 FROM campus_activity_runs school WHERE school.organization_id=e.organization_id AND school.run_id=e.run_id)))
+  ` : []
+  if(options?.operation==='BOUND_FINAL'&&!library[0]?.privateForm)fail('RUN_BOUND_FINAL_SOURCE_REQUIRED')
   // Account mutation conflicts with these shared fences. Do not evaluate expiry
   // against this statement's start time: acquiring a row lock can wait past it.
   const users = await tx.$queryRaw<Array<{ valid: boolean }>>`
@@ -16,7 +42,7 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
       SELECT a."user_id" FROM "assessment_run_actor_snapshots" a
       JOIN "assessment_run_executions" e ON a."id" IN (e."subject_actor_snapshot_id", e."respondent_actor_snapshot_id")
       WHERE e."id" = ${executionId}
-    ) ORDER BY u."id" FOR SHARE OF u
+    ) ORDER BY u."id" ${library.length ? Prisma.empty : Prisma.sql`FOR SHARE OF u`}
   `
   if (!users.length || users.some((u) => !u.valid)) fail('RUN_ACCOUNT_INACTIVE')
   const envelopes = await tx.$queryRaw<Array<{ organizationId: string; active: boolean }>>`
@@ -163,5 +189,7 @@ export const assertCurrentRunStartAuthority = async (tx: Prisma.TransactionClien
   `
   if (!windows[0]?.accountsCurrent) fail('RUN_ACCOUNT_INACTIVE')
   if (!windows[0]?.populationCurrent) fail('RUN_ACTOR_AUTHORITY_REVOKED')
-  if (!windows[0].intakeOpen) fail('RUN_INTAKE_CLOSED')
+  // Only the dedicated, DB-bound FORM FINAL caller opts out of new-intake time.
+  // It has already verified the immutable source and exact existing parent.
+  if (options?.operation!=='BOUND_FINAL' && !windows[0].intakeOpen) fail('RUN_INTAKE_CLOSED')
 }

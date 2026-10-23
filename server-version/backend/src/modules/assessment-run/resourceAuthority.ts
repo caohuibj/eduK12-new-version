@@ -131,6 +131,16 @@ export const relationalEntryToRunPolicy = (
   // Shared readiness checks apply to both exact lookups and already batched
   // catalog entries; eliminating a second lookup must not bypass this contract.
   if (entry.releaseStatus !== 'PUBLISHED') throw new RunResourceAuthorityError('RUN_RESOURCE_NOT_PUBLISHED', 'resource version is not published', 409)
+  return projectRelationalRunPolicy(entry,registry)
+}
+
+/** Pure shape projection, NOT release readiness or authorization. Public and
+ * runtime callers must use relationalEntryToRunPolicy. The private FORM draft
+ * adapter may project only its already verified immutable DRAFT source. */
+export const projectRelationalRunPolicy = (
+  entry: RelationalProductEntryV1,
+  registry: RelationalProductRegistryV1 = relationalProductRegistry,
+): RunResourcePolicy => {
   if (!entry.launchTarget) throw new RunResourceAuthorityError('RUN_RESOURCE_RUNTIME_UNAVAILABLE', 'resource has no runtime launch target', 409)
   if (entry.applicability.subjectRoles.includes('TEACHER') && entry.applicability.respondentRoles.includes('STUDENT') && !entry.allowedTargetModes?.length) {
     throw new RunResourceAuthorityError('RUN_TARGET_POLICY_MISSING', 'Published teacher-evaluation content must declare target modes', 409)

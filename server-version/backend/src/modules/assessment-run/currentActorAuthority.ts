@@ -10,15 +10,19 @@ export const usableRunAccountSql = (row: Prisma.Sql) => Prisma.sql`
   AND (${row}.role <> 'TEACHER' OR ${row}.teacher_approved)
   AND (${row}.expires_at IS NULL OR ${row}.expires_at > statement_timestamp())
 `
+export type RunAuthorityPurpose = 'COLLECTION' | 'REPORT_READ'
+
 export const currentRunActorAuthoritySql = (actor: {
   userId: Prisma.Sql; organizationId: Prisma.Sql; provenance: Prisma.Sql;
   membershipId: Prisma.Sql; personaGrantId: Prisma.Sql; role: Prisma.Sql;
-}) => Prisma.sql`EXISTS (
+}, purpose: RunAuthorityPurpose = 'COLLECTION') => Prisma.sql`EXISTS (
   SELECT 1 FROM users current_account WHERE current_account.id=${actor.userId}
     AND ${usableRunAccountSql(Prisma.sql`current_account`)}
     AND NOT EXISTS (SELECT 1 FROM organization_access_denies deny
       WHERE deny.organization_id=${actor.organizationId} AND deny.user_id=${actor.userId}
-        AND deny.lifted_at IS NULL AND deny.permission IN ('*','RUN_START'))
+        AND deny.lifted_at IS NULL AND ${purpose === 'REPORT_READ'
+          ? Prisma.sql`deny.permission IN ('*','REPORT_READ','PARTICIPANT_REPORT_READ')`
+          : Prisma.sql`deny.permission IN ('*','RUN_START')`})
     AND (
       (${actor.provenance}='ORG_MEMBER' AND EXISTS (
         SELECT 1 FROM organization_memberships member JOIN organization_persona_grants persona

@@ -25,6 +25,6 @@ describe('Teacher shared education account recovery',()=>{
     fireEvent.click(screen.getByRole('button',{name:'确认修改密码'}))
     await waitFor(()=>expect(calls.find(c=>c.url.endsWith('/auth/change-password'))?.body)
       .toEqual({oldPassword:'CurrentPass123',newPassword:'NewPass456'}))
-    expect(await screen.findByRole('heading',{name:'登录 Huiteacher'})).toBeInTheDocument()
+    expect(await screen.findByRole('heading',{name:'登录 Teacher'})).toBeInTheDocument()
   })
 })

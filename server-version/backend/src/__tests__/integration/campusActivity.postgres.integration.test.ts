@@ -9,15 +9,20 @@ import {
   registerCampusStudent, approveCampusClass,
 } from '../../modules/campus/admission.service'
 import {
-  createCampusActivity,changeCampusActivityStatus,CampusActivityError,
+  createCampusActivity,changeCampusActivityStatus,CampusActivityError,addCampusActivityCollaborator,readCampusActivity,
 } from '../../modules/campus/activity.service'
-import { allocateCampusActivityParticipants } from '../../modules/campus/activity.allocation'
+import { allocateCampusActivityParticipants,listCampusActivityEligibleClasses } from '../../modules/campus/activity.allocation'
 import { addCampusActivityTask,listCampusStudentTasks } from '../../modules/campus/activity.tasks'
 import { assignmentController } from '../../controllers/assignmentController'
 import { courseController } from '../../controllers/courseController'
 import { checkinController } from '../../controllers/checkinController'
 import type { Request, Response } from 'express'
-import { createCampusActivityRunDraft } from '../../modules/campus/activity.runs'
+import { createCampusActivityRunDraft,assertCampusActivityRunPublisher } from '../../modules/campus/activity.runs'
+import { addAssessmentRunTrackDraft } from '../../modules/assessment-run/repository'
+import { publishAssessmentRun,previewAssessmentRun } from '../../modules/assessment-run/publish'
+import { closeAssessmentRun,cancelAssessmentRun } from '../../modules/assessment-run/lifecycle'
+import { RunResourceAuthorityRegistry,type RunResourceAuthorityAdapter } from '../../modules/assessment-run/resourceAuthority'
+import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { campusRunParticipantScope } from '../../modules/campus/activity.runScope'
 import { hasActiveCourseMembership } from '../../utils/courseAccess'
 import type { AuthenticatedPrincipal } from '../../types'
@@ -33,7 +38,7 @@ const actor=(u:{id:string;username:string;role:UserRole}):AuthenticatedPrincipal
   userId:u.id,username:u.username,role:u.role,platformRole:'STANDARD',
   tokenVersion:0,mustChangePassword:false,accountDomain:'SCHOOL',
 })
-async function fixture(){
+async function fixture(studentCount=1){
   const admin=await db.user.create({data:{
     username:userName('hs_admin_'),passwordHash:'synthetic-only',
     accountDomain:'SCHOOL',role:UserRole.ADMIN,
@@ -69,10 +74,10 @@ async function fixture(){
     id:randomUUID(),organizationId:organization.id,
     membershipId:psychMember.id,capability:'PSYCHOLOGY_STAFF',grantedByUserId:admin.id,
   }})
-  const studentNumber='S'+randomUUID().slice(0,8)
+  const studentNumbers=Array.from({length:studentCount},()=> 'S'+randomUUID().slice(0,8))
   const roster=await replaceCampusRoster({
     actor:actor(admin),organizationId:organization.id,classUnitId:cls.id,
-    studentNumbers:[studentNumber],
+    studentNumbers,
   })
   await setCampusRegistrationWindow({
     actor:actor(admin),organizationId:organization.id,classUnitId:cls.id,
@@ -80,13 +85,15 @@ async function fixture(){
   })
   const code=await issueCampusActivationCodes({
     actor:actor(admin),organizationId:organization.id,classUnitId:cls.id,
-    count:1,ttlMinutes:35,
+    count:studentCount,ttlMinutes:35,
   })
-  const student=await registerCampusStudent({
+  const students=[]
+  for(const [index,studentNumber] of studentNumbers.entries())students.push(await registerCampusStudent({
     organizationId:organization.id,classUnitId:cls.id,
-    studentNumber,activationCode:code.codes[0],
+    studentNumber,activationCode:code.codes[index],
     username:userName('hs_participant_'),password:'SyntheticPassword123',
-  })
+  }))
+  const student=students[0]
   await setCampusRegistrationWindow({
     actor:actor(admin),organizationId:organization.id,classUnitId:cls.id,
     action:'CLOSE',
@@ -99,12 +106,49 @@ async function fixture(){
     userId:student.userId,organizationId:organization.id,validUntil:null,
   }})
   const studentUser=await db.user.findUniqueOrThrow({where:{id:student.userId}})
+  const studentMembers=await db.organizationMembership.findMany({where:{
+    organizationId:organization.id,userId:{in:students.map(item=>item.userId)},validUntil:null,
+  },select:{id:true,userId:true}})
   return {
     organizationId:organization.id,classUnitId:cls.id,
     admin:actor(admin),counselor:actor(counselor),
-    student:actor(studentUser),studentMember:member.id,adminMember:adminMember.id,
+    student:actor(studentUser),studentMember:member.id,studentMembers,adminMember:adminMember.id,
   }
 }
+const psychologistPolicy={
+  subjectRoles:['STUDENT'],respondentRoles:['STUDENT'],relationshipKinds:['SELF'],perspectives:['SELF_REPORT'],
+  analysisMode:'INDIVIDUAL_ONLY',visibilityPolicyKey:'ORG_SELF_V1',minimumRespondents:null,
+}
+function psychologistRegistry(initiationModes:Array<'CLASS_ASSIGN'|'PROFESSIONAL_ASSIGN'>=['CLASS_ASSIGN']){
+  const adapter:RunResourceAuthorityAdapter={
+    family:'BUNDLE',capabilities:{transactionMode:'TRANSACTIONAL_DB',startMode:'TRANSACTIONAL',
+      supportsLookupByOperationKey:false,supportsSafeCancel:true,finalAuthority:'CANONICAL_RUNTIME',
+      runtimeBindingKind:'COMPOSITE',runV1Enabled:true},
+    async resolveExact(ref){return {family:ref.family,key:ref.key,version:ref.version,
+      scientificMaturity:'PILOT',applicabilityHash:canonicalHash({ref,psychologistPolicy}),
+      ...psychologistPolicy,initiationModes,runtimeLaunchTarget:{kind:'COMPOSITE',ref:'synthetic-school-self'}}},
+  }
+  return new RunResourceAuthorityRegistry([adapter])
+}
+async function psychologistDraft(studentCount=1){
+  const f=await fixture(studentCount)
+  await db.user.update({where:{id:f.counselor.userId},data:{teacherApproved:true}})
+  const member=await db.organizationMembership.findFirstOrThrow({where:{organizationId:f.organizationId,userId:f.counselor.userId}})
+  const a=await createCampusActivity({actor:f.counselor,organizationId:f.organizationId,title:'本人心理活动',purpose:'STUDENT_WELLBEING'})
+  const scope={actor:f.counselor,organizationId:f.organizationId,courseId:a.id}
+  await allocateCampusActivityParticipants({...scope,classUnitIds:[f.classUnitId],requestKey:randomUUID(),expectedVersion:1})
+  const run=await createCampusActivityRunDraft({...scope,name:'学生自评'})
+  await addAssessmentRunTrackDraft({organizationId:f.organizationId,runId:run.id,
+    resource:{family:'BUNDLE',key:'synthetic-school-psychology',version:'1.0.0'},
+    subjectSelector:{kind:'MEMBERSHIP_IDS',membershipIds:f.studentMembers.map(item=>item.id)},
+    respondentSelector:{kind:'MEMBERSHIP_IDS',membershipIds:f.studentMembers.map(item=>item.id)},requestedPolicy:psychologistPolicy})
+  const detail=await readCampusActivity(scope)
+  const submitted=await changeCampusActivityStatus({...scope,action:'SUBMIT',expectedVersion:detail.version})
+  const publication={organizationId:f.organizationId,runId:run.id,actorUserId:f.counselor.userId,
+    expectedVersion:2,resourceRegistry:psychologistRegistry()}
+  return {f,scope,member,run,submitted,publication}
+}
+
 suite('Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL',()=>{
   beforeAll(async()=>{
     process.env.CAMPUS_ELIGIBILITY_HMAC_KEY='56'.repeat(32)
@@ -112,6 +156,159 @@ suite('Huischool Activity lifecycle, independent training boundary and task gate
     await db.$connect()
   })
   afterAll(async()=>{await db?.$disconnect()})
+
+  it('publishes own psychologist activity with CLASS_ASSIGN without TEACHER persona and safely closes its batch',async()=>{
+    const {f,scope,member,run,submitted,publication}=await psychologistDraft()
+    expect(await db.organizationPersonaGrant.count({where:{membershipId:member.id,persona:'TEACHER'}})).toBe(0)
+    expect(await db.$queryRaw`SELECT count(*)::int AS "count" FROM "organization_staff_class_assignments"
+      WHERE "membership_id"=${member.id}`).toEqual([{count:0}])
+    expect(await db.organizationPersonaGrant.count({where:{membershipId:f.studentMember,persona:'CLIENT'}})).toBe(0)
+    const before=await readCampusActivity(scope)
+    expect(before.capabilities).toMatchObject({canOpen:true,ownPsychologyPublisher:true})
+    expect((await previewAssessmentRun(publication)).tracks[0].executionCount).toBe(1)
+    await expect(publishAssessmentRun(publication)).rejects.toMatchObject({code:'CAMPUS_RUN_REQUIRES_OPEN_GOVERNED_ACTIVITY'})
+    const opened=await changeCampusActivityStatus({...scope,action:'OPEN',expectedVersion:submitted.version})
+    expect(await publishAssessmentRun(publication)).toMatchObject({executionCount:1})
+    const detail=await readCampusActivity(scope)
+    expect(detail.runs[0].capabilities).toMatchObject({canPublish:false,canClose:true,canCancel:true})
+    const paused=await changeCampusActivityStatus({...scope,action:'PAUSE',expectedVersion:opened.version})
+    await expect(db.$transaction(tx=>campusRunParticipantScope(tx,{...publication,publish:true}))).rejects.toBeInstanceOf(CampusActivityError)
+    await changeCampusActivityStatus({...scope,action:'RESUME',expectedVersion:paused.version})
+    await expect(closeAssessmentRun({organizationId:f.organizationId,runId:run.id,
+      schoolActivity:{actor:f.counselor,courseId:scope.courseId}})).resolves.toEqual({status:'CLOSED'})
+    expect(await db.educationProductRoleGrant.count({where:{membershipId:member.id}})).toBe(0)
+  })
+
+  it('does not substitute all school students when an activity has no selected population',async()=>{
+    const {scope,submitted,publication}=await psychologistDraft()
+    await db.$executeRaw`UPDATE "campus_activity_participants" SET "status"='REVOKED',"revoked_at"=clock_timestamp()
+      WHERE "course_id"=${scope.courseId}`
+    await expect(previewAssessmentRun(publication)).rejects.toMatchObject({code:'ACTIVITY_PUBLISH_CLASS_SCOPE'})
+    await expect(changeCampusActivityStatus({...scope,action:'OPEN',expectedVersion:submitted.version}))
+      .rejects.toMatchObject({code:'ACTIVITY_PUBLISH_CLASS_SCOPE'})
+  })
+
+  it('rejects an entire reviewed two-student population after one account expires instead of publishing one',async()=>{
+    const {f,scope,run,submitted,publication}=await psychologistDraft(2)
+    await changeCampusActivityStatus({...scope,action:'OPEN',expectedVersion:submitted.version})
+    expect((await previewAssessmentRun(publication)).tracks[0].executionCount).toBe(2)
+    await db.$executeRaw`UPDATE "users" SET "expires_at"=clock_timestamp()-interval '1 second'
+      WHERE "id"=${f.studentMembers[0].userId}`
+    await expect(publishAssessmentRun(publication)).rejects.toMatchObject({code:'ACTIVITY_PUBLISH_CLASS_SCOPE'})
+    const rows=await db.$queryRaw<Array<{status:string;count:number}>>`
+      SELECT r."status",(SELECT count(*)::int FROM "assessment_run_executions" e WHERE e."run_id"=r."id") AS "count"
+      FROM "assessment_runs" r WHERE r."id"=${run.id}`
+    expect(rows).toEqual([{status:'DRAFT',count:0}])
+  })
+
+  it('rejects withdrawn class approval at OPEN and publish, while retaining administrator emergency stop',async()=>{
+    const {f,scope,member,run,submitted,publication}=await psychologistDraft()
+    await db.$executeRaw`UPDATE "campus_class_admissions" SET "status"='CLOSED'
+      WHERE "organization_id"=${f.organizationId} AND "class_unit_id"=${f.classUnitId}`
+    await expect(changeCampusActivityStatus({...scope,action:'OPEN',expectedVersion:submitted.version})).rejects.toMatchObject({code:'ACTIVITY_PUBLISH_CLASS_SCOPE'})
+    await db.$executeRaw`UPDATE "campus_class_admissions" SET "status"='APPROVED'
+      WHERE "organization_id"=${f.organizationId} AND "class_unit_id"=${f.classUnitId}`
+    const opened=await changeCampusActivityStatus({...scope,action:'OPEN',expectedVersion:submitted.version})
+    await db.$executeRaw`UPDATE "campus_class_admissions" SET "status"='CLOSED'
+      WHERE "organization_id"=${f.organizationId} AND "class_unit_id"=${f.classUnitId}`
+    await expect(publishAssessmentRun(publication)).rejects.toMatchObject({code:'ACTIVITY_PUBLISH_CLASS_SCOPE'})
+    await db.$executeRaw`UPDATE "organization_capability_grants" SET "revoked_at"=clock_timestamp()
+      WHERE "membership_id"=${member.id} AND "capability"='PSYCHOLOGY_STAFF'`
+    await expect(assertCampusActivityRunPublisher({...scope,runId:run.id})).rejects.toMatchObject({code:'ACTIVITY_PUBLISHER_REQUIRED'})
+    await expect(changeCampusActivityStatus({...scope,action:'PAUSE',expectedVersion:opened.version})).rejects.toMatchObject({code:'ACTIVITY_GOVERNANCE_REQUIRED'})
+    await expect(changeCampusActivityStatus({...scope,actor:f.admin,action:'PAUSE',expectedVersion:opened.version})).resolves.toMatchObject({status:'PAUSED'})
+  })
+
+  it('does not let collaborator-only ownership, foreign actors or professional-only resource policy publish students',async()=>{
+    const {f,scope,member,run,submitted,publication}=await psychologistDraft()
+    const other=await fixture()
+    await expect(assertCampusActivityRunPublisher({...scope,actor:other.counselor,runId:run.id})).rejects.toThrow()
+    await changeCampusActivityStatus({...scope,action:'OPEN',expectedVersion:submitted.version})
+    await expect(previewAssessmentRun({...publication,resourceRegistry:psychologistRegistry(['PROFESSIONAL_ASSIGN'])})).rejects.toMatchObject({code:'RUN_INITIATION_FORBIDDEN'})
+    await db.$executeRaw`UPDATE "campus_activities" SET "owner_membership_id"=${f.adminMember} WHERE "course_id"=${scope.courseId}`
+    await db.$executeRaw`INSERT INTO "campus_activity_collaborators" ("course_id","organization_id","membership_id")
+      VALUES (${scope.courseId},${f.organizationId},${member.id})`
+    await expect(assertCampusActivityRunPublisher({...scope,runId:run.id})).rejects.toMatchObject({code:'ACTIVITY_PUBLISHER_REQUIRED'})
+    await expect(publishAssessmentRun(publication)).rejects.toThrow()
+  })
+
+  it('rechecks psychologist qualification in close/cancel transactions and preserves admin cancellation',async()=>{
+    const {f,scope,member,run,submitted,publication}=await psychologistDraft()
+    await changeCampusActivityStatus({...scope,action:'OPEN',expectedVersion:submitted.version})
+    await publishAssessmentRun(publication)
+    await assertCampusActivityRunPublisher({...scope,runId:run.id})
+    await db.$executeRaw`UPDATE "organization_capability_grants" SET "revoked_at"=clock_timestamp()
+      WHERE "membership_id"=${member.id} AND "capability"='PSYCHOLOGY_STAFF'`
+    const lifecycle={organizationId:f.organizationId,runId:run.id,schoolActivity:{actor:f.counselor,courseId:scope.courseId}}
+    await expect(closeAssessmentRun(lifecycle)).rejects.toMatchObject({code:'ACTIVITY_PUBLISHER_REQUIRED'})
+    await expect(cancelAssessmentRun(lifecycle)).rejects.toMatchObject({code:'ACTIVITY_PUBLISHER_REQUIRED'})
+    await expect(cancelAssessmentRun({...lifecycle,schoolActivity:{actor:f.admin,courseId:scope.courseId}})).resolves.toEqual({status:'CANCELLED'})
+  })
+
+  it('lists only current allocatable class names for activity editors and rechecks scope at allocation',async()=>{
+    const f=await fixture()
+    const other=await fixture()
+    const activity=await createCampusActivity({actor:f.admin,organizationId:f.organizationId,
+      title:'Scoped class picker',purpose:'SCHOOL_CLIMATE'})
+    const input={actor:f.admin,organizationId:f.organizationId,courseId:activity.id}
+    const grade=await createOrganizationUnit({organizationId:f.organizationId,unitKind:'GRADE',name:'目录年级'})
+    const extra=await createOrganizationUnit({organizationId:f.organizationId,unitKind:'CLASS',name:'其他获批班级',parentUnitId:grade.id})
+    const pending=await createOrganizationUnit({organizationId:f.organizationId,unitKind:'CLASS',name:'未审批班级',parentUnitId:grade.id})
+    await db.campusClassAdmission.createMany({data:[
+      {organizationId:f.organizationId,classUnitId:extra.id,status:'APPROVED'},
+      {organizationId:f.organizationId,classUnitId:pending.id,status:'DRAFT'},
+    ]})
+    const adminList=await listCampusActivityEligibleClasses(input)
+    expect(adminList.list.map(row=>row.id).sort()).toEqual([f.classUnitId,extra.id].sort())
+    expect(adminList.list.every(row=>Object.keys(row).sort().join(',')==='id,name')).toBe(true)
+    expect(adminList.list.some(row=>row.id===other.classUnitId)).toBe(false)
+    await expect(listCampusActivityEligibleClasses({...input,actor:other.admin})).rejects.toBeInstanceOf(CampusActivityError)
+    await expect(listCampusActivityEligibleClasses({...input,organizationId:other.organizationId})).rejects.toBeInstanceOf(CampusActivityError)
+
+    await db.user.update({where:{id:f.counselor.userId},data:{teacherApproved:true}})
+    const psych=await db.organizationMembership.findFirstOrThrow({where:{userId:f.counselor.userId,organizationId:f.organizationId}})
+    await addCampusActivityCollaborator({...input,membershipId:psych.id})
+    // Qualified psychology membership can select this school's approved classes, without TEACHER.
+    expect((await listCampusActivityEligibleClasses({...input,actor:f.counselor})).list.map(row=>row.id).sort()).toEqual([f.classUnitId,extra.id].sort())
+    await expect(allocateCampusActivityParticipants({...input,actor:f.counselor,
+      classUnitIds:[other.classUnitId],requestKey:randomUUID(),expectedVersion:1,
+    })).rejects.toMatchObject({code:'ACTIVITY_CLASS_NOT_APPROVED'})
+    const teacher=await db.user.create({data:{username:userName('class_teacher_'),passwordHash:'synthetic-only',accountDomain:'SCHOOL',role:'TEACHER'}})
+    const teacherMember=await db.organizationMembership.create({data:{id:randomUUID(),organizationId:f.organizationId,userId:teacher.id,orgRole:'MEMBER'}})
+    for(const membershipId of [teacherMember.id]){
+      await db.organizationPersonaGrant.create({data:{id:randomUUID(),organizationId:f.organizationId,membershipId,persona:'TEACHER',grantedByUserId:f.admin.userId}})
+    }
+    await addCampusActivityCollaborator({...input,membershipId:teacherMember.id})
+    await expect(listCampusActivityEligibleClasses({...input,actor:actor(teacher)})).rejects.toMatchObject({code:'ACTIVITY_EDITOR_REQUIRED'})
+    for(const membershipId of [teacherMember.id]){
+      for(const [classId,from,until] of [
+        [f.classUnitId,new Date(Date.now()-60_000),null],
+        [pending.id,new Date(Date.now()-60_000),null],
+        [extra.id,new Date(Date.now()-120_000),new Date(Date.now()-60_000)],
+        [extra.id,new Date(Date.now()+60_000),null],
+      ] as const){
+        await db.$executeRaw`INSERT INTO "organization_staff_class_assignments"
+          ("id","organization_id","membership_id","class_unit_id","staff_role","valid_from","valid_until")
+          VALUES (${randomUUID()},${f.organizationId},${membershipId},${classId},'TEACHING',${from},${until})`
+      }
+    }
+    expect((await listCampusActivityEligibleClasses({...input,actor:actor(teacher)})).list.map(row=>row.id)).toEqual([f.classUnitId])
+    expect((await listCampusActivityEligibleClasses({...input,actor:f.counselor})).list.map(row=>row.id).sort()).toEqual([f.classUnitId,extra.id].sort())
+    // A previously successful GET is not permission to allocate after professional withdrawal.
+    await db.$executeRaw`UPDATE "organization_capability_grants" SET "revoked_at"=clock_timestamp()
+      WHERE "organization_id"=${f.organizationId} AND "membership_id"=${psych.id}
+        AND "capability"='PSYCHOLOGY_STAFF' AND "revoked_at" IS NULL`
+    await expect(listCampusActivityEligibleClasses({...input,actor:f.counselor})).rejects.toMatchObject({code:'ACTIVITY_EDITOR_REQUIRED'})
+    await expect(allocateCampusActivityParticipants({...input,actor:f.counselor,
+      classUnitIds:[f.classUnitId],requestKey:'picker-'+randomUUID(),expectedVersion:1,
+    })).rejects.toMatchObject({code:'ACTIVITY_EDITOR_REQUIRED'})
+    await expect(createCampusActivity({actor:f.counselor,organizationId:f.organizationId,title:'COUNSELOR alone',purpose:'STUDENT_WELLBEING'}))
+      .rejects.toMatchObject({code:'ACTIVITY_EDITOR_REQUIRED'})
+    await db.organizationMembership.update({where:{id:teacherMember.id},data:{validUntil:new Date()}})
+    await expect(listCampusActivityEligibleClasses({...input,actor:actor(teacher)})).rejects.toBeInstanceOf(CampusActivityError)
+    await changeCampusActivityStatus({...input,action:'SUBMIT',expectedVersion:1})
+    await expect(listCampusActivityEligibleClasses(input)).rejects.toMatchObject({code:'ACTIVITY_ALLOCATION_FROZEN'})
+  })
 
   it('keeps legacy Course records typed LEGACY and forbids a SCHOOL account creating legacy/training Course',async()=>{
     const legacyUser=await db.user.create({data:{

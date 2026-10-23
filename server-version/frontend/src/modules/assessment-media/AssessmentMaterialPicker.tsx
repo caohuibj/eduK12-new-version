@@ -5,7 +5,7 @@ import './material-picker.css'
 
 export type MaterialLibraryRow={id:string;name:string;mimeType:AssessmentMaterial['asset']['mimeType'];contentHash:string;size:number}
 export type MaterialLibraryQuery={kind:string;page:number}
-export type MaterialLibraryProvider={load:(query:MaterialLibraryQuery)=>Promise<{list:MaterialLibraryRow[];total:number;pageSize?:number}>;manageHref:string|((kind:string)=>string);loadContent?:(asset:AssessmentMaterial['asset'],signal:AbortSignal)=>Promise<Response>;note:string;appearance:'survey'|'training'}
+export type MaterialLibraryProvider={load:(query:MaterialLibraryQuery)=>Promise<{list:MaterialLibraryRow[];total:number;pageSize?:number}>;manageHref?:string|((kind:string)=>string);loadContent?:(asset:AssessmentMaterial['asset'],signal:AbortSignal)=>Promise<Response>;note:string;appearance:'survey'|'training'}
 export function AssessmentMaterialPicker({value=[],onChange,label='展示素材',provider,disabled=false}:{value?:AssessmentMaterial[];onChange:(items:AssessmentMaterial[])=>void;label?:string;provider:MaterialLibraryProvider;disabled?:boolean}){
   const [open,setOpen]=useState(false),[kind,setKind]=useState('all'),[page,setPage]=useState(1),[reload,setReload]=useState(0)
   const [rows,setRows]=useState<MaterialLibraryRow[]>([]),[total,setTotal]=useState(0),[loading,setLoading]=useState(false),[error,setError]=useState(''),[pageSize,setPageSize]=useState(9)
@@ -19,7 +19,7 @@ export function AssessmentMaterialPicker({value=[],onChange,label='展示素材'
   return <fieldset disabled={disabled} className="assessment-material-picker" data-appearance={provider.appearance} aria-label={label}>
     <header><div><strong>{label}</strong><p>{label==='反馈展示素材'?'图片、视频、PDF · 在对应反馈区间获准开放后展示，不影响计分。':label==='题目展示素材'?'图片、视频、PDF · 随本题展示，不参与计分，也不要求完整观看。':'图片、视频、PDF · 按顺序在工具开始前展示，阅读不参与计分。组合问卷保留所选工具的素材。'}</p></div><button type="button" className="btn-secondary" aria-expanded={open} onClick={()=>setOpen(!open)}>{open?'收起素材库':'从素材库添加'}</button></header>
     {open&&<div className="assessment-material-picker-browser">
-      <div className="assessment-material-picker-filters"><label>素材类型<select className="input" aria-label="素材类型" value={kind} onChange={e=>{setKind(e.target.value);setPage(1)}}><option value="all">全部</option><option value="image">图片</option><option value="video">视频</option><option value="document">PDF 文档</option></select></label><a href={typeof provider.manageHref==='function'?provider.manageHref(kind):provider.manageHref} target="_blank" rel="noopener noreferrer">在素材库上传或管理 ↗</a></div>
+      <div className="assessment-material-picker-filters"><label>素材类型<select className="input" aria-label="素材类型" value={kind} onChange={e=>{setKind(e.target.value);setPage(1)}}><option value="all">全部</option><option value="image">图片</option><option value="video">视频</option><option value="document">PDF 文档</option></select></label>{provider.manageHref&&<a href={typeof provider.manageHref==='function'?provider.manageHref(kind):provider.manageHref} target="_blank" rel="noopener noreferrer">在素材库上传或管理 ↗</a>}</div>
       <p className="assessment-material-picker-note">{provider.note}</p>
       {loading?<p role="status">正在读取素材…</p>:error?<div role="alert">{error}<button type="button" className="btn-secondary" onClick={()=>setReload(x=>x+1)}>重新读取</button></div>:<>
         {!rows.length&&<p role="status">没有符合条件的素材。可切换类型，或到素材库上传后重新读取。</p>}

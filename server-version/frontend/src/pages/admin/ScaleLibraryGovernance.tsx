@@ -1,9 +1,11 @@
+import { EducationLibraryDistributionPicker, educationDistributionReason } from '../../components/scale-governance/EducationLibraryDistributionPicker'
+import {EducationApplicabilitySummary} from '../../components/scale-governance/EducationApplicabilityFields'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { Link, useLocation } from 'react-router-dom'
 import './survey-admin.css'
 import './survey-library.css'
 import { ArrowLeft, BookOpen, CheckCheck, ClipboardList, FileSearch, RefreshCw, Search, ShieldCheck } from 'lucide-react'
-import { governanceApi, submissionStatusLabel, type GovernanceCatalogRecord, type GovernanceCapabilities, type GovernanceEntry, type GovernanceProduct, type GovernanceSubmission, type GovernanceUseGrant } from '../../api/scaleLibraryGovernance'
+import { governanceApi, submissionStatusLabel, type GovernanceCatalogRecord, type GovernanceCapabilities, type GovernanceEntry, type GovernanceTargetProduct, type EducationDistributionProduct, type GovernanceSubmission, type GovernanceUseGrant } from '../../api/scaleLibraryGovernance'
 import { ScaleLibraryMediaPreview } from '../../components/scale-governance/ScaleLibraryMediaPreview'
 import { ProductPage, PageHeader } from '../../components/product-ui'
 
@@ -11,6 +13,14 @@ const api = governanceApi('TRAINING')
 const metadataLabels: Record<string, string> = { title: '名称', author: '作者 / 来源', copyright: '版权', applicability: '用途与适用范围', scoringDescription: '计分说明', reportDescription: '报告说明' }
 const entryLabels = { ACTIVE: '已收录', WITHDRAWN: '已下架', EMERGENCY_DISABLED: '紧急停用' }
 type Person = { id: string; username: string; name?: string; status?: string; isActive?: boolean }
+const isEducationTarget=(product:GovernanceTargetProduct):product is EducationDistributionProduct=>product==='SCHOOL'||product==='TEACHER'
+const targetReady=(entry:GovernanceEntry,target:GovernanceTargetProduct)=>{
+  if(!entry.supportedEntrypoints?.includes(target))return false
+  if(!isEducationTarget(target))return true
+  const readiness=entry.educationDistribution?.products?.[target]
+  return Boolean(readiness?.status==='READY'&&readiness.canDistribute&&readiness.contentCompatible&&entry.contentHash)
+}
+const targetLabels={TRAINING:'Training',SURVEY:'Survey',SCHOOL:'School',TEACHER:'Teacher'}
 const covers = (releaseIds: string[], releaseId: string) => releaseIds.includes(releaseId)
 export default function ScaleLibraryGovernance() {
   const [view, setView] = useState<'catalog' | 'submissions'>('catalog')
@@ -28,7 +38,7 @@ export default function ScaleLibraryGovernance() {
   const [reason, setReason] = useState(''), [selected, setSelected] = useState<GovernanceEntry | null>(null)
   const [keyword, setKeyword] = useState(''), [peopleHasMore, setPeopleHasMore] = useState(false)
   const [grantLoaded, setGrantLoaded] = useState(false)
-  const [grants, setGrants] = useState<GovernanceUseGrant[]>([]), [people, setPeople] = useState<Person[]>([]), [userId, setUserId] = useState(''), [product, setProduct] = useState<GovernanceProduct>(surveyContext?'SURVEY':'TRAINING'), [peoplePage, setPeoplePage] = useState(1)
+  const [grants, setGrants] = useState<GovernanceUseGrant[]>([]), [people, setPeople] = useState<Person[]>([]), [userId, setUserId] = useState(''), [product, setProduct] = useState<GovernanceTargetProduct>(surveyContext?'SURVEY':'TRAINING'), [peoplePage, setPeoplePage] = useState(1)
   const detailRegion = useRef<HTMLElement>(null), grantRegion = useRef<HTMLElement>(null)
   useEffect(() => { if (surveyContext && catalogDetail) { detailRegion.current?.focus({ preventScroll: true }); detailRegion.current?.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' }) } }, [surveyContext, catalogDetail])
   useEffect(() => { if (surveyContext && selected?.id) { grantRegion.current?.focus({ preventScroll: true }); grantRegion.current?.scrollIntoView?.({ block: 'nearest', behavior: 'smooth' }) } }, [surveyContext, selected?.id])
@@ -65,8 +75,8 @@ export default function ScaleLibraryGovernance() {
   }
   const reviewGrant = (releaseId: string) => capabilities?.reviewGrants.find(grant => covers(grant.releaseIds, releaseId))?.grantId
   const canReview = (releaseId: string) => Boolean(capabilities?.systemAdmin || reviewGrant(releaseId))
-  const distributionGrant = (releaseId: string, target: GovernanceProduct) => capabilities?.distributionGrants.find(grant => grant.product === target && covers(grant.releaseIds, releaseId))?.grantId
-  const canDistribute = (row: GovernanceEntry, target: GovernanceProduct) => Boolean(row.supportedEntrypoints?.includes(target) && (capabilities?.systemAdmin || distributionGrant(row.releaseId, target)))
+  const distributionGrant = (releaseId: string, target: GovernanceTargetProduct) => capabilities?.distributionGrants.find(grant => grant.product === target && covers(grant.releaseIds, releaseId))?.grantId
+  const canDistribute = (row: GovernanceEntry, target: GovernanceTargetProduct) => Boolean(targetReady(row,target) && (capabilities?.systemAdmin || distributionGrant(row.releaseId, target)))
   const loadGrants = async (entry: GovernanceEntry) => {
     const current = ++lookupGeneration.current
     setSelected(entry); setProduct(surveyContext?'SURVEY':entry.supportedEntrypoints?.[0] || 'TRAINING'); setKeyword(''); setGrants([]); setGrantLoaded(false); setUserId(''); setPeople([])
@@ -74,7 +84,7 @@ export default function ScaleLibraryGovernance() {
     catch (failure) { if (mounted.current && current === lookupGeneration.current) setError(failure instanceof Error ? failure.message : '授权状态加载失败') }
   }
   const loadPeople = async (page = 1) => {
-    if (!selected || !canDistribute(selected, product)) return
+    if (!selected || isEducationTarget(product) || !canDistribute(selected, product)) return
     const current = ++lookupGeneration.current
     setUserId(''); setPeople([]); setError('')
     try {
@@ -90,7 +100,7 @@ export default function ScaleLibraryGovernance() {
     finally { if (mounted.current && current === catalogDetailGeneration.current) setCatalogDetailLoading(false) }
   }
   const assign = async () => {
-    if (!selected || !userId || !canDistribute(selected, product)) return
+    if (!selected || !userId || isEducationTarget(product) || !canDistribute(selected, product)) return
     const key = JSON.stringify([selected.id, userId, product])
     if (pendingGrant.current?.key !== key) pendingGrant.current = { key, requestId: crypto.randomUUID() }
     await api.grant(selected.id, userId, product, pendingGrant.current.requestId, distributionGrant(selected.releaseId, product))
@@ -99,7 +109,7 @@ export default function ScaleLibraryGovernance() {
   }
   const permissionNotes=<><p>审核负责是否入库；使用授权负责哪些账号可用，两者分别核对。</p><p>入库不代表所有研究者均可使用，也不改变标准量表的科学身份、版权或改编限制。</p>{capabilities?.systemAdmin&&<Link to="/admin/permissions">平台审核权限设置</Link>}<p>操作按后台返回的精确版本与实际权限提供。</p></>
   const applicationPanel = <section className="staff-panel staff-panel--padded p-5 mt-4 slg-submissions"><h2>入库申请</h2>{!surveyContext && <label>审核、下架或撤权说明<textarea className="input block w-full" value={reason} onChange={event => setReason(event.target.value)} disabled={busy}/></label>}
-      {submissions.map(row => <article key={row.id} className="border rounded p-4 mt-3"><h3>{row.metadata.title} · {submissionStatusLabel[row.status]}</h3><p className="break-all">{row.product} · 精确版本 {row.releaseId}</p><dl>{Object.entries(row.metadata).map(([key, value]) => <div key={key}><dt>{metadataLabels[key] || key}</dt><dd>{value}</dd></div>)}</dl>{row.reason && <p>处理说明：{row.reason}</p>}{canReview(row.releaseId) && <div className="my-3"><button type="button" className="hui-button hui-button--secondary" disabled={busy || !!detailLoading} onClick={() => void inspect(row)}>读取精确版本审核内容</button>{details[row.id] && <details open><summary>冻结内容、计分、报告与依赖版本</summary><pre tabIndex={0} role="region" aria-label={`审核冻结内容：${row.metadata.title} · ${row.releaseId}`} className="whitespace-pre-wrap break-all text-xs max-h-96 overflow-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current">{JSON.stringify(details[row.id], null, 2)}</pre></details>}{details[row.id]?.mediaManifest && <section aria-label="固定附件审核清单"><h4>同批媒体审核</h4><p>批准后将固定附件纳入受控平台媒体库；不是匿名公开 URL。退回不发布媒体。</p>{details[row.id].mediaManifest.items.map(item => <article key={item.assetId + item.assetVersion}><p className="break-all">{item.assetId} · {item.mimeType} · {item.sizeBytes} 字节 · v{item.assetVersion} · {item.contentHash}</p><p>用途：{item.usages.join('、')}；权限：仅随此批准量表供获授权使用者 / 对应任务使用，不允许脱离量表独立复用。</p><ScaleLibraryMediaPreview product="TRAINING" context={{ kind: 'submissions', id: row.id }} item={item}/></article>)}{details[row.id].mediaManifest.items.length > 0 && <label><input type="checkbox" checked={mediaReviewed[row.id] === details[row.id].mediaManifest.manifestHash} onChange={event => setMediaReviewed(current => ({ ...current, [row.id]: event.target.checked ? details[row.id].mediaManifest.manifestHash : '' }))}/>已核对固定附件内容及随量表共享权限</label>}</section>}<p>批准前请核对实际冻结题目、计分、报告及依赖；仅有申请说明不足以批准。</p></div>}{row.status === 'SUBMITTED' && canReview(row.releaseId) && <div className="flex gap-2 mt-3"><button type="button" className="hui-button hui-button--primary" disabled={busy || loading || !reason.trim() || details[row.id]?.version !== row.version || details[row.id]?.releaseId !== row.releaseId || !details[row.id]?.mediaManifest || (details[row.id].mediaManifest.items.length > 0 && mediaReviewed[row.id] !== details[row.id].mediaManifest.manifestHash)} onClick={() => void run(() => api.review(row, 'APPROVE', reason.trim(), reviewGrant(row.releaseId)), '已批准收录，尚未自动分配使用权限。')}>批准精确版本入库</button><button type="button" className="hui-button hui-button--secondary" disabled={busy || loading || !reason.trim()} onClick={() => void run(() => api.review(row, 'RETURN', reason.trim(), reviewGrant(row.releaseId)), '申请已退回，作者可查看原因。')}>退回并说明原因</button></div>}</article>)}
+      {submissions.map(row => <article key={row.id} className="border rounded p-4 mt-3"><h3>{row.metadata.title} · {submissionStatusLabel[row.status]}</h3><p className="break-all">{row.product} · 精确版本 {row.releaseId}</p><dl>{Object.entries(row.metadata).map(([key, value]) => <div key={key}><dt>{metadataLabels[key] || key}</dt><dd>{value}</dd></div>)}</dl>{row.reason && <p>处理说明：{row.reason}</p>}{canReview(row.releaseId) && <div className="my-3"><button type="button" className="hui-button hui-button--secondary" disabled={busy || !!detailLoading} onClick={() => void inspect(row)}>读取精确版本审核内容</button>{details[row.id] && <details open><summary>冻结内容、计分、报告与依赖版本</summary><pre tabIndex={0} role="region" aria-label={`审核冻结内容：${row.metadata.title} · ${row.releaseId}`} className="whitespace-pre-wrap break-all text-xs max-h-96 overflow-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current">{JSON.stringify(details[row.id], null, 2)}</pre></details>}{details[row.id]?.version===row.version && details[row.id]?.releaseId===row.releaseId && <EducationApplicabilitySummary value={details[row.id].educationApplicability} hash={details[row.id].educationApplicabilityHash}/>}{details[row.id]?.mediaManifest && <section aria-label="固定附件审核清单"><h4>同批媒体审核</h4><p>批准后将固定附件纳入受控平台媒体库；不是匿名公开 URL。退回不发布媒体。</p>{details[row.id].mediaManifest.items.map(item => <article key={item.assetId + item.assetVersion}><p className="break-all">{item.assetId} · {item.mimeType} · {item.sizeBytes} 字节 · v{item.assetVersion} · {item.contentHash}</p><p>用途：{item.usages.join('、')}；权限：仅随此批准量表供获授权使用者 / 对应任务使用，不允许脱离量表独立复用。</p><ScaleLibraryMediaPreview product="TRAINING" context={{ kind: 'submissions', id: row.id }} item={item}/></article>)}{details[row.id].mediaManifest.items.length > 0 && <label><input type="checkbox" checked={mediaReviewed[row.id] === details[row.id].mediaManifest.manifestHash} onChange={event => setMediaReviewed(current => ({ ...current, [row.id]: event.target.checked ? details[row.id].mediaManifest.manifestHash : '' }))}/>已核对固定附件内容及随量表共享权限</label>}</section>}<p>批准前请核对实际冻结题目、计分、报告及依赖；仅有申请说明不足以批准。</p></div>}{row.status === 'SUBMITTED' && canReview(row.releaseId) && <div className="flex gap-2 mt-3"><button type="button" className="hui-button hui-button--primary" disabled={busy || loading || !reason.trim() || details[row.id]?.version !== row.version || details[row.id]?.releaseId !== row.releaseId || !details[row.id]?.mediaManifest || (details[row.id].mediaManifest.items.length > 0 && mediaReviewed[row.id] !== details[row.id].mediaManifest.manifestHash)} onClick={() => void run(() => api.review(row, 'APPROVE', reason.trim(), reviewGrant(row.releaseId)), '已批准收录，尚未自动分配使用权限。')}>批准精确版本入库</button><button type="button" className="hui-button hui-button--secondary" disabled={busy || loading || !reason.trim()} onClick={() => void run(() => api.review(row, 'RETURN', reason.trim(), reviewGrant(row.releaseId)), '申请已退回，作者可查看原因。')}>退回并说明原因</button></div>}</article>)}
       {!submissions.length && !loading && <p>当前范围没有入库申请。</p>}
     </section>
   const legacyCatalog = <section className="staff-panel staff-panel--padded p-5 mt-4"><h2>公共量表总汇</h2><p>标准量表与获批自编量表在同一目录分页呈现。目录可见或版权获批，不代表当前用户已获入口使用权限；来源入口仅表示出处，不决定使用授权。</p><p>普通下架或撤权停止新增使用，保留历史与既有绑定；紧急停用会阻止该版本继续用于运行，可能影响正在进行的任务或波次。历史答卷与报告不删除。</p>
@@ -108,8 +118,39 @@ export default function ScaleLibraryGovernance() {
       {!catalog.length && !loading && <p>本页没有可见量表。</p>}<div className="flex gap-3 items-center mt-4" aria-label="公共量表目录分页"><button type="button" className="hui-button hui-button--secondary" disabled={loading || busy || catalogPage <= 1} onClick={() => { catalogDetailGeneration.current++; setCatalogDetailLoading(false); setCatalogDetail(null); setCatalogPage(page => page - 1) }}>目录上一页</button><span>目录第 {catalogPage} 页</span><button type="button" className="hui-button hui-button--secondary" disabled={loading || busy || !catalogHasMore} onClick={() => { catalogDetailGeneration.current++; setCatalogDetailLoading(false); setCatalogDetail(null); setCatalogPage(page => page + 1) }}>目录下一页</button></div>
       {catalogDetailLoading && <p role="status">正在读取精确目录详情…</p>}{catalogDetail && <section aria-label="公共量表精确版本详情" className="border rounded p-4 mt-3"><h3>{catalogDetail.title} · {catalogDetail.origin === 'STANDARD_REGISTRY' ? '标准科学身份保留 · 只读' : '自编描述性量表 · 精确获批版本'}</h3><p>目录与许可状态不替代目标入口的实际使用授权。以下是服务器按精确版本返回的详情。</p><pre tabIndex={0} role="region" aria-label={`目录版本内容：${catalogDetail.title}`} className="whitespace-pre-wrap break-all text-xs max-h-96 overflow-auto focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-current">{JSON.stringify(catalogDetail, null, 2)}</pre></section>}
     </section>
-  const grantPanel = selected && <section ref={grantRegion} tabIndex={-1} className="staff-panel staff-panel--padded p-5 mt-4" aria-label="精确版本使用授权"><h2>{selected.metadata.title} · 只读使用授权</h2><p className="break-all">版本 {selected.releaseId}。授权不包含改编；旧问卷不会自动升级。</p>{!grantLoaded && <p role="status">尚未确认现有授权，请重新读取该版本授权后再分配。</p>}<fieldset disabled={busy || loading || !grantLoaded || selected.status !== 'ACTIVE'}><label>目标入口<select className="input block" value={product} onChange={event => { lookupGeneration.current++; setProduct(event.target.value as GovernanceProduct); setPeople([]); setUserId('') }}>{!surveyContext&&<option value="TRAINING" disabled={!selected.supportedEntrypoints?.includes('TRAINING')}>Training</option>}<option value="SURVEY" disabled={!selected.supportedEntrypoints?.includes('SURVEY')}>Survey</option></select></label>{(['TRAINING', 'SURVEY'] as const).filter(target => (!surveyContext||target==='SURVEY')&&!selected.supportedEntrypoints?.includes(target)).map(target => <p key={target}>{target}：{selected.compatibilityReasons?.[target] || '当前版本不支持此入口，不能分配使用。'}</p>)}{canDistribute(selected, product) ? <><label>查找授权账号<input className="input block" value={keyword} onChange={event => setKeyword(event.target.value)}/></label><button type="button" className="hui-button hui-button--secondary" onClick={() => void loadPeople(1)}>读取可见授权对象</button><label>授权对象<select className="input block" value={userId} onChange={event => setUserId(event.target.value)}><option value="">请选择已核对的账号</option>{people.map(person => <option key={person.id} value={person.id}>{person.name || person.username} · {person.username} · {person.id}</option>)}</select></label>{people.length > 0 && <div><button type="button" disabled={peoplePage <= 1} onClick={() => void loadPeople(peoplePage - 1)}>对象上一页</button><button type="button" disabled={!peopleHasMore} onClick={() => void loadPeople(peoplePage + 1)}>对象下一页</button></div>}<button type="button" className="hui-button hui-button--primary" disabled={!userId} onClick={() => void run(assign, '已分配精确版本的只读使用授权。')}>授予所选账号只读使用</button></> : <p>当前账号没有此版本在该入口的分配权限。</p>}</fieldset>
-      {grants.filter(grant=>!surveyContext||grant.product==='SURVEY').map(grant => <article key={grant.id} className="border rounded p-3 mt-2"><p>{grant.product} · {grant.userId} · {grant.status}</p>{canDistribute(selected, grant.product) && grant.status === 'ACTIVE' && <button type="button" className="hui-button hui-button--secondary" disabled={busy || !reason.trim()} onClick={() => void run(async () => { await api.revoke(grant, reason.trim()); const response = await api.grants(selected.id); if (mounted.current) setGrants(response.list) }, '授权已撤销；历史记录保留。')}>撤销新增使用权限</button>}</article>)}
+  const grantPanel = selected && <section ref={grantRegion} tabIndex={-1} className="staff-panel staff-panel--padded p-5 mt-4" aria-label="精确版本使用授权">
+      <h2>{selected.metadata.title} · 只读使用授权</h2>
+      <p className="break-all">版本 {selected.releaseId}。授权不包含改编；旧问卷不会自动升级。</p>
+      {!grantLoaded && <p role="status">尚未确认现有授权，请重新读取该版本授权后再分配。</p>}
+      <fieldset disabled={busy || loading || !grantLoaded || selected.status !== 'ACTIVE'}>
+        <label>目标入口<select className="input block" value={product} onChange={event => {
+          lookupGeneration.current++; setProduct(event.target.value as GovernanceTargetProduct); setPeople([]); setUserId('')
+        }}>{(['TRAINING','SURVEY','SCHOOL','TEACHER'] as const).filter(target=>!surveyContext||target==='SURVEY').map(target=><option key={target} value={target} disabled={!targetReady(selected,target)}>{targetLabels[target]}</option>)}</select></label>
+        {(['TRAINING','SURVEY','SCHOOL','TEACHER'] as const).filter(target=>(!surveyContext||target==='SURVEY')&&!targetReady(selected,target)).map(target=><p key={target}>
+          {isEducationTarget(target)?targetLabels[target]:target}：{isEducationTarget(target)?educationDistributionReason(selected.educationDistribution?.products?.[target]?.reason||selected.compatibilityReasons?.[target]):selected.compatibilityReasons?.[target]||'当前版本暂未开放此入口的使用分配。'}</p>)}
+        {canDistribute(selected, product) ? isEducationTarget(product)?<EducationLibraryDistributionPicker
+          key={[selected.id,selected.releaseId,selected.contentHash,product,distributionGrant(selected.releaseId,product)].join(':')}
+          entry={selected} product={product} grantId={distributionGrant(selected.releaseId,product)} grants={grants} api={api}
+          disabled={busy||loading||!grantLoaded} run={run} onGranted={async()=>{
+            const generation=lookupGeneration.current
+            const response=await api.grants(selected.id)
+            if(mounted.current&&generation===lookupGeneration.current)setGrants(response.list)
+          }}/>:<>
+          <label>查找授权账号<input className="input block" value={keyword} onChange={event=>setKeyword(event.target.value)}/></label>
+          <button type="button" className="hui-button hui-button--secondary" onClick={()=>void loadPeople(1)}>读取可见授权对象</button>
+          <label>授权对象<select className="input block" value={userId} onChange={event=>setUserId(event.target.value)}>
+            <option value="">请选择已核对的账号</option>{people.map(person=><option key={person.id} value={person.id}>{person.name||person.username} · {person.username} · {person.id}</option>)}
+          </select></label>
+          {people.length>0&&<div><button type="button" disabled={peoplePage<=1} onClick={()=>void loadPeople(peoplePage-1)}>对象上一页</button><button type="button" disabled={!peopleHasMore} onClick={()=>void loadPeople(peoplePage+1)}>对象下一页</button></div>}
+          <button type="button" className="hui-button hui-button--primary" disabled={!userId} onClick={()=>void run(assign,'已分配精确版本的只读使用授权。')}>授予所选账号只读使用</button>
+        </>:<p>当前账号没有此版本在该入口的分配权限，或该入口尚未开放。</p>}
+      </fieldset>
+      {grants.filter(grant=>!surveyContext||grant.product==='SURVEY').map(grant=><article key={grant.id} className="border rounded p-3 mt-2">
+        <p>{grant.product} · {grant.scopeKind==='ORGANIZATION'?'组织范围':'使用者'}{grant.organizationId?` · 学校 ${grant.organizationId}`:''} · {grant.userId??'无指定个人'} · {grant.status}</p>
+        {canDistribute(selected,grant.product)&&grant.status==='ACTIVE'&&<button type="button" className="hui-button hui-button--secondary" disabled={busy||!reason.trim()} onClick={()=>void run(async()=>{
+          await api.revoke(grant,reason.trim());const response=await api.grants(selected.id);if(mounted.current)setGrants(response.list)
+        },'授权已撤销；历史记录保留。')}>撤销新增使用权限</button>}
+      </article>)}
     </section>
   const pendingCount = submissions.filter(row => row.status === 'SUBMITTED').length
   const visibleCatalog = catalog.filter(row => (originFilter === 'ALL' || row.origin === originFilter)
@@ -143,6 +184,7 @@ export default function ScaleLibraryGovernance() {
               <h3>{row.title}</h3><p className="slg-record-description">{standard ? row.standard?.construct.constructDefinition || '查看精确详情，核对构念与科学证据。' : entry?.metadata.applicability || '查看精确获批版本与适用范围。'}</p>
               <dl className="slg-record-facts"><div><dt>{standard ? '版本' : '来源'}</dt><dd>{standard ? `${row.exactVersion.instrumentKey} · v${row.exactVersion.instrumentVersion}` : entry?.metadata.author || '待核对'}</dd></div><div><dt>{standard ? '版权状态' : '兼容入口'}</dt><dd>{standard ? row.standard?.rights.status || '待核对' : entry?.supportedEntrypoints?.join(' / ') || '暂无可分配入口'}</dd></div></dl>
               {!standard && <p className="slg-version">精确版本 <span>{row.exactVersion.releaseId}</span></p>}
+              {entry && <EducationApplicabilitySummary value={entry.educationApplicability} hash={entry.educationApplicabilityHash}/>}
               <div className="slg-record-actions"><button type="button" className="hui-button hui-button--secondary" disabled={catalogDetailLoading} onClick={() => void inspectCatalog(row)}><FileSearch size={15} aria-hidden="true"/>{standard ? '查看标准精确版本详情' : '查看自编精确版本详情'}</button>
                 {entry && <><button type="button" className="hui-button hui-button--secondary" disabled={busy} onClick={() => void loadGrants(entry)}>查看 / 分配只读使用权限</button>
                   {entry.status !== 'EMERGENCY_DISABLED' && canReview(entry.releaseId) && <details className="slg-danger-actions"><summary>状态操作</summary><div><p>请先在“操作说明”填写原因。</p><button type="button" className="hui-button hui-button--secondary" disabled={busy || loading || entry.status !== 'ACTIVE' || !reason.trim()} onClick={() => void run(() => api.setStatus(entry, 'WITHDRAWN', reason.trim(), reviewGrant(entry.releaseId)), '已普通下架；历史记录保留。')}>普通下架</button><button type="button" className="hui-button hui-button--secondary" disabled={busy || loading || !reason.trim()} onClick={() => { if (window.confirm('紧急停用将阻止此精确版本继续用于运行，可能影响正在进行的任务或波次；历史数据不会删除。确认紧急停用？\n原因：' + reason.trim())) void run(() => api.setStatus(entry, 'EMERGENCY_DISABLED', reason.trim(), reviewGrant(entry.releaseId)), '已紧急停用；历史数据保留。') }}>紧急停用（影响运行）</button></div></details>}

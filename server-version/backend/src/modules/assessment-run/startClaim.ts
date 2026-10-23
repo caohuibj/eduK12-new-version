@@ -169,7 +169,7 @@ export const acquireRunExecutionStartClaim = async (input: {
 
     const existing = await lockClaim(tx, input.executionId)
     if (existing?.state === 'ABORTED') return { kind: 'ABORTED' as const, claim: existing }
-    if (!existing) await assertCurrentRunStartAuthority(tx, input.executionId)
+    if (!existing) await assertCurrentRunStartAuthority(tx, input.executionId, {accountMode:'DETECT_EDUCATION_LIBRARY'})
     const admission = await loadRunExecutionStartAdmission({
       tx,
       executionId: input.executionId,

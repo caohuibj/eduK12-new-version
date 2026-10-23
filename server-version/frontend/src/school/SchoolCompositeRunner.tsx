@@ -14,6 +14,7 @@ import type { SchoolApi } from './SchoolRecovery'
 
 export type CampusExecutionRef={
   organizationId:string;courseId:string;runId:string;executionId:string
+  resumeExisting?:boolean
   consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
 }
 export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
@@ -26,6 +27,10 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
   const [error,setError]=useState('')
   const [done,setDone]=useState(false)
   const [consentAccepted,setConsentAccepted]=useState(false)
+  // This hint only skips signing a new admission consent. Protected START replay
+  // and attempt reads keep their existing identity/population checks; FINAL
+  // independently revalidates the frozen accepted consent.
+  const needsAdmissionConsent=!!execution.consentRequired&&!execution.resumeExisting
   const prefix=`/organizations/${execution.organizationId}/activities/${execution.courseId}/runs/${execution.runId}/executions/${execution.executionId}`
   const wrapped=<T,>(data:T):ApiResponse<T>=>({code:0,message:'成功',data})
   const load=useCallback(async(id:string)=>{
@@ -38,9 +43,9 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
     try{
       // Only the respondent may accept a frozen observer Run consent; a
       // student's/guardian's activity association never implies consent.
-      if(execution.consentRequired&&!consentAccepted)
+      if(needsAdmissionConsent&&!consentAccepted)
         throw new Error('请先阅读并明确同意本次观察测评使用范围')
-      if(execution.consentRequired){
+      if(needsAdmissionConsent){
         await api(prefix+'/consent/accept','POST',{})
       }
       const result=await api<{
@@ -115,7 +120,8 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
     if(state)try{await load(state.id)}catch(e){setError(e instanceof Error?e.message:'测评进度刷新失败')}
   }
   return <section className="hs-panel hs-runner">
-    <div className="hs-actions"><button disabled={busy} onClick={onExit}>保存并返回活动</button></div>
+    <div className="hs-actions"><button disabled={busy} onClick={onExit}>返回活动</button></div>
+    <p>返回不会提交当前作答。已成功提交的结果会保留；尚未提交的内容可能无法保留。</p>
     <h2>校园正式测评</h2>
     <p>答案在官方评估引擎中结算，不会因为你完成测评就自动公开给家长或普通教师。</p>
     {error&&<p className="hs-alert" role="alert">{error}</p>}
@@ -172,7 +178,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
         setChild(item)
       }}
     />:<div>
-      {execution.consentRequired&&<div className="hs-panel">
+      {needsAdmissionConsent&&<div className="hs-panel">
         <h3>本次受控观察测评的知情同意</h3>
         <p>用途：{execution.consentPurpose||'学校正式授权的教育观察'}</p>
         <p>可见性政策：{execution.consentVisibility||'仅限经授权人员'}</p>
@@ -182,7 +188,7 @@ export function SchoolCompositeRunner({api,execution,onExit,onFinished}:{
           <span>我已阅读本次测评的用途与可见性说明，自愿同意作答。</span>
         </label>
       </div>}
-      <button className="hs-primary" disabled={busy||(!!execution.consentRequired&&!consentAccepted)}
+      <button className="hs-primary" disabled={busy||(needsAdmissionConsent&&!consentAccepted)}
         onClick={()=>void start()}>
         {busy?'正在核对正式测评…':'开始或继续正式测评'}
       </button>
