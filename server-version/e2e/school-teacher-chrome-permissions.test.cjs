@@ -119,3 +119,32 @@ test('final rewalk catches added files and byte changes and already-tight entrie
   const f = fixture(); for (const [p, row] of f.items) if (p === '/opt' || p === '/opt/google' || p === ROOT || p.startsWith(ROOT + '/')) row.mode &= ~0o022
   assert.equal(f.run().status, 'PERMISSIONS_TIGHTENED'); assert.equal(mutations(f).length, 0)
 })
+
+// New exact regression only; earlier six tests are unchanged.
+test('official stable manpage alias is read-only and requires exact relative target with verified package bytes', () => {
+  const alias = '/usr/share/man/man1/google-chrome.1.gz', target = '/usr/share/man/man1/google-chrome-stable.1.gz'
+  const setup = () => {
+    const f = fixture(); f.add(alias, 'symlink', 0o777); f.items.get(alias).redirect = 'google-chrome-stable.1.gz'
+    f.add(target, 'file', 0o777)
+    const list = f.items.get(LIST), hashes = f.items.get(MD5)
+    list.contents = Buffer.from(list.contents.toString() + alias + '\n' + target + '\n'); list.size = list.contents.length
+    hashes.contents = Buffer.from(hashes.contents.toString() + md5(f.items.get(target).contents) + '  ' + target.slice(1) + '\n'); hashes.size = hashes.contents.length
+    return f
+  }
+  const good = setup(), before = [good.items.get(alias).mode, good.items.get(target).mode]
+  assert.equal(good.run().status, 'PERMISSIONS_TIGHTENED')
+  assert.deepEqual([good.items.get(alias).mode, good.items.get(target).mode], before)
+  assert.equal(mutations(good).some(c => [alias, target].includes(c.args[4])), false)
+  for (const alter of [f => { f.items.get(alias).redirect = '/etc/alternatives/google-chrome' },
+    f => { f.items.get(alias).uid = 1001 }, f => { f.items.get(target).uid = 1001 },
+    f => { f.items.get(target).kind = 'symlink' }, f => { f.items.get(target).kind = 'directory' }, f => { f.items.get(target).contents[0] ^= 1 },
+    f => { f.items.delete(target) }, f => { f.items.get(LIST).contents = Buffer.from(f.items.get(LIST).contents.toString().replace(target + '\n', '')) },
+    f => { f.items.get(MD5).contents = Buffer.from(f.items.get(MD5).contents.toString().split('\n').filter(line => !line.endsWith(target.slice(1))).join('\n')) }]) {
+    const bad = setup(); alter(bad); const report = bad.run()
+    assert.equal(report.status, 'FAILED'); assert.equal(report.permissionChangeAttempted, false); assert.equal(mutations(bad).length, 0)
+  }
+  const unexpected = setup(); unexpected.items.get(alias).redirect = '/private/unexpected-target'
+  const report = unexpected.run()
+  assert.deepEqual(report.pathFacts, { uid: 0, gid: 0, permissionMode: 0o777, type: 'SYMLINK', expectedRelativeTargetMatches: false, targetListed: true, targetHashRecorded: true })
+  assert.equal(JSON.stringify(report).includes('/private/unexpected-target'), false)
+})

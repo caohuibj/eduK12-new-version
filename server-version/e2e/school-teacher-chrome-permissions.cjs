@@ -11,7 +11,7 @@ const { createHash } = require('node:crypto')
 const { parseChromePackage, trustedExecutable, CHROME_BINARY, CHROME_SANDBOX } = require('./school-teacher-chrome.cjs')
 const ROOT = '/opt/google/chrome', PARENTS = ['/opt', '/opt/google']
 const hash = (kind, data) => createHash(kind).update(data).digest('hex')
-const check = (condition, code, target) => { if (!condition) throw Object.assign(new Error(code), { safeCode: code, target }) }
+const check = (condition, code, target, pathFacts) => { if (!condition) throw Object.assign(new Error(code), { safeCode: code, target, pathFacts }) }
 const inChrome = file => file === ROOT || file.startsWith(ROOT + '/')
 const safePath = file => typeof file === 'string' && file.startsWith('/') && file.length < 512 &&
   /^[A-Za-z0-9_./+ -]+$/.test(file) && path.posix.normalize(file) === file && !file.endsWith('/')
@@ -70,7 +70,25 @@ function inspectInstallation(io, query) {
   for (const file of listed) {
     if (inChrome(file) || PARENTS.includes(file) || ['/usr/bin/google-chrome-stable', '/etc/cron.daily/google-chrome'].includes(file)) continue
     const s = io.lstatSync(file)
-    check(s.uid === 0 && !s.isSymbolicLink() && io.realpathSync(file) === file && (s.isDirectory() || s.isFile()), 'OUTSIDE_PACKAGE_PATH_UNEXPECTED', file)
+    const facts = { uid: s.uid, gid: s.gid, permissionMode: s.mode & 0o7777,
+      type: s.isSymbolicLink() ? 'SYMLINK' : s.isDirectory() ? 'DIRECTORY' : s.isFile() ? 'FILE' : 'OTHER' }
+    // Official 155.0.8059.39 installer.py lines 1008-1034 emits this one
+    // relative manpage alias. It is inspected, never traversed or chmodded:
+    // https://github.com/chromium/chromium/blob/155.0.8059.39/chrome/installer/linux/common/installer.py#L1008-L1034
+    if (file === '/usr/share/man/man1/google-chrome.1.gz' && s.isSymbolicLink()) {
+      const target = '/usr/share/man/man1/google-chrome-stable.1.gz'
+      facts.expectedRelativeTargetMatches = io.readlinkSync(file) === 'google-chrome-stable.1.gz'
+      facts.targetListed = listed.has(target); facts.targetHashRecorded = hashes.has(target)
+      check(s.uid === 0 && facts.expectedRelativeTargetMatches && facts.targetListed && facts.targetHashRecorded,
+        'OUTSIDE_MANPAGE_LINK_UNEXPECTED', file, facts)
+      const targetStat = io.lstatSync(target)
+      facts.targetRootOwnedRegularFile = targetStat.uid === 0 && targetStat.isFile() && !targetStat.isSymbolicLink()
+      check(facts.targetRootOwnedRegularFile, 'OUTSIDE_MANPAGE_TARGET_UNEXPECTED', file, facts)
+      // The existing normal-file loop separately validates target owner/type
+      // and package MD5 before any permission change, including the final recheck.
+      continue
+    }
+    check(s.uid === 0 && !s.isSymbolicLink() && io.realpathSync(file) === file && (s.isDirectory() || s.isFile()), 'OUTSIDE_PACKAGE_PATH_UNEXPECTED', file, facts)
     if (s.isFile()) {
       check(hashes.has(file) && s.size > 0 && s.size <= 512 * 1024 * 1024, 'OUTSIDE_PACKAGE_FILE_RECORD_INVALID', file)
       check(hash('md5', io.readFileSync(file)) === hashes.get(file), 'OUTSIDE_PACKAGE_BYTES_MISMATCH', file)
@@ -167,6 +185,7 @@ function tightenChromePermissions({ repo = path.resolve(__dirname, '../..'), env
   } catch (error) {
     report.stage = stage; report.code = error.safeCode || 'READ_OR_SYSTEM_OPERATION_FAILED'
     if (typeof error.target === 'string' && safePath(error.target)) report.target = error.target
+    if (error.pathFacts) report.pathFacts = error.pathFacts
     report.outcome = report.permissionChangeAttempted ? 'PARTIAL_OR_UNCERTAIN_STOPPED' : 'NO_PERMISSION_CHANGE'
     report.errorDigest = hash('sha256', String(error))
   }
