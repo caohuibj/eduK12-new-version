@@ -159,7 +159,7 @@ async function main() {
     const { getCognitiveRegistryEntry } = await import(
       '../modules/cognitive/cognitive.registry'
     )
-    const { buildCognitiveV2TaskDefinition } = await import(
+    const { getCognitiveV2TaskDefinition } = await import(
       '../modules/cognitive/v2/registry'
     )
     const { validateTaskDefinition } = await import(
@@ -192,11 +192,11 @@ async function main() {
           id.engineVersion,
           id.scoringVersion,
         )
-        if (!entry)
+        const definition = getCognitiveV2TaskDefinition(id.testType, id.engineVersion, id.scoringVersion)
+        if (!definition)
           throw new Error(
             'Declared execution export is absent from the generated runtime registry.',
           )
-        const definition = buildCognitiveV2TaskDefinition(entry)
         for (const issue of validateTaskDefinition(definition).filter(
           (i) => i.severity === 'error',
         )) {
@@ -269,7 +269,7 @@ async function main() {
         try {
           pilot.push(
             ...validateExecutableFixtures(
-              entry,
+              entry ?? definition,
               JSON.parse(
                 fs.readFileSync(path.join(manifests.ROOT, file), 'utf8'),
               ),

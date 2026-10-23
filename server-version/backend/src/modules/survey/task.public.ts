@@ -1,3 +1,4 @@
+import { surveyCognitiveProtocol } from './cognitive.protocols'
 import {materialListSchema,publicMaterial} from '../assessment-media/material'
 import {readSurveyScalePresentation,scalePresentationOptions} from './catalog-scale.presentation'
 import { readSurveyCognitiveProgressFromVerifiedAttempt } from './cognitive.service'
@@ -76,7 +77,7 @@ export async function getOwnResearchTask(input:{
         templateKey:frozen.templateKey,measurementDigest:frozen.measurementDigest,
         devicePolicy:frozen.devicePolicy,timingPolicy:frozen.timingPolicy,
         maturity:frozen.maturity,restartLimit:frozen.restartLimit,
-        totalTrials:120,estimatedDurationSeconds:180,
+        totalTrials:surveyCognitiveProtocol(frozen.templateKey).formalTrials,estimatedDurationSeconds:surveyCognitiveProtocol(frozen.templateKey).estimatedDurationSeconds,
         feedback:{mode:frozen.feedback.mode,release:frozen.feedback.release},
         partialRetentionDays:frozen.partialRetentionDays}
     }

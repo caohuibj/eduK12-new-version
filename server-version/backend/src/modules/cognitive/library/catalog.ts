@@ -11,12 +11,7 @@
  */
 
 import { cognitiveCatalog } from '../generated/catalog'
-import type { RegistryEntry } from '../cognitive.types'
-import {
-  getCognitiveRegistryEntry,
-  listCognitiveRegistryEntries,
-  listCognitiveRegistryEntriesForType,
-} from '../cognitive.registry'
+import { getCognitiveCatalogMetadata, listCognitiveCatalogMetadata, type CognitiveCatalogMetadata } from '../catalog-metadata'
 import { listCognitiveEvidenceMappingsForTask } from '../../cognitive-analysis/evidence-mapping.registry'
 import {
   RESEARCH_GRADE_IDENTITIES as COGNITIVE_RESEARCH_GRADE_IDENTITIES,
@@ -42,7 +37,7 @@ if (CATALOG_TEST_TYPES.includes('fake')) {
 /** build-time 校验：catalog 与 registry 身份必须互相对应（fail-fast）。 */
 export const validateCatalogIntegrity = (): void => {
   for (const testType of CATALOG_TEST_TYPES) {
-    if (listCognitiveRegistryEntriesForType(testType).length === 0) {
+    if (!listCognitiveCatalogMetadata().some(entry => entry.testType === testType)) {
       throw new Error(`Cognitive library catalog entry has no registry identity: ${testType}`)
     }
   }
@@ -56,7 +51,7 @@ export const validateCatalogIntegrity = (): void => {
 
 const listAllRegistryTestTypes = (): string[] => {
   const all = new Set<string>()
-  for (const registryEntry of listCognitiveRegistryEntries()) all.add(registryEntry.testType)
+  for (const registryEntry of listCognitiveCatalogMetadata()) all.add(registryEntry.testType)
   return [...all]
 }
 
@@ -79,9 +74,9 @@ export const resolveCatalogForIdentity = (
   testType: string,
   engineVersion: string,
   scoringVersion: string,
-): { catalog: CognitiveLibraryCatalogEntry; registry: RegistryEntry<unknown, unknown> } | undefined => {
+): { catalog: CognitiveLibraryCatalogEntry; registry: CognitiveCatalogMetadata } | undefined => {
   const catalog = CATALOG[testType]
-  const registry = getCognitiveRegistryEntry(testType, engineVersion, scoringVersion)
+  const registry = getCognitiveCatalogMetadata(testType, engineVersion, scoringVersion)
   if (!catalog || !registry) return undefined
   return { catalog, registry }
 }
@@ -90,7 +85,7 @@ export const requireCatalogForIdentity = (
   testType: string,
   engineVersion: string,
   scoringVersion: string,
-): { catalog: CognitiveLibraryCatalogEntry; registry: RegistryEntry<unknown, unknown> } => {
+): { catalog: CognitiveLibraryCatalogEntry; registry: CognitiveCatalogMetadata } => {
   const resolved = resolveCatalogForIdentity(testType, engineVersion, scoringVersion)
   if (!resolved) {
     throw new Error(

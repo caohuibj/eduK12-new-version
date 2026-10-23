@@ -13,6 +13,7 @@ function group(count=1){
   const rows=Array.from({length:count},(_,index)=>{
     const id=randomUUID(),sessionId=randomUUID(),slotKey='go'+index,measurementDigest='a'.repeat(64),rawHash='b'.repeat(64)
     const result={schemaVersion:1,sessionId,...parent,slotKey,epoch:1,measurementDigest,rawHash,
+      testType:'gonogo',engineVersion:'1.0.0',scoringVersion:'1.0.0',configVersion:'1.1.0',timingPolicy:'software-frame-v1',
       audit:{trialCount:120},metrics:{hitRate:1},quality:{state:'valid'}}
     return {id,sessionId,...parent,slotKey,epoch:1,measurementDigest,rawHash,resultHash:canonicalHash(result),
       resultCipher:encryptUnifiedRuntimePayload(result),trialCount:120,completedAt:new Date()}

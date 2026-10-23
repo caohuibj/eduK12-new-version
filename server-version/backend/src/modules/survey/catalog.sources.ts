@@ -1,3 +1,4 @@
+import { matchSurveyCognitiveProtocol } from './cognitive.protocols'
 import {canonicalScalePresentation} from './catalog-scale.presentation'
 import { Prisma, PrismaClient } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -15,7 +16,7 @@ import { listSituationPackages, getSituationPackage } from '../situational/situa
 import { validateSituationPackage, type SituationPackage } from '../situational/situation-package'
 import { type SituationDefinitionV2 } from '../situational/situation-branching'
 import { assertSurveyDraft, type SurveyKind } from './builder.definition'
-import { compileResearchCognitive, initialCognitiveDefinition, SURVEY_GONOGO_CONFIG } from './cognitive.definition'
+import { compileResearchCognitive, initialCognitiveDefinition } from './cognitive.definition'
 
 type Database=Prisma.TransactionClient|PrismaClient
 export const CATALOG_ADAPTER_VERSION='survey-catalog-v1' as const
@@ -133,9 +134,10 @@ export function adaptCatalogSjt(ref:CatalogSourceRef,title:string,pkg:SituationP
 export function adaptCatalogCognitive(ref:CatalogSourceRef,row:{name:string;testType:string;configVersion:string;engineVersion:string;scoringVersion:string;config:unknown;status:string;accessPolicy:string}):CatalogSourceSnapshot {
   if(row.status!=='PUBLISHED')fail('SOURCE_NOT_PUBLISHED')
   if(row.accessPolicy!=='OPEN')fail('SOURCE_COGNITIVE_ACCESS_POLICY_REQUIRES_SEPARATE_GRANT')
-  if(row.testType!=='gonogo'||row.configVersion!=='1.1.0'||row.engineVersion!=='1.0.0'||row.scoringVersion!=='1.0.0'||canonicalHash(row.config)!==canonicalHash(SURVEY_GONOGO_CONFIG))
+  const protocol=matchSurveyCognitiveProtocol(row)
+  if(!protocol)
     fail('SOURCE_COGNITIVE_CONTROLLED_IDENTITY_UNSUPPORTED')
-  const display=initialCognitiveDefinition(),compiled=compileResearchCognitive(display)
+  const display={...initialCognitiveDefinition(),templateKey:protocol!.templateKey},compiled=compileResearchCognitive(display)
   return snapshot(ref,row.name,row.config,display,compiled,compiled.measurementDigest,{testType:row.testType,configVersion:row.configVersion,engineVersion:row.engineVersion,scoringVersion:row.scoringVersion,referenceMode:'none'})
 }
 const questionnaireFormInclude={questionnaire:{select:{id:true,name:true,status:true,creatorId:true,updatedAt:true}},items:{orderBy:{id:'asc' as const}}} as const

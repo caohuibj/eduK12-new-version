@@ -14,7 +14,8 @@
  *    （Catalog 不保存、不复制任何 reference 真值）。
  */
 
-import type { CognitiveProfile, RegistryEntry } from '../cognitive.types'
+import type { CognitiveProfile } from '../cognitive.types'
+import type { CognitiveCatalogMetadata } from '../catalog-metadata'
 import {
   requireCatalogForIdentity,
   deriveCatalogDomainSummary,
@@ -82,7 +83,7 @@ export interface CatalogProjectionInput {
 }
 
 const resolveProfileMinutes = (
-  registry: RegistryEntry<unknown, unknown>,
+  registry: CognitiveCatalogMetadata,
   profile?: CognitiveProfile,
 ): [number, number] | null => {
   if (!profile) return null

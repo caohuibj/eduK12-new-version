@@ -33,6 +33,7 @@ function discover(root = ROOT, taskRoot = TASK_ROOT) {
     const directory = `${taskRoot}/${dir}`, file = `${directory}/task-package.json`
     const d = JSON.parse(fs.readFileSync(safeFile(root, file), 'utf8'))
     if (d.schemaVersion !== 1 || typeof d.task !== 'string' || !/^[a-zA-Z0-9_-]+$/.test(d.task) || d.task !== dir || !Array.isArray(d.identities) || !d.identities.length || !Array.isArray(d.frontend) || !d.frontend.length) fail('COG_PACKAGE_SCHEMA_INVALID', file, 'invalid package v1')
+    if (d.executionModel !== undefined && !['LEGACY_V1', 'NATIVE_V2'].includes(d.executionModel)) fail('COG_EXECUTION_MODEL_INVALID', file, 'unknown execution model')
     if (seenTasks.has(d.task)) fail('COG_TASK_DUPLICATE', file, d.task)
     seenTasks.add(d.task)
     for (const i of d.identities) {
@@ -68,7 +69,12 @@ function projections(packages, back = BACK, front = FRONT) {
     result.set(output, HEADER + imports + '\n' + expression + '\n')
   }
   const ordered = packages.flatMap((p,pi)=>p.identities.map((id,index)=>({id,pi,index}))).sort((a,b)=>(a.id.order??Number.MAX_SAFE_INTEGER)-(b.id.order??Number.MAX_SAFE_INTEGER)||stable(identity(a.id),identity(b.id)))
-  projection(`${back}/execution.ts`, packages.map(p=>({file:p.backendFile,export:p.backend.export})), 'export const cognitiveExecutionEntries = [\n'+ordered.map(e=>`  task${e.pi}[${e.index}],`).join('\n')+'\n]')
+  for (const [model, filename, name] of [['LEGACY_V1', 'execution.ts', 'cognitiveExecutionEntries'], ['NATIVE_V2', 'native-execution.ts', 'cognitiveNativeDefinitions']]) {
+    const selected = packages.filter(p => (p.executionModel ?? 'LEGACY_V1') === model)
+    const selectedOrder = ordered.filter(e => selected.includes(packages[e.pi]))
+    projection(`${back}/${filename}`, selected.map(p => ({file:p.backendFile,export:p.backend.export})),
+      `export const ${name} = [\n` + selectedOrder.map(e => `  task${selected.indexOf(packages[e.pi])}[${e.index}],`).join('\n') + '\n]')
+  }
   const runners = packages.flatMap(p=>p.runners)
   projection(`${front}/runners.ts`,runners.map(r=>({file:r.resolvedFile,export:r.export})),`export const cognitiveRunnerEntries = [${runners.map((_,i)=>`task${i}`).join(', ')}]`)
   const catalogs=packages.filter(p=>p.catalogFile)

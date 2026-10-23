@@ -1,5 +1,6 @@
 import { isDeepStrictEqual } from 'node:util'
 import { z } from 'zod'
+import type { TaskDefinition, TrialEnvelope } from '../v2/types'
 import type { RegistryEntry } from '../cognitive.types'
 import { buildCognitiveV2TaskDefinition } from '../v2/registry'
 import { projectThreeLayerReport } from '../v2/report'
@@ -43,6 +44,7 @@ export const executableFixtureSchema = z
                     .object({
                       trialIndex: z.number().int().nonnegative(),
                       payload: z.unknown(),
+                      envelope: z.unknown().optional(),
                     })
                     .strict(),
                 ),
@@ -65,7 +67,7 @@ const finite = (v: unknown): boolean =>
         ? Object.values(v).every(finite)
         : true
 export function validateExecutableFixtures(
-  entry: RegistryEntry<unknown, unknown>,
+  entry: RegistryEntry<unknown, unknown> | TaskDefinition<unknown, unknown>,
   raw: unknown,
   file: string,
 ): CognitiveBlockerV1[] {
@@ -115,7 +117,13 @@ export function validateExecutableFixtures(
         'cases',
         `Missing ${name} case.`,
       )
-  const definition = buildCognitiveV2TaskDefinition(entry)
+  const definition = 'scorer' in entry ? entry : buildCognitiveV2TaskDefinition(entry)
+  const fixtureTrials = (trials: typeof fixture.cases[number]['input']['trials']) => trials.map(t => t.envelope !== undefined ? t.envelope as TrialEnvelope : createTrialEnvelope({trialIndex:t.trialIndex,payload:t.payload,phase:definition.protocol.phases.find(p=>p.persists)!.key,startedAtPerfMs:t.trialIndex*100,endedAtPerfMs:t.trialIndex*100+50}))
+  const fixtureScore = (input: typeof fixture.cases[number]['input']) => {
+    if ('score' in entry) return entry.score({config:input.config,randomSeed:input.randomSeed,trials:input.trials.map(t=>({trialIndex:t.trialIndex,payload:t.payload}))})
+    const session = createSessionConfigSnapshot({definition,configVersion:'fixture',config:input.config,frozenAt:new Date('2026-01-01T00:00:00Z')})
+    return runAuthoritativeScorer({definition,session,trials:fixtureTrials(input.trials),randomSeed:input.randomSeed??'fixture'})
+  }
   for (const [i, c] of fixture.cases.entries()) {
     const field = `cases.${i}`
     if ((c.expected === undefined) === (c.expectedError === undefined)) {
@@ -166,11 +174,12 @@ export function validateExecutableFixtures(
         trials: c.input.trials.map((t) => ({
           trialIndex: t.trialIndex,
           payload: t.payload,
+          ...(t.envelope !== undefined ? {envelope:t.envelope} : {}),
         })),
       }
       const copy = structuredClone(input),
         before = JSON.stringify(copy),
-        output = entry.score(copy)
+        output = fixtureScore(copy)
       if (
         c.expectedError !== undefined ||
         !isDeepStrictEqual(output, c.expected)
@@ -189,7 +198,7 @@ export function validateExecutableFixtures(
           'Scorer emitted a nonfinite value.',
         )
       if (
-        !isDeepStrictEqual(output, entry.score(structuredClone(input))) ||
+        !isDeepStrictEqual(output, fixtureScore(structuredClone(input))) ||
         before !== JSON.stringify(copy)
       )
         add(
@@ -249,17 +258,10 @@ export function validateExecutableFixtures(
             'Metric output does not match its declared value type.',
           )
       }
-      const trials = c.input.trials.map((t) =>
-        createTrialEnvelope({
-          trialIndex: t.trialIndex,
-          payload: t.payload,
-          phase:
-            (t.payload as { phase?: 'learning' | 'delayed' })?.phase ??
-            definition.protocol.phases.find((p) => p.persists)!.key,
-          startedAtPerfMs: t.trialIndex * 100,
-          endedAtPerfMs: t.trialIndex * 100 + 50,
-        }),
-      )
+      const trials = 'scorer' in entry ? fixtureTrials(c.input.trials) : c.input.trials.map((t) =>
+        createTrialEnvelope({trialIndex:t.trialIndex,payload:t.payload,
+          phase:(t.payload as {phase?: 'learning'|'delayed'})?.phase ?? definition.protocol.phases.find(p=>p.persists)!.key,
+          startedAtPerfMs:t.trialIndex*100,endedAtPerfMs:t.trialIndex*100+50}))
       const session = createSessionConfigSnapshot({
         definition,
         configVersion: 'fixture',

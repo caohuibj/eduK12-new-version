@@ -1,3 +1,4 @@
+import { surveyCognitiveResultProtocol } from './cognitive.protocols'
 import { Prisma,type SurveyCognitiveResult } from '@prisma/client'
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -15,7 +16,7 @@ export const cognitiveFail=(status:number,message:string):never=>{throw new Surv
 export interface SurveyCognitiveStoredResult {
   schemaVersion:1;sessionId:string;projectId:string;waveId:string;attemptId:string;publicationId:string;
   slotKey:string;epoch:number;measurementDigest:string;configHash:string;protocolSignature:string;
-  testType:'gonogo';configVersion:'1.1.0';engineVersion:'1.0.0';scoringVersion:'1.0.0';
+  testType:string;configVersion:string;engineVersion:string;scoringVersion:string;
   timingPolicy:'software-frame-v1';maturity:'PILOT';referenceMode:'none';
   metrics:Record<string,unknown>;quality:CognitiveScoreResult['quality'];audit:CognitiveScoreResult['audit'];
   administrationProvenance:AdministrationProvenanceV1;restartCount:number;rawHash:string;completedAt:string;
@@ -86,7 +87,7 @@ function decodeResults(input:Scope&{includeRaw?:boolean},references:SurveyCognit
         ||result.waveId!==input.waveId||result.attemptId!==input.attemptId||result.publicationId!==input.publicationId
         ||result.slotKey!==reference.slotKey||result.epoch!==reference.epoch
         ||result.measurementDigest!==reference.measurementDigest||result.rawHash!==row!.rawHash
-        ||result.audit.trialCount!==row!.trialCount||row!.trialCount!==120)
+        ||result.audit.trialCount!==row!.trialCount||row!.trialCount!==surveyCognitiveResultProtocol(result).formalTrials)
         cognitiveFail(409,'认知权威结果密文或来源摘要校验失败')
       const base:LoadedSurveyCognitiveResult={reference,sessionId:row!.sessionId,completedAt:row!.completedAt,result}
       if(input.includeRaw){

@@ -1,3 +1,4 @@
+import { cognitiveNativeDefinitions } from '../generated/native-execution'
 import {
   getCognitiveRegistryEntry,
   listCognitiveRegistryEntries,
@@ -183,8 +184,22 @@ export const buildCognitiveV2TaskDefinition = (
   }
 }
 
-export const listCognitiveV2TaskDefinitions = (): TaskDefinition<unknown, unknown>[] =>
-  listCognitiveRegistryEntries().map((entry) => buildCognitiveV2TaskDefinition(entry))
+const nativeIdentity = (d: Pick<TaskDefinition, 'testType' | 'engineVersion' | 'scoringVersion'>) => `${d.testType}/${d.engineVersion}/${d.scoringVersion}`
+/** Native v2 tasks never invent a legacy numeric score. Exact identities are exclusive. */
+export function validateNativeCognitiveDefinitions(definitions: readonly TaskDefinition[], legacy = listCognitiveRegistryEntries()) {
+  const keys = new Set(legacy.map(nativeIdentity))
+  for (const definition of definitions) {
+    const key = nativeIdentity(definition)
+    if (keys.has(key)) throw new Error(`Cognitive native registry duplicate key: ${key}`)
+    keys.add(key)
+  }
+}
+validateNativeCognitiveDefinitions(cognitiveNativeDefinitions)
+export const listNativeCognitiveTaskDefinitions = (): TaskDefinition[] => [...cognitiveNativeDefinitions]
+export const listCognitiveV2TaskDefinitions = (): TaskDefinition<unknown, unknown>[] => [
+  ...listCognitiveRegistryEntries().map((entry) => buildCognitiveV2TaskDefinition(entry)),
+  ...cognitiveNativeDefinitions,
+]
 
 export const getCognitiveV2TaskDefinition = (
   testType: string,
@@ -192,5 +207,7 @@ export const getCognitiveV2TaskDefinition = (
   scoringVersion: string,
 ): TaskDefinition<unknown, unknown> | undefined => {
   const entry = getCognitiveRegistryEntry(testType, engineVersion, scoringVersion)
-  return entry ? buildCognitiveV2TaskDefinition(entry) : undefined
+  return entry ? buildCognitiveV2TaskDefinition(entry) : cognitiveNativeDefinitions.find(
+    (definition: TaskDefinition) => definition.testType === testType && definition.engineVersion === engineVersion && definition.scoringVersion === scoringVersion,
+  )
 }

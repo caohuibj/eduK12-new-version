@@ -1,5 +1,5 @@
 import { cognitiveGovernance } from '../generated/scientific'
-import { getCognitiveRegistryEntry } from '../cognitive.registry'
+import { getCognitiveCatalogMetadata } from '../catalog-metadata'
 import type { CognitiveScientificStatus } from './catalog-contract'
 
 export const cognitiveScientificMaturityIdentityKey = (
@@ -63,7 +63,7 @@ export const resolveCognitiveScientificMaturity = (
   scoringVersion: string,
 ): CognitiveScientificStatus => {
   const identity = cognitiveScientificMaturityIdentityKey(testType, engineVersion, scoringVersion)
-  const entry = getCognitiveRegistryEntry(testType, engineVersion, scoringVersion)
+  const entry = getCognitiveCatalogMetadata(testType, engineVersion, scoringVersion)
   if (!entry || testType === 'fake') throw new Error(`Unknown cognitive catalog identity: ${identity}`)
   return COGNITIVE_SCIENTIFIC_MATURITY_BY_IDENTITY.get(identity) ?? 'PILOT'
 }

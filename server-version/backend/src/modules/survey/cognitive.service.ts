@@ -1,3 +1,4 @@
+import { surveyCognitiveProtocol } from './cognitive.protocols'
 import { randomBytes,randomUUID } from 'node:crypto'
 import type { Prisma,SurveyCognitiveSession } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -186,7 +187,8 @@ export async function startSurveyCognitive(proof:SurveyCognitiveProof,slotKey:st
     const frozen=frozenUnit(snapshot,slotKey)
     const existing=await latest(tx,known,slotKey)
     if(existing)return sessionView(tx,known,slotKey,existing,frozen)
-    const hold=getAssessmentOperationalHold({family:'COGNITIVE',key:'gonogo',version:'1.0.0',scoringVersion:'1.0.0'})
+    const protocol=surveyCognitiveProtocol(frozen.templateKey)
+    const hold=getAssessmentOperationalHold({family:'COGNITIVE',key:protocol.testType,version:protocol.engineVersion,scoringVersion:protocol.scoringVersion})
     if(hold)cognitiveFail(409,'该认知协议暂停新任务，请联系研究者')
     if(snapshot.flow)await ensureSurveyFlowAssignment(tx,{...scope(known,slotKey),participantId:known.participantId,
       researchCode:proof.researchCode,accessCredential:proof.accessCredential,snapshot})
@@ -256,18 +258,20 @@ export async function submitSurveyCognitiveFinal(proof:SurveyCognitiveProof,slot
   const submissionId=validateSubmissionId(input.submissionId)
   const known=await verifiedSurveyAttempt(proof)
   const frozen=frozenUnit(known.compiledSnapshot,slotKey)
-  const definition=surveyCognitiveTaskDefinition(),snapshot=frozen.sessionSnapshot
+  const definition=surveyCognitiveTaskDefinition(frozen.templateKey),snapshot=frozen.sessionSnapshot
+  const protocol=surveyCognitiveProtocol(frozen.templateKey)
+  if(input.trials.length!==protocol.formalTrials)cognitiveFail(400,'认知试次数不符合冻结协议')
   if(input.definitionHash!==snapshot.configHash||(input.contextSnapshotHash??null)!==null)
     cognitiveFail(409,'认知提交配置身份不匹配')
   const provenance=assertDevice(input.administrationProvenance)
   let trials
-  try{trials=validateAndNormalizeTrials({definition,values:input.trials,maxTrials:120})}
+  try{trials=validateAndNormalizeTrials({definition,values:input.trials,maxTrials:protocol.formalTrials})}
   catch{ return cognitiveFail(400,'认知试次结构或试次数不合法') }
   const raw=createUnifiedCognitiveRawSubmissionPayload({attemptEpoch:input.attemptEpoch,trials,administrationProvenance:provenance})
   const canonical=prepareCanonicalSubmission({sessionId,slotKey,measurementDigest:frozen.measurementDigest,
     definitionHash:input.definitionHash,raw})
   assertCanonicalSubmissionPayloadSize(canonical,MAX_RAW_BYTES,'研究认知 FINAL')
-  // Bounded 120-trial scoring occurs under the same current parent authority lock.
+  // Bounded exact-protocol scoring occurs under the same current parent authority lock.
   // Replays return before invoking the scorer or constructing another encrypted raw record.
   return withFinalOnlyCompletionTransaction(async tx=>{
     const {attempt,snapshot:publication}=await lockAccess(tx,proof,known,true)
@@ -297,8 +301,8 @@ export async function submitSurveyCognitiveFinal(proof:SurveyCognitiveProof,slot
     const completedAt=new Date(),rawHash=canonicalHash(raw)
     const result:SurveyCognitiveStoredResult={schemaVersion:1,sessionId:current.id,...scope(known,slotKey),
       epoch:current.epoch,measurementDigest:frozen.measurementDigest,configHash:snapshot.configHash,
-      protocolSignature:snapshot.protocolSignature,testType:'gonogo',configVersion:'1.1.0',engineVersion:'1.0.0',scoringVersion:'1.0.0',
-      timingPolicy:'software-frame-v1',maturity:'PILOT',referenceMode:'none',metrics:scored.metrics,
+      protocolSignature:snapshot.protocolSignature,testType:snapshot.testType,configVersion:snapshot.configVersion,engineVersion:snapshot.engineVersion,scoringVersion:snapshot.scoringVersion,
+      timingPolicy:frozen.timingPolicy,maturity:'PILOT',referenceMode:'none',metrics:scored.metrics,
       quality:scored.quality,audit:scored.audit,administrationProvenance:provenance,restartCount:current.epoch-1,
       rawHash,completedAt:completedAt.toISOString(),
     }

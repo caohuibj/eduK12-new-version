@@ -1,11 +1,11 @@
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { compileCognitiveRuntime } from '../assessment-runtime/compiler'
-import { getCognitiveV2TaskDefinition } from '../cognitive/v2/registry'
 import { createSessionConfigSnapshot,parseSessionConfigSnapshot } from '../cognitive/v2/session-snapshot'
 import type { SessionConfigSnapshot } from '../cognitive/v2/types'
 
-export const SURVEY_COGNITIVE_TEMPLATE='gonogo-software-frame-v1' as const
+import { SURVEY_COGNITIVE_TEMPLATE, surveyCognitiveProtocol, surveyCognitiveTaskDefinition, type SurveyCognitiveTemplate } from './cognitive.protocols'
+export { SURVEY_COGNITIVE_TEMPLATE, SURVEY_GONOGO_CONFIG, surveyCognitiveTaskDefinition } from './cognitive.protocols'
 export const surveyCognitiveFeedbackSchema=z.object({
   policyVersion:z.literal('SURVEY_DESCRIPTIVE_V1').default('SURVEY_DESCRIPTIVE_V1'),
   mode:z.enum(['GENERAL','DESCRIPTIVE']).default('GENERAL'),
@@ -29,7 +29,7 @@ export const initialCognitiveDefinition=():CognitiveDraft=>cognitiveDraftSchema.
 export const validateCognitiveDraft=(_definition:CognitiveDraft,_forPreview:boolean):Array<{path:string;message:string;severity:'error'|'warning'}>=>[]
 export interface FrozenSurveyCognitive {
   schemaVersion:1
-  templateKey:typeof SURVEY_COGNITIVE_TEMPLATE
+  templateKey:SurveyCognitiveTemplate
   sessionSnapshot:SessionConfigSnapshot
   measurementDigest:string
   timingPolicy:'software-frame-v1'
@@ -40,27 +40,18 @@ export interface FrozenSurveyCognitive {
   partialRetentionDays:30
   feedback:CognitiveDraft['feedback']
 }
-// This is a fixed, versioned Survey template, not an editable task configuration.
-// Its existing runner selects software-frame-v1 only for this exact config identity.
-export const SURVEY_GONOGO_CONFIG={totalTrials:120,nogoRatio:0.25,stimulusMs:800,isiMs:500,
-  validRtFloorMs:100,report:{reportVersion:'1.0.0',referenceMode:'none' as const}}
-export const surveyCognitiveTaskDefinition=()=>{
-  const definition=getCognitiveV2TaskDefinition('gonogo','1.0.0','1.0.0')
-  if(!definition)throw new Error('Survey Go/No-Go runtime is unavailable')
-  // No catalog norms are admitted into this expressly non-normative pilot.
-  return {...definition,references:[]}
-}
 export function compileResearchCognitive(input:unknown):FrozenSurveyCognitive{
   const draft=cognitiveDraftSchema.parse(input)
-  const definition=surveyCognitiveTaskDefinition()
+  const protocol=surveyCognitiveProtocol(draft.templateKey)
+  const definition=surveyCognitiveTaskDefinition(draft.templateKey)
   const compiledRuntime=compileCognitiveRuntime({definition,instrumentVersion:'1.0.0'})
-  const sessionSnapshot=createSessionConfigSnapshot({definition,configVersion:'1.1.0',
-    config:SURVEY_GONOGO_CONFIG,
+  const sessionSnapshot=createSessionConfigSnapshot({definition,configVersion:protocol.configVersion,
+    config:protocol.config,
     // Stable template release time: actual publication/admission times are stored separately.
-    frozenAt:new Date('2026-10-17T00:00:00.000Z'),
+    frozenAt:new Date(protocol.frozenAt),
     runtime:{runtimeGeneration:'UNIFIED_V1',compiledRuntime,referenceBindings:[]}})
   const measurement={schemaVersion:1 as const,templateKey:draft.templateKey,sessionSnapshot,
-    timingPolicy:'software-frame-v1' as const,devicePolicy:'DESKTOP_KEYBOARD' as const,
+    timingPolicy:protocol.timingPolicy,devicePolicy:'DESKTOP_KEYBOARD' as const,
     restartLimit:1 as const,maturity:'PILOT' as const,referenceMode:'none' as const,
     partialRetentionDays:30 as const}
   return {...measurement,measurementDigest:canonicalHash(measurement),feedback:draft.feedback}
@@ -71,10 +62,11 @@ export function parseFrozenSurveyCognitive(value:unknown):FrozenSurveyCognitive{
   const {measurementDigest,feedback,...measurement}=frozen
   cognitiveDraftSchema.parse({schemaVersion:frozen.schemaVersion,templateKey:frozen.templateKey,feedback})
   const snapshot=parseSessionConfigSnapshot(frozen.sessionSnapshot)
-  if(canonicalHash(measurement)!==measurementDigest||snapshot.testType!=='gonogo'
-    ||snapshot.configVersion!=='1.1.0'||snapshot.engineVersion!=='1.0.0'||snapshot.scoringVersion!=='1.0.0'
-    ||canonicalHash(snapshot.config)!==canonicalHash(SURVEY_GONOGO_CONFIG)
-    ||frozen.timingPolicy!=='software-frame-v1'||frozen.devicePolicy!=='DESKTOP_KEYBOARD'
+  const protocol=surveyCognitiveProtocol(frozen.templateKey)
+  if(canonicalHash(measurement)!==measurementDigest||snapshot.testType!==protocol.testType
+    ||snapshot.configVersion!==protocol.configVersion||snapshot.engineVersion!==protocol.engineVersion||snapshot.scoringVersion!==protocol.scoringVersion
+    ||canonicalHash(snapshot.config)!==canonicalHash(protocol.config)
+    ||frozen.timingPolicy!==protocol.timingPolicy||frozen.devicePolicy!=='DESKTOP_KEYBOARD'
     ||frozen.restartLimit!==1||frozen.maturity!=='PILOT'||frozen.referenceMode!=='none'
     ||frozen.partialRetentionDays!==30||snapshot.referenceBindings?.length!==0)
     throw new Error('Frozen Survey cognitive measurement identity mismatch')
