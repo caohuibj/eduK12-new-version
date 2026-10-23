@@ -240,6 +240,12 @@ function prepareFonts(){let stage='font-inventory';try{
 
 function privateRoot(){assert(process.env.RUNNER_TEMP);const root=realpathSync(process.env.RUNNER_TEMP),p=join(root,'school-teacher-checks-private');if(!existsSync(p))mkdirSync(p,{mode:0o700});assert.equal(realpathSync(p),p);return p}
 export function safeDiagnostic(raw){const text=String(raw),locations=[...text.matchAll(/(?:server-version\/)?(?:src|scripts|prisma)\/[A-Za-z0-9_./-]+\.(?:[cm]?[jt]sx?|prisma)(?::\d+(?::\d+)?|\(\d+,\d+\))/g)].map(m=>m[0]),codes=[...text.matchAll(/\berror TS\d{4,5}\b/g)].map(m=>m[0]);return {rawSha256:sha256(text),codeLocations:[...new Set(locations)].slice(0,100),compilerCodes:[...new Set(codes)],rawRetainedAfterRunnerDestruction:false};}
+export function safeTestFailure(messages,allowedSourcePaths){
+ const text=(Array.isArray(messages)?messages:[]).filter(v=>typeof v==='string').join('\n');
+ const types=[...text.matchAll(/(?:^|\n)(TypeError|ReferenceError|SyntaxError|RangeError|AssertionError|Error):/g)].map(m=>m[1]);
+ const codeLocations=safeDiagnostic(text).codeLocations.filter(location=>allowedSourcePaths.has(location.replace(/(?::\d+(?::\d+)?|\(\d+,\d+\))$/,'')));
+ return {errorTypes:[...new Set(types)],codeLocations:codeLocations.slice(0,20),diagnosticSha256:sha256(text)};
+}
 export function parseSeedDiagnostic(raw,contract){
  const prefix='SCHOOL_TEACHER_SEED_DIAGNOSTIC ',lines=String(raw).split(/\r?\n/).filter(line=>line.startsWith(prefix));
  if(lines.length===0)return {status:'MISSING_SAFE_DIAGNOSTIC'};
@@ -348,12 +354,12 @@ function admission(b,plan){
  const evidence=JSON.parse(readFileSync('.github/scripts/school-teacher-evidence.json','utf8'));requireNoHistoricalAcceptance(evidence);
  const inputs=verifyExecutionInputs(b);receipt('admission',{status:'PASSED',plan,inputs,historicalAcceptedCases:0,acceptedCases:[]});
 }
-function batches(component,selected,offset=0){const cwd=resolve('server-version',component);assert(Array.isArray(selected));for(const [index,b] of selected.entries()){const i=index+offset;
+function batches(component,selected,offset=0){const cwd=resolve('server-version',component),allowedSourcePaths=new Set(git('ls-files','server-version/'+component+'/src').split('\n').map(p=>p.slice(('server-version/'+component+'/').length)));assert(Array.isArray(selected));for(const [index,b] of selected.entries()){const i=index+offset;
  assert(Array.isArray(b.files)&&b.files.length);for(const f of b.files)assert(/^src\/.+\.test\.tsx?$/.test(f)&&!f.split('/').includes('..'));
  assert(b.expectedPassed?.length>0&&Array.isArray(b.expectedFiltered));verifyClosure(b.inputClosure);
  const file=join(privateRoot(),component+'-'+i+'.json'),args=['node_modules/vitest/vitest.mjs','run',...b.files,'--maxWorkers=1','--no-file-parallelism','--reporter=json','--outputFile='+file];
  if(b.namePattern){assert.equal(typeof b.namePattern,'string');args.push('-t',b.namePattern)}
- try{command(component+'-tests-'+i,process.execPath,args,cwd)}finally{if(existsSync(file)){const raw=readFileSync(file),report=JSON.parse(raw),known=new Set([...b.expectedPassed,...b.expectedFiltered]);receipt(component+'-tests-'+i+'-actual',{rawSha256:sha256(raw),invocationSuccess:report.success===true,cases:report.testResults.flatMap(s=>s.assertionResults||[]).map(c=>({...known.has(c.fullName)?{name:c.fullName}:{unreviewedNameSha256:sha256(String(c.fullName))},status:['passed','failed','pending','skipped','todo'].includes(c.status)?c.status:'UNKNOWN'})),rawRetainedAfterRunnerDestruction:false})}}
+ try{command(component+'-tests-'+i,process.execPath,args,cwd)}finally{if(existsSync(file)){const raw=readFileSync(file),report=JSON.parse(raw),known=new Set([...b.expectedPassed,...b.expectedFiltered]);receipt(component+'-tests-'+i+'-actual',{rawSha256:sha256(raw),invocationSuccess:report.success===true,cases:report.testResults.flatMap(s=>s.assertionResults||[]).map(c=>({...known.has(c.fullName)?{name:c.fullName}:{unreviewedNameSha256:sha256(String(c.fullName))},status:['passed','failed','pending','skipped','todo'].includes(c.status)?c.status:'UNKNOWN',...(c.status==='failed'?{failure:safeTestFailure(c.failureMessages,allowedSourcePaths)}:{})})),rawRetainedAfterRunnerDestruction:false})}}
  const raw=readFileSync(file);receipt(component+'-tests-'+i,{...verifyTestReport(JSON.parse(raw),b),reportSha256:sha256(raw),sourceHead:git('rev-parse','HEAD')});
  }}
 export function verifyFreshManifest(manifest,{kind,head,runId,lockDigest,contentDigest}){

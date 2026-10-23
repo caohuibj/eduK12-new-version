@@ -5,9 +5,9 @@
   "branch": "work/school-teacher-review-20261022",
   "enabled": true,
   "base": "69497181d569d4a5f7d61cdab108b977894cf9b3",
-  "productHead": "491d444fcf2525ab7491f08665911959fabeb9db",
+  "productHead": "96ddac02b28022867f0ad7231aff36cb5516d93f",
   "frontendTree": "c2408a4d95b81113136e12339a650fd76378cea2",
-  "backendTree": "feda66ea4a7584cb3eb61439a8a926df90788a1b",
+  "backendTree": "6333ccb8c84e49753531ac01ca30591496d4b127",
   "source": {
     ".github/scripts/school-teacher-browser-control.mjs": {
       "before": "",
@@ -1456,6 +1456,10 @@
     "server-version/frontend/src/survey/SurveyScaleLibrarySubmission.tsx": {
       "before": "24ce4fa78809f2e4c82b8370f171993486d2a17e",
       "after": "f9d5d9b4299b66aa2e1f2d2a18e798871d4beb02"
+    },
+    "server-version/backend/src/__tests__/measurement-content/training-reference-unified-context.test.ts": {
+      "before": "80e959fb02ae52ccb6db0ad2346db064ae32a5ff",
+      "after": "32b7de46e956832d2d335ba89f70359acdc1c6ca"
     }
   },
   "controlBefore": {
@@ -2847,10 +2851,10 @@
               },
               {
                 "path": "server-version/backend/src/__tests__/measurement-content/training-reference-unified-context.test.ts",
-                "blob": "80e959fb02ae52ccb6db0ad2346db064ae32a5ff"
+                "blob": "32b7de46e956832d2d335ba89f70359acdc1c6ca"
               }
             ],
-            "sha256": "0fd83d81dd3aa67d9bb46eec39d77f9eb85e23d29b5b474cc88c8010adbec5f3"
+            "sha256": "b38acf10d4f286dc247ccde10239372561aff48a6af45e5df723ffd271dc77e2"
           }
         }
       ]
