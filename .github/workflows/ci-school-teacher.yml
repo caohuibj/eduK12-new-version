@@ -29,7 +29,7 @@ jobs:
       - name: authenticate frozen scope and all configured source inputs
         run: node .github/scripts/school-teacher-checks.mjs admission
       - name: verify only new control contracts
-        run: node --test --test-name-pattern='Run15' .github/scripts/school-teacher.test.mjs
+        run: node --test .github/scripts/school-teacher-fresh.test.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -44,6 +44,7 @@ jobs:
     env:
       VITE_COGNITIVE_MODULE_ENABLED: 'true'
       NODE_OPTIONS: --max-old-space-size=4096
+      DATABASE_URL: postgresql://synthetic:synthetic@127.0.0.1:5432/type_generation_only
     steps:
       - uses: actions/checkout@v4
         with:
@@ -52,12 +53,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - name: verify original frontend checks and exact run15 immutable frontend build
+      - name: prepare exact frontend type dependencies without compiling backend
         env:
-          GH_TOKEN: ${{ github.token }}
+          PRISMA_SKIP_POSTINSTALL_GENERATE: 'true'
         run: |
-          git fetch --no-tags --depth=1 origin dcbc58483c6b6ce8a81526ddbc124a8b1c1c993c 81ee1f6d6a097e0c9e0aca3da05582f614325878 81947063451c5a5e2ee028ee41256671b19ef201 dadcef2d497ed51f4d75458c12b46bbb2fc6d82b 051d8eb0f869c166b09739132ff8ea8e9a666613 6337343de882ba07999a47c1f5a2c71a58b1a597
-          node .github/scripts/school-teacher-checks.mjs frontend
+          npm ci --ignore-scripts --prefix server-version/backend
+          node server-version/backend/node_modules/prisma/build/index.js generate --schema server-version/backend/prisma/schema.prisma
+          npm ci --prefix server-version/frontend
+      - name: execute current frontend types lint affected tests and one production build
+        run: node .github/scripts/school-teacher-checks.mjs frontend
       - uses: actions/upload-artifact@v4
         with:
           name: school-teacher-frontend-${{ github.sha }}
@@ -116,7 +120,12 @@ jobs:
           CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
           SCHOOL_TEACHER_PRIVATE_DIR: ${{ runner.temp }}/school-teacher-private
         run: |
-          for key in DATABASE_URL SCHOOL_TEACHER_TEST_DATABASE_URL RELEASE_INTEGRATION_DATABASE_URL REDIS_URL CI_POSTGRES_SERVICE_ID SCHOOL_TEACHER_PRIVATE_DIR; do
+          mkdir -p "$SCHOOL_TEACHER_PRIVATE_DIR/uploads"
+          chmod 700 "$SCHOOL_TEACHER_PRIVATE_DIR" "$SCHOOL_TEACHER_PRIVATE_DIR/uploads"
+          export JWT_SECRET="$(node -e "process.stdout.write(require('node:crypto').randomBytes(48).toString('hex'))")"
+          printf '::add-mask::%s\n' "$JWT_SECRET"
+          export UPLOAD_DIR="$SCHOOL_TEACHER_PRIVATE_DIR/uploads"
+          for key in JWT_SECRET UPLOAD_DIR DATABASE_URL SCHOOL_TEACHER_TEST_DATABASE_URL RELEASE_INTEGRATION_DATABASE_URL REDIS_URL CI_POSTGRES_SERVICE_ID SCHOOL_TEACHER_PRIVATE_DIR; do
             printf '%s=%s\n' "$key" "${!key}" >> "$GITHUB_ENV"
           done
       - run: npm ci --ignore-scripts --prefix .github/release-tools
@@ -127,39 +136,23 @@ jobs:
         run: |
           node node_modules/prisma/build/index.js validate --schema prisma/schema.prisma
           node node_modules/prisma/build/index.js generate --schema prisma/schema.prisma
-      - name: verify fixed official backend compile and 105 passed cases then restore original dist
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          git fetch --no-tags --depth=1 origin b717cddfdeb957bc3665ed3e69f8a680befa021b db477157b097556dc8e59cda1f6bda71f06a71f6
-          node .github/scripts/school-teacher-checks.mjs backend
+      - name: compile current backend once and bind the immutable output to this run
+        run: node .github/scripts/school-teacher-checks.mjs backend
       - uses: actions/upload-artifact@v4
         with:
           name: school-teacher-backend-${{ github.sha }}
           path: server-version/backend/dist
           if-no-files-found: error
           retention-days: 3
-      - name: retain original nonempty upgrade qualification and prepare this fresh isolated database
+      - name: prove nonempty upgrade from the frozen main339 baseline
         run: node .github/scripts/school-teacher-checks.mjs migrate
-      - name: verify the fixed official remaining five cases without executing business tests
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          git fetch --no-tags --depth=1 origin 60f13df9121eeb66c221dfe8b1f0535082a4a59c c291aec6bbd2009e8c18f783e3eb42d0791ad1bb
-          node .github/scripts/school-teacher-checks.mjs postgres
+      - name: execute current affected backend and PostgreSQL assertions with real capacity guard
+        run: node .github/scripts/school-teacher-checks.mjs postgres
       - uses: actions/download-artifact@v4
         with:
           name: school-teacher-frontend-${{ github.sha }}
           path: server-version/frontend/dist
-      - uses: actions/download-artifact@v4
-        with:
-          name: school-teacher-frontend-checks-${{ github.sha }}
-          path: school-teacher-frontend-receipt
-      - name: retain the exact verified frontend receipt
-        run: |
-          mkdir -p school-teacher-evidence
-          cp school-teacher-frontend-receipt/official-frontend-build-reuse.json school-teacher-evidence/official-frontend-build-reuse.json
-      - name: verify the original frontend and backend manifests against actual dist bytes
+      - name: verify same-SHA same-run frontend and backend manifests against actual dist bytes
         run: |
           node .github/scripts/school-teacher-checks.mjs verify-frontend-artifact
           node .github/scripts/school-teacher-checks.mjs verify-backend-artifact
@@ -206,12 +199,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - name: verify original successful two-component audit and unchanged dependency inputs
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          git fetch --no-tags --depth=1 origin dcbc58483c6b6ce8a81526ddbc124a8b1c1c993c 81ee1f6d6a097e0c9e0aca3da05582f614325878
-          node .github/scripts/school-teacher-checks.mjs audit
+      - name: run current frontend and backend HIGH CRITICAL dependency audits
+        run: node .github/scripts/school-teacher-checks.mjs audit
       - uses: actions/upload-artifact@v4
         if: always()
         with:

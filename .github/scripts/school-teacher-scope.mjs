@@ -18,6 +18,17 @@ export function rawEntries(bytes){
  return rows;
 }
 export const rawDiffFingerprint=bytes=>{rawEntries(bytes);return sha256(bytes)};
+export function requireFreshQualification(b){
+ assert.equal(b.qualification,'fresh-integrated-authoring');
+ assert.equal(b.base,'69497181d569d4a5f7d61cdab108b977894cf9b3');
+ assert.equal(b.frontendBuildDecision,'fresh-current-source');
+ assert.equal(b.backendBuildDecision,'fresh-current-source');
+ assert.equal(b.execution.finalized,true);
+ assert.equal(b.execution.frontend.types,true);
+ for(const component of ['frontend','backend'])assert(b.execution[component].batches.length>0,'Fresh affected batches required');
+ assert.deepEqual(b.execution.auditComponents,['frontend','backend']);
+ return true;
+}
 export function validateCandidate(b,o,evidenceBytes){
  assert.equal(b.enabled,true,'Candidate not independently frozen');assert.deepEqual(b.blockers,[]);
  assert.equal(b.branch,BRANCH);assert(['pull_request','push'].includes(o.event));assert.equal(o.branch,o.event==='push'?'main':BRANCH);assert.equal(o.repository,REPOSITORY);
@@ -39,10 +50,13 @@ export function validateCandidate(b,o,evidenceBytes){
  }
  assert.match(b.evidenceSha256||'',/^[a-f0-9]{64}$/);assert.equal(sha256(evidenceBytes),b.evidenceSha256);
  assert.equal(b.review.completed,true,'Final control review required');assert.equal(b.review.originalExecutionSigned,false);
- assert.deepEqual(b.requiredJobs,JOBS);assert.equal(b.frontendBuildDecision,'fixed-run15-frontend-build');
+ assert.deepEqual(b.requiredJobs,JOBS);if(b.qualification==='fresh-integrated-authoring'){requireFreshQualification(b)}else{
+ assert.equal(b.qualification,undefined,'Unknown qualification mode');
+ assert.equal(b.frontendBuildDecision,'fixed-run15-frontend-build');
  // Frontend reuses the exact verified run15 build; backend retains its fixed producer identity.
  assert.equal(b.backendBuildDecision,'fixed-official-backend-build','Only the fixed official backend producer may qualify; no fresh fallback');
  assert(b.backendBuildReason&&b.backendBuildInputsChanged.length>0);
+ }
  assert.equal(b.execution.finalized,true,'Final per-check selections required');
  return {schema:1,route:'school-teacher',base:b.base,head:o.checkoutHead,sourceHead:o.sourceHead,sourceTree:o.sourceTree,
   product:b.productHead,components:{frontend:b.frontendTree,backend:b.backendTree},requiredJobs:JOBS,changes:o.entries};

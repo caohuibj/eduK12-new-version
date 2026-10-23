@@ -356,7 +356,30 @@ function batches(component,selected,offset=0){const cwd=resolve('server-version'
  try{command(component+'-tests-'+i,process.execPath,args,cwd)}finally{if(existsSync(file)){const raw=readFileSync(file),report=JSON.parse(raw),known=new Set([...b.expectedPassed,...b.expectedFiltered]);receipt(component+'-tests-'+i+'-actual',{rawSha256:sha256(raw),invocationSuccess:report.success===true,cases:report.testResults.flatMap(s=>s.assertionResults||[]).map(c=>({...known.has(c.fullName)?{name:c.fullName}:{unreviewedNameSha256:sha256(String(c.fullName))},status:['passed','failed','pending','skipped','todo'].includes(c.status)?c.status:'UNKNOWN'})),rawRetainedAfterRunnerDestruction:false})}}
  const raw=readFileSync(file);receipt(component+'-tests-'+i,{...verifyTestReport(JSON.parse(raw),b),reportSha256:sha256(raw),sourceHead:git('rev-parse','HEAD')});
  }}
-async function frontend(b){await reuseCompletedFrontend(b)}
+export function verifyFreshManifest(manifest,{kind,head,runId,lockDigest,contentDigest}){
+ assert(['frontend','backend'].includes(kind));assert.match(head,/^[a-f0-9]{40}$/);assert.match(runId,/^\d+$/);
+ verifyManifest(manifest,{schemaVersion:1,sha:head,runId,kind,lockDigest},contentDigest);
+ return manifest;
+}
+function freshArtifact(kind){
+ for(const name of ['official-frontend-build-reuse','official-backend-build-reuse'])assert.equal(existsSync(join(out,name+'.json')),false,'Fresh qualification cannot consume historical build receipts');
+ const dir=resolve('server-version',kind,'dist'),manifest=JSON.parse(readFileSync(join(dir,'ci-build-manifest.json')));
+ return verifyFreshManifest(manifest,{kind,head:git('rev-parse','HEAD'),runId:process.env.GITHUB_RUN_ID,lockDigest:sha256(readFileSync(resolve('server-version',kind,'package-lock.json'))),contentDigest:treeDigest(dir)});
+}
+function freshBuild(kind){
+ const cwd=resolve('server-version',kind);rmSync(join(cwd,'dist'),{recursive:true,force:true});
+ if(kind==='frontend')command('frontend-build','npm',['run','build'],cwd);
+ else command('backend-build',process.execPath,['node_modules/typescript/bin/tsc','-p','tsconfig.json'],cwd);
+ command(kind+'-manifest',process.execPath,['.github/scripts/ci-artifact.mjs','write',kind]);
+ receipt(kind+'-fresh-build',{status:'PASSED',qualification:'fresh-current-source',manifest:freshArtifact(kind)});
+}
+async function frontend(b){
+ if(b.qualification!=='fresh-integrated-authoring'){await reuseCompletedFrontend(b);return}
+ const cwd=resolve('server-version/frontend');
+ command('frontend-types',process.execPath,['node_modules/typescript/bin/tsc','-b'],cwd);
+ if(b.execution.frontend.lintFiles.length)command('frontend-lint',process.execPath,['node_modules/eslint/bin/eslint.js',...b.execution.frontend.lintFiles],cwd);
+ batches('frontend',b.execution.frontend.batches);freshBuild('frontend');
+}
 
 function databaseGuard(){
  assert.equal(process.env.CI,'true');assert.equal(process.env.GITHUB_ACTIONS,'true');assert.equal(process.env.NODE_ENV,'test');
@@ -395,20 +418,20 @@ async function restore(b){databaseGuard();const {Client}=createRequire(resolve('
  receipt('restore',{status:'PASSED',preserved,restrictedRuntimeRole:true,releaseSchemaVerified:true});
 }
 function cleanup(){const root=realpathSync(process.env.RUNNER_TEMP);for(const name of ['school-teacher-private','school-teacher-checks-private','school-teacher-seed.log']){const p=join(root,name);if(existsSync(p)){assert.equal(realpathSync(p),p);rmSync(p,{recursive:true})}}receipt('cleanup',{privateMaterialRemoved:true})}
-async function main(){const phase=process.argv[2];if(phase==='cleanup'){cleanup();return}assert.equal(process.version,'v24.21.0');const b=binding(),plan=actualPlan();assert.deepEqual(plan,JSON.parse(process.env.PLAN));
+async function main(){const phase=process.argv[2];if(phase==='cleanup'){cleanup();return}assert.equal(process.version,'v24.21.0');const b=binding(),plan=actualPlan();assert.deepEqual(plan,JSON.parse(process.env.PLAN));const fresh=b.qualification==='fresh-integrated-authoring';
  if(phase==='admission')admission(b,plan);
  else if(phase==='frontend')await frontend(b);
- else if(phase==='verify-frontend-artifact')verifyConnectedFrontend();
- else if(phase==='backend')await reuseCompletedBackend(b);
- else if(phase==='verify-backend-artifact')verifyConnectedBackend();
- else if(phase==='migrate')await prepareCurrentDatabase(b);
- else if(phase==='postgres'){verifyConnectedBackend();await reuseCompletedRemainder(b)}
+ else if(phase==='verify-frontend-artifact')fresh?freshArtifact('frontend'):verifyConnectedFrontend();
+ else if(phase==='backend'){if(fresh)freshBuild('backend');else await reuseCompletedBackend(b);}
+ else if(phase==='verify-backend-artifact')fresh?freshArtifact('backend'):verifyConnectedBackend();
+ else if(phase==='migrate'){if(fresh){freshArtifact('backend');await migrate(b)}else await prepareCurrentDatabase(b);}
+ else if(phase==='postgres'){if(fresh){freshArtifact('backend');databaseGuard();assert.notEqual(process.env.EDUCATION_MATERIAL_CAPACITY_PROBE_STUB,'true','Real upload admission capacity required');batches('backend',b.execution.backend.batches)}else{verifyConnectedBackend();await reuseCompletedRemainder(b)}}
  else if(phase==='fonts')prepareFonts();
  else if(phase==='seed'){databaseGuard();command('browser-fixture',process.execPath,['server-version/e2e/school-teacher-fixture.cjs','seed']);}
  else if(phase==='restore')await restore(b);
- else if(phase==='browser-report'){const module=await import(pathToFileURL(resolve(b.execution.browserHelper))),helper=module.default||module;assert.equal(typeof helper.verifyReport,'function');const report=JSON.parse(readFileSync(join(out,'browser.json'))),frontend=JSON.parse(readFileSync('server-version/frontend/dist/ci-build-manifest.json')),backend=JSON.parse(readFileSync('server-version/backend/dist/ci-build-manifest.json'));const result=helper.verifyReport(report,{head:plan.head,tree:plan.sourceTree,runId:process.env.GITHUB_RUN_ID,frontend,backend,officialFrontendReuse:verifyConnectedFrontend(),officialBackendReuse:verifyConnectedBackend(),backendCompileDigest:verifyBackendCompileInputs(),backendLockDigest:sha256(readFileSync('server-version/backend/package-lock.json')),backendContentDigest:treeDigest(resolve('server-version/backend/dist')),frontendTree:git('rev-parse','HEAD:server-version/frontend'),frontendLockDigest:sha256(readFileSync('server-version/frontend/package-lock.json')),frontendContentDigest:treeDigest(resolve('server-version/frontend/dist'))},file=>{assert(/^screenshots\/[a-z0-9-]+\.png$/.test(file));return readFileSync(join(out,file))});receipt('browser-acceptance',result);}
- else if(phase==='audit')await reuseOfficial('audit',b);
- else if(phase==='sast-reuse')await reuseOfficial('sast',b);
+ else if(phase==='browser-report'){const module=await import(pathToFileURL(resolve(b.execution.browserHelper))),helper=module.default||module;assert.equal(typeof helper.verifyReport,'function');const report=JSON.parse(readFileSync(join(out,'browser.json'))),frontend=JSON.parse(readFileSync('server-version/frontend/dist/ci-build-manifest.json')),backend=JSON.parse(readFileSync('server-version/backend/dist/ci-build-manifest.json'));const result=helper.verifyReport(report,{head:plan.head,tree:plan.sourceTree,runId:process.env.GITHUB_RUN_ID,frontend,backend,...(fresh?{frontend:freshArtifact('frontend'),backend:freshArtifact('backend')}:{officialFrontendReuse:verifyConnectedFrontend(),officialBackendReuse:verifyConnectedBackend(),backendCompileDigest:verifyBackendCompileInputs()}),backendLockDigest:sha256(readFileSync('server-version/backend/package-lock.json')),backendContentDigest:treeDigest(resolve('server-version/backend/dist')),frontendTree:git('rev-parse','HEAD:server-version/frontend'),frontendLockDigest:sha256(readFileSync('server-version/frontend/package-lock.json')),frontendContentDigest:treeDigest(resolve('server-version/frontend/dist'))},file=>{assert(/^screenshots\/[a-z0-9-]+\.png$/.test(file));return readFileSync(join(out,file))});receipt('browser-acceptance',result);}
+ else if(phase==='audit'){if(fresh)auditComponents(b.execution.auditComponents,auditComponent,value=>receipt('audit',value));else await reuseOfficial('audit',b);}
+ else if(phase==='sast-reuse'){assert.equal(fresh,false,'Fresh qualification requires actual SAST, never historical reuse');await reuseOfficial('sast',b);}
  else if(phase==='aggregate')requireSuccess(plan,JSON.parse(process.env.NEEDS_JSON));
  else throw Error('Unknown phase');
 }
