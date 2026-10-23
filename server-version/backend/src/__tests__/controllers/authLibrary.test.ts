@@ -5,6 +5,7 @@ const { mockPrisma } = vi.hoisted(() => ({
     $transaction: vi.fn(),
     $executeRaw: vi.fn(),
     course: { findUnique: vi.fn() },
+    teacherCode: { findUnique: vi.fn() },
     user: { findUnique: vi.fn(), findFirst: vi.fn(), updateMany: vi.fn(), create: vi.fn() },
     courseStudent: { create: vi.fn() },
   },
@@ -21,6 +22,7 @@ vi.mock('../../utils/password', () => ({
 }))
 
 import { authController } from '../../controllers/authController'
+import { hashPassword } from '../../utils/password'
 
 const makeRes = () => {
   const res: any = { statusCode: 200, body: null }
@@ -28,6 +30,8 @@ const makeRes = () => {
     res.statusCode = code
     return res
   })
+  res.getHeader = vi.fn()
+  res.setHeader = vi.fn()
   res.json = vi.fn((body: any) => {
     res.body = body
     return res
@@ -122,5 +126,92 @@ describe('legacy account extension target boundary', () => {
     await authController.extendAccount({ body: { userId: 'teacher', months: 12 } } as any, raced)
     expect(raced.statusCode).toBe(409)
     expect(raced.body).not.toHaveProperty('data.expiresAt')
+  })
+})
+
+describe('registration lookup projections', () => {
+  const courseSelect = { id: true, courseCode: true, status: true, endedAt: true, isRecruiting: true, isLibrary: true }
+  const course = {
+    id: 'course-1', courseCode: 'COURSE', status: 'PUBLISHED', endedAt: null,
+    isRecruiting: true, isLibrary: false, description: 'Unneeded course content',
+  }
+  const body = { courseCode: 'COURSE', username: 'student01', password: 'Demo2026', nickname: '学生甲' }
+  // Return only requested fields so omitted status or transaction fields
+  // actually affect behavior, rather than hiding omissions in broad mocks.
+  const projected = (row: Record<string, unknown>, select: Record<string, boolean>) =>
+    Object.fromEntries(Object.entries(select).filter(([, enabled]) => enabled).map(([key]) => [key, row[key]]))
+  const prepareCourses = (locked: Record<string, unknown> = course) => {
+    mockPrisma.course.findUnique.mockImplementation(async ({ where, select }) => {
+      expect(select).toEqual(courseSelect)
+      return projected('courseCode' in where ? course : locked, select)
+    })
+  }
+  beforeEach(() => {
+    vi.resetAllMocks()
+    vi.mocked(hashPassword).mockResolvedValue('hash')
+    mockPrisma.$transaction.mockImplementation(async (callback: (tx: typeof mockPrisma) => unknown) => callback(mockPrisma))
+    mockPrisma.user.findUnique.mockImplementation(async ({ select }) => {
+      expect(select).toEqual({ id: true })
+      return null
+    })
+    mockPrisma.user.create.mockResolvedValue({ id: 'new-student', username: 'student01', role: 'STUDENT', tokenVersion: 0, mustChangePassword: false })
+    prepareCourses()
+  })
+
+  it('registers using selected course fields and preserves both reads and the row lock', async () => {
+    const res = makeRes()
+    await authController.studentRegister({ body } as any, res)
+    expect(res.statusCode).toBe(200)
+    expect(res.body.message).toBe('注册成功，已加入课程')
+    expect(mockPrisma.course.findUnique.mock.calls).toEqual([
+      [{ where: { courseCode: 'COURSE' }, select: courseSelect }],
+      [{ where: { id: 'course-1' }, select: courseSelect }],
+    ])
+    expect(mockPrisma.user.findUnique).toHaveBeenCalledExactlyOnceWith({ where: { username: 'student01' }, select: { id: true } })
+    expect(mockPrisma.$executeRaw).toHaveBeenCalledOnce()
+    expect(mockPrisma.$executeRaw.mock.invocationCallOrder[0]).toBeLessThan(mockPrisma.course.findUnique.mock.invocationCallOrder[1])
+    expect(mockPrisma.user.create).toHaveBeenCalledWith({ data: {
+      username: 'student01', passwordHash: 'hash', role: 'STUDENT', nickname: '学生甲', expiresAt: null,
+    } })
+    expect(mockPrisma.courseStudent.create).toHaveBeenCalledWith({ data: { courseId: 'course-1', studentId: 'new-student', status: 'ACTIVE' } })
+    expect(res.setHeader).toHaveBeenCalledWith('Set-Cookie', expect.stringContaining('ptool_session='))
+  })
+
+  it.each([
+    [{ courseCode: 'ROTATED' }, '课程码无效'],
+    [{ status: 'DRAFT' }, '课程未发布，无法加入'],
+    [{ endedAt: new Date(0) }, '课程已结束，无法加入'],
+    [{ isRecruiting: false }, '该课程已停止招募，无法加入'],
+    [{ isLibrary: true }, '库课程不能加入'],
+  ])('rechecks projected locked course state: %j', async (change, message) => {
+    prepareCourses({ ...course, ...change })
+    const res = makeRes()
+    await authController.studentRegister({ body } as any, res)
+    expect(res.statusCode).toBe(400)
+    expect(res.body.message).toBe(message)
+    expect(mockPrisma.course.findUnique).toHaveBeenCalledTimes(2)
+    expect(mockPrisma.$executeRaw).toHaveBeenCalledOnce()
+    expect(mockPrisma.user.create).not.toHaveBeenCalled()
+    expect(mockPrisma.courseStudent.create).not.toHaveBeenCalled()
+    expect(res.setHeader).not.toHaveBeenCalled()
+  })
+
+  it.each(['student', 'teacher'])('uses only id for %s username conflicts before hashing or writing', async kind => {
+    mockPrisma.teacherCode.findUnique.mockResolvedValue({ id: 'teacher-code', isActive: true, expiresAt: null, usedCount: 0, maxUses: 1 })
+    mockPrisma.user.findUnique.mockImplementation(async ({ select }) => {
+      expect(select).toEqual({ id: true })
+      return projected({ id: 'existing', passwordHash: 'must-not-be-loaded', nickname: 'unused' }, select)
+    })
+    const res = makeRes()
+    if (kind === 'student') await authController.studentRegister({ body } as any, res)
+    else await authController.teacherRegister({ body: { teacherCode: 'ABCD1234', username: body.username, password: body.password, nickname: body.nickname } } as any, res)
+    expect(res.statusCode).toBe(400)
+    expect(res.body.message).toBe('用户名已被使用，请更换')
+    expect(mockPrisma.user.findUnique).toHaveBeenCalledExactlyOnceWith({ where: { username: body.username }, select: { id: true } })
+    const codeLookup = kind === 'student' ? mockPrisma.course.findUnique : mockPrisma.teacherCode.findUnique
+    expect(codeLookup.mock.invocationCallOrder[0]).toBeLessThan(mockPrisma.user.findUnique.mock.invocationCallOrder[0])
+    expect(hashPassword).not.toHaveBeenCalled()
+    expect(mockPrisma.$transaction).not.toHaveBeenCalled()
+    expect(res.setHeader).not.toHaveBeenCalled()
   })
 })

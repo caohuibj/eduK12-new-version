@@ -207,7 +207,8 @@ export const authController = {
 
       // 检查用户名是否已存在
       const existingUser = await prisma.user.findUnique({
-        where: { username }
+        where: { username },
+        select: { id: true },
       })
 
       if (existingUser) {
@@ -284,7 +285,8 @@ export const authController = {
 
       // 查找课程
       const course = await prisma.course.findUnique({
-        where: { courseCode }
+        where: { courseCode },
+        select: { id: true, courseCode: true, status: true, endedAt: true, isRecruiting: true, isLibrary: true },
       })
 
       if (!course) {
@@ -295,7 +297,8 @@ export const authController = {
 
       // 检查用户名是否已存在
       const existingUser = await prisma.user.findUnique({
-        where: { username }
+        where: { username },
+        select: { id: true },
       })
 
       if (existingUser) {
@@ -311,7 +314,10 @@ export const authController = {
         if (typeof (tx as any).$executeRaw === 'function') {
           await (tx as any).$executeRaw`SELECT id FROM "courses" WHERE id = ${course.id} FOR UPDATE`
         }
-        const lockedCourse = await tx.course.findUnique({ where: { id: course.id } })
+        const lockedCourse = await tx.course.findUnique({
+          where: { id: course.id },
+          select: { id: true, courseCode: true, status: true, endedAt: true, isRecruiting: true, isLibrary: true },
+        })
         // The initial lookup only identifies the row to lock.  A teacher may
         // rotate the code while this request is waiting for that row lock;
         // accepting the refreshed row without comparing the submitted code
