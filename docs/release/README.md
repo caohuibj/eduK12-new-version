@@ -1266,3 +1266,7 @@ The stable ready gate independently recomputes the complete scope and requires
 actual scope, all nested Survey qualification jobs and CodeQL success. Draft,
 missing/skipped/failed/cancelled jobs cannot merge. Exact main pushes only
 classify the merged diff; they do not repeat the PR application checks.
+
+### Training / Survey 4C4G 容量修订（2026-10-24）
+
+`work/training-survey-capacity-20261024` 从 `902144e636905ab372ff4a0c7cbfd1b88bffba47` 冻结独立云端容量候选。仅修改认证学员准入锁、Survey 团体 IP 豁免查询繁忙时的普通限流路径，以及公共静态文件传输；不更改题目、计分、冻结版本或生产配置。`participant-capacity` 精确路线绑定完整差异，接纳同一输入已完成的云端后端编译；Actions 只执行受影响限流/持久化契约、真实隔离 PostgreSQL 并发与归档边界、Nginx HTTP 契约和当前 SAST。依赖、前端 JS 和数据库结构不变，不重复应用构建、全量回归或服务器验收。压测是独立合成负载观察，不能代替正式合并门禁或生产容量承诺。

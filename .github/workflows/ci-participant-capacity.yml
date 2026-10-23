@@ -1,0 +1,130 @@
+name: Participant capacity affected qualification
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  CI_EVENT: pull_request
+  CI_HEAD_REF: work/training-survey-capacity-20261024
+  CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+  CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+  CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+  PLAN: ${{ inputs.plan }}
+jobs:
+  admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: accept exact existing cloud compilation without repeating it
+        run: node .github/scripts/participant-capacity-checks.mjs admission
+      - name: parse preserved pressure harness sources without executing pressure
+        run: python3 -c "import ast,pathlib;[ast.parse(p.read_text(),filename=str(p)) for p in pathlib.Path('server-version/perf/training-survey-capacity-20261024').glob('*.py')]"
+      - name: check scope and merge refusal contracts
+        run: node --test .github/scripts/participant-capacity.test.mjs
+      - name: reuse unchanged official dependency audits
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/participant-access-checks.mjs audit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: participant-capacity-admission-${{ github.sha }}
+          path: |
+            participant-capacity-evidence
+            participant-access-evidence/official-audit-reuse.json
+          if-no-files-found: error
+          retention-days: 3
+  backend:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    services:
+      postgres:
+        image: postgres:16.15-bookworm
+        env:
+          POSTGRES_USER: capacity
+          POSTGRES_PASSWORD: capacity
+          POSTGRES_DB: capacity_ci
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U capacity -d capacity_ci"
+          --health-interval 3s --health-timeout 3s --health-retries 20
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgresql://capacity:capacity@127.0.0.1:5432/capacity_ci?schema=public
+      AUTHENTICATED_ADMISSION_TEST_DATABASE_URL: postgresql://capacity:capacity@127.0.0.1:5432/capacity_ci?schema=public
+      TRAINING_ARCHIVE_TEST_DATABASE_URL: postgresql://capacity:capacity@127.0.0.1:5432/capacity_ci?schema=public
+      JWT_SECRET: ci-only-synthetic-capacity-signing-secret
+      DATA_ENCRYPTION_KEY: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+      DATA_PSEUDONYM_KEY: bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb
+      ASSET_CAPABILITY_SECRET: ci-only-synthetic-capacity-asset-secret
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/backend/package-lock.json
+      - name: install exact locked backend dependencies
+        working-directory: server-version/backend
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: generate types and migrate disposable service database
+        working-directory: server-version/backend
+        run: |
+          node node_modules/prisma/build/index.js generate
+          node node_modules/prisma/build/index.js migrate deploy
+      - name: execute selected admission and rate-limit contracts
+        run: node .github/scripts/participant-capacity-checks.mjs unit
+      - name: execute real PostgreSQL concurrent-start and archive contracts
+        run: node .github/scripts/participant-capacity-checks.mjs postgres
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: participant-capacity-backend-${{ github.sha }}
+          path: participant-capacity-evidence
+          if-no-files-found: error
+          retention-days: 3
+  static-delivery:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - name: execute only HTTP compression, cache, MIME and retained security-header contracts
+        run: python3 -B .github/scripts/participant-capacity-nginx.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: participant-capacity-static-${{ github.sha }}
+          path: participant-capacity-evidence
+          if-no-files-found: error
+          retention-days: 3
+  qualified:
+    needs: [admission, backend, static-delivery]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    steps:
+      - name: require every selected job to actually succeed
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: node -e 'const n=JSON.parse(process.env.NEEDS);for(const k of ["admission","backend","static-delivery"])if(n[k]?.result!=="success")throw Error(k+" did not succeed")'

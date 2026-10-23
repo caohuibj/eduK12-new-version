@@ -1,3 +1,4 @@
+import {participantCapacityPlan,participantCapacityOutputs} from './participant-capacity-scope.mjs';
 import {surveyAssessmentPlan,surveyAssessmentOutputs} from './survey-assessment-scope.mjs';
 import {trainingAssessmentPlan,trainingAssessmentOutputs} from './training-assessment-scope.mjs';
 import {schoolTeacherVisualPlan,schoolTeacherVisualOutputs} from './school-teacher-visual-scope.mjs';
@@ -299,6 +300,8 @@ export function runnerPlan({ profile = 'hosted', scenario = 'platform' } = {}) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const event = process.env.CI_EVENT;
   const base = process.env.CI_BASE_SHA;
+  const participantCapacity=participantCapacityPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  if(participantCapacity){const output=participantCapacityOutputs(participantCapacity);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const surveyAssessment=surveyAssessmentPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(surveyAssessment){const output=surveyAssessmentOutputs(surveyAssessment);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const trainingAssessment=trainingAssessmentPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
