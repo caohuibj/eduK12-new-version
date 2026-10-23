@@ -54,3 +54,8 @@
    Product dark-theme rules retain their higher-specificity color pairs. */
 .hs-workspace .education-private-tools button[aria-pressed=true] { color: var(--hs-ink); }
 .hs-workspace .education-private-tools button.education-private-primary { background: var(--private-accent); color: #fff; }
+
+/* Native file controls must shrink inside the upload label's grid track. */
+.education-private-tools .scale-feedback-upload { min-width: 0; grid-template-columns: minmax(0, 1fr); }
+.education-private-tools .scale-feedback-upload input[type=file] { width: 100%; min-width: 0; box-sizing: border-box; }
+@media(max-width:640px) { .education-private-tools .education-private-form-fields header { flex-wrap: wrap; } .education-private-tools .education-private-form-fields header input { flex-basis: 100%; min-width: 0; } }

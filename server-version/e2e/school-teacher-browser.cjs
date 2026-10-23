@@ -314,7 +314,6 @@ async function run() {
     report.chrome.sandbox = await verifyChromeSandbox(browser)
     assert.equal(report.chrome.sandbox.ok, true, 'Runtime sandbox evidence missing or unsafe')
     // Do not inherit production credentials, external storage, mail or telemetry.
-    await startBackend('SCHOOL')
 
     async function session(product, user, label, options = {}) {
       lastSafeSession = null
@@ -462,8 +461,18 @@ async function run() {
       for (const viewport of viewports) {
         await s.page.setViewportSize(viewport)
         await s.page.evaluate(async () => { await document.fonts.ready; await Promise.all([...document.images].map(image => image.decode())) })
-        const layout = await s.page.evaluate(() => ({ width: innerWidth, scrollWidth: document.documentElement.scrollWidth,
-          secretNodes: document.querySelectorAll('.ht-secret,.hs-secret,.ht-mfa-setup').length }))
+        const layout = await s.page.evaluate(() => {
+          const scrollWidth = document.documentElement.scrollWidth
+          // Bounded structural diagnostics only: never text, values, filenames or URLs.
+          const overflowElements = scrollWidth > innerWidth + 1 ? [...document.querySelectorAll('body *')].flatMap(element => {
+            const rect = element.getBoundingClientRect()
+            if (!rect.width || !rect.height || (rect.left >= -1 && rect.right <= innerWidth + 1)) return []
+            return [{ tag: element.tagName, classes: [...element.classList].filter(token => /^(?:education-private-|scale-feedback-|hs-|ht-|survey-form-)[a-z-]+$/.test(token)).slice(0, 8),
+              left: rect.left, right: rect.right, width: rect.width, clientWidth: element.clientWidth, scrollWidth: element.scrollWidth }]
+          }).slice(0, 20) : []
+          return { width: innerWidth, scrollWidth, overflowElements,
+            secretNodes: document.querySelectorAll('.ht-secret,.hs-secret,.ht-mfa-setup').length }
+        })
         assert.equal(layout.secretNodes, 0, 'Do not capture authentication secrets')
         await s.page.keyboard.press('Tab')
         const keyboard = await s.page.evaluate(() => {
@@ -750,47 +759,72 @@ async function run() {
       assert.deepEqual([...encountered].sort(), ['FORM', 'SCALE'])
     }
 
-    for (const product of ['SCHOOL', 'TEACHER']) {
-      // All School browser sessions have closed before replacing its process.
-      // Each product gets the unchanged production exact-origin configuration.
-      if (product === 'TEACHER') await startBackend(product)
-      const f = fixture.products[product]
-      stage = product + '-public-theme-layout'
-      await ui.publicChecks(session, product)
-      stage = product + '-author-login'
-      const author = await session(product, f.author, 'author')
-      stage = product + '-workspace-layout'; await ui.workspace(author)
-      const capability = await author.api('/organizations/' + f.organizationId + '/tool-authoring-capabilities')
-      assert.equal(capability.canAuthor, true)
-      if (product === 'SCHOOL') {
-        const context = await author.api('/organizations/' + f.organizationId + '/context')
-        assert.equal(context.access.orgRole, 'MEMBER'); assert.equal(context.access.canGovern, false)
-        assert.ok(context.access.capabilities.includes('PSYCHOLOGY_STAFF'))
-      }
-      const versions = {}
-      for (const kind of ['SCALE', 'FORM']) { stage = product + '-author-' + kind; versions[kind] = await authorTool(author, f, kind) }
-      stage = product + '-publish'; const w = await publish(author, f, versions)
-      stage = product + '-participant-login'; const learner = await session(product, f.participant, 'participant')
-      const canAuthor = await learner.api('/organizations/' + f.organizationId + '/tool-authoring-capabilities')
-      assert.equal(canAuthor.canAuthor, false)
-      stage = product + '-participant-answer-report'; await participant(learner, f, w, author, versions)
-      await learner.close(); await author.close()
-    }
-    // Teacher admin management is NOT evidence of ordinary psychology authorship.
-    stage = 'TEACHER-nonadmin-psychology-author'
-    const f = fixture.products.TEACHER, psych = await session('TEACHER', f.psychAuthor, 'ordinary-psychology-author')
-    const me = await psych.api('/auth/me'), organization = me.organizations.find(row => row.organizationId === f.organizationId)
-    assert.equal(organization.orgRole, 'MEMBER'); assert.equal(organization.productAdmin, false)
-    const base = '/organizations/' + f.organizationId
-    assert.equal((await psych.api(base + '/tool-authoring-capabilities')).canAuthor, true)
-    const draft = await psych.api(base + '/private-tools', 'POST', { kind: 'FORM', title: '普通心理教师合成编制' })
-    const uri = base + '/private-tools/' + draft.id
-    const saved = await psych.api(uri, 'PUT', { expectedRevision: draft.revision, title: draft.title, definition: f.definitions.form })
-    assert.equal((await psych.api(uri + '/validate', 'POST', {})).valid, true)
-    await psych.api(uri + '/freeze', 'POST', { expectedRevision: saved.revision, expectedContentHash: saved.contentHash })
-    await psych.api(base + '/evaluation-targets', 'POST', { kind: 'ORGANIZATION', name: '不得提升发布权限' }, [403])
-    report.coverage.push({ product: 'TEACHER', check: 'ordinary-psychology-author-real-API', compiled: true, publicationAuthorityNotElevated: true })
-    await psych.close()
+    const completedProducts = await runRealmJourneys(['SCHOOL', 'TEACHER'], {
+      journey: async product => {
+        await startBackend(product)
+        const f = fixture.products[product]
+        stage = product + '-public-theme-layout'
+        await ui.publicChecks(session, product)
+        stage = product + '-author-login'
+        const author = await session(product, f.author, 'author')
+        stage = product + '-workspace-layout'; await ui.workspace(author)
+        const capability = await author.api('/organizations/' + f.organizationId + '/tool-authoring-capabilities')
+        assert.equal(capability.canAuthor, true)
+        if (product === 'SCHOOL') {
+          const context = await author.api('/organizations/' + f.organizationId + '/context')
+          assert.equal(context.access.orgRole, 'MEMBER'); assert.equal(context.access.canGovern, false)
+          assert.ok(context.access.capabilities.includes('PSYCHOLOGY_STAFF'))
+        }
+        const versions = {}
+        for (const kind of ['SCALE', 'FORM']) { stage = product + '-author-' + kind; versions[kind] = await authorTool(author, f, kind) }
+        stage = product + '-publish'; const w = await publish(author, f, versions)
+        stage = product + '-participant-login'; const learner = await session(product, f.participant, 'participant')
+        const canAuthor = await learner.api('/organizations/' + f.organizationId + '/tool-authoring-capabilities')
+        assert.equal(canAuthor.canAuthor, false)
+        stage = product + '-participant-answer-report'; await participant(learner, f, w, author, versions)
+        await learner.close(); await author.close()
+        if (product === 'TEACHER') {
+          // Teacher admin management is NOT evidence of ordinary psychology authorship.
+          stage = 'TEACHER-nonadmin-psychology-author'
+          const f = fixture.products.TEACHER, psych = await session('TEACHER', f.psychAuthor, 'ordinary-psychology-author')
+          const me = await psych.api('/auth/me'), organization = me.organizations.find(row => row.organizationId === f.organizationId)
+          assert.equal(organization.orgRole, 'MEMBER'); assert.equal(organization.productAdmin, false)
+          const base = '/organizations/' + f.organizationId
+          assert.equal((await psych.api(base + '/tool-authoring-capabilities')).canAuthor, true)
+          const draft = await psych.api(base + '/private-tools', 'POST', { kind: 'FORM', title: '普通心理教师合成编制' })
+          const uri = base + '/private-tools/' + draft.id
+          const saved = await psych.api(uri, 'PUT', { expectedRevision: draft.revision, title: draft.title, definition: f.definitions.form })
+          assert.equal((await psych.api(uri + '/validate', 'POST', {})).valid, true)
+          await psych.api(uri + '/freeze', 'POST', { expectedRevision: saved.revision, expectedContentHash: saved.contentHash })
+          await psych.api(base + '/evaluation-targets', 'POST', { kind: 'ORGANIZATION', name: '不得提升发布权限' }, [403])
+          report.coverage.push({ product: 'TEACHER', check: 'ordinary-psychology-author-real-API', compiled: true, publicationAuthorityNotElevated: true })
+          await psych.close()
+        }
+      },
+      onFailure: async (product, error) => {
+        report.status = 'FAILED'
+        report.errors.push({ stage, name: error.name, messageHash: sha(String(error)),
+          note: 'Realm journey failed; dependent steps stopped. No raw exception is published.' })
+        if (lastSafeSession?.authenticated && !lastSafeSession.page.isClosed()) {
+          try {
+            const unsafe = await lastSafeSession.page.locator('input[type=password],.ht-secret,.hs-secret,.ht-mfa-setup').count()
+            if (!unsafe) await lastSafeSession.page.screenshot({ path: path.join(out, 'screenshots', product.toLowerCase() + '-failure.png'), fullPage: true })
+          } catch { /* Preserve the original sanitized failure. */ }
+        }
+      },
+      cleanup: async product => {
+        // Never route a still-live realm page into the next realm's backend.
+        let firstError
+        for (const context of browser.contexts()) {
+          try { await context.close() } catch (error) { firstError ||= error }
+        }
+        try { await stopBackend() } catch (error) { firstError ||= error }
+        lastSafeSession = null
+        if (firstError) { stage = product + '-realm-cleanup'; throw firstError }
+      },
+    })
+    stage = 'realm-journey-summary'
+    assert.deepEqual(completedProducts, ['SCHOOL', 'TEACHER'], 'Every realm journey must pass')
     for (const audit of [...report.sessions, ...report.ui.sessions]) {
       assert.deepEqual(audit.pageErrors, [], 'No browser application exceptions')
       assert.deepEqual(audit.unexpectedRequests, [], 'No external or cross-product traffic')
@@ -831,6 +865,22 @@ async function run() {
     }
     if (!bodyFailed && cleanupFailed) throw new Error('Browser acceptance cleanup or evidence publication failed')
   }
+}
+
+// Continue only independent realms, and only after successful isolation cleanup.
+async function runRealmJourneys(products, { journey, onFailure, cleanup }) {
+  const completed = []
+  for (const product of products) {
+    try {
+      await journey(product)
+      completed.push(product)
+    } catch (error) {
+      await onFailure(product, error)
+    } finally {
+      await cleanup(product)
+    }
+  }
+  return completed
 }
 
 function browserCliMode(args) {
