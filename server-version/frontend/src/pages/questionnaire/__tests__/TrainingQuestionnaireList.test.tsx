@@ -7,7 +7,7 @@ vi.mock('../../../api/client',()=>({default:{get:mocks.get,post:mocks.post},sess
 vi.mock('../../../training/context',()=>({isTrainingHost:()=>true}))
 vi.mock('../../../contexts/AuthContext',()=>({useAuth:()=>({user:{id:'synthetic-teacher',role:'TEACHER'}})}))
 vi.mock('../../../utils/exportJobs',()=>({requestExportIntent:(scope:string,run:(key:string)=>unknown)=>{mocks.intent(scope);return run('stable-synthetic-key')},waitForExportArtifacts:mocks.wait,assertExportDownload:(r:{ok:boolean})=>{if(!r.ok)throw Error('下载失败')},triggerExportDownload:mocks.download,clearExportIntentKey:mocks.clear,ExportJobFailedError:class extends Error{}}))
-import { AssessmentDataExport } from '../TrainingQuestionnaireList'
+import AssessmentDataExport from '../AssessmentDataExport'
 import { QuestionnaireProductList } from '../QuestionnaireProducts'
 const row=(id:string,status='PUBLISHED',kind='COLLECTION')=>({id,name:'合成测评 '+id,status,kind,editHref:'/questionnaire-products/'+id})
 const success=(data:unknown)=>({code:0,data})
@@ -22,7 +22,7 @@ describe('Training questionnaire list and deidentified export',()=>{
   expect(within(screen.getByRole('heading',{name:'合成测评 draft'}).closest('article')!).getByRole('button',{name:'导出数据'})).toBeDisabled()
   expect(screen.getByRole('link',{name:'历史问卷导出'})).toHaveAttribute('href','/questionnaires/legacy')
   await userEvent.click(published.getByRole('button',{name:'导出数据'}))
-  expect(screen.getByRole('dialog',{name:'导出脱敏摘要'})).toHaveTextContent('合成测评 published')
+  expect(await screen.findByRole('dialog',{name:'导出脱敏摘要'})).toHaveTextContent('合成测评 published')
   expect(mocks.get).toHaveBeenCalledTimes(1);expect(mocks.post).not.toHaveBeenCalled()
   fireEvent.keyDown(screen.getByRole('dialog'),{key:'Escape'})
   expect(screen.queryByRole('dialog')).toBeNull()

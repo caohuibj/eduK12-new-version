@@ -5,7 +5,9 @@ import { ArrowRight, Download, Plus } from 'lucide-react'
 import { internalReturnTo } from '../components/app-shell/access'
 import { compositeApi } from '../modules/composite/api'
 import type { CompositeTeacherAttemptsResponse } from '../modules/composite/types'
-import { AssessmentDataExport } from '../pages/questionnaire/TrainingQuestionnaireList'
+import '../pages/questionnaire/training-questionnaire-list.css'
+
+import AssessmentDataExport from '../pages/questionnaire/DeferredAssessmentDataExport'
 import './training-course-assessments.css'
 
 export type CourseAssessment = {
