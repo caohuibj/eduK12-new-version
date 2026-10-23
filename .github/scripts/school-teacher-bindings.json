@@ -4,9 +4,9 @@
   "repository": "caohuibj/eduK12-new-version",
   "branch": "work/school-teacher-review-20261022",
   "enabled": true,
-  "base": "69497181d569d4a5f7d61cdab108b977894cf9b3",
-  "productHead": "626bf91ab9a24390f54f0a06c542f148fb1de096",
-  "frontendTree": "ab5a1766eb54f4e26e243e8281e8874be6011690",
+  "base": "ea887330b6eba11013a00e294d5aff84ecfbaf36",
+  "productHead": "1eb6241033179a874e0bb1f38deb2cc0e777b7ae",
+  "frontendTree": "e82bd5e126734bbf179a360c59a8cbc1abb77b8c",
   "backendTree": "bf2ddb04129457154d00261f4d3b139f748914f3",
   "source": {
     ".github/scripts/school-teacher-browser-control.mjs": {
@@ -895,7 +895,7 @@
     },
     "server-version/frontend/src/components/FinalCompositeAssessment.tsx": {
       "before": "11c9ca1864c6c164df17c6a63f628564d7df0ca4",
-      "after": "4f543f2bf33205a4ee14a92df79e6c638001850a"
+      "after": "c3aa56afbc4a44ae378ea5e3478fbd7232a7b9ae"
     },
     "server-version/frontend/src/components/education-tools/EducationMaterialPicker.tsx": {
       "before": "",
@@ -1171,7 +1171,7 @@
     },
     "server-version/frontend/src/huiteacher/HuiteacherPrivateFormRunnerHost.test.tsx": {
       "before": "",
-      "after": "38e4d2ebee0d781bbad9ab6f9f9a91a2a96bb3c9"
+      "after": "8f51dbec7d1112b0efb42a22c41fe0595d4ec4bd"
     },
     "server-version/frontend/src/huiteacher/HuiteacherPrivateFormTaskPagination.test.tsx": {
       "before": "",
@@ -1215,7 +1215,7 @@
     },
     "server-version/frontend/src/huiteacher/huiteacher-theme.css": {
       "before": "",
-      "after": "b9b6485e28a67dd2c3bb51d4808ae23b51847f2e"
+      "after": "de4b411269a83397bb3f718f2603aafff81cf00f"
     },
     "server-version/frontend/src/huiteacher/huiteacher-workspace-layout.css": {
       "before": "",
@@ -1291,15 +1291,19 @@
     },
     "server-version/frontend/src/pages/admin/ScaleLibraryEducationDistribution.test.tsx": {
       "before": "",
-      "after": "ab49c321e08b84a385bca3a9ea66452295afdbe3"
+      "after": "d1f7e1a7b3f458e9a7ed634ed6522a5f30e0b61f"
     },
     "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.tsx": {
-      "before": "bd34009e79d9c37bdf184572839127d0ece679b7",
-      "after": "ff3b96f9a685da3cbdbafcd28be11687401a4356"
+      "before": "03192c5f42889271f54c387d37c7daa3c6786cdc",
+      "after": "9b96b67fe0974daae51dc90c051ed614754b1164"
     },
     "server-version/frontend/src/pages/scaleDefinitionEditorModel.ts": {
       "before": "",
       "after": "b236cbc0c7f510fea4ecc25fd5ff551ed9e384bd"
+    },
+    "server-version/frontend/src/product-entry.test.ts": {
+      "before": "f5cab7c0d068c81eafe8421149db1bd95f9900d8",
+      "after": "bd4a5edaaec5b080360d905103d0451861847bfc"
     },
     "server-version/frontend/src/school/SchoolActivityCatalogPagination.test.tsx": {
       "before": "",
@@ -1447,7 +1451,7 @@
     },
     "server-version/frontend/src/school/school-theme.css": {
       "before": "",
-      "after": "98f29290381908ffbd5da4437b0044a5ea4bd4dc"
+      "after": "f0d2bfa903ed2ea22de39c239291a002192611a3"
     },
     "server-version/frontend/src/school/school-workspace.css": {
       "before": "4dd3a2a7188c182bf5d1a32e3a6d549e96a3aa48",
@@ -1471,16 +1475,16 @@
     }
   },
   "controlBefore": {
-    ".github/scripts/content-scope.mjs": "e654abc90171aa962fed1a8e01d25c470e5a0bf5",
-    ".github/scripts/merge-gate.mjs": "755fae09ca1a4a138800a6074dee4c11b7567def",
+    ".github/scripts/content-scope.mjs": "83d6a00c9a0f20ad3fd9941d478c57c0cdf04993",
+    ".github/scripts/merge-gate.mjs": "8ff67cf90f273a6d0c30ec8ba101404d2f5cdd4f",
     ".github/scripts/school-teacher-bindings.json": "",
     ".github/scripts/school-teacher-checks.mjs": "",
     ".github/scripts/school-teacher-evidence.json": "",
     ".github/scripts/school-teacher-scope.mjs": "",
     ".github/scripts/school-teacher.test.mjs": "",
     ".github/workflows/ci-school-teacher.yml": "",
-    ".github/workflows/ci.yml": "e8cbf0c1f0f71512113cf333dfdb24150be4877b",
-    "docs/release/README.md": "8a36deea0107d0680d7c35c26111a0ddcdef42da",
+    ".github/workflows/ci.yml": "3aa1553131a3ec8b84842b70eea16d9feb7cb606",
+    "docs/release/README.md": "556f081a87936dd266ee6846ab544ee4e5e89367",
     "server-version/e2e/school-teacher-browser.cjs": "",
     "server-version/e2e/school-teacher-chrome.cjs": "",
     "server-version/e2e/school-teacher-chrome.test.cjs": "",
@@ -1762,7 +1766,12 @@
         "src/pages/TrainingRawScoreFeedbackEditor.tsx",
         "src/pages/__tests__/ScaleEdit.pending-navigation.test.tsx",
         "src/pages/__tests__/ScaleEdit.readonly.test.tsx",
+        "src/pages/admin/ScaleLibraryEducationApplicability.test.tsx",
+        "src/pages/admin/ScaleLibraryEducationDistribution.test.tsx",
+        "src/pages/admin/ScaleLibraryGovernance.test.tsx",
+        "src/pages/admin/ScaleLibraryGovernance.tsx",
         "src/pages/scaleDefinitionEditorModel.ts",
+        "src/product-entry.test.ts",
         "src/school/SchoolActivityManager.tsx",
         "src/school/SchoolActivityOutline.test.tsx",
         "src/school/SchoolStudentTasks.test.tsx",
@@ -1828,14 +1837,14 @@
               },
               {
                 "path": "server-version/frontend/src/school/school-theme.css",
-                "blob": "98f29290381908ffbd5da4437b0044a5ea4bd4dc"
+                "blob": "f0d2bfa903ed2ea22de39c239291a002192611a3"
               },
               {
                 "path": "server-version/frontend/src/huiteacher/huiteacher-theme.css",
-                "blob": "b9b6485e28a67dd2c3bb51d4808ae23b51847f2e"
+                "blob": "de4b411269a83397bb3f718f2603aafff81cf00f"
               }
             ],
-            "sha256": "01f0d32b32dce525df6e8d2c7d1bd3d20ee91b4ac5ac96e481ec812b6f96f870"
+            "sha256": "5fdfbd7d251f1aecdccf7b43e5ff280ed45e581622c33c3934936139309dbfdb"
           }
         },
         {
@@ -2072,7 +2081,8 @@
             "src/huiteacher/HuiteacherPrivateFormRunnerHost.test.tsx"
           ],
           "expectedPassed": [
-            "uses the real Teacher host and Final form section with CSRF, forwarding the durable sealed FINAL payload only to private-form endpoints"
+            "uses the real Teacher host and Final form section with CSRF, forwarding the durable sealed FINAL payload only to private-form endpoints",
+            "scopes local draft status and error colors to education dark appearance without changing cognitive surfaces"
           ],
           "expectedFiltered": [],
           "inputClosure": {
@@ -2087,14 +2097,26 @@
               },
               {
                 "path": "server-version/frontend/src/huiteacher/HuiteacherPrivateFormRunnerHost.test.tsx",
-                "blob": "38e4d2ebee0d781bbad9ab6f9f9a91a2a96bb3c9"
+                "blob": "8f51dbec7d1112b0efb42a22c41fe0595d4ec4bd"
               },
               {
                 "path": "server-version/e2e/school-teacher-browser.cjs",
                 "blob": "cea65a3b4e97959cedc13986a23a5989f07ea3aa"
+              },
+              {
+                "path": "server-version/frontend/src/school/school-theme.css",
+                "blob": "f0d2bfa903ed2ea22de39c239291a002192611a3"
+              },
+              {
+                "path": "server-version/frontend/src/huiteacher/huiteacher-theme.css",
+                "blob": "de4b411269a83397bb3f718f2603aafff81cf00f"
+              },
+              {
+                "path": "server-version/frontend/src/components/FinalCompositeAssessment.tsx",
+                "blob": "c3aa56afbc4a44ae378ea5e3478fbd7232a7b9ae"
               }
             ],
-            "sha256": "d6e0137d09ca4319d08dac15fed400ff598950700e3add26359651c7f9d3c2c0"
+            "sha256": "59320efcb7fc835f0736da501674e756eae6385114759f995e9c31c8c877057f"
           }
         },
         {
@@ -2558,6 +2580,161 @@
             ],
             "sha256": "4886d1a92c7d85e280cc1223831df88c0d2b90ece5a8ba3a6c66dec3411db500"
           }
+        },
+        {
+          "files": [
+            "src/pages/admin/ScaleLibraryEducationApplicability.test.tsx"
+          ],
+          "expectedPassed": [
+            "administrator exact-version applicability snapshot shows the verified detail declaration and hash read-only rather than using list metadata",
+            "administrator exact-version applicability snapshot does not present mismatched detail as the reviewed snapshot ({\"version\":1})",
+            "administrator exact-version applicability snapshot does not present mismatched detail as the reviewed snapshot ({\"releaseId\":\"other-release\"})",
+            "administrator exact-version applicability snapshot treats an old absent detail declaration as undeclared without edit controls (undefined)",
+            "administrator exact-version applicability snapshot treats an old absent detail declaration as undeclared without edit controls (null)"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              },
+              {
+                "path": "server-version/frontend/src/pages/admin/ScaleLibraryEducationApplicability.test.tsx",
+                "blob": "836e896a6bad66e5b4ed20463fa7d6344b6b8cf0"
+              },
+              {
+                "path": "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.tsx",
+                "blob": "9b96b67fe0974daae51dc90c051ed614754b1164"
+              }
+            ],
+            "sha256": "a56c44879f96251ffa509bcb75abdc0b9d6d02677401b0f120c3475288abcd47"
+          }
+        },
+        {
+          "files": [
+            "src/pages/admin/ScaleLibraryEducationDistribution.test.tsx"
+          ],
+          "expectedPassed": [
+            "real admin education distribution gate keeps readiness closed with a concrete reason even for system administrators",
+            "real admin education distribution gate does not infer distribution authority from READY or an unrelated release grant",
+            "real admin education distribution gate mounts the picker only for a matching product and exact release delegation",
+            "uses product readiness rather than aggregate READY in the real admin: different-product",
+            "uses product readiness rather than aggregate READY in the real admin: missing-products",
+            "keeps Survey management isolated even when the exact version is ready for both education entries",
+            "preserves all admin targets and exact education readiness outside Survey management"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              },
+              {
+                "path": "server-version/frontend/src/pages/admin/ScaleLibraryEducationDistribution.test.tsx",
+                "blob": "d1f7e1a7b3f458e9a7ed634ed6522a5f30e0b61f"
+              },
+              {
+                "path": "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.tsx",
+                "blob": "9b96b67fe0974daae51dc90c051ed614754b1164"
+              }
+            ],
+            "sha256": "e7a8659564bd61e132682464c81a55605c0046c510c891709223dbb6defd691a"
+          }
+        },
+        {
+          "files": [
+            "src/pages/admin/ScaleLibraryGovernance.test.tsx"
+          ],
+          "expectedPassed": [
+            "Scale library system review versus entrance distribution keeps Survey management recipients in Survey even when the source supports both entrances",
+            "Scale library system review versus entrance distribution does not mistake entrance distribution authority for review authority",
+            "Scale library system review versus entrance distribution limits distribution to compatible entrances and uses the scoped recipient API",
+            "Scale library system review versus entrance distribution shows registry and authored records together, preserves standard identity and pages using hasMore",
+            "Scale library system review versus entrance distribution requires inspecting frozen content before approval",
+            "Scale library system review versus entrance distribution requires reason and a distinct confirmation before emergency disable"
+          ],
+          "expectedFiltered": [],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              },
+              {
+                "path": "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.test.tsx",
+                "blob": "9a2d607cea7238f178b21db6199ce8d42afd0adf"
+              },
+              {
+                "path": "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.tsx",
+                "blob": "9b96b67fe0974daae51dc90c051ed614754b1164"
+              }
+            ],
+            "sha256": "96e44f0edf928755e64664dedbb5a6a353e9111009ad820985a509b0ad6bc1c5"
+          }
+        },
+        {
+          "files": [
+            "src/product-entry.test.ts"
+          ],
+          "expectedPassed": [
+            "product entry only imports the selected application keeps school.eduk12.top entry selection after the synchronous shared brand bootstrap",
+            "product entry only imports the selected application keeps teacher.eduk12.top entry selection after the synchronous shared brand bootstrap"
+          ],
+          "expectedFiltered": [
+            "product entry only imports the selected application eduk12.top/ loads platform only",
+            "product entry only imports the selected application training.eduk12.top/learner/courses/example loads platform only",
+            "product entry only imports the selected application school.eduk12.top/workspace/reports loads school only",
+            "product entry only imports the selected application SCHOOL.EDUK12.TOP./ loads school only",
+            "product entry only imports the selected application teacher.eduk12.top/participate loads teacher only",
+            "product entry only imports the selected application survey.eduk12.top/ loads survey only",
+            "product entry only imports the selected application survey.eduk12.top/r/example loads participant only",
+            "product entry only imports the selected application survey.eduk12.top/r loads survey only",
+            "product entry only imports the selected application survey.eduk12.top.evil.example/r/example loads platform only"
+          ],
+          "inputClosure": {
+            "files": [
+              {
+                "path": "server-version/frontend/package-lock.json",
+                "blob": "38d624d2dd610673f9392a89af7290682862e2b0"
+              },
+              {
+                "path": "server-version/frontend/vitest.config.ts",
+                "blob": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+              },
+              {
+                "path": "server-version/frontend/src/product-entry.test.ts",
+                "blob": "bd4a5edaaec5b080360d905103d0451861847bfc"
+              },
+              {
+                "path": "server-version/frontend/src/product-entry.ts",
+                "blob": "5ecea6cee850fa943f0bf1343abf017e51595f3a"
+              },
+              {
+                "path": "server-version/frontend/public/entry-brand.js",
+                "blob": "1659a9af644c41ce1e0d23d7c34c62c9b883d5c5"
+              },
+              {
+                "path": "server-version/frontend/index.html",
+                "blob": "01ce94e1adf9123e0a609c93a2873c4485e4fb58"
+              }
+            ],
+            "sha256": "c873b01fe1fdedc3810df771c1c32b54e6dd8e043a083c0833a14758584e5fca"
+          },
+          "namePattern": "^(?:product\\ entry\\ only\\ imports\\ the\\ selected\\ application\\ keeps\\ school\\.eduk12\\.top\\ entry\\ selection\\ after\\ the\\ synchronous\\ shared\\ brand\\ bootstrap|product\\ entry\\ only\\ imports\\ the\\ selected\\ application\\ keeps\\ teacher\\.eduk12\\.top\\ entry\\ selection\\ after\\ the\\ synchronous\\ shared\\ brand\\ bootstrap)$"
         }
       ]
     },

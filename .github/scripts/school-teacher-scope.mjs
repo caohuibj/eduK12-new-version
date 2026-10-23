@@ -20,7 +20,7 @@ export function rawEntries(bytes){
 export const rawDiffFingerprint=bytes=>{rawEntries(bytes);return sha256(bytes)};
 export function requireFreshQualification(b){
  assert.equal(b.qualification,'fresh-integrated-authoring');
- assert.equal(b.base,'69497181d569d4a5f7d61cdab108b977894cf9b3');
+ assert.equal(b.base,'ea887330b6eba11013a00e294d5aff84ecfbaf36');
  assert.equal(b.frontendBuildDecision,'fresh-current-source');
  assert.equal(b.backendBuildDecision,'fresh-current-source');
  assert.equal(b.execution.finalized,true);
