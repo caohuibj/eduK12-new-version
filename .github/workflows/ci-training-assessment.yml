@@ -32,7 +32,7 @@ jobs:
       - name: verify frozen scope and existing local builds without repeating them
         run: node .github/scripts/training-assessment-checks.mjs admission
       - name: execute new scope and merge refusal contracts
-        run: node --test .github/scripts/training-assessment.test.mjs
+        run: node --test .github/scripts/training-assessment.test.mjs .github/scripts/training-assessment-reuse.test.mjs
       - name: reuse exact official successful unchanged dependency audits
         env:
           GH_TOKEN: ${{ github.token }}
@@ -50,6 +50,8 @@ jobs:
     needs: admission
     runs-on: ubuntu-24.04
     timeout-minutes: 8
+    env:
+      DATABASE_URL: postgresql://synthetic:synthetic@127.0.0.1:5432/unused_compile_only
     steps:
       - uses: actions/checkout@v4
         with:
@@ -62,19 +64,22 @@ jobs:
       - name: install official locked frontend dependencies
         working-directory: server-version/frontend
         run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: lint only changed frontend source and tests
-        run: |
-          node --input-type=module - <<'JS'
-          import {execFileSync} from 'node:child_process';
-          import {binding} from './.github/scripts/training-assessment-scope.mjs';
-          const files=Object.keys(binding.source).filter(f=>/^server-version\/frontend\/src\/.*\.(ts|tsx)$/.test(f)).map(f=>f.replace('server-version/frontend/',''));
-          execFileSync(process.execPath,['node_modules/eslint/bin/eslint.js',...files],{cwd:'server-version/frontend',stdio:'inherit'});
-          JS
-      - name: check affected app and cognitive TypeScript contracts once
+      - name: verify the original successful affected lint stage
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/training-assessment-reuse.mjs frontend
+      - name: install missing backend type dependencies consumed by frontend examples
+        working-directory: server-version/backend
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: generate missing Prisma types without connecting a database
+        working-directory: server-version/backend
+        run: node node_modules/prisma/build/index.js generate
+      - name: check affected app TypeScript after supplying missing dependency types
         working-directory: server-version/frontend
-        run: |
-          node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit
-          node node_modules/typescript/bin/tsc -p tsconfig.cognitive.json --noEmit
+        run: node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit
+      - name: check affected cognitive TypeScript for the first time
+        working-directory: server-version/frontend
+        run: node node_modules/typescript/bin/tsc -p tsconfig.cognitive.json --noEmit
       - name: execute only affected runner media and persistence assertions
         run: node .github/scripts/training-assessment-checks.mjs frontend
       - uses: actions/upload-artifact@v4
@@ -87,37 +92,23 @@ jobs:
   backend:
     needs: admission
     runs-on: ubuntu-24.04
-    timeout-minutes: 8
-    env:
-      NODE_OPTIONS: --max-old-space-size=4096
-      DATABASE_URL: postgresql://synthetic:synthetic@127.0.0.1:5432/unused_compile_only
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-          cache: npm
-          cache-dependency-path: server-version/backend/package-lock.json
-      - name: install official locked backend dependencies
-        working-directory: server-version/backend
-        run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: generate types from unchanged schema without a database
-        working-directory: server-version/backend
-        run: node node_modules/prisma/build/index.js generate
-      - name: compile affected backend candidate once
-        working-directory: server-version/backend
-        run: node node_modules/typescript/bin/tsc -p tsconfig.json
-      - name: execute selector permission and projection assertions
-        run: node .github/scripts/training-assessment-checks.mjs backend
+      - name: verify actual successful backend compilation and permission assertions
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/training-assessment-reuse.mjs backend
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: training-assessment-backend-${{ github.sha }}
-          path: |
-            training-assessment-evidence
-            server-version/backend/dist
+          name: training-assessment-backend-reuse-${{ github.sha }}
+          path: training-assessment-evidence/backend-official-reuse.json
           if-no-files-found: error
           retention-days: 3
   qualified:

@@ -425,6 +425,8 @@
     }
   },
   "controls": [
+    ".github/scripts/training-assessment-reuse.mjs",
+    ".github/scripts/training-assessment-reuse.test.mjs",
     ".github/scripts/training-assessment-scope.mjs",
     ".github/scripts/training-assessment-checks.mjs",
     ".github/scripts/training-assessment.test.mjs",
@@ -469,7 +471,7 @@
     "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22",
     "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
   },
-  "buildEvidenceSHA256": "407fed918840674dc28dfb3e7fc3bf26c60dc886cee8e4b4a48653e449a27849",
+  "buildEvidenceSHA256": "ffd89f590c33356021ea274feb7580036f42ed6988d18bd6da51c5be75bd8026",
   "frontendBuildInputCount": 1061,
   "checks": {
     "primary": "GitHub Actions; none of these tests/types/lint/backend-emitting compilation ran locally in this round",

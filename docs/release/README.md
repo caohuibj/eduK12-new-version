@@ -1165,3 +1165,21 @@ failed and cancelled selected results cannot qualify. Main merge only classifies
 the same diff. No full platform suite, image build, DB/migration/restore, media
 worker test, heavy load repetition or production deployment is selected. Report
 concrete waiting items at the five-minute threshold; do not add unrelated checks.
+
+The first Training assessment run (`39975935257`, source `4144a1d3`) retains its
+failed history: an overly broad workflow condition also selected the previous
+participant route, and frontend types lacked backend Zod/Prisma declarations used
+by the existing cross-tree examples. No frontend tests ran in that failed stage.
+The exact backend job completed compilation and all three selector assertions;
+the affected frontend lint stage also actually passed.
+
+The follow-up fixes only qualification wiring and supplies those missing type
+dependencies. It admits the exact successful backend job/artifact (ZIP digest,
+original report, complete same component, command program, PR/source identities
+and 24-hour lifetime) and the successful lint stage separately, retaining the
+parent and type failure. It does not recompile or rerun those successful inputs.
+The completed full application CodeQL job is verified by exact official metadata,
+source trees, original configuration and successful init/analyze steps; only the
+three new/changed qualification-control JavaScript files are then scanned anew.
+Types and the previously unexecuted affected assertions must still actually pass.
+No missing, failed or expired evidence triggers a full-check fallback.
