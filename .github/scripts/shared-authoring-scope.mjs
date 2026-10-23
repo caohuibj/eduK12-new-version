@@ -11,7 +11,8 @@ export function sharedAuthoringPlan(entries,base,head,read=git,env=process.env){
  assert.ok(['pull_request','push'].includes(env.CI_EVENT),'No manual/full/probe route');
  assert.notEqual(env.CI_FORCE_FULL,'true','No full-platform fallback');
  assert.equal(base,binding.base,'Frozen main changed');assert.match(head,/^[a-f0-9]{40}$/);
- assert.equal(binding.product,'693fd489e626eec6b34869657b2b23c5faeae69a');
+ assert.equal(binding.product,'0814c74f49b5bd47ccec27966f9ff55e1b112011');
+ assert.equal(binding.evidenceProduct,'693fd489e626eec6b34869657b2b23c5faeae69a');
  assert.equal(binding.base,'4dd9f1340fef2bc3df2d066b9bf7712bc2eb3c66');
  if(env.CI_EVENT==='pull_request'){
   assert.equal(ref,branch);assert.equal(env.CI_PR_REPOSITORY||env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');

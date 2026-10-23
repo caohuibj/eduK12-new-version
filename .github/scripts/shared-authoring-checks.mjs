@@ -9,7 +9,7 @@ const sha=b=>createHash('sha256').update(b).digest('hex');
 export function verifyReviewedEvidence(read=readFileSync){
  const bytes=read('.github/evidence/shared-authoring/reviewed-local.json');
  assert.equal(sha(bytes),binding.evidenceSHA256,'Reviewed evidence bytes changed');
- const record=JSON.parse(bytes);assert.equal(record.kind,'reviewed-local-evidence');assert.equal(record.product,binding.product);assert.equal(record.base,binding.base);
+ const record=JSON.parse(bytes);assert.equal(record.kind,'reviewed-local-evidence');assert.equal(record.product,binding.evidenceProduct);assert.equal(record.base,binding.base);
  assert.equal(record.ciExecuted,false);assert.equal(record.originalExecutionSigned,false);
  const reports={};
  for(const[name,r]of Object.entries(record.reports)){
@@ -29,7 +29,7 @@ export function verifyReviewedEvidence(read=readFileSync){
   const rows=reports[name].results;assert.equal(rows.length,count);assert.ok(rows.every(r=>r.status==='passed'));assert.equal(new Set(rows.map(r=>[r.product,r.width,r.theme,r.mode??'flow'].join(':'))).size,count);
   assert.ok(rows.some(r=>r.product==='training'&&r.width===390&&r.theme==='dark'));
  }
- const state=reports['shared-authoring-current-state.json'];assert.equal(state.head,binding.product);assert.equal(state.checks.appTypesExit,0);assert.equal(state.checks.backendTypesExit,0);assert.equal(state.checks.changedComponentsLintExit,0);
+ const state=reports['shared-authoring-current-state.json'];assert.equal(state.head,binding.evidenceProduct);assert.equal(state.checks.appTypesExit,0);assert.equal(state.checks.backendTypesExit,0);assert.equal(state.checks.changedComponentsLintExit,0);
  // Empty type logs cannot independently establish success; this is the explicitly
  // reviewed local execution receipt, not a fabricated CI or signed execution.
  for(const name of ['shared-authoring-final-app-types-after-adapters.log','shared-authoring-final-backend-types.log','shared-authoring-final-lint.log'])assert.equal(reports[name],'');
@@ -37,6 +37,10 @@ export function verifyReviewedEvidence(read=readFileSync){
  assert.match(reports['shared-authoring-routing-regression.log'],/pass 83/);assert.match(reports['shared-authoring-routing-regression.log'],/fail 0/);
  assert.equal(controls.acceptedCases.length,10);assert.equal(new Set(controls.acceptedCases.map(c=>c.name)).size,10);
  for(const c of controls.acceptedCases)assert.ok(reports[c.report].includes('\u2714 '+c.name),'Control assertion not actually passed: '+c.name);
+ if(controls.reuseReview){
+  assert.equal(controls.reuseReview.cases.length,7);
+  for(const name of controls.reuseReview.cases)assert.ok(reports[controls.reuseReview.report].includes('\u2714 '+name),'Reuse rejection assertion missing: '+name);
+ }
  const expectedControls=binding.controls.filter(file=>!['.github/scripts/shared-authoring-bindings.json','.github/evidence/shared-authoring/reviewed-local.json'].includes(file));
  assert.deepEqual(Object.keys(controls.sourceSHA256).sort(),expectedControls.sort());
  for(const[file,digest]of Object.entries(controls.sourceSHA256))assert.equal(sha(read(file)),digest,'Control input drift: '+file);

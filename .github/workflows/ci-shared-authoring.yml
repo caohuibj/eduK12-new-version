@@ -7,6 +7,7 @@ on:
         required: true
 permissions:
   contents: read
+  actions: read
 env:
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
@@ -57,7 +58,21 @@ jobs:
         run: npm ci --ignore-scripts --prefix server-version/frontend
       - name: missing frontend dependency security audit
         run: npm audit --audit-level=high --prefix server-version/frontend
-      - name: compile the current frontend once; admit existing local types separately
+      - name: verify the new dependency with current app types and sanitizer boundary regressions
+        working-directory: server-version/frontend
+        run: |
+          node -e 'const p=JSON.parse(require("fs").readFileSync("node_modules/dompurify/package.json"));require("assert").equal(p.version,"3.4.17");console.log("Actual DOMPurify:",p.version)'
+          node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit
+          mkdir -p ../../shared-authoring-evidence
+          node node_modules/vitest/vitest.mjs run src/utils/__tests__/sanitize.test.ts --maxWorkers=1 --reporter=verbose --reporter=json --outputFile.json=../../shared-authoring-evidence/sanitizer.json
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: shared-authoring-sanitizer-${{ github.sha }}
+          path: shared-authoring-evidence/sanitizer.json
+          if-no-files-found: error
+          retention-days: 3
+      - name: compile the repaired current frontend once
         run: npm run build --prefix server-version/frontend
       - uses: actions/upload-artifact@v4
         with:
@@ -68,68 +83,25 @@ jobs:
   backend:
     needs: admission
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
-    env:
-      NODE_ENV: test
-      DATABASE_URL: postgresql://ptool:ptool123@127.0.0.1:5432/shared_authoring_ci?schema=public
-      JWT_SECRET: shared-authoring-ci-only-12345678901234567890
-      DATA_ENCRYPTION_KEY: 0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-      DATA_PSEUDONYM_KEY: fedcba9876543210fedcba9876543210fedcba9876543210fedcba9876543210
-      COGNITIVE_MODULE_ENABLED: 'true'
-      MATERIAL_GRANTS_ENABLED: 'true'
-      REDIS_URL: redis://127.0.0.1:6379
-      UPLOAD_DIR: /tmp/shared-authoring-uploads-${{ github.run_id }}-${{ github.run_attempt }}
-    services:
-      postgres:
-        image: postgres:16.15-bookworm
-        env:
-          POSTGRES_USER: ptool
-          POSTGRES_PASSWORD: ptool123
-          POSTGRES_DB: shared_authoring_ci
-        ports: ['5432:5432']
-        options: --health-cmd "pg_isready -U ptool -d shared_authoring_ci" --health-interval 5s --health-timeout 5s --health-retries 12
-      redis:
-        image: redis:7.4.9-bookworm
-        ports: ['6379:6379']
-        options: --health-cmd "redis-cli ping" --health-interval 5s --health-timeout 5s --health-retries 12
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-          cache: npm
-          cache-dependency-path: server-version/backend/package-lock.json
-      - name: install official locked backend dependencies and exact Prisma client
-        run: |
-          npm ci --ignore-scripts --prefix server-version/backend
-          cd server-version/backend
-          node node_modules/prisma/build/index.js generate
-      - name: missing backend dependency security audit
-        run: npm audit --audit-level=high --prefix server-version/backend
-      - name: compile current backend once without repeating accepted semantic types
-        working-directory: server-version/backend
-        run: node node_modules/typescript/bin/tsc --noCheck
-      - name: prepare only the disposable service database
-        working-directory: server-version/backend
-        run: node node_modules/prisma/build/index.js migrate deploy
-      - name: actual compiled publication, frozen participant and released-report material chain
-        run: node .github/scripts/shared-authoring-frozen.cjs
+      - name: verify exact official successful backend build audit migration and frozen chain
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/shared-authoring-reuse.mjs backend
       - uses: actions/upload-artifact@v4
-        if: always()
         with:
-          name: shared-authoring-backend-${{ github.sha }}
-          path: |
-            server-version/backend/dist
-            shared-authoring-evidence
+          name: shared-authoring-backend-reuse-${{ github.sha }}
+          path: shared-authoring-evidence/official-backend.json
           if-no-files-found: error
           retention-days: 3
-      - name: remove only this job's disposable media files
-        if: always()
-        shell: bash
-        run: |
-          case "$UPLOAD_DIR" in "/tmp/shared-authoring-uploads-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT") rm -rf -- "$UPLOAD_DIR" ;; *) exit 1 ;; esac
   browser:
     needs: frontend
     runs-on: ubuntu-24.04

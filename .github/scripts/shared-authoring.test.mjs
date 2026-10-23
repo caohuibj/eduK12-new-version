@@ -39,7 +39,7 @@ test('verifies original unsigned reports without accepting failed or filtered ca
 test('rejects evidence drift before trusting a self-reported count or receipt',()=>{assert.throws(()=>verifyReviewedEvidence(()=>Buffer.from('{}')),/bytes changed/)});
 test('workflow wires current builds, authenticated freeze chain, Chrome sandbox and strict nested aggregate',()=>{
  const workflow=readFileSync('.github/workflows/ci-shared-authoring.yml','utf8'),ci=readFileSync('.github/workflows/ci.yml','utf8');
- for(const text of ['shared-authoring-checks.mjs','shared-authoring-frozen.cjs','shared-authoring-browser.mjs','tsc --noCheck','npm run build','npm audit --audit-level=high','needs: [admission, frontend, backend, browser]','n[k]?.result!=="success"'])assert.ok(workflow.includes(text),text);
+ for(const text of ['shared-authoring-checks.mjs','shared-authoring-reuse.mjs backend','shared-authoring-browser.mjs','tsc -p tsconfig.app.json --noEmit','npm run build','npm audit --audit-level=high','needs: [admission, frontend, backend, browser]','n[k]?.result!=="success"'])assert.ok(workflow.includes(text),text);
  assert.ok(ci.includes('shared_authoring_plan: ${{ steps.scope.outputs.shared_authoring_plan }}'));
  assert.ok(ci.includes('needs: [scope, shared-authoring,'));assert.ok(ci.includes('uses: ./.github/workflows/ci-shared-authoring.yml'));
  assert.ok(!workflow.includes('--with-deps'));assert.ok(!workflow.includes('--no-sandbox'));

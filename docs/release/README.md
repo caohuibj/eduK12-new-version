@@ -947,3 +947,29 @@ platform regression, performance/load/media/Ops work, heavy image build,
 production access, deployment or branch-protection change is authorized.
 An exact post-merge main event classifies without repeating accepted work.
 Other branches retain their existing routes.
+
+
+### PR #339 audit repair and exact successful-component reuse
+
+The candidate now includes only the necessary DOMPurify lock patch (3.4.14 to
+3.4.17, official registry and integrity) and sanitizer regression tests after
+product baseline 693fd489. Exact repaired product is
+0814c74f49b5bd47ccec27966f9ff55e1b112011; the historical unsigned local reports
+remain bound to 693fd489 and are never relabeled as new-dependency verification.
+The new lock requires fresh frontend audit, app types, seven sanitizer boundary
+cases, production compilation and the first built-candidate browser short flow.
+The cases establish the application's sanitizer contract, not an old-failing /
+new-passing exploit reproduction of every upstream advisory.
+
+Official run 39903131297 failed at the frontend dependency audit. Its successful
+backend job 120249077938 and CodeQL job 120249022752 remain component successes,
+not a successful parent run. Reuse is limited to 24 hours, the exact repository,
+branch, source 62949663112b0e19518b019f29fa691fdcd61d4d, actual successful stages,
+unchanged backend tree and frozen consumer. Artifact 12479427511 is pinned by
+name, size, owner, run, expiry and ZIP SHA256
+`d97c94e132cba937d73a9860a6cf8246fd733ee9ad494fd0e5f2aad933193fe8`.
+Only Actions reads the ZIP and its seven-check frozen-chain receipt; no compiled
+artifact is relayed through the local computer. No database is launched again.
+Application SAST reuse requires the only changed app source to be the new
+sanitizer test; changed CI controls and the sanitizer directory receive fresh
+CodeQL. Missing, stale, altered or unsuccessful evidence stops qualification.
