@@ -954,7 +954,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           PLAN: ${{ needs.scope.outputs.school_teacher_plan }}
         run: |
-          git fetch --no-tags --depth=1 origin 4dd9f1340fef2bc3df2d066b9bf7712bc2eb3c66 1f18ab94cdac3bfe9f20d59d35635d4d898774ff dcbc58483c6b6ce8a81526ddbc124a8b1c1c993c 81ee1f6d6a097e0c9e0aca3da05582f614325878 526987d5b973cf2103930195fa9db9fd65bf015b 0cd324ab77c1ee64a2cbc0df40ac95bba1d46d8b "${{ github.event.pull_request.head.sha }}"
+          git fetch --no-tags --depth=1 origin 4dd9f1340fef2bc3df2d066b9bf7712bc2eb3c66 03fce9b4697fd9e5749a1356bdc852b7e652c3e5 dcbc58483c6b6ce8a81526ddbc124a8b1c1c993c 81ee1f6d6a097e0c9e0aca3da05582f614325878 526987d5b973cf2103930195fa9db9fd65bf015b 0cd324ab77c1ee64a2cbc0df40ac95bba1d46d8b "${{ github.event.pull_request.head.sha }}"
           node .github/scripts/school-teacher-checks.mjs sast-reuse
       - name: initialize CodeQL
         if: steps.appearance-codeql-reuse.outputs.reused != 'true'

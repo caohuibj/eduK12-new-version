@@ -5,8 +5,8 @@
   "branch": "work/school-teacher-review-20261022",
   "enabled": true,
   "base": "4dd9f1340fef2bc3df2d066b9bf7712bc2eb3c66",
-  "productHead": "1f18ab94cdac3bfe9f20d59d35635d4d898774ff",
-  "frontendTree": "80807530e9a360c24783f45d55805ba8121e6ec5",
+  "productHead": "03fce9b4697fd9e5749a1356bdc852b7e652c3e5",
+  "frontendTree": "4c089c44c21c156f416879896c41ade98c40309a",
   "backendTree": "7d7da5957de21f09dfd89bd097b4dc7c81a88ef3",
   "source": {
     ".github/scripts/school-teacher-browser-control.mjs": {
@@ -1155,7 +1155,7 @@
     },
     "server-version/frontend/src/huiteacher/huiteacher-theme.css": {
       "before": null,
-      "after": "dfd21ad922f0d01bea45dec599632a428257cd3f"
+      "after": "2cb909e09399388b36a2ea669fbec4be1b2767d1"
     },
     "server-version/frontend/src/huiteacher/huiteacher-workspace-layout.css": {
       "before": null,
@@ -1351,7 +1351,7 @@
     },
     "server-version/frontend/src/school/school-theme.css": {
       "before": null,
-      "after": "f73afdffd1be70194987a7dde3e231a87f956756"
+      "after": "48e8a3529d7812632631301b5b56d084cec56c8e"
     },
     "server-version/frontend/src/school/school-workspace.css": {
       "before": "4dd3a2a7188c182bf5d1a32e3a6d549e96a3aa48",
