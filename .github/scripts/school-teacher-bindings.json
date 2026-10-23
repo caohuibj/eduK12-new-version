@@ -5,8 +5,8 @@
   "branch": "work/school-teacher-review-20261022",
   "enabled": true,
   "base": "69497181d569d4a5f7d61cdab108b977894cf9b3",
-  "productHead": "f9c60689c5993dad95649e129ecf3d22405afe87",
-  "frontendTree": "0d64b3ad6c651363f7dddc9e5c84204765f952db",
+  "productHead": "be96cc1afceac1431c39c745149de408ea535aa1",
+  "frontendTree": "894b767461cb06a4caa2632597fa59c69d299569",
   "backendTree": "6333ccb8c84e49753531ac01ca30591496d4b127",
   "source": {
     ".github/scripts/school-teacher-browser-control.mjs": {
@@ -899,7 +899,7 @@
     },
     "server-version/frontend/src/components/education-tools/EducationMaterials.test.tsx": {
       "before": "",
-      "after": "68378d194a04996211e4479332a1081b7641049c"
+      "after": "2e551ac8b0e91f05fcfb2031a2f93e4abb7ba915"
     },
     "server-version/frontend/src/components/education-tools/EducationPersonalReportConsumers.test.tsx": {
       "before": "",
@@ -1211,7 +1211,7 @@
     },
     "server-version/frontend/src/huiteacher/huiteacher-theme.css": {
       "before": "",
-      "after": "46d89f51c4c5e5bb07306496b9f428a1d14a4c1d"
+      "after": "1534b2d7e93e64911c5ed3bf37a3983473570161"
     },
     "server-version/frontend/src/huiteacher/huiteacher-workspace-layout.css": {
       "before": "",
@@ -1435,7 +1435,7 @@
     },
     "server-version/frontend/src/school/school-theme.css": {
       "before": "",
-      "after": "36e9f48b7975342d7b24c04d7040eb2a08dc2ab0"
+      "after": "f5029685e6e370b53558d72f1004c93a901bbcb0"
     },
     "server-version/frontend/src/school/school-workspace.css": {
       "before": "4dd3a2a7188c182bf5d1a32e3a6d549e96a3aa48",
@@ -1781,10 +1781,10 @@
               },
               {
                 "path": "server-version/frontend/src/components/education-tools/EducationMaterials.test.tsx",
-                "blob": "68378d194a04996211e4479332a1081b7641049c"
+                "blob": "2e551ac8b0e91f05fcfb2031a2f93e4abb7ba915"
               }
             ],
-            "sha256": "534ee2dc76157c91607112ff331613843fbee2655bd1429c981c4a65516489a8"
+            "sha256": "fc5611799457a7fddc5e9f87ca564fa8f5f26d33c26685b5766d51df080d681e"
           }
         },
         {
