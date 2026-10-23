@@ -1,0 +1,6 @@
+/* Training admin startup only; no global theme or authorization changes. */
+html[data-training-entry="true"] { color-scheme:light;background:#f5f3ed;color:#263d32; }
+html[data-training-entry="true"][data-training-theme="dark"] { color-scheme:dark;background:#15231f;color:#e9eee2; }
+html[data-training-entry="true"] body { margin:0;background:inherit;color:inherit; }
+html[data-training-entry="true"] #root { min-height:100dvh;background:inherit;color:inherit; }
+.training-entry-loading { margin:0;padding:32px;font:14px/1.8 system-ui,sans-serif;color:inherit;background:transparent; }

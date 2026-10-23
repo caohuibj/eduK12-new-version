@@ -1,3 +1,4 @@
+import {isTrainingAdminPath} from './trainingPages'
 import {useState} from 'react'
 import {Link,useLocation} from 'react-router-dom'
 import {QRCodeSVG} from 'qrcode.react'
@@ -21,7 +22,7 @@ function AdminKeyEnrollment(){
   const location=useLocation(),origins=productOrigins()
   const {mode}=useSurveyAppearance()
   const surveyEntry=Boolean(origins&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH)
-  const trainingEntry=new URLSearchParams(location.search).get('returnTo')==='/admin/training'
+  const trainingEntry=isTrainingAdminPath(new URLSearchParams(location.search).get('returnTo')??'')
   const homeOrigin=new URL(origins?.admin??window.location.origin)
   if(import.meta.env.DEV&&['localhost','127.0.0.1'].includes(homeOrigin.hostname))homeOrigin.hostname='training.localhost'
   const trainingHome=homeOrigin.origin+'/'

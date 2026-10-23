@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
-import React, { useEffect, useState } from 'react'
-import { AlertCircle, Calendar, CheckCircle, Clock, Search, Users } from 'lucide-react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
+import { AlertCircle, Calendar, CheckCircle, Clock, Search, Users, SlidersHorizontal, ChevronDown } from 'lucide-react'
 import apiClient from '../api/client'
 import { PageHeader } from '../components/product-ui/PageHeader'
 import { ProductPage } from '../components/product-ui/ProductPage'
@@ -9,64 +9,70 @@ import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 
 type UserTab = 'TEACHER' | 'STUDENT' | 'PARENT'
 
-const UserList: React.FC = () => {
-  const { feedback, info } = useStaffFeedback()
+const UserList: React.FC<{training?:boolean}> = ({training=false}) => {
+  const { feedback, info,confirm,success:notifySuccess,error:notifyError } = useStaffFeedback({dialogClassName:training?'training-accounts-dialog':undefined})
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const [activeTab, setActiveTab] = useState<UserTab>('TEACHER')
   const [users, setUsers] = useState<User[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [searchKeyword, setSearchKeyword] = useState('')
+  const [filtersOpen,setFiltersOpen]=useState(false)
   const [extendingUser, setExtendingUser] = useState<string | null>(null)
+  const [approvingUser,setApprovingUser]=useState<string|null>(null)
+  const [query,setQuery]=useState(''),[page,setPage]=useState(1),[total,setTotal]=useState(0)
+  const requestId=useRef(0)
+  const serverRole=training?activeTab:undefined
 
-  useEffect(() => {
-    void fetchUsers()
-  }, [])
 
-  const fetchUsers = async () => {
+  const fetchUsers = useCallback(async () => {
+    const id=++requestId.current
     try {
-      setLoading(true)
-      setError(null)
-      const response = await apiClient.get('/users')
-      if (response.code === 0) {
-        setUsers(response.data.list)
-      } else {
-        setError(response.message || '获取用户列表失败')
-      }
-    } catch (fetchError) {
-      console.error('获取用户列表失败:', fetchError)
-      setError((fetchError as { message?: string }).message || '获取用户列表失败')
-    } finally {
-      setLoading(false)
-    }
-  }
+      setLoading(true);setError(null)
+      const response=training
+        ?await apiClient.get('/users',{params:{role:serverRole,keyword:query||undefined,page,pageSize:20}})
+        :await apiClient.get('/users')
+      if(id!==requestId.current)return
+      if(response.code===0){setUsers(response.data.list);setTotal(response.data.total??response.data.list.length)}
+      else setError(response.message||'获取账号列表失败')
+    }catch(fetchError){
+      if(id===requestId.current)setError((fetchError as {message?:string}).message||'获取账号列表失败')
+    }finally{if(id===requestId.current)setLoading(false)}
+  },[training,serverRole,query,page])
+  useEffect(()=>{const sequence=requestId;void fetchUsers();return()=>{sequence.current++}},[fetchUsers])
 
   const handleApprove = async (userId: string) => {
+    if(approvingUser)return
+    const target=users.find(user=>user.id===userId)
+    if(training&&!await confirm({title:'确认通过培训师审核',body:`请确认 ${target?.nickname||target?.username||'该账号'} 的培训师资格已核实。通过后，该账号将获得现有培训师业务权限。`,confirmLabel:'确认通过'}))return
+    setApprovingUser(userId)
     try {
-      const response = await apiClient.post(`/users/${userId}/approve-teacher`)
-      if (response.code === 0) {
-        showMessage('已通过该教师的注册审核')
-        void fetchUsers()
-      } else {
-        showMessage(response.message || '审核失败')
-      }
-    } catch (operationError: any) {
-      showMessage(operationError.message || '审核失败')
-    }
+      const response=await apiClient.post(`/users/${userId}/approve-teacher`)
+      if(response.code!==0)throw new Error(response.message||'审核失败')
+      if(training)notifySuccess('审核已通过','该培训师账号已通过注册审核。')
+      else showMessage('已通过该教师的注册审核')
+      await fetchUsers()
+    }catch(operationError){
+      const message=(operationError as {message?:string}).message||'审核失败'
+      if(training)notifyError('审核未完成',message);else showMessage(message)
+    }finally{setApprovingUser(null)}
   }
 
   const handleExtend = async (userId: string, months: number = 12) => {
+    if(extendingUser)return
+    const target=users.find(user=>user.id===userId)
+    if(training&&!await confirm({title:'确认延长账号有效期',body:`将 ${target?.nickname||target?.username||'该账号'} 的有效期延长 ${months} 个月。`,confirmLabel:'确认延期'}))return
     try {
       setExtendingUser(userId)
       const response = await apiClient.post('/auth/extend-account', { userId, months })
       if (response.code === 0) {
-        showMessage(`账号已成功延期${months}个月`)
-        void fetchUsers()
+        if(training)notifySuccess('延期已完成',`账号有效期已延长 ${months} 个月。`);else showMessage(`账号已成功延期${months}个月`)
+        await fetchUsers()
       } else {
-        showMessage(response.message || '延期失败')
+        if(training)notifyError('延期未完成',response.message||'延期失败');else showMessage(response.message || '延期失败')
       }
     } catch (operationError: any) {
-      showMessage(operationError.message || '延期失败')
+      if(training)notifyError('延期未完成',operationError.message||'延期失败');else showMessage(operationError.message || '延期失败')
     } finally {
       setExtendingUser(null)
     }
@@ -106,6 +112,46 @@ const UserList: React.FC = () => {
   const teacherCount = users.filter(user => user.role === 'TEACHER').length
   const studentCount = users.filter(user => user.role === 'STUDENT').length
   const parentCount = users.filter(user => user.role === 'PARENT').length
+
+  if(training){
+    const status=(user:User)=>user.role==='TEACHER'&&user.teacherApproved===false?{label:'待审核',tone:'pending'}:user.isFrozen?{label:'已冻结',tone:'muted'}:user.isActive?{label:'正常',tone:'active'}:{label:'已禁用',tone:'muted'}
+    const pages=Math.max(1,Math.ceil(total/20)),busy=Boolean(approvingUser||extendingUser)
+    return <section className="training-accounts training-account-list" aria-label="账号列表与审核">
+      {feedback}
+      <div className="training-account-list-toolbar">
+        <div className="training-accounts-role" role="group" aria-label="账号身份">
+          {(['TEACHER','STUDENT'] as const).map(role=><button key={role} type="button" aria-pressed={activeTab===role} disabled={busy} onClick={()=>{setActiveTab(role);setPage(1)}}>{role==='TEACHER'?'培训师':'学员'}</button>)}
+        </div>
+        <span className="training-account-list-count">共 {total} 个账号</span>
+        <button type="button" className="training-accounts-secondary training-account-filter-toggle" disabled={busy} aria-expanded={filtersOpen} aria-controls="training-account-filters" onClick={()=>setFiltersOpen(value=>!value)}><SlidersHorizontal size={16} aria-hidden="true"/>{filtersOpen?'收起检索':'账号检索'}<ChevronDown size={15} aria-hidden="true"/></button>
+        <button type="button" className="training-accounts-secondary" disabled={loading||busy} onClick={()=>void fetchUsers()}>刷新列表</button>
+      </div>
+      {filtersOpen&&<section id="training-account-filters" aria-label="账号检索"><form className="training-accounts-search" onSubmit={event=>{event.preventDefault();setPage(1);setQuery(searchKeyword.trim());setFiltersOpen(false)}}>
+        <label><span>搜索账号</span><span className="training-accounts-search-input"><Search size={17} aria-hidden="true"/><input type="search" disabled={busy} value={searchKeyword} maxLength={200} onChange={event=>setSearchKeyword(event.target.value)} placeholder="输入账号或姓名"/></span></label>
+        <button type="submit" disabled={busy} className="training-accounts-primary">查询</button>
+        <button type="button" disabled={busy} className="training-accounts-secondary" onClick={()=>{setSearchKeyword('');setQuery('');setPage(1)}}>重置</button>
+      </form></section>}
+      {query&&<div className="training-supervision-filter-summary"><span>关键词：{query}</span><button type="button" disabled={busy} onClick={()=>{setSearchKeyword('');setQuery('');setPage(1)}}>清除筛选</button></div>}
+      {error&&<div className="training-accounts-error" role="alert"><span>{error}</span><button type="button" onClick={()=>void fetchUsers()}>重新加载</button></div>}
+      {loading?<p className="training-accounts-empty" role="status">正在加载账号列表…</p>:error?null:users.length===0?<div className="training-accounts-empty"><Users size={32} aria-hidden="true"/><h3>{query?'未找到匹配账号':'暂无'+(activeTab==='TEACHER'?'培训师':'学员')+'账号'}</h3><p>{query?'试试其他账号或姓名，或重置搜索条件。':'新注册账号会显示在这里。'}</p></div>:<>
+        <div className="training-accounts-table-wrap training-account-list-wrap" role="region" aria-label="账号列表" tabIndex={0}>
+          <table className="training-accounts-table training-account-list-table"><thead><tr><th>账号与姓名</th><th>状态</th>{activeTab==='TEACHER'&&<th>有效期</th>}<th>注册时间</th><th>账号 ID</th>{activeTab==='TEACHER'&&<th className="training-accounts-actions-cell">管理操作</th>}</tr></thead>
+          <tbody>{users.map(user=>{const state=status(user),name=user.nickname||user.username;return <tr key={user.id}>
+            <td data-label="账号与姓名"><strong>{user.username}</strong><small>{user.nickname||'未填写姓名'}</small></td>
+            <td data-label="账号状态"><span className={'training-accounts-status training-accounts-status--'+state.tone}>{state.label}</span></td>
+            {activeTab==='TEACHER'&&<td data-label="有效期"><span className={isExpired(user.expiresAt)?'training-accounts-expired':undefined}>{formatDate(user.expiresAt)}</span>{isExpired(user.expiresAt)&&<small className="training-accounts-expired">已过期</small>}</td>}
+            <td data-label="注册时间">{user.createdAt?new Date(user.createdAt).toLocaleDateString('zh-CN'):'—'}</td>
+            <td data-label="账号 ID" className="training-account-id-cell"><div className="training-account-id-value"><code>{user.id}</code><button type="button" onClick={()=>void copyUserId(user.id)} aria-label={`复制 ${name} 的用户 ID`}>复制 ID</button></div></td>
+            {activeTab==='TEACHER'&&<td data-label="管理操作" className="training-accounts-actions-cell"><details className="training-account-actions"><summary>管理操作<ChevronDown size={15} aria-hidden="true"/></summary><div className="training-account-actions-buttons">
+              {user.teacherApproved===false&&<button type="button" className="training-accounts-primary" disabled={Boolean(approvingUser||extendingUser)} aria-label={`通过培训师 ${name} 的注册审核`} onClick={()=>void handleApprove(user.id)}>{approvingUser===user.id?'正在审核…':'通过审核'}</button>}
+              {user.expiresAt?<button type="button" className="training-accounts-secondary" disabled={Boolean(approvingUser||extendingUser)} aria-label={`将培训师 ${name} 的账号延期 1 年`} onClick={()=>void handleExtend(user.id,12)}>{extendingUser===user.id?'正在延期…':'延期 1 年'}</button>:<span className="training-accounts-permanent">永久有效，无需延期</span>}
+            </div></details></td>}
+          </tr>})}</tbody></table>
+        </div>
+        <div className="training-accounts-pagination"><p>共 {total} 个{activeTab==='TEACHER'?'培训师':'学员'}账号 · 第 {page} / {pages} 页</p><div><button type="button" disabled={page<=1||busy} onClick={()=>setPage(current=>current-1)}>上一页</button><button type="button" disabled={page>=pages||busy} onClick={()=>setPage(current=>current+1)}>下一页</button></div></div>
+      </>}
+    </section>
+  }
 
   return (
     <ProductPage width="management" className="space-y-6">

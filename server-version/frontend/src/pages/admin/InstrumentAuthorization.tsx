@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react'
+import TrainingResourceActions from '../../training/TrainingResourceActions'
+import React, { useEffect, useState, useRef } from 'react'
 import {
   instrumentAuthorizationApi,
   type InstrumentAuthorizationRow,
@@ -28,7 +29,11 @@ const emptyForm = () => ({
   basis: '',
 })
 
-const InstrumentAuthorizationPage: React.FC = () => {
+const InstrumentAuthorizationPage: React.FC<{training?:boolean}> = ({training=false}) => {
+  const [showDraft,setShowDraft]=useState(!training)
+  const [keyword,setKeyword]=useState('')
+  const [busy,setBusy]=useState(false)
+  const pending=useRef(false)
   const [list, setList] = useState<InstrumentAuthorizationRow[]>([])
   const [error, setError] = useState<string | null>(null)
   const [declaration, setDeclaration] = useState('')
@@ -55,6 +60,8 @@ const InstrumentAuthorizationPage: React.FC = () => {
   }, [])
 
   const createDraft = async () => {
+    if(pending.current)return
+    pending.current=true;setBusy(true)
     try {
       setError(null)
       if (!form.instrumentKey.trim() || !form.instrumentVersion.trim()) {
@@ -89,10 +96,12 @@ const InstrumentAuthorizationPage: React.FC = () => {
       await reload()
     } catch (operationError) {
       setError((operationError as { message?: string }).message || '创建失败')
-    }
+    } finally {pending.current=false;setBusy(false)}
   }
 
   const approve = async (row: InstrumentAuthorizationRow) => {
+    if(pending.current)return
+    pending.current=true;setBusy(true)
     try {
       setError(null)
       const response = await instrumentAuthorizationApi.approve(row.authorizationId, declaration)
@@ -101,10 +110,12 @@ const InstrumentAuthorizationPage: React.FC = () => {
       await reload()
     } catch (operationError) {
       setError((operationError as { message?: string }).message || '批准失败')
-    }
+    } finally {pending.current=false;setBusy(false)}
   }
 
   const runPublishPreview = async () => {
+    if(pending.current)return
+    pending.current=true;setBusy(true)
     try {
       setError(null)
       if (!form.instrumentKey.trim() || !form.instrumentVersion.trim()) throw new Error('请先填写 instrumentKey 与 instrumentVersion')
@@ -128,7 +139,7 @@ const InstrumentAuthorizationPage: React.FC = () => {
       )
     } catch (operationError) {
       setError((operationError as { message?: string }).message || '预览失败')
-    }
+    } finally {pending.current=false;setBusy(false)}
   }
 
   const textField = (label: string, key: keyof ReturnType<typeof emptyForm>) => (
@@ -136,6 +147,7 @@ const InstrumentAuthorizationPage: React.FC = () => {
       <span className="mb-1 block font-medium">{label}</span>
       <input
         className="input w-full"
+        disabled={busy}
         value={String(form[key] ?? '')}
         onChange={event => setForm({ ...form, [key]: event.target.value })}
         placeholder={label}
@@ -143,11 +155,32 @@ const InstrumentAuthorizationPage: React.FC = () => {
     </label>
   )
 
+  const publishControls=(<>        <div className="flex flex-wrap items-center justify-between gap-3">
+
+          <button type="button" className="hui-button hui-button--secondary" disabled={busy} onClick={() => void runPublishPreview()}>{training?'预览发布条件':'Scale Publish 预览'}</button>
+        </div>
+
+        {!training&&<label className="block max-w-2xl text-sm text-gray-700">
+          <span className="mb-1 block font-medium">自批确认声明</span>
+          <input
+            className="input w-full"
+            disabled={busy}
+            value={declaration}
+            onChange={event => setDeclaration(event.target.value)}
+            placeholder="同一管理员批准时必填"
+          />
+        </label>}
+
+        {preview && (
+          <pre className="overflow-x-auto whitespace-pre-wrap rounded border bg-gray-50 p-3 text-sm" aria-label="Publish gate 预览结果">{preview}</pre>
+        )}</>)
+
   return (
-    <ProductPage width="management" className="space-y-6">
+    <ProductPage width="management" className={training?"training-inline-rights space-y-6":"space-y-6"}>
       <PageHeader
-        title="测评内容授权"
-        description="授权记录与动态 Publish 校验（科学/权利/语言/报告/安全/golden）。同一管理员可自批，但必须填写确认声明。EXPIRED/REVOKED/SCOPE_MISMATCH 会将目录置 HOLD 并停止新建。表单默认空白，不预填任何法律事实。"
+        title={training?"内容权利授权":"测评内容授权"}
+        headingLevel={training?2:1}
+        description={training?undefined:"授权记录与动态 Publish 校验（科学/权利/语言/报告/安全/golden）。同一管理员可自批，但必须填写确认声明。EXPIRED/REVOKED/SCOPE_MISMATCH 会将目录置 HOLD 并停止新建。表单默认空白，不预填任何法律事实。"}
       />
 
       {error && (
@@ -159,7 +192,8 @@ const InstrumentAuthorizationPage: React.FC = () => {
         </div>
       )}
 
-      <section className="staff-panel staff-panel--padded space-y-4" aria-labelledby="authorization-draft-title">
+      {training&&<button type="button" className="training-accounts-secondary" disabled={busy} aria-expanded={showDraft} onClick={()=>setShowDraft(value=>!value)}>{showDraft?'收起草稿表单':'新建授权草稿'}</button>}
+      {showDraft&&<section className="staff-panel staff-panel--padded space-y-4" aria-labelledby="authorization-draft-title">
         <h2 id="authorization-draft-title" className="text-lg font-semibold">新建授权草稿</h2>
         <div className="grid gap-4 md:grid-cols-2">
           {textField('Instrument key（非法律身份）', 'instrumentKey')}
@@ -170,6 +204,7 @@ const InstrumentAuthorizationPage: React.FC = () => {
             <span className="mb-1 block font-medium">商业性质</span>
             <select
               className="input w-full"
+              disabled={busy}
               value={form.commercialNature}
               onChange={event => setForm({ ...form, commercialNature: event.target.value as typeof form.commercialNature })}
             >
@@ -197,6 +232,7 @@ const InstrumentAuthorizationPage: React.FC = () => {
               <label key={key} className="flex items-center gap-2 text-sm text-gray-700">
                 <input
                   type="checkbox"
+                  disabled={busy}
                   checked={Boolean(form[key])}
                   onChange={event => setForm({ ...form, [key]: event.target.checked })}
                 />
@@ -206,60 +242,45 @@ const InstrumentAuthorizationPage: React.FC = () => {
           </div>
         </fieldset>
 
-        <button type="button" className="hui-button hui-button--primary" onClick={() => void createDraft()}>创建授权草稿</button>
-      </section>
+        <button type="button" className="hui-button hui-button--primary" disabled={busy} onClick={() => void createDraft()}>创建授权草稿</button>
+      </section>}
 
       <section className="staff-panel staff-panel--padded space-y-4" aria-labelledby="authorization-gates-title">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h2 id="authorization-gates-title" className="text-lg font-semibold">Publish gate 预览与批准</h2>
-          <button type="button" className="hui-button hui-button--secondary" onClick={() => void runPublishPreview()}>Scale Publish 预览</button>
-        </div>
-
-        <label className="block max-w-2xl text-sm text-gray-700">
-          <span className="mb-1 block font-medium">自批确认声明</span>
-          <input
-            className="input w-full"
-            value={declaration}
-            onChange={event => setDeclaration(event.target.value)}
-            placeholder="同一管理员批准时必填"
-          />
-        </label>
-
-        {preview && (
-          <pre className="overflow-x-auto whitespace-pre-wrap rounded border bg-gray-50 p-3 text-sm" aria-label="Publish gate 预览结果">{preview}</pre>
-        )}
+        {training&&<details className="training-resource-search"><summary>权利检索<span>{keyword?"关键词："+keyword:"按标识、版本或状态查找"}</span></summary><label className="training-rights-search">搜索权利记录<input type="search" value={keyword} disabled={busy} onChange={event=>setKeyword(event.target.value)} placeholder="测评标识、版本或状态"/></label>{keyword&&<button type="button" disabled={busy} className="training-accounts-secondary" onClick={()=>setKeyword('')}>清除筛选</button>}</details>}
+        <h2 id="authorization-gates-title" className="text-lg font-semibold">{training?'内容权利记录':'Publish gate 预览与批准'}</h2>
+        {training?<TrainingResourceActions label="发布条件预览">{publishControls}</TrainingResourceActions>:publishControls}
 
         {loading ? (
           <p role="status" aria-live="polite">加载中…</p>
         ) : list.length === 0 ? (
           <div className="rounded-lg border border-dashed p-8 text-center text-gray-500">暂无授权记录。</div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="min-w-full text-sm">
+          <div className={training?"training-resource-list-wrap":"overflow-x-auto"}>
+            <table className={training?"min-w-full text-sm training-resource-record-table":"min-w-full text-sm"}>
               <thead>
                 <tr className="border-b text-left">
-                  <th className="py-2 pr-4">Instrument</th>
-                  <th className="pr-4">Version</th>
-                  <th className="pr-4">Status</th>
-                  <th className="pr-4">Commercial</th>
-                  <th className="pr-4">Auth Ver</th>
+                  <th className="py-2 pr-4">{training?'测评标识':'Instrument'}</th>
+                  <th className="pr-4">{training?'内容版本':'Version'}</th>
+                  <th className="pr-4">{training?'状态':'Status'}</th>
+                  <th className="pr-4">{training?'商业性质':'Commercial'}</th>
+                  <th className="pr-4">{training?'授权版本':'Auth Ver'}</th>
                   <th className="text-right">操作</th>
                 </tr>
               </thead>
               <tbody>
-                {list.map(row => (
+                {list.filter(row=>!training||[row.instrumentKey,row.instrumentVersion,row.status].some(value=>String(value||'').toLocaleLowerCase().includes(keyword.toLocaleLowerCase()))).map(row => (
                   <tr key={`${row.authorizationId}@${row.version}`} className="border-b">
-                    <td className="py-3 pr-4">{row.instrumentKey}</td>
-                    <td className="pr-4">{row.instrumentVersion}</td>
-                    <td className="pr-4">{row.status}</td>
-                    <td className="pr-4">{row.scope?.commercialNature}</td>
-                    <td className="pr-4">v{row.version}</td>
-                    <td className="py-2 text-right">
-                      {(row.status === 'DRAFT' || row.status === 'EVIDENCE_PENDING') && (
+                    <td data-label="测评标识" className="py-3 pr-4">{row.instrumentKey}</td>
+                    <td data-label="内容版本" className="pr-4">{row.instrumentVersion}</td>
+                    <td data-label="状态" className="pr-4">{row.status}</td>
+                    <td data-label="商业性质" className="pr-4">{row.scope?.commercialNature}</td>
+                    <td data-label="授权版本" className="pr-4">v{row.version}</td>
+                    <td data-label="管理操作" className="py-2 text-right training-resource-action-cell">
+                      {training&&(row.status==='DRAFT'||row.status==='EVIDENCE_PENDING')?<TrainingResourceActions label="批准管理"><label className="training-rights-declaration">自批确认声明<input className="input w-full" value={declaration} disabled={busy} onChange={event=>setDeclaration(event.target.value)} placeholder="同一管理员批准时必填"/></label><button type="button" className="hui-button hui-button--secondary" disabled={busy} onClick={()=>void approve(row)} aria-label={`批准 ${row.instrumentKey} ${row.instrumentVersion} 授权版本 ${row.version}`}>批准</button></TrainingResourceActions>:!training&&(row.status === 'DRAFT' || row.status === 'EVIDENCE_PENDING') && (
                         <button
                           type="button"
                           className="hui-button hui-button--secondary"
-                          onClick={() => void approve(row)}
+                          disabled={busy} onClick={() => void approve(row)}
                           aria-label={`批准 ${row.instrumentKey} ${row.instrumentVersion} 授权版本 ${row.version}`}
                         >
                           批准

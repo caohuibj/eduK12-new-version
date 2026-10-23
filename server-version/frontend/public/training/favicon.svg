@@ -1,39 +1,10 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" role="img" aria-label="Training"><title>Training</title><rect width="640" height="640" rx="136" fill="#f7f3e7"/><g transform="translate(-28 120)"><g xmlns="http://www.w3.org/2000/svg" transform="translate(0 33)">
-    <defs>
-      <linearGradient id="sun" x1="465" y1="22" x2="465" y2="158" gradientUnits="userSpaceOnUse">
-        <stop stop-color="#e98159" />
-        <stop offset="1" stop-color="#edb89b" stop-opacity=".3" />
-      </linearGradient>
-      <linearGradient id="far" x1="337" y1="15" x2="337" y2="287" gradientUnits="userSpaceOnUse">
-        <stop stop-color="#24594c" />
-        <stop offset=".65" stop-color="#6f9a87" />
-        <stop offset="1" stop-color="#d7dfce" stop-opacity=".2" />
-      </linearGradient>
-      <linearGradient id="left" x1="222" y1="62" x2="222" y2="274" gradientUnits="userSpaceOnUse">
-        <stop stop-color="#134d40" />
-        <stop offset=".6" stop-color="#4d806b" />
-        <stop offset="1" stop-color="#b9cbb7" stop-opacity=".65" />
-      </linearGradient>
-      <linearGradient id="right" x1="492" y1="120" x2="492" y2="276" gradientUnits="userSpaceOnUse">
-        <stop stop-color="#225a48" />
-        <stop offset="1" stop-color="#a4bdaa" stop-opacity=".7" />
-      </linearGradient>
-      <linearGradient id="near" x1="325" y1="156" x2="325" y2="320" gradientUnits="userSpaceOnUse">
-        <stop stop-color="#0d4435" />
-        <stop offset=".65" stop-color="#215b46" />
-        <stop offset="1" stop-color="#739881" stop-opacity=".55" />
-      </linearGradient>
-    </defs>
-    <circle cx="468" cy="84" r="62" fill="url(#sun)" />
-    <path d="M79 253 241 109 268 117 313 25Q332-1 350 25L398 109 420 103 459 155 484 156 590 257Q464 298 331 316 208 297 79 253Z" fill="url(#far)" />
-    <path d="M24 256Q63 237 84 208L199 75Q220 44 239 73L276 131 293 146 370 269Q193 283 24 256Z" fill="url(#left)" />
-    <path d="M380 237 473 142Q491 111 507 125L596 222Q612 244 642 259L468 285Z" fill="url(#right)" />
-    <path d="M60 250 134 184Q147 168 155 177L170 195 208 156Q229 130 248 159L288 200 327 167Q343 151 360 175L404 212 438 183Q453 170 466 192L482 216 511 191Q524 172 539 198L588 253 499 291 363 317 199 300Z" fill="url(#near)" />
-    <path d="M17 260Q145 203 239 262L326 298 412 263Q507 204 644 260L646 279Q518 253 469 310L409 317 329 302 247 317 188 310Q136 252 17 279Z" fill="#0e4939" />
-    <g stroke="#f7f3e7" stroke-width="7" stroke-linecap="round">
-      <path d="M20 260Q137 208 223 257L263 279M20 273Q134 226 214 267L253 289" />
-      <path d="M443 258Q526 209 640 260M451 269Q528 228 640 273" />
-    </g>
-    <path d="M190 302C227 276 246 225 257 175L269 130Q274 112 287 112 302 112 301 129L298 173Q297 188 312 188H348Q363 188 362 173L359 129Q358 112 373 112 386 112 391 130L403 175C414 225 433 276 470 302Q438 312 406 309 387 307 382 290L367 231Q363 214 348 214H312Q297 214 293 231L278 290Q273 307 254 309 222 312 190 302Z" fill="#f7f3e7" />
-  </g>
-  </g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Training</title>
+  <style>
+    .mountain { fill: #315f49; }
+    @media (prefers-color-scheme: dark) { .mountain { fill: #accbb4; } }
+  </style>
+  <circle cx="49" cy="15" r="8" fill="#e49a72"/>
+  <!-- The H is a transparent cutout; no background tile or embedded bitmap. -->
+  <path class="mountain" fill-rule="evenodd" d="M3 55 16 30Q18 26 21 30L24 35 31 14Q33 10 35 14L44 34 48 27Q50 23 53 28L61 55Q47 61 33 57 18 61 3 55ZM23 54 28 29Q29 25 31 27L30 38H36L35 28Q35 25 38 27L43 54H36L34 44H30L28 54Z"/>
+</svg>

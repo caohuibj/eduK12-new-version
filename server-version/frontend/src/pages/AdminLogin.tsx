@@ -1,3 +1,4 @@
+import {isTrainingAdminPath} from '../admin/trainingPages'
 import SurveyAdminOrigin from '../components/app-shell/SurveyAdminOrigin'
 import { productOrigins, SURVEY_ADMIN_PATH } from '../products/origins'
 import SurveyAdminEntryShell from '../survey/SurveyAdminEntryShell'
@@ -23,7 +24,7 @@ const AdminLogin: React.FC = () => {
   const { mode } = useSurveyAppearance()
   const origins=productOrigins()
   const surveyEntry=Boolean(origins&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH)
-  const trainingEntry=new URLSearchParams(location.search).get('returnTo')==='/admin/training'
+  const trainingEntry=isTrainingAdminPath(new URLSearchParams(location.search).get('returnTo')??'')
   const homeOrigin=new URL(origins?.admin??window.location.origin)
   if(import.meta.env.DEV&&['localhost','127.0.0.1'].includes(homeOrigin.hostname))homeOrigin.hostname='training.localhost'
   const trainingHome=homeOrigin.origin+'/'
