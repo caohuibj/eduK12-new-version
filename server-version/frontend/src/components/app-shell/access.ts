@@ -48,7 +48,8 @@ export function returnAfterLogin(value: string | null | undefined, role: Role, a
   if (isAuthPath(pathname)) return fallback
   const organizationTarget = inRoot(pathname, 'organizations') || inRoot(pathname, 'organization-tasks') || inRoot(pathname, 'my-assessments')
   const participantScaleTarget = /^\/student\/scales\/(?:result\/)?[^/]+$/.test(pathname)
-  const allowed = participantScaleTarget || inRoot(pathname, 'scale-library') || organizationTarget || (role === 'PARENT'
+  const trainingWorkspaceTarget = role === 'TEACHER' && ['toolkit', 'media-library'].some(root => inRoot(pathname, root))
+  const allowed = trainingWorkspaceTarget || participantScaleTarget || inRoot(pathname, 'scale-library') || organizationTarget || (role === 'PARENT'
     ? inRoot(pathname, 'parent') || inRoot(pathname, 'relational')
     : inRoot(pathname, 'scale-library') || (role === 'STUDENT' ? inRoot(pathname, 'student') || inRoot(pathname, 'relational')
       : staffRoots.some((root) => inRoot(pathname, root)) || inRoot(pathname, 'teacher/classrooms') || (role === 'TEACHER' && inRoot(pathname, 'relational')) || (role === 'ADMIN' && adminRoots.some((root) => inRoot(pathname, root)))))

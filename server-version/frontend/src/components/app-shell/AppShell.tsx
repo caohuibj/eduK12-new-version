@@ -19,6 +19,7 @@ import { isTrainingHost, trainingNavigation } from '../../training/context'
 import { TrainingAppearanceProvider } from '../../training/TrainingAppearance'
 import { useTrainingAppearance } from '../../training/appearanceContext'
 import TrainingBrand from '../../training/TrainingBrand'
+import TrainingAppearanceControl from '../../training/TrainingAppearanceControl'
 import TrainingWorkspaceTabs from '../../training/TrainingWorkspaceTabs'
 import TrainingContextBack from '../../training/TrainingContextBack'
 import { TrainingLearnerNavigationBoundary } from '../../training/TrainingLearnerNavigationBoundary'
@@ -57,14 +58,15 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const trainingAdmin = user?.role === 'ADMIN' && (location.pathname === '/admin/training' || new URLSearchParams(location.search).get('workspace') === 'training')
   const organizationProductRoute=location.pathname==='/organizations'||location.pathname.startsWith('/organizations/')||(location.pathname==='/organization-tasks'||location.pathname==='/my-assessments')
   const organizationWorkspaceRoute=location.pathname.startsWith('/organizations/')
-  const desiredMode=shellModeFor(location.pathname), guestClassroom=location.pathname.startsWith('/student/classroom/')&&user?.role!=='STUDENT'
+  const trainingOverview=training&&(location.pathname==='/contact'||/^\/features\/[^/]+\/?$/.test(location.pathname))
+  const desiredMode=trainingOverview?'public':shellModeFor(location.pathname), guestClassroom=location.pathname.startsWith('/student/classroom/')&&user?.role!=='STUDENT'
   const mode=guestClassroom||(desiredMode==='standard'&&!user)?'public':desiredMode
   const roleClass=user?.role?` hui-app--${user.role.toLowerCase()}`:''
   const assessmentSurfaceClass=mode==='focused'?' hui-app--assessment-runner':''
   const reportSurfaceClass=/^\/student\/(?:scales\/result\/|questionnaires\/result\/|cognitive\/sessions\/[^/]+\/result|situational\/attempts\/[^/]+\/result|composite\/attempts\/[^/]+\/report)/.test(location.pathname)||/^\/relational\/attempts\/[^/]+\/report/.test(location.pathname)?' hui-app--report-surface':''
   const trainingAssessmentVisual = training && (mode === 'focused' || Boolean(reportSurfaceClass))
   const studentSubmitClass=/^\/student\/(?:assignments|checkins)\/[^/]+$/.test(location.pathname)?' hui-app--student-submit':''
-  const entryMode=location.pathname==='/'||isAuthPath(location.pathname)
+  const entryMode=location.pathname==='/'||isAuthPath(location.pathname)||trainingOverview
   const staffMode=mode==='standard'&&(adminWorkspace||user?.role==='ADMIN'||user?.role==='TEACHER'), staffWorkspace=staffMode&&!training&&isStaffWorkspacePath(location.pathname)
   const routeOrganizationId=matchPath('/organizations/:organizationId/*',location.pathname)?.params.organizationId
   const displayOrganization=!routeOrganizationId||routeOrganizationId==='new'||activeOrganization?.organization.id===routeOrganizationId?activeOrganization:null
@@ -100,6 +102,7 @@ function AppShellContent({ children }: { children: ReactNode }) {
       {trainingWorkspace&&user?.role==='TEACHER'&&<TrainingWorkspaceTabs/>}
       {mode==='standard'&&!trainingWorkspace&&<ProductButton ref={toggleRef} className="hui-menu-toggle" aria-expanded={menuOpen} aria-controls="hui-navigation" onKeyDown={e=>{if(e.key==='Escape')setOpenPath(null)}} onClick={()=>setOpenPath(menuOpen?null:location.pathname)}><PanelLeft size={18} aria-hidden="true"/>导航菜单</ProductButton>}
       <div className="hui-account">{isPublicAssessmentPath(location.pathname)?<span>公开参与</span>:user?(trainingWorkspace?<Link className="training-account-link" to={profilePath} title="个人账号设置" aria-label={`${identityLabel}，个人账号设置`} aria-current={location.pathname===profilePath?'page':undefined}><UserRound size={19} aria-hidden="true"/><span>{identityLabel}</span></Link>:<span>{identityLabel}</span>):<span>欢迎使用</span>}
+        {training&&!surveyAdmin&&mode==='standard'&&<TrainingAppearanceControl />}
         {!training&&user&&mode==='standard'&&(organizations.length>0||organizationsLoading)&&<label className="hui-organization-switch"><span>组织</span><select aria-label="当前组织" value={displayOrganization?.organization.id||''} disabled={organizationLoading||organizationsLoading} onChange={e=>{const id=e.target.value;if(!id)return;if(organizationWorkspaceRoute)navigate(`/organizations/${encodeURIComponent(id)}`);else void selectOrganization(id)}}><option value="" disabled>{organizationLoading||organizationsLoading?'正在加载…':'选择组织'}</option>{displayOrganization&&!organizations.some(i=>i.id===displayOrganization.organization.id)&&<option value={displayOrganization.organization.id}>{displayOrganization.organization.name}</option>}{organizations.map(o=><option key={o.id} value={o.id}>{o.name}{o.status==='SUSPENDED'?'（已暂停）':''}</option>)}</select></label>}
         {!training&&staffMode&&organizationTotal>organizations.length&&<Link to="/organizations">更多组织</Link>}
         {!training&&user&&mode==='standard'&&(organizationError||organizationListError)&&<button type="button" className="hui-context-retry" onClick={()=>{if(routeOrganizationId&&routeOrganizationId!=='new')void selectOrganization(routeOrganizationId);else void refreshOrganizations()}}>组织连接失败，重试</button>}

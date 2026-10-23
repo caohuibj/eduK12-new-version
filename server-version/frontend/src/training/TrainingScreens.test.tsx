@@ -15,6 +15,7 @@ import TrainingTrainerHome from './TrainingTrainerHome'
 const course = { id: 'course-1', title: '成长研修', description: '每周一课', isLibrary: false }
 
 beforeEach(() => {
+  vi.spyOn(window, 'scrollTo').mockImplementation(() => {})
   get.mockReset()
   post.mockReset()
   get.mockResolvedValue({ code: 0, data: { list: [course] } })
@@ -26,12 +27,13 @@ describe('training presentation and course-first entry', () => {
     render(<MemoryRouter initialEntries={['/?returnTo=%2Fstudent%2Fcourses%2Fcourse-1']}><TrainingPortal /></MemoryRouter>)
     expect(screen.getByRole('link', { name: '登录' })).toHaveAttribute('href', '/login?returnTo=%2Fstudent%2Fcourses%2Fcourse-1')
     expect(screen.getByRole('link', { name: '注册' })).toHaveAttribute('href', '/register?returnTo=%2Fstudent%2Fcourses%2Fcourse-1')
-    expect(screen.getAllByRole('link')).toHaveLength(2)
+    expect(screen.getByRole('navigation', { name: 'Training 入口导航' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: '联系我们' })).toHaveAttribute('href', '/contact')
     expect(screen.queryByRole('navigation', { name: '培训账号入口' })).toBeNull()
     expect(screen.queryByText('登录账号')).toBeNull()
     expect(screen.queryByText('注册账号')).toBeNull()
     expect(screen.getByRole('heading', { name: /以学习为径，.*见更远的天地。/ })).toBeInTheDocument()
-    expect(screen.getByRole('img', { name: 'Training @eduk12.top' })).toBeInTheDocument()
+    expect(screen.getByRole('img', { name: 'Training @EduK12.top' })).toBeInTheDocument()
     expect(screen.queryByText('我是学员')).toBeNull()
     expect(screen.queryByText('我是培训师')).toBeNull()
     expect(screen.queryByRole('link', { name: /管理员入口/ })).toBeNull()

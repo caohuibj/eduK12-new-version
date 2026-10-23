@@ -1,285 +1,200 @@
-/* Public training homepage: text surfaces retain the landscape underneath. */
+/* Training's public entrance keeps the landscape and uses its own theme tokens. */
 .hui-training .training-portal {
-  position: relative;
-  isolation: isolate;
-  box-sizing: border-box;
-  display: grid;
-  grid-template-rows: auto 1fr auto;
-  width: 100%;
-  min-height: 100dvh;
-  padding: clamp(18px, 2.7vh, 27px) clamp(24px, 4.5vw, 78px) 18px;
-  background: #faf8f3;
-  color: #1f4d3b;
+  --portal-glass: rgb(253 251 247 / 42%);
+  --portal-card: rgb(255 254 250 / 78%);
+  position: relative; display: block; isolation: isolate; width: 100%; min-height: 100dvh; padding: 0;
+  background: var(--training-paper); color: var(--training-ink);
 }
-.hui-training .training-portal::before,
-.hui-training .training-portal::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
+.hui-training .training-portal-intro {
+  position: relative; isolation: isolate; display: grid; grid-template-rows: auto 1fr;
+  min-height: min(850px, 100svh); padding: 24px clamp(24px, 5vw, 80px) 28px; background: #faf8f3;
 }
-.hui-training .training-portal::before {
-  z-index: -2;
-  background: url('./training-landscape-v2.webp') center / cover no-repeat;
-}
-.hui-training .training-portal::after {
-  z-index: -1;
-  background: linear-gradient(90deg, rgb(253 251 247 / 10%), transparent 80%);
-}
-.hui-training .training-portal-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-.hui-training .training-portal .training-home-brand {
-  padding: 6px 12px 6px 6px;
-  background: transparent;
-  border-radius: 12px;
-}
-.hui-training .training-portal-actions { display: flex; gap: 12px; }
+.hui-training .training-portal-intro::before,
+.hui-training .training-portal-intro::after { content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none; }
+.hui-training .training-portal-intro::before { background: url('./training-landscape-v2.webp') center / cover no-repeat; }
+.hui-training .training-portal-intro::after { background: linear-gradient(90deg, rgb(253 251 247 / 12%), transparent 75%), linear-gradient(0deg, rgb(250 248 243 / 28%), transparent 32%); }
+.hui-training .training-portal-header { display: flex; align-items: center; justify-content: space-between; gap: 24px; width: min(100%, 1200px); margin: 0 auto; }
+.hui-training .training-public-brand { display: inline-flex; flex: none; border-radius: 10px; }
+.hui-training .training-portal .training-home-brand { padding: 6px; background: transparent; border-radius: 12px; }
+.hui-training .training-portal-actions { display: flex; align-items: center; gap: 10px; margin-inline-start: 8px; }
 .hui-training .training-portal-login {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 9px;
-  min-width: 102px;
-  min-height: 44px;
-  padding: 0 18px;
-  border: 1px solid #36564c;
-  border-radius: 9px;
-  background: rgb(255 254 251 / 76%);
-  color: #1f4d3b;
-  font-family: inherit;
-  font-size: 15px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color .2s ease;
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  min-height: 44px; padding: 0 20px; border: 1px solid var(--training-border); border-radius: 9px;
+  background: var(--portal-card); color: var(--training-ink); font-family: inherit; font-size: 14px; font-weight: 600; line-height: 1.5; text-decoration: none;
+  transition: background-color .2s ease, transform .2s ease;
 }
-.hui-training .training-portal-login:hover { background: rgb(255 254 251 / 95%); }
-.hui-training .training-portal-main {
-  box-sizing: border-box;
-  width: min(100%, 1160px);
-  margin: auto;
-  padding: 54px 0;
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 480px);
-  gap: clamp(32px, 4vw, 64px);
-  align-items: center;
-}
-.hui-training .training-portal-copy {
-  min-width: 0;
-  padding: clamp(26px, 3vw, 40px);
-  border: 1px solid rgb(255 254 249 / 55%);
-  border-radius: 18px;
-  background: rgb(253 251 247 / 70%);
-  backdrop-filter: blur(5px);
-}
-.hui-training .training-eyebrow {
-  margin: 0;
-  color: #36594c;
-  font-family: 'PingFang SC', 'Microsoft YaHei', sans-serif;
-  font-size: 13px;
-  font-weight: 600;
-  letter-spacing: .24em;
-}
-.hui-training .training-portal-copy h1 {
-  margin: 20px 0 24px;
-  color: #1f4d3b;
-  font-family: var(--training-serif);
-  font-size: clamp(52px, 4.7vw, 72px);
-  font-weight: 600;
-  letter-spacing: .025em;
-  line-height: 1.28;
-}
-.hui-training .training-portal-description {
-  margin: 0;
-  color: #4e5953;
-  font-family: var(--training-serif);
-  font-size: clamp(17px, 1.3vw, 20px);
-  line-height: 1.8;
-  letter-spacing: .035em;
-}
-.hui-training .training-portal-accent {
-  display: block;
-  width: 40px;
-  height: 3px;
-  margin-top: 22px;
-  background: #e67c63;
-  border-radius: 3px;
-}
-.hui-training .training-role-cards {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-.hui-training .training-role-card {
-  box-sizing: border-box;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-width: 0;
-  min-height: 280px;
-  padding: 26px 14px;
-  border: 1px solid rgb(90 99 88 / 20%);
-  border-radius: 16px;
-  background: rgb(255 254 251 / 82%);
-  backdrop-filter: blur(5px);
-  color: #1f4d3b;
-  text-decoration: none;
-  box-shadow: 0 12px 30px rgb(30 54 43 / 6%);
-  transition: transform .2s ease, box-shadow .2s ease;
-}
-.hui-training .training-role-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 16px 36px rgb(30 54 43 / 12%);
-}
-.hui-training .training-role-icon {
-  width: 60px;
-  height: 60px;
-  display: grid;
-  place-items: center;
-  color: #294f40;
-  border-radius: 50%;
-  background: radial-gradient(circle, #e0e8e2 3%, rgb(238 241 236 / 0%) 73%);
-}
-.hui-training .training-role-icon svg { width: 42px; height: 42px; }
-.hui-training .training-role-card--trainer .training-role-icon {
-  color: #85533e;
-  background: radial-gradient(circle, #f0dcd1 4%, rgb(250 234 224 / 0%) 73%);
-}
-.hui-training .training-role-text { text-align: center; }
-.hui-training .training-role-card strong {
-  display: block;
-  margin-top: 14px;
-  font-family: var(--training-serif);
-  font-size: 26px;
-  font-weight: 700;
-  line-height: 1.4;
-  white-space: nowrap;
-}
-.hui-training .training-role-card small {
-  display: block;
-  margin-top: 7px;
-  color: #59665d;
-  font-size: 13px;
-  line-height: 1.6;
-}
-.hui-training .training-card-arrow {
-  display: grid;
-  place-items: center;
-  width: 44px;
-  height: 44px;
-  margin-top: 22px;
-  border-radius: 50%;
-  background: #1f4d3b;
-  color: #fff;
-}
-.hui-training .training-card-arrow svg { width: 24px; height: 24px; }
-.hui-training .training-role-card--trainer .training-card-arrow { background: #b76750; }
-.hui-training .training-portal-footer {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  border: 0;
-  padding: 0;
-  font-size: 11px;
-}
-.hui-training .training-portal-footer > span {
-  color: #365044;
-  background: rgb(253 251 247 / 78%);
-  padding: 6px 10px;
-  border-radius: 5px;
-}
-.hui-training .training-portal :is(a,button):focus-visible { outline: 3px solid #255242; outline-offset: 4px; }
-/* Preserve the primary login action on the unified entrance. */
-.hui-training .training-portal-login--primary {
-  border-color: #1f4d3b;
-  background: #1f4d3b;
-  color: #fffdf8;
-}
+.hui-training .training-portal-login:hover { background: var(--training-surface); }
+.hui-training .training-portal-login--primary { border-color: #1f4d3b; background: #1f4d3b; color: #fffdf8; }
 .hui-training .training-portal-login--primary:hover { background: #173d31; }
-.hui-training .training-role-cards { position: relative; padding-top: 36px; }
-.hui-training .training-role-mode {
-  grid-column: 1 / -1;
-  position: absolute;
-  top: 0;
-  left: 0;
-  margin: 0;
-  padding: 5px 10px;
-  border-radius: 5px;
-  background: rgb(253 251 247 / 80%);
-  color: #365044;
-  font-size: 12px;
-  letter-spacing: .08em;
+.hui-training .training-portal-main { display: grid; grid-template-columns: minmax(0, 630px) minmax(0, 1fr); align-items: center; gap: 50px; width: min(100%, 1160px); margin: 0 auto; padding: clamp(48px, 7vh, 84px) 0 68px; }
+.hui-training .training-portal-copy { min-width: 0; padding: clamp(30px, 3.3vw, 48px); border: 1px solid rgb(255 254 249 / 36%); border-radius: 22px 22px 64px 22px; background: var(--portal-glass); backdrop-filter: blur(1.5px); box-shadow: 0 16px 60px rgb(26 52 38 / 3%); }
+.hui-training .training-portal .training-eyebrow { margin: 0; color: #36594c; font-size: 12px; font-weight: 600; letter-spacing: .24em; }
+.hui-training .training-portal-copy h1 { margin: 23px 0 23px; color: #1f4d3b; font-family: var(--training-serif); font-size: clamp(44px, 4.6vw, 64px); font-weight: 600; letter-spacing: .025em; line-height: 1.35; text-wrap: balance; }
+.hui-training .training-portal-description { margin: 0; color: #4e5953; font-family: var(--training-serif); font-size: 19px; line-height: 1.9; letter-spacing: .035em; }
+.hui-training .training-portal-copy-contact { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; margin-top: 24px; color: var(--training-bamboo); font-size: 13px; text-decoration: none; }
+.hui-training .training-portal-copy-contact:hover { text-decoration: underline; text-underline-offset: 5px; }
+.hui-training .training-portal-overview { width: min(100% - 96px, 1160px); margin: 0 auto; }
+.hui-training .training-portal-section { padding-top: 100px; scroll-margin-top: 24px; }
+.hui-training .training-portal-section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 36px; margin-bottom: 38px; }
+.hui-training .training-portal-kicker { margin: 0 0 14px; color: var(--training-bamboo); font-size: 12px; font-weight: 600; letter-spacing: .18em; }
+.hui-training .training-portal h2 { margin: 0; font-family: var(--training-serif); font-size: clamp(30px, 2.7vw, 40px); font-weight: 600; line-height: 1.5; letter-spacing: .025em; }
+.hui-training .training-portal-section-heading > p { margin: 0 0 5px; color: var(--training-muted); font-size: 14px; line-height: 1.9; }
+.hui-training .training-feature-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+.hui-training .training-feature-card { display: flex; flex-direction: column; min-width: 0; min-height: 320px; padding: 27px 23px 20px; overflow: hidden; border: 1px solid var(--training-border); border-radius: 14px; background: var(--portal-card); color: var(--training-ink); text-decoration: none; transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
+.hui-training .training-feature-card:hover { transform: translateY(-4px); box-shadow: 0 15px 35px rgb(26 52 38 / 7%); }
+.hui-training .training-feature-top { display: flex; align-items: center; justify-content: space-between; gap: 18px; color: var(--training-bamboo); }
+.hui-training .training-feature-top > span { color: var(--training-muted); font-family: var(--training-serif); font-size: 13px; }
+.hui-training .training-feature-card h3 { margin: 32px 0 12px; font-family: var(--training-serif); font-size: 24px; font-weight: 600; letter-spacing: .02em; }
+.hui-training .training-feature-card > p { margin: 0; color: var(--training-muted); font-size: 14px; line-height: 1.9; }
+.hui-training .training-feature-tags { display: flex; flex-wrap: wrap; gap: 6px 10px; margin: 18px 0 26px; color: var(--training-muted); font-size: 11px; line-height: 1.7; }
+.hui-training .training-feature-tags > span { padding-bottom: 3px; border-bottom: 1px solid var(--training-border); }
+.hui-training .training-feature-more { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: auto; padding-top: 18px; border-top: 1px solid var(--training-border); color: var(--training-bamboo); font-size: 12px; }
+.hui-training .training-feature-more svg { transition: transform .2s ease; }
+.hui-training .training-feature-card:hover { border-color: var(--training-bamboo); }
+.hui-training .training-feature-card:hover .training-feature-more svg { transform: translateX(4px); }
+.hui-training .training-learning-path { padding-top: 110px; }
+.hui-training .training-learning-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 32px; padding: 34px 0 0; margin: 0; border-top: 1px solid var(--training-border); list-style: none; }
+.hui-training .training-learning-steps li { min-width: 0; }
+.hui-training .training-learning-number { display: inline-grid; place-items: center; width: 38px; height: 38px; border: 1px solid var(--training-border); border-radius: 50%; color: var(--training-bamboo); font-family: var(--training-serif); font-size: 13px; }
+.hui-training .training-learning-steps h3 { margin: 20px 0 10px; font-size: 17px; font-weight: 600; }
+.hui-training .training-learning-steps p { margin: 0; color: var(--training-muted); font-size: 13px; line-height: 1.9; }
+.hui-training .training-portal-start { display: flex; align-items: center; justify-content: space-between; gap: 40px; margin-top: 100px; padding: 44px 0; border-top: 1px solid var(--training-border); border-bottom: 1px solid var(--training-border); }
+.hui-training .training-portal-start h2 { font-size: clamp(27px, 2.4vw, 34px); }
+.hui-training .training-portal-start p:last-child { margin: 16px 0 0; color: var(--training-muted); font-size: 13px; line-height: 1.9; }
+.hui-training .training-portal-start-actions { display: flex; flex-direction: column; align-items: center; gap: 12px; flex: none; }
+.hui-training .training-portal-start-actions .training-portal-login { min-height: 48px; padding-inline: 24px; }
+.hui-training .training-portal-start-register { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; color: var(--training-bamboo); font-size: 12px; text-decoration: none; }
+.hui-training .training-portal-start-register:hover { text-decoration: underline; text-underline-offset: 4px; }
+.hui-training .training-portal-footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 0; padding: 28px 0 32px; border: 0; color: var(--training-muted); font-size: 11px; letter-spacing: .04em; }
+.hui-training .training-portal-footer a { display: inline-flex; align-items: center; gap: 9px; min-height: 44px; color: inherit; text-decoration: none; }
+.hui-training .training-portal-footer a svg { transform: rotate(180deg); }
+.hui-training .training-portal :is(a,button,summary):focus-visible { outline: 3px solid var(--training-bamboo); outline-offset: 4px; }
+/* Feature pages continue the entrance's paper, ink and landscape language. */
+.hui-training .training-feature-page { padding: 24px clamp(24px, 5vw, 80px) 0; }
+.hui-training .training-feature-page-inner { width: min(100%, 1160px); margin: 0 auto; }
+.hui-training .training-feature-breadcrumb { display: flex; align-items: center; gap: 10px; padding-top: 42px; color: var(--training-muted); font-size: 12px; }
+.hui-training .training-feature-breadcrumb a { display: inline-flex; align-items: center; min-height: 36px; color: inherit; text-decoration: none; }
+.hui-training .training-feature-breadcrumb a:hover { color: var(--training-bamboo); }
+.hui-training .training-feature-hero { display: grid; grid-template-columns: 1.25fr 1fr; align-items: center; gap: clamp(40px, 7vw, 100px); padding: 44px 0 64px; }
+.hui-training .training-feature-hero h1 { max-width: 590px; margin: 20px 0 24px; font-family: var(--training-serif); font-size: clamp(34px, 3.7vw, 52px); font-weight: 600; letter-spacing: .02em; line-height: 1.5; text-wrap: balance; }
+.hui-training .training-feature-hero .training-portal-kicker > span { padding-right: 8px; opacity: .65; }
+.hui-training .training-feature-lead { max-width: 530px; margin: 0; color: var(--training-muted); font-size: 15px; line-height: 2; }
+.hui-training .training-feature-anchor { display: inline-flex; align-items: center; gap: 12px; min-height: 44px; margin-top: 24px; color: var(--training-bamboo); font-size: 13px; font-weight: 600; text-decoration: none; }
+.hui-training .training-feature-preview { position: relative; isolation: isolate; overflow: hidden; padding: 32px; border: 1px solid var(--training-border); border-radius: 18px 18px 48px 18px; background: var(--training-surface); box-shadow: 0 20px 45px rgb(26 52 38 / 4%); }
+.hui-training .training-feature-preview::before { content: ''; position: absolute; inset: 0; z-index: -1; background: url('./training-landscape-v2.webp') 70% center / cover no-repeat; opacity: .13; }
+.hui-training .training-feature-preview-top { display: flex; align-items: center; justify-content: space-between; gap: 12px; color: var(--training-bamboo); }
+.hui-training .training-feature-preview-top > span { color: var(--training-muted); font-size: 11px; }
+.hui-training .training-feature-preview h2 { margin: 24px 0 22px; font-size: 23px; }
+.hui-training .training-feature-preview ol { display: grid; gap: 10px; padding: 0; margin: 0; list-style: none; }
+.hui-training .training-feature-preview li { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border: 1px solid var(--training-border); border-radius: 8px; background: color-mix(in srgb, var(--training-surface) 88%, transparent); font-size: 12px; }
+.hui-training .training-feature-preview li > span:first-child { color: var(--training-bamboo); font-family: var(--training-serif); font-size: 11px; }
+.hui-training .training-feature-preview li svg { flex: none; margin-left: auto; color: var(--training-bamboo); }
+.hui-training .training-feature-preview > p { margin: 23px 0 0; color: var(--training-muted); font-family: var(--training-serif); font-size: 12px; letter-spacing: .08em; }
+.hui-training .training-feature-tabs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); border-block: 1px solid var(--training-border); }
+.hui-training .training-feature-tabs a { display: flex; align-items: center; justify-content: center; gap: 12px; min-height: 70px; padding: 12px 10px; color: var(--training-muted); font-size: 14px; text-decoration: none; border-bottom: 2px solid transparent; }
+.hui-training .training-feature-tabs a > span { font-family: var(--training-serif); font-size: 11px; opacity: .7; }
+.hui-training .training-feature-tabs a > svg { opacity: 0; }
+.hui-training .training-feature-tabs a:hover { color: var(--training-bamboo); background: var(--portal-card); }
+.hui-training .training-feature-tabs a[aria-current=page] { color: var(--training-bamboo); background: color-mix(in srgb, var(--training-bamboo) 6%, transparent); border-bottom-color: var(--training-bamboo); }
+.hui-training .training-feature-tabs a[aria-current=page] > svg { opacity: 1; }
+.hui-training .training-feature-capabilities { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 26px; }
+.hui-training .training-feature-capabilities article { padding: 28px; border: 1px solid var(--training-border); border-radius: 12px; background: var(--portal-card); }
+.hui-training .training-feature-capability-number { color: var(--training-bamboo); font-family: var(--training-serif); font-size: 14px; }
+.hui-training .training-feature-page h3 { margin: 22px 0 12px; font-family: var(--training-serif); font-size: 22px; font-weight: 600; }
+.hui-training .training-feature-capabilities p, .hui-training .training-feature-steps p { margin: 0; color: var(--training-muted); font-size: 14px; line-height: 1.95; }
+.hui-training .training-feature-steps { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 36px; padding: 30px 0 0; margin: 0; list-style: none; border-top: 1px solid var(--training-border); }
+.hui-training .training-feature-steps li { display: flex; align-items: flex-start; gap: 18px; }
+.hui-training .training-feature-steps .training-learning-number { flex: none; }
+.hui-training .training-feature-steps h3 { margin-top: 5px; font-size: 19px; }
+.hui-training .training-feature-start { scroll-margin-top: 24px; margin-top: 90px; padding: 44px; border: 1px solid var(--training-border); border-radius: 18px; background: color-mix(in srgb, var(--training-bamboo) 5%, var(--training-paper)); }
+.hui-training .training-feature-start > h2 { font-size: clamp(27px, 2.7vw, 36px); }
+.hui-training .training-feature-entry-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 36px; margin-top: 32px; }
+.hui-training .training-feature-entry-grid article { min-width: 0; }
+.hui-training .training-feature-entry-grid article > span { color: var(--training-bamboo); font-size: 11px; letter-spacing: .12em; }
+.hui-training .training-feature-entry-grid h3 { margin: 12px 0 10px; font-size: 23px; }
+.hui-training .training-feature-entry-grid p { margin: 0 0 20px; color: var(--training-muted); font-size: 13px; line-height: 1.9; }
+.hui-training .training-feature-register { margin: 32px 0 0; padding-top: 24px; border-top: 1px solid var(--training-border); color: var(--training-muted); font-size: 12px; line-height: 2; }
+.hui-training .training-feature-register a { display: inline-flex; align-items: center; gap: 6px; color: var(--training-bamboo); text-underline-offset: 4px; }
+.hui-training .training-feature-page .training-portal-footer a svg { transform: none; }
+.hui-training .training-feature-missing { max-width: 760px; margin: 100px auto; }
+.hui-training .training-feature-missing h1 { font-family: var(--training-serif); font-size: clamp(28px, 4vw, 44px); }
+.hui-training .training-feature-missing > p:not(.training-portal-kicker) { margin: 24px 0; color: var(--training-muted); }
+.hui-training .training-contact-page { padding: 24px clamp(24px, 5vw, 80px) 0; }
+.hui-training .training-contact-content { width: min(100%, 1160px); margin: 0 auto; padding: 90px 0; }
+.hui-training .training-contact-content h1 { margin: 0; font-family: var(--training-serif); font-size: clamp(32px, 4vw, 48px); font-weight: 600; }
+.hui-training[data-training-theme=dark] .training-feature-preview::before { background-image: url('./training-moonlit-landscape.webp'); opacity: .32; }
+@media(max-width:1100px) {
+  .hui-training .training-feature-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hui-training .training-feature-card { min-height: 280px; }
 }
-.hui-training .training-role-cards--active .training-role-card {
-  border-color: #547c64;
-  background: rgb(253 254 248 / 89%);
-  box-shadow: 0 0 0 2px rgb(66 108 82 / 16%), 0 12px 30px rgb(30 54 43 / 9%);
-}
-.hui-training .training-role-cards--active .training-role-card--trainer { border-color: #b77b65; }
-.hui-training .training-card-arrow { position: relative; }
-.hui-training .training-card-action { position: absolute; right: calc(100% + 10px); color: #365044; font-size: 12px; white-space: nowrap; }
-@media (max-width: 1050px) {
-  .hui-training .training-portal-main { width: min(100%, 600px); grid-template-columns: 1fr; gap: 24px; padding-block: 36px; }
-  .hui-training .training-portal-copy { padding: 28px 34px; }
-  .hui-training .training-portal-copy h1 { font-size: 54px; margin-block: 16px 18px; }
+@media(max-width:760px) {
+  .hui-training .training-portal-intro { padding: 18px 24px 24px; }
+  .hui-training .training-portal-main { grid-template-columns: minmax(0, 1fr); max-width: 570px; padding-block: 64px 80px; }
+  .hui-training .training-portal-copy h1 { font-size: clamp(38px, 7.5vw, 54px); }
   .hui-training .training-portal-description { font-size: 17px; }
-  .hui-training .training-role-card { min-height: 226px; padding-block: 22px; }
-  .hui-training .training-role-card strong { font-size: 24px; margin-top: 10px; }
-  .hui-training .training-card-arrow { margin-top: 16px; width: 40px; height: 40px; }
-  .hui-training .training-portal::before { background-position: 64% center; }
+  .hui-training .training-portal-overview { width: calc(100% - 48px); }
+  .hui-training .training-portal-section { padding-top: 64px; }
+  .hui-training .training-portal-section-heading { display: block; margin-bottom: 28px; }
+  .hui-training .training-portal-section-heading > p { margin-top: 20px; }
+  .hui-training .training-learning-steps { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 30px; }
+  .hui-training .training-portal-start { display: block; margin-top: 64px; padding-block: 32px; }
+  .hui-training .training-portal-start-actions { align-items: flex-start; margin-top: 24px; }
+  .hui-training .training-feature-page { padding: 18px 24px 0; }
+  .hui-training .training-contact-page { padding: 18px 24px 0; }
+  .hui-training .training-contact-content { padding-top: 64px; }
+  .hui-training .training-feature-breadcrumb { padding-top: 24px; }
+  .hui-training .training-feature-hero { grid-template-columns: minmax(0, 1fr); gap: 32px; padding: 28px 0 42px; }
+  .hui-training .training-feature-hero h1 { max-width: 520px; font-size: clamp(32px, 5.8vw, 44px); }
+  .hui-training .training-feature-preview { padding: 28px; }
+  .hui-training .training-feature-capabilities { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .hui-training .training-feature-capabilities article { padding: 24px; }
+  .hui-training .training-feature-tabs { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hui-training .training-feature-tabs a { justify-content: flex-start; min-height: 58px; padding-inline: 14px; }
+  .hui-training .training-feature-tabs a > svg { margin-left: auto; }
+  .hui-training .training-feature-steps { grid-template-columns: minmax(0, 1fr); gap: 26px; }
+  .hui-training .training-feature-start { margin-top: 60px; padding: 28px; }
+  .hui-training .training-feature-entry-grid { grid-template-columns: minmax(0, 1fr); gap: 30px; }
 }
-@media (max-width: 620px) {
-  .hui-training .training-portal { padding: 16px 18px 12px; }
-  .hui-training .training-portal .training-home-brand { padding: 5px 7px 5px 3px; }
-  .hui-training .training-portal-actions { gap: 6px; }
-  .hui-training .training-portal-login { min-width: 0; padding-inline: 9px; gap: 3px; font-size: 13px; }
-  .hui-training .training-portal-main { width: min(100%, 430px); padding-block: 20px; gap: 14px; }
-  .hui-training .training-portal-copy { padding: 18px 22px; border-radius: 14px; }
-  .hui-training .training-eyebrow { font-size: 11px; letter-spacing: .18em; }
-  .hui-training .training-portal-copy h1 { font-size: clamp(30px, 8.2vw, 38px); margin-block: 10px 12px; line-height: 1.24; }
-  .hui-training .training-portal-description { font-size: 14px; line-height: 1.6; }
-  .hui-training .training-portal-accent { margin-top: 12px; }
-  .hui-training .training-role-cards { grid-template-columns: 1fr; gap: 12px; }
-  .hui-training .training-role-card { flex-direction: row; justify-content: flex-start; gap: 14px; min-height: 98px; padding: 16px; border-radius: 13px; }
-  .hui-training .training-role-icon { width: 46px; height: 46px; flex: none; }
-  .hui-training .training-role-icon svg { width: 34px; height: 34px; }
-  .hui-training .training-role-text { text-align: left; }
-  .hui-training .training-role-card strong { font-size: 21px; margin: 0; }
-  .hui-training .training-role-card small { font-size: 12px; margin-top: 4px; }
-  .hui-training .training-card-arrow { width: 36px; height: 36px; margin: 0 0 0 auto; flex: none; }
-  .hui-training .training-card-arrow svg { width: 20px; height: 20px; }
-  .hui-training .training-card-action { display: none; }
-  .hui-training .training-portal-footer { flex-wrap: wrap; font-size: 10px; }
-  .hui-training .training-portal-footer > span { padding-inline: 6px; }
-
+@media(max-width:520px) {
+  .hui-training .training-portal-intro { min-height: 92svh; padding: 16px 18px 20px; }
+  .hui-training .training-portal-header { gap: 10px; }
+  .hui-training .training-portal .training-home-brand { padding-inline: 0; }
+  .hui-training .training-portal-actions { gap: 5px; }
+  .hui-training .training-portal-login { padding-inline: 11px; font-size: 13px; }
+  .hui-training .training-portal-main { padding-block: 46px 60px; }
+  .hui-training .training-portal-copy { padding: 28px 23px; border-radius: 16px 16px 40px 16px; }
+  .hui-training .training-portal .training-eyebrow { font-size: 10px; letter-spacing: .18em; }
+  .hui-training .training-portal-copy h1 { margin-block: 18px 20px; font-size: clamp(31px, 8.6vw, 41px); }
+  .hui-training .training-portal-description { font-size: 15px; }
+  .hui-training .training-portal-overview { width: calc(100% - 36px); }
+  .hui-training .training-portal h2 { font-size: 29px; }
+  .hui-training .training-portal-section-heading > p { font-size: 13px; }
+  .hui-training .training-desktop-break { display: none; }
+  .hui-training .training-feature-grid { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .hui-training .training-feature-card { min-height: 0; padding: 24px; }
+  .hui-training .training-feature-card h3 { margin-top: 23px; }
+  .hui-training .training-feature-tags { margin-bottom: 20px; }
+  .hui-training .training-learning-steps { gap: 28px 24px; }
+  .hui-training .training-learning-steps h3 { font-size: 16px; }
+  .hui-training .training-portal-start h2 { font-size: 26px; }
+  .hui-training .training-portal-header .training-appearance-trigger { width: 44px; padding-inline: 0; }
+  .hui-training .training-portal-header .training-portal-actions { flex-wrap: nowrap; gap: 5px; margin-inline-start: auto; }
+  .hui-training .training-portal-header { gap: 8px; }
+  .hui-training .training-portal-header .training-brand-lockup { width: 132px; }
+  .hui-training .training-portal-header .training-portal-login { padding-inline: 7px; font-size: 12px; }
+  .hui-training .training-contact-page { padding: 16px 18px 0; }
+  .hui-training .training-feature-page { padding: 16px 18px 0; }
+  .hui-training .training-feature-preview { padding: 24px; }
+  .hui-training .training-feature-preview-top > span { font-size: 10px; }
+  .hui-training .training-feature-lead { font-size: 14px; }
+  .hui-training .training-feature-tabs a { gap: 8px; padding-inline: 9px; font-size: 13px; }
+  .hui-training .training-feature-start { padding: 24px; }
 }
-@media (max-width: 380px) {
-  .hui-training .training-portal { padding-inline: 14px; }
-  .hui-training .training-portal .training-home-brand { font-size: 19px; gap: 5px; }
-  .hui-training .training-portal .training-home-brand-symbol { width: 52px; height: 38px; }
-  .hui-training .training-portal-login { padding-inline: 7px; }
-  .hui-training .training-role-card { gap: 10px; padding-inline: 12px; }
+@media(max-width:360px) {
+  .hui-training .training-portal-header .training-brand-lockup { width: 110px; }
+  .hui-training .training-portal-header .training-portal-actions { gap: 4px; }
 }
-@media (prefers-reduced-motion: reduce) {
-  .hui-training .training-role-card, .hui-training .training-portal-login { transition: none; }
-}
-
-@media (min-width: 900px) and (max-width: 1050px) and (orientation: landscape) {
-  .hui-training .training-portal-main { width: 100%; grid-template-columns: minmax(0, 1fr) minmax(0, 440px); gap: 26px; }
-  .hui-training .training-portal-copy { padding: 28px; }
-  .hui-training .training-portal-copy h1 { font-size: 46px; }
-  .hui-training .training-role-card { min-height: 250px; }
-}
-
-@media (max-width: 620px) and (max-height: 700px) {
-  .hui-training .training-portal { padding-top: 12px; padding-bottom: 10px; }
-  .hui-training .training-portal-main { padding-block: 12px; gap: 12px; }
-  .hui-training .training-portal-copy { padding: 16px 20px; }
-  .hui-training .training-role-card { min-height: 88px; padding-block: 12px; }
-  .hui-training .training-role-cards { padding-top: 32px; gap: 10px; }
-  .hui-training .training-portal-footer > span:last-child { display: none; }
+@media(prefers-reduced-motion:reduce) {
+  .hui-training :is(.training-feature-card,.training-feature-more svg,.training-portal-login) { transition: none; }
+  .hui-training .training-feature-card:hover { transform: none; }
 }

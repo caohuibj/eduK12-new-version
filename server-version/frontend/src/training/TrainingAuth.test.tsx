@@ -16,9 +16,9 @@ describe('training authentication shell', () => {
     </AuthShell></MemoryRouter>)
     expect(screen.getByRole('heading', { name: '学员登录' })).toBeInTheDocument()
     expect(screen.getByText('使用学员账号登录')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: /Training.*@eduk12\.top/ })).toContainElement(screen.getByRole('img', { name: 'Training @eduk12.top' }))
+    expect(screen.getByRole('link', { name: /Training.*@EduK12\.top/ })).toContainElement(screen.getByRole('img', { name: 'Training @EduK12.top' }))
     expect(screen.queryByText(/Healthier Students/)).toBeNull()
-    expect(screen.getByRole('link', { name: /Training.*@eduk12\.top/ })).toHaveAttribute('href', '/')
+    expect(screen.getByRole('link', { name: /Training.*@EduK12\.top/ })).toHaveAttribute('href', '/')
   })
 
   it.each([
