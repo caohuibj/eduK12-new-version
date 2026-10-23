@@ -56,6 +56,30 @@ beforeEach(() => {
 })
 
 describe('course-first training workspaces', () => {
+  it('loads task groups on first visit and reuses them while switching course tabs', async () => {
+    mount('/student/courses/course-1', '/student/courses/:courseId', TrainingLearnerCourse)
+    await screen.findByRole('link', { name: /完成练习/ })
+    expect(get).not.toHaveBeenCalledWith('/courses/course-1/checkins')
+    expect(loadAssessments).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: '打卡' }))
+    await screen.findByRole('link', { name: /去打卡/ })
+    fireEvent.click(screen.getByRole('button', { name: '练习' }))
+    await screen.findByRole('link', { name: /完成练习/ })
+    fireEvent.click(screen.getByRole('button', { name: '打卡' }))
+    await screen.findByRole('link', { name: /去打卡/ })
+    for (const path of ['/courses/course-1', '/courses/course-1/assignments', '/courses/course-1/checkins']) {
+      expect(get.mock.calls.filter(([url]) => url === path)).toHaveLength(1)
+    }
+  })
+
+  it('does not request practice or check-ins when the learner opens an assessment deep link', async () => {
+    mount('/student/courses/course-1?section=assessments', '/student/courses/:courseId', TrainingLearnerCourse)
+    await screen.findByRole('link', { name: /进入测评/ })
+    expect(get).not.toHaveBeenCalledWith('/courses/course-1/assignments')
+    expect(get).not.toHaveBeenCalledWith('/courses/course-1/checkins')
+    expect(loadAssessments).toHaveBeenCalledTimes(1)
+  })
+
   it('renames the exercise interface while preserving the authored task title', async () => {
     const original = get.getMockImplementation()!
     get.mockImplementation((url: string) => url.startsWith('/assignments?')

@@ -4,8 +4,7 @@ import {SurveyCatalogScaleMedia,type SurveyScaleMedia} from './SurveyCatalogScal
 import { BasicFormAnswer } from '../modules/assessment-core/form/BasicFormAnswer'
 import { cleanupExpiredSurveyCognitiveDrafts } from './survey-cognitive-retention'
 import { clearSurveyCognitiveSessions,rememberSurveyCognitiveSession } from './survey-cognitive-local'
-import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
-import { SurveyCognitiveUnit } from './SurveyCognitiveUnit'
+import { lazy, Suspense, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import type { SurveyCognitiveReference,SurveyCognitiveSessionInfo } from './survey-cognitive-api'
 import type { SurveyPublicImage } from './builder.types'
 import { visibleFormKeys,sanitizeFormAnswers } from './form-visibility'
@@ -20,6 +19,10 @@ import { resolveClientSurveyFlow,type PublicFlow } from './flow.client'
 import { resolveSurveyCheckpointDraft,sameSurveyCheckpointAnswers } from './checkpoint-recovery'
 import { readRecruitmentEntry, rememberRecruitmentEntry, clearRecruitmentEntry, isRecruitmentEntryToken } from './recruitment-entry'
 import './survey-participant.css'
+
+// Load before the cognitive unit's own admission/instructions, never during trials.
+// Form/Scale/SJT participants do not need its router, registry or task runners.
+const SurveyCognitiveUnit = lazy(() => import('./SurveyCognitiveUnit').then(module => ({ default: module.SurveyCognitiveUnit })))
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
 type Wave={id:string;title:string;ordinal:number;status:string;consentText:string;consentVersion:number;
@@ -658,7 +661,7 @@ export default function SurveyPublicApp(){
   })
   const markVideoComplete=(unit:Unit,itemKey:string)=>setVideoCompletions(old=>({...old,[videoKey(unit,itemKey)]:true}))
   const renderSurveyTaskBody=(unit:Unit)=>{
-    if(unit.kind==='COGNITIVE')return <SurveyCognitiveUnit key={unit.instrumentKey} publicId={publicId} attemptId={attemptId}
+    if(unit.kind==='COGNITIVE')return <Suspense key={unit.instrumentKey} fallback={<p role="status">正在加载认知测评…</p>}><SurveyCognitiveUnit publicId={publicId} attemptId={attemptId}
       instrumentKey={unit.instrumentKey} title={unit.title} request={publicApi}
       proof={{accessCredential,...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode}:{})}}
       priorAnswers={priorAnswersFor(unit.instrumentKey)} existing={cognitiveSessions.find(s=>s.slotKey===unit.instrumentKey)}
@@ -669,7 +672,7 @@ export default function SurveyPublicApp(){
         setCognitiveSessions(old=>[...old.filter(s=>s.slotKey!==session.slotKey),session])
       }}
       onCommitted={reference=>{setCognitiveReferences(old=>[...old.filter(r=>r.slotKey!==reference.slotKey),reference]);setCognitiveRunning(false)}}
-      onRunningChange={setCognitiveRunning}/>
+      onRunningChange={setCognitiveRunning}/></Suspense>
     if(unit.kind==='SCALE'&&unit.presentationMode==='ONE_BY_ONE')
       return <fieldset key={unit.instrumentKey} className="border-0 p-0 min-w-0"><SurveyTimedScale
         unit={{instrumentKey:unit.instrumentKey,title:unit.title,

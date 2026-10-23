@@ -1,17 +1,12 @@
 import { SurveyAppearance, SurveyAppearanceControl } from './SurveyAppearance'
-import {SurveyToolLibrary} from './SurveyToolLibrary'
-import {SurveyMaterialLibrary} from './SurveyMaterialLibrary'
 import './survey-sections.css'
 import { surveyAdminLoginUrl } from '../products/origins'
-import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
-import { QRCodeSVG } from 'qrcode.react'
+import { lazy, Suspense, useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { ProductPasswordChange } from '../components/account/ProductPasswordChange'
 import AuthenticatorHelp from '../components/auth/AuthenticatorHelp'
 import { type BuilderLeaveRisk } from './SurveyBuilder'
-import { SurveyReportStudio, type ReportLeaveRisk } from './SurveyReportStudio'
+import { type ReportLeaveRisk } from './SurveyReportStudio'
 import { createInstrumentLibrary } from './instrument-library'
-import { SurveyWaveStudio } from './SurveyWaveStudio'
-import { SurveyAnalyticsWorkspace } from './SurveyAnalyticsWorkspace'
 import { SurveyWorkspaceNav,type WorkspaceSection } from './SurveyWorkspaceNav'
 import './survey-workspace.css'
 import './survey-directory.css'
@@ -24,6 +19,13 @@ import { SurveyProjectDirectory, type SurveyProject as Project } from './SurveyP
 import { SurveyResearcherAccount } from './SurveyResearcherAccount'
 import { SurveyCreateProjectDialog } from './SurveyCreateProjectDialog'
 import { SurveyResearchNavigation, type ResearchArea } from './SurveyResearchNavigation'
+
+const QRCodeSVG = lazy(() => import('qrcode.react').then(module => ({ default: module.QRCodeSVG })))
+const SurveyToolLibrary = lazy(() => import('./SurveyToolLibrary').then(module => ({ default: module.SurveyToolLibrary })))
+const SurveyMaterialLibrary = lazy(() => import('./SurveyMaterialLibrary').then(module => ({ default: module.SurveyMaterialLibrary })))
+const SurveyReportStudio = lazy(() => import('./SurveyReportStudio').then(module => ({ default: module.SurveyReportStudio })))
+const SurveyWaveStudio = lazy(() => import('./SurveyWaveStudio').then(module => ({ default: module.SurveyWaveStudio })))
+const SurveyAnalyticsWorkspace = lazy(() => import('./SurveyAnalyticsWorkspace').then(module => ({ default: module.SurveyAnalyticsWorkspace })))
 
 type Envelope<T>={code:number|string;message:string;data:T}
 type Researcher={id:string;username:string;mustChangePassword:boolean}
@@ -55,7 +57,7 @@ const readStudyLocation=()=>{
     section:(section==='tools'?'publish':['settings','reports','publish','data'].includes(section||'')?section:'settings') as WorkspaceSection}
 }
 export default function SurveyApp(){
-  return <SurveyAppearance><SurveyApplication/></SurveyAppearance>
+  return <SurveyAppearance><Suspense fallback={<p role="status">正在加载研究工作区…</p>}><SurveyApplication/></Suspense></SurveyAppearance>
 }
 function SurveyApplication(){
   // Keep the entry stable when activation removes its one-time token from the URL.

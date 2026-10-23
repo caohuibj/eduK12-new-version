@@ -35,6 +35,29 @@ const Probe = () => {
 }
 
 describe('AuthContext session expiry handling', () => {
+  it('shares concurrent focus checks but makes a fresh request after they settle', async () => {
+    let resolveInitial!: (value: unknown) => void
+    mockMe.mockImplementationOnce(() => new Promise(resolve => { resolveInitial = resolve }))
+    render(<AuthProvider><Probe /></AuthProvider>)
+    act(() => {
+      window.dispatchEvent(new Event('focus'))
+      window.dispatchEvent(new Event('focus'))
+    })
+    expect(mockMe).toHaveBeenCalledTimes(1)
+    await act(async () => resolveInitial({ code: 0, data: { id: 'user-1', username: 'teacher-1', role: 'TEACHER' } }))
+    await screen.findByText('signed-in:teacher-1')
+    let resolveFocus!: (value: unknown) => void
+    mockMe.mockImplementationOnce(() => new Promise(resolve => { resolveFocus = resolve }))
+    act(() => {
+      window.dispatchEvent(new Event('focus'))
+      window.dispatchEvent(new Event('focus'))
+    })
+    expect(mockMe).toHaveBeenCalledTimes(2)
+    await act(async () => resolveFocus({ code: 0, data: { id: 'user-1', username: 'teacher-1', role: 'TEACHER' } }))
+    act(() => window.dispatchEvent(new Event('focus')))
+    await waitFor(() => expect(mockMe).toHaveBeenCalledTimes(3))
+  })
+
   beforeEach(() => {
     vi.clearAllMocks()
     sessionStorage.clear()

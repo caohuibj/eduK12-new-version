@@ -9,20 +9,20 @@ import { isTrainingHost } from './training/context'
 import TrainingSjtAuthoringAccess from './training/TrainingSjtAuthoringAccess'
 
 // Portal & Auth Pages
-import Portal from './pages/Portal'
+const Portal = React.lazy(() => import('./pages/Portal'))
 import SurveyAdminOrigin from './components/app-shell/SurveyAdminOrigin'
 import AdminAccess from './admin/AdminAccess'
 const AdminPermissions = React.lazy(() => import('./admin/AdminPermissions'))
 const AdminEntrances = React.lazy(() => import('./admin/AdminEntrances'))
 const AdminKeyEnrollment = React.lazy(() => import('./admin/AdminKeyEnrollment'))
-import AdminLogin from './pages/AdminLogin'
-import TeacherLogin from './pages/TeacherLogin'
-import TeacherRegister from './pages/TeacherRegister'
-import TeacherAccountLogin from './pages/TeacherAccountLogin'
-import ParentLogin from './pages/parent/ParentLogin'
-import StudentLogin from './pages/StudentLogin'
-import StudentCourseLogin from './pages/StudentCourseLogin'
-import StudentRegister from './pages/student/StudentRegister'
+const AdminLogin = React.lazy(() => import('./pages/AdminLogin'))
+const TeacherLogin = React.lazy(() => import('./pages/TeacherLogin'))
+const TeacherRegister = React.lazy(() => import('./pages/TeacherRegister'))
+const TeacherAccountLogin = React.lazy(() => import('./pages/TeacherAccountLogin'))
+const ParentLogin = React.lazy(() => import('./pages/parent/ParentLogin'))
+const StudentLogin = React.lazy(() => import('./pages/StudentLogin'))
+const StudentCourseLogin = React.lazy(() => import('./pages/StudentCourseLogin'))
+const StudentRegister = React.lazy(() => import('./pages/student/StudentRegister'))
 
 // Admin/Teacher Pages
 const CourseList = React.lazy(() => import('./pages/CourseList'))

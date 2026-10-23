@@ -8,9 +8,7 @@ import { ArrowLeft, Clock, Camera, Image, Loader2, CheckCircle, Users, Eye, X, Z
 import apiClient from '../../api/client'
 import { sanitizeHtml } from '../../utils/sanitize'
 import type { Checkin, CheckinSubmission, CheckinSubmissionImage, MediaItem, DocumentItem } from '../../types'
-import { VideoList, ImageList } from '../../components/MediaRenderer'
 import { normalizeImageUrl, handleImageError } from '../../utils/mediaUtils'
-import PdfViewer from '../../components/PdfViewer'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 import {
   createIdempotencyKey,
@@ -18,6 +16,10 @@ import {
   submissionErrorMessage,
   shouldClearIdempotencyKey,
 } from '../../utils/idempotency'
+
+const VideoList = React.lazy(() => import('../../components/MediaRenderer').then(module => ({ default: module.VideoList })))
+const ImageList = React.lazy(() => import('../../components/MediaRenderer').then(module => ({ default: module.ImageList })))
+const PdfViewer = React.lazy(() => import('../../components/PdfViewer'))
 
 type FeedbackFocusToken = { sequence: number; origin: HTMLElement; page: HTMLElement }
 type CheckinFeedback = { kind: 'success' | 'error'; message: string; focusToken?: FeedbackFocusToken | null }
@@ -298,22 +300,26 @@ const CheckinSubmit: React.FC = () => {
         
         {/* 打卡视频 */}
         {checkin.videos && checkin.videos.length > 0 && (
+          <React.Suspense fallback={<p role="status">正在加载视频…</p>}>
           <VideoList
             videos={checkin.videos}
             title="相关视频"
             watermarkText={isTrainingHost() ? "Huitraining 专属培训视频" : "慧育空间专属教学视频"}
             className="!p-0 !shadow-none !border-0"
           />
+          </React.Suspense>
         )}
         
         {/* 打卡图片 */}
         {checkin.images && checkin.images.length > 0 && (
+          <React.Suspense fallback={<p role="status">正在加载图片…</p>}>
           <ImageList
             images={checkin.images}
             title="相关图片"
             watermarkText={isTrainingHost() ? "Huitraining 专属培训图片" : "慧育空间专属教学图片"}
             className="!p-0 !shadow-none !border-0"
           />
+          </React.Suspense>
         )}
 
         {/* 打卡文档 */}
@@ -602,6 +608,7 @@ const CheckinSubmit: React.FC = () => {
 
       {/* PDF Viewer */}
       {selectedDocument && (
+        <React.Suspense fallback={<p role="status">正在加载文档…</p>}>
         <PdfViewer
           isOpen={showPdfViewer}
           onClose={() => {
@@ -612,6 +619,7 @@ const CheckinSubmit: React.FC = () => {
           title={selectedDocument.title}
           allowDownload={selectedDocument.allowDownload}
         />
+        </React.Suspense>
       )}
 
     </ProductPage>
