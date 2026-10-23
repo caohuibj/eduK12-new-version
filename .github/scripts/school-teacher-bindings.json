@@ -5,8 +5,8 @@
   "branch": "work/school-teacher-review-20261022",
   "enabled": true,
   "base": "4dd9f1340fef2bc3df2d066b9bf7712bc2eb3c66",
-  "productHead": "f2af1d62b981a82370a91743e49ea58748b5f36a",
-  "frontendTree": "41c0da6e20502603217924ed3162ec39dd826185",
+  "productHead": "1f18ab94cdac3bfe9f20d59d35635d4d898774ff",
+  "frontendTree": "80807530e9a360c24783f45d55805ba8121e6ec5",
   "backendTree": "7d7da5957de21f09dfd89bd097b4dc7c81a88ef3",
   "source": {
     ".github/scripts/school-teacher-browser-control.mjs": {
@@ -971,7 +971,7 @@
     },
     "server-version/frontend/src/components/education-tools/education-private-tools.css": {
       "before": null,
-      "after": "79744aa7296bc8e25e98d2239372cd08b87e3dd3"
+      "after": "b201a22096f47f2a4facf944bdc536e28719a9c0"
     },
     "server-version/frontend/src/components/education-tools/educationPrivateImageAdapter.test.ts": {
       "before": null,

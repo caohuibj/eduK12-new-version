@@ -89,7 +89,7 @@ export function verifyOfficialJob(run,job,kind,now=Date.now()){
  if(kind==='frontend')assert(job.steps.some(s=>s.name==='run only frozen affected checks then compile once and bind dist'&&s.conclusion==='failure'),'Original frontend failure must remain explicit');
 }
 export const FRONTEND_STYLE_PATH='server-version/frontend/src/components/education-tools/education-private-tools.css';
-export const FRONTEND_STYLE_OLD='dbd4770e7f869846a0a8b071bfffbcbddfc1f26e',FRONTEND_STYLE_NEW='79744aa7296bc8e25e98d2239372cd08b87e3dd3';
+export const FRONTEND_STYLE_OLD='dbd4770e7f869846a0a8b071bfffbcbddfc1f26e',FRONTEND_STYLE_NEW='b201a22096f47f2a4facf944bdc536e28719a9c0';
 export function verifyFrontendCheckInputs(ref,read=git){
  if(read('rev-parse',ref+':server-version/frontend')===read('rev-parse','HEAD:server-version/frontend'))return {cssOnly:false};
  assert.equal(read('diff','--no-ext-diff','--no-textconv','--no-renames','--raw','--abbrev=40',ref,'HEAD','--','server-version/frontend'),
