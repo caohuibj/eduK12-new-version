@@ -1083,5 +1083,681 @@
       "sha256": "9425bd9872a0e53c85fb657066f2cb4bd9514fcf1af2c4efa0a8df1246a873d1",
       "bytes": 996
     }
-  ]
+  ],
+  "measurementCandidate": "a4a7ddf0ead89c1fcc6474797c3d4a8b1a4bcad0",
+  "followup": {
+    "reason": "Affected CI assertions found an unnecessary readiness state update without a loader and an obsolete URL test substitute. Fixed in 18aa443c; compiled delivery inputs rebuilt; native transaction checks added. Earlier observations remain unchanged original observations.",
+    "nativeIndexedDb": {
+      "kind": "recorded-local-native-indexeddb",
+      "ciExecuted": false,
+      "originalExecutionSigned": false,
+      "sourceGitBlob": "0e2ec6f9a84cf91791aa6f8ab203b976e963d0d8",
+      "sourceSHA256": "f038155970935dd911a848f59bc12a278fabeb90a80b29c119dbd25caba48a7e",
+      "sourceModuleSHA256": "7a2b6189b943a6e2a178aba6d307980c7c74c3e9e88b5e57db902aad2102fad3",
+      "harnessSHA256": "c89904b559eacad265e8e258f9239633c881fbc266b140df55575c4e978f878c",
+      "originalTestSourceSHA256": "fe31c60f7c4ec78f2f73ad80106476f2126a86b8173484e5d6c21d1c08984a7e",
+      "browser": "151.0.7922.173",
+      "startedAtEpoch": 1792769552.3729336,
+      "completedAtEpoch": 1792769553.814854,
+      "scope": "Exact abort/quota/commit assertions ported from the three existing native-IDB-only cases to real Chromium, plus two new answer/timing/seal cases. Original jsdom skips remain skips; not claimed as CI execution.",
+      "nativeIndexedDb": true,
+      "results": [
+        {
+          "name": "IndexedDB transaction failure boundaries rolls back old-only deletion, shared updates, new-only insertion, and timing on a late abort",
+          "status": "passed",
+          "durationMs": 73.19999999925494
+        },
+        {
+          "name": "IndexedDB transaction failure boundaries rolls back answer requests if the final metadata write throws",
+          "status": "passed",
+          "durationMs": 19.100000001490116
+        },
+        {
+          "name": "IndexedDB transaction failure boundaries resolves only after the transaction completion event",
+          "status": "passed",
+          "durationMs": 30.299999998882413
+        },
+        {
+          "name": "Native timed answer rolls back both values on metadata quota failure",
+          "status": "passed",
+          "durationMs": 7.800000000745058
+        },
+        {
+          "name": "Native following seal sees matching answer and timing and replays immutable FINAL",
+          "status": "passed",
+          "durationMs": 15.699999999254942
+        }
+      ]
+    },
+    "finalCognitive": [
+      {
+        "name": "cognitive.assignment_open",
+        "ready_ms": 1250.43,
+        "started_at": 16267.647016496,
+        "end_at": 16269.61233738,
+        "navigation": true,
+        "resources": [
+          {
+            "path": "/entry-brand.js",
+            "initiator": "script",
+            "transfer": 887,
+            "encoded": 587,
+            "decoded": 1099,
+            "duration": 106.19999999925494
+          },
+          {
+            "path": "/assets/index-CwyuPYxD.js",
+            "initiator": "script",
+            "transfer": 0,
+            "encoded": 49864,
+            "decoded": 151691,
+            "duration": 0
+          },
+          {
+            "path": "/assets/index-BF0qlg4b.css",
+            "initiator": "link",
+            "transfer": 0,
+            "encoded": 10644,
+            "decoded": 56437,
+            "duration": 0
+          },
+          {
+            "path": "/assets/App-DJfUzaPZ.js",
+            "initiator": "script",
+            "transfer": 0,
+            "encoded": 35616,
+            "decoded": 119179,
+            "duration": 0
+          },
+          {
+            "path": "/assets/learnerNavigation-CNi2vxnw.js",
+            "initiator": "script",
+            "transfer": 0,
+            "encoded": 35000,
+            "decoded": 103369,
+            "duration": 0
+          },
+          {
+            "path": "/assets/context-DH9TJPZn.js",
+            "initiator": "script",
+            "transfer": 0,
+            "encoded": 747,
+            "decoded": 747,
+            "duration": 0
+          },
+          {
+            "path": "/assets/client-DP_BZqLp.js",
+            "initiator": "script",
+            "transfer": 0,
+            "encoded": 21491,
+            "decoded": 56979,
+            "duration": 0
+          },
+          {
+            "path": "/assets/SurveyBrand-CEoMfvsz.js",
+            "initiator": "script",
+            "transfer": 0,
+            "encoded": 2633,
+            "decoded": 6535,
+            "duration": 0
+          },
+          {
+            "path": "/assets/createLucideIcon-CNhu8z1_.js",
+            "initiator": "script",
+            "transfer": 0,
+            "encoded": 813,
+            "decoded": 2578,
+            "duration": 0
+          },
+          {
+            "path": "/assets/sun-XjJTBUlo.js",
+            "initiator": "script",
+            "transfer": 0,
+            "encoded": 694,
+            "decoded": 1958,
+            "duration": 0
+          },
+          {
+            "path": "/assets/SurveyBrand-Bbv_PrNl.css",
+            "initiator": "link",
+            "transfer": 0,
+            "encoded": 4163,
+            "decoded": 18294,
+            "duration": 0
+          },
+          {
+            "path": "/assets/shield-check-6-kAXlYI.js",
+            "initiator": "script",
+            "transfer": 0,
+            "encoded": 793,
+            "decoded": 793,
+            "duration": 0
+          },
+          {
+            "path": "/assets/heart-handshake-CqiJIvzD.js",
+            "initiator": "script",
+            "transfer": 0,
+            "encoded": 506,
+            "decoded": 1045,
+            "duration": 0
+          },
+          {
+            "path": "/assets/ProductStatus--28kOm1Y.js",
+            "initiator": "script",
+            "transfer": 0,
+            "encoded": 531,
+            "decoded": 1070,
+            "duration": 0
+          },
+          {
+            "path": "/assets/ProductStatus-CSdvJMrA.css",
+            "initiator": "link",
+            "transfer": 0,
+            "encoded": 1961,
+            "decoded": 7883,
+            "duration": 0
+          },
+          {
+            "path": "/assets/sun-moon-BlHoiFd_.js",
+            "initiator": "script",
+            "transfer": 0,
+            "encoded": 829,
+            "decoded": 829,
+            "duration": 0
+          },
+          {
+            "path": "/assets/App-Bg3ZAA1r.css",
+            "initiator": "link",
+            "transfer": 0,
+            "encoded": 45886,
+            "decoded": 315226,
+            "duration": 0
+          },
+          {
+            "path": "/vite.svg",
+            "initiator": "other",
+            "transfer": 1071,
+            "encoded": 771,
+            "decoded": 1497,
+            "duration": 106.79999999888241
+          },
+          {
+            "path": "/assets/training-logo-nWDnbkt0.svg",
+            "initiator": "img",
+            "transfer": 0,
+            "encoded": 8965,
+            "decoded": 26884,
+            "duration": 0
+          },
+          {
+            "path": "/api/auth/me",
+            "initiator": "xmlhttprequest",
+            "transfer": 1257,
+            "encoded": 957,
+            "decoded": 957,
+            "duration": 110.09999999962747
+          },
+          {
+            "path": "/api/capabilities",
+            "initiator": "xmlhttprequest",
+            "transfer": 500,
+            "encoded": 200,
+            "decoded": 200,
+            "duration": 103.69999999925494
+          },
+          {
+            "path": "/assets/CognitiveAssignmentEntry-CqdcbPWV.js",
+            "initiator": "script",
+            "transfer": 2669,
+            "encoded": 2369,
+            "decoded": 5013,
+            "duration": 116.90000000037253
+          },
+          {
+            "path": "/assets/api-CcAtl-vr.js",
+            "initiator": "script",
+            "transfer": 1397,
+            "encoded": 1097,
+            "decoded": 3411,
+            "duration": 106.89999999850988
+          },
+          {
+            "path": "/assets/session-ledger-BGSCsyPq.js",
+            "initiator": "script",
+            "transfer": 763,
+            "encoded": 463,
+            "decoded": 463,
+            "duration": 112.29999999888241
+          },
+          {
+            "path": "/assets/play-BtSFdR-p.js",
+            "initiator": "script",
+            "transfer": 674,
+            "encoded": 374,
+            "decoded": 374,
+            "duration": 108.59999999962747
+          },
+          {
+            "path": "/api/cognitive/assignments/bf94e0eb-3551-4f44-aaae-0be488117a8e",
+            "initiator": "xmlhttprequest",
+            "transfer": 1113,
+            "encoded": 813,
+            "decoded": 813,
+            "duration": 108.80000000074506
+          },
+          {
+            "path": "/student/cognitive/assignments/bf94e0eb-3551-4f44-aaae-0be488117a8e",
+            "initiator": "navigation",
+            "transfer": 874,
+            "encoded": 574,
+            "decoded": 574,
+            "duration": 254.7999999988824
+          }
+        ],
+        "api": [
+          {
+            "phase": "candidate-cognitive.cognitive.assignment_open",
+            "path": "/api/capabilities",
+            "method": "GET",
+            "status": 200,
+            "duration_ms": 103.79,
+            "ttfb_ms": 102.72,
+            "finished_at": 16268.169485991
+          },
+          {
+            "phase": "candidate-cognitive.cognitive.assignment_open",
+            "path": "/api/auth/me",
+            "method": "GET",
+            "status": 200,
+            "duration_ms": 110.16,
+            "ttfb_ms": 106.08,
+            "finished_at": 16268.172503828
+          },
+          {
+            "phase": "candidate-cognitive.cognitive.assignment_open",
+            "path": "/api/cognitive/assignments/bf94e0eb-3551-4f44-aaae-0be488117a8e",
+            "method": "GET",
+            "status": 200,
+            "duration_ms": 108.8,
+            "ttfb_ms": 104.02,
+            "finished_at": 16268.434463996
+          }
+        ],
+        "renderer_task_seconds": 0.3754,
+        "js_heap_bytes": 7406404
+      },
+      {
+        "name": "cognitive.runner_open",
+        "ready_ms": 982.03,
+        "started_at": 16269.61433037,
+        "end_at": 16271.306299415,
+        "navigation": false,
+        "resources": [
+          {
+            "path": "/api/cognitive/sessions",
+            "initiator": "xmlhttprequest",
+            "transfer": 5898,
+            "encoded": 5598,
+            "decoded": 5598,
+            "duration": 117.90000000037253
+          },
+          {
+            "path": "/vite.svg",
+            "initiator": "other",
+            "transfer": 1071,
+            "encoded": 771,
+            "decoded": 1497,
+            "duration": 105.70000000111759
+          },
+          {
+            "path": "/assets/CognitiveRunner-DpmETcGi.js",
+            "initiator": "script",
+            "transfer": 12997,
+            "encoded": 12697,
+            "decoded": 39364,
+            "duration": 141.69999999925494
+          },
+          {
+            "path": "/assets/CognitiveSessionEntry-DiXf49ZV.js",
+            "initiator": "script",
+            "transfer": 1464,
+            "encoded": 1164,
+            "decoded": 1956,
+            "duration": 111.70000000111759
+          },
+          {
+            "path": "/assets/recovery-credential-DTG-RQ8c.js",
+            "initiator": "script",
+            "transfer": 494,
+            "encoded": 194,
+            "decoded": 194,
+            "duration": 107.29999999888241
+          },
+          {
+            "path": "/assets/finalDraftCapacityRetry-Ch4KSCRu.js",
+            "initiator": "script",
+            "transfer": 2575,
+            "encoded": 2275,
+            "decoded": 5998,
+            "duration": 122
+          },
+          {
+            "path": "/assets/readiness-CA7SeYHK.js",
+            "initiator": "script",
+            "transfer": 1519,
+            "encoded": 1219,
+            "decoded": 2797,
+            "duration": 115.70000000111759
+          },
+          {
+            "path": "/assets/registry-CH4uS6cy.js",
+            "initiator": "script",
+            "transfer": 7398,
+            "encoded": 7098,
+            "decoded": 28968,
+            "duration": 214.7000000011176
+          },
+          {
+            "path": "/assets/finalDraftStore-31Kh0TRq.js",
+            "initiator": "script",
+            "transfer": 6065,
+            "encoded": 5765,
+            "decoded": 20045,
+            "duration": 240.19999999925494
+          },
+          {
+            "path": "/assets/flushLifecycle-BrckMErX.js",
+            "initiator": "script",
+            "transfer": 3611,
+            "encoded": 3311,
+            "decoded": 10023,
+            "duration": 234.2000000011176
+          },
+          {
+            "path": "/assets/checkpointTypes-CE0Ib90y.js",
+            "initiator": "script",
+            "transfer": 493,
+            "encoded": 193,
+            "decoded": 193,
+            "duration": 221.59999999962747
+          },
+          {
+            "path": "/assets/AssessmentImagePresentation-p9hmDxHH.js",
+            "initiator": "script",
+            "transfer": 1018,
+            "encoded": 718,
+            "decoded": 1557,
+            "duration": 230
+          },
+          {
+            "path": "/assets/AssessmentVideoPlayer-vOwBQ3my.js",
+            "initiator": "script",
+            "transfer": 4069,
+            "encoded": 3769,
+            "decoded": 10113,
+            "duration": 246.90000000037253
+          },
+          {
+            "path": "/assets/loader-circle-BXD1smZ3.js",
+            "initiator": "script",
+            "transfer": 0,
+            "encoded": 323,
+            "decoded": 323,
+            "duration": 0
+          },
+          {
+            "path": "/assets/circle-alert-BezQNke3.js",
+            "initiator": "script",
+            "transfer": 734,
+            "encoded": 434,
+            "decoded": 434,
+            "duration": 315.40000000037253
+          },
+          {
+            "path": "/assets/refresh-cw-BNCLAR7Y.js",
+            "initiator": "script",
+            "transfer": 805,
+            "encoded": 505,
+            "decoded": 505,
+            "duration": 321.2000000011176
+          },
+          {
+            "path": "/assets/useAssessmentImageAssets-Kk7gdQHg.js",
+            "initiator": "script",
+            "transfer": 854,
+            "encoded": 554,
+            "decoded": 1049,
+            "duration": 333.09999999962747
+          },
+          {
+            "path": "/assets/required-video-completion-h87kc569.js",
+            "initiator": "script",
+            "transfer": 1191,
+            "encoded": 891,
+            "decoded": 891,
+            "duration": 334.69999999925494
+          },
+          {
+            "path": "/assets/child-route-context-CQZoqJHU.js",
+            "initiator": "script",
+            "transfer": 989,
+            "encoded": 689,
+            "decoded": 1417,
+            "duration": 337.19999999925494
+          },
+          {
+            "path": "/api/cognitive/sessions/c7857aa9-b710-4480-92ea-2e057e307436",
+            "initiator": "xmlhttprequest",
+            "transfer": 5911,
+            "encoded": 5611,
+            "decoded": 5611,
+            "duration": 116.40000000037253
+          },
+          {
+            "path": "/assets/ReactionFrameTask-CkIwZCrt.js",
+            "initiator": "script",
+            "transfer": 3073,
+            "encoded": 2773,
+            "decoded": 6733,
+            "duration": 129.09999999962747
+          },
+          {
+            "path": "/assets/CognitiveTaskPresentation-DSqIDiJB.js",
+            "initiator": "script",
+            "transfer": 1205,
+            "encoded": 905,
+            "decoded": 2794,
+            "duration": 107.10000000149012
+          },
+          {
+            "path": "/assets/CognitiveTaskPresentation-UBH7vRj1.css",
+            "initiator": "link",
+            "transfer": 1830,
+            "encoded": 1530,
+            "decoded": 5302,
+            "duration": 124.19999999925494
+          },
+          {
+            "path": "/assets/task-timing-diagnostics-CSf-UBts.js",
+            "initiator": "script",
+            "transfer": 877,
+            "encoded": 577,
+            "decoded": 1478,
+            "duration": 114.30000000074506
+          },
+          {
+            "path": "/assets/CognitiveFocusStage-DIQndw2t.js",
+            "initiator": "script",
+            "transfer": 730,
+            "encoded": 430,
+            "decoded": 430,
+            "duration": 107.89999999850988
+          },
+          {
+            "path": "/assets/prng-D4TmOqaD.js",
+            "initiator": "script",
+            "transfer": 762,
+            "encoded": 462,
+            "decoded": 462,
+            "duration": 118
+          },
+          {
+            "path": "/assets/ReactionTask-DNs8MZMJ.js",
+            "initiator": "script",
+            "transfer": 2609,
+            "encoded": 2309,
+            "decoded": 5565,
+            "duration": 210.09999999962747
+          }
+        ],
+        "api": [
+          {
+            "phase": "candidate-cognitive.cognitive.runner_open",
+            "path": "/api/cognitive/sessions",
+            "method": "POST",
+            "status": 200,
+            "duration_ms": 118.63,
+            "ttfb_ms": 104.03,
+            "finished_at": 16269.791211083
+          },
+          {
+            "phase": "candidate-cognitive.cognitive.runner_open",
+            "path": "/api/cognitive/sessions/c7857aa9-b710-4480-92ea-2e057e307436",
+            "method": "GET",
+            "status": 200,
+            "duration_ms": 116.47,
+            "ttfb_ms": 101.98,
+            "finished_at": 16270.301412538
+          }
+        ],
+        "renderer_task_seconds": 0.3784,
+        "js_heap_bytes": 10036920
+      },
+      {
+        "name": "cognitive.instruction",
+        "ready_ms": 97.44,
+        "started_at": 16271.308275199,
+        "end_at": 16272.112430739,
+        "navigation": false,
+        "resources": [],
+        "api": [],
+        "renderer_task_seconds": 0.09,
+        "js_heap_bytes": 10211644
+      },
+      {
+        "name": "cognitive.practice_and_trials",
+        "ready_ms": 24205.02,
+        "started_at": 16272.16622449,
+        "end_at": 16297.076681796,
+        "navigation": false,
+        "resources": [],
+        "api": [],
+        "renderer_task_seconds": 1.5168,
+        "js_heap_bytes": 5768168
+      },
+      {
+        "name": "cognitive.final_submit_feedback",
+        "ready_ms": 744.36,
+        "started_at": 16297.081099186,
+        "end_at": 16298.538616175,
+        "navigation": false,
+        "resources": [
+          {
+            "path": "/api/cognitive/sessions/c7857aa9-b710-4480-92ea-2e057e307436/submit",
+            "initiator": "xmlhttprequest",
+            "transfer": 26913,
+            "encoded": 26613,
+            "decoded": 26613,
+            "duration": 166
+          },
+          {
+            "path": "/assets/CognitiveResult-DtIGLyVf.js",
+            "initiator": "script",
+            "transfer": 10348,
+            "encoded": 10048,
+            "decoded": 32345,
+            "duration": 158.80000000074506
+          },
+          {
+            "path": "/assets/ReportPrimitives-BHGKmFwV.js",
+            "initiator": "script",
+            "transfer": 1486,
+            "encoded": 1186,
+            "decoded": 3439,
+            "duration": 107.59999999962747
+          },
+          {
+            "path": "/assets/ReportPrimitives-B4Wml2ma.css",
+            "initiator": "link",
+            "transfer": 3154,
+            "encoded": 2854,
+            "decoded": 12812,
+            "duration": 139.09999999962747
+          },
+          {
+            "path": "/assets/CognitiveSingleTaskReportCard-DHW4zTIy.js",
+            "initiator": "script",
+            "transfer": 3558,
+            "encoded": 3258,
+            "decoded": 7671,
+            "duration": 141.2999999988824
+          },
+          {
+            "path": "/assets/cognitive-report-audiences-BvE3_jCc.js",
+            "initiator": "script",
+            "transfer": 2281,
+            "encoded": 1981,
+            "decoded": 4690,
+            "duration": 128.5
+          },
+          {
+            "path": "/assets/cognitive-report-audiences-CR0dEEDW.css",
+            "initiator": "link",
+            "transfer": 4411,
+            "encoded": 4111,
+            "decoded": 22533,
+            "duration": 142.40000000037253
+          },
+          {
+            "path": "/vite.svg",
+            "initiator": "other",
+            "transfer": 1071,
+            "encoded": 771,
+            "decoded": 1497,
+            "duration": 191.2000000011176
+          },
+          {
+            "path": "/api/cognitive/sessions/c7857aa9-b710-4480-92ea-2e057e307436",
+            "initiator": "xmlhttprequest",
+            "transfer": 19111,
+            "encoded": 18811,
+            "decoded": 18811,
+            "duration": 143.69999999925494
+          }
+        ],
+        "api": [
+          {
+            "phase": "candidate-cognitive.cognitive.final_submit_feedback",
+            "path": "/api/cognitive/sessions/c7857aa9-b710-4480-92ea-2e057e307436/submit",
+            "method": "POST",
+            "status": 200,
+            "duration_ms": 166.63,
+            "ttfb_ms": 110.59,
+            "finished_at": 16297.319659248
+          },
+          {
+            "phase": "candidate-cognitive.cognitive.final_submit_feedback",
+            "path": "/api/cognitive/sessions/c7857aa9-b710-4480-92ea-2e057e307436",
+            "method": "GET",
+            "status": 200,
+            "duration_ms": 143.99,
+            "ttfb_ms": 104.21,
+            "finished_at": 16297.691126461
+          }
+        ],
+        "renderer_task_seconds": 0.3775,
+        "js_heap_bytes": 6438252
+      }
+    ]
+  }
 }

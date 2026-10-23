@@ -115,3 +115,17 @@ and session material stays in the node's private directory and is not committed.
 The node has no tool-provided external preview URL. `training.localhost:5173`
 and the measurement HTTPS ports are internal node entry points, not addresses
 that can be opened through the user's Mac localhost.
+
+CI follow-up: 230 Node assertions initially passed; three failed assertions found
+a URL constructor test substitution incompatible with dynamic module loading and
+a redundant readiness state update without any loader. Both were corrected.
+Only affected import closures and the failed assertions require a recheck; the
+original failed report and its three native-IDB-only jsdom skips remain visible.
+Those three transaction assertions were ported to real Chromium and passed,
+including late abort, metadata quota rollback and completion-event ordering. Two
+additional native tests verified new answer/timing rollback and immutable seal
+replay. These five checks are local browser execution, not CI Node execution.
+The timing table above retains the original paired candidate observations; the
+small readiness correction rebuilt only changed delivery inputs and received a
+fresh complete cognitive journey. Detailed final phase measurements are in the
+JSON follow-up.
