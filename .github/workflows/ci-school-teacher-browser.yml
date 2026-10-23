@@ -1,114 +1,41 @@
-name: School Teacher standalone browser diagnostic
+name: School Teacher focused theme diagnostic
 on:
   push:
-    branches: ['ci/school-teacher-browser-20261022']
+    branches: ['ci/school-teacher-console-20261023']
 permissions:
   contents: read
-  actions: read
 env:
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
 jobs:
-  # This candidate diagnoses launch only. It does not execute or qualify journeys.
   launch-diagnostic:
-    permissions:
-      contents: read
-    if: ${{ github.event_name == 'push' && github.repository == 'caohuibj/eduK12-new-version' && github.ref == 'refs/heads/ci/school-teacher-browser-20261022' && !github.event.deleted }}
+    if: ${{ github.event_name == 'push' && github.repository == 'caohuibj/eduK12-new-version' && github.ref == 'refs/heads/ci/school-teacher-console-20261023' && !github.event.deleted }}
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
       - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - run: node .github/scripts/school-teacher-browser-control.mjs preflight
+      - run: npm ci --ignore-scripts --prefix server-version/frontend
       - run: npm ci --ignore-scripts --prefix .github/release-tools
-      - run: node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
-      - name: diagnose unchanged Chromium launch only (not browser acceptance)
-        run: node server-version/e2e/school-teacher-browser.cjs --launch-diagnostic
+      - name: prepare official CJK fonts
+        run: sudo apt-get update && sudo apt-get install -y fonts-wqy-zenhei
+      - name: compile current real components with synthetic diagnostic inputs
+        working-directory: server-version/frontend
+        run: node node_modules/vite/bin/vite.js build --config theme-diagnostic/vite.config.ts
+      - name: narrow previously approved temporary Chrome write permissions
+        env:
+          SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-temporary-runner
+        run: node server-version/e2e/school-teacher-chrome-permissions.cjs tighten
+      - name: inspect theme transitions and material states without backend or database
+        run: node server-version/e2e/school-teacher-theme-diagnostic.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: school-teacher-launch-diagnostic-${{ github.sha }}
-          path: school-teacher-evidence/browser-launch.json
-          retention-days: 7
-          if-no-files-found: error
-  # Retained unchanged for a separately authorized full consumer continuation.
-  # A skipped job creates no PostgreSQL/Redis services and executes no preparation.
-  browser:
-    if: ${{ false }}
-    runs-on: ubuntu-24.04
-    timeout-minutes: 25
-    services:
-      postgres:
-        image: postgres:16.15-bookworm
-        env:
-          POSTGRES_DB: school_teacher_browser_ci_test
-          POSTGRES_USER: ptool
-          POSTGRES_PASSWORD: synthetic-actions-disposable
-        ports: ['5432/tcp']
-        options: >-
-          --health-cmd "pg_isready -U ptool -d school_teacher_browser_ci_test"
-          --health-interval 5s --health-timeout 5s --health-retries 20
-      redis:
-        image: redis:7.4-bookworm
-        ports: ['6379/tcp']
-        options: >-
-          --health-cmd "redis-cli ping"
-          --health-interval 5s --health-timeout 5s --health-retries 20
-    env:
-      NODE_ENV: test
-      SCHOOL_TEACHER_ISOLATED_DB: '1'
-    steps:
-      - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '24.21.0'
-      - run: node .github/scripts/school-teacher-browser-control.mjs preflight
-      - name: bind isolated service endpoints after runner initialization
-        env:
-          DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-          SCHOOL_TEACHER_TEST_DATABASE_URL: postgresql://ptool:synthetic-actions-disposable@127.0.0.1:${{ job.services.postgres.ports[5432] }}/school_teacher_browser_ci_test?schema=public&connection_limit=10
-          REDIS_URL: redis://127.0.0.1:${{ job.services.redis.ports[6379] }}/0
-          CI_POSTGRES_SERVICE_ID: ${{ job.services.postgres.id }}
-          SCHOOL_TEACHER_PRIVATE_DIR: ${{ runner.temp }}/school-teacher-private
-        run: |
-          printf '%s=%s\n' DATABASE_URL "$DATABASE_URL" >> "$GITHUB_ENV"
-          printf '%s=%s\n' SCHOOL_TEACHER_TEST_DATABASE_URL "$SCHOOL_TEACHER_TEST_DATABASE_URL" >> "$GITHUB_ENV"
-          printf '%s=%s\n' REDIS_URL "$REDIS_URL" >> "$GITHUB_ENV"
-          printf '%s=%s\n' CI_POSTGRES_SERVICE_ID "$CI_POSTGRES_SERVICE_ID" >> "$GITHUB_ENV"
-          printf '%s=%s\n' SCHOOL_TEACHER_PRIVATE_DIR "$SCHOOL_TEACHER_PRIVATE_DIR" >> "$GITHUB_ENV"
-      - run: bash server-version/scripts/ci-install-canvas-deps.sh
-      - run: npm ci --prefix server-version/backend
-      - run: npx --prefix server-version/backend prisma generate --schema server-version/backend/prisma/schema.prisma
-      - run: npm ci --ignore-scripts --prefix .github/release-tools
-      - run: node .github/release-tools/node_modules/playwright-core/cli.js install --with-deps chromium
-      - name: restore exact original successful builds (no compilation)
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: node .github/scripts/school-teacher-browser-control.mjs restore
-      - name: migrate disposable synthetic database
-        working-directory: server-version/backend
-        run: npx prisma migrate deploy
-      - name: seed synthetic identities and verify restricted runtime principal
-        run: |
-          umask 077
-          node server-version/e2e/school-teacher-fixture.cjs seed > "$RUNNER_TEMP/school-teacher-seed.log" 2>&1
-      - name: exercise real School and Teacher browser paths
-        env:
-          SCHOOL_TEACHER_ARTIFACTS_VERIFIED: '1'
-        run: node server-version/e2e/school-teacher-browser.cjs
-      - name: verify diagnostic report (not merge qualification)
-        run: node .github/scripts/school-teacher-browser-control.mjs report
-      - name: remove private test material
-        if: always()
-        run: node .github/scripts/school-teacher-browser-control.mjs cleanup
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: school-teacher-browser-evidence-${{ github.sha }}
-          path: school-teacher-evidence
-          retention-days: 7
+          name: school-teacher-theme-diagnostic-${{ github.sha }}
+          path: school-theme-diagnostic-evidence/
+          retention-days: 3
           if-no-files-found: error

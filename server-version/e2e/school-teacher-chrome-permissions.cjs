@@ -136,8 +136,11 @@ function tightenChromePermissions({ repo = path.resolve(__dirname, '../..'), env
   try {
     check(env.CI === 'true' && env.GITHUB_ACTIONS === 'true' && env.RUNNER_ENVIRONMENT === 'github-hosted' &&
       env.RUNNER_OS === 'Linux' && env.RUNNER_ARCH === 'X64' && env.ImageOS === 'ubuntu24' &&
-      env.GITHUB_REPOSITORY === 'caohuibj/eduK12-new-version' && env.GITHUB_EVENT_NAME === 'pull_request' &&
-      env.GITHUB_REF === 'refs/pull/338/merge' && env.GITHUB_HEAD_REF === 'work/school-teacher-review-20261022' &&
+      env.GITHUB_REPOSITORY === 'caohuibj/eduK12-new-version' &&
+      ((env.GITHUB_EVENT_NAME === 'pull_request' && env.GITHUB_REF === 'refs/pull/338/merge' &&
+        env.GITHUB_HEAD_REF === 'work/school-teacher-review-20261022') ||
+        (env.GITHUB_EVENT_NAME === 'push' && env.GITHUB_REF === 'refs/heads/ci/school-teacher-console-20261023' &&
+          require('./school-teacher-theme-diagnostic.cjs').allowed(env, JSON.parse(io.readFileSync(env.GITHUB_EVENT_PATH, 'utf8'))))) &&
       env.SCHOOL_TEACHER_CHROME_TIGHTEN === 'confirmed-temporary-runner', 'UNAPPROVED_CI_CONTEXT')
     check(facts.platform === 'linux' && facts.arch === 'x64' && Number.isSafeInteger(facts.getuid?.()) &&
       facts.getuid() > 0 && facts.geteuid?.() === facts.getuid(), 'NONROOT_RUNNER_REQUIRED')
