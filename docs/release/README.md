@@ -1196,3 +1196,39 @@ Current qualification requires the complete 233 Node-assertion union plus those
 explicit native checks. Only the two affected application files and changed
 qualification controls receive fresh CodeQL; other inputs retain the original
 actual application scan. The failed history is preserved without a full rerun.
+## School / Teacher visual frontend qualification (2026-10-23)
+
+For `work/school-teacher-visual-20261023` only, the user explicitly approved a
+one-time repeat of necessary frontend checks in GitHub CI because the previous
+local results have no general trusted admission mechanism. This does not change
+the standing no-repeat rule or accept unsigned local logs as passing evidence.
+The exact product blobs, complete raw diff, unchanged frontend/backend trees,
+protected dependency/configuration inputs and PR source/checkout tree must match
+`school-teacher-visual-bindings.json`. Unknown changes fail closed, without a
+platform/manual/full fallback. The small frontend workflow runs changed lint,
+complete frontend types, named consumer tests, one production build and browser
+checks against those exact dist bytes. Locked backend dependencies and Prisma
+client generation only prepare transitive frontend type imports; no backend
+business build/test, database, migration or schema change is authorized.
+
+Browser acceptance uses the real compiled App and all production CSS at 320,
+390, 768, 1100 and 1440 pixels in light/dark themes. Strict synthetic APIs cover
+School editing, Teacher draft/navigation/history/focus and both admin branded
+login/enrollment/workspaces, with a negative entry-grant case. Unknown requests,
+page errors, overflow and selected accessibility failures reject the run.
+Screenshots and machine-readable checks are retained with the production dist.
+This is synthetic frontend acceptance, not real-account/backend/deployment
+acceptance. Scope, the actual frontend job and bounded frontend/control CodeQL
+must all succeed; drafts and missing/skipped/failed/cancelled checks cannot merge.
+The stable gate recomputes the complete scope. Exact main pushes only classify
+and do not repeat application checks. No deployment is authorized by this lane.
+
+The same visual candidate was subsequently aligned with main PR #343 at
+`e3ebf626c39f57604362c7e4ce8d6a9d74e29c2f`. Its changed shared frontend inputs
+invalidate the earlier frontend semantic/build/SAST qualification. The active
+visual workflow therefore performs fresh integrated frontend types, named
+consumers (including shared draft/deferred-loader integration), one production
+build, full current frontend/control CodeQL and the real-dist browser matrix.
+The earlier official reuse helper remains historical only and is not called by
+this workflow or browser. PR #343 business files and its independent CI route
+are preserved unchanged; no backend business checks or database are added.

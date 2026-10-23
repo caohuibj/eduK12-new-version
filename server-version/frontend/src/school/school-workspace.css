@@ -175,3 +175,13 @@
  .hs-workspace-navigation a { padding:8px;gap:8px;font-size:13px; }
 }
 @media(max-width:360px) { .hs-workspace-shortcuts { grid-template-columns:1fr; } }
+
+/* Consistent card baselines and readable navigation for long school/account names. */
+.hs-workspace-shortcuts>a{display:flex;flex-direction:column}
+.hs-workspace-shortcuts>a>span{margin-top:auto}
+.hs-workspace-navigation a>span,.hs-workspace-mobilebar>span{min-width:0;overflow-wrap:anywhere}
+.hs-workspace-page-heading h1{overflow-wrap:anywhere}
+.hs-workspace-content :is(.hs-workspace-shortcuts a,.hs-workspace-trail a):focus-visible{outline:3px solid var(--hs-primary);outline-offset:3px}
+@media(prefers-reduced-motion:reduce){
+ .hs-workspace button:not(:disabled):not(.hs-runner *),.hs-workspace-shortcuts>a,.hs-workspace-navigation a{transition:none}
+}

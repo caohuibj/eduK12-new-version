@@ -2,6 +2,8 @@ import {useState} from 'react'
 import {Link,useLocation} from 'react-router-dom'
 import {QRCodeSVG} from 'qrcode.react'
 import AuthShell from '../components/auth/AuthShell'
+import EducationAdminEntryShell from '../pages/admin/EducationAdminEntryShell'
+import {educationEntry} from '../pages/admin/education-entry'
 import SurveyAdminEntryShell from '../survey/SurveyAdminEntryShell'
 import {beginTotpEnrollment,confirmTotpEnrollment,enrollSecurityKey} from './securityKey'
 import api from '../api/client'
@@ -16,8 +18,9 @@ function AdminKeyEnrollment(){
   const {mode}=useSurveyAppearance()
   const surveyEntry=Boolean(origins&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH)
   const trainingEntry=new URLSearchParams(location.search).get('returnTo')==='/admin/training'
-  const Shell=surveyEntry?SurveyAdminEntryShell:AuthShell
-  const loginPath=surveyEntry?surveyAppearanceHref('/admin/login?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH),mode):trainingEntry?'/admin/login?returnTo=%2Fadmin%2Ftraining':'/admin/login'
+  const educationProduct=educationEntry(location.search)
+  const Shell=educationProduct?EducationAdminEntryShell:surveyEntry?SurveyAdminEntryShell:AuthShell
+  const loginPath=educationProduct?`/admin/login?returnTo=${encodeURIComponent(educationProduct==='School'?'/admin/huischool':'/admin/huiteacher')}`:surveyEntry?surveyAppearanceHref('/admin/login?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH),mode):trainingEntry?'/admin/login?returnTo=%2Fadmin%2Ftraining':'/admin/login'
   const [username,setUsername]=useState(''),[password,setPassword]=useState(''),[ticket,setTicket]=useState('')
   const [method,setMethod]=useState<'TOTP'|'SECURITY_KEY'>('TOTP')
   const [uri,setUri]=useState(''),[code,setCode]=useState('')
@@ -39,7 +42,7 @@ function AdminKeyEnrollment(){
     finally{setCode('');setBusy(false)}
   }
   return <Shell tone="admin" title="绑定管理员验证方式" description="使用账号、密码与一次性绑定码，绑定你的验证方式"
-    {...(surveyEntry?{backTo:loginPath,backLabel:'返回 Survey 管理员登录'}:{})}>
+    {...(educationProduct?{backTo:loginPath,backLabel:`返回 ${educationProduct} 管理员登录`}:surveyEntry?{backTo:loginPath,backLabel:'返回 Survey 管理员登录'}:{})}>
     <p>{method==='TOTP'
       ?'请向平台运维人员获取一次性绑定码（15 分钟内有效），然后按提示绑定手机验证器。绑定码只能使用一次。'
       :'请先向单位领取或自行准备硬件安全密钥，再向平台运维人员获取一次性绑定码。密钥需支持 FIDO2 和 PIN 或指纹验证。'}</p>
