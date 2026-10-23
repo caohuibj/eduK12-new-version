@@ -1,4 +1,8 @@
-import { applyScaleOptionLabels, parseScaleItemPaste, resizeScaleOptions, scaleOptionPresets } from './scaleAuthoringInput'
+import {normalizedMaterialList} from '../modules/assessment-media/material'
+import {TrainingMaterialPicker} from '../modules/assessment-media/TrainingMaterialPicker'
+import type {AssessmentMaterial} from '../modules/assessment-media/material'
+import {scoreSelectionSummary as sharedScoreSummary} from '../modules/assessment-core/scale/scoreSummary'
+import { applyScaleOptionLabels, parseScaleItemPaste, resizeScaleOptions, scaleOptionPresets } from '../modules/assessment-core/scale/authoringInput'
 import { type RawScoreFeedback, type RawScoreFeedbackRule, validateRawScoreFeedback } from '../modules/scale/rawScoreFeedback'
 import { TrainingRawScoreFeedbackEditor } from './TrainingRawScoreFeedbackEditor'
 import ScaleCsvImport from './ScaleCsvImport'
@@ -31,7 +35,7 @@ interface ScaleDefinition {
   license: { status: 'self_authored' | 'authorized' | 'verified' | 'unknown'; redistribution: 'allowed' | 'restricted' | 'unknown'; note?: string }
   display: { randomizeItems: boolean }
   responseSets: Array<{ key: string; options: ResponseOption[] }>
-  items: Array<{ itemCode: string; content: string; type: string; required: boolean; sortOrder: number; responseSetKey: string; randomizeOptions: boolean; purpose?: 'CONTENT' | 'ATTENTION_CHECK' | 'SOCIAL_DESIRABILITY'; attentionTarget?: ResponseValue }>
+  items: Array<{ materials?:AssessmentMaterial[]; itemCode: string; content: string; type: string; required: boolean; sortOrder: number; responseSetKey: string; randomizeOptions: boolean; purpose?: 'CONTENT' | 'ATTENTION_CHECK' | 'SOCIAL_DESIRABILITY'; attentionTarget?: ResponseValue }>
   scoring: {
     scoringVersion: string
     itemRules: Array<{ itemCode: string; transform: { type: 'identity' | 'reverse' } }>
@@ -44,7 +48,7 @@ interface ScaleDefinition {
       direction: Direction
       canonical: boolean
       displayPrecision: number
-      source: { type: 'items'; items: Array<{ itemCode: string; weight: number }>; aggregation: Aggregation }
+      source: { type: 'items'; items: Array<{ materials?:AssessmentMaterial[]; itemCode: string; weight: number }>; aggregation: Aggregation }
     }>
   }
   report: {
@@ -375,8 +379,10 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
     const qualityItems = (value: ScaleDefinition) => value.items.filter(item => item.purpose && item.purpose !== 'CONTENT').map(item => ({ itemCode: item.itemCode, purpose: item.purpose, attentionTarget: item.attentionTarget, responseSetKey: item.responseSetKey }))
     const feedbackContract = (value: ScaleDefinition) => {
       const images = (entries: import('../modules/scale/rawScoreFeedback').RawScoreFeedbackImage[] | undefined) => entries?.map(image => ({ asset: { assetId: image.asset.assetId, contentHash: image.asset.contentHash, mimeType: image.asset.mimeType }, altText: image.altText, caption: image.caption, order: image.order }))
-      return value.report.rawScoreFeedback?.rules.map(rule => ({ scoreKey: rule.scoreKey, ranges: rule.ranges.map(range => ({ key: range.key, min: range.min, max: range.max, includeMax: range.includeMax, text: range.text.trim(), images: images(range.images) })), fallback: rule.fallback ? { text: rule.fallback.text.trim(), images: images(rule.fallback.images) } : undefined })) ?? []
+      return value.report.rawScoreFeedback?.rules.map(rule => ({ scoreKey: rule.scoreKey, ranges: rule.ranges.map(range => ({ key: range.key, min: range.min, max: range.max, includeMax: range.includeMax, text: range.text.trim(), materials:normalizedMaterialList(range.materials), images: images(range.images) })), fallback: rule.fallback ? { text: rule.fallback.text.trim(), materials:normalizedMaterialList(rule.fallback.materials), images: images(rule.fallback.images) } : undefined })) ?? []
     }
+    const stimulusContract=(value:ScaleDefinition)=>value.items.map(item=>({key:item.itemCode,materials:normalizedMaterialList(item.materials)}))
+    if(JSON.stringify(stimulusContract(stored))!==JSON.stringify(stimulusContract(next)))throw new Error('保存后的素材引用与当前编辑不一致，未确认保存；当前编辑内容已保留')
     if (JSON.stringify(qualityItems(stored)) !== JSON.stringify(qualityItems(next)) || JSON.stringify(feedbackContract(stored)) !== JSON.stringify(feedbackContract(next))) throw new Error('保存后的题型或反馈配置与当前编辑不一致，未确认保存；当前编辑内容已保留')
     if ((stored.license.note ?? '') !== (next.license.note ?? '')) throw new Error('保存后的授权声明与当前编辑不一致，未确认保存；当前编辑内容已保留')
     setDefinition(stored)
@@ -538,22 +544,10 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
 
   const removeItem = (itemCode: string) => setDefinition((current) => ({ ...current, items: [...current.items].sort((a, b) => a.sortOrder - b.sortOrder).filter((item) => item.itemCode !== itemCode).map((item, index) => ({ ...item, sortOrder: index + 1 })), scoring: { ...current.scoring, itemRules: current.scoring.itemRules.filter((rule) => rule.itemCode !== itemCode), scores: current.scoring.scores.map((score) => ({ ...score, source: { ...score.source, items: score.source.items.filter((item) => item.itemCode !== itemCode) } })) } }))
 
-  const scoreSelectionSummary = (score: ScaleDefinition['scoring']['scores'][number]) => {
-    const selected = score.source.items
-    const ranges = selected.map(entry => {
-      const item = definition.items.find(candidate => candidate.itemCode === entry.itemCode)
-      const options = definition.responseSets.find(set => set.key === item?.responseSetKey)?.options
-      if (!options?.length) return null
-      const values = options.map(option => option.score)
-      const weight = score.source.aggregation === 'mean' ? 1 : entry.weight
-      return { min: Math.min(...values) * weight, max: Math.max(...values) * weight }
-    })
-    const complete = ranges.length > 0 && ranges.every(range => range !== null)
-    const divisor = score.source.aggregation === 'mean' ? selected.length : 1
-    const range = complete ? `${(ranges.reduce((sum, r) => sum + Math.min(r!.min, r!.max), 0) / divisor).toFixed(score.displayPrecision ?? 1)}–${(ranges.reduce((sum, r) => sum + Math.max(r!.min, r!.max), 0) / divisor).toFixed(score.displayPrecision ?? 1)}` : '请先选题并完成选项计分'
-    const omitted = contentItems.filter(item => !selected.some(entry => entry.itemCode === item.itemCode)).map(item => item.itemCode)
-    return `已纳入 ${selected.length}/${contentItems.length} 题 · 预计范围 ${range}。${omitted.length ? `未纳入：${omitted.join('、')}。请核对报告文案，避免将部分计分称为全部题目合计。` : '全部题目已纳入。'}`
-  }
+  const scoreSelectionSummary = (score: ScaleDefinition['scoring']['scores'][number]) => sharedScoreSummary({
+    items:contentItems.map(item=>({key:item.itemCode,scores:definition.responseSets.find(set=>set.key===item.responseSetKey)?.options.map(option=>option.score)??[]})),
+    selected:score.source.items.map(item=>({key:item.itemCode,weight:item.weight})),aggregation:score.source.aggregation,precision:score.displayPrecision,
+  })
 
   const addScore = (type: 'total' | 'dimension') => setDefinition((current) => {
     const scoreKeys = new Set(current.scoring.scores.map((score) => score.key))
@@ -634,6 +628,7 @@ const ScaleEditor: React.FC<{ id?: string }> = ({ id }) => {
         <div className="scale-item-list">{sortedItems.map((item, itemIndex) => { const rule = definition.scoring.itemRules.find(candidate => candidate.itemCode === item.itemCode); return <article key={item.itemCode} className="scale-item-card">
           <div className="scale-item-top"><strong>第 {itemIndex + 1} 题</strong><span>{item.required ? '必答' : '选答'}{item.purpose === 'ATTENTION_CHECK' ? ' · 注意力题' : item.purpose === 'SOCIAL_DESIRABILITY' ? ' · 社会赞许性题' : ''}</span></div>
           <textarea aria-label={`第 ${itemIndex + 1} 题题干`} disabled={controlsDisabled} value={item.content} onChange={event => updateItem(item.itemCode, { content: event.target.value })} className="input" placeholder="题目内容" />
+          <details className="scale-author-advanced"><summary>题目素材 · 图片、视频、文档{item.materials?.length?'（'+item.materials.length+'）':''}</summary><TrainingMaterialPicker label="题目展示素材" value={item.materials} disabled={controlsDisabled} onChange={materials=>updateItem(item.itemCode,{materials})}/></details>
           <div className="scale-item-controls">{(!item.purpose || item.purpose === 'CONTENT') && <label><input type="checkbox" checked={rule?.transform.type === 'reverse'} disabled={controlsDisabled} onChange={() => toggleReverse(item.itemCode)} />反向计分</label>}
             {item.purpose === 'ATTENTION_CHECK' && <label>注意力题目标选项<select aria-label={`目标选项 ${item.itemCode}`} className="input" disabled={controlsDisabled} value={item.attentionTarget === undefined ? '' : responseValueToken(item.attentionTarget)} onChange={event => { const option = definition.responseSets.find(set => set.key === item.responseSetKey)?.options.find(option => responseValueToken(option.value) === event.target.value); updateItem(item.itemCode, { attentionTarget: option?.value }) }}><option value="">请选择目标选项</option>{definition.responseSets.find(set => set.key === item.responseSetKey)?.options.map(option => <option key={responseValueToken(option.value)} value={responseValueToken(option.value)}>{option.label}</option>)}</select></label>}
             <div className="scale-item-actions"><button type="button" aria-label={`上移 ${item.itemCode}`} onClick={() => moveItem(item.itemCode, -1)} disabled={controlsDisabled || itemIndex === 0} title="上移"><ArrowUp size={17} /></button><button type="button" aria-label={`下移 ${item.itemCode}`} onClick={() => moveItem(item.itemCode, 1)} disabled={controlsDisabled || itemIndex === sortedItems.length - 1} title="下移"><ArrowDown size={17} /></button><button type="button" aria-label={`复制 ${item.itemCode}`} onClick={() => duplicateItem(item.itemCode)} disabled={controlsDisabled}><Copy size={17} />复制</button><button type="button" aria-label={`删除题目 ${itemIndex + 1}`} onClick={() => removeItem(item.itemCode)} disabled={controlsDisabled} className="scale-author-delete"><Trash2 size={17} />删除</button></div>

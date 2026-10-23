@@ -1,13 +1,7 @@
 import { sanitizeFormAnswers } from './form-visibility'
 
-export type FlowField=
-  |{source:'ANSWER';instrumentKey:string;itemKey:string}
-  |{source:'EMBEDDED';key:string}
-export type FlowCondition=
-  |{op:'AND'|'OR';terms:FlowCondition[]}
-  |{op:'NOT';term:FlowCondition}
-  |{op:'EQUALS'|'INCLUDES'|'GT'|'GTE'|'LT'|'LTE'|'IS_MISSING';
-    field:FlowField;value?:string|number|boolean}
+import type {FlowCondition} from '../modules/assessment-core/flow/conditions'
+export type {FlowField,FlowCondition} from '../modules/assessment-core/flow/conditions'
 export type FlowBlock={
   blockKey:string;kind:'INSTRUMENT'|'MATERIAL'|'END';
   instrumentKey?:string;title?:string;body?:string;

@@ -1,6 +1,8 @@
+import {SurveyMaterialPicker} from './SurveyMaterialPicker'
+import {scoreSelectionSummary} from '../modules/assessment-core/scale/scoreSummary'
 import {useEffect,useId,useState} from 'react'
 import {Settings2,ListChecks,ListOrdered,SlidersHorizontal,MessageSquare,Plus,ArrowUp,ArrowDown,Copy,Trash2} from 'lucide-react'
-import {applyScaleOptionLabels,parseScaleItemPaste,scaleOptionPresets} from '../pages/scaleAuthoringInput'
+import {applyScaleOptionLabels,parseScaleItemPaste,scaleOptionPresets} from '../modules/assessment-core/scale/authoringInput'
 import {validateRawScoreFeedback} from '../modules/scale/rawScoreFeedback'
 import './survey-scale-studio.css'
 import { SurveyRawScoreFeedbackEditor } from './SurveyRawScoreFeedbackEditor'
@@ -55,6 +57,7 @@ export function ResearchScaleEditor({value,onChange,projectId,appearance='standa
         </div>)}</div>
       <button type="button" className="btn-secondary" disabled={studio&&value.responseOptions.length>=15} onClick={()=>onChange({...value,responseOptions:[...value.responseOptions,{optionKey:researchKey('o'),label:'新选项',score:value.responseOptions.length+1}]})}>{studio&&<Plus size={16}/>}新增选项</button>
     </section>
+  const selectionSummary=(keys:string[],aggregation:'sum'|'mean')=>scoreSelectionSummary({items:value.items.filter(item=>!item.purpose||item.purpose==='CONTENT').map(item=>({key:item.itemKey,scores:value.responseOptions.map(option=>option.score)})),selected:keys.map(key=>({key})),aggregation})
   const dimensions=<section className="border rounded-xl p-4 space-y-3 bg-white">
       <header className={studio?'survey-scale-panel-heading':undefined}><div><h3 className="font-semibold">{studio?'维度计分':'维度（研究描述性得分，不提供常模）'}</h3>{studio&&<p>设置维度名称、分数含义及纳入的内容题，不提供常模或诊断。</p>}</div>{studio&&<span>{value.dimensions.length} / 20 个维度</span>}</header>
       {studio&&!value.dimensions.length&&<p className="survey-scale-empty">还没有维度。先新增一个维度，再选择参与计分的题目。</p>}
@@ -74,6 +77,7 @@ export function ResearchScaleEditor({value,onChange,projectId,appearance='standa
           dimensions:value.dimensions.filter(x=>x.dimensionKey!==dim.dimensionKey),
           items:value.items.map(x=>({...x,dimensionKeys:x.dimensionKeys.filter(k=>k!==dim.dimensionKey)}))})}>删除</button>
         </div>
+        <p className="text-sm text-slate-600" role="status">{selectionSummary(value.items.filter(item=>item.dimensionKeys.includes(dim.dimensionKey)).map(item=>item.itemKey),value.aggregation)}</p>
         {studio&&<fieldset className="survey-scale-score-members"><legend>纳入计分的题目 <small>{value.items.filter(q=>(!q.purpose||q.purpose==='CONTENT')&&q.dimensionKeys.includes(dim.dimensionKey)).length} 题</small></legend><div>{value.items.map((q,qi)=>(!q.purpose||q.purpose==='CONTENT')&&<label key={q.itemKey} className={q.dimensionKeys.includes(dim.dimensionKey)?'is-selected':''}><input type="checkbox" aria-label={dim.label+' 纳入第 '+(qi+1)+' 题'} checked={q.dimensionKeys.includes(dim.dimensionKey)} onChange={event=>setItem(qi,item=>({...item,dimensionKeys:event.target.checked?[...item.dimensionKeys,dim.dimensionKey]:item.dimensionKeys.filter(key=>key!==dim.dimensionKey)}))}/><span>第 {qi+1} 题</span><small title={q.prompt}>{q.prompt||'未填写题干'}</small></label>)}</div>{!value.items.some(q=>!q.purpose||q.purpose==='CONTENT')&&<p>先到“题目”分区添加内容题；辅助题不参与计分。</p>}</fieldset>}
       </div>)}
       <button type="button" className="btn-secondary" disabled={studio&&value.dimensions.length>=20} onClick={()=>onChange({...value,dimensions:[
@@ -114,6 +118,7 @@ export function ResearchScaleEditor({value,onChange,projectId,appearance='standa
         {!studio&&settings}
         <textarea className="input w-full" rows={2} aria-label={'题干 '+(i+1)} value={q.prompt}
           onChange={e=>setItem(i,x=>({...x,prompt:e.target.value}))}/>
+        <details className="survey-scale-item-details survey-scale-item-materials"><summary>题目素材 · 图片、视频、文档</summary><SurveyMaterialPicker label="题目展示素材" value={q.materials} onChange={materials=>setItem(i,item=>({...item,materials}))}/></details>
         {studio&&<details className="survey-scale-item-details"><summary>题目用途与辅助题设置</summary>{settings}</details>}
         {(!q.purpose||q.purpose==='CONTENT')&&<><label className="inline-flex gap-2 items-center"><input type="checkbox" checked={q.reverse}
           onChange={e=>setItem(i,x=>({...x,reverse:e.target.checked}))}/>反向计分</label>
@@ -133,6 +138,7 @@ export function ResearchScaleEditor({value,onChange,projectId,appearance='standa
         <label className="block text-sm">总分标识<input className="input block" value={value.totalScore.key} onChange={e=>onChange({...value,totalScore:{...value.totalScore!,key:e.target.value}})}/></label>
         <label className="block text-sm">总分名称<input className="input block" value={value.totalScore.label} onChange={e=>onChange({...value,totalScore:{...value.totalScore!,label:e.target.value}})}/></label>
         <label className="block text-sm">总分聚合<select className="input block" value={value.totalScore.aggregation} onChange={e=>onChange({...value,totalScore:{...value.totalScore!,aggregation:e.target.value as 'sum'|'mean'}})}><option value="sum">求和</option><option value="mean">平均</option></select></label>
+        <p className="text-sm text-slate-600" role="status">{selectionSummary(value.totalScore.itemKeys,value.totalScore.aggregation)}</p>
         <fieldset className={studio?'survey-scale-total-members':'space-y-2'}><legend className="text-sm font-semibold">纳入总分的内容题</legend>{value.items.filter(q=>!q.purpose||q.purpose==='CONTENT').map(q=><label className="flex gap-2 text-sm" key={q.itemKey}><input type="checkbox" checked={value.totalScore!.itemKeys.includes(q.itemKey)} onChange={e=>onChange({...value,totalScore:{...value.totalScore!,itemKeys:e.target.checked?[...value.totalScore!.itemKeys,q.itemKey]:value.totalScore!.itemKeys.filter(k=>k!==q.itemKey)}})}/>{q.prompt||q.itemKey}</label>)}</fieldset>
       </>}
     </section>

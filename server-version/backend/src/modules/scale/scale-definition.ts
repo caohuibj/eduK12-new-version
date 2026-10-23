@@ -1,3 +1,4 @@
+import {materialListSchema,publicMaterial} from '../assessment-media/material'
 import { rawScoreFeedbackSchema, rawScoreFeedbackBindingIssues } from './raw-score-feedback'
 import { validateAudienceReport } from './library/audience-report-gate'
 import { createHash } from 'node:crypto'
@@ -58,6 +59,7 @@ export const scaleItemDefinitionSchema = z.object({
   attentionTarget: responseValueSchema.optional(),
   itemCode: z.string().min(1),
   content: z.string().min(1),
+  materials:materialListSchema.optional(),
   images: assessmentImagePresentationListSchema.optional(),
   video: assessmentVideoPresentationSchema.optional(),
   type: z.string().default('single'),
@@ -528,6 +530,7 @@ export const runnerDefinition = (definition: ScaleDefinitionV2) => ({
   display: definition.display,
   items: [...definition.items].sort((left, right) => left.sortOrder - right.sortOrder).map(({ attentionTarget: _target, purpose: _purpose, ...item }) => ({
     ...item,
+    ...(item.materials?{materials:item.materials.map(publicMaterial)}:{}),
     options: responseSetForItem(definition, item).options.map(({ value, label }) => ({ value, label })),
   })),
 })

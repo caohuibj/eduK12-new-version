@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { fireEvent,render,screen } from '@testing-library/react'
-import { describe,expect,it } from 'vitest'
+import { describe,expect,it,vi } from 'vitest'
 import { SurveyFlowStudio } from './SurveyFlowStudio'
 import type { FlowDraft } from './flow.client'
 const initial:FlowDraft={schemaVersion:1,embeddedData:[],blocks:[
@@ -45,4 +45,13 @@ describe('A/B questionnaire variant editor',()=>{
     expect(draft.experiment!.groups[0].instrumentKeys).toEqual([])
     expect(draft.experiment!.groups[1].instrumentKeys).toEqual(['tool-b'])
   })
+})
+
+it('uses includes when inserting an END rule from a multiple-choice question', () => {
+  const onChange = vi.fn()
+  render(<SurveyFlowStudio value={initial} onChange={onChange} collectionMode="LINKED_WAVES"
+    selectedIds={['a','b']} tools={[{id:'a',instrumentKey:'tool-a',title:'甲',kind:'FORM'},{id:'b',instrumentKey:'tool-b',title:'乙',kind:'FORM'}]}
+    questions={[{instrumentKey:'tool-a',itemKey:'multi',prompt:'选择',type:'MULTIPLE',options:[{optionKey:'yes',label:'是'}]}]}/>)
+  fireEvent.click(screen.getByRole('button',{name:'增加条件终止'}))
+  expect(onChange.mock.calls[0][0].blocks.at(-1).when).toEqual({op:'INCLUDES',field:{source:'ANSWER',instrumentKey:'tool-a',itemKey:'multi'},value:'yes'})
 })

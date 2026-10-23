@@ -2,7 +2,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { fireEvent, render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
-import { parseScaleItemPaste } from '../scaleAuthoringInput'
+import { parseScaleItemPaste } from '../../modules/assessment-core/scale/authoringInput'
 const api = vi.hoisted(() => ({ get: vi.fn(), put: vi.fn(), post: vi.fn() }))
 vi.mock('../../api/client', () => ({ default: api }))
 vi.mock('react-router-dom', async () => ({ ...await vi.importActual('react-router-dom'), useParams: () => ({ id: 'scale-1' }) }))

@@ -1,0 +1,11 @@
+.shared-flow-condition[data-appearance="training"] { border-color:var(--training-border); background:var(--training-surface); color:var(--training-ink); }
+.shared-flow-condition[data-appearance="survey"] { border-color:var(--survey-brand-line); color:var(--survey-brand-ink); }
+.shared-flow-condition { min-width:0; }
+.shared-flow-condition select { min-width:0; max-width:100%; }
+.training-flow-blocks { display:grid; gap:12px; margin-block:16px; }
+.training-flow-block { min-width:0; border:1px solid var(--training-border); background:var(--training-surface); border-radius:12px; padding:16px; }
+.training-flow-block header { display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap; }
+.training-flow-block label { display:block; margin-top:12px; font-size:14px; }
+.training-flow-block .input { display:block; width:100%; margin-top:6px; }
+.training-flow-block-actions { display:flex; gap:8px; }
+.training-flow-block-actions button { min-height:36px; }

@@ -1,3 +1,5 @@
+import {materialListSchema} from '../assessment-media/material'
+import {serveAssessmentMaterial} from '../assessment-media/material-delivery'
 import type { Response } from 'express'
 import { prisma } from '../../config/database'
 import type { AssetDatabase } from '../../services/assetStorage'
@@ -10,6 +12,7 @@ import {
   findFrozenAssessmentAssetReference,
   retainAssessmentAssetReferences,
   type AssessmentAssetRetentionOwner,
+  type AssessmentAssetIdentityV1,
 } from '../assessment-media/assessment-asset'
 import {
   assessmentImageAssetReferences,
@@ -82,8 +85,12 @@ const compositeFormSectionVideoReferences = (definition: unknown) => {
   })
 }
 
+export const compositeFormSectionMaterialReferences=(definition:unknown)=>{
+  const items=(definition as {items?:Array<{formDefinition?:{materials?:unknown}}>})?.items??[]
+  return items.flatMap(item=>materialListSchema.optional().parse(item.formDefinition?.materials)??[]).map(item=>item.asset)
+}
 export const compositeFormSectionMediaReferences = (definition: unknown) => [
-  ...compositeFormSectionImageReferences(definition), ...compositeFormSectionVideoReferences(definition),
+  ...compositeFormSectionImageReferences(definition), ...compositeFormSectionVideoReferences(definition), ...compositeFormSectionMaterialReferences(definition),
 ]
 
 export const frozenFormSectionImageReferences = (admission: FrozenUnitAdmissionV1) => {
@@ -99,6 +106,7 @@ export const frozenFormSectionMediaReferences = (admission: FrozenUnitAdmissionV
   if (!frozen) return []
   return [
     ...frozenFormSectionImageReferences(admission),
+    ...(frozen.kind==='composite'?compositeFormSectionMaterialReferences(frozen.definition):[]),
     ...(frozen.kind === 'questionnaire'
       ? questionnaireFormSectionVideoReferences(frozen.definition)
       : compositeFormSectionVideoReferences(frozen.definition)),
@@ -132,7 +140,7 @@ export const frozenFormMediaOwner = (
 
 export const retainFormSectionImages = async (input: {
   owner: AssessmentAssetRetentionOwner
-  references: ReturnType<typeof questionnaireFormSectionImageReferences>
+  references: readonly AssessmentAssetIdentityV1[]
   db?: AssetDatabase
 }): Promise<void> => retainAssessmentAssetReferences({
   owner: input.owner,
@@ -167,6 +175,10 @@ export const serveFrozenFormSectionImage = async (input: {
   res: Response
   db?: AssetDatabase
 }): Promise<void> => {
+  const frozen=input.admission.formSection
+  const materials=frozen?.kind==='composite'?compositeFormSectionMaterialReferences(frozen.definition):[]
+  const material=materials.find(ref=>ref.assetId===input.assetId)
+  if(material){await serveAssessmentMaterial(material,input.res,input.db);return}
   const references = frozenFormSectionImageReferences(input.admission)
   const reference = findFrozenAssessmentAssetReference(references, input.assetId)
   if (!reference) throw new Error('Assessment image is not referenced by the frozen Form section')

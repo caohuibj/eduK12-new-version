@@ -34,7 +34,7 @@ export function surveyGroupRateScope(req:Pick<Request,'method'|'path'|'body'>):S
   if(!attempt)return null
   const action=attempt[2]
   const simple=/^(task|final|screen-out|general|withdraw-data|checkpoint\/(read|save|clear))$/.test(action)
-    ||new RegExp('^images/'+uuid+'$').test(action)
+    ||new RegExp('^(?:images|materials|report-materials)/'+uuid+'$').test(action)
   const cognitive=action.match(new RegExp('^cognitive/([a-z][a-z0-9_-]{0,79})/(?:('+uuid+')/(read|interrupt|restart|final)|(start))$'))
   if(!simple&&!cognitive)return null
   return {publicId,attemptId:attempt[1],credentialHash:credential,researchCode,

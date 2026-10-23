@@ -1,5 +1,5 @@
-import { createContext, useContext, useEffect, useId, useRef, useState, type ReactNode } from 'react'
-import { Check, Clock3, Moon, Sun } from 'lucide-react'
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
+import { Clock3, Moon, Sun } from 'lucide-react'
 import './survey-appearance.css'
 import { surveyDaylight } from './survey-appearance-clock'
 
@@ -54,37 +54,26 @@ export function SurveyAppearance({ children }: { children: ReactNode }) {
   </AppearanceContext.Provider>
 }
 
+const appearanceModes = [
+  { value: 'auto', label: '自动', Icon: Clock3 },
+  { value: 'light', label: '浅色', Icon: Sun },
+  { value: 'dark', label: '深色', Icon: Moon },
+] as const
+
 export function SurveyAppearanceControl() {
   const { mode, theme, setMode } = useContext(AppearanceContext)
-  const [open, setOpen] = useState(false)
-  const container = useRef<HTMLDivElement>(null)
-  const trigger = useRef<HTMLButtonElement>(null)
-  const id = useId()
-  useEffect(() => {
-    if (!open) return
-    const dismiss = (event: PointerEvent) => {
-      if (!container.current?.contains(event.target as Node)) setOpen(false)
-    }
-    const escape = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') { setOpen(false); trigger.current?.focus() }
-    }
-    document.addEventListener('pointerdown', dismiss)
-    document.addEventListener('keydown', escape)
-    return () => { document.removeEventListener('pointerdown', dismiss); document.removeEventListener('keydown', escape) }
-  }, [open])
-  const Icon = theme === 'dark' ? Moon : Sun
-  return <div className="survey-appearance-control" ref={container}>
-    <button type="button" ref={trigger} className="survey-appearance-trigger" aria-expanded={open}
-      aria-controls={id} onClick={() => setOpen(!open)}><Icon size={18} aria-hidden="true"/><span>外观</span></button>
-    {open && <section id={id} className="survey-appearance-popover" aria-label="外观设置">
-      <strong>外观设置</strong><p>选择适合此刻的明暗。</p>
-      <div role="group" aria-label="显示模式">{([
-        ['auto', '自动', Clock3], ['light', '浅色', Sun], ['dark', '深色', Moon],
-      ] as const).map(([value, label, ModeIcon]) => <button type="button" key={value}
-        aria-pressed={mode === value} onClick={() => setMode(value)}>
-        <ModeIcon size={20} aria-hidden="true"/><span>{label}</span>{mode === value && <Check size={14} aria-hidden="true"/>}
-      </button>)}</div>
-      <small>{mode === 'auto' ? `按本机时间自动切换，当前为${theme === 'dark' ? '深色' : '浅色'}。` : '已记住此设备上的选择。'}<br/>7:00–19:00 浅色，其余时间深色。</small>
-    </section>}
+  const index = appearanceModes.findIndex(item => item.value === mode)
+  const { label, Icon } = appearanceModes[index]
+  const next = appearanceModes[(index + 1) % appearanceModes.length]
+  const description = mode === 'auto'
+    ? `按本机时间，7:00–19:00 浅色，其余时间深色；当前${theme === 'dark' ? '深色' : '浅色'}`
+    : '已记住此设备上的选择'
+  return <div className="survey-appearance-control">
+    <button type="button" className="survey-appearance-trigger"
+      aria-label={`外观：${label}，点击切换为${next.label}`}
+      title={`${description}。点击切换为${next.label}；自动 → 浅色 → 深色。`}
+      onClick={() => setMode(next.value)}>
+      <Icon size={18} aria-hidden="true"/><span>外观<span className="survey-appearance-mode" aria-live="polite"> · {label}</span></span>
+    </button>
   </div>
 }

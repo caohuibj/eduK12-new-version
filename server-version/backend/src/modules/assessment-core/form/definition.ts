@@ -1,3 +1,4 @@
+import {materialListSchema} from '../../assessment-media/material'
 import { z } from 'zod'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import { assessmentKeySchema, assessmentImageSchema } from '../definition-primitives'
@@ -63,6 +64,7 @@ export const formQuestionSchema=z.object({
     'DATE','TIME','RANK_ORDER','SLIDER','CONSTANT_SUM','MATRIX_MULTIPLE']),
   prompt:note,
   image:assessmentImageSchema.optional(),
+  materials:materialListSchema.optional(),
   required:z.boolean(),
   allowRefusal:z.boolean().optional(),
   options:z.array(option).max(30).default([]),
@@ -134,6 +136,7 @@ export const validateFormDefinition=(input:unknown,options:{
     page.questions.forEach((q,qi)=>{
       const path=`pages.${pi}.questions.${qi}`
       if(forPreview)requireText(q.prompt,path+'.prompt',issues)
+      if(forPreview&&q.materials?.some(item=>item.rightsStatus==='unknown'||!item.rightsNote.trim()))err(issues,path+'.materials','请确认素材使用依据并填写原创或授权说明')
       if(forPreview&&q.image&&(q.image.rightsStatus==='unknown'||!q.image.rightsNote.trim()))
         err(issues,path+'.image','研究图片须明确作者或使用许可来源，才可发布')
       if(d.schemaVersion===1&&formQuestionRegistry[q.type].version>1)

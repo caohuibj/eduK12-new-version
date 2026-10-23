@@ -1,3 +1,5 @@
+import {serveAssessmentMaterial} from '../assessment-media/material-delivery'
+import {scaleStimulusMaterialReferences} from './scale-image-retention'
 import type { Response } from 'express'
 import type { AssetDatabase } from '../../services/assetStorage'
 import { findFrozenAssessmentAssetReference } from '../assessment-media/assessment-asset'
@@ -21,6 +23,8 @@ export const serveFrozenScaleAssessmentImage = async (input: {
   res: Response
   db?: AssetDatabase
 }): Promise<void> => {
+  const material=scaleStimulusMaterialReferences(input.snapshot.definition).find(reference=>reference.assetId===input.assetId)
+  if(material){await serveAssessmentMaterial(material,input.res,input.db);return}
   const reference = findFrozenAssessmentAssetReference(
     scaleAssessmentImageReferences(input.snapshot.definition),
     input.assetId,

@@ -1,3 +1,5 @@
+import {ownedScope} from './material-scope'
+import {materialListSchema,materialLimits,stimulusMaterials,type AssessmentMaterial} from '../assessment-media/material'
 import {authorizedLibraryUnitMedia,type LibraryBoundMediaUnit} from '../scale-library-governance/media.authorization'
 import { rawScoreFeedbackImages } from '../scale/scale-image-retention'
 import type { RawScoreFeedback } from '../scale/raw-score-feedback'
@@ -46,9 +48,21 @@ export async function assertSurveyMediaOwned(tx:Tx,userId:string,projectId:strin
     ?rawScoreFeedbackImages((unit.definition as {rawScoreFeedback?:RawScoreFeedback}).rawScoreFeedback):[])
   const refs:Array<ImageIdentity|AssessmentImagePresentationV1>=[...stimuli,...reportImages]
   const ids=[...new Set(refs.map(r=>r.asset.assetId))]
-  if(!ids.length)return libraryRefs
-  if(ids.length>30)fail(400,'单次研究发布最多引用 30 个静态图片')
-  const assets=await tx.storedAsset.findMany({where:{id:{in:ids},ownerId:userId,...assetScope(projectId,toolLibrary),
+  const materials=nativeUnits.flatMap(unit=>{
+    if(!['FORM','SCALE'].includes(unit.kind))return []
+    const d=unit.definition as {materials?:AssessmentMaterial[];rawScoreFeedback?:{rules:Array<{ranges:Array<{materials?:AssessmentMaterial[]}>;fallback?:{materials?:AssessmentMaterial[]}}>}}
+    return [...stimulusMaterials(d),...(d.rawScoreFeedback?.rules.flatMap(rule=>[...rule.ranges,...(rule.fallback?[rule.fallback]:[])].flatMap(range=>range.materials??[]))??[])]
+  })
+  for(const material of materials){
+    const checked=materialListSchema.parse([material])[0]
+    if(checked.rightsStatus==='unknown'||!checked.rightsNote.trim())fail(403,'展示素材必须确认原创或授权依据')
+  }
+  const allIds=[...new Set([...ids,...materials.map(item=>item.asset.assetId)])]
+  if(!allIds.length)return libraryRefs
+  const allowed=await tx.$queryRaw<Array<{id:string}>>`SELECT a.id FROM stored_assets a WHERE a.id=ANY(${allIds}::text[]) AND ${ownedScope(userId)}`
+  const allowedIds=allowed.map(row=>row.id)
+  if(allIds.length>30)fail(400,'单次研究发布最多引用 30 个图片或展示素材')
+  const assets=await tx.storedAsset.findMany({where:{id:{in:allowedIds},ownerId:userId,
     accessScope:'PRIVATE',deletedAt:null},select:{
     id:true,mimeType:true,sha256:true,sizeBytes:true,
   }})
@@ -63,7 +77,12 @@ export async function assertSurveyMediaOwned(tx:Tx,userId:string,projectId:strin
       ||!surveyMimeTypes.includes(a.mimeType as (typeof surveyMimeTypes)[number]))
       fail(403,'研究图片缺少本项目授权或与上传时的文件摘要不一致')
   }
-  return [...libraryRefs,...refs.map(r=>r.asset)]
+  for(const material of materials){
+    const a=byId.get(material.asset.assetId)
+    if(!a||a.sha256!==material.asset.contentHash||a.mimeType!==material.asset.mimeType||a.sizeBytes<=0||a.sizeBytes>materialLimits[material.asset.mimeType])
+      fail(403,'展示素材不存在、无权使用或与保存的文件摘要不一致')
+  }
+  return [...libraryRefs,...refs.map(r=>r.asset),...materials.map(r=>r.asset)]
 }
 export async function retainSurveyMedia(tx:Tx,userId:string,projectId:string,publicationId:string,
   units:readonly UnitDef[]){

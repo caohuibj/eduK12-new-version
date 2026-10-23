@@ -1,3 +1,4 @@
+import {materialListSchema,type AssessmentMaterial} from '../assessment-media/material'
 import { rawScoreFeedbackSchema, rawScoreFeedbackBindingIssues } from '../scale/raw-score-feedback'
 import { scaleItemPurposeSchema, isScaleContentItem } from '../scale/scale-definition'
 import { z } from 'zod'
@@ -6,11 +7,12 @@ import { expandedSurveySjtOptions } from './sjt-selection'
 import { validateSurveySjtV2 } from './sjt-v2.validation'
 import { cognitiveDraftSchema, initialCognitiveDefinition, validateCognitiveDraft, type CognitiveDraft } from './cognitive.definition'
 import { assessmentKeySchema as surveyKeySchema, assessmentImageSchema as surveyImageSchema } from '../assessment-core/definition-primitives'
-import { formDraftSchema, validateFormDefinition, type FormDraft } from '../assessment-core/form/definition'
+import { formDraftSchema, validateFormDefinition, type FormDraft as CoreFormDraft } from '../assessment-core/form/definition'
 export { assessmentKeySchema as surveyKeySchema, assessmentImageSchema as surveyImageSchema } from '../assessment-core/definition-primitives'
 export { formDraftSchema, formQuestionSchema, formQuestionRegistry, formAnswerFieldCount,
   formWorstCaseAnswerBytes, FORM_MAX_ANSWER_FIELDS as SURVEY_FORM_MAX_ANSWER_FIELDS } from '../assessment-core/form/definition'
-export type { FormDraft, FormQuestion, FormQuestionType } from '../assessment-core/form/definition'
+export type FormDraft=CoreFormDraft & {materials?:AssessmentMaterial[]}
+export type { FormQuestion, FormQuestionType } from '../assessment-core/form/definition'
 
 /** Survey-only research drafts, never platform scientific publication definitions. */
 export const surveyKindSchema = z.enum(['FORM','SCALE','SJT','COGNITIVE'])
@@ -22,6 +24,7 @@ const option = z.object({
   optionKey: key, label, score: z.number().finite().min(-10000).max(10000).optional(),
 }).strict()
 export const scaleDraftSchema=z.object({
+  materials:materialListSchema.optional(),
   rawScoreFeedback:rawScoreFeedbackSchema.optional(),
   totalScore:z.object({key,label,itemKeys:z.array(key).min(1).max(240),aggregation:z.enum(['sum','mean'])}).strict().optional(),
   schemaVersion:z.literal(1),
@@ -35,7 +38,7 @@ export const scaleDraftSchema=z.object({
   }).strict()).max(20),
   aggregation:z.enum(['sum','mean']),
   items:z.array(z.object({
-    itemKey:key,prompt:note,required:z.boolean(),
+    itemKey:key,prompt:note,required:z.boolean(),materials:materialListSchema.optional(),
     purpose:scaleItemPurposeSchema.optional(),attentionTarget:key.optional(),
     reverse:z.boolean(),dimensionKeys:z.array(key).max(20),
   }).strict()).max(240),
@@ -85,7 +88,17 @@ const validateSurveyDraftCore=(
 ):{
   definition?:SurveyDraft;issues:Issue[];digest?:string
 }=>{
-  if(kind==='FORM')return validateFormDefinition(input,{forPreview,allowLegacyFrozenConditionOperators,includeDigest})
+  if(kind==='FORM'){
+    const outer=z.object({materials:materialListSchema.optional()}).passthrough().safeParse(input)
+    if(!outer.success)return {issues:outer.error.issues.map(x=>({path:x.path.join('.'),message:x.message,severity:'error' as const}))}
+    const {materials,...core}=outer.data
+    const result=validateFormDefinition(core,{forPreview,allowLegacyFrozenConditionOperators,includeDigest:false})
+    if(!result.definition)return result
+    const definition:FormDraft={...result.definition,...(materials?.length?{materials}:{})}
+    const canonical={kind,definition}
+    if(Buffer.byteLength(JSON.stringify(canonical),'utf8')>480000)result.issues.push({path:'definition',message:'定义超过大小限制',severity:'error'})
+    return {definition,issues:result.issues,...(includeDigest?{digest:canonicalHash(canonical)}:{})}
+  }
   const parsed=surveyDraftSchemaFor(kind).safeParse(input)
   if(!parsed.success)return {issues:parsed.error.issues.map(x=>({
     path:x.path.join('.')||'definition',message:x.message,severity:'error' as const,

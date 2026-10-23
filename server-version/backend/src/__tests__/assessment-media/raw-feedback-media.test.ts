@@ -29,9 +29,11 @@ describe('raw feedback media isolation and author simulation', () => {
   })
   it('checks Survey project ownership and immutable identity for report media', async () => {
     const findMany = vi.fn().mockResolvedValue([{ id: image.asset.assetId, mimeType: 'image/png', sha256: 'a'.repeat(64), sizeBytes: 120 }])
-    const db = { storedAsset: { findMany } } as never
+    const query=vi.fn().mockResolvedValue([{id:image.asset.assetId}])
+    const db = { $queryRaw:query,storedAsset: { findMany } } as never
     await expect(assertSurveyMediaOwned(db, 'owner', 'project', [{ kind: 'SCALE', definition: { rawScoreFeedback: config } }])).resolves.toEqual([image.asset])
-    expect(findMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ ownerId: 'owner', scopeId: 'project', accessScope: 'PRIVATE' }) }))
+    expect(findMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ ownerId: 'owner', id:{in:[image.asset.assetId]}, accessScope: 'PRIVATE' }) }))
+    expect(query).toHaveBeenCalled()
     findMany.mockResolvedValue([{ id: image.asset.assetId, mimeType: 'image/png', sha256: 'b'.repeat(64), sizeBytes: 120 }])
     await expect(assertSurveyMediaOwned(db, 'owner', 'project', [{ kind: 'SCALE', definition: { rawScoreFeedback: config } }])).rejects.toThrow('摘要')
   })

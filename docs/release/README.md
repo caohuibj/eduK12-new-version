@@ -919,3 +919,85 @@ WenQuanYi 字体包，以可信 runner apt 元数据摘要核验后解包至用�
 `119948366459` 覆盖未变的 scope/browser 控制文件，逐 blob 核验后复用；
 变化的 reuse、reuse.test、workspace.test 及消费新 helper 的 checks 控制接受新的 CodeQL。
 取消父 run 的状态原样记录，接纳成功步骤不授予其整条运行成功身份。
+
+## PR #339 shared authoring candidate (2026-10-23 approval)
+
+Only `work/shared-assessment-authoring-20261023`, fixed main
+`4dd9f1340fef2bc3df2d066b9bf7712bc2eb3c66` and product
+`693fd489e626eec6b34869657b2b23c5faeae69a` may use `shared-authoring`.
+The full raw diff, modes, before/after blobs, component trees, protected
+lock/config inputs and actual PR source/merge tree are rechecked. The only
+deleted path is an identical-blob move to the shared scale directory. Unknown
+paths, base drift, missing markers and manual/full/probe requests fail closed.
+
+Approved unsigned local evidence is explicitly `reviewed-local-evidence`,
+`ciExecuted=false`, `originalExecutionSigned=false`. Original failures and
+filtered rechecks remain recorded. No retrospective execution signature or
+historical full node_modules byte identity is asserted. Current type checks,
+focused assertions and synthetic pages are admitted only as the listed case
+identities after source/config/callee review. They do not establish manual
+real-account acceptance. The missing current production compilations, actual
+frozen/participant/report material chain, built-frontend short flow, missing
+lock audits and new CodeQL execute in Actions.
+
+The stable `merge gate / ready PR` recomputes the complete checkout and requires
+scope, all nested shared-authoring jobs and CodeQL to actually succeed. Draft,
+missing, failed, cancelled and skipped required work cannot qualify. No unrelated
+platform regression, performance/load/media/Ops work, heavy image build,
+production access, deployment or branch-protection change is authorized.
+An exact post-merge main event classifies without repeating accepted work.
+Other branches retain their existing routes.
+
+
+### PR #339 audit repair and exact successful-component reuse
+
+The candidate now includes only the necessary DOMPurify lock patch (3.4.14 to
+3.4.17, official registry and integrity) and sanitizer regression tests after
+product baseline 693fd489. Exact repaired product is
+0814c74f49b5bd47ccec27966f9ff55e1b112011; the historical unsigned local reports
+remain bound to 693fd489 and are never relabeled as new-dependency verification.
+The new lock requires fresh frontend audit, app types, seven sanitizer boundary
+cases, production compilation and the first built-candidate browser short flow.
+The cases establish the application's sanitizer contract, not an old-failing /
+new-passing exploit reproduction of every upstream advisory.
+
+Official run 39903131297 failed at the frontend dependency audit. Its successful
+backend job 120249077938 and CodeQL job 120249022752 remain component successes,
+not a successful parent run. Reuse is limited to 24 hours, the exact repository,
+branch, source 62949663112b0e19518b019f29fa691fdcd61d4d, actual successful stages,
+unchanged backend tree and frozen consumer. Artifact 12479427511 is pinned by
+name, size, owner, run, expiry and ZIP SHA256
+`d97c94e132cba937d73a9860a6cf8246fd733ee9ad494fd0e5f2aad933193fe8`.
+Only Actions reads the ZIP and its seven-check frozen-chain receipt; no compiled
+artifact is relayed through the local computer. No database is launched again.
+Application SAST reuse requires the only changed app source to be the new
+sanitizer test; changed CI controls and the sanitizer directory receive fresh
+CodeQL. Missing, stale, altered or unsuccessful evidence stops qualification.
+
+
+The first repaired browser job 120256492847 failed before page assertions because
+its fixture read Request.url as a property instead of calling Request.url().
+The browser consumer is corrected; this does not change either application tree.
+Official run 39905348476 frontend job 120256060844 succeeded with DOMPurify 3.4.17,
+seven sanitizer cases, new-lock app types, unchanged HIGH audit threshold and
+current Vite compilation. Its artifact 12481080458 (20,916,288 bytes) is pinned
+by exact name/source/run/owner and SHA256
+`8d104080ce0e553a5d399f7b2c21b1b3d5b5caed375313d452bbd67a583b517f`.
+Only Actions restores safe regular paths from that verified ZIP and records each
+file digest; compilation, sanitizer tests and audits are not repeated. The parent
+failure remains failure. CodeQL job 120255988282 also succeeded: its exact prior
+source range is checked, and only the five changed control scripts receive fresh
+analysis. The original application scan remains independently bound as above.
+
+
+Run 39906061284 browser job 120258397428 then reached the compiled document but
+waited for the wrong product: `survey.localhost` is deliberately DEV-only and is
+not a Survey host in Vite production. This is a consumer contract failure, not a
+new application or sanitizer failure. The consumer now uses the canonical
+presentation host and fulfills EVERY request from exact local dist bytes or
+strict synthetic API responses, following the existing workspace-browser route
+pattern. It cannot make network or production requests. Anonymous landing and
+signed-in authoring states are distinct; the capabilities response and material
+`name` field match the actual adapters. Actual pseudo-element day/night art,
+mobile overflow, CSRF-bearing revision-bound save and exact material identity
+remain required. Previous successful application qualifications are unchanged.

@@ -1,9 +1,10 @@
+import {serveSurveyMaterial} from './material.delivery'
 import {Router,type Request,type Response,type NextFunction} from 'express'
 import {z} from 'zod'
 import {authenticateSurvey} from '../../middleware/auth'
 import {boundedUpload,uploadPrincipalRateLimit} from '../../middleware/uploadAdmission'
 import {prisma} from '../../config/database'
-import {storeAsset,serveStoredAssetContent} from '../../services/assetStorage'
+import {storeAsset} from '../../services/assetStorage'
 import {success,error} from '../../utils/response'
 import {authorizeToolOwner} from './tool-library.service'
 import {SurveyBuilderError} from './builder.service'
@@ -26,7 +27,7 @@ surveyMaterialLibraryRouter.get('/',wrap(req=>listSurveyMaterials(req.user!.user
 surveyMaterialLibraryRouter.patch('/:id/name',wrap(req=>renameSurveyMaterial(req.user!.userId,id.parse(req.params.id),z.object({name:z.string().trim().min(1).max(160).refine(value=>!/[\\/\0]/.test(value))}).strict().parse(req.body).name)))
 surveyMaterialLibraryRouter.get('/:id/content',wrap(async(req,res)=>{
   const asset=await prisma.$transaction(tx=>ownSurveyMaterial(tx,req.user!.userId,id.parse(req.params.id)))
-  return serveStoredAssetContent(asset,res)
+  return serveSurveyMaterial({assetId:asset.id,contentHash:asset.sha256,mimeType:asset.mimeType as keyof typeof import('../assessment-media/material').materialLimits},res)
 }))
 for(const [kind,policy] of Object.entries(materialKinds)){
   surveyMaterialLibraryRouter.post('/upload/'+kind,uploadPrincipalRateLimit,

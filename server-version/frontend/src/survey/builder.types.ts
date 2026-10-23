@@ -1,3 +1,4 @@
+import type {AssessmentMaterial} from '../modules/assessment-media/material'
 import type { FormDraft as SharedFormDraft, FormQuestion as SharedFormQuestion, Option } from '../modules/assessment-core/form/types'
 export type { Option, Condition } from '../modules/assessment-core/form/types'
 
@@ -6,15 +7,16 @@ export type SurveyImage = import('../modules/assessment-media/types').Assessment
 export type SurveyPublicImage=Pick<SurveyImage,'asset'|'altText'|'caption'>
 // Product-owned image metadata stays outside the shared Form contracts.
 export type FormQuestion=SharedFormQuestion<SurveyImage>
-export type FormDraft=SharedFormDraft<SurveyImage>
+export type FormDraft=SharedFormDraft<SurveyImage> & {materials?:AssessmentMaterial[]}
 export type ScaleDraft={
+  materials?:AssessmentMaterial[];
   schemaVersion:1;presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE';respondentType:'participant_self_report'|'student_self_report'|'teacher_self_report';
   responseOptions:{optionKey:string;label:string;score:number}[];
   dimensions:{dimensionKey:string;label:string;direction:'descriptive'|'higher_is_more'|'higher_is_better'|'higher_is_worse'|'bipolar'}[];
   aggregation:'sum'|'mean';
   totalScore?:{key:string;label:string;itemKeys:string[];aggregation:'sum'|'mean'};
   rawScoreFeedback?:import('../modules/scale/rawScoreFeedback').RawScoreFeedback;
-  items:{itemKey:string;prompt:string;required:boolean;reverse:boolean;dimensionKeys:string[];purpose?:'CONTENT'|'ATTENTION_CHECK'|'SOCIAL_DESIRABILITY';attentionTarget?:string}[]
+  items:{materials?:AssessmentMaterial[];itemKey:string;prompt:string;required:boolean;reverse:boolean;dimensionKeys:string[];purpose?:'CONTENT'|'ATTENTION_CHECK'|'SOCIAL_DESIRABILITY';attentionTarget?:string}[]
 }
 export type SjtDraftV1={
   schemaVersion:1;respondentType:'student_self_report'|'teacher_self_report';
@@ -50,11 +52,11 @@ export const choiceTypes=new Set<FormQuestion['type']>([
   'SINGLE','MULTIPLE','LIKERT','MATRIX','RANK_ORDER','CONSTANT_SUM','MATRIX_MULTIPLE'])
 export const professionalTypes=new Set<FormQuestion['type']>([
   'DATE','TIME','RANK_ORDER','SLIDER','CONSTANT_SUM','MATRIX_MULTIPLE'])
-export const newOption=():Option=>({optionKey:researchKey('o'),label:'新选项'})
+export const newOption=():Option=>({optionKey:researchKey('o'),label:''})
 export const newQuestion=(type:FormQuestion['type']):FormQuestion=>({
   itemKey:researchKey('q'),type,prompt:'',required:true,allowRefusal:false,
   options:choiceTypes.has(type)?[newOption(),newOption()]:[],
-  rows:['MATRIX','MATRIX_MULTIPLE'].includes(type)?[{rowKey:researchKey('r'),label:'第一行'}]:[],
+  rows:['MATRIX','MATRIX_MULTIPLE'].includes(type)?[{rowKey:researchKey('r'),label:''}]:[],
   ...(type==='TIME'?{timeZone:'Asia/Shanghai' as const}:{}),
   ...(type==='SLIDER'?{min:0,max:100,step:1,precision:0}:{}),
   ...(type==='CONSTANT_SUM'?{total:100,integerOnly:true}:{}),

@@ -812,6 +812,22 @@ describe('Training automatic Form stages', () => {
     await userEvent.setup().click(await screen.findByRole('button', { name: '自定义表单' }))
   }
   const openAdvanced = async () => userEvent.setup().click(screen.getByText('高级答题规则', { selector: 'summary' }))
+  it('adds library materials without opening advanced rules and persists them with the typed Form policy',async()=>{
+    const read=api.get.getMockImplementation()!
+    const asset={id:'asset',contentHash:'a'.repeat(64),mimeType:'application/pdf',name:'已有说明文档',size:100}
+    api.get.mockImplementation(async(path:any,...rest:any[])=>path.startsWith('/training-workspace/media')?{code:0,data:{list:[asset],total:1,pageSize:9}}:read(path,...rest))
+    await openForm()
+    expect(screen.getByText('高级答题规则',{selector:'summary'}).closest('details')).not.toHaveAttribute('open')
+    fireEvent.click(screen.getByText('题目素材 · 图片、视频、文档',{selector:'summary'}))
+    fireEvent.click(screen.getByRole('button',{name:'从素材库添加'}));await screen.findByText('已有说明文档')
+    fireEvent.click(screen.getByRole('button',{name:'添加'}))
+    fireEvent.change(screen.getByLabelText('使用依据'),{target:{value:'authorized'}})
+    fireEvent.change(screen.getByLabelText('原创／授权说明'),{target:{value:'本次展示许可'}})
+    fireEvent.change(screen.getByLabelText('题目文字'),{target:{value:'先阅读再回答'}})
+    fireEvent.click(screen.getByRole('button',{name:'添加到测评'}))
+    await waitFor(()=>expect(api.post).toHaveBeenCalledTimes(1))
+    expect(api.post.mock.calls[0][1].item).toMatchObject({formDefinition:{type:'SHORT_TEXT',materials:[{asset:{assetId:'asset',contentHash:asset.contentHash,mimeType:asset.mimeType},rightsStatus:'authorized',rightsNote:'本次展示许可'}]},formPolicy:{version:3}})
+  })
   it('hides manual grouping and automatically appends ordinary questions without enabling V3', async () => {
     await openForm()
     expect(screen.queryByRole('combobox', { name: '加入表单区段' })).not.toBeInTheDocument()
@@ -902,7 +918,7 @@ describe('Training automatic Form stages', () => {
     expect(api.post.mock.calls[0][1].item.formDefinition).toMatchObject({ type: 'MATRIX', options: [{ optionKey: 'option_1', label: '满意' }, { optionKey: 'option_3', label: '一般' }], rows: [{ rowKey: 'row_1', label: '课堂内容' }, { rowKey: 'row_3', label: '教学方式' }] })
   })
 
-  it('preserves supplied background codes and clears removed other/exclusive option references', async () => {
+  it('preserves supplied background codes and requires unlinking other/exclusive roles before deleting an option', async () => {
     await openForm()
     const user = userEvent.setup()
     await user.selectOptions(screen.getByLabelText('背景字段'), 'sexAtBirth')
@@ -917,6 +933,10 @@ describe('Training automatic Form stages', () => {
     await openAdvanced()
     fireEvent.click(screen.getByRole('checkbox', { name: '启用条件显示、拒答等规则' }))
     await user.selectOptions(screen.getByLabelText('其他填写选项'), 'option_1')
+    fireEvent.click(screen.getByRole('checkbox', { name: '其他' }))
+    fireEvent.click(screen.getByRole('button', { name: '删除选项 1' }))
+    expect(screen.getByLabelText('其他填写选项')).toHaveValue('option_1')
+    await user.selectOptions(screen.getByLabelText('其他填写选项'), '')
     fireEvent.click(screen.getByRole('checkbox', { name: '其他' }))
     fireEvent.click(screen.getByRole('button', { name: '删除选项 1' }))
     expect(screen.getByLabelText('其他填写选项')).toHaveValue('')

@@ -145,4 +145,53 @@ suite('Survey independent tool library — isolated local synthetic records',()=
   await archiveTemplate(uid,tool.id,1)
   await expect(selectTemplate(uid,pid,{requestId:randomUUID(),tool:{source:'owned',id:tool.id,revision:2}})).rejects.toMatchObject({statusCode:409})
  })
+ it('retains per-question image video and PDF across Form completion and composition selection',async()=>{
+  const source=await newTool('FORM','Question material source'),target=await newTool('FORM','Question material target')
+  const materials=[]
+  for(const mimeType of ['image/png','video/mp4','application/pdf'] as const){
+   const id=randomUUID();assetIds.push(id)
+   await prisma.storedAsset.create({data:{id,objectKey:'synthetic/question-materials/'+id,ownerId:uid,scopeId:source.id,accessScope:'PRIVATE',mimeType,sizeBytes:100,sha256:'a'.repeat(64)}})
+   materials.push({asset:{assetId:id,contentHash:'a'.repeat(64),mimeType},name:'Question '+mimeType,rightsStatus:'authorized' as const,rightsNote:'Synthetic question display permission'})
+  }
+  const definition={...form,pages:[{...form.pages[0],questions:[{...form.pages[0].questions[0],materials}]}]}
+  const saved=await saveTemplate(uid,target.id,{revision:target.revision,title:target.title,definition})
+  const ready=await completeTemplate(uid,saved.id,saved.revision)
+  expect(ready.readiness).toBe('READY')
+  expect(await prisma.assetReference.count({where:{entityType:'SurveyToolTemplate',entityId:target.id,assetId:{in:materials.map(item=>item.asset.assetId)}}})).toBe(3)
+  const group=await newTool('COMPOSITION','Question material composition')
+  const composed=await saveTemplate(uid,group.id,{revision:group.revision,title:group.title,definition:{schemaVersion:1,items:[{source:'owned',id:ready.id,revision:ready.revision}]}})
+  await completeTemplate(uid,composed.id,composed.revision)
+  const selected=await selectTemplate(uid,pid,{requestId:randomUUID(),tool:{source:'owned',id:composed.id,revision:composed.revision}})
+  const copied=await prisma.surveyInstrumentDraft.findUniqueOrThrow({where:{id:selected.instrumentIds[0]}})
+  expect(copied.definition).toMatchObject({pages:[{questions:[{itemKey:'q1',materials}]}]})
+  expect(await prisma.assetReference.count({where:{entityType:'SurveyProject',entityId:pid,assetId:{in:materials.map(item=>item.asset.assetId)}}})).toBe(3)
+ })
+ it('reuses private images, video and PDF from another tool and preserves them through completion and composition selection',async()=>{
+  const source=await newTool('FORM','Synthetic media source'),target=await newTool('FORM','Synthetic media target')
+  const materials=[]
+  for(const mimeType of ['image/png','video/mp4','application/pdf'] as const){
+   const id=randomUUID();assetIds.push(id)
+   await prisma.storedAsset.create({data:{id,objectKey:'synthetic/materials/'+id,ownerId:uid,scopeId:source.id,accessScope:'PRIVATE',mimeType,sizeBytes:100,sha256:'a'.repeat(64)}})
+   materials.push({asset:{assetId:id,contentHash:'a'.repeat(64),mimeType},name:'Synthetic '+mimeType,rightsStatus:'self_authored' as const,rightsNote:'Isolated synthetic acceptance'})
+  }
+  const saved=await saveTemplate(uid,target.id,{revision:target.revision,title:'Synthetic media target',definition:{...form,materials}})
+  const ready=await completeTemplate(uid,saved.id,saved.revision)
+  expect(ready.readiness).toBe('READY')
+  expect(await prisma.assetReference.count({where:{entityType:'SurveyToolTemplate',entityId:target.id,assetId:{in:materials.map(item=>item.asset.assetId)}}})).toBe(3)
+  // Archive the originating tool: the target's retained references remain sufficient.
+  await archiveTemplate(uid,source.id,source.revision)
+  expect(await prisma.$transaction(tx=>assertSurveyMediaOwned(tx,uid,target.id,[{kind:'SCALE',definition:{materials}}],true))).toHaveLength(3)
+  const group=await newTool('COMPOSITION','Synthetic media composition')
+  const composed=await saveTemplate(uid,group.id,{revision:group.revision,title:group.title,definition:{schemaVersion:1,items:[{source:'owned',id:ready.id,revision:ready.revision}]}})
+  await completeTemplate(uid,composed.id,composed.revision)
+  const chosen=await selectTemplate(uid,pid,{requestId:randomUUID(),tool:{source:'owned',id:composed.id,revision:composed.revision}})
+  const copy=await prisma.surveyInstrumentDraft.findUniqueOrThrow({where:{id:chosen.instrumentIds[0]}})
+  expect(copy.definition).toMatchObject({materials})
+  expect(await prisma.assetReference.count({where:{entityType:'SurveyProject',entityId:pid,assetId:{in:materials.map(item=>item.asset.assetId)}}})).toBe(3)
+  const invalid=[{...materials[0],asset:{...materials[0].asset,contentHash:'b'.repeat(64)}}]
+  await expect(prisma.$transaction(tx=>assertSurveyMediaOwned(tx,uid,pid,[{kind:'SCALE',definition:{materials:invalid}}]))).rejects.toMatchObject({statusCode:403})
+  await expect(prisma.$transaction(tx=>assertSurveyMediaOwned(tx,other,pid,[{kind:'SCALE',definition:{materials}}]))).rejects.toMatchObject({statusCode:403})
+  await expect(prisma.$transaction(tx=>assertSurveyMediaOwned(tx,uid,pid,[{kind:'SCALE',definition:{materials:[{...materials[0],rightsStatus:'unknown'}]}}]))).rejects.toMatchObject({statusCode:403})
+ })
+
 })

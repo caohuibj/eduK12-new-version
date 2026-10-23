@@ -1,10 +1,13 @@
+import {SurveyMaterialPicker} from './SurveyMaterialPicker'
 import type { ReactNode } from 'react'
 import { SurveyFormStudio } from './SurveyFormStudio'
 import { StructuredFormConstraints } from '../modules/assessment-core/form/StructuredFormConstraints'
 import { BasicFormConstraints } from '../modules/assessment-core/form/BasicFormConstraints'
 import type { FormDraft, FormQuestion } from './builder.types'
-import { choiceTypes, professionalTypes, newOption, newQuestion, researchKey } from './builder.types'
+import { choiceTypes, professionalTypes, newQuestion, researchKey } from './builder.types'
 import { SurveyImageField } from './SurveyImageField'
+import { SurveyFormChoiceList } from './SurveyFormChoiceList'
+import {referencedFormChoiceKeys} from '../modules/assessment-core/form/choiceSafety'
 
 const types:Record<FormQuestion['type'],string>={
   SINGLE:'单选',MULTIPLE:'多选',SHORT_TEXT:'短文本',LONG_TEXT:'长文本',
@@ -13,12 +16,12 @@ const types:Record<FormQuestion['type'],string>={
   CONSTANT_SUM:'恒定总和',MATRIX_MULTIPLE:'矩阵多选',
 }
 function FormSettings({compact,title,children}:{compact:boolean;title:string;children:ReactNode}){return compact?<details className="survey-form-question-settings"><summary>{title}</summary>{children}</details>:<>{children}</>}
-type FieldsProps={value:FormDraft;onChange:(next:FormDraft)=>void;projectId?:string;questionKey?:string;questionMeta?:ReactNode}
+type FieldsProps={value:FormDraft;onChange:(next:FormDraft)=>void;projectId?:string;questionKey?:string;questionMeta?:ReactNode;bulkPending?:boolean;onPendingChange?:(id:string,pending:boolean)=>void}
 type Props=FieldsProps&({appearance:'studio';onCommit:(next:FormDraft)=>Promise<boolean>;onDraftRiskChange?:(dirty:boolean)=>void;disabled?:boolean}|{appearance?:'standard'})
 export function ResearchFormEditor(props:Props){
-  return props.appearance==='studio'?<SurveyFormStudio value={props.value} onCommit={props.onCommit} onDraftRiskChange={props.onDraftRiskChange} disabled={props.disabled} renderQuestion={(value,onChange,key,pageControl)=><FormFields value={value} onChange={onChange} projectId={props.projectId} questionKey={key} questionMeta={pageControl}/>}/>:<FormFields {...props}/>
+  return props.appearance==='studio'?<SurveyFormStudio value={props.value} onCommit={props.onCommit} onDraftRiskChange={props.onDraftRiskChange} disabled={props.disabled} renderQuestion={(value,onChange,key,pageControl,onPendingChange,bulkPending)=><FormFields value={value} onChange={onChange} projectId={props.projectId} questionKey={key} questionMeta={pageControl} bulkPending={bulkPending} onPendingChange={onPendingChange}/>}/>:<FormFields {...props}/>
 }
-function FormFields({value,onChange,projectId,questionKey,questionMeta}:FieldsProps){
+function FormFields({value,onChange,projectId,questionKey,questionMeta,bulkPending,onPendingChange}:FieldsProps){
   const setPage=(index:number,update:(p:FormDraft['pages'][number])=>FormDraft['pages'][number])=>{
     const pages=value.pages.map((p,i)=>i===index?update(p):p)
     onChange({...value,pages})
@@ -57,7 +60,8 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta}:FieldsPr
         const previous=[...value.pages.slice(0,pi).flatMap(p=>p.questions),...page.questions.slice(0,qi)]
           .filter(q=>['SINGLE','MULTIPLE','LIKERT'].includes(q.type))
         if(questionKey&&q.itemKey!==questionKey)return null
-        const typeControl=<select className="input" aria-label="选择题型" value={q.type} onChange={e=>{
+        const referencedOptions=referencedFormChoiceKeys(q,value.pages.flatMap(p=>p.questions))
+        const typeControl=<select className="input" aria-label="选择题型" disabled={bulkPending} value={q.type} onChange={e=>{
               const type=e.target.value as FormQuestion['type']
               const fresh=newQuestion(type)
               setQuestion(pi,qi,old=>({...fresh,itemKey:old.itemKey,prompt:old.prompt,required:old.required,allowRefusal:old.allowRefusal}))
@@ -97,6 +101,7 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta}:FieldsPr
             <textarea className="input w-full block" rows={questionKey?3:2} placeholder={questionKey?'请输入题目内容':undefined} value={q.prompt}
               onChange={e=>setQuestion(pi,qi,x=>({...x,prompt:e.target.value}))}/>
           </label>
+          {projectId&&<details className="survey-form-question-settings"><summary>题目素材 · 图片、视频、文档</summary><SurveyMaterialPicker label="题目展示素材" value={q.materials} onChange={materials=>setQuestion(pi,qi,x=>({...x,materials}))}/></details>}
           <div className={questionKey?'survey-form-question-switches':'flex gap-4 flex-wrap'}>
             <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={q.required}
               onChange={e=>setQuestion(pi,qi,x=>({...x,required:e.target.checked}))}/>必答</label>
@@ -107,19 +112,7 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta}:FieldsPr
             </label>
           </div>
           {!questionKey&&mediaFields}
-          {choiceTypes.has(q.type)&&<div className={questionKey?'survey-form-options space-y-2':'space-y-2'}>
-            <p className="text-sm font-medium">选项</p>
-            {q.options.map((o,oi)=><div className={questionKey?'survey-form-option-row':'flex gap-2'} key={o.optionKey}>{questionKey&&<span className="survey-form-option-number">{oi+1}</span>}
-              <input className="input flex-1" aria-label={'选项 '+(oi+1)} value={o.label}
-                onChange={e=>setQuestion(pi,qi,x=>({...x,options:x.options.map(a=>a.optionKey===o.optionKey?{...a,label:e.target.value}:a)}))}/>
-              <button className="btn-secondary" aria-label={questionKey?'删除选项 '+(oi+1):undefined} type="button" onClick={()=>setQuestion(pi,qi,x=>({...x,
-                options:x.options.filter(a=>a.optionKey!==o.optionKey),
-                otherOptionKey:x.otherOptionKey===o.optionKey?undefined:x.otherOptionKey,
-                otherMaxLength:x.otherOptionKey===o.optionKey?undefined:x.otherMaxLength,
-                exclusiveOptionKeys:x.exclusiveOptionKeys?.filter(key=>key!==o.optionKey)}))}>{questionKey?'×':'删除'}</button>
-            </div>)}
-            <button type="button" className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,options:[...x.options,newOption()]}))}>增加选项</button>
-          </div>}
+          {choiceTypes.has(q.type)&&<SurveyFormChoiceList key={q.itemKey+q.type+'options'} question={q} kind="选项" limit={30} protectedKeys={referencedOptions} onPendingChange={onPendingChange} onChange={next=>setQuestion(pi,qi,()=>next)}/>}
           {questionKey&&mediaFields}
           {(!questionKey||value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type))&&<FormSettings compact={!!questionKey} title="选项补充设置">
           {value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type)&&
@@ -153,15 +146,7 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta}:FieldsPr
               </fieldset>}
             </div>}
           </FormSettings>}
-          {['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<div className="space-y-2">
-            <p className="text-sm font-medium">矩阵行</p>
-            {q.rows.map((row,ri)=><div key={row.rowKey} className="flex gap-2">
-              <input className="input flex-1" aria-label={'矩阵行 '+(ri+1)} value={row.label}
-                onChange={e=>setQuestion(pi,qi,x=>({...x,rows:x.rows.map(a=>a.rowKey===row.rowKey?{...a,label:e.target.value}:a)}))}/>
-              <button className="btn-secondary" type="button" onClick={()=>setQuestion(pi,qi,x=>({...x,rows:x.rows.filter(a=>a.rowKey!==row.rowKey)}))}>删除</button>
-            </div>)}
-            <button type="button" className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,rows:[...x.rows,{rowKey:researchKey('r'),label:'新行'}]}))}>增加矩阵行</button>
-          </div>}
+          {['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<SurveyFormChoiceList key={q.itemKey+q.type+'rows'} question={q} kind="矩阵行" limit={Math.min(40,500-fieldCount+q.rows.length)} onPendingChange={onPendingChange} onChange={next=>setQuestion(pi,qi,()=>next)}/>}
           {(!questionKey||['NUMBER','SLIDER','TIME','SHORT_TEXT','LONG_TEXT','CONSTANT_SUM','MULTIPLE','MATRIX_MULTIPLE'].includes(q.type))&&<FormSettings compact={!!questionKey} title="作答规则与格式"><div className="space-y-3">
           <BasicFormConstraints question={q} onChange={patch=>setQuestion(pi,qi,x=>({...x,...patch}))}/>
           {value.schemaVersion===2&&<StructuredFormConstraints question={q} onChange={patch=>setQuestion(pi,qi,x=>({...x,...patch}))}/>}

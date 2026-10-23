@@ -1,3 +1,4 @@
+import {materialListSchema,publicMaterial} from '../assessment-media/material'
 import {readSurveyScalePresentation,scalePresentationOptions} from './catalog-scale.presentation'
 import { readSurveyCognitiveProgressFromVerifiedAttempt } from './cognitive.service'
 import { surveySjtScenes } from './sjt-structure'
@@ -45,10 +46,10 @@ export async function getOwnResearchTask(input:{
       // Published definitions are immutable; do not retroactively invalidate an
       // older Wave solely for an operator combination newly restricted in Builder.
       const d=assertSurveyDraft('FORM',unit.displayDefinition,true,true) as FormDraft
-      return {kind:'FORM',instrumentKey:unit.instrumentKey,title:unit.title,
+      return {kind:'FORM',instrumentKey:unit.instrumentKey,title:unit.title,...(materialListSchema.optional().parse((unit.displayDefinition as {materials?:unknown}).materials)?.length?{materials:materialListSchema.parse((unit.displayDefinition as {materials:unknown}).materials).map(publicMaterial)}:{}),
         pages:d.pages.map(page=>({pageKey:page.pageKey,title:page.title,...(page.description?{description:page.description}:{}),
           questions:page.questions.map(q=>({
-            itemKey:q.itemKey,type:q.type,prompt:q.prompt,image:projectPublicSurveyImage(q.image),required:q.required,allowRefusal:q.allowRefusal===true,
+            itemKey:q.itemKey,type:q.type,prompt:q.prompt,...(q.materials?{materials:q.materials.map(publicMaterial)}:{}),image:projectPublicSurveyImage(q.image),required:q.required,allowRefusal:q.allowRefusal===true,
             options:q.options.map(o=>({optionKey:o.optionKey,label:o.label})),
             rows:q.rows.map(row=>({rowKey:row.rowKey,label:row.label})),
             min:q.min,max:q.max,integerOnly:q.integerOnly,step:q.step,precision:q.precision,
@@ -61,17 +62,17 @@ export async function getOwnResearchTask(input:{
     }
     if(unit.kind==='SCALE'){
       const d=readSurveyScalePresentation(unit.displayDefinition)
-      return {kind:'SCALE',instrumentKey:unit.instrumentKey,title:unit.title,
+      return {kind:'SCALE',instrumentKey:unit.instrumentKey,title:unit.title,...(materialListSchema.optional().parse((unit.displayDefinition as {materials?:unknown}).materials)?.length?{materials:materialListSchema.parse((unit.displayDefinition as {materials:unknown}).materials).map(publicMaterial)}:{}),
         presentationMode:d.presentationMode??'ALL_AT_ONCE',
         responseOptions:d.responseOptions.map(o=>({optionKey:o.optionKey,label:o.label})),
-        items:d.items.map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required,
+        items:d.items.map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required,...(q.materials?{materials:q.materials.map(publicMaterial)}:{}),
           responseOptions:scalePresentationOptions(d,q).map(o=>({optionKey:o.optionKey,label:o.label})),
           ...('images' in q&&q.images?{images:[...q.images].sort((a,b)=>a.order-b.order).map(image=>projectPublicSurveyImage(image))}:{}),
           ...('video' in q&&q.video?{video:q.video}:{})}))}
     }
     if(unit.kind==='COGNITIVE'){
       const frozen=parseFrozenSurveyCognitive(unit.compiledDefinition)
-      return {kind:'COGNITIVE',instrumentKey:unit.instrumentKey,title:unit.title,
+      return {kind:'COGNITIVE',instrumentKey:unit.instrumentKey,title:unit.title,...(materialListSchema.optional().parse((unit.displayDefinition as {materials?:unknown}).materials)?.length?{materials:materialListSchema.parse((unit.displayDefinition as {materials:unknown}).materials).map(publicMaterial)}:{}),
         templateKey:frozen.templateKey,measurementDigest:frozen.measurementDigest,
         devicePolicy:frozen.devicePolicy,timingPolicy:frozen.timingPolicy,
         maturity:frozen.maturity,restartLimit:frozen.restartLimit,
@@ -89,10 +90,10 @@ export async function getOwnResearchTask(input:{
         maxSelections:q.responseType==='MULTIPLE'?(q.maxSelections??q.options.length):undefined,
         options:q.options.map(o=>({optionKey:o.optionKey,label:o.label,
           ...('nonanswerReason' in o&&o.nonanswerReason?{nonanswerReason:o.nonanswerReason}:{})}))}))}))
-    if(d.schemaVersion===1)return {kind:'SJT',instrumentKey:unit.instrumentKey,title:unit.title,
+    if(d.schemaVersion===1)return {kind:'SJT',instrumentKey:unit.instrumentKey,title:unit.title,...(materialListSchema.optional().parse((unit.displayDefinition as {materials?:unknown}).materials)?.length?{materials:materialListSchema.parse((unit.displayDefinition as {materials:unknown}).materials).map(publicMaterial)}:{}),
       stimulus:d.stimulus,scenarioTitle:d.title,image:projectPublicSurveyImage(d.image),
       questions:scenes[0].questions}
-    return {kind:'SJT',schemaVersion:2,instrumentKey:unit.instrumentKey,title:unit.title,
+    return {kind:'SJT',schemaVersion:2,instrumentKey:unit.instrumentKey,title:unit.title,...(materialListSchema.optional().parse((unit.displayDefinition as {materials?:unknown}).materials)?.length?{materials:materialListSchema.parse((unit.displayDefinition as {materials:unknown}).materials).map(publicMaterial)}:{}),
       orderPolicy:'FIXED',scenes}
 
   })

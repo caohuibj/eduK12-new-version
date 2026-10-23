@@ -1,8 +1,9 @@
+import type {AssessmentMaterial,PublicMaterial} from '../assessment-media/material'
 import type { AssessmentImagePresentationItem } from '../assessment-media/types'
 
 export type RawScoreFeedbackImage = AssessmentImagePresentationItem & { order: number }
-export type RawScoreFeedbackContent = { text: string; images?: RawScoreFeedbackImage[] }
-export type MatchedRawScoreFeedback = RawScoreFeedbackContent & { scoreKey: string; rangeKey: string | null }
+export type RawScoreFeedbackContent = { text: string; materials?:AssessmentMaterial[]; images?: RawScoreFeedbackImage[] }
+export type MatchedRawScoreFeedback = Omit<RawScoreFeedbackContent,'materials'> & { materials?:PublicMaterial[];scoreKey: string; rangeKey: string | null }
 export type RawScoreFeedbackRange = RawScoreFeedbackContent & { key: string; min: number; max: number; includeMax: boolean }
 export type RawScoreFeedbackRule = { scoreKey: string; ranges: RawScoreFeedbackRange[]; fallback?: RawScoreFeedbackContent }
 export type RawScoreFeedback = { schemaVersion: 1; rules: RawScoreFeedbackRule[] }
@@ -38,5 +39,5 @@ export function matchRawScoreFeedback(config: RawScoreFeedback | undefined, scor
   const rule = config?.rules.find(candidate => candidate.scoreKey === scoreKey)
   const range = rule?.ranges.find(candidate => value >= candidate.min && (value < candidate.max || (candidate.includeMax && value === candidate.max)))
   const content = range ?? rule?.fallback
-  return content ? { text: content.text, images: content.images, rangeKey: range?.key ?? null } : null
+  return content ? { text: content.text, images: content.images, materials:content.materials, rangeKey: range?.key ?? null } : null
 }

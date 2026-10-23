@@ -1,3 +1,4 @@
+import type {AssessmentMaterial} from '../assessment-media/material'
 import {assertSurveyDraft,type ScaleDraft} from './builder.definition'
 import type {ScaleDefinitionV2,ScaleItemDefinition} from '../scale/scale-definition'
 import type {SourceAnswerMapping} from './catalog.sources'
@@ -10,7 +11,7 @@ export type CatalogScalePresentation={
   items:Array<{itemKey:string;prompt:string;required:boolean;reverse:boolean;dimensionKeys:string[];
     purpose?:ScaleItemDefinition['purpose'];attentionTarget?:string;
     responseOptions:Array<{optionKey:string;label:string;score:number}>;
-    images?:ScaleItemDefinition['images'];video?:ScaleItemDefinition['video'];randomizeOptions:false}>;
+    materials?:AssessmentMaterial[];images?:ScaleItemDefinition['images'];video?:ScaleItemDefinition['video'];randomizeOptions:false}>;
 }
 export const isCatalogScalePresentation=(value:unknown):value is CatalogScalePresentation=>
   !!value&&typeof value==='object'&&(value as CatalogScalePresentation).runtime==='CANONICAL_SCALE_V1'
@@ -30,7 +31,7 @@ export function canonicalScalePresentation(definition:ScaleDefinitionV2,presenta
     items:[...definition.items].sort((a,b)=>a.sortOrder-b.sortOrder).map((item,i)=>{
       const itemKey='i_'+i;mapping.items[itemKey]=item.itemCode
       const options=sets.get(item.responseSetKey)!
-      return {itemKey,prompt:item.content,required:item.required,
+      return {itemKey,prompt:item.content,required:item.required,...(item.materials?{materials:item.materials}:{}),
         reverse:definition.scoring.itemRules.some(rule=>rule.itemCode===item.itemCode&&rule.transform.type==='reverse'),
         dimensionKeys:definition.scoring.scores.filter(score=>score.source.type==='items'&&score.source.items.some(ref=>ref.itemCode===item.itemCode)).map(score=>score.key),
         ...(item.purpose?{purpose:item.purpose}:{}),

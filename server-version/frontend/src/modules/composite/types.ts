@@ -1,3 +1,4 @@
+import type {PublicMaterial} from '../assessment-media/material'
 import type { TrainingPersistence } from './training-checkpoint'
 export type TrainingTimingBinding={schemaVersion:1;contract:'BROWSER_ACTIVE_SCALE_V1';snapshotHash:string}
 import type { FormQuestion } from '../assessment-core/form/types'
@@ -20,6 +21,7 @@ export interface CompositeItemSummary {
 export type CompositeScaleResponseValue = string | number
 
 export interface CompositeScaleRunnerItem {
+  materials?:PublicMaterial[]
   itemCode: string
   content: string
   type: string
