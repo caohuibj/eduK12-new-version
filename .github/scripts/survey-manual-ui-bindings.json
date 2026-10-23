@@ -306,6 +306,6 @@
     "server-version/frontend/vitest.config.d.ts": "340562aff103906b000e905d3c228c55c71decc9",
     "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
   },
-  "evidenceSHA256": "54470331055a9580a3bc238f0907bd83ac411933bffe90cd03d9b73f36acc0bc",
+  "evidenceSHA256": "f9487d0799dd92a21d5910fdfd5cb2dab2bb25904774b5a52e9b00dc00424792",
   "acceptedCases": 94
 }

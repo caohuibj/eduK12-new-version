@@ -1028,3 +1028,7 @@ merge tree 不符直接拒绝；已知分支缺 marker 不回退 platform/manual
 既有上限；约五分钟报告具体等待阶段。稳定 `merge gate / ready PR` 要求 scope、
 完整 survey-manual-ui 与 CodeQL 实际 success，重算完整 checkout；draft、缺失、
 跳过、取消、失败或输入漂移均阻断。精确 main push 只分类，不重复检查。
+
+保留首次 CI run `39938370582` 的 scope 失败：浅 checkout 未包含精确 PR source
+对象，尚未执行应用/接纳/lint/SAST。仅补精确只读 source fetch 和本路线 SAST
+选择条件，后续仍核 source/merge tree 一致，不回退重型检查或省略断言。

@@ -51,3 +51,5 @@ test('ready gate requires all selected actual successes and refuses draft or for
  const c=structuredClone(n);c.scope.outputs.frontend='true';assert.ok(failedChecks(c,false).includes('scope'));
  const d=structuredClone(n);d.scope.outputs.survey_manual_ui_plan='invalid';assert.ok(failedChecks(d,false).includes('scope'));
 });
+
+test('workflow fetches the exact PR source before classification and selects bounded SAST',()=>{const text=readFileSync('.github/workflows/ci.yml','utf8');const start=text.indexOf('      - name: fetch exact Survey manual UI PR source');const classify=text.indexOf('      - id: documentation-scope');assert.ok(start>0&&start<classify);assert.ok(text.slice(start,classify).includes("['fetch','--no-tags','--depth=1','origin',source]"));const codeql=text.slice(text.indexOf('  codeql:\n'),text.indexOf('  miniprogram:\n'));assert.ok(codeql.split('    runs-on:')[0].includes("application_route == 'survey-manual-ui'"));assert.ok(codeql.includes('server-version/frontend/public/entry-brand.js'));});
