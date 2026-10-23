@@ -106,3 +106,43 @@ unauthorized Survey/School/Teacher management navigation and anonymous entry),
 application types, backend types, and one new-input production frontend build all
 passed. Registration projection mocks return only selected fields and preserve
 locked-course race rejection checks. Real browser startup remains unavailable.
+
+## Follow-up: learner assignments and check-ins
+
+Registered learner forms now memoize unchanged instructional HTML and media
+presentation. In paired jsdom probes using the real sanitizer/media implementation,
+20 input events added 20 sanitizer calls on each old page and zero on each new page.
+Media parsing calls were 120 to zero for assignments and 80 to zero for check-ins,
+including internal image-URL parsing. These are operation counts, not browser
+latency, CPU, heap or production capacity results; the API transport is mocked.
+
+The assignment detail API already includes the student's submission. Ordinary
+assignment opening plus one successful submission refresh now requires two GETs
+instead of four. The fresh detail read remains. A compatibility exception retains
+the raw my-submission endpoint when an answers map contains a nonempty assetId
+key: valid question IDs are not restricted, and detail's recursive media hydration
+can otherwise alter a url answer. Failure of this fallback does not hydrate the
+potentially transformed answers. Check-ins retain their separate own-submission
+request because their detail API does not provide that same contract.
+
+Route-local layout cleanup and loaded-entity guards isolate late detail, POST and
+upload outcomes (including finally blocks and compatibility fallback) from a newly
+opened task. Fetch callbacks depend only on task ID, so ordinary typing does not
+reset the form. Submission idempotency keys, retry on uncertain results, revisions,
+requiredness, deadlines, feedback, fresh post-submit hydration and asset ownership
+checks are preserved.
+
+Backend submit gates now select only course/status/deadline fields needed by the
+existing checks (assignment: three scalars; check-in: two). Assignment revision
+history reads only its latest version number. Statement counts, membership reads,
+locks, receipt replay guards, historical snapshot writes and image checks remain.
+
+Validation: 35 backend and 45 frontend targeted assertions passed, plus two separate
+baseline operation-count probes. Final changed frontend lint has zero warnings;
+backend types, frontend application types and one new-input Vite build passed.
+Independent static review found and resolved the route-cleanup gap and the valid
+assetId/url answer compatibility issue before commit. An initial obsolete Vitest
+CLI option failed before tests; an initial lazy-module mock harness was replaced
+with the real media implementation. Final evidence retains these original attempts.
+No real browser/DB resource benchmark, CI run, PR merge or deployment is claimed.
+Anonymous media preloading was inspected but not changed in this batch.

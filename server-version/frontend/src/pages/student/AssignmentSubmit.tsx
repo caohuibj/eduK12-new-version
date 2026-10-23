@@ -1,11 +1,11 @@
 import { useTrainingLearnerNavigation } from '../../training/learnerNavigation'
 import { isTrainingHost } from '../../training/context'
 import { formatLocalDateTime } from '../../utils/dateTime'
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useLayoutEffect, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { ArrowLeft, Clock, FileText, Loader2, FileText as FileIcon } from 'lucide-react'
 import apiClient from '../../api/client'
-import type { Assignment, Submission, MediaItem, DocumentItem } from '../../types'
+import type { Assignment, Submission, DocumentItem } from '../../types'
 import { parseMediaItems } from '../../utils/mediaUtils'
 import { assignmentChoiceValues, formatAssignmentAnswer, readAssignmentAnswer } from '../../utils/answerLabels'
 import { sanitizeHtml } from '../../utils/sanitize'
@@ -17,8 +17,8 @@ import {
   shouldClearIdempotencyKey,
 } from '../../utils/idempotency'
 
-const VideoList = React.lazy(() => import('../../components/MediaRenderer').then(module => ({ default: module.VideoList })))
-const ImageList = React.lazy(() => import('../../components/MediaRenderer').then(module => ({ default: module.ImageList })))
+const VideoList = React.memo(React.lazy(() => import('../../components/MediaRenderer').then(module => ({ default: module.VideoList }))))
+const ImageList = React.memo(React.lazy(() => import('../../components/MediaRenderer').then(module => ({ default: module.ImageList }))))
 const PdfViewer = React.lazy(() => import('../../components/PdfViewer'))
 
 const AssignmentSubmit: React.FC = () => {
@@ -35,12 +35,16 @@ const AssignmentSubmit: React.FC = () => {
   const [submitting, setSubmitting] = useState(false)
   const [formError, setFormError] = useState('')
   const [formErrorAttempt, setFormErrorAttempt] = useState(0)
-  const [playingVideo, setPlayingVideo] = useState<MediaItem | null>(null)
   const [isEditing, setIsEditing] = useState(false)
   const [selectedDocument, setSelectedDocument] = useState<DocumentItem | null>(null)
   const [showPdfViewer, setShowPdfViewer] = useState(false)
   const submitIdempotencyKeyRef = useRef<{ key: string; fingerprint: string } | null>(null)
   const submitInFlightRef = useRef(false)
+  // A route's reads and writes must never hydrate the next learner form.
+  const routeEpochRef = useRef(0)
+  const sanitizedContent = useMemo(() => sanitizeHtml(assignment?.content), [assignment?.content])
+  const hasVideos = useMemo(() => parseMediaItems(assignment?.videos).length > 0, [assignment?.videos])
+  const hasImages = useMemo(() => parseMediaItems(assignment?.images).length > 0, [assignment?.images])
   const formErrorRef = useRef<HTMLParagraphElement>(null)
 
   useEffect(() => {
@@ -49,30 +53,36 @@ const AssignmentSubmit: React.FC = () => {
     if (formErrorAttempt > 0 && isTrainingHost()) formErrorRef.current?.focus()
   }, [formErrorAttempt])
 
-  useEffect(() => {
-    if (assignmentId) {
-      fetchAssignmentDetail()
-    }
-  }, [assignmentId])
 
-  const fetchAssignmentDetail = async () => {
+
+  const fetchAssignmentDetail = useCallback(async () => {
+    const routeEpoch = routeEpochRef.current
     try {
       setLoading(true)
-      const [assignmentRes, submissionRes] = await Promise.all([
-        apiClient.get(`/assignments/${assignmentId}`),
-        apiClient.get(`/assignments/${assignmentId}/my-submission`),
-      ])
+      // The authorized learner detail already includes the same own-submission
+      // row. Keep this fresh read after submit without fetching that row twice.
+      const assignmentRes = await apiClient.get(`/assignments/${assignmentId}`)
+      if (routeEpoch !== routeEpochRef.current) return
 
+      let ownSubmission = assignmentRes.code === 0 ? assignmentRes.data?.mySubmission : null
+      // Legacy questions may use arbitrary IDs, including "assetId". Detail's
+      // recursive media hydration can rewrite an answer named "url" in that
+      // shape, so retain the raw endpoint only for this compatibility case.
+      if (typeof ownSubmission?.answers?.assetId === 'string' && ownSubmission.answers.assetId) {
+        const submissionRes = await apiClient.get(`/assignments/${assignmentId}/my-submission`)
+        if (routeEpoch !== routeEpochRef.current) return
+        if (submissionRes.code !== 0) throw new Error(submissionRes.message || '获取我的提交失败')
+        ownSubmission = submissionRes.data
+      }
       if (assignmentRes.code === 0) {
         setAssignment(assignmentRes.data)
       }
-
-      if (submissionRes.code === 0 && submissionRes.data) {
-        setSubmission(submissionRes.data)
-        setContent(submissionRes.data.content || '')
+      if (ownSubmission) {
+        setSubmission(ownSubmission)
+        setContent(ownSubmission.content || '')
         
-        if (submissionRes.data.answers && typeof submissionRes.data.answers === 'object') {
-          const answers = submissionRes.data.answers as Record<string, string>
+        if (ownSubmission.answers && typeof ownSubmission.answers === 'object') {
+          const answers = ownSubmission.answers as Record<string, string>
           const optionsArray: string[] = []
           const multiOptions: Record<number, string[]> = {}
           const textAns: Record<number, string> = {}
@@ -98,11 +108,32 @@ const AssignmentSubmit: React.FC = () => {
         }
       }
     } catch (error) {
+      if (routeEpoch !== routeEpochRef.current) return
       console.error('获取练习详情失败:', error)
     } finally {
-      setLoading(false)
+      if (routeEpoch === routeEpochRef.current) setLoading(false)
     }
-  }
+  }, [assignmentId])
+
+  useLayoutEffect(() => {
+    setAssignment(null)
+    setSubmission(null)
+    setContent('')
+    setSelectedOptions([])
+    setMultipleOptions({})
+    setTextAnswers({})
+    setIsEditing(false)
+    setFormError('')
+    setSelectedDocument(null)
+    setShowPdfViewer(false)
+    submitIdempotencyKeyRef.current = null
+    submitInFlightRef.current = false
+    setSubmitting(false)
+    if (assignmentId) {
+      void fetchAssignmentDetail()
+    }
+    return () => { routeEpochRef.current += 1 }
+  }, [assignmentId, fetchAssignmentDetail])
 
   const handleOptionSelect = (index: number, option: string) => {
     const newOptions = [...selectedOptions]
@@ -129,7 +160,8 @@ const AssignmentSubmit: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    if (!assignment || submitInFlightRef.current) return
+    if (!assignment || assignment.id !== assignmentId || submitInFlightRef.current) return
+    const routeEpoch = routeEpochRef.current
 
     setFormError('')
     const questions = assignment.questions ?? []
@@ -179,6 +211,7 @@ const AssignmentSubmit: React.FC = () => {
         headers: { 'Idempotency-Key': idempotencyKey },
       })
 
+      if (routeEpoch !== routeEpochRef.current) return
       if (response.code === 0) {
         submitIdempotencyKeyRef.current = null
         const isUpdate = submission !== null
@@ -190,6 +223,7 @@ const AssignmentSubmit: React.FC = () => {
         alert(response.message || '提交失败')
       }
     } catch (error: any) {
+      if (routeEpoch !== routeEpochRef.current) return
       // Only an explicit, non-retryable 4xx rejection invalidates this key.
       // Network errors, timeouts and 5xx responses may follow a committed
       // write, so retain the key for an idempotent retry of the same payload.
@@ -198,8 +232,10 @@ const AssignmentSubmit: React.FC = () => {
       }
       alert(submissionErrorMessage(error, '提交失败'))
     } finally {
-      submitInFlightRef.current = false
-      setSubmitting(false)
+      if (routeEpoch === routeEpochRef.current) {
+        submitInFlightRef.current = false
+        setSubmitting(false)
+      }
     }
   }
 
@@ -214,7 +250,7 @@ const AssignmentSubmit: React.FC = () => {
     }
   }
 
-  if (loading) {
+  if (loading || (assignment && assignment.id !== assignmentId)) {
     return (
       <ProductPage width="reading" className="hui-student-page hui-student-submission">
         <ProductStatus kind="pending" title="正在加载练习">正在读取练习内容与已有提交。</ProductStatus>
@@ -255,7 +291,7 @@ const AssignmentSubmit: React.FC = () => {
         {assignment.content && (
           <div
             className="student-submit-richtext prose prose-sm max-w-none"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(assignment.content) }}
+            dangerouslySetInnerHTML={{ __html: sanitizedContent }}
           />
         )}
         <div className={`student-submit-deadline ${isOverdue ? 'student-submit-deadline--closed' : ''}`}>
@@ -265,14 +301,14 @@ const AssignmentSubmit: React.FC = () => {
       </section>
 
       {/* Video Attachments */}
-      {parseMediaItems(assignment.videos).length > 0 && <React.Suspense fallback={<p role="status">正在加载视频…</p>}><VideoList
+      {hasVideos && <React.Suspense fallback={<p role="status">正在加载视频…</p>}><VideoList
         videos={assignment.videos}
         title="关联视频"
         watermarkText={isTrainingHost() ? "Huitraining 专属培训视频" : "慧育空间专属教学视频"}
       /></React.Suspense>}
 
       {/* Image Attachments */}
-      {parseMediaItems(assignment.images).length > 0 && <React.Suspense fallback={<p role="status">正在加载图片…</p>}><ImageList
+      {hasImages && <React.Suspense fallback={<p role="status">正在加载图片…</p>}><ImageList
         images={assignment.images}
         title="相关图片"
         watermarkText={isTrainingHost() ? "Huitraining 专属培训图片" : "慧育空间专属教学图片"}
