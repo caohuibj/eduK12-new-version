@@ -17,7 +17,7 @@ function animationFacts(selector){
 async function run(){
  assert(allowed(process.env,JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH,'utf8'))),'Diagnostic context refused')
  const repo=path.resolve(__dirname,'../..'),dist=path.join(repo,'server-version/frontend/theme-diagnostic-dist'),out=path.join(repo,'school-theme-diagnostic-evidence');fs.mkdirSync(out,{recursive:true})
- const report={schemaVersion:1,acceptance:false,scope:'synthetic real-component theme diagnostic; no backend/authentication qualification',source:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID,observations:[],console:[],pageErrors:[],unexpected:[],errors:[]}
+ const report={schemaVersion:1,acceptance:false,scope:'synthetic real participant-shell and FormPlayer theme diagnostic; no backend/authentication/FINAL qualification',source:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID,observations:[],console:[],pageErrors:[],unexpected:[],errors:[]}
  let browser,server,phase='preflight'
  try{
   const chrome=require('./school-teacher-chrome.cjs'),{settleThemeTransitions,classifyThemeFailure}=require('./school-teacher-ui.cjs')
@@ -27,32 +27,40 @@ async function run(){
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const origin='http://127.0.0.1:'+server.address().port
   const {chromium}=require(path.join(repo,'.github/release-tools/node_modules/playwright-core'));browser=await chromium.launch(chrome.CHROME_LAUNCH_OPTIONS);report.sandbox=await chrome.verifyChromeSandbox(browser);assert.equal(report.sandbox.ok,true)
   const axe=fs.readFileSync(path.join(repo,'.github/release-tools/node_modules/axe-core/axe.min.js'),'utf8')
-  for(const entry of ['school','teacher'])for(const motion of ['reduce','no-preference'])for(const width of [320,390])for(const state of ['empty','selected','error','disabled','display-error'])for(const editorState of (state==='disabled'?['readonly']:['matrix','bulk','condition'])){
+  for(const entry of ['school','teacher'])for(const motion of ['reduce','no-preference'])for(const width of [320,390])for(const state of ['single','conditional','multiple','matrix','matrix-refusal','page-two','error','save-error','complete']){
+   const editorState='participant'
    const context=await browser.newContext({viewport:{width,height:844},reducedMotion:motion,serviceWorkers:'block'})
    try{
     await context.routeWebSocket('**/*',ws=>{report.unexpected.push({phase,kind:'websocket'});ws.close()})
     await context.route('**/*',route=>{const u=new URL(route.request().url());if(u.origin===origin&&route.request().method()==='GET'&&!u.pathname.startsWith('/api/'))return route.continue();report.unexpected.push({phase,kind:'network'});return route.abort()})
     await context.addInitScript(installAnimationProbe);const page=await context.newPage();page.setDefaultTimeout(10000);page.on('console',m=>{if(m.type()==='error'&&report.console.length<50)report.console.push({phase,hash:hash(m.text())})});page.on('pageerror',e=>{if(report.pageErrors.length<30)report.pageErrors.push({phase,hash:hash(e.message)})})
-    phase=[entry,motion,width,state,editorState].join(':');await page.goto(origin+'/?entry='+entry+'&state='+state);await page.locator('[data-theme-diagnostic-ready]').waitFor();await page.evaluate(()=>document.fonts.ready)
-    if(state!=='disabled'){
-     await page.getByRole('button',{name:'编辑题目：'+(editorState==='condition'?'合成条件拒答题':'合成矩阵题'),exact:true}).click()
-     if(editorState==='condition'){await page.getByRole('combobox',{name:'依据哪道题',exact:true}).waitFor();await page.getByRole('combobox',{name:'选中哪个选项',exact:true}).waitFor()}
-     if(editorState==='bulk')for(const kind of ['选项','矩阵行']){
-      await page.locator('details.survey-form-bulk-lines > summary').filter({hasText:'批量编辑'+kind}).click()
-      await page.getByRole('button',{name:'载入现有'+kind,exact:true}).click()
-      await page.getByRole('list',{name:kind+'粘贴预览',exact:true}).waitFor()
+    phase=[entry,motion,width,state,editorState].join(':');const participantState=['error','save-error','complete'].includes(state)?state:'form';await page.goto(origin+'/?view=participant&entry='+entry+'&participantState='+participantState);await page.locator('[data-theme-diagnostic-ready]').waitFor();await page.evaluate(()=>document.fonts.ready)
+    if(['conditional','multiple','matrix','matrix-refusal','page-two'].includes(state)){
+     await page.getByRole('radio',{name:'合成选项甲',exact:true}).check();await page.getByRole('button',{name:'下一字段',exact:true}).click()
+     await page.getByRole('textbox',{name:/合成条件拒答题/}).waitFor()
+     if(state!=='conditional'){
+      await page.getByRole('checkbox',{name:'我选择不回答这一题',exact:true}).check();await page.getByRole('button',{name:'下一字段',exact:true}).click()
+      await page.getByRole('checkbox',{name:'合成选项甲',exact:true}).waitFor()
+      if(state!=='multiple'){
+       await page.getByRole('checkbox',{name:'合成选项甲',exact:true}).check();await page.getByRole('button',{name:'下一字段',exact:true}).click()
+       const first=page.getByRole('group',{name:'合成矩阵第一行',exact:true}),second=page.getByRole('group',{name:'合成矩阵第二行',exact:true});await first.waitFor()
+       if(state!=='matrix'){
+        await first.getByRole('checkbox',{name:'不愿回答本行',exact:true}).check();await second.getByRole('radio',{name:'合成选项乙',exact:true}).check()
+        if(state==='page-two'){await page.getByRole('button',{name:'提交整个区段',exact:true}).click();await page.getByRole('textbox',{name:/合成分节确认题/}).waitFor()}
+       }
+      }
      }
     }
-    if(state==='empty'||state==='error'||state==='selected')await page.getByRole('button',{name:'从素材库添加',exact:true}).click()
-    if(state==='selected'||state==='display-error'){await page.getByText('修改展示文字与说明',{exact:true}).first().click();await page.getByRole('button',{name:'查看图片',exact:true}).first().click();if(state==='display-error')await page.getByRole('button',{name:'重新加载素材',exact:true}).first().waitFor()}
+    if(state==='complete')await page.getByText('合成表单演示已完成。这不是正式提交，没有产生 FINAL。',{exact:true}).waitFor()
     const selector=entry==='school'?'.hs-app':'.ht-app',label=entry==='school'?'School 外观':'Teacher 外观'
     for(const mode of ['light','dark']){
      const row={entry,motion,width,state,editorState,mode};report.observations.push(row);phase=[entry,motion,width,state,editorState,mode].join(':')
      await page.getByRole('combobox',{name:label,exact:true}).selectOption(mode);await page.locator(selector+'[data-theme="'+mode+'"]').waitFor();await page.waitForLoadState('networkidle');row.before=await page.evaluate(animationFacts,selector)
      try{row.transitions=await page.evaluate(settleThemeTransitions,selector)}catch(e){row.transitionFailure=classifyThemeFailure(e);row.errorHash=hash(e)}finally{row.after=await page.evaluate(animationFacts,selector)}
      await page.addScriptTag({content:axe});row.axe=await page.evaluate(async()=>{const result=await axe.run(document,{runOnly:{type:'rule',values:['color-contrast']}});return result.violations.map(v=>({id:v.id,impact:v.impact,nodes:v.nodes.slice(0,30).map(n=>({target:n.target,data:n.any.map(c=>c.data).filter(Boolean)}))}))})
-     row.stylesheets=await page.evaluate(()=>[...document.querySelectorAll('link[rel=stylesheet]')].map(el=>new URL(el.href).pathname));row.formPanels=await page.locator('.survey-form-options,.survey-form-bulk-preview,.survey-form-setting-note').evaluateAll(nodes=>nodes.slice(0,20).map(el=>{const c=getComputedStyle(el);return {tag:el.tagName,background:c.backgroundColor,color:c.color,subtle:c.getPropertyValue('--survey-brand-subtle'),muted:c.getPropertyValue('--survey-brand-muted')}}));row.layout=await page.evaluate(()=>({viewport:innerWidth,scrollWidth:document.documentElement.scrollWidth}));row.palette=await page.locator('.assessment-material-picker,.assessment-material-display').evaluateAll(nodes=>nodes.slice(0,12).map(el=>{const c=getComputedStyle(el);return{background:c.backgroundColor,color:c.color,muted:c.getPropertyValue('--material-muted')}}))
+     row.stylesheets=await page.evaluate(()=>[...document.querySelectorAll('link[rel=stylesheet]')].map(el=>new URL(el.href).pathname));row.formPanels=await page.locator('.form-player,[data-participant-local-save],[data-assessment-shell-header],[data-assessment-shell-navigation]').evaluateAll(nodes=>nodes.slice(0,20).map(el=>{const c=getComputedStyle(el);return {tag:el.tagName,background:c.backgroundColor,color:c.color,subtle:c.getPropertyValue('--survey-brand-subtle'),muted:c.getPropertyValue('--survey-brand-muted')}}));row.layout=await page.evaluate(()=>({viewport:innerWidth,scrollWidth:document.documentElement.scrollWidth}));row.palette=await page.locator('.assessment-material-picker,.assessment-material-display').evaluateAll(nodes=>nodes.slice(0,12).map(el=>{const c=getComputedStyle(el);return{background:c.backgroundColor,color:c.color,muted:c.getPropertyValue('--material-muted')}}))
      if(row.transitionFailure||row.axe.length||row.layout.scrollWidth>width+1)await page.screenshot({path:path.join(out,phase.replace(/:/g,'-')+'.png'),fullPage:true})
+     if(mode==='dark'&&state!=='complete')row.localSaveComparison=await page.locator('[data-participant-local-save]').evaluate(el=>{const original=el.getAttribute('class'),current=getComputedStyle(el).color;let legacy;try{el.classList.remove('assessment-local-save-status');legacy=getComputedStyle(el).color}finally{if(original===null)el.removeAttribute('class');else el.setAttribute('class',original)}return {current,legacy,scope:'class-only regression probe after all acceptance observations; original class restored'}})
     }
    }catch(e){report.errors.push({phase,hash:hash(e)})}finally{await context.close()}
   }

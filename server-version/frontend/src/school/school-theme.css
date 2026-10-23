@@ -83,3 +83,7 @@
 /* Shared material components inherit this entry palette, not Training defaults. */
 .hs-app :is(.assessment-material-picker,.assessment-material-display):not([data-cognitive-task-root],[data-cognitive-task-root] *){--material-line:var(--hs-border);--material-surface:var(--hs-surface);--material-ink:var(--hs-ink);--material-muted:var(--hs-muted);--material-accent:var(--hs-primary);background:var(--material-surface);color:var(--material-ink);border-color:var(--material-line)}
 .hs-app :is(.assessment-material-picker,.assessment-material-display):not([data-cognitive-task-root],[data-cognitive-task-root] *) a{color:var(--material-accent)}
+
+/* Local draft feedback is outside FormPlayer and must not inherit the day-only ProductPage ink. */
+.hs-app[data-theme=dark] .assessment-local-save-status[role=status]:not([data-cognitive-task-root],[data-cognitive-task-root] *){color:var(--hs-muted)}
+.hs-app[data-theme=dark] .assessment-local-save-status[role=alert]:not([data-cognitive-task-root],[data-cognitive-task-root] *){color:#ffbbaa}

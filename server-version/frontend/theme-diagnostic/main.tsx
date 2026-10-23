@@ -1,3 +1,4 @@
+import {ParticipantFixture} from './participant'
 import React,{useCallback,useMemo,useState} from 'react'
 import {createRoot} from 'react-dom/client'
 import {EducationPrivateFormEditor} from '@source/components/education-tools/EducationPrivateFormEditor'
@@ -63,4 +64,4 @@ function Fixture(){
  const rootProps={'data-theme':appearance.theme,'data-testid':'theme-root','data-fixture':'synthetic-only','data-theme-diagnostic-ready':'true'}
  return entry==='school'?<div className="hs-app hs-workspace" {...rootProps}><main id="hs-main" tabIndex={-1} className="hs-main hs-main-workspace"><div className="hs-workspace-layout">{content}</div></main></div>:<main className="ht-app" {...rootProps}>{content}</main>
 }
-createRoot(document.getElementById('root')!).render(<React.StrictMode><Fixture/></React.StrictMode>)
+createRoot(document.getElementById('root')!).render(<React.StrictMode>{query.get('view')==='participant'?<ParticipantFixture entry={entry} definition={draft(false)}/>:<Fixture/>}</React.StrictMode>)

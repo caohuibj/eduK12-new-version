@@ -45,6 +45,7 @@ it('uses the real Teacher host and Final form section with CSRF, forwarding the 
  const input=await screen.findByRole('textbox',{name:/任教学科/})
  await waitFor(()=>expect(input).toBeEnabled())
  fireEvent.change(input,{target:{value:'数学'}})
+ expect(await screen.findByText('已保存到本机。',{exact:true})).toHaveClass('assessment-local-save-status')
  const submit=screen.getByRole('button',{name:'提交整个区段'})
  await waitFor(()=>expect(submit).toBeEnabled());fireEvent.click(submit)
  await waitFor(()=>expect(saved).toBe(true))
@@ -71,4 +72,17 @@ it('uses the real Teacher host and Final form section with CSRF, forwarding the 
  await waitFor(()=>expect(fetch.mock.calls.filter(([url])=>url===prefix+'/my-private-form-tasks').length).toBeGreaterThan(1))
  expect(fetch.mock.calls.every(([url])=>url.startsWith(prefix+'/'))).toBe(true)
  await waitFor(async()=>expect(await finalDraftStore.get(draftKey)).toBeNull())
+})
+
+// This checks the real entry CSS contract, not computed browser contrast.
+it('scopes local draft status and error colors to education dark appearance without changing cognitive surfaces',()=>{
+ for(const [entry,prefix,muted] of [['school','hs','hs-muted'],['huiteacher','ht','ht-quiet']]){
+  const css=readFileSync(`src/${entry}/${entry}-theme.css`,'utf8')
+  const selector=`.${prefix}-app[data-theme=dark] .assessment-local-save-status`
+  const guard=':not([data-cognitive-task-root],[data-cognitive-task-root] *)'
+  expect(css).toContain(`${selector}[role=status]${guard}{color:var(--${muted})}`)
+  expect(css).toContain(`${selector}[role=alert]${guard}{color:#ffbbaa}`)
+ }
+ const component=readFileSync('src/components/FinalCompositeAssessment.tsx','utf8')
+ expect(component).toContain(`role={localSaveStatus.state === 'error' ? 'alert' : 'status'} className="assessment-local-save-status mb-4 text-sm"`)
 })

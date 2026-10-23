@@ -5,8 +5,8 @@
   "branch": "work/school-teacher-review-20261022",
   "enabled": true,
   "base": "69497181d569d4a5f7d61cdab108b977894cf9b3",
-  "productHead": "ae6c6583ee188efcaf293dbec82c51979f27d776",
-  "frontendTree": "41f191934cd98ebb4a7fd1e8ea4cf64249171bd4",
+  "productHead": "626bf91ab9a24390f54f0a06c542f148fb1de096",
+  "frontendTree": "ab5a1766eb54f4e26e243e8281e8874be6011690",
   "backendTree": "bf2ddb04129457154d00261f4d3b139f748914f3",
   "source": {
     ".github/scripts/school-teacher-browser-control.mjs": {
@@ -919,7 +919,7 @@
     },
     "server-version/frontend/src/components/education-tools/EducationPrivateFormEditor.test.tsx": {
       "before": "",
-      "after": "64529c1c713d3f1f024d47b6cd443c8655c139ea"
+      "after": "3c7c8a2f8f5d928666e6b6d24744c4156bf1e4dc"
     },
     "server-version/frontend/src/components/education-tools/EducationPrivateFormEditor.tsx": {
       "before": "",
@@ -1171,7 +1171,7 @@
     },
     "server-version/frontend/src/huiteacher/HuiteacherPrivateFormRunnerHost.test.tsx": {
       "before": "",
-      "after": "d782eef20b8e8d9397b42c7670441f735e8ddc54"
+      "after": "38e4d2ebee0d781bbad9ab6f9f9a91a2a96bb3c9"
     },
     "server-version/frontend/src/huiteacher/HuiteacherPrivateFormTaskPagination.test.tsx": {
       "before": "",
@@ -1215,7 +1215,7 @@
     },
     "server-version/frontend/src/huiteacher/huiteacher-theme.css": {
       "before": "",
-      "after": "1534b2d7e93e64911c5ed3bf37a3983473570161"
+      "after": "b9b6485e28a67dd2c3bb51d4808ae23b51847f2e"
     },
     "server-version/frontend/src/huiteacher/huiteacher-workspace-layout.css": {
       "before": "",
@@ -1447,7 +1447,7 @@
     },
     "server-version/frontend/src/school/school-theme.css": {
       "before": "",
-      "after": "f5029685e6e370b53558d72f1004c93a901bbcb0"
+      "after": "98f29290381908ffbd5da4437b0044a5ea4bd4dc"
     },
     "server-version/frontend/src/school/school-workspace.css": {
       "before": "4dd3a2a7188c182bf5d1a32e3a6d549e96a3aa48",
@@ -1736,6 +1736,7 @@
       "lintFiles": [
         "src/components/education-tools/EducationMaterialPicker.tsx",
         "src/components/education-tools/EducationMaterials.test.tsx",
+        "src/components/education-tools/EducationPrivateFormEditor.test.tsx",
         "src/components/education-tools/EducationPrivateFormEditor.tsx",
         "src/components/education-tools/EducationPrivateScaleSharing.tsx",
         "src/components/education-tools/EducationPrivateToolStudio.tsx",
@@ -1807,7 +1808,8 @@
             "education section and question authoring navigator changes only view selection and keeps unsaved field edits when navigating away and back",
             "education section and question authoring navigator preserves the original Survey pagination wording and fully expanded questions by default",
             "education section and question authoring navigator selects a copied question by its new stable key and keeps selection through move and neighbour deletion",
-            "education section and question authoring navigator selects the remaining neighbouring section when the active section is removed"
+            "education section and question authoring navigator selects the remaining neighbouring section when the active section is removed",
+            "pairs shared form row and bulk tokens inside each education dark surface only"
           ],
           "expectedFiltered": [],
           "inputClosure": {
@@ -1822,10 +1824,18 @@
               },
               {
                 "path": "server-version/frontend/src/components/education-tools/EducationPrivateFormEditor.test.tsx",
-                "blob": "64529c1c713d3f1f024d47b6cd443c8655c139ea"
+                "blob": "3c7c8a2f8f5d928666e6b6d24744c4156bf1e4dc"
+              },
+              {
+                "path": "server-version/frontend/src/school/school-theme.css",
+                "blob": "98f29290381908ffbd5da4437b0044a5ea4bd4dc"
+              },
+              {
+                "path": "server-version/frontend/src/huiteacher/huiteacher-theme.css",
+                "blob": "b9b6485e28a67dd2c3bb51d4808ae23b51847f2e"
               }
             ],
-            "sha256": "5978c0c46e9f24e8fb3114f305cfaa40870cb428505916096545c78804b769be"
+            "sha256": "01f0d32b32dce525df6e8d2c7d1bd3d20ee91b4ac5ac96e481ec812b6f96f870"
           }
         },
         {
@@ -2077,10 +2087,14 @@
               },
               {
                 "path": "server-version/frontend/src/huiteacher/HuiteacherPrivateFormRunnerHost.test.tsx",
-                "blob": "d782eef20b8e8d9397b42c7670441f735e8ddc54"
+                "blob": "38e4d2ebee0d781bbad9ab6f9f9a91a2a96bb3c9"
+              },
+              {
+                "path": "server-version/e2e/school-teacher-browser.cjs",
+                "blob": "cea65a3b4e97959cedc13986a23a5989f07ea3aa"
               }
             ],
-            "sha256": "9e6a5360a930022cc204b7dbfb6a916bec515c3fdd993c42ee3bcd40e805ee98"
+            "sha256": "d6e0137d09ca4319d08dac15fed400ff598950700e3add26359651c7f9d3c2c0"
           }
         },
         {
