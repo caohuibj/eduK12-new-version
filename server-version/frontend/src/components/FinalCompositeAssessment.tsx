@@ -581,7 +581,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       ) : null}
 
       <CompositeUnitRequirements item={item} />
-      {localSaveStatus.state !== 'idle' ? <p role={localSaveStatus.state === 'error' ? 'alert' : 'status'} className="mb-4 text-sm">{localSaveStatus.message}</p> : null}
+      {localSaveStatus.state !== 'idle' ? <p role={localSaveStatus.state === 'error' ? 'alert' : 'status'} className="assessment-local-save-status mb-4 text-sm">{localSaveStatus.message}</p> : null}
 
       {item?.type === 'COGNITIVE' ? (
         <div className="card p-8 text-center">
