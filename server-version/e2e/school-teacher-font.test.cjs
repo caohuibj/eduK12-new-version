@@ -5,7 +5,7 @@
 const { test } = require('node:test')
 const assert = require('node:assert/strict')
 const { CJK_SAMPLES, inspectCjkFonts, validateCjkInventory, validateRenderedCjk } = require('./school-teacher-chrome.cjs')
-const { cjkSampleIds, validateUiFontEvidence, readRenderedCjk } = require('./school-teacher-ui.cjs')
+const { cjkSampleIds, validateUiFontEvidence, prepareRenderedCjk, readRenderedCjk } = require('./school-teacher-ui.cjs')
 
 const SECRET = 'synthetic-secret-must-not-be-serialized'
 const FONT = '/usr/share/fonts/opentype/example/ExampleCJK-Regular.otf'
@@ -189,10 +189,11 @@ function fakePage() {
     '.hs-main-auth h1': 'school-serif', '.hs-main-auth .hs-field > span': 'school-sans',
     '#ht-journal-title > span:first-child': 'teacher-serif', '.ht-auth-surface .ht-field > span': 'teacher-sans',
   }
-  const samples = Object.keys(CJK_SAMPLES), calls = [], state = { detached: 0, connected: 0, visible: true }
+  const samples = Object.keys(CJK_SAMPLES), calls = [], state = { detached: 0, connected: 0, visible: true, url: 'about:blank' }
   const cdp = {
     send: async (method, args) => {
       calls.push({ method, args })
+      if (state.initError && method === 'CSS.enable') throw state.initError
       if (method === 'DOM.enable' || method === 'CSS.enable') return {}
       if (method === 'DOM.getDocument') return { root: { nodeId: 10 } }
       if (method === 'DOM.querySelector') {
@@ -204,9 +205,11 @@ function fakePage() {
       const sampleId = samples[args.nodeId - 100]; assert.ok(sampleId)
       return { fonts: rendered(sampleId).map(font => ({ ...font, familyName: 'Localized family is not evidence' })) }
     },
-    detach: async () => { state.detached++ },
+    detach: async () => { state.detached++; if (state.detachError) throw state.detachError },
   }
   const page = {
+    url: () => state.url,
+    once: (event, fn) => { assert.equal(event, 'close'); state.close = fn },
     context: () => ({ newCDPSession: async target => { assert.equal(target, page); state.connected++; return cdp } }),
     locator: selector => {
       assert.ok(Object.hasOwn(selectorIds, selector))
@@ -217,27 +220,66 @@ function fakePage() {
   return { page, calls, state }
 }
 
-test('UI CDP collection targets real leaf-node selectors and detaches without DOM mutation', async () => {
+test('UI CDP collection reuses pre-navigation session for real leaf-node selectors', async () => {
   const inventory = fixture().run()
   for (const [product, state] of [['SCHOOL', 'public-login-empty'], ['TEACHER', 'public-home'], ['TEACHER', 'public-login-empty']]) {
-    const f = fakePage(), result = await readRenderedCjk(f.page, product, state, 320, inventory)
+    const f = fakePage(); await prepareRenderedCjk(f.page); f.state.url = 'https://synthetic.invalid/login'
+    const result = await readRenderedCjk(f.page, product, state, 320, inventory)
     const ids = cjkSampleIds(product, state, 320)
     assert.deepEqual(result, ids.map(sampleId => ({ sampleId, fonts: rendered(sampleId) })))
-    assert.equal(f.state.connected, 1); assert.equal(f.state.detached, 1)
+    assert.equal(f.state.connected, 1); assert.equal(f.state.detached, 0)
     assert.deepEqual(f.calls.slice(0, 3).map(call => call.method), ['DOM.enable', 'CSS.enable', 'DOM.getDocument'])
     assert.deepEqual(f.calls.slice(3).map(call => call.method), ids.flatMap(() => ['DOM.querySelector', 'CSS.getPlatformFontsForNode']))
     assert.equal(JSON.stringify(result).includes('Localized'), false)
+    await readRenderedCjk(f.page, product, state, 320, inventory)
+    assert.equal(f.state.connected, 1); assert.equal(f.calls.filter(call => call.method === 'CSS.enable').length, 1)
+    f.state.close()
+    await assert.rejects(readRenderedCjk(f.page, product, state, 320, inventory), /initialized before navigation/)
   }
   assert.deepEqual(await readRenderedCjk({}, 'TEACHER', 'public-home', 390, inventory), [])
 })
 
-test('UI collection rejects substituted or hidden text and still detaches after failures', async () => {
+test('UI collection retains strict text and font checks using the initialized session', async () => {
   const inventory = fixture().run()
   for (const changes of [{ text: 'Teacher' }, { text: '教育账号 ' }, { visible: false }, { cdpError: true }]) {
-    const f = fakePage(); Object.assign(f.state, changes)
+    const f = fakePage(); await prepareRenderedCjk(f.page); Object.assign(f.state, changes)
     await assert.rejects(readRenderedCjk(f.page, 'TEACHER', 'public-login-empty', 320, inventory))
-    assert.equal(f.state.connected, 1); assert.equal(f.state.detached, 1)
+    assert.equal(f.state.connected, 1); assert.equal(f.state.detached, 0)
     if (changes.text || changes.visible === false)
       assert.equal(f.calls.some(call => call.method === 'CSS.getPlatformFontsForNode'), false)
+  }
+})
+
+test('font inspection initialization rejects late or duplicate setup and preserves initialization failures', async () => {
+  const late = fakePage(); late.state.url = 'https://synthetic.invalid/login'
+  await assert.rejects(prepareRenderedCjk(late.page), /before navigation/); assert.equal(late.state.connected, 0)
+  const duplicate = fakePage(); await prepareRenderedCjk(duplicate.page)
+  await assert.rejects(prepareRenderedCjk(duplicate.page), /once per page/); assert.equal(duplicate.state.connected, 1)
+  const broken = fakePage(), primary = new Error('initialization failed')
+  broken.state.initError = primary; broken.state.detachError = new Error('detach failed')
+  await assert.rejects(prepareRenderedCjk(broken.page), error => error === primary)
+  assert.equal(broken.state.detached, 1)
+  await assert.rejects(readRenderedCjk(broken.page, 'SCHOOL', 'public-login-empty', 320, fixture().run()), /initialized before navigation/)
+  const source = require('node:fs').readFileSync(require('node:path').join(__dirname, 'school-teacher-browser.cjs'), 'utf8')
+  const sessionSource = source.split('async function session(')[1]
+  const initialize = sessionSource.indexOf('await prepareRenderedCjk(page)'), navigate = sessionSource.indexOf('await page.goto(')
+  assert(initialize >= 0 && navigate >= 0); assert(initialize < navigate)
+})
+
+test('browser session validation always closes context and preserves the primary failure', async () => {
+  const source = require('node:fs').readFileSync(require('node:path').join(__dirname, 'school-teacher-browser.cjs'), 'utf8')
+  const body = source.split('      s.close = async () => {')[1].split('\n      }\n      await prepareRenderedCjk(page)')[0]
+  const AsyncFunction = Object.getPrototypeOf(async function () {}).constructor
+  const close = new AsyncFunction('page','audit','expectedFailures','assert','context','report','sha',body)
+  for(const validationFails of [false,true])for(const cleanupFails of [false,true]){
+    const primary = new Error('validation identity'), audit={failedResponses:[],consoleErrors:[]},report={errors:[]};let attempted=0,caught
+    try{await close({waitForLoadState:async()=>{if(validationFails)throw primary}},audit,new Set(),assert,
+      {close:async()=>{attempted++;if(cleanupFails)throw new Error('private-cleanup-error')}},report,
+      value=>require('node:crypto').createHash('sha256').update(value).digest('hex'))}catch(error){caught=error}
+    assert.equal(attempted,1)
+    if(validationFails)assert.equal(caught,primary)
+    else if(cleanupFails)assert.equal(caught.message,'Browser session context cleanup failed')
+    else assert.equal(caught,undefined)
+    assert.equal(report.errors.length,Number(cleanupFails));assert(!JSON.stringify(report).includes('private-cleanup-error'))
   }
 })

@@ -342,13 +342,25 @@ async function migrate(b){databaseGuard();const {Client}=createRequire(resolve('
   await client.query(m.baselineFixtureSql);const before=await snapshots(client,m.preserveTables);
   command('migrate-current',process.execPath,['node_modules/prisma/build/index.js','migrate','deploy'],resolve('server-version/backend'));const after=await snapshots(client,before);assert.deepEqual(after,before);receipt('migration',{status:'PASSED',base:b.base,sourceHead:git('rev-parse','HEAD'),preserved:after});
  }finally{await client.end()}}
-async function restore(b){databaseGuard();const {Client}=createRequire(resolve('server-version/backend/package.json'))('pg'),u=new URL(process.env.DATABASE_URL),owner=new Client({connectionString:u.href});await owner.connect();const db='school_teacher_restore_ci_test',svc=process.env.CI_POSTGRES_SERVICE_ID;
- try{const before=await snapshots(owner,b.execution.migration.restoreTables);await owner.query('CREATE DATABASE '+identifier(db));
+async function restore(b){databaseGuard();const {Client}=createRequire(resolve('server-version/backend/package.json'))('pg'),u=new URL(process.env.DATABASE_URL),owner=new Client({connectionString:u.href});await owner.connect();const db='school_teacher_restore_ci_test',svc=process.env.CI_POSTGRES_SERVICE_ID;let bodyFailed=false,preserved;
+ try{const before=await snapshots(owner,b.execution.migration.restoreTables);preserved=before;await owner.query('CREATE DATABASE '+identifier(db));
   command('dump-current','docker',['exec',svc,'pg_dump','-U','ptool','-d','school_teacher_browser_ci_test','--format=custom','--file=/tmp/school-teacher.dump']);
   command('restore-current','docker',['exec',svc,'pg_restore','-U','ptool','-d',db,'--exit-on-error','/tmp/school-teacher.dump']);u.pathname='/'+db;const restored=new Client({connectionString:u.href});await restored.connect();try{assert.deepEqual(await snapshots(restored,before),before)}finally{await restored.end()}
   const fixtureModule=await import(pathToFileURL(resolve('server-version/e2e/school-teacher-fixture.cjs'))),fixture=(fixtureModule.default||fixtureModule).readFixture().value;const runtimeUrl=new URL(fixture.runtimeUrl);assert.equal(runtimeUrl.hostname,u.hostname);runtimeUrl.pathname='/'+db;const {PrismaClient}=createRequire(resolve('server-version/backend/package.json'))('@prisma/client');const runtime=new PrismaClient({datasources:{db:{url:runtimeUrl.href}}});try{const {verifyRuntimePrivileges}=await import(pathToFileURL(resolve('server-version/backend/scripts/runtime-role-contract.mjs'))),{verifyReleaseSchema}=await import(pathToFileURL(resolve('server-version/backend/scripts/release-schema-contract.mjs')));assert.equal((await verifyRuntimePrivileges(runtime)).restrictedRuntimeRole,true);await verifyReleaseSchema(runtime);}finally{await runtime.$disconnect()}
-  receipt('restore',{status:'PASSED',preserved:before,restrictedRuntimeRole:true,releaseSchemaVerified:true});
- }finally{await owner.query('DROP DATABASE IF EXISTS '+identifier(db)+' WITH (FORCE)');await owner.end();command('remove-private-dump','docker',['exec',svc,'rm','-f','/tmp/school-teacher.dump'])}}
+ }catch(error){bodyFailed=true;throw error}finally{
+  const failures=[];
+  for(const [stage,cleanup] of [
+   ['drop-restore-database',()=>owner.query('DROP DATABASE IF EXISTS '+identifier(db)+' WITH (FORCE)')],
+   ['close-restore-owner',()=>owner.end()],
+   ['remove-private-dump',()=>command('remove-private-dump','docker',['exec',svc,'rm','-f','/tmp/school-teacher.dump'])]
+  ]){try{await cleanup()}catch(error){failures.push({stage,messageHash:sha256(String(error))})}}
+  if(failures.length){
+   try{receipt('restore-cleanup',{status:'FAILED',errors:failures})}catch{/* Preserve primary error, or fail below. */}
+   if(!bodyFailed)throw Error('Restore cleanup failed; no passing restore receipt was written');
+  }
+ }
+ receipt('restore',{status:'PASSED',preserved,restrictedRuntimeRole:true,releaseSchemaVerified:true});
+}
 function cleanup(){const root=realpathSync(process.env.RUNNER_TEMP);for(const name of ['school-teacher-private','school-teacher-checks-private','school-teacher-seed.log']){const p=join(root,name);if(existsSync(p)){assert.equal(realpathSync(p),p);rmSync(p,{recursive:true})}}receipt('cleanup',{privateMaterialRemoved:true})}
 async function main(){const phase=process.argv[2];if(phase==='cleanup'){cleanup();return}assert.equal(process.version,'v24.21.0');const b=binding(),plan=actualPlan();assert.deepEqual(plan,JSON.parse(process.env.PLAN));
  if(phase==='admission')admission(b,plan);

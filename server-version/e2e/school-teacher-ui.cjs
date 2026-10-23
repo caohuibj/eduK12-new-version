@@ -59,15 +59,31 @@ function validateUiFontEvidence(row, inventory) {
   }
   return { ok: true, code: 'UI_CJK_EVIDENCE_VERIFIED' }
 }
+// Font inspection must start on the blank page, before stylesheets are loaded.
+// CDP sessions are owned by their browser context and end when that context closes.
+const renderedCjkSessions = new WeakMap()
+async function prepareRenderedCjk(page) {
+  assert.equal(page.url(), 'about:blank', 'Initialize font inspection before navigation')
+  assert.equal(renderedCjkSessions.has(page), false, 'Initialize font inspection once per page')
+  const cdp = await page.context().newCDPSession(page)
+  try {
+    await cdp.send('DOM.enable'); await cdp.send('CSS.enable')
+    renderedCjkSessions.set(page, cdp)
+    page.once('close', () => renderedCjkSessions.delete(page))
+  } catch (error) {
+    try { await cdp.detach() } catch { /* Preserve the initialization error; outer browser cleanup still runs. */ }
+    throw error
+  }
+}
 async function readRenderedCjk(page, product, state, width, inventory) {
   const ids = cjkSampleIds(product, state, width)
   if (!ids.length) return []
   assert.deepEqual(validateCjkInventory(inventory), { ok: true, code: 'CJK_INVENTORY_VERIFIED' })
   const selectors = { 'school-serif': '.hs-main-auth h1', 'school-sans': '.hs-main-auth .hs-field > span',
     'teacher-serif': '#ht-journal-title > span:first-child', 'teacher-sans': '.ht-auth-surface .ht-field > span' }
-  const cdp = await page.context().newCDPSession(page)
-  try {
-    await cdp.send('DOM.enable'); await cdp.send('CSS.enable')
+  const cdp = renderedCjkSessions.get(page)
+  assert.ok(cdp, 'Font inspection must be initialized before navigation')
+  {
     const { root } = await cdp.send('DOM.getDocument')
     const result = []
     for (const sampleId of ids) {
@@ -82,7 +98,7 @@ async function readRenderedCjk(page, product, state, width, inventory) {
       result.push({ sampleId, fonts })
     }
     return result
-  } finally { await cdp.detach() }
+  }
 }
 
 function createUiChecks({ report, out, axeSource, getFontInventory }) {
@@ -489,4 +505,4 @@ function verifyReport(report, options, readScreenshot) {
     notCovered: [...report.notCovered, ...ui.notCovered] }
 }
 
-module.exports = { OFFICIAL_BACKEND, BACKEND_FIXTURE_EXCEPTION, computeBackendCompileDigest, validateOfficialBackendReceipt, OFFICIAL_FRONTEND, validateOfficialFrontendReceipt, validateReportBuildInputs, cjkSampleIds, validateUiFontEvidence, readRenderedCjk, appearanceKeys, imageMode, validateSelectedImages, createUiChecks, verifyReport, products, darkStates, originalShots }
+module.exports = { OFFICIAL_BACKEND, BACKEND_FIXTURE_EXCEPTION, computeBackendCompileDigest, validateOfficialBackendReceipt, OFFICIAL_FRONTEND, validateOfficialFrontendReceipt, validateReportBuildInputs, cjkSampleIds, validateUiFontEvidence, prepareRenderedCjk, readRenderedCjk, appearanceKeys, imageMode, validateSelectedImages, createUiChecks, verifyReport, products, darkStates, originalShots }

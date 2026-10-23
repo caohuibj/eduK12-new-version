@@ -28,7 +28,7 @@ const { spawn, execFileSync } = require('node:child_process')
 const { pathToFileURL } = require('node:url')
 const { randomUUID, createHmac } = require('node:crypto')
 const { readFixture, sourceIdentity, backend, repo, sha } = require('./school-teacher-fixture.cjs')
-const { createUiChecks, verifyReport, validateOfficialFrontendReceipt, validateOfficialBackendReceipt, computeBackendCompileDigest } = require('./school-teacher-ui.cjs')
+const { prepareRenderedCjk, createUiChecks, verifyReport, validateOfficialFrontendReceipt, validateOfficialBackendReceipt, computeBackendCompileDigest } = require('./school-teacher-ui.cjs')
 const { preflightChrome, verifyChromeSandbox, inspectCjkFonts, CHROME_LAUNCH_OPTIONS } = require('./school-teacher-chrome.cjs')
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 const origins = { SCHOOL: 'https://school.eduk12.top', TEACHER: 'https://teacher.eduk12.top' }
@@ -255,7 +255,7 @@ async function run() {
       'Public deployment TLS, DNS, reverse proxy', 'MFA enrollment UI visuals (real enrollment API is used)', 'Manual construction of every question (real saved definition template API is used)'],
     sessions: [], status: 'RUNNING' }
   const ui = createUiChecks({ report: report.ui, out, axeSource, getFontInventory: () => report.chrome.fonts })
-  let browser, app, privateLog, lastSafeSession, stage = 'chrome-preflight'
+  let browser, app, privateLog, lastSafeSession, bodyFailed = false, stage = 'chrome-preflight'
   async function stopBackend() {
     const current = app
     if (current?.pid && current.exitCode === null && current.signalCode === null) {
@@ -406,13 +406,22 @@ async function run() {
         return body.data
       }
       s.close = async () => {
+        let validationFailed = false
+        try {
         await page.waitForLoadState('networkidle')
         audit.expectedFailures = [...expectedFailures]
         assert.deepEqual(audit.failedResponses.filter(row => !expectedFailures.has(row.path + ':' + row.status)), [], 'No unexpected HTTP errors')
         assert.deepEqual(audit.consoleErrors.filter(row => !row.network || !audit.failedResponses.some(response =>
           response.path === row.path && expectedFailures.has(response.path + ':' + response.status))), [], 'No unexpected browser console errors')
-        await context.close()
+        } catch (error) { validationFailed = true; throw error } finally {
+          try { await context.close() } catch (error) {
+            report.errors.push({ stage: 'session-context-close', name: 'CleanupError', messageHash: sha(String(error)),
+              note: 'Context cleanup failed; no raw exception is published.' })
+            if (!validationFailed) throw new Error('Browser session context cleanup failed')
+          }
+        }
       }
+      await prepareRenderedCjk(page)
       if (options.anonymous) {
         await page.goto(origin + '/')
         return s
@@ -792,6 +801,7 @@ async function run() {
     report.status = 'PASSED'
     verifyReport(report, { ...fixture.identity, runId: process.env.GITHUB_RUN_ID, ...report.inputs, ...buildEvidence }, file => fs.readFileSync(path.join(out, file)))
   } catch (error) {
+    bodyFailed = true
     report.status = 'FAILED'; report.errors.push({ stage, name: error.name, messageHash: sha(String(error)),
       note: 'No raw auth-bearing exception/body/trace is published. Inspect the failing stage and status records.' })
     if (lastSafeSession?.authenticated && !lastSafeSession.page.isClosed()) {
@@ -802,9 +812,24 @@ async function run() {
     }
     throw new Error('School/Teacher browser acceptance failed at ' + stage + '; see sanitized evidence, not fixture secrets')
   } finally {
-    if (browser) await browser.close()
-    await stopBackend()
-    fs.writeFileSync(path.join(out, 'browser.json'), JSON.stringify(report, null, 2))
+    // Attempt every cleanup and evidence write without replacing the primary failure.
+    let cleanupFailed = false
+    for (const [cleanupStage, cleanup] of [
+      ['browser-close', async () => { if (browser) await browser.close() }],
+      ['backend-stop', stopBackend],
+    ]) {
+      try { await cleanup() } catch (error) {
+        cleanupFailed = true
+        report.status = 'FAILED'
+        report.errors.push({ stage: cleanupStage, name: 'CleanupError', messageHash: sha(String(error)),
+          note: 'Cleanup failed; no raw exception is published.' })
+      }
+    }
+    try { fs.writeFileSync(path.join(out, 'browser.json'), JSON.stringify(report, null, 2)) } catch {
+      cleanupFailed = true
+      report.status = 'FAILED'
+    }
+    if (!bodyFailed && cleanupFailed) throw new Error('Browser acceptance cleanup or evidence publication failed')
   }
 }
 
