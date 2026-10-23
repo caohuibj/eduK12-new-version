@@ -17,13 +17,14 @@ export const privateExecutionFormDefinition = (): FormDraft => ({ schemaVersion:
     { itemKey: 'comment', type: 'LONG_TEXT', prompt: 'Comment', required: false, options: [], rows: [], maxLength: 150 },
   ] },
 ] })
-async function frozen(context: PrivateToolContext, content: FormDraft = privateExecutionFormDefinition()) {
+async function frozen(context: PrivateToolContext, prepareContent?: (context: PrivateToolContext, toolId: string) => Promise<FormDraft>) {
   const draft = await tools.createPrivateTool(context, { kind: 'FORM', title: 'Synthetic private draft form' })
+  const content = prepareContent ? await prepareContent(context, draft.id) : privateExecutionFormDefinition()
   const saved = await tools.updatePrivateTool(context, draft.id, { expectedRevision: draft.revision, title: draft.title, definition: content })
   const version = await tools.freezePrivateTool(context, draft.id, { expectedRevision: saved.revision, expectedContentHash: saved.contentHash })
   return { draft: saved, version }
 }
-export async function setupPrivateFormExecutionFixture(db: PrismaClient, product: 'SCHOOL' | 'TEACHER', responseMode: 'SELF' | 'PARENT_REPORT' | 'TEACHER_REPORT' = 'SELF', trackCount = 1) {
+export async function setupPrivateFormExecutionFixture(db: PrismaClient, product: 'SCHOOL' | 'TEACHER', responseMode: 'SELF' | 'PARENT_REPORT' | 'TEACHER_REPORT' = 'SELF', trackCount = 1, prepareContent?: (context: PrivateToolContext, toolId: string) => Promise<FormDraft>) {
   const f = await setupEducationLibraryRuntimeFixture({ db, product, trackCount: 0, publish: false, responseMode, ...(product === 'SCHOOL' ? { publisher: 'PSYCHOLOGY' as const } : {}) })
   const context: PrivateToolContext = { entry: product, organizationId: f.organizationId,
     principal: { userId: f.managerUserId, accountDomain: 'SCHOOL' } }
@@ -34,7 +35,7 @@ export async function setupPrivateFormExecutionFixture(db: PrismaClient, product
     await db.organizationCapabilityGrant.create({ data: { id: randomUUID(), organizationId: f.organizationId,
       membershipId: member.id, capability: 'PSYCHOLOGY_STAFF', grantedByUserId: f.managerUserId } })
   }
-  const source = await frozen(context)
+  const source = await frozen(context, prepareContent)
   const target = { organizationId: f.organizationId, runId: f.runId, actorUserId: f.managerUserId,
     parent: { kind: product === 'SCHOOL' ? 'SCHOOL_ACTIVITY' as const : 'TEACHER_EVENT' as const, id: f.workflow.id } }
   const teacher = { organizationId: f.organizationId, eventId: f.workflow.id, actorUserId: f.managerUserId }

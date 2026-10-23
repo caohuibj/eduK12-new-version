@@ -1,3 +1,4 @@
+import {importPrivateToolCsv} from './private-tool.csv.service'
 import {privateToolSharingRouter} from './private-tool.sharing.routes'
 import {educationPrivateToolMediaRouter} from './private-tool.media.routes'
 import {Router,type Request} from 'express'
@@ -40,6 +41,8 @@ export function educationPrivateToolRouter(entry:EducationToolEntry){
  }))
  router.get('/:toolId',handle(req=>service.readPrivateTool(context(req),toolId(req))))
  router.put('/:toolId',handle(req=>service.updatePrivateTool(context(req),toolId(req),req.body)))
+ router.post('/:toolId/import/preview',handle(req=>importPrivateToolCsv(context(req),toolId(req),req.body)))
+ router.post('/:toolId/import/apply',handle(req=>importPrivateToolCsv(context(req),toolId(req),req.body,true)))
  router.post('/:toolId/validate',handle(req=>{z.object({}).strict().parse(req.body??{});return service.validatePrivateTool(context(req),toolId(req))}))
  router.post('/:toolId/preview',handle(req=>service.previewPrivateTool(context(req),toolId(req),req.body)))
  router.post('/:toolId/freeze',handle(req=>service.freezePrivateTool(context(req),toolId(req),req.body)))

@@ -74,7 +74,7 @@ export async function preparePrivateFormRuntimeResource(tx:Tx,c:PrivateToolConte
    const item=privateFormRuntimeItem(q,randomUUID(),position++,itemIndex)
    await tx.compositeAssessmentItem.create({data:{id:item.id,compositeAssessmentId:composite.id,type:'FORM',position:item.position,required:item.required,
     formType:item.formType,formLabel:item.formLabel,formSectionId:section.id,formSectionPosition:itemIndex,
-    formOptions:item.formOptions as Prisma.InputJsonValue,formPolicy:item.formPolicy as Prisma.InputJsonValue,formDefinition:q as unknown as Prisma.InputJsonValue}})
+    formOptions:item.formOptions as Prisma.InputJsonValue,formPolicy:item.formPolicy as Prisma.InputJsonValue,formDefinition:item.formDefinition as unknown as Prisma.InputJsonValue}})
   }
  }
  const snapshot=trainingContentSnapshotSchema.parse({schemaVersion:1,compositeId:composite.id,units:[]})

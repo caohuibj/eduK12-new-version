@@ -4,9 +4,10 @@ import sharp from 'sharp'
 import {boundedUpload,uploadPrincipalRateLimit} from '../../middleware/uploadAdmission'
 import {asyncHandler} from '../../middleware/asyncHandler'
 import {success} from '../../utils/response'
-import {serveAssessmentImageContent} from '../assessment-media/assessment-image-delivery'
+import {serveAssessmentMaterial} from '../assessment-media/material-delivery'
+import {materialSchema} from '../assessment-media/material'
 import {EducationPrivateToolError,privateToolId,type PrivateToolContext} from './private-tool.contracts'
-import {privateToolImageMaxBytes,privateToolImageMimeTypes} from './private-tool.media-definition'
+import {privateToolImageMaxBytes,privateToolImageMimeTypes,privateToolMaterialMimeTypes} from './private-tool.media-definition'
 import * as media from './private-tool.media'
 
 /** Parent owns product authentication; never mount on a generic asset router. */
@@ -23,6 +24,19 @@ export function educationPrivateToolMediaRouter(context:(req:Request)=>PrivateTo
    throw error
   }
  }
+ router.get('/:toolId/materials',asyncHandler((req,res)=>handle(res,async()=>success(res,await media.listPrivateToolMaterials(context(req),toolId(req),req.query)))))
+ router.post('/:toolId/materials/register',asyncHandler((req,res)=>handle(res,async()=>success(res,await media.registerOwnedPrivateToolMaterial(context(req),toolId(req),req.body)))))
+ router.post('/:toolId/materials',uploadPrincipalRateLimit,
+  (req,res,next)=>{void handle(res,async()=>{await media.assertPrivateToolMediaAdmission(context(req),toolId(req));next()}).catch(next)},
+  boundedUpload('material',50*1024*1024,privateToolMaterialMimeTypes,async(req,res)=>{
+   await handle(res,async()=>{
+    const file=req.file as (Express.Multer.File & {detectedMimeType:string})|undefined
+    if(!file)throw new EducationPrivateToolError('PRIVATE_TOOL_MATERIAL_REQUIRED',400)
+    if(file.detectedMimeType.startsWith('image/')&&((await sharp(file.buffer,{animated:true}).metadata()).pages??1)>1)
+     throw new EducationPrivateToolError('PRIVATE_TOOL_STATIC_IMAGE_REQUIRED',400)
+    return success(res,await media.uploadPrivateToolMaterial(context(req),toolId(req),file))
+   })
+  }))
  router.get('/:toolId/assets',asyncHandler((req,res)=>handle(res,async()=>success(res,await media.listPrivateToolImages(context(req),toolId(req))))))
  router.post('/:toolId/assets/images',uploadPrincipalRateLimit,
   (req,res,next)=>{void handle(res,async()=>{await media.assertPrivateToolMediaAdmission(context(req),toolId(req));next()}).catch(next)},
@@ -38,7 +52,7 @@ export function educationPrivateToolMediaRouter(context:(req:Request)=>PrivateTo
   }))
  router.get('/:toolId/assets/:assetId/content',asyncHandler((req,res)=>handle(res,async()=>{
   const reference=await media.readPrivateToolImage(context(req),toolId(req),privateToolId.parse(req.params.assetId))
-  return serveAssessmentImageContent({reference,res})
+  return serveAssessmentMaterial(materialSchema.shape.asset.parse(reference),res)
  })))
  return router
 }

@@ -1,4 +1,4 @@
-import {privateToolImageReferences} from './private-tool.media-definition'
+import {privateToolImageReferences,privateToolMaterialRightsIssues} from './private-tool.media-definition'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {collectAssetReferences} from '../../services/assetStorage'
 import {createCustomScaleDefinition,scaleDefinitionSchema,validateScaleDefinition,type ScaleDefinitionV2} from '../scale/scale-definition'
@@ -27,7 +27,7 @@ export function privateToolDefinition(kind:PrivateToolKind,input:unknown){
  // references against the exact scoped registration inside their transaction.
  privateToolImageReferences(kind,parsed.data)
  const parsedRefs=collectAssetReferences(parsed.data)
- const supportedPath=kind==='SCALE'?/^(?:items\.\d+\.images\.\d+|report\.rawScoreFeedback\.rules\.\d+\.(?:ranges\.\d+|fallback)\.images\.\d+)\.asset$/:/^pages\.\d+\.questions\.\d+\.image\.asset$/
+ const supportedPath=kind==='SCALE'?/^(?:items\.\d+\.(?:images|materials)\.\d+|report\.rawScoreFeedback\.rules\.\d+\.(?:ranges\.\d+|fallback)\.(?:images|materials)\.\d+)\.asset$/:/^pages\.\d+\.questions\.\d+\.(?:image|materials\.\d+)\.asset$/
  if(parsedRefs.some(ref=>!supportedPath.test(ref.field)))privateToolFail('PRIVATE_TOOL_MEDIA_FIELD_NOT_SUPPORTED',400)
  if(collectAssetReferences(input).some(ref=>!parsedRefs.some(p=>p.assetId===ref.assetId&&p.field===ref.field)))
   privateToolFail('PRIVATE_TOOL_MEDIA_FIELD_NOT_SUPPORTED',400)
@@ -36,7 +36,8 @@ export function privateToolDefinition(kind:PrivateToolKind,input:unknown){
 export function validatePrivateToolDefinition(kind:PrivateToolKind,definition:unknown){
  const parsed=privateToolDefinition(kind,definition)
  const result=kind==='SCALE'?validateScaleDefinition(parsed,{instrumentClass:'CUSTOM_DESCRIPTIVE'}):validateFormDefinition(parsed,{forPreview:true})
- const valid=Boolean(result.definition)&&!result.issues.some(issue=>issue.severity==='error')
- return {valid,issues:result.issues,definition:result.definition as ScaleDefinitionV2|FormDraft|undefined}
+ const issues=[...result.issues,...privateToolMaterialRightsIssues(kind,parsed)]
+ const valid=Boolean(result.definition)&&!issues.some(issue=>issue.severity==='error')
+ return {valid,issues,definition:result.definition as ScaleDefinitionV2|FormDraft|undefined}
 }
 export const privateToolContentHash=(kind:PrivateToolKind,title:string,definition:unknown)=>canonicalHash({kind,title,definition})

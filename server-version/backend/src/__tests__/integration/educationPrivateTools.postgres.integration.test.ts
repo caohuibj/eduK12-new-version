@@ -146,6 +146,42 @@ suite('Education author-private tool API services / isolated PostgreSQL',()=>{
   await expect(tools.updatePrivateTool(a.context,sibling.id,{expectedRevision:1,title:'Other',definition})).rejects.toThrow('SCOPE_OR_IDENTITY')
   await expect(media.registerPrivateToolImage(a.context,draft.id,{...reference,contentHash:'b'.repeat(64)})).rejects.toThrow('SCOPE_OR_IDENTITY')
  })
+ it.each(['image/png','video/mp4','application/pdf'] as const)('saves and freezes %s only in exact owner/tool/realm scope',async mimeType=>{
+  const a=await actor(),other=await actor(a.org),foreign=await actor()
+  const draft=await tools.createPrivateTool(a.context,{kind:'FORM',title:'Bound materials'})
+  const sibling=await tools.createPrivateTool(a.context,{kind:'FORM',title:'Other tool'})
+  const ref={assetId:randomUUID(),contentHash:'a'.repeat(64),mimeType}
+  await db.storedAsset.create({data:{id:ref.assetId,objectKey:'synthetic/'+ref.assetId,provider:'local',mimeType,sizeBytes:16,sha256:ref.contentHash,
+   ownerId:a.user.id,accessScope:'PRIVATE',scopeId:media.privateToolMediaScope(a.context,draft.id)}})
+  await media.registerPrivateToolImage(a.context,draft.id,ref)
+  const definition=structuredClone(form)
+  Object.assign(definition.pages[0].questions[0],{materials:[{asset:ref,name:'Bound material',rightsStatus:'authorized',rightsNote:'Synthetic authorized fixture'}]})
+  const saved=await tools.updatePrivateTool(a.context,draft.id,{expectedRevision:1,title:'Bound materials',definition})
+  const version=await tools.freezePrivateTool(a.context,draft.id,{expectedRevision:saved.revision,expectedContentHash:saved.contentHash})
+  expect((await media.listPrivateToolMaterials(a.context,draft.id,{kind:'all',page:1})).list).toContainEqual(expect.objectContaining({id:ref.assetId,mimeType}))
+  expect(await db.assetReference.count({where:{entityType:'EducationPrivateToolVersion',entityId:version.id,field:'stimuli',assetId:ref.assetId}})).toBe(1)
+  for(const context of [other.context,foreign.context,{...a.context,entry:'TEACHER' as const}]){
+   await expect(media.listPrivateToolMaterials(context,draft.id,{})).rejects.toThrow('NOT_FOUND')
+   await expect(media.readPrivateToolImage(context,draft.id,ref.assetId)).rejects.toThrow('NOT_FOUND')
+  }
+  await expect(media.registerPrivateToolImage(a.context,sibling.id,ref)).rejects.toThrow('SCOPE_OR_IDENTITY')
+  expect((await media.listPrivateToolMaterials(a.context,sibling.id,{})).list).toContainEqual(expect.objectContaining({id:ref.assetId}))
+  await expect(media.readPrivateToolImage(a.context,sibling.id,ref.assetId)).rejects.toThrow('NOT_FOUND')
+  await media.registerOwnedPrivateToolMaterial(a.context,sibling.id,ref)
+  expect(await media.readPrivateToolImage(a.context,sibling.id,ref.assetId)).toEqual(ref)
+  const reused=await tools.updatePrivateTool(a.context,sibling.id,{expectedRevision:1,title:'Reused own material',definition})
+  const reusedVersion=await tools.freezePrivateTool(a.context,sibling.id,{expectedRevision:reused.revision,expectedContentHash:reused.contentHash})
+  expect(await db.assetReference.count({where:{entityType:'EducationPrivateToolVersion',entityId:reusedVersion.id,assetId:ref.assetId}})).toBe(1)
+  for(const context of [other.context,foreign.context,{...a.context,entry:'TEACHER' as const}]){
+   const target=await tools.createPrivateTool(context,{kind:'FORM',title:'Other identity target'})
+   expect((await media.listPrivateToolMaterials(context,target.id,{})).list.some(row=>row.id===ref.assetId)).toBe(false)
+   await expect(media.registerOwnedPrivateToolMaterial(context,target.id,ref)).rejects.toThrow('SCOPE_OR_IDENTITY')
+  }
+
+  await expect(media.registerPrivateToolImage(a.context,draft.id,{...ref,contentHash:'b'.repeat(64)})).rejects.toThrow('SCOPE_OR_IDENTITY')
+  await tools.updatePrivateTool(a.context,draft.id,{expectedRevision:saved.revision,title:'Bound materials',definition:form})
+  expect(await db.assetReference.count({where:{entityType:'EducationPrivateToolVersion',entityId:version.id,field:'stimuli',assetId:ref.assetId}})).toBe(1)
+ })
  it('pins report and stimulus images separately and retains frozen images after draft removal',async()=>{
   const a=await actor(),draft=await tools.createPrivateTool(a.context,{kind:'SCALE',title:'Images'})
   const images=[]

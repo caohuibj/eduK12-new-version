@@ -16,7 +16,7 @@ const url=integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL'),suite=url?d
 let db:PrismaClient,admin:string
 const metadata={title:'Synthetic education share',author:'Synthetic author',copyright:'Self authored; authorize bound scale use',applicability:'Synthetic only',scoringDescription:'Mean',reportDescription:'Descriptive only'}
 const draftDefinition={schemaVersion:1,presentationMode:'ONE_BY_ONE',respondentType:'participant_self_report',aggregation:'mean',responseOptions:[{optionKey:'a',label:'A',score:1},{optionKey:'b',label:'B',score:2}],dimensions:[{dimensionKey:'total',label:'Total',direction:'descriptive'}],items:[{itemKey:'q',prompt:'Synthetic question',required:true,reverse:false,dimensionKeys:['total']}]}
-async function fixture(entry:'SCHOOL'|'TEACHER'='SCHOOL',withImage=false){
+async function fixture(entry:'SCHOOL'|'TEACHER'='SCHOOL',withImage=false,mimeType:'image/png'|'video/mp4'|'application/pdf'='image/png'){
  const user=await db.user.create({data:{username:'share_'+randomUUID(),passwordHash:'synthetic',accountDomain:'SCHOOL',role:'TEACHER',teacherApproved:true}})
  const organizationId=randomUUID()
  await db.organization.create({data:{id:organizationId,name:'Synthetic sharing school',productDomain:'SCHOOL',createdByUserId:admin}})
@@ -28,11 +28,12 @@ async function fixture(entry:'SCHOOL'|'TEACHER'='SCHOOL',withImage=false){
  const draft=await tools.createPrivateTool(c,{kind:'SCALE',title:metadata.title})
  let assetId:string|undefined
  if(withImage){
-  const asset=await db.storedAsset.create({data:{objectKey:'assets/synthetic-education-share-'+randomUUID(),provider:'local',mimeType:'image/png',sizeBytes:42,sha256:'a'.repeat(64),ownerId:user.id,accessScope:'PRIVATE',scopeId:`education-private:${entry}:${organizationId}:${draft.id}`}})
+  const asset=await db.storedAsset.create({data:{objectKey:'assets/synthetic-education-share-'+randomUUID(),provider:'local',mimeType,sizeBytes:42,sha256:'a'.repeat(64),ownerId:user.id,accessScope:'PRIVATE',scopeId:`education-private:${entry}:${organizationId}:${draft.id}`}})
   assetId=asset.id
   await db.assetReference.create({data:{assetId,entityType:'EducationPrivateToolMediaLibrary',entityId:draft.id,field:'image-library'}})
  }
  const definition=compileResearchScale(metadata.title,{...draftDefinition,...(assetId?{rawScoreFeedback:{schemaVersion:1,rules:[{scoreKey:'total',ranges:[{key:'range',min:1,max:2,includeMax:true,text:'Synthetic',images:[{asset:{assetId,contentHash:'a'.repeat(64),mimeType:'image/png'},altText:'Synthetic image',order:0}]}]}]}}:{})})
+ if(assetId&&mimeType!=='image/png'){const range=definition.report.rawScoreFeedback!.rules[0].ranges[0];delete range.images;range.materials=[{asset:{assetId,contentHash:'a'.repeat(64),mimeType},name:'Synthetic shared material',rightsStatus:'self_authored',rightsNote:'Synthetic authorized sharing fixture'}]}
  const saved=await tools.updatePrivateTool(c,draft.id,{expectedRevision:draft.revision,title:draft.title,definition})
  const version=await tools.freezePrivateTool(c,draft.id,{expectedRevision:saved.revision,expectedContentHash:saved.contentHash})
  return {c,user,capability,draft,version,assetId}
@@ -108,8 +109,8 @@ suite('Education private SCALE sharing / isolated PostgreSQL',()=>{
   await db.organizationCapabilityGrant.update({where:{id:f.capability.id},data:{revokedAt:new Date(),revokedByUserId:admin}})
   await expect(prepare(f)).rejects.toThrow('PRIVATE_TOOL_AUTHOR_REQUIRED')
  },120000)
- it('pins consented private report media and makes approved content independent of author membership',async()=>{
-  const f=await fixture('SCHOOL',true),p=await prepare(f)
+ it.each(['image/png','video/mp4','application/pdf'] as const)('%s pins consented report media and makes approved content independent of author membership',async mimeType=>{
+  const f=await fixture('SCHOOL',true,mimeType),p=await prepare(f)
   expect(p.mediaManifest.items.map(item=>item.assetId)).toEqual([f.assetId])
   await expect(apply(f,p)).rejects.toThrow('CONSENT')
   await expect(apply(f,p,{mediaConsent:{manifestHash:'0'.repeat(64),shareWithAuthorizedUsers:true}})).rejects.toThrow('CONSENT')

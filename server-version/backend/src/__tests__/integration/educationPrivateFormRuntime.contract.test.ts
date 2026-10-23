@@ -1,3 +1,4 @@
+import {privateToolMaterialRightsIssues} from '../../modules/education-tools/private-tool.media-definition'
 import {describe,it,expect} from 'vitest'
 import {compilePrivateFormRuntime} from '../../modules/education-tools/private-tool.form-runtime-adapter'
 import {formDraftSchema,type FormQuestion} from '../../modules/assessment-core/form/definition'
@@ -31,10 +32,12 @@ describe('Education private Form lossless Training-compatible adapter',()=>{
   expect(()=>normalizeTypedCompositeSection(items,new Map([[items[0].id,{value:{_surveyRefusal:true as const}}],[items[1].id,{value:'text'}]]))).toThrow()
   expect(()=>normalizeTypedCompositeSection(items,new Map([[items[0].id,{value:'b'}],[items[1].id,{value:'text'}],[items[2].id,{value:'injected'}]]))).toThrow()
  })
- it('reports exact image and cross-page/unsupported condition locations, retaining the source intact',()=>{
-  const imageDraft=draft([q('SHORT_TEXT',{image:{asset:{assetId:'synthetic',contentHash:'a'.repeat(64),mimeType:'image/png'},altText:'Synthetic',rightsStatus:'self_authored',rightsNote:'Synthetic test'}})])
+ it('adapts legacy images without changing the source and rejects cross-page/unsupported conditions',()=>{
+  const imageDraft=draft([q('SHORT_TEXT',{image:{asset:{assetId:'11111111-1111-4111-8111-111111111111',contentHash:'a'.repeat(64),mimeType:'image/png'},altText:'Synthetic',rightsStatus:'self_authored',rightsNote:'Synthetic test'}})])
   const before=canonicalHash(imageDraft)
-  expect(issues(imageDraft)).toContainEqual(expect.objectContaining({pageKey:'one',itemKey:'short_text',reason:'QUESTION_IMAGE_UNSUPPORTED'}))
+  const item=compilePrivateFormRuntime(imageDraft).sections[0].items[0]
+  expect(item.formDefinition).toMatchObject({materials:[{asset:imageDraft.pages[0].questions[0].image!.asset,name:'Synthetic',rightsStatus:'self_authored',rightsNote:'Synthetic test'}]})
+  expect(item.formDefinition).not.toHaveProperty('image')
   expect(canonicalHash(imageDraft)).toBe(before)
   const cross=draft([q('SINGLE',{options})]);cross.pages.push({pageKey:'two',title:'Second',questions:[q('SHORT_TEXT',{displayIf:{itemKey:'single',operator:'EQUALS',optionKey:'a'}})]})
   expect(issues(cross)).toContainEqual(expect.objectContaining({pageKey:'two',itemKey:'short_text',reason:'CONDITION_SCOPE_UNSUPPORTED'}))
@@ -46,4 +49,10 @@ describe('Education private Form lossless Training-compatible adapter',()=>{
   const empty=draft([q('SHORT_TEXT')]);empty.pages.push({pageKey:'empty',title:'Instructions without questions',questions:[]})
   expect(issues(empty)).toContainEqual(expect.objectContaining({pageKey:'empty',itemKey:null,reason:'EMPTY_PAGE_UNSUPPORTED'}))
  })
+})
+
+it('requires explicit rights for every scale stimulus and feedback material before freezing',()=>{
+ const material={asset:{assetId:'11111111-1111-4111-8111-111111111111',contentHash:'a'.repeat(64),mimeType:'application/pdf'},name:'Fixture',rightsStatus:'unknown',rightsNote:''}
+ const definition={items:[{materials:[material]}],report:{rawScoreFeedback:{rules:[{ranges:[{materials:[material]}],fallback:{materials:[{...material,rightsStatus:'authorized',rightsNote:'   '}]}}]}}}
+ expect(privateToolMaterialRightsIssues('SCALE',definition).map(issue=>issue.path)).toEqual(['items.0.materials.0','report.rawScoreFeedback.rules.0.ranges.0.materials.0','report.rawScoreFeedback.rules.0.fallback.materials.0'])
 })

@@ -1,3 +1,5 @@
+import {privateToolImageReferences} from './private-tool.media-definition'
+import {assertAssessmentAssetReferencesReady} from '../assessment-media/assessment-asset'
 import type {Prisma} from '@prisma/client'
 import {createRelationalProductRegistry,type RelationalProductEntryV1} from '../assessment-relational/product-registry'
 import {privateToolContentHash} from './private-tool.definition'
@@ -9,7 +11,16 @@ export async function readPrivateFormVersionIdentity(tx:Prisma.TransactionClient
  const version=await tx.educationPrivateToolVersion.findUnique({where:{id:versionId}})
  if(!version||version.kind!=='FORM'||!['SCHOOL','TEACHER'].includes(version.entry)
   ||version.contentHash!==privateToolContentHash('FORM',version.title,version.definition))privateToolFail('PRIVATE_FORM_RUNTIME_SOURCE_INVALID')
- return {version,...compilePrivateFormRuntime(version.definition)}
+ const compiled=compilePrivateFormRuntime(version.definition),refs=privateToolImageReferences('FORM',compiled.definition)
+ if(refs.all.length){
+  const rows=await tx.storedAsset.findMany({where:{id:{in:refs.all.map(ref=>ref.assetId)},ownerId:version.ownerUserId,
+   accessScope:'PRIVATE',scopeId:{startsWith:`education-private:${version.entry}:${version.organizationId}:`},deletedAt:null,
+   references:{some:{entityType:'EducationPrivateToolVersion',entityId:version.id,field:'stimuli'}}},select:{id:true,sha256:true,mimeType:true}})
+  if(refs.all.some(ref=>!rows.some(row=>row.id===ref.assetId&&row.sha256===ref.contentHash&&row.mimeType===ref.mimeType)))
+   privateToolFail('PRIVATE_FORM_RUNTIME_MEDIA_IDENTITY_INVALID')
+  await assertAssessmentAssetReferencesReady(refs.all,tx)
+ }
+ return {version,...compiled}
 }
 export function privateFormResourceEntry(origin:PrivateFormOrigin,title:string,compositeId:string,releaseStatus:'DRAFT'|'PUBLISHED'='DRAFT'){
  const [population,responseMode]=origin.variantKey.split(':'),v=privateFormVariant(origin.entry,{population,responseMode})

@@ -24,7 +24,7 @@ export async function readPrivateScaleVersionIdentity(tx:Tx,versionId:string){
  const refs=privateToolImageReferences('SCALE',definition)
  if(refs.all.length){
   const rows=await tx.storedAsset.findMany({where:{id:{in:refs.all.map(ref=>ref.assetId)},ownerId:version.ownerUserId,
-   accessScope:'PRIVATE',scopeId:`education-private:${version.entry}:${version.organizationId}:${version.toolId}`,deletedAt:null,
+   accessScope:'PRIVATE',scopeId:{startsWith:`education-private:${version.entry}:${version.organizationId}:`},deletedAt:null,
    references:{some:{entityType:'EducationPrivateToolVersion',entityId:version.id,field:{in:['stimuli','reports']}}}},select:{id:true,sha256:true,mimeType:true}})
   if(refs.all.some(ref=>!rows.some(row=>row.id===ref.assetId&&row.sha256===ref.contentHash&&row.mimeType===ref.mimeType)))
    privateToolFail('PRIVATE_TOOL_RUNTIME_MEDIA_IDENTITY_INVALID')

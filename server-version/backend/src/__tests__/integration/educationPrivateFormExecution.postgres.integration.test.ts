@@ -149,10 +149,11 @@ suite('Private Form real educational execution, typed FINAL and current task aut
       }
       expect((await fetch(`${readUrl}/form-sections/${randomUUID()}/submit`, { method: 'POST', headers: auth, body: JSON.stringify(body) })).status).toBe(404)
       const response = await fetch(submitUrl, { method: 'POST', headers: auth, body: JSON.stringify(body) }); expect(response.status).toBe(200)
+      if(page===1){expect((await response.json()).data.parent.status).toBe('COMPLETED');await assertFinal(id,f.executionId,'NOT_SHOWN')}
       const replay = await fetch(submitUrl, { method: 'POST', headers: auth, body: JSON.stringify(body) }); expect(replay.status).toBe(200)
       expect((await replay.json()).data.replayed).toBe(true)
     }
-    await getAttemptState(id, { userId: f.participantUserId }); await assertFinal(id, f.executionId, 'NOT_SHOWN')
+    await assertFinal(id, f.executionId, 'NOT_SHOWN')
     const receipt = await fetch(readUrl, { headers: auth }); expect(receipt.status).toBe(200)
     expect((await receipt.json()).data.status).toBe('COMPLETED')
     const completedStart = await fetch(startUrl, { method: 'POST', headers: auth })
@@ -212,4 +213,23 @@ suite('Private Form real educational execution, typed FINAL and current task aut
     await expect(submitCompositeFormSectionFinal(inputs[1])).rejects.toMatchObject({ code: 'RUN_PARENT_ORGANIZATION_TETHER_REVOKED' })
     expect(await writes(ids[1])).toEqual(before[1])
   }, 120_000)
+  it('finishes private Teacher Form FINAL and Run projection without a subsequent state GET', async () => {
+    const f=await setupPrivateFormExecutionFixture(db,'TEACHER')
+    const id=await started(f.executionId,f.participantUserId)
+    const first=await currentInput(id,f.participantUserId)
+    await submitCompositeFormSectionFinal(first)
+    expect((await db.compositeAssessmentAttempt.findUniqueOrThrow({where:{id}})).status).toBe('IN_PROGRESS')
+    // Read only before the last FINAL to obtain its actual current section contract.
+    const last=await currentInput(id,f.participantUserId)
+    const result=await submitCompositeFormSectionFinal(last)
+    expect(result.parent.status).toBe('COMPLETED')
+    // No getAttemptState here: raw persistence must already be terminal.
+    await assertFinal(id,f.executionId,'REFUSED')
+    const before=await writes(id)
+    const replay=await submitCompositeFormSectionFinal(last)
+    expect(replay.replayed).toBe(true)
+    expect(replay.parent.status).toBe('COMPLETED')
+    expect(await writes(id)).toEqual(before)
+  },120_000)
+
 })

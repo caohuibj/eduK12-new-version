@@ -448,6 +448,11 @@ export const submitUnifiedCompositeFormSectionFinal = async (
     await assertTrainingPrivateReferenceAdmissionCurrent(tx)
     return { replayed: false, sectionAttemptId: currentSection.id, contextSnapshotHash, payloadHash }
   }))
+  // Private educational Forms have no async report enrollment. Ask the existing
+  // outer submit wrapper to reconcile readiness only AFTER releasing the UNIT gate.
+  // The aggregate finalizer itself retains frozen-slot completeness and replay checks.
+  if(productKind==='ORGANIZATION_RESOURCE')return {submissionId,sectionId:input.sectionId,...committed,
+    shouldFinalize:true,finalizeCompositeAttemptId:input.attemptId}
   return { submissionId, sectionId: input.sectionId, ...committed, parent: null }
 }
 

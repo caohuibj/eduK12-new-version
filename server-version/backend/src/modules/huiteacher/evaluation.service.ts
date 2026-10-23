@@ -307,11 +307,19 @@ export async function readHuiteacherEventRun(input:{
       WHERE "id"=${link.runId} AND "organization_id"=${input.organizationId}
     `
     if(!run.length)fail('HUITEACHER_EVENT_RUN_NOT_FOUND',404)
-    const tracks=await tx.$queryRaw<Array<{n:number}>>`
-      SELECT COUNT(*)::int AS n FROM "assessment_run_tracks"
+    // Minimal configured-resource metadata only. The existing product-admin
+    // check above remains mandatory; never return selectors, definitions,
+    // respondent identities, frozen policies or execution details here.
+    const tracks=await tx.$queryRaw<Array<{
+      id:string;resourceFamily:string;resourceKey:string;resourceVersion:string
+    }>>`
+      SELECT "id", "resource_family" AS "resourceFamily",
+        "resource_key" AS "resourceKey", "resource_version" AS "resourceVersion"
+      FROM "assessment_run_tracks"
       WHERE "organization_id"=${input.organizationId}
         AND "run_id"=${link.runId}
+      ORDER BY "created_at", "id"
     `
-    return {...link,...run[0],trackCount:tracks[0]?.n??0}
+    return {...link,...run[0],trackCount:tracks.length,tracks}
   })
 }

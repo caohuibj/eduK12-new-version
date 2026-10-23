@@ -1,3 +1,4 @@
+import type {ScaleDefinitionV2} from '../../modules/scale/scale-definition'
 import { randomUUID } from 'node:crypto'
 import type { PrismaClient } from '@prisma/client'
 import { setupEducationLibraryRuntimeFixture } from './educationLibraryRuntimeFixture'
@@ -11,7 +12,7 @@ import { addTeacherPrivateRunTrack, previewTeacherRun, publishTeacherRun } from 
 /** Synthetic account and storage metadata, real private version freezing/pins,
  * product draft attachment and publication. No fake execution or FINAL. */
 export async function setupPrivateScaleExecutionFixture(db: PrismaClient, product: 'SCHOOL' | 'TEACHER',
-  responseMode: 'SELF' | 'PARENT_REPORT' | 'TEACHER_REPORT' = 'SELF', trackCount = 1) {
+  responseMode: 'SELF' | 'PARENT_REPORT' | 'TEACHER_REPORT' = 'SELF', trackCount = 1, prepareDefinition?: (context:PrivateToolContext,toolId:string,definition:ScaleDefinitionV2)=>Promise<void>) {
   if (!Number.isSafeInteger(trackCount) || trackCount < 1) throw new Error('Positive test track count required')
   const f = await setupEducationLibraryRuntimeFixture({ db, product, responseMode, publisher: 'PSYCHOLOGY', trackCount: 0, publish: false })
   if (product === 'TEACHER') {
@@ -43,6 +44,7 @@ export async function setupPrivateScaleExecutionFixture(db: PrismaClient, produc
       reviewedAt: '2026-10-22T00:00:00.000Z', basis: 'Descriptive synthetic test only, no normative inference or diagnosis.' } }
   definition.report.rawScoreFeedback = { schemaVersion: 1, rules: [{ scoreKey: 'total', ranges: [{ key: 'all', min: 0, max: 3,
     includeMax: true, text: '固定私有版本描述反馈，不是诊断。', images: [images[1]] }] }] }
+  await prepareDefinition?.(context,draft.id,definition)
   const saved = await tools.updatePrivateTool(context, draft.id, { expectedRevision: draft.revision, title: draft.title, definition })
   const version = await tools.freezePrivateTool(context, draft.id, { expectedRevision: saved.revision, expectedContentHash: saved.contentHash })
   const body = { expectedVersion: f.expectedVersion, privateScale: { versionId: version.id, contentHash: version.contentHash,

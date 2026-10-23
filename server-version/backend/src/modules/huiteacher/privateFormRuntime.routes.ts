@@ -1,3 +1,4 @@
+import {compositeImageController} from '../composite/composite-image.controller'
 import {Router,type Request,type RequestHandler} from 'express'
 import {Prisma} from '@prisma/client'
 import {z,ZodError} from 'zod'
@@ -103,5 +104,6 @@ router.post('/run-executions/:executionId/start-private-form',authenticateHuitea
  return result
 }))
 router.get('/private-form-composite-attempts/:attemptId',authenticateHuiteacher,requireAttempt,compositeController.getAttempt)
+router.get('/private-form-composite-attempts/:attemptId/form-sections/:sectionId/assets/:assetId/content',authenticateHuiteacher,requireAttempt,compositeImageController.authenticatedFormImage)
 router.post('/private-form-composite-attempts/:attemptId/form-sections/:sectionId/submit',authenticateHuiteacher,requireAttempt,finalConsent,compositeController.submitFinalFormSection)
 export default router
