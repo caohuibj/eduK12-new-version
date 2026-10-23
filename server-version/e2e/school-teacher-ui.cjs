@@ -296,8 +296,48 @@ function validateOfficialFrontendReceipt(receipt, { head, runId, frontend, front
   assert.equal(frontend.lockDigest, frontendLockDigest); assert.equal(frontend.contentDigest, frontendContentDigest)
   return receipt
 }
+// This completed compile produced an official artifact even though the later
+// connected job failed. Its failed job conclusion must remain explicit. Only
+// one tsc-excluded fixture is omitted from the otherwise whole-backend digest.
+const BACKEND_FIXTURE_EXCEPTION = 'server-version/backend/src/__tests__/survey/tool-publication.postgres.integration.test.ts'
+const OFFICIAL_BACKEND = Object.freeze({
+  originalRun: 39877023519, originalHead: 'b717cddfdeb957bc3665ed3e69f8a680befa021b',
+  originalCheckout: 'db477157b097556dc8e59cda1f6bda71f06a71f6', originalJob: 120165263496,
+  originalJobConclusion: 'failure', originalArtifact: 12469580004,
+  originalArtifactSha256: '64032cdebcfbf855622f3dbaa53f6b31bffb1b5d9f965ef719b3d3faad469d18',
+  backendCompileDigest: '8689278a86c4571e8a5f251338c56d164f3626ec76520c5e27c44350c76b323d',
+})
+function computeBackendCompileDigest(lsTreeText) {
+  assert.equal(typeof lsTreeText, 'string'); assert.ok(lsTreeText.endsWith('\n') && !lsTreeText.includes('\r'))
+  const rows = lsTreeText.slice(0, -1).split('\n'), seen = new Set()
+  let omitted = 0
+  const included = rows.filter(row => {
+    assert.match(row, /^[0-7]{6} blob [a-f0-9]{40}\tserver-version\/backend\/[^\t]+$/)
+    const file = row.split('\t')[1]; assert.equal(seen.has(file), false); seen.add(file)
+    if (file === BACKEND_FIXTURE_EXCEPTION) { omitted++; return false }
+    return true
+  })
+  assert.equal(omitted, 1); assert.ok(included.length > 0)
+  return require('node:crypto').createHash('sha256').update(included.join('\n') + '\n').digest('hex')
+}
+function validateOfficialBackendReceipt(receipt, { head, runId, backend, backendCompileDigest, backendLockDigest, backendContentDigest }) {
+  assert.deepEqual(Object.keys(receipt).sort(), ['schemaVersion', 'status', 'currentHead', 'currentRun',
+    ...Object.keys(OFFICIAL_BACKEND), 'manifest'].sort())
+  assert.equal(receipt.schemaVersion, 1); assert.equal(receipt.status, 'VERIFIED_OFFICIAL_BACKEND_BUILD')
+  assert.equal(receipt.currentHead, head); assert.equal(receipt.currentRun, runId)
+  assert.match(head, /^[a-f0-9]{40}$/); assert.match(runId, /^\d+$/)
+  for (const [key, expected] of Object.entries(OFFICIAL_BACKEND)) assert.equal(receipt[key], expected)
+  assert.equal(backendCompileDigest, OFFICIAL_BACKEND.backendCompileDigest)
+  assert.deepEqual(receipt.manifest, backend)
+  assert.deepEqual(Object.keys(backend).sort(), ['schemaVersion', 'kind', 'sha', 'runId', 'contentDigest', 'lockDigest'].sort())
+  assert.equal(backend.schemaVersion, 1); assert.equal(backend.kind, 'backend')
+  assert.equal(backend.sha, OFFICIAL_BACKEND.originalCheckout); assert.equal(backend.runId, String(OFFICIAL_BACKEND.originalRun))
+  assert.match(backendLockDigest, /^[a-f0-9]{64}$/); assert.match(backendContentDigest, /^[a-f0-9]{64}$/)
+  assert.equal(backend.lockDigest, backendLockDigest); assert.equal(backend.contentDigest, backendContentDigest)
+  return receipt
+}
 function validateReportBuildInputs(report, options) {
-  const { head, tree, runId, frontend, backend, officialFrontendReuse } = options
+  const { head, tree, runId, frontend, backend, officialFrontendReuse, officialBackendReuse } = options
   assert.deepEqual(report.source, { head, tree }); assert.equal(report.runId, runId)
   assert.match(head, /^[a-f0-9]{40}$/); assert.match(tree, /^[a-f0-9]{40}$/); assert.match(runId, /^\d+$/)
   assert.equal(Object.hasOwn(report, 'buildReuse'), false, 'No historical diagnostic-build identity substitution')
@@ -305,11 +345,16 @@ function validateReportBuildInputs(report, options) {
     assert.deepEqual(report.officialFrontendReuse, officialFrontendReuse)
     validateOfficialFrontendReceipt(officialFrontendReuse, options)
   } else assert.equal(Object.hasOwn(report, 'officialFrontendReuse'), false, 'Never trust only report-supplied reuse evidence')
+  if (officialBackendReuse !== undefined) {
+    assert.deepEqual(report.officialBackendReuse, officialBackendReuse)
+    validateOfficialBackendReceipt(officialBackendReuse, options)
+  } else assert.equal(Object.hasOwn(report, 'officialBackendReuse'), false, 'Never trust only report-supplied backend reuse evidence')
   for (const [kind, expected] of Object.entries({ frontend, backend })) {
     const m = report.inputs[kind]
     assert.deepEqual(m, expected); assert.equal(m.schemaVersion, 1); assert.equal(m.kind, kind)
-    assert.equal(m.sha, kind === 'frontend' && officialFrontendReuse ? OFFICIAL_FRONTEND.originalCheckout : head)
-    assert.equal(m.runId, kind === 'frontend' && officialFrontendReuse ? String(OFFICIAL_FRONTEND.originalRun) : runId)
+    const original = kind === 'frontend' && officialFrontendReuse ? OFFICIAL_FRONTEND : kind === 'backend' && officialBackendReuse ? OFFICIAL_BACKEND : null
+    assert.equal(m.sha, original ? original.originalCheckout : head)
+    assert.equal(m.runId, original ? String(original.originalRun) : runId)
     assert.match(m.contentDigest, /^[a-f0-9]{64}$/); assert.match(m.lockDigest, /^[a-f0-9]{64}$/)
   }
   return { ok: true, code: 'BROWSER_BUILD_INPUTS_VERIFIED' }
@@ -434,4 +479,4 @@ function verifyReport(report, options, readScreenshot) {
     notCovered: [...report.notCovered, ...ui.notCovered] }
 }
 
-module.exports = { OFFICIAL_FRONTEND, validateOfficialFrontendReceipt, validateReportBuildInputs, cjkSampleIds, validateUiFontEvidence, readRenderedCjk, appearanceKeys, imageMode, validateSelectedImages, createUiChecks, verifyReport, products, darkStates, originalShots }
+module.exports = { OFFICIAL_BACKEND, BACKEND_FIXTURE_EXCEPTION, computeBackendCompileDigest, validateOfficialBackendReceipt, OFFICIAL_FRONTEND, validateOfficialFrontendReceipt, validateReportBuildInputs, cjkSampleIds, validateUiFontEvidence, readRenderedCjk, appearanceKeys, imageMode, validateSelectedImages, createUiChecks, verifyReport, products, darkStates, originalShots }

@@ -12,8 +12,7 @@
  *
  * Required besides fixture env: REDIS_URL=redis://127.0.0.1:<port>/0 and
  * SCHOOL_TEACHER_ARTIFACTS_VERIFIED=1 only after ci-artifact.mjs verify succeeds
- * for the fresh backend and either same-run frontend or the single qualified
- * official frontend receipt. Original producer manifest identities are preserved.
+ * for same-run components or their fixed qualified official build receipts. Original producer manifest identities are preserved.
  * Optional: SCHOOL_TEACHER_BACKEND_PORT=3187,
  * SCHOOL_TEACHER_EVIDENCE_DIR=<repo>/school-teacher-evidence,
  * SCHOOL_TEACHER_FRONTEND_DIST=<downloaded production artifact directory>.
@@ -29,7 +28,7 @@ const { spawn, execFileSync } = require('node:child_process')
 const { pathToFileURL } = require('node:url')
 const { randomUUID, createHmac } = require('node:crypto')
 const { readFixture, sourceIdentity, backend, repo, sha } = require('./school-teacher-fixture.cjs')
-const { createUiChecks, verifyReport, validateOfficialFrontendReceipt } = require('./school-teacher-ui.cjs')
+const { createUiChecks, verifyReport, validateOfficialFrontendReceipt, validateOfficialBackendReceipt, computeBackendCompileDigest } = require('./school-teacher-ui.cjs')
 const { preflightChrome, verifyChromeSandbox, inspectCjkFonts, CHROME_LAUNCH_OPTIONS } = require('./school-teacher-chrome.cjs')
 const pause = ms => new Promise(resolve => setTimeout(resolve, ms))
 const origins = { SCHOOL: 'https://school.eduk12.top', TEACHER: 'https://teacher.eduk12.top' }
@@ -210,8 +209,8 @@ async function run() {
   assert.ok(out !== root && !out.startsWith(root + path.sep) && !root.startsWith(out + path.sep), 'Never upload fixture secrets')
   fs.mkdirSync(path.join(out, 'screenshots'), { recursive: true })
   assert.equal(process.env.SCHOOL_TEACHER_ARTIFACTS_VERIFIED, '1', 'Reuse verified current-run artifacts; do not silently consume a local build')
-  // Historical diagnostic dual-build reuse is never accepted. The only exception
-  // to same-run builds is one official completed frontend with unchanged source.
+  // Historical diagnostic dual-build reuse is never accepted. Each official
+  // component exception requires its fixed receipt and independent current bytes.
   assert.equal(fs.existsSync(path.join(out, 'reused-builds.json')), false, 'No historical diagnostic-build reuse')
   const manifest = (kind, dir) => validateBuildManifest(JSON.parse(fs.readFileSync(path.join(dir, 'ci-build-manifest.json'), 'utf8')),
     kind, fixture.identity, process.env.GITHUB_RUN_ID, null)
@@ -230,9 +229,25 @@ async function run() {
     validateOfficialFrontendReceipt(officialFrontendReuse, { ...fixture.identity, runId: process.env.GITHUB_RUN_ID,
       frontend: frontendManifest, ...buildEvidence })
   } else frontendManifest = manifest('frontend', dist)
+  const backendReceiptPath = path.join(out, 'official-backend-build-reuse.json')
+  let backendManifest
+  if (fs.existsSync(backendReceiptPath)) {
+    assert.ok(fs.lstatSync(backendReceiptPath).isFile() && !fs.lstatSync(backendReceiptPath).isSymbolicLink())
+    assert.equal(fs.realpathSync(backendReceiptPath), backendReceiptPath)
+    const officialBackendReuse = JSON.parse(fs.readFileSync(backendReceiptPath, 'utf8'))
+    const { treeDigest } = await import(pathToFileURL(path.join(repo, '.github/scripts/ci-artifact.mjs')).href)
+    backendManifest = JSON.parse(fs.readFileSync(path.join(backend, 'dist/ci-build-manifest.json'), 'utf8'))
+    Object.assign(buildEvidence, { officialBackendReuse,
+      backendCompileDigest: computeBackendCompileDigest(execFileSync('git', ['ls-tree', '-r', 'HEAD', '--', 'server-version/backend'], { cwd: repo, encoding: 'utf8' })),
+      backendLockDigest: sha(fs.readFileSync(path.join(backend, 'package-lock.json'))),
+      backendContentDigest: treeDigest(path.join(backend, 'dist')) })
+    validateOfficialBackendReceipt(officialBackendReuse, { ...fixture.identity, runId: process.env.GITHUB_RUN_ID,
+      backend: backendManifest, ...buildEvidence })
+  } else backendManifest = manifest('backend', path.join(backend, 'dist'))
   const report = { schemaVersion: 1, source: fixture.identity, runId: process.env.GITHUB_RUN_ID,
-    inputs: { frontend: frontendManifest, backend: manifest('backend', path.join(backend, 'dist')) },
+    inputs: { frontend: frontendManifest, backend: backendManifest },
     ...(buildEvidence.officialFrontendReuse ? { officialFrontendReuse: buildEvidence.officialFrontendReuse } : {}),
+    ...(buildEvidence.officialBackendReuse ? { officialBackendReuse: buildEvidence.officialBackendReuse } : {}),
     startups: [], chrome: null, ui: {},
     transport: 'Synthetic canonical-origin static documents; unmodified real loopback backend API responses. No public TLS/DNS/deployment assertion.',
     runtime: 'Official runtime-role-defaults/contract and release-schema checks; API never uses owner principal.',
