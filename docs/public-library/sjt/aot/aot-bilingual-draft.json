@@ -1,0 +1,680 @@
+{
+  "status": "GO_FOR_DRAFT_CONTENT",
+  "runtime": "HOLD",
+  "source_content_review": "GO_FOR_SOURCE_CONTENT relayed by parent; independent reviewer confirmed final Table A1 16/48 source text. This does not approve this new Chinese translation.",
+  "instrument": "AOT-SJT",
+  "title": {
+    "en": "Situational Judgment Test for Actively Open-Minded Thinking",
+    "zh_Hans": "积极开放思维情境判断测验（中文工作译稿）"
+  },
+  "source": {
+    "authors": [
+      "Nikola Erceg",
+      "Andrija Vrhovnik",
+      "Zvonimir Galić",
+      "Mitja Ružojčić"
+    ],
+    "article_title": "Development and initial validation of a situational judgment test for the measurement of actively open-minded thinking",
+    "year": 2025,
+    "journal": "Judgment and Decision Making",
+    "volume": "20",
+    "article_number": "e32",
+    "doi": "10.1017/jdm.2025.10008",
+    "article_url": "https://doi.org/10.1017/jdm.2025.10008",
+    "pdf_url": "https://www.cambridge.org/core/services/aop-cambridge-core/content/view/S1930297525100089",
+    "pdf_sha256": "28b12cbc8c66db53500f5c2dbb2ef5073cbf82a73f4e3615458749e54fcbf037",
+    "source_package_sha256": "fefb7bdcd1f741a0679b2a90e727d19def200ff634c91f6644addd5bbaa94f05",
+    "item_source": "Final Table A1, pages 25–31, Study 4 version only",
+    "license": "CC BY 4.0",
+    "license_url": "https://creativecommons.org/licenses/by/4.0/",
+    "rights_basis": "Article p1 license explicitly covers article; full test is integral Table A1, not an external supplement. No Table A1 third-party exclusion or separate restrictive credit found.",
+    "changes": "AI-generated Simplified Chinese working translation. English copied unchanged from independently reviewed normalized extraction. New administration/report drafts and translation notes added. Original typos retained in English. No endorsement implied."
+  },
+  "context": {
+    "population": "Adult English-language final version with initial validation; Chinese translation not validated. Not a K–12 instrument or a clinical diagnostic tool.",
+    "source_health_statements": "Medicine, surgery and alcohol content is hypothetical measurement stimulus text, not factual medical advice or endorsement. Do not treat a keyed response as a real-world treatment recommendation. This notice is separate from the item text.",
+    "political_scenario": "Item 12 concerns fictional unnamed candidates A/B as a research stimulus; not real electoral advice."
+  },
+  "administration_draft": {
+    "provenance": "Editorial draft, not verbatim author instructions; retains should judgment frame.",
+    "en": "Read each situation and select one response that best describes what you should do in that situation. Where the scenario asks about making the best possible decision, answer that question as written. Select one of the three responses for each of the 16 situations. This is not a request to select the response you would be most likely to perform. The Chinese wording is an unvalidated working translation.",
+    "zh_Hans": "请阅读每个情境，从三个选项中选择最符合你在该情境下应该采取的做法的一项。题干要求考虑如何作出尽可能好的决定时，请按题干原意回答。16 个情境各选一项。这里不是让你选择自己最可能实际采取的做法。中文内容为尚未经验证的工作译稿。",
+    "completion_rule": "Require all 16 for any later platform calculation; conservative platform guardrail only, not an established author missing-data rule."
+  },
+  "scoring_contract": {
+    "status": "DOCUMENTATION_ONLY_RUNTIME_HOLD",
+    "item_scores": "Final Table A1 option 1/2/3 corresponds to Figure A1 a/b/c, with author-supported ordinal values 1/2/3; no reverse items.",
+    "option_mapping": {
+      "1": {
+        "figure_label": "a",
+        "score": 1
+      },
+      "2": {
+        "figure_label": "b",
+        "score": 2
+      },
+      "3": {
+        "figure_label": "c",
+        "score": 3
+      }
+    },
+    "provisional_total": {
+      "formula": "sum of all 16 item scores / 16",
+      "range": [
+        1,
+        3
+      ],
+      "evidence_status": "STRONGLY_SUPPORTED_CARRY_FORWARD_INFERENCE_NOT_DIRECT_FINAL_FORMULA_CONFIRMATION",
+      "explanation": "Earlier 13-item method states averaging. Final option ordering and Table 11 range support continuity, but no explicit final-16 averaging formula has been confirmed. Do not present as a directly quoted final scoring rule. Section 6.1.2 remained the same wording concerns another self-report AOT measure, not proof of this formula."
+    },
+    "subscales": "Counts quantity 4, direction 7, overconfidence 5 are stated; exact item-to-dimension assignment remains inferred and is deliberately omitted. Do not compute or publish subscale scores.",
+    "missing": "No prorating, imputation or minimum-completion author rule found. All-16 guardrail is an editorial platform restriction.",
+    "norms": "No deployable norms, percentile thresholds, pass/fail or diagnostic cutoffs established. Study 4 sample mean 2.31 and SD .21 are not norms.",
+    "hold_reasons": [
+      "Chinese translation content review passed; Chinese psychometric validation not established",
+      "Final overall formula not directly confirmed",
+      "Exact subscale mappings not directly confirmed",
+      "Runtime implementation/validation absent",
+      "Chinese psychometric validation absent"
+    ]
+  },
+  "items": [
+    {
+      "id": 1,
+      "source": {
+        "table": "A1",
+        "pdf_pages": [
+          25
+        ],
+        "final_version": "Study 4"
+      },
+      "scenario": {
+        "en": "You work for a newly founded IT company, and this year, as part of promoting socially responsible business, the firm wants to donate a large sum of money to a charitable organization. Your work team has the task of deciding which charitable organization will receive these funds. It is very important to choose a verified and high-quality organization, with which it would be possible to establish an effective and sustainable partnership. The image of your company as a desirable and responsible employer, but also your own reputation, depend on this decision. You need to choose an organization within the next week, and this organization must operate within the area of your city. What should you do in this situation to make the best possible decision?",
+        "zh_Hans": "你在一家新成立的 IT 公司工作。今年，作为推动企业社会责任的一部分，公司想向一家慈善组织捐赠一大笔资金。你的工作团队负责决定由哪家慈善组织获得这笔资金。选择一家经过核实、质量可靠，且能够与之建立有效、可持续合作关系的组织非常重要。这一决定关系到公司作为有吸引力且负责任雇主的形象，也关系到你个人的声誉。你们需要在接下来的一周内选定一家组织，而且该组织必须在你们所在城市的范围内开展活动。在这种情况下，你应该怎么做，才能作出尽可能好的决定？"
+      },
+      "options": [
+        {
+          "id": "1",
+          "figure_label": "a",
+          "author_score": 1,
+          "en": "You will suggest to your team to donate to a well-known and popular organization that you saw on TV and which you have heard many other companies donate to. You believe that this is the best way to make a good decision within the given deadline.",
+          "zh_Hans": "你会建议团队把钱捐给一家知名且受欢迎的组织，你曾在电视上看到过它，也听说过许多其他公司向它捐款。你认为这是在规定期限内作出良好决定的最佳方式。"
+        },
+        {
+          "id": "2",
+          "figure_label": "b",
+          "author_score": 2,
+          "en": "You will consider a recommendation from a close friend you trust, whose wife runs a charity. After you get more details about the organization from him, you will propose it to your team.",
+          "zh_Hans": "你会考虑一位你信任的亲近朋友的推荐，他的妻子经营一家慈善机构。向他了解更多有关该组织的细节后，你会把它推荐给团队。"
+        },
+        {
+          "id": "3",
+          "figure_label": "c",
+          "author_score": 3,
+          "en": "After searching the Internet for numerous charities and writing down a few options that particularly impressed you, you will contact each of these organizations to personally verify the accuracy of the information and ask your team to help you make a final decision.",
+          "zh_Hans": "在网上搜索众多慈善机构，并记下几个特别给你留下深刻印象的选择后，你会逐一联系这些组织，亲自核实信息是否准确，再请团队帮助你作出最终决定。"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "source": {
+        "table": "A1",
+        "pdf_pages": [
+          25
+        ],
+        "final_version": "Study 4"
+      },
+      "scenario": {
+        "en": "Your 2-and-a-half-year-old child currently goes to a daycare center in the neighborhood where you live. In that same building, there is also a kindergarten. A friend whose child is enrolled in that kindergarten tells you that the kindergarten is excellent and that there is even the possibility of learning a foreign language. You are considering which kindergarten you should enroll your child in when he turns 3. What should you do in this situation to make the best possible decision?",
+        "zh_Hans": "你两岁半的孩子目前在居住街区的一家日托中心接受照料。同一栋楼里还有一家幼儿园。一位孩子就读于该幼儿园的朋友告诉你，这家幼儿园非常好，甚至还能学习外语。你正在考虑，等孩子满三岁时应该送他去哪家幼儿园。在这种情况下，你应该怎么做，才能作出尽可能好的决定？"
+      },
+      "options": [
+        {
+          "id": "1",
+          "figure_label": "a",
+          "author_score": 1,
+          "en": "Due to the proximity and extremely positive experiences of your friend, you will enroll your child in the kindergarten that is in the same building as the current daycare center.",
+          "zh_Hans": "考虑到距离近，而且朋友的体验非常好，你会让孩子就读于与目前日托中心位于同一栋楼的幼儿园。"
+        },
+        {
+          "id": "2",
+          "figure_label": "b",
+          "author_score": 2,
+          "en": "You decide to talk to a few other parents whose children go to that kindergarten in order to hear their impressions and experiences before making a decision about where to enroll your child.",
+          "zh_Hans": "你决定先与另外几位孩子就读于该幼儿园的家长聊聊，听听他们的印象和经历，再决定让孩子就读哪家幼儿园。"
+        },
+        {
+          "id": "3",
+          "figure_label": "c",
+          "author_score": 3,
+          "en": "You have decided to take a week to research which kindergartens are located within a few kilometers of your place of residence. You will focus on the number of educators, available professionals within the facility, type of program (e.g., Montessori and Waldorf), proximity, and reviews.",
+          "zh_Hans": "你决定用一周时间调查住所周围几公里内有哪些幼儿园。你会重点了解教育人员的数量、园内可提供服务的专业人员、课程类型（例如蒙台梭利和华德福）、距离以及评价。"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "source": {
+        "table": "A1",
+        "pdf_pages": [
+          25,
+          26
+        ],
+        "final_version": "Study 4"
+      },
+      "scenario": {
+        "en": "You have been working in your field for 3 years in an organization in which you were employed right after college. You are satisfied with your current job and relationships with colleagues, but occasionally encounter misunderstandings with your supervisor. You have received a job offer from another organization, and after successfully going through the selection process, you have been offered the same position with a 10% higher salary than your current one. They have asked for your response within 4 days. What should you do in this situation to make the best possible decision?",
+        "zh_Hans": "大学毕业后，你就进入目前的单位工作，并已在自己的专业领域工作了三年。你对目前的工作和同事关系感到满意，但偶尔会与主管产生误解。你收到了另一家单位的工作邀约，顺利通过选拔后，对方给你提供了相同的岗位，薪水比目前高 10%。他们要求你在四天内答复。在这种情况下，你应该怎么做，才能作出尽可能好的决定？"
+      },
+      "options": [
+        {
+          "id": "1",
+          "figure_label": "a",
+          "author_score": 1,
+          "en": "Considering it’s a good opportunity and offers a higher salary, you will accept the job immediately. A quick response will demonstrate motivation and decisiveness. If you don’t respond promptly, the company might hire someone else.",
+          "zh_Hans": "考虑到这是一个好机会，而且薪水更高，你会立即接受这份工作。迅速答复能够体现你的积极性和果断。如果你不及时回复，公司可能会聘用别人。"
+        },
+        {
+          "id": "2",
+          "figure_label": "b",
+          "author_score": 2,
+          "en": "You will have a conversation with an acquaintance who works at the organization that offered you the job. You will ask about their experiences and seek advice. After this discussion, you will make a decision as soon as possible.",
+          "zh_Hans": "你会与一位在发出邀约的单位工作的熟人交谈，询问对方的经历并征求建议。聊过之后，你会尽快作出决定。"
+        },
+        {
+          "id": "3",
+          "figure_label": "c",
+          "author_score": 3,
+          "en": "You will express your gratitude about the offer and say that you will need to think about it. Over the next few days, you will thoroughly research the organization that offered you a job and try to gather information from their employees. You will consult your colleagues and consider the pros and cons of your current job, as well as the offered job before making a decision.",
+          "zh_Hans": "你会感谢对方提供的机会，并表示需要考虑一下。接下来的几天里，你会全面调查这家向你提供工作的单位，并设法向其员工了解情况。作出决定前，你会咨询自己的同事，权衡目前工作与对方所提供工作的利弊。"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "source": {
+        "table": "A1",
+        "pdf_pages": [
+          26
+        ],
+        "final_version": "Study 4"
+      },
+      "scenario": {
+        "en": "Lately you’ve been suffering from insomnia and anxiety, you’re constantly in a bad mood, and you don’t know how to help yourself. Your neighbor recommended that you try a well-known alternative medicine that allegedly works well for cases of psychological distress and your neighbor swears that it will solve all your problems. Despite the fact that it is quite expensive, you know that you need to help yourself as soon as possible because the symptoms are becoming unbearable. What should you do in this situation to make the best possible decision?",
+        "zh_Hans": "最近，你一直受到失眠和焦虑的困扰，情绪总是不好，也不知道该如何帮助自己。邻居建议你尝试一种知名的替代疗法药物，据说它对心理困扰很有效，而且邻居信誓旦旦地说，它会解决你的所有问题。虽然这种药物相当昂贵，但你知道自己需要尽快采取办法帮助自己，因为症状已经变得难以忍受。在这种情况下，你应该怎么做，才能作出尽可能好的决定？"
+      },
+      "options": [
+        {
+          "id": "1",
+          "figure_label": "a",
+          "author_score": 1,
+          "en": "You trust your neighbor’s recommendation because you have known her for a very long time, and she herself tried the medicine she recommends, so you decide to buy it at the first opportunity.",
+          "zh_Hans": "你信任邻居的推荐，因为你已经认识她很久，而且她亲自试用过所推荐的药物，所以你决定一有机会就购买。"
+        },
+        {
+          "id": "2",
+          "figure_label": "b",
+          "author_score": 2,
+          "en": "Many people struggle with these kinds of problems, and you have heard positive experiences with similar treatments from some acquaintances. Therefore, you decide to call a few acquaintances to inquire about their experiences with this medicine because the experiences of others are a very good indicator of the effectiveness of the drug.",
+          "zh_Hans": "许多人都面临这类问题，而且你听一些熟人讲过使用类似疗法的积极经历。因此，你决定给几位熟人打电话，询问他们使用这种药物的经历，因为他人的经历是判断药物有效性的一个很好的指标。"
+        },
+        {
+          "id": "3",
+          "figure_label": "c",
+          "author_score": 3,
+          "en": "You search the Internet to find expert reviews and articles on the effects of this drug and its scientific basis. You will make a decision only after you are convinced that this medicine can actually help you.",
+          "zh_Hans": "你会在网上搜索关于这种药物的效果及其科学依据的专家评论和文章。只有在确信这种药物确实能帮助你之后，你才会作出决定。"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "source": {
+        "table": "A1",
+        "pdf_pages": [
+          26
+        ],
+        "final_version": "Study 4"
+      },
+      "scenario": {
+        "en": "You lead the Human Resources Department in an organization, and you have heard that other companies are implementing flexible working hours for their employees. This sounds like a good and interesting idea to you because you believe it will ease the workload and enhance efficiency. You are considering proposing this idea to the CEO, but before doing so, you want to gather additional information. What should you do in this situation to make the best possible decision?",
+        "zh_Hans": "你负责一家单位的人力资源部门，听说其他公司正在为员工实行弹性工作时间。你觉得这是一个不错而且有趣的想法，因为你认为它能减轻工作负担、提高效率。你正考虑向首席执行官提出这个建议，但在此之前，你想收集更多信息。在这种情况下，你应该怎么做，才能作出尽可能好的决定？"
+      },
+      "options": [
+        {
+          "id": "1",
+          "figure_label": "a",
+          "author_score": 1,
+          "en": "You will talk with colleagues from the HR departments of organizations that have had positive experiences after implementing such a working arrangement. You will ask them to explain the benefits of flexible working hours and how your organization can benefit from its introduction.",
+          "zh_Hans": "你会与那些实行这种工作安排后获得积极体验的单位的人力资源部门同仁交谈。你会请他们说明弹性工作时间的好处，以及你的单位引入它后能如何受益。"
+        },
+        {
+          "id": "2",
+          "figure_label": "b",
+          "author_score": 2,
+          "en": "You will seek advice from an acquaintance whose organization has recently introduced flexible working hours. You will ask them about their experiences and the results of this approach.",
+          "zh_Hans": "你会向一位所在单位最近开始实行弹性工作时间的熟人征求建议，询问对方的体验以及这种做法带来的结果。"
+        },
+        {
+          "id": "3",
+          "figure_label": "c",
+          "author_score": 3,
+          "en": "You will try to identify organizations that haven’t had positive experiences after implementing this kind of working arrangement. In discussions with colleagues from these organizations, you will pay special attention to potential drawbacks of flexible working hours.",
+          "zh_Hans": "你会尝试找到实行这种工作安排后未获得积极体验的单位。与这些单位的同仁讨论时，你会特别关注弹性工作时间可能存在的缺点。"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "source": {
+        "table": "A1",
+        "pdf_pages": [
+          27
+        ],
+        "final_version": "Study 4"
+      },
+      "scenario": {
+        "en": "You dislike your nose and you’ve been thinking your whole life about reducing its size. During elementary and high school, you were often teased and called ‘Long Nose’, which made you always keep to the sidelines. Now that you’re an adult, you have the financial means to finally undergo plastic surgery that has been on your mind for a long time. Although the benefits of the surgery personally appeal to you and outweigh any drawbacks you can think of, before making a decision, you want to gather additional information. What should you do in this situation to make the best possible decision?",
+        "zh_Hans": "你不喜欢自己的鼻子，一直以来都想把它变小。在小学和高中期间，你常常被人取笑，被叫作“长鼻子”，这使你总是待在一旁，很少参与。如今你已成年，也有经济能力终于接受想了很久的整形手术。虽然手术的好处对你很有吸引力，并且超过了你能想到的任何弊端，但在作出决定之前，你想收集更多信息。在这种情况下，你应该怎么做，才能作出尽可能好的决定？"
+      },
+      "options": [
+        {
+          "id": "1",
+          "figure_label": "a",
+          "author_score": 1,
+          "en": "In social media groups for people who have undergone a similar procedure, you will seek opinions and experiences from individuals who think that the procedure significantly improved their quality of life. You want to learn more about the advantages and positive effects of the surgery.",
+          "zh_Hans": "你会在接受过类似手术者的社交媒体群组中，寻找那些认为手术显著改善了生活质量的人的看法和经历。你想进一步了解手术的优势和积极影响。"
+        },
+        {
+          "id": "2",
+          "figure_label": "b",
+          "author_score": 2,
+          "en": "You will search for more information about the procedure on the Internet. Also, during consultations with a surgeon from a clinic, you will ask them to provide you with a detailed overview of the surgery process and recovery.",
+          "zh_Hans": "你会在网上搜索更多有关这项手术的信息。此外，在与一家诊所的外科医生咨询时，你会请对方详细介绍手术过程和康复情况。"
+        },
+        {
+          "id": "3",
+          "figure_label": "c",
+          "author_score": 3,
+          "en": "By searching the Internet and social media, you will attempt to find negative patient experiences and key arguments against your decision to undergo the surgery.",
+          "zh_Hans": "你会通过搜索互联网和社交媒体，尝试找到患者的负面经历，以及反对你接受手术这一决定的主要理由。"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "source": {
+        "table": "A1",
+        "pdf_pages": [
+          27
+        ],
+        "final_version": "Study 4"
+      },
+      "scenario": {
+        "en": "The school psychologist has invited you to talk about your child. She tells you that it has been noticed that your child shows signs of giftedness. Therefore, the psychologist makes a proposal for the child to skip a grade and join a long-term program for gifted children, which includes a range of activities and a school program that is a third more extensive than the standard one. This information made you happy and the proposed program seems like a good way to encourage and develop your child’s abilities. However, before making a decision you want to gather additional information. What should you do in this situation to make the best possible decision?",
+        "zh_Hans": "学校的心理学专业人员邀请你谈谈孩子的情况。她告诉你，有人注意到你的孩子表现出资优的迹象。因此，她建议孩子跳一级，并参加一个长期的资优儿童项目。该项目包括一系列活动，其学校课程内容比标准课程多三分之一。这个消息让你很高兴，而且你觉得这个项目似乎是鼓励和发展孩子能力的好办法。不过，在作出决定之前，你想收集更多信息。在这种情况下，你应该怎么做，才能作出尽可能好的决定？"
+      },
+      "options": [
+        {
+          "id": "1",
+          "figure_label": "a",
+          "author_score": 1,
+          "en": "You will talk to a class teacher who agrees with the psychologist’s assessment and ask her for an opinion. You will also ask the psychologist to explain to you in more detail why she thinks your child is gifted and to describe the methods, conditions, and the price of the proposed program.",
+          "zh_Hans": "你会与一位赞同该心理学专业人员评估的班级教师交谈，征求她的意见。你也会请该心理学专业人员更详细地解释，她为何认为你的孩子属于资优儿童，并介绍所提议项目的方法、条件和费用。"
+        },
+        {
+          "id": "2",
+          "figure_label": "b",
+          "author_score": 2,
+          "en": "You will search the Internet to find the experiences of parents whose children are gifted and of parents whose children attended the proposed program at your school. You will explore the content and dynamics of the program and how it differs from the regular curriculum.",
+          "zh_Hans": "你会在网上寻找资优儿童家长的经历，以及孩子参加过你们学校所提议项目的家长的经历。你会了解项目的内容、开展方式，以及它与常规课程有何不同。"
+        },
+        {
+          "id": "3",
+          "figure_label": "c",
+          "author_score": 3,
+          "en": "Although you are glad that the psychologist recognized your child’s giftedness, you are not completely sure of her assessment. You want to make sure it’s correct before you put your child in such a demanding program. You will take your child to the Center for Gifted Children for further evaluation.",
+          "zh_Hans": "虽然你很高兴该心理学专业人员发现了孩子的资优表现，但你并不完全确信她的评估。在让孩子参加要求如此高的项目之前，你想确认这一评估是正确的。你会带孩子到资优儿童中心接受进一步评估。"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "source": {
+        "table": "A1",
+        "pdf_pages": [
+          27,
+          28
+        ],
+        "final_version": "Study 4"
+      },
+      "scenario": {
+        "en": "After a routine check-up, the doctor approaches you with a feedback. She informs you that you are generally in a good health but that, among other findings, she identified a potential health concern. While a relatively routine and straightforward surgical procedure could ensure that the issue doesn’t become serious, the doctor assures you that it won’t be necessary and there’s no need for concern. As you have never noticed any symptoms or had any issues related to the concerns described, you also feel that excessive worry might not be warranted. However, you still want to gather additional information. What should you do in this situation to make the best possible decision?",
+        "zh_Hans": "例行体检后，医生向你反馈情况。她告诉你，你总体上健康状况良好，但在其他检查结果之外，她还发现了一个潜在的健康问题。虽然一项相对常规、简单的外科手术可以确保问题不至于变得严重，但医生向你保证，没有必要做手术，也不必担心。由于你从未注意到任何症状，也从未出现与所述问题相关的情况，你也觉得或许不必过分担忧。不过，你仍想收集更多信息。在这种情况下，你应该怎么做，才能作出尽可能好的决定？"
+      },
+      "options": [
+        {
+          "id": "1",
+          "figure_label": "a",
+          "author_score": 1,
+          "en": "You will ask the doctor to provide you with a more detailed explanation of why they believe the surgical procedure is unnecessary. You are confident that this will give you a clearer understanding of what to do and help you feel more at ease.",
+          "zh_Hans": "你会请医生更详细地解释，为什么她认为不需要做手术。你相信这会让你更清楚该怎么做，也会让你更安心。"
+        },
+        {
+          "id": "2",
+          "figure_label": "b",
+          "author_score": 2,
+          "en": "You will request more information from the doctor about the specific health concern mentioned, and you will inquire about the experiences of individuals who have undergone the surgical procedure as well as those who have not.",
+          "zh_Hans": "你会请医生进一步介绍所提到的具体健康问题，并询问接受过这项手术的人，以及没有接受手术的人的经历。"
+        },
+        {
+          "id": "3",
+          "figure_label": "c",
+          "author_score": 3,
+          "en": "You will ask the doctor to provide you with a more detailed description of this health concern, its symptoms, and long-term prognosis. In doing so, you will specifically ask her to outline the risks associated with not undergoing the surgery.",
+          "zh_Hans": "你会请医生更详细地介绍这个健康问题、相关症状和长期预后。在此过程中，你会特别请她说明不接受手术会有哪些风险。"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "source": {
+        "table": "A1",
+        "pdf_pages": [
+          28
+        ],
+        "final_version": "Study 4"
+      },
+      "scenario": {
+        "en": "You are a manager who has just been urgently hired by a company for web sales. You are employed as the head of the ‘Procurement and Delivery System Management’ and the CEO has immediately made it clear that they expect an efficient response from you to enhance the procurement segment of the system. According to the CEO’s opinion, this segment is causing issues with orders and delays in delivering the ordered products. What should you do in this situation to make the best possible decision?",
+        "zh_Hans": "你是一名经理，刚被一家网络销售公司紧急聘用，担任“采购与配送系统管理”负责人。首席执行官立即明确表示，希望你高效作出回应，改善系统中的采购环节。首席执行官认为，正是这一环节导致订单出现问题，以及所订商品的配送延迟。在这种情况下，你应该怎么做，才能作出尽可能好的决定？"
+      },
+      "options": [
+        {
+          "id": "1",
+          "figure_label": "a",
+          "author_score": 1,
+          "en": "You are expected to fix things and to do so as quickly as possible. You dive into the work immediately, without too many questions. You will send out assignments to people to restructure the procurement system as soon as possible.",
+          "zh_Hans": "公司期望你解决问题，而且越快越好。你会不多问问题，立即投入工作。你会向相关人员分派任务，尽快重组采购系统。"
+        },
+        {
+          "id": "2",
+          "figure_label": "b",
+          "author_score": 2,
+          "en": "Before delving into changes, you will first have a conversation with the CEO and ask them to further explain the arguments for changing the procurement system. You want to have a clearer picture of what the CEO wants so that you don’t miss potentially important information.",
+          "zh_Hans": "在着手改变之前，你会先与首席执行官交谈，请对方进一步说明改变采购系统的理由。你想更清楚地了解首席执行官的意图，以免遗漏可能重要的信息。"
+        },
+        {
+          "id": "3",
+          "figure_label": "c",
+          "author_score": 3,
+          "en": "Even at the risk of appearing indecisive in the eyes of the CEO, you will hold off on concrete actions until you consult with other people in the organization who are well-versed in all of its business operations. You want to investigate whether the issue truly lies in the procurement system or if the delays are occurring due to other parts of the system, such as delivery.",
+          "zh_Hans": "即使冒着让首席执行官觉得你优柔寡断的风险，你也会暂缓采取具体行动，直到咨询过单位里熟悉全部业务运作的其他人员。你想调查，问题是否真的出在采购系统，还是延误源于配送等系统其他环节。"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "source": {
+        "table": "A1",
+        "pdf_pages": [
+          28,
+          29
+        ],
+        "final_version": "Study 4"
+      },
+      "scenario": {
+        "en": "You are an owner of an agency for adventure tourism that conducts a smaller portion of its bookings online and a larger portion through a storefront located in the city center. Your business performed very well last season, and now you are considering renting additional space in the city center to further increase revenue. You are confident that this move would double your sales and significantly boost profits. However, the rent for a space in the city center is quite expensive (around $15,000 per month), and if it fails, it could potentially lead to financial difficulties. Currently, you have 15 employees in the company, most of whom have expressed support for the idea, while a few of the most experienced ones are seriously reserved. Additionally, you have an acquaintance in a similar industry who has already taken a similar step and is convinced it’s the right move. What should you do in this situation to make the best possible decision?",
+        "zh_Hans": "你是一家探险旅游机构的老板，少部分预订通过网上完成，大部分则通过位于市中心的门店完成。上一季的生意很好，现在你正考虑在市中心再租一处场地，以进一步增加收入。你确信这一举措会使销售额翻倍，并显著提高利润。不过，市中心场地的租金相当昂贵（每月约 15,000 美元），如果失败，可能导致财务困难。目前公司有 15 名员工，其中大多数支持这个想法，而几位经验最丰富的员工持明显的保留态度。此外，你有一位从事类似行业的熟人，已经采取过类似举措，并确信这是正确的做法。在这种情况下，你应该怎么做，才能作出尽可能好的决定？"
+      },
+      "options": [
+        {
+          "id": "1",
+          "figure_label": "a",
+          "author_score": 1,
+          "en": "You are convinced that renting the additional space is the right decision, so you will independently decide to proceed with the rental. You believe it doesn’t make sense to overly delay the decision.",
+          "zh_Hans": "你确信增租场地是正确的决定，所以会自行决定推进租赁。你认为过度拖延决定没有意义。"
+        },
+        {
+          "id": "2",
+          "figure_label": "b",
+          "author_score": 2,
+          "en": "You will consult with your acquaintance who has already rented additional business space and considers it a good idea and ask them to explain why they made such a decision.",
+          "zh_Hans": "你会咨询那位已经增租经营场地、并认为这是个好主意的熟人，请对方解释作出这一决定的原因。"
+        },
+        {
+          "id": "3",
+          "figure_label": "c",
+          "author_score": 3,
+          "en": "You are aware that some of your employees disagree with the decision to rent the new space. Before making a decision, you will ask them to explain their viewpoints, and you are particularly interested in the arguments from employees who are skeptical about renting a new space.",
+          "zh_Hans": "你知道部分员工不赞同租赁新场地的决定。作出决定前，你会请他们解释自己的观点，尤其想了解那些对增租场地持怀疑态度的员工的理由。"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "source": {
+        "table": "A1",
+        "pdf_pages": [
+          29
+        ],
+        "final_version": "Study 4"
+      },
+      "scenario": {
+        "en": "You have recently been promoted to the position of Human Resources Department Manager in a large company. The management expects you to introduce some changes to enhance employee motivation. An older colleague, a long-time employee of the HR department, believes from practice and experience that rewarding employees based on performance is the best way to motivate them. This approach also sounds like a very good move to you—it makes sense that people will exert more effort if they are paid in proportion to the work they have done, and you do not currently see any objective drawbacks to this method. What should you do in this situation to make the best possible decision?",
+        "zh_Hans": "你最近晋升为一家大公司的人力资源部经理。管理层希望你引入一些改变，以提高员工的工作积极性。一位在人力资源部门工作多年的年长同事根据实践和经验认为，按工作表现奖励员工，是激励他们的最佳方式。你也觉得这似乎是一个很好的举措：按完成的工作量付酬，人们就会更加努力，这很有道理，而且你目前看不出这种方法有什么客观的缺点。在这种情况下，你应该怎么做，才能作出尽可能好的决定？"
+      },
+      "options": [
+        {
+          "id": "1",
+          "figure_label": "a",
+          "author_score": 1,
+          "en": "You don’t see any significant drawbacks to this approach, so you will introduce a performance-based reward system as soon as possible. This will increase employee motivation and simultaneously meet the management’s demands.",
+          "zh_Hans": "你看不出这种做法有什么明显缺点，所以会尽快引入按工作表现给予奖励的制度。这将提高员工的积极性，同时满足管理层的要求。"
+        },
+        {
+          "id": "2",
+          "figure_label": "b",
+          "author_score": 2,
+          "en": "You will have a conversation with the older colleague who advocates for this system and knows more about it than you do. If his reasons for implementing this approach are compelling enough, you will implement it right away.",
+          "zh_Hans": "你会与那位支持这种制度、而且比你更了解它的年长同事交谈。如果他支持实施这种做法的理由足够有说服力，你就会立即实施。"
+        },
+        {
+          "id": "3",
+          "figure_label": "c",
+          "author_score": 3,
+          "en": "Although it seems that the majority supports this approach, before making a decision about implementation, you will make every effort to find key arguments against this approach, or identify potential issues with introducing this practice.",
+          "zh_Hans": "虽然大多数人似乎都支持这种做法，但在决定是否实施之前，你会尽力寻找反对它的主要理由，或者识别引入这种做法可能出现的问题。"
+        }
+      ]
+    },
+    {
+      "id": 12,
+      "source": {
+        "table": "A1",
+        "pdf_pages": [
+          29
+        ],
+        "final_version": "Study 4"
+      },
+      "scenario": {
+        "en": "Local elections for the mayor will soon be held in your city. Your favorite is candidate A. You watched an interview with him and you believe he presented convincing arguments in support of the measures he is advocating. His opponent, candidate B, is a man whose worldview is completely different from yours, so you didn’t even bother to listen to his arguments about local problems. You have decided to vote for candidate A. On the day before the election, an apolitical friend asks you for your opinion on which candidate is better and who he should vote for. Your friend sees you as someone who is much more knowledgeable and familiar with the local political scene than he is. What should you do in this situation?",
+        "zh_Hans": "你所在城市即将举行市长选举。你最支持的是候选人 A。你看过对他的采访，认为他为自己主张的措施提出了有说服力的理由。他的对手候选人 B 是一位世界观与你完全不同的人，所以你甚至没费心听他对当地问题的论述。你已经决定投票给候选人 A。选举前一天，一位不关心政治的朋友询问你，哪位候选人更好、他应该投票给谁。朋友认为你比他更了解政治，也更熟悉本地政坛。在这种情况下，你应该怎么做？"
+      },
+      "options": [
+        {
+          "id": "1",
+          "figure_label": "a",
+          "author_score": 1,
+          "en": "Tell your friend to vote for candidate A, without mentioning that you know next to nothing about candidate B’s program. No one has all the information and you trust your own judgment.",
+          "zh_Hans": "告诉朋友投票给候选人 A，但不提自己对候选人 B 的政纲几乎一无所知。没有人掌握全部信息，而你信任自己的判断。"
+        },
+        {
+          "id": "2",
+          "figure_label": "b",
+          "author_score": 2,
+          "en": "Indicate that you are not completely familiar with candidate B’s program, but explain to your friend why you will still vote for candidate A.",
+          "zh_Hans": "说明你并不完全熟悉候选人 B 的政纲，但向朋友解释，你为什么仍会投票给候选人 A。"
+        },
+        {
+          "id": "3",
+          "figure_label": "c",
+          "author_score": 3,
+          "en": "Openly tell a friend that you will vote for candidate A, but that you don’t know enough about candidate B to make a sound judgment and give him an advice.",
+          "zh_Hans": "坦诚告诉朋友，你会投票给候选人 A，但你对候选人 B 的了解不足以作出可靠判断，也不足以向他提供建议。"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "source": {
+        "table": "A1",
+        "pdf_pages": [
+          29,
+          30
+        ],
+        "final_version": "Study 4"
+      },
+      "scenario": {
+        "en": "You are a red wine enthusiast. For many years, you have been learning about wines, and you’re a favorite among your friends because you always know how to choose a good wine and describe it in a way others don’t. You regularly consume it—you have a glass every day after lunch or dinner, and you’re happy because you’ve read the studies that wine is good for the cardiovascular system. In a conversation with a friend, you learn about the latest research he read about, which claims that even in the smallest amount red wine does not contribute to health. On the contrary, the research shows that all types of alcohol, including wine, are ultimately harmful. What should you do in this situation to make the best possible decision?",
+        "zh_Hans": "你是一名红葡萄酒爱好者。多年来，你一直在学习有关葡萄酒的知识，朋友们都很喜欢你，因为你总知道如何挑选好酒，还能用别人不会的方式描述它。你经常喝葡萄酒，每天在午餐或晚餐后喝一杯。你对此感到高兴，因为你读过说葡萄酒有益于心血管系统的研究。与一位朋友交谈时，你听他介绍了最近读到的一项研究。该研究认为，即使饮用量极小，红葡萄酒也无益于健康。相反，研究显示，包括葡萄酒在内的各类酒精饮品，最终都有害。 在这种情况下，你应该怎么做，才能作出尽可能好的决定？"
+      },
+      "options": [
+        {
+          "id": "1",
+          "figure_label": "a",
+          "author_score": 1,
+          "en": "You will disregard this information. The contents of internet portals are often inaccurate, and the new research is likely questionable, given the conflicting results of all previous studies. You will explain to your friend that he shouldn’t trust such information.",
+          "zh_Hans": "你会忽略这条信息。互联网门户网站上的内容往往不准确，而且考虑到所有先前研究得出了与之相冲突的结果，这项新研究很可能值得怀疑。你会向朋友解释，他不应该相信这类信息。"
+        },
+        {
+          "id": "2",
+          "figure_label": "b",
+          "author_score": 2,
+          "en": "You are willing to listen to the new research. While you believe in the accuracy of previous information, there’s always a chance that previous studies were wrong. However, you still believe that wine can contribute to health when you don’t overconsume it.",
+          "zh_Hans": "你愿意听听这项新研究。虽然你相信以前的信息是准确的，但先前研究总有可能出错。不过，你仍然认为，只要不过量饮用，葡萄酒仍可能有益于健康。"
+        },
+        {
+          "id": "3",
+          "figure_label": "c",
+          "author_score": 3,
+          "en": "After hearing about the new research, you are no longer as certain about the benefits of red wine. You know that newer research can uncover something that previous studies missed. You admit to your friend that there’s a fair chance he might be right.",
+          "zh_Hans": "听说这项新研究后，你不再那么确信红葡萄酒的益处。你知道，较新的研究可能发现先前研究遗漏的东西。你向朋友承认，他很有可能是对的。"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "source": {
+        "table": "A1",
+        "pdf_pages": [
+          30
+        ],
+        "final_version": "Study 4"
+      },
+      "scenario": {
+        "en": "You are making a holiday lunch that you have been preparing for years using the same recipe. It is one of your favorite dishes and you have received many compliments for it. Everyone who knows you know that you are the master of that dish. Your mother-in-law is visiting and advises you to add additional spice to your dish to make it even tastier. She prepares it in a slightly different way and emphasizes that everyone who has tried it likes it very much. What should you do in this situation?",
+        "zh_Hans": "你正在准备一顿节日午餐，多年来一直使用同一个食谱。这是你最喜欢的菜之一，也让你得到过许多称赞。认识你的人都知道，你是做这道菜的高手。你的岳母或婆婆来访，建议你在菜中再加一种香料，让它更好吃。她做这道菜的方法略有不同，并强调尝过的人都非常喜欢。在这种情况下，你应该怎么做？"
+      },
+      "options": [
+        {
+          "id": "1",
+          "figure_label": "a",
+          "author_score": 1,
+          "en": "You will explain that you have been preparing the dish according to the same recipe for years and that it does not need additional spices. You will completely reject her suggestion.",
+          "zh_Hans": "你会解释，自己多年来一直按照同一个食谱做这道菜，不需要额外添加香料。你会完全拒绝她的建议。"
+        },
+        {
+          "id": "2",
+          "figure_label": "b",
+          "author_score": 2,
+          "en": "You’ll thank her for the advice and admit that the spice could improve the dish. However, you will emphasize that this is an important holiday lunch, so you don’t want to experiment.",
+          "zh_Hans": "你会感谢她的建议，并承认这种香料可能会让菜更好吃。不过，你会强调，这是一顿重要的节日午餐，所以你不想做尝试。"
+        },
+        {
+          "id": "3",
+          "figure_label": "c",
+          "author_score": 3,
+          "en": "You will admit that you hadn’t thought about this spice before and that you can see how it could really enrich your dish and that it would be worth trying.",
+          "zh_Hans": "你会承认，自己以前没有想到过这种香料，现在能理解它确实可能让这道菜的味道更丰富，值得一试。"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "source": {
+        "table": "A1",
+        "pdf_pages": [
+          30
+        ],
+        "final_version": "Study 4"
+      },
+      "scenario": {
+        "en": "You are an architect, and in your 15-year-long career, you have designed several award-winning and high-quality residential building. You are having a conversation with a statics expert about the construction of a new building. You have invested a lot of effort and time considering different aspects of the design, including a certain type of staircase that you think should be installed in the building. However, the statics expert tells you that this type of staircase will greatly reduce the static resistance of the building and should be changed. However, changing the staircase would lead to numerous additional changes to the design. What should you do in this situation to make the best possible decision?",
+        "zh_Hans": "你是一名建筑师，在十五年的职业生涯中，设计过多座获奖且优质的住宅建筑。你正与一位结构静力学专家讨论一栋新建筑的建造。你已经投入了大量精力和时间，考虑设计的各个方面，包括一种你认为应当在建筑中采用的楼梯。不过，这位结构静力学专家告诉你，这种楼梯会大幅降低建筑的静力承载能力，应该更换。然而，更换楼梯又会导致设计需要作出许多额外调整。在这种情况下，你应该怎么做，才能作出尽可能好的决定？"
+      },
+      "options": [
+        {
+          "id": "1",
+          "figure_label": "a",
+          "author_score": 1,
+          "en": "You should tell the expert that you have thoroughly checked all the possibilities and that this option is the best if we take into account the other components of the design. You refuse to change your plan and stand by your decision, trusting your judgment.",
+          "zh_Hans": "你应该告诉专家，你已经全面核查了所有可能方案，如果把设计中的其他部分也考虑在内，这个方案就是最好的。你拒绝修改计划，坚持自己的决定，信任自己的判断。"
+        },
+        {
+          "id": "2",
+          "figure_label": "b",
+          "author_score": 2,
+          "en": "You say that you thought about it and generally agree with the expert’s comment. After additional argumentation, you stand by your initial position, emphasizing your vast experience.",
+          "zh_Hans": "你会表示，自己已经考虑过这个问题，而且总体上同意专家的意见。在进一步论证后，你仍坚持最初的立场，并强调自己丰富的经验。"
+        },
+        {
+          "id": "3",
+          "figure_label": "c",
+          "author_score": 3,
+          "en": "You will discuss the matter with an expert and admit that in this case he may be more knowledgeable than you and that your initial conclusion might have been wrong.",
+          "zh_Hans": "你会与专家讨论这件事，并承认，在这个问题上，他可能比你更有知识，而你最初的结论可能是错的。"
+        }
+      ]
+    },
+    {
+      "id": 16,
+      "source": {
+        "table": "A1",
+        "pdf_pages": [
+          31
+        ],
+        "final_version": "Study 4"
+      },
+      "scenario": {
+        "en": "You are the manager at a marketing agency with 20 employees. The director of a hotel contacted you and wants to hire you to ‘rebrand’ the hotel as a great destination for young families. The problem is that the tourist season starts in a month, and the hotel delayed this until the last hour due to financial uncertainties. However, the director decided on a more aggressive campaign and it is extremely important to him that it be successful. You are the most experienced member of the agency, and you have been in several situations in your career when you had to do something at the last minute. Based on these experiences, you have a clear idea of how you would implement this campaign and you feel that, due to the short deadline, it is best to just communicate your idea to the team and divide them into roles. However, not everything goes smoothly at the team meeting. A junior colleague comments on your plan and shows disagreement with it, persistently trying to push his idea. Although his arguments make some sense, the deadline for a decision is relatively short. What should you do in this situation?",
+        "zh_Hans": "你是一家拥有 20 名员工的营销机构的经理。一家酒店的负责人联系你，希望聘请你们重新塑造酒店的品牌形象，把它打造成年轻家庭的理想目的地。问题是，旅游季一个月后就要开始，而酒店因为财务上的不确定性，将这件事一直拖到最后一刻。不过，负责人决定开展更积极有力的宣传活动，而且活动成功对他极其重要。你是机构里经验最丰富的成员，在职业生涯中，曾多次需要在最后关头完成任务。基于这些经历，你对如何实施此次活动已有清晰想法，并且觉得期限这么短，最好直接把想法告诉团队，再给大家分工。然而，团队会议并非一帆风顺。一位资历较浅的同事对你的计划提出意见，表达不同看法，并不断尝试推动自己的想法。虽然对方的理由有些道理，但作出决定的期限相当紧迫。在这种情况下，你应该怎么做？"
+      },
+      "options": [
+        {
+          "id": "1",
+          "figure_label": "a",
+          "author_score": 1,
+          "en": "React vigorously and make it clear that you do not want to listen to further complaints. You have nothing against other people’s ideas, but your rich experience gives you the right to persist in your idea. In addition, you will not allow a junior colleague to ‘undermine’ your authority.",
+          "zh_Hans": "作出强硬回应，明确表示你不想继续听抱怨。你并非反对别人的想法，但丰富的经验使你有权坚持自己的想法。此外，你不会允许一位资历较浅的同事“削弱”你的权威。"
+        },
+        {
+          "id": "2",
+          "figure_label": "b",
+          "author_score": 2,
+          "en": "You will thank your colleague for fresh ideas and say that you appreciate her engagement and creativity. You will admit that her remarks make sense, but that the current situation requires a quick reaction and a great experience, so this time you will still ‘play it’ your way.",
+          "zh_Hans": "你会感谢同事带来新想法，并表示欣赏对方的投入和创造力。你会承认对方的意见有道理，但当前情况需要迅速反应和丰富经验，所以这次你仍会按自己的方式来做。"
+        },
+        {
+          "id": "3",
+          "figure_label": "c",
+          "author_score": 3,
+          "en": "You will admit that your colleague made you reconsider your decision. In addition, you will also encourage the rest of the team not to hesitate to criticize your approach if they think you are wrong, even at risk of having your authority questioned.",
+          "zh_Hans": "你会承认，同事让你重新考虑了自己的决定。此外，你还会鼓励团队其他成员，如果认为你错了，就不要犹豫，要批评你的做法，即使这可能使你的权威受到质疑。"
+        }
+      ]
+    }
+  ],
+  "translation_review": "Independent translation review passed after three item-level corrections; not psychometric validation."
+}

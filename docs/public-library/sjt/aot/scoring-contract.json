@@ -1,0 +1,37 @@
+{
+  "status": "DOCUMENTATION_ONLY_RUNTIME_HOLD",
+  "item_scores": "Final Table A1 option 1/2/3 corresponds to Figure A1 a/b/c, with author-supported ordinal values 1/2/3; no reverse items.",
+  "option_mapping": {
+    "1": {
+      "figure_label": "a",
+      "score": 1
+    },
+    "2": {
+      "figure_label": "b",
+      "score": 2
+    },
+    "3": {
+      "figure_label": "c",
+      "score": 3
+    }
+  },
+  "provisional_total": {
+    "formula": "sum of all 16 item scores / 16",
+    "range": [
+      1,
+      3
+    ],
+    "evidence_status": "STRONGLY_SUPPORTED_CARRY_FORWARD_INFERENCE_NOT_DIRECT_FINAL_FORMULA_CONFIRMATION",
+    "explanation": "Earlier 13-item method states averaging. Final option ordering and Table 11 range support continuity, but no explicit final-16 averaging formula has been confirmed. Do not present as a directly quoted final scoring rule. Section 6.1.2 remained the same wording concerns another self-report AOT measure, not proof of this formula."
+  },
+  "subscales": "Counts quantity 4, direction 7, overconfidence 5 are stated; exact item-to-dimension assignment remains inferred and is deliberately omitted. Do not compute or publish subscale scores.",
+  "missing": "No prorating, imputation or minimum-completion author rule found. All-16 guardrail is an editorial platform restriction.",
+  "norms": "No deployable norms, percentile thresholds, pass/fail or diagnostic cutoffs established. Study 4 sample mean 2.31 and SD .21 are not norms.",
+  "hold_reasons": [
+    "Chinese translation content review passed; Chinese psychometric validation not established",
+    "Final overall formula not directly confirmed",
+    "Exact subscale mappings not directly confirmed",
+    "Runtime implementation/validation absent",
+    "Chinese psychometric validation absent"
+  ]
+}

@@ -1,0 +1,149 @@
+{
+  "schema_version": "1.0",
+  "source": "sec-sjt-manual.pdf",
+  "table_pdf_page": 161,
+  "table_printed_page": 159,
+  "table": "A16",
+  "values_status": "Printed values transcribed without correction; not runtime weights or recalibrated probabilities.",
+  "n_as_printed": 306,
+  "printed_body_pdf_page": 93,
+  "printed_body_printed_page": 91,
+  "printed_body_correct_frequency_range": [
+    "51.96%",
+    "76.14%"
+  ],
+  "rows": [
+    {
+      "item_number": 1,
+      "printed_percentages": [
+        "16.67",
+        "20.59",
+        "61.44",
+        "0.33",
+        "1.63"
+      ],
+      "derived_sum_percent": "100.66",
+      "keyed_option_1based": 3,
+      "printed_keyed_percentage": "61.44"
+    },
+    {
+      "item_number": 2,
+      "printed_percentages": [
+        "4.25",
+        "0.98",
+        "10.78",
+        "65.03",
+        "19.93"
+      ],
+      "derived_sum_percent": "100.97",
+      "keyed_option_1based": 4,
+      "printed_keyed_percentage": "65.03"
+    },
+    {
+      "item_number": 3,
+      "printed_percentages": [
+        "17.97",
+        "65.36",
+        "0.98",
+        "6.86",
+        "9.48"
+      ],
+      "derived_sum_percent": "100.65",
+      "keyed_option_1based": 2,
+      "printed_keyed_percentage": "65.36"
+    },
+    {
+      "item_number": 4,
+      "printed_percentages": [
+        "80.72",
+        "2.61",
+        "3.27",
+        "12.09",
+        "1.31"
+      ],
+      "derived_sum_percent": "100.00",
+      "keyed_option_1based": 1,
+      "printed_keyed_percentage": "80.72"
+    },
+    {
+      "item_number": 5,
+      "printed_percentages": [
+        "5.23",
+        "18.63",
+        "5.23",
+        "56.54",
+        "14.38"
+      ],
+      "derived_sum_percent": "100.01",
+      "keyed_option_1based": 4,
+      "printed_keyed_percentage": "56.54"
+    },
+    {
+      "item_number": 6,
+      "printed_percentages": [
+        "6.21",
+        "10.46",
+        "67.97",
+        "11.76",
+        "4.58"
+      ],
+      "derived_sum_percent": "100.98",
+      "keyed_option_1based": 3,
+      "printed_keyed_percentage": "67.97"
+    },
+    {
+      "item_number": 7,
+      "printed_percentages": [
+        "3.27",
+        "10.13",
+        "76.14",
+        "2.94",
+        "6.86"
+      ],
+      "derived_sum_percent": "99.34",
+      "keyed_option_1based": 3,
+      "printed_keyed_percentage": "76.14"
+    },
+    {
+      "item_number": 8,
+      "printed_percentages": [
+        "7.84",
+        "16.01",
+        "59.80",
+        "3.27",
+        "12.09"
+      ],
+      "derived_sum_percent": "99.01",
+      "keyed_option_1based": 3,
+      "printed_keyed_percentage": "59.80"
+    },
+    {
+      "item_number": 9,
+      "printed_percentages": [
+        "30.72",
+        "51.96",
+        "5.56",
+        "8.17",
+        "4.25"
+      ],
+      "derived_sum_percent": "100.66",
+      "keyed_option_1based": 2,
+      "printed_keyed_percentage": "51.96"
+    },
+    {
+      "item_number": 10,
+      "printed_percentages": [
+        "9.15",
+        "17.65",
+        "66.67",
+        "2.29",
+        "4.25"
+      ],
+      "derived_sum_percent": "100.01",
+      "keyed_option_1based": 3,
+      "printed_keyed_percentage": "66.67"
+    }
+  ],
+  "inconsistency": "The body upper bound of 76.14% conflicts with keyed item 4 = 80.72% in Table A16. Some row sums depart from 100%, not always explainable by two-decimal rounding. Cause unknown from the materials reviewed.",
+  "handling": "Do not repair by inference, normalize rows, infer new keys, use frequencies as weights, or silently calibrate norms."
+}

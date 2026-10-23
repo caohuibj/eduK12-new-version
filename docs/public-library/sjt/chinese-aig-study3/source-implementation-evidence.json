@@ -1,0 +1,29 @@
+{
+  "status": "PASS",
+  "node": "24.21.0",
+  "scope": "single tool; one bounded schema/scorer/published-selector/SSR report run",
+  "source_files": {
+    "server-version/backend/src/modules/situational/instruments/chinese-aig-study3/1.0.0/instrument.json": "4e7e26b6b74ea5d9c259acb95d4374fb47b1dc046ce6857c2f82479bb3b9ed97",
+    "server-version/backend/src/modules/situational/instruments/chinese-aig-study3/1.0.0/publication.json": "7f13aa3a89032d7ab474f6d0fa0c412fa0d4b5e6aa7f1f9ab75fc3914ba143d3",
+    "server-version/backend/src/modules/situational/instruments/chinese-aig-study3/1.0.0/scientific.json": "dd1efc75fffc35157417e0ddfff701336c4fd8c8256214f26df9bded5080a42a",
+    "server-version/backend/src/modules/situational/onboarding/instruments.generated.ts": "96a1284a00bcfc0ffeb6156e79b7385467fa2663af4a930d7831475ee714ee1d",
+    "server-version/backend/scripts/public-library/chinese-aig-study3-contract.tsx": "d08fb7840f3e171245597330c54ba8da112a8642aa6c5fb787b161f6b5bffd82"
+  },
+  "checks": {
+    "schemaAndV2Package": true,
+    "exactItems": 40,
+    "exactOptionKeys": 160,
+    "goldenCases": 5,
+    "missingFacetCases": 5,
+    "publishedSelectorRejectsDraft": true,
+    "renderedRawFacetMetrics": 5,
+    "runnerHidesKeys": true
+  },
+  "not_run": [
+    "platform suite",
+    "CI",
+    "browser acceptance",
+    "deployment"
+  ],
+  "human_scientific_review_claimed": false
+}

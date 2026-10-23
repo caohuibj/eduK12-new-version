@@ -1,0 +1,35 @@
+{
+  "status": "PASS",
+  "node": "24.21.0",
+  "scope": "SEC-SJT only; one full bounded probe plus one additional focused FINAL-input-isolation assertion, no old source checks",
+  "files": {
+    "server-version/backend/src/modules/situational/instruments/sec-sjt-zh-hans/1.0.0/instrument.json": "a699bdf75ae2712915caa50580335327912f59475c4a2ab92f0228a21b611091",
+    "server-version/backend/src/modules/situational/instruments/sec-sjt-zh-hans/1.0.0/publication.json": "7f13aa3a89032d7ab474f6d0fa0c412fa0d4b5e6aa7f1f9ab75fc3914ba143d3",
+    "server-version/backend/src/modules/situational/instruments/sec-sjt-zh-hans/1.0.0/scientific.json": "51034de62d1fe6b06a3411137dfce675f8617d99cb974d26c5481382c0c93c65",
+    "server-version/backend/scripts/public-library/sec-sjt-contract.tsx": "2ee06db8263190b97947b2415a102563f2d235781ea75de60ab5c52f6175dbd8",
+    "server-version/backend/src/modules/situational/onboarding/instruments.generated.ts": "aeee0432f0bb79bac50976fbbd3b49cd413bb0f323dd8ba8d7e52f2ecdec261d"
+  },
+  "checks": {
+    "sourceSchemaAndV2Validator": true,
+    "practiceResponsesExcluded": 5,
+    "formalItems": 10,
+    "formalKeys": 50,
+    "goldenCases": 4,
+    "individualMissingCases": 10,
+    "allMissingNull": true,
+    "optionalTrajectoryTerminal": true,
+    "invalidInputsRejected": 8,
+    "rawPracticeExcluded": true,
+    "reportNumericAndNullSSR": true,
+    "draftPublishedSelectorRejected": true,
+    "finalScorerFullRawListPracticeIsolation": true
+  },
+  "not_claimed": [
+    "DB/FINAL transaction execution",
+    "browser acceptance",
+    "Chinese validation",
+    "human scientific approval",
+    "CI",
+    "publication"
+  ]
+}
