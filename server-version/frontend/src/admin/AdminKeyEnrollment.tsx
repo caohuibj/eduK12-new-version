@@ -11,7 +11,8 @@ import '../survey/survey-admin-auth.css'
 export default function AdminKeyEnrollment(){
   const location=useLocation(),origins=productOrigins()
   const surveyEntry=Boolean(origins&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH)
-  const loginPath='/admin/login'+(surveyEntry?'?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH):'')
+  const trainingEntry=new URLSearchParams(location.search).get('returnTo')==='/admin/training'
+  const loginPath='/admin/login'+(trainingEntry?'?returnTo=%2Fadmin%2Ftraining':surveyEntry?'?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH):'')
   const [username,setUsername]=useState(''),[password,setPassword]=useState(''),[ticket,setTicket]=useState('')
   const [method,setMethod]=useState<'TOTP'|'SECURITY_KEY'>('TOTP')
   const [uri,setUri]=useState(''),[code,setCode]=useState('')

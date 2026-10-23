@@ -1,12 +1,12 @@
 import { Link } from 'react-router-dom'
-import { BookOpen, KeyRound, ShieldCheck, Users } from 'lucide-react'
-import { PageHeader, ProductPage } from '../../components/product-ui'
+import { ArrowRight, BookOpen, KeyRound, ShieldCheck, Users } from 'lucide-react'
+import { ProductPage } from '../../components/product-ui'
 import './admin-training.css'
 
 const work = [
   {
     title: '培训师与学员账户',
-    description: '审核培训师、管理账号，以及签发培训师注册码。统一账号管理，不建立第二套用户库。',
+    description: '审核培训师资格、管理培训账号与注册码，让每位参与者从清晰的身份开始。',
     Icon: Users,
     links: [
       { to: '/users', label: '账户审核与管理' },
@@ -36,18 +36,22 @@ const work = [
 /** A navigation workspace, not another admin authority or copied grant state. */
 export default function AdminTrainingWorkspace() {
   return <ProductPage width="management" className="training-admin-space">
-    <PageHeader title="培训版管理" description="培训师审核、测评授权与课程治理统一办理。学员和培训师仍使用独立的培训前台。" />
+    <header className="training-admin-welcome">
+      <div><p className="training-admin-eyebrow">TRAINING / 培训管理空间</p><h1>培训有序，管理有据。</h1><p>从账号审核到课程监管，让教学资源得到有序使用。</p></div>
+      <span className="training-admin-identity"><ShieldCheck size={18} aria-hidden="true" />Training 独立管理资格</span>
+    </header>
+    <h2 className="training-admin-section-title">开始今天的管理工作</h2>
     <p className="training-admin-scope" role="note">
       本窗口使用显式 Training 管理授权，管理培训账号、培训课程及适用资源。
       系统治理、Survey 研究和学校产品需要各自授权；学校活动、研究项目与个人答卷仍按所属范围检查。
     </p>
     <div className="training-admin-grid">
-      {work.map(({ title, description, Icon, links }) => <section key={title} className="training-admin-card">
-        <Icon size={23} aria-hidden="true" />
+      {work.map(({ title, description, Icon, links },index) => <section key={title} className="training-admin-card">
+        <div className="training-admin-card-top"><Icon size={26} strokeWidth={1.5} aria-hidden="true" /><span>0{index+1}</span></div>
         <h2>{title}</h2>
         <p>{description}</p>
         <div className="training-admin-links">
-          {links.map(({ to, label }) => <Link key={to} to={to + '?workspace=training'}>{label} →</Link>)}
+          {links.map(({ to, label }) => <Link key={to} to={to + '?workspace=training'}>{label}<ArrowRight size={14} aria-hidden="true" /></Link>)}
         </div>
       </section>)}
     </div>
