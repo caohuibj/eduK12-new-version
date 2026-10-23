@@ -27,7 +27,7 @@ type Wave={id:string;title:string;ordinal:number;status:string;consentText:strin
   groupIpPolicy?:{schemaVersion:1;timeZone:string;activationDate?:string}|null;groupIpActivatedAt?:string|null}
 type StudyInfo={project:{name:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:string};waves:Wave[];scopeWaveId?:string|null}
 type Choice={optionKey:string;label:string;nonanswerReason?:'DECLINED'|'UNABLE_TO_JUDGE'}
-type Question=SurveyScaleMedia&{responseOptions?:Choice[];itemKey:string;questionKey?:string;type:string;prompt:string;image?:SurveyPublicImage;required:boolean;
+type Question=SurveyScaleMedia&{materials?:PublicMaterial[];responseOptions?:Choice[];itemKey:string;questionKey?:string;type:string;prompt:string;image?:SurveyPublicImage;required:boolean;
   options:Choice[];rows?:{rowKey:string;label:string}[];allowRefusal?:boolean;displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string};
   min?:number;max?:number;integerOnly?:boolean;step?:number;precision?:number;
   maxLength?:number;minSelections?:number;maxSelections?:number;
@@ -174,6 +174,7 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
       id={'survey-answer-'+unit.instrumentKey+'-'+q.itemKey} tabIndex={-1} key={q.itemKey}>
       <legend className="font-medium text-sm">{q.prompt}{q.required?' *':''}</legend>
       {unit.kind==='SCALE'&&proof&&<SurveyCatalogScaleMedia item={q} proof={proof} instrumentKey={unit.instrumentKey} itemKey={q.itemKey} complete={videoComplete?.[q.itemKey]} onComplete={()=>onVideoComplete?.(q.itemKey)} onImagesReadyChange={ready=>onImageReadyChange?.(q.itemKey,ready)} readOnly={readOnly}/>}
+      {q.materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item} proof={proof}/>)}
       {q.image&&proof&&<SurveyParticipantImage image={q.image} proof={proof}/>}
       {q.type==='MULTIPLE'&&q.maxSelections!==undefined&&<p className="text-xs mb-2">
         请选 {q.minSelections??1} 至 {q.maxSelections} 项。</p>}

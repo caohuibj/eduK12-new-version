@@ -1,3 +1,4 @@
+import type {AssessmentMaterial} from '../../assessment-media/material'
 /** Frontend-only Form contracts. Image metadata belongs to the consuming product,
  * so draft types accept it as a type parameter rather than importing product code.
  * The legacy refusal key is part of the existing answer protocol and stays intact.
@@ -7,7 +8,7 @@ export type Condition={itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:str
 export type FormQuestion<TImage>={
   itemKey:string;type:'SINGLE'|'MULTIPLE'|'SHORT_TEXT'|'LONG_TEXT'|'NUMBER'|'LIKERT'|'MATRIX'|
     'DATE'|'TIME'|'RANK_ORDER'|'SLIDER'|'CONSTANT_SUM'|'MATRIX_MULTIPLE';
-  prompt:string;image?:TImage;required:boolean;allowRefusal?:boolean;options:Option[];rows:{rowKey:string;label:string}[];
+  prompt:string;image?:TImage;materials?:AssessmentMaterial[];required:boolean;allowRefusal?:boolean;options:Option[];rows:{rowKey:string;label:string}[];
   min?:number;max?:number;integerOnly?:boolean;step?:number;precision?:number;
   maxLength?:number;total?:number;minSelections?:number;maxSelections?:number;
   timeZone?:'Asia/Shanghai'|'UTC';textValidation?:'EMAIL'|'DIGITS'|'ALPHANUMERIC';

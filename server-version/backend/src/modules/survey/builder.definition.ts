@@ -38,7 +38,7 @@ export const scaleDraftSchema=z.object({
   }).strict()).max(20),
   aggregation:z.enum(['sum','mean']),
   items:z.array(z.object({
-    itemKey:key,prompt:note,required:z.boolean(),
+    itemKey:key,prompt:note,required:z.boolean(),materials:materialListSchema.optional(),
     purpose:scaleItemPurposeSchema.optional(),attentionTarget:key.optional(),
     reverse:z.boolean(),dimensionKeys:z.array(key).max(20),
   }).strict()).max(240),

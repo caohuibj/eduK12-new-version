@@ -49,7 +49,7 @@ export async function getOwnResearchTask(input:{
       return {kind:'FORM',instrumentKey:unit.instrumentKey,title:unit.title,...(materialListSchema.optional().parse((unit.displayDefinition as {materials?:unknown}).materials)?.length?{materials:materialListSchema.parse((unit.displayDefinition as {materials:unknown}).materials).map(publicMaterial)}:{}),
         pages:d.pages.map(page=>({pageKey:page.pageKey,title:page.title,...(page.description?{description:page.description}:{}),
           questions:page.questions.map(q=>({
-            itemKey:q.itemKey,type:q.type,prompt:q.prompt,image:projectPublicSurveyImage(q.image),required:q.required,allowRefusal:q.allowRefusal===true,
+            itemKey:q.itemKey,type:q.type,prompt:q.prompt,...(q.materials?{materials:q.materials.map(publicMaterial)}:{}),image:projectPublicSurveyImage(q.image),required:q.required,allowRefusal:q.allowRefusal===true,
             options:q.options.map(o=>({optionKey:o.optionKey,label:o.label})),
             rows:q.rows.map(row=>({rowKey:row.rowKey,label:row.label})),
             min:q.min,max:q.max,integerOnly:q.integerOnly,step:q.step,precision:q.precision,
@@ -65,7 +65,7 @@ export async function getOwnResearchTask(input:{
       return {kind:'SCALE',instrumentKey:unit.instrumentKey,title:unit.title,...(materialListSchema.optional().parse((unit.displayDefinition as {materials?:unknown}).materials)?.length?{materials:materialListSchema.parse((unit.displayDefinition as {materials:unknown}).materials).map(publicMaterial)}:{}),
         presentationMode:d.presentationMode??'ALL_AT_ONCE',
         responseOptions:d.responseOptions.map(o=>({optionKey:o.optionKey,label:o.label})),
-        items:d.items.map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required,
+        items:d.items.map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required,...(q.materials?{materials:q.materials.map(publicMaterial)}:{}),
           responseOptions:scalePresentationOptions(d,q).map(o=>({optionKey:o.optionKey,label:o.label})),
           ...('images' in q&&q.images?{images:[...q.images].sort((a,b)=>a.order-b.order).map(image=>projectPublicSurveyImage(image))}:{}),
           ...('video' in q&&q.video?{video:q.video}:{})}))}

@@ -1,3 +1,4 @@
+import {stimulusMaterials} from '../assessment-media/material'
 import {prisma} from '../../config/database'
 import {retainAssessmentAssetReferences} from '../assessment-media/assessment-asset'
 import {publishScaleMeasurement,surveyScaleReleaseContext} from '../measurement-content/scale'
@@ -15,7 +16,7 @@ export async function publishToolMeasurement(actorId:string,templateId:string,re
     if(row.status!=='DRAFT'||row.revision!==revision)throw new SurveyBuilderError(409,'工具状态或修订已变化，请重新读取后发布')
     if(row.kind!=='SCALE')throw new SurveyBuilderError(400,'目前仅自建量表支持共用库申请；表单和组合问卷的审核流程尚未开放')
     const media=row.definition as {materials?:unknown[];rawScoreFeedback?:{rules:Array<{ranges:Array<{materials?:unknown[]}>;fallback?:{materials?:unknown[]}}>}}
-    if(media.materials?.length||media.rawScoreFeedback?.rules.some(rule=>rule.ranges.some(range=>range.materials?.length)||rule.fallback?.materials?.length))
+    if(stimulusMaterials(row.definition).length||media.rawScoreFeedback?.rules.some(rule=>rule.ranges.some(range=>range.materials?.length)||rule.fallback?.materials?.length))
       throw new SurveyBuilderError(400,'通用展示素材可随研究发布；公共库的附件审核目前仅支持原有图片协议，请勿将视频、文档或通用展示素材提交公共库')
     const unit=compileFrozenResearchUnit({id:row.id,instrumentKey:'library_tool',kind:row.kind,title:row.title,revision:row.revision,definition:row.definition})
     const references=await assertSurveyMediaOwned(tx,actorId,row.id,[{kind:unit.kind,definition:unit.displayDefinition,compiledDefinition:unit.compiledDefinition}],true)

@@ -1,3 +1,6 @@
+import {authorizedTrainingMaterial} from '../modules/assessment-media/training-materials'
+import {serveAssessmentMaterial} from '../modules/assessment-media/material-delivery'
+import {materialSchema} from '../modules/assessment-media/material'
 import { Router } from 'express'
 import { Prisma } from '@prisma/client'
 import { z } from 'zod'
@@ -16,6 +19,7 @@ const router = Router()
 router.use(authenticate, requireTeacher)
 export const workspaceQuery = z.object({
   keyword: z.string().trim().max(200).default(''),
+  usage:z.enum(['library','assessment']).default('library'),
   kind: z.string().max(24).default('all'), source: z.enum(['all','owned','granted']).default('all'),
   page: z.coerce.number().int().min(1).max(500).default(1),
   pageSize: z.coerce.number().int().min(1).max(40).default(12),
@@ -30,7 +34,7 @@ const handle = (fn: (req: any) => Promise<unknown>) => async (req: any, res: any
 const mediaRows = Prisma.sql`SELECT a.id, a.id AS "assetId", a.original_name AS "originalName",
   COALESCE(v.title,d.title,a.original_name,'未命名媒体') AS name,
   a.owner_id AS "ownerId", a.mime_type AS "mimeType", a.size_bytes AS size, a.created_at AS "updatedAt",
-  a.provider, a.access_scope AS "accessScope", a.deleted_at AS "deletedAt",
+  a.sha256 AS "contentHash", a.provider, a.access_scope AS "accessScope", a.deleted_at AS "deletedAt",
   CASE WHEN a.mime_type LIKE 'image/%' THEN 'image' WHEN a.mime_type LIKE 'video/%' THEN 'video' ELSE 'document' END AS kind
   FROM stored_assets a JOIN users u ON u.id=a.owner_id
   LEFT JOIN videos v ON v.original_asset_id=a.id LEFT JOIN documents d ON d.asset_id=a.id`
@@ -39,6 +43,10 @@ router.get('/media', handle(async req => {
   const filter = Prisma.sql`${mediaLibraryFilter} AND (a.owner_id=${actor} OR (${mediaGrantFilter(actor)}))`
   const where = Prisma.sql`POSITION(LOWER(${q.keyword}) IN LOWER(r.name))>0
     AND (${q.kind}='all' OR r.kind=${q.kind})
+    AND (${q.usage}='library' OR (r."contentHash" ~ '^[a-f0-9]{64}$' AND r.size>0 AND (
+      (r."mimeType" IN ('image/png','image/jpeg','image/webp') AND r.size<=2097152) OR
+      (r."mimeType" IN ('video/mp4','video/webm') AND r.size<=52428800) OR
+      (r."mimeType"='application/pdf' AND r.size<=20971520))))
     AND (${q.source}='all' OR (${q.source}='owned' AND r."ownerId"=${actor}) OR (${q.source}='granted' AND r."ownerId"<>${actor}))`
   const [list, count] = await prisma.$transaction([
     prisma.$queryRaw<any[]>(Prisma.sql`WITH r AS (${mediaRows} WHERE ${filter}) SELECT * FROM r WHERE ${where} ORDER BY "updatedAt" DESC,id LIMIT ${q.pageSize} OFFSET ${(q.page-1)*q.pageSize}`),
@@ -47,6 +55,13 @@ router.get('/media', handle(async req => {
   return { list: list.map(row => ({ ...row, source: row.ownerId === actor ? 'owned':'granted', url: signKnownAsset(row) })),
     total: Number(count[0]?.total || 0), page:q.page, pageSize:q.pageSize, hasMore:q.page*q.pageSize<Number(count[0]?.total || 0) }
 }))
+router.get('/media/:id/content',async(req:any,res:any,next:any)=>{
+  try{
+    const assetId=z.string().uuid().parse(req.params.id)
+    const asset=await prisma.$transaction(db=>authorizedTrainingMaterial(db,req.user.userId,assetId))
+    await serveAssessmentMaterial(materialSchema.shape.asset.parse({assetId:asset.id,contentHash:asset.sha256,mimeType:asset.mimeType}),res)
+  }catch(cause){if(cause instanceof z.ZodError)return error(res,'素材参数无效',-1,400);if((cause as {statusCode?:number}).statusCode)return error(res,(cause as Error).message,-1,(cause as {statusCode:number}).statusCode);next(cause)}
+})
 router.patch('/media/:id/name', handle(async req => {
   const { name } = z.object({ name:z.string().trim().min(1).max(160).refine(value => !/[\\/\0]/.test(value)) }).strict().parse(req.body)
   // Lock the exact asset while updating the display metadata in related libraries.

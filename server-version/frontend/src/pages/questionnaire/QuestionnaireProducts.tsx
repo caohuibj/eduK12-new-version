@@ -1,3 +1,4 @@
+import {TrainingMaterialPicker} from '../../modules/assessment-media/TrainingMaterialPicker'
 import { FormTemplatePicker } from './FormTemplatePicker'
 import { FormTemplateWorkspace } from './FormTemplateWorkspace'
 import {useFormPendingBuffers} from '../../modules/assessment-core/form/useFormBulkDraft'
@@ -922,8 +923,10 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
 {detail && user?.id && draft && detail.questionnaireType === 'COURSE' && (detail.questionnaireCourses || []).some((link: any) => catalog.courses.some((course: any) => course.id === link.courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)) && <TrainingContentSelection key={JSON.stringify([user.id,detail.id])} actorId={user.id} detail={detail} disabled={busy||dirty||reportBlocked||!!pendingMeasurement} recoveryDisabled={busy||dirty||reportState.busy} onSaved={hydrate} onRiskChange={selectionRiskChanged}/>}
       {detail && user?.id && detail.questionnaireType === 'COURSE' && (detail.questionnaireCourses || []).some((link: any) => catalog.courses.some((course: any) => course.id === link.courseId && course.courseType === 'TRAINING_COURSE' && !course.isLibrary)) && <TrainingReportStudio disabled={busy || dirty || selectionBlocked || !!pendingMeasurement} onLeaveRiskChange={reportRiskChanged} actorId={user.id} compositeId={detail.id} courses={(detail.questionnaireCourses || []).flatMap((link: any) => { const course = catalog.courses.find((row: any) => row.id === link.courseId && row.courseType === 'TRAINING_COURSE' && !row.isLibrary); return course ? [{id:course.id,title:course.title}] : [] })}/>}
   </>
+  const formMaterials = formType!=='year_month'&&!contextKey&&<details><summary>题目素材 · 图片、视频、文档</summary><TrainingMaterialPicker label="题目展示素材" value={formConstraints.materials} disabled={busy||authoringLocked} onChange={materials=>{setFormConstraints(previous=>({...previous,materials}));if(materials.length)setPolicyEnabled(true)}}/></details>
   const formRules = <>
-                      {formType!=='year_month'&&!contextKey ? <label className="block"><input type="checkbox" checked={policyEnabled} onChange={e=>{setPolicyEnabled(e.target.checked);if(!e.target.checked)setFormConstraints(previous=>({...previous,allowRefusal:undefined,displayIf:undefined,otherOptionKey:undefined,otherMaxLength:undefined,exclusiveOptionKeys:undefined}))}}/>{trainingDesign ? '启用条件显示、拒答等规则' : '启用新表单策略（V3）'}</label>:null}
+
+                      {formType!=='year_month'&&!contextKey ? <label className="block"><input type="checkbox" checked={policyEnabled} disabled={!!formConstraints.materials?.length} onChange={e=>{setPolicyEnabled(e.target.checked);if(!e.target.checked)setFormConstraints(previous=>({...previous,allowRefusal:undefined,displayIf:undefined,otherOptionKey:undefined,otherMaxLength:undefined,exclusiveOptionKeys:undefined}))}}/>{trainingDesign ? '启用条件显示、拒答等规则' : '启用新表单策略（V3）'}</label>:null}
                       {policyEnabled && <fieldset className="space-y-3 rounded border p-3"><legend>{trainingDesign ? '本题规则' : '本次新发布的表单策略'}</legend>
                         <label className="block"><input type="checkbox" checked={formConstraints.allowRefusal===true} onChange={e=>setFormConstraints(previous=>({...previous,allowRefusal:e.target.checked}))}/>允许明确拒答</label>
                         <label className="block">必答拒答<select aria-label="必答拒答" value={requiredRefusal} onChange={e=>setRequiredRefusal(e.target.value as typeof requiredRefusal)}><option value="BLOCK_SUBMIT">拒答后不能交卷</option><option value="ALLOW_SUBMIT">允许交卷但不达成任务</option></select></label>
@@ -1107,6 +1110,7 @@ export function QuestionnaireProductEdit({ formTemplate = false }: { formTemplat
                           {formRules}
                         </div>
                       </details> : formRules}
+                      {formMaterials}
                       {typedFormType && <BasicFormConstraints question={{ ...formConstraints, type: typedFormType }} onChange={patch => setFormConstraints(previous => ({ ...previous, ...patch }))} />}
                       {typedFormType && <StructuredFormConstraints question={{ ...formConstraints, type: typedFormType }} onChange={patch => setFormConstraints(previous => ({ ...previous, ...patch }))} />}
                       {['matrix', 'matrix_multiple'].includes(formType) && (trainingDesign

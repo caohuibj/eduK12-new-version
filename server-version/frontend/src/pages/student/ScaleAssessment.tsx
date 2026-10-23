@@ -1,3 +1,5 @@
+import {TrainingMaterials} from '../../modules/assessment-media/TrainingMaterialPicker'
+import type {PublicMaterial} from '../../modules/assessment-media/material'
 import { useTrainingLearnerNavigation } from '../../training/learnerNavigation'
 import { isTrainingHost } from '../../training/context'
 import { useScaleAutoAdvance } from '../../hooks/useScaleAutoAdvance'
@@ -43,6 +45,7 @@ type ScaleFinalPayload = {
 }
 
 interface ScaleRunnerItem {
+  materials?:PublicMaterial[]
   itemCode: string
   content: string
   type: string
@@ -671,6 +674,7 @@ const ScaleAssessment: React.FC = () => {
             <h2 ref={allAtOnce ? undefined : autoSelection.headingRef} tabIndex={allAtOnce || isTrainingHost() ? -1 : undefined} id={`scale-question-${item.itemCode}`} className="mt-2 text-lg font-semibold leading-relaxed text-slate-900">{item.content}</h2>
           </div>
 
+          <TrainingMaterials items={item.materials} loadAsset={loadAssessmentImage}/>
           <AssessmentImageGate items={images} loadAsset={loadAssessmentImage} disabled={savingAnswer || submitting || autoSelection.busy} ariaLabel={`${item.content} 视觉内容`}>
             <ScaleFormVideoGate
               presentation={video}

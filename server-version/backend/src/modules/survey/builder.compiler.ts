@@ -46,7 +46,7 @@ export function compileResearchScale(title:string,input:unknown):ScaleDefinition
       value:x.optionKey,label:x.label,score:x.score,
     }))}],
     items:d.items.map((q,i)=>({
-      itemCode:q.itemKey,content:q.prompt,type:'single',required:q.required,
+      itemCode:q.itemKey,content:q.prompt,type:'single',required:q.required,...(q.materials?{materials:q.materials}:{}),
       ...(q.purpose?{purpose:q.purpose}:{}),...(q.attentionTarget!==undefined?{attentionTarget:q.attentionTarget}:{}),
       sortOrder:i,responseSetKey:'research_options',randomizeOptions:false,
     })),

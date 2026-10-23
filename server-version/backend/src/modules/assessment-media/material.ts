@@ -16,3 +16,9 @@ export const materialListSchema=z.array(materialSchema).max(10).superRefine((ite
 })
 export type AssessmentMaterial=z.infer<typeof materialSchema>
 export const publicMaterial=(item:AssessmentMaterial)=>({asset:item.asset,name:item.name,...(item.caption?{caption:item.caption}:{})})
+
+/** Traverse only declared stimulus locations, never report feedback or arbitrary JSON. */
+export function stimulusMaterials(definition:unknown):AssessmentMaterial[]{
+  const d=definition as {materials?:unknown;items?:Array<{materials?:unknown}>;pages?:Array<{questions?:Array<{materials?:unknown}>}>}
+  return [d?.materials,...(d?.items??[]).map(item=>item.materials),...(d?.pages??[]).flatMap(page=>(page.questions??[]).map(item=>item.materials))].flatMap(value=>materialListSchema.optional().parse(value)??[])
+}

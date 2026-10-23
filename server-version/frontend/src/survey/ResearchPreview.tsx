@@ -88,6 +88,7 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath,focus
       className="border rounded-lg p-3 my-3 bg-white scroll-mt-5">
       <legend className="font-medium text-sm">{q.prompt||'未填写题干'} {q.required?'*':''}</legend>
       {picture(q.image)}
+      {q.materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item}/>)}
       {['SINGLE','LIKERT'].includes(q.type)&&q.options.map(o=><label key={o.optionKey} className="flex gap-2 items-center my-2">
         <input type="radio" checked={answers[q.itemKey]===o.optionKey} name={q.itemKey}
           onChange={()=>choose(q.itemKey,o.optionKey)}/>{o.label||'未填写选项'}</label>)}

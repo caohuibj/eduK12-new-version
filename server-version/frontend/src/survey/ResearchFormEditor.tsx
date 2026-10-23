@@ -1,3 +1,4 @@
+import {SurveyMaterialPicker} from './SurveyMaterialPicker'
 import type { ReactNode } from 'react'
 import { SurveyFormStudio } from './SurveyFormStudio'
 import { StructuredFormConstraints } from '../modules/assessment-core/form/StructuredFormConstraints'
@@ -100,6 +101,7 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,bulkPendi
             <textarea className="input w-full block" rows={questionKey?3:2} placeholder={questionKey?'请输入题目内容':undefined} value={q.prompt}
               onChange={e=>setQuestion(pi,qi,x=>({...x,prompt:e.target.value}))}/>
           </label>
+          {projectId&&<details className="survey-form-question-settings"><summary>题目素材 · 图片、视频、文档</summary><SurveyMaterialPicker label="题目展示素材" value={q.materials} onChange={materials=>setQuestion(pi,qi,x=>({...x,materials}))}/></details>}
           <div className={questionKey?'survey-form-question-switches':'flex gap-4 flex-wrap'}>
             <label className="inline-flex items-center gap-2 text-sm"><input type="checkbox" checked={q.required}
               onChange={e=>setQuestion(pi,qi,x=>({...x,required:e.target.checked}))}/>必答</label>

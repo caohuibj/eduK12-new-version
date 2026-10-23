@@ -1,3 +1,4 @@
+import {TrainingMaterials} from '../modules/assessment-media/TrainingMaterialPicker'
 import { TrainingCheckpointPanel } from '../modules/composite/TrainingCheckpointPanel'
 import {TrainingTimingBoundary,restoreTrainingTiming} from '../modules/scale/TrainingTimingBoundary'
 import {SurveyScaleTimingTracker,sealObservedScaleTimings} from '../modules/scale/item-timing'
@@ -616,7 +617,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
             const imageItems = assessmentOptionImageItems(options)
             const videoEntries = formOptionVideoPresentations(options)
             return (
-              <AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${field.label} 选项视觉内容`}>
+              <div key={field.formItemId}><TrainingMaterials items={field.formDefinition?.materials} loadAsset={loadAssessmentImage}/><AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${field.label} 选项视觉内容`}>
                 <FormOptionVideoGroupGate
                   entries={videoEntries}
                   loadSources={(entry) => loadCompositeVideoCapability(`${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/form-sections/${encodeURIComponent(sectionId || item.id)}/items/${encodeURIComponent(field.formItemId)}/options/${entry.optionIndex}/video-capability`)}
@@ -650,7 +651,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                     submitting={submitting}
                   />
                 </FormOptionVideoGroupGate>
-              </AssessmentImageGate>
+              </AssessmentImageGate></div>
             )
           })()}
         </div>
@@ -670,7 +671,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
             const imageItems = assessmentImageItems(question.images)
             const videoPresentation = scaleItemVideoPresentation(question)
             return (
-              <AssessmentImageGate key={question.itemCode} items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${question.content} 视觉内容`}>
+              <div key={question.itemCode}><TrainingMaterials items={question.materials} loadAsset={loadAssessmentImage}/><AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${question.content} 视觉内容`}>
                 <ScaleFormVideoGate
                   presentation={videoPresentation}
                   loadSources={() => loadCompositeVideoCapability(`${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/items/${encodeURIComponent(item.id)}/scale/items/${encodeURIComponent(question.itemCode)}/video-capability`)}
@@ -697,7 +698,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                     submitting={submitting}
                   />); if (allScaleItems) return <div onFocusCapture={() => activateQuestion(question.itemCode)} onPointerDownCapture={() => activateQuestion(question.itemCode)}>{player}</div>; return item.trainingTiming&&timingRef.current ? <TrainingTimingBoundary tracker={timingRef.current} itemKey={question.itemCode} locked={draftLocked||submitting||exiting} onTiming={rows=>{if(draftKey&&!draftLocked&&!submitting&&!exiting)void scheduleLocalSave('scale-timing',()=>finalDraftStore.setInstrumentMetadata(draftKey,{trainingScaleTiming:{snapshotHash:item.trainingTiming!.snapshotHash,items:rows}}).then(()=>undefined)).catch(()=>undefined)}}>{player}</TrainingTimingBoundary>:player })()}
                 </ScaleFormVideoGate>
-              </AssessmentImageGate>
+              </AssessmentImageGate></div>
             )
             }
             const activateQuestion = (key: string) => {

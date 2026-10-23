@@ -1,3 +1,4 @@
+import {TrainingMaterials} from '../modules/assessment-media/TrainingMaterialPicker'
 import { isTrainingHost } from '../training/context'
 import { TrainingCheckpointPanel } from '../modules/composite/TrainingCheckpointPanel'
 import {TrainingTimingBoundary,restoreTrainingTiming} from '../modules/scale/TrainingTimingBoundary'
@@ -278,6 +279,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
           <h2 className="mb-3 text-xl font-semibold">{current.unit.scale.name}</h2>
           {current.unit.scale.instruction ? <p className="mb-4 whitespace-pre-wrap text-slate-600">{current.unit.scale.instruction}</p> : null}
           <p className="mb-4 text-sm text-slate-600">整卷第 {index + 1} / {questions.length} 题</p>
+          <TrainingMaterials items={current.question.materials} loadAsset={loadImage}/>
           <AssessmentImageGate items={assessmentImageItems((current.question as { images?: unknown }).images)} loadAsset={loadImage} disabled={busy}>
             <ScaleFormVideoGate presentation={scaleItemVideoPresentation(current.question)} loadSources={() => requestAssessmentVideoCapabilities(`${unitPath}/items/${encodeURIComponent(current.question.itemCode)}/video-capability`, publicMode ? { headers: { 'X-Recovery-Token': recoveryToken || '' } } : undefined)}>
               {(()=>{const player=(<ScalePlayer scopeKey={`${draftKey}:${current.unit.itemId}:${checkpointRestoreGeneration}`} autoAdvance={isTrainingHost() && !publicMode} item={current.question} value={answers[wholeAnswerKey(current.unit.itemId, current.question.itemCode)]?.responseValue}

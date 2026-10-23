@@ -1,3 +1,4 @@
+import {publicMaterial} from '../assessment-media/material'
 /** Training adapter for the shared Form definition and answer contracts.
  * The database ID addresses a module; itemKey belongs to its immutable definition.
  * Advanced authoring and V3 display/refusal policy are enabled in later units.
@@ -118,4 +119,11 @@ export const normalizeTypedCompositeSection = (items: CompositeSectionItem[], pr
     const payloadValue = rowStates ? Object.fromEntries(q.rows.flatMap(row => rowStates[row.rowKey] === 'REFUSED' ? [[row.rowKey, {_surveyRefusal:true}]] : value && typeof value === 'object' && Object.prototype.hasOwnProperty.call(value,row.rowKey) ? [[row.rowKey,(value as Record<string,unknown>)[row.rowKey]]] : [])) as TypedFormValue : state === 'REFUSED' ? {_surveyRefusal:true} as const : value
     return [item.id, { normalizedValue:value, storedValue:state==='ANSWERED'?legacyFormValueProjection(value):null, completed:state==='ANSWERED', state, ...(rowStates ? {rowStates}:{}), ...(otherText!==undefined?{otherText}:{}), qualifies, payloadValue }]
   }))
+}
+
+/** Author rights remain in the frozen definition; participant payloads omit them. */
+export function publicTrainingFormDefinition(value:unknown){
+  if(!value||typeof value!=='object')return value
+  const definition=value as FormQuestion
+  return {...definition,...(definition.materials?{materials:definition.materials.map(publicMaterial)}:{})}
 }

@@ -1,5 +1,5 @@
 import {ownedScope} from './material-scope'
-import {materialListSchema,materialLimits,type AssessmentMaterial} from '../assessment-media/material'
+import {materialListSchema,materialLimits,stimulusMaterials,type AssessmentMaterial} from '../assessment-media/material'
 import {authorizedLibraryUnitMedia,type LibraryBoundMediaUnit} from '../scale-library-governance/media.authorization'
 import { rawScoreFeedbackImages } from '../scale/scale-image-retention'
 import type { RawScoreFeedback } from '../scale/raw-score-feedback'
@@ -51,7 +51,7 @@ export async function assertSurveyMediaOwned(tx:Tx,userId:string,projectId:strin
   const materials=nativeUnits.flatMap(unit=>{
     if(!['FORM','SCALE'].includes(unit.kind))return []
     const d=unit.definition as {materials?:AssessmentMaterial[];rawScoreFeedback?:{rules:Array<{ranges:Array<{materials?:AssessmentMaterial[]}>;fallback?:{materials?:AssessmentMaterial[]}}>}}
-    return [...(d.materials??[]),...(d.rawScoreFeedback?.rules.flatMap(rule=>[...rule.ranges,...(rule.fallback?[rule.fallback]:[])].flatMap(range=>range.materials??[]))??[])]
+    return [...stimulusMaterials(d),...(d.rawScoreFeedback?.rules.flatMap(rule=>[...rule.ranges,...(rule.fallback?[rule.fallback]:[])].flatMap(range=>range.materials??[]))??[])]
   })
   for(const material of materials){
     const checked=materialListSchema.parse([material])[0]

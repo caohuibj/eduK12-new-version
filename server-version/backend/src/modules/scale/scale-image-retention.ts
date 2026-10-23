@@ -1,3 +1,5 @@
+import {assertTrainingMaterialsUsable} from '../assessment-media/training-materials'
+import type {Prisma} from '@prisma/client'
 import { prisma } from '../../config/database'
 import type { AssetDatabase } from '../../services/assetStorage'
 import {
@@ -18,6 +20,12 @@ import type { VersionedFrozenScaleRuntimeSnapshot } from '../assessment-runtime/
 import type { RawScoreFeedback } from './raw-score-feedback'
 import type { ScaleDefinitionV2 } from './scale-definition'
 
+export const scaleMaterialLists=(definition:ScaleDefinitionV2)=>[
+  ...definition.items.map(item=>item.materials),
+  ...(definition.report.rawScoreFeedback?.rules.flatMap(rule=>[...rule.ranges,...(rule.fallback?[rule.fallback]:[])].map(content=>content.materials))??[]),
+]
+export const scaleStimulusMaterialReferences=(definition:ScaleDefinitionV2)=>definition.items.flatMap(item=>item.materials??[]).map(item=>item.asset)
+export const scaleReportMaterialReferences=(definition:ScaleDefinitionV2)=>definition.report.rawScoreFeedback?.rules.flatMap(rule=>[...rule.ranges,...(rule.fallback?[rule.fallback]:[])].flatMap(content=>content.materials??[])).map(item=>item.asset)??[]
 export const scaleAssessmentImageReferences = (definition: ScaleDefinitionV2) => (
   definition.items.flatMap((item) => assessmentImageAssetReferences(item.images))
 )
@@ -32,9 +40,14 @@ export const scaleReportImageReferences = (definition: ScaleDefinitionV2) => (
   assessmentImageAssetReferences(rawScoreFeedbackImages(definition.report?.rawScoreFeedback))
 )
 export const assertScaleReportImagesOwned = async (
-  definition: ScaleDefinitionV2, ownerId: string, db: AssetDatabase = prisma,
+  definition: ScaleDefinitionV2, ownerId: string, db: AssetDatabase = prisma, requireRights=false,
 ): Promise<void> => {
   const references = scaleReportImageReferences(definition)
+  const lists=scaleMaterialLists(definition)
+  if(lists.some(list=>list?.length)){
+    if(db===prisma)await prisma.$transaction(tx=>assertTrainingMaterialsUsable(tx,ownerId,lists,requireRights))
+    else await assertTrainingMaterialsUsable(db as unknown as Prisma.TransactionClient,ownerId,lists,requireRights)
+  }
   if (!references.length) return
   const ids = [...new Set(references.map(reference => reference.assetId))]
   const assets = await db.storedAsset.findMany({
@@ -55,6 +68,8 @@ const scaleAssessmentVideoReferencesForRetention = (definition: ScaleDefinitionV
 
 export const scaleAssessmentMediaReferences = (definition: ScaleDefinitionV2) => ([
   ...scaleAssessmentImageReferences(definition),
+  ...scaleStimulusMaterialReferences(definition),
+  ...scaleReportMaterialReferences(definition),
   ...scaleReportImageReferences(definition),
   ...scaleAssessmentVideoReferencesForRetention(definition),
 ])

@@ -1,3 +1,5 @@
+import {TrainingMaterials} from '../assessment-media/TrainingMaterialPicker'
+import type {PublicMaterial} from '../assessment-media/material'
 import { useCallback, useMemo } from 'react'
 import { sessionFetch } from '../../api/client'
 import { useAssessmentImageAssets } from '../assessment-media/useAssessmentImageAssets'
@@ -14,6 +16,7 @@ export function TrainingRawScoreFeedback({ entries, assessmentId, labels, loadRe
     <div className="report-feedback-list">{entries.map(entry => <article className="report-feedback" key={entry.scoreKey}>
       <h4>{labels[entry.scoreKey] || '本次结果'}</h4>
       <p className="whitespace-pre-line leading-relaxed">{entry.text}</p>
+      {!!entry.materials?.length&&<FeedbackMaterials items={entry.materials} assessmentId={assessmentId} loadReportImage={loadReportImage}/>}
       {entry.images?.length ? <FeedbackImages images={entry.images} assessmentId={assessmentId} loadReportImage={loadReportImage} /> : null}
     </article>)}</div>
   </ReportSection>
@@ -35,4 +38,15 @@ function FeedbackImages({ images, assessmentId, loadReportImage }: { images: Raw
     <img src={state.urls[image.asset.assetId]} alt={image.altText} className="max-h-96 max-w-full object-contain" />
     {image.caption && <figcaption className="text-sm text-gray-600">{image.caption}</figcaption>}
   </figure>)}</div>
+}
+
+function FeedbackMaterials({items,assessmentId,loadReportImage}:{items:PublicMaterial[];assessmentId?:string;loadReportImage?:(assetId:string)=>Promise<Blob>}){
+  const load=useCallback(async(assetId:string)=>{
+    if(loadReportImage)return loadReportImage(assetId)
+    if(!assessmentId)throw new Error('当前报告未提供素材访问标识')
+    const response=await sessionFetch(`/api/scales/assessments/${encodeURIComponent(assessmentId)}/report-assets/${encodeURIComponent(assetId)}`)
+    if(!response.ok)throw new Error('反馈素材暂时无法读取')
+    return response.blob()
+  },[assessmentId,loadReportImage])
+  return <TrainingMaterials items={items} loadAsset={load}/>
 }

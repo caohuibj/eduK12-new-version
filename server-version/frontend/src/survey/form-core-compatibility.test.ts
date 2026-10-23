@@ -14,7 +14,7 @@ import type { ConditionalFormItem } from './form-visibility'
 type ExistingFormQuestion={
   itemKey:string;type:'SINGLE'|'MULTIPLE'|'SHORT_TEXT'|'LONG_TEXT'|'NUMBER'|'LIKERT'|'MATRIX'|
     'DATE'|'TIME'|'RANK_ORDER'|'SLIDER'|'CONSTANT_SUM'|'MATRIX_MULTIPLE';
-  prompt:string;image?:SurveyImage;required:boolean;allowRefusal?:boolean;
+  prompt:string;image?:SurveyImage;materials?:import('../modules/assessment-media/material').AssessmentMaterial[];required:boolean;allowRefusal?:boolean;
   options:{optionKey:string;label:string;score?:number}[];rows:{rowKey:string;label:string}[];
   min?:number;max?:number;integerOnly?:boolean;step?:number;precision?:number;
   maxLength?:number;total?:number;minSelections?:number;maxSelections?:number;

@@ -16,7 +16,7 @@ export type ScaleDraft={
   aggregation:'sum'|'mean';
   totalScore?:{key:string;label:string;itemKeys:string[];aggregation:'sum'|'mean'};
   rawScoreFeedback?:import('../modules/scale/rawScoreFeedback').RawScoreFeedback;
-  items:{itemKey:string;prompt:string;required:boolean;reverse:boolean;dimensionKeys:string[];purpose?:'CONTENT'|'ATTENTION_CHECK'|'SOCIAL_DESIRABILITY';attentionTarget?:string}[]
+  items:{materials?:AssessmentMaterial[];itemKey:string;prompt:string;required:boolean;reverse:boolean;dimensionKeys:string[];purpose?:'CONTENT'|'ATTENTION_CHECK'|'SOCIAL_DESIRABILITY';attentionTarget?:string}[]
 }
 export type SjtDraftV1={
   schemaVersion:1;respondentType:'student_self_report'|'teacher_self_report';

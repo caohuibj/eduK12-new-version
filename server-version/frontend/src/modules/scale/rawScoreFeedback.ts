@@ -1,9 +1,9 @@
-import type {AssessmentMaterial} from '../assessment-media/material'
+import type {AssessmentMaterial,PublicMaterial} from '../assessment-media/material'
 import type { AssessmentImagePresentationItem } from '../assessment-media/types'
 
 export type RawScoreFeedbackImage = AssessmentImagePresentationItem & { order: number }
 export type RawScoreFeedbackContent = { text: string; materials?:AssessmentMaterial[]; images?: RawScoreFeedbackImage[] }
-export type MatchedRawScoreFeedback = RawScoreFeedbackContent & { scoreKey: string; rangeKey: string | null }
+export type MatchedRawScoreFeedback = Omit<RawScoreFeedbackContent,'materials'> & { materials?:PublicMaterial[];scoreKey: string; rangeKey: string | null }
 export type RawScoreFeedbackRange = RawScoreFeedbackContent & { key: string; min: number; max: number; includeMax: boolean }
 export type RawScoreFeedbackRule = { scoreKey: string; ranges: RawScoreFeedbackRange[]; fallback?: RawScoreFeedbackContent }
 export type RawScoreFeedback = { schemaVersion: 1; rules: RawScoreFeedbackRule[] }

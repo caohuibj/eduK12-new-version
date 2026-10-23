@@ -1,10 +1,11 @@
+import {serveAssessmentMaterial} from '../modules/assessment-media/material-delivery'
 import { loadScaleAssessmentForResponse } from '../modules/scale/scale-workflow.service'
 import { assertTrainingChildSelected, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../modules/composite/training-variant-child-scope'
 import { trainingFeedbackAttemptSelect, trainingFeedbackParentSelect } from '../modules/composite/training-feedback-binding'
 import { isLoadedCompositeParticipantFeedbackDeferred } from '../modules/assessment-policy/participant-feedback'
 import { isRelationalCohortOnlyCompositeAttempt } from '../modules/assessment-relational/result-authority'
 import { serveAssessmentImageContent } from '../modules/assessment-media/assessment-image-delivery'
-import type { RawScoreFeedbackMatch } from '../modules/scale/raw-score-feedback'
+import type { PublicRawScoreFeedbackMatch } from '../modules/scale/raw-score-feedback'
 import { assertScaleReportImagesOwned } from '../modules/scale/scale-image-retention'
 import { publishScaleMeasurement } from '../modules/measurement-content/scale'
 import { Prisma } from '@prisma/client'
@@ -50,7 +51,9 @@ export const scaleImageController = {
       if (assessment.compositeAttemptId && await isLoadedCompositeParticipantFeedbackDeferred(assessment.compositeAttempt)) return forbidden(res, '报告尚未开放')
       if (await isRelationalCohortOnlyCompositeAttempt(assessment.compositeAttemptId)) return forbidden(res, '个人报告不可访问')
       const projected = await loadScaleAssessmentForResponse(assessment)
-      const feedback: RawScoreFeedbackMatch[] = projected.report?.rawScoreFeedback ?? []
+      const feedback: PublicRawScoreFeedbackMatch[] = projected.report?.rawScoreFeedback ?? []
+      const material=feedback.flatMap(item=>item.materials??[]).find(item=>item.asset.assetId===req.params.assetId)
+      if(material){await serveAssessmentMaterial(material.asset,res);return undefined}
       const image = feedback.flatMap(item => item.images ?? []).find(item => item.asset.assetId === req.params.assetId)
       if (!image) return notFound(res, '报告图片不可访问')
       await serveAssessmentImageContent({ reference: image.asset, res })
@@ -82,7 +85,7 @@ export const scaleImageController = {
       const definitionHash = hashScaleDefinition(definition)
       const updated = await prisma.$transaction(async (tx) => {
         const checkedCopySource = await assertScaleCopyPublishSource(tx, scale)
-        await assertScaleReportImagesOwned(definition, scale.creatorId, tx as never)
+        await assertScaleReportImagesOwned(definition, scale.creatorId, tx as never, true)
         await retainScaleAssessmentImages({
           owner: publishedScaleMediaOwner(scale.id, definitionHash),
           definition,
