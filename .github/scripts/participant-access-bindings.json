@@ -1,0 +1,360 @@
+{
+  "schema": 1,
+  "base": "3c8b0ad97f664b10fb0abcb5884606c18f9ac4be",
+  "product": "93009c77695de55107cde22f11421b114daa50d0",
+  "source": {
+    "docs/performance/participant-access-20261023.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9ec5f98aeb968bb0bb158230bf898a3b46269160"
+    },
+    "docs/performance/participant-access-20261023.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5bfd0e90e3067bc3c79f38bca57bfa63eade15bd"
+    },
+    "docs/performance/teacher-authoring-20261023.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "26028c3690b8bff41a4d80a02be568f842d8e5de"
+    },
+    "docs/performance/teacher-authoring-20261023.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "bd8fd3c16f3cd1a3795dd908472839d10e26b433"
+    },
+    "server-version/backend/src/__tests__/controllers/assignmentExport.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "779122e4af65c4330d39f14efad8714cd45df1d1"
+    },
+    "server-version/backend/src/__tests__/controllers/checkinExport.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6e84692a605c901c89a7f72e219a523fb6e00295",
+      "after": "62516ece958e581649a7608a7fe9d99249e3e236"
+    },
+    "server-version/backend/src/controllers/assignmentController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6bcc42ed90aaff0f49a855457f47954f484a90ae",
+      "after": "3da77c9677f87d95cbb5888df9b6c0a7a30731c3"
+    },
+    "server-version/backend/src/controllers/checkinController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9b5442fd4efa0c073fdba0260e6fa870b16eccb5",
+      "after": "e8f0bd67be843f301f86d72c2d1e1eada101be2b"
+    },
+    "server-version/frontend/src/App.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "01263259cf45e58bf27ee0ff72054ff5749a6346",
+      "after": "302cbf0d64f396c331fd2202cd01aa2794a9415f"
+    },
+    "server-version/frontend/src/components/DeferredMediaSelector.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "87a25fc5d27e413ea5d1b158526f9505de7e4f57"
+    },
+    "server-version/frontend/src/components/__tests__/DeferredMediaSelector.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "55d4ed0d5a22c20dda79a2d76e498097976eebf0"
+    },
+    "server-version/frontend/src/components/app-shell/AppShell.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2a69237afc7224de34e73928c441a003b3e8c009",
+      "after": "0165e812627e2d111f210ca31cb4df310889c945"
+    },
+    "server-version/frontend/src/contexts/AuthContext.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "49290c7a270cbec7fea1c7622ec72ad8828d00cb",
+      "after": "0668d733b7eeb2f4b864033677677b0937e80d9c"
+    },
+    "server-version/frontend/src/contexts/__tests__/AuthContext.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "52fd3c8f13d378b268173c8228a2942be2734d76",
+      "after": "2f8c7fa80a4426f16ca162c816e329d2e463443c"
+    },
+    "server-version/frontend/src/hooks/__tests__/useTaskExport.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7639bd53ff5acf20151c6c163392fe587af40c84"
+    },
+    "server-version/frontend/src/hooks/useTaskExport.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "8850276a745f1d6830b280b18718f7fc78df9c0f"
+    },
+    "server-version/frontend/src/modules/composite/TypedFormExportActions.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2c01bb0496bf6f737fc6d5a27d8654f5a4960f22",
+      "after": "f4311697735fa33144c04137680b478a346c422d"
+    },
+    "server-version/frontend/src/modules/composite/__tests__/TypedFormExportActions.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "63398417461763ebf5dc492568a0c6a8673def99",
+      "after": "436d416a26549a91521b35aca891516ffa7bcc38"
+    },
+    "server-version/frontend/src/pages/AssignmentList.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2f3dbde3095fa768263138e25911598b9e66d840",
+      "after": "59c654c529db4901456a70091dd14e603969745f"
+    },
+    "server-version/frontend/src/pages/CheckinList.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b8b79532fd2bfaa6c9b9530153a8298d1e887470",
+      "after": "0f7b45026fd1ec7d068af4a8a23e3feba9280116"
+    },
+    "server-version/frontend/src/pages/ScaleEdit.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "fd3a48d9656fe16df35673895c05b1dfec48fb76",
+      "after": "368f2f2d92d188c3aa769f1c9a62e3180d9ff9f6"
+    },
+    "server-version/frontend/src/pages/ScaleEditDefinition.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "550bc8406e61c0dca7528f2c1eca27bb82521a03"
+    },
+    "server-version/frontend/src/pages/__tests__/AssignmentList.course-workspace.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f027322135be8dc71409b3b1b3dc6ca38ff0778b",
+      "after": "0138f8784e6ac890f4870303e36661345d1df3e5"
+    },
+    "server-version/frontend/src/pages/__tests__/CheckinList.course-workspace.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "36a907329a8868363168fc5121a77d6db84f420c",
+      "after": "fa3c3dd00429994bc3ae15ee015ffc7a74354a23"
+    },
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.paste.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3668b7119341d21d2da6dc4c433eca5fa53e9fe0",
+      "after": "e093d44c0676cbedc2a8d122aba4aa955750f6b4"
+    },
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.pending-navigation.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2dfe20ae6fd6137e8b06b867149d9b694992b9e0",
+      "after": "b83f507a4e56b2d740f5322d23f189f7cd51c3b9"
+    },
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.persistence-boundaries.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c86d93907fe84e8f0bf0cea6e6af55628a4be75c",
+      "after": "c66066feee60ad840824cff6746eed176441542d"
+    },
+    "server-version/frontend/src/pages/__tests__/ScaleEdit.scoring-save.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3904dc06cbf058f9912770a21dfed78d1fa1ae6b",
+      "after": "ee34902eaf2eb60f49c9ddd4778a0a433a8d2c00"
+    },
+    "server-version/frontend/src/pages/questionnaire/QuestionnaireProducts.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6eadfb2a2d788767f4af5e54773f410efa1b3e6b",
+      "after": "5b0cd1e3d1daf4ae67296e7d719980bafa931c01"
+    },
+    "server-version/frontend/src/pages/student/AssignmentSubmit.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7b12c1387f385a97626aef5f015fad8d0dfe7965",
+      "after": "94562e6cb2d7b82f7a204bd53e59d4aec15a0729"
+    },
+    "server-version/frontend/src/pages/student/CheckinSubmit.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b2aa739b6105b0445e6e081113bcf86cb59fcf33",
+      "after": "18b8b8f908a85378f08a66c5b56c3fc7112c0fb4"
+    },
+    "server-version/frontend/src/pages/student/__tests__/AssignmentSubmit.review.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f7f0572d9c9eadf777672f062bfc9cd77d19b90c",
+      "after": "ca647eacf03852af9baa7340bfc73015f2ad834e"
+    },
+    "server-version/frontend/src/pages/student/__tests__/CheckinSubmit.accessibility.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d07f998b67ce9290c01f3c174b01ff581c35676f",
+      "after": "9362ebf8dcd02424066d88b0ef0e41291c65a3d0"
+    },
+    "server-version/frontend/src/survey/SurveyApp.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f2340e3bc8533846d640d3a9209e7fd56f060ffb",
+      "after": "33b823efa443445aa5c788b7f5bf3912cbc94f83"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.cognitive.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "95ba964ffe2ddef1c0f6defcd7580ccf7de6d126",
+      "after": "304e60de1a596d76fc6c7aabaef94b8c8c725093"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8423294846c52e25e4d2be59760bafe021666d06",
+      "after": "05b02ff1e47fccf55d3d6ffbe86a6e79144fa92f"
+    },
+    "server-version/frontend/src/training/TrainingCoursePages.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "53475365c7ea34251c30ed9700746ebb626578d6",
+      "after": "bbbfc46f0fa349ffe4ba204b80778db254870b57"
+    },
+    "server-version/frontend/src/training/TrainingLearnerCourse.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f3135d02e4576dbb63776565ff40375802ccf14a",
+      "after": "4f26330e7a24f6676c6482a3bacc5e5d59e2d7fe"
+    },
+    "server-version/frontend/src/training/TrainingLibrary.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b87d4b9e01783d5f09b316d37a363ac58d9577a6",
+      "after": "20890501d54a1f8c1f764aa58134048a1820b2be"
+    },
+    "server-version/frontend/src/training/TrainingTrainerCourse.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "630fd268c2d2c8312c2bbb4a5f82f88d9473371c",
+      "after": "e27415ef936f7d4daa01cf1a761379afc4643809"
+    },
+    "server-version/frontend/src/utils/__tests__/exportJobs-recovery.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ff89bbd9de5e948f4cf1cbfb172d3c42be60c2de",
+      "after": "1934a65cd6e746b27f004a5003ba019f8d6830ac"
+    },
+    "server-version/frontend/src/utils/exportJobs.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "454f6fb53d30e2d4cd8325f9917846ce73b8becd",
+      "after": "9b4d5e47f927f7fdc2ddc89255c6d2166aa45331"
+    }
+  },
+  "controls": [
+    ".github/scripts/participant-access-scope.mjs",
+    ".github/scripts/participant-access-checks.mjs",
+    ".github/scripts/participant-access.test.mjs",
+    ".github/scripts/participant-access-bindings.json",
+    ".github/evidence/participant-access/reviewed-local.json",
+    ".github/workflows/ci-participant-access.yml",
+    ".github/workflows/ci.yml",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    "docs/release/README.md"
+  ],
+  "controlBefore": {
+    ".github/workflows/ci.yml": "064068243cd0534c15d371ad49e50ff848e48d97",
+    ".github/scripts/content-scope.mjs": "e077c7b3abd845027a02b440c89c9f4a43647656",
+    ".github/scripts/merge-gate.mjs": "98bf3995c2f40b0a9d8f163a6aa2e360fce9789d",
+    "docs/release/README.md": "51a0ba482ab5567f57cfed97ae1e2f8ce3942b83"
+  },
+  "components": {
+    "frontend": "60d24ebb0c36055d5a8d4bc5ceec55dc91f3898b",
+    "backend": "e82fa9e456d5b02c840f823ab7d03d6d47e4aeb4"
+  },
+  "protectedInputs": {
+    "AGENTS.md": "592945af44a0bf72761f2ceb34386c87adc08fb3",
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "server-version/frontend/tsconfig.json": "1ffef600d959ec9e396d5a260bd3f5b927b2cef8",
+    "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7",
+    "server-version/backend/package.json": "033398f6361b0e4217226ae00f2edc2ed3380ecd",
+    "server-version/backend/package-lock.json": "73607721290dd28f1c6f85d5e12d5d517926ede3",
+    "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
+    "server-version/backend/vitest.config.ts": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406",
+    "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
+    "server-version/frontend/tsconfig.cognitive.json": "910e97700f25652bc1d80ada47e176cbd51c2fbe",
+    "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22",
+    "server-version/frontend/eslint.config.js": "4e89832bf4d92a5e1ba1815aad2ade6c9a65c3a1",
+    "server-version/frontend/src/test/setup.ts": "3217d9d84ea1285cf3495e27669a88e3fe7d2cf3",
+    "server-version/backend/prisma/schema.prisma": "aca635e128f3327a71064f575795f1835a40fea9"
+  },
+  "evidenceSHA256": "a8de3ad7d5458be39ffc3ebc825a53830ef2745c935e976dcd9c3295ba6a61e9",
+  "acceptedCases": 208,
+  "missingCases": 123,
+  "audit": {
+    "source": "c3c04e125d497017ebc0769689fcdd8a55236a46",
+    "run": 39946962495,
+    "job": 120392089185,
+    "artifact": 12497439959,
+    "bytes": 2035,
+    "sha256": "616991b34af8a385a43d902564743a0d1e07b712837dd8f8e7dc3b27892f3f03",
+    "name": "school-teacher-audit-1ee11051e28248daf3a5b5507d40a248b615bea2",
+    "inputs": [
+      "server-version/frontend/package.json",
+      "server-version/frontend/package-lock.json",
+      "server-version/backend/package.json",
+      "server-version/backend/package-lock.json",
+      ".github/scripts/school-teacher-checks.mjs",
+      ".github/workflows/ci-school-teacher.yml"
+    ]
+  }
+}

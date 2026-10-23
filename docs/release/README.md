@@ -1095,3 +1095,43 @@ The stable ready gate requires scope, the complete nested training-manual-ui
 workflow and CodeQL success on the exact current source; missing, skipped, failed
 and cancelled selected stages block. Exact main push only classifies. At five
 minutes report the actual waiting stage; retry only affected or missing inputs.
+
+
+## Participant access exact merge qualification (2026-10-23)
+
+Only `work/participant-access-20261023`, main base
+`3c8b0ad97f664b10fb0abcb5884606c18f9ac4be` and application product
+`93009c77695de55107cde22f11421b114daa50d0` use `participant-access`.
+Complete raw paths, modes, before/after blobs, both component trees, dependency
+inputs, actual PR source and checkout tree must match. Unknown changes, missing
+markers, manual/full/probe requests and base drift fail without platform fallback.
+
+Reviewed local assertions retain original reports, failed invocations and filtered
+rechecks. They remain `reviewed-local-evidence`, `ciExecuted=false`,
+`originalExecutionSigned=false`; Git anchors and import closures were reconstructed
+during review, not signed at execution. The initial authoring reporter precedes
+five test-only asynchronous locator repairs: only those failed cases use the
+filtered recheck; successful case bodies and fixtures were unchanged. Historical
+complete node_modules byte identity was not recorded. Empty compiler logs alone
+are not execution evidence; the final frontend type result includes the actual
+observed execution-tool exit receipt, explicitly saved retrospectively.
+
+CI verifies those exact receipts and their current imported inputs. Cases whose
+imported modules changed after their earlier local result execute once in Actions;
+current accepted cases do not rerun. Current HIGH/CRITICAL production lock audits
+reuse the exact successful official School/Teacher security job and authenticated
+artifact, unchanged package/lock/audit program inputs, original stage results,
+ZIP SHA-256 and a 24-hour lifetime. Missing or altered evidence stops admission.
+New scope/evidence/refusal contracts and changed application/control JS/TS SAST
+execute in Actions. Backend production compilation emits the first merge-candidate
+backend artifact; earlier local non-emitting type checks are not relabeled as it.
+No full regression, DB/migration/restore, load/media tests or production images
+are selected. Local browser measurements remain bounded synthetic observations.
+
+The existing stable `merge gate / ready PR` recomputes the full plan and requires
+actual scope, participant qualification and CodeQL success. Draft, missing,
+skipped, failed or cancelled selected results cannot qualify. Main merge only
+classifies the same frozen diff without repeating application work. This route
+authorizes merge qualification only: no production deployment or production
+artifact/security certification is claimed. Report the actual waiting phase at
+about five minutes; do not append unrelated checks.
