@@ -1,0 +1,148 @@
+{
+  "status": "BOUNDED_CHECKS_PASSED_NOT_FULL_CI",
+  "date_utc": "2026-10-23",
+  "base_commit": "d33b70b1",
+  "node": "24.19.0",
+  "scope": "SEC-SJT DRAFT only; no shared runtime changes",
+  "source_inputs_sha256": {
+    "server-version/backend/src/modules/situational/instruments/sec-sjt-zh-hans/1.0.0/instrument.json": "a699bdf75ae2712915caa50580335327912f59475c4a2ab92f0228a21b611091",
+    "server-version/backend/src/modules/situational/instruments/sec-sjt-zh-hans/1.0.0/publication.json": "7f13aa3a89032d7ab474f6d0fa0c412fa0d4b5e6aa7f1f9ab75fc3914ba143d3",
+    "server-version/backend/src/modules/situational/instruments/sec-sjt-zh-hans/1.0.0/scientific.json": "51034de62d1fe6b06a3411137dfce675f8617d99cb974d26c5481382c0c93c65",
+    "docs/public-library/sjt/sec-sjt/sec-sjt.zh-Hans-working.json": "3573847bbdfdd0d3936b59ffd340e257152c9b6da7f574de7a65c132ef4fe547",
+    "docs/public-library/sjt/sec-sjt/instructions.de-zh-Hans.json": "1e6293e681709ac868a51f3869c3f2762124e4a36a6e9029033487b3d7deed36",
+    "server-version/backend/src/modules/assessment-governance/scientific-maturity.ts": "cadef7312021a52de9f1caadf5557b6bf51e6a9e361dcfbfac75659b19a0ef09",
+    "server-version/backend/src/modules/situational/onboarding/scientific-schema.ts": "4e641d95fe291f06f5b3a883122fc2dc66b1e1a2ef786d7b6c95561504593366",
+    "server-version/backend/src/modules/situational/situation-scientific-contract.ts": "c2010f48c3ba35c3c4c3adf6976598f6e7d83cb3051afb556562892a030149e2",
+    "server-version/backend/src/modules/assessment-media/assessment-asset-identity.ts": "1fc3935d4b329989280dcb8e8464e8791e1134fcbb98951662d18378b5dd44c1",
+    "server-version/backend/src/modules/assessment-media/assessment-image.ts": "00acb1f2aaaffb4dbfbf990f82042834a63830418aa68a026ae0aba3dbf74fe1",
+    "server-version/backend/src/modules/assessment-media/assessment-video.ts": "46aab4aa9395d27a4f5cf14e01c175323422712ebbf656d30f50c198ab71edd5",
+    "server-version/backend/src/modules/situational/situation-definition.ts": "ff20244907886d083ec0f724a24ce3ccc46d4a89a1e23ec6611cb07d545d444d",
+    "server-version/backend/src/modules/situational/situation-scientific-validation.ts": "29716bdd0a5eb380e84370edb7b8ddec3dd7485b7d2047ad97e2c669790de09f",
+    "server-version/backend/src/modules/situational/situation-branching.ts": "3ee11726c8d26e2290c43a0317531d7a17803e02707eb1320cf7cb7139253cd2",
+    "server-version/backend/src/modules/assessment-runtime/canonical.ts": "e469eb794eadd6596cb0c4531dd6b6b256c8c176eac657ee20d5982f8e217066",
+    "server-version/backend/src/modules/situational/onboarding/schema.ts": "60ebf9eec3157bea991a6984719fdfe60791931e6c725235987ff04f4a7b4922",
+    "server-version/backend/src/modules/assessment-core/definition-primitives.ts": "779117cbdd076a448afc1b468d5a10037c8e1fb850686f13a2e01a2ff7e546b5",
+    "server-version/backend/src/modules/assessment-core/sjt/definition.ts": "fc7f91e611a2b48d3e0334bcb0946a22f442ac83ecf4b34aa23a6cb3607a3a4b",
+    "server-version/backend/src/modules/assessment-core/sjt/selection.ts": "ac8abaea269dbe888fbd72477119ee9545bc6d0fb57d18c0892aabb54bb2ff7f",
+    "server-version/backend/src/modules/assessment-core/sjt/structure.ts": "00b064c8c131391e409bc6e914a6a7ebcf691850342d7c26e1f4444478fbf692",
+    "server-version/backend/src/modules/assessment-core/sjt/compiler.ts": "d6d83bc427bcc4c33bffb083c0956711ac6ad088896047425a1c7f41e6a332e0",
+    "server-version/backend/src/modules/assessment-core/sjt/validation.ts": "82d4e3c57f6757c1ee6178a36a604e3a9a61d812b91ecedfc6ebb10368bf26e5",
+    "server-version/backend/src/modules/situational/situation-scoring.ts": "8213485115e7f5f8a90eb12be24f8a774ed74245245f6694fca404c85fe02844",
+    "server-version/backend/src/modules/situational/situation-model-resolver.ts": "4d39d1b07c4a09956a548c287955df33b2ebe58f77ccb4d38ede8b9ff8548eea",
+    "server-version/backend/src/modules/situational/situation-runtime-definition.ts": "4d852a9fbf1b77c7c21e1e38d22a451911461f3e53c115f381c2a825be1dd99a",
+    "server-version/backend/src/modules/assessment-core/sjt/runtime.ts": "37613c4ffaf7a0af38f833830cf467b4f7b45b75d3998fed532a81d111f71e93",
+    "server-version/backend/src/modules/situational/situation-trajectory.ts": "24b9c653fee0c590fb4c885333d80566d8a975d3fa261d376a4fa050f1b0d76d",
+    "server-version/backend/src/modules/situational/authoring/template.ts": "46c1de5fc13472f525230ad805ae64030123d3d163c32dd1d5f7e8f5aacfb84e",
+    "server-version/backend/src/modules/situational/authoring/online.ts": "40925afd9bf8d38d7c15e562aab9c1e2c0c47c712d203ed53c203b72dc352b9e",
+    "server-version/backend/src/modules/situational/situation-package.ts": "2c3568fcac0353e4762a3cd5386e18c2f2a812b56212d4e2b777e2de134b0548",
+    "server-version/backend/src/modules/assessment-governance/operational-hold.ts": "425f53d9b1b5e2dc68446580e85106a89ea39c8adb2c0106ebb1d2112e7dd7d6",
+    "server-version/backend/src/modules/situational/instruments/sjt-anxiety-golden/1.0.0/instrument.json": "7422392e272c355825a1e7f854d01b037228afd3fe384321fd62b2ae87b3428c",
+    "server-version/backend/src/modules/situational/instruments/sjt-anxiety-golden/1.0.0/publication.json": "7837b6f9de1efad261b8418833fb7567da0a7038d6380ae21e15fae3e7f8e3f3",
+    "server-version/backend/src/modules/situational/instruments/sjt-anxiety-golden/1.0.0/scientific.json": "88023cd5d3dbfa95aee7f56b62509df8d43c808f24c767e2354e2f3ebc1a9f4d",
+    "server-version/backend/src/modules/situational/instruments/sjt-assertiveness-golden/1.0.0/instrument.json": "e0ef7c315cf42db521ba9d9fc19b4a11408473f487c2bd0f2e9ad1811214f1fb",
+    "server-version/backend/src/modules/situational/instruments/sjt-assertiveness-golden/1.0.0/publication.json": "1470f0ff5394ac6e9441016a6b3b8b2dabb55b7ff684e6675a54368ec264dbed",
+    "server-version/backend/src/modules/situational/instruments/sjt-assertiveness-golden/1.0.0/scientific.json": "88023cd5d3dbfa95aee7f56b62509df8d43c808f24c767e2354e2f3ebc1a9f4d",
+    "server-version/backend/src/modules/situational/instruments/sjt-responsibility-golden/1.0.0/instrument.json": "105b7cec8f5a5ba1937586a8d926eb56f0e1ff36b9eed8152323bd4279531d87",
+    "server-version/backend/src/modules/situational/instruments/sjt-responsibility-golden/1.0.0/publication.json": "70b5dae8e9de65228696bedec4cc4b1678c88bbddd055417a19110176f705ff7",
+    "server-version/backend/src/modules/situational/instruments/sjt-responsibility-golden/1.0.0/scientific.json": "88023cd5d3dbfa95aee7f56b62509df8d43c808f24c767e2354e2f3ebc1a9f4d",
+    "server-version/backend/src/modules/situational/onboarding/instruments.generated.ts": "53918fddb2edc6c43ef28e2ad41f2a774191c4223cf9f95b72fc3cad6b99d78a",
+    "server-version/backend/src/modules/assessment-media/material.ts": "04f489b6a0df7a05be5e6627084233e7c2dd2c911032598c76d1ed60a4a23a5f",
+    "server-version/backend/src/modules/assessment-media/assessment-image-presentation.ts": "69e686e9fb501950d928f4b074acdd07f28a603ef817921b95e02f8671829a38",
+    "server-version/backend/src/modules/scale/raw-score-feedback.ts": "3a9d99d7086c1659ea6d212c3a6277d08c64d28f5873138b62521b3d5234fbe4",
+    "server-version/backend/src/modules/scale/library/audience-report-gate.ts": "eae74de499e5710826bf9d65b203cbae6e3d9795652148a8a87136a371813ed6",
+    "server-version/backend/src/modules/scale/scale-definition.ts": "8136925d8a6b99827da7abd68683d2f7de7cd06353105a246216eab920cfdaba",
+    "server-version/backend/src/modules/cognitive/v2/presentation.ts": "95841697a6ce8afdc241c567d63602b8a9c2043f1b7bb02d151b550ba77e1b7d",
+    "server-version/backend/src/modules/assessment-runtime/compiler.ts": "c0e2fc116e5a7c77e5c390b208027a1252fbfa78955c709678205720fec2d880",
+    "server-version/backend/src/modules/situational/onboarding/publication-gate.ts": "52c95ea6799b84bb7cb824ce74135ad07a7abd23ced3983297e094eeb836c580",
+    "server-version/backend/src/modules/situational/onboarding/migration-releases.json": "31674663a2efba83521b1df981daff495831bbec18bbdb73384aaadbba88b69e",
+    "server-version/backend/src/modules/situational/onboarding/instrument-registry.ts": "6cb2c5d9ebad732d4a18a1ce744a2096301565b1034c2a3225109e47f885e2e7",
+    "server-version/backend/src/modules/situational/packages/sjt-assertiveness-golden-zh-cn-v1.ts": "0b0a22960e5230ec1290c35389bb243b98ebb0c8fef289357f07c22caae7662b",
+    "server-version/backend/src/modules/situational/fixtures/standardized-e2e-fixture.ts": "2a2cef4c730853d4324206d5f9bebf175870c148c1568b208109a77d06d5c386",
+    "server-version/backend/src/modules/situational/packages/sjt-static-visual-e2e-fixture.ts": "2e7289530f5f33ec9bff13591b3bba9baa5a41fe8f1fc2b7bc6daa0613b900e7",
+    "server-version/backend/src/modules/situational/packages/sjt-branching-e2e-fixture.ts": "2b3cd22dd6c0ffbfe7ea77b3d1a82f6a9857dac34f9cc49c475d8c7e61ef335e",
+    "server-version/backend/src/modules/situational/packages/sjt-video-e2e-fixture.ts": "492acb1a4f1e3e49bc65fc8da0c9e6c8ee2584008bfffd376f6d85fa1a0596cb",
+    "server-version/backend/src/modules/situational/fixtures/fixture-registry.ts": "ecee21b4066c35391bc1c5fde962b45546903c9e8d2363bcf6423c2e61d9dee1",
+    "server-version/backend/src/modules/situational/situation-package.registry.ts": "30db9f0a647a435dcdaac45aa7d26d21e1d5944470ea7ffc76332f7abdfbe1e2",
+    "server-version/frontend/src/modules/reporting/report-ui.css": "043340caa080d471d0faf2fc5fd69eec41ad8b87ba2ae71f4a1fa18b9aa42eec",
+    "server-version/frontend/src/modules/reporting/ReportPrimitives.tsx": "da85f924d440dee5bcab93b1e053c8bdaeeb1f76aa83708e74db12f90419426b",
+    "server-version/frontend/src/modules/reporting/SituationalReportCard.tsx": "308044cc2a96231bf2209141afe7b6181b1b972636486b648222a62274247af8",
+    "server-version/backend/scripts/public-library/sec-sjt-contract.tsx": "007fca35a286cff225a0051de2a2072c4de0ab8f57b8b88a73cd62bd07bdf346"
+  },
+  "dependency_context": {
+    "backend": "reused /tmp/education-authoring-deps-20261023/backend/node_modules",
+    "frontend": "reused /tmp/education-authoring-deps-20261023/frontend/node_modules",
+    "installed_or_updated": false,
+    "formal_CI_attestation": false
+  },
+  "executions": [
+    {
+      "stage": "initial core plus SSR",
+      "exit_code": 1,
+      "core_assertions": "Passed before first SSR render: source schema/package validation, 10/50 mapping, DRAFT selector rejection, original golden totals, 5 practice choices, each 10 formal omissions, all missing, FINAL raw-practice isolation, invalid/duplicate response rejection and runner key exclusion. Not a successful whole invocation.",
+      "failure": "SSR ReferenceError: React is not defined in ReportCoreSummary because exploratory esbuild omitted jsx=automatic. No product defect claimed."
+    },
+    {
+      "stage": "new independent oracle",
+      "exit_code": 0,
+      "command": "SEC_SJT_CHECK_GROUP=independent node /tmp/sec-sjt-contract-20261023.cjs",
+      "checks": {
+        "option_metric_cells": 50,
+        "single_option_perturbed_totals": 50,
+        "all_possible_totals": 11,
+        "fixed_NEXT_order": true
+      }
+    },
+    {
+      "stage": "SSR focused rerun with jsx=automatic",
+      "exit_code": 0,
+      "command": "SEC_SJT_CHECK_GROUP=report node /tmp/sec-sjt-contract-20261023.cjs",
+      "checks": {
+        "numeric_and_null_render": true,
+        "range_0_10": true,
+        "population_and_license_notice": true,
+        "scoring_key_not_rendered": true
+      }
+    },
+    {
+      "stage": "generated manifest check and git diff check",
+      "exit_code": 0
+    }
+  ],
+  "original_source_reinspection": {
+    "official_manual_license_page": 4,
+    "manual_missing_rules_pages": [
+      42,
+      43,
+      44
+    ],
+    "materials_key_visual_page": 39,
+    "workbook_sheet": "SEC-SJT Auswertungsbogen",
+    "workbook_cells": "BD41:BM41",
+    "key_1based": [
+      3,
+      4,
+      2,
+      1,
+      4,
+      3,
+      3,
+      3,
+      2,
+      3
+    ],
+    "local_original_hashes_matched": true
+  },
+  "survey_adaptation_status": "BLOCKED: current catalog.sources.ts rejects optional or RAW_ONLY; source protocol intentionally preserved",
+  "not_claimed": [
+    "full core group rerun after grouping-only harness edit",
+    "application typecheck/lint",
+    "browser acceptance",
+    "DB/FINAL transaction",
+    "Chinese validation",
+    "human scientific approval",
+    "CI",
+    "publication",
+    "Survey import usability",
+    "Notion write/readback this phase"
+  ]
+}

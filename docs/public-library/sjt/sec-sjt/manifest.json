@@ -1,0 +1,137 @@
+{
+  "instrument_id": "SEC-SJT",
+  "content_version": "research-draft-2026-10-21-r2",
+  "repository_stage": "2026-10-23-draft-standalone",
+  "release_status": "DRAFT",
+  "survey_import_status": "UNSUPPORTED_RAW_ONLY_AND_OPTIONAL_CHANNELS",
+  "license": "CC-BY-SA-4.0",
+  "content_origin_commit": "a5effd7f86249a77b7c82606130e5db6f89aae45",
+  "baseline_commit": "d33b70b1",
+  "files": [
+    {
+      "path": "ATTRIBUTION.md",
+      "sha256": "6b3e2d7a68360462a9ed5b9866446769249b2635a26a8e6fdd684a1e49eb55c5",
+      "bytes": 2629
+    },
+    {
+      "path": "LICENSE.md",
+      "sha256": "2d293173d799064cb94961ca0574a55eb33d61bd8bdb68fef61f9649d025b9a0",
+      "bytes": 3163
+    },
+    {
+      "path": "README.md",
+      "sha256": "83040269fef72b5797ed9ce6f24e1be1e646354cfad8ddce9d90b2264674a4de",
+      "bytes": 3660
+    },
+    {
+      "path": "REVIEW_SUMMARY.md",
+      "sha256": "21b8ce15ae4d6da60fbd5efedc0797d4d8534313e479bd1bd194568d0a4c4887",
+      "bytes": 2523
+    },
+    {
+      "path": "TRANSLATION_REVIEW.md",
+      "sha256": "2dac45c99b8c0a85426388f91a5605a05216695ff652f6047fe79241aa0faf9d",
+      "bytes": 6247
+    },
+    {
+      "path": "implementation-note.md",
+      "sha256": "6e7d6d939a16818f67320767b22ec12f8985a08748f871b43cc41acf8a7aaacc",
+      "bytes": 2913
+    },
+    {
+      "path": "instructions.de-zh-Hans.json",
+      "sha256": "1e6293e681709ac868a51f3869c3f2762124e4a36a6e9029033487b3d7deed36",
+      "bytes": 6498
+    },
+    {
+      "path": "notion-backup-evidence.json",
+      "sha256": "1e37707050627d18171cd2aa4f459095aae374cde9e2fbc4980d5face690fce1",
+      "bytes": 3425
+    },
+    {
+      "path": "report-copy.zh-Hans.json",
+      "sha256": "0f2e1f9af7e1511f40104028070ada98ce680f770ff78bd6892fab9411e49dd8",
+      "bytes": 2522
+    },
+    {
+      "path": "report-copy.zh-Hans.md",
+      "sha256": "3b14f2d66394421c1349d3b069d87365cf98c5e860a1315575543eb196f349f5",
+      "bytes": 2175
+    },
+    {
+      "path": "score_reference.py",
+      "sha256": "6708bec466c101f7b5d503de52ebf661122cde6a2dc99e75861fa3ea5af4737e",
+      "bytes": 1318
+    },
+    {
+      "path": "scoring-contract.json",
+      "sha256": "1e722149eb1b675455d89a3e2f9f01d5629ba67f9a16f626b8a7d20086f018c6",
+      "bytes": 8458
+    },
+    {
+      "path": "sec-sjt.bilingual.research-draft.json",
+      "sha256": "64b69dbb798ab887141120a3cf7d3ce0dd7e4c913849ed1ea0e042a8822a6375",
+      "bytes": 18380
+    },
+    {
+      "path": "sec-sjt.de-original.json",
+      "sha256": "c9c7e28a2f64f31835d757a63c190362bcef8f2935020d0b698676b51b8dd117",
+      "bytes": 11927
+    },
+    {
+      "path": "sec-sjt.de-zh-Hans.parallel.md",
+      "sha256": "7625b182cb0d209279797f553591b2d2769fa694ca6f51765a55ba8b0fc875f5",
+      "bytes": 14762
+    },
+    {
+      "path": "sec-sjt.zh-Hans-working.json",
+      "sha256": "3573847bbdfdd0d3936b59ffd340e257152c9b6da7f574de7a65c132ef4fe547",
+      "bytes": 12073
+    },
+    {
+      "path": "source-implementation-evidence.json",
+      "sha256": "e6100071e460e8d438358276cdb318917e5c095c44647103d3663ab2a1fc65f7",
+      "bytes": 12335
+    },
+    {
+      "path": "source-license-and-disclaimer-de.txt",
+      "sha256": "750a0233292b74e409f33f4b261cd632ede6bd887382e6f552a114af97dde467",
+      "bytes": 1437
+    },
+    {
+      "path": "source-provenance.json",
+      "sha256": "d978b2315a7eeed8c7030e18183cd1b2b5e44c75356cd942c3c08c71c8178660",
+      "bytes": 4794
+    },
+    {
+      "path": "source-quality-warnings.json",
+      "sha256": "43c5f27be5aa3190e222b15c64035e3c587a301bdf738edcd6dc5cc7ef029eb5",
+      "bytes": 3512
+    },
+    {
+      "path": "source-sec-sjt-pages-20-26-de.txt",
+      "sha256": "93d78d92f0628cafb772a4a202e214334f90399fc457b3ea3be4df39b65a0393",
+      "bytes": 9875
+    },
+    {
+      "path": "validation-results.json",
+      "sha256": "a4d53c4b3e8c3550b72448c14abdaffa51ca6dad96c3b7565884e6ef852a4867",
+      "bytes": 14293
+    }
+  ],
+  "historical_evidence": [
+    "validation-results.json",
+    "notion-backup-evidence.json",
+    "TRANSLATION_REVIEW.md",
+    "REVIEW_SUMMARY.md"
+  ],
+  "current_evidence": "source-implementation-evidence.json",
+  "notion_handled_by": "coordinator; no write in this stage",
+  "not_claimed": [
+    "production release",
+    "validated Chinese version",
+    "full CI",
+    "Survey import availability"
+  ],
+  "normalization_note": "Removed one trailing blank line from source-license-and-disclaimer-de.txt; German text unchanged."
+}

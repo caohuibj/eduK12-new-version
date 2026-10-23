@@ -1,0 +1,23 @@
+{
+  "schemaVersion": 1,
+  "scientificMaturity": "PILOT",
+  "governanceRevision": 1,
+  "claimScope": {
+    "language": "zh-Hans未验证工作初译，原版德文",
+    "population": "原15;0–24;11认知/心理障碍支持与职业准备人群，不能推广为普通青年或中国K12常模",
+    "use": "DRAFT研究讨论；非诊断/筛查/选拔",
+    "claim": "10正式题原key匹配次数，不提供常模解释"
+  },
+  "evidence": [],
+  "knownLimitations": [
+    "原版在德国 15 岁 0 个月至 24 岁 11 个月、有（亚）临床认知或心理障碍、尤其处于学习障碍支持及职业准备情境的青年中开发和常模化。便利样本为 306 人，内部一致性 α = .65，信度有限。本中文工作初译没有中国 K12 常模或本地效度证据。",
+    "不套用德国百分位，不使用原版 ≤5 分建议生成中文筛查结论，也不提供“正常／异常”“健康／不健康”等自动标签。",
+    "原适用人群年龄15岁0个月至24岁11个月，具有（亚）临床认知或心理障碍，特别是学习障碍支持/职业准备人群，不泛称普通青年或中国K12验证。",
+    "独立练习不计分；唯一原始总分0–10只计10正式题与原key的匹配数，不是健康、人格、现实行为或道德优劣程度。",
+    "任一正式题缺答则唯一总分null，不填0、不插补、不折算。有效但未匹配原key的回答记0，不与缺答混淆。",
+    "平台说明（新增，不是原作者指导语）：可以留空或退出；任一正式题缺答，本次不计算总分。界面的“可选”表示允许留空，不表示少答仍可评分。练习必须选择一项以熟悉操作，但不计分，没有练习答案key。原纸本每页2题，本数字草案每页1题，是分页改编，不声称与原纸本等同。无硬性限时，可以休息；本版是未经中文验证的工作初译。",
+    "原作：Daniel Wolf, Sarah Schneider, Astrid Schütz (2020), Otto-Friedrich-Universität Bamberg. https://doi.org/10.20378/irb-48863 。材料及本中文工作初译/数字改编采用CC BY-SA4.0 https://creativecommons.org/licenses/by-sa/4.0/ ，不是仓库MIT。修改：原SEC-SJT子集提取、AI辅助中文工作初译、逐题数字分页、平台留空说明及描述性报告；非原作者认可或验证的中文版，未声称人工双语审校。",
+    "未声明平台人工科学审核或新执行绑定资格；原N=306研究及α=.65引用保留，不否认原研究。"
+  ],
+  "changeReason": "Licensed BY-SA selected content and digital working adaptation; no human approval or Chinese validity claimed."
+}
