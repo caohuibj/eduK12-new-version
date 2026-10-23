@@ -3,7 +3,7 @@ vi.mock('../../../api/relational', () => ({ relationalApi: { catalog: async () =
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
+import { Link, MemoryRouter, Route, Routes, useLocation } from 'react-router-dom'
 import AppShell from '../AppShell'
 import { RouteAccess } from '../RouteAccess'
 import { readReauthReturn, rememberReauthReturn } from '../access'
@@ -65,15 +65,38 @@ beforeEach(() => {
 })
 
 describe('Survey administrator presentation',()=>{
+  it('keeps Survey tab branding through enrollment and clears it when leaving the Survey login context',async()=>{
+    auth.user=null
+    const icon=document.createElement('link');icon.rel='icon';icon.href='/vite.svg';document.head.append(icon)
+    try{
+      render(<MemoryRouter initialEntries={['/admin/login']}><AppShell>
+        <Link to="/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers">Survey 登录</Link>
+        <Link to="/admin/security/enroll?returnTo=%2Fadmin%2Fsurvey-researchers">Survey 绑定</Link>
+        <Link to="/admin/login">通用登录</Link>
+      </AppShell></MemoryRouter>)
+      expect(document.title).not.toBe('Research')
+      for(const name of ['Survey 登录','Survey 绑定']){
+        await userEvent.click(screen.getByRole('link',{name}))
+        expect(document.title).toBe('Research')
+        expect(icon).toHaveAttribute('href','/survey/huisurvey-w2-emblem.svg')
+      }
+      await userEvent.click(screen.getByRole('link',{name:'通用登录'}))
+      expect(document.title).not.toBe('Research')
+      expect(icon).toHaveAttribute('href','/vite.svg')
+    }finally{icon.remove()}
+  })
   it.each(['/admin/survey-researchers','/admin/scale-library-governance?workspace=survey'])(
     'keeps scoped management navigation on the canonical Training host at %s',path=>{
       presentation.training=true
       auth.user={id:'survey-manager',role:'STUDENT',businessRole:'STUDENT',username:'manager',platformRole:'STANDARD',entryGrants:[{entry:'SURVEY',version:1}]} as User
       render(<MemoryRouter initialEntries={[path]}><AppShell><p>研究管理内容</p></AppShell></MemoryRouter>)
       const navigation=screen.getByRole('navigation',{name:'主要导航'})
-      expect(navigation.querySelector('.hui-nav-group')).not.toBeNull()
-      expect(screen.getByRole('searchbox',{name:'查找管理页面'})).toBeInTheDocument()
-      expect(navigation).toHaveTextContent('Survey 研究管理')
+      expect(screen.queryByRole('searchbox',{name:'查找管理页面'})).not.toBeInTheDocument()
+      expect(navigation).toHaveTextContent('研究者与授权')
+      expect(navigation).toHaveTextContent('工具公库与审批')
+      expect(navigation).not.toHaveTextContent('Survey 首页')
+      expect(navigation.querySelector('a[href*="workspace=business"]')).toBeNull()
+      expect(screen.queryByText(/业务身份：/)).not.toBeInTheDocument()
       expect(navigation).not.toHaveTextContent('Training 培训管理')
       expect(navigation).not.toHaveTextContent('系统治理与入口授权')
     })
@@ -89,7 +112,7 @@ describe('Survey administrator presentation',()=>{
     expect(view.container.querySelector('.hui-survey-admin-shell')).not.toBeNull()
     expect(view.container.querySelector('.hui-training,.training-workspace-shell')).toBeNull()
     expect(screen.getByRole('banner').querySelector('.survey-brand img')).toHaveAttribute('src','/survey/huisurvey-w2-emblem.svg')
-    expect(screen.getByRole('contentinfo')).toHaveTextContent('Huisurvey · 观风知微')
+    expect(screen.getByRole('contentinfo')).toHaveTextContent('Research · 观风知微')
     expect(screen.getByRole('main')).toContainElement(screen.getByRole('heading',{name:'获授权的研究管理页面'}))
   })
   it.each([
@@ -104,7 +127,7 @@ describe('Survey administrator presentation',()=>{
     expect(view.container.querySelector('.hui-survey-admin-shell')).not.toBeNull()
     expect(view.container.querySelector('.hui-training')).toBeNull()
     expect(screen.getByRole('banner').querySelector('.survey-brand img')).toHaveAttribute('src','/survey/huisurvey-w2-emblem.svg')
-    expect(screen.getByRole('contentinfo')).toHaveTextContent('Huisurvey · 观风知微')
+    expect(screen.getByRole('contentinfo')).toHaveTextContent('Research · 观风知微')
     expect(screen.getByRole('main')).toContainElement(screen.getByRole('heading',{name:'既有管理内容'}))
   })
   it.each(['/admin/permissions?workspace=survey','/admin/training','/admin/scale-library-governance?workspace=training'])(
