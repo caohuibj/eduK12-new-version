@@ -193,30 +193,38 @@ export function verifyCompletedFrontendRemainder(read,b,previous){
 export function validateDistEntries(entries,kind='frontend'){assert(['frontend','backend'].includes(kind));
  assert(Array.isArray(entries)&&entries.length>0);const names=new Set();for(const e of entries){assert.equal(typeof e.name,'string');assert(!/[\x00-\x1f\x7f\\]/.test(e.name)&&!e.name.startsWith('/'));const parts=e.name.replace(/\/$/,'').split('/');assert(parts.every(p=>p&&p!=='.'&&p!=='..'));assert(!names.has(e.name));names.add(e.name);assert([0,0o100000,0o040000].includes(e.mode&0o170000),'Artifact special entries forbidden');assert.equal(e.encrypted,false)}assert(names.has(kind==='frontend'?'index.html':'index.js')&&names.has('ci-build-manifest.json'));return true;
 }
+export const RUN15_FRONTEND={run:39899292976,head:'051d8eb0f869c166b09739132ff8ea8e9a666613',checkout:'6337343de882ba07999a47c1f5a2c71a58b1a597',job:120237022790,buildArtifact:12478381269,buildDigest:'9d5d62c0f6279092502b76a880fedfbb600b8a590395a6d3adde0432756c1f83',buildSize:21208007,frontendTree:'4c089c44c21c156f416879896c41ade98c40309a',lockDigest:'ee290a304e22c10e760cc55eb55bb6815cb34fb57773c0af77985450306916fe',contentDigest:'3634f79f3b286012bb409e8b6e1de2f80e9d0ea3db6b4c59dee3c650e4270441'};
+export function verifyRun15FrontendJob(run,job,now=Date.now()){
+ assert.equal(run.id,RUN15_FRONTEND.run);assert.equal(run.head_sha,RUN15_FRONTEND.head);assert.equal(run.head_branch,'work/school-teacher-review-20261022');assert.equal(run.path,'.github/workflows/ci.yml');assert.equal(run.event,'pull_request');assert.equal(run.run_attempt,1);assert.equal(run.status,'completed');assert.equal(run.conclusion,'failure');assert(run.pull_requests.some(p=>p.number===338));
+ assert.equal(job.id,RUN15_FRONTEND.job);assert.equal(job.run_id,run.id);assert.equal(job.head_sha,run.head_sha);assert.equal(job.name,'school-teacher / frontend');assert.equal(job.status,'completed');assert.equal(job.conclusion,'success');const age=now-Date.parse(job.completed_at);assert(Number.isFinite(age)&&age>=0&&age<=86400000);
+ assert(job.steps.some(s=>s.name==='verify unchanged official frontend checks and build the exact CSS repair once'&&s.status==='completed'&&s.conclusion==='success'));
+}
 export function verifyFrontendBuildReceipt(r,{head,runId,manifest,lockDigest,contentDigest,frontendTree}){
- assert.equal(r.schemaVersion,1);assert.equal(r.status,'VERIFIED_OFFICIAL_FRONTEND_BUILD');assert.equal(r.currentHead,head);assert.equal(r.currentRun,runId);assert.equal(r.originalRun,COMPLETED_FRONTEND.run);assert.equal(r.originalHead,COMPLETED_FRONTEND.head);assert.equal(r.originalCheckout,COMPLETED_FRONTEND.checkout);assert.equal(r.originalJob,COMPLETED_FRONTEND.job);assert.equal(r.originalArtifact,COMPLETED_FRONTEND.buildArtifact);assert.equal(r.originalArtifactSha256,COMPLETED_FRONTEND.buildDigest);assert.equal(r.frontendTree,COMPLETED_FRONTEND.frontendTree);assert.equal(frontendTree,r.frontendTree);assert.deepEqual(r.manifest,manifest);
- assert.deepEqual(Object.keys(manifest).sort(),['contentDigest','kind','lockDigest','runId','schemaVersion','sha']);verifyManifest(manifest,{schemaVersion:1,sha:COMPLETED_FRONTEND.checkout,runId:String(COMPLETED_FRONTEND.run),kind:'frontend',lockDigest},contentDigest);return r;
+ assert.equal(lockDigest,RUN15_FRONTEND.lockDigest);assert.equal(contentDigest,RUN15_FRONTEND.contentDigest);
+ const {validateOfficialFrontendReceipt}=createRequire(import.meta.url)('../../server-version/e2e/school-teacher-ui.cjs');
+ return validateOfficialFrontendReceipt(r,{head,runId,frontend:manifest,frontendTree,frontendLockDigest:lockDigest,frontendContentDigest:contentDigest});
 }
 async function reuseCompletedFrontend(b){
- assert.equal(b.frontendBuildDecision,'current-css-only-frontend-build');assert.deepEqual(b.execution.officialFrontendBuild,COMPLETED_FRONTEND);
- const cssDelta=verifyFrontendCheckInputs(COMPLETED_FRONTEND.checkout);assert.equal(cssDelta.cssOnly,true,'This lane requires the exact reviewed stylesheet repair');
+ assert.equal(b.frontendBuildDecision,'fixed-run15-frontend-build');assert.deepEqual(b.execution.officialFrontendBuild,COMPLETED_FRONTEND);
+ const cssDelta=verifyFrontendCheckInputs(COMPLETED_FRONTEND.checkout);assert.equal(cssDelta.cssOnly,true,'This lane requires the exact reviewed stylesheet repairs');
  const previous=await reuseOfficial('frontend',b);assert.equal(git('rev-parse',COMPLETED_FRONTEND.head+'^{tree}'),git('rev-parse',COMPLETED_FRONTEND.checkout+'^{tree}'));verifyBackendEquivalent(COMPLETED_FRONTEND.checkout);
  const run=await officialApi('/actions/runs/'+COMPLETED_FRONTEND.run),job=await officialApi('/actions/jobs/'+COMPLETED_FRONTEND.job);verifyCompletedFrontendJob(run,job);
  const checks=await officialZip(COMPLETED_FRONTEND.checksArtifact,COMPLETED_FRONTEND.checksDigest,'school-teacher-frontend-checks-'+COMPLETED_FRONTEND.checkout,COMPLETED_FRONTEND.run,COMPLETED_FRONTEND.head);
  const historicalChecks=verifyCompletedFrontendRemainder(jsonZip(checks),b,previous.completed);
- const cwd=resolve('server-version/frontend'),dir=join(cwd,'dist');assert(!existsSync(dir),'No stale frontend dist accepted');
- command('frontend-install','npm',['ci','--ignore-scripts','--no-audit','--no-fund','--registry=https://registry.npmjs.org'],cwd);
- command('frontend-build','npm',['run','build'],cwd);
- command('frontend-manifest',process.execPath,['.github/scripts/ci-artifact.mjs','write','frontend']);
- const manifest=JSON.parse(readFileSync(join(dir,'ci-build-manifest.json'))),result={status:'BUILT_CURRENT_CSS_ONLY',sourceHead:git('rev-parse','HEAD'),runId:process.env.GITHUB_RUN_ID,
-  frontendTree:git('rev-parse','HEAD:server-version/frontend'),freshBuild:true,oldBuildReused:false,originalChecksRun:COMPLETED_FRONTEND.run,cssDelta,historicalChecks,manifest};
- verifyCurrentFrontendReceipt(result,manifest,{head:result.sourceHead,runId:result.runId,frontendTree:result.frontendTree,lockDigest:sha256(readFileSync(join(cwd,'package-lock.json'))),contentDigest:treeDigest(dir)});receipt('frontend',result);
+ assert.equal(git('rev-parse','HEAD:server-version/frontend'),RUN15_FRONTEND.frontendTree);
+ assert.equal(git('rev-parse',RUN15_FRONTEND.head+'^{tree}'),git('rev-parse',RUN15_FRONTEND.checkout+'^{tree}'));assert.equal(git('rev-parse',RUN15_FRONTEND.checkout+':server-version/frontend'),RUN15_FRONTEND.frontendTree);
+ verifyRun15FrontendJob(await officialApi('/actions/runs/'+RUN15_FRONTEND.run),await officialApi('/actions/jobs/'+RUN15_FRONTEND.job));
+ const zip=await officialZip(RUN15_FRONTEND.buildArtifact,RUN15_FRONTEND.buildDigest,'school-teacher-frontend-'+RUN15_FRONTEND.checkout,RUN15_FRONTEND.run,RUN15_FRONTEND.head,RUN15_FRONTEND.buildSize);
+ const listing=spawnSync('python3',['-c',"import json,sys,zipfile; z=zipfile.ZipFile(sys.argv[1]); print(json.dumps([{'name':i.filename,'mode':i.external_attr>>16,'encrypted':bool(i.flag_bits&1)} for i in z.infolist()]))",zip],{encoding:'utf8',maxBuffer:4*1024*1024});assert.equal(listing.status,0);validateDistEntries(JSON.parse(listing.stdout),'frontend');
+ const cwd=resolve('server-version/frontend'),dir=join(cwd,'dist');assert(!existsSync(dir),'No stale frontend dist accepted');mkdirSync(dir,{recursive:true});assert.equal(spawnSync('unzip',['-q',zip,'-d',dir]).status,0);
+ const manifest=JSON.parse(readFileSync(join(dir,'ci-build-manifest.json'))),result={schemaVersion:1,status:'VERIFIED_OFFICIAL_FRONTEND_BUILD',currentHead:git('rev-parse','HEAD'),currentRun:process.env.GITHUB_RUN_ID,originalRun:RUN15_FRONTEND.run,originalHead:RUN15_FRONTEND.head,originalCheckout:RUN15_FRONTEND.checkout,originalJob:RUN15_FRONTEND.job,originalArtifact:RUN15_FRONTEND.buildArtifact,originalArtifactSha256:RUN15_FRONTEND.buildDigest,frontendTree:RUN15_FRONTEND.frontendTree,manifest};
+ verifyFrontendBuildReceipt(result,{head:result.currentHead,runId:result.currentRun,manifest,frontendTree:git('rev-parse','HEAD:server-version/frontend'),lockDigest:sha256(readFileSync(join(cwd,'package-lock.json'))),contentDigest:treeDigest(dir)});
+ receipt('official-frontend-build-reuse',result);receipt('frontend',{status:'VERIFIED_OFFICIAL_FRONTEND_BUILD',freshBuild:false,originalBuildRun:RUN15_FRONTEND.run,originalBuildJobConclusion:'success',originalBuildParentConclusion:'failure',originalChecksRun:COMPLETED_FRONTEND.run,cssDelta,historicalChecks});
 }
 function verifyConnectedFrontend(){
- assert.equal(binding().frontendBuildDecision,'current-css-only-frontend-build');assert.equal(existsSync(join(out,'official-frontend-build-reuse.json')),false,'Old dist reuse forbidden for changed CSS');
- const dir=resolve('server-version/frontend/dist'),manifest=JSON.parse(readFileSync(join(dir,'ci-build-manifest.json'))),receiptValue=JSON.parse(readFileSync(join(out,'frontend.json')));
- verifyCurrentFrontendReceipt(receiptValue,manifest,{head:git('rev-parse','HEAD'),runId:process.env.GITHUB_RUN_ID,frontendTree:git('rev-parse','HEAD:server-version/frontend'),lockDigest:sha256(readFileSync('server-version/frontend/package-lock.json')),contentDigest:treeDigest(dir)});
- // No officialFrontendReuse value: the existing browser path verifies current-run manifests.
+ assert.equal(binding().frontendBuildDecision,'fixed-run15-frontend-build');
+ const dir=resolve('server-version/frontend/dist'),manifest=JSON.parse(readFileSync(join(dir,'ci-build-manifest.json'))),receiptValue=JSON.parse(readFileSync(join(out,'official-frontend-build-reuse.json')));
+ return verifyFrontendBuildReceipt(receiptValue,{head:git('rev-parse','HEAD'),runId:process.env.GITHUB_RUN_ID,manifest,frontendTree:git('rev-parse','HEAD:server-version/frontend'),lockDigest:sha256(readFileSync('server-version/frontend/package-lock.json')),contentDigest:treeDigest(dir)});
 }
 
 const FONT_PACKAGE_URL='https://archive.ubuntu.com/ubuntu/pool/universe/f/fonts-wqy-zenhei/fonts-wqy-zenhei_0.9.45-8_all.deb';

@@ -5,7 +5,7 @@
   "branch": "work/school-teacher-review-20261022",
   "enabled": true,
   "base": "4dd9f1340fef2bc3df2d066b9bf7712bc2eb3c66",
-  "productHead": "03fce9b4697fd9e5749a1356bdc852b7e652c3e5",
+  "productHead": "84aa06394519aebb3c6c5554a4e69bf00de37b8a",
   "frontendTree": "4c089c44c21c156f416879896c41ade98c40309a",
   "backendTree": "7d7da5957de21f09dfd89bd097b4dc7c81a88ef3",
   "source": {
@@ -1410,7 +1410,7 @@
   "review": {
     "completed": true,
     "originalExecutionSigned": false,
-    "note": "No local historical execution is admitted. Fixed official frontend checks and immutable frontend/backend artifacts retain original producer identities. The fifth failed connected job supplies independently reverified 105 passed cases and nonempty upgrade preservation; the sixth failed connected job supplies five passed cases. No business test is repeated. The exact noncompiled runtime policy repair is normalized only for compiled-artifact reuse; current seed, role and restore checks use the new policy. Fresh schema, seed, font and narrowly authorized temporary permission preparation remain environment setup, not browser acceptance. Browser and restore remain required real execution. Eighth successful SAST authenticates prior application/control evidence; only the exact changed policy, seed, receipt, browser/font harness and control paths are newly scanned. The font inspector is initialized before navigation and reuses its CDP session; all console and rendered-font assertions remain strict. Cleanup failures cannot produce passing restore evidence. No prior failure is relabeled as a successful job. One exact stylesheet old/new blob change invalidates only the frontend compiled artifact and layout evidence: unchanged types, lint, JS tests and dependency evidence are reverified from original official checks, while the frontend is actually rebuilt with a current-run manifest and real responsive browser qualification. No prior dist or manifest is substituted."
+    "note": "No local historical execution is admitted. Fixed official frontend checks and immutable frontend/backend artifacts retain original producer identities. The fifth failed connected job supplies independently reverified 105 passed cases and nonempty upgrade preservation; the sixth failed connected job supplies five passed cases. No business test is repeated. The exact noncompiled runtime policy repair is normalized only for compiled-artifact reuse; current seed, role and restore checks use the new policy. Fresh schema, seed, font and narrowly authorized temporary permission preparation remain environment setup, not browser acceptance. Browser and restore remain required real execution. Eighth successful SAST authenticates prior application/control evidence; only the exact changed policy, seed, receipt, browser/font harness and control paths are newly scanned. The font inspector is initialized before navigation and reuses its CDP session; all console and rendered-font assertions remain strict. Cleanup failures cannot produce passing restore evidence. No prior failure is relabeled as a successful job. Three exact reviewed stylesheet pairs retain unchanged original types, lint, JS tests and dependency checks. Their real run15 frontend build is now reused only with identical current frontend tree, lock and dist bytes, authenticated successful producer job and exact artifact ZIP. Its original manifest is preserved; its failed parent run remains failed. Current keyboard/theme harness changes require real browser qualification, not another identical frontend build."
   },
   "requiredJobs": [
     "admission",
@@ -1418,7 +1418,7 @@
     "connected",
     "security"
   ],
-  "frontendBuildDecision": "current-css-only-frontend-build",
+  "frontendBuildDecision": "fixed-run15-frontend-build",
   "backendBuildDecision": "fixed-official-backend-build",
   "backendBuildReason": "Reuse the original fifth-run immutable compiled artifact; the one tsc-excluded Survey fixture and exact old/new noncompiled runtime policy are separately pinned. Current seed, role and restore checks consume the new policy.",
   "backendBuildInputsChanged": [

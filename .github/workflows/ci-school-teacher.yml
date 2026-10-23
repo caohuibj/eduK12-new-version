@@ -29,7 +29,7 @@ jobs:
       - name: authenticate frozen scope and all configured source inputs
         run: node .github/scripts/school-teacher-checks.mjs admission
       - name: verify only new control contracts
-        run: node --test --test-name-pattern='CSS-only' .github/scripts/school-teacher.test.mjs
+        run: node --test --test-name-pattern='Run15' .github/scripts/school-teacher.test.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -52,11 +52,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-      - name: verify unchanged official frontend checks and build the exact CSS repair once
+      - name: verify original frontend checks and exact run15 immutable frontend build
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git fetch --no-tags --depth=1 origin dcbc58483c6b6ce8a81526ddbc124a8b1c1c993c 81ee1f6d6a097e0c9e0aca3da05582f614325878 81947063451c5a5e2ee028ee41256671b19ef201 dadcef2d497ed51f4d75458c12b46bbb2fc6d82b
+          git fetch --no-tags --depth=1 origin dcbc58483c6b6ce8a81526ddbc124a8b1c1c993c 81ee1f6d6a097e0c9e0aca3da05582f614325878 81947063451c5a5e2ee028ee41256671b19ef201 dadcef2d497ed51f4d75458c12b46bbb2fc6d82b 051d8eb0f869c166b09739132ff8ea8e9a666613 6337343de882ba07999a47c1f5a2c71a58b1a597
           node .github/scripts/school-teacher-checks.mjs frontend
       - uses: actions/upload-artifact@v4
         with:
@@ -158,8 +158,8 @@ jobs:
       - name: retain the exact verified frontend receipt
         run: |
           mkdir -p school-teacher-evidence
-          cp school-teacher-frontend-receipt/frontend.json school-teacher-evidence/frontend.json
-      - name: verify the current frontend and original backend manifests against actual dist bytes
+          cp school-teacher-frontend-receipt/official-frontend-build-reuse.json school-teacher-evidence/official-frontend-build-reuse.json
+      - name: verify the original frontend and backend manifests against actual dist bytes
         run: |
           node .github/scripts/school-teacher-checks.mjs verify-frontend-artifact
           node .github/scripts/school-teacher-checks.mjs verify-backend-artifact

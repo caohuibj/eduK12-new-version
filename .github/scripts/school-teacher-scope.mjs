@@ -39,8 +39,8 @@ export function validateCandidate(b,o,evidenceBytes){
  }
  assert.match(b.evidenceSha256||'',/^[a-f0-9]{64}$/);assert.equal(sha256(evidenceBytes),b.evidenceSha256);
  assert.equal(b.review.completed,true,'Final control review required');assert.equal(b.review.originalExecutionSigned,false);
- assert.deepEqual(b.requiredJobs,JOBS);assert.equal(b.frontendBuildDecision,'current-css-only-frontend-build');
- // Frontend is rebuilt for one exact CSS change; backend retains its fixed producer identity.
+ assert.deepEqual(b.requiredJobs,JOBS);assert.equal(b.frontendBuildDecision,'fixed-run15-frontend-build');
+ // Frontend reuses the exact verified run15 build; backend retains its fixed producer identity.
  assert.equal(b.backendBuildDecision,'fixed-official-backend-build','Only the fixed official backend producer may qualify; no fresh fallback');
  assert(b.backendBuildReason&&b.backendBuildInputsChanged.length>0);
  assert.equal(b.execution.finalized,true,'Final per-check selections required');
