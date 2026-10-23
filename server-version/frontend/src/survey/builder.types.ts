@@ -52,11 +52,11 @@ export const choiceTypes=new Set<FormQuestion['type']>([
   'SINGLE','MULTIPLE','LIKERT','MATRIX','RANK_ORDER','CONSTANT_SUM','MATRIX_MULTIPLE'])
 export const professionalTypes=new Set<FormQuestion['type']>([
   'DATE','TIME','RANK_ORDER','SLIDER','CONSTANT_SUM','MATRIX_MULTIPLE'])
-export const newOption=():Option=>({optionKey:researchKey('o'),label:'新选项'})
+export const newOption=():Option=>({optionKey:researchKey('o'),label:''})
 export const newQuestion=(type:FormQuestion['type']):FormQuestion=>({
   itemKey:researchKey('q'),type,prompt:'',required:true,allowRefusal:false,
   options:choiceTypes.has(type)?[newOption(),newOption()]:[],
-  rows:['MATRIX','MATRIX_MULTIPLE'].includes(type)?[{rowKey:researchKey('r'),label:'第一行'}]:[],
+  rows:['MATRIX','MATRIX_MULTIPLE'].includes(type)?[{rowKey:researchKey('r'),label:''}]:[],
   ...(type==='TIME'?{timeZone:'Asia/Shanghai' as const}:{}),
   ...(type==='SLIDER'?{min:0,max:100,step:1,precision:0}:{}),
   ...(type==='CONSTANT_SUM'?{total:100,integerOnly:true}:{}),

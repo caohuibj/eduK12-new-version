@@ -3,9 +3,9 @@ import { SurveyFormStudio } from './SurveyFormStudio'
 import { StructuredFormConstraints } from '../modules/assessment-core/form/StructuredFormConstraints'
 import { BasicFormConstraints } from '../modules/assessment-core/form/BasicFormConstraints'
 import type { FormDraft, FormQuestion } from './builder.types'
-import { choiceTypes, professionalTypes, newOption, newQuestion, researchKey } from './builder.types'
+import { choiceTypes, professionalTypes, newQuestion, researchKey } from './builder.types'
 import { SurveyImageField } from './SurveyImageField'
-import { SurveyFormBulkLines } from './SurveyFormBulkLines'
+import { SurveyFormChoiceList } from './SurveyFormChoiceList'
 
 const types:Record<FormQuestion['type'],string>={
   SINGLE:'单选',MULTIPLE:'多选',SHORT_TEXT:'短文本',LONG_TEXT:'长文本',
@@ -110,21 +110,7 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,bulkPendi
             </label>
           </div>
           {!questionKey&&mediaFields}
-          {choiceTypes.has(q.type)&&<div className={questionKey?'survey-form-options space-y-2':'space-y-2'}>
-            <p className="text-sm font-medium">选项</p>
-            {q.options.map((o,oi)=><div className={questionKey?'survey-form-option-row':'flex gap-2'} key={o.optionKey}>{questionKey&&<span className="survey-form-option-number">{oi+1}</span>}
-              <input className="input flex-1" aria-label={'选项 '+(oi+1)} value={o.label}
-                onChange={e=>setQuestion(pi,qi,x=>({...x,options:x.options.map(a=>a.optionKey===o.optionKey?{...a,label:e.target.value}:a)}))}/>
-              <button className="btn-secondary" aria-label={questionKey?'删除选项 '+(oi+1):undefined} type="button" onClick={()=>setQuestion(pi,qi,x=>({...x,
-                options:x.options.filter(a=>a.optionKey!==o.optionKey),
-                otherOptionKey:x.otherOptionKey===o.optionKey?undefined:x.otherOptionKey,
-                otherMaxLength:x.otherOptionKey===o.optionKey?undefined:x.otherMaxLength,
-                exclusiveOptionKeys:x.exclusiveOptionKeys?.filter(key=>key!==o.optionKey)}))}>{questionKey?'×':'删除'}</button>
-            </div>)}
-            <button type="button" className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,options:[...x.options,newOption()]}))}>增加选项</button>
-            <SurveyFormBulkLines key={q.itemKey+q.type+'options'} id={q.itemKey+'options'} kind="选项" labels={q.options.map(option=>option.label)} limit={30} minimum={2} minimumRetained={minimumRetained} onPendingChange={onPendingChange}
-              onApply={(lines,mode)=>setQuestion(pi,qi,x=>({...x,options:mode==='append'?[...x.options,...lines.map(label=>({...newOption(),label}))]:lines.map((label,i)=>({...x.options[i]??newOption(),label}))}))}/>
-          </div>}
+          {choiceTypes.has(q.type)&&<SurveyFormChoiceList key={q.itemKey+q.type+'options'} question={q} kind="选项" limit={30} minimumRetained={minimumRetained} onPendingChange={onPendingChange} onChange={next=>setQuestion(pi,qi,()=>next)}/>}
           {questionKey&&mediaFields}
           {(!questionKey||value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type))&&<FormSettings compact={!!questionKey} title="选项补充设置">
           {value.schemaVersion===2&&['SINGLE','MULTIPLE'].includes(q.type)&&
@@ -158,17 +144,7 @@ function FormFields({value,onChange,projectId,questionKey,questionMeta,bulkPendi
               </fieldset>}
             </div>}
           </FormSettings>}
-          {['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<div className={questionKey?'survey-form-options space-y-2':'space-y-2'}>
-            <p className="text-sm font-medium">矩阵行</p>
-            {q.rows.map((row,ri)=><div key={row.rowKey} className="flex gap-2">
-              <input className="input flex-1" aria-label={'矩阵行 '+(ri+1)} value={row.label}
-                onChange={e=>setQuestion(pi,qi,x=>({...x,rows:x.rows.map(a=>a.rowKey===row.rowKey?{...a,label:e.target.value}:a)}))}/>
-              <button className="btn-secondary" type="button" onClick={()=>setQuestion(pi,qi,x=>({...x,rows:x.rows.filter(a=>a.rowKey!==row.rowKey)}))}>删除</button>
-            </div>)}
-            <button type="button" className="btn-secondary" onClick={()=>setQuestion(pi,qi,x=>({...x,rows:[...x.rows,{rowKey:researchKey('r'),label:'新行'}]}))}>增加矩阵行</button>
-            <SurveyFormBulkLines key={q.itemKey+q.type+'rows'} id={q.itemKey+'rows'} kind="矩阵行" labels={q.rows.map(row=>row.label)} limit={Math.min(40,500-fieldCount+q.rows.length)} minimum={1} onPendingChange={onPendingChange}
-              onApply={(lines,mode)=>setQuestion(pi,qi,x=>({...x,rows:mode==='append'?[...x.rows,...lines.map(label=>({rowKey:researchKey('r'),label}))]:lines.map((label,i)=>({rowKey:x.rows[i]?.rowKey??researchKey('r'),label}))}))}/>
-          </div>}
+          {['MATRIX','MATRIX_MULTIPLE'].includes(q.type)&&<SurveyFormChoiceList key={q.itemKey+q.type+'rows'} question={q} kind="矩阵行" limit={Math.min(40,500-fieldCount+q.rows.length)} onPendingChange={onPendingChange} onChange={next=>setQuestion(pi,qi,()=>next)}/>}
           {(!questionKey||['NUMBER','SLIDER','TIME','SHORT_TEXT','LONG_TEXT','CONSTANT_SUM','MULTIPLE','MATRIX_MULTIPLE'].includes(q.type))&&<FormSettings compact={!!questionKey} title="作答规则与格式"><div className="space-y-3">
           <BasicFormConstraints question={q} onChange={patch=>setQuestion(pi,qi,x=>({...x,...patch}))}/>
           {value.schemaVersion===2&&<StructuredFormConstraints question={q} onChange={patch=>setQuestion(pi,qi,x=>({...x,...patch}))}/>}

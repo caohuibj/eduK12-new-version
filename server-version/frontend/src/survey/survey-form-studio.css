@@ -189,3 +189,10 @@
 .survey-form-bulk-footer > span { flex:1; min-width:10rem; }
 .survey-researcher .is-form .survey-form-bulk-body button { min-height:34px; padding:.4rem .7rem; font-size:.75rem; border-radius:.4rem; }
 .survey-form-bulk-body .survey-form-bulk-error { color:var(--survey-ui-danger,#a04848); }
+.survey-form-choice-list { display:grid; gap:.5rem; list-style:none; padding:0; margin:.55rem 0; }
+.survey-form-choice-actions { display:flex; gap:.15rem; }
+.survey-researcher .is-form .survey-form-choice-actions > button { display:grid; place-items:center; min-height:32px; width:30px; min-width:30px; padding:.25rem; border:0; background:transparent; color:var(--survey-brand-muted); }
+.survey-researcher .is-form .survey-form-choice-actions > button:hover:not(:disabled) { background:var(--survey-brand-soft); color:var(--survey-brand-accent); }
+.survey-researcher .is-form .survey-form-choice-add { display:flex; justify-content:center; align-items:center; gap:.35rem; width:100%; min-height:36px; border:1px dashed var(--survey-brand-border); border-radius:.4rem; background:transparent; color:var(--survey-brand-muted); font-size:.75rem; }
+.survey-form-bulk-preview { max-height:9rem; overflow:auto; padding:.6rem .8rem .6rem 2rem; margin:0; list-style:decimal; border:1px solid var(--survey-brand-line); border-radius:.4rem; background:var(--survey-brand-subtle); color:var(--survey-brand-muted); font-size:.8rem; line-height:1.8; overflow-wrap:anywhere; }
+@media(max-width:40rem){.survey-form-choice-list .survey-form-option-row{display:grid;grid-template-columns:1.1rem minmax(0,1fr)}.survey-form-choice-actions{grid-column:2;justify-content:flex-end}}
