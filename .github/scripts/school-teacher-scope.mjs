@@ -39,8 +39,8 @@ export function validateCandidate(b,o,evidenceBytes){
  }
  assert.match(b.evidenceSha256||'',/^[a-f0-9]{64}$/);assert.equal(sha256(evidenceBytes),b.evidenceSha256);
  assert.equal(b.review.completed,true,'Final control review required');assert.equal(b.review.originalExecutionSigned,false);
- assert.deepEqual(b.requiredJobs,JOBS);assert.equal(b.frontendBuildDecision,'fresh-once');
- // This first implementation supports fresh compilation only. Never silently rebuild an unchanged qualified component.
+ assert.deepEqual(b.requiredJobs,JOBS);assert.equal(b.frontendBuildDecision,'fixed-official-frontend-build');
+ // Only the still-missing backend compiles fresh. Never silently rebuild a qualified frontend.
  assert.equal(b.backendBuildDecision,'fresh-once','Explicit affected backend fresh decision required; no reuse fallback');
  assert(b.backendBuildReason&&b.backendBuildInputsChanged.length>0);
  assert.equal(b.execution.finalized,true,'Final per-check selections required');

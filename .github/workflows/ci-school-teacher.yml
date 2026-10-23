@@ -52,22 +52,11 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-          cache: npm
-          cache-dependency-path: |
-            server-version/frontend/package-lock.json
-            server-version/backend/package-lock.json
-      - working-directory: server-version/frontend
-        run: npm ci --ignore-scripts
-      - name: retain exact dependency environment without native lifecycle builds
-        working-directory: server-version/backend
-        run: |
-          npm ci --ignore-scripts
-          npm run db:generate
-      - name: verify completed official frontend subchecks then run missing cases and compile once
+      - name: verify complete official frontend checks and reuse the immutable compiled artifact
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          git fetch --no-tags --depth=1 origin dcbc58483c6b6ce8a81526ddbc124a8b1c1c993c 81ee1f6d6a097e0c9e0aca3da05582f614325878
+          git fetch --no-tags --depth=1 origin dcbc58483c6b6ce8a81526ddbc124a8b1c1c993c 81ee1f6d6a097e0c9e0aca3da05582f614325878 81947063451c5a5e2ee028ee41256671b19ef201 dadcef2d497ed51f4d75458c12b46bbb2fc6d82b
           node .github/scripts/school-teacher-checks.mjs frontend
       - uses: actions/upload-artifact@v4
         with:
@@ -131,8 +120,6 @@ jobs:
             printf '%s=%s\n' "$key" "${!key}" >> "$GITHUB_ENV"
           done
       - run: npm ci --ignore-scripts --prefix .github/release-tools
-      - name: inspect this runner Chrome, no automatic install or fallback
-        run: node server-version/e2e/school-teacher-chrome.cjs preflight
       - run: bash server-version/scripts/ci-install-canvas-deps.sh
       - working-directory: server-version/backend
         run: npm ci
@@ -160,10 +147,27 @@ jobs:
         with:
           name: school-teacher-frontend-${{ github.sha }}
           path: server-version/frontend/dist
-      - name: verify both compiled artifacts against this SHA, run and lock
+      - uses: actions/download-artifact@v4
+        with:
+          name: school-teacher-frontend-checks-${{ github.sha }}
+          path: school-teacher-frontend-receipt
+      - name: retain the exact verified frontend receipt
         run: |
-          node .github/scripts/ci-artifact.mjs verify frontend
+          mkdir -p school-teacher-evidence
+          cp school-teacher-frontend-receipt/official-frontend-build-reuse.json school-teacher-evidence/official-frontend-build-reuse.json
+      - name: verify original frontend bytes and fresh current backend manifest
+        run: |
+          node .github/scripts/school-teacher-checks.mjs verify-frontend-artifact
           node .github/scripts/ci-artifact.mjs verify backend
+      - name: prepare only the missing authenticated CJK font without claiming visual success
+        run: node .github/scripts/school-teacher-checks.mjs fonts
+      - name: apply the confirmed temporary runner Chrome write-permission tightening
+        if: github.repository == 'caohuibj/eduK12-new-version' && github.event_name == 'pull_request' && github.event.pull_request.number == 338 && github.event.pull_request.head.ref == 'work/school-teacher-review-20261022' && github.event.pull_request.head.repo.full_name == github.repository
+        env:
+          SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-temporary-runner
+        run: node server-version/e2e/school-teacher-chrome-permissions.cjs tighten
+      - name: inspect this runner Chrome, no automatic install or fallback
+        run: node server-version/e2e/school-teacher-chrome.cjs preflight
       - name: seed restricted synthetic browser identities without exposing private output
         run: node .github/scripts/school-teacher-checks.mjs seed
       - name: execute real School Teacher journey with sandboxed official Chrome

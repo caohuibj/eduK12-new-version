@@ -5,7 +5,7 @@
   "branch": "work/school-teacher-review-20261022",
   "enabled": true,
   "base": "4dd9f1340fef2bc3df2d066b9bf7712bc2eb3c66",
-  "productHead": "2474801b49ac69dde2d45903f42cfa4cc1092e4b",
+  "productHead": "9e258d3937c956cc10de876a1432614e631695f4",
   "frontendTree": "c1e34b8fdd1a0127a155a208187a8c6bb2f8760f",
   "backendTree": "1d3a5ac4e2d2b5e73d8563f15c191eaaf0893bf8",
   "source": {
@@ -801,17 +801,41 @@
       "before": "0e66916fac2092041824a5fa9a0db30fd1b42fa2",
       "after": "df4e6d7b354bfcd3a77696d7a84a375abed2637a"
     },
+    "server-version/e2e/school-teacher-chrome-permissions.cjs": {
+      "before": null,
+      "after": "932f0c3f86b65619ad2e69b128dc56641f5da667"
+    },
+    "server-version/e2e/school-teacher-chrome-permissions.test.cjs": {
+      "before": null,
+      "after": "aa4a08045de767d1e572f5b1bd542c89d8b77aa1"
+    },
     "server-version/e2e/school-teacher-fixture.cjs": {
       "before": null,
       "after": "9bf1a45e71b03efd37a38afaa4ddb5886d328cf4"
+    },
+    "server-version/e2e/school-teacher-frontend-receipt.test.cjs": {
+      "before": null,
+      "after": "34a91fc583535abe49b3137466cbfeb9518e301a"
     },
     "server-version/e2e/school-teacher-launch-diagnostic.test.cjs": {
       "before": null,
       "after": "397a13a4a2db005b7e5901e78e59f9ddccc57c10"
     },
+    "server-version/e2e/school-teacher-preflight-resume.test.cjs": {
+      "before": null,
+      "after": "1287e1a7799b29f45c73d3cf64cfaaf364757e28"
+    },
     "server-version/e2e/school-teacher-startup-contract.test.cjs": {
       "before": null,
       "after": "76b8828cdb972bccc76529dbe456edc465c5c1af"
+    },
+    "server-version/frontend/package-lock.json": {
+      "before": "70318f94fe631d8292f567cf421f97e7d5613b31",
+      "after": "38d624d2dd610673f9392a89af7290682862e2b0"
+    },
+    "server-version/frontend/package.json": {
+      "before": "84089551a17c85d00f03a36081fe78e6374f0716",
+      "after": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda"
     },
     "server-version/frontend/public/huiteacher/educator-journal-moonlight-small.webp": {
       "before": null,
@@ -1336,14 +1360,6 @@
     "server-version/frontend/src/survey/SurveyScaleLibrarySubmission.tsx": {
       "before": "24ce4fa78809f2e4c82b8370f171993486d2a17e",
       "after": "f9d5d9b4299b66aa2e1f2d2a18e798871d4beb02"
-    },
-    "server-version/frontend/package.json": {
-      "before": "84089551a17c85d00f03a36081fe78e6374f0716",
-      "after": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda"
-    },
-    "server-version/frontend/package-lock.json": {
-      "before": "70318f94fe631d8292f567cf421f97e7d5613b31",
-      "after": "38d624d2dd610673f9392a89af7290682862e2b0"
     }
   },
   "controlBefore": {
@@ -1386,7 +1402,7 @@
   "review": {
     "completed": true,
     "originalExecutionSigned": false,
-    "note": "No local historical evidence is admitted. Fixed third-run official artifacts may prove only the original successful frontend subchecks and two-component audit with unchanged exact component inputs; the frontend parent job remains failed. Missing 13 frontend assertions, fresh build, all connected qualification and current changed-control SAST remain mandatory."
+    "note": "No local historical execution is admitted. Fixed third-run original failed frontend subchecks and fourth-run successful remaining checks prove all 23 frontend cases, types and lint; the fourth-run official dist is reused with original manifest and verified bytes, not rebuilt or relabeled. Audit requires unchanged exact FE/BE inputs. Backend, migrations, browser, restore and changed e2e/control SAST remain required current qualification."
   },
   "requiredJobs": [
     "admission",
@@ -1394,7 +1410,7 @@
     "connected",
     "security"
   ],
-  "frontendBuildDecision": "fresh-once",
+  "frontendBuildDecision": "fixed-official-frontend-build",
   "backendBuildDecision": "fresh-once",
   "backendBuildReason": "Integrated Survey schema adds actual Prisma generated client models and shared source dispatcher consumes changed provenance.",
   "backendBuildInputsChanged": [
@@ -2247,6 +2263,19 @@
       "auditArtifact": 12464502959,
       "auditDigest": "dac8363a31ff8e8a05809ec80d9b31929624e0be9a9f06bc549d2fb0e66fda1b",
       "workflowSha256": "3711b141411280f2775ba9475d72b4011ecbfd664789b5228114eefee58331d7"
+    },
+    "officialFrontendBuild": {
+      "run": 39870012962,
+      "head": "81947063451c5a5e2ee028ee41256671b19ef201",
+      "checkout": "dadcef2d497ed51f4d75458c12b46bbb2fc6d82b",
+      "job": 120141983273,
+      "checksArtifact": 12465423930,
+      "checksDigest": "208b349c606215236ca7e33070ae2b13e8ea4d1ea3f09c3dad65dc121d355198",
+      "buildArtifact": 12466106464,
+      "buildDigest": "bdfeec8e3b06220e5a611d607caa167badcdf6c9dd35827ea2c379fd6b352b35",
+      "buildSize": 21207434,
+      "frontendTree": "c1e34b8fdd1a0127a155a208187a8c6bb2f8760f",
+      "backendTree": "1d3a5ac4e2d2b5e73d8563f15c191eaaf0893bf8"
     }
   },
   "blockers": []
