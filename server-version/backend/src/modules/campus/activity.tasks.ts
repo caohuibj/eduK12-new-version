@@ -115,7 +115,7 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
   const tasks:Array<{
     id:string;activityId:string;activityTitle:string;kind:CampusTaskType|'MEASUREMENT'
     title:string;status:'PENDING'|'COMPLETED'|'EXPIRED'|'IN_PROGRESS'|'UNAVAILABLE'
-    deadline:string|null;href:string|null
+    deadline:string|null;href:string|null;resourceFamily?:string
     canResumeExisting?:boolean;consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
   }>=[]
   for(const t of assignments){
@@ -148,7 +148,7 @@ export async function listCampusStudentTasks(actor:AuthenticatedPrincipal,input:
       e.status==='ASSIGNED'?'PENDING':
       e.status==='EXPIRED'?'EXPIRED':'UNAVAILABLE'
     tasks.push({id:e.executionId,activityId:courseId,activityTitle:activity.title,
-      kind:'MEASUREMENT',title:e.runName,status,
+      kind:'MEASUREMENT',resourceFamily:e.resourceFamily,title:e.runName,status,
       canResumeExisting:e.canResumeExisting,consentRequired:e.consentRequired,consentPurpose:e.consentPurpose,
       consentVisibility:e.consentVisibility,
       deadline:e.deadline?.toISOString()??null,

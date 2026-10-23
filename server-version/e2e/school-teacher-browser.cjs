@@ -321,7 +321,7 @@ async function run() {
       const context = await browser.newContext({ viewport: options.anonymous ? { width: 320, height: 844 } : viewports[0], reducedMotion: 'reduce', serviceWorkers: 'block' })
       const appearanceKeys = await ui.prepare(context, product, user, options.mode)
       const audit = { product, actor: label, pageErrors: [], consoleErrors: [], unexpectedRequests: [], failedResponses: [], requestFailures: [],
-        staticRequests: [], staticResponses: [], apiMutations: [] }
+        staticRequests: [], staticResponses: [], apiMutations: [], apiReads: [] }
       ;(options.anonymous ? report.ui.sessions : report.sessions).push(audit)
       const expectedFailures = new Set([prefix + '/auth/me:401'])
       await context.routeWebSocket('**/*', socket => {
@@ -371,6 +371,8 @@ async function run() {
       page.on('request', req => {
         const url = new URL(req.url())
         if (url.origin === origin && !url.pathname.startsWith('/api/')) audit.staticRequests.push(url.origin + url.pathname)
+        if (url.origin === origin && url.pathname.startsWith('/api/') && req.method() === 'GET')
+          audit.apiReads.push({ path: url.pathname, method: req.method() })
         if (url.origin === origin && url.pathname.startsWith('/api/') && !['GET', 'HEAD'].includes(req.method()))
           audit.apiMutations.push({ path: url.pathname, method: req.method() })
       })
@@ -652,9 +654,8 @@ async function run() {
           : items.find(t => (t.title || t.formTitle) === versions[kind].title)
         assert.ok(task, 'Published fixed-version task must be assigned to the separate real participant')
         const executionId = task.executionId || task.id
-        let schoolIndex = items.findIndex(t => t.id === executionId)
         const card = () => s.product === 'SCHOOL'
-          ? p.locator('article.hs-task-card').filter({ hasText: w.title }).nth(schoolIndex)
+          ? p.locator('article.hs-task-card[data-task-id=' + JSON.stringify(executionId) + ']')
           : p.locator('article.ht-event').filter({ hasText: versions[kind].title })
         const open = async () => {
           const loaded = p.waitForResponse(r => r.request().method() === 'GET' && new RegExp('^' + s.prefix + '/(?:private-form-)?composite-attempts/[^/]+$').test(new URL(r.url()).pathname))
@@ -728,7 +729,6 @@ async function run() {
         }
         if (s.product === 'SCHOOL') {
           await p.getByRole('button', { name: '返回我的校园活动', exact: true }).click()
-          schoolIndex = (await list(kind)).findIndex(t => t.id === executionId)
           await card().getByText('状态：已完成', { exact: true }).waitFor()
         } else if (kind === 'FORM') await p.getByRole('button', { name: '返回任务列表', exact: true }).click()
         const complete = (await list(kind)).find(t => (t.executionId || t.id) === executionId)
@@ -745,10 +745,11 @@ async function run() {
         } else {
           assert.equal(await card().getByRole('button', { name: '查看本人反馈', exact: true }).count(), 0)
           if (s.product === 'SCHOOL') {
-            const feedback = await s.click(card().getByRole('button', { name: '查看我的测评反馈', exact: true }), '/reports/student/executions/' + executionId, 'GET')
-            assert.ok(feedback.state === 'COMPLETED' || feedback.state === 'WITHHELD', 'FORM must not fabricate a scored report')
-            assert.equal(feedback.unitReports, undefined); assert.equal(feedback.metrics, undefined)
-            await p.getByRole('button', { name: '关闭我的反馈', exact: true }).click()
+            assert.equal(complete.resourceFamily, 'FORM', 'School task DTO must preserve the frozen resource family')
+            assert.equal(await card().getByRole('button', { name: '查看我的测评反馈', exact: true }).count(), 0)
+            await card().getByText('本次表单已正式提交。表单只记录作答，不计算量表分数，也不新增个人报告读取权。', { exact: true }).waitFor()
+            assert.equal(s.audit.apiReads.filter(request => request.path === s.prefix + '/reports/student/executions/' + executionId).length, 0,
+              'FORM completion must not request a scored-report endpoint')
           }
           await shot(s, 'form-completed-no-score')
         }

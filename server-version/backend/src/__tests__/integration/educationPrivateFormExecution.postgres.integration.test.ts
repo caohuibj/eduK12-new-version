@@ -22,6 +22,7 @@ import { closeTeacherRun } from '../../modules/huiteacher/run.service'
 import { cancelAssessmentRun } from '../../modules/assessment-run/lifecycle'
 import { createSqlRelationalAssignmentRepository } from '../../modules/assessment-relational/repository'
 import { createRelationalAssessmentService } from '../../modules/assessment-relational/service'
+import { listCampusStudentTasks } from '../../modules/campus/activity.tasks'
 import { parentPortalService } from '../../modules/parent-portal/service'
 const url = integrationDatabaseUrl('RELEASE_INTEGRATION_DATABASE_URL'), suite = url ? describe : describe.skip
 let db: PrismaClient, server: Server, base: string
@@ -113,8 +114,16 @@ suite('Private Form real educational execution, typed FINAL and current task aut
     const afterFirst = await writes(id)
     expect(await submitCompositeFormSectionFinal(first)).toMatchObject({ replayed: true }); expect(await writes(id)).toEqual(afterFirst)
     const second = await currentInput(id, f.participantUserId)
-    await submitCompositeFormSectionFinal(second); await getAttemptState(id, { userId: f.participantUserId })
+    const final = await submitCompositeFormSectionFinal(second)
+    expect(final.parent.status).toBe('COMPLETED')
+    // No state GET after FINAL: the task DTO must already expose the durable receipt.
     await assertFinal(id, f.executionId, 'REFUSED')
+    const participant = await db.user.findUniqueOrThrow({ where: { id: f.participantUserId } })
+    const tasks = await listCampusStudentTasks({ userId: participant.id, username: participant.username,
+      accountDomain: participant.accountDomain, role: participant.role, platformRole: participant.platformRole,
+      tokenVersion: participant.tokenVersion, mustChangePassword: participant.mustChangePassword }, { page: 1, pageSize: 50 })
+    expect(tasks.list).toContainEqual(expect.objectContaining({ id: f.executionId,
+      kind: 'MEASUREMENT', resourceFamily: 'FORM', status: 'COMPLETED', href: null }))
   }, 120_000)
   it('uses real Teacher cookies, CSRF, task listing, exact parent reads and typed section FINAL over HTTP', async () => {
     const f = await setupPrivateFormExecutionFixture(db, 'TEACHER'), auth = await headers(f.participantUserId), manager = await headers(f.managerUserId)

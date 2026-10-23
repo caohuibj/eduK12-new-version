@@ -8,9 +8,14 @@ afterEach(()=>{cleanup();vi.restoreAllMocks()})
 const props={entry:'TEACHER' as const,actorId:'actor',organizationId:'school',toolId:'tool',onChange:vi.fn()}
 describe('Education material library has no Training permission fallback',()=>{
  it('uses only the injected scoped catalog and shows all three kinds',async()=>{
-  const api=vi.fn(async()=>({list:[{id:'asset',name:'Owned PDF',mimeType:'application/pdf',contentHash:'a'.repeat(64),size:10}],total:1,pageSize:9}))
+  const longName='A'.repeat(296)+'.pdf'
+  const materialCss=readFileSync('src/modules/assessment-media/material-picker.css','utf8')
+  expect(materialCss).toContain('.assessment-material-picker-browser li > div { min-width:0; max-width:100%; overflow-wrap:anywhere; }')
+  expect(materialCss).toContain('.assessment-material-display figcaption { flex-wrap:wrap; }')
+  expect(materialCss).toContain('.assessment-material-display figcaption strong { min-width:0; max-width:100%; overflow-wrap:anywhere; }')
+  const api=vi.fn(async()=>({list:[{id:'asset',name:longName,mimeType:'application/pdf',contentHash:'a'.repeat(64),size:10}],total:1,pageSize:9}))
   render(<EducationMaterialPicker {...props} api={api as PrivateToolApi}/>)
-  fireEvent.click(screen.getByRole('button',{name:'从素材库添加'}));await screen.findByText('Owned PDF')
+  fireEvent.click(screen.getByRole('button',{name:'从素材库添加'}));await screen.findByText(longName)
   expect(api).toHaveBeenCalledWith('/organizations/school/private-tools/tool/materials?kind=all&page=1')
   expect(screen.queryByRole('link',{name:/在素材库上传/})).not.toBeInTheDocument()
   fireEvent.change(screen.getByLabelText('素材类型'),{target:{value:'video'}})

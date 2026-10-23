@@ -7,7 +7,7 @@ type SchoolTask={
   id:string;activityId:string;activityTitle:string
   kind:'ASSIGNMENT'|'READING'|'CHECKIN'|'MEASUREMENT'
   title:string;status:'PENDING'|'COMPLETED'|'EXPIRED'|'IN_PROGRESS'|'UNAVAILABLE'
-  deadline:string|null;href:string|null
+  deadline:string|null;href:string|null;resourceFamily?:string
   canResumeExisting?:boolean
   consentRequired?:boolean;consentPurpose?:string|null;consentVisibility?:string|null
 }
@@ -119,7 +119,7 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
     {!items?null:
       items.list.length===0?!loading&&!listError&&<p>目前没有开放给你的活动。你不需要采取任何操作。</p>:
       <div className="hs-task-list">
-        {items.list.map(task=><article className="hs-task-card" key={task.kind+task.id}>
+        {items.list.map(task=><article className="hs-task-card" data-task-id={task.id} key={task.kind+task.id}>
           <small>{task.activityTitle} · {kinds[task.kind]}</small>
           <h3>{task.title}</h3>
           <p>状态：{captions[task.status]}{task.deadline?
@@ -135,7 +135,8 @@ export function SchoolStudentTasks({api}: {api:SchoolApi}) {
                     consentPurpose:task.consentPurpose,
                     consentVisibility:task.consentVisibility})
                 }}>开始／继续官方测评</button>:
-              task.status==='COMPLETED'?
+              task.status==='COMPLETED'?task.resourceFamily==='FORM'?
+                <p>本次表单已正式提交。表单只记录作答，不计算量表分数，也不新增个人报告读取权。</p>:
                 <button disabled={busy} onClick={()=>void showFeedback(task)}>查看我的测评反馈</button>:
                 <p>测评目前不可作答。符合授权与科学规则的反馈才可查看。</p>:
             task.href&&task.status!=='EXPIRED'&&<button disabled={busy}
