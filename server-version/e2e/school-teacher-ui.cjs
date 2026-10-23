@@ -36,24 +36,30 @@ function classifyThemeFailure(error) {
 async function settleThemeTransitions(rootSelector) {
   const root = document.querySelector(rootSelector)
   if (!root) throw new Error('Theme root missing')
-  root.getBoundingClientRect() // Flush the new theme styles before enumerating transitions.
-  let timer, observed = 0
-  const properties = new Set()
+  let timer, frame, stopped = false, observed = 0, stableFrames = 0, previousGeometry = null
+  const properties = new Set(), seen = new WeakSet()
   const timeout = new Promise((_, reject) => { timer = setTimeout(() => reject(new Error('Theme transitions did not settle within 2000ms')), 2000) })
   try {
     await Promise.race([timeout, (async () => {
-      while (true) {
+      while (!stopped) {
+        await new Promise(resolve => { frame = requestAnimationFrame(resolve) })
+        if (stopped) return
+        const rect = root.getBoundingClientRect() // Flush each frame, including offscreen transition state.
         const active = root.getAnimations({ subtree: true }).filter(animation => animation instanceof CSSTransition && (animation.playState === 'running' || animation.pending))
-        if (!active.length) return
         for (const animation of active) {
           if (!Number.isFinite(animation.effect.getComputedTiming().endTime)) throw new Error('Non-finite theme transition')
-          observed++; properties.add(animation.transitionProperty)
+          if (!seen.has(animation)) { seen.add(animation); observed++ }
+          properties.add(animation.transitionProperty)
         }
-        await Promise.all(active.map(animation => animation.finished.catch(error => { if (error.name !== 'AbortError') throw error })))
+        const geometry = [rect.x, rect.y, rect.width, rect.height, root.scrollWidth, root.scrollHeight].join(':')
+        if (active.length) { stableFrames = 0; previousGeometry = null; continue }
+        stableFrames = previousGeometry === geometry ? stableFrames + 1 : 1
+        previousGeometry = geometry
+        if (stableFrames >= 2) return
       }
     })()])
     return { settled: true, observed, properties: [...properties].sort() }
-  } finally { clearTimeout(timer) }
+  } finally { stopped = true; clearTimeout(timer); if (frame !== undefined) cancelAnimationFrame(frame) }
 }
 
 function appearanceKeys(product, id) {
