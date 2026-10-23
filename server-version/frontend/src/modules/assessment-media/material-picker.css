@@ -32,3 +32,9 @@
 .assessment-material-picker-selected .assessment-material-display { padding:10px; margin-bottom:0; }
 .assessment-material-picker-selected .assessment-material-display figcaption { display:none; }
 .assessment-material-picker-selected .assessment-material-display :is(img,video,iframe) { max-height:280px; }
+
+/* Material names may be long unbroken upload names; keep the full name readable. */
+.assessment-material-picker-browser li > div { min-width:0; max-width:100%; overflow-wrap:anywhere; }
+.assessment-material-display { min-width:0; max-width:100%; }
+.assessment-material-display figcaption { flex-wrap:wrap; }
+.assessment-material-display figcaption strong { min-width:0; max-width:100%; overflow-wrap:anywhere; }

@@ -3,7 +3,7 @@ import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 import type { AuthenticatedPrincipal } from '../../types'
 import {
-  CampusActivityError,lockAndAssertCampusActivityEditor,assertCampusActivityGovernor,
+  CampusActivityError,lockAndAssertCampusActivityEditor,assertCampusActivityGovernor,lockAndAssertCampusActivityPublisher,
 } from './activity.service'
 import { createAssessmentRunDraft } from '../assessment-run/repository'
 import { appendAudit } from '../organization/service'
@@ -108,5 +108,15 @@ export async function bindCampusActivityRun(input:{
       domainEventId:randomUUID(),payload:{courseId:input.courseId},
     })
     return {runId:input.runId,linked:true}
+  })
+}
+
+export async function assertCampusActivityRunPublisher(input:{
+  actor:AuthenticatedPrincipal;organizationId:string;courseId:string;runId:string
+}){
+  return prisma.$transaction(async tx=>{
+    const {activity}=await lockAndAssertCampusActivityPublisher(tx,input)
+    const run=await attached(tx,input.organizationId,input.courseId,input.runId)
+    return {activity,run}
   })
 }

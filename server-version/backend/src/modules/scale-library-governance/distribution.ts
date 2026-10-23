@@ -1,3 +1,6 @@
+import {z} from 'zod'
+import {assertEducationPublicDistributionReady} from './education-distribution-readiness'
+import {grantEducationPublicUseInTransaction,educationRecipientsInTransaction} from './education-distribution-public'
 import {hashScaleDefinition} from '../scale/scale-definition'
 import {assertLibraryMediaReady} from './media'
 import {randomUUID} from 'node:crypto'
@@ -7,22 +10,27 @@ import {canonicalHash} from '../assessment-runtime/canonical'
 import {getContentRelease} from '../measurement-content/repository'
 import {libraryActor,libraryCapabilities,assertLibraryAuthority} from './authority'
 import {loadEntry,event} from './service'
-import {distributionInput,transitionInput,fail,type LibraryProduct} from './contracts'
+import {distributionInput,legacyDistributionInput,transitionInput,fail,type LibraryProduct,type LegacyLibraryProduct} from './contracts'
 import {libraryCatalogSnapshot,libraryCompatibility} from './catalog-adapter'
 import {assertScaleLibraryCollectionAllowed} from './collection-guard'
 import {type LibraryUseRow,useView} from './usage'
-async function target(tx:Prisma.TransactionClient,userId:string,product:LibraryProduct){
+async function target(tx:Prisma.TransactionClient,userId:string,product:LegacyLibraryProduct){
   const user=await libraryActor(tx,userId)
   if(product==='TRAINING'){
     if(!['TRAINING','LEGACY'].includes(user.account_domain)||user.role!=='TEACHER'||!user.teacher_approved)fail('目标不是有效的 Training 教师',403)
-  }else{
+  }else if(product==='SURVEY'){
     if(user.account_domain!=='SURVEY')fail('目标不是 Survey 账号',403)
     const qualified=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT user_id AS id FROM survey_researcher_grants WHERE user_id=${userId} AND status IN ('ACTIVE','PENDING_MFA') FOR SHARE`)
     if(!qualified.length)fail('研究者资格不可用',403)
-  }
+  }else fail('SCALE_LIBRARY_ENTRYPOINT_NOT_SUPPORTED',400)
 }
 export async function grantUse(actorId:string,entryId:string,raw:unknown){
-  const input=distributionInput.parse(raw)
+  if(raw&&typeof raw==='object'&&'product' in raw&&(raw.product==='SCHOOL'||raw.product==='TEACHER')){
+    assertEducationPublicDistributionReady()
+    return prisma.$transaction(tx=>grantEducationPublicUseInTransaction(tx,actorId,entryId,raw),{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
+  }
+  const parsed=distributionInput.parse(raw)
+  const input=legacyDistributionInput.parse(parsed)
   return prisma.$transaction(async tx=>{
     const [header]=await tx.$queryRaw<Array<{release_id:string}>>(Prisma.sql`SELECT release_id FROM scale_library_entries WHERE id=${entryId}`)
     if(!header)fail('条目不存在',404)
@@ -36,7 +44,7 @@ export async function grantUse(actorId:string,entryId:string,raw:unknown){
     await assertLibraryMediaReady(tx,entryId,submission.snapshot.mediaManifest)
     if(!libraryCompatibility(submission.snapshot).supportedEntrypoints.includes(input.product))fail('SCALE_LIBRARY_ENTRYPOINT_NOT_SUPPORTED',400)
     const [prior]=await tx.$queryRaw<LibraryUseRow[]>(Prisma.sql`SELECT * FROM scale_library_use_grants WHERE id=${input.requestId} FOR SHARE`)
-    if(prior){if(prior.entry_id!==entryId||prior.user_id!==input.userId||prior.product!==input.product||prior.issuer_id!==actorId||prior.authority_grant_id!==authority.grantId)fail('请求编号已用于其他授权');return useView(prior)}
+    if(prior){if(prior.scope_kind!=='USER'||prior.organization_id!==null||prior.entry_id!==entryId||prior.user_id!==input.userId||prior.product!==input.product||prior.issuer_id!==actorId||prior.authority_grant_id!==authority.grantId)fail('请求编号已用于其他授权');return useView(prior)}
     const release=await getContentRelease(tx,entry.release_id,true)
     if(!release||release.layer!=='MEASUREMENT'||release.family!=='SCALE'||release.status!=='PUBLISHED')fail('该版本不可用于新投放')
     let materialId:string|null=null,surveyId:string|null=null
@@ -58,12 +66,13 @@ export async function grantUse(actorId:string,entryId:string,raw:unknown){
       if(priorMaterial)fail('该用户已有独立量表授权，请先明确处理原授权，不能覆盖')
       const grant=await tx.materialGrant.create({data:{teacherId:input.userId,resourceType:'SCALE',resourceId:wrapper.id,grantedBy:actorId}})
       materialId=grant.id
-    }else{
+    }else if(input.product==='SURVEY'){
       const snapshot=libraryCatalogSnapshot(entryId,release,submission.snapshot)
       surveyId=randomUUID()
       await tx.$executeRaw(Prisma.sql`INSERT INTO survey_tool_grants(id,user_id,status,snapshot,snapshot_digest,created_by)
         VALUES(${surveyId},${input.userId},'ACTIVE',${JSON.stringify(snapshot)}::jsonb,${canonicalHash(snapshot)},${actorId})`)
     }
+    else fail('SCALE_LIBRARY_ENTRYPOINT_NOT_SUPPORTED',400)
     const [row]=await tx.$queryRaw<LibraryUseRow[]>(Prisma.sql`INSERT INTO scale_library_use_grants
       (id,entry_id,user_id,product,issuer_id,authority_grant_id,material_grant_id,survey_tool_grant_id)
       VALUES(${input.requestId},${entryId},${input.userId},${input.product},${actorId},${authority.grantId},${materialId},${surveyId}) RETURNING *`)
@@ -99,7 +108,13 @@ export async function revokeUse(actorId:string,id:string,raw:unknown){
 }
 /** Minimal picker, not the user administration API. Exact distributor scope is
  * checked before any candidate identity leaves the database. */
-export async function recipients(actorId:string,entryId:string,input:{product:LibraryProduct;page:number;keyword:string;grantId?:string}){
+export async function recipients(actorId:string,entryId:string,raw:unknown){
+ if(raw&&typeof raw==='object'&&'product' in raw&&(raw.product==='SCHOOL'||raw.product==='TEACHER')){
+  assertEducationPublicDistributionReady()
+  return prisma.$transaction(tx=>educationRecipientsInTransaction(tx,actorId,entryId,raw),{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
+ }
+ const input=z.object({product:z.enum(['TRAINING','SURVEY']),page:z.coerce.number().int().min(1).max(100).default(1),
+  keyword:z.string().trim().max(100).default(''),grantId:z.string().uuid().optional()}).parse(raw)
  return prisma.$transaction(async tx=>{
   const [entry]=await tx.$queryRaw<Array<{release_id:string}>>(Prisma.sql`SELECT release_id FROM scale_library_entries WHERE id=${entryId}`)
   if(!entry)fail('条目不存在',404)

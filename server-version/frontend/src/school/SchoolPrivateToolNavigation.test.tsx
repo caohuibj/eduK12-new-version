@@ -1,0 +1,45 @@
+import {cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react'
+import {afterEach,expect,it,vi} from 'vitest'
+import SchoolApp from './SchoolApp'
+const reply=(data:unknown)=>({ok:true,json:async()=>({code:0,data})})
+function transport(canAuthor:boolean,role='TEACHER'){
+ vi.stubGlobal('scrollTo',vi.fn())
+ vi.stubGlobal('fetch',vi.fn(async(url:string)=>{
+  if(url.endsWith('/auth/me'))return reply({id:'psych',username:'心理教师',role,accountDomain:'SCHOOL'})
+  if(url.endsWith('/organizations'))return reply({list:['a','b'].map(id=>({id,name:'学校 '+id,orgRole:'MEMBER'}))})
+  if(url.endsWith('/context'))return reply({access:{orgRole:'MEMBER',canGovern:false,personas:['COUNSELOR'],capabilities:['PSYCHOLOGY_STAFF'],explicitDenies:[]}})
+  if(url.endsWith('/tool-authoring-capabilities'))return reply({canAuthor,authorableToolKinds:canAuthor?['SCALE','FORM']:[]})
+  if(url.endsWith('/reports/availability'))return reply({parentReportsEnabled:false})
+  return reply({list:[],nextCursor:null,truncated:false})
+ }))
+}
+afterEach(()=>{cleanup();vi.restoreAllMocks();vi.unstubAllGlobals();window.history.replaceState(null,'','/')})
+it('preserves a new private tool name when School navigation or school change is cancelled',async()=>{
+ window.history.replaceState(null,'','/workspace/private-tools?organizationId=a')
+ transport(true)
+ const confirm=vi.spyOn(window,'confirm').mockReturnValue(false)
+ render(<SchoolApp/> )
+ await waitFor(()=>expect(screen.getByLabelText('工具名称')).toBeEnabled())
+ fireEvent.change(screen.getByLabelText('工具名称'),{target:{value:'尚未创建的工具'}})
+ fireEvent.change(screen.getByLabelText('当前学校'),{target:{value:'b'}})
+ expect(screen.getByLabelText('当前学校')).toHaveValue('a')
+ expect(screen.getByLabelText('工具名称')).toHaveValue('尚未创建的工具')
+ fireEvent.click(screen.getByRole('link',{name:'校园概览'}))
+ expect(window.location.pathname).toBe('/workspace/private-tools')
+ expect(screen.getByLabelText('工具名称')).toHaveValue('尚未创建的工具')
+ expect(confirm).toHaveBeenCalledTimes(2)
+ confirm.mockReturnValue(true)
+ fireEvent.click(screen.getByRole('link',{name:'校园概览'}))
+ expect(await screen.findByRole('heading',{name:'欢迎，心理教师'})).toBeInTheDocument()
+ expect(screen.queryByLabelText('工具名称')).not.toBeInTheDocument()
+})
+it.each(['TEACHER','ADMIN'])('does not grant private authoring from the %s account role alone',async(role)=>{
+ window.history.replaceState(null,'','/workspace/private-tools?organizationId=a')
+ transport(false,role)
+ render(<SchoolApp/> )
+ await waitFor(()=>expect(vi.mocked(fetch).mock.calls.some(([url])=>String(url).endsWith('/tool-authoring-capabilities'))).toBe(true))
+ await screen.findByRole('heading',{name:'当前无法进入此功能'})
+ expect(screen.queryByRole('button',{name:'创建私有工具'})).not.toBeInTheDocument()
+ expect(screen.queryByRole('link',{name:'我的工具'})).not.toBeInTheDocument()
+ expect(vi.mocked(fetch).mock.calls.some(([url])=>String(url).includes('/private-tools'))).toBe(false)
+})

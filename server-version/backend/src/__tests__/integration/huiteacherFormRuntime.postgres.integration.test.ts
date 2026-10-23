@@ -1,3 +1,4 @@
+import { listAssignedRunTasks } from '../../modules/assessment-run/productRead'
 import { prisma } from '../../config/database'
 import * as runtimeSecurity from '../../modules/assessment-runtime/security'
 import { randomUUID } from 'node:crypto'
@@ -115,7 +116,7 @@ suite('Teacher-only Survey Form V2 released resource → Run START → encrypted
       eventId:event.id,name:'Teacher Form Run',
     })
     const key={organizationId:organization.id,actorUserId:admin.id,eventId:event.id}
-    await addTeacherRunTrack({...key,resource:ref,
+    const configuredTrack=await addTeacherRunTrack({...key,resource:ref,
       subjectSelector:{kind:'ALL_CURRENT'},respondentSelector:{kind:'ALL_CURRENT'},
       requestedPolicy:{
         subjectRoles:['TEACHER'],respondentRoles:['TEACHER'],
@@ -129,12 +130,24 @@ suite('Teacher-only Survey Form V2 released resource → Run START → encrypted
     })
     expect(opened.status).toBe('OPEN')
     let run=await readHuiteacherEventRun(key)
+    // The outline projection returns only the exact configured resource metadata,
+    // never definitions, selectors, policies or respondent/execution records.
+    const outline=[{id:configuredTrack.id,resourceFamily:ref.family,
+      resourceKey:ref.key,resourceVersion:ref.version}]
+    expect(run.tracks).toStrictEqual(outline)
+    expect(run.trackCount).toBe(outline.length)
+    await expect(readHuiteacherEventRun({...key,actorUserId:participants[0].id}))
+      .rejects.toMatchObject({code:'HUITEACHER_EVALUATION_AUTH_REQUIRED',statusCode:403})
     const dry=await previewTeacherRun({...key,expectedVersion:run.version})
     expect(dry).toBeTruthy()
     const pub=await publishTeacherRun({...key,expectedVersion:run.version})
     expect(pub.executionCount).toBe(10)
     run=await readHuiteacherEventRun(key)
     expect(run.status).toBe('PUBLISHED')
+    expect(run.tracks).toStrictEqual(outline)
+    expect(run.trackCount).toBe(outline.length)
+    await expect(readHuiteacherEventRun({...key,actorUserId:participants[0].id}))
+      .rejects.toMatchObject({code:'HUITEACHER_EVALUATION_AUTH_REQUIRED',statusCode:403})
     const assignments=await db.$queryRaw<Array<{id:string}>>`
       SELECT execution."id" FROM "assessment_run_executions" execution
       JOIN "assessment_run_actor_snapshots" respondent
@@ -228,6 +241,14 @@ suite('Teacher-only Survey Form V2 released resource → Run START → encrypted
     })).status).toBe('COMPLETED')
     const closed=await closeTeacherRun(key)
     expect(closed.status).toBe('CLOSED')
+    // Campus continuation is opt-in and SQL-bound to a campus Activity. Even
+    // accidentally passing it here cannot change Teacher FORM history.
+    const formTasks=await listAssignedRunTasks(admin.id,{runIds:[created.runId]})
+    expect(formTasks.list).toHaveLength(1)
+    expect(formTasks.list[0]).toMatchObject({resourceFamily:'FORM',status:'COMPLETED'})
+    expect(await listAssignedRunTasks(admin.id,{
+      runIds:[created.runId],preserveBoundSchoolContinuation:true,
+    })).toEqual(formTasks)
     await transitionHuiteacherEvent({
       organizationId:organization.id,actorUserId:admin.id,eventId:event.id,
       action:'CLOSE',expectedVersion:2,

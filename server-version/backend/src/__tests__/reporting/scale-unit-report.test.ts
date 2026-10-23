@@ -143,3 +143,42 @@ describe('Scale unit report contract', () => {
     expect(authenticated).not.toHaveProperty('result')
   })
 })
+
+
+describe('explicit frozen report content audience', () => {
+  const report = (audience?: 'student' | 'teacher') => {
+    const result = makeResult()
+    result.method.reportAudience = audience
+    result.rawScoreFeedback = [{ scoreKey: 'engagement', rangeKey: 'range', text: 'Frozen feedback' }]
+    return buildScaleUnitReport({ scaleId: 'scale-1', scaleName: 'Example', result })
+  }
+  const context = () => createScaleProjectionContext({ instrumentKey: 'adexi_v1', instrumentVersion: '2.0.0',
+    audience: 'respondent', purpose: 'report' })
+
+  it('keeps the old respondent default unchanged for teacher content', () => {
+    const input = report('teacher'), ctx = context()
+    expect(projectScaleUnitReport(input, ctx)).toEqual(projectScaleUnitReport(input, ctx, undefined))
+    expect(projectScaleUnitReport(input, ctx)).not.toHaveProperty('rawScoreFeedback')
+  })
+
+  it('selects teacher content without changing the respondent viewing context', () => {
+    const input = report('teacher'), ctx = context(), before = structuredClone(ctx)
+    expect(projectScaleUnitReport(input, ctx, { contentAudience: 'teacher' }).rawScoreFeedback)
+      .toEqual([{ scoreKey: 'engagement', rangeKey: 'range', text: 'Frozen feedback' }])
+    expect(ctx).toEqual(before)
+    expect(projectScaleUnitReport(input, ctx, { contentAudience: 'student' })).not.toHaveProperty('rawScoreFeedback')
+  })
+
+  it('cannot elevate disclosure with explicit matching content', () => {
+    const input = report('teacher'), ctx = context()
+    ctx.currentRestrictions.individualInterpretations = false
+    expect(projectScaleUnitReport(input, ctx, { contentAudience: 'teacher' })).not.toHaveProperty('rawScoreFeedback')
+    ctx.accessDecision.allowed = false
+    expect(projectScaleUnitReport(input, ctx, { contentAudience: 'teacher' })).toMatchObject({ reportKind: 'completion' })
+  })
+
+  it('preserves historical output when the result has no report audience', () => {
+    const input = report(), ctx = context()
+    expect(projectScaleUnitReport(input, ctx)).toEqual(projectScaleUnitReport(input, ctx, { contentAudience: 'student' }))
+  })
+})

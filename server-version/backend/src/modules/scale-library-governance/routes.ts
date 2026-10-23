@@ -45,7 +45,7 @@ function router(product:'TRAINING'|'SURVEY'){
  if(product==='TRAINING'){
   result.post('/submissions/:id/review',handle(req=>service.review(req.user!.userId,uuid.parse(req.params.id),req.body)))
   result.post('/entries/:id/status',handle(req=>service.changeEntryStatus(req.user!.userId,uuid.parse(req.params.id),req.body)))
-  result.get('/entries/:id/recipients',handle(req=>recipients(req.user!.userId,uuid.parse(req.params.id),z.object({product:z.enum(['TRAINING','SURVEY']),page:z.coerce.number().int().min(1).max(100).default(1),keyword:z.string().trim().max(100).default(''),grantId:uuid.optional()}).parse(req.query))))
+  result.get('/entries/:id/recipients',handle(req=>recipients(req.user!.userId,uuid.parse(req.params.id),req.query)))
   result.get('/entries/:id/grants',handle(req=>listUses(req.user!.userId,uuid.parse(req.params.id))))
   result.post('/entries/:id/grants',handle(req=>grantUse(req.user!.userId,uuid.parse(req.params.id),req.body)))
   result.post('/grants/:id/revoke',handle(req=>revokeUse(req.user!.userId,uuid.parse(req.params.id),req.body)))

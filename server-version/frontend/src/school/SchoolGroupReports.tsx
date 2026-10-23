@@ -23,6 +23,9 @@ export function SchoolGroupReports({api,organizationId}:{
   api:SchoolApi;organizationId:string
 }){
   const [catalog,setCatalog]=useState<Catalog|null>(null)
+  const [catalogLoading,setCatalogLoading]=useState(true)
+  const [catalogError,setCatalogError]=useState('')
+  const [catalogRequest,setCatalogRequest]=useState(0)
   const [selection,setSelection]=useState('')
   const [specId,setSpecId]=useState('')
   const [report,setReport]=useState<GroupReport|null>(null)
@@ -33,12 +36,13 @@ export function SchoolGroupReports({api,organizationId}:{
   const path='/reports/groups/catalog?organizationId='+encodeURIComponent(organizationId)
   useEffect(()=>{
     const token=++current.current
+    setCatalogLoading(true);setCatalogError('');setBusy(false)
     setCatalog(null);setSelection('');setSpecId('');setReport(null);setError('');setNotice('')
     void api<Catalog>(path).then(data=>{
       if(token===current.current)setCatalog(data)
-    }).catch(e=>{if(token===current.current)setError(reason(e))})
+    }).catch(e=>{if(token===current.current)setCatalogError(reason(e))}).finally(()=>{if(token===current.current)setCatalogLoading(false)})
     return ()=>{current.current+=1}
-  },[api,organizationId,path])
+  },[api,organizationId,path,catalogRequest])
   const source=catalog?.sources.find(s=>s.runId+':'+s.trackId===selection)
   const selectedSpec=catalog?.specs.find(s=>s.specId===specId)
   const generate=async()=>{
@@ -80,7 +84,11 @@ export function SchoolGroupReports({api,organizationId}:{
     <p>现阶段只供校内授权人员开展支持性分析。群体均值不能证明某种教育措施产生了因果效果，也不能用于个人诊断、排名或绩效考核。</p>
     {error&&<p role="alert" className="hs-alert">{error}</p>}
     {notice&&<p role="status" className="hs-message">{notice}</p>}
-    {!catalog?<p>正在核查校园报告权限与已发布方案…</p>:<>
+    {catalogLoading&&<p role="status">正在核查校园报告权限与已发布方案…</p>}
+    {catalogError&&<div><p role="alert" className="hs-alert">{catalogError}</p>
+      <button disabled={catalogLoading} onClick={()=>{setCatalogLoading(true);setCatalogError('');setCatalogRequest(value=>value+1)}}>重新读取报告目录</button>
+    </div>}
+    {catalog&&<>
       <label className="hs-field"><span>选择正式校园测评来源</span>
         <select value={selection} onChange={e=>{setSelection(e.target.value);setReport(null)}}>
           <option value="">请选择已投放的学生自评测评</option>

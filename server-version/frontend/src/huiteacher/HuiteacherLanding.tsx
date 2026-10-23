@@ -1,3 +1,4 @@
+import type { ProductTheme } from '../components/product-theme/useProductTheme'
 import { useRef, useState } from 'react'
 import { NotebookPen, School, ScanEye, Sprout } from 'lucide-react'
 
@@ -18,7 +19,8 @@ function Arrow() {
   </svg>
 }
 
-export function HuiteacherLanding({ onEnter }: { onEnter: () => void }) {
+export function HuiteacherLanding({ onEnter, theme = 'light' }: { onEnter: () => void; theme?: ProductTheme }) {
+  const artwork=theme === 'dark' ? 'educator-journal-moonlight' : 'educator-journal'
   const about=useRef<HTMLDialogElement>(null)
   const aboutTitle=useRef<HTMLHeadingElement>(null)
   const [feature,setFeature]=useState(features[0])
@@ -32,16 +34,16 @@ export function HuiteacherLanding({ onEnter }: { onEnter: () => void }) {
         <h1 id="ht-journal-title"><span>从每一次思考，</span><span>走向更好的教育。</span></h1>
         <p>在日常实践中，看见成长的方向。</p>
         <div className="ht-journal-actions">
-          <button type="button" className="ht-primary" onClick={onEnter}>进入 Huiteacher <Arrow/></button>
+          <button type="button" className="ht-primary" onClick={onEnter}>进入 Teacher <Arrow/></button>
           <a className="ht-learn" href="#ht-features">了解平台 <Arrow/></a>
         </div>
       </div>
       <figure className="ht-journal-art">
-        <img className="ht-journal-image" src="/huiteacher/educator-journal.webp"
-          srcSet="/huiteacher/educator-journal-small.webp 768w, /huiteacher/educator-journal.webp 1536w"
+        <img className="ht-journal-image" src={`/huiteacher/${artwork}.webp`}
+          srcSet={`/huiteacher/${artwork}-small.webp 768w, /huiteacher/${artwork}.webp 1536w`}
           sizes="(max-width: 600px) 1100px, 100vw"
           width="1536" height="1024" fetchPriority="high" decoding="async"
-          alt="阳光落在展开的工作手记上，书页留着教室观察的铅笔速写，一旁是浅杏色笔记本。"/>
+          alt={theme === 'dark' ? '月光落在展开的工作手记上，书页里的教室窗外挂着月亮，一旁是铜杏色笔记本。' : '阳光落在展开的工作手记上，书页留着教室观察的铅笔速写，一旁是浅杏色笔记本。'}/>
       </figure>
       <section className="ht-feature-strip" id="ht-features" aria-label="教师发展与学校改进" tabIndex={-1}>
         {features.map(({title,description,Icon},index)=><button className="ht-feature" type="button" key={title}
@@ -59,7 +61,7 @@ export function HuiteacherLanding({ onEnter }: { onEnter: () => void }) {
         <h2 id="ht-about-title" ref={aboutTitle} tabIndex={-1}>{feature.title}</h2>
         <p>{feature.detail}</p>
         <p className="ht-about-note">{feature.note}</p>
-        <button type="button" className="ht-primary" onClick={()=>{about.current?.close();onEnter()}}>进入 Huiteacher <Arrow/></button>
+        <button type="button" className="ht-primary" onClick={()=>{about.current?.close();onEnter()}}>进入 Teacher <Arrow/></button>
       </div>
     </dialog>
   </>

@@ -26,7 +26,7 @@ function fixture(){
  const binding={schemaVersion:1,compositeId:'composite',attemptId:'attempt',epoch:1,publicationHash:hash,units:[{itemId:'item',family:'SCALE',source:{kind:'SCALE',id:'scale',ownerId:'teacher'},
   measurement:{releaseId:id(1),contentHash:hash,measurementHash:hash},referencePolicy:{policyVersion:'EXACT_POPULATION_PRIORITY_V1',measurementReleaseId:id(1),
    choices:[{releaseId:id(2),contentHash:hash,entryKey:referenceEntryKey(entry),metricKey:'total',referenceKind:'descriptive_sample',priority:0}]}}]}
- let parent:any={id:'attempt',attemptEpoch:1,compositeAssessmentId:'composite',compositeAssessment:{createdBy:'teacher'},trainingContentBinding:binding,trainingContentBindingHash:canonicalHash(binding),
+ let parent:any={id:'attempt',attemptEpoch:1,compositeAssessmentId:'composite',compositeAssessment:{createdBy:'teacher',productKind:'QUESTIONNAIRE'},trainingContentBinding:binding,trainingContentBindingHash:canonicalHash(binding),
   trainingReferenceBinding:null,trainingReferenceBindingHash:null,contextSnapshotEncrypted:null,contextSnapshotHash:null}
  let section:any={id:'section-attempt',attemptEpoch:1,status:'IN_PROGRESS',submissionId:null,submissionPayloadHash:null,frozenAdmissionSnapshotHash:hash}
  const events:string[]=[],control={contextCount:1}

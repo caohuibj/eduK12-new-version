@@ -65,3 +65,42 @@ describe('Survey exact-version library application',()=>{
     expect(mocks.withdraw).toHaveBeenCalledWith(expect.objectContaining({id:'s1'}),'需要修订')
   })
 })
+
+
+describe('Survey library submission parent busy lifecycle',()=>{
+  it.each(['success','failure'] as const)('reports idle, keeps pending work busy, and releases the parent after %s',outcome=>{
+    const onBusyChange=vi.fn()
+    const state={source:null,submissions:[],loading:false,busy:false,error:'',status:'',refresh:mocks.refresh,submit:mocks.submit,withdraw:mocks.withdraw}
+    mocks.use.mockReturnValue(state)
+    const view=render(<SurveyScaleLibrarySubmission sourceId="scale" onBusyChange={onBusyChange}/>)
+    expect(onBusyChange).toHaveBeenLastCalledWith(false)
+
+    // Exercise the parent callback boundary, without repeating submission/API contracts.
+    mocks.use.mockReturnValue({...state,busy:true})
+    view.rerender(<SurveyScaleLibrarySubmission sourceId="scale" onBusyChange={onBusyChange}/>)
+    expect(onBusyChange).toHaveBeenLastCalledWith(true)
+    expect(screen.getByRole('button',{name:'刷新发布版本与申请'})).toBeDisabled()
+    onBusyChange.mockClear()
+    mocks.use.mockReturnValue({...state,busy:true,status:'仍在处理'})
+    view.rerender(<SurveyScaleLibrarySubmission sourceId="scale" onBusyChange={onBusyChange}/>)
+    expect(onBusyChange).not.toHaveBeenCalled()
+
+    mocks.use.mockReturnValue({...state,error:outcome==='failure'?'操作结果未确认':'',status:outcome==='success'?'申请已提交':''})
+    view.rerender(<SurveyScaleLibrarySubmission sourceId="scale" onBusyChange={onBusyChange}/>)
+    expect(onBusyChange).toHaveBeenLastCalledWith(false)
+    if(outcome==='failure')expect(screen.getByRole('alert')).toHaveTextContent('操作结果未确认')
+    onBusyChange.mockClear()
+    view.unmount()
+    expect(onBusyChange).toHaveBeenCalledExactlyOnceWith(false)
+  })
+
+  it('clears the parent busy flag when unmounted while an operation remains pending',()=>{
+    const onBusyChange=vi.fn()
+    mocks.use.mockReturnValue({source:null,submissions:[],loading:false,busy:true,error:'',status:'',refresh:mocks.refresh,submit:mocks.submit,withdraw:mocks.withdraw})
+    const view=render(<SurveyScaleLibrarySubmission sourceId="scale" onBusyChange={onBusyChange}/>)
+    expect(onBusyChange).toHaveBeenLastCalledWith(true)
+    onBusyChange.mockClear()
+    view.unmount()
+    expect(onBusyChange).toHaveBeenCalledExactlyOnceWith(false)
+  })
+})

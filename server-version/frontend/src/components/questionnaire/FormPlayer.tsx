@@ -107,6 +107,10 @@ export function FormPlayer({
   const submitControlsDisabled = disabled || submitDisabled || submitting
 
   const q = item.formDefinition
+  // Immutable private FORM versions retain their typed wire names. Normalize
+  // only the matching typed choice presentation, never the stored definition.
+  const choiceType = q?.type === item.type && q.type === 'SINGLE' ? 'single_choice'
+    : q?.type === item.type && q.type === 'MULTIPLE' ? 'multiple_choice' : item.type
   const matrix = q?.type === 'MATRIX' || q?.type === 'MATRIX_MULTIPLE'
   // The shared renderer uses independent row keys; Training wire/storage uses one
   // typed object per DB item. Preserve row keys rather than serializing the object.
@@ -145,7 +149,7 @@ export function FormPlayer({
         <p className="text-sm font-medium text-slate-500">字段 {position} / {total}</p>
       </div>
 
-      {item.type === 'single_choice' ? (
+      {choiceType === 'single_choice' ? (
         <fieldset aria-describedby={describedBy} disabled={answerControlsDisabled}>
           <legend className="mb-4 text-lg font-semibold text-slate-900">{prompt}</legend>
           <div className="space-y-2">
@@ -165,7 +169,7 @@ export function FormPlayer({
         </fieldset>
       ) : null}
 
-      {item.type === 'multiple_choice' ? (
+      {choiceType === 'multiple_choice' ? (
         <fieldset aria-describedby={describedBy} disabled={answerControlsDisabled}>
           <legend className="mb-4 text-lg font-semibold text-slate-900">{prompt}</legend>
           <div className="space-y-2">

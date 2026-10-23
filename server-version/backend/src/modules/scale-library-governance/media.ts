@@ -10,7 +10,7 @@ import type { LibrarySnapshot } from './source'
 import { fail } from './contracts'
 
 type Tx = Prisma.TransactionClient
-const supported = ['image/png', 'image/jpeg', 'image/webp', 'video/mp4', 'video/webm', 'video/ogg', 'text/vtt']
+const supported = ['image/png', 'image/jpeg', 'image/webp', 'video/mp4', 'video/webm', 'video/ogg', 'text/vtt', 'application/pdf']
 export const libraryMediaItemSchema = assessmentAssetIdentitySchema.extend({
   sizeBytes: z.number().int().positive(), assetVersion: z.string().datetime(),
   usages: z.array(z.string().min(1)).min(1).max(2000),

@@ -197,6 +197,7 @@ model Organization {
   updatedAt       DateTime  @default(now()) @map("updated_at") @db.Timestamptz(6)
 
   createdBy        User                          @relation("OrganizationCreator", fields: [createdByUserId], references: [id], onDelete: Restrict, onUpdate: Cascade)
+  scaleLibraryUseGrants ScaleLibraryUseGrant[]
   memberships      OrganizationMembership[]
   courses          Course[] @relation("OrganizationCourses")
   accessDenies     OrganizationAccessDeny[]
@@ -4338,8 +4339,11 @@ model ScaleLibraryUseGrant {
  id String @id
  entryId String @map("entry_id")
  entry ScaleLibraryEntry @relation(fields:[entryId],references:[id],onDelete:Restrict)
- userId String @map("user_id")
- user User @relation("LibraryGrantRecipient",fields:[userId],references:[id],onDelete:Restrict)
+ userId String? @map("user_id")
+ user User? @relation("LibraryGrantRecipient",fields:[userId],references:[id],onDelete:Restrict)
+ scopeKind String @default("USER") @map("scope_kind")
+ organizationId String? @map("organization_id")
+ organization Organization? @relation(fields:[organizationId],references:[id],onDelete:Restrict)
  product String
  issuerId String @map("issuer_id")
  issuer User @relation("LibraryGrantIssuer",fields:[issuerId],references:[id],onDelete:Restrict)
@@ -4390,6 +4394,42 @@ model ScaleLibraryMedia {
  state String @default("READY")
  @@unique([entryId,assetId])
  @@map("scale_library_media")
+}
+
+// Author-private education drafting only; never an organization-owned Teacher
+// Form, public library entry, Measurement publication or execution entitlement.
+model EducationPrivateTool {
+ id String @id
+ entry String
+ organizationId String @map("organization_id")
+ ownerUserId String @map("owner_user_id")
+ kind String
+ title String
+ definition Json
+ contentHash String @map("content_hash")
+ revision Int @default(1)
+ createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+ updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz(6)
+ versions EducationPrivateToolVersion[]
+ @@unique([id,entry,organizationId,ownerUserId,kind],map:"education_private_tools_scope_key")
+ @@index([entry,organizationId,ownerUserId,id],map:"education_private_tools_owner_idx")
+ @@map("education_private_tools")
+}
+model EducationPrivateToolVersion {
+ id String @id
+ toolId String @map("tool_id")
+ entry String
+ organizationId String @map("organization_id")
+ ownerUserId String @map("owner_user_id")
+ kind String
+ sourceRevision Int @map("source_revision")
+ title String
+ definition Json
+ contentHash String @map("content_hash")
+ createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+ tool EducationPrivateTool @relation(fields:[toolId,entry,organizationId,ownerUserId,kind],references:[id,entry,organizationId,ownerUserId,kind],onDelete:Restrict)
+ @@unique([toolId,sourceRevision],map:"education_private_tool_versions_revision_key")
+ @@map("education_private_tool_versions")
 }
 
 // Independent private Survey templates; study selection creates a fixed project copy.

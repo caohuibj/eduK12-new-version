@@ -8,7 +8,7 @@ import { prisma } from '../../config/database'
 import { hasActiveCourseMembership } from '../../utils/courseAccess'
 import { assignmentController } from '../../controllers/assignmentController'
 import { checkinController } from '../../controllers/checkinController'
-import { allocateCampusActivityParticipants, revokeCampusActivityParticipant } from './activity.allocation'
+import { allocateCampusActivityParticipants, revokeCampusActivityParticipant, listCampusActivityEligibleClasses } from './activity.allocation'
 import { addCampusActivityTask, listCampusStudentTasks, listCampusParentRunTasks } from './activity.tasks'
 import { listCampusTeacherRunTasks } from './teacher-tasks'
 import { readCampusStudentStatus } from './admission.service'
@@ -87,6 +87,11 @@ router.post('/organizations/:organizationId/activities/:courseId/govern',
       actor:req.user!,...activityParams.parse(req.params),...body,
     }))
   }))
+
+router.get('/organizations/:organizationId/activities/:courseId/eligible-classes',
+  authenticateSchool,wrap(async(req,res)=>success(res,await listCampusActivityEligibleClasses({
+    actor:req.user!,...activityParams.parse(req.params),
+  }))))
 
 router.post('/organizations/:organizationId/activities/:courseId/participants',
   authenticateSchool,wrap(async(req,res)=>{

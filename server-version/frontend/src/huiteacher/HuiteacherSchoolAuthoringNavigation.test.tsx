@@ -1,0 +1,41 @@
+import {cleanup,fireEvent,render,screen,waitFor,within} from '@testing-library/react'
+import {afterEach,expect,it,vi} from 'vitest'
+import HuiteacherApp from './HuiteacherApp'
+import {SCHOOL_HOST} from '../school/context'
+vi.mock('./HuiteacherPersonalSelf',()=>({HuiteacherPersonalSelf:()=> <p>本人个人测评</p>}))
+vi.mock('./HuiteacherMyFormTasks',()=>({HuiteacherMyFormTasks:()=>null}))
+vi.mock('./HuiteacherMyScaleTasks',()=>({HuiteacherMyScaleTasks:()=>null}))
+vi.mock('./HuiteacherClassRelationships',()=>({HuiteacherClassRelationships:()=>null}))
+const reply=(data:unknown)=>({ok:true,json:async()=>({code:0,message:'成功',data})})
+afterEach(()=>{cleanup();vi.restoreAllMocks();vi.unstubAllGlobals()})
+it('explains the separate School authoring entry with a credential-free explicit link, without navigation or permission expansion',async()=>{
+ const originalLocation=window.location.href
+ const open=vi.spyOn(window,'open').mockImplementation(()=>null)
+ const fetch=vi.fn(async(url:string,_options?:RequestInit)=>{
+  if(url.endsWith('/auth/me'))return reply({id:'psych',username:'Psych',role:'TEACHER',mustChangePassword:false,organizations:['a','b'].map(id=>({organizationId:id,organizationName:'学校 '+id,productAdmin:true}))})
+  if(url.endsWith('/auth/csrf'))return reply({csrfToken:'test-csrf'})
+  if(url.endsWith('/tool-authoring-capabilities'))return reply({canAuthor:url.includes('/organizations/a/'),authorableToolKinds:url.includes('/organizations/a/')?['SCALE','FORM']:[]})
+  return reply({list:[],nextCursor:null})
+ })
+ vi.stubGlobal('fetch',fetch)
+ render(<HuiteacherApp/>)
+ fireEvent.click(await screen.findByRole('button',{name:'我的工具'}))
+ const hint=await screen.findByRole('complementary',{name:'学生测评编制入口提示'})
+ expect(within(hint).getByText(/此处自编工具用于 Teacher 教师测评/)).toBeInTheDocument()
+ expect(hint).toHaveTextContent('学校须已开通 School，并授予本人对应权限')
+ expect(hint).toHaveTextContent('使用同一教育账号单独登录')
+ expect(hint).toHaveTextContent('两个入口的私有草稿与固定版本不会自动互通')
+ const link=within(hint).getByRole('link',{name:'前往 School 编制学生测评'})
+ expect(link).toHaveAttribute('href',`https://${SCHOOL_HOST}/login`)
+ expect(link).toHaveAttribute('target','_blank');expect(link).toHaveAttribute('rel','noopener noreferrer')
+ const target=new URL(link.getAttribute('href')!)
+ expect(target.search).toBe('');expect(target.hash).toBe('');expect(target.username).toBe('');expect(target.password).toBe('')
+ expect(open).not.toHaveBeenCalled();expect(window.location.href).toBe(originalLocation)
+ expect(fetch.mock.calls.some(([url])=>url.startsWith(`https://${SCHOOL_HOST}/`))).toBe(false)
+ expect(fetch.mock.calls.some(([,options])=>options?.method&&options.method!=='GET')).toBe(false)
+ fireEvent.change(screen.getByLabelText('当前学校管理范围'),{target:{value:'b'}})
+ await waitFor(()=>expect(fetch.mock.calls.some(([url])=>url.endsWith('/organizations/b/tool-authoring-capabilities'))).toBe(true))
+ await waitFor(()=>expect(screen.queryByRole('button',{name:'创建私有工具'})).not.toBeInTheDocument())
+ expect(screen.queryByRole('link',{name:'前往 School 编制学生测评'})).not.toBeInTheDocument()
+ expect(fetch.mock.calls.some(([url])=>url.includes('/organizations/b/private-tools'))).toBe(false)
+})

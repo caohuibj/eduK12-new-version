@@ -80,3 +80,15 @@ describe('Huischool Cognitive task uses only school-bound Composite FINAL endpoi
     expect(screen.queryByText('校园认知子测评已进入')).not.toBeInTheDocument()
   })
 })
+
+it('returns without promising to save or sending a submission',()=>{
+  const api=vi.fn()
+  const onExit=vi.fn()
+  render(<SchoolCompositeRunner api={api as unknown as SchoolApi} execution={execution}
+    onExit={onExit} onFinished={vi.fn()}/>)
+  expect(screen.queryByRole('button',{name:'保存并返回活动'})).not.toBeInTheDocument()
+  expect(screen.getByText(/返回不会提交当前作答/)).toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button',{name:'返回活动'}))
+  expect(onExit).toHaveBeenCalledOnce()
+  expect(api).not.toHaveBeenCalled()
+})

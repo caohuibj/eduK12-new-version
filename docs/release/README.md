@@ -1002,6 +1002,37 @@ signed-in authoring states are distinct; the capabilities response and material
 mobile overflow, CSRF-bearing revision-bound save and exact material identity
 remain required. Previous successful application qualifications are unchanged.
 
+
+### School/Teacher one-shot affected qualification (2026-10-22)
+
+`work/school-teacher-review-20261022` uses its own `school-teacher` route, not
+an extension of A/B, reviewed-candidate, Training or Survey approval. The route
+requires the frozen Survey-integrated base, retrievable product anchor and exact
+complete raw diff. Unknown paths, modes, source trees, draft PRs, manual/full/probe
+fallback, missing evidence and skipped jobs are rejected. Bindings remain disabled
+until independent final review is complete. Actual PR source comes from the event;
+a local-only merge SHA is never an Actions product anchor.
+
+The four required groups are admission, frontend, connected and security. The
+connected group generates Prisma once, compiles the affected backend once, proves
+nonempty exact-base migration preservation using synthetic rows, runs only frozen
+affected assertions, consumes same-SHA/same-run verified frontend/backend manifests,
+executes the real restricted-principal School/Teacher browser journey with the
+Chrome sandbox retained, and proves nonempty restore plus the existing runtime-role
+and release-schema contracts. Existing business screenshot/session/keyboard matrices
+are not replaced by the separately reported brand/theme/layout observations.
+
+No historical local assertions are admitted after the frontend dependency patch.
+The four direct brand/SVG assertions run against the final dependency inputs in CI.
+Original unsigned local reports remain local and are not relabeled as CI results.
+Reports expose allowlisted cases/statuses, diagnostic source locations and hashes,
+not DSNs, credentials or private fixture output. Raw logs exist only temporarily
+on the isolated runner and are not a persistent archive. The stable merge gate
+also requires actual CodeQL success over the affected application and controls.
+No public deployment, TLS/DNS, production media delivery or universal platform
+regression coverage is claimed by this bounded route.
+
+The School/Teacher qualification above is historical and does not qualify the later integration of PR #339. New source or changed frozen inputs must be rejected by the existing exact bindings; this merge does not alter their anchors, evidence identities, or reuse exceptions.
 ## Survey 手工验收前端修订的精确合并范围（2026-10-23）
 
 用户确认 Survey PR #340 先合并，再由 Training #341 基于新 main 集成；本路线

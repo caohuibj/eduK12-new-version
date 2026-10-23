@@ -293,6 +293,21 @@ export const submitUnifiedQuestionnaireFormSectionFinal = async (
   return { submissionId, sectionId: input.sectionId, ...committed, parent: null }
 }
 
+/** A narrow DB projection is not evidence of a legacy product. Normal dispatch
+ * includes this field; direct internal callers missing it must resolve it from
+ * this actual attempt, never from request input. Both security gates use the
+ * required return type, rather than optional/any projection fields. */
+const compositeFormFinalProductKind = async (parent: {
+  id: string; compositeAssessment: { productKind?: string }
+}): Promise<string> => {
+  if (parent.compositeAssessment.productKind) return parent.compositeAssessment.productKind
+  const persisted = await prisma.compositeAssessmentAttempt.findUnique({
+    where: { id: parent.id }, select: { compositeAssessment: { select: { productKind: true } } },
+  })
+  if (!persisted) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '综合测评记录不存在', 404)
+  return persisted.compositeAssessment.productKind
+}
+
 export const submitUnifiedCompositeFormSectionFinal = async (
   input: CompositeSectionSubmitInput,
   _parent?: unknown,
@@ -302,6 +317,11 @@ export const submitUnifiedCompositeFormSectionFinal = async (
   const principalParent = await loadTrainingChildParent(input.attemptId, selectedParent)
   assertTrainingFormFinalPrincipal(principalParent, input)
   const parent = await assertTrainingSectionSelected(input.attemptId, input.sectionId, { parent: principalParent })
+  const productKind: string = await compositeFormFinalProductKind(parent)
+  if(productKind==='ORGANIZATION_RESOURCE'){
+    const {assertPrivateFormSectionOwnership}=await import('../assessment-run/educationPrivateFormExecution')
+    await assertPrivateFormSectionOwnership(parent.id,input.sectionId)
+  }
   const child = await ensureCompositeSectionAttempt(input.attemptId, input.sectionId, input.attemptEpoch, parent)
   const admission = await measureRequestPhase('final_submit_admission', () => activateStoredOrCatalogCompositeFormAdmission({
     parentId: input.attemptId,
@@ -334,6 +354,10 @@ export const submitUnifiedCompositeFormSectionFinal = async (
   void _parent
 
   const committed = await measureRequestPhase('final_submit_db_query', () => withCompositeFormUnitTransaction(async (tx) => {
+    if(productKind==='ORGANIZATION_RESOURCE'){
+      const {assertPrivateFormFinalCurrent}=await import('../assessment-run/educationPrivateFormExecution')
+      await assertPrivateFormFinalCurrent(tx,{attemptId:input.attemptId,actorUserId:input.userId})
+    }
     const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, {
       attemptId: input.attemptId, parent, attemptEpoch: input.attemptEpoch, sectionId: input.sectionId, sourceAttemptId: child.id, submissionId,
     })
@@ -424,6 +448,11 @@ export const submitUnifiedCompositeFormSectionFinal = async (
     await assertTrainingPrivateReferenceAdmissionCurrent(tx)
     return { replayed: false, sectionAttemptId: currentSection.id, contextSnapshotHash, payloadHash }
   }))
+  // Private educational Forms have no async report enrollment. Ask the existing
+  // outer submit wrapper to reconcile readiness only AFTER releasing the UNIT gate.
+  // The aggregate finalizer itself retains frozen-slot completeness and replay checks.
+  if(productKind==='ORGANIZATION_RESOURCE')return {submissionId,sectionId:input.sectionId,...committed,
+    shouldFinalize:true,finalizeCompositeAttemptId:input.attemptId}
   return { submissionId, sectionId: input.sectionId, ...committed, parent: null }
 }
 

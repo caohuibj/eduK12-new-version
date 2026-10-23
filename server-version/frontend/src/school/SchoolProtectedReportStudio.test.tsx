@@ -1,5 +1,5 @@
 import { describe,expect,it,vi } from 'vitest'
-import { fireEvent,render,screen,waitFor } from '@testing-library/react'
+import { act,fireEvent,render,screen,waitFor } from '@testing-library/react'
 import { SchoolProtectedReportStudio } from './SchoolProtectedReportStudio'
 import type { SchoolApi } from './SchoolRecovery'
 
@@ -35,6 +35,7 @@ describe('Huischool psychological professional protected reporting workspace',()
       fireEvent.click(screen.getByRole('button',{name:'经近期动态验证码核验后生成'}))
       expect(await screen.findByRole('region',{name:'受保护报告生成结果'}))
         .toHaveTextContent('已生成满足当前权限')
+      expect(screen.getByText(/请从工作台“专业报告”入口重新核验权限后查看/)).toBeInTheDocument()
       await waitFor(()=>expect(api).toHaveBeenCalledWith('/reports/protected','POST',{
         organizationId:org,runId:run,trackId:track,subjectReference:pseudonym,
         relationshipKind:'CLASS_TEACHER_STUDENT',perspective:'OBSERVER_REPORT',specId:spec,
@@ -51,5 +52,41 @@ describe('Huischool psychological professional protected reporting workspace',()
       .toBeInTheDocument()
     expect(screen.getByRole('button',{name:'经近期动态验证码核验后生成'}))
       .toBeDisabled()
+  })
+})
+
+
+describe('SchoolProtectedReportStudio catalogue request recovery',()=>{
+  it('replaces pending state with an error and retries only the catalogue GET',async()=>{
+    let reject!:(reason:Error)=>void
+    const pending=new Promise<never>((_resolve,no)=>{reject=no})
+    let requests=0
+    const api=vi.fn(async(_path:string,_method?:string)=>++requests===1?pending:catalog)
+    render(<SchoolProtectedReportStudio api={api as SchoolApi} organizationId={org}/>)
+    expect(screen.getByText('正在核查当前专业关系与已发布内容…')).toBeInTheDocument()
+    expect(screen.queryByRole('button',{name:'重新读取报告目录'})).not.toBeInTheDocument()
+    await act(async()=>reject(Error('目录读取失败，请重试')))
+    expect(await screen.findByRole('alert')).toHaveTextContent('目录读取失败，请重试')
+    expect(screen.queryByText('正在核查当前专业关系与已发布内容…')).not.toBeInTheDocument()
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button',{name:'重新读取报告目录'}))
+    await screen.findByRole('option',{name:new RegExp(catalog.specs[0].title)})
+    expect(screen.queryByText('目录读取失败，请重试')).not.toBeInTheDocument()
+    expect(api.mock.calls).toEqual([
+      ['/reports/protected/catalog?organizationId='+org],['/reports/protected/catalog?organizationId='+org],
+    ])
+  })
+  it('does not restore a previous school catalogue from a late response',async()=>{
+    let resolve!:(value:typeof catalog)=>void
+    const pending=new Promise<typeof catalog>(yes=>{resolve=yes})
+    const api=vi.fn(async(path:string)=>path.endsWith('organizationId='+org)?pending:{sources:[],specs:[],truncated:false})
+    const view=render(<SchoolProtectedReportStudio api={api as SchoolApi} organizationId={org}/>)
+    expect(screen.getByText('正在核查当前专业关系与已发布内容…')).toBeInTheDocument()
+    view.rerender(<SchoolProtectedReportStudio api={api as SchoolApi} organizationId="new-school"/>)
+    await waitFor(()=>expect(screen.queryByText('正在核查当前专业关系与已发布内容…')).not.toBeInTheDocument())
+    await act(async()=>resolve(catalog))
+    expect(screen.queryByRole('option',{name:new RegExp(catalog.specs[0].title)})).not.toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(api).toHaveBeenLastCalledWith('/reports/protected/catalog?organizationId=new-school')
   })
 })

@@ -1,3 +1,6 @@
+import {addPrivateScaleRunTrack,addPrivateFormRunTrack} from '../education-tools/private-tool.run-adapter'
+import {listEducationLibraryResourcePage} from '../scale-library-governance/education-catalog'
+import {canonicalHash} from '../assessment-runtime/canonical'
 import { prisma } from '../../config/database'
 import { resolveEducationProductMemberScope } from '../organization/educationProductAccess'
 import { addAssessmentRunTrackDraft } from '../assessment-run/repository'
@@ -85,7 +88,7 @@ export async function addTeacherRunTrack(input:Key&{
   // can only narrow an exact frozen resource policy.
   if(input.resource.family==='FORM'&&!teacherFormResourceId(input.resource))
     fail('HUITEACHER_FORM_REQUIRES_TEACHER_RELEASE',403)
-  if(input.resource.family==='SCALE'&&(!teacherScaleResource(input.resource)
+  if(input.resource.family==='SCALE'&&(!(teacherScaleResource(input.resource)||input.resource.key.startsWith('library-scale:'))
     ||input.requestedPolicy.analysisMode!=='INDIVIDUAL_ONLY'))
     fail('HUITEACHER_PERSONAL_SCALE_RELEASE_REQUIRED',403)
   if(!['FORM','SCALE'].includes(input.resource.family))
@@ -100,10 +103,24 @@ export async function addTeacherRunTrack(input:Key&{
   assertRunTrackNarrowing(policy,requestedPolicy)
   await assertRegisteredResourceUse(input.resource,input.actorUserId,prisma,false,{organizationId:input.organizationId,runId:link.runId})
   return addAssessmentRunTrackDraft({
+    actorUserId:input.actorUserId,
     organizationId:input.organizationId,runId:link.runId,
     resource:input.resource,subjectSelector:input.subjectSelector,
     respondentSelector:input.respondentSelector,requestedPolicy,
   })
+}
+/** Product route identity is kept separate from the strict client draft DTO. */
+export async function addTeacherPrivateRunTrack(input:Key,raw:unknown){
+  const link=await activeLink(input)
+  if(link.eventStatus!=='DRAFT'||link.runStatus!=='DRAFT')fail('HUITEACHER_RUN_NOT_DRAFT')
+  return addPrivateScaleRunTrack({organizationId:input.organizationId,runId:link.runId,actorUserId:input.actorUserId,
+    parent:{kind:'TEACHER_EVENT',id:input.eventId}},raw)
+}
+export async function addTeacherPrivateFormRunTrack(input:Key,raw:unknown){
+  const link=await activeLink(input)
+  if(link.eventStatus!=='DRAFT'||link.runStatus!=='DRAFT')fail('HUITEACHER_RUN_NOT_DRAFT')
+  return addPrivateFormRunTrack({organizationId:input.organizationId,runId:link.runId,actorUserId:input.actorUserId,
+    parent:{kind:'TEACHER_EVENT',id:input.eventId}},raw)
 }
 export async function previewTeacherRun(input:Key&{expectedVersion:number}){
   const link=await activeLink(input)
@@ -147,7 +164,10 @@ export async function cancelTeacherRun(input:Key){
   return cancelAssessmentRun({organizationId:input.organizationId,runId:link.runId})
 }
 
-export async function listTeacherAvailableScales(input:Key){
+export async function listTeacherAvailableScales(input:Key&{cursor?:string}){
   await activeLink(input)
-  return listTeacherScaleCatalog(input)
+  const legacy=input.cursor?{list:[],truncated:false}:await listTeacherScaleCatalog(input)
+  const catalog=await prisma.$transaction(tx=>listEducationLibraryResourcePage(tx,{product:'TEACHER',organizationId:input.organizationId,actorId:input.actorUserId,workflow:{kind:'EVENT',id:input.eventId},cursor:input.cursor}))
+  return {list:[...legacy.list,...catalog.entries.map(entry=>({id:entry.applicability.resourceKey,key:entry.applicability.resourceKey,version:entry.applicability.resourceVersion,title:entry.title,hash:canonicalHash(entry),visibilityPolicyKey:entry.applicability.visibilityPolicyKey,personalReportAvailable:entry.resultDisclosure?.audiences.RESPONDENT.mode==='INDIVIDUAL_SUMMARY'}))],truncated:legacy.truncated,nextCursor:catalog.nextCursor}
 }
+

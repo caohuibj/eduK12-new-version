@@ -69,6 +69,7 @@ describe('ScaleEdit frozen definition and request ownership', () => {
     expect(screen.queryByRole('button', { name: '发布自用（描述性量表）' })).not.toBeInTheDocument()
     for (const tab of ['基本信息', '响应选项', '题目', '计分', '报告文案']) {
       await user.click(screen.getByRole('button', { name: tab }))
+      if (instrumentClass === 'CUSTOM_DESCRIPTIVE') expect(screen.getAllByRole('button', { name: '查看同量表版本历史' })).toHaveLength(1)
       const controls = activeEditingSection().querySelectorAll('input, textarea, select, button')
       expect(controls.length).toBeGreaterThan(0)
       controls.forEach(control => expect(control).toBeDisabled())

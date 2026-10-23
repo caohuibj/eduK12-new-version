@@ -1,3 +1,4 @@
+import { readEducationRespondentScaleReport } from '../reporting/education-scale-personal-report.service'
 import { readRespondentRunSummary } from '../reporting/respondentSummary'
 
 /** Content-qualified STUDENT narrative templates. Real metric interpretations
@@ -13,6 +14,8 @@ export const publishedCampusStudentNarratives: ReadonlyArray<never> = Object.fre
  * exact-instrument narrative. TRAINING reporting remains unchanged.
  */
 export async function readCampusStudentFeedback(userId:string,executionId:string){
+  const libraryReport = await readEducationRespondentScaleReport({ actorUserId: userId, executionId, product: 'SCHOOL' })
+  if (libraryReport) return libraryReport
   const allowed=await readRespondentRunSummary(userId,executionId)
   if(allowed.state==='READY'){
     return {

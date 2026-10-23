@@ -1,0 +1,5 @@
+.education-personal-report{display:grid;gap:1rem;min-width:0;overflow-wrap:anywhere}
+.education-personal-report--school{--hui-ds-color-ink:var(--hs-ink,#1d3a31);--hui-ds-color-muted:#557b69;--hui-ds-color-line:var(--hs-border,#cbded1);--hui-ds-color-surface:#fff;--hui-ds-color-page:var(--hs-bg,#f3f7f1);--hui-ds-color-action:var(--hs-primary,#356957)}
+.education-personal-report--teacher{--hui-ds-color-ink:var(--ht-ink,#362925);--hui-ds-color-muted:var(--ht-quiet,#76665e);--hui-ds-color-line:var(--ht-line,#e5d5ca);--hui-ds-color-surface:var(--ht-paper,#fffdf9);--hui-ds-color-page:var(--ht-bg,#fbf4ed);--hui-ds-color-action:var(--ht-copper,#944638)}
+.education-personal-report .report-core{background:var(--hui-ds-color-page);border-color:var(--hui-ds-color-line)}
+.education-personal-report img{max-width:100%;height:auto}

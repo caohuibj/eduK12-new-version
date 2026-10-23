@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
 
 export class RunResourceBoundaryError extends Error {
@@ -36,8 +37,8 @@ export const assertCurrentRunManagerBoundary = async (input: {
   organizationId: string
   runId: string
   actorUserId: string
-}): Promise<void> => {
-  const rows = await prisma.$queryRaw<Array<{
+}, db: Prisma.TransactionClient | typeof prisma = prisma): Promise<void> => {
+  const rows = await db.$queryRaw<Array<{
     createdByUserId: string
     membershipId: string | null
     orgRole: string | null
