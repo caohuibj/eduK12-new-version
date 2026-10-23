@@ -1,9 +1,14 @@
+import {execFileSync} from 'node:child_process';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {binding,branch,marker,trainingAssessmentPlan,trainingAssessmentOutputs} from './training-assessment-scope.mjs';
 import {verifyBuildEvidence,verifyTests} from './training-assessment-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
+// Preserve the historical build proof without admitting it for today's changed inputs.
+const historicalMain='e3ebf626c39f57604362c7e4ce8d6a9d74e29c2f';
+function historicalRead(file){const r=JSON.parse(readFileSync('.github/evidence/training-assessment/build.json'));return Object.hasOwn(r.controlSHA256,file)?execFileSync('git',['show',historicalMain+':'+file]):readFileSync(file);}
+const historicalBlob=file=>execFileSync('git',['rev-parse',historicalMain+':'+file],{encoding:'utf8'}).trim();
 function fixture(){
  const head='a'.repeat(40),source='b'.repeat(40),values={};
  const entries=Object.entries(binding.source).map(([file,s])=>({file,...s}));
@@ -33,8 +38,10 @@ for(const[name,change]of [
 ])test('refuses '+name,()=>{const f=fixture();change(f);assert.throws(()=>f.plan())});
 test('base drift is rejected',()=>{const f=fixture();assert.throws(()=>trainingAssessmentPlan(f.entries,'c'.repeat(40),f.head,f.read,f.env))});
 test('only an exact main merge classifies without repeated checks',()=>{const f=fixture();Object.assign(f.env,{CI_EVENT:'push',CI_HEAD_REF:'main',GITHUB_REF_NAME:'main'});const p=f.plan();assert.equal(p.postMerge,true);assert.equal(trainingAssessmentOutputs(p).codeql,false);f.env.GITHUB_REF_NAME=branch;assert.throws(()=>f.plan())});
-test('accepts original local builds with explicit provenance limits and current inputs',()=>{const r=verifyBuildEvidence();assert.equal(r.ciExecuted,false);assert.equal(r.originalExecutionSigned,false);assert.equal(r.builds.length,2);});
-test('rejects tampered build receipts and changed compiler inputs',()=>{assert.throws(()=>verifyBuildEvidence(f=>f.endsWith('build.json')?Buffer.from('{}'):readFileSync(f)));assert.throws(()=>verifyBuildEvidence(readFileSync,()=> 'c'.repeat(40)));});
+test('accepts original local builds with explicit provenance limits and historical inputs',()=>{const r=verifyBuildEvidence(historicalRead,historicalBlob);assert.equal(r.ciExecuted,false);assert.equal(r.originalExecutionSigned,false);assert.equal(r.builds.length,2);});
+test('rejects tampered build receipts and changed compiler inputs',()=>{assert.throws(()=>verifyBuildEvidence(f=>f.endsWith('build.json')?Buffer.from('{}'):historicalRead(f),historicalBlob));assert.throws(()=>verifyBuildEvidence(historicalRead,()=> 'c'.repeat(40)));});
 test('requires every selected assertion with no filtered or missing files',()=>{const files=['src/one.test.ts'];const r={success:true,numFailedTests:0,numPendingTests:0,numTodoTests:0,testResults:[{name:'/runner/src/one.test.ts',assertionResults:[{fullName:'one',status:'passed'}]}]};assert.equal(verifyTests(r,files).cases,1);assert.throws(()=>verifyTests(r,['src/two.test.ts']));r.testResults[0].assertionResults[0].status='pending';assert.throws(()=>verifyTests(r,files));});
 test('stable gate requires actual scope qualification and CodeQL, refuses draft or skipped results',()=>{const p=fixture().plan(),outputs=Object.fromEntries(Object.entries(trainingAssessmentOutputs(p)).map(([k,v])=>[k,String(v)]));const n={scope:{result:'success',outputs},'training-assessment':{result:'success'},codeql:{result:'success'}};assert.deepEqual(requiredChecks(n,false),['scope','training-assessment','codeql']);assert.deepEqual(failedChecks(n,false),[]);assert(failedChecks(n,true).length);for(const result of [undefined,'failure','skipped','cancelled'])for(const job of ['scope','training-assessment','codeql']){const a=structuredClone(n);a[job].result=result;assert(failedChecks(a,false).includes(job))}const a=structuredClone(n);a.scope.outputs.frontend='true';assert(failedChecks(a,false).includes('scope'));});
 test('workflow wires scoped assertions and existing HIGH CRITICAL audit reuse without broad builds',()=>{const main=readFileSync('.github/workflows/ci.yml','utf8'),workflow=readFileSync('.github/workflows/ci-training-assessment.yml','utf8');assert(main.includes('training_assessment_plan: ${{ steps.scope.outputs.training_assessment_plan }}'));assert(main.includes('uses: ./.github/workflows/ci-training-assessment.yml'));assert(main.includes("application_route != 'training-assessment'"));assert(workflow.includes('participant-access-checks.mjs audit'));assert(workflow.includes('training-assessment-reuse.mjs backend'));assert(!workflow.includes('npm test'));assert(!workflow.includes('npm run build'));assert(!workflow.includes('services:'));assert(workflow.includes('needs: [admission, frontend, backend]'));});
+
+test('current education inputs reject the original Training build qualification',()=>{assert.throws(()=>verifyBuildEvidence(),/Built input drift:/)});

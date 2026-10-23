@@ -1,5 +1,5 @@
 {
-  "base": "54ed73fdbef60b3b8d4998984c624c98c6bc99cb",
+  "base": "e3ebf626c39f57604362c7e4ce8d6a9d74e29c2f",
   "product": "63564fb87d7ffc7722652a2d564fdaaf3443892f",
   "source": {
     "server-version/frontend/src/admin/AdminKeyEnrollment.tsx": {
@@ -156,7 +156,8 @@
     "docs/release/README.md",
     ".github/scripts/training-manual-ui.test.mjs",
     ".github/scripts/survey-manual-ui.test.mjs",
-    ".github/scripts/school-teacher-visual-reuse.mjs"
+    ".github/scripts/school-teacher-visual-reuse.mjs",
+    ".github/scripts/training-assessment.test.mjs"
   ],
   "controlBefore": {
     ".github/scripts/school-teacher-visual-bindings.json": null,
@@ -165,17 +166,18 @@
     ".github/scripts/school-teacher-visual-browser.cjs": null,
     ".github/scripts/school-teacher-visual-fixtures.cjs": null,
     ".github/workflows/ci-school-teacher-visual.yml": null,
-    ".github/scripts/content-scope.mjs": "5d4e36de9972cd6979d3243be198888954c68449",
-    ".github/scripts/merge-gate.mjs": "2895a9a92b95f4593f6cdc83e2be061a73f5a5dc",
-    ".github/workflows/ci.yml": "a5c9edf31852ececb0e42f2fc3a0c236daa3a231",
-    "docs/release/README.md": "e788796cfdaa6c9208c3df51f87cec8c3769785a",
+    ".github/scripts/content-scope.mjs": "6312c317a3e88dfb9da55ad7e4fb17cde628c067",
+    ".github/scripts/merge-gate.mjs": "404ca52d032e4a5db5904d355501b2998573123b",
+    ".github/workflows/ci.yml": "9ee1854d4722bb6e803db8ac3b2aab6d2b18a965",
+    "docs/release/README.md": "dd1e991fb762d3c800fe449116beef0d96442968",
     ".github/scripts/training-manual-ui.test.mjs": "dd3db63aea96c2a0b5d1637080a0fa9776ffe3c0",
     ".github/scripts/survey-manual-ui.test.mjs": "66f8cb77cfd79e2c344b175e7361f76a9058819f",
-    ".github/scripts/school-teacher-visual-reuse.mjs": null
+    ".github/scripts/school-teacher-visual-reuse.mjs": null,
+    ".github/scripts/training-assessment.test.mjs": "a04f74ff68f012ead2c44af58985a64de6d36cac"
   },
   "components": {
-    "frontend": "8f06706ae6dd74d6527f00a493aafa3c441e0d95",
-    "backend": "e82fa9e456d5b02c840f823ab7d03d6d47e4aeb4"
+    "frontend": "4ba666dd6448b6942c1bd44d31c3b2e52cc6b9f0",
+    "backend": "6ef1ba477c85aaeb40bbe7ad02b38e6df5cdd66a"
   },
   "protectedInputs": {
     "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",

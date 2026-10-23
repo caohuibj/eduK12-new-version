@@ -11,7 +11,7 @@ export function schoolTeacherVisualPlan(entries,base,head,read=git,env=process.e
  assert.ok(['pull_request','push'].includes(env.CI_EVENT),'No manual/full/probe route');
  assert.notEqual(env.CI_FORCE_FULL,'true','No full-platform fallback');
  assert.equal(base,binding.base,'Frozen main changed');assert.match(head,/^[a-f0-9]{40}$/);
- assert.equal(binding.base,'54ed73fdbef60b3b8d4998984c624c98c6bc99cb');
+ assert.equal(binding.base,'e3ebf626c39f57604362c7e4ce8d6a9d74e29c2f');
  assert.equal(binding.product,'63564fb87d7ffc7722652a2d564fdaaf3443892f');
  if(env.CI_EVENT==='pull_request'){
   assert.equal(ref,branch);assert.equal(env.CI_PR_REPOSITORY||env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');

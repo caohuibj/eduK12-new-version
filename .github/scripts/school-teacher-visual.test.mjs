@@ -51,7 +51,7 @@ test('ready gate requires all selected actual successes and refuses draft or for
 test('only real frontend execution qualifies and browser consumes the same official dist',()=>{
  const w=readFileSync('.github/workflows/ci-school-teacher-visual.yml','utf8');
  assert.equal((w.match(/npm run build/g)||[]).length,1);
- for(const command of ['school-teacher-visual-reuse.mjs','school-teacher-visual-browser.cjs','google-chrome --version','if: always()'])assert.ok(w.includes(command),command);
+ for(const command of ['tsc -p tsconfig.app.json --noEmit','vitest.mjs run','eslint/bin/eslint.js','school-teacher-visual-browser.cjs','google-chrome --version','if: always()'])assert.ok(w.includes(command),command);
  for(const forbidden of ['verifyReviewedEvidence','npm test','services:','prisma migrate','DATABASE_URL','secrets.','--no-sandbox','sysctl'])assert.ok(!w.includes(forbidden),forbidden);
  const b=readFileSync('.github/scripts/school-teacher-visual-browser.cjs','utf8');
  assert.ok(b.includes('server-version/frontend/dist'));assert.ok(b.includes('body:fs.readFileSync(file)'));
@@ -63,7 +63,7 @@ test('manual full and all probe entries reject this branch before any business j
  assert.ok(lines.length>=10);for(const line of lines)assert.ok(line.includes(branch));
  assert.ok(w.includes('school_teacher_visual_plan: ${{ steps.scope.outputs.school_teacher_visual_plan }}'));
  assert.ok(w.includes('uses: ./.github/workflows/ci-school-teacher-visual.yml'));
- assert.ok(w.includes('needs: [scope, training-manual-ui, survey-manual-ui, school-teacher-visual,'));
+ assert.match(w,/needs: \[scope, training-manual-ui, survey-manual-ui,[^\n]*school-teacher-visual,/);
 });
 test('synthetic API refuses unknown reads and every mutation, while preserving denied auth',async()=>{
  const {default:f}=await import('./school-teacher-visual-fixtures.cjs');
@@ -93,7 +93,7 @@ test('reuse protects exact original merge, all other files, and old artifact ide
  const {original:o,cssPolish,verifyClosure,verifyMerge,verifyReceipt,manifest}=await import('./school-teacher-visual-reuse.mjs');
  const read=(cmd,ref,...rest)=>cmd==='diff'?(rest.includes('--')?cssPolish:'.github/scripts/school-teacher-visual-browser.cjs'):ref.endsWith('^{tree}')?o.tree:ref.endsWith(':server-version/frontend')?binding.components.frontend:ref.endsWith(':server-version/backend')?binding.components.backend:ref.endsWith('ci-school-teacher-visual.yml')?'96243bb4328b896b1ee74c2b1ecc5e54debe9ba6':'d0b2cab09f6e829b89d9fa2c0e9bfbb68d89a5b2';
  verifyClosure(read);assert.throws(()=>verifyClosure((cmd,...a)=>cmd==='diff'?'server-version/frontend/src/App.tsx':read(cmd,...a)));assert.throws(()=>verifyClosure(()=> 'wrong'));
- const merge={sha:o.merge,tree:{sha:o.tree},parents:[{sha:binding.base},{sha:o.head}]};verifyMerge(merge);assert.throws(()=>verifyMerge({...merge,parents:[]}));
+ const merge={sha:o.merge,tree:{sha:o.tree},parents:[{sha:'54ed73fdbef60b3b8d4998984c624c98c6bc99cb'},{sha:o.head}]};verifyMerge(merge);assert.throws(()=>verifyMerge({...merge,parents:[]}));
  const receipt={kind:'official-frontend-stages-reuse',currentHead:'new',currentRun:'1',sourceHead:o.head,sourceRun:String(o.run),semanticChecksReexecuted:false,originalRunConclusion:'failure',originalBrowserConclusion:'failure',originalCodeQLConclusion:'success',browserReused:false,buildReused:false,originalArtifact:manifest};verifyReceipt(receipt,'new',1);
  for(const patch of [{currentHead:'old'},{browserReused:true},{originalArtifact:{...manifest,sha:'new'}},{originalRunConclusion:'success'}])assert.throws(()=>verifyReceipt({...receipt,...patch},'new',1));
 });
@@ -106,4 +106,12 @@ test('CSS polish is tightly scoped and current browser uses only the new dist',(
  assert.ok(b.includes('sha:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID'));
  assert.ok(b.indexOf("await proof(product+'-admin-login'")<b.indexOf("name:'管理员登录',exact:true}).click()"));
  assert.ok(b.includes('admin-login-invalid-viewport'));assert.ok(b.includes('Exactly one visible return-to-login link'));
+});
+
+test('latest main integration cannot reuse old semantic or build qualification',()=>{
+ const w=readFileSync('.github/workflows/ci-school-teacher-visual.yml','utf8');
+ assert.ok(!w.includes('school-teacher-visual-reuse.mjs'));assert.ok(!w.includes('GH_TOKEN'));
+ const b=readFileSync('.github/scripts/school-teacher-visual-browser.cjs','utf8');assert.ok(!b.includes('official-reuse.json'));assert.ok(!b.includes('school-teacher-visual-reuse.mjs'));
+ assert.equal(binding.base,'e3ebf626c39f57604362c7e4ce8d6a9d74e29c2f');
+ for(const file of ['finalDraftStore.test.ts','deferred-media.test.tsx','runner-preparation.test.tsx','SurveyCognitiveRunner.integration.test.tsx'])assert.ok(w.includes(file));
 });

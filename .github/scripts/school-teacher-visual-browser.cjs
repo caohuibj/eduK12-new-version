@@ -16,9 +16,9 @@ async function run(){
  const axe=fs.readFileSync(path.join(root,'.github/release-tools/node_modules/axe-core/axe.min.js'),'utf8');
  const report={source:process.env.GITHUB_SHA,run:process.env.GITHUB_RUN_ID,scope:'synthetic-production-frontend-ui',checks:[],unexpected:[],pageErrors:[],status:'running'};
  const manifest=JSON.parse(fs.readFileSync(path.join(dist,'ci-build-manifest.json'),'utf8'));
- const {verifyReceipt}=await import('./school-teacher-visual-reuse.mjs');
- const receipt=JSON.parse(fs.readFileSync(path.join(out,'official-reuse.json'),'utf8'));verifyReceipt(receipt,process.env.GITHUB_SHA,process.env.GITHUB_RUN_ID);
- const {verifyManifest,treeDigest}=await import('./ci-artifact.mjs');verifyManifest(manifest,{schemaVersion:1,sha:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID,kind:'frontend',lockDigest:receipt.originalArtifact.lockDigest},treeDigest(dist));report.artifact=manifest;report.reuse=receipt;
+ const {verifyManifest,treeDigest}=await import('./ci-artifact.mjs');
+ const lockDigest=require('node:crypto').createHash('sha256').update(fs.readFileSync(path.join(root,'server-version/frontend/package-lock.json'))).digest('hex');
+ verifyManifest(manifest,{schemaVersion:1,sha:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID,kind:'frontend',lockDigest},treeDigest(dist));report.artifact=manifest;
  let browser,page;
  const timeout=setTimeout(()=>{throw Error('Browser matrix exceeded 6 minutes')},360000);
  async function proof(name,width,theme){

@@ -7,7 +7,6 @@ on:
         required: true
 permissions:
   contents: read
-  actions: read
 env:
   NPM_CONFIG_REGISTRY: https://registry.npmjs.org
   NPM_CONFIG_REPLACE_REGISTRY_HOST: always
@@ -45,15 +44,32 @@ jobs:
           assert.deepEqual(schoolTeacherVisualPlan(changedEntries(p.base,head),p.base,head),p);
           assert.equal(p.postMerge,false);
           JS
-          node --test .github/scripts/school-teacher-visual.test.mjs .github/scripts/training-manual-ui.test.mjs .github/scripts/survey-manual-ui.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/content-workflows.test.mjs
-      - name: verify official unchanged semantic checks without reusing the old CSS build
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: node .github/scripts/school-teacher-visual-reuse.mjs
-      - name: build the CSS-polished production frontend once
+          node --test .github/scripts/training-assessment.test.mjs .github/scripts/training-assessment-reuse.test.mjs .github/scripts/school-teacher-visual.test.mjs .github/scripts/training-manual-ui.test.mjs .github/scripts/survey-manual-ui.test.mjs .github/scripts/ci-topology.test.mjs .github/scripts/content-workflows.test.mjs
+      - name: install locked frontend and compile-only backend type dependencies
+        run: |
+          npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/frontend
+          npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/backend
+          cd server-version/backend
+          node node_modules/prisma/build/index.js generate --schema prisma/schema.prisma
+      - name: changed product lint and complete frontend types
         working-directory: server-version/frontend
         run: |
-          npm ci --ignore-scripts --no-audit --no-fund
+          node --input-type=module <<'JS'
+          import {execFileSync} from 'node:child_process';
+          import {binding} from '../../.github/scripts/school-teacher-visual-scope.mjs';
+          const files=Object.keys(binding.source).filter(f=>/\.[jt]sx?$/.test(f)).map(f=>f.replace('server-version/frontend/',''));
+          if(!files.length)throw Error('Missing changed lint inputs');
+          execFileSync(process.execPath,['node_modules/eslint/bin/eslint.js',...files],{stdio:'inherit'});
+          JS
+          node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit
+      - name: targeted entry authorization navigation and draft consumers
+        working-directory: server-version/frontend
+        run: |
+          mkdir -p ../../school-teacher-visual-evidence
+          node node_modules/vitest/vitest.mjs run src/pages/AdminLogin.test.tsx src/admin/SurveyAdminEnrollmentContext.test.tsx src/admin/AdminAuthenticator.test.tsx src/components/app-shell/__tests__/SurveyAdminOrigin.test.tsx src/components/app-shell/__tests__/shell.test.tsx src/school/SchoolEntryMfa.test.tsx src/school/SchoolWorkspaceShell.test.tsx src/school/SchoolWorkspace.test.tsx src/school/SchoolPrivateToolNavigation.test.tsx src/huiteacher/HuiteacherWorkspaceFlow.test.tsx src/huiteacher/HuiteacherWorkspaceLayout.test.tsx src/huiteacher/HuiteacherPrivateToolNavigation.test.tsx src/pages/admin/EducationProductGovernance.test.tsx src/services/persistence/__tests__/finalDraftStore.test.ts src/modules/assessment-media/__tests__/deferred-media.test.tsx src/modules/cognitive/core/__tests__/runner-preparation.test.tsx src/survey/SurveyCognitiveRunner.integration.test.tsx --maxWorkers=2 --reporter=default --reporter=json --outputFile=../../school-teacher-visual-evidence/consumer-tests.json
+      - name: build the latest-main integrated production frontend once
+        working-directory: server-version/frontend
+        run: |
           npm run build
           node "$GITHUB_WORKSPACE/.github/scripts/ci-artifact.mjs" write frontend
           node "$GITHUB_WORKSPACE/.github/scripts/ci-artifact.mjs" verify frontend

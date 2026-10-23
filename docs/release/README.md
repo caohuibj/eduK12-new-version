@@ -1222,3 +1222,13 @@ acceptance. Scope, the actual frontend job and bounded frontend/control CodeQL
 must all succeed; drafts and missing/skipped/failed/cancelled checks cannot merge.
 The stable gate recomputes the complete scope. Exact main pushes only classify
 and do not repeat application checks. No deployment is authorized by this lane.
+
+The same visual candidate was subsequently aligned with main PR #343 at
+`e3ebf626c39f57604362c7e4ce8d6a9d74e29c2f`. Its changed shared frontend inputs
+invalidate the earlier frontend semantic/build/SAST qualification. The active
+visual workflow therefore performs fresh integrated frontend types, named
+consumers (including shared draft/deferred-loader integration), one production
+build, full current frontend/control CodeQL and the real-dist browser matrix.
+The earlier official reuse helper remains historical only and is not called by
+this workflow or browser. PR #343 business files and its independent CI route
+are preserved unchanged; no backend business checks or database are added.
