@@ -78,7 +78,7 @@ jobs:
       COGNITIVE_MODULE_ENABLED: 'true'
       MATERIAL_GRANTS_ENABLED: 'true'
       REDIS_URL: redis://127.0.0.1:6379
-      UPLOAD_DIR: ${{ runner.temp }}/shared-authoring-uploads-${{ github.run_id }}-${{ github.run_attempt }}
+      UPLOAD_DIR: /tmp/shared-authoring-uploads-${{ github.run_id }}-${{ github.run_attempt }}
     services:
       postgres:
         image: postgres:16.15-bookworm
@@ -129,7 +129,7 @@ jobs:
         if: always()
         shell: bash
         run: |
-          case "$UPLOAD_DIR" in "$RUNNER_TEMP"/shared-authoring-uploads-*) rm -rf -- "$UPLOAD_DIR" ;; *) exit 1 ;; esac
+          case "$UPLOAD_DIR" in "/tmp/shared-authoring-uploads-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT") rm -rf -- "$UPLOAD_DIR" ;; *) exit 1 ;; esac
   browser:
     needs: frontend
     runs-on: ubuntu-24.04
