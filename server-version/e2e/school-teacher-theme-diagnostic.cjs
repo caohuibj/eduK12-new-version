@@ -14,10 +14,19 @@ function animationFacts(selector){
  return {visibility:document.visibilityState,activeTag:document.activeElement?.tagName||null,events:{...probe?.events},animations:root?[...root.getAnimations({subtree:true})].filter(a=>a instanceof CSSTransition).slice(0,40).map(a=>{const t=a.effect?.getComputedTiming(),el=a.effect?.target,r=el?.getBoundingClientRect();return{id:probe?.id(a)||null,property:a.transitionProperty,playState:a.playState,pending:a.pending,startTime:num(a.startTime),timelineTime:num(a.timeline?.currentTime),playbackRate:num(a.playbackRate),currentTime:num(a.currentTime),endTime:num(t?.endTime),duration:num(t?.duration),connected:el?.isConnected===true,tag:el?.tagName||null,rect:r?{x:r.x,y:r.y,width:r.width,height:r.height}:null}}):[]}
 }
 
+async function waitParticipantComplete(page,entry){
+ if(entry==='school'){
+  const status=page.locator('.hs-runner .hs-message[role="status"]')
+  await status.getByRole('heading',{name:'合成表单演示已完成',exact:true}).waitFor()
+  await status.getByText('这不是正式提交，没有产生 FINAL。',{exact:true}).waitFor()
+  await status.getByRole('button',{name:'返回合成表单',exact:true}).waitFor()
+ }else await page.getByText('合成表单演示已完成。这不是正式提交，没有产生 FINAL。',{exact:true}).waitFor()
+}
+
 async function run(){
  assert(allowed(process.env,JSON.parse(fs.readFileSync(process.env.GITHUB_EVENT_PATH,'utf8'))),'Diagnostic context refused')
  const repo=path.resolve(__dirname,'../..'),dist=path.join(repo,'server-version/frontend/theme-diagnostic-dist'),out=path.join(repo,'school-theme-diagnostic-evidence');fs.mkdirSync(out,{recursive:true})
- const report={schemaVersion:1,acceptance:false,scope:'synthetic real participant-shell and FormPlayer theme diagnostic; no backend/authentication/FINAL qualification',source:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID,observations:[],console:[],pageErrors:[],unexpected:[],errors:[]}
+ const report={schemaVersion:1,acceptance:false,expectedObservations:8,selectedScope:{entries:['school'],states:['complete'],widths:[320,390],motions:['reduce','no-preference'],modes:['light','dark']},scope:'8 missing School synthetic completion observations; other 136 unchanged observations passed in run 39941778702; no FINAL qualification',source:process.env.GITHUB_SHA,runId:process.env.GITHUB_RUN_ID,observations:[],console:[],pageErrors:[],unexpected:[],errors:[]}
  let browser,server,phase='preflight'
  try{
   const chrome=require('./school-teacher-chrome.cjs'),{settleThemeTransitions,classifyThemeFailure}=require('./school-teacher-ui.cjs')
@@ -27,7 +36,7 @@ async function run(){
   await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));const origin='http://127.0.0.1:'+server.address().port
   const {chromium}=require(path.join(repo,'.github/release-tools/node_modules/playwright-core'));browser=await chromium.launch(chrome.CHROME_LAUNCH_OPTIONS);report.sandbox=await chrome.verifyChromeSandbox(browser);assert.equal(report.sandbox.ok,true)
   const axe=fs.readFileSync(path.join(repo,'.github/release-tools/node_modules/axe-core/axe.min.js'),'utf8')
-  for(const entry of ['school','teacher'])for(const motion of ['reduce','no-preference'])for(const width of [320,390])for(const state of ['single','conditional','multiple','matrix','matrix-refusal','page-two','error','save-error','complete']){
+  for(const entry of ['school'])for(const motion of ['reduce','no-preference'])for(const width of [320,390])for(const state of ['complete']){
    const editorState='participant'
    const context=await browser.newContext({viewport:{width,height:844},reducedMotion:motion,serviceWorkers:'block'})
    try{
@@ -51,7 +60,7 @@ async function run(){
       }
      }
     }
-    if(state==='complete')await page.getByText('合成表单演示已完成。这不是正式提交，没有产生 FINAL。',{exact:true}).waitFor()
+    if(state==='complete')await waitParticipantComplete(page,entry)
     const selector=entry==='school'?'.hs-app':'.ht-app',label=entry==='school'?'School 外观':'Teacher 外观'
     for(const mode of ['light','dark']){
      const row={entry,motion,width,state,editorState,mode};report.observations.push(row);phase=[entry,motion,width,state,editorState,mode].join(':')
@@ -67,9 +76,9 @@ async function run(){
  }catch(e){report.errors.push({phase,hash:hash(e)})}finally{
   if(browser)try{await browser.close()}catch(e){report.errors.push({phase:'browser-close',hash:hash(e)})}
   if(server)await new Promise(resolve=>server.close(resolve))
-  report.status=report.errors.length||report.console.length||report.pageErrors.length||report.unexpected.length||report.observations.some(r=>r.transitionFailure||r.axe?.length||r.layout?.scrollWidth>r.width+1)?'FAILED':'DIAGNOSTIC_PASSED'
+  report.status=report.observations.length!==report.expectedObservations||report.errors.length||report.console.length||report.pageErrors.length||report.unexpected.length||report.observations.some(r=>r.transitionFailure||r.axe?.length||r.layout?.scrollWidth>r.width+1)?'FAILED':'DIAGNOSTIC_PASSED'
   fs.writeFileSync(path.join(out,'theme-diagnostic.json'),JSON.stringify(report,null,2)+'\n');if(report.status==='FAILED')process.exitCode=1
  }
 }
-module.exports={allowed,animationFacts,installAnimationProbe}
+module.exports={allowed,animationFacts,installAnimationProbe,waitParticipantComplete}
 if(require.main===module)run().catch(e=>{console.error('Diagnostic refused: '+hash(e));process.exitCode=1})
