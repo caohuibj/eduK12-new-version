@@ -51,7 +51,7 @@ function EducationMaterialSession({api,organizationId,toolId,value,onChange,disa
   catch(cause){if(active.current===request&&alive.current&&currentApi.current===api)setError(cause instanceof Error?cause.message:'上传失败')}
   finally{finish(request)}
  }
- return <div><label>上传当前工具素材<input aria-label="上传当前工具素材" type="file" accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,application/pdf" disabled={disabled||uploading} onChange={event=>{const file=event.target.files?.[0];event.target.value='';if(file)void upload(file)}}/></label>
+ return <div><label className="education-material-upload">上传当前工具素材<input aria-label="上传当前工具素材" type="file" accept="image/png,image/jpeg,image/webp,video/mp4,video/webm,application/pdf" disabled={disabled||uploading} onChange={event=>{const file=event.target.files?.[0];event.target.value='';if(file)void upload(file)}}/></label>
   {uploading&&<p role="status">正在上传素材…</p>}{error&&<p role="alert">{error}</p>}
   <AssessmentMaterialPicker value={value} onChange={items=>void change(items)} label={label} disabled={disabled||uploading} provider={provider}/>
  </div>

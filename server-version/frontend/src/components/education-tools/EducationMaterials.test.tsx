@@ -1,6 +1,8 @@
 import {act,cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react'
 import {afterEach,describe,it,expect,vi} from 'vitest'
 import {EducationMaterialPicker} from './EducationMaterialPicker'
+import {readFileSync} from 'node:fs'
+const privateToolsCss=readFileSync('src/components/education-tools/education-private-tools.css','utf8')
 import type {PrivateToolApi} from './privateToolClient'
 afterEach(()=>{cleanup();vi.restoreAllMocks()})
 const props={entry:'TEACHER' as const,actorId:'actor',organizationId:'school',toolId:'tool',onChange:vi.fn()}
@@ -20,6 +22,9 @@ describe('Education material library has no Training permission fallback',()=>{
  it('uploads through the selected tool with its own busy guard and leaves other tools untouched',async()=>{
   const api=vi.fn(async()=>({assetId:'asset'})),onBusy=vi.fn()
   render(<EducationMaterialPicker {...props} api={api as PrivateToolApi} onBusy={onBusy}/>)
+  expect(screen.getByLabelText('上传当前工具素材').closest('label')).toHaveClass('education-material-upload')
+  expect(privateToolsCss).toMatch(/\.education-material-upload \{ min-width: 0; grid-template-columns: minmax\(0, 1fr\); \}/)
+  expect(privateToolsCss).toMatch(/\.education-material-upload input\[type=file\] \{ width: 100%; min-width: 0; box-sizing: border-box; \}/)
   fireEvent.change(screen.getByLabelText('上传当前工具素材'),{target:{files:[new File(['%PDF-1.4'],'fixture.pdf',{type:'application/pdf'})]}})
   await waitFor(()=>expect(api).toHaveBeenCalledWith('/organizations/school/private-tools/tool/materials','POST',expect.any(FormData)))
   await waitFor(()=>expect(onBusy).toHaveBeenLastCalledWith(false))
