@@ -5,9 +5,9 @@
   "branch": "work/school-teacher-review-20261022",
   "enabled": true,
   "base": "4dd9f1340fef2bc3df2d066b9bf7712bc2eb3c66",
-  "productHead": "d9657432f39da2638daa1492215fa1015cf78710",
+  "productHead": "6da860545274b41b9d37a894f73ac72a7e62c068",
   "frontendTree": "c1e34b8fdd1a0127a155a208187a8c6bb2f8760f",
-  "backendTree": "f58ac0f0fb0ab55a58303dd267e89ba1090c0795",
+  "backendTree": "7d7da5957de21f09dfd89bd097b4dc7c81a88ef3",
   "source": {
     ".github/scripts/school-teacher-browser-control.mjs": {
       "before": null,
@@ -59,7 +59,7 @@
     },
     "server-version/backend/scripts/runtime-table-policy.json": {
       "before": "54033945ee56e92086edbbfd5ea1b1abb98d5566",
-      "after": "c7a33ee0e2d700ba39a9a99a82c6a5cb052a08f8"
+      "after": "ace85218711a03301aef8b4626f0cf9951cb7b4e"
     },
     "server-version/backend/src/__tests__/assessment-run/private-form-execution.test.ts": {
       "before": null,
@@ -807,7 +807,7 @@
     },
     "server-version/e2e/school-teacher-backend-receipt.test.cjs": {
       "before": null,
-      "after": "40103da077082bc6f3241f572b0b5ea748e5b631"
+      "after": "88b6d7ec7a51456583ea5db9b43483ba2703bbab"
     },
     "server-version/e2e/school-teacher-chrome-permissions.cjs": {
       "before": null,
@@ -819,7 +819,7 @@
     },
     "server-version/e2e/school-teacher-fixture.cjs": {
       "before": null,
-      "after": "9bf1a45e71b03efd37a38afaa4ddb5886d328cf4"
+      "after": "e143fd988330b1c62578b3e43ab85382725a8c3f"
     },
     "server-version/e2e/school-teacher-frontend-receipt.test.cjs": {
       "before": null,
@@ -1410,7 +1410,7 @@
   "review": {
     "completed": true,
     "originalExecutionSigned": false,
-    "note": "No local historical execution is admitted. Fixed official frontend checks and immutable frontend/backend artifacts retain original producer identities. The fifth failed connected job supplies independently reverified 105 passed cases and nonempty upgrade preservation; the sixth failed connected job supplies five passed cases. No business test is repeated. Fresh schema, seed, font and narrowly authorized temporary permission preparation remain environment setup, not browser acceptance. Browser and restore remain required real execution. Seventh successful SAST authenticates prior application/control evidence; only three changed controls and Chrome helper plus its two affected tests are newly scanned. No prior failure is relabeled as a successful job."
+    "note": "No local historical execution is admitted. Fixed official frontend checks and immutable frontend/backend artifacts retain original producer identities. The fifth failed connected job supplies independently reverified 105 passed cases and nonempty upgrade preservation; the sixth failed connected job supplies five passed cases. No business test is repeated. The exact noncompiled runtime policy repair is normalized only for compiled-artifact reuse; current seed, role and restore checks use the new policy. Fresh schema, seed, font and narrowly authorized temporary permission preparation remain environment setup, not browser acceptance. Browser and restore remain required real execution. Eighth successful SAST authenticates prior application/control evidence; only the exact changed policy, seed, receipt and control paths are newly scanned. No prior failure is relabeled as a successful job."
   },
   "requiredJobs": [
     "admission",
@@ -1420,7 +1420,7 @@
   ],
   "frontendBuildDecision": "fixed-official-frontend-build",
   "backendBuildDecision": "fixed-official-backend-build",
-  "backendBuildReason": "Reuse fifth official immutable compiled artifact; only the single excluded Survey fixture changes",
+  "backendBuildReason": "Reuse the original fifth-run immutable compiled artifact; the one tsc-excluded Survey fixture and exact old/new noncompiled runtime policy are separately pinned. Current seed, role and restore checks consume the new policy.",
   "backendBuildInputsChanged": [
     "server-version/backend/prisma/schema.prisma",
     "server-version/backend/src/modules/scale-library-governance/source.ts"
@@ -1789,16 +1789,16 @@
             "Education library emergency collection stop at real runtime boundaries TEACHER: committed release stop rejects a new START and an already-started FINAL without saving results",
             "School approved library observer real completion and report privacy completes PARENT_REPORT with real relationship/consent and no individual report disclosure",
             "School approved library observer real completion and report privacy completes TEACHER_REPORT with real relationship/consent and no individual report disclosure",
-            "Education library real START\u2192FINAL\u2192personal report and image authorization does not invent personal text or image rights for a version with no content audience",
-            "Education library real START\u2192FINAL\u2192personal report and image authorization reads SCHOOL self feedback from real FINAL and enforces identical current image access",
-            "Education library real START\u2192FINAL\u2192personal report and image authorization reads TEACHER self feedback from real FINAL and enforces identical current image access",
+            "Education library real START→FINAL→personal report and image authorization does not invent personal text or image rights for a version with no content audience",
+            "Education library real START→FINAL→personal report and image authorization reads SCHOOL self feedback from real FINAL and enforces identical current image access",
+            "Education library real START→FINAL→personal report and image authorization reads TEACHER self feedback from real FINAL and enforces identical current image access",
             "Psychologist own-activity approved library observer publication publishes and completes PARENT_REPORT without granting individual report access",
             "Psychologist own-activity approved library observer publication publishes and completes TEACHER_REPORT without granting individual report access",
             "School psychologist real ALL_CURRENT teacher-target selection rejects a mixed teacher target atomically and publishes only the explicitly selected HOMEROOM population",
             "Education public library actual publication / isolated PostgreSQL SCHOOL: actual approved grant, catalog, two tracks, preview and publish preserve exact source",
             "Education public library actual publication / isolated PostgreSQL TEACHER: actual approved grant, catalog, two tracks, preview and publish preserve exact source",
             "Education public library actual publication / isolated PostgreSQL another organization cannot publish the fixed source run",
-            "Education public library actual publication / isolated PostgreSQL real admission quarantine ahead of publication does not invert admission\u2192org locking or publish an ineligible student",
+            "Education public library actual publication / isolated PostgreSQL real admission quarantine ahead of publication does not invert admission→org locking or publish an ineligible student",
             "Education public library actual publication / isolated PostgreSQL revoked distribution blocks new preview/publication, but immutable history remains addressable",
             "Education public library actual publication / isolated PostgreSQL selected class revocation committed while fact locking waits cannot freeze the stale selection",
             "Private Form fixed-version draft attachment and read-only preview, preserving source content SCHOOL uses the real product draft parent and CAS, rejects incompatible versions without changing source, and leaves the activity unpublished",
@@ -1856,7 +1856,7 @@
             "School/Teacher authoring current PostgreSQL authority cannot combine a counselor persona here with a psychology capability in another school",
             "School/Teacher authoring current PostgreSQL authority does not apply an unrelated School-product deny to Teacher",
             "School/Teacher authoring current PostgreSQL authority does not turn platform, organization or product administration into authoring authority",
-            "School/Teacher authoring current PostgreSQL authority does not use another school\u2019s grants or reveal its membership",
+            "School/Teacher authoring current PostgreSQL authority does not use another school’s grants or reveal its membership",
             "School/Teacher authoring current PostgreSQL authority honors explicit * deny even for administrators",
             "School/Teacher authoring current PostgreSQL authority honors explicit EDUCATION_ACCESS deny even for administrators",
             "School/Teacher authoring current PostgreSQL authority honors explicit HUITEACHER_ACCESS deny even for administrators",
@@ -2005,22 +2005,22 @@
             "src/__tests__/integration/campusActivity.postgres.integration.test.ts"
           ],
           "expectedPassed": [
-            "Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL creates canonical Run drafts atomically, but forbids publication before governing Activity OPEN",
-            "Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL does not let collaborator-only ownership, foreign actors or professional-only resource policy publish students",
-            "Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL does not substitute all school students when an activity has no selected population",
-            "Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL lists only current allocatable class names for activity editors and rechecks scope at allocation",
-            "Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL publishes own psychologist activity with CLASS_ASSIGN without TEACHER persona and safely closes its batch",
-            "Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL rechecks psychologist qualification in close/cancel transactions and preserves admin cancellation",
-            "Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL rejects an actor from another SCHOOL trying to allocate and view a private Activity",
-            "Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL rejects an entire reviewed two-student population after one account expires instead of publishing one",
-            "Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL rejects withdrawn class approval at OPEN and publish, while retaining administrator emergency stop",
-            "Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL requires school approval, selects exactly one participant and gates homework on OPEN/PAUSE"
+            "Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL creates canonical Run drafts atomically, but forbids publication before governing Activity OPEN",
+            "Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL does not let collaborator-only ownership, foreign actors or professional-only resource policy publish students",
+            "Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL does not substitute all school students when an activity has no selected population",
+            "Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL lists only current allocatable class names for activity editors and rechecks scope at allocation",
+            "Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL publishes own psychologist activity with CLASS_ASSIGN without TEACHER persona and safely closes its batch",
+            "Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL rechecks psychologist qualification in close/cancel transactions and preserves admin cancellation",
+            "Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL rejects an actor from another SCHOOL trying to allocate and view a private Activity",
+            "Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL rejects an entire reviewed two-student population after one account expires instead of publishing one",
+            "Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL rejects withdrawn class approval at OPEN and publish, while retaining administrator emergency stop",
+            "Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL requires school approval, selects exactly one participant and gates homework on OPEN/PAUSE"
           ],
           "expectedFiltered": [
-            "Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL cannot open an Activity using frozen identities or revoked STUDENT persona",
-            "Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL does not disclose CAMPUS Activity assignments, checkins or tags to a legacy platform ADMIN",
-            "Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL keeps legacy Course records typed LEGACY and forbids a SCHOOL account creating legacy/training Course",
-            "Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL rejects delayed Assignment and Checkin submissions after STUDENT persona revocation"
+            "Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL cannot open an Activity using frozen identities or revoked STUDENT persona",
+            "Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL does not disclose CAMPUS Activity assignments, checkins or tags to a legacy platform ADMIN",
+            "Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL keeps legacy Course records typed LEGACY and forbids a SCHOOL account creating legacy/training Course",
+            "Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL rejects delayed Assignment and Checkin submissions after STUDENT persona revocation"
           ],
           "inputClosure": {
             "files": [
@@ -2039,14 +2039,14 @@
             ],
             "sha256": "1df8beb842919d8d754c8d43e6110abecbd8769d54b9a31d49575d3c6ab6826c"
           },
-          "namePattern": "^(?:Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL creates canonical Run drafts atomically, but forbids publication before governing Activity OPEN|Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL does not let collaborator-only ownership, foreign actors or professional-only resource policy publish students|Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL does not substitute all school students when an activity has no selected population|Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL lists only current allocatable class names for activity editors and rechecks scope at allocation|Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL publishes own psychologist activity with CLASS_ASSIGN without TEACHER persona and safely closes its batch|Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL rechecks psychologist qualification in close/cancel transactions and preserves admin cancellation|Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL rejects an actor from another SCHOOL trying to allocate and view a private Activity|Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL rejects an entire reviewed two-student population after one account expires instead of publishing one|Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL rejects withdrawn class approval at OPEN and publish, while retaining administrator emergency stop|Huischool Activity lifecycle, independent training boundary and task gate \u2014 isolated PostgreSQL requires school approval, selects exactly one participant and gates homework on OPEN/PAUSE)$"
+          "namePattern": "^(?:Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL creates canonical Run drafts atomically, but forbids publication before governing Activity OPEN|Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL does not let collaborator-only ownership, foreign actors or professional-only resource policy publish students|Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL does not substitute all school students when an activity has no selected population|Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL lists only current allocatable class names for activity editors and rechecks scope at allocation|Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL publishes own psychologist activity with CLASS_ASSIGN without TEACHER persona and safely closes its batch|Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL rechecks psychologist qualification in close/cancel transactions and preserves admin cancellation|Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL rejects an actor from another SCHOOL trying to allocate and view a private Activity|Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL rejects an entire reviewed two-student population after one account expires instead of publishing one|Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL rejects withdrawn class approval at OPEN and publish, while retaining administrator emergency stop|Huischool Activity lifecycle, independent training boundary and task gate — isolated PostgreSQL requires school approval, selects exactly one participant and gates homework on OPEN/PAUSE)$"
         },
         {
           "files": [
             "src/__tests__/integration/huiteacherFormRuntime.postgres.integration.test.ts"
           ],
           "expectedPassed": [
-            "Teacher-only Survey Form V2 released resource \u2192 Run START \u2192 encrypted FINAL shares one canonical task identity and cannot overwrite FINAL"
+            "Teacher-only Survey Form V2 released resource → Run START → encrypted FINAL shares one canonical task identity and cannot overwrite FINAL"
           ],
           "expectedFiltered": [],
           "inputClosure": {
@@ -2126,11 +2126,11 @@
             "src/__tests__/survey/tool-publication.postgres.integration.test.ts"
           ],
           "expectedPassed": [
-            "Standalone Survey scale publication and library application \u2014 rollback-only PostgreSQL submits and approves through existing governance, preserving exact content and no implicit use grants"
+            "Standalone Survey scale publication and library application — rollback-only PostgreSQL submits and approves through existing governance, preserving exact content and no implicit use grants"
           ],
           "expectedFiltered": [
-            "Standalone Survey scale publication and library application \u2014 rollback-only PostgreSQL publishes idempotently with tool scope; later edits preserve the old exact snapshot",
-            "Standalone Survey scale publication and library application \u2014 rollback-only PostgreSQL rejects non-scale, unfinished content and non-owner publication before creating releases"
+            "Standalone Survey scale publication and library application — rollback-only PostgreSQL publishes idempotently with tool scope; later edits preserve the old exact snapshot",
+            "Standalone Survey scale publication and library application — rollback-only PostgreSQL rejects non-scale, unfinished content and non-owner publication before creating releases"
           ],
           "inputClosure": {
             "files": [
@@ -2149,7 +2149,7 @@
             ],
             "sha256": "f8d8097d8a520377b49e5d1818da45ddb9c3c0464a7a8dfc47f94f2a3f52c903"
           },
-          "namePattern": "^(?:Standalone Survey scale publication and library application \u2014 rollback-only PostgreSQL submits and approves through existing governance, preserving exact content and no implicit use grants)$"
+          "namePattern": "^(?:Standalone Survey scale publication and library application — rollback-only PostgreSQL submits and approves through existing governance, preserving exact content and no implicit use grants)$"
         },
         {
           "files": [
