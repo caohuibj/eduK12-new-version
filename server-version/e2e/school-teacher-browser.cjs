@@ -522,7 +522,7 @@ async function run() {
       await toolsPage(s, f)
       const studio = p.getByRole('region', { name: '我的私有工具', exact: true })
       await studio.getByLabel('工具名称', { exact: true }).fill(title)
-      await studio.getByLabel('类型', { exact: true }).selectOption(kind)
+      await studio.getByRole('combobox', { name: '类型', exact: true }).selectOption(kind)
       const draft = await s.click(studio.getByRole('button', { name: '创建私有工具' }), base)
       const uri = base + '/' + draft.id
       await s.api(uri, 'PUT', { expectedRevision: draft.revision, title, definition: f.definitions[kind.toLowerCase()] })
@@ -574,7 +574,7 @@ async function run() {
     async function workflowPage(s, f, w) {
       if (s.product === 'SCHOOL') {
         await s.page.goto(s.origin + '/workspace/activities?organizationId=' + f.organizationId)
-        await s.page.getByLabel('选择已有活动', { exact: true }).selectOption(w.id)
+        await s.page.getByRole('combobox', { name: '选择已有活动', exact: true }).selectOption(w.id)
         await s.page.getByRole('button', { name: w.runName + ' · 准备中', exact: true }).click()
         return s.page
       }
@@ -605,8 +605,8 @@ async function run() {
       for (const [kind, version] of Object.entries(versions)) {
         const label = kind === 'SCALE' ? '量表' : '表单', picker = scope.getByRole('region', { name: '我的' + label + '固定版本', exact: true })
         await picker.getByRole('button', { name: '读取我的固定' + label, exact: true }).click()
-        await picker.getByLabel('我的' + label + ' · 固定版本', { exact: true }).selectOption(version.id)
-        await picker.getByLabel('本次作答方式', { exact: true }).selectOption('SELF')
+        await picker.getByRole('combobox', { name: '我的' + label + ' · 固定版本', exact: true }).selectOption(version.id)
+        await picker.getByRole('combobox', { name: '本次作答方式', exact: true }).selectOption('SELF')
         await s.click(picker.getByRole('button', { name: '加入我的固定' + label, exact: true }), w.endpoint + '/tracks')
       }
       const previewLabel = s.product === 'SCHOOL' ? '预览合法参与者数量' : '预览任务配置'
