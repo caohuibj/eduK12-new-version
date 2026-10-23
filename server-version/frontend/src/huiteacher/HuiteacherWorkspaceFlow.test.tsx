@@ -84,7 +84,6 @@ describe('Teacher form draft navigation',()=>{
     const confirm=vi.spyOn(window,'confirm').mockReturnValue(false)
     const api=vi.fn(async(path:string)=>path.endsWith('/f1')?form:{list:[form]})
     render(<HuiteacherFormStudio organizationId="a" api={api as Api}/> )
-    fireEvent.click(screen.getByRole('link',{name:'学校表单'}))
     fireEvent.click(await screen.findByRole('button',{name:'旧表单 · 草稿'}))
     fireEvent.change(await screen.findByLabelText('表单标题'),{target:{value:'未保存内容'}})
     fireEvent.change(screen.getByLabelText('新表单名称'),{target:{value:'新表单'}})
