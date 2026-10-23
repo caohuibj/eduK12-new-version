@@ -5,7 +5,7 @@
   "branch": "work/school-teacher-review-20261022",
   "enabled": true,
   "base": "4dd9f1340fef2bc3df2d066b9bf7712bc2eb3c66",
-  "productHead": "c3bbcaf8a69fbfa36a4bbebac51d807223e9a8cf",
+  "productHead": "d9657432f39da2638daa1492215fa1015cf78710",
   "frontendTree": "c1e34b8fdd1a0127a155a208187a8c6bb2f8760f",
   "backendTree": "f58ac0f0fb0ab55a58303dd267e89ba1090c0795",
   "source": {
@@ -1410,7 +1410,7 @@
   "review": {
     "completed": true,
     "originalExecutionSigned": false,
-    "note": "No local historical execution is admitted. Fixed official frontend checks and immutable frontend/backend artifacts retain their original producer identities. The fifth connected job remains FAILED while its 105 passed cases and nonempty upgrade preservation are independently reverified. The sixth connected job remains FAILED while its remaining five passed cases are independently reverified; permission preparation made no changes and no browser ran. No business test is repeated. Fresh isolated schema and seed remain setup; browser and restore remain required real execution. Sixth successful SAST authenticates prior application/control evidence; only the three changed controls and two permission helper files are newly scanned."
+    "note": "No local historical execution is admitted. Fixed official frontend checks and immutable frontend/backend artifacts retain original producer identities. The fifth failed connected job supplies independently reverified 105 passed cases and nonempty upgrade preservation; the sixth failed connected job supplies five passed cases. No business test is repeated. Fresh schema, seed, font and narrowly authorized temporary permission preparation remain environment setup, not browser acceptance. Browser and restore remain required real execution. Seventh successful SAST authenticates prior application/control evidence; only three changed controls and Chrome helper plus its two affected tests are newly scanned. No prior failure is relabeled as a successful job."
   },
   "requiredJobs": [
     "admission",
