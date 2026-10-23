@@ -39,10 +39,12 @@ import '../../training/training-assessment-visual.css'
 import '../../training/training-account.css'
 import '../../training/training-workspace-header.css'
 import '../../training/training-appearance.css'
-import '../../survey/survey-admin-shell.css'
-import SurveyAdminShell from '../../survey/SurveyAdminShell'
-import EducationAdminShell from '../../pages/admin/EducationAdminShell'
 import {educationEntry} from '../../pages/admin/education-entry'
+
+// Product-specific management frames are not needed for public Training entry.
+// Keep the existing grant/context checks below authoritative before loading them.
+const SurveyAdminShell = lazy(() => import('../../survey/SurveyAdminShell'))
+const EducationAdminShell = lazy(() => import('../../pages/admin/EducationAdminShell'))
 
 // Organization reports and charts are only needed on organization routes.
 const OrganizationProductRoutes = lazy(() => import('../../pages/organization/OrganizationProductRoutes'))
@@ -113,8 +115,8 @@ function AppShellContent({ children }: { children: ReactNode }) {
     if(previousPath.current!==location.pathname&&mode!=='focused')mainRef.current?.focus()
     previousPath.current=location.pathname
   },[location.pathname,title,mode,training,surveyAdmin,surveyAdminEntry,educationBrand])
-  if(educationProduct&&user&&hasAdminEntry(user,educationProduct==='School'?'HUISCHOOL':'HUITEACHER'))return <EducationAdminShell product={educationProduct} userId={user.id} username={user.nickname||user.username} loggingOut={loggingOut} onLogout={async()=>{setLoggingOut(true);try{await logout()}finally{setLoggingOut(false)}}}>{children}</EducationAdminShell>
-  if(surveyAdmin&&user)return <SurveyAdminShell username={user.nickname||user.username} loggingOut={loggingOut} onLogout={async()=>{setLoggingOut(true);try{await logout()}finally{setLoggingOut(false)}}}>{children}</SurveyAdminShell>
+  if(educationProduct&&user&&hasAdminEntry(user,educationProduct==='School'?'HUISCHOOL':'HUITEACHER'))return <Suspense fallback={<RouteLoading/>}><EducationAdminShell product={educationProduct} userId={user.id} username={user.nickname||user.username} loggingOut={loggingOut} onLogout={async()=>{setLoggingOut(true);try{await logout()}finally{setLoggingOut(false)}}}>{children}</EducationAdminShell></Suspense>
+  if(surveyAdmin&&user)return <Suspense fallback={<RouteLoading/>}><SurveyAdminShell username={user.nickname||user.username} loggingOut={loggingOut} onLogout={async()=>{setLoggingOut(true);try{await logout()}finally{setLoggingOut(false)}}}>{children}</SurveyAdminShell></Suspense>
   if(mode==='display')return <>{children}</>
   return <div className={`hui-app hui-app--${mode}${roleClass}${staffMode?' hui-app--staff':''}${assessmentSurfaceClass}${reportSurfaceClass}${studentSubmitClass}${entryMode?' hui-app--entry':''}${training&&!surveyAdmin?' hui-training':''}${surveyAdmin?' hui-survey-admin-shell':''}${trainingAssessmentVisual?' training-assessment-visual':''}${trainingWorkspace?' training-workspace-shell':''}${teacherVisual?' training-teacher-visual':''}`} data-shell-mode={mode} data-training-theme={training && !surveyAdmin ? appearance.theme : undefined}>
     <div className="hui-product"><a className="hui-skip" href="#hui-main" onClick={()=>mainRef.current?.focus()}>跳到主要内容</a></div>

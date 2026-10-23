@@ -68,3 +68,41 @@ FINAL measurement scope checks are deliberately not memoized: not all mutable
 wrapper/version/media facts are row-locked, so eliminating repeated reads could
 change READ COMMITTED revocation visibility. These are separate future changes,
 not silently included performance shortcuts.
+
+## Follow-up: first visit, login and registration
+
+A further bounded change defers Survey and Education administration frames until
+AppShell's existing route/identity checks select them. The Survey-specific style
+sheet stays imported by its own frame rather than eagerly by AppShell. Existing
+loading and top-level retry behavior remain. Login/registration pages were already
+lazy; no duplicate login-response /me request existed to remove.
+
+Using the preceding candidate's preserved dist as baseline (same dependencies and
+build flags), one new Vite build produced these **static manifest reachable JS/CSS**
+closures, excluding images and dynamic children:
+
+| Route | Before raw bytes | After raw bytes | Before per-file gzip sum | After per-file gzip sum |
+| --- | ---: | ---: | ---: | ---: |
+| Training portal | 894579 | 866510 | 226226 | 218591 |
+| Training login | 863243 | 835174 | 218189 | 210546 |
+| Training registration-code entry | 862375 | 834306 | 217615 | 209979 |
+
+Each closure is 28,069 raw bytes smaller and includes one fewer CSS file. Gzip
+savings are about 7.6 KB (roughly 3.4–3.5% of this modeled closure), not a measured
+browser transfer or latency improvement. Do not describe the entire shared
+learner-navigation chunk as removed. The earlier baseline build was reused, not
+re-executed; neither browser measurements nor production deployment occurred.
+
+Registration username-existence reads now select only id. Both initial and locked
+student course reads select the six fields consumed by registration and joinability.
+All reads, lock ordering, code rotation checks, recruitment state checks, password
+cost, MFA, session validation, admission limits and errors remain unchanged. In
+particular /me still rereads current account/profile state; no stale principal cache
+replaces it. Field selection reduces unnecessary data, not SQL statement count.
+
+Additional affected validation: 80 frontend assertions (including authorized and
+unauthorized Survey/School/Teacher management navigation and anonymous entry),
+45 backend registration/entry/admission assertions, changed frontend lint, frontend
+application types, backend types, and one new-input production frontend build all
+passed. Registration projection mocks return only selected fields and preserve
+locked-course race rejection checks. Real browser startup remains unavailable.

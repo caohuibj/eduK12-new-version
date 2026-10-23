@@ -86,11 +86,11 @@ describe('Survey administrator presentation',()=>{
     }finally{icon.remove()}
   })
   it.each(['/admin/survey-researchers','/admin/scale-library-governance?workspace=survey'])(
-    'keeps scoped management navigation on the canonical Training host at %s',path=>{
+    'keeps scoped management navigation on the canonical Training host at %s',async path=>{
       presentation.training=true
       auth.user={id:'survey-manager',role:'STUDENT',businessRole:'STUDENT',username:'manager',platformRole:'STANDARD',entryGrants:[{entry:'SURVEY',version:1}]} as User
       render(<MemoryRouter initialEntries={[path]}><AppShell><p>研究管理内容</p></AppShell></MemoryRouter>)
-      const navigation=screen.getByRole('navigation',{name:'主要导航'})
+      const navigation=await screen.findByRole('navigation',{name:'主要导航'})
       expect(screen.queryByRole('searchbox',{name:'查找管理页面'})).not.toBeInTheDocument()
       expect(navigation).toHaveTextContent('研究者与授权')
       expect(navigation).toHaveTextContent('工具公库与审批')
@@ -105,11 +105,11 @@ describe('Survey administrator presentation',()=>{
     ['TEACHER','/admin/survey-researchers'],
     ['STUDENT','/admin/scale-library-governance?workspace=survey'],
     ['TEACHER','/admin/scale-library-governance?workspace=survey'],
-  ])('uses independent Survey management authority for the %s business identity at %s',(role,path)=>{
+  ])('uses independent Survey management authority for the %s business identity at %s',async(role,path)=>{
     presentation.training=true
     auth.user={id:'entry-manager',role,businessRole:role,username:'manager',platformRole:'STANDARD',entryGrants:[{entry:'SURVEY',version:1}]} as User
     const view=render(<MemoryRouter initialEntries={[path]}><AppShell><h1>获授权的研究管理页面</h1></AppShell></MemoryRouter>)
-    expect(view.container.querySelector('.hui-survey-admin-shell')).not.toBeNull()
+    await waitFor(()=>expect(view.container.querySelector('.hui-survey-admin-shell')).not.toBeNull())
     expect(view.container.querySelector('.hui-training,.training-workspace-shell')).toBeNull()
     expect(screen.getByRole('banner').querySelector('.survey-brand img')).toHaveAttribute('src','/survey/huisurvey-w2-emblem.svg')
     expect(screen.getByRole('contentinfo')).toHaveTextContent('Research · 观风知微')
@@ -120,11 +120,11 @@ describe('Survey administrator presentation',()=>{
     ['/admin/survey-researchers',true],
     ['/admin/scale-library-governance?workspace=survey',false],
     ['/admin/scale-library-governance?workspace=survey',true],
-  ])('retains Survey branding and the actual page on %s, Training host=%s',(path,training)=>{
+  ])('retains Survey branding and the actual page on %s, Training host=%s',async(path,training)=>{
     presentation.training=training
     auth.user={id:'survey-admin',role:'ADMIN',username:'manager',platformRole:'STANDARD',entryGrants:[{entry:'SURVEY',version:1}]} as User
     const view=render(<MemoryRouter initialEntries={[path]}><AppShell><h1>既有管理内容</h1></AppShell></MemoryRouter>)
-    expect(view.container.querySelector('.hui-survey-admin-shell')).not.toBeNull()
+    await waitFor(()=>expect(view.container.querySelector('.hui-survey-admin-shell')).not.toBeNull())
     expect(view.container.querySelector('.hui-training')).toBeNull()
     expect(screen.getByRole('banner').querySelector('.survey-brand img')).toHaveAttribute('src','/survey/huisurvey-w2-emblem.svg')
     expect(screen.getByRole('contentinfo')).toHaveTextContent('Research · 观风知微')
@@ -435,7 +435,7 @@ describe('School and Teacher administrator frames',()=>{
  it.each([['HUISCHOOL','School','/admin/huischool'],['HUITEACHER','Teacher','/admin/huiteacher']] as const)('uses only the granted %s administration frame',async(entry,brand,path)=>{
   auth.user={id:'education-manager',role:'TEACHER',businessRole:'TEACHER',username:'manager',platformRole:'STANDARD',entryGrants:[{entry,version:1}]} as User
   const {container}=render(<MemoryRouter initialEntries={[path]}><AppShell><h1>产品治理内容</h1></AppShell></MemoryRouter>)
-  expect(container.querySelector('.education-admin-shell')).toHaveAttribute('data-product',brand)
+  await waitFor(()=>expect(container.querySelector('.education-admin-shell')).toHaveAttribute('data-product',brand))
   expect(screen.getByRole('link',{name:`${brand} 管理员首页`})).toHaveAttribute('href',path)
   expect(screen.getByText(`${brand} 管理员`)).toBeInTheDocument()
   expect(screen.queryByRole('navigation',{name:'培训师工作台'})).not.toBeInTheDocument()
