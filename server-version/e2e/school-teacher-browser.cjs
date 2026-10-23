@@ -456,9 +456,11 @@ async function run() {
     }
 
     async function shot(s, name) {
+      const journeyStage = stage
       assert.equal(s.authenticated, true, 'No authentication/MFA screenshots')
       assert.equal(await s.page.locator(s.product === 'SCHOOL' ? '.hs-app' : '.ht-app').getAttribute('data-theme'), 'light', 'Stable light baseline')
       for (const viewport of viewports) {
+        stage = s.product + '-' + name + '-light-' + viewport.width
         await s.page.setViewportSize(viewport)
         await s.page.evaluate(async () => { await document.fonts.ready; await Promise.all([...document.images].map(image => image.decode())) })
         const layout = await s.page.evaluate(() => {
@@ -494,7 +496,9 @@ async function run() {
         assert.deepEqual(accessibility.violations, [], `${name} WCAG A/AA browser violations at ${viewport.width}`)
       }
       await s.page.setViewportSize(viewports[0])
+      stage = s.product + '-' + name + '-dark-supplement'
       await ui.supplement(s, name)
+      stage = journeyStage
     }
     async function keyboardCheck(s, locator, pressed = false) {
       await locator.focus(); await locator.press('Space')
