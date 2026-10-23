@@ -57,3 +57,7 @@
 
 /* Personal-report limitations use readable warning text in dark appearance. */
 .ht-app[data-theme=dark] .education-personal-report .text-amber-700:not([data-cognitive-task-root],[data-cognitive-task-root] *){color:#f3d4b3}
+
+/* Shared material components inherit this entry palette, not Training defaults. */
+.ht-app :is(.assessment-material-picker,.assessment-material-display):not([data-cognitive-task-root],[data-cognitive-task-root] *){--material-line:var(--ht-line);--material-surface:var(--ht-paper);--material-ink:var(--ht-ink);--material-muted:var(--ht-quiet);--material-accent:var(--ht-copper);background:var(--material-surface);color:var(--material-ink);border-color:var(--material-line)}
+.ht-app :is(.assessment-material-picker,.assessment-material-display):not([data-cognitive-task-root],[data-cognitive-task-root] *) a{color:var(--material-accent)}

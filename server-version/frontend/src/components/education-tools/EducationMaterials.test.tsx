@@ -22,6 +22,13 @@ describe('Education material library has no Training permission fallback',()=>{
  it('uploads through the selected tool with its own busy guard and leaves other tools untouched',async()=>{
   const api=vi.fn(async()=>({assetId:'asset'})),onBusy=vi.fn()
   render(<EducationMaterialPicker {...props} api={api as PrivateToolApi} onBusy={onBusy}/>)
+  for(const [entry,prefix,tokens] of [['school','hs',['border','surface','ink','muted','primary']],['huiteacher','ht',['line','paper','ink','quiet','copper']]] as const){
+   const css=readFileSync(`src/${entry}/${entry}-theme.css`,'utf8')
+   const selector=`.${prefix}-app :is(.assessment-material-picker,.assessment-material-display):not([data-cognitive-task-root],[data-cognitive-task-root] *)`
+   const palette=['line','surface','ink','muted','accent'].map((key,index)=>`--material-${key}:var(--${prefix}-${tokens[index]});`).join('')
+   expect(css).toContain(selector+'{'+palette+'background:var(--material-surface);color:var(--material-ink);border-color:var(--material-line)}')
+   expect(css).toContain(selector+' a{color:var(--material-accent)}')
+  }
   expect(screen.getByLabelText('上传当前工具素材').closest('label')).toHaveClass('education-material-upload')
   expect(privateToolsCss).toMatch(/\.education-material-upload \{ min-width: 0; grid-template-columns: minmax\(0, 1fr\); \}/)
   expect(privateToolsCss).toMatch(/\.education-material-upload input\[type=file\] \{ width: 100%; min-width: 0; box-sizing: border-box; \}/)
