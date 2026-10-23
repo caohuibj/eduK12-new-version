@@ -115,11 +115,11 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
   purpose?:'SURVEY'|'HUITEACHER';readOnly?:boolean;videoComplete?:Record<string,boolean>;onVideoComplete?:(itemKey:string)=>void;imageReady?:Record<string,boolean>;onImageReadyChange?:(itemKey:string,ready:boolean)=>void}){
   const [pageError,setPageError]=useState('')
 
-  const shownFormKeys=unit.kind==='FORM'
-    ?visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],answer)
-    :null
-  const visiblePages=unit.kind==='FORM'?(unit.pages||[])
-    .filter(p=>p.questions.some(q=>shownFormKeys?.has(q.itemKey))):[]
+  const formQuestions=useMemo(()=>unit.pages?.flatMap(p=>p.questions)??[],[unit])
+  const shownFormKeys=useMemo(()=>unit.kind==='FORM'
+    ?visibleFormKeys(formQuestions,answer):null,[unit,formQuestions,answer])
+  const visiblePages=useMemo(()=>unit.kind==='FORM'?(unit.pages??[])
+    .filter(p=>p.questions.some(q=>shownFormKeys?.has(q.itemKey))):[],[unit,shownFormKeys])
   const currentIndex=Math.min(pageIndex,Math.max(0,visiblePages.length-1))
   const activePage=visiblePages[currentIndex]
   const nextPage=()=>{
@@ -557,7 +557,11 @@ export default function SurveyPublicApp(){
       await loadTask(started.attemptId,'',started.accessCredential)
     }
   },'正在读取本轮作答，请勿重复开始…')}
-  const currentFlow=task?.flow?resolveClientSurveyFlow(task.flow,task.units,answers):null
+  const currentFlow=useMemo(()=>task?.flow?resolveClientSurveyFlow(task.flow,task.units,answers):null,[task,answers])
+  const timedScaleUnits=useMemo(()=>new Map((task?.units??[]).filter(unit=>unit.kind==='SCALE').map(unit=>[
+    unit.instrumentKey,{instrumentKey:unit.instrumentKey,title:unit.title,
+      items:unit.items??[],responseOptions:unit.responseOptions??[]},
+  ])),[task])
   const flowBlock=currentFlow?.blocks[Math.min(flowStep,Math.max(0,currentFlow.blocks.length-1))]
   // One-by-one studies must not render multiple Scale timers simultaneously.
   // Keep historical all-at-once Waves on their original multi-tool layout.
@@ -675,9 +679,7 @@ export default function SurveyPublicApp(){
       onRunningChange={setCognitiveRunning}/></Suspense>
     if(unit.kind==='SCALE'&&unit.presentationMode==='ONE_BY_ONE')
       return <fieldset key={unit.instrumentKey} className="border-0 p-0 min-w-0"><SurveyTimedScale
-        unit={{instrumentKey:unit.instrumentKey,title:unit.title,
-          items:(unit.items??[]).map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required,responseOptions:q.responseOptions})),
-          responseOptions:unit.responseOptions??[]}}
+        unit={timedScaleUnits.get(unit.instrumentKey)!}
         imagesReady={mountedScaleImagesReady(unit)}
         autoAdvanceReady={(()=>{
           const item=unit.items?.[Math.min(own(scalePages,unit.instrumentKey)??0,Math.max(0,(unit.items?.length??0)-1))]

@@ -65,7 +65,7 @@ const sameFrozenPage=(before:Ticket,after:Ticket)=>
   &&before.manifest.batch?.representation===after.manifest.batch?.representation
 const isCompactAttendance=(ticket:Ticket)=>['ATTENDANCE_COMPACT_V1','ATTENDANCE_COMPACT_V2']
   .includes(ticket.manifest.batch?.representation??'')
-type Artifact={id:string;format:ExportFormat;csv:string;codebook:unknown;manifest:unknown}
+type Artifact={id:string;format:ExportFormat;csv?:string;codebook?:unknown;manifest?:unknown}
 type DownloadPart='csv'|'codebook'|'manifest'
 const downloadParts:[DownloadPart,string][]=[['csv','CSV'],['codebook','Codebook'],['manifest','Manifest']]
 const kindOptions:Record<ExportFormat,string>={
@@ -358,9 +358,9 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
     const label=downloadParts.find(([key])=>key===part)![1]
     let artifact:Artifact
     try{
-      artifact=await api<Artifact>(base+'/exports/'+ticket.id+'/download')
-      if(artifact.id!==ticket.id||artifact.format!==ticket.format||typeof artifact.csv!=='string'
-        ||!artifact.codebook||typeof artifact.codebook!=='object'||!artifact.manifest||typeof artifact.manifest!=='object')
+      artifact=await api<Artifact>(base+'/exports/'+ticket.id+'/download?part='+part)
+      if(artifact.id!==ticket.id||artifact.format!==ticket.format||
+        (part==='csv'?typeof artifact.csv!=='string':!artifact[part]||typeof artifact[part]!=='object'))
         throw new Error('导出回执与当前批次不一致或内容不完整')
     }catch(e){
       if(!isCurrent())return
