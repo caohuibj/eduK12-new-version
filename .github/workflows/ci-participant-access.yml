@@ -1,0 +1,112 @@
+name: Participant access exact qualification
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  CI_EVENT: pull_request
+  CI_HEAD_REF: work/participant-access-20261023
+  CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+  CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+  CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+  PLAN: ${{ inputs.plan }}
+jobs:
+  admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify frozen product and reviewed local assertions without rerunning them
+        run: node .github/scripts/participant-access-checks.mjs admission
+      - name: execute only new scope evidence and no-skip gate refusal contracts
+        run: node --test .github/scripts/participant-access.test.mjs
+      - name: verify exact official successful unchanged dependency audits
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/participant-access-checks.mjs audit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: participant-access-admission-${{ github.sha }}
+          path: participant-access-evidence
+          if-no-files-found: error
+          retention-days: 3
+  missing:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/frontend/package-lock.json
+      - name: install official locked frontend tools without native lifecycle builds
+        working-directory: server-version/frontend
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: execute only cases whose imported inputs changed since their local result
+        run: node .github/scripts/participant-access-checks.mjs missing
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: participant-access-missing-${{ github.sha }}
+          path: participant-access-evidence
+          if-no-files-found: error
+          retention-days: 3
+  qualified:
+    needs: [admission, missing, backend]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    steps:
+      - name: require every selected qualification to succeed
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: node -e 'const n=JSON.parse(process.env.NEEDS);for(const k of ["admission","missing","backend"])if(n[k]?.result!=="success")throw Error(k+" did not succeed")'
+  backend:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    env:
+      NODE_OPTIONS: --max-old-space-size=4096
+      DATABASE_URL: postgresql://synthetic:synthetic@127.0.0.1:5432/unused_compile_only
+    defaults:
+      run:
+        working-directory: server-version/backend
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/backend/package-lock.json
+      - name: install exact official backend type dependencies without native lifecycle builds
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: generate client types from the unchanged schema without connecting a database
+        run: node node_modules/prisma/build/index.js generate
+      - name: emit the first candidate backend compilation without unrelated catalog checks
+        run: node node_modules/typescript/bin/tsc -p tsconfig.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: participant-access-backend-${{ github.sha }}
+          path: server-version/backend/dist
+          if-no-files-found: error
+          retention-days: 3

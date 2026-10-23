@@ -1,3 +1,4 @@
+import {participantAccessPlan,participantAccessOutputs} from './participant-access-scope.mjs';
 import {trainingManualUIPlan,trainingManualUIOutputs} from './training-manual-ui-scope.mjs';
 import {surveyManualUIPlan,surveyManualUIOutputs} from './survey-manual-ui-scope.mjs';
 import {sharedAuthoringPlan,sharedAuthoringOutputs} from './shared-authoring-scope.mjs';
@@ -295,6 +296,8 @@ export function runnerPlan({ profile = 'hosted', scenario = 'platform' } = {}) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const event = process.env.CI_EVENT;
   const base = process.env.CI_BASE_SHA;
+  const participant=participantAccessPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  if(participant){const output=participantAccessOutputs(participant);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const trainingManualUI=trainingManualUIPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(trainingManualUI){const output=trainingManualUIOutputs(trainingManualUI);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const surveyManualUI=surveyManualUIPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());

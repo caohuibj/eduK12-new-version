@@ -8,7 +8,6 @@ import { logger } from '../utils/logger'
 import { Messages } from '../constants'
 import { getPaginationParams, buildPaginatedResult } from '../utils/pagination'
 import { z } from 'zod'
-import { workbookBuffer } from '../utils/excelWorkbook'
 import { hashIdempotencyKey, hashIdempotencyPayload } from '../utils/idempotency'
 import { canAccessCourseContent, canAccessCourseRoster, hasActiveCourseMembership } from '../utils/courseAccess'
 import { config } from '../config'
@@ -1029,11 +1028,12 @@ export const assignmentController = {
       // 检查练习
       const assignment = await prisma.assignment.findUnique({
         where: { id },
-        include: {
+        select: {
+          title: true,
+          questions: true,
           course: {
             select: {
               creatorId: true,
-              title: true,
             }
           }
         }
@@ -1051,7 +1051,13 @@ export const assignmentController = {
       // 获取所有提交
       const submissions = await prisma.submission.findMany({
         where: { assignmentId: id },
-        include: {
+        select: {
+          submittedAt: true,
+          reviewedAt: true,
+          status: true,
+          comment: true,
+          answers: true,
+          content: true,
           student: {
             select: {
               nickname: true,
@@ -1121,7 +1127,7 @@ export const assignmentController = {
       res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`)
 
       // 发送文件
-      const buffer = await workbookBuffer({ '练习提交数据': exportData })
+      const buffer = await (await import('../utils/excelWorkbook')).workbookBuffer({ '练习提交数据': exportData })
       res.send(buffer)
     } catch (err) {
       logger.error('导出数据错误', err)
@@ -1241,12 +1247,7 @@ export const assignmentController = {
 
       // 教师只能看自己创建的练习标签
       if (userRole === UserRole.TEACHER) {
-        const teacherCourses = await prisma.course.findMany({
-          where: { creatorId: userId },
-          select: { id: true }
-        })
-        const courseIds = teacherCourses.map(c => c.id)
-        where.courseId = { in: courseIds }
+        where.course = { creatorId: userId }
       }
 
       where.course = { ...where.course, courseType: { not: 'CAMPUS_ACTIVITY' } }

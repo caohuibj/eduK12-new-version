@@ -1,17 +1,18 @@
-import { useEffect, useState } from 'react'
+import { lazy, Suspense, useEffect, useState } from 'react'
 import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Search, Plus, Upload, FileText, Image, Video, Wrench, ArrowRight, Pencil, X } from 'lucide-react'
 import apiClient from '../api/client'
-import MediaSelector from '../components/MediaSelector'
 import { ProductButton } from '../components/product-ui'
 import ManagementDialog from '../components/staff-ui/ManagementDialog'
-import FormalReferenceStudio from './FormalReferenceStudio'
 import { useAuth } from '../contexts/AuthContext'
 import TrainingCardDescription from './TrainingCardDescription'
 import './training-workspace.css'
 import './training-workspace-heading.css'
 import './training-workspace-cards.css'
 import './training-media-dialogs.css'
+
+const MediaSelector = lazy(() => import('../components/MediaSelector'))
+const FormalReferenceStudio = lazy(() => import('./FormalReferenceStudio'))
 
 type Row = { canUpdateVersion?:boolean; id:string; name:string; kind:string; description?:string; source:'owned'|'granted'; status?:string; version?:string; size?:number; url?:string; updatedAt?:string; href?:string }
 const labels:Record<string,string> = {image:'图片',video:'视频',document:'文档',scale:'量表',form:'表单','form-composition':'表单内容','form-template':'表单',situational:'情境判断', 'sjt-draft':'情境判断',cognitive:'认知测验',composition:'普通组合问卷',bundle:'打包组合问卷 · 综合报告'}
@@ -100,9 +101,9 @@ export default function TrainingLibrary({ area }:{area:'media'|'tools'}) {
       </article>
     })}</div>}
     {pages>1&&<nav className="training-library-pagination" aria-label="资源分页"><button disabled={page<=1||loading} onClick={()=>{const next=new URLSearchParams(params);next.set('page',String(page-1));setParams(next)}}>上一页</button><span>{page} / {pages}</span><button disabled={page>=pages||loading} onClick={()=>{const next=new URLSearchParams(params);next.set('page',String(page+1));setParams(next)}}>下一页</button></nav>}
-    {!media&&<><p className="training-library-footnote">普通组合问卷可创建与编辑，各测评单独出报告。打包组合问卷生成综合报告，内容、顺序与分析规则固定，不提供编辑或复制更新。SJT 和认知测验仍仅按授权选用；已发布的普通问卷需新建版本草稿后修订。</p><details className="training-library-governance" onToggle={event=>setGovernanceOpen(event.currentTarget.open)}><summary>参考、阈值与报告管理</summary><p>课程私有配置请进入上方组合测评的“配置与报告”；下方管理可复用的参考内容。</p>{governanceOpen&&user?.id&&<FormalReferenceStudio key={user.id} actorId={user.id}/>}</details></>}
+    {!media&&<><p className="training-library-footnote">普通组合问卷可创建与编辑，各测评单独出报告。打包组合问卷生成综合报告，内容、顺序与分析规则固定，不提供编辑或复制更新。SJT 和认知测验仍仅按授权选用；已发布的普通问卷需新建版本草稿后修订。</p><details className="training-library-governance" onToggle={event=>setGovernanceOpen(event.currentTarget.open)}><summary>参考、阈值与报告管理</summary><p>课程私有配置请进入上方组合测评的“配置与报告”；下方管理可复用的参考内容。</p>{governanceOpen&&user?.id&&<Suspense fallback={<p role="status">正在加载参考管理…</p>}><FormalReferenceStudio key={user.id} actorId={user.id}/></Suspense>}</details></>}
     {rename&&<ManagementDialog open width="compact" className="training-media-rename-dialog" title="修改媒体名称" description="只更新显示名称，原文件与已有引用保持不变。" closeDisabled={busy} onClose={()=>{if(!busy)setRename(null)}} actions={<><ProductButton disabled={busy} onClick={()=>setRename(null)}>取消</ProductButton><ProductButton variant="primary" disabled={busy||!name.trim()} onClick={()=>void saveName()}>{busy?'正在保存…':'保存名称'}</ProductButton></>}><label className="training-library-rename">显示名称<input maxLength={160} autoFocus value={name} onChange={event=>setName(event.target.value)} onKeyDown={event=>{if(event.key==='Enter')void saveName()}}/></label>{error&&<p role="alert">{error}</p>}</ManagementDialog>}
     {preview&&<ManagementDialog open width="wide" className="training-media-preview-dialog" title={preview.name} description={[labels[preview.kind],preview.source==='owned'?'我上传的':'已获授权',preview.size!=null?`${(preview.size/1024/1024).toFixed(1)} MB`:null].filter(Boolean).join(' · ')} onClose={()=>setPreview(null)} actions={<ProductButton onClick={()=>setPreview(null)}>关闭预览</ProductButton>}><div className={`training-media-preview-stage is-${preview.kind}`}>{preview.kind==='image'?<img className="training-library-preview" src={preview.url} alt={preview.name}/>:preview.kind==='video'?<video className="training-library-preview" controls preload="metadata" src={preview.url}/>:<iframe className="training-library-document" title={preview.name} src={preview.url}/>}</div></ManagementDialog>}
-    {upload&&<MediaSelector isOpen type={upload} initialTab="upload" onClose={()=>{setUpload(null);setRevision(value=>value+1)}} onSelect={()=>{setUpload(null);setRevision(value=>value+1);setNotice('媒体已上传。')}}/>}
+    {upload&&<Suspense fallback={<p role="status">正在加载素材选择器…</p>}><MediaSelector isOpen type={upload} initialTab="upload" onClose={()=>{setUpload(null);setRevision(value=>value+1)}} onSelect={()=>{setUpload(null);setRevision(value=>value+1);setNotice('媒体已上传。')}}/></Suspense>}
   </div>
 }

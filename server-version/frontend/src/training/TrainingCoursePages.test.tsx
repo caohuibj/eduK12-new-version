@@ -56,6 +56,30 @@ beforeEach(() => {
 })
 
 describe('course-first training workspaces', () => {
+  it('loads task groups on first visit and reuses them while switching course tabs', async () => {
+    mount('/student/courses/course-1', '/student/courses/:courseId', TrainingLearnerCourse)
+    await screen.findByRole('link', { name: /完成练习/ })
+    expect(get).not.toHaveBeenCalledWith('/courses/course-1/checkins')
+    expect(loadAssessments).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button', { name: '打卡' }))
+    await screen.findByRole('link', { name: /去打卡/ })
+    fireEvent.click(screen.getByRole('button', { name: '练习' }))
+    await screen.findByRole('link', { name: /完成练习/ })
+    fireEvent.click(screen.getByRole('button', { name: '打卡' }))
+    await screen.findByRole('link', { name: /去打卡/ })
+    for (const path of ['/courses/course-1', '/courses/course-1/assignments', '/courses/course-1/checkins']) {
+      expect(get.mock.calls.filter(([url]) => url === path)).toHaveLength(1)
+    }
+  })
+
+  it('does not request practice or check-ins when the learner opens an assessment deep link', async () => {
+    mount('/student/courses/course-1?section=assessments', '/student/courses/:courseId', TrainingLearnerCourse)
+    await screen.findByRole('link', { name: /进入测评/ })
+    expect(get).not.toHaveBeenCalledWith('/courses/course-1/assignments')
+    expect(get).not.toHaveBeenCalledWith('/courses/course-1/checkins')
+    expect(loadAssessments).toHaveBeenCalledTimes(1)
+  })
+
   it('renames the exercise interface while preserving the authored task title', async () => {
     const original = get.getMockImplementation()!
     get.mockImplementation((url: string) => url.startsWith('/assignments?')
@@ -151,7 +175,7 @@ describe('course-first training workspaces', () => {
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button',{name:'课程管理'}))
-    fireEvent.click(screen.getByRole('button', { name: '轮换课程码' }))
+    fireEvent.click(await screen.findByRole('button', { name: '轮换课程码' }))
     await screen.findByRole('button', { name: '轮换课程码' })
     expect(confirm).toHaveBeenCalledWith(expect.objectContaining({ title: '轮换课程码？' }))
     await waitFor(() => expect(post).toHaveBeenCalledWith('/courses/course-1/rotate-code', {}))
@@ -168,7 +192,7 @@ describe('course-first training workspaces', () => {
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     await screen.findByRole('heading', { name: course.title })
     fireEvent.click(screen.getByRole('button',{name:'课程管理'}))
-    const settings = screen.getByRole('textbox', { name: '课程介绍' })
+    const settings = await screen.findByRole('textbox', { name: '课程介绍' })
     expect(settings).toBeVisible()
     expect(screen.queryByRole('link', { name: '测评与结果' })).toBeNull()
     expect(screen.getByRole('link', { name: /管理学员/ })).toBeVisible()
@@ -188,7 +212,7 @@ describe('course-first training workspaces', () => {
     mount('/courses/course-1/detail', '/courses/:courseId/detail', TrainingTrainerCourse)
     expect(await screen.findByRole('heading', { name: course.title })).toBeInTheDocument()
     fireEvent.click(screen.getByRole('button',{name:'课程管理'}))
-    fireEvent.click(screen.getByRole('button', { name: '结束课程' }))
+    fireEvent.click(await screen.findByRole('button', { name: '结束课程' }))
     await waitFor(() => expect(confirm).toHaveBeenCalledWith(expect.objectContaining({
       title: '确定结束课程？', danger: true,
     })))
@@ -223,10 +247,10 @@ describe('course-first training workspaces', () => {
     expect(screen.getByRole('button', { name: '导出提交' })).toBeVisible()
     expect(screen.queryByRole('link', { name: /查看管理/ })).toBeNull()
     fireEvent.click(screen.getByRole('button', { name: '测评' }))
-    expect(screen.getByRole('link', { name: /发布测评/ })).toHaveAttribute('href', expect.stringContaining('/questionnaire-products/new?courseId=course-1&returnTo='))
+    expect(await screen.findByRole('link', { name: /发布测评/ })).toHaveAttribute('href', expect.stringContaining('/questionnaire-products/new?courseId=course-1&returnTo='))
     expect(screen.queryByRole('link',{name:/管理学员/})).toBeNull()
     fireEvent.click(screen.getByRole('button',{name:'课程管理'}))
-    for (const link of screen.getAllByRole('link', { name: /管理学员/ })) expect(link).toHaveAttribute('href', '/courses/course-1/students')
+    for (const link of await screen.findAllByRole('link', { name: /管理学员/ })) expect(link).toHaveAttribute('href', '/courses/course-1/students')
   })
 })
 

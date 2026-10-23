@@ -2,9 +2,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import ExcelJS from 'exceljs'
 import { mkdir, writeFile } from 'node:fs/promises'
 import path from 'node:path'
-const { findUnique } = vi.hoisted(() => ({ findUnique: vi.fn() }))
+const { findUnique, findMany } = vi.hoisted(() => ({ findUnique: vi.fn(), findMany: vi.fn() }))
 vi.mock('../../config/database', () => ({
-  prisma: { checkin: { findUnique } },
+  prisma: { checkin: { findUnique }, checkinSubmission: { findMany } },
 }))
 import { checkinController } from '../../controllers/checkinController'
 const res = () => {
@@ -26,13 +26,13 @@ describe('actual checkin XLSX image export', () => {
     findUnique.mockResolvedValue({
       course: { title: '课程', creatorId: 'teacher' },
       title: '打卡',
-      submissions: images.map((images, i) => ({
+    })
+    findMany.mockResolvedValue(images.map((images, i) => ({
         images,
         content: '合成正文' + i,
         student: { username: 'S' + i, nickname: '合成学生' + i },
         createdAt: new Date('2026-10-04T00:00:00Z'),
-      })),
-    })
+      })))
     const response = res()
     await checkinController.export(
       {
@@ -82,5 +82,6 @@ describe('actual checkin XLSX image export', () => {
     )
     expect(response.status).toHaveBeenCalledWith(403)
     expect(response.send).not.toHaveBeenCalled()
+    expect(findMany).not.toHaveBeenCalled()
   })
 })

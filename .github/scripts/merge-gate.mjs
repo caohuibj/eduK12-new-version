@@ -1,3 +1,4 @@
+import {participantAccessPlan,participantAccessOutputs} from './participant-access-scope.mjs';
 import {trainingManualUIPlan,trainingManualUIOutputs} from './training-manual-ui-scope.mjs';
 import {surveyManualUIPlan,surveyManualUIOutputs} from './survey-manual-ui-scope.mjs';
 import {sharedAuthoringPlan,sharedAuthoringOutputs} from './shared-authoring-scope.mjs';
@@ -49,6 +50,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='participant-access')return ['scope','participant-access','codeql'];
   if(scope.application_route==='training-manual-ui')return ['scope','training-manual-ui','codeql'];
   if(scope.application_route==='survey-manual-ui')return ['scope','survey-manual-ui','codeql'];
   if(scope.application_route==='shared-authoring')return ['scope','shared-authoring','codeql'];
@@ -115,6 +117,10 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='participant-access'){
+    try{const p=JSON.parse(scope.participant_access_plan);if(draft||p.postMerge!==false||p.route!=='participant-access'||Object.entries(participantAccessOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+    return [...new Set(failed)];
+  }
   if(scope.application_route==='training-manual-ui'){
     try{const p=JSON.parse(scope.training_manual_ui_plan);if(draft||p.postMerge!==false||Object.entries(trainingManualUIOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
     return [...new Set(failed)];
@@ -365,6 +371,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const needs = readNeeds();
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.application_route==='participant-access'){
+    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');
+      const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.participant_access_plan);
+      if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(participantAccessPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-participant-access-plan');
+    }catch{failed.push('recomputed-participant-access-plan');}
+  }
   if(needs.scope?.outputs?.application_route==='training-manual-ui'){
     try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');
       const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.training_manual_ui_plan);

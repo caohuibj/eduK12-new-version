@@ -1,9 +1,9 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 import { Link, useParams, useSearchParams } from 'react-router-dom'
 import apiClient from '../api/client'
 import { useCognitiveEnabled } from '../contexts/CapabilitiesContext'
-import type { Assignment, Checkin, Course } from '../types'
+import type { ApiResponse, Assignment, Checkin, Course } from '../types'
 import { loadCourseAssessments, type CourseAssessmentResult } from './courseAssessments'
 import { learnerSection, withLearnerCourse } from './learnerNavigation'
 
@@ -11,6 +11,12 @@ type Section = 'assignments' | 'checkins' | 'assessments'
 type SectionState<T> = { loading: boolean; error: string | null; rows: T[] }
 const waiting = <T,>(): SectionState<T> => ({ loading: true, error: null, rows: [] })
 const message = (error: unknown) => error instanceof Error ? error.message : '无法读取内容'
+type CourseRequests = {
+  key: string
+  course?: Promise<ApiResponse<Course>>
+  assignments?: Promise<ApiResponse<{ list: Assignment[] }>>
+  checkins?: Promise<ApiResponse<{ list: Checkin[] }>>
+}
 
 export default function TrainingLearnerCourse() {
   const { courseId } = useParams<{ courseId: string }>()
@@ -33,44 +39,54 @@ export default function TrainingLearnerCourse() {
   const [assessments, setAssessments] = useState<CourseAssessmentResult | null>(null)
   const [assessmentsLoading, setAssessmentsLoading] = useState(false)
   const [assessmentRevision, setAssessmentRevision] = useState(0)
+  const requests = useRef<CourseRequests>({ key: '' })
 
   // Keep current course data separate from previous course. Ignore stale loads.
   useEffect(() => {
     let alive = true
     if (!courseId) { setCourse(null); setCourseError('课程链接缺少必要信息'); setCourseLoading(false); return }
     const encoded = encodeURIComponent(courseId)
-    setCourse(null)
-    setCourseError(null)
-    setCourseLoading(true)
-    setAssignments(waiting())
-    setCheckins(waiting())
-    setAssessments(null)
+    const key = `${courseId}:${epoch}`
+    if (requests.current.key !== key) {
+      requests.current = { key }
+      setCourse(null)
+      setCourseError(null)
+      setCourseLoading(true)
+      setAssignments(waiting())
+      setCheckins(waiting())
+      setAssessments(null)
+    }
+    const current = requests.current
+    // Retain each request only for this mounted course/retry generation. Opening
+    // a task tab starts its first read; switching tabs never starts it twice.
     void Promise.all([
       (async () => {
         try {
-          const res = await apiClient.get<Course>('/courses/' + encoded)
+          const res = await (current.course ??= apiClient.get<Course>('/courses/' + encoded))
           if (res.code !== 0 || !res.data) throw new Error(res.message || '课程不可用')
           if (alive) setCourse(res.data)
         } catch (error) { if (alive) setCourseError(message(error)) }
         finally { if (alive) setCourseLoading(false) }
       })(),
       (async () => {
+        if (section !== 'assignments') return
         try {
-          const res = await apiClient.get<{ list: Assignment[] }>('/courses/' + encoded + '/assignments')
+          const res = await (current.assignments ??= apiClient.get<{ list: Assignment[] }>('/courses/' + encoded + '/assignments'))
           if (res.code !== 0) throw new Error(res.message || '练习加载失败')
           if (alive) setAssignments({ loading: false, error: null, rows: res.data?.list || [] })
         } catch (error) { if (alive) setAssignments({ loading: false, error: message(error), rows: [] }) }
       })(),
       (async () => {
+        if (section !== 'checkins') return
         try {
-          const res = await apiClient.get<{ list: Checkin[] }>('/courses/' + encoded + '/checkins')
+          const res = await (current.checkins ??= apiClient.get<{ list: Checkin[] }>('/courses/' + encoded + '/checkins'))
           if (res.code !== 0) throw new Error(res.message || '打卡加载失败')
           if (alive) setCheckins({ loading: false, error: null, rows: res.data?.list || [] })
         } catch (error) { if (alive) setCheckins({ loading: false, error: message(error), rows: [] }) }
       })(),
     ])
     return () => { alive = false }
-  }, [courseId, epoch])
+  }, [courseId, epoch, section])
 
   useEffect(() => {
     if (!courseId || !course || course.id !== courseId || section !== 'assessments' || assessments) return

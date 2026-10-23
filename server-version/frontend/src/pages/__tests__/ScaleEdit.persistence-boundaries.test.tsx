@@ -46,7 +46,7 @@ describe('Training scale persistence boundaries', () => {
     expect(screen.getByLabelText('量表名称')).toHaveValue('新量表')
     expect(screen.getByLabelText('作答指导')).toHaveValue('新指导')
     await user.click(screen.getByRole('button', { name: /^报告文案$/ }))
-    expect(screen.getByLabelText('自有内容 / 授权声明')).toBeEnabled()
+    expect(await screen.findByLabelText('自有内容 / 授权声明')).toBeEnabled()
   })
 
   it('keeps new metadata and the creation boundary after a failed create', async () => {

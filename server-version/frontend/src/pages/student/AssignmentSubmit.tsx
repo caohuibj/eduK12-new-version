@@ -6,8 +6,7 @@ import { useParams } from 'react-router-dom'
 import { ArrowLeft, Clock, FileText, Loader2, FileText as FileIcon } from 'lucide-react'
 import apiClient from '../../api/client'
 import type { Assignment, Submission, MediaItem, DocumentItem } from '../../types'
-import { VideoList, ImageList } from '../../components/MediaRenderer'
-import PdfViewer from '../../components/PdfViewer'
+import { parseMediaItems } from '../../utils/mediaUtils'
 import { assignmentChoiceValues, formatAssignmentAnswer, readAssignmentAnswer } from '../../utils/answerLabels'
 import { sanitizeHtml } from '../../utils/sanitize'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
@@ -17,6 +16,10 @@ import {
   submissionErrorMessage,
   shouldClearIdempotencyKey,
 } from '../../utils/idempotency'
+
+const VideoList = React.lazy(() => import('../../components/MediaRenderer').then(module => ({ default: module.VideoList })))
+const ImageList = React.lazy(() => import('../../components/MediaRenderer').then(module => ({ default: module.ImageList })))
+const PdfViewer = React.lazy(() => import('../../components/PdfViewer'))
 
 const AssignmentSubmit: React.FC = () => {
   const { assignmentId } = useParams<{ assignmentId: string }>()
@@ -262,18 +265,18 @@ const AssignmentSubmit: React.FC = () => {
       </section>
 
       {/* Video Attachments */}
-      <VideoList
+      {parseMediaItems(assignment.videos).length > 0 && <React.Suspense fallback={<p role="status">正在加载视频…</p>}><VideoList
         videos={assignment.videos}
         title="关联视频"
         watermarkText={isTrainingHost() ? "Huitraining 专属培训视频" : "慧育空间专属教学视频"}
-      />
+      /></React.Suspense>}
 
       {/* Image Attachments */}
-      <ImageList
+      {parseMediaItems(assignment.images).length > 0 && <React.Suspense fallback={<p role="status">正在加载图片…</p>}><ImageList
         images={assignment.images}
         title="相关图片"
         watermarkText={isTrainingHost() ? "Huitraining 专属培训图片" : "慧育空间专属教学图片"}
-      />
+      /></React.Suspense>}
 
       {/* Document Attachments */}
       {assignment.documents && assignment.documents.length > 0 && (
@@ -505,6 +508,7 @@ const AssignmentSubmit: React.FC = () => {
 
       {/* PDF Viewer */}
       {selectedDocument && (
+        <React.Suspense fallback={<p role="status">正在加载文档…</p>}>
         <PdfViewer
           isOpen={showPdfViewer}
           onClose={() => {
@@ -515,6 +519,7 @@ const AssignmentSubmit: React.FC = () => {
           title={selectedDocument.title}
           allowDownload={selectedDocument.allowDownload}
         />
+        </React.Suspense>
       )}
 
     </ProductPage>

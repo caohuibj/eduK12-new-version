@@ -1388,25 +1388,12 @@ export const checkinController = {
 
       const checkin = await prisma.checkin.findUnique({
         where: { id },
-        include: {
+        select: {
+          title: true,
           course: {
             select: {
               title: true,
               creatorId: true,
-            }
-          },
-          submissions: {
-            include: {
-              student: {
-                select: {
-                  id: true,
-                  username: true,
-                  nickname: true,
-                }
-              }
-            },
-            orderBy: {
-              createdAt: 'desc'
             }
           }
         }
@@ -1421,8 +1408,21 @@ export const checkinController = {
         return forbidden(res, '无权限导出此打卡')
       }
 
+      // Read submission payloads only after the existing ownership check.
+      const submissions = await prisma.checkinSubmission.findMany({
+        where: { checkinId: id },
+        select: {
+          content: true,
+          images: true,
+          isAnonymous: true,
+          createdAt: true,
+          student: { select: { username: true, nickname: true } },
+        },
+        orderBy: { createdAt: 'desc' },
+      })
+
       // 准备导出数据
-      const exportData = checkin.submissions.map((sub, index) => {
+      const exportData = submissions.map((sub, index) => {
         const images = checkinExportImages(sub.images)
         return {
           '序号': index + 1,
