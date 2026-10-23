@@ -49,3 +49,8 @@
 .education-private-tools .education-private-form-directory p { margin: .25rem 0; font-size: .8rem; }
 .education-private-tools .education-private-form-fields { min-width: 0; }
 @media(max-width:760px) { .education-private-tools .education-private-form-layout { grid-template-columns: minmax(0, 1fr); } .education-private-tools .education-private-form-directory { border-right: 0; padding-right: 0; padding-bottom: .65rem; border-bottom: 1px solid var(--private-line); } }
+
+/* Keep School workspace state backgrounds paired with readable foregrounds.
+   Product dark-theme rules retain their higher-specificity color pairs. */
+.hs-workspace .education-private-tools button[aria-pressed=true] { color: var(--hs-ink); }
+.hs-workspace .education-private-tools button.education-private-primary { background: var(--private-accent); color: #fff; }
