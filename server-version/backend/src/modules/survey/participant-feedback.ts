@@ -1,3 +1,4 @@
+import {materialListSchema,publicMaterial} from '../assessment-media/material'
 import { assessmentImagePresentationListSchema } from '../assessment-media/assessment-image-presentation'
 import {z} from 'zod'
 import type {ResearchFrozenUnit} from './publication.service'
@@ -34,7 +35,7 @@ export function freezeSurveyParticipantFeedback(units:ResearchFrozenUnit[],raw:u
   }
 }
 const savedFeedbackSchema=z.array(z.object({scoreKey:z.string(),rangeKey:z.string().nullable(),
-  text:z.string(),images:assessmentImagePresentationListSchema.optional(),
+  text:z.string(),materials:materialListSchema.optional(),images:assessmentImagePresentationListSchema.optional(),
 }).strict())
 const recordedScores=z.object({
   scores:z.array(z.object({key:z.string(),value:z.number().finite().nullable(),status:z.string()}).passthrough()),
@@ -71,7 +72,7 @@ export function rawParticipantFeedback(unit:ResearchFrozenUnit,result:FrozenUnit
   // rerender current definitions on read or disclose unselected interval rules.
   const feedback=savedFeedbackSchema.safeParse(saved?.rawScoreFeedback)
   const rawScoreFeedback=unit.kind==='SCALE'&&feedback.success
-    ?feedback.data.filter(item=>metrics.some(metric=>metric.key===item.scoreKey)):[]
+    ?feedback.data.filter(item=>metrics.some(metric=>metric.key===item.scoreKey)).map(item=>({...item,...(item.materials?{materials:item.materials.map(publicMaterial)}:{})})):[]
   return {feedbackKind:'RAW_METRICS' as const,pending:false as const,instrumentKey:unit.instrumentKey,title:unit.title,
     measurementReleaseId:unit.measurementRelease.releaseId,metrics,...(rawScoreFeedback.length?{rawScoreFeedback}:{}),quality:'interpretable' as const}
 }

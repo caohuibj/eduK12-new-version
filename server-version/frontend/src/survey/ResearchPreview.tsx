@@ -1,3 +1,5 @@
+import {SurveyMaterialDisplay} from './SurveyMaterialDisplay'
+import type {AssessmentMaterial} from '../modules/assessment-media/material'
 import {surveyAssetBase} from './tool-library-api'
 import { BasicFormAnswer } from '../modules/assessment-core/form/BasicFormAnswer'
 import { useEffect, useRef, useState } from 'react'
@@ -121,6 +123,7 @@ export function ResearchPreview({draft,onSimulate,onValidateForm,errorPath,focus
     </fieldset>
   }
   return <section ref={previewRoot} className="border rounded-xl p-4 bg-slate-50 space-y-3" aria-label="研究工具试答预览">
+    {(draft.definition as {materials?:AssessmentMaterial[]}).materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item}/>)}
     <div><h3 className="text-lg font-semibold">模拟作答（不保存正式数据）</h3>
       <p className="text-xs text-slate-600">预览仅用于检查内容、条件与研究计分，绝不产生正式研究被试或 FINAL。</p></div>
     {draft.kind==='FORM'&&<div>

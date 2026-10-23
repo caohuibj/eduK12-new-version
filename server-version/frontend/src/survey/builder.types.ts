@@ -1,3 +1,4 @@
+import type {AssessmentMaterial} from '../modules/assessment-media/material'
 import type { FormDraft as SharedFormDraft, FormQuestion as SharedFormQuestion, Option } from '../modules/assessment-core/form/types'
 export type { Option, Condition } from '../modules/assessment-core/form/types'
 
@@ -6,8 +7,9 @@ export type SurveyImage = import('../modules/assessment-media/types').Assessment
 export type SurveyPublicImage=Pick<SurveyImage,'asset'|'altText'|'caption'>
 // Product-owned image metadata stays outside the shared Form contracts.
 export type FormQuestion=SharedFormQuestion<SurveyImage>
-export type FormDraft=SharedFormDraft<SurveyImage>
+export type FormDraft=SharedFormDraft<SurveyImage> & {materials?:AssessmentMaterial[]}
 export type ScaleDraft={
+  materials?:AssessmentMaterial[];
   schemaVersion:1;presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE';respondentType:'participant_self_report'|'student_self_report'|'teacher_self_report';
   responseOptions:{optionKey:string;label:string;score:number}[];
   dimensions:{dimensionKey:string;label:string;direction:'descriptive'|'higher_is_more'|'higher_is_better'|'higher_is_worse'|'bipolar'}[];

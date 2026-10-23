@@ -1,7 +1,9 @@
+import {materialListSchema} from '../assessment-media/material'
 import { z } from 'zod'
 import { assessmentImagePresentationListSchema } from '../assessment-media/assessment-image-presentation'
 
 const feedbackContent = z.object({
+  materials:materialListSchema.optional(),
   text: z.string().trim().min(1).max(16000),
   images: assessmentImagePresentationListSchema.optional(),
 }).strict()
@@ -47,7 +49,7 @@ export function matchRawScoreFeedback(config: RawScoreFeedback | undefined, scor
   const range = rule.ranges.find(candidate => value >= candidate.min && (value < candidate.max || (candidate.includeMax && value === candidate.max)))
   const content = range ?? rule.fallback
   if (!content) return null
-  return { scoreKey, rangeKey: range?.key ?? null, text: content.text, ...(content.images ? { images: content.images } : {}) }
+  return { scoreKey, rangeKey: range?.key ?? null, text: content.text, ...(content.images ? { images: content.images } : {}), ...(content.materials ? { materials:content.materials } : {}) }
 }
 export function rawScoreFeedbackBindingIssues(config: RawScoreFeedback | undefined, scoreKeys: readonly string[]) {
   return config?.rules.flatMap((rule, index) => scoreKeys.includes(rule.scoreKey) ? [] : [{ path: `report.rawScoreFeedback.rules.${index}.scoreKey`, message: '反馈引用了不存在的计分指标', severity: 'error' as const }]) ?? []

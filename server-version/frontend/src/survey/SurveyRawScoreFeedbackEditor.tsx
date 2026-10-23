@@ -1,3 +1,5 @@
+import {SurveyMaterialPicker} from './SurveyMaterialPicker'
+import {SurveyMaterialDisplay} from './SurveyMaterialDisplay'
 import {surveyAssetBase} from './tool-library-api'
 import { useState } from 'react'
 import type { ScaleDraft, SurveyImage } from './builder.types'
@@ -14,6 +16,8 @@ export function SurveyRawScoreFeedbackEditor({value,onChange,projectId,compact=f
   const update=(index:number,next:RawScoreFeedbackRule)=>setRules(rules.map((r,i)=>i===index?next:r))
   const issues=validateRawScoreFeedback(value.rawScoreFeedback,scores.map(s=>s.key))
   const images=(content:RawScoreFeedbackContent,change:(next:RawScoreFeedbackContent)=>void)=>projectId&&<div className="space-y-2">
+    <SurveyMaterialPicker label="反馈展示素材" value={content.materials} onChange={materials=>change({...content,materials})}/>
+    {content.materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item}/>)}
     {(content.images??[]).map((image,index)=><SurveyImageField presentationOnly key={image.order} projectId={projectId}
       image={{...image,rightsStatus:'unknown',rightsNote:''} as SurveyImage} onChange={next=>change({...content,images:next?(content.images??[]).map((old,i)=>i===index?{asset:next.asset,altText:next.altText,...(next.caption?{caption:next.caption}:{}),order:old.order}:old):(content.images??[]).filter((_,i)=>i!==index)})}/>)}
     <SurveyImageField presentationOnly projectId={projectId} onChange={next=>{if(next)change({...content,images:[...(content.images??[]),{asset:next.asset,altText:next.altText,...(next.caption?{caption:next.caption}:{}),order:Math.max(-1,...(content.images??[]).map(image=>image.order))+1}]})}}/>
@@ -40,7 +44,7 @@ export function SurveyRawScoreFeedbackEditor({value,onChange,projectId,compact=f
       <button type="button" className="btn-secondary" onClick={()=>{const min=rule.ranges[rule.ranges.length-1]?.max??0;update(index,{...rule,ranges:[...rule.ranges.map(r=>({...r,includeMax:false})),{key:researchKey('range'),min,max:min+1,includeMax:true,text:''}]})}}>增加反馈区间</button>
       <label className="flex gap-2 text-sm"><input type="checkbox" checked={!!rule.fallback} onChange={e=>update(index,{...rule,fallback:e.target.checked?{text:''}:undefined})}/>设置未匹配时的兜底反馈</label>
       {rule.fallback&&<div className="space-y-2"><label className="block text-sm">兜底文字<textarea className="input block w-full" aria-label={'兜底文字 '+(index+1)} value={rule.fallback.text} onChange={e=>update(index,{...rule,fallback:{...rule.fallback!,text:e.target.value}})}/></label>{images(rule.fallback,next=>update(index,{...rule,fallback:next}))}</div>}
-      <aside className="border-l-2 border-slate-400 pl-3 text-sm" aria-label="作者模拟反馈"><strong>作者本地模拟（不创建真实作答）</strong><p>{ruleIssues.length?'请先修正此指标反馈配置，再查看模拟结果。':preview?.text||'此原始分没有匹配反馈'}</p>{preview?.images?.map(image=><figure key={image.asset.assetId}>{projectId&&<img className="max-h-48 max-w-full object-contain" src={surveyAssetBase(projectId)+'/'+encodeURIComponent(image.asset.assetId)+'/preview'} alt={image.altText}/>}<figcaption>{image.caption}</figcaption></figure>)}</aside>
+      <aside className="border-l-2 border-slate-400 pl-3 text-sm" aria-label="作者模拟反馈"><strong>作者本地模拟（不创建真实作答）</strong><p>{ruleIssues.length?'请先修正此指标反馈配置，再查看模拟结果。':preview?.text||'此原始分没有匹配反馈'}</p>{preview?.materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item}/>)}{preview?.images?.map(image=><figure key={image.asset.assetId}>{projectId&&<img className="max-h-48 max-w-full object-contain" src={surveyAssetBase(projectId)+'/'+encodeURIComponent(image.asset.assetId)+'/preview'} alt={image.altText}/>}<figcaption>{image.caption}</figcaption></figure>)}</aside>
     </article>})}
     <button type="button" className="btn-secondary" disabled={!scores.some(s=>!rules.some(r=>r.scoreKey===s.key))} onClick={()=>{const score=scores.find(s=>!rules.some(r=>r.scoreKey===s.key));if(score)setRules([...rules,{scoreKey:score.key,ranges:[{key:researchKey('range'),min:0,max:1,includeMax:true,text:''}]}])}}>新增指标反馈</button>
     {!!rules.length&&<label className="block text-sm">模拟原始分<input className="input block w-36" type="number" value={sample} onChange={e=>setSample(Number(e.target.value))}/></label>}

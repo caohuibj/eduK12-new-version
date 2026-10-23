@@ -2,7 +2,7 @@ import { parseText, parseCsv, type ImportRow, type ImportIssue } from '../assess
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import {
-  formDraftSchema, scaleDraftSchema, surveyKeySchema,
+  assertSurveyDraft, scaleDraftSchema, surveyKeySchema,
   validateSurveyDraft, type FormDraft, type ScaleDraft,
 } from './builder.definition'
 
@@ -52,7 +52,7 @@ export function previewBulk(input:BulkInput,kind:'FORM'|'SCALE',formSchemaVersio
   return {ok:issues.length===0,issues,digest,items:extracted.rows,count:extracted.rows.length}
 }
 export function applyBulk(kind:'FORM'|'SCALE',definition:unknown,input:BulkInput,digest:string){
-  const parsedForm=kind==='FORM'?formDraftSchema.parse(definition):null
+  const parsedForm=kind==='FORM'?(assertSurveyDraft('FORM',definition) as FormDraft):null
   const pre=previewBulk(input,kind,parsedForm?.schemaVersion)
   if(!pre.ok||pre.digest!==digest)throw new BulkImportError(
     !pre.ok?pre.issues:[{line:1,message:'预览数据已发生变化，请重新预览'}])

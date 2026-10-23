@@ -1,3 +1,5 @@
+import {SurveyMaterialDisplay} from './SurveyMaterialDisplay'
+import type {PublicMaterial} from '../modules/assessment-media/material'
 import {SurveyCatalogScaleMedia,type SurveyScaleMedia} from './SurveyCatalogScaleMedia'
 import { BasicFormAnswer } from '../modules/assessment-core/form/BasicFormAnswer'
 import { cleanupExpiredSurveyCognitiveDrafts } from './survey-cognitive-retention'
@@ -32,7 +34,7 @@ type Question=SurveyScaleMedia&{responseOptions?:Choice[];itemKey:string;questio
   total?:number;timeZone?:string;textValidation?:'EMAIL'|'DIGITS'|'ALPHANUMERIC';
   otherOptionKey?:string;otherMaxLength?:number;exclusiveOptionKeys?:string[]}
 type SjtPublicQuestion={questionKey:string;prompt:string;responseType?:'SINGLE'|'MULTIPLE';required?:boolean;allowRefusal?:boolean;exclusiveOptionKeys?:string[];minSelections?:number;maxSelections?:number;options:Choice[]}
-type Unit={kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';instrumentKey:string;title:string;image?:SurveyPublicImage;
+type Unit={materials?:PublicMaterial[];kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE';instrumentKey:string;title:string;image?:SurveyPublicImage;
   presentationMode?:'ONE_BY_ONE'|'ALL_AT_ONCE';
   stimulus?:string;scenarioTitle?:string;
   pages?:{pageKey:string;title:string;description?:string;questions:Question[]}[];
@@ -654,7 +656,7 @@ export default function SurveyPublicApp(){
     const key=videoKey(unit,itemKey);return old[key]===ready?old:{...old,[key]:ready}
   })
   const markVideoComplete=(unit:Unit,itemKey:string)=>setVideoCompletions(old=>({...old,[videoKey(unit,itemKey)]:true}))
-  const renderSurveyTask=(unit:Unit)=>{
+  const renderSurveyTaskBody=(unit:Unit)=>{
     if(unit.kind==='COGNITIVE')return <SurveyCognitiveUnit key={unit.instrumentKey} publicId={publicId} attemptId={attemptId}
       instrumentKey={unit.instrumentKey} title={unit.title} request={publicApi}
       proof={{accessCredential,...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode}:{})}}
@@ -699,6 +701,10 @@ export default function SurveyPublicApp(){
       answer={answers[unit.instrumentKey]||{}}
       onChange={(key,value)=>updateAnswer(unit,key,value)}/></fieldset>
   }
+  const renderSurveyTask=(unit:Unit)=><div key={unit.instrumentKey}>
+    {unit.materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item} proof={{publicId,attemptId,accessCredential,...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode}:{})}}/>)}
+    {renderSurveyTaskBody(unit)}
+  </div>
   const submit=(e:FormEvent)=>{e.preventDefault();if(!task||!attemptId||finalInFlight.current||cognitiveRunning)return;
     if(!finalRequest.current&&(currentFlow||timedSequence)&&!finalFlowStep){
       setError('请按顺序完成当前研究步骤');return
@@ -1081,6 +1087,7 @@ export default function SurveyPublicApp(){
             {measurement.metrics.map(metric=><p key={metric.key}>{metric.label}：{metric.value===null?'不可计算':measurement.feedbackKind==='RAW_METRICS'?String(metric.value):metric.unit==='ratio'?(metric.value*100).toFixed(1)+'%':metric.unit==='ms'?metric.value+' ms':String(metric.value)}（{metric.status}）</p>)}
             {measurement.feedbackKind==='RAW_METRICS'&&measurement.rawScoreFeedback?.map((feedback,index)=><section className="border-l-2 border-slate-300 pl-3 space-y-2" key={feedback.scoreKey+':'+index} aria-label="原始分描述性反馈">
               <p className="whitespace-pre-wrap text-sm">{feedback.text}</p>
+              {completion&&feedback.materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item} purpose="report" proof={{publicId,attemptId:completion.attemptId,...completion.proof}}/>)}
               {completion&&feedback.images?.map(image=><SurveyParticipantImage key={image.asset.assetId} image={image} purpose="report" proof={{publicId,attemptId:completion.attemptId,...completion.proof}}/>)}
             </section>)}
           </article>)}

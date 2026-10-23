@@ -1,0 +1,18 @@
+.survey-material-picker { margin:18px 0; padding:20px; border:1px solid var(--survey-brand-line); border-radius:14px; background:var(--survey-ui-surface,#fff); color:var(--survey-brand-ink); }
+.survey-material-picker header,.survey-material-picker-row,.survey-material-picker li,.survey-material-picker-filters,.survey-material-picker footer { display:flex; gap:12px; align-items:center; justify-content:space-between; flex-wrap:wrap; }
+.survey-material-picker header p,.survey-material-picker-note { font-size:13px; color:var(--survey-brand-muted); line-height:1.8; margin:6px 0; }
+.survey-material-picker-browser { border-top:1px solid var(--survey-brand-line); margin-top:16px; padding-top:16px; }
+.survey-material-picker ul,.survey-material-picker-selected { list-style:none; padding:0; margin:12px 0; }
+.survey-material-picker li { padding:12px 0; border-bottom:1px solid var(--survey-brand-line); }
+.survey-material-picker small { display:block; color:var(--survey-brand-muted); }
+.survey-material-picker .survey-material-picker-selected li { display:block; padding:16px; margin-top:12px; border:1px solid var(--survey-brand-line); border-radius:10px; }
+.survey-material-picker label { display:block; font-size:13px; margin-top:10px; }
+.survey-material-picker label .input { display:block; width:100%; margin-top:5px; }
+.survey-material-picker-rights { display:grid; grid-template-columns:1fr 2fr; gap:12px; }
+.survey-material-picker-row button { margin-left:10px; color:var(--survey-brand-accent-strong); font-size:13px; }
+.survey-material-display { border:1px solid var(--survey-brand-line); border-radius:12px; padding:16px; margin:12px 0; }
+.survey-material-display figcaption { display:flex; justify-content:space-between; gap:12px; margin-bottom:10px; }
+.survey-material-display figcaption span { font-size:12px; color:var(--survey-brand-muted); }
+.survey-material-display :is(img,video,iframe) { display:block; width:100%; max-height:420px; margin-top:12px; object-fit:contain; border:0; }
+.survey-material-display iframe { height:420px; }
+@media(max-width:700px) { .survey-material-picker { padding:14px; } .survey-material-picker-rights { grid-template-columns:1fr; } }

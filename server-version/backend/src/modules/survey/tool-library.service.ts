@@ -124,16 +124,18 @@ async function resolveItems(tx:Tx,userId:string,items:ToolReference[],ready:bool
 }
 async function assertTemplateComplete(tx:Tx,userId:string,row:Template,requireCompleted=true){
   if(row.status!=='DRAFT'||requireCompleted&&row.completed_revision!==row.revision)fail(409,'工具尚未完成当前修订')
-  if(row.kind==='COMPOSITION')return resolveItems(tx,userId,compositionDefinition.parse(row.definition).items,true)
+  if(row.kind==='COMPOSITION')return {units:await resolveItems(tx,userId,compositionDefinition.parse(row.definition).items,true)}
   const check=previewResearchInstrument({kind:row.kind,instrumentKey:'library_tool',title:row.title,definition:row.definition})
   if(!check.ok)throw new SurveyDraftError(check.issues)
-  await assertSurveyMediaOwned(tx,userId,row.id,[{kind:row.kind,definition:row.definition}],true)
+  return {references:await assertSurveyMediaOwned(tx,userId,row.id,[{kind:row.kind,definition:row.definition}],true)}
 }
 export async function completeTemplate(userId:string,id:string,revision:number){return prisma.$transaction(async tx=>{
   await authorizeToolOwner(tx,userId)
   const row=await ownedTemplate(tx,userId,id,'update')
   if(row.revision!==revision)fail(409,'工具已更新，请重新读取当前修订后完成编制')
-  await assertTemplateComplete(tx,userId,row,false)
+  const checked=await assertTemplateComplete(tx,userId,row,false)
+  const references='references' in checked?checked.references??[]:[]
+  if(references.length)await retainAssessmentAssetReferences({owner:{entityType:'SurveyToolTemplate',entityId:row.id,field:'tool-library'},references,db:tx})
   const changed=await tx.$executeRaw`UPDATE survey_tool_templates SET completed_revision=revision,updated_at=clock_timestamp()
     WHERE id=${id} AND owner_user_id=${userId} AND revision=${revision} AND status='DRAFT'`
   if(changed!==1)fail(409,'工具状态或修订已变化')

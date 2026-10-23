@@ -42,9 +42,10 @@ describe('shared Form compatibility entries',()=>{
 
   it('preserves the existing draft, answer and renderer type contracts',()=>{
     expectTypeOf<FormQuestion>().toEqualTypeOf<ExistingFormQuestion>()
-    expectTypeOf<FormDraft>().toEqualTypeOf<ExistingFormDraft>()
+    expectTypeOf<Omit<FormDraft,'materials'>>().toEqualTypeOf<ExistingFormDraft>()
     expectTypeOf<FormQuestion>().toEqualTypeOf<SharedFormQuestion<SurveyImage>>()
-    expectTypeOf<FormDraft>().toEqualTypeOf<SharedFormDraft<SurveyImage>>()
+    expectTypeOf<Omit<FormDraft,'materials'>>().toEqualTypeOf<SharedFormDraft<SurveyImage>>()
+    expectTypeOf<FormDraft['materials']>().toEqualTypeOf<import('../modules/assessment-media/material').AssessmentMaterial[]|undefined>()
     expectTypeOf<ProfessionalAnswer>().toEqualTypeOf<ExistingAnswer>()
     expectTypeOf<ProfessionalAnswer>().toEqualTypeOf<core.ProfessionalAnswer>()
     expectTypeOf<ProfessionalQuestion>().toEqualTypeOf<core.ProfessionalQuestion>()
