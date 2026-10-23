@@ -1,0 +1,93 @@
+{
+  "kind": "reviewed-local-evidence",
+  "base": "dd41e47cfea797fa03a31062a268e2357ea5f70e",
+  "product": "3bcb634f0a0ba62ecfbe0972039e2dd8f87a3d18",
+  "evidenceSource": "375efcf7333d244c3328f46e9ef4127fce4ccc8b",
+  "ciExecuted": false,
+  "originalExecutionSigned": false,
+  "reports": {
+    "targeted-tests.json": {
+      "bytes": 29085,
+      "sha256": "6f931ce2981666c8103eb91167b84b46e9f10004be70167d42305af77d20ea47",
+      "gzipBase64": "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"
+    },
+    "targeted-tests-execution.json": {
+      "bytes": 751,
+      "sha256": "b4d04bcb0cde927a35763350f1ac0480f79fdff6ccd0ca5c39229c5143457ecc",
+      "gzipBase64": "H4sIAAAAAAAC/7WSTWvjMBCG7/kVwdeurI84dhzIoXQpe9zSlh7KYmRr4qqxJSONSqD0v1cWDU2hy572pJmRnnc+NK+L5TLzKB2CusRsu8wEEyXhjIjVHau3q3K7KnJWbdZMXDC2ZSz7MSN7bbR/+itTiLwqas6/MJ0dR2lUBB6jGwP03oPz9EZL09OftgsjGPT0yio40k9NitIfKKhw4IKgkzG16UmUCnIgsutgQmk6IC4Y1CNQtHbw1EQV8iKKXPCc0VabFEmVxNSz3YxWhQE8fdEIHj+OfHz2p1dR8WSSmPD4YN0hVrwTn1EHk43DczsFexkG/Obm2dszGRtwCnitB9j9p/59aEftvbaGzCKcJQnXQ/xjMrfo8/OSvOvoSZXefRjXIDE4+C17yNNU0B/PgfiXkzWpXDlNJK7CMNCmSepNQ5P/TzDg0xlzGd3br1zE/qTVgaPGeSxxd1gK9Bp/gZx3KSvroq74hqt1WatCrveVKnmnZMvZpq2ralMX3b5uV9nibfEOoPstKu8CAAA="
+    }
+  },
+  "acceptedCases": [
+    {
+      "file": "src/training/TrainingFeaturePage.test.tsx",
+      "name": "Training public feature navigation opens the empty contact page from the homepage text panel",
+      "report": "targeted-tests.json"
+    },
+    {
+      "file": "src/training/TrainingFeaturePage.test.tsx",
+      "name": "Training public feature navigation opens 课程与学习 from its homepage card and preserves the feature destination at login",
+      "report": "targeted-tests.json"
+    },
+    {
+      "file": "src/training/TrainingFeaturePage.test.tsx",
+      "name": "Training public feature navigation opens 测评与工具 from its homepage card and preserves the feature destination at login",
+      "report": "targeted-tests.json"
+    },
+    {
+      "file": "src/training/TrainingFeaturePage.test.tsx",
+      "name": "Training public feature navigation opens 素材与资源 from its homepage card and preserves the feature destination at login",
+      "report": "targeted-tests.json"
+    },
+    {
+      "file": "src/training/TrainingFeaturePage.test.tsx",
+      "name": "Training public feature navigation opens 进度与反馈 from its homepage card and preserves the feature destination at login",
+      "report": "targeted-tests.json"
+    },
+    {
+      "file": "src/training/TrainingFeaturePage.test.tsx",
+      "name": "Training public feature navigation lets readers move between feature pages and marks the current page",
+      "report": "targeted-tests.json"
+    },
+    {
+      "file": "src/training/TrainingFeaturePage.test.tsx",
+      "name": "Training public feature navigation takes signed-in learners to their courses rather than a trainer library",
+      "report": "targeted-tests.json"
+    },
+    {
+      "file": "src/training/TrainingFeaturePage.test.tsx",
+      "name": "Training public feature navigation takes signed-in trainers directly to the corresponding workspace",
+      "report": "targeted-tests.json"
+    },
+    {
+      "file": "src/training/TrainingFeaturePage.test.tsx",
+      "name": "Training public feature navigation offers a route home for an unknown feature URL",
+      "report": "targeted-tests.json"
+    },
+    {
+      "file": "src/components/auth/__tests__/AuthShell.test.tsx",
+      "name": "AuthShell back control keeps the existing link-backed return behavior by default",
+      "report": "targeted-tests.json"
+    },
+    {
+      "file": "src/components/auth/__tests__/AuthShell.test.tsx",
+      "name": "AuthShell back control uses the provided action instead of navigation when requested",
+      "report": "targeted-tests.json"
+    }
+  ],
+  "controlSHA256": {
+    ".github/scripts/content-scope.mjs": "9030ec2f2985cfc4aad3b8848beae86b853da52e60f744f5410aae8f0bfa0f97",
+    ".github/scripts/merge-gate.mjs": "98cf8059efcf2469ad5b8bfb9096985f9f5a56e0dfa847e721174ada11d7ac60",
+    ".github/workflows/ci.yml": "a2d5fde089d98aefccde45937813d7d35d2129f166e2889298aed5546f0ae6d2",
+    "docs/release/README.md": "3e195411b398ba77e6dcf079e6960feae808c25acf32cb5c2ec9b6214d36ed38",
+    ".github/scripts/training-manual-ui-scope.mjs": "6ef5ff5b50c5e5ccbad2bc138a5ba5fd35855a9168b87e217d3b9adbd9df390f",
+    ".github/scripts/training-manual-ui-checks.mjs": "e64dbc3bd4d37ea9e10dc3c8d3f37def910e164b7420d2524aeacf20ebcc8331",
+    ".github/scripts/training-manual-ui.test.mjs": "cda53b52dd67ecfa9f3aac57751312fb5ed2ee193536a869a3084ace3884d42a",
+    ".github/workflows/ci-training-manual-ui.yml": "3eaee7228c94988ce8b999c1aa11166aaa9e27544e72e18d88354a6436f797a4"
+  },
+  "limits": [
+    "Only eleven unchanged cases admitted; original 78 total is not re-labelled as current integration success.",
+    "Source executed as an uncommitted tree on old base; full product tree reconstructed and checked before GitHub upload.",
+    "Complete historical node_modules bytes and cryptographic execution signatures were not recorded.",
+    "Earlier tooltip/locator/browser transport failures retained in local development records; no browser or real-account acceptance asserted."
+  ]
+}
