@@ -1,3 +1,4 @@
+import {readFileSync} from 'node:fs'
 import {cleanup,fireEvent,render,screen,waitFor} from '@testing-library/react'
 import {afterEach,expect,it,vi} from 'vitest'
 import HuiteacherApp from './HuiteacherApp'
@@ -21,12 +22,16 @@ it('uses the real Teacher host and Final form section with CSRF, forwarding the 
  await finalDraftStore.delete(draftKey)
  vi.stubGlobal('scrollTo',vi.fn());document.cookie='huiteacher_csrf=; Max-Age=0; path=/'
  const prefix='/api/huiteacher';let saved=false
+ const finalReads:((data:unknown)=>void)[]=[]
  const fetch=vi.fn(async(url:string,options?:RequestInit)=>{
   if(url===prefix+'/auth/me')return reply({id:'teacher',username:'教师',role:'TEACHER',mustChangePassword:false,organizations:[{organizationId:'school',organizationName:'学校',productAdmin:false}]})
   if(url===prefix+'/auth/csrf')return reply({csrfToken:'private-form-csrf'})
   if(url===prefix+'/my-private-form-tasks')return reply({list:[{executionId:'execution',runId:'run',organizationId:'school',eventId:'event',eventTitle:'教师活动',formTitle:'本人表单',status:saved?'COMPLETED':'ASSIGNED',runStatus:'PUBLISHED',eventStatus:'OPEN',runtimeBindingKind:null,runtimeBindingRef:null}]})
   if(url===prefix+'/run-executions/execution/start-private-form')return reply({state:'STARTED',runtimeBindingKind:'COMPOSITE',runtimeBindingRef:'private-form-attempt'})
-  if(url===prefix+'/private-form-composite-attempts/private-form-attempt')return reply(state(saved))
+  if(url===prefix+'/private-form-composite-attempts/private-form-attempt'){
+   if(!saved)return reply(state(false))
+   return await new Promise<ReturnType<typeof reply>>(resolve=>finalReads.push(data=>resolve(reply(data))))
+  }
   if(url===prefix+'/private-form-composite-attempts/private-form-attempt/form-sections/section/submit'){
    const persisted=await finalDraftStore.get(draftKey)
    expect(JSON.parse(String(options?.body))).toEqual(persisted?.sealedSubmission?.payload)
@@ -43,7 +48,22 @@ it('uses the real Teacher host and Final form section with CSRF, forwarding the 
  const submit=screen.getByRole('button',{name:'提交整个区段'})
  await waitFor(()=>expect(submit).toBeEnabled());fireEvent.click(submit)
  await waitFor(()=>expect(saved).toBe(true))
+ await waitFor(()=>expect(finalReads).toHaveLength(1))
+ // Loading already exposes a return button: it is not a terminal signal.
+ expect(screen.getByRole('button',{name:'返回任务列表'})).toBeInTheDocument()
+ expect(screen.queryByText('本次表单已正式提交。',{exact:true})).not.toBeInTheDocument()
+ finalReads[0]({...state(false),currentItem:null})
+ await screen.findByText('正在确认完成状态，请刷新。')
+ expect(screen.queryByText('本次表单已正式提交。',{exact:true})).not.toBeInTheDocument()
+ const retry=screen.getByRole('button',{name:'重新读取当前表单'})
+ await waitFor(()=>expect(retry).toBeEnabled());fireEvent.click(retry)
+ await waitFor(()=>expect(finalReads).toHaveLength(2));finalReads[1](state(true))
  await screen.findByText('本次表单已正式提交。')
+ const browser=readFileSync('../e2e/school-teacher-browser.cjs','utf8')
+ expect(browser).toContain("const completedForm = p.locator('.ht-task').filter({ has: p.getByText('本次表单已正式提交。', { exact: true }) })")
+ expect(browser).toContain("await completedForm.getByText('本次表单已正式提交。', { exact: true }).waitFor()")
+ expect(browser).toContain("await completedForm.getByRole('button', { name: '返回任务列表', exact: true }).click()")
+ expect(browser.indexOf("await completedForm.getByText('本次表单已正式提交。', { exact: true }).waitFor()")).toBeLessThan(browser.indexOf("await completedForm.getByRole('button', { name: '返回任务列表', exact: true }).click()"))
  const writes=fetch.mock.calls.filter(([,options])=>options?.method==='POST')
  expect(writes.map(([url])=>url)).toEqual([prefix+'/run-executions/execution/start-private-form',prefix+'/private-form-composite-attempts/private-form-attempt/form-sections/section/submit'])
  for(const [,options] of writes){expect(options?.credentials).toBe('same-origin');expect(new Headers(options?.headers).get('x-csrf-token')).toBe('private-form-csrf')}
