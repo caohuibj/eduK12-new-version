@@ -109,8 +109,14 @@ function png(file) {
   bytes.writeUInt32BE(width, 16); bytes.writeUInt32BE(width === 1440 ? 900 : 844, 20)
   return bytes
 }
-test('complete exact-source report accepts original matrix plus bounded UI evidence', () => {
-  const s = sample(), accepted = verifyReport(s.report, s.identity, png)
+test('complete exact-source report accepts original matrix plus bounded UI evidence', async () => {
+  const s = sample()
+  const { backendEnvironment, backendCompactFactsEnabled } = require('./school-teacher-browser.cjs')
+  s.report.storageModes = ['SCHOOL','TEACHER'].map(product => ({ product, compactFactsEnabled: backendCompactFactsEnabled(backendEnvironment({ runtimeUrl:'synthetic', secrets:{} }, '/tmp/synthetic', 3187, 'redis://127.0.0.1', product, {})) }))
+  const serialized = JSON.parse(JSON.stringify(s.report)), accepted = verifyReport(serialized, s.identity, png)
+  const { restoreStorageTables } = await import('../../.github/scripts/school-teacher-checks.mjs')
+  const tables = ['assessments','composite_form_answers','composite_form_section_attempts','composite_assessment_attempts','assessment_run_executions','relational_assessment_assignments','assessment_result_facts']
+  assert.deepEqual(restoreStorageTables(tables, serialized, { head:s.identity.head, runId:s.identity.runId }).at(-1), { table:'assessment_result_facts', expectEmpty:true })
   assert.equal(accepted.coverage, 11); assert.equal(accepted.screenshots, 40); assert.equal(accepted.sessions, 5)
   assert.equal(accepted.keyboardSpace, 8); assert.equal(accepted.uiScreenshots, 12); assert.equal(accepted.uiObservations, 32)
 })

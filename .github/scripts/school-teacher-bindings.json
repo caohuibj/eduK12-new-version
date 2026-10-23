@@ -1492,7 +1492,8 @@
     "server-version/e2e/school-teacher-ui.cjs": "",
     "server-version/e2e/school-teacher-ui.test.cjs": "",
     ".github/scripts/school-teacher-fresh.test.mjs": null,
-    "server-version/e2e/school-teacher-theme-settle.test.cjs": null
+    "server-version/e2e/school-teacher-theme-settle.test.cjs": null,
+    ".github/scripts/school-teacher-restore.test.mjs": null
   },
   "plannedControlPaths": [
     ".github/scripts/school-teacher-scope.mjs",
@@ -1512,7 +1513,8 @@
     "server-version/e2e/school-teacher-ui.test.cjs",
     "server-version/e2e/school-teacher-font.test.cjs",
     ".github/scripts/school-teacher-fresh.test.mjs",
-    "server-version/e2e/school-teacher-theme-settle.test.cjs"
+    "server-version/e2e/school-teacher-theme-settle.test.cjs",
+    ".github/scripts/school-teacher-restore.test.mjs"
   ],
   "evidenceSha256": "db20d58fbafe0178969fa8ab3d13cde454131630bfe772beada344f6b4df37db",
   "review": {
@@ -2101,7 +2103,7 @@
               },
               {
                 "path": "server-version/e2e/school-teacher-browser.cjs",
-                "blob": "cea65a3b4e97959cedc13986a23a5989f07ea3aa"
+                "blob": "cf5cebf7c9ad119a20d80f314b989a632c7448bc"
               },
               {
                 "path": "server-version/frontend/src/school/school-theme.css",
@@ -2116,7 +2118,7 @@
                 "blob": "c3aa56afbc4a44ae378ea5e3478fbd7232a7b9ae"
               }
             ],
-            "sha256": "59320efcb7fc835f0736da501674e756eae6385114759f995e9c31c8c877057f"
+            "sha256": "4ac077e64c7d40c025017aa7394dd777e5c511a3f345438d0da1e50fef384b92"
           }
         },
         {
@@ -3114,7 +3116,13 @@
         "registered_assessment_resources",
         "composite_assessments",
         "composite_assessment_items",
-        "assessment_result_facts"
+        "assessment_result_facts",
+        "assessments",
+        "composite_form_answers",
+        "composite_form_section_attempts",
+        "composite_assessment_attempts",
+        "assessment_run_executions",
+        "relational_assessment_assignments"
       ]
     },
     "auditComponents": [

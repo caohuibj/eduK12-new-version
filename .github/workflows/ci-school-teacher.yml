@@ -29,7 +29,9 @@ jobs:
       - name: authenticate frozen scope and all configured source inputs
         run: node .github/scripts/school-teacher-checks.mjs admission
       - name: verify only new control contracts
-        run: node --test .github/scripts/school-teacher-fresh.test.mjs server-version/e2e/school-teacher-theme-settle.test.cjs
+        run: |
+          node --test .github/scripts/school-teacher-fresh.test.mjs .github/scripts/school-teacher-restore.test.mjs server-version/e2e/school-teacher-theme-settle.test.cjs
+          node --test --test-name-pattern='complete exact-source report' server-version/e2e/school-teacher-ui.test.cjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:

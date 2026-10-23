@@ -49,6 +49,11 @@ function backendEnvironment(fixture, root, port, redisUrl, product, host = proce
     ASSET_MIGRATION_COMPLETE: 'true', BACKGROUND_WORKERS_ENABLED: 'false', HUITEACHER_WORKSPACE_ENABLED: 'true', SOCKET_REDIS_REQUIRED: 'false' }
 }
 
+function backendCompactFactsEnabled(env) {
+  assert.ok([undefined, 'false', 'true'].includes(env.ASSESSMENT_COMPACT_FACTS_ENABLED), 'Unknown compact facts storage mode')
+  return env.ASSESSMENT_COMPACT_FACTS_ENABLED === 'true'
+}
+
 function validateBuildReuse(receipt, identity, runId) {
   assert.equal(receipt.status, 'VERIFIED_OFFICIAL_BUILDS')
   assert.equal(receipt.currentHead, identity.head); assert.equal(receipt.currentRun, runId)
@@ -248,7 +253,7 @@ async function run() {
     inputs: { frontend: frontendManifest, backend: backendManifest },
     ...(buildEvidence.officialFrontendReuse ? { officialFrontendReuse: buildEvidence.officialFrontendReuse } : {}),
     ...(buildEvidence.officialBackendReuse ? { officialBackendReuse: buildEvidence.officialBackendReuse } : {}),
-    startups: [], chrome: null, ui: {},
+    startups: [], storageModes: [], chrome: null, ui: {},
     transport: 'Synthetic canonical-origin static documents; unmodified real loopback backend API responses. No public TLS/DNS/deployment assertion.',
     runtime: 'Official runtime-role-defaults/contract and release-schema checks; API never uses owner principal.',
     coverage: [], screenshots: [], keyboard: [], errors: [], notCovered: ['Real media upload/storage/delivery and report images', 'Parent/teacher-observer/revocation matrix',
@@ -274,6 +279,7 @@ async function run() {
     privateLog = fs.openSync(logPath, 'wx', 0o600)
     const env = backendEnvironment(fixture, root, port, redis.href, product)
     const startup = { product, corsOrigin: env.CORS_ORIGIN, ready: false, phase: 'PRODUCTION_ENTRYPOINT' }
+    report.storageModes.push({ product, compactFactsEnabled: backendCompactFactsEnabled(env) })
     report.startups.push(startup)
     app = spawn(process.execPath, ['dist/index.js'], { cwd: backend, env, stdio: ['ignore', privateLog, privateLog] })
     let spawnError = false, spawnCode = null
@@ -901,5 +907,5 @@ if (require.main === module) {
     process.exitCode = 1
   })
 }
-module.exports = { totp, backendEnvironment, validateBuildReuse, validateBuildManifest, classifyStartupLog,
+module.exports = { totp, backendEnvironment, backendCompactFactsEnabled, validateBuildReuse, validateBuildManifest, classifyStartupLog,
   classifyBrowserLaunchError, browserLaunchEnvironment, runLaunchDiagnostic, browserCliMode, validateLaunchDiagnosticContext, verifyReport }
