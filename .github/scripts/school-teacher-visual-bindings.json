@@ -1,0 +1,189 @@
+{
+  "base": "54ed73fdbef60b3b8d4998984c624c98c6bc99cb",
+  "product": "63564fb87d7ffc7722652a2d564fdaaf3443892f",
+  "source": {
+    "server-version/frontend/src/admin/AdminKeyEnrollment.tsx": {
+      "before": "c6da8724a50bf2ee7f5f03256a384fbbb8d31962",
+      "after": "a1faa9b77e273b4d8b9c5ed523455496689231d2",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/admin/SurveyAdminEnrollmentContext.test.tsx": {
+      "before": "b5fe2af4ab21e8aa0621ef544a0bf326434da82c",
+      "after": "05868cd535c768f79fbaab3f95fa74e08166d383",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/components/app-shell/AppShell.tsx": {
+      "before": "0165e812627e2d111f210ca31cb4df310889c945",
+      "after": "c8c84bf706e9de7c7f1960635bc52f752b2a4fd3",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx": {
+      "before": "b8233fc0b6a96e4cd40b38a1362193510679e859",
+      "after": "6de3eea4115d27f135a30c3eaffa8b83741c2676",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/components/education-tools/education-entry-layout.css": {
+      "before": null,
+      "after": "9bd3e3ad0f42273da85207d37a44ae357aeb4e07",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherApp.tsx": {
+      "before": "a4001c5ed4d38d95140f53fcfe71b9f38ec308a7",
+      "after": "195a25ec333a1ebc23ab64f23f33ffdf3a505117",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherWorkspaceFlow.test.tsx": {
+      "before": "97416fe1744ad02d059580dc850fd465cb3fc4a7",
+      "after": "c9b637fc69163e40c92cd69cf2bef4216877e091",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/huiteacher/HuiteacherWorkspaceLayout.test.tsx": {
+      "before": "84e982d491607396873d08f79ebc645807f819c9",
+      "after": "5a956a06c38ce329e193c49f1fbe288caad55280",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/huiteacher/huiteacher-workspace-layout.css": {
+      "before": "e253567b376c91326e461f568dd79c0e9cd61b19",
+      "after": "cf12e586ca2bf8175505109ed86c230cde4edee8",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/AdminLogin.test.tsx": {
+      "before": "bc9c6b5a5934fef9fc637a8dda81ec07326d1cb5",
+      "after": "4ea2cbef4da2e65cfc87748a9cb3d3f813376fdf",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/AdminLogin.tsx": {
+      "before": "71549d6e810219abb832273844eb8d413dfbedc8",
+      "after": "7d10eea60a2ddc6ea443d654d3b1db9ca690b7a8",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/EducationAdminEntryShell.tsx": {
+      "before": null,
+      "after": "85ddbc09e857bd7381bc290ad6a6d517fe46a97a",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/EducationAdminShell.tsx": {
+      "before": null,
+      "after": "7bca8ac1ca677e74f37ead59b7b3a30547d1bfca",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/EducationProductGovernance.test.tsx": {
+      "before": null,
+      "after": "b3c1b3b6c8055a6f76ccf4355ecd1e88fbbec1b9",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/EducationProductGovernance.tsx": {
+      "before": "06ed643aa5519f96deb9fd365c4f08fa1465da3c",
+      "after": "784fa17b26cb1a00f71c94b7bc3a692ab5365905",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/education-admin-shell.css": {
+      "before": null,
+      "after": "b7a09131b5f36af4fed0943be8d869c8eac1e32b",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/education-entry.ts": {
+      "before": null,
+      "after": "c7a570f344ad3a2f478d0dbae77a07cebf9c4939",
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/pages/admin/education-products.css": {
+      "before": "44fe039fb58a7ed2d87010e23feb726804819d2e",
+      "after": "7a95dc595f6f779eb3fa61a6a166a6fe6f949541",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/school/SchoolApp.tsx": {
+      "before": "3d0553b73ff89ea97f9b7850fe0e8bc25e3aaddb",
+      "after": "4856820a388996fb537a9479a1539a3b94d4d358",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    },
+    "server-version/frontend/src/school/school-workspace.css": {
+      "before": "04b32fe69c0c7bbae7e19869622c29cc95b5e6fe",
+      "after": "3eef816e502805db59f7af604b9ca72801086728",
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644"
+    }
+  },
+  "controls": [
+    ".github/scripts/school-teacher-visual-bindings.json",
+    ".github/scripts/school-teacher-visual-scope.mjs",
+    ".github/scripts/school-teacher-visual.test.mjs",
+    ".github/scripts/school-teacher-visual-browser.cjs",
+    ".github/scripts/school-teacher-visual-fixtures.cjs",
+    ".github/workflows/ci-school-teacher-visual.yml",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    ".github/workflows/ci.yml",
+    "docs/release/README.md",
+    ".github/scripts/training-manual-ui.test.mjs",
+    ".github/scripts/survey-manual-ui.test.mjs"
+  ],
+  "controlBefore": {
+    ".github/scripts/school-teacher-visual-bindings.json": null,
+    ".github/scripts/school-teacher-visual-scope.mjs": null,
+    ".github/scripts/school-teacher-visual.test.mjs": null,
+    ".github/scripts/school-teacher-visual-browser.cjs": null,
+    ".github/scripts/school-teacher-visual-fixtures.cjs": null,
+    ".github/workflows/ci-school-teacher-visual.yml": null,
+    ".github/scripts/content-scope.mjs": "5d4e36de9972cd6979d3243be198888954c68449",
+    ".github/scripts/merge-gate.mjs": "2895a9a92b95f4593f6cdc83e2be061a73f5a5dc",
+    ".github/workflows/ci.yml": "a5c9edf31852ececb0e42f2fc3a0c236daa3a231",
+    "docs/release/README.md": "e788796cfdaa6c9208c3df51f87cec8c3769785a",
+    ".github/scripts/training-manual-ui.test.mjs": "dd3db63aea96c2a0b5d1637080a0fa9776ffe3c0",
+    ".github/scripts/survey-manual-ui.test.mjs": "66f8cb77cfd79e2c344b175e7361f76a9058819f"
+  },
+  "components": {
+    "frontend": "d1745d740c91be69e7184156e1c1d5094d9da62e",
+    "backend": "e82fa9e456d5b02c840f823ab7d03d6d47e4aeb4"
+  },
+  "protectedInputs": {
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22",
+    "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
+    "server-version/backend/package.json": "033398f6361b0e4217226ae00f2edc2ed3380ecd",
+    "server-version/backend/package-lock.json": "73607721290dd28f1c6f85d5e12d5d517926ede3",
+    "server-version/backend/prisma/schema.prisma": "aca635e128f3327a71064f575795f1835a40fea9",
+    ".github/release-tools/package.json": "1913b93fbd582fbbd28398488e8e91d6bb9865d5",
+    ".github/release-tools/package-lock.json": "b7731f8e3b798e08d1693a9c7b108405d183f45e"
+  }
+}
