@@ -1,10 +1,12 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-const mocks=vi.hoisted(()=>({tx:{} as any,transaction:vi.fn(),slots:vi.fn()}))
+const mocks=vi.hoisted(()=>({tx:{} as any,transaction:vi.fn(),slots:vi.fn(),scale:vi.fn(),sjt:vi.fn(),guard:vi.fn()}))
 vi.mock('../../config/database',()=>({prisma:{$transaction:mocks.transaction}}))
 vi.mock('../../utils/encryption',()=>({encryptSerializedField:(s:string)=>`encrypted:${s}`,decryptField:(s:string)=>JSON.parse(s.slice(10))}))
 vi.mock('../../modules/assessment-runtime/slot-set',()=>({loadFrozenActiveSlotSet:mocks.slots}))
-vi.mock('../../modules/assessment-runtime/runtime-snapshot',()=>({loadFrozenScaleRuntimeSnapshot:vi.fn()}))
-vi.mock('../../modules/assessment-runtime/situational-runtime-snapshot',()=>({decryptFrozenSituationalRuntimeSnapshot:vi.fn()}))
+vi.mock('../../modules/assessment-runtime/runtime-snapshot',()=>({loadFrozenScaleRuntimeSnapshot:mocks.scale}))
+vi.mock('../../modules/assessment-runtime/situational-runtime-snapshot',()=>({decryptFrozenSituationalRuntimeSnapshot:mocks.sjt}))
+vi.mock('../../modules/scale/scale-collection-guard',()=>({assertTrainingScaleCollectionAllowed:mocks.guard}))
+vi.mock('../../modules/composite/composite.service',()=>({compositeFormSectionRuntimeDefinition:(section:any)=>section}))
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { freezeTrainingPersistenceSnapshot } from '../../modules/composite/training-persistence.policy'
 import { assertTrainingCheckpointBounds, clearTrainingCheckpoint, readTrainingCheckpoint, saveTrainingCheckpoint,cleanupExpiredTrainingCheckpoints } from '../../modules/composite/training-checkpoint.service'
@@ -18,13 +20,16 @@ let row:any,attempt:any,course:any
 beforeEach(()=>{
  row=null;course={courseType:'TRAINING_COURSE',status:'PUBLISHED',isLibrary:false,endedAt:null}
  attempt={id:'attempt',compositeAssessmentId:'parent',deliveryCourseId:'course',userId:'user',recoveryTokenHash:null,attemptEpoch:1,status:'IN_PROGRESS',deliveryMode:'FINAL_ONLY',runtimeGeneration:'UNIFIED_V1',trainingPersistenceSnapshot:snapshot,trainingPersistenceSnapshotHash:snapshotHash,frozenActiveSlotSetHash:definitionHash,frozenActiveSlotSetEncrypted:'slot-cipher',compositeAssessment:publication,accessToken:null}
+ const project=(value:any,select:any)=>!value||!select?value:Object.fromEntries(Object.keys(select).map(key=>[key,value[key]]))
  const update=(data:any)=>{row={...row,...data,revision:typeof data.revision==='object'?row.revision+data.revision.increment:data.revision??row.revision};return row}
  mocks.tx={$executeRawUnsafe:vi.fn(),$queryRaw:vi.fn().mockResolvedValue([]),
   compositeAssessmentAttempt:{findUnique:vi.fn().mockImplementation(({select})=>Object.fromEntries(Object.keys(select).map(key=>[key,attempt[key]]))),findUniqueOrThrow:vi.fn(()=>{throw new Error('Unexpected separate slot carrier read')})},
   course:{findUnique:vi.fn().mockImplementation(()=>course)},
   assessmentUnitSnapshot:{findMany:vi.fn().mockResolvedValue([])},
-  trainingAttemptCheckpoint:{findUnique:vi.fn().mockImplementation(()=>row),create:vi.fn().mockImplementation(({data})=>row={successfulSaveCount:0,...data}),update:vi.fn().mockImplementation(({data})=>update(data)),updateMany:vi.fn().mockImplementation(({data})=>{if(row?.payloadEncrypted){update(data);return {count:1}}return {count:0}})},
+  trainingAttemptCheckpoint:{findUnique:vi.fn().mockImplementation(({select})=>project(row,select)),create:vi.fn().mockImplementation(({data,select})=>project(row={successfulSaveCount:0,...data},select)),update:vi.fn().mockImplementation(({data,select})=>project(update(data),select)),updateMany:vi.fn().mockImplementation(({data})=>{if(row?.payloadEncrypted){update(data);return {count:1}}return {count:0}})},
  }
+ mocks.guard.mockReset().mockResolvedValue(undefined)
+ mocks.scale.mockReset();mocks.sjt.mockReset()
  mocks.transaction.mockReset().mockImplementation((fn:any)=>fn(mocks.tx))
  mocks.slots.mockReset().mockResolvedValue({snapshotHash:definitionHash,attemptEpoch:1,slots:[]})
 })
@@ -129,5 +134,84 @@ describe('Training checkpoint service contracts (mock transaction; PG races sepa
   expect(()=>assertTrainingCheckpointBounds(nested)).toThrow('嵌套')
   expect(()=>assertTrainingCheckpointBounds('中'.repeat(22000))).toThrow('64KB')
   expect(()=>assertTrainingCheckpointBounds({score:Infinity})).toThrow('数值')
+ })
+})
+
+describe('checkpoint bounded allocation and lookup regressions',()=>{
+ it('returns only metadata from SAVE/CLEAR writes, retaining SAVE/GET payload reads',async()=>{
+  const metadata={revision:true,successfulSaveCount:true,expiresAt:true}
+  await saveTrainingCheckpoint('attempt',{userId:'user'},input())
+  expect(mocks.tx.trainingAttemptCheckpoint.create.mock.calls[0][0].select).toEqual(metadata)
+  await saveTrainingCheckpoint('attempt',{userId:'user'},{...input(),expectedRevision:1})
+  expect(mocks.tx.trainingAttemptCheckpoint.update.mock.calls[0][0].select).toEqual(metadata)
+  await readTrainingCheckpoint('attempt',{userId:'user'})
+  for(const [args] of mocks.tx.trainingAttemptCheckpoint.findUnique.mock.calls)expect(args.select).toBeUndefined()
+  await clearTrainingCheckpoint('attempt',{userId:'user'},{expectedRevision:2,attemptEpoch:1})
+  expect(mocks.tx.trainingAttemptCheckpoint.findUnique.mock.lastCall[0].select).toEqual(metadata)
+  expect(mocks.tx.trainingAttemptCheckpoint.update.mock.lastCall[0].select).toEqual(metadata)
+  expect(row.payloadEncrypted).toBeNull()
+ })
+ function mixed(count=1){
+  const slots:any[]=[],drafts:any[]=[],cognitiveResults:any[]=[],forms:any[]=[],scales:any[]=[],sjts:any[]=[],facts:any[]=[]
+  let keyReads=0
+  const key=(row:any,name:string,value:string)=>{Object.defineProperty(row,name,{enumerable:true,get:()=>{keyReads++;return value}});return row}
+  for(let i=0;i<count;i++){
+   const section={items:[{id:`q${i}`}]}
+   for(const [kind,id,h] of [['FORM_SECTION',`f${i}`,canonicalHash(section)],['SCALE',`s${i}`,definitionHash],['SITUATIONAL',`j${i}`,definitionHash],['COGNITIVE',`c${i}`,definitionHash]]){
+    slots.push({slotKey:id,unitType:kind,sourceBinding:kind==='FORM_SECTION'?{sectionId:id}:{compositeItemId:id},sourceDefinitionIdentity:{hash:h}})
+    if(kind==='COGNITIVE')cognitiveResults.push({slotKey:id,resultId:`result${i}`,sessionId:`session${i}`,submissionId:`submit${i}`})
+    else drafts.push({slotKey:id,answers:kind==='SITUATIONAL'?{'scene:channel':1}:{[`q${i}`]:1}})
+   }
+   forms.push(key({section},'sectionId',`f${i}`))
+   scales.push(key({scaleId:`scale${i}`,runtimeSnapshotEncrypted:`scale:${i}`},'compositeItemId',`s${i}`))
+   sjts.push(key({runtimeSnapshotEncrypted:`sjt:${i}`},'compositeItemId',`j${i}`))
+   facts.push(key({slotKey:`c${i}`,sourceAttemptId:`session${i}`,sourceSubmissionId:`submit${i}`,sourceDefinitionHash:definitionHash,terminalState:'COMPLETED'},'id',`result${i}`))
+  }
+  mocks.slots.mockResolvedValue({snapshotHash:definitionHash,attemptEpoch:1,slots})
+  mocks.scale.mockImplementation(async(cipher:string)=>({sourceDefinitionHash:definitionHash,definition:{items:[{itemCode:`q${cipher.split(':')[1]}`}]}}))
+  mocks.sjt.mockReturnValue({definitionHash,runnerDefinition:{scenes:[{sceneKey:'scene',channels:[{channelKey:'channel'}]}]}})
+  mocks.tx.compositeFormSectionAttempt={findMany:vi.fn().mockResolvedValue(forms.reverse())}
+  mocks.tx.assessment={findMany:vi.fn().mockResolvedValue(scales.reverse())}
+  mocks.tx.situationalAttempt={findMany:vi.fn().mockResolvedValue(sjts.reverse())}
+  mocks.tx.assessmentUnitSnapshot.findMany.mockResolvedValue(facts.reverse())
+  return {data:{...input(),envelope:{...input().envelope,drafts,cognitiveResults}},slots,facts,keyReads:()=>keyReads}
+ }
+ it('indexes four shuffled tool batches once instead of scanning per draft/reference',async()=>{
+  const f=mixed(25)
+  await saveTrainingCheckpoint('attempt',{userId:'user'},f.data)
+  // Before: 4 * (25 * 26 / 2) = 1300 identity reads. Now: 4 * 25 = 100.
+  expect(f.keyReads()).toBe(100)
+  for(const model of ['compositeFormSectionAttempt','assessment','situationalAttempt','assessmentUnitSnapshot'])expect(mocks.tx[model].findMany).toHaveBeenCalledOnce()
+  expect(mocks.scale).toHaveBeenCalledTimes(25);expect(mocks.sjt).toHaveBeenCalledTimes(25)
+  expect(mocks.guard).toHaveBeenCalledExactlyOnceWith(mocks.tx,Array.from({length:25},(_,i)=>`scale${24-i}`))
+  expect(JSON.parse(row.payloadEncrypted.slice(10)).drafts).toEqual(f.data.envelope.drafts)
+ })
+ it.each(['FORM_SECTION','SCALE','SITUATIONAL','COGNITIVE'])('rejects %s frozen mismatch in mixed batches',async kind=>{
+  const f=mixed();f.slots.find(s=>s.unitType===kind).sourceDefinitionIdentity.hash='b'.repeat(64)
+  await expect(saveTrainingCheckpoint('attempt',{userId:'user'},f.data)).rejects.toMatchObject({statusCode:409})
+  expect(mocks.tx.trainingAttemptCheckpoint.create).not.toHaveBeenCalled()
+ })
+ it.each(['draft','cognitive slot','cognitive result'])('rejects duplicate %s before persistence',async kind=>{
+  const f=mixed(2)
+  if(kind==='draft')f.data.envelope.drafts.push(f.data.envelope.drafts[0])
+  else if(kind==='cognitive slot')f.data.envelope.cognitiveResults[1].slotKey=f.data.envelope.cognitiveResults[0].slotKey
+  else f.data.envelope.cognitiveResults[1].resultId=f.data.envelope.cognitiveResults[0].resultId
+  await expect(saveTrainingCheckpoint('attempt',{userId:'user'},f.data)).rejects.toMatchObject({statusCode:400})
+  expect(mocks.tx.trainingAttemptCheckpoint.create).not.toHaveBeenCalled()
+ })
+ it('preserves first-match semantics for historical duplicate scale children',async()=>{
+  const f=mixed()
+  mocks.tx.assessment.findMany.mockResolvedValue([
+   {compositeItemId:'s0',scaleId:'scale0',runtimeSnapshotEncrypted:'scale:0'},
+   {compositeItemId:'s0',scaleId:'scale0',runtimeSnapshotEncrypted:'scale:wrong'},
+  ])
+  await saveTrainingCheckpoint('attempt',{userId:'user'},f.data)
+  expect(mocks.scale).toHaveBeenCalledExactlyOnceWith('scale:0',mocks.tx)
+ })
+ it('keeps current scale emergency guard before decrypting mixed drafts',async()=>{
+  const f=mixed();mocks.guard.mockRejectedValue(new Error('emergency stop'))
+  await expect(saveTrainingCheckpoint('attempt',{userId:'user'},f.data)).rejects.toThrow('emergency stop')
+  expect(mocks.scale).not.toHaveBeenCalled();expect(mocks.sjt).not.toHaveBeenCalled()
+  expect(mocks.tx.trainingAttemptCheckpoint.create).not.toHaveBeenCalled()
  })
 })
