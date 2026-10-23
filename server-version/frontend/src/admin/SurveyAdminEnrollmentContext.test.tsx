@@ -8,8 +8,13 @@ describe('Survey administrator enrollment return context',()=>{
   it('keeps the Survey brand and trusted return path through initial enrollment',()=>{
     render(<MemoryRouter initialEntries={['/admin/security/enroll?returnTo=%2Fadmin%2Fsurvey-researchers']}><AdminKeyEnrollment/></MemoryRouter>)
     expect(screen.getByRole('link',{name:'Research 首页'}).querySelector('img')).toHaveAttribute('src','/survey/huisurvey-w2-emblem.svg')
-    expect(screen.getByRole('link',{name:'前往管理员登录'})).toHaveAttribute('href','/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
-    expect(screen.getByLabelText('受控登记票据')).toBeRequired()
+    expect(screen.getByRole('link',{name:'前往管理员登录'})).toHaveAttribute('href','/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers&appearance=auto')
+    expect(screen.getByLabelText('一次性绑定码')).toBeRequired()
+  })
+  it('keeps the Training return without applying Survey entry chrome',()=>{
+    render(<MemoryRouter initialEntries={['/admin/security/enroll?returnTo=%2Fadmin%2Ftraining']}><AdminKeyEnrollment/></MemoryRouter>)
+    expect(screen.getByRole('link',{name:'前往管理员登录'})).toHaveAttribute('href','/admin/login?returnTo=%2Fadmin%2Ftraining')
+    expect(screen.queryByRole('link',{name:'Research 首页'})).not.toBeInTheDocument()
   })
   it('discards an arbitrary return destination and retains the generic enrollment route',()=>{
     render(<MemoryRouter initialEntries={['/admin/security/enroll?returnTo=https%3A%2F%2Fexample.com']}><AdminKeyEnrollment/></MemoryRouter>)

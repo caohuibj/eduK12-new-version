@@ -2,16 +2,22 @@ import {useState} from 'react'
 import {Link,useLocation} from 'react-router-dom'
 import {QRCodeSVG} from 'qrcode.react'
 import AuthShell from '../components/auth/AuthShell'
+import SurveyAdminEntryShell from '../survey/SurveyAdminEntryShell'
 import {beginTotpEnrollment,confirmTotpEnrollment,enrollSecurityKey} from './securityKey'
 import api from '../api/client'
 import {productOrigins,SURVEY_ADMIN_PATH} from '../products/origins'
-import {SurveyBrand} from '../survey/SurveyBrand'
+import {SurveyAdminAppearance} from '../survey/SurveyAdminAppearance'
+import {useSurveyAppearance} from '../survey/SurveyAppearance'
+import {surveyAppearanceHref} from '../survey/survey-appearance-links'
 import '../survey/survey-admin-auth.css'
 
-export default function AdminKeyEnrollment(){
+function AdminKeyEnrollment(){
   const location=useLocation(),origins=productOrigins()
+  const {mode}=useSurveyAppearance()
   const surveyEntry=Boolean(origins&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH)
-  const loginPath='/admin/login'+(surveyEntry?'?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH):'')
+  const trainingEntry=new URLSearchParams(location.search).get('returnTo')==='/admin/training'
+  const Shell=surveyEntry?SurveyAdminEntryShell:AuthShell
+  const loginPath=surveyEntry?surveyAppearanceHref('/admin/login?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH),mode):trainingEntry?'/admin/login?returnTo=%2Fadmin%2Ftraining':'/admin/login'
   const [username,setUsername]=useState(''),[password,setPassword]=useState(''),[ticket,setTicket]=useState('')
   const [method,setMethod]=useState<'TOTP'|'SECURITY_KEY'>('TOTP')
   const [uri,setUri]=useState(''),[code,setCode]=useState('')
@@ -32,20 +38,18 @@ export default function AdminKeyEnrollment(){
     catch(error){setUri('');setMessage((error instanceof Error?error.message:'验证未完成')+'；请重新填写登记信息开始绑定。')}
     finally{setCode('');setBusy(false)}
   }
-  return <AuthShell tone="admin" title="绑定管理员验证方式" description="使用受控后台提供的短期登记票据，完成管理员双因素绑定"
-    {...(surveyEntry&&origins?{
-      brand:<SurveyBrand href={origins.survey+'/'}/>,className:'survey-admin-auth',backTo:loginPath,backLabel:'返回 Survey 管理员登录',
-      heroTitle:'为研究管理建立安全入口。',heroDescription:'绑定验证器后，使用现有账号、密码与动态码进入获授权的研究管理工作台。',
-      heroBullets:['仅使用受控登记票据','保留现有账号与入口权限','绑定后返回原管理入口'],tagline:'观风知微 · 心理与教育测量研究平台',
-    }:{})}>
-    <p>可以使用微软 Authenticator 等手机验证器。绑定完成后，登录仍需账号密码与六位动态码。</p>
+  return <Shell tone="admin" title="绑定管理员验证方式" description="使用账号、密码与一次性绑定码，绑定你的验证方式"
+    {...(surveyEntry?{backTo:loginPath,backLabel:'返回 Survey 管理员登录'}:{})}>
+    <p>{method==='TOTP'
+      ?'请向平台运维人员获取一次性绑定码（15 分钟内有效），然后按提示绑定手机验证器。绑定码只能使用一次。'
+      :'请先向单位领取或自行准备硬件安全密钥，再向平台运维人员获取一次性绑定码。密钥需支持 FIDO2 和 PIN 或指纹验证。'}</p>
     {!registered&&!uri&&<form className="space-y-4" onSubmit={e=>{e.preventDefault();void setup()}}>
       <label>验证方式<select className="input" value={method} disabled={busy} onChange={e=>{setMethod(e.target.value as typeof method);setMessage('')}}>
-        <option value="TOTP">Authenticator 动态码</option><option value="SECURITY_KEY">独立安全密钥</option>
+        <option value="TOTP">Authenticator 动态码</option><option value="SECURITY_KEY">硬件安全密钥（需自备）</option>
       </select></label>
       <label>管理账号<input className="input" value={username} autoComplete="username" required disabled={busy} onChange={e=>setUsername(e.target.value)}/></label>
       <label>当前密码<input className="input" type="password" autoComplete="current-password" required value={password} disabled={busy} onChange={e=>setPassword(e.target.value)}/></label>
-      <label>受控登记票据<input className="input" type="password" autoComplete="off" required value={ticket} disabled={busy} onChange={e=>setTicket(e.target.value)}/></label>
+      <label>一次性绑定码<input className="input" type="password" autoComplete="off" required value={ticket} disabled={busy} onChange={e=>setTicket(e.target.value)}/></label>
       <button className="btn-primary" type="submit" disabled={busy}>{busy?'正在准备…':method==='TOTP'?'生成绑定二维码':'登记安全密钥'}</button>
     </form>}
     {uri&&<section aria-label="Authenticator 绑定">
@@ -62,5 +66,9 @@ export default function AdminKeyEnrollment(){
     <p role="status">{message}</p>
     <p>无法访问已绑定的验证器？请通过受控后台恢复账号后重新绑定。</p>
     <Link to={loginPath}>前往管理员登录</Link>
-  </AuthShell>
+  </Shell>
+}
+
+export default function AdminKeyEnrollmentEntry(){
+  return <SurveyAdminAppearance><AdminKeyEnrollment/></SurveyAdminAppearance>
 }

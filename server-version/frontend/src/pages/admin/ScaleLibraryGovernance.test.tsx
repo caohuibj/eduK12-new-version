@@ -13,6 +13,19 @@ beforeEach(() => {
   api.capabilities.mockResolvedValue({ systemAdmin: false, canReview: false, reviewGrants: [], distributionGrants: [{ grantId: 'distribute', product: 'TRAINING', releaseIds: ['release'] }] })
 })
 describe('Scale library system review versus entrance distribution', () => {
+  it('keeps Survey management recipients in Survey even when the source supports both entrances',async()=>{
+    api.capabilities.mockResolvedValue({systemAdmin:false,canReview:false,reviewGrants:[],distributionGrants:[{grantId:'survey-distribution',product:'SURVEY',releaseIds:['release']}]})
+    api.grants.mockResolvedValue({list:[]});api.recipients.mockResolvedValue({list:[{id:'researcher',username:'verified-researcher'}],page:1,hasMore:false})
+    render(<MemoryRouter initialEntries={['/admin/scale-library-governance?workspace=survey']}><ScaleLibraryGovernance/></MemoryRouter>)
+    fireEvent.click(await screen.findByRole('button',{name:'查看 / 分配只读使用权限'}))
+    await waitFor(()=>expect(screen.getByRole('button',{name:'读取可见授权对象'})).toBeEnabled())
+    expect(screen.getByRole('combobox',{name:'目标入口'})).toHaveValue('SURVEY')
+    expect(screen.queryByRole('option',{name:'Training'})).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button',{name:'读取可见授权对象'}))
+    await screen.findByRole('option',{name:/verified-researcher/})
+    expect(api.recipients).toHaveBeenCalledExactlyOnceWith('entry','SURVEY',1,'','survey-distribution')
+  })
+
   it('does not mistake entrance distribution authority for review authority', async () => {
     render(<MemoryRouter><ScaleLibraryGovernance /></MemoryRouter>)
     await screen.findByText('范围内量表 · 待审核')

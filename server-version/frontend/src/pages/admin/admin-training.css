@@ -60,3 +60,34 @@
 
 /* Loading and helper text also need contrast on the training paper surface. */
 .hui-training-admin-content .text-gray-500 { color: var(--training-muted); }
+
+/* Dedicated Training administrator landing; all links retain their existing guards. */
+.training-admin-space { --admin-ink:var(--training-ink,#292d2b);--admin-muted:var(--training-muted,#626a60);--admin-green:var(--training-bamboo,#365a48);--admin-line:var(--training-border,#ded8cb); }
+.training-admin-welcome { position:relative;isolation:isolate;overflow:hidden;display:flex;align-items:center;justify-content:space-between;gap:30px;margin-bottom:36px;padding:38px;border:1px solid var(--admin-line);border-radius:16px;background:var(--training-surface,#fffdf8); }
+.training-admin-welcome::before { content:'';position:absolute;inset:0;z-index:-1;background:url('../../training/training-landscape-v2.webp') 80% 45%/cover;opacity:.11; }
+.training-admin-eyebrow { margin:0 0 16px;color:var(--admin-green);font-size:11px;letter-spacing:.16em; }
+.training-admin-welcome h1 { margin:0 0 14px;font-family:'Songti SC','STSong',serif;font-size:clamp(28px,3vw,40px);font-weight:600;line-height:1.5;color:var(--admin-ink); }
+.training-admin-welcome > div > p:last-child { margin:0;color:var(--admin-muted);font-size:14px;line-height:1.9; }
+.training-admin-identity { display:inline-flex;align-items:center;gap:8px;flex:none;padding:10px 14px;border:1px solid var(--admin-line);border-radius:30px;background:var(--training-surface,#fffdf8);color:var(--admin-green);font-size:12px; }
+.training-admin-section-title { margin:0 0 18px;color:var(--admin-ink);font-size:18px;font-weight:600; }
+.training-admin-space .training-admin-scope { margin-bottom:24px;background:transparent;border:0;border-left:2px solid var(--admin-line);border-radius:0;padding:2px 16px;color:var(--admin-muted);font-size:12px; }
+.training-admin-space .training-admin-grid { grid-template-columns:repeat(3,minmax(0,1fr));gap:20px; }
+.training-admin-space .training-admin-card { padding:26px;border-radius:14px;background:var(--training-surface,#fffdf8);border-color:var(--admin-line);gap:16px; }
+.training-admin-card-top { display:flex;align-items:center;justify-content:space-between;gap:20px;color:var(--admin-green); }
+.training-admin-card-top > span { color:var(--admin-muted);font-family:'Songti SC','STSong',serif;font-size:12px; }
+.training-admin-space .training-admin-card h2 { font-family:'Songti SC','STSong',serif;font-size:23px;color:var(--admin-ink); }
+.training-admin-space .training-admin-card p { font-size:13px;line-height:1.95;color:var(--admin-muted); }
+.training-admin-space .training-admin-links { flex-direction:column;gap:0;padding-top:14px; }
+.training-admin-space .training-admin-links a { display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:46px;border-top:1px solid var(--admin-line);color:var(--admin-green);font-size:13px;font-weight:500; }
+.training-admin-links a > svg { flex:none; }
+.training-admin-space .training-admin-policy { margin-top:28px;background:transparent;border:1px solid var(--admin-line);border-radius:12px; }
+@media(max-width:1023px) {
+ .training-admin-welcome { display:block;padding:28px; }
+ .training-admin-identity { margin-top:22px; }
+ .training-admin-space .training-admin-grid { grid-template-columns:minmax(0,1fr);gap:16px; }
+}
+@media(max-width:520px) {
+ .training-admin-welcome { padding:24px; }
+ .training-admin-space .training-admin-card { padding:24px; }
+ .training-admin-space .training-admin-card h2 { font-size:22px; }
+}

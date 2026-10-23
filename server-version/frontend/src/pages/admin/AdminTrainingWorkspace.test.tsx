@@ -16,7 +16,7 @@ describe('unified training administration', () => {
 
   it('reuses the canonical account, grant and course screens', () => {
     render(<MemoryRouter><AdminTrainingWorkspace /></MemoryRouter>)
-    expect(screen.getByRole('heading', { name: '培训版管理' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { level:1,name: '培训有序，管理有据。' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: /账户审核与管理/ })).toHaveAttribute('href', '/users?workspace=training')
     expect(screen.getByRole('link', { name: /量表资源与授权/ })).toHaveAttribute('href', '/scales?workspace=training')
     expect(screen.getByRole('link', { name: /认知配置与授权/ })).toHaveAttribute('href', '/cognitive-assignments?workspace=training')

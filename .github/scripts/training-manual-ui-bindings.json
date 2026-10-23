@@ -1,0 +1,384 @@
+{
+  "schema": 1,
+  "base": "dd41e47cfea797fa03a31062a268e2357ea5f70e",
+  "product": "3bcb634f0a0ba62ecfbe0972039e2dd8f87a3d18",
+  "evidenceSource": "375efcf7333d244c3328f46e9ef4127fce4ccc8b",
+  "source": {
+    "server-version/frontend/public/brand-preview/chancery-dark.svg": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "262db3f78582b7d378fdf10d7d545d607903e776"
+    },
+    "server-version/frontend/public/brand-preview/chancery-light.svg": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "dc5e67fcd4ef533b6f09a47fd9309e42b4064eec"
+    },
+    "server-version/frontend/public/brand-preview/index.html": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "cd186b85e71085f3f442482c12e3a2d47b1bf2fc"
+    },
+    "server-version/frontend/public/brand-preview/italian-bold-dark.svg": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6d4ad9d6b519d03660fcefe1a2b5a4a2b58f2aaf"
+    },
+    "server-version/frontend/public/brand-preview/italian-bold-light.svg": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a9e8a08492956501296f2399f41f88d44d48841c"
+    },
+    "server-version/frontend/public/brand-preview/italic-dark.svg": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "4a5a4cefcab2076d89b93978878fa23c0cb43488"
+    },
+    "server-version/frontend/public/brand-preview/italic-light.svg": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "68953177c918204d8ed86774ae05f03fa44bdea7"
+    },
+    "server-version/frontend/public/brand-preview/original-dark.svg": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9bbcb123899dc96f7776eed4df7d18c93dae2334"
+    },
+    "server-version/frontend/public/brand-preview/original-light.svg": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "61b8cc6ac0ab66959a697e3df2b37cb7e5ec6e7f"
+    },
+    "server-version/frontend/public/brand-preview/rounded-dark.svg": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ba4dabb7a32fecc19687770ed71cb9c40e40d67b"
+    },
+    "server-version/frontend/public/brand-preview/rounded-light.svg": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "4b9d0ba5c521d531f44c57dad24d97a0ff160bd3"
+    },
+    "server-version/frontend/public/brand-preview/script-dark.svg": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f82330bfe4372a20347cc1fbf382dea370be03fe"
+    },
+    "server-version/frontend/public/brand-preview/script-light.svg": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "48aa9b0c397ab63a923d84127f1148055c413cb7"
+    },
+    "server-version/frontend/src/App.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "310dbc9cdc248e49494f45920de4e5f119774c25",
+      "after": "01263259cf45e58bf27ee0ff72054ff5749a6346"
+    },
+    "server-version/frontend/src/admin/AdminKeyEnrollment.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2cad7a5b5e68104dd83adc5eb1484f4d6edb9636",
+      "after": "c6da8724a50bf2ee7f5f03256a384fbbb8d31962"
+    },
+    "server-version/frontend/src/admin/SurveyAdminEnrollmentContext.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bc7b822d95dabd0f5d4b11e6a274942a36e41109",
+      "after": "b5fe2af4ab21e8aa0621ef544a0bf326434da82c"
+    },
+    "server-version/frontend/src/components/app-shell/AppShell.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f2e814c0284ec856e774b14db6301f402ac9411c",
+      "after": "2a69237afc7224de34e73928c441a003b3e8c009"
+    },
+    "server-version/frontend/src/components/app-shell/SurveyAdminOrigin.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "31673857df2961b168f07b8c45ae60fc33f059d9",
+      "after": "754e4bfe3ab3260990dad2d395d446d2d406cba9"
+    },
+    "server-version/frontend/src/components/app-shell/__tests__/access.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4b36ccc471d107ef7050e870fbb06bcffdf090a6",
+      "after": "1f529e83d90074b36b086cb7e73880f0290a5bd2"
+    },
+    "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7b615f9722043c4bd063fc9c25c89777924e9e0d",
+      "after": "b8233fc0b6a96e4cd40b38a1362193510679e859"
+    },
+    "server-version/frontend/src/components/app-shell/access.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9c8427440c4174b2d02aba83e66bb38412b1e42e",
+      "after": "3dd15fbe2f306384ed2c2391b558743cabf4b6a2"
+    },
+    "server-version/frontend/src/components/auth/AuthShell.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "48bb0e4fc553f9a642c05a7ba33a8540f4028b50",
+      "after": "e3ed54753e92305acf89412392f75d639a3faf16"
+    },
+    "server-version/frontend/src/pages/AdminLogin.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bb19eb489a853bfe61256759bd3ae36c19ea88f9",
+      "after": "bc9c6b5a5934fef9fc637a8dda81ec07326d1cb5"
+    },
+    "server-version/frontend/src/pages/AdminLogin.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "27c6da5b97d8caf761768fedb3f41e3f1ee49e36",
+      "after": "71549d6e810219abb832273844eb8d413dfbedc8"
+    },
+    "server-version/frontend/src/pages/admin/AdminTrainingWorkspace.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1f0a457d7180f5aa6a3ba4d2f73955c5624864e5",
+      "after": "40a594e81f3361b68f1ecf11cd34a08668a3c2eb"
+    },
+    "server-version/frontend/src/pages/admin/AdminTrainingWorkspace.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d512e9360d10f55a15958f152e4b1bf2cfd62b11",
+      "after": "952e43587cc8ea3ab220f0af45693e3d90f86b65"
+    },
+    "server-version/frontend/src/pages/admin/admin-training.css": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "631a61372ecf008cdeedc2db2b401d2be8f49ae6",
+      "after": "9f209ec58320c908c49a5693e739e765e5d0ebfb"
+    },
+    "server-version/frontend/src/training/TrainingAppearanceControl.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "37cfd306c7b3637d4cee05570a8140bdd1fe1ae7"
+    },
+    "server-version/frontend/src/training/TrainingAppearanceControl.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "59a4c6b037d6e59b73747c4a62a68d340aeb70f9"
+    },
+    "server-version/frontend/src/training/TrainingAuth.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e47c4e452d4590d6e1da2c6a81ea1c4dd60f1130",
+      "after": "4123831fff7bf4e3847fa758448c49bc16a4d257"
+    },
+    "server-version/frontend/src/training/TrainingBrand.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b8fc008e1e849eed099a0279f0493f624038ee7a",
+      "after": "ae8b4d6c4c3047aeb83b91189652acdd95fda19a"
+    },
+    "server-version/frontend/src/training/TrainingContactPage.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a28737c75dd33be93655607b195b65c588da237a"
+    },
+    "server-version/frontend/src/training/TrainingFeaturePage.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "92e9b4af6f68023cbf8d086e80c62fb0b6b33daf"
+    },
+    "server-version/frontend/src/training/TrainingFeaturePage.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "48aa4b3d9ba3794ae5a68a9aae1fd242acd239b7"
+    },
+    "server-version/frontend/src/training/TrainingPortal.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a661d5075d9ff92f3c5d4139d27e5b0754cb7fcd",
+      "after": "988c6376f95040d4009a5d3f33f4bd28d9dd5253"
+    },
+    "server-version/frontend/src/training/TrainingPublicHeader.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ddf6bc4650a8f6c2b99018d541e8a1c6e3a3f9d5"
+    },
+    "server-version/frontend/src/training/TrainingScreens.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "086af52e56969154bf287566aec42e47f5c8545b",
+      "after": "8dcbc9b027db58d2c985832e948ec8f37ee93a25"
+    },
+    "server-version/frontend/src/training/featureContent.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "375e638742659f0c280dc88e7bb130376131cf12"
+    },
+    "server-version/frontend/src/training/training-admin-auth.css": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "700a66ecdeb49ca99bf9bf2755ddb6a96a593409"
+    },
+    "server-version/frontend/src/training/training-appearance.css": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8738545011e1349a06749a32c1543b343d59f149",
+      "after": "9ddad4236c512816c9e8c21f03e21023ab9dc99a"
+    },
+    "server-version/frontend/src/training/training-logo-dark.svg": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9bbcb123899dc96f7776eed4df7d18c93dae2334",
+      "after": "6d4ad9d6b519d03660fcefe1a2b5a4a2b58f2aaf"
+    },
+    "server-version/frontend/src/training/training-logo.svg": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "61b8cc6ac0ab66959a697e3df2b37cb7e5ec6e7f",
+      "after": "a9e8a08492956501296f2399f41f88d44d48841c"
+    },
+    "server-version/frontend/src/training/training-portal-refresh.css": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d3c1bc1dd6e6552e18bc5651b8b87baa78d97ff1",
+      "after": "f521c4086e3425ec6d67b1a8d1fe9b144945cfb7"
+    }
+  },
+  "controls": [
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    ".github/workflows/ci.yml",
+    "docs/release/README.md",
+    ".github/scripts/training-manual-ui-scope.mjs",
+    ".github/scripts/training-manual-ui-checks.mjs",
+    ".github/scripts/training-manual-ui.test.mjs",
+    ".github/scripts/training-manual-ui-bindings.json",
+    ".github/workflows/ci-training-manual-ui.yml",
+    ".github/evidence/training-manual-ui/reviewed-local.json"
+  ],
+  "controlBefore": {
+    ".github/scripts/content-scope.mjs": "059fba42d7d1760eaa9f5a481f8bacd696ac7bda",
+    ".github/scripts/merge-gate.mjs": "56845b8d9862f86f2b7eeb6a67dc6c8d8060acfb",
+    ".github/workflows/ci.yml": "377311869b54812dab4907fa3a8df0c9a0fdf555",
+    "docs/release/README.md": "b6704cf0e95a1e39c67977aaf047161cb70451c1",
+    ".github/scripts/training-manual-ui-scope.mjs": null,
+    ".github/scripts/training-manual-ui-checks.mjs": null,
+    ".github/scripts/training-manual-ui.test.mjs": null,
+    ".github/scripts/training-manual-ui-bindings.json": null,
+    ".github/workflows/ci-training-manual-ui.yml": null,
+    ".github/evidence/training-manual-ui/reviewed-local.json": null
+  },
+  "components": {
+    "frontend": "dc5328312ddea31c14312d2d1cf4628e60b4b914",
+    "backend": "1ea566a2144cb81ee9f5b2e68930c755fec0d9d6"
+  },
+  "protectedInputs": {
+    "server-version/frontend/package.json": "84089551a17c85d00f03a36081fe78e6374f0716",
+    "server-version/frontend/package-lock.json": "7558a85c21614df1e19d0f1eb78002247d3a0d92",
+    "server-version/frontend/tsconfig.json": "1ffef600d959ec9e396d5a260bd3f5b927b2cef8",
+    "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
+    "server-version/frontend/tsconfig.cognitive.json": "910e97700f25652bc1d80ada47e176cbd51c2fbe",
+    "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7",
+    "server-version/frontend/eslint.config.js": "4e89832bf4d92a5e1ba1815aad2ade6c9a65c3a1",
+    "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22",
+    "server-version/frontend/src/test/setup.ts": "3217d9d84ea1285cf3495e27669a88e3fe7d2cf3"
+  },
+  "acceptedCases": 11,
+  "reuseClosure": {
+    "server-version/frontend/src/components/auth/__tests__/AuthShell.test.tsx": "f5034baaccbc679067ff452529852661b54a42ab",
+    "server-version/frontend/src/components/auth/AuthShell.tsx": "e3ed54753e92305acf89412392f75d639a3faf16",
+    "server-version/frontend/src/training/training-auth-refresh.css": "b1b18e71b73e45eb5d5afdbf911fcfbf64164bfd",
+    "server-version/frontend/src/training/context.ts": "9a04fce6764c2d12c73120055821b8c2fa51a070",
+    "server-version/frontend/src/components/app-shell/navigation.ts": "e1d0da68903cb0e8100523fd8a30d66d8a19eb00",
+    "server-version/frontend/src/components/app-shell/access.ts": "3dd15fbe2f306384ed2c2391b558743cabf4b6a2",
+    "server-version/frontend/src/types/index.ts": "757793744bb5170f66517169ad21d4495fa9c10b",
+    "server-version/frontend/src/components/app-shell/useAuthLinks.ts": "1beb14c5bab4c54ed9a3dbb10ca2339f5af3dba3",
+    "server-version/frontend/src/training/welcomeCopy.ts": "63f4a0c7edc19e20190faa39df0df393e5a82c76",
+    "server-version/frontend/src/training/TrainingAppearanceControl.tsx": "59a4c6b037d6e59b73747c4a62a68d340aeb70f9",
+    "server-version/frontend/src/training/appearanceContext.ts": "97fa88213e48366effe3c3b21a35ecce88c3a6c2",
+    "server-version/frontend/src/training/appearance.ts": "e3a163c92edadae9b8df9f5b3f7baa7e94ae1761",
+    "server-version/frontend/src/training/TrainingBrand.tsx": "ae8b4d6c4c3047aeb83b91189652acdd95fda19a",
+    "server-version/frontend/src/training/training-brand.css": "150c09b5bc06dad9043c389b69a8458a8b417b9c",
+    "server-version/frontend/src/training/training-logo-dark.svg": "6d4ad9d6b519d03660fcefe1a2b5a4a2b58f2aaf",
+    "server-version/frontend/src/training/training-logo.svg": "a9e8a08492956501296f2399f41f88d44d48841c",
+    "server-version/frontend/src/components/auth/auth-shell.css": "662c78ea563fa7a6dd865cf4aedd868795df2954",
+    "server-version/frontend/src/training/TrainingFeaturePage.test.tsx": "92e9b4af6f68023cbf8d086e80c62fb0b6b33daf",
+    "server-version/frontend/src/training/TrainingContactPage.tsx": "a28737c75dd33be93655607b195b65c588da237a",
+    "server-version/frontend/src/training/training-portal-refresh.css": "f521c4086e3425ec6d67b1a8d1fe9b144945cfb7",
+    "server-version/frontend/src/training/TrainingPublicHeader.tsx": "ddf6bc4650a8f6c2b99018d541e8a1c6e3a3f9d5",
+    "server-version/frontend/src/training/TrainingHomeBrand.tsx": "b4b373eef17b194f74111544e243def564b36387",
+    "server-version/frontend/src/training/training-home-brand.css": "a38ceea75fc2be047b6ad789a0049eda4c8fd163",
+    "server-version/frontend/src/training/TrainingPortal.tsx": "988c6376f95040d4009a5d3f33f4bd28d9dd5253",
+    "server-version/frontend/src/training/featureContent.ts": "375e638742659f0c280dc88e7bb130376131cf12",
+    "server-version/frontend/src/training/TrainingFeaturePage.tsx": "48aa4b3d9ba3794ae5a68a9aae1fd242acd239b7",
+    "server-version/frontend/src/contexts/AuthContext.tsx": "49290c7a270cbec7fea1c7622ec72ad8828d00cb",
+    "server-version/frontend/src/admin/accountView.ts": "d51996301996575fc62b46897ab4e8489ce90883",
+    "server-version/frontend/src/api/auth.ts": "bbf335e8b6bf88eab010f3471d8aad416387b6dc",
+    "server-version/frontend/src/admin/securityKey.ts": "d33d47dcf1edcf182a7485ca20866b214e5f9e81",
+    "server-version/frontend/src/api/client.ts": "77ac3361e546972920e80dab4b44c53f5e00abc5",
+    "server-version/frontend/src/utils/normalizeApiError.ts": "f826c5c45c4db534242f83c615710aca7c1c7197"
+  },
+  "evidenceSHA256": "bb7a3acf75722645b9e05f84924aae27967282950a4513c24cac11553acb66d3"
+}
