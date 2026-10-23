@@ -68,8 +68,8 @@ async function run() {
   const repo = path.resolve(__dirname, '../..'), dist = path.join(process.env.RUNNER_TEMP, 'school-anonymous-fixed-dist')
   const out = path.join(repo, 'school-anonymous-evidence'); fs.mkdirSync(out, { recursive: true })
   const report = { schemaVersion: 1, acceptance: false, scope: 'anonymous-static-console-diagnostic', source: process.env.GITHUB_SHA,
-    artifact: ARTIFACT, skippedChecks: { axe: 'Four anonymous checks completed in run 39890148285; not repeated or requalified here' }, steps: [], console: [], pageErrors: [], unexpected: [], observations: [], primaryFailure: null, cleanupFailure: null }
-  let browser, phase = 'artifact-verification'
+    artifact: ARTIFACT, skippedChecks: { axe: 'Four anonymous checks completed in run 39890148285; not repeated or requalified here' }, steps: [], staticCss: [], cssResponses: [], console: [], pageErrors: [], unexpected: [], observations: [], primaryFailure: null, cleanupFailure: null }
+  let browser, cdp, phase = 'artifact-verification'
   async function step(label, operation) {
     phase = label + ':before'
     report.steps.push({ phase, consoleCount: report.console.length })
@@ -105,11 +105,19 @@ async function run() {
         file = path.join(dist, 'index.html')
       }
       assert.ok(fs.realpathSync(file).startsWith(dist + path.sep))
-      return route.fulfill({ status: 200, contentType: mime[path.extname(file)] || 'application/octet-stream', body: fs.readFileSync(file) })
+      const bytes = fs.readFileSync(file), contentType = mime[path.extname(file)] || 'application/octet-stream'
+      if (u.pathname.endsWith('.css') && report.staticCss.length < 100) report.staticCss.push({ phase, path: u.pathname, contentType, sha256: sha(bytes) })
+      return route.fulfill({ status: 200, contentType, body: bytes })
     })
     const p = await c.newPage(); p.setDefaultTimeout(15000)
     p.on('console', m => { if (m.type() === 'error' && report.console.length < 100) report.console.push({ phase, type: m.type(), text: clean(m.text()), hash: sha(m.text()), location: location(m.location()) }) })
     p.on('pageerror', e => { if (report.pageErrors.length < 20) report.pageErrors.push({ phase, name: e.name, text: clean(e.message), hash: sha(e.message) }) })
+    p.on('response', response => { const u = new URL(response.url()); if (u.origin === origin && u.pathname.endsWith('.css') && report.cssResponses.length < 100) report.cssResponses.push({ phase, path: u.pathname, status: response.status(), contentType: response.headers()['content-type'] || '' }) })
+    // Initialize the actual font-inspection domains before loading any stylesheet.
+    // Reuse this session for real rendered-font queries; never hide console errors.
+    cdp = await step('pre-navigation:cdp-session', () => c.newCDPSession(p))
+    await step('pre-navigation:DOM-enable', () => cdp.send('DOM.enable'))
+    await step('pre-navigation:CSS-enable', () => cdp.send('CSS.enable'))
     for (const pathname of ['/', '/login']) {
       phase = 'navigate:' + pathname; await p.goto(origin + pathname); await p.waitForLoadState('networkidle')
       if (pathname === '/') await p.locator('.hs-campus-art').waitFor()
@@ -148,10 +156,6 @@ async function run() {
           return use.evaluate(el => { const b = el.getBBox(), css = getComputedStyle(el.closest('svg')); return { width: b.width, height: b.height, color: css.color, visible: css.visibility !== 'hidden' && css.display !== 'none' } })
         })
         if (pathname === '/login' && width === 320) {
-          const cdp = await step(prefix + ':cdp-session', () => c.newCDPSession(p))
-          try {
-            await step(prefix + ':DOM-enable', () => cdp.send('DOM.enable'))
-            await step(prefix + ':CSS-enable', () => cdp.send('CSS.enable'))
             const { root } = await step(prefix + ':DOM-document', () => cdp.send('DOM.getDocument'))
             observation.fonts = []
             for (const [sampleId, selector] of [['school-serif', '.hs-main-auth h1'], ['school-sans', '.hs-main-auth .hs-field > span']]) {
@@ -161,7 +165,6 @@ async function run() {
               const response = await step(prefix + ':' + sampleId + ':CSS-platform-fonts', () => cdp.send('CSS.getPlatformFontsForNode', { nodeId }))
               observation.fonts.push({ sampleId, fonts: response.fonts.map(({ postScriptName, isCustomFont, glyphCount }) => ({ postScriptName, isCustomFont, glyphCount })) })
             }
-          } finally { await step(prefix + ':cdp-detach', () => cdp.detach()) }
         }
         await step(prefix + ':Tab', () => p.keyboard.press('Tab'))
         observation.keyboard = await step(prefix + ':focus-ring', () => p.evaluate(() => { const el = document.activeElement, css = getComputedStyle(el), r = el.getBoundingClientRect(); return {
@@ -182,7 +185,8 @@ async function run() {
     phase = 'finished'; report.status = 'DIAGNOSED'
   } catch (e) { report.status = 'FAILED'; report.primaryFailure = { phase, name: e.name, text: clean(String(e)), hash: sha(String(e)) } }
   finally {
-    try { if (browser) await browser.close() } catch (e) { report.cleanupFailure = { name: e.name, hash: sha(String(e)) } }
+    try { if (cdp) await cdp.detach() } catch (e) { report.cleanupFailure = { stage: 'cdp-detach', name: e.name, hash: sha(String(e)) } }
+    try { if (browser) await browser.close() } catch (e) { report.cleanupFailure = { stage: 'browser-close', name: e.name, hash: sha(String(e)), prior: report.cleanupFailure } }
     fs.writeFileSync(path.join(out, 'anonymous-console.json'), JSON.stringify(report, null, 2))
   }
   // Diagnostics can collect errors, but must never report acceptance or make an unknown error successful.
