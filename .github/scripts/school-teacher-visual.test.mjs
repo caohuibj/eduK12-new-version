@@ -50,9 +50,9 @@ test('ready gate requires all selected actual successes and refuses draft or for
 
 test('only real frontend execution qualifies and browser consumes the same official dist',()=>{
  const w=readFileSync('.github/workflows/ci-school-teacher-visual.yml','utf8');
- assert.equal((w.match(/npm run build/g)||[]).length,1);
- for(const command of ['tsc -p tsconfig.app.json --noEmit','vitest.mjs run','eslint/bin/eslint.js','ci-artifact.mjs" write frontend','ci-artifact.mjs" verify frontend','school-teacher-visual-browser.cjs'])assert.ok(w.includes(command),command);
- for(const forbidden of ['verifyReviewedEvidence','npm test','services:','prisma migrate','DATABASE_URL','secrets.'])assert.ok(!w.includes(forbidden),forbidden);
+ assert.equal((w.match(/npm run build/g)||[]).length,0);
+ for(const command of ['school-teacher-visual-reuse.mjs','school-teacher-visual-browser.cjs','google-chrome --version','if: always()'])assert.ok(w.includes(command),command);
+ for(const forbidden of ['verifyReviewedEvidence','npm test','services:','prisma migrate','DATABASE_URL','secrets.','--no-sandbox','sysctl'])assert.ok(!w.includes(forbidden),forbidden);
  const b=readFileSync('.github/scripts/school-teacher-visual-browser.cjs','utf8');
  assert.ok(b.includes('server-version/frontend/dist'));assert.ok(b.includes('body:fs.readFileSync(file)'));
  assert.ok(b.includes('report.unexpected,[]'));assert.ok(b.includes('report.pageErrors,[]'));assert.ok(!b.includes('vite dev'));
@@ -71,4 +71,56 @@ test('synthetic API refuses unknown reads and every mutation, while preserving d
  assert.throws(()=>f.apiResponse('GET','/api/unknown','',{}),/Unexpected API/);
  assert.equal(f.apiResponse('GET','/api/auth/me','',{}).status,401);
  assert.deepEqual(f.apiResponse('GET','/api/auth/me','',{adminSession:true,denied:true}).data.entryGrants,[]);
+});
+
+
+test('official failed run only contributes exact successful frontend stages and original SAST',async()=>{
+ const {original:o,verifyOfficial}=await import('./school-teacher-visual-reuse.mjs');
+ const run={id:o.run,run_attempt:1,head_sha:o.head,head_branch:branch,event:'pull_request',path:'.github/workflows/ci.yml',repository:{full_name:'caohuibj/eduK12-new-version'},head_repository:{full_name:'caohuibj/eduK12-new-version'},status:'completed',conclusion:'failure'};
+ const steps=[[4,'verify selected source and scope controls'],[5,'install locked frontend and compile-only backend type dependencies'],[6,'changed product lint and complete frontend types'],[7,'targeted entry authorization navigation and draft consumers'],[8,'build production frontend once and bind official artifact'],[10,'real production App and complete CSS synthetic browser matrix','failure'],[11,'Run actions/upload-artifact@v4']].map(([number,name,conclusion='success'])=>({number,name,conclusion,status:'completed'}));
+ const job={id:o.job,run_id:o.run,run_attempt:1,head_sha:o.head,name:'school-teacher-visual / frontend',status:'completed',conclusion:'failure',steps};
+ const sast={...job,id:o.sast,name:'codeql (javascript/typescript SAST)',conclusion:'success',steps:[[16,'initialize CodeQL'],[17,'analyze with CodeQL']].map(([number,name])=>({number,name,status:'completed',conclusion:'success'}))};
+ const artifact={id:o.artifact,name:'school-teacher-visual-'+o.merge,expired:false,size_in_bytes:o.size,digest:'sha256:'+o.digest,created_at:'2026-10-23T15:32:01Z',expires_at:'2026-10-26T15:31:59Z',workflow_run:{id:o.run,head_sha:o.head,head_branch:branch,repository_id:1338215995,head_repository_id:1338215995}};
+ const now=Date.parse('2026-10-23T16:00:00Z');verifyOfficial(run,job,sast,artifact,now);
+ for(const field of ['id','run_attempt','head_sha','head_branch','event','path','conclusion'])assert.throws(()=>verifyOfficial({...run,[field]:'invalid'},job,sast,artifact,now));
+ for(const result of ['skipped','cancelled','failure',undefined])for(const n of [4,5,6,7,8,11]){const j=structuredClone(job);j.steps.find(s=>s.number===n).conclusion=result;assert.throws(()=>verifyOfficial(run,j,sast,artifact,now))}
+ assert.throws(()=>verifyOfficial(run,{...job,steps:steps.filter(s=>s.number!==8)},sast,artifact,now));
+ assert.throws(()=>verifyOfficial(run,job,{...sast,conclusion:'failure'},artifact,now));
+ for(const patch of [{id:1},{expired:true},{digest:'sha256:wrong'},{size_in_bytes:1},{workflow_run:{...artifact.workflow_run,head_sha:'wrong'}}])assert.throws(()=>verifyOfficial(run,job,sast,{...artifact,...patch},now));
+ assert.throws(()=>verifyOfficial(run,job,sast,artifact,Date.parse('2026-10-27T00:00:00Z')));
+});
+test('reuse protects exact original merge, all other files, and old artifact identity',async()=>{
+ const {original:o,verifyClosure,verifyMerge,verifyReceipt,manifest}=await import('./school-teacher-visual-reuse.mjs');
+ const read=(cmd,ref)=>cmd==='diff'?'.github/scripts/school-teacher-visual-browser.cjs':ref.endsWith('^{tree}')?o.tree:ref.endsWith(':server-version/frontend')?binding.components.frontend:ref.endsWith(':server-version/backend')?binding.components.backend:ref.endsWith('ci-school-teacher-visual.yml')?'96243bb4328b896b1ee74c2b1ecc5e54debe9ba6':'d0b2cab09f6e829b89d9fa2c0e9bfbb68d89a5b2';
+ verifyClosure(read);assert.throws(()=>verifyClosure((cmd,...a)=>cmd==='diff'?'server-version/frontend/src/App.tsx':read(cmd,...a)));assert.throws(()=>verifyClosure(()=> 'wrong'));
+ const merge={sha:o.merge,tree:{sha:o.tree},parents:[{sha:binding.base},{sha:o.head}]};verifyMerge(merge);assert.throws(()=>verifyMerge({...merge,parents:[]}));
+ const receipt={kind:'official-frontend-stages-reuse',currentHead:'new',currentRun:'1',sourceHead:o.head,sourceRun:String(o.run),frontendReexecuted:false,originalRunConclusion:'failure',originalBrowserConclusion:'failure',originalCodeQLConclusion:'success',browserReused:false,artifact:manifest};verifyReceipt(receipt,'new',1);
+ for(const patch of [{currentHead:'old'},{browserReused:true},{artifact:{...manifest,sha:'new'}},{originalRunConclusion:'success'}])assert.throws(()=>verifyReceipt({...receipt,...patch},'new',1));
+});
+
+test('actual ZIP extractor refuses traversal symlinks duplicates and absolute paths',async()=>{
+ const {zipCheck,manifest}=await import('./school-teacher-visual-reuse.mjs');
+ const {execFileSync}=await import('node:child_process');
+ const {verifyManifest}=await import('./ci-artifact.mjs');
+ const program=`import zipfile,tempfile,pathlib,subprocess,sys,stat
+code=sys.argv[1]
+with tempfile.TemporaryDirectory() as d:
+ for kind in ['valid','traversal','absolute','symlink','duplicate']:
+  archive=pathlib.Path(d)/(kind+'.zip'); out=pathlib.Path(d)/kind
+  with zipfile.ZipFile(archive,'w') as z:
+   z.writestr('server-version/frontend/dist/ci-build-manifest.json','{}')
+   z.writestr('server-version/frontend/dist/index.html','compiled')
+   if kind=='traversal': z.writestr('../escape','bad')
+   if kind=='absolute': z.writestr('/tmp/escape','bad')
+   if kind=='duplicate': z.writestr('server-version/frontend/dist/index.html','bad')
+   if kind=='symlink':
+    i=zipfile.ZipInfo('server-version/frontend/dist/link'); i.create_system=3; i.external_attr=(stat.S_IFLNK|0o777)<<16; z.writestr(i,'/tmp/escape')
+  r=subprocess.run([sys.executable,'-c',code,str(archive),str(out)],capture_output=True)
+  assert (r.returncode==0)==(kind=='valid'),(kind,r.stderr)
+  if kind=='valid': assert (out/'index.html').read_text()=='compiled'
+`;
+ execFileSync('python3',['-c',program,zipCheck],{stdio:'pipe'});
+ verifyManifest(manifest,manifest,manifest.contentDigest);
+ assert.throws(()=>verifyManifest(manifest,manifest,'tampered'));
+ assert.throws(()=>verifyManifest({...manifest,sha:'new'},manifest,manifest.contentDigest));
 });

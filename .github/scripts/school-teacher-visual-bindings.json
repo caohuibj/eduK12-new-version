@@ -155,7 +155,8 @@
     ".github/workflows/ci.yml",
     "docs/release/README.md",
     ".github/scripts/training-manual-ui.test.mjs",
-    ".github/scripts/survey-manual-ui.test.mjs"
+    ".github/scripts/survey-manual-ui.test.mjs",
+    ".github/scripts/school-teacher-visual-reuse.mjs"
   ],
   "controlBefore": {
     ".github/scripts/school-teacher-visual-bindings.json": null,
@@ -169,7 +170,8 @@
     ".github/workflows/ci.yml": "a5c9edf31852ececb0e42f2fc3a0c236daa3a231",
     "docs/release/README.md": "e788796cfdaa6c9208c3df51f87cec8c3769785a",
     ".github/scripts/training-manual-ui.test.mjs": "dd3db63aea96c2a0b5d1637080a0fa9776ffe3c0",
-    ".github/scripts/survey-manual-ui.test.mjs": "66f8cb77cfd79e2c344b175e7361f76a9058819f"
+    ".github/scripts/survey-manual-ui.test.mjs": "66f8cb77cfd79e2c344b175e7361f76a9058819f",
+    ".github/scripts/school-teacher-visual-reuse.mjs": null
   },
   "components": {
     "frontend": "d1745d740c91be69e7184156e1c1d5094d9da62e",

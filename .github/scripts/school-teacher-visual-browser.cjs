@@ -16,7 +16,9 @@ async function run(){
  const axe=fs.readFileSync(path.join(root,'.github/release-tools/node_modules/axe-core/axe.min.js'),'utf8');
  const report={source:process.env.GITHUB_SHA,run:process.env.GITHUB_RUN_ID,scope:'synthetic-production-frontend-ui',checks:[],unexpected:[],pageErrors:[],status:'running'};
  const manifest=JSON.parse(fs.readFileSync(path.join(dist,'ci-build-manifest.json'),'utf8'));
- assert.equal(manifest.sha,process.env.GITHUB_SHA);assert.equal(manifest.runId,process.env.GITHUB_RUN_ID);report.artifact=manifest;
+ const {verifyReceipt,manifest:expected}=await import('./school-teacher-visual-reuse.mjs');
+ const receipt=JSON.parse(fs.readFileSync(path.join(out,'official-reuse.json'),'utf8'));verifyReceipt(receipt,process.env.GITHUB_SHA,process.env.GITHUB_RUN_ID);
+ const {verifyManifest,treeDigest}=await import('./ci-artifact.mjs');verifyManifest(manifest,expected,treeDigest(dist));report.artifact=manifest;report.reuse=receipt;
  let browser,page;
  const timeout=setTimeout(()=>{throw Error('Browser matrix exceeded 6 minutes')},360000);
  async function proof(name,width,theme){
@@ -54,7 +56,7 @@ async function run(){
   return context;
  }
  try{
-  browser=await chromium.launch({chromiumSandbox:true});
+  browser=await chromium.launch({channel:'chrome',headless:true,chromiumSandbox:true});
   for(const width of widths)for(const theme of themes){
    for(const product of ['School','Teacher']){
     const state={session:false};const context=await contextFor(product,width,theme,state);
