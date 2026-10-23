@@ -1,0 +1,53 @@
+/* Explicit Training management return target; authentication remains shared. */
+.training-admin-auth {
+  --auth-ink:#263b31;--auth-muted:#687568;--auth-line:#dcded1;--auth-page:#f5f0e7;
+  --auth-surface:#fffdf8;--auth-soft:#e9ede2;--auth-primary:#365a48;--auth-primary-hover:#294938;
+  --auth-accent:#365a48;--auth-accent-soft:#e9ede2;
+  grid-template-columns:minmax(0,1.08fr) minmax(430px,.92fr);background:#f5f0e7;
+}
+.training-admin-auth .hui-auth-hero {
+  position:relative;isolation:isolate;border-color:#dcded1;
+  background:linear-gradient(180deg,#f5f0e7dd,#f5f0e750),url('./training-landscape-v2.webp') 62% center/cover;
+}
+.training-admin-auth .hui-auth-hero::before,.training-admin-auth .hui-auth-hero::after { display:none; }
+.training-admin-auth .hui-auth-hero__inner { gap:42px;padding:clamp(30px,5vw,76px); }
+.training-admin-auth .hui-auth-brand { margin-bottom:16px; }
+.training-admin-auth .training-brand-lockup { width:250px; }
+.training-admin-auth .hui-auth-eyebrow { background:#e6ebdf;color:#365a48;border:1px solid #cfd9c9; }
+.training-admin-auth .hui-auth-hero__title { font-family:'Songti SC','STSong',serif;font-size:clamp(38px,4.3vw,60px);line-height:1.5;font-weight:600;letter-spacing:.06em;white-space:pre-line; }
+.training-admin-auth .hui-auth-hero__description { max-width:380px;font-size:15px;line-height:1.95;color:#526456; }
+.training-admin-auth .hui-auth-benefits { padding-top:24px;border-top:1px solid #ced6c4;color:#3f5946;font-size:13px;gap:18px; }
+.training-admin-auth .hui-auth-benefits li > span { width:5px;height:5px;flex-basis:5px;background:#70886c;box-shadow:none; }
+.training-admin-auth .hui-auth-stage { padding:36px clamp(24px,4vw,64px);background:#faf8f3; }
+.training-admin-auth .hui-auth-stage__inner { max-width:470px; }
+.training-admin-auth .hui-auth-back { color:#526456;min-height:44px; }
+.training-admin-auth .hui-auth-card { padding:30px;border-color:#dcded1;border-radius:18px;box-shadow:0 18px 60px #365a4808; }
+.training-admin-auth .hui-auth-card__header { margin-bottom:24px; }
+.training-admin-auth .hui-auth-card__header h1 { font-family:'Songti SC','STSong',serif;font-size:27px;color:#263b31; }
+.training-admin-auth .hui-auth-card__icon { color:#365a48;background:#e9ede2; }
+.training-admin-auth .hui-auth-card__body label { color:#405646; }
+.training-admin-auth .hui-auth-note { margin:0 0 24px;background:#f0f3e9;border-color:#d9e1cf;color:#526456;line-height:1.85;font-size:12px; }
+.training-admin-auth .hui-auth-note strong { display:block;margin-bottom:4px;color:#365a48;font-size:13px; }
+.training-admin-auth .hui-auth-card__body input:focus,.training-admin-auth .hui-auth-card__body select:focus { box-shadow:0 0 0 3px #365a481a; }
+.training-admin-auth .hui-auth-card__body > p a { color:#365a48;font-size:13px;text-underline-offset:4px; }
+.training-admin-auth .hui-auth-stage__tagline { color:#687568; }
+.training-admin-auth :is(a,button,input,select):focus-visible { outline:3px solid #70886c;outline-offset:3px; }
+@media(max-width:1023px) {
+  .training-admin-auth { grid-template-columns:minmax(0,1fr); }
+  .training-admin-auth .hui-auth-hero__inner { max-width:680px;padding:28px 32px;gap:18px; }
+  .training-admin-auth .hui-auth-brand { margin-bottom:0; }
+  .training-admin-auth .training-brand-lockup { width:200px; }
+  .training-admin-auth .hui-auth-hero__title { font-size:34px;white-space:normal; }
+  .training-admin-auth .hui-auth-hero__description { max-width:560px;font-size:13px; }
+  .training-admin-auth .hui-auth-benefits { display:none; }
+  .training-admin-auth .hui-auth-stage { padding:22px 28px 40px; }
+  .training-admin-auth .hui-auth-stage__inner { max-width:620px; }
+}
+@media(max-width:520px) {
+  .training-admin-auth .hui-auth-hero__inner { padding:24px;gap:16px; }
+  .training-admin-auth .training-brand-lockup { width:180px; }
+  .training-admin-auth .hui-auth-hero__title { font-size:29px; }
+  .training-admin-auth .hui-auth-stage { padding:18px 18px 30px; }
+  .training-admin-auth .hui-auth-card { padding:23px 20px;border-radius:14px; }
+  .training-admin-auth .hui-auth-card__header h1 { font-size:24px; }
+}

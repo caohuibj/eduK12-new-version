@@ -28,6 +28,12 @@ describe('safe access and return context', () => {
     expect(returnAfterLogin('/organizations/org-1/reporting?tab=group', 'TEACHER')).toBe('/organizations/org-1/reporting?tab=group')
     expect(returnAfterLogin('/organization-tasks', 'ADMIN')).toBe('/organization-tasks')
   })
+  it.each(['/toolkit', '/media-library'])('returns trainers to %s while keeping other roles at their home', (path) => {
+    expect(returnAfterLogin(path, 'TEACHER')).toBe(path)
+    expect(returnAfterLogin(path, 'STUDENT')).toBe('/student')
+    expect(returnAfterLogin(path, 'ADMIN')).toBe('/dashboard')
+    expect(returnAfterLogin(path, 'PARENT')).toBe('/parent')
+  })
   it('restricts child returns to the matching public/authenticated parent family', () => {
     expect(parentReturnTo('/student/composite/attempts/1?slot=a', false, '/')).toBe('/student/composite/attempts/1?slot=a')
     expect(parentReturnTo('/student/composite/attempts/1', true, '/')).toBe('/')

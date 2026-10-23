@@ -1,0 +1,97 @@
+name: Training manual acceptance frontend qualification
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  CI_EVENT: pull_request
+  CI_HEAD_REF: work/training-manual-acceptance-20261023
+  CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+  CI_PR_REPOSITORY: caohuibj/eduK12-new-version
+  CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+jobs:
+  admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      PLAN: ${{ inputs.plan }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify exact source and unchanged local feature contracts
+        run: node .github/scripts/training-manual-ui-checks.mjs
+      - name: new Training scope rejection evidence and stable gate contracts
+        run: node --test .github/scripts/training-manual-ui.test.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: training-manual-ui-admission-${{ github.sha }}
+          path: training-manual-ui-evidence
+          if-no-files-found: error
+          retention-days: 3
+  frontend:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    env:
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      NODE_OPTIONS: --max-old-space-size=4096
+    defaults:
+      run:
+        working-directory: server-version/frontend
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/frontend/package-lock.json
+      - name: install unchanged official locked frontend dependencies
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: lint changed Training product files
+        run: |
+          node --input-type=module <<'JS'
+          import {execFileSync} from 'node:child_process';
+          import {binding} from '../../.github/scripts/training-manual-ui-scope.mjs';
+          const files=Object.keys(binding.source).filter(f=>/\.[jt]sx?$/.test(f)).map(f=>f.replace('server-version/frontend/',''));
+          if(!files.length)throw Error('Missing changed lint inputs');
+          execFileSync(process.execPath,['node_modules/eslint/bin/eslint.js',...files],{stdio:'inherit'});
+          JS
+      - name: integrated application types
+        run: node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit
+      - name: direct consumers of merged login enrollment redirect and shell
+        run: node node_modules/vitest/vitest.mjs run src/pages/AdminLogin.test.tsx src/admin/SurveyAdminEnrollmentContext.test.tsx src/admin/AdminAuthenticator.test.tsx src/components/app-shell/__tests__/SurveyAdminOrigin.test.tsx src/components/app-shell/__tests__/shell.test.tsx --maxWorkers=2 --reporter=default --reporter=json --outputFile=../../training-manual-ui-evidence/integrated-tests.json
+      - name: compile the new integrated frontend once
+        run: npm run build
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: training-manual-ui-frontend-${{ github.sha }}
+          path: |
+            training-manual-ui-evidence
+            server-version/frontend/dist
+          if-no-files-found: error
+          retention-days: 3
+  qualified:
+    needs: [admission, frontend]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    steps:
+      - name: every selected frontend stage must succeed
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: node -e 'const n=JSON.parse(process.env.NEEDS);for(const k of ["admission","frontend"])if(n[k]?.result!=="success")throw Error(k+" did not succeed")'

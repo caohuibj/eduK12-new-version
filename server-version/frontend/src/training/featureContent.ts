@@ -1,0 +1,69 @@
+import { BookOpenText, ChartNoAxesCombined, Images, ListChecks } from 'lucide-react'
+
+/** Public explanations of existing Training workflows; no sample account data. */
+export const trainingFeatures = [
+  {
+    slug: 'courses', title: '课程与学习', Icon: BookOpenText, marker: '01',
+    description: '课程内容、学员与课堂任务，在同一个空间有序展开。',
+    tags: ['课程组织', '学习任务'],
+    headline: '把每一次学习，连成一条清晰的路。',
+    introduction: '从加入课程到完成任务，以课程为起点，找到内容、安排和反馈。让培训师的组织与学员的投入，在同一个空间相遇。',
+    previewTitle: '以课程为中心', previewItems: ['课程内容与说明', '学习与课堂任务', '参与记录与反馈'],
+    capabilities: [
+      { title: '有序组织课程', text: '培训师维护课程信息、学员与课堂安排，让学习目标和参与方式更清楚。' },
+      { title: '集中找到任务', text: '学员从“我的课程”进入，查看课程内容与任务，不必在不同入口之间寻找。' },
+      { title: '延续学习脉络', text: '从课程查看任务状态，按实际开放的安排继续学习，或回看已经完成的内容。' },
+    ],
+    steps: [{ title: '加入或建立课程', text: '学员使用课程码加入；培训师在课程空间组织课程。' }, { title: '查看课程安排', text: '阅读课程说明，找到对应的内容和任务入口。' }, { title: '按安排开展学习', text: '完成已开放的学习与课堂任务，回到课程查看后续安排。' }],
+    trainerPath: '/dashboard', trainerAction: '管理我的课程', learnerAction: '进入我的课程',
+    learnerNote: '已加入的课程、课程内容和任务，都从这里开始。', trainerNote: '组织课程、管理学员，安排课程中的学习与任务。',
+  },
+  {
+    slug: 'assessment', title: '测评与工具', Icon: ListChecks, marker: '02',
+    description: '按课程需要选用工具，也能编制表单、量表与组合问卷。',
+    tags: ['工具编制', '发布与作答'],
+    headline: '选择合适的工具，让学习得到回应。',
+    introduction: '围绕课程目标组织问题与内容。编制、选用和检查工具，再把合适的版本安排到课程中，让参与过程更连贯。',
+    previewTitle: '从工具到课程任务', previewItems: ['表单 · 量表 · 组合问卷', '选用版本与检查流程', '课程任务中的参与入口'],
+    capabilities: [
+      { title: '按用途编制', text: '根据需要编制表单、量表或普通组合问卷，组织问题、说明与内容。' },
+      { title: '按版本选用', text: '从自己拥有或获授权的工具中选择具体版本，检查内容与作答流程。' },
+      { title: '从课程参与', text: '将工具用于课程安排。学员从课程中的任务入口进入，按要求完成作答。' },
+    ],
+    steps: [{ title: '明确使用目标', text: '先确定需要收集的信息或课程任务，再选择合适的工具类型。' }, { title: '准备并检查工具', text: '编制或选用获授权的版本，检查题目、内容与参与流程。' }, { title: '安排到课程', text: '根据课程需要安排任务，让学员从对应课程进入。' }],
+    trainerPath: '/toolkit', trainerAction: '进入工具空间', learnerAction: '从课程参与测评',
+    learnerNote: '测评随课程任务开放，请先进入对应课程查看安排。', trainerNote: '查看可用工具，按需要编制、选用并安排到课程。',
+  },
+  {
+    slug: 'resources', title: '素材与资源', Icon: Images, marker: '03',
+    description: '让图片、视频和文档，成为课程与工具内容的一部分。',
+    tags: ['素材整理', '按需引用'],
+    headline: '让合适的素材，在需要的地方出现。',
+    introduction: '把图片、视频与文档整理成可查找的资源，再按需要引用到工具内容中。素材与内容相互配合，让说明更清楚，参与更自然。',
+    previewTitle: '有内容，也有表达', previewItems: ['图片 · 视频 · 文档', '分类查找与预览', '在工具内容中按需引用'],
+    capabilities: [
+      { title: '集中整理素材', text: '在媒体空间管理自己上传或获得授权的素材，保留清楚的资源来源。' },
+      { title: '按类型查找', text: '按图片、视频和文档等类型查找与预览，为内容选择合适的表达方式。' },
+      { title: '在内容中引用', text: '编制工具时使用合适的素材，丰富题目与说明，让资源服务于具体任务。' },
+    ],
+    steps: [{ title: '准备可用素材', text: '整理自己上传或已获授权的图片、视频和文档。' }, { title: '查找并预览', text: '在媒体空间确认素材内容，选择适合当前用途的资源。' }, { title: '引用到工具内容', text: '在编制内容时选用素材，并检查最终呈现。' }],
+    trainerPath: '/media-library', trainerAction: '进入媒体空间', learnerAction: '查看课程中的资源',
+    learnerNote: '学习所需的内容随课程与任务呈现，无需单独管理素材。', trainerNote: '整理可用素材，为工具编制和课程内容做好准备。',
+  },
+  {
+    slug: 'feedback', title: '进度与反馈', Icon: ChartNoAxesCombined, marker: '04',
+    description: '看见任务的完成情况，让结果回到学习和实践。',
+    tags: ['过程记录', '结果回看'],
+    headline: '看见走过的路，再走好下一步。',
+    introduction: '把完成状态与已开放的结果放回课程情境。回顾一次参与，理解一份反馈，为下一段学习留下可以参考的记录。',
+    previewTitle: '让学习形成回响', previewItems: ['查看课程任务状态', '回看已开放的结果', '结合反馈继续学习'],
+    capabilities: [
+      { title: '了解完成情况', text: '在课程中查看任务与完成状态，区分已经参与的内容和接下来的安排。' },
+      { title: '回看开放结果', text: '从对应任务查看已开放的结果或反馈。可见内容以任务设置与实际权限为准。' },
+      { title: '联系学习实践', text: '结合课程内容回顾自己的参与过程，把反馈作为后续学习的参考。' },
+    ],
+    steps: [{ title: '回到对应课程', text: '找到参与过的课程及任务，查看当前完成情况。' }, { title: '查看开放反馈', text: '在任务已开放结果时，从相应入口回看。' }, { title: '带着反馈继续', text: '结合课程要求理解反馈，再进入后续的学习与实践。' }],
+    trainerPath: '/dashboard', trainerAction: '查看课程与任务', learnerAction: '回看我的课程任务',
+    learnerNote: '进入对应课程，查找任务状态与已经开放的结果。', trainerNote: '从课程进入对应任务，了解参与情况与结果。',
+  },
+] as const

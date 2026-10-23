@@ -150,7 +150,7 @@ describe('Training assessment presentation boundary', () => {
     presentation.training = true
     const view = render(<MemoryRouter initialEntries={[path]}><AppShell><button>既有作答操作</button><div data-cognitive-task-root>既有刺激</div></AppShell></MemoryRouter>)
     expect(view.container.querySelector('.hui-training.training-assessment-visual')).not.toBeNull()
-    expect(view.container.querySelector('.hui-brand')).toContainElement(screen.getByRole('img', { name: 'Training @eduk12.top' }))
+    expect(view.container.querySelector('.hui-brand')).toContainElement(screen.getByRole('img', { name: 'Training @EduK12.top' }))
     expect(screen.getByRole('button', { name: '既有作答操作' })).toBeEnabled()
     expect(view.container.querySelector('[data-cognitive-task-root]')).toHaveTextContent('既有刺激')
   })

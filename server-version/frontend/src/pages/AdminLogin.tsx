@@ -13,6 +13,8 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { adminReturnTo } from '../admin/authority'
 import { useAuth } from '../contexts/AuthContext'
 import { Link } from 'react-router-dom'
+import TrainingBrand from '../training/TrainingBrand'
+import '../training/training-admin-auth.css'
 
 const AdminLogin: React.FC = () => {
   const navigate = useNavigate()
@@ -21,6 +23,10 @@ const AdminLogin: React.FC = () => {
   const { mode } = useSurveyAppearance()
   const origins=productOrigins()
   const surveyEntry=Boolean(origins&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH)
+  const trainingEntry=new URLSearchParams(location.search).get('returnTo')==='/admin/training'
+  const homeOrigin=new URL(origins?.admin??window.location.origin)
+  if(import.meta.env.DEV&&['localhost','127.0.0.1'].includes(homeOrigin.hostname))homeOrigin.hostname='training.localhost'
+  const trainingHome=homeOrigin.origin+'/'
   const Shell = surveyEntry ? SurveyAdminEntryShell : AuthShell
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -48,10 +54,17 @@ const AdminLogin: React.FC = () => {
   }
 
   return (
-    <Shell tone="admin" title="管理员登录" description={surveyEntry?'Survey · 研究者资格、邀请与工具授权':'密码与 Authenticator 动态码验证，按入口授权管理'}>
+    <Shell tone="admin" title={trainingEntry?'培训管理员登录':'管理员登录'} description={trainingEntry?'账号审核、课程监管与资源授权，从这里开始。':surveyEntry?'Survey · 研究者资格、邀请与工具授权':'密码与 Authenticator 动态码验证，按入口授权管理'}
+      {...(trainingEntry?{
+        brand:<a className="hui-auth-brand" href={trainingHome} aria-label="Training 首页"><TrainingBrand /></a>,
+        className:'training-admin-auth',backTo:trainingHome,backLabel:'返回 Training 首页',
+        heroTitle:'培训有序，\n管理有据。',heroDescription:'在独立的培训管理空间，连接账号、课程与资源，让教与学各得其所。',
+        heroBullets:['培训师审核与账号管理','培训课程监管与查询','教学素材与测评资源授权'],
+        heroLabel:'Training 培训管理介绍',tagline:'仅限已获 Training 管理授权的账号',
+      }:{})}>
       {!surveyEntry&&<div className="hui-auth-note mt-0 mb-5">
-        <strong>管理员身份</strong>
-        <div>{surveyEntry?'使用账号、密码和六位动态码进入获授权的研究管理工作台。':'使用密码与手机验证器的六位动态码登录。微软 Authenticator 等兼容验证器均可使用；每个入口分别授权。'}</div>
+        <strong>{trainingEntry?'Training 管理身份':'管理员身份'}</strong>
+        <div>{trainingEntry?'使用已获培训管理授权的账号、密码与手机验证器动态码登录。系统治理和其他产品管理分别授权。':'使用密码与手机验证器的六位动态码登录。微软 Authenticator 等兼容验证器均可使用；每个入口分别授权。'}</div>
       </div>}
 
       <LoginRecoveryNotice />
@@ -122,7 +135,7 @@ const AdminLogin: React.FC = () => {
       </form>
       {surveyEntry?<div className="survey-admin-auth-tools">
         <Link to={surveyAppearanceHref('/admin/security/enroll?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH),mode)}>首次绑定 Authenticator</Link>
-      </div>:<p className="mt-4"><Link to="/admin/security/enroll">首次绑定 Authenticator</Link></p>}
+      </div>:<p className="mt-4"><Link to={trainingEntry?'/admin/security/enroll?returnTo=%2Fadmin%2Ftraining':'/admin/security/enroll'}>首次绑定 Authenticator</Link></p>}
     </Shell>
   )
 }

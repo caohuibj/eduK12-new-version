@@ -15,8 +15,9 @@ function AdminKeyEnrollment(){
   const location=useLocation(),origins=productOrigins()
   const {mode}=useSurveyAppearance()
   const surveyEntry=Boolean(origins&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH)
+  const trainingEntry=new URLSearchParams(location.search).get('returnTo')==='/admin/training'
   const Shell=surveyEntry?SurveyAdminEntryShell:AuthShell
-  const loginPath=surveyEntry?surveyAppearanceHref('/admin/login?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH),mode):'/admin/login'
+  const loginPath=surveyEntry?surveyAppearanceHref('/admin/login?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH),mode):trainingEntry?'/admin/login?returnTo=%2Fadmin%2Ftraining':'/admin/login'
   const [username,setUsername]=useState(''),[password,setPassword]=useState(''),[ticket,setTicket]=useState('')
   const [method,setMethod]=useState<'TOTP'|'SECURITY_KEY'>('TOTP')
   const [uri,setUri]=useState(''),[code,setCode]=useState('')

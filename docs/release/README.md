@@ -1038,3 +1038,29 @@ merge tree 不符直接拒绝；已知分支缺 marker 不回退 platform/manual
 source、原日志 SHA256、逐 case 通过行及依赖源码相同；原 job 仍标 failure。
 CI 只执行失败项和证据哈希输入变化涉及的 3 项，共 4 项；不以原失败 job 授予
 整作业资格。新作业仍要求当前证据接纳、官方部分接纳、四项复验及 lint 真成功。
+
+
+## Training manual entry PR #341, after Survey #340
+
+The user authorizes frontend-only CI and merge after Survey. This exact candidate
+is based on dd41e47cfea797fa03a31062a268e2357ea5f70e and product
+3bcb634f0a0ba62ecfbe0972039e2dd8f87a3d18. Complete raw diff, modes, blobs,
+source/merge trees, backend and protected dependency/config inputs are pinned.
+Unknown paths, base drift and missing evidence stop; no full-platform fallback.
+
+Eleven unchanged feature/AuthShell cases are admitted from the retained 78-case
+Mac reporter, with the entire actual relative-import closure checked against the
+old product. The 67 old shell cases are invalidated by Survey integration and
+are not admitted as current. Original unsigned records remain reviewed-local-
+evidence, ciExecuted=false and originalExecutionSigned=false; no retrospective
+signing or complete historical node_modules byte identity is claimed.
+
+Actions executes the new scope/rejection/evidence/gate controls, changed-product
+lint, integrated app types, five direct login/enrollment/origin/shell test files,
+one new integrated frontend compile and frontend/changed-control JS/TS CodeQL.
+No backend, DB/Redis, migration, recovery, whole frontend suite, media/load, image
+build or deployment. Actual browser or real-account MFA acceptance is not claimed.
+The stable ready gate requires scope, the complete nested training-manual-ui
+workflow and CodeQL success on the exact current source; missing, skipped, failed
+and cancelled selected stages block. Exact main push only classifies. At five
+minutes report the actual waiting stage; retry only affected or missing inputs.

@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom'
 import { ArrowLeft, BookOpenCheck, GraduationCap, HeartHandshake, ShieldCheck, UserRound } from 'lucide-react'
 import './auth-shell.css'
 import TrainingBrand from '../../training/TrainingBrand'
+import TrainingAppearanceControl from '../../training/TrainingAppearanceControl'
 import { trainingWelcomeCopy } from '../../training/welcomeCopy'
 import { useAuthLinks } from '../app-shell/useAuthLinks'
 import { isTrainingHost } from '../../training/context'
@@ -52,6 +53,7 @@ type AuthShellProps = {
   heroTitle?: string
   heroDescription?: string
   heroBullets?: readonly string[]
+  heroLabel?: string
   registrationStep?: 'verify' | 'account' | 'submitted'
   trainingUnified?: boolean
   brand?: ReactNode
@@ -70,6 +72,7 @@ export default function AuthShell({
   heroTitle,
   heroDescription,
   heroBullets,
+  heroLabel,
   registrationStep,
   trainingUnified = false,
   brand,
@@ -103,9 +106,9 @@ export default function AuthShell({
     <div className={`hui-auth-page hui-auth-page--${tone}${training ? ` hui-auth-page--training training-auth-refresh${accountStep && !submitted ? ' training-auth-account-step' : ''}` : ''}${className?' '+className:''}`}>
       {training && <header className="training-auth-header">
         <Link to="/" className="hui-auth-brand" title="返回培训首页"><TrainingBrand /></Link>
-        {backControl}
+        <div className="training-auth-actions">{backControl}<TrainingAppearanceControl /></div>
       </header>}
-      <aside className="hui-auth-hero" aria-label={training ? "Huitraining 介绍" : "Huisurvey 介绍"}>
+      <aside className="hui-auth-hero" aria-label={heroLabel??(training ? "Huitraining 介绍" : "Huisurvey 介绍")}>
         <div className="hui-auth-hero__inner">
           {!training && (brand ?? <Link to="/" className="hui-auth-brand" aria-label="返回 Huisurvey 入口">
             <span className="hui-auth-brand__mark" aria-hidden="true" /><strong>Huisurvey</strong>

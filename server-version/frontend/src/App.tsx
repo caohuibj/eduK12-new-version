@@ -27,6 +27,8 @@ import StudentRegister from './pages/student/StudentRegister'
 // Admin/Teacher Pages
 const CourseList = React.lazy(() => import('./pages/CourseList'))
 const TrainingPortal = React.lazy(() => import('./training/TrainingPortal'))
+const TrainingFeaturePage = React.lazy(() => import('./training/TrainingFeaturePage'))
+const TrainingContactPage = React.lazy(() => import('./training/TrainingContactPage'))
 const TrainingLogin = React.lazy(() => import('./training/TrainingLogin'))
 const TrainingRegister = React.lazy(() => import('./training/TrainingRegister'))
 const TrainingAuthRedirect = React.lazy(() => import('./training/TrainingAuthRedirect'))
@@ -225,6 +227,8 @@ function AppRoutes() {
 
           <Route path="/login" element={isTrainingHost() ? <TrainingLogin /> : <Navigate to="/" replace />} />
           <Route path="/register" element={isTrainingHost() ? <TrainingRegister /> : <Navigate to="/" replace />} />
+          <Route path="/features/:feature" element={isTrainingHost() ? <TrainingFeaturePage /> : <Navigate to="/" replace />} />
+          <Route path="/contact" element={isTrainingHost() ? <TrainingContactPage /> : <Navigate to="/" replace />} />
 
           {/* Admin Login - no auth check to allow switching accounts */}
           <Route
@@ -566,7 +570,7 @@ function AppRoutes() {
               </ProtectedRoute>
             }
           />
-          <Route path="/admin/training" element={<ProtectedRoute roles={['ADMIN']}><AdminTrainingWorkspace /></ProtectedRoute>} />
+          <Route path="/admin/training" element={<AdminAccess entries={['TRAINING']}><AdminTrainingWorkspace /></AdminAccess>} />
           <Route path="/admin/education-products"
             element={<AdminAccess entries={['HUISCHOOL','HUITEACHER']}>
               <EducationProductGovernance/>

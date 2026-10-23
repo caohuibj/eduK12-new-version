@@ -53,6 +53,23 @@ describe('administrator login flow',()=>{
     submit()
     expect(await screen.findByText('destination:/admin/survey-researchers')).toBeInTheDocument()
   })
+  it('presents Training management and returns a Training-only administrator to its workspace',async()=>{
+    login.mockResolvedValue({code:0,data:{user:{id:'training-admin',username:'synthetic-training-admin',role:'ADMIN',businessRole:'STUDENT',platformRole:'STANDARD',entryGrants:[{entry:'TRAINING',version:1}]}}})
+    mount('/admin/login?returnTo=%2Fadmin%2Ftraining')
+    expect(screen.getByRole('heading',{name:'培训管理员登录'})).toBeVisible()
+    expect(screen.getByRole('link',{name:'Training 首页'}).querySelector('img')).toHaveAttribute('alt','Training @EduK12.top')
+    expect(screen.getByRole('link',{name:'首次绑定 Authenticator'})).toHaveAttribute('href','/admin/security/enroll?returnTo=%2Fadmin%2Ftraining')
+    submit()
+    expect(await screen.findByText('destination:/admin/training')).toBeInTheDocument()
+    expect(login).toHaveBeenCalledExactlyOnceWith({username:'synthetic-admin',password:'synthetic-password'},'admin',{method:'TOTP',code:'123456'})
+  })
+  it('preserves the Training return target while moving to the canonical administrator origin',()=>{
+    const original=window,replace=vi.fn()
+    vi.stubGlobal('window',new Proxy(original,{get(target,key){return key==='location'?{origin:'http://training.localhost:5201',search:'?returnTo=%2Fadmin%2Ftraining',replace}:Reflect.get(target,key)}}))
+    mount('/admin/login?returnTo=%2Fadmin%2Ftraining')
+    expect(screen.queryByLabelText('管理员账号')).not.toBeInTheDocument()
+    expect(replace).toHaveBeenCalledExactlyOnceWith('http://localhost:5201/admin/login?returnTo=%2Fadmin%2Ftraining')
+  })
   it.each([['TEACHER','/admin/entrances'],['STUDENT','/admin/entrances'],['PARENT','/admin/entrances']])(
     'does not promote an authenticated %s into governance',async(role,target)=>{
       login.mockResolvedValue({code:0,data:{user:{id:'ordinary',username:'ordinary',role,platformRole:'STANDARD'}}})

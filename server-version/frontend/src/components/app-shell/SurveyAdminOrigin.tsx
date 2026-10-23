@@ -6,7 +6,8 @@ import { surveyAppearanceFromSearch, surveyAppearanceHref } from '../../survey/s
  * Only the fixed destination and a validated appearance hint may cross origins. */
 export default function SurveyAdminOrigin({ children, login = false }: { children: ReactNode; login?: boolean }) {
   const origins = productOrigins()
-  const returnTo = new URLSearchParams(window.location.search).get('returnTo') === SURVEY_ADMIN_PATH ? SURVEY_ADMIN_PATH : '/users'
+  const requested = new URLSearchParams(window.location.search).get('returnTo')
+  const returnTo = requested === SURVEY_ADMIN_PATH || requested === '/admin/training' ? requested : '/users'
   const destination = origins ? origins.admin + (login ? `/admin/login?returnTo=${encodeURIComponent(returnTo)}` : SURVEY_ADMIN_PATH) : null
   const appearance = surveyAppearanceFromSearch(window.location.search)
   const target = destination && login && appearance ? surveyAppearanceHref(destination, appearance) : destination
