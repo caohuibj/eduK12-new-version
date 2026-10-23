@@ -988,3 +988,16 @@ file digest; compilation, sanitizer tests and audits are not repeated. The paren
 failure remains failure. CodeQL job 120255988282 also succeeded: its exact prior
 source range is checked, and only the five changed control scripts receive fresh
 analysis. The original application scan remains independently bound as above.
+
+
+Run 39906061284 browser job 120258397428 then reached the compiled document but
+waited for the wrong product: `survey.localhost` is deliberately DEV-only and is
+not a Survey host in Vite production. This is a consumer contract failure, not a
+new application or sanitizer failure. The consumer now uses the canonical
+presentation host and fulfills EVERY request from exact local dist bytes or
+strict synthetic API responses, following the existing workspace-browser route
+pattern. It cannot make network or production requests. Anonymous landing and
+signed-in authoring states are distinct; the capabilities response and material
+`name` field match the actual adapters. Actual pseudo-element day/night art,
+mobile overflow, CSRF-bearing revision-bound save and exact material identity
+remain required. Previous successful application qualifications are unchanged.
