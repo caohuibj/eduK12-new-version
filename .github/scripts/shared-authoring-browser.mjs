@@ -15,7 +15,7 @@ try{for(const[width,theme]of [[1440,'light'],[390,'dark']]){
  const tool={id:'fixture',title:'Compiled authoring',kind:'SCALE',revision:1,status:'DRAFT',readiness:'DRAFT',completedRevision:null,updatedAt:'2026-10-23T00:00:00.000Z',definition:{schemaVersion:1,respondentType:'participant_self_report',aggregation:'sum',responseOptions:[{optionKey:'a',label:'No',score:0},{optionKey:'b',label:'Yes',score:1}],dimensions:[{dimensionKey:'d',label:'Descriptive',direction:'descriptive'}],items:[{itemKey:'q',prompt:'Synthetic compiled question',required:true,reverse:false,dimensionKeys:['d']}]}};
  try{
   await context.addInitScript(mode=>localStorage.setItem('survey.appearance',mode),theme);
-  await page.route('**/api/**',async route=>{const req=route.request(),url=new URL(req.url);let data;
+  await page.route('**/api/**',async route=>{const req=route.request(),url=new URL(req.url());let data;
    if(url.pathname==='/api/survey/auth/me')data={id:'fixture-researcher',username:'synthetic-ci-only',mustChangePassword:false};
    else if(url.pathname==='/api/survey/auth/csrf')data={csrfToken:'synthetic-ui-fixture'};
    else if(url.pathname==='/api/survey/projects')data={list:[]};

@@ -1,5 +1,5 @@
 import {test} from 'node:test';import assert from 'node:assert/strict';
-import {original,artifactPin,verifyOfficial,verifyArtifact,verifyClosure,verifyFrozenReceipt} from './shared-authoring-reuse.mjs';
+import {original,repaired,artifactPin,frontendPin,verifyOfficial,verifyArtifact,verifyClosure,verifyControlClosure,verifyFrozenReceipt} from './shared-authoring-reuse.mjs';
 import {binding,branch} from './shared-authoring-scope.mjs';
 const now=Date.parse('2026-10-23T06:00:00Z');
 const run={id:original.run,head_sha:original.head,repository:{full_name:'caohuibj/eduK12-new-version'},head_repository:{full_name:'caohuibj/eduK12-new-version'},head_branch:branch,event:'pull_request',status:'completed',conclusion:'failure'};
@@ -22,3 +22,15 @@ test('requires unchanged backend and frozen consumer bytes; SAST permits only fr
  assert.throws(()=>verifyClosure('sast',(...args)=>args[0]==='diff'?'server-version/frontend/src/utils/sanitize.ts':read(...args)));
 });
 test('refuses missing frozen-chain assertions and false manual acceptance claims',()=>{const r={status:'PASS',compiledBackend:true,syntheticAccounts:true,loginUiManuallyAccepted:false,checks:Array.from({length:7},(_,i)=>'check '+i)};verifyFrozenReceipt(r);for(const patch of [{status:'FAIL'},{compiledBackend:false},{loginUiManuallyAccepted:true},{checks:['same','same']}])assert.throws(()=>verifyFrozenReceipt({...r,...patch}))});
+test('frontend reuse requires its exact tree and successful new-lock types sanitizer audit and build',()=>{
+ const r={...run,id:repaired.run,head_sha:repaired.head};
+ const j={...job,id:repaired.frontend,run_id:r.id,head_sha:r.head_sha,name:'shared-authoring / frontend',steps:['install official locked frontend dependencies','missing frontend dependency security audit','verify the new dependency with current app types and sanitizer boundary regressions','compile the repaired current frontend once'].map(name=>({name,status:'completed',conclusion:'success'}))};
+ verifyOfficial(r,j,'frontend',now,repaired);assert.throws(()=>verifyOfficial(r,{...j,steps:j.steps.slice(0,3)},'frontend',now,repaired));
+ const a={...artifact,id:frontendPin.id,name:frontendPin.name,size_in_bytes:frontendPin.size,digest:'sha256:'+frontendPin.sha256,workflow_run:{...artifact.workflow_run,id:r.id,head_sha:r.head_sha}};verifyArtifact(a,now,frontendPin,repaired);
+ const read=(...args)=>args[1].endsWith(':server-version/backend')?binding.components.backend:binding.components.frontend;
+ verifyClosure('frontend',read);assert.throws(()=>verifyClosure('frontend',(...args)=>args[1]==='HEAD:server-version/frontend'?'drift':read(...args)));
+});
+test('prior control scan reuse refuses any change outside fresh CodeQL paths',()=>{
+ const paths=['.github/scripts/shared-authoring-browser.mjs','.github/scripts/shared-authoring-checks.mjs','.github/scripts/shared-authoring-reuse.mjs','.github/scripts/shared-authoring-reuse.test.mjs','.github/scripts/shared-authoring.test.mjs'];
+ verifyControlClosure(()=>paths.join('\n'));assert.throws(()=>verifyControlClosure(()=>[...paths,'.github/scripts/merge-gate.mjs'].join('\n')));assert.throws(()=>verifyControlClosure(()=>paths.slice(1).join('\n')));
+});

@@ -42,42 +42,29 @@ jobs:
   frontend:
     needs: admission
     runs-on: ubuntu-24.04
-    timeout-minutes: 8
-    env:
-      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-          cache: npm
-          cache-dependency-path: server-version/frontend/package-lock.json
-      - name: install official locked frontend dependencies
-        run: npm ci --ignore-scripts --prefix server-version/frontend
-      - name: missing frontend dependency security audit
-        run: npm audit --audit-level=high --prefix server-version/frontend
-      - name: verify the new dependency with current app types and sanitizer boundary regressions
-        working-directory: server-version/frontend
-        run: |
-          node -e 'const p=JSON.parse(require("fs").readFileSync("node_modules/dompurify/package.json"));require("assert").equal(p.version,"3.4.17");console.log("Actual DOMPurify:",p.version)'
-          node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit
-          mkdir -p ../../shared-authoring-evidence
-          node node_modules/vitest/vitest.mjs run src/utils/__tests__/sanitize.test.ts --maxWorkers=1 --reporter=verbose --reporter=json --outputFile.json=../../shared-authoring-evidence/sanitizer.json
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: shared-authoring-sanitizer-${{ github.sha }}
-          path: shared-authoring-evidence/sanitizer.json
-          if-no-files-found: error
-          retention-days: 3
-      - name: compile the repaired current frontend once
-        run: npm run build --prefix server-version/frontend
+      - name: retain exact successful new-lock frontend audit types sanitizer and production dist
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/shared-authoring-reuse.mjs frontend
       - uses: actions/upload-artifact@v4
         with:
           name: shared-authoring-frontend-${{ github.sha }}
           path: server-version/frontend/dist
+          if-no-files-found: error
+          retention-days: 3
+      - uses: actions/upload-artifact@v4
+        with:
+          name: shared-authoring-frontend-reuse-${{ github.sha }}
+          path: shared-authoring-evidence/official-frontend.json
           if-no-files-found: error
           retention-days: 3
   backend:

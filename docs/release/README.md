@@ -973,3 +973,18 @@ artifact is relayed through the local computer. No database is launched again.
 Application SAST reuse requires the only changed app source to be the new
 sanitizer test; changed CI controls and the sanitizer directory receive fresh
 CodeQL. Missing, stale, altered or unsuccessful evidence stops qualification.
+
+
+The first repaired browser job 120256492847 failed before page assertions because
+its fixture read Request.url as a property instead of calling Request.url().
+The browser consumer is corrected; this does not change either application tree.
+Official run 39905348476 frontend job 120256060844 succeeded with DOMPurify 3.4.17,
+seven sanitizer cases, new-lock app types, unchanged HIGH audit threshold and
+current Vite compilation. Its artifact 12481080458 (20,916,288 bytes) is pinned
+by exact name/source/run/owner and SHA256
+`8d104080ce0e553a5d399f7b2c21b1b3d5b5caed375313d452bbd67a583b517f`.
+Only Actions restores safe regular paths from that verified ZIP and records each
+file digest; compilation, sanitizer tests and audits are not repeated. The parent
+failure remains failure. CodeQL job 120255988282 also succeeded: its exact prior
+source range is checked, and only the five changed control scripts receive fresh
+analysis. The original application scan remains independently bound as above.
