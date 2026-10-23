@@ -1,3 +1,4 @@
+import {readFileSync} from 'node:fs'
 import {useState} from 'react'
 import {cleanup,fireEvent,render,screen,within} from '@testing-library/react'
 import {afterEach,describe,expect,it,vi} from 'vitest'
@@ -55,4 +56,18 @@ describe('education section and question authoring navigator',()=>{
   expect(screen.getByLabelText('第 1 页标题')).toHaveValue('第一段')
   expect(screen.queryByRole('navigation',{name:'表单区段与题目'})).not.toBeInTheDocument()
  })
+})
+
+// Static cascade contract: browser diagnostics exercise the same real CSS separately.
+it('pairs shared form row and bulk tokens inside each education dark surface only',()=>{
+ const palette={'brand-ink': 'ink', 'brand-accent': 'action', 'brand-accent-strong': 'action', 'brand-muted': 'muted', 'brand-soft': 'soft', 'brand-subtle': 'soft', 'brand-canvas': 'surface', 'brand-line': 'line', 'brand-border': 'line', 'brand-border-strong': 'action', 'brand-focus': 'action', 'ui-ink': 'ink', 'ui-body': 'ink', 'ui-muted': 'muted', 'ui-surface': 'surface', 'ui-line': 'line'}
+ for(const [entry,prefix] of [['school','hs'],['huiteacher','ht']]){
+  const css=readFileSync(`src/${entry}/${entry}-theme.css`,'utf8')
+  const selector=`.${prefix}-app[data-theme=dark] .education-private-tools:not([data-cognitive-task-root],[data-cognitive-task-root] *)`
+  const rule=css.slice(css.indexOf(selector+'{')).split('}')[0]
+  expect(rule.startsWith(selector+'{')).toBe(true)
+  for(const [key,value] of Object.entries(palette))expect(rule).toContain(`--survey-${key}:var(--product-${value})`)
+  expect(rule).toContain('--survey-ui-danger:#ffbbaa')
+  expect(rule).toContain('--survey-ui-success:#b8e6c2')
+ }
 })

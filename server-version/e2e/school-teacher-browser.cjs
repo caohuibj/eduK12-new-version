@@ -730,7 +730,11 @@ async function run() {
         if (s.product === 'SCHOOL') {
           await p.getByRole('button', { name: '返回我的校园活动', exact: true }).click()
           await card().getByText('状态：已完成', { exact: true }).waitFor()
-        } else if (kind === 'FORM') await p.getByRole('button', { name: '返回任务列表', exact: true }).click()
+        } else if (kind === 'FORM') {
+          const completedForm = p.locator('.ht-task').filter({ has: p.getByText('本次表单已正式提交。', { exact: true }) })
+          await completedForm.getByText('本次表单已正式提交。', { exact: true }).waitFor()
+          await completedForm.getByRole('button', { name: '返回任务列表', exact: true }).click()
+        }
         const complete = (await list(kind)).find(t => (t.executionId || t.id) === executionId)
         assert.equal(complete.status, 'COMPLETED')
         if (kind === 'SCALE') {

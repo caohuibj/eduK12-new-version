@@ -1,2 +1,7 @@
 import '@source/index.css'
-void import('./main')
+async function start(){
+ const entry=new URLSearchParams(location.search).get('entry')==='school'?await import('./school-css'):await import('./teacher-css')
+ await entry.loadEntryCss()
+ await import('./main')
+}
+void start()

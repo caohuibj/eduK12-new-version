@@ -46,8 +46,7 @@ function Fixture(){
   }
   throw Error('诊断不执行上传或未知API；没有网络请求')
  },[state])
- return <main className={entry==='school'?'hs-app hs-workspace':'ht-app'} data-theme={appearance.theme} data-testid="theme-root" data-fixture="synthetic-only" data-theme-diagnostic-ready="true">
-  <div className={entry==='school'?'hs-workspace-content':'ht-workspace'}>
+ const content=<div className={entry==='school'?'hs-workspace-content':'ht-workspace'}>
    <header><h1>合成教育主题专项诊断</h1><p>无账号、无数据库、无业务网络；此页不代表正式业务验收。</p>
     <label>诊断入口<select aria-label="诊断入口" value={entry} onChange={event=>{const next=new URL(location.href);next.searchParams.set('entry',event.target.value);next.searchParams.set('state',state);location.assign(next)}}><option value="school">School</option><option value="teacher">Teacher</option></select></label>
     <label>诊断状态<select aria-label="诊断状态" value={state} onChange={event=>{const next=event.target.value;setState(next);setValue(draft(next==='selected'||next==='disabled'||next==='display-error'));setPending({})}}><option value="empty">空素材</option><option value="selected">已选素材</option><option value="error">素材库错误</option><option value="disabled">禁用编辑</option><option value="display-error">素材内容错误</option></select></label>
@@ -61,10 +60,7 @@ function Fixture(){
     {(state==='selected'||state==='disabled'||state==='display-error')&&<section aria-label="独立素材预览"><EducationMaterialPreview api={api} organizationId="synthetic-organization" toolId="synthetic-tool" item={synthetic}/></section>}
    </section>
   </div>
- </main>
+ const rootProps={'data-theme':appearance.theme,'data-testid':'theme-root','data-fixture':'synthetic-only','data-theme-diagnostic-ready':'true'}
+ return entry==='school'?<div className="hs-app hs-workspace" {...rootProps}><main id="hs-main" tabIndex={-1} className="hs-main hs-main-workspace"><div className="hs-workspace-layout">{content}</div></main></div>:<main className="ht-app" {...rootProps}>{content}</main>
 }
-async function start(){
- if(entry==='school')await import('./school-css');else await import('./teacher-css')
- createRoot(document.getElementById('root')!).render(<React.StrictMode><Fixture/></React.StrictMode>)
-}
-void start()
+createRoot(document.getElementById('root')!).render(<React.StrictMode><Fixture/></React.StrictMode>)
