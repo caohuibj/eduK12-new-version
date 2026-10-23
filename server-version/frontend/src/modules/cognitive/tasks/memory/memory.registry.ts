@@ -1,4 +1,5 @@
-import { MemoryTask } from './MemoryTask'
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
+const MemoryTask = deferredCognitiveRunner(() => import('./MemoryTask').then(module => module.MemoryTask))
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
 
 export const memoryRegistryEntry: CognitiveFrontendRegistryEntry = {
@@ -6,7 +7,7 @@ export const memoryRegistryEntry: CognitiveFrontendRegistryEntry = {
   name: '数字序列短时记忆',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: MemoryTask,
+  RunnerComponent: MemoryTask, prepareRunner: MemoryTask.prepare,
   completionMode: 'task',
   metricDefinitions: [
     { key: 'maxSpan', label: '最大数字广度', unit: '位', displayType: 'number' },

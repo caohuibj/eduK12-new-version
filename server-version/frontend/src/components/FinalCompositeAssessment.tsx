@@ -1,4 +1,4 @@
-import {TrainingMaterials} from '../modules/assessment-media/TrainingMaterialPicker'
+import {TrainingMaterials} from '../modules/assessment-media/TrainingMaterials'
 import { TrainingCheckpointPanel } from '../modules/composite/TrainingCheckpointPanel'
 import {TrainingTimingBoundary,restoreTrainingTiming} from '../modules/scale/TrainingTimingBoundary'
 import {SurveyScaleTimingTracker,sealObservedScaleTimings} from '../modules/scale/item-timing'
@@ -299,8 +299,8 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     timingRef.current?.answer(itemCode,scaleValues[itemCode],value)
     setScaleValues((previous) => ({ ...previous, [itemCode]: value }))
     return scheduleLocalSave(`scale:${itemCode}`, async () => {
-      await finalDraftStore.putAnswer({ draftKey, itemKey: itemCode, value: { responseValue: value }, updatedAt: Date.now() })
-      if(item?.trainingTiming&&timingRef.current)await finalDraftStore.setInstrumentMetadata(draftKey,{trainingScaleTiming:{snapshotHash:item.trainingTiming.snapshotHash,items:timingRef.current.snapshot()}})
+      await finalDraftStore.putAnswer({ draftKey, itemKey: itemCode, value: { responseValue: value }, updatedAt: Date.now() },
+        item?.trainingTiming && timingRef.current ? { trainingScaleTiming: { snapshotHash: item.trainingTiming.snapshotHash, items: timingRef.current.snapshot() } } : undefined)
     })
   }
 

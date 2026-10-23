@@ -47,6 +47,8 @@ export interface CognitiveFrontendRegistryEntry {
   /** 与后端 registry key 对齐；前端不权威评分，仅透传。 */
   scoringVersion: string
   RunnerComponent: React.ComponentType<CognitiveTaskProps>
+  /** Exact task implementation only; prepared before starting its frozen trials. */
+  prepareRunner?: () => Promise<React.ComponentType<CognitiveTaskProps> | void>
   metricDefinitions: MetricDefinition[]
   reportDefinition: ReportDefinition
   /** Memory 等自适应任务由任务本身决定何时完成。 */

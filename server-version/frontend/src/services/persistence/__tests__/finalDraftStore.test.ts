@@ -21,6 +21,33 @@ const metaFor = (draftKey: string) => createFinalDraftMeta({
 })
 
 describe('final draft persistence', () => {
+  it('commits answer and timing together, preserving provenance through FINAL and replay', async () => {
+    const store = createFinalDraftStore(), draftKey = `answer-timing-${Date.now()}`
+    await store.ensure(metaFor(draftKey))
+    await store.setInstrumentMetadata(draftKey, { provenance: { device: 'synthetic' } })
+    const timing = { trainingScaleTiming: { snapshotHash: 'frozen', items: { q1: { activeMs: 12 } } } }
+    await store.putAnswer({ draftKey, itemKey: 'q1', value: 3, updatedAt: 1 }, timing)
+    const sealed = await store.sealForSubmission(draftKey, snapshot => ({
+      answers: snapshot.answers.map(a => a.value), metadata: snapshot.meta.instrumentMetadata,
+    }))
+    expect(sealed?.payload).toEqual({ answers: [3], metadata: { provenance: { device: 'synthetic' }, ...timing } })
+    await expect(store.putAnswer({ draftKey, itemKey: 'q1', value: 4, updatedAt: 2 }, { changed: true }))
+      .rejects.toBeInstanceOf(FinalDraftNotWritableError)
+    expect((await store.sealForSubmission(draftKey, () => 'must not rebuild'))?.payload).toEqual(sealed?.payload)
+    await store.delete(draftKey)
+  })
+
+  it('leaves both values intact when optional timing cannot be cloned', async () => {
+    const store = createFinalDraftStore(), draftKey = `answer-timing-failure-${Date.now()}`
+    await store.ensure(metaFor(draftKey))
+    await store.putAnswer({ draftKey, itemKey: 'q1', value: 'prior', updatedAt: 1 }, { timing: 'prior' })
+    const metadata = Object.defineProperty({}, 'timing', { enumerable: true, get() { throw new Error('cannot clone timing') } })
+    await expect(store.putAnswer({ draftKey, itemKey: 'q1', value: 'new', updatedAt: 2 }, metadata)).rejects.toThrow('cannot clone timing')
+    expect((await store.listAnswers(draftKey))[0].value).toBe('prior')
+    expect((await store.get(draftKey))?.instrumentMetadata).toEqual({ timing: 'prior' })
+    await store.delete(draftKey)
+  })
+
   it('keeps latest answers and append-only trials in local storage', async () => {
     const store = createFinalDraftStore()
     const draftKey = `test-draft-${Date.now()}`

@@ -1,9 +1,10 @@
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
 import { createElement } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { usesSoftwareFrameTiming } from '../../core/timing'
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
-import { ReactionFrameTask } from './ReactionFrameTask'
-import { ReactionTask } from './ReactionTask'
+const ReactionFrameTask = deferredCognitiveRunner(() => import('./ReactionFrameTask').then(module => module.ReactionFrameTask))
+const ReactionTask = deferredCognitiveRunner(() => import('./ReactionTask').then(module => module.ReactionTask))
 
 const ReactionRunner = (props: CognitiveTaskProps) => createElement(
   usesSoftwareFrameTiming(props.taskContext) ? ReactionFrameTask : ReactionTask,
@@ -16,7 +17,7 @@ export const reactionRegistryEntry: CognitiveFrontendRegistryEntry = {
   name: '反应速度',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: ReactionRunner,
+  RunnerComponent: ReactionRunner, prepareRunner: () => Promise.all([ReactionFrameTask.prepare(), ReactionTask.prepare()]).then(() => undefined),
   metricDefinitions: [
     { key: 'medianRtMs', label: '中位反应时', unit: 'ms', displayType: 'ms' },
     { key: 'meanRtMs', label: '平均反应时', unit: 'ms', displayType: 'ms' },

@@ -48,6 +48,7 @@ describe('MEDIA-2 frontend image adapters', () => {
       </AssessmentImageGate>,
     )
 
+    await waitFor(() => expect(loadAsset).toHaveBeenCalledTimes(1))
     expect(screen.getByRole('status')).toHaveTextContent('加载视觉内容')
     expect(screen.getByRole('button', { name: 'Answer' })).toBeDisabled()
     resolve(new Blob(['x'], { type: 'image/png' }))

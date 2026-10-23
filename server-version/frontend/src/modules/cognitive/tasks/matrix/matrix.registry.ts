@@ -1,12 +1,13 @@
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
-import { MatrixTask } from './MatrixTask'
+const MatrixTask = deferredCognitiveRunner(() => import('./MatrixTask').then(module => module.MatrixTask))
 
 export const matrixRegistryEntry: CognitiveFrontendRegistryEntry = {
   testType: 'matrix',
   name: '矩阵规则推理',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: MatrixTask,
+  RunnerComponent: MatrixTask, prepareRunner: MatrixTask.prepare,
   completionMode: 'task',
   metricDefinitions: [
     { key: 'accuracy', label: '正确率', displayType: 'percentage' },

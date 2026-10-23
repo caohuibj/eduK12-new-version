@@ -29,7 +29,7 @@ import { compositeFormSectionImageReferences, compositeFormSectionMaterialRefere
 import { compositeFormSectionVideoPresentations, retainFormSectionVideos } from '../assessment-runtime/form-video.adapter'
 import { ensureCompositeFormSections } from '../composite/final-submit.service'
 import { addCompositeItemSchema } from '../composite/composite.schema'
-import { canUseScale } from '../../services/materialGrant'
+import { listQuestionnaireScaleResources } from './scale-resources'
 import { situationalReleaseKey, listSituationalResourceSummaries } from '../situational/situational-release.service'
 import { freezeAssignmentProfile, freezeDataForWrite } from '../cognitive/profile-freeze'
 import { requireCognitiveRegistryEntry } from '../cognitive/cognitive.registry'
@@ -617,16 +617,14 @@ export async function available(userId: string) {
 export async function resources(actor: Actor) {
   author(actor)
   const [scales, cognitive, courseRows, situational] = await Promise.all([
-    prisma.scale.findMany({ where: { status: 'PUBLISHED' }, orderBy: { name: 'asc' } }),
+    listQuestionnaireScaleResources(actor),
     isCognitiveNewAdmissionEnabled() ? prisma.cognitiveAssignment.findMany({ where: { status: 'PUBLISHED', listedStandalone: true, config: { status: 'PUBLISHED' }, ...(actor.role === 'ADMIN' ? {} : { createdBy: actor.userId }) }, include: { config: true }, orderBy: { title: 'asc' } }) : Promise.resolve([]),
     prisma.course.findMany({ where: { isLibrary: false, ...(actor.role === 'ADMIN' ? {} : { creatorId: actor.userId }) }, select: { id: true, title: true, courseType: true } }),
     listSituationalResourceSummaries(actor.userId),
   ])
-  const usable = []
-  for (const row of scales) if (await canUseScale(actor.userId, actor.role, row)) usable.push({ id: row.id, name: row.name, code: row.code, version: row.instrumentVersion })
   for (const row of cognitive.filter(v => isCognitiveProductEligible(v.config.testType))) assertCognitiveCatalogConfiguration(row.config)
   return {
-    scales: usable, cognitive: cognitive.filter(v => isCognitiveProductEligible(v.config.testType)).map(v => ({ id: v.id, name: v.title, profile: v.profile, testType: v.config.testType, configVersion: v.config.configVersion, engineVersion: v.config.engineVersion, scoringVersion: v.config.scoringVersion })),
+    scales, cognitive: cognitive.filter(v => isCognitiveProductEligible(v.config.testType)).map(v => ({ id: v.id, name: v.title, profile: v.profile, testType: v.config.testType, configVersion: v.config.configVersion, engineVersion: v.config.engineVersion, scoringVersion: v.config.scoringVersion })),
     situational,
     courses: courseRows,
   }

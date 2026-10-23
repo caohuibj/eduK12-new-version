@@ -1,12 +1,13 @@
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
-import { WordlistTask } from './WordlistTask'
+const WordlistTask = deferredCognitiveRunner(() => import('./WordlistTask').then(module => module.WordlistTask))
 
 export const wordlistRegistryEntry: CognitiveFrontendRegistryEntry = {
   testType: 'wordlist',
   name: '中文词表自由回忆',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: WordlistTask,
+  RunnerComponent: WordlistTask, prepareRunner: WordlistTask.prepare,
   completionMode: 'task',
   metricDefinitions: [
     { key: 'immediateAccuracy', label: '即时回忆正确率', displayType: 'percentage' },

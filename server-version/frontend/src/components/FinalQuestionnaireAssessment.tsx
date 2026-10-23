@@ -1,5 +1,5 @@
 import type {PublicMaterial} from '../modules/assessment-media/material'
-import {TrainingMaterials} from '../modules/assessment-media/TrainingMaterialPicker'
+import {TrainingMaterials} from '../modules/assessment-media/TrainingMaterials'
 import { isTrainingHost } from '../training/context'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { FileText, Layers, Save } from 'lucide-react'

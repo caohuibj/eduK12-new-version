@@ -1,0 +1,1087 @@
+{
+  "schema": 1,
+  "baseline_main": "54ed73fdbef60b3b8d4998984c624c98c6bc99cb",
+  "scope": "Training teacher selector and learner assessment delivery/persistence only",
+  "browser_profile": {
+    "latency_ms": 100,
+    "download_bytes_per_second": 500000,
+    "upload_bytes_per_second": 250000,
+    "cpu_throttle": 4,
+    "survey_transport": "HTTPS with one ephemeral test certificate pinned only in measurement Chromium",
+    "training_transport": "HTTP loopback harness",
+    "settle_after_ready_ms": 700,
+    "resource_sample_interval_ms": 500,
+    "transport": "loopback TLS; exact ephemeral test-key pin"
+  },
+  "browser_summary": [
+    {
+      "phase": "learner.login_cold",
+      "baseline": {
+        "n": 2,
+        "ready_ms_median": 1377.825,
+        "js_transfer_bytes_median": 158863.0,
+        "api_count_median": 2.0,
+        "idb_readwrite_median": 0.0,
+        "renderer_cpu_ms_median": 707.35,
+        "js_heap_bytes_median": 5488750.0
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms_median": 1398.905,
+        "js_transfer_bytes_median": 157860.0,
+        "api_count_median": 2.0,
+        "idb_readwrite_median": 0.0,
+        "renderer_cpu_ms_median": 736.6999999999999,
+        "js_heap_bytes_median": 5027986.0
+      }
+    },
+    {
+      "phase": "learner.assessment_cold",
+      "baseline": {
+        "n": 2,
+        "ready_ms_median": 2698.0299999999997,
+        "js_transfer_bytes_median": 231738.0,
+        "api_count_median": 5.0,
+        "idb_readwrite_median": 4.0,
+        "renderer_cpu_ms_median": 918.95,
+        "js_heap_bytes_median": 4997610.0
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms_median": 2381.385,
+        "js_transfer_bytes_median": 218659.0,
+        "api_count_median": 5.0,
+        "idb_readwrite_median": 4.0,
+        "renderer_cpu_ms_median": 811.95,
+        "js_heap_bytes_median": 4916680.0
+      }
+    },
+    {
+      "phase": "learner.scale_answer.1",
+      "baseline": {
+        "n": 2,
+        "ready_ms_median": 375.59000000000003,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 0.0,
+        "idb_readwrite_median": 4.0,
+        "renderer_cpu_ms_median": 172.10000000000002,
+        "js_heap_bytes_median": 6063458.0
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms_median": 325.1,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 0.0,
+        "idb_readwrite_median": 3.0,
+        "renderer_cpu_ms_median": 167.64999999999998,
+        "js_heap_bytes_median": 6512072.0
+      }
+    },
+    {
+      "phase": "learner.scale_answer.2",
+      "baseline": {
+        "n": 2,
+        "ready_ms_median": 355.63,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 0.0,
+        "idb_readwrite_median": 4.0,
+        "renderer_cpu_ms_median": 137.2,
+        "js_heap_bytes_median": 6671758.0
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms_median": 315.145,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 0.0,
+        "idb_readwrite_median": 3.0,
+        "renderer_cpu_ms_median": 151.15,
+        "js_heap_bytes_median": 6278894.0
+      }
+    },
+    {
+      "phase": "learner.scale_answer.3",
+      "baseline": {
+        "n": 2,
+        "ready_ms_median": 300.93,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 0.0,
+        "idb_readwrite_median": 4.0,
+        "renderer_cpu_ms_median": 123.1,
+        "js_heap_bytes_median": 6367900.0
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms_median": 389.815,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 0.0,
+        "idb_readwrite_median": 3.0,
+        "renderer_cpu_ms_median": 121.75,
+        "js_heap_bytes_median": 6165522.0
+      }
+    },
+    {
+      "phase": "learner.scale_answer.4",
+      "baseline": {
+        "n": 2,
+        "ready_ms_median": 315.095,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 0.0,
+        "idb_readwrite_median": 4.0,
+        "renderer_cpu_ms_median": 123.3,
+        "js_heap_bytes_median": 6092100.0
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms_median": 316.3,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 0.0,
+        "idb_readwrite_median": 3.0,
+        "renderer_cpu_ms_median": 131.10000000000002,
+        "js_heap_bytes_median": 5754696.0
+      }
+    },
+    {
+      "phase": "learner.restore_after_reload",
+      "baseline": {
+        "n": 2,
+        "ready_ms_median": 1248.725,
+        "js_transfer_bytes_median": 887.0,
+        "api_count_median": 5.0,
+        "idb_readwrite_median": 3.0,
+        "renderer_cpu_ms_median": 492.15,
+        "js_heap_bytes_median": 8343672.0
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms_median": 1293.595,
+        "js_transfer_bytes_median": 887.0,
+        "api_count_median": 5.0,
+        "idb_readwrite_median": 3.0,
+        "renderer_cpu_ms_median": 501.05,
+        "js_heap_bytes_median": 8134876.0
+      }
+    },
+    {
+      "phase": "learner.scale_answer.5",
+      "baseline": {
+        "n": 2,
+        "ready_ms_median": 375.8,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 0.0,
+        "idb_readwrite_median": 4.0,
+        "renderer_cpu_ms_median": 155.2,
+        "js_heap_bytes_median": 11025998.0
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms_median": 319.935,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 0.0,
+        "idb_readwrite_median": 3.0,
+        "renderer_cpu_ms_median": 152.89999999999998,
+        "js_heap_bytes_median": 10582018.0
+      }
+    },
+    {
+      "phase": "learner.scale_answer.6",
+      "baseline": {
+        "n": 2,
+        "ready_ms_median": 349.525,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 0.0,
+        "idb_readwrite_median": 4.0,
+        "renderer_cpu_ms_median": 142.3,
+        "js_heap_bytes_median": 9234624.0
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms_median": 300.55499999999995,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 0.0,
+        "idb_readwrite_median": 3.0,
+        "renderer_cpu_ms_median": 123.7,
+        "js_heap_bytes_median": 8750284.0
+      }
+    },
+    {
+      "phase": "learner.scale_answer.7",
+      "baseline": {
+        "n": 2,
+        "ready_ms_median": 389.31,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 0.0,
+        "idb_readwrite_median": 4.0,
+        "renderer_cpu_ms_median": 123.19999999999999,
+        "js_heap_bytes_median": 10691986.0
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms_median": 308.70000000000005,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 0.0,
+        "idb_readwrite_median": 3.0,
+        "renderer_cpu_ms_median": 134.0,
+        "js_heap_bytes_median": 9946340.0
+      }
+    },
+    {
+      "phase": "learner.scale_answer.8",
+      "baseline": {
+        "n": 2,
+        "ready_ms_median": 59.97,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 0.0,
+        "idb_readwrite_median": 2.0,
+        "renderer_cpu_ms_median": 48.25,
+        "js_heap_bytes_median": 10939650.0
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms_median": 61.91,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 0.0,
+        "idb_readwrite_median": 1.0,
+        "renderer_cpu_ms_median": 51.650000000000006,
+        "js_heap_bytes_median": 10173520.0
+      }
+    },
+    {
+      "phase": "learner.scale_submit",
+      "baseline": {
+        "n": 2,
+        "ready_ms_median": 434.43,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 2.0,
+        "idb_readwrite_median": 6.0,
+        "renderer_cpu_ms_median": 214.9,
+        "js_heap_bytes_median": 9611018.0
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms_median": 417.29999999999995,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 2.0,
+        "idb_readwrite_median": 6.0,
+        "renderer_cpu_ms_median": 200.45,
+        "js_heap_bytes_median": 8819664.0
+      }
+    },
+    {
+      "phase": "learner.form_text_submit",
+      "baseline": {
+        "n": 2,
+        "ready_ms_median": 421.705,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 2.0,
+        "idb_readwrite_median": 7.0,
+        "renderer_cpu_ms_median": 201.95,
+        "js_heap_bytes_median": 11290852.0
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms_median": 415.34000000000003,
+        "js_transfer_bytes_median": 0.0,
+        "api_count_median": 2.0,
+        "idb_readwrite_median": 7.0,
+        "renderer_cpu_ms_median": 190.0,
+        "js_heap_bytes_median": 10491548.0
+      }
+    },
+    {
+      "phase": "learner.final_submit_feedback",
+      "baseline": {
+        "n": 2,
+        "ready_ms_median": 996.075,
+        "js_transfer_bytes_median": 31819.0,
+        "api_count_median": 4.0,
+        "idb_readwrite_median": 3.0,
+        "renderer_cpu_ms_median": 461.15,
+        "js_heap_bytes_median": 6123078.0
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms_median": 1011.1800000000001,
+        "js_transfer_bytes_median": 32637.0,
+        "api_count_median": 4.0,
+        "idb_readwrite_median": 3.0,
+        "renderer_cpu_ms_median": 539.1,
+        "js_heap_bytes_median": 5987470.0
+      }
+    },
+    {
+      "phase": "teacher.questionnaire_new_cold",
+      "baseline": {
+        "n": 1,
+        "ready_ms_median": 2481.13,
+        "js_transfer_bytes_median": 241843,
+        "api_count_median": 3,
+        "idb_readwrite_median": 0,
+        "renderer_cpu_ms_median": 1034.6,
+        "js_heap_bytes_median": 5585364
+      },
+      "candidate": {
+        "n": 2,
+        "ready_ms_median": 2442.795,
+        "js_transfer_bytes_median": 240318.0,
+        "api_count_median": 3.0,
+        "idb_readwrite_median": 0.0,
+        "renderer_cpu_ms_median": 1015.15,
+        "js_heap_bytes_median": 5587196.0
+      }
+    }
+  ],
+  "cognitive_summary": [
+    {
+      "phase": "cognitive.assignment_open",
+      "baseline": {
+        "n": 1,
+        "ready_ms": 1308.38,
+        "js_transfer_bytes": 6403,
+        "api_count": 3,
+        "renderer_cpu_ms": 430.59999999999997,
+        "js_heap_bytes": 7249784
+      },
+      "candidate": {
+        "n": 1,
+        "ready_ms": 1274.76,
+        "js_transfer_bytes": 6393,
+        "api_count": 3,
+        "renderer_cpu_ms": 406.6,
+        "js_heap_bytes": 7380960
+      }
+    },
+    {
+      "phase": "cognitive.runner_open",
+      "baseline": {
+        "n": 1,
+        "ready_ms": 968.12,
+        "js_transfer_bytes": 88184,
+        "api_count": 2,
+        "renderer_cpu_ms": 406.9,
+        "js_heap_bytes": 8321964
+      },
+      "candidate": {
+        "n": 1,
+        "ready_ms": 990.73,
+        "js_transfer_bytes": 55547,
+        "api_count": 2,
+        "renderer_cpu_ms": 363.09999999999997,
+        "js_heap_bytes": 8231788
+      }
+    },
+    {
+      "phase": "cognitive.instruction",
+      "baseline": {
+        "n": 1,
+        "ready_ms": 103.14,
+        "js_transfer_bytes": 0,
+        "api_count": 0,
+        "renderer_cpu_ms": 74.30000000000001,
+        "js_heap_bytes": 8496960
+      },
+      "candidate": {
+        "n": 1,
+        "ready_ms": 104.38,
+        "js_transfer_bytes": 0,
+        "api_count": 0,
+        "renderer_cpu_ms": 95.3,
+        "js_heap_bytes": 8405588
+      }
+    },
+    {
+      "phase": "cognitive.practice_and_trials",
+      "baseline": {
+        "n": 1,
+        "ready_ms": 23375.75,
+        "js_transfer_bytes": 0,
+        "api_count": 0,
+        "renderer_cpu_ms": 1185.2,
+        "js_heap_bytes": 5800860
+      },
+      "candidate": {
+        "n": 1,
+        "ready_ms": 23992.66,
+        "js_transfer_bytes": 0,
+        "api_count": 0,
+        "renderer_cpu_ms": 1315.9,
+        "js_heap_bytes": 5770284
+      }
+    },
+    {
+      "phase": "cognitive.final_submit_feedback",
+      "baseline": {
+        "n": 1,
+        "ready_ms": 763.13,
+        "js_transfer_bytes": 17683,
+        "api_count": 2,
+        "renderer_cpu_ms": 394.8,
+        "js_heap_bytes": 6603632
+      },
+      "candidate": {
+        "n": 1,
+        "ready_ms": 725.63,
+        "js_transfer_bytes": 17672,
+        "api_count": 2,
+        "renderer_cpu_ms": 341.9,
+        "js_heap_bytes": 6488916
+      }
+    }
+  ],
+  "browser_passed": true,
+  "resource_service": {
+    "baseline": {
+      "provenance": "Copied from actual execution tool output chunk 696e27, exit_code 0; not an execution-time signed artifact",
+      "mode": "same isolated DB; actual service function; event counts include transactions; no HTTP",
+      "samples": [
+        {
+          "n": 0,
+          "duration_ms": 28.202145999999857,
+          "sql_events": 7,
+          "sql_duration_ms": 8,
+          "cpu": {
+            "user": 19313,
+            "system": 1111
+          },
+          "memory": {
+            "rss": 242831360,
+            "heapTotal": 207822848,
+            "heapUsed": 68788920,
+            "external": 8684548,
+            "arrayBuffers": 5653329
+          },
+          "scale_count": 1
+        },
+        {
+          "n": 1,
+          "duration_ms": 4.899298000000044,
+          "sql_events": 7,
+          "sql_duration_ms": 1,
+          "cpu": {
+            "user": 864,
+            "system": 3556
+          },
+          "memory": {
+            "rss": 242962432,
+            "heapTotal": 207822848,
+            "heapUsed": 69148592,
+            "external": 8684588,
+            "arrayBuffers": 5653329
+          },
+          "scale_count": 1
+        },
+        {
+          "n": 2,
+          "duration_ms": 2.93822699999987,
+          "sql_events": 7,
+          "sql_duration_ms": 1,
+          "cpu": {
+            "user": 3202,
+            "system": 502
+          },
+          "memory": {
+            "rss": 242962432,
+            "heapTotal": 207822848,
+            "heapUsed": 69443448,
+            "external": 8684588,
+            "arrayBuffers": 5653329
+          },
+          "scale_count": 1
+        }
+      ]
+    },
+    "candidate": {
+      "mode": "same isolated DB; actual service function; event counts include transactions; no HTTP",
+      "samples": [
+        {
+          "n": 0,
+          "duration_ms": 16.465302000000065,
+          "sql_events": 4,
+          "sql_duration_ms": 3,
+          "cpu": {
+            "user": 18883,
+            "system": 295
+          },
+          "memory": {
+            "rss": 244789248,
+            "heapTotal": 208871424,
+            "heapUsed": 68847184,
+            "external": 8684548,
+            "arrayBuffers": 5653329
+          },
+          "scale_count": 1,
+          "shape": [
+            "cognitive",
+            "courses",
+            "scales",
+            "situational"
+          ]
+        },
+        {
+          "n": 1,
+          "duration_ms": 3.7232809999998153,
+          "sql_events": 4,
+          "sql_duration_ms": 3,
+          "cpu": {
+            "user": 4319,
+            "system": 29
+          },
+          "memory": {
+            "rss": 244920320,
+            "heapTotal": 208871424,
+            "heapUsed": 69013632,
+            "external": 8684588,
+            "arrayBuffers": 5653329
+          },
+          "scale_count": 1,
+          "shape": [
+            "cognitive",
+            "courses",
+            "scales",
+            "situational"
+          ]
+        },
+        {
+          "n": 2,
+          "duration_ms": 1.652364999999918,
+          "sql_events": 4,
+          "sql_duration_ms": 0,
+          "cpu": {
+            "user": 2642,
+            "system": 0
+          },
+          "memory": {
+            "rss": 245051392,
+            "heapTotal": 208871424,
+            "heapUsed": 69134320,
+            "external": 8684588,
+            "arrayBuffers": 5653329
+          },
+          "scale_count": 1,
+          "shape": [
+            "cognitive",
+            "courses",
+            "scales",
+            "situational"
+          ]
+        }
+      ]
+    },
+    "catalog": "one owned private published scale; same course selector rows, no cognitive assignments during this isolated service comparison; synthetic questionnaire/config installation between samples does not participate in this selector"
+  },
+  "situational_computation": {
+    "scope": "Extracted actual frozen-path and completion functions, text-only fully answered V2 DAG; matches the runner navigation computation, excludes React/DOM/network; not a capacity claim",
+    "baseline": "54ed73fdbef60b3b8d4998984c624c98c6bc99cb",
+    "source_sha256": {
+      "/workspace/eduk12-node-20261023/assessment-performance-20261023/baseline-source/server-version/frontend/src/modules/situational/traversal.ts": "13b105c2acf1ffc66356ffe2cb63626f575ba46b2272edea8d3aa414a756bc19",
+      "/workspace/eduk12-node-20261023/assessment-performance-20261023/baseline-source/server-version/frontend/src/modules/situational/draft.ts": "4f88ef0c8d54b9f099212df2036fb9e04bb0c8beeee42346c6c2618bccdb4772",
+      "/workspace/eduk12-node-20261023/repo/server-version/frontend/src/modules/situational/traversal.ts": "e38df0dfb444d17cbb175f5f46ac76d9b0b70dfbe74ad87dcdc53fea73826716",
+      "/workspace/eduk12-node-20261023/repo/server-version/frontend/src/modules/situational/draft.ts": "aedfab6cae0aefac1502f01950513fa08ec7219085fe430600166a0cd64420c0"
+    },
+    "results": [
+      {
+        "scenes": 32,
+        "variant": "baseline",
+        "samples": [
+          {
+            "ms": 1.479534000000001,
+            "cpu": {
+              "user": 1335,
+              "system": 292
+            },
+            "heap_delta_bytes": 1852800,
+            "topology_map_builds": 67
+          },
+          {
+            "ms": 1.9451070000000072,
+            "cpu": {
+              "user": 4666,
+              "system": 106
+            },
+            "heap_delta_bytes": -6520952,
+            "topology_map_builds": 67
+          },
+          {
+            "ms": 0.8095930000000067,
+            "cpu": {
+              "user": 732,
+              "system": 158
+            },
+            "heap_delta_bytes": 1849080,
+            "topology_map_builds": 67
+          },
+          {
+            "ms": 0.9410909999999717,
+            "cpu": {
+              "user": 951,
+              "system": 206
+            },
+            "heap_delta_bytes": 1851904,
+            "topology_map_builds": 67
+          },
+          {
+            "ms": 1.6702029999999581,
+            "cpu": {
+              "user": 1684,
+              "system": 364
+            },
+            "heap_delta_bytes": 1856272,
+            "topology_map_builds": 67
+          }
+        ]
+      },
+      {
+        "scenes": 32,
+        "variant": "candidate",
+        "samples": [
+          {
+            "ms": 0.04139199999997345,
+            "cpu": {
+              "user": 65,
+              "system": 0
+            },
+            "heap_delta_bytes": 39088,
+            "topology_map_builds": 1
+          },
+          {
+            "ms": 0.043085000000019136,
+            "cpu": {
+              "user": 49,
+              "system": 0
+            },
+            "heap_delta_bytes": 38776,
+            "topology_map_builds": 1
+          },
+          {
+            "ms": 0.03981999999996333,
+            "cpu": {
+              "user": 44,
+              "system": 0
+            },
+            "heap_delta_bytes": 38776,
+            "topology_map_builds": 1
+          },
+          {
+            "ms": 0.03998999999998887,
+            "cpu": {
+              "user": 44,
+              "system": 0
+            },
+            "heap_delta_bytes": 38776,
+            "topology_map_builds": 1
+          },
+          {
+            "ms": 0.05598400000002357,
+            "cpu": {
+              "user": 61,
+              "system": 0
+            },
+            "heap_delta_bytes": 39248,
+            "topology_map_builds": 1
+          }
+        ]
+      },
+      {
+        "scenes": 128,
+        "variant": "baseline",
+        "samples": [
+          {
+            "ms": 15.51112999999998,
+            "cpu": {
+              "user": 14916,
+              "system": 708
+            },
+            "heap_delta_bytes": 1520296,
+            "topology_map_builds": 259
+          },
+          {
+            "ms": 11.95705799999996,
+            "cpu": {
+              "user": 11679,
+              "system": 1
+            },
+            "heap_delta_bytes": 1516976,
+            "topology_map_builds": 259
+          },
+          {
+            "ms": 12.861344000000031,
+            "cpu": {
+              "user": 12912,
+              "system": 0
+            },
+            "heap_delta_bytes": -6816872,
+            "topology_map_builds": 259
+          },
+          {
+            "ms": 18.02844700000003,
+            "cpu": {
+              "user": 18092,
+              "system": 0
+            },
+            "heap_delta_bytes": 1529512,
+            "topology_map_builds": 259
+          },
+          {
+            "ms": 14.649583999999948,
+            "cpu": {
+              "user": 14634,
+              "system": 0
+            },
+            "heap_delta_bytes": 1546448,
+            "topology_map_builds": 259
+          }
+        ]
+      },
+      {
+        "scenes": 128,
+        "variant": "candidate",
+        "samples": [
+          {
+            "ms": 0.11428200000000288,
+            "cpu": {
+              "user": 261,
+              "system": 0
+            },
+            "heap_delta_bytes": -36400,
+            "topology_map_builds": 1
+          },
+          {
+            "ms": 0.1352239999999938,
+            "cpu": {
+              "user": 142,
+              "system": 0
+            },
+            "heap_delta_bytes": 140080,
+            "topology_map_builds": 1
+          },
+          {
+            "ms": 0.15466399999996838,
+            "cpu": {
+              "user": 162,
+              "system": 0
+            },
+            "heap_delta_bytes": 139504,
+            "topology_map_builds": 1
+          },
+          {
+            "ms": 0.09756700000002638,
+            "cpu": {
+              "user": 103,
+              "system": 0
+            },
+            "heap_delta_bytes": 139496,
+            "topology_map_builds": 1
+          },
+          {
+            "ms": 0.09868899999997893,
+            "cpu": {
+              "user": 103,
+              "system": 0
+            },
+            "heap_delta_bytes": 139504,
+            "topology_map_builds": 1
+          }
+        ]
+      }
+    ]
+  },
+  "hardware_observations": [
+    {
+      "family": "assessment",
+      "version": "baseline",
+      "n": 1,
+      "service": "chromium",
+      "wall_seconds": 27.99463332200139,
+      "cpu_seconds": null,
+      "peak_working_set_bytes": null,
+      "peak_rss_sum_bytes": 993026048
+    },
+    {
+      "family": "assessment",
+      "version": "baseline",
+      "n": 1,
+      "service": "eduk12-node-20261023-backend-1",
+      "wall_seconds": 28.004093487999853,
+      "cpu_seconds": 1.517284,
+      "peak_working_set_bytes": 339861504,
+      "peak_rss_sum_bytes": null
+    },
+    {
+      "family": "assessment",
+      "version": "baseline",
+      "n": 1,
+      "service": "eduk12-node-20261023-postgres-1",
+      "wall_seconds": 28.000781977998486,
+      "cpu_seconds": 0.664023,
+      "peak_working_set_bytes": 79568896,
+      "peak_rss_sum_bytes": null
+    },
+    {
+      "family": "assessment",
+      "version": "baseline",
+      "n": 1,
+      "service": "eduk12-node-20261023-redis-1",
+      "wall_seconds": 28.00069926300057,
+      "cpu_seconds": 0.334755,
+      "peak_working_set_bytes": 5611520,
+      "peak_rss_sum_bytes": null
+    },
+    {
+      "family": "assessment",
+      "version": "baseline",
+      "n": 2,
+      "service": "chromium",
+      "wall_seconds": 28.51740103800148,
+      "cpu_seconds": null,
+      "peak_working_set_bytes": null,
+      "peak_rss_sum_bytes": 993849344
+    },
+    {
+      "family": "assessment",
+      "version": "baseline",
+      "n": 2,
+      "service": "eduk12-node-20261023-backend-1",
+      "wall_seconds": 28.51663482100048,
+      "cpu_seconds": 1.20404,
+      "peak_working_set_bytes": 352518144,
+      "peak_rss_sum_bytes": null
+    },
+    {
+      "family": "assessment",
+      "version": "baseline",
+      "n": 2,
+      "service": "eduk12-node-20261023-postgres-1",
+      "wall_seconds": 28.518844197000362,
+      "cpu_seconds": 0.65862,
+      "peak_working_set_bytes": 84348928,
+      "peak_rss_sum_bytes": null
+    },
+    {
+      "family": "assessment",
+      "version": "baseline",
+      "n": 2,
+      "service": "eduk12-node-20261023-redis-1",
+      "wall_seconds": 28.51936591499907,
+      "cpu_seconds": 0.343917,
+      "peak_working_set_bytes": 4419584,
+      "peak_rss_sum_bytes": null
+    },
+    {
+      "family": "assessment",
+      "version": "candidate",
+      "n": 1,
+      "service": "chromium",
+      "wall_seconds": 28.012536192998596,
+      "cpu_seconds": null,
+      "peak_working_set_bytes": null,
+      "peak_rss_sum_bytes": 998416384
+    },
+    {
+      "family": "assessment",
+      "version": "candidate",
+      "n": 1,
+      "service": "eduk12-node-20261023-backend-1",
+      "wall_seconds": 28.014210310000635,
+      "cpu_seconds": 1.135847,
+      "peak_working_set_bytes": 334643200,
+      "peak_rss_sum_bytes": null
+    },
+    {
+      "family": "assessment",
+      "version": "candidate",
+      "n": 1,
+      "service": "eduk12-node-20261023-postgres-1",
+      "wall_seconds": 28.013572717998613,
+      "cpu_seconds": 0.608032,
+      "peak_working_set_bytes": 89931776,
+      "peak_rss_sum_bytes": null
+    },
+    {
+      "family": "assessment",
+      "version": "candidate",
+      "n": 1,
+      "service": "eduk12-node-20261023-redis-1",
+      "wall_seconds": 28.013011048999033,
+      "cpu_seconds": 0.33892,
+      "peak_working_set_bytes": 5079040,
+      "peak_rss_sum_bytes": null
+    },
+    {
+      "family": "assessment",
+      "version": "candidate",
+      "n": 2,
+      "service": "chromium",
+      "wall_seconds": 27.50250394900104,
+      "cpu_seconds": null,
+      "peak_working_set_bytes": null,
+      "peak_rss_sum_bytes": 993787904
+    },
+    {
+      "family": "assessment",
+      "version": "candidate",
+      "n": 2,
+      "service": "eduk12-node-20261023-backend-1",
+      "wall_seconds": 27.515519812001003,
+      "cpu_seconds": 1.198523,
+      "peak_working_set_bytes": 332763136,
+      "peak_rss_sum_bytes": null
+    },
+    {
+      "family": "assessment",
+      "version": "candidate",
+      "n": 2,
+      "service": "eduk12-node-20261023-postgres-1",
+      "wall_seconds": 27.5150845449989,
+      "cpu_seconds": 0.662932,
+      "peak_working_set_bytes": 90296320,
+      "peak_rss_sum_bytes": null
+    },
+    {
+      "family": "assessment",
+      "version": "candidate",
+      "n": 2,
+      "service": "eduk12-node-20261023-redis-1",
+      "wall_seconds": 27.505811082000946,
+      "cpu_seconds": 0.332371,
+      "peak_working_set_bytes": 5652480,
+      "peak_rss_sum_bytes": null
+    },
+    {
+      "family": "cognitive",
+      "version": "baseline",
+      "n": 1,
+      "service": "chromium",
+      "wall_seconds": 33.49750319099985,
+      "cpu_seconds": null,
+      "peak_working_set_bytes": null,
+      "peak_rss_sum_bytes": 987062272
+    },
+    {
+      "family": "cognitive",
+      "version": "baseline",
+      "n": 1,
+      "service": "eduk12-node-20261023-backend-1",
+      "wall_seconds": 33.50963022399992,
+      "cpu_seconds": 1.000692,
+      "peak_working_set_bytes": 346288128,
+      "peak_rss_sum_bytes": null
+    },
+    {
+      "family": "cognitive",
+      "version": "baseline",
+      "n": 1,
+      "service": "eduk12-node-20261023-postgres-1",
+      "wall_seconds": 33.50916975800101,
+      "cpu_seconds": 0.707572,
+      "peak_working_set_bytes": 93548544,
+      "peak_rss_sum_bytes": null
+    },
+    {
+      "family": "cognitive",
+      "version": "baseline",
+      "n": 1,
+      "service": "eduk12-node-20261023-redis-1",
+      "wall_seconds": 33.50264863099983,
+      "cpu_seconds": 0.392833,
+      "peak_working_set_bytes": 5144576,
+      "peak_rss_sum_bytes": null
+    },
+    {
+      "family": "cognitive",
+      "version": "candidate",
+      "n": 1,
+      "service": "chromium",
+      "wall_seconds": 34.01641323600052,
+      "cpu_seconds": null,
+      "peak_working_set_bytes": null,
+      "peak_rss_sum_bytes": 979886080
+    },
+    {
+      "family": "cognitive",
+      "version": "candidate",
+      "n": 1,
+      "service": "eduk12-node-20261023-backend-1",
+      "wall_seconds": 34.015054299999974,
+      "cpu_seconds": 0.98882,
+      "peak_working_set_bytes": 331051008,
+      "peak_rss_sum_bytes": null
+    },
+    {
+      "family": "cognitive",
+      "version": "candidate",
+      "n": 1,
+      "service": "eduk12-node-20261023-postgres-1",
+      "wall_seconds": 34.01516974399965,
+      "cpu_seconds": 0.700599,
+      "peak_working_set_bytes": 95367168,
+      "peak_rss_sum_bytes": null
+    },
+    {
+      "family": "cognitive",
+      "version": "candidate",
+      "n": 1,
+      "service": "eduk12-node-20261023-redis-1",
+      "wall_seconds": 34.01500110899906,
+      "cpu_seconds": 0.432508,
+      "peak_working_set_bytes": 5849088,
+      "peak_rss_sum_bytes": null
+    }
+  ],
+  "limits": [
+    "Browser A/B shares the candidate backend: learner API routes are unchanged, while teacher page timings isolate frontend and do not represent old versus new selector SQL.",
+    "Two browser samples per assessment variant; only one frozen 8-trial cognitive journey per variant; no production load or capacity certification.",
+    "Teacher baseline sample 2 is excluded from performance comparison because its final phase may overlap candidate compilation; retained original evidence is not erased.",
+    "Docker process-wide CPU includes independent readiness checks; Chromium RSS sums may count shared pages more than once; memory sampling cannot establish universal capacity gains.",
+    "Cognitive initial probe with the legacy-only build ended on an intentionally disabled start button, before any session creation. Retained separately; final cognitive pair uses the same VITE_COGNITIVE_MODULE_ENABLED=true build setting.",
+    "No stable scale/form FINAL feedback improvement or general CPU/RAM reduction is claimed.",
+    "Situational numbers are extracted actual path/completion-function computations, not end-to-end browser latency; scoring, timings, scientific configuration and persistence protocols are unchanged.",
+    "Local builds and browser observations are reviewed evidence, not signed CI execution or qualified production images.",
+    "Only own non-governed selector rows avoid redundant authorization reads; governed and other-owner permissions remain checked fresh, and add/publish retain existing transaction checks."
+  ],
+  "raw_evidence": [
+    {
+      "path": "assessment-performance-20261023/evidence/baseline-1.json",
+      "sha256": "1d33ef0613cec508c87692518aa4b4b05fe3735cca3a47a5e328011160817f5a",
+      "bytes": 523379
+    },
+    {
+      "path": "assessment-performance-20261023/evidence/baseline-2.json",
+      "sha256": "0b3d31fe08ab7f41d8a1c60cb5af0ff80eb11a55f867777ee12bd8eb9a5b9371",
+      "bytes": 542089
+    },
+    {
+      "path": "assessment-performance-20261023/evidence/candidate-1.json",
+      "sha256": "2198f2ae07f4e9d6c25360cedcabf74e3ea15b63456568533829e93a0f9a33aa",
+      "bytes": 542607
+    },
+    {
+      "path": "assessment-performance-20261023/evidence/candidate-2.json",
+      "sha256": "cbc5d931700c8b1fb9dac3394a29661ca453e1ca9f402ccf0892baa8a91ae051",
+      "bytes": 545178
+    },
+    {
+      "path": "assessment-performance-20261023/evidence/cognitive-enabled-baseline.json",
+      "sha256": "4dd6c16afde8277868c9596ebda623f1bf20c0154b4fe3c8d02a1ad7656c9c86",
+      "bytes": 618735
+    },
+    {
+      "path": "assessment-performance-20261023/evidence/cognitive-enabled-candidate.json",
+      "sha256": "e78a6fdbd480f0cc76efda3f6605f082164837a1fe747894251d9197d10cada3",
+      "bytes": 641783
+    },
+    {
+      "path": "assessment-performance-20261023/evidence/situational-cpu.json",
+      "sha256": "a7b2730b19e9148206a81f91ce6898c4c13e53cb0978dd8919a3fc88936de4d4",
+      "bytes": 5692
+    },
+    {
+      "path": "assessment-performance-20261023/evidence/resources-baseline-observed.json",
+      "sha256": "de959ff484a688afa7edc7c58b1ca2b217097ac2aa20c99bd30173be8a75f89c",
+      "bytes": 937
+    },
+    {
+      "path": "assessment-performance-20261023/evidence/resources-candidate.log",
+      "sha256": "9425bd9872a0e53c85fb657066f2cb4bd9514fcf1af2c4efa0a8df1246a873d1",
+      "bytes": 996
+    }
+  ]
+}

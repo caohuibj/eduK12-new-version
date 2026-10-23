@@ -1,4 +1,5 @@
-import { SstTask } from './SstTask'
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
+const SstTask = deferredCognitiveRunner(() => import('./SstTask').then(module => module.SstTask))
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
 
 export const sstRegistryEntry: CognitiveFrontendRegistryEntry = {
@@ -6,7 +7,7 @@ export const sstRegistryEntry: CognitiveFrontendRegistryEntry = {
   name: '停止信号任务',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: SstTask,
+  RunnerComponent: SstTask, prepareRunner: SstTask.prepare,
   completionMode: 'task',
   metricDefinitions: [
     { key: 'ssrtMs', label: 'SSRT', unit: 'ms', displayType: 'ms' },

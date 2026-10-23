@@ -1,9 +1,10 @@
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
 import { createElement } from 'react'
 import type { CognitiveTaskProps } from '../../core/runner.types'
 import { usesSoftwareFrameTiming } from '../../core/timing'
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
-import { CptFrameTask } from './CptFrameTask'
-import { CptTask } from './CptTask'
+const CptFrameTask = deferredCognitiveRunner(() => import('./CptFrameTask').then(module => module.CptFrameTask))
+const CptTask = deferredCognitiveRunner(() => import('./CptTask').then(module => module.CptTask))
 
 const CptRunner = (props: CognitiveTaskProps) => createElement(
   usesSoftwareFrameTiming(props.taskContext) ? CptFrameTask : CptTask,
@@ -15,7 +16,7 @@ export const cptRegistryEntry: CognitiveFrontendRegistryEntry = {
   name: '连续执行任务',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: CptRunner,
+  RunnerComponent: CptRunner, prepareRunner: () => Promise.all([CptFrameTask.prepare(), CptTask.prepare()]).then(() => undefined),
   metricDefinitions: [
     { key: 'dPrime', label: 'd′', displayType: 'number' },
     { key: 'omissionRate', label: '遗漏率', displayType: 'percentage' },

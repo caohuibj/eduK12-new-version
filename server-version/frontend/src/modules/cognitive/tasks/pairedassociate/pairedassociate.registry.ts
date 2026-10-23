@@ -1,8 +1,9 @@
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
-import { PairedassociateTask } from './PairedassociateTask'
+const PairedassociateTask = deferredCognitiveRunner(() => import('./PairedassociateTask').then(module => module.PairedassociateTask))
 
 export const pairedassociateRegistryEntry: CognitiveFrontendRegistryEntry = {
-  testType: 'pairedassociate', name: '图形—位置配对学习', engineVersion: '1.0.0', scoringVersion: '1.0.0', RunnerComponent: PairedassociateTask, completionMode: 'task',
+  testType: 'pairedassociate', name: '图形—位置配对学习', engineVersion: '1.0.0', scoringVersion: '1.0.0', RunnerComponent: PairedassociateTask, prepareRunner: PairedassociateTask.prepare, completionMode: 'task',
   metricDefinitions: [
     { key: 'learningSlope', label: '学习斜率', displayType: 'number' },
     { key: 'trialsToCriterion', label: '达到标准所需轮次', displayType: 'number' },
