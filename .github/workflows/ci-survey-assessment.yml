@@ -1,0 +1,138 @@
+name: Survey assessment affected qualification
+on:
+  workflow_call:
+    inputs:
+      plan:
+        type: string
+        required: true
+permissions:
+  contents: read
+  actions: read
+env:
+  NPM_CONFIG_REGISTRY: https://registry.npmjs.org
+  NPM_CONFIG_REPLACE_REGISTRY_HOST: always
+  CI_EVENT: pull_request
+  CI_HEAD_REF: work/survey-assessment-performance-20261024
+  CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+  CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+  CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+  PLAN: ${{ inputs.plan }}
+jobs:
+  admission:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify frozen scope and existing local build without repeating it
+        run: node .github/scripts/survey-assessment-checks.mjs admission
+      - name: execute new scope and merge refusal contracts
+        run: node --test .github/scripts/survey-assessment.test.mjs
+      - name: reuse exact official successful unchanged dependency audits
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/participant-access-checks.mjs audit
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: survey-assessment-admission-${{ github.sha }}
+          path: |
+            survey-assessment-evidence
+            participant-access-evidence/official-audit-reuse.json
+          if-no-files-found: error
+          retention-days: 3
+  frontend:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 8
+    env:
+      DATABASE_URL: postgresql://synthetic:synthetic@127.0.0.1:5432/unused_compile_only
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/frontend/package-lock.json
+      - name: install official locked frontend dependencies
+        working-directory: server-version/frontend
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: install backend declarations consumed by existing frontend examples
+        working-directory: server-version/backend
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: generate Prisma types without connecting a database
+        working-directory: server-version/backend
+        run: node node_modules/prisma/build/index.js generate
+      - name: check affected application TypeScript
+        working-directory: server-version/frontend
+        run: node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit
+      - name: lint changed Survey frontend inputs
+        working-directory: server-version/frontend
+        run: >-
+          node node_modules/eslint/bin/eslint.js
+          src/survey/SurveyApp.tsx src/survey/SurveyPublicApp.tsx
+          src/survey/SurveyCatalogScaleMedia.tsx src/survey/SurveyCatalogScaleMediaContent.tsx
+          src/survey/SurveyAnalyticsWorkspace.tsx
+          src/survey/SurveyAnalyticsWorkspace.download.test.tsx src/survey/SurveyAnalyticsWorkspace.recovery.test.tsx
+          src/survey/SurveyWorkspace.performance.test.tsx src/survey/SurveyCatalogScaleMedia.loading.test.tsx
+      - name: execute only named affected Survey assertions
+        run: node .github/scripts/survey-assessment-checks.mjs frontend
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: survey-assessment-frontend-${{ github.sha }}
+          path: survey-assessment-evidence
+          if-no-files-found: error
+          retention-days: 3
+  backend:
+    needs: admission
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    env:
+      DATABASE_URL: postgresql://synthetic:synthetic@127.0.0.1:5432/unused_compile_only
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+          cache: npm
+          cache-dependency-path: server-version/backend/package-lock.json
+      - name: install official locked backend dependencies
+        working-directory: server-version/backend
+        run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: generate Prisma types without connecting a database
+        working-directory: server-version/backend
+        run: node node_modules/prisma/build/index.js generate
+      - name: compile affected backend once without unrelated catalog preprocessing
+        working-directory: server-version/backend
+        run: node node_modules/typescript/bin/tsc -p tsconfig.json
+      - name: execute projection and current export authority contracts
+        run: node .github/scripts/survey-assessment-checks.mjs backend
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: survey-assessment-backend-${{ github.sha }}
+          path: |
+            survey-assessment-evidence
+            server-version/backend/dist
+          if-no-files-found: error
+          retention-days: 3
+  qualified:
+    needs: [admission, frontend, backend]
+    if: always()
+    runs-on: ubuntu-24.04
+    timeout-minutes: 1
+    steps:
+      - name: require every selected component to succeed
+        env:
+          NEEDS: ${{ toJSON(needs) }}
+        run: node -e 'const n=JSON.parse(process.env.NEEDS);for(const k of ["admission","frontend","backend"])if(n[k]?.result!=="success")throw Error(k+" did not succeed")'

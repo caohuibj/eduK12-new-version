@@ -1232,3 +1232,37 @@ build, full current frontend/control CodeQL and the real-dist browser matrix.
 The earlier official reuse helper remains historical only and is not called by
 this workflow or browser. PR #343 business files and its independent CI route
 are preserved unchanged; no backend business checks or database are added.
+
+## Survey assessment access exact qualification (2026-10-24 Asia/Tokyo)
+
+Only `work/survey-assessment-performance-20261024`, integrated main
+`d33b70b14c4788b9d2c8f24914e7eee2458ee4c6` and product
+`ea7380ad06abfe54c78565a4206273d7e954c079` use `survey-assessment`.
+The complete raw diff, paths/modes/blobs, both component trees, protected inputs,
+actual PR source and checkout tree must match the frozen binding. Unknown or
+manual/full/probe scope and main-base drift stop without a platform fallback.
+
+The final integrated Vite artifact was actually built once locally. Its original
+log, complete artifact hashes, reconstructed non-test input Git manifest and
+reviewed controls are admitted as unsigned local build evidence, not CI execution
+or a general signed mechanism. Earlier synthetic browser performance observations
+use the same Survey business code before the unrelated School/Teacher integration;
+the report explicitly separates these observations from final integrated build
+qualification. No complete historical node_modules byte identity is claimed.
+
+Actions runs current app types, changed frontend lint, the named Survey consumer
+assertions, affected backend compilation and projection/export authority tests,
+new exact-scope/evidence/refusal contracts and current JS/TS SAST. Unchanged
+cognitive-only types, production lock audits, and unrelated business suites do
+not rerun. Audits retain the exact original official verifier/source/run/job/ZIP
+identity, unchanged inputs and 24-hour lifetime; expired or missing proof stops.
+No full regression, database migration/restore, load/media worker test, image
+build or production deployment is selected. Each affected failure is repaired
+and rechecked only where its inputs changed; successful unchanged inputs must
+be admitted rather than repeated. About five minutes triggers a progress report,
+not an unrelated test expansion.
+
+The stable ready gate independently recomputes the complete scope and requires
+actual scope, all nested Survey qualification jobs and CodeQL success. Draft,
+missing/skipped/failed/cancelled jobs cannot merge. Exact main pushes only
+classify the merged diff; they do not repeat the PR application checks.
