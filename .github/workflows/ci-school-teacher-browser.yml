@@ -29,6 +29,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: node server-version/e2e/school-teacher-anonymous-diagnostic.cjs restore
+      - name: prepare the same official CJK font inputs
+        run: node server-version/e2e/school-teacher-anonymous-diagnostic.cjs fonts
       - name: narrow approved temporary Chrome write permissions
         env:
           SCHOOL_TEACHER_CHROME_TIGHTEN: confirmed-temporary-runner
@@ -41,6 +43,9 @@ jobs:
           name: school-teacher-anonymous-diagnostic-${{ github.sha }}
           path: |
             school-anonymous-evidence/anonymous-console.json
+            school-anonymous-evidence/anonymous-home-light-320.png
+            school-teacher-evidence/font-preparation-status.json
+            school-teacher-evidence/official-font-preparation.json
             school-teacher-evidence/chrome-permissions.json
           retention-days: 3
           if-no-files-found: error

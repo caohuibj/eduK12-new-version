@@ -196,7 +196,7 @@ function verifyConnectedFrontend(){const dir=resolve('server-version/frontend/di
 
 const FONT_PACKAGE_URL='https://archive.ubuntu.com/ubuntu/pool/universe/f/fonts-wqy-zenhei/fonts-wqy-zenhei_0.9.45-8_all.deb';
 export function verifyFontMetadata(text){const field=n=>{const values=[...String(text).matchAll(new RegExp('^'+n+': (.+)$','gm'))].map(m=>m[1]);assert.equal(values.length,1);return values[0]};assert.equal(field('Package'),'fonts-wqy-zenhei');assert.equal(field('Version'),'0.9.45-8');assert.equal(field('Architecture'),'all');assert.equal(field('Filename'),'pool/universe/f/fonts-wqy-zenhei/fonts-wqy-zenhei_0.9.45-8_all.deb');const digest=field('SHA256');assert.match(digest,/^[a-f0-9]{64}$/);return digest}
-function prepareFonts(){let stage='font-inventory';try{
+export function prepareFonts(){let stage='font-inventory';try{
  if(command(stage,'fc-list',[':lang=zh','file']).trim()){receipt('font-preparation-status',{status:'SYSTEM_FONTS_PRESENT',visualQualification:false});return}
  stage='font-package-metadata';const debSha256=verifyFontMetadata(command(stage,'apt-cache',['show','fonts-wqy-zenhei=0.9.45-8']));const root=privateRoot(),deb=join(root,'school-teacher-font.deb'),extracted=join(root,'school-teacher-font');
  stage='font-package-download';command(stage,'curl',['--proto','=https','--tlsv1.2','--fail','--location','--show-error','--max-time','60','--retry','1',FONT_PACKAGE_URL,'-o',deb]);assert.equal(sha256(readFileSync(deb)),debSha256,'Official package digest mismatch');

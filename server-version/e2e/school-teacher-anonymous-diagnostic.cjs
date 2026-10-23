@@ -58,13 +58,28 @@ with zipfile.ZipFile(sys.argv[1]) as z:
   assert.ok(fs.existsSync(path.join(dir, 'assets/SchoolApp-Cpx47Nof.js')))
   await verifyDist(dir)
 }
+async function fonts() {
+  context()
+  const { prepareFonts } = await import('../../.github/scripts/school-teacher-checks.mjs')
+  prepareFonts()
+}
 async function run() {
   context()
   const repo = path.resolve(__dirname, '../..'), dist = path.join(process.env.RUNNER_TEMP, 'school-anonymous-fixed-dist')
   const out = path.join(repo, 'school-anonymous-evidence'); fs.mkdirSync(out, { recursive: true })
   const report = { schemaVersion: 1, acceptance: false, scope: 'anonymous-static-console-diagnostic', source: process.env.GITHUB_SHA,
-    artifact: ARTIFACT, console: [], pageErrors: [], unexpected: [], observations: [], primaryFailure: null, cleanupFailure: null }
+    artifact: ARTIFACT, skippedChecks: { axe: 'Four anonymous checks completed in run 39890148285; not repeated or requalified here' }, steps: [], console: [], pageErrors: [], unexpected: [], observations: [], primaryFailure: null, cleanupFailure: null }
   let browser, phase = 'artifact-verification'
+  async function step(label, operation) {
+    phase = label + ':before'
+    report.steps.push({ phase, consoleCount: report.console.length })
+    const result = await operation()
+    // Let async console delivery settle without executing another acceptance check.
+    await new Promise(resolve => setTimeout(resolve, 100))
+    phase = label + ':after'
+    report.steps.push({ phase, consoleCount: report.console.length })
+    return result
+  }
   try {
     await verifyDist(dist); phase = 'preflight'
     const chrome = require('./school-teacher-chrome.cjs'); report.preflight = chrome.preflightChrome({ repo, diagnostics: true })
@@ -97,15 +112,72 @@ async function run() {
     p.on('pageerror', e => { if (report.pageErrors.length < 20) report.pageErrors.push({ phase, name: e.name, text: clean(e.message), hash: sha(e.message) }) })
     for (const pathname of ['/', '/login']) {
       phase = 'navigate:' + pathname; await p.goto(origin + pathname); await p.waitForLoadState('networkidle')
+      if (pathname === '/') await p.locator('.hs-campus-art').waitFor()
+      else await p.getByLabel('用户名', { exact: true }).waitFor()
       for (const width of [320, 390]) {
         phase = `layout:${pathname}:${width}`; await p.setViewportSize({ width, height: 844 })
         await p.evaluate(async () => { await document.fonts.ready; await Promise.all([...document.images].map(x => x.decode())) })
         assert.equal(await p.locator('input').evaluateAll(xs => xs.some(x => x.value)), false, 'Diagnostic stays anonymous with zero entered values')
-        phase = `axe:${pathname}:${width}`
-        if (!await p.evaluate(() => Boolean(window.axe))) await p.addScriptTag({ path: path.join(repo, '.github/release-tools/node_modules/axe-core/axe.min.js') })
-        const result = await p.evaluate(async () => { const a = await window.axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa'] } }); return { violations: a.violations.map(x => x.id), incomplete: a.incomplete.map(x => x.id) } })
-        report.observations.push({ phase, ...result })
+        const prefix = `observe:${pathname}:${width}`, observation = { path: pathname, width }
+        observation.layout = await step(prefix + ':layout', () => p.evaluate(() => {
+      const forbidden = document.querySelectorAll('.ht-secret,.hs-secret,.ht-mfa-setup').length
+      const filledPasswords = [...document.querySelectorAll('input[type="password"]')].some(el => el.value.length > 0)
+      const clipped = [...document.querySelectorAll('button,a[href],input,select,textarea,summary')].filter(el => {
+        const r = el.getBoundingClientRect(), css = getComputedStyle(el)
+        if (!r.width || !r.height || css.visibility === 'hidden' || (r.left >= -1 && r.right <= innerWidth + 1)) return false
+        // A deliberate, bounded inner scroll area (e.g. a matrix) is not page overflow.
+        for (let parent = el.parentElement; parent; parent = parent.parentElement) {
+          const p = parent.getBoundingClientRect(), style = getComputedStyle(parent)
+          if (['auto', 'scroll'].includes(style.overflowX) && parent.scrollWidth > parent.clientWidth && p.left >= -1 && p.right <= innerWidth + 1) return false
+        }
+        return true
+      }).map(el => ({ tag: el.tagName, role: el.getAttribute('role') }))
+      return { width: innerWidth, scrollWidth: document.documentElement.scrollWidth, secretNodes: forbidden, filledPasswords, clipped }
+
+        }))
+        assert.equal(observation.layout.secretNodes, 0); assert.equal(observation.layout.filledPasswords, false)
+        observation.brand = await step(prefix + ':brand-bbox-style', async () => {
+          const logo = p.getByRole('img', { name: 'School @eduk12.top', exact: true }), use = logo.locator('use')
+          await use.waitFor({ state: 'attached' })
+          await p.waitForFunction(() => {
+            const use = [...document.querySelectorAll('.hs-app svg use')].find(el => el.closest('svg')?.getAttribute('aria-label') === 'School @eduk12.top')
+            try { const b = use?.getBBox(); return Boolean(b && b.width > 0 && b.height > 0) } catch { return false }
+          })
+          const href = await use.getAttribute('href'), url = new URL(href, origin)
+          assert.equal(url.origin, origin); assert.equal(url.hash, '#school-wordmark')
+          return use.evaluate(el => { const b = el.getBBox(), css = getComputedStyle(el.closest('svg')); return { width: b.width, height: b.height, color: css.color, visible: css.visibility !== 'hidden' && css.display !== 'none' } })
+        })
+        if (pathname === '/login' && width === 320) {
+          const cdp = await step(prefix + ':cdp-session', () => c.newCDPSession(p))
+          try {
+            await step(prefix + ':DOM-enable', () => cdp.send('DOM.enable'))
+            await step(prefix + ':CSS-enable', () => cdp.send('CSS.enable'))
+            const { root } = await step(prefix + ':DOM-document', () => cdp.send('DOM.getDocument'))
+            observation.fonts = []
+            for (const [sampleId, selector] of [['school-serif', '.hs-main-auth h1'], ['school-sans', '.hs-main-auth .hs-field > span']]) {
+              assert.equal(await p.locator(selector).first().isVisible(), true)
+              assert.equal(await p.locator(selector).first().textContent(), chrome.CJK_SAMPLES[sampleId].text)
+              const { nodeId } = await step(prefix + ':' + sampleId + ':DOM-query', () => cdp.send('DOM.querySelector', { nodeId: root.nodeId, selector }))
+              const response = await step(prefix + ':' + sampleId + ':CSS-platform-fonts', () => cdp.send('CSS.getPlatformFontsForNode', { nodeId }))
+              observation.fonts.push({ sampleId, fonts: response.fonts.map(({ postScriptName, isCustomFont, glyphCount }) => ({ postScriptName, isCustomFont, glyphCount })) })
+            }
+          } finally { await step(prefix + ':cdp-detach', () => cdp.detach()) }
+        }
+        await step(prefix + ':Tab', () => p.keyboard.press('Tab'))
+        observation.keyboard = await step(prefix + ':focus-ring', () => p.evaluate(() => { const el = document.activeElement, css = getComputedStyle(el), r = el.getBoundingClientRect(); return {
+          visible: r.width > 0 && r.height > 0 && r.left >= -1 && r.right <= innerWidth + 1,
+          focusVisible: el.matches(':focus-visible'), ring: (css.outlineStyle !== 'none' && parseFloat(css.outlineWidth) > 0) || css.boxShadow !== 'none' } }))
+        if (pathname === '/' && width === 320) {
+          assert.equal(await p.locator('input').evaluateAll(xs => xs.some(x => x.value)), false)
+          await step(prefix + ':screenshot', () => p.screenshot({ path: path.join(out, 'anonymous-home-light-320.png'), fullPage: true }))
+        }
+        report.observations.push(observation)
       }
+      if (pathname === '/') report.hero = await step('home:hero-candidates', () => p.locator('.hs-campus-art').evaluate(el => ({ currentSrc: el.currentSrc, candidates: [el.src, ...el.srcset.split(',').filter(Boolean).map(part => new URL(part.trim().split(/\s+/)[0], location.href).href)] })))
+      else report.background = await step('login:background-style', () => p.locator('.hs-main-auth').evaluate(el => {
+        const match = /^url\(["']?(.*?)["']?\)$/.exec(getComputedStyle(el, '::before').backgroundImage)
+        return match ? new URL(match[1], location.href).href : ''
+      }))
     }
     phase = 'finished'; report.status = 'DIAGNOSED'
   } catch (e) { report.status = 'FAILED'; report.primaryFailure = { phase, name: e.name, text: clean(String(e)), hash: sha(String(e)) } }
@@ -116,5 +188,5 @@ async function run() {
   // Diagnostics can collect errors, but must never report acceptance or make an unknown error successful.
   if (report.status !== 'DIAGNOSED' || report.cleanupFailure || report.pageErrors.length || report.unexpected.length || report.console.some(x => !/^Failed to load resource:/.test(x.text) || x.location.path !== '/api/campus/auth/me')) process.exitCode = 1
 }
-if (require.main === module) { const command = process.argv[2]; Promise.resolve().then(() => { assert.ok(['restore', 'run'].includes(command)); return command === 'restore' ? restore() : run() }).catch(e => { console.error('Anonymous diagnostic stopped: ' + sha(String(e))); process.exitCode = 1 }) }
+if (require.main === module) { const command = process.argv[2]; Promise.resolve().then(() => { assert.ok(['restore', 'fonts', 'run'].includes(command)); return command === 'restore' ? restore() : command === 'fonts' ? fonts() : run() }).catch(e => { console.error('Anonymous diagnostic stopped: ' + sha(String(e))); process.exitCode = 1 }) }
 module.exports = { BRANCH, ARTIFACT, allowed, clean, location }
