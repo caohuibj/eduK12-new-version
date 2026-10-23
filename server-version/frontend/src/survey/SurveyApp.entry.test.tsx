@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
-import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import SurveyApp from './SurveyApp'
 
 vi.mock('./SurveyBuilder', () => ({ SurveyBuilder: () => null }))
@@ -13,7 +13,7 @@ describe('Survey public entry and existing authentication transitions', () => {
   it('makes both role destinations visible without adding administrator controls to the public page',()=>{
     render(<SurveyApp/>)
     expect(screen.getByRole('link',{name:'研究者入口'})).toHaveAttribute('href','/login')
-    expect(screen.getByRole('link',{name:'管理员入口'}).getAttribute('href')).toMatch(/\/admin\/login\?returnTo=%2Fadmin%2Fsurvey-researchers$/)
+    expect(within(screen.getByRole('navigation',{name:'研究平台导航'})).getByRole('link',{name:'管理员入口'}).getAttribute('href')).toMatch(/\/admin\/login\?returnTo=%2Fadmin%2Fsurvey-researchers&appearance=auto$/)
     expect(screen.queryByRole('button',{name:'生成研究者邀请'})).not.toBeInTheDocument()
   })
   beforeEach(() => {

@@ -2,23 +2,36 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from '
 import { Clock3, Moon, Sun } from 'lucide-react'
 import './survey-appearance.css'
 import { surveyDaylight } from './survey-appearance-clock'
+import { surveyAppearanceFromSearch, type SurveyAppearanceMode } from './survey-appearance-links'
 
-export type SurveyAppearanceMode = 'auto' | 'light' | 'dark'
+export type { SurveyAppearanceMode } from './survey-appearance-links'
 const storageKey = 'survey.appearance'
 function readMode(): SurveyAppearanceMode {
   try {
+    const linked = surveyAppearanceFromSearch(window.location.search)
+    if (linked) return linked
     const stored = window.localStorage.getItem(storageKey)
     if (stored === 'light' || stored === 'dark') return stored
   } catch { /* Appearance still works when storage is unavailable. */ }
   return 'auto'
 }
 const AppearanceContext = createContext({ mode: 'auto' as SurveyAppearanceMode, theme: 'light', setMode: (_mode: SurveyAppearanceMode) => {} })
+export const useSurveyAppearance = () => useContext(AppearanceContext)
 
 /** Scoped to the Survey application: never changes Training or assessment stimuli. */
 export function SurveyAppearance({ children }: { children: ReactNode }) {
   const [mode, updateMode] = useState<SurveyAppearanceMode>(readMode)
   const [daylight, setDaylight] = useState(() => surveyDaylight(new Date()))
   const theme = mode === 'auto' ? daylight : mode
+  useEffect(() => {
+    const linked = surveyAppearanceFromSearch(window.location.search)
+    if (!linked) return
+    try { window.localStorage.setItem(storageKey, linked) } catch { /* Session-only fallback. */ }
+    // Consume only the appearance hint, preserving the auth destination and fragment.
+    const url = new URL(window.location.href)
+    url.searchParams.delete('appearance')
+    window.history.replaceState(window.history.state, '', url)
+  }, [])
   useEffect(() => {
     let timer: number
     const refresh = () => {

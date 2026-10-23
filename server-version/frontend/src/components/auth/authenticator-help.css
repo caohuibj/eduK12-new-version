@@ -1,0 +1,33 @@
+.hui-authenticator-help-trigger {
+  display:inline-flex; align-items:center; justify-content:center; gap:6px; min-height:44px;
+  padding:4px 0; border:0; background:transparent; color:var(--survey-brand-accent-strong,#235975);
+  font-size:13px; font-weight:500; cursor:pointer; white-space:nowrap;
+}
+.hui-authenticator-help-trigger:hover { text-decoration:underline; text-underline-offset:4px; }
+dialog.hui-modal-surface.hui-authenticator-help-surface { padding:16px; background:transparent; color:var(--survey-brand-ink,#234a65); }
+dialog.hui-authenticator-help-surface[open] { display:grid; place-items:center; }
+dialog.hui-authenticator-help-surface::backdrop { background:var(--survey-ui-overlay,#0c253c66); backdrop-filter:blur(4px); }
+.hui-authenticator-help-dialog {
+  width:min(580px,100%); max-height:calc(100dvh - 32px); overflow:auto;
+  border:1px solid var(--survey-brand-line,#d4e3ec); border-radius:18px;
+  background:var(--survey-ui-surface,var(--survey-brand-canvas,#fff)); color:var(--survey-brand-ink,#234a65);
+  box-shadow:0 24px 80px #00000030; line-height:1.7; outline:none;
+}
+.hui-authenticator-help-dialog > header { display:flex; justify-content:space-between; align-items:flex-start; gap:16px; padding:24px 24px 16px; border-bottom:1px solid var(--survey-brand-line,#d4e3ec); }
+.hui-authenticator-help-dialog > header p { margin:0 0 4px; color:var(--survey-brand-muted,#526f80); font-size:12px; }
+.hui-authenticator-help-dialog h2 { margin:0; font-size:21px; line-height:1.5; color:inherit; }
+.hui-authenticator-help-close { display:inline-flex; align-items:center; justify-content:center; flex-shrink:0; width:44px; height:44px; border:1px solid var(--survey-brand-line,#d4e3ec); border-radius:10px; background:var(--survey-brand-soft,#eaf3f8); color:inherit; }
+.hui-authenticator-help-content { padding:20px 24px; font-size:14px; }
+.hui-authenticator-help-content section + section { margin-top:20px; }
+.hui-authenticator-help-content h3 { margin:0 0 8px; color:var(--survey-brand-ink,#234a65); font-size:15px; font-weight:600; }
+.hui-authenticator-help-content p { margin:8px 0 0; color:var(--survey-ui-body,var(--survey-brand-muted,#526f80)); }
+.hui-authenticator-help-content .hui-authenticator-help-note { margin-top:20px; padding:12px 14px; border:1px solid var(--survey-brand-line,#d4e3ec); border-radius:10px; background:var(--survey-brand-soft,#eaf3f8); font-size:13px; }
+.hui-authenticator-help-dialog > footer { display:flex; justify-content:flex-end; padding:0 24px 24px; }
+.hui-authenticator-help-dialog > footer button { min-height:44px; padding:10px 22px; border:1px solid var(--survey-brand-accent-strong,#235975); border-radius:10px; background:var(--survey-brand-accent-strong,#235975); color:var(--survey-brand-on-dark,#edf6fc); font-size:14px; font-weight:600; }
+:is(.hui-authenticator-help-trigger,.hui-authenticator-help-dialog button):focus-visible { outline:3px solid var(--survey-brand-focus,#2b718d); outline-offset:3px; }
+@media (max-width:600px) {
+  .hui-authenticator-help-dialog > header { padding:18px 18px 14px; }
+  .hui-authenticator-help-dialog h2 { font-size:18px; }
+  .hui-authenticator-help-content { padding:16px 18px; }
+  .hui-authenticator-help-dialog > footer { padding:0 18px 18px; }
+}

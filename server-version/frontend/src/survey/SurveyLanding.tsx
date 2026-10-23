@@ -1,32 +1,39 @@
 import { ArrowRight, ArrowUpRight, Check, ChevronDown } from 'lucide-react'
-import { SurveyAppearanceControl } from './SurveyAppearance'
+import { SurveyAppearanceControl, useSurveyAppearance } from './SurveyAppearance'
+import { surveyAppearanceHref } from './survey-appearance-links'
 import { SurveyBrand } from './SurveyBrand'
 import { surveyFeatures, surveyResearchFlow } from './survey-features'
 import './survey-landing.css'
 import './survey-public-pages.css'
 import { surveyAdminLoginUrl } from '../products/origins'
 
-export function SurveyPublicHeader({ signedIn = false }: { signedIn?: boolean }) {
-  return <header className="survey-landing-header">
-    <SurveyBrand/>
+export function SurveyPublicHeader({ signedIn = false, entry = false, surveyOrigin }: { signedIn?: boolean; entry?: boolean; surveyOrigin?: string }) {
+  const { mode } = useSurveyAppearance()
+  const adminUrl = surveyAdminLoginUrl()
+  const surveyHref = (path: string) => surveyOrigin ? surveyAppearanceHref(surveyOrigin + path, mode) : path
+  return <header className={'survey-landing-header'+(entry?' survey-entry-public-header':'')}>
+    <SurveyBrand href={surveyHref('/')}/>
     <nav aria-label="研究平台导航">
-      <a href="/#survey-features">产品功能</a>
-      <a href="/#survey-workflow">研究流程</a>
-      <a className="survey-public-login" href={signedIn ? '/workspace' : '/login'}>
+      {entry && <a href={surveyHref('/')}>首页</a>}
+      <a href={surveyHref('/#survey-features')}>产品功能</a>
+      <a href={surveyHref('/#survey-workflow')}>研究流程</a>
+      {adminUrl && <a href={surveyAppearanceHref(adminUrl, mode)}>管理员入口</a>}
+      {!entry && <a className="survey-public-login" href={signedIn ? '/workspace' : '/login'}>
         {signedIn ? '研究工作台' : '研究者入口'}<ArrowUpRight size={15} aria-hidden="true"/>
-      </a>
+      </a>}
     </nav>
     <SurveyAppearanceControl/>
   </header>
 }
 
 export function SurveyPublicFooter() {
+  const { mode } = useSurveyAppearance()
   const adminUrl = surveyAdminLoginUrl()
   return <footer className="survey-landing-footer">
     <div><strong>Research <span>@eduk12.top</span></strong><p>心理与教育测量研究平台</p></div>
     <div className="survey-public-footer-links">
       <a href="/#survey-features">了解平台</a>
-      {adminUrl && <a href={adminUrl}>管理员入口<ArrowUpRight size={14} aria-hidden="true"/></a>}
+      {adminUrl && <a href={surveyAppearanceHref(adminUrl, mode)}>管理员入口<ArrowUpRight size={14} aria-hidden="true"/></a>}
     </div>
   </footer>
 }

@@ -6,6 +6,7 @@ import { surveyAdminLoginUrl } from '../products/origins'
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { QRCodeSVG } from 'qrcode.react'
 import { ProductPasswordChange } from '../components/account/ProductPasswordChange'
+import AuthenticatorHelp from '../components/auth/AuthenticatorHelp'
 import { type BuilderLeaveRisk } from './SurveyBuilder'
 import { SurveyReportStudio, type ReportLeaveRisk } from './SurveyReportStudio'
 import { createInstrumentLibrary } from './instrument-library'
@@ -15,7 +16,8 @@ import { SurveyWorkspaceNav,type WorkspaceSection } from './SurveyWorkspaceNav'
 import './survey-workspace.css'
 import './survey-directory.css'
 import { SurveyBrand } from './SurveyBrand'
-import { SurveyLanding } from './SurveyLanding'
+import { SurveyLanding, SurveyPublicHeader } from './SurveyLanding'
+import { SurveyEntryPanel } from './SurveyEntryPanel'
 import { SurveyFeaturePage } from './SurveyFeaturePage'
 import { surveyFeatures } from './survey-features'
 import { SurveyProjectDirectory, type SurveyProject as Project } from './SurveyProjectDirectory'
@@ -175,7 +177,7 @@ function SurveyApplication(){
     finally{setLoading(false)}
   },[initial,initialStudy,loadProjects])
   useEffect(()=>{
-    document.title=activeFeature?activeFeature.title+' | Research':initial==='home'?'Research · 观风知微':'Huisurvey · 观风知微';void refresh()
+    document.title=activeFeature?activeFeature.title+' | Research':'Research';void refresh()
     return cancelStudyRestore
   },[refresh,activeFeature,cancelStudyRestore,initial])
   useEffect(()=>{
@@ -310,35 +312,29 @@ function SurveyApplication(){
   const entryScreen=screen==='login'||screen==='claim'||screen==='reset'
   return <div className={entryScreen?'survey-entry':'survey-researcher min-h-screen bg-slate-50 text-slate-800'}>
     {entryScreen&&<a className="survey-skip-link" href="#survey-entry-content">跳至主要内容</a>}
-    <header className="border-b border-slate-200 bg-white"><div className={entryScreen?'survey-entry-header':'survey-researcher-header'+(user&&screen==='work'&&!user.mustChangePassword?' survey-researcher-header--navigation':'')}>
+    {entryScreen?<SurveyPublicHeader entry/>:<header className="border-b border-slate-200 bg-white"><div className={'survey-researcher-header'+(user&&screen==='work'&&!user.mustChangePassword?' survey-researcher-header--navigation':'')}>
       <SurveyBrand/>
       {user&&screen==='work'&&!user.mustChangePassword&&<SurveyResearchNavigation active={researchArea} onNavigate={navigateResearchArea}/>}
       <div className="survey-session-actions"><SurveyAppearanceControl/>{user&&screen==='work'
         ?<SurveyResearcherAccount username={user.username} busy={busy} writeBusy={writeBusy} error={error} onLogout={logout} onChangePassword={changeAccountPassword}/>
         :<span>{screen==='mfa'?'研究者身份验证':'研究者入口'}</span>}</div>
-    </div></header>
+    </div></header>}
     <main id={entryScreen?'survey-entry-content':undefined} tabIndex={entryScreen?-1:undefined}
       className={entryScreen?'survey-entry-main':screen==='work'&&!user?.mustChangePassword
         ?'survey-researcher-main':'max-w-4xl mx-auto px-4 py-8'}>
       {loading&&<p role="status">正在核对研究者会话…</p>}
       {error&&!creating&&<p role="alert" className="p-4 border-l-4 border-red-600 bg-red-50">{error}</p>}
       {notice&&notice!=='研究草稿已保存'&&<p role="status" className="p-4 border-l-4 border-teal-600 bg-teal-50">{notice}</p>}
-      {!loading&&(screen==='claim'||screen==='reset')&&<section className="survey-entry-panel">
-        <a className="survey-back" href="/">返回首页</a>
-        <h1>{screen==='claim'?'激活研究者身份':'恢复 Survey 密码'}</h1>
-        <p className="survey-entry-intro">{screen==='claim'
+      {!loading&&(screen==='claim'||screen==='reset')&&<SurveyEntryPanel title={screen==='claim'?'激活研究者身份':'恢复 Survey 密码'} intro={screen==='claim'
           ?'使用管理员提供的一次性邀请，设置独立研究账号，然后绑定验证器。'
-          :'使用管理员提供的密码恢复邀请设置新密码，再完成双因素验证。'}</p>
+          :'使用管理员提供的密码恢复邀请设置新密码，再完成双因素验证。'}>
         <form onSubmit={activate} aria-busy={busy}>{field('一次性邀请凭证',invite,setInvite,'password')}
           {screen==='claim'&&field('研究者登录名',username,setUsername)}
           {field('新密码（至少 8 位，字母与数字组合）',password,setPassword,'password')}
           <button className="btn-primary" disabled={busy}>确认并绑定验证器</button></form>
         <p className="survey-entry-help">没有有效凭证，或凭证已失效？请联系为你开通账号的管理员。</p>
-      </section>}
-      {!loading&&screen==='login'&&<section className="survey-entry-panel">
-        <a className="survey-back" href="/">返回首页</a>
-        <h1>研究者登录</h1>
-        <p className="survey-entry-intro">研究者仅由系统管理员邀请开通，账户与培训和校园系统相互独立。</p>
+      </SurveyEntryPanel>}
+      {!loading&&screen==='login'&&<SurveyEntryPanel title="研究者登录" intro="研究者仅由系统管理员邀请开通，账户与培训和校园系统相互独立。">
         <form onSubmit={login} aria-busy={busy}>{field('研究者登录名',username,setUsername)}
           {field('密码',password,setPassword,'password')}
           <button className="btn-primary" disabled={busy}>进入双因素验证</button></form>
@@ -346,9 +342,9 @@ function SurveyApplication(){
         <div className="survey-entry-admin">{surveyAdminLoginUrl()
           ?<a href={surveyAdminLoginUrl()!}>系统管理员入口：研究者与工具授权</a>
           :<p>当前地址未配置管理员入口。</p>}</div>
-      </section>}
+      </SurveyEntryPanel>}
       {!loading&&screen==='mfa'&&<section className="survey-mfa-panel bg-white rounded-xl border p-6 my-4 max-w-xl mx-auto">
-        <h2 className="text-xl font-semibold">{enrolled?'双因素验证':'绑定 TOTP 验证器'}</h2>
+        <div className="survey-entry-heading"><h2 className="text-xl font-semibold">{enrolled?'双因素验证':'绑定 TOTP 验证器'}</h2><AuthenticatorHelp/></div>
         {!enrolled&&!uri&&<button className="btn-primary" disabled={busy} onClick={setup}>生成二维码</button>}
         {uri&&<div className="my-4"><QRCodeSVG value={uri} size={180}/><p className="text-sm mt-2">验证器手动密钥：</p>
           <code className="break-all">{new URL(uri).searchParams.get('secret')}</code></div>}

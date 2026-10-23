@@ -195,7 +195,7 @@
 @media (max-width:700px) {
   .survey-landing-header { grid-template-columns:1fr auto; gap:12px 18px; padding:22px 24px 10px; }
   .survey-landing-header .survey-brand { --survey-brand-emblem:45px; --survey-brand-wordmark:139px; }
-  .survey-landing-header nav { grid-column:1 / -1; grid-row:2; justify-content:space-between; gap:18px; border-bottom:1px solid var(--survey-brand-line); padding-bottom:4px; }
+  .survey-landing-header nav { grid-column:1 / -1; grid-row:2; justify-content:space-between; gap:clamp(6px,2vw,18px); border-bottom:1px solid var(--survey-brand-line); padding-bottom:4px; }
   .survey-landing-header nav a { font-size:13px; }
   .survey-landing-header .survey-appearance-control { grid-column:2; grid-row:1; position:static; }
   .survey-landing-header .survey-appearance-trigger { font-size:12px; padding:7px; gap:5px; }
