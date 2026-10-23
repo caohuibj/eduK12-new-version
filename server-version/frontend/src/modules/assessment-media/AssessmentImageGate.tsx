@@ -1,33 +1,18 @@
-import React from 'react'
-import AssessmentImagePresentation from './AssessmentImagePresentation'
+import type { ReactNode } from 'react'
 import type { AssessmentImagePresentationItem } from './types'
-import { useAssessmentImageAssets } from './useAssessmentImageAssets'
+import { deferredAssessmentMedia } from './deferred-media'
 
 export interface AssessmentImageGateProps {
   items: readonly AssessmentImagePresentationItem[]
   loadAsset: (assetId: string) => Promise<Blob>
-  children: React.ReactNode
+  children: ReactNode
   disabled?: boolean
   ariaLabel?: string
 }
 
-const AssessmentImageGate: React.FC<AssessmentImageGateProps> = ({
-  items,
-  loadAsset,
-  children,
-  disabled = false,
-  ariaLabel,
-}) => {
-  const state = useAssessmentImageAssets(items, loadAsset)
-  const visualBusy = state.status !== 'ready'
-  return (
-    <div data-assessment-image-gate={visualBusy ? state.status : 'ready'}>
-      <AssessmentImagePresentation items={items} state={state} ordered={items.length > 1} ariaLabel={ariaLabel} />
-      <fieldset disabled={disabled || visualBusy} className={visualBusy ? 'opacity-70' : undefined}>
-        {children}
-      </fieldset>
-    </div>
-  )
-}
+const MediaGate = deferredAssessmentMedia<AssessmentImageGateProps>(() => import('./AssessmentImageGateContent').then(module => module.default))
 
-export default AssessmentImageGate
+export default function AssessmentImageGate(props: AssessmentImageGateProps) {
+  if (props.items.length) return <MediaGate {...props} />
+  return <div data-assessment-image-gate="ready"><fieldset disabled={props.disabled}>{props.children}</fieldset></div>
+}

@@ -384,7 +384,8 @@ export interface FinalDraftStore {
   ensure(meta: FinalDraftMeta): Promise<FinalDraftMeta>
   update(meta: FinalDraftMeta): Promise<FinalDraftMeta>
   setInstrumentMetadata(draftKey: string, metadata: Record<string, unknown>): Promise<FinalDraftMeta | null>
-  putAnswer(answer: FinalDraftAnswer): Promise<void>
+  /** Answer and optional timing metadata commit together under the seal lock. */
+  putAnswer(answer: FinalDraftAnswer, metadata?: Record<string, unknown>): Promise<void>
   /** Replaces the complete answer set and optional timing metadata for one draft
    * in a single commit. Whole questionnaires must include every unit in this key. */
   replaceAnswers(expected: FinalDraftMeta, answers: FinalDraftAnswer[], metadata?: Record<string, unknown>): Promise<void>
@@ -496,14 +497,20 @@ class MemoryFinalDraftStore implements FinalDraftStore {
     return written.trainingRetention ? cloneValue(written) : written
   }
 
-  async putAnswer(answer: FinalDraftAnswer) {
+  async putAnswer(answer: FinalDraftAnswer, metadata?: Record<string, unknown>) {
     const meta = this.metas.get(answer.draftKey)
     if (!meta) throw new FinalDraftStorageError('本地测评草稿不存在')
     assertWritable(meta)
     const key = `${answer.draftKey}:${answer.itemKey}`
     const previous = this.answers.get(key)
-    this.answers.set(key, cloneValue(answer))
-    if ((hasSurveyRetention(meta) || hasTrainingRetention(meta)) && (!previous || serialize(previous.value) !== serialize(answer.value))) this.metas.set(meta.draftKey, stampRetentionWrite(meta))
+    const nextAnswer = cloneValue(answer)
+    const withMetadata = metadata ? { ...meta,
+      instrumentMetadata: { ...(meta.instrumentMetadata ?? {}), ...cloneValue(metadata) }, updatedAt: Date.now() } : meta
+    const nextMeta = (hasSurveyRetention(meta) || hasTrainingRetention(meta)) && (!previous || serialize(previous.value) !== serialize(answer.value))
+      ? stampRetentionWrite(withMetadata) : stampChangedRetentionWrite(meta, withMetadata)
+    // Clone and validate both values before either becomes visible.
+    this.answers.set(key, nextAnswer)
+    if (nextMeta !== meta) this.metas.set(meta.draftKey, nextMeta)
   }
 
   async replaceAnswers(expected: FinalDraftMeta, answers: FinalDraftAnswer[], metadata?: Record<string, unknown>) {
@@ -800,7 +807,7 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
     })
   }
 
-  async putAnswer(answer: FinalDraftAnswer) {
+  async putAnswer(answer: FinalDraftAnswer, metadata?: Record<string, unknown>) {
     await this.run<void>([META_STORE, ANSWER_STORE], 'readwrite', async (transaction) => {
       const meta = await requestResult<FinalDraftMeta | undefined>(transaction.objectStore(META_STORE).get(answer.draftKey))
       if (!meta) throw new FinalDraftStorageError('本地测评草稿不存在')
@@ -809,7 +816,11 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
       const previous = (hasSurveyRetention(meta) || hasTrainingRetention(meta))
         ? await requestResult<FinalDraftAnswer | undefined>(store.get([answer.draftKey, answer.itemKey])) : undefined
       store.put(cloneValue(answer))
-      if ((hasSurveyRetention(meta) || hasTrainingRetention(meta)) && (!previous || serialize(previous.value) !== serialize(answer.value))) transaction.objectStore(META_STORE).put(stampRetentionWrite(meta))
+      const withMetadata = metadata ? { ...meta,
+        instrumentMetadata: { ...(meta.instrumentMetadata ?? {}), ...cloneValue(metadata) }, updatedAt: Date.now() } : meta
+      const nextMeta = (hasSurveyRetention(meta) || hasTrainingRetention(meta)) && (!previous || serialize(previous.value) !== serialize(answer.value))
+        ? stampRetentionWrite(withMetadata) : stampChangedRetentionWrite(meta, withMetadata)
+      if (nextMeta !== meta) transaction.objectStore(META_STORE).put(nextMeta)
     })
   }
 

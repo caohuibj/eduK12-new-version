@@ -1,8 +1,9 @@
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
-import { DigitbackwardTask } from './DigitbackwardTask'
+const DigitbackwardTask = deferredCognitiveRunner(() => import('./DigitbackwardTask').then(module => module.DigitbackwardTask))
 
 export const digitbackwardRegistryEntry: CognitiveFrontendRegistryEntry = {
-  testType: 'digitbackward', name: '数字倒背', engineVersion: '1.0.0', scoringVersion: '1.0.0', RunnerComponent: DigitbackwardTask, completionMode: 'task',
+  testType: 'digitbackward', name: '数字倒背', engineVersion: '1.0.0', scoringVersion: '1.0.0', RunnerComponent: DigitbackwardTask, prepareRunner: DigitbackwardTask.prepare, completionMode: 'task',
   metricDefinitions: [
     { key: 'maxSpan', label: '最大倒背广度', displayType: 'number' },
     { key: 'totalCorrectTrials', label: '正确试次总数', displayType: 'number' },

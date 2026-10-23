@@ -1,4 +1,5 @@
-import { NbackTask } from './NbackTask'
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
+const NbackTask = deferredCognitiveRunner(() => import('./NbackTask').then(module => module.NbackTask))
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
 
 export const nbackRegistryEntry: CognitiveFrontendRegistryEntry = {
@@ -6,7 +7,7 @@ export const nbackRegistryEntry: CognitiveFrontendRegistryEntry = {
   name: 'N-Back',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: NbackTask,
+  RunnerComponent: NbackTask, prepareRunner: NbackTask.prepare,
   completionMode: 'task',
   metricDefinitions: [
     { key: 'maxReliableN', label: '达到门槛的最高 N', displayType: 'number' },

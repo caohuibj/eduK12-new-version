@@ -11,10 +11,9 @@ const image = (assetId: string, order = 0) => ({
 })
 
 beforeEach(() => {
-  vi.stubGlobal('URL', {
-    ...URL,
-    createObjectURL: vi.fn(() => 'blob:media'),
-    revokeObjectURL: vi.fn(),
+  vi.stubGlobal('URL', class extends URL {
+    static createObjectURL = vi.fn(() => 'blob:media')
+    static revokeObjectURL = vi.fn()
   })
 })
 
@@ -48,6 +47,7 @@ describe('MEDIA-2 frontend image adapters', () => {
       </AssessmentImageGate>,
     )
 
+    await waitFor(() => expect(loadAsset).toHaveBeenCalledTimes(1))
     expect(screen.getByRole('status')).toHaveTextContent('加载视觉内容')
     expect(screen.getByRole('button', { name: 'Answer' })).toBeDisabled()
     resolve(new Blob(['x'], { type: 'image/png' }))

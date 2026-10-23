@@ -1,4 +1,5 @@
-import { CorsiTask } from './CorsiTask'
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
+const CorsiTask = deferredCognitiveRunner(() => import('./CorsiTask').then(module => module.CorsiTask))
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
 
 export const corsiRegistryEntry: CognitiveFrontendRegistryEntry = {
@@ -6,7 +7,7 @@ export const corsiRegistryEntry: CognitiveFrontendRegistryEntry = {
   name: 'Corsi 方块广度',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: CorsiTask,
+  RunnerComponent: CorsiTask, prepareRunner: CorsiTask.prepare,
   completionMode: 'task',
   metricDefinitions: [
     { key: 'maxSpan', label: '最大空间广度', displayType: 'number' },

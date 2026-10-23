@@ -1,12 +1,13 @@
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
-import { ReversallearningTask } from './ReversallearningTask'
+const ReversallearningTask = deferredCognitiveRunner(() => import('./ReversallearningTask').then(module => module.ReversallearningTask))
 
 export const reversallearningRegistryEntry: CognitiveFrontendRegistryEntry = {
   testType: 'reversallearning',
   name: '概率学习与规则反转',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: ReversallearningTask,
+  RunnerComponent: ReversallearningTask, prepareRunner: ReversallearningTask.prepare,
   completionMode: 'task',
   metricDefinitions: [
     { key: 'acquisitionAccuracy', label: '习得阶段正确率', displayType: 'percentage' },

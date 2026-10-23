@@ -1,12 +1,13 @@
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
-import { BartTask } from './BartTask'
+const BartTask = deferredCognitiveRunner(() => import('./BartTask').then(module => module.BartTask))
 
 export const bartRegistryEntry: CognitiveFrontendRegistryEntry = {
   testType: 'bart',
   name: '气球泵压行为任务',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: BartTask,
+  RunnerComponent: BartTask, prepareRunner: BartTask.prepare,
   completionMode: 'task',
   metricDefinitions: [
     { key: 'adjustedPumps', label: '现金化气球平均泵压', displayType: 'number' },

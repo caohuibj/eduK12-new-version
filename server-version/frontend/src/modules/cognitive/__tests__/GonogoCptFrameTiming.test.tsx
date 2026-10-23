@@ -5,7 +5,8 @@ import { resolveRunner } from '../registry'
 let nextFrameId = 1
 let frameCallbacks: Map<number, FrameRequestCallback>
 
-beforeEach(() => {
+beforeEach(async () => {
+  await Promise.all(['gonogo','cpt'].map(testType => resolveRunner(testType, '1.0.0')!.prepareRunner!()))
   vi.useFakeTimers()
   nextFrameId = 1
   frameCallbacks = new Map()
