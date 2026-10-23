@@ -1,3 +1,4 @@
+import {SelectedToolOutline} from '../modules/assessment-core/composition/SelectedToolOutline'
 import {EducationPrivateScalePicker} from '../components/education-tools/EducationPrivateScalePicker'
 import { useEffect, useRef, useState } from 'react'
 import type { SchoolApi } from './SchoolRecovery'
@@ -8,7 +9,9 @@ type Activity={
   courseId:string;organizationId:string;title:string;purpose:string;status:ActivityState
   version:number;participantCount:number;runCount:number
 }
-type Run={id:string;name:string;status:string;version:number}
+type RunTrackSummary={id:string;resourceFamily:string;resourceKey:string;resourceVersion:string}
+type Run={id:string;name:string;status:string;version:number;tracks?:RunTrackSummary[]}
+type RunDetail={run:Run;tracks?:RunTrackSummary[]}
 type ActivityCapabilities={canSubmit:boolean;canOpen:boolean;canPause:boolean;canResume:boolean;canClose:boolean;canPublishRun:boolean;ownPsychologyPublisher:boolean}
 type RunCapabilities={canPublish:boolean;canClose:boolean;canCancel:boolean}
 type Detail=Activity&{capabilities?:ActivityCapabilities;runs:Array<{runId:string;name:string;status:string;capabilities?:RunCapabilities}>}
@@ -185,7 +188,7 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
     const run=await api<Run>(path+'/runs','POST',{name:runTitle})
     setRunTitle('')
     await fetchDetail(selected.courseId)
-    setActiveRun(run)
+    setActiveRun({...run,tracks:[]})
     setNotice('已创建独立且未发布的测评批次。')
   })
   const showResources=async(cursor?:string)=>{
@@ -237,8 +240,8 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
         ...(targetMode?{targetPolicy:{mode:targetMode}}:{}),
       },
     })
-    const detail=await api<{run:Run}>(path+'/runs/'+activeRun.id)
-    setActiveRun(detail.run)
+    const detail=await api<RunDetail>(path+'/runs/'+activeRun.id)
+    setActiveRun({...detail.run,tracks:detail.tracks})
     setPreview(null)
     setNotice('已添加有版本和科学政策的测评项目；须预览并由获授权人员发布。')
     void result
@@ -353,9 +356,9 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
           <button disabled={busy||!canInspectRuns} key={r.runId} onClick={()=>void execute(async()=>{
             const request=++runRequest.current
             resourceRequest.current++;setActiveRun(null);setPreview(null)
-            const d=await api<{run:Run}>(path+'/runs/'+r.runId)
+            const d=await api<RunDetail>(path+'/runs/'+r.runId)
             if(request!==runRequest.current||activityPath.current!==path)return
-            setActiveRun(d.run)
+            setActiveRun({...d.run,tracks:d.tracks})
           })}>{r.name} · {schoolRunStatusText(r.status)}</button>)}</div>}
       {selected.runs.map(r=>(r.capabilities?.canClose||r.capabilities?.canCancel)?<div key={'lifecycle-'+r.runId} className="hs-actions">
         {r.capabilities.canClose&&<button disabled={busy} onClick={()=>void execute(async()=>{
@@ -372,6 +375,11 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
       {activeRun&&<div className="hs-task-detail">
         <h3>测评批次：{activeRun.name}（{schoolRunStatusText(activeRun.status)}）</h3>
         <details><summary>技术详情</summary><p>Run ID：{activeRun.id} · 状态：{activeRun.status} · 版本：{activeRun.version}</p></details>
+        <SelectedToolOutline className="hs-selected-tool-outline" items={activeRun.tracks?.map(track=>({
+          id:track.id,kind:track.resourceFamily,version:track.resourceVersion,
+          title:resources.find(resource=>resource.family===track.resourceFamily&&resource.key===track.resourceKey
+            &&resource.version===track.resourceVersion)?.title??track.resourceKey,
+        }))}/>
         {selected.status==='DRAFT'&&activeRun.status==='DRAFT'&&<>
           {canAuthorPrivateTools&&actorKey&&<EducationPrivateScalePicker
             key={`private:${actorKey}:${organizationId}:${selected.courseId}:${activeRun.id}`}
@@ -380,8 +388,8 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
             disabled={busy} homeroomOnly={!isAdmin&&selected.capabilities?.ownPsychologyPublisher===true}
             onBusy={setBusy} onRefresh={async()=>{
               const context=resourceContext.current
-              const data=await api<{run:Run}>(path+'/runs/'+activeRun.id)
-              if(resourceContext.current.scope===context.scope&&resourceContext.current.api===context.api){setActiveRun(data.run);setPreview(null)}
+              const data=await api<RunDetail>(path+'/runs/'+activeRun.id)
+              if(resourceContext.current.scope===context.scope&&resourceContext.current.api===context.api){setActiveRun({...data.run,tracks:data.tracks});setPreview(null)}
             }}/>}
           {canAuthorPrivateTools&&actorKey&&<EducationPrivateScalePicker kind="FORM"
             key={`private-form:${actorKey}:${organizationId}:${selected.courseId}:${activeRun.id}`}
@@ -390,8 +398,8 @@ export function SchoolActivityManager({api,organizationId,isAdmin,classes,canAut
             disabled={busy} homeroomOnly={!isAdmin&&selected.capabilities?.ownPsychologyPublisher===true}
             onBusy={setBusy} onRefresh={async()=>{
               const context=resourceContext.current
-              const data=await api<{run:Run}>(path+'/runs/'+activeRun.id)
-              if(resourceContext.current.scope===context.scope&&resourceContext.current.api===context.api){setActiveRun(data.run);setPreview(null)}
+              const data=await api<RunDetail>(path+'/runs/'+activeRun.id)
+              if(resourceContext.current.scope===context.scope&&resourceContext.current.api===context.api){setActiveRun({...data.run,tracks:data.tracks});setPreview(null)}
             }}/>}
           <button disabled={busy||resourceLoading} onClick={()=>void showResources()}>查看已发布、受授权的测评资源</button>
           {resourceLoading&&<p role="status">正在读取授权测评资源…</p>}

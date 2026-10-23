@@ -4,7 +4,7 @@ export type PrivateSharingRow=GovernanceSubmission&{versionId:string;privateCont
 export type PrivateSharingPrepared={sourceId:string;versionId:string;privateContentHash:string;product:'SCHOOL'|'TEACHER';releaseId:string;contentHash:string;defaults:SubmissionMetadata;mediaManifest:GovernanceMediaManifest;canRequestLibraryShare:boolean}
 export type PrivateSharingBody={contentHash:string;releaseId:string;requestId:string;metadata:SubmissionMetadata;dependencyReleaseIds:[];mediaConsent?:GovernanceMediaConsent;educationApplicability?:EducationApplicability}
 export type PrivateSharingDetail=PrivateSharingRow&{snapshot:unknown;mediaManifest:GovernanceMediaManifest}
-export const sharingManifestValid=(manifest:GovernanceMediaManifest)=>Boolean(manifest?.schemaVersion===1&&manifest.manifestHash&&Array.isArray(manifest.items)&&manifest.items.every(item=>item&&item.assetId&&item.contentHash&&typeof item.sizeBytes==='number'&&Array.isArray(item.usages)&&item.usages.every(usage=>typeof usage==='string')&&['image/png','image/jpeg','image/webp'].includes(item.mimeType)))
+export const sharingManifestValid=(manifest:GovernanceMediaManifest)=>Boolean(manifest?.schemaVersion===1&&manifest.manifestHash&&Array.isArray(manifest.items)&&manifest.items.every(item=>item&&item.assetId&&item.contentHash&&typeof item.sizeBytes==='number'&&Array.isArray(item.usages)&&item.usages.every(usage=>typeof usage==='string')&&['image/png','image/jpeg','image/webp','video/mp4','video/webm','application/pdf'].includes(item.mimeType)))
 export function createPrivateScaleSharingClient(api:PrivateToolApi,organizationId:string,toolId:string,entry:'SCHOOL'|'TEACHER'){
  const base=privateToolBase(organizationId)+'/'+encodeURIComponent(toolId)
  const version=(id:string)=>base+'/versions/'+encodeURIComponent(id)+'/sharing'
@@ -42,7 +42,7 @@ export function createPrivateScaleSharingClient(api:PrivateToolApi,organizationI
    const path='submissionId' in context?base+'/sharing/submissions/'+encodeURIComponent(context.submissionId)+'/media/'+encodeURIComponent(assetId)+'/preview'
     :version(context.versionId)+'/media/'+encodeURIComponent(assetId)+'/preview?releaseId='+encodeURIComponent(context.releaseId)
    const blob=await api<Blob>(path,'GET',undefined,{responseType:'blob'})
-   if(!(blob instanceof Blob)||blob.type!==mimeType||!['image/png','image/jpeg','image/webp'].includes(blob.type))throw Error('服务器未返回该附件的有效图片预览。')
+   if(!(blob instanceof Blob)||blob.type!==mimeType||!['image/png','image/jpeg','image/webp','video/mp4','video/webm','application/pdf'].includes(blob.type))throw Error('服务器未返回该附件的有效素材预览。')
    return blob
   },
  }

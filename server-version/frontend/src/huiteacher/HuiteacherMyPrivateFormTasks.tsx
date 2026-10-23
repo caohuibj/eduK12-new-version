@@ -1,17 +1,21 @@
-import {useCallback,useEffect,useRef,useState} from 'react'
+import {useCallback,useEffect,useMemo,useRef,useState} from 'react'
 import FinalCompositeAssessment from '../components/FinalCompositeAssessment'
 import type {CompositeAttemptState} from '../modules/composite/types'
 
-type Api=<T>(path:string,method?:string,payload?:unknown)=>Promise<T>
+type Api=<T>(path:string,method?:string,payload?:unknown,options?:{responseType?:'blob'})=>Promise<T>
 type Task={executionId:string;runId:string;organizationId:string;eventId:string;eventTitle:string;formTitle:string;status:string;runStatus:string;eventStatus:string;runtimeBindingKind:string|null;runtimeBindingRef:string|null}
 type Start={state:'STARTED'|'IN_PROGRESS'|'WITHHELD';runtimeBindingKind?:string;runtimeBindingRef?:string}
 const canOpen=(task:Task)=>['ASSIGNED','STARTED'].includes(task.status)&&task.eventStatus==='OPEN'&&(task.runStatus==='PUBLISHED'||(task.runStatus==='CLOSED'&&task.status==='STARTED'&&task.runtimeBindingKind==='COMPOSITE'&&Boolean(task.runtimeBindingRef)))
 const attemptPath=(id:string)=>'/private-form-composite-attempts/'+encodeURIComponent(id)
 function assertAttempt(state:CompositeAttemptState,id:string){
- if(!state||state.id!==id||!['IN_PROGRESS','COMPLETED','ABANDONED'].includes(state.status)||!Array.isArray(state.items)||state.items.some(item=>item.type!=='FORM_SECTION')||
-  (state.currentItem&&state.currentItem.type!=='FORM_SECTION')||
-  (state.status==='IN_PROGRESS'&&state.currentItem&&!(state.currentItem.formSectionId||state.currentItem.formSection?.id)))throw Error('表单运行记录与当前获授权任务不一致，请重新读取。')
+ // The server's items are FORM field summaries; units are FORM_SECTION navigation entries.
+ const sectionId=state?.currentItem?.formSectionId||state?.currentItem?.formSection?.id
+ if(!state||state.id!==id||!['IN_PROGRESS','COMPLETED','ABANDONED'].includes(state.status)||
+  !Array.isArray(state.items)||state.items.some(item=>item.type!=='FORM')||
+  !Array.isArray(state.units)||state.units.some(unit=>unit.type!=='FORM_SECTION'||!unit.formSectionId||unit.id!==unit.formSectionId)||
+  (state.currentItem&&(state.currentItem.type!=='FORM_SECTION'||!sectionId||state.currentItem.id!==sectionId||!state.units.some(unit=>unit.id===sectionId))))throw Error('表单运行记录与当前获授权任务不一致，请重新读取。')
 }
+
 export function HuiteacherMyPrivateFormTasks(props:{api:Api;actorKey:string}){return <PrivateFormSession key={props.actorKey} {...props}/>}
 function PrivateFormSession({api,actorKey}:{api:Api;actorKey:string}){
  const [listing,setListing]=useState<{api:Api;actorKey:string;rows:Task[];nextCursor:string|null}|null>(null),[busy,setBusy]=useState(false),[message,setMessage]=useState('')
@@ -22,6 +26,33 @@ function PrivateFormSession({api,actorKey}:{api:Api;actorKey:string}){
  currentApi.current=api;currentActor.current=actorKey;activeRef.current=active
  const currentListing=listing?.api===api&&listing.actorKey===actorKey?listing:null
  const tasks=currentListing?.rows??[],visible=active?.api===api?active:null
+ const mediaTransport=useMemo(()=>{
+  const attempt=visible?.attempt,item=attempt?.currentItem
+  const rawSectionId=item?.formSectionId||item?.formSection?.id
+  const rejectUnavailable=async()=>{throw Error('当前表单区段不可读取素材，请重新读取')}
+  if(!visible||!attempt||item?.type!=='FORM_SECTION'||!rawSectionId)return {loadImage:rejectUnavailable,loadVideoCapability:rejectUnavailable}
+  const capturedEpoch=epoch.current,executionId=visible.task.executionId,attemptEpoch=attempt.attemptEpoch,definitionHash=item.definitionHash
+  const attemptId=encodeURIComponent(attempt.id),sectionId=encodeURIComponent(rawSectionId)
+  const prefix=`/api/composite-assessments/attempts/${attemptId}/form-sections/${sectionId}/`
+  const current=()=>{
+   const now=activeRef.current
+   if(!alive.current||currentApi.current!==api||currentActor.current!==actorKey||now?.api!==api||epoch.current!==capturedEpoch||now.task.executionId!==executionId||now.attempt!==attempt||now.attempt.id!==attempt.id||now.attempt.attemptEpoch!==attemptEpoch||now.attempt.currentItem?.id!==item.id||(now.attempt.currentItem?.formSectionId||now.attempt.currentItem?.formSection?.id)!==rawSectionId||now.attempt.currentItem?.definitionHash!==definitionHash)throw Error('表单任务或区段已切换，请重新读取素材')
+  }
+  const scopedPath=(path:string,kind:'image'|'video')=>{
+   current()
+   if(!path.startsWith(prefix))throw Error('视觉内容不属于当前冻结表单区段')
+   const suffix=path.slice(prefix.length),match=(kind==='image'?/^assets\/([^/]+)\/content$/:/^items\/([^/]+)\/options\/(0|[1-9]\d*)\/video-capability$/).exec(suffix)
+   if(!match)throw Error('视觉内容路径无效')
+   let segment:string
+   try{segment=decodeURIComponent(match[1])}catch{throw Error('视觉内容路径无效')}
+   if(!segment||segment==='.'||segment==='..'||/[\\/?#]/.test(segment)||encodeURIComponent(segment)!==match[1])throw Error('视觉内容路径无效')
+   return `/private-form-composite-attempts/${attemptId}/form-sections/${sectionId}/${suffix}`
+  }
+  return {
+   loadImage:async(path:string)=>{const blob=await api<Blob>(scopedPath(path,'image'),'GET',undefined,{responseType:'blob'});current();if(!(blob instanceof Blob))throw Error('视觉内容响应无效');return blob},
+   loadVideoCapability:async()=>{throw Error('私有表单仅支持展示素材，不支持选项视频协议')},
+  }
+ },[api,actorKey,visible])
  const fetchPage=useCallback(async(cursor?:string)=>{
   if(!alive.current||currentApi.current!==api||currentActor.current!==actorKey)return
   const request=++listEpoch.current
@@ -112,6 +143,7 @@ function PrivateFormSession({api,actorKey}:{api:Api;actorKey:string}){
      return {code:0,message:'本次表单正式提交已确认',data:result}
     }}
     submitScale={async()=>{throw Error('私有表单任务不接受量表提交')}}
+    mediaTransport={mediaTransport}
     onReload={reload} onExit={leave} onCompleted={()=>{void work(async()=>{await reload()})}}
     onEnterCognitive={()=>setMessage('当前表单不包含认知任务')}
     onEnterSituational={()=>setMessage('当前表单不包含情境判断任务')}

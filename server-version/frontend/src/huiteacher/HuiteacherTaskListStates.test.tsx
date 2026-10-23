@@ -105,7 +105,7 @@ describe('List-only retry preserves current answering',()=>{
    if(path==='/personal-scale/assessments')return method==='POST'?{assessmentId:'attempt'}:{list:[]}
    if(path==='/personal-scale/assessments/attempt')return {assessmentId:'attempt',title:'当前作答',status:'IN_PROGRESS',definitionHash:'hash',runner:{items:[{itemCode:'q',content:'当前问题',required:true,options:[{value:'yes',label:'我的选择'}]}]}}
    if(path==='/form-attempts/attempt/task')return {attemptId:'attempt',formId:'form',title:'当前作答',status:'STARTED',definitionDigest:'hash',pages:[{id:'page',questions:[{itemKey:'q',type:'text',title:'问题'}]}]}
-   return {id:'attempt',status:'IN_PROGRESS',items:[{id:'item',type:'FORM_SECTION'}],currentItem:{id:'item',type:'FORM_SECTION',formSectionId:'section',definitionHash:'hash'}}
+   return {id:'attempt',status:'IN_PROGRESS',items:[{id:'item',type:'FORM'}],units:[{id:'section',type:'FORM_SECTION',formSectionId:'section'}],currentItem:{id:'section',type:'FORM_SECTION',formSectionId:'section',definitionHash:'hash'}}
   })
   render(view.render(api as Api))
   const open={form:'继续评价',scale:'进入本人自评',personal:'开始／继续自主测评',private:'打开本人表单'}[key]

@@ -2,7 +2,8 @@ import {useCallback,useEffect,useMemo,useRef,useState} from 'react'
 import {submissionStatusLabel,type SubmissionMetadata,type GovernanceMediaManifest} from '../../api/scaleLibraryGovernance'
 import {EducationApplicabilityFields,EducationApplicabilitySummary,useEducationApplicabilityDraft} from '../scale-governance/EducationApplicabilityFields'
 import {SubmissionMetadataFields,emptySubmissionMetadata} from '../scale-governance/SubmissionMetadataFields'
-import {AssessmentImagePreview,type ImageAuthoringAdapter} from '../../modules/assessment-media/AssessmentImageField'
+import {AssessmentMaterialDisplay} from '../../modules/assessment-media/AssessmentMaterialDisplay'
+import type {PublicMaterial} from '../../modules/assessment-media/material'
 import {createPrivateScaleSharingClient,type PrivateSharingPrepared,type PrivateSharingRow,type PrivateSharingDetail,type PrivateSharingBody} from './educationPrivateScaleSharingClient'
 import {privateToolError,type PrivateToolApi,type PrivateToolVersion,type PrivateDraftState} from './privateToolClient'
 type Props={api:PrivateToolApi;entry:'SCHOOL'|'TEACHER';organizationId:string;actorId:string;toolId:string;version:PrivateToolVersion;disabled?:boolean;onDraftStateChange?:(value:PrivateDraftState)=>void}
@@ -112,16 +113,13 @@ function SharingSession({api,entry,organizationId,actorId,toolId,version,disable
 function SharingImages({manifest,context,scope,client,busy}:{manifest:GovernanceMediaManifest;context:{versionId:string;releaseId:string}|{submissionId:string};scope:string;client:ReturnType<typeof createPrivateScaleSharingClient>;busy:boolean}){
  const [expanded,setExpanded]=useState(false),[error,setError]=useState('')
  const contextKey=JSON.stringify(context)
- const adapter=useMemo<ImageAuthoringAdapter>(()=>({scopeKey:scope+':'+contextKey+':'+manifest.manifestHash,
-  upload:async()=>{throw Error('申请清单不支持上传图片')},
-  loadPreview:async asset=>{
-   try{return await client.preview(JSON.parse(contextKey),asset.assetId,asset.mimeType)}
-   catch(cause){setError('附件预览未能加载，可关闭后重新读取；原附件引用未改变。');throw cause}
-  },
- }),[scope,contextKey,manifest.manifestHash,client])
+ const load=useCallback(async(asset:PublicMaterial['asset'],signal:AbortSignal)=>{
+  try{const blob=await client.preview(JSON.parse(contextKey),asset.assetId,asset.mimeType);if(signal.aborted)throw Error('附件读取已取消');return new Response(blob,{headers:{'Content-Type':blob.type}})}
+  catch(cause){if(!signal.aborted)setError('附件预览未能加载，可关闭后重新读取；原附件引用未改变。');throw cause}
+ },[contextKey,client])
  return <section aria-label="入库附件清单"><h5>随本版本申请的附件</h5>{!manifest.items.length&&<p>此版本没有托管附件。</p>}
   {manifest.items.map(item=><div key={item.assetId+item.contentHash}><p>{item.assetId} · {item.mimeType} · {item.sizeBytes} 字节 · 用途：{item.usages.join('、')}</p>
-   {expanded&&<AssessmentImagePreview adapter={adapter} image={{asset:{assetId:item.assetId,contentHash:item.contentHash,mimeType:item.mimeType as 'image/png'|'image/jpeg'|'image/webp'},altText:'入库附件 '+item.assetId}}/>}</div>)}
+   {expanded&&<AssessmentMaterialDisplay key={scope+contextKey+manifest.manifestHash+item.assetId} appearance="training" load={load} item={{asset:{assetId:item.assetId,contentHash:item.contentHash,mimeType:item.mimeType as PublicMaterial['asset']['mimeType']},name:'入库附件 '+item.assetId}}/>}</div>)}
   {manifest.items.length>0&&<button type="button" disabled={busy} onClick={()=>{setExpanded(value=>!value);setError('')}}>{expanded?'关闭附件预览':'读取获授权的附件预览'}</button>}{error&&<p role="alert">{error}</p>}
  </section>
 }

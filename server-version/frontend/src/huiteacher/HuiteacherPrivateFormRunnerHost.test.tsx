@@ -8,7 +8,14 @@ vi.mock('./HuiteacherMyScaleTasks',()=>({HuiteacherMyScaleTasks:()=>null}))
 vi.mock('./HuiteacherClassRelationships',()=>({HuiteacherClassRelationships:()=>null}))
 const reply=(data:unknown)=>({ok:true,status:200,json:async()=>({code:0,data})})
 const draftKey='composite-form-section:private-form-attempt:section'
-function state(completed=false){return {id:'private-form-attempt',assessmentId:'assessment',name:'教师私有表单',instruction:null,status:completed?'COMPLETED':'IN_PROGRESS',progress:completed?100:0,completedItems:completed?1:0,totalItems:1,currentIndex:0,startedAt:'2026-10-22T00:00:00Z',lastSavedAt:'2026-10-22T00:00:00Z',completedAt:completed?'2026-10-22T01:00:00Z':null,anonymousCode:null,deliveryMode:'FINAL_ONLY',attemptEpoch:3,contextSnapshotHash:null,items:[{id:'item',type:'FORM_SECTION',position:0,label:'教师信息',completed,index:0}],currentItem:completed?null:{id:'item',type:'FORM_SECTION',position:0,required:true,formSectionId:'section',definitionHash:'fixed-definition-hash',title:'教师信息',formAnswers:[{formItemId:'field',type:'text_input',label:'任教学科',placeholder:null,options:null,required:true,contextKey:null,value:null}]}}}
+function state(completed=false){
+ const answers=[{id:'field',formItemId:'field',type:'text_input',label:'任教学科',placeholder:null,options:null,required:true,contextKey:null,value:null}]
+ const section={id:'section',title:'教师信息',description:null,position:0,contextSection:false,definitionHash:'fixed-definition-hash',status:completed?'COMPLETED':'IN_PROGRESS',submittedAt:null,items:answers,answers}
+ return {id:'private-form-attempt',assessmentId:'assessment',name:'教师私有表单',instruction:null,status:completed?'COMPLETED':'IN_PROGRESS',progress:completed?100:0,completedItems:completed?1:0,totalItems:1,currentIndex:completed?1:0,startedAt:'2026-10-22T00:00:00Z',lastSavedAt:'2026-10-22T00:00:00Z',completedAt:completed?'2026-10-22T01:00:00Z':null,anonymousCode:null,deliveryMode:'FINAL_ONLY',attemptEpoch:3,contextSnapshotHash:null,
+  items:[{id:'field',type:'FORM',position:0,label:'任教学科',completed,index:0}],units:[{id:'section',type:'FORM_SECTION',formSectionId:'section',position:0,required:true,label:'教师信息',completed,index:0}],formSections:[section],
+  currentItem:completed?null:{id:section.id,type:'FORM_SECTION',position:0,required:true,formSectionId:section.id,title:section.title,description:section.description,contextSection:section.contextSection,definitionHash:section.definitionHash,status:section.status,answers:section.items}}
+}
+
 afterEach(async()=>{cleanup();vi.restoreAllMocks();vi.unstubAllGlobals();await finalDraftStore.delete(draftKey);sessionStorage.clear()})
 it('uses the real Teacher host and Final form section with CSRF, forwarding the durable sealed FINAL payload only to private-form endpoints',async()=>{
  await finalDraftStore.delete(draftKey)

@@ -1,14 +1,16 @@
+import type {RawScoreFeedbackContent} from '../modules/scale/rawScoreFeedback'
+import {scoreSelectionSummary as sharedScoreSummary} from '../modules/assessment-core/scale/scoreSummary'
 import {AssessmentImageField,type ImageAuthoringAdapter} from '../modules/assessment-media/AssessmentImageField'
 import React, { useEffect, useMemo, useState } from 'react'
 import { ArrowDown, ArrowUp, Copy, Plus, Trash2 } from 'lucide-react'
-import { applyScaleOptionLabels, parseScaleItemPaste, resizeScaleOptions, scaleOptionPresets } from './scaleAuthoringInput'
+import { applyScaleOptionLabels, parseScaleItemPaste, resizeScaleOptions, scaleOptionPresets } from '../modules/assessment-core/scale/authoringInput'
 import type { RawScoreFeedbackRule } from '../modules/scale/rawScoreFeedback'
 import { TrainingRawScoreFeedbackEditor } from './TrainingRawScoreFeedbackEditor'
 import { type ScaleDefinition, type ResponseOption, type Direction, type Aggregation, responseValueToken, scoreSourceFor, updateReportContract } from './scaleDefinitionEditorModel'
 import './ScaleEdit.css'
 
 /** Definition-only editing. Persistence, product authority and navigation stay in the owning entry. */
-export function ScaleDefinitionEditor({ definition, setDefinition, activeTab, readOnly, controlsDisabled, saveDefinition, mediaUploadCount = 0, onUploadBusy, mediaEnabled = true, imageAdapter, importControl }: {
+export function ScaleDefinitionEditor({ definition, setDefinition, activeTab, readOnly, controlsDisabled, saveDefinition, mediaUploadCount = 0, onUploadBusy, mediaEnabled = true, imageAdapter, importControl, onPendingChange, renderItemMaterials, renderFeedbackContent, renderFeedbackPreview }: {
   definition: ScaleDefinition
   setDefinition: React.Dispatch<React.SetStateAction<ScaleDefinition>>
   activeTab: 'basic' | 'responses' | 'items' | 'scores' | 'report'
@@ -20,9 +22,16 @@ export function ScaleDefinitionEditor({ definition, setDefinition, activeTab, re
   mediaEnabled?: boolean
   imageAdapter?: ImageAuthoringAdapter
   importControl?: React.ReactNode
+  onPendingChange?: (id:string,pending:boolean)=>void
+  renderItemMaterials?: (item:ScaleDefinition['items'][number],onChange:(patch:Partial<ScaleDefinition['items'][number]>)=>void)=>React.ReactNode
+  renderFeedbackContent?: (content:RawScoreFeedbackContent,onChange:(content:RawScoreFeedbackContent)=>void)=>React.ReactNode
+  renderFeedbackPreview?: (content:RawScoreFeedbackContent)=>React.ReactNode
 }) {
   const [itemPaste, setItemPaste] = useState('')
   const [optionPaste, setOptionPaste] = useState('')
+  const pending=!!itemPaste.trim()||!!optionPaste.trim()
+  useEffect(()=>{onPendingChange?.('scale-paste',pending)},[pending,onPendingChange])
+  useEffect(()=>()=>onPendingChange?.('scale-paste',false),[onPendingChange])
   const [authoringNotice, setAuthoringNotice] = useState('')
   const [authoringError, setAuthoringError] = useState('')
   useEffect(() => { setAuthoringNotice(''); setAuthoringError('') }, [activeTab])
@@ -30,14 +39,14 @@ export function ScaleDefinitionEditor({ definition, setDefinition, activeTab, re
   const sortedItems = useMemo(() => [...definition.items].sort((a, b) => a.sortOrder - b.sortOrder), [definition.items])
   const contentItems = sortedItems.filter(item => !item.purpose || item.purpose === 'CONTENT')
   const replaceOptions = (options: ResponseOption[]) => {
-    if (readOnly || controlsDisabled) return
+    if (readOnly || controlsDisabled) return false
     const removedTarget = definition.items.find(item => item.purpose === 'ATTENTION_CHECK' && item.responseSetKey === responseSet.key && item.attentionTarget !== undefined && !options.some(option => option.value === item.attentionTarget))
-    if (removedTarget) { setAuthoringError('这些选项包含注意力题的目标答案，请先修改目标答案，再减少选项。'); return }
+    if (removedTarget) { setAuthoringError('这些选项包含注意力题的目标答案，请先修改目标答案，再减少选项。'); return false }
     setDefinition(current => ({ ...current, responseSets: [{ ...current.responseSets[0], options }, ...current.responseSets.slice(1)] }))
     setAuthoringError(''); setAuthoringNotice('选项已更新，尚未保存。')
   }
   const applyOptionText = (text = optionPaste) => {
-    try { replaceOptions(applyScaleOptionLabels(responseSet.options, text)) }
+    try { const options=applyScaleOptionLabels(responseSet.options, text); if(replaceOptions(options)!==false)setOptionPaste('') }
     catch (error) { setAuthoringError((error as Error).message) }
   }
   const pastedItems = (() => { try { return { rows: parseScaleItemPaste(itemPaste), error: '' } } catch (error) { return { rows: [], error: (error as Error).message } } })()
@@ -55,6 +64,7 @@ export function ScaleDefinitionEditor({ definition, setDefinition, activeTab, re
 
 
   const addItem = (purpose: 'CONTENT' | 'ATTENTION_CHECK' | 'SOCIAL_DESIRABILITY' = 'CONTENT') => setDefinition((current) => {
+    if(current.items.length>=200)return current
     const itemCode = `Q_${crypto.randomUUID().replace(/-/g, '')}`
     const ordered = [...current.items].sort((a, b) => a.sortOrder - b.sortOrder)
     const previousSetKey = ordered[ordered.length - 1]?.responseSetKey
@@ -74,6 +84,7 @@ export function ScaleDefinitionEditor({ definition, setDefinition, activeTab, re
     return { ...current, items: items.map((item, i) => ({ ...item, sortOrder: i + 1 })) }
   })
   const duplicateItem = (itemCode: string) => setDefinition(current => {
+    if(current.items.length>=200)return current
     const items = [...current.items].sort((a, b) => a.sortOrder - b.sortOrder)
     const index = items.findIndex(item => item.itemCode === itemCode)
     if (index < 0) return current
@@ -93,22 +104,10 @@ export function ScaleDefinitionEditor({ definition, setDefinition, activeTab, re
 
   const removeItem = (itemCode: string) => setDefinition((current) => ({ ...current, items: [...current.items].sort((a, b) => a.sortOrder - b.sortOrder).filter((item) => item.itemCode !== itemCode).map((item, index) => ({ ...item, sortOrder: index + 1 })), scoring: { ...current.scoring, itemRules: current.scoring.itemRules.filter((rule) => rule.itemCode !== itemCode), scores: current.scoring.scores.map((score) => ({ ...score, source: { ...score.source, items: score.source.items.filter((item) => item.itemCode !== itemCode) } })) } }))
 
-  const scoreSelectionSummary = (score: ScaleDefinition['scoring']['scores'][number]) => {
-    const selected = score.source.items
-    const ranges = selected.map(entry => {
-      const item = definition.items.find(candidate => candidate.itemCode === entry.itemCode)
-      const options = definition.responseSets.find(set => set.key === item?.responseSetKey)?.options
-      if (!options?.length) return null
-      const values = options.map(option => option.score)
-      const weight = score.source.aggregation === 'mean' ? 1 : entry.weight
-      return { min: Math.min(...values) * weight, max: Math.max(...values) * weight }
-    })
-    const complete = ranges.length > 0 && ranges.every(range => range !== null)
-    const divisor = score.source.aggregation === 'mean' ? selected.length : 1
-    const range = complete ? `${(ranges.reduce((sum, r) => sum + Math.min(r!.min, r!.max), 0) / divisor).toFixed(score.displayPrecision ?? 1)}–${(ranges.reduce((sum, r) => sum + Math.max(r!.min, r!.max), 0) / divisor).toFixed(score.displayPrecision ?? 1)}` : '请先选题并完成选项计分'
-    const omitted = contentItems.filter(item => !selected.some(entry => entry.itemCode === item.itemCode)).map(item => item.itemCode)
-    return `已纳入 ${selected.length}/${contentItems.length} 题 · 预计范围 ${range}。${omitted.length ? `未纳入：${omitted.join('、')}。请核对报告文案，避免将部分计分称为全部题目合计。` : '全部题目已纳入。'}`
-  }
+  const scoreSelectionSummary = (score: ScaleDefinition['scoring']['scores'][number]) => sharedScoreSummary({
+    items:contentItems.map(item=>({key:item.itemCode,scores:definition.responseSets.find(set=>set.key===item.responseSetKey)?.options.map(option=>option.score)??[]})),
+    selected:score.source.items.map(item=>({key:item.itemCode,weight:item.weight})),aggregation:score.source.aggregation,precision:score.displayPrecision,
+  })
 
   const addScore = (type: 'total' | 'dimension') => setDefinition((current) => {
     const scoreKeys = new Set(current.scoring.scores.map((score) => score.key))
@@ -142,7 +141,7 @@ export function ScaleDefinitionEditor({ definition, setDefinition, activeTab, re
         </div>}
         {authoringError && <p className="scale-author-error" role="alert">{authoringError}</p>}{authoringNotice && <p className="scale-author-notice" role="status">{authoringNotice}</p>}
         <div className="scale-option-list">{responseSet.options.map((option, index) => <div key={responseValueToken(option.value)} className="scale-option-row"><span className="scale-option-number">{index + 1}</span><label>选项文字<input aria-label={`选项 ${index + 1} 文字`} disabled={controlsDisabled} value={option.label} onChange={event => updateOption(index, { label: event.target.value })} className="input" placeholder="显示标签" /></label><label>分值<input aria-label={`选项 ${index + 1} 分值`} disabled={controlsDisabled} type="number" value={option.score} onChange={event => updateOption(index, { score: Number(event.target.value) })} className="input" /></label><button type="button" aria-label={`删除选项 ${index + 1}`} onClick={() => removeOption(index)} disabled={controlsDisabled || responseSet.options.length <= 2} className="scale-author-delete text-red-500"><Trash2 size={18} aria-hidden="true" /></button></div>)}</div>
-        <footer className="scale-author-footer"><button onClick={() => void saveDefinition()} disabled={controlsDisabled || mediaUploadCount > 0} className="hui-button hui-button--primary">保存响应集</button></footer>
+        <footer className="scale-author-footer"><button onClick={() => void saveDefinition()} disabled={controlsDisabled || mediaUploadCount > 0 || pending} className="hui-button hui-button--primary">保存响应集</button></footer>
       </section>}
 
       {activeTab === 'items' && <section className="staff-panel scale-author-panel">
@@ -153,13 +152,14 @@ export function ScaleDefinitionEditor({ definition, setDefinition, activeTab, re
         <div className="scale-item-list">{sortedItems.map((item, itemIndex) => { const rule = definition.scoring.itemRules.find(candidate => candidate.itemCode === item.itemCode); return <article key={item.itemCode} className="scale-item-card">
           <div className="scale-item-top"><strong>第 {itemIndex + 1} 题</strong><span>{item.required ? '必答' : '选答'}{item.purpose === 'ATTENTION_CHECK' ? ' · 注意力题' : item.purpose === 'SOCIAL_DESIRABILITY' ? ' · 社会赞许性题' : ''}</span></div>
           <textarea aria-label={`第 ${itemIndex + 1} 题题干`} disabled={controlsDisabled} value={item.content} onChange={event => updateItem(item.itemCode, { content: event.target.value })} className="input" placeholder="题目内容" />
+          {renderItemMaterials?.(item,patch=>updateItem(item.itemCode,patch))}
           {imageAdapter&&<AssessmentImageField adapter={imageAdapter} images={item.images} disabled={controlsDisabled} onBusy={onUploadBusy} legend="题目图片（可选）" uploadLabel="上传题目图片" description="题目图片与报告反馈图片独立保存；仅可使用当前工具内有权使用的静态图片。" allowCaption onChange={images=>updateItem(item.itemCode,{images})}/>}
           <div className="scale-item-controls">{(!item.purpose || item.purpose === 'CONTENT') && <label><input type="checkbox" checked={rule?.transform.type === 'reverse'} disabled={controlsDisabled} onChange={() => toggleReverse(item.itemCode)} />反向计分</label>}
             {item.purpose === 'ATTENTION_CHECK' && <label>注意力题目标选项<select aria-label={`目标选项 ${item.itemCode}`} className="input" disabled={controlsDisabled} value={item.attentionTarget === undefined ? '' : responseValueToken(item.attentionTarget)} onChange={event => { const option = definition.responseSets.find(set => set.key === item.responseSetKey)?.options.find(option => responseValueToken(option.value) === event.target.value); updateItem(item.itemCode, { attentionTarget: option?.value }) }}><option value="">请选择目标选项</option>{definition.responseSets.find(set => set.key === item.responseSetKey)?.options.map(option => <option key={responseValueToken(option.value)} value={responseValueToken(option.value)}>{option.label}</option>)}</select></label>}
             <div className="scale-item-actions"><button type="button" aria-label={`上移 ${item.itemCode}`} onClick={() => moveItem(item.itemCode, -1)} disabled={controlsDisabled || itemIndex === 0} title="上移"><ArrowUp size={17} /></button><button type="button" aria-label={`下移 ${item.itemCode}`} onClick={() => moveItem(item.itemCode, 1)} disabled={controlsDisabled || itemIndex === sortedItems.length - 1} title="下移"><ArrowDown size={17} /></button><button type="button" aria-label={`复制 ${item.itemCode}`} onClick={() => duplicateItem(item.itemCode)} disabled={controlsDisabled}><Copy size={17} />复制</button><button type="button" aria-label={`删除题目 ${itemIndex + 1}`} onClick={() => removeItem(item.itemCode)} disabled={controlsDisabled} className="scale-author-delete"><Trash2 size={17} />删除</button></div>
           </div>
         </article> })}</div>
-        <footer className="scale-author-footer"><p>新增题目请在“计分”中选择纳入的计分项。</p><button onClick={() => void saveDefinition()} disabled={controlsDisabled || mediaUploadCount > 0} className="hui-button hui-button--primary">保存题目</button></footer>
+        <footer className="scale-author-footer"><p>新增题目请在“计分”中选择纳入的计分项。</p><button onClick={() => void saveDefinition()} disabled={controlsDisabled || mediaUploadCount > 0 || pending} className="hui-button hui-button--primary">保存题目</button></footer>
       </section>}
 
       {activeTab === 'scores' && <section className="staff-panel scale-scoring-panel" aria-labelledby="scale-scoring-title">
@@ -187,11 +187,11 @@ export function ScaleDefinitionEditor({ definition, setDefinition, activeTab, re
           <div className="scale-score-items"><h3>纳入计分的题目</h3><p role="status">{scoreSelectionSummary(score)}</p><div className="scale-score-item-options">{contentItems.map(item => <button type="button" key={item.itemCode} aria-pressed={scoreSourceFor(definition, score.key).some(candidate => candidate.itemCode === item.itemCode)} disabled={controlsDisabled} onClick={() => toggleScoreItem(score.key, item.itemCode)}><span aria-hidden="true">{scoreSourceFor(definition, score.key).some(candidate => candidate.itemCode === item.itemCode) ? '☑ ' : '☐ '}</span>{item.itemCode}</button>)}</div></div>
         </article>)}</div>
         {!definition.scoring.scores.length && <p className="scale-score-empty">尚未设置计分项。请先添加总分或维度分，再选择参与计分的题目。</p>}
-        <footer className="scale-scoring-footer"><p>保存前请核对纳入题目、分数范围和报告文案。</p><button onClick={() => void saveDefinition()} disabled={controlsDisabled || mediaUploadCount > 0} className="hui-button hui-button--primary">保存计分定义</button></footer>
+        <footer className="scale-scoring-footer"><p>保存前请核对纳入题目、分数范围和报告文案。</p><button onClick={() => void saveDefinition()} disabled={controlsDisabled || mediaUploadCount > 0 || pending} className="hui-button hui-button--primary">保存计分定义</button></footer>
       </section>}
 
 
-      {activeTab === 'report' && <section className="staff-panel staff-panel--padded p-6"><label className="block text-sm text-gray-700">自有内容 / 授权声明<textarea disabled={controlsDisabled} value={definition.license.note || ''} onChange={(event) => setDefinition((current) => ({ ...current, license: { ...current.license, note: event.target.value } }))} className="input mt-1 w-full min-h-20" placeholder="说明题目内容由谁提供，以及允许在本系统中使用的范围" /></label><p className="scale-edit-multiset-note">授权声明属于量表定义，请使用“保存报告定义”或“保存草稿”保存。</p><h2 className="font-semibold mb-2">量表专属解释</h2><p className="text-sm text-gray-500 mb-5">自定义量表仅能写描述性解释；可按原始总分或维度分设置区间图文反馈；不提供正常/异常、常模或百分位配置。</p><div className="space-y-4">{definition.scoring.scores.map((score) => { const entry = definition.report.interpretations.find((candidate) => candidate.scoreKey === score.key); if (!entry) return null; return <article key={score.key} className="border rounded-lg p-4 space-y-2"><h3 className="font-medium">{score.label}</h3><input disabled={controlsDisabled} value={entry.headline} onChange={(event) => updateInterpretation(score.key, { headline: event.target.value })} className="input w-full" placeholder="标题" /><textarea disabled={controlsDisabled} value={entry.summary} onChange={(event) => updateInterpretation(score.key, { summary: event.target.value })} className="input w-full min-h-20" placeholder="描述性解释" /><TrainingRawScoreFeedbackEditor imageAdapter={imageAdapter} mediaEnabled={mediaEnabled} onUploadBusy={onUploadBusy} scoreKey={score.key} rule={definition.report.rawScoreFeedback?.rules.find(rule => rule.scoreKey === score.key)} disabled={controlsDisabled} onChange={rule => updateRawFeedback(score.key, rule)} /></article> })}</div><label className="block text-sm text-gray-700 mt-5">免责声明<textarea disabled={controlsDisabled} value={definition.report.disclaimer} onChange={(event) => setDefinition((current) => ({ ...current, report: { ...current.report, disclaimer: event.target.value } }))} className="input mt-1 w-full min-h-20" /></label><div className="flex justify-end mt-5"><button onClick={() => void saveDefinition()} disabled={controlsDisabled || mediaUploadCount > 0} className="hui-button hui-button--primary">保存报告定义</button></div></section>}
+      {activeTab === 'report' && <section className="staff-panel staff-panel--padded p-6"><label className="block text-sm text-gray-700">自有内容 / 授权声明<textarea disabled={controlsDisabled} value={definition.license.note || ''} onChange={(event) => setDefinition((current) => ({ ...current, license: { ...current.license, note: event.target.value } }))} className="input mt-1 w-full min-h-20" placeholder="说明题目内容由谁提供，以及允许在本系统中使用的范围" /></label><p className="scale-edit-multiset-note">授权声明属于量表定义，请使用“保存报告定义”或“保存草稿”保存。</p><h2 className="font-semibold mb-2">量表专属解释</h2><p className="text-sm text-gray-500 mb-5">自定义量表仅能写描述性解释；可按原始总分或维度分设置区间图文反馈；不提供正常/异常、常模或百分位配置。</p><div className="space-y-4">{definition.scoring.scores.map((score) => { const entry = definition.report.interpretations.find((candidate) => candidate.scoreKey === score.key); if (!entry) return null; return <article key={score.key} className="border rounded-lg p-4 space-y-2"><h3 className="font-medium">{score.label}</h3><input disabled={controlsDisabled} value={entry.headline} onChange={(event) => updateInterpretation(score.key, { headline: event.target.value })} className="input w-full" placeholder="标题" /><textarea disabled={controlsDisabled} value={entry.summary} onChange={(event) => updateInterpretation(score.key, { summary: event.target.value })} className="input w-full min-h-20" placeholder="描述性解释" /><TrainingRawScoreFeedbackEditor renderContent={renderFeedbackContent} renderPreview={renderFeedbackPreview} imageAdapter={imageAdapter} mediaEnabled={mediaEnabled} onUploadBusy={onUploadBusy} scoreKey={score.key} rule={definition.report.rawScoreFeedback?.rules.find(rule => rule.scoreKey === score.key)} disabled={controlsDisabled} onChange={rule => updateRawFeedback(score.key, rule)} /></article> })}</div><label className="block text-sm text-gray-700 mt-5">免责声明<textarea disabled={controlsDisabled} value={definition.report.disclaimer} onChange={(event) => setDefinition((current) => ({ ...current, report: { ...current.report, disclaimer: event.target.value } }))} className="input mt-1 w-full min-h-20" /></label><div className="flex justify-end mt-5"><button onClick={() => void saveDefinition()} disabled={controlsDisabled || mediaUploadCount > 0 || pending} className="hui-button hui-button--primary">保存报告定义</button></div></section>}
 
   </>
 }

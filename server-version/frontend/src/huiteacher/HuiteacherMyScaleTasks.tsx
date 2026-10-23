@@ -25,8 +25,11 @@ type Start={state:'STARTED'|'IN_PROGRESS'|'WITHHELD';
 
 export function HuiteacherMyScaleTasks({api}:{api:Api}){
   const [taskRows,setTasks]=useState<Task[]>([])
-  const [selected,setSelected]=useState<Task|null>(null)
-  const [attempt,setAttempt]=useState<CompositeAttemptState|null>(null)
+  const [session,setSession]=useState<{api:Api;selected:Task;attempt:CompositeAttemptState}|null>(null)
+  const currentApi=useRef(api),sessionRef=useRef(session),sessionEpoch=useRef(0)
+  currentApi.current=api;sessionRef.current=session
+  const visible=session?.api===api?session:null
+  const selected=visible?.selected??null,attempt=visible?.attempt??null
   const mediaTransport=useMemo(()=>{
     if(!attempt?.currentItem||attempt.currentItem.type!=='SCALE')return undefined
     const attemptId=encodeURIComponent(attempt.id)
@@ -89,20 +92,24 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
     return()=>{listRequest.current+=1}
   },[refresh])
   useEffect(()=>{
-    reportEpoch.current+=1;setReports({});setReportBusy(false)
-    return()=>{reportEpoch.current+=1}
+    reportEpoch.current+=1;sessionEpoch.current+=1;setReports({});setReportBusy(false);setSession(null);setLoading(false)
+    return()=>{reportEpoch.current+=1;sessionEpoch.current+=1}
   },[api])
-  const work=(task:()=>Promise<void>)=>{
+  const work=(task:(valid:()=>boolean)=>Promise<void>)=>{
+    const token=++sessionEpoch.current
+    const valid=()=>currentApi.current===api&&sessionEpoch.current===token
     setLoading(true);setMessage('')
-    void task().catch(e=>setMessage(e instanceof Error?e.message:'当前测评操作失败'))
-      .finally(()=>setLoading(false))
+    void task(valid).catch(e=>{if(valid())setMessage(e instanceof Error?e.message:'当前测评操作失败')})
+      .finally(()=>{if(valid())setLoading(false)})
   }
   const load=async(attemptId:string)=>{
     const value=await api<CompositeAttemptState>('/composite-attempts/'+attemptId)
-    setAttempt(value)
+    if(value.id!==attemptId)throw new Error('测评记录与当前任务不一致，请重新读取。')
     return value
   }
-  const open=(item:Task)=>work(async()=>{
+  const open=(item:Task)=>{
+    if(sessionRef.current?.api===api){setMessage('请先在当前测评中保存并退出，再打开另一项自评。');return}
+    work(async valid=>{
     if(item.runStatus!=='PUBLISHED'
       &&!(item.runStatus==='CLOSED'&&item.status==='STARTED'&&item.runtimeBindingRef)){
       throw new Error('任务已结束，不能建立新的作答。')
@@ -111,6 +118,7 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
     if(!attemptId){
       const started=await api<Start>(
         '/run-executions/'+item.executionId+'/start-scale','POST',{})
+      if(!valid())return
       if(started.state==='IN_PROGRESS'){
         setMessage('正式测评正在建立，请刷新任务后继续。')
         return
@@ -121,10 +129,12 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
         throw new Error('当前未找到获授权的教师自评运行记录')
       attemptId=started.runtimeBindingRef
     }
-    setSelected(item)
-    await load(attemptId)
+    const value=await load(attemptId)
+    if(!valid())return
+    setSession(value.status==='COMPLETED'?null:{api,selected:item,attempt:value})
     await refresh()
-  })
+    })
+  }
   const closeReport=(executionId:string)=>{
     reportEpoch.current+=1;setReportBusy(false)
     setReports(previous=>{
@@ -145,14 +155,22 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
       if(token===reportEpoch.current)setReportBusy(false)
     }
   }
+  const leave=()=>{sessionEpoch.current+=1;sessionRef.current=null;setSession(null);setLoading(false)}
   const reload=async()=>{
-    if(!attempt)return
-    await load(attempt.id)
+    const source=visible,token=sessionEpoch.current
+    if(!source||source.api!==api||currentApi.current!==api||sessionRef.current!==source)return
+    const value=await load(source.attempt.id)
+    if(currentApi.current!==api||sessionEpoch.current!==token||sessionRef.current!==source)return
+    setSession(value.status==='COMPLETED'?null:{...source,attempt:value})
     await refresh()
   }
   const submitScale=async(attemptId:string,itemId:string,payload:unknown)=>{
+    const source=visible,token=sessionEpoch.current
+    const valid=()=>currentApi.current===api&&sessionEpoch.current===token&&sessionRef.current===source
+    if(!source||source.api!==api||source.attempt.id!==attemptId||source.attempt.currentItem?.id!==itemId||!valid())throw new Error('当前测评任务已切换，请重新读取。')
     const result=await api<unknown>('/composite-attempts/'+attemptId+
       '/items/'+itemId+'/scale/submit','POST',payload)
+    if(!valid())throw new Error('测评任务已切换，请重新读取提交状态。')
     return {code:0,message:'本次正式提交已确认',data:result}
   }
   return <section className="ht-panel" aria-label="教师个人发展 Scale 自评">
@@ -163,6 +181,8 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
     {listError&&<div role="alert" className="ht-notice"><p>任务列表读取失败，请重试。</p><p>{listError}</p>
       <button type="button" disabled={listPending} onClick={()=>void refresh()}>重试读取任务列表</button>
     </div>}
+    {visible&&<p className="ht-muted">请先在当前测评中保存并退出，再打开另一项自评。</p>}
+    {loading&&!visible&&<button type="button" onClick={leave}>取消打开测评</button>}
     {message&&<p role="status" className="ht-notice">{message}</p>}
     {listReady&&!listPending&&!listError&&!tasks.length?<p className="ht-empty">目前尚未安排经过授权的教师个人 Scale 测评。</p>:
       <div className="ht-event-list">{tasks.map(item=><article className="ht-event" key={item.executionId}>
@@ -171,7 +191,7 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
         <div className="ht-inline">
           {item.status!=='COMPLETED'&&(item.runStatus==='PUBLISHED'
             ||(item.runStatus==='CLOSED'&&item.status==='STARTED'&&Boolean(item.runtimeBindingRef)))&&
-            <button type="button" disabled={loading||reportBusy}
+            <button type="button" disabled={loading||reportBusy||Boolean(visible)}
               onClick={()=>open(item)}>{item.runStatus==='CLOSED'?'继续已有自评':'进入本人自评'}</button>}
           {item.status!=='COMPLETED'&&item.runStatus!=='PUBLISHED'
             &&!(item.runStatus==='CLOSED'&&item.status==='STARTED'&&item.runtimeBindingRef)&&
@@ -216,8 +236,8 @@ export function HuiteacherMyScaleTasks({api}:{api:Api}){
         submitScale={submitScale}
         submitFormSection={async()=>{throw new Error('教师 Scale 任务不存在 Form Section')}}
         onReload={reload}
-        onExit={()=>{setSelected(null);setAttempt(null)}}
-        onCompleted={()=>{setSelected(null);setAttempt(null);void refresh()}}
+        onExit={()=>{if(sessionRef.current===visible)leave()}}
+        onCompleted={()=>{if(sessionRef.current===visible){leave();void refresh()}}}
         onEnterCognitive={()=>setMessage('该教师个人测评不允许启动认知任务')}
         onEnterSituational={()=>setMessage('该教师个人测评不允许启动情境任务')}
       />

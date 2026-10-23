@@ -1,3 +1,4 @@
+import type {AssessmentMaterial} from '../modules/assessment-media/material'
 import type {OrderedAuthoringImage} from '../modules/assessment-media/AssessmentImageField'
 import type { RawScoreFeedback } from '../modules/scale/rawScoreFeedback'
 export type ResponseValue = string | number
@@ -18,7 +19,7 @@ export interface ScaleDefinition {
   license: { status: 'self_authored' | 'authorized' | 'verified' | 'unknown'; redistribution: 'allowed' | 'restricted' | 'unknown'; note?: string }
   display: { randomizeItems: boolean }
   responseSets: Array<{ key: string; options: ResponseOption[] }>
-  items: Array<{ images?: OrderedAuthoringImage[]; itemCode: string; content: string; type: string; required: boolean; sortOrder: number; responseSetKey: string; randomizeOptions: boolean; purpose?: 'CONTENT' | 'ATTENTION_CHECK' | 'SOCIAL_DESIRABILITY'; attentionTarget?: ResponseValue }>
+  items: Array<{ materials?:AssessmentMaterial[]; images?: OrderedAuthoringImage[]; itemCode: string; content: string; type: string; required: boolean; sortOrder: number; responseSetKey: string; randomizeOptions: boolean; purpose?: 'CONTENT' | 'ATTENTION_CHECK' | 'SOCIAL_DESIRABILITY'; attentionTarget?: ResponseValue }>
   scoring: {
     scoringVersion: string
     itemRules: Array<{ itemCode: string; transform: { type: 'identity' | 'reverse' } }>

@@ -31,7 +31,7 @@ export function SurveyFormChoiceList({question:q,kind,limit,protectedKeys=[],onC
   const create=(_existing:FormChoiceRow[],label=''):FormChoiceRow=>{const key=researchKey(options?'o':'r');return {id:key,value:key,label}}
   return <div className="survey-form-options survey-form-rows-editor space-y-2">
     <p className="text-sm font-medium">{kind}</p>
-    <FormChoiceRows appearance="survey" title={kind} choices={choices} onChange={change} createChoice={create} max={limit} onNotice={setNotice}
+    <FormChoiceRows appearance="survey" title={kind} choices={choices} onChange={change} createChoice={create} max={limit} onNotice={setNotice} validate={next=>choiceReferenceError(choices,next,protectedKeys)}
       onPasteFailure={(text,error)=>{setNotice(error);setPaste(previous=>({text,nonce:previous.nonce+1}))}}/>
     {referenceError&&<p className="survey-form-bulk-error" role="alert">{referenceError}</p>}
     {notice&&<p className="survey-form-setting-note" role="status">{notice}</p>}

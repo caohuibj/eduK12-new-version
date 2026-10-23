@@ -54,3 +54,6 @@
 
 /* Scientific stimuli are immutable. Only surrounding product/answer shells follow appearance. */
 .ht-app[data-theme] [data-cognitive-task-root]{color-scheme:light;color:#362925;--ht-bg:#fbf4ed;--ht-copper:#944638;--ht-ink:#362925;--ht-quiet:#76665e;--ht-line:#e5d5ca;--ht-paper:#fffdf9}
+
+/* Personal-report limitations use readable warning text in dark appearance. */
+.ht-app[data-theme=dark] .education-personal-report .text-amber-700:not([data-cognitive-task-root],[data-cognitive-task-root] *){color:#f3d4b3}

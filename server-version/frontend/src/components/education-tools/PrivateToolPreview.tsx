@@ -1,3 +1,5 @@
+import type {ReactNode} from 'react'
+import type {PublicMaterial} from '../../modules/assessment-media/material'
 import {AssessmentImagePreview,type ImageAuthoringAdapter} from '../../modules/assessment-media/AssessmentImageField'
 import type {PrivateTool} from './privateToolClient'
 import type {ScaleDefinition} from '../../pages/scaleDefinitionEditorModel'
@@ -8,11 +10,11 @@ import {FormChoiceExtras,toggleFormMultiple} from '../../modules/assessment-core
 import {visibleFormKeys} from '../../modules/assessment-core/form/form-visibility'
 import type {ProfessionalAnswer} from '../../modules/assessment-core/form/types'
 
-export function PrivateToolPreview({tool,answers,onAnswer,imageAdapter}:{tool:PrivateTool;answers:Record<string,ProfessionalAnswer>;onAnswer:(key:string,value:ProfessionalAnswer)=>void;imageAdapter?:ImageAuthoringAdapter}){
+export function PrivateToolPreview({tool,answers,onAnswer,imageAdapter,renderMaterials}:{tool:PrivateTool;answers:Record<string,ProfessionalAnswer>;onAnswer:(key:string,value:ProfessionalAnswer)=>void;imageAdapter?:ImageAuthoringAdapter;renderMaterials?:(items:PublicMaterial[]|undefined)=>ReactNode}){
  if(tool.kind==='SCALE'){
   const definition=tool.definition as ScaleDefinition
   return <div className="education-private-preview">{[...definition.items].sort((a,b)=>a.sortOrder-b.sortOrder).map((item,index)=><fieldset key={item.itemCode}>
-   <legend>{index+1}. {item.content}</legend>
+   <legend>{index+1}. {item.content}</legend>{renderMaterials?.(item.materials)}
    {imageAdapter&&[...(item.images??[])].sort((a,b)=>a.order-b.order).map((image,index)=><AssessmentImagePreview key={`${image.asset.assetId}:${index}`} adapter={imageAdapter} image={image}/>)}
    {definition.responseSets.find(set=>set.key===item.responseSetKey)?.options.map(option=><label key={JSON.stringify(option.value)}>
     <input type="radio" name={`private-${tool.id}-${item.itemCode}`} checked={answers[item.itemCode]===option.value} onChange={()=>onAnswer(item.itemCode,option.value)}/>{option.label}
@@ -26,7 +28,7 @@ export function PrivateToolPreview({tool,answers,onAnswer,imageAdapter}:{tool:Pr
    const answer=answers[q.itemKey]
    const refused=Boolean(answer&&typeof answer==='object'&&!Array.isArray(answer)&&'_surveyRefusal' in answer)
    return <fieldset key={q.itemKey}><legend>{q.prompt}{q.required?'（必答）':''}</legend>
-    {q.image&&imageAdapter&&<AssessmentImagePreview adapter={imageAdapter} image={q.image}/>}
+    {renderMaterials?.(q.materials)}{q.image&&imageAdapter&&<AssessmentImagePreview adapter={imageAdapter} image={q.image}/>}
     <fieldset disabled={refused}>
      {['SHORT_TEXT','LONG_TEXT','NUMBER'].includes(q.type)?<BasicFormAnswer question={q} value={typeof answer==='string'||typeof answer==='number'?answer:null} onChange={value=>onAnswer(q.itemKey,value)}/>
       :q.type==='SINGLE'||q.type==='MULTIPLE'?q.options.map(option=><label key={option.optionKey}><input type={q.type==='MULTIPLE'?'checkbox':'radio'} name={`private-${tool.id}-${q.itemKey}`} checked={q.type==='MULTIPLE'?Array.isArray(answer)&&answer.includes(option.optionKey):answer===option.optionKey} onChange={event=>onAnswer(q.itemKey,q.type==='MULTIPLE'?toggleFormMultiple(Array.isArray(answer)?answer as string[]:[],option.optionKey,event.target.checked,q.exclusiveOptionKeys):option.optionKey)}/>{option.label}</label>)

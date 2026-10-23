@@ -21,11 +21,17 @@ describe('education private sharing client exact scope',()=>{
   await expect(createPrivateScaleSharingClient(api as PrivateToolApi,'org','tool/a','SCHOOL').prepare('v/a','private-hash')).rejects.toThrow('申请准备信息与固定版本不一致')
   expect(api).toHaveBeenCalledTimes(1)
  })
+ it.each(['video/mp4','application/pdf'])('accepts %s only from the exact fixed-version sharing endpoint',async mimeType=>{
+  const blob=new Blob(['synthetic'],{type:mimeType}),api=vi.fn().mockResolvedValue(blob)
+  const client=createPrivateScaleSharingClient(api as PrivateToolApi,'org','tool/a','SCHOOL')
+  expect(await client.preview({versionId:'v/a',releaseId:'release/a'},'asset',mimeType)).toBe(blob)
+  expect(api).toHaveBeenCalledWith('/organizations/org/private-tools/tool%2Fa/versions/v%2Fa/sharing/media/asset/preview?releaseId=release%2Fa','GET',undefined,{responseType:'blob'})
+ })
  it('rejects mismatched submission results and unexpected image content types',async()=>{
   const api=vi.fn().mockResolvedValueOnce({...prepared,id:'request',metadata,status:'SUBMITTED',privateContentHash:'wrong'}).mockResolvedValueOnce(new Blob(['html'],{type:'text/html'}))
   const client=createPrivateScaleSharingClient(api as PrivateToolApi,'org','tool/a','SCHOOL')
   await expect(client.submit('v/a',{contentHash:'private-hash',releaseId:'release/a',requestId:'request',metadata,dependencyReleaseIds:[]})).rejects.toThrow('提交结果身份不一致')
-  await expect(client.preview({submissionId:'request/a'},'asset','image/png')).rejects.toThrow('有效图片预览')
+  await expect(client.preview({submissionId:'request/a'},'asset','image/png')).rejects.toThrow('有效素材预览')
   expect(api).toHaveBeenLastCalledWith('/organizations/org/private-tools/tool%2Fa/sharing/submissions/request%2Fa/media/asset/preview','GET',undefined,{responseType:'blob'})
  })
 })
