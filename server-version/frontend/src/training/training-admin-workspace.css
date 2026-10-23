@@ -506,3 +506,40 @@
  .training-resource-search>summary { flex-wrap:wrap; }
  .training-resource-search>summary>span { max-width:100%; }
 }
+
+/* Admin theme owns both management and shared Training tokens. */
+.hui-app.hui-training.training-management-frame {
+ --training-paper:var(--tm-page);--training-surface:var(--tm-surface);--training-raised:var(--tm-soft);
+ --training-ink:var(--tm-ink);--training-muted:var(--tm-muted);--training-bamboo:var(--tm-green);--training-border:var(--tm-line);
+ --tm-action:#365a48;--tm-on-action:#fffefa;--tm-action-hover:#294938;
+ --tm-danger:#973e30;--tm-danger-bg:#fff1ec;--tm-danger-line:#e3c5bc;
+ --tm-warning:#7c551a;--tm-warning-bg:#fff0d4;
+ color-scheme:light;
+}
+.hui-app.hui-training.training-management-frame[data-training-theme="dark"] {
+ --tm-ink:#edf2e9;--tm-muted:#bdcdbf;--tm-green:#c1dcad;--tm-line:#637b6a;--tm-hover:#304738;
+ --tm-action:#bdd9b4;--tm-on-action:#15231f;--tm-action-hover:#cee6c4;
+ --tm-danger:#ffbbb1;--tm-danger-bg:#482a2b;--tm-danger-line:#b47f76;
+ --tm-warning:#ffe2a2;--tm-warning-bg:#4a3a1b;
+ color-scheme:dark;
+}
+.training-management-frame :is(.training-management-page-heading h1,.training-supervision-inspection h2,.training-supervision-roster h3) { color:var(--tm-ink); }
+.training-management-frame :is(.training-supervision-sort,.training-supervision-filters>label) { color:var(--tm-muted);font-size:13px; }
+.hui-app.hui-training.training-management-frame :where(input:not([type="checkbox"]):not([type="radio"]),textarea,select) { background:var(--tm-surface);color:var(--tm-ink);border-color:var(--tm-line);caret-color:var(--tm-ink); }
+.hui-app.hui-training.training-management-frame :is(input,textarea)::placeholder { color:var(--tm-muted);opacity:1; }
+.hui-app.hui-training.training-management-frame .training-accounts-search-input input { border:0;background:transparent; }
+.training-management-frame .training-accounts-table { font-size:13px; }
+.training-management-frame .training-accounts-table small { font-size:12px; }
+.training-management-frame .training-accounts-status--pending { background:var(--tm-warning-bg);color:var(--tm-warning); }
+.training-management-frame :is(.training-accounts-primary,.training-accounts-dialog .hui-button--primary,.training-accounts-role [aria-pressed="true"],.training-resource-views [aria-pressed="true"]) { background:var(--tm-action);color:var(--tm-on-action);border-color:var(--tm-action); }
+.training-management-frame :is(.training-accounts-primary,.training-accounts-dialog .hui-button--primary):hover:not(:disabled) { background:var(--tm-action-hover);border-color:var(--tm-action-hover); }
+.training-management-frame :is(.training-supervision-end,.training-accounts-expired) { color:var(--tm-danger); }
+.training-management-frame :is(.training-accounts-error,.training-supervision-editor-error) { background:var(--tm-danger-bg);color:var(--tm-danger);border-color:var(--tm-danger-line); }
+.training-management-frame .training-accounts-dialog { background:var(--tm-surface);color:var(--tm-ink);border-color:var(--tm-line); }
+.training-management-frame .training-accounts-dialog :is(h2,.staff-dialog__description,.training-supervision-editor label) { color:var(--tm-ink); }
+.training-management-frame .training-accounts-dialog :is(.staff-dialog__header,.staff-dialog__actions) { border-color:var(--tm-line); }
+.training-management-frame .training-accounts-dialog :is(.hui-button--secondary,.staff-icon-button) { color:var(--tm-green);background:var(--tm-surface);border-color:var(--tm-line); }
+.training-management-frame .training-accounts-dialog .hui-button--danger { background:var(--tm-danger);border-color:var(--tm-danger);color:var(--tm-on-action); }
+.training-management-frame .training-accounts-dialog .training-supervision-editor>p { color:var(--tm-muted); }
+.training-management-frame .training-appearance-trigger { border-color:var(--tm-line);color:var(--tm-ink);background:var(--tm-surface); }
+.training-management-frame[data-training-theme="dark"] .training-accounts-pagination button:disabled { opacity:1;color:#a8b9ad;background:#23372d;border-color:#52685b;cursor:not-allowed; }

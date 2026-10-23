@@ -80,6 +80,9 @@ describe('Training administrator workspace presentation',()=>{
     expect(screen.getByRole('main')).toContainElement(screen.getByRole('heading',{name:'培训管理内容'}))
     expect(screen.getByRole('link',{name:'账户设置'})).toHaveAttribute('href','/admin/training/profile')
     expect(screen.getByRole('button',{name:'退出登录'})).toBeEnabled()
+    const appearance=screen.getByRole('button',{name:/^外观：/}),logout=screen.getByRole('button',{name:'退出登录'})
+    expect(logout.compareDocumentPosition(appearance)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(appearance.closest('.training-management-account')?.lastElementChild).toContainElement(appearance)
   })
 })
 

@@ -25,9 +25,9 @@ export default function TrainingAdminShell({children,user,loggingOut,onLogout}:{
         {trainingAdminPages.map(item=><Link key={item.key} to={item.path} aria-current={item.key===page?.key?'page':undefined}>{item.label}</Link>)}
       </nav>
       <div className="training-management-account">
-        <TrainingAppearanceControl/>
         <Link to={profile} aria-label="账户设置" aria-current={pathname===profile?'page':undefined}><UserRound size={17} aria-hidden="true"/><span><strong>{user.nickname||user.username}</strong><small>Training 管理员</small></span></Link>
         <button type="button" disabled={loggingOut} onClick={()=>void onLogout()} aria-label={loggingOut?'正在退出…':'退出登录'}><LogOut size={18} aria-hidden="true"/><span>{loggingOut?'正在退出…':'退出登录'}</span></button>
+        <TrainingAppearanceControl/>
       </div>
     </header>
     <main id="hui-main" ref={main} tabIndex={-1} className="training-management-main">{children}</main>
