@@ -1325,3 +1325,33 @@ job remains failed. Original successful application SAST is verified by its exac
 successful official job and unchanged component trees; only the two changed
 qualification JS files receive fresh CodeQL. No application tests/build ran in
 the failed admission invocation; those missing stages still must succeed.
+
+
+## Training trainer account management qualification (2026-10-24)
+
+The authorized candidate on `work/survey-training-branding-20261023` binds the
+complete twenty-file product diff, main base and component trees in
+`training-teacher-bindings.json`. It includes nullable registration-code account
+terms, trainer renewal/freeze/recovery and their compact UI. Survey entry CSS,
+dependencies, existing authority/CSRF/session controls and production remain
+outside this candidate. Unknown paths/modes/blobs, moved base, mismatched PR
+source/merge trees, manual/full requests and failed/missing stages fail closed.
+
+The bounded job admits the reviewed original local reporter/stdout and actual
+tool-completion observations for 78 affected assertions, current backend/app
+types and changed lint. These are reviewed-local-evidence, ciExecuted=false and
+originalExecutionSigned=false. Source/runtime/type input bindings are reviewed
+retrospectively; complete historical node_modules bytes were not recorded. The
+original type/fixture failures are retained, not relabeled successful. Erased
+type-only additions and subsequent CSS-only adjustments do not claim that old
+browser observations validated new styles; final Mac UI checks are separately
+recorded. This narrowly reviewed admission is not a generic signed local runner.
+
+Actions executes new scope/refusal/gate contracts, an isolated old-schema to
+new-schema upgrade and dump/restore with retained synthetic rows, actual HTTP
+CSRF/MFA/entry/target/version boundaries and credential recovery, one frontend
+compile, and current frontend/backend/changed-control CodeQL. Existing local
+unit/rollback flows and types/lint are not replayed. No full platform, scientific,
+media, load, image, deployment or server job is selected. The inlined job retains
+the current reusable-workflow reference limit. This route qualifies merging,
+not deployment. Exact main push classifies without repeating application work.
