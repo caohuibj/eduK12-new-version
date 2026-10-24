@@ -1,4 +1,5 @@
 import { lazy,Suspense,useEffect,useMemo,useRef,useState } from 'react'
+import { MemoryRouter } from 'react-router-dom'
 import type { SituationalRunnerClient } from '../modules/situational/api'
 import type { SituationalAttemptResponse } from '../modules/situational/types'
 import { isSurveySituationalReference,type SurveySituationalReference } from './survey-situational-api'
@@ -61,8 +62,8 @@ export function SurveySituationalUnit(props:{publicId:string;attemptId:string;sl
   return <section aria-label={props.title}><h2>{props.title}</h2>
     {error&&<div role="alert"><p>{error}</p><button type="button" onClick={()=>setRetry(v=>v+1)}>重试读取任务</button></div>}
     {done?<p role="status">情境化作答已可靠保存，请继续提交整轮研究。个体反馈按研究约定开放。</p>
-      :child?<Suspense fallback={<p role="status">正在加载共享情境化作答工具…</p>}><Runner host={{attemptId:child,
-        parentAttemptId:props.attemptId,compositeItemId:props.slotKey,client:client.runner,onCompleted:complete}}/></Suspense>
+      :child?<Suspense fallback={<p role="status">正在加载共享情境化作答工具…</p>}><MemoryRouter><Runner host={{attemptId:child,
+        parentAttemptId:props.attemptId,compositeItemId:props.slotKey,client:client.runner,onCompleted:complete}}/></MemoryRouter></Suspense>
       :!error?<p role="status">正在读取情境化任务…</p>:null}
   </section>
 }

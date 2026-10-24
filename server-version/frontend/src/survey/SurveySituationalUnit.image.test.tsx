@@ -1,6 +1,5 @@
 import {fireEvent,render,screen,waitFor} from '@testing-library/react'
 import {afterEach,describe,it,expect,vi} from 'vitest'
-import {MemoryRouter} from 'react-router-dom'
 import {SurveySituationalUnit} from './SurveySituationalUnit'
 import {finalDraftStore} from '../services/persistence/finalDraftStore'
 import type {SituationalAttemptResponse} from '../modules/situational/types'
@@ -39,8 +38,10 @@ describe('real Survey host and shared image runner UI contract with synthetic AP
     })
     vi.stubGlobal('fetch',fetch)
     const onCommitted=vi.fn()
-    render(<MemoryRouter><SurveySituationalUnit publicId="public" attemptId="parent" slotKey="image" title="Synthetic native image" accessCredential={proof} onCommitted={onCommitted}/></MemoryRouter>)
-    expect(await screen.findByRole('alert')).toHaveTextContent('视觉内容加载失败')
+    const hostUrl=window.location.href
+    const hostHistoryLength=window.history.length
+    render(<SurveySituationalUnit publicId="public" attemptId="parent" slotKey="image" title="Synthetic native image" accessCredential={proof} onCommitted={onCommitted}/>)
+    expect(await screen.findByRole('alert',{}, {timeout:5000})).toHaveTextContent('视觉内容加载失败')
     expect(screen.getByLabelText('Choose A')).toBeDisabled()
     expect(screen.getByRole('button',{name:'提交测评'})).toBeDisabled()
     expect(accepted).toBe(false)
@@ -58,5 +59,7 @@ describe('real Survey host and shared image runner UI contract with synthetic AP
     expect(submission.responses).toEqual([expect.objectContaining({sceneKey:'ONE',channelKey:'ACTION',responseValue:'A'})])
     expect(JSON.stringify(submission)).not.toMatch(/blob:|image-id|synthetic-private-image/)
     expect(JSON.stringify(submission)).not.toContain(proof)
+    expect(window.location.href).toBe(hostUrl)
+    expect(window.history.length).toBe(hostHistoryLength)
   })
 })
