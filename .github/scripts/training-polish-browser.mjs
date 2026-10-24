@@ -75,7 +75,7 @@ try{browser=await chromium.launch({headless:true,executablePath:process.env.CHRO
    await page.goto('http://training.eduk12.top/toolkit?kind=composition');await page.getByRole('heading',{name:tools[0].name,exact:true}).waitFor();
    assert.equal(await page.getByText(tools[0].description,{exact:true}).count(),0);await page.getByRole('button',{name:'展开详情：'+tools[0].name,exact:true}).click();await page.getByText(tools[0].description,{exact:true}).waitFor();
    await proof('tool-details-'+theme);const bar=page.locator('.training-library-filter');const first=bar.getByRole('button').first();await first.focus();assert(await first.evaluate(el=>{const b=el.closest('.training-library-filter').getBoundingClientRect(),r=el.getBoundingClientRect();return r.left>=b.left+4&&r.right<=b.right-4;}));await proof('tool-focus-inset-'+theme);
-   await page.goto('http://training.eduk12.top/media');await page.getByRole('heading',{name:'媒体',exact:true}).waitFor();await proof('media-filter-'+theme);
+   await page.goto('http://training.eduk12.top/media-library');await page.getByRole('heading',{name:'媒体',exact:true}).waitFor();await proof('media-filter-'+theme);
   }
   await context.close();
  }

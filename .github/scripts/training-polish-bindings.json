@@ -451,7 +451,7 @@
     "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
     "server-version/backend/prisma/schema.prisma": "b75acf10b51f520b1e0c2ac3f68d720ad2fe15ef"
   },
-  "evidenceSHA256": "51230b5cac98033b7185011fbd2397c127547cfc9610e1b19fccdf5941dbcfaf",
+  "evidenceSHA256": "f6b6532f7f6f8eda0beb4e11659ec1b030fab1916d29161502196f9958abb50c",
   "admittedCases": 302,
   "missingTests": [
     "server-version/frontend/src/components/assessment-shell/__tests__/AssessmentShell.test.tsx",
@@ -464,5 +464,21 @@
     "server-version/frontend/src/components/assessment-shell/__tests__/AssessmentShell.test.tsx",
     "server-version/frontend/src/modules/composite/item-label.ts",
     "server-version/frontend/src/modules/situational/answer-status.ts"
-  ]
+  ],
+  "resume": {
+    "run": 40108196841,
+    "scopeJob": 120914187222,
+    "qualificationJob": 120914234847,
+    "sastJob": 120914234710,
+    "source": "1be45c1f2d327d10b1771a33487501860a47f473",
+    "checkout": "42bfbfe09c5d9795a110a7f5819536e9985112e7",
+    "attempt": 1,
+    "artifact": 12565582682,
+    "zipSHA256": "3aac04a19820dc7f2d350880e549d9119f1c9c7acb58cf04e6d99ef522299acb",
+    "sastChangedControls": [
+      ".github/scripts/training-polish-checks.mjs",
+      ".github/scripts/training-polish-browser.mjs",
+      ".github/scripts/training-polish.test.mjs"
+    ]
+  }
 }

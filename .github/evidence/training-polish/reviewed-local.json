@@ -1699,12 +1699,12 @@
   ],
   "controlSHA256": {
     ".github/scripts/training-polish-scope.mjs": "f6c965882a3f35bb14f9c1c6e915967fe3473664b704ccb6a6e1bf5fa87f3170",
-    ".github/scripts/training-polish-checks.mjs": "27e2a07dfe32a0b4540af03b1c4bfb358e3eecaa41d85e02a052b1171c99973d",
-    ".github/scripts/training-polish.test.mjs": "67cfbe263b52e28a672de62ecab52a10ff0d1ddc247b59fedd87408bf1951ddd",
-    ".github/scripts/training-polish-browser.mjs": "c0658df69477000a49186fdba04a87d319481879e3fe08a4961c9478d88b9418",
+    ".github/scripts/training-polish-checks.mjs": "aa5702ce637b0bbec1f50950a0bdab21f250c1123db7526d130d7b8ca2f5dc9c",
+    ".github/scripts/training-polish.test.mjs": "c392239e85b938ed1d0859d3cc7af7058d4a2c4ef462b36056aa26c1a4cecc83",
+    ".github/scripts/training-polish-browser.mjs": "7381d1c55c5626e65d0d1867bf511fb976a61c021de7f4508e7843680541de67",
     ".github/scripts/content-scope.mjs": "b1bbd2e09b38676817729243f775f0ad64702ebf14ad13c9939b510fa11e7725",
     ".github/scripts/merge-gate.mjs": "18daddb6e67fedcba28988f71ec0146681e1bda38bba7387f75e5a1c5dc0132f",
-    ".github/workflows/ci.yml": "3683f1ec67527a538fc1b140e3b398ba18be09f3106f1e04d5b1073e290bfc2f",
-    "docs/release/README.md": "17b6615a3be9ff45fc16f720f377c00c21c014fba47f8fb0a72b1718827029fe"
+    ".github/workflows/ci.yml": "cc8e8b6c3791e410243c9eb39c54c61602ca20e800979b74bd606307839f2ca1",
+    "docs/release/README.md": "fe679341021d8b96cfa9fcec67360af379458ae67a5e97df25249d23c80c0114"
   }
 }

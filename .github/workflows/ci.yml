@@ -1213,6 +1213,8 @@ jobs:
       - name: select exact PR352 application and control SAST inputs
         if: needs.scope.outputs.application_route == 'training-polish'
         id: polish-codeql-config
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: node .github/scripts/training-polish-checks.mjs codeql-config
       - name: initialize CodeQL
         if: steps.appearance-codeql-reuse.outputs.reused != 'true'
@@ -1516,11 +1518,18 @@ jobs:
         run: node .github/scripts/training-polish-checks.mjs admission
       - name: new scope refusal evidence and fail-closed merge contracts
         run: node --test --test-reporter=tap .github/scripts/training-polish.test.mjs
+      - name: restore exact successful frontend subprocesses and immutable compiled artifact
+        id: prior
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/training-polish-checks.mjs restore
       - name: install unchanged frontend and shared-contract dependencies from official locks
+        if: steps.prior.outputs.restored != 'true'
         run: |
           npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/frontend
           npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/backend
       - name: only missing frontend assertions lint and one production frontend compilation
+        if: steps.prior.outputs.restored != 'true'
         run: node .github/scripts/training-polish-checks.mjs frontend
       - name: install pinned compiled-browser controls
         run: |

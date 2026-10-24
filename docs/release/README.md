@@ -1694,3 +1694,21 @@ the complete Training qualification and current CodeQL success. Draft, missing,
 skipped, failed and cancelled selected stages block merge. Main push classifies
 the exact same diff without replaying application work. At five minutes report
 the actual waiting stage; only affected failures may be retried.
+
+The first PR352 run 40108196841 retains its browser-stage failure. Its 30 new
+control assertions, three missing application suites, changed-file lint, one
+frontend compilation and current full selected CodeQL all succeeded. The
+consumer incorrectly required a Vite manifest file that this project does not
+emit; actual complete asset hashes and HTML were already retained. The correction
+requires the real HTML to reference an exact retained compiled JS asset, keeps
+complete file hashes and adds negative tampering contracts. No product code changes.
+
+Continuation binds official run/job/source, original successful steps, 24-hour
+lifetime, artifact 12565582682 and exact ZIP SHA256. It restores those original
+compiled bytes and application reports directly on the runner, without another
+application install/test/lint/build. Original source/checkout identities stay
+original, and the failed job is not re-labelled successful. Only changed
+qualification controls receive fresh CodeQL after authenticating the original
+completed full selected analysis; original CodeQL action versions/options and
+all unchanged selected JS/TS blobs remain equal. New control consumers and all
+not-yet-executed compiled browser scenarios still execute and must succeed.
