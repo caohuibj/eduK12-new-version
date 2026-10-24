@@ -1,16 +1,19 @@
+import {deferredResearcherComponent} from './deferred-researcher-component'
 import {SurveyMaterialPicker} from './SurveyMaterialPicker'
 import {SurveyMaterialDisplay} from './SurveyMaterialDisplay'
 import {useCallback,useEffect,useRef,useState} from 'react'
 import {ArrowLeft,Pencil} from 'lucide-react'
 import {toolLibraryApi as api,ToolLibraryError,libraryKindLabel,type LibraryTool,type ToolRef} from './tool-library-api'
-import {ResearchFormEditor} from './ResearchFormEditor'
-import {ResearchScaleEditor} from './ResearchScaleEditor'
-import {ResearchPreview} from './ResearchPreview'
 import {ResearchImportGuide} from './ResearchAuthoringGuide'
 import type {FormDraft,ScaleDraft,ResearchDraft} from './builder.types'
 import type {BuilderLeaveRisk} from './SurveyBuilder'
-import {SurveyCompositionEditor} from './SurveyCompositionEditor'
 import {SurveyToolManagementGuide} from './SurveyToolManagementGuide'
+
+// Load researcher authoring/preview code only when its existing control is opened.
+const ResearchFormEditor=deferredResearcherComponent(()=>import('./ResearchFormEditor').then(module=>module.ResearchFormEditor),'表单编辑器')
+const ResearchScaleEditor=deferredResearcherComponent(()=>import('./ResearchScaleEditor').then(module=>module.ResearchScaleEditor),'量表编辑器')
+const ResearchPreview=deferredResearcherComponent(()=>import('./ResearchPreview').then(module=>module.ResearchPreview),'模拟作答')
+const SurveyCompositionEditor=deferredResearcherComponent(()=>import('./SurveyCompositionEditor').then(module=>module.SurveyCompositionEditor),'组合编辑器')
 
 type Review={ok:boolean;issues:{path?:string;line?:number;message:string}[];score?:{scores?:{key:string;value:number|null;status:string}[]}|null;unitCount?:number}
 type Batch={batchId:string;format:'TEXT'|'CSV';content:string}

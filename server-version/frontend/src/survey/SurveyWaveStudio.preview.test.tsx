@@ -2,12 +2,13 @@ import { useState } from 'react'
 import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { SurveyWaveStudio } from './SurveyWaveStudio'
+const previewModule=vi.hoisted(()=>vi.fn())
 vi.mock('./SurveyFlowStudio',()=>({SurveyFlowStudio:()=>null}))
-vi.mock('./SurveyStudyPreview',()=>({SurveyStudyPreview:({consentText,onClose}:{consentText:string;onClose:()=>void})=>{
+vi.mock('./SurveyStudyPreview',()=>{previewModule();return {SurveyStudyPreview:({consentText,onClose}:{consentText:string;onClose:()=>void})=>{
   const [step,setStep]=useState(0)
   return <section aria-label="test study preview"><p>Preview consent: {consentText}</p><p>Preview step: {step}</p>
     <button type="button" onClick={()=>setStep(step+1)}>Advance test preview</button><button type="button" onClick={onClose}>Close test preview</button></section>
-}}))
+}}})
 const draft={id:'tool1',projectId:'p1',kind:'FORM',instrumentKey:'form',title:'Test tool',status:'DRAFT',revision:1,
   definition:{schemaVersion:1,pages:[]}}
 const wave=(id='w1')=>({id,projectId:'p1',title:id==='w1'?'First wave':'Second wave',ordinal:id==='w1'?1:2,status:'DRAFT',revision:1,
@@ -38,7 +39,7 @@ async function preview(){fireEvent.click(screen.getByRole('button',{name:'预览
 afterEach(()=>vi.unstubAllGlobals())
 describe('wave preview lifecycle',()=>{
   it('unmounts an old preview before rerun and mounts a fresh snapshot after loading',async()=>{
-    const api=fixture();render(<SurveyWaveStudio projectId="p1"/>);await selectFirst();await preview()
+    const api=fixture();render(<SurveyWaveStudio projectId="p1"/>);await selectFirst();expect(previewModule).not.toHaveBeenCalled();await preview();expect(previewModule).toHaveBeenCalledOnce()
     fireEvent.click(screen.getByRole('button',{name:'Advance test preview'}))
     expect(screen.getByText('Preview step: 1')).toBeInTheDocument()
     fireEvent.change(screen.getByLabelText('参与说明与知情同意'),{target:{value:'Consent captured at rerun'}})

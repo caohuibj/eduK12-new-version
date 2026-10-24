@@ -1,11 +1,14 @@
+import {deferredResearcherComponent} from './deferred-researcher-component'
 import {useCallback,useEffect,useRef,useState} from 'react'
 import {Plus,Search,Wrench,ArrowRight,FileText,SlidersHorizontal,Layers,Pencil} from 'lucide-react'
 import {toolLibraryApi as api,libraryKindLabel,type LibraryTool,type ToolRef} from './tool-library-api'
 import type {CatalogGrant} from './ResearchCatalog'
 import {SourceProvenance} from './ResearchCatalog'
-import {SurveyToolTemplateEditor} from './SurveyToolTemplateEditor'
 import type {BuilderLeaveRisk} from './SurveyBuilder'
 import './survey-tool-library.css'
+
+// Load researcher authoring/preview code only when its existing control is opened.
+const SurveyToolTemplateEditor=deferredResearcherComponent(()=>import('./SurveyToolTemplateEditor').then(module=>module.SurveyToolTemplateEditor),'工具编辑器')
 
 type Props={visible?:boolean;projectId?:string;onSelected?:(ids:string[])=>Promise<void>;onBeforeSelect?:()=>boolean;targetLabel?:string;onLeaveRiskChange?:(risk:BuilderLeaveRisk)=>void;onNavigateLibrary?:()=>void}
 export function SurveyToolLibrary({visible=true,projectId,onSelected,onBeforeSelect,targetLabel, onLeaveRiskChange,onNavigateLibrary}:Props){

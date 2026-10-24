@@ -45,7 +45,7 @@ describe('Survey tool card inline renaming',()=>{
   fireEvent.click(screen.getByRole('button',{name:'修改名称：学习背景表单'}));fireEvent.change(screen.getByRole('textbox',{name:'工具名称'}),{target:{value:'  '}})
   expect(screen.getByRole('button',{name:'保存名称'})).toBeDisabled();fireEvent.click(screen.getByRole('button',{name:'取消'}));expect(writes()).toHaveLength(0)
   fireEvent.click(screen.getByRole('button',{name:'已获授权'}));await screen.findByRole('heading',{name:'已授权表单'});expect(screen.queryByRole('button',{name:/修改名称/})).not.toBeInTheDocument()
-  view.unmount();render(<SurveyToolLibrary projectId="p"/>);await screen.findByRole('heading',{name:'学习背景表单'});expect(screen.queryByRole('button',{name:/修改名称/})).not.toBeInTheDocument()
+  records=records.map(row=>({...row,readiness:'READY',completedRevision:row.revision}));view.unmount();render(<SurveyToolLibrary projectId="p"/>);await screen.findByRole('heading',{name:'学习背景表单'});expect(screen.queryByRole('button',{name:/修改名称/})).not.toBeInTheDocument()
  })
  it('retains a failed rename and rechecks the current revision before retrying',async()=>{
   failWrite=true;render(<SurveyToolLibrary/>);await screen.findByRole('heading',{name:'学习背景表单'});fireEvent.click(screen.getByRole('button',{name:'修改名称：学习背景表单'}))
