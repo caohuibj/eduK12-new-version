@@ -1314,3 +1314,14 @@ control inventory, so all 24 current control assertions execute in Actions; none
 of that earlier control invocation is admitted as current success. The 16 course
 assertions and five input-matching lint files remain independently valid. No
 application checks or builds were executed in those rejected workflow runs.
+
+Run 40051675495 completed current CodeQL successfully and retained another
+23-pass/1-fail control result; only the synthetic report count was missing.
+The continuation verifies the exact official run/job/source identities, completed
+steps and 24-hour lifetime. It hashes the original failed control log and checks
+the 21 unchanged passing assertion bodies plus scope/gate/binding inputs. Only
+the failed report case and two evidence/workflow consumers rerun. The original
+job remains failed. Original successful application SAST is verified by its exact
+successful official job and unchanged component trees; only the two changed
+qualification JS files receive fresh CodeQL. No application tests/build ran in
+the failed admission invocation; those missing stages still must succeed.

@@ -67,12 +67,12 @@
   },
   "controlSHA256": {
     ".github/scripts/training-admin-integration-scope.mjs": "2fcfa63c881781f0540b56b73fa1cc5d143ec3855cec7435c18353c2a22a686c",
-    ".github/scripts/training-admin-integration-checks.mjs": "70ef3846f0d07e27e6d6c05c66fd5cc16104d5ec4a10cea8f0daeeea11ec841d",
-    ".github/scripts/training-admin-integration.test.mjs": "7b5e8b242d9cf05e6bdf113a6dfbbbd155e05265ef1e8dcacac010b86b6a8e6a",
+    ".github/scripts/training-admin-integration-checks.mjs": "d1a0b6c558075b36017ad9361af12459d61adb504bd8e64a0a613e4ab891d619",
+    ".github/scripts/training-admin-integration.test.mjs": "9edcc71cd32256373331aa020a9812edfc4175501e46470058ae17cbdbe06711",
     ".github/scripts/content-scope.mjs": "55f9bfc7a9105b06c8c41869656bb4989b1517d48e724b7995a127cd30925131",
     ".github/scripts/merge-gate.mjs": "e16a420de96fd27cebd867034f8d55f487625923548f2d6b4a07eb70528dbeeb",
-    ".github/workflows/ci.yml": "9d6ea8d7cd77fe8d8f13029c4a0da00461f0cd360ea6f78c2b42cdb92e777307",
-    "docs/release/README.md": "7f915169fb06fca72b395b1f548620f87026aded503201a837de403c0c3e701b"
+    ".github/workflows/ci.yml": "11f993a42cfb76dfb800bb92f1a45c935ec7cb0d4ecd79121cfd3ed3a835f903",
+    "docs/release/README.md": "ed7589a1abb659c085d3cd4a8e7f7fd843c1f9ba8683bf8c563e59f9f3b764ac"
   },
   "limits": [
     "Original reports are unsigned local execution, not CI execution.",

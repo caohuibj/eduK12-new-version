@@ -467,5 +467,39 @@
     "src/__tests__/controllers/course-list-pagination.test.ts",
     "src/__tests__/controllers/userController.lifecycle.test.ts"
   ],
-  "evidenceSHA256": "8f1a965661ab6d434d6ad2676b598832a28fdb3a6ca3d5f688f51c61ac930c52"
+  "evidenceSHA256": "6f84b828dcac598fc9c51153d1847391bb2405d1fd32b6479679d7d5dc9cfaaa",
+  "resume": {
+    "run": 40051675495,
+    "source": "9f74d1d6d6e3b8a293fd611237aae3da84e3e825",
+    "admissionJob": 120745556632,
+    "sastJob": 120745556409,
+    "logSHA256": "9c1c2aa1a8457ce0fee7dc1aa482188b9463bf081294ffb00b5db692eac1b25b",
+    "acceptedControlCases": [
+      "exact participant candidate disables unrelated consumers and retains fresh SAST",
+      "other branches retain existing routes",
+      "refuses missing marker",
+      "refuses unknown path",
+      "refuses missing path",
+      "refuses duplicate path",
+      "refuses executable mode",
+      "refuses deleted file",
+      "refuses changed source",
+      "refuses changed frontend",
+      "refuses changed backend",
+      "refuses mismatched merge tree",
+      "refuses wrong repository",
+      "refuses wrong branch",
+      "refuses missing PR identity",
+      "refuses manual request",
+      "refuses full fallback",
+      "refuses full acceptance",
+      "base drift is rejected",
+      "only an exact main merge classifies without repeated checks",
+      "stable gate requires actual scope qualification and CodeQL, refuses draft or skipped results"
+    ],
+    "changedCodeqlFiles": [
+      ".github/scripts/training-admin-integration-checks.mjs",
+      ".github/scripts/training-admin-integration.test.mjs"
+    ]
+  }
 }

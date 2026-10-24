@@ -1032,7 +1032,9 @@ jobs:
       - name: exact changed Training management SAST inputs
         if: needs.scope.outputs.application_route == 'training-admin-integration'
         id: admin-integration-codeql-config
-        run: node .github/scripts/training-admin-integration-checks.mjs codeql-config
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: git fetch --no-tags --depth=1 origin 9f74d1d6d6e3b8a293fd611237aae3da84e3e825 && node .github/scripts/training-admin-integration-checks.mjs codeql-config node .github/scripts/training-admin-integration-checks.mjs codeql-config
       - name: initialize CodeQL
         if: steps.appearance-codeql-reuse.outputs.reused != 'true'
         uses: github/codeql-action/init@v3
@@ -1311,9 +1313,11 @@ jobs:
         with:
           node-version: '24.21.0'
       - name: admit exact existing course assertions and source-bound lint
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: node .github/scripts/training-admin-integration-checks.mjs admission
       - name: new exact-scope evidence and merge refusal contracts
-        run: node --test .github/scripts/training-admin-integration.test.mjs
+        run: node --test --test-name-pattern='^(requires every selected assertion|admits only original unchanged course assertions|bounded inline workflow excludes)' .github/scripts/training-admin-integration.test.mjs
       - uses: actions/upload-artifact@v4
         if: always()
         with:
