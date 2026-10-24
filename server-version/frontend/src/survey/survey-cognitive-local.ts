@@ -1,5 +1,3 @@
-import { finalDraftStore } from '../services/persistence/finalDraftStore'
-
 // Technical IDs only, scoped to this public research project. This registry lets
 // withdrawal clean known Survey trials without touching any other product's drafts.
 type LocalSession={attemptId:string;sessionId:string;researchCode?:string}
@@ -19,13 +17,19 @@ export function rememberSurveyCognitiveSession(publicId:string,attemptId:string,
 }
 export async function clearSurveyCognitiveSessions(publicId:string,attemptId?:string,knownIds:string[]=[],researchCode?:string):Promise<boolean>{
   const rows=read(publicId),ids=new Set([...knownIds,...rows.filter(r=>attemptId?r.attemptId===attemptId:!!researchCode&&r.researchCode===researchCode).map(r=>r.sessionId)])
+  // Text-only attempts have no cognitive drafts and do not need IndexedDB code.
+  if(!ids.size)return true
+  let store:typeof import('../services/persistence/finalDraftStore')
+  try{store=await import('../services/persistence/finalDraftStore')}catch{return false}
+  const {finalDraftStore}=store
   const deleted=new Set<string>()
   await Promise.all([...ids].map(async id=>{try{await finalDraftStore.delete('cognitive:'+id);deleted.add(id)}catch{/* preserve registry for a later cleanup retry */}}))
   write(publicId,read(publicId).filter(r=>!deleted.has(r.sessionId)))
   return deleted.size===ids.size
 }
 export async function clearSurveyCognitiveSession(publicId:string,sessionId:string):Promise<boolean>{
-  try{await finalDraftStore.delete('cognitive:'+sessionId)
+  try{const {finalDraftStore}=await import('../services/persistence/finalDraftStore')
+    await finalDraftStore.delete('cognitive:'+sessionId)
     write(publicId,read(publicId).filter(r=>r.sessionId!==sessionId));return true
   }catch{return false}
 }
