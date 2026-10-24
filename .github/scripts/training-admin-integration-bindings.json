@@ -415,7 +415,6 @@
     ".github/scripts/training-admin-integration-scope.mjs",
     ".github/scripts/training-admin-integration-checks.mjs",
     ".github/scripts/training-admin-integration.test.mjs",
-    ".github/workflows/ci-training-admin-integration.yml",
     ".github/evidence/training-admin-integration/reviewed-local.json",
     ".github/scripts/content-scope.mjs",
     ".github/scripts/merge-gate.mjs",
@@ -468,5 +467,5 @@
     "src/__tests__/controllers/course-list-pagination.test.ts",
     "src/__tests__/controllers/userController.lifecycle.test.ts"
   ],
-  "evidenceSHA256": "bd59a559fd6060f4bf0320390a85727f495d0606ec84909d1715df0bed2e61b9"
+  "evidenceSHA256": "fe719a569b6408f47f509c1355c595c8fd73562189b16653c4c0f6250ee230bc"
 }

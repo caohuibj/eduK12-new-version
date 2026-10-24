@@ -1306,10 +1306,11 @@ stages block merging. Exact main push only classifies without repeating checks.
 At about five minutes report the actual waiting stage and retry affected failures
 only, admitting successful current official artifacts on unchanged stage inputs.
 
-Control preparation retained a local 23-pass/1-fail result. The failed synthetic
-report fixture lacked its suite status; only that fixture is repaired. Twenty-one
-unchanged scope/gate assertions are admitted from the explicit observed tool
-result and frozen test-body/scope/gate/binding inputs; the original nonzero exit
-is preserved and is not called a successful invocation or a reporter file.
-Actions runs the failed report case and two cases consuming changed evidence or
-workflow inputs. This does not repeat the 21 unchanged control assertions.
+Control preparation retained a local 23-pass/1-fail result; the failed synthetic
+report fixture lacked its suite status. GitHub runs 40051388967/40051428914 then
+rejected the 51st reusable workflow before any job ran. The bounded jobs are now
+inlined in the existing CI, retaining the 50-reference limit. This changes the
+control inventory, so all 24 current control assertions execute in Actions; none
+of that earlier control invocation is admitted as current success. The 16 course
+assertions and five input-matching lint files remain independently valid. No
+application checks or builds were executed in those rejected workflow runs.
