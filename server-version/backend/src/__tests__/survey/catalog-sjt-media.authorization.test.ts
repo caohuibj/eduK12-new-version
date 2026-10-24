@@ -5,7 +5,9 @@ import { adaptCatalogSjt } from '../../modules/survey/catalog.sources'
 import { compileCatalogUnit } from '../../modules/survey/catalog.service'
 import { authorizedCatalogSjtMedia } from '../../modules/survey/catalog-sjt-media.authorization'
 import { assertSurveyMediaOwned } from '../../modules/survey/media.references'
-const h = vi.hoisted(() => ({ snapshots: vi.fn() }))
+const h = vi.hoisted(() => ({ snapshots: vi.fn(), authority:vi.fn() }))
+vi.mock('../../modules/situational/entry-authority',async original=>({...await original<object>(),recheckSjtEntryDistributionAuthority:h.authority}))
+import {SjtEntryAuthorityError} from '../../modules/situational/entry-authority'
 vi.mock('../../modules/survey/catalog.service', async original => ({ ...await original<object>(), catalogSnapshotsForDrafts: h.snapshots }))
 const identity = { assetId: 'source-image', contentHash: 'a'.repeat(64), mimeType: 'image/png' }
 const image = { asset: identity, altText: '情境图', rightsStatus: 'self_authored', rightsNote: 'synthetic source' }
@@ -41,6 +43,20 @@ describe('catalog SJT media authority is release-bound, not asset-ID borrowing',
   it.each(['COURSE_GRANT_V1', 'FUTURE', undefined])('never replaces source permission policy %s with a Survey grant', async policy => {
     const { db, unit, release } = setup(); Object.assign(release, { authorizationPolicy: policy })
     await expect(authorizedCatalogSjtMedia(db as never, 'researcher', unit)).rejects.toThrow('SOURCE_SJT_MEDIA_AUTHORIZATION_REQUIRED')
+  })
+  it('accepts only the exact separately authorized Survey source and retains private asset checks',async()=>{
+    const {db,unit,release,snapshot,asset}=setup()
+    Object.assign(release,{authorizationPolicy:'COURSE_GRANT_V1'})
+    const receipt={protocol:'sjt-survey-distribution-v1',grantId:'exact-capability'}
+    snapshot.provenance.sjtEntryAuthority=receipt
+    unit.sourceProvenance!.sjtEntryAuthority=receipt
+    h.authority.mockResolvedValue(undefined)
+    expect(await authorizedCatalogSjtMedia(db as never,'researcher',unit)).toEqual([identity])
+    expect(h.authority).toHaveBeenCalledWith(db,receipt)
+    h.authority.mockRejectedValueOnce(new SjtEntryAuthorityError('SOURCE_SJT_ENTRY_AUTHORITY_REQUIRED'))
+    await expect(authorizedCatalogSjtMedia(db as never,'researcher',unit)).rejects.toThrow('SOURCE_SJT_MEDIA_AUTHORIZATION_REQUIRED')
+    asset.accessScope='PUBLIC'
+    await expect(authorizedCatalogSjtMedia(db as never,'researcher',unit)).rejects.toThrow('SOURCE_SJT_MEDIA_AUTHORIZATION_REQUIRED')
   })
   it('rejects missing source retention, altered hash, public or deleted assets', async () => {
     const { db, unit, asset } = setup(); db.assetReference.findMany.mockResolvedValueOnce([])

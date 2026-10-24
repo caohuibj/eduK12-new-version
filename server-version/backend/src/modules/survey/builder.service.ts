@@ -1,3 +1,4 @@
+import {recheckCatalogSjtSourceAuthority} from './catalog.sources'
 import { previewScaleRawScoreFeedback } from '../scale/raw-score-feedback-preview'
 import { compileResearchScale } from './builder.compiler'
 import {catalogSnapshotsForDrafts,compileCatalogUnit,researcherCatalog} from './catalog.service'
@@ -127,11 +128,12 @@ export async function copyDraft(userId:string,projectId:string,id:string,input:{
     await authorizedProject(tx,userId,projectId,true)
     const from=await findDraft(tx,projectId,id)
     if(!from.catalogGrantId&&!['FORM','SCALE'].includes(from.kind))fail(403,'SJT 与认知测验暂不开放复制自建')
-    await catalogSnapshotsForDrafts(tx,userId,from.catalogGrantId?[from.catalogGrantId]:[])
+    const sources=await catalogSnapshotsForDrafts(tx,userId,from.catalogGrantId?[from.catalogGrantId]:[])
     const prior=await tx.surveyInstrumentDraft.findUnique({where:{id:input.requestId}})
     if(prior){
       if(prior.projectId!==projectId||prior.instrumentKey!==input.instrumentKey||prior.title!==input.title)
         fail(409,'复制请求冲突')
+      await recheckCatalogSjtSourceAuthority(tx,sources.values())
       return publicRow(prior)
     }
     if(input.instrumentKey===from.instrumentKey)fail(409,'新的独立研究工具必须拥有新的工具编码')
@@ -146,6 +148,7 @@ export async function copyDraft(userId:string,projectId:string,id:string,input:{
     }})
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:userId,projectId,action:'INSTRUMENT_COPIED',
       metadata:{instrumentId:created.id,copiedFrom:id}}})
+    await recheckCatalogSjtSourceAuthority(tx,sources.values())
     return publicRow(created)
   })
 }
@@ -288,6 +291,7 @@ export async function importCatalogDraft(userId:string,projectId:string,grantId:
     if(prior){
       if(prior.projectId!==projectId||prior.catalogGrantId!==grantId||prior.instrumentKey!==input.instrumentKey||prior.title!==input.title)
         fail(409,'导入请求标识已用于其他内容')
+      await recheckCatalogSjtSourceAuthority(tx,sources.values())
       return {...publicRow(prior),sourceProvenance:compileCatalogUnit(prior,source).sourceProvenance}
     }
     const row=await tx.surveyInstrumentDraft.create({data:{id:input.requestId,projectId,
@@ -295,6 +299,7 @@ export async function importCatalogDraft(userId:string,projectId:string,grantId:
       definition:source.displayDefinition as Prisma.InputJsonValue,catalogGrantId:grantId}})
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId:userId,projectId,
       action:'CATALOG_TOOL_IMPORTED',metadata:{grantId,instrumentId:row.id,sourceDigest:source.definitionDigest}}})
+    await recheckCatalogSjtSourceAuthority(tx,sources.values())
     return {...publicRow(row),sourceProvenance:compileCatalogUnit(row,source).sourceProvenance}
   })
 }

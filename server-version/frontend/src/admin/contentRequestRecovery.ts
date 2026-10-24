@@ -38,6 +38,10 @@ export function isContentGrant(value: unknown): value is AdminContentGrant {
     if (scope.product === 'TRAINING' && scope.resourceKind === 'catalog') allowed = ['catalog.manage']
     if (scope.resourceKind === 'material') allowed = ['material.distribute']
   }
+  if (scope.product === 'SURVEY' && scope.scopeKind === 'PLATFORM' && scope.scopeId === 'situational-library-governance'
+    && scope.resourceKind === 'material' && value.remainingDelegationDepth === 0 && value.delegableCapabilities.length === 0) {
+    allowed = ['material.distribute']
+  }
   return value.capabilities.every(capability => allowed.includes(capability))
 }
 export function isContentMetadata(value: unknown): value is AdminContentGrantMetadata {

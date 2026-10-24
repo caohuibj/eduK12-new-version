@@ -40,7 +40,7 @@ describe('bounded source catalog pagination',()=>{
     expect(result.list.every(row=>!row.available&&row.unsupportedReason==='SOURCE_SCALE_EXPLICIT_CONVERSION_REQUIRED')).toBe(true)
     expect(result.list.map(row=>row.ref.sourceId)).toEqual(Array.from({length:count},(_,i)=>'source-'+String((page-1)*25+i+1).padStart(4,'0')))
     expect(db.$queryRaw).toHaveBeenCalledTimes(1) // Current administrator authority remains mandatory.
-    expect(db.scale.findMany).toHaveBeenCalledExactlyOnceWith({where:{status:'PUBLISHED'},orderBy:{id:'asc'},skip:(page-1)*25,take:26})
+    expect(db.scale.findMany).toHaveBeenCalledExactlyOnceWith({where:{status:'PUBLISHED',instrumentClass:'STANDARD'},orderBy:{id:'asc'},skip:(page-1)*25,take:26})
     expect(db.scale.findFirst).not.toHaveBeenCalled()
   })
   it.each([1001,987,975])('rejects page 41 before a source query instead of repeating page 40 ($0 sources)',async(total)=>{

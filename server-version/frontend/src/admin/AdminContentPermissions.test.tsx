@@ -246,3 +246,74 @@ describe('exact scale library authority',()=>{
   await waitFor(()=>expect(mocks.post).toHaveBeenCalledWith('/admin/permissions/content-grants',request))
  })
 })
+
+describe('exact nondelegable Survey SJT distribution preset',()=>{
+ const request=()=>({requestId:id(8),expectedVersion:0,reason:'独立 Survey 入口授权',grant:{subjectId:id(1),scope:{product:'SURVEY',scopeKind:'PLATFORM',scopeId:'situational-library-governance',resourceKind:'material',resourceKeys:[id(3)]},capabilities:['material.distribute'],delegableCapabilities:[] as string[],remainingDelegationDepth:0,validFrom:'2098-10-20T06:00:00Z',expiresAt:'2098-10-21T06:00:00Z'}})
+ function selectPreset(){fireEvent.change(screen.getByLabelText('Survey 授权用途'),{target:{value:'sjt-distribute'}})}
+ function fillPreset(){
+  for(const [label,value] of [['目标 Survey 入口管理员 UUID',id(1)],['精确资源 UUID（逗号或换行分隔）',id(3)],['生效时间（本地时间）','2098-10-20T06:00'],['到期时间（本地时间）','2098-10-21T06:00'],['内容授权原因','独立 Survey 入口授权']])fireEvent.change(screen.getByLabelText(label),{target:{value}})
+ }
+ it('requires explicit confirmation for only Survey material.distribute over exact releases without delegation',async()=>{
+  render(<AdminContentPermissions actorId={id(9)}/>);selectPreset();fillPreset()
+  expect(mocks.post).not.toHaveBeenCalled();expect(mocks.get).not.toHaveBeenCalled()
+  expect(screen.queryByLabelText('项目 UUID')).not.toBeInTheDocument();expect(screen.queryByLabelText('课程 UUID')).not.toBeInTheDocument()
+  expect(screen.queryByLabelText('资源类型')).not.toBeInTheDocument();expect(screen.queryByLabelText('允许上述能力一层受限委派')).not.toBeInTheDocument()
+  expect(screen.getByText(/不升级现有课程授权/)).toBeInTheDocument()
+  vi.mocked(window.confirm).mockReturnValueOnce(false)
+  fireEvent.click(screen.getByRole('button',{name:'确认签发内容授权'}));expect(mocks.post).not.toHaveBeenCalled()
+  fireEvent.click(screen.getByRole('button',{name:'确认签发内容授权'}))
+  await waitFor(()=>expect(mocks.post).toHaveBeenCalledTimes(1))
+  expect(mocks.post.mock.calls[0][1]).toMatchObject({...request(),requestId:expect.any(String),grant:{...request().grant,validFrom:new Date('2098-10-20T06:00').toISOString(),expiresAt:new Date('2098-10-21T06:00').toISOString()}})
+  expect(window.confirm).toHaveBeenLastCalledWith(expect.stringContaining('situational-library-governance'))
+  expect(window.confirm).toHaveBeenLastCalledWith(expect.stringContaining('不允许委派'))
+ })
+ it('clears old resources/capabilities/delegation and does not carry the new preset across products',()=>{
+  render(<AdminContentPermissions actorId={id(9)}/>);fill();fireEvent.click(screen.getByLabelText('reference.review'));fireEvent.click(screen.getByLabelText('允许上述能力一层受限委派'))
+  selectPreset()
+  expect(screen.getByLabelText('精确资源 UUID（逗号或换行分隔）')).toHaveValue('')
+  expect(screen.queryByLabelText('reference.review')).not.toBeInTheDocument()
+  fireEvent.change(screen.getByLabelText('产品授权范围'),{target:{value:'TRAINING'}})
+  expect(screen.getByLabelText('Training 授权用途')).toHaveValue('report');expect(screen.getByLabelText('课程 UUID')).toHaveValue('')
+  expect(screen.getByLabelText('report.publish')).not.toBeChecked();expect(screen.getByLabelText('允许上述能力一层受限委派')).not.toBeChecked()
+  expect(screen.queryByRole('option',{name:'SJT 精确版本入口分发'})).not.toBeInTheDocument()
+  fireEvent.change(screen.getByLabelText('产品授权范围'),{target:{value:'SURVEY'}})
+  expect(screen.getByLabelText('Survey 授权用途')).toHaveValue('report');expect(screen.getByLabelText('项目 UUID')).toHaveValue('')
+ })
+ it('restores and retries the exact response-lost request after remount, preserving its nondelegable scope',async()=>{
+  mocks.post.mockRejectedValueOnce(new Error('response lost'))
+  const view=render(<AdminContentPermissions actorId={id(9)}/>);selectPreset();fillPreset()
+  fireEvent.click(screen.getByRole('button',{name:'确认签发内容授权'}));await screen.findByRole('alert')
+  const issued=mocks.post.mock.calls[0][1];view.unmount();render(<AdminContentPermissions actorId={id(9)}/>)
+  expect(screen.getByLabelText('Survey 授权用途')).toHaveValue('sjt-distribute');expect(screen.getByLabelText('Survey 授权用途')).toBeDisabled()
+  expect(screen.getByLabelText('目标 Survey 入口管理员 UUID')).toHaveValue(id(1));expect(screen.getByLabelText('精确资源 UUID（逗号或换行分隔）')).toHaveValue(id(3))
+  fireEvent.click(screen.getByRole('button',{name:'重试同一签发请求'}));await waitFor(()=>expect(mocks.post).toHaveBeenCalledTimes(2))
+  expect(mocks.post.mock.calls[1][1]).toEqual(issued)
+ })
+ it('reads exact metadata to resolve unknown issuance, then permits explicit versioned revocation',async()=>{
+  const pending=request()
+  sessionStorage.setItem('admin-content-pending:'+id(9),JSON.stringify({actorId:id(9),request:pending,hadUnknownOutcome:true}))
+  mocks.get.mockResolvedValue({data:{...pending.grant,grantId:pending.requestId,issuerId:id(9),parentGrantId:null,version:1,revokedAt:null}})
+  render(<AdminContentPermissions actorId={id(9)}/>);fireEvent.click(screen.getByRole('button',{name:'读取授权元数据'}))
+  await screen.findByRole('button',{name:'按已读记录结束待核对请求'});fireEvent.click(screen.getByRole('button',{name:'按已读记录结束待核对请求'}))
+  expect(sessionStorage.getItem('admin-content-pending:'+id(9))).toBeNull();expect(mocks.post).not.toHaveBeenCalled()
+  fireEvent.change(screen.getByLabelText('撤销原因'),{target:{value:'撤销精确入口分发'}});fireEvent.click(screen.getByRole('button',{name:'确认撤销已读授权'}))
+  await waitFor(()=>expect(mocks.post).toHaveBeenCalledWith('/admin/permissions/content-grants/'+pending.requestId+'/revoke',{expectedVersion:1,reason:'撤销精确入口分发'}))
+ })
+ it.each(['training','course','project','scope','resource-kind','wildcard','duplicate','capabilities','delegation-depth','delegable'])('blocks altered stored SJT distribution request: %s',variant=>{
+  const pending=request()
+  if(variant==='training')pending.grant.scope.product='TRAINING'
+  if(variant==='course')pending.grant.scope.scopeKind='COURSE'
+  if(variant==='project')pending.grant.scope.scopeKind='PROJECT'
+  if(variant==='scope')pending.grant.scope.scopeId='situational-registry'
+  if(variant==='resource-kind')pending.grant.scope.resourceKind='measurement'
+  if(variant==='wildcard')pending.grant.scope.resourceKeys=['*']
+  if(variant==='duplicate')pending.grant.scope.resourceKeys=[id(3),id(3)]
+  if(variant==='capabilities')pending.grant.capabilities.push('material.adapt')
+  if(variant==='delegation-depth')pending.grant.remainingDelegationDepth=1
+  if(variant==='delegable')pending.grant.delegableCapabilities=['material.distribute']
+  sessionStorage.setItem('admin-content-pending:'+id(9),JSON.stringify({actorId:id(9),request:pending,hadUnknownOutcome:true}))
+  render(<AdminContentPermissions actorId={id(9)}/>)
+  expect(screen.getByRole('button',{name:'确认签发内容授权'})).toBeDisabled();expect(screen.getByRole('alert')).toHaveTextContent('保存的请求无法恢复')
+  expect(mocks.post).not.toHaveBeenCalled()
+ })
+})

@@ -1,3 +1,5 @@
+import { assertSjtEntryDistributionAuthority, recheckSjtEntryDistributionAuthority, SjtEntryAuthorityError } from '../situational/entry-authority'
+import { SJT_COURSE_GRANT_POLICY } from '../situational/authoring/grant-contract'
 import { compileSurveyNativeSituationalHeader,type SurveyNativeSituationalHeader } from './situational-native.definition'
 import { SURVEY_NATIVE_SJT_PROTOCOL,SurveySituationalProtocolError } from './situational-native.contract'
 import {canonicalScalePresentation} from './catalog-scale.presentation'
@@ -250,7 +252,7 @@ async function lockCatalogSourceRows(refs:CatalogSourceRef[],db:Database):Promis
   }
 
 }
-async function readCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSourceRef},db:Database,verifiedFormScope:boolean,scaleAuthorityDb:Database=db,scaleReleases?:ReadonlyMap<string,StoredRelease>):Promise<CatalogSourceSnapshot>{
+async function readCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSourceRef;pinnedSjtAuthority?:unknown},db:Database,verifiedFormScope:boolean,scaleAuthorityDb:Database=db,scaleReleases?:ReadonlyMap<string,StoredRelease>):Promise<CatalogSourceSnapshot>{
   const {ref}=input
   if(ref.kind==='SCALE'){
     const row=await db.scale.findFirst({where:{id:ref.sourceId,instrumentVersion:ref.sourceVersion,status:'PUBLISHED'}})
@@ -269,18 +271,25 @@ async function readCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSo
   }
   if(ref.kind==='SJT'){
     let pkg:SituationPackage|undefined
+    let entryAuthority:Awaited<ReturnType<typeof assertSjtEntryDistributionAuthority>>|undefined
     if(ref.sourceId.startsWith('registry:'))pkg=getSituationPackage(ref.sourceId.slice(9),ref.sourceVersion)
     else{
       const row=await db.sjtAuthorRelease.findFirst({where:{id:ref.sourceId,instrumentVersion:ref.sourceVersion,status:'PUBLISHED'}})
       if(row){
-        if(row.authorizationPolicy!==null)fail('SOURCE_SJT_AUTHORIZATION_POLICY_UNSUPPORTED')
+        if(row.authorizationPolicy===SJT_COURSE_GRANT_POLICY){
+          try{entryAuthority=await assertSjtEntryDistributionAuthority(scaleAuthorityDb as Prisma.TransactionClient,{
+            actorId:input.actorUserId,releaseId:row.id,instrumentVersion:ref.sourceVersion,
+            ...(input.pinnedSjtAuthority!==undefined?{pinned:input.pinnedSjtAuthority}:{})})}
+          catch(error){if(error instanceof SjtEntryAuthorityError)throw new CatalogSourceError(error.code,403);throw error}
+        }else if(row.authorizationPolicy!==null||input.pinnedSjtAuthority!==undefined)fail('SOURCE_SJT_AUTHORIZATION_POLICY_UNSUPPORTED')
         pkg=row.package as unknown as SituationPackage
         const checked=validateSituationPackage(pkg)
         if(!checked.valid||checked.definitionHash!==row.definitionHash||pkg.key!==row.instrumentKey||pkg.instrumentVersion!==row.instrumentVersion)fail('SOURCE_SJT_RELEASE_DIGEST_MISMATCH')}
     }
     if(!pkg||pkg.releaseStatus!=='PUBLISHED')fail('SOURCE_NOT_PUBLISHED')
     if(isAssessmentOperationallyPaused({family:'SITUATIONAL',key:pkg!.key,version:ref.sourceVersion}))fail('SOURCE_OPERATIONALLY_PAUSED')
-    return adaptCatalogSjt(ref,pkg!.definition.source.title||pkg!.key,pkg!)
+    const result=adaptCatalogSjt(ref,pkg!.definition.source.title||pkg!.key,pkg!)
+    return entryAuthority?{...result,provenance:{...result.provenance,sjtEntryAuthority:entryAuthority}}:result
   }
   if(ref.kind==='COGNITIVE'){
     const row=await db.cognitiveTestConfig.findFirst({where:{id:ref.sourceId,configVersion:ref.sourceVersion,status:'PUBLISHED'}})
@@ -306,6 +315,7 @@ async function readCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSo
 /** Administrative caller owns authorization; omitted kind selects Scale, never a cross-product scan. */
 export async function listCatalogSources(input:{actorUserId:string;kind?:SurveyKind;organizationId?:string;page?:number;limit?:number},db:Database=prisma):Promise<CatalogSourcePage>{
   const kind=input.kind??'SCALE'
+  if(kind==='SJT'&&db===prisma)return prisma.$transaction(tx=>listCatalogSources(input,tx))
   const limit=Math.min(25,Math.max(1,Math.floor(input.limit||25))),page=Math.max(1,Math.floor(input.page||1))
   if(page>CATALOG_MAX_PAGE)throw new CatalogSourceError('SOURCE_CATALOG_PAGE_LIMIT_EXCEEDED',400)
   const offset=(page-1)*limit,take=limit+1,refs:Array<{ref:CatalogSourceRef;title:string}>=[]
@@ -382,9 +392,9 @@ export async function assertCatalogSourcesCurrent(entries:Array<{snapshot:Catalo
   } as unknown as Database
   const verified=new Map<string,CatalogSourceSnapshot>()
   for(const entry of entries){
-    const key=canonicalHash({ref:entry.snapshot.ref,actorUserId:entry.actorUserId})
+    const key=canonicalHash({ref:entry.snapshot.ref,actorUserId:entry.actorUserId,pinnedSjtAuthority:entry.snapshot.provenance.sjtEntryAuthority??null})
     let current=verified.get(key)
-    if(!current){current=await readCatalogSourceSnapshot({actorUserId:entry.actorUserId,ref:entry.snapshot.ref},cached,true,db,scaleReleases);verified.set(key,current)}
+    if(!current){current=await readCatalogSourceSnapshot({actorUserId:entry.actorUserId,ref:entry.snapshot.ref,pinnedSjtAuthority:entry.snapshot.provenance.sjtEntryAuthority},cached,true,db,scaleReleases);verified.set(key,current)}
     // Whole immutable adapter identity includes original scorer, presentation, typed mapping and provenance.
     if(canonicalHash(catalogAdapterForRecheck(current,entry.snapshot))!==canonicalHash(entry.snapshot))fail('SOURCE_SNAPSHOT_CHANGED')
   }
@@ -402,5 +412,19 @@ export async function recheckCatalogScaleSourceExpiry(db:Prisma.TransactionClien
     const rights=snapshot.provenance.sourceRights as {validFrom?:string;validTo?:string}|undefined
     const from=Date.parse(rights?.validFrom??''),to=Date.parse(rights?.validTo??'')
     if(!Number.isFinite(from)||!Number.isFinite(to)||clock.now.getTime()<from||clock.now.getTime()>=to)fail('SOURCE_SCALE_LICENSE_EXPIRED')
+  }
+}
+
+/** Same-transaction final fence after asset/publication waits. The pinned grant
+ * never changes to another grant; frozen participant reads do not call this. */
+export async function recheckCatalogSjtSourceAuthority(db:Prisma.TransactionClient,snapshots:Iterable<CatalogSourceSnapshot>){
+  const seen=new Set<string>()
+  for(const snapshot of snapshots){
+    const receipt=snapshot.provenance.sjtEntryAuthority
+    if(snapshot.ref.kind!=='SJT'||receipt===undefined)continue
+    const key=canonicalHash(receipt);if(seen.has(key))continue
+    seen.add(key)
+    try{await recheckSjtEntryDistributionAuthority(db,receipt)}
+    catch(error){if(error instanceof SjtEntryAuthorityError)throw new CatalogSourceError(error.code,403);throw error}
   }
 }

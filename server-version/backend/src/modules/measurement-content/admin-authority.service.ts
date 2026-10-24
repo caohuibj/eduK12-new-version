@@ -1,4 +1,5 @@
 import {validateStaticSjtRegistryMappings} from '../situational/static-measurement-release'
+import {readSjtEntryDistributionSource,SjtEntryAuthorityError} from '../situational/entry-authority'
 import {randomUUID} from 'node:crypto'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
@@ -12,9 +13,11 @@ const wireGrant=z.object({ ...contentGrantInputSchema.shape,
   validFrom:z.string().datetime().transform(value=>new Date(value)),
   expiresAt:z.string().datetime().transform(value=>new Date(value)),
 }).strict().pipe(contentGrantInputSchema).superRefine((grant,ctx)=>{
-  if(!supported(grant)||!uuid.safeParse(grant.subjectId).success||(!platformSjt(grant)&&!platformReference(grant)&&!platformScaleLibrary(grant)&&!platformScalePublic(grant)&&!uuid.safeParse(grant.scope.scopeId).success)||
+  if(!supported(grant)||!uuid.safeParse(grant.subjectId).success||(!platformSjt(grant)&&!platformReference(grant)&&!platformScaleLibrary(grant)&&!platformScalePublic(grant)&&!platformSjtDistribution(grant)&&!uuid.safeParse(grant.scope.scopeId).success)||
     grant.scope.resourceKeys.some(key=>!uuid.safeParse(key).success))
-    ctx.addIssue({code:'custom',message:'Only exact Survey project, Training course, formal reference governance or installed situational measurement grants are supported'})
+    ctx.addIssue({code:'custom',message:'Only exact Survey project, Training course, formal reference governance, installed situational measurement or entry distribution grants are supported'})
+  if(platformSjtDistribution(grant)&&(grant.remainingDelegationDepth!==0||grant.delegableCapabilities.length!==0))
+    ctx.addIssue({code:'custom',message:'Situational entry distribution does not support delegation'})
 })
 export const adminContentRootRequestSchema=z.object({requestId:uuid,expectedVersion:z.literal(0),reason,grant:wireGrant}).strict()
 export const adminContentRevokeRequestSchema=z.object({expectedVersion:z.number().int().positive(),reason}).strict()
@@ -39,8 +42,12 @@ function platformScalePublic(grant:Pick<ContentGrantInput,'scope'|'capabilities'
   return grant.scope.product==='TRAINING'&&grant.scope.scopeKind==='PLATFORM'&&grant.scope.scopeId==='scale-public-delivery'&&
     grant.scope.resourceKind==='material'&&grant.capabilities.length===1&&grant.capabilities[0]==='material.distribute'
 }
+function platformSjtDistribution(grant:Pick<ContentGrantInput,'scope'|'capabilities'>){
+  return grant.scope.product==='SURVEY'&&grant.scope.scopeKind==='PLATFORM'&&grant.scope.scopeId==='situational-library-governance'
+    &&grant.scope.resourceKind==='material'&&grant.capabilities.length===1&&grant.capabilities[0]==='material.distribute'
+}
 function supported(grant:Pick<ContentGrantInput,'scope'|'capabilities'>){
-  if(platformSjt(grant)||platformReference(grant)||platformScaleLibrary(grant)||platformScalePublic(grant))return true
+  if(platformSjt(grant)||platformReference(grant)||platformScaleLibrary(grant)||platformScalePublic(grant)||platformSjtDistribution(grant))return true
   if(grant.scope.product==='TRAINING')return grant.scope.scopeKind==='COURSE'&&(
     grant.scope.resourceKind==='report'&&grant.capabilities.every(capability=>['report.edit','report.publish'].includes(capability))||
     grant.scope.resourceKind==='reference'&&grant.capabilities.every(capability=>['reference.analyze','reference.review','reference.publish'].includes(capability))||
@@ -80,7 +87,7 @@ function storedInput(row:GrantRow):ContentGrantInput{return contentGrantInputSch
 const comparable=(grant:ContentGrantInput)=>({...grant,validFrom:grant.validFrom.toISOString(),expiresAt:grant.expiresAt.toISOString()})
 /** Root issuance only. No administrator/owner identity implicitly acquires rights. */
 export async function issueAdminContentRoot(actorId:string,proof:AdminSessionProof,raw:unknown){
-  const input=adminContentRootRequestSchema.parse(raw),grant=input.grant,scope=grant.scope,isPlatformSjt=platformSjt(grant),isPlatformReference=platformReference(grant),isLibrary=platformScaleLibrary(grant),isScalePublic=platformScalePublic(grant)
+  const input=adminContentRootRequestSchema.parse(raw),grant=input.grant,scope=grant.scope,isPlatformSjt=platformSjt(grant),isPlatformReference=platformReference(grant),isLibrary=platformScaleLibrary(grant),isScalePublic=platformScalePublic(grant),isSjtDistribution=platformSjtDistribution(grant)
   assertProof(proof)
   return prisma.$transaction(async tx=>{
     // Match consumers: Project/Course → Users → composites/deliveries → grants/resources.
@@ -92,7 +99,7 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
       if(mappings.length!==scope.resourceKeys.length||mappings.some(row=>!scope.resourceKeys.includes(row.id)))deny()
       registryResources=mappings
     }
-    const projects=isPlatformSjt||isPlatformReference||isLibrary||isScalePublic?[{id:scope.scopeId}]:scope.product==='TRAINING'
+    const projects=isPlatformSjt||isPlatformReference||isLibrary||isScalePublic||isSjtDistribution?[{id:scope.scopeId}]:scope.product==='TRAINING'
       ?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM courses
         WHERE id=${scope.scopeId} AND creator_id=${grant.subjectId} AND course_type='TRAINING_COURSE' AND NOT is_library FOR SHARE`)
       :await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM survey_projects
@@ -101,7 +108,7 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
     const {users}=await lockActor(tx,actorId,proof,grant.subjectId)
     const target=users.find(user=>user.id===grant.subjectId)
     if(!target||!target.is_active||target.is_frozen||target.must_change_password)deny()
-    if(isLibrary||isScalePublic){
+    if(isLibrary||isScalePublic||isSjtDistribution){
       if(!['TRAINING','LEGACY'].includes(target.account_domain))deny()
       if(grant.scope.resourceKind==='material'){
         const entry=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM admin_entry_grants WHERE user_id=${grant.subjectId} AND entry=${scope.product} AND revoked_at IS NULL FOR SHARE`)
@@ -143,7 +150,22 @@ export async function issueAdminContentRoot(actorId:string,proof:AdminSessionPro
           &&attemptParents.some(prior=>prior.id===row.id&&prior.composite_assessment_id===row.composite_assessment_id))
       }else trainingResources=authorizedParents
     }
-    const resources=isScalePublic?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM scales WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND instrument_class='CUSTOM_DESCRIPTIVE' ORDER BY id FOR SHARE`)
+    const distributionResources:Array<{id:string}>=[]
+    if(isSjtDistribution){
+      // Deterministic source SHARE locks, after Users and before root insertion.
+      // A course grant, registry mapping or arbitrary release ID is not authority.
+      for(const measurementReleaseId of [...scope.resourceKeys].sort()){
+        try{
+          const source=await readSjtEntryDistributionSource(tx,measurementReleaseId)
+          if(source.measurementReleaseId!==measurementReleaseId)deny()
+          distributionResources.push({id:source.measurementReleaseId})
+        }catch(error){
+          if(error instanceof SjtEntryAuthorityError)deny('该 SJT 版本不符合入口分发要求')
+          throw error
+        }
+      }
+    }
+    const resources=isSjtDistribution?distributionResources:isScalePublic?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM scales WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND instrument_class='CUSTOM_DESCRIPTIVE' ORDER BY id FOR SHARE`)
       :isLibrary?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM measurement_content_releases WHERE id IN (${Prisma.join(scope.resourceKeys)}) AND family='SCALE' AND layer='MEASUREMENT' AND status='PUBLISHED' ORDER BY id FOR SHARE`)
       :isPlatformSjt?registryResources:isPlatformReference
       ?await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM measurement_content_releases

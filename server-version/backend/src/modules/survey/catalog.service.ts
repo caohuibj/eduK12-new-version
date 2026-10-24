@@ -5,7 +5,7 @@ import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {assertEntryAdmin} from '../admin-permissions/service'
 import {SurveyGovernanceError} from './governance.service'
-import {getCatalogSourceSnapshot,listCatalogSources,assertCatalogSourcesCurrent,recheckCatalogScaleSourceExpiry,type CatalogSourceRef} from './catalog.sources'
+import {getCatalogSourceSnapshot,listCatalogSources,assertCatalogSourcesCurrent,recheckCatalogSjtSourceAuthority,recheckCatalogScaleSourceExpiry,type CatalogSourceRef} from './catalog.sources'
 import type {ResearchFrozenUnit} from './publication.service'
 
 type Tx=Prisma.TransactionClient
@@ -45,6 +45,7 @@ export async function grantCatalogSource(actorUserId:string,userId:string,ref:Ca
     await tx.surveyEvent.create({data:{id:randomUUID(),actorUserId,targetUserId:userId,
       action:'CATALOG_TOOL_GRANTED',metadata:{grantId:rows[0].id,source:ref,snapshotDigest}}})
     await recheckCatalogScaleSourceExpiry(tx,[snapshot])
+    await recheckCatalogSjtSourceAuthority(tx,[snapshot])
     return view(rows[0])
   })
 }

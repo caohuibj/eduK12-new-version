@@ -11,7 +11,9 @@ import { computeSurveyFinal } from '../../modules/survey/final.compute'
 import type { ResearchFrozenPublication } from '../../modules/survey/publication.service'
 import { validateSituationPackage, type SituationPackage } from '../../modules/situational/situation-package'
 import { getOwnResearchTask } from '../../modules/survey/task.public'
-const h = vi.hoisted(() => ({ own: vi.fn() }))
+const h = vi.hoisted(() => ({ own: vi.fn(), authority: vi.fn() }))
+vi.mock('../../modules/situational/entry-authority', async original => ({...await original<object>(),assertSjtEntryDistributionAuthority:h.authority}))
+import {SjtEntryAuthorityError} from '../../modules/situational/entry-authority'
 vi.mock('../../modules/survey/admission.service', () => ({ verifiedSurveyAttempt: h.own }))
 const ref = { kind: 'SJT' as const, sourceId: 'authorized-release', sourceVersion: '1.0.0' }
 const published = (document: unknown = fixture): SituationPackage => ({ ...compileSjtOnlineDocument(document).package, releaseStatus: 'PUBLISHED' })
@@ -103,9 +105,20 @@ describe('Survey catalog does not widen Training course-scoped authorization', (
       definitionHash: validateSituationPackage(pkg).definitionHash, authorizationPolicy,
     }) } }
   }
-  it.each(['COURSE_GRANT_V1', 'FUTURE_POLICY', undefined])('rejects restricted or unknown policy %s before catalog adaptation', async policy => {
+  it.each(['FUTURE_POLICY', undefined])('rejects restricted or unknown policy %s before catalog adaptation', async policy => {
     const db = sourceDatabase(policy)
     await expect(getCatalogSourceSnapshot({ actorUserId: 'survey-admin', ref }, db as never)).rejects.toThrow('SOURCE_SJT_AUTHORIZATION_POLICY_UNSUPPORTED')
+  })
+  it('requires explicit Survey distribution instead of treating a course policy as permission',async()=>{
+    const db=sourceDatabase('COURSE_GRANT_V1')
+    h.authority.mockRejectedValueOnce(new SjtEntryAuthorityError('SOURCE_SJT_ENTRY_AUTHORITY_REQUIRED'))
+    await expect(getCatalogSourceSnapshot({actorUserId:'survey-admin',ref},db as never)).rejects.toMatchObject({code:'SOURCE_SJT_ENTRY_AUTHORITY_REQUIRED',statusCode:403})
+    const receipt={protocol:'sjt-survey-distribution-v1',actorId:'survey-admin',grantId:'capability',grantVersion:1}
+    h.authority.mockResolvedValueOnce(receipt)
+    const result=await getCatalogSourceSnapshot({actorUserId:'survey-admin',ref},db as never)
+    expect(result.provenance.sjtEntryAuthority).toEqual(receipt)
+    expect(result.compiledDefinition).toEqual(published().definition)
+    expect(h.authority).toHaveBeenLastCalledWith(db,{actorId:'survey-admin',releaseId:ref.sourceId,instrumentVersion:ref.sourceVersion})
   })
   it('accepts an explicitly unrestricted published release while preserving exact source identity', async () => {
     const db = sourceDatabase(null)

@@ -1,3 +1,5 @@
+import { SJT_COURSE_GRANT_POLICY } from '../situational/authoring/grant-contract'
+import { recheckSjtEntryDistributionAuthority, SjtEntryAuthorityError } from '../situational/entry-authority'
 import { assertSurveyStagedSituationalDefinition } from './situational-native.definition'
 import type { SituationRuntimeDefinition } from '../situational/situation-runtime-definition'
 import { Prisma } from '@prisma/client'
@@ -30,7 +32,7 @@ export async function authorizedCatalogSjtMedia(tx: Prisma.TransactionClient, us
   const candidates = await tx.$queryRaw<Array<{ id: string }>>`SELECT id FROM survey_tool_grants
     WHERE user_id=${userId} AND status='ACTIVE' AND snapshot->'ref'=${JSON.stringify(source)}::jsonb ORDER BY id`
   const snapshots = await catalogSnapshotsForDrafts(tx, userId, candidates.map(row => row.id))
-  const bound = [...snapshots.values()].some(snapshot => canonicalHash(snapshot.displayDefinition) === canonicalHash(unit.definition)
+  const bound = [...snapshots.values()].find(snapshot => canonicalHash(snapshot.displayDefinition) === canonicalHash(unit.definition)
     && canonicalHash(snapshot.compiledDefinition) === canonicalHash(unit.compiledDefinition)
     && canonicalHash({ ...snapshot.provenance, originalSource: snapshot.provenance.source ?? null, source: snapshot.ref,
       definitionDigest: snapshot.definitionDigest, adapterVersion: snapshot.adapterVersion }) === canonicalHash(unit.sourceProvenance))
@@ -38,9 +40,15 @@ export async function authorizedCatalogSjtMedia(tx: Prisma.TransactionClient, us
   const release = await tx.sjtAuthorRelease.findUnique({ where: { id: source.sourceId }, select: {
     status: true, authorizationPolicy: true, instrumentVersion: true, definitionHash: true,
   } })
-  // Course-scoped permissions are not interchangeable with a Survey tool grant.
-  if (!release || release.status !== 'PUBLISHED' || release.authorizationPolicy !== null
+  // A course grant alone is never a Survey media permission. The exact separately
+  // issued entry capability was validated by catalogSnapshotsForDrafts above.
+  if (!release || release.status !== 'PUBLISHED' || (release.authorizationPolicy !== null && release.authorizationPolicy !== SJT_COURSE_GRANT_POLICY)
     || release.instrumentVersion !== source.sourceVersion || release.definitionHash !== unit.sourceProvenance.definitionHash) return fail()
+  if(release.authorizationPolicy===SJT_COURSE_GRANT_POLICY){
+    if(bound.provenance.sjtEntryAuthority===undefined)return fail()
+    try{await recheckSjtEntryDistributionAuthority(tx,bound.provenance.sjtEntryAuthority)}
+    catch(error){if(error instanceof SjtEntryAuthorityError)return fail();throw error}
+  }
   const ids = [...new Set(images.map(image => image.asset.assetId))].sort()
   if (ids.length > 20) return fail()
   await lockStoredAssetRows(tx, ids)
