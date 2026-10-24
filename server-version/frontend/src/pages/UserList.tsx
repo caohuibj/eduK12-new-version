@@ -1,5 +1,7 @@
 import { Link } from 'react-router-dom'
-import TrainingTeacherManagement, {type TeacherAction} from '../training/TrainingTeacherManagement'
+import type {TeacherAction} from '../training/TrainingTeacherManagement'
+import {createRetryableLazy} from '../components/shared-ui/RetryableLazy'
+const TrainingTeacherManagement=createRetryableLazy(()=>import('../training/TrainingTeacherManagement'),'培训师账号管理',{label:'取消账号管理',run:props=>props.onClose()})
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { AlertCircle, Calendar, CheckCircle, Clock, Search, Users, SlidersHorizontal, ChevronDown, RefreshCw } from 'lucide-react'
 import apiClient from '../api/client'
@@ -141,7 +143,7 @@ const UserList: React.FC<{training?:boolean;trainingTitle?:string}> = ({training
           <button type="button" className="training-accounts-secondary" aria-label="刷新列表" disabled={loading||busy} onClick={()=>void fetchUsers()}><RefreshCw size={15} aria-hidden="true"/>刷新</button>
         </div>
     return <>
-      <TrainingTeacherManagement selection={management} onClose={()=>setManagement(null)} onChanged={fetchUsers} onBusyChange={setManaging}/>
+      {management&&<TrainingTeacherManagement selection={management} onClose={()=>setManagement(null)} onChanged={fetchUsers} onBusyChange={setManaging}/>}
       {trainingTitle&&<header className="training-management-page-heading training-course-page-heading training-account-page-heading"><h1>{trainingTitle}</h1>{tools}</header>}
       <section className="training-accounts training-account-list" aria-label="账号列表与审核">
       {feedback}

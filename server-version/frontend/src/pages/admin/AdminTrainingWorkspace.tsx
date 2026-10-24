@@ -1,9 +1,10 @@
 import {useState} from 'react'
-import UserList from '../UserList'
-import TeacherCodeList from '../TeacherCodeList'
-import TrainingAdminCourses from '../../training/TrainingAdminCourses'
-import TrainingAdminResources from '../../training/TrainingAdminResources'
-import {Link,Navigate,useLocation} from 'react-router-dom'
+import {createRetryableLazy} from '../../components/shared-ui/RetryableLazy'
+const UserList=createRetryableLazy(()=>import('../UserList'),'账号列表')
+const TeacherCodeList=createRetryableLazy(()=>import('../TeacherCodeList'),'注册码管理')
+const TrainingAdminCourses=createRetryableLazy(()=>import('../../training/TrainingAdminCourses'),'课程监管')
+const TrainingAdminResources=createRetryableLazy(()=>import('../../training/TrainingAdminResources'),'资源与授权')
+import {Navigate,useLocation} from 'react-router-dom'
 import {trainingAdminPage} from '../../admin/trainingPages'
 import {ShieldCheck} from 'lucide-react'
 import '../../training/training-admin-workspace.css'
