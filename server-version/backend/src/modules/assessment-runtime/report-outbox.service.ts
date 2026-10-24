@@ -110,9 +110,22 @@ export const enqueueCompositeReportForUnit = async (
     if (!rows.length) throw new ReportProcessingLeaseLostError()
     return rows[0].id
   }
+  // This only trims a projection, never the fresh parent or eligibility check.
+  // Enrolled jobs and flow advancement remain active when new enrollment is off.
+  const enrollmentExplicitlyOff = () => (process.env.ASSESSMENT_REPORT_ASYNC_ENABLED ?? 'false') === 'false'
+  const omitDefinition = enrollmentExplicitlyOff()
   let parent: any = await tx.compositeAssessmentAttempt.findUnique({
-    where: { id: input.compositeAttemptId }, select: { ...REPORT_PARENT_SELECT, frozenActiveSlotSetEncrypted: true },
+    where: { id: input.compositeAttemptId }, select: { ...REPORT_PARENT_SELECT,
+      compositeAssessment: omitDefinition ? false : REPORT_PARENT_SELECT.compositeAssessment,
+      frozenActiveSlotSetEncrypted: true },
   })
+  // Normally process configuration is stable. Preserve eligibility if an embedded
+  // host changes it while the database read is pending, without caching authority.
+  if (parent && omitDefinition && parent.asyncReportEpoch !== parent.attemptEpoch && !enrollmentExplicitlyOff()) {
+    parent = await tx.compositeAssessmentAttempt.findUnique({
+      where: { id: input.compositeAttemptId }, select: { ...REPORT_PARENT_SELECT, frozenActiveSlotSetEncrypted: true },
+    })
+  }
   if (!parent) return null
   const asyncEligible=parent.asyncReportEpoch===parent.attemptEpoch||acceptsAsyncCompositeReport(parent)
   if(!hasTrainingFlow(parent)&&!asyncEligible)return null
