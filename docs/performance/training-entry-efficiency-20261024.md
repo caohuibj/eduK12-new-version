@@ -576,3 +576,65 @@ process/module/GC histories and five observations bound causal interpretation.
 Deterministic payload reduction and report equivalence are the strongest evidence;
 latency/CPU/memory remain observational. Processes were shut down after each phase.
 No CI, build/image qualification, push, merge or deployment is established here.
+
+## Follow-up: remove the duplicate scale-child lookup (2026-10-24)
+
+The next bounded candidate is `4bb8825e374d748ab7bba7b5d70cd3a54dc0eadd`
+(tree `a33a56a44d08919162fb2935717279f122ba2d6b`). Its product baseline is the
+preceding optimized `9b7deeb3485f1f5974b550ef1517a9f8ffad1404`; the intervening
+`7f2eb147` changes documentation only. The previous five observations/type were
+reused without repeating baseline checks. The candidate ran the same three
+warmups followed by five interleaved rounds/type, using the unchanged execution
+harness, compact GET query and fixture definitions. Harness hashes and the new
+frozen-source manifest were captured before execution.
+
+Only the scale submission locator changes: the composite/item-scoped read now
+returns the existing admission projection, avoiding a second child lookup. The
+fresh transaction lock/re-read, authorization, scoring, replay, rollback and
+parent-finalization boundaries remain. This round does not introduce a parsed
+runtime cache, skip scientific validation, or change form/SJT submission code.
+Focused wrapper/conflict checks and backend type checking passed locally; this
+is not CI, image-build or deployment qualification.
+
+Means of five, with observed min–max in brackets:
+
+| Case | Total POST→report ms, previous→new | API CPU ms, previous→new | SQL events, previous→new |
+|---|---|---|---:|
+| 40 questions | 125.7 [118.6–138.1] →128.1 [116.4–148.8] | 92.5 [83.6–106.0] →80.9 [75.8–88.8] | 86→84 |
+| 300 questions | 395.1 [351.9–453.0] →378.4 [357.9–412.2] | 256.8 [236.1–268.5] →249.0 [233.2–263.3] | 218→212 |
+| Mixed317 | 604.1 [588.0–639.5] →570.7 [543.0–591.8] | 390.0 [367.1–416.1] →365.2 [341.4–385.6] | 352→346 |
+
+The exact two/six/six SQL-event reduction occurred in every measured completion,
+matching one removed lookup per scale. Mean scale-POST CPU totals were
+39.7→35.5 /127.5→114.4 /132.2→109.5 ms; scale-POST wall totals were
+50.6→51.0 /184.4→167.1 /191.2→160.3 ms. Whole-case CPU means fell
+12.6% /3.0% /6.4%, but time did not improve uniformly: simple total rose 1.9%,
+and final-unit-to-report means changed 76.0→78.7 /104.5→98.2 /97.9→107.7 ms.
+The mixed final SJT path, untouched in this patch, was 10.1% slower. These small
+observational timing differences do not prove causality or a universal speedup.
+No additional trials were run to select a favorable outcome.
+
+HTTP JSON size is unchanged apart from approximately one byte of variable
+recorded time in mixed reports. Mean DB→API bytes changed
+195,879→195,735 /1,136,819→1,136,387 /1,545,275→1,544,844: this patch removes
+small locator results, not another large-payload transfer. Report-GET SQL and
+payload remain unchanged. All 30 reused/new measured reports pass the same
+explicitly normalized structural equivalence checks described above, preserving
+values, form fields, quality and frozen SJT scientific context.
+
+Logical row increments remain exactly 29,522 /166,490 /196,883 bytes. Mean API
+peak RSS was 388.5→383.4 /390.4→384.6 /393.1→385.9 MiB; mean within-case peak
+increments were 1.34→1.49 /2.69→1.47 /3.06→1.99 MiB. Scoped PostgreSQL observed
+CPU means were 14→12 /44→40 /68→62 ms, and PSS mean peaks were
+69.8→73.9 /70.0→74.5 /70.9→74.1 MiB. These process/cluster memory observations
+retain the sampling, GC and shared-environment limits above; no capacity claim
+follows. Physical relation means were 34,406→39,322 /203,162→190,054 /
+249,037→235,930 bytes; WAL means were 44,360→45,752 /207,272→362,488 /
+382,235→261,965 bytes. They are retained, not interpreted as storage improvements.
+
+The same isolated database was preserved: 2,057 rows before new fixture setup,
+2,555 after setup/before warmups, and 2,777 after all completions. Thus the prior
+phase is a reused, not freshly reset, baseline. Background maintenance and
+allocation differ; one new complex WAL sample reached 983,424 bytes. The strongest
+result is the verified per-scale SQL removal with unchanged outputs/durable data;
+CPU/time directions remain bounded observations. API/PostgreSQL stopped afterward.
