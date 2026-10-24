@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
 import {binding,branch,surveyGovernancePlan,surveyGovernanceOutputs} from './survey-governance-scope.mjs';
-import {verifyEvidence,loadEvidence,verifyReport} from './survey-governance-checks.mjs';import {requiredChecks,failedChecks} from './merge-gate.mjs';
+import {verifyEvidence,loadEvidence,verifyReport,verifyTestRepairs} from './survey-governance-checks.mjs';import {requiredChecks,failedChecks} from './merge-gate.mjs';
 const entries=()=>[...Object.entries(binding.source).map(([file,s])=>({file,status:s.status,oldMode:s.oldMode,newMode:s.newMode})),...binding.controls.map(file=>({file,status:binding.controlBefore[file]?'M':'A',oldMode:binding.controlBefore[file]?'100644':'000000',newMode:'100644'}))];
 const head='1'.repeat(40),source='2'.repeat(40),env={CI_EVENT:'pull_request',CI_HEAD_REF:branch,CI_SOURCE_HEAD:source,CI_PR_NUMBER:'354',CI_PR_REPOSITORY:'caohuibj/eduK12-new-version'};
 function read(_,...args){const x=args.join('');if(x.endsWith('^{tree}'))return '3'.repeat(40);const colon=x.indexOf(':'),ref=x.slice(0,colon),p=x.slice(colon+1);if(p.startsWith('server-version/')&&['frontend','backend'].includes(p.slice(15)))return binding.components[p.slice(15)];const s=binding.source[p];if(s)return ref===binding.base?s.before:s.after;if(binding.controlBefore[p])return binding.controlBefore[p];if(binding.protectedInputs[p])return binding.protectedInputs[p];throw Error('Unbound fixture read '+x);}
@@ -24,3 +24,5 @@ test('changed old reporter cannot qualify',()=>{const e=loadEvidence();e.reports
 test('imported input drift cannot qualify',()=>assert.throws(()=>verifyEvidence(loadEvidence(),p=>p===Object.keys(loadEvidence().suites[0].inputSHA256)[0]?Buffer.from('changed'):readFileSync(p))));
 test('empty or skipped selected tests cannot qualify',()=>{for(const r of [{numFailedTests:0,numPendingTests:0,numPassedTests:0,testResults:[]},{numFailedTests:0,numPendingTests:1,numPassedTests:1,testResults:[]}])assert.throws(()=>verifyReport(r,[]));});
 test('admitted files are not selected for replay',()=>{assert(!binding.checks.backendUnit.some(p=>p.endsWith('tool-management-policy.test.ts')));assert(!binding.checks.frontendTests.some(p=>p.endsWith('GovernedToolsWorkspace.test.tsx')));});
+
+test("exact reviewed repair cannot change passed setup",()=>{verifyTestRepairs(p=>{const changes=binding.resume.testRepairs[p];return changes.map(x=>x.before).join("\n");},p=>binding.resume.testRepairs[p].map(x=>x.after).join("\n"));});

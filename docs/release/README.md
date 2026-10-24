@@ -1771,3 +1771,24 @@ The first PR354 candidate run `40143579966` stopped before application work
 because the new classifier variable duplicated an existing governance variable.
 Only that identifier is repaired. No dependency install, type check, test, DB,
 compilation or SAST success is claimed from the failed invocation.
+
+
+Run `40143699913` retained successful integrated backend/frontend types, all
+changed-file lint, 109 backend assertions and 207 frontend assertions. Seven
+frontend cases failed: six old fixtures omitted the now-required STANDARD entry
+identity and one expected the superseded three-role heading. Only those bodies
+are repaired; all surrounding test setup and application code remain identical.
+The user explicitly approved this continuation and successful official-result
+reuse, followed by merging only after the remaining checks actually succeed.
+Official artifact `12579502917`, its exact ZIP digest, original run/job/source,
+successful steps and command/exit/log receipts are verified with a 24-hour lifetime.
+The failed job and seven original failures retain their original identities.
+Only the seven failed cases execute again; the exact disjoint union must cover
+all 214 original frontend cases. Backend types and 109 assertions are unchanged;
+only the two changed test files need fresh lint, and integrated frontend types
+consume the changed test inputs. No earlier success is replayed or re-labelled.
+The original SAST stopped before query completion because its Python extractor
+requires directory roots. Roots now remain directories and unchanged scripts
+are explicitly excluded, preserving the same selected application/control scope.
+No successful SAST is claimed from that failed invocation. Missing database,
+restore, compilation and compiled-browser stages still must actually succeed.

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "base": "31d9e4cb933395acda3e2123f100a0a1a66a869b",
-  "product": "bf76d06cfea2f2ea0448b3d18ce17bbe56865c27",
+  "product": "6fadf6de2a27394fd6b75de6b5389f11364142ce",
   "source": {
     "docs/survey-unified-tool-management.md": {
       "before": null,
@@ -607,7 +607,7 @@
     },
     "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx": {
       "before": "a81d98d28cb0a0d110ccc63b0c282b1b98ad7d16",
-      "after": "f55f82dc0f28ff1e3bc4bbb5c5e7802b051c183a",
+      "after": "d43dfa6e349c6b68dd957d5a8f4e09f721b92931",
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644"
@@ -677,7 +677,7 @@
     },
     "server-version/frontend/src/pages/admin/StandardTripletWorkspace.test.tsx": {
       "before": null,
-      "after": "fb73a5b518f56280bf9a42815376ba0623958382",
+      "after": "1fcaa1b53445c6d639500e48ecbd51012d2be956",
       "status": "A",
       "oldMode": "000000",
       "newMode": "100644"
@@ -850,7 +850,7 @@
     "docs/release/README.md": "4cc7f730ce9f1f6105e246f988fe6de015c98fc9"
   },
   "components": {
-    "frontend": "72355eff8577f03d660fca3517851bf1bd426f4a",
+    "frontend": "91cda22b8013a0f375f4ed0f6868a157d49dd523",
     "backend": "daaf5007aad5a23b7e8ee97fd74616d0c0133c66"
   },
   "protectedInputs": {
@@ -965,6 +965,50 @@
         "survey_triplet_test_governance",
         "SURVEY_TRIPLET_ISOLATED"
       ]
+    ]
+  },
+  "resume": {
+    "run": 40143699913,
+    "scopeJob": 121020524898,
+    "job": 121020585047,
+    "source": "470ece4b17e6d452fae72943c8dd7f5208ff9fb3",
+    "checkout": "cd0b4a9a0bfd98b0ac12b6b1d3bafebb29dc93bf",
+    "artifact": 12579502917,
+    "zipSHA256": "92a2f530c48d09d9646698db50d12f03d21b9abfd43d1373d5c25f707c098807",
+    "testRepairs": {
+      "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx": [
+        {
+          "before": "auth.user={id:'loading-admin',username:'manager',role:'STUDENT',",
+          "after": "auth.user={id:'loading-admin',username:'manager',role:'STUDENT',platformRole:'STANDARD',"
+        },
+        {
+          "before": "auth.user={id,username:'theme-admin',role:'STUDENT',",
+          "after": "auth.user={id,username:'theme-admin',role:'STUDENT',platformRole:'STANDARD',"
+        },
+        {
+          "before": "auth.user={id:'theme-route-admin',username:'manager',role:'STUDENT',",
+          "after": "auth.user={id:'theme-route-admin',username:'manager',role:'STUDENT',platformRole:'STANDARD',"
+        },
+        {
+          "before": "it('keeps the administrator banner and account location on the dedicated profile page',async()=>{\n    auth.user={id:'manager',username:'manager',role:'STUDENT',",
+          "after": "it('keeps the administrator banner and account location on the dedicated profile page',async()=>{\n    auth.user={id:'manager',username:'manager',role:'STUDENT',platformRole:'STANDARD',"
+        }
+      ],
+      "server-version/frontend/src/pages/admin/StandardTripletWorkspace.test.tsx": [
+        {
+          "before": "expect(await screen.findByRole('heading',{name:'\u4e09\u7c7b\u7ba1\u7406\u5458\u7684\u6743\u9650\u8fb9\u754c'})).toBeVisible();",
+          "after": "expect(await screen.findByRole('heading',{name:'\u7cfb\u7edf\u4e0e\u56db\u4e2a\u5165\u53e3\u7ba1\u7406\u5458\u7684\u6743\u9650\u8fb9\u754c'})).toBeVisible();expect(screen.getByRole('columnheader',{name:'School \u7ba1\u7406\u5458'})).toBeVisible();expect(screen.getByRole('columnheader',{name:'Teacher \u7ba1\u7406\u5458'})).toBeVisible();"
+        }
+      ]
+    },
+    "failedFrontendCases": [
+      "standard workflow and unified management design UI displays unified roles and both composition types without mutation",
+      "Training management appearance on the admin origin keeps Training startup colors and loading copy while the administrator session is loading",
+      "Training management appearance on the admin origin shows the appearance control and remembers its choice on accounts",
+      "Training management appearance on the admin origin shows the appearance control and remembers its choice on courses",
+      "Training management appearance on the admin origin shows the appearance control and remembers its choice on resources",
+      "Training management appearance on the admin origin loads the saved Training preference when entering from another admin-origin page",
+      "Training management section context keeps the administrator banner and account location on the dedicated profile page"
     ]
   }
 }

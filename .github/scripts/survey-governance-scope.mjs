@@ -10,7 +10,7 @@ export function surveyGovernancePlan(entries,base,head,read=git,env=process.env)
  assert(['pull_request','push'].includes(env.CI_EVENT),'Manual/probe refused');
  assert.notEqual(env.CI_FORCE_FULL,'true','Full platform refused');assert.notEqual(env.CI_FULL_ACCEPTANCE,'true');
  assert.equal(base,binding.base,'Main base drift');assert.equal(binding.base,'31d9e4cb933395acda3e2123f100a0a1a66a869b');
- assert.equal(binding.product,'bf76d06cfea2f2ea0448b3d18ce17bbe56865c27');assert.match(head,/^[a-f0-9]{40}$/);
+ assert.equal(binding.product,'6fadf6de2a27394fd6b75de6b5389f11364142ce');assert.match(head,/^[a-f0-9]{40}$/);
  if(env.CI_EVENT==='pull_request'){
   assert.equal(ref,branch);assert.equal(String(env.CI_PR_NUMBER),'354');
   assert.equal(env.CI_PR_REPOSITORY||env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');assert.match(env.CI_SOURCE_HEAD||'',/^[a-f0-9]{40}$/);
