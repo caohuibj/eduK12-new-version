@@ -1,16 +1,100 @@
 {
   "schema": 1,
-  "base": "67d0c77034aea3c3cf1ee118eb65ab3aafe7b6eb",
-  "product": "a1369db0b237f8f022d619feeba9c85b24cf5bbe",
-  "localProduct": "74485d31e2ec419bce1e7df3b6214990a2d4b017",
-  "productTree": "45a536111839dc369385c10a3429c22f0700ea55",
+  "base": "44c1e502acaed5524c5b1e233d1bfb1f0c6f7b40",
+  "product": "4a4756d133e5da75345da7f7af75091b0b3f41fb",
+  "localProduct": "1a96d2014a3841c30f92967e971d9d3cea173b47",
+  "productTree": "6c9b70e26ae5d23f412e819d453673639fce5f6a",
   "source": {
+    "docs/performance/20261024-training-ordinary-submit-fact-protocol.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "424db361c44ae8e07e9f519d0f20ecc92cd67270"
+    },
+    "docs/performance/survey-entry-efficiency-20261024.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d1c3a1d2fffa53a039870a7b35670dce0caaf4c8"
+    },
     "docs/performance/training-entry-efficiency-20261024.md": {
       "status": "A",
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "008855174d0d4d436af9c3d09a1faabe6d70c8fe"
+      "after": "987e836f06799da48a3b610d323075e3793822c0"
+    },
+    "server-version/backend/prisma/migrations/20261024080000_training_participation_codes/migration.sql": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "05906585f16668ab4a8726bbc918516a51abe946"
+    },
+    "server-version/backend/prisma/migrations/20261024083000_training_stable_admission_identity/migration.sql": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "3f08aacfa0991852e25b2c775f0292b059d13995"
+    },
+    "server-version/backend/src/__tests__/anonymous-study/admission-principal.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "8d7845035a5df6dfa3f373f081900c1d0b5d020d"
+    },
+    "server-version/backend/src/__tests__/anonymous-study/participation-crypto.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "37be513cd1767b2cb34a6c34867b2366fe383b39"
+    },
+    "server-version/backend/src/__tests__/anonymous-study/reset-route-boundary.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "458cbc3239a24c838c410089c91acb93ea414ebd"
+    },
+    "server-version/backend/src/__tests__/anonymous-study/sjt-stable-replay.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7844a5e7cb38affdc878a3201f3d98e66bb42a54"
+    },
+    "server-version/backend/src/__tests__/composite/composite-report.service.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8360dcdecfe1fcc09159e487c95f45b616df3aaf",
+      "after": "0e1ebdbeb249a4935522f9e3089f09936f1920ba"
+    },
+    "server-version/backend/src/__tests__/composite/current-unit-state.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ee7019442aeda6d46f9dae7af8583c0a09ff8706"
+    },
+    "server-version/backend/src/__tests__/composite/report-read-plan.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "decd2c327e5e0d4659953bb6206affd499b4bb4e"
+    },
+    "server-version/backend/src/__tests__/composite/results.service.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7534618c001594afc03ebe536b0729ae3718a1fd",
+      "after": "cdda6969d0e3b82bc306c18f792d1a5880fe46c6"
     },
     "server-version/backend/src/__tests__/composite/training-checkpoint.contract.test.ts": {
       "status": "M",
@@ -18,6 +102,13 @@
       "newMode": "100644",
       "before": "e5ee3f99bee9957c2462592baa1ea643d2cb2bcb",
       "after": "25d34ca7065f24da9be7e0a84b797b27a7e78228"
+    },
+    "server-version/backend/src/__tests__/composite/training-feedback-runtime.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "09270b7fedb06df12e3977d08fdc3f769a0c7647",
+      "after": "ed86282deb10e40c0ad384de87ac461b00b5d1fd"
     },
     "server-version/backend/src/__tests__/controllers/assignmentExport.test.ts": {
       "status": "M",
@@ -54,12 +145,26 @@
       "before": "62516ece958e581649a7608a7fe9d99249e3e236",
       "after": "695ffcdd3817256033ce0df4ce3f9ca6d63fd56d"
     },
+    "server-version/backend/src/__tests__/controllers/checkinPublicSecurity.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0f52ea48469c1ad6cf57e55bc66bc467404e9d28",
+      "after": "933e0c176b649506b3002d7bd7c7ff3885148a22"
+    },
     "server-version/backend/src/__tests__/controllers/checkinSubmit.test.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "aadc7b1a2a01c90e5bed0ac9cff40e861dc0fb20",
       "after": "2b1a76196afc600c20b8456716d1284adbf4c9d2"
+    },
+    "server-version/backend/src/__tests__/controllers/scaleListSource.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8ee743874f6b578001fc8944baa2338c71efd9da",
+      "after": "71f763f162501e57f256437e48f8feee82719877"
     },
     "server-version/backend/src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts": {
       "status": "A",
@@ -75,6 +180,27 @@
       "before": null,
       "after": "8b76e2e187f6425f345bfb700d36086404e1a887"
     },
+    "server-version/backend/src/__tests__/controllers/teacherCode-list.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5f13103c6828ca291b78f699fab9c463828a2549"
+    },
+    "server-version/backend/src/__tests__/controllers/training-admin-query-efficiency.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "86fe0c2ba6acac386bacdad2227617dc86bc68f7"
+    },
+    "server-version/backend/src/__tests__/controllers/training-task-detail.performance.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6377a75223ada292f4feb891ae73e9ec2fb797e7"
+    },
     "server-version/backend/src/__tests__/controllers/trainingTeacherQueries.test.ts": {
       "status": "A",
       "oldMode": "000000",
@@ -89,12 +215,61 @@
       "before": null,
       "after": "5dbf565deaca4fc6f0321792b85eb95f8ad36d93"
     },
+    "server-version/backend/src/__tests__/integration/trainingParticipation.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "3e5d739375a99384fe0e85f971ae13881df62e89"
+    },
+    "server-version/backend/src/__tests__/integration/trainingResetBoundaries.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "491a1c0335d27a5c46dd962b8122d9518c713e1c"
+    },
+    "server-version/backend/src/__tests__/integration/trainingStableAdmission.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f4dfb4e2406904adb2d55e4ea6b76bc20e4ffa22"
+    },
+    "server-version/backend/src/__tests__/measurement-content/survey-participant-feedback.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "336e35c749177ca2cca0804b8429d4d3a5f883bd",
+      "after": "4c0c920f06cefaf16dd5ddda2010c009de8b9651"
+    },
     "server-version/backend/src/__tests__/measurement-content/training-content-final.test.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "5c26d5d0988494f6454f3b2e234c2892465e78c0",
       "after": "0025d62ff3d8ab7435658a0f2e2eab906e5fd27c"
+    },
+    "server-version/backend/src/__tests__/questionnaire/assessment-state-routing.performance.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9515d244db9b4291597e3e0df935290cba979d34"
+    },
+    "server-version/backend/src/__tests__/questionnaire/collection-report.controller.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7b1169b3a09e5c1c025e59b1d64aa060c0b0e63e",
+      "after": "2cd2e0b3ec8640f855fb7180c789536ed898a01e"
+    },
+    "server-version/backend/src/__tests__/scale/composite-final-locator.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f4a0040054e0d74ee1fc4ba29862a356a44eb0d3"
     },
     "server-version/backend/src/__tests__/security/legacy-list-roles.test.ts": {
       "status": "M",
@@ -103,26 +278,194 @@
       "before": "714ee07b60f88ebf3d6699bc976ce1f8408b137b",
       "after": "971d9bd6df12c6907c5e9db0839d60cbdb7192c6"
     },
+    "server-version/backend/src/__tests__/services/checkinTokenProjection.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "990f48b88bad46618798c590cdc98027cae54a01"
+    },
+    "server-version/backend/src/__tests__/services/checkinUploadCleanup.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "01563eb92af03eb9ef04633fd4ce6eccb7429a42"
+    },
+    "server-version/backend/src/__tests__/services/checkinUploadCleanupScheduler.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6bc85d1c6a0981a0e451a8ce5aa356683d951afe"
+    },
+    "server-version/backend/src/__tests__/services/materialGrant.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bc8862c4ddcae97df8a75962dfe6f1a7d1fd8881",
+      "after": "f30e07bd14d15fad135ea68681e947ecb52b33bb"
+    },
+    "server-version/backend/src/__tests__/survey/catalog-sjt-media.authorization.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6a133c0bb300da000792fa61581c352b4e5c722d"
+    },
+    "server-version/backend/src/__tests__/survey/catalog-sjt-online.contract.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "4abb553091c56c3268b3a67d57e28eb4fb73aabe"
+    },
+    "server-version/backend/src/__tests__/survey/checkpoint-query.contract.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "1f49d52d8babfb1be84f2eafd9104d8d11df8833"
+    },
+    "server-version/backend/src/__tests__/survey/public-scale-media.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f3e0a1cb7351300ee5618f59e46183058bd100e7",
+      "after": "5dd6ba95c2a705257f40abca78e986fd8e6dff05"
+    },
+    "server-version/backend/src/__tests__/survey/research-operations.postgres.integration.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ae12c9ac63c3a69b3c00531be08d9fc2c2b948f7",
+      "after": "4be0df0f0dc9a9af9051b027f9478d637c968487"
+    },
+    "server-version/backend/src/__tests__/survey/research-request-local-final.contract.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "17e05fbbc3df06e653cd3ccf91f212d6e94a51d9",
+      "after": "11dd8ca00656cabe2f1e97e9f26d6341f6c00cd0"
+    },
+    "server-version/backend/src/__tests__/survey/task-options-performance.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3a7a6b4b70db19468f20b644314fc8a34d64ccc7",
+      "after": "47124b2a319543e8c107510cd486b2ccb59a9a68"
+    },
+    "server-version/backend/src/config/checkinUploadCleanup.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c746520ba0969bd4402ba25df951275f99721b48"
+    },
     "server-version/backend/src/controllers/assignmentController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "3da77c9677f87d95cbb5888df9b6c0a7a30731c3",
-      "after": "5e2b01866afcefff65bb29a5badb68b85dcd4146"
+      "after": "e64353e2dd6d075d23f4f0f84d748169c8d18fa2"
     },
     "server-version/backend/src/controllers/authController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
-      "before": "1b59d04ec26990bdff739278727285ce328b9f05",
-      "after": "a466326dcd7affd7896f86f972acc06ae38f9489"
+      "before": "f037edaccb2fe4c10ad245870dd7e4cde0b454d3",
+      "after": "3942742ac364bf0dcedfaa8fbfc45f972658fec7"
     },
     "server-version/backend/src/controllers/checkinController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "e8f0bd67be843f301f86d72c2d1e1eada101be2b",
-      "after": "b284600d374c0447309513e9cf14df41f4790f08"
+      "after": "b3c7691c2318c5bb938a8330b730faf18fbaf156"
+    },
+    "server-version/backend/src/controllers/courseController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0b87467992fa3a2712c97b6bab746d9e73e7cb2f",
+      "after": "35126ee218e62dc87180174d44d70fc9314d1ba8"
+    },
+    "server-version/backend/src/controllers/publicQuestionnaireController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2f81d100038f22600267a4815de72b78dcca576b",
+      "after": "748f0a33d9a27adb9a3baedfd1390562c306bc18"
+    },
+    "server-version/backend/src/controllers/questionnaireController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "fd9a176248e586e727ccbab5cc298d1fb22ca403",
+      "after": "7a205bcceac7f35515fd0140f9e2425cfb4bdb55"
+    },
+    "server-version/backend/src/controllers/scaleController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7d41dbabadb6505fe4c4f8ce5a948452f660ec3f",
+      "after": "15e0f082e6d3e61cd48bc4759fca3486b993c0b1"
+    },
+    "server-version/backend/src/controllers/teacherCodeController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "661d91ad9a655ad87b2fb42eb09afff6669caa92",
+      "after": "623c4b84d67d041b06fb2fb5adaa5bccd987b412"
+    },
+    "server-version/backend/src/index.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bd9d674c51532cbb0a0191d60640d182a5ea9042",
+      "after": "84c4f9f89dba0a47577fc11e64679a277448bf7b"
+    },
+    "server-version/backend/src/modules/anonymous-study/admission-principal.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "377e56a56bdb6e8f242f5addb15f066ebca42e91"
+    },
+    "server-version/backend/src/modules/anonymous-study/participation.crypto.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a651a5c9ba570912e834a094ed64af90c1a054c2"
+    },
+    "server-version/backend/src/modules/anonymous-study/routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ba6e2b9b297570c6f6cdb814dd787723eccb7d57",
+      "after": "0a3d1ccc7033bb4f44c8b2b6b3de82dee7a1d9a9"
+    },
+    "server-version/backend/src/modules/anonymous-study/service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "acbf71c5bc80e7778d5713bbad3fa26cd4c7ab4a",
+      "after": "a6ae47192c4c171c3e27086a70227646e4424f5f"
+    },
+    "server-version/backend/src/modules/assessment-runtime/form-admission.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "43dd0b80fc8bb004407283743465898db5ce1828",
+      "after": "c6636e760ae096de4aec45b33a7dda557a98befe"
+    },
+    "server-version/backend/src/modules/assessment-runtime/unified-form-section-final-submit.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ee442cf51e9b0cf84364eaa9fc7f5c5c80cc188c",
+      "after": "b5fa9eae152dae648a75d3d30aa3cc894be85cb6"
     },
     "server-version/backend/src/modules/assignment-review/selection.ts": {
       "status": "A",
@@ -130,6 +473,41 @@
       "newMode": "100644",
       "before": null,
       "after": "cd26668b8aec06c950f51417c1c1fc7bdae158f7"
+    },
+    "server-version/backend/src/modules/cognitive/cognitive-admission.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d46ebdf364eba1f4f4fff438ecd342e5dca47f16",
+      "after": "bdcafe663a7f0f72a57a9b314ce7bd4493f0e8b0"
+    },
+    "server-version/backend/src/modules/cognitive/unified-final-submit.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f0903eafda5a62e7a97ae988d9f0c470d0275ac2",
+      "after": "4b944e96a41b24cadf22eabb39ed1be4a00024f1"
+    },
+    "server-version/backend/src/modules/composite/composite-report-read-plan.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "051e8cdf9fb91e04b13555edeae02fb53616fb7a"
+    },
+    "server-version/backend/src/modules/composite/composite.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5acf61efa78ae19200511dbdb24f8c8a1e98c6c5",
+      "after": "1be0af38de9b39f262c97a1d4fea69101c08f2ea"
+    },
+    "server-version/backend/src/modules/composite/composite.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "72252bc07a2eefaf556e36704d065920f0066fe5",
+      "after": "13c6e7764236669c7de19961e92d625173d899c2"
     },
     "server-version/backend/src/modules/composite/training-checkpoint.service.ts": {
       "status": "M",
@@ -145,12 +523,152 @@
       "before": "150ec1a2d9aa44c7d593cfc6dc7eda75cd41299c",
       "after": "9664b7016436e9bf2a7f90cdd422e9f4d6bbbf9e"
     },
+    "server-version/backend/src/modules/composite/whole-questionnaire.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "67969b9ae05375c03e2c316f62ed6cc21059e7ed",
+      "after": "95b053332a2bf7aba6abfa146e882ee0336ad649"
+    },
+    "server-version/backend/src/modules/participation/code-crypto.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "420da31c100ccdfc27e0a2f994e6c0a11a34a91d"
+    },
+    "server-version/backend/src/modules/scale/scale-admission.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "967c4ca67377ae4107d9e9d6409af9571faa84d9",
+      "after": "81aa55d383954d1f08996c2a597738c5008d2973"
+    },
+    "server-version/backend/src/modules/scale/scale-final-submit.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0666e62b08758c0c406769533a3e3a826dca148e",
+      "after": "a50e9acacce157d4591d04ee7936b98d5ec08e92"
+    },
+    "server-version/backend/src/modules/scale/unified-final-submit.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "dcb094951e44b4876f6fcaabcf457f14dbcf5557",
+      "after": "fbf3b4a768f102d9c709c624fcac332a37543be3"
+    },
+    "server-version/backend/src/modules/situational/situational-final-submit.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "73b06d35071faff9c9ef4f2ccac4a563bb37fc60",
+      "after": "3cc20eb8fd9bafd1b6f306b3677472c064e31a34"
+    },
+    "server-version/backend/src/modules/survey/admission.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a9547a31d1974927317e21b6b30899863a66ca24",
+      "after": "cca365729d39cc2032c90f4d7624c4ce8b367a8f"
+    },
+    "server-version/backend/src/modules/survey/catalog-sjt-media.authorization.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "8bed8d351e0ce540be62d7d1f8c15c5dc2f6d3b3"
+    },
+    "server-version/backend/src/modules/survey/catalog.sources.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0549e31d1ff3595ac51d9c7d227e2dd14340e588",
+      "after": "a73273a7585c30f8a142f7fd1fc0f3028e598aa9"
+    },
+    "server-version/backend/src/modules/survey/checkpoint.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "34069e3e756d028b9d18fec772ef869771ff8839",
+      "after": "bb962442b64c5a08fcb8744c4619d690eaf7fdd7"
+    },
+    "server-version/backend/src/modules/survey/final.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "883b4fcad070a9b2b74f0f4e583294ceaa6c39be",
+      "after": "a5b1042c74b9f09dbbf8f9f2a8795b28fcccba66"
+    },
+    "server-version/backend/src/modules/survey/media.references.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d6a56ccbd7d53d876f95025512063366e318dab1",
+      "after": "74e08c3e6bd5f16302b2a5aba2ce23078b629cb9"
+    },
+    "server-version/backend/src/modules/survey/memorable-code.crypto.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "002ae2ad3a9632700701ce57ccd30df9ca2dece1",
+      "after": "83f69b2479bb81e1c2956bf49d3c1db3349800ee"
+    },
+    "server-version/backend/src/modules/survey/public-scale-media.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "db24eb5cb1d1b0d6dbc375e40ae384c7fb02d0f7",
+      "after": "41c7c0db26fee7ec7988cdcbbc67f183f44cfefc"
+    },
+    "server-version/backend/src/modules/survey/public.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "091b123e7491143190a35b63f3d31f2a11b0a83b",
+      "after": "3283139d8776b7600cb315c16dd4cefc3155afb6"
+    },
+    "server-version/backend/src/modules/survey/task.public.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4624e94c8e522ac0a926599b2a7d7edd8f4b712d",
+      "after": "121830f4c0c8a214437c2f9a836cfd3d31be2579"
+    },
     "server-version/backend/src/routes/assignments.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "afa3f10634b08f8a044f77c1a49c6a6d13c9f144",
       "after": "dda912d3da9880fd82160f301f1c5ae0dcea9bfe"
+    },
+    "server-version/backend/src/services/checkinTokenService.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6428fe9e21c262a114d3fb83b450b385931ca150",
+      "after": "61f64966b38bbae36c9935a15e70537dd20b8756"
+    },
+    "server-version/backend/src/services/checkinUploadCleanup.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c5f384bd58096e69a78e09f6810b1da35074f30e"
+    },
+    "server-version/backend/src/services/checkinUploadCleanupScheduler.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f9111638353e4c62eac340f26deefe9c78c4812e"
+    },
+    "server-version/backend/src/services/materialGrant.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d1f0a103d21dec80363bb6672a933662ba440aba",
+      "after": "c214de17d3ba939bbc07d6998473082578a271ad"
     },
     "server-version/backend/src/utils/streamingTaskExport.ts": {
       "status": "A",
@@ -159,26 +677,173 @@
       "before": null,
       "after": "deee161c9ff6069279262040ea58f15a6354695b"
     },
+    "server-version/frontend/src/api/__tests__/materialGrants.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "102c606aa71cc2595be3831073195959da33b231",
+      "after": "0df4efabd7b3ddb766ad69c12916b591b85abd45"
+    },
+    "server-version/frontend/src/api/anonymousStudy.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e4280fbdd13a5f424d817aa22a659e915ca04b48",
+      "after": "87735f316ac201712a0cf6dc28d01574541e3638"
+    },
+    "server-version/frontend/src/api/materialGrants.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "661a71baee62b375fb8cb0570e576cad9278f4ba",
+      "after": "5dff12a5bf41ad479cdb8b26baa3b2375d0562ec"
+    },
+    "server-version/frontend/src/components/AnonymousStudyManager.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "185ed6e2ff15e77b6c69d294591caa151d9de4bc",
+      "after": "939b9fbd0764511cc2ccbde16e2aa9f3a57a4aba"
+    },
+    "server-version/frontend/src/components/FinalCompositeAssessment.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "77a9814dacddef65196b85017f2ec1ad6b1a4a7f",
+      "after": "a295a6571c8df17c28ec3f49328d4eeee93124ca"
+    },
+    "server-version/frontend/src/components/MaterialGrantModal.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d8982c9a9236ea092455c2a00f35897f7397865c",
+      "after": "eec4de99fb74fc47fdaae6565596097e70e15d83"
+    },
+    "server-version/frontend/src/components/TrainingParticipationSettings.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "eec3ffa0b547fb1f181fde755d4e0c10df34c954"
+    },
+    "server-version/frontend/src/components/WholeCompositeQuestionnaire.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "956553cf68d4551b7d68765b93584fea758c980e",
+      "after": "3054f96e9be3bd26b56d997e049bff21f7a82c4e"
+    },
+    "server-version/frontend/src/components/__tests__/AnonymousStudyManager.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "279a4d51edb72c485d2051ba8f67149932b50b2e",
+      "after": "4c8724eda6e40fae1f80e3bdbffae4dc52c21657"
+    },
+    "server-version/frontend/src/components/__tests__/FinalCompositeAssessment.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "10ee0f8ee76b01c9e778382f7995e39c1002ff61",
+      "after": "aa09460d0f1b542f5b7e4dcf78b076f6cefacbe8"
+    },
+    "server-version/frontend/src/components/__tests__/MaterialGrantModal.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9839a41280aa41b7aa08efe58e7e7182d34789be",
+      "after": "686e5b2c741fcf24c6713d1e59a07683fa17a527"
+    },
+    "server-version/frontend/src/components/__tests__/TrainingParticipationSettings.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a7554bd2f6e005a101c842591e5615078dfb06e4"
+    },
+    "server-version/frontend/src/components/__tests__/WholeCompositeQuestionnaire.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d388fbc280eac4ef162b9a52046ac804a22f4ac3",
+      "after": "e8bfb12130fd45f10f2ac0b204a8b2eb335b4d29"
+    },
     "server-version/frontend/src/components/app-shell/AppShell.tsx": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
-      "before": "c8c84bf706e9de7c7f1960635bc52f752b2a4fd3",
-      "after": "45cbcc9b1bf213f433cd37c276afc6df7c5154df"
+      "before": "c741677d6f159218af34a886a2c868badbb43cc3",
+      "after": "73cf5bc2b24cedabbd1af0c3ee080e7386225188"
     },
     "server-version/frontend/src/components/app-shell/__tests__/management-frame-loading.test.tsx": {
       "status": "A",
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "6bcb3aef0b60fd7bde51de442c8c5b77a3db3b1b"
+      "after": "36dd5d7a476630cd4dd50c43576cb0ab643d881a"
     },
     "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
-      "before": "6de3eea4115d27f135a30c3eaffa8b83741c2676",
-      "after": "e6840556ef6ead9ac77523cccf413aed1d35afc0"
+      "before": "76e37df524a2cf324c89b1f33525adaff7aba683",
+      "after": "cb1944b00845e5c7e2195f1bc2797705edb97e35"
+    },
+    "server-version/frontend/src/components/participation/ParticipationCode.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d09cfd8e6a1e52adb858538f78f1bb97a4f1c464"
+    },
+    "server-version/frontend/src/components/participation/ParticipationSettings.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "0b8992fd77e17a84b1310ba71964112ac6de4c3d"
+    },
+    "server-version/frontend/src/components/participation/PersonalParticipationLink.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "0730e307f220a90348dfcea6a6251b9b19b88b53"
+    },
+    "server-version/frontend/src/components/participation/participation-link.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5477909e4ca871c6c8d261dfbdd3ad053f5ea5ca"
+    },
+    "server-version/frontend/src/components/participation/participation-link.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9aebaf129ab9b1e219522662903ab9240107e08b"
+    },
+    "server-version/frontend/src/components/participation/training-participation-link.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c3260765f6dcd7369da67deb738492b3a837618d"
+    },
+    "server-version/frontend/src/components/shared-ui/RetryableLazy.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "3a88fd8f30457dd889d0fa0b34c34e21b00e0936"
+    },
+    "server-version/frontend/src/components/shared-ui/__tests__/RetryableLazy.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ad34e667501fb3e71ff7b31bf22e57d75486a3d9"
     },
     "server-version/frontend/src/hooks/__tests__/useTaskExport.test.tsx": {
       "status": "M",
@@ -194,6 +859,83 @@
       "before": "8850276a745f1d6830b280b18718f7fc78df9c0f",
       "after": "66c28763eae1be0c35acc9ef80a58e92e3173f29"
     },
+    "server-version/frontend/src/modules/cognitive/__tests__/CognitivePublicEntry.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6e01a34681f335326a75f84e55d34f7ab8cd2a61",
+      "after": "ed0460b51e9f6b8d1fbdf187139b79a8c8bbff6c"
+    },
+    "server-version/frontend/src/modules/cognitive/pages/CognitiveRunner.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3902c9c6692d85760cca40217ba3b6b3d9a35df0",
+      "after": "aee6834ee0d68ddb7627ab2a7109baf2870582c7"
+    },
+    "server-version/frontend/src/modules/cognitive/pages/CognitiveSessionEntry.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d74ef9a989557c96d925884d1bc0618bf9bce3b3",
+      "after": "3532d64fb352516e845a1e1ee560eb8b22097c08"
+    },
+    "server-version/frontend/src/modules/composite/CompositeAssessmentPage.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "05fc88068eafa5ae23b0f85d5c4644570099f1ca",
+      "after": "80140a3136cd1479b70f763c56129b723406e16e"
+    },
+    "server-version/frontend/src/modules/composite/__tests__/CompositeAssessmentPage.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7ecbe7e59c2d8b2dfbd422fe10cd1e3e9873a5f5",
+      "after": "3adca6205b00394520307a2542a0b3688a1e9005"
+    },
+    "server-version/frontend/src/modules/composite/__tests__/library-api.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7dd0bedca9d2ac6694b32b24081de530bcaacc7b",
+      "after": "6424cca95cbbc23361eb3529e898e932118807a1"
+    },
+    "server-version/frontend/src/modules/composite/api.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "167a697b6c41aedd1d28435959a95a86a37ba446",
+      "after": "f704d5f955e153c2f4504adbefcabbba54fd3a0c"
+    },
+    "server-version/frontend/src/modules/situational/__tests__/vnext-history.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "797ef4a2509fe02d0ba7312c2dfbc0de5a6af204",
+      "after": "f03c8ee53445e1c20c65f2f633012a9435a6dd03"
+    },
+    "server-version/frontend/src/modules/situational/draft.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6fb890f35a6a6d1fe5bb90a66f97a2f16c10f28f",
+      "after": "07f60afe3055656b0f765718f4d0b144b0ddef59"
+    },
+    "server-version/frontend/src/modules/situational/history.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c377580c36c9870491378ae9b711abcb72282e69",
+      "after": "2e8ba1c121c8a9e063b2e3ecec045b81f8f410f6"
+    },
+    "server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "71090f84f62c182767940ab7844fe3e96c19ea59",
+      "after": "c2eeb9a8058f66d47d2d30bd203016d0e3f4e2a1"
+    },
     "server-version/frontend/src/pages/AssignmentList.tsx": {
       "status": "M",
       "oldMode": "100644",
@@ -208,6 +950,20 @@
       "before": "0f7b45026fd1ec7d068af4a8a23e3feba9280116",
       "after": "8c113e42183f20a874a30329e34909c21a9af642"
     },
+    "server-version/frontend/src/pages/TeacherCodeList.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1463e727827bee2b3b2e483564fb1a56714860ab",
+      "after": "31761ce01e051b30270292ac278fee83c60366a9"
+    },
+    "server-version/frontend/src/pages/UserList.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8781b734476b388437d621a8b4683c041bb653d7",
+      "after": "5221a5892a9c885621415f29c0908a0e367ac337"
+    },
     "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": {
       "status": "A",
       "oldMode": "000000",
@@ -215,12 +971,89 @@
       "before": null,
       "after": "c4cc93208a873628438d32603b38c411c1cf6e97"
     },
+    "server-version/frontend/src/pages/__tests__/TeacherCodeList.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cc0990e07db7f11eda58e9ce2119ee3c6ffdbef7",
+      "after": "737e2ac14a1b3f53874cfd2e28caa6febc0bd5f8"
+    },
     "server-version/frontend/src/pages/__tests__/TeacherTasks.loading.test.tsx": {
       "status": "A",
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
       "after": "db218f21b89ba393f8568d1bdb703d6019934a69"
+    },
+    "server-version/frontend/src/pages/__tests__/UserList.training.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bfe3f48ab636ee4f6adc4c48ae92ad60d8d15c18",
+      "after": "c14011a96f90b221802ab4f9bae30cf25ced99a2"
+    },
+    "server-version/frontend/src/pages/admin/AdminTrainingWorkspace.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "964dcf37860db1e0b871a8069ef2f2f2d80f8fa9",
+      "after": "fe4e44e3ec802d43579b80b726320ab7ef6d6f0b"
+    },
+    "server-version/frontend/src/pages/admin/AdminTrainingWorkspace.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4a9be0109cf6fe3ea78b3a6cd484b0212e75f3c8",
+      "after": "6ab61f561efeeb2cb9c2ab65caceef042b0fd126"
+    },
+    "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.rendering.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c49ce40dcc0978ac546e3e2733c7cc7e9db8ebda"
+    },
+    "server-version/frontend/src/pages/admin/ScaleLibraryGovernance.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "415d80243c77c158e55238c1fb947232f90081b8",
+      "after": "76e02953e2b5dc5b1cf6cffd6bc601da72ed94b2"
+    },
+    "server-version/frontend/src/pages/public/AnonymousStudyPage.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "fceacca2449ed950b3001759f7bb16b1e62807be",
+      "after": "440ada5e283d26e68ea8399705c174a05ff17b94"
+    },
+    "server-version/frontend/src/pages/public/PublicCheckin.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bbc98929461af290f822d25e33b7a8de21972429",
+      "after": "86a160565a74158b6f146ce55d182901ad17da30"
+    },
+    "server-version/frontend/src/pages/public/__tests__/AnonymousStudyPage.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "70213ecc22ac3faabec10a624c51a111d1aa6d87",
+      "after": "56923afd1a7e1c725a2a227a8f1076ba51b67c0c"
+    },
+    "server-version/frontend/src/pages/public/__tests__/PublicCheckin.performance.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "55e99f61adf8c9d3579e96ce1e55123b786738b0"
+    },
+    "server-version/frontend/src/pages/public/__tests__/PublicCheckin.protected-media.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f438e32786b112d2bbf4d42fa0110f19dada0bb0"
     },
     "server-version/frontend/src/pages/questionnaire/AssessmentDataExport.tsx": {
       "status": "A",
@@ -292,6 +1125,202 @@
       "before": null,
       "after": "3a7947e870b352d719386684d2ad05798bf2190b"
     },
+    "server-version/frontend/src/services/persistence/__tests__/finalDraftCleanup.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "015ba1222c60c08ce938aca4bfa375a67f808a2c"
+    },
+    "server-version/frontend/src/services/persistence/finalDraftStore.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0e2ec6f9a84cf91791aa6f8ab203b976e963d0d8",
+      "after": "34dcb07608f313741aa58030c1f75af4106cd832"
+    },
+    "server-version/frontend/src/survey/ResearchCatalog.requests.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "b8f9426d18dfa25313b94e6fc67d38d5c73ff202"
+    },
+    "server-version/frontend/src/survey/ResearchCatalog.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "aaca615dd024b709f3b67047b15b07aae70ad472",
+      "after": "b2697ca8b210da5b179a24c0f6b7488ab9896797"
+    },
+    "server-version/frontend/src/survey/SurveyMemorableCode.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8014ca68cb9045a95d7b64c805f572555ca3ef0d",
+      "after": "885bd75243136142d779254ec6546afee1559efc"
+    },
+    "server-version/frontend/src/survey/SurveyParticipationSettings.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4443775fd5d9d1ddd67dcaea3e79c71ec0254b12",
+      "after": "3bdcbdb57dc3004f616e580a650a4c598bf5acc3"
+    },
+    "server-version/frontend/src/survey/SurveyPersonalLink.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "231ff084b54d9ab803a883cee04decd1c6dae266",
+      "after": "a65d8f02f41337bc572fddcf14941444c8675514"
+    },
+    "server-version/frontend/src/survey/SurveyProjectTools.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "02a7f76516a40bcb9c4a2cbb9ecfc68ffdf9e3f9",
+      "after": "6203d46a6ebb90ff0e7551faac92d4d2c6b1fde1"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "aba2071c2d24066200d447a947899a124c24b203",
+      "after": "b2a7c7f30dd4adee6da3f5f874b4caae35083c89"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cd1b267b7ea862b4628540854f455775a8a0f967",
+      "after": "89267035511656a7c9e02b4569edd5c96009384b"
+    },
+    "server-version/frontend/src/survey/SurveyResearcher.loading.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ce357b5f9ab5262ce7b7a5321df26aa206da7522"
+    },
+    "server-version/frontend/src/survey/SurveyToolCardRename.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7db59377867acbeaa64abf76e62e85cde355f630",
+      "after": "c285b521044f12a14d644aa096187764d945303b"
+    },
+    "server-version/frontend/src/survey/SurveyToolLibrary.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "adaa5f5d984d1095864c2538e091d0cbaa688f8d",
+      "after": "f7c3bc655d1ee34abe1814def95a7ff534272727"
+    },
+    "server-version/frontend/src/survey/SurveyToolTemplateEditor.loading.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "fb02f49171b67eb56dfef45aaf0130495a1afe87"
+    },
+    "server-version/frontend/src/survey/SurveyToolTemplateEditor.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "30c516184b965f46b02756676ed686d486cf6247",
+      "after": "68cf9867b9f0bd172fcc1c5a14b44357e1dd8d19"
+    },
+    "server-version/frontend/src/survey/SurveyWaveStudio.preview.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "01b7de9fcba64a6ae737bd98e5289cb6f4fbbab0",
+      "after": "63645cf8f533d521b8b19d074e9375a92c5a15f7"
+    },
+    "server-version/frontend/src/survey/SurveyWaveStudio.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a3016dcdc36f3038c49262f57ad5c56fad23f11a",
+      "after": "d8f544d068f3c66f2689131b745598066a56023f"
+    },
+    "server-version/frontend/src/survey/deferred-researcher-component.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "fe04ba6bf2a8fd2640a7a089b98401e926eb8aea"
+    },
+    "server-version/frontend/src/survey/deferred-researcher-component.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "04291b5041984f64e18b7f121ea932fe53a05f5e"
+    },
+    "server-version/frontend/src/survey/personal-participation-link.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8834067b136d8d91f5afeb0d6e4f5a95724ca9e1",
+      "after": "f1367a9c95f27aeb1371788a21721801a3bba9c0"
+    },
+    "server-version/frontend/src/survey/survey-cognitive-deferred.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9848c1bd97d61be94f0fdc93e73c9ca00e80f769"
+    },
+    "server-version/frontend/src/survey/survey-cognitive-local.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e8b7d1d75aa7a54a3afdd4757b9cce6859a8863a",
+      "after": "b6d0dc71423c80daa8448840dc61b362fb05d798"
+    },
+    "server-version/frontend/src/survey/survey-cognitive-retention.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "695ef97308f4fd0eb133761fbbe0a7ab0b0b17b6",
+      "after": "475ebe721d7d13a85ebd3f85daf10f67891d0c7b"
+    },
+    "server-version/frontend/src/training/TrainingAdminCourses.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5b03f96573b072b14c0ac73add3bf193ce3490ec",
+      "after": "37b617a68f88fd9b70e7f20b43cbe2822fc26106"
+    },
+    "server-version/frontend/src/training/TrainingAdminCourses.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c4d0709dbe07d0d39ca7c5e450b929c3bd8520ab",
+      "after": "7934a9a2a9716b6eaebbb67d08a1844a3928e4d3"
+    },
+    "server-version/frontend/src/training/TrainingAdminResources.efficiency.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ecc2b28dc290eb5e73f4ae269792bc9665b40c5c"
+    },
+    "server-version/frontend/src/training/TrainingAdminResources.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b16cdb3ec3107ffa75d8c1ed50fc24c42fdc74f3",
+      "after": "c2c55bbca0fab311b9780cd4b7b93efd22887834"
+    },
+    "server-version/frontend/src/training/TrainingAdminResources.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d623385f3f10ba1aa1c7e6c45f4758f6c4f0663f",
+      "after": "7d4fb1438caf8dbafc510406c1d8130b7e1010a5"
+    },
     "server-version/frontend/src/training/TrainingCourseAssessments.loading.test.tsx": {
       "status": "A",
       "oldMode": "000000",
@@ -333,6 +1362,13 @@
       "newMode": "100644",
       "before": "456e2082dd6974c7df7bcd29bedd13c513071d1e",
       "after": "0fa8563f08a031528f1a2d39713e94ccc12d82be"
+    },
+    "server-version/frontend/src/training/trainingResourceCatalog.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "fa4ee5bf5b8e06cef066aae3d12e4d02c10b015b",
+      "after": "320482b131d1f172727405c16b5ebc3abca4fca1"
     }
   },
   "controls": [
@@ -347,18 +1383,19 @@
     ".github/scripts/merge-gate.mjs",
     ".github/workflows/ci.yml",
     "docs/release/README.md",
-    ".github/scripts/content-workflows.test.mjs"
+    ".github/scripts/content-workflows.test.mjs",
+    ".github/scripts/training-entry-migration.mjs"
   ],
   "controlBefore": {
-    ".github/scripts/content-scope.mjs": "ed5d0926860294fd2f83ab1f2f0d81573e3124ea",
-    ".github/scripts/merge-gate.mjs": "811b8321d55a3f77a18891245aa65320e2da7ef9",
-    ".github/workflows/ci.yml": "edbbf7666bfcbbcaf038fe145c19a4bdae09401c",
-    "docs/release/README.md": "2bc777e02356658b83765717c8a6c403840f1c53",
-    ".github/scripts/content-workflows.test.mjs": "e19a3922d1a2fc62a2d1afb42be11556d6947fe8"
+    ".github/scripts/content-scope.mjs": "62c3a541dc80ee2ba5aa69efd7d2808f22e75aa4",
+    ".github/scripts/content-workflows.test.mjs": "e19a3922d1a2fc62a2d1afb42be11556d6947fe8",
+    ".github/scripts/merge-gate.mjs": "5c6ac339c0efbc0d9ac84c719430be5c5ae14521",
+    ".github/workflows/ci.yml": "0bba55470013c103d22fbdd08550c153cdbeea15",
+    "docs/release/README.md": "c2ad42f95180d91f4603fbe83235b938a7c4d159"
   },
   "components": {
-    "frontend": "3596fe269a2029e0ef968e4eb76df005e04a72c2",
-    "backend": "5f932b6a1013f20c26a8a0aa8dc059e8d4ba8090"
+    "frontend": "8c324cd0303e21d5687cf14ced22fbe85b7b0be0",
+    "backend": "d95ff138882a669f046c4a5799b49a2b3601ecd5"
   },
   "protectedInputs": {
     "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
@@ -367,72 +1404,194 @@
     "server-version/backend/package.json": "033398f6361b0e4217226ae00f2edc2ed3380ecd",
     "server-version/backend/package-lock.json": "73607721290dd28f1c6f85d5e12d5d517926ede3",
     "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
-    "server-version/backend/prisma/schema.prisma": "aca635e128f3327a71064f575795f1835a40fea9",
+    "server-version/backend/prisma/schema.prisma": "b0556f0f6d93606ec7bee89e69b48749a33c7a4f",
     "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
     "server-version/frontend/tsconfig.cognitive.json": "910e97700f25652bc1d80ada47e176cbd51c2fbe",
     "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22"
   },
-  "evidenceSHA256": "ea98a0912368f2ac89a4ce5b260fd8266031b37b73474d3089ec6d598c2d0eaa",
+  "evidenceSHA256": "e42813ab656f33e676732ab084e9deafd20cac42504eefb9235b6e8a9b01328a",
   "requiredGroups": [
     "learner-frontend",
-    "learner-backend",
-    "teacher-retained",
-    "review-current",
     "export-hook",
-    "legacy-roles",
-    "teacher-queries",
-    "postgres-concurrency",
-    "current-frontend-types",
-    "retained-lint"
+    "teacher-retained",
+    "retained-lint",
+    "final-frontend-types",
+    "final-backend-types"
   ],
   "checks": {
     "backendTestFiles": [
+      "src/__tests__/anonymous-study/admission-principal.test.ts",
+      "src/__tests__/anonymous-study/participation-crypto.test.ts",
+      "src/__tests__/anonymous-study/reset-route-boundary.test.ts",
+      "src/__tests__/anonymous-study/sjt-stable-replay.test.ts",
+      "src/__tests__/composite/current-unit-state.test.ts",
+      "src/__tests__/composite/report-read-plan.test.ts",
       "src/__tests__/composite/training-checkpoint.contract.test.ts",
+      "src/__tests__/controllers/assignmentExport.test.ts",
+      "src/__tests__/controllers/authLibrary.test.ts",
+      "src/__tests__/controllers/checkinExport.test.ts",
+      "src/__tests__/controllers/checkinPublicSecurity.test.ts",
+      "src/__tests__/controllers/login-admission.test.ts",
+      "src/__tests__/controllers/scaleListSource.test.ts",
+      "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts",
+      "src/__tests__/controllers/streamingTaskExport.test.ts",
+      "src/__tests__/controllers/teacherCode-list.test.ts",
+      "src/__tests__/controllers/training-admin-query-efficiency.test.ts",
+      "src/__tests__/measurement-content/survey-participant-feedback.test.ts",
       "src/__tests__/measurement-content/training-content-final.test.ts",
       "src/__tests__/measurement-content/training-reference-consumption.test.ts",
-      "src/__tests__/controllers/authLibrary.test.ts",
-      "src/__tests__/controllers/login-admission.test.ts"
+      "src/__tests__/scale/composite-final-locator.test.ts",
+      "src/__tests__/services/checkinTokenProjection.test.ts",
+      "src/__tests__/services/checkinUploadCleanup.test.ts",
+      "src/__tests__/services/checkinUploadCleanupScheduler.test.ts",
+      "src/__tests__/survey/catalog-sjt-media.authorization.test.ts",
+      "src/__tests__/survey/catalog-sjt-online.contract.test.ts",
+      "src/__tests__/survey/checkpoint-query.contract.test.ts",
+      "src/__tests__/survey/public-scale-media.test.ts",
+      "src/__tests__/survey/research-request-local-final.contract.test.ts",
+      "src/__tests__/survey/task-options-performance.test.ts"
     ],
     "frontendTestFiles": [
-      "src/training/TrainingLearnerCourse.loading.test.tsx",
-      "src/training/TrainingCourseAssessments.loading.test.tsx",
-      "src/training/TrainingCourseAssessments.test.tsx",
+      "src/api/__tests__/materialGrants.test.ts",
+      "src/components/__tests__/AnonymousStudyManager.test.tsx",
+      "src/components/__tests__/FinalCompositeAssessment.test.tsx",
+      "src/components/__tests__/MaterialGrantModal.test.tsx",
+      "src/components/__tests__/TrainingParticipationSettings.test.tsx",
+      "src/components/__tests__/WholeCompositeQuestionnaire.test.tsx",
+      "src/components/app-shell/__tests__/management-frame-loading.test.tsx",
+      "src/components/app-shell/__tests__/shell.test.tsx",
+      "src/components/participation/participation-link.test.ts",
+      "src/components/shared-ui/__tests__/RetryableLazy.test.tsx",
+      "src/modules/cognitive/__tests__/CognitivePublicEntry.test.tsx",
+      "src/modules/composite/__tests__/CompositeAssessmentPage.test.tsx",
+      "src/modules/situational/__tests__/vnext-history.test.ts",
+      "src/pages/__tests__/AssignmentList.course-workspace.test.tsx",
+      "src/pages/__tests__/AssignmentList.review-pagination.test.tsx",
+      "src/pages/__tests__/AssignmentList.states.test.tsx",
+      "src/pages/__tests__/TeacherCodeList.test.tsx",
+      "src/pages/__tests__/TeacherTasks.loading.test.tsx",
+      "src/pages/__tests__/UserList.training.test.tsx",
+      "src/pages/admin/AdminTrainingWorkspace.test.tsx",
+      "src/pages/public/__tests__/AnonymousStudyPage.test.tsx",
+      "src/pages/public/__tests__/PublicCheckin.performance.test.tsx",
+      "src/pages/public/__tests__/PublicCheckin.protected-media.test.tsx",
       "src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx",
       "src/pages/questionnaire/__tests__/TrainingQuestionnaireList.test.tsx",
-      "src/components/app-shell/__tests__/management-frame-loading.test.tsx",
-      "src/components/app-shell/__tests__/shell.test.tsx"
+      "src/survey/ResearchCatalog.requests.test.tsx",
+      "src/survey/SurveyPublicApp.final.test.tsx",
+      "src/survey/SurveyToolTemplateEditor.loading.test.tsx",
+      "src/survey/SurveyWaveStudio.preview.test.tsx",
+      "src/survey/survey-cognitive-deferred.test.ts",
+      "src/training/TrainingAdminResources.efficiency.test.tsx",
+      "src/training/TrainingCourseAssessments.loading.test.tsx",
+      "src/training/TrainingCourseAssessments.test.tsx",
+      "src/training/TrainingLearnerCourse.loading.test.tsx"
     ],
     "earlyLintFiles": [
+      "src/api/__tests__/materialGrants.test.ts",
+      "src/api/anonymousStudy.ts",
+      "src/api/materialGrants.ts",
+      "src/components/AnonymousStudyManager.tsx",
+      "src/components/FinalCompositeAssessment.tsx",
+      "src/components/MaterialGrantModal.tsx",
+      "src/components/TrainingParticipationSettings.tsx",
+      "src/components/WholeCompositeQuestionnaire.tsx",
+      "src/components/__tests__/AnonymousStudyManager.test.tsx",
+      "src/components/__tests__/FinalCompositeAssessment.test.tsx",
+      "src/components/__tests__/MaterialGrantModal.test.tsx",
+      "src/components/__tests__/TrainingParticipationSettings.test.tsx",
+      "src/components/__tests__/WholeCompositeQuestionnaire.test.tsx",
       "src/components/app-shell/AppShell.tsx",
       "src/components/app-shell/__tests__/management-frame-loading.test.tsx",
       "src/components/app-shell/__tests__/shell.test.tsx",
+      "src/components/participation/ParticipationCode.tsx",
+      "src/components/participation/ParticipationSettings.tsx",
+      "src/components/participation/PersonalParticipationLink.tsx",
+      "src/components/participation/participation-link.test.ts",
+      "src/components/participation/participation-link.ts",
+      "src/components/participation/training-participation-link.ts",
+      "src/components/shared-ui/RetryableLazy.tsx",
+      "src/components/shared-ui/__tests__/RetryableLazy.test.tsx",
+      "src/modules/cognitive/__tests__/CognitivePublicEntry.test.tsx",
+      "src/modules/cognitive/pages/CognitiveRunner.tsx",
+      "src/modules/cognitive/pages/CognitiveSessionEntry.tsx",
+      "src/modules/composite/CompositeAssessmentPage.tsx",
+      "src/modules/composite/__tests__/CompositeAssessmentPage.test.tsx",
+      "src/modules/composite/__tests__/library-api.test.ts",
+      "src/modules/composite/api.ts",
+      "src/modules/situational/__tests__/vnext-history.test.ts",
+      "src/modules/situational/draft.ts",
+      "src/modules/situational/history.ts",
+      "src/modules/situational/pages/SituationalRunner.tsx",
+      "src/pages/TeacherCodeList.tsx",
+      "src/pages/UserList.tsx",
+      "src/pages/__tests__/TeacherCodeList.test.tsx",
+      "src/pages/__tests__/UserList.training.test.tsx",
+      "src/pages/admin/AdminTrainingWorkspace.test.tsx",
+      "src/pages/admin/AdminTrainingWorkspace.tsx",
+      "src/pages/admin/ScaleLibraryGovernance.rendering.test.tsx",
+      "src/pages/admin/ScaleLibraryGovernance.tsx",
+      "src/pages/public/AnonymousStudyPage.tsx",
+      "src/pages/public/PublicCheckin.tsx",
+      "src/pages/public/__tests__/AnonymousStudyPage.test.tsx",
+      "src/pages/public/__tests__/PublicCheckin.performance.test.tsx",
+      "src/pages/public/__tests__/PublicCheckin.protected-media.test.tsx",
       "src/pages/questionnaire/AssessmentDataExport.tsx",
       "src/pages/questionnaire/DeferredAssessmentDataExport.tsx",
       "src/pages/questionnaire/TrainingQuestionnaireList.tsx",
       "src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx",
       "src/pages/questionnaire/__tests__/TrainingQuestionnaireList.test.tsx",
       "src/pages/questionnaire/deferredAssessmentExport.tsx",
+      "src/services/persistence/__tests__/finalDraftCleanup.test.ts",
+      "src/services/persistence/finalDraftStore.ts",
+      "src/survey/ResearchCatalog.requests.test.tsx",
+      "src/survey/ResearchCatalog.tsx",
+      "src/survey/SurveyMemorableCode.tsx",
+      "src/survey/SurveyParticipationSettings.tsx",
+      "src/survey/SurveyPersonalLink.tsx",
+      "src/survey/SurveyProjectTools.tsx",
+      "src/survey/SurveyPublicApp.final.test.tsx",
+      "src/survey/SurveyPublicApp.tsx",
+      "src/survey/SurveyResearcher.loading.test.tsx",
+      "src/survey/SurveyToolCardRename.test.tsx",
+      "src/survey/SurveyToolLibrary.tsx",
+      "src/survey/SurveyToolTemplateEditor.loading.test.tsx",
+      "src/survey/SurveyToolTemplateEditor.tsx",
+      "src/survey/SurveyWaveStudio.preview.test.tsx",
+      "src/survey/SurveyWaveStudio.tsx",
+      "src/survey/deferred-researcher-component.test.tsx",
+      "src/survey/deferred-researcher-component.tsx",
+      "src/survey/personal-participation-link.ts",
+      "src/survey/survey-cognitive-deferred.test.ts",
+      "src/survey/survey-cognitive-local.ts",
+      "src/survey/survey-cognitive-retention.ts",
+      "src/training/TrainingAdminCourses.test.tsx",
+      "src/training/TrainingAdminCourses.tsx",
+      "src/training/TrainingAdminResources.efficiency.test.tsx",
+      "src/training/TrainingAdminResources.test.tsx",
+      "src/training/TrainingAdminResources.tsx",
       "src/training/TrainingCourseAssessments.loading.test.tsx",
       "src/training/TrainingCourseAssessments.test.tsx",
       "src/training/TrainingCourseAssessments.tsx",
       "src/training/TrainingLearnerCourse.loading.test.tsx",
-      "src/training/TrainingLearnerCourse.tsx"
+      "src/training/TrainingLearnerCourse.tsx",
+      "src/training/trainingResourceCatalog.ts"
     ],
-    "laterFrontendTestFiles": [
-      "src/pages/__tests__/TeacherTasks.loading.test.tsx",
-      "src/pages/__tests__/AssignmentList.course-workspace.test.tsx",
-      "src/pages/__tests__/AssignmentList.review-pagination.test.tsx",
-      "src/pages/__tests__/AssignmentList.states.test.tsx"
-    ],
-    "laterBackendTestFiles": [
-      "src/__tests__/controllers/assignmentExport.test.ts",
-      "src/__tests__/controllers/streamingTaskExport.test.ts",
-      "src/__tests__/controllers/checkinExport.test.ts",
-      "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
-    ],
+    "laterFrontendTestFiles": [],
+    "laterBackendTestFiles": [],
     "newBackendTestFiles": [
       "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
-    ]
+    ],
+    "frontendBuild": "missing-current-component",
+    "postgresSelections": [
+      {
+        "file": "src/__tests__/integration/trainingParticipation.postgres.integration.test.ts",
+        "pattern": "claims a short number once concurrently|restores the same participant across waves|server generated code uses shared mechanism|keeps unpublished study settings private|does not reconfigure a closed study|freezes assigned registry at publication|freezes publication mode and keeps original personal-link",
+        "expectedPassed": 7
+      }
+    ],
+    "selectionRationale": "Only directly changed Training/Survey contracts and their shared identity/media/report consumers. No full platform or performance benchmark. Twelve independently reviewed reset/FINAL PostgreSQL cases and the admitted whole-file groups must not repeat.",
+    "missingRecordRevalidationApproved": true
   },
   "reviewedGroupFiles": {
     "learner-frontend": [
@@ -440,31 +1599,32 @@
       "server-version/frontend/src/pages/student/__tests__/CheckinSubmit.accessibility.test.tsx",
       "server-version/frontend/src/pages/student/__tests__/LearnerSubmission.performance.test.tsx"
     ],
-    "learner-backend": [
-      "server-version/backend/src/__tests__/controllers/assignmentSubmit.test.ts",
-      "server-version/backend/src/__tests__/controllers/checkinSubmit.test.ts"
-    ],
-    "review-current": [
-      "server-version/backend/src/__tests__/controllers/assignmentReview.test.ts"
+    "teacher-retained": [
+      "server-version/frontend/src/pages/__tests__/CheckinList.course-workspace.test.tsx",
+      "server-version/frontend/src/training/TrainingTaskReusePicker.test.tsx"
     ],
     "export-hook": [
       "server-version/frontend/src/hooks/__tests__/useTaskExport.test.tsx"
     ],
-    "legacy-roles": [
-      "server-version/backend/src/__tests__/security/legacy-list-roles.test.ts"
-    ],
-    "teacher-queries": [
-      "server-version/backend/src/__tests__/controllers/trainingTeacherQueries.test.ts"
-    ],
-    "postgres-concurrency": [
-      "server-version/backend/src/__tests__/integration/training-review-export.postgres.integration.test.ts"
-    ],
-    "teacher-retained": [
-      "server-version/frontend/src/pages/__tests__/CheckinList.course-workspace.test.tsx",
-      "server-version/frontend/src/training/TrainingTaskReusePicker.test.tsx"
-    ]
+    "retained-lint": []
   },
   "reviewedDeltas": {
+    "learner-frontend": {
+      "server-version/frontend/src/types/index.ts": {
+        "before": "757793744bb5170f66517169ad21d4495fa9c10b",
+        "after": "132e9193400c0bd894e1dccf4bf64270d23c20b4",
+        "changedSymbols": [
+          "User.updatedAt optional interface member",
+          "TeacherCode.accountValidityDays optional interface member"
+        ],
+        "unchangedExecutedPaths": [
+          "All runtime test module values and imported execution paths; interface-only changes erase during transpilation"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Independent exact Git blob diff contains only optional TypeScript interface declarations, no runtime imports, initializers or values. All other recorded inputs remain unchanged for the admitted test groups. This is not compiler/type-check reuse.",
+        "reviewEvidence": "Independent audit_report_state_optimizations review at 2026-10-24 09:08 UTC against this exact mixed candidate."
+      }
+    },
     "teacher-retained": {
       "server-version/frontend/src/hooks/useTaskExport.ts": {
         "before": "8850276a745f1d6830b280b18718f7fc78df9c0f",
@@ -480,321 +1640,104 @@
         "executedPathUnchanged": true,
         "reason": "The retained Checkin course test supplies an ok download response; the added bounded error-body parser is defined but never called. Existing success branch, pending deduplication and navigation download completion are unchanged. The picker does not call the export hook.",
         "reviewEvidence": "Candidate-specific independent source review approved retaining only these two files; AssignmentList.states moved to fresh affected checks."
+      },
+      "server-version/frontend/src/types/index.ts": {
+        "before": "757793744bb5170f66517169ad21d4495fa9c10b",
+        "after": "132e9193400c0bd894e1dccf4bf64270d23c20b4",
+        "changedSymbols": [
+          "User.updatedAt optional interface member",
+          "TeacherCode.accountValidityDays optional interface member"
+        ],
+        "unchangedExecutedPaths": [
+          "All runtime test module values and imported execution paths; interface-only changes erase during transpilation"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Independent exact Git blob diff contains only optional TypeScript interface declarations, no runtime imports, initializers or values. All other recorded inputs remain unchanged for the admitted test groups. This is not compiler/type-check reuse.",
+        "reviewEvidence": "Independent audit_report_state_optimizations review at 2026-10-24 09:08 UTC against this exact mixed candidate."
+      },
+      "server-version/frontend/src/components/staff-ui/useStaffFeedback.tsx": {
+        "before": "fad925fa85d80d625908daf7761a7552f934afd6",
+        "after": "8f8685b091ea95eda86c4e2bc75dbb1adf752e52",
+        "changedSymbols": [
+          "Optional dialogClassName option with default empty object",
+          "Forward optional className to ManagementDialog"
+        ],
+        "unchangedExecutedPaths": [
+          "Retained CheckinList calls useStaffFeedback without arguments, leaving className undefined and existing ManagementDialog default empty string",
+          "TrainingTaskReusePicker does not invoke this hook"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Retained consumers use the unchanged no-argument path, so existing ManagementDialog empty class default and callbacks are unchanged. This narrow review does not admit the new explicit-class caller or other changed frontend tests.",
+        "reviewEvidence": "Independent audit_report_state_optimizations exact blob and retained-consumer call-site review at 2026-10-24 09:08 UTC."
       }
     },
-    "learner-backend": {
-      "server-version/backend/src/controllers/assignmentController.ts": {
-        "before": "760de0f07bec5a351f4e9ad11a843a642a31a3f3",
-        "after": "5e2b01866afcefff65bb29a5badb68b85dcd4146",
+    "export-hook": {
+      "server-version/frontend/src/types/index.ts": {
+        "before": "757793744bb5170f66517169ad21d4495fa9c10b",
+        "after": "132e9193400c0bd894e1dccf4bf64270d23c20b4",
         "changedSymbols": [
-          "controller list, review, batch grading and export members",
-          "selection and streaming helper imports"
+          "User.updatedAt optional interface member",
+          "TeacherCode.accountValidityDays optional interface member"
         ],
         "unchangedExecutedPaths": [
-          "submit method",
-          "submission validators and image validation",
-          "idempotency, locking, revision persistence, permission and hydration callees"
+          "All runtime test module values and imported execution paths; interface-only changes erase during transpilation"
         ],
         "executedPathUnchanged": true,
-        "reason": "Exact submit AST text, directly consumed submission schema/image validators and original helper/config inputs are unchanged. Changes are separate list/review/export members. New imports do not call submit paths; current streaming/controller checks exercise current initialization.",
-        "reviewEvidence": "Independent candidate-specific AST and transitive-call review, explicitly accepted for these35 historical submit assertions only.",
-        "unchangedSymbolSHA256": {
-          "submissionAnswersSchema": "7baa55294b855e0fca83f4e93c5826b8968d8635c3d137df6395825bf54c09de",
-          "submitSchema": "21f78249044d43ea823a1bcfdd262162d4c2c8358fc2546f0b28df044fd6661a",
-          "{ courseId, title, description, deadline, questions, videos, images, documents, content, tags }": "1df24a60abd7ac39969ce995d125c59bb2aad98cf64af1dec1ebd5badc2b4682",
-          "submit": "2869558f66b9e66aa148168f93a8a6e7c3a7343c10557bc7e2c1d548cde36a7e",
-          "{ content, answers, expectedRevision }": "47962292b4eef7f3346943dc54a19f5d048f305ef1b0e039b02963bdd5314af8",
-          "normalizedAnswers": "de7c0212b0d843a33ce43f36d061fc7af7e9f6305d8477da1b0b1d74bcdde96d",
-          "answers": "85b318cc79e09b8cc8ab1192c69c05b3b9c5cc9afd3f5d6082ec5e7b604912f6",
-          "answer": "6077138054f9ebfd5d86826e0e8d1e2d27e2e06c0c2484e62a979ca6d204ee63",
-          "contentIndex": "6c79a0398d94e410ac05893e20bcef0a6db681a6dfebc55f8ee52e026ffd5019"
-        }
-      },
-      "server-version/backend/src/controllers/checkinController.ts": {
-        "before": "671c88b2bb03bf83b543c863eb83d27652f872fc",
-        "after": "b284600d374c0447309513e9cf14df41f4790f08",
-        "changedSymbols": [
-          "controller list, review, batch grading and export members",
-          "selection and streaming helper imports"
-        ],
-        "unchangedExecutedPaths": [
-          "submit method",
-          "submission validators and image validation",
-          "idempotency, locking, revision persistence, permission and hydration callees"
-        ],
-        "executedPathUnchanged": true,
-        "reason": "Exact submit AST text, directly consumed submission schema/image validators and original helper/config inputs are unchanged. Changes are separate list/review/export members. New imports do not call submit paths; current streaming/controller checks exercise current initialization.",
-        "reviewEvidence": "Independent candidate-specific AST and transitive-call review, explicitly accepted for these35 historical submit assertions only.",
-        "unchangedSymbolSHA256": {
-          "submissionImageSchema": "e9472fcd9d46a7ffd36435344352b015bc069f6dd35abe6b896688c5ffae0e7e",
-          "submitCheckinSchema": "51252ce3a488fd6ecff3e9b6e00110dc632dafe56945dbe597b2a19ddd86bb3e",
-          "isSubmissionAssetImage": "3071763ab23dbefb6996d7f341835aa150d17d4a108d02f65f41a60118194958",
-          "validateStudentSubmissionImages": "7b8a08b9c2af0c644b5344e961736c866029ebead844357d6a12bf50e15ea92e",
-          "assetImages": "f1230094c90015a0ebb1355fd47f5754893101a28df9083637748264c81c0318",
-          "publicSubmissionImageSchema": "c3a55db964256a362b46183d4f4f3d659670e80004ddd1d7cd6a01a36f574afb",
-          "MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION": "aa2f4ff16dba329ef9d9f60df64ea8d0d8187cfb72dbfcb6d6c27100d9a329be",
-          "validatePublicSubmissionImages": "cc055a509eff1487988c343da79714aafa543dbe2aeb703f3d23ac08af1611b6",
-          "publicImageUpload": "ef5d0aa92edf419818289340274e0a6cf1b24b44bba61b2a8e82d22d7de74c76",
-          "acceptedImageMimeTypes": "fc43c33c1aa3ab09a835075fecad9d5ab1d65e90ac42918ceeaf8e838948e36b",
-          "detectAcceptedImageMimeType": "5a582c8c76b3b157fee8663a43c6142343055a9985d92443287d6ca7fde880df",
-          "submissionImageUpload": "735612330274aa0ca96b7d6ce051245c46029a32a187e12df668cb763fbc7e65",
-          "{ courseId, title, description, content, videos, images, documents, endTime, allowViewOthers, tags }": "ed19c8ccb181c9a2b85ee121b43aa9b1a3645665dfe008aa9173e06c01708d82",
-          "{ title, description, content, videos, images, documents, endTime, allowViewOthers, tags }": "8f69ce1ad24529e33f7dce2fee52b0fd461f398b8789697e48cb8aa75529e44b",
-          "submit": "e72ad3eb2b95f3d6c5f84a2474e3fd085adf9b5ce504a144210c8818ac02fe70",
-          "{ content, images, expectedRevision }": "d1428197b8cd11124d7d07192c51417c22f2400bf59ac7199fffb18925926b70",
-          "requestedImages": "e6d6b4844bde66f71fbeb24e7fb06b27e7c92c33ae7132c5ceb6a6e4ec464566",
-          "validatedImages": "51cdc0427e0f6340776dad30d80302de594abbc0d9c723d73e2975a0ef8f0134",
-          "imageUrls": "24fa4273d13f11246936496cba340ddceec2db56e24b01c76c90ff2721af73be",
-          "images": "0d7806ce5774151806c6da842c33000b80a129f86e95399e9e26902e421f04b6",
-          "{ content, images, sessionId }": "ffb1af1d2d0c7b717048a2f4165892d3223b1a5f6bf50784b49e1a3be2911515"
-        }
-      },
-      "server-version/backend/src/middleware/auth.ts": {
-        "before": null,
-        "after": "77bcfc977c6824b72fc4c736ee9cc0bc3b530a63",
-        "changedSymbols": [
-          "newly reachable export/selection helper import",
-          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
-        ],
-        "unchangedExecutedPaths": [
-          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
-        ],
-        "executedPathUnchanged": true,
-        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
-        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
-        "freshValidationFiles": [
-          "src/__tests__/controllers/assignmentExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.test.ts",
-          "src/__tests__/controllers/checkinExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
-        ]
-      },
-      "server-version/backend/src/modules/admin-permissions/security.ts": {
-        "before": null,
-        "after": "213b8a56d4bd4f5b38a76a169e3eb80653c9ead5",
-        "changedSymbols": [
-          "newly reachable export/selection helper import",
-          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
-        ],
-        "unchangedExecutedPaths": [
-          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
-        ],
-        "executedPathUnchanged": true,
-        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
-        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
-        "freshValidationFiles": [
-          "src/__tests__/controllers/assignmentExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.test.ts",
-          "src/__tests__/controllers/checkinExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
-        ]
-      },
-      "server-version/backend/src/modules/assignment-review/selection.ts": {
-        "before": null,
-        "after": "cd26668b8aec06c950f51417c1c1fc7bdae158f7",
-        "changedSymbols": [
-          "newly reachable export/selection helper import",
-          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
-        ],
-        "unchangedExecutedPaths": [
-          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
-        ],
-        "executedPathUnchanged": true,
-        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
-        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
-        "freshValidationFiles": [
-          "src/__tests__/controllers/assignmentExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.test.ts",
-          "src/__tests__/controllers/checkinExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
-        ]
-      },
-      "server-version/backend/src/modules/campus/mfa.service.ts": {
-        "before": null,
-        "after": "52f8715045af9a852b6d572d3d0fa5d7d1b16496",
-        "changedSymbols": [
-          "newly reachable export/selection helper import",
-          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
-        ],
-        "unchangedExecutedPaths": [
-          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
-        ],
-        "executedPathUnchanged": true,
-        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
-        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
-        "freshValidationFiles": [
-          "src/__tests__/controllers/assignmentExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.test.ts",
-          "src/__tests__/controllers/checkinExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
-        ]
-      },
-      "server-version/backend/src/modules/survey/authority.ts": {
-        "before": null,
-        "after": "b7b889966870589ad7ed4acace4d15d233d05aeb",
-        "changedSymbols": [
-          "newly reachable export/selection helper import",
-          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
-        ],
-        "unchangedExecutedPaths": [
-          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
-        ],
-        "executedPathUnchanged": true,
-        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
-        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
-        "freshValidationFiles": [
-          "src/__tests__/controllers/assignmentExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.test.ts",
-          "src/__tests__/controllers/checkinExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
-        ]
-      },
-      "server-version/backend/src/utils/authCookies.ts": {
-        "before": null,
-        "after": "b9bb79d2f94aa6a20c0df557ed55acdb43fe0fd6",
-        "changedSymbols": [
-          "newly reachable export/selection helper import",
-          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
-        ],
-        "unchangedExecutedPaths": [
-          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
-        ],
-        "executedPathUnchanged": true,
-        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
-        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
-        "freshValidationFiles": [
-          "src/__tests__/controllers/assignmentExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.test.ts",
-          "src/__tests__/controllers/checkinExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
-        ]
-      },
-      "server-version/backend/src/utils/jwt.ts": {
-        "before": null,
-        "after": "f07ba6d08aab8fbd53331adb0002b5a142b13eb3",
-        "changedSymbols": [
-          "newly reachable export/selection helper import",
-          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
-        ],
-        "unchangedExecutedPaths": [
-          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
-        ],
-        "executedPathUnchanged": true,
-        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
-        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
-        "freshValidationFiles": [
-          "src/__tests__/controllers/assignmentExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.test.ts",
-          "src/__tests__/controllers/checkinExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
-        ]
-      },
-      "server-version/backend/src/utils/sessionRevocation.ts": {
-        "before": null,
-        "after": "ea50d612d3a45b71d5b85746bb0fee82110d919d",
-        "changedSymbols": [
-          "newly reachable export/selection helper import",
-          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
-        ],
-        "unchangedExecutedPaths": [
-          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
-        ],
-        "executedPathUnchanged": true,
-        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
-        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
-        "freshValidationFiles": [
-          "src/__tests__/controllers/assignmentExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.test.ts",
-          "src/__tests__/controllers/checkinExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
-        ]
-      },
-      "server-version/backend/src/utils/streamingTaskExport.ts": {
-        "before": null,
-        "after": "deee161c9ff6069279262040ea58f15a6354695b",
-        "changedSymbols": [
-          "newly reachable export/selection helper import",
-          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
-        ],
-        "unchangedExecutedPaths": [
-          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
-        ],
-        "executedPathUnchanged": true,
-        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
-        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
-        "freshValidationFiles": [
-          "src/__tests__/controllers/assignmentExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.test.ts",
-          "src/__tests__/controllers/checkinExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
-        ]
+        "reason": "Independent exact Git blob diff contains only optional TypeScript interface declarations, no runtime imports, initializers or values. All other recorded inputs remain unchanged for the admitted test groups. This is not compiler/type-check reuse.",
+        "reviewEvidence": "Independent audit_report_state_optimizations review at 2026-10-24 09:08 UTC against this exact mixed candidate."
       }
     },
-    "review-current": {
-      "server-version/backend/src/utils/streamingTaskExport.ts": {
-        "before": "8ecc20814ff609e2215776d4617b61c7211dee76",
-        "after": "deee161c9ff6069279262040ea58f15a6354695b",
-        "changedSymbols": [
-          "ExcelJS runtime import removal",
-          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
-        ],
-        "unchangedExecutedPaths": [
-          "reviewSelection, submissions, grade, batchGrade and selection helpers; no workbook calls"
-        ],
-        "executedPathUnchanged": true,
-        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
-        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
-        "freshValidationFiles": [
-          "src/__tests__/controllers/assignmentExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.test.ts",
-          "src/__tests__/controllers/checkinExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
-        ]
-      }
+    "retained-lint": {}
+  },
+  "executionPolicy": "missing-only-current-mixed-candidate",
+  "fixedPgCases": [
+    {
+      "file": "server-version/backend/src/__tests__/integration/trainingParticipation.postgres.integration.test.ts",
+      "caseName": "continues a previously frozen FORM with the new proof and rejects old FINAL/replay without changing admission"
     },
-    "legacy-roles": {
-      "server-version/backend/src/utils/streamingTaskExport.ts": {
-        "before": "8ecc20814ff609e2215776d4617b61c7211dee76",
-        "after": "deee161c9ff6069279262040ea58f15a6354695b",
-        "changedSymbols": [
-          "ExcelJS runtime import removal",
-          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
-        ],
-        "unchangedExecutedPaths": [
-          "legacy teacher list role and creator relation queries; no export calls"
-        ],
-        "executedPathUnchanged": true,
-        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
-        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
-        "freshValidationFiles": [
-          "src/__tests__/controllers/assignmentExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.test.ts",
-          "src/__tests__/controllers/checkinExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
-        ]
-      }
+    {
+      "file": "server-version/backend/src/__tests__/integration/trainingParticipation.postgres.integration.test.ts",
+      "caseName": "linearizes FORM FINAL against reset without deadlock or duplicate answers"
     },
-    "teacher-queries": {
-      "server-version/backend/src/utils/streamingTaskExport.ts": {
-        "before": "8ecc20814ff609e2215776d4617b61c7211dee76",
-        "after": "deee161c9ff6069279262040ea58f15a6354695b",
-        "changedSymbols": [
-          "ExcelJS runtime import removal",
-          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
-        ],
-        "unchangedExecutedPaths": [
-          "teacher query consumers with sendTaskExport mocked; original module definitions only"
-        ],
-        "executedPathUnchanged": true,
-        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
-        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
-        "freshValidationFiles": [
-          "src/__tests__/controllers/assignmentExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.test.ts",
-          "src/__tests__/controllers/checkinExport.test.ts",
-          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
-        ]
-      }
+    {
+      "file": "server-version/backend/src/__tests__/integration/trainingParticipation.postgres.integration.test.ts",
+      "caseName": "refuses an entire reset with a historical unbound attempt before any credential rotation"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/integration/trainingParticipation.postgres.integration.test.ts",
+      "caseName": "reset immediately invalidates old identity and per-wave reports while preserving accepted answers"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/integration/trainingStableAdmission.postgres.integration.test.ts",
+      "caseName": "SCALE frozen before reset accepts current proof, rejects old FINAL and completed replay, and preserves admission"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/integration/trainingStableAdmission.postgres.integration.test.ts",
+      "caseName": "accepted WHOLE receipt survives reset with batch=true, while old client access stays denied"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/integration/trainingStableAdmission.postgres.integration.test.ts",
+      "caseName": "accepted WHOLE receipt survives reset with batch=false, while old client access stays denied"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/integration/trainingStableAdmission.postgres.integration.test.ts",
+      "caseName": "COGNITIVE preserves frozen admission across reset and rejects old proof including completed replay"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/integration/trainingResetBoundaries.postgres.integration.test.ts",
+      "caseName": "preserves the actual completed report endpoint while replacing its credential"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/integration/trainingResetBoundaries.postgres.integration.test.ts",
+      "caseName": "serializes reset first using actual parent-lock waiters"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/integration/trainingResetBoundaries.postgres.integration.test.ts",
+      "caseName": "serializes FINAL first using actual parent-lock waiters"
+    },
+    {
+      "file": "server-version/backend/src/__tests__/integration/trainingStableAdmission.postgres.integration.test.ts",
+      "caseName": "serializes identity revocation behind a Cognitive FINAL parent lock without child-parent inversion"
     }
-  }
+  ]
 }

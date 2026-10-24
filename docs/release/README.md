@@ -1500,3 +1500,43 @@ step, analysis success, options and 24-hour lifetime remain checked. Database
 checks may finish independently after an unrelated frontend assertion failure;
 such a failure still fails the job and blocks merging. A compiled artifact is
 retained even if an independent later check fails, so it need not be rebuilt.
+
+### Current Training + Survey mixed candidate (2026-10-24)
+
+The previously unmerged Training-entry slot is superseded, not added to: current
+base is `44c1e502acaed5524c5b1e233d1bfb1f0c6f7b40`, product snapshot is
+`4a4756d133e5da75345da7f7af75091b0b3f41fb`, source tree is
+`6c9b70e26ae5d23f412e819d453673639fce5f6a`, and the only PR branch is
+`backup/training-survey-main350-20261024`. Exact source blobs, modes, complete
+changed-path inventory and current control hashes are frozen by the existing
+binding/admission mechanism. The old 67d0/a1369 qualification is not inherited.
+All other main routes remain unchanged. Reusable-workflow closure remains 50.
+
+Current required merge checks are scope, the whole nested qualification, and
+fresh application/control CodeQL. The nested lane requires reviewed local
+admission, current production dependency HIGH/CRITICAL audits, missing directly
+affected frontend/backend contracts, one emitted build per component, and real
+Chromium on those exact frontend bytes. Browser API responses remain synthetic;
+the browser result proves compiled UI interaction, not HTTP-to-database access.
+Real PostgreSQL credential/reset/FINAL evidence is separately bound and cannot be
+replaced by UI mocks. Fixed selected-case admission does not certify unselected
+cases or turn original failed invocations into successful whole-file runs.
+
+Because this product adds two migrations, the earlier entry-only exclusion of
+DB validation no longer applies. CI must create the complete fixed-main schema
+in an isolated PostgreSQL service, retain nonempty old study/participant/wave/
+attempt/answer rows, apply exactly the two new migrations, verify old-column
+fidelity and new guards, and dump/restore into a second new database with row,
+constraint, index, trigger and function equality. Existing databases are never
+reset. Same-input checks already admitted locally do not run again; missing
+records cause only the specifically selected affected checks to execute, not a
+platform-wide or performance suite. New control contracts are run locally once
+at final freeze and admitted only with their exact control hashes.
+
+This is merge qualification, not release/deployment qualification: no production
+image or OS-package scan is claimed, no production artifact is approved, and no
+server or Mac is changed. npm dependency audit and CodeQL are not substitutes
+for a production runtime-image scan when a later release requires one. A draft,
+missing, skipped, failed or cancelled selected job remains blocking; no fallback
+route may bypass these requirements. Report the actual waiting stage after five
+minutes rather than widening or repeating completed work.

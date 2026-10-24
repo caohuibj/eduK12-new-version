@@ -1,4 +1,4 @@
-name: Training entry exact merge qualification
+name: Training Survey exact mixed merge qualification
 on:
   workflow_call:
     inputs:
@@ -31,9 +31,7 @@ jobs:
           node-version: '24.21.0'
       - name: verify exact scope and explicitly reviewed original local evidence
         run: node .github/scripts/training-entry-checks.mjs admission
-      - name: execute new exact-scope and refusal contracts once in CI
-        run: node --test .github/scripts/training-entry.test.mjs
-      - name: reuse exact official audits or refresh only expired audits
+      - name: run current frontend and backend HIGH CRITICAL dependency audits
         env:
           GH_TOKEN: ${{ github.token }}
         run: node .github/scripts/training-entry-checks.mjs audit
@@ -45,11 +43,20 @@ jobs:
           if-no-files-found: error
           retention-days: 3
   backend:
+    services:
+      postgres:
+        image: postgres:17
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: synthetic-ci-only
+          POSTGRES_DB: qualification_training_entry_ci
+        ports: ['55432:5432']
+        options: --health-cmd pg_isready --health-interval 2s --health-timeout 2s --health-retries 15
     needs: admission
     runs-on: ubuntu-24.04
     timeout-minutes: 8
     env:
-      DATABASE_URL: postgresql://synthetic:synthetic@127.0.0.1:5432/unused_compile_only
+      DATABASE_URL: postgresql://postgres:synthetic-ci-only@127.0.0.1:55432/qualification_training_entry_ci
       NODE_ENV: test
       JWT_SECRET: ci-training-entry-synthetic-jwt-not-a-real-credential
       ASSET_SIGNING_SECRET: ci-training-entry-synthetic-assets-not-a-real-credential
@@ -61,6 +68,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -70,15 +78,21 @@ jobs:
       - name: install official locked backend tools
         working-directory: server-version/backend
         run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: generate existing Prisma declarations without a database
+      - name: generate exact candidate Prisma declarations
         working-directory: server-version/backend
         run: node node_modules/prisma/build/index.js generate
+      - name: upgrade nonempty fixed-main database and verify isolated dump restore
+        env:
+          CI_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
+        run: node .github/scripts/training-entry-migration.mjs
       - name: emit the missing backend compilation once
         run: node .github/scripts/training-entry-checks.mjs backend-compile
-      - name: only explicitly approved missing-record early backend files
+      - name: only fixed missing-record affected backend contracts
         run: node .github/scripts/training-entry-checks.mjs backend
-      - name: only separately approved compact-record streaming files
-        run: node .github/scripts/training-entry-checks.mjs backend-later
+      - name: only the seven missing participation cases, never the twelve admitted reset FINAL cases
+        env:
+          TRAINING_PARTICIPATION_TEST_DATABASE_URL: postgresql://postgres:synthetic-ci-only@127.0.0.1:55432/qualification_training_entry_ci
+        run: node .github/scripts/training-entry-checks.mjs postgres
       - uses: actions/upload-artifact@v4
         if: always()
         with:
@@ -101,6 +115,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -110,10 +125,8 @@ jobs:
       - name: install official locked frontend tools
         working-directory: server-version/frontend
         run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: only explicitly approved missing-record early frontend files
+      - name: only fixed missing-record affected frontend contracts
         run: node .github/scripts/training-entry-checks.mjs frontend
-      - name: only separately approved compact-record paging files
-        run: node .github/scripts/training-entry-checks.mjs frontend-later
       - name: only early changed lint inputs whose original records are missing
         run: node .github/scripts/training-entry-checks.mjs lint
       - name: require explicit one-time rebuild exception
@@ -142,6 +155,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
+          fetch-depth: 0
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:

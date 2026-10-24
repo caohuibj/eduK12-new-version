@@ -77,6 +77,8 @@ const requiredScenarios = [
   ...['assignments', 'checkins'].flatMap(kind => ['detail', 'submit'].flatMap(phase => ['success', 'failure'].map(outcome => `learner-${kind}-${phase}-${outcome}`))),
   'checkin-late-upload', 'teacher-assignments-lazy-courses', 'teacher-checkins-lazy-courses',
   'assignment-review-paging-batch-download', 'assessment-deferred-export-retry',
+  ...['PERSONAL_LINK', 'MEMORABLE_CODE', 'SELF_CODE'].map(mode => `anonymous-enrollment-${mode}`),
+  'anonymous-saved-recovery-retry-clear', 'anonymous-memorable-reset', 'anonymous-sjt-image-retry',
 ];
 const report = {
   status: 'RUNNING', startedAt: new Date().toISOString(), syntheticOnly: true, physicalBrowser: false, browserChannel: 'chrome', chromiumSandbox: true, playwrightVersion, nodeVersion: process.version,
@@ -86,6 +88,7 @@ const report = {
   harnessSha256: sha256(await readFile(fileURLToPath(import.meta.url))),
   distManifestSha256: sha256(JSON.stringify(manifest)), requiredScenarios, scenarios: [],
   limitations: [
+    'Anonymous enrollment, recovery and reset use synthetic API responses. They prove compiled UI contracts only, not browser-to-database authorization or real credential rotation. SJT image byte delivery remains outside this harness.',
     'Chromium synthetic UI contracts only; not backend authorization, database, production, native Safari or a quantitative performance benchmark.',
     'Management coverage is limited to actual lazy Survey/School/Teacher frame mounting, anonymous/no-grant boundaries and the Organization entry; no full management workflow, security-key/MFA operation or authority proof.',
     'Learner races use real course links and same-document browser history through unmount/remount. Same-mounted route-param swaps, raw legacy-answer fallback and sanitizer/media invocation counts remain targeted unit-test coverage.',
@@ -560,6 +563,159 @@ try {
     assert.equal(count('POST /api/composite-assessments/assessment/export'), 1);
     assert.deepEqual(result.downloads, ['synthetic-assessment.csv']);
     await proof('explicit-export');
+  });
+
+
+  // All credentials below are public synthetic fixture values, never real secrets.
+  // Real principal/epoch/reset authorization is independently covered by PG tests.
+  const studyId = 'browser-study', waveId = 'browser-wave';
+  const studyBase = '/api/public/anonymous-studies';
+  const studyPath = `/public/studies/${studyId}`;
+  const invitation = `/public/studies/waves/${waveId}/synthetic-invitation`;
+  const studyCredential = 's'.repeat(43), rotatedCredential = 'r'.repeat(43);
+  const studyHome = { studyId, title: '合成匿名培训', displayCode: 'DISPLAY-ONLY', limitations: [], waves: [
+    { id: waveId, title: '合成进行中任务', ordinal: 1, attemptId: 'browser-attempt', state: 'IN_PROGRESS', completedAt: null, accepting: true },
+    { id: 'history-wave', title: '合成历史任务', ordinal: 2, attemptId: 'history-attempt', state: 'COMPLETED', completedAt: '2026-10-01T00:00:00Z', accepting: false },
+  ] };
+  const installStudy = ({ on, json }, mode, homeHandler) => {
+    const entry = { id: waveId, studyId, studyTitle: '合成匿名培训', title: '合成邀请', accepting: true, mode, label: '分配的短编号', instructions: '' };
+    on(`POST ${studyBase}/waves/${waveId}/info`, ({body}) => { assert.equal(body.token, 'synthetic-invitation'); return json(entry); });
+    on(`GET ${studyBase}/${studyId}/participation-info`, () => json(entry));
+    on(`GET ${studyBase}/${studyId}`, homeHandler || (() => json(studyHome)));
+    on(`GET ${studyBase}/${studyId}/research-consent`, () => json({ version: null, acceptedVersion: null, acceptance: null, state: 'UNKNOWN', revision: 0, eligible: false, reason: null }));
+  };
+  for (const mode of ['PERSONAL_LINK', 'MEMORABLE_CODE', 'SELF_CODE']) {
+    await scenario(`anonymous-enrollment-${mode}`, null, async tools => {
+      const { page, on, json, count, proof } = tools;
+      installStudy(tools, mode, ({request}) => { assert.equal(request.headers().authorization, `Bearer ${studyCredential}`); return json(studyHome); });
+      const joinKey = `POST ${studyBase}/waves/${waveId}/join`;
+      on(joinKey, ({body}) => {
+        assert.equal(body.consent, true); assert.equal(body.token, 'synthetic-invitation');
+        if (mode === 'MEMORABLE_CODE') { assert.equal(body.prefix, '001'); assert.equal(body.suffix, 'SKY7'); }
+        if (mode === 'SELF_CODE') assert.equal(body.generatedCode, true);
+        return json({ studyId, credential: studyCredential, displayCode: 'DISPLAY-ONLY', ...(mode !== 'PERSONAL_LINK' ? { fullCode: '001-SKY7' } : {}) });
+      });
+      await page.goto(origin + invitation);
+      await page.getByRole('heading', { name: '已经参加过？继续原来的记录' }).waitFor();
+      assert.equal(await page.getByRole('link', { name: '以单次访客开始' }).getAttribute('href'), '/public/composite/synthetic-invitation');
+      const enroll = page.getByRole('button', { name: mode === 'PERSONAL_LINK' ? '创建研究内身份码' : mode === 'SELF_CODE' ? '领取随机恢复编码' : '确认研究编码', exact: true });
+      assert.equal(await enroll.isDisabled(), true);
+      await page.getByRole('checkbox', { name: '我选择保存研究内身份，了解本研究多次作答可关联。' }).check();
+      if (mode === 'MEMORABLE_CODE') {
+        await page.getByLabel('分配的短编号', { exact: true }).fill('001');
+        await page.getByLabel('自己设置的后缀', { exact: true }).fill('SKY7');
+        await page.getByLabel('再次确认后缀', { exact: true }).fill('SKY7');
+      }
+      await enroll.click();
+      await page.getByRole('heading', { name: '先保存，下次才能继续' }).waitFor();
+      assert.equal(count(joinKey), 1);
+      assert.equal(count(`GET ${studyBase}/${studyId}`), 0, 'Enrollment must first show save credentials, not silently start answering');
+      if (mode === 'PERSONAL_LINK') {
+        await page.getByRole('img', { name: '专属参与二维码' }).waitFor();
+        const downloadPromise = page.waitForEvent('download');
+        await page.getByRole('button', { name: '保存链接文件', exact: true }).click();
+        const download = await downloadPromise;
+        const path = resolve(evidence, 'synthetic-study-link.txt'); await download.saveAs(path);
+        const content = await readFile(path, 'utf8');
+        assert.ok(content.includes(studyPath)); assert.ok(content.includes(studyCredential));
+      } else await page.getByText('001-SKY7', { exact: true }).waitFor();
+      await proof('save-before-answer');
+      await page.getByRole('button', { name: mode === 'PERSONAL_LINK' ? '进入我的研究测评' : '我已保存，进入答题', exact: true }).click();
+      await page.getByRole('button', { name: '继续作答', exact: true }).waitFor();
+      await page.getByRole('button', { name: '查看本次个人报告', exact: true }).waitFor();
+      await page.getByText('研究者尚未发布版本化研究同意正文。', { exact: true }).waitFor();
+      assert.equal(count(joinKey), 1);
+      assert.equal(await page.evaluate(id => sessionStorage.getItem(`anonymous-study:identity:${id}`), studyId), studyCredential);
+      assert.ok(!new URL(page.url()).search.includes(studyCredential));
+      await proof('task-history-without-implied-research-consent');
+    }, 390);
+  }
+  await scenario('anonymous-saved-recovery-retry-clear', null, async tools => {
+    const { page, on, json, count, proof } = tools;
+    let reads = 0;
+    installStudy(tools, 'PERSONAL_LINK', ({request}) => {
+      assert.equal(request.headers().authorization, `Bearer ${studyCredential}`);
+      return ++reads === 1 ? { ...json(null, 503, '合成恢复暂不可用'), status: 503 } : json(studyHome);
+    });
+    await page.addInitScript(({studyId, credential, studyPath}) => {
+      sessionStorage.setItem(`anonymous-study:identity:${studyId}`, credential);
+      sessionStorage.setItem('composite:recovery:attempt:browser-attempt', 'same-study-proof');
+      sessionStorage.setItem('composite:study:return:browser-attempt', studyPath);
+      sessionStorage.setItem('composite:recovery:attempt:other-attempt', 'other-study-proof');
+      sessionStorage.setItem('composite:study:return:other-attempt', '/public/studies/other');
+    }, { studyId, credential: studyCredential, studyPath });
+    await page.goto(origin + studyPath);
+    await page.getByRole('button', { name: '重新读取我的任务', exact: true }).waitFor();
+    assert.equal(await page.getByRole('button', { name: '创建研究内身份码', exact: true }).count(), 0);
+    assert.equal(await page.getByRole('button', { name: '查看本次个人报告', exact: true }).count(), 0);
+    await proof('recover-failure-no-new-identity');
+    await page.getByRole('button', { name: '重新读取我的任务', exact: true }).click();
+    await page.getByRole('button', { name: '继续作答', exact: true }).waitFor();
+    assert.equal(count(`GET ${studyBase}/${studyId}`), 2);
+    await page.getByRole('button', { name: '退出并清除本机凭证', exact: true }).click();
+    await page.getByRole('button', { name: '用身份码进入', exact: true }).waitFor();
+    assert.deepEqual(await page.evaluate(id => [sessionStorage.getItem(`anonymous-study:identity:${id}`), sessionStorage.getItem('composite:recovery:attempt:browser-attempt'), sessionStorage.getItem('composite:study:return:browser-attempt'), sessionStorage.getItem('composite:recovery:attempt:other-attempt')], studyId), [null, null, null, 'other-study-proof']);
+    assert.equal(count(`POST ${studyBase}/waves/${waveId}/join`), 0);
+    assert.equal(count(`POST ${studyBase}/${studyId}/revoke`), 0);
+    await proof('local-clear-keeps-other-study');
+  });
+  await scenario('anonymous-memorable-reset', null, async tools => {
+    const { page, on, json, count, proof } = tools;
+    installStudy(tools, 'MEMORABLE_CODE', ({request}) => { assert.equal(request.headers().authorization, `Bearer ${rotatedCredential}`); return json(studyHome); });
+    const resetKey = `POST ${studyBase}/${studyId}/code/reset`;
+    on(resetKey, ({body}) => { assert.deepEqual(body, { resetCode: 'SYNTHETIC-RESET', suffix: 'NEW7' }); return json({ studyId, credential: rotatedCredential, displayCode: 'DISPLAY-ONLY' }); });
+    await page.goto(origin + studyPath);
+    await page.getByRole('button', { name: '研究者已为我重置编码', exact: true }).click();
+    await page.getByLabel('一次性重置码', { exact: true }).fill('SYNTHETIC-RESET');
+    await page.getByLabel('新的私人后缀', { exact: true }).fill('NEW7');
+    await page.getByLabel('确认新的后缀', { exact: true }).fill('WRONG');
+    await page.getByRole('button', { name: '设置新后缀', exact: true }).click();
+    await page.getByText('两次后缀不一致，请核对。', { exact: true }).waitFor(); assert.equal(count(resetKey), 0);
+    await page.getByLabel('确认新的后缀', { exact: true }).fill('NEW7');
+    await page.getByRole('button', { name: '设置新后缀', exact: true }).click();
+    await page.getByRole('button', { name: '继续作答', exact: true }).waitFor();
+    assert.equal(count(resetKey), 1);
+    assert.equal(await page.evaluate(id => sessionStorage.getItem(`anonymous-study:identity:${id}`), studyId), rotatedCredential);
+    assert.equal(await page.getByLabel('一次性重置码', { exact: true }).count(), 0);
+    assert.equal(count(`POST ${studyBase}/waves/${waveId}/join`), 0);
+    await proof('reset-contract-restores-existing-history');
+  });
+
+
+  await scenario('anonymous-sjt-image-retry', null, async ({page, on, json, count, proof}) => {
+    const parent = 'sjt-parent', child = 'sjt-child', item = 'sjt-item', credential = 'm'.repeat(43);
+    const path = `/api/public/composite-assessments/attempts/${parent}/items/${item}/situational/${child}`;
+    const png = Buffer.from('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR4nGNQaPj/HwAFAgKfdqhGyQAAAABJRU5ErkJggg==', 'base64');
+    const identity = { instrumentKey: 'synthetic-visual', instrumentVersion: '1.0.0', definitionHash: 'a'.repeat(64), compiledRuntimeHash: 'b'.repeat(64), scorerKey: 'situational.default', scoringVersion: 'pilot-v1' };
+    const date = '2026-10-01T00:00:00.000Z';
+    const data = { attemptId: child, attempt: { id: child, ...identity, attemptNo: 1, status: 'IN_PROGRESS', deliveryMode: 'FINAL_ONLY', runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1, progress: 0, submissionId: null, submissionPayloadHash: null, submittedAt: null, startedAt: date, completedAt: null, totalTime: null, createdAt: date, updatedAt: date }, instrument: {
+      ...identity, key: identity.instrumentKey, version: identity.instrumentVersion, releaseStatus: 'PUBLISHED', scienceMaturity: 'PILOT', frozenAt: date, sampling: {strategy: 'ALL'},
+      definition: { schemaVersion: 1, respondentType: 'participant_self_report', sampling: {strategy: 'ALL'}, scenes: [{sceneKey: 'S1', title: '合成视觉情境', sortOrder: 0,
+        stimulus: {type: 'IMAGE', asset: {assetId: 'synthetic-image', contentHash: sha256(png), mimeType: 'image/png'}, altText: '合成情境图片'},
+        channels: [{channelKey: 'choice', responseType: 'SINGLE_CHOICE', prompt: '选择一个行动', options: [{optionKey: 'A', label: '合成选择 A'}, {optionKey: 'B', label: '合成选择 B'}]}]}]},
+      report: {reportVersion: 'v1', primaryMetricKeys: ['metric'], metricOrder: ['metric'], interpretations: [], limitations: [], disclaimer: 'Synthetic only'}, referencePolicy: {type: 'none'}, runtimeCapabilities: {standalone: false, embedded: true, aggregateEligible: true, collectionFacts: true, supported: true},
+    }};
+    on(`GET ${path}`, ({request}) => {assert.equal(request.headers()['x-recovery-token'], credential); return json(data);});
+    let imageReads = 0;
+    const imageKey = `GET ${path}/assets/synthetic-image/content`;
+    on(imageKey, ({request}) => {
+      assert.equal(request.headers()['x-recovery-token'], credential);
+      return ++imageReads === 1 ? {...json(null, 403, '合成媒体拒绝'), status: 403} : {status: 200, contentType: 'image/png', body: png};
+    });
+    await page.addInitScript(({parent, credential}) => sessionStorage.setItem(`composite:recovery:attempt:${parent}`, credential), {parent, credential});
+    await page.goto(origin + `/public/composite/situational/${child}?compositeAttemptId=${parent}&compositeItemId=${item}`);
+    await page.getByText('视觉内容加载失败，当前内容暂不能作答。', {exact: true}).waitFor();
+    assert.equal(await page.getByLabel('合成选择 A', {exact: true}).isDisabled(), true);
+    assert.equal(count(`POST ${path}/submit`), 0);
+    await proof('image-error-blocks-answer');
+    await page.getByRole('button', {name: '重试', exact: true}).click();
+    const image = page.getByRole('img', {name: '合成情境图片', exact: true});
+    await image.waitFor();
+    await image.evaluate(async element => {await element.decode(); if (!element.naturalWidth) throw Error('Synthetic PNG did not decode');});
+    assert.equal(await page.getByLabel('合成选择 A', {exact: true}).isEnabled(), true);
+    assert.equal(count(imageKey), 2);
+    assert.ok(!page.url().includes(credential));
+    await proof('image-retry-decoded-with-parent-header');
   });
 
   assert.deepEqual(report.scenarios.map(item => item.name).sort(), [...requiredScenarios].sort(), 'Required browser scenario missing or duplicated');

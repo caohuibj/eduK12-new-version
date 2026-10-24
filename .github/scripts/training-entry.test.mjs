@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {gzipSync} from 'node:zlib';
 import {binding,branch,marker,trainingEntryPlan,trainingEntryOutputs} from './training-entry-scope.mjs';
-import {verifyEvidence,verifyFreshReport,requireApproval} from './training-entry-checks.mjs';
+import {verifyEvidence,verifyFreshReport,requireApproval,verifyFixedPg,requireMissingRecordApproval} from './training-entry-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 function fixture(){
  const head='a'.repeat(40),source='b'.repeat(40),values={};
@@ -57,6 +57,10 @@ test('workflow stays bounded and blocks broad manual probes before any work',()=
  assert(main.includes('"perf/training-entry-20261023","work/measurement-version-final-20261020"'));
  assert(wf.includes('needs: [admission, backend, frontend, browser]'));
  assert(wf.includes('training-entry-checks.mjs build-permission'));
+ assert(wf.includes('training-entry-migration.mjs'));
+ assert(wf.includes('postgres:17'));
+ assert(wf.includes('run current frontend and backend HIGH CRITICAL dependency audits'));
+ assert(main.includes('backup/training-survey-main350-20261024'));
  assert(wf.includes('training-entry-browser.mjs'));
  for(const forbidden of ['npm test','npm run typecheck','docker build','migrate deploy','--grep','--passWithNoTests'])assert(!wf.includes(forbidden),forbidden);
 });
@@ -68,15 +72,15 @@ function evidenceFixture(change=()=>{}){
  const record={id:'synthetic-original',sha256:digest(log),bytes:log.length,gzipBase64:gzipSync(log).toString('base64')};
  const controls=binding.controls.filter(f=>!f.endsWith('training-entry-bindings.json')&&!f.startsWith('.github/evidence/'));
  const e={kind:'reviewed-local-evidence',product:binding.product,ciExecuted:false,originalExecutionSigned:false,reviewStatus:'INDEPENDENTLY_REVIEWED',blockers:[],
-  limits:['Original execution was unsigned.','Historical full node_modules identity missing.'],controlSHA256:Object.fromEntries(controls.map(f=>[f,digest('control '+f)])),historicalReports:[record],
+  controlValidation:{exitCode:0,command:'node --test .github/scripts/training-entry.test.mjs',passed:38,logSHA256:'a'.repeat(64)},limits:['Original execution was unsigned.','Historical full node_modules identity missing.'],controlSHA256:Object.fromEntries(controls.map(f=>[f,digest('control '+f)])),historicalReports:[record],
   groups:[{id:'synthetic',reviewStatus:'INDEPENDENTLY_REVIEWED',reviewNote:'Independent review establishes exact selected original file and its unchanged complete imports.',executions:[{
    source,kind:'whole-file-tests',cwd:'server-version/frontend',command:null,commandSource:'reviewed-historical-scope-reconstruction',commandEvidence:'Retained worker named full-file scope, explicitly not original argv.',reviewedInvocation:{files:[file],filter:null},
    originalExecutionSigned:false,ciExecuted:false,files:[file],inputs,sourceObjectMode:'preserved-reviewed-local-manifest',originalManifestSource:source,originalManifestSHA256:digest(JSON.stringify(inputs)),historicalSourceReconstructed:true,originalManifestReview:'Reviewed immutable local Git source closure, not a contemporaneous cryptographic execution record.',
    reportId:record.id,logSHA256:record.sha256,logBytes:record.bytes,logGzipBase64:record.gzipBase64,observedExitCode:0,failed:0,filtered:0,todo:0,passedAssertions:1,admittedAssertions:1,
   }]}]};
  change(e,e.groups[0].executions[0]);const bytes=Buffer.from(JSON.stringify(e));
- const original={requiredGroups:binding.requiredGroups,evidenceSHA256:binding.evidenceSHA256,reviewedGroupFiles:binding.reviewedGroupFiles};
- Object.assign(binding,{requiredGroups:['synthetic'],evidenceSHA256:digest(bytes),reviewedGroupFiles:{synthetic:[file]}});
+ const original={requiredGroups:binding.requiredGroups,evidenceSHA256:binding.evidenceSHA256,reviewedGroupFiles:binding.reviewedGroupFiles,fixedPgCases:binding.fixedPgCases};
+ Object.assign(binding,{fixedPgCases:[],requiredGroups:['synthetic'],evidenceSHA256:digest(bytes),reviewedGroupFiles:{synthetic:[file]}});
  try{return verifyEvidence(f=>f.endsWith('/reviewed.json')?bytes:Buffer.from('control '+f),()=>blob);}finally{Object.assign(binding,original);}
 }
 test('admits only independently reviewed whole-file evidence without invented case names',()=>{const r=evidenceFixture();assert.equal(r.acceptedWholeFiles,1);assert.equal(r.acceptedWholeFileAssertions,1)});
@@ -129,3 +133,23 @@ test('complete main workflow reference graph stays within GitHub initialization 
  assert(!refs.has('./.github/workflows/ci-cognitive-step.yml'));
  assert(refs.has('./.github/workflows/ci-training-entry.yml'));
 });
+
+function fixedPgFixture(){
+ const digest=v=>createHash('sha256').update(v).digest('hex'),blob='c'.repeat(40);
+ const files=[...new Set(binding.fixedPgCases.map(c=>c.file))];
+ const sourceInputs=Object.fromEntries(files.map(f=>[f,blob]));
+ const cases=binding.fixedPgCases.map(c=>({...c,sourceBlob:blob,originalRunId:c.file}));
+ const originalExecutions=files.map(file=>{const selectedCaseNames=cases.filter(c=>c.file===file).map(c=>c.caseName),log=Buffer.from(`Tests ${selectedCaseNames.length} passed`);return {id:file,cwd:'server-version/backend',runnerSHA256:'a'.repeat(64),argv:['node','node_modules/vitest/vitest.mjs','run',file.slice('server-version/backend/'.length)],selectedCaseNames,failedCaseNames:[],failedCount:0,passedCount:selectedCaseNames.length,originalInvocationExit:0,logBytes:log.length,logSHA256:digest(log),logGzipBase64:gzipSync(log).toString('base64')};});
+ return {e:{kind:'reviewed-fixed-training-anonymous-pg-12',reviewStatus:'INDEPENDENTLY_REVIEWED_FIXED_12_CASE_MAPPING',ciExecuted:false,originalExecutionSigned:false,currentLocalProduct:binding.localProduct,currentProductTree:binding.productTree,sourceInputs,sourceInputsSHA256:digest(JSON.stringify(sourceInputs)),cases,originalExecutions},object:()=>files.map(f=>`100644 blob ${blob}\t${f}`).join('\n')};
+}
+test('fixed PG admission is exactly twelve reviewed cases, not whole files',()=>{const f=fixedPgFixture();assert.deepEqual(verifyFixedPg(f.e,f.object),{cases:12,kind:f.e.kind,ciExecuted:false,wholeFileQualification:false});});
+for(const [name,change]of [
+ ['invented case',f=>f.e.cases[0].caseName+=' unknown'],
+ ['missing case',f=>f.e.cases.pop()],
+ ['duplicate case',f=>f.e.cases[0]=f.e.cases[1]],
+ ['failed case claimed',f=>{const r=f.e.originalExecutions[0];r.failedCaseNames=[r.selectedCaseNames[0]];r.failedCount=1;r.originalInvocationExit=1;}],
+ ['lost original output',f=>f.e.originalExecutions[0].logSHA256='0'.repeat(64)],
+ ['changed closure',f=>f.object=()=> '100644 blob '+ '0'.repeat(40)+'\t'+f.e.cases[0].file],
+])test('fixed PG admission refuses '+name,()=>{const f=fixedPgFixture();change(f);assert.throws(()=>verifyFixedPg(f.e,f.object));});
+
+test('missing-record rerun cannot activate until the bounded user exception is approved',()=>{for(const value of [undefined,false,'true'])assert.throws(()=>requireMissingRecordApproval({missingRecordRevalidationApproved:value}));requireMissingRecordApproval({missingRecordRevalidationApproved:true});});
