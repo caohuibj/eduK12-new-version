@@ -455,3 +455,124 @@ than scanning desiredIds for each existing grant. The affected grant suite passe
 This reduces unused field materialization and collection work, not the number of
 mandatory authorization checks. Large-scale server-side directory pagination,
 partial-set grant protocols and cross-request permission caching remain excluded.
+
+## Submission-to-report bounded comparison (2026-10-24)
+
+This is an isolated synthetic observation, not production/public-network testing,
+load testing, release qualification, or a throughput/p95 claim. Baseline source is
+`8af0b44e51ee91edd3d4f25dad3f0c6c1b54bcaa`; optimized source is
+`9b7deeb3485f1f5974b550ef1517a9f8ffad1404` (tree
+`f7cf2f3817073cb91aebc34e21efbb66563f2768`). Each backend source tree was copied
+outside the working tree with a per-file SHA-256 manifest before its run;
+unchanged installed dependencies/Prisma client were shared. Local evidence retains
+raw requests, SQL events, process samples, storage snapshots, both manifests and
+harness scripts. Baseline harness bytes were reconstructed from recorded edits,
+not retrospectively presented as an execution-time signed artifact.
+
+### Protocol and limits
+
+Each phase ran one unmeasured warmup per type, then five sequential interleaved
+rounds of simple → complex → mixed: 15 measured completions per phase, no
+concurrent submissions. Earlier one-off/fixture-debug results are excluded.
+Simple = two 20-question scales; complex = six 50-question scales; mixed adds
+three five-field text forms and the actual published two-scene V1 assertiveness
+SJT (317 responses). Scale answers are binary/all-yes, one sum dimension per
+scale; SJT expected metric is 1.5 and retains frozen PILOT maturity/governance2.
+There are no media, norms or long/adaptive SJT scenarios in this corpus.
+
+Async/whole-submit remain false. Every unit POST is followed by the real attempt
+GET; then status GET and report GET. SJT, when last, finalizes the parent inside
+its POST. Main time starts before the first unit HTTP POST and ends on receiving
+all report JSON; answering time, initial delivery and fixture preparation are
+excluded. Final-unit-to-report time is reported separately. The intended protocol
+change is optimized attempt GETs requesting `?view=current-unit`, matching the new
+frontend; baseline used the existing full DTO. Initial delivery uses the same
+phase-specific option. Payload generation, ordering, scoring and timing/sampling
+logic otherwise remain fixed. Later harness changes only add this query and
+outside-timer metadata/initial-storage capture, not another optimization flag.
+
+Real HTTP controllers, database durability, scoring and report paths execute.
+Synthetic identity injection excludes authentication/CSRF middleware. No browser
+rendering/IndexedDB, TLS, nginx or WAN is timed. API runs in a separate process
+from the client, TCP byte-meter and sampler; both proxy sockets use TCP_NODELAY.
+No evidence files are written inside the measured sequence. Instrumentation
+still costs time. Host: x86_64 AMD EPYC 9V74, nine available CPUs, Node24.22.1,
+PostgreSQL17.11, 32MiB shared_buffers, fsync/synchronous_commit/full_page_writes on;
+this is not a certified 4C4G production allocation.
+
+### Observed timing and resource means
+
+All values below are means of five; brackets are observed min–max, not confidence
+intervals. CPU is API-process user+system time, not wall time or a capacity ratio.
+
+| Case | First POST→report ms, before→after | Final POST→report ms, before→after | API CPU ms, before→after |
+|---|---|---|---|
+| 40 questions | 131.0 [114.5–148.3] →125.7 [118.6–138.1] | 80.0 [67.3–90.3] →76.0 [70.6–80.5] | 84.4 [77.3–93.6] →92.5 [83.6–106.0] |
+| 300 questions | 406.2 [330.6–450.9] →395.1 [351.9–453.0] | 110.1 [96.1–129.4] →104.5 [80.3–154.8] | 269.7 [253.0–301.3] →256.8 [236.1–268.5] |
+| Mixed317 | 571.1 [519.5–645.2] →604.1 [588.0–639.5] | 109.3 [98.6–117.0] →97.9 [80.0–112.2] | 360.5 [339.0–379.2] →390.0 [367.1–416.1] |
+
+Mixed total latency increased5.8% and API CPU increased8.2%; simple CPU increased
+9.6%. These data do **not** establish a general speed/CPU improvement. Ranges
+substantially overlap; no extra runs were selected to chase a favorable result.
+Report GET itself averaged17.7→14.8 /36.9→36.3 /37.4→29.4ms, with API CPU
+11.8→10.2 /29.6→25.0 /29.0→23.6ms (simple/complex/mixed). Mixed attempt reloads
+instead totaled208.3→227.6ms and133.5→144.3ms API CPU. Unchanged mixed scale POSTs
+also rose173.7→191.2ms. These identify where the observed increase occurred, not
+its cause. GC, scheduling, process warmup and growing database state prevent
+attributing it solely to the DTO patch.
+
+Mean observed API peak RSS was357.2→388.5 /358.7→390.4 /359.9→393.1MiB; mean
+within-case peak increments were1.67→1.34 /1.80→2.69 /1.98→3.06MiB. Absolute peaks
+reflect the long-lived instrumented process and order; there is no demonstrated
+memory saving. Cluster PSS mean peaks were64.1→69.8 /65.8→70.0 /66.1→70.9MiB.
+PostgreSQL CPU observed from scoped per-PID ticks averaged10→14 /52→44 /68→68ms
+at10ms resolution, including background processes. One baseline backend exited;
+per-PID sampled maxima avoid the erroneous zero from subtracting endpoint sums,
+but this remains a coarse observation, not pure query-engine CPU.
+
+### Deterministic payload benefit; no SQL-count reduction
+
+| Case | SQL events before→after | HTTP response JSON bytes before→after | DB→API protocol bytes before→after |
+|---|---:|---:|---:|
+| 40 questions | 86→86 | 14,076→14,040 | 236,169→195,879 |
+| 300 questions | 218→218 | 105,450→105,342 | 1,394,449→1,136,819 |
+| Mixed317 | 352→352 | 246,263→169,733 | 1,811,725→1,545,275 |
+
+Mixed JSON falls31.1%; attempt reload JSON alone falls204,461→127,929 bytes.
+Report GET database payload falls98,195→58,093 /584,915→327,401 /
+641,430→380,149 bytes, with its SQL counts unchanged11/11/12. Scale/form receipts
+were already compact and were not altered. Request JSON remains2,920 /20,100 /
+22,428 bytes; mean API→DB protocol bytes are38,365→37,737 /189,875→189,630 /
+248,122→234,078. Protocol byte counters exclude TCP/IP/TLS headers; there is no
+production gzip or bandwidth-rate claim. Per-request SQL attribution may differ
+by a late event at a request boundary; whole-case counts are authoritative.
+
+All30 measured reports passed value checks and full normalized structural JSON
+comparison. Normalization replaces only synthetic UUIDs/item-code suffixes,
+completedAt/totalTime/resultHash and scale method.definitionHash (fixture item IDs
+change); it preserves result values, structure, item order, quality, labels,
+references, disclaimers and the SJT scientific context/definition hash. This is
+semantic equivalence, not equality of independently generated cryptographic
+provenance or raw timestamped bytes.
+
+### Persistence and comparison confounders
+
+Stored row-datum increments (`sum(pg_column_size(row))`) are exactly unchanged:
+29,522 /166,490 /196,883 bytes, with2 /6 /29 new rows. This read/DTO optimization
+makes no persistence-saving claim. Physical relation means before→after are
+40,960→34,406 /201,523→203,162 /250,675→249,037 bytes; WAL means are
+71,606→44,360 /524,827→207,272 /256,778→382,235 bytes. These are noisy allocation/
+maintenance observations, **not** optimization benefits. Baseline complex WAL
+reached1,813,184 bytes; after mixed WAL reached884,072. Whole-database deltas even
+include a negative sample while durable logical data increased. Relation bytes
+include indexes/TOAST/page allocation; WAL and whole-database size are distinct.
+
+Both phases preserve earlier synthetic records in the same isolated database;
+there was no prebaseline database snapshot or exact page-state reset. After all
+phase fixtures were prepared, row counts were1115→1337 during baseline and
+1835→2057 during optimized execution. Autovacuum remains enabled with recorded
+server settings. The larger later database, background maintenance, independent
+process/module/GC histories and five observations bound causal interpretation.
+Deterministic payload reduction and report equivalence are the strongest evidence;
+latency/CPU/memory remain observational. Processes were shut down after each phase.
+No CI, build/image qualification, push, merge or deployment is established here.
