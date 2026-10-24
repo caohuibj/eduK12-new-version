@@ -23,7 +23,7 @@ function setup(native=false) {
   const asset = { id: identity.assetId, sha256: identity.contentHash, mimeType: identity.mimeType, sizeBytes: 12, objectKey: 'synthetic.png', storageObjectKey: null,
     provider: 'local', deletedAt: null, accessScope: 'PRIVATE', scopeId: 'sjt-authoring', ownerId: 'original-author' }
   const release = { status: 'PUBLISHED', authorizationPolicy: null, instrumentVersion: pkg.instrumentVersion, definitionHash: snapshot.provenance.definitionHash }
-  const db = { $queryRaw: vi.fn().mockResolvedValue([{ id: 'grant' }]), sjtAuthorRelease: { findUnique: vi.fn().mockResolvedValue(release) },
+  const db = { $queryRaw: vi.fn().mockResolvedValue([{ id: 'grant',snapshot }]), sjtAuthorRelease: { findUnique: vi.fn().mockResolvedValue(release) },
     storedAsset: { findMany: vi.fn().mockResolvedValue([asset]) }, assetReference: { findMany: vi.fn().mockResolvedValue([{ assetId: identity.assetId }]) } }
   h.snapshots.mockResolvedValue(new Map([['grant', snapshot]]))
   return { db, unit, asset, release, snapshot }
@@ -37,6 +37,30 @@ describe('catalog SJT media authority is release-bound, not asset-ID borrowing',
     db.assetReference.findMany.mockResolvedValueOnce([])
     await expect(authorizedCatalogSjtMedia(db as never,'researcher',unit)).rejects.toThrow('SOURCE_SJT_MEDIA_AUTHORIZATION_REQUIRED')
     asset.accessScope='PUBLIC'
+    await expect(authorizedCatalogSjtMedia(db as never,'researcher',unit)).rejects.toThrow('SOURCE_SJT_MEDIA_AUTHORIZATION_REQUIRED')
+  })
+  it('validates only the exact frozen replacement grant, without an unrelated expired chain blocking it',async()=>{
+    const {db,unit,snapshot}=setup(true)
+    const old=structuredClone(snapshot)
+    old.provenance.sjtEntryAuthority={protocol:'sjt-survey-distribution-v1',grantId:'old-root',grantVersion:1}
+    db.$queryRaw.mockResolvedValue([{id:'old-tool',snapshot:old},{id:'grant',snapshot}])
+    h.snapshots.mockImplementation(async(_tx,_user,ids)=>{
+      if(ids.includes('old-tool'))throw new Error('old distribution revoked')
+      return new Map([['grant',snapshot]])
+    })
+    await expect(authorizedCatalogSjtMedia(db as never,'researcher',unit)).resolves.toEqual([identity])
+    expect(h.snapshots).toHaveBeenCalledWith(db,'researcher',['grant'])
+    // The old unit cannot silently borrow the replacement's authority.
+    const oldUnit={...unit,sourceProvenance:{...unit.sourceProvenance,sjtEntryAuthority:old.provenance.sjtEntryAuthority}}
+    await expect(authorizedCatalogSjtMedia(db as never,'researcher',oldUnit)).rejects.toThrow('old distribution revoked')
+  })
+  it('fails closed for multiple exact candidates or an identity changed between selection and locked validation',async()=>{
+    const {db,unit,snapshot}=setup(true)
+    db.$queryRaw.mockResolvedValue([{id:'grant',snapshot},{id:'duplicate',snapshot}])
+    await expect(authorizedCatalogSjtMedia(db as never,'researcher',unit)).rejects.toThrow('SOURCE_SJT_MEDIA_AUTHORIZATION_REQUIRED')
+    expect(h.snapshots).not.toHaveBeenCalled()
+    db.$queryRaw.mockResolvedValue([{id:'grant',snapshot}])
+    h.snapshots.mockResolvedValue(new Map([['grant',{...snapshot,definitionDigest:'changed'}]]))
     await expect(authorizedCatalogSjtMedia(db as never,'researcher',unit)).rejects.toThrow('SOURCE_SJT_MEDIA_AUTHORIZATION_REQUIRED')
   })
   it('uses current grant admission and original release retention without changing private ownership', async () => {

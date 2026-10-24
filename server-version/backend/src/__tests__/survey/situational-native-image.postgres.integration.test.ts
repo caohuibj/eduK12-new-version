@@ -231,6 +231,40 @@ suite('Survey native staged image: formal source, frozen authorization and actua
     expect(mutated).toBe(true)
   }
 
+  it('publishes a replacement IMAGE grant without reviving or being blocked by its revoked predecessor', async () => {
+    const f=await fixture()
+    await revokeAdminContentGrant(f.issuer.id,adminProof(),f.rootId,
+      {expectedVersion:1,reason:'Synthetic replacement entry authority; keep old tool grant record'})
+    const rootId=randomUUID()
+    await issueAdminContentRoot(f.issuer.id,adminProof(),{requestId:rootId,expectedVersion:0,
+      reason:'Explicit replacement Survey distribution of this original image version',
+      grant:{subjectId:f.entryAdmin.id,scope:{product:'SURVEY',scopeKind:'PLATFORM',
+        scopeId:'situational-library-governance',resourceKind:'material',resourceKeys:[f.measurement.id]},
+        capabilities:['material.distribute'],delegableCapabilities:[],remainingDelegationDepth:0,
+        validFrom:new Date(Date.now()-60000).toISOString(),expiresAt:new Date(Date.now()+3600000).toISOString()}})
+    const tool=await grantCatalogSource(f.entryAdmin.id,f.owner.id,
+      {kind:'SJT',sourceId:f.release.id,sourceVersion:f.release.instrumentVersion})
+    expect(tool.id).not.toBe(f.tool.id)
+    expect(tool.sourceProvenance.sjtEntryAuthority).toMatchObject({grantId:rootId,grantVersion:1})
+    const replacement=await importCatalogDraft(f.owner.id,f.projectId,tool.id,
+      {requestId:randomUUID(),instrumentKey:'replacement',title:'Synthetic replacement IMAGE'})
+    const newWaveId=randomUUID(),oldWaveId=randomUUID()
+    await db.surveyWave.create({data:{id:newWaveId,projectId:f.projectId,ordinal:2,title:'Replacement image',
+      instrumentIds:[replacement.id],consentText:'Synthetic replacement consent'}})
+    await db.surveyWave.create({data:{id:oldWaveId,projectId:f.projectId,ordinal:3,title:'Revoked old binding',
+      instrumentIds:[f.imported.id],consentText:'Synthetic old binding must fail'}})
+    await expect(freezeResearchWaveDraft({actorUserId:f.owner.id,projectId:f.projectId,waveId:oldWaveId,revision:0})).rejects.toThrow()
+    const frozen=await freezeResearchWaveDraft({actorUserId:f.owner.id,projectId:f.projectId,waveId:newWaveId,revision:0})
+    const publication=await db.surveyPublication.findUniqueOrThrow({where:{id:frozen.publicationId}})
+    const snapshot=publication.compiledSnapshot as unknown as ResearchFrozenPublication
+    expect(snapshot.units[0].sourceProvenance?.sjtEntryAuthority).toMatchObject({grantId:rootId,grantVersion:1})
+    expect(await db.assetReference.count({where:{assetId:f.asset.id,entityType:'SurveyResearchPublication',entityId:publication.id}})).toBe(1)
+    const [old]=await db.$queryRaw<Array<{status:string}>>`SELECT status FROM survey_tool_grants WHERE id=${f.tool.id}`
+    expect(old.status).toBe('ACTIVE')
+    expect((await db.surveyWave.findUniqueOrThrow({where:{id:oldWaveId}})).publicationId).toBeNull()
+    expect(await db.surveyPublication.findUniqueOrThrow({where:{id:f.publication.id}})).toEqual(f.publication)
+  },30000)
+
   it('refuses foreign proof/asset, absent frozen pins, deleted/public/changed-identity assets without durable mutations', async () => {
     const f = await fixture(), { child, pin } = await start(f)
     const authorize = () => authorizeSurveySituationalImage(f.proof, 'staged', child.attempt.id, f.asset.id)

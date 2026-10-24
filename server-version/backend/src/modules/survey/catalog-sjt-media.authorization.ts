@@ -8,7 +8,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { assertAssessmentAssetReferencesReady, AssessmentAssetValidationError } from '../assessment-media/assessment-asset'
 import { lockStoredAssetRows } from '../../services/assetStorage'
 import { SjtAuthorMediaError, SJT_AUTHOR_MEDIA_SCOPE, SJT_AUTHOR_MAX_IMAGE_BYTES, SJT_AUTHOR_RELEASE_MEDIA_REFERENCE_TYPE, sjtAuthorImages } from '../situational/authoring/media'
-import { catalogSnapshotsForDrafts } from './catalog.service'
+import { catalogSnapshotsForDrafts,type CatalogSnapshot } from './catalog.service'
 import type { LibraryBoundMediaUnit } from '../scale-library-governance/media.authorization'
 import { CatalogSourceError, ONLINE_SJT_ADAPTER_VERSION, NATIVE_SJT_ADAPTER_VERSION, type CatalogSourceRef } from './catalog.sources'
 
@@ -32,13 +32,22 @@ export async function authorizedCatalogSjtMedia(tx: Prisma.TransactionClient, us
   }
   if (!images.length) return []
   if (source.sourceId.startsWith('registry:') || (!native&&unit.sourceProvenance.adapterVersion !== ONLINE_SJT_ADAPTER_VERSION) || !unit.compiledDefinition) return fail()
-  const candidates = await tx.$queryRaw<Array<{ id: string }>>`SELECT id FROM survey_tool_grants
+  // Select by the immutable identity before admission. An unrelated older
+  // grant for this source may legitimately have lost its distribution chain.
+  // Never replace the unit's pinned provenance with any currently valid grant.
+  const matches=(snapshot:CatalogSnapshot)=>canonicalHash(snapshot.displayDefinition)===canonicalHash(unit.definition)
+    && canonicalHash(snapshot.compiledDefinition)===canonicalHash(unit.compiledDefinition)
+    && canonicalHash({...snapshot.provenance,originalSource:snapshot.provenance.source??null,source:snapshot.ref,
+      definitionDigest:snapshot.definitionDigest,adapterVersion:snapshot.adapterVersion})===canonicalHash(unit.sourceProvenance)
+  const candidates = await tx.$queryRaw<Array<{ id: string;snapshot:CatalogSnapshot }>>`SELECT id,snapshot FROM survey_tool_grants
     WHERE user_id=${userId} AND status='ACTIVE' AND snapshot->'ref'=${JSON.stringify(source)}::jsonb ORDER BY id`
-  const snapshots = await catalogSnapshotsForDrafts(tx, userId, candidates.map(row => row.id))
-  const bound = [...snapshots.values()].find(snapshot => canonicalHash(snapshot.displayDefinition) === canonicalHash(unit.definition)
-    && canonicalHash(snapshot.compiledDefinition) === canonicalHash(unit.compiledDefinition)
-    && canonicalHash({ ...snapshot.provenance, originalSource: snapshot.provenance.source ?? null, source: snapshot.ref,
-      definitionDigest: snapshot.definitionDigest, adapterVersion: snapshot.adapterVersion }) === canonicalHash(unit.sourceProvenance))
+  const selected=candidates.filter(row=>{
+    try{return matches(row.snapshot)}catch{return false}
+  })
+  if(selected.length!==1)return fail()
+  const snapshots=await catalogSnapshotsForDrafts(tx,userId,[selected[0].id])
+  const checked=snapshots.get(selected[0].id)
+  const bound=checked&&matches(checked)?checked:undefined
   if (!bound) return fail()
   const release = await tx.sjtAuthorRelease.findUnique({ where: { id: source.sourceId }, select: {
     status: true, authorizationPolicy: true, instrumentVersion: true, definitionHash: true,
