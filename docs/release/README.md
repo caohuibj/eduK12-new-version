@@ -1413,3 +1413,8 @@ passed or changing branch protection. No platform full suite, production images,
 heavy load/media jobs, deployment or production access is authorized. The stable
 gate recomputes the entire plan and requires actual qualification and SAST success;
 drafts, missing/skipped/failed/cancelled selected checks cannot qualify for merge.
+
+The first PR350 qualification run `40071391876` stopped during classification:
+the shallow merge checkout lacked the PR source object required for independent
+tree comparison. No application check or build executed. A PR350-only exact-source
+fetch supplies that object; identity/tree checks remain mandatory.

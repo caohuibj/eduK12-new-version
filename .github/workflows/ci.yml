@@ -447,6 +447,15 @@ jobs:
           const {execFileSync}=require('node:child_process');
           const source=process.env.SOURCE;if(!/^[a-f0-9]{40}$/.test(source||''))throw Error('Invalid PR source');
           execFileSync('git',['fetch','--no-tags','--depth=1','origin',source],{stdio:'inherit'});
+      - name: fetch exact PR350 source for checkout tree comparison
+        if: github.event_name == 'pull_request' && github.event.pull_request.number == 350 && github.event.pull_request.head.ref == 'work/survey-review-20261024'
+        env:
+          SOURCE: ${{ github.event.pull_request.head.sha }}
+        shell: node {0}
+        run: |
+          const {execFileSync}=require('node:child_process');
+          const source=process.env.SOURCE;if(!/^[a-f0-9]{40}$/.test(source||''))throw Error('Invalid PR source');
+          execFileSync('git',['fetch','--no-tags','--depth=1','origin',source],{stdio:'inherit'});
       - id: documentation-scope
         name: select dependency-free documentation or tooling classification
         env:
