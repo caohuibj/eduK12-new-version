@@ -15,3 +15,8 @@ export const finalScaleSubmitSchema = z.object({
     changeCount: z.number().int().nonnegative().optional(),
   }).strict()).max(1000),
 }).strict()
+
+// Response selection is separate from the sealed scientific submission body.
+export const compositeScaleFinalResponseQuerySchema = z.object({
+  response: z.literal('receipt').optional(),
+}).strict()

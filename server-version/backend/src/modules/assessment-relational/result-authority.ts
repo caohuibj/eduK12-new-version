@@ -68,14 +68,12 @@ export const projectRelationalUnitFinalResponse = async <T extends Record<string
   compositeAttemptId: string | null | undefined,
   data: T,
   db: any = prisma,
-  buildDetail?: () => Promise<T>,
 ): Promise<T | {
   submissionId?: string
   payloadHash?: string
   replayed: boolean
   completed: true
   feedbackDeferred?: true
-  detailUnavailable?: true
 }> => {
   const loaded = compositeAttemptId ? await readCompositeParticipantFeedbackContext(compositeAttemptId, db) : null
   const disposition = await resolveRelationalCompositeResultDisposition(compositeAttemptId, db, loaded?.parent ?? null)
@@ -85,20 +83,12 @@ export const projectRelationalUnitFinalResponse = async <T extends Record<string
     policyKey: 'frozen-relational-final-v1',
   })
   const feedbackDeferred = Boolean(compositeAttemptId) && await isLoadedCompositeParticipantFeedbackDeferred(loaded?.parent, db, loaded?.job ?? null)
-  const receipt = {
+  if (disclosure.mode !== 'COMPLETION_ONLY' && !feedbackDeferred) return data
+  return {
     ...(typeof data.submissionId === 'string' ? { submissionId: data.submissionId } : {}),
     ...(typeof data.payloadHash === 'string' ? { payloadHash: data.payloadHash } : {}),
     replayed: Boolean(data.replayed),
-    completed: true as const,
+    completed: true,
     ...(feedbackDeferred ? { feedbackDeferred: true as const } : {}),
   }
-  if (disclosure.mode === 'COMPLETION_ONLY' || feedbackDeferred) return receipt
-  if (!buildDetail) return data
-  // Detail work happens only after current disclosure permits it. Its failure
-  // cannot turn an already durable submission into an apparently failed save.
-  let detail: T
-  try { detail = await buildDetail() } catch { return { ...receipt, detailUnavailable: true as const } }
-  // Detail loading may await storage. Retain the original last-moment
-  // disclosure check so a policy tightened during that work still wins.
-  return projectRelationalUnitFinalResponse(compositeAttemptId, detail, db)
 }

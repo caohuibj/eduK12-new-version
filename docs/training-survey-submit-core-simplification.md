@@ -9,11 +9,13 @@
 - 当前 GET 不只是展示：它执行下一单元准入、流程推进、终态汇总和必要修复。不能删除它的工作后让客户端猜下一题。
 - 目标是“一次单元提交命令：可靠保存，然后提供可用的继续作答状态”，不是“整份最后才保存”。不启 whole-submit 旗标，不恢复旧 ordinary 协议草稿，不新增原件副本、队列表或服务端事务层。
 
-## 优先去掉不会返回的响应工作
+## 优先去掉页面不消费的响应工作
 
-Training Composite Scale FINAL 当前先构造完整 assessment，再由 controller 新鲜读取关系披露/反馈上下文，部分路径最终只返回 completed / feedbackDeferred 小 receipt。先将 detail 构造改成请求内惰性操作：保持提交、父完成、新鲜披露判定顺序，仅允许详细反馈时才执行原 DTO loader；其余直接返回原小 receipt。其他服务调用默认保持原响应，legacy 路径和关系披露规则不改，不缓存权限，不把函数或内部载体传给客户端。
+真实 Composite 单元页面只用 code=0 确认服务器保存，随后通过原 GET 读取当前状态，不消费 FINAL 的 assessment 详情。因此页面显式请求 query `response=receipt`，严格只接受该值；它不进入封存答案、submissionId 或 payloadHash。默认 API 不带参数时保持原完整响应语义。
 
-这一步减少本来会被丢弃的解密/解析/投影，不增加请求、不改变每单元保存与反馈时机。允许详细反馈时继续使用现有 exact-runtime 复用和结果不可用降级。先核成功、回放、关系受限、反馈延迟、允许详情及 loader 失败分支，再量目标 POST CPU/分配和 ACK 时间，不凭代码行数宣称加速。
+UNIFIED receipt-only 在原事务/回放校验后不构造 assessment，服务层只返回 submissionId、payloadHash、replayed、completed，controller 仍执行一次原有 fresh 关系/反馈投影来给准确 feedbackDeferred。既有 legacy 仍保原构造过程，仅缩小 wire 响应。无需捕获 callback、lazy factory、第二次披露读取或新状态管理。
+
+第五片 ebf6 的 callback 预判是探索历史，不作为长期方案；显式 receipt-only 后续提交替代它，旧提交与测量记录保留。保存、断线后同编号重试、草稿清理及原 GET 恢复不变。只有允许展示详情不代表当前页面需要详情；API 默认详情仍在原时点新鲜判定，不以减少披露扩大权限。
 
 ## 随后评估的命令收敛
 
@@ -43,7 +45,7 @@ Training Composite Scale FINAL 当前先构造完整 assessment，再由 control
 
 ## 分阶段交付与验收
 
-A. 先交付惰性详情投影：保持 fresh 披露和保存顺序，定点验证 receipt 字节不变、禁用详情分支零构造、允许分支完整原 DTO，随后做同场景配对。
+A. 先交付显式 receipt-only：严格 query/两宿主 client 合同、默认详情兼容、receipt allowlist、原保存后 GET 恢复及类型；真实路由探针验证 opt-in、默认重放、0额外写入和单次 fresh 投影，性能另按目标阶段衡量。
 
 B. 小范围服务适配与合同：先 Scale，再 Form，保持原事务。验证成功/回放/冲突、保存后状态异常、撤回、epoch 漂移；本地定点合同与类型检查，约 20–40 分钟。
 

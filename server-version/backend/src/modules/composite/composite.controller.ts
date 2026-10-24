@@ -33,7 +33,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { listReportPackageCatalog } from '../cognitive-analysis'
 import { buildCompositeAnalysisExport } from './composite-export.service'
-import { finalScaleSubmitSchema } from '../../services/scale-final-submit.schema'
+import { finalScaleSubmitSchema, compositeScaleFinalResponseQuerySchema } from '../../services/scale-final-submit.schema'
 import { finalCompositeFormSectionSubmitSchema } from '../../services/questionnaire-final-submit.schema'
 import { isInstrumentFinalSubmitError } from '../../services/instrumentFinalSubmit'
 import {
@@ -561,15 +561,17 @@ export const compositeController = {
     try {
       if (!req.user) return unauthorized(res)
       const input = finalScaleSubmitSchema.parse(req.body)
+      const { response } = compositeScaleFinalResponseQuerySchema.parse(req.query)
       const { submitCompositeScaleFinal } = await import('../scale/scale-final-submit.service')
       const data = await submitCompositeScaleFinal(
         req.params.attemptId,
         req.params.itemId,
         input,
         { userId: req.user.userId },
-        { participantProjection: true },
+        response === 'receipt' ? { receiptOnly: true } : undefined,
       )
-      return success(res, data, data.replayed ? '量表提交已确认' : '量表提交成功')
+      const responseData = await projectRelationalUnitFinalResponse(req.params.attemptId, data)
+      return success(res, responseData, data.replayed ? '量表提交已确认' : '量表提交成功')
     } catch (err) {
       if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
@@ -857,15 +859,17 @@ export const compositeController = {
     res.setHeader('Cache-Control', 'no-store')
     try {
       const input = finalScaleSubmitSchema.parse(req.body)
+      const { response } = compositeScaleFinalResponseQuerySchema.parse(req.query)
       const { submitCompositeScaleFinal } = await import('../scale/scale-final-submit.service')
       const data = await submitCompositeScaleFinal(
         req.params.attemptId,
         req.params.itemId,
         input,
         { userId: null, recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) },
-        { participantProjection: true },
+        response === 'receipt' ? { receiptOnly: true } : undefined,
       )
-      return success(res, data, data.replayed ? '匿名量表提交已确认' : '匿名量表提交成功')
+      const responseData = await projectRelationalUnitFinalResponse(req.params.attemptId, data)
+      return success(res, responseData, data.replayed ? '匿名量表提交已确认' : '匿名量表提交成功')
     } catch (err) {
       if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)

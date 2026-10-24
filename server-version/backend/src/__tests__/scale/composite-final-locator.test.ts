@@ -70,25 +70,12 @@ describe('Composite FINAL request-local child locator', () => {
   })
 })
 
-describe('Composite request-local deferred detail capture', () => {
-  it.each(['IN_PROGRESS', 'COMPLETED'])('projects only after durable submission using fresh parent %s', async status => {
-    const detail = vi.fn().mockResolvedValue({ id: 'child-1', result: 'persisted' })
-    unified.mockImplementation(async (_input, _child, _whole, _db, capture) => {
-      expect(db.$queryRaw).not.toHaveBeenCalled()
-      capture(detail)
-      return { submissionId: input.submissionId, payloadHash: 'hash', replayed: true, assessment: null, parent: null }
-    })
-    db.$queryRaw.mockResolvedValue([{ parent: { status, assignmentRef: null }, job: null }])
-    const output = await submitCompositeScaleFinal('parent-1', 'item-1', input, { userId: 'student-1' }, { participantProjection: true })
-    expect(db.$queryRaw).toHaveBeenCalledTimes(status === 'IN_PROGRESS' ? 1 : 2)
-    if (status === 'IN_PROGRESS') {
-      expect(detail).not.toHaveBeenCalled()
-      expect(output).toEqual({ submissionId: input.submissionId, payloadHash: 'hash', replayed: true, completed: true, feedbackDeferred: true })
-    } else {
-      expect(detail).toHaveBeenCalledTimes(1)
-      expect(output.assessment).toEqual({ id: 'child-1', result: 'persisted' })
-    }
-    expect(JSON.stringify(output)).not.toContain('internalContext')
-    expect(Object.values(output).some(value => typeof value === 'function')).toBe(false)
+describe('Composite explicit receipt-only response', () => {
+  it.each([false, true])('keeps initial/replayed durable identity and removes all detail %s', async replayed => {
+    unified.mockResolvedValue({ submissionId: input.submissionId, payloadHash: 'hash', replayed, assessment: { private: 'detail' }, parent: { private: 'parent' } })
+    const output = await submitCompositeScaleFinal('parent-1', 'item-1', input, { userId: 'student-1' }, { receiptOnly: true })
+    expect(unified.mock.calls[0].slice(2)).toEqual([undefined, undefined, true])
+    expect(output).toEqual({ submissionId: input.submissionId, payloadHash: 'hash', replayed, completed: true })
+    expect(db.$queryRaw).not.toHaveBeenCalled()
   })
 })
