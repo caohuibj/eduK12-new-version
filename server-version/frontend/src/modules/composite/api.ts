@@ -1,6 +1,6 @@
 import type { PublicDeliveryCreateInput } from '../../api/publicDelivery'
 import type { WholeReceiptLookup } from './receipt-recovery'
-import type { CompositeReportStatus, WholeQuestionnaireDefinition, WholeQuestionnaireInput, WholeQuestionnaireReceipt } from './types'
+import type { CompositeReportStatus, CompositeReportView, WholeQuestionnaireDefinition, WholeQuestionnaireInput, WholeQuestionnaireReceipt } from './types'
 import apiClient, { sessionFetch } from '../../api/client'
 import type {
   AnalysisProtocolCatalog,
@@ -119,6 +119,7 @@ export const compositeApi = {
   wholeReceipt: (attemptId: string, submissionId: string, attemptEpoch: number) => apiClient.get<WholeReceiptLookup>(`/composite-assessments/attempts/${attemptId}/whole/receipt?submissionId=${encodeURIComponent(submissionId)}&attemptEpoch=${attemptEpoch}`),
   submitWhole: (attemptId: string, input: WholeQuestionnaireInput) => apiClient.post<WholeQuestionnaireReceipt>(`/composite-assessments/attempts/${attemptId}/whole/submit`, input),
   reportStatus: (attemptId: string, waitMs = 0, signal?: AbortSignal) => apiClient.get<CompositeReportStatus>(`/composite-assessments/attempts/${attemptId}/report-status`, { params: { waitMs }, signal }),
+  reportView: (attemptId: string, waitMs = 0, signal?: AbortSignal) => apiClient.get<CompositeReportView>(`/composite-assessments/attempts/${attemptId}/report`, { params: { view: 'combined', waitMs }, signal }),
   retryReport: (attemptId: string) => apiClient.post<CompositeReportStatus>(`/composite-assessments/attempts/${attemptId}/report-retry`, {}),
   teacherReportStatus: (id: string, attemptId: string) => apiClient.get<CompositeReportStatus>(`/composite-assessments/${id}/attempts/${attemptId}/report-status`),
   report: (attemptId: string) => apiClient.get<CompositeReport>(`/composite-assessments/attempts/${attemptId}/report`),
@@ -171,6 +172,7 @@ export const publicCompositeApi = (recoveryToken: string) => ({
   wholeReceipt: (attemptId: string, submissionId: string, attemptEpoch: number) => apiClient.get<WholeReceiptLookup>(`/public/composite-assessments/attempts/${attemptId}/whole/receipt?submissionId=${encodeURIComponent(submissionId)}&attemptEpoch=${attemptEpoch}`, { headers: { 'X-Recovery-Token': recoveryToken } }),
   submitWhole: (attemptId: string, input: WholeQuestionnaireInput) => apiClient.post<WholeQuestionnaireReceipt>(`/public/composite-assessments/attempts/${attemptId}/whole/submit`, input, { headers: { 'X-Recovery-Token': recoveryToken } }),
   reportStatus: (attemptId: string, waitMs = 0, signal?: AbortSignal) => apiClient.get<CompositeReportStatus>(`/public/composite-assessments/attempts/${attemptId}/report-status`, { headers: { 'X-Recovery-Token': recoveryToken }, params: { waitMs }, signal }),
+  reportView: (attemptId: string, waitMs = 0, signal?: AbortSignal) => apiClient.get<CompositeReportView>(`/public/composite-assessments/attempts/${attemptId}/report`, { headers: { 'X-Recovery-Token': recoveryToken }, params: { view: 'combined', waitMs }, signal }),
   retryReport: (attemptId: string) => apiClient.post<CompositeReportStatus>(`/public/composite-assessments/attempts/${attemptId}/report-retry`, {}, { headers: { 'X-Recovery-Token': recoveryToken } }),
   report: (attemptId: string) => apiClient.get<CompositeReport>(`/public/composite-assessments/attempts/${attemptId}/report`, { headers: { 'X-Recovery-Token': recoveryToken } }),
   // Kept for a future participant-facing export flow; PR11 deliberately has

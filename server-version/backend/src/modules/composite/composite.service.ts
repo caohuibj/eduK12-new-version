@@ -5463,9 +5463,9 @@ const reportStatusForHeader = async (parent: any, joinedJob?: Awaited<ReturnType
   }
 }
 
-export const getCompositeReportStatus = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string },
-  options: { waitMs?: number; signal?: AbortSignal } = {}) => {
-  const compact = process.env.ASSESSMENT_REPORT_COMPACT_READ_ENABLED === 'true'
+const readParticipantReportStatus = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string },
+  options: { waitMs?: number; signal?: AbortSignal } = {}, compactView = false) => {
+  const compact = compactView || process.env.ASSESSMENT_REPORT_COMPACT_READ_ENABLED === 'true'
   if (compact || options.waitMs) await prepareReportReadyNotifications()
   const sequence = reportReadyNotificationSequence()
   const loaded = compact ? await readCompositeReportStatusContext(attemptId) : null
@@ -5477,19 +5477,22 @@ export const getCompositeReportStatus = async (attemptId: string, context: { use
   try {
     const status = await reportStatusForHeader(parent, compact ? loaded!.job : undefined)
     if (!wait || !status.wholeSubmissionReceived || !['PENDING', 'PROCESSING'].includes(status.reportStatus.state)) {
-      return options.waitMs && !wait ? { ...status, feedbackWaitMs: 0 } : status
+      return { parent, status: options.waitMs && !wait ? { ...status, feedbackWaitMs: 0 } : status }
     }
     const result = await wait.done
-    if (options.signal?.aborted) return status
+    if (options.signal?.aborted) return { parent, status }
     // Fresh authorization AND status share one DB snapshot after a hint/timeout.
     const refreshed = compact ? await readCompositeReportStatusContext(attemptId) : null
     const current = compact ? refreshed?.parent : await loadReportReadHeader(attemptId)
     if (!current) throw compositeNotFound('综合测评记录不存在')
     authorizeReportParticipant(current, context)
     const authoritative = await reportStatusForHeader(current, compact ? refreshed!.job : undefined)
-    return result === 'unavailable' ? { ...authoritative, feedbackWaitMs: 0 } : authoritative
+    return { parent: current, status: result === 'unavailable' ? { ...authoritative, feedbackWaitMs: 0 } : authoritative }
   } finally { wait?.cancel() }
 }
+
+export const getCompositeReportStatus = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string },
+  options: { waitMs?: number; signal?: AbortSignal } = {}) => (await readParticipantReportStatus(attemptId, context, options)).status
 
 export const retryCompositeQuestionnaireReport = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }) => {
   const parent = await loadReportReadHeader(attemptId)
@@ -5670,6 +5673,44 @@ export const getReport = async (attemptId: string, context: { userId?: string; r
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
   await assertParticipantFeedbackAvailable(attempt, job)
   return projectHttpReport(attempt, 'participant')
+}
+
+/** Opt-in participant page read. The compact locator never authorizes report contents. */
+export const getCompositeReportView = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string },
+  options: { waitMs?: number; signal?: AbortSignal } = {}) => {
+  const ready = (generation: Awaited<ReturnType<typeof reportStatusForHeader>>) => generation.reportStatus.state === 'READY'
+    && (!generation.participantFeedback || generation.participantFeedback.state === 'AVAILABLE')
+  const initial = await readParticipantReportStatus(attemptId, context, options, true)
+  if (!ready(initial.status) || options.signal?.aborted) return { generation: initial.status, report: null }
+
+  if (assessmentReportConfig().enabled && initial.parent.asyncReportEpoch === initial.parent.attemptEpoch) {
+    // Reload the full current projection context, not the compact status JSON.
+    const parent = await loadReportReadHeader(attemptId)
+    authorizeReportParticipant(parent, context)
+    const job = parent.asyncReportEpoch === parent.attemptEpoch ? await prisma.compositeReportJob.findUnique({
+      where: { attemptId_attemptEpoch: { attemptId, attemptEpoch: parent.attemptEpoch } },
+      select: { id: true, status: true, errorCode: true, completedAt: true, requestedRevision: true,
+        wholeSubmissionId: true, attemptEpoch: true, slotSetHash: true, contextHash: true,
+        aggregateInputHash: true, reportEncrypted: true },
+    }) : null
+    const generation = await reportStatusForHeader(parent, job)
+    if (!ready(generation) || options.signal?.aborted) return { generation, report: null }
+    await assertParticipantFeedbackAvailable(parent, job)
+    const report = await materializedReportForHeader(parent, 'participant', job)
+    if (report) return { generation, report }
+  }
+
+  // The original fresh frozen graph remains authoritative after a READY hint.
+  // Recompute status so a restarted epoch or tightened release cannot pair an
+  // earlier status with a different report or expose its contents.
+  const attempt = await findAttempt(attemptId, context, true, true)
+  const job = attempt.asyncReportEpoch === attempt.attemptEpoch
+    ? await readCompositeReportJobHeader(attempt.id, attempt.attemptEpoch) : null
+  const generation = await reportStatusForHeader(attempt, job)
+  if (!ready(generation) || options.signal?.aborted) return { generation, report: null }
+  if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
+  await assertParticipantFeedbackAvailable(attempt, job)
+  return { generation, report: await projectHttpReport(attempt, 'participant') }
 }
 
 /** Reads completed, frozen children without finalizing the aggregate or admitting a new unit. */
