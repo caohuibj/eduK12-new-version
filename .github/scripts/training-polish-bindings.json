@@ -1,0 +1,523 @@
+{
+  "schema": 1,
+  "base": "972a695e96eb897c120258d044c1d2590007709c",
+  "product": "17b32f4afa8278b24371de8920d99aec66ef4d83",
+  "source": {
+    "server-version/backend/src/__tests__/controllers/trainingLearningController.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5a81d650dbdbe3727497fed1fc5ae2b58e3554fe"
+    },
+    "server-version/backend/src/__tests__/controllers/trainingTeachingController.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "11fb3ac88bc7d4af09749f9ee1b424e905c6e8e6"
+    },
+    "server-version/backend/src/__tests__/services/trainingLearningInbox.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "3219cce8ce51be8e9f40b62c9d8a447c339cd70d"
+    },
+    "server-version/backend/src/__tests__/services/trainingTeachingOverview.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "3cc02c1b61a192f40655451dedef7c038742d729"
+    },
+    "server-version/backend/src/controllers/trainingLearningController.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7b8955527264d14a01d7e47c76b8a8f95b3ab5b9"
+    },
+    "server-version/backend/src/controllers/trainingTeachingController.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a34db5e1f1d335fc3e1280829355a883ba3139c0"
+    },
+    "server-version/backend/src/routes/courses.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "72c74f204d3c976d42ee68e33ded9190a5818926",
+      "after": "70a8d6d1f457ccb6ab92c1cff2d570493cc69fd2"
+    },
+    "server-version/backend/src/services/trainingLearningInbox.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f97c9322a6e4f3a696e8403f9bb1c85a4949c990"
+    },
+    "server-version/backend/src/services/trainingLearningLinks.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "55f0f5fbf0efc024bfe398fed06587d7257a698e"
+    },
+    "server-version/backend/src/services/trainingTeachingOverview.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "314c6d669cf124609f2938aa83abab3dd750768a"
+    },
+    "server-version/frontend/public/entry-brand.css": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ebec538d24fd52900809b89b76669a6d82393f1e",
+      "after": "858686c33b93fd66d9f16da48398563ca9470a71"
+    },
+    "server-version/frontend/public/entry-brand.js": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bb989a5ee483ab1860816c18765c6f7c55981739",
+      "after": "9f19be9bdd1e8fe7754332c3a50d42bf39f2d170"
+    },
+    "server-version/frontend/src/components/FinalCompositeAssessment.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a295a6571c8df17c28ec3f49328d4eeee93124ca",
+      "after": "268ba1fae95a2b94f102873f1613714c5a4d1a43"
+    },
+    "server-version/frontend/src/components/WholeCompositeQuestionnaire.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3054f96e9be3bd26b56d997e049bff21f7a82c4e",
+      "after": "5095af952b52e18b0454d957fef48ce4a3dcc157"
+    },
+    "server-version/frontend/src/components/__tests__/FinalCompositeAssessment.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "aa09460d0f1b542f5b7e4dcf78b076f6cefacbe8",
+      "after": "cebb92747a751091358f4a269fa221266822b793"
+    },
+    "server-version/frontend/src/components/app-shell/AppShell.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "73cf5bc2b24cedabbd1af0c3ee080e7386225188",
+      "after": "7dcb2945f8775ad9cab7378c472fa3863d97ee33"
+    },
+    "server-version/frontend/src/components/app-shell/RouteAccess.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "55d90b8f86f6f960842ab74a275d96d27090ce61",
+      "after": "09bcf8dbc68ea8fe5e69b89b53539a550776216b"
+    },
+    "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cb1944b00845e5c7e2195f1bc2797705edb97e35",
+      "after": "a81d98d28cb0a0d110ccc63b0c282b1b98ad7d16"
+    },
+    "server-version/frontend/src/components/assessment-shell/AssessmentShell.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "95c3ac77629af6e1134ca32936c4b48a5957d332",
+      "after": "0245d3eb3357f878a33d72047acc41bb7b49dc34"
+    },
+    "server-version/frontend/src/components/assessment-shell/__tests__/AssessmentShell.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1d4561d3d5618d933dad8ad02ff94bf7f904928c",
+      "after": "b5a1fc39efc3a4f435d241d7f97ac07eaab30d3b"
+    },
+    "server-version/frontend/src/main.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "81e6775354dfcfc6bf3918b961554ac4d592bf2f",
+      "after": "b624739dc8baca26f74d3716250ff7d3c939860b"
+    },
+    "server-version/frontend/src/modules/composite/CompositeAssessmentPage.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "80140a3136cd1479b70f763c56129b723406e16e",
+      "after": "6e8694f61251ab67faa898daf1e1cb372549e78e"
+    },
+    "server-version/frontend/src/modules/composite/item-label.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "0c98b9a488e3815576b3399389553a811c3592b8"
+    },
+    "server-version/frontend/src/modules/situational/__tests__/SituationalRunner.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1e89fe0b0c93ad40030de49e2c644dfb174c0af4",
+      "after": "fff8aa9395fb4bd5780893e07a3dfc3d07cf5baf"
+    },
+    "server-version/frontend/src/modules/situational/answer-status.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "47799ff622ee1cd9a701194aacbebd9088af7649"
+    },
+    "server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "66bdb2146fb8364e3677b11c7db45a00f1a35fd3",
+      "after": "eb126f258899d9e8623440c659f11094571e5df4"
+    },
+    "server-version/frontend/src/product-entry.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bdae751ea629c9ad8a598efbb8aab6f786a7efc0",
+      "after": "54b14af3ead41285754d1523c60bbce14ddcfc09"
+    },
+    "server-version/frontend/src/training/TrainingAppearance.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "efe0dd46e899bb4b80a3745f409c157d668e9b9f",
+      "after": "1919a2c21f041d8059a35adc7d23652027ea5ddc"
+    },
+    "server-version/frontend/src/training/TrainingAppearance.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9381d8a2aaa195bdeb41fd839e1ef60b31a90937",
+      "after": "a250dfeef033b4e52785cd8bad3be7b6a17ab482"
+    },
+    "server-version/frontend/src/training/TrainingCoursePages.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bbbfc46f0fa349ffe4ba204b80778db254870b57",
+      "after": "e625a5c10ca6177de7681e577d87edcfd63c6748"
+    },
+    "server-version/frontend/src/training/TrainingLearnerCourse.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "76795db22dffb5219e93926d7af68b6184161d84",
+      "after": "1cc1c4b4beedde5e547ca45edec25a56d3572228"
+    },
+    "server-version/frontend/src/training/TrainingLearnerHome.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b1887d53b5f37248a9bbbe8e0fde91e20cd82b89",
+      "after": "3e6f2e9790f2a0d3fa427a049f49e99de43f4257"
+    },
+    "server-version/frontend/src/training/TrainingLearningOverview.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "8b873a09353b6e9d391911029ad5ab10bbf5f66b"
+    },
+    "server-version/frontend/src/training/TrainingLearningOverview.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ccfacedf996380b4c041fdda6c8dcf28e79f40b8"
+    },
+    "server-version/frontend/src/training/TrainingLibrary.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "891389aeb698a680730f74830afc6f7ee55c3c64",
+      "after": "9fb056ac839d8b58c73b6b511e859948ea84833e"
+    },
+    "server-version/frontend/src/training/TrainingLibrary.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "20890501d54a1f8c1f764aa58134048a1820b2be",
+      "after": "1f9810d70b52a9e468a06ac114f3d3d1b08c2af7"
+    },
+    "server-version/frontend/src/training/TrainingScreens.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d60cb3886efecdf524021d568df09ee9196c3bf0",
+      "after": "3cadf45d739bc91549f60a51d79621bdaecc1c11"
+    },
+    "server-version/frontend/src/training/TrainingToolCard.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c5a6bc4cb1a4ee19b869ed78c1c7688d0d3f6095"
+    },
+    "server-version/frontend/src/training/TrainingTrainerHome.formal.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1836ac1a84739a989ba3b98e7c7abf423519e114",
+      "after": "b4a7d6fb254ab3043414bde2a79ab5b262121c2f"
+    },
+    "server-version/frontend/src/training/TrainingTrainerHome.pagination.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ddee80d8d18b646b5e6f067fd110aaa1a6a09abd",
+      "after": "d33c6ce0db9bba03e3851ade62a8a6d474fa5334"
+    },
+    "server-version/frontend/src/training/TrainingTrainerHome.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "52f6be0bec0a85fd723b233dd8773972aa1cbd66",
+      "after": "3e2c8f462de28d949afb67b8462996348eaba2cc"
+    },
+    "server-version/frontend/src/training/TrainingTrainerOverview.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "b85bb4fa116b608aeec42ec771a290bdd617ece8"
+    },
+    "server-version/frontend/src/training/TrainingTrainerOverview.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f957d60ed8dabb49eef68689cd5cf4e9945e3bb1"
+    },
+    "server-version/frontend/src/training/courseAssessments.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c593f76290c4fb8e81a19db58a213e7757fc3a01",
+      "after": "7cc39926836b27bbc36e1748484ea85d7ce05712"
+    },
+    "server-version/frontend/src/training/courseAssessments.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8ed909f177c81f3663000a05f917745b7f5b2db1",
+      "after": "e424399c9310c74abe7a9b29244bb623b2fa3953"
+    },
+    "server-version/frontend/src/training/training-appearance.css": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9ddad4236c512816c9e8c21f03e21023ab9dc99a",
+      "after": "ea76fc6bf1201df43395ccb38e50f63b88e6771b"
+    },
+    "server-version/frontend/src/training/training-assessment-visual.css": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "18061e946a15e613ee0e79d3cc85d73e94ae102f",
+      "after": "95dde9ebca5359c9d43ed75f1f2673001760e245"
+    },
+    "server-version/frontend/src/training/training-assignment-workspace.css": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a7eaed616c5aeb8fc2968e29ff5c4c73f2cbe41d",
+      "after": "7f22eebd49c0d84abd63cfb8e348bcd0e5058a66"
+    },
+    "server-version/frontend/src/training/training-course-assessments.css": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5b12c661f293683a67c86f867847ff72a9c8fd3a",
+      "after": "57f2f164c1c9f6e172028166782f485a0eb65eb4"
+    },
+    "server-version/frontend/src/training/training-course-overview.css": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9060e4185ffe3f8a89584d96fb5f3957b22be1f4",
+      "after": "ce873f140c04c75b903e59c6b7437e155b53ecfc"
+    },
+    "server-version/frontend/src/training/training-course-settings.css": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c32e78da99bdb37a41b1fb9a46e1801897333e60",
+      "after": "9566623b99d0b54fc9b7ca83d41087c7d44bf468"
+    },
+    "server-version/frontend/src/training/training-learner-course.css": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "b633ab58abc80dba2c53208d6c78aa8f4f7471bb"
+    },
+    "server-version/frontend/src/training/training-learning-overview.css": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7ea4fb3b71e690212c7154c3fe9a1efb0755495b"
+    },
+    "server-version/frontend/src/training/training-toolkit-compact.css": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "042df2d0796ad11d48d3eb7cff11c04145beaf10"
+    },
+    "server-version/frontend/src/training/training-trainer-home-layout.css": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "bfd344779a8ada2c395c7bd48665cd34242d4766"
+    },
+    "server-version/frontend/src/training/training-trainer-overview.css": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f933fdc5defb83844292d4036c148b4331c67232"
+    },
+    "server-version/frontend/src/training/training-workspace-cards.css": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "530f978dcd192dd427e54d0b2ced4aeed9e9607d",
+      "after": "36ec6a443af2d8681abaa96055ca713d571421c1"
+    },
+    "server-version/frontend/src/training/training-workspace-refresh.css": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "caae5e7665897a62478198e94dd219cf8c2caa0b",
+      "after": "9fc4c8465782e1c162379b92a674c13a3c82bb22"
+    }
+  },
+  "components": {
+    "frontend": "f0ee824fc17213d9544b8327a9d868d9d6a34b3a",
+    "backend": "c818526f7b05954460c2c4c7e6496daa4fe1d205"
+  },
+  "controls": [
+    ".github/scripts/training-polish-bindings.json",
+    ".github/scripts/training-polish-scope.mjs",
+    ".github/scripts/training-polish-checks.mjs",
+    ".github/scripts/training-polish.test.mjs",
+    ".github/scripts/training-polish-browser.mjs",
+    ".github/evidence/training-polish/reviewed-local.json",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    ".github/workflows/ci.yml",
+    "docs/release/README.md"
+  ],
+  "controlBefore": {
+    ".github/scripts/training-polish-bindings.json": null,
+    ".github/scripts/training-polish-scope.mjs": null,
+    ".github/scripts/training-polish-checks.mjs": null,
+    ".github/scripts/training-polish.test.mjs": null,
+    ".github/scripts/training-polish-browser.mjs": null,
+    ".github/evidence/training-polish/reviewed-local.json": null,
+    ".github/scripts/content-scope.mjs": "2b4ef00cb1aebf53639e475d35f050307baf8b6e",
+    ".github/scripts/merge-gate.mjs": "c1862c6aed06d7baee3741cedd1c09b7d738c8b3",
+    ".github/workflows/ci.yml": "6f66a8ad562634a5d86ec0017d5e452c7f88f32c",
+    "docs/release/README.md": "2a505e1f5f5214a53f4627b3e449c621b8ff20e6"
+  },
+  "protectedInputs": {
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "server-version/frontend/eslint.config.js": "4e89832bf4d92a5e1ba1815aad2ade6c9a65c3a1",
+    "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7",
+    "server-version/frontend/src/test/setup.ts": "3217d9d84ea1285cf3495e27669a88e3fe7d2cf3",
+    "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
+    "server-version/frontend/tsconfig.json": "1ffef600d959ec9e396d5a260bd3f5b927b2cef8",
+    "server-version/backend/package.json": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+    "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
+    "server-version/backend/prisma/schema.prisma": "b75acf10b51f520b1e0c2ac3f68d720ad2fe15ef"
+  },
+  "evidenceSHA256": "61e7a8992f851ea82d4b4dbacb21e2fb85cf51c82b185945c8c0680ca1cc8929",
+  "admittedCases": 302,
+  "missingTests": [
+    "server-version/frontend/src/components/assessment-shell/__tests__/AssessmentShell.test.tsx",
+    "server-version/frontend/src/product-entry.test.ts",
+    "server-version/frontend/src/training/TrainingTrainerHome.formal.test.tsx"
+  ],
+  "missingLint": [
+    "server-version/frontend/src/components/WholeCompositeQuestionnaire.tsx",
+    "server-version/frontend/src/components/assessment-shell/AssessmentShell.tsx",
+    "server-version/frontend/src/components/assessment-shell/__tests__/AssessmentShell.test.tsx",
+    "server-version/frontend/src/modules/composite/item-label.ts",
+    "server-version/frontend/src/modules/situational/answer-status.ts"
+  ],
+  "resume": {
+    "run": 40108196841,
+    "scopeJob": 120914187222,
+    "qualificationJob": 120914234847,
+    "sastJob": 120914234710,
+    "source": "1be45c1f2d327d10b1771a33487501860a47f473",
+    "checkout": "42bfbfe09c5d9795a110a7f5819536e9985112e7",
+    "attempt": 1,
+    "artifact": 12565582682,
+    "zipSHA256": "3aac04a19820dc7f2d350880e549d9119f1c9c7acb58cf04e6d99ef522299acb",
+    "sastChangedControls": [
+      ".github/scripts/training-polish-checks.mjs",
+      ".github/scripts/training-polish-browser.mjs",
+      ".github/scripts/training-polish.test.mjs"
+    ]
+  },
+  "priorSast": {
+    "run": 40108928592,
+    "scopeJob": 120916354815,
+    "sastJob": 120916412681,
+    "source": "52a986e5d8004514529e6c41290f3d1ed4b3b53a"
+  },
+  "priorBrowser": {
+    "run": 40108928592,
+    "scopeJob": 120916354815,
+    "qualificationJob": 120916412593,
+    "source": "52a986e5d8004514529e6c41290f3d1ed4b3b53a",
+    "checkout": "836c23d1b3d036a9bb604b4f4ca94f949235b872",
+    "artifact": 12566090219,
+    "zipSHA256": "ade446df7413ccd108f115ffc7a12357f07761b232117b6238894995abfb521d",
+    "cases": [
+      "TEACHER-light-1440",
+      "review-link-light",
+      "TEACHER-light-768",
+      "TEACHER-light-390",
+      "TEACHER-light-320",
+      "tool-details-light",
+      "tool-focus-inset-light",
+      "media-filter-light",
+      "TEACHER-dark-1440",
+      "review-link-dark",
+      "TEACHER-dark-768",
+      "TEACHER-dark-390",
+      "TEACHER-dark-320",
+      "tool-details-dark",
+      "tool-focus-inset-dark",
+      "media-filter-dark",
+      "STUDENT-light-1440",
+      "student-inbox-light",
+      "STUDENT-light-768",
+      "STUDENT-light-390",
+      "STUDENT-light-320"
+    ],
+    "browserProgramSHA256": "7381d1c55c5626e65d0d1867bf511fb976a61c021de7f4508e7843680541de67"
+  }
+}

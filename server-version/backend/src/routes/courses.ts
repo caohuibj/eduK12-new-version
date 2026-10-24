@@ -9,6 +9,8 @@ import { courseTrainingAssessments } from '../controllers/courseTrainingAssessme
 import { courseController } from '../controllers/courseController'
 import { courseStudentLifecycleController } from '../controllers/courseStudentLifecycleController'
 import { authenticate, requireAdmin, requireTeacher, requireStudent } from '../middleware/auth'
+import { trainingTeachingOverview } from '../controllers/trainingTeachingController'
+import { trainingLearningInbox } from '../controllers/trainingLearningController'
 import { studentTaskList } from '../controllers/studentTaskController'
 import { createRedisRateLimiter } from '../middleware/redisRateLimit'
 
@@ -51,6 +53,8 @@ router.get('/', authenticate, courseController.list)
 router.post('/', authenticate, requireTeacher, courseController.create)
 router.get('/my', authenticate, courseController.myCourses)
 router.get('/my/tasks', authenticate, requireStudent, studentTaskList)
+router.get('/my/learning-inbox', authenticate, requireStudent, trainingLearningInbox)
+router.get('/my/teaching-overview', authenticate, requireTeacher, trainingTeachingOverview)
 router.get('/shared-to-me', authenticate, courseController.getSharedToMe)
 
 // 动态路由（:id）放在静态路由之后

@@ -283,7 +283,7 @@ describe('Situational text runner', () => {
 
     expect(await screen.findByAltText('界面中的静态图片')).toBeInTheDocument()
     expect(vi.mocked(situationalApi.loadAsset)).toHaveBeenCalledWith('ui-attempt', 'ui-image')
-    fireEvent.click(screen.getByRole('button', { name: '情境 2，未完成' }))
+    fireEvent.click(screen.getByRole('button', { name: '情境 2，未作答' }))
 
     expect(await screen.findByAltText('漫画第一格')).toBeInTheDocument()
     const panels = screen.getAllByRole('img')
@@ -428,8 +428,8 @@ describe('Situational text runner', () => {
 
     renderRunner()
     expect(await screen.findByText('第 1 段文字情境')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: `情境 ${sceneCount}，已完成` })).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: `情境 ${sceneCount}，已完成` }))
+    expect(screen.getByRole('button', { name: `情境 ${sceneCount}，已作答` })).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: `情境 ${sceneCount}，已作答` }))
     expect(await screen.findByText(`第 ${sceneCount} 段文字情境`)).toBeInTheDocument()
 
     fireEvent.click(screen.getByRole('button', { name: /提交测评/ }))
@@ -638,10 +638,37 @@ describe('Training SJT page confirmation and choice focus', () => {
     vi.mocked(situationalApi.start).mockResolvedValue({ code: 0, message: 'ok', data: startData() })
   })
 
+  it('does not mistake optional readiness for an answer and distinguishes clearing, blank and refusal', async () => {
+    const data=startData()
+    const first=data.instrument.definition.scenes[0]!
+    first.channels=[{...first.channels[0]!,responseType:'MULTIPLE_CHOICE',required:false,online:true,allowRefusal:true,minSelections:1,maxSelections:2}]
+    vi.mocked(situationalApi.start).mockResolvedValue({code:0,message:'ok',data})
+    renderRunner()
+    await screen.findByText('第一段文字情境')
+    const next=screen.getByRole('button',{name:/确认本页/})
+    expect(screen.getByRole('button',{name:'情境 1，未作答'})).toBeInTheDocument()
+    expect(screen.getByRole('button',{name:'情境 2，未作答'})).toBeDisabled()
+    expect(next).not.toBeDisabled()
+    expect(screen.queryByText('已完成')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    await waitFor(()=>expect(screen.getByRole('button',{name:'情境 1，已作答'})).toBeInTheDocument())
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    await waitFor(()=>expect(screen.getByRole('button',{name:'情境 1，未作答'})).toBeInTheDocument())
+    fireEvent.click(screen.getByLabelText('此题留空'))
+    await waitFor(()=>expect(screen.getByRole('button',{name:'情境 1，已留空'})).toBeInTheDocument())
+    fireEvent.click(screen.getByLabelText('明确选择不回答'))
+    await waitFor(()=>expect(screen.getByRole('button',{name:'情境 1，已选择不回答'})).toBeInTheDocument())
+    await waitFor(()=>expect(next).not.toBeDisabled())
+    expect(situationalApi.submit).not.toHaveBeenCalled()
+    expect(screen.getByText('第一段文字情境')).toBeInTheDocument()
+    const saved=await finalDraftStore.listAnswers('situational:ui-attempt')
+    expect(saved.find(row=>row.itemKey==='S1:choice')?.value).toMatchObject({status:'REFUSED'})
+  })
+
   it('focuses the next question only after saving, and never changes scene automatically', async () => {
     renderRunner()
     await screen.findByText('第一段文字情境')
-    expect(screen.getByText(/本页共 2 个问题，其中 1 道选择题/)).toBeInTheDocument()
+    expect(screen.getByText('作答说明', {selector:'summary'}).closest('details')).not.toHaveAttribute('open')
     fireEvent.click(screen.getByLabelText('选择 A'))
     await waitFor(() => expect(screen.getByText('你有多确定？', { selector: 'legend' })).toHaveFocus())
     expect(screen.getByText('第一段文字情境')).toBeInTheDocument()

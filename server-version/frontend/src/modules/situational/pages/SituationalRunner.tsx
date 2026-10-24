@@ -1,5 +1,6 @@
 import {PersonalParticipationLink} from '../../../components/participation/PersonalParticipationLink'
 import {trainingAttemptLink} from '../../../components/participation/training-participation-link'
+import { situationalSceneAnswerStatus } from '../answer-status'
 import { useTrainingLearnerNavigation } from '../../../training/learnerNavigation'
 import { TrainingCheckpointPanel } from '../../composite/TrainingCheckpointPanel'
 import { situationalCheckpointAnswers, situationalCheckpointUnsupported } from '../training-checkpoint-adapter'
@@ -279,6 +280,8 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps;host?:
   ), [data, responses, trajectory])
   const currentScene = scenes[currentIndex]
   const completedScenes = useMemo(() => scenes.map(scene => situationalSceneIsComplete(scene, responses)), [scenes, responses])
+  const sceneAnswerStatuses = useMemo(() => scenes.map(scene => situationalSceneAnswerStatus(scene, responses)), [scenes, responses])
+  const currentAnswerStatus = sceneAnswerStatuses[currentIndex]
   const responseSceneComplete = completedScenes[currentIndex] ?? false
   const currentFlowNode = useMemo(() => {
     if (!data || data.instrument.definition.schemaVersion !== 2) return null
@@ -380,11 +383,12 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps;host?:
     const currentParts = [currentFlowNode?.roundKey, currentFlowNode?.stepKey, currentScene.title].filter(Boolean)
     return {
       kind: 'open-path',
-      visited: currentIndex + (currentSceneComplete ? 1 : 0),
+      visited: currentIndex + 1,
+      visitedLabel: '已查看',
       current: currentParts.join(' · '),
       label: '当前开放路径',
     }
-  }, [currentFlowNode?.roundKey, currentFlowNode?.stepKey, currentIndex, currentScene, currentSceneComplete, data, scenes.length])
+  }, [currentFlowNode?.roundKey, currentFlowNode?.stepKey, currentIndex, currentScene, data, scenes.length])
 
   const submissionStatus = useMemo<AssessmentSubmissionStatus>(() => {
     if (submitting) return { state: 'submitting', message: '答案已锁定，正在提交同一份封存 FINAL。' }
@@ -712,7 +716,9 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps;host?:
       >
         <ChevronLeft className="h-4 w-4" />上一题
       </button>
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col gap-2 sm:items-end">
+        {trainingSequential ? <p className="text-xs text-gray-500">{currentIndex < scenes.length - 1 ? '确认后不能返回修改本页。选填题可留空。' : '最后一个情境，检查后提交。'}</p> : null}
+        <div className="flex flex-col gap-3 sm:flex-row">
         {currentIndex < scenes.length - 1 ? (
           <button
             type="button"
@@ -731,6 +737,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps;host?:
         >
           <Send className="h-4 w-4" />{submitting ? '提交中…' : submissionLocked ? '重新核对提交' : '提交测评'}
         </button>
+        </div>
       </div>
     </div>
   )
@@ -745,9 +752,9 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps;host?:
             type="button"
             onClick={() => setCurrentIndex(index)}
             disabled={(trainingSequential && index !== currentIndex) || checkpointBusy || saving || submitting || (Boolean(responseStage) && index > currentIndex)}
-            aria-label={`情境 ${index + 1}${completedScenes[index] ? '，已完成' : '，未完成'}`}
+            aria-label={`情境 ${index + 1}，${sceneAnswerStatuses[index]?.label ?? '未作答'}`}
             aria-current={currentIndex === index ? 'step' : undefined}
-            className={`min-h-11 min-w-11 rounded-lg px-3 text-sm font-medium transition ${currentIndex === index ? 'bg-indigo-600 text-white' : completedScenes[index] ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+            className={`min-h-11 min-w-11 rounded-lg px-3 text-sm font-medium transition ${currentIndex === index ? 'bg-indigo-600 text-white' : sceneAnswerStatuses[index]?.answered ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
           >
             {index + 1}
           </button>
@@ -759,8 +766,9 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps;host?:
   return (
     <AssessmentShell
       title={currentScene.title}
-      eyebrow={embedded ? '综合测评 · 情境单元' : '情境化测评'}
-      instructions={trainingSequential ? '单选保存后会自动定位到本页下一题。进入下一情境前请检查本页答案，点击确认后不能返回本页修改。' : `冻结版本 ${data.attempt.instrumentVersion}。请根据当前可达情境完成作答；分支变化时，只保留当前路径上仍有效的答案。`}
+      eyebrow={embedded ? '综合测评 · 情境判断' : '情境判断'}
+      instructionsSummary={isTrainingHost() && !campus ? '作答说明' : undefined}
+      instructions={trainingSequential ? '单选后自动定位下一题，多选完成后请自行确认。选填题可留空；切换情境前请检查答案，确认后不能返回修改。' : `版本 ${data.attempt.instrumentVersion}。请根据当前情境作答；情境分支变化后，后续内容将随当前选择调整。`}
       progress={shellProgress}
       saveStatus={saveStatus}
       submissionStatus={submissionStatus}
@@ -793,12 +801,12 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps;host?:
       <section className="rounded-2xl bg-white p-5 shadow-sm ring-1 ring-slate-100 sm:p-8" aria-labelledby="situational-scene-content-title">
         <div className="mb-5 flex items-center justify-between gap-4 text-sm text-gray-500">
           <span>{data.instrument.definition.schemaVersion === 1 ? `情境 ${currentIndex + 1} / ${scenes.length}` : '开放路径中的当前情境'}</span>
-          <span>{currentSceneComplete ? <span className="inline-flex items-center gap-1 text-emerald-700"><CheckCircle2 className="h-4 w-4" />已完成</span> : '待完成'}</span>
+          <span data-sjt-answer-status={currentAnswerStatus?.state}>{currentAnswerStatus?.answered ? <span className="inline-flex items-center gap-1 text-emerald-700"><CheckCircle2 className="h-4 w-4" />{currentAnswerStatus.label}</span> : currentAnswerStatus?.label ?? '未作答'}</span>
         </div>
         <h2 ref={choiceAdvance.headingRef} tabIndex={trainingSequential ? -1 : undefined} id="situational-scene-content-title" className="text-base font-semibold text-gray-900">情境内容</h2>
         {renderStimulus()}
 
-        {trainingSequential ? <p className="mt-5 text-sm text-gray-600">本页共 {currentScene.channels.length} 个问题，其中 {currentScene.channels.filter(channel => channel.responseType === 'SINGLE_CHOICE' || channel.responseType === 'MULTIPLE_CHOICE').length} 道选择题。{responseStage ? '分阶段展示，确认前不会显示后续问题。' : null}{currentIndex < scenes.length - 1 ? '本页完成后需手动确认换页；确认后不能返回。' : '这是最后一个情境，完成后请手动提交测评。'}</p> : null}
+        {trainingSequential && responseStage ? <p className="mt-3 text-sm text-gray-600">本情境分阶段展示，确认后进入下一阶段。</p> : null}
 
         {responseStage ? <p role="status" className="mt-5 text-sm text-gray-600">{responseStage.kind === 'CHOICE' ? '确认行动选择后，将展示后续问题。确认后的行动选择将锁定。' : '请根据已看到的信息回答本阶段问题。'}</p> : null}
         <div ref={stageInputsRef} className="mt-7 space-y-7">

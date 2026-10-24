@@ -1,3 +1,6 @@
+import type { ReactNode } from 'react'
+vi.mock('./TrainingLearningOverview', () => ({ default: ({ courseHeading, courseAction }: { courseHeading?: ReactNode; courseAction?: ReactNode }) => <>{courseHeading}{courseAction}</> }))
+vi.mock('./TrainingTrainerOverview', () => ({ default: () => null }))
 import { render, screen, fireEvent, within } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -103,21 +106,21 @@ describe('training presentation and course-first entry', () => {
   })
 
   it('paginates trainer courses without appending the previous page', async () => {
-    const first = Array.from({ length: 2 }, (_, index) => ({
+    const first = Array.from({ length: 6 }, (_, index) => ({
       ...course, id: 'owned-' + index, title: '课程' + (index + 1),
     }))
     get.mockImplementation((url: string) => Promise.resolve({
-      code: 0, data: url === '/courses?status=all&page=1&pageSize=2&excludeLibrary=true'
-        ? { list: first, total: 3 }
-        : url === '/courses?status=all&page=2&pageSize=2&excludeLibrary=true'
-          ? { list: [{ ...course, id: 'last-course', title: '第3门课程' }], total: 3 }
+      code: 0, data: url === '/courses?status=all&page=1&pageSize=6&excludeLibrary=true'
+        ? { list: first, total: 7 }
+        : url === '/courses?status=all&page=2&pageSize=6&excludeLibrary=true'
+          ? { list: [{ ...course, id: 'last-course', title: '第7门课程' }], total: 7 }
           : { list: [], total: 0 },
     }))
     render(<MemoryRouter><TrainingTrainerHome /></MemoryRouter>)
     fireEvent.click(await screen.findByRole('button', { name: '下一页' }))
-    expect(await screen.findByRole('link', { name: '第3门课程' })).toHaveAttribute('href', '/courses/last-course/detail')
+    expect(await screen.findByRole('link', { name: '第7门课程' })).toHaveAttribute('href', '/courses/last-course/detail')
     expect(screen.queryByRole('link', { name: '课程1' })).toBeNull()
-    expect(get).toHaveBeenCalledWith('/courses?status=all&page=2&pageSize=2&excludeLibrary=true')
+    expect(get).toHaveBeenCalledWith('/courses?status=all&page=2&pageSize=6&excludeLibrary=true')
   })
 
   it('a learner can join an existing course through the original API', async () => {

@@ -1,3 +1,4 @@
+import { isTrainingHost } from '../../training/context'
 import {isTrainingAdminPath} from '../../admin/trainingPages'
 import { SURVEY_ADMIN_PATH } from '../../products/origins'
 import { useEffect, type ReactNode } from 'react'
@@ -9,7 +10,7 @@ import { homeFor, loginUrl, readReauthReturn, sameReturnPage, type Role } from '
 
 export function RouteLoading() {
   const {pathname}=useLocation()
-  if(isTrainingAdminPath(pathname))return <p className="training-entry-loading" role="status">正在加载 Training 管理…</p>
+  if(isTrainingHost() || isTrainingAdminPath(pathname))return <p className="training-entry-loading" role="status">{isTrainingAdminPath(pathname)?'正在加载 Training 管理…':'正在加载页面…'}</p>
   return <ProductPage><ProductStatus kind="pending" title="正在加载页面" announce="polite">请稍候。</ProductStatus></ProductPage>
 }
 export function RouteAccess({ children, roles }: { children: ReactNode; roles?: Role[] }) {

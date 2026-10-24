@@ -6,12 +6,14 @@ import { useCursorList } from '../hooks/useCursorList'
 import apiClient from '../api/client'
 import ModalSurface from '../components/shared-ui/ModalSurface'
 import type { Course } from '../types'
+import TrainingLearningOverview from './TrainingLearningOverview'
 import './training-learner-home.css'
 
-/** Course-first training home. The generic STUDENT homepage is unchanged. */
+/** Training learning overview; generic student routes retain their existing homepage. */
 export default function TrainingLearnerHome() {
   const { user } = useAuth()
   const { list: courses, loading, error: loadError, refresh, more, hasMore } = useCursorList<Course>('/courses/my')
+  const [overviewRefresh, setOverviewRefresh] = useState(0)
   const [mutationNotice, setMutationNotice] = useState('')
   const [joinOpen, setJoinOpen] = useState(false)
   const [courseCode, setCourseCode] = useState('')
@@ -33,6 +35,7 @@ export default function TrainingLearnerHome() {
       setCourseCode('')
       setMutationNotice('已加入课程。')
       await refresh()
+      setOverviewRefresh(value => value + 1)
     } catch (error) {
       setJoinError(error instanceof Error ? error.message : '加入课程失败')
     } finally {
@@ -60,12 +63,11 @@ export default function TrainingLearnerHome() {
     </header>}
 
     {mutationNotice && <p className="training-message learner-home-notice" role="status"><Check size={18} aria-hidden="true" />{mutationNotice}</p>}
+    <TrainingLearningOverview key={user?.id} refreshKey={overviewRefresh}
+      courseHeading={!showOnboarding ? <div className="learning-course-heading"><div className="learner-course-title"><h1 id="learner-courses">我的课程</h1>{!loading && !loadError && <span className="learner-course-count">{hasMore ? `已加载 ${courses.length} 门` : `${courses.length} 门`}</span>}</div><p>选择已加入的课程，继续学习。</p></div> : undefined}
+      courseAction={!showOnboarding ? <button type="button" className="training-action" onClick={() => { setJoinError(''); setJoinOpen(true) }}><Plus size={17} aria-hidden="true" />加入课程</button> : undefined} />
     <div className="learner-home-layout">
       {!showOnboarding && <section className="training-course-section" aria-labelledby="learner-courses">
-        <div className="training-section-header">
-          <div className="learner-course-heading"><div className="learner-course-title"><h1 id="learner-courses">我的课程</h1>{!loading && !loadError && <span className="learner-course-count">{hasMore ? `已加载 ${courses.length} 门` : `${courses.length} 门`}</span>}</div><p>选择已加入的课程，继续学习。</p></div>
-          <button type="button" className="training-action" onClick={() => { setJoinError(''); setJoinOpen(true) }}><Plus size={17} aria-hidden="true" />加入课程</button>
-        </div>
         {loading && courses.length === 0 ? <p role="status" className="training-status learner-home-state"><LoaderCircle size={22} aria-hidden="true" />正在读取课程…</p>
           : loadError && courses.length === 0 ? <div className="training-message learner-home-state learner-home-error" role="alert"><BookOpen size={28} aria-hidden="true" /><h3>课程暂时无法显示</h3><p>{loadError}</p><button type="button" className="training-action training-action--quiet" onClick={() => void refresh()}>重试</button></div>
           : <div className={`training-course-list ${courses.length === 1 ? 'training-course-list--single' : ''}`}>{courses.map(course =>

@@ -16,9 +16,10 @@
   width: 100%;
   box-sizing: border-box;
   padding: 14px 18px;
-  border: 1px solid #dce5d8;
+  border: 1px solid var(--training-border);
   border-radius: 14px;
-  background: #fcfdf9;
+  background: var(--training-surface);
+  color: var(--training-ink);
   gap: 8px;
 }
 .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-hero .training-inline-course-code > small { font-size: 13px; }
@@ -64,17 +65,49 @@
 }
 
 /* Catalog expands in normal document flow, below the shared heading row. */
-.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar { display: grid; grid-template-columns: minmax(0,1fr); align-items: center; min-width: 0; border-bottom: 1px solid #dce5d8; border-radius: 10px 10px 0 0; background: #fcfdf9; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar { display: grid; grid-template-columns: minmax(0,1fr); align-items: center; min-width: 0; border-bottom: 1px solid var(--training-border); border-radius: 10px 10px 0 0; background: var(--training-paper); }
 .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar > .training-course-tabs { border-bottom: 0; background: transparent; }
-.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-catalog-toggle { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; min-width: 0; min-height: 44px; margin: 0 16px 16px; padding: 10px 12px; border: 1px solid #dce4d5; border-radius: 10px; background: #fff; color: #456440; font-size: 14px; text-align: left; }
-.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-catalog-toggle small { margin-left: auto; font-size: 11px; color: #77856d; }
-.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-catalog-toggle > span { font-size: 11px; padding: 2px 5px; border-radius: 4px; background: #e9f1df; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-catalog-toggle { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; min-width: 0; min-height: 44px; margin: 0 16px 16px; padding: 10px 12px; border: 1px solid var(--training-border); border-radius: 10px; background: var(--training-surface); color: var(--training-bamboo); font-size: 14px; text-align: left; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-catalog-toggle small { margin-left: auto; font-size: 11px; color: var(--training-muted); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-catalog-toggle > span { font-size: 11px; padding: 2px 5px; border-radius: 4px; background: color-mix(in srgb, var(--training-bamboo) 9%, var(--training-surface)); }
 .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-catalog-toggle[aria-expanded=true] > svg:last-child { transform: rotate(180deg); }
-.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-catalog-toggle:focus-visible { outline: 2px solid #3d7045; outline-offset: 3px; }
-.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar > .training-catalog-filter { grid-column: 1 / -1; position: static; min-width: 0; width: auto; margin: 0 16px 16px; border: 1px solid #dce5d8; background: #fff; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-catalog-toggle:focus-visible { outline: 2px solid var(--training-bamboo); outline-offset: 3px; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar > .training-catalog-filter { grid-column: 1 / -1; position: static; min-width: 0; width: auto; margin: 0 16px 16px; border: 1px solid var(--training-border); background: var(--training-surface); }
 @media (min-width: 1024px) {
   .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar { grid-template-columns: minmax(0,1fr) 320px; gap: 0 24px; }
   .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar > .training-course-tabs { grid-column: 1; grid-row: 1; }
   .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-catalog-toggle { grid-column: 2; grid-row: 1; margin: 0 20px 0 0; }
   .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar > .training-catalog-filter { margin: 0 20px 20px; }
+}
+
+/* The course header shares Training's current light/dark palette. */
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-hero .training-inline-course-code > small { color: var(--training-muted); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-hero .training-inline-course-code code { min-width: 0; color: var(--training-ink); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-hero .training-inline-course-code button {
+  flex: none; min-height: 44px; background: var(--training-surface); color: var(--training-bamboo); border-color: var(--training-border);
+}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-hero .training-inline-course-code button:hover { background: color-mix(in srgb, var(--training-bamboo) 9%, var(--training-surface)); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-hero .training-inline-course-code p { color: var(--training-bamboo); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course :is(.training-course-hero .training-inline-course-code button, .training-course-tabs .training-section-tab):focus-visible {
+  outline: 2px solid var(--training-bamboo); outline-offset: 3px;
+}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar > .training-course-tabs .training-section-tab:hover {
+  background: color-mix(in srgb, var(--training-bamboo) 9%, var(--training-surface)); color: var(--training-bamboo);
+}
+@media (max-width: 700px) {
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-hero .training-inline-course-code > div { flex-wrap: wrap; min-width: 0; }
+}
+
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar > .training-catalog-filter { color: var(--training-ink); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar > .training-catalog-filter small { color: var(--training-muted); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar > .training-catalog-filter button {
+  background: var(--training-surface); color: var(--training-bamboo); border-color: var(--training-border);
+}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-toolbar > .training-catalog-filter button[type=submit] {
+  background: var(--training-bamboo); color: var(--training-on-accent); border-color: var(--training-bamboo);
+}
+@media (max-width: 700px) {
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-catalog-toggle { flex-wrap: nowrap; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-catalog-toggle small { min-width: 0; }
+  .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-catalog-toggle > svg { flex: none; }
 }

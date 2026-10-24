@@ -41,3 +41,25 @@
   .hui-training .training-admin-form :is(input,textarea) { font-size: 16px; }
   .hui-training .training-admin-end { padding: 18px; gap: 15px; flex-wrap: wrap; }
 }
+
+/* Keep administration in the course theme; danger actions retain their own status. */
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-admin { min-width:0;background:var(--training-paper);color:var(--training-ink); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course :is(.training-admin-roster,.training-admin-card) { background:var(--training-surface);border-color:var(--training-border);color:var(--training-ink); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-admin-icon { background:color-mix(in srgb,var(--training-bamboo) 9%,var(--training-surface));color:var(--training-bamboo); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-admin :is(h2,h3,label) { color:var(--training-ink); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-admin :is(p,.training-admin-save>span,.training-admin-enrollment-state) { color:var(--training-muted); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-admin-card-heading > svg { color:var(--training-bamboo); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-admin-form :is(input,textarea) { background:var(--training-surface);color:var(--training-ink);border-color:var(--training-border); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course :is(.training-admin-save,.training-admin-code-maintenance) { border-color:var(--training-border); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-admin-enrollment-state strong { background:color-mix(in srgb,var(--training-bamboo) 9%,var(--training-surface));color:var(--training-bamboo); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-admin-enrollment-state .is-paused { background:var(--hui-ds-status-warning-bg,#f5ecd7);color:var(--hui-ds-status-warning-text,#765d27); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-admin-code-maintenance button { background:transparent;color:var(--training-bamboo); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-admin-end { background:var(--hui-ds-status-error-bg,#fdf3ef);border-color:var(--hui-ds-status-error-border,#dfbbae); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-admin-end h2 { color:var(--hui-ds-status-error-text,#973e30)!important; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-admin-end button { background:var(--training-surface);border-color:var(--hui-ds-status-error-border,#dfbbae);color:var(--hui-ds-status-error-text,#973e30); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-admin-end button:hover:not(:disabled) { background:var(--hui-ds-status-error-bg,#fdf3ef); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-admin :is(button,input,textarea,a):focus-visible { outline-color:var(--training-bamboo); }
+@media(max-width:500px) {
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-admin-roster .training-action { margin-left:0;min-width:0;min-height:44px;white-space:normal; }
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-admin :is(.training-action,.training-admin-end button,.training-admin-code-maintenance button) { min-height:44px; }
+}

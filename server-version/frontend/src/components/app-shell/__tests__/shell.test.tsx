@@ -292,6 +292,10 @@ describe('Training learner header', () => {
     expect(screen.queryByRole('navigation', { name: '主要导航' })).toBeNull()
     expect(screen.getByRole('link', { name: /个人账号设置/ })).toHaveAttribute('href', '/student/profile')
     expect(screen.getByRole('button', { name: '退出登录' })).toBeEnabled()
+    const appearance=screen.getByRole('button',{name:/^外观：/})
+    const logout=screen.getByRole('button',{name:'退出登录'})
+    expect(logout.compareDocumentPosition(appearance)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(appearance.closest('.hui-account')?.lastElementChild).toContainElement(appearance)
   })
 
 })
@@ -314,6 +318,10 @@ describe('Training teacher visual boundary', () => {
     const view = render(<MemoryRouter initialEntries={[path]}><AppShell><p>课程内容</p></AppShell></MemoryRouter>)
     expect(view.container.querySelector('.training-workspace-menu')).toBeNull()
     expect(screen.getByRole('link', { name: /个人账号设置/ })).toBeInTheDocument()
+    const appearance=screen.getByRole('button',{name:/^外观：/})
+    const logout=screen.getByRole('button',{name:'退出登录'})
+    expect(logout.compareDocumentPosition(appearance)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+    expect(appearance.closest('.hui-account')?.lastElementChild).toContainElement(appearance)
     if (path.startsWith('/questionnaire-products')) expect(screen.getByRole('navigation', { name: '课程管理内容' })).toBeInTheDocument()
   })
   it.each([
@@ -569,5 +577,61 @@ describe('School and Teacher administrator frames',()=>{
   auth.user={id:'ordinary',role:'TEACHER',username:'teacher',entryGrants:[]} as User
   const {container}=render(<MemoryRouter initialEntries={['/admin/huischool']}><AppShell><p>RouteAccess owns access</p></AppShell></MemoryRouter>)
   expect(container.querySelector('.education-admin-shell')).toBeNull()
+ })
+})
+
+describe('Training ordinary startup and route loading presentation',()=>{
+ it.each(['/dashboard','/toolkit','/student','/student/courses/example'])('keeps %s neutral and themed until identity is resolved',path=>{
+  presentation.training=true;auth.user=null;auth.isLoading=true
+  const boot='training:appearance:boot:v1',key='training:appearance:v1:recovered'
+  localStorage.setItem(boot,'dark');localStorage.setItem(key,'light')
+  try{
+   const view=render(<MemoryRouter initialEntries={[path]}><AppShell><p>恢复后的内容</p></AppShell></MemoryRouter>)
+   expect(view.container.querySelector('.training-pending-frame')).toHaveAttribute('data-training-theme','dark')
+   expect(screen.getByRole('status')).toHaveClass('training-entry-loading')
+   expect(screen.queryByText('恢复后的内容')).not.toBeInTheDocument()
+   expect(screen.queryByRole('navigation')).not.toBeInTheDocument()
+   expect(screen.queryByRole('link',{name:/个人账号设置/})).not.toBeInTheDocument()
+   expect(view.container.querySelector('.hui-status--pending')).toBeNull()
+   auth.user={id:'recovered',username:'recovered',role:path.startsWith('/student')?'STUDENT':'TEACHER'} as User;auth.isLoading=false
+   view.rerender(<MemoryRouter initialEntries={[path]}><AppShell><p>恢复后的内容</p></AppShell></MemoryRouter>)
+   expect(screen.getByText('恢复后的内容')).toBeVisible()
+   expect(view.container.querySelector('.training-pending-frame')).toBeNull()
+   expect(view.container.querySelector('.training-workspace-shell')).toHaveAttribute('data-training-theme','light')
+  }finally{localStorage.removeItem(boot);localStorage.removeItem(key)}
+ })
+ it.each(['light','dark'])('keeps route-chunk loading inside the Training %s workspace',theme=>{
+  presentation.training=true;auth.user={id:'route-loader',username:'trainer',role:'TEACHER'} as User
+  localStorage.setItem('training:appearance:v1:route-loader',theme)
+  try{
+   const view=render(<MemoryRouter initialEntries={['/toolkit']}><AppShell><RouteLoading/></AppShell></MemoryRouter>)
+   expect(view.container.querySelector('.training-workspace-shell')).toHaveAttribute('data-training-theme',theme)
+   expect(screen.getByRole('status')).toHaveClass('training-entry-loading')
+   expect(view.container.querySelector('.hui-status--pending')).toBeNull()
+  }finally{localStorage.removeItem('training:appearance:v1:route-loader')}
+ })
+ it('still rejects an unpermitted identity after the neutral recovery frame',()=>{
+  presentation.training=true;auth.user=null;auth.isLoading=true
+  const element=<MemoryRouter initialEntries={['/dashboard']}><AppShell><RouteAccess roles={['TEACHER']}><p>培训师专属内容</p></RouteAccess></AppShell></MemoryRouter>
+  const view=render(element)
+  expect(screen.queryByText('培训师专属内容')).not.toBeInTheDocument()
+  auth.user=student;auth.isLoading=false;view.rerender(element)
+  // A new React tree forces the context mock's current identity to be read.
+  view.rerender(<MemoryRouter initialEntries={['/dashboard']}><AppShell><RouteAccess roles={['TEACHER']}><p>培训师专属内容</p></RouteAccess></AppShell></MemoryRouter>)
+  expect(screen.getByText('当前账户无法访问此页面')).toBeInTheDocument()
+  expect(screen.queryByText('培训师专属内容')).not.toBeInTheDocument()
+ })
+ it('preserves the generic loading surface outside Training',()=>{
+  presentation.training=false
+  const view=render(<MemoryRouter initialEntries={['/dashboard']}><AppShell><RouteLoading/></AppShell></MemoryRouter>)
+  expect(view.container.querySelector('.hui-status--pending')).not.toBeNull()
+  expect(document.documentElement).not.toHaveAttribute('data-training-entry')
+ })
+ it('keeps explicit Survey entry branding outside Training document recovery colors',()=>{
+  presentation.training=true;auth.user=null;auth.isLoading=true
+  const view=render(<MemoryRouter initialEntries={['/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers']}><AppShell><RouteLoading/></AppShell></MemoryRouter>)
+  expect(document.title).toBe('Research')
+  expect(document.documentElement).not.toHaveAttribute('data-training-entry')
+  expect(view.container.querySelector('.training-pending-frame')).toBeNull()
  })
 })

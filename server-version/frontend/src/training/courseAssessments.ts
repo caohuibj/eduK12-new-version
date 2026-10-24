@@ -11,6 +11,7 @@ export interface CourseAssessmentView {
   typeLabel: string
   description: string | null
   status: string
+  completed?: boolean
   href: string | null
   action: string
   reportHref?: string | null
@@ -102,6 +103,7 @@ export function projectCourseAssessments(
       key: 'questionnaire:' + item.id, kind: 'questionnaire', name: item.name,
       typeLabel: '课程问卷', description: item.description,
       status: item.inProgress ? '进行中' : item.completed ? '已完成' : '待完成',
+      completed: done,
       href, action: item.inProgress ? '继续填写' : done ? (href ? '查看反馈' : '已完成') : '开始填写',
     })
   }
@@ -120,6 +122,7 @@ export function projectCourseAssessments(
       key: 'scale:' + item.id, kind: 'scale', name: item.name, typeLabel: '课程测评',
       description: item.description,
       status: item.inProgress ? '进行中' : done ? '已完成' : '待完成',
+      completed: done,
       href,
       action: item.inProgress ? '继续测评' : done ? item.assessmentId ? '查看反馈' : canRetake ? '再次测评' : '已完成' : '开始测评',
     })
@@ -140,7 +143,7 @@ export function projectCourseAssessments(
     items.push({
       key: 'cognitive:' + item.id, kind: 'cognitive', name: item.title,
       typeLabel: '认知测评', description: item.instruction,
-      status,
+      status, completed: !canContinue && Boolean(item.latestCompletedSessionId),
       href: item.admissionPaused ? null : !cognitiveEnabled ? item.continueHref || '/student/cognitive/sessions/' + enc(item.latestCompletedSessionId!) + '/result' : '/student/cognitive/assignments/' + enc(item.id),
       action: item.admissionPaused ? '暂不可用' : canContinue ? '继续测评' : !cognitiveEnabled ? '查看反馈' : status === '待完成' ? '进入测评' : '查看任务',
     })
@@ -169,6 +172,7 @@ export function projectCourseAssessments(
       typeLabel: '组合测评', description: item.description,
       taskSatisfactionLabel: !finished ? undefined : item.hasSatisfiedAttempt === false ? '本次作答已保存并计入次数，可查看报告。'
         : item.latestCompletedAttempt?.taskSatisfied === false ? '本次未达成，历史达成仍保留' : '任务已达成',
+      completed: Boolean(finished && item.hasSatisfiedAttempt !== false),
       status, href, reportHref: reportHref && reportHref !== href ? reportHref : null,
       action: inProgress ? '继续测评' : item.canStartNewAttempt ? finished ? '再次测评' : '开始测评' : reportHref ? '查看反馈' : status,
     })

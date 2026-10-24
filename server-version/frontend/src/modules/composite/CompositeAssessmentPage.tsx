@@ -1,5 +1,6 @@
 import {PersonalParticipationLink} from '../../components/participation/PersonalParticipationLink'
 import {trainingAttemptLink} from '../../components/participation/training-participation-link'
+import { compositeItemLabel } from './item-label'
 import { learnerCourseContext, withLearnerCourse, useTrainingLearnerNavigation } from '../../training/learnerNavigation'
 import { runWithCompletionRetry } from '../../services/completionRetry'
 import { usePageSignal } from '../../hooks/usePageSignal'
@@ -594,7 +595,7 @@ const CompositeAssessmentContent: React.FC = () => {
 
       {current?.type === 'SCALE' && scale && scaleQuestion && <div className="card p-8"><p className="text-sm text-gray-500 mb-2">{scale.name} · 第 {scaleIndex + 1} / {scaleItems.length} 题</p><h2 className="text-xl font-semibold mb-6">{scaleQuestion.content}</h2><div className="space-y-2">{scaleQuestion.options.map((option) => <button key={`${typeof option.value}:${String(option.value)}`} onClick={() => void submitScaleAnswer(option.value)} className={`block w-full text-left border rounded px-4 py-3 ${scaleAnswers[scaleQuestion.itemCode] === option.value ? 'border-action bg-action/5 text-action' : 'hover:border-gray-400'}`}><span>{option.label}</span></button>)}</div><div className="flex justify-between mt-6"><button onClick={() => setScaleIndex((index) => Math.max(0, index - 1))} disabled={scaleIndex === 0} className="btn-secondary"><ChevronLeft className="w-4 h-4 inline" />上一题</button>{scaleIndex < scaleItems.length - 1 ? <button onClick={() => setScaleIndex((index) => Math.min(scaleItems.length - 1, index + 1))} className="btn-secondary">下一题<ChevronRight className="w-4 h-4 inline" /></button> : <button onClick={() => void completeScale()} disabled={submitting} className="btn-primary">完成量表</button>}</div></div>}
 
-      <div className="mt-5 bg-white rounded shadow p-4"><p className="text-sm text-gray-500 mb-2">模块进度</p><div className="flex flex-wrap gap-2">{state.items.map((item) => <span key={item.id} className={`px-3 py-1 rounded text-sm ${item.completed ? 'bg-green-100 text-green-700' : item.index === state.currentIndex ? 'bg-action text-white' : 'bg-gray-100 text-gray-600'}`}>{item.index + 1}. {item.label || item.type}</span>)}</div></div>
+      <div className="mt-5 bg-white rounded shadow p-4"><p className="text-sm text-gray-500 mb-2">模块进度</p><div className="flex flex-wrap gap-2">{state.items.map((item) => <span key={item.id} className={`px-3 py-1 rounded text-sm ${item.completed ? 'bg-green-100 text-green-700' : item.index === state.currentIndex ? 'bg-action text-white' : 'bg-gray-100 text-gray-600'}`}>{item.index + 1}. {compositeItemLabel(item)}</span>)}</div></div>
     </div>
   )
 }

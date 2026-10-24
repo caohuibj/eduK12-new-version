@@ -1647,3 +1647,84 @@ Successful selected jobs, including CodeQL, are all mandatory for `merge gate / 
 SJT PR #353 控制修复（2026-10-24）：官方 run 40102230878 的资格 job 原结论仍为 failure，只有 BE 编译、FE 构建及 emitted-byte 清单三子步骤成功。固定 artifact 12562419854 的官方身份、ZIP digest、完整两端源码/依赖/release-tools 清单及所有 dist 文件逐字节一致时承接原构建，不重复编译。两迁移虽已 apply，尚不授升级/恢复资格；新空隔离库继续完整恢复探针。探针按当前已发布 wave 冻结错误精确匹配，并分离 draft linkage disclosure 与 published consent 冻结负例，不禁用保护。双宿主真实 decoder 仍必须实际执行。
 
 SJT PR #353 持久化交互修复（2026-10-24）：真实浏览器已证明坏 HTTP 200 图片阻答/零曝光及重试成功后的单次曝光；随后 radio 的 checked 需等待真实 IndexedDB 日志持久化，不能用同步 check 后置条件误判。仅 harness 改真实 click→严格等待 checked、唯一 RESPONSE_FIRST_COMMITTED 和已保存提示，生产 Runner 不改；补充一个延迟日志合同已通过。原完整构建仅允许这一测试文件的精确 before/after blob 差异，其他输入及所有 dist 字节仍严格相同。官方 run 40103266820 的 job 整体 failure 保留，只接纳成功的非空主线升级/完整恢复子步骤（完整 prisma、两 probe 源码、report/schema/dump 固定字节）；不再启动第二数据库，双宿主浏览器仍实际执行，未过场景不得算通过。
+
+## Training PR352 non-permission qualification (2026-10-25)
+
+Only PR352 on work/survey-training-branding-20261023, main
+972a695e96eb897c120258d044c1d2590007709c and the 58-file product
+17b32f4afa8278b24371de8920d99aec66ef4d83 enter training-polish.
+Complete raw paths/modes/blobs, both component trees, protected inputs and the
+actual PR source/checkout tree are bound. Administrator permissions, grants,
+approval/publication services, schema and migration additions are excluded.
+Unknown content, changed main, manual/full/probe dispatch and mismatched trees
+fail closed without a platform fallback. Concurrent local permission edits stay
+uncommitted and are not inputs to this candidate.
+
+Retained original local JSON reporters and observed exit receipts admit 302
+disjoint successful assertions, full current frontend types, affected backend
+types and matching per-file frontend lint. These are reviewed-local-evidence,
+ciExecuted=false, originalExecutionSigned=false. The original failed invocation
+containing an independently successful group is retained; only its actual passed
+suite is admitted. Relative TypeScript import closure, fixture/setup/config/lock
+and explicit file-read inputs were reviewed. Vitest's unchanged default disables
+CSS processing; CSS bytes are validated on the new compiled browser artifact,
+not used to invalidate otherwise identical logic assertions. Dynamic application
+entry imports and changed main inputs invalidate the old product-entry and
+formal-home evidence; missing original complete reports are not invented.
+
+Local source/config bindings were reviewed after execution; complete historical
+node_modules bytes were not recorded. The original 203 frontend UI assertions
+used the unchanged frontend tool installation before the local backend Zod
+package was aligned, and are UI contracts with their original mocks, not new
+backend validator/scientific authority evidence. Later 28 backend contracts and
+current type receipts used the fixed-main dependency installation. Initial Zod
+type failure, stopped full-backend traversal and incomplete scoped-config failures
+remain historical and unqualified. No historical run is retroactively signed.
+
+Actions runs only new refusal/admission/gate contracts, three missing frontend
+test groups, five missing frontend lint files, one Vite compilation and compiled
+Training student/trainer/tool/media checks in light/dark and 1440/768/390/320
+layouts. API fixtures are synthetic read-only UI contracts, not real permission
+qualification. The backend has no ESLint lane; actual affected types, contracts
+and current application/control JS/TS CodeQL remain selected. No backend business
+build, database/Redis, migration/restore, scientific platform regression,
+dependency audit repetition, image, load/media pipeline or deployment is selected.
+The original stable merge gate recomputes the full exact plan and requires scope,
+the complete Training qualification and current CodeQL success. Draft, missing,
+skipped, failed and cancelled selected stages block merge. Main push classifies
+the exact same diff without replaying application work. At five minutes report
+the actual waiting stage; only affected failures may be retried.
+
+The first PR352 run 40108196841 retains its browser-stage failure. Its 30 new
+control assertions, three missing application suites, changed-file lint, one
+frontend compilation and current full selected CodeQL all succeeded. The
+consumer incorrectly required a Vite manifest file that this project does not
+emit; actual complete asset hashes and HTML were already retained. The correction
+requires the real HTML to reference an exact retained compiled JS asset, keeps
+complete file hashes and adds negative tampering contracts. No product code changes.
+
+Continuation binds official run/job/source, original successful steps, 24-hour
+lifetime, artifact 12565582682 and exact ZIP SHA256. It restores those original
+compiled bytes and application reports directly on the runner, without another
+application install/test/lint/build. Original source/checkout identities stay
+original, and the failed job is not re-labelled successful. Only changed
+qualification controls receive fresh CodeQL after authenticating the original
+completed full selected analysis; original CodeQL action versions/options and
+all unchanged selected JS/TS blobs remain equal. New control consumers and all
+not-yet-executed compiled browser scenarios still execute and must succeed.
+
+The second PR352 run 40108928592 retained its failed browser result after 21
+actual completed scenarios. The first completed-card locator was already present
+before a React filter transition, so its immediate row-count assertion raced.
+The browser control now waits for the opposite-status card to detach and still
+requires exactly one correct-status card. It does not weaken or change product
+completion rules. Official artifact 12566090219, its exact ZIP digest, source,
+failed job, original browser report and 21 images are verified. Only the other
+17 scenarios run; all 38 must be covered by the exact disjoint union.
+
+The original 50 official application assertions and original build still come
+from the first immutable artifact; no application build/test/lint is repeated.
+SAST retains both the first full selected success and the second successful
+changed-control analysis by fixed official identities, then scans current changed
+controls. Changed qualification consumers execute again; old failed jobs and the
+unexecuted filter scenario remain failed/unqualified until actual new success.

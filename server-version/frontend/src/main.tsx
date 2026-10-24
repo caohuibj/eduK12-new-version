@@ -21,7 +21,7 @@ class EntryErrorBoundary extends React.Component<{ children: React.ReactNode }, 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <EntryErrorBoundary>
-      <React.Suspense fallback={<p className={trainingEntry?"training-entry-loading":undefined} role="status">{trainingEntry?'正在加载 Training 管理…':'正在加载页面…'}</p>}>
+      <React.Suspense fallback={<p className={trainingEntry?"training-entry-loading":undefined} role="status">正在加载页面…</p>}>
         <ProductApp />
       </React.Suspense>
     </EntryErrorBoundary>

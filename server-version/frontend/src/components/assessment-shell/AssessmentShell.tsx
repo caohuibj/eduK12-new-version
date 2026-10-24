@@ -5,7 +5,7 @@ export type AssessmentProgress =
   | { kind: 'count'; completed: number; total: number; label?: string }
   | { kind: 'position'; current: number; total: number; label?: string }
   | { kind: 'phase'; phase: string; detail?: string; label?: string }
-  | { kind: 'open-path'; visited: number; current?: string; label?: string }
+  | { kind: 'open-path'; visited: number; current?: string; label?: string; visitedLabel?: string }
 
 export type AssessmentSaveStatus =
   | { state: 'idle' }
@@ -35,6 +35,7 @@ export interface AssessmentShellProps {
   title: string
   eyebrow?: string
   instructions?: ReactNode
+  instructionsSummary?: string
   estimatedMinutes?: number | null
   progress?: AssessmentProgress
   saveStatus?: AssessmentSaveStatus
@@ -66,7 +67,7 @@ function ProgressView({ progress }: { progress: AssessmentProgress }) {
     return (
       <section aria-label={label} className="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-3">
         <p className="text-sm font-medium text-slate-500">{label}</p>
-        <p className="mt-1 font-semibold text-slate-900">已完成 {Math.max(0, progress.visited)} 个步骤</p>
+        <p className="mt-1 font-semibold text-slate-900">{progress.visitedLabel ?? '已完成'} {Math.max(0, progress.visited)} 个步骤</p>
         {progress.current ? <p className="mt-1 text-sm text-slate-600">当前：{progress.current}</p> : null}
       </section>
     )
@@ -160,6 +161,7 @@ export function AssessmentShell({
   title,
   eyebrow = '测评',
   instructions,
+  instructionsSummary,
   estimatedMinutes,
   progress,
   saveStatus = { state: 'idle' },
@@ -173,7 +175,7 @@ export function AssessmentShell({
 }: AssessmentShellProps) {
   return (
     <ProductPage width="assessment" className={className}>
-      <header className="mb-6 space-y-3" data-assessment-shell-header>
+      <header className="mb-6 space-y-3" data-assessment-shell-header data-assessment-shell-compact={instructionsSummary ? true : undefined}>
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between">
           <div className="min-w-0">
             <p className="text-sm font-medium text-slate-500">{eyebrow}</p>
@@ -181,7 +183,12 @@ export function AssessmentShell({
           </div>
           {estimatedMinutes ? <p className="text-sm text-slate-500 sm:text-right">预计约 {estimatedMinutes} 分钟</p> : null}
         </div>
-        {instructions ? <div className="max-w-prose whitespace-pre-wrap text-sm text-slate-600">{instructions}</div> : null}
+        {instructions ? instructionsSummary ? (
+          <details className="assessment-instructions">
+            <summary>{instructionsSummary}</summary>
+            <div className="max-w-prose whitespace-pre-wrap text-sm text-slate-600">{instructions}</div>
+          </details>
+        ) : <div className="max-w-prose whitespace-pre-wrap text-sm text-slate-600">{instructions}</div> : null}
       </header>
 
       {progress ? <ProgressView progress={progress} /> : null}

@@ -16,7 +16,7 @@
     || (productOrigin && ['/admin/login', '/admin/security/enroll'].includes(window.location.pathname)
       && isTrainingAdminPath(new URLSearchParams(window.location.search).get('returnTo') || ''))
   const training = trainingHost || trainingAdminEntry
-  if (trainingAdminPage) {
+  if (training && !survey) {
     let mode = 'auto'
     try { mode = localStorage.getItem('training:appearance:boot:v1') || 'auto' } catch { /* Use the local clock when storage is unavailable. */ }
     const hour = new Date().getHours()
