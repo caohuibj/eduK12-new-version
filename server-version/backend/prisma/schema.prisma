@@ -2100,6 +2100,9 @@ model SituationalAttempt {
   compositeAttemptId     String?                @map("composite_attempt_id")
   compositeItemId        String?                @map("composite_item_id")
   compositeSlotKey       String?                @map("composite_slot_key")
+  surveyAttemptId       String?                @map("survey_attempt_id")
+  surveyPublicationId   String?                @map("survey_publication_id")
+  surveySlotKey         String?                @map("survey_slot_key")
   participantKey         String                 @map("participant_key")
   instrumentKey          String                 @map("instrument_key")
   instrumentVersion      String                 @map("instrument_version")
@@ -2130,6 +2133,8 @@ model SituationalAttempt {
   compositeAttempt CompositeAssessmentAttempt? @relation("CompositeAttemptSituationalAttempts", fields: [compositeAttemptId], references: [id], onDelete: Cascade)
   compositeItem   CompositeAssessmentItem? @relation("CompositeSituationalAttempts", fields: [compositeItemId], references: [id], onDelete: Restrict)
   rawSubmission SituationalRawSubmission?
+  surveyAttempt SurveyWaveAttempt? @relation("SurveySituationalAttempts", fields: [surveyAttemptId], references: [id], onDelete: Restrict, onUpdate: NoAction)
+  surveyPublication SurveyPublication? @relation("SurveySituationalPublication", fields: [surveyPublicationId], references: [id], onDelete: Restrict, onUpdate: NoAction)
 
   // Standalone attempt numbers are unique within the standalone namespace;
   // embedded children are scoped by their composite parent/slot instead.
@@ -2139,6 +2144,7 @@ model SituationalAttempt {
   @@index([instrumentKey, instrumentVersion, status])
   @@index([compositeAttemptId, status])
   @@unique([compositeAttemptId, compositeItemId], map: "situational_attempts_composite_item_key")
+  @@unique([surveyAttemptId, surveySlotKey, attemptEpoch], map: "situational_attempts_survey_slot_epoch_key")
   @@map("situational_attempts")
 }
 
@@ -3059,6 +3065,7 @@ model SurveyInstrumentDraft {
 // PR3 design: Survey research-only frozen publication and wave lineage.
 // Old anonymous_study_* tables remain unmodified and are not double-written.
 model SurveyPublication {
+  situationalAttempts SituationalAttempt[] @relation("SurveySituationalPublication")
   id              String        @id
   projectId       String        @map("project_id")
   project         SurveyProject @relation(fields:[projectId],references:[id],onDelete:Restrict)
@@ -3133,6 +3140,7 @@ model SurveyParticipant {
   @@map("survey_participants")
 }
 model SurveyWaveAttempt {
+  situationalAttempts SituationalAttempt[] @relation("SurveySituationalAttempts")
   id             String        @id
   projectId      String        @map("project_id")
   waveId         String        @map("wave_id")
