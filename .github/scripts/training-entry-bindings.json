@@ -346,13 +346,15 @@
     ".github/scripts/content-scope.mjs",
     ".github/scripts/merge-gate.mjs",
     ".github/workflows/ci.yml",
-    "docs/release/README.md"
+    "docs/release/README.md",
+    ".github/scripts/content-workflows.test.mjs"
   ],
   "controlBefore": {
     ".github/scripts/content-scope.mjs": "ed5d0926860294fd2f83ab1f2f0d81573e3124ea",
     ".github/scripts/merge-gate.mjs": "811b8321d55a3f77a18891245aa65320e2da7ef9",
     ".github/workflows/ci.yml": "edbbf7666bfcbbcaf038fe145c19a4bdae09401c",
-    "docs/release/README.md": "2bc777e02356658b83765717c8a6c403840f1c53"
+    "docs/release/README.md": "2bc777e02356658b83765717c8a6c403840f1c53",
+    ".github/scripts/content-workflows.test.mjs": "e19a3922d1a2fc62a2d1afb42be11556d6947fe8"
   },
   "components": {
     "frontend": "3596fe269a2029e0ef968e4eb76df005e04a72c2",
@@ -370,7 +372,7 @@
     "server-version/frontend/tsconfig.cognitive.json": "910e97700f25652bc1d80ada47e176cbd51c2fbe",
     "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22"
   },
-  "evidenceSHA256": "71f22b6a29548e868387656c2f4339d0664e62674d1d21f57eaa29ed30bf652f",
+  "evidenceSHA256": "ea98a0912368f2ac89a4ce5b260fd8266031b37b73474d3089ec6d598c2d0eaa",
   "requiredGroups": [
     "learner-frontend",
     "learner-backend",

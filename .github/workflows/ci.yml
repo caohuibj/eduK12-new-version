@@ -226,7 +226,34 @@ jobs:
 
   probe-cognitive:
     if: ${{ !(github.event_name == 'workflow_dispatch' && contains(fromJSON('["perf/training-entry-20261023","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023"]'), github.ref_name)) && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/survey/mac-visual-s01-20261019') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/fix/survey-wave-content-selection-20261021') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/work/training-functional-final-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/perf/training-load-followup-20261020') && !(github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/admin-permissions/a01-a07-20261020') && (github.event_name == 'workflow_dispatch' && inputs.step_probe == 'cognitive') }}
-    uses: ./.github/workflows/ci-cognitive-step.yml
+    # Inline the unchanged diagnostic job to keep reusable references at GitHub's limit.
+    permissions:
+      contents: read
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    env:
+      NODE_ENV: test
+      COGNITIVE_MODULE_ENABLED: 'true'
+      VITE_COGNITIVE_MODULE_ENABLED: 'true'
+      TZ: UTC
+      DATABASE_URL: postgresql://ci_guard:ci_guard_pw@127.0.0.1:5432/eduk12_content_ci?schema=public
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.21.0'
+      - name: verify runner capacity
+        run: node .github/scripts/runner-preflight.mjs
+      - name: prepare native dependencies
+        run: bash server-version/scripts/ci-install-canvas-deps.sh
+      - name: install backend dependencies
+        working-directory: server-version/backend
+        run: npm ci
+      - name: generate Prisma client without database access
+        working-directory: server-version/backend
+        run: npx prisma generate
+      - name: run the exact shared Cognitive CI step
+        run: bash .github/scripts/cognitive-ci-diagnostics.sh
 
   probe-frontend:
     needs: probe-frontend-build

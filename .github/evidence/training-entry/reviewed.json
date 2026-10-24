@@ -17,13 +17,14 @@
   "controlSHA256": {
     ".github/scripts/training-entry-scope.mjs": "d27ae480ad5855ef1dec431da92554ddd16406c54840935e832b5ae859c5659e",
     ".github/scripts/training-entry-checks.mjs": "9ac45d92602e115e6fba7a2940f3da6dc59c3f6ac11c3e4983b9efd12bf03bed",
-    ".github/scripts/training-entry.test.mjs": "1e9da177d91b0584d6313f1865078ecbf9b2388fe4672a64d2b7d64849bd0d3a",
+    ".github/scripts/training-entry.test.mjs": "9c97458784a0002d610f76383e2654dca2aaca40ea3dfc50eed52a5169727bf0",
     ".github/scripts/training-entry-browser.mjs": "56cbca0ac11907aeb90a6710087e5a79e84177e285b299a671d6ec39935751e9",
     ".github/workflows/ci-training-entry.yml": "6fc607275d3230ec4860369aa7fc6475b49c35be882be5d8e7df20cc07082c3b",
     ".github/scripts/content-scope.mjs": "6ce18a38647150ea663b8c8d96ab631f3bb06b91441c486ebfea6cbfa02012d8",
     ".github/scripts/merge-gate.mjs": "f2de8993cbc4f003471a4309ee08dc03bc1b5906c3b95b6f509c71dcd73cf06e",
-    ".github/workflows/ci.yml": "52137727958e3fe05d5285cae4229c5841aae95dfbcb39ea6cbf7f155601119f",
-    "docs/release/README.md": "8b20a359c605ccb9323ebbb467915fc89dac0d7ac15b07f7319c8bb5c3b78757"
+    ".github/workflows/ci.yml": "48e74f5b4c31850bdecf99e3c0ef983c99bb830936d44031b9d58d5c82ea33e9",
+    "docs/release/README.md": "c4f1c27975aa1d56798bbb9e2939d1321ca5566d0a47a5006581b2c94e4dddde",
+    ".github/scripts/content-workflows.test.mjs": "e62059676d8e418fb75392c03ca35e7abba8c73d1bdbdb829162b10c125bdefd"
   },
   "groups": [
     {

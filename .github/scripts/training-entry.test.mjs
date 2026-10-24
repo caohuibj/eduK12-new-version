@@ -112,3 +112,20 @@ test('browser consumes exact same-run build bytes and refuses drift without rebu
  assert(wf.includes('["admission","backend","frontend","browser"]'));
  assert(browser.includes('timeout-minutes: 8'));
 });
+
+
+test('complete main workflow reference graph stays within GitHub initialization limit',()=>{
+ const seen=new Set(),refs=new Set();
+ const visit=path=>{
+  if(seen.has(path))return;seen.add(path);
+  const source=readFileSync(path,'utf8');
+  for(const match of source.matchAll(/^    uses:\s+([^\s#]+)\s*$/gm)){
+   const ref=match[1];refs.add(ref);
+   if(ref.startsWith('./.github/workflows/'))visit(ref.slice(2));
+  }
+ };
+ visit('.github/workflows/ci.yml');
+ assert(refs.size<=50,`GitHub permits 50 unique referenced workflows, found ${refs.size}`);
+ assert(!refs.has('./.github/workflows/ci-cognitive-step.yml'));
+ assert(refs.has('./.github/workflows/ci-training-entry.yml'));
+});
