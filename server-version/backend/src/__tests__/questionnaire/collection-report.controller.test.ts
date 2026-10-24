@@ -182,7 +182,8 @@ describe('collection-only questionnaire completion/report contract', () => {
     await publicQuestionnaireController.getAssessment({ params: { sessionId: 'session-1' } } as any, res)
 
     expect(dataOf(res).questionnaireAssessment.status).toBe('COMPLETED')
-    expect(mockPrisma.questionnaireAssessment.findUnique).toHaveBeenNthCalledWith(2, expect.objectContaining({
+    // Dispatch header, legacy graph, then the authoritative transaction reload.
+    expect(mockPrisma.questionnaireAssessment.findUnique).toHaveBeenNthCalledWith(3, expect.objectContaining({
       where: { id: 'qa-1' },
       select: expect.objectContaining({
         contextSnapshotEncrypted: true,
