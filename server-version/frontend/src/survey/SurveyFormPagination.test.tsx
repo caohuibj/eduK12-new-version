@@ -59,8 +59,8 @@ describe('Survey real participant Form paging',()=>{
     expect(screen.getByText('第一页')).toBeInTheDocument()
     expect(screen.queryByText('第二页')).not.toBeInTheDocument()
     // The next page is conditional: until the source answer is 'yes',
-    // Next is disabled rather than misleadingly claiming a page exists.
-    expect(screen.getByRole('button',{name:'下一页'})).toBeDisabled()
+    // With one currently visible page, no persistent paging controls are shown.
+    expect(screen.queryByRole('button',{name:'下一页'})).toBeNull()
     expect(screen.queryByRole('alert')).toBeNull()
     expect(screen.getByTestId('page-number')).toHaveTextContent('0')
     fireEvent.click(screen.getByRole('radio',{name:'同意'}))
@@ -89,8 +89,9 @@ describe('Survey real participant Form paging',()=>{
   it('skips conditional pages entirely when their predicates are false',()=>{
     render(<Host/>)
     fireEvent.click(screen.getByRole('radio',{name:'不同意'}))
-    expect(screen.getByText(/第 1 \/ 1 页/)).toBeInTheDocument()
-    expect(screen.getByRole('button',{name:'下一页'})).toBeDisabled()
+    expect(screen.queryByRole('progressbar')).toBeNull()
+    expect(screen.getByRole('radio',{name:'不同意'})).toBeChecked()
+    expect(screen.queryByRole('button',{name:'下一页'})).toBeNull()
     expect(screen.queryByText('补充说明')).not.toBeInTheDocument()
   })
 })
