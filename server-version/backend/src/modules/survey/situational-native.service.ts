@@ -80,10 +80,11 @@ function view(row:SituationalAttemptRow|SituationalAttemptCommitRow,runtime:Awai
     ...(row.status==='COMPLETED'?{receipt:{protocol:SURVEY_NATIVE_SJT_PROTOCOL,attemptId:row.id,
       submissionId:row.submissionId,payloadHash:row.submissionPayloadHash}}:{})}
 }
-/** The host lock is independent of the immutable scientific runtime. */
-async function flowView(tx:Tx,known:VerifiedSurveyTask,slotKey:string,
-  row:SituationalAttemptRow|SituationalAttemptCommitRow,runtime:Awaited<ReturnType<typeof access>>,replayed?:boolean){
-  if(!runtime.publication.flow)return view(row,runtime,replayed)
+/** The host lock is independent of the immutable scientific runtime. Keep this
+ * proof on every authorized operation, even when no participant DTO is needed. */
+async function verifiedFlowPrefix(tx:Tx,known:VerifiedSurveyTask,slotKey:string,
+  row:SituationalAttemptRow|SituationalAttemptCommitRow,runtime:Awaited<ReturnType<typeof access>>){
+  if(!runtime.publication.flow)return undefined
   if(!runtime.assignment)fail(409,'冻结研究缺少已持久化的分配')
   const own=await tx.situationalAttempt.findUnique({where:{id:row.id},
     select:{surveyLockedAnswersCipher:true,surveyLockedAnswersHash:true}})
@@ -94,7 +95,15 @@ async function flowView(tx:Tx,known:VerifiedSurveyTask,slotKey:string,
     const prefix=await freezeSurveyTaskPrefix(tx,known,runtime.publication,slotKey,lockedPriorAnswers,runtime.assignment)
     if(canonicalHash(prefix)!==own!.surveyLockedAnswersHash)fail(409,'情境化前置答案与冻结路径不一致')
   }catch(error){if(error instanceof SurveyCognitiveError)fail(error.statusCode,error.message);throw error}
-  return {...view(row,runtime,replayed),lockedPriorAnswers}
+  return lockedPriorAnswers
+}
+function responseFor(row:SituationalAttemptRow|SituationalAttemptCommitRow,
+  runtime:Awaited<ReturnType<typeof access>>,lockedPriorAnswers:Record<string,unknown>|undefined,replayed?:boolean){
+  return {...view(row,runtime,replayed),...(lockedPriorAnswers===undefined?{}:{lockedPriorAnswers})}
+}
+async function flowView(tx:Tx,known:VerifiedSurveyTask,slotKey:string,
+  row:SituationalAttemptRow|SituationalAttemptCommitRow,runtime:Awaited<ReturnType<typeof access>>,replayed?:boolean){
+  return responseFor(row,runtime,await verifiedFlowPrefix(tx,known,slotKey,row,runtime),replayed)
 }
 export async function startSurveySituational(proof:SurveyTaskProof,slotKey:string,priorAnswers?:unknown){
   const known=await verifiedSurveyAttempt(proof)
@@ -144,14 +153,14 @@ async function readLocked(tx:Tx,proof:SurveyTaskProof,known:VerifiedSurveyTask,s
   assertChild(row!,known,slotKey,runtime)
   const stored=decryptFrozenSituationalRuntimeSnapshot(row!.runtimeSnapshotEncrypted)
   if(canonicalHash(stored)!==canonicalHash(runtime.snapshot))fail(409,'情境化冻结运行时已变化')
-  const response=await flowView(tx,known,slotKey,row!,runtime)
-  return {row:row!,snapshot:stored,runtime,response}
+  const lockedPriorAnswers=await verifiedFlowPrefix(tx,known,slotKey,row!,runtime)
+  return {row:row!,snapshot:stored,runtime,lockedPriorAnswers}
 }
 export async function readSurveySituational(proof:SurveyTaskProof,slotKey:string,childId:string){
   const known=await verifiedSurveyAttempt(proof)
   return withFinalOnlyCompletionTransaction(async tx=>{
     const loaded=await readLocked(tx,proof,known,slotKey,childId)
-    return loaded.response
+    return responseFor(loaded.row,loaded.runtime,loaded.lockedPriorAnswers)
   })
 }
 export async function submitSurveySituationalFinal(proof:SurveyTaskProof,slotKey:string,childId:string,
@@ -165,7 +174,7 @@ export async function submitSurveySituationalFinal(proof:SurveyTaskProof,slotKey
     if(loaded.row.status==='COMPLETED'){
       if(assertSubmissionReplay(loaded.row,prepared.submissionId,prepared.payloadHash)!=='replay')
         throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT','已提交内容不一致',409)
-      return {replay:{...loaded.response,replayed:true}}
+      return {replay:responseFor(loaded.row,loaded.runtime,loaded.lockedPriorAnswers,true)}
     }
     return {prepared}
   })
