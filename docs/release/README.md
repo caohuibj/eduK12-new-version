@@ -1603,3 +1603,19 @@ including previously passing assignment detail cases, execute against the new
 CSS build because restoring the actual return button affects those pages. Every
 remaining required browser scenario and build must succeed; failed/skipped jobs
 remain blocking. No additional original logs are published in this repair.
+
+The sixth run completed backend qualification and frontend build successfully.
+The next recovery keeps the complete official backend job, its exact dependency/
+source manifest and all 5,941 emitted file hashes; it does not start PostgreSQL,
+regenerate Prisma, compile or repeat its 473 contracts/seven remaining PG cases.
+The original migration qualification and the twelve prior reset cases remain
+separately identified rather than counted as new executions.
+
+AssignmentList's current successful batch now clears its own busy state before
+advancing list-refresh generation; stale or failed operations retain their guards.
+The affected file's seven old assertions are removed from the 421-case receipt,
+leaving 414. Its eight current assertions execute with explicit approval. The
+frontend rebuilds for this actual runtime change and lints the two changed files.
+Twenty-four already passing browser scenarios retain exact official provenance;
+the failed batch-review scenario and seven never-executed scenarios still run.
+No new original logs are published, and no failed job is re-labelled successful.

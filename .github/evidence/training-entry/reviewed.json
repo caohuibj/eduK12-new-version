@@ -3,22 +3,22 @@
   "kind": "reviewed-local-evidence",
   "ciExecuted": false,
   "originalExecutionSigned": false,
-  "product": "f1a185fca8dca4d967c9e45def6903fbe2fe6b5b",
+  "product": "61d1fec21d20139aef014045a5694d7ea983e4d1",
   "reviewStatus": "INDEPENDENTLY_REVIEWED",
   "authorization": {
     "currentMixedCandidate": "Only missing directly affected contracts/build/browser/migration-restore/audit/CodeQL, with no admitted-case replay. Current PR merge requested by the repository owner; no deployment."
   },
   "blockers": [],
   "controlSHA256": {
-    ".github/scripts/training-entry-scope.mjs": "ca5d68d35faa3d4402b672ec90165daf2d90ee7443aece1334d7e9c91b9a347c",
-    ".github/scripts/training-entry-checks.mjs": "83fb6778ce4098068a8da8059af9ac1c4c6fdd143bf78168c5965134a2ac3d70",
-    ".github/scripts/training-entry.test.mjs": "ee80f96a40f026abaf1546990d2f24f724fce456055528bd488139653be659ce",
-    ".github/scripts/training-entry-browser.mjs": "c73b3c620e48afc6d60f794f4081421df9f00d2e6e6cfbad81fe410568403715",
-    ".github/workflows/ci-training-entry.yml": "d1efdf6ae5c553df6d2ddb7593be8ccd5e3869ed03dc3b518a759ac17fc6eedb",
+    ".github/scripts/training-entry-scope.mjs": "13f556f4cf1bbcc576659f1af7c320a0dc5837e748cc6852fef901bce35f6bd0",
+    ".github/scripts/training-entry-checks.mjs": "4a8a14ac53084abf2924b0f330fe3442122bbea49dff6ae85fddb1d61e804f15",
+    ".github/scripts/training-entry.test.mjs": "0b9421b45b0f73e119ae09ab050d3afa4d6b682d240e32ac964f85bf85f5d1ca",
+    ".github/scripts/training-entry-browser.mjs": "e9c468e53d2a2bc926be903fe0524eb1ae79becd48a2062b8de233e41ea93fce",
+    ".github/workflows/ci-training-entry.yml": "0a50d6dd39026d92c30e8a4417f48a1eb9eabf23ba2cd2a00d0bf2a8db6438e7",
     ".github/scripts/content-scope.mjs": "c78db2f6b4384701b9547e9df88e3de5453008a459a18d3108817b143e1ea762",
     ".github/scripts/merge-gate.mjs": "71585d6ca8785c8e60686f4770fcaec6f49be86c880a85d4ca3f42c02879d018",
     ".github/workflows/ci.yml": "a889c637f454d8c1cb735c9fe5300c8bb03d78c9866e21cf1844e3718d7a0f50",
-    "docs/release/README.md": "6f3b7b113336c1c4c8263e0e8385faada38116f22f61f57de92410ad0bf495c5",
+    "docs/release/README.md": "6591b1e3ebacde80cc453b2b61d59758f89bf23aa91b038dd6f182479c46ccd3",
     ".github/scripts/content-workflows.test.mjs": "e62059676d8e418fb75392c03ca35e7abba8c73d1bdbdb829162b10c125bdefd",
     ".github/scripts/training-entry-migration.mjs": "b5c42b2c5bb3894cb8f0baaf4330cf78fc1f0147fad79bd676d1a35186a9faac"
   },
@@ -656,9 +656,9 @@
             "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx"
           ],
           "inputs": {
-            "server-version/frontend/src/pages/AssignmentList.tsx": "e3cbc1dc34f9b29aa1eda4fb243b6aa523e2c8b5",
+            "server-version/frontend/src/pages/AssignmentList.tsx": "8444738d6c74784be2fa985c7ecc1822bd8cc4f6",
             "server-version/frontend/src/pages/__tests__/TeacherTasks.loading.test.tsx": "db218f21b89ba393f8568d1bdb703d6019934a69",
-            "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": "c4cc93208a873628438d32603b38c411c1cf6e97",
+            "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": "611c23c6683557d5fcab311363e8586fd38dc07f",
             "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
             "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
             "server-version/frontend/eslint.config.js": "4e89832bf4d92a5e1ba1815aad2ade6c9a65c3a1"
@@ -677,7 +677,46 @@
           "exitEvidence": "Original validator explicitly observed three-file ESLint exit0, confirmed during candidate review. Raw report supports0errors/4originalwarnings but does not itself encode full argv.",
           "ciExecuted": false,
           "originalExecutionSigned": false,
-          "inputDeltaReview": {}
+          "inputDeltaReview": {
+            "server-version/frontend/src/pages/AssignmentList.tsx": {
+              "before": "e3cbc1dc34f9b29aa1eda4fb243b6aa523e2c8b5",
+              "after": "8444738d6c74784be2fa985c7ecc1822bd8cc4f6",
+              "changedSymbols": [
+                "AssignmentList completed batch busy cleanup and regression"
+              ],
+              "unchangedExecutedPaths": [
+                "all paths not executing a successful batch-grade completion",
+                "backend and immutable scientific/schema paths",
+                "TypeScript public types and component signatures"
+              ],
+              "executedPathUnchanged": true,
+              "reason": "The successful current-generation batch-grade branch now clears its own busy flag before advancing list refresh. Prior seven review assertions are excluded from fixed frontend acceptance and the full affected eight-case file reexecutes; other retained tests do not execute that changed branch.",
+              "reviewEvidence": "Independent exact two-file review and owner 8 focused passes; user separately approved the eight-case CI revalidation."
+            },
+            "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": {
+              "before": "c4cc93208a873628438d32603b38c411c1cf6e97",
+              "after": "611c23c6683557d5fcab311363e8586fd38dc07f",
+              "changedSymbols": [
+                "AssignmentList completed batch busy cleanup and regression"
+              ],
+              "unchangedExecutedPaths": [
+                "all paths not executing a successful batch-grade completion",
+                "backend and immutable scientific/schema paths",
+                "TypeScript public types and component signatures"
+              ],
+              "executedPathUnchanged": true,
+              "reason": "The successful current-generation batch-grade branch now clears its own busy flag before advancing list refresh. Prior seven review assertions are excluded from fixed frontend acceptance and the full affected eight-case file reexecutes; other retained tests do not execute that changed branch.",
+              "reviewEvidence": "Independent exact two-file review and owner 8 focused passes; user separately approved the eight-case CI revalidation."
+            }
+          },
+          "originalInputs": {
+            "server-version/frontend/src/pages/AssignmentList.tsx": "e3cbc1dc34f9b29aa1eda4fb243b6aa523e2c8b5",
+            "server-version/frontend/src/pages/__tests__/TeacherTasks.loading.test.tsx": "db218f21b89ba393f8568d1bdb703d6019934a69",
+            "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": "c4cc93208a873628438d32603b38c411c1cf6e97",
+            "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+            "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+            "server-version/frontend/eslint.config.js": "4e89832bf4d92a5e1ba1815aad2ade6c9a65c3a1"
+          }
         }
       ]
     },
@@ -4565,7 +4604,7 @@
             "server-version/frontend/src/modules/situational/useAuthorCursorList.ts": "3cb3121ee7c3a93ad2422f20a748b141a0fec35b",
             "server-version/frontend/src/pages/AdminLogin.test.tsx": "94720f68743bb92fb12a4a5528046428ee3e960a",
             "server-version/frontend/src/pages/AdminLogin.tsx": "1dbc0166a90415b162ee8b016882b715d58f7659",
-            "server-version/frontend/src/pages/AssignmentList.tsx": "e3cbc1dc34f9b29aa1eda4fb243b6aa523e2c8b5",
+            "server-version/frontend/src/pages/AssignmentList.tsx": "8444738d6c74784be2fa985c7ecc1822bd8cc4f6",
             "server-version/frontend/src/pages/CheckinList.tsx": "8c113e42183f20a874a30329e34909c21a9af642",
             "server-version/frontend/src/pages/CourseList.tsx": "96d4ceb25ea08f7ef7540b964005686f31038d17",
             "server-version/frontend/src/pages/CourseStudents.training-roles.test.tsx": "1731d1e0414d08d8b8911f7e89c0b3cea40de2c7",
@@ -4597,7 +4636,7 @@
             "server-version/frontend/src/pages/UserList.tsx": "5221a5892a9c885621415f29c0908a0e367ac337",
             "server-version/frontend/src/pages/VideoLibrary.tsx": "fe4a818aa5a1269338a4f4ecb2dc375598487498",
             "server-version/frontend/src/pages/__tests__/AssignmentList.course-workspace.test.tsx": "0138f8784e6ac890f4870303e36661345d1df3e5",
-            "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": "c4cc93208a873628438d32603b38c411c1cf6e97",
+            "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": "611c23c6683557d5fcab311363e8586fd38dc07f",
             "server-version/frontend/src/pages/__tests__/AssignmentList.states.test.tsx": "7efe1c192d781be57e331b3c0533b8fae330319d",
             "server-version/frontend/src/pages/__tests__/CheckinList.course-workspace.test.tsx": "fa3c3dd00429994bc3ae15ee015ffc7a74354a23",
             "server-version/frontend/src/pages/__tests__/ClassroomEnter.test.tsx": "f8a3d0f4ea77c39850e124aa03d99eb4cba2e55b",
@@ -9955,6 +9994,36 @@
               "executedPathUnchanged": true,
               "reason": "Reviewed recovery changes only Form invalid-input issue presentation, test assertions and a CSS display rule. Successful scientific parse, identity and submitted data paths remain unchanged; CSS is not rendered by retained unit tests.",
               "reviewEvidence": "Independent review of exact three-file PR351 fourth-run repair; original failures remain failed and eight affected assertions are explicitly revalidated."
+            },
+            "server-version/frontend/src/pages/AssignmentList.tsx": {
+              "before": "e3cbc1dc34f9b29aa1eda4fb243b6aa523e2c8b5",
+              "after": "8444738d6c74784be2fa985c7ecc1822bd8cc4f6",
+              "changedSymbols": [
+                "AssignmentList completed batch busy cleanup and regression"
+              ],
+              "unchangedExecutedPaths": [
+                "all paths not executing a successful batch-grade completion",
+                "backend and immutable scientific/schema paths",
+                "TypeScript public types and component signatures"
+              ],
+              "executedPathUnchanged": true,
+              "reason": "The successful current-generation batch-grade branch now clears its own busy flag before advancing list refresh. Prior seven review assertions are excluded from fixed frontend acceptance and the full affected eight-case file reexecutes; other retained tests do not execute that changed branch.",
+              "reviewEvidence": "Independent exact two-file review and owner 8 focused passes; user separately approved the eight-case CI revalidation."
+            },
+            "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": {
+              "before": "c4cc93208a873628438d32603b38c411c1cf6e97",
+              "after": "611c23c6683557d5fcab311363e8586fd38dc07f",
+              "changedSymbols": [
+                "AssignmentList completed batch busy cleanup and regression"
+              ],
+              "unchangedExecutedPaths": [
+                "all paths not executing a successful batch-grade completion",
+                "backend and immutable scientific/schema paths",
+                "TypeScript public types and component signatures"
+              ],
+              "executedPathUnchanged": true,
+              "reason": "The successful current-generation batch-grade branch now clears its own busy flag before advancing list refresh. Prior seven review assertions are excluded from fixed frontend acceptance and the full affected eight-case file reexecutes; other retained tests do not execute that changed branch.",
+              "reviewEvidence": "Independent exact two-file review and owner 8 focused passes; user separately approved the eight-case CI revalidation."
             }
           }
         }
@@ -13844,7 +13913,7 @@
             "server-version/frontend/src/modules/situational/useAuthorCursorList.ts": "3cb3121ee7c3a93ad2422f20a748b141a0fec35b",
             "server-version/frontend/src/pages/AdminLogin.test.tsx": "94720f68743bb92fb12a4a5528046428ee3e960a",
             "server-version/frontend/src/pages/AdminLogin.tsx": "1dbc0166a90415b162ee8b016882b715d58f7659",
-            "server-version/frontend/src/pages/AssignmentList.tsx": "e3cbc1dc34f9b29aa1eda4fb243b6aa523e2c8b5",
+            "server-version/frontend/src/pages/AssignmentList.tsx": "8444738d6c74784be2fa985c7ecc1822bd8cc4f6",
             "server-version/frontend/src/pages/CheckinList.tsx": "8c113e42183f20a874a30329e34909c21a9af642",
             "server-version/frontend/src/pages/CourseList.tsx": "96d4ceb25ea08f7ef7540b964005686f31038d17",
             "server-version/frontend/src/pages/CourseStudents.training-roles.test.tsx": "1731d1e0414d08d8b8911f7e89c0b3cea40de2c7",
@@ -13876,7 +13945,7 @@
             "server-version/frontend/src/pages/UserList.tsx": "5221a5892a9c885621415f29c0908a0e367ac337",
             "server-version/frontend/src/pages/VideoLibrary.tsx": "fe4a818aa5a1269338a4f4ecb2dc375598487498",
             "server-version/frontend/src/pages/__tests__/AssignmentList.course-workspace.test.tsx": "0138f8784e6ac890f4870303e36661345d1df3e5",
-            "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": "c4cc93208a873628438d32603b38c411c1cf6e97",
+            "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": "611c23c6683557d5fcab311363e8586fd38dc07f",
             "server-version/frontend/src/pages/__tests__/AssignmentList.states.test.tsx": "7efe1c192d781be57e331b3c0533b8fae330319d",
             "server-version/frontend/src/pages/__tests__/CheckinList.course-workspace.test.tsx": "fa3c3dd00429994bc3ae15ee015ffc7a74354a23",
             "server-version/frontend/src/pages/__tests__/ClassroomEnter.test.tsx": "f8a3d0f4ea77c39850e124aa03d99eb4cba2e55b",
@@ -19234,6 +19303,36 @@
               "executedPathUnchanged": true,
               "reason": "Reviewed recovery changes only Form invalid-input issue presentation, test assertions and a CSS display rule. Successful scientific parse, identity and submitted data paths remain unchanged; CSS is not rendered by retained unit tests.",
               "reviewEvidence": "Independent review of exact three-file PR351 fourth-run repair; original failures remain failed and eight affected assertions are explicitly revalidated."
+            },
+            "server-version/frontend/src/pages/AssignmentList.tsx": {
+              "before": "e3cbc1dc34f9b29aa1eda4fb243b6aa523e2c8b5",
+              "after": "8444738d6c74784be2fa985c7ecc1822bd8cc4f6",
+              "changedSymbols": [
+                "AssignmentList completed batch busy cleanup and regression"
+              ],
+              "unchangedExecutedPaths": [
+                "all paths not executing a successful batch-grade completion",
+                "backend and immutable scientific/schema paths",
+                "TypeScript public types and component signatures"
+              ],
+              "executedPathUnchanged": true,
+              "reason": "The successful current-generation batch-grade branch now clears its own busy flag before advancing list refresh. Prior seven review assertions are excluded from fixed frontend acceptance and the full affected eight-case file reexecutes; other retained tests do not execute that changed branch.",
+              "reviewEvidence": "Independent exact two-file review and owner 8 focused passes; user separately approved the eight-case CI revalidation."
+            },
+            "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": {
+              "before": "c4cc93208a873628438d32603b38c411c1cf6e97",
+              "after": "611c23c6683557d5fcab311363e8586fd38dc07f",
+              "changedSymbols": [
+                "AssignmentList completed batch busy cleanup and regression"
+              ],
+              "unchangedExecutedPaths": [
+                "all paths not executing a successful batch-grade completion",
+                "backend and immutable scientific/schema paths",
+                "TypeScript public types and component signatures"
+              ],
+              "executedPathUnchanged": true,
+              "reason": "The successful current-generation batch-grade branch now clears its own busy flag before advancing list refresh. Prior seven review assertions are excluded from fixed frontend acceptance and the full affected eight-case file reexecutes; other retained tests do not execute that changed branch.",
+              "reviewEvidence": "Independent exact two-file review and owner 8 focused passes; user separately approved the eight-case CI revalidation."
             }
           }
         }
@@ -19643,8 +19742,8 @@
   "fixedPg": {
     "schema": 1,
     "kind": "reviewed-fixed-training-anonymous-pg-12",
-    "currentLocalProduct": "1dbb43af076088b0dc57b3ca1bfc2bf0ee59803b",
-    "currentProductTree": "b8a74af758bd045fa0e7b5f1a7f73f174328dc06",
+    "currentLocalProduct": "85b730191454e43172ddf268f1cf3d9cd3b360d0",
+    "currentProductTree": "83132ab6d440cb00311be4994b4573bcc444c5e5",
     "reviewStatus": "INDEPENDENTLY_REVIEWED_FIXED_12_CASE_MAPPING",
     "originalExecutionSigned": false,
     "ciExecuted": false,
@@ -22893,6 +22992,14 @@
       "logSHA256": "745c336dd543ed6647c43d503ee402c96be217477da096d211e440ff8fe00867",
       "command": "node --test --test-name-pattern=actual repository diff discovers .github/scripts/training-entry.test.mjs",
       "remoteOnlyCli": "Official shallow-fetched main44c1 and PR6a5d objects; actual content-scope CLI with corrected binding file returned training-entry/358. No locally mirrored source commit existed in the bare object database."
+    },
+    "batchRecovery": {
+      "passed": 4,
+      "exitCode": 0,
+      "logsSHA256": [
+        "370ecde26ba2757c401075984969ef0e9d4f3c9222b6dcc84e9df67cdd587be2",
+        "d8279a72911bef8c365cd35b8d29076bcaf981221fe85c82c9e74582319b0862"
+      ]
     }
   },
   "previousDependencyFixedPg": {
@@ -26094,10 +26201,11 @@
     ],
     "review": "Local exact 34-file reproduction:420 passed/1 failed, followed by only that failed case:1 passed/16 unselected. No official CI job is relabelled successful. Product and dependencies unchanged; only the asserted recovery message changed, with both no-API assertions retained.",
     "sourceBefore": "a5ed2ebfa093f89e1345f8db1fba940793bc9639",
-    "sourceAfter": "1dbb43af076088b0dc57b3ca1bfc2bf0ee59803b",
+    "sourceAfter": "85b730191454e43172ddf268f1cf3d9cd3b360d0",
     "inputClosureGroup": "final-frontend-types"
   },
   "recoveryReview": {
-    "fourthRun": "Official 465 passing backend assertions remain distinct from the six failures. Eight affected contracts execute with user approval; CSS invalidates learner rendered scenarios and the build, not retained JS-only unit assertions. Original public reports remain historical."
+    "fourthRun": "Official 465 passing backend assertions remain distinct from the six failures. Eight affected contracts execute with user approval; CSS invalidates learner rendered scenarios and the build, not retained JS-only unit assertions. Original public reports remain historical.",
+    "sixthRun": "Official completed backend job and full emitted bytes are retained with exact unchanged backend inputs. Fixed frontend 421 excludes the affected review file prior seven cases, retaining414; its current eight cases execute with explicit permission. Browser retains24 prior passing scenarios; failed review plus seven never-executed scenarios run on a new frontend build."
   }
 }

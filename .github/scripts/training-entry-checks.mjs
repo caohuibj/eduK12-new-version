@@ -128,7 +128,7 @@ export function verifyFixedFrontend(e){
  assert.equal(retry.testResults[0].name,expected.retryFile);
  const retryCases=retry.testResults[0].assertionResults;assert.equal(retryCases.length,17);
  for(const c of retryCases){const key=expected.retryFile+'\0'+c.fullName;assert(all.has(key));if(c.status==='passed'){assert.equal(key,retryKey);assert(!passed.has(key));passed.add(key)}else assert(['pending','skipped'].includes(c.status));}
- assert.equal(passed.size,421);return {cases:421,originalPassed:420,retryPassed:1,ciExecuted:false,originalExecutionSigned:false};
+ assert.equal(passed.size,421);const excluded=[...passed].filter(key=>key.startsWith(expected.excludedAffectedFile+'\0'));assert.equal(excluded.length,expected.excludedPriorCount);for(const key of excluded)passed.delete(key);assert.equal(passed.size,expected.retainedPassed);return {cases:passed.size,originalPassed:420,retryPassed:1,excludedAffected:excluded.length,ciExecuted:false,originalExecutionSigned:false};
 }
 export function verifyEvidence(read=readFileSync,resolve=git){
  const raw=read('.github/evidence/training-entry/reviewed.json');
@@ -214,13 +214,13 @@ export function verifyEvidence(read=readFileSync,resolve=git){
   if((binding.reviewedGroupFiles?.[g.id]||[]).length)assert.deepEqual([...groupFiles].sort(),[...(binding.reviewedGroupFiles?.[g.id]||[])].sort(),'Missing admitted files in group '+g.id);
  }
  if(binding.fixedPgCases?.length)verifyFixedPg(e.fixedPg);
- if(binding.fixedFrontendContracts){const group=e.groups.find(g=>g.id==='final-frontend-types');assert(group);const d=binding.fixedFrontendContracts,x=group.executions[0];assert.equal(x.inputs[d.retryFile],d.finalTestBlob);assert.equal((x.originalInputs||x.inputs)[d.retryFile],d.priorTestBlob);assert.equal(e.fixedFrontendContracts.sourceAfter,binding.localProduct);verifyFixedFrontend(e.fixedFrontendContracts);assert.deepEqual(binding.checks.frontendTestFiles,[],'Admitted 421 must not rerun');}
+ if(binding.fixedFrontendContracts){const group=e.groups.find(g=>g.id==='final-frontend-types');assert(group);const d=binding.fixedFrontendContracts,x=group.executions[0];assert.equal(x.inputs[d.retryFile],d.finalTestBlob);assert.equal((x.originalInputs||x.inputs)[d.retryFile],d.priorTestBlob);assert.equal(e.fixedFrontendContracts.sourceAfter,binding.localProduct);verifyFixedFrontend(e.fixedFrontendContracts);assert.deepEqual(binding.checks.frontendTestFiles,[d.excludedAffectedFile.replace('server-version/frontend/','')],'Only the explicitly invalidated review file may rerun');}
  const fresh=new Set();
  for(const[component,key]of [['frontend','frontendTestFiles'],['backend','backendTestFiles'],['frontend','laterFrontendTestFiles'],['backend','laterBackendTestFiles']]){
   for(const f of binding.checks[key]||[]){const full=`server-version/${component}/${f}`;assert(!fresh.has(full),'Duplicate fresh check selection');assert(!admitted.has(full),'A qualified unchanged whole-file check must not rerun');fresh.add(full);}
  }
  assert(e.limits.some(s=>s.includes('unsigned')));assert(e.limits.some(s=>s.includes('node_modules')));
- return {kind:e.kind,ciExecuted:false,originalExecutionSigned:false,groups:e.groups.map(g=>g.id),acceptedWholeFiles:admitted.size,acceptedWholeFileAssertions:admittedAssertions,acceptedFixedPgCases:binding.fixedPgCases?.length||0,acceptedFixedFrontendCases:binding.fixedFrontendContracts?421:0,limits:e.limits};
+ return {kind:e.kind,ciExecuted:false,originalExecutionSigned:false,groups:e.groups.map(g=>g.id),acceptedWholeFiles:admitted.size,acceptedWholeFileAssertions:admittedAssertions,acceptedFixedPgCases:binding.fixedPgCases?.length||0,acceptedFixedFrontendCases:binding.fixedFrontendContracts?binding.fixedFrontendContracts.retainedPassed:0,limits:e.limits};
 }
 export function verifyFreshReport(r,files){
  assert.equal(r.success,true);for(const k of ['numFailedTests','numPendingTests','numTodoTests'])assert.equal(r[k],0);
@@ -267,7 +267,7 @@ export function verifyDependencyAuditEvidence(command,stdout,currentManifest,com
  const expected=component==='frontend'?binding.officialFrontendAudit:binding.officialBackendAudit;assert(expected);
  // These exact source/test/CSS changes do not alter npm audit inputs. Restore
  // their prior manifest entries before the original strict whole-manifest check.
- for(const [file,d]of Object.entries(binding.officialRecovery?.productDeltas||{})){
+ for(const [file,d]of Object.entries(binding.auditSourceDeltas||binding.officialRecovery?.productDeltas||{})){
   if(!file.startsWith(`server-version/${component}/`))continue;
   const after=`100644 blob ${d.after}\t${file}`,before=`100644 blob ${d.before}\t${file}`;
   assert(currentManifest.split('\n').includes(after));currentManifest=currentManifest.split('\n').map(l=>l===after?before:l).join('\n');
@@ -357,9 +357,10 @@ async function officialRecoveryFiles(component){
  const [run,job,artifact]=await Promise.all([api(`actions/runs/${r.run}`).then(x=>x.json()),api(`actions/jobs/${a.job}`).then(x=>x.json()),api(`actions/artifacts/${a.id}`).then(x=>x.json())]);
  assert.equal(run.head_sha,r.sourceHead);assert.equal(run.head_branch,branch);assert.equal(run.event,'pull_request');assert.equal(run.path,'.github/workflows/ci.yml');
  assert.equal(job.run_id,r.run);assert.equal(job.head_sha,r.sourceHead);assert.equal(job.name,a.jobName);assert.equal(job.status,'completed');assert.equal(job.conclusion,a.conclusion);
+ if(component==='browser'){const producer=await(await api(`actions/jobs/${r.frontendJob}`)).json();assert.equal(producer.run_id,r.run);assert.equal(producer.head_sha,r.sourceHead);assert.equal(producer.name,'training-entry / frontend');assert.equal(producer.status,'completed');assert.equal(producer.conclusion,'success');assert(producer.steps.some(step=>step.name==='retain exact successful lint and unaffected browser scenarios'&&step.conclusion==='success'));}
  assert.equal(artifact.id,a.id);assert.equal(artifact.name,a.name);assert.equal(artifact.workflow_run.id,r.run);assert.equal(artifact.workflow_run.head_sha,r.sourceHead);assert.equal(artifact.expired,false);assert.equal(artifact.size_in_bytes,a.bytes);assert.equal(artifact.digest,'sha256:'+a.sha256);
  const zip=Buffer.from(await(await api(`actions/artifacts/${a.id}/zip`)).arrayBuffer());assert.equal(zip.length,a.bytes);assert.equal(sha(zip),a.sha256);
- const wanted=component==='backend'?['backend-fresh.json','backend-fresh-command.json','migration.json','training-entry-upgrade.dump']:['browser.json','component-source-manifest.json','early-lint-command.json'];
+ const wanted=component==='backend'?Object.keys(binding.completedBackend.fileHashes):['browser.json','component-source-manifest.json','frontend-build-command.json','lint-retained.json'];
  const result=JSON.parse(execFileSync('python3',['-c',`import sys,io,zipfile,json,base64
 z=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read())); wanted=json.loads(sys.argv[1]); out={}
 for name in wanted:
@@ -370,25 +371,34 @@ for name in wanted:
 print(json.dumps(out))`,JSON.stringify(wanted)],{input:zip,encoding:'utf8',maxBuffer:48*1024*1024}));
  const files=Object.fromEntries(Object.entries(result).map(([k,v])=>[k,Buffer.from(v,'base64')]));
  save(component+'-recovery-official',{run:r.run,job:a.job,artifact:a.id,artifactSHA256:a.sha256,originalConclusion:a.conclusion});
- return {files,job};
+ return {files,job,zip};
+}
+export function verifyCompletedBackend(files,currentManifest,actualDist){
+ const r=binding.completedBackend;
+ for(const[name,h]of Object.entries(r.fileHashes))assert.equal(sha(files[name]),h,'Official backend file changed: '+name);
+ const parse=name=>JSON.parse(files[name]);const command=parse('backend-compile-command.json'),manifest=parse('backend-build-manifest.json');
+ assert.equal(command.source,r.checkout);assert.equal(command.status,'success');assert.equal(command.exitCode,0);assert.equal(command.tools.node,'v24.21.0');assert.equal(command.gitInputManifest,currentManifest);assert.equal(command.gitInputManifestSHA256,sha(currentManifest));assert.equal(command.componentTree,binding.components.backend);assert.equal(command.componentTree,r.componentTree);
+ assert.deepEqual(command.command.slice(1),['node_modules/typescript/bin/tsc','-p','tsconfig.json']);
+ assert.equal(manifest.componentTree,r.componentTree);assert.equal(manifest.source,r.checkout);assert.equal(manifest.sourceHead,r.sourceHead);assert.equal(manifest.run,String(r.run));assert.deepEqual(actualDist,manifest.files,'Emitted backend artifact bytes differ');
+ for(const name of ['backend-eight-command.json','postgres-missing-command.json']){const c=parse(name);assert.equal(c.status,'success');assert.equal(c.exitCode,0);assert.equal(c.source,r.checkout);assert.equal(c.componentTree,r.componentTree);assert.equal(c.gitInputManifest,currentManifest);assert.equal(c.tools.node,'v24.21.0');}
+ const eight=parse('backend-eight-checked.json'),pg=parse('postgres-missing-checked.json');assert.equal(eight.selected.length,8);assert.equal(eight.retainedOfficial,465);assert.equal(eight.totalQualified,473);assert.equal(pg.passed.length,7);assert.equal(pg.wholeFileQualification,false);
+ const old=parse('backend-465-retained.json');assert.equal(old.passed,465);assert.equal(old.failed,6);assert.equal(old.originalJobConclusion,'failure');assert.equal(old.wholeInvocationPassed,false);
+ const migration=parse('migration-reused.json');assert.equal(migration.qualificationReexecuted,false);assert.equal(migration.testDatabaseSeeded,true);
+ return {source:r.sourceHead,run:r.run,componentTree:r.componentTree,backendContracts:473,missingPgCases:7,compiledFiles:Object.keys(actualDist).length,officialJobConclusion:'success',reexecuted:false};
 }
 async function recoverBackend(){
- const r=binding.officialRecovery,{files,job}=await officialRecoveryFiles('backend');
- assert.equal(sha(files['backend-fresh.json']),r.backendReportSHA256);assert.equal(sha(files['backend-fresh-command.json']),r.backendCommandSHA256);
- save('backend-465-retained',verifyRecoveredBackend(JSON.parse(files['backend-fresh.json']),JSON.parse(files['backend-fresh-command.json']),git('ls-tree','-r','HEAD','--','server-version/backend')));
- assert(job.steps.some(s=>s.name==='upgrade nonempty fixed-main database and verify isolated dump restore'&&s.conclusion==='success'));
- assert.equal(sha(files['migration.json']),r.migrationSHA256);const proof=JSON.parse(files['migration.json']);
- assert.equal(proof.head,r.checkout);assert.equal(proof.base,binding.base);for(const key of ['oldRowsPreserved','legacyNullBindingsPreserved','newDefaultsVerified','stableIdentityGuardsVerified','restoredRowsAndSchemaEqual'])assert.equal(proof[key],true);
- assert.equal(git('rev-parse','HEAD:.github/scripts/training-entry-migration.mjs'),r.migrationScriptBlob);assert.equal(git('ls-tree','-r','HEAD','--','server-version/backend/prisma'),r.migrationInputs);
- assert.equal(sha(files['training-entry-upgrade.dump']),proof.dumpSHA256);
- writeFileSync(`${output}/retained-upgrade.dump`,files['training-entry-upgrade.dump']);save('retained-migration',proof);
- const u=new URL(process.env.DATABASE_URL);assert.equal(u.hostname,'127.0.0.1');assert.equal(u.port,'55432');assert.equal(u.pathname,'/qualification_training_entry_ci');u.searchParams.delete('schema');
- const count=execFileSync('psql',['--dbname',u.toString(),'-X','-At','-v','ON_ERROR_STOP=1','-c',"SELECT count(*) FROM pg_tables WHERE schemaname='public'"],{encoding:'utf8'}).trim();assert.equal(count,'0','Never overwrite an existing database');
- const container=process.env.CI_POSTGRES_CONTAINER;assert.match(container||'',/^[a-f0-9]{64}$/);
- // Restore the already-qualified exact dump only to seed the seven unexecuted
- // cases. This is not another upgrade/dump-restore qualification invocation.
- execFileSync('docker',['exec','-i',container,'pg_restore','-U','postgres','--dbname','qualification_training_entry_ci','--exit-on-error'],{input:files['training-entry-upgrade.dump'],stdio:['pipe','inherit','inherit'],timeout:60000});
- save('migration-reused',{source:r.sourceHead,artifact:r.artifacts.backend.id,dumpSHA256:proof.dumpSHA256,qualificationReexecuted:false,testDatabaseSeeded:true});
+ const r=binding.completedBackend,{files,job,zip}=await officialRecoveryFiles('backend');assert.equal(job.conclusion,'success');
+ for(const name of ['recover qualified migration and 465 successful contracts, seed remaining PG cases','emit the missing backend compilation once','only fixed missing-record affected backend contracts','only the seven missing participation cases, never the twelve admitted reset FINAL cases'])assert(job.steps.some(step=>step.name===name&&step.conclusion==='success'));
+ assert.equal(git('rev-parse','HEAD:.github/scripts/training-entry-migration.mjs'),r.migrationScriptBlob);assert.equal(git('ls-tree','-r','HEAD','--','server-version/backend/prisma'),r.prismaInputs);
+ const dist=JSON.parse(execFileSync('python3',['-c',`import sys,io,zipfile,json,hashlib
+z=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read())); out={}; prefix='server-version/backend/dist/'
+for i in z.infolist():
+ if i.filename.startswith(prefix) and not i.is_dir():
+  assert '..' not in i.filename.split('/') and i.file_size<16000000
+  data=z.read(i);out[i.filename[len(prefix):]]={'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)}
+assert out
+print(json.dumps(out))`],{input:zip,encoding:'utf8',maxBuffer:4*1024*1024}));
+ save('backend-complete-retained',verifyCompletedBackend(files,git('ls-tree','-r','HEAD','--','server-version/backend'),dist));
 }
 function retryBackend(){
  const r=binding.officialRecovery;assert.equal(r.revalidation8Approved,true);assert.equal(r.approvalMessage,'Sentinel_355ab6c09da88191aaf61e8b9d1648f2');
@@ -399,11 +409,12 @@ function retryBackend(){
 }
 async function recoverBrowserAndLint(){
  const r=binding.officialRecovery,{files}=await officialRecoveryFiles('browser');
- assert.equal(sha(files['browser.json']),r.browserReportSHA256);assert.equal(sha(files['component-source-manifest.json']),r.browserSourceManifestSHA256);assert.equal(sha(files['early-lint-command.json']),r.lintCommandSHA256);
- const report=JSON.parse(files['browser.json']),lint=JSON.parse(files['early-lint-command.json']);assert.equal(report.sourceSha,r.checkout);assert.equal(report.status,'FAIL');assert.equal(report.harnessSha256,r.browserHarnessSHA256);
- reviewedRecoveryManifest(lint.gitInputManifest,git('ls-tree','-r','HEAD','--','server-version/frontend'),'frontend');assert.equal(lint.gitInputManifestSHA256,sha(lint.gitInputManifest));assert.equal(lint.source,r.checkout);assert.equal(lint.status,'success');assert.equal(lint.exitCode,0);assert.equal(lint.id,'early-lint');
- assert.equal(lint.tools.node,'v24.21.0');assert(lint.command[0].endsWith('/bin/node'));assert.deepEqual(lint.command.slice(1),['node_modules/eslint/bin/eslint.js',...binding.checks.earlyLintFiles]);
- const scenarios=report.scenarios.filter(s=>r.browserRetainedNames.includes(s.name));assert.equal(scenarios.length,13);assert.equal(new Set(scenarios.map(s=>s.name)).size,13);assert(scenarios.every(s=>s.status==='PASS'&&s.errors.length===0&&s.unexpected.length===0));assert(scenarios.every(s=>!s.name.startsWith('learner-')));
+ assert.equal(sha(files['browser.json']),r.browserReportSHA256);assert.equal(sha(files['component-source-manifest.json']),r.browserSourceManifestSHA256);assert.equal(sha(files['frontend-build-command.json']),r.lintCommandSHA256);
+ const report=JSON.parse(files['browser.json']),lint=JSON.parse(files['frontend-build-command.json']);assert.equal(report.sourceSha,r.checkout);assert.equal(report.status,'FAIL');assert.equal(report.harnessSha256,r.browserHarnessSHA256);
+ reviewedRecoveryManifest(lint.gitInputManifest,git('ls-tree','-r','HEAD','--','server-version/frontend'),'frontend');assert.equal(lint.gitInputManifestSHA256,sha(lint.gitInputManifest));assert.equal(lint.source,r.checkout);assert.equal(lint.status,'success');assert.equal(lint.exitCode,0);assert.equal(lint.id,'frontend-build');
+ assert.equal(lint.tools.node,'v24.21.0');assert.deepEqual(lint.command.slice(1),['node_modules/vite/bin/vite.js','build','--manifest']);
+ assert.equal(sha(files['lint-retained.json']),r.lintRetainedSHA256);const retained=JSON.parse(files['lint-retained.json']);assert.equal(retained.originalSuccessfulSubprocess,true);assert.deepEqual(retained.files,binding.checks.earlyLintFiles);
+ const scenarios=report.scenarios.filter(s=>r.browserRetainedNames.includes(s.name));assert.equal(scenarios.length,24);assert.equal(new Set(scenarios.map(s=>s.name)).size,24);assert(scenarios.every(s=>s.status==='PASS'&&s.errors.length===0&&s.unexpected.length===0));assert(scenarios.every(s=>s.name!=='assignment-review-paging-batch-download'));
  save('browser-retained',{source:r.sourceHead,artifact:r.artifacts.browser.id,originalJobConclusion:'failure',currentFrontendTree:binding.components.frontend,scenarios});
  save('lint-retained',{source:r.sourceHead,artifact:r.artifacts.browser.id,originalSuccessfulSubprocess:true,files:binding.checks.earlyLintFiles});
 }
@@ -416,7 +427,8 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  }else if(action==='backend')retryBackend();
  else if(action==='recover-backend')await recoverBackend();
  else if(action==='recover-browser')await recoverBrowserAndLint();
- else if(action==='frontend')tests(action);
+ else if(action==='frontend'){assert.equal(binding.checks.frontendRetry8Approved,true);assert.equal(binding.checks.frontendRetry8Approval,'Sentinel_ea16694e14708191b121c5db5ebd1528');tests(action);const report=JSON.parse(readFileSync(`${output}/frontend-fresh.json`));assert.equal(report.numPassedTests,8);}
+ else if(action==='batch-grade-lint')runRecorded('batch-grade-lint','frontend',process.execPath,['node_modules/eslint/bin/eslint.js','src/pages/AssignmentList.tsx','src/pages/__tests__/AssignmentList.review-pagination.test.tsx']);
  else if(action==='frontend-later'||action==='backend-later')tests(action.split('-')[0],true);
  else if(action==='lint'){
   assert.equal(binding.executionPolicy,'missing-only-current-mixed-candidate');

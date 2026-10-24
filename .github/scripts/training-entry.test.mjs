@@ -7,7 +7,7 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {gzipSync} from 'node:zlib';
 import {binding,branch,marker,trainingEntryPlan,trainingEntryOutputs} from './training-entry-scope.mjs';
-import {verifyEvidence,verifyFreshReport,requireApproval,verifyFixedPg,requireMissingRecordApproval,verifyFrontendAuditEvidence,evidenceSourceObject,failedVitestSummary,verifyFixedFrontend,verifyDependencyAuditEvidence,reviewedRecoveryManifest} from './training-entry-checks.mjs';
+import {verifyEvidence,verifyFreshReport,requireApproval,verifyFixedPg,requireMissingRecordApproval,verifyFrontendAuditEvidence,evidenceSourceObject,failedVitestSummary,verifyFixedFrontend,verifyDependencyAuditEvidence,reviewedRecoveryManifest,verifyCompletedBackend} from './training-entry-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 function fixture(){
  const head='a'.repeat(40),source='b'.repeat(40),values={};
@@ -60,8 +60,8 @@ test('workflow stays bounded and blocks broad manual probes before any work',()=
  assert(main.includes('"perf/training-entry-20261023","work/measurement-version-final-20261020"'));
  assert(wf.includes('needs: [admission, backend, frontend, browser]'));
  assert(wf.includes('training-entry-checks.mjs build-permission'));
- assert(wf.includes('training-entry-migration.mjs'));
- assert(wf.includes('postgres:17'));
+ assert(readFileSync('.github/scripts/training-entry-checks.mjs','utf8').includes('HEAD:.github/scripts/training-entry-migration.mjs'));
+ assert(wf.includes('verify complete successful official backend qualification and emitted bytes'));assert(!wf.includes('postgres:17'));
  assert(wf.includes('run current frontend and backend HIGH CRITICAL dependency audits'));
  assert(main.includes('backup/training-survey-main350-20261024'));
  assert(wf.includes('training-entry-browser.mjs'));
@@ -182,7 +182,7 @@ test('restore rejects unrecognized dtd physical identity',()=>{const a=schemaFix
 test('failed JSON diagnostics use assertion results rather than synthetic stderr',()=>{const r={success:false,numFailedTests:1,testResults:[{name:'a',status:'failed',assertionResults:[{status:'passed',fullName:'expected synthetic failure'},{status:'failed',fullName:'real mismatch',failureMessages:['expected text']}]}]};assert.deepEqual(failedVitestSummary(r).failures,[{file:'a',name:'real mismatch',messages:['expected text']}]);assert.equal(failedVitestSummary(r).success,false);});
 
 const fixedFrontendProof=()=>JSON.parse(readFileSync('.github/evidence/training-entry/reviewed.json')).fixedFrontendContracts;
-test('fixed frontend accepts only reviewed local 420 plus unique retry one',()=>{assert.deepEqual(verifyFixedFrontend(fixedFrontendProof()),{cases:421,originalPassed:420,retryPassed:1,ciExecuted:false,originalExecutionSigned:false});});
+test('fixed frontend accepts only reviewed local 420 plus unique retry one',()=>{assert.deepEqual(verifyFixedFrontend(fixedFrontendProof()),{cases:414,originalPassed:420,retryPassed:1,excludedAffected:7,ciExecuted:false,originalExecutionSigned:false});});
 test('fixed frontend rejects report tampering',()=>{const e=fixedFrontendProof();e.reports[0].sha256='0'.repeat(64);assert.throws(()=>verifyFixedFrontend(e));});
 test('fixed frontend retains original failed invocation',()=>{const e=fixedFrontendProof();e.reports[0].exitCode=0;assert.throws(()=>verifyFixedFrontend(e));});
 test('fixed frontend never treats a failed retry as accepted',()=>{const e=fixedFrontendProof();e.reports[1].exitCode=1;assert.throws(()=>verifyFixedFrontend(e));});
@@ -207,12 +207,12 @@ test('fourth recovery cannot use a frontend exception to bypass backend source e
  const d={'server-version/frontend/x.css':{before:'a'.repeat(40),after:'b'.repeat(40)}};
  assert.throws(()=>reviewedRecoveryManifest('before','after','backend',d));
 });
-test('fourth recovery keeps eight explicit failed or new contracts and thirteen non-learner scenarios',()=>{
+test('sixth recovery retains official completed backend and excludes only affected review contracts',()=>{
  const r=binding.officialRecovery;assert.equal(r.failedBackendNames.length,6);assert.equal(new Set(r.failedBackendNames).size,6);
  assert.equal(r.revalidation8Approved,true);assert.equal(r.approvalMessage,'Sentinel_355ab6c09da88191aaf61e8b9d1648f2');
- assert.equal(r.browserRetainedNames.length,13);assert(r.browserRetainedNames.every(n=>!n.startsWith('learner-')));
- const workflow=readFileSync('.github/workflows/ci-training-entry.yml','utf8');assert(workflow.includes('recover-backend'));assert(workflow.includes('recover-browser'));assert(workflow.includes('training-entry-checks.mjs postgres'));
- assert(workflow.includes('training-entry-checks.mjs backend-compile'));assert(workflow.includes('training-entry-checks.mjs frontend-build'));
+ assert.equal(r.browserRetainedNames.length,24);assert(!r.browserRetainedNames.includes('assignment-review-paging-batch-download'));assert.equal(binding.fixedFrontendContracts.retainedPassed,414);assert.equal(binding.fixedFrontendContracts.excludedPriorCount,7);
+ const workflow=readFileSync('.github/workflows/ci-training-entry.yml','utf8');assert(workflow.includes('recover-backend'));assert(workflow.includes('recover-browser'));assert(!workflow.includes('training-entry-checks.mjs postgres'));
+ assert(!workflow.includes('training-entry-checks.mjs backend-compile'));assert(workflow.includes('training-entry-checks.mjs frontend-build'));
 });
 
 test('actual repository diff discovers newly modified main paths outside the former manifest',()=>{
@@ -228,4 +228,8 @@ test('actual repository diff discovers newly modified main paths outside the for
  }
  const injected=[...actual,{file:'server-version/backend/src/unreviewed-new.ts',status:'A',oldMode:'000000',newMode:'100644'}];
  assert.throws(()=>trainingEntryPlan(injected,binding.base,head,git,env),/Complete raw diff required/);
+});
+
+test('completed backend evidence rejects missing files before accepting any qualification',()=>{
+ assert.throws(()=>verifyCompletedBackend({},'',{}));
 });
