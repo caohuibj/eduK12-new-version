@@ -1,5 +1,7 @@
 import { chooseMaterialGroup,findLinkedMaterialAssignment,planMaterialAllocation } from '../assessment-core/materials/allocation'
 import { randomInt,createHash } from 'node:crypto'
+import { SURVEY_NATIVE_SJT_PROTOCOL } from './situational-native.contract'
+import { decodeSurveyAttemptContentBinding } from './content-binding.service'
 import type { Prisma } from '@prisma/client'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
@@ -80,9 +82,10 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
     SELECT id FROM survey_projects WHERE id=${input.projectId} FOR SHARE
   `
   if(project.length!==1)fail('研究项目不可访问')
-  const wave=await tx.$queryRaw<Array<{id:string}>>`
-    SELECT id FROM survey_waves
-    WHERE id=${input.waveId} AND project_id=${input.projectId} FOR SHARE
+  const wave=await tx.$queryRaw<Array<{id:string;publication_id:string|null;definition_digest:string|null}>>`
+    SELECT wave.id,wave.publication_id,publication.definition_digest FROM survey_waves wave
+    LEFT JOIN survey_publications publication ON publication.id=wave.publication_id AND publication.project_id=wave.project_id
+    WHERE wave.id=${input.waveId} AND wave.project_id=${input.projectId} FOR SHARE OF wave
   `
   if(wave.length!==1)fail('冻结研究波次不可访问')
   const locked=await tx.$queryRaw<Array<{id:string}>>`
@@ -110,7 +113,21 @@ export async function ensureSurveyFlowAssignment(tx:Prisma.TransactionClient,inp
   if(current.flowAssignmentCipher){
     const prior=decryptUnifiedRuntimePayload<SurveyFlowAssignment>(current.flowAssignmentCipher)
     assertSurveyFlowAssignment(flow,prior)
+    if(input.snapshot.units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)
+      &&(current.contentBindingCipher!==null||current.contentBindingHash!==null)){
+      if(!wave[0].publication_id||!wave[0].definition_digest)fail('冻结研究发布不可访问')
+      decodeSurveyAttemptContentBinding({projectId:input.projectId,waveId:input.waveId,
+        attemptId:input.attemptId,publicationId:wave[0].publication_id!,definitionDigest:wave[0].definition_digest!,
+        selectedSnapshot:assignedSurveySnapshot(input.snapshot,prior),
+        contentBindingCipher:current.contentBindingCipher,contentBindingHash:current.contentBindingHash})
+    }
     return prior
+  }
+  // A missing assignment is not permission to re-randomize accepted native
+  // work through parent task/FINAL entry points. The parent lock covers all slots.
+  if(input.snapshot.units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)){
+    const child=await tx.situationalAttempt.findFirst({where:{surveyAttemptId:input.attemptId},select:{id:true}})
+    if(child)fail('情境化任务已有原件，不能重新建立缺失的冻结分配')
   }
   let inherited:ReturnType<typeof findLinkedMaterialAssignment>
   if(experiment?.linkedPolicy==='KEEP_LINKED'&&input.participantId){

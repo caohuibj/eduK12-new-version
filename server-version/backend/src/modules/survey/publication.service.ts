@@ -285,9 +285,6 @@ export async function freezeResearchWaveDraft(input:{
       try{
         frozenFlow=compileSurveyFlow(wave.flowDefinition,units,
           project.collectionMode as ResearchFrozenPublication['collectionMode'])
-        if(units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)
-          &&frozenFlow.experiment?.mode==='QUESTIONNAIRE_VARIANTS')
-          stop('原生情境化父流程尚不支持问卷子版本分配')
       }catch(e){
         if(e instanceof SurveyFlowError)stop('冻结 Flow 结构未通过校验：'+
           e.issues.slice(0,5).map(i=>i.path+': '+i.message).join('；'))

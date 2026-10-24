@@ -1,7 +1,7 @@
 import {freezeSurveyTaskPrefix} from './task-prefix'
 import {readSurveyTaskLockedAnswers} from './task-answer-locks'
 import {encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload} from '../assessment-runtime/security'
-import {ensureSurveyFlowAssignment,assertSurveyFlowAssignment,type SurveyFlowAssignment} from './flow.assignment'
+import {ensureSurveyFlowAssignment,assertSurveyFlowAssignment,assignedSurveySnapshot,type SurveyFlowAssignment} from './flow.assignment'
 import {assertSurveyPriorCognitiveCompleted,SurveyCognitiveError} from './cognitive.results'
 import { situationalImageAssetReferences } from '../situational/situation-definition'
 import { ASSESSMENT_FROZEN_RUNTIME_REFERENCE_TYPE,ASSESSMENT_FROZEN_RUNTIME_MEDIA_FIELD } from '../assessment-media/assessment-asset'
@@ -32,20 +32,18 @@ export class SurveySituationalError extends Error {
 }
 const fail=(status:number,message:string):never=>{throw new SurveySituationalError(status,message)}
 type Tx=Prisma.TransactionClient
-async function access(tx:Tx,proof:SurveyTaskProof,known:VerifiedSurveyTask,slotKey:string,allowCompleted:boolean,allowUninitializedAssignment=false){
-  const {attempt,snapshot:publication}=await lockSurveyTaskAccess(tx,proof,known,
-    {kind:'SITUATIONAL',allowCompleted,fail})
-  if(publication.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS')
-    fail(409,'原生情境化父流程尚不支持问卷子版本分配')
-  let assignment:SurveyFlowAssignment|null=null
-  if(publication.flow){
-    if(!attempt.flowAssignmentCipher){
-      if(!allowUninitializedAssignment)fail(409,'冻结研究缺少已持久化的分配')
-    }else{
-      assignment=decryptUnifiedRuntimePayload<SurveyFlowAssignment>(attempt.flowAssignmentCipher)
-      assertSurveyFlowAssignment(publication.flow,assignment)
-    }
-  }
+type LockedHost=Awaited<ReturnType<typeof lockSurveyTaskAccess>>
+function storedAssignment(host:LockedHost):SurveyFlowAssignment|null{
+  if(!host.snapshot.flow)return null
+  if(!host.attempt.flowAssignmentCipher)fail(409,'冻结研究缺少已持久化的分配')
+  const assignment=decryptUnifiedRuntimePayload<SurveyFlowAssignment>(host.attempt.flowAssignmentCipher!)
+  assertSurveyFlowAssignment(host.snapshot.flow,assignment)
+  return assignment
+}
+/** Resolve only the server-selected publication, never a union slot locator. */
+function selectedAccess(host:LockedHost,known:VerifiedSurveyTask,slotKey:string,assignment:SurveyFlowAssignment|null){
+  const {attempt}=host
+  const publication=assignedSurveySnapshot(host.snapshot,assignment)
   const unit=publication.units.find(unit=>unit.kind==='SJT'&&unit.instrumentKey===slotKey)
   if(!unit)fail(404,'当前冻结研究中没有这个情境化工具')
   const binding=decodeSurveyAttemptContentBinding({projectId:known.projectId,waveId:known.waveId,
@@ -59,6 +57,11 @@ async function access(tx:Tx,proof:SurveyTaskProof,known:VerifiedSurveyTask,slotK
     fail(409,'冻结研究缺少该情境化工具实际作答记录说明')
   return {attempt,publication,assignment,unit:unit!,...runtime}
 }
+async function access(tx:Tx,proof:SurveyTaskProof,known:VerifiedSurveyTask,slotKey:string,allowCompleted:boolean){
+  const host=await lockSurveyTaskAccess(tx,proof,known,{kind:'SITUATIONAL',allowCompleted,fail})
+  return selectedAccess(host,known,slotKey,storedAssignment(host))
+}
+
 function assertChild(row:SituationalAttemptRow|SituationalAttemptCommitRow,known:VerifiedSurveyTask,
   slotKey:string,runtime:Awaited<ReturnType<typeof access>>){
   if(row.surveyAttemptId!==known.attemptId||row.surveyPublicationId!==known.publicationId
@@ -96,16 +99,19 @@ async function flowView(tx:Tx,known:VerifiedSurveyTask,slotKey:string,
 export async function startSurveySituational(proof:SurveyTaskProof,slotKey:string,priorAnswers?:unknown){
   const known=await verifiedSurveyAttempt(proof)
   return withFinalOnlyCompletionTransaction(async tx=>{
-    const runtime=await access(tx,proof,known,slotKey,false,true)
+    const host=await lockSurveyTaskAccess(tx,proof,known,{kind:'SITUATIONAL',allowCompleted:false,fail})
     let row=await findChild(tx,known,slotKey)
+    // The locator is not authority. Existing children require the original stored
+    // assignment; only new admission may invoke the existing allocator.
+    const assignment=row?storedAssignment(host):await ensureSurveyFlowAssignment(tx,{
+      projectId:known.projectId,waveId:known.waveId,attemptId:known.attemptId,
+      participantId:known.participantId,researchCode:proof.researchCode,
+      accessCredential:proof.accessCredential,snapshot:host.snapshot})
+    const runtime=selectedAccess(host,known,slotKey,assignment)
     if(row){assertChild(row,known,slotKey,runtime);return flowView(tx,known,slotKey,row,runtime)}
     let locked:Record<string,unknown>|undefined
     try{
       if(runtime.publication.flow){
-        const assignment=await ensureSurveyFlowAssignment(tx,{projectId:known.projectId,waveId:known.waveId,
-          attemptId:known.attemptId,participantId:known.participantId,researchCode:proof.researchCode,
-          accessCredential:proof.accessCredential,snapshot:runtime.publication})
-        runtime.assignment=assignment
         locked=await freezeSurveyTaskPrefix(tx,known,runtime.publication,slotKey,priorAnswers,assignment)
       }else{
         const index=runtime.publication.units.findIndex(unit=>unit.instrumentKey===slotKey)

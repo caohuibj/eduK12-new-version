@@ -48,7 +48,7 @@ export async function lockSurveyTaskAccess(tx:Prisma.TransactionClient,proof:Sur
   },select:{id:true}})
   if(!consent)fail(403,'当前研究缺少有效的知情同意记录')
   const snapshot=publication!.compiledSnapshot as unknown as ResearchFrozenPublication
-  const assignment=snapshot.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'
+  const assignment=policy.kind==='COGNITIVE'&&snapshot.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'
     ?await ensureSurveyFlowAssignment(tx,{projectId:known.projectId,waveId:known.waveId,
       attemptId:known.attemptId,participantId:known.participantId,researchCode:proof.researchCode,
       accessCredential:proof.accessCredential,snapshot}):null
