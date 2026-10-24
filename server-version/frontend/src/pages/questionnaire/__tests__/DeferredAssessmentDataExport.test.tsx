@@ -3,21 +3,25 @@ import { expect, it, vi } from 'vitest'
 import { deferredAssessmentExport } from '../deferredAssessmentExport'
 
 const props = { row: { id: 'assessment', name: '测评', kind: 'QUESTIONNAIRE', status: 'PUBLISHED', editHref: '/questionnaire-products/assessment' }, actorId: 'teacher', onClose: vi.fn() }
-it('keeps the teacher list usable after a code-download failure and retries only on request', async () => {
-  const submit = vi.fn()
+it('keeps the list and requires confirmed reload after a cached module failure, without exporting', async () => {
+  const submit = vi.fn(), reload = vi.fn()
   const Dialog = () => <button onClick={submit}>导出 CSV</button>
   const load = vi.fn().mockRejectedValueOnce(new Error('offline')).mockResolvedValue(Dialog)
-  const Deferred = deferredAssessmentExport(load)
+  const Deferred = deferredAssessmentExport(load, reload)
   render(<><h1>课程测评列表</h1><Deferred {...props} /></>)
   expect(await screen.findByRole('alert')).toHaveTextContent('尚未提交导出')
   expect(screen.getByRole('heading', { name: '课程测评列表' })).toBeVisible()
-  expect(screen.queryByRole('button', { name: '导出 CSV' })).toBeNull()
+  fireEvent.click(screen.getByRole('button', { name: '重新加载页面', exact: true }))
+  expect(screen.getByRole('alert')).toHaveTextContent('尚未保存的内容')
+  fireEvent.click(screen.getByRole('button', { name: '取消重新加载' }))
+  expect(reload).not.toHaveBeenCalled()
+  expect(screen.getByRole('heading', { name: '课程测评列表' })).toBeVisible()
+  fireEvent.click(screen.getByRole('button', { name: '重新加载页面', exact: true }))
+  fireEvent.click(screen.getByRole('button', { name: '确认重新加载' }))
+  expect(reload).toHaveBeenCalledTimes(1)
   expect(load).toHaveBeenCalledTimes(1)
   expect(submit).not.toHaveBeenCalled()
-  fireEvent.click(screen.getByRole('button', { name: '重试加载导出' }))
-  await screen.findByRole('button', { name: '导出 CSV' })
-  expect(load).toHaveBeenCalledTimes(2)
-  expect(submit).not.toHaveBeenCalled()
+  expect(screen.queryByRole('button', { name: '导出 CSV' })).toBeNull()
 })
 it('shares a pending code download and retains successful code across reopens', async () => {
   const Dialog = ({ actorId }: { actorId: string }) => <div role="dialog">{actorId}</div>
