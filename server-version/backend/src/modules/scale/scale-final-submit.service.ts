@@ -29,7 +29,7 @@ import {
 } from '../../services/questionnaireProgressService'
 import { submitUnifiedScaleAssessmentFinal } from './unified-final-submit.service'
 import { withUnitSubmitAdmission } from '../../services/unitSubmitAdmission'
-import { UNIFIED_SCALE_CHILD_ADMISSION_SELECT, standaloneAdmissionPersistence } from './scale-admission.service'
+import { UNIFIED_SCALE_CHILD_ADMISSION_SELECT, standaloneAdmissionPersistence, type ScaleAdmissionChildRow } from './scale-admission.service'
 import { persistFrozenScaleRuntimeSnapshot, freezeScaleRuntimeAtAttemptStart } from '../assessment-runtime/runtime-snapshot'
 import type { DeviceInputProvenanceV1 } from './device-input-provenance'
 
@@ -236,9 +236,14 @@ const finalizeLinkedParent = async (assessment: any): Promise<void> => {
   }
 }
 
-const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput) => {
+const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, locatedChild?: ScaleAdmissionChildRow) => {
   const submissionId = validateSubmissionId(input.submissionId)
-  const child = await measureRequestPhase('final_submit_admission', () => prisma.assessment.findUnique({
+  // Only the private Composite parent/item lookup supplies this request-local row.
+  // Unified submission still performs its normal admission checks and locked reread.
+  if (locatedChild && (locatedChild.id !== input.assessmentId || locatedChild.compositeAttemptId !== input.compositeAttemptId)) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不属于当前作答', 403)
+  }
+  const child = locatedChild ?? await measureRequestPhase('final_submit_admission', () => prisma.assessment.findUnique({
     where: { id: input.assessmentId },
     select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
   }))
@@ -586,18 +591,21 @@ export const submitCompositeScaleFinal = async (
   context: { userId?: string | null; recoveryTokenHash?: string },
 ) => {
   const result = await withUnitSubmitAdmission(async () => {
-    const child = await prisma.assessment.findFirst({
+    const child = await measureRequestPhase('final_submit_admission', () => prisma.assessment.findFirst({
       where: { compositeAttemptId: attemptId, compositeItemId: itemId },
-      select: { id: true },
-    })
+      select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT,
+    }))
     if (!child) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不存在', 404)
+    if (child.compositeAttemptId !== attemptId || child.compositeItemId !== itemId) {
+      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评不属于当前单元', 403)
+    }
     return submitScaleAssessmentFinalImpl({
       ...input,
       assessmentId: child.id,
       userId: context.userId,
       compositeAttemptId: attemptId,
       recoveryTokenHash: context.recoveryTokenHash,
-    })
+    }, child)
   })
   return stripScaleFinalContext(await finalizeParentAfterUnitSubmit(result))
 }
