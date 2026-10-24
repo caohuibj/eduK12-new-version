@@ -42,11 +42,15 @@ export async function getOwnResearchTask(input:{
     })):null
   const selected=assignedSurveySnapshot(own.compiledSnapshot,assignment)
   const units=selected.units.map(unit=>{
+    // Validate the same list once per selected unit; the public allowlist still
+    // strips private rights notes and no definition is cached across requests.
+    const materials=materialListSchema.optional().parse((unit.displayDefinition as {materials?:unknown}).materials)
+    const publicMaterials=materials?.length?{materials:materials.map(publicMaterial)}:{}
     if(unit.kind==='FORM'){
       // Published definitions are immutable; do not retroactively invalidate an
       // older Wave solely for an operator combination newly restricted in Builder.
       const d=assertSurveyDraft('FORM',unit.displayDefinition,true,true) as FormDraft
-      return {kind:'FORM',instrumentKey:unit.instrumentKey,title:unit.title,...(materialListSchema.optional().parse((unit.displayDefinition as {materials?:unknown}).materials)?.length?{materials:materialListSchema.parse((unit.displayDefinition as {materials:unknown}).materials).map(publicMaterial)}:{}),
+      return {kind:'FORM',instrumentKey:unit.instrumentKey,title:unit.title,...publicMaterials,
         pages:d.pages.map(page=>({pageKey:page.pageKey,title:page.title,...(page.description?{description:page.description}:{}),
           questions:page.questions.map(q=>({
             itemKey:q.itemKey,type:q.type,prompt:q.prompt,...(q.materials?{materials:q.materials.map(publicMaterial)}:{}),image:projectPublicSurveyImage(q.image),required:q.required,allowRefusal:q.allowRefusal===true,
@@ -63,7 +67,7 @@ export async function getOwnResearchTask(input:{
     if(unit.kind==='SCALE'){
       const d=readSurveyScalePresentation(unit.displayDefinition)
       const responseOptions=d.responseOptions.map(o=>({optionKey:o.optionKey,label:o.label}))
-      return {kind:'SCALE',instrumentKey:unit.instrumentKey,title:unit.title,...(materialListSchema.optional().parse((unit.displayDefinition as {materials?:unknown}).materials)?.length?{materials:materialListSchema.parse((unit.displayDefinition as {materials:unknown}).materials).map(publicMaterial)}:{}),
+      return {kind:'SCALE',instrumentKey:unit.instrumentKey,title:unit.title,...publicMaterials,
         presentationMode:d.presentationMode??'ALL_AT_ONCE',
         responseOptions,
         items:d.items.map(q=>{
@@ -80,7 +84,7 @@ export async function getOwnResearchTask(input:{
     }
     if(unit.kind==='COGNITIVE'){
       const frozen=parseFrozenSurveyCognitive(unit.compiledDefinition)
-      return {kind:'COGNITIVE',instrumentKey:unit.instrumentKey,title:unit.title,...(materialListSchema.optional().parse((unit.displayDefinition as {materials?:unknown}).materials)?.length?{materials:materialListSchema.parse((unit.displayDefinition as {materials:unknown}).materials).map(publicMaterial)}:{}),
+      return {kind:'COGNITIVE',instrumentKey:unit.instrumentKey,title:unit.title,...publicMaterials,
         templateKey:frozen.templateKey,measurementDigest:frozen.measurementDigest,
         devicePolicy:frozen.devicePolicy,timingPolicy:frozen.timingPolicy,
         maturity:frozen.maturity,restartLimit:frozen.restartLimit,
@@ -98,10 +102,10 @@ export async function getOwnResearchTask(input:{
         maxSelections:q.responseType==='MULTIPLE'?(q.maxSelections??q.options.length):undefined,
         options:q.options.map(o=>({optionKey:o.optionKey,label:o.label,
           ...('nonanswerReason' in o&&o.nonanswerReason?{nonanswerReason:o.nonanswerReason}:{})}))}))}))
-    if(d.schemaVersion===1)return {kind:'SJT',instrumentKey:unit.instrumentKey,title:unit.title,...(materialListSchema.optional().parse((unit.displayDefinition as {materials?:unknown}).materials)?.length?{materials:materialListSchema.parse((unit.displayDefinition as {materials:unknown}).materials).map(publicMaterial)}:{}),
+    if(d.schemaVersion===1)return {kind:'SJT',instrumentKey:unit.instrumentKey,title:unit.title,...publicMaterials,
       stimulus:d.stimulus,scenarioTitle:d.title,image:projectPublicSurveyImage(d.image),
       questions:scenes[0].questions}
-    return {kind:'SJT',schemaVersion:2,instrumentKey:unit.instrumentKey,title:unit.title,...(materialListSchema.optional().parse((unit.displayDefinition as {materials?:unknown}).materials)?.length?{materials:materialListSchema.parse((unit.displayDefinition as {materials:unknown}).materials).map(publicMaterial)}:{}),
+    return {kind:'SJT',schemaVersion:2,instrumentKey:unit.instrumentKey,title:unit.title,...publicMaterials,
       orderPolicy:'FIXED',scenes}
 
   })
