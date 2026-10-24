@@ -313,6 +313,9 @@ export const submitUnifiedScaleAssessmentFinal = async (
   input: UnifiedScaleFinalSubmitInput, child: ScaleAdmissionChildRow, wholeReceipt?: WholeReceiptExecution, referenceDb?: FrozenReferenceDb,
 ) => {
   const { submissionId, admission, snapshot, answers, payloadHash, timing } = await prepareUnifiedScaleFinalSubmission(input, child, wholeReceipt?.acceptedAtMs, wholeReceipt?.studyReceipt)
+  const responseRuntime = { assessmentId: child.id, attemptEpoch: child.attemptEpoch,
+    compiledRuntimeHash: snapshot.compiledRuntime.compiledRuntimeHash,
+    encrypted: child.runtimeSnapshotEncrypted, runtime: snapshot }
 
   if (child.status === 'COMPLETED') {
     const replay = assertSubmissionReplay(child, submissionId, payloadHash)
@@ -328,7 +331,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
         submissionId,
         payloadHash,
         replayed: true,
-        assessment: wholeReceipt ? null : (await loadScaleAssessmentForResponse(child)),
+        assessment: wholeReceipt ? null : (await loadScaleAssessmentForResponse(child, {}, undefined, responseRuntime)),
         parent: null,
       }
     }
@@ -453,7 +456,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
     submissionId,
     payloadHash,
     replayed: committed.replayed,
-    assessment: wholeReceipt ? null : (await loadScaleAssessmentForResponse({ ...committed.current, scale: child.scale })),
+    assessment: wholeReceipt ? null : (await loadScaleAssessmentForResponse({ ...committed.current, scale: child.scale }, {}, undefined, responseRuntime)),
     parent: null,
   }
 }
