@@ -692,3 +692,64 @@ maintenance-sensitive figures are observations, not storage optimization claims.
 The preserved database grew from 2,777 rows before fixture creation to 3,275
 before warmups and 3,497 afterward. Growing database/process history and enabled
 autovacuum remain comparison confounds. API and PostgreSQL stopped after the run.
+
+## Stage 2 experiment: one fresh aggregation snapshot read, NOT RETAINED (2026-10-24)
+
+Candidate `407a03a74388cefef5ea2fffc5c2315bd2d632e3` (tree
+`14de3239f0b50b8a7a4cab71ff31940d37f66679`) uses the immediately preceding
+`d01f77b5` stage-1 observations as baseline, not the original implementation.
+The same unchanged harness, three warmups, five sequential interleaved rounds,
+source freeze and manifests were retained. Evidence is held locally outside the
+repository as `training-repeat-snapshot-reuse-evidence-20261024`. Focused local
+checks, backend types and review preceded execution; no CI/build qualification.
+
+For eligible ordinary synchronous completion triggered by terminal GET, one fresh
+full snapshot query replaces separate aggregation-header and payload queries.
+Validation and CAS remain; this is not reuse of an earlier stale status result.
+The SJT-last mixed case finalizes inside POST and does not use this shortcut.
+All five samples confirm the snapshot-query sequences: simple 4→3 and complex
+8→7 reads, while mixed remains 12. Report GET remains 7 /7 /11 queries.
+
+Means of five, with observed min–max in brackets:
+
+| Case | Total POST→report ms, stage 1→2 | API CPU ms, stage 1→2 | SQL events, stage 1→2 |
+|---|---|---|---:|
+| 40 questions | 150.3 [124.4–172.2] →147.4 [119.5–174.0] | 86.2 [76.5–96.9] →83.1 [68.5–92.2] | 80→79 |
+| 300 questions | 368.8 [345.5–393.7] →405.5 [359.7–444.2] | 222.2 [214.5–231.1] →239.1 [214.3–262.4] | 208→207 |
+| Mixed317 | 580.3 [534.5–683.8] →660.1 [583.6–841.5] | 340.8 [326.2–355.4] →374.3 [346.9–453.9] | 345→345 |
+
+Counts are exact across all measured repetitions. Nevertheless total mean wall
+changes were −1.9% /+9.9% /+13.8%, and CPU changes were −3.6% /+7.6% /+9.8%.
+The mixed case, whose finalization read strategy is unchanged, also became slower.
+Neither an overall speedup nor a causal slowdown from this one-query change is
+established. Aggregate attempt-reload wall means were 51.43→50.07 /
+135.43→155.03 /214.58→249.46 ms; CPU means were 28.49→27.16 /
+79.74→92.71 /124.04→140.20 ms. Report-GET wall means were
+16.33→17.09 /24.93→27.03 /32.13→35.82 ms, despite unchanged report SQL and mean
+DB payload. These negative observations are retained; no extra trials were run.
+
+All 30 reused/new reports pass the same explicit semantic equivalence checks.
+HTTP JSON is unchanged except variable recorded-time digits (complex mean
+105,342→105,343 bytes, mixed 169,732.4→169,732.8). Mean DB→API protocol bytes
+were 204,739→203,777 /1,136,927→1,134,329 /1,549,507→1,549,719. Stable SQL
+reduction is stronger evidence than byte/latency differences across these runs.
+Logical durable increments remain exactly 29,522 /166,490 /196,883 bytes.
+
+Mean API peak RSS was 392.1→397.7 /393.2→399.4 /395.0→401.4 MiB; PG PSS peaks
+85.3→84.7 /85.5→85.2 /86.2→86.0 MiB. Coarse observed PG CPU means were
+20→24 /42→44 /58→68 ms. Physical relation means were 34,406→47,514 /
+194,970→194,970 /255,590→247,398 bytes; WAL means were 48,602→50,184 /
+211,203→347,418 /305,107→284,510 bytes. No memory/storage improvement claim is
+made. Rows grew from 3,497 before setup to 3,995 before warmups and 4,217 after
+completion. The same growing database, background maintenance and independent
+process/GC histories remain confounds. API and PostgreSQL stopped. This completes
+the two-stage bounded plan, with no further benchmarks or deployment implied.
+
+Decision: stage 2 was not retained. Commit
+`f3a4202bea424c92f01e16c74279d6ff6e2dc244` reverts the measured `407a03a7`
+experiment; backend and frontend trees were verified identical to stage 1
+`d01f77b5`. The one-query saving did not establish a CPU/time benefit sufficient
+to justify another finalizer path. This is a complexity/benefit decision, not a
+claim that the patch caused the observed slowdown. All experimental evidence is
+preserved. Stage-1 checks and measurements apply to the restored identical source;
+no repeated benchmark or check was run merely to confirm the revert.
