@@ -182,5 +182,11 @@
     "server-version/backend/src/modules/admin-permissions/proof.ts": "95215659e43e4463cbd545a34e1e4981352ce8a6",
     "server-version/backend/scripts/runtime-table-policy.json": "ace85218711a03301aef8b4626f0cf9951cb7b4e"
   },
-  "evidenceSHA256": "8ec99d7925a21b8378bc911643653a1346f93050a85e2a6881fee0d22383a043"
+  "evidenceSHA256": "8ec99d7925a21b8378bc911643653a1346f93050a85e2a6881fee0d22383a043",
+  "officialSast": {
+    "run": 40056841527,
+    "job": 120761623429,
+    "source": "b12697ac255ab845fc8567f6df2b1694e8e3082d",
+    "requireActualSuccessBeforeAdmission": true
+  }
 }

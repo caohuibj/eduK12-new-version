@@ -1355,3 +1355,18 @@ unit/rollback flows and types/lint are not replayed. No full platform, scientifi
 media, load, image, deployment or server job is selected. The inlined job retains
 the current reusable-workflow reference limit. This route qualifies merging,
 not deployment. Exact main push classifies without repeating application work.
+
+
+The first PR349 run 40056841527 failed during Redis service creation because
+single-quoted health-command arguments were passed literally by the runner.
+No application admission, dependency installation, migration, HTTP test or build
+ran in that job. Only that quoting is repaired. Its independently successful
+CodeQL job may be admitted only by exact run/job/source/PR, completed successful
+analysis step, 24-hour lifetime and unchanged application/stable-control Git
+inputs; the two changed verifier/test scripts receive current CodeQL. The
+original run remains failed. Mock refusal tests never publish official receipts.
+
+The one repair run uses a candidate-only concurrency suffix so the original
+independent SAST can finish while missing qualification work proceeds. Its
+original-job verifier waits at most six minutes for actual completed success;
+failure/timeout still blocks merging, and no pending result is accepted.
