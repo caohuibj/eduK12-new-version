@@ -3,6 +3,7 @@ import { afterEach,beforeEach,describe,expect,it,vi } from 'vitest'
 import SurveyPublicApp from './SurveyPublicApp'
 import { saveLocalSurveyDraft } from './local-answer-draft'
 import type { SurveySituationalReference } from './survey-situational-api'
+import type { PublicFlow } from './flow.client'
 
 vi.mock('./survey-cognitive-local',()=>({rememberSurveyCognitiveSession:vi.fn(),clearSurveyCognitiveSessions:vi.fn().mockResolvedValue(true)}))
 vi.mock('./survey-situational-local',()=>({rememberSurveySituationalSession:vi.fn(),clearSurveySituationalSessions:vi.fn().mockResolvedValue(true)}))
@@ -33,17 +34,18 @@ function makeTask(){return {attemptId,waveId:'wave',status:'STARTED',definitionD
     {blockKey:'form_block',kind:'INSTRUMENT',instrumentKey:'form'},
     ...routes.map(route=>({blockKey:`native_${route}_block`,kind:'INSTRUMENT',instrumentKey:`native_${route}`,
       when:{field:{source:'ANSWER',instrumentKey:'form',itemKey:'route'},op:'EQUALS',value:route}})),
-  ]},
+  ]} as PublicFlow,
 }}
 const reply=(data:unknown)=>Promise.resolve({ok:true,status:200,json:async()=>({code:0,message:'ok',data})} as Response)
 const originalScrollIntoView=HTMLElement.prototype.scrollIntoView
 let task:ReturnType<typeof makeTask>,recovered:boolean,canonicalOverride:Record<string,Record<string,unknown>>|undefined
 let starts:{route:Route;body:Record<string,unknown>}[],reads:Route[],finals:Record<string,unknown>[]
+let screenOuts:Record<string,unknown>[]
 beforeEach(()=>{
   HTMLElement.prototype.scrollIntoView=vi.fn();vi.clearAllMocks()
   sessionStorage.clear();window.history.replaceState(null,'',`/r/${publicId}`)
   sessionStorage.setItem(`huisurvey:v1:single:${publicId}`,JSON.stringify({attemptId,accessCredential:credential,createdAt:Date.now()}))
-  task=makeTask();recovered=false;canonicalOverride=undefined;starts=[];reads=[];finals=[]
+  task=makeTask();recovered=false;canonicalOverride=undefined;starts=[];reads=[];finals=[];screenOuts=[]
   vi.stubGlobal('fetch',vi.fn((url:string,init?:RequestInit)=>{
     if(url.endsWith('/info'))return reply({project:{name:'条件情境研究',description:'说明',collectionMode:'SINGLE_UNLINKED',status:'OPEN'},waves:[]})
     if(url.endsWith('/task'))return reply(task)
@@ -63,6 +65,10 @@ beforeEach(()=>{
         return reply({attempt:{id:receipts[route].attemptId,status:'COMPLETED'},receipt:receipts[route]})
       }
       throw new Error('Unexpected native route '+url)
+    }
+    if(url.endsWith('/screen-out')){
+      screenOuts.push(JSON.parse(String(init?.body)))
+      return reply({attemptId,status:'SCREENED_OUT'})
     }
     if(url.endsWith('/final')){
       finals.push(JSON.parse(String(init?.body)))
@@ -139,5 +145,74 @@ describe('Survey native SJT in ordinary conditional Flow',()=>{
     final();expect(finals).toHaveLength(0)
     fireEvent(window,new Event('beforeunload'))
     await waitFor(()=>expect(JSON.parse(sessionStorage.getItem(`huisurvey:v1:unfinished:${publicId}:${attemptId}`)!).answers).toEqual(answers('a')))
+  })
+
+  it('submits only the reached native receipt at COMPLETE_EARLY without mounting the trailing native unit',async()=>{
+    task.flow.blocks=[task.flow.blocks[0],task.flow.blocks[1],
+      {blockKey:'early_end',kind:'END',termination:'COMPLETE_EARLY',title:'提前完成'},
+      {blockKey:'unreached_native',kind:'INSTRUMENT',instrumentKey:'native_b'}]
+    await openTask()
+    fireEvent.click(screen.getByRole('radio',{name:'路径 A'}));advance()
+    const complete=await screen.findByRole('button',{name:'完成 native_a 共享任务'})
+    advance()
+    expect(screen.queryByRole('heading',{name:'提前完成'})).toBeNull()
+    expect(finals).toEqual([])
+    fireEvent.click(complete);await screen.findByText(/情境化作答已可靠保存/);advance()
+    expect(screen.getByRole('heading',{name:'提前完成'})).toBeInTheDocument()
+    expect(screen.getByText(/后续研究工具无需作答/)).toBeInTheDocument()
+    expect(screen.queryByRole('button',{name:'完成 native_b 共享任务'})).toBeNull()
+    final();await screen.findByText('感谢参与，问卷已提交')
+    expect(starts).toEqual([{route:'a',body:{accessCredential:credential,priorAnswers:answers('a')}}])
+    expect(reads).toEqual(['a']);expect(screenOuts).toEqual([])
+    expect(finals).toHaveLength(1)
+    expect(finals[0].answers).toEqual({...answers('a'),native_a:{}})
+    expect(finals[0].situationalReferences).toEqual([receipts.a])
+    expect(finals[0].presentation).toEqual({shownBlocks:['form_block','native_a_block','early_end']})
+  })
+
+  it('seals the reached native receipt through SCREEN_OUT and ends without a FINAL, scores or rerun',async()=>{
+    task.flow.blocks=[task.flow.blocks[0],task.flow.blocks[1],
+      {blockKey:'screen_end',kind:'END',termination:'SCREEN_OUT',title:'资格路径结束'},
+      {blockKey:'unreached_native',kind:'INSTRUMENT',instrumentKey:'native_b'}]
+    await openTask()
+    fireEvent.click(screen.getByRole('radio',{name:'路径 A'}));advance()
+    fireEvent.click(await screen.findByRole('button',{name:'完成 native_a 共享任务'}))
+    await screen.findByText(/情境化作答已可靠保存/);advance()
+    expect(screen.getByRole('heading',{name:'资格路径结束'})).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button',{name:'完成资格筛选'}))
+    await screen.findByRole('heading',{name:'本轮资格筛选已结束'})
+    expect(finals).toEqual([]);expect(screenOuts).toHaveLength(1)
+    expect(screenOuts[0].answers).toEqual({...answers('a'),native_a:{}})
+    expect(screenOuts[0].situationalReferences).toEqual([receipts.a])
+    expect(screenOuts[0].presentation).toEqual({shownBlocks:['form_block','native_a_block','screen_end']})
+    expect(starts).toEqual([{route:'a',body:{accessCredential:credential,priorAnswers:answers('a')}}])
+    expect(reads).toEqual(['a'])
+    expect(screen.queryByRole('heading',{name:'感谢参与，问卷已提交'})).toBeNull()
+    expect(screen.queryByRole('region',{name:'本次表现描述性反馈'})).toBeNull()
+    expect(screen.queryByRole('button',{name:/共享任务|重做|重答|重新开始|提交本轮正式回答/})).toBeNull()
+    expect(sessionStorage.getItem(`huisurvey:v1:unfinished:${publicId}:${attemptId}`)).toBeNull()
+  })
+
+  it('shows frozen material-only selectedMaterial before the shared native sequence without inventing read events',async()=>{
+    task.flow.selectedMaterial={blockKey:'assigned_material',title:'本组研究材料',body:'这是服务器冻结的材料内容。'}
+    render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+    await screen.findByRole('heading',{name:'本组研究材料'})
+    expect(screen.getByText('这是服务器冻结的材料内容。')).toBeInTheDocument()
+    expect(screen.queryByRole('radio',{name:'路径 A'})).toBeNull()
+    expect(screen.queryByRole('button',{name:/共享任务/})).toBeNull()
+    expect(starts).toEqual([])
+    advance()
+    fireEvent.click(await screen.findByRole('radio',{name:'路径 A'}));advance()
+    fireEvent.click(await screen.findByRole('button',{name:'完成 native_a 共享任务'}))
+    await screen.findByText(/情境化作答已可靠保存/)
+    final();await screen.findByText('感谢参与，问卷已提交')
+    expect(starts).toEqual([{route:'a',body:{accessCredential:credential,priorAnswers:answers('a')}}])
+    expect(finals).toHaveLength(1);expect(screenOuts).toEqual([])
+    expect(finals[0].answers).toEqual({...answers('a'),native_a:{}})
+    expect(finals[0].situationalReferences).toEqual([receipts.a])
+    expect(finals[0].presentation).toEqual({shownBlocks:['assigned_material','form_block','native_a_block']})
+    expect(Object.keys(finals[0]).sort()).toEqual(['accessCredential','answers','presentation','situationalReferences','submissionId'])
+    expect(vi.mocked(fetch).mock.calls.map(([url])=>String(url).split('/').pop())).toEqual(['info','task','start','read','final'])
   })
 })

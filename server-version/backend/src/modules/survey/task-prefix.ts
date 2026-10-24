@@ -1,3 +1,5 @@
+import {assertSurveyFlowAssignment,type SurveyFlowAssignment} from './flow.assignment'
+import {surveyAssignedFlowBlocks} from './flow.definition'
 import type { Prisma } from '@prisma/client'
 import {prepareCanonicalSubmission,assertCanonicalSubmissionPayloadSize} from '../../services/instrumentFinalSubmit'
 import type {VerifiedSurveyTask} from './task-authority'
@@ -35,13 +37,17 @@ export function prepareSurveyCognitivePriorAnswers(input:unknown){
   assertCanonicalSubmissionPayloadSize(canonical,900000,'认知前置答案')
   return {answers,canonical}
 }
-export async function freezeSurveyTaskPrefix(tx:Tx,known:Known,snapshot:ResearchFrozenPublication,slotKey:string,input:unknown){
+export async function freezeSurveyTaskPrefix(tx:Tx,known:Known,snapshot:ResearchFrozenPublication,slotKey:string,input:unknown,assignment?:SurveyFlowAssignment|null){
   const {answers}=prepareSurveyCognitivePriorAnswers(input)
   const verified:Record<string,Record<string,unknown>>={},locked:Record<string,unknown>={}
   const units=new Map(snapshot.units.map(u=>[u.instrumentKey,u]))
   if(snapshot.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'&&Object.keys(answers).some(key=>!units.has(key)))
     cognitiveFail(400,'认知前置答案不属于当前问卷子版本')
-  const blocks=snapshot.flow?.blocks??snapshot.units.map(u=>({kind:'INSTRUMENT',instrumentKey:u.instrumentKey,when:undefined}))
+  if(snapshot.flow){
+    if(!assignment)cognitiveFail(409,'冻结前置路径缺少服务器持久化分配')
+    assertSurveyFlowAssignment(snapshot.flow,assignment!)
+  }
+  const blocks=snapshot.flow?surveyAssignedFlowBlocks(snapshot.flow,assignment!.groupKey):snapshot.units.map(u=>({kind:'INSTRUMENT',instrumentKey:u.instrumentKey,when:undefined}))
   const vars=snapshot.flow?staticFlowValues(snapshot.flow):{}
   const priorCognitive:string[]=[],priorSituational:string[]=[]
   for(const block of blocks){

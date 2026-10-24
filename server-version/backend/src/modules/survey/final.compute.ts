@@ -209,8 +209,8 @@ function computeSurveyFinalFromSnapshot(snapshot:ResearchFrozenPublication,input
     invalid('publication','尚未提供可执行的 Survey 专用冻结定义')
   if(snapshot.flow){
     if(snapshot.units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)
-      &&(snapshot.flow.experiment||snapshot.flow.blocks.some(block=>block.kind==='END')))
-      invalid('publication','原生情境化父流程尚不支持实验分配或提前终止')
+      &&snapshot.flow.experiment?.mode==='QUESTIONNAIRE_VARIANTS')
+      invalid('publication','原生情境化父流程尚不支持问卷子版本分配')
     if(!assignment)invalid('flow.assignment','冻结流程缺少已持久化的实验分配')
     let result
     try{

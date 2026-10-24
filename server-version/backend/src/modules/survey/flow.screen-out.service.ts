@@ -1,3 +1,5 @@
+import {SurveyScaleTimingError} from './timing.definition'
+import {loadSurveyTaskReceipts,assertSurveyReachedTaskReceipts} from './task-receipts'
 import { randomUUID } from 'node:crypto'
 import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -5,12 +7,13 @@ import { prepareCanonicalSubmission,assertCanonicalSubmissionPayloadSize,validat
 import { withFinalOnlyCompletionTransaction } from '../../services/questionnaireProgressService'
 import { verifiedSurveyAttempt } from './admission.service'
 import { hashResearchCredential } from './identity.service'
-import { ensureSurveyFlowAssignment } from './flow.assignment'
-import { computeSurveyFinal,SurveyFinalValidationError } from './final.compute'
+import { ensureSurveyFlowAssignment,assignedSurveySnapshot } from './flow.assignment'
+import { verifySurveyFinalPublication,SurveyFinalValidationError } from './final.compute'
 import { SurveyFinalError,type FinalInput } from './final.service'
 import type { ResearchFrozenPublication } from './publication.service'
 
-/** Screen-out is NOT FINAL. Only a coarse Attempt state survives; incomplete
+/** Screen-out is NOT FINAL. Existing child originals remain; only their validated
+ * identities accompany the coarse termination event. Incomplete
  * qualifying Form answers are neither scored nor written to SurveyWaveFinal.
  */
 export async function screenOutResearchAttempt(input:FinalInput){
@@ -22,6 +25,8 @@ export async function screenOutResearchAttempt(input:FinalInput){
     throw new SurveyFinalError(400,'当前冻结研究没有资格筛除流程')
   const canonical=prepareCanonicalSubmission({
     publicationId:own.publicationId,definitionDigest:own.definitionDigest,answers:input.answers,
+    ...(input.cognitiveReferences!==undefined?{cognitiveReferences:input.cognitiveReferences}:{}),
+    ...(input.situationalReferences!==undefined?{situationalReferences:input.situationalReferences}:{}),
   })
   assertCanonicalSubmissionPayloadSize(canonical,1024*1024,'研究筛除核验')
   return withFinalOnlyCompletionTransaction(async tx=>{
@@ -83,15 +88,21 @@ export async function screenOutResearchAttempt(input:FinalInput){
       accessCredential:input.accessCredential,snapshot:frozen,
     })
     if(!assignment)throw new SurveyFinalError(400,'筛除必须来自冻结 Flow')
+    const verified=verifySurveyFinalPublication(frozen,publication.definitionDigest)
+    if(!verified)throw new SurveyFinalError(409,'冻结研究摘要校验失败')
+    const taskReceipts=await loadSurveyTaskReceipts(tx,{projectId:own.projectId,waveId:own.waveId,
+      attemptId:own.attemptId,publicationId:publication.id,snapshot:assignedSurveySnapshot(frozen,assignment)},input)
     let result
     try{
-      result=computeSurveyFinal(frozen,input.answers,assignment,
-        input.presentation?.shownBlocks,'SCREEN_OUT')
+      result=verified!.compute(input.answers,assignment,
+        input.presentation?.shownBlocks,'SCREEN_OUT',input.itemTimings,
+        taskReceipts.cognitiveResults,taskReceipts.nativeSituationalResults)
     }catch(e){
-      if(e instanceof SurveyFinalValidationError)
+      if(e instanceof SurveyFinalValidationError||e instanceof SurveyScaleTimingError)
         throw new SurveyFinalError(400,e.path+'：'+e.message)
       throw e
     }
+    assertSurveyReachedTaskReceipts(result,taskReceipts,message=>{throw new SurveyFinalError(409,message)})
     if(result.executionTrace?.termination!=='SCREEN_OUT')
       throw new SurveyFinalError(400,'当前研究路径并未筛除')
     const updated=await tx.surveyWaveAttempt.updateMany({where:{
@@ -103,7 +114,8 @@ export async function screenOutResearchAttempt(input:FinalInput){
       id:randomUUID(),actorUserId:null,projectId:own.projectId,
       action:'SURVEY_FLOW_SCREENED_OUT',
       metadata:{waveId:own.waveId,flowDigest:frozen.flow!.flowDigest,
-        outcome:'SCREENED_OUT',rawAnswersPersisted:false},
+        outcome:'SCREENED_OUT',rawAnswersPersisted:false,
+        acceptedTaskReferences:taskReceipts.acceptedTaskReferences},
     }})
     return {status:'SCREENED_OUT' as const,idempotent:false}
   })

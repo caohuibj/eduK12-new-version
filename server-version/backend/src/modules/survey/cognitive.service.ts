@@ -83,9 +83,9 @@ export async function startSurveyCognitive(proof:SurveyCognitiveProof,slotKey:st
     if(existing)return sessionView(tx,known,slotKey,existing,frozen)
     const hold=getAssessmentOperationalHold({family:'COGNITIVE',key:'gonogo',version:'1.0.0',scoringVersion:'1.0.0'})
     if(hold)cognitiveFail(409,'该认知协议暂停新任务，请联系研究者')
-    if(snapshot.flow)await ensureSurveyFlowAssignment(tx,{...scope(known,slotKey),participantId:known.participantId,
-      researchCode:proof.researchCode,accessCredential:proof.accessCredential,snapshot})
-    const locked=await freezeSurveyTaskPrefix(tx,known,snapshot,slotKey,input.priorAnswers)
+    const assignment=snapshot.flow?await ensureSurveyFlowAssignment(tx,{...scope(known,slotKey),participantId:known.participantId,
+      researchCode:proof.researchCode,accessCredential:proof.accessCredential,snapshot}):null
+    const locked=await freezeSurveyTaskPrefix(tx,known,snapshot,slotKey,input.priorAnswers,assignment)
     const now=new Date()
     const session=await tx.surveyCognitiveSession.create({data:{id:randomUUID(),...scope(known,slotKey),epoch:1,
       measurementDigest:frozen.measurementDigest,status:'IN_PROGRESS',
