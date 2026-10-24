@@ -1,4 +1,4 @@
-import {TrainingMaterials} from '../modules/assessment-media/TrainingMaterialPicker'
+import {TrainingMaterials} from '../modules/assessment-media/TrainingMaterials'
 import { isTrainingHost } from '../training/context'
 import { TrainingCheckpointPanel } from '../modules/composite/TrainingCheckpointPanel'
 import {TrainingTimingBoundary,restoreTrainingTiming} from '../modules/scale/TrainingTimingBoundary'
@@ -161,7 +161,8 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
       changeCount: (previous?.changeCount ?? 0) + (previous && previous.responseValue !== value ? 1 : 0) }
     questionStart.current = now
     setAnswers(prior => ({ ...prior, [key]: answer }))
-    return schedule(key, async () => {await finalDraftStore.putAnswer({ draftKey, itemKey: key, value: answer, updatedAt: now });if(Object.keys(timingRef.current).length)await finalDraftStore.setInstrumentMetadata(draftKey,{wholeScaleTiming:timingMetadata()})})
+    return schedule(key, () => finalDraftStore.putAnswer({ draftKey, itemKey: key, value: answer, updatedAt: now },
+      Object.keys(timingRef.current).length ? { wholeScaleTiming: timingMetadata() } : undefined))
   }
   const saveAndExit = async () => {
     if (submitting.current || busy || checkpointBusy) return

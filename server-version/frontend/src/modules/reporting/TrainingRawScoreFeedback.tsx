@@ -1,4 +1,4 @@
-import {TrainingMaterials} from '../assessment-media/TrainingMaterialPicker'
+import {TrainingMaterials} from '../assessment-media/TrainingMaterials'
 import type {PublicMaterial} from '../assessment-media/material'
 import { useCallback, useMemo } from 'react'
 import { sessionFetch } from '../../api/client'

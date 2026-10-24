@@ -97,9 +97,9 @@ describe('FE-07A Cognitive shell integration', () => {
     expect(mocks.controller.restart).not.toHaveBeenCalled()
     expect(mocks.controller.start).not.toHaveBeenCalled()
   })
-  it('keeps the active task mounted when shell save status changes', () => {
+  it('keeps the active task mounted when shell save status changes', async () => {
     const view = render(app())
-    const before = screen.getByRole('button', { name: 'trial 0' })
+    const before = await screen.findByRole('button', { name: 'trial 0' })
 
     mocks.controller.state = { ...baseState(), status: 'SUBMITTING_TRIAL' }
     view.rerender(app())
@@ -109,7 +109,7 @@ describe('FE-07A Cognitive shell integration', () => {
     expect(screen.getByText('正在保存到本机')).toBeTruthy()
   })
 
-  it('does not mount a task or create a trial when required media is unavailable', () => {
+  it('does not mount a task or create a trial when required media is unavailable', async () => {
     mocks.imageStatus = 'error'
     mocks.controller.state = {
       ...baseState(),
@@ -128,7 +128,7 @@ describe('FE-07A Cognitive shell integration', () => {
     render(app())
 
     expect(screen.queryByRole('button', { name: 'trial 0' })).toBeNull()
-    expect(screen.getByText('视觉内容未就绪，测量不会继续。')).toBeTruthy()
+    expect(await screen.findByText('视觉内容未就绪，测量不会继续。')).toBeTruthy()
     expect(mocks.controller.appendTrial).not.toHaveBeenCalled()
   })
 })

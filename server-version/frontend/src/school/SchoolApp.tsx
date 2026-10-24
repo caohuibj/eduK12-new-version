@@ -28,6 +28,7 @@ import { SchoolPeerConsent } from './SchoolPeerConsent'
 import { SchoolStudentFeedback, SchoolStudentReportConsent, SchoolParentReports, SchoolReportOfficer, SchoolDisclosureOfficers, SchoolProfessionalReports } from './SchoolReports'
 
 import './school-theme.css'
+import '../components/education-tools/education-entry-layout.css'
 
 type CampusUser={id:string;username:string;role:string;accountDomain:'SCHOOL';mustChangePassword:boolean}
 type CampusOrg={id:string;name:string;orgRole:string}

@@ -31,7 +31,9 @@ afterEach(async()=>{vi.restoreAllMocks();await finalDraftStore.delete('cognitive
 describe('Survey actual shared runner adapter',()=>{
   it('persists raw trials locally, sends one bearer-bound FINAL, and keeps child receipt distinct',async()=>{
     const {request,onCommitted}=setup()
-    fireEvent.click(await screen.findByRole('button',{name:'开始测评'}))
+    const start = await screen.findByRole('button',{name:'开始测评'})
+    await waitFor(() => expect(start).toBeEnabled())
+    fireEvent.click(start)
     fireEvent.click(await screen.findByRole('button',{name:'trial 0'}))
     await waitFor(async()=>expect(await finalDraftStore.listTrials('cognitive:'+session.sessionId)).toHaveLength(1))
     expect(request.mock.calls.every(([p])=>!p.endsWith('/final'))).toBe(true)
@@ -47,7 +49,9 @@ describe('Survey actual shared runner adapter',()=>{
   })
   it('stops the real runner on trial storage failure and exposes parent-owned recovery without FINAL',async()=>{
     const {request,onRunningChange}=setup()
-    fireEvent.click(await screen.findByRole('button',{name:'开始测评'}))
+    const start = await screen.findByRole('button',{name:'开始测评'})
+    await waitFor(() => expect(start).toBeEnabled())
+    fireEvent.click(start)
     vi.spyOn(finalDraftStore,'putTrial').mockRejectedValueOnce(new Error('IndexedDB write failed'))
     fireEvent.click(await screen.findByRole('button',{name:'trial 0'}))
     await screen.findByText(/本机试次暂存失败/)

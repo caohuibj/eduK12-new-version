@@ -13,7 +13,7 @@
  padding:.65rem .9rem;color:inherit}
 .epg-main button:disabled{opacity:.5;cursor:not-allowed}
 .epg-main :is(button,input,a):focus-visible{outline:3px solid #a85d35;outline-offset:2px}
-.epg-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:.8rem}
+.epg-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:.8rem}
 .epg-grid article,.epg-grant{border:1px solid #dbe2eb;padding:1rem;border-radius:9px}
 .epg-grant{display:flex;flex-wrap:wrap;align-items:center;gap:.7rem;margin-bottom:.65rem}
 .epg-grant span{overflow-wrap:anywhere;flex:1;color:#59677a}
@@ -21,3 +21,17 @@
 .epg-error,.epg-notice{border-left:4px solid #a53a37;background:#fff6f6;padding:.8rem}
 .epg-notice{background:#f4faf9;border-color:#487e72}
 @media(max-width:650px){.epg-grid{grid-template-columns:1fr}.epg-main{padding:1rem}}
+
+/* Administration stays separate from participant navigation and authority. */
+.epg-main header>span{font-size:.8rem;font-weight:650;letter-spacing:.04em;color:#526273}
+.epg-main header h1{margin:.5rem 0 .75rem}
+.epg-main header p{margin:0 0 1.25rem}
+.epg-main :is(h1,h2,h3,p,span){overflow-wrap:anywhere}
+.epg-verification{border:1px solid #dce2ec;border-radius:12px;background:#fff;margin:1rem 0;padding:0 1rem}
+.epg-verification>summary{cursor:pointer;min-height:48px;padding:.8rem 0;font-size:.9rem;font-weight:600}
+.epg-verification>summary span{font-weight:400;font-size:.8rem;color:#59677a;margin-left:.75rem}
+.epg-verification>summary:focus-visible{outline:3px solid #a85d35;outline-offset:3px}
+.epg-main button,.epg-actions a{min-height:44px;max-width:100%;overflow-wrap:anywhere}
+.epg-actions a{display:inline-flex;align-items:center;padding:.45rem .7rem;border-radius:8px;background:#f2f5f7;text-decoration:none}
+.epg-actions a:hover{text-decoration:underline}
+@media(max-width:650px){.epg-verification>summary span{display:block;margin:4px 0 0}.epg-actions{gap:.5rem}}

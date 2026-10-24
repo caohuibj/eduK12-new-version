@@ -1,4 +1,5 @@
-import { TaskswitchTask } from './TaskswitchTask'
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
+const TaskswitchTask = deferredCognitiveRunner(() => import('./TaskswitchTask').then(module => module.TaskswitchTask))
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
 
 export const taskswitchRegistryEntry: CognitiveFrontendRegistryEntry = {
@@ -6,7 +7,7 @@ export const taskswitchRegistryEntry: CognitiveFrontendRegistryEntry = {
   name: '任务转换',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: TaskswitchTask,
+  RunnerComponent: TaskswitchTask, prepareRunner: TaskswitchTask.prepare,
   completionMode: 'task',
   metricDefinitions: [
     { key: 'switchCostRtMs', label: 'RT 转换代价', unit: 'ms', displayType: 'ms' },

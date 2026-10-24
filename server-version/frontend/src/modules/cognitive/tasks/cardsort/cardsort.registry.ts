@@ -1,4 +1,5 @@
-import { CardsortTask } from './CardsortTask'
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
+const CardsortTask = deferredCognitiveRunner(() => import('./CardsortTask').then(module => module.CardsortTask))
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
 
 export const cardsortRegistryEntry: CognitiveFrontendRegistryEntry = {
@@ -6,7 +7,7 @@ export const cardsortRegistryEntry: CognitiveFrontendRegistryEntry = {
   name: '规则卡片分类',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: CardsortTask,
+  RunnerComponent: CardsortTask, prepareRunner: CardsortTask.prepare,
   completionMode: 'task',
   metricDefinitions: [
     { key: 'switchCostRtMs', label: '规则转换 RT 代价', unit: 'ms', displayType: 'ms' },

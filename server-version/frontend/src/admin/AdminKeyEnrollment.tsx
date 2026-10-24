@@ -3,6 +3,8 @@ import {useState} from 'react'
 import {Link,useLocation} from 'react-router-dom'
 import {QRCodeSVG} from 'qrcode.react'
 import AuthShell from '../components/auth/AuthShell'
+import EducationAdminEntryShell from '../pages/admin/EducationAdminEntryShell'
+import {educationEntry} from '../pages/admin/education-entry'
 import SurveyAdminEntryShell from '../survey/SurveyAdminEntryShell'
 import {beginTotpEnrollment,confirmTotpEnrollment,enrollSecurityKey} from './securityKey'
 import api from '../api/client'
@@ -26,8 +28,9 @@ function AdminKeyEnrollment(){
   const homeOrigin=new URL(origins?.admin??window.location.origin)
   if(import.meta.env.DEV&&['localhost','127.0.0.1'].includes(homeOrigin.hostname))homeOrigin.hostname='training.localhost'
   const trainingHome=homeOrigin.origin+'/'
-  const Shell=surveyEntry?SurveyAdminEntryShell:AuthShell
-  const loginPath=surveyEntry?surveyAppearanceHref('/admin/login?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH),mode):trainingEntry?'/admin/login?returnTo=%2Fadmin%2Ftraining':'/admin/login'
+  const educationProduct=educationEntry(location.search)
+  const Shell=educationProduct?EducationAdminEntryShell:surveyEntry?SurveyAdminEntryShell:AuthShell
+  const loginPath=educationProduct?`/admin/login?returnTo=${encodeURIComponent(educationProduct==='School'?'/admin/huischool':'/admin/huiteacher')}`:surveyEntry?surveyAppearanceHref('/admin/login?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH),mode):trainingEntry?'/admin/login?returnTo=%2Fadmin%2Ftraining':'/admin/login'
   const [username,setUsername]=useState(''),[password,setPassword]=useState(''),[ticket,setTicket]=useState('')
   const [method,setMethod]=useState<'TOTP'|'SECURITY_KEY'>('TOTP')
   const [uri,setUri]=useState(''),[code,setCode]=useState('')
@@ -55,7 +58,7 @@ function AdminKeyEnrollment(){
       heroTitle:'先完成绑定，\n再开始管理。',heroDescription:'绑定手机验证器后，即可使用培训管理账号审核账号、监管课程与授权资源。',
       heroBullets:['准备已获授权的培训管理账号','扫码绑定自己的手机验证器','验证完成后返回 Training 管理员登录'],
       heroLabel:'Training 管理员绑定介绍',tagline:'仅限已获 Training 管理授权的账号',
-    }:surveyEntry?{backTo:loginPath,backLabel:'返回 Survey 管理员登录'}:{})}>
+    }:educationProduct?{backTo:loginPath,backLabel:`返回 ${educationProduct} 管理员登录`}:surveyEntry?{backTo:loginPath,backLabel:'返回 Survey 管理员登录'}:{})}>
     {trainingEntry&&<>
       <ol className="training-enrollment-steps" aria-label="首次绑定步骤">
         {['填写凭据','绑定验证器','返回登录'].map((label,index)=><li key={label} aria-current={index===(registered?2:uri?1:0)?'step':undefined}>

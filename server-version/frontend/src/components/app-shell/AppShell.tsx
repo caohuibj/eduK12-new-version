@@ -45,6 +45,8 @@ import SurveyAdminShell from '../../survey/SurveyAdminShell'
 import TrainingAdminShell from '../../training/TrainingAdminShell'
 
 const trainingFavicon='/training/favicon.svg?v=20261023-compact'
+import EducationAdminShell from '../../pages/admin/EducationAdminShell'
+import {educationEntry} from '../../pages/admin/education-entry'
 
 // Organization reports and charts are only needed on organization routes.
 const OrganizationProductRoutes = lazy(() => import('../../pages/organization/OrganizationProductRoutes'))
@@ -63,6 +65,8 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const surveyAdmin=(hasAdminEntry(user,'SURVEY')||user?.platformRole==='SYSTEM_ADMIN')&&Boolean(origins)&&(location.pathname===SURVEY_ADMIN_PATH||
     (location.pathname==='/admin/scale-library-governance'&&new URLSearchParams(location.search).get('workspace')==='survey'))
   const surveyAdminEntry=Boolean(origins)&&['/admin/login','/admin/security/enroll'].includes(location.pathname)&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH
+  const educationProduct=location.pathname==='/admin/huischool'?'School':location.pathname==='/admin/huiteacher'?'Teacher':null
+  const educationBrand=educationProduct??(['/admin/login','/admin/security/enroll'].includes(location.pathname)?educationEntry(location.search):null)
   const adminWorkspace=isAdminWorkspacePath(location.pathname)
   const trainingAdmin = user?.role === 'ADMIN' && (location.pathname === '/admin/training' || new URLSearchParams(location.search).get('workspace') === 'training')
   const organizationProductRoute=location.pathname==='/organizations'||location.pathname.startsWith('/organizations/')||(location.pathname==='/organization-tasks'||location.pathname==='/my-assessments')
@@ -109,15 +113,16 @@ function AppShellContent({ children }: { children: ReactNode }) {
       &&isTrainingAdminPath(new URLSearchParams(location.search).get('returnTo')??''))
     if(mode==='display'&&!trainingBrand)return
     const surveyBrand=surveyAdmin||surveyAdminEntry
-    document.title=surveyBrand?'Research':trainingBrand?'Training':`${title==='Huisurvey'?'':`${title} · `}Huisurvey`
+    document.title=educationBrand?`${educationBrand} · 管理员工作台`:surveyBrand?'Research':trainingBrand?'Training':`${title==='Huisurvey'?'':`${title} · `}Huisurvey`
     const icon=document.head.querySelector<HTMLLinkElement>('link[rel="icon"]')
     if(surveyBrand)icon?.setAttribute('href','/survey/huisurvey-w2-emblem.svg')
     else if(trainingBrand)icon?.setAttribute('href',trainingFavicon)
     else if(['/survey/huisurvey-w2-emblem.svg','/training/favicon.svg',trainingFavicon].includes(icon?.getAttribute('href')??''))icon?.setAttribute('href','/vite.svg')
     if(previousPath.current!==location.pathname&&mode!=='focused')mainRef.current?.focus()
     previousPath.current=location.pathname
-  },[location.pathname,location.search,title,mode,training,surveyAdmin,surveyAdminEntry])
+  },[location.pathname,location.search,title,mode,training,surveyAdmin,surveyAdminEntry,educationBrand])
   if(isTrainingAdminPath(location.pathname)&&(authLoading||!user))return <div className="hui-app hui-training training-management-frame" data-training-theme={appearance.theme}><main className="training-management-main">{children}</main></div>
+  if(educationProduct&&user&&hasAdminEntry(user,educationProduct==='School'?'HUISCHOOL':'HUITEACHER'))return <EducationAdminShell product={educationProduct} userId={user.id} username={user.nickname||user.username} loggingOut={loggingOut} onLogout={async()=>{setLoggingOut(true);try{await logout()}finally{setLoggingOut(false)}}}>{children}</EducationAdminShell>
   if(surveyAdmin&&user)return <SurveyAdminShell username={user.nickname||user.username} loggingOut={loggingOut} onLogout={async()=>{setLoggingOut(true);try{await logout()}finally{setLoggingOut(false)}}}>{children}</SurveyAdminShell>
   if(user&&hasAdminEntry(user,'TRAINING')&&isTrainingAdminPath(location.pathname))return <TrainingAdminShell user={user} loggingOut={loggingOut} onLogout={async()=>{setLoggingOut(true);try{await logout()}finally{setLoggingOut(false)}}}>{children}</TrainingAdminShell>
   if(mode==='display')return <>{children}</>

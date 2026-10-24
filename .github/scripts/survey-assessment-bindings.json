@@ -1,0 +1,183 @@
+{
+  "schema": 1,
+  "base": "d33b70b14c4788b9d2c8f24914e7eee2458ee4c6",
+  "product": "ea7380ad06abfe54c78565a4206273d7e954c079",
+  "source": {
+    "docs/performance/survey-assessment-20261024.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "8fb8f670842e701a492a9fe03899b05f95173d44"
+    },
+    "docs/performance/survey-assessment-20261024.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5e9460461d8eaaf502ce33ca0582408bf58b7e72"
+    },
+    "server-version/backend/src/__tests__/survey/export-download-parts.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "0d7e97a161837c73b0b471d772a1ae6529069223"
+    },
+    "server-version/backend/src/__tests__/survey/task-options-performance.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "3a7a6b4b70db19468f20b644314fc8a34d64ccc7"
+    },
+    "server-version/backend/src/modules/survey/analytics.export.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "43b9a9938d23428e08beac38f18e2ed54b3f92bc",
+      "after": "4d1144ff0e457130206305eb75ba0b79e595d37b"
+    },
+    "server-version/backend/src/modules/survey/task.public.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "579c13a1d570537d7b279b0fd6e080f0814a5d1e",
+      "after": "4624e94c8e522ac0a926599b2a7d7edd8f4b712d"
+    },
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.download.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "17c8b42f8fefd8e9ca62d62bb99ce98908e5abc1",
+      "after": "996056f6ee7a58fc3555ea3c3055643302f782d6"
+    },
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.recovery.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4c72b6f83bf99705058e61722b25b6e17487aa08",
+      "after": "b578a8aeddbcf51d5e26558df0f0000d71829e21"
+    },
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a2bed570faafc5503d82643dd1948d48e292ea44",
+      "after": "9dbb5c1903b3ace8748ba5e09cf92ac2334ccb83"
+    },
+    "server-version/frontend/src/survey/SurveyApp.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "33b823efa443445aa5c788b7f5bf3912cbc94f83",
+      "after": "a5f041f688c20e08aadf5a2824241e8ff07edd69"
+    },
+    "server-version/frontend/src/survey/SurveyCatalogScaleMedia.loading.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "1571072b7511f333f128c4b7b274c65c0bd4a216"
+    },
+    "server-version/frontend/src/survey/SurveyCatalogScaleMedia.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0f2b82b928f2f0ffc12de3afb1b65c043e3e13a5",
+      "after": "5974bb0f9376b8862d2dbdca1459a35b089818a8"
+    },
+    "server-version/frontend/src/survey/SurveyCatalogScaleMediaContent.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "880f7862346fc33e3cb1f3a6455c7a16481a36fd"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "05b02ff1e47fccf55d3d6ffbe86a6e79144fa92f",
+      "after": "c8cdf06fe7a8102a63d17115ff0fa6915a640758"
+    },
+    "server-version/frontend/src/survey/SurveyWorkspace.performance.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "370f8fdeba783314cedce4c1fbe9d63ac02b9515"
+    }
+  },
+  "controls": [
+    ".github/scripts/survey-assessment-scope.mjs",
+    ".github/scripts/survey-assessment-checks.mjs",
+    ".github/scripts/survey-assessment.test.mjs",
+    ".github/scripts/survey-assessment-bindings.json",
+    ".github/evidence/survey-assessment/build.json",
+    ".github/workflows/ci-survey-assessment.yml",
+    ".github/workflows/ci.yml",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    "docs/release/README.md"
+  ],
+  "controlBefore": {
+    ".github/workflows/ci.yml": "478aa763408606a27e1159e7024013901905b9ce",
+    ".github/scripts/content-scope.mjs": "de5e5eee32b68e481607199ee9f8a6ecf855dbb9",
+    ".github/scripts/merge-gate.mjs": "77ef8d8524028684309c6b775c270cbf9ac1997c",
+    "docs/release/README.md": "8d777420687d5ad174ace1b616f5a1b19f9ad0d2"
+  },
+  "components": {
+    "frontend": "c05d84d06360b9cfc2bb100c1840db576684d290",
+    "backend": "b3a9c5863d25ad6c6c81a560c68f7f5980026d15"
+  },
+  "protectedInputs": {
+    ".github/config/acceptance-scopes.json": "3e712ad61188aac0ec9af4cc4ca99496bde186df",
+    ".github/scripts/participant-access-bindings.json": "a989b6534437f0a6c047d2f3c27f6af6f07d7292",
+    ".github/scripts/participant-access-checks.mjs": "5fc0de30cf1e52313978991bd80615ec46d81b00",
+    ".github/scripts/participant-access-scope.mjs": "40b0933fd4b60fceeab55c04aa3c329551cc5135",
+    ".github/scripts/school-teacher-checks.mjs": "b9fd6a6b09cdd8f02a87d4120b4d467c313b4a3d",
+    ".github/workflows/ci-school-teacher.yml": "6b7a50b397c207c25c3762e49cf658ccc19e57d3",
+    "AGENTS.md": "592945af44a0bf72761f2ceb34386c87adc08fb3",
+    "server-version/backend/package-lock.json": "73607721290dd28f1c6f85d5e12d5d517926ede3",
+    "server-version/backend/package.json": "033398f6361b0e4217226ae00f2edc2ed3380ecd",
+    "server-version/backend/prisma/schema.prisma": "aca635e128f3327a71064f575795f1835a40fea9",
+    "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
+    "server-version/backend/vitest.config.ts": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406",
+    "server-version/frontend/eslint.config.js": "4e89832bf4d92a5e1ba1815aad2ade6c9a65c3a1",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/src/test/setup.ts": "3217d9d84ea1285cf3495e27669a88e3fe7d2cf3",
+    "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
+    "server-version/frontend/tsconfig.cognitive.json": "910e97700f25652bc1d80ada47e176cbd51c2fbe",
+    "server-version/frontend/tsconfig.json": "1ffef600d959ec9e396d5a260bd3f5b927b2cef8",
+    "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22",
+    "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+  },
+  "buildEvidenceSHA256": "6f8233b292cddfd6c1e93f1166b93433be20f9d5ee54217a489927568b0eac48",
+  "frontendBuildInputCount": 1068,
+  "checks": {
+    "primary": "GitHub Actions: fresh affected types/lint/Node assertions and backend compilation. Local primary: already completed Vite artifact and real synthetic browser observations; no duplicate build.",
+    "frontendTestFiles": [
+      "src/survey/SurveyWorkspace.performance.test.tsx",
+      "src/survey/SurveyCatalogScaleMedia.loading.test.tsx",
+      "src/survey/SurveyAnalyticsWorkspace.download.test.tsx",
+      "src/survey/SurveyAnalyticsWorkspace.recovery.test.tsx",
+      "src/survey/SurveyPublicApp.final.test.tsx",
+      "src/survey/SurveyPublicApp.cognitive.test.tsx",
+      "src/survey/SurveyPublicApp.group-ip.test.tsx",
+      "src/survey/SurveyTimedScale.test.tsx",
+      "src/survey/SurveyFormPagination.test.tsx",
+      "src/survey/SurveyStudyPreview.test.tsx",
+      "src/survey/SurveyWorkspace.requests.test.tsx",
+      "src/survey/SurveyWorkspace.directory.test.tsx"
+    ],
+    "backendTestFiles": [
+      "src/__tests__/survey/task-options-performance.test.ts",
+      "src/__tests__/survey/export-download-parts.test.ts",
+      "src/__tests__/survey/public-scale-media.test.ts",
+      "src/__tests__/survey/measurement-export-service.contract.test.ts"
+    ]
+  },
+  "auditReuse": "Unchanged authenticated official participant-access audit verifier; exact original inputs/artifact and 24-hour lifetime."
+}

@@ -1,12 +1,13 @@
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
-import { TrailmakingTask } from './TrailmakingTask'
+const TrailmakingTask = deferredCognitiveRunner(() => import('./TrailmakingTask').then(module => module.TrailmakingTask))
 
 export const trailmakingRegistryEntry: CognitiveFrontendRegistryEntry = {
   testType: 'trailmaking',
   name: 'Trail Making 视觉搜索与切换',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: TrailmakingTask,
+  RunnerComponent: TrailmakingTask, prepareRunner: TrailmakingTask.prepare,
   completionMode: 'task',
   metricDefinitions: [
     { key: 'completionTimeMs', label: '累计正确步骤时长', unit: 'ms', displayType: 'ms' },

@@ -8,7 +8,8 @@ let now = 0
 let nextFrameId = 1
 let frameCallbacks: Map<number, FrameRequestCallback>
 
-beforeEach(() => {
+beforeEach(async () => {
+  await Promise.all(['reaction','gonogo','cpt'].map(testType => resolveRunner(testType, '1.0.0')!.prepareRunner!()))
   vi.useFakeTimers()
   now = 0
   nextFrameId = 1

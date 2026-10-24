@@ -1,12 +1,13 @@
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
-import { EmotionrecognitionTask } from './EmotionrecognitionTask'
+const EmotionrecognitionTask = deferredCognitiveRunner(() => import('./EmotionrecognitionTask').then(module => module.EmotionrecognitionTask))
 
 export const emotionrecognitionRegistryEntry: CognitiveFrontendRegistryEntry = {
   testType: 'emotionrecognition',
   name: '六类情绪面孔分类',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: EmotionrecognitionTask,
+  RunnerComponent: EmotionrecognitionTask, prepareRunner: EmotionrecognitionTask.prepare,
   completionMode: 'task',
   metricDefinitions: [
     { key: 'accuracy', label: '总体分类正确率', displayType: 'percentage' },

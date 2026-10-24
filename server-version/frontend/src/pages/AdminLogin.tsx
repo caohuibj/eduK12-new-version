@@ -8,6 +8,8 @@ import { surveyAppearanceHref } from '../survey/survey-appearance-links'
 import '../survey/survey-admin-auth.css'
 import LoginRecoveryNotice from '../components/app-shell/LoginRecoveryNotice'
 import AuthShell from '../components/auth/AuthShell'
+import EducationAdminEntryShell from './admin/EducationAdminEntryShell'
+import {educationEntry} from './admin/education-entry'
 import React, { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
@@ -30,7 +32,8 @@ const AdminLogin: React.FC = () => {
   const homeOrigin=new URL(origins?.admin??window.location.origin)
   if(import.meta.env.DEV&&['localhost','127.0.0.1'].includes(homeOrigin.hostname))homeOrigin.hostname='training.localhost'
   const trainingHome=homeOrigin.origin+'/'
-  const Shell = trainingEntry ? TrainingAdminLoginShell : surveyEntry ? SurveyAdminEntryShell : AuthShell
+  const educationProduct=educationEntry(location.search)
+  const Shell = trainingEntry ? TrainingAdminLoginShell : educationProduct ? EducationAdminEntryShell : surveyEntry ? SurveyAdminEntryShell : AuthShell
   const trainingRecovery = trainingEntry && readReauthReturn()?.target === new URLSearchParams(location.search).get('returnTo')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -58,7 +61,7 @@ const AdminLogin: React.FC = () => {
   }
 
   return (
-    <Shell tone="admin" title={trainingEntry?'培训管理员登录':'管理员登录'} description={trainingEntry?'使用管理员账号与手机验证器动态码登录。':surveyEntry?'Survey · 研究者资格、邀请与工具授权':'密码与 Authenticator 动态码验证，按入口授权管理'}
+    <Shell tone="admin" title={educationProduct?`${educationProduct} 管理员登录`:trainingEntry?'培训管理员登录':'管理员登录'} description={educationProduct?'使用已获本产品管理授权的账号登录，管理学校开通与授权。':trainingEntry?'使用管理员账号与手机验证器动态码登录。':surveyEntry?'Survey · 研究者资格、邀请与工具授权':'密码与 Authenticator 动态码验证，按入口授权管理'}
       {...(trainingEntry?{
         brand:<a className="hui-auth-brand" href={trainingHome} aria-label="Training 首页"><TrainingBrand /></a>,
         className:'training-admin-auth',backTo:trainingHome,backLabel:'返回 Training 首页',
@@ -154,7 +157,7 @@ const AdminLogin: React.FC = () => {
             <p>已绑定实体安全密钥时，可在「验证方式」中切换为硬件安全密钥，再按提示连接密钥并验证。尚未绑定时，请使用 Authenticator。</p>
           </div>
         </details>
-      </>:<p className="mt-4"><Link to="/admin/security/enroll">首次绑定 Authenticator</Link></p>}
+      </>:<p className="mt-4"><Link to={educationProduct?`/admin/security/enroll?returnTo=${encodeURIComponent(educationProduct==='School'?'/admin/huischool':'/admin/huiteacher')}`:'/admin/security/enroll'}>首次绑定 Authenticator</Link></p>}
     </Shell>
   )
 }

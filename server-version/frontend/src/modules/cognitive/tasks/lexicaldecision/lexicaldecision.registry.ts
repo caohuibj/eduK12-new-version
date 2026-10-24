@@ -1,12 +1,13 @@
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
-import { LexicaldecisionTask } from './LexicaldecisionTask'
+const LexicaldecisionTask = deferredCognitiveRunner(() => import('./LexicaldecisionTask').then(module => module.LexicaldecisionTask))
 
 export const lexicaldecisionRegistryEntry: CognitiveFrontendRegistryEntry = {
   testType: 'lexicaldecision',
   name: '中文词汇判断',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: LexicaldecisionTask,
+  RunnerComponent: LexicaldecisionTask, prepareRunner: LexicaldecisionTask.prepare,
   completionMode: 'task',
   metricDefinitions: [
     { key: 'dPrime', label: '词汇判断 d-prime', displayType: 'number' },

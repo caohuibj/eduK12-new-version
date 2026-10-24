@@ -62,13 +62,21 @@ export async function getOwnResearchTask(input:{
     }
     if(unit.kind==='SCALE'){
       const d=readSurveyScalePresentation(unit.displayDefinition)
+      const responseOptions=d.responseOptions.map(o=>({optionKey:o.optionKey,label:o.label}))
       return {kind:'SCALE',instrumentKey:unit.instrumentKey,title:unit.title,...(materialListSchema.optional().parse((unit.displayDefinition as {materials?:unknown}).materials)?.length?{materials:materialListSchema.parse((unit.displayDefinition as {materials:unknown}).materials).map(publicMaterial)}:{}),
         presentationMode:d.presentationMode??'ALL_AT_ONCE',
-        responseOptions:d.responseOptions.map(o=>({optionKey:o.optionKey,label:o.label})),
-        items:d.items.map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required,...(q.materials?{materials:q.materials.map(publicMaterial)}:{}),
-          responseOptions:scalePresentationOptions(d,q).map(o=>({optionKey:o.optionKey,label:o.label})),
+        responseOptions,
+        items:d.items.map(q=>{
+          const options=scalePresentationOptions(d,q)
+          // The public renderer already falls back to the shared response set.
+          // Compare public keys/labels only; frozen scores and per-item overrides
+          // retain their original identity in the private publication.
+          const shared=options===d.responseOptions||options.length===responseOptions.length&&
+            options.every((o,i)=>o.optionKey===responseOptions[i].optionKey&&o.label===responseOptions[i].label)
+          return {itemKey:q.itemKey,prompt:q.prompt,required:q.required,...(q.materials?{materials:q.materials.map(publicMaterial)}:{}),
+          ...(!shared?{responseOptions:options.map(o=>({optionKey:o.optionKey,label:o.label}))}:{}),
           ...('images' in q&&q.images?{images:[...q.images].sort((a,b)=>a.order-b.order).map(image=>projectPublicSurveyImage(image))}:{}),
-          ...('video' in q&&q.video?{video:q.video}:{})}))}
+          ...('video' in q&&q.video?{video:q.video}:{})}})}
     }
     if(unit.kind==='COGNITIVE'){
       const frozen=parseFrozenSurveyCognitive(unit.compiledDefinition)

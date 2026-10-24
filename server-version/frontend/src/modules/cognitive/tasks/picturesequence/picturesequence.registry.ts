@@ -1,8 +1,9 @@
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
-import { PicturesequenceTask } from './PicturesequenceTask'
+const PicturesequenceTask = deferredCognitiveRunner(() => import('./PicturesequenceTask').then(module => module.PicturesequenceTask))
 
 export const picturesequenceRegistryEntry: CognitiveFrontendRegistryEntry = {
-  testType: 'picturesequence', name: '图片序列学习', engineVersion: '1.0.0', scoringVersion: '1.0.0', RunnerComponent: PicturesequenceTask, completionMode: 'task',
+  testType: 'picturesequence', name: '图片序列学习', engineVersion: '1.0.0', scoringVersion: '1.0.0', RunnerComponent: PicturesequenceTask, prepareRunner: PicturesequenceTask.prepare, completionMode: 'task',
   metricDefinitions: [
     { key: 'adjacentPairScore', label: '相邻顺序得分', displayType: 'percentage' },
     { key: 'positionScore', label: '位置得分', displayType: 'percentage' },
