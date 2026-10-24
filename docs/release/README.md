@@ -1585,3 +1585,21 @@ association are normalized; unknown changes, values, operators, flags, indexes,
 triggers and functions stay strict. Raw before/after schema comparison is retained
 on failure. A bounded real PostgreSQL dump/restore reproduction and negative
 control contracts verified this correction, not a production migration.
+
+The fourth PR351 run retains its failed backend/browser conclusions. Recovery
+accepts only 465 successful backend assertions from the exact official JSON,
+with the six failed Form contracts excluded. The six repaired contracts and two
+new diagnostic-boundary contracts execute once under explicit user approval;
+their local reports are not published. Form compatibility is limited to public
+issue presentation; Zod 4 validation, immutable golden facts and issue ordering
+remain unchanged. The precise media leaf import guard still excludes adapters.
+
+The successful official nonempty upgrade/restore result and exact dump are reused
+only while the migration script, schema and full migration inputs match. The dump
+seeds a new empty local CI database for the seven not-yet-executed cases; it is
+not presented as a second qualification. Official successful lint and thirteen
+unaffected entry/management browser scenarios are retained. Learner scenarios,
+including previously passing assignment detail cases, execute against the new
+CSS build because restoring the actual return button affects those pages. Every
+remaining required browser scenario and build must succeed; failed/skipped jobs
+remain blocking. No additional original logs are published in this repair.

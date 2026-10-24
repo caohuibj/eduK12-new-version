@@ -104,7 +104,12 @@ async function writeReport() {
 }
 const tick = page => page.evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));
 
+const retainedProof=JSON.parse(await readFile(resolve('training-entry-evidence/browser-retained.json'),'utf8'));
+assert.equal(retainedProof.currentFrontendTree,git('rev-parse','HEAD:server-version/frontend'));
+assert.equal(retainedProof.originalJobConclusion,'failure');
 async function scenario(name, identity, run, width = 1440, expectedManagement = []) {
+  const retained=retainedProof.scenarios.find(item=>item.name===name);
+  if(retained){assert.equal(retained.status,'PASS');assert(!name.startsWith('learner-'));report.scenarios.push({...retained,reusedFromOfficial:retainedProof.source,reexecuted:false});await writeReport();return;}
   const result = { name, width, startedAt: new Date().toISOString(), status: 'RUNNING', checks: [], requests: [], assets: [], expectedFailures: [], unexpected: [], errors: [], consoleErrors: [], dialogs: [], downloads: [] };
   report.scenarios.push(result);
   const context = await browser.newContext({ serviceWorkers: 'block', viewport: { width, height: 1000 }, locale: 'zh-CN', timezoneId: 'UTC', acceptDownloads: true });

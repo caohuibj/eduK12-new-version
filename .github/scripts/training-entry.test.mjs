@@ -5,7 +5,7 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {gzipSync} from 'node:zlib';
 import {binding,branch,marker,trainingEntryPlan,trainingEntryOutputs} from './training-entry-scope.mjs';
-import {verifyEvidence,verifyFreshReport,requireApproval,verifyFixedPg,requireMissingRecordApproval,verifyFrontendAuditEvidence,evidenceSourceObject,failedVitestSummary,verifyFixedFrontend,verifyDependencyAuditEvidence} from './training-entry-checks.mjs';
+import {verifyEvidence,verifyFreshReport,requireApproval,verifyFixedPg,requireMissingRecordApproval,verifyFrontendAuditEvidence,evidenceSourceObject,failedVitestSummary,verifyFixedFrontend,verifyDependencyAuditEvidence,reviewedRecoveryManifest} from './training-entry-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 function fixture(){
  const head='a'.repeat(40),source='b'.repeat(40),values={};
@@ -190,3 +190,25 @@ test('backend audit accepts exact successful component subprocess and expires af
 test('backend audit refuses any input drift even with reviewed frontend delta',()=>{const f=backendAuditFixture();assert.throws(()=>verifyDependencyAuditEvidence(f.command,f.stdout,f.manifest+'x','backend',f.now),/Backend dependency inputs changed/);});
 test('backend audit refuses failed original subprocess',()=>{const f=backendAuditFixture();f.command.exitCode=1;assert.throws(()=>verifyDependencyAuditEvidence(f.command,f.stdout,f.manifest,'backend',f.now));});
 test('evidence preserves earlier compiler source through explicit identical-tree public mapping',()=>{const [source,mapping]=Object.entries(binding.evidenceSourceObjects)[0];assert.equal(evidenceSourceObject(source,(cmd,ref)=>{assert.equal(cmd,'rev-parse');assert.equal(ref,mapping.remote+'^{tree}');return mapping.tree}),mapping.remote);});
+
+// The fourth-run repair may only reverse three independently reviewed blobs;
+// no directory, dependency, metadata or additional-file exception is allowed.
+test('fourth recovery accepts only the exact reviewed component blob substitutions',()=>{
+ const file='server-version/backend/src/form.ts',d={[file]:{before:'a'.repeat(40),after:'b'.repeat(40)}};
+ const before=`100644 blob ${d[file].before}\t${file}`,after=`100644 blob ${d[file].after}\t${file}`;
+ assert.doesNotThrow(()=>reviewedRecoveryManifest(before,after,'backend',d));
+ assert.throws(()=>reviewedRecoveryManifest(before,after+'\n100644 blob '+ 'c'.repeat(40)+'\tserver-version/backend/package.json','backend',d));
+ assert.throws(()=>reviewedRecoveryManifest(before,after.replace('100644','100755'),'backend',d));
+ assert.throws(()=>reviewedRecoveryManifest(before,after.replace('b'.repeat(40),'c'.repeat(40)),'backend',d));
+});
+test('fourth recovery cannot use a frontend exception to bypass backend source equality',()=>{
+ const d={'server-version/frontend/x.css':{before:'a'.repeat(40),after:'b'.repeat(40)}};
+ assert.throws(()=>reviewedRecoveryManifest('before','after','backend',d));
+});
+test('fourth recovery keeps eight explicit failed or new contracts and thirteen non-learner scenarios',()=>{
+ const r=binding.officialRecovery;assert.equal(r.failedBackendNames.length,6);assert.equal(new Set(r.failedBackendNames).size,6);
+ assert.equal(r.revalidation8Approved,true);assert.equal(r.approvalMessage,'Sentinel_355ab6c09da88191aaf61e8b9d1648f2');
+ assert.equal(r.browserRetainedNames.length,13);assert(r.browserRetainedNames.every(n=>!n.startsWith('learner-')));
+ const workflow=readFileSync('.github/workflows/ci-training-entry.yml','utf8');assert(workflow.includes('recover-backend'));assert(workflow.includes('recover-browser'));assert(workflow.includes('training-entry-checks.mjs postgres'));
+ assert(workflow.includes('training-entry-checks.mjs backend-compile'));assert(workflow.includes('training-entry-checks.mjs frontend-build'));
+});

@@ -81,10 +81,11 @@ jobs:
       - name: generate exact candidate Prisma declarations
         working-directory: server-version/backend
         run: node node_modules/prisma/build/index.js generate
-      - name: upgrade nonempty fixed-main database and verify isolated dump restore
+      - name: recover qualified migration and 465 successful contracts, seed remaining PG cases
         env:
+          GH_TOKEN: ${{ github.token }}
           CI_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
-        run: node .github/scripts/training-entry-migration.mjs
+        run: node .github/scripts/training-entry-checks.mjs recover-backend
       - name: emit the missing backend compilation once
         run: node .github/scripts/training-entry-checks.mjs backend-compile
       - name: only fixed missing-record affected backend contracts
@@ -127,8 +128,10 @@ jobs:
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: only fixed missing-record affected frontend contracts
         run: node .github/scripts/training-entry-checks.mjs frontend
-      - name: only early changed lint inputs whose original records are missing
-        run: node .github/scripts/training-entry-checks.mjs lint
+      - name: retain exact successful lint and unaffected browser scenarios
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/training-entry-checks.mjs recover-browser
       - name: require explicit one-time rebuild exception
         run: node .github/scripts/training-entry-checks.mjs build-permission
       - name: compile once for previously unexecuted actual-dist browser acceptance

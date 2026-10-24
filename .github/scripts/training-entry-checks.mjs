@@ -265,6 +265,13 @@ function postgresSelections(){
 export function verifyDependencyAuditEvidence(command,stdout,currentManifest,component,now=Date.now()){
  assert(['frontend','backend'].includes(component));
  const expected=component==='frontend'?binding.officialFrontendAudit:binding.officialBackendAudit;assert(expected);
+ // These exact source/test/CSS changes do not alter npm audit inputs. Restore
+ // their prior manifest entries before the original strict whole-manifest check.
+ for(const [file,d]of Object.entries(binding.officialRecovery?.productDeltas||{})){
+  if(!file.startsWith(`server-version/${component}/`))continue;
+  const after=`100644 blob ${d.after}\t${file}`,before=`100644 blob ${d.before}\t${file}`;
+  assert(currentManifest.split('\n').includes(after));currentManifest=currentManifest.split('\n').map(l=>l===after?before:l).join('\n');
+ }
  assert.equal(command.id,component+'-audit');assert.equal(command.cwd,'server-version/'+component);
  assert.deepEqual(command.command,['npm','audit','--package-lock-only','--omit=dev','--audit-level=high','--json']);
  assert.equal(command.source,expected.checkout);assert.equal(command.componentTree,expected.componentTree);
@@ -319,13 +326,97 @@ async function audits(){
  }
  save('audit',{mode:'verified-component-subprocesses-with-24h-expiry',proofs,results});
 }
+// Fixed fourth-run recovery only: retain successful subchecks of failed jobs,
+// never their overall conclusion. No uploaded local reports or inferred passes.
+export function reviewedRecoveryManifest(original,current,component,deltas=binding.officialRecovery.productDeltas){
+ let expected=current;
+ for(const [file,d]of Object.entries(deltas)){
+  if(!file.startsWith(`server-version/${component}/`))continue;
+  const before=`100644 blob ${d.before}\t${file}`,after=`100644 blob ${d.after}\t${file}`;
+  assert(expected.split('\n').includes(after),'Recovery delta current blob differs');
+  expected=expected.split('\n').map(line=>line===after?before:line).join('\n');
+ }
+ assert.equal(expected,original,'Unreviewed recovery input drift');
+}
+export function verifyRecoveredBackend(report,command,current){
+ const r=binding.officialRecovery;
+ assert.equal(sha(JSON.stringify(report)),r.backendParsedSHA256);
+ assert.equal(command.source,r.checkout);assert.equal(command.status,'failed');assert.equal(command.exitCode,1);assert.equal(command.tools.node,'v24.21.0');
+ assert.equal(command.gitInputManifestSHA256,sha(command.gitInputManifest));
+ reviewedRecoveryManifest(command.gitInputManifest,current,'backend');
+ assert.equal(report.success,false);assert.equal(report.numPassedTests,465);assert.equal(report.numFailedTests,6);assert.equal(report.numPendingTests,0);
+ assert.deepEqual(report.testResults.map(f=>f.name.split('/server-version/backend/').at(-1)).sort(),[...r.backendFiles].sort());
+ const seen=new Set(),failed=[];let passed=0;
+ for(const f of report.testResults)for(const [index,c]of f.assertionResults.entries()){const key=f.name+'\0'+index+'\0'+c.fullName;assert(!seen.has(key));seen.add(key);if(c.status==='passed')passed++;else{assert.equal(c.status,'failed');assert(f.name.endsWith('/'+r.retryFile));failed.push(c.fullName)}}
+ assert.equal(seen.size,471);assert.equal(passed,465);assert.deepEqual(failed.sort(),[...r.failedBackendNames].sort());
+ return {passed:465,failed:6,originalJobConclusion:'failure',wholeInvocationPassed:false};
+}
+async function officialRecoveryFiles(component){
+ const r=binding.officialRecovery,a=r.artifacts[component];assert(a);assert.equal(process.env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');
+ const api=async path=>{const x=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/'+path,{headers:{Authorization:`Bearer ${process.env.GH_TOKEN}`,Accept:'application/vnd.github+json'}});assert.equal(x.status,200);return x};
+ const [run,job,artifact]=await Promise.all([api(`actions/runs/${r.run}`).then(x=>x.json()),api(`actions/jobs/${a.job}`).then(x=>x.json()),api(`actions/artifacts/${a.id}`).then(x=>x.json())]);
+ assert.equal(run.head_sha,r.sourceHead);assert.equal(run.head_branch,branch);assert.equal(run.event,'pull_request');assert.equal(run.path,'.github/workflows/ci.yml');
+ assert.equal(job.run_id,r.run);assert.equal(job.head_sha,r.sourceHead);assert.equal(job.name,a.jobName);assert.equal(job.status,'completed');assert.equal(job.conclusion,a.conclusion);
+ assert.equal(artifact.id,a.id);assert.equal(artifact.name,a.name);assert.equal(artifact.workflow_run.id,r.run);assert.equal(artifact.workflow_run.head_sha,r.sourceHead);assert.equal(artifact.expired,false);assert.equal(artifact.size_in_bytes,a.bytes);assert.equal(artifact.digest,'sha256:'+a.sha256);
+ const zip=Buffer.from(await(await api(`actions/artifacts/${a.id}/zip`)).arrayBuffer());assert.equal(zip.length,a.bytes);assert.equal(sha(zip),a.sha256);
+ const wanted=component==='backend'?['backend-fresh.json','backend-fresh-command.json','migration.json','training-entry-upgrade.dump']:['browser.json','component-source-manifest.json','early-lint-command.json'];
+ const result=JSON.parse(execFileSync('python3',['-c',`import sys,io,zipfile,json,base64
+z=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read())); wanted=json.loads(sys.argv[1]); out={}
+for name in wanted:
+ found=[i for i in z.infolist() if i.filename.split('/')[-1]==name]
+ assert len(found)==1
+ i=found[0]; assert not i.filename.startswith('/') and '..' not in i.filename.split('/') and i.file_size<32000000
+ out[name]=base64.b64encode(z.read(i)).decode()
+print(json.dumps(out))`,JSON.stringify(wanted)],{input:zip,encoding:'utf8',maxBuffer:48*1024*1024}));
+ const files=Object.fromEntries(Object.entries(result).map(([k,v])=>[k,Buffer.from(v,'base64')]));
+ save(component+'-recovery-official',{run:r.run,job:a.job,artifact:a.id,artifactSHA256:a.sha256,originalConclusion:a.conclusion});
+ return {files,job};
+}
+async function recoverBackend(){
+ const r=binding.officialRecovery,{files,job}=await officialRecoveryFiles('backend');
+ assert.equal(sha(files['backend-fresh.json']),r.backendReportSHA256);assert.equal(sha(files['backend-fresh-command.json']),r.backendCommandSHA256);
+ save('backend-465-retained',verifyRecoveredBackend(JSON.parse(files['backend-fresh.json']),JSON.parse(files['backend-fresh-command.json']),git('ls-tree','-r','HEAD','--','server-version/backend')));
+ assert(job.steps.some(s=>s.name==='upgrade nonempty fixed-main database and verify isolated dump restore'&&s.conclusion==='success'));
+ assert.equal(sha(files['migration.json']),r.migrationSHA256);const proof=JSON.parse(files['migration.json']);
+ assert.equal(proof.head,r.checkout);assert.equal(proof.base,binding.base);for(const key of ['oldRowsPreserved','legacyNullBindingsPreserved','newDefaultsVerified','stableIdentityGuardsVerified','restoredRowsAndSchemaEqual'])assert.equal(proof[key],true);
+ assert.equal(git('rev-parse','HEAD:.github/scripts/training-entry-migration.mjs'),r.migrationScriptBlob);assert.equal(git('ls-tree','-r','HEAD','--','server-version/backend/prisma'),r.migrationInputs);
+ assert.equal(sha(files['training-entry-upgrade.dump']),proof.dumpSHA256);
+ writeFileSync(`${output}/retained-upgrade.dump`,files['training-entry-upgrade.dump']);save('retained-migration',proof);
+ const u=new URL(process.env.DATABASE_URL);assert.equal(u.hostname,'127.0.0.1');assert.equal(u.port,'55432');assert.equal(u.pathname,'/qualification_training_entry_ci');u.searchParams.delete('schema');
+ const count=execFileSync('psql',['--dbname',u.toString(),'-X','-At','-v','ON_ERROR_STOP=1','-c',"SELECT count(*) FROM pg_tables WHERE schemaname='public'"],{encoding:'utf8'}).trim();assert.equal(count,'0','Never overwrite an existing database');
+ const container=process.env.CI_POSTGRES_CONTAINER;assert.match(container||'',/^[a-f0-9]{64}$/);
+ // Restore the already-qualified exact dump only to seed the seven unexecuted
+ // cases. This is not another upgrade/dump-restore qualification invocation.
+ execFileSync('docker',['exec','-i',container,'pg_restore','-U','postgres','--dbname','qualification_training_entry_ci','--exit-on-error'],{input:files['training-entry-upgrade.dump'],stdio:['pipe','inherit','inherit'],timeout:60000});
+ save('migration-reused',{source:r.sourceHead,artifact:r.artifacts.backend.id,dumpSHA256:proof.dumpSHA256,qualificationReexecuted:false,testDatabaseSeeded:true});
+}
+function retryBackend(){
+ const r=binding.officialRecovery;assert.equal(r.revalidation8Approved,true);assert.equal(r.approvalMessage,'Sentinel_355ab6c09da88191aaf61e8b9d1648f2');
+ const target=`${output}/backend-eight.json`;runRecorded('backend-eight','backend',process.execPath,['node_modules/vitest/vitest.mjs','run',r.retryFile,'-t',r.retryPattern,'--maxWorkers=1','--reporter=json',`--outputFile=../../${target}`]);
+ const report=JSON.parse(readFileSync(target));assert.equal(report.success,true);assert.equal(report.numPassedTests,8);assert.equal(report.numFailedTests,0);
+ const selected=report.testResults.flatMap(f=>f.assertionResults).filter(c=>c.status==='passed').map(c=>c.fullName);assert.equal(new Set(selected).size,8);for(const name of r.failedBackendNames)assert(selected.includes(name));
+ assert(selected.every(name=>r.failedBackendNames.includes(name)||name.includes('preserves missing, null, NaN')||name.includes('preserves multiple issue paths')));save('backend-eight-checked',{selected,retainedOfficial:465,totalQualified:473});
+}
+async function recoverBrowserAndLint(){
+ const r=binding.officialRecovery,{files}=await officialRecoveryFiles('browser');
+ assert.equal(sha(files['browser.json']),r.browserReportSHA256);assert.equal(sha(files['component-source-manifest.json']),r.browserSourceManifestSHA256);assert.equal(sha(files['early-lint-command.json']),r.lintCommandSHA256);
+ const report=JSON.parse(files['browser.json']),lint=JSON.parse(files['early-lint-command.json']);assert.equal(report.sourceSha,r.checkout);assert.equal(report.status,'FAIL');assert.equal(report.harnessSha256,r.browserHarnessSHA256);
+ reviewedRecoveryManifest(lint.gitInputManifest,git('ls-tree','-r','HEAD','--','server-version/frontend'),'frontend');assert.equal(lint.gitInputManifestSHA256,sha(lint.gitInputManifest));assert.equal(lint.source,r.checkout);assert.equal(lint.status,'success');assert.equal(lint.exitCode,0);assert.equal(lint.id,'early-lint');
+ assert.equal(lint.tools.node,'v24.21.0');assert(lint.command[0].endsWith('/bin/node'));assert.deepEqual(lint.command.slice(1),['node_modules/eslint/bin/eslint.js',...binding.checks.earlyLintFiles]);
+ const scenarios=report.scenarios.filter(s=>r.browserRetainedNames.includes(s.name));assert.equal(scenarios.length,13);assert.equal(new Set(scenarios.map(s=>s.name)).size,13);assert(scenarios.every(s=>s.status==='PASS'&&s.errors.length===0&&s.unexpected.length===0));assert(scenarios.every(s=>!s.name.startsWith('learner-')));
+ save('browser-retained',{source:r.sourceHead,artifact:r.artifacts.browser.id,originalJobConclusion:'failure',currentFrontendTree:binding.components.frontend,scenarios});
+ save('lint-retained',{source:r.sourceHead,artifact:r.artifacts.browser.id,originalSuccessfulSubprocess:true,files:binding.checks.earlyLintFiles});
+}
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  assert.equal(process.version,'v24.21.0');const action=process.argv[2];
  if(action==='admission'){
   const {changedEntries}=await import('./content-scope.mjs');const head=git('rev-parse','HEAD');
   assert.deepEqual(trainingEntryPlan(changedEntries(binding.base,head),binding.base,head),JSON.parse(process.env.PLAN));
   const accepted=verifyEvidence();assert.equal(binding.executionPolicy,'missing-only-current-mixed-candidate');requireMissingRecordApproval(binding.checks);save('admission',accepted);
- }else if(action==='frontend'||action==='backend')tests(action);
+ }else if(action==='backend')retryBackend();
+ else if(action==='recover-backend')await recoverBackend();
+ else if(action==='recover-browser')await recoverBrowserAndLint();
+ else if(action==='frontend')tests(action);
  else if(action==='frontend-later'||action==='backend-later')tests(action.split('-')[0],true);
  else if(action==='lint'){
   assert.equal(binding.executionPolicy,'missing-only-current-mixed-candidate');

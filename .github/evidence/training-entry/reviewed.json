@@ -3,22 +3,22 @@
   "kind": "reviewed-local-evidence",
   "ciExecuted": false,
   "originalExecutionSigned": false,
-  "product": "faee762e9b14f38acaeec2a730d7b17db57fb550",
+  "product": "f1a185fca8dca4d967c9e45def6903fbe2fe6b5b",
   "reviewStatus": "INDEPENDENTLY_REVIEWED",
   "authorization": {
     "currentMixedCandidate": "Only missing directly affected contracts/build/browser/migration-restore/audit/CodeQL, with no admitted-case replay. Current PR merge requested by the repository owner; no deployment."
   },
   "blockers": [],
   "controlSHA256": {
-    ".github/scripts/training-entry-scope.mjs": "5c5002029f6ea6a87bb89c6194cc3312dcef9b03bb8e2a7dedf7fb8df5bf94c2",
-    ".github/scripts/training-entry-checks.mjs": "29a9a3b31859e58d3069684594cfee53bf7f95b772fc2e6769e8b1cf6f9a56dc",
-    ".github/scripts/training-entry.test.mjs": "52b5cb8a00f1196c78962e0d671ecad1fd8b0af2b987a35c200fe174a806e3a5",
-    ".github/scripts/training-entry-browser.mjs": "38a9e306a260de7a483d74a4ba57a02778b1f11fae8c0bee12831bc6284016fe",
-    ".github/workflows/ci-training-entry.yml": "62fcfd530280041d00704ee8c9c179547b725b20382653378b86253df6ec459e",
+    ".github/scripts/training-entry-scope.mjs": "ca5d68d35faa3d4402b672ec90165daf2d90ee7443aece1334d7e9c91b9a347c",
+    ".github/scripts/training-entry-checks.mjs": "83fb6778ce4098068a8da8059af9ac1c4c6fdd143bf78168c5965134a2ac3d70",
+    ".github/scripts/training-entry.test.mjs": "b3b45aaff06b6f00d0522303a7011bc68cefa44643f4aea8a5d30cb5ad0a6fde",
+    ".github/scripts/training-entry-browser.mjs": "c73b3c620e48afc6d60f794f4081421df9f00d2e6e6cfbad81fe410568403715",
+    ".github/workflows/ci-training-entry.yml": "d1efdf6ae5c553df6d2ddb7593be8ccd5e3869ed03dc3b518a759ac17fc6eedb",
     ".github/scripts/content-scope.mjs": "c78db2f6b4384701b9547e9df88e3de5453008a459a18d3108817b143e1ea762",
     ".github/scripts/merge-gate.mjs": "71585d6ca8785c8e60686f4770fcaec6f49be86c880a85d4ca3f42c02879d018",
     ".github/workflows/ci.yml": "a889c637f454d8c1cb735c9fe5300c8bb03d78c9866e21cf1844e3718d7a0f50",
-    "docs/release/README.md": "15f679a396c851104da4d5e0e1559f6bfbf7911f11b68f7d2248d4f6607e3493",
+    "docs/release/README.md": "6f3b7b113336c1c4c8263e0e8385faada38116f22f61f57de92410ad0bf495c5",
     ".github/scripts/content-workflows.test.mjs": "e62059676d8e418fb75392c03ca35e7abba8c73d1bdbdb829162b10c125bdefd",
     ".github/scripts/training-entry-migration.mjs": "b5c42b2c5bb3894cb8f0baaf4330cf78fc1f0147fad79bd676d1a35186a9faac"
   },
@@ -1043,7 +1043,7 @@
             "server-version/backend/src/__tests__/assessment-core/fixtures/form-foundation-cases.json": "babdc5c98c7cb15759f1d245e3fd57f4cc447686",
             "server-version/backend/src/__tests__/assessment-core/fixtures/form-foundation-golden.json": "7c1da5a0fae250b4c2eea03cf934344f7d405d32",
             "server-version/backend/src/__tests__/assessment-core/form-foundation-corpus.ts": "bf3753c9543b0194c7edce70ac4b25627ed47e56",
-            "server-version/backend/src/__tests__/assessment-core/form-foundation.contract.test.ts": "b88a9b111a2be8384fb43a6338f2069ae8e9da09",
+            "server-version/backend/src/__tests__/assessment-core/form-foundation.contract.test.ts": "5309c7e1aca89d09428b741c7702e33c17e18438",
             "server-version/backend/src/__tests__/assessment-core/scale-import.contract.test.ts": "0cfbddf63996ffa16aa734962b3d0ed3b913a95f",
             "server-version/backend/src/__tests__/assessment-governance/cognitive-maturity-orthogonality.test.ts": "7790a7038ffe4d1255e69faa770d132169e44455",
             "server-version/backend/src/__tests__/assessment-governance/operational-hold-boundary.test.ts": "f84683beb46f403f2d3e7f8c594b11e10ca760e1",
@@ -2191,7 +2191,7 @@
             "server-version/backend/src/modules/assessment-core/flow/definition.ts": "bdcf4c1d2e2a624086600c6c59020ad550314819",
             "server-version/backend/src/modules/assessment-core/flow/training.ts": "5c840c671da69ea934c00578c41b7ccf967c7f2e",
             "server-version/backend/src/modules/assessment-core/form/answers.ts": "b5a531121e43f055e98ad2b6c8c6d150a42b5c10",
-            "server-version/backend/src/modules/assessment-core/form/definition.ts": "74fc2209982527d3599962234dd6f5f3b7a60e0a",
+            "server-version/backend/src/modules/assessment-core/form/definition.ts": "269514b731b6caa3cea0b2cf17fd18d46d918cc8",
             "server-version/backend/src/modules/assessment-core/form/import-parser.ts": "752e1704cbea5db97ad9b0d67c0a24f3721ae680",
             "server-version/backend/src/modules/assessment-core/form/runtime.ts": "6d6fdfaafc7d17beb1faf0c41d8c1b3736b07af0",
             "server-version/backend/src/modules/assessment-core/materials/allocation.ts": "6a93eb2d11aefd0dc8e6db4c13567ff31cbee95a",
@@ -5204,7 +5204,7 @@
             "server-version/frontend/src/training/featureContent.ts": "375e638742659f0c280dc88e7bb130376131cf12",
             "server-version/frontend/src/training/formal-reference-studio.css": "38d33c0e0fba68c4aff7456f973a803241c1c91f",
             "server-version/frontend/src/training/learnerNavigation.ts": "1fdf8483cdf0b8998a494825727e5f8e3afb535d",
-            "server-version/frontend/src/training/paper-ink.css": "35f21f103cdbdfea55dea6443ce09a092a2c81b0",
+            "server-version/frontend/src/training/paper-ink.css": "9b37c865d67f7b1bf7f5230dee9743eb2f5868f3",
             "server-version/frontend/src/training/pendingToolRequests.test.ts": "3a468ee0a5960836d3be66fa52f7878954790d05",
             "server-version/frontend/src/training/pendingToolRequests.ts": "898bab6da03f34bdc5b94f52eb3c5630bfb4d7a1",
             "server-version/frontend/src/training/resolveCoursePrefill.test.ts": "7cb3d5ace5d9e89b09f42440343a31b6af231c30",
@@ -9910,6 +9910,51 @@
               ],
               "reason": "Only one existing test assertion replaces exact old text query with alert role plus complete current text. No product, import, interface or inferred data type changed; targeted case passed.",
               "reviewEvidence": "Independent source review plus actual single-case exit0; existing getAttempt/start-not-called assertions remain."
+            },
+            "server-version/backend/src/__tests__/assessment-core/form-foundation.contract.test.ts": {
+              "before": "b88a9b111a2be8384fb43a6338f2069ae8e9da09",
+              "after": "5309c7e1aca89d09428b741c7702e33c17e18438",
+              "changedSymbols": [
+                "Form error presentation / exact pure-import contract / Training return-button CSS only"
+              ],
+              "unchangedExecutedPaths": [
+                "successful parsed scientific facts and hashes",
+                "runtime authorization and immutable evidence",
+                "Vitest JavaScript behavior (CSS not rendered)"
+              ],
+              "executedPathUnchanged": true,
+              "reason": "Reviewed recovery changes only Form invalid-input issue presentation, test assertions and a CSS display rule. Successful scientific parse, identity and submitted data paths remain unchanged; CSS is not rendered by retained unit tests.",
+              "reviewEvidence": "Independent review of exact three-file PR351 fourth-run repair; original failures remain failed and eight affected assertions are explicitly revalidated."
+            },
+            "server-version/backend/src/modules/assessment-core/form/definition.ts": {
+              "before": "74fc2209982527d3599962234dd6f5f3b7a60e0a",
+              "after": "269514b731b6caa3cea0b2cf17fd18d46d918cc8",
+              "changedSymbols": [
+                "Form error presentation / exact pure-import contract / Training return-button CSS only"
+              ],
+              "unchangedExecutedPaths": [
+                "successful parsed scientific facts and hashes",
+                "runtime authorization and immutable evidence",
+                "Vitest JavaScript behavior (CSS not rendered)"
+              ],
+              "executedPathUnchanged": true,
+              "reason": "Reviewed recovery changes only Form invalid-input issue presentation, test assertions and a CSS display rule. Successful scientific parse, identity and submitted data paths remain unchanged; CSS is not rendered by retained unit tests.",
+              "reviewEvidence": "Independent review of exact three-file PR351 fourth-run repair; original failures remain failed and eight affected assertions are explicitly revalidated."
+            },
+            "server-version/frontend/src/training/paper-ink.css": {
+              "before": "35f21f103cdbdfea55dea6443ce09a092a2c81b0",
+              "after": "9b37c865d67f7b1bf7f5230dee9743eb2f5868f3",
+              "changedSymbols": [
+                "Form error presentation / exact pure-import contract / Training return-button CSS only"
+              ],
+              "unchangedExecutedPaths": [
+                "successful parsed scientific facts and hashes",
+                "runtime authorization and immutable evidence",
+                "Vitest JavaScript behavior (CSS not rendered)"
+              ],
+              "executedPathUnchanged": true,
+              "reason": "Reviewed recovery changes only Form invalid-input issue presentation, test assertions and a CSS display rule. Successful scientific parse, identity and submitted data paths remain unchanged; CSS is not rendered by retained unit tests.",
+              "reviewEvidence": "Independent review of exact three-file PR351 fourth-run repair; original failures remain failed and eight affected assertions are explicitly revalidated."
             }
           }
         }
@@ -10277,7 +10322,7 @@
             "server-version/backend/src/__tests__/assessment-core/fixtures/form-foundation-cases.json": "babdc5c98c7cb15759f1d245e3fd57f4cc447686",
             "server-version/backend/src/__tests__/assessment-core/fixtures/form-foundation-golden.json": "7c1da5a0fae250b4c2eea03cf934344f7d405d32",
             "server-version/backend/src/__tests__/assessment-core/form-foundation-corpus.ts": "bf3753c9543b0194c7edce70ac4b25627ed47e56",
-            "server-version/backend/src/__tests__/assessment-core/form-foundation.contract.test.ts": "b88a9b111a2be8384fb43a6338f2069ae8e9da09",
+            "server-version/backend/src/__tests__/assessment-core/form-foundation.contract.test.ts": "5309c7e1aca89d09428b741c7702e33c17e18438",
             "server-version/backend/src/__tests__/assessment-core/scale-import.contract.test.ts": "0cfbddf63996ffa16aa734962b3d0ed3b913a95f",
             "server-version/backend/src/__tests__/assessment-governance/cognitive-maturity-orthogonality.test.ts": "7790a7038ffe4d1255e69faa770d132169e44455",
             "server-version/backend/src/__tests__/assessment-governance/operational-hold-boundary.test.ts": "f84683beb46f403f2d3e7f8c594b11e10ca760e1",
@@ -11425,7 +11470,7 @@
             "server-version/backend/src/modules/assessment-core/flow/definition.ts": "bdcf4c1d2e2a624086600c6c59020ad550314819",
             "server-version/backend/src/modules/assessment-core/flow/training.ts": "5c840c671da69ea934c00578c41b7ccf967c7f2e",
             "server-version/backend/src/modules/assessment-core/form/answers.ts": "b5a531121e43f055e98ad2b6c8c6d150a42b5c10",
-            "server-version/backend/src/modules/assessment-core/form/definition.ts": "74fc2209982527d3599962234dd6f5f3b7a60e0a",
+            "server-version/backend/src/modules/assessment-core/form/definition.ts": "269514b731b6caa3cea0b2cf17fd18d46d918cc8",
             "server-version/backend/src/modules/assessment-core/form/import-parser.ts": "752e1704cbea5db97ad9b0d67c0a24f3721ae680",
             "server-version/backend/src/modules/assessment-core/form/runtime.ts": "6d6fdfaafc7d17beb1faf0c41d8c1b3736b07af0",
             "server-version/backend/src/modules/assessment-core/materials/allocation.ts": "6a93eb2d11aefd0dc8e6db4c13567ff31cbee95a",
@@ -14438,7 +14483,7 @@
             "server-version/frontend/src/training/featureContent.ts": "375e638742659f0c280dc88e7bb130376131cf12",
             "server-version/frontend/src/training/formal-reference-studio.css": "38d33c0e0fba68c4aff7456f973a803241c1c91f",
             "server-version/frontend/src/training/learnerNavigation.ts": "1fdf8483cdf0b8998a494825727e5f8e3afb535d",
-            "server-version/frontend/src/training/paper-ink.css": "35f21f103cdbdfea55dea6443ce09a092a2c81b0",
+            "server-version/frontend/src/training/paper-ink.css": "9b37c865d67f7b1bf7f5230dee9743eb2f5868f3",
             "server-version/frontend/src/training/pendingToolRequests.test.ts": "3a468ee0a5960836d3be66fa52f7878954790d05",
             "server-version/frontend/src/training/pendingToolRequests.ts": "898bab6da03f34bdc5b94f52eb3c5630bfb4d7a1",
             "server-version/frontend/src/training/resolveCoursePrefill.test.ts": "7cb3d5ace5d9e89b09f42440343a31b6af231c30",
@@ -14534,7 +14579,7 @@
           "logBytes": 0,
           "observedExitCode": 0,
           "retrospectiveReceipt": true,
-          "exitEvidence": "Fresh actual compiler exit0 after genuine Zod4 upgrade. Frontend completed after all source changes. Backend completed before final strict validator addition (no inferred output type change) and ip-address patch (no declaration change); independent review confirmed this bounded delta. No old Zod3 types reused.",
+          "exitEvidence": "Fresh actual compiler exit0 after genuine Zod4 upgrade. Frontend completed after all source changes. Backend completed before final strict validator addition (no inferred output type change) and ip-address patch (no declaration change); independent review confirmed this bounded delta. No old Zod3 types reused. A fresh node node_modules/typescript/bin/tsc --noEmit completed exit 0 at 2026-10-24T12:02Z after the Form presentation repair; output /tmp/pr351-form-issue-types.log was empty. This is an observed exit, not inferred from empty output.",
           "ciExecuted": false,
           "originalExecutionSigned": false,
           "originalInputs": {
@@ -19144,6 +19189,51 @@
               ],
               "reason": "Only one existing test assertion replaces exact old text query with alert role plus complete current text. No product, import, interface or inferred data type changed; targeted case passed.",
               "reviewEvidence": "Independent source review plus actual single-case exit0; existing getAttempt/start-not-called assertions remain."
+            },
+            "server-version/backend/src/__tests__/assessment-core/form-foundation.contract.test.ts": {
+              "before": "b88a9b111a2be8384fb43a6338f2069ae8e9da09",
+              "after": "5309c7e1aca89d09428b741c7702e33c17e18438",
+              "changedSymbols": [
+                "Form error presentation / exact pure-import contract / Training return-button CSS only"
+              ],
+              "unchangedExecutedPaths": [
+                "successful parsed scientific facts and hashes",
+                "runtime authorization and immutable evidence",
+                "Vitest JavaScript behavior (CSS not rendered)"
+              ],
+              "executedPathUnchanged": true,
+              "reason": "Reviewed recovery changes only Form invalid-input issue presentation, test assertions and a CSS display rule. Successful scientific parse, identity and submitted data paths remain unchanged; CSS is not rendered by retained unit tests.",
+              "reviewEvidence": "Independent review of exact three-file PR351 fourth-run repair; original failures remain failed and eight affected assertions are explicitly revalidated."
+            },
+            "server-version/backend/src/modules/assessment-core/form/definition.ts": {
+              "before": "74fc2209982527d3599962234dd6f5f3b7a60e0a",
+              "after": "269514b731b6caa3cea0b2cf17fd18d46d918cc8",
+              "changedSymbols": [
+                "Form error presentation / exact pure-import contract / Training return-button CSS only"
+              ],
+              "unchangedExecutedPaths": [
+                "successful parsed scientific facts and hashes",
+                "runtime authorization and immutable evidence",
+                "Vitest JavaScript behavior (CSS not rendered)"
+              ],
+              "executedPathUnchanged": true,
+              "reason": "Reviewed recovery changes only Form invalid-input issue presentation, test assertions and a CSS display rule. Successful scientific parse, identity and submitted data paths remain unchanged; CSS is not rendered by retained unit tests.",
+              "reviewEvidence": "Independent review of exact three-file PR351 fourth-run repair; original failures remain failed and eight affected assertions are explicitly revalidated."
+            },
+            "server-version/frontend/src/training/paper-ink.css": {
+              "before": "35f21f103cdbdfea55dea6443ce09a092a2c81b0",
+              "after": "9b37c865d67f7b1bf7f5230dee9743eb2f5868f3",
+              "changedSymbols": [
+                "Form error presentation / exact pure-import contract / Training return-button CSS only"
+              ],
+              "unchangedExecutedPaths": [
+                "successful parsed scientific facts and hashes",
+                "runtime authorization and immutable evidence",
+                "Vitest JavaScript behavior (CSS not rendered)"
+              ],
+              "executedPathUnchanged": true,
+              "reason": "Reviewed recovery changes only Form invalid-input issue presentation, test assertions and a CSS display rule. Successful scientific parse, identity and submitted data paths remain unchanged; CSS is not rendered by retained unit tests.",
+              "reviewEvidence": "Independent review of exact three-file PR351 fourth-run repair; original failures remain failed and eight affected assertions are explicitly revalidated."
             }
           }
         }
@@ -19553,8 +19643,8 @@
   "fixedPg": {
     "schema": 1,
     "kind": "reviewed-fixed-training-anonymous-pg-12",
-    "currentLocalProduct": "48ad737c5d7185090fabea05da95e31d592bd04e",
-    "currentProductTree": "accc9951701ebe33c3899a1a2159b4f376de380e",
+    "currentLocalProduct": "1dbb43af076088b0dc57b3ca1bfc2bf0ee59803b",
+    "currentProductTree": "b8a74af758bd045fa0e7b5f1a7f73f174328dc06",
     "reviewStatus": "INDEPENDENTLY_REVIEWED_FIXED_12_CASE_MAPPING",
     "originalExecutionSigned": false,
     "ciExecuted": false,
@@ -19905,7 +19995,7 @@
       "server-version/backend/src/__tests__/assessment-core/fixtures/form-foundation-cases.json": "babdc5c98c7cb15759f1d245e3fd57f4cc447686",
       "server-version/backend/src/__tests__/assessment-core/fixtures/form-foundation-golden.json": "7c1da5a0fae250b4c2eea03cf934344f7d405d32",
       "server-version/backend/src/__tests__/assessment-core/form-foundation-corpus.ts": "bf3753c9543b0194c7edce70ac4b25627ed47e56",
-      "server-version/backend/src/__tests__/assessment-core/form-foundation.contract.test.ts": "b88a9b111a2be8384fb43a6338f2069ae8e9da09",
+      "server-version/backend/src/__tests__/assessment-core/form-foundation.contract.test.ts": "5309c7e1aca89d09428b741c7702e33c17e18438",
       "server-version/backend/src/__tests__/assessment-core/scale-import.contract.test.ts": "0cfbddf63996ffa16aa734962b3d0ed3b913a95f",
       "server-version/backend/src/__tests__/assessment-governance/cognitive-maturity-orthogonality.test.ts": "7790a7038ffe4d1255e69faa770d132169e44455",
       "server-version/backend/src/__tests__/assessment-governance/operational-hold-boundary.test.ts": "f84683beb46f403f2d3e7f8c594b11e10ca760e1",
@@ -21053,7 +21143,7 @@
       "server-version/backend/src/modules/assessment-core/flow/definition.ts": "bdcf4c1d2e2a624086600c6c59020ad550314819",
       "server-version/backend/src/modules/assessment-core/flow/training.ts": "5c840c671da69ea934c00578c41b7ccf967c7f2e",
       "server-version/backend/src/modules/assessment-core/form/answers.ts": "b5a531121e43f055e98ad2b6c8c6d150a42b5c10",
-      "server-version/backend/src/modules/assessment-core/form/definition.ts": "74fc2209982527d3599962234dd6f5f3b7a60e0a",
+      "server-version/backend/src/modules/assessment-core/form/definition.ts": "269514b731b6caa3cea0b2cf17fd18d46d918cc8",
       "server-version/backend/src/modules/assessment-core/form/import-parser.ts": "752e1704cbea5db97ad9b0d67c0a24f3721ae680",
       "server-version/backend/src/modules/assessment-core/form/runtime.ts": "6d6fdfaafc7d17beb1faf0c41d8c1b3736b07af0",
       "server-version/backend/src/modules/assessment-core/materials/allocation.ts": "6a93eb2d11aefd0dc8e6db4c13567ff31cbee95a",
@@ -22517,7 +22607,7 @@
       "server-version/backend/uploads/videos/.gitkeep": "e69de29bb2d1d6434b8b29ae775ad8c2e48c5391",
       "server-version/backend/vitest.config.ts": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
     },
-    "sourceInputsSHA256": "bd693451923286db0aac4e448ebef6c72baafab6dcc5b485c2e905be5f0c62a9",
+    "sourceInputsSHA256": "a1bd4da808b2af83329bead1f9b57163262ac32d700fcc672cb75cd63511162f",
     "sourceProvenance": "Fresh real PostgreSQL execution on frozen Zod4.6.7 dependency state, matching committed backend source. Old dependency evidence retained separately, not accepted for current runtime.",
     "runtimeProvenance": "Local isolated clone; installed zod4.6.7/body-parser1.20.9/multer2.5.0/ip-address10.7.4 match official lock integrity. Real process exits recorded.",
     "cases": [
@@ -22738,7 +22828,7 @@
       "Other participation-mode cases, migrations/restore, SJT catalog/media and UI missing evidence are not covered.",
       "Final candidate/product/control binding must be applied and independently reviewed; this fragment is not an official CI pass."
     ],
-    "deltaReview": "No source changed between fresh PG checks and product commit. The first stable consumer invocation omitted synthetic cognitive capability flags, causing exactly two setup failures; only these two reran with test-only COGNITIVE_MODULE_ENABLED=true and COGNITIVE_TEST_FIXTURES_ENABLED=true. Original failed invocation remains failed. Subsequent test-only frontend assertion correction does not change any backend/PG source or runtime input."
+    "deltaReview": "No source changed between fresh PG checks and product commit. The first stable consumer invocation omitted synthetic cognitive capability flags, causing exactly two setup failures; only these two reran with test-only COGNITIVE_MODULE_ENABLED=true and COGNITIVE_TEST_FIXTURES_ENABLED=true. Original failed invocation remains failed. Subsequent test-only frontend assertion correction does not change any backend/PG source or runtime input. Fourth-run recovery subsequently changes only invalid Form-definition error presentation and its tests. All twelve recorded PG cases use valid frozen Form definitions, so successful parse data, hashes, stable admission, FINAL and report paths are unchanged. This is an explicit reviewed delta, not a claim that all backend source bytes remain identical."
   },
   "controlValidation": {
     "command": "node --test .github/scripts/training-entry.test.mjs",
@@ -22790,6 +22880,12 @@
         }
       ],
       "realPostgresProbe": "Two fresh synthetic databases reproduced physical ordinal gaps and the four exact CHECK definitions across dump/restore; normalized full schema equality passed; PostgreSQL stopped normally."
+    },
+    "fourthRecovery": {
+      "passed": 3,
+      "exitCode": 0,
+      "command": "node --test --test-name-pattern=fourth recovery .github/scripts/training-entry.test.mjs",
+      "logSHA256": "f05bbcce7e00a2c076a27df55308f4b09f2ff75382820d54348aaca91edfe381"
     }
   },
   "previousDependencyFixedPg": {
@@ -25991,7 +26087,10 @@
     ],
     "review": "Local exact 34-file reproduction:420 passed/1 failed, followed by only that failed case:1 passed/16 unselected. No official CI job is relabelled successful. Product and dependencies unchanged; only the asserted recovery message changed, with both no-API assertions retained.",
     "sourceBefore": "a5ed2ebfa093f89e1345f8db1fba940793bc9639",
-    "sourceAfter": "48ad737c5d7185090fabea05da95e31d592bd04e",
+    "sourceAfter": "1dbb43af076088b0dc57b3ca1bfc2bf0ee59803b",
     "inputClosureGroup": "final-frontend-types"
+  },
+  "recoveryReview": {
+    "fourthRun": "Official 465 passing backend assertions remain distinct from the six failures. Eight affected contracts execute with user approval; CSS invalidates learner rendered scenarios and the build, not retained JS-only unit assertions. Original public reports remain historical."
   }
 }
