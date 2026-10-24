@@ -1505,8 +1505,8 @@ retained even if an independent later check fails, so it need not be rebuilt.
 
 The previously unmerged Training-entry slot is superseded, not added to: current
 base is `44c1e502acaed5524c5b1e233d1bfb1f0c6f7b40`, product snapshot is
-`4a4756d133e5da75345da7f7af75091b0b3f41fb`, source tree is
-`6c9b70e26ae5d23f412e819d453673639fce5f6a`, and the only PR branch is
+`95c793998a9bd2047c1da48747bf406fe1ca353a`, source tree is
+`69e6b659f503e856a478f04918665f16f031c2ea`, and the only PR branch is
 `backup/training-survey-main350-20261024`. Exact source blobs, modes, complete
 changed-path inventory and current control hashes are frozen by the existing
 binding/admission mechanism. The old 67d0/a1369 qualification is not inherited.
@@ -1540,3 +1540,30 @@ for a production runtime-image scan when a later release requires one. A draft,
 missing, skipped, failed or cancelled selected job remains blocking; no fallback
 route may bypass these requirements. Report the actual waiting stage after five
 minutes rather than widening or repeating completed work.
+
+#### PR351 security dependency correction
+
+The first qualification run `40083811762` failed the backend dependency audit;
+that failure remains recorded. The frontend audit subprocess alone succeeded.
+Its official run/job/artifact identity, original failure, ZIP digest, complete
+frontend input manifest, output bytes and successful subprocess exit are verified
+before reuse, with a 24-hour maximum age. A stale result causes a fresh frontend
+audit; missing or corrupt evidence stops admission. Backend audit always executes
+against the new locked dependencies, without reducing HIGH/CRITICAL thresholds.
+
+The repair uses actual Zod 4.6.7, body-parser 1.20.9, multer 2.5.0 and ip-address
+10.7.4. It does not import Zod's vulnerable v3 compatibility entry. Old UUID-like
+acceptance uses the official guid validator; record/error APIs and strict schema
+composition are adapted without changing frozen scientific definitions. Five old
+payload outputs/hashes, the bounded-array rejection and a strict-grant regression
+were checked locally. This is bounded compatibility evidence, not exhaustive
+coverage of every schema or authorization path.
+
+Because parser and dependency inputs changed, old Zod3 backend/PG/type evidence
+is historical only. Twelve affected PostgreSQL cases were executed on a new
+isolated clone under the new dependencies, with original setup failures and their
+two-case retry preserved separately. Both component type checks were refreshed.
+The unchanged 71 frontend assertions retain their exact input review. Four added
+pure contracts cover Bundle schema composition, catalog/localization error
+behavior and shared FORM defaults; the remaining affected CI checks and builds
+still execute. No production-image or deployment qualification is claimed.

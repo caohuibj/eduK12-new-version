@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "base": "44c1e502acaed5524c5b1e233d1bfb1f0c6f7b40",
-  "product": "4a4756d133e5da75345da7f7af75091b0b3f41fb",
-  "localProduct": "1a96d2014a3841c30f92967e971d9d3cea173b47",
-  "productTree": "6c9b70e26ae5d23f412e819d453673639fce5f6a",
+  "product": "95c793998a9bd2047c1da48747bf406fe1ca353a",
+  "localProduct": "848f4c1014060f949ae6263418be25787f6f907c",
+  "productTree": "69e6b659f503e856a478f04918665f16f031c2ea",
   "source": {
     "docs/performance/20261024-training-ordinary-submit-fact-protocol.md": {
       "status": "A",
@@ -25,6 +25,20 @@
       "newMode": "100644",
       "before": null,
       "after": "987e836f06799da48a3b610d323075e3793822c0"
+    },
+    "server-version/backend/package-lock.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "73607721290dd28f1c6f85d5e12d5d517926ede3",
+      "after": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+    },
+    "server-version/backend/package.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "033398f6361b0e4217226ae00f2edc2ed3380ecd",
+      "after": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf"
     },
     "server-version/backend/prisma/migrations/20261024080000_training_participation_codes/migration.sql": {
       "status": "A",
@@ -236,6 +250,13 @@
       "before": null,
       "after": "f4dfb4e2406904adb2d55e4ea6b76bc20e4ffa22"
     },
+    "server-version/backend/src/__tests__/measurement-content/admin-authority.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "57127d9f95fe18d72ee5affdc2abe98862b1a0f9",
+      "after": "84bb25775aa8008b0298cf8e59e1e800d4cd0f7c"
+    },
     "server-version/backend/src/__tests__/measurement-content/survey-participant-feedback.test.ts": {
       "status": "M",
       "oldMode": "100644",
@@ -355,6 +376,20 @@
       "before": "3a7a6b4b70db19468f20b644314fc8a34d64ccc7",
       "after": "47124b2a319543e8c107510cd486b2ccb59a9a68"
     },
+    "server-version/backend/src/__tests__/validation/fixtures/zod3-contracts.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9611ae69ffcfc14be6dddb1699eb33dfc146a5c5"
+    },
+    "server-version/backend/src/__tests__/validation/zod4-contracts.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a30d3d80099e551b02cbb2378dd58be61f558bae"
+    },
     "server-version/backend/src/config/checkinUploadCleanup.ts": {
       "status": "A",
       "oldMode": "000000",
@@ -362,61 +397,117 @@
       "before": null,
       "after": "c746520ba0969bd4402ba25df951275f99721b48"
     },
+    "server-version/backend/src/config/index.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "17965b9d34764157e099938a111c3fca566ad9d5",
+      "after": "a445eaeae7515b42af432733a5a0e0f73b512b13"
+    },
     "server-version/backend/src/controllers/assignmentController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "3da77c9677f87d95cbb5888df9b6c0a7a30731c3",
-      "after": "e64353e2dd6d075d23f4f0f84d748169c8d18fa2"
+      "after": "49674087e8d6b608123a3e811009804a5bf99b9e"
     },
     "server-version/backend/src/controllers/authController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "f037edaccb2fe4c10ad245870dd7e4cde0b454d3",
-      "after": "3942742ac364bf0dcedfaa8fbfc45f972658fec7"
+      "after": "203d5ba91e7c5808758b000e76ed31ac69d35ded"
     },
     "server-version/backend/src/controllers/checkinController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "e8f0bd67be843f301f86d72c2d1e1eada101be2b",
-      "after": "b3c7691c2318c5bb938a8330b730faf18fbaf156"
+      "after": "9c71bf27106358d13e2e22bb2099b8eeef68bbea"
+    },
+    "server-version/backend/src/controllers/checkinScheduleController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d125552c75cd7c76fda05fd3a0bcb614065cbef4",
+      "after": "241ee5820daac2d436694587ec5788530e2d0d35"
+    },
+    "server-version/backend/src/controllers/classroomController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "923af7d8cfa0de8a41c54d306f0d358d061d2b0b",
+      "after": "5268c051ff12a6df333d1504240b21651f6ade81"
     },
     "server-version/backend/src/controllers/courseController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "0b87467992fa3a2712c97b6bab746d9e73e7cb2f",
-      "after": "35126ee218e62dc87180174d44d70fc9314d1ba8"
+      "after": "e37e1faa0d5a6a14cfa978b0a218a32aa908a22b"
+    },
+    "server-version/backend/src/controllers/generalQuestionnaireController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "69a416ffb9f94e034aee597f71224d1e4d50c8cb",
+      "after": "84cec812826539805d1ee356d209e88c9adb49f3"
     },
     "server-version/backend/src/controllers/publicQuestionnaireController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "2f81d100038f22600267a4815de72b78dcca576b",
-      "after": "748f0a33d9a27adb9a3baedfd1390562c306bc18"
+      "after": "19dc85021812c42c17e5560bfead6ae591e46856"
     },
     "server-version/backend/src/controllers/questionnaireController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "fd9a176248e586e727ccbab5cc298d1fb22ca403",
-      "after": "7a205bcceac7f35515fd0140f9e2425cfb4bdb55"
+      "after": "ae96977617ced60417060fbdf67ff018cfa7e80a"
     },
     "server-version/backend/src/controllers/scaleController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "7d41dbabadb6505fe4c4f8ce5a948452f660ec3f",
-      "after": "15e0f082e6d3e61cd48bc4759fca3486b993c0b1"
+      "after": "07db06465b5370204f25d37b811668451f324f2b"
+    },
+    "server-version/backend/src/controllers/situationalController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "330695291f8251701f75a915083e882f38303972",
+      "after": "459b66b22324cb02f5d02eb84005ecbd85d46ae2"
     },
     "server-version/backend/src/controllers/teacherCodeController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "661d91ad9a655ad87b2fb42eb09afff6669caa92",
-      "after": "623c4b84d67d041b06fb2fb5adaa5bccd987b412"
+      "after": "15dbe1828a3c6690cf63d0be90eac9cd04ddbc9d"
+    },
+    "server-version/backend/src/controllers/trainingAnalysisController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "787cfc9ebe128504934f7a09699a8dfe38301ebd",
+      "after": "c5d1ef2f38d1ad72447a676ed895e4c55e25ccb4"
+    },
+    "server-version/backend/src/controllers/userController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "418d934deffba06e33bf565913b5c122182fe270",
+      "after": "8a7564a748d6d568c583fafcb3af54e4a079a1e9"
+    },
+    "server-version/backend/src/controllers/videoController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c92560dfea9d22ebb6843a047080dba7bc88622c",
+      "after": "9a4fbda486d0137c5741dff416308ea972c210a3"
     },
     "server-version/backend/src/index.ts": {
       "status": "M",
@@ -424,6 +515,13 @@
       "newMode": "100644",
       "before": "bd9d674c51532cbb0a0191d60640d182a5ea9042",
       "after": "84c4f9f89dba0a47577fc11e64679a277448bf7b"
+    },
+    "server-version/backend/src/modules/admin-permissions/routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "62b112bfcb9e28a531058a039976afec0d485b8f",
+      "after": "f6a5baab7dc372ddf4b787fc61d5e905abb8d5ef"
     },
     "server-version/backend/src/modules/anonymous-study/admission-principal.ts": {
       "status": "A",
@@ -444,7 +542,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "ba6e2b9b297570c6f6cdb814dd787723eccb7d57",
-      "after": "0a3d1ccc7033bb4f44c8b2b6b3de82dee7a1d9a9"
+      "after": "323a19a2a84a67ba16109f0422b43598f85b8659"
     },
     "server-version/backend/src/modules/anonymous-study/service.ts": {
       "status": "M",
@@ -453,12 +551,110 @@
       "before": "acbf71c5bc80e7778d5713bbad3fa26cd4c7ab4a",
       "after": "a6ae47192c4c171c3e27086a70227646e4424f5f"
     },
+    "server-version/backend/src/modules/assessment-authorization/records-schema.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "091bcfac82eff18aceb71e1d13fc952414637cb9",
+      "after": "b10a5e6b7089f6ccf8c7c82a9568bddcd4794164"
+    },
+    "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "37543675704f7d3803bea480f1775bc4cba6c41a",
+      "after": "171719b67d754dfbbdaaec71bd3ebf323287b090"
+    },
+    "server-version/backend/src/modules/assessment-core/flow/training.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3941449d9d8175501a248c08dc4d57cc7e4b15ab",
+      "after": "5c840c671da69ea934c00578c41b7ccf967c7f2e"
+    },
+    "server-version/backend/src/modules/assessment-media/material.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c23760fa63af5d3d5aac509150bd9fc8e0e3b267",
+      "after": "ebd9bf3abec79efd12d8993e40d3b030d7c38571"
+    },
+    "server-version/backend/src/modules/assessment-run/run.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1ae6368250347bcb83be47b24900ecb7a65b5b11",
+      "after": "a5c0929145a98a61c17ef27889aafce40b08ab63"
+    },
+    "server-version/backend/src/modules/assessment-runtime/admission-snapshot-v2.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "77d9a0d6fdb973af1fb6ec4516dcd97608aa809e",
+      "after": "078f6ccb7ea0fc6fdf6b7fb707f9ae1279cd3220"
+    },
+    "server-version/backend/src/modules/assessment-runtime/admission-snapshot.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a75a25a51ea7ce3da77bf411726b7638cc5394ea",
+      "after": "ab60fdb9de1791e39679462af92223d70fcd9ad0"
+    },
+    "server-version/backend/src/modules/assessment-runtime/compiler.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "97841e4be7163fa28f456bdc60e041617c6dddce",
+      "after": "dc5774b6b6e9dc1a375379056253d552f51e8786"
+    },
     "server-version/backend/src/modules/assessment-runtime/form-admission.service.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "43dd0b80fc8bb004407283743465898db5ce1828",
       "after": "c6636e760ae096de4aec45b33a7dda557a98befe"
+    },
+    "server-version/backend/src/modules/assessment-runtime/form-facts.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6b837321d34c013a4974f0bf627e98c97cb84eda",
+      "after": "fa510f00f3ee792694c18e447eddcf051702db24"
+    },
+    "server-version/backend/src/modules/assessment-runtime/runtime-snapshot-v2.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "24b3f92227e691e436cbd687a76c16ad353837aa",
+      "after": "3e971112a976ddbdbd690b138c07bdb16f75faca"
+    },
+    "server-version/backend/src/modules/assessment-runtime/runtime-snapshot.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7696a4eb15f1990e56d73ad108eb95d987496a69",
+      "after": "fdb7d81dbe121186db796b6bc4aa3826bcddf177"
+    },
+    "server-version/backend/src/modules/assessment-runtime/situational-runtime-snapshot.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "607da3c243a9a5e7a71b3c5cc8372b9cb8174f91",
+      "after": "22b00783e53777d5bf3a8a2c10f71babb0910f01"
+    },
+    "server-version/backend/src/modules/assessment-runtime/slot-set.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9d27d4661f7c2565df00796185da3d85cc4126e3",
+      "after": "67aa56ef3bc7b0fee2c7a9ba5d1a853579b78579"
+    },
+    "server-version/backend/src/modules/assessment-runtime/training-scale-timing.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0eeb13b5a06aaefc8a993c18149b4bff26206885",
+      "after": "04e5d65932dae8ab38447ed2cfd37c290b356f6a"
     },
     "server-version/backend/src/modules/assessment-runtime/unified-form-section-final-submit.service.ts": {
       "status": "M",
@@ -467,12 +663,103 @@
       "before": "ee442cf51e9b0cf84364eaa9fc7f5c5c80cc188c",
       "after": "b5fa9eae152dae648a75d3d30aa3cc894be85cb6"
     },
+    "server-version/backend/src/modules/assessment-runtime/unit-result.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ee7dbc191330ec075b467c60b20e3baf6210432a",
+      "after": "dc78e9a79edb179d1bcd608f08e898c9c9ade28d"
+    },
     "server-version/backend/src/modules/assignment-review/selection.ts": {
       "status": "A",
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "cd26668b8aec06c950f51417c1c1fc7bdae158f7"
+      "after": "e1f1caf0d1ee504541cda80052fde30fa46c4235"
+    },
+    "server-version/backend/src/modules/bundle-product/analysis.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7f3a825587815d0f6b06f93882492c796e69ef47",
+      "after": "584587187b17024fddcf2a1a50e5793a5c909bba"
+    },
+    "server-version/backend/src/modules/bundle-product/routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f5bcaaf123ca42d62dac89853dc2c9c4f3996a8b",
+      "after": "f00d92d4e111948ffa92478d00dbc512426f0944"
+    },
+    "server-version/backend/src/modules/bundle-product/service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d40970beb14d784d100a1f3d5df506c96a5fdd3e",
+      "after": "417534c345595a31c97c1e16576b6265ddce0d5b"
+    },
+    "server-version/backend/src/modules/campus/activity.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b4d416271d98a4c6d3a933edba449c36b9ce3746",
+      "after": "327d99495370c721998a9e886369662226180731"
+    },
+    "server-version/backend/src/modules/campus/activity.run.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ea51a4af67479acc6e3b9bc7a723921da5152efa",
+      "after": "a0a0ad28be8574247ac78741340ac00a87b14d9d"
+    },
+    "server-version/backend/src/modules/campus/admission.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e793f4737b9772df9e5747b63370adb251f1b506",
+      "after": "b8eca4d33095736488cdb7e0b97e2ce1fa9f2359"
+    },
+    "server-version/backend/src/modules/campus/organization.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "164ca23bada857d92795fd6819290eb7eda28115",
+      "after": "7133afc1fb15ed403271e8452c004824fce3269c"
+    },
+    "server-version/backend/src/modules/campus/parent.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "49d7a04c7cf3f8ec2a7bc2021612bd7e7382be37",
+      "after": "fb11d4be91c2bc5845cfbf3cab2f786c63f76626"
+    },
+    "server-version/backend/src/modules/campus/peer.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5fde291c89c9cf21d59a6f9493836b1fea9718ec",
+      "after": "9728d9fafb050cc8554fe52cd22fe0d81bb45358"
+    },
+    "server-version/backend/src/modules/campus/recovery.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e7aed110103567764f50deb8a7e76b24004e583b",
+      "after": "d9ff4fecf85929a5068e642176ee212e82a3a362"
+    },
+    "server-version/backend/src/modules/campus/report.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7ab42470c6b8fe55bea1f8cf5b54b8cce703dee3",
+      "after": "18cee67f75742711e1642b612f65250986165206"
+    },
+    "server-version/backend/src/modules/campus/staff.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9bd9be5a8b77ae9acafc9ca1958213ec69feb310",
+      "after": "c6d9babe0902abfd86636451db50aa14020a941e"
     },
     "server-version/backend/src/modules/cognitive/cognitive-admission.service.ts": {
       "status": "M",
@@ -481,12 +768,40 @@
       "before": "d46ebdf364eba1f4f4fff438ecd342e5dca47f16",
       "after": "bdcafe663a7f0f72a57a9b314ce7bd4493f0e8b0"
     },
+    "server-version/backend/src/modules/cognitive/cognitive.schema.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1cbb7f93ac721781f30c92521b0f75ad9c121796",
+      "after": "41a1c4b129550687f0ec87590a52d6d9b2f49ba6"
+    },
+    "server-version/backend/src/modules/cognitive/onboarding/decision.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8081830312786947b6c565b7b85ff526cc9fb175",
+      "after": "23b517b38c04597450ba99c7fc4302780bdde3af"
+    },
     "server-version/backend/src/modules/cognitive/unified-final-submit.service.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "f0903eafda5a62e7a97ae988d9f0c470d0275ac2",
       "after": "4b944e96a41b24cadf22eabb39ed1be4a00024f1"
+    },
+    "server-version/backend/src/modules/cognitive/v2/result-snapshot.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8c70f06ccce5cf2c7595ab59e33a207db4a33c05",
+      "after": "54aab4bd75b24bb94dcdb5a217ec37463f03442c"
+    },
+    "server-version/backend/src/modules/cognitive/v2/session-snapshot.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "75ba96dc57426cf90d8114faff07b8f744d06502",
+      "after": "92bed80104cf3c4541888d031be13572c580198d"
     },
     "server-version/backend/src/modules/composite/composite-report-read-plan.ts": {
       "status": "A",
@@ -502,6 +817,13 @@
       "before": "5acf61efa78ae19200511dbdb24f8c8a1e98c6c5",
       "after": "1be0af38de9b39f262c97a1d4fea69101c08f2ea"
     },
+    "server-version/backend/src/modules/composite/composite.schema.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "47f1284f6eee03ef5ed809ec56d9539d93a34109",
+      "after": "f166628c2409435d742e454a733691e7d37ad58b"
+    },
     "server-version/backend/src/modules/composite/composite.service.ts": {
       "status": "M",
       "oldMode": "100644",
@@ -514,7 +836,14 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "87b1c7c08b399f9016906a529b2d86559a2cee11",
-      "after": "dd8ee6139293dc8b09a2d14d7ba30a26bc6e6bee"
+      "after": "c87b7302822a51f540982d9343ad197e1daa5d42"
+    },
+    "server-version/backend/src/modules/composite/training-content-binding.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7a45f3b35d64cd6d8d0afcab4e0f3a66a8c52729",
+      "after": "9244d2297efa62ca56841a020fed82c5f0c82df0"
     },
     "server-version/backend/src/modules/composite/training-content-final.ts": {
       "status": "M",
@@ -523,6 +852,27 @@
       "before": "150ec1a2d9aa44c7d593cfc6dc7eda75cd41299c",
       "after": "9664b7016436e9bf2a7f90cdd422e9f4d6bbbf9e"
     },
+    "server-version/backend/src/modules/composite/training-reference-binding.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f03c52d45814062cf376a20a503388bfb008074c",
+      "after": "a4fd9833df9268f826d11588f7df4dab780a5111"
+    },
+    "server-version/backend/src/modules/composite/training-reference-selection.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2711c35a5d78ef3ad15db5538e3a4a37497ec569",
+      "after": "10c23237204ace6647508dfcee2bbb036b9304b4"
+    },
+    "server-version/backend/src/modules/composite/training-report-selection.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "be3cbbf705eeec37870a3073b61ee022932ca35a",
+      "after": "5e2382ef083a5281e32ce213b68908c1b7194e3e"
+    },
     "server-version/backend/src/modules/composite/whole-questionnaire.service.ts": {
       "status": "M",
       "oldMode": "100644",
@@ -530,12 +880,432 @@
       "before": "67969b9ae05375c03e2c316f62ed6cc21059e7ed",
       "after": "95b053332a2bf7aba6abfa146e882ee0336ad649"
     },
+    "server-version/backend/src/modules/education-tools/capabilities.handler.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4628964d7d852163e0876ff2178bc37601fb50df",
+      "after": "bd3d825010640c4c397bbdfc1d8db9cc4ad00717"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.contracts.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5b3b05e67d6b92a0dab6e196bfc828b97750596d",
+      "after": "aa47bc4e3620f699fbaa71ab104897e45a53ba60"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.form-runtime-contracts.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bd20811e4227e2a2ba2a4d743e1eb88565d63241",
+      "after": "412a2d42bcf631b8f26f0c1dfcb1f25e6dbfa4fd"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.run-contract.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "91d77121e8cdbe2161ce9b5d5278148424edd9ef",
+      "after": "0204031a90b93e424b270689ee334e6e5cb79c58"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.runtime-origin.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1f36e4f4e29642c1e9c6aa1ec4c03d9cbe642af7",
+      "after": "fd83509f9860b2223eacbd3fe407fe874614d957"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.sharing.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5009e6ea333337f48b67dab1f211d8580a607411",
+      "after": "cf1f2e49a4be5a1857136a5fb4c69a819bb842a7"
+    },
+    "server-version/backend/src/modules/huiteacher/admission.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "dc74a4da63b355abc0e0fd07274c47dae0edacb1",
+      "after": "a378323348479ba142a4565cabe06af1170e4324"
+    },
+    "server-version/backend/src/modules/huiteacher/consensus.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d155a1befb91e76cf9c8384173c33725051762b5",
+      "after": "e43d5e06b22d4569f456c4feaf2140f81c9780ab"
+    },
+    "server-version/backend/src/modules/huiteacher/evaluation.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "20e6ac8da308ce35289a525011c4bff07359f5f0",
+      "after": "465695672f7bcce484c3b771868577192b692470"
+    },
+    "server-version/backend/src/modules/huiteacher/expertRegistration.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "38882f0f56c788ba5c54fd66dba5b016e627ea36",
+      "after": "688ec136e70df87bb8d165f88577fd6426df02f8"
+    },
+    "server-version/backend/src/modules/huiteacher/fieldFeedback.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "76cb62554b45fa8d1dc588a595bb0ba1361db4ce",
+      "after": "59c0d95e536ad22c10c0e3b23273fd65719c4406"
+    },
+    "server-version/backend/src/modules/huiteacher/fieldForm.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c6baab97377d7e4a294138e4f98d5594523e4cd5",
+      "after": "b258bd549abed149f2a444a2916dc977c78850d0"
+    },
+    "server-version/backend/src/modules/huiteacher/formRuntime.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "604d9b2dd614596a0356d681e9c6d00ce150dbc9",
+      "after": "e52b0467a4eeeb02c8728108ac59caef33bc864a"
+    },
+    "server-version/backend/src/modules/huiteacher/forms.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3eb2c53b765453944ff84d017c7d0d9bc95882d7",
+      "after": "7145f737e284621676ccfe0b0b146b5be23fc990"
+    },
+    "server-version/backend/src/modules/huiteacher/groupReport.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4a3f50eae86c22e1d6b09072b9d547ba0726340b",
+      "after": "1f803ef942c672536c2b5eca2f2e10a2f4d9d126"
+    },
+    "server-version/backend/src/modules/huiteacher/improvement.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a8ca81831cb9f2b70b3dac685b93b38b006735c6",
+      "after": "c6017092d5df947c743a3cc524c9952fa378d4be"
+    },
+    "server-version/backend/src/modules/huiteacher/observer.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8326c10bfd3d1b17f2fa626f55e5c468cde3a8e0",
+      "after": "f450fc68b3c15daf5fa5bc2af4b93ca3785b942b"
+    },
+    "server-version/backend/src/modules/huiteacher/organization.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2d43d4af4488ee6aa9f09d781c92acd65e6b4484",
+      "after": "22d259fe9f6939e916c4ddeb3fd1c79e146ca140"
+    },
+    "server-version/backend/src/modules/huiteacher/personalScale.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e51f175b656b92c539c3e336937d6f6c6006c383",
+      "after": "27253cff6ed6df47656e8b2cf59f554d3c8196ff"
+    },
+    "server-version/backend/src/modules/huiteacher/platform.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "205e567e059e7d6307960eca9640b5e319958297",
+      "after": "5d8001473152516e8e8a8e7acddd7b29af30a9d2"
+    },
+    "server-version/backend/src/modules/huiteacher/privateFormRuntime.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "fa02fd5e57c41888fece80dd9c86139467f9e24d",
+      "after": "1f74ab2e05d1e49f51f5f11b0ddeb83038628bde"
+    },
+    "server-version/backend/src/modules/huiteacher/run.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f26cfe9c8e51993145f6f84238142ce8b395a8f1",
+      "after": "e35b4fc82c2311fc7de1c79e3a106285bb718cf0"
+    },
+    "server-version/backend/src/modules/huiteacher/scaleRuntime.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "32043ce6522270661b2ca1f8bf4e6fee36c4bc14",
+      "after": "f7c1a4ed2d468ba349d21d6fa05d7132e4294517"
+    },
+    "server-version/backend/src/modules/huiteacher/staffInvitation.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3f0d43b49fe0730a8195f67ad01ed0dcbcc07569",
+      "after": "dedf2104b30f6a79fc444811db6fc9dfaad31c37"
+    },
+    "server-version/backend/src/modules/huiteacher/studentEvaluation.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "88f81e4b47208d0db97a1bc0736fb3e9808f3617",
+      "after": "124ac38cc3868a8144a44d108b7848c413da0753"
+    },
+    "server-version/backend/src/modules/measurement-content/admin-authority.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "104bb08e03af139549eed7ea23794efb65bebff9",
+      "after": "e3aff00ad16840cfcb97e680be27030d0ee5f7a2"
+    },
+    "server-version/backend/src/modules/measurement-content/formal-reference.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "06827e6025852438c90c5a77284787056e20d28d",
+      "after": "996078e92a92a7eb0ba6b53f192a4a7e1adecd38"
+    },
+    "server-version/backend/src/modules/measurement-content/reference-candidate.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c58eb806dd19bbd02fee8b7e1f4a8cc175927338",
+      "after": "59b90d2be9e596e5939f0abc0a500e4ba8c4adb8"
+    },
+    "server-version/backend/src/modules/measurement-content/release.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a46b5f9df681d37da30a36c542dea2968cd4d5c5",
+      "after": "39b97614d3b3686be510ea1be2f75fc6d0214763"
+    },
+    "server-version/backend/src/modules/organization/organization.admin.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2acf6ea15d512beb8371734c7e65f1c9043ce3e5",
+      "after": "aad63969b3a255d5f3c9187da83396c522632c0e"
+    },
+    "server-version/backend/src/modules/organization/organization.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "219c0b83fd50fce726fb27e5c2e50018fe445962",
+      "after": "614f2ff24075f6623c65685c6d1f2f3bd756b770"
+    },
+    "server-version/backend/src/modules/parent-portal/accounts.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c9c5a073db934cd53b6c08cf007eed504baae68d",
+      "after": "6b37ccf37c6a62ebee7ca4fdf74f1e763e8d6860"
+    },
+    "server-version/backend/src/modules/parent-portal/tool-policy.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1245739053c61b40b630e5fac664739a278b4a10",
+      "after": "91897093f07bed99dfb402384a51ea13f7c3271b"
+    },
     "server-version/backend/src/modules/participation/code-crypto.ts": {
       "status": "A",
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
       "after": "420da31c100ccdfc27e0a2f994e6c0a11a34a91d"
+    },
+    "server-version/backend/src/modules/questionnaire-product/content-report.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c4c5dd68ab678c19fd06edf5786716efa10c2a53",
+      "after": "ad83ab73ff8e01d382ce3026801daab56ed32a51"
+    },
+    "server-version/backend/src/modules/questionnaire-product/content-report.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a452bd3f6e80c0daaa8048fd68d1ae13edf7a2f3",
+      "after": "1783230539c541cd9249107e1f8fbc83c8517a3a"
+    },
+    "server-version/backend/src/modules/questionnaire-product/reinterpretation-source.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ed8c05bd3dbc1fcc76bdf86433b3b93df7ab0181",
+      "after": "19a373afe9182477a085810f7c1195ed758f8675"
+    },
+    "server-version/backend/src/modules/questionnaire-product/reinterpretation.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6e84130055eb1e2121580e1fdb2ab82d72396a49",
+      "after": "3eda432b5d4adf717be17667e4ab6fb2b45b5184"
+    },
+    "server-version/backend/src/modules/questionnaire-product/reinterpretation.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9a60b98bf2333619322e588c670c1fa3f3363ad3",
+      "after": "65cc8212a7490428d76060a3313e9a9006edb0c3"
+    },
+    "server-version/backend/src/modules/questionnaire-product/service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "846efc0c171748a31634fe79597cb8f71bce9664",
+      "after": "c0dff760878cb568584c6305321662e39eee493c"
+    },
+    "server-version/backend/src/modules/questionnaire-product/workbench.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8c6635d12caa250823b656f1d9db5d7b66599b3a",
+      "after": "514be94c5e7e82c089e62582ebe76395a5a23d9e"
+    },
+    "server-version/backend/src/modules/report-privacy/routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "45ec84cc57e9f52ea6b469b51c3fcb0dd190bf7a",
+      "after": "cfeabd028536d6f349a9315c1caaef31990b2e07"
+    },
+    "server-version/backend/src/modules/report-privacy/schema.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ee04ec410516230c447657feabdbec1e7c81d26d",
+      "after": "d2813c499407856c9803a27939e3b7a946c05c95"
+    },
+    "server-version/backend/src/modules/reporting/cohort-selector.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "752a6dd58c9fb3f2ac131aaa9403c99eea5a7a2f",
+      "after": "6c69776c58dae63273a5bd24d6d0f87d1258c514"
+    },
+    "server-version/backend/src/modules/reporting/content.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d770f1173c3f3997c24651260cd209dadceef148",
+      "after": "d93307d9dd6244155a3e06594b515447d603013f"
+    },
+    "server-version/backend/src/modules/reporting/discovery.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8d5bb4675973d0e6816460683db21e89fa217f9e",
+      "after": "8e25aa613e57d9c4be81af836b4f592296a7ad23"
+    },
+    "server-version/backend/src/modules/reporting/education-scale-report.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "eeb005152a5e090b6c8650a1663836be6eaaa011",
+      "after": "0941dab0505aea63ba71c0ed36c4feab3fdb4630"
+    },
+    "server-version/backend/src/modules/reporting/reporting.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a151f5836498350fa742b0fa759e76cb6fc379b2",
+      "after": "c896c8144f48ea91acf10bb3e7cd9e7f3150b64b"
+    },
+    "server-version/backend/src/modules/reporting/spec.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "865ca2028d95ae196b231d9b6e3d3e217657f483",
+      "after": "d2e2ec218d70d01d275eb1c07c5c0c69e6964aff"
+    },
+    "server-version/backend/src/modules/scale-library-governance/contracts.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "de39e835f354b6f101aff3942df9b6533b1e5f7f",
+      "after": "7e9f38597a7800718f054e1b5a82ea072844b87f"
+    },
+    "server-version/backend/src/modules/scale-library-governance/distribution.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "db94b567ba66aa5fbf6a836e3fb0a25f39830f81",
+      "after": "37c809a9715d13a4b782a5d14b4e4a6debeca2cb"
+    },
+    "server-version/backend/src/modules/scale-library-governance/education-distribution-public-contracts.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5a643ba33c703a50169c80840547df59ae5001d6",
+      "after": "9403cf468666f930b3382e8bb64a1ded6e4208d6"
+    },
+    "server-version/backend/src/modules/scale-library-governance/education-runtime-entry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4403a47e617e4fab9c25dfc7148b4eb023818446",
+      "after": "a17803757b832fa2324f3527a04180a7678313c6"
+    },
+    "server-version/backend/src/modules/scale-library-governance/education-runtime-resources.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "14edde3e810fe0172e68907f72996fe4ad584613",
+      "after": "d85232b4daa534a928d2f6b721988a550fd1d949"
+    },
+    "server-version/backend/src/modules/scale-library-governance/education-use.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "310b1ba3209712bcdff7f62ed64d47c1353ebf64",
+      "after": "d2a8fe73b511e78068ed72a36bc005859783e234"
+    },
+    "server-version/backend/src/modules/scale-library-governance/media.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "45924c8b631fc9677acbd8a13e853f8a249bf2e7",
+      "after": "370f46225c1c2372085fe7b6d419bcece21ec088"
+    },
+    "server-version/backend/src/modules/scale-library-governance/routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "21bc02243dcef06670f30bf54207d057b5d4e1c8",
+      "after": "6b267e78b85d67e153b094f672179c69aa9ff155"
+    },
+    "server-version/backend/src/modules/scale/library/catalog-manifest.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "76e2ad7f51e7d495030900978f715701b912e6d4",
+      "after": "f5140497ff0f2dd08e55444584242baca3dcd2c3"
+    },
+    "server-version/backend/src/modules/scale/library/localization-manifest.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "37c1da116fa77a5d97d1b2640d0d87da164f1da9",
+      "after": "05d92b765fc00d9a5c2a732559585a1f3aeb9c6c"
+    },
+    "server-version/backend/src/modules/scale/onboarding/measurement-conversion.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0fb08771fc457d8bb3f0d85af4cc89725b10028f",
+      "after": "c1933b14abe5eb86eb7605e821a7904d74749dd2"
+    },
+    "server-version/backend/src/modules/scale/onboarding/schema.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "eea578d4fbddeb0254688c196d2a618c8b27d66e",
+      "after": "45121ba51dd694ad003873278dac476cd989d29e"
     },
     "server-version/backend/src/modules/scale/scale-admission.service.ts": {
       "status": "M",
@@ -551,12 +1321,54 @@
       "before": "0666e62b08758c0c406769533a3e3a826dca148e",
       "after": "a50e9acacce157d4591d04ee7936b98d5ec08e92"
     },
+    "server-version/backend/src/modules/scale/scale-restart.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "67032d7f194a9e4908eb4d9c00899d6f59e1f661",
+      "after": "6757125b9f3d1077bca8a61e7c9e51f15bec3126"
+    },
+    "server-version/backend/src/modules/scale/scale-result.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f7114f4040176df66b5101007571b221caea1a37",
+      "after": "9f59bde7913ef0696389713e7f8db7d4b9921b9a"
+    },
+    "server-version/backend/src/modules/scale/scale-start.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6527efab0ae1e93c6e0fb0b68832ede42bd48c79",
+      "after": "4b4184ea0376b262539b351dd4d1e930d92567cc"
+    },
     "server-version/backend/src/modules/scale/unified-final-submit.service.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "dcb094951e44b4876f6fcaabcf457f14dbcf5557",
       "after": "fbf3b4a768f102d9c709c624fcac332a37543be3"
+    },
+    "server-version/backend/src/modules/situational/authoring/online.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1b6be2fe04a9e97c94eecc240cdf64f3b700ff64",
+      "after": "7d6e2e7f9bdc9fa5af216954c2191fc0e3910b14"
+    },
+    "server-version/backend/src/modules/situational/authoring/template.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "55435fe80b4b3f2f88622dc4ad841e2646865530",
+      "after": "45122a5bdc4945fcae9e0fc6281011239381ddb6"
+    },
+    "server-version/backend/src/modules/situational/onboarding/schema.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "07923cc58bd7391e7ab6e19a67062bf4c83a5f0c",
+      "after": "5dc43474c66cf126d1ae1c2eb26d10075ffd73a8"
     },
     "server-version/backend/src/modules/situational/situational-final-submit.service.ts": {
       "status": "M",
@@ -565,12 +1377,54 @@
       "before": "73b06d35071faff9c9ef4f2ccac4a563bb37fc60",
       "after": "3cc20eb8fd9bafd1b6f306b3677472c064e31a34"
     },
+    "server-version/backend/src/modules/situational/static-measurement-admin.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3502d3d1b0ddc0f16cefe79cf13e01c49dcdf265",
+      "after": "218b84429b73f8de63365203f5ce49da514f2dff"
+    },
+    "server-version/backend/src/modules/situational/static-measurement-release.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "80a8d6346b75bc67fe5cbce738feed763293d283",
+      "after": "3dd9eba36c572c7b7348d3b4131b7848a368f287"
+    },
     "server-version/backend/src/modules/survey/admission.service.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "a9547a31d1974927317e21b6b30899863a66ca24",
       "after": "cca365729d39cc2032c90f4d7624c4ce8b367a8f"
+    },
+    "server-version/backend/src/modules/survey/analytics.export.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4d1144ff0e457130206305eb75ba0b79e595d37b",
+      "after": "daf6fa02f9ceecbb5b60ff430bfb646b94c1955e"
+    },
+    "server-version/backend/src/modules/survey/analytics.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b9517bb28860eeb0a5c531623799e144f91b99d8",
+      "after": "bde06c2f90dde8eaa23a41077452c701cbad31ea"
+    },
+    "server-version/backend/src/modules/survey/builder.import.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "79f346bbea3bd337891e4cc143f32725f00de06b",
+      "after": "c9ef131fb8d191aceb7027676ff4f452844e0317"
+    },
+    "server-version/backend/src/modules/survey/builder.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "695eecd488f6399a14219b471f11d3a10123f0ad",
+      "after": "470c3ac03a74432816141f6d76bba7caf62f37d3"
     },
     "server-version/backend/src/modules/survey/catalog-sjt-media.authorization.ts": {
       "status": "A",
@@ -593,12 +1447,47 @@
       "before": "34069e3e756d028b9d18fec772ef869771ff8839",
       "after": "bb962442b64c5a08fcb8744c4619d690eaf7fdd7"
     },
+    "server-version/backend/src/modules/survey/cognitive.definition.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6efb855488e980dbf70bf2c84c2317b361495341",
+      "after": "1199da5276d4ca73bd5cf5b9c9410563b82e4c1c"
+    },
+    "server-version/backend/src/modules/survey/cognitive.public.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "391cb68a870d8157fc1f754822c75e0e5d0b7dc6",
+      "after": "282eafb9fcdda42c37df41d6b0b15e1283ce4c15"
+    },
+    "server-version/backend/src/modules/survey/content-options.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d29762bc4554a58ffcd327d8d402d60a95c0ee1f",
+      "after": "aa82678fce07ef2430efa0ef3ed7e91e4eba94b2"
+    },
+    "server-version/backend/src/modules/survey/content-selection.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c59ff815f9b16bc69db8c96b0098720954bfc651",
+      "after": "8feaabd457ce689b2bc89ccfa0ee967c2f0e2a30"
+    },
     "server-version/backend/src/modules/survey/final.service.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "883b4fcad070a9b2b74f0f4e583294ceaa6c39be",
       "after": "a5b1042c74b9f09dbbf8f9f2a8795b28fcccba66"
+    },
+    "server-version/backend/src/modules/survey/material-library.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ccea1a7fc78da202a5ebe2e93d3d8887910f9e78",
+      "after": "d6992241958ef1d01617639e07e591c24c1eb63f"
     },
     "server-version/backend/src/modules/survey/media.references.ts": {
       "status": "M",
@@ -607,12 +1496,40 @@
       "before": "d6a56ccbd7d53d876f95025512063366e318dab1",
       "after": "74e08c3e6bd5f16302b2a5aba2ce23078b629cb9"
     },
+    "server-version/backend/src/modules/survey/media.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ddfb45b51c5939a3a4f031b76b7e17118a5d9c63",
+      "after": "cfd1faa8e57db11e4fe35f3f7585458ce98c3704"
+    },
     "server-version/backend/src/modules/survey/memorable-code.crypto.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "002ae2ad3a9632700701ce57ccd30df9ca2dece1",
       "after": "83f69b2479bb81e1c2956bf49d3c1db3349800ee"
+    },
+    "server-version/backend/src/modules/survey/participant-feedback.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ba2b1c10cfe9ad4bb303c523630541b4099560f1",
+      "after": "fb910f9a196dab3e59ce264b4c13222dd8dee17e"
+    },
+    "server-version/backend/src/modules/survey/platform.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3e851a14b8ffee7b791c0568b6a24afba4c0f438",
+      "after": "5c110054fc597538f8da7596f279368d728fef62"
+    },
+    "server-version/backend/src/modules/survey/projects.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9e5718ea266e6a40223ed6efcac838c9a75ae7ff",
+      "after": "73bad2b8a06b7236d38dc6dfa3a662f6ee3cb628"
     },
     "server-version/backend/src/modules/survey/public-scale-media.ts": {
       "status": "M",
@@ -626,7 +1543,35 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "091b123e7491143190a35b63f3d31f2a11b0a83b",
-      "after": "3283139d8776b7600cb315c16dd4cefc3155afb6"
+      "after": "b3f02e91be80429d4139c356b7adbcc11eb3ff8a"
+    },
+    "server-version/backend/src/modules/survey/reference-candidates.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "baa06c290afc69c1ef4117e52eba71b9ce7a96b5",
+      "after": "0a22a3e8b37fb6443abe7b99d2f4a6a729c99dc3"
+    },
+    "server-version/backend/src/modules/survey/reinterpretation.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5c68403fd858ca8fe3572bc0826e39e56552f1da",
+      "after": "a3657587d680993938e5802122735c5d2a50cc9f"
+    },
+    "server-version/backend/src/modules/survey/report-drafts.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ed3072e70cb2a7f953b2eacc44fb97a9e7e39244",
+      "after": "38f04ade9213900ee4ebc452d392f057cf7e51b9"
+    },
+    "server-version/backend/src/modules/survey/report-drafts.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d00497d67e736d1c78f5f1d852f62297faf5399f",
+      "after": "5d709e693833ec5bd7d1db51799c34fe6c91d5b1"
     },
     "server-version/backend/src/modules/survey/task.public.ts": {
       "status": "M",
@@ -635,12 +1580,89 @@
       "before": "4624e94c8e522ac0a926599b2a7d7edd8f4b712d",
       "after": "121830f4c0c8a214437c2f9a836cfd3d31be2579"
     },
+    "server-version/backend/src/modules/survey/tool-library.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cf8afc4716a6980f1fe795c73a061260a99bdeae",
+      "after": "be25aaaa8dc52e26e4b7bd1947dacd668d20d2c7"
+    },
+    "server-version/backend/src/modules/survey/tool-library.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b56fca8824c985ba5326652bb3c178f84b5fefd1",
+      "after": "5808dea96e077bd648b3e641f0d18f1b77c8fe52"
+    },
+    "server-version/backend/src/modules/survey/waves.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5b00c3534553ce045bc0a2ee629c0625f5009065",
+      "after": "e550fe964443779cadea2fae92bf325fd3685ed7"
+    },
+    "server-version/backend/src/modules/training-analysis/export.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4660efe914c153fa460e02353b9916db1bbff8fe",
+      "after": "c9e20315a5dd5cd66e916568b389748d81e4fbf2"
+    },
+    "server-version/backend/src/modules/training-analysis/manifest.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4ffc17d792831aff143c579ced162808d4459620",
+      "after": "ebe7430e022dbe8feca6925333c5e34484204f28"
+    },
+    "server-version/backend/src/modules/training-analysis/reference-candidates.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cd169e2943754ed7f06cc56d3cb0210744b70f7c",
+      "after": "5c0f2adff5571c936f0ea572ce7f2d814b991ac4"
+    },
+    "server-version/backend/src/modules/training-analysis/reference-source.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "698ed9e73e010799678bf87e4906791ff50762af",
+      "after": "12ae26c45896144a09d4e10e9cd35fb177417158"
+    },
+    "server-version/backend/src/modules/training-analysis/reference.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2dbcf8a6b7c35baf298514add08b28e10fd8ffee",
+      "after": "4c45ba126f103572114c68864534fa14583e3fde"
+    },
     "server-version/backend/src/routes/assignments.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "afa3f10634b08f8a044f77c1a49c6a6d13c9f144",
       "after": "dda912d3da9880fd82160f301f1c5ae0dcea9bfe"
+    },
+    "server-version/backend/src/routes/sjtAuthoring.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "da83f23d578327c5e079fef00e5d94373e9a0478",
+      "after": "6d553bb59f00ed241fdc40ec63050b2ec2e68dee"
+    },
+    "server-version/backend/src/routes/trainingWorkspace.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7746a9ec7c9736a60c6bea4c41348173489581d4",
+      "after": "1f595e357bccf606fb42874df86ac3f72ba39882"
+    },
+    "server-version/backend/src/services/assessmentExportArtifact.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5b289a0510c8a7cd55a644360f8f8fd9437681d2",
+      "after": "f466ef9c7cb05ae20c8935590446f27979587014"
     },
     "server-version/backend/src/services/checkinTokenService.ts": {
       "status": "M",
@@ -669,6 +1691,13 @@
       "newMode": "100644",
       "before": "d1f0a103d21dec80363bb6672a933662ba440aba",
       "after": "c214de17d3ba939bbc07d6998473082578a271ad"
+    },
+    "server-version/backend/src/services/scale-final-submit.schema.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b682e7c47ae2cedeb0876cffc13d570ae0162557",
+      "after": "7988d283b802c48ecccfd686c9ea7dde375c9501"
     },
     "server-version/backend/src/utils/streamingTaskExport.ts": {
       "status": "A",
@@ -1395,21 +2424,21 @@
   },
   "components": {
     "frontend": "8c324cd0303e21d5687cf14ced22fbe85b7b0be0",
-    "backend": "d95ff138882a669f046c4a5799b49a2b3601ecd5"
+    "backend": "69824f4813204569d3c7554670ad06bee8c83986"
   },
   "protectedInputs": {
     "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
     "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
     "server-version/frontend/tsconfig.json": "1ffef600d959ec9e396d5a260bd3f5b927b2cef8",
-    "server-version/backend/package.json": "033398f6361b0e4217226ae00f2edc2ed3380ecd",
-    "server-version/backend/package-lock.json": "73607721290dd28f1c6f85d5e12d5d517926ede3",
+    "server-version/backend/package.json": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+    "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
     "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
     "server-version/backend/prisma/schema.prisma": "b0556f0f6d93606ec7bee89e69b48749a33c7a4f",
     "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
     "server-version/frontend/tsconfig.cognitive.json": "910e97700f25652bc1d80ada47e176cbd51c2fbe",
     "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22"
   },
-  "evidenceSHA256": "e42813ab656f33e676732ab084e9deafd20cac42504eefb9235b6e8a9b01328a",
+  "evidenceSHA256": "6376fa8b307508a8dfb11467b12e8e4a9e642e9942b0c05518486d3481e2450d",
   "requiredGroups": [
     "learner-frontend",
     "export-hook",
@@ -1449,7 +2478,11 @@
       "src/__tests__/survey/checkpoint-query.contract.test.ts",
       "src/__tests__/survey/public-scale-media.test.ts",
       "src/__tests__/survey/research-request-local-final.contract.test.ts",
-      "src/__tests__/survey/task-options-performance.test.ts"
+      "src/__tests__/survey/task-options-performance.test.ts",
+      "src/__tests__/bundle-onboarding/contract.test.ts",
+      "src/__tests__/scale/scale-library-catalog-evidence.test.ts",
+      "src/__tests__/scale/scale-library-localization-manifest.test.ts",
+      "src/__tests__/assessment-core/form-foundation.contract.test.ts"
     ],
     "frontendTestFiles": [
       "src/api/__tests__/materialGrants.test.ts",
@@ -1590,7 +2623,7 @@
         "expectedPassed": 7
       }
     ],
-    "selectionRationale": "Only directly changed Training/Survey contracts and their shared identity/media/report consumers. No full platform or performance benchmark. Twelve independently reviewed reset/FINAL PostgreSQL cases and the admitted whole-file groups must not repeat.",
+    "selectionRationale": "Only directly changed Training/Survey contracts and their shared identity/media/report consumers. No full platform or performance benchmark. Twelve independently reviewed reset/FINAL PostgreSQL cases and the admitted whole-file groups must not repeat. Security dependency repair uses genuine Zod4.6.7; four additional directly affected Bundle, error-message and FORM foundation contracts run in CI. Twenty local frozen-schema/array-bound contracts and one strict-grant case already passed locally; no claim of exhaustive Zod compatibility. Twelve PostgreSQL cases and cross-schema types were freshly revalidated on new dependencies, not inherited from Zod3.",
     "missingRecordRevalidationApproved": true
   },
   "reviewedGroupFiles": {
@@ -1739,5 +2772,17 @@
       "file": "server-version/backend/src/__tests__/integration/trainingStableAdmission.postgres.integration.test.ts",
       "caseName": "serializes identity revocation behind a Cognitive FINAL parent lock without child-parent inversion"
     }
-  ]
+  ],
+  "officialFrontendAudit": {
+    "run": 40083811762,
+    "job": 120842648294,
+    "artifact": 12555908081,
+    "sourceHead": "dbadf6de8a472bf7cce06b7dadd62d1d1264c54d",
+    "checkout": "516abc8e9f95208d09b259f2e54deb6601ff26ef",
+    "name": "training-entry-admission-516abc8e9f95208d09b259f2e54deb6601ff26ef",
+    "bytes": 163365,
+    "sha256": "72330867c2f65a986c40bf45d17522ad9d3cc2194e4cb1dc960f071c6a406575",
+    "componentTree": "8c324cd0303e21d5687cf14ced22fbe85b7b0be0",
+    "completedAt": "2026-10-24T09:55:44.522Z"
+  }
 }

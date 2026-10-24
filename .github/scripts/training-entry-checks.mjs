@@ -4,7 +4,7 @@ import {createHash} from 'node:crypto';
 import {gunzipSync} from 'node:zlib';
 import {execFileSync,spawnSync} from 'node:child_process';
 import {pathToFileURL} from 'node:url';
-import {binding,trainingEntryPlan} from './training-entry-scope.mjs';
+import {binding,branch,trainingEntryPlan} from './training-entry-scope.mjs';
 const sha=b=>createHash('sha256').update(b).digest('hex');
 const git=(...a)=>execFileSync('git',a,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
 const output='training-entry-evidence';
@@ -219,17 +219,54 @@ function postgresSelections(){
  assert(cases.filter(c=>c.status!=='passed').every(c=>!selection.test(c.fullName)&&['pending','skipped','todo'].includes(c.status)));
  save('postgres-missing-checked',{passed:passed.map(c=>c.fullName),notExecuted:cases.length-passed.length,wholeFileQualification:false});
 }
+// Reuse the existing authenticated artifact + 24h freshness mechanism for the
+// successful frontend subprocess only. The original backend/admission failed.
+export function verifyFrontendAuditEvidence(command,stdout,currentManifest,now=Date.now()){
+ const expected=binding.officialFrontendAudit;
+ assert.equal(command.id,'frontend-audit');assert.equal(command.cwd,'server-version/frontend');
+ assert.deepEqual(command.command,['npm','audit','--package-lock-only','--omit=dev','--audit-level=high','--json']);
+ assert.equal(command.source,expected.checkout);assert.equal(command.componentTree,expected.componentTree);
+ assert.equal(command.status,'success');assert.equal(command.exitCode,0);assert.equal(command.ciExecuted,true);
+ assert.equal(command.tools.node,'v24.21.0');assert.equal(command.signal,null);assert.equal(command.error,null);
+ assert.equal(command.gitInputManifest,currentManifest);assert.equal(command.gitInputManifestSHA256,sha(currentManifest));
+ assert.equal(command.stdoutSHA256,sha(stdout));assert.equal(command.stderrSHA256,sha(''));
+ assert.equal(command.completedAt,expected.completedAt);
+ const report=JSON.parse(stdout);assert.equal(report.auditReportVersion,2);assert(!report.error);
+ assert.equal(report.metadata?.vulnerabilities?.high,0);assert.equal(report.metadata?.vulnerabilities?.critical,0);
+ const age=now-Date.parse(command.completedAt);assert(Number.isFinite(age)&&age>=0);
+ return {fresh:age<86400000,ageMilliseconds:age,completedAt:command.completedAt,source:command.source,sourceHead:expected.sourceHead};
+}
+async function frontendAuditProof(){
+ const r=binding.officialFrontendAudit;assert(r,'Exact successful frontend audit binding missing');
+ assert.equal(process.env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');
+ const api=async path=>{const response=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/'+path,{headers:{Authorization:`Bearer ${process.env.GH_TOKEN}`,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}});assert.equal(response.status,200,'Official frontend audit evidence unavailable');return response;};
+ const [run,job,artifact]=await Promise.all([api(`actions/runs/${r.run}`).then(x=>x.json()),api(`actions/jobs/${r.job}`).then(x=>x.json()),api(`actions/artifacts/${r.artifact}`).then(x=>x.json())]);
+ assert.equal(run.head_sha,r.sourceHead);assert.equal(run.event,'pull_request');assert.equal(run.path,'.github/workflows/ci.yml');
+ assert.equal(job.id,r.job);assert.equal(job.run_id,r.run);assert.equal(job.head_sha,r.sourceHead);assert.equal(job.status,'completed');
+ assert.equal(job.name,'training-entry / admission');assert(job.steps.some(s=>s.name==='run current frontend and backend HIGH CRITICAL dependency audits'&&s.conclusion==='failure'));
+ assert.equal(run.head_branch,branch);assert.equal(artifact.id,r.artifact);
+ assert.equal(job.conclusion,'failure','Original failed admission must stay failed');
+ assert.equal(artifact.workflow_run.id,r.run);assert.equal(artifact.workflow_run.head_sha,r.sourceHead);
+ assert.equal(artifact.expired,false);assert.equal(artifact.size_in_bytes,r.bytes);assert.equal(artifact.digest,'sha256:'+r.sha256);assert.equal(artifact.name,r.name);
+ const zip=Buffer.from(await(await api(`actions/artifacts/${r.artifact}/zip`)).arrayBuffer());assert.equal(zip.length,r.bytes);assert.equal(sha(zip),r.sha256);
+ const files=JSON.parse(execFileSync('python3',['-c',"import sys,io,zipfile,json; z=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read())); assert all(i.file_size<2000000 and not i.filename.startswith('/') and '..' not in i.filename.split('/') for i in z.infolist()); assert sum(i.file_size for i in z.infolist())<8000000; print(json.dumps({i.filename:z.read(i).decode() for i in z.infolist() if not i.is_dir()}))"],{input:zip,encoding:'utf8',maxBuffer:10*1024*1024}));
+ const read=name=>{const found=Object.entries(files).filter(([p])=>p.split('/').at(-1)===name);assert.equal(found.length,1);return found[0][1];};
+ const proof=verifyFrontendAuditEvidence(JSON.parse(read('frontend-audit-command.json')),read('frontend-audit.stdout.log'),git('ls-tree','-r','HEAD','--','server-version/frontend'));
+ save('frontend-audit-original-proof',{...proof,run:r.run,job:r.job,artifact:r.artifact,artifactSHA256:r.sha256,originalAdmissionConclusion:'failure',onlyFrontendSubprocessAccepted:true});
+ return proof;
+}
 async function audits(){
- // Current mixed product has new inputs: never inherit a different product's audit.
- const results=[];
- for(const component of ['frontend','backend']){
+ // Backend inputs changed. Frontend is reusable only while the exact official
+ // subprocess proof remains intact and the existing 24h advisory lifetime holds.
+ const frontend=await frontendAuditProof(),results=[];
+ for(const component of (frontend.fresh?['backend']:['frontend','backend'])){
   const record=runRecorded(component+'-audit',component,'npm',['audit','--package-lock-only','--omit=dev','--audit-level=high','--json']);
   const raw=readFileSync(`${output}/${component}-audit.stdout.log`),report=JSON.parse(raw);
   assert.equal(report.auditReportVersion,2);assert(!report.error);
   assert.equal(report.metadata?.vulnerabilities?.high,0);assert.equal(report.metadata?.vulnerabilities?.critical,0);
   results.push({component,exitCode:record.exitCode,sha256:sha(raw),vulnerabilities:report.metadata.vulnerabilities});
  }
- save('audit',{mode:'fresh-current-mixed-product',results});
+ save('audit',{mode:frontend.fresh?'fresh-backend-exact-frontend-reuse':'fresh-both-after-frontend-proof-expiry',frontend,results});
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  assert.equal(process.version,'v24.21.0');const action=process.argv[2];

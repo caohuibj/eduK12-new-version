@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {gzipSync} from 'node:zlib';
 import {binding,branch,marker,trainingEntryPlan,trainingEntryOutputs} from './training-entry-scope.mjs';
-import {verifyEvidence,verifyFreshReport,requireApproval,verifyFixedPg,requireMissingRecordApproval} from './training-entry-checks.mjs';
+import {verifyEvidence,verifyFreshReport,requireApproval,verifyFixedPg,requireMissingRecordApproval,verifyFrontendAuditEvidence} from './training-entry-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 function fixture(){
  const head='a'.repeat(40),source='b'.repeat(40),values={};
@@ -153,3 +153,16 @@ for(const [name,change]of [
 ])test('fixed PG admission refuses '+name,()=>{const f=fixedPgFixture();change(f);assert.throws(()=>verifyFixedPg(f.e,f.object));});
 
 test('missing-record rerun cannot activate until the bounded user exception is approved',()=>{for(const value of [undefined,false,'true'])assert.throws(()=>requireMissingRecordApproval({missingRecordRevalidationApproved:value}));requireMissingRecordApproval({missingRecordRevalidationApproved:true});});
+
+function frontendAuditFixture(){
+ const digest=v=>createHash('sha256').update(v).digest('hex'),r=binding.officialFrontendAudit;
+ const stdout=JSON.stringify({auditReportVersion:2,metadata:{vulnerabilities:{high:0,critical:0}}}),manifest='100644 blob '+ 'a'.repeat(40)+'\tserver-version/frontend/package-lock.json';
+ const command={id:'frontend-audit',cwd:'server-version/frontend',command:['npm','audit','--package-lock-only','--omit=dev','--audit-level=high','--json'],source:r.checkout,componentTree:r.componentTree,status:'success',exitCode:0,ciExecuted:true,tools:{node:'v24.21.0'},signal:null,error:null,gitInputManifest:manifest,gitInputManifestSHA256:digest(manifest),stdoutSHA256:digest(stdout),stderrSHA256:digest(''),completedAt:r.completedAt};
+ return {command,stdout,manifest,now:Date.parse(r.completedAt)+1000};
+}
+test('frontend audit accepts only its successful exact official subprocess within 24 hours',()=>{const f=frontendAuditFixture();assert.equal(verifyFrontendAuditEvidence(f.command,f.stdout,f.manifest,f.now).fresh,true);assert.equal(verifyFrontendAuditEvidence(f.command,f.stdout,f.manifest,f.now+86400000).fresh,false);});
+for(const [name,change]of [
+ ['failed subprocess',f=>f.command.exitCode=1],['changed lock manifest',f=>f.manifest+='changed'],
+ ['tampered output',f=>f.stdout+=' '],['different source',f=>f.command.source='0'.repeat(40)],
+ ['future completion',f=>f.now-=2000],
+])test('frontend audit rejects '+name,()=>{const f=frontendAuditFixture();change(f);assert.throws(()=>verifyFrontendAuditEvidence(f.command,f.stdout,f.manifest,f.now));});
