@@ -69,6 +69,15 @@ export interface PublicCheckinSessionCapability {
 
 const sessionCapabilityPattern = /^v1\.(\d+)\.([A-Za-z0-9_-]{40,100})$/
 
+// Validation and asset authorization need only current scope and access fields.
+// Public display/media content is read separately by getPublicCheckin.
+const validationCheckinSelect = {
+  id: true,
+  courseId: true,
+  allowAnonymous: true,
+  endTime: true,
+} satisfies Prisma.CheckinSelect
+
 export interface CheckinTokenValidation {
   valid: boolean
   expired: boolean
@@ -158,7 +167,7 @@ export const checkinTokenService = {
     let accessToken = await prisma.checkinAccessToken.findUnique({
       where: { tokenHash },
       include: {
-        checkin: true,
+        checkin: { select: validationCheckinSelect },
       },
     })
 
@@ -167,7 +176,7 @@ export const checkinTokenService = {
       // have not yet been processed by the resumable backfill.
       accessToken = await prisma.checkinAccessToken.findUnique({
         where: { token: tokenString },
-        include: { checkin: true },
+        include: { checkin: { select: validationCheckinSelect } },
       })
       if (accessToken?.tokenHash && accessToken.tokenHash !== tokenHash) accessToken = null
     }
