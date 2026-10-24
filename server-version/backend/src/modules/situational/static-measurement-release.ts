@@ -42,7 +42,7 @@ export async function ensureStaticSjtRegistryMapping(tx:Prisma.TransactionClient
 }
 /** Batch root resource validation: source locks precede row/User/grant locks. */
 export async function validateStaticSjtRegistryMappings(tx:Prisma.TransactionClient,ids:string[],mode:'READ'|'PUBLISH'='READ'){
- if(!ids.length||ids.length>128||new Set(ids).size!==ids.length||ids.some(id=>!z.string().uuid().safeParse(id).success))fail('MAPPING_INVALID')
+ if(!ids.length||ids.length>128||new Set(ids).size!==ids.length||ids.some(id=>!z.string().guid().safeParse(id).success))fail('MAPPING_INVALID')
  const before=await tx.$queryRaw<StaticSjtRegistryMapping[]>(Prisma.sql`SELECT * FROM static_sjt_measurement_mappings WHERE id IN (${Prisma.join(ids)})`)
  if(before.length!==ids.length)fail('MAPPING_MISSING')
  for(const row of [...before].sort((a,b)=>a.instrument_key.localeCompare(b.instrument_key)||a.instrument_version.localeCompare(b.instrument_version)))
@@ -148,7 +148,7 @@ export async function recheckStaticSjtConsumerLicense(tx:Prisma.TransactionClien
 }
 
 function sourceAuthorization(release:StoredRelease){
- const parsed=z.object({authorizationId:z.string().uuid(),authorizationVersion:z.number().int().positive(),recordHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().safeParse(release.provenance.sourceAuthorization)
+ const parsed=z.object({authorizationId:z.string().guid(),authorizationVersion:z.number().int().positive(),recordHash:z.string().regex(/^[a-f0-9]{64}$/)}).strict().safeParse(release.provenance.sourceAuthorization)
  if(!parsed.success)fail('SOURCE_LICENSE_IDENTITY_INVALID')
  return parsed.data
 }

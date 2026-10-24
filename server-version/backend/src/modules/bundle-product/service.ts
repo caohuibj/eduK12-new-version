@@ -38,7 +38,7 @@ export function readInstance(row: { definitionEncrypted: string; definitionHash:
   return { frozen, bindings }
 }
 const createSchema = z.object({
-  requestId: z.string().uuid(), bundleKey: z.string().min(1), bundleVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
+  requestId: z.string().guid(), bundleKey: z.string().min(1), bundleVersion: z.string().regex(/^\d+\.\d+\.\d+$/),
   name: z.string().trim().min(1).max(200), courseId: z.string().min(1).nullable(),
   publicEnabled: z.boolean().default(false), expiresAt: z.string().datetime().nullable().default(null),
   bindings: z.array(z.object({ slotKey: z.string().min(1), resourceId: z.string().min(1).optional() }).strict()).max(100),

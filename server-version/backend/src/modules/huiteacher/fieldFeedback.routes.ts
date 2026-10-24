@@ -11,7 +11,7 @@ import {
 } from './fieldFeedback.service'
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const id=z.string().uuid()
+const id=z.string().guid()
 const release=z.object({
   sourceKind:z.enum(['FORMAL_FEEDBACK','CONSENSUS']),sourceId:id,
 }).strict()

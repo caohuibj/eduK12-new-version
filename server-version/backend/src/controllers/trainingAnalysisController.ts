@@ -37,7 +37,7 @@ export const trainingAnalysisController={
     return success(res,trainingQualityPage(result.quality,req.body?.page??1))
   }catch(err){return respondError(res,err)}},
   quality:async(req:Request,res:Response)=>{try{
-    const parsed=z.object({attemptId:z.string().uuid(),attemptEpoch:z.number().int().positive(),sourceHash:z.string().regex(/^[a-f0-9]{64}$/),
+    const parsed=z.object({attemptId:z.string().guid(),attemptEpoch:z.number().int().positive(),sourceHash:z.string().regex(/^[a-f0-9]{64}$/),
       expectedRevision:z.number().int().nonnegative(),verdict:z.enum(['INCLUDE','EXCLUDE']),reason:z.string().min(2).max(1000)}).parse(req.body)
     return success(res,await setTrainingAnalysisQuality({actor:actor(req),courseId:req.params.id,selector:selectorFor(req),...parsed}))
   }catch(err){return respondError(res,err)}},

@@ -99,7 +99,7 @@ const frozenUnitAdmissionV2Schema = z.object({
     id: z.string().min(1),
     identityHash: z.string().min(1),
     kind: z.enum(['questionnaire', 'composite']),
-    definition: z.record(z.unknown()),
+    definition: z.record(z.string(), z.unknown()),
   }).strict().optional(),
   principal: z.object({
     userId: z.string().min(1).nullable(),
@@ -115,7 +115,7 @@ const frozenUnitAdmissionV2Schema = z.object({
   }).strict().nullable(),
   requiresContext: z.boolean(),
   contextSnapshotHash: z.string().regex(/^[0-9a-f]{64}$/).nullable(),
-  contextValues: z.record(z.unknown()).nullable(),
+  contextValues: z.record(z.string(), z.unknown()).nullable(),
   governance: z.object({
     status: z.enum(['READY', 'HOLD']),
     holdReason: z.string().min(1).nullable(),

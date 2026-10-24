@@ -136,6 +136,7 @@ export function failedChecks(needs, draft) {
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
   if(scope.application_route==='training-entry'){
     try{const p=JSON.parse(scope.training_entry_plan);if(draft||p.postMerge!==false||p.route!=='training-entry'||Object.entries(trainingEntryOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+  return [...new Set(failed)];
   }
   if(scope.application_route==='survey-review'){
     try{const p=JSON.parse(scope.survey_review_plan);if(draft||p.postMerge!==false||p.route!=='survey-review'||Object.entries(surveyReviewOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}

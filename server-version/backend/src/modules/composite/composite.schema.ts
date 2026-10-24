@@ -132,7 +132,7 @@ export const reorderCompositeContentUnitsSchema = z.object({
 
 export const createCompositeTokenSchema = z.object({
   groupIpPolicy: groupIpDraftPolicySchema.optional(),
-  roundId: z.string().uuid().optional(),
+  roundId: z.string().guid().optional(),
   expiresAt: dateTime,
   maxUses: z.number().int().min(0).max(MAX_TOKEN_USES).default(0),
 }).strict().refine(value => !(value.groupIpPolicy && value.roundId), "新轮次设置与已有轮次不能同时提交")
@@ -158,7 +158,7 @@ export const compositeParticipantAnalysisExportQuerySchema = z.object({
 export const compositeReanalysisBodySchema = z.object({}).strict()
 
 export const compositeExportRequestSchema = z.object({
-  courseId: z.string().uuid().optional(),
+  courseId: z.string().guid().optional(),
   detail: z.enum(['summary', 'full']).default('summary'),
   format: z.enum(['csv', 'sav', 'zip']).default('csv'),
   anonymize: z.boolean().default(true),
@@ -196,7 +196,7 @@ export const copyCompositeSchema = z.object({
 }).strict()
 
 export const listCompositeAttemptsQuerySchema = z.object({
-  courseId: z.string().uuid().optional(),
+  courseId: z.string().guid().optional(),
   status: z.enum(['IN_PROGRESS', 'COMPLETED', 'ABANDONED']).optional(),
   q: z.string().max(100).optional(),
   page: z.union([z.string(), z.number()]).optional(),

@@ -246,7 +246,7 @@ export const courseController = {
 
       const result = createCourseSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { title, description, isLibrary } = result.data
@@ -387,7 +387,7 @@ export const courseController = {
 
       const result = updateCourseSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       if (result.data.isLibrary !== undefined) {

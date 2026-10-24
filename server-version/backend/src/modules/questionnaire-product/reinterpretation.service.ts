@@ -14,7 +14,7 @@ import {trainingReportDisclosureAllowed,type TrainingMetricDisclosure} from '../
 import type {AssessmentReferenceEntry,ReferenceContext} from '../assessment-reference/reference'
 import {authorizeTrainingReinterpretation,recheckTrainingReinterpretationAuthority,trainingInterpretationSource,readTrainingInterpretationFacts,readTrainingInterpretationDisclosure,
  interpretationFail,trainingReinterpretationContextSchema,type TrainingReinterpretationContext,type TrainingInterpretationParent} from './reinterpretation-source'
-const uuid=z.string().uuid(),digest=z.string().regex(/^[a-f0-9]{64}$/)
+const uuid=z.string().guid(),digest=z.string().regex(/^[a-f0-9]{64}$/)
 export const trainingReinterpretationBodySchema=z.object({requestId:uuid,itemId:uuid,reason:z.string().trim().min(3).max(1000),
  previousArtifactId:uuid.optional(),reportReleaseId:uuid.optional(),references:z.array(z.object({releaseId:uuid,entryKey:digest,priority:z.number().int().safe()}).strict()).max(100),
 }).strict().refine(value=>Boolean(value.reportReleaseId)||value.references.length>0,'Explicit report or reference selection is required')

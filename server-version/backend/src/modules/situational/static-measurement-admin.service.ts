@@ -7,7 +7,7 @@ import {assertContentAuthority} from '../measurement-content/content-authority.r
 import {sourceIdentitySchema} from './onboarding/schema'
 import {ensureStaticSjtRegistryMapping,validateStaticSjtRegistryMapping,publishStaticSjtMeasurement,staticSjtDeploymentSchema} from './static-measurement-release'
 const options={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:10000}
-const publishInput=z.object({mappingId:z.string().uuid(),grantId:z.string().uuid(),deployment:staticSjtDeploymentSchema}).strict()
+const publishInput=z.object({mappingId:z.string().guid(),grantId:z.string().guid(),deployment:staticSjtDeploymentSchema}).strict()
 /** Explicit registry preparation creates only an immutable source mapping, never
  * a license, capability, business identity or content release. */
 export async function prepareAdminStaticSjtMapping(actorId:string,proof:AdminSessionProof,raw:unknown){

@@ -57,7 +57,7 @@ router.get('/media', handle(async req => {
 }))
 router.get('/media/:id/content',async(req:any,res:any,next:any)=>{
   try{
-    const assetId=z.string().uuid().parse(req.params.id)
+    const assetId=z.string().guid().parse(req.params.id)
     const asset=await prisma.$transaction(db=>authorizedTrainingMaterial(db,req.user.userId,assetId))
     await serveAssessmentMaterial(materialSchema.shape.asset.parse({assetId:asset.id,contentHash:asset.sha256,mimeType:asset.mimeType}),res)
   }catch(cause){if(cause instanceof z.ZodError)return error(res,'素材参数无效',-1,400);if((cause as {statusCode?:number}).statusCode)return error(res,(cause as Error).message,-1,(cause as {statusCode:number}).statusCode);next(cause)}

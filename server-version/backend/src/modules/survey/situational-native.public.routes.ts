@@ -8,7 +8,7 @@ import { ResearchIdentityError } from './identity.service'
 import { SurveySituationalProtocolError } from './situational-native.contract'
 import { startSurveySituational,readSurveySituational,submitSurveySituationalFinal,SurveySituationalError } from './situational-native.service'
 export const surveySituationalRouter=Router({mergeParams:true})
-const id=z.string().uuid(),slot=z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)
+const id=z.string().guid(),slot=z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)
 const proof=z.object({accessCredential:z.string().regex(/^[A-Za-z0-9_-]{43}$/),researchCode:z.string().regex(/^R-[A-Z0-9]{8,32}$/).optional()}).strict()
 const final=proof.extend({submission:situationalLegacyFinalSubmitSchema}).strict()
 const identity=(req:Request,body:z.infer<typeof proof>)=>({publicId:id.parse(req.params.publicId),

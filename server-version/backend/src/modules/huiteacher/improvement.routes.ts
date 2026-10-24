@@ -11,7 +11,7 @@ import {HuiteacherImprovementError,createHuiteacherImprovement,
   attachHuiteacherReassessment} from './improvement.service'
 
 const router=Router()
-const id=z.string().uuid()
+const id=z.string().guid()
 const targetParams=z.object({organizationId:id,targetId:id}).strict()
 const actionParams=targetParams.extend({actionId:id}).strict()
 const cursor=z.object({cursor:id.optional()}).strict()

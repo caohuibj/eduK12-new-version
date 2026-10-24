@@ -28,7 +28,7 @@ surveyAnalyticsRouter.use('/:pid/analytics',(_req,res,next)=>{
   res.setHeader('Cache-Control','no-store')
   next()
 })
-const id=z.string().uuid()
+const id=z.string().guid()
 const matched=z.object({baselineWaveId:id,followupWaveId:id}).strict()
 const qualityPage=z.coerce.number().int().min(1).max(1000).default(1)
 const wrap=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{

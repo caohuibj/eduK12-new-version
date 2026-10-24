@@ -268,7 +268,7 @@ export const scaleEvidenceRecordSchema = z.object({
   sampleSize: z.number().int().positive({ message: 'sampleSize 必须是正整数' }).optional(),
   studyDesign: z.string().min(1, 'studyDesign 不能为空'),
   rating: evidenceRatingSchema,
-  citation: z.string({ required_error: 'evidence 必须提供 citation' }).min(1, 'evidence 必须提供 citation'),
+  citation: z.string({ error: issue => issue.input === undefined ? 'evidence 必须提供 citation' : undefined }).min(1, 'evidence 必须提供 citation'),
   doi: z.string().min(1).optional(),
   url: z.string().url().optional(),
   notes: z.string().min(1).optional(),

@@ -23,7 +23,7 @@ import { relationalEntryToRunPolicy } from './resourceAuthority'
 import { productionRunResourceAuthorityRegistry } from './resourceAuthority'
 import { listAssignedRunTasks, listAssessmentRunProducts, readAssessmentRunProduct } from './productRead'
 
-const selectorSchema = z.record(z.unknown()).default({})
+const selectorSchema = z.record(z.string(), z.unknown()).default({})
 const policySchema = z.object({
   targetPolicy: z.object({
     mode: z.enum(['SELF', 'HOMEROOM_TEACHER', 'ALL_CLASS_TEACHERS', 'SELECTED_CLASS_TEACHERS', 'COURSE_TEACHER']),
@@ -117,7 +117,7 @@ export const assessmentRunController = {
   async list(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     const parsed = listRunSchema.safeParse(req.query)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message, -1, 400)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message, -1, 400)
     try {
       const organizationWide = req.assessmentDeliveryAccess?.deliveryScopes.includes('ORGANIZATION') === true
       return success(res, await listAssessmentRunProducts({
@@ -150,7 +150,7 @@ export const assessmentRunController = {
   async create(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     const parsed = createRunSchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message, -1, 400)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message, -1, 400)
     try {
       return success(res, await createAssessmentRunDraft({
         organizationId: req.params.organizationId,
@@ -177,7 +177,7 @@ export const assessmentRunController = {
       ||req.body?.resource&&Object.prototype.hasOwnProperty.call(req.body.resource,'privateOrigin'))
       return error(res,'Private versions require the private fixed-version draft request',-1,400)
     const parsed = addTrackSchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message, -1, 400)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message, -1, 400)
     try {
       await assertCurrentRunManagerBoundary({
         organizationId: req.params.organizationId,
@@ -199,7 +199,7 @@ export const assessmentRunController = {
   async preview(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     const parsed = publishSchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message, -1, 400)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message, -1, 400)
     try {
       await assertCurrentRunManagerBoundary({
         organizationId: req.params.organizationId,
@@ -213,7 +213,7 @@ export const assessmentRunController = {
   async publish(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     const parsed = publishSchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message, -1, 400)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message, -1, 400)
     try {
       await assertCurrentRunPublisherBoundary({
         organizationId: req.params.organizationId,

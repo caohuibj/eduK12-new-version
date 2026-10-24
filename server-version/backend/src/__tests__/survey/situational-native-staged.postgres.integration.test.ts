@@ -1,3 +1,9 @@
+import { canonicalHash } from '../../modules/assessment-runtime/canonical'
+import { decryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
+import { parseFrozenSituationalRuntimeSnapshot } from '../../modules/assessment-runtime/situational-runtime-snapshot'
+import { parseSituationalRawSubmissionPayload } from '../../modules/situational/situational-raw-submission'
+import { SITUATIONAL_ATTEMPT_SELECT } from '../../modules/situational/situational-runtime.service'
+import { prepareSituationalFinalSubmission,deriveSituationalFinalFacts } from '../../modules/situational/situational-final-submit.service'
 import { situationalLegacyFinalSubmitSchema } from '../../modules/situational/situational-final-submit.schema'
 import { randomUUID,randomBytes } from 'node:crypto'
 import { PrismaClient } from '@prisma/client'
@@ -23,6 +29,7 @@ const suite=url?describe:describe.skip
 suite('Survey native staged actual author release and shared scientific lifecycle',()=>{
   let db:PrismaClient,admin:string,author:string,owner:string,projectId:string,publicId:string,grantId:string,draftId:string,ordinal=0
   let compiled:ReturnType<typeof compileSjtNativeStagedFixture>
+  const runStarted=new Date()
   const oldFlags={workspace:process.env.SURVEY_WORKSPACE_ENABLED,publication:process.env.SURVEY_PUBLICATION_ENABLED}
   beforeAll(async()=>{
     requireIsolatedReleaseDatabase(url!)
@@ -98,6 +105,33 @@ suite('Survey native staged actual author release and shared scientific lifecycl
     const raw=source.raw.find(row=>row.itemKey==='__native_raw')!
     expect(JSON.parse(raw.value as string).researchCapture.events.length).toBeGreaterThan(0)
     expect((await readSurveySituational(f.proof,'staged',child.attempt.id)).receipt).toEqual(results[0].receipt)
+  })
+  it.skipIf(process.env.SURVEY_NATIVE_SJT_REQUIRE_PREUPGRADE!=='true')('preserves previously accepted frozen payload hashes and scientific results after dependency upgrade',async()=>{
+    // Explicit evidence cutoff, not merely before this test: later Zod4 runs
+    // must not accidentally qualify their own new facts as pre-upgrade data.
+    const cutoff=new Date(process.env.SURVEY_NATIVE_SJT_PREUPGRADE_BEFORE??'')
+    expect(Number.isFinite(cutoff.getTime())&&cutoff<runStarted).toBe(true)
+    const rows=await db.situationalAttempt.findMany({where:{surveyAttemptId:{not:null},status:'COMPLETED',
+      instrumentKey:{startsWith:'synthetic-native-'},completedAt:{lt:cutoff}},
+      select:{...SITUATIONAL_ATTEMPT_SELECT,rawSubmission:true},take:20})
+    expect(rows.length).toBeGreaterThan(0)
+    console.info('Synthetic pre-upgrade native corpus', {cutoff:cutoff.toISOString(),count:rows.length,
+      identityDigest:canonicalHash(rows.map(row=>({id:row.id,completedAt:row.completedAt?.toISOString(),payloadHash:row.submissionPayloadHash})).sort((a,b)=>a.id.localeCompare(b.id)))})
+    for(const row of rows){
+      const originalSnapshot=decryptUnifiedRuntimePayload(row.runtimeSnapshotEncrypted!)
+      const snapshot=parseFrozenSituationalRuntimeSnapshot(originalSnapshot)
+      expect(canonicalHash(snapshot)).toBe(canonicalHash(originalSnapshot))
+      const raw=parseSituationalRawSubmissionPayload(decryptUnifiedRuntimePayload(row.rawSubmission!.payloadEncrypted))
+      const prepared=prepareSituationalFinalSubmission({attemptId:row.id,submissionId:row.submissionId!,
+        attemptEpoch:row.attemptEpoch,definitionHash:row.definitionHash!,compiledRuntimeHash:row.compiledRuntimeHash!,
+        instrumentVersion:row.instrumentVersion,scoringVersion:row.scoringVersion!,
+        responses:raw.responses,...(raw.researchCapture?{researchCapture:raw.researchCapture}:{})},{row,snapshot})
+      expect(prepared.payloadHash).toBe(row.submissionPayloadHash)
+      const derived=deriveSituationalFinalFacts(prepared,'SITUATIONAL_ATTEMPT')
+      expect(derived.result).toEqual(decryptUnifiedRuntimePayload(row.resultEncrypted!))
+      const oldCanonical=decryptUnifiedRuntimePayload(row.canonicalResultEncrypted!) as {core:unknown}
+      expect(derived.canonicalResult.core).toEqual(oldCanonical.core)
+    }
   })
   it('rejects missing stage evidence and foreign proof without facts; a forged parent receipt cannot complete',async()=>{
     const f=await fixture(),child=await startSurveySituational(f.proof,'staged'),payload=input(child.attempt.id)

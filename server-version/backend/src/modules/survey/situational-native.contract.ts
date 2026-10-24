@@ -26,7 +26,7 @@ const hash = z.string().regex(/^[a-f0-9]{64}$/)
 export const surveySituationalReceiptReferenceSchema = z.object({
   protocol: z.literal(SURVEY_NATIVE_SJT_PROTOCOL),
   attemptId: key,
-  submissionId: z.string().uuid(),
+  submissionId: z.string().guid(),
   payloadHash: hash,
 }).strict()
 export type SurveySituationalReceiptReference = z.infer<typeof surveySituationalReceiptReferenceSchema>

@@ -97,7 +97,7 @@ export const organizationAdminController = {
       z.object({ operation: z.literal('END_RELATIONSHIP'), relationshipId: z.string().min(1) }),
     ])
     const parsed = schema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message, -1, 400)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message, -1, 400)
     const input = { ...parsed.data, organizationId: req.params.organizationId }
     try {
       switch (input.operation) {
@@ -141,7 +141,7 @@ export const organizationAdminController = {
 
   async createUnit(req: Request, res: Response) {
     const parsed = unitSchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message)
     try {
       return success(res, await createOrganizationUnit({
         organizationId: req.params.organizationId,
@@ -240,7 +240,7 @@ export const organizationAdminController = {
 
   async assignStudent(req: Request, res: Response) {
     const parsed = studentAssignmentSchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message)
     try {
       return success(res, await assignStudentToClass({
         organizationId: req.params.organizationId,
@@ -290,7 +290,7 @@ export const organizationAdminController = {
 
   async assignStaff(req: Request, res: Response) {
     const parsed = staffAssignmentSchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message)
     try {
       return success(res, await assignStaffToClass({
         organizationId: req.params.organizationId,
@@ -347,7 +347,7 @@ export const organizationAdminController = {
 
   async grantAssessmentDelivery(req: Request, res: Response) {
     const parsed = deliveryGrantSchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message)
     if (!req.user) return error(res, '未登录', -1, 401)
     try {
       return success(res, await grantTeachingAssessmentDelivery({

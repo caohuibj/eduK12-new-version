@@ -4,7 +4,7 @@ import {success,error} from '../../utils/response'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {ContentReleaseError} from '../measurement-content/release'
 import {createTrainingReinterpretation,readTrainingReinterpretation,exportTrainingReinterpretation,trainingReinterpretationBodySchema} from './reinterpretation.service'
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 /** Mounted behind authenticate + requireTeacher. Current business identity and
  * exact course/FINAL capability are checked again inside every transaction. */
 export const trainingReinterpretationsRouter=Router({mergeParams:true})

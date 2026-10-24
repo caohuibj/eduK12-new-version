@@ -13,7 +13,7 @@ import {
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 const bearer=z.string().trim().regex(/^[A-Za-z0-9_-]{43}$/)
 const register=z.object({
   inviteCode:bearer,username:z.string().trim().min(4).max(32).regex(/^[a-zA-Z0-9_.-]+$/),

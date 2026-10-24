@@ -13,15 +13,15 @@ import { SurveyFinalValidationError } from '../survey/final.compute'
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const id=z.string().uuid()
+const id=z.string().guid()
 const title=z.string().trim().min(1).max(200)
 const create=z.object({title}).strict()
 const update=z.object({
   expectedRevision:z.number().int().min(1),title,
-  definition:z.record(z.unknown()),
+  definition:z.record(z.string(), z.unknown()),
 }).strict()
 const publish=z.object({expectedRevision:z.number().int().min(1)}).strict()
-const preview=z.object({answers:z.record(z.unknown())}).strict()
+const preview=z.object({answers:z.record(z.string(), z.unknown())}).strict()
 const wrap=(fn:(req:any,res:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
   try{return await fn(req,res)}
   catch(e){

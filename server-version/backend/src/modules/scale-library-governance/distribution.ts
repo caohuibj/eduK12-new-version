@@ -114,7 +114,7 @@ export async function recipients(actorId:string,entryId:string,raw:unknown){
   return prisma.$transaction(tx=>educationRecipientsInTransaction(tx,actorId,entryId,raw),{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
  }
  const input=z.object({product:z.enum(['TRAINING','SURVEY']),page:z.coerce.number().int().min(1).max(100).default(1),
-  keyword:z.string().trim().max(100).default(''),grantId:z.string().uuid().optional()}).parse(raw)
+  keyword:z.string().trim().max(100).default(''),grantId:z.string().guid().optional()}).parse(raw)
  return prisma.$transaction(async tx=>{
   const [entry]=await tx.$queryRaw<Array<{release_id:string}>>(Prisma.sql`SELECT release_id FROM scale_library_entries WHERE id=${entryId}`)
   if(!entry)fail('条目不存在',404)

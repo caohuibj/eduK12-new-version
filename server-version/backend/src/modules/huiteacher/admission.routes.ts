@@ -14,7 +14,7 @@ import {
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 const studentNo=z.string().trim().min(2).max(40).regex(/^[a-zA-Z0-9_-]+$/)
 const token=z.string().trim().regex(/^[a-zA-Z0-9_-]{43}$/)
 const register=z.object({

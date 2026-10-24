@@ -20,14 +20,14 @@ import { situationalReleaseKey, type ResolvedSituationalRelease } from '../situa
 
 const text=z.string().min(1).max(240),digest=z.string().regex(/^[a-f0-9]{64}$/)
 const sourceSchema=z.object({kind:z.enum(['SCALE','COGNITIVE_CONFIG','SJT_AUTHOR_RELEASE','STATIC_SJT_REGISTRY']),id:text,ownerId:text.optional(),
-  libraryEntryId:z.string().uuid().optional(),privateVersionId:z.string().uuid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
+  libraryEntryId:z.string().guid().optional(),privateVersionId:z.string().guid().optional(),assignmentId:text.optional(),instrumentKey:text.optional(),instrumentVersion:text.optional()}).strict().superRefine((source,ctx)=>{
  if(source.privateVersionId&&(source.kind!=='SCALE'||source.libraryEntryId!==undefined))ctx.addIssue({code:'custom',message:'Private Scale identity cannot alias library or other families'})
  if(source.libraryEntryId&&source.kind!=='SCALE')ctx.addIssue({code:'custom',message:'Library identity is only valid for Scale'})
- if(source.kind==='STATIC_SJT_REGISTRY'?(!z.string().uuid().safeParse(source.id).success||source.ownerId!==undefined||!source.instrumentKey||!source.instrumentVersion||source.assignmentId!==undefined):!source.ownerId)
+ if(source.kind==='STATIC_SJT_REGISTRY'?(!z.string().guid().safeParse(source.id).success||source.ownerId!==undefined||!source.instrumentKey||!source.instrumentVersion||source.assignmentId!==undefined):!source.ownerId)
   ctx.addIssue({code:'custom',message:'Exact source identity required'})
 })
 const unitSchema=z.object({itemId:text,family:z.enum(['SCALE','COGNITIVE','SJT']),source:sourceSchema,
-  measurement:z.object({releaseId:z.string().uuid(),contentHash:digest,measurementHash:digest}).strict(),referencePolicy:trainingReferencePolicySchema.optional(),report:z.object({releaseId:z.string().uuid(),contentHash:digest}).strict().optional()}).strict()
+  measurement:z.object({releaseId:z.string().guid(),contentHash:digest,measurementHash:digest}).strict(),referencePolicy:trainingReferencePolicySchema.optional(),report:z.object({releaseId:z.string().guid(),contentHash:digest}).strict().optional()}).strict()
 export const trainingContentSnapshotSchema=z.object({schemaVersion:z.literal(1),compositeId:text,units:z.array(unitSchema).max(1000)}).strict()
 export type TrainingContentSnapshot=z.infer<typeof trainingContentSnapshotSchema>
 type Unit=TrainingContentSnapshot['units'][number]

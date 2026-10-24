@@ -31,7 +31,7 @@ const goldenCaseSchema = z.object({
   }).strict()),
   expected: z.object({
     quality: z.enum(['interpretable', 'limited', 'invalid']),
-    scores: z.record(z.number().nullable()),
+    scores: z.record(z.string(), z.number().nullable()),
     totalScoreKeys: z.array(z.string().min(1)),
   }).strict(),
 }).strict()
@@ -46,7 +46,7 @@ const executableSchema = z.object({
   releaseStatus: z.enum(['DRAFT', 'PUBLISHED', 'RETIRED']),
   contentLocale: z.string().min(2).max(32).regex(LOCALE_RE),
   definition: scaleDefinitionSchema,
-  references: z.array(z.record(z.unknown())),
+  references: z.array(z.record(z.string(), z.unknown())),
   goldenCases: z.array(goldenCaseSchema),
   scorerPlugins: z.array(scorerPluginSchema).optional(),
 }).strict()
@@ -58,7 +58,7 @@ export const scaleInstrumentSourceV1Schema = z.object({
     instrumentVersion: z.string().regex(VERSION_RE),
   }).strict(),
   catalog: catalogBodySchema,
-  localization: z.record(z.unknown()).optional(),
+  localization: z.record(z.string(), z.unknown()).optional(),
   applicability: instrumentApplicabilityV1Schema.optional(),
   disclosure: audienceDisclosurePolicyV1Schema.optional(),
   usageRequirements: instrumentUsageRequirementsV1Schema.optional(),

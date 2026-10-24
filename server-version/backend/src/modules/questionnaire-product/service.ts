@@ -52,7 +52,7 @@ const metadata = {
   instruction: z.string().max(10000).nullable().optional(), courseIds: z.array(z.string().min(1)).max(100).default([]),
   publicEnabled: z.boolean().default(false), opensAt: z.string().datetime().nullable().optional(), expiresAt: z.string().datetime().nullable().optional(),
 }
-export const createSchema = z.object({ ...metadata, requestId: z.string().uuid(), questionnaireType: z.enum(['COURSE', 'GENERAL']) }).strict()
+export const createSchema = z.object({ ...metadata, requestId: z.string().guid(), questionnaireType: z.enum(['COURSE', 'GENERAL']) }).strict()
 export const editSchema = z.object({ ...metadata, revision: z.number().int().nonnegative() }).strict()
 export const trainingVariantsSchema = z.object({
   revision: z.number().int().nonnegative(), config: weightedVariantConfigSchema.nullable(),
@@ -193,7 +193,7 @@ const formSourceSchema = z.object({ id: z.string().min(1), kind: z.enum(['COMPOS
 export async function createFormTemplate(actor: Actor, raw: unknown) {
   author(actor)
   if (process.env.QUESTIONNAIRE_PRODUCTS_ENABLED === 'false') throw compositeConflict('暂未开放表单编制')
-  const input = z.object({ name: metadata.name, description: metadata.description, instruction: metadata.instruction, requestId: z.string().uuid(), source: formSourceSchema.optional() }).strict().parse(raw)
+  const input = z.object({ name: metadata.name, description: metadata.description, instruction: metadata.instruction, requestId: z.string().guid(), source: formSourceSchema.optional() }).strict().parse(raw)
   const creationKey = actor.userId + ':' + input.requestId, creationHash = canonicalHash({ formTemplate: input })
   const id = await prisma.$transaction(async tx => {
     await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtextextended(${creationKey},0))`
@@ -634,7 +634,7 @@ export async function resources(actor: Actor) {
 export async function copy(actor: Actor, id: string, raw: unknown, options: { allowTrainingVariants?: boolean; allowTrainingFlow?: boolean } = {}) {
   author(actor)
   if (process.env.QUESTIONNAIRE_PRODUCTS_ENABLED === 'false') throw compositeConflict('暂未开放新版问卷创建')
-  const { requestId } = z.object({ requestId: z.string().uuid() }).strict().parse(raw)
+  const { requestId } = z.object({ requestId: z.string().guid() }).strict().parse(raw)
   const creationKey = actor.userId + ':' + requestId
   const creationHash = canonicalHash({ copySource: id })
   const run = () => prisma.$transaction(async tx => {
@@ -784,7 +784,7 @@ export async function copy(actor: Actor, id: string, raw: unknown, options: { al
 /** Paged audience-projected reports, never raw response tables. */
 export async function exportReports(actor: Actor, id: string, raw: unknown) {
   const definition = await detail(actor, id)
-  const { after } = z.object({ after: z.string().uuid().optional() }).strict().parse(raw)
+  const { after } = z.object({ after: z.string().guid().optional() }).strict().parse(raw)
   if (definition.trainingVariantDraft != null || definition.trainingVariantFrozen != null || definition.trainingVariantDigest != null) {
     const { getTrainingVariantReportsForTeacher } = await import('../composite/composite.service')
     const page = await getTrainingVariantReportsForTeacher(actor.userId, actor.role, id, after)

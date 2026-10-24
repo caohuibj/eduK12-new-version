@@ -23,8 +23,8 @@ import { situationalFinalSubmitSchema, situationalStartSchema } from '../modules
 import { serveFrozenSituationalAsset } from '../modules/situational/situational-asset.service'
 import { projectRelationalUnitFinalResponse } from '../modules/assessment-relational/result-authority'
 
-const firstZodMessage = (errorValue: { errors?: Array<{ message: string }> }): string => (
-  errorValue.errors?.[0]?.message ?? '请求参数不合法'
+const firstZodMessage = (errorValue: { issues?: Array<{ message: string }> }): string => (
+  errorValue.issues?.[0]?.message ?? '请求参数不合法'
 )
 
 const handleSituationalError = (res: Response, errorValue: unknown, operation: string) => {

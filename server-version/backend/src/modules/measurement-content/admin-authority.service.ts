@@ -7,11 +7,11 @@ import {AdminPermissionError} from '../admin-permissions/service'
 import {ADMIN_STEP_UP_SECONDS,validAdminProof,type AdminSessionProof} from '../admin-permissions/proof'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {contentGrantInputSchema,type ContentGrantInput} from './content-authority'
-const uuid=z.string().uuid(),reason=z.string().trim().min(1).max(500)
-const wireGrant=contentGrantInputSchema.innerType().extend({
+const uuid=z.string().guid(),reason=z.string().trim().min(1).max(500)
+const wireGrant=z.object({ ...contentGrantInputSchema.shape,
   validFrom:z.string().datetime().transform(value=>new Date(value)),
   expiresAt:z.string().datetime().transform(value=>new Date(value)),
-}).pipe(contentGrantInputSchema).superRefine((grant,ctx)=>{
+}).strict().pipe(contentGrantInputSchema).superRefine((grant,ctx)=>{
   if(!supported(grant)||!uuid.safeParse(grant.subjectId).success||(!platformSjt(grant)&&!platformReference(grant)&&!platformScaleLibrary(grant)&&!platformScalePublic(grant)&&!uuid.safeParse(grant.scope.scopeId).success)||
     grant.scope.resourceKeys.some(key=>!uuid.safeParse(key).success))
     ctx.addIssue({code:'custom',message:'Only exact Survey project, Training course, formal reference governance or installed situational measurement grants are supported'})

@@ -137,7 +137,7 @@ export type TrainingFlowPath={
   acceptedFacts:Array<{instrumentKey:string;acceptedHash:string;requirementSatisfied:boolean;hasValidMeasurement:boolean}>
 }
 const acceptedFactSchema=z.object({status:z.literal('ACCEPTED'),
-  acceptedHash:z.string().min(1).max(256),answers:z.record(z.unknown()).optional(),unavailableItemKeys:z.array(assessmentKeySchema).max(500).optional(),
+  acceptedHash:z.string().min(1).max(256),answers:z.record(z.string(), z.unknown()).optional(),unavailableItemKeys:z.array(assessmentKeySchema).max(500).optional(),
   requirementSatisfied:z.boolean(),hasValidMeasurement:z.boolean(),
 }).strict()
 /** Pure path reconstruction from server-accepted facts. Never mutate the frozen

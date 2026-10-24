@@ -94,7 +94,7 @@ function commandMeta(req: Request) {
 }
 
 function sendDomainError(res: Response, err: unknown) {
-  if (err instanceof z.ZodError) return error(res, err.errors[0].message, -1, 400)
+  if (err instanceof z.ZodError) return error(res, err.issues[0].message, -1, 400)
   if (err instanceof OrganizationDomainError) {
     return res.status(err.statusCode).json({ code: err.code, message: err.message, data: null })
   }
@@ -274,7 +274,7 @@ export const organizationController = {
   async create(req: Request, res: Response) {
     if (req.user?.platformRole !== 'SYSTEM_ADMIN') return forbidden(res, '仅平台管理员可创建组织')
     const parsed = createOrganizationSchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message)
     try {
       return success(res, await createOrganization({ ...parsed.data, meta: commandMeta(req) }))
     } catch (err) {
@@ -322,7 +322,7 @@ export const organizationController = {
 
   async createMembership(req: Request, res: Response) {
     const parsed = membershipSchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message)
     try {
       return success(res, await createMembership({
         organizationId: req.params.organizationId,
@@ -336,7 +336,7 @@ export const organizationController = {
 
   async endMembership(req: Request, res: Response) {
     const parsed = endSchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message)
     try {
       return success(res, await endMembership({
         organizationId: req.params.organizationId,
@@ -351,7 +351,7 @@ export const organizationController = {
 
   async setMembershipRole(req: Request, res: Response) {
     const parsed = roleSchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message)
     try {
       return success(res, await setMembershipRole({
         organizationId: req.params.organizationId,
@@ -366,7 +366,7 @@ export const organizationController = {
 
   async grantPersona(req: Request, res: Response) {
     const parsed = personaSchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message)
     try {
       return success(res, await grantPersona({
         organizationId: req.params.organizationId,
@@ -381,7 +381,7 @@ export const organizationController = {
 
   async revokePersona(req: Request, res: Response) {
     const parsed = personaSchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message)
     try {
       return success(res, await revokePersona({
         organizationId: req.params.organizationId,
@@ -396,7 +396,7 @@ export const organizationController = {
 
   async grantCapability(req: Request, res: Response) {
     const parsed = capabilitySchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message)
     try {
       return success(res, await grantCapability({
         organizationId: req.params.organizationId,
@@ -411,7 +411,7 @@ export const organizationController = {
 
   async revokeCapability(req: Request, res: Response) {
     const parsed = capabilitySchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message)
     try {
       return success(res, await revokeCapability({
         organizationId: req.params.organizationId,
@@ -426,7 +426,7 @@ export const organizationController = {
 
   async deny(req: Request, res: Response) {
     const parsed = denySchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message)
     try {
       return success(res, await denyOrganizationAccess({
         organizationId: req.params.organizationId,
@@ -440,7 +440,7 @@ export const organizationController = {
 
   async liftDeny(req: Request, res: Response) {
     const parsed = liftDenySchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message)
     try {
       return success(res, await liftOrganizationAccessDeny({
         organizationId: req.params.organizationId,

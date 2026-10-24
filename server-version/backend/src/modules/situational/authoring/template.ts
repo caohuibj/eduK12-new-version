@@ -126,7 +126,7 @@ export const sjtAuthorTemplateSchema = row({
           )
           .min(1)
           .max(240),
-        expected: z.record(z.number().finite().nullable()),
+        expected: z.record(z.string(), z.number().finite().nullable()),
       }),
     )
     .max(512),

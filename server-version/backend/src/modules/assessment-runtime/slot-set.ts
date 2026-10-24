@@ -65,7 +65,7 @@ const jsonValueSchema: z.ZodType<unknown> = z.lazy(() => z.union([
   z.boolean(),
   z.null(),
   z.array(jsonValueSchema),
-  z.record(jsonValueSchema),
+  z.record(z.string(), jsonValueSchema),
 ]))
 
 const frozenSlotSchema = z.object({
@@ -77,7 +77,7 @@ const frozenSlotSchema = z.object({
     version: z.string().min(1),
     hash: z.string().regex(/^[0-9a-f]{64}$/),
   }).strict(),
-  sourceBinding: z.record(jsonValueSchema),
+  sourceBinding: z.record(z.string(), jsonValueSchema),
   runtimeIdentity: z.object({
     instrumentKey: z.string().min(1),
     instrumentVersion: z.string().min(1),

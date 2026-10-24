@@ -250,7 +250,7 @@ export const questionnaireController = {
 
       const result = createQuestionnaireSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { code, name, description, instruction, visibility, estimatedTime } = result.data
@@ -397,7 +397,7 @@ export const questionnaireController = {
 
       const result = updateQuestionnaireSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const questionnaire = await courseQuestionnaire(id)
@@ -752,7 +752,7 @@ export const questionnaireController = {
 
       const result = addScaleSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { scaleId, position } = result.data
@@ -879,7 +879,7 @@ export const questionnaireController = {
 
       const result = reorderScalesSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { scales } = result.data
@@ -1119,7 +1119,7 @@ export const questionnaireController = {
 
       const result = addFormItemSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { type, label, placeholder, required, position, options, contextKey } = result.data
@@ -1203,7 +1203,7 @@ export const questionnaireController = {
 
       const result = updateFormItemSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       // 检查问卷是否存在和权限
@@ -1326,7 +1326,7 @@ export const questionnaireController = {
 
       const result = reorderSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       // 检查问卷是否存在和权限
@@ -1378,7 +1378,7 @@ export const questionnaireController = {
 
       const result = saveFormAnswerSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { formItemId } = result.data
@@ -1547,7 +1547,7 @@ export const questionnaireController = {
 
       const result = saveFormAnswersSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { answers } = result.data
@@ -1854,7 +1854,7 @@ export const questionnaireController = {
 
       const result = addCourseSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { courseIds } = result.data

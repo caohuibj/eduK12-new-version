@@ -13,7 +13,7 @@ import {
 } from './expertRegistration.service'
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 const token=z.string().regex(/^[a-zA-Z0-9_-]{43}$/)
 const newAccount=z.object({
   inviteCode:token,

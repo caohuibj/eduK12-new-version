@@ -144,7 +144,7 @@ const utf8ByteLimitedString = (limit: number, message: string) => z.string().ref
   { message },
 )
 
-const submissionAnswersSchema = z.record(utf8ByteLimitedString(10_000, '单个答案不能超过10KB')).superRefine((value, ctx) => {
+const submissionAnswersSchema = z.record(z.string(), utf8ByteLimitedString(10_000, '单个答案不能超过10KB')).superRefine((value, ctx) => {
   if (Buffer.byteLength(JSON.stringify(value), 'utf8') > 256_000) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: '答案总大小不能超过256KB' })
   }
@@ -282,8 +282,8 @@ export const assignmentController = {
 
       const result = createAssignmentSchema.safeParse(req.body)
       if (!result.success) {
-        logger.error('Schema validation error', result.error.errors)
-        return error(res, result.error.errors[0].message)
+        logger.error('Schema validation error', result.error.issues)
+        return error(res, result.error.issues[0].message)
       }
 
       const { courseId, title, description, deadline, questions, videos, images, documents, content, tags } = result.data
@@ -487,7 +487,7 @@ export const assignmentController = {
 
       const result = updateAssignmentSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const updateData: any = { ...result.data }
@@ -602,7 +602,7 @@ export const assignmentController = {
 
       const result = submitSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { content, answers, expectedRevision } = result.data
@@ -894,7 +894,7 @@ export const assignmentController = {
 
       const result = gradeSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { comment } = result.data
@@ -981,7 +981,7 @@ export const assignmentController = {
     try {
       const { id } = req.params
       const result = gradeSchema.safeParse(req.body)
-      if (!result.success) return error(res, result.error.errors[0].message, -1, 400)
+      if (!result.success) return error(res, result.error.issues[0].message, -1, 400)
       const assignment = await prisma.assignment.findUnique({ where: { id }, select: { course: { select: { creatorId: true } } } })
       if (!assignment) return notFound(res, '练习不存在')
       if (assignment.course.creatorId !== req.user?.userId && req.user?.role !== UserRole.ADMIN) return forbidden(res, '无权限批改此练习')

@@ -14,7 +14,7 @@ import {
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 const path=z.object({organizationId:uuid,courseId:uuid})
 const limiter=createRedisRateLimiter({name:'campus-peer-consent',limit:20,windowSeconds:900,
   key:req=>req.user?.userId??'anonymous'})

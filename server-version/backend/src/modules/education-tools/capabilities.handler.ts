@@ -9,7 +9,7 @@ export const educationToolAuthoringCapabilitiesHandler = (entry: EducationToolEn
   asyncHandler(async (req, res) => {
     res.setHeader('Cache-Control', 'no-store')
     if (!req.user) return unauthorized(res)
-    const organizationId = z.string().uuid().safeParse(req.params.organizationId)
+    const organizationId = z.string().guid().safeParse(req.params.organizationId)
     if (!organizationId.success) return res.status(400).json({
       code: 'BAD_REQUEST', message: '学校组织参数无效', data: null,
     })

@@ -25,7 +25,7 @@ import { listCampusGroupLongitudinalCatalog,generateCampusFixedGroupLongitudinal
  * Only the reviewed parent projections are exposed: not their source artifacts.
  */
 const router = Router()
-const id = z.string().uuid()
+const id = z.string().guid()
 const pagination = z.object({
   page: z.coerce.number().int().min(1).max(10000).default(1),
   pageSize: z.coerce.number().int().min(1).max(20).default(20),

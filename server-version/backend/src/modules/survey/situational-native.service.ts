@@ -99,7 +99,7 @@ export async function readSurveySituational(proof:SurveyTaskProof,slotKey:string
 export async function submitSurveySituationalFinal(proof:SurveyTaskProof,slotKey:string,childId:string,
   input:z.infer<typeof situationalLegacyFinalSubmitSchema>){
   const known=await verifiedSurveyAttempt(proof)
-  z.string().uuid().parse(input.submissionId)
+  z.string().guid().parse(input.submissionId)
   const serviceInput={...input,attemptId:childId}
   const initial=await withFinalOnlyCompletionTransaction(async tx=>{
     const loaded=await readLocked(tx,proof,known,slotKey,childId)

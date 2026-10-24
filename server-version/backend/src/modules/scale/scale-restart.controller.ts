@@ -14,7 +14,7 @@ export const restartStandaloneScaleAssessmentWithPolicyController = async (req: 
     const userId = req.user?.userId
     if (!userId) return forbidden(res, '请先登录')
     const context = standaloneContextSchema.safeParse(req.body?.context)
-    if (!context.success) return error(res, context.error.errors[0].message)
+    if (!context.success) return error(res, context.error.issues[0].message)
     const created = await restartStandaloneScaleAssessmentWithPolicy(req.params.assessmentId, userId, context.data)
     const definition = scaleDefinitionFromRecord(created.scale)
     const admission = await loadStoredScaleAdmission(created as any)

@@ -1,0 +1,1010 @@
+{
+  "admission": {
+    "schemaVersion": 1,
+    "runtimeGeneration": "UNIFIED_V1",
+    "frozenAt": "2026-09-21T00:00:00.000Z",
+    "attemptEpoch": 1,
+    "scale": {
+      "id": "scale-1",
+      "code": "adexi_v1",
+      "name": "ADEXI",
+      "instrumentVersion": "2.0.0"
+    },
+    "principal": {
+      "userId": null,
+      "questionnaireSessionId": null,
+      "recoveryTokenHash": null
+    },
+    "parent": null,
+    "requiresContext": false,
+    "contextSnapshotHash": null,
+    "contextValues": {
+      "arbitrary": "value",
+      "nested": {
+        "a": 1
+      }
+    },
+    "governance": {
+      "status": "READY",
+      "holdReason": null
+    },
+    "snapshotHash": "6c52bc0a9f10a0648236256a018106fce4b450c3386db2e4468d01eff3141eb0"
+  },
+  "runtime": {
+    "schemaVersion": 1,
+    "runtimeGeneration": "UNIFIED_V1",
+    "frozenAt": "2026-09-21T00:00:00.000Z",
+    "instrumentKey": "adexi_v1",
+    "instrumentVersion": "2.0.0",
+    "sourceDefinitionHash": "14722172c7203b8f04f3dc8428e0e125c5c21c2a769f487f532b2945bbe88949",
+    "legacyDefinitionHash": "14722172c7203b8f04f3dc8428e0e125c5c21c2a769f487f532b2945bbe88949",
+    "compiledRuntime": {
+      "schemaVersion": 1,
+      "compilerVersion": "unified-runtime-v32-unit-1",
+      "instrumentType": "SCALE",
+      "instrumentKey": "adexi_v1",
+      "instrumentVersion": "2.0.0",
+      "sourceDefinitionHash": "14722172c7203b8f04f3dc8428e0e125c5c21c2a769f487f532b2945bbe88949",
+      "compiledRuntimeHash": "cd4c293c25cb0ce8fdc5db9d074704083852e8326e53907147199b3a00328f8e",
+      "hashScheme": "CANONICAL_JSON_SHA256_V1",
+      "scorerKey": "scale.default",
+      "scorerVersion": "2.0.0",
+      "metricDefinitions": {
+        "working_memory": {
+          "key": "working_memory",
+          "label": "工作记忆相关困难（自评）",
+          "unit": "score",
+          "valueType": "number",
+          "direction": "higher_is_worse",
+          "role": "primary"
+        },
+        "inhibition": {
+          "key": "inhibition",
+          "label": "抑制相关困难（自评）",
+          "unit": "score",
+          "valueType": "number",
+          "direction": "higher_is_worse",
+          "role": "primary"
+        }
+      },
+      "qualityDefinitions": {
+        "interpretable": {
+          "key": "interpretable",
+          "label": "可解释",
+          "description": "结果满足量表定义的解释条件。"
+        },
+        "limited": {
+          "key": "limited",
+          "label": "有限",
+          "description": "结果可计算但解释受到数据质量限制。"
+        },
+        "invalid": {
+          "key": "invalid",
+          "label": "无效",
+          "description": "结果不满足可解释条件。"
+        }
+      },
+      "reportDefinition": {
+        "reportVersion": "2.0.0",
+        "primaryScoreKeys": [
+          "working_memory",
+          "inhibition"
+        ],
+        "scoreOrder": [
+          "working_memory",
+          "inhibition"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "working_memory",
+            "headline": "工作记忆相关困难（自评）",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "该分数反映本次自评中与记住、保持和处理多步骤信息有关的困难程度；分数越高表示报告的困难更多。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回顾哪些指令、步骤或情境最容易需要重复确认。"
+              },
+              {
+                "category": "strategy",
+                "text": "可以尝试把较长指令拆成短步骤，并使用清单或外部提醒。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "inhibition",
+            "headline": "抑制相关困难（自评）",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "该分数反映本次自评中与抑制冲动、停止活动和抑制不合适反应有关的困难程度；分数越高表示报告的困难更多。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回顾哪些活动或情境中最容易出现先行动后思考或难以停止。"
+              },
+              {
+                "category": "environment",
+                "text": "可以在需要转换活动时预留提示和缓冲时间。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "ADEXI 结果是参与者自评的描述性分数，不代表行为任务表现。",
+          "本 package 不提供群体参考、典型范围、异常判断或百分位。"
+        ],
+        "disclaimer": "本量表不是诊断工具；结果仅描述本次自评，不能替代专业评估或医疗建议。"
+      },
+      "aggregateProjection": {
+        "allowedMetricKeys": [
+          "working_memory",
+          "inhibition"
+        ],
+        "allowedFactKeys": [
+          "quality.status",
+          "quality.flag.*"
+        ],
+        "allowedReferenceClassifications": []
+      },
+      "referenceBindingDefinition": {
+        "required": false,
+        "selections": []
+      },
+      "runtimeCapabilities": {
+        "standalone": true,
+        "embedded": true,
+        "aggregateEligible": true,
+        "collectionFacts": false,
+        "supported": true
+      }
+    },
+    "referenceBindings": [],
+    "definition": {
+      "schemaVersion": 2,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "ADEXI Self-Report",
+        "citation": "ADEXI Self-Report instrument, authorized Chinese adaptation package",
+        "url": "https://chexi.se/onewebmedia/ADEXI_SELFREPORT_ENG.pdf"
+      },
+      "license": {
+        "status": "authorized",
+        "redistribution": "restricted",
+        "note": "按项目已取得的量表使用授权使用；授权范围由 governance/deployment 层单独管理。"
+      },
+      "display": {
+        "randomizeItems": false
+      },
+      "responseSets": [
+        {
+          "key": "adexi_frequency_1_5",
+          "options": [
+            {
+              "value": "never",
+              "label": "绝对不符合",
+              "score": 1
+            },
+            {
+              "value": "rarely",
+              "label": "不太符合",
+              "score": 2
+            },
+            {
+              "value": "sometimes",
+              "label": "有时符合",
+              "score": 3
+            },
+            {
+              "value": "often",
+              "label": "比较符合",
+              "score": 4
+            },
+            {
+              "value": "nearly_every_day",
+              "label": "非常符合",
+              "score": 5
+            }
+          ]
+        }
+      ],
+      "items": [
+        {
+          "itemCode": "ADEXI-01",
+          "content": "我难以记住较长的指令。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 0,
+          "responseSetKey": "adexi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ADEXI-02",
+          "content": "在一项活动进行到一半时，我有时难以记住自己正在做什么。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 1,
+          "responseSetKey": "adexi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ADEXI-03",
+          "content": "我往往会不先考虑可能发生什么就直接做事。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 2,
+          "responseSetKey": "adexi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ADEXI-04",
+          "content": "即使别人告诉我不可以，我有时仍难以阻止自己做喜欢的事情。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 3,
+          "responseSetKey": "adexi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ADEXI-05",
+          "content": "别人让我做几件事时，我有时只记得第一件或最后一件。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 4,
+          "responseSetKey": "adexi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ADEXI-06",
+          "content": "在不合适的场合，我有时难以忍住不微笑或大笑。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 5,
+          "responseSetKey": "adexi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ADEXI-07",
+          "content": "遇到困难时，我难以想出另一种解决问题的方法。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 6,
+          "responseSetKey": "adexi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ADEXI-08",
+          "content": "别人让我去拿某样东西时，我有时会忘记自己应该拿什么。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 7,
+          "responseSetKey": "adexi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ADEXI-09",
+          "content": "我难以为一项活动做计划（例如出行、上班或上学时记得带齐所需物品）。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 8,
+          "responseSetKey": "adexi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ADEXI-10",
+          "content": "我有时难以停止喜欢的活动（例如晚上到了该睡觉的时间，我仍看电视或坐在电脑前）。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 9,
+          "responseSetKey": "adexi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ADEXI-11",
+          "content": "除非同时有人示范，否则我有时难以理解口头指令。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 10,
+          "responseSetKey": "adexi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ADEXI-12",
+          "content": "涉及多个步骤的任务或活动对我来说比较困难。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 11,
+          "responseSetKey": "adexi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ADEXI-13",
+          "content": "我难以提前思考或从经验中学习。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 12,
+          "responseSetKey": "adexi_frequency_1_5",
+          "randomizeOptions": false
+        },
+        {
+          "itemCode": "ADEXI-14",
+          "content": "我遇到的人有时似乎认为，与同龄人相比，我更活跃或更“野”。",
+          "type": "single",
+          "required": true,
+          "sortOrder": 13,
+          "responseSetKey": "adexi_frequency_1_5",
+          "randomizeOptions": false
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "2.0.0",
+        "itemRules": [
+          {
+            "itemCode": "ADEXI-01",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ADEXI-02",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ADEXI-03",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ADEXI-04",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ADEXI-05",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ADEXI-06",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ADEXI-07",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ADEXI-08",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ADEXI-09",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ADEXI-10",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ADEXI-11",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ADEXI-12",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ADEXI-13",
+            "transform": {
+              "type": "identity"
+            }
+          },
+          {
+            "itemCode": "ADEXI-14",
+            "transform": {
+              "type": "identity"
+            }
+          }
+        ],
+        "defaultMissingPolicy": {
+          "type": "complete_required"
+        },
+        "scores": [
+          {
+            "key": "working_memory",
+            "type": "dimension",
+            "label": "工作记忆相关困难（自评）",
+            "description": "与记住、保持和处理多步骤信息有关的自评分数。",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ADEXI-01",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ADEXI-02",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ADEXI-05",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ADEXI-07",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ADEXI-08",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ADEXI-09",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ADEXI-11",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ADEXI-12",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ADEXI-13",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          },
+          {
+            "key": "inhibition",
+            "type": "dimension",
+            "label": "抑制相关困难（自评）",
+            "description": "与抑制冲动、停止偏好活动和抑制不合适反应有关的自评分数。",
+            "direction": "higher_is_worse",
+            "canonical": true,
+            "displayPrecision": 0,
+            "missingPolicy": {
+              "type": "complete_required"
+            },
+            "source": {
+              "type": "items",
+              "items": [
+                {
+                  "itemCode": "ADEXI-03",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ADEXI-04",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ADEXI-06",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ADEXI-10",
+                  "weight": 1
+                },
+                {
+                  "itemCode": "ADEXI-14",
+                  "weight": 1
+                }
+              ],
+              "aggregation": "sum"
+            }
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "2.0.0",
+        "primaryScoreKeys": [
+          "working_memory",
+          "inhibition"
+        ],
+        "scoreOrder": [
+          "working_memory",
+          "inhibition"
+        ],
+        "interpretations": [
+          {
+            "scoreKey": "working_memory",
+            "headline": "工作记忆相关困难（自评）",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "该分数反映本次自评中与记住、保持和处理多步骤信息有关的困难程度；分数越高表示报告的困难更多。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回顾哪些指令、步骤或情境最容易需要重复确认。"
+              },
+              {
+                "category": "strategy",
+                "text": "可以尝试把较长指令拆成短步骤，并使用清单或外部提醒。"
+              }
+            ]
+          },
+          {
+            "scoreKey": "inhibition",
+            "headline": "抑制相关困难（自评）",
+            "source": {
+              "type": "score_only"
+            },
+            "summary": "该分数反映本次自评中与抑制冲动、停止活动和抑制不合适反应有关的困难程度；分数越高表示报告的困难更多。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "回顾哪些活动或情境中最容易出现先行动后思考或难以停止。"
+              },
+              {
+                "category": "environment",
+                "text": "可以在需要转换活动时预留提示和缓冲时间。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "ADEXI 结果是参与者自评的描述性分数，不代表行为任务表现。",
+          "本 package 不提供群体参考、典型范围、异常判断或百分位。"
+        ],
+        "disclaimer": "本量表不是诊断工具；结果仅描述本次自评，不能替代专业评估或医疗建议。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      }
+    },
+    "snapshotHash": "5744a7a717dc628a1f8a96216c01342522cbcc10075e31ade6591ec745b8edfc"
+  },
+  "sjt": {
+    "schemaVersion": 1,
+    "runtimeGeneration": "UNIFIED_V1",
+    "frozenAt": "2026-09-21T00:00:00.000Z",
+    "instrumentKey": "sjt-assertiveness-golden",
+    "instrumentVersion": "1.0.0",
+    "definitionHash": "d60aa196c3a0f1a9d92bf17f06f3f67039541168bd9ba422f0bdf20759e03fab",
+    "compiledRuntimeHash": "e995fee8bbd8e72369247ae789dda19cd44296e6beb47aa9b1638a60768e4f9b",
+    "scorerKey": "situational.default",
+    "scoringVersion": "sjt-provisional-v1",
+    "definition": {
+      "schemaVersion": 1,
+      "respondentType": "participant_self_report",
+      "source": {
+        "title": "情境化人格测评黄金模板：E-Assertiveness（行为倾向通道，文字版 V1）",
+        "citation": "eduK12 情境化测评设计组，基于 BFI-2 Assertiveness facet 的自编情境草案。",
+        "publicationYear": 2026
+      },
+      "license": {
+        "status": "self_authored",
+        "redistribution": "restricted",
+        "note": "自编情境草案；provisional key 仅用于开发期验证，不得作为常模解释依据。"
+      },
+      "sampling": {
+        "strategy": "ALL"
+      },
+      "scenes": [
+        {
+          "sceneKey": "AS-01",
+          "title": "大家都同意了，你要指出错误吗？",
+          "sortOrder": 0,
+          "stimulus": {
+            "type": "TEXT_V1",
+            "text": "四人小组正在快速确定汇报方案。你刚看见屏幕上的数据明显支持方案 B，但组员把它误读成了 A。有人看了一眼时间说\"差不多了，就这样吧\"，其他人点头。组员甲看向你：\"你也觉得 A 可以吧？\"——画面定格。"
+          },
+          "primaryConstruct": "bfi2.assertiveness",
+          "secondaryConstructs": [
+            "bfi2.respectfulness"
+          ],
+          "situationFeatures": {
+            "duty": 0.8,
+            "sociality": 0.5,
+            "adversity": 0.5
+          },
+          "channels": [
+            {
+              "channelKey": "behavior",
+              "purpose": "BEHAVIOR_TENDENCY",
+              "responseType": "SINGLE_CHOICE",
+              "scoredConstruct": "bfi2.assertiveness",
+              "prompt": "如果是你，下一步最可能怎么做？",
+              "options": [
+                {
+                  "optionKey": "A",
+                  "label": "直接指出数据实际支持哪一个，并建议重新确认。"
+                },
+                {
+                  "optionKey": "B",
+                  "label": "表示\"我好像看到的是另一个结果\"，请大家再看一次。"
+                },
+                {
+                  "optionKey": "C",
+                  "label": "先不打断，会后私下提醒负责汇报的人。"
+                },
+                {
+                  "optionKey": "D",
+                  "label": "不再提出，按大家已经决定的方案继续。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sceneKey": "AS-02",
+          "title": "会上资深同事用错了数字，你要开口吗？",
+          "sortOrder": 1,
+          "stimulus": {
+            "type": "TEXT_V1",
+            "text": "会议室里正在过月度数据。资深同事引用一组数字得出结论，而你手头的报表清楚显示正确数字是另一个。会议即将进入下一项，没有人提出疑问。主持人看向你：\"这里大家没有异议吧？\"——画面定格。"
+          },
+          "primaryConstruct": "bfi2.assertiveness",
+          "secondaryConstructs": [
+            "bfi2.respectfulness"
+          ],
+          "situationFeatures": {
+            "duty": 0.8,
+            "sociality": 0.6,
+            "adversity": 0.6
+          },
+          "channels": [
+            {
+              "channelKey": "behavior",
+              "purpose": "BEHAVIOR_TENDENCY",
+              "responseType": "SINGLE_CHOICE",
+              "scoredConstruct": "bfi2.assertiveness",
+              "prompt": "如果是你，此刻最可能怎么做？",
+              "options": [
+                {
+                  "optionKey": "A",
+                  "label": "直接指出数据实际支持哪一个，并建议重新确认。"
+                },
+                {
+                  "optionKey": "B",
+                  "label": "表示\"我好像看到的是另一个结果\"，请大家再看一次。"
+                },
+                {
+                  "optionKey": "C",
+                  "label": "先不打断，会后私下提醒负责汇报的人。"
+                },
+                {
+                  "optionKey": "D",
+                  "label": "不再提出，按大家已经决定的方案继续。"
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "scoring": {
+        "scoringVersion": "sjt-provisional-v1",
+        "choiceScores": [
+          {
+            "sceneKey": "AS-01",
+            "channelKey": "behavior",
+            "optionKey": "A",
+            "contribution": 1.5
+          },
+          {
+            "sceneKey": "AS-01",
+            "channelKey": "behavior",
+            "optionKey": "B",
+            "contribution": 0.5
+          },
+          {
+            "sceneKey": "AS-01",
+            "channelKey": "behavior",
+            "optionKey": "C",
+            "contribution": -0.5
+          },
+          {
+            "sceneKey": "AS-01",
+            "channelKey": "behavior",
+            "optionKey": "D",
+            "contribution": -1.5
+          },
+          {
+            "sceneKey": "AS-02",
+            "channelKey": "behavior",
+            "optionKey": "A",
+            "contribution": 1.5
+          },
+          {
+            "sceneKey": "AS-02",
+            "channelKey": "behavior",
+            "optionKey": "B",
+            "contribution": 0.5
+          },
+          {
+            "sceneKey": "AS-02",
+            "channelKey": "behavior",
+            "optionKey": "C",
+            "contribution": -0.5
+          },
+          {
+            "sceneKey": "AS-02",
+            "channelKey": "behavior",
+            "optionKey": "D",
+            "contribution": -1.5
+          }
+        ],
+        "publishedMetrics": [
+          {
+            "key": "bfi2.assertiveness.behavior",
+            "label": "果断性 × 行为倾向（provisional）",
+            "construct": "bfi2.assertiveness",
+            "channelKey": "behavior",
+            "direction": "higher_is_more",
+            "role": "primary",
+            "displayPrecision": 2
+          }
+        ]
+      },
+      "report": {
+        "reportVersion": "sjt-report-v1",
+        "primaryMetricKeys": [
+          "bfi2.assertiveness.behavior"
+        ],
+        "metricOrder": [
+          "bfi2.assertiveness.behavior"
+        ],
+        "interpretations": [
+          {
+            "metricKey": "bfi2.assertiveness.behavior",
+            "headline": "果断性 × 行为倾向（情境化，provisional）",
+            "summary": "反映在\"群体共识 + 时间压力 + 是否公开表达异议\"的标准化情境中，公开表达异议的行为倾向梯度。分数为开发期 provisional 编码，不构成人格常模结论。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "可回顾自己在需要公开表达不同意见的情境中，通常选择哪种强度的表达方式。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "严格描述性；provisional key 未经过大样本校准。",
+          "结果不构成人格诊断、常模比较或选拔依据。"
+        ],
+        "disclaimer": "本测评结果仅描述本次标准化情境中的作答选择，不能替代专业评估。"
+      },
+      "referencePolicy": {
+        "type": "none"
+      }
+    },
+    "runnerDefinition": {
+      "schemaVersion": 1,
+      "respondentType": "participant_self_report",
+      "sampling": {
+        "strategy": "ALL"
+      },
+      "scenes": [
+        {
+          "sceneKey": "AS-01",
+          "title": "大家都同意了，你要指出错误吗？",
+          "sortOrder": 0,
+          "stimulus": {
+            "type": "TEXT_V1",
+            "text": "四人小组正在快速确定汇报方案。你刚看见屏幕上的数据明显支持方案 B，但组员把它误读成了 A。有人看了一眼时间说\"差不多了，就这样吧\"，其他人点头。组员甲看向你：\"你也觉得 A 可以吧？\"——画面定格。"
+          },
+          "channels": [
+            {
+              "channelKey": "behavior",
+              "responseType": "SINGLE_CHOICE",
+              "prompt": "如果是你，下一步最可能怎么做？",
+              "options": [
+                {
+                  "optionKey": "A",
+                  "label": "直接指出数据实际支持哪一个，并建议重新确认。"
+                },
+                {
+                  "optionKey": "B",
+                  "label": "表示\"我好像看到的是另一个结果\"，请大家再看一次。"
+                },
+                {
+                  "optionKey": "C",
+                  "label": "先不打断，会后私下提醒负责汇报的人。"
+                },
+                {
+                  "optionKey": "D",
+                  "label": "不再提出，按大家已经决定的方案继续。"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "sceneKey": "AS-02",
+          "title": "会上资深同事用错了数字，你要开口吗？",
+          "sortOrder": 1,
+          "stimulus": {
+            "type": "TEXT_V1",
+            "text": "会议室里正在过月度数据。资深同事引用一组数字得出结论，而你手头的报表清楚显示正确数字是另一个。会议即将进入下一项，没有人提出疑问。主持人看向你：\"这里大家没有异议吧？\"——画面定格。"
+          },
+          "channels": [
+            {
+              "channelKey": "behavior",
+              "responseType": "SINGLE_CHOICE",
+              "prompt": "如果是你，此刻最可能怎么做？",
+              "options": [
+                {
+                  "optionKey": "A",
+                  "label": "直接指出数据实际支持哪一个，并建议重新确认。"
+                },
+                {
+                  "optionKey": "B",
+                  "label": "表示\"我好像看到的是另一个结果\"，请大家再看一次。"
+                },
+                {
+                  "optionKey": "C",
+                  "label": "先不打断，会后私下提醒负责汇报的人。"
+                },
+                {
+                  "optionKey": "D",
+                  "label": "不再提出，按大家已经决定的方案继续。"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    "compiledRuntime": {
+      "schemaVersion": 1,
+      "compilerVersion": "unified-runtime-v32-unit-1",
+      "instrumentType": "SITUATIONAL",
+      "instrumentKey": "sjt-assertiveness-golden",
+      "instrumentVersion": "1.0.0",
+      "sourceDefinitionHash": "d60aa196c3a0f1a9d92bf17f06f3f67039541168bd9ba422f0bdf20759e03fab",
+      "compiledRuntimeHash": "e995fee8bbd8e72369247ae789dda19cd44296e6beb47aa9b1638a60768e4f9b",
+      "hashScheme": "CANONICAL_JSON_SHA256_V1",
+      "scorerKey": "situational.default",
+      "scorerVersion": "sjt-provisional-v1",
+      "metricDefinitions": {
+        "bfi2.assertiveness.behavior": {
+          "key": "bfi2.assertiveness.behavior",
+          "label": "果断性 × 行为倾向（provisional）",
+          "unit": "score",
+          "valueType": "number",
+          "direction": "higher_is_more",
+          "role": "primary"
+        }
+      },
+      "qualityDefinitions": {
+        "interpretable": {
+          "key": "interpretable",
+          "label": "可解释",
+          "description": "结果满足情境化测评定义的解释条件。"
+        },
+        "limited": {
+          "key": "limited",
+          "label": "有限",
+          "description": "结果可计算但解释受到数据质量限制。"
+        },
+        "invalid": {
+          "key": "invalid",
+          "label": "无效",
+          "description": "结果不满足可解释条件。"
+        }
+      },
+      "reportDefinition": {
+        "reportVersion": "sjt-report-v1",
+        "primaryMetricKeys": [
+          "bfi2.assertiveness.behavior"
+        ],
+        "metricOrder": [
+          "bfi2.assertiveness.behavior"
+        ],
+        "interpretations": [
+          {
+            "metricKey": "bfi2.assertiveness.behavior",
+            "headline": "果断性 × 行为倾向（情境化，provisional）",
+            "summary": "反映在\"群体共识 + 时间压力 + 是否公开表达异议\"的标准化情境中，公开表达异议的行为倾向梯度。分数为开发期 provisional 编码，不构成人格常模结论。",
+            "bands": [],
+            "guidance": [
+              {
+                "category": "reflection",
+                "text": "可回顾自己在需要公开表达不同意见的情境中，通常选择哪种强度的表达方式。"
+              }
+            ]
+          }
+        ],
+        "limitations": [
+          "严格描述性；provisional key 未经过大样本校准。",
+          "结果不构成人格诊断、常模比较或选拔依据。"
+        ],
+        "disclaimer": "本测评结果仅描述本次标准化情境中的作答选择，不能替代专业评估。"
+      },
+      "aggregateProjection": {
+        "allowedMetricKeys": [
+          "bfi2.assertiveness.behavior"
+        ],
+        "allowedFactKeys": [
+          "quality.status",
+          "quality.flag.*"
+        ],
+        "allowedReferenceClassifications": []
+      },
+      "referenceBindingDefinition": {
+        "required": false,
+        "selections": []
+      },
+      "runtimeCapabilities": {
+        "standalone": true,
+        "embedded": true,
+        "aggregateEligible": true,
+        "collectionFacts": false,
+        "supported": true
+      }
+    },
+    "snapshotHash": "ea776b822a31459ccf10c0978f288a303698249884fd683ca427863d6516dfdc"
+  },
+  "slots": {
+    "schemaVersion": 1,
+    "runtimeGeneration": "UNIFIED_V1",
+    "attemptEpoch": 1,
+    "slots": [
+      {
+        "slotKey": "scale:11111111-1111-4111-8111-111111111111",
+        "unitType": "SCALE",
+        "required": true,
+        "sourceDefinitionIdentity": {
+          "key": "synthetic",
+          "version": "1.0.0",
+          "hash": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+        },
+        "sourceBinding": {
+          "scaleCode": "synthetic",
+          "compiledRuntimeHash": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+        }
+      }
+    ],
+    "snapshotHash": "361a54f73dc58ade56cf9c3bff8248acb3b0ebda8bb2c4147c4df9a1094f0e30"
+  },
+  "final": {
+    "submissionId": "synthetic-golden-submit",
+    "attemptEpoch": 1,
+    "definitionHash": "definition",
+    "itemTimings": {
+      "freeKey": {
+        "ms": 2
+      }
+    },
+    "answers": [
+      {
+        "itemCode": "A",
+        "responseValue": 1
+      }
+    ]
+  }
+}

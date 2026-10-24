@@ -13,7 +13,7 @@ import { requireTeacherProductAdmin, requireRecentTeacherMfa, requireTeacherProd
 const router=Router()
 router.use('/organizations/:organizationId/private-tools',authenticateHuiteacher,educationPrivateToolRouter('TEACHER'))
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const id=z.string().uuid()
+const id=z.string().guid()
 const wrap=(fn:(req:any,res:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
   try{return await fn(req,res)}
   catch(e){

@@ -19,7 +19,7 @@ import { resolveEducationProductMemberScope } from '../organization/educationPro
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 const wrap=(work:(req:Request)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
   try{return success(res,await work(req))}
   catch(e){

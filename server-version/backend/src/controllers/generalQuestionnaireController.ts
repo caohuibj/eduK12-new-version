@@ -153,7 +153,7 @@ export const generalQuestionnaireController = {
 
       const result = createQuestionnaireSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { code, name, description, instruction, estimatedTime } = result.data
@@ -243,7 +243,7 @@ export const generalQuestionnaireController = {
 
       const result = createTokenSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { expiresDays, expiresAt: requestedExpiry, maxUses } = result.data
@@ -1128,7 +1128,7 @@ export const generalQuestionnaireController = {
 
       const result = addFormItemSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { type, label, placeholder, required, position, options, contextKey } = result.data
@@ -1212,7 +1212,7 @@ export const generalQuestionnaireController = {
 
       const result = updateFormItemSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       // 检查表单题目是否存在
@@ -1338,7 +1338,7 @@ export const generalQuestionnaireController = {
 
       const result = reorderSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       // 检查问卷是否存在和权限
@@ -1388,7 +1388,7 @@ export const generalQuestionnaireController = {
 
       const result = updateSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const questionnaire = await generalQuestionnaire(id)

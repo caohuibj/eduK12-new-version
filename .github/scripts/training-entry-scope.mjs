@@ -2,7 +2,7 @@ import {participantAccessOutputs} from './participant-access-scope.mjs';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {execFileSync} from 'node:child_process';
-export const branch='perf/training-entry-20261023';
+export const branch='backup/training-survey-main350-20261024';
 export const marker='.github/scripts/training-entry-bindings.json';
 export const binding=JSON.parse(readFileSync(new URL('./training-entry-bindings.json',import.meta.url)));
 const git=(...args)=>execFileSync('git',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
@@ -12,8 +12,8 @@ export function trainingEntryPlan(entries,base,head,read=git,env=process.env){
  assert.ok(['pull_request','push'].includes(env.CI_EVENT),'No manual/full/probe route');
  assert.notEqual(env.CI_FORCE_FULL,'true','No full-platform fallback');assert.notEqual(env.CI_FULL_ACCEPTANCE,'true','No full acceptance');
  assert.equal(base,binding.base,'Frozen main changed');assert.match(head,/^[a-f0-9]{40}$/);
- assert.equal(binding.base,'67d0c77034aea3c3cf1ee118eb65ab3aafe7b6eb');
- assert.equal(binding.product,'a1369db0b237f8f022d619feeba9c85b24cf5bbe');
+ assert.equal(binding.base,'44c1e502acaed5524c5b1e233d1bfb1f0c6f7b40');
+ assert.equal(binding.product,'4a4756d133e5da75345da7f7af75091b0b3f41fb');
  if(env.CI_EVENT==='pull_request'){
   assert.equal(ref,branch);assert.equal(env.CI_PR_REPOSITORY||env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');
   assert.match(String(env.CI_PR_NUMBER),/^[1-9][0-9]*$/,'Actual PR number required');assert.match(env.CI_SOURCE_HEAD||'',/^[a-f0-9]{40}$/);

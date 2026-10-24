@@ -12,7 +12,7 @@ import {
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 const keys=z.object({organizationId:uuid,eventId:uuid}).strict()
 const resource=z.object({
   family:z.enum(['BUNDLE','SCALE','FORM','SITUATIONAL']),
@@ -21,8 +21,8 @@ const resource=z.object({
 }).strict()
 const track=z.object({
   resource,
-  subjectSelector:z.record(z.unknown()).default({}),
-  respondentSelector:z.record(z.unknown()).default({}),
+  subjectSelector:z.record(z.string(), z.unknown()).default({}),
+  respondentSelector:z.record(z.string(), z.unknown()).default({}),
   requestedPolicy:z.object({
     targetPolicy:z.object({
       mode:z.enum(['SELF','HOMEROOM_TEACHER','ALL_CLASS_TEACHERS',

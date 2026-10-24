@@ -13,7 +13,7 @@ import {resolveCompositeSituationalItems,compositeSjtGrantScope} from '../compos
 import {trainingCognitiveMetricKeys} from '../composite/training-metric-disclosure'
 import {readFrozenReport} from '../cognitive/profile-freeze'
 
-const text=z.string().trim().min(1).max(240),id=z.string().uuid()
+const text=z.string().trim().min(1).max(240),id=z.string().guid()
 export const trainingReportPayload=z.object({measurementReleaseId:id,metricKeys:z.array(text).min(1).max(100),
   audience:z.enum(['teacher','researcher']),language:text,template:reportTemplateSchema,assets:z.array(z.never()).max(0).default([])}).strict()
 export const createTrainingReportInput=z.object({requestId:id,reportKey:text.max(168),version:text,payload:trainingReportPayload}).strict()

@@ -17,7 +17,7 @@ import {assertScaleLibraryCollectionAllowed} from '../scale-library-governance/c
 type Tx=Prisma.TransactionClient
 const hash=z.string().regex(/^[a-f0-9]{64}$/)
 export const sharingPrepareInput=z.object({contentHash:hash}).strict()
-export const sharingSubmissionInput=submissionInput.extend({contentHash:hash,dependencyReleaseIds:z.array(z.string().uuid()).max(0).default([])}).strict()
+export const sharingSubmissionInput=submissionInput.extend({contentHash:hash,dependencyReleaseIds:z.array(z.string().guid()).max(0).default([])}).strict()
 const transact=<T>(fn:(tx:Tx)=>Promise<T>)=>prisma.$transaction(fn,{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted})
 const boundary={canRequestLibraryShare:true,canShare:false,canPublish:false,visibility:'AUTHOR_PRIVATE'} as const
 const sharingView=(row:SubmissionRow)=>({...submissionView(row),versionId:row.snapshot.educationSource?.versionId,privateContentHash:row.snapshot.educationSource?.contentHash})

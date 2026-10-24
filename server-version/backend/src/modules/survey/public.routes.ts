@@ -41,7 +41,7 @@ publicSurveyRouter.use((_req,res,next)=>{
 // Only a current server-authorized group wave may bypass this shared IP bucket.
 // The exemption is not participant authorization; all handlers retain their fences.
 publicSurveyRouter.use(createSurveyPublicRateLimiter())
-const id=z.string().uuid(), secret=z.string().regex(/^[A-Za-z0-9_-]{43}$/)
+const id=z.string().guid(), secret=z.string().regex(/^[A-Za-z0-9_-]{43}$/)
 const code=z.string().regex(/^R-[A-Z0-9]{8,32}$/)
 const consent=z.object({consent:z.literal(true),consentVersion:z.number().int().positive()})
 const entry=consent.extend({entryToken:secret}).strict()
@@ -49,13 +49,13 @@ const linked=consent.extend({researchCode:code,accessCredential:secret}).strict(
 const identity=z.object({researchCode:code,accessCredential:secret}).strict()
 const proof=z.object({researchCode:code.optional(),accessCredential:secret}).strict()
 const checkpointWrite=proof.extend({revision:z.number().int().min(0).max(100),
-  answers:z.record(z.record(z.unknown())),
-  itemTimings:z.record(z.record(z.unknown())).optional()}).strict()
+  answers:z.record(z.string(), z.record(z.string(), z.unknown())),
+  itemTimings:z.record(z.string(), z.record(z.string(), z.unknown())).optional()}).strict()
 const submission=proof.extend({submissionId:z.string().min(16).max(200),
   cognitiveReferences:z.array(surveyCognitiveReferenceSchema).max(4).optional(),
   situationalReferences:z.array(surveySituationalReceiptReferenceSchema).max(30).optional(),
-  answers:z.record(z.record(z.unknown())),
-  itemTimings:z.record(z.record(z.unknown())).optional(),
+  answers:z.record(z.string(), z.record(z.string(), z.unknown())),
+  itemTimings:z.record(z.string(), z.record(z.string(), z.unknown())).optional(),
   presentation:z.object({shownBlocks:z.array(z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)).max(70)}).strict().optional()}).strict()
 const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
   try{return success(res,await action(req))}

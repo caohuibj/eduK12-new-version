@@ -17,7 +17,7 @@ export const surveyRawFeedbackSchema=z.object({
     ctx.addIssue({code:'custom',message:'反馈指标必须唯一，且与显式反馈模式一致'})
 })
 export const surveyParticipantFeedbackSelectionsSchema=z.array(z.object({
-  instrumentId:z.string().uuid(),feedback:surveyRawFeedbackSchema,
+  instrumentId:z.string().guid(),feedback:surveyRawFeedbackSchema,
 }).strict()).max(30).refine(v=>new Set(v.map(x=>x.instrumentId)).size===v.length)
 export type SurveyParticipantFeedbackSelection=z.infer<typeof surveyParticipantFeedbackSelectionsSchema>[number]
 export type SurveyRawFeedback=z.infer<typeof surveyRawFeedbackSchema>

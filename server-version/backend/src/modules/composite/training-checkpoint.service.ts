@@ -16,8 +16,8 @@ import { encodeTrainingCheckpointEnvelope, nextTrainingCheckpointSave, readTrain
 const hash = z.string().regex(/^[0-9a-f]{64}$/)
 export const trainingCheckpointSaveSchema = z.object({ expectedRevision: z.number().int().min(0), attemptEpoch: z.number().int().min(1),
   envelope: z.object({ schemaVersion: z.literal(1), snapshotHash: hash, definitionHash: hash,
-    drafts: z.array(z.object({ slotKey: z.string().min(1).max(240), answers: z.record(z.unknown()),
-      itemTimings: z.record(scaleTimingItemSchema).optional() }).strict()).max(100),
+    drafts: z.array(z.object({ slotKey: z.string().min(1).max(240), answers: z.record(z.string(), z.unknown()),
+      itemTimings: z.record(z.string(), scaleTimingItemSchema).optional() }).strict()).max(100),
     cognitiveResults: z.array(z.object({ slotKey: z.string().min(1).max(240), resultId: z.string().min(1).max(200),
       sessionId: z.string().min(1).max(200), submissionId: z.string().min(1).max(200) }).strict()).max(100),
   }).strict(),

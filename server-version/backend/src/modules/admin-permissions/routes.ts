@@ -39,7 +39,7 @@ const originGuard = (req: Request, res: Response, next: NextFunction) => {
 const limiter = createRedisRateLimiter({ name: 'admin-security', limit: 30, windowSeconds: 300, key: req => req.user?.userId ?? req.ip ?? 'unknown' })
 const encoded = z.string().min(1).max(65536)
 const credential = z.object({ id: z.string().min(1).max(2048), rawId: z.string().min(1).max(2048),
-  type: z.literal('public-key'), clientExtensionResults: z.record(z.unknown()),
+  type: z.literal('public-key'), clientExtensionResults: z.record(z.string(), z.unknown()),
   authenticatorAttachment: z.enum(['platform','cross-platform']).optional() }).strict()
 const registration = z.object({ response: credential.extend({ response: z.object({
   clientDataJSON: encoded, attestationObject: encoded,
@@ -105,11 +105,11 @@ adminPermissionsRouter.get('/accounts', handle(async req => {
 }))
 adminPermissionsRouter.put('/accounts/:id/entries/:entry', requireRecentAdminKey, handle(req => {
   const body = z.object({ active: z.boolean(), expectedVersion: z.number().int().min(0), reason: z.string().trim().min(1).max(500) }).strict().parse(req.body)
-  return changeEntryGrant({ actorUserId: req.user!.userId, targetUserId: z.string().uuid().parse(req.params.id),
+  return changeEntryGrant({ actorUserId: req.user!.userId, targetUserId: z.string().guid().parse(req.params.id),
     entry: z.enum(ADMIN_ENTRIES).parse(req.params.entry), actorSession: req.user!, ...body })
 }))
 adminPermissionsRouter.get('/audit', handle(req => {
-  const input = z.object({ targetUserId: z.string().uuid(), page: z.coerce.number().int().min(1).max(10000).default(1) }).strict().parse(req.query)
+  const input = z.object({ targetUserId: z.string().guid(), page: z.coerce.number().int().min(1).max(10000).default(1) }).strict().parse(req.query)
   return prisma.adminAuthorizationAudit.findMany({ where: { targetUserId: input.targetUserId }, take: 25, skip: (input.page - 1) * 25,
     orderBy: [{ createdAt: 'desc' }, { id: 'desc' }] })
 }))
@@ -119,10 +119,10 @@ adminPermissionsRouter.get('/audit', handle(req => {
 adminPermissionsRouter.post('/content-grants',requireRecentAdminKey,handle(req=>
   issueAdminContentRoot(req.user!.userId,req.user!,req.body)))
 adminPermissionsRouter.post('/content-grants/:id/revoke',requireRecentAdminKey,handle(req=>
-  revokeAdminContentGrant(req.user!.userId,req.user!,z.string().uuid().parse(req.params.id),req.body)))
+  revokeAdminContentGrant(req.user!.userId,req.user!,z.string().guid().parse(req.params.id),req.body)))
 
 adminPermissionsRouter.get('/content-grants/:id',requireRecentAdminKey,handle(req=>
-  readAdminContentGrant(req.user!.userId,req.user!,z.string().uuid().parse(req.params.id))))
+  readAdminContentGrant(req.user!.userId,req.user!,z.string().guid().parse(req.params.id))))
 
 adminPermissionsRouter.post('/static-sjt/prepare',requireRecentAdminKey,handle(req=>
   prepareAdminStaticSjtMapping(req.user!.userId,req.user!,req.body)))
