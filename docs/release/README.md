@@ -1505,8 +1505,8 @@ retained even if an independent later check fails, so it need not be rebuilt.
 
 The previously unmerged Training-entry slot is superseded, not added to: current
 base is `44c1e502acaed5524c5b1e233d1bfb1f0c6f7b40`, product snapshot is
-`95c793998a9bd2047c1da48747bf406fe1ca353a`, source tree is
-`69e6b659f503e856a478f04918665f16f031c2ea`, and the only PR branch is
+`faee762e9b14f38acaeec2a730d7b17db57fb550`, source tree is
+`accc9951701ebe33c3899a1a2159b4f376de380e`, and the only PR branch is
 `backup/training-survey-main350-20261024`. Exact source blobs, modes, complete
 changed-path inventory and current control hashes are frozen by the existing
 binding/admission mechanism. The old 67d0/a1369 qualification is not inherited.
@@ -1548,8 +1548,9 @@ that failure remains recorded. The frontend audit subprocess alone succeeded.
 Its official run/job/artifact identity, original failure, ZIP digest, complete
 frontend input manifest, output bytes and successful subprocess exit are verified
 before reuse, with a 24-hour maximum age. A stale result causes a fresh frontend
-audit; missing or corrupt evidence stops admission. Backend audit always executes
-against the new locked dependencies, without reducing HIGH/CRITICAL thresholds.
+audit; missing or corrupt evidence stops admission. The initial backend audit executes against the new locked dependencies. Later
+unchanged backend inputs may reuse their own exact successful official artifact
+subprocess within the same 24-hour bound; HIGH/CRITICAL thresholds never change.
 
 The repair uses actual Zod 4.6.7, body-parser 1.20.9, multer 2.5.0 and ip-address
 10.7.4. It does not import Zod's vulnerable v3 compatibility entry. Old UUID-like
@@ -1567,3 +1568,20 @@ The unchanged 71 frontend assertions retain their exact input review. Four added
 pure contracts cover Bundle schema composition, catalog/localization error
 behavior and shared FORM defaults; the remaining affected CI checks and builds
 still execute. No production-image or deployment qualification is claimed.
+
+
+The next PR351 recovery retains two local, unsigned Vitest JSON reports: the
+34-file reproduction's 420 passes and one failure, followed by only that failed
+case passing (16 others unselected). The single test-only recovery-text assertion
+change retains both cross-namespace no-API-call assertions. Exact report hashes,
+case identity and current imported input closure are checked; this does not turn
+the original official failed frontend job into a success. Failed JSON/exit records
+are always uploaded before the job remains failed.
+
+PostgreSQL restore comparison retains visible column order and all metadata,
+while mapping dropped-column physical ordinal/dtd gaps to dense visible positions.
+Only four fixed table/constraint/full-definition pairs with equivalent AND
+association are normalized; unknown changes, values, operators, flags, indexes,
+triggers and functions stay strict. Raw before/after schema comparison is retained
+on failure. A bounded real PostgreSQL dump/restore reproduction and negative
+control contracts verified this correction, not a production migration.

@@ -135,6 +135,7 @@ jobs:
         id: build
         run: node .github/scripts/training-entry-checks.mjs frontend-build
       - uses: actions/upload-artifact@v4
+        if: always()
         id: dist
         with:
           name: training-entry-frontend-${{ github.sha }}

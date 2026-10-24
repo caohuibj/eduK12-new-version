@@ -105,11 +105,30 @@ export function verifyFixedPg(e,object=git){
 // Local execution commits are provenance, not necessarily published Git objects.
 // Only the frozen current product has an explicit, byte-identical remote mapping.
 export function evidenceSourceObject(source,resolve=git){
- if(source!==binding.localProduct)return source;
- assert.match(binding.product,/^[a-f0-9]{40}$/);
- assert.notEqual(binding.product,binding.localProduct,'Published snapshot identity required');
- assert.equal(resolve('rev-parse',binding.product+'^{tree}'),binding.productTree,'Published evidence product tree mismatch');
- return binding.product;
+ const mapping=binding.evidenceSourceObjects?.[source]||(source===binding.localProduct?{remote:binding.product,tree:binding.productTree}:null);
+ if(!mapping)return source;
+ assert.match(mapping.remote,/^[a-f0-9]{40}$/);assert.match(mapping.tree,/^[a-f0-9]{40}$/);
+ assert.notEqual(mapping.remote,source,'Published snapshot identity required');
+ assert.equal(resolve('rev-parse',mapping.remote+'^{tree}'),mapping.tree,'Published evidence product tree mismatch');
+ return mapping.remote;
+}
+export function verifyFixedFrontend(e){
+ const expected=binding.fixedFrontendContracts;
+ assert.equal(e.kind,'reviewed-fixed-pr351-frontend-420-plus-1');assert.equal(e.ciExecuted,false);assert.equal(e.originalExecutionSigned,false);
+ assert.equal(e.inputClosureGroup,'final-frontend-types');assert.equal(expected.inputClosureGroup,e.inputClosureGroup);
+ assert.equal(e.reports.length,2);assert.equal(expected.files.length,34);assert.equal(expected.expectedPassed,421);
+ const reports=e.reports.map(r=>{const bytes=gunzipSync(Buffer.from(r.gzipBase64,'base64'),{maxOutputLength:1024*1024});assert.equal(bytes.length,r.bytes);assert.equal(sha(bytes),r.sha256);assert(!bytes.toString().includes('/workspace/'));return JSON.parse(bytes)});
+ const [first,retry]=reports;assert.equal(e.reports[0].exitCode,1);assert.equal(first.success,false);assert.equal(first.numPassedTests,420);assert.equal(first.numFailedTests,1);
+ assert.deepEqual(first.testResults.map(f=>f.name).sort(),[...expected.files].sort());
+ const all=new Map(),passed=new Set(),failed=[];
+ for(const file of first.testResults)for(const c of file.assertionResults){const key=file.name+'\0'+c.fullName;assert(!all.has(key));all.set(key,c);assert(['passed','failed'].includes(c.status));if(c.status==='passed')passed.add(key);else failed.push(key);}
+ const retryKey=expected.retryFile+'\0'+expected.retryName;
+ assert.equal(all.size,421);assert.deepEqual(failed,[retryKey]);assert.equal(passed.size,420);
+ assert.equal(e.reports[1].exitCode,0);assert.equal(retry.success,true);assert.equal(retry.numPassedTests,1);assert.equal(retry.numFailedTests,0);assert.equal(retry.testResults.length,1);
+ assert.equal(retry.testResults[0].name,expected.retryFile);
+ const retryCases=retry.testResults[0].assertionResults;assert.equal(retryCases.length,17);
+ for(const c of retryCases){const key=expected.retryFile+'\0'+c.fullName;assert(all.has(key));if(c.status==='passed'){assert.equal(key,retryKey);assert(!passed.has(key));passed.add(key)}else assert(['pending','skipped'].includes(c.status));}
+ assert.equal(passed.size,421);return {cases:421,originalPassed:420,retryPassed:1,ciExecuted:false,originalExecutionSigned:false};
 }
 export function verifyEvidence(read=readFileSync,resolve=git){
  const raw=read('.github/evidence/training-entry/reviewed.json');
@@ -195,12 +214,13 @@ export function verifyEvidence(read=readFileSync,resolve=git){
   if((binding.reviewedGroupFiles?.[g.id]||[]).length)assert.deepEqual([...groupFiles].sort(),[...(binding.reviewedGroupFiles?.[g.id]||[])].sort(),'Missing admitted files in group '+g.id);
  }
  if(binding.fixedPgCases?.length)verifyFixedPg(e.fixedPg);
+ if(binding.fixedFrontendContracts){const group=e.groups.find(g=>g.id==='final-frontend-types');assert(group);const d=binding.fixedFrontendContracts,x=group.executions[0];assert.equal(x.inputs[d.retryFile],d.finalTestBlob);assert.equal((x.originalInputs||x.inputs)[d.retryFile],d.priorTestBlob);assert.equal(e.fixedFrontendContracts.sourceAfter,binding.localProduct);verifyFixedFrontend(e.fixedFrontendContracts);assert.deepEqual(binding.checks.frontendTestFiles,[],'Admitted 421 must not rerun');}
  const fresh=new Set();
  for(const[component,key]of [['frontend','frontendTestFiles'],['backend','backendTestFiles'],['frontend','laterFrontendTestFiles'],['backend','laterBackendTestFiles']]){
   for(const f of binding.checks[key]||[]){const full=`server-version/${component}/${f}`;assert(!fresh.has(full),'Duplicate fresh check selection');assert(!admitted.has(full),'A qualified unchanged whole-file check must not rerun');fresh.add(full);}
  }
  assert(e.limits.some(s=>s.includes('unsigned')));assert(e.limits.some(s=>s.includes('node_modules')));
- return {kind:e.kind,ciExecuted:false,originalExecutionSigned:false,groups:e.groups.map(g=>g.id),acceptedWholeFiles:admitted.size,acceptedWholeFileAssertions:admittedAssertions,acceptedFixedPgCases:binding.fixedPgCases?.length||0,limits:e.limits};
+ return {kind:e.kind,ciExecuted:false,originalExecutionSigned:false,groups:e.groups.map(g=>g.id),acceptedWholeFiles:admitted.size,acceptedWholeFileAssertions:admittedAssertions,acceptedFixedPgCases:binding.fixedPgCases?.length||0,acceptedFixedFrontendCases:binding.fixedFrontendContracts?421:0,limits:e.limits};
 }
 export function verifyFreshReport(r,files){
  assert.equal(r.success,true);for(const k of ['numFailedTests','numPendingTests','numTodoTests'])assert.equal(r[k],0);
@@ -209,12 +229,22 @@ export function verifyFreshReport(r,files){
  return {files:files.length,cases:cases.length};
 }
 function evidence(){return JSON.parse(readFileSync('.github/evidence/training-entry/reviewed.json'));}
+export function failedVitestSummary(report){
+ return {success:report.success,numFailedTests:report.numFailedTests,numFailedTestSuites:report.numFailedTestSuites,
+  failures:(report.testResults||[]).flatMap(file=>(file.assertionResults||[]).filter(c=>c.status==='failed').map(c=>({file:file.name,name:c.fullName||c.title,messages:c.failureMessages||[]}))),
+  suiteFailures:(report.testResults||[]).filter(file=>file.status==='failed'&&!(file.assertionResults||[]).some(c=>c.status==='failed')).map(file=>({file:file.name,message:file.message||''}))};
+}
 function tests(component,later=false){
  assert.equal(binding.executionPolicy,'missing-only-current-mixed-candidate');
  const files=binding.checks[later?'later'+component[0].toUpperCase()+component.slice(1)+'TestFiles':component+'TestFiles'];assert(files.every(f=>/^src\/[\w/.-]+\.test\.tsx?$/.test(f)));
  if(files.length===0){save(component+(later?'-later':'')+'-selection',{files:[],reason:'No missing files in this fixed group; not an executed test'});return;}
  mkdirSync(output,{recursive:true});const id=component+(later?'-later-fresh':'-fresh');const target=`${output}/${id}.json`;
- runRecorded(id,component,process.execPath,['node_modules/vitest/vitest.mjs','run',...files,'--maxWorkers=2','--reporter=json',`--outputFile=../../${target}`]);
+ try{runRecorded(id,component,process.execPath,['node_modules/vitest/vitest.mjs','run',...files,'--maxWorkers=2','--reporter=json',`--outputFile=../../${target}`]);}
+ catch(error){
+  // Keep the real JSON and failing invocation; diagnostic stderr is not a verdict.
+  if(existsSync(target)){const summary=failedVitestSummary(JSON.parse(readFileSync(target)));save(id+'-failures',summary);console.error(JSON.stringify(summary).slice(0,16000));}
+  throw error;
+ }
  save(id+'-checked',verifyFreshReport(JSON.parse(readFileSync(target)),files));
 }
 function postgresSelections(){
@@ -232,14 +262,23 @@ function postgresSelections(){
 }
 // Reuse the existing authenticated artifact + 24h freshness mechanism for the
 // successful frontend subprocess only. The original backend/admission failed.
-export function verifyFrontendAuditEvidence(command,stdout,currentManifest,now=Date.now()){
- const expected=binding.officialFrontendAudit;
- assert.equal(command.id,'frontend-audit');assert.equal(command.cwd,'server-version/frontend');
+export function verifyDependencyAuditEvidence(command,stdout,currentManifest,component,now=Date.now()){
+ assert(['frontend','backend'].includes(component));
+ const expected=component==='frontend'?binding.officialFrontendAudit:binding.officialBackendAudit;assert(expected);
+ assert.equal(command.id,component+'-audit');assert.equal(command.cwd,'server-version/'+component);
  assert.deepEqual(command.command,['npm','audit','--package-lock-only','--omit=dev','--audit-level=high','--json']);
  assert.equal(command.source,expected.checkout);assert.equal(command.componentTree,expected.componentTree);
  assert.equal(command.status,'success');assert.equal(command.exitCode,0);assert.equal(command.ciExecuted,true);
  assert.equal(command.tools.node,'v24.21.0');assert.equal(command.signal,null);assert.equal(command.error,null);
- assert.equal(command.gitInputManifest,currentManifest);assert.equal(command.gitInputManifestSHA256,sha(currentManifest));
+ assert.equal(command.gitInputManifestSHA256,sha(command.gitInputManifest));
+ if(currentManifest!==command.gitInputManifest){
+  assert.equal(component,'frontend','Backend dependency inputs changed');
+  const d=binding.fixedFrontendContracts;assert(d,'No reviewed audit-input delta');
+  assert.equal(d.retryFile,'server-version/frontend/src/modules/composite/__tests__/CompositeAssessmentPage.test.tsx');
+  const originalLine=`100644 blob ${d.priorTestBlob}\t${d.retryFile}`,currentLine=`100644 blob ${d.finalTestBlob}\t${d.retryFile}`;
+  assert(command.gitInputManifest.split('\n').includes(originalLine));assert(currentManifest.split('\n').includes(currentLine));
+  assert.equal(currentManifest.split('\n').map(l=>l===currentLine?originalLine:l).join('\n'),command.gitInputManifest,'Non-test dependency audit input changed');
+ }
  assert.equal(command.stdoutSHA256,sha(stdout));assert.equal(command.stderrSHA256,sha(''));
  assert.equal(command.completedAt,expected.completedAt);
  const report=JSON.parse(stdout);assert.equal(report.auditReportVersion,2);assert(!report.error);
@@ -247,37 +286,38 @@ export function verifyFrontendAuditEvidence(command,stdout,currentManifest,now=D
  const age=now-Date.parse(command.completedAt);assert(Number.isFinite(age)&&age>=0);
  return {fresh:age<86400000,ageMilliseconds:age,completedAt:command.completedAt,source:command.source,sourceHead:expected.sourceHead};
 }
-async function frontendAuditProof(){
- const r=binding.officialFrontendAudit;assert(r,'Exact successful frontend audit binding missing');
+export function verifyFrontendAuditEvidence(command,stdout,currentManifest,now=Date.now()){return verifyDependencyAuditEvidence(command,stdout,currentManifest,'frontend',now);}
+async function dependencyAuditProof(component){
+ const r=component==='frontend'?binding.officialFrontendAudit:binding.officialBackendAudit;assert(r,'Exact successful dependency audit binding missing');
  assert.equal(process.env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');
- const api=async path=>{const response=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/'+path,{headers:{Authorization:`Bearer ${process.env.GH_TOKEN}`,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}});assert.equal(response.status,200,'Official frontend audit evidence unavailable');return response;};
+ const api=async path=>{const response=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/'+path,{headers:{Authorization:`Bearer ${process.env.GH_TOKEN}`,Accept:'application/vnd.github+json','X-GitHub-Api-Version':'2022-11-28'}});assert.equal(response.status,200,'Official dependency audit evidence unavailable');return response;};
  const [run,job,artifact]=await Promise.all([api(`actions/runs/${r.run}`).then(x=>x.json()),api(`actions/jobs/${r.job}`).then(x=>x.json()),api(`actions/artifacts/${r.artifact}`).then(x=>x.json())]);
  assert.equal(run.head_sha,r.sourceHead);assert.equal(run.event,'pull_request');assert.equal(run.path,'.github/workflows/ci.yml');
  assert.equal(job.id,r.job);assert.equal(job.run_id,r.run);assert.equal(job.head_sha,r.sourceHead);assert.equal(job.status,'completed');
- assert.equal(job.name,'training-entry / admission');assert(job.steps.some(s=>s.name==='run current frontend and backend HIGH CRITICAL dependency audits'&&s.conclusion==='failure'));
+ assert.equal(job.name,'training-entry / admission');assert(job.steps.some(s=>s.name==='run current frontend and backend HIGH CRITICAL dependency audits'&&s.conclusion===(r.auditStepConclusion||'failure')));
  assert.equal(run.head_branch,branch);assert.equal(artifact.id,r.artifact);
- assert.equal(job.conclusion,'failure','Original failed admission must stay failed');
+ assert.equal(job.conclusion,r.admissionConclusion||'failure','Original admission conclusion must remain unchanged');
  assert.equal(artifact.workflow_run.id,r.run);assert.equal(artifact.workflow_run.head_sha,r.sourceHead);
  assert.equal(artifact.expired,false);assert.equal(artifact.size_in_bytes,r.bytes);assert.equal(artifact.digest,'sha256:'+r.sha256);assert.equal(artifact.name,r.name);
  const zip=Buffer.from(await(await api(`actions/artifacts/${r.artifact}/zip`)).arrayBuffer());assert.equal(zip.length,r.bytes);assert.equal(sha(zip),r.sha256);
  const files=JSON.parse(execFileSync('python3',['-c',"import sys,io,zipfile,json; z=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read())); assert all(i.file_size<2000000 and not i.filename.startswith('/') and '..' not in i.filename.split('/') for i in z.infolist()); assert sum(i.file_size for i in z.infolist())<8000000; print(json.dumps({i.filename:z.read(i).decode() for i in z.infolist() if not i.is_dir()}))"],{input:zip,encoding:'utf8',maxBuffer:10*1024*1024}));
  const read=name=>{const found=Object.entries(files).filter(([p])=>p.split('/').at(-1)===name);assert.equal(found.length,1);return found[0][1];};
- const proof=verifyFrontendAuditEvidence(JSON.parse(read('frontend-audit-command.json')),read('frontend-audit.stdout.log'),git('ls-tree','-r','HEAD','--','server-version/frontend'));
- save('frontend-audit-original-proof',{...proof,run:r.run,job:r.job,artifact:r.artifact,artifactSHA256:r.sha256,originalAdmissionConclusion:'failure',onlyFrontendSubprocessAccepted:true});
+ const proof=verifyDependencyAuditEvidence(JSON.parse(read(component+'-audit-command.json')),read(component+'-audit.stdout.log'),git('ls-tree','-r','HEAD','--','server-version/'+component),component);
+ save(component+'-audit-original-proof',{...proof,run:r.run,job:r.job,artifact:r.artifact,artifactSHA256:r.sha256,originalAdmissionConclusion:r.admissionConclusion||'failure',onlyExactAuditSubprocessAccepted:true});
  return proof;
 }
 async function audits(){
- // Backend inputs changed. Frontend is reusable only while the exact official
- // subprocess proof remains intact and the existing 24h advisory lifetime holds.
- const frontend=await frontendAuditProof(),results=[];
- for(const component of (frontend.fresh?['backend']:['frontend','backend'])){
+ // Reuse only exact successful official component subprocesses within 24 hours.
+ const proofs={},results=[];
+ for(const component of ['frontend','backend']){
+  proofs[component]=await dependencyAuditProof(component);if(proofs[component].fresh)continue;
   const record=runRecorded(component+'-audit',component,'npm',['audit','--package-lock-only','--omit=dev','--audit-level=high','--json']);
   const raw=readFileSync(`${output}/${component}-audit.stdout.log`),report=JSON.parse(raw);
   assert.equal(report.auditReportVersion,2);assert(!report.error);
   assert.equal(report.metadata?.vulnerabilities?.high,0);assert.equal(report.metadata?.vulnerabilities?.critical,0);
   results.push({component,exitCode:record.exitCode,sha256:sha(raw),vulnerabilities:report.metadata.vulnerabilities});
  }
- save('audit',{mode:frontend.fresh?'fresh-backend-exact-frontend-reuse':'fresh-both-after-frontend-proof-expiry',frontend,results});
+ save('audit',{mode:'verified-component-subprocesses-with-24h-expiry',proofs,results});
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  assert.equal(process.version,'v24.21.0');const action=process.argv[2];

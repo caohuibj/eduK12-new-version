@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "base": "44c1e502acaed5524c5b1e233d1bfb1f0c6f7b40",
-  "product": "95c793998a9bd2047c1da48747bf406fe1ca353a",
-  "localProduct": "848f4c1014060f949ae6263418be25787f6f907c",
-  "productTree": "69e6b659f503e856a478f04918665f16f031c2ea",
+  "product": "faee762e9b14f38acaeec2a730d7b17db57fb550",
+  "localProduct": "48ad737c5d7185090fabea05da95e31d592bd04e",
+  "productTree": "accc9951701ebe33c3899a1a2159b4f376de380e",
   "source": {
     "docs/performance/20261024-training-ordinary-submit-fact-protocol.md": {
       "status": "A",
@@ -1921,7 +1921,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "7ecbe7e59c2d8b2dfbd422fe10cd1e3e9873a5f5",
-      "after": "3adca6205b00394520307a2542a0b3688a1e9005"
+      "after": "7e019198f935f0db9fbaeef09bffcace5d54558e"
     },
     "server-version/frontend/src/modules/composite/__tests__/library-api.test.ts": {
       "status": "M",
@@ -2423,7 +2423,7 @@
     "docs/release/README.md": "c2ad42f95180d91f4603fbe83235b938a7c4d159"
   },
   "components": {
-    "frontend": "8c324cd0303e21d5687cf14ced22fbe85b7b0be0",
+    "frontend": "c8f8d785ceaa4d77743e2370693061aa1cf7bb0d",
     "backend": "69824f4813204569d3c7554670ad06bee8c83986"
   },
   "protectedInputs": {
@@ -2438,7 +2438,7 @@
     "server-version/frontend/tsconfig.cognitive.json": "910e97700f25652bc1d80ada47e176cbd51c2fbe",
     "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22"
   },
-  "evidenceSHA256": "7e59f4fd5c251c6806679f5770139ff6c091b885ebed5dea91aca94a1f718e51",
+  "evidenceSHA256": "d36bf04b4ed0846a6049585f583fb3d5d45f931b444a819c92a5808282d546ca",
   "requiredGroups": [
     "learner-frontend",
     "export-hook",
@@ -2484,42 +2484,7 @@
       "src/__tests__/scale/scale-library-localization-manifest.test.ts",
       "src/__tests__/assessment-core/form-foundation.contract.test.ts"
     ],
-    "frontendTestFiles": [
-      "src/api/__tests__/materialGrants.test.ts",
-      "src/components/__tests__/AnonymousStudyManager.test.tsx",
-      "src/components/__tests__/FinalCompositeAssessment.test.tsx",
-      "src/components/__tests__/MaterialGrantModal.test.tsx",
-      "src/components/__tests__/TrainingParticipationSettings.test.tsx",
-      "src/components/__tests__/WholeCompositeQuestionnaire.test.tsx",
-      "src/components/app-shell/__tests__/management-frame-loading.test.tsx",
-      "src/components/app-shell/__tests__/shell.test.tsx",
-      "src/components/participation/participation-link.test.ts",
-      "src/components/shared-ui/__tests__/RetryableLazy.test.tsx",
-      "src/modules/cognitive/__tests__/CognitivePublicEntry.test.tsx",
-      "src/modules/composite/__tests__/CompositeAssessmentPage.test.tsx",
-      "src/modules/situational/__tests__/vnext-history.test.ts",
-      "src/pages/__tests__/AssignmentList.course-workspace.test.tsx",
-      "src/pages/__tests__/AssignmentList.review-pagination.test.tsx",
-      "src/pages/__tests__/AssignmentList.states.test.tsx",
-      "src/pages/__tests__/TeacherCodeList.test.tsx",
-      "src/pages/__tests__/TeacherTasks.loading.test.tsx",
-      "src/pages/__tests__/UserList.training.test.tsx",
-      "src/pages/admin/AdminTrainingWorkspace.test.tsx",
-      "src/pages/public/__tests__/AnonymousStudyPage.test.tsx",
-      "src/pages/public/__tests__/PublicCheckin.performance.test.tsx",
-      "src/pages/public/__tests__/PublicCheckin.protected-media.test.tsx",
-      "src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx",
-      "src/pages/questionnaire/__tests__/TrainingQuestionnaireList.test.tsx",
-      "src/survey/ResearchCatalog.requests.test.tsx",
-      "src/survey/SurveyPublicApp.final.test.tsx",
-      "src/survey/SurveyToolTemplateEditor.loading.test.tsx",
-      "src/survey/SurveyWaveStudio.preview.test.tsx",
-      "src/survey/survey-cognitive-deferred.test.ts",
-      "src/training/TrainingAdminResources.efficiency.test.tsx",
-      "src/training/TrainingCourseAssessments.loading.test.tsx",
-      "src/training/TrainingCourseAssessments.test.tsx",
-      "src/training/TrainingLearnerCourse.loading.test.tsx"
-    ],
+    "frontendTestFiles": [],
     "earlyLintFiles": [
       "src/api/__tests__/materialGrants.test.ts",
       "src/api/anonymousStudy.ts",
@@ -2720,7 +2685,39 @@
         "reviewEvidence": "Independent audit_report_state_optimizations review at 2026-10-24 09:08 UTC against this exact mixed candidate."
       }
     },
-    "retained-lint": {}
+    "retained-lint": {},
+    "final-frontend-types": {
+      "server-version/frontend/src/modules/composite/__tests__/CompositeAssessmentPage.test.tsx": {
+        "before": "3adca6205b00394520307a2542a0b3688a1e9005",
+        "after": "7e019198f935f0db9fbaeef09bffcace5d54558e",
+        "executedPathUnchanged": true,
+        "changedSymbols": [
+          "namespace rejection test text query"
+        ],
+        "unchangedExecutedPaths": [
+          "all production imports and API guards",
+          "compiler-compatible existing expect/toHaveTextContent APIs"
+        ],
+        "reason": "Only one existing test assertion replaces exact old text query with alert role plus complete current text. No product, import, interface or inferred data type changed; targeted case passed.",
+        "reviewEvidence": "Independent source review plus actual single-case exit0; existing getAttempt/start-not-called assertions remain."
+      }
+    },
+    "final-backend-types": {
+      "server-version/frontend/src/modules/composite/__tests__/CompositeAssessmentPage.test.tsx": {
+        "before": "3adca6205b00394520307a2542a0b3688a1e9005",
+        "after": "7e019198f935f0db9fbaeef09bffcace5d54558e",
+        "executedPathUnchanged": true,
+        "changedSymbols": [
+          "namespace rejection test text query"
+        ],
+        "unchangedExecutedPaths": [
+          "all production imports and API guards",
+          "compiler-compatible existing expect/toHaveTextContent APIs"
+        ],
+        "reason": "Only one existing test assertion replaces exact old text query with alert role plus complete current text. No product, import, interface or inferred data type changed; targeted case passed.",
+        "reviewEvidence": "Independent source review plus actual single-case exit0; existing getAttempt/start-not-called assertions remain."
+      }
+    }
   },
   "executionPolicy": "missing-only-current-mixed-candidate",
   "fixedPgCases": [
@@ -2784,5 +2781,69 @@
     "sha256": "72330867c2f65a986c40bf45d17522ad9d3cc2194e4cb1dc960f071c6a406575",
     "componentTree": "8c324cd0303e21d5687cf14ced22fbe85b7b0be0",
     "completedAt": "2026-10-24T09:55:44.522Z"
+  },
+  "fixedFrontendContracts": {
+    "files": [
+      "server-version/frontend/src/api/__tests__/materialGrants.test.ts",
+      "server-version/frontend/src/components/__tests__/AnonymousStudyManager.test.tsx",
+      "server-version/frontend/src/components/__tests__/FinalCompositeAssessment.test.tsx",
+      "server-version/frontend/src/components/__tests__/MaterialGrantModal.test.tsx",
+      "server-version/frontend/src/components/__tests__/TrainingParticipationSettings.test.tsx",
+      "server-version/frontend/src/components/__tests__/WholeCompositeQuestionnaire.test.tsx",
+      "server-version/frontend/src/components/app-shell/__tests__/management-frame-loading.test.tsx",
+      "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx",
+      "server-version/frontend/src/components/participation/participation-link.test.ts",
+      "server-version/frontend/src/components/shared-ui/__tests__/RetryableLazy.test.tsx",
+      "server-version/frontend/src/modules/cognitive/__tests__/CognitivePublicEntry.test.tsx",
+      "server-version/frontend/src/modules/composite/__tests__/CompositeAssessmentPage.test.tsx",
+      "server-version/frontend/src/modules/situational/__tests__/vnext-history.test.ts",
+      "server-version/frontend/src/pages/__tests__/AssignmentList.course-workspace.test.tsx",
+      "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx",
+      "server-version/frontend/src/pages/__tests__/AssignmentList.states.test.tsx",
+      "server-version/frontend/src/pages/__tests__/TeacherCodeList.test.tsx",
+      "server-version/frontend/src/pages/__tests__/TeacherTasks.loading.test.tsx",
+      "server-version/frontend/src/pages/__tests__/UserList.training.test.tsx",
+      "server-version/frontend/src/pages/admin/AdminTrainingWorkspace.test.tsx",
+      "server-version/frontend/src/pages/public/__tests__/AnonymousStudyPage.test.tsx",
+      "server-version/frontend/src/pages/public/__tests__/PublicCheckin.performance.test.tsx",
+      "server-version/frontend/src/pages/public/__tests__/PublicCheckin.protected-media.test.tsx",
+      "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx",
+      "server-version/frontend/src/pages/questionnaire/__tests__/TrainingQuestionnaireList.test.tsx",
+      "server-version/frontend/src/survey/ResearchCatalog.requests.test.tsx",
+      "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx",
+      "server-version/frontend/src/survey/SurveyToolTemplateEditor.loading.test.tsx",
+      "server-version/frontend/src/survey/SurveyWaveStudio.preview.test.tsx",
+      "server-version/frontend/src/survey/survey-cognitive-deferred.test.ts",
+      "server-version/frontend/src/training/TrainingAdminResources.efficiency.test.tsx",
+      "server-version/frontend/src/training/TrainingCourseAssessments.loading.test.tsx",
+      "server-version/frontend/src/training/TrainingCourseAssessments.test.tsx",
+      "server-version/frontend/src/training/TrainingLearnerCourse.loading.test.tsx"
+    ],
+    "expectedPassed": 421,
+    "retryFile": "server-version/frontend/src/modules/composite/__tests__/CompositeAssessmentPage.test.tsx",
+    "retryName": "does not accept a study or Survey fragment as a single attempt credential",
+    "priorTestBlob": "3adca6205b00394520307a2542a0b3688a1e9005",
+    "finalTestBlob": "7e019198f935f0db9fbaeef09bffcace5d54558e",
+    "inputClosureGroup": "final-frontend-types"
+  },
+  "evidenceSourceObjects": {
+    "848f4c1014060f949ae6263418be25787f6f907c": {
+      "remote": "95c793998a9bd2047c1da48747bf406fe1ca353a",
+      "tree": "69e6b659f503e856a478f04918665f16f031c2ea"
+    }
+  },
+  "officialBackendAudit": {
+    "run": 40089648347,
+    "job": 120859592632,
+    "artifact": 12558885203,
+    "bytes": 104921,
+    "sha256": "d885e0cef27eca8d49dfbee9411d212b9b5b6cb22f40293a94984c6ea5f27b14",
+    "name": "training-entry-admission-d921c8a70f730be7407006e4ec443917ac5ae6e6",
+    "sourceHead": "b01155eb11c5b8d2c106bebe34f6520f3861a2e0",
+    "checkout": "d921c8a70f730be7407006e4ec443917ac5ae6e6",
+    "componentTree": "69824f4813204569d3c7554670ad06bee8c83986",
+    "completedAt": "2026-10-24T11:23:47.451Z",
+    "admissionConclusion": "success",
+    "auditStepConclusion": "success"
   }
 }

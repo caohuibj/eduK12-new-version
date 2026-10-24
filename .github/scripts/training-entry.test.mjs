@@ -1,10 +1,11 @@
+import {normalizedRestoredSchema,restoredCheckRepresentations} from './training-entry-migration.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {gzipSync} from 'node:zlib';
 import {binding,branch,marker,trainingEntryPlan,trainingEntryOutputs} from './training-entry-scope.mjs';
-import {verifyEvidence,verifyFreshReport,requireApproval,verifyFixedPg,requireMissingRecordApproval,verifyFrontendAuditEvidence,evidenceSourceObject} from './training-entry-checks.mjs';
+import {verifyEvidence,verifyFreshReport,requireApproval,verifyFixedPg,requireMissingRecordApproval,verifyFrontendAuditEvidence,evidenceSourceObject,failedVitestSummary,verifyFixedFrontend,verifyDependencyAuditEvidence} from './training-entry-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 function fixture(){
  const head='a'.repeat(40),source='b'.repeat(40),values={};
@@ -170,3 +171,22 @@ for(const [name,change]of [
  test('evidence maps only current local provenance to the exact published product tree',()=>{const seen=[];const resolve=(cmd,ref)=>{seen.push(ref);assert.equal(cmd,'rev-parse');assert.equal(ref,binding.product+'^{tree}');return binding.productTree};assert.equal(evidenceSourceObject(binding.localProduct,resolve),binding.product);assert.deepEqual(seen,[binding.product+'^{tree}']);});
  test('evidence rejects a published snapshot with different tree bytes',()=>{assert.throws(()=>evidenceSourceObject(binding.localProduct,()=> '0'.repeat(40)),/tree mismatch/);});
  test('evidence never aliases unrelated historical source commits',()=>{const other='1'.repeat(40);assert.equal(evidenceSourceObject(other,()=>{throw Error('unexpected lookup')}),other);});
+
+const schemaFixture=()=>({columns:[{table_schema:'public',table_name:'t',column_name:'a',ordinal_position:1,dtd_identifier:'1',is_nullable:'NO'},{table_schema:'public',table_name:'t',column_name:'b',ordinal_position:4,dtd_identifier:'4',is_nullable:'YES'}],constraints:[],indexes:[],triggers:[],functions:[]});
+for(const pair of restoredCheckRepresentations)test('restore canonicalizes only exact CHECK pair '+pair.name,()=>{const a=schemaFixture(),b=schemaFixture();a.constraints=[[pair.table,pair.name,pair.original,true]];b.constraints=[[pair.table,pair.name,pair.restored,true]];assert.deepEqual(normalizedRestoredSchema(a),normalizedRestoredSchema(b));});
+test('restore preserves semantic CHECK differences and table identity',()=>{const p=restoredCheckRepresentations[0],a=schemaFixture();a.constraints=[[p.table,p.name,p.original.replace('>= 4','>= 5'),true],['other',p.name,p.original,true],[p.table,p.name,p.original.replace(' AND ',' OR '),false]];assert.deepEqual(normalizedRestoredSchema(a).constraints,a.constraints);});
+test('restore normalizes only dropped-column physical gaps and preserves visible order and metadata',()=>{const a=schemaFixture(),b=structuredClone(a);b.columns[1].ordinal_position=2;b.columns[1].dtd_identifier='2';assert.deepEqual(normalizedRestoredSchema(a),normalizedRestoredSchema(b));b.columns.reverse();assert.notDeepEqual(normalizedRestoredSchema(a),normalizedRestoredSchema(b));b.columns.reverse();b.columns[1].is_nullable='NO';assert.notDeepEqual(normalizedRestoredSchema(a),normalizedRestoredSchema(b));});
+test('restore rejects unrecognized dtd physical identity',()=>{const a=schemaFixture();a.columns[1].dtd_identifier='unknown';assert.throws(()=>normalizedRestoredSchema(a),/dtd identity/);});
+test('failed JSON diagnostics use assertion results rather than synthetic stderr',()=>{const r={success:false,numFailedTests:1,testResults:[{name:'a',status:'failed',assertionResults:[{status:'passed',fullName:'expected synthetic failure'},{status:'failed',fullName:'real mismatch',failureMessages:['expected text']}]}]};assert.deepEqual(failedVitestSummary(r).failures,[{file:'a',name:'real mismatch',messages:['expected text']}]);assert.equal(failedVitestSummary(r).success,false);});
+
+const fixedFrontendProof=()=>JSON.parse(readFileSync('.github/evidence/training-entry/reviewed.json')).fixedFrontendContracts;
+test('fixed frontend accepts only reviewed local 420 plus unique retry one',()=>{assert.deepEqual(verifyFixedFrontend(fixedFrontendProof()),{cases:421,originalPassed:420,retryPassed:1,ciExecuted:false,originalExecutionSigned:false});});
+test('fixed frontend rejects report tampering',()=>{const e=fixedFrontendProof();e.reports[0].sha256='0'.repeat(64);assert.throws(()=>verifyFixedFrontend(e));});
+test('fixed frontend retains original failed invocation',()=>{const e=fixedFrontendProof();e.reports[0].exitCode=0;assert.throws(()=>verifyFixedFrontend(e));});
+test('fixed frontend never treats a failed retry as accepted',()=>{const e=fixedFrontendProof();e.reports[1].exitCode=1;assert.throws(()=>verifyFixedFrontend(e));});
+
+function backendAuditFixture(){const f=frontendAuditFixture(),r=binding.officialBackendAudit;f.command={...f.command,id:'backend-audit',cwd:'server-version/backend',source:r.checkout,componentTree:r.componentTree,completedAt:r.completedAt};f.manifest=f.manifest.replace('frontend','backend');f.command.gitInputManifest=f.manifest;f.command.gitInputManifestSHA256=createHash('sha256').update(f.manifest).digest('hex');f.now=Date.parse(r.completedAt)+1000;return f;}
+test('backend audit accepts exact successful component subprocess and expires after 24h',()=>{const f=backendAuditFixture();assert.equal(verifyDependencyAuditEvidence(f.command,f.stdout,f.manifest,'backend',f.now).fresh,true);assert.equal(verifyDependencyAuditEvidence(f.command,f.stdout,f.manifest,'backend',f.now+86400000).fresh,false);});
+test('backend audit refuses any input drift even with reviewed frontend delta',()=>{const f=backendAuditFixture();assert.throws(()=>verifyDependencyAuditEvidence(f.command,f.stdout,f.manifest+'x','backend',f.now),/Backend dependency inputs changed/);});
+test('backend audit refuses failed original subprocess',()=>{const f=backendAuditFixture();f.command.exitCode=1;assert.throws(()=>verifyDependencyAuditEvidence(f.command,f.stdout,f.manifest,'backend',f.now));});
+test('evidence preserves earlier compiler source through explicit identical-tree public mapping',()=>{const [source,mapping]=Object.entries(binding.evidenceSourceObjects)[0];assert.equal(evidenceSourceObject(source,(cmd,ref)=>{assert.equal(cmd,'rev-parse');assert.equal(ref,mapping.remote+'^{tree}');return mapping.tree}),mapping.remote);});
