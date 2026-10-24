@@ -28,7 +28,7 @@ function fixture(){
  composite.trainingVariantFrozen=compiled;composite.trainingVariantDigest=compiled.configDigest
  const allocation=createWeightedVariantAllocation(compiled,{compositeId:composite.id,attemptId:'parent',participantKey:'user',attemptEpoch:1,publishedAt:composite.publishedAt.toISOString()},{randomInt:()=>0,assignedAt:'2026-10-18T00:00:01Z'})
  const slots=createFrozenActiveSlotSet({schemaVersion:1,runtimeGeneration:'UNIFIED_V1',attemptEpoch:1,slots:[{slotKey:'form-section:section-0',unitType:'FORM_SECTION',required:true,sourceDefinitionIdentity:{key:'section-0',version:'FORM_SECTION_V3',hash:canonicalHash(mapCompositeSection(sections[0]))},sourceBinding:{sectionId:'section-0'}}]})
- const parent:any={id:'parent',compositeAssessmentId:'composite',trainingContentBinding:null,trainingContentBindingHash:null,trainingReferenceBinding:null,trainingReferenceBindingHash:null,status:'IN_PROGRESS',runtimeGeneration:'UNIFIED_V1',deliveryMode:'FINAL_ONLY',attemptEpoch:1,participantKey:'user',startedAt:new Date('2026-10-18T00:00:00Z'),completedAt:null,progress:0,completedItems:0,
+ const parent:any={id:'parent',compositeAssessmentId:'composite',trainingContentBinding:null,trainingContentBindingHash:null,status:'IN_PROGRESS',runtimeGeneration:'UNIFIED_V1',deliveryMode:'FINAL_ONLY',attemptEpoch:1,participantKey:'user',startedAt:new Date('2026-10-18T00:00:00Z'),completedAt:null,progress:0,completedItems:0,
    contextSnapshotEncrypted:null,contextSnapshotHash:null,compiledBundleRuntimeHash:null,aggregateInputHash:null,trainingVariantAllocationEncrypted:encryptUnifiedRuntimePayload(allocation),trainingVariantAllocationHash:allocation.allocationHash,
    trainingFlowSnapshotEncrypted:null,trainingFlowSnapshotHash:null,trainingFlowPathEncrypted:null,trainingFlowPathHash:null,
    frozenActiveSlotSetEncrypted:encryptFrozenActiveSlotSet(slots),frozenActiveSlotSetHash:slots.snapshotHash,compositeAssessment:composite,
@@ -167,68 +167,5 @@ describe('committed aggregate graph to Training FINAL receipt',()=>{
   expect(db.compositeAssessmentAttempt.findUnique).not.toHaveBeenCalled()
   expect(db.$transaction).toHaveBeenCalledTimes(1);expect(db.compositeAssessmentAttempt.updateMany).toHaveBeenCalledTimes(1)
   // Mocked I/O proves shared transaction/error propagation, not PostgreSQL rollback.
- })
-})
-
-function ordinaryTerminalFixture() {
- const f=boundScaleFixture()
- f.parent.trainingContentBinding=null;f.parent.trainingContentBindingHash=null
- f.parent.asyncReportEpoch=null;f.parent.assignmentRef=null;f.parent.compositeAssessment.reportPackageKey=null;f.parent.compositeAssessment.analysisProtocolKey=null
- return f
-}
-describe('ordinary synchronous terminal snapshot read strategy',()=>{
- it('uses one fresh payload read instead of header plus payload without changing aggregate identity or CAS',async()=>{
-  const f=ordinaryTerminalFixture(),before=JSON.stringify(f.row)
-  const original=await finalizeCompositeAttemptUnifiedIfReady(f.parent.id,f.parent)
-  expect(db.assessmentUnitSnapshot.findMany).toHaveBeenCalledTimes(2)
-  db.assessmentUnitSnapshot.findMany.mockClear();db.compositeAssessmentAttempt.updateMany.mockClear()
-  const optimized=await finalizeCompositeAttemptUnifiedIfReady(f.parent.id,f.parent,undefined,undefined,true)
-  expect(optimized).toEqual(original)
-  expect(db.assessmentUnitSnapshot.findMany).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({
-   where:{compositeAttemptId:f.parent.id,attemptEpoch:1},select:expect.objectContaining({canonicalResultEncrypted:true,collectionFactsEncrypted:true,sourceSubmissionId:true,attemptEpoch:true}),
-  }))
-  expect(db.compositeAssessmentAttempt.updateMany).toHaveBeenCalledTimes(1)
-  expect(db.compositeAssessmentAttempt.updateMany.mock.calls[0][0].where).toMatchObject({id:f.parent.id,attemptEpoch:1,status:'IN_PROGRESS'})
-  expect(JSON.stringify(f.row)).toBe(before)
- })
- it.each(['epoch','definition','provenance','canonical-hash','ciphertext','frozen-hash'])('still rejects %s corruption before any completion write',async kind=>{
-  const f=ordinaryTerminalFixture()
-  if(kind==='epoch')f.row.attemptEpoch=2
-  if(kind==='definition')f.row.sourceDefinitionHash='c'.repeat(64)
-  if(kind==='provenance')f.row.sourceSubmissionId='other-submission'
-  if(kind==='canonical-hash')f.row.canonicalResultEncrypted=encryptUnifiedRuntimePayload({...f.envelope,resultHash:'c'.repeat(64)})
-  if(kind==='ciphertext')f.row.canonicalResultEncrypted='corrupt'
-  if(kind==='frozen-hash')f.parent.frozenActiveSlotSetHash='c'.repeat(64)
-  await expect(finalizeCompositeAttemptUnifiedIfReady(f.parent.id,f.parent,undefined,undefined,true)).rejects.toBeTruthy()
-  expect(db.compositeAssessmentAttempt.updateMany).not.toHaveBeenCalled();expect(db.$transaction).not.toHaveBeenCalled()
- })
- it('does not treat a terminal hint as proof that a missing snapshot is complete',async()=>{
-  const f=ordinaryTerminalFixture();db.assessmentUnitSnapshot.findMany.mockResolvedValue([])
-  expect(await finalizeCompositeAttemptUnifiedIfReady(f.parent.id,f.parent,undefined,undefined,true)).toMatchObject({status:'IN_PROGRESS'})
-  expect(db.compositeAssessmentAttempt.updateMany).not.toHaveBeenCalledWith(expect.objectContaining({data:expect.objectContaining({status:'COMPLETED'})}))
- })
- it('does not suppress snapshot read errors',async()=>{
-  const f=ordinaryTerminalFixture();db.assessmentUnitSnapshot.findMany.mockRejectedValueOnce(new Error('snapshot read unavailable'))
-  await expect(finalizeCompositeAttemptUnifiedIfReady(f.parent.id,f.parent,undefined,undefined,true)).rejects.toThrow('snapshot read unavailable')
-  expect(db.$transaction).not.toHaveBeenCalled()
- })
- it('does not broaden the strategy to variants',async()=>{
-  const f=fixture()
-  await finalizeCompositeAttemptUnifiedIfReady(f.parent.id,f.parent,undefined,undefined,true)
-  expect(db.assessmentUnitSnapshot.findMany).toHaveBeenCalledTimes(2)
-  expect(db.assessmentUnitSnapshot.findMany.mock.calls[0][0].select).not.toHaveProperty('canonicalResultEncrypted')
- })
- it.each(['legacy','enrolled','unknown','analysis-unknown','report-unknown','assignment-unknown','async-unknown'])('keeps full fallback for %s',async kind=>{
-  const f=ordinaryTerminalFixture()
-  if(kind==='legacy')f.parent.compositeAssessment.productKind='LEGACY_COMPOSITE'
-  if(kind==='enrolled')f.parent.asyncReportEpoch=1
-  if(kind==='unknown')delete f.parent.compositeAssessment.trainingVariantDraft
-  if(kind==='analysis-unknown')delete f.parent.compositeAssessment.analysisProtocolKey
-  if(kind==='report-unknown')delete f.parent.compositeAssessment.reportPackageKey
-  if(kind==='assignment-unknown')delete f.parent.assignmentRef
-  if(kind==='async-unknown')delete f.parent.asyncReportEpoch
-  const result=finalizeCompositeAttemptUnifiedIfReady(f.parent.id,f.parent,undefined,undefined,true)
-  if(kind==='unknown')await expect(result).rejects.toBeTruthy();else await result
-  expect(db.assessmentUnitSnapshot.findMany.mock.calls[0][0].select).not.toHaveProperty('canonicalResultEncrypted')
  })
 })

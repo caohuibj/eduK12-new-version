@@ -3740,7 +3740,6 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
       instruction: true,
       reportPackageSnapshotEncrypted: true,
       reportPackageKey: true,
-      analysisProtocolKey: true,
       reportPackageVersion: true,
       reportPackageProfile: true,
       items: {
@@ -4536,7 +4535,6 @@ export const finalizeCompositeAttemptIfReady = async (attemptId: string, options
   reportJob?: ReportJobIdentity
   preloadedParent?: any
   committedGraph?: any
-  terminalSnapshotRead?: boolean
 } = {}): Promise<{ status: string; progress: number; completedAt: Date | null;
   aggregateInputHash?: string; totalTime?: number } | null | undefined> => {
   const route = options.preloadedParent ?? await prisma.compositeAssessmentAttempt.findUnique({
@@ -4554,7 +4552,7 @@ export const finalizeCompositeAttemptIfReady = async (attemptId: string, options
   let result
   if (route?.runtimeGeneration === 'UNIFIED_V1') {
     const { finalizeCompositeAttemptUnifiedIfReady } = await import('../assessment-runtime/unified-aggregate-finalizer.service')
-    result = await finalizeCompositeAttemptUnifiedIfReady(attemptId, route, options.reportJob, options.committedGraph, options.terminalSnapshotRead)
+    result = await finalizeCompositeAttemptUnifiedIfReady(attemptId, route, options.reportJob, options.committedGraph)
   } else if (!route || route.deliveryMode !== 'FINAL_ONLY') {
     result = await finalizeCompositeAttemptLegacyIfReady(attemptId)
   } else {
@@ -4631,14 +4629,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
         const job = await readCompositeReportJobHeader(attemptId, runtime.attemptEpoch)
         return { ...state, allUnitsSubmitted: true, reportStatus: compositeReportJobState(job) }
       }
-      const finalized = await finalizeCompositeAttemptIfReady(attemptId, { preloadedParent: runtime,
-        // This is only a read-strategy hint: the finalizer still independently
-        // verifies completeness, canonical facts and the parent CAS binding.
-        terminalSnapshotRead: !assessmentReportConfig().enabled && runtime.asyncReportEpoch === null
-          && runtime.compositeAssessment.productKind === 'QUESTIONNAIRE'
-          && runtime.assignmentRef === null && runtime.compositeAssessment.reportPackageKey === null
-          && runtime.compositeAssessment.analysisProtocolKey === null && !hasTrainingVariantMetadata(runtime),
-      })
+      const finalized = await finalizeCompositeAttemptIfReady(attemptId, { preloadedParent: runtime })
       if (!finalized) return state
       return patchCompositeStateAfterFinalize(state, finalized)
     }
