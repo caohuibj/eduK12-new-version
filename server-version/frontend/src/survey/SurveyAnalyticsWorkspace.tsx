@@ -1,3 +1,6 @@
+import './survey-workspace-polish.css'
+import {CheckCircle2,ClipboardCheck,Filter,UserMinus} from 'lucide-react'
+import {readableAnswerCsv} from './readable-answer-export'
 import { SurveySectionHeader } from './SurveySectionHeader'
 import {SurveyPrivateReferenceStudio} from './SurveyPrivateReferenceStudio'
 import {SurveyStoredReportReader} from './SurveyStoredReportReader'
@@ -66,11 +69,12 @@ const sameFrozenPage=(before:Ticket,after:Ticket)=>
 const isCompactAttendance=(ticket:Ticket)=>['ATTENDANCE_COMPACT_V1','ATTENDANCE_COMPACT_V2']
   .includes(ticket.manifest.batch?.representation??'')
 type Artifact={id:string;format:ExportFormat;csv?:string;codebook?:unknown;manifest?:unknown}
-type DownloadPart='csv'|'codebook'|'manifest'
-const downloadParts:[DownloadPart,string][]=[['csv','CSV'],['codebook','Codebook'],['manifest','Manifest']]
+type DownloadPart='csv'|'codebook'|'manifest'|'readable'
+const downloadParts:[Exclude<DownloadPart,'readable'>,string][]=[['csv','CSV'],['codebook','Codebook'],['manifest','Manifest']]
+const supportsReadable=(ticket:Ticket)=>['RAW_WAVE','RAW_LONG'].includes(ticket.format)&&!isCompactAttendance(ticket)
 const kindOptions:Record<ExportFormat,string>={
-  RAW_WAVE:'单波次逐题原始数据',
-  RAW_LONG:'全部波次逐题 Long',
+  RAW_WAVE:'逐题答卷（当前问卷）',
+  RAW_LONG:'逐题答卷（全部轮次）',
   RAW_WIDE:'同编号逐题 Wide',
   SCORE_LONG:'全部波次探索性得分 Long',
   SCORE_WIDE:'同编号探索性得分 Wide',
@@ -154,7 +158,7 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
   const base='/projects/'+projectId
   const rememberFiles=()=>{
     if(!ticket)return
-    const parts=downloadParts.filter(([part])=>downloadsStarted[part]).map(([,label])=>label)
+    const parts=[...(downloadsStarted.readable?['中文答卷']:[]),...downloadParts.filter(([part])=>downloadsStarted[part]).map(([,label])=>label)]
     if(parts.length){
       const previous={ticketId:ticket.id,page:ticket.pageNumber??1,parts}
       previousFilesRef.current=previous;setPreviousFiles(previous)
@@ -355,13 +359,18 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
     const isCurrent=()=>mounted.current&&currentProject.current===project&&exportEpoch.current===epoch&&currentTicket.current===id
     void execute(async()=>{
     try{
-    const label=downloadParts.find(([key])=>key===part)![1]
+    const label=part==='readable'?'中文答卷':downloadParts.find(([key])=>key===part)![1]
     let artifact:Artifact
     try{
-      artifact=await api<Artifact>(base+'/exports/'+ticket.id+'/download?part='+part)
-      if(artifact.id!==ticket.id||artifact.format!==ticket.format||
-        (part==='csv'?typeof artifact.csv!=='string':!artifact[part]||typeof artifact[part]!=='object'))
-        throw new Error('导出回执与当前批次不一致或内容不完整')
+      const requestedParts=part==='readable'?(['csv','codebook'] as const):[part]
+      const artifacts=await Promise.all(requestedParts.map(async requestedPart=>{
+        const result=await api<Artifact>(base+'/exports/'+ticket.id+'/download?part='+requestedPart)
+        if(result.id!==ticket.id||result.format!==ticket.format||
+          (requestedPart==='csv'?typeof result.csv!=='string':!result[requestedPart]||typeof result[requestedPart]!=='object'))
+          throw new Error('导出回执与当前批次不一致或内容不完整')
+        return result
+      }))
+      artifact=Object.assign({},...artifacts)
     }catch(e){
       if(!isCurrent())return
       exportFailure(e,'read')
@@ -376,11 +385,12 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
     const baseName='survey_'+projectId.slice(0,8)+'_'+artifact.format.toLowerCase()
       +'_batch'+batchLabel+(isCompactAttendance(ticket)
         ?'_attendance':'')+'_'+ticket.id.slice(0,8)
-    const filename=baseName+(part==='csv'?'.csv':'_'+part+'.json')
+    const filename=baseName+(part==='readable'?'_中文答卷.csv':part==='csv'?'.csv':'_'+part+'.json')
+    const readable=part==='readable'?readableAnswerCsv(artifact.csv!,artifact.codebook):null
     try{
-      downloadBlob(filename,part==='csv'?'\uFEFF'+artifact.csv:
+      downloadBlob(filename,part==='readable'?'\uFEFF'+readable:part==='csv'?'\uFEFF'+artifact.csv:
         JSON.stringify(part==='codebook'?artifact.codebook:artifact.manifest,null,2),
-      part==='csv'?'text/csv;charset=utf-8':'application/json;charset=utf-8')
+      (part==='csv'||part==='readable')?'text/csv;charset=utf-8':'application/json;charset=utf-8')
     }catch{throw new Error(label+' 下载发起结果未确认，请先核对浏览器下载列表，再重试此文件。')}
     setDownloadsStarted(previous=>({...previous,[part]:true}))
     setMessage('已发起 '+filename+' 下载。请在浏览器下载列表核对是否保存；网页无法确认文件已落盘。若被取消或拦截，请重试此文件。')
@@ -398,30 +408,36 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
     {overviewLoading&&<p role="status">正在加载完成进度…</p>}
     {overviewError&&<p role="alert">完成进度加载失败：{overviewError}。请使用“刷新完成进度”重试。{overview?'下方保留上次成功读取的数据，可能不是最新状态。':''}</p>}
     {!overviewLoading&&!overviewError&&overview?.waves.length===0&&<p>本项目暂无研究波次。请先在发布入口创建并保存波次。</p>}
-    {overview&&<><div className="overflow-x-auto" tabIndex={0} role="region" aria-label="研究波次完成统计"><table className="w-full text-sm border-collapse">
+    {overview&&<><section className="survey-data-summary" aria-label="答卷完成概览"><div className="survey-data-summary-heading"><h3>答卷完成情况</h3><span>各波次累计答卷，不代表独立参与人数</span></div><div className="survey-data-metrics">{[
+      {label:'已完成答卷',key:'finalCompleted' as const,Icon:ClipboardCheck},
+      {label:'有效分析答卷',key:'analysisIncluded' as const,Icon:CheckCircle2},
+      {label:'质量排除',key:'qualityExcluded' as const,Icon:Filter},
+      {label:'撤回排除',key:'excluded' as const,Icon:UserMinus},
+    ].map(({label,key,Icon})=><article key={key}><span><Icon size={17} aria-hidden="true"/>{label}</span><strong>{overview.waves.every(w=>typeof w[key]==='number')?overview.waves.reduce((sum,w)=>sum+w[key],0):'—'}</strong></article>)}</div></section>
+    <div className="survey-data-wave-table overflow-x-auto" tabIndex={0} role="region" aria-label="研究波次完成统计"><table className="w-full text-sm border-collapse">
       <thead><tr className="bg-slate-100"><th className="p-2 text-left">波次</th><th className="p-2">状态</th>
-        <th className="p-2">已启动</th><th className="p-2">完成 FINAL</th>
+        <th className="p-2">已启动</th><th className="p-2">已完成答卷</th>
         <th className="p-2">有效分析</th><th className="p-2">质量排除</th>
         <th className="p-2">研究编号数</th><th className="p-2">撤回排除</th></tr></thead>
       <tbody>{overview.waves.map(w=><tr key={w.id} className="border-b">
-        <th scope="row" className="p-2 text-left">T{w.ordinal} · {w.title}</th><td className="p-2 text-center">{w.status}</td>
+        <th scope="row" className="p-2 text-left">T{w.ordinal} · {w.title}</th><td className="p-2 text-center"><span className="survey-data-wave-state" data-status={w.status}>{{OPEN:'采集中',DRAFT:'未开放',PAUSED:'已暂停',CLOSED:'已结束'}[w.status]||w.status}</span></td>
         <td className="p-2 text-center">{w.starts}</td><td className="p-2 text-center">{w.finalCompleted}</td>
         <td className="p-2 text-center">{w.analysisIncluded}</td>
         <td className="p-2 text-center">{w.qualityExcluded}</td>
         <td className="p-2 text-center">{w.uniqueLinkedCodes??'不可关联'}</td>
         <td className="p-2 text-center">{w.excluded}</td></tr>)}</tbody></table></div>
-      <p className="text-xs text-slate-600">{overview.note} 质量排除是可审计的分析政策，不修改加密原始 FINAL；参与者撤回另行处理。</p>
-      <section id="survey-data-quality" tabIndex={-1} className="survey-task-card space-y-3" aria-label="科研样本质量复核">
+      <details className="survey-data-count-note"><summary>答卷数量与统计口径</summary><p>{overview.note} 质量排除不修改原始答卷；参与者撤回另行处理。</p></details>
+      <section id="survey-data-quality" data-empty={!qualityRows.length} tabIndex={-1} className="survey-task-card space-y-3" aria-label="科研样本质量复核">
         <h3 className="font-semibold">科研样本质量复核</h3>
         <p className="text-xs text-slate-600">只列出本人项目已完成且未撤回的 FINAL。审核决定可恢复，必须注明理由并留痕。</p>
         <label className="survey-quality-reason block text-sm">本次复核理由（必填）
-          <textarea className="input block w-full" maxLength={1000} value={qualityReason}
+          <textarea className="input block w-full" disabled={busy||!qualityRows.length} maxLength={1000} value={qualityReason}
             onChange={e=>setQualityReason(e.target.value)} placeholder="例如：注意力题未通过；或重新检查后符合纳入标准"/>
         </label>
         {qualityLoading&&<p role="status">正在加载质量复核列表…</p>}
         {qualityError&&<div role="alert"><p>质量复核列表加载失败：{qualityError}。{qualityRows.length?'下方保留上次成功读取的记录。':''}</p>
           <button type="button" className="btn-secondary" disabled={busy||qualityLoading} onClick={()=>void execute(()=>loadQuality())}>重试质量复核列表</button></div>}
-        {!qualityLoading&&!qualityError&&!qualityRows.length&&<p>此页暂无可复核的已完成答卷。</p>}
+        {!qualityLoading&&!qualityError&&!qualityRows.length&&<div className="survey-data-empty"><CheckCircle2 size={22} aria-hidden="true"/><p>此页暂无可复核的已完成答卷。</p><span>问卷提交后，可在这里检查答卷并记录复核决定。</span></div>}
         {qualityRows.map(row=><div className="survey-quality-record flex flex-wrap justify-between gap-3 border-b py-2" key={row.attemptId}>
           <div className="text-xs"><code>{row.attemptCode}</code>
             <p>{row.researchCode??'独立匿名作答'} · <span className="survey-quality-verdict" data-verdict={row.verdict}>{row.verdict==='EXCLUDED'?'当前排除':'当前纳入'}</span></p>
@@ -466,8 +482,8 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
             onClick={()=>void execute(()=>loadQuality(qualityPage+1))}>下一页</button>
         </div>
       </section>
-      {overview.collectionMode==='LINKED_WAVES'&&overview.waves.length>=2&&<div className="border rounded-xl p-4 space-y-3">
-        <h3 className="font-semibold">纵向匹配 · 有效完成记录</h3>
+      {overview.collectionMode==='LINKED_WAVES'&&overview.waves.length>=2&&<div className="survey-data-matching border rounded-xl p-4 space-y-3">
+        <h3 className="font-semibold">纵向匹配 · 有效完成记录</h3><p className="survey-data-section-intro">选择前后两次问卷，核对同一研究编号的有效答卷。</p>
         <div className="flex flex-wrap gap-3 items-end">
           <label className="text-sm">基线<select className="input block" value={baseline}
             onChange={e=>setBaseline(e.target.value)}>{overview.waves.map(w=>
@@ -603,21 +619,21 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
         </div>}
       </div>
       <div id="survey-data-export" tabIndex={-1} className="survey-task-card survey-export-card space-y-4">
-        <h3 className="font-semibold">匿名科研数据导出</h3>
-        <p className="text-sm">导出可能包含自由文本或研究编号，请确认研究用途与数据保存规定。分批时请保留全部 CSV、Codebook、Manifest。</p>
+        <div className="survey-export-heading"><div><p className="survey-export-eyebrow">研究数据 / 导出</p><h3>导出答卷</h3><p>把回答带走，轻松阅读与整理。</p></div><span>中文题目 · 中文答案</span></div>
+        <p className="survey-export-intro">中文答卷中，每位被试占一行，每道题占一列；表头为中文题目，单元格直接显示中文答案。</p>
         <details className="survey-workflow-help"><summary>导出流程说明</summary><ol aria-label="导出操作步骤" className="list-decimal pl-5 text-sm space-y-1">
           <li>完成二次认证，再选择数据范围与格式。</li>
           <li>手动创建受控导出，核对当前批次。</li>
           <li>分别下载三份文件，并在浏览器下载列表确认保存。</li>
         </ol></details>
-        <details className="rounded-lg border p-3 text-sm"><summary className="cursor-pointer font-medium">批次限制与文件合并说明</summary><p className="mt-2">每批至多 250 份 FINAL、2MB，复杂量表会按安全预算自动缩小批次；RAW_WAVE 以及选定单波次的 RAW_LONG / SCORE_LONG 可按签名游标连续分批。全部波次 Wide 与未限定波次的 Long 仍适用 250 FINAL 上限；新单波次分页的有效 FINAL 与非 FINAL 参与状态使用不同 CSV 结构，后者每人每波次一行，按研究编号和波次关联而非直接拼接。分批时请保留全部 CSV、Codebook、Manifest。</p></details>
+        <details className="survey-export-policy rounded-lg border p-3 text-sm"><summary className="cursor-pointer font-medium">批次限制与文件合并说明</summary><p className="mt-2">每批至多 250 份 FINAL、2MB，复杂量表会按安全预算自动缩小批次；RAW_WAVE 以及选定单波次的 RAW_LONG / SCORE_LONG 可按签名游标连续分批。全部波次 Wide 与未限定波次的 Long 仍适用 250 FINAL 上限；新单波次分页的有效 FINAL 与非 FINAL 参与状态使用不同 CSV 结构，后者每人每波次一行，按研究编号和波次关联而非直接拼接。分批时请保留全部 CSV、Codebook、Manifest。</p></details>
         <section className="survey-export-step" aria-label="导出身份确认"><h4><span aria-hidden="true">1</span>确认身份</h4><form className="flex flex-wrap gap-3 items-end" onSubmit={stepUp}>
-          <label className="text-sm">最新 TOTP 动态验证码
+          <label className="text-sm">动态验证码
             <input className="input block" inputMode="numeric" type="password" autoComplete="off"
               value={otp} onChange={e=>setOtp(e.target.value)} placeholder="6 位验证码"/></label>
-          <button className="btn-secondary" disabled={busy||otp.length<6}>完成五分钟内二次认证</button>
+          <button className="btn-secondary" disabled={busy||otp.length<6}>验证身份</button>
         </form></section>
-        <section className="survey-export-step" aria-label="导出数据范围"><h4><span aria-hidden="true">2</span>选择数据与范围</h4><div className="survey-export-filters flex flex-wrap gap-3 items-end">
+        <section className="survey-export-step" aria-label="导出数据范围"><h4><span aria-hidden="true">2</span>选择导出内容</h4><div className="survey-export-filters flex flex-wrap gap-3 items-end">
           <label className="text-sm">数据格式
             <select className="input block" value={format} onChange={e=>{setFormat(e.target.value as ExportFormat);invalidateExport()}}>
               {Object.entries(kindOptions).filter(([kind])=>
@@ -636,13 +652,13 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
             <select className="input block" value={waveId} onChange={e=>changeWave(e.target.value)}>
               {overview.waves.map(w=><option key={w.id} value={w.id}>T{w.ordinal} {w.title}</option>)}
             </select></label>}
-          {['RAW_WAVE','COGNITIVE_TRIAL_LONG','INTERPRETATION_LONG'].includes(format)&&<div className="grid gap-2 text-sm">
+          {['RAW_WAVE','COGNITIVE_TRIAL_LONG','INTERPRETATION_LONG'].includes(format)&&<details className="survey-export-time-filter"><summary>按提交时间筛选（可选）</summary><div className="grid gap-2 text-sm">
             <label>完成时间起点（含）<input type="datetime-local" className="input block w-full"
               value={completedFrom} onChange={e=>{setCompletedFrom(e.target.value);invalidateExport()}}/></label>
             <label>完成时间终点（不含）<input type="datetime-local" className="input block w-full"
               value={completedBefore} onChange={e=>{setCompletedBefore(e.target.value);invalidateExport()}}/></label>
             <p className="text-xs">{format==='INTERPRETATION_LONG'?'留空表示不限制。仅按 FINAL 完成时间筛选已保存解释。':'留空表示不限制。按完成时间分段；未 FINAL 的记录可能重复出现，合并时请按研究编号和状态去重。'}</p>
-          </div>}
+          </div></details>}
 
         </div>
         {retryUntil>0&&<p role="status" className="text-sm text-amber-800">
@@ -663,15 +679,19 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
           包含自由文本原始回答（可能含姓名、班级或间接身份线索）。默认不导出，需要确认本项目知情同意覆盖该用途，并妥善控制保存与共享。
         </label>}
         <div className="survey-export-create-action"><button type="button" className="btn-primary" disabled={busy||waiting||['RAW_WAVE','COGNITIVE_TRIAL_LONG','INTERPRETATION_LONG'].includes(format)&&!waveId}
-            onClick={()=>createExport()}>创建受控导出</button></div>
+            onClick={()=>createExport()}>生成导出文件</button></div>
         </section>
-        {ticket&&<div role="region" aria-label="当前导出批次" className="survey-export-step survey-export-batch border rounded-lg p-3 space-y-2"><h4><span aria-hidden="true">3</span>下载与核对文件</h4>
-          <p className="text-sm">导出 {ticket.format} · 第 {ticket.pageNumber||1} 批 · {ticket.manifest.rowCount} 行 ·
-            {ticket.manifest.columnCount} 列</p>
+        {ticket&&<div role="region" aria-label="当前导出批次" className="survey-export-step survey-export-batch border rounded-lg p-3 space-y-2"><h4><span aria-hidden="true">3</span>下载答卷</h4>
+          <div className="survey-export-batch-summary"><strong>文件已准备好</strong><span>第 {ticket.pageNumber||1} 批 · {ticket.manifest.rowCount} 条记录</span></div>
           <p className="text-xs">到期：{new Date(ticket.expiresAt).toLocaleString('zh-CN')}</p>
           {isCompactAttendance(ticket)&&
             <p className="text-xs text-amber-800">本批为独立参与状态表，不是逐题答案；请保留 Manifest 的关联说明。</p>}
-          <p className="text-xs">本批提供 3 个独立文件：CSV、变量编码字典 Codebook、Manifest。逐个点击下载；浏览器可能要求许可或选择保存位置。</p>
+          {supportsReadable(ticket)&&<div className="survey-export-readable-file">
+            <div className="survey-export-file-icon" aria-hidden="true">文</div><div><h5>中文答卷</h5><p>每位被试一行、每道题一列。中文答案便于查看和统计，多选内容完整显示。</p></div>
+            <button type="button" className="btn-primary" disabled={busy||waiting||needsRecovery||continuationStopped} onClick={()=>download('readable')}>
+              {downloadsStarted.readable?'重新下载中文答卷':'下载中文答卷'}<span aria-hidden="true"> ↓</span></button>
+          </div>}
+          <div className="survey-export-source-note"><strong>原始数据与辅助文件</strong><p>用于统计处理与来源核对；日常查看可直接使用中文答卷。以下三份文件属于同一批次。</p></div>
           {downloadIssue&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{downloadIssue}</p>}
           {(needsRecovery||continuationStopped)&&<div className="space-y-2 text-sm">
             <p>{continuationStopped
@@ -692,9 +712,9 @@ export function SurveyAnalyticsWorkspace({projectId,actorId}:{projectId:string;a
             <p className="text-xs">{label}：{downloadsStarted[part]?'已发起，请核对保存':'尚未发起'}</p>
           </div>)}</div>
           {ticket.nextCursor&&<button className="btn-secondary" type="button"
-            disabled={busy||waiting||continuationStopped||!downloadParts.every(([part])=>downloadsStarted[part])} onClick={()=>createExport('next')}>
+            disabled={busy||waiting||continuationStopped||!(downloadsStarted.readable||downloadParts.every(([part])=>downloadsStarted[part]))} onClick={()=>createExport('next')}>
             生成下一批（请先核对本批文件）</button>}
-          {ticket.nextCursor&&<p className="text-xs">三个文件均发起后可继续。发起不等于保存成功；继续前请自行核对本批文件，取消或失败时先重试相应文件。</p>}
+          {ticket.nextCursor&&<p className="text-xs">下载中文答卷，或下载全部三份原始文件后可继续。请先确认本批文件已保存；取消或失败时请重试。</p>}
           {ticket.nextCursor&&<p className="text-xs">分批数据以同一时间水位和研究修订版本固定样本范围；
             FINAL 页可合并，独立参与状态页按研究编号与波次关联；不要将两类 CSV 直接拼接。</p>}
         </div>}

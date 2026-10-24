@@ -87,7 +87,7 @@ describe('Survey analytics artifact downloads',()=>{
     artifact={id:ticketId,format:'RAW_WAVE',csv:'"research_code","wave_id","variant_key"\r\n"R-1","wave-01","a"\r\n',
       codebook:[],manifest:responseTicket.manifest}
     render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
-    fireEvent.click(await screen.findByRole('button',{name:'创建受控导出'}))
+    fireEvent.click(await screen.findByRole('button',{name:'生成导出文件'}))
     expect(await screen.findByText(/已生成紧凑参与状态表/)).toBeInTheDocument()
     expect(screen.getByText(/本批为独立参与状态表/)).toBeInTheDocument()
     for(const label of ['CSV','Codebook','Manifest']){
@@ -116,10 +116,10 @@ describe('Survey analytics artifact downloads',()=>{
   })
   it('uses the bounded cognitive trial export with mandatory wave and no free-text disclosure',async()=>{
     render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
-    await screen.findByRole('button',{name:'创建受控导出'})
+    await screen.findByRole('button',{name:'生成导出文件'})
     fireEvent.change(screen.getByLabelText('数据格式'),{target:{value:'COGNITIVE_TRIAL_LONG'}})
     expect(screen.queryByRole('checkbox',{name:/包含自由文本原始回答/})).toBeNull()
-    fireEvent.click(screen.getByRole('button',{name:'创建受控导出'}))
+    fireEvent.click(screen.getByRole('button',{name:'生成导出文件'}))
     await screen.findByRole('button',{name:'下载 CSV'})
     expect(requests.filter(r=>r.url===base+'/exports')[0].body).toEqual({format:'COGNITIVE_TRIAL_LONG',waveId})
     expect(screen.getByText(/认知试次按行与字节预算分批导出/)).toBeInTheDocument()
@@ -134,7 +134,7 @@ describe('Survey analytics artifact downloads',()=>{
       csv:csvHeader+ordinaryRows+(includeFreeText?freeTextRow:''),codebook,manifest,
     }
     render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
-    const create=await screen.findByRole('button',{name:'创建受控导出'})
+    const create=await screen.findByRole('button',{name:'生成导出文件'})
     const freeText=screen.getByRole('checkbox',{name:/包含自由文本原始回答/})
     expect(freeText).not.toBeChecked()
     if(includeFreeText){
@@ -192,7 +192,7 @@ describe('Survey analytics artifact downloads',()=>{
 
   it('hands the exact signed cursor to the next batch only after three explicit file actions',async()=>{
     render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
-    fireEvent.click(await screen.findByRole('button',{name:'创建受控导出'}))
+    fireEvent.click(await screen.findByRole('button',{name:'生成导出文件'}))
     for(const label of ['CSV','Codebook','Manifest']){
       fireEvent.click(await screen.findByRole('button',{name:'下载 '+label}))
       await screen.findByRole('button',{name:'重新发起 '+label})
@@ -219,7 +219,7 @@ describe('Survey analytics artifact downloads',()=>{
       failure==='non-json'?Promise.resolve(new Response('<html>synthetic failure</html>',{status:200})):
       Promise.resolve(new Response(JSON.stringify({code:-1,message:'synthetic rejection '+failure,data:null}),{status:Number(failure)}))
     render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
-    fireEvent.click(await screen.findByRole('button',{name:'创建受控导出'}))
+    fireEvent.click(await screen.findByRole('button',{name:'生成导出文件'}))
     fireEvent.click(await screen.findByRole('button',{name:'下载 Codebook'}))
     expect(await screen.findByRole('alert')).toHaveTextContent('Codebook 内容获取失败，尚未发起本次文件下载')
     expect(within(screen.getByRole('region',{name:'当前导出批次'})).getByRole('alert')).toHaveTextContent('Codebook 内容获取失败')
@@ -240,7 +240,7 @@ describe('Survey analytics artifact downloads',()=>{
   it('does not launch a file from a mismatched export receipt',async()=>{
     artifact={...artifact,id:'different-ticket'}
     render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
-    fireEvent.click(await screen.findByRole('button',{name:'创建受控导出'}))
+    fireEvent.click(await screen.findByRole('button',{name:'生成导出文件'}))
     fireEvent.click(await screen.findByRole('button',{name:'下载 CSV'}))
     expect(await screen.findByRole('alert')).toHaveTextContent('导出回执与当前批次不一致或内容不完整')
     expect(blobs).toHaveLength(0)
@@ -249,13 +249,13 @@ describe('Survey analytics artifact downloads',()=>{
 
   it('clears per-file launch status when creating a different format without automatically fetching files',async()=>{
     render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
-    fireEvent.click(await screen.findByRole('button',{name:'创建受控导出'}))
+    fireEvent.click(await screen.findByRole('button',{name:'生成导出文件'}))
     fireEvent.click(await screen.findByRole('button',{name:'下载 CSV'}))
     await screen.findByRole('button',{name:'重新发起 CSV'})
     fireEvent.change(screen.getByLabelText('数据格式'),{target:{value:'COGNITIVE_TRIAL_LONG'}})
     expect(screen.queryByRole('button',{name:'重新发起 CSV'})).toBeNull()
     responseTicket={...ticket,format:'COGNITIVE_TRIAL_LONG'}
-    fireEvent.click(screen.getByRole('button',{name:'创建受控导出'}))
+    fireEvent.click(screen.getByRole('button',{name:'生成导出文件'}))
     await screen.findByRole('button',{name:'下载 CSV'})
     expect(screen.getByText('CSV：尚未发起')).toBeInTheDocument()
     expect(screen.getByRole('button',{name:'生成下一批（请先核对本批文件）'})).toBeDisabled()
@@ -266,7 +266,7 @@ describe('Survey analytics artifact downloads',()=>{
   it('cleans a failed browser launch and allows an explicit original-file retry without false saved status',async()=>{
     vi.mocked(HTMLAnchorElement.prototype.click).mockImplementationOnce(()=>{throw new Error('synthetic browser launch failure')})
     render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
-    fireEvent.click(await screen.findByRole('button',{name:'创建受控导出'}))
+    fireEvent.click(await screen.findByRole('button',{name:'生成导出文件'}))
     fireEvent.click(await screen.findByRole('button',{name:'下载 CSV'}))
     expect(await screen.findByRole('alert')).toHaveTextContent('下载发起结果未确认')
     expect(document.querySelectorAll('a[download]')).toHaveLength(0)
@@ -284,7 +284,7 @@ describe('Survey analytics artifact downloads',()=>{
 describe('explicit saved interpretation export',()=>{
   it('keeps RAW_WAVE default, omits even a previously checked free-text option, and preserves the signed page selection',async()=>{
     render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
-    await screen.findByRole('button',{name:'创建受控导出'})
+    await screen.findByRole('button',{name:'生成导出文件'})
     expect(screen.getByLabelText('数据格式')).toHaveValue('RAW_WAVE')
     fireEvent.click(screen.getByRole('checkbox',{name:/包含自由文本原始回答/}))
     fireEvent.change(screen.getByLabelText('数据格式'),{target:{value:'INTERPRETATION_LONG'}})
@@ -295,7 +295,7 @@ describe('explicit saved interpretation export',()=>{
     fireEvent.change(screen.getByLabelText('完成时间终点（不含）'),{target:{value:'2026-10-02T10:00'}})
     responseTicket={...ticket,format:'INTERPRETATION_LONG'}
     artifact={...artifact,format:'INTERPRETATION_LONG'}
-    fireEvent.click(screen.getByRole('button',{name:'创建受控导出'}))
+    fireEvent.click(screen.getByRole('button',{name:'生成导出文件'}))
     await screen.findByRole('region',{name:'当前导出批次'})
     const expected={format:'INTERPRETATION_LONG',waveId,completedFrom:new Date('2026-10-01T10:00').toISOString(),completedBefore:new Date('2026-10-02T10:00').toISOString()}
     expect(requests.filter(r=>r.url===base+'/exports').map(r=>r.body)).toEqual([expected])
@@ -309,4 +309,21 @@ describe('explicit saved interpretation export',()=>{
     await screen.findByText(/第 8 批有效 FINAL 已生成/)
     expect(requests.filter(r=>r.url===base+'/exports').map(r=>r.body)).toEqual([expected,{...expected,cursor:'synthetic-next-page'}])
   })
+  it('downloads Chinese answers through the same authorized artifact endpoint and allows continuing the frozen batch',async()=>{
+    artifact={...artifact,csv:'"research_code_or_attempt","variable_code","value","missing_reason","final_completed_at_utc"\r\n"A-ONE","question","o2","","2026-10-23T15:58:23Z"\r\n',
+      codebook:[{columnKey:'question',title:'中文量表',prompt:'这是中文题目',responseType:'LIKERT',options:[{code:'o2',label:'非常同意'}]}]}
+    render(<SurveyAnalyticsWorkspace projectId={projectId}/>)
+    fireEvent.click(await screen.findByRole('button',{name:'生成导出文件'}))
+    fireEvent.click(await screen.findByRole('button',{name:'下载中文答卷'}))
+    await screen.findByRole('button',{name:'重新下载中文答卷'})
+    const bytes=await readBytes(blobs[0]),text=new TextDecoder().decode(bytes)
+    expect([...bytes.slice(0,3)]).toEqual([0xef,0xbb,0xbf])
+    expect(text).toContain('匿名答卷编号');expect(text).toContain('这是中文题目');expect(text).toContain('非常同意')
+    expect(text.trim().split('\r\n')).toHaveLength(2)
+    expect(downloads[0].filename).toBe(baseName+'_中文答卷.csv')
+    expect(requests.filter(r=>r.url.includes('/download?part=')).map(r=>r.url.split('?')[1])).toEqual(['part=csv','part=codebook'])
+    expect(screen.getByRole('button',{name:'生成下一批（请先核对本批文件）'})).toBeEnabled()
+    expect(artifact.csv).toContain('"o2"')
+  })
+
 })

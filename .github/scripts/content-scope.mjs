@@ -1,4 +1,5 @@
 import {trainingEntryPlan,trainingEntryOutputs} from './training-entry-scope.mjs';
+import {surveyReviewPlan,surveyReviewOutputs} from './survey-review-scope.mjs';
 import {trainingTeacherPlan,trainingTeacherOutputs} from './training-teacher-scope.mjs';
 import {trainingAdminIntegrationPlan,trainingAdminIntegrationOutputs} from './training-admin-integration-scope.mjs';
 import {participantCapacityPlan,participantCapacityOutputs} from './participant-capacity-scope.mjs';
@@ -305,6 +306,8 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const base = process.env.CI_BASE_SHA;
   const trainingEntry=trainingEntryPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(trainingEntry){const output=trainingEntryOutputs(trainingEntry);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
+  const surveyReview=surveyReviewPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  if(surveyReview){const output=surveyReviewOutputs(surveyReview);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const teacherManagement=trainingTeacherPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(teacherManagement){const output=trainingTeacherOutputs(teacherManagement);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const adminIntegration=trainingAdminIntegrationPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());

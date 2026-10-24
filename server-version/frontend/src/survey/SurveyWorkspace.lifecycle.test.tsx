@@ -156,6 +156,19 @@ describe('Survey workspace in-flight editing and request scope',()=>{
     return requests
   }
 
+  it('counts completed answers across waves without presenting their sum as unique participants',async()=>{
+    const requests=setupAnalytics(()=>response(items),()=>response(ticket))
+    const summary=await screen.findByRole('region',{name:'答卷完成概览'})
+    expect(summary).toHaveTextContent('各波次累计答卷，不代表独立参与人数')
+    const cards=summary.querySelectorAll('article')
+    expect(cards[0]).toHaveTextContent('已完成答卷2')
+    expect(cards[1]).toHaveTextContent('有效分析答卷2')
+    expect(cards[2]).toHaveTextContent('质量排除0')
+    expect(cards[3]).toHaveTextContent('撤回排除0')
+    expect(requests.filter(row=>row.url===base+'/exports')).toHaveLength(0)
+    expect(requests.filter(row=>row.url.endsWith('/download'))).toHaveLength(0)
+  })
+
   it('keeps the selected wave fixed while an item-statistics response is pending',async()=>{
     const pending=deferred<Response>(),user=userEvent.setup()
     setupAnalytics(()=>pending.promise,()=>response(ticket))
@@ -175,7 +188,7 @@ describe('Survey workspace in-flight editing and request scope',()=>{
     const pending=deferred<Response>(),user=userEvent.setup()
     const launch=vi.spyOn(HTMLAnchorElement.prototype,'click').mockImplementation(()=>{})
     const requests=setupAnalytics(()=>response(items),()=>pending.promise)
-    fireEvent.click(await screen.findByRole('button',{name:'创建受控导出'}))
+    fireEvent.click(await screen.findByRole('button',{name:'生成导出文件'}))
     await waitFor(()=>expect(requests.some(row=>row.url===base+'/exports')).toBe(true))
     const select=screen.getAllByLabelText('波次',{exact:true})[1]
     const freeText=screen.getByRole('checkbox',{name:/包含自由文本原始回答/})
@@ -197,9 +210,9 @@ describe('Survey workspace in-flight editing and request scope',()=>{
     const user=userEvent.setup()
     const launch=vi.spyOn(HTMLAnchorElement.prototype,'click').mockImplementation(()=>{})
     const requests=setupAnalytics(()=>response(items),()=>response(ticket))
-    await screen.findByRole('button',{name:'创建受控导出'})
+    await screen.findByRole('button',{name:'生成导出文件'})
     await user.selectOptions(screen.getAllByLabelText('波次',{exact:true})[1],'wave2')
-    fireEvent.click(screen.getByRole('button',{name:'创建受控导出'}))
+    fireEvent.click(screen.getByRole('button',{name:'生成导出文件'}))
     await screen.findByRole('button',{name:'下载 CSV'})
     for(const part of ['CSV','Codebook','Manifest'])expect(screen.getByRole('button',{name:'下载 '+part})).toBeEnabled()
     fireEvent.click(screen.getByRole('button',{name:'刷新完成进度'}))

@@ -1,4 +1,5 @@
 import {trainingEntryPlan,trainingEntryOutputs} from './training-entry-scope.mjs';
+import {surveyReviewPlan,surveyReviewOutputs} from './survey-review-scope.mjs';
 import {trainingTeacherPlan,trainingTeacherOutputs} from './training-teacher-scope.mjs';
 import {trainingAdminIntegrationPlan,trainingAdminIntegrationOutputs} from './training-admin-integration-scope.mjs';
 import {participantCapacityPlan,participantCapacityOutputs} from './participant-capacity-scope.mjs';
@@ -58,6 +59,7 @@ const acceptanceJobs = {
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   if(scope.application_route==='training-entry')return ['scope','training-entry','codeql'];
+  if(scope.application_route==='survey-review')return ['scope','survey-review','codeql'];
   if(scope.application_route==='training-teacher-management')return ['scope','training-teacher-management','codeql'];
   if(scope.application_route==='training-admin-integration')return ['scope','training-admin-integration','codeql'];
   if(scope.application_route==='participant-capacity')return ['scope','participant-capacity','codeql'];
@@ -134,6 +136,9 @@ export function failedChecks(needs, draft) {
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
   if(scope.application_route==='training-entry'){
     try{const p=JSON.parse(scope.training_entry_plan);if(draft||p.postMerge!==false||p.route!=='training-entry'||Object.entries(trainingEntryOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+  }
+  if(scope.application_route==='survey-review'){
+    try{const p=JSON.parse(scope.survey_review_plan);if(draft||p.postMerge!==false||p.route!=='survey-review'||Object.entries(surveyReviewOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
     return [...new Set(failed)];
   }
   if(scope.application_route==='training-teacher-management'){
@@ -419,6 +424,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
       const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.training_entry_plan);
       if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(trainingEntryPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-training-entry-plan');
     }catch{failed.push('recomputed-training-entry-plan');}
+  }
+  if(needs.scope?.outputs?.application_route==='survey-review'){
+    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');
+      const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.survey_review_plan);
+      if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(surveyReviewPlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-survey-review-plan');
+    }catch{failed.push('recomputed-survey-review-plan');}
   }
   if(needs.scope?.outputs?.application_route==='training-teacher-management'){
     try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');

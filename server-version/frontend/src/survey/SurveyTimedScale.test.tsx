@@ -8,12 +8,12 @@ const unit={instrumentKey:'scale',title:'学习状态',
   items:[{itemKey:'first',prompt:'第一题',required:true},
     {itemKey:'second',prompt:'第二题',required:true}],
   responseOptions:[{optionKey:'o1',label:'不同意'},{optionKey:'o2',label:'同意'}]}
-function Harness(){
-  const [answers,setAnswers]=useState<Record<string,string>>({})
-  const [index,setIndex]=useState(0)
+function Harness({initialAnswers={},questions=unit,initialIndex=0}:{initialAnswers?:Record<string,string>;questions?:typeof unit;initialIndex?:number}={}){
+  const [answers,setAnswers]=useState<Record<string,string>>(initialAnswers)
+  const [index,setIndex]=useState(initialIndex)
   const timer=useRef(new SurveyScaleTimingTracker())
   return <>
-    <SurveyTimedScale unit={unit} answer={answers} tracker={timer.current}
+    <SurveyTimedScale unit={questions} answer={answers} tracker={timer.current}
       index={index} onIndexChange={setIndex}
       onAnswer={(key,value)=>setAnswers(old=>({...old,[key]:value}))}
       onTiming={()=>{}}/>
@@ -22,17 +22,25 @@ function Harness(){
 }
 afterEach(()=>vi.restoreAllMocks())
 describe('Survey Scale participant one-by-one delivery',()=>{
+  it('keeps mouse and keyboard answering available without persistent timing or keyboard explanations',()=>{
+    render(<Harness/>)
+    expect(screen.queryByText('关于作答计时')).toBeNull()
+    expect(screen.queryByText(/方向键选择，Enter 确认/)).toBeNull()
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    expect(screen.getByText('第二题')).toBeInTheDocument()
+    expect(screen.getByRole('button',{name:'题目导航'})).toBeInTheDocument()
+  })
   it('gates current image answers and forward navigation without deleting restored answers',()=>{
     const props={unit,answer:{first:'o2'},tracker:new SurveyScaleTimingTracker(),index:0,
       onIndexChange:vi.fn(),onAnswer:vi.fn(),onTiming:vi.fn()}
     const {rerender}=render(<SurveyTimedScale {...props} imagesReady={false}/>)
     expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
     expect(screen.getByRole('radio',{name:'同意'})).toBeDisabled()
-    expect(screen.getByRole('button',{name:'下一题'})).toBeDisabled()
+    expect(screen.getByRole('button',{name:'继续未答题'})).toBeDisabled()
     rerender(<SurveyTimedScale {...props} imagesReady/>)
     expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
     expect(screen.getByRole('radio',{name:'同意'})).toBeEnabled()
-    expect(screen.getByRole('button',{name:'下一题'})).toBeEnabled()
+    expect(screen.getByRole('button',{name:'继续未答题'})).toBeEnabled()
   })
   it('uses per-item source response options rather than the compatibility union and renders authorized media',()=>{
     render(<SurveyTimedScale unit={{...unit,items:[{itemKey:'source',prompt:'Source item',required:false,
@@ -61,12 +69,13 @@ describe('Survey Scale participant one-by-one delivery',()=>{
     fireEvent.click(screen.getByRole('radio',{name:'同意'}))
     expect(document.getElementById('survey-answer-scale-second')).toHaveFocus()
     fireEvent.click(screen.getByRole('radio',{name:'不同意'}))
-    expect(screen.getByText('第二题 *')).toBeInTheDocument()
-    expect(screen.getByRole('button',{name:'下一题'})).toBeDisabled()
-    fireEvent.click(screen.getByRole('button',{name:'上一题'}))
+    expect(screen.getByText('第二题')).toBeInTheDocument()
+    expect(screen.queryByRole('button',{name:'继续未答题'})).toBeNull()
+    fireEvent.click(screen.getByRole('button',{name:'题目导航'}))
+    fireEvent.click(screen.getByRole('button',{name:'第 1 题，已作答'}))
     expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
     fireEvent.click(screen.getByRole('radio',{name:'同意'}))
-    expect(screen.getByText('第一题 *')).toBeInTheDocument()
+    expect(screen.getByText('第一题')).toBeInTheDocument()
     fireEvent.click(screen.getByRole('radio',{name:'不同意'}))
     expect(screen.getByRole('radio',{name:'不同意'})).toBeChecked()
     expect(screen.getByTestId('answers').textContent).toContain('"first":"o1"')
@@ -78,7 +87,7 @@ describe('Survey Scale participant one-by-one delivery',()=>{
     fireEvent.keyDown(first,{key:'ArrowRight'})
     // Model native radio navigation: focus changes before the selection event.
     second.focus();fireEvent.click(second)
-    expect(screen.getByText('第一题 *')).toBeInTheDocument()
+    expect(screen.getByText('第一题')).toBeInTheDocument()
     expect(second).toBeChecked()
     fireEvent.pointerDown(first);fireEvent.click(first)
     expect(document.getElementById('survey-answer-scale-second')).toHaveFocus()
@@ -110,7 +119,7 @@ describe('Survey Scale participant one-by-one delivery',()=>{
     rerender(<SurveyTimedScale {...props} answer={{first:'o2'}} autoAdvanceReady/>)
     expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
     expect(advance).not.toHaveBeenCalled()
-    fireEvent.click(screen.getByRole('button',{name:'下一题'}))
+    fireEvent.click(screen.getByRole('button',{name:'继续未答题'}))
     expect(advance).toHaveBeenCalledWith(1)
   })
   it('keeps native repeated arrow behavior on media volume controls',()=>{
@@ -122,9 +131,9 @@ describe('Survey Scale participant one-by-one delivery',()=>{
   it('points a final video item to the outer continue or submit action, not a disabled next question',()=>{
     render(<SurveyTimedScale unit={unit} answer={{}} tracker={new SurveyScaleTimingTracker()}
       index={1} onAnswer={()=>{}} onIndexChange={()=>{}} onTiming={()=>{}} autoAdvanceReady={false}/>)
-    expect(screen.getByText(/请看完视频后检查答案，再使用本工具后方/)).toBeInTheDocument()
-    expect(screen.queryByText(/请看完视频后按“下一题”继续/)).toBeNull()
-    expect(screen.getByRole('button',{name:'下一题'})).toBeDisabled()
+    expect(screen.getByText(/请先看完本题视频/)).toBeInTheDocument()
+    expect(screen.queryByRole('button',{name:'下一题'})).toBeNull()
+    expect(screen.queryByRole('button',{name:'继续未答题'})).toBeNull()
   })
   it('records the selected item before advancing and keeps duration with its source item',()=>{
     let now=100
@@ -152,8 +161,44 @@ describe('Survey Scale participant one-by-one delivery',()=>{
     fireEvent.click(screen.getByRole('radio',{name:'同意'}))
     expect(screen.getByText(/第二题/)).toBeInTheDocument()
     expect(screen.queryByText(/第一题/)).toBeNull()
-    fireEvent.click(screen.getByRole('button',{name:'上一题'}))
+    fireEvent.click(screen.getByRole('button',{name:'题目导航'}))
+    fireEvent.click(screen.getByRole('button',{name:'第 1 题，已作答'}))
     expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
     expect(screen.getByTestId('answers').textContent).toContain('"first":"o2"')
   })
+  it('skips answered items, wraps to earlier unanswered items and never navigates to another scale',()=>{
+    const questions={...unit,items:[...unit.items,{itemKey:'third',prompt:'第三题',required:true},{itemKey:'fourth',prompt:'第四题',required:true}]}
+    render(<Harness questions={questions} initialAnswers={{second:'o2',unrelated:'o1'}}/>)
+    fireEvent.click(screen.getByRole('button',{name:'题目导航'}))
+    expect(screen.getByRole('button',{name:'第 1 题，未作答'})).toBeDisabled()
+    expect(screen.getByRole('button',{name:'第 3 题，未作答'})).toBeDisabled()
+    expect(screen.getAllByRole('button',{name:/第 .*题，/})).toHaveLength(4)
+    fireEvent.click(screen.getByRole('button',{name:'关闭题目导航'}))
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    expect(screen.getByText('第三题')).toBeInTheDocument()
+    expect(screen.getByRole('progressbar',{name:'量表作答进度'})).toHaveAttribute('value','2')
+    expect(screen.getByRole('status',{name:'作答反馈'})).toHaveTextContent('第 1 题已作答 · 已切换至第 3 题')
+    fireEvent.click(screen.getByRole('button',{name:'题目导航'}))
+    fireEvent.click(screen.getByRole('button',{name:'第 2 题，已作答'}))
+    fireEvent.click(screen.getByRole('radio',{name:'不同意'}))
+    expect(screen.getByText('第三题')).toBeInTheDocument()
+  })
+  it('returns from the last item to an earlier unanswered item without clearing any other answer',()=>{
+    const questions={...unit,items:[...unit.items,{itemKey:'third',prompt:'第三题',required:true}]}
+    render(<Harness questions={questions} initialIndex={2} initialAnswers={{second:'o2'}}/>)
+    fireEvent.click(screen.getByRole('radio',{name:'同意'}))
+    expect(screen.getByText('第一题')).toBeInTheDocument()
+    expect(screen.getByTestId('answers').textContent).toContain('"second":"o2"')
+    expect(screen.getByTestId('answers').textContent).toContain('"third":"o2"')
+  })
+  it('confirms an arrow-key selection with Enter without requiring previous/next buttons',()=>{
+    render(<Harness/>);const option=screen.getByRole('radio',{name:'同意'})
+    fireEvent.keyDown(option,{key:'ArrowRight'});fireEvent.click(option)
+    expect(screen.getByText('第一题')).toBeInTheDocument()
+    fireEvent.keyDown(option,{key:'Enter'})
+    expect(document.getElementById('survey-answer-scale-second')).toHaveFocus()
+    expect(screen.queryByRole('button',{name:'上一题'})).toBeNull()
+    expect(screen.queryByRole('button',{name:'下一题'})).toBeNull()
+  })
+
 })

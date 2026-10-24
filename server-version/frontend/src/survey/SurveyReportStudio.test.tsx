@@ -6,8 +6,8 @@ const base='/api/survey/projects/project1/report-drafts'
 const response=(data:unknown,ok=true,message='ok')=>({ok,json:async()=>({code:ok?0:-1,message,data})} as Response)
 const payload=()=>({measurementReleaseId:'measure1',metricKeys:['effort'],audience:'researcher',language:'zh-CN',
   template:{title:'原报告',blocks:[{type:'TEXT',text:'原始文案'},{type:'METRIC',metricKey:'effort',display:'RAW'}],limitations:[],disclaimer:'仅供研究'},assets:[]})
-function fixture({published=false,emptyMeasurements=false,extraBlocks=false,createDisconnect=false}={}){
-  const measure={id:'measure1',family:'SCALE',key:'project-scale',version:'1',status:'PUBLISHED',contentHash:'a'.repeat(64),metrics:[{metricKey:'effort',unit:'points'}]}
+function fixture({published=false,emptyMeasurements=false,extraBlocks=false,createDisconnect=false,measurementKey='project-scale'}={}){
+  const measure={id:'measure1',family:'SCALE',key:measurementKey,version:'1',status:'PUBLISHED',contentHash:'a'.repeat(64),metrics:[{metricKey:'effort',unit:'points'}]}
   const original=payload()
   if(extraBlocks){
     Object.assign(original,{assets:[{assetId:'asset1',sha256:'b'.repeat(64),mediaType:'image/png',rightsStatus:'authorized',rightsNote:'Existing rights'}]})
@@ -61,6 +61,19 @@ function fixture({published=false,emptyMeasurements=false,extraBlocks=false,crea
 afterEach(()=>{cleanup();vi.unstubAllGlobals();vi.restoreAllMocks();document.cookie='huisurvey_research_csrf=; Max-Age=0'})
 async function openDraft(){fireEvent.click(await screen.findByRole('button',{name:'feedback · 1 · 草稿'}));await screen.findByLabelText('报告标题')}
 describe('project private report studio',()=>{
+  it('shows the owned tool name while retaining the exact measurement release in a newly created report',async()=>{
+    const f=fixture({measurementKey:'scale:'+('a'.repeat(64))+':native'})
+    render(<SurveyReportStudio projectId="project1" instrumentTitles={[{id:'native',title:'学习体验量表'}]}/>)
+    const option=await screen.findByRole('option',{name:'学习体验量表 · 1 · 已发布'})
+    expect(option).toHaveValue('measure1')
+    expect(f.writes).toHaveLength(0)
+    await waitFor(()=>expect(screen.getByLabelText('报告系列标识')).toBeEnabled())
+    fireEvent.change(screen.getByLabelText('报告系列标识'),{target:{value:'学习体验报告'}})
+    fireEvent.click(screen.getByRole('button',{name:'创建报告草稿'}))
+    await screen.findByText('报告草稿已创建，尚未发布。')
+    expect(f.writes[0].body.payload.measurementReleaseId).toBe('measure1')
+    expect(f.writes[0].body.reportKey).toBe('学习体验报告')
+  })
   it('retains the expanded report layout for custom Training transport paths',async()=>{
     fixture();render(<SurveyReportStudio projectId="project1" basePath="/projects/project1/report-drafts"/>);await openDraft()
     expect(screen.getByRole('article',{name:'报告区块 2'}).querySelector('details')).toBeNull()

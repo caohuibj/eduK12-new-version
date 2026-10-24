@@ -18,7 +18,11 @@ beforeEach(()=>{
     if(url.endsWith('/auth/me'))return reply({id:'r',username:'研究者',mustChangePassword:false})
     if(url.endsWith('/auth/capabilities'))return reply({analytics:true,publication:true})
     if(url.includes('/tool-library?')||url.includes('/media-library?'))return reply({list:[],total:0})
-    if(url.includes('/projects?page='))return reply({list:projects})
+    if(url.includes('/projects?page=')){
+      const params=new URL(url,'http://local.test').searchParams,q=params.get('q')||'',status=params.get('status')
+      const list=projects.filter(p=>(!q||(p.title+' '+p.description).includes(q))&&(!status||p.status===status))
+      return reply({list,total:list.length,page:1,hasNext:false})
+    }
     throw new Error('Unexpected request '+url)
   }))
 })
@@ -30,10 +34,20 @@ function renderCards(project:SurveyProject,busy=false){
   return {onChoose,onArchive}
 }
 describe('Survey researcher directory and editing context',()=>{
+  it('clears a stale data-page anchor on the directory without guessing a project or changing the session',async()=>{
+    window.history.replaceState(null,'','/workspace#survey-data-overview')
+    render(<SurveyApp/>)
+    await screen.findByRole('heading',{name:'研究工作台'})
+    await waitFor(()=>expect(window.location.hash).toBe(''))
+    expect(window.location.pathname).toBe('/workspace')
+    expect(window.location.search).toBe('')
+    expect(vi.mocked(fetch).mock.calls.some(([url])=>/\/projects\/[^?]+$/.test(String(url)))).toBe(false)
+    expect(screen.getByRole('heading',{name:'学习体验研究'})).toBeVisible()
+  })
   it('keeps hash-only navigation inside the current editor without discarding edits or issuing requests',async()=>{
     render(<SurveyApp/>)
     fireEvent.click((await screen.findAllByRole('button',{name:'查看/编辑'}))[0])
-    fireEvent.change(screen.getByLabelText('研究名称'),{target:{value:'尚未保存的名称'}})
+    fireEvent.change(await screen.findByLabelText('研究名称'),{target:{value:'尚未保存的名称'}})
     const requests=vi.mocked(fetch).mock.calls.length
     const url=new URL(window.location.href);url.hash='survey-project-save'
     window.history.pushState(null,'',url.pathname+url.search+url.hash);fireEvent.popState(window)
@@ -172,7 +186,8 @@ describe('Survey researcher directory and editing context',()=>{
     expect(within(navigation).getAllByRole('link').map(link=>link.textContent)).toEqual(['我的研究','工具集','素材库'])
     expect(within(navigation).getByRole('link',{name:'我的研究'})).toHaveAttribute('aria-current','page')
     fireEvent.click(screen.getByRole('button',{name:'研究检索'}))
-    fireEvent.change(screen.getByRole('searchbox',{name:'筛选本页研究'}),{target:{value:'学习'}})
+    fireEvent.change(screen.getByRole('searchbox',{name:'检索研究'}),{target:{value:'学习'}})
+    await waitFor(()=>expect(screen.queryByRole('heading',{name:'长期跟踪研究'})).not.toBeInTheDocument())
     fireEvent.click(screen.getByRole('button',{name:'查看/编辑'}))
     fireEvent.change(screen.getByLabelText('研究名称'),{target:{value:'未保存的名称'}})
     fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}))
@@ -189,7 +204,7 @@ describe('Survey researcher directory and editing context',()=>{
     expect(await screen.findByRole('heading',{name:'工具集'})).toBeVisible()
     fireEvent.click(within(navigation).getByRole('link',{name:'我的研究'}))
     await waitFor(()=>expect(screen.getByRole('heading',{name:'研究工作台'})).toHaveFocus())
-    expect(screen.getByRole('searchbox',{name:'筛选本页研究'})).toHaveValue('学习')
+    expect(screen.getByRole('searchbox',{name:'检索研究'})).toHaveValue('学习')
     fireEvent.click(screen.getByRole('button',{name:'查看/编辑'}))
     expect(screen.getByRole('tab',{name:'发布与采集'})).toHaveAttribute('aria-selected','true')
     expect(screen.getByLabelText('研究名称')).toHaveValue('未保存的名称')
@@ -223,7 +238,8 @@ describe('Survey researcher directory and editing context',()=>{
     await screen.findByRole('heading',{name:'研究工作台'})
     expect(screen.queryByLabelText('研究名称')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button',{name:'研究检索'}))
-    fireEvent.change(screen.getByRole('searchbox',{name:'筛选本页研究'}),{target:{value:'学习'}})
+    fireEvent.change(screen.getByRole('searchbox',{name:'检索研究'}),{target:{value:'学习'}})
+    await waitFor(()=>expect(screen.getByRole('button',{name:'新建研究'})).toBeEnabled())
     fireEvent.click(screen.getByRole('button',{name:'新建研究'}))
     expect(screen.getByRole('dialog',{name:'创建研究项目'})).toBeVisible()
     expect(screen.getByLabelText('研究名称')).toHaveFocus()
@@ -398,25 +414,25 @@ describe('Survey researcher directory and editing context',()=>{
     expect(fetcher.mock.calls.some(([,options])=>options?.method&&options.method!=='GET')).toBe(false)
   })
 
-  it('keeps current-page filters and edits when returning to the directory',async()=>{
+  it('keeps global filters and edits when returning to the directory',async()=>{
     render(<SurveyApp/>)
     await screen.findByRole('heading',{name:'研究工作台'})
     const searchToggle=screen.getByRole('button',{name:'研究检索'})
     expect(searchToggle).toHaveAttribute('aria-expanded','false')
-    expect(screen.queryByRole('searchbox',{name:'筛选本页研究'})).not.toBeInTheDocument()
+    expect(screen.queryByRole('searchbox',{name:'检索研究'})).not.toBeInTheDocument()
     fireEvent.click(searchToggle)
-    expect(screen.getByRole('searchbox',{name:'筛选本页研究'})).toHaveFocus()
-    fireEvent.change(screen.getByRole('searchbox',{name:'筛选本页研究'}),{target:{value:'学习'}})
+    expect(screen.getByRole('searchbox',{name:'检索研究'})).toHaveFocus()
+    fireEvent.change(screen.getByRole('searchbox',{name:'检索研究'}),{target:{value:'学习'}})
     fireEvent.click(searchToggle)
-    expect(screen.queryByRole('searchbox',{name:'筛选本页研究'})).not.toBeInTheDocument()
+    expect(screen.queryByRole('searchbox',{name:'检索研究'})).not.toBeInTheDocument()
     expect(searchToggle).toHaveAttribute('data-filtered','true')
-    expect(screen.queryByRole('heading',{name:'长期跟踪研究'})).not.toBeInTheDocument()
+    await waitFor(()=>expect(screen.queryByRole('heading',{name:'长期跟踪研究'})).not.toBeInTheDocument())
     fireEvent.click(screen.getByRole('button',{name:'查看/编辑'}))
     fireEvent.change(screen.getByLabelText('研究名称'),{target:{value:'尚未保存的研究'}})
     fireEvent.click(screen.getByRole('button',{name:'← 返回研究列表（保留编辑）'}))
     await waitFor(()=>expect(screen.getByRole('heading',{name:'研究工作台'})).toHaveFocus())
     fireEvent.click(searchToggle)
-    expect(screen.getByRole('searchbox',{name:'筛选本页研究'})).toHaveValue('学习')
+    expect(screen.getByRole('searchbox',{name:'检索研究'})).toHaveValue('学习')
     expect(screen.getByLabelText('研究名称')).toHaveValue('尚未保存的研究')
     fireEvent.click(screen.getByRole('button',{name:'查看/编辑'}))
     expect(screen.getByRole('tab',{name:'研究设置'})).toHaveAttribute('aria-selected','true')
@@ -427,10 +443,10 @@ describe('Survey researcher directory and editing context',()=>{
     render(<SurveyApp/>)
     await screen.findByRole('heading',{name:'研究工作台'})
     fireEvent.click(screen.getByRole('button',{name:'研究检索'}))
-    fireEvent.change(screen.getByLabelText('本页状态'),{target:{value:'CLOSED'}})
-    expect(screen.getByRole('heading',{name:'本页没有符合条件的研究'})).toBeVisible()
-    fireEvent.click(screen.getByRole('button',{name:'显示本页全部研究'}))
-    fireEvent.click(screen.getAllByRole('button',{name:'查看/编辑'})[0])
+    fireEvent.click(within(screen.getByRole('group',{name:'按研究状态筛选'})).getByRole('button',{name:'已结束'}))
+    expect(await screen.findByRole('heading',{name:'没有符合条件的研究'})).toBeVisible()
+    fireEvent.click(screen.getByRole('button',{name:'显示全部研究'}))
+    fireEvent.click((await screen.findAllByRole('button',{name:'查看/编辑'}))[0])
     fireEvent.change(screen.getByLabelText('研究名称'),{target:{value:'不能丢失'}})
     fireEvent.click(screen.getByRole('button',{name:'新建其他项目'}))
     expect(confirm).toHaveBeenCalledOnce()
@@ -440,4 +456,51 @@ describe('Survey researcher directory and editing context',()=>{
     expect(screen.getByRole('dialog',{name:'创建研究项目'})).toBeVisible()
     expect(screen.getByLabelText('研究名称')).toHaveValue('')
   })
+  it('keeps state buttons visible with search collapsed, changes page size and sort, and resets each new query to page one',async()=>{
+    const base=vi.mocked(fetch).getMockImplementation()!
+    vi.stubGlobal('fetch',vi.fn((url:string,options?:RequestInit)=>{
+      if(url.includes('/projects?page=')){
+        const p=new URL(url,'http://local.test').searchParams,page=Number(p.get('page')),size=Number(p.get('pageSize')||25)
+        return reply({page,total:80,hasNext:page*size<80,list:[{...projects[0],id:'page-'+page,title:'第'+page+'页研究'}]})
+      }
+      return base(url,options)
+    }))
+    render(<SurveyApp/>);await screen.findByRole('heading',{name:'第1页研究'})
+    expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+    const states=screen.getByRole('group',{name:'按研究状态筛选'})
+    expect(within(states).getAllByRole('button').map(b=>b.textContent)).toEqual(['全部','草稿','进行中','已暂停','已结束','已归档'])
+    fireEvent.click(screen.getByRole('button',{name:'下一页'}));await screen.findByRole('heading',{name:'第2页研究'})
+    fireEvent.change(screen.getByLabelText('每页显示'),{target:{value:'10'}})
+    await screen.findByRole('heading',{name:'第1页研究'})
+    expect(vi.mocked(fetch).mock.calls.slice(-1)[0]?.[0]).toBe('/api/survey/projects?page=1&pageSize=10')
+    fireEvent.change(screen.getByLabelText('创建时间排序'),{target:{value:'created_asc'}})
+    await waitFor(()=>expect(vi.mocked(fetch).mock.calls.slice(-1)[0]?.[0]).toBe('/api/survey/projects?page=1&pageSize=10&sort=created_asc'))
+    fireEvent.click(within(states).getByRole('button',{name:'草稿'}))
+    await waitFor(()=>expect(vi.mocked(fetch).mock.calls.slice(-1)[0]?.[0]).toBe('/api/survey/projects?page=1&pageSize=10&sort=created_asc&status=DRAFT'))
+    expect(screen.getByText('共 80 项研究 · 显示 1–1 项')).toBeVisible()
+    expect(within(states).getByRole('button',{name:'草稿'})).toHaveAttribute('aria-pressed','true')
+    expect(vi.mocked(fetch).mock.calls.filter(([url])=>String(url).endsWith('/auth/me'))).toHaveLength(1)
+  })
+
+  it.each([false,true])('ignores an older filter response or error after a newer successful selection (failure=%s)',async failure=>{
+    const base=vi.mocked(fetch).getMockImplementation()!
+    let resolveOld!:(value:Response)=>void
+    const old=new Promise<Response>(resolve=>{resolveOld=resolve})
+    vi.stubGlobal('fetch',vi.fn((url:string,options?:RequestInit)=>{
+      if(url.includes('status=DRAFT'))return old
+      if(url.includes('status=ACTIVE'))return reply({list:[projects[1]],page:1,total:1,hasNext:false})
+      return base(url,options)
+    }))
+    render(<SurveyApp/>);await screen.findByRole('heading',{name:'研究工作台'})
+    const states=screen.getByRole('group',{name:'按研究状态筛选'})
+    fireEvent.click(within(states).getByRole('button',{name:'草稿'}))
+    fireEvent.click(within(states).getByRole('button',{name:'进行中'}))
+    await waitFor(()=>expect(screen.queryByRole('heading',{name:'学习体验研究'})).not.toBeInTheDocument())
+    await act(async()=>{resolveOld(await reply({list:[projects[0]]},!failure))})
+    expect(screen.getByRole('heading',{name:'长期跟踪研究'})).toBeVisible()
+    expect(screen.queryByRole('heading',{name:'学习体验研究'})).not.toBeInTheDocument()
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+    expect(screen.queryByText('正在读取研究列表，请稍候…')).not.toBeInTheDocument()
+  })
+
 })
