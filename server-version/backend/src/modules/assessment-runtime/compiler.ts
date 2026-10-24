@@ -44,9 +44,9 @@ const compiledRuntimeSchema = z.object({
   hashScheme: z.literal(CANONICAL_JSON_SHA256_V1),
   scorerKey: z.string().nullable(),
   scorerVersion: z.string().min(1),
-  metricDefinitions: z.record(compiledMetricDefinitionSchema),
-  qualityDefinitions: z.record(compiledQualityDefinitionSchema),
-  reportDefinition: z.record(z.unknown()),
+  metricDefinitions: z.record(z.string(), compiledMetricDefinitionSchema),
+  qualityDefinitions: z.record(z.string(), compiledQualityDefinitionSchema),
+  reportDefinition: z.record(z.string(), z.unknown()),
   aggregateProjection: z.object({
     allowedMetricKeys: z.array(z.string()),
     allowedFactKeys: z.array(z.string()),

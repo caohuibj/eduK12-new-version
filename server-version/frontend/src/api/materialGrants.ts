@@ -17,13 +17,14 @@ export interface MaterialGrantRow {
 }
 
 export const materialGrantApi = {
-  list: (query: { resourceType?: MaterialResourceType; resourceId?: string; teacherId?: string } = {}) => {
+  list: (query: { resourceType?: MaterialResourceType; resourceId?: string; teacherId?: string } = {}, signal?: AbortSignal) => {
     const params = new URLSearchParams()
     if (query.resourceType) params.set('resourceType', query.resourceType)
     if (query.resourceId) params.set('resourceId', query.resourceId)
     if (query.teacherId) params.set('teacherId', query.teacherId)
     const qs = params.toString()
-    return apiClient.get<{ list: MaterialGrantRow[] }>(`/admin/material-grants${qs ? `?${qs}` : ''}`)
+    const url = `/admin/material-grants${qs ? `?${qs}` : ''}`
+    return signal ? apiClient.get<{ list: MaterialGrantRow[] }>(url, {signal}) : apiClient.get<{ list: MaterialGrantRow[] }>(url)
   },
   create: (input: { teacherId: string; resourceType: MaterialResourceType; resourceId: string }) =>
     apiClient.post<MaterialGrantRow>('/admin/material-grants', input),
@@ -32,18 +33,25 @@ export const materialGrantApi = {
   set: (input: { resourceType: MaterialResourceType; resourceId: string; teacherIds: string[] }) =>
     apiClient.put<{ list: MaterialGrantRow[] }>('/admin/material-grants/set', input),
   remove: (id: string) => apiClient.delete<{ id: string }>(`/admin/material-grants/${id}`),
-  listTeachers: async () => {
-    const pageSize = 100
+  listTeachers: async (signal?: AbortSignal) => {
+    const checkActive = () => { if (signal?.aborted) throw new DOMException('Teacher directory read cancelled', 'AbortError') }
+    const readPage = (page: number) => {
+      checkActive()
+      const url = `/users?role=TEACHER&page=${page}&pageSize=100`
+      return signal ? apiClient.get<{ list: User[]; total: number }>(url, {signal}) : apiClient.get<{ list: User[]; total: number }>(url)
+    }
     const list: User[] = []
     let page = 1
-    let last = await apiClient.get<{ list: User[]; total: number }>(`/users?role=TEACHER&page=${page}&pageSize=${pageSize}`)
+    let last = await readPage(page)
+    checkActive()
     if (last.code !== 0 || !last.data) return last
     if (!Array.isArray(last.data.list)) throw new Error('教师名单格式不完整')
     list.push(...last.data.list)
     const total = last.data.total ?? list.length
     while (list.length < total) {
       page += 1
-      last = await apiClient.get<{ list: User[]; total: number }>(`/users?role=TEACHER&page=${page}&pageSize=${pageSize}`)
+      last = await readPage(page)
+      checkActive()
       if (last.code !== 0 || !last.data) return last
       const chunk = last.data.list
       if (!Array.isArray(chunk) || chunk.length === 0 || (last.data.total != null && last.data.total !== total)) {

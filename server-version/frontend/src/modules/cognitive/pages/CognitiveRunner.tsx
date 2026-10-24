@@ -1,3 +1,5 @@
+import {PersonalParticipationLink} from '../../../components/participation/PersonalParticipationLink'
+import {trainingCognitiveLink} from '../../../components/participation/training-participation-link'
 import '../cognitive-surface.css'
 import { useTrainingLearnerNavigation } from '../../../training/learnerNavigation'
 import CognitiveCredentialReset from './CognitiveCredentialReset'
@@ -213,9 +215,9 @@ const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacy
   )
 
   const publicCredentialNotice = isPublic && recoveryToken ? (
-    <p className="text-left text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded p-3 mb-4">
+    <><details className="mb-4 rounded border p-3"><summary>保存本次认知测评恢复链接</summary><PersonalParticipationLink url={trainingCognitiveLink.link(window.location.origin,sessionId||'',{key:recoveryToken})} firstTime={false} fileLabel="本次认知测评" scopeNotice="只恢复本次服务器测评身份和已开放结果；未提交的本机试次草稿不会跨设备同步。" onSaved={()=>{}}/></details><p className="text-left text-sm text-amber-800 bg-amber-50 border border-amber-200 rounded p-3 mb-4">
       匿名编号：{state.session?.anonymousCode || '匿名参与者'}；恢复凭证：<code className="break-all">{recoveryToken}</code>。请保存恢复凭证，它用于恢复服务器中的测评身份和已完成结果。未提交的试次草稿只保存在本设备，不会随凭证同步到其他设备；请优先回到原设备继续。已在本设备封存的最终提交会在本设备重试。
-    </p>
+    </p></>
   ) : null
 
   if (state.status === 'COMPLETED') {

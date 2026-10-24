@@ -20,6 +20,31 @@ describe('shared Form foundation immutable baseline oracle',()=>{
     // Compare serialized bytes too: error order, missing order, raw choice order and hashes matter.
     expect(JSON.stringify(await evaluateFormCase(test,api))).toBe(JSON.stringify(golden.cases[index].output))
   })
+  it('preserves missing, null, NaN and integer diagnostics without accepting invalid input',()=>{
+    const source=cases.find(c=>c.name==='v2-all-13-types')!.definition
+    const diagnose=(key:string,value:unknown)=>{
+      const definition=structuredClone(source) as any
+      definition.pages[0].questions[0][key]=value
+      return validateFormDefinition(definition).issues
+    }
+    expect(diagnose('required',undefined)[0].message).toBe('Required')
+    expect(diagnose('required',null)[0].message).toBe('Expected boolean, received null')
+    expect(diagnose('minSelections',NaN)[0].message).toBe('Expected number, received nan')
+    expect(diagnose('minSelections',1.5)[0].message).toBe('Expected integer, received float')
+    expect(diagnose('minSelections',31)[0].message).toBe('Number must be less than or equal to 30')
+    expect(diagnose('step',0)[0].message).toBe('Number must be greater than 0')
+  })
+  it('preserves multiple issue paths and unknown-key order while still rejecting them',()=>{
+    const definition=structuredClone(cases.find(c=>c.name==='v2-all-13-types')!.definition) as any
+    const question=definition.pages[0].questions[0]
+    question.required=null
+    question.extraFirst=true
+    question.extraSecond=true
+    expect(validateFormDefinition(definition).issues).toEqual([
+      {path:'pages.0.questions.0.required',message:'Expected boolean, received null',severity:'error'},
+      {path:'pages.0.questions.0',message:"Unrecognized key(s) in object: 'extraFirst', 'extraSecond'",severity:'error'},
+    ])
+  })
   it('keeps the legacy schema and exception exports as the same objects',()=>{
     expect(builder.formDraftSchema).toBe(formDraftSchema)
     expect(final.SurveyFinalValidationError).toBe(FormAnswerValidationError)
@@ -51,6 +76,7 @@ describe('shared Form foundation immutable baseline oracle',()=>{
     const allowed=new Set(['zod','../assessment-media/assessment-image','../../assessment-runtime/canonical','../definition-primitives','./definition','./answers'])
     // Keep new shared pure modules explicit; no adapter/database/HTTP directory allowances.
     const moduleDependencies:Record<string,readonly string[]>={
+      'form/definition.ts':['../../assessment-media/material'],
       'flow/training.ts':['../materials/definition','./compiler'],
       'materials/definition.ts':['../flow/compiler','../flow/definition'],
       'scale/import-parser.ts':['../form/import-parser','../../scale/scale-definition'],
@@ -61,6 +87,10 @@ describe('shared Form foundation immutable baseline oracle',()=>{
       'sjt/validation.ts':['./selection'],
       'weighted-variants.ts':['node:crypto','../assessment-runtime/canonical','./definition-primitives'],
     }
+    // Check the exact external pure leaf, not a broad media-directory exemption.
+    const material=fs.readFileSync(path.resolve(root,'../assessment-media/material.ts'),'utf8')
+    const materialImports=[...material.matchAll(/(?:from\s+|import\s*\()(['"])([^'"]+)\1/g)].map(m=>m[2])
+    expect(materialImports).toEqual(['zod'])
     for(const file of walk(root).filter(f=>f.endsWith('.ts'))){
       const source=fs.readFileSync(file,'utf8')
       const imports=[...source.matchAll(/(?:from\s+|import\s*\()(['"])([^'"]+)\1/g)].map(m=>m[2])

@@ -13,7 +13,7 @@ vi.mock('../../../components/PdfViewer', () => ({ default: (props: { isOpen: boo
 import AssignmentSubmit from '../AssignmentSubmit'
 const questions = [{ id: 'subjective', type: 'text', question: '说说你的想法' }, { id: 'color', type: 'single_choice', question: '颜色', options: [{ key: 'B', text: '绿色' }] }, { id: 'colors', type: 'multiple_choice', question: '多种颜色', options: [{ key: 'A', text: '红色' }, { key: 'B', text: '绿色' }] }]
 const assignment = { id: 'a1', title: '合成练习', questions }
-function load(data = assignment, submission: any = null) { mocks.get.mockImplementation(async (url: string) => ({ code: 0, data: url.endsWith('/my-submission') ? submission : data })) }
+function load(data = assignment, submission: any = null) { mocks.get.mockImplementation(async (url: string) => ({ code: 0, data: url.endsWith('/my-submission') ? submission : { ...data, mySubmission: submission } })) }
 function show() { return render(<MemoryRouter initialEntries={['/student/assignments/a1']}><Routes><Route path="/student/assignments/:assignmentId" element={<AssignmentSubmit />} /></Routes></MemoryRouter>) }
 beforeEach(() => { vi.clearAllMocks(); mocks.training.mockReturnValue(false); vi.spyOn(window, 'alert').mockImplementation(() => {}); load(); mocks.post.mockResolvedValue({ code: 0 }) })
 afterEach(() => vi.restoreAllMocks())
@@ -137,5 +137,36 @@ it.each([true, false])('preserves pending, retry identity, native alerts and acc
   expect(focus).not.toHaveBeenCalled()
   expect(mocks.post).toHaveBeenCalledTimes(2)
   expect(mocks.post.mock.calls[1]).toEqual(['/assignments/a1/submit', { content: '保留这份作答', answers: undefined, expectedRevision: 0 }, { headers: { 'Idempotency-Key': firstKey } }])
-  expect(mocks.get.mock.calls.filter(([url]) => url === '/assignments/a1/my-submission')).toHaveLength(2)
+  expect(mocks.get.mock.calls.map(([url]) => url)).toEqual(['/assignments/a1', '/assignments/a1'])
+})
+
+it('preserves raw legacy answers named assetId/url along with feedback and revision', async () => {
+  const legacy = { ...assignment, questions: [{ id: 'assetId', type: 'text', question: '第一题' }, { id: 'url', type: 'text', question: '第二题' }] }
+  const raw = { id: 's-legacy', content: '原补充', answers: { assetId: '普通答案一', url: '普通答案二' }, revision: 7, comment: '原评语', submittedAt: '2026-10-19T00:00:00Z' }
+  mocks.get.mockImplementation(async (url: string) => ({ code: 0, data: url.endsWith('/my-submission') ? raw : { ...legacy, mySubmission: { ...raw, answers: { ...raw.answers, url: null } } } }))
+  show()
+  expect(await screen.findByText('题目2：普通答案二')).toBeInTheDocument()
+  expect(screen.getByText('原补充')).toBeInTheDocument()
+  expect(screen.getByText('原评语')).toBeInTheDocument()
+  expect(mocks.get.mock.calls.map(([url]) => url)).toEqual(['/assignments/a1', '/assignments/a1/my-submission'])
+  fireEvent.click(screen.getByRole('button', { name: '修改练习' }))
+  expect(screen.getByRole('textbox', { name: '题目1：第一题' })).toHaveValue('普通答案一')
+  expect(screen.getByRole('textbox', { name: '题目2：第二题' })).toHaveValue('普通答案二')
+  mocks.post.mockReturnValue(new Promise(() => {}))
+  fireEvent.click(screen.getByRole('button', { name: '保存修改' }))
+  expect(mocks.post).toHaveBeenCalledWith('/assignments/a1/submit', { content: '原补充', answers: { '0': '普通答案一', '1': '普通答案二' }, expectedRevision: 7 }, expect.anything())
+})
+
+it.each(['rejection', 'network'])('does not expose a corrupted legacy answer form after raw fallback %s', async failure => {
+  const broken = { ...assignment, mySubmission: { id: 'legacy', answers: { assetId: '原答案', url: null }, revision: 4 } }
+  mocks.get.mockImplementation(async (url: string) => {
+    if (!url.endsWith('/my-submission')) return { code: 0, data: broken }
+    if (failure === 'network') throw new Error('unavailable')
+    return { code: 403, message: 'forbidden' }
+  })
+  vi.spyOn(console, 'error').mockImplementation(() => {})
+  show()
+  await screen.findByText('练习不存在')
+  expect(screen.queryByRole('textbox')).not.toBeInTheDocument()
+  expect(mocks.post).not.toHaveBeenCalled()
 })

@@ -5,7 +5,7 @@ export const materialLimits = {
   'video/mp4':50*1024*1024, 'video/webm':50*1024*1024, 'application/pdf':20*1024*1024,
 } as const
 export const materialSchema = z.object({
-  asset:z.object({assetId:z.string().uuid(),contentHash:z.string().regex(/^[a-f0-9]{64}$/),
+  asset:z.object({assetId:z.string().guid(),contentHash:z.string().regex(/^[a-f0-9]{64}$/),
     mimeType:z.enum(['image/png','image/jpeg','image/webp','video/mp4','video/webm','application/pdf'])}).strict(),
   name:z.string().trim().min(1).max(300), caption:z.string().trim().max(1000).optional(),
   rightsStatus:z.enum(['unknown','self_authored','authorized']),rightsNote:z.string().trim().max(2000),

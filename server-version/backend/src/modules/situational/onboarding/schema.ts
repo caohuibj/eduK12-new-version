@@ -15,7 +15,7 @@ export const instrumentContentSchema = z.object({
   schemaVersion: z.literal(1), identity: sourceIdentitySchema,
   catalogOrder: z.number().int().nonnegative().default(1000),
   definition: z.union([situationDefinitionSchema, situationDefinitionV2Schema]),
-  goldenCases: z.array(z.object({ name: z.string().min(1), responses: z.array(response), expected: z.object({ quality: z.enum(['interpretable', 'limited', 'invalid']), metricKeys: z.array(z.string()), metrics: z.record(z.number().finite().nullable()) }).strict() }).strict()),
+  goldenCases: z.array(z.object({ name: z.string().min(1), responses: z.array(response), expected: z.object({ quality: z.enum(['interpretable', 'limited', 'invalid']), metricKeys: z.array(z.string()), metrics: z.record(z.string(), z.number().finite().nullable()) }).strict() }).strict()),
 }).strict()
 export const publicationSchema = z.object({
   releaseStatus: z.enum(['DRAFT', 'PUBLISHED', 'RETIRED']),

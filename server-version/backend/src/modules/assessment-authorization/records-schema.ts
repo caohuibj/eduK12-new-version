@@ -23,7 +23,7 @@ const scopeSchema = z.object({
 
 export const instrumentAuthorizationRecordSchema = z.object({
   schemaVersion: z.literal(INSTRUMENT_AUTHORIZATION_SCHEMA),
-  authorizationId: z.string().uuid(),
+  authorizationId: z.string().guid(),
   version: z.number().int().positive(),
   instrumentKey: z.string().min(1),
   instrumentVersion: z.string().regex(exactVersion),
@@ -67,8 +67,8 @@ export const instrumentAuthorizationRecordSchema = z.object({
 })
 
 export const instrumentAuthorizationAuditSchema = z.object({
-  auditId: z.string().uuid(),
-  authorizationId: z.string().uuid(),
+  auditId: z.string().guid(),
+  authorizationId: z.string().guid(),
   authorizationVersion: z.number().int().positive(),
   action: z.enum(['CREATE', 'UPDATE', 'SUBMIT', 'APPROVE', 'REVOKE', 'EXPIRE', 'ATTACH_EVIDENCE']),
   actorUserId: z.string().min(1),

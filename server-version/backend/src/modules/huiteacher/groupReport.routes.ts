@@ -8,7 +8,7 @@ import { readTeacherFormGroupReport,HuiteacherGroupReportError } from './groupRe
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 const base='/organizations/:organizationId/evaluation-events/:eventId/forms/:formId/group-report'
 const handler=(publishV2:boolean,releasedOnly=false)=>asyncHandler(async(req,res)=>{
   try{

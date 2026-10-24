@@ -42,3 +42,20 @@ describe('Survey public shared response options',()=>{
     await expect(getOwnResearchTask(proof)).rejects.toThrow('revoked')
   })
 })
+
+
+describe('Survey task unit material projection',()=>{
+  const material={asset:{assetId:'a8d5f8ce-4c34-4be0-96d6-9a3100030303',contentHash:'a'.repeat(64),mimeType:'image/png'},
+    name:'Study material',caption:'Read this',rightsStatus:'authorized',rightsNote:'PRIVATE CONTRACT'}
+  it('preserves public materials without leaking rights or mutating the frozen source',async()=>{
+    const display={...catalog(),materials:[material]},before=structuredClone(display);own(display)
+    const task=await getOwnResearchTask(proof)
+    expect(task.units[0].materials).toEqual([{asset:material.asset,name:material.name,caption:material.caption}])
+    expect(JSON.stringify(task)).not.toContain('PRIVATE CONTRACT');expect(display).toEqual(before)
+  })
+  it('omits empty materials and still rejects duplicate or invalid lists',async()=>{
+    own({...catalog(),materials:[]});expect((await getOwnResearchTask(proof)).units[0]).not.toHaveProperty('materials')
+    own({...catalog(),materials:[material,material]});await expect(getOwnResearchTask(proof)).rejects.toThrow()
+    own({...catalog(),materials:[{...material,rightsStatus:'INVALID'}]});await expect(getOwnResearchTask(proof)).rejects.toThrow()
+  })
+})

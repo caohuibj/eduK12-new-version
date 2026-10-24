@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { ChevronDown, Copy, Key, Plus, RefreshCw, Trash2 } from 'lucide-react'
 import apiClient from '../api/client'
 import { PageHeader } from '../components/product-ui/PageHeader'
@@ -24,29 +24,48 @@ const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
   const [now, setNow] = useState(Date.now())
   const [deletingId, setDeletingId] = useState<string | null>(null)
 
+  const [page, setPage] = useState(1)
+  const [loadedPage, setLoadedPage] = useState<number | null>(null)
+  const [total, setTotal] = useState(0)
+  const requestId = useRef(0)
+
   useEffect(() => {
-    void fetchCodes()
     const timer = window.setInterval(() => setNow(Date.now()), 30000)
     return () => window.clearInterval(timer)
   }, [])
 
-  const fetchCodes = async () => {
+  const fetchCodes = useCallback(async () => {
+    const id = ++requestId.current
     try {
       setLoading(true)
       setError(null)
-      const response = await apiClient.get('/teacher-codes')
+      const response = training
+        ? await apiClient.get('/teacher-codes', { params: { page, pageSize: 20 } })
+        : await apiClient.get('/teacher-codes')
+      if (id !== requestId.current) return
       if (response.code === 0) {
+        const nextTotal = response.data.total ?? response.data.list.length
+        const lastPage = Math.max(1, Math.ceil(nextTotal / 20))
+        if (training && page > lastPage) { setPage(lastPage); return }
         setCodes(response.data.list)
+        setLoadedPage(page)
+        setTotal(nextTotal)
       } else {
         setError(response.message || '获取教师码列表失败')
       }
     } catch (fetchError) {
+      if (id !== requestId.current) return
       console.error('获取教师码列表失败:', fetchError)
       setError((fetchError as { message?: string }).message || '获取教师码列表失败')
     } finally {
-      setLoading(false)
+      if (id === requestId.current) setLoading(false)
     }
-  }
+  }, [training, page])
+
+  useEffect(() => {
+    void fetchCodes()
+    return () => { requestId.current++ }
+  }, [fetchCodes])
 
   const handleCreate = async () => {
     if (creatingRef.current) return
@@ -75,7 +94,8 @@ const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
       setError(null)
       const response = await apiClient.post('/teacher-codes', payload)
       if (response.code === 0) {
-        await fetchCodes()
+        if (training && page !== 1) setPage(1)
+        else await fetchCodes()
         setFormOpen(false)
       } else {
         setError(response.message || '生成教师码失败')
@@ -96,7 +116,10 @@ const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
       setError(null)
       const response = await apiClient.delete(`/teacher-codes/${teacherCode.id}`)
       if (response.code === 0) {
-        setCodes(current => current.filter(item => item.id !== teacherCode.id))
+        if (training) {
+          if (codes.length === 1 && page > 1) setPage(current => current - 1)
+          else await fetchCodes()
+        } else setCodes(current => current.filter(item => item.id !== teacherCode.id))
       } else {
         setError(response.message || '删除教师码失败')
       }
@@ -124,10 +147,10 @@ const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
     <section className="training-code-management" aria-label="培训师注册码">
       {feedback}
       <div className="training-code-toolbar">
-        <p>共 {codes.length} 个注册码 <span>· 新码限注册 1 个账号</span></p>
+        <p>共 {total} 个注册码 <span>· 新码限注册 1 个账号</span></p>
         <div>
-          <button type="button" className="training-accounts-secondary" aria-label="刷新注册码" disabled={loading || creating} onClick={() => void fetchCodes()}><RefreshCw size={15}/></button>
-          <button type="button" className="training-code-primary" aria-expanded={formOpen} aria-controls="training-code-create" onClick={() => {setFormOpen(!formOpen); setError(null)}}><Plus size={15}/>生成注册码</button>
+          <button type="button" className="training-accounts-secondary" aria-label="刷新注册码" disabled={loading || creating || Boolean(deletingId)} onClick={() => void fetchCodes()}><RefreshCw size={15}/></button>
+          <button type="button" className="training-code-primary" disabled={Boolean(deletingId)} aria-expanded={formOpen} aria-controls="training-code-create" onClick={() => {setFormOpen(!formOpen); setError(null)}}><Plus size={15}/>生成注册码</button>
         </div>
       </div>
       {formOpen && <form id="training-code-create" className="training-code-form" onSubmit={event => {event.preventDefault(); void handleCreate()}}>
@@ -152,14 +175,15 @@ const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
         <div className="training-code-form-footer"><span>仅适用于本次生成的注册码，已有账号和注册码不变。</span><button type="button" disabled={creating} className="training-accounts-secondary" onClick={() => setFormOpen(false)}>取消</button><button type="submit" disabled={creating} className="training-code-primary">{creating ? '生成中…' : '确认生成'}</button></div>
       </form>}
       {error && <div className="training-code-error" role="alert">{error}</div>}
-      {loading ? <p className="training-code-empty" role="status">正在加载注册码…</p> : codes.length === 0 ? <p className="training-code-empty">暂无注册码，点击右上方按钮生成。</p> : <div className="training-code-grid">{codes.map(code => {
+      {loading ? <p className="training-code-empty" role="status">正在加载注册码…</p> : loadedPage !== page ? null : codes.length === 0 ? <p className="training-code-empty">暂无注册码，点击右上方按钮生成。</p> : <div className="training-code-grid">{codes.map(code => {
         const status = codeState(code)
         return <article className="training-code-card" key={code.id} aria-label={`培训师注册码 ${code.code}`}>
           <div className="training-code-card-heading"><code>{code.code}</code><span className={`training-code-status${status === '可使用' ? ' is-usable' : ''}`}>{status}</span><button type="button" className="training-code-icon" aria-label={`复制培训师注册码 ${code.code}`} title="复制注册码" onClick={() => void copyCode(code.code)}><Copy size={16}/></button></div>
           <dl className="training-code-terms"><div><dt>注册截止</dt><dd>{code.expiresAt ? formatDate(code.expiresAt) : '不限时间'}</dd></div><div><dt>账号期限</dt><dd>{accountTermLabel(code)}</dd></div></dl>
-          <details className="training-code-details"><summary>详情与管理<ChevronDown size={14}/><span>已用 {code.usedCount}/{code.maxUses}</span></summary><dl><div><dt>创建者</dt><dd>{code.creator?.nickname || code.creator?.username || '—'}</dd></div><div><dt>创建时间</dt><dd>{formatDate(code.createdAt)}</dd></div><div><dt>使用次数</dt><dd>{code.usedCount} / {code.maxUses}</dd></div></dl><button type="button" className="training-code-delete" aria-label={`删除培训师注册码 ${code.code}`} disabled={deletingId === code.id} onClick={() => void handleDelete(code)}><Trash2 size={14}/>删除注册码</button></details>
+          <details className="training-code-details"><summary>详情与管理<ChevronDown size={14}/><span>已用 {code.usedCount}/{code.maxUses}</span></summary><dl><div><dt>创建者</dt><dd>{code.creator?.nickname || code.creator?.username || '—'}</dd></div><div><dt>创建时间</dt><dd>{formatDate(code.createdAt)}</dd></div><div><dt>使用次数</dt><dd>{code.usedCount} / {code.maxUses}</dd></div></dl><button type="button" className="training-code-delete" aria-label={`删除培训师注册码 ${code.code}`} disabled={loading || creating || Boolean(deletingId)} onClick={() => void handleDelete(code)}><Trash2 size={14}/>删除注册码</button></details>
         </article>
       })}</div>}
+      {total > 20 && <div className="training-accounts-pagination"><p>共 {total} 个注册码 · 第 {page} / {Math.max(1, Math.ceil(total / 20))} 页</p><div><button type="button" disabled={page <= 1 || loading || creating || Boolean(deletingId)} onClick={() => setPage(current => current - 1)}>上一页</button><button type="button" disabled={page >= Math.ceil(total / 20) || loading || creating || Boolean(deletingId)} onClick={() => setPage(current => current + 1)}>下一页</button></div></div>}
     </section>
   )
 

@@ -140,6 +140,11 @@ describe('public check-in session capability', () => {
 
     expect(response.statusCode).toBe(200)
     expect(mockPrisma.$executeRaw).toHaveBeenCalledOnce()
+    // Periodic retirement must not run on a valid anonymous submit request.
+    expect(mockPrisma.assetReference.findMany).toHaveBeenCalledExactlyOnceWith({
+      where: { entityType: 'CheckinSubmission', entityId: 'submission-1', field: 'images' },
+      select: { assetId: true, field: true },
+    })
     expect(mockCheckinTokenService.claimSubmissionSlot).toHaveBeenCalledWith('token-1', mockPrisma)
     expect(mockPrisma.assetReference.deleteMany).toHaveBeenCalledWith(expect.objectContaining({
       where: expect.objectContaining({

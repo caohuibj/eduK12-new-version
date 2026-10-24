@@ -36,19 +36,19 @@ export interface ReferenceAnalysisEvidence {
   sampleAdequacy: string
 }
 export const surveyReferenceSourceBindingSchema=z.object({
-  kind:z.literal('SURVEY_VERIFIED_SOURCE_V1'),projectId:z.string().uuid(),waveId:z.string().uuid(),
+  kind:z.literal('SURVEY_VERIFIED_SOURCE_V1'),projectId:z.string().guid(),waveId:z.string().guid(),
   instrumentKey:z.string().trim().min(1).max(240),scoreKey:z.string().trim().min(1).max(240),
   sourceRevision:z.number().int().nonnegative().safe(),sourceFinalCount:z.number().int().nonnegative().safe(),
   cutOff:z.string().max(64).refine(value=>Number.isFinite(Date.parse(value))),
 }).strict()
 export type SurveyReferenceSourceBinding=z.infer<typeof surveyReferenceSourceBindingSchema>
 export const trainingReferenceSourceBindingSchema=z.object({
-  kind:z.literal('TRAINING_VERIFIED_SOURCE_V1'),courseId:z.string().uuid(),compositeId:z.string().uuid(),
-  selector:z.object({itemId:z.string().uuid(),scoreKey:z.string().trim().min(1).max(200),publication:z.string().datetime(),
+  kind:z.literal('TRAINING_VERIFIED_SOURCE_V1'),courseId:z.string().guid(),compositeId:z.string().guid(),
+  selector:z.object({itemId:z.string().guid(),scoreKey:z.string().trim().min(1).max(200),publication:z.string().datetime(),
     configDigest:z.string().regex(/^[a-f0-9]{64}$/).nullable(),variantKey:z.string().trim().min(1).max(200).nullable(),
     materialGroupKey:z.string().trim().min(1).max(200).optional()}).strict(),
   cutOff:z.string().datetime(),sourceHash:z.string().regex(/^[a-f0-9]{64}$/),
-  sourceIds:z.array(z.object({attemptId:z.string().uuid(),attemptEpoch:z.number().int().positive()}).strict()).min(1).max(250),
+  sourceIds:z.array(z.object({attemptId:z.string().guid(),attemptEpoch:z.number().int().positive()}).strict()).min(1).max(250),
 }).strict()
 export type TrainingReferenceSourceBinding=z.infer<typeof trainingReferenceSourceBindingSchema>
 const matchValues=z.array(z.string().trim().min(1).max(240)).min(1).max(50).refine(values=>new Set(values).size===values.length)
@@ -62,8 +62,8 @@ export const formalReferencePopulationMatchSchema=z.object({
     ||match.minAgeMonthsInclusive<match.maxAgeMonthsExclusive,'Invalid population age bounds')
 export const formalReferencePromotionSchema=z.object({
   kind:z.literal('FORMAL_CROSS_ENTRY_SUBMISSION_V1'),
-  sourceCandidateId:z.string().uuid(),sourceCandidateHash:z.string().regex(/^[a-f0-9]{64}$/),
-  analyzeGrantId:z.string().uuid(),
+  sourceCandidateId:z.string().guid(),sourceCandidateHash:z.string().regex(/^[a-f0-9]{64}$/),
+  analyzeGrantId:z.string().guid(),
   statement:z.string().trim().min(1).max(4000),
   populationDescription:z.string().trim().min(1).max(4000),
   applicability:z.string().trim().min(1).max(4000),

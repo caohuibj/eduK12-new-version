@@ -1,3 +1,4 @@
+import {stableStudyAdmissionHash} from '../anonymous-study/admission-principal'
 import { assertTrainingSectionSelected, loadTrainingChildAdmissionParent } from '../composite/training-variant-child-scope'
 import { loadStoredUnitAdmission } from './unit-admission'
 import { prisma } from '../../config/database'
@@ -343,7 +344,7 @@ export const activateCompositeFormAdmission = async (input: {
     formSection: identity,
     principal: {
       userId: parent.userId,
-      recoveryTokenHash: parent.recoveryTokenHash,
+      recoveryTokenHash: await stableStudyAdmissionHash(prisma,parent.id,parent.recoveryTokenHash,parent.userId),
     },
     parent: {
       kind: 'composite',

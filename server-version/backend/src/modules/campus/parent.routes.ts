@@ -15,7 +15,7 @@ import {
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const id=z.string().uuid()
+const id=z.string().guid()
 const invite=z.string().regex(/^[a-zA-Z0-9_-]{24}$/)
 const rate=createRedisRateLimiter({name:'campus-parent-links',limit:20,windowSeconds:900,
   key:req=>req.user?.userId??'anonymous'})

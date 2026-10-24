@@ -946,11 +946,12 @@ export class IndexedDbFinalDraftStore implements FinalDraftStore {
       const meta = await requestResult<FinalDraftMeta | undefined>(transaction.objectStore(META_STORE).get(draftKey))
       if (meta?.trainingRetention?.expiredAt !== undefined) return
       transaction.objectStore(META_STORE).delete(draftKey)
-      for (const answer of await requestResult<FinalDraftAnswer[]>(transaction.objectStore(ANSWER_STORE).index(DRAFT_INDEX).getAll(draftKey))) {
-        transaction.objectStore(ANSWER_STORE).delete([answer.draftKey, answer.itemKey])
-      }
-      for (const trial of await requestResult<FinalDraftTrial[]>(transaction.objectStore(TRIAL_STORE).index(DRAFT_INDEX).getAll(draftKey))) {
-        transaction.objectStore(TRIAL_STORE).delete([trial.draftKey, trial.trialIndex])
+      // The index returns primary keys, not draftKey index values. Avoid cloning
+      // potentially large answer/trial payloads solely to discard accepted drafts.
+      for (const name of [ANSWER_STORE, TRIAL_STORE]) {
+        const store = transaction.objectStore(name)
+        const keys = await requestResult<IDBValidKey[]>(store.index(DRAFT_INDEX).getAllKeys(draftKey))
+        for (const key of keys) store.delete(key)
       }
     })
   }

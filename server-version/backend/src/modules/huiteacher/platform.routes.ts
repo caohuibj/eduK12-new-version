@@ -17,7 +17,7 @@ import {
 } from '../organization/educationProductGovernance'
 
 const router=Router()
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 const product=z.enum(['HUISCHOOL','HUITEACHER'])
 const limiter=createRedisRateLimiter({
   name:'education-platform-governance',limit:15,windowSeconds:900,
@@ -26,7 +26,7 @@ const limiter=createRedisRateLimiter({
 const password=z.string().min(1).max(128)
 const entitlementInput=z.object({
   action:z.enum(['ACTIVATE','SUSPEND']),expectedRevision:z.number().int().min(0).optional(),
-  initialSchoolAdminMembershipId:z.string().uuid().optional(),
+  initialSchoolAdminMembershipId:z.string().guid().optional(),
   currentPassword:password,
 }).strict()
 const grantInput=z.object({membershipId:uuid,currentPassword:password}).strict()

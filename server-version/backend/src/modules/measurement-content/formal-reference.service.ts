@@ -11,7 +11,7 @@ import {formalReferenceCandidateView,prepareFormalReferenceCandidate} from './fo
 import {formalReferencePromotionSchema,reviewReferenceCandidate,type ReferenceCandidate} from './reference-candidate'
 import {publishReviewedReferenceCandidate,storeReferenceCandidate} from './reference-candidate.repository'
 
-const uuid=z.string().uuid(),digest=z.string().regex(/^[a-f0-9]{64}$/)
+const uuid=z.string().guid(),digest=z.string().regex(/^[a-f0-9]{64}$/)
 const statement=z.string().trim().min(1).max(4000)
 const options={isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:10000}
 const fail=(code:string):never=>{throw new ContentReleaseError(code)}

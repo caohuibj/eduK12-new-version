@@ -66,6 +66,34 @@ describe('logged-in checkin submit endTime', () => {
     mockPrisma.$transaction.mockImplementation(async (callback: (tx: typeof mockPrisma) => unknown) => callback(mockPrisma))
   })
 
+  it('reads only fresh submission gates, not checkin content or media', async () => {
+    mockPrisma.checkin.findUnique.mockImplementation(async (query) => {
+      expect(query).toEqual({
+        where: { id: 'ck-1' }, select: { courseId: true, endTime: true },
+      })
+      return { courseId: 'course-1', endTime: null }
+    })
+    mockPrisma.checkinSubmission.create.mockResolvedValue({ id: 'sub-1' })
+    const res = makeRes()
+    await checkinController.submit(makeReq(), res)
+    expect(res.body.code).toBe(0)
+    expect(mockPrisma.checkin.findUnique).toHaveBeenCalledOnce()
+    expect(mockPrisma.courseStudent.findFirst).toHaveBeenCalledWith({
+      where: { courseId: 'course-1', studentId: 'student-1', status: { in: ['ACTIVE', 'APPROVED'] } },
+      select: { id: true },
+    })
+  })
+
+  it('rechecks membership before replaying a committed keyed checkin', async () => {
+    mockPrisma.checkin.findUnique.mockResolvedValue({ courseId: 'course-1', endTime: null })
+    mockPrisma.courseStudent.findFirst.mockResolvedValue(null)
+    const res = makeRes()
+    await checkinController.submit(makeReq({ header: vi.fn().mockReturnValue('revoked-member-key') }), res)
+    expect(res.statusCode).toBe(403)
+    expect(mockPrisma.checkinSubmissionIdempotencyReceipt.findFirst).not.toHaveBeenCalled()
+    expect(mockPrisma.$transaction).not.toHaveBeenCalled()
+  })
+
   it('rejects a submit after endTime', async () => {
     mockPrisma.checkin.findUnique.mockResolvedValue({
       id: 'ck-1',

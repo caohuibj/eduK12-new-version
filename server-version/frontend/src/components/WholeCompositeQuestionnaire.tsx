@@ -174,7 +174,14 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
     if (!meta || submitting.current || busy || checkpointBusy || accepted || meta.status === 'CONFLICT') return
     if (!meta.sealedSubmission) {
       const missing = questions.findIndex(({ unit, question }) => question.required && answers[wholeAnswerKey(unit.itemId, question.itemCode)]?.responseValue === undefined)
-      if (missing >= 0) { setIndex(missing); setError('还有必答题未作答，请完成后提交整份问卷。'); return }
+      if (missing >= 0) {
+        setIndex(missing)
+        if (publicMode) window.requestAnimationFrame(() => {
+          const target = document.getElementById(`training-anonymous-whole-required:${state.id}`)
+          target?.focus({ preventScroll: true }); target?.scrollIntoView?.({ block: 'center' })
+        })
+        setError('还有必答题未作答，请完成后提交整份问卷。'); return
+      }
     }
     Object.values(timingRef.current).forEach(tracker=>tracker.pause())
     submitting.current = true; setBusy(true); setError(null); setSubmitStartedAt(Date.now())
@@ -247,7 +254,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
     instructions={<div className="space-y-2">{state.instruction ? <p>{state.instruction}</p> : null}<p>整卷答案保存在当前浏览器，最后一次提交。请使用同一浏览器继续未提交的草稿。</p></div>}
     progress={definition ? { kind: 'count', completed: Object.keys(answers).length, total: questions.length, label: '整卷作答进度' } : undefined}
     saveStatus={local.status}
-    submissionStatus={accepted ? { state: 'committed', message: '整份问卷已可靠保存，正在生成报告。' } : busy ? { state: 'submitting', message: submitElapsedSeconds >= 8 ? `已等待 ${submitElapsedSeconds} 秒，正在确认服务器保存；请勿关闭，本机草稿仍保留。` : '正在提交并确认保存…' } : locked ? { state: 'pending', message: '整卷已封存，重试将使用相同内容。' } : { state: 'ready' }}
+    submissionStatus={accepted ? { state: 'committed', message: publicMode ? '整份问卷已可靠保存。报告按生成状态和开放权限显示，无需再次交卷。' : '整份问卷已可靠保存，正在生成报告。' } : busy ? { state: 'submitting', message: submitElapsedSeconds >= 8 ? `已等待 ${submitElapsedSeconds} 秒，正在确认服务器保存；请勿关闭，本机草稿仍保留。` : '正在提交并确认保存…' } : locked ? { state: 'pending', message: '整卷已封存，重试将使用相同内容。' } : { state: 'ready' }}
     actions={<button type="button" className="btn-secondary min-h-11" disabled={busy || checkpointBusy} onClick={() => void saveAndExit()}>保存并退出</button>}>
     {definition && meta && !accepted ? <TrainingCheckpointPanel policy={state.trainingPersistence} definitionHash={state.checkpointDefinitionHash} publicMode={publicMode} recoveryToken={recoveryToken}
       disabled={busy || meta.status !== 'DRAFT' || !!meta.sealedSubmission} onBusy={setCheckpointBusy} activeSlotKeys={definition.units.map(unit=>`scale:${unit.itemId}`)}
@@ -273,10 +280,10 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
         setAnswers(next); setIndex(0)
       }}/>:null}
     {error ? <p role="alert" className="mb-4 text-red-700">{error}</p> : null}
-    {publicMode && recoveryToken ? <details className="mb-4 rounded border p-3"><summary>保存匿名恢复凭证</summary><p className="my-2 text-sm">恢复凭证用于已提交进度；未提交答案仍保存在当前浏览器。</p><code className="break-all select-all">{recoveryToken}</code></details> : null}
+    {publicMode && recoveryToken ? <p className="mb-4 text-sm text-gray-600">请在页面上方保存本次匿名作答的恢复链接。链接不包含未提交答案，本机草稿或已保存的临时进度仍按各自有效期恢复。</p> : null}
     {accepted ? <div className="space-y-4"><h2 className="text-xl font-semibold">交卷成功</h2><p>答案已保存。可以离开页面，稍后查看报告；报告失败不需要重新交卷。</p><button className="btn-primary min-h-11" type="button" onClick={onCompleted}>查看报告进度</button></div>
       : meta?.sealedSubmission ? <div className="space-y-4"><p>整卷已封存，本机草稿会保留到服务器确认保存。</p><button type="button" className="btn-primary min-h-11" disabled={busy || meta.status === 'CONFLICT'} onClick={() => void submit()}>重试并确认整卷提交</button></div>
-        : current ? <div className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
+        : current ? <div id={publicMode ? `training-anonymous-whole-required:${state.id}` : undefined} tabIndex={publicMode ? -1 : undefined} className="rounded-xl border border-slate-200 bg-white p-4 sm:p-6">
           <h2 className="mb-3 text-xl font-semibold">{current.unit.scale.name}</h2>
           {current.unit.scale.instruction ? <p className="mb-4 whitespace-pre-wrap text-slate-600">{current.unit.scale.instruction}</p> : null}
           <p className="mb-4 text-sm text-slate-600">整卷第 {index + 1} / {questions.length} 题</p>

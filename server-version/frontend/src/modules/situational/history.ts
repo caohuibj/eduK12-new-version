@@ -22,15 +22,31 @@ export function situationalHistoryIdentities(definition: SituationalRunnerDefini
   return identities
 }
 
+export interface SituationalHistoryInvalidation {
+  responses: Record<string, SituationalDraftAnswer>
+  staleKeys: string[]
+}
+
+/** Operation-local projection. Do not retain it across answer or definition changes. */
+export function createSituationalHistorySnapshot(definition: SituationalRunnerDefinition, before: Record<string, SituationalDraftAnswer>) {
+  const identities = situationalHistoryIdentities(definition, before)
+  return {
+    identities,
+    invalidate(after: Record<string, SituationalDraftAnswer>): SituationalHistoryInvalidation {
+      if (definition.schemaVersion === 1) return { responses: after, staleKeys: [] }
+      const newHistory = before === after ? identities : situationalHistoryIdentities(definition, after)
+      const staleKeys = Object.entries(after).flatMap(([key, answer]) => {
+        const sceneKey = key.slice(0, key.indexOf(':')), expected = newHistory[sceneKey]
+        return expected === undefined || (identities[sceneKey] !== undefined && identities[sceneKey] !== expected) || (answer.historyIdentity !== undefined && answer.historyIdentity !== expected) ? [key] : []
+      })
+      const responses = { ...after }
+      staleKeys.forEach(key => { delete responses[key] })
+      return { responses, staleKeys }
+    },
+  }
+}
+
 /** Retain current-node answers, invalidate the entire suffix on any upstream decision edit. */
-export function invalidateChangedSituationalHistory(definition: SituationalRunnerDefinition, before: Record<string, SituationalDraftAnswer>, after: Record<string, SituationalDraftAnswer>): { responses: Record<string, SituationalDraftAnswer>; staleKeys: string[] } {
-  if (definition.schemaVersion === 1) return { responses: after, staleKeys: [] }
-  const oldHistory = situationalHistoryIdentities(definition, before), newHistory = situationalHistoryIdentities(definition, after)
-  const staleKeys = Object.entries(after).flatMap(([key, answer]) => {
-    const sceneKey = key.slice(0, key.indexOf(':')), expected = newHistory[sceneKey]
-    return expected === undefined || (oldHistory[sceneKey] !== undefined && oldHistory[sceneKey] !== expected) || (answer.historyIdentity !== undefined && answer.historyIdentity !== expected) ? [key] : []
-  })
-  const responses = { ...after }
-  staleKeys.forEach(key => { delete responses[key] })
-  return { responses, staleKeys }
+export function invalidateChangedSituationalHistory(definition: SituationalRunnerDefinition, before: Record<string, SituationalDraftAnswer>, after: Record<string, SituationalDraftAnswer>): SituationalHistoryInvalidation {
+  return createSituationalHistorySnapshot(definition, before).invalidate(after)
 }

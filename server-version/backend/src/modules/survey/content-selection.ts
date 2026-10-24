@@ -7,7 +7,7 @@ import {referenceEntryKey} from '../measurement-content/reference-candidate'
 import type {FrozenReferencePolicy} from '../measurement-content/reference-policy'
 import {SurveyWaveError} from './waves.service'
 import type {ResearchFrozenUnit} from './publication.service'
-const id=z.string().uuid()
+const id=z.string().guid()
 export const surveyContentSelectionsSchema=z.array(z.object({
   instrumentId:id,reportReleaseId:id.optional(),
   references:z.array(z.object({releaseId:id,entryKey:z.string().regex(/^[a-f0-9]{64}$/),priority:z.number().int().safe()}).strict()).max(100),

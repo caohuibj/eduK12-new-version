@@ -9,10 +9,10 @@ const hash=z.string().regex(/^[a-f0-9]{64}$/)
 /** Persisted inside the registered resource entry; never a user-supplied grant. */
 export const educationLibraryOriginSchema=z.object({
   schemaVersion:z.literal(1),adapterVersion:z.literal('1.0.0'),
-  entryId:z.string().uuid(),product:educationLibraryProduct,releaseId:z.string().uuid(),contentHash:hash,
+  entryId:z.string().guid(),product:educationLibraryProduct,releaseId:z.string().guid(),contentHash:hash,
   approvedSnapshotHash:hash,sourceDefinitionHash:hash,applicabilityHash:hash,variantKey:z.enum([
     'STUDENT:SELF','STUDENT:PARENT_REPORT','STUDENT:TEACHER_REPORT','TEACHER:SELF','TEACHER:STUDENT_REPORT']),
-  dependencies:z.array(z.object({releaseId:z.string().uuid(),contentHash:hash}).strict()).max(20)
+  dependencies:z.array(z.object({releaseId:z.string().guid(),contentHash:hash}).strict()).max(20)
     .refine(values=>new Set(values.map(value=>value.releaseId)).size===values.length),
 }).strict()
 export type EducationLibraryOrigin=z.infer<typeof educationLibraryOriginSchema>
@@ -20,7 +20,7 @@ export type EducationLibraryResourceEntry=RelationalProductEntryV1&{libraryOrigi
 export const educationLibraryResourceKey=(origin:EducationLibraryOrigin)=>`library-scale:${origin.entryId}:${origin.product}:${origin.variantKey}`
 export function educationLibraryResourceProduct(key:string){
   const match=/^library-scale:([a-f0-9-]{36}):(SCHOOL|TEACHER):(STUDENT:(?:SELF|PARENT_REPORT|TEACHER_REPORT)|TEACHER:(?:SELF|STUDENT_REPORT))$/.exec(key)
-  if(!match||!z.string().uuid().safeParse(match[1]).success)fail('EDUCATION_LIBRARY_RESOURCE_KEY_INVALID')
+  if(!match||!z.string().guid().safeParse(match[1]).success)fail('EDUCATION_LIBRARY_RESOURCE_KEY_INVALID')
   return match[2] as EducationLibraryOrigin['product']
 }
 

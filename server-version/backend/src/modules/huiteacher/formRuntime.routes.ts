@@ -14,10 +14,10 @@ import {studentFormResourceId} from './studentFormResource'
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const id=z.string().uuid()
+const id=z.string().guid()
 const final=z.object({
   submissionId:z.string().min(16).max(120),
-  answers:z.record(z.unknown()),
+  answers:z.record(z.string(), z.unknown()),
 }).strict()
 const respond=(task:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
   try{return success(res,await task(req))}

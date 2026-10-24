@@ -443,7 +443,7 @@ const jsonValueSchema: z.ZodType<JsonValue> = z.lazy(() => z.union([
   z.boolean(),
   z.null(),
   z.array(jsonValueSchema),
-  z.record(jsonValueSchema),
+  z.record(z.string(), jsonValueSchema),
 ])) as z.ZodType<JsonValue>
 
 const metricFactSchema = z.object({
@@ -514,7 +514,7 @@ const canonicalBundleBridgeSchema = z.object({
     status: z.enum(['calculated', 'limited', 'not_calculable']),
     criterionBandKey: z.string().min(1).nullable(),
   }).strict()).optional(),
-  metrics: z.record(z.unknown()).optional(),
+  metrics: z.record(z.string(), z.unknown()).optional(),
   hasReferenceNorms: z.boolean().optional(),
 }).strict()
 

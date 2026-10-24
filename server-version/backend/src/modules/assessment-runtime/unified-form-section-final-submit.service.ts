@@ -1,3 +1,4 @@
+import {assertCurrentStudyPrincipal} from '../anonymous-study/admission-principal'
 import {assertTrainingPrivateReferenceAdmissionCurrent} from '../composite/training-private-reference-use'
 import { assertTrainingSectionSelected, loadTrainingChildParent, assertTrainingFormFinalPrincipal, lockTrainingFlowFinalAdmission } from '../composite/training-variant-child-scope'
 import {freezeTrainingReferenceBinding} from '../composite/training-reference-binding'
@@ -141,7 +142,7 @@ const assertFormPrincipal = (
   )
 }
 
-const assertFormFrozenAdmission = (
+const assertFormFrozenAdmission = async (
   admission: FrozenUnitAdmissionV1,
   input: {
     sectionId: string
@@ -155,7 +156,7 @@ const assertFormFrozenAdmission = (
   },
   parent: { questionnaireAssessmentId?: string | null; compositeAttemptId?: string | null },
   kind: 'questionnaire' | 'composite',
-): void => {
+): Promise<void> => {
   if (!admission.formSection || admission.formSection.id !== input.sectionId || admission.formSection.kind !== kind) {
     throw new InstrumentFinalSubmitError('DEFINITION_MISMATCH', '表单区段准入快照身份不匹配', 409)
   }
@@ -169,7 +170,9 @@ const assertFormFrozenAdmission = (
       409,
     )
   }
-  assertFormPrincipal(admission, input, kind)
+  const studyPrincipal=kind==='composite' && await assertCurrentStudyPrincipal(prisma,{attemptId:parent.compositeAttemptId,
+    userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash})
+  if(!studyPrincipal)assertFormPrincipal(admission, input, kind)
   assertAdmissionParentBinding(parent, admission)
   assertDefinitionHash(admission.formSection.identityHash, input.definitionHash)
   if ((input.contextSnapshotHash ?? null) !== (admission.contextSnapshotHash ?? null)) {
@@ -188,7 +191,7 @@ export const submitUnifiedQuestionnaireFormSectionFinal = async (
     sectionId: input.sectionId,
     child,
   }))
-  assertFormFrozenAdmission(admission, input, {
+  await assertFormFrozenAdmission(admission, input, {
     questionnaireAssessmentId: input.questionnaireAssessmentId,
     compositeAttemptId: null,
   }, 'questionnaire')
@@ -329,7 +332,7 @@ export const submitUnifiedCompositeFormSectionFinal = async (
     sectionId: input.sectionId,
     child,
   }))
-  assertFormFrozenAdmission(admission, input, {
+  await assertFormFrozenAdmission(admission, input, {
     questionnaireAssessmentId: null,
     compositeAttemptId: input.attemptId,
   }, 'composite')
@@ -354,6 +357,8 @@ export const submitUnifiedCompositeFormSectionFinal = async (
   void _parent
 
   const committed = await measureRequestPhase('final_submit_db_query', () => withCompositeFormUnitTransaction(async (tx) => {
+    await assertCurrentStudyPrincipal(tx,{attemptId:input.attemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,
+      attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash},true)
     if(productKind==='ORGANIZATION_RESOURCE'){
       const {assertPrivateFormFinalCurrent}=await import('../assessment-run/educationPrivateFormExecution')
       await assertPrivateFormFinalCurrent(tx,{attemptId:input.attemptId,actorUserId:input.userId})

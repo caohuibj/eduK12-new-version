@@ -375,6 +375,18 @@ describe('C05 structured FINAL persistence', () => {
 })
 
 describe('C06 visibility and durable answer cleanup',()=>{
+ it('saves each ordinary form edit without an empty cleanup transaction', async () => {
+  render(<FinalCompositeAssessment {...sharedProps} state={makeState(formItem)} submitFormSection={vi.fn()} submitScale={vi.fn()}/>)
+  const input = await screen.findByRole('textbox')
+  await waitFor(() => expect(input).toBeEnabled())
+  const save = vi.spyOn(finalDraftStore, 'putAnswer')
+  const prune = vi.spyOn(finalDraftStore, 'deleteAnswers')
+  await userEvent.type(input, 'abc')
+  await screen.findByText('已保存到本机。')
+  expect(save.mock.calls.map(([answer]) => answer.value)).toEqual(['a', 'ab', 'abc'])
+  expect(prune).not.toHaveBeenCalled()
+  expect((await finalDraftStore.listAnswers('composite-form-section:composite-attempt-1:composite-form-section-1'))[0].value).toBe('abc')
+ })
  it('clears a previously saved hidden answer and seals only visible fields',async()=>{
   const policy={version:3 as const,requiredRefusal:'BLOCK_SUBMIT' as const,hiddenRequired:'EXEMPT' as const}
   const first={...formItem.formAnswers![0],formItemId:'source',type:'single_choice',label:'是否显示',required:true,options:[{value:'yes',label:'显示'},{value:'no',label:'隐藏'}],formPolicy:policy,formDefinition:{itemKey:'q_source',type:'SINGLE' as const,prompt:'是否显示',required:true,options:[{optionKey:'yes',label:'显示'},{optionKey:'no',label:'隐藏'}],rows:[]}}
@@ -383,8 +395,10 @@ describe('C06 visibility and durable answer cleanup',()=>{
   render(<FinalCompositeAssessment {...sharedProps} state={makeState({...formItem,formAnswers:[first,second]})} submitFormSection={submit} submitScale={vi.fn()}/>)
   const user=userEvent.setup();await waitFor(()=>expect(screen.getByRole('radio',{name:'显示'})).toBeEnabled())
   await user.click(screen.getByRole('radio',{name:'显示'}));await user.click(screen.getByRole('button',{name:'下一字段'}));await user.type(screen.getByLabelText('条件内容'),'应被清除')
+  const prune = vi.spyOn(finalDraftStore, 'deleteAnswers')
   await user.click(screen.getByRole('button',{name:'上一字段'}));await user.click(screen.getByRole('radio',{name:'隐藏'}))
   await waitFor(async()=>expect((await finalDraftStore.listAnswers('composite-form-section:composite-attempt-1:composite-form-section-1')).some(a=>a.itemKey==='conditional')).toBe(false))
+  expect(prune.mock.calls).toEqual([['composite-form-section:composite-attempt-1:composite-form-section-1', ['conditional']]])
   await user.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1))
   expect(submit.mock.calls[0][2].answers).toEqual([{formItemId:'source',value:'no'}])
  })
@@ -422,4 +436,25 @@ it('clears hidden selected Other and late same-frame text when a source changes'
  await act(async()=>{void frameHandlers.get('source-frame').onChange('no');void frameHandlers.get('other-frame').onOtherTextChange('晚到文本')})
  await waitFor(async()=>{const rows=await finalDraftStore.listAnswers('composite-form-section:composite-attempt-1:composite-form-section-1');expect(rows.some(r=>r.itemKey==='other-frame'||r.itemKey==='other-frame:other')).toBe(false);expect(rows.find(r=>r.itemKey==='source-frame')?.value).toBe('no')})
  await userEvent.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1));expect(submit.mock.calls[0][2].answers).toEqual([{formItemId:'source-frame',value:'no'}])
+})
+
+it('focuses the first missing anonymous whole-page scale answer without sending a FINAL',async()=>{
+ const first=scaleItem.scale!.definition!.items[0]
+ const current:CompositeCurrentItem={...scaleItem,presentationMode:'ALL_AT_ONCE',scale:{...scaleItem.scale!,definition:{...scaleItem.scale!.definition!,items:[first,{...first,itemCode:'item-2',content:'第二道必答题',sortOrder:1}]}}}
+ const submit=vi.fn()
+ render(<FinalCompositeAssessment {...sharedProps} state={makeState(current)} publicMode recoveryToken="synthetic-recovery" submitScale={submit} submitFormSection={vi.fn()}/>);
+ await userEvent.click(await screen.findByRole('button',{name:'提交整份量表'}))
+ await waitFor(()=>expect(document.getElementById('training-anonymous-required:composite-attempt-1:item-1')).toHaveFocus())
+ expect(screen.getByRole('alert')).toHaveTextContent('还有 2 道必答题未作答')
+ expect(submit).not.toHaveBeenCalled()
+ expect(screen.getByText(/仅可恢复此浏览器中仍有效的本机草稿/)).toBeInTheDocument()
+})
+it('focuses the missing anonymous form field without changing required validation or submitting',async()=>{
+ const current:CompositeCurrentItem={...formItem,formAnswers:[{...formItem.formAnswers![0],required:true}]}
+ const submit=vi.fn()
+ render(<FinalCompositeAssessment {...sharedProps} state={makeState(current)} publicMode recoveryToken="synthetic-recovery" submitScale={vi.fn()} submitFormSection={submit}/>);
+ await userEvent.click(await screen.findByRole('button',{name:'提交整个区段'}))
+ await waitFor(()=>expect(document.getElementById('training-anonymous-required:composite-attempt-1:form-item-1')).toHaveFocus())
+ expect(screen.getByRole('alert')).toHaveTextContent('还有 1 个必填字段未完成')
+ expect(submit).not.toHaveBeenCalled()
 })

@@ -42,52 +42,52 @@ const createSeriesSchema = z.object({
 const bindWaveSchema = z.object({
   waveKey: z.string().trim().min(1).max(160),
   ordinal: z.number().int().min(1),
-  runId: z.string().uuid(),
-  trackId: z.string().uuid(),
+  runId: z.string().guid(),
+  trackId: z.string().guid(),
 }).strict()
 
 const legacyGroupAnalysisSchema = z.object({
   cohortSelector: cohortSelectorSchema.optional(),
-  runId: z.string().uuid(),
-  trackId: z.string().uuid(),
-  specId: z.string().uuid(),
+  runId: z.string().guid(),
+  trackId: z.string().guid(),
+  specId: z.string().guid(),
   options: z.object({}).strict().optional(),
 }).strict()
 const repeatedAnalysisSchema = z.object({
   analysisKind: z.literal('REPEATED_COHORT'),
-  seriesId: z.string().uuid(),
+  seriesId: z.string().guid(),
   waveKeys: z.array(z.string().trim().min(1).max(160)).min(2).max(50),
-  specId: z.string().uuid(),
+  specId: z.string().guid(),
 }).strict()
 const matchedAnalysisSchema = z.object({
   analysisKind: z.literal('MATCHED_LONGITUDINAL'),
-  seriesId: z.string().uuid(),
+  seriesId: z.string().guid(),
   waveKeys: z.array(z.string().trim().min(1).max(160)).min(2).max(50),
-  specId: z.string().uuid(),
+  specId: z.string().guid(),
   options: z.object({ mode: z.enum(['PAIRWISE', 'FULL_CASE']) }).strict(),
 }).strict()
 const protectedAnalysisSchema = z.object({
   analysisKind: z.literal('PROTECTED_FEEDBACK'),
-  runId: z.string().uuid(),
-  trackId: z.string().uuid(),
-  subjectUserId: z.string().uuid(),
+  runId: z.string().guid(),
+  trackId: z.string().guid(),
+  subjectUserId: z.string().guid(),
   relationshipKind: z.string().trim().min(1).max(120),
   perspective: z.enum(['SELF_REPORT', 'OBSERVER_REPORT', 'RELATIONAL_EXPERIENCE']),
-  specId: z.string().uuid(),
+  specId: z.string().guid(),
 }).strict()
 const automaticAnalysisSchema = z.object({
   analysisKind: z.enum(['REPEATED_COHORT', 'MATCHED_LONGITUDINAL']),
-  sources: z.array(z.object({ runId: z.string().uuid(), trackId: z.string().uuid() }).strict()).min(2).max(50),
+  sources: z.array(z.object({ runId: z.string().guid(), trackId: z.string().guid() }).strict()).min(2).max(50),
   cohortSelector: cohortSelectorSchema.optional(),
   cohortStrategy: z.enum(['WAVE_SPECIFIC', 'BASELINE_FIXED']),
-  specId: z.string().uuid(),
+  specId: z.string().guid(),
   mode: z.enum(['PAIRWISE', 'FULL_CASE']).optional(),
 }).strict()
 const individualAnalysisSchema = z.object({
   referenceResolutionMode:z.enum(['ORIGINAL','TIME_MATCHED','LATER_REFERENCE']).optional(),
   regenerateWithLatestReference:z.boolean().optional(),
-  analysisKind: z.literal('INDIVIDUAL_LONGITUDINAL'), subjectUserId: z.string().uuid(), specId: z.string().uuid(),
-  sources: z.array(z.object({ runId: z.string().uuid(), trackId: z.string().uuid() }).strict()).min(2).max(50),
+  analysisKind: z.literal('INDIVIDUAL_LONGITUDINAL'), subjectUserId: z.string().guid(), specId: z.string().guid(),
+  sources: z.array(z.object({ runId: z.string().guid(), trackId: z.string().guid() }).strict()).min(2).max(50),
 }).strict()
 const analysisSchema = z.union([
   individualAnalysisSchema,
@@ -99,8 +99,8 @@ const analysisSchema = z.union([
 ])
 
 const exportSchema = z.union([
-  z.object({ kind: z.enum(['AGGREGATE', 'MEMBER']), artifactId: z.string().uuid() }).strict(),
-  z.object({ kind: z.literal('SAFETY'), caseId: z.string().uuid() }).strict(),
+  z.object({ kind: z.enum(['AGGREGATE', 'MEMBER']), artifactId: z.string().guid() }).strict(),
+  z.object({ kind: z.literal('SAFETY'), caseId: z.string().guid() }).strict(),
 ])
 
 const badRequest = (res: Response, message: string) => instrumentError(res, 'REPORT_REQUEST_INVALID', message, 400)
@@ -157,7 +157,7 @@ export const reportingController = {
   async createSpec(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     const parsed = createSpecSchema.safeParse(req.body)
-    if (!parsed.success) return badRequest(res, parsed.error.errors[0]?.message ?? 'invalid reporting spec')
+    if (!parsed.success) return badRequest(res, parsed.error.issues[0]?.message ?? 'invalid reporting spec')
     try {
       const spec = await createPlatformReportingSpec({
         actor: principal(req),
@@ -200,7 +200,7 @@ export const reportingController = {
   async createSeries(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     const parsed = createSeriesSchema.safeParse(req.body)
-    if (!parsed.success) return badRequest(res, parsed.error.errors[0]?.message ?? 'invalid reporting series')
+    if (!parsed.success) return badRequest(res, parsed.error.issues[0]?.message ?? 'invalid reporting series')
     try {
       const series = await createOrganizationReportingSeries({
         principal: principal(req),
@@ -217,7 +217,7 @@ export const reportingController = {
   async bindWave(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     const parsed = bindWaveSchema.safeParse(req.body)
-    if (!parsed.success) return badRequest(res, parsed.error.errors[0]?.message ?? 'invalid reporting Wave')
+    if (!parsed.success) return badRequest(res, parsed.error.issues[0]?.message ?? 'invalid reporting Wave')
     try {
       return await withReportingAnalysisExecution(async () => {
         const wave = await bindOrganizationReportingWave({
@@ -236,7 +236,7 @@ export const reportingController = {
     try {
       if (!req.user) return unauthorized(res)
       const parsed = analysisSchema.safeParse(req.body)
-      if (!parsed.success) return badRequest(res, parsed.error.errors[0]?.message ?? 'invalid analysis request')
+      if (!parsed.success) return badRequest(res, parsed.error.issues[0]?.message ?? 'invalid analysis request')
       return await withReportingAnalysisExecution(async () => {
         const data = parsed.data
         if ('analysisKind' in data && data.analysisKind === 'INDIVIDUAL_LONGITUDINAL') {

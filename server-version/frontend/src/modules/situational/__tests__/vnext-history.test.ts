@@ -1,7 +1,9 @@
-import { describe, it, expect } from 'vitest'
-import { invalidateChangedSituationalHistory, situationalHistoryIdentities } from '../history'
-import { pruneUnreachableSituationalResponses } from '../draft'
-import type { SituationalDraftAnswer, SituationalRunnerDefinitionV2 } from '../types'
+import { afterEach, describe, it, expect, vi } from 'vitest'
+import { createSituationalHistorySnapshot, invalidateChangedSituationalHistory, situationalHistoryIdentities } from '../history'
+import { pruneInvalidatedSituationalDraftResponses, pruneUnreachableSituationalResponses } from '../draft'
+import * as traversal from '../traversal'
+import { finalDraftStore } from '../../../services/persistence/finalDraftStore'
+import type { SituationalAttempt, SituationalDraftAnswer, SituationalRunnerDefinitionV2 } from '../types'
 
 export const convergedDefinition = (): SituationalRunnerDefinitionV2 => ({
   schemaVersion: 2, respondentType: 'synthetic', sampling: { strategy: 'BRANCH_REACHABLE' },
@@ -37,5 +39,75 @@ describe('Situational branch and converge history', () => {
     const returned = { ...initial, 'entry:choice': { responseValue: 'A', responseRevision: 3 }, 'common:choice': { responseValue: 'B', historyIdentity: old } }
     expect(situationalHistoryIdentities(d, returned).common).not.toBe(old)
     expect(pruneUnreachableSituationalResponses(d, returned).responses['common:choice']).toBeUndefined()
+  })
+})
+
+
+describe('operation-local situational history reuse', () => {
+  afterEach(() => vi.restoreAllMocks())
+
+  it('uses three history traversals plus reachable-key pruning even without stale answers', async () => {
+    const d = convergedDefinition()
+    const derive = vi.spyOn(traversal, 'deriveReachableTrajectory')
+    const reachable = vi.spyOn(traversal, 'reachableSituationalScenes')
+    const snapshot = createSituationalHistorySnapshot(d, {})
+    const answer = { responseValue: 'A', responseRevision: 1, historyIdentity: snapshot.identities.entry }
+    const invalidated = snapshot.invalidate({ 'entry:choice': answer })
+    expect(invalidated.staleKeys).toEqual([])
+    const next = await pruneInvalidatedSituationalDraftResponses({ id: 'local-operation' } as SituationalAttempt, d, invalidated)
+    expect(next).toEqual({ 'entry:choice': answer })
+    // The internal traversal in reachableSituationalScenes is a lexical call, not this export spy.
+    expect(derive).toHaveBeenCalledTimes(3)
+    expect(reachable).toHaveBeenCalledTimes(1)
+  })
+
+  it('recomputes after invalidation removes a required answer and shortens the path', async () => {
+    const d = convergedDefinition()
+    const deleted = vi.spyOn(finalDraftStore, 'deleteAnswers').mockResolvedValue()
+    const derive = vi.spyOn(traversal, 'deriveReachableTrajectory')
+    const reachable = vi.spyOn(traversal, 'reachableSituationalScenes')
+    const snapshot = createSituationalHistorySnapshot(d, {})
+    const invalidated = snapshot.invalidate({
+      'entry:choice': { responseValue: 'A' },
+      'left:choice': { responseValue: 'A', historyIdentity: 'stale-binding' },
+      'common:choice': { responseValue: 'B' },
+    })
+    expect(invalidated.staleKeys).toEqual(['left:choice'])
+    expect(invalidated.responses['common:choice']).toBeDefined()
+    const next = await pruneInvalidatedSituationalDraftResponses({ id: 'shortened-operation' } as SituationalAttempt, d, invalidated)
+    expect(next).toEqual({ 'entry:choice': { responseValue: 'A' } })
+    expect(deleted).toHaveBeenCalledWith('situational:shortened-operation', ['left:choice', 'common:choice'])
+    // The internal traversal in reachableSituationalScenes is a lexical call, not this export spy.
+    expect(derive).toHaveBeenCalledTimes(3)
+    expect(reachable).toHaveBeenCalledTimes(1)
+  })
+
+  it('keeps reachable optional diagnostics but still deletes unknown response channels', async () => {
+    const d = convergedDefinition()
+    d.scenes[0]!.channels.push({ channelKey: 'probe', responseType: 'FREE_TEXT', prompt: 'optional', required: false })
+    const deleted = vi.spyOn(finalDraftStore, 'deleteAnswers').mockResolvedValue()
+    const snapshot = createSituationalHistorySnapshot(d, {})
+    const invalidated = snapshot.invalidate({
+      'entry:choice': { responseValue: 'A' },
+      'entry:probe': { responseValue: '观察 🐱' },
+      'entry:unknown': { responseValue: 'not a channel' },
+    })
+    const next = await pruneInvalidatedSituationalDraftResponses({ id: 'optional-operation' } as SituationalAttempt, d, invalidated)
+    expect(next['entry:probe']?.responseValue).toBe('观察 🐱')
+    expect(next['entry:unknown']).toBeUndefined()
+    expect(deleted).toHaveBeenCalledWith('situational:optional-operation', ['entry:unknown'])
+  })
+
+  it('does not substitute a later response reference into an already-created operation', async () => {
+    const d = convergedDefinition()
+    let current: Record<string, SituationalDraftAnswer> = { 'entry:choice': { responseValue: 'A', responseRevision: 1 } }
+    const snapshot = createSituationalHistorySnapshot(d, current)
+    const original = snapshot.identities.left
+    await Promise.resolve()
+    current = { 'entry:choice': { responseValue: 'B', responseRevision: 2 } }
+    expect(snapshot.identities.left).toBe(original)
+    const nextSnapshot = createSituationalHistorySnapshot(d, current)
+    expect(nextSnapshot.identities.left).toBeUndefined()
+    expect(nextSnapshot.identities.right).toBeDefined()
   })
 })

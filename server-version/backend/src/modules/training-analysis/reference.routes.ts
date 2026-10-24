@@ -4,7 +4,7 @@ import {success,error} from '../../utils/response'
 import {ContentAuthorityError} from '../measurement-content/content-authority'
 import {ContentReleaseError} from '../measurement-content/release'
 import * as service from './reference-candidates.service'
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 /** Mounted behind the existing authenticated Training teacher route. */
 export const trainingReferencesRouter=Router({mergeParams:true})
 const context=(req:Request)=>({actorId:req.user!.userId,courseId:uuid.parse(req.params.courseId),

@@ -11,8 +11,8 @@ import { trainingAnalysisProvenanceSchema, assertTrainingAnalysisExportIdentity 
 
 export const provenanceSchema = z.object({
   version: z.literal(1),
-  courseId: z.string().uuid().optional(),
-  generation: z.string().uuid(),
+  courseId: z.string().guid().optional(),
+  generation: z.string().guid(),
   creatorRole: z.enum(['ADMIN', 'TEACHER']),
   audience: z.literal('teacher'),
   detail: z.enum(['summary', 'full', 'research']),

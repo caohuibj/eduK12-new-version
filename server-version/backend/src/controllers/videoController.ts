@@ -464,7 +464,7 @@ export const videoController = {
 
       const result = updateVideoSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const video = await prisma.video.findUnique({

@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client'
 import { beforeAll,afterAll,describe,expect,it } from 'vitest'
 import type { Request } from 'express'
 import { integrationDatabaseUrl } from '../integration/integration-env'
+import { publishSurveyMeasurementDraft } from '../../modules/survey/measurement-publication.service'
 import { createDraft,updateDraft } from '../../modules/survey/builder.service'
 import { createWave,getWave } from '../../modules/survey/waves.service'
 import { prepareWave,openWave } from '../../modules/survey/waves.publish'
@@ -86,6 +87,7 @@ suite('Survey PR4 real PG: bounded quota, opt-in encrypted checkpoint, exact N',
       const id=randomUUID()
       await createDraft(owner,project,{requestId:id,kind,instrumentKey,title:instrumentKey})
       await updateDraft(owner,project,id,{revision:0,title:instrumentKey,definition})
+      if(kind==='SCALE')await publishSurveyMeasurementDraft(owner,project,id,1)
       return id
     }
     const ids=[await tool('FORM','screening',screening),

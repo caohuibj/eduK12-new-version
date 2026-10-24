@@ -193,8 +193,8 @@ export async function history(actor: BundleActor, attemptId: string) {
     select: { id: true, status: true, purpose: true, generatedBy: true, reason: true, previousAnalysisId: true, factsHash: true,
       targetDefinitionHash: true, createdAt: true, retryCount: true, errorCode: true }, take: 100 })
 }
-const reanalysisSchema = z.object({ requestId: z.string().uuid(), targetBundleKey: z.string().min(1),
-  targetBundleVersion: z.string().regex(/^\d+\.\d+\.\d+$/), reason: z.string().trim().min(1).max(1000), previousAnalysisId: z.string().uuid() }).strict()
+const reanalysisSchema = z.object({ requestId: z.string().guid(), targetBundleKey: z.string().min(1),
+  targetBundleVersion: z.string().regex(/^\d+\.\d+\.\d+$/), reason: z.string().trim().min(1).max(1000), previousAnalysisId: z.string().guid() }).strict()
 export async function reanalyze(actor: BundleActor, attemptId: string, raw: unknown, provider: BundleDefinitionProvider,
   assertEligible: (actor: BundleActor, key: string, version: string, db?: Prisma.TransactionClient) => Promise<unknown>) {
   const parent = await authorizeStaff(actor, attemptId), input = reanalysisSchema.parse(raw)

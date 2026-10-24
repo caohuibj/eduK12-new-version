@@ -1271,6 +1271,60 @@ classify the merged diff; they do not repeat the PR application checks.
 
 `work/training-survey-capacity-20261024` 从 `902144e636905ab372ff4a0c7cbfd1b88bffba47` 冻结独立云端容量候选。仅修改认证学员准入锁、Survey 团体 IP 豁免查询繁忙时的普通限流路径，以及公共静态文件传输；不更改题目、计分、冻结版本或生产配置。`participant-capacity` 精确路线绑定完整差异，接纳同一输入已完成的云端后端编译；Actions 只执行受影响限流/持久化契约、真实隔离 PostgreSQL 并发与归档边界、Nginx HTTP 契约和当前 SAST。依赖、前端 JS 和数据库结构不变，不重复应用构建、全量回归或服务器验收。压测是独立合成负载观察，不能代替正式合并门禁或生产容量承诺。
 
+## Training entry, review and export exact merge candidate (2026-10-24)
+
+Only `perf/training-entry-20261023`, base
+`67d0c77034aea3c3cf1ee118eb65ab3aafe7b6eb` and product tree
+`45a536111839dc369385c10a3429c22f0700ea55` use `training-entry`.
+The complete raw diff, paths, modes, product blobs, both component trees,
+protected dependency/schema/config inputs and actual PR source/checkout tree
+must match. Unknown changes, base drift and missing binding fail closed without
+platform fallback. Manual/full/component probes on this branch are refused
+before heavy jobs. Exact main push only classifies the merged diff.
+
+This route is prepared but NOT qualified while its reviewed evidence is pending.
+No original command is reconstructed from aggregate test counts. Retained local
+records keep their failures, source/input identity and unsigned status:
+`reviewed-local-evidence`, `ciExecuted=false`, `originalExecutionSigned=false`.
+Retrospectively recorded parent exit observations are identified as such; empty
+compiler logs alone do not establish success. Full historical node_modules byte
+identity was not captured. Actual imported source, setup, tool and configuration
+inputs must be reviewed and frozen; missing or changed proof stops admission.
+Filtered compact reporters cannot silently prove a whole invocation or a named
+assertion union. The five retained PostgreSQL results prove bounded real grading
+service/concurrency and SQL MVCC behavior, not full HTTP controller/download
+acceptance. Same-input admitted checks do not rerun.
+
+One-time repeats of the explicitly enumerated missing-record early files and one
+frontend rebuild require explicit candidate permission before execution. This is
+not a general repeat permission. Current backend noEmit results are not an emitted
+artifact: the lane produces the first actual backend compile. Real Chromium
+consumes the exact frontend bytes produced for its previously unexecuted journeys;
+synthetic frontend APIs are not backend authorization evidence. Existing official
+production lock audits retain exact source/job/artifact identity, unchanged inputs
+and 24-hour validity. Only verified expiry refreshes those audits; corruption or
+unavailable proof stops for diagnosis. Current application/control JS/TS CodeQL
+and new scope/admission/refusal contracts remain required.
+
+The stable ready gate independently recomputes the complete plan and requires
+scope, the complete nested Training qualification and CodeQL success. Draft,
+missing, skipped, failed and cancelled selected checks block merge. No complete
+application suite, Docker/runtime image, DB migration/restore, mini-program,
+media/load work or production deployment is selected. Report the actual waiting
+stage after about five minutes; repair only affected or missing checks.
+
+The final bounded follow-up defers ExcelJS loading until workbook generation. Its new
+import-deferral assertions run once in the streaming job; the emitted backend
+compilation covers its new types. The earlier backend noEmit result remains
+historical, not new-helper qualification. Frontend and PostgreSQL inputs retain
+their existing identities.
+
+Training entry browser failure isolation: the frontend producer uploads its one-time actual dist plus build manifest (including hidden Vite manifest), exposing the immutable same-run artifact ID and SHA256 of the manifest. The separate browser consumer downloads only that ID and verifies checkout SHA, PR source SHA, frontend tree, run identity, producer attempt, exact file set and every output digest before Chrome. A browser-only failure is retried via failed-job rerun, never rerun-all: the successful frontend checks/build are not repeated. Qualification requires actual success of both frontend and browser. Artifact expiry or failed integrity is a blocker, not permission to rebuild.
+
+Training entry initialization repair: GitHub expands the complete reusable-workflow graph before job conditions. The candidate added the 51st distinct referenced workflow (66 call edges), exceeding the 50-workflow limit before any job ran. Only the existing single-job `probe-cognitive` diagnostic is inlined in `ci.yml`, preserving its full refusal/selection condition, contents-read-only permission, environment, runner, timeout and steps. Its standalone dispatch workflow remains unchanged. The graph returns to 50; Training admission, backend, frontend producer, independent browser consumer, current CodeQL and aggregate gates remain unchanged. A static reference-count contract guards future additions. This local topology repair does not authorize a CI restart or establish the future main base after PR 347.
+
+Backup-only state after product increment `6add6cdc`: this topology fix is statically validated, but the existing product/base bindings and historical evidence deliberately remain frozen to the earlier candidate. The new product delta is not qualified by those records. PR 347 alignment, affected-input review and fresh exact bindings are required before any CI restart; this backup commit does not authorize CI or merge.
+
 ## Training management PR347 bounded integration (2026-10-24)
 
 The user approved this exact CI configuration and merge after success. Only PR347,
@@ -1326,6 +1380,8 @@ successful official job and unchanged component trees; only the two changed
 qualification JS files receive fresh CodeQL. No application tests/build ran in
 the failed admission invocation; those missing stages still must succeed.
 
+Local alignment with merged main `4d95a5b11c3b2261c96d7161eea66ebf8d6f0626` preserves both bounded Training routes and the 50-reference topology. Existing Training-entry base/product/control evidence bindings remain historical and intentionally stale after this integration; no CI qualification, new evidence admission, CI restart or merge is authorized by this alignment. Reconcile affected inputs and freeze a new exact candidate separately before execution.
+
 
 ## Training trainer account management qualification (2026-10-24)
 
@@ -1376,6 +1432,7 @@ was placed at job environment scope. The container id is now supplied only to
 the migration step, where that context is available. No checks/build ran in the
 rejected invocation; original SAST remains independently running.
 
+Local alignment with main `3ee60da761bf777da833f77e81565c5b3d5898a1` retains PR349 trainer-management qualification, including its schema-upgrade/restore and HTTP boundary gates, alongside the paused Training-entry route. Historical Training-entry base/product/schema/control bindings are not refreshed or admitted by this alignment and remain stale. Current-main schema and shared-input changes require a separate affected-input review and exact candidate freeze before any authorized CI; this local alignment does not start CI or authorize merging.
 ## Survey local review PR350 qualification (2026-10-24)
 
 The user explicitly approved a bounded CI route for PR350 only, on
@@ -1443,3 +1500,134 @@ step, analysis success, options and 24-hour lifetime remain checked. Database
 checks may finish independently after an unrelated frontend assertion failure;
 such a failure still fails the job and blocks merging. A compiled artifact is
 retained even if an independent later check fails, so it need not be rebuilt.
+
+### Current Training + Survey mixed candidate (2026-10-24)
+
+The previously unmerged Training-entry slot is superseded, not added to: current
+base is `44c1e502acaed5524c5b1e233d1bfb1f0c6f7b40`, product snapshot is
+`faee762e9b14f38acaeec2a730d7b17db57fb550`, source tree is
+`accc9951701ebe33c3899a1a2159b4f376de380e`, and the only PR branch is
+`backup/training-survey-main350-20261024`. Exact source blobs, modes, complete
+changed-path inventory and current control hashes are frozen by the existing
+binding/admission mechanism. The old 67d0/a1369 qualification is not inherited.
+All other main routes remain unchanged. Reusable-workflow closure remains 50.
+
+Current required merge checks are scope, the whole nested qualification, and
+fresh application/control CodeQL. The nested lane requires reviewed local
+admission, current production dependency HIGH/CRITICAL audits, missing directly
+affected frontend/backend contracts, one emitted build per component, and real
+Chromium on those exact frontend bytes. Browser API responses remain synthetic;
+the browser result proves compiled UI interaction, not HTTP-to-database access.
+Real PostgreSQL credential/reset/FINAL evidence is separately bound and cannot be
+replaced by UI mocks. Fixed selected-case admission does not certify unselected
+cases or turn original failed invocations into successful whole-file runs.
+
+Because this product adds two migrations, the earlier entry-only exclusion of
+DB validation no longer applies. CI must create the complete fixed-main schema
+in an isolated PostgreSQL service, retain nonempty old study/participant/wave/
+attempt/answer rows, apply exactly the two new migrations, verify old-column
+fidelity and new guards, and dump/restore into a second new database with row,
+constraint, index, trigger and function equality. Existing databases are never
+reset. Same-input checks already admitted locally do not run again; missing
+records cause only the specifically selected affected checks to execute, not a
+platform-wide or performance suite. New control contracts are run locally once
+at final freeze and admitted only with their exact control hashes.
+
+This is merge qualification, not release/deployment qualification: no production
+image or OS-package scan is claimed, no production artifact is approved, and no
+server or Mac is changed. npm dependency audit and CodeQL are not substitutes
+for a production runtime-image scan when a later release requires one. A draft,
+missing, skipped, failed or cancelled selected job remains blocking; no fallback
+route may bypass these requirements. Report the actual waiting stage after five
+minutes rather than widening or repeating completed work.
+
+#### PR351 security dependency correction
+
+The first qualification run `40083811762` failed the backend dependency audit;
+that failure remains recorded. The frontend audit subprocess alone succeeded.
+Its official run/job/artifact identity, original failure, ZIP digest, complete
+frontend input manifest, output bytes and successful subprocess exit are verified
+before reuse, with a 24-hour maximum age. A stale result causes a fresh frontend
+audit; missing or corrupt evidence stops admission. The initial backend audit executes against the new locked dependencies. Later
+unchanged backend inputs may reuse their own exact successful official artifact
+subprocess within the same 24-hour bound; HIGH/CRITICAL thresholds never change.
+
+The repair uses actual Zod 4.6.7, body-parser 1.20.9, multer 2.5.0 and ip-address
+10.7.4. It does not import Zod's vulnerable v3 compatibility entry. Old UUID-like
+acceptance uses the official guid validator; record/error APIs and strict schema
+composition are adapted without changing frozen scientific definitions. Five old
+payload outputs/hashes, the bounded-array rejection and a strict-grant regression
+were checked locally. This is bounded compatibility evidence, not exhaustive
+coverage of every schema or authorization path.
+
+Because parser and dependency inputs changed, old Zod3 backend/PG/type evidence
+is historical only. Twelve affected PostgreSQL cases were executed on a new
+isolated clone under the new dependencies, with original setup failures and their
+two-case retry preserved separately. Both component type checks were refreshed.
+The unchanged 71 frontend assertions retain their exact input review. Four added
+pure contracts cover Bundle schema composition, catalog/localization error
+behavior and shared FORM defaults; the remaining affected CI checks and builds
+still execute. No production-image or deployment qualification is claimed.
+
+
+The next PR351 recovery retains two local, unsigned Vitest JSON reports: the
+34-file reproduction's 420 passes and one failure, followed by only that failed
+case passing (16 others unselected). The single test-only recovery-text assertion
+change retains both cross-namespace no-API-call assertions. Exact report hashes,
+case identity and current imported input closure are checked; this does not turn
+the original official failed frontend job into a success. Failed JSON/exit records
+are always uploaded before the job remains failed.
+
+PostgreSQL restore comparison retains visible column order and all metadata,
+while mapping dropped-column physical ordinal/dtd gaps to dense visible positions.
+Only four fixed table/constraint/full-definition pairs with equivalent AND
+association are normalized; unknown changes, values, operators, flags, indexes,
+triggers and functions stay strict. Raw before/after schema comparison is retained
+on failure. A bounded real PostgreSQL dump/restore reproduction and negative
+control contracts verified this correction, not a production migration.
+
+The fourth PR351 run retains its failed backend/browser conclusions. Recovery
+accepts only 465 successful backend assertions from the exact official JSON,
+with the six failed Form contracts excluded. The six repaired contracts and two
+new diagnostic-boundary contracts execute once under explicit user approval;
+their local reports are not published. Form compatibility is limited to public
+issue presentation; Zod 4 validation, immutable golden facts and issue ordering
+remain unchanged. The precise media leaf import guard still excludes adapters.
+
+The successful official nonempty upgrade/restore result and exact dump are reused
+only while the migration script, schema and full migration inputs match. The dump
+seeds a new empty local CI database for the seven not-yet-executed cases; it is
+not presented as a second qualification. Official successful lint and thirteen
+unaffected entry/management browser scenarios are retained. Learner scenarios,
+including previously passing assignment detail cases, execute against the new
+CSS build because restoring the actual return button affects those pages. Every
+remaining required browser scenario and build must succeed; failed/skipped jobs
+remain blocking. No additional original logs are published in this repair.
+
+The sixth run completed backend qualification and frontend build successfully.
+The next recovery keeps the complete official backend job, its exact dependency/
+source manifest and all 5,941 emitted file hashes; it does not start PostgreSQL,
+regenerate Prisma, compile or repeat its 473 contracts/seven remaining PG cases.
+The original migration qualification and the twelve prior reset cases remain
+separately identified rather than counted as new executions.
+
+AssignmentList's current successful batch now clears its own busy state before
+advancing list-refresh generation; stale or failed operations retain their guards.
+The affected file's seven old assertions are removed from the 421-case receipt,
+leaving 414. Its eight current assertions execute with explicit approval. The
+frontend rebuilds for this actual runtime change and lints the two changed files.
+Twenty-four already passing browser scenarios retain exact official provenance;
+the failed batch-review scenario and seven never-executed scenarios still run.
+No new original logs are published, and no failed job is re-labelled successful.
+
+### PR351 explicit export document recovery
+
+The seventh official browser run passed batch grading but proved that the failed ES module URL remains cached after clearing the loader promise. Export recovery now warns about unsaved page state and requires an explicit confirmable document reload; cancel preserves the page, and export must be reopened manually. No second build entry, arbitrary import URL, automatic reload or automatic export is added.
+
+The unchanged backend keeps its exact official completed qualification and emitted bytes. The original local frontend 421 set excludes the old review seven and export three (411 retained); the seventh official successful review eight are verified against their exact report, command, source and dependency manifest. Only the current three export contracts execute under the separate user approval. A new frontend build executes the failed export recovery plus the six unexecuted anonymous journeys; the 25 previously successful browser scenarios are retained with their original provenance. Failed runs remain failed, and no deployment or production image qualification is implied.
+
+### PR351 valid anonymous fixture and unchanged frontend reuse
+
+The eighth run completed export reload recovery. Its next anonymous-link journey exposed a malformed synthetic study ID, not a product authorization defect. The harness now uses a valid synthetic UUID, prechecks both original and rotated proofs through the actual shared codec, and verifies the downloaded link's exact path, empty query, namespace and proof fields. Production validation is unchanged.
+
+All frontend source and dependency bytes remain identical to the eighth successful frontend job. Its fixed official artifact, source manifest, three export contracts, prior eight review receipt, lint records and all 727 emitted files are checked and transferred unchanged; no repeat install, test or build is needed. Browser consumption explicitly names that original producer rather than claiming a new build. The 26 original successful scenarios are retained; all six anonymous scenarios still execute against the exact artifact. Missing, expired, corrupted or mismatched artifacts fail closed.

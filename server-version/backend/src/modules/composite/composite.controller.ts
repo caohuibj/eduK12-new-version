@@ -430,7 +430,7 @@ export const compositeController = {
     res.setHeader('Cache-Control', 'no-store')
     try {
       if (!req.user) return unauthorized(res)
-      return success(res, await service.getAttemptState(req.params.attemptId, { userId: req.user.userId }))
+      return success(res, await service.getAttemptState(req.params.attemptId, { userId: req.user.userId }, undefined, req.query.view === 'current-unit' ? 'current-unit' : 'full'))
     } catch (err) { return handleError(res, err) }
   },
 
@@ -736,7 +736,7 @@ export const compositeController = {
 
   async publicAttempt(req: Request, res: Response) {
     res.setHeader('Cache-Control', 'no-store')
-    try { return success(res, await service.getAttemptState(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) })) } catch (err) { return handleError(res, err) }
+    try { return success(res, await service.getAttemptState(req.params.attemptId, { recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) }, undefined, req.query.view === 'current-unit' ? 'current-unit' : 'full')) } catch (err) { return handleError(res, err) }
   },
 
   async publicEmbeddedSituational(req: Request, res: Response) {

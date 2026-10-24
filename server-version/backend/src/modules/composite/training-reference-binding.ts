@@ -10,7 +10,7 @@ import {trainingReferenceKindSchema,trainingReferenceFail,validateTrainingRefere
 const text=z.string().min(1).max(240),hash=z.string().regex(/^[a-f0-9]{64}$/)
 const slotBase={metricKey:text,referenceKind:trainingReferenceKindSchema}
 export const trainingSelectedReferenceSchema=z.discriminatedUnion('status',[
- z.object({...slotBase,status:z.literal('SELECTED'),releaseId:z.string().uuid(),contentHash:hash,entryKey:hash}).strict(),
+ z.object({...slotBase,status:z.literal('SELECTED'),releaseId:z.string().guid(),contentHash:hash,entryKey:hash}).strict(),
  z.object({...slotBase,status:z.literal('UNAVAILABLE'),reason:z.enum(['REVOKED','RETIRED','MISSING_CONTEXT','NO_MATCH','AMBIGUOUS'])}).strict(),
 ])
 export const trainingReferenceBindingSchema=z.object({schemaVersion:z.literal(1),attemptId:text,epoch:z.number().int().positive(),

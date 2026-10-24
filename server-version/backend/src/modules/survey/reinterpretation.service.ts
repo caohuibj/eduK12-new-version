@@ -15,7 +15,7 @@ import {surveyAttemptContentBindingSchema,type SurveyAttemptContentBinding} from
 import {checkedStoredSurveyInterpretation} from './analytics.interpretation-export'
 import {interpretSurveyContentBinding,type SurveyInterpretationFacts,type SurveyFinalInterpretation} from './final-interpretation.service'
 import {SurveyAnalyticsError} from './analytics.errors'
-const id=z.string().uuid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
+const id=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 export const surveyReinterpretationRequestSchema=z.object({requestId:id,projectId:id,waveId:id,finalId:id,grantId:id,
   instrumentKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),reportReleaseId:id.optional(),
   references:z.array(z.object({releaseId:id,entryKey:hash,priority:z.number().int().safe()}).strict()).max(100),

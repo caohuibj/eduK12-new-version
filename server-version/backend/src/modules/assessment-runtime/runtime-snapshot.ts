@@ -65,7 +65,7 @@ const frozenScaleRuntimeSnapshotSchema = z.object({
   instrumentVersion: z.string().min(1),
   sourceDefinitionHash: z.string().regex(/^[0-9a-f]{64}$/),
   legacyDefinitionHash: z.string().regex(/^[0-9a-f]{64}$/),
-  compiledRuntime: z.record(z.unknown()),
+  compiledRuntime: z.record(z.string(), z.unknown()),
   referenceBindings: z.array(referenceBindingSchema),
   definition: scaleDefinitionSchema,
   snapshotHash: z.string().regex(/^[0-9a-f]{64}$/),

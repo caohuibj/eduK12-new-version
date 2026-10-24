@@ -1,3 +1,4 @@
+import {stableStudyAdmissionHash} from '../anonymous-study/admission-principal'
 import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
 import { assertTrainingChildSelected, loadTrainingChildAdmissionParent, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../composite/training-variant-child-scope'
 import {readTrainingTimingSnapshot,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
@@ -672,7 +673,7 @@ const activateUnstoredScaleAdmission = async (
       principal: {
         userId: row.userId ?? loaded.userId,
         questionnaireSessionId: null,
-        recoveryTokenHash: loaded.recoveryTokenHash,
+        recoveryTokenHash: await stableStudyAdmissionHash(db,loaded.id,loaded.recoveryTokenHash,row.userId ?? loaded.userId),
       },
       parent: {
         kind: 'composite',

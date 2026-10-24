@@ -13,7 +13,7 @@ import {ContentReleaseError} from '../measurement-content/release'
 import {ScaleLibraryError} from './contracts'
 import * as service from './service'
 import {grantUse,listUses,revokeUse,recipients} from './distribution'
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 const handle=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
  try{return success(res,await fn(req))}catch(e){
   if(e instanceof z.ZodError)return error(res,'共用库请求参数不合法',-1,400)

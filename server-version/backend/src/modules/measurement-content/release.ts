@@ -14,7 +14,7 @@ export const contentScope = z.discriminatedUnion('kind', [
   z.object({ kind: z.literal('PLATFORM'), ownerId: text.optional() }).strict(),
 ])
 export const assetReference = z.object({ assetId: text, sha256: digest, mediaType: text }).strict()
-export const exactRelease = z.object({ releaseId: z.string().uuid(), contentHash: digest }).strict()
+export const exactRelease = z.object({ releaseId: z.string().guid(), contentHash: digest }).strict()
 const metric = z.object({ metricKey: text, unit: text, direction: text }).strict()
 // Family adapters validate the executable definition with the existing authoritative
 // schema/scorer/runner before calling this core. This is not a script interpreter.
@@ -29,7 +29,7 @@ export const measurementContent = z.object({
   locale: text,
   localizationVersion: text,
   metrics: z.array(metric).min(1),
-  executable: z.record(z.unknown()),
+  executable: z.record(z.string(), z.unknown()),
 }).strict()
 export const referenceContent = z.object({
   projectionVersion: z.literal(1),
@@ -38,9 +38,9 @@ export const referenceContent = z.object({
   entries: z.array(z.object({
     metricKey: text,
     referenceKind: z.enum(['normative_distribution', 'criterion_threshold', 'descriptive_sample', 'theoretical_range']),
-    definition: z.record(z.unknown()),
+    definition: z.record(z.string(), z.unknown()),
   }).strict()).min(1),
-  evidence: z.record(z.unknown()),
+  evidence: z.record(z.string(), z.unknown()),
 }).strict()
 export const reportContent = z.object({
   projectionVersion: z.literal(1),
@@ -55,8 +55,8 @@ export const reportContent = z.object({
 const common = {
   family: releaseFamily, key: text, version: text, scope: contentScope,
   assetRefs: z.array(assetReference).max(1000),
-  sourceReleaseId: z.string().uuid().nullable(),
-  provenance: z.record(z.unknown()).default({}),
+  sourceReleaseId: z.string().guid().nullable(),
+  provenance: z.record(z.string(), z.unknown()).default({}),
 }
 export const releaseInputSchema = z.discriminatedUnion('layer', [
   z.object({ ...common, layer: z.literal('MEASUREMENT'), content: measurementContent }).strict(),

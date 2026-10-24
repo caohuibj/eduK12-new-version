@@ -12,7 +12,7 @@ import {
 } from './evaluation.service'
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const id=z.string().uuid()
+const id=z.string().guid()
 const targetCreate=z.object({
   kind:z.enum(['PERSON','TEAM','ORGANIZATION','ACTIVITY','ARTIFACT','PROJECT']),
   name:z.string().trim().min(1).max(200),

@@ -47,6 +47,79 @@ describe('assignment submit deadline', () => {
     mockPrisma.submissionIdempotencyReceipt.findFirst.mockResolvedValue(null)
   })
 
+  it('reads only fresh submission gates, not the assignment body or media', async () => {
+    mockPrisma.assignment.findUnique.mockImplementation(async (query) => {
+      expect(query).toEqual({
+        where: { id: 'asg-1' },
+        select: { courseId: true, status: true, deadline: true },
+      })
+      return { courseId: 'course-1', status: AssignmentStatus.PUBLISHED, deadline: null }
+    })
+    mockPrisma.submission.findFirst.mockResolvedValue(null)
+    mockPrisma.submission.create.mockResolvedValue({ id: 'sub-1' })
+    const res = makeRes()
+
+    await assignmentController.submit(makeReq(), res)
+
+    expect(res.body.code).toBe(0)
+    expect(mockPrisma.assignment.findUnique).toHaveBeenCalledOnce()
+    expect(mockPrisma.courseStudent.findFirst).toHaveBeenCalledWith({
+      where: { courseId: 'course-1', studentId: 'student-1', status: { in: ['ACTIVE', 'APPROVED'] } },
+      select: { id: true },
+    })
+  })
+
+  it('reads only the latest history version while preserving the prior answer snapshot', async () => {
+    mockPrisma.assignment.findUnique.mockResolvedValue({
+      courseId: 'course-1', status: AssignmentStatus.PUBLISHED, deadline: null,
+    })
+    mockPrisma.submission.findFirst.mockResolvedValue({
+      id: 'sub-1', revision: 3, content: 'previous content', answers: { q1: 'previous answer' },
+    })
+    mockPrisma.submissionHistory.findFirst.mockImplementation(async (query) => {
+      expect(query).toEqual({
+        where: { submissionId: 'sub-1' }, orderBy: { version: 'desc' }, select: { version: true },
+      })
+      return { version: 7 }
+    })
+    mockPrisma.submissionHistory.create.mockResolvedValue({ id: 'history-8' })
+    mockPrisma.submission.update.mockResolvedValue({ id: 'sub-1', revision: 4 })
+    const res = makeRes()
+
+    await assignmentController.submit(makeReq({ body: { content: 'new', expectedRevision: 3 } }), res)
+
+    expect(res.body.code).toBe(0)
+    expect(mockPrisma.submissionHistory.findFirst).toHaveBeenCalledOnce()
+    expect(mockPrisma.submissionHistory.create).toHaveBeenCalledWith({ data: {
+      submissionId: 'sub-1', content: 'previous content', answers: { q1: 'previous answer' }, version: 8,
+    } })
+    expect(mockPrisma.submission.update).toHaveBeenCalledOnce()
+  })
+
+  it('still rejects an unpublished assignment with the narrow gate projection', async () => {
+    mockPrisma.assignment.findUnique.mockResolvedValue({
+      courseId: 'course-1', status: AssignmentStatus.DRAFT, deadline: null,
+    })
+    const res = makeRes()
+    await assignmentController.submit(makeReq(), res)
+    expect(res.statusCode).toBe(400)
+    expect(res.body.message).toBe('练习未发布')
+    expect(mockPrisma.submission.create).not.toHaveBeenCalled()
+    expect(mockPrisma.submission.update).not.toHaveBeenCalled()
+  })
+
+  it('rechecks membership before replaying a committed keyed submission', async () => {
+    mockPrisma.assignment.findUnique.mockResolvedValue({
+      courseId: 'course-1', status: AssignmentStatus.PUBLISHED, deadline: null,
+    })
+    mockPrisma.courseStudent.findFirst.mockResolvedValue(null)
+    const res = makeRes()
+    await assignmentController.submit(makeReq({ header: vi.fn().mockReturnValue('revoked-member-key') }), res)
+    expect(res.statusCode).toBe(403)
+    expect(mockPrisma.submissionIdempotencyReceipt.findFirst).not.toHaveBeenCalled()
+    expect(mockPrisma.submission.create).not.toHaveBeenCalled()
+  })
+
   it('rejects a new submit after the deadline', async () => {
     mockPrisma.assignment.findUnique.mockResolvedValue({
       id: 'asg-1',

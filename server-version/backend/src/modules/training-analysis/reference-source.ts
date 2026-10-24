@@ -11,7 +11,7 @@ import {loadTrainingAnalysisSources,type TrainingAnalysisManifestAttemptV1} from
 import {TRAINING_ANALYSIS_MINIMUM_N} from './core'
 import {referenceConsentBodyHash,trainingReferenceSourceBindingSchema,type TrainingReferenceSourceBinding} from '../measurement-content/reference-candidate'
 
-const uuid=z.string().uuid(),text=z.string().trim().min(1).max(200),digest=z.string().regex(/^[a-f0-9]{64}$/)
+const uuid=z.string().guid(),text=z.string().trim().min(1).max(200),digest=z.string().regex(/^[a-f0-9]{64}$/)
 export const trainingReferenceContextSchema=z.object({actorId:text,courseId:uuid,compositeId:uuid,grantId:uuid}).strict()
 export type TrainingReferenceContext=z.infer<typeof trainingReferenceContextSchema>
 export const trainingReferenceSelectorSchema=z.object({itemId:uuid,scoreKey:text,publication:z.string().datetime(),

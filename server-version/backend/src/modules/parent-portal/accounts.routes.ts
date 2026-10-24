@@ -102,7 +102,7 @@ function sendError(res: Response, err: unknown) {
       .status(400)
       .json({
         code: 'PARENT_ACCOUNT_INPUT',
-        message: err.errors[0].message,
+        message: err.issues[0].message,
         data: null,
       })
   if (

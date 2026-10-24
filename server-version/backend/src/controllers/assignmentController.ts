@@ -1,3 +1,5 @@
+import { EXPORT_BATCH_SIZE, sendTaskExport, TaskExportBusyError, TaskExportLimitError, TaskExportPermissionError, TaskExportAuthenticationError, refreshTaskExportAuthentication } from '../utils/streamingTaskExport'
+import { REVIEW_PAGE_SIZE, REVIEW_BATCH_SIZE, REVIEW_SELECTION_LIMIT, ReviewInputError, freezeSelection, readSelection, reviewCursor, nextReviewCursor, gradeReviewChunk } from '../modules/assignment-review/selection'
 import { managementTaskList } from '../modules/training-catalog/tasks'
 import { Request, Response } from 'express'
 import { canReadLegacyContent } from '../utils/legacyContentRoles'
@@ -142,7 +144,7 @@ const utf8ByteLimitedString = (limit: number, message: string) => z.string().ref
   { message },
 )
 
-const submissionAnswersSchema = z.record(utf8ByteLimitedString(10_000, '单个答案不能超过10KB')).superRefine((value, ctx) => {
+const submissionAnswersSchema = z.record(z.string(), utf8ByteLimitedString(10_000, '单个答案不能超过10KB')).superRefine((value, ctx) => {
   if (Buffer.byteLength(JSON.stringify(value), 'utf8') > 256_000) {
     ctx.addIssue({ code: z.ZodIssueCode.custom, message: '答案总大小不能超过256KB' })
   }
@@ -155,7 +157,8 @@ const submitSchema = z.object({
 })
 
 const gradeSchema = z.object({
-  comment: z.string().min(1, '评语不能为空'),
+  comment: z.string().trim().min(1, '评语不能为空').max(10000),
+  expectedRevision: z.number().int().nonnegative().optional(),
 })
 
 export const assignmentController = {
@@ -198,22 +201,9 @@ export const assignmentController = {
 
       // 教师只能看到自己课程的练习，管理员可以看到所有
       if (userRole === UserRole.TEACHER) {
-        // 获取教师的所有课程ID
-        const teacherCourses = await prisma.course.findMany({
-          where: { creatorId: userId },
-          select: { id: true }
-        })
-        const courseIds = teacherCourses.map(c => c.id)
-        
-        // 如果指定了courseId，检查是否属于该教师
-        if (courseId) {
-          if (!courseIds.includes(courseId as string)) {
-            return success(res, buildPaginatedResult([], 0, pagination))
-          }
-        } else {
-          // 未指定courseId，只看自己课程的练习
-          where.courseId = { in: courseIds }
-        }
+        // Enforce ownership in the task query itself instead of materializing
+        // every owned course ID (also keeps a supplied courseId constrained).
+        where.course = { creatorId: userId }
       }
 
       // The old training list is not an Activity discovery API. Global
@@ -292,8 +282,8 @@ export const assignmentController = {
 
       const result = createAssignmentSchema.safeParse(req.body)
       if (!result.success) {
-        logger.error('Schema validation error', result.error.errors)
-        return error(res, result.error.errors[0].message)
+        logger.error('Schema validation error', result.error.issues)
+        return error(res, result.error.issues[0].message)
       }
 
       const { courseId, title, description, deadline, questions, videos, images, documents, content, tags } = result.data
@@ -394,7 +384,8 @@ export const assignmentController = {
           id: true,
           courseId: true,
           tags: true,
-          _count: { select: { submissions: true } },
+          // Learners never receive roster counts; avoid aggregating every submission.
+          _count: userRole !== UserRole.STUDENT ? { select: { submissions: true } } : false,
           title: true,
           description: true,
           content: true,
@@ -496,7 +487,7 @@ export const assignmentController = {
 
       const result = updateAssignmentSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const updateData: any = { ...result.data }
@@ -611,7 +602,7 @@ export const assignmentController = {
 
       const result = submitSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { content, answers, expectedRevision } = result.data
@@ -628,7 +619,9 @@ export const assignmentController = {
 
       // 检查练习是否存在
       const assignment = await prisma.assignment.findUnique({
-        where: { id }
+        where: { id },
+        // Submission gates do not consume the task body or attachment JSON.
+        select: { courseId: true, status: true, deadline: true },
       })
 
       if (!assignment) {
@@ -772,6 +765,7 @@ export const assignmentController = {
         const latestHistory = await tx.submissionHistory.findFirst({
           where: { submissionId: existing.id },
           orderBy: { version: 'desc' },
+          select: { version: true },
         })
         const newVersion = latestHistory ? latestHistory.version + 1 : 1
         await tx.submissionHistory.create({
@@ -847,7 +841,7 @@ export const assignmentController = {
 
       const assignment = await prisma.assignment.findUnique({
         where: { id },
-        include: {
+        select: {
           course: {
             select: {
               creatorId: true,
@@ -865,28 +859,27 @@ export const assignmentController = {
         return forbidden(res, '无权限查看提交')
       }
 
-      const submissions = await prisma.submission.findMany({
-        where: { assignmentId: id },
-        include: {
-          student: {
-            select: {
-              id: true,
-              nickname: true,
-              username: true,
-              avatarUrl: true,
-            }
-          }
-        },
-        orderBy: {
-          submittedAt: 'desc'
-        }
-      })
-
-      return success(res, {
-        list: submissions,
-        total: submissions.length,
-      })
+      const cursor = reviewCursor(req.query.cursor)
+      const pageSize = req.query.pageSize === undefined ? REVIEW_PAGE_SIZE : Number(req.query.pageSize)
+      if (!Number.isInteger(pageSize) || pageSize < 1 || pageSize > 100) return error(res, '每页数量须为 1–100', -1, 400)
+      const result = await prisma.$transaction(async tx => {
+        const where = { assignmentId: id }
+        const [total, gradedCount, rows] = await Promise.all([
+          tx.submission.count({ where }),
+          tx.submission.count({ where: { ...where, status: SubmissionStatus.GRADED } }),
+          tx.submission.findMany({
+            where: { ...where, ...(cursor ? { id: { lt: cursor.id } } : {}) },
+            include: { student: { select: { id: true, nickname: true, username: true, avatarUrl: true } } },
+            orderBy: { id: 'desc' }, take: pageSize + 1,
+          }),
+        ])
+        const list = rows.slice(0, pageSize)
+        return { list, total, gradedCount, ungradedCount: total - gradedCount,
+          nextCursor: rows.length > pageSize ? nextReviewCursor(list[list.length - 1]) : null }
+      }, { isolationLevel: 'RepeatableRead' })
+      return success(res, result)
     } catch (err) {
+      if (err instanceof ReviewInputError) return error(res, err.message, -1, 400)
       logger.error('获取提交列表错误', err)
       return error(res, '获取提交列表失败')
     }
@@ -901,7 +894,7 @@ export const assignmentController = {
 
       const result = gradeSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { comment } = result.data
@@ -938,95 +931,94 @@ export const assignmentController = {
         return notFound(res, '提交记录不存在')
       }
 
-      const updated = await prisma.submission.update({
-        where: { id: submissionId },
-        data: {
-          comment,
-          status: SubmissionStatus.GRADED,
-          reviewedAt: new Date(),
-        }
+      const updated = await prisma.$transaction(async tx => {
+        const lockKey = `assignment-submission:${id}:${submission.studentId}`
+        await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext(${lockKey}))`
+        const changed = await tx.submission.updateMany({
+          where: { id: submissionId, assignmentId: id, revision: result.data.expectedRevision ?? submission.revision, ...(userRole !== UserRole.ADMIN ? { assignment: { course: { creatorId: userId } } } : {}) },
+          data: { comment, status: SubmissionStatus.GRADED, reviewedAt: new Date(), revision: { increment: 1 } },
+        })
+        if (!changed.count) throw new SubmissionRevisionConflictError()
+        return tx.submission.findUnique({ where: { id: submissionId } })
       })
 
       return success(res, updated, '批改成功')
     } catch (err) {
+      if (err instanceof SubmissionRevisionConflictError) return error(res, '提交已更新，请刷新后重试', -1, 409)
       logger.error('批改练习错误', err)
       return error(res, '批改失败')
     }
   },
 
-  // 批量批改
+  // Capture IDs and revisions only. The signed, expiring snapshot cannot include later arrivals.
+  async reviewSelection(req: Request, res: Response) {
+    try {
+      const id = req.params.id
+      const actor = req.user!.userId
+      const assignment = await prisma.assignment.findUnique({ where: { id }, select: { course: { select: { creatorId: true } } } })
+      if (!assignment) return notFound(res, '练习不存在')
+      if (assignment.course.creatorId !== actor && req.user?.role !== UserRole.ADMIN) return forbidden(res, '无权限批改此练习')
+      const parsed = z.union([
+        z.object({ scope: z.literal('all-ungraded') }),
+        z.object({ scope: z.literal('page'), items: z.array(z.object({ id: z.string().min(1).max(100), revision: z.number().int().nonnegative() })).min(1).max(100) }),
+      ]).safeParse(req.body)
+      if (!parsed.success) return error(res, '选择范围无效', -1, 400)
+      const selection = parsed.data
+      const items = await prisma.submission.findMany({
+        where: { assignmentId: id, status: { not: SubmissionStatus.GRADED }, ...(selection.scope === 'page' ? { OR: selection.items.map(item => ({ id: item.id, revision: item.revision })) } : {}) },
+        select: { id: true, revision: true }, orderBy: { id: 'asc' }, take: REVIEW_SELECTION_LIMIT + 1,
+      })
+      if (items.length > REVIEW_SELECTION_LIMIT) return error(res, `全部选择最多支持 ${REVIEW_SELECTION_LIMIT} 份，请按本页分批批改`, -1, 400)
+      return success(res, freezeSelection(actor, id, items))
+    } catch (err) {
+      logger.error('选择待批改练习失败', err)
+      return error(res, '选择失败，请重试', -1, 500)
+    }
+  },
+
+  // Explicit snapshots are processed in bounded chunks; legacy clients retain statement-time all-ungraded semantics.
   async batchGrade(req: Request, res: Response) {
     try {
-      const userId = req.user?.userId
-      const userRole = req.user?.role
       const { id } = req.params
-      const { comment } = req.body
-
-      if (!comment) {
-        return error(res, '评语不能为空')
-      }
-
-      // 检查练习
-      const assignment = await prisma.assignment.findUnique({
-        where: { id },
-        include: {
-          course: {
-            select: {
-              creatorId: true,
-            }
-          }
+      const result = gradeSchema.safeParse(req.body)
+      if (!result.success) return error(res, result.error.issues[0].message, -1, 400)
+      const assignment = await prisma.assignment.findUnique({ where: { id }, select: { course: { select: { creatorId: true } } } })
+      if (!assignment) return notFound(res, '练习不存在')
+      if (assignment.course.creatorId !== req.user?.userId && req.user?.role !== UserRole.ADMIN) return forbidden(res, '无权限批改此练习')
+      if (req.body.selectionToken === undefined) {
+        // Older mini-program callers explicitly request all ungraded. Bound the snapshot,
+        // never load answers or silently grade just a prefix when the protective limit is exceeded.
+        const items = await prisma.submission.findMany({ where: { assignmentId: id, status: { not: SubmissionStatus.GRADED } }, select: { id: true, revision: true }, orderBy: { id: 'asc' }, take: REVIEW_SELECTION_LIMIT + 1 })
+        if (items.length > REVIEW_SELECTION_LIMIT) throw new ReviewInputError(`全部批改最多支持 ${REVIEW_SELECTION_LIMIT} 份，请使用分页批改`)
+        let gradedCount = 0
+        try {
+          for (let offset = 0; offset < items.length; offset += REVIEW_BATCH_SIZE) gradedCount += (await gradeReviewChunk(id, items.slice(offset, offset + REVIEW_BATCH_SIZE), result.data.comment, req.user!.userId, req.user?.role === UserRole.ADMIN)).count
+        } catch (err) {
+          logger.error('批量批改部分完成', err)
+          return error(res, `已确认批改 ${gradedCount} 份，后续批次失败；请刷新确认后重试`, -1, 500)
         }
-      })
-
-      if (!assignment) {
-        return notFound(res, '练习不存在')
+        return success(res, { gradedCount, skippedCount: items.length - gradedCount }, `批量批改成功，共 ${gradedCount} 份练习`)
       }
-
-      // 权限检查
-      if (assignment.course.creatorId !== userId && userRole !== UserRole.ADMIN) {
-        return forbidden(res, '无权限批改此练习')
-      }
-
-      // 获取所有未批改的提交
-      const submissions = await prisma.submission.findMany({
-        where: {
-          assignmentId: id,
-          status: { not: SubmissionStatus.GRADED }
-        }
-      })
-
-      // 批量更新 - 使用事务保证原子性
-      await prisma.$transaction(
-        submissions.map(submission =>
-          prisma.submission.update({
-            where: { id: submission.id },
-            data: {
-              comment,
-              status: SubmissionStatus.GRADED,
-              reviewedAt: new Date(),
-            }
-          })
-        )
-      )
-
-      return success(res, {
-        gradedCount: submissions.length
-      }, `批量批改成功，共 ${submissions.length} 份练习`)
+      const selection = readSelection(req.body.selectionToken, req.user!.userId, id)
+      const updated = await gradeReviewChunk(id, selection.items, result.data.comment, req.user!.userId, req.user?.role === UserRole.ADMIN)
+      return success(res, { gradedCount: updated.count, skippedCount: selection.items.length - updated.count,
+        selectionId: selection.selectionId, index: selection.index, total: selection.total })
     } catch (err) {
+      if (err instanceof ReviewInputError) return error(res, err.message, -1, 400)
       logger.error('批量批改错误', err)
-      return error(res, '批量批改失败')
+      return error(res, '批量批改失败，可重试未完成批次', -1, 500)
     }
   },
 
   // 导出数据
   async export(req: Request, res: Response) {
     try {
-      const userId = req.user?.userId
-      const userRole = req.user?.role
+      let userId = req.user?.userId
+      let userRole = req.user?.role
       const { id } = req.params
 
       // 检查练习
-      const assignment = await prisma.assignment.findUnique({
+      let assignment = await prisma.assignment.findUnique({
         where: { id },
         select: {
           title: true,
@@ -1048,89 +1040,124 @@ export const assignmentController = {
         return forbidden(res, '无权限导出数据')
       }
 
-      // 获取所有提交
-      const submissions = await prisma.submission.findMany({
-        where: { assignmentId: id },
-        select: {
-          submittedAt: true,
-          reviewedAt: true,
-          status: true,
-          comment: true,
-          answers: true,
-          content: true,
-          student: {
-            select: {
-              nickname: true,
-              username: true,
-              phone: true,
-            }
-          }
-        },
-        orderBy: {
-          submittedAt: 'desc'
+      const authorize = async (db: Pick<typeof prisma, 'assignment'>) => {
+        const current = await db.assignment.findUnique({ where: { id }, select: { course: { select: { creatorId: true } } } })
+        if (!current || (current.course.creatorId !== userId && userRole !== UserRole.ADMIN)) {
+          throw new TaskExportPermissionError('无权限导出数据')
         }
-      })
+      }
+      await sendTaskExport(res, () => `${assignment!.title}_提交数据.xlsx`, '练习提交数据', async (append, checkConnected) => {
+        // One bounded MVCC snapshot: concurrent edits/inserts never move or duplicate rows.
+        // Spool only within the transaction; compression and download happen after release.
+        await prisma.$transaction(async tx => {
+          const snapshotMetadata = await tx.assignment.findUnique({ where: { id }, select: { title: true, questions: true, course: { select: { creatorId: true } } } })
+          if (!snapshotMetadata || (snapshotMetadata.course.creatorId !== userId && userRole !== UserRole.ADMIN)) throw new TaskExportPermissionError('无权限导出数据')
+          assignment = snapshotMetadata
+          const questions: Question[] = (snapshotMetadata.questions as unknown as Question[]) || []
+          let cursor: { time: Date; id: string } | undefined
+          let rowCount = 0
+          while (true) {
+            checkConnected()
+            const submissions = await tx.submission.findMany({
+              where: { assignmentId: id, ...(cursor ? { OR: [
+                  { submittedAt: { lt: cursor.time } },
+                  { submittedAt: cursor.time, id: { lt: cursor.id } },
+                ] } : {}) },
+              take: EXPORT_BATCH_SIZE,
+              select: {
+                id: true,
+                submittedAt: true,
+                reviewedAt: true,
+                status: true,
+                comment: true,
+                answers: true,
+                content: true,
+                student: {
+                  select: {
+                    nickname: true,
+                    username: true,
+                    phone: true,
+                  }
+                }
+              },
+              orderBy: [{ submittedAt: 'desc' }, { id: 'desc' }]
+            })
+            if (!submissions.length) break
 
-      // 准备 Excel 数据
-      const questions: Question[] = (assignment.questions as unknown as Question[]) || []
 
-      const exportData = submissions.map((sub, index) => {
-        const baseRecord: any = {
-          '序号': index + 1,
-          '学员姓名': sub.student.nickname || sub.student.username,
-          '手机号': sub.student.phone || '-',
-          '提交时间': sub.submittedAt ? new Date(sub.submittedAt).toLocaleString('zh-CN') : '-',
-          '更新时间': sub.reviewedAt ? new Date(sub.reviewedAt).toLocaleString('zh-CN') : '-',
-          '状态': sub.status === 'GRADED' ? '已批改' : (sub.status === 'SUBMITTED' ? '已提交' : '草稿'),
-          '评语': sub.comment || '-',
-        }
 
-        // 添加题目作答
-        const answers = (sub.answers as Record<string, string>) || {}
-        questions.forEach((q, qIndex) => {
-          baseRecord[`题${qIndex + 1}_题目`] = q.question
-          
-          // 正确判断题目类型
-          if (q.type === 'single_choice') {
-            baseRecord[`题${qIndex + 1}_类型`] = '单选题'
-            const answer = answers[qIndex.toString()] || answers[q.id] || '未作答'
-            baseRecord[`题${qIndex + 1}_答案`] = answer
-          } else if (q.type === 'multiple_choice') {
-            baseRecord[`题${qIndex + 1}_类型`] = '多选题'
-            const answer = answers[qIndex.toString()] || answers[q.id] || '未作答'
-            baseRecord[`题${qIndex + 1}_答案`] = answer
-          } else if (q.type === 'text') {
-            baseRecord[`题${qIndex + 1}_类型`] = '主观题'
-            // 主观题从 answers 中获取答案
-            const answer = answers[qIndex.toString()] || answers[q.id] || '未作答'
-            baseRecord[`题${qIndex + 1}_答案`] = answer
-          } else {
-            baseRecord[`题${qIndex + 1}_类型`] = '未知'
-            baseRecord[`题${qIndex + 1}_答案`] = '未作答'
+            const exportData = submissions.map((sub, index) => {
+              const baseRecord: any = {
+                '序号': rowCount + index + 1,
+                '学员姓名': sub.student.nickname || sub.student.username,
+                '手机号': sub.student.phone || '-',
+                '提交时间': sub.submittedAt ? new Date(sub.submittedAt).toLocaleString('zh-CN') : '-',
+                '更新时间': sub.reviewedAt ? new Date(sub.reviewedAt).toLocaleString('zh-CN') : '-',
+                '状态': sub.status === 'GRADED' ? '已批改' : (sub.status === 'SUBMITTED' ? '已提交' : '草稿'),
+                '评语': sub.comment || '-',
+              }
+
+              // 添加题目作答
+              const answers = (sub.answers as Record<string, string>) || {}
+              questions.forEach((q, qIndex) => {
+                baseRecord[`题${qIndex + 1}_题目`] = q.question
+
+                // 正确判断题目类型
+                if (q.type === 'single_choice') {
+                  baseRecord[`题${qIndex + 1}_类型`] = '单选题'
+                  const answer = answers[qIndex.toString()] || answers[q.id] || '未作答'
+                  baseRecord[`题${qIndex + 1}_答案`] = answer
+                } else if (q.type === 'multiple_choice') {
+                  baseRecord[`题${qIndex + 1}_类型`] = '多选题'
+                  const answer = answers[qIndex.toString()] || answers[q.id] || '未作答'
+                  baseRecord[`题${qIndex + 1}_答案`] = answer
+                } else if (q.type === 'text') {
+                  baseRecord[`题${qIndex + 1}_类型`] = '主观题'
+                  // 主观题从 answers 中获取答案
+                  const answer = answers[qIndex.toString()] || answers[q.id] || '未作答'
+                  baseRecord[`题${qIndex + 1}_答案`] = answer
+                } else {
+                  baseRecord[`题${qIndex + 1}_类型`] = '未知'
+                  baseRecord[`题${qIndex + 1}_答案`] = '未作答'
+                }
+              })
+
+              // 添加默认作答内容（content字段）
+              const contentIndex = questions.length + 1
+              baseRecord[`题${contentIndex}_题目`] = '作答内容'
+              baseRecord[`题${contentIndex}_类型`] = '主观题'
+              baseRecord[`题${contentIndex}_答案`] = sub.content || '未作答'
+
+              return baseRecord
+            })
+
+
+            await append(exportData)
+            rowCount += submissions.length
+            const last = submissions[submissions.length - 1]
+            cursor = { time: last.submittedAt, id: last.id }
+            if (submissions.length < EXPORT_BATCH_SIZE) break
           }
-        })
-
-        // 添加默认作答内容（content字段）
-        const contentIndex = questions.length + 1
-        baseRecord[`题${contentIndex}_题目`] = '作答内容'
-        baseRecord[`题${contentIndex}_类型`] = '主观题'
-        baseRecord[`题${contentIndex}_答案`] = sub.content || '未作答'
-
-        return baseRecord
+        }, { isolationLevel: 'RepeatableRead', timeout: 5000, maxWait: 2000 })
+      }, async () => {
+        await refreshTaskExportAuthentication(req, res)
+        userId = req.user?.userId
+        userRole = req.user?.role
+        await authorize(prisma)
       })
-
-      // 创建 Excel（ExcelJS，避免旧版 xlsx 解析器漏洞）
-
-      // 设置响应头
-      const fileName = `${assignment.title}_提交数据.xlsx`
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`)
-
-      // 发送文件
-      const buffer = await (await import('../utils/excelWorkbook')).workbookBuffer({ '练习提交数据': exportData })
-      res.send(buffer)
     } catch (err) {
+      if (err instanceof TaskExportAuthenticationError) return
       logger.error('导出数据错误', err)
+      if (res.headersSent || res.destroyed) {
+        if (!res.destroyed) res.destroy()
+        return
+      }
+      res.removeHeader('Content-Type')
+      res.removeHeader('Content-Disposition')
+      res.removeHeader('Content-Length')
+      if (err instanceof TaskExportPermissionError) return forbidden(res, err.message)
+      if (err instanceof TaskExportBusyError) return error(res, err.message, -1, 503)
+      if (err instanceof TaskExportLimitError) return error(res, err.message, -1, 413)
       return error(res, '导出数据失败')
     }
   },

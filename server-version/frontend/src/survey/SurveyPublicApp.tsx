@@ -574,18 +574,28 @@ export default function SurveyPublicApp(){
     // The authenticated terminal projection contains no answers or task units.
     // A lost screen-out response must not reopen its sealed qualifying draft.
     for(const session of data.cognitiveSessions??[])rememberCognitive(id,session.sessionId)
-    if(data.status==='COMPLETED')void clearCognitive(id)
+    if(data.status==='COMPLETED'){
+      // The authorized terminal projection has no runnable task to hydrate.
+      // markCompleted owns cleanup, including the single cognitive cleanup attempt.
+      const proof={...(code?{researchCode:code}:{}),accessCredential:secret}
+      timingTrackers.current={}
+      setAnswers({});setItemTimings({});setLockedAnswers({})
+      setCognitiveSessions([]);setCognitiveReferences([]);setCognitiveRunning(false)
+      setFormPages({});setScalePages({});setFlowStep(0);setToolStep(0)
+      setCheckpointOverwritePending(false);setScreenedOut(false);setAttemptId(id)
+      markCompleted(id,proof)
+      await readCompletion(id,proof)
+      return
+    }
     if(data.status==='SCREENED_OUT'){markScreenedOut(id);return}
     // Reconcile complete local+remote envelopes before mounting any timed
     // Scale runner. An older local revision can never silently replace remote.
-    const saved=data.status==='COMPLETED'?null:
-      restoreLocalSurveyDraftEnvelope<Record<string,Record<string,Answer>>>(
+    const saved=restoreLocalSurveyDraftEnvelope<Record<string,Record<string,Answer>>>(
         publicId,id,data.definitionDigest)
     let restoredAnswers=saved?.answers??{}
     let restoredTimings=(saved?.itemTimings??{}) as SurveyWaveScaleTimings
     let restoredRevision=0,overwritePending=false
-    if(data.status==='COMPLETED')clearLocalSurveyDraft(publicId,id)
-    else if(saved)setNotice(singleResumeNotice)
+    if(saved)setNotice(singleResumeNotice)
     if(data.status==='STARTED'&&data.checkpointPolicy?.enabled&&!saved?.finalSubmission){
       try{
         const remote=await publicApi<{revision:number;checkpoint:{
@@ -630,11 +640,6 @@ export default function SurveyPublicApp(){
     setTask(data);setFormPages({});setScalePages({});setFlowStep(0);setToolStep(0);setScreenedOut(false)
     setCheckpointRevision(restoredRevision);setCheckpointOverwritePending(overwritePending)
     setAnswers(restoredAnswers);setItemTimings(restoredTimings)
-    if(data.status==='COMPLETED'){
-      const proof={...(code?{researchCode:code}:{}),accessCredential:secret}
-      markCompleted(id,proof)
-      await readCompletion(id,proof)
-    }
   }
   const resumeSingle=()=>{if(!singleResume)return;void run(async()=>{
     setAccessCredential(singleResume.accessCredential)
@@ -847,34 +852,35 @@ export default function SurveyPublicApp(){
     if(!finalRequest.current&&task.units.some(unit=>unit.kind==='SCALE'&&!mountedScaleImagesReady(unit))){setError('请等待当前量表图片加载完成；加载失败时请重试图片');return}
     finalInFlight.current=true
     void run(async()=>{
-    // Match the frozen conditional form. An earlier selection change must
-    // clear fields that are now hidden; the server repeats this validation.
-    const eligible=task.flow?new Set(currentFlow?.visibleUnitKeys??[]):null
-    const payload=Object.fromEntries(task.units.filter(unit=>
-      eligible===null||eligible.has(unit.instrumentKey)).map(unit=>{
-      const original=own(answers,unit.instrumentKey)??{}
-      return [unit.instrumentKey,unit.kind==='FORM'
-        ?sanitizeFormAnswers(unit.pages?.flatMap(p=>p.questions)||[],original)
-        :original]
-    }))
-    if(!finalRequest.current)for(const tracker of Object.values(timingTrackers.current))tracker.pause()
-    const timedUnits=task.units.filter(unit=>
-      unit.kind==='SCALE'&&unit.presentationMode==='ONE_BY_ONE'&&
-      (eligible===null||eligible.has(unit.instrumentKey)))
-    const sealedTimings=Object.fromEntries(timedUnits.map(unit=>[
-      unit.instrumentKey,sealSurveyScaleTimings(
-        (unit.items??[]).map(item=>item.itemKey),payload[unit.instrumentKey]??{},
-        own(timingTrackers.current,unit.instrumentKey)?.snapshot()??
-          own(itemTimings,unit.instrumentKey)??{},
-      ),
-    ]))
     const screened=finalRequest.current?finalRequest.current.path.endsWith('/screen-out')
       :currentFlow?.termination==='SCREEN_OUT'
-    const path=base+'/attempts/'+attemptId+(screened?'/screen-out':'/final')
     // A sealed request from a prior error/reload has an ambiguous outcome even
     // if its retry creates the first FINAL. Keep the current GENERAL recheck.
     const firstRequest=finalRequest.current===null
     if(!finalRequest.current){
+      // Retry sends the original envelope; do not sanitize answers or reseal clocks.
+      // Match the frozen conditional form. An earlier selection change must
+      // clear fields that are now hidden; the server repeats this validation.
+      const eligible=task.flow?new Set(currentFlow?.visibleUnitKeys??[]):null
+      const payload=Object.fromEntries(task.units.filter(unit=>
+        eligible===null||eligible.has(unit.instrumentKey)).map(unit=>{
+        const original=own(answers,unit.instrumentKey)??{}
+        return [unit.instrumentKey,unit.kind==='FORM'
+          ?sanitizeFormAnswers(unit.pages?.flatMap(p=>p.questions)||[],original)
+          :original]
+      }))
+      for(const tracker of Object.values(timingTrackers.current))tracker.pause()
+      const timedUnits=task.units.filter(unit=>
+        unit.kind==='SCALE'&&unit.presentationMode==='ONE_BY_ONE'&&
+        (eligible===null||eligible.has(unit.instrumentKey)))
+      const sealedTimings=Object.fromEntries(timedUnits.map(unit=>[
+        unit.instrumentKey,sealSurveyScaleTimings(
+          (unit.items??[]).map(item=>item.itemKey),payload[unit.instrumentKey]??{},
+          own(timingTrackers.current,unit.instrumentKey)?.snapshot()??
+            own(itemTimings,unit.instrumentKey)??{},
+        ),
+      ]))
+      const path=base+'/attempts/'+attemptId+(screened?'/screen-out':'/final')
       finalRequest.current={attemptId,path,body:{
       ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode:researchCode.trim().toUpperCase()}:{}),
       accessCredential:accessCredential.trim(),submissionId,answers:payload,

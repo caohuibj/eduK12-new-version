@@ -22,7 +22,7 @@ const wrap=(fn:(req:Request,res:Response)=>Promise<unknown>,pass=false)=>async(r
     next(cause)
   }
 }
-const id=z.string().uuid()
+const id=z.string().guid()
 surveyMaterialLibraryRouter.get('/',wrap(req=>listSurveyMaterials(req.user!.userId,materialQuery.parse(req.query))))
 surveyMaterialLibraryRouter.patch('/:id/name',wrap(req=>renameSurveyMaterial(req.user!.userId,id.parse(req.params.id),z.object({name:z.string().trim().min(1).max(160).refine(value=>!/[\\/\0]/.test(value))}).strict().parse(req.body).name)))
 surveyMaterialLibraryRouter.get('/:id/content',wrap(async(req,res)=>{

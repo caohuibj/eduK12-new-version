@@ -293,7 +293,7 @@ export async function verifiedSurveyAttempt(input:SurveyAttemptProof):Promise<Ve
   const result=await readVerifiedSurveyAttempt(input,true)
   return {...result,compiledSnapshot:result.compiledSnapshot!}
 }
-/** Internal parent-FINAL locator, not a verified definition or cached authority.
+/** Internal FINAL/checkpoint locator, not a verified definition or cached authority.
  * The caller MUST reload and hash the full current publication under the
  * Project -> Wave -> Attempt locks, before replay or mutation. */
 export async function verifiedSurveyFinalLocator(input:SurveyAttemptProof):Promise<Omit<VerifiedSurveyAttempt,'compiledSnapshot'>>{

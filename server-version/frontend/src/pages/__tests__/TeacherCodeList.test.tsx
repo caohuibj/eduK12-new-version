@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { act, render, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 
 const { mockGet, mockPost, mockDelete } = vi.hoisted(() => ({
@@ -93,5 +93,65 @@ describe('Training registration code settings',()=>{
     const user=userEvent.setup();render(<TeacherCodeList training/>);await screen.findByText('ABCD2345')
     await user.click(screen.getByRole('button',{name:'生成注册码'}));await user.selectOptions(screen.getByLabelText('注册码有效期'),'custom');await user.type(screen.getByLabelText('注册码截止时间'),'2020-01-01T12:00');await user.click(screen.getByRole('button',{name:'确认生成'}))
     expect(screen.getByRole('alert')).toHaveTextContent('晚于当前时间');expect(mockPost).not.toHaveBeenCalled()
+  })
+})
+
+
+describe('Training registration code pagination', () => {
+  const code = (id: string) => ({id, code: id, isActive: true, maxUses: 1, usedCount: 0, createdAt: '2026-01-01T00:00:00Z', expiresAt: null})
+  beforeEach(() => {
+    vi.clearAllMocks()
+    mockGet.mockImplementation((_url, config) => Promise.resolve({code: 0, data: {list: [code(config?.params?.page === 2 ? 'SECOND234' : 'FIRST234')], total: 21}}))
+    mockPost.mockResolvedValue({code: 0, data: {}})
+    mockDelete.mockResolvedValue({code: 0, data: {}})
+  })
+  it('opts into twenty-row pages and preserves the total count', async () => {
+    const user = userEvent.setup(); render(<TeacherCodeList training/>)
+    await screen.findByText('FIRST234')
+    expect(mockGet).toHaveBeenLastCalledWith('/teacher-codes', {params: {page: 1, pageSize: 20}})
+    await user.click(screen.getByRole('button', {name: '下一页'}))
+    await screen.findByText('SECOND234')
+    expect(mockGet).toHaveBeenLastCalledWith('/teacher-codes', {params: {page: 2, pageSize: 20}})
+    expect(screen.getByText('共 21 个注册码 · 第 2 / 2 页')).toBeInTheDocument()
+  })
+  it('returns to page one after creation from a later page', async () => {
+    const user = userEvent.setup(); render(<TeacherCodeList training/>)
+    await screen.findByText('FIRST234'); await user.click(screen.getByRole('button', {name: '下一页'})); await screen.findByText('SECOND234')
+    await user.click(screen.getByRole('button', {name: '生成注册码'})); await user.click(screen.getByRole('button', {name: '确认生成'}))
+    await screen.findByText('FIRST234')
+    expect(mockGet).toHaveBeenLastCalledWith('/teacher-codes', {params: {page: 1, pageSize: 20}})
+  })
+  it('returns to the previous page after deleting the last row on a later page', async () => {
+    const user = userEvent.setup(); render(<TeacherCodeList training/>)
+    await screen.findByText('FIRST234'); await user.click(screen.getByRole('button', {name: '下一页'})); await screen.findByText('SECOND234')
+    await user.click(screen.getByText('详情与管理'))
+    await user.click(screen.getByRole('button', {name: '删除培训师注册码 SECOND234'})); await user.click(screen.getByRole('button', {name: '确认'}))
+    await screen.findByText('FIRST234')
+    expect(mockDelete).toHaveBeenCalledWith('/teacher-codes/SECOND234')
+    expect(mockGet).toHaveBeenLastCalledWith('/teacher-codes', {params: {page: 1, pageSize: 20}})
+  })
+  it('hides the previous page after a page request fails and refreshes the requested page', async () => {
+    const user = userEvent.setup(); render(<TeacherCodeList training/>)
+    await screen.findByText('FIRST234')
+    mockGet.mockResolvedValueOnce({code: -1, message: '分页请求失败'})
+    await user.click(screen.getByRole('button', {name: '下一页'}))
+    expect(await screen.findByRole('alert')).toHaveTextContent('分页请求失败')
+    expect(screen.queryByText('FIRST234')).not.toBeInTheDocument()
+    expect(screen.queryByText('SECOND234')).not.toBeInTheDocument()
+    await user.click(screen.getByRole('button', {name: '刷新注册码'}))
+    expect(await screen.findByText('SECOND234')).toBeInTheDocument()
+    expect(mockGet).toHaveBeenLastCalledWith('/teacher-codes', {params: {page: 2, pageSize: 20}})
+    expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  })
+  it('does not let an older generation replace the current list', async () => {
+    let resolveOld!: (value: unknown) => void
+    mockGet.mockImplementationOnce(() => new Promise(resolve => { resolveOld = resolve }))
+    const {rerender} = render(<TeacherCodeList training/>)
+    rerender(<TeacherCodeList/>)
+    await screen.findByText('FIRST234')
+    await act(async () => { resolveOld({code: 0, data: {list: [code('STALE234')], total: 1}}) })
+    expect(screen.queryByText('STALE234')).not.toBeInTheDocument()
+    expect(screen.getByText('FIRST234')).toBeInTheDocument()
+    await waitFor(() => expect(mockGet).toHaveBeenLastCalledWith('/teacher-codes'))
   })
 })

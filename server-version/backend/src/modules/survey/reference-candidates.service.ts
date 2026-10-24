@@ -16,7 +16,7 @@ import { SurveyAnalyticsError } from './analytics.errors'
 const text=z.string().trim().min(1).max(4000)
 const selector=z.string().trim().min(1).max(240)
 export const surveyReferenceCreateSchema=z.object({
-  requestId:z.string().uuid(),projectId:z.string().uuid(),waveId:z.string().uuid(),grantId:z.string().uuid(),
+  requestId:z.string().guid(),projectId:z.string().guid(),waveId:z.string().guid(),grantId:z.string().guid(),
   instrumentKey:selector,scoreKey:selector,referenceVersion:selector,
   evidence:z.object({methodRationale:text,inclusionRule:text,missingness:text,repeatResponses:text,
     organizationClustering:text,administrationDifferences:text,uncertainty:text,applicability:text,sampleAdequacy:text}).strict(),
@@ -160,9 +160,9 @@ export async function createSurveyReferenceCandidate(actorId:string,raw:unknown)
   },{isolationLevel:Prisma.TransactionIsolationLevel.ReadCommitted,maxWait:5000,timeout:5000})
 }
 
-export const surveyReferenceActionSchema=z.object({projectId:z.string().uuid(),waveId:z.string().uuid(),candidateId:z.string().uuid(),grantId:z.string().uuid()}).strict()
-export const surveyReferenceReviewSchema=surveyReferenceActionSchema.extend({requestId:z.string().uuid(),candidateHash:z.string().regex(/^[a-f0-9]{64}$/),decision:z.enum(['APPROVED','REJECTED']),statement:text}).strict()
-export const surveyReferencePublishSchema=surveyReferenceActionSchema.extend({reviewId:z.string().uuid(),localKey:z.string().trim().min(1).max(165),version:selector}).strict()
+export const surveyReferenceActionSchema=z.object({projectId:z.string().guid(),waveId:z.string().guid(),candidateId:z.string().guid(),grantId:z.string().guid()}).strict()
+export const surveyReferenceReviewSchema=surveyReferenceActionSchema.extend({requestId:z.string().guid(),candidateHash:z.string().regex(/^[a-f0-9]{64}$/),decision:z.enum(['APPROVED','REJECTED']),statement:text}).strict()
+export const surveyReferencePublishSchema=surveyReferenceActionSchema.extend({reviewId:z.string().guid(),localKey:z.string().trim().min(1).max(165),version:selector}).strict()
 
 async function readCandidate(tx:Prisma.TransactionClient,id:string){
   const rows=await tx.$queryRaw<Array<{payload:ReferenceCandidate}>>(Prisma.sql`

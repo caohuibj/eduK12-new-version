@@ -1,3 +1,4 @@
+import {assertCurrentStudyPrincipal,type AcceptedStudyReceipt} from '../anonymous-study/admission-principal'
 import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
 import { lockTrainingFlowFinalAdmission, requiresTrainingFlowFinalLock } from '../composite/training-variant-child-scope'
 import {normalizeTrainingScaleTiming} from '../assessment-runtime/training-scale-timing'
@@ -71,7 +72,9 @@ export type UnifiedScaleFinalSubmitInput = {
 
 export type UnifiedScaleAdmission = ScaleAdmissionChildRow
 
-const assertPrincipal = (child: ScaleAdmissionChildRow, admission: VersionedFrozenUnitAdmission, input: UnifiedScaleFinalSubmitInput): void => {
+const assertPrincipal = async (child: ScaleAdmissionChildRow, admission: VersionedFrozenUnitAdmission, input: UnifiedScaleFinalSubmitInput, receipt?:AcceptedStudyReceipt): Promise<void> => {
+  if(await assertCurrentStudyPrincipal(prisma,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,
+    attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash,receipt,unit:input}))return
   if (input.userId && (child.userId === input.userId || admission.principal.userId === input.userId)) return
   if (input.questionnaireSessionId && admission.principal.questionnaireSessionId === input.questionnaireSessionId) {
     if (input.userId && admission.principal.userId === input.userId) return
@@ -113,11 +116,11 @@ const normalizeAnswers = (
   })
 }
 
-const assertFrozenAdmission = (
+const assertFrozenAdmission = async (
   child: ScaleAdmissionChildRow,
   admission: VersionedFrozenUnitAdmission,
-  input: UnifiedScaleFinalSubmitInput,
-): void => {
+  input: UnifiedScaleFinalSubmitInput, receipt?:AcceptedStudyReceipt,
+): Promise<void> => {
   if (child.runtimeGeneration !== 'UNIFIED_V1' || !child.runtimeSnapshotEncrypted) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表运行时快照缺失，请重启后重新作答', 409)
   }
@@ -139,7 +142,7 @@ const assertFrozenAdmission = (
       409,
     )
   }
-  assertPrincipal(child, admission, input)
+  await assertPrincipal(child, admission, input, receipt)
   assertFinalOnly(child.deliveryMode)
   assertAttemptEpoch(child.attemptEpoch, input.attemptEpoch)
   assertFinalSubmitStatus(child.status, '量表测评')
@@ -220,17 +223,17 @@ const txAdmissionSelect = {
   totalTime: true,
 } as const
 
-export const assertUnifiedScaleDelivery = (input: UnifiedScaleFinalSubmitInput, child: ScaleAdmissionChildRow, admission: VersionedFrozenUnitAdmission, snapshot: VersionedFrozenScaleRuntimeSnapshot): void => {
-  assertFrozenAdmission(child, admission, input)
+export const assertUnifiedScaleDelivery = async (input: UnifiedScaleFinalSubmitInput, child: ScaleAdmissionChildRow, admission: VersionedFrozenUnitAdmission, snapshot: VersionedFrozenScaleRuntimeSnapshot): Promise<void> => {
+  await assertFrozenAdmission(child, admission, input)
   assertRuntimeAgainstAdmission(child, admission, snapshot, input)
 }
 
 export const prepareUnifiedScaleFinalSubmission = async (
-  input: UnifiedScaleFinalSubmitInput, child: ScaleAdmissionChildRow, referenceTimeMs = Date.now(),
+  input: UnifiedScaleFinalSubmitInput, child: ScaleAdmissionChildRow, referenceTimeMs = Date.now(), receipt?:AcceptedStudyReceipt,
 ) => {
   const submissionId = validateSubmissionId(input.submissionId)
   const admission = await measureRequestPhase('final_submit_admission', () => activateScaleAdmission(child, undefined, referenceTimeMs))
-  assertFrozenAdmission(child, admission, input)
+  await assertFrozenAdmission(child, admission, input, receipt)
   const snapshot = (await measureRequestPhase('final_submit_definition_prepare', async () => {
     const parsed = (await loadScaleAdmissionRuntime(child))
     assertRuntimeAgainstAdmission(child, admission, parsed, input)
@@ -309,13 +312,14 @@ const prepareUnifiedScaleWrite = async (
 export const submitUnifiedScaleAssessmentFinal = async (
   input: UnifiedScaleFinalSubmitInput, child: ScaleAdmissionChildRow, wholeReceipt?: WholeReceiptExecution, referenceDb?: FrozenReferenceDb,
 ) => {
-  const { submissionId, admission, snapshot, answers, payloadHash, timing } = await prepareUnifiedScaleFinalSubmission(input, child, wholeReceipt?.acceptedAtMs)
+  const { submissionId, admission, snapshot, answers, payloadHash, timing } = await prepareUnifiedScaleFinalSubmission(input, child, wholeReceipt?.acceptedAtMs, wholeReceipt?.studyReceipt)
 
   if (child.status === 'COMPLETED') {
     const replay = assertSubmissionReplay(child, submissionId, payloadHash)
     if (replay === 'replay') {
-      if (requiresTrainingFlowFinalLock(child.compositeAttemptId, child.compositeAttempt)) {
+      if (requiresTrainingFlowFinalLock(child.compositeAttemptId, child.compositeAttempt) || await assertCurrentStudyPrincipal(prisma,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash,receipt:wholeReceipt?.studyReceipt,unit:input})) {
         await withFinalOnlyCompletionTransaction(async tx => {
+          await assertCurrentStudyPrincipal(tx,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash,receipt:wholeReceipt?.studyReceipt,unit:input},true)
           const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: child.compositeAttemptId, parent: child.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: child.compositeItemId, sourceAttemptId: child.id, submissionId })
           assertFlowFinal(true)
         })
@@ -334,6 +338,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
     input, child, { submissionId, admission, snapshot, answers, payloadHash, timing }, wholeReceipt, referenceDb)
 
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
+    await assertCurrentStudyPrincipal(tx,{attemptId:child.compositeAttemptId,userId:input.userId,recoveryTokenHash:input.recoveryTokenHash,attemptEpoch:input.attemptEpoch,frozenHash:admission.principal.recoveryTokenHash,receipt:wholeReceipt?.studyReceipt,unit:input},true)
     const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: child.compositeAttemptId, parent: child.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: child.compositeItemId, sourceAttemptId: child.id, submissionId })
     const current = await tx.assessment.findUnique({
       where: { id: input.assessmentId },
@@ -470,7 +475,7 @@ export const submitUnifiedScaleCollectionBatch = async (
     write: Awaited<ReturnType<typeof prepareUnifiedScaleWrite>> | null;
   }> = []
   for (const { input, child } of units) {
-    const data = await prepareUnifiedScaleFinalSubmission(input, child, execution.acceptedAtMs)
+    const data = await prepareUnifiedScaleFinalSubmission(input, child, execution.acceptedAtMs, execution.studyReceipt)
     if (child.compositeAttemptId !== job.attemptId || input.compositeAttemptId !== job.attemptId
       || child.questionnaireAssessmentId || input.assessmentId !== child.id || !data.admission.parent?.slotKey
       || !data.snapshot.compiledRuntime.runtimeCapabilities.aggregateEligible)
@@ -480,6 +485,11 @@ export const submitUnifiedScaleCollectionBatch = async (
       ? null : await prepareUnifiedScaleWrite(input, child, data, execution, referenceDb) })
   }
   return withFinalOnlyCompletionTransaction(async tx => {
+    // New study admissions always lock parent -> accepted job -> child. The
+    // historical batch lock order remains untouched for unbound protocols.
+    for(const unit of prepared)await assertCurrentStudyPrincipal(tx,{attemptId:unit.child.compositeAttemptId,userId:unit.input.userId,
+      recoveryTokenHash:unit.input.recoveryTokenHash,attemptEpoch:unit.input.attemptEpoch,
+      frozenHash:unit.data.admission.principal.recoveryTokenHash,receipt:execution.studyReceipt,unit:unit.input},true)
     const rows = await tx.$queryRaw<Array<{
       id: string; status: string; deliveryMode: string; runtimeGeneration: string | null; attemptEpoch: number;
       compiledRuntimeHash: string | null; frozenAdmissionSnapshotHash: string | null;

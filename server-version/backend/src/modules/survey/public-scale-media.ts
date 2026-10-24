@@ -1,3 +1,4 @@
+import {surveyImageRefs} from './media.references'
 import {prisma} from '../../config/database'
 import {canonicalHash} from '../assessment-runtime/canonical'
 import {scaleDefinitionSchema,type ScaleItemDefinition} from '../scale/scale-definition'
@@ -53,4 +54,19 @@ export async function issueOwnSurveyScaleVideo(input:SurveyMediaProof,instrument
     audience:'public',presentation:presentation!,
     retentionOwner:{entityType:'SurveyResearchPublication',entityId:own.publicationId,field:'media'},db:prisma,
   })
+}
+
+/** Shared image route authorization. Native Survey images retain their existing
+ * frozen-definition policy; imported sources additionally need publication pins. */
+export async function authorizeOwnSurveyImage(input:SurveyMediaProof,assetId:string){
+  const {own,selected}=await authorizedSurveyMediaSnapshot(input)
+  const refs=surveyImageRefs(selected.units.map(unit=>({kind:unit.kind,definition:unit.displayDefinition})))
+  const scaleReference=frozenSurveyScaleImage(selected,assetId)
+  const reference=refs.find(image=>image.asset.assetId===assetId)?.asset??scaleReference
+  if(!reference)missing()
+  const catalogSjtReference=selected.units.some(unit=>unit.kind==='SJT'&&unit.sourceProvenance
+    &&surveyImageRefs([{kind:unit.kind,definition:unit.displayDefinition}]).some(image=>image.asset.assetId===assetId))
+  if((scaleReference||catalogSjtReference)&&!await prisma.assetReference.findFirst({where:{assetId,
+    entityType:'SurveyResearchPublication',entityId:own.publicationId,field:'media'},select:{id:true}}))missing()
+  return reference!
 }

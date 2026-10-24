@@ -340,7 +340,7 @@ router.get('/releases/:id/grants', handle(async (req, res) => {
 }))
 router.post('/releases/:id/grants', handle(async (req, res) => {
   const body = exactRelease.extend({
-    granteeTeacherId: z.string().uuid(), courseId: z.string().uuid(), purpose: z.literal('TRAINING_COURSE'),
+    granteeTeacherId: z.string().guid(), courseId: z.string().guid(), purpose: z.literal('TRAINING_COURSE'),
     permission: z.enum(['DISTRIBUTE', 'ADAPT']), validFrom: z.string().datetime({ offset: true }),
     expiresAt: z.string().datetime({ offset: true }), note: z.string().trim().min(1).max(2000),
   }).strict().parse(req.body)
@@ -353,7 +353,7 @@ router.post('/grants/:id/revoke', handle(async (req, res) => {
 }))
 router.post('/releases/:id/adapt', handle(async (req, res) => {
   const body = exactRelease.extend({
-    courseId: z.string().uuid(), grantId: z.string().uuid(), grantVersion: z.number().int().positive(),
+    courseId: z.string().guid(), grantId: z.string().guid(), grantVersion: z.number().int().positive(),
     newInstrumentKey: z.string().max(80).regex(/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/),
     newInstrumentVersion: z.string().max(40).regex(/^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)$/),
   }).strict().parse(req.body)

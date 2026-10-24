@@ -39,7 +39,7 @@ export async function assertEducationLibraryReadCommitted(tx:Prisma.TransactionC
  * current query-time checks, not extra account locks.
  */
 export async function lockEducationLibraryOrganization(tx:Prisma.TransactionClient,organizationId:string,product:EducationLibraryOrigin['product']){
-  z.string().uuid().parse(organizationId);educationLibraryProduct.parse(product)
+  z.string().guid().parse(organizationId);educationLibraryProduct.parse(product)
   const [org]=await tx.$queryRaw<Array<{id:string}>>(Prisma.sql`SELECT id FROM organizations
     WHERE id=${organizationId} AND product_domain='SCHOOL' AND status='ACTIVE' FOR UPDATE`)
   if(!org)fail('EDUCATION_LIBRARY_ORGANIZATION_UNAVAILABLE',403)

@@ -20,7 +20,7 @@ it('unifies drafts, configuration and scoped results without reading participant
  expect(await screen.findByRole('link',{name:'打开本课程作答名单与报告'})).toHaveAttribute('href','/composite-assessments/assessment/results?courseId=course-a&returnTo=%2F')
  expect(m.attempts).toHaveBeenCalledWith('assessment',{courseId:'course-a',page:1,pageSize:1})
  fireEvent.click(screen.getByRole('button',{name:'导出本课程数据'}))
- expect(screen.getByRole('dialog')).toHaveTextContent('仅导出「课程 A」')
+ expect(await screen.findByRole('dialog')).toHaveTextContent('仅导出「课程 A」')
  expect(m.exportData).not.toHaveBeenCalled()
 })
 it('does not present unscoped result counts when scope cannot be verified',async()=>{

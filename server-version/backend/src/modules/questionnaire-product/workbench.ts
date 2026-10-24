@@ -25,7 +25,7 @@ export async function templates(actor: Actor, raw: unknown) {
 }
 export async function saveTemplate(actor: Actor, raw: unknown) {
   teacher(actor)
-  const input = z.object({ sourceId: z.string().min(1), name: z.string().trim().min(1).max(200), requestId: z.string().uuid() }).strict().parse(raw)
+  const input = z.object({ sourceId: z.string().min(1), name: z.string().trim().min(1).max(200), requestId: z.string().guid() }).strict().parse(raw)
   const requestKey = actor.userId + ':' + input.requestId, requestHash = canonicalHash(input)
   const previous = await prisma.assessmentCompositionTemplate.findUnique({ where: { requestKey } })
   if (previous) { if (previous.requestHash !== requestHash) throw compositeConflict('同一模板请求不能更换内容'); return previous }
@@ -60,7 +60,7 @@ async function ownedTemplate(actor: Actor, id: string) {
 }
 export async function instantiateTemplate(actor: Actor, id: string, raw: unknown) {
   const row = await ownedTemplate(actor, id)
-  const input = z.object({ requestId: z.string().uuid() }).strict().parse(raw)
+  const input = z.object({ requestId: z.string().guid() }).strict().parse(raw)
   return questionnaire.copy(actor, row.definitionId, input)
 }
 export async function archiveTemplate(actor: Actor, id: string) {

@@ -72,7 +72,7 @@ export interface FormSectionCollectionFactsV2 {
 export type FormSectionCollectionFacts = FormSectionCollectionFactsV1 | FormSectionCollectionFactsV2 | FormSectionCollectionFactsV3
 export const typedFormValueSchema = z.union([
   z.string(), z.number().finite(), z.array(z.string()),
-  z.record(z.union([z.string(), z.number().finite(), z.array(z.string())])), z.null(),
+  z.record(z.string(), z.union([z.string(), z.number().finite(), z.array(z.string())])), z.null(),
 ])
 const typedFactsSchema = z.object({
   schemaVersion: z.literal(2), sectionKey: z.string().min(1),
@@ -101,10 +101,10 @@ const refusalSchema = z.object({_surveyRefusal:z.literal(true)}).strict()
 export const trainingFormWireValueSchema = z.unknown().superRefine((value,ctx)=>{
   if (!value || typeof value!=='object' || Array.isArray(value)) return
   for (const key of Object.keys(value)) if (['__proto__','constructor','prototype'].includes(key)) ctx.addIssue({code:'custom',message:'不允许的表单对象键',path:[key]})
-}).pipe(z.union([typedFormValueSchema, refusalSchema, z.record(z.union([z.string(),z.number().finite(),z.array(z.string()),refusalSchema]))]))
+}).pipe(z.union([typedFormValueSchema, refusalSchema, z.record(z.string(), z.union([z.string(),z.number().finite(),z.array(z.string()),refusalSchema]))]))
 const v3FactsSchema = z.object({schemaVersion:z.literal(3),sectionKey:z.string().min(1),items:z.array(z.object({
   key:z.string().min(1),label:z.string().min(1),value:typedFormValueSchema,state:factState,
-  rowStates:z.record(factState).optional(),otherText:z.string().optional(),
+  rowStates:z.record(z.string(), factState).optional(),otherText:z.string().optional(),
 }).strict()).max(500)}).strict()
 export type FormSectionCollectionFactsV3 = z.infer<typeof v3FactsSchema>
 export const createPolicyFormSectionCollectionFacts = (input: Omit<FormSectionCollectionFactsV3,'schemaVersion'>): FormSectionCollectionFactsV3 => {

@@ -143,7 +143,7 @@ export const authController = {
     try {
       const result = verifyTeacherCodeSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { teacherCode: codeInput } = result.data
@@ -183,7 +183,7 @@ export const authController = {
     try {
       const result = teacherRegisterSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { teacherCode: codeInput, username, password, nickname } = result.data
@@ -207,7 +207,8 @@ export const authController = {
 
       // 检查用户名是否已存在
       const existingUser = await prisma.user.findUnique({
-        where: { username }
+        where: { username },
+        select: { id: true },
       })
 
       if (existingUser) {
@@ -282,14 +283,15 @@ export const authController = {
     try {
       const result = studentRegisterSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { courseCode, username, password, nickname } = result.data
 
       // 查找课程
       const course = await prisma.course.findUnique({
-        where: { courseCode }
+        where: { courseCode },
+        select: { id: true, courseCode: true, status: true, endedAt: true, isRecruiting: true, isLibrary: true },
       })
 
       if (!course) {
@@ -300,7 +302,8 @@ export const authController = {
 
       // 检查用户名是否已存在
       const existingUser = await prisma.user.findUnique({
-        where: { username }
+        where: { username },
+        select: { id: true },
       })
 
       if (existingUser) {
@@ -316,7 +319,10 @@ export const authController = {
         if (typeof (tx as any).$executeRaw === 'function') {
           await (tx as any).$executeRaw`SELECT id FROM "courses" WHERE id = ${course.id} FOR UPDATE`
         }
-        const lockedCourse = await tx.course.findUnique({ where: { id: course.id } })
+        const lockedCourse = await tx.course.findUnique({
+          where: { id: course.id },
+          select: { id: true, courseCode: true, status: true, endedAt: true, isRecruiting: true, isLibrary: true },
+        })
         // The initial lookup only identifies the row to lock.  A teacher may
         // rotate the code while this request is waiting for that row lock;
         // accepting the refreshed row without comparing the submitted code

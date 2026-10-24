@@ -20,11 +20,12 @@ import { compileResearchCognitive, initialCognitiveDefinition, SURVEY_GONOGO_CON
 type Database=Prisma.TransactionClient|PrismaClient
 export const CATALOG_ADAPTER_VERSION='survey-catalog-v1' as const
 export const CANONICAL_SCALE_ADAPTER_VERSION='survey-catalog-scale-v2' as const
+export const ONLINE_SJT_ADAPTER_VERSION='survey-catalog-sjt-online-v1' as const
 export type CatalogSourceRef={kind:SurveyKind;sourceId:string;sourceVersion:string;organizationId?:string}
 export type SourceAnswerMapping={type:'SCALE_TYPED_V1';items:Record<string,string>;options:Record<string,string|number>}
 export type CatalogSourceSnapshot={ref:CatalogSourceRef;title:string;displayDefinition:unknown;compiledDefinition:unknown;
   definitionDigest:string;scoringDigest:string|null;answerMapping?:SourceAnswerMapping;
-  adapterVersion:typeof CATALOG_ADAPTER_VERSION|typeof CANONICAL_SCALE_ADAPTER_VERSION;provenance:Record<string,unknown>}
+  adapterVersion:typeof CATALOG_ADAPTER_VERSION|typeof CANONICAL_SCALE_ADAPTER_VERSION|typeof ONLINE_SJT_ADAPTER_VERSION;provenance:Record<string,unknown>}
 export type CatalogSourceRow={ref:CatalogSourceRef;title:string;available:boolean;unsupportedReason:string|null;definitionDigest?:string}
 const CATALOG_MAX_PAGE=40
 export type CatalogSourcePage={list:CatalogSourceRow[];page:number;hasMore:boolean;terminalReason:'PAGE_LIMIT_REACHED'|'END_OF_CATALOG'|null}
@@ -86,11 +87,18 @@ function adaptLegacyCatalogScale(ref:CatalogSourceRef,title:string,definition:Sc
     {source:definition.source,license:definition.license,originalScoreKeys:definition.scoring.scores.map(s=>s.key),presentationOnly:true},answerMapping)
 }
 export function catalogAdapterForRecheck(current:CatalogSourceSnapshot,stored:CatalogSourceSnapshot):CatalogSourceSnapshot {
+  if(stored.ref.kind==='SJT'&&stored.adapterVersion===CATALOG_ADAPTER_VERSION&&current.adapterVersion===ONLINE_SJT_ADAPTER_VERSION){
+    // A previously admitted raw-channel projection keeps its original digest.
+    // New online grants must not rewrite that immutable presentation on recheck.
+    return adaptLegacyCatalogSjt(current.ref,current.title,current.compiledDefinition as SituationDefinitionV2,
+      String(current.provenance.definitionHash))
+  }
   if(stored.ref.kind!=='SCALE'||stored.adapterVersion!==CATALOG_ADAPTER_VERSION)return current
   const legacy=adaptLegacyCatalogScale(current.ref,current.title,current.compiledDefinition as ScaleDefinitionV2)
   return {...current,...legacy,provenance:{...current.provenance,...legacy.provenance}}
 }
-/** This adapter admits only complete, fixed V2 expert-key presentations; no branch flattening. */
+/** Exact authorized scoring plane. Online sources retain their validated shared
+ * presentation; legacy sources keep the original narrow raw-channel adapter. */
 export function adaptCatalogSjt(ref:CatalogSourceRef,title:string,pkg:SituationPackage):CatalogSourceSnapshot {
   rights(pkg.definition.license)
   if(pkg.releaseStatus!=='PUBLISHED')fail('SOURCE_NOT_PUBLISHED')
@@ -99,6 +107,22 @@ export function adaptCatalogSjt(ref:CatalogSourceRef,title:string,pkg:SituationP
   if(pkg.definition.schemaVersion!==2)fail('SOURCE_SJT_V1_REQUIRES_SEPARATE_RUNTIME_ADAPTER')
   const d=pkg.definition as SituationDefinitionV2
   if(d.researchAssignment)fail('SOURCE_SJT_RESEARCH_CAPTURE_UNSUPPORTED')
+  const model=d.scoring.model
+  if(!model||!['AUTHOR_KEY_SUM','EXPERT_KEY'].includes(model.modelKey)||model.modelVersion!=='1')throw new CatalogSourceError('SOURCE_SJT_MODEL_UNSUPPORTED')
+  if(pkg.online){
+    // validateSituationPackage above verifies displayHash AND recompiles the
+    // shared online protocol against this exact definitionHash. Do not flatten
+    // MULTIPLE/refusal/mother-scene semantics back into raw scorer options.
+    if(pkg.online.display.scenes.some(scene=>scene.image)&&ref.sourceId.startsWith('registry:'))fail('SOURCE_SJT_ONLINE_MEDIA_REQUIRES_AUTHORIZED_DELIVERY')
+    return {...snapshot(ref,title,d,pkg.online.display,d,canonicalHash(d.scoring),
+      {source:d.source,license:d.license,definitionHash:validation.definitionHash}),
+      adapterVersion:ONLINE_SJT_ADAPTER_VERSION}
+  }
+  return adaptLegacyCatalogSjt(ref,title,d,validation.definitionHash)
+}
+
+/** Historical grants are checked using their original projection, not upgraded. */
+function adaptLegacyCatalogSjt(ref:CatalogSourceRef,title:string,d:SituationDefinitionV2,definitionHash:string):CatalogSourceSnapshot {
   const model=d.scoring.model
   if(!model||!['AUTHOR_KEY_SUM','EXPERT_KEY'].includes(model.modelKey)||model.modelVersion!=='1')throw new CatalogSourceError('SOURCE_SJT_MODEL_UNSUPPORTED')
   const nodes=new Map(d.flow.nodes.map(n=>[n.nodeKey,n]));const visited=new Set<string>();const scenes:typeof d.scenes=[]
@@ -128,7 +152,7 @@ export function adaptCatalogSjt(ref:CatalogSourceRef,title:string,pkg:SituationP
           return [m.key,entries[0].contribution]
         }))}))}
     })}))}
-  return snapshot(ref,title,d,display,d,canonicalHash(d.scoring),{source:d.source,license:d.license,definitionHash:validation.definitionHash})
+  return snapshot(ref,title,d,display,d,canonicalHash(d.scoring),{source:d.source,license:d.license,definitionHash})
 }
 export function adaptCatalogCognitive(ref:CatalogSourceRef,row:{name:string;testType:string;configVersion:string;engineVersion:string;scoringVersion:string;config:unknown;status:string;accessPolicy:string}):CatalogSourceSnapshot {
   if(row.status!=='PUBLISHED')fail('SOURCE_NOT_PUBLISHED')
@@ -233,7 +257,9 @@ async function readCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSo
     if(ref.sourceId.startsWith('registry:'))pkg=getSituationPackage(ref.sourceId.slice(9),ref.sourceVersion)
     else{
       const row=await db.sjtAuthorRelease.findFirst({where:{id:ref.sourceId,instrumentVersion:ref.sourceVersion,status:'PUBLISHED'}})
-      if(row){pkg=row.package as unknown as SituationPackage
+      if(row){
+        if(row.authorizationPolicy!==null)fail('SOURCE_SJT_AUTHORIZATION_POLICY_UNSUPPORTED')
+        pkg=row.package as unknown as SituationPackage
         const checked=validateSituationPackage(pkg)
         if(!checked.valid||checked.definitionHash!==row.definitionHash||pkg.key!==row.instrumentKey||pkg.instrumentVersion!==row.instrumentVersion)fail('SOURCE_SJT_RELEASE_DIGEST_MISMATCH')}
     }

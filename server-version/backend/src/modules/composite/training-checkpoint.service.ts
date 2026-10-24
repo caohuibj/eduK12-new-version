@@ -16,8 +16,8 @@ import { encodeTrainingCheckpointEnvelope, nextTrainingCheckpointSave, readTrain
 const hash = z.string().regex(/^[0-9a-f]{64}$/)
 export const trainingCheckpointSaveSchema = z.object({ expectedRevision: z.number().int().min(0), attemptEpoch: z.number().int().min(1),
   envelope: z.object({ schemaVersion: z.literal(1), snapshotHash: hash, definitionHash: hash,
-    drafts: z.array(z.object({ slotKey: z.string().min(1).max(240), answers: z.record(z.unknown()),
-      itemTimings: z.record(scaleTimingItemSchema).optional() }).strict()).max(100),
+    drafts: z.array(z.object({ slotKey: z.string().min(1).max(240), answers: z.record(z.string(), z.unknown()),
+      itemTimings: z.record(z.string(), scaleTimingItemSchema).optional() }).strict()).max(100),
     cognitiveResults: z.array(z.object({ slotKey: z.string().min(1).max(240), resultId: z.string().min(1).max(200),
       sessionId: z.string().min(1).max(200), submissionId: z.string().min(1).max(200) }).strict()).max(100),
   }).strict(),
@@ -26,6 +26,9 @@ export type TrainingCheckpointSave = z.infer<typeof trainingCheckpointSaveSchema
 type Principal = { userId?: string; recoveryTokenHash?: string }
 const fail = (status: number, message: string): never => { throw new TrainingPersistenceError(status, message) }
 const TX_OPTIONS = { maxWait: 1_000, timeout: 5_000 }
+// Write acknowledgements and CLEAR never consume draft ciphertext. GET and SAVE
+// retain their payload reads for recovery integrity and expiry/CAS respectively.
+const checkpointMetadataSelect = { revision: true, successfulSaveCount: true, expiresAt: true } as const
 async function limits(tx: Prisma.TransactionClient) {
   await tx.$executeRawUnsafe("SET LOCAL lock_timeout = '500ms'")
   await tx.$executeRawUnsafe("SET LOCAL statement_timeout = '2000ms'")
@@ -103,26 +106,35 @@ async function validateDrafts(tx: Prisma.TransactionClient, context: Awaited<Ret
   const scales = scaleIds.length ? await tx.assessment.findMany({where:{compositeAttemptId:a.id,attemptEpoch:a.attemptEpoch,compositeItemId:{in:scaleIds},status:'IN_PROGRESS'},select:{scaleId:true,compositeItemId:true,runtimeSnapshotEncrypted:true}}) : []
   await assertTrainingScaleCollectionAllowed(tx,scales.map(row=>row.scaleId))
   const sjts = sjtIds.length ? await tx.situationalAttempt.findMany({where:{compositeAttemptId:a.id,attemptEpoch:a.attemptEpoch,compositeItemId:{in:sjtIds},status:'IN_PROGRESS'},select:{compositeItemId:true,runtimeSnapshotEncrypted:true}}) : []
+  const formsById = new Map(forms.map(row=>[row.sectionId,row]))
+  // Historical scale children have no unique composite item constraint. Keep
+  // the previous find() first-match behavior rather than choosing the last row.
+  const scalesById = new Map<string | null, (typeof scales)[number]>()
+  for (const row of scales) {
+    const key = row.compositeItemId
+    if (!scalesById.has(key)) scalesById.set(key,row)
+  }
+  const sjtsById = new Map(sjts.map(row=>[row.compositeItemId,row]))
   for (const draft of envelope.drafts) {
     const slot = slots.get(draft.slotKey)!
     let allowed: Set<string>
     if (slot.unitType!=='SCALE' && draft.itemTimings!==undefined) fail(400,'只有已启用计时的量表可以保存计时')
     if (slot.unitType==='FORM_SECTION') {
-      const row = forms.find(r=>r.sectionId===slot.sourceBinding.sectionId)
+      const row = formsById.get(slot.sourceBinding.sectionId as string)
       if (!row) fail(409,'表单未到达或已交卷')
       const { compositeFormSectionRuntimeDefinition } = await import('./composite.service')
       const definition = compositeFormSectionRuntimeDefinition(row!.section)
       if (canonicalHash(definition)!==slot.sourceDefinitionIdentity.hash) fail(409,'表单冻结定义不匹配')
       allowed = new Set(definition.items.map((item:any)=>item.id))
     } else if (slot.unitType==='SCALE') {
-      const row = scales.find(r=>r.compositeItemId===slot.sourceBinding.compositeItemId)
+      const row = scalesById.get(slot.sourceBinding.compositeItemId as string)
       if (!row?.runtimeSnapshotEncrypted) fail(409,'量表未到达或已交卷')
       const runtime = await loadFrozenScaleRuntimeSnapshot(row!.runtimeSnapshotEncrypted!,tx)
       if (runtime.sourceDefinitionHash!==slot.sourceDefinitionIdentity.hash) fail(409,'量表冻结定义不匹配')
       allowed = new Set(runtime.definition.items.map(item=>item.itemCode))
       normalizeTrainingScaleTiming(a.trainingTimingSnapshot,[...allowed],Object.keys(draft.answers),draft.itemTimings)
     } else {
-      const row = sjts.find(r=>r.compositeItemId===slot.sourceBinding.compositeItemId)
+      const row = sjtsById.get(slot.sourceBinding.compositeItemId as string)
       if (!row) fail(409,'情境工具未到达或已交卷')
       const runtime = decryptFrozenSituationalRuntimeSnapshot(row!.runtimeSnapshotEncrypted)
       if (runtime.definitionHash!==slot.sourceDefinitionIdentity.hash) fail(409,'情境冻结定义不匹配')
@@ -134,8 +146,9 @@ async function validateDrafts(tx: Prisma.TransactionClient, context: Awaited<Ret
   const refs=envelope.cognitiveResults
   if (new Set(refs.map(ref=>ref.slotKey)).size!==refs.length || new Set(refs.map(ref=>ref.resultId)).size!==refs.length) fail(400,'重复认知结果引用')
   const facts = refs.length ? await tx.assessmentUnitSnapshot.findMany({where:{compositeAttemptId:a.id,attemptEpoch:a.attemptEpoch,id:{in:refs.map(r=>r.resultId)},unitType:'COGNITIVE'},select:{id:true,slotKey:true,sourceAttemptId:true,sourceSubmissionId:true,sourceDefinitionHash:true,terminalState:true}}) : []
+  const factsById = new Map(facts.map(fact=>[fact.id,fact]))
   for (const ref of refs) {
-    const slot=slots.get(ref.slotKey),fact=facts.find(f=>f.id===ref.resultId)
+    const slot=slots.get(ref.slotKey),fact=factsById.get(ref.resultId)
     if (!slot || slot.unitType!=='COGNITIVE' || !fact || fact.slotKey!==ref.slotKey || fact.sourceAttemptId!==ref.sessionId || fact.sourceSubmissionId!==ref.submissionId || fact.sourceDefinitionHash!==slot.sourceDefinitionIdentity.hash || fact.terminalState!=='COMPLETED') fail(409,'认知结果必须引用本作答已接受的锁定事实')
   }
 }
@@ -179,9 +192,9 @@ export async function saveTrainingCheckpoint(attemptId:string,principal:Principa
     const state=nextTrainingCheckpointSave(row??{revision:0,successfulSaveCount:0},input.expectedRevision)
     await validateDrafts(tx,c,input.envelope)
     const data={...state,payloadEncrypted:encryptSerializedField(encoded.plaintext),payloadHash:encoded.payloadHash,expiresAt:c.expiresAt}
-    row = row ? await tx.trainingAttemptCheckpoint.update({where:{attemptId},data}) : await tx.trainingAttemptCheckpoint.create({data:{attemptId,
+    const saved = row ? await tx.trainingAttemptCheckpoint.update({where:{attemptId},data,select:checkpointMetadataSelect}) : await tx.trainingAttemptCheckpoint.create({select:checkpointMetadataSelect,data:{attemptId,
       snapshotHash:c.attempt.trainingPersistenceSnapshotHash!,definitionHash:c.attempt.frozenActiveSlotSetHash!,attemptEpoch:c.attempt.attemptEpoch,roundId:c.snapshot.roundId,...data}})
-    return response(row,trainingPersistenceMetadata(c.attempt))
+    return response(saved,trainingPersistenceMetadata(c.attempt))
   },TX_OPTIONS)
 }
 export async function clearTrainingCheckpoint(attemptId:string,principal:Principal,input:{expectedRevision:number;attemptEpoch:number}) {
@@ -189,11 +202,11 @@ export async function clearTrainingCheckpoint(attemptId:string,principal:Princip
     await limits(tx)
     const c=await access(tx,attemptId,principal,input.attemptEpoch)
     if(c.closed){await clearPayload(tx,attemptId);return {closed:true}}
-    const row=await tx.trainingAttemptCheckpoint.findUnique({where:{attemptId}})
+    const row=await tx.trainingAttemptCheckpoint.findUnique({where:{attemptId},select:checkpointMetadataSelect})
     if ((row?.revision??0)!==input.expectedRevision) fail(409,'Checkpoint 已被其他窗口更新')
     // Even an empty clear establishes a tombstone revision, invalidating stale initial CAS.
-    const cleared=row ? await tx.trainingAttemptCheckpoint.update({where:{attemptId},data:{payloadEncrypted:null,payloadHash:null,expiresAt:null,revision:{increment:1}}})
-      : await tx.trainingAttemptCheckpoint.create({data:{attemptId,snapshotHash:c.attempt.trainingPersistenceSnapshotHash!,definitionHash:c.attempt.frozenActiveSlotSetHash!,attemptEpoch:c.attempt.attemptEpoch,roundId:c.snapshot.roundId,revision:1}})
+    const cleared=row ? await tx.trainingAttemptCheckpoint.update({where:{attemptId},select:checkpointMetadataSelect,data:{payloadEncrypted:null,payloadHash:null,expiresAt:null,revision:{increment:1}}})
+      : await tx.trainingAttemptCheckpoint.create({select:checkpointMetadataSelect,data:{attemptId,snapshotHash:c.attempt.trainingPersistenceSnapshotHash!,definitionHash:c.attempt.frozenActiveSlotSetHash!,attemptEpoch:c.attempt.attemptEpoch,roundId:c.snapshot.roundId,revision:1}})
     return response(cleared,trainingPersistenceMetadata(c.attempt))
   },TX_OPTIONS)
 }

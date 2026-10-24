@@ -1,10 +1,12 @@
+import {PersonalParticipationLink} from '../../../components/participation/PersonalParticipationLink'
+import {trainingAttemptLink} from '../../../components/participation/training-participation-link'
 import { useTrainingLearnerNavigation } from '../../../training/learnerNavigation'
 import { TrainingCheckpointPanel } from '../../composite/TrainingCheckpointPanel'
 import { situationalCheckpointAnswers, situationalCheckpointUnsupported } from '../training-checkpoint-adapter'
 import { OnlineAnswerField } from '../OnlineAnswerField'
 import { withOnlineRunner, onlineResponses } from '../online'
 import { situationalBasePath } from '../paths'
-import { situationalHistoryIdentities, invalidateChangedSituationalHistory } from '../history'
+import { situationalHistoryIdentities, createSituationalHistorySnapshot } from '../history'
 import { researchEventsFromTrials, missingResearchExposureEvents, appendResearchEvents, currentResponseStage, eventTime, researchCapture, researchEnabled, restoreResearchAnswers, type SituationalResearchEvent } from '../research'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CheckCircle2, ChevronLeft, ChevronRight, CircleAlert, Loader2, Send } from 'lucide-react'
@@ -22,6 +24,7 @@ import {
   ensureSituationalDraft,
   firstMissingSceneIndex,
   pruneSituationalDraftResponses,
+  pruneInvalidatedSituationalDraftResponses,
   pruneUnreachableSituationalResponses,
   readSituationalDraft,
   responseKey,
@@ -411,14 +414,15 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
         if (JSON.stringify(previous[key]?.responseValue) === JSON.stringify(responseValue) && previous[key]?.status === status) return
         const definition = currentData.instrument.definition
         const node = definition.schemaVersion === 2 ? definition.flow.nodes.find(n => n.nodeType === 'SCENE' && n.sceneKey === scene.sceneKey) : undefined
-        const historyIdentity = situationalHistoryIdentities(definition, previous)[scene.sceneKey] ?? '[]'
+        const historySnapshot = createSituationalHistorySnapshot(definition, previous)
+        const historyIdentity = historySnapshot.identities[scene.sceneKey] ?? '[]'
         const stage = node?.nodeType === 'SCENE' ? currentResponseStage(node, historyIdentity, researchEventsRef.current) : null
         if (node?.nodeType === 'SCENE' && node.responseStages && !stage?.channelKeys.includes(channel.channelKey)) throw new Error('已确认的作答不能在后续信息披露后修改。')
         const answer: SituationalDraftAnswer = {
           responseValue, responseTimeMs, answeredAt, ...(status ? {status} : {}),
           ...(definition.schemaVersion === 2 ? { historyIdentity, responseRevision: (previous[key]?.responseRevision ?? 0) + 1 } : {}),
         }
-        const invalidated = invalidateChangedSituationalHistory(definition, previous, { ...previous, [key]: answer })
+        const invalidated = historySnapshot.invalidate({ ...previous, [key]: answer })
         setContinuousInputs(current => { const updated = { ...current }; invalidated.staleKeys.forEach(k => delete updated[k]); return updated })
         if (researchEnabled(currentData) && node?.nodeType === 'SCENE') {
           const time = eventTime(currentData, researchEventsRef.current)
@@ -442,11 +446,10 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
           value: answer,
           updatedAt: Date.now(),
         })
-        const nextResponses = await pruneSituationalDraftResponses(
+        const nextResponses = await pruneInvalidatedSituationalDraftResponses(
           currentData.attempt,
-          currentData.instrument.definition,
-          { ...previous, [key]: answer },
-          previous,
+          definition,
+          invalidated,
         )
         responsesRef.current = nextResponses
         const nextScenes = reachableSituationalScenes(currentData.instrument.definition, nextResponses)
@@ -570,7 +573,11 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
       setNotice('还有必答通道未完成，请补充后再提交。')
       return
     }
-    if (!submissionLocked && data.instrument.definition.schemaVersion === 2 && data.instrument.definition.flow.nodes.some(node => node.nodeType === 'SCENE' && node.responseStages && trajectory.nodeKeys.includes(node.nodeKey) && currentResponseStage(node, situationalHistoryIdentities(data.instrument.definition, responsesRef.current)[node.sceneKey] ?? '[]', researchEventsRef.current))) { setNotice('请先确认当前阶段的作答。'); return }
+    if (!submissionLocked && data.instrument.definition.schemaVersion === 2) {
+      // This synchronous precheck is separate from the authoritative sealed snapshot below.
+      let currentHistories: Record<string, string> | undefined
+      if (data.instrument.definition.flow.nodes.some(node => node.nodeType === 'SCENE' && node.responseStages && trajectory.nodeKeys.includes(node.nodeKey) && currentResponseStage(node, (currentHistories ??= situationalHistoryIdentities(data.instrument.definition, responsesRef.current))[node.sceneKey] ?? '[]', researchEventsRef.current))) { setNotice('请先确认当前阶段的作答。'); return }
+    }
     if (!submissionLocked && !situationalReadyToSubmit(data.instrument.definition, responsesRef.current)) {
       setNotice('当前分支尚未到达可提交的结束节点，请完成当前决策路径。')
       return
@@ -761,6 +768,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
       actions={actions}
       navigation={navigation}
     >
+      {publicMode&&compositeAttemptId&&recoveryToken&&<details className="mb-4 rounded border p-3"><summary>保存本次匿名测评恢复链接</summary><PersonalParticipationLink url={trainingAttemptLink.link(window.location.origin,compositeAttemptId,{key:recoveryToken})} firstTime={false} fileLabel="本次情境测评" scopeNotice="恢复所属测评的当前任务，不新建身份或关联其他波次；未提交的本机情境记录请在原设备继续。" onSaved={()=>{}}/></details>}
       {!campus && embedded && data.trainingPersistence?.checkpoint ? situationalCheckpointUnsupported(data)
         ? <p role="status" className="mb-4 rounded border p-3">此情境任务依赖本机研究阶段记录或视频观看凭据，暂不支持服务器答案草稿恢复。请在原浏览器继续；不会生成或代替这些记录。</p>
         : <TrainingCheckpointPanel policy={data.trainingPersistence} definitionHash={data.checkpointDefinitionHash} publicMode={publicMode} recoveryToken={recoveryToken} disabled={saving||submitting||submissionLocked} onBusy={setCheckpointBusy} activeSlotKeys={[`situational:${compositeItemId}`]} preserveOtherDrafts

@@ -28,7 +28,7 @@ export type TrainingAnalysisExportOptions = z.infer<typeof trainingAnalysisExpor
 export const trainingAnalysisProvenanceSchema = z.object({
   version: z.literal(2),
   resourceType: z.literal('TRAINING_ANALYSIS'),
-  generation: z.string().uuid(),
+  generation: z.string().guid(),
   creatorRole: z.enum(['ADMIN', 'TEACHER']),
   audience: z.literal('teacher'),
   trainingAnalysis: trainingAnalysisExportOptionsSchema,

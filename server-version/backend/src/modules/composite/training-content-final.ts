@@ -53,6 +53,26 @@ export async function prepareTrainingFinalReceipt(tx:Prisma.TransactionClient,in
   if(parent.compositeAssessment.id!==binding.compositeId)fail()
   const bySlot=new Map(input.verifiedPayloads.map(p=>[p.header.slotKey,p]))
   if(bySlot.size!==input.verifiedPayloads.length)fail()
+  // Index frozen bindings only. Authority validation still runs on every read,
+  // in binding order, including every unit sharing a release.
+  const referenceUnitsByItemId=new Map(referenceBinding?.units.map(unit=>[unit.itemId,unit]))
+  const measurementUnitsByReleaseId=new Map<string,typeof binding.units>()
+  const selectedReferenceUnitsByReleaseId=new Map<string,typeof binding.units>()
+  for(const unit of binding.units){
+    const measurementUnits=measurementUnitsByReleaseId.get(unit.measurement.releaseId)
+    if(measurementUnits)measurementUnits.push(unit)
+    else measurementUnitsByReleaseId.set(unit.measurement.releaseId,[unit])
+    // Match the former filter/some semantics: multiple slots for the same
+    // release contribute this unit once, not once per selected slot.
+    const selectedReleaseIds=new Set<string>()
+    for(const slot of referenceUnitsByItemId.get(unit.itemId)?.references??[]){
+      if(slot.status!=='SELECTED'||selectedReleaseIds.has(slot.releaseId))continue
+      selectedReleaseIds.add(slot.releaseId)
+      const referenceUnits=selectedReferenceUnitsByReleaseId.get(slot.releaseId)
+      if(referenceUnits)referenceUnits.push(unit)
+      else selectedReferenceUnitsByReleaseId.set(slot.releaseId,[unit])
+    }
+  }
   const cache=new Map<string,StoredRelease>(),sources:TrainingFinalReceipt['sources']=[]
   const readRelease=async(id:string,expectedHash:string)=>{
     let release=cache.get(id)
@@ -62,11 +82,11 @@ export async function prepareTrainingFinalReceipt(tx:Prisma.TransactionClient,in
     if(release.layer==='REPORT'){
       if(scope.kind!=='PRIVATE'||scope.product!=='TRAINING'||scope.ownerId!==parent.compositeAssessment.createdBy||scope.resourceId!==binding.compositeId)fail()
     }else if(release.layer==='MEASUREMENT'){
-      const matching=binding.units.filter(u=>u.measurement.releaseId===id)
+      const matching=measurementUnitsByReleaseId.get(id)??[]
       if(!matching.length)fail()
       for(const unit of matching)if(release.family!==unit.family||!await trainingMeasurementSourceScopeMatchesForConsumer(tx,release,unit.source))fail()
     }else if(release.layer==='REFERENCE'){
-      const matching=binding.units.filter(u=>referenceBinding?.units.find(r=>r.itemId===u.itemId)?.references.some(r=>r.status==='SELECTED'&&r.releaseId===id))
+      const matching=selectedReferenceUnitsByReleaseId.get(id)??[]
       if(!matching.length)fail()
       for(const unit of matching)await validateTrainingReferenceRelease(tx,{unit,ownerId:parent.compositeAssessment.createdBy,compositeId:binding.compositeId,
         releaseId:id,contentHash:expectedHash,purpose:'HISTORY',releases:cache})
@@ -74,7 +94,7 @@ export async function prepareTrainingFinalReceipt(tx:Prisma.TransactionClient,in
     return release
   }
   const interpretation:FinalInterpretation=await interpretContentBinding({contentBindingHash:parent.trainingContentBindingHash!,
-    binding:{populationContext,units:binding.units.map(u=>({...u,instrumentKey:u.itemId,references:referenceBinding?.units.find(r=>r.itemId===u.itemId)?.references??[]}))},readRelease,
+    binding:{populationContext,units:binding.units.map(u=>({...u,instrumentKey:u.itemId,references:referenceUnitsByItemId.get(u.itemId)?.references??[]}))},readRelease,
     readFacts:(unit,measurement)=>{
       const payload=bySlot.get(compositeItemSlotKey(unit.itemId,unit.family==='SJT'?'SITUATIONAL':unit.family))
       const envelope=payload?.envelope

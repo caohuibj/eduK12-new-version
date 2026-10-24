@@ -48,7 +48,9 @@ describe('legacy content lists reject unrecognized principals before side effect
       await controller.list({ user: { userId: 'actor', role }, query: {} } as any, res)
       expect(res.statusCode).toBe(200)
     }
-    if (role === 'TEACHER') expect(mocks.course.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: { creatorId: 'actor' } }))
+    if (role === 'TEACHER') {
+      for (const model of [mocks.assignment, mocks.checkin]) expect(model.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ course: { creatorId: 'actor', courseType: { not: 'CAMPUS_ACTIVITY' } } }) }))
+    }
     if (role === 'STUDENT') {
       expect(mocks.assignment.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ status: 'PUBLISHED', course: expect.objectContaining({ students: expect.anything() }) }) }))
       expect(mocks.checkin.findMany).toHaveBeenCalledWith(expect.objectContaining({ where: expect.objectContaining({ course: expect.objectContaining({ students: expect.anything() }) }) }))

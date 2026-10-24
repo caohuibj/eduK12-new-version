@@ -5,7 +5,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { reportingFail, type ReportingCohortSelectorInputV2 } from './types'
 
 export const MAX_COHORT_SELECTOR_REFERENCES = 5000
-const ids = z.array(z.string().uuid()).min(1).max(MAX_COHORT_SELECTOR_REFERENCES)
+const ids = z.array(z.string().guid()).min(1).max(MAX_COHORT_SELECTOR_REFERENCES)
 
 export const cohortSelectorSchema = z.object({
   schemaVersion: z.literal(2),

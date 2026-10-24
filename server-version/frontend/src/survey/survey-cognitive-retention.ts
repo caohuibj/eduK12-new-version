@@ -1,4 +1,3 @@
-import { finalDraftStore } from '../services/persistence/finalDraftStore'
 import { readSurveyCognitiveSessionIds } from './survey-cognitive-local'
 
 const cursorKey='huisurvey:v1:cognitive-retention-cursor'
@@ -51,6 +50,10 @@ export async function cleanupExpiredSurveyCognitiveDrafts():Promise<void>{
   try{
     const manager=locks()
     if(!manager||!mayCleanup())return // Cannot prove no active peer: retain rather than guess.
+    // Keep the durable store out of the participant entry's eager dependency graph.
+    // Loading failure is best-effort cleanup failure, never permission to discard drafts.
+    const {finalDraftStore}=await import('../services/persistence/finalDraftStore')
+    if(!mayCleanup())return
     const legacy=new Set(readSurveyCognitiveSessionIds())
     const savedCursor=localStorage.getItem(cursorKey)
     const after=savedCursor&&savedCursor.length<=512?savedCursor:null

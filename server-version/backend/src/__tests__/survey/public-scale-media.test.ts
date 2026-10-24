@@ -3,11 +3,13 @@ const state=vi.hoisted(()=>({assets:[] as unknown[],pins:[] as unknown[]}))
 vi.mock('../../config',()=>({config:{assetSigningSecret:'synthetic-public-media-test-secret',uploadDir:'/tmp/synthetic-public-media-tests'}}))
 vi.mock('../../config/database',()=>({prisma:{
  $transaction:async(fn:(tx:unknown)=>unknown)=>fn({}),
- storedAsset:{findMany:async()=>state.assets},assetReference:{findMany:async()=>state.pins},
+ storedAsset:{findMany:async()=>state.assets},assetReference:{findMany:async()=>state.pins,findFirst:vi.fn(async()=>state.pins[0]??null)},
 }}))
 vi.mock('../../modules/survey/admission.service',()=>({verifiedSurveyAttempt:vi.fn()}))
 vi.mock('../../modules/survey/flow.assignment',()=>({ensureSurveyFlowAssignment:vi.fn(),assignedSurveySnapshot:vi.fn()}))
 vi.mock('../../modules/survey/waves.service',()=>({SurveyWaveError:class extends Error{constructor(readonly statusCode:number,message:string){super(message)}}}))
+import {prisma} from '../../config/database'
+import {authorizeOwnSurveyImage} from '../../modules/survey/public-scale-media'
 import {verifiedSurveyAttempt} from '../../modules/survey/admission.service'
 import {ensureSurveyFlowAssignment,assignedSurveySnapshot} from '../../modules/survey/flow.assignment'
 import {createCustomScaleDefinition} from '../../modules/scale/scale-definition'
@@ -82,5 +84,29 @@ describe('Survey canonical Scale participant media boundary',()=>{
   vi.mocked(assignedSurveySnapshot).mockReturnValueOnce({...selected,units:[]})
   await expect(issueOwnSurveyScaleVideo(proof,'scale','i_0')).rejects.toThrow()
   expect(ensureSurveyFlowAssignment).toHaveBeenCalledWith(expect.anything(),expect.objectContaining({attemptId:'attempt',accessCredential:'secret',snapshot:original}))
+ })
+})
+
+
+describe('Survey sourced SJT image access',()=>{
+ const sjt=(source=true)=>({instrumentKey:'sjt',kind:'SJT',displayDefinition:{schemaVersion:2,scenes:[{sceneKey:'scene',image,questions:[]}]},...(source?{sourceProvenance:{source:{kind:'SJT',sourceId:'release'}}}:{})})
+ it('requires the actual selected source image and this publication retention',async()=>{
+  selected.units=[sjt() as never]
+  expect(await authorizeOwnSurveyImage(proof,'image')).toEqual(image.asset)
+  expect(prisma.assetReference.findFirst).toHaveBeenCalledWith({where:{assetId:'image',entityType:'SurveyResearchPublication',entityId:'publication',field:'media'},select:{id:true}})
+  state.pins=[]; await expect(authorizeOwnSurveyImage(proof,'image')).rejects.toMatchObject({statusCode:404})
+  await expect(authorizeOwnSurveyImage(proof,'unassigned')).rejects.toMatchObject({statusCode:404})
+ })
+ it('preserves native Survey frozen images without imposing new grant/pin requirements',async()=>{
+  selected.units=[sjt(false) as never]; state.pins=[]
+  expect(await authorizeOwnSurveyImage(proof,'image')).toEqual(image.asset)
+  expect(prisma.assetReference.findFirst).not.toHaveBeenCalled()
+ })
+ it('keeps fresh participant proof and persisted assignment checks before image disclosure',async()=>{
+  selected.units=[sjt() as never]
+  vi.mocked(verifiedSurveyAttempt).mockRejectedValueOnce(new Error('invalid proof'))
+  await expect(authorizeOwnSurveyImage(proof,'image')).rejects.toThrow('invalid proof')
+  vi.mocked(assignedSurveySnapshot).mockReturnValueOnce({...selected,units:[]})
+  await expect(authorizeOwnSurveyImage(proof,'image')).rejects.toMatchObject({statusCode:404})
  })
 })

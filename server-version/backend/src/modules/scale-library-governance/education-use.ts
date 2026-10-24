@@ -11,8 +11,8 @@ import {loadEntry} from './service'
 import type {LibraryUseRow} from './usage'
 
 export const educationLibraryUseInput=z.object({
-  product:educationLibraryProduct,organizationId:z.string().uuid(),actorId:z.string().uuid(),
-  entryId:z.string().uuid(),releaseId:z.string().uuid(),contentHash:z.string().regex(/^[a-f0-9]{64}$/),
+  product:educationLibraryProduct,organizationId:z.string().guid(),actorId:z.string().guid(),
+  entryId:z.string().guid(),releaseId:z.string().guid(),contentHash:z.string().regex(/^[a-f0-9]{64}$/),
 }).strict()
 
 /** Read-only authorization projection, NOT a publication/runtime capability.
@@ -22,7 +22,7 @@ export const educationLibraryUseInput=z.object({
  */
 export async function readEducationLibraryUse(tx:Prisma.TransactionClient,raw:z.input<typeof educationLibraryUseInput>,options?:{onlyGrantId:string}){
   const input=educationLibraryUseInput.parse(raw)
-  const onlyGrantId=options?z.string().uuid().parse(options.onlyGrantId):null
+  const onlyGrantId=options?z.string().guid().parse(options.onlyGrantId):null
   const member=await resolveEducationProductMemberScope({actorUserId:input.actorId,
     organizationId:input.organizationId,product:educationLibraryEntry[input.product]},tx)
   if(!member)fail('EDUCATION_LIBRARY_MEMBERSHIP_REQUIRED',403)

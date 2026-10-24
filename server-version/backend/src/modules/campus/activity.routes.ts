@@ -19,7 +19,7 @@ import {
 } from './activity.service'
 
 const router=Router()
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 const params=z.object({organizationId:uuid})
 const activityParams=params.extend({courseId:uuid})
 const purpose=z.enum(['STUDENT_WELLBEING','LEARNING_ADAPTATION','SCHOOL_CLIMATE','FAMILY_SUPPORT'])

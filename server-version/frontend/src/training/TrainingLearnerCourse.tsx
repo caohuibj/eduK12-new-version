@@ -40,6 +40,7 @@ export default function TrainingLearnerCourse() {
   const [assessmentsLoading, setAssessmentsLoading] = useState(false)
   const [assessmentRevision, setAssessmentRevision] = useState(0)
   const requests = useRef<CourseRequests>({ key: '' })
+  const assessmentRequest = useRef<{ key: string; promise: Promise<CourseAssessmentResult> } | null>(null)
 
   // Keep current course data separate from previous course. Ignore stale loads.
   useEffect(() => {
@@ -92,7 +93,14 @@ export default function TrainingLearnerCourse() {
     if (!courseId || !course || course.id !== courseId || section !== 'assessments' || assessments) return
     let alive = true
     setAssessmentsLoading(true)
-    void loadCourseAssessments(courseId, cognitiveEnabled).then(result => {
+    // Reuse the in-flight discovery when a learner leaves and returns to this
+    // tab. Keep it local to this mount and invalidate on course, retry or
+    // capability changes; no cross-session or durable availability cache.
+    const key = JSON.stringify([courseId, epoch, assessmentRevision, cognitiveEnabled])
+    if (assessmentRequest.current?.key !== key) {
+      assessmentRequest.current = { key, promise: loadCourseAssessments(courseId, cognitiveEnabled) }
+    }
+    void assessmentRequest.current.promise.then(result => {
       if (!alive) return
       // Publish data and its settled loading state together. Updating assessments
       // invalidates this effect, so a later finally callback can be cancelled.
@@ -104,7 +112,7 @@ export default function TrainingLearnerCourse() {
       setAssessments({ items: [], errors: [message(error)] })
     })
     return () => { alive = false }
-  }, [courseId, course, section, assessments, assessmentRevision, cognitiveEnabled])
+  }, [courseId, course, section, assessments, epoch, assessmentRevision, cognitiveEnabled])
 
   // The capability check may finish after the course page first renders.
   // Re-discover available cognitive assignments when the authoritative flag changes.

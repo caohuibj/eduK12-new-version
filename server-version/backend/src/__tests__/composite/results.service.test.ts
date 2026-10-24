@@ -1,3 +1,4 @@
+import { createFrozenActiveSlotSet, encryptFrozenActiveSlotSet } from '../../modules/assessment-runtime/slot-set'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { UserRole } from '@prisma/client'
 
@@ -7,6 +8,11 @@ process.env.COGNITIVE_MODULE_ENABLED = 'true'
 
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
+    cognitiveSession: { findMany: vi.fn() },
+    situationalAttempt: { findMany: vi.fn() },
+    compositeFormAnswer: { findMany: vi.fn() },
+    compositeFormSectionAttempt: { findMany: vi.fn() },
+
     compositeAssessment: {
       findMany: vi.fn(),
       findUnique: vi.fn(),
@@ -27,6 +33,8 @@ const { mockPrisma } = vi.hoisted(() => ({
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 vi.mock('../../modules/composite/composite-course-scope',()=>({assertCompositeCourseScope:vi.fn().mockResolvedValue({id:'course-a',title:'课程 A'})}))
+import { createCanonicalUnitResultEnvelope } from '../../modules/assessment-runtime/unit-result'
+import { encryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import { resolveCognitiveReferenceForResult } from '../../modules/cognitive/reference'
 import { readFrozenReport } from '../../modules/cognitive/profile-freeze'
@@ -197,6 +205,10 @@ const completedAttemptForReport = (overrides: Record<string, unknown> = {}) => (
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPrisma.cognitiveSession.findMany.mockImplementation(async () => (await mockPrisma.compositeAssessmentAttempt.findUnique.mock.results.at(-1)?.value)?.cognitiveSessions ?? [])
+  mockPrisma.situationalAttempt.findMany.mockImplementation(async () => (await mockPrisma.compositeAssessmentAttempt.findUnique.mock.results.at(-1)?.value)?.situationalAttempts ?? [])
+  mockPrisma.compositeFormAnswer.findMany.mockImplementation(async () => (await mockPrisma.compositeAssessmentAttempt.findUnique.mock.results.at(-1)?.value)?.formAnswers ?? [])
+  mockPrisma.compositeFormSectionAttempt.findMany.mockImplementation(async () => (await mockPrisma.compositeAssessmentAttempt.findUnique.mock.results.at(-1)?.value)?.formSectionAttempts ?? [])
   mockPrisma.compositeAssessmentAttempt.groupBy.mockResolvedValue([])
   mockPrisma.compositeAssessmentAttempt.findMany.mockResolvedValue([])
   mockPrisma.compositeAssessmentAttempt.count.mockResolvedValue(0)
@@ -846,5 +858,98 @@ describe('legacy composite approved-library report disclosure', () => {
     const report = await project(attempt)
     expect(report).toMatchObject({ reportKind: 'unavailable', reason: 'POLICY_UNAVAILABLE' })
     expect(report).not.toHaveProperty('scores')
+  })
+})
+
+
+// Unlike ordinary Prisma doubles, enforce nested selects so an omitted required
+// field really disappears and report-equivalence assertions detect it.
+const selectedRow = (row: any, query: any): any => {
+  if (row == null) return row
+  if (Array.isArray(row)) return row.map(value => selectedRow(value, query))
+  const fields = query?.select ?? query?.include
+  if (!fields) return row
+  const result: any = query.select ? {} : { ...row }
+  for (const [key, selection] of Object.entries(fields)) {
+    if (selection === false) delete result[key]
+    else if (selection === true) result[key] = row[key]
+    else if (selection && typeof selection === 'object') result[key] = selectedRow(row[key], selection)
+  }
+  return result
+}
+
+describe('participant report-only database projection', () => {
+  it.each(['LEGACY_COMPOSITE', 'QUESTIONNAIRE'])('preserves %s mixed frozen report JSON without loading raw answers or live definitions', async productKind => {
+    const full: any = completedAttemptForReport({ taskSatisfaction: 'SATISFIED' })
+    full.compositeAssessment.productKind = productKind
+    full.compositeAssessment.items.push({ id: 'item-sjt', type: 'SITUATIONAL',
+      situationalInstrumentKey: 'sjt-assertiveness-golden', situationalInstrumentVersion: '1.0.0' })
+    full.scaleAssessments[0].answers = 'PRIVATE_RAW_ANSWERS'
+    full.scaleAssessments[0].scale = { code: 'adexi_v1', instrumentVersion: '2.0.0', definition: 'PRIVATE_LIVE_DEFINITION' }
+    full.compositeAssessment.items[1].scale.definition = 'PRIVATE_LIVE_DEFINITION'
+    full.cognitiveSessions[0].trials = [{ trialIndex: 1, response: 'PRIVATE_TRIAL' }]
+    full.situationalAttempts = [{ compositeItemId: 'item-sjt', resultEncrypted: 'PRIVATE_LEGACY_RESULT',
+      instrumentKey: 'sjt-assertiveness-golden', instrumentVersion: '1.0.0', completedAt: full.completedAt, totalTime: 20,
+      canonicalResultEncrypted: encryptUnifiedRuntimePayload(createCanonicalUnitResultEnvelope({
+        core: { schemaVersion: 1, unitType: 'SITUATIONAL', instrumentKey: 'sjt-assertiveness-golden', instrumentVersion: '1.0.0',
+          sourceDefinitionHash: 'a'.repeat(64), compilerVersion: '1.0.0', compiledRuntimeHash: 'b'.repeat(64),
+          scorerKey: 'fixture', scorerVersion: '1.0.0', quality: { status: 'interpretable', flags: [] },
+          metrics: [{ key: 'assertiveness', value: 1.5 }], facts: [], references: [], contextHash: null,
+          scientificProvenance: { instrumentKey: 'sjt-assertiveness-golden', instrumentVersion: '1.0.0' } },
+        completedAt: full.completedAt,
+        persistenceProvenance: { sourceType: 'SITUATIONAL_ATTEMPT', sourceAttemptId: 'sjt-1', sourceSubmissionId: 'submission-1' },
+      })) }]
+    mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue(full)
+    const expected = JSON.stringify(await getReport('attempt-1', { userId: 'student-1' }))
+    mockPrisma.cognitiveSession.findMany.mockImplementation(async (query: any) => selectedRow(full.cognitiveSessions ?? [], query))
+    mockPrisma.situationalAttempt.findMany.mockImplementation(async (query: any) => selectedRow(full.situationalAttempts ?? [], query))
+    mockPrisma.compositeFormAnswer.findMany.mockImplementation(async (query: any) => selectedRow(full.formAnswers ?? [], query))
+    mockPrisma.compositeFormSectionAttempt.findMany.mockImplementation(async (query: any) => selectedRow(full.formSectionAttempts ?? [], query))
+    let loaded: any
+    mockPrisma.compositeAssessmentAttempt.findUnique.mockImplementation(async (query: any) => {
+      loaded = selectedRow(full, query)
+      return loaded
+    })
+    const actual = await getReport('attempt-1', { userId: 'student-1' })
+    expect(JSON.stringify(actual)).toBe(expected)
+    expect(actual.unitReports.find((unit: any) => unit.type === 'SITUATIONAL')?.metrics).toEqual([{ key: 'assertiveness', value: 1.5 }])
+    expect(loaded.scaleAssessments[0]).not.toHaveProperty('answers')
+    expect(loaded.scaleAssessments[0].scale).not.toHaveProperty('definition')
+    expect(loaded.compositeAssessment.items[1].scale).not.toHaveProperty('definition')
+    expect(mockPrisma.cognitiveSession.findMany.mock.calls.at(-1)?.[0].select).not.toHaveProperty('trials')
+    expect(mockPrisma.situationalAttempt.findMany.mock.calls.at(-1)?.[0].select).not.toHaveProperty('resultEncrypted')
+    expect(JSON.stringify(actual)).not.toContain('PRIVATE_')
+  })
+})
+
+
+describe('participant report empty module query elimination', () => {
+  it('skips exactly four empty relation reads without changing scale-only report JSON; positive counts and corrupt manifests read fully', async () => {
+    const full: any = completedAttemptForReport({ runtimeGeneration: 'UNIFIED_V1', deliveryMode: 'FINAL_ONLY', attemptEpoch: 1 })
+    full.compositeAssessment.productKind = 'QUESTIONNAIRE'
+    full.compositeAssessment.items = full.compositeAssessment.items.filter((item: any) => item.type === 'SCALE')
+    full.compositeAssessment.formSections = []
+    full.cognitiveSessions = []; full.situationalAttempts = []; full.formAnswers = []; full.formSectionAttempts = []
+    const slots = createFrozenActiveSlotSet({ schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1,
+      slots: [{ slotKey: 'scale:item-scale', unitType: 'SCALE', required: true,
+        sourceDefinitionIdentity: { key: 'adexi_v1', version: '2.0.0', hash: 'a'.repeat(64) }, sourceBinding: {} }] })
+    full.frozenActiveSlotSetEncrypted = encryptFrozenActiveSlotSet(slots); full.frozenActiveSlotSetHash = slots.snapshotHash
+    mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue(full)
+    const expected = JSON.stringify(await getReport('attempt-1', { userId: 'student-1' }))
+    const delegates = [mockPrisma.cognitiveSession, mockPrisma.situationalAttempt, mockPrisma.compositeFormAnswer, mockPrisma.compositeFormSectionAttempt]
+    for (const delegate of delegates) delegate.findMany.mockClear()
+    full._count = { cognitiveSessions: 0, situationalAttempts: 0, formAnswers: 0, formSectionAttempts: 0 }
+    expect(JSON.stringify(await getReport('attempt-1', { userId: 'student-1' }))).toBe(expected)
+    for (const delegate of delegates) expect(delegate.findMany).not.toHaveBeenCalled()
+    expect(mockPrisma.compositeAssessmentAttempt.findUnique.mock.calls.at(-1)?.[0].include._count.select).toEqual({
+      cognitiveSessions: true, situationalAttempts: true, formAnswers: true, formSectionAttempts: true,
+    })
+    full._count.cognitiveSessions = 1
+    await getReport('attempt-1', { userId: 'student-1' })
+    expect(mockPrisma.cognitiveSession.findMany).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ where: { compositeAttemptId: 'attempt-1' } }))
+    for (const delegate of delegates) delegate.findMany.mockClear()
+    full._count.cognitiveSessions = 0; full.frozenActiveSlotSetEncrypted = 'corrupt'
+    expect(JSON.stringify(await getReport('attempt-1', { userId: 'student-1' }))).toBe(expected)
+    for (const delegate of delegates) expect(delegate.findMany).toHaveBeenCalledTimes(1)
   })
 })

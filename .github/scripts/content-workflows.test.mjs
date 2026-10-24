@@ -269,7 +269,11 @@ test('manual step probes select one shared component and cannot schedule full CI
   assert.match(job(ci,'probe-images'),/inputs\.step_probe == 'images'/);
   assert.match(job(ci,'probe-images'),/uses: \.\/\.github\/workflows\/ci-images\.yml/);
   assert.match(job(ci,'probe-cognitive'),/inputs\.step_probe == 'cognitive'/);
-  assert.match(job(ci,'probe-cognitive'),/uses: \.\/\.github\/workflows\/ci-cognitive-step\.yml/);
+  const cognitiveProbe=job(ci,'probe-cognitive');
+  assert.doesNotMatch(cognitiveProbe,/uses: \.\/\.github\/workflows\/ci-cognitive-step\.yml/);
+  assert.match(cognitiveProbe,/permissions:\n      contents: read/);
+  const originalDiagnostic=job(source('ci-cognitive-step'),'cognitive');
+  assert.equal(cognitiveProbe.slice(cognitiveProbe.indexOf('    runs-on:')).trim(),originalDiagnostic.slice(originalDiagnostic.indexOf('    runs-on:')).trim());
   assert.match(job(ci,'probe-frontend'),/inputs\.step_probe == 'frontend'/);
   assert.match(job(ci,'probe-frontend'),/uses: \.\/\.github\/workflows\/ci-frontend\.yml/);
   assert.match(job(ci,'probe-maintenance'),/inputs\.step_probe == 'maintenance'/);

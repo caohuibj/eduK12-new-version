@@ -139,7 +139,7 @@ export const userController = {
     try {
       const result = createUserSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { username, password, role, nickname } = result.data
@@ -226,7 +226,7 @@ export const userController = {
 
       const result = updateUserSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       // Account activation/deactivation is not a generic profile mutation.

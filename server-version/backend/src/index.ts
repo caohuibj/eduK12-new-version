@@ -32,7 +32,9 @@ import assessmentInboxRoutes from './modules/assessment-policy/inbox.routes'
 import { recordCspReport, cspMetricLines } from './services/cspReports'
 import { createRedisRateLimiter } from './middleware/redisRateLimit'
 import { cleanupStaleUploadDirectories } from './utils/uploadTemp'
-import { cleanupStalePublicUploadAssets } from './controllers/checkinController'
+import { cleanupStalePublicUploadAssets } from './services/checkinUploadCleanup'
+import { resolveCheckinUploadCleanupConfig } from './config/checkinUploadCleanup'
+import { startCheckinUploadCleanupScheduler } from './services/checkinUploadCleanupScheduler'
 import bundleProductRoutes from './modules/bundle-product/routes'
 import express from 'express'
 import { publicAssessmentRateLimiters } from './middleware/publicAssessmentRateLimit'
@@ -425,6 +427,7 @@ app.use(errorHandler)
 // have initialized. This keeps PM2/Docker from declaring a process ready while
 // classroom broadcasts are silently running without cross-process delivery.
 let stopCheckinSchedules: (() => void) | null = null
+let stopCheckinUploadCleanup: (() => Promise<void>) | null = null
 let exportCleanupTimer: ReturnType<typeof setInterval> | null = null
 let submissionReceiptCleanupTimer: ReturnType<typeof setInterval> | null = null
 let serverListening = false
@@ -434,6 +437,7 @@ const gracefulShutdown = async (signal: string, exitCode = 0) => {
   if (shutdownStarted) return
   shutdownStarted = true
   stopCheckinSchedules?.()
+  const uploadCleanupDrain = stopCheckinUploadCleanup?.()
   if (exportCleanupTimer) clearInterval(exportCleanupTimer)
   if (submissionReceiptCleanupTimer) clearInterval(submissionReceiptCleanupTimer)
   logger.info(`${signal} signal received: closing HTTP server`)
@@ -454,6 +458,10 @@ const gracefulShutdown = async (signal: string, exitCode = 0) => {
       })
     })
   }
+
+  // Keep Prisma available for the tracked sweep. The existing five-second hard
+  // shutdown deadline still applies; it is not a guarantee of durable blob deletion.
+  await uploadCleanupDrain
 
   await Promise.allSettled([
     socketService.close(),
@@ -502,13 +510,18 @@ const startServer = async (): Promise<void> => {
   await startBackgroundWorkers(config.backgroundWorkersEnabled)
   // Lightweight durable publication is independent of heavy media/export consumers.
   stopCheckinSchedules = startCheckinScheduleScheduler()
+  const uploadCleanupConfig = resolveCheckinUploadCleanupConfig()
+  stopCheckinUploadCleanup = startCheckinUploadCleanupScheduler(
+    () => cleanupStalePublicUploadAssets(uploadCleanupConfig.batchSize),
+    uploadCleanupConfig,
+    cause => logger.warn('过期上传暂存清理失败', { errorType: cause instanceof Error ? cause.name : 'unknown' }),
+  )
 
   // ExportArtifact cleanup is metadata-driven: only exact expired objects are
   // removed, never an exploratory directory scan. Keep one bounded hourly task
   // per backend process and make shutdown cancel it.
   exportCleanupTimer = setInterval(() => {
     void cleanupStaleUploadDirectories()
-    void cleanupStalePublicUploadAssets().catch(err => logger.warn('过期上传暂存清理失败', err))
     void cleanupExpiredTrainingCheckpoints().then(cleared=>{
       if(cleared)logger.info('过期 Training 加密临时存档已清除',{cleared})
     }).catch(e=>logger.warn('Training 临时存档清理失败',e))

@@ -6,7 +6,7 @@ export const finalScaleSubmitSchema = z.object({
   attemptEpoch: z.number().int().min(1),
   definitionHash: z.string().min(1).max(200),
   contextSnapshotHash: z.string().min(1).max(200).nullable().optional(),
-  itemTimings: z.preprocess((raw,ctx)=>{if(raw&&typeof raw==='object'&&Object.prototype.hasOwnProperty.call(raw,'__proto__'))ctx.addIssue({code:z.ZodIssueCode.custom,message:'计时包含非法保留题目编码'});return raw},z.record(z.unknown())).optional(),
+  itemTimings: z.preprocess((raw,ctx)=>{if(raw&&typeof raw==='object'&&Object.prototype.hasOwnProperty.call(raw,'__proto__'))ctx.addIssue({code:z.ZodIssueCode.custom,message:'计时包含非法保留题目编码'});return raw},z.record(z.string(), z.unknown())).optional(),
   deviceInputProvenance: deviceInputProvenanceV1Schema.optional(),
   answers: z.array(z.object({
     itemCode: z.string().min(1).max(200),

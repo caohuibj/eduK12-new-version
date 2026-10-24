@@ -40,7 +40,7 @@ export const localizationManifestV1Schema = z.object({
   sourceLocale: z.string().refine(isValidContentLocaleTag, 'sourceLocale 必须是合法的语言 tag（如 zh-CN / en）'),
   targetLocale: z.string().refine(isValidContentLocaleTag, 'targetLocale 必须是合法的语言 tag（如 zh-CN / en）'),
   localizationVersion: z.string().regex(VERSION_RE, 'localizationVersion 必须是 x.y.z 三段数字'),
-  translationSource: z.string({ required_error: 'translationSource 必填：必须记录当前部署文本的来源' }).min(1, 'translationSource 必填：必须记录当前部署文本的来源'),
+  translationSource: z.string({ error: issue => issue.input === undefined ? 'translationSource 必填：必须记录当前部署文本的来源' : undefined }).min(1, 'translationSource 必填：必须记录当前部署文本的来源'),
   adaptationMethod: localizationAdaptationMethodSchema,
   expertReviewStatus: localizationReviewItemStatusSchema,
   cognitiveDebriefStatus: localizationReviewItemStatusSchema,

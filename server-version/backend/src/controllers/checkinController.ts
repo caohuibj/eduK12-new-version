@@ -1,3 +1,4 @@
+import { EXPORT_BATCH_SIZE, sendTaskExport, TaskExportBusyError, TaskExportLimitError, TaskExportPermissionError, TaskExportAuthenticationError, refreshTaskExportAuthentication } from '../utils/streamingTaskExport'
 import { managementTaskList } from '../modules/training-catalog/tasks'
 import { listPage, cursorWhere, listPageResult, ListCursorError } from '../utils/listCursor'
 import { checkinExportImages } from '../utils/checkinExportImages'
@@ -38,6 +39,14 @@ import {
   createCheckinIdempotencyReceipt,
   findCheckinIdempotencyReceipt,
 } from '../utils/submissionIdempotency'
+
+import {
+  STUDENT_UPLOAD_REFERENCE_ENTITY,
+  STUDENT_UPLOAD_PENDING_ENTITY,
+  PUBLIC_UPLOAD_REFERENCE_ENTITY,
+  PUBLIC_UPLOAD_REFERENCE_FIELD,
+  MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION,
+} from '../services/checkinUploadCleanup'
 
 const attachmentSchema = createAttachmentSchema(config.legacyUploadsEnabled)
 const attachmentsSchema = z.array(attachmentSchema).max(100)
@@ -173,12 +182,15 @@ const publicSubmissionImageSchema = z.object({
   assetId: z.string().min(1).max(100),
 }).strict()
 
-export const STUDENT_UPLOAD_REFERENCE_ENTITY = 'CheckinStudentUploadSession'
-export const STUDENT_UPLOAD_PENDING_ENTITY = 'CheckinStudentUploadPending'
-export const PUBLIC_UPLOAD_REFERENCE_ENTITY = 'CheckinUploadSession'
-export const PUBLIC_UPLOAD_REFERENCE_FIELD = 'staging'
-export const MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION = 9
-export const PUBLIC_UPLOAD_STAGING_TTL_MS = 24 * 60 * 60 * 1000
+export {
+  STUDENT_UPLOAD_REFERENCE_ENTITY,
+  STUDENT_UPLOAD_PENDING_ENTITY,
+  PUBLIC_UPLOAD_REFERENCE_ENTITY,
+  PUBLIC_UPLOAD_REFERENCE_FIELD,
+  MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION,
+  PUBLIC_UPLOAD_STAGING_TTL_MS,
+  cleanupStalePublicUploadAssets,
+} from '../services/checkinUploadCleanup'
 
 const publicSessionIdSchema = z.string().regex(/^session_[a-z0-9]{16}$/, '会话标识无效')
 
@@ -223,40 +235,6 @@ export async function stageStudentUploadAsset(db: AssetDatabase, checkinId: stri
   if (count >= 9) throw new PublicUploadSessionLimitError()
   await attachAssetReference({ assetId, entityType: STUDENT_UPLOAD_REFERENCE_ENTITY, entityId, field: 'staging' }, db)
   await db.assetReference.deleteMany({ where: { assetId, entityType: STUDENT_UPLOAD_PENDING_ENTITY, entityId } })
-}
-
-let lastPublicUploadCleanupAt = 0
-
-/** Remove abandoned anonymous upload references and their unreferenced blobs. */
-export const cleanupStalePublicUploadAssets = async (): Promise<void> => {
-  const now = Date.now()
-  if (now - lastPublicUploadCleanupAt < 5 * 60 * 1000) return
-  lastPublicUploadCleanupAt = now
-
-  const cutoff = new Date(now - PUBLIC_UPLOAD_STAGING_TTL_MS)
-  const staleReferences = await prisma.assetReference.findMany({
-    where: { entityType: { in: [PUBLIC_UPLOAD_REFERENCE_ENTITY, STUDENT_UPLOAD_REFERENCE_ENTITY, STUDENT_UPLOAD_PENDING_ENTITY] }, createdAt: { lt: cutoff } },
-    select: { id: true, asset: { select: { id: true, objectKey: true, provider: true } } },
-    orderBy: { createdAt: 'asc' }, take: 100,
-  })
-  if (staleReferences.length) {
-    await prisma.assetReference.deleteMany({ where: { id: { in: staleReferences.map(row => row.id) }, createdAt: { lt: cutoff } } })
-    for (const row of staleReferences) await discardUnreferencedAsset(row.asset)
-  }
-  const staleAssets = await prisma.storedAsset.findMany({
-    where: { accessScope: 'PUBLIC_CHECKIN', deletedAt: null, createdAt: { lt: cutoff }, references: { none: {} } },
-    select: { id: true, objectKey: true, provider: true }, orderBy: { createdAt: 'asc' }, take: 100,
-  })
-  for (const asset of staleAssets) await discardUnreferencedAsset(asset)
-}
-
-const runPublicUploadCleanup = async (): Promise<void> => {
-  try {
-    await cleanupStalePublicUploadAssets()
-  } catch (cleanupError) {
-    // Cleanup is best effort and must not make a valid upload unavailable.
-    logger.warn('匿名上传暂存清理失败', { errorType: cleanupError instanceof Error ? cleanupError.name : 'unknown' })
-  }
 }
 
 export const validatePublicSubmissionImages = async (
@@ -430,22 +408,9 @@ export const checkinController = {
 
       // 教师只能看到自己课程的打卡，管理员可以看到所有
       if (userRole === UserRole.TEACHER) {
-        // 获取教师的所有课程ID
-        const teacherCourses = await prisma.course.findMany({
-          where: { creatorId: userId },
-          select: { id: true }
-        })
-        const courseIds = teacherCourses.map(c => c.id)
-        
-        // 如果指定了courseId，检查是否属于该教师
-        if (courseId) {
-          if (!courseIds.includes(courseId as string)) {
-            return success(res, buildPaginatedResult([], 0, pagination))
-          }
-        } else {
-          // 未指定courseId，只看自己课程的打卡
-          where.courseId = { in: courseIds }
-        }
+        // Enforce ownership in the task query itself instead of materializing
+        // every owned course ID (also keeps a supplied courseId constrained).
+        where.course = { creatorId: userId }
       }
 
       // The legacy training API must never enumerate SCHOOL Activity work.
@@ -506,7 +471,7 @@ export const checkinController = {
 
       const result = createCheckinSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { courseId, title, description, content, videos, images, documents, endTime, allowViewOthers, tags } = result.data
@@ -611,7 +576,8 @@ export const checkinController = {
       const checkin = await prisma.checkin.findUnique({
         where: { id },
         include: {
-          _count: { select: { submissions: true } },
+          // Learners never receive roster counts; avoid aggregating every submission.
+          _count: req.user?.role !== UserRole.STUDENT ? { select: { submissions: true } } : false,
           course: {
             select: {
               id: true,
@@ -669,7 +635,7 @@ export const checkinController = {
 
       const result = updateCheckinSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const checkin = await prisma.checkin.findUnique({
@@ -836,7 +802,7 @@ export const checkinController = {
 
       const result = submitCheckinSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { content, images, expectedRevision } = result.data
@@ -853,7 +819,9 @@ export const checkinController = {
 
       // 检查打卡
       const checkin = await prisma.checkin.findUnique({
-        where: { id }
+        where: { id },
+        // Keep the fresh access/deadline read without loading task media/content.
+        select: { courseId: true, endTime: true },
       })
 
       if (!checkin) {
@@ -1062,7 +1030,6 @@ export const checkinController = {
       const detectedMimeType = detectAcceptedImageMimeType(file)
       if (!detectedMimeType) return error(res, '图片内容类型无效')
 
-      await runPublicUploadCleanup()
       const asset = await storeAsset({
         buffer: file.buffer,
         originalName: file.originalname,
@@ -1184,11 +1151,10 @@ export const checkinController = {
 
       const checkin = await prisma.checkin.findUnique({
         where: { id },
-        include: {
+        select: {
+          courseId: true,
           course: {
             select: {
-              id: true,
-              title: true,
               creatorId: true,
             }
           }
@@ -1382,11 +1348,11 @@ export const checkinController = {
   // 导出打卡数据
   async export(req: Request, res: Response) {
     try {
-      const userId = req.user?.userId
-      const userRole = req.user?.role
+      let userId = req.user?.userId
+      let userRole = req.user?.role
       const { id } = req.params
 
-      const checkin = await prisma.checkin.findUnique({
+      let checkin = await prisma.checkin.findUnique({
         where: { id },
         select: {
           title: true,
@@ -1408,45 +1374,83 @@ export const checkinController = {
         return forbidden(res, '无权限导出此打卡')
       }
 
-      // Read submission payloads only after the existing ownership check.
-      const submissions = await prisma.checkinSubmission.findMany({
-        where: { checkinId: id },
-        select: {
-          content: true,
-          images: true,
-          isAnonymous: true,
-          createdAt: true,
-          student: { select: { username: true, nickname: true } },
-        },
-        orderBy: { createdAt: 'desc' },
-      })
-
-      // 准备导出数据
-      const exportData = submissions.map((sub, index) => {
-        const images = checkinExportImages(sub.images)
-        return {
-          '序号': index + 1,
-          '学生姓名': sub.student?.nickname || sub.student?.username || (sub.isAnonymous ? '匿名用户' : '未知'),
-          '学号': sub.student?.username || (sub.isAnonymous ? '匿名' : ''),
-          '提交内容': sub.content || '',
-          '图片数量': images.count,
-          '图片链接': images.references,
-          '提交时间': sub.createdAt ? new Date(sub.createdAt).toLocaleString('zh-CN') : '',
+      const authorize = async (db: Pick<typeof prisma, 'checkin'>) => {
+        const current = await db.checkin.findUnique({ where: { id }, select: { course: { select: { creatorId: true } } } })
+        if (!current || (current.course.creatorId !== userId && userRole !== UserRole.ADMIN)) {
+          throw new TaskExportPermissionError('无权限导出数据')
         }
+      }
+      await sendTaskExport(res, () => `${checkin!.course.title}_${checkin!.title}_打卡数据.xlsx`, '打卡提交数据', async (append, checkConnected) => {
+        // One bounded MVCC snapshot: concurrent edits/inserts never move or duplicate rows.
+        // Spool only within the transaction; compression and download happen after release.
+        await prisma.$transaction(async tx => {
+          const snapshotMetadata = await tx.checkin.findUnique({ where: { id }, select: { title: true, course: { select: { title: true, creatorId: true } } } })
+          if (!snapshotMetadata || (snapshotMetadata.course.creatorId !== userId && userRole !== UserRole.ADMIN)) throw new TaskExportPermissionError('无权限导出数据')
+          checkin = snapshotMetadata
+          let cursor: { time: Date; id: string } | undefined
+          let rowCount = 0
+          while (true) {
+            checkConnected()
+            const submissions = await tx.checkinSubmission.findMany({
+              where: { checkinId: id, ...(cursor ? { OR: [
+                  { createdAt: { lt: cursor.time } },
+                  { createdAt: cursor.time, id: { lt: cursor.id } },
+                ] } : {}) },
+              take: EXPORT_BATCH_SIZE,
+              select: {
+                id: true,
+                content: true,
+                images: true,
+                isAnonymous: true,
+                createdAt: true,
+                student: { select: { username: true, nickname: true } },
+              },
+              orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+            })
+            if (!submissions.length) break
+
+
+            // 准备导出数据
+            const exportData = submissions.map((sub, index) => {
+              const images = checkinExportImages(sub.images)
+              return {
+                '序号': rowCount + index + 1,
+                '学生姓名': sub.student?.nickname || sub.student?.username || (sub.isAnonymous ? '匿名用户' : '未知'),
+                '学号': sub.student?.username || (sub.isAnonymous ? '匿名' : ''),
+                '提交内容': sub.content || '',
+                '图片数量': images.count,
+                '图片链接': images.references,
+                '提交时间': sub.createdAt ? new Date(sub.createdAt).toLocaleString('zh-CN') : '',
+              }
+            })
+
+
+            await append(exportData)
+            rowCount += submissions.length
+            const last = submissions[submissions.length - 1]
+            cursor = { time: last.createdAt, id: last.id }
+            if (submissions.length < EXPORT_BATCH_SIZE) break
+          }
+        }, { isolationLevel: 'RepeatableRead', timeout: 5000, maxWait: 2000 })
+      }, async () => {
+        await refreshTaskExportAuthentication(req, res)
+        userId = req.user?.userId
+        userRole = req.user?.role
+        await authorize(prisma)
       })
-
-      // 创建 Excel（ExcelJS，避免旧版 xlsx 解析器漏洞）
-
-      // 设置响应头
-      const fileName = `${checkin.course.title}_${checkin.title}_打卡数据.xlsx`
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`)
-
-      // 发送文件
-      const buffer = await (await import('../utils/excelWorkbook')).workbookBuffer({ '打卡提交数据': exportData })
-      res.send(buffer)
     } catch (err) {
+      if (err instanceof TaskExportAuthenticationError) return
       logger.error('导出打卡错误', err)
+      if (res.headersSent || res.destroyed) {
+        if (!res.destroyed) res.destroy()
+        return
+      }
+      res.removeHeader('Content-Type')
+      res.removeHeader('Content-Disposition')
+      res.removeHeader('Content-Length')
+      if (err instanceof TaskExportPermissionError) return forbidden(res, err.message)
+      if (err instanceof TaskExportBusyError) return error(res, err.message, -1, 503)
+      if (err instanceof TaskExportLimitError) return error(res, err.message, -1, 413)
       return error(res, Messages.COMMON.FAILED)
     }
   },
@@ -1491,7 +1495,7 @@ export const checkinController = {
       const userId = req.user?.userId
       const { id: checkinId } = req.params
       const parsed = createCheckinTokenSchema.safeParse(req.body)
-      if (!parsed.success) return error(res, parsed.error.errors[0]?.message || '令牌参数无效')
+      if (!parsed.success) return error(res, parsed.error.issues[0]?.message || '令牌参数无效')
       const { expiresAt, maxUses } = parsed.data
 
       // 验证打卡是否存在
@@ -1770,8 +1774,6 @@ export const checkinController = {
       const detectedMimeType = detectAcceptedImageMimeType(file)
       if (!detectedMimeType) return error(res, '图片内容类型无效')
 
-      await runPublicUploadCleanup()
-
       const asset = await storeAsset({
         buffer: file.buffer,
         originalName: file.originalname,
@@ -1882,8 +1884,6 @@ export const checkinController = {
       if (validation.checkin.endTime && new Date() > validation.checkin.endTime) {
         return error(res, Messages.CHECKIN.EXPIRED)
       }
-
-      await runPublicUploadCleanup()
 
       // Claim the quota and create the submission in one transaction. A
       // session can consume at most one remaining slot.

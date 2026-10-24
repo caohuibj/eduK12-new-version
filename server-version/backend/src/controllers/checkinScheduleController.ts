@@ -54,7 +54,7 @@ export const checkinScheduleController = {
   async create(req: Request, res: Response) {
     if (req.user?.role !== 'TEACHER') return forbidden(res, '仅课程创建者可设置周期打卡')
     const parsed = createScheduleSchema.safeParse(req.body)
-    if (!parsed.success) return error(res, parsed.error.errors[0].message, -1, 400)
+    if (!parsed.success) return error(res, parsed.error.issues[0].message, -1, 400)
     const input = parsed.data, now = new Date(), first = new Date(input.firstPublishAt)
     const end = input.endsAt ? new Date(input.endsAt) : null
     if (first.getTime() < now.getTime() - 5 * 60000 || first.getTime() > now.getTime() + 2 * 366 * 86400000 || (end && end < first)) {

@@ -251,3 +251,8 @@ describe('exact Training scientific roots and formal governance',()=>{
    expect(()=>adminContentRootRequestSchema.parse({...input(),grant})).toThrow()
  })
 })
+
+it('rejects unknown grant keys before date conversion and authority validation',()=>{
+ const body=input();expect(adminContentRootRequestSchema.safeParse(body).success).toBe(true)
+ expect(adminContentRootRequestSchema.safeParse({...body,grant:{...body.grant,unexpectedPrivilege:true}}).success).toBe(false)
+})

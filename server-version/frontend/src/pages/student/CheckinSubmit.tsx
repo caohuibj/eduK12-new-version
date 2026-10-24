@@ -2,12 +2,12 @@ import { useTrainingLearnerNavigation } from '../../training/learnerNavigation'
 import { useCursorList } from '../../hooks/useCursorList'
 import { isTrainingHost } from '../../training/context'
 import ModalSurface from '../../components/shared-ui/ModalSurface'
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo, useLayoutEffect, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { ArrowLeft, Clock, Camera, Image, Loader2, CheckCircle, Users, Eye, X, ZoomIn, FileText } from 'lucide-react'
 import apiClient from '../../api/client'
 import { sanitizeHtml } from '../../utils/sanitize'
-import type { Checkin, CheckinSubmission, CheckinSubmissionImage, MediaItem, DocumentItem } from '../../types'
+import type { Checkin, CheckinSubmission, CheckinSubmissionImage, DocumentItem } from '../../types'
 import { normalizeImageUrl, handleImageError } from '../../utils/mediaUtils'
 import { PageHeader, ProductButton, ProductPage, ProductStatus } from '../../components/product-ui'
 import {
@@ -17,8 +17,8 @@ import {
   shouldClearIdempotencyKey,
 } from '../../utils/idempotency'
 
-const VideoList = React.lazy(() => import('../../components/MediaRenderer').then(module => ({ default: module.VideoList })))
-const ImageList = React.lazy(() => import('../../components/MediaRenderer').then(module => ({ default: module.ImageList })))
+const VideoList = React.memo(React.lazy(() => import('../../components/MediaRenderer').then(module => ({ default: module.VideoList }))))
+const ImageList = React.memo(React.lazy(() => import('../../components/MediaRenderer').then(module => ({ default: module.ImageList }))))
 const PdfViewer = React.lazy(() => import('../../components/PdfViewer'))
 
 type FeedbackFocusToken = { sequence: number; origin: HTMLElement; page: HTMLElement }
@@ -61,13 +61,15 @@ const CheckinSubmit: React.FC = () => {
   const [uploading, setUploading] = useState(false)
   const [showOthers, setShowOthers] = useState(false)
   const { list: othersSubmissions, loading: othersLoading, error: othersError, more: moreOthers, refresh: refreshOthers, hasMore: hasMoreOthers } = useCursorList<OtherSubmission>(showOthers && checkin?.allowViewOthers ? `/checkins/${checkinId}/others-submissions` : null)
-  const [playingVideo, setPlayingVideo] = useState<MediaItem | null>(null)
   const [previewImage, setPreviewImage] = useState<{url: string, name: string} | null>(null)
   const [selectedDocument, setSelectedDocument] = useState<DocumentItem | null>(null)
   const [showPdfViewer, setShowPdfViewer] = useState(false)
   const [feedback, setFeedback] = useState<CheckinFeedback | null>(null)
   const submitIdempotencyKeyRef = useRef<{ key: string; fingerprint: string } | null>(null)
   const submitInFlightRef = useRef(false)
+  // A route's reads and writes must never hydrate the next learner form.
+  const routeEpochRef = useRef(0)
+  const sanitizedContent = useMemo(() => sanitizeHtml(checkin?.content), [checkin?.content])
   const previewCloseRef = useRef<HTMLButtonElement | null>(null)
   const feedbackRef = useRef<HTMLDivElement>(null)
   const imageInputRef = useRef<HTMLInputElement>(null)
@@ -91,11 +93,7 @@ const CheckinSubmit: React.FC = () => {
     feedbackRef.current?.focus()
   }, [feedback])
 
-  useEffect(() => {
-    if (checkinId) {
-      fetchCheckinDetail()
-    }
-  }, [checkinId])
+
 
   const openPreviewImage = (image: { url: string; name: string }) => {
     setPreviewImage(image)
@@ -103,13 +101,15 @@ const CheckinSubmit: React.FC = () => {
 
   const closePreviewImage = () => setPreviewImage(null)
 
-  const fetchCheckinDetail = async () => {
+  const fetchCheckinDetail = useCallback(async () => {
+    const routeEpoch = routeEpochRef.current
     try {
       setLoading(true)
       const [checkinRes, submissionRes] = await Promise.all([
         apiClient.get(`/checkins/${checkinId}`),
         apiClient.get(`/checkins/${checkinId}/my-submission`),
       ])
+      if (routeEpoch !== routeEpochRef.current) return
 
       if (checkinRes.code === 0) {
         setCheckin(checkinRes.data)
@@ -122,16 +122,39 @@ const CheckinSubmit: React.FC = () => {
         setImages(normalizeSubmissionImages(submissionRes.data.images))
       }
     } catch (error) {
+      if (routeEpoch !== routeEpochRef.current) return
       console.error('获取打卡详情失败:', error)
     } finally {
-      setLoading(false)
+      if (routeEpoch === routeEpochRef.current) setLoading(false)
     }
-  }
+  }, [checkinId])
+
+  useLayoutEffect(() => {
+    setCheckin(null)
+    setSubmission(null)
+    setContent('')
+    setImages([])
+    setShowOthers(false)
+    setFeedback(null)
+    setUploading(false)
+    setPreviewImage(null)
+    setSelectedDocument(null)
+    setShowPdfViewer(false)
+    submitIdempotencyKeyRef.current = null
+    submitInFlightRef.current = false
+    setSubmitting(false)
+    if (checkinId) {
+      void fetchCheckinDetail()
+    }
+    return () => { routeEpochRef.current += 1 }
+  }, [checkinId, fetchCheckinDetail])
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!checkin || checkin.id !== checkinId) return
     const file = e.target.files?.[0]
     if (!file) return
 
+    const routeEpoch = routeEpochRef.current
     const focusToken = captureFeedbackFocus(e.currentTarget)
     setUploading(true)
     setFeedback(null)
@@ -143,6 +166,7 @@ const CheckinSubmit: React.FC = () => {
         headers: { 'Content-Type': 'multipart/form-data' },
       })
 
+      if (routeEpoch !== routeEpochRef.current) return
       const uploaded = response.data as { assetId?: string; url?: string }
       if (response.code === 0 && uploaded.assetId && uploaded.url) {
         setImages((current) => (
@@ -154,10 +178,11 @@ const CheckinSubmit: React.FC = () => {
         setFeedback({ kind: 'error', message: '图片上传失败，请重试。', focusToken })
       }
     } catch (error) {
+      if (routeEpoch !== routeEpochRef.current) return
       console.error('图片上传失败:', error)
       setFeedback({ kind: 'error', message: '图片上传失败，请重试。', focusToken })
     } finally {
-      setUploading(false)
+      if (routeEpoch === routeEpochRef.current) setUploading(false)
     }
   }
 
@@ -167,7 +192,8 @@ const CheckinSubmit: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
-    if (!checkin || submitInFlightRef.current) return
+    if (!checkin || checkin.id !== checkinId || submitInFlightRef.current) return
+    const routeEpoch = routeEpochRef.current
 
     const focusToken = captureFeedbackFocus(e.currentTarget)
     submitInFlightRef.current = true
@@ -197,6 +223,7 @@ const CheckinSubmit: React.FC = () => {
         headers: { 'Idempotency-Key': idempotencyKey },
       })
 
+      if (routeEpoch !== routeEpochRef.current) return
       if (response.code === 0) {
         submitIdempotencyKeyRef.current = null
         setFeedback({ kind: 'success', message: '打卡已成功提交。' })
@@ -206,6 +233,7 @@ const CheckinSubmit: React.FC = () => {
         setFeedback({ kind: 'error', message: response.message || '打卡失败', focusToken })
       }
     } catch (error: any) {
+      if (routeEpoch !== routeEpochRef.current) return
       // Only an explicit, non-retryable 4xx rejection invalidates this key.
       // Hydration failures after commit, network errors, timeouts and 5xx
       // responses must retain it for a safe retry of the same payload.
@@ -214,8 +242,10 @@ const CheckinSubmit: React.FC = () => {
       }
       setFeedback({ kind: 'error', message: submissionErrorMessage(error, '打卡失败'), focusToken })
     } finally {
-      submitInFlightRef.current = false
-      setSubmitting(false)
+      if (routeEpoch === routeEpochRef.current) {
+        submitInFlightRef.current = false
+        setSubmitting(false)
+      }
     }
   }
 
@@ -230,7 +260,7 @@ const CheckinSubmit: React.FC = () => {
     }
   }
 
-  if (loading) {
+  if (loading || (checkin && checkin.id !== checkinId)) {
     return (
       <ProductPage width="reading" className="hui-student-page hui-student-submission">
         <ProductStatus kind="pending" title="正在加载打卡">正在读取打卡要求与已有提交。</ProductStatus>
@@ -294,7 +324,7 @@ const CheckinSubmit: React.FC = () => {
         {checkin.content && (
           <div 
             className="text-gray-700 mb-4 prose prose-sm max-w-none"
-            dangerouslySetInnerHTML={{ __html: sanitizeHtml(checkin.content) }}
+            dangerouslySetInnerHTML={{ __html: sanitizedContent }}
           />
         )}
         

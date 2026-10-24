@@ -9,7 +9,7 @@ import TrainingCourseEditorTabs from '../training/TrainingCourseEditorTabs'
 import '../training/training-task-editor.css'
 import TrainingTaskReusePicker from '../training/TrainingTaskReusePicker'
 import { assignmentReuseContent } from '../training/taskReuse'
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { Plus, Trash2, ClipboardList, FileText, Clock, Video, Image as ImageIcon, CheckSquare, Square, MessageSquare, Users, X } from 'lucide-react'
 import { Navigate, useLocation, useSearchParams } from 'react-router-dom'
 import apiClient from '../api/client'
@@ -67,7 +67,10 @@ interface AssignmentFormData {
   tags: string[]
 }
 
+interface ReviewSnapshot { selectionId: string; chunks: string[]; count: number; expiresAt: string }
+
 interface Submission {
+  revision: number
   id: string
   studentId: string
   student: {
@@ -113,6 +116,10 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
   const { exporting, exportTask } = useTaskExport(showMessage)
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [courses, setCourses] = useState<Course[]>(embeddedCourse ? [embeddedCourse] : [])
+  const coursesLoaded = useRef(Boolean(embeddedCourse))
+  const coursesPending = useRef(false)
+  const [coursesError, setCoursesError] = useState<string | null>(null)
+  const [coursesLoading, setCoursesLoading] = useState(false)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const mounted = useRef(true)
@@ -143,7 +150,20 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
   const [showSubmissionsModal, setShowSubmissionsModal] = useState(false)
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null)
   const [submissions, setSubmissions] = useState<Submission[]>([])
+  const [submissionCounts, setSubmissionCounts] = useState({ total: 0, graded: 0, ungraded: 0 })
+  const [submissionCursor, setSubmissionCursor] = useState<string | null>(null)
+  const [submissionHistory, setSubmissionHistory] = useState<(string | null)[]>([null])
+  const [nextSubmissionCursor, setNextSubmissionCursor] = useState<string | null>(null)
+  const [reviewSnapshot, setReviewSnapshot] = useState<ReviewSnapshot | null>(null)
+  const [selectionLoading, setSelectionLoading] = useState(false)
+  const reviewComment = useRef<string | null>(null)
+  const reviewProgress = useRef({ next: 0, applied: 0, skipped: 0 })
   const [submissionsLoading, setSubmissionsLoading] = useState(false)
+  const [submissionsError, setSubmissionsError] = useState<string | null>(null)
+  const submissionsSequence = useRef(0)
+  const submissionsPending = useRef<{ id: string; sequence: number } | null>(null)
+  const submissionsTask = useRef<string | null>(null)
+  const ungradedSubmissions = useMemo(() => submissions.filter(submission => submission.status !== 'GRADED'), [submissions])
   const [selectedSubmissions, setSelectedSubmissions] = useState<Set<string>>(new Set())
   const [batchComment, setBatchComment] = useState('你的练习质量很棒，再接再厉！')
   const [isBatchGrading, setIsBatchGrading] = useState(false)
@@ -151,9 +171,23 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
 
   useEffect(() => {
     mounted.current = true
-    void fetchCourses()
-    return () => { mounted.current = false; loadSequence.current++ }
+    setSelectionLoading(false)
+    setIsBatchGrading(false)
+    setSubmissionsLoading(false)
+    // Invalidate the live request epoch, rather than capturing its mount-time value.
+    const invalidateSubmissions = () => {
+      submissionsSequence.current++
+      submissionsPending.current = null
+    }
+    return () => { mounted.current = false; loadSequence.current++; invalidateSubmissions() }
   }, [])
+
+  // Course choices are authoring data, not a prerequisite for reviewing/exporting tasks.
+  // Preserve eager authorization/prefill for existing course-context deep links.
+  const needsCourses = Boolean(requestedCourseId || showModal || showReuse)
+  useEffect(() => {
+    if (needsCourses) void fetchCourses()
+  }, [needsCourses])
 
   useEffect(() => { void fetchAssignments(); return () => { loadSequence.current++ } }, [catalog.params, focusId, requestedCourseId])
 
@@ -221,9 +255,13 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
   }
 
   const fetchCourses = async () => {
-    if (embeddedCourse) return
+    if (coursesLoaded.current || coursesPending.current) return
+    coursesPending.current = true
+    setCoursesLoading(true)
+    setCoursesError(null)
     try {
       const response = await apiClient.get<{ list: Course[] }>('/courses')
+      if (response.code !== 0) throw new Error(response.message || '获取课程列表失败')
       if (response.code === 0) {
         const list = response.data.list
         const appended = (searchParams.get('create') === 'true' || searchParams.get('reuse') === 'true')
@@ -232,84 +270,138 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
             userId: user?.id,
             knownIds: list.map(course => course.id),
           }) : null
-        if (mounted.current) setCourses(appended ? [...list, appended] : list)
-      }
-    } catch (error) {
-      console.error('获取课程列表失败:', error)
-    }
-  }
-
-
-  const fetchSubmissions = async (assignmentId: string) => {
-    try {
-      setSubmissionsLoading(true)
-      const response = await apiClient.get(`/assignments/${assignmentId}/submissions`)
-      if (response.code === 0) {
-        setSubmissions(response.data.list)
-        // 默认选中所有未批改的提交
-        const ungraded = response.data.list.filter((s: Submission) => s.status !== 'GRADED')
-        setSelectedSubmissions(new Set(ungraded.map((s: Submission) => s.id)))
-      }
-    } catch (error) {
-      console.error('获取提交列表失败:', error)
-      showMessage('获取提交列表失败')
-    } finally {
-      setSubmissionsLoading(false)
-    }
-  }
-
-  // 打开提交列表弹窗
-  const openSubmissionsModal = (assignment: Assignment) => {
-    setSelectedAssignment(assignment)
-    setShowSubmissionsModal(true)
-    fetchSubmissions(assignment.id)
-  }
-
-  // 一键批量批复
-  const handleBatchGrade = async () => {
-    if (!selectedAssignment) return
-    if (selectedSubmissions.size === 0) {
-      showMessage('请至少选择一份练习')
-      return
-    }
-    if (!batchComment.trim()) {
-      showMessage('请输入评语')
-      return
-    }
-
-    setIsBatchGrading(true)
-    try {
-      // 逐个批复选中的提交
-      let successCount = 0
-      for (const submissionId of selectedSubmissions) {
-        try {
-          const response = await apiClient.post(`/assignments/${selectedAssignment.id}/submissions/${submissionId}/grade`, {
-            comment: batchComment.trim()
-          })
-          if (response.code === 0) {
-            successCount++
-          }
-        } catch (err) {
-          console.error(`批复失败: ${submissionId}`, err)
+        if (mounted.current) {
+          coursesLoaded.current = true
+          setCourses(appended ? [...list, appended] : list)
         }
       }
-      
-      showMessage(`批量批复完成，成功批复 ${successCount} 份练习`)
-      setShowBatchGradeModal(false)
-      // 刷新提交列表
-      fetchSubmissions(selectedAssignment.id)
-      // 清空选择
-      setSelectedSubmissions(new Set())
-    } catch (error: any) {
-      showMessage(error.message || '批量批复失败')
+    } catch (error) {
+      if (mounted.current) setCoursesError(error instanceof Error ? error.message : '获取课程列表失败')
     } finally {
+      coursesPending.current = false
+      if (mounted.current) setCoursesLoading(false)
+    }
+  }
+
+
+  const fetchSubmissions = async (assignmentId: string, cursor: string | null = null, history: (string | null)[] = [null]) => {
+    if (!mounted.current || submissionsTask.current !== assignmentId || submissionsPending.current?.id === assignmentId) return
+    const sequence = ++submissionsSequence.current
+    submissionsPending.current = { id: assignmentId, sequence }
+    setSubmissionsLoading(true)
+    setSubmissionCursor(cursor)
+    setSubmissionHistory(history)
+    setSubmissionsError(null)
+    try {
+      const response = await apiClient.get<{ list: Submission[]; total: number; gradedCount: number; ungradedCount: number; nextCursor: string | null }>(`/assignments/${assignmentId}/submissions${cursor ? `?cursor=${encodeURIComponent(cursor)}` : ''}`)
+      if (!mounted.current || sequence !== submissionsSequence.current) return
+      if (response.code !== 0) throw new Error(response.message || '获取提交列表失败')
+      setSubmissions(response.data.list)
+      setSubmissionCounts({ total: response.data.total, graded: response.data.gradedCount, ungraded: response.data.ungradedCount })
+      setSubmissionCursor(cursor)
+      setSubmissionHistory(history)
+      setNextSubmissionCursor(response.data.nextCursor)
+      setReviewSnapshot(null)
+      reviewProgress.current = { next: 0, applied: 0, skipped: 0 }
+      reviewComment.current = null
+      // Selection is explicitly limited to this page until the teacher chooses all ungraded.
+      const ungraded = response.data.list.filter(submission => submission.status !== 'GRADED')
+      setSelectedSubmissions(new Set(ungraded.map(submission => submission.id)))
+    } catch (error) {
+      if (mounted.current && sequence === submissionsSequence.current) {
+        setSubmissionsError(error instanceof Error ? error.message : '获取提交列表失败')
+      }
+    } finally {
+      if (mounted.current && sequence === submissionsSequence.current) {
+        submissionsPending.current = null
+        setSubmissionsLoading(false)
+      }
+    }
+  }
+
+  // A closed/replaced dialog invalidates its response, including an earlier read of the same task.
+  const openSubmissionsModal = (assignment: Assignment) => {
+    if (submissionsTask.current !== assignment.id) {
+      submissionsSequence.current++
+      submissionsPending.current = null
+      setSubmissions([])
+      setSubmissionCounts({ total: 0, graded: 0, ungraded: 0 })
+      setSelectedSubmissions(new Set())
+    }
+    submissionsTask.current = assignment.id
+    setSelectedAssignment(assignment)
+    setShowSubmissionsModal(true)
+    void fetchSubmissions(assignment.id)
+  }
+
+  const selectAllUngraded = async () => {
+    if (!selectedAssignment || selectionLoading || isBatchGrading) return
+    const sequence = submissionsSequence.current
+    setSelectionLoading(true)
+    try {
+      const response = await apiClient.post<ReviewSnapshot>(`/assignments/${selectedAssignment.id}/review-selection`, { scope: 'all-ungraded' })
+      if (!mounted.current || sequence !== submissionsSequence.current) return
+      if (response.code !== 0) throw new Error(response.message || '选择失败')
+      setReviewSnapshot(response.data)
+      reviewProgress.current = { next: 0, applied: 0, skipped: 0 }
+      reviewComment.current = null
+    } catch (error) {
+      if (mounted.current && sequence === submissionsSequence.current) showMessage(error instanceof Error ? error.message : '选择失败，请重试')
+    } finally {
+      if (mounted.current && sequence === submissionsSequence.current) setSelectionLoading(false)
+    }
+  }
+
+  // Retry resumes the failed chunk. A possibly committed retry is skipped, never re-applied.
+  const handleBatchGrade = async () => {
+    if (!selectedAssignment || isBatchGrading || selectionLoading) return
+    if (!(reviewSnapshot?.count ?? selectedSubmissions.size)) return showMessage('请至少选择一份练习')
+    if (!batchComment.trim()) return showMessage('请输入评语')
+    const sequence = submissionsSequence.current
+    const assignmentId = selectedAssignment.id
+    setIsBatchGrading(true)
+    try {
+      let snapshot = reviewSnapshot
+      if (!snapshot) {
+        const response = await apiClient.post<ReviewSnapshot>(`/assignments/${assignmentId}/review-selection`, {
+          scope: 'page', items: submissions.filter(item => selectedSubmissions.has(item.id)).map(({ id, revision }) => ({ id, revision })),
+        })
+        if (response.code !== 0) throw new Error(response.message || '选择失败')
+        snapshot = response.data
+        if (!mounted.current || sequence !== submissionsSequence.current) return
+        setReviewSnapshot(snapshot)
+        reviewProgress.current.skipped += selectedSubmissions.size - snapshot.count
+      }
+      reviewComment.current ??= batchComment.trim()
+      while (reviewProgress.current.next < snapshot.chunks.length) {
+        const response = await apiClient.post<{ gradedCount: number; skippedCount: number }>(`/assignments/${assignmentId}/batch-grade`, {
+          selectionToken: snapshot.chunks[reviewProgress.current.next], comment: reviewComment.current,
+        })
+        if (!mounted.current || sequence !== submissionsSequence.current) return
+        if (response.code !== 0) throw new Error(response.message || '批改失败')
+        reviewProgress.current.applied += response.data.gradedCount
+        reviewProgress.current.skipped += response.data.skippedCount
+        reviewProgress.current.next++
+      }
+      const { applied, skipped } = reviewProgress.current
+      showMessage(`本次确认批复 ${applied} 份；${skipped} 份已变化或已处理，未重复批改。请以刷新后的列表为准。`)
+      setShowBatchGradeModal(false)
+      // Refresh advances the list generation, so release this completed batch
+      // before its finally guard intentionally stops owning that generation.
       setIsBatchGrading(false)
+      void fetchSubmissions(assignmentId)
+    } catch (error) {
+      if (mounted.current && sequence === submissionsSequence.current) showMessage(`${error instanceof Error ? error.message : '批量批复失败'}。已确认 ${reviewProgress.current.applied} 份，可重试未完成批次；网络异常的批次结果请刷新确认。`)
+    } finally {
+      if (mounted.current && sequence === submissionsSequence.current) setIsBatchGrading(false)
     }
   }
 
   // 全选/取消全选
   const toggleSelectAll = () => {
-    const ungradedSubmissions = submissions.filter(s => s.status !== 'GRADED')
+    setReviewSnapshot(null)
+    reviewProgress.current = { next: 0, applied: 0, skipped: 0 }
+    reviewComment.current = null
     if (selectedSubmissions.size === ungradedSubmissions.length) {
       setSelectedSubmissions(new Set())
     } else {
@@ -319,6 +411,9 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
 
   // 单个选择/取消选择
   const toggleSelectSubmission = (submissionId: string) => {
+    setReviewSnapshot(null)
+    reviewProgress.current = { next: 0, applied: 0, skipped: 0 }
+    reviewComment.current = null
     const newSet = new Set(selectedSubmissions)
     if (newSet.has(submissionId)) {
       newSet.delete(submissionId)
@@ -566,6 +661,15 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
   }
 
   const closeSubmissions = () => {
+    if (isBatchGrading) return
+    setSelectionLoading(false)
+    setReviewSnapshot(null)
+    setShowBatchGradeModal(false)
+    submissionsTask.current = null
+    submissionsSequence.current++
+    submissionsPending.current = null
+    setSubmissionsLoading(false)
+    setSubmissionsError(null)
     setShowSubmissionsModal(false)
     setSelectedAssignment(null)
     setSubmissions([])
@@ -585,6 +689,8 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
       {embeddedCourse && <div className="training-assignment-toolbar"><div><ProductButton variant="primary" onClick={openCreateModal}><Plus size={17} aria-hidden="true"/>发布练习</ProductButton>{canReuse && <ProductButton onClick={() => setShowReuse(true)}>复用练习</ProductButton>}</div><p>在当前课程内编辑、查看提交和导出数据。</p></div>}
       {embeddedCourse && focusId && <div className="training-assignment-focused"><span>已定位到这份练习</span><ProductButton onClick={() => { const next=new URLSearchParams(searchParams);next.delete('assignmentId');setSearchParams(next,{replace:true}) }}>显示全部练习</ProductButton></div>}
       {feedback}
+      {!showModal && !showReuse && coursesLoading && <p role="status">正在读取可选课程…</p>}
+      {!showModal && !showReuse && coursesError && <p role="alert">{coursesError}<ProductButton onClick={() => void fetchCourses()}>重试课程列表</ProductButton></p>}
       {openingDetail && <p role="status">正在读取练习完整内容…</p>}
       {!embeddedCourse && !focusId && <CatalogFilters key={filterRevision+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline label="练习"/>}
       {loading ? <ProductStatus kind="pending" title="正在加载练习">正在读取练习和提交概况。</ProductStatus>
@@ -792,6 +898,8 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
                   <header className="training-task-editor__section-heading"><h3>发布设置</h3></header>
               {/* Course Selection */}
               <div>
+                {coursesLoading && <p role="status">正在读取可选课程…</p>}
+                {coursesError && <p role="alert">{coursesError}<ProductButton onClick={() => void fetchCourses()}>重试课程列表</ProductButton></p>}
                 <label htmlFor="AssignmentList-field-101" className="label">选择课程 *</label>
                 <select id="AssignmentList-field-101"
                   value={formData.courseId}
@@ -853,7 +961,7 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
         </ModalSurface>
       )}
 
-      {canReuse && showReuse && <TrainingTaskReusePicker kind="assignments" courses={courses} initialCourseId={requestedCourseId} onClose={() => setShowReuse(false)} onSelect={(source, targetCourseId) => {
+      {canReuse && showReuse && <TrainingTaskReusePicker kind="assignments" courses={courses} courseLoading={coursesLoading} courseError={coursesError} onRetryCourses={() => void fetchCourses()} initialCourseId={requestedCourseId} onClose={() => setShowReuse(false)} onSelect={(source, targetCourseId) => {
         setEditingAssignment(null)
         setFormData(assignmentReuseContent(source as Assignment, targetCourseId) as AssignmentFormData)
         setShowReuse(false)
@@ -891,27 +999,37 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
               <div className="staff-toolbar staff-submission-toolbar">
                 <div className="flex items-center space-x-4">
                   <span className="text-sm text-gray-500">
-                    共 {submissions.length} 份提交
+                    共 {submissionCounts.total} 份提交
                   </span>
                   <span className="text-sm text-green-600">
-                    {submissions.filter(s => s.status === 'GRADED').length} 已批改
+                    {submissionCounts.graded} 已批改
                   </span>
                   <span className="text-sm text-orange-500">
-                    {submissions.filter(s => s.status !== 'GRADED').length} 待批改
+                    {submissionCounts.ungraded} 待批改
                   </span>
                 </div>
-                {submissions.filter(s => s.status !== 'GRADED').length > 0 && (
-                  <ProductButton variant="primary" onClick={() => setShowBatchGradeModal(true)}>
+                {submissionCounts.ungraded > 0 && (
+                  <ProductButton variant="primary" disabled={submissionsLoading || Boolean(submissionsError)} onClick={() => setShowBatchGradeModal(true)}>
                     <CheckSquare className="w-4 h-4" aria-hidden="true" />
                     <span>一键批量批复</span>
                   </ProductButton>
                 )}
               </div>
 
+              <p className="text-sm text-gray-500">每页 25 份，按稳定顺序分页；新提交请刷新查看。翻页后默认仅选择本页未批改记录。</p>
+              <div className="staff-toolbar">
+                <ProductButton disabled={submissionsLoading || submissionHistory.length <= 1} onClick={() => { const history = submissionHistory.slice(0, -1); void fetchSubmissions(selectedAssignment.id, history[history.length - 1], history) }}>上一页</ProductButton>
+                <span>第 {submissionHistory.length} 页 · 本页 {submissions.length} 份</span>
+                <ProductButton disabled={submissionsLoading || !nextSubmissionCursor} onClick={() => void fetchSubmissions(selectedAssignment.id, nextSubmissionCursor, [...submissionHistory, nextSubmissionCursor])}>下一页</ProductButton>
+                <ProductButton disabled={submissionsLoading} onClick={() => void fetchSubmissions(selectedAssignment.id)}>刷新提交列表</ProductButton>
+              </div>
+
               {submissionsLoading ? (
                 <div className="flex items-center justify-center h-64">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-action"></div>
                 </div>
+              ) : submissionsError ? (
+                <p role="alert">{submissionsError}<ProductButton onClick={() => void fetchSubmissions(selectedAssignment.id, submissionCursor, submissionHistory)}>重试提交列表</ProductButton></p>
               ) : submissions.length === 0 ? (
                 <div className="text-center py-12">
                   <ClipboardList className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -997,7 +1115,7 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
             <div className="staff-dialog__header">
               <div>
                 <h2 id="batch-grade-title">一键批量批复</h2>
-                <p className="staff-dialog__description">已选择 {selectedSubmissions.size} 份待批改练习</p>
+                <p className="staff-dialog__description">已选择 {reviewSnapshot?.count ?? selectedSubmissions.size} 份待批改练习</p>
               </div>
             </div>
             
@@ -1005,30 +1123,34 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
               {/* Select All */}
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
                 <span className="text-sm font-medium text-gray-700">
-                  待批改练习 ({submissions.filter(s => s.status !== 'GRADED').length})
+                  本页待批改练习 ({ungradedSubmissions.length})
                 </span>
                 <button
                   onClick={toggleSelectAll}
+                  disabled={isBatchGrading || selectionLoading}
                   className="text-sm text-action hover:text-action-hover flex items-center space-x-1"
                 >
-                  {selectedSubmissions.size === submissions.filter(s => s.status !== 'GRADED').length ? (
+                  {selectedSubmissions.size === ungradedSubmissions.length ? (
                     <>
                       <CheckSquare className="w-4 h-4" />
-                      <span>取消全选</span>
+                      <span>取消本页全选</span>
                     </>
                   ) : (
                     <>
                       <Square className="w-4 h-4" />
-                      <span>全选</span>
+                      <span>全选本页</span>
                     </>
                   )}
                 </button>
               </div>
 
+              <ProductButton disabled={isBatchGrading || selectionLoading} onClick={() => void selectAllUngraded()}>{selectionLoading ? '正在选择…' : '选择全部未批改'}</ProductButton>
+              <p className="text-sm text-gray-500">全部未批改按点击时冻结，最多 5000 份，有效期 15 分钟，不含之后新提交或重新提交的版本。重新勾选本页将取消全部选择。</p>
+              {reviewSnapshot && <p role="status">已冻结选择 {reviewSnapshot.count} 份；批改时跳过已变化或已处理记录。</p>}
+
               {/* Submission List */}
               <div className="max-h-48 overflow-y-auto space-y-2 border rounded p-2">
-                {submissions
-                  .filter(s => s.status !== 'GRADED')
+                {ungradedSubmissions
                   .map((submission) => (
                     <label
                       key={submission.id}
@@ -1036,6 +1158,7 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
                     >
                       <input
                         type="checkbox"
+                        disabled={isBatchGrading || selectionLoading}
                         checked={selectedSubmissions.has(submission.id)}
                         onChange={() => toggleSelectSubmission(submission.id)}
                         className="w-4 h-4 text-action rounded"
@@ -1054,6 +1177,7 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
                   <span>批复评语</span>
                 </label>
                 <textarea
+                  disabled={isBatchGrading || reviewComment.current !== null}
                   value={batchComment}
                   onChange={(e) => setBatchComment(e.target.value)}
                   className="input w-full h-24"
@@ -1078,9 +1202,9 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
                 type="button"
                 variant="primary"
                 onClick={handleBatchGrade}
-                disabled={isBatchGrading || selectedSubmissions.size === 0}
+                disabled={isBatchGrading || selectionLoading || (reviewSnapshot?.count ?? selectedSubmissions.size) === 0}
               >
-                {isBatchGrading ? '批复中...' : `确认批复 (${selectedSubmissions.size}份)`}
+                {isBatchGrading ? '批复中...' : `确认批复 (${reviewSnapshot?.count ?? selectedSubmissions.size}份)`}
               </ProductButton>
             </div>
           </div>

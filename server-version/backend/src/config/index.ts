@@ -260,8 +260,8 @@ if (rawConfig.nodeEnv === 'production') {
 const result = configSchema.safeParse(rawConfig)
 
 if (!result.success) {
-  logger.error('Configuration validation failed', result.error.errors)
-  throw new Error(`Configuration error: ${result.error.errors.map(e => e.message).join(', ')}`)
+  logger.error('Configuration validation failed', result.error.issues)
+  throw new Error(`Configuration error: ${result.error.issues.map(e => e.message).join(', ')}`)
 }
 
 export const config = result.data

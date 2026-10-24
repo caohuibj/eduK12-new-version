@@ -1,4 +1,5 @@
 import {ArrowUpRight,Plus,Layers3,FileText,Users,CheckCircle2} from 'lucide-react'
+import {deferredResearcherComponent} from './deferred-researcher-component'
 import {SurveySectionHeader} from './SurveySectionHeader'
 import {SurveyProjectTools} from './SurveyProjectTools'
 import type {BuilderLeaveRisk} from './SurveyBuilder'
@@ -8,11 +9,13 @@ import { useCallback, useRef, useEffect,useState,useMemo,type FormEvent } from '
 import { QRCodeSVG } from 'qrcode.react'
 import { SurveyFlowStudio,type FormQuestionInfo } from './SurveyFlowStudio'
 import type { FlowDraft } from './flow.client'
-import { SurveyStudyPreview } from './SurveyStudyPreview'
 import type { CognitivePreviewSnapshot } from './ResearchCognitivePreview'
 import type { FormDraft, ResearchDraft, ScaleDraft } from './builder.types'
 import { useInstrumentLibrary, createInstrumentLibrary, type InstrumentLibrary } from './instrument-library'
 import './survey-publish.css'
+
+// Load researcher authoring/preview code only when its existing control is opened.
+const SurveyStudyPreview=deferredResearcherComponent(()=>import('./SurveyStudyPreview').then(module=>module.SurveyStudyPreview),'研究预览')
 
 type RawFeedbackChoice={metricKeys:string[];release:'AFTER_FINAL'|'AFTER_COLLECTION'}
 type ApiResult<T>={code:number|string;message:string;data:T|null}

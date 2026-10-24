@@ -91,7 +91,7 @@ const definitionRequestSchema = z.object({
 })
 
 const answerPreviewSchema = z.object({
-  rawScores: z.record(z.number().finite()).optional(),
+  rawScores: z.record(z.string(), z.number().finite()).optional(),
   answers: z.array(z.object({
     itemCode: z.string().min(1),
     responseValue: z.union([z.string(), z.number().finite()]),
@@ -149,6 +149,25 @@ export const scaleController = {
       }
 
       const where = await scaleWhereForViewer(userId as string, userRole as UserRole, extra)
+
+      // Opt-in directory DTO; default authoring/list clients retain their full
+      // contract. Resolve current visibility above for both paths, unchanged.
+      if (req.query.view === 'training-catalog') {
+        const [list, total] = await Promise.all([
+          prisma.scale.findMany({
+            where,
+            select: {
+              id: true, name: true, code: true, instrumentVersion: true,
+              instrumentClass: true, libraryEntryId: true, status: true, description: true,
+            },
+            orderBy: { createdAt: 'desc' },
+            skip: pagination.skip,
+            take: pagination.take,
+          }),
+          prisma.scale.count({ where }),
+        ])
+        return success(res, buildPaginatedResult(list, total, pagination))
+      }
 
       // 并行查询量表列表和总数
       const [scales, total] = await Promise.all([
@@ -215,7 +234,7 @@ export const scaleController = {
 
       const result = createScaleSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { code, name, description, visibility, estimatedTime, instruction, tags } = result.data
@@ -305,7 +324,7 @@ export const scaleController = {
   async publicDelivery(req: Request,res: Response){
     try {
       if(!req.user?.userId)return forbidden(res,'未登录')
-      const input=z.object({grantId:z.string().uuid(),enabled:z.boolean()}).strict().parse(req.body)
+      const input=z.object({grantId:z.string().guid(),enabled:z.boolean()}).strict().parse(req.body)
       return success(res,await setScalePublicDelivery(req.user.userId,req.params.id,input.grantId,input.enabled))
     } catch(cause){return error(res,cause instanceof Error?cause.message:'平台投放权限不足',-1,403)}
   },
@@ -402,7 +421,7 @@ export const scaleController = {
       const userRole = req.user?.role
       const { id } = req.params
       const body = answerPreviewSchema.safeParse(req.body)
-      if (!body.success) return error(res, body.error.errors[0]?.message ?? '回答格式不正确')
+      if (!body.success) return error(res, body.error.issues[0]?.message ?? '回答格式不正确')
       const scale = await prisma.scale.findUnique({
         where: { id },
         select: { id: true, code: true, name: true, creatorId: true, instrumentVersion: true, instrumentClass: true, definition: true, libraryEntryId: true },
@@ -535,7 +554,7 @@ export const scaleController = {
 
       const result = updateScaleSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const scale = await prisma.scale.findUnique({
@@ -850,7 +869,7 @@ export const scaleController = {
     res.setHeader('Cache-Control', 'no-store')
     try {
       const input = finalScaleSubmitSchema.safeParse(req.body)
-      if (!input.success) return error(res, input.error.errors[0].message)
+      if (!input.success) return error(res, input.error.issues[0].message)
       const { data, internalContext } = await submitScaleAssessmentFinalWithContext({
         assessmentId: req.params.assessmentId,
         userId: req.user?.userId ?? null,
@@ -1074,7 +1093,7 @@ export const scaleController = {
       const userId = req.user?.userId
       const { assessmentId } = req.params
       const parsed = scaleBatchAnswerSchema.safeParse(req.body)
-      if (!parsed.success) return error(res, parsed.error.errors[0].message)
+      if (!parsed.success) return error(res, parsed.error.issues[0].message)
 
       const transactionResult = await withScaleAnswerTransaction(assessmentId, async (tx) => {
         const assessment = await tx.assessment.findUnique({

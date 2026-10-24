@@ -14,7 +14,7 @@ import { prisma } from '../../config/database'
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 const path=z.object({organizationId:uuid,courseId:uuid})
 const runPath=path.extend({runId:uuid})
 const execPath=runPath.extend({executionId:uuid})

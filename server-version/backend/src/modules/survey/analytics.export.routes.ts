@@ -7,7 +7,7 @@ import { createSurveyExport,downloadSurveyExport } from './analytics.export.serv
 import { SurveyAnalyticsError } from './analytics.read'
 
 export const surveyExportsRouter=Router()
-const pid=z.string().uuid(), eid=z.string().uuid()
+const pid=z.string().guid(), eid=z.string().guid()
 const downloadSelection=z.object({part:z.enum(['csv','codebook','manifest']).optional()}).strict()
 const create=z.object({
   format:z.enum(['INTERPRETATION_LONG','RAW_WAVE','RAW_LONG','RAW_WIDE','SCORE_LONG','SCORE_WIDE','COGNITIVE_TRIAL_LONG']),

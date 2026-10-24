@@ -11,7 +11,7 @@ import {privacyScenarioSchema,savePreferenceSchema,
 import {readReportPrivacyPreferences,saveReportPrivacyPreferences,
   readReportPrivacyPolicyState,ReportPrivacyError} from './preferences.service'
 
-const id=z.string().uuid()
+const id=z.string().guid()
 const rate=createRedisRateLimiter({name:'report-privacy-preference-v1',
   limit:24,windowSeconds:900,key:req=>req.user?.userId??req.ip??'unknown'})
 
