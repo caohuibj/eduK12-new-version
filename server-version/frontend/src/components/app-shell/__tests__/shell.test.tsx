@@ -110,7 +110,7 @@ describe('Training management appearance on the admin origin',()=>{
       expect(view.container.querySelector('.training-management-frame')).toHaveAttribute('data-training-theme','dark')
       expect(screen.getByRole('status')).toHaveTextContent('正在加载 Training 管理')
       expect(view.container.querySelector('.hui-product-header')).toBeNull()
-      auth.user={id:'loading-admin',username:'manager',role:'STUDENT',entryGrants:[{entry:'TRAINING',version:1}]} as User;auth.isLoading=false
+      auth.user={id:'loading-admin',username:'manager',role:'STUDENT',platformRole:'STANDARD',entryGrants:[{entry:'TRAINING',version:1}]} as User;auth.isLoading=false
       view.rerender(<MemoryRouter initialEntries={['/admin/training/resources']}><AppShell><p>账号读取完成</p></AppShell></MemoryRouter>)
       await screen.findByRole('link',{name:'账户设置'})
       expect(view.container.querySelector('.training-management-frame')).toHaveAttribute('data-training-theme','light')
@@ -121,7 +121,7 @@ describe('Training management appearance on the admin origin',()=>{
   it.each(['accounts','courses','resources'])('shows the appearance control and remembers its choice on %s',async page=>{
     presentation.training=false
     const id='theme-admin-'+page,key='training:appearance:v1:'+id
-    auth.user={id,username:'theme-admin',role:'STUDENT',entryGrants:[{entry:'TRAINING',version:1}]} as User
+    auth.user={id,username:'theme-admin',role:'STUDENT',platformRole:'STANDARD',entryGrants:[{entry:'TRAINING',version:1}]} as User
     localStorage.setItem(key,'light')
     try{
       const view=render(<MemoryRouter initialEntries={['/admin/training/'+page]}><AppShell><h1>管理内容</h1></AppShell></MemoryRouter>)
@@ -138,7 +138,7 @@ describe('Training management appearance on the admin origin',()=>{
   })
   it('loads the saved Training preference when entering from another admin-origin page',async()=>{
     presentation.training=false
-    auth.user={id:'theme-route-admin',username:'manager',role:'STUDENT',entryGrants:[{entry:'TRAINING',version:1}]} as User
+    auth.user={id:'theme-route-admin',username:'manager',role:'STUDENT',platformRole:'STANDARD',entryGrants:[{entry:'TRAINING',version:1}]} as User
     const key='training:appearance:v1:theme-route-admin';localStorage.setItem(key,'dark')
     try{
       render(<MemoryRouter initialEntries={['/student']}><AppShell><Link to="/admin/training/resources">进入培训管理</Link><Link to="/student">返回学员页</Link></AppShell></MemoryRouter>)
@@ -163,7 +163,7 @@ describe('Training nested-page auth branding',()=>{
 
 describe('Training management section context',()=>{
   it('keeps the administrator banner and account location on the dedicated profile page',async()=>{
-    auth.user={id:'manager',username:'manager',role:'STUDENT',entryGrants:[{entry:'TRAINING',version:1}]} as User
+    auth.user={id:'manager',username:'manager',role:'STUDENT',platformRole:'STANDARD',entryGrants:[{entry:'TRAINING',version:1}]} as User
     render(<MemoryRouter initialEntries={['/admin/training/profile']}><AppShell><h1>个人信息</h1></AppShell></MemoryRouter>)
     await screen.findByRole('link',{name:'账户设置'})
     expect(document.querySelector('.training-management-frame')).not.toBeNull()
