@@ -146,3 +146,47 @@ CLI option failed before tests; an initial lazy-module mock harness was replaced
 with the real media implementation. Final evidence retains these original attempts.
 No real browser/DB resource benchmark, CI run, PR merge or deployment is claimed.
 Anonymous media preloading was inspected but not changed in this batch.
+
+## Follow-up: teacher task authoring, review and export
+
+Standalone assignment/check-in lists defer course choices until authoring or reuse.
+Course-context deep links still load their required prefill, and embedded pages use
+their existing course. Loading failures now expose retry without clearing editor
+input. The optional reuse-picker feedback keeps the dialog usable while choices
+load. There is no course filter in the affected catalog toolbar to starve.
+
+Assignment submission review coalesces repeated in-flight opens in the same dialog,
+invalidates closed/replaced reads, and reports retryable failures. Closing and
+reopening deliberately performs a fresh read. Batch grading retains its complete
+selection semantics; stale completion cannot refresh another task. The ungraded
+partition is memoized only by the current submission array and updates after refresh.
+
+Mocked paired probes observed course-option GETs per standalone list entry 1 to 0,
+same-turn duplicate review GETs 2 to 1, and ten-row batch-comment status-property
+reads 90 to 30. These are request/render-work counters, not real browser latency or
+system throughput measurements. Existing task-export deduplication and finishing
+an explicitly requested download after navigation are unchanged.
+
+Backend legacy teacher list queries use a live course.creatorId relation predicate
+instead of materializing all owned course IDs. Authorized legacy requests use two
+model queries instead of three; an explicitly foreign course previously returned
+early after one course-ID query and now performs two scoped queries. This is not
+a universal query-count reduction, and the current summary-list route is unchanged.
+Teacher/admin branches, course constraints, Activity exclusions and list/count
+predicates remain aligned. Review authorization selects only required ownership
+and context fields. Workbook generation completes before Excel response headers
+are set, so generation failures retain the existing JSON error response behavior.
+Export columns and authorization are unchanged.
+
+Validation: 26 distinct backend assertions, 34 distinct frontend assertions,
+backend/frontend application types and one new-input Vite build passed. Changed
+frontend lint has zero errors and eight verified pre-existing warnings; no new
+warning or rule suppression was introduced. Initial mock HTTP expectations and
+option-name locators were corrected to the unchanged production contracts; their
+failure history is retained. Independent review found no remaining static blocker.
+
+Large assignment review remains a full-list operation, and both XLSX exports still
+materialize full workbook buffers. Cursor paging must preserve explicit batch
+selection semantics; streaming exports need completeness and failure tests. These
+larger changes are not silently included. Real browser/DB capacity measurements,
+CI qualification, PR merge and deployment remain outside this batch.

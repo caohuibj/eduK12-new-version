@@ -114,6 +114,10 @@ const CheckinListContent: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
   const { exporting, exportTask } = useTaskExport(showMessage)
   const [checkins, setCheckins] = useState<Checkin[]>([])
   const [courses, setCourses] = useState<Course[]>(embeddedCourse ? [embeddedCourse] : [])
+  const coursesLoaded = useRef(Boolean(embeddedCourse))
+  const coursesPending = useRef(false)
+  const [coursesError, setCoursesError] = useState<string | null>(null)
+  const [coursesLoading, setCoursesLoading] = useState(false)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const mounted = useRef(true)
@@ -146,9 +150,15 @@ const CheckinListContent: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
 
   useEffect(() => {
     mounted.current = true
-    void fetchCourses()
     return () => { mounted.current = false; loadSequence.current++ }
   }, [])
+
+  // Course choices are authoring data, not a prerequisite for reviewing/exporting tasks.
+  // Preserve eager authorization/prefill for existing course-context deep links.
+  const needsCourses = Boolean(requestedCourseId || showModal || showReuse)
+  useEffect(() => {
+    if (needsCourses) void fetchCourses()
+  }, [needsCourses])
 
   useEffect(() => { void fetchCheckins(); return () => { loadSequence.current++ } }, [catalog.params, focusId, requestedCourseId])
 
@@ -231,9 +241,13 @@ const CheckinListContent: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
   }
 
   const fetchCourses = async () => {
-    if (embeddedCourse) return
+    if (coursesLoaded.current || coursesPending.current) return
+    coursesPending.current = true
+    setCoursesLoading(true)
+    setCoursesError(null)
     try {
       const response = await apiClient.get<{ list: Course[] }>('/courses')
+      if (response.code !== 0) throw new Error(response.message || '获取课程列表失败')
       if (response.code === 0) {
         const list = response.data.list
         const appended = (searchParams.get('create') === 'true' || searchParams.get('reuse') === 'true')
@@ -242,10 +256,16 @@ const CheckinListContent: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
             userId: user?.id,
             knownIds: list.map(course => course.id),
           }) : null
-        if (mounted.current) setCourses(appended ? [...list, appended] : list)
+        if (mounted.current) {
+          coursesLoaded.current = true
+          setCourses(appended ? [...list, appended] : list)
+        }
       }
     } catch (error) {
-      console.error('获取课程列表失败:', error)
+      if (mounted.current) setCoursesError(error instanceof Error ? error.message : '获取课程列表失败')
+    } finally {
+      coursesPending.current = false
+      if (mounted.current) setCoursesLoading(false)
     }
   }
 
@@ -506,6 +526,8 @@ const CheckinListContent: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
       {embeddedCourse && <TrainingCheckinSchedules key={filterRevision} courseId={embeddedCourse.id}/>}
       {embeddedCourse && focusId && <div className="training-assignment-focused"><span>已定位到这项打卡</span><ProductButton onClick={() => { const next=new URLSearchParams(searchParams);next.delete('checkinId');setSearchParams(next,{replace:true}) }}>显示全部打卡</ProductButton></div>}
       {feedback}
+      {!showModal && !showReuse && coursesLoading && <p role="status">正在读取可选课程…</p>}
+      {!showModal && !showReuse && coursesError && <p role="alert">{coursesError}<ProductButton onClick={() => void fetchCourses()}>重试课程列表</ProductButton></p>}
       {openingDetail && <p role="status">正在读取打卡完整内容…</p>}
       {!embeddedCourse && !focusId && <CatalogFilters key={filterRevision+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline label="打卡"/>}
       {loading ? <ProductStatus kind="pending" title="正在加载打卡">正在读取打卡和参与概况。</ProductStatus>
@@ -700,6 +722,8 @@ const CheckinListContent: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
                   <header className="training-task-editor__section-heading"><h3>发布设置</h3></header>
               {/* Course Selection */}
               <div>
+                {coursesLoading && <p role="status">正在读取可选课程…</p>}
+                {coursesError && <p role="alert">{coursesError}<ProductButton onClick={() => void fetchCourses()}>重试课程列表</ProductButton></p>}
                 <label htmlFor="CheckinList-field-101" className="label">选择课程 *</label>
                 <select id="CheckinList-field-101"
                   value={formData.courseId}
@@ -775,7 +799,7 @@ const CheckinListContent: React.FC<CheckinListProps> = ({ embeddedCourse }) => {
         </ModalSurface>
       )}
 
-      {canReuse && showReuse && <TrainingTaskReusePicker kind="checkins" courses={courses} initialCourseId={requestedCourseId} onClose={() => setShowReuse(false)} onSelect={(source, targetCourseId) => {
+      {canReuse && showReuse && <TrainingTaskReusePicker kind="checkins" courses={courses} courseLoading={coursesLoading} courseError={coursesError} onRetryCourses={() => void fetchCourses()} initialCourseId={requestedCourseId} onClose={() => setShowReuse(false)} onSelect={(source, targetCourseId) => {
         setEditingCheckin(null)
         setFormData(checkinReuseContent(source as Checkin, targetCourseId) as CheckinFormData)
         setShowReuse(false)

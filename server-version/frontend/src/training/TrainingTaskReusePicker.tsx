@@ -7,9 +7,12 @@ import type { Assignment, Checkin, Course } from '../types'
 import './training-task-reuse.css'
 
 type Row = { id: string; title: string; courseId: string; course?: { title?: string } }
-export default function TrainingTaskReusePicker({ kind, courses, initialCourseId, onClose, onSelect }: {
+export default function TrainingTaskReusePicker({ kind, courses, courseLoading = false, courseError, onRetryCourses, initialCourseId, onClose, onSelect }: {
   kind: 'assignments' | 'checkins'
   courses: Course[]
+  courseLoading?: boolean
+  courseError?: string | null
+  onRetryCourses?: () => void
   initialCourseId: string | null
   onClose: () => void
   onSelect: (source: Assignment | Checkin, courseId: string) => void
@@ -55,6 +58,8 @@ export default function TrainingTaskReusePicker({ kind, courses, initialCourseId
     <button type="button" disabled={Boolean(selecting)} onClick={onClose}>取消</button>
   </div>}>
     <div className="training-task-reuse">
+      {courseLoading && <p role="status">正在读取可选课程…</p>}
+      {courseError && <p role="alert">{courseError}{onRetryCourses && <button type="button" onClick={onRetryCourses}>重试课程列表</button>}</p>}
       {initialCourseId ? <div className="training-reuse-target"><BookOpen size={20} aria-hidden="true" /><div><span>用于课程</span><strong>{target?.title || '正在确认课程…'}</strong></div></div> : <label>用于课程<select aria-label="复用到课程" value={courseId} disabled={Boolean(selecting)} onChange={event => setCourseId(event.target.value)}><option value="">请选择课程</option>{courses.filter(course => course.creatorId === user?.id).map(course => <option key={course.id} value={course.id}>{course.title}</option>)}</select></label>}
       <p className="training-reuse-note">仅复用内容、题目、附件和标签；不带入起止时间、已有提交或成绩。</p>
       <form onSubmit={apply} className="training-reuse-search"><Search size={18} aria-hidden="true" /><input aria-label={'搜索已有' + label} placeholder={'搜索已有' + label + '标题'} maxLength={200} value={search} disabled={Boolean(selecting)} onChange={event => setSearch(event.target.value)} /><button type="submit" disabled={Boolean(selecting)}>搜索</button></form>

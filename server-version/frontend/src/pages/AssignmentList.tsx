@@ -9,7 +9,7 @@ import TrainingCourseEditorTabs from '../training/TrainingCourseEditorTabs'
 import '../training/training-task-editor.css'
 import TrainingTaskReusePicker from '../training/TrainingTaskReusePicker'
 import { assignmentReuseContent } from '../training/taskReuse'
-import React, { useState, useEffect, useRef } from 'react'
+import React, { useState, useEffect, useRef, useMemo } from 'react'
 import { Plus, Trash2, ClipboardList, FileText, Clock, Video, Image as ImageIcon, CheckSquare, Square, MessageSquare, Users, X } from 'lucide-react'
 import { Navigate, useLocation, useSearchParams } from 'react-router-dom'
 import apiClient from '../api/client'
@@ -113,6 +113,10 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
   const { exporting, exportTask } = useTaskExport(showMessage)
   const [assignments, setAssignments] = useState<Assignment[]>([])
   const [courses, setCourses] = useState<Course[]>(embeddedCourse ? [embeddedCourse] : [])
+  const coursesLoaded = useRef(Boolean(embeddedCourse))
+  const coursesPending = useRef(false)
+  const [coursesError, setCoursesError] = useState<string | null>(null)
+  const [coursesLoading, setCoursesLoading] = useState(false)
   const [loading, setLoading] = useState(true)
   const [loadError, setLoadError] = useState<string | null>(null)
   const mounted = useRef(true)
@@ -144,6 +148,11 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
   const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null)
   const [submissions, setSubmissions] = useState<Submission[]>([])
   const [submissionsLoading, setSubmissionsLoading] = useState(false)
+  const [submissionsError, setSubmissionsError] = useState<string | null>(null)
+  const submissionsSequence = useRef(0)
+  const submissionsPending = useRef<{ id: string; sequence: number } | null>(null)
+  const submissionsTask = useRef<string | null>(null)
+  const ungradedSubmissions = useMemo(() => submissions.filter(submission => submission.status !== 'GRADED'), [submissions])
   const [selectedSubmissions, setSelectedSubmissions] = useState<Set<string>>(new Set())
   const [batchComment, setBatchComment] = useState('你的练习质量很棒，再接再厉！')
   const [isBatchGrading, setIsBatchGrading] = useState(false)
@@ -151,9 +160,20 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
 
   useEffect(() => {
     mounted.current = true
-    void fetchCourses()
-    return () => { mounted.current = false; loadSequence.current++ }
+    // Invalidate the live request epoch, rather than capturing its mount-time value.
+    const invalidateSubmissions = () => {
+      submissionsSequence.current++
+      submissionsPending.current = null
+    }
+    return () => { mounted.current = false; loadSequence.current++; invalidateSubmissions() }
   }, [])
+
+  // Course choices are authoring data, not a prerequisite for reviewing/exporting tasks.
+  // Preserve eager authorization/prefill for existing course-context deep links.
+  const needsCourses = Boolean(requestedCourseId || showModal || showReuse)
+  useEffect(() => {
+    if (needsCourses) void fetchCourses()
+  }, [needsCourses])
 
   useEffect(() => { void fetchAssignments(); return () => { loadSequence.current++ } }, [catalog.params, focusId, requestedCourseId])
 
@@ -221,9 +241,13 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
   }
 
   const fetchCourses = async () => {
-    if (embeddedCourse) return
+    if (coursesLoaded.current || coursesPending.current) return
+    coursesPending.current = true
+    setCoursesLoading(true)
+    setCoursesError(null)
     try {
       const response = await apiClient.get<{ list: Course[] }>('/courses')
+      if (response.code !== 0) throw new Error(response.message || '获取课程列表失败')
       if (response.code === 0) {
         const list = response.data.list
         const appended = (searchParams.get('create') === 'true' || searchParams.get('reuse') === 'true')
@@ -232,37 +256,58 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
             userId: user?.id,
             knownIds: list.map(course => course.id),
           }) : null
-        if (mounted.current) setCourses(appended ? [...list, appended] : list)
+        if (mounted.current) {
+          coursesLoaded.current = true
+          setCourses(appended ? [...list, appended] : list)
+        }
       }
     } catch (error) {
-      console.error('获取课程列表失败:', error)
+      if (mounted.current) setCoursesError(error instanceof Error ? error.message : '获取课程列表失败')
+    } finally {
+      coursesPending.current = false
+      if (mounted.current) setCoursesLoading(false)
     }
   }
 
 
   const fetchSubmissions = async (assignmentId: string) => {
+    if (!mounted.current || submissionsTask.current !== assignmentId || submissionsPending.current?.id === assignmentId) return
+    const sequence = ++submissionsSequence.current
+    submissionsPending.current = { id: assignmentId, sequence }
+    setSubmissionsLoading(true)
+    setSubmissionsError(null)
     try {
-      setSubmissionsLoading(true)
-      const response = await apiClient.get(`/assignments/${assignmentId}/submissions`)
-      if (response.code === 0) {
-        setSubmissions(response.data.list)
-        // 默认选中所有未批改的提交
-        const ungraded = response.data.list.filter((s: Submission) => s.status !== 'GRADED')
-        setSelectedSubmissions(new Set(ungraded.map((s: Submission) => s.id)))
-      }
+      const response = await apiClient.get<{ list: Submission[] }>(`/assignments/${assignmentId}/submissions`)
+      if (!mounted.current || sequence !== submissionsSequence.current) return
+      if (response.code !== 0) throw new Error(response.message || '获取提交列表失败')
+      setSubmissions(response.data.list)
+      // Default selection remains every ungraded submission, never a partial page.
+      const ungraded = response.data.list.filter(submission => submission.status !== 'GRADED')
+      setSelectedSubmissions(new Set(ungraded.map(submission => submission.id)))
     } catch (error) {
-      console.error('获取提交列表失败:', error)
-      showMessage('获取提交列表失败')
+      if (mounted.current && sequence === submissionsSequence.current) {
+        setSubmissionsError(error instanceof Error ? error.message : '获取提交列表失败')
+      }
     } finally {
-      setSubmissionsLoading(false)
+      if (mounted.current && sequence === submissionsSequence.current) {
+        submissionsPending.current = null
+        setSubmissionsLoading(false)
+      }
     }
   }
 
-  // 打开提交列表弹窗
+  // A closed/replaced dialog invalidates its response, including an earlier read of the same task.
   const openSubmissionsModal = (assignment: Assignment) => {
+    if (submissionsTask.current !== assignment.id) {
+      submissionsSequence.current++
+      submissionsPending.current = null
+      setSubmissions([])
+      setSelectedSubmissions(new Set())
+    }
+    submissionsTask.current = assignment.id
     setSelectedAssignment(assignment)
     setShowSubmissionsModal(true)
-    fetchSubmissions(assignment.id)
+    void fetchSubmissions(assignment.id)
   }
 
   // 一键批量批复
@@ -309,7 +354,6 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
 
   // 全选/取消全选
   const toggleSelectAll = () => {
-    const ungradedSubmissions = submissions.filter(s => s.status !== 'GRADED')
     if (selectedSubmissions.size === ungradedSubmissions.length) {
       setSelectedSubmissions(new Set())
     } else {
@@ -566,6 +610,11 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
   }
 
   const closeSubmissions = () => {
+    submissionsTask.current = null
+    submissionsSequence.current++
+    submissionsPending.current = null
+    setSubmissionsLoading(false)
+    setSubmissionsError(null)
     setShowSubmissionsModal(false)
     setSelectedAssignment(null)
     setSubmissions([])
@@ -585,6 +634,8 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
       {embeddedCourse && <div className="training-assignment-toolbar"><div><ProductButton variant="primary" onClick={openCreateModal}><Plus size={17} aria-hidden="true"/>发布练习</ProductButton>{canReuse && <ProductButton onClick={() => setShowReuse(true)}>复用练习</ProductButton>}</div><p>在当前课程内编辑、查看提交和导出数据。</p></div>}
       {embeddedCourse && focusId && <div className="training-assignment-focused"><span>已定位到这份练习</span><ProductButton onClick={() => { const next=new URLSearchParams(searchParams);next.delete('assignmentId');setSearchParams(next,{replace:true}) }}>显示全部练习</ProductButton></div>}
       {feedback}
+      {!showModal && !showReuse && coursesLoading && <p role="status">正在读取可选课程…</p>}
+      {!showModal && !showReuse && coursesError && <p role="alert">{coursesError}<ProductButton onClick={() => void fetchCourses()}>重试课程列表</ProductButton></p>}
       {openingDetail && <p role="status">正在读取练习完整内容…</p>}
       {!embeddedCourse && !focusId && <CatalogFilters key={filterRevision+catalog.stateKey} selection={catalog.selection} onApply={catalog.apply} deadline label="练习"/>}
       {loading ? <ProductStatus kind="pending" title="正在加载练习">正在读取练习和提交概况。</ProductStatus>
@@ -792,6 +843,8 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
                   <header className="training-task-editor__section-heading"><h3>发布设置</h3></header>
               {/* Course Selection */}
               <div>
+                {coursesLoading && <p role="status">正在读取可选课程…</p>}
+                {coursesError && <p role="alert">{coursesError}<ProductButton onClick={() => void fetchCourses()}>重试课程列表</ProductButton></p>}
                 <label htmlFor="AssignmentList-field-101" className="label">选择课程 *</label>
                 <select id="AssignmentList-field-101"
                   value={formData.courseId}
@@ -853,7 +906,7 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
         </ModalSurface>
       )}
 
-      {canReuse && showReuse && <TrainingTaskReusePicker kind="assignments" courses={courses} initialCourseId={requestedCourseId} onClose={() => setShowReuse(false)} onSelect={(source, targetCourseId) => {
+      {canReuse && showReuse && <TrainingTaskReusePicker kind="assignments" courses={courses} courseLoading={coursesLoading} courseError={coursesError} onRetryCourses={() => void fetchCourses()} initialCourseId={requestedCourseId} onClose={() => setShowReuse(false)} onSelect={(source, targetCourseId) => {
         setEditingAssignment(null)
         setFormData(assignmentReuseContent(source as Assignment, targetCourseId) as AssignmentFormData)
         setShowReuse(false)
@@ -894,14 +947,14 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
                     共 {submissions.length} 份提交
                   </span>
                   <span className="text-sm text-green-600">
-                    {submissions.filter(s => s.status === 'GRADED').length} 已批改
+                    {(submissions.length - ungradedSubmissions.length)} 已批改
                   </span>
                   <span className="text-sm text-orange-500">
-                    {submissions.filter(s => s.status !== 'GRADED').length} 待批改
+                    {ungradedSubmissions.length} 待批改
                   </span>
                 </div>
-                {submissions.filter(s => s.status !== 'GRADED').length > 0 && (
-                  <ProductButton variant="primary" onClick={() => setShowBatchGradeModal(true)}>
+                {ungradedSubmissions.length > 0 && (
+                  <ProductButton variant="primary" disabled={submissionsLoading || Boolean(submissionsError)} onClick={() => setShowBatchGradeModal(true)}>
                     <CheckSquare className="w-4 h-4" aria-hidden="true" />
                     <span>一键批量批复</span>
                   </ProductButton>
@@ -912,6 +965,8 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
                 <div className="flex items-center justify-center h-64">
                   <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-action"></div>
                 </div>
+              ) : submissionsError ? (
+                <p role="alert">{submissionsError}<ProductButton onClick={() => void fetchSubmissions(selectedAssignment.id)}>重试提交列表</ProductButton></p>
               ) : submissions.length === 0 ? (
                 <div className="text-center py-12">
                   <ClipboardList className="w-16 h-16 text-gray-300 mx-auto mb-4" />
@@ -1005,13 +1060,13 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
               {/* Select All */}
               <div className="flex items-center justify-between p-3 bg-gray-50 rounded">
                 <span className="text-sm font-medium text-gray-700">
-                  待批改练习 ({submissions.filter(s => s.status !== 'GRADED').length})
+                  待批改练习 ({ungradedSubmissions.length})
                 </span>
                 <button
                   onClick={toggleSelectAll}
                   className="text-sm text-action hover:text-action-hover flex items-center space-x-1"
                 >
-                  {selectedSubmissions.size === submissions.filter(s => s.status !== 'GRADED').length ? (
+                  {selectedSubmissions.size === ungradedSubmissions.length ? (
                     <>
                       <CheckSquare className="w-4 h-4" />
                       <span>取消全选</span>
@@ -1027,8 +1082,7 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
 
               {/* Submission List */}
               <div className="max-h-48 overflow-y-auto space-y-2 border rounded p-2">
-                {submissions
-                  .filter(s => s.status !== 'GRADED')
+                {ungradedSubmissions
                   .map((submission) => (
                     <label
                       key={submission.id}
