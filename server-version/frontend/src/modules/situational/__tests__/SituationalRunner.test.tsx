@@ -495,6 +495,39 @@ describe('Situational journal failure recovery', () => {
     vi.mocked(situationalApi.result).mockRejectedValue(new Error('not completed'))
   })
 
+  it('waits for the durable choice journal before checking or allowing the next stage', async () => {
+    renderRunner()
+    await screen.findByLabelText('选择 A')
+    const putTrial = finalDraftStore.putTrial.bind(finalDraftStore)
+    let release!: () => void
+    const pending = new Promise<void>(resolve => { release = resolve })
+    let started = false
+    vi.spyOn(finalDraftStore, 'putTrial').mockImplementation(async row => {
+      const batch = row.payload as { events?: SituationalResearchEvent[] }
+      if (batch.events?.some(event => event.type === 'RESPONSE_FIRST_COMMITTED')) {
+        started = true
+        await pending
+      }
+      return putTrial(row)
+    })
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    await waitFor(() => expect(started).toBe(true))
+    expect(screen.getByLabelText('选择 A')).not.toBeChecked()
+    expect(screen.getByRole('button', { name: '确认行动选择' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: '提交测评' })).toBeDisabled()
+    expect(screen.queryByRole('slider')).not.toBeInTheDocument()
+    await act(async () => { release(); await pending })
+    await waitFor(() => expect(screen.getByLabelText('选择 A')).toBeChecked())
+    await waitFor(() => expect(screen.getByRole('button', { name: '确认行动选择' })).toBeEnabled())
+    const events = (await finalDraftStore.listTrials('situational:ui-attempt')).flatMap(row =>
+      (row.payload as { events: SituationalResearchEvent[] }).events)
+    expect(events.filter(event => event.type === 'RESPONSE_FIRST_COMMITTED')).toMatchObject([
+      { channelKey: 'choice', responseValue: 'A', responseRevision: 1 },
+    ])
+    fireEvent.click(screen.getByRole('button', { name: '确认行动选择' }))
+    expect(await screen.findByRole('slider')).toBeInTheDocument()
+  })
+
   it('keeps the next edit revision consistent after the journal succeeds but the answer cache fails', async () => {
     renderRunner()
     await screen.findByLabelText('选择 A')
