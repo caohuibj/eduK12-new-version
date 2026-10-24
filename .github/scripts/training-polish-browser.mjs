@@ -1,7 +1,7 @@
 // Compiled UI smoke with synthetic read-only API fixtures; not backend authority evidence.
 import assert from 'node:assert/strict';import {createServer} from 'node:http';import {readFile,stat,mkdir,writeFile} from 'node:fs/promises';
 import {resolve,extname,sep} from 'node:path';import {createRequire} from 'node:module';import {verifyBuiltSource} from './training-polish-checks.mjs';
-verifyBuiltSource();const require=createRequire(new URL('../release-tools/package.json',import.meta.url));const {chromium}=require('playwright-core');
+verifyBuiltSource();const priorReceipt=JSON.parse(await readFile('training-polish-evidence/prior-browser.json','utf8'));const prior=new Set(priorReceipt.checks);const require=createRequire(new URL('../release-tools/package.json',import.meta.url));const {chromium}=require('playwright-core');
 assert.equal(require('playwright-core/package.json').version,require('./package.json').dependencies['playwright-core']);
 const dist=resolve('server-version/frontend/dist'),evidence=resolve('training-polish-evidence');await mkdir(evidence,{recursive:true});
 const mime={'.html':'text/html','.js':'application/javascript','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.webp':'image/webp','.woff2':'font/woff2','.ico':'image/x-icon'};
@@ -20,6 +20,8 @@ const tools=[{id:'tool1',name:'合成普通组合问卷',kind:'composition',desc
 let browser,page;const checks=[],unexpected=[],errors=[];const deadline=setTimeout(async()=>{server.closeAllConnections();await browser?.close();process.exit(1)},180000);
 try{browser=await chromium.launch({headless:true,executablePath:process.env.CHROME_BIN||'/usr/bin/google-chrome'});
  for(const role of ['TEACHER','STUDENT'])for(const theme of ['light','dark']){
+  const names=[...[1440,768,390,320].map(w=>role+'-'+theme+'-'+w),...(role==='TEACHER'?['review-link-','tool-details-','tool-focus-inset-','media-filter-'].map(n=>n+theme):['student-inbox-'+theme,...['assignments','checkins','assessments'].flatMap(s=>['student-'+s+'-completed-'+theme,'student-'+s+'-incomplete-'+theme])])];
+  if(names.every(n=>prior.has(n)))continue;
   const context=await browser.newContext({serviceWorkers:'block',viewport:{width:1440,height:900}});await context.addInitScript(({role,theme})=>{localStorage.setItem('training:appearance:boot:v1',theme);localStorage.setItem('training:appearance:v1:synthetic-'+role,theme)},{role,theme});
   page=await context.newPage();page.setDefaultTimeout(15000);page.on('pageerror',e=>errors.push(e.message));
   await context.route('**/*',async route=>{const req=route.request(),u=new URL(req.url()),p=u.pathname,q=u.searchParams;
@@ -49,27 +51,29 @@ try{browser=await chromium.launch({headless:true,executablePath:process.env.CHRO
    if(req.method()!=='GET'){unexpected.push(req.method()+' '+p);return route.abort();}
    const r=await fetch(local+p+u.search);if(!r.ok)unexpected.push('static '+r.status+' '+p);return route.fulfill({status:r.status,contentType:r.headers.get('content-type')||'application/octet-stream',body:Buffer.from(await r.arrayBuffer())});
   });
-  async function proof(name){await page.waitForLoadState('networkidle');assert.deepEqual(unexpected,[]);assert.deepEqual(errors,[]);assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Page horizontal overflow');
+  async function proof(name){assert(!prior.has(name),'Do not repeat an admitted browser case');await page.waitForLoadState('networkidle');assert.deepEqual(unexpected,[]);assert.deepEqual(errors,[]);assert(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth),'Page horizontal overflow');
    assert.equal(await page.locator('.training-workspace-shell').getAttribute('data-training-theme'),theme);await page.screenshot({path:resolve(evidence,name+'.png'),fullPage:true});checks.push(name);}
   const home=role==='TEACHER'?'/dashboard':'/student';
   for(const width of [1440,768,390,320]){
+   const homeName=role+'-'+theme+'-'+width,extraName=(role==='TEACHER'?'review-link-':'student-inbox-')+theme;if(prior.has(homeName)&&(width!==1440||prior.has(extraName)))continue;
    await page.setViewportSize({width,height:900});await page.goto('http://training.eduk12.top'+home);
    if(role==='TEACHER'){
     await page.getByRole('link',{name:courses[0].title,exact:true}).waitFor();const cols=await page.locator('.training-trainer-course-grid').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);assert.equal(cols,width>=1100?3:width>=701?2:1);
     assert.equal(await page.locator('.trainer-shortcut').count(),1);assert(await page.locator('.trainer-shortcut').evaluate(el=>el.getBoundingClientRect().height<125));
    }else{await page.getByRole('heading',{name:'我的课程',exact:true}).waitFor();assert(await page.locator('.learning-shortcut').first().evaluate(el=>el.getBoundingClientRect().height<125));}
-   const account=page.locator('.hui-account');assert(await account.locator('.training-appearance-control').isVisible());assert(await account.evaluate(el=>{const a=el.querySelector('.training-appearance-control'),b=[...el.querySelectorAll('button')].find(b=>b.textContent.includes('退出'));return Boolean(a&&b&&(b.compareDocumentPosition(a)&Node.DOCUMENT_POSITION_FOLLOWING));}));await proof(role+'-'+theme+'-'+width);
-   if(width===1440){
+   const account=page.locator('.hui-account');assert(await account.locator('.training-appearance-control').isVisible());assert(await account.evaluate(el=>{const a=el.querySelector('.training-appearance-control'),b=[...el.querySelectorAll('button')].find(b=>b.textContent.includes('退出'));return Boolean(a&&b&&(b.compareDocumentPosition(a)&Node.DOCUMENT_POSITION_FOLLOWING));}));if(!prior.has(homeName))await proof(homeName);
+   if(width===1440&&!prior.has(extraName)){
     if(role==='TEACHER'){await page.getByRole('button',{name:/待批阅练习.*份提交/}).click();const link=page.getByRole('link',{name:'查看并批阅：待完成的练习',exact:true});await link.waitFor();assert.equal(await link.getAttribute('href'),teaching.list[0].href);await proof('review-link-'+theme);}
     else{await page.getByRole('button',{name:/待办任务.*跨课程/}).click();await page.getByRole('link',{name:'去完成：待完成的练习',exact:true}).waitFor();await page.getByRole('button',{name:/反馈与结果.*练习评语/}).click();await page.getByRole('link',{name:'查看反馈：已完成的练习',exact:true}).waitFor();assert.equal(await page.getByRole('group',{name:'学习内容分类'}).getByRole('button',{name:/打卡/}).count(),0);await proof('student-inbox-'+theme);}
    }
   }
   if(role==='STUDENT'){
+   await page.setViewportSize({width:320,height:900});
    for(const section of ['assignments','checkins','assessments']){
     await page.goto('http://training.eduk12.top/student/courses/c1?section='+section);await page.locator('.training-completion-filter').waitFor();
-    await page.getByRole('button',{name:/^已完成/}).click();await page.locator('.training-task-item[data-completion="complete"]').waitFor();assert.equal(await page.locator('.training-task-item').count(),1);
+    await page.getByRole('button',{name:/^已完成/}).click();await page.locator('.training-task-item[data-completion="incomplete"]').waitFor({state:'detached'});await page.locator('.training-task-item[data-completion="complete"]').waitFor();assert.equal(await page.locator('.training-task-item').count(),1);
     await proof('student-'+section+'-completed-'+theme);
-    await page.getByRole('button',{name:/^未完成/}).click();await page.locator('.training-task-item[data-completion="incomplete"]').waitFor();assert.equal(await page.locator('.training-task-item').count(),1);await proof('student-'+section+'-incomplete-'+theme);
+    await page.getByRole('button',{name:/^未完成/}).click();await page.locator('.training-task-item[data-completion="complete"]').waitFor({state:'detached'});await page.locator('.training-task-item[data-completion="incomplete"]').waitFor();assert.equal(await page.locator('.training-task-item').count(),1);await proof('student-'+section+'-incomplete-'+theme);
    }
   }else{
    await page.goto('http://training.eduk12.top/toolkit?kind=composition');await page.getByRole('heading',{name:tools[0].name,exact:true}).waitFor();
@@ -79,6 +83,6 @@ try{browser=await chromium.launch({headless:true,executablePath:process.env.CHRO
   }
   await context.close();
  }
- await writeFile(resolve(evidence,'browser.json'),JSON.stringify({checks,unexpected,errors,syntheticOnly:true,compiledArtifact:true},null,2));
+ assert.equal(new Set([...prior,...checks]).size,38);assert.equal(checks.length,17);await writeFile(resolve(evidence,'browser.json'),JSON.stringify({checks,reusedChecks:[...prior],totalChecks:38,unexpected,errors,syntheticOnly:true,compiledArtifact:true},null,2));
 }catch(e){if(page&&!page.isClosed()){await page.screenshot({path:resolve(evidence,'browser-failure.png'),fullPage:true});await writeFile(resolve(evidence,'browser-failure.json'),JSON.stringify({error:String(e),url:page.url(),body:await page.locator('body').innerText(),checks,unexpected,errors},null,2));}throw e;}
 finally{clearTimeout(deadline);await browser?.close();server.closeAllConnections();await new Promise(r=>server.close(r));}

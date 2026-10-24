@@ -1,6 +1,6 @@
 import test from 'node:test';import assert from 'node:assert/strict';import {readFileSync} from 'node:fs';
 import {binding,branch,trainingPolishPlan,trainingPolishOutputs} from './training-polish-scope.mjs';
-import {verifyEvidence,loadEvidence,verifyManifest,verifyHtmlEntry} from './training-polish-checks.mjs';import {failedChecks,requiredChecks} from './merge-gate.mjs';
+import {verifyEvidence,loadEvidence,verifyManifest,verifyHtmlEntry,verifyBrowserReceipt} from './training-polish-checks.mjs';import {failedChecks,requiredChecks} from './merge-gate.mjs';
 const entries=()=>[...Object.entries(binding.source).map(([file,s])=>({file,status:s.status,oldMode:s.oldMode,newMode:s.newMode})),...binding.controls.map(file=>({file,status:binding.controlBefore[file]?'M':'A',oldMode:binding.controlBefore[file]?'100644':'000000',newMode:'100644'}))];
 const head='1'.repeat(40),source='2'.repeat(40);const env={CI_EVENT:'pull_request',CI_HEAD_REF:branch,CI_SOURCE_HEAD:source,CI_PR_NUMBER:'352',CI_PR_REPOSITORY:'caohuibj/eduK12-new-version'};
 function read(_,...args){const x=args.join('');if(x.endsWith('^{tree}'))return '3'.repeat(40);const colon=x.indexOf(':'),ref=x.slice(0,colon),p=x.slice(colon+1);if(p.startsWith('server-version/')&&['frontend','backend'].includes(p.slice(15)))return binding.components[p.slice(15)];
@@ -29,3 +29,8 @@ test('selected route does not enable unrelated application flags',()=>{const o=t
 test('retains actual index and compiled runtime without inventing a Vite manifest',()=>{const files={'index.html':{sha256:'a',bytes:1},'assets/index.js':{sha256:'b',bytes:1}},expected={checkout:'source',source:'head',run:1,attempt:1};verifyManifest({...expected,source:'source',sourceHead:'head',frontendTree:binding.components.frontend,files},files,expected);verifyHtmlEntry('<script type="module" src="/assets/index.js"></script>',files);});
 test('changed emitted files are refused',()=>assert.throws(()=>verifyManifest({source:'s',sourceHead:'h',frontendTree:binding.components.frontend,run:1,attempt:1,files:{'index.html':{sha256:'a'}}},{'index.html':{sha256:'b'}},{checkout:'s',source:'h',run:1,attempt:1})));
 test('HTML must reference the exact retained compiled runtime',()=>assert.throws(()=>verifyHtmlEntry('<script src="/missing.js"></script>',{'index.html':{},'assets/index.js':{}})));
+
+const priorFixture=()=>({checks:binding.priorBrowser.cases.slice(),errors:[],unexpected:[],url:'http://training.eduk12.top/student/courses/c1?section=assignments',error:'2 !== 1'});
+test('admits only the exact previously completed browser cases',()=>assert.equal(verifyBrowserReceipt(priorFixture(),binding.priorBrowser.cases).length,21));
+test('browser errors cannot become admitted passes',()=>{const r=priorFixture();r.errors.push('unexpected error');assert.throws(()=>verifyBrowserReceipt(r,binding.priorBrowser.cases));});
+test('pending or changed browser case sets cannot qualify',()=>{const r=priorFixture();r.checks.push('student-assignments-completed-light');assert.throws(()=>verifyBrowserReceipt(r,binding.priorBrowser.cases));});

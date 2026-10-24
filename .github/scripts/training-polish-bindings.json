@@ -451,7 +451,7 @@
     "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
     "server-version/backend/prisma/schema.prisma": "b75acf10b51f520b1e0c2ac3f68d720ad2fe15ef"
   },
-  "evidenceSHA256": "f6b6532f7f6f8eda0beb4e11659ec1b030fab1916d29161502196f9958abb50c",
+  "evidenceSHA256": "61e7a8992f851ea82d4b4dbacb21e2fb85cf51c82b185945c8c0680ca1cc8929",
   "admittedCases": 302,
   "missingTests": [
     "server-version/frontend/src/components/assessment-shell/__tests__/AssessmentShell.test.tsx",
@@ -480,5 +480,44 @@
       ".github/scripts/training-polish-browser.mjs",
       ".github/scripts/training-polish.test.mjs"
     ]
+  },
+  "priorSast": {
+    "run": 40108928592,
+    "scopeJob": 120916354815,
+    "sastJob": 120916412681,
+    "source": "52a986e5d8004514529e6c41290f3d1ed4b3b53a"
+  },
+  "priorBrowser": {
+    "run": 40108928592,
+    "scopeJob": 120916354815,
+    "qualificationJob": 120916412593,
+    "source": "52a986e5d8004514529e6c41290f3d1ed4b3b53a",
+    "checkout": "836c23d1b3d036a9bb604b4f4ca94f949235b872",
+    "artifact": 12566090219,
+    "zipSHA256": "ade446df7413ccd108f115ffc7a12357f07761b232117b6238894995abfb521d",
+    "cases": [
+      "TEACHER-light-1440",
+      "review-link-light",
+      "TEACHER-light-768",
+      "TEACHER-light-390",
+      "TEACHER-light-320",
+      "tool-details-light",
+      "tool-focus-inset-light",
+      "media-filter-light",
+      "TEACHER-dark-1440",
+      "review-link-dark",
+      "TEACHER-dark-768",
+      "TEACHER-dark-390",
+      "TEACHER-dark-320",
+      "tool-details-dark",
+      "tool-focus-inset-dark",
+      "media-filter-dark",
+      "STUDENT-light-1440",
+      "student-inbox-light",
+      "STUDENT-light-768",
+      "STUDENT-light-390",
+      "STUDENT-light-320"
+    ],
+    "browserProgramSHA256": "7381d1c55c5626e65d0d1867bf511fb976a61c021de7f4508e7843680541de67"
   }
 }

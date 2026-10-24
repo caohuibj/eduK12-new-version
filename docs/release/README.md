@@ -1712,3 +1712,19 @@ qualification controls receive fresh CodeQL after authenticating the original
 completed full selected analysis; original CodeQL action versions/options and
 all unchanged selected JS/TS blobs remain equal. New control consumers and all
 not-yet-executed compiled browser scenarios still execute and must succeed.
+
+The second PR352 run 40108928592 retained its failed browser result after 21
+actual completed scenarios. The first completed-card locator was already present
+before a React filter transition, so its immediate row-count assertion raced.
+The browser control now waits for the opposite-status card to detach and still
+requires exactly one correct-status card. It does not weaken or change product
+completion rules. Official artifact 12566090219, its exact ZIP digest, source,
+failed job, original browser report and 21 images are verified. Only the other
+17 scenarios run; all 38 must be covered by the exact disjoint union.
+
+The original 50 official application assertions and original build still come
+from the first immutable artifact; no application build/test/lint is repeated.
+SAST retains both the first full selected success and the second successful
+changed-control analysis by fixed official identities, then scans current changed
+controls. Changed qualification consumers execute again; old failed jobs and the
+unexecuted filter scenario remain failed/unqualified until actual new success.
