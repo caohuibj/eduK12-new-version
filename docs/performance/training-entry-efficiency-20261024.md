@@ -345,3 +345,55 @@ SJT history/prefix hashing and growing journal serialization, or removing up to 
 stale-asset cleanup operations from an anonymous request. These need separate
 behavioral, authorization, retention or scheduling validation. No debouncing of
 scientific events or weakening of submission/permission checks is introduced.
+
+## PR #349 alignment and bounded phase-one follow-ups
+
+Integrated main `3ee60da761bf777da833f77e81565c5b3d5898a1` locally while preserving
+its trainer-registration/account-lifecycle behavior and schema migration. The
+merged auth controller differs from that main only by the previous four narrow
+projections; administrator-selected account term and expiry boundary remain.
+The generated Prisma client was refreshed from this schema, without migrating a
+database or deploying. Old CI bindings are not valid for this expanded candidate.
+
+- SJT V2 saves reuse an operation-local history projection inside the existing
+  save queue. Three history constructions replace seven, retaining fresh
+  post-invalidation binding, reachable-key pruning and independent final sealing.
+  The synchronous submission precheck computes history at most once. Hash bytes,
+  research journal contents, event order and persistence order are unchanged.
+  This does not claim the same gain for V1 static online SJT. Forty-five affected
+  assertions have passing results; two new instrumentation expectations were
+  corrected and selectively rerun, and three affected submit cases rechecked
+  after lazy precheck initialization. Original failures remain recorded.
+- Periodic stale-upload sweeps no longer run inside student-upload, anonymous-
+  upload or anonymous-submit handlers. A separate lightweight in-process scheduler
+  waits for completion before scheduling another sweep: default five minutes plus
+  0–30 seconds jitter, at most ten candidates per category, sequentially. Settings
+  are bounded by CHECKIN_UPLOAD_CLEANUP_BATCH_SIZE (1–25),
+  CHECKIN_UPLOAD_CLEANUP_INTERVAL_SECONDS (60–3600), and
+  CHECKIN_UPLOAD_CLEANUP_JITTER_SECONDS (0–60). Limits are per process, not cluster.
+  Stop tracks/drains the actual active promise before Prisma disconnect, subject
+  to the pre-existing five-second hard exit. Other hourly jobs/heavy-worker gates,
+  TTL, deletion eligibility, reference guards and compensation remain. Forty-three
+  focused assertions passed, with one overbroad new assertion corrected and only
+  that case rerun. Independent review found no blocker. This remains best-effort:
+  durable physical-delete retry, existing staging TTL races and backlog monitoring
+  are not added; smaller batches may increase cleanup delay.
+- Protected public-check-in videos/documents load only on explicit activation.
+  The initial unused-content request count is zero in focused tests. Cancel,
+  duplicate clicks, late results, token/source identity changes, object-URL release
+  and retries are guarded. Expired URLs refresh through the existing single-asset
+  endpoint, not the detail endpoint that issues an upload session. Documents use
+  prepare-then-open clicks. Images/external/legacy media and server authorization
+  are unchanged. Twenty-two new cases and two existing presentation cases passed.
+  Actual browser playback, popup/new-tab lifetime, transfer bytes and memory remain
+  unverified; activated videos still wait for the complete blob, not Range streaming.
+- Training administrator registration codes use opt-in page/pageSize=20, capped
+  at 50, stable createdAt/id order and a server total. Legacy unpaged callers keep
+  their response. Create/delete refresh and page-request epochs preserve current
+  data; a loaded-page guard prevents failed navigation showing the old page as the
+  new one. Twelve backend and ten distinct frontend cases passed. No new schema
+  index is added: this bounds fetched/rendered rows, not database scanning cost.
+
+Raw command/exits, source hashes, initial failures and selective follow-up results
+are retained in dedicated evidence directories. No new production build, native
+browser acceptance, PostgreSQL run, GitHub CI, PR merge or deployment is claimed.

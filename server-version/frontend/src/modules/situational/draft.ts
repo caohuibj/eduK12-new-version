@@ -1,5 +1,5 @@
 import { onlineAnswerComplete } from './online'
-import { invalidateChangedSituationalHistory } from './history'
+import { invalidateChangedSituationalHistory, type SituationalHistoryInvalidation } from './history'
 import {
   createFinalDraftMeta,
   finalDraftStore,
@@ -101,6 +101,16 @@ export const pruneSituationalDraftResponses = async (
   previousResponses: Record<string, SituationalDraftAnswer> = responses,
 ): Promise<Record<string, SituationalDraftAnswer>> => {
   const history = invalidateChangedSituationalHistory(definition, previousResponses, responses)
+  return pruneInvalidatedSituationalDraftResponses(attempt, definition, history)
+}
+
+/** Finish the same operation's invalidation without repeating its before/after projection. */
+export const pruneInvalidatedSituationalDraftResponses = async (
+  attempt: SituationalAttempt,
+  definition: SituationalRunnerDefinition,
+  history: SituationalHistoryInvalidation,
+): Promise<Record<string, SituationalDraftAnswer>> => {
+  // Deletions may shorten the path: rebind and derive reachable keys from the pruned snapshot.
   const reachable = pruneUnreachableSituationalResponses(definition, history.responses)
   const pruned = { responses: reachable.responses, staleKeys: [...history.staleKeys, ...reachable.staleKeys] }
   if (pruned.staleKeys.length > 0) {

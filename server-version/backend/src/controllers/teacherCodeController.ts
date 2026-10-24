@@ -20,7 +20,25 @@ export const teacherCodeController = {
   // 获取教师码列表
   async list(req: Request, res: Response) {
     try {
-      const codes = await prisma.teacherCode.findMany({
+      // Pagination is opt-in so existing callers keep their complete legacy list.
+      const paged = req.query?.page !== undefined || req.query?.pageSize !== undefined
+      let paging: { page: number; pageSize: number; skip: number } | undefined
+      if (paged) {
+        const positiveInteger = (value: unknown, fallback: number) => {
+          if (value === undefined) return fallback
+          if (typeof value !== 'string' || !/^[1-9]\d*$/.test(value)) return NaN
+          const parsed = Number(value)
+          return Number.isSafeInteger(parsed) ? parsed : NaN
+        }
+        const page = positiveInteger(req.query.page, 1)
+        const pageSize = positiveInteger(req.query.pageSize, 20)
+        const skip = (page - 1) * pageSize
+        if (!Number.isSafeInteger(page) || !Number.isSafeInteger(pageSize) || pageSize > 50 || !Number.isSafeInteger(skip) || skip > 2147483647) {
+          return error(res, '注册码分页参数无效', -1, 400)
+        }
+        paging = { page, pageSize, skip }
+      }
+      const listQuery = prisma.teacherCode.findMany({
         include: {
           creator: {
             select: {
@@ -30,14 +48,18 @@ export const teacherCodeController = {
             }
           }
         },
-        orderBy: {
-          createdAt: 'desc'
-        }
+        orderBy: paging ? [{ createdAt: 'desc' }, { id: 'desc' }] : { createdAt: 'desc' },
+        ...(paging ? { take: paging.pageSize, skip: paging.skip } : {}),
       })
+      const [codes, total] = await Promise.all([
+        listQuery,
+        paging ? prisma.teacherCode.count() : Promise.resolve(undefined),
+      ])
 
       return success(res, {
         list: codes,
-        total: codes.length,
+        total: total ?? codes.length,
+        ...(paging ? { page: paging.page, pageSize: paging.pageSize } : {}),
       })
     } catch (err) {
       logger.error('获取教师码列表错误', err)

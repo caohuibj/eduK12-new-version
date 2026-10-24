@@ -4,7 +4,7 @@ import { situationalCheckpointAnswers, situationalCheckpointUnsupported } from '
 import { OnlineAnswerField } from '../OnlineAnswerField'
 import { withOnlineRunner, onlineResponses } from '../online'
 import { situationalBasePath } from '../paths'
-import { situationalHistoryIdentities, invalidateChangedSituationalHistory } from '../history'
+import { situationalHistoryIdentities, createSituationalHistorySnapshot } from '../history'
 import { researchEventsFromTrials, missingResearchExposureEvents, appendResearchEvents, currentResponseStage, eventTime, researchCapture, researchEnabled, restoreResearchAnswers, type SituationalResearchEvent } from '../research'
 import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { CheckCircle2, ChevronLeft, ChevronRight, CircleAlert, Loader2, Send } from 'lucide-react'
@@ -22,6 +22,7 @@ import {
   ensureSituationalDraft,
   firstMissingSceneIndex,
   pruneSituationalDraftResponses,
+  pruneInvalidatedSituationalDraftResponses,
   pruneUnreachableSituationalResponses,
   readSituationalDraft,
   responseKey,
@@ -411,14 +412,15 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
         if (JSON.stringify(previous[key]?.responseValue) === JSON.stringify(responseValue) && previous[key]?.status === status) return
         const definition = currentData.instrument.definition
         const node = definition.schemaVersion === 2 ? definition.flow.nodes.find(n => n.nodeType === 'SCENE' && n.sceneKey === scene.sceneKey) : undefined
-        const historyIdentity = situationalHistoryIdentities(definition, previous)[scene.sceneKey] ?? '[]'
+        const historySnapshot = createSituationalHistorySnapshot(definition, previous)
+        const historyIdentity = historySnapshot.identities[scene.sceneKey] ?? '[]'
         const stage = node?.nodeType === 'SCENE' ? currentResponseStage(node, historyIdentity, researchEventsRef.current) : null
         if (node?.nodeType === 'SCENE' && node.responseStages && !stage?.channelKeys.includes(channel.channelKey)) throw new Error('已确认的作答不能在后续信息披露后修改。')
         const answer: SituationalDraftAnswer = {
           responseValue, responseTimeMs, answeredAt, ...(status ? {status} : {}),
           ...(definition.schemaVersion === 2 ? { historyIdentity, responseRevision: (previous[key]?.responseRevision ?? 0) + 1 } : {}),
         }
-        const invalidated = invalidateChangedSituationalHistory(definition, previous, { ...previous, [key]: answer })
+        const invalidated = historySnapshot.invalidate({ ...previous, [key]: answer })
         setContinuousInputs(current => { const updated = { ...current }; invalidated.staleKeys.forEach(k => delete updated[k]); return updated })
         if (researchEnabled(currentData) && node?.nodeType === 'SCENE') {
           const time = eventTime(currentData, researchEventsRef.current)
@@ -442,11 +444,10 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
           value: answer,
           updatedAt: Date.now(),
         })
-        const nextResponses = await pruneSituationalDraftResponses(
+        const nextResponses = await pruneInvalidatedSituationalDraftResponses(
           currentData.attempt,
-          currentData.instrument.definition,
-          { ...previous, [key]: answer },
-          previous,
+          definition,
+          invalidated,
         )
         responsesRef.current = nextResponses
         const nextScenes = reachableSituationalScenes(currentData.instrument.definition, nextResponses)
@@ -570,7 +571,11 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
       setNotice('还有必答通道未完成，请补充后再提交。')
       return
     }
-    if (!submissionLocked && data.instrument.definition.schemaVersion === 2 && data.instrument.definition.flow.nodes.some(node => node.nodeType === 'SCENE' && node.responseStages && trajectory.nodeKeys.includes(node.nodeKey) && currentResponseStage(node, situationalHistoryIdentities(data.instrument.definition, responsesRef.current)[node.sceneKey] ?? '[]', researchEventsRef.current))) { setNotice('请先确认当前阶段的作答。'); return }
+    if (!submissionLocked && data.instrument.definition.schemaVersion === 2) {
+      // This synchronous precheck is separate from the authoritative sealed snapshot below.
+      let currentHistories: Record<string, string> | undefined
+      if (data.instrument.definition.flow.nodes.some(node => node.nodeType === 'SCENE' && node.responseStages && trajectory.nodeKeys.includes(node.nodeKey) && currentResponseStage(node, (currentHistories ??= situationalHistoryIdentities(data.instrument.definition, responsesRef.current))[node.sceneKey] ?? '[]', researchEventsRef.current))) { setNotice('请先确认当前阶段的作答。'); return }
+    }
     if (!submissionLocked && !situationalReadyToSubmit(data.instrument.definition, responsesRef.current)) {
       setNotice('当前分支尚未到达可提交的结束节点，请完成当前决策路径。')
       return
