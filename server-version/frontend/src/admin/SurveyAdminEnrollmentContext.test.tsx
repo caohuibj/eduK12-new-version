@@ -46,3 +46,12 @@ describe('education administrator enrollment context',()=>{
   expect(screen.getByLabelText('一次性绑定码')).toBeRequired()
  })
 })
+
+it('preserves neutral system enrollment context without using Survey chrome',()=>{
+ render(<MemoryRouter initialEntries={['/admin/security/enroll?returnTo=%2Fadmin%2Fsystem']}><AdminKeyEnrollment/></MemoryRouter>)
+ expect(screen.getByRole('heading',{name:'系统管理员验证器绑定'})).toBeVisible()
+ expect(document.querySelector('.system-admin-auth')).not.toBeNull()
+ expect(screen.queryByRole('link',{name:'Research 首页'})).not.toBeInTheDocument()
+ expect(screen.getByRole('link',{name:'前往管理员登录'})).toHaveAttribute('href','/admin/login?returnTo=%2Fadmin%2Fsystem')
+ expect(screen.getByLabelText('一次性绑定码')).toBeRequired()
+})

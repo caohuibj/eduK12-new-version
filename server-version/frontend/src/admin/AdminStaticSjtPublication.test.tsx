@@ -7,8 +7,9 @@ const id = (n: number) => '00000000-0000-4000-8000-' + String(n).padStart(12, '0
 const mapping = {instrumentKey: 'installed-sjt', instrumentVersion: '1.2.0', mappingId: id(2), contentDigest: 'source-digest', measurementReleaseId: null}
 const published = {mappingId: id(2), measurementReleaseId: id(3), contentHash: 'measurement-hash', status: 'PUBLISHED'}
 const change = (label: string, value: string) => fireEvent.change(screen.getByLabelText(label), {target: {value}})
-const click = (name: string) => fireEvent.click(screen.getByRole('button', {name}))
-function source() { change('来源 instrumentKey', 'installed-sjt'); change('来源 instrumentVersion', '1.2.0') }
+function openSjt(){const summary=screen.getByText('已安装 SJT 发布准备');if(!summary.closest('details')?.open)fireEvent.click(summary)}
+const click = (name: string) => {openSjt();fireEvent.click(screen.getByRole('button', {name}))}
+function source() { openSjt(); change('来源 instrumentKey', 'installed-sjt'); change('来源 instrumentVersion', '1.2.0') }
 async function prepare() { source(); click('准备精确 SJT 来源'); await screen.findByRole('button', {name: '确认发布 SJT 测量版本'}) }
 function deployment() {
   change('SJT 发布授权 UUID', id(4)); change('许可语言 locale', 'zh-CN'); change('许可地域 territory', 'CN')
@@ -80,7 +81,7 @@ it('warns on storage failures and protects unresolved publication from unload', 
 })
 it('blocks mutations if saved state cannot safely restore', () => {
   sessionStorage.setItem('admin-static-sjt:' + id(9), '{broken'); render(<AdminContentPermissions actorId={id(9)}/>)
-  expect(screen.getByRole('button', {name: '准备精确 SJT 来源'})).toBeDisabled(); expect(screen.getByText(/无法恢复当前管理员的 SJT 请求/)).toBeInTheDocument(); expect(mocks.post).not.toHaveBeenCalled()
+  openSjt();expect(screen.getByRole('button', {name: '准备精确 SJT 来源'})).toBeDisabled(); expect(screen.getByText(/无法恢复当前管理员的 SJT 请求/)).toBeInTheDocument(); expect(mocks.post).not.toHaveBeenCalled()
 })
 it('does not treat an existing source release as confirmation of a new deployment', async () => {
   mocks.post.mockResolvedValueOnce({data: {...mapping, measurementReleaseId: id(3)}})

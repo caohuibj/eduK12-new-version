@@ -1,5 +1,5 @@
 import { beforeEach, expect, it, vi } from 'vitest'
-import { render, screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor, fireEvent } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 const api = vi.hoisted(() => ({resources:vi.fn(),specs:vi.fn(),register:vi.fn(),transitionResource:vi.fn(),createSpec:vi.fn(),transitionSpec:vi.fn()}))
@@ -22,14 +22,18 @@ it('exposes normal resource and spec draft → review → publication with expli
   api.createSpec.mockImplementation(async input=>{spec={id:'spec',specKey:input.specKey,version:input.version,status:'DRAFT',definition:{analysisKind:input.analysisKind,reportEvidenceCeiling:'PILOT',metricRules:[{metricId:'total'}]}};return spec})
   api.transitionSpec.mockImplementation(async(_id,action)=>{spec={...spec,status:action==='review'?'REVIEWED':'PUBLISHED'};return spec})
   const user=userEvent.setup();render(<MemoryRouter><ReportingContent/></MemoryRouter>)
+  await user.click(screen.getByText('注册测量资源',{selector:'summary'}))
   await user.selectOptions(await screen.findByLabelText('原创量表'),'scale')
   expect(client.get).toHaveBeenCalledWith('/organizations/measurement-resources/candidates')
   await user.click(screen.getByRole('button',{name:'注册资源草稿'}))
+  const record=await screen.findByText('原创偏好',{selector:'strong'});fireEvent.click(record.closest('summary')!);
   await user.click(await screen.findByRole('button',{name:'审核'}));await user.click(await screen.findByRole('button',{name:'发布'}))
   await waitFor(()=>expect(stored.status).toBe('PUBLISHED'))
+  await user.click(screen.getByRole('button',{name:/报告方案/}));await user.click(screen.getByText('创建纵向报告方案',{selector:'summary'}))
   await user.selectOptions(screen.getByLabelText('已发布测量资源'),'resource')
   await user.type(screen.getByLabelText('方案名称'),'偏好变化')
   await user.click(screen.getByRole('button',{name:'创建方案草稿'}))
+  fireEvent.click((await screen.findByText('偏好变化',{selector:'strong'})).closest('summary')!)
   await user.click(await screen.findByRole('button',{name:'审核'}));await user.click(await screen.findByRole('button',{name:'发布'}))
   await waitFor(()=>expect(spec.status).toBe('PUBLISHED'))
   expect(api.createSpec).toHaveBeenCalledWith({resourceId:'resource',specKey:'偏好变化',version:1,analysisKind:'INDIVIDUAL_LONGITUDINAL',minimumN:3})
@@ -45,11 +49,14 @@ it('loads older resources without losing selection or duplicating overlapping pa
   const first={...resource,status:'PUBLISHED'},old={...first,id:'old',entry:{...first.entry,title:'更早资源'}}
   api.resources.mockImplementation(async(page=1)=>page===1?{list:[first],nextPage:2}:{list:[first,old],nextPage:null})
   const user=userEvent.setup();render(<MemoryRouter><ReportingContent/></MemoryRouter>)
+  await user.click(screen.getByRole('button',{name:/报告方案/}));await user.click(screen.getByText('创建纵向报告方案',{selector:'summary'}))
   await user.selectOptions(await screen.findByLabelText('已发布测量资源'),'resource')
+  await user.click(screen.getByRole('button',{name:/测量资源/}))
   await user.click(screen.getByRole('button',{name:'更多资源'}))
-  await screen.findByText('更早资源 · 已发布')
+  await screen.findByText('更早资源',{selector:'strong'})
   expect(api.resources).toHaveBeenCalledWith(2)
   expect(screen.getByLabelText('已发布测量资源')).toHaveValue('resource')
+  await user.click(screen.getByRole('button',{name:/报告方案/}))
   expect(screen.getAllByRole('option',{name:'原创偏好'})).toHaveLength(1)
   await user.selectOptions(screen.getByLabelText('已发布测量资源'),'old')
   expect(screen.queryByRole('button',{name:'更多资源'})).not.toBeInTheDocument()
@@ -59,9 +66,10 @@ it('disables self-review of registered resources and reporting specs',async()=>{
  api.resources.mockResolvedValue({list:[{...resource,created_by_user_id:'reviewer'}],truncated:false})
  api.specs.mockResolvedValue({list:[{id:'self-spec',specKey:'My spec',version:1,status:'DRAFT',createdByUserId:'reviewer',definition:{analysisKind:'INDIVIDUAL_LONGITUDINAL',reportEvidenceCeiling:'PILOT',metricRules:[]}}],nextPage:null})
  render(<MemoryRouter><ReportingContent/></MemoryRouter>)
- await screen.findByText('原创偏好 · 草稿')
- const buttons=screen.getAllByRole('button',{name:'审核'})
- expect(buttons).toHaveLength(2);buttons.forEach(button=>expect(button).toBeDisabled())
+ fireEvent.click((await screen.findByText('原创偏好',{selector:'strong'})).closest('summary')!)
+ expect(screen.getByRole('button',{name:'审核'})).toBeDisabled()
+ fireEvent.click(screen.getByRole('button',{name:/报告方案/}));fireEvent.click(screen.getByText('My spec',{selector:'strong'}).closest('summary')!)
+ expect(screen.getByRole('button',{name:'审核'})).toBeDisabled()
  expect(screen.getByText(/注册者、量表作者与方案创建者不能自审/)).toBeInTheDocument()
  expect(api.transitionResource).not.toHaveBeenCalled();expect(api.transitionSpec).not.toHaveBeenCalled()
 })

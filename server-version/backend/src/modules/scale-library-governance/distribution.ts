@@ -1,3 +1,5 @@
+import {assertSurveyManager} from '../survey/admin-role'
+import {assertSurveyToolPolicy} from '../survey/tool-policy'
 import {z} from 'zod'
 import {assertEducationPublicDistributionReady} from './education-distribution-readiness'
 import {grantEducationPublicUseInTransaction,educationRecipientsInTransaction} from './education-distribution-public'
@@ -39,6 +41,7 @@ export async function grantUse(actorId:string,entryId:string,raw:unknown){
     await target(tx,input.userId,input.product)
     await assertScaleLibraryCollectionAllowed(tx,[header.release_id])
     const {entry,submission}=await loadEntry(tx,entryId)
+    if(input.product==='SURVEY')await assertSurveyToolPolicy(tx,{resourceKey:'release:'+entry.release_id,fingerprint:entry.content_hash??''},true)
     if(entry.status!=='ACTIVE')fail('该版本不再接受新使用')
     if(!submission.snapshot.mediaManifest)fail('申请缺少固定附件清单')
     await assertLibraryMediaReady(tx,entryId,submission.snapshot.mediaManifest)
@@ -96,7 +99,8 @@ export async function revokeUse(actorId:string,id:string,raw:unknown){
     const actor=await libraryActor(tx,actorId)
     const [header]=await tx.$queryRaw<LibraryUseRow[]>(Prisma.sql`SELECT * FROM scale_library_use_grants WHERE id=${id}`)
     if(!header)fail('授权不存在',404)
-    if(header.issuer_id!==actorId&&!actor.systemAdmin)fail('只能撤销本人分发的授权',403)
+    if(header.product==='SURVEY')await assertSurveyManager(tx,actorId)
+    if(header.product!=='SURVEY'&&header.issuer_id!==actorId&&!actor.systemAdmin)fail('只能撤销本人分发的授权',403)
     const [row]=await tx.$queryRaw<LibraryUseRow[]>(Prisma.sql`UPDATE scale_library_use_grants SET status='REVOKED',version=version+1,reason=${input.reason},revoked_at=clock_timestamp()
       WHERE id=${id} AND status='ACTIVE' AND version=${input.expectedVersion} RETURNING *`)
     if(!row)fail('授权已撤销或版本已变化')

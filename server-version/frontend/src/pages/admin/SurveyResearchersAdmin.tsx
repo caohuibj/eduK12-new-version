@@ -1,3 +1,4 @@
+import { ChevronDown, UserRound, ShieldCheck, RefreshCw, UsersRound, Mail, MailPlus } from 'lucide-react'
 import { productOrigins, surveyInvitationUrl } from '../../products/origins'
 import { useEffect, useId, useRef, useState } from 'react'
 import { SurveyCatalogGrants } from './SurveyCatalogGrants'
@@ -139,8 +140,15 @@ export default function SurveyResearchersAdmin(){
   const copyLink=async()=>{try{await navigator.clipboard.writeText(link);setError('');setNotice(linkContext+'链接已复制到剪贴板。')}
     catch{setError('未能写入剪贴板，请手动选择复制此链接。')}}
   return <ProductPage width="management"><div className="survey-admin">
-    <header className="survey-admin-header"><div><h1>研究者与授权</h1><p>账号、邀请与工具使用权限。</p></div>
-      <div className="survey-admin-header-actions"><button className="btn-secondary" type="button" aria-label={unconfirmed?'核对当前列表与状态':'刷新管理列表'} disabled={busy||loading} onClick={()=>void refreshForReview()}>{unconfirmed?'核对状态':'刷新'}</button>
+    <header className="survey-admin-header">
+      <div><p className="survey-admin-kicker">RESEARCH · 管理工作台</p><h1>研究者与授权</h1><p>让每一份研究，拥有清晰的使用边界。</p></div>
+      <button className="btn-secondary survey-admin-refresh" type="button" aria-label={unconfirmed?'核对当前列表与状态':'刷新管理列表'} disabled={busy||loading} onClick={()=>void refreshForReview()}><RefreshCw size={16} aria-hidden="true"/>{unconfirmed?'核对状态':'刷新列表'}</button>
+    </header>
+    <div className="survey-admin-workbench">
+      <aside className="survey-admin-sidebar" aria-label="管理辅助">
+        <section className="survey-admin-sidecard survey-admin-security-card">
+          <div className="survey-admin-sidecard-title"><ShieldCheck size={18} aria-hidden="true"/><h2>安全操作</h2></div>
+          <p>浏览无需验证。变更账号或授权前，请先确认管理员身份。</p>
         <div className="survey-admin-security-anchor" onMouseEnter={()=>setTooltipDismissed(false)} onFocus={event=>{if(!event.currentTarget.contains(event.relatedTarget as Node|null))setTooltipDismissed(false)}}>
     <details className="survey-admin-security" ref={verification} onToggle={()=>setTooltipDismissed(true)} onKeyDown={event=>{
       if(event.key==='Escape'){event.preventDefault();setTooltipDismissed(true);if(verification.current){verification.current.open=false;verification.current.querySelector('summary')?.focus()}}
@@ -171,8 +179,17 @@ export default function SurveyResearchersAdmin(){
       <p>双因素验证五分钟内有效，不随操作延长；每次变更仍会校验密码。</p>
     </div>
         </div>
-      </div>
-    </header>
+        </section>
+        <section className="survey-admin-sidecard survey-admin-overview" aria-label="本页概览">
+          <h2>本页概览</h2>
+          <dl><div><dt><UsersRound size={16} aria-hidden="true"/>研究者</dt><dd>{loading?'—':list.length}<span> 位</span></dd></div>
+          <div><dt><Mail size={16} aria-hidden="true"/>待领取邀请</dt><dd>{loading?'—':pending.filter(inv=>inv.status==='PENDING').length}<span> 份</span></dd></div></dl>
+          <p>仅统计当前已加载的分页。</p>
+        </section>
+
+      </aside>
+      <div className="survey-admin-content">
+
     <nav role="tablist" aria-label="Survey 管理分区" className="survey-admin-tabs">
       {sections.map(([key,title,description],index)=><button type="button" role="tab" key={key}
         id={'survey-admin-tab-'+key} aria-controls={'survey-admin-panel-'+key} aria-selected={section===key}
@@ -192,16 +209,22 @@ export default function SurveyResearchersAdmin(){
     <section role="tabpanel" id="survey-admin-panel-tools" aria-labelledby="survey-admin-tab-tools" hidden={section!=='tools'}>
       <SurveyCatalogGrants api={catalogApi} password={password} researchers={list} ensureVerification={ensureVerification}/>
     </section>
-    <section role="tabpanel" id="survey-admin-panel-invitations" aria-labelledby="survey-admin-tab-invitations" hidden={section!=='invitations'} className="survey-admin-panel">
-    <div className="survey-admin-section-heading"><div><h2>研究者邀请</h2><p>签发开户邀请，或查看尚未领取的邀请元数据。</p></div>
-      <button className="btn-primary" disabled={busy||loading} onClick={()=>void act('/researcher-invitations','研究者开户邀请')}>生成研究者邀请</button></div>
-    <p className="survey-admin-muted">链接仅在签发时显示一次；这里查看领取状态和有效期。</p>
-    <div className="space-y-2">{pending.map(inv=><article className="survey-admin-card" key={inv.id}>
-      <h3>研究者开户邀请</h3>
+    <section role="tabpanel" id="survey-admin-panel-invitations" aria-labelledby="survey-admin-tab-invitations" hidden={section!=='invitations'} className="survey-admin-panel survey-admin-invitations">
+    <div className="survey-admin-section-heading"><div className="survey-admin-panel-heading"><span className="survey-admin-avatar"><MailPlus size={22} aria-hidden="true"/></span><div><h2>研究者邀请</h2><p>签发开户邀请，或查看尚未领取的邀请元数据。</p></div></div>
+      <button className="btn-primary" disabled={busy||loading} onClick={()=>void act('/researcher-invitations','研究者开户邀请')}><MailPlus size={16} aria-hidden="true"/>生成研究者邀请</button></div>
+    <p className="survey-admin-inline-note"><ShieldCheck size={15} aria-hidden="true"/><span>链接仅在签发时显示一次；这里查看领取状态和有效期。</span></p>
+    <div className="survey-admin-invitation-list">{pending.map(inv=><article className="survey-admin-card survey-admin-invitation-card" key={inv.id}>
+      <details className="survey-admin-invitation-disclosure"><summary aria-label={'查看邀请：'+inv.id}>
+        <span className="survey-admin-avatar"><Mail size={21} aria-hidden="true"/></span>
+        <span className="survey-admin-card-name"><h3>研究者开户邀请</h3><span>签发于 {new Date(inv.createdAt).toLocaleDateString('zh-CN')}</span></span>
+        <span className="survey-admin-badge" data-status={inv.status}>{inv.status==='PENDING'?'待领取':'已过期'}</span>
+        <ChevronDown className="survey-admin-disclosure-chevron" size={18} aria-hidden="true"/>
+      </summary><div className="survey-admin-invitation-body">
       <p className="text-sm">状态：{inv.status==='PENDING'?'待领取':'已过期'} ·
         签发于 {new Date(inv.createdAt).toLocaleString('zh-CN')} ·
         截止 {new Date(inv.expiresAt).toLocaleString('zh-CN')}</p>
       <details><summary>查看邀请编号与签发者</summary><p className="break-all">邀请编号：{inv.id}<br/>签发者编号：{inv.createdBy}</p></details>
+      <div className="survey-admin-invitation-actions">
       {inv.status==='PENDING'&&<button className="btn-secondary" type="button"
         disabled={busy} onClick={()=>{
           if(!ensureVerification('撤销研究者邀请'))return
@@ -209,9 +232,11 @@ export default function SurveyResearchersAdmin(){
             void act('/researcher-invitations/'+inv.id+'/revoke','撤销邀请 '+inv.id)
           else cancelled('撤销邀请 '+inv.id)
         }} aria-label={'撤销未领取邀请：'+inv.id}>撤销未领取邀请</button>}
+      {inv.status==='EXPIRED'&&<p className="survey-admin-muted">邀请已过期，无需撤销。</p>}
+      </div></div></details>
     </article>)}</div>
-    {!loading&&!error&&!pending.length&&<p className="survey-admin-empty">{invitationPage===1?'目前没有未领取的研究者邀请。':'本页没有未领取的研究者邀请，可返回上一页。'}</p>}
-    <div className="flex items-center gap-3 text-sm">
+    {!loading&&!error&&!pending.length&&<div className="survey-admin-empty-state"><span className="survey-admin-empty-icon"><MailPlus size={28} aria-hidden="true"/></span><p>{invitationPage===1?'目前没有未领取的研究者邀请。':'本页没有未领取的研究者邀请，可返回上一页。'}</p><span>邀请领取后，账号将在“研究者”中管理。</span></div>}
+    <div className="survey-admin-pagination">
       <button type="button" className="btn-secondary" disabled={busy||invitationPage<=1}
         onClick={()=>void refresh(researcherPage,invitationPage-1).catch(e=>setError(String(e)))}>邀请上一页</button>
       <span>邀请第 {invitationPage} 页</span>
@@ -221,10 +246,17 @@ export default function SurveyResearchersAdmin(){
     </section>
     <section role="tabpanel" id="survey-admin-panel-researchers" aria-labelledby="survey-admin-tab-researchers" hidden={section!=='researchers'} className="survey-admin-panel">
     <div className="survey-admin-section-heading"><h2>研究者</h2><span className="survey-admin-muted">当前页 {list.length} 位</span></div>
-    <div className="grid gap-3">{list.map(person=><article className="survey-admin-card survey-admin-person" key={person.id} aria-label={'研究者：'+person.username}>
-      <div className="survey-admin-person-heading"><h3>{person.username}</h3><p className="survey-admin-badge" data-status={person.status}>{statusLabel(person.status)}</p></div>
+    <div className="survey-admin-people">{list.map(person=><article className="survey-admin-card survey-admin-person" key={person.id} aria-label={'研究者：'+person.username}>
+      <details className="survey-admin-person-disclosure">
+        <summary aria-label={'管理研究者：'+person.username}>
+          <span className="survey-admin-avatar"><UserRound size={22} aria-hidden="true"/></span>
+          <span className="survey-admin-person-name"><h3>{person.username}</h3><span>{person.createdAt?'加入于 '+new Date(person.createdAt).toLocaleDateString('zh-CN'):'研究者账号'}</span></span>
+          <span className="survey-admin-badge" data-status={person.status}>{statusLabel(person.status)}</span>
+          <ChevronDown className="survey-admin-disclosure-chevron" size={18} aria-hidden="true"/>
+        </summary>
+        <div className="survey-admin-person-body">
       <details><summary>查看账户编号与状态代码</summary><p className="break-all">账户编号：{person.id} · 状态代码：{person.status}</p></details>
-      <div className="flex flex-wrap gap-2 my-3">
+      <div className="survey-admin-person-actions">
         {['ACTIVE','PENDING_MFA'].includes(person.status)&&<button className="btn-secondary" disabled={busy||loading} aria-label={'暂停资格：'+person.username} onClick={()=>void act('/researchers/'+person.id+'/suspend','暂停资格：'+person.username)}>暂停资格</button>}
         {person.status==='SUSPENDED'&&<button className="btn-secondary" disabled={busy||loading} aria-label={'恢复资格：'+person.username} onClick={()=>void act('/researchers/'+person.id+'/restore','恢复资格：'+person.username)}>恢复资格</button>}
         <button className="btn-secondary" disabled={busy||loading||!['ACTIVE','PENDING_MFA'].includes(person.status)} aria-label={'重置 TOTP：'+person.username} onClick={()=>void act('/researchers/'+person.id+'/mfa-reset','重置 TOTP：'+person.username)}>重置验证器</button>
@@ -234,9 +266,11 @@ export default function SurveyResearchersAdmin(){
         <button className="btn-secondary" disabled={busy||loading||!['ACTIVE','PENDING_MFA'].includes(person.status)} aria-label={'密码重置邀请：'+person.username} onClick={()=>void act('/researchers/'+person.id+'/password-reset-invitations','密码重置邀请：'+person.username)}>密码重置邀请</button>
       </div>
       {!['ACTIVE','PENDING_MFA'].includes(person.status)&&<p className="text-sm">当前资格状态不能重置双因素认证或签发密码恢复邀请。资格恢复以后台现有规则为准。</p>}
+        </div>
+      </details>
     </article>)}</div>
     {!loading&&!error&&!list.length&&<p className="survey-admin-empty">{researcherPage===1?'暂无可见研究者。':'本页没有研究者，可返回上一页。'}</p>}
-    <div className="flex items-center gap-3 text-sm">
+    <div className="survey-admin-pagination">
       <button type="button" className="btn-secondary" disabled={busy||researcherPage<=1}
         onClick={()=>void refresh(researcherPage-1,invitationPage).catch(e=>setError(String(e)))}>研究者上一页</button>
       <span>研究者第 {researcherPage} 页</span>
@@ -244,6 +278,8 @@ export default function SurveyResearchersAdmin(){
         onClick={()=>void refresh(researcherPage+1,invitationPage).catch(e=>setError(String(e)))}>研究者下一页</button>
     </div>
     </section>
-    <details className="survey-admin-scope"><summary>管理范围说明</summary><p>此处管理研究者资格与工具的精确版本授权，不授予研究原始答案访问权。公库收录、版本审核和使用分配在“工具公库与审批”中按现有权限提供。</p></details>
+        <details className="survey-admin-scope"><summary>管理范围说明</summary><p>此处管理研究者资格与工具的精确版本授权，不授予研究原始答案访问权。公库收录、版本审核和使用分配在“工具公库与审批”中按现有权限提供。</p></details>
+    </div>
+    </div>
   </div></ProductPage>
 }

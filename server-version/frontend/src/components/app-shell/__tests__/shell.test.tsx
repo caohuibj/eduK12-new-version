@@ -215,8 +215,8 @@ describe('Survey administrator presentation',()=>{
       render(<MemoryRouter initialEntries={[path]}><AppShell><p>研究管理内容</p></AppShell></MemoryRouter>)
       const navigation=await screen.findByRole('navigation',{name:'主要导航'})
       expect(screen.queryByRole('searchbox',{name:'查找管理页面'})).not.toBeInTheDocument()
-      expect(navigation).toHaveTextContent('研究者与授权')
-      expect(navigation).toHaveTextContent('工具公库与审批')
+      expect(navigation).toHaveTextContent('研究者授权')
+      expect(navigation).toHaveTextContent('工具库审批')
       expect(navigation).not.toHaveTextContent('Survey 首页')
       expect(navigation.querySelector('a[href*="workspace=business"]')).toBeNull()
       expect(screen.queryByText(/业务身份：/)).not.toBeInTheDocument()
@@ -254,12 +254,13 @@ describe('Survey administrator presentation',()=>{
     expect(screen.getByRole('main')).toContainElement(screen.getByRole('heading',{name:'既有管理内容'}))
   })
   it.each(['/admin/permissions?workspace=survey','/admin/training','/admin/scale-library-governance?workspace=training'])(
-    'does not restyle another management context at %s',path=>{
+    'keeps other management contexts outside Survey chrome at %s',path=>{
       presentation.training=true
       auth.user={id:'admin',role:'ADMIN',username:'manager',platformRole:'SYSTEM_ADMIN'} as User
       const view=render(<MemoryRouter initialEntries={[path]}><AppShell><p>原管理内容</p></AppShell></MemoryRouter>)
       expect(view.container.querySelector('.hui-survey-admin-shell')).toBeNull()
-      expect(view.container.querySelector('.hui-training')).not.toBeNull()
+      if(path==='/admin/training')expect(view.container.querySelector('.hui-training')).not.toBeNull()
+      else{expect(view.container.querySelector('.system-admin-shell')).not.toBeNull();expect(view.container.querySelector('.hui-training')).toBeNull()}
       expect(screen.getByText('原管理内容')).toBeVisible()
     })
 })
@@ -633,5 +634,31 @@ describe('Training ordinary startup and route loading presentation',()=>{
   expect(document.title).toBe('Research')
   expect(document.documentElement).not.toHaveAttribute('data-training-entry')
   expect(view.container.querySelector('.training-pending-frame')).toBeNull()
+ })
+})
+
+describe('independent system administrator workspace',()=>{
+ it.each(['/admin/system','/admin/permissions','/admin/scale-library-governance','/admin/system/survey-audit','/admin/survey-system','/admin/survey-researchers'])('keeps system chrome separate from Survey on %s',path=>{
+  auth.user={id:'system',username:'system_admin',role:'STUDENT',businessRole:'STUDENT',platformRole:'SYSTEM_ADMIN',entryGrants:[]} as User
+  const view=render(<MemoryRouter initialEntries={[path]}><AppShell><h1>受保护的系统页面</h1></AppShell></MemoryRouter>)
+  expect(view.container.querySelector('.system-admin-shell')).not.toBeNull()
+  expect(view.container.querySelector('.hui-survey-admin-shell,.training-management-frame,.training-workspace-shell')).toBeNull()
+  expect(screen.queryByRole('link',{name:'Research 首页'})).not.toBeInTheDocument()
+  expect(screen.queryByRole('link',{name:'研究者授权'})).not.toBeInTheDocument()
+  const nav=screen.getByRole('navigation',{name:'主要导航'})
+  expect(nav).toHaveTextContent('管理授权工具库治理报告内容数据审计')
+  expect(nav.querySelector('a[href*="workspace=business"]')).toBeNull()
+  expect(document.title).toBe('系统管理 · eduK12')
+  expect(screen.getByRole('main')).toContainElement(screen.getByRole('heading',{name:'受保护的系统页面'}))
+ })
+ it('keeps system appearance separate from the Survey and Training preferences',async()=>{
+  auth.user={id:'system',username:'system_admin',role:'STUDENT',platformRole:'SYSTEM_ADMIN',entryGrants:[]} as User
+  localStorage.setItem('eduk12:system-admin:theme:v1','light')
+  localStorage.setItem('training:appearance:boot:v1','light')
+  const view=render(<MemoryRouter initialEntries={['/admin/system']}><AppShell><p>系统页面</p></AppShell></MemoryRouter>)
+  await userEvent.click(screen.getByRole('button',{name:'切换为深色外观'}))
+  expect(view.container.querySelector('.system-admin-shell')).toHaveAttribute('data-system-theme','dark')
+  expect(localStorage.getItem('eduk12:system-admin:theme:v1')).toBe('dark')
+  expect(localStorage.getItem('training:appearance:boot:v1')).toBe('light')
  })
 })

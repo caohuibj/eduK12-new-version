@@ -190,7 +190,20 @@ export const requireRole = (...roles: UserRole[]) => {
 }
 
 export const requireAdmin = requireRole(UserRole.ADMIN)
-export const requireTeacher = requireRole(UserRole.TEACHER, UserRole.ADMIN)
+/** Training business endpoints use the existing business persona, never the
+ * compatibility ADMIN projection from an entry grant. No new lookup. */
+export const requireTeacher = (req:Request,res:Response,next:NextFunction) => {
+  if(!req.user)return unauthorized(res)
+  const domain=req.user.accountDomain
+  if(!domain)return forbidden(res,'缺少当前产品身份，请重新登录')
+  if(['LEGACY','TRAINING'].includes(domain)){
+    const role=req.user.businessRole??req.user.role
+    if(role!==UserRole.TEACHER)return forbidden(res,'此操作需要培训师业务身份，入口管理身份不授予私有业务数据权限')
+    req.user={...req.user,role:UserRole.TEACHER}
+    return next()
+  }
+  return requireRole(UserRole.TEACHER,UserRole.ADMIN)(req,res,next)
+}
 export const requireBusinessRole = (...roles:UserRole[]) => (req:Request,res:Response,next:NextFunction)=>{
   if(!req.user)return unauthorized(res)
   const business=asBusinessPrincipal(req.user)

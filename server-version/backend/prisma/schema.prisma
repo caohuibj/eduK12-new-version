@@ -9,6 +9,10 @@ datasource db {
 }
 
 model User {
+  surveyToolPolicies SurveyToolPolicy[] @relation("SurveyPolicyReviewer")
+  surveySystemExportsReceived SurveySystemExportGrant[] @relation("SurveyExportSubject")
+  surveySystemExportsIssued SurveySystemExportGrant[] @relation("SurveyExportIssuer")
+  surveyAdministratorDataAudits SurveyAdminDataAudit[] @relation("SurveyDataAuditActor")
   surveyToolTemplates SurveyToolTemplate[]
   surveyToolSelections SurveyToolSelection[]
   scaleLibrarySubmissions ScaleLibrarySubmission[]
@@ -2991,6 +2995,8 @@ model SurveyMfaRecoveryCode {
   @@map("survey_mfa_recovery_codes")
 }
 model SurveyProject {
+  systemExportGrants SurveySystemExportGrant[]
+  administratorDataAudits SurveyAdminDataAudit[]
   participantCodes SurveyParticipantCode[]
   participantIdentityMode String @default("PERSONAL_LINK") @map("participant_identity_mode")
   participantCodeLabel String @default("报名序号") @map("participant_code_label")
@@ -4494,4 +4500,99 @@ model SurveyParticipantCode {
   @@unique([participantId,projectId])
   @@unique([projectId,prefix])
   @@map("survey_participant_codes")
+}
+
+// Survey administration only. Append-only audit enforcement lives in the migration.
+model SurveyToolPolicy {
+ resourceKey String @map("resource_key")
+ fingerprint String
+ decision String @default("PENDING")
+ paused Boolean @default(false)
+ version Int @default(1)
+ reason String
+ reviewedBy String @map("reviewed_by")
+ reviewer User @relation("SurveyPolicyReviewer",fields:[reviewedBy],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+ @@id([resourceKey,fingerprint])
+ @@map("survey_tool_policies")
+}
+model SurveySystemExportGrant {
+ id String @id
+ userId String @map("user_id")
+ projectId String @map("project_id")
+ subject User @relation("SurveyExportSubject",fields:[userId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ project SurveyProject @relation(fields:[projectId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ pseudonymSalt String @map("pseudonym_salt")
+ capability String
+ issuedBy String @map("issued_by")
+ issuer User @relation("SurveyExportIssuer",fields:[issuedBy],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ reason String
+ expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+ revokedAt DateTime? @map("revoked_at") @db.Timestamptz(6)
+ createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+ @@index([userId,projectId,expiresAt],map:"survey_system_export_grants_scope")
+ @@map("survey_system_export_grants")
+}
+model SurveyAdminDataAudit {
+ id String @id
+ actorId String @map("actor_id")
+ actor User @relation("SurveyDataAuditActor",fields:[actorId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ projectId String? @map("project_id")
+ project SurveyProject? @relation(fields:[projectId],references:[id],onDelete:Restrict,onUpdate:NoAction)
+ action String
+ reason String
+ metadata Json @default("{}")
+ createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+ @@map("survey_admin_data_audits")
+}
+
+// Survey-only three-axis approval and isolated automatic trials. Existing tools are never backfilled.
+model SurveyStandardVersion {
+ id String @id
+ toolKey String @map("tool_key")
+ axis String
+ version String
+ contentHash String @map("content_hash")
+ payload Json
+ sourceVersion String @map("source_version")
+ reference Json
+ createdBy String @map("created_by")
+ createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+ @@unique([toolKey,axis,version])
+ @@unique([toolKey,axis,contentHash])
+ @@map("survey_standard_versions")
+}
+model SurveyStandardRelease {
+ id String @id
+ toolKey String @map("tool_key")
+ combinationHash String @unique @map("combination_hash")
+ snapshot Json
+ reference Json
+ state String
+ version Int @default(1)
+ approvedBy String @map("approved_by")
+ approvedAt DateTime @default(now()) @map("approved_at") @db.Timestamptz(6)
+ latestTrial String? @map("latest_trial")
+ leaseUntil DateTime? @map("lease_until") @db.Timestamptz(6)
+ blockers Json @default("[]")
+ measurementRelease Json? @map("measurement_release")
+ createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+ updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+ trials SurveyStandardTrial[]
+ @@index([toolKey,state,createdAt])
+ @@map("survey_standard_releases")
+}
+model SurveyStandardTrial {
+ id String @id
+ releaseId String @map("release_id")
+ runId String @map("run_id")
+ caseIndex Int @map("case_index")
+ answers Json
+ scores Json
+ report Json
+ recordHash String @map("record_hash")
+ createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+ release SurveyStandardRelease @relation(fields:[releaseId],references:[id],onDelete:Restrict)
+ @@unique([releaseId,runId,caseIndex])
+ @@map("survey_standard_trials")
 }

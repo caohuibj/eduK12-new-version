@@ -21,11 +21,12 @@ beforeEach(()=>{
   vi.clearAllMocks();sessionStorage.clear();localStorage.clear();window.history.replaceState(null,'','/')
   me.mockRejectedValue(new Error('anonymous'))
   csrf.mockResolvedValue({code:0,data:{csrfToken:'synthetic-csrf'}})
-  login.mockResolvedValue({code:0,data:{user:{id:'admin',username:'synthetic-admin',role:'ADMIN',platformRole:'SYSTEM_ADMIN',entryGrants:[{entry:'SURVEY',version:1}]}}})
+  login.mockResolvedValue({code:0,data:{user:{id:'admin',username:'synthetic-admin',role:'ADMIN',platformRole:'SYSTEM_ADMIN',entryGrants:[]}}})
 })
 afterEach(()=>vi.unstubAllGlobals())
 describe('administrator login flow',()=>{
   it('keeps Survey appearance through login and enrollment without theming the generic entry',async()=>{
+    login.mockResolvedValue({code:0,data:{user:{id:'survey-admin',username:'survey-admin',role:'STUDENT',platformRole:'STANDARD',entryGrants:[{entry:'SURVEY',version:1}]}}})
     window.history.replaceState(null,'','/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers&appearance=dark')
     mount('/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers&appearance=dark')
     expect(document.querySelector('.survey-appearance-root')).toHaveAttribute('data-survey-theme','dark')
@@ -39,11 +40,12 @@ describe('administrator login flow',()=>{
     'selects explicit generic auth and a reachable admin fallback for %s',async path=>{
       mount(path);submit()
       expect(screen.queryByRole('button',{name:/^外观：/})).not.toBeInTheDocument()
-      expect(await screen.findByText('destination:/admin/permissions')).toBeInTheDocument()
+      expect(await screen.findByText('destination:/admin/system')).toBeInTheDocument()
       expect(csrf).toHaveBeenCalledTimes(1)
       expect(login).toHaveBeenCalledExactlyOnceWith({username:'synthetic-admin',password:'synthetic-password'},'admin',{method:'TOTP',code:'123456'})
     })
   it('returns the committed administrator identity to Survey governance',async()=>{
+    login.mockResolvedValue({code:0,data:{user:{id:'survey-admin',username:'survey-admin',role:'STUDENT',platformRole:'STANDARD',entryGrants:[{entry:'SURVEY',version:1}]}}})
     mount('/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers')
     expect(screen.getByRole('link',{name:'Research 首页'}).querySelector('img')).toHaveAttribute('src','/survey/huisurvey-w2-emblem.svg')
     expect(document.querySelector('.survey-admin-entry .survey-entry-panel')).toBeVisible()
@@ -90,7 +92,7 @@ describe('administrator login flow',()=>{
     await waitFor(()=>expect(screen.getByRole('button',{name:'管理员登录'})).toBeEnabled())
     fireEvent.change(screen.getByLabelText('Authenticator 六位动态码'),{target:{value:'123456'}})
     fireEvent.click(screen.getByRole('button',{name:'管理员登录'}))
-    expect(await screen.findByText('destination:/admin/permissions')).toBeInTheDocument()
+    expect(await screen.findByText('destination:/admin/system')).toBeInTheDocument()
     expect(login).toHaveBeenCalledTimes(2);expect(csrf).toHaveBeenCalledTimes(2)
   })
   it('does not render credential fields or issue login requests before alias canonicalization',()=>{
@@ -120,6 +122,26 @@ describe('School and Teacher administrator presentation',()=>{
  it('does not grant School access because its branding was selected',async()=>{
   login.mockResolvedValue({code:0,data:{user:{id:'ordinary',username:'ordinary',role:'TEACHER',platformRole:'STANDARD',entryGrants:[]}}})
   mount('/admin/login?returnTo=%2Fadmin%2Fhuischool');submit()
+  expect(await screen.findByText('destination:/admin/entrances')).toBeInTheDocument()
+ })
+})
+
+describe('independent system administrator entry',()=>{
+ it('uses neutral system branding and preserves its dedicated landing target',async()=>{
+  mount('/admin/login?returnTo=%2Fadmin%2Fsystem')
+  expect(screen.getByRole('heading',{name:'系统管理员登录'})).toBeVisible()
+  expect(document.querySelector('.system-admin-auth')).not.toBeNull()
+  expect(screen.queryByRole('link',{name:'Research 首页'})).not.toBeInTheDocument()
+  expect(screen.getByRole('link',{name:'首次绑定 Authenticator'})).toHaveAttribute('href','/admin/security/enroll?returnTo=%2Fadmin%2Fsystem')
+  submit();expect(await screen.findByText('destination:/admin/system')).toBeInTheDocument()
+ })
+ it('returns system administrators from a Survey-only target to the system workbench',async()=>{
+  mount('/admin/login?returnTo=%2Fadmin%2Fsurvey-researchers');submit()
+  expect(await screen.findByText('destination:/admin/system')).toBeInTheDocument()
+ })
+ it('does not turn system entry branding into system authority for a Survey manager',async()=>{
+  login.mockResolvedValue({code:0,data:{user:{id:'survey-manager',username:'survey-manager',role:'STUDENT',platformRole:'STANDARD',entryGrants:[{entry:'SURVEY',version:1}]}}})
+  mount('/admin/login?returnTo=%2Fadmin%2Fsystem');submit()
   expect(await screen.findByText('destination:/admin/entrances')).toBeInTheDocument()
  })
 })

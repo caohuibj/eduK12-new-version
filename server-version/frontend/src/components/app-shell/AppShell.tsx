@@ -1,3 +1,5 @@
+import SystemAdminShell from '../../admin/SystemAdminShell'
+import {isSystemWorkspacePath,isSystemLoginTarget} from '../../admin/systemWorkspace'
 import {isTrainingAdminPath} from '../../admin/trainingPages'
 import { productOrigins, SURVEY_ADMIN_PATH } from '../../products/origins'
 import { SurveyBrand } from '../../survey/SurveyBrand'
@@ -66,7 +68,9 @@ function AppShellContent({ children }: { children: ReactNode }) {
   const origins=productOrigins()
   // This exact route context selects presentation only. RouteAccess, existing
   // navigation capabilities and server permissions remain authoritative.
-  const surveyAdmin=(hasAdminEntry(user,'SURVEY')||user?.platformRole==='SYSTEM_ADMIN')&&Boolean(origins)&&(location.pathname===SURVEY_ADMIN_PATH||
+  const systemWorkspace=user?.platformRole==='SYSTEM_ADMIN'&&isSystemWorkspacePath(location.pathname)
+  const systemEntry=['/admin/login','/admin/security/enroll'].includes(location.pathname)&&isSystemLoginTarget(new URLSearchParams(location.search).get('returnTo'))
+  const surveyAdmin=user?.platformRole!=='SYSTEM_ADMIN'&&hasAdminEntry(user,'SURVEY')&&Boolean(origins)&&(location.pathname===SURVEY_ADMIN_PATH||
     (location.pathname==='/admin/scale-library-governance'&&new URLSearchParams(location.search).get('workspace')==='survey'))
   const surveyAdminEntry=Boolean(origins)&&['/admin/login','/admin/security/enroll'].includes(location.pathname)&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH
   const educationProduct=location.pathname==='/admin/huischool'?'School':location.pathname==='/admin/huiteacher'?'Teacher':null
@@ -117,15 +121,17 @@ function AppShellContent({ children }: { children: ReactNode }) {
       &&isTrainingAdminPath(new URLSearchParams(location.search).get('returnTo')??''))
     if(mode==='display'&&!trainingBrand)return
     const surveyBrand=surveyAdmin||surveyAdminEntry
-    document.title=educationBrand?`${educationBrand} · 管理员工作台`:surveyBrand?'Research':trainingBrand?'Training':`${title==='Huisurvey'?'':`${title} · `}Huisurvey`
+    document.title=systemWorkspace||systemEntry?'系统管理 · eduK12':educationBrand?`${educationBrand} · 管理员工作台`:surveyBrand?'Research':trainingBrand?'Training':`${title==='Huisurvey'?'':`${title} · `}Huisurvey`
     const icon=document.head.querySelector<HTMLLinkElement>('link[rel="icon"]')
-    if(surveyBrand)icon?.setAttribute('href','/survey/huisurvey-w2-emblem.svg')
+    if(systemWorkspace||systemEntry)icon?.setAttribute('href','/system-admin.svg')
+    else if(surveyBrand)icon?.setAttribute('href','/survey/huisurvey-w2-emblem.svg')
     else if(trainingBrand)icon?.setAttribute('href',trainingFavicon)
-    else if(['/survey/huisurvey-w2-emblem.svg','/training/favicon.svg',trainingFavicon].includes(icon?.getAttribute('href')??''))icon?.setAttribute('href','/vite.svg')
+    else if(['/system-admin.svg','/survey/huisurvey-w2-emblem.svg','/training/favicon.svg',trainingFavicon].includes(icon?.getAttribute('href')??''))icon?.setAttribute('href','/vite.svg')
     if(previousPath.current!==location.pathname&&mode!=='focused')mainRef.current?.focus()
     previousPath.current=location.pathname
-  },[location.pathname,location.search,title,mode,training,surveyAdmin,surveyAdminEntry,educationBrand])
+  },[location.pathname,location.search,title,mode,training,surveyAdmin,surveyAdminEntry,educationBrand,systemWorkspace,systemEntry])
   if(isTrainingAdminPath(location.pathname)&&(authLoading||!user))return <div className="hui-app hui-training training-management-frame" data-training-theme={appearance.theme}><main className="training-management-main">{children}</main></div>
+  if(systemWorkspace&&user)return <SystemAdminShell username={user.nickname||user.username} loggingOut={loggingOut} onLogout={async()=>{setLoggingOut(true);try{await logout()}finally{setLoggingOut(false)}}}>{children}</SystemAdminShell>
   // Keep a themed neutral frame while identity is unresolved. It never displays
   // workspace content or role-specific navigation before RouteAccess can decide.
   if(training&&appearance.enabled&&!surveyAdmin&&!surveyAdminEntry&&authLoading)return <div className="hui-app hui-training training-pending-frame" data-shell-mode="standard" data-training-theme={appearance.theme}><main id="hui-main" className="training-pending-main" tabIndex={-1}><RouteLoading/></main></div>
@@ -157,13 +163,15 @@ function AppShellContent({ children }: { children: ReactNode }) {
 }
 export default function AppShell({children}:{children:ReactNode}) {
   const { pathname,search } = useLocation()
+  const {user}=useAuth()
   const training = isTrainingHost()
   // Direct deep links to the existing Organization/Relational product must
   // still be functional; only ordinary Training course navigation skips
   // irrelevant discovery. Host context changes presentation, not API authority.
   const requiresOrganization = /^\/(organizations(?:\/|$)|organization-tasks(?:\/|$)|my-assessments(?:\/|$)|organization-invitations(?:\/|$))/.test(pathname)
   const requiresRelational = /^\/(relational(?:\/|$)|parent(?:\/|$)|student\/parent-links(?:\/|$))/.test(pathname)
-  const surveyManagement=pathname===SURVEY_ADMIN_PATH||(pathname==='/admin/scale-library-governance'&&new URLSearchParams(search).get('workspace')==='survey')||(['/admin/login','/admin/security/enroll'].includes(pathname)&&new URLSearchParams(search).get('returnTo')===SURVEY_ADMIN_PATH)
+  const systemManagement=user?.platformRole==='SYSTEM_ADMIN'&&isSystemWorkspacePath(pathname)
+  const surveyManagement=systemManagement||pathname===SURVEY_ADMIN_PATH||(pathname==='/admin/scale-library-governance'&&new URLSearchParams(search).get('workspace')==='survey')||(['/admin/login','/admin/security/enroll'].includes(pathname)&&new URLSearchParams(search).get('returnTo')===SURVEY_ADMIN_PATH)
   return <AccountViewProvider view={accountView(pathname,search)}><TrainingAppearanceProvider suspended={surveyManagement} management={isTrainingAdminPath(pathname)}><OrganizationProvider suspended={surveyManagement||(training && !requiresOrganization)}>
     <RelationalAvailabilityProvider suspended={surveyManagement||(training && !requiresRelational)}>
       <AppShellContent>{children}</AppShellContent>

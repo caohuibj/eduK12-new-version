@@ -1,3 +1,4 @@
+import {assertSurveyPublicationNotPaused} from './tool-policy'
 import { assertSurveyScaleCollectionAllowed } from './scale-collection-guard'
 import {Prisma} from '@prisma/client'
 import {z} from 'zod'
@@ -75,7 +76,7 @@ export async function bindSurveyAttemptContent(tx:Prisma.TransactionClient,input
   if(!input.newAttempt&&!row.content_binding_cipher)return // Legacy recovery never invents an assignment/content binding.
   const assignment=row.flow_assignment_cipher?decryptUnifiedRuntimePayload<SurveyFlowAssignment>(row.flow_assignment_cipher):null
   const selected=assignedSurveySnapshot(snapshot,assignment)
-  if(input.newAttempt) await assertSurveyScaleCollectionAllowed(tx,selected)
+  if(input.newAttempt){await assertSurveyPublicationNotPaused(tx,selected);await assertSurveyScaleCollectionAllowed(tx,selected)}
   const cache=new Map<string,StoredRelease>()
   const read=async(id:string)=>{
     if(cache.has(id))return cache.get(id)!

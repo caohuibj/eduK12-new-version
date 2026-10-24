@@ -1,3 +1,4 @@
+import {assertSurveyLibraryManager} from '../survey/admin-role'
 import {compileEducationApplicability,readFrozenEducationApplicability} from './education-applicability'
 import {buildLibraryMediaManifest,assertLibraryMediaConsent,retainLibrarySubmissionMedia,approveLibraryMedia} from './media'
 import {randomUUID} from 'node:crypto'
@@ -152,6 +153,7 @@ export async function listEntries(actorId:string,entryId?:string,pagination?:{of
   })
 }
 export async function stopCollection(tx:Tx,actorId:string,targetKind:'RELEASE'|'TRAINING_SCALE'|'SURVEY_INSTRUMENT',targetId:string,reason:string,grantId?:string){
+  if(!(await libraryActor(tx,actorId)).systemAdmin)fail('共享工具紧急停用仅限系统管理员',403)
   if(targetKind==='RELEASE')await assertLibraryAuthority(tx,actorId,targetId,'catalog.manage','TRAINING',grantId)
   else if(!(await libraryActor(tx,actorId)).systemAdmin)fail('旧量表紧急停用需要系统管理员',403)
   const exists=targetKind==='RELEASE'
@@ -172,6 +174,7 @@ export async function changeEntryStatus(actorId:string,id:string,raw:unknown){
   return prisma.$transaction(async tx=>{
     const [header]=await tx.$queryRaw<EntryRow[]>(Prisma.sql`SELECT * FROM scale_library_entries WHERE id=${id}`)
     if(!header)fail('条目不存在',404)
+    if(!(await libraryActor(tx,actorId)).systemAdmin)fail('共享工具全局下架或紧急停用仅限系统管理员',403)
     await assertLibraryAuthority(tx,actorId,header.release_id,'catalog.manage','TRAINING',input.grantId)
     if(input.status==='EMERGENCY_DISABLED')await stopCollection(tx,actorId,'RELEASE',header.release_id,input.reason,input.grantId)
     const {entry,submission}=await loadEntry(tx,id,true)
@@ -183,12 +186,13 @@ export async function changeEntryStatus(actorId:string,id:string,raw:unknown){
 }
 
 /** Owner/reviewer-only exact content. Never public catalog or answer data. */
-export async function readSubmission(actorId:string,id:string,grantId?:string){
+export async function readSubmission(actorId:string,id:string,grantId?:string,surveyManagement=false){
  return prisma.$transaction(async tx=>{
   const actor=await libraryActor(tx,actorId)
   const [row]=await tx.$queryRaw<SubmissionRow[]>(Prisma.sql`SELECT * FROM scale_library_submissions WHERE id=${id} FOR SHARE`)
   if(!row)fail('申请不存在',404)
-  if(row.author_id!==actorId&&!actor.systemAdmin){
+  if(surveyManagement)await assertSurveyLibraryManager(tx,actorId)
+  if(!surveyManagement&&row.author_id!==actorId&&!actor.systemAdmin){
    const caps=await libraryCapabilities(tx,actorId)
    const grant=grantId??caps.reviewGrants.find(g=>g.releaseIds.includes(row.release_id))?.grantId
    await assertLibraryAuthority(tx,actorId,row.release_id,'catalog.manage','TRAINING',grant)

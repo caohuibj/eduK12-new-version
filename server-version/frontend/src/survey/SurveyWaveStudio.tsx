@@ -1,3 +1,4 @@
+import {WavePackagePicker} from './WavePackagePicker'
 import {ArrowUpRight,Plus,Layers3,FileText,Users,CheckCircle2} from 'lucide-react'
 import {deferredResearcherComponent} from './deferred-researcher-component'
 import {SurveySectionHeader} from './SurveySectionHeader'
@@ -526,6 +527,7 @@ export function SurveyWaveStudio({projectId,instrumentLibrary,onProjectChanged,o
             setForm(old=>({...old,instrumentIds:[...old.instrumentIds,...ids.filter(id=>!old.instrumentIds.includes(id))],flowDefinition:null,quotaPolicy:null}))
             setLibrarySelectionDirty(true);setReady(null);setStudyPreview(null)
           }}/>}
+        {showDraft&&<WavePackagePicker projectId={projectId} selected={form.instrumentIds} disabled={busy} onSelect={ids=>{if(form.flowDefinition&&!window.confirm('整包加入会重置当前流程，请随后重新编排。继续？'))return;setForm(old=>({...old,instrumentIds:ids,flowDefinition:null,quotaPolicy:null}));setLibrarySelectionDirty(true);setReady(null);setStudyPreview(null)}}/>}
         {showDraft&&<form className="survey-wave-form survey-task-card space-y-4" onSubmit={save}>
           <div className="survey-wave-draft-heading"><h3>{editing?'修改未发布波次':'创建波次草稿'}</h3>
           <button type="button" className="btn-secondary" disabled={busy||!form.instrumentIds.length} onClick={previewStudy}>预览整轮研究流程</button></div>

@@ -1,6 +1,10 @@
 import { SURVEY_NATIVE_SJT_PROTOCOL } from './situational-native.contract'
 import type {SituationRuntimeDefinition} from '../situational/situation-runtime-definition'
 import {surveyNativeSituationalRequiresStageNotice,type FrozenSurveyNativeSituationalHeader,type SurveyNativeSituationalHeader } from './situational-native.definition'
+import {bindGovernedToolContent} from './governed-tool.content'
+import {freezeGovernedPackages} from './governed-package.service'
+import type {PackageReport} from './governed-tool.model'
+import {bindApprovedTripletContent} from './standard-triplet.content'
 import {freezeSurveyParticipantFeedback,type SurveyRawFeedback,type SurveyParticipantFeedbackSelection} from './participant-feedback'
 import {freezeSurveyContentSelections,type SurveyContentSelection,type FrozenSurveyContentSelection} from './content-selection'
 import {ContentReleaseError} from '../measurement-content/release'
@@ -56,7 +60,9 @@ export interface ResearchFrozenUnit {
   compiledDefinition:unknown
   displayDefinition:unknown
 }
+export interface FrozenGovernedPackage {schemaVersion:1;importId:string;toolId:string;hash:string;title:string;family:'COMBINATION'|'BUNDLE';parentGrantId:string;report:PackageReport|null;slots:Array<{slotKey:string;draftId:string;instrumentKey:string;kind:'FORM'|'SCALE'|'SJT'|'COGNITIVE'}>}
 export interface ResearchFrozenPublication {
+  governedPackages?:FrozenGovernedPackage[]
   schemaVersion:1
   purpose:'RESEARCH_ONLY'
   projectId:string
@@ -87,12 +93,12 @@ export function surveyMeasurementReleaseInput(unit:ResearchFrozenUnit,actorId:st
       protocolContext:{timingPolicy:frozen.timingPolicy,devicePolicy:frozen.devicePolicy,restartLimit:frozen.restartLimit}})
   }
   if(unit.kind==='SJT')return sjtMeasurementRelease({localId:unit.draftId,version:String(unit.draftRevision),
-    instrumentVersion:surveyScaleReleaseContext(unit).instrumentVersion,definition:unit.compiledDefinition,
+    instrumentVersion:String(unit.sourceProvenance?.governedInstrumentVersion??surveyScaleReleaseContext(unit).instrumentVersion),definition:unit.compiledDefinition,
     ...(unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL?{}:{displayProtocol:unit.displayDefinition}),scope,provenance:unit.sourceProvenance??{}})
   const source=unit.sourceProvenance?.sourceMeasurementRelease as {releaseId?:string}|undefined
   if(unit.sourceProvenance&&!source?.releaseId)throw new SurveyWaveError(409,'目录量表须先由来源管理者完成显式版本转换，再重新授权导入')
   return scaleMeasurementRelease({localId:unit.draftId,version:unit.authoringVersion?`v${unit.authoringVersion}`:String(unit.draftRevision),sourceReleaseId:source?.releaseId??unit.revisionSourceReleaseId??null,
-    ...surveyScaleReleaseContext(unit),definition:unit.compiledDefinition,
+    ...surveyScaleReleaseContext(unit),...(typeof unit.sourceProvenance?.governedInstrumentVersion==='string'?{instrumentVersion:unit.sourceProvenance.governedInstrumentVersion}:typeof unit.sourceProvenance?.standardInstrumentVersion==='string'?{instrumentVersion:unit.sourceProvenance.standardInstrumentVersion}:{}),definition:unit.compiledDefinition,
     instrumentClass:unit.sourceProvenance&&unit.sourceProvenance.instrumentClass!=='CUSTOM_DESCRIPTIVE'?'STANDARD':'CUSTOM_DESCRIPTIVE',provenance:{...(unit.sourceProvenance??{}),
       ...(!unit.sourceProvenance&&unit.authoringFamilyId?{authoringRelationship:unit.revisionSourceReleaseId?((unit.authoringVersion??1)>1?'REVISION':'COPY'):'ORIGINAL',authoringFamilyId:unit.authoringFamilyId??unit.draftId,authoringVersion:unit.authoringVersion??1,
         authoringSnapshot:{title:unit.title,definition:unit.displayDefinition,instrumentClass:'CUSTOM_DESCRIPTIVE',product:'SURVEY'}}:{})},scope})
@@ -212,13 +218,16 @@ export async function freezeResearchWaveDraft(input:{
       if (unit.kind === 'FORM') continue
       // Scale catalog imports now use the same explicit publication action as
       // native drafts. Other catalog families retain their separate migration.
-      const release=unit.sourceProvenance&&unit.kind!=='SCALE'
+      const release=unit.sourceProvenance&&(unit.kind!=='SCALE'||Boolean(unit.sourceProvenance.surveyPackage))
         ?await publishSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
         :await resolveSurveyMeasurementUnit(tx,unit,input.actorUserId,input.projectId)
       feedbackMetrics.set(unit.draftId,release.content.metrics.map(metric=>metric.metricKey))
       unit.measurementRelease = { releaseId: release.releaseId, contentHash: release.contentHash,
         measurementHash: release.content.measurementHash }
     }
+    for(const unit of units){await bindApprovedTripletContent(tx,unit,input.actorUserId);await bindGovernedToolContent(tx,unit,input.actorUserId)}
+    if((input.participantFeedback??[]).some(s=>units.some(u=>s.feedback.mode==='DESCRIPTIVE'&&u.draftId===s.instrumentId&&(u.sourceProvenance?.surveyStandardReleaseId||u.sourceProvenance?.surveyToolReleaseId)&&u.sourceProvenance?.reportConfigured===false)))stop('已批准组合明确不反馈，不能在投放时添加报告反馈')
+    if((input.contentSelections??[]).some(s=>units.some(u=>u.draftId===s.instrumentId&&(u.sourceProvenance?.surveyStandardReleaseId||u.sourceProvenance?.surveyToolReleaseId))))stop('已批准标准工具的参数与报告组合已冻结，不能在投放时替换版本')
     freezeSurveyParticipantFeedback(units,input.participantFeedback??[],feedbackMetrics)
     await freezeSurveyContentSelections(tx,input.actorUserId,input.projectId,units,input.contentSelections??[])
     // Initial bounded research safety limit, not a measured capacity claim.
@@ -310,6 +319,7 @@ export async function freezeResearchWaveDraft(input:{
         &&surveyNativeSituationalRequiresStageNotice(unit.compiledDefinition as SituationRuntimeDefinition)),
       linearSituational:units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL
         &&!surveyNativeSituationalRequiresStageNotice(unit.compiledDefinition as SituationRuntimeDefinition))})
+    const governedPackages=await freezeGovernedPackages(tx,input.actorUserId,input.projectId,units,frozenFlow)
     const snapshot:ResearchFrozenPublication={
       schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:input.projectId,
       waveId:input.waveId,collectionMode:project.collectionMode as ResearchFrozenPublication['collectionMode'],
@@ -318,7 +328,7 @@ export async function freezeResearchWaveDraft(input:{
       consentDigest:canonicalHash({text:wave.consentText,version:wave.consentVersion,
         linkedConfirmed:wave.linkageNoticeConfirmed,...(measurementNotice?{measurementNotice}:{})}),
       ...(measurementNotice?{measurementNotice}:{}),
-      units,...(frozenFlow?{flow:frozenFlow}:{}),
+      units,...(governedPackages.length?{governedPackages}:{}),...(frozenFlow?{flow:frozenFlow}:{}),
       ...(quotaPolicy?{quotaPolicy}:{}),
       ...(checkpointPolicy?{checkpointPolicy}:{}),
       ...(groupIpPolicy?{groupIpPolicy}:{}),

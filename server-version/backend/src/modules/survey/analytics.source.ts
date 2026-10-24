@@ -4,6 +4,7 @@ import { deriveAuthoritativeSituationalTrajectory } from '../situational/situati
 import { SURVEY_NATIVE_SJT_PROTOCOL,SurveySituationalProtocolError } from './situational-native.contract'
 import { frozenSurveyNativeSituationalRuntime } from './situational-native.definition'
 import { loadSurveySituationalResults } from './situational-native.results'
+import {assertSystemSurveyDataAudit} from './system-data-authority'
 import {readSurveyScalePresentation,scalePresentationOptions} from './catalog-scale.presentation'
 import {decodeSurveyAttemptContentBinding} from './content-binding.service'
 import {checkedStoredSurveyInterpretation,type SurveyStoredInterpretationObservation} from './analytics.interpretation-export'
@@ -452,6 +453,8 @@ export function surveyExclusiveSnapshotCutOff(timestamp:Date):Date {
   return new Date(timestamp.getTime()+1)
 }
 type SurveySourceInput = {
+  /** Internal audited system reader only. Never bound from owner API input. */
+  systemAccess?:import('./system-data-authority').SystemDataAccess
   actorUserId:string;projectId:string;waveIds?:string[];maxFinals?:number;
   /** Internal exact report read only; never forwarded from public raw/analytics inputs. */
   finalId?:string;
@@ -510,7 +513,10 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
 
   const max=Math.min(500,Math.max(1,input.maxFinals??250))
   return prisma.$transaction(async tx=>{
-    const [project]=await tx.$queryRaw<Array<{collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';sourceCutOff:Date;sourceRevision:number}>>`
+    if(input.systemAccess)await assertSystemSurveyDataAudit(tx,input.actorUserId,input.projectId,input.systemAccess)
+    const [project]=input.systemAccess?await tx.$queryRaw<Array<{collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';sourceCutOff:Date;sourceRevision:number}>>`
+      SELECT collection_mode AS "collectionMode",revision AS "sourceRevision",transaction_timestamp() AS "sourceCutOff"
+      FROM survey_projects WHERE id=${input.projectId} FOR SHARE`:await tx.$queryRaw<Array<{collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';sourceCutOff:Date;sourceRevision:number}>>`
       WITH authorized AS MATERIALIZED (
       SELECT p.collection_mode AS "collectionMode", p.revision AS "sourceRevision",
         transaction_timestamp() AS "sourceCutOff", u.expires_at

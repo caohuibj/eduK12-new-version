@@ -1,9 +1,10 @@
 import {describe,it,expect,vi,beforeEach} from 'vitest'
-const mocks=vi.hoisted(()=>({source:vi.fn(),auth:vi.fn(),get:vi.fn(),transaction:vi.fn(),project:vi.fn(),final:vi.fn()}))
+const mocks=vi.hoisted(()=>({source:vi.fn(),auth:vi.fn(),get:vi.fn(),transaction:vi.fn(),project:vi.fn(),final:vi.fn(),systemAuth:vi.fn()}))
 vi.mock('../../config/database',()=>({prisma:{$transaction:mocks.transaction}}))
 vi.mock('../../modules/survey/analytics.source',()=>({loadSurveySource:mocks.source}))
 vi.mock('../../modules/survey/builder.service',()=>({authorizedProject:mocks.auth,SurveyBuilderError:class extends Error{statusCode=403}}))
 vi.mock('../../modules/measurement-content/repository',()=>({getContentRelease:mocks.get}))
+vi.mock('../../modules/survey/system-data-authority',()=>({assertSystemSurveyDataAudit:mocks.systemAuth}))
 import {readSurveyStoredReport,listSurveyStoredReports} from '../../modules/survey/report-results.service'
 const hash='a'.repeat(64),scope={kind:'PRIVATE',ownerId:'owner',product:'SURVEY',resourceId:'project'}
 const pointer={releaseId:'m',contentHash:hash,measurementHash:hash}
@@ -18,7 +19,7 @@ const source=()=>({projectId:'project',sourceRevision:5,completeAttempts:1,inter
  {attemptId:'attempt',measurement:{instrumentKey:'scale',scoreKey:'secret'},value:999,status:'calculated',quality:{status:'interpretable'}}]})
 const input={projectId:'project',waveId:'wave',finalId:'final',instrumentKey:'scale'}
 beforeEach(()=>{
- vi.clearAllMocks();mocks.source.mockResolvedValue(source());mocks.auth.mockResolvedValue({id:'project'});mocks.project.mockResolvedValue({revision:5});mocks.final.mockResolvedValue({resultsHash:hash})
+ vi.clearAllMocks();mocks.systemAuth.mockResolvedValue('owner');mocks.source.mockResolvedValue(source());mocks.auth.mockResolvedValue({id:'project'});mocks.project.mockResolvedValue({revision:5});mocks.final.mockResolvedValue({resultsHash:hash})
  mocks.transaction.mockImplementation(async fn=>fn({surveyProject:{findUnique:mocks.project},surveyWaveFinal:{findFirst:mocks.final}}))
  mocks.get.mockImplementation(async(_tx,id)=>id==='m'?measurement():id==='p'?report():reference())
 })
@@ -79,5 +80,20 @@ describe('bounded saved report pointer index',()=>{
  it('refuses incomplete or foreign reader identities',async()=>{
   await expect(listSurveyStoredReports('owner',{projectId:'project',waveId:'wave'})).rejects.toMatchObject({statusCode:409})
   mocks.source.mockResolvedValue({...source(),interpretations:[]});await expect(listSurveyStoredReports('owner',{projectId:'project',waveId:'wave'})).rejects.toMatchObject({statusCode:409})
+ })
+})
+
+describe('audited system report uses the original private owner scope',()=>{
+ it('checks its audit receipt and renders only saved declared facts without owner impersonation',async()=>{
+  const systemAccess={auditId:'scoped-receipt',proof:{tokenVersion:0,adminVerifiedAt:Math.floor(Date.now()/1000),adminSessionId:'system-session'}}
+  const result=await readSurveyStoredReport('system',{...input,systemAccess})
+  expect(mocks.systemAuth).toHaveBeenCalledWith(expect.anything(),'system','project',systemAccess)
+  expect(mocks.auth).not.toHaveBeenCalled()
+  expect(mocks.source).toHaveBeenCalledWith(expect.objectContaining({actorUserId:'system',systemAccess}))
+  expect(result.report.blocks).toContainEqual(expect.objectContaining({type:'METRIC',metricKey:'total',value:3}))
+ })
+ it('refuses a missing, expired or mismatched audit receipt before rendering',async()=>{
+  mocks.systemAuth.mockRejectedValue(new Error('AUDIT_REQUIRED'))
+  await expect(readSurveyStoredReport('system',{...input,systemAccess:{auditId:'foreign',proof:{tokenVersion:0}}})).rejects.toThrow('AUDIT_REQUIRED')
  })
 })
