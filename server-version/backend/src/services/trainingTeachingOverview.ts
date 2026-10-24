@@ -1,12 +1,12 @@
 import { prisma } from '../config/database'
 
-export type TeachingOverviewQuery = { page: number; pageSize: number }
+export type TeachingOverviewQuery = { page: number; pageSize: number; includeCourseCounts?: boolean }
 
 /** Course-owner metadata only. Shared content never grants access to submissions. */
 export async function listTrainingTeachingOverview(userId: string, query: TeachingOverviewQuery) {
   const courseWhere = { creatorId: userId, isLibrary: false, courseType: { not: 'CAMPUS_ACTIVITY' } }
   const [courseCounts, pending] = await Promise.all([
-    prisma.course.groupBy({ by: ['status'], where: courseWhere, _count: { _all: true } }),
+    query.includeCourseCounts === false ? null : prisma.course.groupBy({ by: ['status'], where: courseWhere, _count: { _all: true } }),
     prisma.submission.groupBy({
       by: ['assignmentId'],
       where: { status: 'SUBMITTED', assignment: { course: courseWhere } },
@@ -26,8 +26,10 @@ export async function listTrainingTeachingOverview(userId: string, query: Teachi
     summary: {
       pendingSubmissions: pending.reduce((sum, row) => sum + row._count._all, 0),
       pendingAssignments: pending.length,
-      courses: courseCounts.reduce((sum, row) => sum + row._count._all, 0),
-      publishedCourses: courseCounts.find(row => row.status === 'PUBLISHED')?._count._all ?? 0,
+      ...(courseCounts ? {
+        courses: courseCounts.reduce((sum, row) => sum + row._count._all, 0),
+        publishedCourses: courseCounts.find(row => row.status === 'PUBLISHED')?._count._all ?? 0,
+      } : {}),
     },
     list: pageRows.flatMap(row => {
       const assignment = byId.get(row.assignmentId)

@@ -5,7 +5,7 @@ import apiClient from '../api/client'
 import './training-trainer-overview.css'
 
 export type TeachingOverview = {
-  summary: { pendingSubmissions: number; pendingAssignments: number; courses: number; publishedCourses: number }
+  summary: { pendingSubmissions: number; pendingAssignments: number; courses?: number; publishedCourses?: number }
   list: { id: string; title: string; course: { id: string; title: string }; pendingCount: number; oldestSubmittedAt: string | null; href: string }[]
   total: number; page: number; pageSize: number
 }
@@ -26,11 +26,15 @@ export default function TrainingTrainerOverview({ heading, refreshKey = 0 }: { h
     setLoading(true)
     setError('')
     setData(null)
-    void apiClient.get<TeachingOverview>('/courses/my/teaching-overview?page=' + page + '&pageSize=5').then(response => {
+    void apiClient.get<TeachingOverview>('/courses/my/teaching-overview?page=' + page + '&pageSize=5&includeCourseCounts=false').then(response => {
       if (!active) return
       const next = response.data
       if (response.code !== 0 || !next || !Array.isArray(next.list) || !next.summary
-        || (['pendingSubmissions', 'pendingAssignments', 'courses', 'publishedCourses'] as const).some(key => !Number.isSafeInteger(next.summary[key]) || next.summary[key] < 0)
+        || (['pendingSubmissions', 'pendingAssignments'] as const).some(key => !Number.isSafeInteger(next.summary[key]) || next.summary[key] < 0)
+        || (['courses', 'publishedCourses'] as const).some(key => {
+          const value = next.summary[key]
+          return value !== undefined && (!Number.isSafeInteger(value) || value < 0)
+        })
         || !Number.isSafeInteger(next.total) || next.total < 0 || next.page !== page || next.pageSize !== 5
         || next.list.some(row => typeof row.href !== 'string' || !row.href.startsWith('/courses/'))) {
         throw new Error(response.message || '批阅概览数据不完整，请重试')
