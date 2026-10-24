@@ -1325,3 +1325,53 @@ job remains failed. Original successful application SAST is verified by its exac
 successful official job and unchanged component trees; only the two changed
 qualification JS files receive fresh CodeQL. No application tests/build ran in
 the failed admission invocation; those missing stages still must succeed.
+
+
+## Training trainer account management qualification (2026-10-24)
+
+The authorized candidate on `work/survey-training-branding-20261023` binds the
+complete twenty-file product diff, main base and component trees in
+`training-teacher-bindings.json`. It includes nullable registration-code account
+terms, trainer renewal/freeze/recovery and their compact UI. Survey entry CSS,
+dependencies, existing authority/CSRF/session controls and production remain
+outside this candidate. Unknown paths/modes/blobs, moved base, mismatched PR
+source/merge trees, manual/full requests and failed/missing stages fail closed.
+
+The bounded job admits the reviewed original local reporter/stdout and actual
+tool-completion observations for 78 affected assertions, current backend/app
+types and changed lint. These are reviewed-local-evidence, ciExecuted=false and
+originalExecutionSigned=false. Source/runtime/type input bindings are reviewed
+retrospectively; complete historical node_modules bytes were not recorded. The
+original type/fixture failures are retained, not relabeled successful. Erased
+type-only additions and subsequent CSS-only adjustments do not claim that old
+browser observations validated new styles; final Mac UI checks are separately
+recorded. This narrowly reviewed admission is not a generic signed local runner.
+
+Actions executes new scope/refusal/gate contracts, an isolated old-schema to
+new-schema upgrade and dump/restore with retained synthetic rows, actual HTTP
+CSRF/MFA/entry/target/version boundaries and credential recovery, one frontend
+compile, and current frontend/backend/changed-control CodeQL. Existing local
+unit/rollback flows and types/lint are not replayed. No full platform, scientific,
+media, load, image, deployment or server job is selected. The inlined job retains
+the current reusable-workflow reference limit. This route qualifies merging,
+not deployment. Exact main push classifies without repeating application work.
+
+
+The first PR349 run 40056841527 failed during Redis service creation because
+single-quoted health-command arguments were passed literally by the runner.
+No application admission, dependency installation, migration, HTTP test or build
+ran in that job. Only that quoting is repaired. Its independently successful
+CodeQL job may be admitted only by exact run/job/source/PR, completed successful
+analysis step, 24-hour lifetime and unchanged application/stable-control Git
+inputs; the two changed verifier/test scripts receive current CodeQL. The
+original run remains failed. Mock refusal tests never publish official receipts.
+
+The one repair run uses a candidate-only concurrency suffix so the original
+independent SAST can finish while missing qualification work proceeds. Its
+original-job verifier waits at most six minutes for actual completed success;
+failure/timeout still blocks merging, and no pending result is accepted.
+
+Run 40057566877 was rejected before jobs because the service-container context
+was placed at job environment scope. The container id is now supplied only to
+the migration step, where that context is available. No checks/build ran in the
+rejected invocation; original SAST remains independently running.

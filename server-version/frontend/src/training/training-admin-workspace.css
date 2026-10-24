@@ -712,3 +712,80 @@
  .training-resource-management :is(.training-inline-grants,.training-inline-rights)>.hui-page-header { gap:8px 12px; }
  .training-resource-management .training-resource-record-table tbody { padding:10px;gap:10px; }
 }
+
+/* Registration codes share the compact Training management typography and theme. */
+.training-code-management { padding:0 0 20px;color:var(--tm-ink);font:400 13px/1.6 -apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; }
+.training-code-toolbar,.training-code-toolbar>div { display:flex;align-items:center;gap:8px; }
+.training-code-toolbar { justify-content:space-between;flex-wrap:wrap;gap:12px;padding:8px 0 16px; }
+.training-code-toolbar p { margin:0;color:var(--tm-muted);font-size:12px; }
+.training-code-management button { display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:6px 11px;border:1px solid var(--tm-line);border-radius:7px;font-family:inherit;font-size:12px;font-weight:500;line-height:1.5;cursor:pointer; }
+.training-code-management button:disabled { opacity:.55;cursor:wait; }
+.training-code-management .training-code-primary { background:var(--tm-action);border-color:var(--tm-action);color:var(--tm-on-action); }
+.training-code-management .training-code-primary:hover { background:var(--tm-action-hover); }
+.training-code-management :is(button,select,input,summary):focus-visible { outline:2px solid var(--tm-green);outline-offset:3px; }
+.training-code-form { margin-bottom:16px;padding:16px;border:1px solid var(--tm-line);border-radius:10px;background:var(--tm-soft); }
+.training-code-form-fields { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:20px; }
+.training-code-form label { display:block;margin-bottom:6px;font-size:12px;font-weight:600; }
+.training-code-form :is(select,input) { width:100%;min-width:0;min-height:38px;padding:8px 10px;border:1px solid var(--tm-line);border-radius:7px;background:var(--tm-surface);color:var(--tm-ink);font:inherit;color-scheme:inherit; }
+.training-code-form .training-code-custom { margin-top:10px; }
+.training-code-form p { margin:6px 0 0;color:var(--tm-muted);font-size:12px; }
+.training-code-form-footer { display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:12px;border-top:1px solid var(--tm-line); }
+.training-code-form-footer>span { flex:1;min-width:180px;color:var(--tm-muted);font-size:12px; }
+.training-code-grid { display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,300px),1fr));gap:12px; }
+.training-code-card { min-width:0;align-self:start;padding:14px 16px;border:1px solid var(--tm-line);border-radius:10px;background:var(--tm-surface); }
+.training-code-card-heading { display:flex;align-items:center;gap:10px; }
+.training-code-card-heading code { margin-right:auto;color:var(--tm-ink);font:600 17px/1.5 ui-monospace,SFMono-Regular,Menlo,monospace;letter-spacing:.06em;overflow-wrap:anywhere;min-width:0; }
+.training-code-status { flex:none;padding:2px 7px;border-radius:5px;background:var(--tm-soft);color:var(--tm-muted);font-size:11px; }
+.training-code-status.is-usable { color:var(--tm-green); }
+.training-code-management .training-code-icon { flex:none;width:34px;min-height:34px;padding:6px;color:var(--tm-green);background:transparent;border-color:transparent; }
+.training-code-management .training-code-icon:hover { background:var(--tm-soft); }
+.training-code-management dl { margin:12px 0 0; }
+.training-code-management dl>div { display:flex;justify-content:space-between;gap:12px;margin-top:5px;font-size:12px; }
+.training-code-management dt { flex:none;color:var(--tm-muted); }
+.training-code-management dd { margin:0;text-align:right;overflow-wrap:anywhere; }
+.training-code-details { margin-top:12px;border-top:1px solid var(--tm-line); }
+.training-code-details summary { display:flex;align-items:center;gap:4px;padding-top:10px;cursor:pointer;color:var(--tm-green);font-size:12px;list-style:none; }
+.training-code-details summary::-webkit-details-marker { display:none; }
+.training-code-details summary>span { margin-left:auto;color:var(--tm-muted);font-size:11px; }
+.training-code-details[open] summary>svg { transform:rotate(180deg); }
+.training-code-management .training-code-delete { margin-top:12px;background:transparent;color:var(--tm-danger);border-color:var(--tm-danger-line); }
+.training-code-error { margin:0 0 12px;padding:10px 12px;border:1px solid var(--tm-danger-line);border-radius:7px;background:var(--tm-danger-bg);color:var(--tm-danger); }
+.training-code-empty { padding:24px 0;text-align:center;color:var(--tm-muted); }
+@media(max-width:600px) {
+ .training-code-form-fields { grid-template-columns:minmax(0,1fr);gap:16px; }
+ .training-code-toolbar p>span { display:none; }
+ .training-code-form-footer>span { flex-basis:100%; }
+ .training-code-form-footer button { flex:1; }
+ .training-code-card { padding:12px; }
+}
+
+/* Training teacher lifecycle forms and transient credential delivery. */
+.training-teacher-command { display:grid;gap:12px;color:var(--tm-ink);font-size:13px;line-height:1.8; }
+.training-teacher-command p { margin:0; }
+.training-teacher-command label { display:block;font-size:12px;font-weight:600; }
+.training-teacher-command :is(select,input) { display:block;width:100%;min-height:40px;margin-top:4px;padding:8px 10px;border:1px solid var(--tm-line);border-radius:7px;background:var(--tm-surface);color:var(--tm-ink);font:inherit; }
+.training-teacher-dialog .staff-dialog__actions { flex-wrap:wrap; }
+.training-password-handoff { font-family:-apple-system,BlinkMacSystemFont,'Segoe UI','PingFang SC','Microsoft YaHei',sans-serif; }
+.training-password-handoff :is(.text-amber-900,.text-slate-900,.text-slate-700) { color:var(--tm-ink); }
+.training-password-handoff .bg-amber-50 { background:var(--tm-soft);border-color:var(--tm-line); }
+.training-password-handoff :is(.btn-primary,.btn-secondary) { min-height:40px;padding:8px 12px;border:1px solid var(--tm-line);border-radius:7px;font-size:13px; }
+.training-password-handoff .btn-primary { background:var(--tm-action);color:var(--tm-on-action);border-color:var(--tm-action); }
+.training-password-handoff .btn-secondary { background:var(--tm-surface);color:var(--tm-green); }
+.training-management-frame :is(.training-teacher-dialog,.training-password-handoff) h2 { font-family:inherit;font-size:18px;line-height:1.5; }
+.training-management-frame :is(.training-teacher-dialog,.training-password-handoff) .staff-dialog__actions { display:flex;flex-direction:row;justify-content:flex-end;gap:8px;padding:14px 16px; }
+.training-management-frame .training-teacher-dialog .staff-dialog__actions .hui-button { flex:1;min-height:40px;padding:8px 14px;border:1px solid var(--tm-line);border-radius:8px;font-size:13px;line-height:1.5;cursor:pointer; }
+.training-management-frame .training-teacher-dialog .staff-dialog__actions .hui-button--primary { border-color:var(--tm-action); }
+.training-management-frame .training-teacher-dialog .staff-dialog__actions .hui-button--danger { border-color:var(--tm-danger); }
+.training-management-frame :is(.training-teacher-dialog,.training-password-handoff) .staff-icon-button { width:36px;height:36px;display:grid;place-items:center;border-radius:8px; }
+.training-management-frame :is(.training-teacher-dialog,.training-password-handoff) .staff-dialog__actions { background:var(--tm-soft);border-color:var(--tm-line); }
+
+/* Compact teacher actions: hints get their own row; controls never inherit
+   the larger management heading font or stretch across a desktop card. */
+.training-management-frame .training-account-card-details .training-account-actions-buttons { display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding-top:8px; }
+.training-management-frame .training-account-card-details .training-account-actions-buttons>.training-accounts-permanent { flex:0 0 100%;min-width:0;min-height:0;margin:0 0 2px;font-size:12px;line-height:1.6;white-space:normal;overflow-wrap:anywhere; }
+.training-management-frame .training-account-card-details .training-account-actions-buttons>button { flex:0 1 auto;min-width:0;min-height:36px;padding:7px 12px;border-radius:7px;font-family:inherit;font-size:12px;font-weight:500;line-height:1.5;white-space:normal;overflow-wrap:anywhere; }
+.training-management-frame .training-account-card-details .training-account-actions>summary { min-height:32px;font-size:12px;line-height:1.5; }
+.training-management-frame .training-account-card-details .training-account-actions>summary:focus-visible { outline:2px solid var(--tm-green);outline-offset:1px;border-radius:5px; }
+@media(max-width:600px) {
+ .training-management-frame .training-account-card-details .training-account-actions-buttons>button { flex:1 1 calc(50% - 4px);min-height:40px;padding:8px 10px; }
+}

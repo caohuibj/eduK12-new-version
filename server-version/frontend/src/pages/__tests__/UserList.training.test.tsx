@@ -3,8 +3,8 @@ import {beforeEach,describe,expect,it,vi} from 'vitest'
 import UserList from '../UserList'
 const api=vi.hoisted(()=>({get:vi.fn(),post:vi.fn()}))
 vi.mock('../../api/client',()=>({default:api}))
-const pending={id:'teacher-pending',username:'trainer_pending',nickname:'待审核培训师',role:'TEACHER',teacherApproved:false,isActive:true,createdAt:'2026-10-01T00:00:00Z'}
-const approved={id:'teacher-active',username:'trainer_active',nickname:'在用培训师',role:'TEACHER',teacherApproved:true,isActive:true,expiresAt:'2099-12-31T00:00:00Z'}
+const pending={updatedAt:'2026-10-24T01:00:00.000Z',id:'teacher-pending',username:'trainer_pending',nickname:'待审核培训师',role:'TEACHER',teacherApproved:false,isActive:true,createdAt:'2026-10-01T00:00:00Z'}
+const approved={updatedAt:'2026-10-24T01:00:00.000Z',id:'teacher-active',username:'trainer_active',nickname:'在用培训师',role:'TEACHER',teacherApproved:true,isActive:true,expiresAt:'2099-12-31T00:00:00Z'}
 const openCard=async(username='trainer_pending')=>{const card=(await screen.findByText(username)).closest<HTMLDetailsElement>('details.training-account-card')!;fireEvent.click(card.querySelector('summary')!);return card}
 const openActions=async(username='trainer_pending')=>{const card=await openCard(username);fireEvent.click(within(card).getByText('管理操作',{selector:'summary'}));return card}
 const student={id:'learner-1',username:'learner_test',nickname:'测试学员',role:'STUDENT',isActive:true}
@@ -73,13 +73,13 @@ describe('Training account management',()=>{
   expect(screen.getByText('永久有效，无需延期')).toBeInTheDocument()
   expect(screen.queryByRole('button',{name:/账号延期/})).not.toBeInTheDocument()
  })
- it('confirms an extension and uses the existing one-year contract',async()=>{
+ it('confirms a Training-scoped extension with the reviewed account version',async()=>{
   render(<UserList training/>)
   await openActions('trainer_active')
-  fireEvent.click(screen.getByRole('button',{name:'将培训师 在用培训师 的账号延期 1 年'}))
+  fireEvent.click(screen.getByRole('button',{name:'延长培训师 在用培训师 的账号有效期'}))
   expect(api.post).not.toHaveBeenCalled()
   fireEvent.click(screen.getByRole('button',{name:'确认延期'}))
-  await waitFor(()=>expect(api.post).toHaveBeenCalledExactlyOnceWith('/auth/extend-account',{userId:'teacher-active',months:12}))
+  await waitFor(()=>expect(api.post).toHaveBeenCalledExactlyOnceWith('/users/teacher-active/training-management',{action:'EXTEND',expectedUpdatedAt:approved.updatedAt,months:12}))
  })
  it('uses server totals for paging and requests the next page',async()=>{
   api.get.mockImplementation((_url,config)=>Promise.resolve({code:0,data:{list:[{...approved,username:'page_'+config.params.page}],total:45}}))
@@ -116,7 +116,7 @@ describe('Training account management',()=>{
   fireEvent.click(row.querySelector('summary')!)
   for(const value of ['trainer_active','在用培训师','正常','teacher-active'])expect(within(row).getByText(value)).toBeVisible()
   expect(within(row).getByText('teacher-active').closest('[data-label]')).toHaveAttribute('data-label','账号 ID')
-  const action=within(row).getByText('管理操作',{selector:'summary'}),extend=within(row).getByText('延期 1 年')
+  const action=within(row).getByText('管理操作',{selector:'summary'}),extend=within(row).getByText('账号延期')
   expect(extend).not.toBeVisible();expect(action.closest('details')).not.toHaveAttribute('open')
   fireEvent.click(action);expect(extend).toBeVisible()
   fireEvent.click(action);expect(extend).not.toBeVisible()
@@ -158,6 +158,53 @@ describe('Training account management',()=>{
   fireEvent.click(first.querySelector('summary')!);expect(within(first).getByText('teacher-pending')).toBeVisible();expect(second).not.toHaveAttribute('open')
   fireEvent.click(first.querySelector('summary')!);expect(within(first).getByText('teacher-pending')).not.toBeVisible()
   expect(api.get).toHaveBeenCalledTimes(1);expect(api.post).not.toHaveBeenCalled()
+ })
+
+ it('shows expired teachers as expired and allows a selectable renewal from now',async()=>{
+  api.get.mockResolvedValue({code:0,data:{list:[{...approved,expiresAt:'2020-01-01T00:00:00Z'}],total:1}})
+  render(<UserList training/>);await openActions('trainer_active')
+  expect(screen.getByText('已到期')).toBeVisible()
+  fireEvent.click(screen.getByRole('button',{name:'延长培训师 在用培训师 的账号有效期'}))
+  expect(screen.getByText(/从当前时间开始续期/)).toBeVisible()
+  fireEvent.change(screen.getByLabelText('延长时间'),{target:{value:'3'}})
+  fireEvent.click(screen.getByRole('button',{name:'确认延期'}))
+  await waitFor(()=>expect(api.post).toHaveBeenCalledWith('/users/teacher-active/training-management',{action:'EXTEND',expectedUpdatedAt:approved.updatedAt,months:3}))
+ })
+ it('cancels freezing without writing and requires confirmation for an active teacher',async()=>{
+  render(<UserList training/>);await openActions('trainer_active')
+  fireEvent.click(screen.getByRole('button',{name:'冻结培训师 在用培训师 的账号'}))
+  expect(screen.getByText(/冻结期间有效期继续计算/)).toBeVisible();expect(api.post).not.toHaveBeenCalled()
+  fireEvent.click(screen.getByRole('button',{name:'取消'}));expect(api.post).not.toHaveBeenCalled()
+  fireEvent.click(screen.getByRole('button',{name:'冻结培训师 在用培训师 的账号'}));fireEvent.click(screen.getByRole('button',{name:'确认冻结'}))
+  await waitFor(()=>expect(api.post).toHaveBeenCalledWith('/users/teacher-active/training-management',{action:'FREEZE',expectedUpdatedAt:approved.updatedAt}))
+ })
+ it('can unfreeze while warning that an expired account still needs renewal',async()=>{
+  api.get.mockResolvedValue({code:0,data:{list:[{...approved,isFrozen:true,expiresAt:'2020-01-01T00:00:00Z'}],total:1}})
+  render(<UserList training/>);await openActions('trainer_active')
+  fireEvent.click(screen.getByRole('button',{name:'解冻培训师 在用培训师 的账号'}))
+  expect(screen.getByText(/还需延期才能登录/)).toBeVisible()
+  fireEvent.click(screen.getByRole('button',{name:'确认解冻'}))
+  await waitFor(()=>expect(api.post).toHaveBeenCalledWith('/users/teacher-active/training-management',{action:'UNFREEZE',expectedUpdatedAt:approved.updatedAt}))
+ })
+ it('shows a reset credential only after confirmation and removes it when closed',async()=>{
+  api.post.mockResolvedValue({code:0,data:{username:'trainer_active',temporaryPassword:'SyntheticTemp123'}})
+  render(<UserList training/>);await openActions('trainer_active')
+  fireEvent.click(screen.getByRole('button',{name:'重置培训师 在用培训师 的密码'}))
+  expect(screen.queryByLabelText('临时密码')).not.toBeInTheDocument();expect(api.post).not.toHaveBeenCalled()
+  fireEvent.click(screen.getByRole('button',{name:'确认重置密码'}))
+  expect(await screen.findByRole('dialog',{name:'培训师临时密码'})).toHaveClass('training-password-handoff')
+  expect(screen.getByLabelText('临时密码')).toHaveTextContent('SyntheticTemp123')
+  expect(screen.getByText(/首次使用临时密码登录后立即修改/)).toBeVisible()
+  fireEvent.click(screen.getByRole('button',{name:'我已安全交付，关闭'}))
+  expect(screen.queryByText('SyntheticTemp123')).not.toBeInTheDocument()
+  expect(api.post).toHaveBeenCalledWith('/users/teacher-active/training-management',{action:'RESET_PASSWORD',expectedUpdatedAt:approved.updatedAt})
+ })
+ it('shows stale-account errors without claiming a successful change',async()=>{
+  api.post.mockResolvedValue({code:-1,message:'账号状态已改变，请刷新列表后重试'})
+  render(<UserList training/>);await openActions('trainer_active')
+  fireEvent.click(screen.getByRole('button',{name:'冻结培训师 在用培训师 的账号'}));fireEvent.click(screen.getByRole('button',{name:'确认冻结'}))
+  expect(await screen.findByRole('alert')).toHaveTextContent('账号状态已改变')
+  expect(screen.getByRole('dialog',{name:'冻结培训师账号'})).toBeVisible()
  })
 
 })

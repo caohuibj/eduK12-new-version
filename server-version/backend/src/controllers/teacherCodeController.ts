@@ -8,7 +8,8 @@ import { MAX_TOKEN_USES } from '../constants'
 
 const createCodeSchema = z.object({
   maxUses: z.number().int().min(1).max(MAX_TOKEN_USES).default(1),
-  expiresAt: z.string().datetime().optional(),
+  expiresAt: z.string().datetime().refine(value => new Date(value).getTime() > Date.now(), "注册码截止时间必须晚于当前时间").optional(),
+  accountValidityDays: z.number().int().min(1).max(3650).optional(),
 })
 
 const verifyCodeSchema = z.object({
@@ -57,7 +58,7 @@ export const teacherCodeController = {
         return error(res, result.error.errors[0].message)
       }
 
-      const { maxUses, expiresAt } = result.data
+      const { maxUses, expiresAt, accountValidityDays } = result.data
 
       // 生成唯一教师码
       const code = await generateTeacherCode()
@@ -67,6 +68,7 @@ export const teacherCodeController = {
           code,
           createdBy: userId,
           maxUses,
+          accountValidityDays: accountValidityDays ?? null,
           expiresAt: expiresAt ? new Date(expiresAt) : null,
         },
         include: {
@@ -130,7 +132,7 @@ export const teacherCodeController = {
         return error(res, '教师码已失效')
       }
 
-      if (teacherCode.expiresAt && teacherCode.expiresAt < new Date()) {
+      if (teacherCode.expiresAt && teacherCode.expiresAt <= new Date()) {
         return error(res, '教师码已过期')
       }
 
