@@ -1,3 +1,4 @@
+import {trainingPolishPlan,trainingPolishOutputs} from './training-polish-scope.mjs';
 import {sjtNativePlan,sjtNativeOutputs} from './sjt-native-scope.mjs';
 import {trainingEntryPlan,trainingEntryOutputs} from './training-entry-scope.mjs';
 import {surveyReviewPlan,surveyReviewOutputs} from './survey-review-scope.mjs';
@@ -305,6 +306,8 @@ export function runnerPlan({ profile = 'hosted', scenario = 'platform' } = {}) {
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const event = process.env.CI_EVENT;
   const base = process.env.CI_BASE_SHA;
+  const polish=trainingPolishPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
+  if(polish){const output=trainingPolishOutputs(polish);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const sjtNative=sjtNativePlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
   if(sjtNative){const output=sjtNativeOutputs(sjtNative);console.log(JSON.stringify(output));if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,Object.entries(output).map(([k,v])=>`${k}=${v}\n`).join(''));process.exit(0);}
   const trainingEntry=trainingEntryPlan(event==='workflow_dispatch'?[]:changedEntries(base),base,execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim());
