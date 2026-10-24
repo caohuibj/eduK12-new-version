@@ -40,6 +40,14 @@ import {
   findCheckinIdempotencyReceipt,
 } from '../utils/submissionIdempotency'
 
+import {
+  STUDENT_UPLOAD_REFERENCE_ENTITY,
+  STUDENT_UPLOAD_PENDING_ENTITY,
+  PUBLIC_UPLOAD_REFERENCE_ENTITY,
+  PUBLIC_UPLOAD_REFERENCE_FIELD,
+  MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION,
+} from '../services/checkinUploadCleanup'
+
 const attachmentSchema = createAttachmentSchema(config.legacyUploadsEnabled)
 const attachmentsSchema = z.array(attachmentSchema).max(100)
 
@@ -174,12 +182,15 @@ const publicSubmissionImageSchema = z.object({
   assetId: z.string().min(1).max(100),
 }).strict()
 
-export const STUDENT_UPLOAD_REFERENCE_ENTITY = 'CheckinStudentUploadSession'
-export const STUDENT_UPLOAD_PENDING_ENTITY = 'CheckinStudentUploadPending'
-export const PUBLIC_UPLOAD_REFERENCE_ENTITY = 'CheckinUploadSession'
-export const PUBLIC_UPLOAD_REFERENCE_FIELD = 'staging'
-export const MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION = 9
-export const PUBLIC_UPLOAD_STAGING_TTL_MS = 24 * 60 * 60 * 1000
+export {
+  STUDENT_UPLOAD_REFERENCE_ENTITY,
+  STUDENT_UPLOAD_PENDING_ENTITY,
+  PUBLIC_UPLOAD_REFERENCE_ENTITY,
+  PUBLIC_UPLOAD_REFERENCE_FIELD,
+  MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION,
+  PUBLIC_UPLOAD_STAGING_TTL_MS,
+  cleanupStalePublicUploadAssets,
+} from '../services/checkinUploadCleanup'
 
 const publicSessionIdSchema = z.string().regex(/^session_[a-z0-9]{16}$/, '会话标识无效')
 
@@ -224,40 +235,6 @@ export async function stageStudentUploadAsset(db: AssetDatabase, checkinId: stri
   if (count >= 9) throw new PublicUploadSessionLimitError()
   await attachAssetReference({ assetId, entityType: STUDENT_UPLOAD_REFERENCE_ENTITY, entityId, field: 'staging' }, db)
   await db.assetReference.deleteMany({ where: { assetId, entityType: STUDENT_UPLOAD_PENDING_ENTITY, entityId } })
-}
-
-let lastPublicUploadCleanupAt = 0
-
-/** Remove abandoned anonymous upload references and their unreferenced blobs. */
-export const cleanupStalePublicUploadAssets = async (): Promise<void> => {
-  const now = Date.now()
-  if (now - lastPublicUploadCleanupAt < 5 * 60 * 1000) return
-  lastPublicUploadCleanupAt = now
-
-  const cutoff = new Date(now - PUBLIC_UPLOAD_STAGING_TTL_MS)
-  const staleReferences = await prisma.assetReference.findMany({
-    where: { entityType: { in: [PUBLIC_UPLOAD_REFERENCE_ENTITY, STUDENT_UPLOAD_REFERENCE_ENTITY, STUDENT_UPLOAD_PENDING_ENTITY] }, createdAt: { lt: cutoff } },
-    select: { id: true, asset: { select: { id: true, objectKey: true, provider: true } } },
-    orderBy: { createdAt: 'asc' }, take: 100,
-  })
-  if (staleReferences.length) {
-    await prisma.assetReference.deleteMany({ where: { id: { in: staleReferences.map(row => row.id) }, createdAt: { lt: cutoff } } })
-    for (const row of staleReferences) await discardUnreferencedAsset(row.asset)
-  }
-  const staleAssets = await prisma.storedAsset.findMany({
-    where: { accessScope: 'PUBLIC_CHECKIN', deletedAt: null, createdAt: { lt: cutoff }, references: { none: {} } },
-    select: { id: true, objectKey: true, provider: true }, orderBy: { createdAt: 'asc' }, take: 100,
-  })
-  for (const asset of staleAssets) await discardUnreferencedAsset(asset)
-}
-
-const runPublicUploadCleanup = async (): Promise<void> => {
-  try {
-    await cleanupStalePublicUploadAssets()
-  } catch (cleanupError) {
-    // Cleanup is best effort and must not make a valid upload unavailable.
-    logger.warn('匿名上传暂存清理失败', { errorType: cleanupError instanceof Error ? cleanupError.name : 'unknown' })
-  }
 }
 
 export const validatePublicSubmissionImages = async (
@@ -1053,7 +1030,6 @@ export const checkinController = {
       const detectedMimeType = detectAcceptedImageMimeType(file)
       if (!detectedMimeType) return error(res, '图片内容类型无效')
 
-      await runPublicUploadCleanup()
       const asset = await storeAsset({
         buffer: file.buffer,
         originalName: file.originalname,
@@ -1798,8 +1774,6 @@ export const checkinController = {
       const detectedMimeType = detectAcceptedImageMimeType(file)
       if (!detectedMimeType) return error(res, '图片内容类型无效')
 
-      await runPublicUploadCleanup()
-
       const asset = await storeAsset({
         buffer: file.buffer,
         originalName: file.originalname,
@@ -1910,8 +1884,6 @@ export const checkinController = {
       if (validation.checkin.endTime && new Date() > validation.checkin.endTime) {
         return error(res, Messages.CHECKIN.EXPIRED)
       }
-
-      await runPublicUploadCleanup()
 
       // Claim the quota and create the submission in one transaction. A
       // session can consume at most one remaining slot.
