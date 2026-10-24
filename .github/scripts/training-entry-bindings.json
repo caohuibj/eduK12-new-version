@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "base": "44c1e502acaed5524c5b1e233d1bfb1f0c6f7b40",
-  "product": "61d1fec21d20139aef014045a5694d7ea983e4d1",
-  "localProduct": "85b730191454e43172ddf268f1cf3d9cd3b360d0",
-  "productTree": "83132ab6d440cb00311be4994b4573bcc444c5e5",
+  "product": "3ecd238229828a9667a8430c7b2b9909cd30feb7",
+  "localProduct": "b433bea05d7038b68a9badf8f6dad117c55d4064",
+  "productTree": "ad90465552f0f0db26c3cb73533944c3d0413237",
   "source": {
     "docs/performance/20261024-training-ordinary-submit-fact-protocol.md": {
       "status": "A",
@@ -2124,7 +2124,7 @@
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "07f88b1dd7ba559834e23694b827e3b197e86095"
+      "after": "90fddb0bdabe6f72ab118c0a868317c3c72ce90f"
     },
     "server-version/frontend/src/pages/questionnaire/__tests__/TrainingQuestionnaireList.test.tsx": {
       "status": "M",
@@ -2138,7 +2138,7 @@
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "e9eaccaac07dace5c85ec4f2581228d762371f69"
+      "after": "d72bd98d1050124838c43c233bff38d339e468e0"
     },
     "server-version/frontend/src/pages/student/AssignmentSubmit.tsx": {
       "status": "M",
@@ -2444,7 +2444,7 @@
     "docs/release/README.md": "c2ad42f95180d91f4603fbe83235b938a7c4d159"
   },
   "components": {
-    "frontend": "eb405dba91102d5c5e728aaf7664f67da7d0d38c",
+    "frontend": "a766f0717dfae221c11a460059c198739d1e3293",
     "backend": "876e7a5477d0801a1d75b88d6159342850ac1a5d"
   },
   "protectedInputs": {
@@ -2459,7 +2459,7 @@
     "server-version/frontend/tsconfig.cognitive.json": "910e97700f25652bc1d80ada47e176cbd51c2fbe",
     "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22"
   },
-  "evidenceSHA256": "c72f8c578ab796a4b4950d53332e8e6f4b49d6500890486e00a6fe62ffd9c7a6",
+  "evidenceSHA256": "440237a0f2b383351544bbfa49db521bdf63a277d39ef45c0cf7314d7f0b1ac8",
   "requiredGroups": [
     "learner-frontend",
     "export-hook",
@@ -2506,7 +2506,7 @@
       "src/__tests__/assessment-core/form-foundation.contract.test.ts"
     ],
     "frontendTestFiles": [
-      "src/pages/__tests__/AssignmentList.review-pagination.test.tsx"
+      "src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx"
     ],
     "earlyLintFiles": [
       "src/api/__tests__/materialGrants.test.ts",
@@ -2614,7 +2614,9 @@
     "selectionRationale": "Only directly changed Training/Survey contracts and their shared identity/media/report consumers. No full platform or performance benchmark. Twelve independently reviewed reset/FINAL PostgreSQL cases and the admitted whole-file groups must not repeat. Security dependency repair uses genuine Zod4.6.7; four additional directly affected Bundle, error-message and FORM foundation contracts run in CI. Twenty local frozen-schema/array-bound contracts and one strict-grant case already passed locally; no claim of exhaustive Zod compatibility. Twelve PostgreSQL cases and cross-schema types were freshly revalidated on new dependencies, not inherited from Zod3.",
     "missingRecordRevalidationApproved": true,
     "frontendRetry8Approved": true,
-    "frontendRetry8Approval": "Sentinel_ea16694e14708191b121c5db5ebd1528"
+    "frontendRetry8Approval": "Sentinel_ea16694e14708191b121c5db5ebd1528",
+    "frontendRetry3Approved": true,
+    "frontendRetry3Approval": "Sentinel_18b67969843c8191897da31d857ca6ac"
   },
   "reviewedGroupFiles": {
     "learner-frontend": [
@@ -2831,6 +2833,36 @@
         "executedPathUnchanged": true,
         "reason": "The successful current-generation batch-grade branch now clears its own busy flag before advancing list refresh. Prior seven review assertions are excluded from fixed frontend acceptance and the full affected eight-case file reexecutes; other retained tests do not execute that changed branch.",
         "reviewEvidence": "Independent exact two-file review and owner 8 focused passes; user separately approved the eight-case CI revalidation."
+      },
+      "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": {
+        "before": "07f88b1dd7ba559834e23694b827e3b197e86095",
+        "after": "90fddb0bdabe6f72ab118c0a868317c3c72ce90f",
+        "changedSymbols": [
+          "Deferred export explicit confirmed document reload and regression"
+        ],
+        "unchangedExecutedPaths": [
+          "all paths not exercising the failed deferred export recovery panel",
+          "backend and immutable scientific/schema paths",
+          "existing one-argument loader calls remain valid; optional reload callback returns void"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Only failed export module recovery changes to explicit confirmed document reload. The old three export contracts are excluded; the current three execute with user permission. Other retained contracts do not exercise that changed recovery panel. The additional reload callback is optional with a void default; existing callers remain type-compatible.",
+        "reviewEvidence": "Independent exact two-file review and owner 3 focused passes; CI revalidation approval is recorded separately."
+      },
+      "server-version/frontend/src/pages/questionnaire/deferredAssessmentExport.tsx": {
+        "before": "e9eaccaac07dace5c85ec4f2581228d762371f69",
+        "after": "d72bd98d1050124838c43c233bff38d339e468e0",
+        "changedSymbols": [
+          "Deferred export explicit confirmed document reload and regression"
+        ],
+        "unchangedExecutedPaths": [
+          "all paths not exercising the failed deferred export recovery panel",
+          "backend and immutable scientific/schema paths",
+          "existing one-argument loader calls remain valid; optional reload callback returns void"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Only failed export module recovery changes to explicit confirmed document reload. The old three export contracts are excluded; the current three execute with user permission. Other retained contracts do not exercise that changed recovery panel. The additional reload callback is optional with a void default; existing callers remain type-compatible.",
+        "reviewEvidence": "Independent exact two-file review and owner 3 focused passes; CI revalidation approval is recorded separately."
       }
     },
     "final-backend-types": {
@@ -2922,6 +2954,36 @@
         "executedPathUnchanged": true,
         "reason": "The successful current-generation batch-grade branch now clears its own busy flag before advancing list refresh. Prior seven review assertions are excluded from fixed frontend acceptance and the full affected eight-case file reexecutes; other retained tests do not execute that changed branch.",
         "reviewEvidence": "Independent exact two-file review and owner 8 focused passes; user separately approved the eight-case CI revalidation."
+      },
+      "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": {
+        "before": "07f88b1dd7ba559834e23694b827e3b197e86095",
+        "after": "90fddb0bdabe6f72ab118c0a868317c3c72ce90f",
+        "changedSymbols": [
+          "Deferred export explicit confirmed document reload and regression"
+        ],
+        "unchangedExecutedPaths": [
+          "all paths not exercising the failed deferred export recovery panel",
+          "backend and immutable scientific/schema paths",
+          "existing one-argument loader calls remain valid; optional reload callback returns void"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Only failed export module recovery changes to explicit confirmed document reload. The old three export contracts are excluded; the current three execute with user permission. Other retained contracts do not exercise that changed recovery panel. The additional reload callback is optional with a void default; existing callers remain type-compatible.",
+        "reviewEvidence": "Independent exact two-file review and owner 3 focused passes; CI revalidation approval is recorded separately."
+      },
+      "server-version/frontend/src/pages/questionnaire/deferredAssessmentExport.tsx": {
+        "before": "e9eaccaac07dace5c85ec4f2581228d762371f69",
+        "after": "d72bd98d1050124838c43c233bff38d339e468e0",
+        "changedSymbols": [
+          "Deferred export explicit confirmed document reload and regression"
+        ],
+        "unchangedExecutedPaths": [
+          "all paths not exercising the failed deferred export recovery panel",
+          "backend and immutable scientific/schema paths",
+          "existing one-argument loader calls remain valid; optional reload callback returns void"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Only failed export module recovery changes to explicit confirmed document reload. The old three export contracts are excluded; the current three execute with user permission. Other retained contracts do not exercise that changed recovery panel. The additional reload callback is optional with a void default; existing callers remain type-compatible.",
+        "reviewEvidence": "Independent exact two-file review and owner 3 focused passes; CI revalidation approval is recorded separately."
       }
     }
   },
@@ -3031,9 +3093,12 @@
     "priorTestBlob": "3adca6205b00394520307a2542a0b3688a1e9005",
     "finalTestBlob": "7e019198f935f0db9fbaeef09bffcace5d54558e",
     "inputClosureGroup": "final-frontend-types",
-    "excludedAffectedFile": "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx",
-    "excludedPriorCount": 7,
-    "retainedPassed": 414
+    "excludedPriorCount": 10,
+    "retainedPassed": 411,
+    "excludedAffectedFiles": {
+      "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": 7,
+      "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": 3
+    }
   },
   "evidenceSourceObjects": {
     "848f4c1014060f949ae6263418be25787f6f907c": {
@@ -3056,19 +3121,19 @@
     "auditStepConclusion": "success"
   },
   "officialRecovery": {
-    "run": 40093589291,
-    "sourceHead": "96351b9579c1be217abf761bcfa6cd62263c2430",
-    "checkout": "c02fbc52c2e9b6cc711dfcdf6e85b72def7d460c",
+    "run": 40094830671,
+    "sourceHead": "7d253468d1af142123bb61d01e616160adf39bf7",
+    "checkout": "c5536f7d396cebacbb9739aedacb18d235371d24",
     "revalidation8Approved": true,
     "approvalMessage": "Sentinel_355ab6c09da88191aaf61e8b9d1648f2",
     "productDeltas": {
-      "server-version/frontend/src/pages/AssignmentList.tsx": {
-        "before": "e3cbc1dc34f9b29aa1eda4fb243b6aa523e2c8b5",
-        "after": "8444738d6c74784be2fa985c7ecc1822bd8cc4f6"
+      "server-version/frontend/src/pages/questionnaire/deferredAssessmentExport.tsx": {
+        "before": "e9eaccaac07dace5c85ec4f2581228d762371f69",
+        "after": "d72bd98d1050124838c43c233bff38d339e468e0"
       },
-      "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": {
-        "before": "c4cc93208a873628438d32603b38c411c1cf6e97",
-        "after": "611c23c6683557d5fcab311363e8586fd38dc07f"
+      "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": {
+        "before": "07f88b1dd7ba559834e23694b827e3b197e86095",
+        "after": "90fddb0bdabe6f72ab118c0a868317c3c72ce90f"
       }
     },
     "artifacts": {
@@ -3082,11 +3147,11 @@
         "conclusion": "success"
       },
       "browser": {
-        "id": 12560097430,
-        "name": "training-entry-browser-c02fbc52c2e9b6cc711dfcdf6e85b72def7d460c-1",
-        "bytes": 1851531,
-        "sha256": "7828ecf8a43e8539ffb645cf2cf72d40e0b5ea842d2da32e3ae4e8adf5165d5e",
-        "job": 120871518223,
+        "id": 12560780510,
+        "name": "training-entry-browser-c5536f7d396cebacbb9739aedacb18d235371d24-1",
+        "bytes": 1033340,
+        "sha256": "fcbc4e2a300abb312204e27857cbd06cf3dd2a7841a18430fa16a7efdb7e8bc6",
+        "job": 120875202355,
         "jobName": "training-entry / browser",
         "conclusion": "failure"
       }
@@ -3142,8 +3207,8 @@
     ],
     "retryPattern": "schema-|keeps all shared runtime imports|preserves missing|preserves multiple",
     "retryFile": "src/__tests__/assessment-core/form-foundation.contract.test.ts",
-    "browserReportSHA256": "240082442abaee0953b8b9e5f887182d4d0545321e68d61a9b17f5ad3d741603",
-    "lintCommandSHA256": "95c4b974c78e5e38e0cd11e757c1df267336ed3ff0b1b0a4431211bb86872491",
+    "browserReportSHA256": "b2396a1ef1a7efdb2fb5ef3961d52cf0b2ba9c40dd774f9ba6e01ff96ddc5c0b",
+    "lintCommandSHA256": "6d05de6e7379a490ca8ea13e6c2f5046a46fa0523bc7a108f0bbe2d85ad60ef5",
     "browserRetainedNames": [
       "management-survey-granted",
       "management-survey-no-grant",
@@ -3168,13 +3233,28 @@
       "learner-checkins-submit-failure",
       "checkin-late-upload",
       "teacher-assignments-lazy-courses",
-      "teacher-checkins-lazy-courses"
+      "teacher-checkins-lazy-courses",
+      "assignment-review-paging-batch-download"
     ],
-    "browserHarnessSHA256": "c73b3c620e48afc6d60f794f4081421df9f00d2e6e6cfbad81fe410568403715",
-    "browserSourceManifestSHA256": "463413e50a5d89bb8295832cd45934d4956a88f4007ae77b8b497e21fe8186ee",
+    "browserHarnessSHA256": "e9c468e53d2a2bc926be903fe0524eb1ae79becd48a2062b8de233e41ea93fce",
+    "browserSourceManifestSHA256": "91c5b1c0edc311f01dd3141f038a39db06dac9f30026e2492879020daa2edd1c",
     "backendParsedSHA256": "5aea1ce59adc63ce4c7d5eb157f1bdbbdc082d666cd3514b0b5fb2ed5664d32d",
-    "lintRetainedSHA256": "aba1b50020795752c50e19fff04681a49b90ea97596c8e5b1dce088ebd2a3e6c",
-    "frontendJob": 120871361268
+    "lintRetainedSHA256": "4ba657aa34734e41b4e626b58228d6fd4b91fc2396dee198f043cb7b79716b49",
+    "frontendJob": 120875073656,
+    "backendOrigin": {
+      "run": 40093589291,
+      "sourceHead": "96351b9579c1be217abf761bcfa6cd62263c2430"
+    },
+    "completedReview": {
+      "fileHashes": {
+        "frontend-fresh.json": "442b95a5df7028030aa2bcb1095a995b0e77affe618d185a7a7b700c2ac77386",
+        "frontend-fresh-command.json": "ec6592b65f427ece50ec2a34151d9d9baad8c0d17ef7676fe92938cf20b85c69",
+        "frontend-fresh-checked.json": "8c1a48d9b66e09e30386e6948f5a05ad0ec2fadfbb93983164dac3b37a4cd596",
+        "batch-grade-lint-command.json": "6ccb92e58aeac4a14378a2251fde1a7251070917af3021080c12d2b9376bf2ff"
+      },
+      "file": "src/pages/__tests__/AssignmentList.review-pagination.test.tsx",
+      "passed": 8
+    }
   },
   "auditSourceDeltas": {
     "server-version/backend/src/modules/assessment-core/form/definition.ts": {
@@ -3196,6 +3276,14 @@
     "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": {
       "before": "c4cc93208a873628438d32603b38c411c1cf6e97",
       "after": "611c23c6683557d5fcab311363e8586fd38dc07f"
+    },
+    "server-version/frontend/src/pages/questionnaire/deferredAssessmentExport.tsx": {
+      "before": "e9eaccaac07dace5c85ec4f2581228d762371f69",
+      "after": "d72bd98d1050124838c43c233bff38d339e468e0"
+    },
+    "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": {
+      "before": "07f88b1dd7ba559834e23694b827e3b197e86095",
+      "after": "90fddb0bdabe6f72ab118c0a868317c3c72ce90f"
     }
   },
   "completedBackend": {

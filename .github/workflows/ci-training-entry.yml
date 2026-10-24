@@ -94,8 +94,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: node .github/scripts/training-entry-checks.mjs recover-browser
-      - name: lint only the changed batch review source and regression
-        run: node .github/scripts/training-entry-checks.mjs batch-grade-lint
+      - name: lint only the changed export recovery source and regression
+        run: node .github/scripts/training-entry-checks.mjs export-reload-lint
       - name: require explicit one-time rebuild exception
         run: node .github/scripts/training-entry-checks.mjs build-permission
       - name: compile once for previously unexecuted actual-dist browser acceptance

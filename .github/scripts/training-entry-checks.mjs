@@ -128,7 +128,7 @@ export function verifyFixedFrontend(e){
  assert.equal(retry.testResults[0].name,expected.retryFile);
  const retryCases=retry.testResults[0].assertionResults;assert.equal(retryCases.length,17);
  for(const c of retryCases){const key=expected.retryFile+'\0'+c.fullName;assert(all.has(key));if(c.status==='passed'){assert.equal(key,retryKey);assert(!passed.has(key));passed.add(key)}else assert(['pending','skipped'].includes(c.status));}
- assert.equal(passed.size,421);const excluded=[...passed].filter(key=>key.startsWith(expected.excludedAffectedFile+'\0'));assert.equal(excluded.length,expected.excludedPriorCount);for(const key of excluded)passed.delete(key);assert.equal(passed.size,expected.retainedPassed);return {cases:passed.size,originalPassed:420,retryPassed:1,excludedAffected:excluded.length,ciExecuted:false,originalExecutionSigned:false};
+ assert.equal(passed.size,421);const excluded=[];for(const [file,count]of Object.entries(expected.excludedAffectedFiles)){const cases=[...passed].filter(key=>key.startsWith(file+'\0'));assert.equal(cases.length,count);excluded.push(...cases)}assert.equal(excluded.length,expected.excludedPriorCount);for(const key of excluded)passed.delete(key);assert.equal(passed.size,expected.retainedPassed);return {cases:passed.size,originalPassed:420,retryPassed:1,excludedAffected:excluded.length,ciExecuted:false,originalExecutionSigned:false};
 }
 export function verifyEvidence(read=readFileSync,resolve=git){
  const raw=read('.github/evidence/training-entry/reviewed.json');
@@ -214,7 +214,7 @@ export function verifyEvidence(read=readFileSync,resolve=git){
   if((binding.reviewedGroupFiles?.[g.id]||[]).length)assert.deepEqual([...groupFiles].sort(),[...(binding.reviewedGroupFiles?.[g.id]||[])].sort(),'Missing admitted files in group '+g.id);
  }
  if(binding.fixedPgCases?.length)verifyFixedPg(e.fixedPg);
- if(binding.fixedFrontendContracts){const group=e.groups.find(g=>g.id==='final-frontend-types');assert(group);const d=binding.fixedFrontendContracts,x=group.executions[0];assert.equal(x.inputs[d.retryFile],d.finalTestBlob);assert.equal((x.originalInputs||x.inputs)[d.retryFile],d.priorTestBlob);assert.equal(e.fixedFrontendContracts.sourceAfter,binding.localProduct);verifyFixedFrontend(e.fixedFrontendContracts);assert.deepEqual(binding.checks.frontendTestFiles,[d.excludedAffectedFile.replace('server-version/frontend/','')],'Only the explicitly invalidated review file may rerun');}
+ if(binding.fixedFrontendContracts){const group=e.groups.find(g=>g.id==='final-frontend-types');assert(group);const d=binding.fixedFrontendContracts,x=group.executions[0];assert.equal(x.inputs[d.retryFile],d.finalTestBlob);assert.equal((x.originalInputs||x.inputs)[d.retryFile],d.priorTestBlob);assert.equal(e.fixedFrontendContracts.sourceAfter,binding.localProduct);verifyFixedFrontend(e.fixedFrontendContracts);assert.deepEqual(binding.checks.frontendTestFiles,['src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx'],'Only the explicitly invalidated export file may rerun');}
  const fresh=new Set();
  for(const[component,key]of [['frontend','frontendTestFiles'],['backend','backendTestFiles'],['frontend','laterFrontendTestFiles'],['backend','laterBackendTestFiles']]){
   for(const f of binding.checks[key]||[]){const full=`server-version/${component}/${f}`;assert(!fresh.has(full),'Duplicate fresh check selection');assert(!admitted.has(full),'A qualified unchanged whole-file check must not rerun');fresh.add(full);}
@@ -352,7 +352,7 @@ export function verifyRecoveredBackend(report,command,current){
  return {passed:465,failed:6,originalJobConclusion:'failure',wholeInvocationPassed:false};
 }
 async function officialRecoveryFiles(component){
- const r=binding.officialRecovery,a=r.artifacts[component];assert(a);assert.equal(process.env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');
+ const r=component==='backend'?{...binding.officialRecovery,...binding.officialRecovery.backendOrigin}:binding.officialRecovery,a=r.artifacts[component];assert(a);assert.equal(process.env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');
  const api=async path=>{const x=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/'+path,{headers:{Authorization:`Bearer ${process.env.GH_TOKEN}`,Accept:'application/vnd.github+json'}});assert.equal(x.status,200);return x};
  const [run,job,artifact]=await Promise.all([api(`actions/runs/${r.run}`).then(x=>x.json()),api(`actions/jobs/${a.job}`).then(x=>x.json()),api(`actions/artifacts/${a.id}`).then(x=>x.json())]);
  assert.equal(run.head_sha,r.sourceHead);assert.equal(run.head_branch,branch);assert.equal(run.event,'pull_request');assert.equal(run.path,'.github/workflows/ci.yml');
@@ -360,7 +360,7 @@ async function officialRecoveryFiles(component){
  if(component==='browser'){const producer=await(await api(`actions/jobs/${r.frontendJob}`)).json();assert.equal(producer.run_id,r.run);assert.equal(producer.head_sha,r.sourceHead);assert.equal(producer.name,'training-entry / frontend');assert.equal(producer.status,'completed');assert.equal(producer.conclusion,'success');assert(producer.steps.some(step=>step.name==='retain exact successful lint and unaffected browser scenarios'&&step.conclusion==='success'));}
  assert.equal(artifact.id,a.id);assert.equal(artifact.name,a.name);assert.equal(artifact.workflow_run.id,r.run);assert.equal(artifact.workflow_run.head_sha,r.sourceHead);assert.equal(artifact.expired,false);assert.equal(artifact.size_in_bytes,a.bytes);assert.equal(artifact.digest,'sha256:'+a.sha256);
  const zip=Buffer.from(await(await api(`actions/artifacts/${a.id}/zip`)).arrayBuffer());assert.equal(zip.length,a.bytes);assert.equal(sha(zip),a.sha256);
- const wanted=component==='backend'?Object.keys(binding.completedBackend.fileHashes):['browser.json','component-source-manifest.json','frontend-build-command.json','lint-retained.json'];
+ const wanted=component==='backend'?Object.keys(binding.completedBackend.fileHashes):['browser.json','component-source-manifest.json','frontend-build-command.json','lint-retained.json',...Object.keys(r.completedReview.fileHashes)];
  const result=JSON.parse(execFileSync('python3',['-c',`import sys,io,zipfile,json,base64
 z=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read())); wanted=json.loads(sys.argv[1]); out={}
 for name in wanted:
@@ -407,6 +407,15 @@ function retryBackend(){
  const selected=report.testResults.flatMap(f=>f.assertionResults).filter(c=>c.status==='passed').map(c=>c.fullName);assert.equal(new Set(selected).size,8);for(const name of r.failedBackendNames)assert(selected.includes(name));
  assert(selected.every(name=>r.failedBackendNames.includes(name)||name.includes('preserves missing, null, NaN')||name.includes('preserves multiple issue paths')));save('backend-eight-checked',{selected,retainedOfficial:465,totalQualified:473});
 }
+export function verifyCompletedReview(files,currentManifest){
+ const r=binding.officialRecovery;
+ for(const [name,h]of Object.entries(r.completedReview.fileHashes))assert.equal(sha(files[name]),h,'Official review evidence differs: '+name);
+ const command=JSON.parse(files['frontend-fresh-command.json']),report=JSON.parse(files['frontend-fresh.json']),lint=JSON.parse(files['batch-grade-lint-command.json']);
+ for(const c of [command,lint]){assert.equal(c.source,r.checkout);assert.equal(c.status,'success');assert.equal(c.exitCode,0);assert.equal(c.tools.node,'v24.21.0');assert.equal(c.gitInputManifestSHA256,sha(c.gitInputManifest));reviewedRecoveryManifest(c.gitInputManifest,currentManifest,'frontend');}
+ assert(command.command.includes(r.completedReview.file));assert.equal(report.success,true);assert.equal(report.numPassedTests,8);assert.equal(report.numFailedTests,0);assert.equal(report.testResults.length,1);assert(report.testResults[0].name.endsWith('/'+r.completedReview.file));assert.equal(report.testResults[0].assertionResults.length,8);assert(report.testResults[0].assertionResults.every(c=>c.status==='passed'));
+ assert.deepEqual(lint.command.slice(1),['node_modules/eslint/bin/eslint.js','src/pages/AssignmentList.tsx','src/pages/__tests__/AssignmentList.review-pagination.test.tsx']);
+ return {source:r.sourceHead,run:r.run,passed:8,originalJobConclusion:'success',reexecuted:false};
+}
 async function recoverBrowserAndLint(){
  const r=binding.officialRecovery,{files}=await officialRecoveryFiles('browser');
  assert.equal(sha(files['browser.json']),r.browserReportSHA256);assert.equal(sha(files['component-source-manifest.json']),r.browserSourceManifestSHA256);assert.equal(sha(files['frontend-build-command.json']),r.lintCommandSHA256);
@@ -414,9 +423,10 @@ async function recoverBrowserAndLint(){
  reviewedRecoveryManifest(lint.gitInputManifest,git('ls-tree','-r','HEAD','--','server-version/frontend'),'frontend');assert.equal(lint.gitInputManifestSHA256,sha(lint.gitInputManifest));assert.equal(lint.source,r.checkout);assert.equal(lint.status,'success');assert.equal(lint.exitCode,0);assert.equal(lint.id,'frontend-build');
  assert.equal(lint.tools.node,'v24.21.0');assert.deepEqual(lint.command.slice(1),['node_modules/vite/bin/vite.js','build','--manifest']);
  assert.equal(sha(files['lint-retained.json']),r.lintRetainedSHA256);const retained=JSON.parse(files['lint-retained.json']);assert.equal(retained.originalSuccessfulSubprocess,true);assert.deepEqual(retained.files,binding.checks.earlyLintFiles);
- const scenarios=report.scenarios.filter(s=>r.browserRetainedNames.includes(s.name));assert.equal(scenarios.length,24);assert.equal(new Set(scenarios.map(s=>s.name)).size,24);assert(scenarios.every(s=>s.status==='PASS'&&s.errors.length===0&&s.unexpected.length===0));assert(scenarios.every(s=>s.name!=='assignment-review-paging-batch-download'));
+ const scenarios=report.scenarios.filter(s=>r.browserRetainedNames.includes(s.name));assert.equal(scenarios.length,25);assert.equal(new Set(scenarios.map(s=>s.name)).size,25);assert(scenarios.every(s=>s.status==='PASS'&&s.errors.length===0&&s.unexpected.length===0));assert(scenarios.every(s=>s.name!=='assessment-deferred-export-retry'));
+ save('review-contracts-retained',verifyCompletedReview(files,git('ls-tree','-r','HEAD','--','server-version/frontend')));
  save('browser-retained',{source:r.sourceHead,artifact:r.artifacts.browser.id,originalJobConclusion:'failure',currentFrontendTree:binding.components.frontend,scenarios});
- save('lint-retained',{source:r.sourceHead,artifact:r.artifacts.browser.id,originalSuccessfulSubprocess:true,files:binding.checks.earlyLintFiles});
+ save('lint-retained',{source:r.sourceHead,artifact:r.artifacts.browser.id,originalSuccessfulSubprocess:true,files:binding.checks.earlyLintFiles.filter(file=>!['src/pages/questionnaire/deferredAssessmentExport.tsx','src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx'].includes(file)),excludedChangedFiles:['src/pages/questionnaire/deferredAssessmentExport.tsx','src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx'],freshReplacement:'export-reload-lint'});
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  assert.equal(process.version,'v24.21.0');const action=process.argv[2];
@@ -427,8 +437,8 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  }else if(action==='backend')retryBackend();
  else if(action==='recover-backend')await recoverBackend();
  else if(action==='recover-browser')await recoverBrowserAndLint();
- else if(action==='frontend'){assert.equal(binding.checks.frontendRetry8Approved,true);assert.equal(binding.checks.frontendRetry8Approval,'Sentinel_ea16694e14708191b121c5db5ebd1528');tests(action);const report=JSON.parse(readFileSync(`${output}/frontend-fresh.json`));assert.equal(report.numPassedTests,8);}
- else if(action==='batch-grade-lint')runRecorded('batch-grade-lint','frontend',process.execPath,['node_modules/eslint/bin/eslint.js','src/pages/AssignmentList.tsx','src/pages/__tests__/AssignmentList.review-pagination.test.tsx']);
+ else if(action==='frontend'){assert.equal(binding.checks.frontendRetry3Approved,true);assert.equal(binding.checks.frontendRetry3Approval,'Sentinel_18b67969843c8191897da31d857ca6ac');tests(action);const report=JSON.parse(readFileSync(`${output}/frontend-fresh.json`));assert.equal(report.numPassedTests,3);}
+ else if(action==='export-reload-lint')runRecorded('export-reload-lint','frontend',process.execPath,['node_modules/eslint/bin/eslint.js','src/pages/questionnaire/deferredAssessmentExport.tsx','src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx']);
  else if(action==='frontend-later'||action==='backend-later')tests(action.split('-')[0],true);
  else if(action==='lint'){
   assert.equal(binding.executionPolicy,'missing-only-current-mixed-candidate');

@@ -182,7 +182,7 @@ test('restore rejects unrecognized dtd physical identity',()=>{const a=schemaFix
 test('failed JSON diagnostics use assertion results rather than synthetic stderr',()=>{const r={success:false,numFailedTests:1,testResults:[{name:'a',status:'failed',assertionResults:[{status:'passed',fullName:'expected synthetic failure'},{status:'failed',fullName:'real mismatch',failureMessages:['expected text']}]}]};assert.deepEqual(failedVitestSummary(r).failures,[{file:'a',name:'real mismatch',messages:['expected text']}]);assert.equal(failedVitestSummary(r).success,false);});
 
 const fixedFrontendProof=()=>JSON.parse(readFileSync('.github/evidence/training-entry/reviewed.json')).fixedFrontendContracts;
-test('fixed frontend accepts only reviewed local 420 plus unique retry one',()=>{assert.deepEqual(verifyFixedFrontend(fixedFrontendProof()),{cases:414,originalPassed:420,retryPassed:1,excludedAffected:7,ciExecuted:false,originalExecutionSigned:false});});
+test('fixed frontend accepts only reviewed local 420 plus unique retry one',()=>{assert.deepEqual(verifyFixedFrontend(fixedFrontendProof()),{cases:411,originalPassed:420,retryPassed:1,excludedAffected:10,ciExecuted:false,originalExecutionSigned:false});});
 test('fixed frontend rejects report tampering',()=>{const e=fixedFrontendProof();e.reports[0].sha256='0'.repeat(64);assert.throws(()=>verifyFixedFrontend(e));});
 test('fixed frontend retains original failed invocation',()=>{const e=fixedFrontendProof();e.reports[0].exitCode=0;assert.throws(()=>verifyFixedFrontend(e));});
 test('fixed frontend never treats a failed retry as accepted',()=>{const e=fixedFrontendProof();e.reports[1].exitCode=1;assert.throws(()=>verifyFixedFrontend(e));});
@@ -210,7 +210,7 @@ test('fourth recovery cannot use a frontend exception to bypass backend source e
 test('sixth recovery retains official completed backend and excludes only affected review contracts',()=>{
  const r=binding.officialRecovery;assert.equal(r.failedBackendNames.length,6);assert.equal(new Set(r.failedBackendNames).size,6);
  assert.equal(r.revalidation8Approved,true);assert.equal(r.approvalMessage,'Sentinel_355ab6c09da88191aaf61e8b9d1648f2');
- assert.equal(r.browserRetainedNames.length,24);assert(!r.browserRetainedNames.includes('assignment-review-paging-batch-download'));assert.equal(binding.fixedFrontendContracts.retainedPassed,414);assert.equal(binding.fixedFrontendContracts.excludedPriorCount,7);
+ assert.equal(r.browserRetainedNames.length,25);assert(!r.browserRetainedNames.includes('assessment-deferred-export-retry'));assert.equal(binding.fixedFrontendContracts.retainedPassed,411);assert.equal(binding.fixedFrontendContracts.excludedPriorCount,10);
  const workflow=readFileSync('.github/workflows/ci-training-entry.yml','utf8');assert(workflow.includes('recover-backend'));assert(workflow.includes('recover-browser'));assert(!workflow.includes('training-entry-checks.mjs postgres'));
  assert(!workflow.includes('training-entry-checks.mjs backend-compile'));assert(workflow.includes('training-entry-checks.mjs frontend-build'));
 });
@@ -232,4 +232,16 @@ test('actual repository diff discovers newly modified main paths outside the for
 
 test('completed backend evidence rejects missing files before accepting any qualification',()=>{
  assert.throws(()=>verifyCompletedBackend({},'',{}));
+});
+
+test('export recovery retains only official review success and leaves failed export for the new build',()=>{
+ const r=binding.officialRecovery;
+ assert.equal(r.completedReview.passed,8);
+ assert.equal(r.completedReview.file,'src/pages/__tests__/AssignmentList.review-pagination.test.tsx');
+ assert(r.browserRetainedNames.includes('assignment-review-paging-batch-download'));
+ assert(!r.browserRetainedNames.includes('assessment-deferred-export-retry'));
+ assert.deepEqual(binding.checks.frontendTestFiles,['src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx']);
+ assert.equal(binding.fixedFrontendContracts.excludedAffectedFiles['server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx'],3);
+ assert.equal(r.backendOrigin.run,binding.completedBackend.run);
+ assert.equal(r.backendOrigin.sourceHead,binding.completedBackend.sourceHead);
 });

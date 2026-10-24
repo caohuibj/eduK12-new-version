@@ -3,22 +3,22 @@
   "kind": "reviewed-local-evidence",
   "ciExecuted": false,
   "originalExecutionSigned": false,
-  "product": "61d1fec21d20139aef014045a5694d7ea983e4d1",
+  "product": "3ecd238229828a9667a8430c7b2b9909cd30feb7",
   "reviewStatus": "INDEPENDENTLY_REVIEWED",
   "authorization": {
     "currentMixedCandidate": "Only missing directly affected contracts/build/browser/migration-restore/audit/CodeQL, with no admitted-case replay. Current PR merge requested by the repository owner; no deployment."
   },
   "blockers": [],
   "controlSHA256": {
-    ".github/scripts/training-entry-scope.mjs": "13f556f4cf1bbcc576659f1af7c320a0dc5837e748cc6852fef901bce35f6bd0",
-    ".github/scripts/training-entry-checks.mjs": "4a8a14ac53084abf2924b0f330fe3442122bbea49dff6ae85fddb1d61e804f15",
-    ".github/scripts/training-entry.test.mjs": "0b9421b45b0f73e119ae09ab050d3afa4d6b682d240e32ac964f85bf85f5d1ca",
-    ".github/scripts/training-entry-browser.mjs": "e9c468e53d2a2bc926be903fe0524eb1ae79becd48a2062b8de233e41ea93fce",
-    ".github/workflows/ci-training-entry.yml": "0a50d6dd39026d92c30e8a4417f48a1eb9eabf23ba2cd2a00d0bf2a8db6438e7",
+    ".github/scripts/training-entry-scope.mjs": "82d18c25cf8c716fcc8204552cd31bd8a62ec87117c0248385d75a20f9ec4f3d",
+    ".github/scripts/training-entry-checks.mjs": "c37996aea717a00c5f11f97d1011353dab2d33f88db5b47a23ccef75c5bf5198",
+    ".github/scripts/training-entry.test.mjs": "bb5dd70cb1988592dbbe32abfcf2f1ca7a470e02ba82b951d78aac7f7d0371e6",
+    ".github/scripts/training-entry-browser.mjs": "7f8a7a35289757f8498b929ce0e24ba42251b9f8356835273b0f2e70ba427581",
+    ".github/workflows/ci-training-entry.yml": "32bcf3341062d97360ddd9ea05cf3e41ba704c89d567844a42d984bc5c4e1f4c",
     ".github/scripts/content-scope.mjs": "c78db2f6b4384701b9547e9df88e3de5453008a459a18d3108817b143e1ea762",
     ".github/scripts/merge-gate.mjs": "71585d6ca8785c8e60686f4770fcaec6f49be86c880a85d4ca3f42c02879d018",
     ".github/workflows/ci.yml": "a889c637f454d8c1cb735c9fe5300c8bb03d78c9866e21cf1844e3718d7a0f50",
-    "docs/release/README.md": "6591b1e3ebacde80cc453b2b61d59758f89bf23aa91b038dd6f182479c46ccd3",
+    "docs/release/README.md": "51e31bd7d6d0e0448b82355aae710bb3842770c5d9d7a95e7116a97c5d31eb7f",
     ".github/scripts/content-workflows.test.mjs": "e62059676d8e418fb75392c03ca35e7abba8c73d1bdbdb829162b10c125bdefd",
     ".github/scripts/training-entry-migration.mjs": "b5c42b2c5bb3894cb8f0baaf4330cf78fc1f0147fad79bd676d1a35186a9faac"
   },
@@ -4783,7 +4783,7 @@
             "server-version/frontend/src/pages/questionnaire/TrainingReportStudio.tsx": "c6046150afa70fb42e586ecf767b3c7d7e61aa4c",
             "server-version/frontend/src/pages/questionnaire/TrainingVariantEditor.tsx": "92ebc640cd3c43d0e1ef00df1e35470274bf77d6",
             "server-version/frontend/src/pages/questionnaire/__tests__/AssessmentWorkspaces.test.tsx": "34e95a8dd859dc97476f489e5f719019921c3f1d",
-            "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": "07f88b1dd7ba559834e23694b827e3b197e86095",
+            "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": "90fddb0bdabe6f72ab118c0a868317c3c72ce90f",
             "server-version/frontend/src/pages/questionnaire/__tests__/FormChoiceEditor.test.tsx": "073353034dc23c9a144576253dce444241655eb3",
             "server-version/frontend/src/pages/questionnaire/__tests__/FormTemplates.test.tsx": "6a7e602b381e9ba065ccc68e15fbe8c2d9d4aef6",
             "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx": "f9e6ac0aa3c5b21874bffe78cedfe7947bc121fd",
@@ -4798,7 +4798,7 @@
             "server-version/frontend/src/pages/questionnaire/__tests__/TrainingVariantAuthoring.test.tsx": "85693a2d29ae765f0c1cd6faaac5ccf70081ca04",
             "server-version/frontend/src/pages/questionnaire/__tests__/trainingFlow.test.ts": "db85583f44f627ac7d46fea023953b81667f8cf0",
             "server-version/frontend/src/pages/questionnaire/__tests__/trainingVariants.test.ts": "db5586429ce816b4c7c97d728f29762a013ce10d",
-            "server-version/frontend/src/pages/questionnaire/deferredAssessmentExport.tsx": "e9eaccaac07dace5c85ec4f2581228d762371f69",
+            "server-version/frontend/src/pages/questionnaire/deferredAssessmentExport.tsx": "d72bd98d1050124838c43c233bff38d339e468e0",
             "server-version/frontend/src/pages/questionnaire/form-template-editor.css": "4d6d1b9635ee7435d94e342f674e6640836dd97c",
             "server-version/frontend/src/pages/questionnaire/formChoices.ts": "2d719ad853c4a31325ad22833bea808060834d42",
             "server-version/frontend/src/pages/questionnaire/questionnaire-content-editor.css": "adcb9cf79cf13663d307d37e5ded14b7e8ff2063",
@@ -10024,6 +10024,36 @@
               "executedPathUnchanged": true,
               "reason": "The successful current-generation batch-grade branch now clears its own busy flag before advancing list refresh. Prior seven review assertions are excluded from fixed frontend acceptance and the full affected eight-case file reexecutes; other retained tests do not execute that changed branch.",
               "reviewEvidence": "Independent exact two-file review and owner 8 focused passes; user separately approved the eight-case CI revalidation."
+            },
+            "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": {
+              "before": "07f88b1dd7ba559834e23694b827e3b197e86095",
+              "after": "90fddb0bdabe6f72ab118c0a868317c3c72ce90f",
+              "changedSymbols": [
+                "Deferred export explicit confirmed document reload and regression"
+              ],
+              "unchangedExecutedPaths": [
+                "all paths not exercising the failed deferred export recovery panel",
+                "backend and immutable scientific/schema paths",
+                "existing one-argument loader calls remain valid; optional reload callback returns void"
+              ],
+              "executedPathUnchanged": true,
+              "reason": "Only failed export module recovery changes to explicit confirmed document reload. The old three export contracts are excluded; the current three execute with user permission. Other retained contracts do not exercise that changed recovery panel. The additional reload callback is optional with a void default; existing callers remain type-compatible.",
+              "reviewEvidence": "Independent exact two-file review and owner 3 focused passes; CI revalidation approval is recorded separately."
+            },
+            "server-version/frontend/src/pages/questionnaire/deferredAssessmentExport.tsx": {
+              "before": "e9eaccaac07dace5c85ec4f2581228d762371f69",
+              "after": "d72bd98d1050124838c43c233bff38d339e468e0",
+              "changedSymbols": [
+                "Deferred export explicit confirmed document reload and regression"
+              ],
+              "unchangedExecutedPaths": [
+                "all paths not exercising the failed deferred export recovery panel",
+                "backend and immutable scientific/schema paths",
+                "existing one-argument loader calls remain valid; optional reload callback returns void"
+              ],
+              "executedPathUnchanged": true,
+              "reason": "Only failed export module recovery changes to explicit confirmed document reload. The old three export contracts are excluded; the current three execute with user permission. Other retained contracts do not exercise that changed recovery panel. The additional reload callback is optional with a void default; existing callers remain type-compatible.",
+              "reviewEvidence": "Independent exact two-file review and owner 3 focused passes; CI revalidation approval is recorded separately."
             }
           }
         }
@@ -14092,7 +14122,7 @@
             "server-version/frontend/src/pages/questionnaire/TrainingReportStudio.tsx": "c6046150afa70fb42e586ecf767b3c7d7e61aa4c",
             "server-version/frontend/src/pages/questionnaire/TrainingVariantEditor.tsx": "92ebc640cd3c43d0e1ef00df1e35470274bf77d6",
             "server-version/frontend/src/pages/questionnaire/__tests__/AssessmentWorkspaces.test.tsx": "34e95a8dd859dc97476f489e5f719019921c3f1d",
-            "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": "07f88b1dd7ba559834e23694b827e3b197e86095",
+            "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": "90fddb0bdabe6f72ab118c0a868317c3c72ce90f",
             "server-version/frontend/src/pages/questionnaire/__tests__/FormChoiceEditor.test.tsx": "073353034dc23c9a144576253dce444241655eb3",
             "server-version/frontend/src/pages/questionnaire/__tests__/FormTemplates.test.tsx": "6a7e602b381e9ba065ccc68e15fbe8c2d9d4aef6",
             "server-version/frontend/src/pages/questionnaire/__tests__/QuestionnaireProducts.test.tsx": "f9e6ac0aa3c5b21874bffe78cedfe7947bc121fd",
@@ -14107,7 +14137,7 @@
             "server-version/frontend/src/pages/questionnaire/__tests__/TrainingVariantAuthoring.test.tsx": "85693a2d29ae765f0c1cd6faaac5ccf70081ca04",
             "server-version/frontend/src/pages/questionnaire/__tests__/trainingFlow.test.ts": "db85583f44f627ac7d46fea023953b81667f8cf0",
             "server-version/frontend/src/pages/questionnaire/__tests__/trainingVariants.test.ts": "db5586429ce816b4c7c97d728f29762a013ce10d",
-            "server-version/frontend/src/pages/questionnaire/deferredAssessmentExport.tsx": "e9eaccaac07dace5c85ec4f2581228d762371f69",
+            "server-version/frontend/src/pages/questionnaire/deferredAssessmentExport.tsx": "d72bd98d1050124838c43c233bff38d339e468e0",
             "server-version/frontend/src/pages/questionnaire/form-template-editor.css": "4d6d1b9635ee7435d94e342f674e6640836dd97c",
             "server-version/frontend/src/pages/questionnaire/formChoices.ts": "2d719ad853c4a31325ad22833bea808060834d42",
             "server-version/frontend/src/pages/questionnaire/questionnaire-content-editor.css": "adcb9cf79cf13663d307d37e5ded14b7e8ff2063",
@@ -19333,6 +19363,36 @@
               "executedPathUnchanged": true,
               "reason": "The successful current-generation batch-grade branch now clears its own busy flag before advancing list refresh. Prior seven review assertions are excluded from fixed frontend acceptance and the full affected eight-case file reexecutes; other retained tests do not execute that changed branch.",
               "reviewEvidence": "Independent exact two-file review and owner 8 focused passes; user separately approved the eight-case CI revalidation."
+            },
+            "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": {
+              "before": "07f88b1dd7ba559834e23694b827e3b197e86095",
+              "after": "90fddb0bdabe6f72ab118c0a868317c3c72ce90f",
+              "changedSymbols": [
+                "Deferred export explicit confirmed document reload and regression"
+              ],
+              "unchangedExecutedPaths": [
+                "all paths not exercising the failed deferred export recovery panel",
+                "backend and immutable scientific/schema paths",
+                "existing one-argument loader calls remain valid; optional reload callback returns void"
+              ],
+              "executedPathUnchanged": true,
+              "reason": "Only failed export module recovery changes to explicit confirmed document reload. The old three export contracts are excluded; the current three execute with user permission. Other retained contracts do not exercise that changed recovery panel. The additional reload callback is optional with a void default; existing callers remain type-compatible.",
+              "reviewEvidence": "Independent exact two-file review and owner 3 focused passes; CI revalidation approval is recorded separately."
+            },
+            "server-version/frontend/src/pages/questionnaire/deferredAssessmentExport.tsx": {
+              "before": "e9eaccaac07dace5c85ec4f2581228d762371f69",
+              "after": "d72bd98d1050124838c43c233bff38d339e468e0",
+              "changedSymbols": [
+                "Deferred export explicit confirmed document reload and regression"
+              ],
+              "unchangedExecutedPaths": [
+                "all paths not exercising the failed deferred export recovery panel",
+                "backend and immutable scientific/schema paths",
+                "existing one-argument loader calls remain valid; optional reload callback returns void"
+              ],
+              "executedPathUnchanged": true,
+              "reason": "Only failed export module recovery changes to explicit confirmed document reload. The old three export contracts are excluded; the current three execute with user permission. Other retained contracts do not exercise that changed recovery panel. The additional reload callback is optional with a void default; existing callers remain type-compatible.",
+              "reviewEvidence": "Independent exact two-file review and owner 3 focused passes; CI revalidation approval is recorded separately."
             }
           }
         }
@@ -19742,8 +19802,8 @@
   "fixedPg": {
     "schema": 1,
     "kind": "reviewed-fixed-training-anonymous-pg-12",
-    "currentLocalProduct": "85b730191454e43172ddf268f1cf3d9cd3b360d0",
-    "currentProductTree": "83132ab6d440cb00311be4994b4573bcc444c5e5",
+    "currentLocalProduct": "b433bea05d7038b68a9badf8f6dad117c55d4064",
+    "currentProductTree": "ad90465552f0f0db26c3cb73533944c3d0413237",
     "reviewStatus": "INDEPENDENTLY_REVIEWED_FIXED_12_CASE_MAPPING",
     "originalExecutionSigned": false,
     "ciExecuted": false,
@@ -23000,6 +23060,11 @@
         "370ecde26ba2757c401075984969ef0e9d4f3c9222b6dcc84e9df67cdd587be2",
         "d8279a72911bef8c365cd35b8d29076bcaf981221fe85c82c9e74582319b0862"
       ]
+    },
+    "exportRecovery": {
+      "passed": 3,
+      "exitCode": 0,
+      "logSHA256": "e1070e5315974fd1bb4298d96a0fce56a28be911638813b9974b5106edb60c3e"
     }
   },
   "previousDependencyFixedPg": {
@@ -26201,11 +26266,12 @@
     ],
     "review": "Local exact 34-file reproduction:420 passed/1 failed, followed by only that failed case:1 passed/16 unselected. No official CI job is relabelled successful. Product and dependencies unchanged; only the asserted recovery message changed, with both no-API assertions retained.",
     "sourceBefore": "a5ed2ebfa093f89e1345f8db1fba940793bc9639",
-    "sourceAfter": "85b730191454e43172ddf268f1cf3d9cd3b360d0",
+    "sourceAfter": "b433bea05d7038b68a9badf8f6dad117c55d4064",
     "inputClosureGroup": "final-frontend-types"
   },
   "recoveryReview": {
     "fourthRun": "Official 465 passing backend assertions remain distinct from the six failures. Eight affected contracts execute with user approval; CSS invalidates learner rendered scenarios and the build, not retained JS-only unit assertions. Original public reports remain historical.",
-    "sixthRun": "Official completed backend job and full emitted bytes are retained with exact unchanged backend inputs. Fixed frontend 421 excludes the affected review file prior seven cases, retaining414; its current eight cases execute with explicit permission. Browser retains24 prior passing scenarios; failed review plus seven never-executed scenarios run on a new frontend build."
+    "sixthRun": "Official completed backend job and full emitted bytes are retained with exact unchanged backend inputs. Fixed frontend 421 excludes the affected review file prior seven cases, retaining414; its current eight cases execute with explicit permission. Browser retains24 prior passing scenarios; failed review plus seven never-executed scenarios run on a new frontend build.",
+    "seventhRun": "Official completed backend remains unchanged. Original fixed421 excludes review7 and export3, retaining411; seventh official successful review8 supplies the additional8 without rerunning. Current export3 execute, total422. Browser retains25 exact successful scenarios, including batch review; failed export recovery and six never-executed anonymous scenarios run on a new frontend build. Reload is explicitly confirmed and never automatically exports."
   }
 }

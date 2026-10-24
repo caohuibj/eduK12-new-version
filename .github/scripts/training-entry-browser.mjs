@@ -109,7 +109,7 @@ assert.equal(retainedProof.currentFrontendTree,git('rev-parse','HEAD:server-vers
 assert.equal(retainedProof.originalJobConclusion,'failure');
 async function scenario(name, identity, run, width = 1440, expectedManagement = []) {
   const retained=retainedProof.scenarios.find(item=>item.name===name);
-  if(retained){assert.equal(retained.status,'PASS');assert.notEqual(name,'assignment-review-paging-batch-download');report.scenarios.push({...retained,reusedFromOfficial:retainedProof.source,reexecuted:false});await writeReport();return;}
+  if(retained){assert.equal(retained.status,'PASS');assert.notEqual(name,'assessment-deferred-export-retry');report.scenarios.push({...retained,reusedFromOfficial:retainedProof.source,reexecuted:false});await writeReport();return;}
   const result = { name, width, startedAt: new Date().toISOString(), status: 'RUNNING', checks: [], requests: [], assets: [], expectedFailures: [], unexpected: [], errors: [], consoleErrors: [], dialogs: [], downloads: [] };
   report.scenarios.push(result);
   const context = await browser.newContext({ serviceWorkers: 'block', viewport: { width, height: 1000 }, locale: 'zh-CN', timezoneId: 'UTC', acceptDownloads: true });
@@ -549,10 +549,21 @@ try {
     assert.equal(await page.getByRole('heading', { name: '合成课程测评', exact: true }).isVisible(), true);
     assert.equal(count('POST /api/composite-assessments/assessment/export'), 0);
     await proof('code-failure');
-    await page.getByRole('button', { name: '重试加载导出', exact: true }).click();
+    await page.getByText('请重新加载页面，再手动打开数据导出；不会自动提交导出。', { exact: true }).waitFor();
+    await page.getByRole('button', { name: '重新加载页面', exact: true }).click();
+    await page.getByText('重新加载会丢失本页尚未保存的内容。请先保存需要的内容，再确认重新加载。', { exact: true }).waitFor();
+    await page.getByRole('button', { name: '取消重新加载', exact: true }).click();
+    assert.equal(codeAttempts, 1, 'Cancelling reload must retain the current document');
+    assert.equal(count('POST /api/composite-assessments/assessment/export'), 0);
+    await page.getByRole('button', { name: '重新加载页面', exact: true }).click();
+    await Promise.all([page.waitForEvent('load'), page.getByRole('button', { name: '确认重新加载', exact: true }).click()]);
+    await page.getByRole('heading', { name: '合成课程测评', exact: true }).waitFor();
+    assert.equal(codeAttempts, 1, 'Reload must not automatically reopen export');
+    assert.equal(count('POST /api/composite-assessments/assessment/export'), 0);
+    await page.getByRole('button', { name: '导出本课程数据', exact: true }).click();
     const dialog = page.getByRole('dialog', { name: '导出脱敏摘要', exact: true });
     await dialog.waitFor();
-    assert.equal(codeAttempts, 2, 'Explicit retry must actually reload the failed chunk');
+    assert.equal(codeAttempts, 2, 'Explicit document reload and reopen must fetch the failed chunk again');
     assert.equal(count('POST /api/composite-assessments/assessment/export'), 0, 'Opening export must not submit it');
     await dialog.getByRole('button', { name: '关闭数据导出', exact: true }).click();
     await page.getByRole('button', { name: '导出本课程数据', exact: true }).click();

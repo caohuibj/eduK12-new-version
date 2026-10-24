@@ -1619,3 +1619,9 @@ frontend rebuilds for this actual runtime change and lints the two changed files
 Twenty-four already passing browser scenarios retain exact official provenance;
 the failed batch-review scenario and seven never-executed scenarios still run.
 No new original logs are published, and no failed job is re-labelled successful.
+
+### PR351 explicit export document recovery
+
+The seventh official browser run passed batch grading but proved that the failed ES module URL remains cached after clearing the loader promise. Export recovery now warns about unsaved page state and requires an explicit confirmable document reload; cancel preserves the page, and export must be reopened manually. No second build entry, arbitrary import URL, automatic reload or automatic export is added.
+
+The unchanged backend keeps its exact official completed qualification and emitted bytes. The original local frontend 421 set excludes the old review seven and export three (411 retained); the seventh official successful review eight are verified against their exact report, command, source and dependency manifest. Only the current three export contracts execute under the separate user approval. A new frontend build executes the failed export recovery plus the six unexecuted anonymous journeys; the 25 previously successful browser scenarios are retained with their original provenance. Failed runs remain failed, and no deployment or production image qualification is implied.
