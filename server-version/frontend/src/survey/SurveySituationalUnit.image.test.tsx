@@ -22,15 +22,18 @@ const source={attemptId:id,attempt:{id,instrumentKey:'synthetic-image',instrumen
 const json=(data:unknown)=>({ok:true,status:200,json:async()=>({code:0,message:'ok',data})})
 afterEach(()=>vi.unstubAllGlobals())
 describe('real Survey host and shared image runner UI contract with synthetic API',()=>{
-  it('blocks on 403, retries with POST proof, then submits only scientific answers and consumes the server receipt',async()=>{
+  it.each(['403','decode'])('blocks on %s failure, retries with POST proof, then submits only scientific answers and consumes the server receipt',async failure=>{
     await finalDraftStore.delete('situational:'+id)
     if(!URL.createObjectURL)Object.defineProperty(URL,'createObjectURL',{value:vi.fn(()=> 'blob:synthetic-private-image'),configurable:true})
     if(!URL.revokeObjectURL)Object.defineProperty(URL,'revokeObjectURL',{value:vi.fn(),configurable:true})
+    const decode=vi.fn().mockResolvedValue(undefined)
+    if(failure==='decode')decode.mockRejectedValueOnce(new Error('Synthetic HTTP 200 image cannot decode'))
+    vi.stubGlobal('Image',class {src='';onload=null;onerror=null;decode=decode})
     let imageCalls=0,accepted=false
     const receipt={protocol:'SITUATIONAL_NATIVE_V1',attemptId:id,submissionId:'22222222-2222-4222-8222-222222222222',payloadHash:'d'.repeat(64)}
     const fetch=vi.fn(async(url:RequestInfo|URL,_options?:RequestInit)=>{
       const path=String(url)
-      if(path.includes('/images/'))return ++imageCalls===1?{ok:false,status:403}:{ok:true,status:200,blob:async()=>new Blob(['synthetic bytes'],{type:'image/png'})}
+      if(path.includes('/images/'))return ++imageCalls===1&&failure==='403'?{ok:false,status:403}:{ok:true,status:200,blob:async()=>new Blob(['synthetic bytes'],{type:'image/png'})}
       if(path.endsWith('/final'))accepted=true
       return json(accepted?{...source,attempt:{...source.attempt,status:'COMPLETED'},receipt}:source)
     })
@@ -41,6 +44,7 @@ describe('real Survey host and shared image runner UI contract with synthetic AP
     expect(screen.getByLabelText('Choose A')).toBeDisabled()
     expect(screen.getByRole('button',{name:'提交测评'})).toBeDisabled()
     expect(accepted).toBe(false)
+    if(failure==='decode')expect(decode).toHaveBeenCalledTimes(1)
     fireEvent.click(screen.getByRole('button',{name:'重试'}))
     expect(await screen.findByAltText('Original synthetic panel')).toBeInTheDocument()
     fireEvent.click(screen.getByLabelText('Choose A'))

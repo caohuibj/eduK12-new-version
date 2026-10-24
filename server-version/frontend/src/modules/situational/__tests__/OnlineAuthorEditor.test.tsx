@@ -1,14 +1,18 @@
 import { fireEvent, render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { sessionFetch } from '../../../api/client'
 import { newOnlineDocument, OnlineAuthorEditor } from '../OnlineAuthorEditor'
 
 vi.mock('../../../api/client', () => ({ sessionFetch: vi.fn() }))
 beforeEach(() => {
   vi.resetAllMocks()
+  // These transport fixtures contain synthetic bytes; decoder behavior has its own hook contracts.
+  vi.stubGlobal('Image', class { src = ''; decode = () => Promise.resolve() })
   Object.defineProperty(URL, 'createObjectURL', { value: vi.fn(() => 'blob:review'), configurable: true })
   Object.defineProperty(URL, 'revokeObjectURL', { value: vi.fn(), configurable: true })
 })
+afterEach(() => vi.unstubAllGlobals())
+
 describe('online read-only review', () => {
   it('allows a reviewer to inspect another scene and retry media while all authoring controls remain disabled', async () => {
     const value = newOnlineDocument(), onChange = vi.fn()

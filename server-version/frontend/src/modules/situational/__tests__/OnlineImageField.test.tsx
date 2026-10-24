@@ -13,7 +13,10 @@ const json = (data: unknown, ok = true) => ({ ok, json: async () => ({ code: ok 
 const blob = () => ({ ok: true, blob: async () => new Blob(['image'], { type: 'image/png' }) }) as Response
 beforeEach(() => {
   vi.resetAllMocks()
-  vi.stubGlobal('URL', { ...URL, createObjectURL: vi.fn(() => 'blob:private-image'), revokeObjectURL: vi.fn() })
+  // These transport fixtures contain synthetic bytes; decoder behavior has its own hook contracts.
+  vi.stubGlobal('Image', class { src = ''; decode = () => Promise.resolve() })
+  Object.defineProperty(URL,'createObjectURL',{configurable:true,value:vi.fn(()=> 'blob:private-image')})
+  Object.defineProperty(URL,'revokeObjectURL',{configurable:true,value:vi.fn()})
 })
 afterEach(() => vi.unstubAllGlobals())
 function Editor({ initial }: { initial?: AssessmentImage }) {

@@ -14,7 +14,7 @@ vi.mock('../../../training/context', async importOriginal => ({
   ...await importOriginal<typeof import('../../../training/context')>(),
   isTrainingHost: () => training.enabled,
 }))
-afterEach(() => { training.enabled = false; vi.restoreAllMocks() })
+afterEach(() => { training.enabled = false; vi.restoreAllMocks(); vi.unstubAllGlobals() })
 
 vi.mock('../api', () => ({
   situationalApi: {
@@ -129,6 +129,8 @@ const answerDefaultRunner = async () => {
 describe('Situational text runner', () => {
   beforeEach(async () => {
     vi.resetAllMocks()
+    // These transport fixtures contain synthetic bytes; decoder behavior has its own hook contracts.
+    vi.stubGlobal('Image', class { src = ''; decode = () => Promise.resolve() })
     embeddedClient = { start: vi.fn(), resume: vi.fn(), submit: vi.fn(), result: vi.fn() }
     vi.mocked(embeddedSituationalApi).mockReturnValue(embeddedClient as never)
     await finalDraftStore.delete('situational:ui-attempt')
@@ -305,6 +307,33 @@ describe('Situational text runner', () => {
     expect(screen.getByRole('button', { name: /提交测评/ })).not.toBeDisabled()
   })
 
+  it('records staged exposure only after successful image decode, never on HTTP-success corrupt bytes',async()=>{
+    const visual=stagedStartData()
+    visual.instrument.definition.scenes[0]!.stimulus={type:'IMAGE',
+      asset:{assetId:'staged-image',contentHash:'a'.repeat(64),mimeType:'image/png'},altText:'Decoded staged panel'}
+    let rejectDecode!:(error:Error)=>void
+    const pending=new Promise<void>((_resolve,reject)=>{rejectDecode=reject})
+    const decode=vi.fn().mockReturnValueOnce(pending).mockResolvedValue(undefined)
+    vi.stubGlobal('Image',class{src='';decode=decode})
+    vi.mocked(situationalApi.start).mockResolvedValue({code:0,message:'ok',data:visual})
+    vi.mocked(situationalApi.loadAsset).mockResolvedValue(new Blob(['HTTP 200 but undecodable'],{type:'image/png'}))
+    const exposed=async()=> (await finalDraftStore.listTrials('situational:ui-attempt')).flatMap(trial=>
+      (trial.payload as {events?:SituationalResearchEvent[]}).events??[]).filter(event=>event.type==='NODE_EXPOSED')
+    renderRunner()
+    await waitFor(()=>expect(decode).toHaveBeenCalledTimes(1))
+    expect(screen.getByLabelText('选择 A')).toBeDisabled()
+    expect(await exposed()).toEqual([])
+    await act(async()=>{rejectDecode(new Error('Corrupt image'));await pending.catch(()=>{})})
+    expect(await screen.findByRole('alert')).toHaveTextContent('视觉内容加载失败')
+    expect(screen.getByLabelText('选择 A')).toBeDisabled()
+    expect(await exposed()).toEqual([])
+    fireEvent.click(screen.getByRole('button',{name:'重试'}))
+    await waitFor(()=>expect(screen.getByLabelText('选择 A')).toBeEnabled())
+    await waitFor(async()=>expect(await exposed()).toHaveLength(1))
+    expect(decode).toHaveBeenCalledTimes(2)
+    expect(situationalApi.submit).not.toHaveBeenCalled()
+  })
+
   it('blocks an incomplete final request and moves to the first missing scene', async () => {
     renderRunner()
     expect(await screen.findByText('第一段文字情境')).toBeInTheDocument()
@@ -458,6 +487,7 @@ describe('Situational staged scientific presentation', () => {
 describe('Situational journal failure recovery', () => {
   beforeEach(async () => {
     vi.clearAllMocks()
+    vi.stubGlobal('Image',class {src='';decode=()=>Promise.resolve()})
     await finalDraftStore.delete('situational:ui-attempt')
     const source = stagedStartData()
     vi.mocked(situationalApi.start).mockResolvedValue({ code: 0, message: 'ok', data: source })

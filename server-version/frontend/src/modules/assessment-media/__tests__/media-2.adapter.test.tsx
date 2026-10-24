@@ -1,5 +1,5 @@
 import { fireEvent, render, screen, waitFor } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import AssessmentImageGate from '../AssessmentImageGate'
 import { assessmentImageItems, assessmentOptionImageItems } from '../adapter'
 
@@ -11,11 +11,15 @@ const image = (assetId: string, order = 0) => ({
 })
 
 beforeEach(() => {
+  // These transport fixtures contain synthetic bytes; decoder behavior has its own hook contracts.
+  vi.stubGlobal('Image', class { src = ''; decode = () => Promise.resolve() })
   vi.stubGlobal('URL', class extends URL {
     static createObjectURL = vi.fn(() => 'blob:media')
     static revokeObjectURL = vi.fn()
   })
 })
+
+afterEach(() => vi.unstubAllGlobals())
 
 describe('MEDIA-2 frontend image adapters', () => {
   it('sorts Scale image presentation by frozen order and rejects invalid entries', () => {
