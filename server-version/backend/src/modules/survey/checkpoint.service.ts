@@ -1,3 +1,4 @@
+import {SURVEY_NATIVE_SJT_PROTOCOL} from './situational-native.contract'
 import { assertSurveyScaleCollectionAllowed } from './scale-collection-guard'
 import { surveySjtQuestions } from './sjt-structure'
 import { assertSurveyCognitiveLockedAnswers } from './cognitive.results'
@@ -62,7 +63,7 @@ const validCheckpointAnswers=(snapshot:ResearchFrozenPublication,raw:unknown):Ch
       }
     }else if(unit.kind==='SCALE'){
       for(const q of (unit.displayDefinition as ScaleDraft).items)allowed.add(q.itemKey)
-    }else if(unit.kind==='SJT'){
+    }else if(unit.kind==='SJT'&&unit.executionProtocol!==SURVEY_NATIVE_SJT_PROTOCOL){
       for(const q of surveySjtQuestions(unit.displayDefinition as AnySjtDraft))allowed.add(q.questionKey)
     }
     const keys=Object.keys(value as Record<string,unknown>)
@@ -124,7 +125,7 @@ const access=async(tx:Prisma.TransactionClient,proof:Proof,known:AuthContext)=>{
     ?await ensureSurveyFlowAssignment(tx,{...known,researchCode:proof.researchCode,
       accessCredential:proof.accessCredential,snapshot:frozen!}):null
   const snapshot=assignment?assignedSurveySnapshot(frozen!,assignment):frozen!
-  return {policy,wave:attempt.wave,snapshot,hasCognitive:frozen!.units.some(unit=>unit.kind==='COGNITIVE')}
+  return {policy,wave:attempt.wave,snapshot,hasCognitive:frozen!.units.some(unit=>unit.kind==='COGNITIVE'||unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)}
 }
 const context=async(proof:Proof):Promise<AuthContext>=>verifiedSurveyFinalLocator(proof)
 export async function readSurveyCheckpoint(proof:Proof){

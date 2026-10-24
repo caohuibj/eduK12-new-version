@@ -1,3 +1,4 @@
+import {isSurveySituationalReference,type SurveySituationalReference} from './survey-situational-api'
 import type { SurveyCognitiveReference } from './survey-cognitive-api'
 /** Short-lived same-tab Survey draft. Never persists in localStorage or
  * sends data during item navigation. Source+Attempt fence stale submissions.
@@ -13,7 +14,7 @@ export function clearLocalSurveyDraft(publicId:string,attemptId:string):void{
   try{sessionStorage.removeItem(key(publicId,attemptId))}catch{/* private mode */}
 }
 export type SurveyFinalSubmission={submissionId:string;screenOut:boolean;
-  presentation?:{shownBlocks:string[]};cognitiveReferences?:SurveyCognitiveReference[]}
+  presentation?:{shownBlocks:string[]};cognitiveReferences?:SurveyCognitiveReference[];situationalReferences?:SurveySituationalReference[]}
 export type SurveyLocalDraft<T>={answers:T;itemTimings?:Record<string,unknown>;
   finalSubmission?:SurveyFinalSubmission}
 /** Keep a strict allowlist: the retry descriptor must never carry access credentials. */
@@ -28,7 +29,9 @@ const readFinalSubmission=(raw:unknown):SurveyFinalSubmission|null=>{
   if(final.cognitiveReferences!==undefined&&(!Array.isArray(final.cognitiveReferences)||final.cognitiveReferences.length>70||final.cognitiveReferences.some(ref=>
     !ref||typeof ref.slotKey!=='string'||!Number.isSafeInteger(ref.epoch)||ref.epoch<1||typeof ref.resultId!=='string'||
     !/^[a-f0-9]{64}$/i.test(ref.resultHash)||!/^[a-f0-9]{64}$/i.test(ref.measurementDigest))))return null
+  if(final.situationalReferences!==undefined&&(!Array.isArray(final.situationalReferences)||final.situationalReferences.length>30||!final.situationalReferences.every(isSurveySituationalReference)))return null
   return {submissionId:final.submissionId,screenOut:final.screenOut,
+    ...(final.situationalReferences?{situationalReferences:final.situationalReferences.map(ref=>({protocol:ref.protocol,attemptId:ref.attemptId,submissionId:ref.submissionId,payloadHash:ref.payloadHash}))}:{}),
     ...(final.presentation?{presentation:{shownBlocks:[...final.presentation.shownBlocks]}}:{}),
     ...(final.cognitiveReferences?{cognitiveReferences:final.cognitiveReferences.map(ref=>({slotKey:ref.slotKey,epoch:ref.epoch,resultId:ref.resultId,resultHash:ref.resultHash,measurementDigest:ref.measurementDigest}))}:{})}
 }

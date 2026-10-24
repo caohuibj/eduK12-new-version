@@ -5,7 +5,7 @@ import {canonicalHash} from '../assessment-runtime/canonical'
  * an authenticated project-scoped, frozen FINAL source (PR4 read adapter).
  */
 export type MissingReason =
-  | 'NOT_SHOWN' | 'SHOWN_MISSING' | 'REFUSED' | 'UNABLE_TO_JUDGE' | 'NO_WAVE'
+  | 'EXPOSURE_UNVERIFIED' | 'NOT_SHOWN' | 'SHOWN_MISSING' | 'REFUSED' | 'UNABLE_TO_JUDGE' | 'NO_WAVE'
   | 'ABANDONED' | 'NOT_COMPARABLE' | 'WITHDRAWN' | 'QUALITY_EXCLUDED'
 export interface SurveyMeasurementIdentity {
   variantConfiguration?:SurveyVariantConfiguration

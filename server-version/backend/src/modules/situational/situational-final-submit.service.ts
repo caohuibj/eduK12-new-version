@@ -221,29 +221,14 @@ const inputForValidation = (input: SituationalFinalSubmitServiceInput) => {
   return payload
 }
 
-const persistSituationalAttemptFinal = async (
-  input: SituationalFinalSubmitServiceInput,
-) => {
+type SituationalFinalRuntime = Awaited<ReturnType<typeof loadSituationalAttemptRuntime>>
+
+/** Pure scientific preparation. Host authorization must precede runtime loading;
+ * this value is request-local, never a substitute for locked-row admission. */
+export function prepareSituationalFinalSubmission(input: SituationalFinalSubmitServiceInput, runtime: SituationalFinalRuntime) {
   const submissionId = validateSubmissionId(input.submissionId)
-  // Controller callers pass the authenticated identity in both the service
-  // input and the embedded binding. Keep the service boundary tolerant of
-  // direct callers that provide the same identity only at the top level, but
-  // never let it override an explicit anonymous recovery binding.
-  const embedded = input.embedded
-    ? {
-        ...input.embedded,
-        ...(!input.embedded.userId && !input.embedded.recoveryTokenHash && input.userId
-          ? { userId: input.userId }
-          : {}),
-      }
-    : undefined
-  if (!embedded && !input.userId) {
-    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评参与者身份缺失', 403)
-  }
-  const runtime = embedded
-    ? await loadEmbeddedSituationalAttemptRuntime(input.attemptId, embedded)
-    : await loadSituationalAttemptRuntime(input.attemptId, input.userId as string)
   const { row, snapshot } = runtime
+  if (row.id !== input.attemptId) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评记录与提交身份不一致', 409)
   assertFinalOnly(row.deliveryMode)
   assertAttemptEpoch(row.attemptEpoch, input.attemptEpoch)
   assertFinalSubmitStatus(row.status, '情境化测评')
@@ -272,23 +257,13 @@ const persistSituationalAttemptFinal = async (
   assertCanonicalSubmissionPayloadSize(canonical, FINAL_SUBMISSION_MAX_BYTES.situational, '情境化测评提交数据')
   const payloadHash = canonical.hash
 
-  if (row.status === 'COMPLETED') {
-    if (assertSubmissionReplay(row, submissionId, payloadHash) === 'replay') {
-      if (requiresTrainingFlowFinalLock(row.compositeAttemptId, row.compositeAttempt) || await assertCurrentStudyPrincipal(prisma,{attemptId:row.compositeAttemptId,userId:embedded?.userId,recoveryTokenHash:embedded?.recoveryTokenHash,attemptEpoch:input.attemptEpoch})) {
-        await withFinalOnlyCompletionTransaction(async tx => {
-          await assertCurrentStudyPrincipal(tx,{attemptId:row.compositeAttemptId,userId:embedded?.userId,recoveryTokenHash:embedded?.recoveryTokenHash,attemptEpoch:input.attemptEpoch},true)
-          const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: row.compositeAttemptId, parent: row.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: row.compositeItemId, sourceAttemptId: row.id, submissionId })
-          assertFlowFinal(true)
-        })
-      }
-      return {
-        data: situationalAttemptForResponse(row, snapshot, { replayed: true }),
-        parentAttemptId: embedded?.compositeAttemptId ?? null,
-      }
-    }
-    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评已完成，请重启后重新作答', 409)
-  }
+  return { submissionId, row, snapshot, assignedDefinition, normalized, onlineNormalized, researchCapture, responses, payloadHash }
+}
+type PreparedSituationalFinal = ReturnType<typeof prepareSituationalFinalSubmission>
 
+/** Exactly the existing scorer/raw/projection path, before database locks. */
+export function deriveSituationalFinalFacts(prepared: PreparedSituationalFinal, provenance: 'SITUATIONAL_ATTEMPT' | 'ASSESSMENT') {
+  const { row, snapshot, submissionId, assignedDefinition, normalized, responses, onlineNormalized, researchCapture } = prepared
   // This is the sole scoring call for an accepted FINAL. V2 traversal and
   // response validation have already completed, so the existing pure scorer
   // receives only the reachable scientific plane.
@@ -314,7 +289,7 @@ const persistSituationalAttemptFinal = async (
     core: canonicalCore,
     completedAt,
     persistenceProvenance: {
-      sourceType: embedded ? 'SITUATIONAL_ATTEMPT' : 'ASSESSMENT',
+      sourceType: provenance,
       sourceAttemptId: row.id,
       sourceSubmissionId: submissionId,
     },
@@ -333,99 +308,174 @@ const persistSituationalAttemptFinal = async (
   const encryptedCanonicalResult = encryptUnifiedRuntimePayload(canonicalResult)
   const totalTime = Math.max(0, completedAt.getTime() - row.startedAt.getTime())
 
+  return { result, canonicalResult, rawPayload, encryptedRawPayload, encryptedResult, encryptedCanonicalResult, completedAt, totalTime }
+}
+type DerivedSituationalFinal = ReturnType<typeof deriveSituationalFinalFacts>
+
+/** Internal authority adapter. Construct only AFTER acquiring parent/flow locks
+ * in this transaction. No method may acquire an ancestor lock after child lock.
+ * Survey is deliberately not an accepted kind until its real adapter exists. */
+export type LockedSituationalFinalHost = {
+  kind: 'TRAINING' | 'SURVEY'
+  assertLockedAuthority: (row: SituationalAttemptCommitRow) => void | Promise<void>
+  assertReplayAdmission: (replayed: boolean) => void
+  persistProjection: (tx: Prisma.TransactionClient, row: SituationalAttemptCommitRow, facts: DerivedSituationalFinal) => Promise<void>
+}
+
+/** One facts writer, on the caller's existing transaction. There is no optional
+ * authorization hook and no nested transaction or alternative scoring engine. */
+export async function commitPreparedSituationalFinal(tx: Prisma.TransactionClient, input: SituationalFinalSubmitServiceInput,
+  prepared: PreparedSituationalFinal, derived: DerivedSituationalFinal, host: LockedSituationalFinalHost) {
+  const { row, snapshot, submissionId, payloadHash } = prepared
+  const { rawPayload, encryptedRawPayload, encryptedResult, encryptedCanonicalResult, completedAt, totalTime } = derived
+  await lockSituationalAttempt(tx, input.attemptId)
+  const current = await transactionRow(tx, input.attemptId)
+  if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评记录不存在', 404)
+  if (host.kind === 'TRAINING' ? current.surveyAttemptId != null
+    : host.kind !== 'SURVEY' || current.surveyAttemptId == null || current.userId != null || current.compositeAttemptId != null) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评宿主不匹配', 403)
+  }
+  await host.assertLockedAuthority(current)
+  assertRowMatchesSnapshot(current, snapshot)
+  assertFinalOnly(current.deliveryMode)
+  assertAttemptEpoch(current.attemptEpoch, input.attemptEpoch)
+  assertFinalSubmitStatus(current.status, '情境化测评')
+  assertRequestRuntimeIdentity(current, input)
+
+  if (current.status === 'COMPLETED') {
+    if (assertSubmissionReplay(current, submissionId, payloadHash) === 'replay') {
+      host.assertReplayAdmission(true)
+      return { kind: 'replay' as const, row: current }
+    }
+    throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', 'submissionId 已用于其他提交内容', 409)
+  }
+
+  host.assertReplayAdmission(false)
+  const update = await tx.situationalAttempt.updateMany({
+    where: {
+      id: input.attemptId,
+      status: 'IN_PROGRESS',
+      deliveryMode: 'FINAL_ONLY',
+      runtimeGeneration: 'UNIFIED_V1',
+      attemptEpoch: input.attemptEpoch,
+      submissionId: null,
+    },
+    data: {
+      status: 'COMPLETED',
+      progress: 100,
+      submissionId,
+      submissionPayloadHash: payloadHash,
+      submittedAt: completedAt,
+      completedAt,
+      totalTime,
+      resultEncrypted: encryptedResult,
+      canonicalResultEncrypted: encryptedCanonicalResult,
+    },
+  })
+  if (update.count !== 1) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评提交状态已变化，请重试', 409)
+  }
+  await tx.situationalRawSubmission.create({
+    data: {
+      attemptId: input.attemptId,
+      attemptEpoch: row.attemptEpoch,
+      responseCount: rawPayload.schemaVersion === 2 ? rawPayload.rawResponses.length : rawPayload.responses.length,
+      payloadEncrypted: encryptedRawPayload,
+      payloadHash,
+      payloadSchemaVersion: rawPayload.schemaVersion,
+      encodingVersion: rawPayload.schemaVersion === 2 ? SITUATIONAL_ONLINE_RAW_ENCODING_VERSION : SITUATIONAL_RAW_ENCODING_VERSION,
+    },
+  })
+  await host.persistProjection(tx, current, derived)
+
+  return {
+    kind: 'committed' as const,
+    row: {
+      ...current,
+      status: 'COMPLETED' as const,
+      progress: 100,
+      submissionId,
+      submissionPayloadHash: payloadHash,
+      submittedAt: completedAt,
+      completedAt,
+      totalTime,
+      resultEncrypted: encryptedResult,
+      canonicalResultEncrypted: encryptedCanonicalResult,
+    } as SituationalAttemptCommitRow,
+  }
+}
+
+const persistSituationalAttemptFinal = async (
+  input: SituationalFinalSubmitServiceInput,
+) => {
+  const submissionId = validateSubmissionId(input.submissionId)
+  // Controller callers pass the authenticated identity in both the service
+  // input and the embedded binding. Keep the service boundary tolerant of
+  // direct callers that provide the same identity only at the top level, but
+  // never let it override an explicit anonymous recovery binding.
+  const embedded = input.embedded
+    ? {
+        ...input.embedded,
+        ...(!input.embedded.userId && !input.embedded.recoveryTokenHash && input.userId
+          ? { userId: input.userId }
+          : {}),
+      }
+    : undefined
+  if (!embedded && !input.userId) {
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评参与者身份缺失', 403)
+  }
+  const runtime = embedded
+    ? await loadEmbeddedSituationalAttemptRuntime(input.attemptId, embedded)
+    : await loadSituationalAttemptRuntime(input.attemptId, input.userId as string)
+  const { row, snapshot } = runtime
+  const prepared = prepareSituationalFinalSubmission(input, runtime)
+  const { payloadHash } = prepared
+
+  if (row.status === 'COMPLETED') {
+    if (assertSubmissionReplay(row, submissionId, payloadHash) === 'replay') {
+      if (requiresTrainingFlowFinalLock(row.compositeAttemptId, row.compositeAttempt) || await assertCurrentStudyPrincipal(prisma,{attemptId:row.compositeAttemptId,userId:embedded?.userId,recoveryTokenHash:embedded?.recoveryTokenHash,attemptEpoch:input.attemptEpoch})) {
+        await withFinalOnlyCompletionTransaction(async tx => {
+          await assertCurrentStudyPrincipal(tx,{attemptId:row.compositeAttemptId,userId:embedded?.userId,recoveryTokenHash:embedded?.recoveryTokenHash,attemptEpoch:input.attemptEpoch},true)
+          const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: row.compositeAttemptId, parent: row.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: row.compositeItemId, sourceAttemptId: row.id, submissionId })
+          assertFlowFinal(true)
+        })
+      }
+      return {
+        data: situationalAttemptForResponse(row, snapshot, { replayed: true }),
+        parentAttemptId: embedded?.compositeAttemptId ?? null,
+      }
+    }
+    throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评已完成，请重启后重新作答', 409)
+  }
+
+  const derived = deriveSituationalFinalFacts(prepared, embedded ? 'SITUATIONAL_ATTEMPT' : 'ASSESSMENT')
+  const { result, canonicalResult } = derived
+
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
     await assertCurrentStudyPrincipal(tx,{attemptId:row.compositeAttemptId,userId:embedded?.userId,recoveryTokenHash:embedded?.recoveryTokenHash,attemptEpoch:input.attemptEpoch},true)
     if (embedded) await lockEmbeddedCompositeAttempt(tx, embedded.compositeAttemptId)
     const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: row.compositeAttemptId, parent: row.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: row.compositeItemId, sourceAttemptId: row.id, submissionId, parentLocked: Boolean(embedded) })
-    await lockSituationalAttempt(tx, input.attemptId)
-    const current = await transactionRow(tx, input.attemptId)
-    if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评记录不存在', 404)
-    if (embedded) {
-      assertEmbeddedSituationalAttemptBinding(current, embedded)
-    } else {
-      assertSituationalAttemptOwner(current, input.userId as string)
-    }
-    assertRowMatchesSnapshot(current, snapshot)
-    assertFinalOnly(current.deliveryMode)
-    assertAttemptEpoch(current.attemptEpoch, input.attemptEpoch)
-    assertFinalSubmitStatus(current.status, '情境化测评')
-    assertRequestRuntimeIdentity(current, input)
-
-    if (current.status === 'COMPLETED') {
-      if (assertSubmissionReplay(current, submissionId, payloadHash) === 'replay') {
-        assertFlowFinal(true)
-        return { kind: 'replay' as const, row: current }
-      }
-      throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT', 'submissionId 已用于其他提交内容', 409)
-    }
-
-    assertFlowFinal(false)
-    const update = await tx.situationalAttempt.updateMany({
-      where: {
-        id: input.attemptId,
-        status: 'IN_PROGRESS',
-        deliveryMode: 'FINAL_ONLY',
-        runtimeGeneration: 'UNIFIED_V1',
-        attemptEpoch: input.attemptEpoch,
-        submissionId: null,
+    const host: LockedSituationalFinalHost = {
+      kind: 'TRAINING',
+      assertLockedAuthority: current => {
+        if (embedded) return assertEmbeddedSituationalAttemptBinding(current, embedded)
+        return assertSituationalAttemptOwner(current, input.userId as string)
       },
-      data: {
-        status: 'COMPLETED',
-        progress: 100,
-        submissionId,
-        submissionPayloadHash: payloadHash,
-        submittedAt: completedAt,
-        completedAt,
-        totalTime,
-        resultEncrypted: encryptedResult,
-        canonicalResultEncrypted: encryptedCanonicalResult,
+      assertReplayAdmission: assertFlowFinal,
+      persistProjection: async (transaction, current, facts) => {
+        if (!embedded) return
+        await insertCompletedUnitSnapshot(transaction, {
+          compositeAttemptId: embedded.compositeAttemptId,
+          attemptEpoch: current.attemptEpoch,
+          slotKey: embedded.compositeSlotKey,
+          unitType: 'SITUATIONAL', payloadKind: 'UNIT_RESULT', sourceType: 'SITUATIONAL_ATTEMPT',
+          sourceAttemptId: current.id, sourceSubmissionId: submissionId,
+          sourceDefinitionHash: snapshot.definitionHash, compiledRuntimeHash: snapshot.compiledRuntimeHash,
+          canonicalResultEncrypted: facts.encryptedCanonicalResult, completedAt: facts.completedAt,
+        })
       },
-    })
-    if (update.count !== 1) {
-      throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '情境化测评提交状态已变化，请重试', 409)
     }
-    await tx.situationalRawSubmission.create({
-      data: {
-        attemptId: input.attemptId,
-        attemptEpoch: row.attemptEpoch,
-        responseCount: rawPayload.schemaVersion === 2 ? rawPayload.rawResponses.length : rawPayload.responses.length,
-        payloadEncrypted: encryptedRawPayload,
-        payloadHash,
-        payloadSchemaVersion: rawPayload.schemaVersion,
-        encodingVersion: rawPayload.schemaVersion === 2 ? SITUATIONAL_ONLINE_RAW_ENCODING_VERSION : SITUATIONAL_RAW_ENCODING_VERSION,
-      },
-    })
-    if (embedded) {
-      await insertCompletedUnitSnapshot(tx, {
-        compositeAttemptId: embedded.compositeAttemptId,
-        attemptEpoch: current.attemptEpoch,
-        slotKey: embedded.compositeSlotKey,
-        unitType: 'SITUATIONAL',
-        payloadKind: 'UNIT_RESULT',
-        sourceType: 'SITUATIONAL_ATTEMPT',
-        sourceAttemptId: current.id,
-        sourceSubmissionId: submissionId,
-        sourceDefinitionHash: snapshot.definitionHash,
-        compiledRuntimeHash: snapshot.compiledRuntimeHash,
-        canonicalResultEncrypted: encryptedCanonicalResult,
-        completedAt,
-      })
-    }
-    return {
-      kind: 'committed' as const,
-      row: {
-        ...current,
-        status: 'COMPLETED' as const,
-        progress: 100,
-        submissionId,
-        submissionPayloadHash: payloadHash,
-        submittedAt: completedAt,
-        completedAt,
-        totalTime,
-        resultEncrypted: encryptedResult,
-        canonicalResultEncrypted: encryptedCanonicalResult,
-      } as SituationalAttemptCommitRow,
-    }
+    return commitPreparedSituationalFinal(tx, input, prepared, derived, host)
   })
 
   return {

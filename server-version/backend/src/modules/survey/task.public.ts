@@ -1,3 +1,5 @@
+import { SURVEY_NATIVE_SJT_PROTOCOL,surveySituationalExecutionProtocol } from './situational-native.contract'
+import { frozenSurveyNativeSituationalRuntime } from './situational-native.definition'
 import {materialListSchema,publicMaterial} from '../assessment-media/material'
 import {readSurveyScalePresentation,scalePresentationOptions} from './catalog-scale.presentation'
 import { readSurveyCognitiveProgressFromVerifiedAttempt } from './cognitive.service'
@@ -42,6 +44,7 @@ export async function getOwnResearchTask(input:{
     })):null
   const selected=assignedSurveySnapshot(own.compiledSnapshot,assignment)
   const units=selected.units.map(unit=>{
+    if(unit.kind==='SJT'||unit.executionProtocol!==undefined)surveySituationalExecutionProtocol(unit)
     // Validate the same list once per selected unit; the public allowlist still
     // strips private rights notes and no definition is cached across requests.
     const materials=materialListSchema.optional().parse((unit.displayDefinition as {materials?:unknown}).materials)
@@ -92,6 +95,12 @@ export async function getOwnResearchTask(input:{
         feedback:{mode:frozen.feedback.mode,release:frozen.feedback.release},
         partialRetentionDays:frozen.partialRetentionDays}
     }
+    if(unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL){
+      const {header}=frozenSurveyNativeSituationalRuntime(unit)
+      return {kind:'SJT',instrumentKey:unit.instrumentKey,title:unit.title,
+        executionProtocol:SURVEY_NATIVE_SJT_PROTOCOL,definitionHash:header.definitionHash,
+        scienceMaturity:header.scientificContext.scientificMaturity}
+    }
     const d=assertSurveyDraft('SJT',unit.displayDefinition,true) as AnySjtDraft
     const scenes=surveySjtScenes(d).map(scene=>({sceneKey:scene.sceneKey,
       title:scene.title,stimulus:scene.stimulus,image:projectPublicSurveyImage(scene.image),
@@ -109,7 +118,7 @@ export async function getOwnResearchTask(input:{
       orderPolicy:'FIXED',scenes}
 
   })
-  const cognitiveProgress=own.status==='STARTED'&&selected.units.some(unit=>unit.kind==='COGNITIVE')
+  const cognitiveProgress=own.status==='STARTED'&&selected.units.some(unit=>unit.kind==='COGNITIVE'||unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)
     ?await readSurveyCognitiveProgressFromVerifiedAttempt(input,own):null
   return {attemptId:own.attemptId,waveId:own.waveId,status:own.status,
     ...(cognitiveProgress??{}),

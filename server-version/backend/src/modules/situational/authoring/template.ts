@@ -1,4 +1,5 @@
 import { z } from 'zod'
+import { assessmentImageSchema } from '../../assessment-core/definition-primitives'
 import { canonicalHash } from '../../assessment-runtime/canonical'
 import { situationDefinitionV2Schema, type SituationDefinitionV2 } from '../situation-branching'
 import { validateSituationPackage, type SituationPackage } from '../situation-package'
@@ -27,7 +28,8 @@ export const sjtAuthorTemplateSchema = row({
   licenseStatus: z.enum(['self_authored', 'authorized', 'unknown']),
   redistribution: z.enum(['allowed', 'restricted', 'unknown']),
   nodes: z
-    .array(row({ nodeKey: key, motherSceneKey: key, title: text, stimulus: text }))
+    .array(row({ nodeKey: key, motherSceneKey: key, title: text, stimulus: text,
+      image: assessmentImageSchema.optional() }))
     .min(1)
     .max(40),
   questions: z
@@ -379,7 +381,11 @@ export function compileSjtTemplate(input: unknown): {
       sceneKey: physical,
       title: n.title,
       sortOrder: scenes.length,
-      stimulus: { type: 'TEXT_V1', text: [v.bridge, n.stimulus].filter(Boolean).join('\n\n') },
+      stimulus: n.image
+        ? { type: 'IMAGE', text: [v.bridge, n.stimulus].filter(Boolean).join('\n\n'),
+            asset: n.image.asset, altText: n.image.altText,
+            ...(n.image.caption ? { caption: n.image.caption } : {}) }
+        : { type: 'TEXT_V1', text: [v.bridge, n.stimulus].filter(Boolean).join('\n\n') },
       primaryConstruct: t.metrics[0]!.construct,
       secondaryConstructs: t.metrics.slice(1).map((m) => m.construct),
       situationFeatures: {},
@@ -568,6 +574,13 @@ export function assertSjtReleaseReady(compiled: ReturnType<typeof compileSjtTemp
       code: 'SOURCE',
       message: '发布前需明确内容来源与使用授权',
     })
+  for (const [index, node] of t.nodes.entries())
+    if (node.image && (node.image.rightsStatus === 'unknown' || !node.image.rightsNote.trim()))
+      issues.push({
+        path: `nodes.${index}.image`,
+        code: 'SOURCE',
+        message: '情境图片须明确版权或使用许可依据',
+      })
   // Authors supply independent expected scores. Coverage cannot be met by fabricated compiler outputs.
   const covered = new Set<string>()
   for (const c of t.cases)

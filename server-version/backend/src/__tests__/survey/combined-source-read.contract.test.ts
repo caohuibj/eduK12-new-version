@@ -66,7 +66,7 @@ function fixture(options:{attendance?:boolean;variant?:boolean}={}){
     submissionId:'unused-submission-id',payloadHash:'unused-payload-hash',attempt,wave}
   const state={hasFinal:!options.attendance,allow:true,sourceRevision:1,reads:0,
     expiresAt:null as Date|null,afterLockNow:new Date(cutOff),
-    finalCipherBytes:0n,frozenBytes:0n,assignmentBytes:0n,beforeRead:(_read:number)=>{},events:[] as string[]}
+    finalCipherBytes:0n,frozenBytes:0n,nativeCipherBytes:0n,assignmentBytes:0n,beforeRead:(_read:number)=>{},events:[] as string[]}
   const publications=[publication],waves=[wave],attempts=[attempt]
   const tx={
     $queryRaw:vi.fn(async(parts:TemplateStringsArray|{strings:string[]})=>{
@@ -80,7 +80,7 @@ function fixture(options:{attendance?:boolean;variant?:boolean}={}){
         return state.allow&&(!state.expiresAt||state.expiresAt>state.afterLockNow)
         ?[{collectionMode:'LINKED_WAVES',sourceRevision:state.sourceRevision,sourceCutOff:new Date(cutOff)}]:[]
       }
-      if(sql.includes('"finalCipherBytes"')){state.events.push('source-budget');return [{finalCipherBytes:state.finalCipherBytes,frozenBytes:state.frozenBytes}]}
+      if(sql.includes('"finalCipherBytes"')){state.events.push('source-budget');return [{finalCipherBytes:state.finalCipherBytes,frozenBytes:state.frozenBytes,nativeCipherBytes:state.nativeCipherBytes}]}
       if(sql.includes('flow_assignment_cipher')){state.events.push('assignment-budget');return [{bytes:state.assignmentBytes}]}
       throw new Error('Unexpected source SQL: '+sql)
     }),
@@ -135,7 +135,8 @@ describe('Survey exact source material and independent read budgets',()=>{
       expect(queries).toHaveLength(2)
       for(const [parts] of queries){
         const sql=surveyFixtureSql(parts)
-        expect(sql).toContain('FROM survey_publications');expect(sql).not.toMatch(/\bJOIN\b/i)
+        expect(sql).toContain('FROM survey_publications');expect(sql).not.toMatch(/JOIN\s+survey_publications/i)
+        expect(sql.includes('JOIN survey_wave_finals f ON f.attempt_id=a.survey_attempt_id')).toBe(hasFinal)
         expect(sql.includes('FROM survey_wave_finals')).toBe(hasFinal)
         if(!hasFinal)expect(sql).toContain('0::bigint')
       }
@@ -147,10 +148,17 @@ describe('Survey exact source material and independent read budgets',()=>{
     }
   })
 
-  it.each(['finalCipherBytes','frozenBytes'] as const)('rejects %s over 8 MiB before any source data fetch',async field=>{
+  it.each(['finalCipherBytes','frozenBytes','nativeCipherBytes'] as const)('rejects %s over 8 MiB before any source data fetch',async field=>{
     const f=fixture();f.state[field]=budget+1n
     await expect(loadSurveySource(owner)).rejects.toMatchObject({statusCode:413})
     expect(materialReads(f)).toHaveLength(0);expect(f.tx.surveyPublication.findMany).not.toHaveBeenCalled()
+  })
+
+  it('counts native child originals together with parent cipher before loading either',async()=>{
+    const f=fixture();f.state.finalCipherBytes=budget;f.state.nativeCipherBytes=1n
+    await expect(loadSurveySource(owner)).rejects.toMatchObject({statusCode:413})
+    expect(materialReads(f)).toHaveLength(0)
+    expect(f.tx.surveyPublication.findMany).not.toHaveBeenCalled()
   })
 
   it('retains separate inclusive 8 MiB FINAL and publication limits rather than a new combined cap',async()=>{

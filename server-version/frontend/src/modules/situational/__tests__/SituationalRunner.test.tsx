@@ -14,7 +14,7 @@ vi.mock('../../../training/context', async importOriginal => ({
   ...await importOriginal<typeof import('../../../training/context')>(),
   isTrainingHost: () => training.enabled,
 }))
-afterEach(() => { training.enabled = false; vi.restoreAllMocks() })
+afterEach(() => { training.enabled = false; vi.restoreAllMocks(); vi.unstubAllGlobals() })
 
 vi.mock('../api', () => ({
   situationalApi: {
@@ -129,6 +129,8 @@ const answerDefaultRunner = async () => {
 describe('Situational text runner', () => {
   beforeEach(async () => {
     vi.resetAllMocks()
+    // These transport fixtures contain synthetic bytes; decoder behavior has its own hook contracts.
+    vi.stubGlobal('Image', class { src = ''; decode = () => Promise.resolve() })
     embeddedClient = { start: vi.fn(), resume: vi.fn(), submit: vi.fn(), result: vi.fn() }
     vi.mocked(embeddedSituationalApi).mockReturnValue(embeddedClient as never)
     await finalDraftStore.delete('situational:ui-attempt')
@@ -305,6 +307,33 @@ describe('Situational text runner', () => {
     expect(screen.getByRole('button', { name: /提交测评/ })).not.toBeDisabled()
   })
 
+  it('records staged exposure only after successful image decode, never on HTTP-success corrupt bytes',async()=>{
+    const visual=stagedStartData()
+    visual.instrument.definition.scenes[0]!.stimulus={type:'IMAGE',
+      asset:{assetId:'staged-image',contentHash:'a'.repeat(64),mimeType:'image/png'},altText:'Decoded staged panel'}
+    let rejectDecode!:(error:Error)=>void
+    const pending=new Promise<void>((_resolve,reject)=>{rejectDecode=reject})
+    const decode=vi.fn().mockReturnValueOnce(pending).mockResolvedValue(undefined)
+    vi.stubGlobal('Image',class{src='';decode=decode})
+    vi.mocked(situationalApi.start).mockResolvedValue({code:0,message:'ok',data:visual})
+    vi.mocked(situationalApi.loadAsset).mockResolvedValue(new Blob(['HTTP 200 but undecodable'],{type:'image/png'}))
+    const exposed=async()=> (await finalDraftStore.listTrials('situational:ui-attempt')).flatMap(trial=>
+      (trial.payload as {events?:SituationalResearchEvent[]}).events??[]).filter(event=>event.type==='NODE_EXPOSED')
+    renderRunner()
+    await waitFor(()=>expect(decode).toHaveBeenCalledTimes(1))
+    expect(screen.getByLabelText('选择 A')).toBeDisabled()
+    expect(await exposed()).toEqual([])
+    await act(async()=>{rejectDecode(new Error('Corrupt image'));await pending.catch(()=>{})})
+    expect(await screen.findByRole('alert')).toHaveTextContent('视觉内容加载失败')
+    expect(screen.getByLabelText('选择 A')).toBeDisabled()
+    expect(await exposed()).toEqual([])
+    fireEvent.click(screen.getByRole('button',{name:'重试'}))
+    await waitFor(()=>expect(screen.getByLabelText('选择 A')).toBeEnabled())
+    await waitFor(async()=>expect(await exposed()).toHaveLength(1))
+    expect(decode).toHaveBeenCalledTimes(2)
+    expect(situationalApi.submit).not.toHaveBeenCalled()
+  })
+
   it('blocks an incomplete final request and moves to the first missing scene', async () => {
     renderRunner()
     expect(await screen.findByText('第一段文字情境')).toBeInTheDocument()
@@ -458,11 +487,45 @@ describe('Situational staged scientific presentation', () => {
 describe('Situational journal failure recovery', () => {
   beforeEach(async () => {
     vi.clearAllMocks()
+    vi.stubGlobal('Image',class {src='';decode=()=>Promise.resolve()})
     await finalDraftStore.delete('situational:ui-attempt')
     const source = stagedStartData()
     vi.mocked(situationalApi.start).mockResolvedValue({ code: 0, message: 'ok', data: source })
     vi.mocked(situationalApi.submit).mockResolvedValue({ code: 0, message: 'ok', data: completedData(source) })
     vi.mocked(situationalApi.result).mockRejectedValue(new Error('not completed'))
+  })
+
+  it('waits for the durable choice journal before checking or allowing the next stage', async () => {
+    renderRunner()
+    await screen.findByLabelText('选择 A')
+    const putTrial = finalDraftStore.putTrial.bind(finalDraftStore)
+    let release!: () => void
+    const pending = new Promise<void>(resolve => { release = resolve })
+    let started = false
+    vi.spyOn(finalDraftStore, 'putTrial').mockImplementation(async row => {
+      const batch = row.payload as { events?: SituationalResearchEvent[] }
+      if (batch.events?.some(event => event.type === 'RESPONSE_FIRST_COMMITTED')) {
+        started = true
+        await pending
+      }
+      return putTrial(row)
+    })
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    await waitFor(() => expect(started).toBe(true))
+    expect(screen.getByLabelText('选择 A')).not.toBeChecked()
+    expect(screen.getByRole('button', { name: '确认行动选择' })).toBeDisabled()
+    expect(screen.getByRole('button', { name: '提交测评' })).toBeDisabled()
+    expect(screen.queryByRole('slider')).not.toBeInTheDocument()
+    await act(async () => { release(); await pending })
+    await waitFor(() => expect(screen.getByLabelText('选择 A')).toBeChecked())
+    await waitFor(() => expect(screen.getByRole('button', { name: '确认行动选择' })).toBeEnabled())
+    const events = (await finalDraftStore.listTrials('situational:ui-attempt')).flatMap(row =>
+      (row.payload as { events: SituationalResearchEvent[] }).events)
+    expect(events.filter(event => event.type === 'RESPONSE_FIRST_COMMITTED')).toMatchObject([
+      { channelKey: 'choice', responseValue: 'A', responseRevision: 1 },
+    ])
+    fireEvent.click(screen.getByRole('button', { name: '确认行动选择' }))
+    expect(await screen.findByRole('slider')).toBeInTheDocument()
   })
 
   it('keeps the next edit revision consistent after the journal succeeds but the answer cache fails', async () => {
@@ -705,4 +768,98 @@ describe('Training SJT page confirmation and choice focus', () => {
     expect(screen.queryByLabelText('选择 A')).not.toBeInTheDocument()
   })
 
+})
+
+// Same renderer and stage journal for Training and Survey host adapters. The
+// synthetic API exercises UI protocol only, not backend authorization.
+describe('shared staged branch runner across hosts',()=>{
+  it.each([['training','A','left'],['training','B','right'],['survey','A','left'],['survey','B','right']] as const)('%s host follows %s / %s and sends only its stage evidence',async(host,choice,selected)=>{
+    await finalDraftStore.delete('situational:ui-attempt')
+    const source=stagedStartData()
+    if(source.instrument.definition.schemaVersion!==2)throw new Error('fixture')
+    const d=source.instrument.definition,root=d.flow.nodes[0]!
+    if(root.nodeType!=='SCENE')throw new Error('fixture')
+    d.scenes[0]!.channels=[d.scenes[0]!.channels[0]!]
+    root.responseStages=[{stageKey:'choice',kind:'CHOICE',channelKeys:['choice']}]
+    root.transition={type:'DECISION',channelKey:'choice',branches:[{optionKey:'A',nextNodeKey:'left'},{optionKey:'B',nextNodeKey:'right'}]}
+    for(const [index,key] of ['left','right'].entries()){
+      d.scenes.push({sceneKey:key,title:key,sortOrder:index+1,stimulus:{type:'TEXT_V1',text:key+' branch only'},
+        channels:[{channelKey:'choice',responseType:'SINGLE_CHOICE',prompt:key+' action',options:[{optionKey:'A',label:key+' option'}]}]})
+      d.flow.nodes.splice(d.flow.nodes.length-1,0,{nodeType:'SCENE',nodeKey:key,sceneKey:key,motherSceneKey:key,roundKey:'R',stepKey:key,
+        responseStages:[{stageKey:'choice',kind:'CHOICE',channelKeys:['choice']}],transition:{type:'NEXT',nextNodeKey:'terminal'}})
+    }
+    const submit=vi.fn().mockResolvedValue({code:0,message:'ok',data:completedData(source)}),onCompleted=vi.fn()
+    if(host==='survey'){
+      const client={start:vi.fn(),resume:vi.fn().mockResolvedValue({code:0,message:'ok',data:source}),submit,
+        result:vi.fn(),loadAsset:vi.fn(),loadVideoSources:vi.fn()}
+      render(<MemoryRouter><SituationalRunner host={{attemptId:'ui-attempt',parentAttemptId:'survey-parent',compositeItemId:'native',client,onCompleted}}/></MemoryRouter>)
+    }else{
+      vi.mocked(situationalApi.start).mockResolvedValue({code:0,message:'ok',data:source})
+      vi.mocked(situationalApi.submit).mockImplementation(submit)
+      renderRunner()
+    }
+    fireEvent.click(await screen.findByLabelText('选择 '+choice))
+    await waitFor(()=>expect(screen.getByLabelText('选择 '+choice)).toBeChecked())
+    fireEvent.click(screen.getByRole('button',{name:'确认行动选择'}))
+    await waitFor(()=>expect(screen.getByRole('button',{name:'下一题'})).toBeEnabled())
+    fireEvent.click(screen.getByRole('button',{name:'下一题'}))
+    expect(await screen.findByText(selected+' branch only')).toBeInTheDocument()
+    expect(screen.queryByText((selected==='left'?'right':'left')+' branch only')).toBeNull()
+    fireEvent.click(screen.getByLabelText(selected+' option'))
+    await waitFor(()=>expect(screen.getByLabelText(selected+' option')).toBeChecked())
+    fireEvent.click(screen.getByRole('button',{name:'确认行动选择'}))
+    await waitFor(()=>expect(screen.getByRole('button',{name:'提交测评'})).toBeEnabled())
+    fireEvent.click(screen.getByRole('button',{name:'提交测评'}))
+    await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1))
+    const payload=submit.mock.calls[0]![1]
+    expect(payload.responses.map((response:{sceneKey:string})=>response.sceneKey)).toEqual(['S1',selected])
+    const events=payload.researchCapture.events as SituationalResearchEvent[]
+    expect(events.filter(event=>event.type==='NODE_CONFIRMED').map(event=>event.nodeKey)).toEqual(['node',selected])
+    expect(events.some(event=>event.nodeKey===(selected==='left'?'right':'left'))).toBe(false)
+    if(host==='survey')await waitFor(()=>expect(onCompleted).toHaveBeenCalledTimes(1))
+  })
+})
+
+// Native V1 is the same renderer, without manufactured staged capture.
+describe('shared V1 text runner across hosts',()=>{
+  it.each(['training','survey'] as const)('%s host submits V1 answers without inventing stage events',async host=>{
+    vi.resetAllMocks()
+    await finalDraftStore.delete('situational:ui-attempt')
+    const source=startData(),reply={code:0,message:'ok',data:source}
+    const submit=vi.fn().mockResolvedValue({code:0,message:'ok',data:completedData(source)})
+    const onCompleted=vi.fn()
+    if(host==='survey'){
+      const client={start:vi.fn().mockResolvedValue(reply),resume:vi.fn().mockResolvedValue(reply),
+        submit,result:vi.fn().mockResolvedValue(reply),loadAsset:vi.fn(),loadVideoSources:vi.fn()}
+      render(<MemoryRouter><SituationalRunner host={{attemptId:'ui-attempt',parentAttemptId:'survey-parent',compositeItemId:'v1',client,onCompleted}}/></MemoryRouter>)
+    }else{
+      training.enabled=true
+      vi.mocked(situationalApi.start).mockResolvedValue(reply)
+      vi.mocked(situationalApi.submit).mockImplementation(submit)
+      renderRunner()
+    }
+    await screen.findByText('第一段文字情境')
+    expect(screen.queryByRole('button',{name:'确认行动选择'})).toBeNull()
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    await waitFor(()=>expect(screen.getByRole('slider')).not.toBeDisabled())
+    fireEvent.change(screen.getByRole('slider'),{target:{value:'80'}})
+    const next=screen.getByRole('button',{name:host==='training'?/确认本页/:/下一题/})
+    await waitFor(()=>expect(next).toBeEnabled());fireEvent.click(next)
+    await screen.findByText('第二段文字情境')
+    fireEvent.click(screen.getByLabelText('第二个 A'))
+    await waitFor(()=>expect(screen.getByRole('button',{name:'提交测评'})).toBeEnabled())
+    expect(submit).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button',{name:'提交测评'}))
+    await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1))
+    const payload=submit.mock.calls[0]![1]
+    expect(payload.responses.map(({sceneKey,channelKey,responseValue}:{sceneKey:string;channelKey:string;responseValue:unknown})=>({sceneKey,channelKey,responseValue}))).toEqual([
+      {sceneKey:'S1',channelKey:'choice',responseValue:'A'},
+      {sceneKey:'S1',channelKey:'continuous',responseValue:80},
+      {sceneKey:'S2',channelKey:'choice',responseValue:'A'},
+    ])
+    expect(payload.responses.every((response:{answeredAt:unknown;responseTimeMs:unknown})=>typeof response.answeredAt==='string'&&typeof response.responseTimeMs==='number')).toBe(true)
+    expect(payload.researchCapture).toBeUndefined()
+    expect(payload).toMatchObject({attemptEpoch:1,definitionHash:'a'.repeat(64)})
+    if(host==='survey')await waitFor(()=>expect(onCompleted).toHaveBeenCalledTimes(1))
+  })
 })

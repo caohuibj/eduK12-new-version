@@ -1,7 +1,9 @@
 import {beforeEach,afterEach,describe,it,expect,vi} from 'vitest'
+import {SjtEntryAuthorityError} from '../../modules/situational/entry-authority'
 import {issueAdminContentRoot,revokeAdminContentGrant,readAdminContentGrant,adminContentRootRequestSchema} from '../../modules/measurement-content/admin-authority.service'
-const mocks=vi.hoisted(()=>({transaction:vi.fn(),query:vi.fn(),execute:vi.fn(),audit:vi.fn(),auditRead:vi.fn(),registry:vi.fn()}))
+const mocks=vi.hoisted(()=>({transaction:vi.fn(),query:vi.fn(),execute:vi.fn(),audit:vi.fn(),auditRead:vi.fn(),registry:vi.fn(),sjtSource:vi.fn()}))
 vi.mock('../../modules/situational/static-measurement-release',()=>({validateStaticSjtRegistryMappings:mocks.registry}))
+vi.mock('../../modules/situational/entry-authority',()=>({readSjtEntryDistributionSource:mocks.sjtSource,SjtEntryAuthorityError:class extends Error{}}))
 vi.mock('../../config/database',()=>({prisma:{$transaction:mocks.transaction}}))
 const id=(n:number)=>'00000000-0000-4000-8000-'+String(n).padStart(12,'0')
 const actor=id(1),target=id(2),project=id(3),resource=id(4),grantId=id(5)
@@ -19,6 +21,7 @@ beforeEach(()=>{
  vi.useFakeTimers();vi.setSystemTime(now);vi.clearAllMocks();users=[user(actor),user(target)];existing=row();inserted=true;qualified=true;resources=[resource];owned=true
  mocks.transaction.mockImplementation(async(fn:any)=>fn({$queryRaw:mocks.query,$executeRaw:mocks.execute,adminAuthorizationAudit:{create:mocks.audit,findUnique:mocks.auditRead}}))
  mocks.registry.mockResolvedValue([{id:resource,instrument_key:'sjt-installed',instrument_version:'1.0.0',content_digest:'a'.repeat(64)}])
+ mocks.sjtSource.mockImplementation(async(_tx,measurementReleaseId)=>({measurementReleaseId}))
  mocks.auditRead.mockResolvedValue({actorUserId:actor,reason:input().reason,action:'CONTENT_ROOT_GRANTED'});mocks.execute.mockResolvedValue(1)
  mocks.query.mockImplementation(async query=>{
   const text=sql(query)
@@ -28,6 +31,7 @@ beforeEach(()=>{
   if(text.includes('FROM questionnaire_course_deliveries'))return []
   if(text.includes('FROM survey_projects'))return owned?[{id:project}]:[]
   if(text.includes('FROM users'))return users
+  if(text.includes('FROM admin_entry_grants'))return qualified?[{id:target}]:[]
   if(text.includes('FROM survey_researcher_grants'))return qualified?[{id:target}]:[]
   if(text.includes('FROM measurement_content_releases')||text.includes('FROM survey_wave_finals'))return resources.map(id=>({id}))
   if(text.includes('INSERT INTO content_capability_grants'))return inserted?[existing]:[]
@@ -255,4 +259,88 @@ describe('exact Training scientific roots and formal governance',()=>{
 it('rejects unknown grant keys before date conversion and authority validation',()=>{
  const body=input();expect(adminContentRootRequestSchema.safeParse(body).success).toBe(true)
  expect(adminContentRootRequestSchema.safeParse({...body,grant:{...body.grant,unexpectedPrivilege:true}}).success).toBe(false)
+})
+
+
+const sjtDistributionInput=()=>{const body=input();body.grant.scope={product:'SURVEY',scopeKind:'PLATFORM',scopeId:'situational-library-governance',resourceKind:'material',resourceKeys:[resource]};body.grant.capabilities=['material.distribute'];body.grant.delegableCapabilities=[];body.grant.remainingDelegationDepth=0;return body}
+function sjtDistributionTarget(){users[1]={...user(target),account_domain:'TRAINING',role:'ADMIN',teacher_approved:false}}
+function sjtDistributionRow(){existing={...row(),product:'SURVEY',scope_kind:'PLATFORM',scope_id:'situational-library-governance',resource_kind:'material',capabilities:['material.distribute'],delegable_capabilities:[],remaining_delegation_depth:0}}
+describe('exact nondelegable Survey SJT entry distribution roots',()=>{
+ it('uses exact published measurement sources and the current Survey entry administrator, never course authority',async()=>{
+  sjtDistributionTarget();owned=false;const body=sjtDistributionInput();body.grant.scope.resourceKeys=[id(7),resource]
+  await expect(issueAdminContentRoot(actor,proof(),body)).resolves.toEqual({grantId,version:1,changed:true})
+  expect(mocks.sjtSource.mock.calls.map(([,releaseId])=>releaseId)).toEqual([resource,id(7)])
+  const queries=mocks.query.mock.calls.map(([q])=>sql(q)),entryQuery=mocks.query.mock.calls.find(([q])=>sql(q).includes('FROM admin_entry_grants'))![0]
+  expect(sql(entryQuery)).toContain('revoked_at IS NULL FOR SHARE');expect(entryQuery.values).toEqual([target,'SURVEY'])
+  expect(queries.some(q=>/FROM (courses|survey_projects|composite_assessments|situational_grants|survey_researcher_grants)/.test(q))).toBe(false)
+  expect(mocks.registry).not.toHaveBeenCalled()
+  const entryIndex=mocks.query.mock.calls.findIndex(([q])=>sql(q).includes('FROM admin_entry_grants'))
+  expect(mocks.query.mock.invocationCallOrder[entryIndex]).toBeLessThan(mocks.sjtSource.mock.invocationCallOrder[0])
+  const insert=mocks.query.mock.calls.find(([q])=>sql(q).includes('INSERT INTO content_capability_grants'))![0]
+  expect(insert.values).toEqual([grantId,target,actor,'SURVEY','PLATFORM','situational-library-governance','material',[id(7),resource],['material.distribute'],[],0,new Date(body.grant.validFrom),new Date(body.grant.expiresAt),[grantId]])
+  expect(mocks.audit).toHaveBeenCalledWith({data:expect.objectContaining({entry:'SURVEY',action:'CONTENT_ROOT_GRANTED',targetUserId:target})})
+ })
+ it('rejects mismatched product/scope/resources, broader capabilities and all delegation at parse time',()=>{
+  const body=sjtDistributionInput()
+  for(const grant of [
+   {...body.grant,scope:{...body.grant.scope,product:'TRAINING'}},
+   {...body.grant,scope:{...body.grant.scope,scopeKind:'COURSE',scopeId:project}},
+   {...body.grant,scope:{...body.grant.scope,scopeKind:'PROJECT',scopeId:project}},
+   {...body.grant,scope:{...body.grant.scope,scopeId:'situational-registry'}},
+   {...body.grant,scope:{...body.grant.scope,resourceKind:'measurement'}},
+   {...body.grant,scope:{...body.grant.scope,resourceKeys:['*']}},
+   {...body.grant,scope:{...body.grant.scope,resourceKeys:[resource,resource]}},
+   {...body.grant,capabilities:['material.distribute','material.adapt']},
+   {...body.grant,capabilities:['material.use']},
+   {...body.grant,remainingDelegationDepth:1},
+   {...body.grant,remainingDelegationDepth:1,delegableCapabilities:['material.distribute']},
+  ])expect(adminContentRootRequestSchema.safeParse({...body,grant}).success).toBe(false)
+ })
+ it('does not infer a current Survey entry grant from system, teacher or researcher identity',async()=>{
+  sjtDistributionTarget();users[1].platform_role='SYSTEM_ADMIN';qualified=false
+  await expect(issueAdminContentRoot(actor,proof(),sjtDistributionInput())).rejects.toMatchObject({statusCode:403})
+  expect(mocks.sjtSource).not.toHaveBeenCalled();expect(mocks.audit).not.toHaveBeenCalled()
+ })
+ it.each([{account_domain:'SURVEY'},{account_domain:'SCHOOL'},{is_active:false},{is_frozen:true},{must_change_password:true},{expires_at:now}])('requires current eligible target %j',async patch=>{
+  sjtDistributionTarget();Object.assign(users[1],patch)
+  await expect(issueAdminContentRoot(actor,proof(),sjtDistributionInput())).rejects.toMatchObject({statusCode:403})
+  expect(mocks.query.mock.calls.some(([q])=>sql(q).includes('INSERT INTO'))).toBe(false);expect(mocks.audit).not.toHaveBeenCalled()
+ })
+ it('requires a strong current system issuer rather than the target entry authority',async()=>{
+  sjtDistributionTarget()
+  await expect(issueAdminContentRoot(actor,{tokenVersion:3},sjtDistributionInput())).rejects.toMatchObject({statusCode:403})
+  expect(mocks.transaction).not.toHaveBeenCalled()
+  users[0].platform_role='STANDARD'
+  await expect(issueAdminContentRoot(actor,proof(),sjtDistributionInput())).rejects.toMatchObject({statusCode:403})
+  expect(mocks.sjtSource).not.toHaveBeenCalled();expect(mocks.audit).not.toHaveBeenCalled()
+ })
+ it('maps only known source denials to 403 and never inserts mismatched source IDs',async()=>{
+  sjtDistributionTarget();mocks.sjtSource.mockRejectedValueOnce(new SjtEntryAuthorityError('SJT_ENTRY_SOURCE_DENIED'))
+  await expect(issueAdminContentRoot(actor,proof(),sjtDistributionInput())).rejects.toMatchObject({statusCode:403})
+  const unexpected=new Error('storage unavailable');mocks.sjtSource.mockRejectedValueOnce(unexpected)
+  await expect(issueAdminContentRoot(actor,proof(),sjtDistributionInput())).rejects.toBe(unexpected)
+  mocks.sjtSource.mockResolvedValueOnce({measurementReleaseId:id(90)})
+  await expect(issueAdminContentRoot(actor,proof(),sjtDistributionInput())).rejects.toMatchObject({statusCode:403})
+  expect(mocks.query.mock.calls.some(([q])=>sql(q).includes('INSERT INTO'))).toBe(false);expect(mocks.audit).not.toHaveBeenCalled()
+ })
+ it.each(['proof','target','grant'])('rechecks %s expiration after source waits and before insertion',async expiration=>{
+  sjtDistributionTarget();const session=proof(),body=sjtDistributionInput()
+  if(expiration==='target')users[1].expires_at=new Date(now.getTime()+1000)
+  if(expiration==='grant')body.grant.expiresAt=new Date(now.getTime()+1000).toISOString()
+  mocks.sjtSource.mockImplementationOnce(async(_tx,measurementReleaseId)=>{vi.setSystemTime(new Date(now.getTime()+(expiration==='proof'?301000:2000)));return {measurementReleaseId}})
+  await expect(issueAdminContentRoot(actor,session,body)).rejects.toMatchObject({statusCode:403})
+  expect(mocks.query.mock.calls.some(([q])=>sql(q).includes('INSERT INTO'))).toBe(false);expect(mocks.audit).not.toHaveBeenCalled()
+ })
+ it('keeps same-body retry, metadata and emergency CAS revocation without upgrading existing grants',async()=>{
+  sjtDistributionTarget();sjtDistributionRow();inserted=false
+  await expect(issueAdminContentRoot(actor,proof(),sjtDistributionInput())).resolves.toMatchObject({changed:false})
+  const changed=sjtDistributionInput();changed.grant.scope.resourceKeys=[id(7)]
+  await expect(issueAdminContentRoot(actor,proof(),changed)).rejects.toMatchObject({statusCode:409})
+  mocks.sjtSource.mockClear()
+  expect(await readAdminContentGrant(actor,proof(),grantId)).toMatchObject({scope:sjtDistributionInput().grant.scope,capabilities:['material.distribute'],remainingDelegationDepth:0})
+  users[1].is_active=false
+  await expect(revokeAdminContentGrant(actor,proof(),grantId,{expectedVersion:1,reason:'Withdraw entry distribution'})).resolves.toMatchObject({version:2,changed:true})
+  expect(mocks.sjtSource).not.toHaveBeenCalled()
+  expect(mocks.execute).toHaveBeenCalledTimes(1);expect(sql(mocks.execute.mock.calls[0][0])).toContain('UPDATE content_capability_grants')
+ })
 })

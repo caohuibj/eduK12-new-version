@@ -43,8 +43,30 @@ jobs:
           appendFileSync(process.env.GITHUB_OUTPUT,`handled=${result!==null}\n`);
           if(result) console.log(JSON.stringify(result));
           JS
+      - name: Verify bounded SJT candidate scientific catalog input equivalence
+        id: sjt
+        if: github.event.pull_request.head.ref == 'backup/shared-sjt-native-20261024'
+        env:
+          CI_EVENT: pull_request
+          CI_HEAD_REF: ${{ github.event.pull_request.head.ref }}
+          CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
+          CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
+          CI_PR_NUMBER: ${{ github.event.pull_request.number }}
+          CI_FORCE_FULL: ${{ vars.CI_FORCE_FULL }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+        run: |
+          node --input-type=module <<'JS'
+          import {appendFileSync} from 'node:fs';
+          import {execFileSync} from 'node:child_process';
+          import {changedEntries} from './.github/scripts/content-scope.mjs';
+          import {sjtNativePlan,publicationBoundary} from './.github/scripts/sjt-native-scope.mjs';
+          const base=process.env.BASE_SHA,head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim();
+          if(!sjtNativePlan(changedEntries(base,head),base,head))throw Error('Missing exact SJT route');
+          console.log(JSON.stringify(publicationBoundary(base,head)));
+          appendFileSync(process.env.GITHUB_OUTPUT,'handled=true\n');
+          JS
       - name: Detect publication-relevant changes
-        if: steps.exact.outputs.handled != 'true'
+        if: steps.exact.outputs.handled != 'true' && steps.sjt.outputs.handled != 'true'
         id: scope
         env:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}

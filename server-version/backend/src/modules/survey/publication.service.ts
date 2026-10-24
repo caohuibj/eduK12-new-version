@@ -1,3 +1,6 @@
+import { SURVEY_NATIVE_SJT_PROTOCOL } from './situational-native.contract'
+import type {SituationRuntimeDefinition} from '../situational/situation-runtime-definition'
+import {surveyNativeSituationalRequiresStageNotice,type FrozenSurveyNativeSituationalHeader,type SurveyNativeSituationalHeader } from './situational-native.definition'
 import {freezeSurveyParticipantFeedback,type SurveyRawFeedback,type SurveyParticipantFeedbackSelection} from './participant-feedback'
 import {freezeSurveyContentSelections,type SurveyContentSelection,type FrozenSurveyContentSelection} from './content-selection'
 import {ContentReleaseError} from '../measurement-content/release'
@@ -7,8 +10,8 @@ import { publishContentRelease,requirePublishedContentRelease } from '../measure
 import { parseFrozenSurveyCognitive } from './cognitive.definition'
 import { scaleMeasurementRelease, surveyScaleReleaseContext } from '../measurement-content/scale'
 import {catalogSnapshotsForDrafts,compileCatalogUnit} from './catalog.service'
-import {recheckCatalogScaleSourceExpiry,type SourceAnswerMapping} from './catalog.sources'
-import { SURVEY_COGNITIVE_NOTICE } from './measurement.notice'
+import {recheckCatalogSjtSourceAuthority,recheckCatalogScaleSourceExpiry,type SourceAnswerMapping} from './catalog.sources'
+import { freezeSurveyMeasurementNotice,type SurveyMeasurementNotice } from './measurement.notice'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -31,6 +34,10 @@ import { freezeGroupIpPolicy,resolveGroupIpOpenWindow,type FrozenGroupIpPolicy }
  * publication. The Survey FINAL admission adapter is separate from legacy catalog.
  */
 export interface ResearchFrozenUnit {
+  executionProtocol?:'SITUATIONAL_NATIVE_V1'
+  /** Catalog previews carry an unbound header; persisted publication adds time/epoch.
+   * Native runtime and receipt consumers must use the strict frozen parser. */
+  nativeSituational?:FrozenSurveyNativeSituationalHeader|SurveyNativeSituationalHeader
   revisionSourceReleaseId?:string
   authoringFamilyId?:string
   authoringVersion?:number
@@ -58,7 +65,7 @@ export interface ResearchFrozenPublication {
   consentVersion:number
   linkageNoticeConfirmed:boolean
   consentDigest:string
-  measurementNotice?:typeof SURVEY_COGNITIVE_NOTICE
+  measurementNotice?:SurveyMeasurementNotice
   units:ResearchFrozenUnit[]
   flow?:FrozenSurveyFlow
   quotaPolicy?:SurveyGroupQuotaPolicy
@@ -81,7 +88,7 @@ export function surveyMeasurementReleaseInput(unit:ResearchFrozenUnit,actorId:st
   }
   if(unit.kind==='SJT')return sjtMeasurementRelease({localId:unit.draftId,version:String(unit.draftRevision),
     instrumentVersion:surveyScaleReleaseContext(unit).instrumentVersion,definition:unit.compiledDefinition,
-    displayProtocol:unit.displayDefinition,scope,provenance:unit.sourceProvenance??{}})
+    ...(unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL?{}:{displayProtocol:unit.displayDefinition}),scope,provenance:unit.sourceProvenance??{}})
   const source=unit.sourceProvenance?.sourceMeasurementRelease as {releaseId?:string}|undefined
   if(unit.sourceProvenance&&!source?.releaseId)throw new SurveyWaveError(409,'目录量表须先由来源管理者完成显式版本转换，再重新授权导入')
   return scaleMeasurementRelease({localId:unit.draftId,version:unit.authoringVersion?`v${unit.authoringVersion}`:String(unit.draftRevision),sourceReleaseId:source?.releaseId??unit.revisionSourceReleaseId??null,
@@ -193,10 +200,12 @@ export async function freezeResearchWaveDraft(input:{
     })
     const sources=await catalogSnapshotsForDrafts(tx,input.actorUserId,rows.flatMap(r=>r.catalogGrantId?[r.catalogGrantId]:[]))
     const byId=new Map(rows.map(row=>[row.id,row]))
+    const frozenAt=new Date()
     const units=orderedIds.map(id=>{
       const draft=byId.get(id)
       if(!draft)stop('研究工具来源已发生变化')
-      return draft!.catalogGrantId?compileCatalogUnit(draft!,sources.get(draft!.catalogGrantId)!):compileFrozenResearchUnit(draft!)
+      const unit=draft!.catalogGrantId?compileCatalogUnit(draft!,sources.get(draft!.catalogGrantId)!):compileFrozenResearchUnit(draft!)
+      return unit.nativeSituational?{...unit,nativeSituational:{...unit.nativeSituational,attemptEpoch:1 as const,frozenAt:frozenAt.toISOString()}}:unit
     })
     const feedbackMetrics=new Map<string,string[]>()
     for (const unit of units) {
@@ -254,6 +263,7 @@ export async function freezeResearchWaveDraft(input:{
             }
           }
         }else if(unit.kind==='SJT'){
+          if(unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL){worst+=1024;continue}
           const d=unit.displayDefinition as AnySjtDraft
           for(const item of surveySjtQuestions(d)){
             const options=item.options.map(o=>quote(o.optionKey))
@@ -291,12 +301,15 @@ export async function freezeResearchWaveDraft(input:{
     }catch(e){
       stop(e instanceof Error?e.message:'研究运营设置未通过冻结校验')
     }
-    // Freeze the server-local publication day while the project and wave locks are held.
-    const frozenAt=new Date()
+    // Reuse the single server-local publication time frozen under the host locks.
     const groupIpPolicy=freezeGroupIpPolicy(wave.groupIpPolicy,frozenAt)
     // Reject an unusable schedule before the immutable publication is persisted.
     resolveGroupIpOpenWindow(groupIpPolicy,wave,frozenAt)
-    const measurementNotice=units.some(unit=>unit.kind==='COGNITIVE')?SURVEY_COGNITIVE_NOTICE:undefined
+    const measurementNotice=freezeSurveyMeasurementNotice({cognitive:units.some(unit=>unit.kind==='COGNITIVE'),
+      stagedSituational:units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL
+        &&surveyNativeSituationalRequiresStageNotice(unit.compiledDefinition as SituationRuntimeDefinition)),
+      linearSituational:units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL
+        &&!surveyNativeSituationalRequiresStageNotice(unit.compiledDefinition as SituationRuntimeDefinition))})
     const snapshot:ResearchFrozenPublication={
       schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:input.projectId,
       waveId:input.waveId,collectionMode:project.collectionMode as ResearchFrozenPublication['collectionMode'],
@@ -352,6 +365,7 @@ export async function freezeResearchWaveDraft(input:{
         runtimeReady:true,sourceVersions:units.map(x=>[x.instrumentKey,x.draftRevision])},
     }})
     await recheckCatalogScaleSourceExpiry(tx,sources.values())
+    await recheckCatalogSjtSourceAuthority(tx,sources.values())
     return {publicationId,version:version+1,digest,waveId:input.waveId,runtimeReady:true}
   })
 }

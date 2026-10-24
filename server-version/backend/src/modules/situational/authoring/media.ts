@@ -28,10 +28,12 @@ export interface SjtAuthorMediaOptions { adaptSource?: SjtAuthorAdaptMediaSource
 
 export function sjtAuthorImages(template: unknown): SjtAuthorImage[] {
   if (!template || typeof template !== 'object' || Array.isArray(template)) return []
-  const document = template as { templateVersion?: string; display?: { scenes?: Array<{ image?: unknown }> } }
-  if (document.templateVersion !== 'sjt-online-v1') return []
-  if (!Array.isArray(document.display?.scenes)) fail('在线图片题面无效')
-  return document.display!.scenes!.flatMap(scene => {
+  const document = template as { templateVersion?: string; display?: { scenes?: Array<{ image?: unknown }> };
+    nodes?: Array<{ image?: unknown }> }
+  const scenes = document.templateVersion === 'sjt-online-v1' ? document.display?.scenes
+    : document.templateVersion === 'sjt-upload-v1' ? document.nodes ?? [] : []
+  if (!Array.isArray(scenes)) fail('情境图片题面无效')
+  return scenes.flatMap(scene => {
     if (scene.image === undefined) return []
     const parsed = assessmentImageSchema.safeParse(scene.image)
     if (!parsed.success) fail('情境图片身份、替代文字或许可字段无效')
@@ -59,7 +61,7 @@ export async function assertSjtAuthorMedia(
   const images = sjtAuthorImages(template)
   if (!images.length) return []
   const ids = [...new Set(images.map(image => image.asset.assetId))].sort()
-  if (ids.length > 20) fail('单个在线工具最多引用 20 张静态情境图片')
+  if (ids.length > 20) fail('单个工具最多引用 20 张静态情境图片')
   await lockStoredAssetRows(tx, ids)
   const assets = await tx.storedAsset.findMany({ where: { id: { in: ids } }, select: {
     id: true, ownerId: true, accessScope: true, scopeId: true, deletedAt: true,

@@ -103,7 +103,8 @@ export interface SchoolEmbeddedSituationalProps {
   client:SituationalRunnerClient
   onCompleted:()=>void
 }
-const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({campus}) => {
+const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps;host?:SchoolEmbeddedSituationalProps}> = ({campus:campusProp,host}) => {
+  const campus=host??campusProp
   const { instrumentKey, attemptId:routeAttemptId } = useParams<{ instrumentKey?: string; attemptId?: string }>()
   const attemptId=campus?.attemptId||routeAttemptId
   const location = useLocation()

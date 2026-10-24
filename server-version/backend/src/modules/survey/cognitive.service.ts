@@ -1,3 +1,5 @@
+import {freezeSurveyTaskPrefix} from './task-prefix'
+export {prepareSurveyCognitivePriorAnswers} from './task-prefix'
 import { randomBytes,randomUUID } from 'node:crypto'
 import type { Prisma,SurveyCognitiveSession } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -11,10 +13,8 @@ import { prepareAuthoritativeScorerContext,runPreparedAuthoritativeScorer } from
 import { createUnifiedCognitiveRawSubmissionPayload } from '../cognitive/unified-raw-submission'
 import { getAssessmentOperationalHold } from '../assessment-governance/operational-hold'
 import { verifiedSurveyAttempt } from './admission.service'
-import { hashResearchCredential } from './identity.service'
-import { validateSurveyUnitAnswers } from './final.compute'
-import { evaluateFlowCondition,staticFlowValues } from './flow.definition'
-import { ensureSurveyFlowAssignment,assignedSurveySnapshot } from './flow.assignment'
+import { lockSurveyTaskAccess } from './task-authority'
+import { ensureSurveyFlowAssignment } from './flow.assignment'
 import type { ResearchFrozenPublication } from './publication.service'
 import { parseFrozenSurveyCognitive,surveyCognitiveTaskDefinition,type FrozenSurveyCognitive } from './cognitive.definition'
 import { cognitiveFail,assertSurveyCognitiveLockedAnswers,surveyCognitiveResultReference,
@@ -25,56 +25,15 @@ export type SurveyCognitiveProof={publicId:string;attemptId:string;accessCredent
 type Known=Awaited<ReturnType<typeof verifiedSurveyAttempt>>
 type Tx=Prisma.TransactionClient
 const MAX_RAW_BYTES=512*1024
-const jsonCopy=<T>(value:T):T=>JSON.parse(JSON.stringify(value))
 const assertDevice=(input:unknown):AdministrationProvenanceV1=>{
   const value=administrationProvenanceV1Schema.parse(input)
   if(value.deviceClass!=='DESKTOP_LAPTOP'||value.administrationMode!=='KEYBOARD_MOUSE')
     cognitiveFail(400,'本试点只支持桌面或笔记本电脑键盘作答')
   return value
 }
-/** All mutating and participant-read paths share the existing Survey lock order.
- * The Project SHARE serializes revocation/withdrawal; Wave SHARE serializes HARD_STOP.
- * Holding Attempt UPDATE serializes starts, restarts, child FINAL and parent FINAL. */
-async function lockAccess(tx:Tx,proof:SurveyCognitiveProof,known:Known,allowCompleted=false){
-  await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${known.projectId} FOR SHARE`
-  await tx.$queryRaw`SELECT id FROM survey_waves WHERE id=${known.waveId} AND project_id=${known.projectId} FOR SHARE`
-  await tx.$queryRaw`SELECT id FROM survey_wave_attempts WHERE id=${known.attemptId}
-    AND project_id=${known.projectId} AND wave_id=${known.waveId} FOR UPDATE`
-  const attempt=await tx.surveyWaveAttempt.findFirst({where:{
-    id:known.attemptId,projectId:known.projectId,waveId:known.waveId,
-  },include:{wave:{include:{publication:true}}}})
-  if(!attempt||attempt.participantId!==known.participantId||attempt.excludedAt!==null
-    ||!(allowCompleted?['STARTED','COMPLETED']:['STARTED']).includes(attempt.status))
-    cognitiveFail(403,'研究作答已经结束、撤回或不属于当前入口')
-  const wave=attempt!.wave,publication=wave.publication
-  if(!publication||publication.id!==known.publicationId||publication.definitionDigest!==known.definitionDigest
-    ||canonicalHash(jsonCopy(publication.compiledSnapshot))!==known.definitionDigest)
-    cognitiveFail(409,'认知任务的冻结研究定义已失效')
-  const end=wave.finishUntil??wave.closesAt
-  if(wave.hardStopAt||!end||end<=new Date())cognitiveFail(403,'研究认知任务完成窗口已经结束')
-  const hash=hashResearchCredential(proof.accessCredential)
-  if(attempt!.participantId){
-    if(!proof.researchCode)cognitiveFail(403,'请提供本人研究编号和私密凭证')
-    await tx.$queryRaw`SELECT id FROM survey_participants WHERE id=${attempt!.participantId}
-      AND project_id=${known.projectId} FOR UPDATE`
-    const participant=await tx.surveyParticipant.findFirst({where:{
-      id:attempt!.participantId,projectId:known.projectId,researchCode:proof.researchCode,
-      credentialHash:hash,status:'ACTIVE',credentialRevokedAt:null,
-    },select:{id:true}})
-    if(!participant)cognitiveFail(403,'研究参与凭证已撤回或失效')
-  }else if(attempt!.sessionHash!==hash)cognitiveFail(403,'研究参与凭证无效')
-  const consent=await tx.surveyConsent.findFirst({where:{
-    projectId:known.projectId,waveId:known.waveId,attemptId:known.attemptId,
-    accepted:true,consentVersion:wave.consentVersion,
-  },select:{id:true}})
-  if(!consent)cognitiveFail(403,'当前研究缺少有效的知情同意记录')
-  const snapshot=publication!.compiledSnapshot as unknown as ResearchFrozenPublication
-  const assignment=snapshot.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'
-    ?await ensureSurveyFlowAssignment(tx,{projectId:known.projectId,waveId:known.waveId,
-      attemptId:known.attemptId,participantId:known.participantId,researchCode:proof.researchCode,
-      accessCredential:proof.accessCredential,snapshot}):null
-  return {attempt:attempt!,snapshot:assignment?assignedSurveySnapshot(snapshot,assignment):snapshot}
-}
+const lockAccess=(tx:Tx,proof:SurveyCognitiveProof,known:Known,allowCompleted=false)=>
+  lockSurveyTaskAccess(tx,proof,known,{kind:'COGNITIVE',allowCompleted,fail:cognitiveFail})
+
 function frozenUnit(snapshot:ResearchFrozenPublication,slotKey:string):FrozenSurveyCognitive{
   const unit=snapshot.units.find(u=>u.instrumentKey===slotKey&&u.kind==='COGNITIVE')
   if(!unit)cognitiveFail(404,'当前冻结研究中没有这个认知工具')
@@ -114,70 +73,6 @@ async function sessionView(tx:Tx,known:Known,slotKey:string,
       measurementDigest:frozen.measurementDigest},
   }
 }
-/** Prove reachability with normalized ordinary answers, then preserve their original canonical values.
- * Earlier cognitive units must already have a committed child result, never client metrics. */
-export function prepareSurveyCognitivePriorAnswers(input:unknown){
-  if(!input||typeof input!=='object'||Array.isArray(input))cognitiveFail(400,'认知开始需要前置答案对象')
-  const answers=input as Record<string,unknown>
-  // Bound untrusted nesting before canonicalization or any task validator recurses.
-  let nodes=0
-  const active=new WeakSet<object>()
-  const guard=(value:unknown,depth:number):void=>{
-    if(++nodes>300000||depth>4)cognitiveFail(400,'认知前置答案结构超过安全预算')
-    if(value===null||typeof value==='string'||typeof value==='boolean')return
-    if(typeof value==='number'&&Number.isFinite(value))return
-    if(!value||typeof value!=='object'||active.has(value))cognitiveFail(400,'认知前置答案包含无效值')
-    active.add(value as object)
-    const children=Array.isArray(value)?value:Object.values(value as object)
-    if(children.length>500)cognitiveFail(400,'认知前置答案字段数超限')
-    for(const child of children)guard(child,depth+1)
-    active.delete(value as object)
-  }
-  if(Object.keys(answers).length>30)cognitiveFail(400,'认知前置工具数超限')
-  guard(answers,0)
-  const canonical=prepareCanonicalSubmission(answers)
-  assertCanonicalSubmissionPayloadSize(canonical,900000,'认知前置答案')
-  return {answers,canonical}
-}
-async function prefixAnswers(tx:Tx,known:Known,snapshot:ResearchFrozenPublication,slotKey:string,input:unknown){
-  const {answers}=prepareSurveyCognitivePriorAnswers(input)
-  const verified:Record<string,Record<string,unknown>>={},locked:Record<string,unknown>={}
-  const units=new Map(snapshot.units.map(u=>[u.instrumentKey,u]))
-  if(snapshot.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'&&Object.keys(answers).some(key=>!units.has(key)))
-    cognitiveFail(400,'认知前置答案不属于当前问卷子版本')
-  const blocks=snapshot.flow?.blocks??snapshot.units.map(u=>({kind:'INSTRUMENT',instrumentKey:u.instrumentKey,when:undefined}))
-  const vars=snapshot.flow?staticFlowValues(snapshot.flow):{}
-  const priorCognitive:string[]=[]
-  for(const block of blocks){
-    if(block.when&&!evaluateFlowCondition(block.when,verified,vars))continue
-    if(block.kind==='END')break
-    if(block.kind!=='INSTRUMENT')continue
-    const unit=units.get(block.instrumentKey!)
-    if(!unit)cognitiveFail(409,'冻结认知路径含有不存在的工具')
-    if(unit!.instrumentKey===slotKey){
-      if(priorCognitive.length){
-        const sessions=await tx.surveyCognitiveSession.findMany({where:{...scope(known,slotKey),
-          slotKey:{in:priorCognitive}},orderBy:{epoch:'desc'},
-          select:{slotKey:true,status:true,epoch:true,result:{select:{id:true}}}})
-        const current=new Map<string,(typeof sessions)[number]>()
-        for(const session of sessions)if(!current.has(session.slotKey))current.set(session.slotKey,session)
-        if(priorCognitive.some(key=>current.get(key)?.status!=='COMPLETED'||!current.get(key)?.result))
-          cognitiveFail(409,'请先完成前一个认知工具')
-      }
-      await assertSurveyCognitiveLockedAnswers(tx,known.attemptId,answers)
-      return jsonCopy(locked)
-    }
-    if(unit!.kind==='COGNITIVE'){
-      priorCognitive.push(unit!.instrumentKey)
-    }else{
-      if(!Object.prototype.hasOwnProperty.call(answers,unit!.instrumentKey))cognitiveFail(400,'请先完成认知任务之前的研究工具')
-      const result=validateSurveyUnitAnswers(unit!,answers[unit!.instrumentKey])
-      verified[unit!.instrumentKey]=result.rawAnswers
-      locked[unit!.instrumentKey]=answers[unit!.instrumentKey]
-    }
-  }
-  return cognitiveFail(409,'当前合法研究路径不会进入这个认知工具')
-}
 export async function startSurveyCognitive(proof:SurveyCognitiveProof,slotKey:string,input:{priorAnswers:unknown;administrationProvenance:unknown}){
   const known=await verifiedSurveyAttempt(proof)
   const provenance=assertDevice(input.administrationProvenance)
@@ -188,9 +83,9 @@ export async function startSurveyCognitive(proof:SurveyCognitiveProof,slotKey:st
     if(existing)return sessionView(tx,known,slotKey,existing,frozen)
     const hold=getAssessmentOperationalHold({family:'COGNITIVE',key:'gonogo',version:'1.0.0',scoringVersion:'1.0.0'})
     if(hold)cognitiveFail(409,'该认知协议暂停新任务，请联系研究者')
-    if(snapshot.flow)await ensureSurveyFlowAssignment(tx,{...scope(known,slotKey),participantId:known.participantId,
-      researchCode:proof.researchCode,accessCredential:proof.accessCredential,snapshot})
-    const locked=await prefixAnswers(tx,known,snapshot,slotKey,input.priorAnswers)
+    const assignment=snapshot.flow?await ensureSurveyFlowAssignment(tx,{...scope(known,slotKey),participantId:known.participantId,
+      researchCode:proof.researchCode,accessCredential:proof.accessCredential,snapshot}):null
+    const locked=await freezeSurveyTaskPrefix(tx,known,snapshot,slotKey,input.priorAnswers,assignment)
     const now=new Date()
     const session=await tx.surveyCognitiveSession.create({data:{id:randomUUID(),...scope(known,slotKey),epoch:1,
       measurementDigest:frozen.measurementDigest,status:'IN_PROGRESS',

@@ -60,10 +60,21 @@ describe('Survey cognitive fixed pilot and shared scoring contracts',()=>{
   it('locks canonical original prefix answers and rejects changed or removed values',async()=>{
     const locked={screen:{choice:'eligible'}},tx={surveyCognitiveSession:{findMany:vi.fn().mockResolvedValue([
       {lockedAnswersHash:canonicalHash(locked),lockedAnswersCipher:encryptUnifiedRuntimePayload(locked)},
-    ])}}
+    ])},situationalAttempt:{findMany:vi.fn().mockResolvedValue([])}}
     await expect(assertSurveyCognitiveLockedAnswers(tx as any,'attempt',{...locked,later:{x:1}})).resolves.toBeUndefined()
     await expect(assertSurveyCognitiveLockedAnswers(tx as any,'attempt',{screen:{choice:'other'}})).rejects.toThrow('前置答案')
     await expect(assertSurveyCognitiveLockedAnswers(tx as any,'attempt',{})).rejects.toThrow('前置答案')
+  })
+  it('merges native and cognitive host locks only when canonical shared facts agree',async()=>{
+    const locked={screen:{choice:'eligible'}},cipher=encryptUnifiedRuntimePayload(locked)
+    const native=vi.fn().mockResolvedValue([{surveyLockedAnswersCipher:cipher,surveyLockedAnswersHash:canonicalHash(locked)}])
+    const tx={surveyCognitiveSession:{findMany:vi.fn().mockResolvedValue([{lockedAnswersCipher:cipher,lockedAnswersHash:canonicalHash(locked)}])},situationalAttempt:{findMany:native}}
+    await expect(assertSurveyCognitiveLockedAnswers(tx as any,'attempt',locked)).resolves.toBeUndefined()
+    const conflict={screen:{choice:'other'}}
+    native.mockResolvedValue([{surveyLockedAnswersCipher:encryptUnifiedRuntimePayload(conflict),surveyLockedAnswersHash:canonicalHash(conflict)}])
+    await expect(assertSurveyCognitiveLockedAnswers(tx as any,'attempt',locked)).rejects.toThrow('来源不一致')
+    native.mockResolvedValue([{surveyLockedAnswersCipher:cipher,surveyLockedAnswersHash:'0'.repeat(64)}])
+    await expect(assertSurveyCognitiveLockedAnswers(tx as any,'attempt',locked)).rejects.toThrow('校验失败')
   })
   it('verifies only current completed epoch and publication-bound slot, rejecting duplicate refs',async()=>{
     const unit=compileFrozenResearchUnit({id:randomUUID(),instrumentKey:'go',title:'Go',kind:'COGNITIVE',revision:1,definition:initialCognitiveDefinition()})

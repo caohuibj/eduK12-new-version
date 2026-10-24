@@ -4,9 +4,10 @@ import {contentUuid as uuid, isContentRequest, isContentMetadata, localInputTime
 import AdminStaticSjtPublication from './AdminStaticSjtPublication'
 const reportCapabilities=['report.edit','report.publish'] as const
 const referenceCapabilities=['reference.analyze','reference.review','reference.publish'] as const
-type TrainingPurpose='report'|'reference'|'data'|'reference-governance'|'static-sjt'|'library-review'|'library-distribute'
+type TrainingPurpose='report'|'reference'|'data'|'reference-governance'|'static-sjt'|'library-review'|'library-distribute'|'sjt-distribute'
 const formalCapabilities=['reference.review','reference.publish'] as const
 function restoredPurpose(grant?:Grant):TrainingPurpose {
+  if(grant?.scope.product==='SURVEY'&&grant.scope.scopeKind==='PLATFORM'&&grant.scope.scopeId==='situational-library-governance')return 'sjt-distribute'
   if(grant?.scope.scopeKind==='PLATFORM'&&grant.scope.scopeId==='scale-library-governance')return grant.scope.resourceKind==='catalog'?'library-review':'library-distribute'
   if(grant?.scope.scopeKind==='PLATFORM')return grant.scope.scopeId==='situational-registry'?'static-sjt':'reference-governance'
   return grant?.scope.resourceKind==='reference'?'reference':grant?.scope.resourceKind==='data'?'data':'report'
@@ -53,9 +54,10 @@ function ContentPermissions({actorId}:{actorId:string}){
   const [sjtGrant,setSjtGrant]=useState<{mappingId:string;grantId:string}|null>(null)
   const inFlight=useRef(false)
   const library=purpose==='library-review'||purpose==='library-distribute'
-  const platform=library||product==='TRAINING'&&(purpose==='reference-governance'||purpose==='static-sjt')
-  const resourceKind:Grant['scope']['resourceKind']=purpose==='library-review'?'catalog':purpose==='library-distribute'?'material':product==='SURVEY'?kind:purpose==='static-sjt'?'measurement':purpose==='reference-governance'?'reference':purpose
-  const fixedScope=library?'scale-library-governance':purpose==='static-sjt'?'situational-registry':'reference-governance'
+  const sjtDistribution=product==='SURVEY'&&purpose==='sjt-distribute'
+  const platform=library||sjtDistribution||product==='TRAINING'&&(purpose==='reference-governance'||purpose==='static-sjt')
+  const resourceKind:Grant['scope']['resourceKind']=purpose==='library-review'?'catalog':purpose==='library-distribute'||purpose==='sjt-distribute'?'material':product==='SURVEY'?kind:purpose==='static-sjt'?'measurement':purpose==='reference-governance'?'reference':purpose
+  const fixedScope=sjtDistribution?'situational-library-governance':library?'scale-library-governance':purpose==='static-sjt'?'situational-registry':'reference-governance'
   const availableCapabilities=product==='TRAINING'&&purpose==='report'?reportCapabilities:product==='TRAINING'&&purpose==='reference-governance'?formalCapabilities:referenceCapabilities
   useEffect(()=>{
     if(!pending&&!revocation)return
@@ -76,7 +78,7 @@ function ContentPermissions({actorId}:{actorId:string}){
       if(!uuid.test(subject.trim())||(!platform&&!uuid.test(project.trim()))||!keys.length||keys.length>128||keys.some(key=>!uuid.test(key))||new Set(keys).size!==keys.length||!selected.length||!reason.trim()||!from||!until||!Number.isFinite(Date.parse(from))||!Number.isFinite(Date.parse(until))||Date.parse(until)<=Date.parse(from)||Date.parse(until)<=Date.now()){
         setError('请填写有效 UUID、至少一项能力、有效期限和原因；资源最多 128 项且不得重复。');return
       }
-      request={requestId:crypto.randomUUID(),expectedVersion:0,reason:reason.trim(),grant:{subjectId:subject.trim(),scope:{product,scopeKind:platform?'PLATFORM':product==='TRAINING'?'COURSE':'PROJECT',scopeId:platform?fixedScope:project.trim(),resourceKind,resourceKeys:keys},capabilities:selected,delegableCapabilities:delegate?selected:[],remainingDelegationDepth:delegate?1:0,validFrom:new Date(from).toISOString(),expiresAt:new Date(until).toISOString()}}
+      request={requestId:crypto.randomUUID(),expectedVersion:0,reason:reason.trim(),grant:{subjectId:subject.trim(),scope:{product,scopeKind:platform?'PLATFORM':product==='TRAINING'?'COURSE':'PROJECT',scopeId:platform?fixedScope:project.trim(),resourceKind,resourceKeys:keys},capabilities:selected,delegableCapabilities:delegate&&!sjtDistribution?selected:[],remainingDelegationDepth:delegate&&!sjtDistribution?1:0,validFrom:new Date(from).toISOString(),expiresAt:new Date(until).toISOString()}}
     }
     if(!window.confirm(`确认向 ${request.grant.subjectId} 签发 ${request.grant.capabilities.join('、')}？${scopeLabel(request.grant.scope.scopeKind)} ${request.grant.scope.scopeId}，精确资源 ${request.grant.scope.resourceKeys.length} 项，到期 ${request.grant.expiresAt}。${request.grant.remainingDelegationDepth?'允许一层受限委派。':'不允许委派。'}`))return
     inFlight.current=true;retain(request,true);setPending(request);setLookup(request.requestId);setRow(null);setBusy(true)
@@ -146,19 +148,19 @@ function ContentPermissions({actorId}:{actorId:string}){
     catch{setStorageError('无法清理待核对撤销，请保留原请求。')}
   }
   return <section aria-labelledby="content-permissions-title" style={{overflowWrap:'anywhere'}}><h2 id="content-permissions-title">精确内容授权</h2>
-    <p>Survey 支持项目参考与指定 FINAL 重新解释；Training 支持课程报告、参考、指定已完成作答重新解释，以及独立平台参考治理与已安装 SJT 发布。后台复核当前身份、资格、真实所有权和资源归属；管理身份不自动授予科学能力或其他入口身份。</p>
+    <p>Survey 支持项目参考、指定 FINAL 重新解释与独立 SJT 入口分发；Training 支持课程报告、参考、指定已完成作答重新解释，以及独立平台参考治理与已安装 SJT 发布。后台复核当前身份、资格、真实所有权和资源归属；管理身份不自动授予科学能力或其他入口身份。</p>
     <p>签发、读取和撤销前，请在上方完成管理员双因素验证。资源栏只接受实际 UUID，不提供样本或报告浏览。</p>
     <AdminStaticSjtPublication actorId={actorId} onPrepareGrant={prepareSjtGrant} grantReceipt={sjtGrant} grantLocked={busy||Boolean(pending)||Boolean(revocation)||issued||recoveryBlocked}/>
     <fieldset disabled={busy||Boolean(pending)||Boolean(revocation)||issued||recoveryBlocked}><legend>新根授权</legend>
       <label>产品授权范围<select value={product} onChange={e=>{setProduct(e.target.value as 'SURVEY'|'TRAINING');setProject('');setResources('');setCaps([]);setDelegate(false);setPurpose('report')}}><option value="SURVEY">Survey 项目与共用库分发</option><option value="TRAINING">Training 课程与平台内容</option></select></label>
       {product==='TRAINING'&&<label>Training 授权用途<select value={purpose} onChange={e=>{setPurpose(e.target.value as TrainingPurpose);setProject('');setResources('');setCaps([]);setDelegate(false)}}><option value="report">课程报告编辑/发布</option><option value="reference">课程参考分析/复核/发布</option><option value="data">课程指定作答重新解释</option><option value="reference-governance">平台正式参考独立复核/发布</option><option value="static-sjt">已安装 SJT 测量发布</option><option value="library-review">共用量表系统级审核委托</option><option value="library-distribute">共用量表入口分发委托</option></select></label>}
-      {product==='SURVEY'&&<label>Survey 授权用途<select value={library?'library-distribute':'report'} onChange={e=>{setPurpose(e.target.value as TrainingPurpose);setProject('');setResources('');setCaps([]);setDelegate(false)}}><option value="report">项目内容授权</option><option value="library-distribute">共用量表入口分发委托</option></select></label>}
-      <label>{library?(purpose==='library-review'?'目标审核账号 UUID':'目标入口管理员 UUID'):product==='TRAINING'?(purpose==='static-sjt'?'目标系统管理员 UUID':'目标教师 UUID'):'目标研究者 UUID'}<input className="input" value={subject} onChange={e=>setSubject(e.target.value)}/></label>
+      {product==='SURVEY'&&<label>Survey 授权用途<select value={sjtDistribution?'sjt-distribute':library?'library-distribute':'report'} onChange={e=>{setPurpose(e.target.value as TrainingPurpose);setProject('');setResources('');setCaps([]);setDelegate(false)}}><option value="report">项目内容授权</option><option value="library-distribute">共用量表入口分发委托</option><option value="sjt-distribute">SJT 精确版本入口分发</option></select></label>}
+      <label>{sjtDistribution?'目标 Survey 入口管理员 UUID':library?(purpose==='library-review'?'目标审核账号 UUID':'目标入口管理员 UUID'):product==='TRAINING'?(purpose==='static-sjt'?'目标系统管理员 UUID':'目标教师 UUID'):'目标研究者 UUID'}<input className="input" value={subject} onChange={e=>setSubject(e.target.value)}/></label>
       {platform?<p>固定平台范围：{fixedScope}（不可改为课程、项目或其他平台范围）。</p>:<label>{product==='TRAINING'?'课程 UUID':'项目 UUID'}<input className="input" value={project} onChange={e=>setProject(e.target.value)}/></label>}
-      {library?<p>固定共用库范围：仅所列精确 measurement release UUID。审核委托不授予入口分发；分发委托不授予审核、改编或其他入口权限。{purpose==='library-review'?'系统级审核委托不要求额外领取 Training 入口管理员身份。':'分发仍需目标账号具备对应入口管理资格。'}</p>:product==='SURVEY'?<label>资源类型<select value={kind} onChange={e=>{setKind(e.target.value as 'reference'|'data');setCaps([]);setResources('')}}><option value="reference">参考操作（测量 release UUID）</option><option value="data">重新解释（FINAL UUID）</option></select></label>:<p>{purpose==='static-sjt'?'固定资源：上方准备返回的精确 mapping UUID；仅 measurement.publish，不创建来源许可。':purpose==='reference-governance'?'固定资源：精确 measurement release UUID；仅 reference.review / reference.publish，不含 analyze。目标须为当前已批准教师，原因须记录资格与用途，计算者不得自审。':purpose==='data'?'固定资源：当前课程内已完成 compositeAttempt UUID；仅 data.reinterpret，不授予原始数据浏览或导出。':'固定资源：当前课程内真实 composite UUID；服务器核验教师所有权及课程关联，不接受量表、FINAL 或其他课程资源。'}</p>}
+      {sjtDistribution?<p>固定 SJT 范围：仅所列精确 measurement release UUID，须为已发布、来源双向对应且许可允许再分发的原始版本，不支持改编来源。仅授予 Survey 入口分发，不升级现有课程授权，不授予 Training、审核、改编或发布能力；本阶段不允许委派。</p>:library?<p>固定共用库范围：仅所列精确 measurement release UUID。审核委托不授予入口分发；分发委托不授予审核、改编或其他入口权限。{purpose==='library-review'?'系统级审核委托不要求额外领取 Training 入口管理员身份。':'分发仍需目标账号具备对应入口管理资格。'}</p>:product==='SURVEY'?<label>资源类型<select value={kind} onChange={e=>{setKind(e.target.value as 'reference'|'data');setCaps([]);setResources('')}}><option value="reference">参考操作（测量 release UUID）</option><option value="data">重新解释（FINAL UUID）</option></select></label>:<p>{purpose==='static-sjt'?'固定资源：上方准备返回的精确 mapping UUID；仅 measurement.publish，不创建来源许可。':purpose==='reference-governance'?'固定资源：精确 measurement release UUID；仅 reference.review / reference.publish，不含 analyze。目标须为当前已批准教师，原因须记录资格与用途，计算者不得自审。':purpose==='data'?'固定资源：当前课程内已完成 compositeAttempt UUID；仅 data.reinterpret，不授予原始数据浏览或导出。':'固定资源：当前课程内真实 composite UUID；服务器核验教师所有权及课程关联，不接受量表、FINAL 或其他课程资源。'}</p>}
       <label>精确资源 UUID（逗号或换行分隔）<textarea value={resources} onChange={e=>setResources(e.target.value)}/></label>
       {resourceKind==='reference'||resourceKind==='report'?availableCapabilities.map(cap=><label key={cap}><input type="checkbox" checked={caps.includes(cap)} onChange={e=>setCaps(e.target.checked?[...caps,cap]:caps.filter(c=>c!==cap))}/>{cap}</label>):<p>固定能力：{resourceKind==='catalog'?'catalog.manage':resourceKind==='material'?'material.distribute':resourceKind==='measurement'?'measurement.publish':'data.reinterpret'}</p>}
-      <label><input type="checkbox" checked={delegate} onChange={e=>setDelegate(e.target.checked)}/>允许上述能力一层受限委派</label>
+      {!sjtDistribution&&<label><input type="checkbox" checked={delegate} onChange={e=>setDelegate(e.target.checked)}/>允许上述能力一层受限委派</label>}
       <label>生效时间（本地时间）<input type="datetime-local" value={from} onChange={e=>setFrom(e.target.value)}/></label>
       <label>到期时间（本地时间）<input type="datetime-local" value={until} onChange={e=>setUntil(e.target.value)}/></label>
       <label>内容授权原因<input value={reason} maxLength={500} onChange={e=>setReason(e.target.value)}/></label>

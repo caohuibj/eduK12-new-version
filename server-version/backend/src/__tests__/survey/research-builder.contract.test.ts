@@ -61,7 +61,7 @@ describe('Survey research builder contracts without formal publication authority
     const changed=structuredClone(form)
     changed.pages[0].questions[1].displayIf={itemKey:'matrix',operator:'EQUALS',optionKey:'low'}
     expect(validateSurveyDraft('FORM',changed,true).issues.some(i=>i.path.includes('displayIf'))).toBe(true)
-    changed.pages[0].questions[1].displayIf=undefined
+    delete changed.pages[0].questions[1].displayIf
     changed.pages[1].questions[0].itemKey='school'
     expect(validateSurveyDraft('FORM',changed,true).issues.some(i=>i.message.includes('重复'))).toBe(true)
   })

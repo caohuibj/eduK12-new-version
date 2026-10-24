@@ -1,3 +1,6 @@
+import { surveySituationalRouter } from './situational-native.public.routes'
+import { SurveySituationalProtocolError } from './situational-native.contract'
+import { surveySituationalReceiptReferenceSchema } from './situational-native.contract'
 import {joinMemorableStudy,recoverMemorableIdentity,completeMemorableReset,joinGeneratedCodeStudy} from './memorable-code.service'
 import {memorableCodeRateLimit} from './memorable-code.rate'
 import {BoundedAdmissionBusyError} from '../../services/boundedAdmissionGate'
@@ -50,6 +53,7 @@ const checkpointWrite=proof.extend({revision:z.number().int().min(0).max(100),
   itemTimings:z.record(z.string(), z.record(z.string(), z.unknown())).optional()}).strict()
 const submission=proof.extend({submissionId:z.string().min(16).max(200),
   cognitiveReferences:z.array(surveyCognitiveReferenceSchema).max(4).optional(),
+  situationalReferences:z.array(surveySituationalReceiptReferenceSchema).max(30).optional(),
   answers:z.record(z.string(), z.record(z.string(), z.unknown())),
   itemTimings:z.record(z.string(), z.record(z.string(), z.unknown())).optional(),
   presentation:z.object({shownBlocks:z.array(z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)).max(70)}).strict().optional()}).strict()
@@ -57,6 +61,7 @@ const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Res
   try{return success(res,await action(req))}
   catch(e){
     if(e instanceof BoundedAdmissionBusyError)return error(res,'编码验证繁忙，请稍后再试',-1,503)
+    if(e instanceof SurveySituationalProtocolError)return error(res,e.code,-1,409)
     if(e instanceof z.ZodError)return error(res,'输入不合法',-1,400)
     if(e instanceof SurveyWaveError||e instanceof SurveyFinalError||e instanceof ResearchIdentityError||e instanceof SurveyCognitiveError)
       return error(res,e.message,-1,e.statusCode)
@@ -68,6 +73,7 @@ const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Res
   }
 }
 publicSurveyRouter.use('/r/:publicId/attempts/:attemptId/cognitive',surveyCognitiveRouter)
+publicSurveyRouter.use('/r/:publicId/attempts/:attemptId/situational',surveySituationalRouter)
 publicSurveyRouter.get('/r/:publicId/info',handle(req=>
   admission.getPublicResearchInfo(id.parse(req.params.publicId))))
 publicSurveyRouter.post('/r/:publicId/info',handle(req=>

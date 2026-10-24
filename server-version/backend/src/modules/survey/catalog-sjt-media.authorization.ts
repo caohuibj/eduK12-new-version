@@ -1,11 +1,16 @@
+import { SJT_COURSE_GRANT_POLICY } from '../situational/authoring/grant-contract'
+import { recheckSjtEntryDistributionAuthority, SjtEntryAuthorityError } from '../situational/entry-authority'
+import { assertSurveyNativeSituationalDefinition } from './situational-native.definition'
+import { situationalImageAssetReferences } from '../situational/situation-definition'
+import type { SituationRuntimeDefinition } from '../situational/situation-runtime-definition'
 import { Prisma } from '@prisma/client'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { assertAssessmentAssetReferencesReady, AssessmentAssetValidationError } from '../assessment-media/assessment-asset'
 import { lockStoredAssetRows } from '../../services/assetStorage'
 import { SjtAuthorMediaError, SJT_AUTHOR_MEDIA_SCOPE, SJT_AUTHOR_MAX_IMAGE_BYTES, SJT_AUTHOR_RELEASE_MEDIA_REFERENCE_TYPE, sjtAuthorImages } from '../situational/authoring/media'
-import { catalogSnapshotsForDrafts } from './catalog.service'
+import { catalogSnapshotsForDrafts,type CatalogSnapshot } from './catalog.service'
 import type { LibraryBoundMediaUnit } from '../scale-library-governance/media.authorization'
-import { CatalogSourceError, ONLINE_SJT_ADAPTER_VERSION, type CatalogSourceRef } from './catalog.sources'
+import { CatalogSourceError, ONLINE_SJT_ADAPTER_VERSION, NATIVE_SJT_ADAPTER_VERSION, type CatalogSourceRef } from './catalog.sources'
 
 const fail = (): never => { throw new CatalogSourceError('SOURCE_SJT_MEDIA_AUTHORIZATION_REQUIRED', 403) }
 /** Publication-time proof only. Source and grant locks are acquired by the existing
@@ -15,25 +20,47 @@ export async function authorizedCatalogSjtMedia(tx: Prisma.TransactionClient, us
   if (unit.kind !== 'SJT' || !unit.sourceProvenance) return null
   const source = unit.sourceProvenance.source as CatalogSourceRef | undefined
   if (!source || source.kind !== 'SJT' || typeof source.sourceId !== 'string' || typeof source.sourceVersion !== 'string') return fail()
-  let images: ReturnType<typeof sjtAuthorImages>
-  try { images = sjtAuthorImages({ templateVersion: 'sjt-online-v1', display: unit.definition }) }
-  catch (error) { if (error instanceof SjtAuthorMediaError) return fail(); throw error }
+  const native=unit.sourceProvenance.adapterVersion===NATIVE_SJT_ADAPTER_VERSION
+  let images:Array<{asset:ReturnType<typeof sjtAuthorImages>[number]['asset']}>
+  if(native){
+    const definition=unit.compiledDefinition as SituationRuntimeDefinition
+    assertSurveyNativeSituationalDefinition(definition)
+    images=definition.scenes.flatMap(scene=>situationalImageAssetReferences(scene.stimulus)).map(asset=>({asset}))
+  }else{
+    try { images = sjtAuthorImages({ templateVersion: 'sjt-online-v1', display: unit.definition }) }
+    catch (error) { if (error instanceof SjtAuthorMediaError) return fail(); throw error }
+  }
   if (!images.length) return []
-  if (source.sourceId.startsWith('registry:') || unit.sourceProvenance.adapterVersion !== ONLINE_SJT_ADAPTER_VERSION || !unit.compiledDefinition) return fail()
-  const candidates = await tx.$queryRaw<Array<{ id: string }>>`SELECT id FROM survey_tool_grants
+  if (source.sourceId.startsWith('registry:') || (!native&&unit.sourceProvenance.adapterVersion !== ONLINE_SJT_ADAPTER_VERSION) || !unit.compiledDefinition) return fail()
+  // Select by the immutable identity before admission. An unrelated older
+  // grant for this source may legitimately have lost its distribution chain.
+  // Never replace the unit's pinned provenance with any currently valid grant.
+  const matches=(snapshot:CatalogSnapshot)=>canonicalHash(snapshot.displayDefinition)===canonicalHash(unit.definition)
+    && canonicalHash(snapshot.compiledDefinition)===canonicalHash(unit.compiledDefinition)
+    && canonicalHash({...snapshot.provenance,originalSource:snapshot.provenance.source??null,source:snapshot.ref,
+      definitionDigest:snapshot.definitionDigest,adapterVersion:snapshot.adapterVersion})===canonicalHash(unit.sourceProvenance)
+  const candidates = await tx.$queryRaw<Array<{ id: string;snapshot:CatalogSnapshot }>>`SELECT id,snapshot FROM survey_tool_grants
     WHERE user_id=${userId} AND status='ACTIVE' AND snapshot->'ref'=${JSON.stringify(source)}::jsonb ORDER BY id`
-  const snapshots = await catalogSnapshotsForDrafts(tx, userId, candidates.map(row => row.id))
-  const bound = [...snapshots.values()].some(snapshot => canonicalHash(snapshot.displayDefinition) === canonicalHash(unit.definition)
-    && canonicalHash(snapshot.compiledDefinition) === canonicalHash(unit.compiledDefinition)
-    && canonicalHash({ ...snapshot.provenance, originalSource: snapshot.provenance.source ?? null, source: snapshot.ref,
-      definitionDigest: snapshot.definitionDigest, adapterVersion: snapshot.adapterVersion }) === canonicalHash(unit.sourceProvenance))
+  const selected=candidates.filter(row=>{
+    try{return matches(row.snapshot)}catch{return false}
+  })
+  if(selected.length!==1)return fail()
+  const snapshots=await catalogSnapshotsForDrafts(tx,userId,[selected[0].id])
+  const checked=snapshots.get(selected[0].id)
+  const bound=checked&&matches(checked)?checked:undefined
   if (!bound) return fail()
   const release = await tx.sjtAuthorRelease.findUnique({ where: { id: source.sourceId }, select: {
     status: true, authorizationPolicy: true, instrumentVersion: true, definitionHash: true,
   } })
-  // Course-scoped permissions are not interchangeable with a Survey tool grant.
-  if (!release || release.status !== 'PUBLISHED' || release.authorizationPolicy !== null
+  // A course grant alone is never a Survey media permission. The exact separately
+  // issued entry capability was validated by catalogSnapshotsForDrafts above.
+  if (!release || release.status !== 'PUBLISHED' || (release.authorizationPolicy !== null && release.authorizationPolicy !== SJT_COURSE_GRANT_POLICY)
     || release.instrumentVersion !== source.sourceVersion || release.definitionHash !== unit.sourceProvenance.definitionHash) return fail()
+  if(release.authorizationPolicy===SJT_COURSE_GRANT_POLICY){
+    if(bound.provenance.sjtEntryAuthority===undefined)return fail()
+    try{await recheckSjtEntryDistributionAuthority(tx,bound.provenance.sjtEntryAuthority)}
+    catch(error){if(error instanceof SjtEntryAuthorityError)return fail();throw error}
+  }
   const ids = [...new Set(images.map(image => image.asset.assetId))].sort()
   if (ids.length > 20) return fail()
   await lockStoredAssetRows(tx, ids)

@@ -52,6 +52,9 @@ import { trainingFeedbackAttemptSelect, trainingFeedbackParentSelect } from '../
 
 export const SITUATIONAL_ATTEMPT_SELECT = {
   id: true,
+  surveyAttemptId: true,
+  surveyPublicationId: true,
+  surveySlotKey: true,
   userId: true,
   compositeAttemptId: true,
   compositeItemId: true,
@@ -199,8 +202,8 @@ export const assertRowMatchesSnapshot = (
   }
 }
 
-export const assertSituationalAttemptOwner = (row: Pick<SituationalAttemptRow, 'userId' | 'participantKey'>, userId: string): void => {
-  if (!row.userId || row.userId !== userId || row.participantKey !== getParticipantKey(userId)) {
+export const assertSituationalAttemptOwner = (row: Pick<SituationalAttemptRow, 'userId' | 'participantKey' | 'surveyAttemptId'>, userId: string): void => {
+  if (row.surveyAttemptId != null || !row.userId || row.userId !== userId || row.participantKey !== getParticipantKey(userId)) {
     throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '无权限操作此情境化测评', 403)
   }
 }
@@ -215,11 +218,12 @@ export type SituationalEmbeddedAccess = {
 }
 
 export const assertEmbeddedSituationalAttemptBinding = (
-  row: Pick<SituationalAttemptRow, 'userId' | 'participantKey' | 'compositeAttemptId' | 'compositeItemId' | 'compositeSlotKey' | 'compositeAttempt'>,
+  row: Pick<SituationalAttemptRow, 'userId' | 'participantKey' | 'compositeAttemptId' | 'compositeItemId' | 'compositeSlotKey' | 'compositeAttempt' | 'surveyAttemptId'>,
   input: SituationalEmbeddedAccess,
 ): void => {
   if (
-    row.compositeAttemptId !== input.compositeAttemptId
+    row.surveyAttemptId != null
+    || row.compositeAttemptId !== input.compositeAttemptId
     || row.compositeItemId !== input.compositeItemId
     || row.compositeSlotKey !== input.compositeSlotKey
     || !row.compositeAttempt
@@ -438,7 +442,7 @@ export const getSituationalInstrument = (instrumentKey: string, instrumentVersio
   }
 }
 
-const retainFrozenSituationalAssets = async (
+export const retainFrozenSituationalAssets = async (
   db: Prisma.TransactionClient,
   attemptId: string,
   snapshot: FrozenSituationalRuntimeSnapshotV1,
@@ -486,6 +490,7 @@ export const startSituationalAttempt = async (userId: string, input: {
         instrumentKey: situationPackage.key,
         instrumentVersion: situationPackage.instrumentVersion,
         participantKey,
+        surveyAttemptId: null,
         status: 'IN_PROGRESS',
       },
       orderBy: { attemptNo: 'desc' },
@@ -502,6 +507,7 @@ export const startSituationalAttempt = async (userId: string, input: {
         instrumentKey: situationPackage.key,
         instrumentVersion: situationPackage.instrumentVersion,
         participantKey,
+        surveyAttemptId: null,
       },
       orderBy: { attemptNo: 'desc' },
       select: { attemptNo: true },
@@ -641,7 +647,7 @@ export const getSituationalAttemptResult = resumeSituationalAttempt
 
 export const listSituationalHistory = async (userId: string) => {
   const rows = await prisma.situationalAttempt.findMany({
-    where: { userId, compositeAttemptId: null },
+    where: { userId, compositeAttemptId: null, surveyAttemptId: null },
     orderBy: { startedAt: 'desc' },
     take: 100,
     select: SITUATIONAL_ATTEMPT_SELECT,
