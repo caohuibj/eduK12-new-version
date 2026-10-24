@@ -11,7 +11,7 @@ export function ParticipationSettings({scopeId,revision,load,saveSettings,resetC
  const [saved,setSaved]=useState<ParticipationSettingsValue|null>(null),[mode,setMode]=useState<ParticipationSettingsValue['mode']>('PERSONAL_LINK')
  const [label,setLabel]=useState('报名序号'),[instructions,setInstructions]=useState('请输入研究者分配给你的编号。'),[codes,setCodes]=useState('')
  const [busy,setBusy]=useState(false),[error,setError]=useState(''),[notice,setNotice]=useState(''),[prefix,setPrefix]=useState('')
- const [reset,setReset]=useState<{resetCode:string;expiresAt:string}|null>(null)
+ const [reset,setReset]=useState<{resetCode:string;expiresAt:string;prefix:string}|null>(null)
  const apply=(s:ParticipationSettingsValue)=>{setSaved(s);setMode(s.mode);setLabel(s.label);setInstructions(s.instructions);setCodes(s.shortCodes?.join('\n')??'')}
  useEffect(()=>{const current=++epoch.current;working.current=false;setBusy(false);setSaved(null);setError('');setNotice('');setReset(null);setPrefix('');void load().then(s=>{if(current===epoch.current)apply(s)}).catch(()=>{if(current===epoch.current)setError('参与方式未能载入，请刷新页面重试。')});return invalidate},[scopeId,load,revision,invalidate])
  const save=async()=>{if(working.current||!saved||saved.locked)return;const current=epoch.current;working.current=true;setBusy(true);setError('');setNotice('');try{
@@ -20,8 +20,8 @@ export function ParticipationSettings({scopeId,revision,load,saveSettings,resetC
   if(current!==epoch.current)return
   apply(result);onRevision?.(result.revision);setNotice(training?'参与方式已保存。首次建立波次或领取身份后固定，所有波次使用同一种方式。':'参与方式已保存。首次冻结后固定，所有波次使用同一种方式。')
  }catch(e){if(current===epoch.current)setError(e instanceof Error?e.message:'保存失败')}finally{if(current===epoch.current){working.current=false;setBusy(false)}}}
- const issueReset=async()=>{if(working.current)return;const current=epoch.current;working.current=true;setBusy(true);setError('');setReset(null);try{
-  const value=await resetCode(prefix.trim());if(current===epoch.current)setReset(value)
+ const issueReset=async()=>{if(working.current)return;if(training&&!window.confirm('确认给此被试签发一次性重置码？旧编码和旧页面凭据会立即失效，历史作答保留。请先核对该被试与短编号的对应关系，并只将重置码交给本人。'))return;const current=epoch.current;working.current=true;setBusy(true);setError('');setReset(null);try{
+  const requestedPrefix=prefix.trim();const value=await resetCode(requestedPrefix);if(current===epoch.current)setReset({...value,prefix:requestedPrefix})
  }catch(e){if(current===epoch.current)setError(e instanceof Error?e.message:'重置失败')}finally{if(current===epoch.current){working.current=false;setBusy(false)}}}
  const page=async(n:number)=>{if(working.current)return;const current=epoch.current;working.current=true;setBusy(true);setError('');setReset(null);try{const value=await load(n);if(current===epoch.current)setSaved(value)}catch(e){if(current===epoch.current)setError(e instanceof Error?e.message:'读取失败')}finally{if(current===epoch.current){working.current=false;setBusy(false)}}}
  return <section className="survey-participation-settings survey-participant-panel" aria-label="多波次参与方式">
@@ -32,7 +32,7 @@ export function ParticipationSettings({scopeId,revision,load,saveSettings,resetC
    <label><input type="radio" name={'participation-mode-'+scopeId} checked={mode==='PERSONAL_LINK'} onChange={()=>setMode('PERSONAL_LINK')}/><span><strong>专属链接与二维码</strong><small>被试自行保存，点击或扫码继续。</small></span></label>
    <label><input type="radio" name={'participation-mode-'+scopeId} checked={mode==='MEMORABLE_CODE'} onChange={()=>setMode('MEMORABLE_CODE')}/><span><strong>可记忆研究编码</strong><small>研究者分配短编号，被试加上私人后缀。适合机房和共用设备。</small></span></label>
    <label><input type="radio" name={'participation-mode-'+scopeId} checked={mode==='SELF_CODE'} onChange={()=>setMode('SELF_CODE')}/><span><strong>随机研究编码</strong><small>系统随机生成，只需保存这一个编码；无需填写个人信息。</small></span></label>
-   {mode==='SELF_CODE'&&<p>被试在首次知情同意后领取随机编码，后续只输入这个编码。请提醒被试复制或截图保存；丢失后无法找回，也不提供研究者重置。</p>}
+   {mode==='SELF_CODE'&&<p>{training?'被试确认研究内关联说明后领取随机编码，研究同意另行确认。':'被试在首次知情同意后领取随机编码，'}后续只输入这个编码。请提醒被试复制或截图保存；丢失后无法找回，也不提供研究者重置。</p>}
    {mode==='MEMORABLE_CODE'&&<div className="survey-code-settings-fields">
     <label>短编号名称<input className="input" value={label} onChange={e=>setLabel(e.target.value)} maxLength={40}/></label>
     <label>给被试的填写说明<textarea className="input" value={instructions} onChange={e=>setInstructions(e.target.value)} maxLength={500}/></label>
@@ -45,10 +45,10 @@ export function ParticipationSettings({scopeId,revision,load,saveSettings,resetC
    <p>先核对被试对应的短编号。重置会使旧编码和旧页面凭证失效，历史回答仍关联原记录。</p>
    <ul>{saved.participants.map(row=><li key={row.prefix}><strong>{row.prefix}</strong> · {row.participant?row.participant.researchCode+' · 已参加':'尚未参加'}</li>)}</ul>
    <nav aria-label="短编号分页"><button type="button" className="btn-secondary" disabled={busy||saved.page===1} onClick={()=>void page(saved.page-1)}>上一页</button><span>第 {saved.page} 页</span><button type="button" className="btn-secondary" disabled={busy||!saved.hasNext} onClick={()=>void page(saved.page+1)}>下一页</button></nav>
-   <label>要重置的短编号<input className="input" autoComplete="off" value={prefix} onChange={e=>setPrefix(e.target.value)}/></label>
+   <label>要重置的短编号<input className="input" autoComplete="off" disabled={busy} value={prefix} onChange={e=>{setPrefix(e.target.value);setReset(null)}}/></label>
    <button type="button" className="btn-secondary" disabled={busy||!prefix.trim()} onClick={()=>void issueReset()}>签发一次性重置码</button>
    {!training&&<p><a href={'/workspace?project='+scopeId+'&section=data#survey-data-export'}>先完成动态验证码验证</a>，验证后五分钟内可重置。</p>}
-   {reset&&<div role="status" className="survey-code-reset-result"><p>请将此一次性重置码单独交给对应被试：</p><code>{reset.resetCode}</code><p>30分钟内有效。被试在参与入口选择“研究者已为我重置编码”，再设置新的私人后缀。请不要代设或索取后缀。</p></div>}
+   {reset&&<div role="status" className="survey-code-reset-result"><p>请将此一次性重置码仅交给短编号 {reset.prefix} 对应的被试：</p><code>{reset.resetCode}</code><p>30分钟内有效。被试在参与入口选择“研究者已为我重置编码”，再设置新的私人后缀。请不要代设或索取后缀。</p></div>}
   </details>}</>}
  </section>
 }

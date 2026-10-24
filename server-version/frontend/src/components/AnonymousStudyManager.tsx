@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import {TrainingParticipationSettings} from './TrainingParticipationSettings'
 import LocalDateTimeInput, { parseLocalDateTime } from './LocalDateTimeInput'
 import { anonymousStudyApi, type PublishResearchConsent, type ResearchConsentVersion, type ResearchDataCategory, type ResearchWithdrawal, type ReviewResearchWithdrawal, type Study, type WaveStatistics } from '../api/anonymousStudy'
 import { sessionFetch } from '../api/client'
@@ -169,6 +170,7 @@ export function AnonymousStudyManager({compositeId,links,canCreate=true,maximumE
   <div className="flex flex-wrap gap-3"><label>新研究名称<input className="input" value={title} onChange={e=>setTitle(e.target.value)} maxLength={120}/></label><button disabled={busy || !title.trim()} className="btn-secondary" onClick={()=>void create()}>创建研究</button></div>
   <label className="grid gap-2">选择本人的研究<select className="input" disabled={busy} value={selected} onChange={e=>setSelected(e.target.value)}><option value="">请选择</option>{studies.map(s=><option key={s.id} value={s.id}>{s.title}{s.status==='CLOSED'?'（已结束）':''}</option>)}</select></label>
   {selected && <>
+   <TrainingParticipationSettings key={`participation:${user?.id}:${compositeId}:${selected}:${stats?.list.length ?? 0}:${studies.find(study=>study.id===selected)?.status}`} studyId={selected}/>
    <ResearchConsentEditor key={`${user?.id}:${compositeId}:${selected}`} studyId={selected}/>
    <ResearchWithdrawalReview key={`withdrawals:${user?.id}:${compositeId}:${selected}`} studyId={selected}/>
    <button disabled={busy} onClick={()=>void act(async()=>{setStats(null);const current=epoch.current,rows=await anonymousStudyApi.statistics(selected);if(current===epoch.current)setStats(rows)})}>刷新波次统计</button>

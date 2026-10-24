@@ -2,13 +2,13 @@ import {beforeEach,expect,it,vi} from 'vitest'
 import {fireEvent,render,screen,waitFor} from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import {AnonymousStudyManager} from '../AnonymousStudyManager'
-const api=vi.hoisted(()=>({list:vi.fn(),statistics:vi.fn(),create:vi.fn(),createWave:vi.fn(),researchConsent:vi.fn(),publishResearchConsent:vi.fn(),researchWithdrawals:vi.fn(),reviewResearchWithdrawal:vi.fn()}))
+const api=vi.hoisted(()=>({close:vi.fn(),participation:vi.fn(),list:vi.fn(),statistics:vi.fn(),create:vi.fn(),createWave:vi.fn(),researchConsent:vi.fn(),publishResearchConsent:vi.fn(),researchWithdrawals:vi.fn(),reviewResearchWithdrawal:vi.fn()}))
 vi.mock('../../api/anonymousStudy',()=>({anonymousStudyApi:api}))
 vi.mock('../../contexts/AuthContext',()=>({useAuth:()=>({user:{id:'publisher'}})}))
 vi.mock('../../api/client',()=>({sessionFetch:vi.fn()}))
 vi.mock('../../api/publicDelivery',()=>({publicDeliveryAdapter:vi.fn()}))
 const version={id:'11111111-1111-4111-8111-111111111111',studyId:'s',version:1,body:'已经发布的研究同意正文不可变，研究自愿参与且可以退出。',bodyHash:'old-hash',publishedAt:'2026-10-18T12:00:00.000Z',scope:{purpose:'研究目的',dataCategories:['FORM'],waveCoverage:'EXISTING_AND_FUTURE'},scopeId:'s',scopeHash:'scope-hash'}
-beforeEach(()=>{vi.resetAllMocks();sessionStorage.clear();api.list.mockResolvedValue({list:[{id:'s',title:'Research',status:'ACTIVE'}]});api.statistics.mockResolvedValue({list:[{id:'w',title:'Wave',ordinal:1,tokenId:'t',participants:2,completedParticipants:1,attempts:2,completedAttempts:1,abandonedAttempts:0}],countMeaning:'Counts'});api.researchConsent.mockResolvedValue({version:null});api.researchWithdrawals.mockResolvedValue({list:[],page:1,pageSize:25})})
+beforeEach(()=>{vi.resetAllMocks();api.participation.mockResolvedValue({revision:0,mode:'PERSONAL_LINK',label:'报名序号',instructions:'',locked:true,page:1,hasNext:false,participants:[]});sessionStorage.clear();api.list.mockResolvedValue({list:[{id:'s',title:'Research',status:'ACTIVE'}]});api.statistics.mockResolvedValue({list:[{id:'w',title:'Wave',ordinal:1,tokenId:'t',participants:2,completedParticipants:1,attempts:2,completedAttempts:1,abandonedAttempts:0}],countMeaning:'Counts'});api.researchConsent.mockResolvedValue({version:null});api.researchWithdrawals.mockResolvedValue({list:[],page:1,pageSize:25})})
 it('loads studies on first mount and displays counts without psychological group metrics',async()=>{
  render(<AnonymousStudyManager compositeId="c" links={[]}/>)
  expect(await screen.findByRole('option',{name:'Research'})).toBeInTheDocument()
@@ -198,4 +198,22 @@ it('keeps educational totals and shows research qualification counts separately 
  expect(screen.getByText('研究有效同意人数 2 · 退出或排除人数 1 · 同意未知人数 2')).toBeInTheDocument()
  expect(screen.getByRole('button',{name:'导出教育完成记录（非研究样本CSV）'})).toBeInTheDocument()
  expect(screen.getByText(/教育 CSV 保留原授权教育记录，不作为研究样本/)).toBeInTheDocument()
+})
+
+it('reloads and locks participation settings after closing the selected study',async()=>{
+ const openSettings={revision:0,mode:'PERSONAL_LINK',label:'编号',instructions:'',locked:false,page:1,hasNext:false,participants:[]}
+ api.statistics.mockResolvedValue({list:[],countMeaning:'Counts'})
+ api.participation.mockResolvedValue(openSettings);api.close.mockResolvedValue({status:'CLOSED'})
+ render(<AnonymousStudyManager compositeId="c" links={[]}/>);
+ await screen.findByRole('option',{name:'Research'})
+ fireEvent.change(screen.getByLabelText('选择本人的研究'),{target:{value:'s'}})
+ expect(await screen.findByRole('button',{name:'保存参与方式'})).toBeEnabled()
+ const before=api.participation.mock.calls.length
+ api.participation.mockResolvedValue({...openSettings,locked:true})
+ fireEvent.click(screen.getByRole('button',{name:'结束研究，停止新作答'}))
+ await waitFor(()=>expect(api.close).toHaveBeenCalledWith('s'))
+ await waitFor(()=>expect(api.participation.mock.calls.length).toBeGreaterThan(before))
+ await waitFor(()=>expect(screen.queryByRole('button',{name:'保存参与方式'})).not.toBeInTheDocument())
+ for(const radio of screen.getAllByRole('radio'))expect(radio).toBeDisabled()
+ expect(screen.getByRole('option',{name:'Research（已结束）'})).toBeInTheDocument()
 })

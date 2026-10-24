@@ -1,16 +1,16 @@
 import {beforeEach,expect,it,vi} from 'vitest'
-import {fireEvent,render,screen,waitFor} from '@testing-library/react'
+import {fireEvent,render,screen,waitFor,within} from '@testing-library/react'
 import {Link,MemoryRouter,Route,Routes} from 'react-router-dom'
 import AnonymousStudyPage from '../AnonymousStudyPage'
-const api=vi.hoisted(()=>({info:vi.fn(),join:vi.fn(),home:vi.fn(),start:vi.fn(),recover:vi.fn(),revoke:vi.fn(),researchConsent:vi.fn(),acceptResearchConsent:vi.fn(),requestResearchWithdrawal:vi.fn()}))
-vi.mock('../../../api/anonymousStudy',()=>({publicStudyApi:()=>api,studyIdentityKey:(s:string)=>`anonymous-study:identity:${s}`}))
+const api=vi.hoisted(()=>({capability:vi.fn(),info:vi.fn(),participationInfo:vi.fn(),recoverCode:vi.fn(),resetCode:vi.fn(),join:vi.fn(),home:vi.fn(),start:vi.fn(),recover:vi.fn(),revoke:vi.fn(),researchConsent:vi.fn(),acceptResearchConsent:vi.fn(),requestResearchWithdrawal:vi.fn()}))
+vi.mock('../../../api/anonymousStudy',()=>({publicStudyApi:(credential?:string)=>{api.capability(credential);return api},studyIdentityKey:(s:string)=>`anonymous-study:identity:${s}`}))
 const version={id:'11111111-1111-4111-8111-111111111111',studyId:'s',version:1,body:'服务端发布的研究说明：研究自愿参与，可以随时申请退出。',bodyHash:'server-body-hash',publishedAt:'2026-10-18T12:00:00.000Z',scope:{purpose:'研究目的',dataCategories:['FORM'],waveCoverage:'EXISTING_AND_FUTURE'},scopeId:'s',scopeHash:'scope-hash'}
 const unknown={version,acceptedVersion:null,acceptance:null,state:'UNKNOWN',revision:0,eligible:false,reason:'CURRENT_CONSENT_REQUIRED'}
 const consented={...unknown,acceptedVersion:version,acceptance:{id:'accepted',versionId:version.id,bodyHash:version.bodyHash,acceptedAt:'2026-10-18T13:00:00.000Z'},state:'CONSENTED',revision:1,eligible:true,reason:null}
 const withdrawn={...consented,state:'WITHDRAWAL_PENDING',revision:2,eligible:false,reason:'WITHDRAWAL_PENDING'}
 const home={studyId:'s',title:'Research',displayCode:'P-DISPLAY',waves:[{id:'w',title:'One',ordinal:1,attemptId:'attempt',state:'COMPLETED',completedAt:null,accepting:true}],limitations:['研究内关联']}
 function show(path='/public/studies/waves/w/token'){return render(<MemoryRouter initialEntries={[path]}><Link to="/public/studies/other">换研究</Link><Routes><Route path="/public/studies/waves/:waveId/:token" element={<AnonymousStudyPage/>}/><Route path="/public/studies/:studyId" element={<AnonymousStudyPage/>}/><Route path="/public/composite/attempts/:attemptId/report" element={<p>Own report</p>}/></Routes></MemoryRouter>)}
-beforeEach(()=>{vi.restoreAllMocks();vi.resetAllMocks();sessionStorage.clear();api.info.mockResolvedValue({studyId:'s',studyTitle:'Research',title:'One',accepting:true});api.home.mockResolvedValue(home);api.researchConsent.mockResolvedValue({...unknown,version:null})})
+beforeEach(()=>{vi.restoreAllMocks();vi.resetAllMocks();sessionStorage.clear();api.participationInfo.mockResolvedValue({studyId:'s',studyTitle:'Research',mode:'PERSONAL_LINK',label:'编号',instructions:''});api.info.mockResolvedValue({studyId:'s',studyTitle:'Research',title:'One',accepting:true});api.home.mockResolvedValue(home);api.researchConsent.mockResolvedValue({...unknown,version:null})})
 it('offers A guest participation and requires consent before creating B identity',async()=>{
  show();await screen.findByText('One');expect(screen.getByRole('link',{name:'以单次访客开始'})).toHaveAttribute('href','/public/composite/token')
  const button=screen.getByRole('button',{name:'创建研究内身份码'});expect(button).toBeDisabled()
@@ -36,7 +36,7 @@ it('clears private history when refresh permission fails',async()=>{
 })
 
 it('keeps identity restoration available through an expired wave entry',async()=>{
- api.info.mockResolvedValue({studyId:'s',studyTitle:'Research',title:'One',accepting:false});show()
+ api.participationInfo.mockResolvedValue({studyId:'s',studyTitle:'Research',mode:'PERSONAL_LINK',label:'编号',instructions:''});api.info.mockResolvedValue({studyId:'s',studyTitle:'Research',title:'One',accepting:false});show()
  expect(await screen.findByText(/已有身份码仍可恢复研究历史/)).toBeInTheDocument();expect(screen.queryByRole('button',{name:'创建研究内身份码'})).not.toBeInTheDocument()
  fireEvent.change(screen.getByLabelText('已有身份码，恢复研究任务'),{target:{value:'credential'}});fireEvent.click(screen.getByRole('button',{name:'用身份码进入'}))
  await waitFor(()=>expect(screen.getByRole('button',{name:'查看本次个人报告'})).toBeInTheDocument())
@@ -164,4 +164,148 @@ it('keeps identity deactivation a separate action and warns to request research 
  expect(confirm).toHaveBeenCalledWith(expect.stringContaining('请先提交研究退出申请'))
  expect(api.revoke).not.toHaveBeenCalled();expect(api.requestResearchWithdrawal).not.toHaveBeenCalled()
  expect(sessionStorage.getItem('anonymous-study:identity:s')).toBe('credential')
+})
+
+it('recovers a Training code through the scoped exchange, never treats a short code as a bearer',async()=>{
+ api.participationInfo.mockResolvedValue({studyId:'s',studyTitle:'Research',mode:'SELF_CODE',label:'编号',instructions:''})
+ api.recoverCode.mockResolvedValue({studyId:'s',credential:'a'.repeat(43),displayCode:'P-DISPLAY'})
+ show('/public/studies/s')
+ fireEvent.change(await screen.findByLabelText('完整研究编码'),{target:{value:'HT2-ABCDE-ABCDE-ABCDE-ABCDE'}})
+ fireEvent.click(screen.getByRole('button',{name:'继续参加'}))
+ await waitFor(()=>expect(api.recoverCode).toHaveBeenCalledWith('s','HT2-ABCDE-ABCDE-ABCDE-ABCDE'))
+ expect(await screen.findByRole('button',{name:'查看本次个人报告'})).toBeInTheDocument()
+ expect(sessionStorage.getItem('anonymous-study:identity:s')).toBe('a'.repeat(43))
+})
+it('claims a short code only after explicit linkage acknowledgement and private suffix confirmation',async()=>{
+ api.info.mockResolvedValue({studyId:'s',studyTitle:'Research',title:'One',accepting:true,mode:'MEMORABLE_CODE',label:'分配编号',instructions:''})
+ api.join.mockResolvedValue({studyId:'s',credential:'a'.repeat(43),displayCode:'P-DISPLAY',fullCode:'001-ABCD'})
+ show();await screen.findByText('One')
+ expect(screen.getByRole('button',{name:'确认研究编码'})).toBeDisabled()
+ fireEvent.click(screen.getByRole('checkbox'))
+ fireEvent.change(screen.getByLabelText('分配编号'),{target:{value:'001'}})
+ fireEvent.change(screen.getByLabelText('自己设置的后缀'),{target:{value:'abcd'}})
+ fireEvent.change(screen.getByLabelText('再次确认后缀'),{target:{value:'abcd'}})
+ fireEvent.click(screen.getByRole('button',{name:'确认研究编码'}))
+ expect(await screen.findByText('001-ABCD')).toBeInTheDocument()
+ expect(api.join).toHaveBeenCalledWith('w','token',{prefix:'001',suffix:'ABCD'})
+ expect(api.start).not.toHaveBeenCalled()
+})
+
+it('clears the generated full code and recovery form after leaving the participant session',async()=>{
+ const fullCode='HT2-ABCDE-ABCDE-ABCDE-ABCDE'
+ api.info.mockResolvedValue({studyId:'s',studyTitle:'Research',title:'One',accepting:true,mode:'SELF_CODE',label:'编号',instructions:''})
+ api.participationInfo.mockResolvedValue({studyId:'s',studyTitle:'Research',mode:'SELF_CODE',label:'编号',instructions:''})
+ api.join.mockResolvedValue({studyId:'s',credential:'a'.repeat(43),displayCode:'P-DISPLAY',fullCode})
+ show();await screen.findByText('One')
+ fireEvent.click(screen.getByRole('checkbox'))
+ fireEvent.click(screen.getByRole('button',{name:'领取随机恢复编码'}))
+ expect(await screen.findByText(fullCode)).toBeInTheDocument()
+ fireEvent.click(screen.getByRole('button',{name:'我已保存，进入答题'}))
+ fireEvent.click(await screen.findByRole('button',{name:'退出并清除本机凭证'}))
+ expect(await screen.findByLabelText('完整研究编码')).toHaveValue('')
+ expect(screen.queryByText(fullCode)).not.toBeInTheDocument()
+ expect(screen.queryByText('P-DISPLAY')).not.toBeInTheDocument()
+ expect(screen.queryByRole('button',{name:'我已保存，进入答题'})).not.toBeInTheDocument()
+ expect(sessionStorage.getItem('anonymous-study:identity:s')).toBeNull()
+ expect(api.recoverCode).not.toHaveBeenCalled()
+})
+
+it('presents restore before new enrollment and makes saving a separate anonymous step',async()=>{
+ api.info.mockResolvedValue({studyId:'s',studyTitle:'Research',title:'One',accepting:true,mode:'SELF_CODE',label:'编号',instructions:''})
+ api.join.mockResolvedValue({studyId:'s',credential:'a'.repeat(43),displayCode:'P-DISPLAY',fullCode:'HT2-ABCDE-ABCDE-ABCDE-ABCDE'})
+ show();await screen.findByText('One')
+ const recovery=screen.getByRole('region',{name:'恢复已有参与记录'}),enrollment=screen.getByRole('region',{name:'首次领取参与身份'})
+ expect(recovery.compareDocumentPosition(enrollment)&Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+ expect(within(screen.getByRole('navigation',{name:'匿名参与步骤'})).getByText('1. 进入或领取')).toHaveAttribute('aria-current','step')
+ expect(screen.getByRole('region',{name:'单次访客参与'})).toHaveTextContent('不会建立跨波次身份')
+ fireEvent.click(within(enrollment).getByRole('checkbox'));fireEvent.click(within(enrollment).getByRole('button',{name:'领取随机恢复编码'}))
+ expect(await screen.findByRole('region',{name:'保存本人的参与凭据'})).toHaveTextContent('不代表已经提交作答或同意研究')
+ expect(screen.getByText('2. 保存参与凭据')).toHaveAttribute('aria-current','step')
+ expect(api.start).not.toHaveBeenCalled();expect(api.acceptResearchConsent).not.toHaveBeenCalled()
+})
+it('retries an unavailable entry without discarding the saved credential or claiming another identity',async()=>{
+ sessionStorage.setItem('anonymous-study:identity:s','saved-proof')
+ api.info.mockRejectedValueOnce(new Error('offline'))
+ show();fireEvent.click(await screen.findByRole('button',{name:'重新载入入口'}))
+ expect(await screen.findByRole('button',{name:'查看本次个人报告'})).toBeInTheDocument()
+ expect(sessionStorage.getItem('anonymous-study:identity:s')).toBe('saved-proof')
+ expect(api.info).toHaveBeenCalledTimes(2);expect(api.join).not.toHaveBeenCalled()
+ expect(screen.getByText('3. 任务与历史')).toHaveAttribute('aria-current','step')
+})
+it('distinguishes completed answers from report release while preserving resume and report actions',async()=>{
+ sessionStorage.setItem('anonymous-study:identity:s','saved-proof')
+ api.home.mockResolvedValue({...home,waves:[...home.waves,{id:'w2',title:'Two',ordinal:2,attemptId:'ongoing',state:'IN_PROGRESS',completedAt:null,accepting:false}]})
+ show('/public/studies/s')
+ const history=await screen.findByRole('region',{name:'任务与历史个人报告'})
+ expect(history).toHaveTextContent('报告仍按本测评的生成状态与开放权限显示')
+ expect(within(history).getByRole('button',{name:'查看本次个人报告'})).toBeEnabled()
+ expect(within(history).getByRole('button',{name:'继续作答'})).toBeEnabled()
+ expect(api.recover).not.toHaveBeenCalled();expect(api.start).not.toHaveBeenCalled()
+})
+
+it('retries task refresh with the same saved capability after a transient failure without enrolling again',async()=>{
+ sessionStorage.setItem('anonymous-study:identity:s','same-saved-proof')
+ show('/public/studies/s');await screen.findByRole('button',{name:'刷新任务与历史'})
+ api.home.mockRejectedValueOnce(new Error('temporary task failure'))
+ fireEvent.click(screen.getByRole('button',{name:'刷新任务与历史'}))
+ const retry=await screen.findByRole('button',{name:'重新读取我的任务'})
+ expect(screen.queryByRole('region',{name:'首次领取参与身份'})).not.toBeInTheDocument()
+ fireEvent.click(retry)
+ expect(await screen.findByRole('button',{name:'查看本次个人报告'})).toBeInTheDocument()
+ expect(sessionStorage.getItem('anonymous-study:identity:s')).toBe('same-saved-proof')
+ expect(api.home).toHaveBeenCalledTimes(3)
+ expect(api.home.mock.calls).toEqual([['s'],['s'],['s']])
+ expect(api.capability.mock.calls.filter(([proof])=>proof!==undefined).every(([proof])=>proof==='same-saved-proof')).toBe(true)
+ expect(api.capability).toHaveBeenCalledWith('same-saved-proof')
+ expect(api.join).not.toHaveBeenCalled();expect(api.recoverCode).not.toHaveBeenCalled()
+})
+
+it('keeps self-held memorable recovery and the authorized Training reset entry available',async()=>{
+ api.info.mockResolvedValue({studyId:'s',studyTitle:'Research',title:'One',accepting:true,mode:'MEMORABLE_CODE'})
+ api.recoverCode.mockResolvedValue({studyId:'s',credential:'recovered-proof',displayCode:'P-DISPLAY'})
+ show();await screen.findByLabelText('完整研究编码')
+ expect(screen.getByRole('button',{name:'研究者已为我重置编码'})).toBeEnabled()
+ fireEvent.change(screen.getByLabelText('完整研究编码'),{target:{value:'001-SECRET'}})
+ fireEvent.click(screen.getByRole('button',{name:'继续参加'}))
+ await screen.findByRole('button',{name:'查看本次个人报告'})
+ expect(api.recoverCode).toHaveBeenCalledWith('s','001-SECRET')
+ expect(api.resetCode).not.toHaveBeenCalled()
+})
+
+it('preserves the saved recovery intent when the first home read fails without offering a new identity',async()=>{
+ sessionStorage.setItem('anonymous-study:identity:s','original-proof')
+ api.home.mockRejectedValueOnce(new Error('first home temporarily unavailable'))
+ show()
+ const retry=await screen.findByRole('button',{name:'重新读取我的任务'})
+ expect(screen.queryByRole('region',{name:'首次领取参与身份'})).not.toBeInTheDocument()
+ expect(screen.queryByRole('button',{name:'查看本次个人报告'})).not.toBeInTheDocument()
+ expect(sessionStorage.getItem('anonymous-study:identity:s')).toBe('original-proof')
+ fireEvent.click(retry)
+ expect(await screen.findByRole('button',{name:'查看本次个人报告'})).toBeInTheDocument()
+ expect(api.capability.mock.calls.filter(([proof])=>proof!==undefined).every(([proof])=>proof==='original-proof')).toBe(true)
+ expect(api.join).not.toHaveBeenCalled()
+})
+
+it('explicitly clears a failed fragment recovery locally without revoking or enrolling',async()=>{
+ api.home.mockRejectedValue(new Error('expired proof'))
+ sessionStorage.setItem('anonymous-study:identity:s','old-local-proof')
+ sessionStorage.setItem('composite:study:return:old-attempt','/public/studies/s')
+ sessionStorage.setItem('composite:recovery:attempt:old-attempt','old-child-proof')
+ sessionStorage.setItem('composite:study:return:other-attempt','/public/studies/other')
+ sessionStorage.setItem('composite:recovery:attempt:other-attempt','other-child-proof')
+ const fragmentProof='f'.repeat(43)
+ show(`/public/studies/s#resume=training-study&key=${fragmentProof}`)
+ const clear=await screen.findByRole('button',{name:'清除本机凭据并重新输入'})
+ expect(api.capability).toHaveBeenCalledWith(fragmentProof)
+ expect(api.capability).not.toHaveBeenCalledWith('old-local-proof')
+ fireEvent.click(clear)
+ expect(await screen.findByRole('button',{name:'用身份码进入'})).toBeDisabled()
+ expect(sessionStorage.getItem('anonymous-study:identity:s')).toBeNull()
+ expect(screen.queryByRole('button',{name:'重新读取我的任务'})).not.toBeInTheDocument()
+ expect(api.home).toHaveBeenCalledTimes(1)
+ expect(sessionStorage.getItem('composite:recovery:attempt:old-attempt')).toBeNull()
+ expect(sessionStorage.getItem('composite:study:return:old-attempt')).toBeNull()
+ expect(sessionStorage.getItem('composite:recovery:attempt:other-attempt')).toBe('other-child-proof')
+ expect(sessionStorage.getItem('composite:study:return:other-attempt')).toBe('/public/studies/other')
+ expect(api.revoke).not.toHaveBeenCalled();expect(api.join).not.toHaveBeenCalled()
 })
