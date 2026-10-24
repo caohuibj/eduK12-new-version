@@ -79,3 +79,33 @@ Local browser execution remains unavailable. Visual runtime acceptance, native
 module-download retry behavior and actual page/CPU/memory/DB latency are not claimed.
 No CI qualification, PR merge, production deployment or new public-tool publication
 is represented by these development checks.
+
+## Second local optimization round (CI paused)
+
+- FINAL and detailed-feedback queries now select only consumed fields, excluding
+  unused attempt ciphertexts and Wave draft JSON. All current authorization,
+  consent, publication integrity and locking checks remain. A selected snapshot
+  is reused only inside the same FINAL transaction; scoring still uses the frozen
+  union. Focused spies observe one selected projection for a first submission and
+  none for receipt replay. This is not a database-byte or capacity benchmark.
+- Retrying an already sealed FINAL envelope no longer sanitizes answers or seals
+  timing again. The original request identity/body and attempt guard remain.
+  Completed-attempt recovery avoids duplicate scoped cleanup, unused submission
+  UUID creation and runnable-task initialization, while explicitly clearing old
+  answer/timing/cognitive/navigation state. Draft parsing was already absent in
+  this completed path and is not counted as a new saving.
+- The researcher catalog joins only pending reads for the same project, API and
+  page. Project-bound rendering and generation checks prevent old grants, results,
+  errors and loading completions leaking into the new project view. Settled refresh
+  and failed retries remain fresh requests. The measured two-to-one startup read
+  reduction applies to development StrictMode setup replay, not production latency.
+
+Validation was local and targeted: 66 affected backend contracts plus two new
+variant cases; researcher catalog 13 cases with six affected cases rechecked after
+a cleanup correction; respondent 19 targeted regressions, a new sealed-retry case
+and four final terminal-state cases. Raw commands, real exits, source hashes and
+case reports are retained outside the repository, including initial fixture
+failures. Independent static review found and resolved the terminal-state reset
+omission. No new build, browser, PostgreSQL run or CI was executed in this round.
+The earlier bundle figures describe the earlier built candidate, not this new
+source snapshot. Alignment with the eventual Training/main merge is still pending.
