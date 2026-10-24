@@ -756,3 +756,47 @@ describe('shared staged branch runner across hosts',()=>{
     if(host==='survey')await waitFor(()=>expect(onCompleted).toHaveBeenCalledTimes(1))
   })
 })
+
+// Native V1 is the same renderer, without manufactured staged capture.
+describe('shared V1 text runner across hosts',()=>{
+  it.each(['training','survey'] as const)('%s host submits V1 answers without inventing stage events',async host=>{
+    vi.resetAllMocks()
+    await finalDraftStore.delete('situational:ui-attempt')
+    const source=startData(),reply={code:0,message:'ok',data:source}
+    const submit=vi.fn().mockResolvedValue({code:0,message:'ok',data:completedData(source)})
+    const onCompleted=vi.fn()
+    if(host==='survey'){
+      const client={start:vi.fn().mockResolvedValue(reply),resume:vi.fn().mockResolvedValue(reply),
+        submit,result:vi.fn().mockResolvedValue(reply),loadAsset:vi.fn(),loadVideoSources:vi.fn()}
+      render(<MemoryRouter><SituationalRunner host={{attemptId:'ui-attempt',parentAttemptId:'survey-parent',compositeItemId:'v1',client,onCompleted}}/></MemoryRouter>)
+    }else{
+      training.enabled=true
+      vi.mocked(situationalApi.start).mockResolvedValue(reply)
+      vi.mocked(situationalApi.submit).mockImplementation(submit)
+      renderRunner()
+    }
+    await screen.findByText('第一段文字情境')
+    expect(screen.queryByRole('button',{name:'确认行动选择'})).toBeNull()
+    fireEvent.click(screen.getByLabelText('选择 A'))
+    await waitFor(()=>expect(screen.getByRole('slider')).not.toBeDisabled())
+    fireEvent.change(screen.getByRole('slider'),{target:{value:'80'}})
+    const next=screen.getByRole('button',{name:host==='training'?/确认本页/:/下一题/})
+    await waitFor(()=>expect(next).toBeEnabled());fireEvent.click(next)
+    await screen.findByText('第二段文字情境')
+    fireEvent.click(screen.getByLabelText('第二个 A'))
+    await waitFor(()=>expect(screen.getByRole('button',{name:'提交测评'})).toBeEnabled())
+    expect(submit).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByRole('button',{name:'提交测评'}))
+    await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1))
+    const payload=submit.mock.calls[0]![1]
+    expect(payload.responses.map(({sceneKey,channelKey,responseValue}:{sceneKey:string;channelKey:string;responseValue:unknown})=>({sceneKey,channelKey,responseValue}))).toEqual([
+      {sceneKey:'S1',channelKey:'choice',responseValue:'A'},
+      {sceneKey:'S1',channelKey:'continuous',responseValue:80},
+      {sceneKey:'S2',channelKey:'choice',responseValue:'A'},
+    ])
+    expect(payload.responses.every((response:{answeredAt:unknown;responseTimeMs:unknown})=>typeof response.answeredAt==='string'&&typeof response.responseTimeMs==='number')).toBe(true)
+    expect(payload.researchCapture).toBeUndefined()
+    expect(payload).toMatchObject({attemptEpoch:1,definitionHash:'a'.repeat(64)})
+    if(host==='survey')await waitFor(()=>expect(onCompleted).toHaveBeenCalledTimes(1))
+  })
+})

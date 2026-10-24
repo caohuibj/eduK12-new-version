@@ -1,6 +1,6 @@
 import { z } from 'zod'
 import { situationalLegacyFinalSubmitSchema } from '../situational/situational-final-submit.schema'
-import { hasSurveyStagedSituationalNotice } from './measurement.notice'
+import { hasSurveyStagedSituationalNotice,hasSurveyLinearSituationalNotice } from './measurement.notice'
 import { randomUUID } from 'node:crypto'
 import type { Prisma } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -16,7 +16,7 @@ import { prepareSituationalFinalSubmission,deriveSituationalFinalFacts,commitPre
 import { verifiedSurveyAttempt } from './admission.service'
 import { decodeSurveyAttemptContentBinding } from './content-binding.service'
 import { lockSurveyTaskAccess,type SurveyTaskProof,type VerifiedSurveyTask } from './task-authority'
-import { frozenSurveyNativeSituationalRuntime } from './situational-native.definition'
+import { frozenSurveyNativeSituationalRuntime,surveyNativeSituationalRequiresStageNotice } from './situational-native.definition'
 import { SURVEY_NATIVE_SJT_PROTOCOL } from './situational-native.contract'
 
 export class SurveySituationalError extends Error {
@@ -29,7 +29,6 @@ async function access(tx:Tx,proof:SurveyTaskProof,known:VerifiedSurveyTask,slotK
     {kind:'SITUATIONAL',allowCompleted,fail})
   // Parent conditional reachability/experimental allocation is a separate
   // protocol. Do not mistake a staged tool's native flow for parent Survey flow.
-  if(!hasSurveyStagedSituationalNotice(publication.measurementNotice))fail(409,'冻结研究缺少分阶段情境化作答记录说明')
   if(publication.flow)fail(409,'当前原生情境化试点尚不支持研究级条件流程')
   const unit=publication.units.find(unit=>unit.kind==='SJT'&&unit.instrumentKey===slotKey)
   if(!unit)fail(404,'当前冻结研究中没有这个情境化工具')
@@ -39,6 +38,9 @@ async function access(tx:Tx,proof:SurveyTaskProof,known:VerifiedSurveyTask,slotK
     contentBindingHash:attempt.contentBindingHash})
   if(!binding)fail(409,'原生情境化工具需要服务器已冻结的研究内容绑定')
   const runtime=frozenSurveyNativeSituationalRuntime(unit!)
+  const staged=surveyNativeSituationalRequiresStageNotice(runtime.snapshot.definition)
+  if(staged?!hasSurveyStagedSituationalNotice(publication.measurementNotice):!hasSurveyLinearSituationalNotice(publication.measurementNotice))
+    fail(409,'冻结研究缺少该情境化工具实际作答记录说明')
   return {attempt,unit:unit!,...runtime}
 }
 function assertChild(row:SituationalAttemptRow|SituationalAttemptCommitRow,known:VerifiedSurveyTask,

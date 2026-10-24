@@ -109,7 +109,7 @@ export function adaptCatalogSjt(ref:CatalogSourceRef,title:string,pkg:SituationP
   if(pkg.releaseStatus!=='PUBLISHED')fail('SOURCE_NOT_PUBLISHED')
   const validation=validateSituationPackage(pkg)
   if(!validation.valid)fail('SOURCE_SJT_INVALID')
-  if(pkg.definition.schemaVersion!==2)fail('SOURCE_SJT_V1_REQUIRES_SEPARATE_RUNTIME_ADAPTER')
+  if(pkg.definition.schemaVersion===1)return adaptNativeCatalogSjt(ref,title,pkg,validation.definitionHash)
   const d=pkg.definition as SituationDefinitionV2
   if(d.researchAssignment)fail('SOURCE_SJT_RESEARCH_CAPTURE_UNSUPPORTED')
   const model=d.scoring.model
@@ -126,16 +126,22 @@ export function adaptCatalogSjt(ref:CatalogSourceRef,title:string,pkg:SituationP
   if(d.flow.nodes.some(node=>node.nodeType==='SCENE'&&node.responseStages?.length)){
     // Native staged tools retain their exact scientific protocol; this descriptor
     // cannot be submitted through the historical static Survey answer parser.
-    let nativeSituational:SurveyNativeSituationalHeader
-    try{nativeSituational=compileSurveyNativeSituationalHeader(pkg)}
-    catch(error){if(error instanceof SurveySituationalProtocolError)fail(error.code);throw error}
-    return copy({ref,title,compiledDefinition:d,
-      displayDefinition:{schemaVersion:1,executionProtocol:SURVEY_NATIVE_SJT_PROTOCOL,title},
-      definitionDigest:canonicalHash(d),scoringDigest:canonicalHash(d.scoring),
-      adapterVersion:NATIVE_SJT_ADAPTER_VERSION,nativeSituational,
-      provenance:{source:d.source,license:d.license,definitionHash:validation.definitionHash}})
+    return adaptNativeCatalogSjt(ref,title,pkg,validation.definitionHash)
   }
   return adaptLegacyCatalogSjt(ref,title,d,validation.definitionHash)
+}
+
+/** One descriptor for every explicitly qualified shared native definition. */
+function adaptNativeCatalogSjt(ref:CatalogSourceRef,title:string,pkg:SituationPackage,definitionHash:string):CatalogSourceSnapshot{
+  let nativeSituational:SurveyNativeSituationalHeader
+  try{nativeSituational=compileSurveyNativeSituationalHeader(pkg)}
+  catch(error){if(error instanceof SurveySituationalProtocolError)fail(error.code);throw error}
+  const d=pkg.definition
+  return copy({ref,title,compiledDefinition:d,
+    displayDefinition:{schemaVersion:1,executionProtocol:SURVEY_NATIVE_SJT_PROTOCOL,title},
+    definitionDigest:canonicalHash(d),scoringDigest:canonicalHash(d.scoring),
+    adapterVersion:NATIVE_SJT_ADAPTER_VERSION,nativeSituational,
+    provenance:{source:d.source,license:d.license,definitionHash}})
 }
 
 /** Historical grants are checked using their original projection, not upgraded. */

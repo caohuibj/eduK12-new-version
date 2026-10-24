@@ -26,9 +26,14 @@ export const frozenSurveyNativeSituationalHeaderSchema=surveyNativeSituationalHe
 export type FrozenSurveyNativeSituationalHeader=z.infer<typeof frozenSurveyNativeSituationalHeaderSchema>
 const fail=():never=>{throw new SurveySituationalProtocolError('SURVEY_SJT_NATIVE_STAGED_PROTOCOL_INVALID')}
 
-/** Initial native vertical slice: actual upload V2 staged, shared DAG traversal, no
- * experiment allocation or stimulus variants. Unsupported science stays closed. */
-export function assertSurveyStagedSituationalDefinition(definition:SituationRuntimeDefinition):void {
+/** Shared native V1 fixed-linear TEXT and V2 staged TEXT DAG only.
+ * Experiment allocation, variants and media remain separately qualified. */
+export function assertSurveyNativeSituationalDefinition(definition:SituationRuntimeDefinition):void {
+  if(definition.scenes.some(scene=>scene.stimulus.type!=='TEXT_V1'))fail()
+  if(definition.schemaVersion===1){
+    if(definition.sampling.strategy!=='ALL'||'researchAssignment' in definition||'flow' in definition)fail()
+    return
+  }
   if(definition.schemaVersion!==2||definition.researchAssignment)fail()
   const d=definition as Extract<SituationRuntimeDefinition,{schemaVersion:2}>
   let staged=false
@@ -37,11 +42,16 @@ export function assertSurveyStagedSituationalDefinition(definition:SituationRunt
     if(node.stimulusVariants?.length)fail()
     if(node.responseStages?.length)staged=true
   }
-  if(!staged||d.scenes.some(scene=>scene.stimulus.type!=='TEXT_V1'))fail()
+  if(!staged)fail()
+}
+/** Disclosure follows actual frozen collection semantics, not the host label. */
+export function surveyNativeSituationalRequiresStageNotice(definition:SituationRuntimeDefinition):boolean{
+  assertSurveyNativeSituationalDefinition(definition)
+  return definition.schemaVersion===2
 }
 export function compileSurveyNativeSituationalHeader(pkg:SituationPackage):SurveyNativeSituationalHeader{
   if(pkg.online||pkg.releaseStatus!=='PUBLISHED'||!validateSituationPackage(pkg).valid)fail()
-  assertSurveyStagedSituationalDefinition(pkg.definition)
+  assertSurveyNativeSituationalDefinition(pkg.definition)
   const scientificContext=resolveSituationalScientificContext(pkg)
   if(!scientificContext)fail()
   const snapshot=freezeSituationalRuntimeAtAttemptStart({instrumentKey:pkg.key,
@@ -56,7 +66,7 @@ export function frozenSurveyNativeSituationalRuntime(unit:{kind:string;execution
   if(unit.kind!=='SJT'||unit.executionProtocol!==SURVEY_NATIVE_SJT_PROTOCOL)fail()
   const header=frozenSurveyNativeSituationalHeaderSchema.parse(unit.nativeSituational)
   const definition=unit.compiledDefinition as SituationRuntimeDefinition
-  assertSurveyStagedSituationalDefinition(definition)
+  assertSurveyNativeSituationalDefinition(definition)
   const unsigned={schemaVersion:1 as const,runtimeGeneration:'UNIFIED_V1' as const,
     frozenAt:header.frozenAt,instrumentKey:header.instrumentKey,instrumentVersion:header.instrumentVersion,
     definitionHash:header.definitionHash,compiledRuntimeHash:header.compiledRuntimeHash,

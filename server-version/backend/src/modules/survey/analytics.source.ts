@@ -22,7 +22,7 @@ import {loadSurveyCognitiveResults,loadSurveyCognitiveResultGroups,SurveyCogniti
 import {cognitiveMeasurementColumns,prepareCognitiveProjection,pageCognitiveTrialRows,
   type CognitiveTrialObservation} from './analytics.cognitive'
 import type { ScaleDefinitionV2 } from '../scale/scale-definition'
-import type { SituationDefinitionV2 } from '../situational/situation-branching'
+import type { SituationRuntimeDefinition } from '../situational/situation-runtime-definition'
 import { SurveyAnalyticsError } from './analytics.read'
 import { isResearchFreeTextType } from './analytics.response-privacy'
 import {validateSurveyScaleTimings,SurveyScaleTimingError,
@@ -262,7 +262,7 @@ const scoresFrom=(frozen:ResearchFrozenUnit,unit:FrozenUnitResult,meta:{
       respondentType:frozen.kind==='SCALE'
         ?(frozen.displayDefinition as ScaleDraft).respondentType
         :frozen.kind==='SJT'
-          ?(frozen.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL?(frozen.compiledDefinition as SituationDefinitionV2).respondentType:(frozen.displayDefinition as AnySjtDraft).respondentType):'research_form',
+          ?(frozen.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL?(frozen.compiledDefinition as SituationRuntimeDefinition).respondentType:(frozen.displayDefinition as AnySjtDraft).respondentType):'research_form',
       unit:provenance?'score':null,
       ...(provenance?{provenance}:{}),
     },
@@ -283,10 +283,10 @@ function sjtProvenance(frozen:ResearchFrozenUnit){
   if(frozen.kind!=='SJT')return undefined
   const draft=frozen.displayDefinition as AnySjtDraft
   if(draft.schemaVersion!==2&&frozen.executionProtocol!==SURVEY_NATIVE_SJT_PROTOCOL)return undefined
-  const compiled=frozen.compiledDefinition as SituationDefinitionV2
+  const compiled=frozen.compiledDefinition as SituationRuntimeDefinition
   return {kind:'SJT' as const,measurementDigest:canonicalHash({sourceDigest:frozen.sourceDigest,
     scoringDigest:frozen.scoringDigest}),scoringVersion:compiled.scoring.scoringVersion,
-    scoringMethod:frozen.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL?compiled.scoring.model!.modelKey:(draft as Extract<AnySjtDraft,{schemaVersion:2}>).scoring.modelKey}
+    scoringMethod:frozen.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL?(compiled.scoring.model?.modelKey??frozen.nativeSituational?.scorerKey??invalid('原生情境化工具缺少冻结计分身份')):(draft as Extract<AnySjtDraft,{schemaVersion:2}>).scoring.modelKey}
 }
 /** The authoritative score variable list is part of the frozen scorer, not
  * inferred from whichever participants happened to finish a Wave.
@@ -299,7 +299,7 @@ function frozenScoreColumns(projectId:string,waveId:string,ordinal:number,frozen
   const keys=frozen.kind==='SCALE'
     ?(frozen.compiledDefinition as ScaleDefinitionV2).scoring.scores.map(score=>score.key)
     :frozen.kind==='SJT'
-      ?(frozen.compiledDefinition as SituationDefinitionV2).scoring.publishedMetrics.map(metric=>metric.key)
+      ?(frozen.compiledDefinition as SituationRuntimeDefinition).scoring.publishedMetrics.map(metric=>metric.key)
       :[]
   return keys.map(scoreKey=>({
     projectId,waveId,waveOrdinal:ordinal,
@@ -308,7 +308,7 @@ function frozenScoreColumns(projectId:string,waveId:string,ordinal:number,frozen
       responseSignature:frozen.sourceDigest,
       respondentType:frozen.kind==='SCALE'
         ?(frozen.displayDefinition as ScaleDraft).respondentType
-        :(frozen.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL?(frozen.compiledDefinition as SituationDefinitionV2).respondentType:(frozen.displayDefinition as AnySjtDraft).respondentType),
+        :(frozen.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL?(frozen.compiledDefinition as SituationRuntimeDefinition).respondentType:(frozen.displayDefinition as AnySjtDraft).respondentType),
       unit:provenance?'score':null,
       ...(provenance?{provenance}:{}),
     },

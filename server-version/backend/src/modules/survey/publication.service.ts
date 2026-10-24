@@ -1,5 +1,6 @@
 import { SURVEY_NATIVE_SJT_PROTOCOL } from './situational-native.contract'
-import type { FrozenSurveyNativeSituationalHeader,SurveyNativeSituationalHeader } from './situational-native.definition'
+import type {SituationRuntimeDefinition} from '../situational/situation-runtime-definition'
+import {surveyNativeSituationalRequiresStageNotice,type FrozenSurveyNativeSituationalHeader,type SurveyNativeSituationalHeader } from './situational-native.definition'
 import {freezeSurveyParticipantFeedback,type SurveyRawFeedback,type SurveyParticipantFeedbackSelection} from './participant-feedback'
 import {freezeSurveyContentSelections,type SurveyContentSelection,type FrozenSurveyContentSelection} from './content-selection'
 import {ContentReleaseError} from '../measurement-content/release'
@@ -309,7 +310,10 @@ export async function freezeResearchWaveDraft(input:{
     // Reject an unusable schedule before the immutable publication is persisted.
     resolveGroupIpOpenWindow(groupIpPolicy,wave,frozenAt)
     const measurementNotice=freezeSurveyMeasurementNotice({cognitive:units.some(unit=>unit.kind==='COGNITIVE'),
-      stagedSituational:units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)})
+      stagedSituational:units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL
+        &&surveyNativeSituationalRequiresStageNotice(unit.compiledDefinition as SituationRuntimeDefinition)),
+      linearSituational:units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL
+        &&!surveyNativeSituationalRequiresStageNotice(unit.compiledDefinition as SituationRuntimeDefinition))})
     const snapshot:ResearchFrozenPublication={
       schemaVersion:1,purpose:'RESEARCH_ONLY',projectId:input.projectId,
       waveId:input.waveId,collectionMode:project.collectionMode as ResearchFrozenPublication['collectionMode'],

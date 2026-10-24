@@ -1,6 +1,6 @@
 import { SJT_COURSE_GRANT_POLICY } from '../situational/authoring/grant-contract'
 import { recheckSjtEntryDistributionAuthority, SjtEntryAuthorityError } from '../situational/entry-authority'
-import { assertSurveyStagedSituationalDefinition } from './situational-native.definition'
+import { assertSurveyNativeSituationalDefinition } from './situational-native.definition'
 import type { SituationRuntimeDefinition } from '../situational/situation-runtime-definition'
 import { Prisma } from '@prisma/client'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -20,8 +20,8 @@ export async function authorizedCatalogSjtMedia(tx: Prisma.TransactionClient, us
   const source = unit.sourceProvenance.source as CatalogSourceRef | undefined
   if (!source || source.kind !== 'SJT' || typeof source.sourceId !== 'string' || typeof source.sourceVersion !== 'string') return fail()
   if(unit.sourceProvenance.adapterVersion===NATIVE_SJT_ADAPTER_VERSION){
-    // This protocol admits text-only staged definitions; it never transfers an asset.
-    assertSurveyStagedSituationalDefinition(unit.compiledDefinition as SituationRuntimeDefinition)
+    // This protocol admits only its qualified text-only definitions; it never transfers an asset.
+    assertSurveyNativeSituationalDefinition(unit.compiledDefinition as SituationRuntimeDefinition)
     return []
   }
   let images: ReturnType<typeof sjtAuthorImages>
