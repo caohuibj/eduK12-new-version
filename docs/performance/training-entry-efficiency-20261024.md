@@ -285,3 +285,31 @@ as a fresh runtime test. No new build, full typecheck, browser or CI was run.
 These additions are backup-only pending PR #347 integration and final input
 qualification. Prior fixed CI bindings do not qualify this expanded source delta;
 the earlier performance/build figures remain tied to their original candidates.
+
+## Integration of PR #347 and subsequent bounded changes
+
+Official main `4d95a5b11c3b2261c96d7161eea66ebf8d6f0626` was integrated locally
+without replacing existing optimization history. The backend merge changes only
+PR #347's five intended paths; prior registration, assignment/check-in, checkpoint,
+FINAL and export optimizations remain intact. Twenty-five of twenty-seven earlier
+frontend optimization paths retain identical blobs; the shared shell and its test
+were reconciled to preserve both new management UI and existing lazy frames.
+
+New Training management code is now loaded behind the unchanged entry grant/path
+check rather than on every public visit. Startup management CSS remains eager to
+preserve pending-auth/loading appearance. Resource catalog filtering is memoized
+by rows and applied query, so draft typing does not scan the same rows repeatedly.
+Eleven focused frontend cases and changed-file lint passed.
+
+Course completion reads a filtered ACTIVE enrollment count rather than materializing
+all student IDs. Roster retrieval selects only fields used in the complete existing
+response; ownership/admin checks, status/order and credential-protection batching
+are unchanged. Seven new query/response contracts passed. These results establish
+query shape and render-call savings, not measured PostgreSQL latency or capacity.
+
+The global 587-byte startup stylesheet was assessed but left unchanged: conditional
+loading could flash the wrong theme; inlining trades one request for larger HTML
+and needs its own browser verification. New intentional vector lettering is not
+compressed by changing its appearance. Prior bundle measurements are historical,
+not measurements of this merged candidate. Exact CI bindings remain stale until
+explicitly frozen again. No GitHub CI, PR merge or deployment was initiated.
