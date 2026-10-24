@@ -3438,7 +3438,28 @@ export const restartPublicAttempt = async (attemptId: string, recoveryTokenHash:
   return { attempt: await getAttemptState(next.id, { recoveryTokenHash: credential.hash }), recoveryToken: credential.token }
 }
 
-const loadAttemptWithChildren = async (attemptId: string) => {
+// Participant reports consume committed results, not mutable answers or live scale
+// definitions. Keep the parent and definition envelopes complete: authorization,
+// feedback release, variants/flows and historical package reports use those fields.
+const reportScaleChildSelect = {
+  id: true, scaleId: true, compositeItemId: true, result: true, completedAt: true, totalTime: true,
+  submissionId: true, submissionPayloadHash: true,
+  attemptEpoch: true, compiledRuntimeHash: true, runtimeSnapshotEncrypted: true,
+  scale: { select: { code: true, instrumentVersion: true, instrumentClass: true,
+    libraryEntryId: true, measurementReleaseId: true } },
+} as const
+const reportCognitiveChildSelect = {
+  id: true, compositeItemId: true, attemptNo: true, testType: true, finishedAt: true,
+  resultSnapshotEncrypted: true, configSnapshotEncrypted: true,
+  scoreEncrypted: true, metricsEncrypted: true, qualityFlagsEncrypted: true,
+  engineVersion: true, scoringVersion: true, configVersion: true,
+} as const
+const reportSituationalChildSelect = {
+  compositeItemId: true, canonicalResultEncrypted: true, runtimeSnapshotEncrypted: true,
+  instrumentKey: true, instrumentVersion: true, completedAt: true, totalTime: true,
+} as const
+
+const loadAttemptWithChildren = async (attemptId: string, reportOnly = false) => {
   const attempt = await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
     include: {
@@ -3456,7 +3477,7 @@ const loadAttemptWithChildren = async (attemptId: string) => {
                   status: true,
                   instrumentClass: true,
                   instrumentVersion: true,
-                  definition: true,
+                  ...(reportOnly ? {} : { definition: true }),
                 },
               },
               cognitiveAssignment: { include: { config: true } },
@@ -3468,8 +3489,8 @@ const loadAttemptWithChildren = async (attemptId: string) => {
           },
         },
       },
-      scaleAssessments: { include: { scale: true } },
-      cognitiveSessions: {
+      scaleAssessments: reportOnly ? { select: reportScaleChildSelect } : { include: { scale: true } },
+      cognitiveSessions: reportOnly ? { select: reportCognitiveChildSelect } : {
         include: {
           trials: {
             orderBy: { trialIndex: 'desc' },
@@ -3480,7 +3501,7 @@ const loadAttemptWithChildren = async (attemptId: string) => {
       },
       formAnswers: true,
       formSectionAttempts: true,
-      situationalAttempts: true,
+      situationalAttempts: reportOnly ? { select: reportSituationalChildSelect } : true,
     },
   })
   if (!attempt) throw compositeNotFound('综合测评记录不存在')
@@ -3530,8 +3551,8 @@ const loadAttemptForFinalization = async (tx: Db, attemptId: string) => {
   return applyTrainingAttemptScope(attempt)
 }
 
-const findAttempt = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }, frozenRead = false) => {
-  const attempt = await loadAttemptWithChildren(attemptId)
+const findAttempt = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }, frozenRead = false, reportOnly = false) => {
+  const attempt = await loadAttemptWithChildren(attemptId, reportOnly)
   const authorized = context.userId
     ? attempt.userId === context.userId
     : Boolean(context.recoveryTokenHash && attempt.recoveryTokenHash === context.recoveryTokenHash && !attempt.userId)
@@ -3828,9 +3849,12 @@ const UNIFIED_ATTEMPT_STATE_PARENT_SELECT = {
   },
 } satisfies Prisma.CompositeAssessmentAttemptSelect
 
+export type CompositeAttemptStateView = 'full' | 'current-unit'
+
 const getUnifiedCompositeAttemptState = async (
   attempt: any,
   context: { userId?: string; recoveryTokenHash?: string },
+  view: CompositeAttemptStateView = 'full',
 ) => {
   const attemptId = attempt.id
   const authorized = context.userId
@@ -3898,7 +3922,12 @@ const getUnifiedCompositeAttemptState = async (
   const currentUnit = currentIndex >= 0 ? units[currentIndex] : null
   const packageSlotLabels = getFrozenPackageSlotLabels(attempt.compositeAssessment)
 
-  const formSections = sections.map((section: any) => {
+  // The current-unit runner reads only currentItem plus progress summaries.
+  // Keep the default DTO intact for legacy clients and bulk-section consumers.
+  const deliveredSections = view === 'current-unit'
+    ? sections.filter((section: any) => currentUnit?.type === 'FORM_SECTION' && section.id === currentUnit.id)
+    : sections
+  const formSections = deliveredSections.map((section: any) => {
     const sectionDefinition = compositeFormSectionRuntimeDefinition(section)
     const slot = slotsByKey.get(formSectionSlotKey(section.id))
     const sectionCompleted = completedSlot(formSectionSlotKey(section.id))
@@ -4115,7 +4144,7 @@ const getUnifiedCompositeAttemptState = async (
       index,
       ...(unit.type === 'FORM_SECTION' ? { formSectionId: unit.id } : { itemId: unit.id }),
     })),
-    formSections,
+    ...(view === 'full' ? { formSections } : {}),
     currentItem,
   }
 }
@@ -4553,7 +4582,7 @@ const patchCompositeStateAfterFinalize = (
   }
 }
 
-export const getAttemptState = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }, requestedUnit?: {itemId?:string;sectionId?:string}) => {
+export const getAttemptState = async (attemptId: string, context: { userId?: string; recoveryTokenHash?: string }, requestedUnit?: {itemId?:string;sectionId?:string}, view: CompositeAttemptStateView = 'full') => {
   // Load-once: the parent row is read exactly once with the full unified
   // select and shared by the unified state projection and the
   // ensure*AtDelivery steps. The legacy path (rare, pre-UNIFIED_V1 attempts)
@@ -4574,7 +4603,7 @@ export const getAttemptState = async (attemptId: string, context: { userId?: str
       const scope=await resolveTrainingAttemptScope(runtime)
       if((requestedUnit.itemId&&!scope.itemIds.has(requestedUnit.itemId))||(requestedUnit.sectionId&&!scope.sectionIds.has(requestedUnit.sectionId)))throw compositeForbidden('此内容未分配给当前作答')
     }
-    const state = await getUnifiedCompositeAttemptState(runtime, context)
+    const state = await getUnifiedCompositeAttemptState(runtime, context, view)
     // An authorized reread repairs a completion projection that failed after
     // canonical FINAL committed, without creating or resubmitting an attempt.
     if (state.status === 'COMPLETED' && runtime.assignmentRef) {
@@ -5663,7 +5692,7 @@ export const getReport = async (attemptId: string, context: { userId?: string; r
   if (!assessmentReportConfig().enabled) {
     // Compatible rollback reads keep the existing frozen-result path. The
     // independent status endpoint and worker still recover enrolled jobs.
-    const attempt = await findAttempt(attemptId, context, true)
+    const attempt = await findAttempt(attemptId, context, true, true)
     if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
     await assertParticipantFeedbackAvailable(attempt)
     return projectHttpReport(attempt, 'participant')
@@ -5677,7 +5706,7 @@ export const getReport = async (attemptId: string, context: { userId?: string; r
   await assertParticipantFeedbackAvailable(parent, job)
   const cached = await materializedReportForHeader(parent, 'participant', job)
   if (cached) return cached
-  const attempt = await findAttempt(attemptId, context, true)
+  const attempt = await findAttempt(attemptId, context, true, true)
   if (attempt.status !== 'COMPLETED') throw compositeBadRequest('综合测评尚未完成')
   await assertParticipantFeedbackAvailable(attempt, job)
   return projectHttpReport(attempt, 'participant')

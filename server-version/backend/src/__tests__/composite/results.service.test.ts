@@ -27,6 +27,8 @@ const { mockPrisma } = vi.hoisted(() => ({
 vi.mock('../../config/database', () => ({ prisma: mockPrisma }))
 
 vi.mock('../../modules/composite/composite-course-scope',()=>({assertCompositeCourseScope:vi.fn().mockResolvedValue({id:'course-a',title:'课程 A'})}))
+import { createCanonicalUnitResultEnvelope } from '../../modules/assessment-runtime/unit-result'
+import { encryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
 import { encryptCognitivePayload } from '../../modules/cognitive/cognitive.security'
 import { resolveCognitiveReferenceForResult } from '../../modules/cognitive/reference'
 import { readFrozenReport } from '../../modules/cognitive/profile-freeze'
@@ -846,5 +848,61 @@ describe('legacy composite approved-library report disclosure', () => {
     const report = await project(attempt)
     expect(report).toMatchObject({ reportKind: 'unavailable', reason: 'POLICY_UNAVAILABLE' })
     expect(report).not.toHaveProperty('scores')
+  })
+})
+
+
+// Unlike ordinary Prisma doubles, enforce nested selects so an omitted required
+// field really disappears and report-equivalence assertions detect it.
+const selectedRow = (row: any, query: any): any => {
+  if (row == null) return row
+  if (Array.isArray(row)) return row.map(value => selectedRow(value, query))
+  const fields = query?.select ?? query?.include
+  if (!fields) return row
+  const result: any = query.select ? {} : { ...row }
+  for (const [key, selection] of Object.entries(fields)) {
+    if (selection === true) result[key] = row[key]
+    else if (selection && typeof selection === 'object') result[key] = selectedRow(row[key], selection)
+  }
+  return result
+}
+
+describe('participant report-only database projection', () => {
+  it.each(['LEGACY_COMPOSITE', 'QUESTIONNAIRE'])('preserves %s mixed frozen report JSON without loading raw answers or live definitions', async productKind => {
+    const full: any = completedAttemptForReport({ taskSatisfaction: 'SATISFIED' })
+    full.compositeAssessment.productKind = productKind
+    full.compositeAssessment.items.push({ id: 'item-sjt', type: 'SITUATIONAL',
+      situationalInstrumentKey: 'sjt-assertiveness-golden', situationalInstrumentVersion: '1.0.0' })
+    full.scaleAssessments[0].answers = 'PRIVATE_RAW_ANSWERS'
+    full.scaleAssessments[0].scale = { code: 'adexi_v1', instrumentVersion: '2.0.0', definition: 'PRIVATE_LIVE_DEFINITION' }
+    full.compositeAssessment.items[1].scale.definition = 'PRIVATE_LIVE_DEFINITION'
+    full.cognitiveSessions[0].trials = [{ trialIndex: 1, response: 'PRIVATE_TRIAL' }]
+    full.situationalAttempts = [{ compositeItemId: 'item-sjt', resultEncrypted: 'PRIVATE_LEGACY_RESULT',
+      instrumentKey: 'sjt-assertiveness-golden', instrumentVersion: '1.0.0', completedAt: full.completedAt, totalTime: 20,
+      canonicalResultEncrypted: encryptUnifiedRuntimePayload(createCanonicalUnitResultEnvelope({
+        core: { schemaVersion: 1, unitType: 'SITUATIONAL', instrumentKey: 'sjt-assertiveness-golden', instrumentVersion: '1.0.0',
+          sourceDefinitionHash: 'a'.repeat(64), compilerVersion: '1.0.0', compiledRuntimeHash: 'b'.repeat(64),
+          scorerKey: 'fixture', scorerVersion: '1.0.0', quality: { status: 'interpretable', flags: [] },
+          metrics: [{ key: 'assertiveness', value: 1.5 }], facts: [], references: [], contextHash: null,
+          scientificProvenance: { instrumentKey: 'sjt-assertiveness-golden', instrumentVersion: '1.0.0' } },
+        completedAt: full.completedAt,
+        persistenceProvenance: { sourceType: 'SITUATIONAL_ATTEMPT', sourceAttemptId: 'sjt-1', sourceSubmissionId: 'submission-1' },
+      })) }]
+    mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue(full)
+    const expected = JSON.stringify(await getReport('attempt-1', { userId: 'student-1' }))
+    let loaded: any
+    mockPrisma.compositeAssessmentAttempt.findUnique.mockImplementation(async (query: any) => {
+      loaded = selectedRow(full, query)
+      return loaded
+    })
+    const actual = await getReport('attempt-1', { userId: 'student-1' })
+    expect(JSON.stringify(actual)).toBe(expected)
+    expect(actual.unitReports.find((unit: any) => unit.type === 'SITUATIONAL')?.metrics).toEqual([{ key: 'assertiveness', value: 1.5 }])
+    expect(loaded.scaleAssessments[0]).not.toHaveProperty('answers')
+    expect(loaded.scaleAssessments[0].scale).not.toHaveProperty('definition')
+    expect(loaded.compositeAssessment.items[1].scale).not.toHaveProperty('definition')
+    expect(loaded.cognitiveSessions[0]).not.toHaveProperty('trials')
+    expect(loaded.situationalAttempts[0]).not.toHaveProperty('resultEncrypted')
+    expect(JSON.stringify(actual)).not.toContain('PRIVATE_')
   })
 })

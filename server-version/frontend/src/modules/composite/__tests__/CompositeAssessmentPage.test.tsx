@@ -296,6 +296,7 @@ describe('C20 anonymous restart credential rotation', () => {
     </Routes></MemoryRouter>)
     fireEvent.click(await screen.findByRole('button', { name: '重启并继续作答' }))
     await waitFor(() => expect(sessionStorage.getItem('composite:recovery:attempt:new-attempt')).toBe('new-secret'))
+    expect(mockPublicApi.getAttempt).toHaveBeenCalledWith('old-attempt', 'current-unit')
     expect(mockPublicApi.restart).toHaveBeenCalledWith('old-attempt')
     expect(sessionStorage.getItem('composite:recovery:attempt:old-attempt')).toBeNull()
     expect(sessionStorage.getItem('composite:recovery:token:entry')).toBe('new-secret')

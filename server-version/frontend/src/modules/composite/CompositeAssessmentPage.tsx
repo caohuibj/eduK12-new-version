@@ -163,8 +163,8 @@ const CompositeAssessmentContent: React.FC = () => {
     }
     try {
       const response = await runWithCompletionRetry(() => publicMode
-        ? publicCompositeApi(credential).getAttempt(id)
-        : compositeApi.getAttempt(id))
+        ? publicCompositeApi(credential).getAttempt(id, 'current-unit')
+        : compositeApi.getAttempt(id, 'current-unit'))
       if (signal.aborted) return
       if (response.code !== 0 || !response.data)
         throw new Error(response.message || '综合测评记录不存在')

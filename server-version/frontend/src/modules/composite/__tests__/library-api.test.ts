@@ -11,7 +11,7 @@ const { mockClient } = vi.hoisted(() => ({
 
 vi.mock('../../../api/client', () => ({ default: mockClient }))
 
-import { compositeAnalysisExportPath, participantCompositeAnalysisExportPath, publicCompositeAnalysisExportPath, compositeApi } from '../api'
+import { compositeAnalysisExportPath, participantCompositeAnalysisExportPath, publicCompositeAnalysisExportPath, compositeApi, publicCompositeApi } from '../api'
 
 beforeEach(() => {
   vi.clearAllMocks()
@@ -76,4 +76,15 @@ describe('composite library api', () => {
     await compositeApi.reanalyze('attempt-1')
     expect(mockClient.post).toHaveBeenCalledWith('/composite-assessments/attempts/attempt-1/reanalyze', {})
   })
+})
+
+ it('opts into current-unit GET only when explicitly requested and preserves public recovery headers', async () => {
+  await compositeApi.getAttempt('attempt-1')
+  expect(mockClient.get).toHaveBeenLastCalledWith('/composite-assessments/attempts/attempt-1')
+  await compositeApi.getAttempt('attempt-1', 'current-unit')
+  expect(mockClient.get).toHaveBeenLastCalledWith('/composite-assessments/attempts/attempt-1?view=current-unit')
+  await publicCompositeApi('recovery').getAttempt('attempt-1', 'current-unit')
+  expect(mockClient.get).toHaveBeenLastCalledWith('/public/composite-assessments/attempts/attempt-1?view=current-unit', { headers: { 'X-Recovery-Token': 'recovery' } })
+  await publicCompositeApi('recovery').getAttempt('attempt-1')
+  expect(mockClient.get).toHaveBeenLastCalledWith('/public/composite-assessments/attempts/attempt-1', { headers: { 'X-Recovery-Token': 'recovery' } })
 })
