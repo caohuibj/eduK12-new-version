@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { Prisma } from '@prisma/client'
 import onlineExample from '../../modules/situational/authoring/examples/online-hand-calculated.json'
-import stagedExample from '../../modules/situational/authoring/examples/teacher-demonstration.json'
+import { sjtNativeStagedTemplate } from '../fixtures/sjt-native-staged.fixture'
 import { compileSjtAuthorDocument } from '../../modules/situational/authoring/dispatcher'
 import { prepareRelease } from '../../modules/measurement-content/release'
 import { sjtMeasurementRelease } from '../../modules/measurement-content/sjt'
@@ -111,8 +111,7 @@ describe('exact independent SJT Survey entry authority', () => {
     expect(db.sjtAuthorDraft.findUnique.mock.invocationCallOrder[0]).toBeGreaterThan(db.$queryRaw.mock.invocationCallOrder[draftLock])
   })
   it('accepts the real staged upload compiler without flattening its source package', async () => {
-    replaceOriginalDocument({ ...stagedExample, instrumentKey: 'synthetic-staged-entry-authority',
-      author: 'Synthetic contract fixture', licenseStatus: 'self_authored', redistribution: 'allowed' })
+    replaceOriginalDocument(sjtNativeStagedTemplate)
     const receipt = await assertSjtEntryDistributionAuthority(tx, input())
     expect(receipt.definitionHash).toBe(source.definitionHash)
     expect(receipt.contentDigest).toBe(source.contentDigest)
