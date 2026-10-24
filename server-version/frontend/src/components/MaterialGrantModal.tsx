@@ -15,6 +15,8 @@ interface MaterialGrantModalProps {
   resourceType: MaterialResourceType
   resourceId: string
   resourceName: string
+  training?: boolean
+  onSaved?: () => void
   onClose: () => void
 }
 
@@ -28,6 +30,8 @@ const MaterialGrantEditor: React.FC<MaterialGrantModalProps> = ({
   resourceId,
   resourceName,
   onClose,
+  training=false,
+  onSaved,
 }) => {
   const [teachers, setTeachers] = useState<User[]>([])
   const [selected, setSelected] = useState<Record<string, boolean>>({})
@@ -39,6 +43,7 @@ const MaterialGrantEditor: React.FC<MaterialGrantModalProps> = ({
   const [error, setError] = useState<string | null>(null)
   const savePending = useRef(false)
   const mounted = useRef(false)
+  const [keyword,setKeyword]=useState('')
 
   useEffect(() => {
     mounted.current = true
@@ -97,6 +102,7 @@ const MaterialGrantEditor: React.FC<MaterialGrantModalProps> = ({
       const saved = await materialGrantApi.set({ resourceType, resourceId, teacherIds: selectedIds })
       if (!mounted.current) return
       if (saved.code !== 0) throw new Error(saved.message || '保存授权失败')
+      onSaved?.()
       onClose()
     } catch (err) {
       if (mounted.current) setError((err as { message?: string })?.message || '保存授权失败')
@@ -109,7 +115,8 @@ const MaterialGrantEditor: React.FC<MaterialGrantModalProps> = ({
   return (
     <ManagementDialog
       open
-      title="授权给教师"
+      title={training?'管理培训师使用授权':'授权给教师'}
+      className={training?'training-accounts-dialog training-supervision-dialog training-resource-grant-dialog':undefined}
       description={resourceName}
       onClose={close}
       closeDisabled={saving}
@@ -118,11 +125,12 @@ const MaterialGrantEditor: React.FC<MaterialGrantModalProps> = ({
         <>
           <ProductButton onClick={close} disabled={saving}>取消</ProductButton>
           <ProductButton variant="primary" onClick={() => void save()} disabled={!loaded || loading || saving}>
-            {saving ? '保存中...' : '保存'}
+            {saving ? '保存中...' : training?'保存授权':'保存'}
           </ProductButton>
         </>
       )}
     >
+      {training&&<><p className="training-resource-grant-note">勾选以授权，取消勾选将撤销对应使用权。请核对名单后保存。</p><label className="training-resource-grant-search">筛选培训师<input type="search" value={keyword} disabled={saving||loading} onChange={event=>setKeyword(event.target.value)} placeholder="培训师账号或姓名"/></label></>}
       {error ? <p role="alert" className="mb-3 text-sm text-red-600">{error}</p> : null}
       {loadError ? (
         <div>
@@ -132,12 +140,12 @@ const MaterialGrantEditor: React.FC<MaterialGrantModalProps> = ({
       ) : loading ? (
         <p role="status" className="text-gray-500">加载中...</p>
       ) : teachers.length === 0 ? (
-        <p className="text-gray-500">没有可授权的已审教师</p>
+        <p className="text-gray-500">{training?'没有可授权的已审核培训师':'没有可授权的已审教师'}</p>
       ) : (
         <div className="staff-form">
           <fieldset className="grid gap-2" disabled={saving}>
-            <legend className="sr-only">选择授权教师</legend>
-            {teachers.map((teacher) => (
+            <legend className="sr-only">{training?'选择授权培训师':'选择授权教师'}</legend>
+            {teachers.filter(teacher=>!training||[teacher.username,teacher.nickname].some(value=>String(value||'').toLocaleLowerCase().includes(keyword.toLocaleLowerCase()))).map((teacher) => (
               <label key={teacher.id} className="flex min-h-11 items-center gap-3 rounded-lg border border-slate-200 bg-white px-3 py-2 text-sm text-slate-800">
                 <input
                   type="checkbox"

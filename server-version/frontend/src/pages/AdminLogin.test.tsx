@@ -63,6 +63,13 @@ describe('administrator login flow',()=>{
     expect(await screen.findByText('destination:/admin/training')).toBeInTheDocument()
     expect(login).toHaveBeenCalledExactlyOnceWith({username:'synthetic-admin',password:'synthetic-password'},'admin',{method:'TOTP',code:'123456'})
   })
+  it.each(['accounts','courses','resources'])('retains Training login styling and returns to the %s page',async page=>{
+    login.mockResolvedValue({code:0,data:{user:{id:'training-admin',username:'training-admin',role:'ADMIN',businessRole:'STUDENT',platformRole:'STANDARD',entryGrants:[{entry:'TRAINING',version:1}]}}})
+    mount('/admin/login?returnTo='+encodeURIComponent('/admin/training/'+page))
+    expect(screen.getByRole('heading',{name:'培训管理员登录'})).toBeVisible()
+    submit()
+    expect(await screen.findByText('destination:/admin/training/'+page)).toBeInTheDocument()
+  })
   it('preserves the Training return target while moving to the canonical administrator origin',()=>{
     const original=window,replace=vi.fn()
     vi.stubGlobal('window',new Proxy(original,{get(target,key){return key==='location'?{origin:'http://training.localhost:5201',search:'?returnTo=%2Fadmin%2Ftraining',replace}:Reflect.get(target,key)}}))

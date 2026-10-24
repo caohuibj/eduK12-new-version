@@ -1,3 +1,4 @@
+import {isTrainingAdminPath} from './trainingPages'
 import type { User } from '../types'
 import { internalReturnTo } from '../components/app-shell/access'
 export type AdminEntry = 'TRAINING' | 'SURVEY' | 'HUISCHOOL' | 'HUITEACHER'
@@ -10,7 +11,7 @@ export function adminReturnTo(user: User, raw: string | null) {
   if (path && ((path==='/admin/permissions' && user.platformRole==='SYSTEM_ADMIN')
     || (path==='/admin/reporting-content' && user.platformRole==='SYSTEM_ADMIN')
     || (path==='/admin/survey-researchers' && hasAdminEntry(user,'SURVEY'))
-    || (['/users','/admin/training'].includes(path) && hasAdminEntry(user,'TRAINING'))
+    || ((path==='/users'||isTrainingAdminPath(path)) && hasAdminEntry(user,'TRAINING'))
     || (path==='/admin/huischool' && hasAdminEntry(user,'HUISCHOOL'))
     || (path==='/admin/huiteacher' && hasAdminEntry(user,'HUITEACHER'))
     || (path==='/admin/education-products' && (hasAdminEntry(user,'HUISCHOOL')||hasAdminEntry(user,'HUITEACHER'))))) return target!

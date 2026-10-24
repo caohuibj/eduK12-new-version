@@ -43,3 +43,34 @@ describe('product entry only imports the selected application', () => {
     expect(evaluated.mock.calls).toEqual([[expected]])
   })
 })
+
+
+describe('Training synchronous startup identity and colors',()=>{
+ function bootstrap(pathname:string,mode:string|null='dark',hostname='localhost',search='',storageBlocked=false){
+  const icon={setAttribute:vi.fn()},dataset:Record<string,string>={}
+  const doc={title:'',currentScript:{dataset:{development:'true'}},head:{querySelector:()=>icon},documentElement:{dataset}}
+  class LocalClock extends Date{getHours(){return 8}}
+  runInNewContext(readFileSync('public/entry-brand.js','utf8'),{window:{location:{hostname,pathname,search}},document:doc,URLSearchParams,Date:LocalClock,localStorage:{getItem:()=>{if(storageBlocked)throw Error('blocked');return mode}}})
+  return {doc,icon,dataset}
+ }
+ it.each(['/admin/training','/admin/training/accounts','/admin/training/courses','/admin/training/resources','/admin/training/profile/'])('uses Training before React loads on %s',path=>{
+  const {doc,icon,dataset}=bootstrap(path)
+  expect(doc.title).toBe('Training');expect(dataset).toEqual({trainingEntry:'true',trainingTheme:'dark'})
+  expect(icon.setAttribute).toHaveBeenCalledWith('href','/training/favicon.svg?v=20261023-compact')
+ })
+ it.each(['light','auto'])('uses the saved %s mode before paint',mode=>{
+  expect(bootstrap('/admin/training/resources',mode).dataset.trainingTheme).toBe('light')
+ })
+ it('falls back to the local clock when storage is unavailable',()=>{
+  expect(bootstrap('/admin/training/accounts',null,'localhost','',true).dataset.trainingTheme).toBe('light')
+ })
+ it('keeps Training titles through nested-page login returns',()=>{
+  expect(bootstrap('/admin/login',null,'localhost','?returnTo=%2Fadmin%2Ftraining%2Fresources').doc.title).toBe('Training')
+ })
+ it.each(['/admin/training-other','/admin/training/resources/unknown','/admin/survey-researchers'])('does not apply Training startup colors to %s',path=>{
+  const {doc,dataset}=bootstrap(path);expect(doc.title).toBe('慧育空间');expect(dataset).toEqual({})
+ })
+ it('preserves Survey startup branding and colors',()=>{
+  const {doc,dataset}=bootstrap('/admin/training','dark','survey.localhost');expect(doc.title).toBe('Research');expect(dataset).toEqual({})
+ })
+})

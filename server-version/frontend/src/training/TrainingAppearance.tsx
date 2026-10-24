@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useMemo, useState, type ReactNode } from 'react'
 import { Moon, Palette, Sun, SunMoon } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext'
 import { isTrainingHost } from './context'
@@ -10,21 +10,21 @@ function read(key: string, enabled: boolean): TrainingAppearance {
   if (!enabled) return 'light'
   try { return parseAppearance(localStorage.getItem(key)) } catch { return 'auto' }
 }
-export function TrainingAppearanceProvider({ children }: { children: ReactNode }) {
-  const enabled = isTrainingHost()
-  const { user } = useAuth()
+export function TrainingAppearanceProvider({ children, management=false }: { children: ReactNode; management?:boolean }) {
+  const enabled = isTrainingHost() || management
+  const { user, isLoading } = useAuth()
   const key = appearanceKey(user?.id)
-  const [choice, setChoice] = useState(() => ({ key, mode: read(key, enabled), storageError: false }))
+  const [choice, setChoice] = useState(() => ({ key, enabled, mode: read(key, enabled), storageError: false }))
   // A new account must never render the previous account's preference, even
   // during the frame before effects resubscribe to its storage key.
-  const current = choice.key === key ? choice : { key, mode: read(key, enabled), storageError: false }
-  const mode = enabled ? current.mode : 'light'
+  const current = choice.key === key && choice.enabled === enabled ? choice : { key, enabled, mode: read(key, enabled), storageError: false }
+  const mode = enabled ? (management && isLoading && !user ? read('training:appearance:boot:v1',true) : current.mode) : 'light'
   const [now, setNow] = useState(() => new Date())
   useEffect(() => {
     if (!enabled) return
     const update = (event: StorageEvent) => {
       if (event.storageArea && event.storageArea !== localStorage) return
-      if (event.key === key || event.key === null) setChoice({ key, mode: read(key, true), storageError: false })
+      if (event.key === key || event.key === null) setChoice({ key, enabled:true, mode: read(key, true), storageError: false })
     }
     window.addEventListener('storage', update)
     return () => window.removeEventListener('storage', update)
@@ -48,9 +48,16 @@ export function TrainingAppearanceProvider({ children }: { children: ReactNode }
     if (!enabled) return
     let storageError = false
     try { localStorage.setItem(key, value) } catch { storageError = true }
-    setChoice({ key, mode: value, storageError }); setNow(new Date())
+    setChoice({ key, enabled, mode: value, storageError }); setNow(new Date())
   }, [enabled, key])
   const value = useMemo(() => ({ enabled, mode, theme: appearanceTheme(mode, now), storageError: current.storageError, select }), [enabled, mode, now, current.storageError, select])
+  useLayoutEffect(()=>{
+    if(!management)return
+    const root=document.documentElement
+    root.dataset.trainingEntry='true';root.dataset.trainingTheme=value.theme
+    if(user&&!isLoading){try{localStorage.setItem('training:appearance:boot:v1',mode)}catch{/* Theme still applies when storage is unavailable. */}}
+    return()=>{delete root.dataset.trainingEntry;delete root.dataset.trainingTheme}
+  },[management,user,isLoading,mode,value.theme])
   return <Appearance.Provider value={value}>{children}</Appearance.Provider>
 }
 export default function TrainingAppearanceSettings() {

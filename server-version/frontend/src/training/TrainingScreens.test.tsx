@@ -36,7 +36,12 @@ describe('training presentation and course-first entry', () => {
     expect(screen.getByRole('img', { name: 'Training @EduK12.top' })).toBeInTheDocument()
     expect(screen.queryByText('我是学员')).toBeNull()
     expect(screen.queryByText('我是培训师')).toBeNull()
-    expect(screen.queryByRole('link', { name: /管理员入口/ })).toBeNull()
+    const adminEntry = screen.getByRole('link', { name: 'Training 管理员入口' })
+    expect(screen.getByRole('navigation', { name: 'Training 页脚导航' })).toContainElement(adminEntry)
+    const adminUrl = new URL(adminEntry.getAttribute('href')!)
+    expect(adminUrl.hostname).toBe('localhost')
+    expect(adminUrl.pathname).toBe('/admin/login')
+    expect(adminUrl.searchParams.get('returnTo')).toBe('/admin/training')
   })
 
   it('does not carry an external return link into either entrance', () => {

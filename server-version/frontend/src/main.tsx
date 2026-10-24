@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import { loadProductApp } from './product-entry'
 import './index.css'
 
+const trainingEntry = document.documentElement.dataset.trainingEntry === 'true'
 const ProductApp = React.lazy(() => loadProductApp())
 
 class EntryErrorBoundary extends React.Component<{ children: React.ReactNode }, { failed: boolean }> {
@@ -20,7 +21,7 @@ class EntryErrorBoundary extends React.Component<{ children: React.ReactNode }, 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <EntryErrorBoundary>
-      <React.Suspense fallback={<p role="status">正在加载页面…</p>}>
+      <React.Suspense fallback={<p className={trainingEntry?"training-entry-loading":undefined} role="status">{trainingEntry?'正在加载 Training 管理…':'正在加载页面…'}</p>}>
         <ProductApp />
       </React.Suspense>
     </EntryErrorBoundary>
