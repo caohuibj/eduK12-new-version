@@ -1728,3 +1728,41 @@ SAST retains both the first full selected success and the second successful
 changed-control analysis by fixed official identities, then scans current changed
 controls. Changed qualification consumers execute again; old failed jobs and the
 unexecuted filter scenario remain failed/unqualified until actual new success.
+
+
+## Survey administrator and tool governance PR354 (2026-10-25 user approved)
+
+Only PR354 on `work/survey-governance-20261025`, main base
+`31d9e4cb933395acda3e2123f100a0a1a66a869b` and the fixed integrated product
+in `survey-governance-bindings.json` enter this bounded lane. Complete raw
+paths/modes/blobs, both application trees, protected inputs, actual PR source
+and checkout trees must match. Unknown changes, moved base, draft, manual/full
+or probe requests cannot qualify or fall back to the full platform route.
+
+The user explicitly approved reuse of 16 pure policy and four UI assertions.
+Their retained original JSON reporters, disjoint selected names and complete
+relative import closure are reviewed-local-evidence, ciExecuted=false,
+originalExecutionSigned=false. Their source/config bindings were reviewed after
+execution; complete historical node_modules bytes were not recorded. The pure
+policy graph imports only Vitest and builtin crypto: its entire locked Vitest
+package closure is unchanged despite main server-only dependency upgrades.
+Other application results affected by integration are not admitted. No original
+failure, missing case, type check or runtime claim is relabelled successful.
+
+GitHub executes new exact-scope/evidence/refusal/gate contracts, integrated
+backend/frontend types, changed frontend lint, named affected consumers and four
+real isolated PostgreSQL/HTTP flows. Main schema upgrades retain old rows; new
+governance tables start empty and actual synthetic completed reports survive
+native dump/restore. One frontend compilation feeds the exact-dist synthetic
+system-admin desktop/mobile light/dark UI consumer. Current changed application
+and control JS/TS/Python SAST remains mandatory. No full platform, unrelated
+School/Teacher implementation, media/load, dependency audit replay, production
+image or deployment is selected. Original source restrictions and role/data
+boundaries remain enforced; no existing tools or grants are auto-enabled.
+
+The stable merge gate independently recomputes the complete candidate and
+requires scope, the entire bounded qualification and CodeQL actual success.
+Missing/skipped/failed/cancelled selected checks and drafts block merge. Main
+push only classifies the same exact diff; it does not replay PR application
+checks. At five minutes report the specific waiting stage, then repair/recheck
+only affected inputs. This lane qualifies merging only, not deployment.

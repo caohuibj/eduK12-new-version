@@ -1,0 +1,35 @@
+import assert from 'node:assert/strict';import {createServer} from 'node:http';import {readFileSync,existsSync,mkdirSync,writeFileSync} from 'node:fs';import {resolve,extname} from 'node:path';import {chromium} from '../../server-version/backend/node_modules/playwright-core/index.mjs';import {sha,out} from './survey-governance-checks.mjs';
+const root=resolve('server-version/frontend/dist'),manifest=JSON.parse(readFileSync(out+'/frontend-build-manifest.json'));
+for(const[p,h]of Object.entries(manifest.files)){const bytes=readFileSync(root+'/'+p);assert.equal(sha(bytes),h.sha256);assert.equal(bytes.length,h.bytes);}
+const mime={'.html':'text/html','.js':'text/javascript','.css':'text/css','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2','.json':'application/json'};
+const server=createServer((req,res)=>{const p=resolve(root,'.'+new URL(req.url,'http://localhost').pathname);if(!p.startsWith(root+'/')&&p!==root){res.writeHead(403).end();return}const file=existsSync(p)&&extname(p)?p:root+'/index.html';try{res.setHeader('content-type',mime[extname(file)]||'application/octet-stream');res.end(readFileSync(file))}catch{res.writeHead(404).end()}});
+await new Promise(r=>server.listen(4179,'127.0.0.1',r));const browser=await chromium.launch({headless:true,args:['--no-proxy-server','--host-resolver-rules=MAP training.eduk12.top 127.0.0.1']});const results=[];
+try{
+ for(const width of [1440,390])for(const theme of ['light','dark']){
+  const context=await browser.newContext({viewport:{width,height:1000},colorScheme:theme}),page=await context.newPage(),errors=[],unexpected=[],writes=[];
+  page.on('pageerror',e=>errors.push(e.message));
+  await page.route('**/api/**',async route=>{const req=route.request(),url=new URL(req.url());if(req.method()!=='GET'){writes.push(req.method()+' '+url.pathname);await route.fulfill({status:403,json:{code:403,message:'Fixture refuses mutations'}});return;}
+   let data;const p=url.pathname;
+   if(p==='/api/auth/me')data={id:'synthetic-system',username:'system_admin',role:'STUDENT',businessRole:'STUDENT',accountDomain:'TRAINING',platformRole:'SYSTEM_ADMIN',entryGrants:[],isActive:true,mustChangePassword:false};
+   else if(p==='/api/platform/survey-standard/management-design')data={schemaVersion:1,rules:[{action:'people.manage',label:'管理人员与资格',training:'仅 Training',survey:'仅 Survey',school:'仅 School · 待接通',teacher:'仅 Teacher · 待接通',system:'不代管入口人员'}],families:[],boundaries:['审批不授予私有数据访问或导出权限']};
+   else if(p==='/api/capabilities')data={cognitive:true,parentPortal:false};
+   else if(p==='/api/platform/survey-standard/catalog'||p==='/api/platform/survey-tools/catalog')data={list:[],hasMore:false,page:1};
+   else if(p==='/api/training/scale-library-governance/capabilities')data={systemAdmin:true,canReview:true,reviewGrants:[],distributionGrants:[]};
+   else if(p==='/api/training/scale-library-governance/submissions'||p==='/api/training/scale-library-governance/catalog')data={list:[],hasMore:false,page:1};
+   else{unexpected.push(req.method()+' '+p);await route.fulfill({status:500,json:{code:500,message:'Unknown synthetic route'}});return;}
+   await route.fulfill({json:{code:0,data}});
+  });
+  await page.goto('http://training.eduk12.top:4179/admin/scale-library-governance');await page.getByRole('heading',{name:'工具库治理',exact:true}).waitFor();await page.locator('.system-admin-shell').waitFor();
+  assert.equal(await page.locator('.hui-survey-admin-shell,.training-workspace-shell').count(),0);
+  await page.getByRole('button',{name:'权限与授权',exact:true}).click();await page.getByText('School 管理员',{exact:true}).first().waitFor();
+  const table=await page.locator('main').innerText();for(const name of ['Training','Survey','School','Teacher','系统管理员'])assert(table.includes(name),name);
+  await page.getByRole('button',{name:'其他工具与组合',exact:true}).click();await page.getByRole('button',{name:'组合包',exact:true}).waitFor();
+  for(const name of ['情境判断测验','表单','单纯组合','组合包'])await page.getByRole('button',{name,exact:true}).click();
+  await page.getByText('组合包审批',{exact:true}).waitFor();await page.getByRole('heading',{name:'组合包审批',exact:true}).waitFor();
+  await page.getByRole('button',{name:theme==='dark'?'切换为浅色外观':'切换为深色外观',exact:true}).click();
+  assert.equal(await page.locator('.system-admin-shell').getAttribute('data-system-theme'),theme==='dark'?'light':'dark');
+  const size=await page.evaluate(()=>({client:document.documentElement.clientWidth,scroll:document.documentElement.scrollWidth}));assert(size.scroll<=size.client,'Management horizontal overflow');assert.deepEqual(errors,[]);assert.deepEqual(unexpected,[]);assert.deepEqual(writes,[]);
+  const id=width+'-'+theme;await page.screenshot({path:out+'/'+id+'.png',fullPage:true});results.push({id,size,noMutation:true,errors,unexpected});await context.close();
+ }
+ writeFileSync(out+'/compiled-browser.json',JSON.stringify({source:manifest.source,sourceHead:manifest.sourceHead,run:manifest.run,attempt:manifest.attempt,artifact:'retained-exact-dist',syntheticOnly:true,results},null,2));
+}finally{await browser.close();await new Promise(r=>server.close(r));}
