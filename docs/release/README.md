@@ -1270,3 +1270,53 @@ classify the merged diff; they do not repeat the PR application checks.
 ### Training / Survey 4C4G 容量修订（2026-10-24）
 
 `work/training-survey-capacity-20261024` 从 `902144e636905ab372ff4a0c7cbfd1b88bffba47` 冻结独立云端容量候选。仅修改认证学员准入锁、Survey 团体 IP 豁免查询繁忙时的普通限流路径，以及公共静态文件传输；不更改题目、计分、冻结版本或生产配置。`participant-capacity` 精确路线绑定完整差异，接纳同一输入已完成的云端后端编译；Actions 只执行受影响限流/持久化契约、真实隔离 PostgreSQL 并发与归档边界、Nginx HTTP 契约和当前 SAST。依赖、前端 JS 和数据库结构不变，不重复应用构建、全量回归或服务器验收。压测是独立合成负载观察，不能代替正式合并门禁或生产容量承诺。
+
+## Training entry, review and export exact merge candidate (2026-10-24)
+
+Only `perf/training-entry-20261023`, base
+`67d0c77034aea3c3cf1ee118eb65ab3aafe7b6eb` and product tree
+`45a536111839dc369385c10a3429c22f0700ea55` use `training-entry`.
+The complete raw diff, paths, modes, product blobs, both component trees,
+protected dependency/schema/config inputs and actual PR source/checkout tree
+must match. Unknown changes, base drift and missing binding fail closed without
+platform fallback. Manual/full/component probes on this branch are refused
+before heavy jobs. Exact main push only classifies the merged diff.
+
+This route is prepared but NOT qualified while its reviewed evidence is pending.
+No original command is reconstructed from aggregate test counts. Retained local
+records keep their failures, source/input identity and unsigned status:
+`reviewed-local-evidence`, `ciExecuted=false`, `originalExecutionSigned=false`.
+Retrospectively recorded parent exit observations are identified as such; empty
+compiler logs alone do not establish success. Full historical node_modules byte
+identity was not captured. Actual imported source, setup, tool and configuration
+inputs must be reviewed and frozen; missing or changed proof stops admission.
+Filtered compact reporters cannot silently prove a whole invocation or a named
+assertion union. The five retained PostgreSQL results prove bounded real grading
+service/concurrency and SQL MVCC behavior, not full HTTP controller/download
+acceptance. Same-input admitted checks do not rerun.
+
+One-time repeats of the explicitly enumerated missing-record early files and one
+frontend rebuild require explicit candidate permission before execution. This is
+not a general repeat permission. Current backend noEmit results are not an emitted
+artifact: the lane produces the first actual backend compile. Real Chromium
+consumes the exact frontend bytes produced for its previously unexecuted journeys;
+synthetic frontend APIs are not backend authorization evidence. Existing official
+production lock audits retain exact source/job/artifact identity, unchanged inputs
+and 24-hour validity. Only verified expiry refreshes those audits; corruption or
+unavailable proof stops for diagnosis. Current application/control JS/TS CodeQL
+and new scope/admission/refusal contracts remain required.
+
+The stable ready gate independently recomputes the complete plan and requires
+scope, the complete nested Training qualification and CodeQL success. Draft,
+missing, skipped, failed and cancelled selected checks block merge. No complete
+application suite, Docker/runtime image, DB migration/restore, mini-program,
+media/load work or production deployment is selected. Report the actual waiting
+stage after about five minutes; repair only affected or missing checks.
+
+The final bounded follow-up defers ExcelJS loading until workbook generation. Its new
+import-deferral assertions run once in the streaming job; the emitted backend
+compilation covers its new types. The earlier backend noEmit result remains
+historical, not new-helper qualification. Frontend and PostgreSQL inputs retain
+their existing identities.
+
+Training entry browser failure isolation: the frontend producer uploads its one-time actual dist plus build manifest (including hidden Vite manifest), exposing the immutable same-run artifact ID and SHA256 of the manifest. The separate browser consumer downloads only that ID and verifies checkout SHA, PR source SHA, frontend tree, run identity, producer attempt, exact file set and every output digest before Chrome. A browser-only failure is retried via failed-job rerun, never rerun-all: the successful frontend checks/build are not repeated. Qualification requires actual success of both frontend and browser. Artifact expiry or failed integrity is a blocker, not permission to rebuild.

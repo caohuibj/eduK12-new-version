@@ -1,0 +1,798 @@
+{
+  "schema": 1,
+  "base": "67d0c77034aea3c3cf1ee118eb65ab3aafe7b6eb",
+  "product": "a1369db0b237f8f022d619feeba9c85b24cf5bbe",
+  "localProduct": "74485d31e2ec419bce1e7df3b6214990a2d4b017",
+  "productTree": "45a536111839dc369385c10a3429c22f0700ea55",
+  "source": {
+    "docs/performance/training-entry-efficiency-20261024.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "008855174d0d4d436af9c3d09a1faabe6d70c8fe"
+    },
+    "server-version/backend/src/__tests__/composite/training-checkpoint.contract.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e5ee3f99bee9957c2462592baa1ea643d2cb2bcb",
+      "after": "25d34ca7065f24da9be7e0a84b797b27a7e78228"
+    },
+    "server-version/backend/src/__tests__/controllers/assignmentExport.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "779122e4af65c4330d39f14efad8714cd45df1d1",
+      "after": "97a3ee877f722094bd310abf77be0d6af4f334e2"
+    },
+    "server-version/backend/src/__tests__/controllers/assignmentReview.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6ef816984773e9b080c4d083e5b78dbab266d656"
+    },
+    "server-version/backend/src/__tests__/controllers/assignmentSubmit.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9e976f5e63ac4432c05e854726366cbebe6fa4a2",
+      "after": "392d12c6eaf180515a960dcbabb59de91be461ed"
+    },
+    "server-version/backend/src/__tests__/controllers/authLibrary.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "38f267a00863d1563642c58f9baccd8829ab4400",
+      "after": "07568852978fe6b85dbb7f87fbd41e5568a55f54"
+    },
+    "server-version/backend/src/__tests__/controllers/checkinExport.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "62516ece958e581649a7608a7fe9d99249e3e236",
+      "after": "695ffcdd3817256033ce0df4ce3f9ca6d63fd56d"
+    },
+    "server-version/backend/src/__tests__/controllers/checkinSubmit.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "aadc7b1a2a01c90e5bed0ac9cff40e861dc0fb20",
+      "after": "2b1a76196afc600c20b8456716d1284adbf4c9d2"
+    },
+    "server-version/backend/src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "4b221860c25fadc304f3644ec63bdeb7863ff8b4"
+    },
+    "server-version/backend/src/__tests__/controllers/streamingTaskExport.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "8b76e2e187f6425f345bfb700d36086404e1a887"
+    },
+    "server-version/backend/src/__tests__/controllers/trainingTeacherQueries.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e024268954466659f4faa83f695bc676088419f7"
+    },
+    "server-version/backend/src/__tests__/integration/training-review-export.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5dbf565deaca4fc6f0321792b85eb95f8ad36d93"
+    },
+    "server-version/backend/src/__tests__/measurement-content/training-content-final.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5c26d5d0988494f6454f3b2e234c2892465e78c0",
+      "after": "0025d62ff3d8ab7435658a0f2e2eab906e5fd27c"
+    },
+    "server-version/backend/src/__tests__/security/legacy-list-roles.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "714ee07b60f88ebf3d6699bc976ce1f8408b137b",
+      "after": "971d9bd6df12c6907c5e9db0839d60cbdb7192c6"
+    },
+    "server-version/backend/src/controllers/assignmentController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3da77c9677f87d95cbb5888df9b6c0a7a30731c3",
+      "after": "5e2b01866afcefff65bb29a5badb68b85dcd4146"
+    },
+    "server-version/backend/src/controllers/authController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1b59d04ec26990bdff739278727285ce328b9f05",
+      "after": "a466326dcd7affd7896f86f972acc06ae38f9489"
+    },
+    "server-version/backend/src/controllers/checkinController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e8f0bd67be843f301f86d72c2d1e1eada101be2b",
+      "after": "b284600d374c0447309513e9cf14df41f4790f08"
+    },
+    "server-version/backend/src/modules/assignment-review/selection.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "cd26668b8aec06c950f51417c1c1fc7bdae158f7"
+    },
+    "server-version/backend/src/modules/composite/training-checkpoint.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "87b1c7c08b399f9016906a529b2d86559a2cee11",
+      "after": "dd8ee6139293dc8b09a2d14d7ba30a26bc6e6bee"
+    },
+    "server-version/backend/src/modules/composite/training-content-final.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "150ec1a2d9aa44c7d593cfc6dc7eda75cd41299c",
+      "after": "9664b7016436e9bf2a7f90cdd422e9f4d6bbbf9e"
+    },
+    "server-version/backend/src/routes/assignments.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "afa3f10634b08f8a044f77c1a49c6a6d13c9f144",
+      "after": "dda912d3da9880fd82160f301f1c5ae0dcea9bfe"
+    },
+    "server-version/backend/src/utils/streamingTaskExport.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "deee161c9ff6069279262040ea58f15a6354695b"
+    },
+    "server-version/frontend/src/components/app-shell/AppShell.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c8c84bf706e9de7c7f1960635bc52f752b2a4fd3",
+      "after": "45cbcc9b1bf213f433cd37c276afc6df7c5154df"
+    },
+    "server-version/frontend/src/components/app-shell/__tests__/management-frame-loading.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6bcb3aef0b60fd7bde51de442c8c5b77a3db3b1b"
+    },
+    "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6de3eea4115d27f135a30c3eaffa8b83741c2676",
+      "after": "e6840556ef6ead9ac77523cccf413aed1d35afc0"
+    },
+    "server-version/frontend/src/hooks/__tests__/useTaskExport.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7639bd53ff5acf20151c6c163392fe587af40c84",
+      "after": "7c6ab3fc4dc2dd014296cc8ed5b613982eb5043d"
+    },
+    "server-version/frontend/src/hooks/useTaskExport.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8850276a745f1d6830b280b18718f7fc78df9c0f",
+      "after": "66c28763eae1be0c35acc9ef80a58e92e3173f29"
+    },
+    "server-version/frontend/src/pages/AssignmentList.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "59c654c529db4901456a70091dd14e603969745f",
+      "after": "e3cbc1dc34f9b29aa1eda4fb243b6aa523e2c8b5"
+    },
+    "server-version/frontend/src/pages/CheckinList.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0f7b45026fd1ec7d068af4a8a23e3feba9280116",
+      "after": "8c113e42183f20a874a30329e34909c21a9af642"
+    },
+    "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c4cc93208a873628438d32603b38c411c1cf6e97"
+    },
+    "server-version/frontend/src/pages/__tests__/TeacherTasks.loading.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "db218f21b89ba393f8568d1bdb703d6019934a69"
+    },
+    "server-version/frontend/src/pages/questionnaire/AssessmentDataExport.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e6e891c2a33d7f64f28ef24f28e5eea08ebf0e47"
+    },
+    "server-version/frontend/src/pages/questionnaire/DeferredAssessmentDataExport.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c6eab8ece531615b1cfbaf3c4643b36cf36b6ba9"
+    },
+    "server-version/frontend/src/pages/questionnaire/TrainingQuestionnaireList.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1e8119a37211c9d8279a0fa7da8741cc30b3b7ab",
+      "after": "d580fb3da6621541adee44c957c7b76e6b7e027e"
+    },
+    "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "07f88b1dd7ba559834e23694b827e3b197e86095"
+    },
+    "server-version/frontend/src/pages/questionnaire/__tests__/TrainingQuestionnaireList.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9e60554c651b89b72d60346a44c5f596adfda631",
+      "after": "7a210eaee4583600dfc8d4cbe559e99a54a90ed6"
+    },
+    "server-version/frontend/src/pages/questionnaire/deferredAssessmentExport.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e9eaccaac07dace5c85ec4f2581228d762371f69"
+    },
+    "server-version/frontend/src/pages/student/AssignmentSubmit.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "94562e6cb2d7b82f7a204bd53e59d4aec15a0729",
+      "after": "9cdf7c9806ec34ec0e5dca792e39388661447bbc"
+    },
+    "server-version/frontend/src/pages/student/CheckinSubmit.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "18b8b8f908a85378f08a66c5b56c3fc7112c0fb4",
+      "after": "4a467c91cc469a2a35014fa779e62a8066f7b117"
+    },
+    "server-version/frontend/src/pages/student/__tests__/AssignmentSubmit.review.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ca647eacf03852af9baa7340bfc73015f2ad834e",
+      "after": "486ac55de271aefe915496325a9b482cfa0099b7"
+    },
+    "server-version/frontend/src/pages/student/__tests__/LearnerSubmission.performance.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "3a7947e870b352d719386684d2ad05798bf2190b"
+    },
+    "server-version/frontend/src/training/TrainingCourseAssessments.loading.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "51dc3f64259b030ee313a5e8c6688668f334bce5"
+    },
+    "server-version/frontend/src/training/TrainingCourseAssessments.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "31441ec4eaf92b90b857947e4604645d6d10be0f",
+      "after": "67c9dce26078d9a299773a6ecdedb931fa0efd71"
+    },
+    "server-version/frontend/src/training/TrainingCourseAssessments.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "acad3a9a6926d943601ccfcda823e76f032b7e99",
+      "after": "4ea3a5aa06f06dd9b4421fbec93a75bc11bc7ed7"
+    },
+    "server-version/frontend/src/training/TrainingLearnerCourse.loading.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "54074e139bba5731b3de24bf234fce17858c42b5"
+    },
+    "server-version/frontend/src/training/TrainingLearnerCourse.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4f26330e7a24f6676c6482a3bacc5e5d59e2d7fe",
+      "after": "76795db22dffb5219e93926d7af68b6184161d84"
+    },
+    "server-version/frontend/src/training/TrainingTaskReusePicker.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "456e2082dd6974c7df7bcd29bedd13c513071d1e",
+      "after": "0fa8563f08a031528f1a2d39713e94ccc12d82be"
+    }
+  },
+  "controls": [
+    ".github/scripts/training-entry-bindings.json",
+    ".github/scripts/training-entry-scope.mjs",
+    ".github/scripts/training-entry-checks.mjs",
+    ".github/scripts/training-entry.test.mjs",
+    ".github/scripts/training-entry-browser.mjs",
+    ".github/workflows/ci-training-entry.yml",
+    ".github/evidence/training-entry/reviewed.json",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    ".github/workflows/ci.yml",
+    "docs/release/README.md"
+  ],
+  "controlBefore": {
+    ".github/scripts/content-scope.mjs": "ed5d0926860294fd2f83ab1f2f0d81573e3124ea",
+    ".github/scripts/merge-gate.mjs": "811b8321d55a3f77a18891245aa65320e2da7ef9",
+    ".github/workflows/ci.yml": "edbbf7666bfcbbcaf038fe145c19a4bdae09401c",
+    "docs/release/README.md": "2bc777e02356658b83765717c8a6c403840f1c53"
+  },
+  "components": {
+    "frontend": "3596fe269a2029e0ef968e4eb76df005e04a72c2",
+    "backend": "5f932b6a1013f20c26a8a0aa8dc059e8d4ba8090"
+  },
+  "protectedInputs": {
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "server-version/frontend/tsconfig.json": "1ffef600d959ec9e396d5a260bd3f5b927b2cef8",
+    "server-version/backend/package.json": "033398f6361b0e4217226ae00f2edc2ed3380ecd",
+    "server-version/backend/package-lock.json": "73607721290dd28f1c6f85d5e12d5d517926ede3",
+    "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
+    "server-version/backend/prisma/schema.prisma": "aca635e128f3327a71064f575795f1835a40fea9",
+    "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
+    "server-version/frontend/tsconfig.cognitive.json": "910e97700f25652bc1d80ada47e176cbd51c2fbe",
+    "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22"
+  },
+  "evidenceSHA256": "71f22b6a29548e868387656c2f4339d0664e62674d1d21f57eaa29ed30bf652f",
+  "requiredGroups": [
+    "learner-frontend",
+    "learner-backend",
+    "teacher-retained",
+    "review-current",
+    "export-hook",
+    "legacy-roles",
+    "teacher-queries",
+    "postgres-concurrency",
+    "current-frontend-types",
+    "retained-lint"
+  ],
+  "checks": {
+    "backendTestFiles": [
+      "src/__tests__/composite/training-checkpoint.contract.test.ts",
+      "src/__tests__/measurement-content/training-content-final.test.ts",
+      "src/__tests__/measurement-content/training-reference-consumption.test.ts",
+      "src/__tests__/controllers/authLibrary.test.ts",
+      "src/__tests__/controllers/login-admission.test.ts"
+    ],
+    "frontendTestFiles": [
+      "src/training/TrainingLearnerCourse.loading.test.tsx",
+      "src/training/TrainingCourseAssessments.loading.test.tsx",
+      "src/training/TrainingCourseAssessments.test.tsx",
+      "src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx",
+      "src/pages/questionnaire/__tests__/TrainingQuestionnaireList.test.tsx",
+      "src/components/app-shell/__tests__/management-frame-loading.test.tsx",
+      "src/components/app-shell/__tests__/shell.test.tsx"
+    ],
+    "earlyLintFiles": [
+      "src/components/app-shell/AppShell.tsx",
+      "src/components/app-shell/__tests__/management-frame-loading.test.tsx",
+      "src/components/app-shell/__tests__/shell.test.tsx",
+      "src/pages/questionnaire/AssessmentDataExport.tsx",
+      "src/pages/questionnaire/DeferredAssessmentDataExport.tsx",
+      "src/pages/questionnaire/TrainingQuestionnaireList.tsx",
+      "src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx",
+      "src/pages/questionnaire/__tests__/TrainingQuestionnaireList.test.tsx",
+      "src/pages/questionnaire/deferredAssessmentExport.tsx",
+      "src/training/TrainingCourseAssessments.loading.test.tsx",
+      "src/training/TrainingCourseAssessments.test.tsx",
+      "src/training/TrainingCourseAssessments.tsx",
+      "src/training/TrainingLearnerCourse.loading.test.tsx",
+      "src/training/TrainingLearnerCourse.tsx"
+    ],
+    "laterFrontendTestFiles": [
+      "src/pages/__tests__/TeacherTasks.loading.test.tsx",
+      "src/pages/__tests__/AssignmentList.course-workspace.test.tsx",
+      "src/pages/__tests__/AssignmentList.review-pagination.test.tsx",
+      "src/pages/__tests__/AssignmentList.states.test.tsx"
+    ],
+    "laterBackendTestFiles": [
+      "src/__tests__/controllers/assignmentExport.test.ts",
+      "src/__tests__/controllers/streamingTaskExport.test.ts",
+      "src/__tests__/controllers/checkinExport.test.ts",
+      "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
+    ],
+    "newBackendTestFiles": [
+      "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
+    ]
+  },
+  "reviewedGroupFiles": {
+    "learner-frontend": [
+      "server-version/frontend/src/pages/student/__tests__/AssignmentSubmit.review.test.tsx",
+      "server-version/frontend/src/pages/student/__tests__/CheckinSubmit.accessibility.test.tsx",
+      "server-version/frontend/src/pages/student/__tests__/LearnerSubmission.performance.test.tsx"
+    ],
+    "learner-backend": [
+      "server-version/backend/src/__tests__/controllers/assignmentSubmit.test.ts",
+      "server-version/backend/src/__tests__/controllers/checkinSubmit.test.ts"
+    ],
+    "review-current": [
+      "server-version/backend/src/__tests__/controllers/assignmentReview.test.ts"
+    ],
+    "export-hook": [
+      "server-version/frontend/src/hooks/__tests__/useTaskExport.test.tsx"
+    ],
+    "legacy-roles": [
+      "server-version/backend/src/__tests__/security/legacy-list-roles.test.ts"
+    ],
+    "teacher-queries": [
+      "server-version/backend/src/__tests__/controllers/trainingTeacherQueries.test.ts"
+    ],
+    "postgres-concurrency": [
+      "server-version/backend/src/__tests__/integration/training-review-export.postgres.integration.test.ts"
+    ],
+    "teacher-retained": [
+      "server-version/frontend/src/pages/__tests__/CheckinList.course-workspace.test.tsx",
+      "server-version/frontend/src/training/TrainingTaskReusePicker.test.tsx"
+    ]
+  },
+  "reviewedDeltas": {
+    "teacher-retained": {
+      "server-version/frontend/src/hooks/useTaskExport.ts": {
+        "before": "8850276a745f1d6830b280b18718f7fc78df9c0f",
+        "after": "66c28763eae1be0c35acc9ef80a58e92e3173f29",
+        "changedSymbols": [
+          "taskExportFailureMessage",
+          "useTaskExport.run !response.ok branch"
+        ],
+        "unchangedExecutedPaths": [
+          "CheckinList.course-workspace successful response.ok download, blob URL creation and filename path",
+          "TrainingTaskReusePicker course options and reuse presentation"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The retained Checkin course test supplies an ok download response; the added bounded error-body parser is defined but never called. Existing success branch, pending deduplication and navigation download completion are unchanged. The picker does not call the export hook.",
+        "reviewEvidence": "Candidate-specific independent source review approved retaining only these two files; AssignmentList.states moved to fresh affected checks."
+      }
+    },
+    "learner-backend": {
+      "server-version/backend/src/controllers/assignmentController.ts": {
+        "before": "760de0f07bec5a351f4e9ad11a843a642a31a3f3",
+        "after": "5e2b01866afcefff65bb29a5badb68b85dcd4146",
+        "changedSymbols": [
+          "controller list, review, batch grading and export members",
+          "selection and streaming helper imports"
+        ],
+        "unchangedExecutedPaths": [
+          "submit method",
+          "submission validators and image validation",
+          "idempotency, locking, revision persistence, permission and hydration callees"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Exact submit AST text, directly consumed submission schema/image validators and original helper/config inputs are unchanged. Changes are separate list/review/export members. New imports do not call submit paths; current streaming/controller checks exercise current initialization.",
+        "reviewEvidence": "Independent candidate-specific AST and transitive-call review, explicitly accepted for these35 historical submit assertions only.",
+        "unchangedSymbolSHA256": {
+          "submissionAnswersSchema": "7baa55294b855e0fca83f4e93c5826b8968d8635c3d137df6395825bf54c09de",
+          "submitSchema": "21f78249044d43ea823a1bcfdd262162d4c2c8358fc2546f0b28df044fd6661a",
+          "{ courseId, title, description, deadline, questions, videos, images, documents, content, tags }": "1df24a60abd7ac39969ce995d125c59bb2aad98cf64af1dec1ebd5badc2b4682",
+          "submit": "2869558f66b9e66aa148168f93a8a6e7c3a7343c10557bc7e2c1d548cde36a7e",
+          "{ content, answers, expectedRevision }": "47962292b4eef7f3346943dc54a19f5d048f305ef1b0e039b02963bdd5314af8",
+          "normalizedAnswers": "de7c0212b0d843a33ce43f36d061fc7af7e9f6305d8477da1b0b1d74bcdde96d",
+          "answers": "85b318cc79e09b8cc8ab1192c69c05b3b9c5cc9afd3f5d6082ec5e7b604912f6",
+          "answer": "6077138054f9ebfd5d86826e0e8d1e2d27e2e06c0c2484e62a979ca6d204ee63",
+          "contentIndex": "6c79a0398d94e410ac05893e20bcef0a6db681a6dfebc55f8ee52e026ffd5019"
+        }
+      },
+      "server-version/backend/src/controllers/checkinController.ts": {
+        "before": "671c88b2bb03bf83b543c863eb83d27652f872fc",
+        "after": "b284600d374c0447309513e9cf14df41f4790f08",
+        "changedSymbols": [
+          "controller list, review, batch grading and export members",
+          "selection and streaming helper imports"
+        ],
+        "unchangedExecutedPaths": [
+          "submit method",
+          "submission validators and image validation",
+          "idempotency, locking, revision persistence, permission and hydration callees"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Exact submit AST text, directly consumed submission schema/image validators and original helper/config inputs are unchanged. Changes are separate list/review/export members. New imports do not call submit paths; current streaming/controller checks exercise current initialization.",
+        "reviewEvidence": "Independent candidate-specific AST and transitive-call review, explicitly accepted for these35 historical submit assertions only.",
+        "unchangedSymbolSHA256": {
+          "submissionImageSchema": "e9472fcd9d46a7ffd36435344352b015bc069f6dd35abe6b896688c5ffae0e7e",
+          "submitCheckinSchema": "51252ce3a488fd6ecff3e9b6e00110dc632dafe56945dbe597b2a19ddd86bb3e",
+          "isSubmissionAssetImage": "3071763ab23dbefb6996d7f341835aa150d17d4a108d02f65f41a60118194958",
+          "validateStudentSubmissionImages": "7b8a08b9c2af0c644b5344e961736c866029ebead844357d6a12bf50e15ea92e",
+          "assetImages": "f1230094c90015a0ebb1355fd47f5754893101a28df9083637748264c81c0318",
+          "publicSubmissionImageSchema": "c3a55db964256a362b46183d4f4f3d659670e80004ddd1d7cd6a01a36f574afb",
+          "MAX_PUBLIC_UPLOAD_IMAGES_PER_SESSION": "aa2f4ff16dba329ef9d9f60df64ea8d0d8187cfb72dbfcb6d6c27100d9a329be",
+          "validatePublicSubmissionImages": "cc055a509eff1487988c343da79714aafa543dbe2aeb703f3d23ac08af1611b6",
+          "publicImageUpload": "ef5d0aa92edf419818289340274e0a6cf1b24b44bba61b2a8e82d22d7de74c76",
+          "acceptedImageMimeTypes": "fc43c33c1aa3ab09a835075fecad9d5ab1d65e90ac42918ceeaf8e838948e36b",
+          "detectAcceptedImageMimeType": "5a582c8c76b3b157fee8663a43c6142343055a9985d92443287d6ca7fde880df",
+          "submissionImageUpload": "735612330274aa0ca96b7d6ce051245c46029a32a187e12df668cb763fbc7e65",
+          "{ courseId, title, description, content, videos, images, documents, endTime, allowViewOthers, tags }": "ed19c8ccb181c9a2b85ee121b43aa9b1a3645665dfe008aa9173e06c01708d82",
+          "{ title, description, content, videos, images, documents, endTime, allowViewOthers, tags }": "8f69ce1ad24529e33f7dce2fee52b0fd461f398b8789697e48cb8aa75529e44b",
+          "submit": "e72ad3eb2b95f3d6c5f84a2474e3fd085adf9b5ce504a144210c8818ac02fe70",
+          "{ content, images, expectedRevision }": "d1428197b8cd11124d7d07192c51417c22f2400bf59ac7199fffb18925926b70",
+          "requestedImages": "e6d6b4844bde66f71fbeb24e7fb06b27e7c92c33ae7132c5ceb6a6e4ec464566",
+          "validatedImages": "51cdc0427e0f6340776dad30d80302de594abbc0d9c723d73e2975a0ef8f0134",
+          "imageUrls": "24fa4273d13f11246936496cba340ddceec2db56e24b01c76c90ff2721af73be",
+          "images": "0d7806ce5774151806c6da842c33000b80a129f86e95399e9e26902e421f04b6",
+          "{ content, images, sessionId }": "ffb1af1d2d0c7b717048a2f4165892d3223b1a5f6bf50784b49e1a3be2911515"
+        }
+      },
+      "server-version/backend/src/middleware/auth.ts": {
+        "before": null,
+        "after": "77bcfc977c6824b72fc4c736ee9cc0bc3b530a63",
+        "changedSymbols": [
+          "newly reachable export/selection helper import",
+          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
+        ],
+        "unchangedExecutedPaths": [
+          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
+        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
+        "freshValidationFiles": [
+          "src/__tests__/controllers/assignmentExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.test.ts",
+          "src/__tests__/controllers/checkinExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
+        ]
+      },
+      "server-version/backend/src/modules/admin-permissions/security.ts": {
+        "before": null,
+        "after": "213b8a56d4bd4f5b38a76a169e3eb80653c9ead5",
+        "changedSymbols": [
+          "newly reachable export/selection helper import",
+          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
+        ],
+        "unchangedExecutedPaths": [
+          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
+        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
+        "freshValidationFiles": [
+          "src/__tests__/controllers/assignmentExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.test.ts",
+          "src/__tests__/controllers/checkinExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
+        ]
+      },
+      "server-version/backend/src/modules/assignment-review/selection.ts": {
+        "before": null,
+        "after": "cd26668b8aec06c950f51417c1c1fc7bdae158f7",
+        "changedSymbols": [
+          "newly reachable export/selection helper import",
+          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
+        ],
+        "unchangedExecutedPaths": [
+          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
+        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
+        "freshValidationFiles": [
+          "src/__tests__/controllers/assignmentExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.test.ts",
+          "src/__tests__/controllers/checkinExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
+        ]
+      },
+      "server-version/backend/src/modules/campus/mfa.service.ts": {
+        "before": null,
+        "after": "52f8715045af9a852b6d572d3d0fa5d7d1b16496",
+        "changedSymbols": [
+          "newly reachable export/selection helper import",
+          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
+        ],
+        "unchangedExecutedPaths": [
+          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
+        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
+        "freshValidationFiles": [
+          "src/__tests__/controllers/assignmentExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.test.ts",
+          "src/__tests__/controllers/checkinExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
+        ]
+      },
+      "server-version/backend/src/modules/survey/authority.ts": {
+        "before": null,
+        "after": "b7b889966870589ad7ed4acace4d15d233d05aeb",
+        "changedSymbols": [
+          "newly reachable export/selection helper import",
+          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
+        ],
+        "unchangedExecutedPaths": [
+          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
+        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
+        "freshValidationFiles": [
+          "src/__tests__/controllers/assignmentExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.test.ts",
+          "src/__tests__/controllers/checkinExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
+        ]
+      },
+      "server-version/backend/src/utils/authCookies.ts": {
+        "before": null,
+        "after": "b9bb79d2f94aa6a20c0df557ed55acdb43fe0fd6",
+        "changedSymbols": [
+          "newly reachable export/selection helper import",
+          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
+        ],
+        "unchangedExecutedPaths": [
+          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
+        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
+        "freshValidationFiles": [
+          "src/__tests__/controllers/assignmentExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.test.ts",
+          "src/__tests__/controllers/checkinExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
+        ]
+      },
+      "server-version/backend/src/utils/jwt.ts": {
+        "before": null,
+        "after": "f07ba6d08aab8fbd53331adb0002b5a142b13eb3",
+        "changedSymbols": [
+          "newly reachable export/selection helper import",
+          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
+        ],
+        "unchangedExecutedPaths": [
+          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
+        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
+        "freshValidationFiles": [
+          "src/__tests__/controllers/assignmentExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.test.ts",
+          "src/__tests__/controllers/checkinExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
+        ]
+      },
+      "server-version/backend/src/utils/sessionRevocation.ts": {
+        "before": null,
+        "after": "ea50d612d3a45b71d5b85746bb0fee82110d919d",
+        "changedSymbols": [
+          "newly reachable export/selection helper import",
+          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
+        ],
+        "unchangedExecutedPaths": [
+          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
+        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
+        "freshValidationFiles": [
+          "src/__tests__/controllers/assignmentExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.test.ts",
+          "src/__tests__/controllers/checkinExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
+        ]
+      },
+      "server-version/backend/src/utils/streamingTaskExport.ts": {
+        "before": null,
+        "after": "deee161c9ff6069279262040ea58f15a6354695b",
+        "changedSymbols": [
+          "newly reachable export/selection helper import",
+          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
+        ],
+        "unchangedExecutedPaths": [
+          "assignmentController.submit and checkinController.submit; neither calls export or selection signing"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
+        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
+        "freshValidationFiles": [
+          "src/__tests__/controllers/assignmentExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.test.ts",
+          "src/__tests__/controllers/checkinExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
+        ]
+      }
+    },
+    "review-current": {
+      "server-version/backend/src/utils/streamingTaskExport.ts": {
+        "before": "8ecc20814ff609e2215776d4617b61c7211dee76",
+        "after": "deee161c9ff6069279262040ea58f15a6354695b",
+        "changedSymbols": [
+          "ExcelJS runtime import removal",
+          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
+        ],
+        "unchangedExecutedPaths": [
+          "reviewSelection, submissions, grade, batchGrade and selection helpers; no workbook calls"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
+        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
+        "freshValidationFiles": [
+          "src/__tests__/controllers/assignmentExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.test.ts",
+          "src/__tests__/controllers/checkinExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
+        ]
+      }
+    },
+    "legacy-roles": {
+      "server-version/backend/src/utils/streamingTaskExport.ts": {
+        "before": "8ecc20814ff609e2215776d4617b61c7211dee76",
+        "after": "deee161c9ff6069279262040ea58f15a6354695b",
+        "changedSymbols": [
+          "ExcelJS runtime import removal",
+          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
+        ],
+        "unchangedExecutedPaths": [
+          "legacy teacher list role and creator relation queries; no export calls"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
+        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
+        "freshValidationFiles": [
+          "src/__tests__/controllers/assignmentExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.test.ts",
+          "src/__tests__/controllers/checkinExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
+        ]
+      }
+    },
+    "teacher-queries": {
+      "server-version/backend/src/utils/streamingTaskExport.ts": {
+        "before": "8ecc20814ff609e2215776d4617b61c7211dee76",
+        "after": "deee161c9ff6069279262040ea58f15a6354695b",
+        "changedSymbols": [
+          "ExcelJS runtime import removal",
+          "writeSnapshotWorkbook guarded dynamic ExcelJS import and post-load connection check"
+        ],
+        "unchangedExecutedPaths": [
+          "teacher query consumers with sendTaskExport mocked; original module definitions only"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The new workbook loader is exclusively inside writeSnapshotWorkbook guarded try/cleanup. It creates no top-level loading promise or initializer. These admitted callers do not execute it; new authentication imports are deferred within export refresh. Existing shared helper inputs are unchanged. Fresh current streaming and import-deferral assertions cover actual new loading and initialization.",
+        "reviewEvidence": "Candidate-specific independent call-path review of exact old/current blobs; not a claim these historical assertions exercised new export code.",
+        "freshValidationFiles": [
+          "src/__tests__/controllers/assignmentExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.test.ts",
+          "src/__tests__/controllers/checkinExport.test.ts",
+          "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts"
+        ]
+      }
+    }
+  }
+}
