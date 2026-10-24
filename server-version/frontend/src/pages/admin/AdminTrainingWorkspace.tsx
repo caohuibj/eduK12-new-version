@@ -2,7 +2,7 @@ import {useState,type ComponentProps} from 'react'
 import {createRetryableLazy} from '../../components/shared-ui/RetryableLazy'
 const UserList=createRetryableLazy(()=>import('../UserList'),'账号列表')
 const TeacherCodeList=createRetryableLazy(()=>import('../TeacherCodeList'),'注册码管理')
-const TrainingAdminCourses=createRetryableLazy<ComponentProps<typeof import('../../training/TrainingAdminCourses').default>>(()=>import('../../training/TrainingAdminCourses'),'课程监管')
+const TrainingAdminCourses=createRetryableLazy<NonNullable<ComponentProps<typeof import('../../training/TrainingAdminCourses').default>>>(()=>import('../../training/TrainingAdminCourses'),'课程监管')
 const TrainingAdminResources=createRetryableLazy(()=>import('../../training/TrainingAdminResources'),'资源与授权')
 import {Navigate,useLocation} from 'react-router-dom'
 import {trainingAdminPage} from '../../admin/trainingPages'
