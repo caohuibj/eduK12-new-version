@@ -322,6 +322,8 @@ export default function SurveyPublicApp(){
   },[info?.project.collectionMode,info?.project.participantIdentityMode])
 
   const [lockedAnswers,setLockedAnswers]=useState<Record<string,Record<string,Answer>>>({})
+  // Server-frozen prerequisites remain immutable even when FINAL rejects another answer.
+  const serverLockedKeys=useRef(new Set<string>())
   const finalRequest=useRef<{attemptId:string;path:string;
     body:{accessCredential:string;researchCode?:string;submissionId:string;answers:Record<string,Record<string,Answer>>;
       itemTimings?:SurveyWaveScaleTimings;presentation?:{shownBlocks:string[]};cognitiveReferences?:SurveyCognitiveReference[]}}|null>(null)
@@ -418,12 +420,17 @@ export default function SurveyPublicApp(){
     return()=>{current=false;requests.current++}
   },[base,publicId,infoEntryToken,personalProof])
   const focusStep=()=>window.requestAnimationFrame(()=>{if(!cognitiveRunningRef.current)document.getElementById('survey-task-step')?.focus()})
-  const revealAnswer=(unit:Unit,itemKey?:string)=>{
+  const revealAnswer=(unit:Unit,itemKey?:string,correctRejectedAnswer=false)=>{
     if(cognitiveRunningRef.current)return
     const activeTask=taskState.current
     if(!activeTask)return
-    // Completed sections cannot be reopened by a validation-focus fallback.
-    if(Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)&&flowUnit?.instrumentKey!==unit.instrumentKey)return
+    if(Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)){
+      // Ordinary navigation stays within this section. Only a definitive FINAL
+      // rejection can reopen a locally completed section, never a server lock.
+      if(correctRejectedAnswer&&!serverLockedKeys.current.has(unit.instrumentKey)){
+        setLockedAnswers(previous=>{const next={...previous};delete next[unit.instrumentKey];return next})
+      }else if(flowUnit?.instrumentKey!==unit.instrumentKey)return
+    }
     if(unit.kind==='FORM'){
       const visible=visibleFormKeys(unit.pages?.flatMap(page=>page.questions)??[],own(answers,unit.instrumentKey)??{})
       const pages=unit.pages?.filter(page=>page.questions.some(q=>visible.has(q.itemKey)))??[]
@@ -445,20 +452,24 @@ export default function SurveyPublicApp(){
       target?.focus();target?.scrollIntoView({block:'center'})
     })
   }
+  const rejectedAnswerTarget=(message:string)=>{
+    const location=message.match(/answers\.([a-z][a-z0-9_-]*)(?:\.([a-z][a-z0-9_-]*))?/i)
+    const instrumentKey=location?.[2]?location[1]:undefined
+    const itemKey=location?.[2]||location?.[1]
+    const unit=itemKey?taskState.current?.units.find(candidate=>
+      (!instrumentKey||candidate.instrumentKey===instrumentKey)&&(
+        candidate.pages?.some(page=>page.questions.some(q=>q.itemKey===itemKey))||
+        candidate.items?.some(q=>q.itemKey===itemKey)||
+        (candidate.scenes?.flatMap(scene=>scene.questions)??candidate.questions)?.some(q=>q.questionKey===itemKey))):undefined
+    return unit&&itemKey?{unit,itemKey}:null
+  }
   const run=async(task:()=>Promise<void>,label='正在处理，请稍候…')=>{
     setError('');setNotice('');setBusyLabel(label);setBusy(true)
     try{await task()}catch(e){
       const message=parseError(e);setError(message)
       // Locate a server-rejected answer without changing validation or payloads.
-      const location=message.match(/answers\.([a-z][a-z0-9_-]*)(?:\.([a-z][a-z0-9_-]*))?/i)
-      const instrumentKey=location?.[2]?location[1]:undefined
-      const itemKey=location?.[2]||location?.[1]
-      const targetUnit=itemKey?taskState.current?.units.find(unit=>
-        (!instrumentKey||unit.instrumentKey===instrumentKey)&&(
-          unit.pages?.some(page=>page.questions.some(q=>q.itemKey===itemKey))||
-          unit.items?.some(q=>q.itemKey===itemKey)||
-          (unit.scenes?.flatMap(scene=>scene.questions)??unit.questions)?.some(q=>q.questionKey===itemKey))):undefined
-      if(targetUnit&&itemKey)revealAnswer(targetUnit,itemKey)
+      const target=rejectedAnswerTarget(message)
+      if(target)revealAnswer(target.unit,target.itemKey)
     }finally{setBusy(false);setBusyLabel('')}
   }
   const recoverWithoutInvitation=()=>void run(async()=>{
@@ -602,6 +613,7 @@ export default function SurveyPublicApp(){
       }catch(e){setNotice('无法恢复服务器临时存档：'+parseError(e))}
     }
     if(!saved?.finalSubmission)restoredAnswers={...restoredAnswers,...data.lockedPriorAnswers}
+    serverLockedKeys.current=new Set(Object.keys(data.lockedPriorAnswers??{}))
     setLockedAnswers(data.lockedPriorAnswers??{});setCognitiveSessions(data.cognitiveSessions??[])
     setCognitiveReferences((data.cognitiveSessions??[]).flatMap(s=>s.resultReference?[s.resultReference]:[]));setCognitiveRunning(false)
     timingTrackers.current={}
@@ -784,6 +796,7 @@ export default function SurveyPublicApp(){
       onStarted={(session,canonical)=>{
         rememberCognitive(attemptId,session.sessionId)
         const locked=(canonical??priorAnswersFor(unit.instrumentKey)) as Record<string,Record<string,Answer>>
+        for(const key of Object.keys(locked))serverLockedKeys.current.add(key)
         setLockedAnswers(old=>({...old,...locked}));if(!finalRequest.current)setAnswers(old=>({...old,...locked}))
         setCognitiveSessions(old=>[...old.filter(s=>s.slotKey!==session.slotKey),session])
       }}
@@ -886,6 +899,8 @@ export default function SurveyPublicApp(){
       // Ambiguous network/server failures must keep the exact request for retry.
       if(e instanceof SurveyPublicApiError&&[400,413].includes(e.status)){
         finalRequest.current=null;setFinalSealed(false)
+        const target=rejectedAnswerTarget(e.message)
+        if(target)revealAnswer(target.unit,target.itemKey,true)
         if(document.visibilityState!=='hidden'&&document.hasFocus())
           for(const tracker of Object.values(timingTrackers.current))tracker.resume()
         saveLocalSurveyDraft(publicId,attemptId,task.definitionDigest,

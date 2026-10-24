@@ -258,6 +258,23 @@ describe('Survey authoritative FINAL and timing lifecycle',()=>{
     }}})
   })
 
+  it('never reopens server-frozen prerequisites after a definitive FINAL rejection',async()=>{
+    taskOverrides={units:[{kind:'FORM',instrumentKey:'first',title:'前置问卷',
+      pages:[{pageKey:'page',title:'信息页',questions:[{itemKey:'email',type:'SHORT_TEXT',
+        prompt:'已锁定联系信息',required:true,options:[],textValidation:'EMAIL'}]}]},...task.units],
+      lockedPriorAnswers:{first:{email:'server@example.test'}}}
+    render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+    expect(await screen.findByLabelText('已锁定联系信息')).toBeDisabled()
+    fireEvent.click(screen.getByRole('button',{name:'下一部分'}))
+    fireEvent.click(await screen.findByRole('radio',{name:'同意'}))
+    finalReply=()=>response(null,400,'answers.first.email：服务器拒绝')
+    submit();await screen.findByRole('alert')
+    expect(screen.queryByLabelText('已锁定联系信息')).toBeNull()
+    expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
+    expect(finalCalls[0].answers).toEqual({first:{email:'server@example.test'},scale:{q1:'yes'}})
+  })
+
   it('reconciles a committed screen-out after a lost response and reload without replaying answers',async()=>{
     let screenOutCalls=0
     const original=vi.mocked(fetch).getMockImplementation()!
@@ -324,8 +341,8 @@ describe('Survey authoritative FINAL and timing lifecycle',()=>{
     fireEvent.click(screen.getByRole('radio',{name:'同意'}))
     fireEvent.click(screen.getByRole('button',{name:'下一部分'}))
     await waitFor(()=>expect(screen.getByRole('heading',{name:'填写问卷'})).toHaveFocus())
-    fireEvent.click(screen.getByRole('button',{name:'上一部分'}))
-    expect(screen.getByRole('radio',{name:'同意'})).toBeChecked()
+    expect(screen.queryByRole('button',{name:'上一部分'})).toBeNull()
+    expect(screen.queryByText('请选择处理方式')).toBeNull()
   })
   it('returns to the first missing timed item without discarding other answers',async()=>{
     taskValue.units[0].items.push({itemKey:'q2',prompt:'第二题',required:true})
