@@ -313,3 +313,35 @@ and needs its own browser verification. New intentional vector lettering is not
 compressed by changing its appearance. Prior bundle measurements are historical,
 not measurements of this merged candidate. Exact CI bindings remain stale until
 explicitly frozen again. No GitHub CI, PR merge or deployment was initiated.
+
+## Learner lifecycle follow-up
+
+Registered and anonymous questionnaire state endpoints dispatch FINAL_ONLY from
+scalar headers rather than loading then discarding legacy form definitions, scale
+children and answer payloads. Existing authoritative service reads and reconciliation,
+registered ownership checks, and anonymous resume-capability middleware remain.
+FINAL controller query count is unchanged; the legacy compatibility path adds one
+header query before its unchanged full projection and fresh ownership check.
+Twenty-two scoped assertions passed, including a targeted correction of the legacy
+transaction-read call index (2 to 3) without changing its exact reload assertion.
+
+Anonymous check-in validation now selects only check-in id, courseId,
+allowAnonymous and endTime for both hashed and legacy-token lookup. Full token
+scalars, expiry/revocation/usage checks, session capabilities and atomic submission
+SQL are unchanged. Display content is still freshly read separately. Thirty-four
+focused assertions passed. A synthetic fixture's relation JSON shrank from 38,876
+to 77 bytes; this is not a database-wire or production-memory measurement.
+
+Accepted-draft IndexedDB cleanup reads primary keys rather than cloning complete
+answer/trial values merely to delete them. Exact scope, same transaction, failure
+rollback and expired Training tombstones remain. Composite form saves still persist
+every answer; only an empty stale-answer cleanup operation is skipped. Real hidden
+answers continue to be removed. Eight distinct focused tests passed, including
+failure rollback and visible-field pruning; IndexedDB testing uses a transaction
+double, not a native browser. Initial no-test/locator failures were retained.
+
+Not implemented in this round: on-demand protected public video/document loading,
+SJT history/prefix hashing and growing journal serialization, or removing up to 200
+stale-asset cleanup operations from an anonymous request. These need separate
+behavioral, authorization, retention or scheduling validation. No debouncing of
+scientific events or weakening of submission/permission checks is introduced.
