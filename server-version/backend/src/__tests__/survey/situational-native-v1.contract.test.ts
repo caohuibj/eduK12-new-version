@@ -59,7 +59,7 @@ describe('Survey native V1 TEXT uses the existing scientific contract',()=>{
     for(const extra of [{flow:{}},{researchAssignment:{}},{researchAssignment:null}]){
       expect(()=>assertSurveyNativeSituationalDefinition({...pkg.definition,...extra} as never)).toThrow()
     }
-    const media=structuredClone(pkg.definition);media.scenes[0].stimulus={type:'IMAGE'} as never
+    const media=structuredClone(pkg.definition);media.scenes[0].stimulus={type:'VIDEO'} as never
     expect(()=>assertSurveyNativeSituationalDefinition(media)).toThrow()
     const unstaged=structuredClone(createSjtNativeStagedPackage().definition)
     if(unstaged.schemaVersion===2)for(const node of unstaged.flow.nodes)if(node.nodeType==='SCENE')delete node.responseStages

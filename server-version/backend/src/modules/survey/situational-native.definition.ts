@@ -26,10 +26,10 @@ export const frozenSurveyNativeSituationalHeaderSchema=surveyNativeSituationalHe
 export type FrozenSurveyNativeSituationalHeader=z.infer<typeof frozenSurveyNativeSituationalHeaderSchema>
 const fail=():never=>{throw new SurveySituationalProtocolError('SURVEY_SJT_NATIVE_STAGED_PROTOCOL_INVALID')}
 
-/** Shared native V1 fixed-linear TEXT and V2 staged TEXT DAG only.
- * Experiment allocation, variants and media remain separately qualified. */
+/** Shared native V1 fixed-linear and V2 staged DAG with TEXT or static IMAGE only.
+ * Experiment allocation, variants, VIDEO and COMIC remain separately qualified. */
 export function assertSurveyNativeSituationalDefinition(definition:SituationRuntimeDefinition):void {
-  if(definition.scenes.some(scene=>scene.stimulus.type!=='TEXT_V1'))fail()
+  if(definition.scenes.some(scene=>!['TEXT_V1','IMAGE'].includes(scene.stimulus.type)))fail()
   if(definition.schemaVersion===1){
     if(definition.sampling.strategy!=='ALL'||'researchAssignment' in definition||'flow' in definition)fail()
     return

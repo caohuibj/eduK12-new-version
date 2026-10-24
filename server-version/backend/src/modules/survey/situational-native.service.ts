@@ -1,3 +1,6 @@
+import { situationalImageAssetReferences } from '../situational/situation-definition'
+import { ASSESSMENT_FROZEN_RUNTIME_REFERENCE_TYPE,ASSESSMENT_FROZEN_RUNTIME_MEDIA_FIELD } from '../assessment-media/assessment-asset'
+import { SJT_AUTHOR_MEDIA_SCOPE,SJT_AUTHOR_MAX_IMAGE_BYTES } from '../situational/authoring/media'
 import { z } from 'zod'
 import { situationalLegacyFinalSubmitSchema } from '../situational/situational-final-submit.schema'
 import { hasSurveyStagedSituationalNotice,hasSurveyLinearSituationalNotice } from './measurement.notice'
@@ -10,7 +13,7 @@ import { canonicalHash } from '../assessment-runtime/canonical'
 import { getParticipantKey } from '../assessment-runtime/participant-key'
 import { decryptFrozenSituationalRuntimeSnapshot,encryptFrozenSituationalRuntimeSnapshot } from '../assessment-runtime/situational-runtime-snapshot'
 import { getAssessmentOperationalHold } from '../assessment-governance/operational-hold'
-import { SITUATIONAL_ATTEMPT_SELECT,assertRowMatchesSnapshot,situationalAttemptForResponse,
+import { SITUATIONAL_ATTEMPT_SELECT,assertRowMatchesSnapshot,situationalAttemptForResponse,retainFrozenSituationalAssets,
   type SituationalAttemptRow,type SituationalAttemptCommitRow } from '../situational/situational-runtime.service'
 import { prepareSituationalFinalSubmission,deriveSituationalFinalFacts,commitPreparedSituationalFinal } from '../situational/situational-final-submit.service'
 import { verifiedSurveyAttempt } from './admission.service'
@@ -79,6 +82,7 @@ export async function startSurveySituational(proof:SurveyTaskProof,slotKey:strin
       scoringVersion:runtime.header.scoringVersion,frozenAt:new Date(runtime.header.frozenAt),
       runtimeSnapshotEncrypted:encryptFrozenSituationalRuntimeSnapshot(runtime.snapshot),progress:0,
     },select:SITUATIONAL_ATTEMPT_SELECT})
+    await retainFrozenSituationalAssets(tx,row.id,runtime.snapshot)
     return view(row,runtime)
   })
 }
@@ -129,5 +133,29 @@ export async function submitSurveySituationalFinal(proof:SurveyTaskProof,slotKey
       persistProjection:async()=>{},
     })
     return view(committed.row,runtime,committed.kind==='replay')
+  })
+}
+
+/** Fresh host authority and both frozen retention owners precede shared byte
+ * delivery. No current catalog grant is reinterpreted as historical permission. */
+export async function authorizeSurveySituationalImage(proof:SurveyTaskProof,slotKey:string,childId:string,assetId:string){
+  const known=await verifiedSurveyAttempt(proof)
+  return withFinalOnlyCompletionTransaction(async tx=>{
+    const {snapshot}=await readLocked(tx,proof,known,slotKey,childId)
+    const reference=snapshot.definition.scenes.flatMap(scene=>situationalImageAssetReferences(scene.stimulus))
+      .find(asset=>asset.assetId===assetId)
+    if(!reference)fail(403,'图片不属于当前冻结情境化题面')
+    const pins=await tx.assetReference.findMany({where:{assetId,OR:[
+      {entityType:'SurveyResearchPublication',entityId:known.publicationId,field:'media'},
+      {entityType:ASSESSMENT_FROZEN_RUNTIME_REFERENCE_TYPE,entityId:`SITUATIONAL:${childId}`,field:ASSESSMENT_FROZEN_RUNTIME_MEDIA_FIELD},
+    ]},select:{entityType:true,entityId:true}})
+    if(!pins.some(pin=>pin.entityType==='SurveyResearchPublication'&&pin.entityId===known.publicationId)
+      ||!pins.some(pin=>pin.entityType===ASSESSMENT_FROZEN_RUNTIME_REFERENCE_TYPE&&pin.entityId===`SITUATIONAL:${childId}`))
+      fail(403,'情境图片缺少冻结保留凭据')
+    const asset=await tx.storedAsset.findUnique({where:{id:assetId},select:{accessScope:true,scopeId:true,deletedAt:true,sizeBytes:true,sha256:true,mimeType:true}})
+    if(!asset||asset.deletedAt||asset.accessScope!=='PRIVATE'||asset.scopeId!==SJT_AUTHOR_MEDIA_SCOPE
+      ||asset.sizeBytes<=0||asset.sizeBytes>SJT_AUTHOR_MAX_IMAGE_BYTES||asset.sha256!==reference!.contentHash||asset.mimeType!==reference!.mimeType)
+      fail(403,'情境图片已失效或身份不一致')
+    return snapshot
   })
 }

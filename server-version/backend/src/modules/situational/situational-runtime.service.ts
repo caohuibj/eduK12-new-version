@@ -442,7 +442,7 @@ export const getSituationalInstrument = (instrumentKey: string, instrumentVersio
   }
 }
 
-const retainFrozenSituationalAssets = async (
+export const retainFrozenSituationalAssets = async (
   db: Prisma.TransactionClient,
   attemptId: string,
   snapshot: FrozenSituationalRuntimeSnapshotV1,

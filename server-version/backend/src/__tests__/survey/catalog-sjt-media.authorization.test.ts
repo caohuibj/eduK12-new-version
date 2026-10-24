@@ -1,4 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import {compileSjtTemplate} from '../../modules/situational/authoring/template'
+import {sjtNativeStagedTemplate} from '../fixtures/sjt-native-staged.fixture'
 import fixture from '../../modules/situational/authoring/examples/online-hand-calculated.json'
 import { compileSjtOnlineDocument } from '../../modules/situational/authoring/online'
 import { adaptCatalogSjt } from '../../modules/survey/catalog.sources'
@@ -11,9 +13,10 @@ import {SjtEntryAuthorityError} from '../../modules/situational/entry-authority'
 vi.mock('../../modules/survey/catalog.service', async original => ({ ...await original<object>(), catalogSnapshotsForDrafts: h.snapshots }))
 const identity = { assetId: 'source-image', contentHash: 'a'.repeat(64), mimeType: 'image/png' }
 const image = { asset: identity, altText: '情境图', rightsStatus: 'self_authored', rightsNote: 'synthetic source' }
-function setup() {
-  const document: any = structuredClone(fixture); document.display.scenes[0].image = image
-  const pkg = { ...compileSjtOnlineDocument(document).package, releaseStatus: 'PUBLISHED' as const }
+function setup(native=false) {
+  const document: any = structuredClone(native?sjtNativeStagedTemplate:fixture)
+  if(native)document.nodes[0].image=image;else document.display.scenes[0].image=image
+  const pkg = { ...(native?compileSjtTemplate(document):compileSjtOnlineDocument(document)).package, releaseStatus: 'PUBLISHED' as const }
   const snapshot = adaptCatalogSjt({ kind: 'SJT', sourceId: 'release', sourceVersion: pkg.instrumentVersion }, 'SJT', pkg)
   const frozen = compileCatalogUnit({ id: 'draft', instrumentKey: 'sjt', kind: 'SJT', title: 'SJT', revision: 1, definition: snapshot.displayDefinition }, snapshot)
   const unit = { kind: frozen.kind, definition: frozen.displayDefinition, compiledDefinition: frozen.compiledDefinition, sourceProvenance: frozen.sourceProvenance }
@@ -27,6 +30,15 @@ function setup() {
 }
 beforeEach(() => vi.clearAllMocks())
 describe('catalog SJT media authority is release-bound, not asset-ID borrowing', () => {
+  it('uses the same exact grant and release-pin policy for native upload images, not just their asset IDs',async()=>{
+    const {db,unit,asset}=setup(true)
+    expect(await assertSurveyMediaOwned(db as never,'researcher','project',[unit])).toEqual([identity])
+    expect(h.snapshots).toHaveBeenCalledWith(db,'researcher',['grant'])
+    db.assetReference.findMany.mockResolvedValueOnce([])
+    await expect(authorizedCatalogSjtMedia(db as never,'researcher',unit)).rejects.toThrow('SOURCE_SJT_MEDIA_AUTHORIZATION_REQUIRED')
+    asset.accessScope='PUBLIC'
+    await expect(authorizedCatalogSjtMedia(db as never,'researcher',unit)).rejects.toThrow('SOURCE_SJT_MEDIA_AUTHORIZATION_REQUIRED')
+  })
   it('uses current grant admission and original release retention without changing private ownership', async () => {
     const { db, unit, asset } = setup()
     expect(await assertSurveyMediaOwned(db as never, 'researcher', 'project', [unit])).toEqual([identity])

@@ -105,14 +105,19 @@ describe('Original synthetic V1 package contract, not an actual registry release
     expect(() => compileSurveyNativeSituationalHeader(compiled.package)).toThrow()
   })
 
-  it('does not widen V1 admission to media, assignment, stimulus variants or a hidden parent flow', () => {
+  it('does not widen V1 admission to unsupported media, assignment, stimulus variants or a hidden parent flow', () => {
     const media = structuredClone(registry.pkg!)
     media.definition.scenes[0].stimulus = {
       type: 'IMAGE', text: 'Synthetic text fallback', altText: 'Synthetic image',
       asset: { assetId: randomUUID(), contentHash: 'a'.repeat(64), mimeType: 'image/png' },
     }
     expect(validateSituationPackage(media).valid).toBe(true)
-    expect(() => compileSurveyNativeSituationalHeader(media)).toThrow()
+    expect(() => compileSurveyNativeSituationalHeader(media)).not.toThrow()
+    // Header compilation alone grants no image publication or delivery rights;
+    // those require the exact source/publication/child pins tested separately.
+    const comic=structuredClone(registry.pkg!)
+    comic.definition.scenes[0].stimulus={type:'COMIC_PANELS',panels:[]} as never
+    expect(() => compileSurveyNativeSituationalHeader(comic)).toThrow()
     for (const extension of [
       { researchAssignment: { assignmentVersion: 'synthetic-unadmitted', groups: [] } },
       { flow: { strategy: 'BRANCHING_DAG_V1', entryNodeKey: 'hidden', nodes: [] } },

@@ -22,7 +22,13 @@ export function SurveySituationalUnit(props:{publicId:string;attemptId:string;sl
     }
     const result:SituationalRunnerClient={start:()=>call('/start'),resume:id=>call(`/${encodeURIComponent(id)}/read`),
       result:id=>call(`/${encodeURIComponent(id)}/read`),submit:(id,input)=>call(`/${encodeURIComponent(id)}/final`,input),
-      loadAsset:async()=>{throw new Error('当前原生情境化试点不支持媒体')},
+      loadAsset:async(id,assetId)=>{
+        const response=await fetch(base+`/${encodeURIComponent(id)}/images/${encodeURIComponent(assetId)}`,{
+          method:'POST',credentials:'omit',cache:'no-store',headers:{'Content-Type':'application/json'},body:JSON.stringify(proof),
+        })
+        if(!response.ok)throw Object.assign(new Error('情境图片暂时无法访问，请重试'),{status:response.status})
+        return response.blob()
+      },
       loadVideoSources:async()=>{throw new Error('当前原生情境化试点不支持视频')},
     }
     return {runner:result,call}

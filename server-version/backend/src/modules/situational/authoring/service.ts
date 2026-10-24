@@ -466,7 +466,10 @@ export async function adaptSjtRelease(actor: SjtAuthorActor, releaseId: string,
     if (template.templateVersion === 'sjt-online-v1') {
       template.goldenCases = []
       for (const scene of template.display.scenes) if (scene.image) scene.image.rightsStatus = 'authorized'
-    } else template.cases = []
+    } else {
+      template.cases = []
+      for (const node of template.nodes) if (node.image) node.image.rightsStatus = 'authorized'
+    }
     const c = compileSjtAuthorDocument(template)
     assertUnreserved(c.template.instrumentKey)
     const adaptationSource: SjtAdaptationSource = { protocol: 'sjt-adaptation-v1', receipt,

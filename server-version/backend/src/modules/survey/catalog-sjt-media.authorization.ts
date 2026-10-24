@@ -1,6 +1,7 @@
 import { SJT_COURSE_GRANT_POLICY } from '../situational/authoring/grant-contract'
 import { recheckSjtEntryDistributionAuthority, SjtEntryAuthorityError } from '../situational/entry-authority'
 import { assertSurveyNativeSituationalDefinition } from './situational-native.definition'
+import { situationalImageAssetReferences } from '../situational/situation-definition'
 import type { SituationRuntimeDefinition } from '../situational/situation-runtime-definition'
 import { Prisma } from '@prisma/client'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -19,16 +20,18 @@ export async function authorizedCatalogSjtMedia(tx: Prisma.TransactionClient, us
   if (unit.kind !== 'SJT' || !unit.sourceProvenance) return null
   const source = unit.sourceProvenance.source as CatalogSourceRef | undefined
   if (!source || source.kind !== 'SJT' || typeof source.sourceId !== 'string' || typeof source.sourceVersion !== 'string') return fail()
-  if(unit.sourceProvenance.adapterVersion===NATIVE_SJT_ADAPTER_VERSION){
-    // This protocol admits only its qualified text-only definitions; it never transfers an asset.
-    assertSurveyNativeSituationalDefinition(unit.compiledDefinition as SituationRuntimeDefinition)
-    return []
+  const native=unit.sourceProvenance.adapterVersion===NATIVE_SJT_ADAPTER_VERSION
+  let images:Array<{asset:ReturnType<typeof sjtAuthorImages>[number]['asset']}>
+  if(native){
+    const definition=unit.compiledDefinition as SituationRuntimeDefinition
+    assertSurveyNativeSituationalDefinition(definition)
+    images=definition.scenes.flatMap(scene=>situationalImageAssetReferences(scene.stimulus)).map(asset=>({asset}))
+  }else{
+    try { images = sjtAuthorImages({ templateVersion: 'sjt-online-v1', display: unit.definition }) }
+    catch (error) { if (error instanceof SjtAuthorMediaError) return fail(); throw error }
   }
-  let images: ReturnType<typeof sjtAuthorImages>
-  try { images = sjtAuthorImages({ templateVersion: 'sjt-online-v1', display: unit.definition }) }
-  catch (error) { if (error instanceof SjtAuthorMediaError) return fail(); throw error }
   if (!images.length) return []
-  if (source.sourceId.startsWith('registry:') || unit.sourceProvenance.adapterVersion !== ONLINE_SJT_ADAPTER_VERSION || !unit.compiledDefinition) return fail()
+  if (source.sourceId.startsWith('registry:') || (!native&&unit.sourceProvenance.adapterVersion !== ONLINE_SJT_ADAPTER_VERSION) || !unit.compiledDefinition) return fail()
   const candidates = await tx.$queryRaw<Array<{ id: string }>>`SELECT id FROM survey_tool_grants
     WHERE user_id=${userId} AND status='ACTIVE' AND snapshot->'ref'=${JSON.stringify(source)}::jsonb ORDER BY id`
   const snapshots = await catalogSnapshotsForDrafts(tx, userId, candidates.map(row => row.id))
