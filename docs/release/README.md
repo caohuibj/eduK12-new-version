@@ -1370,3 +1370,8 @@ The one repair run uses a candidate-only concurrency suffix so the original
 independent SAST can finish while missing qualification work proceeds. Its
 original-job verifier waits at most six minutes for actual completed success;
 failure/timeout still blocks merging, and no pending result is accepted.
+
+Run 40057566877 was rejected before jobs because the service-container context
+was placed at job environment scope. The container id is now supplied only to
+the migration step, where that context is available. No checks/build ran in the
+rejected invocation; original SAST remains independently running.

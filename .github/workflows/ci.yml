@@ -1330,7 +1330,6 @@ jobs:
       CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
       CI_PR_NUMBER: ${{ github.event.pull_request.number }}
       PLAN: ${{ needs.scope.outputs.training_teacher_plan }}
-      CI_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
       NODE_ENV: test
       DATABASE_URL: postgresql://postgres:synthetic-ci-only@127.0.0.1:55432/qualification_training_teacher_ci
       REDIS_URL: redis://127.0.0.1:16379
@@ -1367,6 +1366,8 @@ jobs:
           cd server-version/backend
           node node_modules/prisma/build/index.js generate
       - name: isolated legacy upgrade and same-schema dump restore
+        env:
+          CI_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
         run: node .github/scripts/training-teacher-checks.mjs migration
       - name: real HTTP authentication CSRF and trainer management boundary
         run: node .github/scripts/training-teacher-http.cjs
