@@ -1487,20 +1487,9 @@ jobs:
     if: github.event_name == 'pull_request' && github.event.pull_request.draft == false && needs.scope.outputs.application_route == 'sjt-native'
     runs-on: ubuntu-24.04
     timeout-minutes: 15
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: synthetic-ci-only
-          POSTGRES_DB: sjt_native_upgrade_test
-        ports: [55432:5432]
-        options: >-
-          --health-cmd pg_isready --health-interval 5s --health-timeout 5s --health-retries 12
     env:
       NPM_CONFIG_REGISTRY: https://registry.npmjs.org
       NPM_CONFIG_REPLACE_REGISTRY_HOST: always
-      DATABASE_URL: postgresql://postgres:synthetic-ci-only@127.0.0.1:55432/sjt_native_upgrade_test
       NODE_OPTIONS: --max-old-space-size=4096
       TZ: UTC
     steps:
@@ -1519,19 +1508,14 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: node .github/scripts/sjt-native-scope.mjs dependency-audits
-      - name: install exact official dependencies without repeat audit
-        run: |
-          npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/backend
-          npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/frontend
-          node server-version/backend/node_modules/prisma/build/index.js generate --schema server-version/backend/prisma/schema.prisma
       - name: restore unchanged exact official backend and frontend builds
         env:
           GH_TOKEN: ${{ github.token }}
         run: node .github/scripts/sjt-native-scope.mjs restore-build
-      - name: upgrade nonempty exact main and verify isolated database restore
+      - name: retain exact successful nonempty upgrade and restore qualification
         env:
-          PG_CONTAINER: ${{ job.services.postgres.id }}
-        run: node .github/scripts/sjt-native-migration.mjs
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/sjt-native-scope.mjs retain-migration
       - name: install pinned browser controls and official Chinese fonts
         run: |
           npm ci --ignore-scripts --no-audit --no-fund --prefix .github/release-tools

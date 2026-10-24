@@ -1,8 +1,8 @@
 {
   "schema": 1,
   "base": "b9ad2b7f6fea17a599bdfd57445822c80a4f7538",
-  "localProduct": "2594517dd04eb9bc99837e59743879c2e749c75b",
-  "productTree": "10549d1cc318b0993d66f09e227cabeac647df0e",
+  "localProduct": "063c2e274e506923d0197c6554ebb62b7137b127",
+  "productTree": "c221e77c0c1ef850188acc72eb1986d7a2c55898",
   "source": {
     "server-version/backend/prisma/migrations/20261024060000_survey_situational_host_binding/migration.sql": {
       "status": "A",
@@ -562,7 +562,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "ff56e863e8898cb05aec93d89d6578786a085deb",
-      "after": "ce968168665843045f87afd243b9337c1067aabf"
+      "after": "1e89fe0b0c93ad40030de49e2c644dfb174c0af4"
     },
     "server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx": {
       "status": "M",
@@ -698,7 +698,7 @@
   },
   "components": {
     "backend": "7c25fd8fcc5e2693c4d2aa242c8c18167a3c0709",
-    "frontend": "68c2ab89d42444facf8526aa1004b73e8b32496d"
+    "frontend": "f6ebbcfda3636617e866fda0db76bd7a6dc86eee"
   },
   "publicationInputs": {
     "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
@@ -788,20 +788,27 @@
       "current CodeQL",
       "two real compiled-host Chromium image decoder journeys"
     ],
-    "priorFailures": "Preserved in local source records; local socket EPERM browser attempt is not passed. Prior FE type failure was corrected and the final type check passed."
+    "priorFailures": "Preserved in local source records; local socket EPERM browser attempt is not passed. Prior FE type failure was corrected and the final type check passed.",
+    "testOnlyFollowup": {
+      "file": "server-version/frontend/src/modules/situational/__tests__/SituationalRunner.test.tsx",
+      "before": "ce968168665843045f87afd243b9337c1067aabf",
+      "after": "1e89fe0b0c93ad40030de49e2c644dfb174c0af4",
+      "review": "One added focused async journal/radio contract only; no production or build configuration changed. Production build does not consume test modules.",
+      "validation": "One selected deferred journal contract passed; 38 not selected. Lint exit 0. Prior fixture-only failed attempt retained locally; not a full-file PASS."
+    }
   },
   "controlSHA256": {
-    ".github/scripts/sjt-native-scope.mjs": "f373a29742f6d9d58d803cadb6d3ea63a92edc3449ee1ac29d627f7e87745c41",
-    ".github/scripts/sjt-native.test.mjs": "12b844566b3be9f9ff1e44eab98eae958737d145299034422c2eaabe4289314b",
+    ".github/scripts/sjt-native-scope.mjs": "479b45659e54b1f31eb345a61bc456f75bfd3b7a016ac34655b444e3cc21c124",
+    ".github/scripts/sjt-native.test.mjs": "ab10813f1cb47db878edae85d436aa17eb2325648ac293cb86a9f30a301571a9",
     ".github/scripts/sjt-native-migration.mjs": "ae100c035dd10674f04f1e0d8b8752f602a7ef3eacde0ea79d7a59ff35b4574f",
-    ".github/scripts/sjt-native-browser.mjs": "1da96f08bf0b7f0f9e6fbbbd266a975446a79534ab7fe068d07a462b5231d03f",
+    ".github/scripts/sjt-native-browser.mjs": "bb89d060043d13087a0e8ba23ac509f78e5d171502e427256c92e1db2d43b7f6",
     ".github/scripts/content-scope.mjs": "e65006067859ca6b5ca969cc3a9337280001c5b1bb5662a7a99b0f994be403b6",
     ".github/scripts/merge-gate.mjs": "46f5722169a9c7e3b7d67408e605bd05e3224d98eb3b1e31e1f78c891bfa987a",
-    ".github/workflows/ci.yml": "db06f6fe2c646d046dc168853e4e51401f1db3dae2c49ede3fc7d534353dc1d3",
+    ".github/workflows/ci.yml": "15fbd110b449524aa85e49db7e9ec85d05a7ebfef06472f22f6a197083127203",
     ".github/workflows/situational-publication.yml": "5c93c3b1a08ab210fff3ff4e43cd4d23e385c72a6eaa44611d4e28a190c37187",
-    "docs/release/README.md": "6bd71ae59cd41967ea707814f2d38dcc30de3e098a53ab00a6ad0bc4396db658"
+    "docs/release/README.md": "fdc3a2d46c4a51907903f94f1f46f282d2194652f8e01d86fd4bebe4313d4702"
   },
-  "product": "684b2bc9362e103d0f3cf8f29935aeaa88803fba",
+  "product": "9384e3155b31d5ffaeb735c8cffaff12d07c84cb",
   "officialBuild": {
     "run": 40102230878,
     "job": 120896620975,
@@ -815,6 +822,32 @@
       "compile changed backend once without broad onboarding replay",
       "build changed frontend once",
       "record exact built source and emitted bytes"
-    ]
+    ],
+    "testDelta": {
+      "file": "server-version/frontend/src/modules/situational/__tests__/SituationalRunner.test.tsx",
+      "before": "ce968168665843045f87afd243b9337c1067aabf",
+      "after": "1e89fe0b0c93ad40030de49e2c644dfb174c0af4",
+      "review": "One added focused async journal/radio contract only; no production or build configuration changed. Production build does not consume test modules."
+    }
+  },
+  "officialMigration": {
+    "run": 40103266820,
+    "job": 120899643368,
+    "head": "81bcd3e375a954220127d88577e23d41c92d4f0c",
+    "checkout": "2baa40b7a845ae38e6e2ed3fa37b8249df82e470",
+    "artifact": 12563591799,
+    "name": "sjt-native-2baa40b7a845ae38e6e2ed3fa37b8249df82e470-1",
+    "bytes": 31416765,
+    "sha256": "273b3710e9cdecf5f5fd04c77257d349a497f7331b0d0016252ccc3eb9e07e59",
+    "prismaTree": "3c255e536daff0613f4c4563bf3398bedf6178f0",
+    "scripts": {
+      ".github/scripts/sjt-native-migration.mjs": "ae100c035dd10674f04f1e0d8b8752f602a7ef3eacde0ea79d7a59ff35b4574f",
+      ".github/scripts/training-entry-migration.mjs": "b5c42b2c5bb3894cb8f0baaf4330cf78fc1f0147fad79bd676d1a35186a9faac"
+    },
+    "files": {
+      "migration.json": "c70aa240d9c9ce6780adda129e27e6b3c87b8ce1a5eb5643d07d165742e6e473",
+      "migration-schema-comparison.json": "00be8db81b8ce3d283c9ca014e597594f4c68e74544aea0482e5e53d13f38560",
+      "sjt-native-upgrade.dump": "164d0463b89c53b1a04d36c0721adc2db8b21f5d521b27559a699bfbc1cff221"
+    }
   }
 }

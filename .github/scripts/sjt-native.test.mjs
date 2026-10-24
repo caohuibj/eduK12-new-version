@@ -45,7 +45,7 @@ test('publication boundary checks every declared input and fixed imported class'
 test('SJT executor does not add a reusable workflow or select full-platform tests',()=>{
  const text=readFileSync('.github/workflows/ci.yml','utf8');
  const job=text.split('  sjt-native:\n')[1].split('\n  training-entry:')[0];
- for(const required of ['postgres:17','sjt-native-migration.mjs','sjt-native-browser.mjs','if: always()','sjt-native-scope.mjs restore-build'])assert(job.includes(required),required);
+ for(const required of ['sjt-native-scope.mjs retain-migration','sjt-native-browser.mjs','if: always()','sjt-native-scope.mjs restore-build'])assert(job.includes(required),required);
  for(const forbidden of ['uses: ./.github/workflows/','npm test','--all','--passWithNoTests','continue-on-error'])assert(!job.includes(forbidden),forbidden);
  assert(text.includes('needs: [scope, sjt-native,'));
 });
@@ -54,7 +54,8 @@ test('service container identity is evaluated only at supported step environment
  const job=text.split('  sjt-native:\n')[1].split('\n  training-entry:')[0];
  const jobEnvironment=job.split('    env:\n')[1].split('    steps:\n')[0];
  assert(!jobEnvironment.includes('job.services'),'Job context is unavailable at job-level env');
- assert(job.includes('      - name: upgrade nonempty exact main and verify isolated database restore\n        env:\n          PG_CONTAINER: ${{ job.services.postgres.id }}\n        run: node .github/scripts/sjt-native-migration.mjs'));
+ assert(!job.includes('PG_CONTAINER'));
+ assert(!job.includes('services:'),'Exact migration reuse must not start a second database');
 });
 test('shallow scope explicitly fetches the exact SJT PR source before comparing trees',()=>{
  const text=readFileSync('.github/workflows/ci.yml','utf8');
@@ -66,7 +67,11 @@ test('shallow scope explicitly fetches the exact SJT PR source before comparing 
 
 test('official build reuse rejects changed input or unrelated checkout',()=>{
  const source=binding.officialBuild.checkout;
- verifyBuiltInputs(source+'\n','exact manifest\n','exact manifest');
+ const d=binding.officialBuild.testDelta;
+ const before=d?'100644 blob '+d.before+'\t'+d.file:'exact manifest';
+ const after=d?'100644 blob '+d.after+'\t'+d.file:'exact manifest';
+ verifyBuiltInputs(source+'\n',before+'\n',after);
+ assert.throws(()=>verifyBuiltInputs(source,before+'\nunchanged',after+'\nchanged'));
  assert.throws(()=>verifyBuiltInputs('a'.repeat(40),'same','same'));
  assert.throws(()=>verifyBuiltInputs(source,'before','after'));
 });
@@ -77,4 +82,14 @@ test('migration probes keep disclosure admission separate from published immutab
  assert(text.includes("UPDATE survey_waves SET linkage_notice_confirmed=true,publication_id='ci_sjt_linked_publication'"));
  assert(!text.includes('DISABLE TRIGGER'));
  assert(text.includes("SQLSTATE '${state}'"));
+});
+
+test('retained migration pins schema, both probes and official restore files',()=>{
+ const r=binding.officialMigration;
+ assert.equal(r.scripts['.github/scripts/sjt-native-migration.mjs'].length,64);
+ assert.equal(r.scripts['.github/scripts/training-entry-migration.mjs'].length,64);
+ assert.deepEqual(Object.keys(r.files).sort(),['migration-schema-comparison.json','migration.json','sjt-native-upgrade.dump']);
+ const text=readFileSync('.github/scripts/sjt-native-scope.mjs','utf8');
+ assert(text.includes("assert.equal(report.guardChecksPerDatabase,29)"));
+ assert(text.includes("s.name==='upgrade nonempty exact main and verify isolated database restore'&&s.conclusion==='success'"));
 });

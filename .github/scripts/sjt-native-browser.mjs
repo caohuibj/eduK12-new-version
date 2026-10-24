@@ -67,12 +67,13 @@ const server=createServer(async(req,res)=>{try{
 let browser;
 const deadline=setTimeout(()=>{report.status='TIMEOUT';void persist();server.closeAllConnections();void browser?.close();process.exitCode=1;},180000);
 const tick=page=>page.evaluate(()=>new Promise(done=>requestAnimationFrame(()=>requestAnimationFrame(done))));
-async function exposure(page){return page.evaluate(async()=>{
+async function journal(page){return page.evaluate(async()=>{
   const databases=await indexedDB.databases();if(!databases.some(d=>d.name==='eduk12-final-drafts-v1'))return [];
   const db=await new Promise((yes,no)=>{const r=indexedDB.open('eduk12-final-drafts-v1');r.onsuccess=()=>yes(r.result);r.onerror=()=>no(r.error);});
   try{return await new Promise((yes,no)=>{const r=db.transaction('draftTrials','readonly').objectStore('draftTrials').getAll();r.onerror=()=>no(r.error);
-    r.onsuccess=()=>yes(r.result.flatMap(row=>row.payload?.events??[row.payload]).filter(e=>e?.type==='NODE_EXPOSED'));});}finally{db.close();}
+    r.onsuccess=()=>yes(r.result.flatMap(row=>row.payload?.events??[row.payload]).filter(Boolean));});}finally{db.close();}
 });}
+const exposure=async page=>(await journal(page)).filter(e=>e.type==='NODE_EXPOSED');
 const until=async(fn,message)=>{const end=Date.now()+12000;while(Date.now()<end){if(await fn())return;await new Promise(r=>setTimeout(r,25));}throw Error(message);};
 async function scenario(host,local){
   const origin=host==='training'?'https://training.eduk12.top':'https://survey.eduk12.top';
@@ -137,7 +138,16 @@ async function scenario(host,local){
     await until(async()=>await page.getByLabel('情境 1 选择 A',{exact:true}).isEnabled(),'Decoded image did not enable choice');
     await until(async()=>(await exposure(page)).length===1,'Successful decode did not create exactly one exposure');
     assert.equal(firstReads,2);await proof('real-decode-retry-one-exposure');
-    await page.getByLabel('情境 1 选择 A',{exact:true}).check();
+    // The controlled choice becomes checked only after its durable journal write.
+    // check() tests synchronously after click and can reject this valid async save.
+    const choice=page.getByLabel('情境 1 选择 A',{exact:true});await choice.click();
+    await until(async()=>await choice.isChecked(),'Durably saved choice did not remain checked');
+    await until(async()=>{
+      const choices=(await journal(page)).filter(e=>e.type==='RESPONSE_FIRST_COMMITTED'&&e.nodeKey==='node-1'&&e.channelKey==='choice');
+      assert(choices.length<=1,'Choice was committed more than once');
+      return choices.length===1&&choices[0].responseValue==='A';
+    },'Selected choice missing from durable research journal');
+    await page.getByText('最新作答已保存到本机。',{exact:true}).waitFor();
     await page.getByRole('button',{name:'确认行动选择',exact:true}).click();
     await page.getByRole('button',{name:'下一题',exact:true}).click();
     await until(()=>secondReads===1,'Second image request missing');

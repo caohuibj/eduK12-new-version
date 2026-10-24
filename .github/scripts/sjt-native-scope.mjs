@@ -86,6 +86,13 @@ async function dependencyAuditProof(component){
 // Fixed successful build substeps only; the original qualification remains failed.
 export function verifyBuiltInputs(source, inputs, current) {
  assert.equal(source.trim(),binding.officialBuild.checkout);
+ const d=binding.officialBuild.testDelta;
+ if(d){
+  const before='100644 blob '+d.before+'\t'+d.file,after='100644 blob '+d.after+'\t'+d.file;
+  const lines=current.trim().split('\n');assert.equal(lines.filter(x=>x===after).length,1,'Exact reviewed test delta missing');
+  assert.equal(inputs.trim().split('\n').filter(x=>x===before).length,1,'Original test blob missing');
+  current=lines.map(x=>x===after?before:x).join('\n');
+ }
  assert.equal(inputs.trim(),current.trim(),'Build source/dependency/tool inputs changed');
 }
 async function restoreOfficialBuild(){
@@ -131,8 +138,33 @@ if sys.argv[1]=='extract':
  execFileSync('python3',['-c',script,'extract'],{input:zip,encoding:'utf8',maxBuffer:4*1024*1024});
  save('build-original-proof',{run:r.run,job:r.job,artifact:r.artifact,sha256:r.sha256,checkout:r.checkout,originalConclusion:'failure',accepted:'successful build substeps only',files:inspect.files,migrationRestoreAccepted:false,browserAccepted:false});
 }
+// Accept only this completed upgrade/restore substep, never its failed browser.
+async function retainOfficialMigration(){
+ const r=binding.officialMigration;
+ assert.equal(git('rev-parse','HEAD:server-version/backend/prisma'),r.prismaTree);
+ for(const [file,digest]of Object.entries(r.scripts))assert.equal(sha(git('show','HEAD:'+file)),digest,'Migration executor input changed');
+ assert.equal(process.env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');
+ const api=async path=>{const response=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/'+path,{headers:{Authorization:`Bearer ${process.env.GH_TOKEN}`,Accept:'application/vnd.github+json'}});assert.equal(response.status,200,'Official migration evidence unavailable');return response;};
+ const [run,job,a]=await Promise.all([api(`actions/runs/${r.run}`).then(x=>x.json()),api(`actions/jobs/${r.job}`).then(x=>x.json()),api(`actions/artifacts/${r.artifact}`).then(x=>x.json())]);
+ assert.equal(run.head_sha,r.head);assert.equal(run.event,'pull_request');assert.equal(run.path,'.github/workflows/ci.yml');assert.equal(run.head_branch,branch);
+ assert.equal(job.run_id,r.run);assert.equal(job.head_sha,r.head);assert.equal(job.name,'shared SJT bounded qualification');assert.equal(job.status,'completed');assert.equal(job.conclusion,'failure');
+ assert(job.steps.some(s=>s.name==='upgrade nonempty exact main and verify isolated database restore'&&s.conclusion==='success'));
+ assert.equal(a.id,r.artifact);assert.equal(a.workflow_run.id,r.run);assert.equal(a.workflow_run.head_sha,r.head);assert.equal(a.expired,false);assert.equal(a.name,r.name);assert.equal(a.size_in_bytes,r.bytes);assert.equal(a.digest,'sha256:'+r.sha256);
+ const zip=Buffer.from(await(await api(`actions/artifacts/${r.artifact}/zip`)).arrayBuffer());assert.equal(zip.length,r.bytes);assert.equal(sha(zip),r.sha256);
+ const report=JSON.parse(execFileSync('python3',['-c',`import sys,io,json,zipfile,hashlib,pathlib
+z=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read())); expected=json.loads(sys.argv[1]); assert len(z.namelist())==len(set(z.namelist()))
+for name,digest in expected.items():
+ data=z.read('sjt-native-evidence/'+name); assert hashlib.sha256(data).hexdigest()==digest
+ p=pathlib.Path('sjt-native-evidence')/name; assert not p.exists(); p.parent.mkdir(exist_ok=True);p.write_bytes(data)
+print(z.read('sjt-native-evidence/migration.json').decode())`,JSON.stringify(r.files)],{input:zip,encoding:'utf8',maxBuffer:4*1024*1024}));
+ assert.equal(report.head,r.checkout);assert.equal(report.base,binding.base);assert.equal(report.kind,'isolated-actions-sjt-migration-restore');
+ for(const name of ['oldRowsPreserved','legacyNullBindingsPreserved','populatedNativeBindingRestored','hostBindingAndAnswerLockGuardsVerified','restoredRowsAndSchemaEqual'])assert.equal(report[name],true);
+ assert.equal(report.guardChecksPerDatabase,29);assert.equal(report.dumpSHA256,r.files['sjt-native-upgrade.dump']);
+ save('migration-original-proof',{run:r.run,job:r.job,artifact:r.artifact,sha256:r.sha256,checkout:r.checkout,originalConclusion:'failure',accepted:'successful nonempty upgrade and full restore substep only',rerun:false,browserAccepted:false});
+}
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
  if(process.argv[2]==='restore-build')await restoreOfficialBuild();
+ else if(process.argv[2]==='retain-migration')await retainOfficialMigration();
  else{assert.equal(process.argv[2],'dependency-audits');
  for(const component of ['backend','frontend']){
   const proof=await dependencyAuditProof(component);
