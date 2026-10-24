@@ -198,22 +198,9 @@ export const assignmentController = {
 
       // 教师只能看到自己课程的练习，管理员可以看到所有
       if (userRole === UserRole.TEACHER) {
-        // 获取教师的所有课程ID
-        const teacherCourses = await prisma.course.findMany({
-          where: { creatorId: userId },
-          select: { id: true }
-        })
-        const courseIds = teacherCourses.map(c => c.id)
-        
-        // 如果指定了courseId，检查是否属于该教师
-        if (courseId) {
-          if (!courseIds.includes(courseId as string)) {
-            return success(res, buildPaginatedResult([], 0, pagination))
-          }
-        } else {
-          // 未指定courseId，只看自己课程的练习
-          where.courseId = { in: courseIds }
-        }
+        // Enforce ownership in the task query itself instead of materializing
+        // every owned course ID (also keeps a supplied courseId constrained).
+        where.course = { creatorId: userId }
       }
 
       // The old training list is not an Activity discovery API. Global
@@ -850,7 +837,7 @@ export const assignmentController = {
 
       const assignment = await prisma.assignment.findUnique({
         where: { id },
-        include: {
+        select: {
           course: {
             select: {
               creatorId: true,
@@ -1124,13 +1111,15 @@ export const assignmentController = {
 
       // 创建 Excel（ExcelJS，避免旧版 xlsx 解析器漏洞）
 
+      // Build before setting download headers so failures remain JSON errors.
+      const buffer = await (await import('../utils/excelWorkbook')).workbookBuffer({ '练习提交数据': exportData })
+
       // 设置响应头
       const fileName = `${assignment.title}_提交数据.xlsx`
       res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
       res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`)
 
       // 发送文件
-      const buffer = await (await import('../utils/excelWorkbook')).workbookBuffer({ '练习提交数据': exportData })
       res.send(buffer)
     } catch (err) {
       logger.error('导出数据错误', err)
