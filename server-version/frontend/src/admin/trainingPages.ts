@@ -1,6 +1,6 @@
 /** Presentation routes; every page still requires the explicit TRAINING grant. */
 export const trainingAdminPages=[
-  {key:'accounts',path:'/admin/training/accounts',label:'账号与审核'},
+  {key:'accounts',path:'/admin/training/accounts',label:'用户管理'},
   {key:'courses',path:'/admin/training/courses',label:'课程监管'},
   {key:'resources',path:'/admin/training/resources',label:'资源与授权'},
 ] as const

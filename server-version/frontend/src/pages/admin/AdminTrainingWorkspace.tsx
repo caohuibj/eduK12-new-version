@@ -11,7 +11,7 @@ import '../../training/training-admin-workspace.css'
 function AccountsPage(){
   const {hash}=useLocation()
   const [codesOpen,setCodesOpen]=useState(hash==='#training-registration-codes')
-  return <div className="training-account-management"><UserList training/>
+  return <div className="training-account-management"><UserList training trainingTitle="用户管理"/>
     <details id="training-registration-codes" className="training-account-codes" open={codesOpen} onToggle={event=>setCodesOpen(event.currentTarget.open)}><summary>培训师注册码管理<span>在本页查看、生成与撤销注册码</span></summary>{codesOpen&&<TeacherCodeList training/>}</details>
   </div>
 }
@@ -22,7 +22,7 @@ function ManagementScope(){return <details className="training-management-scope"
     </div></details>}
 
 const pageCopy={
-  accounts:{title:'账号与审核',description:'核对培训身份，处理账号与培训师注册事宜。',note:'审核前请先核实培训师资格。课程内成员操作请在课程详情中处理。'},
+  accounts:{title:'用户管理',description:'核对培训身份，处理账号与培训师注册事宜。',note:'审核前请先核实培训师资格。课程内成员操作请在课程详情中处理。'},
   courses:{title:'课程监管',description:'查找培训课程、核对学员情况，在本页完成日常监管。',note:'暂停招募不影响现有学员。结束课程会停止招募，并保留课程内容与历史数据。'},
   resources:{title:'资源与授权',description:'查阅资源，在本页管理培训师使用授权与内容权利。',note:'使用授权、科学发布资格和报告查看权限分别核验；请按当前任务选择适用资源。'},
 } as const
@@ -34,8 +34,7 @@ export default function AdminTrainingWorkspace(){
   if(pathname.replace(/\/$/,'')==='/admin/training')return <Navigate replace to={'/admin/training/'+(legacy??'accounts')}/>
   const copy=pageCopy[page]
   return <div className="training-management-home training-management-section-page">
-    <header className="training-management-page-heading training-course-page-heading"><h1>{copy.title}</h1></header>
-    {page==='accounts'?<AccountsPage/>:page==='courses'?<TrainingAdminCourses/>:<TrainingAdminResources/>}
+    {page==='accounts'?<AccountsPage/>:page==='courses'?<TrainingAdminCourses pageTitle="课程监管"/>:<TrainingAdminResources/>}
     <p className="training-management-page-note"><ShieldCheck size={18} aria-hidden="true"/>{copy.note}</p>
     <ManagementScope/>
   </div>

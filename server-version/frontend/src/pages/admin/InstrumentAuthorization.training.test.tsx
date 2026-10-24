@@ -20,7 +20,20 @@ describe('Training content rights integration',()=>{
   expect(await screen.findByRole('alert')).toHaveTextContent('请填写');expect(api.create).not.toHaveBeenCalled();expect(screen.getByPlaceholderText('授权方 grantor')).toHaveValue('')
  })
  it('filters rights records without affecting the underlying authorization collection',async()=>{
-  render(<InstrumentAuthorization training/>);await screen.findByText('demo');fireEvent.click(screen.getByText('权利检索',{selector:'summary'}));fireEvent.change(screen.getByRole('searchbox'),{target:{value:'does-not-exist'}});expect(screen.queryByText('demo')).not.toBeInTheDocument();fireEvent.change(screen.getByRole('searchbox'),{target:{value:'demo'}});expect(screen.getByText('demo')).toBeVisible();expect(api.list).toHaveBeenCalledTimes(1)
+  render(<InstrumentAuthorization training/>);await screen.findByText('demo')
+  const heading=screen.getByRole('heading',{name:'内容权利授权'}).closest('header')!
+  const search=within(heading).getByRole('button',{name:'权利检索'})
+  expect(search).toHaveAttribute('aria-expanded','false');expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+  expect(within(heading).getByRole('button',{name:'刷新权利'})).toBeVisible()
+  fireEvent.click(search);expect(screen.getByRole('searchbox')).toHaveFocus()
+  fireEvent.change(screen.getByRole('searchbox'),{target:{value:'does-not-exist'}});expect(screen.queryByText('demo')).not.toBeInTheDocument();expect(screen.getByText('未找到匹配权利记录')).toBeVisible()
+  fireEvent.keyDown(screen.getByRole('searchbox'),{key:'Escape'});expect(search).toHaveFocus();expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+  fireEvent.click(search);expect(screen.getByRole('searchbox')).toHaveValue('does-not-exist')
+  fireEvent.pointerDown(screen.getByRole('heading',{name:'内容权利授权'}));expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+  fireEvent.click(search);fireEvent.click(screen.getByRole('button',{name:'重置'}));expect(screen.getByText('demo')).toBeVisible()
+  fireEvent.click(screen.getByRole('button',{name:'完成'}));expect(search).toHaveFocus();expect(api.list).toHaveBeenCalledTimes(1)
+  fireEvent.click(screen.getByRole('button',{name:'刷新权利'}));await waitFor(()=>expect(api.list).toHaveBeenCalledTimes(2))
+  expect(api.create).not.toHaveBeenCalled();expect(api.approve).not.toHaveBeenCalled()
  })
  it('keeps complete rights metadata visible while approval declarations and preview tools are collapsed',async()=>{
   render(<InstrumentAuthorization training/>);const tr=(await screen.findByText('demo')).closest('tr')!

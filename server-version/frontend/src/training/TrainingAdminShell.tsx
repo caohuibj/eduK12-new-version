@@ -20,13 +20,13 @@ export default function TrainingAdminShell({children,user,loggingOut,onLogout}:{
   return <div className="hui-app hui-training training-management-frame" data-training-theme={theme}>
     <a className="training-management-skip" href="#hui-main">跳到主要内容</a>
     <header className="training-management-topbar">
-      <div className="training-management-brand-group"><a className="training-management-brand" href={home.origin+'/'} aria-label="Training 首页"><TrainingBrand/></a><span>培训管理</span></div>
+      <div className="training-management-brand-group"><a className="training-management-brand" href={home.origin+'/'} aria-label="Training 首页"><TrainingBrand/></a></div>
       <nav className="training-management-tabs" aria-label="主要导航">
         {trainingAdminPages.map(item=><Link key={item.key} to={item.path} aria-current={item.key===page?.key?'page':undefined}>{item.label}</Link>)}
       </nav>
       <div className="training-management-account">
-        <Link to={profile} aria-label="账户设置" aria-current={pathname===profile?'page':undefined}><UserRound size={17} aria-hidden="true"/><span><strong>{user.nickname||user.username}</strong><small>Training 管理员</small></span></Link>
-        <button type="button" disabled={loggingOut} onClick={()=>void onLogout()} aria-label={loggingOut?'正在退出…':'退出登录'}><LogOut size={18} aria-hidden="true"/><span>{loggingOut?'正在退出…':'退出登录'}</span></button>
+        <Link className="training-management-profile" title={`Training 管理员 · ${user.nickname||user.username}`} to={profile} aria-label="账户设置" aria-current={pathname===profile?'page':undefined}><span className="training-management-avatar" aria-hidden="true"><UserRound size={17}/></span><span className="training-management-display-name">{user.nickname||user.username}</span></Link>
+        <button className="training-management-logout" type="button" disabled={loggingOut} onClick={()=>void onLogout()} aria-label={loggingOut?'正在退出…':'退出登录'}><LogOut size={18} aria-hidden="true"/><span>{loggingOut?'正在退出…':'退出'}</span></button>
         <TrainingAppearanceControl/>
       </div>
     </header>

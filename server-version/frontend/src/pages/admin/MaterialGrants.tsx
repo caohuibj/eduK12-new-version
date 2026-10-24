@@ -1,4 +1,5 @@
 import TrainingResourceActions from '../../training/TrainingResourceActions'
+import TrainingResourceTools from '../../training/TrainingResourceTools'
 import {useStaffFeedback} from '../../components/staff-ui/useStaffFeedback'
 import React, { useEffect, useState, useRef, useCallback } from 'react'
 import { materialGrantApi, type MaterialGrantRow, type MaterialResourceType } from '../../api/materialGrants'
@@ -83,11 +84,12 @@ const MaterialGrants: React.FC<{training?:boolean}> = ({training=false}) => {
       </label>{training&&<><label>搜索授权<input type="search" value={keyword} disabled={busy} onChange={event=>{setKeyword(event.target.value);setPage(1)}} placeholder="资源名称或培训师账号、姓名"/></label></>}</div>)
 
   return (
-    <ProductPage width="management" className={training?"training-inline-grants space-y-6":"space-y-6"}>
+    <ProductPage width="management" className={training?"training-inline-grants":"space-y-6"}>
       {feedback}
       <PageHeader
         title={training?"培训师使用授权":"材料授权"}
         headingLevel={training?2:1}
+        actions={training?<TrainingResourceTools searchLabel="授权检索" refreshLabel="刷新授权" busy={busy} loading={loading} onRefresh={()=>void load()} onReset={()=>{setKeyword('');setResourceType('');setPage(1)}}>{filters}</TrainingResourceTools>:undefined}
         description={training?undefined:"总览已有授权。量表和认知任务授权在对应材料页面操作；报告包授权只对代码内已发布版本开放。"}
       />
 
@@ -100,7 +102,8 @@ const MaterialGrants: React.FC<{training?:boolean}> = ({training=false}) => {
         </div>
       )}
 
-      {training?<div className="training-resource-record-tools"><details className="training-resource-search"><summary>授权检索<span>{keyword||resourceType?'已筛选':'按资源或培训师查找'}</span></summary>{filters}</details><button type="button" className="training-accounts-secondary" disabled={busy||loading} onClick={()=>void load()}>刷新授权</button></div>:filters}
+      {!training&&filters}
+      {training&&<p className="training-resource-record-count">共 {filtered.length} 条授权</p>}
       {training&&(keyword||resourceType)&&<div className="training-supervision-filter-summary"><span>{[resourceType&&typeLabel[resourceType],keyword&&'关键词：'+keyword].filter(Boolean).join(' · ')}</span><button type="button" disabled={busy} onClick={()=>{setKeyword('');setResourceType('');setPage(1)}}>清除筛选</button></div>}
 
       {loading ? (
@@ -145,7 +148,7 @@ const MaterialGrants: React.FC<{training?:boolean}> = ({training=false}) => {
             </table>
         </div>
       )}
-      {training&&<div className="training-accounts-pagination"><p>共 {filtered.length} 条授权 · 第 {currentPage} / {pages} 页</p><div><button type="button" disabled={loading||busy||currentPage<=1} onClick={()=>setPage(currentPage-1)}>上一页</button><button type="button" disabled={loading||busy||currentPage>=pages} onClick={()=>setPage(currentPage+1)}>下一页</button></div></div>}
+      {training&&pages>1&&<div className="training-accounts-pagination"><p>共 {filtered.length} 条授权 · 第 {currentPage} / {pages} 页</p><div><button type="button" disabled={loading||busy||currentPage<=1} onClick={()=>setPage(currentPage-1)}>上一页</button><button type="button" disabled={loading||busy||currentPage>=pages} onClick={()=>setPage(currentPage+1)}>下一页</button></div></div>}
     </ProductPage>
   )
 }

@@ -14,7 +14,10 @@ const openActions=async()=>{await screen.findByText(course.title);fireEvent.clic
 beforeEach(()=>{vi.clearAllMocks();directory.listTeachers.mockResolvedValue({code:0,data:{list:[course.creator],total:1}});api.get.mockImplementation(url=>Promise.resolve(url.endsWith('/students')?{code:0,data:{list:[member]}}:list()));api.post.mockResolvedValue({code:0});api.put.mockResolvedValue({code:0})})
 describe('Training inline course supervision',()=>{
  it('submits server-side search, lifecycle and library filters and resets to page one',async()=>{
-  render(<TrainingAdminCourses/>);expect(await screen.findByText(course.title)).toBeVisible()
+  render(<TrainingAdminCourses pageTitle="课程监管"/>);expect(await screen.findByText(course.title)).toBeVisible()
+  const heading=screen.getByRole('heading',{name:'课程监管'}).closest('header')!
+  expect(within(heading).getByRole('button',{name:'课程检索'})).toBeVisible()
+  expect(within(heading).getByRole('button',{name:'刷新列表'})).toBeVisible()
   expect(api.get).toHaveBeenCalledExactlyOnceWith('/courses',{params:{keyword:undefined,status:'all',excludeLibrary:false,creatorId:undefined,sortBy:'createdAt',sortOrder:'desc',page:1,pageSize:20}})
   fireEvent.click(screen.getByRole('button',{name:'课程检索'}))
   fireEvent.change(screen.getByRole('searchbox'),{target:{value:'  TRAINING01  '}})
@@ -100,7 +103,12 @@ describe('Training inline course supervision',()=>{
   fireEvent.click(screen.getByRole('button',{name:'课程检索'}))
   expect(screen.getByRole('region',{name:'课程检索'})).toBeVisible()
   expect(await screen.findByRole('option',{name:'测试培训师（trainer_test）'})).toBeInTheDocument()
-  fireEvent.click(screen.getByRole('button',{name:'收起检索'}));expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+  expect(screen.getByRole('searchbox')).toHaveFocus()
+  fireEvent.keyDown(screen.getByRole('searchbox'),{key:'Escape'})
+  expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+  expect(screen.getByRole('button',{name:'课程检索'})).toHaveFocus()
+  fireEvent.click(screen.getByRole('button',{name:'课程检索'}));fireEvent.pointerDown(document.body)
+  expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
   expect(screen.getByText(course.title)).toBeVisible()
  })
  it('filters all courses by trainer, collapses the search after applying, and keeps the filter through sorting',async()=>{

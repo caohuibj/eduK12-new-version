@@ -1,5 +1,5 @@
 import {useCallback,useEffect,useRef,useState,type FormEvent} from 'react'
-import {BookOpen,Search,Users,X,SlidersHorizontal,ChevronDown} from 'lucide-react'
+import {BookOpen,Search,Users,X,SlidersHorizontal,ChevronDown,RefreshCw} from 'lucide-react'
 import apiClient from '../api/client'
 import type {Course,User} from '../types'
 import {materialGrantApi} from '../api/materialGrants'
@@ -32,13 +32,21 @@ function CourseRoster({course}:{course:Course}){
 }
 
 /** Training oversight uses existing course contracts, without entering the trainer workspace. */
-export default function TrainingAdminCourses(){
+export default function TrainingAdminCourses({pageTitle}:{pageTitle?:string}={}){
  const {feedback,confirm,success,error:notifyError}=useStaffFeedback({dialogClassName:'training-accounts-dialog training-supervision-dialog'})
  const [rows,setRows]=useState<Course[]>([]),[total,setTotal]=useState(0),[page,setPage]=useState(1)
  const [keyword,setKeyword]=useState(''),[status,setStatus]=useState('all'),[includeLibrary,setIncludeLibrary]=useState(true)
  const [filters,setFilters]=useState({keyword:'',status:'all',includeLibrary:true,creatorId:''})
  const [filtersOpen,setFiltersOpen]=useState(false),[creatorId,setCreatorId]=useState(''),[sort,setSort]=useState('createdAt:desc')
  const [teachers,setTeachers]=useState<User[]>([]),[teacherLoading,setTeacherLoading]=useState(false),[teacherError,setTeacherError]=useState(''),[teacherRevision,setTeacherRevision]=useState(0)
+ const filterAnchor=useRef<HTMLDivElement>(null),filterButton=useRef<HTMLButtonElement>(null),filterInput=useRef<HTMLInputElement>(null)
+ useEffect(()=>{
+  if(!filtersOpen)return
+  filterInput.current?.focus()
+  const outside=(event:PointerEvent)=>{if(event.target instanceof Node&&!filterAnchor.current?.contains(event.target))setFiltersOpen(false)}
+  document.addEventListener('pointerdown',outside)
+  return()=>document.removeEventListener('pointerdown',outside)
+ },[filtersOpen])
  const teachersLoaded=useRef(false)
  useEffect(()=>{
   if(!filtersOpen||teachersLoaded.current)return
@@ -69,7 +77,7 @@ export default function TrainingAdminCourses(){
   finally{if(sequence===request.current)setLoading(false)}
  },[filters,page,sort])
  useEffect(()=>{const sequence=request;void fetchCourses();return()=>{sequence.current++}},[fetchCourses])
- function apply(event:FormEvent){event.preventDefault();setPage(1);setDetails(null);setFilters({keyword:keyword.trim(),status,includeLibrary,creatorId});setFiltersOpen(false)}
+ function apply(event:FormEvent){event.preventDefault();setPage(1);setDetails(null);setFilters({keyword:keyword.trim(),status,includeLibrary,creatorId});setFiltersOpen(false);filterButton.current?.focus()}
  function reset(){setKeyword('');setStatus('all');setIncludeLibrary(true);setCreatorId('');setPage(1);setDetails(null);setFilters({keyword:'',status:'all',includeLibrary:true,creatorId:''})}
  function edit(course:Course){setEditorError('');setEditing(course);setTitle(course.title);setDescription(course.description||'')}
  async function closeEditor(){
@@ -114,17 +122,14 @@ export default function TrainingAdminCourses(){
   }catch(cause){notifyError('课程操作未完成',message(cause))}
   finally{operation.current=false;setBusy(false)}
  }
- return <section className="training-accounts training-supervision" aria-label="课程列表与监管">
-  {feedback}
-  <div className="training-supervision-toolbar">
-    <span className="training-supervision-count">共 {total} 门课程</span>
-    <label className="training-supervision-sort">排序<select value={sort} disabled={busy} onChange={event=>{setSort(event.target.value);setPage(1);setDetails(null)}}><option value="createdAt:desc">创建时间：最新在前</option><option value="createdAt:asc">创建时间：最早在前</option><option value="creator:asc">培训师账号：A–Z</option><option value="creator:desc">培训师账号：Z–A</option></select></label>
-    <button type="button" className="training-accounts-secondary training-supervision-filter-toggle" disabled={busy} aria-expanded={filtersOpen} aria-controls="training-course-filters" onClick={()=>setFiltersOpen(value=>!value)}><SlidersHorizontal size={16} aria-hidden="true"/>{filtersOpen?'收起检索':'课程检索'}<ChevronDown size={15} aria-hidden="true"/></button>
-    <button type="button" className="training-accounts-secondary" disabled={loading||busy} onClick={()=>void fetchCourses()}>刷新列表</button>
-  </div>
-  {filtersOpen&&<section id="training-course-filters" aria-label="课程检索">
+ const tools=<div className="training-account-list-tools">
+   <div className="training-account-filter-anchor training-course-filter-anchor" ref={filterAnchor}
+    onKeyDown={event=>{if(event.key==='Escape'&&filtersOpen){event.preventDefault();setFiltersOpen(false);filterButton.current?.focus()}}}
+    onBlur={event=>{if(event.relatedTarget instanceof Node&&!event.currentTarget.contains(event.relatedTarget))setFiltersOpen(false)}}>
+    <button ref={filterButton} type="button" className="training-accounts-secondary training-supervision-filter-toggle" disabled={busy} aria-expanded={filtersOpen} aria-controls="training-course-filters" onClick={()=>setFiltersOpen(value=>!value)}><SlidersHorizontal size={16} aria-hidden="true"/>{filtersOpen?'收起检索':'课程检索'}<ChevronDown size={15} aria-hidden="true"/></button>
+    {filtersOpen&&<section className="training-account-filter-popover training-course-filter-popover" id="training-course-filters" aria-label="课程检索">
     <form className="training-supervision-filters" onSubmit={apply}>
-     <label className="training-supervision-search">搜索课程<span className="training-accounts-search-input"><Search size={17} aria-hidden="true"/><input type="search" value={keyword} disabled={busy} maxLength={200} onChange={event=>setKeyword(event.target.value)} placeholder="课程名称、介绍或课程码"/></span></label>
+     <label className="training-supervision-search">搜索课程<span className="training-accounts-search-input"><Search size={17} aria-hidden="true"/><input ref={filterInput} type="search" value={keyword} disabled={busy} maxLength={200} onChange={event=>setKeyword(event.target.value)} placeholder="课程名称、介绍或课程码"/></span></label>
      <label>创建培训师<select value={creatorId} disabled={busy||teacherLoading} onChange={event=>setCreatorId(event.target.value)}><option value="">{teacherLoading?'正在读取培训师…':'全部培训师'}</option>{teachers.map(teacher=><option key={teacher.id} value={teacher.id}>{teacher.nickname?teacher.nickname+'（'+teacher.username+'）':teacher.username}</option>)}</select></label>
      <label>课程状态<select value={status} disabled={busy} onChange={event=>setStatus(event.target.value)}><option value="all">全部状态</option><option value="DRAFT">草稿</option><option value="PUBLISHED">已发布</option><option value="COMPLETED">已结束</option></select></label>
      <label className="training-supervision-library"><input type="checkbox" checked={includeLibrary} disabled={busy} onChange={event=>setIncludeLibrary(event.target.checked)}/>包含库课程</label>
@@ -132,6 +137,18 @@ export default function TrainingAdminCourses(){
     </form>
     {teacherError&&<div className="training-accounts-error" role="alert"><span>{teacherError}</span><button type="button" onClick={()=>setTeacherRevision(value=>value+1)}>重试培训师选项</button></div>}
   </section>}
+   </div>
+   <button type="button" className="training-accounts-secondary" aria-label="刷新列表" disabled={loading||busy} onClick={()=>void fetchCourses()}><RefreshCw size={15} aria-hidden="true"/>刷新</button>
+ </div>
+ return <>
+  {pageTitle&&<header className="training-management-page-heading training-course-page-heading training-account-page-heading training-course-controls-heading"><h1>{pageTitle}</h1>{tools}</header>}
+  <section className="training-accounts training-supervision" aria-label="课程列表与监管">
+  {feedback}
+  <div className="training-supervision-toolbar">
+    <span className="training-supervision-count">共 {total} 门课程</span>
+    <label className="training-supervision-sort">排序<select value={sort} disabled={busy} onChange={event=>{setSort(event.target.value);setPage(1);setDetails(null)}}><option value="createdAt:desc">创建时间：最新在前</option><option value="createdAt:asc">创建时间：最早在前</option><option value="creator:asc">培训师账号：A–Z</option><option value="creator:desc">培训师账号：Z–A</option></select></label>
+    {!pageTitle&&tools}
+  </div>
   {(filters.keyword||filters.status!=='all'||!filters.includeLibrary||filters.creatorId)&&<div className="training-supervision-filter-summary"><span>{[
     filters.keyword&&'关键词：'+filters.keyword,
     filters.creatorId&&'培训师：'+(teachers.find(teacher=>teacher.id===filters.creatorId)?.nickname||teachers.find(teacher=>teacher.id===filters.creatorId)?.username||'指定培训师'),
@@ -147,10 +164,10 @@ export default function TrainingAdminCourses(){
     {course.status!=='COMPLETED'&&<button type="button" className="training-supervision-end" disabled={busy} onClick={()=>void execute(course,'end')}>结束课程</button>}
    </div></details></td>
   </tr>})}</tbody></table></div>}
-  <div className="training-accounts-pagination"><p>共 {total} 门课程 · 第 {page} / {pages} 页</p><div><button type="button" disabled={loading||busy||page<=1} onClick={()=>{setDetails(null);setPage(value=>value-1)}}>上一页</button><button type="button" disabled={loading||busy||page>=pages} onClick={()=>{setDetails(null);setPage(value=>value+1)}}>下一页</button></div></div>
+  {pages>1&&<div className="training-accounts-pagination"><p>共 {total} 门课程 · 第 {page} / {pages} 页</p><div><button type="button" disabled={loading||busy||page<=1} onClick={()=>{setDetails(null);setPage(value=>value-1)}}>上一页</button><button type="button" disabled={loading||busy||page>=pages} onClick={()=>{setDetails(null);setPage(value=>value+1)}}>下一页</button></div></div>}
   {details&&<section id="training-course-inspection" ref={inspection} tabIndex={-1} className="training-supervision-inspection" aria-label="课程详情与学员"><header><div><p className="training-management-eyebrow">课程信息</p><h2>{details.title}</h2></div><button type="button" className="training-accounts-secondary" onClick={()=>{setDetails(null);detailTrigger.current?.focus()}} aria-label="收起课程详情"><X size={16} aria-hidden="true"/>收起</button></header><dl><div><dt>课程码</dt><dd>{details.courseCode}</dd></div><div><dt>课程状态</dt><dd>{courseState(details).label}</dd></div><div><dt>创建者</dt><dd>{details.creator?.nickname||details.creator?.username||'—'}</dd></div><div><dt>最近更新</dt><dd>{date(details.updatedAt)}</dd></div></dl><p className="training-supervision-description">{details.description||'暂无课程介绍。'}</p><CourseRoster key={details.id} course={details}/></section>}
   <ManagementDialog open={Boolean(editing)} title="编辑课程信息" description={editing?.title} onClose={()=>void closeEditor()} closeDisabled={busy} className="training-accounts-dialog training-supervision-dialog">
    <form className="training-supervision-editor" onSubmit={event=>void save(event)}>{editorError&&<p role="alert" className="training-supervision-editor-error">{editorError}</p>}<label>课程名称<input required maxLength={200} value={title} disabled={busy} onChange={event=>setTitle(event.target.value)}/></label><label>课程介绍<textarea rows={5} maxLength={2000} disabled={busy} value={description} onChange={event=>setDescription(event.target.value)}/></label><p>仅更新课程名称与介绍，保留现有学员、任务与测试数据。</p><div><button type="button" className="training-accounts-secondary" disabled={busy} onClick={()=>void closeEditor()}>取消</button><button type="submit" className="training-accounts-primary" disabled={busy||!title.trim()||(title===editing?.title&&description===(editing?.description||''))}>{busy?'处理中…':'保存修改'}</button></div></form>
   </ManagementDialog>
- </section>
+ </section></>
 }

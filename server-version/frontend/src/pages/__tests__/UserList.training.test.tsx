@@ -15,7 +15,10 @@ beforeEach(()=>{
 })
 describe('Training account management',()=>{
  it('shows live account data and submits role and keyword filters through the existing list API',async()=>{
-  render(<UserList training/>)
+  render(<UserList training trainingTitle="用户管理"/>)
+  const heading=screen.getByRole('heading',{name:'用户管理'}).closest('header')!
+  expect(within(heading).getByRole('button',{name:'账号检索'})).toBeInTheDocument()
+  expect(within(heading).getByRole('button',{name:'刷新列表'})).toBeInTheDocument()
   expect(await screen.findByText('trainer_pending')).toBeInTheDocument()
   expect(screen.getByText('待审核')).toBeInTheDocument()
   expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
@@ -123,8 +126,14 @@ describe('Training account management',()=>{
   render(<UserList training/>);await screen.findByText('trainer_pending')
   fireEvent.click(screen.getByRole('button',{name:'账号检索'}))
   fireEvent.change(screen.getByRole('searchbox'),{target:{value:'未提交的检索'}})
-  fireEvent.click(screen.getByRole('button',{name:'收起检索'}))
+  expect(screen.getByRole('searchbox')).toHaveFocus()
+  fireEvent.keyDown(screen.getByRole('searchbox'),{key:'Escape'})
+  expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
+  expect(screen.getByRole('button',{name:'账号检索'})).toHaveFocus()
   expect(api.get).toHaveBeenCalledTimes(1)
+  fireEvent.click(screen.getByRole('button',{name:'账号检索'}));expect(screen.getByRole('searchbox')).toHaveValue('未提交的检索')
+  fireEvent.pointerDown(document.body)
+  expect(screen.queryByRole('searchbox')).not.toBeInTheDocument()
   fireEvent.click(screen.getByRole('button',{name:'账号检索'}));expect(screen.getByRole('searchbox')).toHaveValue('未提交的检索')
   fireEvent.click(screen.getByRole('button',{name:'重置'}));expect(screen.getByRole('searchbox')).toHaveValue('')
   expect(api.post).not.toHaveBeenCalled()

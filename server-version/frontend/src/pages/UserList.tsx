@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
-import { AlertCircle, Calendar, CheckCircle, Clock, Search, Users, SlidersHorizontal, ChevronDown } from 'lucide-react'
+import { AlertCircle, Calendar, CheckCircle, Clock, Search, Users, SlidersHorizontal, ChevronDown, RefreshCw } from 'lucide-react'
 import apiClient from '../api/client'
 import { PageHeader } from '../components/product-ui/PageHeader'
 import { ProductPage } from '../components/product-ui/ProductPage'
@@ -9,7 +9,7 @@ import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 
 type UserTab = 'TEACHER' | 'STUDENT' | 'PARENT'
 
-const UserList: React.FC<{training?:boolean}> = ({training=false}) => {
+const UserList: React.FC<{training?:boolean;trainingTitle?:string}> = ({training=false,trainingTitle}) => {
   const { feedback, info,confirm,success:notifySuccess,error:notifyError } = useStaffFeedback({dialogClassName:training?'training-accounts-dialog':undefined})
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const [activeTab, setActiveTab] = useState<UserTab>('TEACHER')
@@ -18,6 +18,14 @@ const UserList: React.FC<{training?:boolean}> = ({training=false}) => {
   const [error, setError] = useState<string | null>(null)
   const [searchKeyword, setSearchKeyword] = useState('')
   const [filtersOpen,setFiltersOpen]=useState(false)
+  const filterAnchor=useRef<HTMLDivElement>(null),filterButton=useRef<HTMLButtonElement>(null),filterInput=useRef<HTMLInputElement>(null)
+  useEffect(()=>{
+    if(!training||!filtersOpen)return
+    filterInput.current?.focus()
+    const outside=(event:PointerEvent)=>{if(event.target instanceof Node&&!filterAnchor.current?.contains(event.target))setFiltersOpen(false)}
+    document.addEventListener('pointerdown',outside)
+    return()=>document.removeEventListener('pointerdown',outside)
+  },[training,filtersOpen])
   const [extendingUser, setExtendingUser] = useState<string | null>(null)
   const [approvingUser,setApprovingUser]=useState<string|null>(null)
   const [query,setQuery]=useState(''),[page,setPage]=useState(1),[total,setTotal]=useState(0)
@@ -116,21 +124,32 @@ const UserList: React.FC<{training?:boolean}> = ({training=false}) => {
   if(training){
     const status=(user:User)=>user.role==='TEACHER'&&user.teacherApproved===false?{label:'待审核',tone:'pending'}:user.isFrozen?{label:'已冻结',tone:'muted'}:user.isActive?{label:'正常',tone:'active'}:{label:'已禁用',tone:'muted'}
     const pages=Math.max(1,Math.ceil(total/20)),busy=Boolean(approvingUser||extendingUser)
-    return <section className="training-accounts training-account-list" aria-label="账号列表与审核">
-      {feedback}
-      <div className="training-account-list-toolbar">
-        <div className="training-accounts-role" role="group" aria-label="账号身份">
-          {(['TEACHER','STUDENT'] as const).map(role=><button key={role} type="button" aria-pressed={activeTab===role} disabled={busy} onClick={()=>{setActiveTab(role);setPage(1)}}>{role==='TEACHER'?'培训师':'学员'}</button>)}
-        </div>
-        <span className="training-account-list-count">共 {total} 个账号</span>
-        <button type="button" className="training-accounts-secondary training-account-filter-toggle" disabled={busy} aria-expanded={filtersOpen} aria-controls="training-account-filters" onClick={()=>setFiltersOpen(value=>!value)}><SlidersHorizontal size={16} aria-hidden="true"/>{filtersOpen?'收起检索':'账号检索'}<ChevronDown size={15} aria-hidden="true"/></button>
-        <button type="button" className="training-accounts-secondary" disabled={loading||busy} onClick={()=>void fetchUsers()}>刷新列表</button>
-      </div>
-      {filtersOpen&&<section id="training-account-filters" aria-label="账号检索"><form className="training-accounts-search" onSubmit={event=>{event.preventDefault();setPage(1);setQuery(searchKeyword.trim());setFiltersOpen(false)}}>
-        <label><span>搜索账号</span><span className="training-accounts-search-input"><Search size={17} aria-hidden="true"/><input type="search" disabled={busy} value={searchKeyword} maxLength={200} onChange={event=>setSearchKeyword(event.target.value)} placeholder="输入账号或姓名"/></span></label>
+    const tools=<div className="training-account-list-tools">
+          <div className="training-account-filter-anchor" ref={filterAnchor}
+            onKeyDown={event=>{if(event.key==='Escape'&&filtersOpen){event.preventDefault();setFiltersOpen(false);filterButton.current?.focus()}}}
+            onBlur={event=>{if(event.relatedTarget instanceof Node&&!event.currentTarget.contains(event.relatedTarget))setFiltersOpen(false)}}>
+            <button ref={filterButton} type="button" className="training-accounts-secondary training-account-filter-toggle" disabled={busy} aria-expanded={filtersOpen} aria-controls="training-account-filters" onClick={()=>setFiltersOpen(value=>!value)}><SlidersHorizontal size={16} aria-hidden="true"/>{filtersOpen?'收起检索':'账号检索'}<ChevronDown size={15} aria-hidden="true"/></button>
+            {filtersOpen&&<section className="training-account-filter-popover" id="training-account-filters" aria-label="账号检索"><form className="training-accounts-search" onSubmit={event=>{event.preventDefault();setPage(1);setQuery(searchKeyword.trim());setFiltersOpen(false);filterButton.current?.focus()}}>
+        <label><span>搜索账号</span><span className="training-accounts-search-input"><Search size={17} aria-hidden="true"/><input ref={filterInput} type="search" disabled={busy} value={searchKeyword} maxLength={200} onChange={event=>setSearchKeyword(event.target.value)} placeholder="输入账号或姓名"/></span></label>
         <button type="submit" disabled={busy} className="training-accounts-primary">查询</button>
         <button type="button" disabled={busy} className="training-accounts-secondary" onClick={()=>{setSearchKeyword('');setQuery('');setPage(1)}}>重置</button>
       </form></section>}
+          </div>
+          <button type="button" className="training-accounts-secondary" aria-label="刷新列表" disabled={loading||busy} onClick={()=>void fetchUsers()}><RefreshCw size={15} aria-hidden="true"/>刷新</button>
+        </div>
+    return <>
+      {trainingTitle&&<header className="training-management-page-heading training-course-page-heading training-account-page-heading"><h1>{trainingTitle}</h1>{tools}</header>}
+      <section className="training-accounts training-account-list" aria-label="账号列表与审核">
+      {feedback}
+      <div className="training-account-list-toolbar">
+        <div className="training-account-list-identity">
+          <div className="training-accounts-role" role="group" aria-label="账号身份">
+            {(['TEACHER','STUDENT'] as const).map(role=><button key={role} type="button" aria-pressed={activeTab===role} disabled={busy} onClick={()=>{setActiveTab(role);setPage(1)}}>{role==='TEACHER'?'培训师':'学员'}</button>)}
+          </div>
+          <span className="training-account-list-count">共 {total} 个账号</span>
+        </div>
+        {!trainingTitle&&tools}
+      </div>
       {query&&<div className="training-supervision-filter-summary"><span>关键词：{query}</span><button type="button" disabled={busy} onClick={()=>{setSearchKeyword('');setQuery('');setPage(1)}}>清除筛选</button></div>}
       {error&&<div className="training-accounts-error" role="alert"><span>{error}</span><button type="button" onClick={()=>void fetchUsers()}>重新加载</button></div>}
       {loading?<p className="training-accounts-empty" role="status">正在加载账号列表…</p>:error?null:users.length===0?<div className="training-accounts-empty"><Users size={32} aria-hidden="true"/><h3>{query?'未找到匹配账号':'暂无'+(activeTab==='TEACHER'?'培训师':'学员')+'账号'}</h3><p>{query?'试试其他账号或姓名，或重置搜索条件。':'新注册账号会显示在这里。'}</p></div>:<>
@@ -150,9 +169,9 @@ const UserList: React.FC<{training?:boolean}> = ({training=false}) => {
             </div>
           </details></li>})}
         </ul>
-        <div className="training-accounts-pagination"><p>共 {total} 个{activeTab==='TEACHER'?'培训师':'学员'}账号 · 第 {page} / {pages} 页</p><div><button type="button" disabled={page<=1||busy} onClick={()=>setPage(current=>current-1)}>上一页</button><button type="button" disabled={page>=pages||busy} onClick={()=>setPage(current=>current+1)}>下一页</button></div></div>
+        {pages>1&&<div className="training-accounts-pagination"><p>共 {total} 个{activeTab==='TEACHER'?'培训师':'学员'}账号 · 第 {page} / {pages} 页</p><div><button type="button" disabled={page<=1||busy} onClick={()=>setPage(current=>current-1)}>上一页</button><button type="button" disabled={page>=pages||busy} onClick={()=>setPage(current=>current+1)}>下一页</button></div></div>}
       </>}
-    </section>
+    </section></>
   }
 
   return (

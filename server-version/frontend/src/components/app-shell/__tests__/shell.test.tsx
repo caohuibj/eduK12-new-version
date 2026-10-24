@@ -72,7 +72,7 @@ describe('Training administrator workspace presentation',()=>{
     expect(view.container.querySelector('.training-management-frame')).not.toBeNull()
     expect(screen.getByRole('link',{name:'Training 首页'}).querySelector('img')).toHaveAttribute('alt','Training @EduK12.top')
     const nav=screen.getByRole('navigation',{name:'主要导航'})
-    expect(nav).toHaveTextContent('账号与审核课程监管资源与授权')
+    expect(nav).toHaveTextContent('用户管理课程监管资源与授权')
     expect(nav.querySelector('a[href*="workspace=business"]')).toBeNull()
     expect(screen.queryByRole('searchbox',{name:'查找管理页面'})).not.toBeInTheDocument()
     expect(screen.queryByText(/业务身份：/)).not.toBeInTheDocument()

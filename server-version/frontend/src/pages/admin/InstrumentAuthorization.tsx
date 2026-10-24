@@ -1,4 +1,5 @@
 import TrainingResourceActions from '../../training/TrainingResourceActions'
+import TrainingResourceTools from '../../training/TrainingResourceTools'
 import React, { useEffect, useState, useRef } from 'react'
 import {
   instrumentAuthorizationApi,
@@ -175,11 +176,14 @@ const InstrumentAuthorizationPage: React.FC<{training?:boolean}> = ({training=fa
           <pre className="overflow-x-auto whitespace-pre-wrap rounded border bg-gray-50 p-3 text-sm" aria-label="Publish gate 预览结果">{preview}</pre>
         )}</>)
 
+  const filtered=list.filter(row=>!training||[row.instrumentKey,row.instrumentVersion,row.status].some(value=>String(value||'').toLocaleLowerCase().includes(keyword.toLocaleLowerCase())))
+
   return (
-    <ProductPage width="management" className={training?"training-inline-rights space-y-6":"space-y-6"}>
+    <ProductPage width="management" className={training?"training-inline-rights":"space-y-6"}>
       <PageHeader
         title={training?"内容权利授权":"测评内容授权"}
         headingLevel={training?2:1}
+        actions={training?<TrainingResourceTools searchLabel="权利检索" refreshLabel="刷新权利" busy={busy} loading={loading} onRefresh={()=>void reload()} onReset={()=>setKeyword('')}><label className="training-rights-search">搜索权利记录<input type="search" value={keyword} disabled={busy} onChange={event=>setKeyword(event.target.value)} placeholder="测评标识、版本或状态"/></label></TrainingResourceTools>:undefined}
         description={training?undefined:"授权记录与动态 Publish 校验（科学/权利/语言/报告/安全/golden）。同一管理员可自批，但必须填写确认声明。EXPIRED/REVOKED/SCOPE_MISMATCH 会将目录置 HOLD 并停止新建。表单默认空白，不预填任何法律事实。"}
       />
 
@@ -192,7 +196,7 @@ const InstrumentAuthorizationPage: React.FC<{training?:boolean}> = ({training=fa
         </div>
       )}
 
-      {training&&<button type="button" className="training-accounts-secondary" disabled={busy} aria-expanded={showDraft} onClick={()=>setShowDraft(value=>!value)}>{showDraft?'收起草稿表单':'新建授权草稿'}</button>}
+      {training&&<div className="training-resource-section-toolbar"><p className="training-resource-record-count">共 {filtered.length} 条权利记录</p><button type="button" className="training-accounts-secondary" disabled={busy} aria-expanded={showDraft} onClick={()=>setShowDraft(value=>!value)}>{showDraft?'收起草稿表单':'新建授权草稿'}</button></div>}
       {showDraft&&<section className="staff-panel staff-panel--padded space-y-4" aria-labelledby="authorization-draft-title">
         <h2 id="authorization-draft-title" className="text-lg font-semibold">新建授权草稿</h2>
         <div className="grid gap-4 md:grid-cols-2">
@@ -246,14 +250,14 @@ const InstrumentAuthorizationPage: React.FC<{training?:boolean}> = ({training=fa
       </section>}
 
       <section className="staff-panel staff-panel--padded space-y-4" aria-labelledby="authorization-gates-title">
-        {training&&<details className="training-resource-search"><summary>权利检索<span>{keyword?"关键词："+keyword:"按标识、版本或状态查找"}</span></summary><label className="training-rights-search">搜索权利记录<input type="search" value={keyword} disabled={busy} onChange={event=>setKeyword(event.target.value)} placeholder="测评标识、版本或状态"/></label>{keyword&&<button type="button" disabled={busy} className="training-accounts-secondary" onClick={()=>setKeyword('')}>清除筛选</button>}</details>}
-        <h2 id="authorization-gates-title" className="text-lg font-semibold">{training?'内容权利记录':'Publish gate 预览与批准'}</h2>
-        {training?<TrainingResourceActions label="发布条件预览">{publishControls}</TrainingResourceActions>:publishControls}
+        {training&&keyword&&<div className="training-supervision-filter-summary"><span>关键词：{keyword}</span><button type="button" disabled={busy} onClick={()=>setKeyword('')}>清除筛选</button></div>}
+        <h2 id="authorization-gates-title" className={training?"training-resource-record-heading sr-only":"text-lg font-semibold"}>{training?'内容权利记录':'Publish gate 预览与批准'}</h2>
+        {!training&&publishControls}
 
         {loading ? (
           <p role="status" aria-live="polite">加载中…</p>
-        ) : list.length === 0 ? (
-          <div className="rounded-lg border border-dashed p-8 text-center text-gray-500">暂无授权记录。</div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-lg border border-dashed p-8 text-center text-gray-500">{training&&keyword?'未找到匹配权利记录':'暂无授权记录。'}</div>
         ) : (
           <div className={training?"training-resource-list-wrap":"overflow-x-auto"}>
             <table className={training?"min-w-full text-sm training-resource-record-table":"min-w-full text-sm"}>
@@ -268,7 +272,7 @@ const InstrumentAuthorizationPage: React.FC<{training?:boolean}> = ({training=fa
                 </tr>
               </thead>
               <tbody>
-                {list.filter(row=>!training||[row.instrumentKey,row.instrumentVersion,row.status].some(value=>String(value||'').toLocaleLowerCase().includes(keyword.toLocaleLowerCase()))).map(row => (
+                {filtered.map(row => (
                   <tr key={`${row.authorizationId}@${row.version}`} className="border-b">
                     <td data-label="测评标识" className="py-3 pr-4">{row.instrumentKey}</td>
                     <td data-label="内容版本" className="pr-4">{row.instrumentVersion}</td>
@@ -294,6 +298,7 @@ const InstrumentAuthorizationPage: React.FC<{training?:boolean}> = ({training=fa
           </div>
         )}
       </section>
+      {training&&<div className="training-resource-preview"><TrainingResourceActions label="发布条件预览">{publishControls}</TrainingResourceActions></div>}
     </ProductPage>
   )
 }
