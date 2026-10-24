@@ -65,10 +65,11 @@ beforeEach(() => {
 })
 
 describe('Training administrator workspace presentation',()=>{
-  it.each([false,true])('uses Training navigation for its explicit entry grant, Training host=%s',training=>{
+  it.each([false,true])('uses Training navigation for its explicit entry grant, Training host=%s',async training=>{
     presentation.training=training
     auth.user={id:'training-manager',role:'STUDENT',businessRole:'STUDENT',username:'training-manager',platformRole:'STANDARD',entryGrants:[{entry:'TRAINING',version:1}]} as User
     const view=render(<MemoryRouter initialEntries={['/admin/training']}><AppShell><h1>培训管理内容</h1></AppShell></MemoryRouter>)
+    await screen.findByRole('link',{name:'账户设置'})
     expect(view.container.querySelector('.training-management-frame')).not.toBeNull()
     expect(screen.getByRole('link',{name:'Training 首页'}).querySelector('img')).toHaveAttribute('alt','Training @EduK12.top')
     const nav=screen.getByRole('navigation',{name:'主要导航'})
@@ -99,7 +100,7 @@ describe('Training vector tab icon',()=>{
 })
 
 describe('Training management appearance on the admin origin',()=>{
-  it('keeps Training startup colors and loading copy while the administrator session is loading',()=>{
+  it('keeps Training startup colors and loading copy while the administrator session is loading',async()=>{
     const boot='training:appearance:boot:v1',key='training:appearance:v1:loading-admin'
     localStorage.setItem(boot,'dark');localStorage.setItem(key,'light')
     auth.user=null;auth.isLoading=true
@@ -111,6 +112,7 @@ describe('Training management appearance on the admin origin',()=>{
       expect(view.container.querySelector('.hui-product-header')).toBeNull()
       auth.user={id:'loading-admin',username:'manager',role:'STUDENT',entryGrants:[{entry:'TRAINING',version:1}]} as User;auth.isLoading=false
       view.rerender(<MemoryRouter initialEntries={['/admin/training/resources']}><AppShell><p>账号读取完成</p></AppShell></MemoryRouter>)
+      await screen.findByRole('link',{name:'账户设置'})
       expect(view.container.querySelector('.training-management-frame')).toHaveAttribute('data-training-theme','light')
       expect(localStorage.getItem(boot)).toBe('light')
     }finally{localStorage.removeItem(boot);localStorage.removeItem(key)}
@@ -123,6 +125,7 @@ describe('Training management appearance on the admin origin',()=>{
     localStorage.setItem(key,'light')
     try{
       const view=render(<MemoryRouter initialEntries={['/admin/training/'+page]}><AppShell><h1>管理内容</h1></AppShell></MemoryRouter>)
+      await screen.findByRole('link',{name:'账户设置'})
       expect(view.container.querySelector('.training-management-frame')).toHaveAttribute('data-training-theme','light')
       await userEvent.click(screen.getByRole('button',{name:'外观：浅色，点击切换为深色'}))
       expect(view.container.querySelector('.training-management-frame')).toHaveAttribute('data-training-theme','dark')
@@ -159,19 +162,20 @@ describe('Training nested-page auth branding',()=>{
 })
 
 describe('Training management section context',()=>{
-  it('keeps the administrator banner and account location on the dedicated profile page',()=>{
+  it('keeps the administrator banner and account location on the dedicated profile page',async()=>{
     auth.user={id:'manager',username:'manager',role:'STUDENT',entryGrants:[{entry:'TRAINING',version:1}]} as User
     render(<MemoryRouter initialEntries={['/admin/training/profile']}><AppShell><h1>个人信息</h1></AppShell></MemoryRouter>)
+    await screen.findByRole('link',{name:'账户设置'})
     expect(document.querySelector('.training-management-frame')).not.toBeNull()
     expect(screen.getByRole('link',{name:'账户设置'})).toHaveAttribute('aria-current','page')
     expect(screen.getByRole('navigation',{name:'主要导航'}).querySelectorAll('[aria-current=page]')).toHaveLength(0)
     expect(document.title).toBe('Training')
   })
 
-  it('marks the resource page and uses only banner tabs',()=>{
+  it('marks the resource page and uses only banner tabs',async()=>{
     auth.user={id:'training-manager',role:'STUDENT',username:'training-manager',platformRole:'STANDARD',entryGrants:[{entry:'TRAINING',version:1}]} as User
     render(<MemoryRouter initialEntries={['/admin/training/resources']}><AppShell><p>管理内容</p></AppShell></MemoryRouter>)
-    expect(screen.getByRole('link',{name:'资源与授权'})).toHaveAttribute('aria-current','page')
+    expect(await screen.findByRole('link',{name:'资源与授权'})).toHaveAttribute('aria-current','page')
     expect(screen.queryByRole('link',{name:'管理概览'})).not.toBeInTheDocument()
     expect(document.querySelector('.training-management-rail')).toBeNull()
     const tabs=screen.getByRole('navigation',{name:'主要导航'})

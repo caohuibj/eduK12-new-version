@@ -1,4 +1,4 @@
-import {lazy,Suspense,useEffect,useRef,useState,type ReactNode} from 'react'
+import {lazy,Suspense,useEffect,useMemo,useRef,useState,type ReactNode} from 'react'
 import {Search,Layers,SlidersHorizontal,ChevronDown,RefreshCw} from 'lucide-react'
 import {trainingResourceCatalog,type CatalogType,type Resource} from './trainingResourceCatalog'
 import {cognitiveApi} from '../modules/cognitive/api'
@@ -30,7 +30,10 @@ function ResourceCatalog({pageTitle,navigation}:{pageTitle:string;navigation:Rea
   void trainingResourceCatalog(type,()=>active).then(list=>{if(active)setRows(list)}).catch(cause=>{if(active)setError(errorMessage(cause))}).finally(()=>{if(active)setLoading(false)})
   return()=>{active=false}
  },[type,revision])
- const filtered=rows.filter(row=>(query.status==='all'||row.status===query.status)&&[row.name,row.code,row.version,row.description].some(value=>String(value||'').toLocaleLowerCase().includes(query.keyword.toLocaleLowerCase())))
+ const filtered=useMemo(()=>{
+  const keyword=query.keyword.toLocaleLowerCase()
+  return rows.filter(row=>(query.status==='all'||row.status===query.status)&&[row.name,row.code,row.version,row.description].some(value=>String(value||'').toLocaleLowerCase().includes(keyword)))
+ },[rows,query])
  const pages=Math.max(1,Math.ceil(filtered.length/20)),currentPage=Math.min(page,pages),visible=filtered.slice((currentPage-1)*20,currentPage*20)
  async function changePolicy(resource:Resource){
   if(pending.current)return;pending.current=true;setBusy(true)

@@ -696,15 +696,9 @@ export const courseController = {
 
       const course = await prisma.course.findUnique({
         where: { id },
-        include: {
-          students: {
-            where: {
-              status: 'ACTIVE'
-            },
-            select: {
-              studentId: true
-            }
-          }
+        select: {
+          creatorId: true,
+          _count: { select: { students: { where: { status: 'ACTIVE' } } } },
         }
       })
 
@@ -718,7 +712,7 @@ export const courseController = {
       }
 
       const now = new Date()
-      const studentCount = course.students.length
+      const studentCount = course._count.students
 
       await prisma.course.update({
         where: { id },
@@ -751,7 +745,8 @@ export const courseController = {
       const { id } = req.params
 
       const course = await prisma.course.findUnique({
-        where: { id }
+        where: { id },
+        select: { creatorId: true },
       })
 
       if (!course) {
@@ -770,7 +765,9 @@ export const courseController = {
             in: [CourseStudentStatus.ACTIVE, CourseStudentStatus.APPROVED, CourseStudentStatus.PENDING]
           }
         },
-        include: {
+        select: {
+          status: true,
+          joinedAt: true,
           student: {
             select: {
               id: true,
@@ -778,7 +775,6 @@ export const courseController = {
               nickname: true,
               avatarUrl: true,
               isFrozen: true,
-              createdAt: true,
             }
           }
         },
