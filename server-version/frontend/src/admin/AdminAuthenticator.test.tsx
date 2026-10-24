@@ -17,6 +17,45 @@ async function setup(){
   await screen.findByRole('heading',{name:'扫描二维码'})
 }
 describe('administrator Authenticator binding and sensitive actions',()=>{
+  it('submits the values actually present after autofill without depending on React change events',async()=>{
+    render(<MemoryRouter><AdminKeyEnrollment/></MemoryRouter>)
+    // Password managers can populate DOM controls without dispatching change.
+    const fields=[['管理账号','autofilled-admin'],['当前密码','Autofilled1!password'],['一次性绑定码','autofilled-private-ticket']] as const
+    for(const [label,value] of fields)(screen.getByLabelText(label) as HTMLInputElement).value=value
+    fireEvent.click(screen.getByRole('button',{name:'生成绑定二维码'}))
+    await screen.findByRole('heading',{name:'扫描二维码'})
+    expect(begin).toHaveBeenCalledExactlyOnceWith('autofilled-admin','Autofilled1!password','autofilled-private-ticket')
+  })
+  it('shows the actual transport error instead of hiding a plain API error object',async()=>{
+    begin.mockRejectedValueOnce({message:'受控登记票据无效或账号权限已变化',status:403})
+    render(<MemoryRouter><AdminKeyEnrollment/></MemoryRouter>)
+    fireEvent.change(screen.getByLabelText('管理账号'),{target:{value:'synthetic-admin'}})
+    fireEvent.change(screen.getByLabelText('当前密码'),{target:{value:'Synthetic1!password'}})
+    fireEvent.change(screen.getByLabelText('一次性绑定码'),{target:{value:'synthetic-private-ticket'}})
+    fireEvent.click(screen.getByRole('button',{name:'生成绑定二维码'}))
+    expect(await screen.findByRole('alert')).toHaveTextContent('受控登记票据无效或账号权限已变化')
+    expect(screen.queryByRole('heading',{name:'扫描二维码'})).not.toBeInTheDocument()
+    expect(screen.getByLabelText('一次性绑定码')).toHaveValue('synthetic-private-ticket')
+  })
+
+  it('lists every missing field in a visible alert before submission',async()=>{
+    render(<MemoryRouter><AdminKeyEnrollment/></MemoryRouter>)
+    fireEvent.click(screen.getByRole('button',{name:'生成绑定二维码'}))
+    expect(await screen.findByRole('alert')).toHaveTextContent('请填写管理账号、当前密码、一次性绑定码后再生成绑定二维码。')
+    expect(begin).not.toHaveBeenCalled();expect(get).not.toHaveBeenCalled()
+  })
+
+  it('explains a missing enrollment ticket without calling the registration API',async()=>{
+    render(<MemoryRouter initialEntries={['/admin/security/enroll?returnTo=%2Fadmin%2Ftraining']}><AdminKeyEnrollment/></MemoryRouter>)
+    fireEvent.change(screen.getByLabelText('管理账号'),{target:{value:'synthetic-admin'}})
+    fireEvent.change(screen.getByLabelText('当前密码'),{target:{value:'Synthetic1!password'}})
+    fireEvent.click(screen.getByRole('button',{name:'生成绑定二维码'}))
+    expect(await screen.findByRole('alert')).toHaveTextContent('请填写一次性绑定码后再生成绑定二维码。')
+    expect(begin).not.toHaveBeenCalled();expect(get).not.toHaveBeenCalled()
+    expect(screen.getByLabelText('一次性绑定码')).toBeRequired()
+    expect(screen.getByRole('link',{name:'前往管理员登录'})).toHaveAttribute('href','/admin/login?returnTo=%2Fadmin%2Ftraining')
+  })
+
   it('defaults to mobile Authenticator, retains the operator ticket, and clears credential fields before showing the QR',async()=>{
     await setup()
     expect(begin).toHaveBeenCalledExactlyOnceWith('synthetic-admin','Synthetic1!password','synthetic-private-ticket')

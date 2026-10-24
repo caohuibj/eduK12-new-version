@@ -599,7 +599,8 @@ export const checkinController = {
       const checkin = await prisma.checkin.findUnique({
         where: { id },
         include: {
-          _count: { select: { submissions: true } },
+          // Learners never receive roster counts; avoid aggregating every submission.
+          _count: req.user?.role !== UserRole.STUDENT ? { select: { submissions: true } } : false,
           course: {
             select: {
               id: true,

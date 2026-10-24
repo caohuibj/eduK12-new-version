@@ -1,12 +1,14 @@
 # Frontend route inventory
 
-Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 150 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
+Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx` by `npm run inventory:product-ui`. 156 explicit routes, including fallback. This is an inventory, not a new routing manifest or authorization source. Conditional feature registration is recorded separately from access guards. Page-level/API authorization still applies to unguarded routes. Target/owner are planning classifications; verify them during each migration.
 
 | Path | Page | Route access | Registration | Current shell | Target mode | Owner | Evidence/status |
 |---|---|---|---|---|---|---|---|
 | / | TrainingPortal | Guest; signed-in redirect | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
 | /login | TrainingLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
 | /register | TrainingRegister | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
+| /features/:feature | TrainingFeaturePage | Public / unguarded | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /contact | TrainingContactPage | Public / unguarded | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /admin/login | AdminLogin | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
 | /teacher/login | TrainingAuthRedirect | Public / unguarded | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /teacher/register | TeacherRegister | Public / unguarded | — | AppShell (outside guards) | public | FE-02 | FE-02 chrome; domain UI retained |
@@ -77,9 +79,13 @@ Generated from `frontend/src/App.tsx` plus nested `OrganizationProductRoutes.tsx
 | /videos | VideoLibrary | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /images | ImageLibrary | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /documents | DocumentLibrary | TEACHER / ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
-| /users | UserList | ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
-| /teacher-codes | TeacherCodeList | ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
-| /admin/training | AdminTrainingWorkspace | ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /users | Navigate | ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /teacher-codes | Navigate | ADMIN | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /admin/training | AdminTrainingWorkspace | Explicit admin entry: ['TRAINING'] | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /admin/training/accounts | AdminTrainingWorkspace | Explicit admin entry: ['TRAINING'] | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /admin/training/courses | AdminTrainingWorkspace | Explicit admin entry: ['TRAINING'] | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /admin/training/resources | AdminTrainingWorkspace | Explicit admin entry: ['TRAINING'] | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
+| /admin/training/profile | StudentProfile | Explicit admin entry: ['TRAINING'] | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /admin/education-products | EducationProductGovernance | Explicit admin entry: ['HUISCHOOL','HUITEACHER'] | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /admin/huischool | EducationProductGovernance | Explicit admin entry: ['HUISCHOOL'] | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |
 | /admin/huiteacher | EducationProductGovernance | Explicit admin entry: ['HUITEACHER'] | — | AppShell (outside guards) | standard | FE-02 + FE-10 | FE-02 chrome; domain UI retained |

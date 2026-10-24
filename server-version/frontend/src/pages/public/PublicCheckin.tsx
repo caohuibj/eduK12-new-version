@@ -3,7 +3,7 @@
  * 学生通过令牌访问，无需登录即可打卡
  */
 
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Image, Upload } from 'antd'
 import type { UploadFile } from 'antd/es/upload/interface'
@@ -117,16 +117,16 @@ const usePublicAssetUrl = (source: PublicAssetSource | undefined, token: string 
   return resolvedUrl
 }
 
-const PublicAssetImage: React.FC<{ source: PublicAssetSource; token?: string; alt: string }> = ({ source, token, alt }) => {
+const PublicAssetImage = React.memo<{ source: PublicAssetSource; token?: string; alt: string }>(({ source, token, alt }) => {
   const url = usePublicAssetUrl(source, token)
   return url ? (
     <Image src={url} alt={alt} className="hui-public-checkin__image" preview={{ mask: '查看大图' }} />
   ) : (
     <div className="hui-public-checkin__asset-unavailable">图片暂不可用</div>
   )
-}
+})
 
-const PublicAssetVideo: React.FC<{ source: PublicAssetSource; token?: string; title: string }> = ({ source, token, title }) => {
+const PublicAssetVideo = React.memo<{ source: PublicAssetSource; token?: string; title: string }>(({ source, token, title }) => {
   const url = usePublicAssetUrl(source, token)
   if (!url) return <div className="hui-public-checkin__asset-error">{title}：视频暂不可用</div>
 
@@ -152,7 +152,7 @@ const PublicAssetVideo: React.FC<{ source: PublicAssetSource; token?: string; ti
       </div>
     </div>
   )
-}
+})
 
 const DocumentBody: React.FC<{ title: string; size?: string; available: boolean }> = ({ title, size, available }) => (
   <>
@@ -167,7 +167,7 @@ const DocumentBody: React.FC<{ title: string; size?: string; available: boolean 
   </>
 )
 
-const PublicAssetDocument: React.FC<{ source: PublicAssetSource; token?: string; title: string; size?: string }> = ({ source, token, title, size }) => {
+const PublicAssetDocument = React.memo<{ source: PublicAssetSource; token?: string; title: string; size?: string }>(({ source, token, title, size }) => {
   const url = usePublicAssetUrl(source, token)
   if (!url) {
     return (
@@ -188,7 +188,7 @@ const PublicAssetDocument: React.FC<{ source: PublicAssetSource; token?: string;
       <DocumentBody title={title} size={size} available />
     </button>
   )
-}
+})
 
 const PublicCheckin: React.FC = () => {
   const { token } = useParams<{ token: string }>()
@@ -202,6 +202,7 @@ const PublicCheckin: React.FC = () => {
   const [content, setContent] = useState('')
   const [imageList, setImageList] = useState<UploadFile[]>([])
   const [submitted, setSubmitted] = useState(false)
+  const sanitizedContent = useMemo(() => sanitizeHtml(checkin?.content), [checkin?.content])
 
   useEffect(() => {
     if (token) validateAndFetchCheckin()
@@ -339,7 +340,7 @@ const PublicCheckin: React.FC = () => {
 
       {checkin?.content && (
         <section className="hui-public-checkin__content" aria-label="打卡说明">
-          <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: sanitizeHtml(checkin.content) }} />
+          <div className="prose max-w-none" dangerouslySetInnerHTML={{ __html: sanitizedContent }} />
         </section>
       )}
 
