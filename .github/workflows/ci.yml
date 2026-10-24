@@ -1501,7 +1501,6 @@ jobs:
       NPM_CONFIG_REGISTRY: https://registry.npmjs.org
       NPM_CONFIG_REPLACE_REGISTRY_HOST: always
       DATABASE_URL: postgresql://postgres:synthetic-ci-only@127.0.0.1:55432/sjt_native_upgrade_test
-      PG_CONTAINER: ${{ job.services.postgres.id }}
       NODE_OPTIONS: --max-old-space-size=4096
       TZ: UTC
     steps:
@@ -1538,6 +1537,8 @@ jobs:
           git ls-tree -r HEAD -- server-version/backend server-version/frontend .github/release-tools > sjt-native-evidence/build-inputs.txt
           find server-version/backend/dist server-version/frontend/dist -type f -print0 | sort -z | xargs -0 sha256sum > sjt-native-evidence/build-sha256.txt
       - name: upgrade nonempty exact main and verify isolated database restore
+        env:
+          PG_CONTAINER: ${{ job.services.postgres.id }}
         run: node .github/scripts/sjt-native-migration.mjs
       - name: install pinned browser controls and official Chinese fonts
         run: |

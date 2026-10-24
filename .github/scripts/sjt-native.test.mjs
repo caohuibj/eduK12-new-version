@@ -49,3 +49,10 @@ test('SJT executor does not add a reusable workflow or select full-platform test
  for(const forbidden of ['uses: ./.github/workflows/','npm test','--all','--passWithNoTests','continue-on-error'])assert(!job.includes(forbidden),forbidden);
  assert(text.includes('needs: [scope, sjt-native,'));
 });
+test('service container identity is evaluated only at supported step environment',()=>{
+ const text=readFileSync('.github/workflows/ci.yml','utf8');
+ const job=text.split('  sjt-native:\n')[1].split('\n  training-entry:')[0];
+ const jobEnvironment=job.split('    env:\n')[1].split('    steps:\n')[0];
+ assert(!jobEnvironment.includes('job.services'),'Job context is unavailable at job-level env');
+ assert(job.includes('      - name: upgrade nonempty exact main and verify isolated database restore\n        env:\n          PG_CONTAINER: ${{ job.services.postgres.id }}\n        run: node .github/scripts/sjt-native-migration.mjs'));
+});

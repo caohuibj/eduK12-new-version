@@ -792,12 +792,12 @@
   },
   "controlSHA256": {
     ".github/scripts/sjt-native-scope.mjs": "7393bd8b8d40280b8107f1d1fb7346832b4f466aded28e1caacc0c5967c83627",
-    ".github/scripts/sjt-native.test.mjs": "9287c7f9303905a2b006416c6727b1cae163696df987ca9cea4a4aee7c3daacf",
+    ".github/scripts/sjt-native.test.mjs": "0e4983cb4a875e39d1e9bf3cbb36aba5c63258f39ba03fefa7e1d4cb173acbd2",
     ".github/scripts/sjt-native-migration.mjs": "e7498e656a0d97b4e158778e8aca21eaeba15db6bbc17d66f856aaf356e8a91d",
     ".github/scripts/sjt-native-browser.mjs": "1da96f08bf0b7f0f9e6fbbbd266a975446a79534ab7fe068d07a462b5231d03f",
     ".github/scripts/content-scope.mjs": "e65006067859ca6b5ca969cc3a9337280001c5b1bb5662a7a99b0f994be403b6",
     ".github/scripts/merge-gate.mjs": "46f5722169a9c7e3b7d67408e605bd05e3224d98eb3b1e31e1f78c891bfa987a",
-    ".github/workflows/ci.yml": "23fbc107ed16b96256dd5b019843cb6decf3210d84552fc8f76122b023857d62",
+    ".github/workflows/ci.yml": "97dd9f159012365c77afa2592c801fb35b7232d513504620c61ca41e98c5ba4f",
     ".github/workflows/situational-publication.yml": "5c93c3b1a08ab210fff3ff4e43cd4d23e385c72a6eaa44611d4e28a190c37187",
     "docs/release/README.md": "712d39aee123eb65876a5472987df0bf92279deaed94d800e5cb4b6f4d303451"
   },
