@@ -27,14 +27,14 @@ router.post('/', refreshCatalog, handle(req => bundleProductService.create(req.u
 router.get('/attempts/:attemptId/history', handle(req => analysis.history(req.user!, req.params.attemptId)))
 router.get('/attempts/:attemptId/report', handle(async req => {
   await analysis.authorizeStaff(req.user!, req.params.attemptId)
-  const query = z.object({ analysisId: z.string().uuid().optional() }).strict().parse(req.query)
+  const query = z.object({ analysisId: z.string().guid().optional() }).strict().parse(req.query)
   return analysis.readReport(req.params.attemptId, req.user!.role === 'ADMIN' ? 'admin' : 'teacher', query.analysisId)
 }))
 router.post('/attempts/:attemptId/reanalyze', refreshCatalog, handle(req => analysis.reanalyze(req.user!, req.params.attemptId, req.body,
   bundleDefinitionProvider, bundleProductService.eligible)))
 router.post('/attempts/:attemptId/retry', handle(async req => {
   await analysis.authorizeStaff(req.user!, req.params.attemptId)
-  const { analysisId } = z.object({ analysisId: z.string().uuid() }).strict().parse(req.body)
+  const { analysisId } = z.object({ analysisId: z.string().guid() }).strict().parse(req.body)
   const previous = await analysis.readReport(req.params.attemptId, req.user!.role === 'ADMIN' ? 'admin' : 'teacher', analysisId)
   await analysis.processAnalysis(previous.analysisId)
   return analysis.readReport(req.params.attemptId, req.user!.role === 'ADMIN' ? 'admin' : 'teacher', analysisId)

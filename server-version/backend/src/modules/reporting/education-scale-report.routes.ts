@@ -8,7 +8,7 @@ import { readEducationRespondentScaleReport } from './education-scale-personal-r
 import { serveProjectedReportImage } from './report-image-delivery'
 import { assessmentAssetIdSchema } from '../assessment-media/assessment-asset-identity'
 
-const executionId = z.string().uuid()
+const executionId = z.string().guid()
 const assetId = assessmentAssetIdSchema
 
 /** Mount only under the corresponding authenticated product base. Publication

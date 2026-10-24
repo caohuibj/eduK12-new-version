@@ -107,7 +107,7 @@ export const classroomController = {
 
       const result = createClassroomSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { name, courseId, questionnaireId } = result.data
@@ -356,7 +356,7 @@ export const classroomController = {
 
       const result = updateClassroomSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const classroom = await prisma.classroom.findUnique({

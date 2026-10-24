@@ -45,7 +45,7 @@ export const savePreferenceSchema = z.object({
   expectedRevision: z.number().int().min(0),
   preset: z.enum(['STANDARD', 'ENHANCED', 'CUSTOM']).optional(),
   options: z.unknown().optional(),
-  requestKey: z.string().uuid(),
+  requestKey: z.string().guid(),
 }).strict()
 export type SavePreferenceRequest = z.infer<typeof savePreferenceSchema>
 

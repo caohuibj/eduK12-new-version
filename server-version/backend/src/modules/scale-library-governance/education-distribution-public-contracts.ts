@@ -1,6 +1,6 @@
 import {z} from 'zod'
 import {educationLibraryProduct} from './contracts'
-const uuid=z.string().uuid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
+const uuid=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 const exact={releaseId:uuid,contentHash:hash,grantId:uuid.optional()}
 const query={...exact,product:educationLibraryProduct,keyword:z.string().trim().max(100).default(''),cursor:uuid.optional()}
 export const educationRecipientInput=z.union([

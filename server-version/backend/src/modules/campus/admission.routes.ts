@@ -19,7 +19,7 @@ import {
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const ids=z.string().uuid()
+const ids=z.string().guid()
 const classParams=z.object({organizationId:ids,classUnitId:ids})
 const register=z.object({
   organizationId:ids,classUnitId:ids,

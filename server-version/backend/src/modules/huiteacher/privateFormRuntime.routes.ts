@@ -15,7 +15,7 @@ import {resolveEducationProductMemberScope} from '../organization/educationProdu
 import {relationalRuntimeConsentAuthority} from '../assessment-relational/runtime-consent'
 import {compositeController} from '../composite/composite.controller'
 
-const router=Router(),uuid=z.string().uuid()
+const router=Router(),uuid=z.string().guid()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
 const wrap=(work:(req:Request)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
  try{return success(res,await work(req))}catch(error){

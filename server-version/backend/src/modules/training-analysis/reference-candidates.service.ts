@@ -9,7 +9,7 @@ import {prepareReferenceCandidate,referenceEntryKey,trainingReferenceSourceBindi
 import {storeReferenceCandidate,storeReferenceReview,publishReviewedReferenceCandidate} from '../measurement-content/reference-candidate.repository'
 import {assertTrainingReferenceAuthority,readTrainingReferenceSource,trainingReferenceSelectorSchema,type TrainingReferenceContext} from './reference-source'
 
-const uuid=z.string().uuid(),text=z.string().trim().min(1).max(4000),selector=z.string().trim().min(1).max(200),digest=z.string().regex(/^[a-f0-9]{64}$/)
+const uuid=z.string().guid(),text=z.string().trim().min(1).max(4000),selector=z.string().trim().min(1).max(200),digest=z.string().regex(/^[a-f0-9]{64}$/)
 export const trainingReferenceCreateSchema=z.object({requestId:uuid,selector:trainingReferenceSelectorSchema,referenceVersion:selector,
  evidence:z.object({methodRationale:text,inclusionRule:text,missingness:text,repeatResponses:text,organizationClustering:text,
   administrationDifferences:text,uncertainty:text,applicability:text,sampleAdequacy:text}).strict()}).strict()

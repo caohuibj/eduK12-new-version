@@ -8,7 +8,7 @@ import type { TrainingContentSnapshot } from './training-content-binding'
 
 type Stored = NonNullable<Awaited<ReturnType<typeof getContentRelease>>>
 export const trainingReportSelectionSchema = z.object({schemaVersion:z.literal(1),units:z.array(z.object({
-  itemId:z.string().uuid(),reportReleaseId:z.string().uuid(),
+  itemId:z.string().guid(),reportReleaseId:z.string().guid(),
 }).strict()).max(1000)}).strict().superRefine((value,ctx)=>{
   if(new Set(value.units.map(unit=>unit.itemId)).size!==value.units.length)ctx.addIssue({code:'custom',message:'Duplicate report selection item'})
 })

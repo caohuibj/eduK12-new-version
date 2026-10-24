@@ -11,7 +11,7 @@ import {getContentReleaseBatch,type StoredRelease} from '../measurement-content/
 import {referenceEntryKey} from '../measurement-content/reference-candidate'
 import type {AssessmentReferenceEntry} from '../assessment-reference/reference'
 
-export const surveyContentOptionsQuerySchema=z.object({instrumentId:z.string().uuid(),
+export const surveyContentOptionsQuerySchema=z.object({instrumentId:z.string().guid(),
   layer:z.enum(['REPORT','REFERENCE']),page:z.coerce.number().int().min(1).max(1000).default(1)}).strict()
 const fail=(message:string):never=>{throw new SurveyWaveError(409,message)}
 const pageSize=25

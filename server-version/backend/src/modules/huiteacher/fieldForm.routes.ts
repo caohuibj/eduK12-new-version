@@ -11,7 +11,7 @@ import {bindHuiteacherFieldForm,readInvitedHuiteacherFieldForm,readManagerHuitea
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 const limit=createRedisRateLimiter({name:'huiteacher-field-form-binding',
   limit:35,windowSeconds:900,key:req=>req.user?.userId||req.ip||'unknown'})
 const wrap=(task:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{

@@ -45,7 +45,7 @@ export const sjtOnlineDocumentSchema = z.object({
   goldenCases: z.array(z.object({
     name: z.string().trim().min(1).max(200),
     responses: z.array(sjtOnlineResponseSchema).max(100),
-    expected: z.record(z.number().finite().nullable()),
+    expected: z.record(z.string(), z.number().finite().nullable()),
   }).strict()).max(512),
 }).strict()
 export type SjtOnlineDocument = z.infer<typeof sjtOnlineDocumentSchema>

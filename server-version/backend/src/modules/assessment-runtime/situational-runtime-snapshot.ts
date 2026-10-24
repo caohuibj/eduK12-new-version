@@ -101,7 +101,7 @@ const frozenSituationalRuntimeSnapshotSchema = z.object({
   scoringVersion: z.string().min(1),
   definition: z.union([situationDefinitionSchema, situationDefinitionV2Schema]),
   runnerDefinition: z.union([runnerDefinitionV1Schema, runnerDefinitionV2Schema]),
-  compiledRuntime: z.record(z.unknown()),
+  compiledRuntime: z.record(z.string(), z.unknown()),
   authorizationReceipt: sjtCourseGrantReceiptSchema.optional(),
   online: sjtOnlineMetadataSchema.optional(),
   scientificContext: situationalScientificContextSchema.optional(),

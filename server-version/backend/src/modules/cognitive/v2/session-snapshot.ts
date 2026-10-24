@@ -41,7 +41,7 @@ export const sessionConfigSnapshotSchema = z.object({
   configHash: z.string().regex(/^[0-9a-f]{64}$/),
   hashScheme: z.literal(CANONICAL_JSON_SHA256_V1).optional(),
   runtimeGeneration: z.literal('UNIFIED_V1').optional(),
-  compiledRuntime: z.record(z.unknown()).optional(),
+  compiledRuntime: z.record(z.string(), z.unknown()).optional(),
   referenceBindings: z.array(z.object({
     referenceKey: z.string().min(1),
     referenceVersion: z.string().min(1),
@@ -49,7 +49,7 @@ export const sessionConfigSnapshotSchema = z.object({
     scoreKey: z.string().min(1).optional(),
     referenceKind: z.string().min(1).optional(),
     profileKey: z.string().min(1).optional(),
-    applicability: z.record(z.unknown()).optional(),
+    applicability: z.record(z.string(), z.unknown()).optional(),
   }).strict()).optional(),
   presentation: cognitivePresentationDefinitionSchema.optional(),
   protocol: protocolDefinitionSchema,

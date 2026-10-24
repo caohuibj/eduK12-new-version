@@ -12,7 +12,7 @@ export const COGNITIVE_BLOCKER_GATES = [
 
 type JsonValue = null | boolean | number | string | JsonValue[] | { [key: string]: JsonValue }
 const jsonValue: z.ZodType<JsonValue> = z.lazy(() => z.union([
-  z.null(), z.boolean(), z.number().finite(), z.string(), z.array(jsonValue), z.record(jsonValue),
+  z.null(), z.boolean(), z.number().finite(), z.string(), z.array(jsonValue), z.record(z.string(), jsonValue),
 ]))
 
 export const cognitiveBlockerV1Schema = z.object({

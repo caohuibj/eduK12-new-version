@@ -18,7 +18,7 @@ import { groupIpDraftPolicySchema,GroupIpPolicyError } from './group-ip-policy'
 
 export const surveyWavesRouter=Router()
 surveyWavesRouter.use('/:pid/waves',authenticateSurvey)
-const id=z.string().uuid()
+const id=z.string().guid()
 const wave=z.object({
   title:z.string().trim().min(1).max(160),
   consentText:z.string().max(20000),

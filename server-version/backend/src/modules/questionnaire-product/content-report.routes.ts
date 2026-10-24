@@ -8,7 +8,7 @@ import * as reports from './content-report.service'
 /** Mounted behind the existing authenticated Training teacher route. Services
  * recheck the actual business identity, course relation and exact capability. */
 export const trainingContentReportsRouter=Router({mergeParams:true})
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 const context=(req:Request)=>({actorId:req.user!.userId,compositeId:uuid.parse(req.params.id),
  courseId:uuid.parse(req.params.courseId),grantId:uuid.parse(req.query.grantId)})
 const handle=(run:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{

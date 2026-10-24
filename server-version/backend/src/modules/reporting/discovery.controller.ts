@@ -47,7 +47,7 @@ export const reportingDiscoveryController = {
   },
   async individualSources(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
-    const parsed = z.object({ ...pagination, subjectUserId: z.string().uuid() }).strict().safeParse(req.query)
+    const parsed = z.object({ ...pagination, subjectUserId: z.string().guid() }).strict().safeParse(req.query)
     if (!parsed.success) return badRequest(res, 'invalid individual source query')
     try { return noStore(res, await listIndividualSources({ ...parsed.data, principal: principal(req), organizationId: req.params.organizationId })) }
     catch (error) { return fail(res, error) }
@@ -60,7 +60,7 @@ export const reportingDiscoveryController = {
   async listSpecs(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     const parsed = specQuery.safeParse(req.query)
-    if (!parsed.success) return badRequest(res, parsed.error.errors[0]?.message ?? 'invalid reporting spec discovery request')
+    if (!parsed.success) return badRequest(res, parsed.error.issues[0]?.message ?? 'invalid reporting spec discovery request')
     try {
       return noStore(res, await listPublishedReportingSpecs({
         principal: principal(req),
@@ -96,7 +96,7 @@ export const reportingDiscoveryController = {
   async listSeries(req: Request, res: Response) {
     if (!req.user) return unauthorized(res)
     const parsed = seriesQuery.safeParse(req.query)
-    if (!parsed.success) return badRequest(res, parsed.error.errors[0]?.message ?? 'invalid reporting series discovery request')
+    if (!parsed.success) return badRequest(res, parsed.error.issues[0]?.message ?? 'invalid reporting series discovery request')
     try {
       return noStore(res, await listOrganizationReportingSeries({
         principal: principal(req),

@@ -16,7 +16,7 @@ import { success, error } from '../../utils/response'
 export const surveyProjectsRouter=Router()
 const title=z.string().trim().min(1).max(160)
 const mode=z.enum(['SINGLE_UNLINKED','LINKED_WAVES'])
-const projectId=z.string().uuid()
+const projectId=z.string().guid()
 const create=z.object({
   requestId:projectId,title,description:z.string().max(5000).default(''),collectionMode:mode,
 }).strict()

@@ -6,12 +6,12 @@ const hash = z.string().regex(/^[a-f0-9]{64}$/)
 const key = z.string().min(1).max(200)
 export const trainingAnalysisSelectorSchema = z.object({
   schemaVersion: z.literal(1),
-  courseId: z.string().uuid(),
+  courseId: z.string().guid(),
   mode: z.enum(['PAIRWISE', 'FULL_CASE']),
   waves: z.array(z.object({
-    waveKey: key, taskId: z.string().uuid(), publication: z.string().datetime(),
+    waveKey: key, taskId: z.string().guid(), publication: z.string().datetime(),
     configDigest: hash.nullable(), variantKey: key.nullable(), materialGroupKey: key.optional(),
-    metrics: z.array(z.object({metricKey: key, itemId: z.string().uuid()}).strict()).min(1).max(32),
+    metrics: z.array(z.object({metricKey: key, itemId: z.string().guid()}).strict()).min(1).max(32),
   }).strict()).min(2).max(8),
 }).strict()
 
@@ -43,21 +43,21 @@ export function parseTrainingAnalysisSelector(value: unknown, courseId?: string)
 }
 
 export const trainingAnalysisFrozenSourceSchema = z.object({
-  waveKey: key, taskId: z.string().uuid(), materialGroupKey: key.optional(), attemptId: z.string().uuid(),
+  waveKey: key, taskId: z.string().guid(), materialGroupKey: key.optional(), attemptId: z.string().guid(),
   attemptEpoch: z.number().int().positive(), sourceHash: hash,
-  sourceHashes: z.record(z.string()),
+  sourceHashes: z.record(z.string(), z.string()),
   status: z.string(), taskSatisfaction: z.string().nullable(),
 }).strict()
 const dictionaryColumn = z.object({
-  columnKey: key, waveKey: key, taskId: z.string().uuid(), publication: z.string().datetime(),
-  configDigest: hash.nullable(), variantKey: key.nullable(), materialGroupKey: key.optional(), metricKey: key, itemId: z.string().uuid(),
+  columnKey: key, waveKey: key, taskId: z.string().guid(), publication: z.string().datetime(),
+  configDigest: hash.nullable(), variantKey: key.nullable(), materialGroupKey: key.optional(), metricKey: key, itemId: z.string().guid(),
   measurement: z.object({instrumentKey:key,scoreKey:key,scoringDigest:key,responseSignature:key,respondentType:key,unit:z.string().nullable(),version:key}).strict().nullable(),
   valueType: z.literal('NUMBER'), missingReasons: z.array(z.string()).max(32),
 }).strict()
 const trainingAnalysisManifestV1Schema = z.object({
   schemaVersion: z.literal(1), kind: z.literal('TRAINING_ANALYSIS'),
   // User.id includes authenticated historical identifiers; preserve bytes exactly.
-  courseId: z.string().uuid(), actor: z.object({id:key,role:z.enum(['ADMIN','TEACHER'])}).strict(),
+  courseId: z.string().guid(), actor: z.object({id:key,role:z.enum(['ADMIN','TEACHER'])}).strict(),
   selector: trainingAnalysisSelectorSchema,
   definitionHash: hash, sourceHash: hash, authorityHash: hash, qualityHash: hash,
   sourceCutoff: z.string().datetime(), manifestHash: hash,
@@ -67,7 +67,7 @@ const trainingAnalysisManifestV1Schema = z.object({
 }).strict()
 // V1 is unchanged for education-only sources. V2 explicitly binds study governance.
 export const trainingAnalysisManifestSchema = z.union([trainingAnalysisManifestV1Schema,
-  trainingAnalysisManifestV1Schema.extend({schemaVersion:z.literal(2),researchGovernanceHash:hash,researchSources:z.array(z.object({taskId:z.string().uuid(),attemptId:z.string().uuid(),attemptEpoch:z.number().int().positive()}).strict()).max(6000)})])
+  trainingAnalysisManifestV1Schema.extend({schemaVersion:z.literal(2),researchGovernanceHash:hash,researchSources:z.array(z.object({taskId:z.string().guid(),attemptId:z.string().guid(),attemptEpoch:z.number().int().positive()}).strict()).max(6000)})])
 export type TrainingAnalysisManifestV1 = z.infer<typeof trainingAnalysisManifestSchema>
 export type TrainingAnalysisActor = TrainingAnalysisManifestV1['actor']
 export const trainingManifestHash = (manifest: Omit<TrainingAnalysisManifestV1,'manifestHash'> & {researchGovernanceHash?:string;researchSources?:Array<{taskId:string;attemptId:string;attemptEpoch:number}>}): string => canonicalHash(manifest)

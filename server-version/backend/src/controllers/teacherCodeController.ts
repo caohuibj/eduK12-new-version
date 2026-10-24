@@ -77,7 +77,7 @@ export const teacherCodeController = {
 
       const result = createCodeSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { maxUses, expiresAt, accountValidityDays } = result.data
@@ -139,7 +139,7 @@ export const teacherCodeController = {
   async verify(req: Request, res: Response) {
     try {
       const result = verifyCodeSchema.safeParse(req.body)
-      if (!result.success) return error(res, result.error.errors[0]?.message || '教师码格式无效')
+      if (!result.success) return error(res, result.error.issues[0]?.message || '教师码格式无效')
       const { code } = result.data
 
       const teacherCode = await prisma.teacherCode.findUnique({

@@ -193,7 +193,7 @@ const validateRuleSets = (definition: ReportingAnalysisSpecDefinitionV1): void =
 
 export const validateReportingSpecDefinition = (input: unknown): ReportingAnalysisSpecDefinitionV1 => {
   const parsed = definitionSchema.safeParse(input)
-  if (!parsed.success) reportingFail('REPORT_SPEC_INVALID', parsed.error.errors[0]?.message ?? 'reporting spec is invalid', 400)
+  if (!parsed.success) reportingFail('REPORT_SPEC_INVALID', parsed.error.issues[0]?.message ?? 'reporting spec is invalid', 400)
   const definition = parsed.data as ReportingAnalysisSpecDefinitionV1
   validateRuleSets(definition)
   return definition

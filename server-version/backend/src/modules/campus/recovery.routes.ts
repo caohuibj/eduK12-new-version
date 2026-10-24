@@ -15,7 +15,7 @@ import { isValidPassword, PASSWORD_MAX_LENGTH } from '../../utils/password'
 
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const ids=z.string().uuid()
+const ids=z.string().guid()
 const wrap=(handler:(req:any,res:any)=>Promise<any>)=>asyncHandler(async(req,res)=>{
   try{return await handler(req,res)}
   catch(err){

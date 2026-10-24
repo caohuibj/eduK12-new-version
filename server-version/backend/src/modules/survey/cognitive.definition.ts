@@ -88,7 +88,7 @@ export function previewCognitiveDraft(input:unknown){
 }
 export const surveyCognitiveReferenceSchema=z.object({
   slotKey:z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/),epoch:z.number().int().min(1).max(2),
-  resultId:z.string().uuid(),resultHash:z.string().regex(/^[a-f0-9]{64}$/),
+  resultId:z.string().guid(),resultHash:z.string().regex(/^[a-f0-9]{64}$/),
   measurementDigest:z.string().regex(/^[a-f0-9]{64}$/),
 }).strict()
 export type SurveyCognitiveReference=z.infer<typeof surveyCognitiveReferenceSchema>

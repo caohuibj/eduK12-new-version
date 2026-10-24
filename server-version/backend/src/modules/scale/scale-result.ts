@@ -123,7 +123,7 @@ const scaleResultV2Schema = z.object({
   quality: scaleQualitySchema,
   itemScores: z.array(scaleItemScoreSchema),
   scores: z.array(scaleScoreSchema).min(1),
-  references: z.array(z.record(z.unknown())),
+  references: z.array(z.record(z.string(), z.unknown())),
   interpretations: z.array(z.object({
     scoreKey: z.string().min(1),
     headline: z.string().min(1),

@@ -16,7 +16,7 @@ import {SurveyGovernanceError} from './governance.service'
 
 type Tx=Prisma.TransactionClient
 export const toolKind=z.enum(['FORM','SCALE','COMPOSITION'])
-export const toolReference=z.object({source:z.enum(['owned','granted']),id:z.string().uuid(),revision:z.number().int().nonnegative().optional(),title:z.string().max(200).optional()}).strict()
+export const toolReference=z.object({source:z.enum(['owned','granted']),id:z.string().guid(),revision:z.number().int().nonnegative().optional(),title:z.string().max(200).optional()}).strict()
 export const compositionDefinition=z.object({schemaVersion:z.literal(1),items:z.array(toolReference).max(20)}).strict()
 export type ToolReference=z.infer<typeof toolReference>
 export type Template={id:string;owner_user_id:string;kind:'FORM'|'SCALE'|'COMPOSITION';title:string;definition:any;revision:number;completed_revision:number|null;status:string;creation_digest:string;created_at:Date;updated_at:Date}

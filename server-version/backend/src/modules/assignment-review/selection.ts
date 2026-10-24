@@ -7,7 +7,7 @@ export const REVIEW_PAGE_SIZE = 25
 export const REVIEW_BATCH_SIZE = 100
 export const REVIEW_SELECTION_LIMIT = 5000
 const item = z.object({ id: z.string().min(1).max(100), revision: z.number().int().nonnegative() })
-const snapshot = z.object({ actor: z.string(), assignment: z.string(), expires: z.number(), selectionId: z.string().uuid(), index: z.number().int().nonnegative(), total: z.number().int().nonnegative().max(REVIEW_SELECTION_LIMIT), items: z.array(item).max(REVIEW_BATCH_SIZE) })
+const snapshot = z.object({ actor: z.string(), assignment: z.string(), expires: z.number(), selectionId: z.string().guid(), index: z.number().int().nonnegative(), total: z.number().int().nonnegative().max(REVIEW_SELECTION_LIMIT), items: z.array(item).max(REVIEW_BATCH_SIZE) })
 export type ReviewSelection = z.infer<typeof snapshot>
 export class ReviewInputError extends Error {}
 const sign = (value: string) => createHmac('sha256', config.jwtSecret).update('assignment-review-v1:' + value).digest('base64url')

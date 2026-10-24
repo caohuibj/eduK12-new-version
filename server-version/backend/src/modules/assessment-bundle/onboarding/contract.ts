@@ -21,9 +21,9 @@ const condition: z.ZodType<Condition> = z.lazy(() => z.union([
   z.object({ op: z.enum(['all', 'any']), conditions: z.array(condition).min(1).max(32) }).strict(),
   z.object({ op: z.literal('not'), condition }).strict(),
 ]))
-const declaration = assessmentBundleDefinitionSchema.innerType().extend({
+const declaration = z.object({ ...assessmentBundleDefinitionSchema.shape,
   bundleKey: z.string().regex(BUNDLE_KEY).max(100),
-  slots: assessmentBundleDefinitionSchema.innerType().shape.slots.max(64),
+  slots: assessmentBundleDefinitionSchema.shape.slots.max(64),
   status: z.literal('DRAFT'),
   engine: z.object({ key: z.literal('declarative-evidence-v1'), version: z.literal('1.0.0') }).strict(),
   respondentTypes: z.tuple([z.literal('SELF')]),

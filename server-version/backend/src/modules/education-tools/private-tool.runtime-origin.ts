@@ -2,7 +2,7 @@ import {z} from 'zod'
 import {compileEducationApplicability} from '../scale-library-governance/education-applicability'
 import {isSupportedEducationLibraryVariant} from '../scale-library-governance/education-supported-variants'
 import {privateToolFail} from './private-tool.contracts'
-const uuid=z.string().uuid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
+const uuid=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/)
 export const privateScaleRuntimeOriginSchema=z.object({
  schemaVersion:z.literal(1),adapterVersion:z.literal('1.0.0'),kind:z.literal('AUTHOR_PRIVATE'),
  entry:z.enum(['SCHOOL','TEACHER']),organizationId:uuid,ownerUserId:uuid,toolId:uuid,versionId:uuid,

@@ -17,7 +17,7 @@ import { planStandardScalePublication } from './publish'
 const operation = 'LEGACY_SCALE_MEASUREMENT_CONVERSION_V1' as const
 const digest = z.string().regex(/^[a-f0-9]{64}$/)
 export const legacyScaleConversionInputSchema = z.object({
-  requestId: z.string().uuid(), scaleId: z.string().min(1).max(240), actorUserId: z.string().min(1).max(240),
+  requestId: z.string().guid(), scaleId: z.string().min(1).max(240), actorUserId: z.string().min(1).max(240),
   // An operator identifies an already verified recoverable point. This does not
   // create or verify a backup, and must never contain credentials or a dump.
   recoveryPoint: z.string().trim().min(1).max(500),

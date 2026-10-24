@@ -101,7 +101,7 @@ export const startStandaloneScaleAssessment = async (req: Request, res: Response
     const userId = req.user?.userId
     if (!userId) return forbidden(res, '请先登录')
     const contextInput = standaloneContextSchema.safeParse(req.body?.context)
-    if (!contextInput.success) return error(res, contextInput.error.errors[0].message)
+    if (!contextInput.success) return error(res, contextInput.error.issues[0].message)
 
     const { scaleId } = req.params
     const scale = await prisma.scale.findUnique({ where: { id: scaleId }, select: scaleSelect })

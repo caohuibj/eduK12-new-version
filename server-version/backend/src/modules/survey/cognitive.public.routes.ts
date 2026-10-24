@@ -10,10 +10,10 @@ import { administrationProvenanceV1Schema } from '../cognitive/administration-pr
 import { startSurveyCognitive,readSurveyCognitive,interruptSurveyCognitive,restartSurveyCognitive,
   submitSurveyCognitiveFinal,SurveyCognitiveError } from './cognitive.service'
 export const surveyCognitiveRouter=Router({mergeParams:true})
-const id=z.string().uuid(),slot=z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)
+const id=z.string().guid(),slot=z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)
 const proof=z.object({accessCredential:z.string().regex(/^[A-Za-z0-9_-]{43}$/),
   researchCode:z.string().regex(/^R-[A-Z0-9]{8,32}$/).optional()}).strict()
-const start=proof.extend({priorAnswers:z.record(z.record(z.unknown())),
+const start=proof.extend({priorAnswers:z.record(z.string(), z.record(z.string(), z.unknown())),
   administrationProvenance:administrationProvenanceV1Schema}).strict()
 const epoch=proof.extend({attemptEpoch:z.number().int().min(1).max(2)}).strict()
 const final=epoch.extend({submissionId:z.string().min(16).max(200),definitionHash:z.string().regex(/^[a-f0-9]{64}$/),

@@ -15,7 +15,7 @@ import {readSubmission,loadEntry} from './service'
 import {fail,ScaleLibraryError,type LegacyLibraryProduct} from './contracts'
 import {assertLibraryMediaManifest,buildLibraryMediaManifest,assertLibraryMediaReady,type LibraryMediaManifest} from './media'
 
-const id=z.string().uuid()
+const id=z.string().guid()
 const wrap=(fn:(req:Request,res:Response)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
   try {res.setHeader('Cache-Control','private, no-store');res.setHeader('Referrer-Policy','no-referrer');await fn(req,res)}
   catch(e){if(e instanceof ScaleLibraryError)return error(res,e.message,-1,e.statusCode)

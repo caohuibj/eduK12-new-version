@@ -7,7 +7,7 @@ import { success, error } from '../../utils/response'
 import * as service from './service'
 import * as governance from './governance'
 
-const id=z.string().uuid(), title=z.string().trim().min(1).max(120)
+const id=z.string().guid(), title=z.string().trim().min(1).max(120)
 const credential=(req:Request) => {
   const match=/^Bearer ([A-Za-z0-9_-]{43})$/.exec(req.get('Authorization') || '')
   return match?.[1] ?? ''

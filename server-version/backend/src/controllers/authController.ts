@@ -143,7 +143,7 @@ export const authController = {
     try {
       const result = verifyTeacherCodeSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { teacherCode: codeInput } = result.data
@@ -183,7 +183,7 @@ export const authController = {
     try {
       const result = teacherRegisterSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { teacherCode: codeInput, username, password, nickname } = result.data
@@ -283,7 +283,7 @@ export const authController = {
     try {
       const result = studentRegisterSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { courseCode, username, password, nickname } = result.data

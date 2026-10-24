@@ -19,7 +19,7 @@ type Tx=Prisma.TransactionClient
 const limit=surveyMaxImageBytes
 const types=surveyMimeTypes
 const fail=(statusCode:number,message:string):never=>{throw new SurveyMediaError(statusCode,message)}
-const id=z.string().uuid()
+const id=z.string().guid()
 export function createSurveyMediaRouter(toolLibrary=false){
 const router=Router()
 router.use('/:pid/assets',authenticateSurvey)

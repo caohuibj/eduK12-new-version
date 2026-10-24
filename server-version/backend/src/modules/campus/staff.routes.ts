@@ -24,7 +24,7 @@ const response=(fn:(req:any,res:any)=>Promise<any>)=>asyncHandler(async(req,res)
 
 router.post('/organizations/:organizationId/staff-invitations',
   authenticateSchool,requireRecentSchoolMfa,response(async(req,res)=>{
-    const params=z.object({organizationId:z.string().uuid()}).parse(req.params)
+    const params=z.object({organizationId:z.string().guid()}).parse(req.params)
     const body=z.object({
       persona:z.enum(['TEACHER','COUNSELOR']),adminRole:z.boolean().default(false),
       psychologyStaff:z.boolean().default(false),

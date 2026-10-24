@@ -14,7 +14,7 @@ import {
 } from './observer.service'
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 const eventParams=z.object({organizationId:uuid,eventId:uuid})
 const invitation=z.object({
   observerUserId:uuid,role:z.enum(['EXPERT','PEER']),
@@ -29,7 +29,7 @@ const change=z.object({expectedRevision:z.number().int().min(1),
 const submit=z.object({
   expectedRevision:z.number().int().min(1),
   fieldFormId:uuid.optional(),
-  answers:z.record(z.unknown()).optional(),
+  answers:z.record(z.string(), z.unknown()).optional(),
 }).strict()
 const limiter=createRedisRateLimiter({
   name:'huiteacher-observation-writes',limit:90,windowSeconds:900,

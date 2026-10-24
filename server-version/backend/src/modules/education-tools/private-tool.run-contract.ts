@@ -2,7 +2,7 @@ import {z} from 'zod'
 import {privateFormRuntimeInput} from './private-tool.form-runtime-contracts'
 import {privateScaleRuntimeInput} from './private-tool.runtime-origin'
 import {privateToolFail} from './private-tool.contracts'
-const ids=z.array(z.string().uuid()).min(1).max(500)
+const ids=z.array(z.string().guid()).min(1).max(500)
 export const privateRunSelector=z.discriminatedUnion('kind',[
  z.object({kind:z.literal('ALL_CURRENT')}).strict(),
  z.object({kind:z.literal('RELATED_PARENT')}).strict(),

@@ -17,7 +17,7 @@ import {
 } from './studentEvaluation.service'
 
 const router=Router()
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 const params=z.object({organizationId:uuid,eventId:uuid}).strict()
 const create=z.object({
   classUnitId:uuid,staffAssignmentId:uuid,formId:uuid,

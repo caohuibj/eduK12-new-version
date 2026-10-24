@@ -8,7 +8,7 @@ import {ContentReleaseError} from '../measurement-content/release'
 import * as reports from './report-drafts.service'
 export const surveyReportDraftsRouter=Router()
 surveyReportDraftsRouter.use('/:pid/report-drafts',authenticateSurvey)
-const id=z.string().uuid()
+const id=z.string().guid()
 const handle=(run:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
   try{res.setHeader('Cache-Control','no-store');return success(res,await run(req))}
   catch(e){if(e instanceof z.ZodError)return error(res,'报告输入不符合受控内容结构',-1,400)

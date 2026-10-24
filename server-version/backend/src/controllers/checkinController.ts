@@ -471,7 +471,7 @@ export const checkinController = {
 
       const result = createCheckinSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { courseId, title, description, content, videos, images, documents, endTime, allowViewOthers, tags } = result.data
@@ -635,7 +635,7 @@ export const checkinController = {
 
       const result = updateCheckinSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const checkin = await prisma.checkin.findUnique({
@@ -802,7 +802,7 @@ export const checkinController = {
 
       const result = submitCheckinSchema.safeParse(req.body)
       if (!result.success) {
-        return error(res, result.error.errors[0].message)
+        return error(res, result.error.issues[0].message)
       }
 
       const { content, images, expectedRevision } = result.data
@@ -1495,7 +1495,7 @@ export const checkinController = {
       const userId = req.user?.userId
       const { id: checkinId } = req.params
       const parsed = createCheckinTokenSchema.safeParse(req.body)
-      if (!parsed.success) return error(res, parsed.error.errors[0]?.message || '令牌参数无效')
+      if (!parsed.success) return error(res, parsed.error.issues[0]?.message || '令牌参数无效')
       const { expiresAt, maxUses } = parsed.data
 
       // 验证打卡是否存在

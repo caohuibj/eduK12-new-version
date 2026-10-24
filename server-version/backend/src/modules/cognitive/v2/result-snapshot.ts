@@ -12,14 +12,14 @@ export const cognitiveResultSnapshotSchema = z.object({
   scoringVersion: z.string().min(1),
   protocolSignature: z.string().regex(/^[0-9a-f]{64}$/),
   profile: z.enum(['experience', 'standard', 'research']).nullable(),
-  metrics: z.record(z.unknown()),
+  metrics: z.record(z.string(), z.unknown()),
   quality: z.object({
     state: qualityStateSchema,
-    flags: z.record(z.boolean()),
+    flags: z.record(z.string(), z.boolean()),
     reasons: z.array(z.string()),
   }).strict(),
-  references: z.array(z.record(z.unknown())),
-  report: z.record(z.unknown()),
+  references: z.array(z.record(z.string(), z.unknown())),
+  report: z.record(z.string(), z.unknown()),
   assessmentContext: z.object({
     schemaVersion: z.literal(1),
     snapshotHash: z.string().min(1),

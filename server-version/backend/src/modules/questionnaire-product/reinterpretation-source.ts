@@ -12,7 +12,7 @@ import {decryptAssessmentContext,assessmentContextHashMatches} from '../assessme
 import type {ReferenceContext} from '../assessment-reference/reference'
 import {loadTrainingMetricDisclosure} from '../composite/training-metric-disclosure'
 
-const uuid=z.string().uuid(),digest=z.string().regex(/^[a-f0-9]{64}$/)
+const uuid=z.string().guid(),digest=z.string().regex(/^[a-f0-9]{64}$/)
 export const trainingReinterpretationContextSchema=z.object({actorId:uuid,courseId:uuid,compositeId:uuid,attemptId:uuid,grantId:uuid}).strict()
 export type TrainingReinterpretationContext=z.infer<typeof trainingReinterpretationContextSchema>
 export class TrainingReinterpretationError extends ContentReleaseError {readonly statusCode=409}

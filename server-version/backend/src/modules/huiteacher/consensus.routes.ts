@@ -13,7 +13,7 @@ import {
 } from './consensus.service'
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const uuid=z.string().uuid()
+const uuid=z.string().guid()
 const eventParams=z.object({organizationId:uuid,eventId:uuid}).strict()
 const text=z.object({
   title:z.string().trim().min(2).max(200),

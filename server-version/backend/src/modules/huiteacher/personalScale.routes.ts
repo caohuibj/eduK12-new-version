@@ -12,7 +12,7 @@ import {
 } from './personalScale.service'
 const router=Router()
 router.use((_req,res,next)=>{res.setHeader('Cache-Control','no-store');next()})
-const id=z.string().uuid()
+const id=z.string().guid()
 const admissionLimiter=createRedisRateLimiter({
   name:'huiteacher-personal-scale-admission',limit:12,windowSeconds:900,
   key:req=>req.user?.userId||req.ip||'unknown',

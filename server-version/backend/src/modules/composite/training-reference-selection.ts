@@ -10,7 +10,7 @@ import {resolveFormalReferenceRelease} from '../measurement-content/formal-refer
 import type {AssessmentReferenceEntry} from '../assessment-reference/reference'
 import type {VerifiedReferenceForSelection} from '../measurement-content/reference-policy'
 import type {TrainingContentSnapshot} from './training-content-binding'
-const uuid=z.string().uuid(),hash=z.string().regex(/^[a-f0-9]{64}$/),text=z.string().min(1).max(240)
+const uuid=z.string().guid(),hash=z.string().regex(/^[a-f0-9]{64}$/),text=z.string().min(1).max(240)
 export const trainingReferenceKindSchema=z.enum(['normative_distribution','criterion_threshold','descriptive_sample','theoretical_range'])
 export const trainingReferencePolicySchema=z.object({policyVersion:z.literal('EXACT_POPULATION_PRIORITY_V1'),measurementReleaseId:uuid,
  choices:z.array(z.object({releaseId:uuid,contentHash:hash,entryKey:hash,metricKey:text,referenceKind:trainingReferenceKindSchema,priority:z.number().int().safe()}).strict()).max(100)}).strict()

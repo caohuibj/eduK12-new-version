@@ -33,7 +33,7 @@ router.get('/organizations/:organizationId/staff-class-assignments',authenticate
 // register merely to support assignment of a reporting disclosure capability.
 router.get('/organizations/:organizationId/disclosure-officers',authenticateSchool,requireOrganizationGovernance,
   asyncHandler(async(req,res)=>{
-    const organizationId=z.string().uuid().parse(req.params.organizationId)
+    const organizationId=z.string().guid().parse(req.params.organizationId)
     const rows=await prisma.$queryRaw<Array<{
       membershipId:string;displayName:string;hasPsychology:boolean;hasDisclosure:boolean;
     }>>`
@@ -60,7 +60,7 @@ router.get('/organizations/:organizationId/disclosure-officers',authenticateScho
 
 router.post('/organizations/:organizationId/memberships/:membershipId/capabilities',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,guardCampusCapabilityGrant,organizationController.grantCapability)
 router.post('/organizations/:organizationId/memberships/:membershipId/capabilities/revoke',authenticateSchool,requireRecentSchoolMfa,requireOrganizationGovernance,organizationController.revokeCapability)
-const relationId=z.string().uuid()
+const relationId=z.string().guid()
 const relations=(handler:(req:any)=>Promise<unknown>)=>asyncHandler(async(req,res)=>{
   try{return success(res,await handler(req))}
   catch(error){

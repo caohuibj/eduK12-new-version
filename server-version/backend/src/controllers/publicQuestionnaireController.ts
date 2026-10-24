@@ -1300,7 +1300,7 @@ export const publicQuestionnaireController = {
         })).min(1).max(10),
       })
       const parsed = schema.safeParse(req.body)
-      if (!parsed.success) return error(res, parsed.error.errors[0].message)
+      if (!parsed.success) return error(res, parsed.error.issues[0].message)
       const { answers } = parsed.data
       const scaleAssessmentId = answers[0].scaleAssessmentId
       if (answers.some((answer) => answer.scaleAssessmentId !== scaleAssessmentId)) {
@@ -1789,7 +1789,7 @@ export const publicQuestionnaireController = {
         })).min(1).max(10),
       })
       const parsed = schema.safeParse(req.body)
-      if (!parsed.success) return error(res, parsed.error.errors[0].message)
+      if (!parsed.success) return error(res, parsed.error.issues[0].message)
       const { answers } = parsed.data
       const requestedFormItemIds = [...new Set(answers.map((answer) => answer.formItemId))]
 

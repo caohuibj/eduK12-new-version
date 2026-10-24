@@ -9,7 +9,7 @@ import {
 const key=surveyKeySchema
 export const bulkInputSchema=z.object({
   format:z.enum(['TEXT','CSV']),content:z.string().min(1).max(200000),
-  batchId:z.string().uuid(),
+  batchId:z.string().guid(),
   pageKey:key.optional(),dimensionKey:key.optional(),
 }).strict()
 export type BulkInput=z.infer<typeof bulkInputSchema>
