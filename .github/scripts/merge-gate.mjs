@@ -1,3 +1,4 @@
+import {sjtNativePlan,sjtNativeOutputs} from './sjt-native-scope.mjs';
 import {trainingEntryPlan,trainingEntryOutputs} from './training-entry-scope.mjs';
 import {surveyReviewPlan,surveyReviewOutputs} from './survey-review-scope.mjs';
 import {trainingTeacherPlan,trainingTeacherOutputs} from './training-teacher-scope.mjs';
@@ -58,6 +59,7 @@ const acceptanceJobs = {
 
 export function requiredChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
+  if(scope.application_route==='sjt-native')return ['scope','sjt-native','codeql'];
   if(scope.application_route==='training-entry')return ['scope','training-entry','codeql'];
   if(scope.application_route==='survey-review')return ['scope','survey-review','codeql'];
   if(scope.application_route==='training-teacher-management')return ['scope','training-teacher-management','codeql'];
@@ -134,6 +136,10 @@ export function requiredChecks(needs, draft) {
 export function failedChecks(needs, draft) {
   const scope = needs.scope?.outputs ?? {};
   const failed = requiredChecks(needs, draft).filter(name => needs[name]?.result !== 'success');
+  if(scope.application_route==='sjt-native'){
+    try{const p=JSON.parse(scope.sjt_native_plan);if(draft||p.postMerge!==false||p.route!=='sjt-native'||Object.entries(sjtNativeOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
+  return [...new Set(failed)];
+  }
   if(scope.application_route==='training-entry'){
     try{const p=JSON.parse(scope.training_entry_plan);if(draft||p.postMerge!==false||p.route!=='training-entry'||Object.entries(trainingEntryOutputs(p)).some(([k,v])=>scope[k]!==String(v)))failed.push('scope');}catch{failed.push('scope');}
   return [...new Set(failed)];
@@ -420,6 +426,12 @@ if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) 
   const needs = readNeeds();
   const draft = process.env.IS_DRAFT === 'true';
   const failed = failedChecks(needs, draft);
+  if(needs.scope?.outputs?.application_route==='sjt-native'){
+    try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');
+      const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.sjt_native_plan);
+      if(p.head!==head||p.base!==process.env.CI_BASE_SHA||JSON.stringify(sjtNativePlan(changedEntries(p.base,head),p.base,head))!==JSON.stringify(p))failed.push('recomputed-sjt-native-plan');
+    }catch{failed.push('recomputed-sjt-native-plan');}
+  }
   if(needs.scope?.outputs?.application_route==='training-entry'){
     try{const {changedEntries}=await import('./content-scope.mjs');const {execFileSync}=await import('node:child_process');
       const head=execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),p=JSON.parse(needs.scope.outputs.training_entry_plan);

@@ -1,0 +1,805 @@
+{
+  "schema": 1,
+  "base": "b9ad2b7f6fea17a599bdfd57445822c80a4f7538",
+  "localProduct": "2594517dd04eb9bc99837e59743879c2e749c75b",
+  "productTree": "10549d1cc318b0993d66f09e227cabeac647df0e",
+  "source": {
+    "server-version/backend/prisma/migrations/20261024060000_survey_situational_host_binding/migration.sql": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "168a86d2d367b3eac89b2ff0c64fc15bc9fbf87e"
+    },
+    "server-version/backend/prisma/migrations/20261024121500_survey_situational_flow_locks/migration.sql": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "0977b58fe364b24eb43f3ed3cfeced4cb3dc2d35"
+    },
+    "server-version/backend/prisma/schema.prisma": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b0556f0f6d93606ec7bee89e69b48749a33c7a4f",
+      "after": "b75acf10b51f520b1e0c2ac3f68d720ad2fe15ef"
+    },
+    "server-version/backend/src/__tests__/fixtures/sjt-native-branch.fixture.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5ca54d6763907563538d5ba0e5dd072cac271529"
+    },
+    "server-version/backend/src/__tests__/fixtures/sjt-native-staged.fixture.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "4afbe8599760ced1be3b88e0a7a2078a856e5e78"
+    },
+    "server-version/backend/src/__tests__/fixtures/sjt-native-v1.fixture.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "8f010f137918431f6f0e8e8ca4e91eb72fd59554"
+    },
+    "server-version/backend/src/__tests__/measurement-content/admin-authority.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "84bb25775aa8008b0298cf8e59e1e800d4cd0f7c",
+      "after": "e890a194d99c8737cf0e1036da0fd4f15ada4a77"
+    },
+    "server-version/backend/src/__tests__/situational/sjt-authoring-upload-image.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6deb821677819ac94c84b9a75f69e1c5c6fd75a8"
+    },
+    "server-version/backend/src/__tests__/situational/sjt-entry-authority.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c0b57e52ff963b36815085c98f0b329e26179d18"
+    },
+    "server-version/backend/src/__tests__/situational/sjt-online-final-persistence.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "eb7d61df2e2e9083ce82e639a84926806b610380",
+      "after": "5e851c901121d2db4367a9d89dc40fb5a675770b"
+    },
+    "server-version/backend/src/__tests__/survey/catalog-sjt-entry-authority.contract.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "829a2a17388c68d9db6acd24cbabfacf0974c746"
+    },
+    "server-version/backend/src/__tests__/survey/catalog-sjt-media.authorization.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6a133c0bb300da000792fa61581c352b4e5c722d",
+      "after": "516f9060b1033465321e58f8d5bddce94a07be3b"
+    },
+    "server-version/backend/src/__tests__/survey/catalog-sjt-online.contract.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4abb553091c56c3268b3a67d57e28eb4fb73aabe",
+      "after": "ec54bda9785e6cffc6ce89ca620bf2627ceb2d14"
+    },
+    "server-version/backend/src/__tests__/survey/catalog.pagination.contract.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e1178fdc7a12f6c132e7d825aa3b5656d6987453",
+      "after": "7954c5b5433fdc1623f769c8d22c5546214dbd71"
+    },
+    "server-version/backend/src/__tests__/survey/combined-source-read.contract.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "14cef41dad2b07c82a236e69c2ef3c06a954d8b9",
+      "after": "d10e34a1852a32e4c66c684f1ab43d7db4fba853"
+    },
+    "server-version/backend/src/__tests__/survey/measurement-export-service.contract.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0a6578a99b8b65607e2e927e438f7627f3da0303",
+      "after": "93a94933151b87d5b3a8e25dc6cf17b7e075446a"
+    },
+    "server-version/backend/src/__tests__/survey/research-builder.contract.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5633b6bc66b948e33a5c2e92b656483945204288",
+      "after": "9644387d0b574e236a8ca5ce4a2b92950e50c693"
+    },
+    "server-version/backend/src/__tests__/survey/research-cognitive.contract.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "43e887d3d6389bcd4042e8afaf16fd75570ca9e5",
+      "after": "d5b082008778e7b7621f78ec57c79a6dd9680d99"
+    },
+    "server-version/backend/src/__tests__/survey/research-form-export-privacy.contract.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "358bb35675d36c0780825625617285d591c96257",
+      "after": "a2c7b96930870fe8c53c0d06f6fac7df0158dbe5"
+    },
+    "server-version/backend/src/__tests__/survey/situational-cognitive-mixed.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "07832637fe7226d3cebca984e40cbf49f8b4f69e"
+    },
+    "server-version/backend/src/__tests__/survey/situational-entry-authority.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5dff63ac97acdc7afff61700361b905acfb0aec4"
+    },
+    "server-version/backend/src/__tests__/survey/situational-native-binding.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a9cd4de70fc555502f432e5eba8749b6991baea0"
+    },
+    "server-version/backend/src/__tests__/survey/situational-native-branch.contract.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "274814f38462a2d01c1658c238550853dbf0f8a7"
+    },
+    "server-version/backend/src/__tests__/survey/situational-native-flow.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "1843713ccad4450a8fc929706e053e25ac84a90a"
+    },
+    "server-version/backend/src/__tests__/survey/situational-native-host-guard.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9dc26b93f3c502a455e9e6f6e699c293cfe1bab5"
+    },
+    "server-version/backend/src/__tests__/survey/situational-native-image.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "35881dd4784526e8b3afb3ffff5813b1211729c5"
+    },
+    "server-version/backend/src/__tests__/survey/situational-native-image.routes.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7e7b0be9ef221fe5b56d725581ac1cfc0f5926df"
+    },
+    "server-version/backend/src/__tests__/survey/situational-native-staged.contract.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "31e3d3cd290d64742043c4ed5753325160c6bfb4"
+    },
+    "server-version/backend/src/__tests__/survey/situational-native-staged.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "cd451249e120f57b5496652d0f7a3de20b6710fb"
+    },
+    "server-version/backend/src/__tests__/survey/situational-native-termination.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "0bcf660c9c261dabe3b9dcc1a1fd0ba7487f99c9"
+    },
+    "server-version/backend/src/__tests__/survey/situational-native-v1.contract.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ceda00fa22fed8d1c7c72a548374aa0f2d5fc2a0"
+    },
+    "server-version/backend/src/__tests__/survey/situational-native-v1.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f2f08a73e8f3ec6a8674172390b4d223e9f36cbd"
+    },
+    "server-version/backend/src/__tests__/survey/situational-native-variants.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "0b67b81d841499064c22a1d4e957ad0b01936bad"
+    },
+    "server-version/backend/src/__tests__/survey/situational-native.contract.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ec17584b8fd9b0a4025a1d61fc9d63b5356394ca"
+    },
+    "server-version/backend/src/modules/measurement-content/admin-authority.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e3aff00ad16840cfcb97e680be27030d0ee5f7a2",
+      "after": "9fde059b686325cce23e868766dd9521939a11a0"
+    },
+    "server-version/backend/src/modules/situational/authoring/media.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "91b7816caaf99d8f0fdce4400189c7bd16fc4fbd",
+      "after": "ac28dbb4313ea21318a74b35e02b989275df9be0"
+    },
+    "server-version/backend/src/modules/situational/authoring/service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4026b0525ae516e9b0a093db562e6365cc982afe",
+      "after": "78a277b524d9cd08806e1160e33e8613689f0ba9"
+    },
+    "server-version/backend/src/modules/situational/authoring/template.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "45122a5bdc4945fcae9e0fc6281011239381ddb6",
+      "after": "5bc215bde9a0cfedb808f4ec3beb455faf7345ac"
+    },
+    "server-version/backend/src/modules/situational/entry-authority.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7fd407f084c749938e0705bc66217dcc109a1733"
+    },
+    "server-version/backend/src/modules/situational/situational-final-submit.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3cc20eb8fd9bafd1b6f306b3677472c064e31a34",
+      "after": "732bd226532337f1dc18224fee411d87ecc258d9"
+    },
+    "server-version/backend/src/modules/situational/situational-runtime.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ba2f0f2845fbdc651b13822535e84c25e0a66622",
+      "after": "5b8ee323c3eb1fe524b3d8b103e92a4ad4f86996"
+    },
+    "server-version/backend/src/modules/survey/analytics.cohorts.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6a0af2d407daa6c01d44bbccef61eeebdd637622",
+      "after": "80e00545422abeb34a76bd95f522bf1255dc9589"
+    },
+    "server-version/backend/src/modules/survey/analytics.export-format.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e91819ea7985e5720137a1fa635f971b9ab95586",
+      "after": "2e9de0e62fbd867e47e8fccf2173a7ee6e8706b9"
+    },
+    "server-version/backend/src/modules/survey/analytics.paged.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f1377da934a39c4c16196f1f094c3fb861a5a69b",
+      "after": "8a6eab1b9e0c45fbfa295817f961045e00cc3a62"
+    },
+    "server-version/backend/src/modules/survey/analytics.response-privacy.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7307cc94d2f45a9b6a4a80c874345fad42a53cd1",
+      "after": "4643247cdbda08d8284b2b71a87151a7bd1a8b9b"
+    },
+    "server-version/backend/src/modules/survey/analytics.source.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5442ac4c5335ad80ba6cd6db901eb0ce7ec536f9",
+      "after": "f1822df61c3d6ec53639921d88a2ed9c8525f13e"
+    },
+    "server-version/backend/src/modules/survey/builder.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "78f94948380283815256eaed7f245f5c3c744228",
+      "after": "8f674749ca9fa78191ee3dc7b14e59699de67bac"
+    },
+    "server-version/backend/src/modules/survey/catalog-sjt-media.authorization.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8bed8d351e0ce540be62d7d1f8c15c5dc2f6d3b3",
+      "after": "e657cab46acf667931c6b49c97e0aa3f885eac63"
+    },
+    "server-version/backend/src/modules/survey/catalog.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b128045d873939cc61ad3c912a04359e0e8b8008",
+      "after": "05520969cf07b247fad04dbf2b6dbb7851b6525c"
+    },
+    "server-version/backend/src/modules/survey/catalog.sources.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a73273a7585c30f8a142f7fd1fc0f3028e598aa9",
+      "after": "925a4a5c0c367fe881b20baa5f670b00c05cb80b"
+    },
+    "server-version/backend/src/modules/survey/checkpoint.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bb962442b64c5a08fcb8744c4619d690eaf7fdd7",
+      "after": "7b8efb42fc7d997171cbd57133f91fce0384f1ec"
+    },
+    "server-version/backend/src/modules/survey/cognitive.results.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ca812ea82fd218de5e8582003f2d07566d159d76",
+      "after": "aa278211bd0b1427f9587e893eb01bb688390846"
+    },
+    "server-version/backend/src/modules/survey/cognitive.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7959c421e8de5500e49af80817db606b1d04c214",
+      "after": "36538b9cb22a6c99925b21a93282d06e2e095961"
+    },
+    "server-version/backend/src/modules/survey/final.compute.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "96100dea780d49059692892b86063e16d8bb2601",
+      "after": "5932a6cb19f3567aadf173f835793c18b90190ff"
+    },
+    "server-version/backend/src/modules/survey/final.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a5b1042c74b9f09dbbf8f9f2a8795b28fcccba66",
+      "after": "32f0f2e441bfc07daa8912d9de9da337fd4a8523"
+    },
+    "server-version/backend/src/modules/survey/flow.assignment.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3593f158dd19d06d4c8c8c36a80aaacfcfc3f9f4",
+      "after": "e9c04e06ee5ea10fcccb37ff9dc39b8384767242"
+    },
+    "server-version/backend/src/modules/survey/flow.runtime.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "552591678cbaa1ae8705a7b76de45c5cfb78884d",
+      "after": "350557e783256f333be9e9905d89a1edb6327989"
+    },
+    "server-version/backend/src/modules/survey/flow.screen-out.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f29a8e2eadf3fe69500e9c642558c2b30ba23b86",
+      "after": "e85d41c4ae5285964d9295ff4e406200e43e0c43"
+    },
+    "server-version/backend/src/modules/survey/measurement.notice.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a635c5d8bcdbb8dadd512c828f44030440532d0a",
+      "after": "657c2e1e4977db60a246a1ab43375e7f3f2f1f11"
+    },
+    "server-version/backend/src/modules/survey/public.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b3f02e91be80429d4139c356b7adbcc11eb3ff8a",
+      "after": "1fcbacd67ded797f6caa630bf1e777dc493904c3"
+    },
+    "server-version/backend/src/modules/survey/publication.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b9af68d0d92418a493e326769bba86b31819adb1",
+      "after": "2dcec4c3887bc7d3297d9f50da4e8e17b60ca56e"
+    },
+    "server-version/backend/src/modules/survey/situational-native.contract.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "fb3ef2b32d5ff556ffa6b85b79f4e13413ce8652"
+    },
+    "server-version/backend/src/modules/survey/situational-native.definition.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ed3877d6a42c95b3e919c8418dede7471c74f844"
+    },
+    "server-version/backend/src/modules/survey/situational-native.public.routes.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "8ff38590806ab736331e5f879c4c5e8d5f9d779c"
+    },
+    "server-version/backend/src/modules/survey/situational-native.results.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f398bade224a7a282c6815fa84282fc5a158fc05"
+    },
+    "server-version/backend/src/modules/survey/situational-native.service.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c69cf9a8cf64c858c8a862c7e38edc8b2439d7f7"
+    },
+    "server-version/backend/src/modules/survey/task-answer-locks.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "dedd563f16f3c8204ac0eda12b0acc7a8ecfd1cb"
+    },
+    "server-version/backend/src/modules/survey/task-authority.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d362d3f7deae00b02b80a32e0dd0eb42b39d60d9"
+    },
+    "server-version/backend/src/modules/survey/task-prefix.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "0a01071c0ef13d1db998913ec7808136f17bd3bc"
+    },
+    "server-version/backend/src/modules/survey/task-receipts.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d19c45d5203a182eb9176c1180e6f9243ddd3973"
+    },
+    "server-version/backend/src/modules/survey/task.public.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "121830f4c0c8a214437c2f9a836cfd3d31be2579",
+      "after": "ebbb884020fd3696670f93f6b5514f9ee1ca8be1"
+    },
+    "server-version/frontend/src/admin/AdminContentPermissions.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7bb1117ac71a5a8db2b1e897a67fe080917bb5dc",
+      "after": "a3b5141eb5372439d10f1abc4ab1ee5c9b3e6220"
+    },
+    "server-version/frontend/src/admin/AdminContentPermissions.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ade2aba760fd8bc63e588fe875e6a6d8ff886b3f",
+      "after": "9218335198e5c3e7888c20725cfdde09ab55a740"
+    },
+    "server-version/frontend/src/admin/contentRequestRecovery.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8102aedbfa6fc2f8f4ebaf6533542dbba02f8411",
+      "after": "a286164211e04869e720f52aec851d40af1059b4"
+    },
+    "server-version/frontend/src/modules/assessment-media/__tests__/media-2.adapter.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "30547ebbf29ece52725a8c77158c03c06b3ed07d",
+      "after": "2246543aea5fc9f21ea4f7144c6095b2a0ef3770"
+    },
+    "server-version/frontend/src/modules/assessment-media/__tests__/useAssessmentImageAssets.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bb2fffe242417a23bc123de1be32934b8c8f2d90",
+      "after": "a178221484ebc675beb7c7d567101b376237eedc"
+    },
+    "server-version/frontend/src/modules/assessment-media/useAssessmentImageAssets.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "26cfaaaa3861987aee52b7e6ab35d8ee822f0a8a",
+      "after": "c3c7a696de28d87e62de986cc7d01318d4d68920"
+    },
+    "server-version/frontend/src/modules/situational/__tests__/OnlineAuthorEditor.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "eec4e48b8f6c2f35b9e68a5399db940d9dcd17d0",
+      "after": "cfc3d7fdbb7bf774fe46b196d58d0a762292083d"
+    },
+    "server-version/frontend/src/modules/situational/__tests__/OnlineImageField.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f9851b48f507f89db9164e892272924b47066411",
+      "after": "7812f46042303cab5ee3baa17f6ba13f702f9636"
+    },
+    "server-version/frontend/src/modules/situational/__tests__/SituationalRunner.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ff56e863e8898cb05aec93d89d6578786a085deb",
+      "after": "ce968168665843045f87afd243b9337c1067aabf"
+    },
+    "server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c2eeb9a8058f66d47d2d30bd203016d0e3f4e2a1",
+      "after": "66bdb2146fb8364e3677b11c7db45a00f1a35fd3"
+    },
+    "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "90fddb0bdabe6f72ab118c0a868317c3c72ce90f",
+      "after": "30495dfab28a05d47f473e1f956e14f1603a00c3"
+    },
+    "server-version/frontend/src/survey/ResearchPreview.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bfa3820c42135569dc0280f29e90d9169e27603e",
+      "after": "230c6016fb0e0c3ebfac1536cd0f17cc4770130d"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b2a7c7f30dd4adee6da3f5f874b4caae35083c89",
+      "after": "0d09ab90e39b2f629cf567d4ff0b540bd23ecb0e"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.mixed-native.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "16fe0c8c796ae4104c17993e4daa5caf8cdc8fae"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.native-flow.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ab29ffb8af4adda05862bb25b66a5b33a05d0322"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "89267035511656a7c9e02b4569edd5c96009384b",
+      "after": "64f2b9efab4951d3fe5cd1360d7cf17157c1e213"
+    },
+    "server-version/frontend/src/survey/SurveySituationalUnit.image.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "db947d62586921921bfda981cc176aa551c10028"
+    },
+    "server-version/frontend/src/survey/SurveySituationalUnit.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7d6c08fb3aa633a947a112a0f68e2fb2868ffc7f"
+    },
+    "server-version/frontend/src/survey/SurveySituationalUnit.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "0609a693cd4d75a37e0184af151ec5c9f69967de"
+    },
+    "server-version/frontend/src/survey/local-answer-draft.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f5e2510c879924d7c4583219a51403d16c5d37fe",
+      "after": "58707ce99b97be83ff72d72b2bdddaeaf6cb10b4"
+    },
+    "server-version/frontend/src/survey/survey-cognitive-local.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3af0004328fe755351db76ecc78a0bc0b50c70cd",
+      "after": "0bfe759fec1b7818836af23ff2fe0504b63a8d0c"
+    },
+    "server-version/frontend/src/survey/survey-cognitive-local.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b6d0dc71423c80daa8448840dc61b362fb05d798",
+      "after": "70f9b6084805da4d877675932b99e852335a3eeb"
+    },
+    "server-version/frontend/src/survey/survey-situational-api.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "66c74629ecd16089d6360ae8b37aa9d66faec4f7"
+    },
+    "server-version/frontend/src/survey/survey-situational-local.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "71d13516f30a041438dc2b6b169453714a120961"
+    },
+    "server-version/frontend/src/survey/survey-task-draft-registry.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "227f4bf036ab6ffbf3e06471112c090e830309b4"
+    }
+  },
+  "controls": [
+    ".github/scripts/sjt-native-bindings.json",
+    ".github/scripts/sjt-native-scope.mjs",
+    ".github/scripts/sjt-native.test.mjs",
+    ".github/scripts/sjt-native-migration.mjs",
+    ".github/scripts/sjt-native-browser.mjs",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    ".github/workflows/ci.yml",
+    ".github/workflows/situational-publication.yml",
+    "docs/release/README.md"
+  ],
+  "controlBefore": {
+    ".github/scripts/content-scope.mjs": "0319bb4c8b279cb5ed65144b67cd1541de415f59",
+    ".github/scripts/merge-gate.mjs": "e93e0cbd17aeb0ed75d91fd61c5adf1063363ee3",
+    ".github/workflows/ci.yml": "aa29c8c48d74fafc579e71c5950fcfeedfc5ee37",
+    ".github/workflows/situational-publication.yml": "baa5d94e8f3cfa89ceb4afda04142140bb05b387",
+    "docs/release/README.md": "05e255b670443ec16401cb3a688f64277c4f8b47"
+  },
+  "components": {
+    "backend": "7c25fd8fcc5e2693c4d2aa242c8c18167a3c0709",
+    "frontend": "68c2ab89d42444facf8526aa1004b73e8b32496d"
+  },
+  "publicationInputs": {
+    "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
+    "server-version/backend/src/modules/situational/onboarding/instruments.generated.ts": "2c3782eecafb7e782615bb7cfefa2d7531352836",
+    "server-version/backend/src/modules/assessment-reference/reference.ts": "1c8a7255c9a7bcac2897f6b5c5abef1515008de4",
+    "server-version/backend/src/modules/assessment-runtime/types.ts": "72060289e8117fcc76a0859d42a615e2a826d8dc",
+    "server-version/backend/src/modules/cognitive/cognitive.types.ts": "7c4c36bfb85a37a9ce8d592aad9b773dfc0d1768",
+    "server-version/backend/src/modules/assessment-core/sjt/runtime.ts": "fd0b55202bad12e8eabeae1f270390616e1bf52a",
+    "server-version/backend/src/modules/assessment-context/context.ts": "d8d573c5fdf43ab392e04dc5f71c93a4e7d3371d",
+    "server-version/backend/src/modules/assessment-core/definition-primitives.ts": "831ec982b84246fabb514622697c95af34b379e9",
+    "server-version/backend/src/modules/situational/situation-definition.ts": "16e38a100d26bf46af5706ef1074539269959b51",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "server-version/backend/src/modules/situational/situation-scientific-validation.ts": "e80112bc6d685c33e9fbbed74134fc9afeb1cbc4",
+    "server-version/backend/src/modules/scale/scale-scoring.ts": "ce315802e4d6fdffb494c54658d4bb5ac019781d",
+    "server-version/backend/src/modules/assessment-runtime/compact-field-codec.ts": "e144eda45208412185ed6a9080a9675a620edff6",
+    "server-version/backend/src/modules/assessment-governance/scientific-qualification.ts": "3aa1b69ab6c711905b24a06e63d5ee737b809c72",
+    "server-version/backend/src/modules/assessment-media/assessment-video.ts": "17249b599e5266c5df5fb5add7277ff7980622d7",
+    "server-version/backend/src/modules/assessment-context/security.ts": "01f988b6200f085a0176f0e52e9c5fac320a2edd",
+    "server-version/backend/src/modules/scale/raw-score-feedback.ts": "05626ffa9c4a85fcf0497248f8c331e03d24bda9",
+    "server-version/backend/src/modules/situational/situation-trajectory.ts": "d22d9ade5a5b62568803c5584939fcc6e3af3257",
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/backend/src/modules/assessment-media/assessment-image-presentation.ts": "8bb97c61e852cdd841138887795b32fa79f02ae3",
+    "server-version/backend/src/modules/situational/situation-scientific-contract.ts": "3c9c7232cc6f345cbd2660e6294ab083aefa0356",
+    "server-version/backend/src/modules/assessment-context/form-answer.ts": "9a64b693718db37e0f43899dee246cb5cc78ecc0",
+    "server-version/backend/src/modules/assessment-core/sjt/selection.ts": "f7e74711d6d77b3b22914963974547399693ed41",
+    "server-version/backend/src/modules/situational/instruments": "a956683e66f2f648c383a583c78535bec07a2354",
+    "server-version/backend/src/modules/assessment-runtime/canonical.ts": "a115b41386a6a6eb9baba9e158611dfd5d3ed425",
+    "server-version/backend/src/modules/cognitive/v2/types.ts": "3fa44df674e253c6a889debee2063910636b9f30",
+    "server-version/backend/src/modules/situational/onboarding/path-policy.ts": "54eede5f92a0c2b8685367c2840b7b47852bde8f",
+    "server-version/backend/src/modules/situational/onboarding/scientific-governance.ts": "70ba43fa3a752d02ced8bef941ac531e0c1ed106",
+    "server-version/backend/src/modules/situational/onboarding/instrument-registry.ts": "d9c136e29bbf0324c530d7f7a44e8499dc53ff20",
+    "server-version/backend/src/modules/situational/onboarding/migration-releases.json": "afe854a133c30aefa60f5ff35c0d1f6b6360101a",
+    "server-version/backend/src/modules/scale/scale-definition.ts": "5da1f84f71a491dedcd93836d6cd0de726e491e9",
+    "server-version/backend/src/modules/situational/onboarding/scientific-schema.ts": "665cd22d30221c549e944fe8e3b11e08574c2da7",
+    "server-version/backend/scripts/generate-situational-instruments.mjs": "383d99d5193bc97d1130e3337dc658e14d3db0b2",
+    "server-version/backend/src/modules/assessment-core/sjt/definition.ts": "7e88c67cbcedc5095cc69af54d27fb40937a468d",
+    "server-version/backend/src/utils/logger.ts": "6b7db2ced9cd3f792fad4b3883f003c63ffb6b03",
+    "server-version/backend/src/modules/scale/library/audience-report-gate.ts": "d64805f97d3732111efd890196104985fb385460",
+    "server-version/backend/src/modules/situational/onboarding/publication-gate.ts": "baa4c814513090d9d5a5bcdeea5caef3462e88f2",
+    "server-version/backend/src/modules/assessment-core/sjt/compiler.ts": "d7e97d5798ac92126c5e763265225ed9610c6d16",
+    "server-version/backend/src/modules/assessment-media/assessment-image.ts": "09b4f6f27c6b6975a61688af120709664d530d10",
+    "server-version/backend/package.json": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+    "server-version/backend/src/utils/encryption.ts": "e625f9df6e9ceaeb21917977007379892cc8ac45",
+    "server-version/backend/src/modules/assessment-runtime/control-reference-codec.ts": "81cceed8fb236a30b9269a0c663c9ad3a44b5bb1",
+    "server-version/backend/src/modules/assessment-core/sjt/validation.ts": "4450a24c965fed09c856c445843b856279750c1d",
+    "server-version/backend/src/modules/assessment-runtime/compiler.ts": "dc5774b6b6e9dc1a375379056253d552f51e8786",
+    "server-version/backend/src/modules/cognitive/task-package.types.ts": "ebce7e51bf566e90aac1d00a242d08d4907ef08e",
+    "server-version/backend/src/modules/situational/situation-branching.ts": "3ce3e81dd03cffc7fdaecd57573ce01113401437",
+    "server-version/backend/src/modules/assessment-governance/scientific-maturity.ts": "9897dc83313ec92d0014cdee2bb3b1d229a312d6",
+    "server-version/backend/src/scripts/situational-onboarding-check.ts": "db7abc6088ad052a1bff76889764bf63a8fafb17",
+    "server-version/backend/src/modules/situational/situation-model-resolver.ts": "70344ef3f3bf229748d8165d8fc01558f26ccaad",
+    "server-version/backend/src/modules/assessment-media/material.ts": "ebd9bf3abec79efd12d8993e40d3b030d7c38571",
+    "server-version/backend/src/modules/assessment-core/sjt/structure.ts": "39955dff22f5583f510515ac6c0c0790ba64f87b",
+    "server-version/backend/src/modules/assessment-reference/governance.ts": "b3e4e7fd349bd2d23f73ccd53e4cac373fa7c141",
+    "server-version/backend/src/modules/assessment-context/index.ts": "a44328b3456d0a659926bfa1cec8263d2824ddfc",
+    "server-version/backend/src/modules/situational/situation-package.ts": "ea972ef01211f119998293ef8e79354beaa63e1b",
+    "server-version/backend/src/modules/assessment-media/assessment-asset-identity.ts": "6a0819dba0c2c94c0c6fcbf66a9f67ccde62b241",
+    "server-version/backend/src/modules/situational/authoring/template.ts": "5bc215bde9a0cfedb808f4ec3beb455faf7345ac",
+    "server-version/backend/src/modules/situational/onboarding/review-authority.ts": "170a76d802e998502bbfa262243f867acc0c4a89",
+    "server-version/backend/src/modules/situational/onboarding/scientific-qualification.ts": "0f31f831b8c3f98c6c74ed365cc123ae8cb6cfde",
+    "server-version/backend/src/modules/situational/authoring/online.ts": "7d6e2e7f9bdc9fa5af216954c2191fc0e3910b14",
+    "server-version/backend/src/modules/cognitive/v2/presentation.ts": "4d91bb2a10761c4c8f7882070997a9693bc41aee",
+    "server-version/backend/src/modules/situational/situation-scoring.ts": "11ad6009ec5f276b4b6d54057b9e46771f62eb8b",
+    "server-version/backend/src/modules/situational/situation-runtime-definition.ts": "3c883c09437d50c6fdaea2782238ce57080cd838",
+    "server-version/backend/src/modules/situational/onboarding/schema.ts": "5dc43474c66cf126d1ae1c2eb26d10075ffd73a8"
+  },
+  "authorization": "Sentinel_1ffcab4d3424819183ef4fdd821da1b5",
+  "publicationDelta": {
+    "file": "server-version/backend/src/modules/situational/authoring/template.ts",
+    "before": "45122a5bdc4945fcae9e0fc6281011239381ddb6",
+    "after": "5bc215bde9a0cfedb808f4ec3beb455faf7345ac",
+    "review": "Only unchanged SjtTemplateError is consumed by online/publication; added image schema initialization pure. All other validator/scientific inputs exact."
+  },
+  "localReview": {
+    "kind": "human-reviewed-static-input-inheritance-not-signed-or-CI-reexecution",
+    "components": {
+      "backend": "7c25fd8fcc5e2693c4d2aa242c8c18167a3c0709",
+      "frontend": "68c2ab89d42444facf8526aa1004b73e8b32496d"
+    },
+    "checkpointSource": "8e58bd0976df8fc344f2c97112a006f47b05804f",
+    "checkpointSummarySHA256": "896222dc69059e97f7f54257864154511504e0ad71f3e22ca982a1b95fe32f0d",
+    "scope": "Individually reviewed authorization/current-grant/private-media, replay, flow, mixed-unit, variants and export contract/PG slices; no aggregate case-count assertion. Main alignment exact prior SJT delta; router fix and test-only type correction separately checked.",
+    "missingExecutedHere": [
+      "new emitted backend build",
+      "new frontend production build",
+      "nonempty main migration upgrade and dump/restore",
+      "current CodeQL",
+      "two real compiled-host Chromium image decoder journeys"
+    ],
+    "priorFailures": "Preserved in local source records; local socket EPERM browser attempt is not passed. Prior FE type failure was corrected and the final type check passed."
+  },
+  "controlSHA256": {
+    ".github/scripts/sjt-native-scope.mjs": "7393bd8b8d40280b8107f1d1fb7346832b4f466aded28e1caacc0c5967c83627",
+    ".github/scripts/sjt-native.test.mjs": "9287c7f9303905a2b006416c6727b1cae163696df987ca9cea4a4aee7c3daacf",
+    ".github/scripts/sjt-native-migration.mjs": "e7498e656a0d97b4e158778e8aca21eaeba15db6bbc17d66f856aaf356e8a91d",
+    ".github/scripts/sjt-native-browser.mjs": "1da96f08bf0b7f0f9e6fbbbd266a975446a79534ab7fe068d07a462b5231d03f",
+    ".github/scripts/content-scope.mjs": "e65006067859ca6b5ca969cc3a9337280001c5b1bb5662a7a99b0f994be403b6",
+    ".github/scripts/merge-gate.mjs": "46f5722169a9c7e3b7d67408e605bd05e3224d98eb3b1e31e1f78c891bfa987a",
+    ".github/workflows/ci.yml": "23fbc107ed16b96256dd5b019843cb6decf3210d84552fc8f76122b023857d62",
+    ".github/workflows/situational-publication.yml": "5c93c3b1a08ab210fff3ff4e43cd4d23e385c72a6eaa44611d4e28a190c37187",
+    "docs/release/README.md": "712d39aee123eb65876a5472987df0bf92279deaed94d800e5cb4b6f4d303451"
+  },
+  "product": "684b2bc9362e103d0f3cf8f29935aeaa88803fba"
+}
