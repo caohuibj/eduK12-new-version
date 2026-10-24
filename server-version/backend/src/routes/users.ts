@@ -1,5 +1,6 @@
 import { passwordChangeRateLimit, withPasswordChangeAdmission } from '../middleware/passwordChangeAdmission'
 import { Router } from 'express'
+import { trainingTeacherManagement } from '../controllers/trainingTeacherManagementController'
 import { createRedisRateLimiter } from '../middleware/redisRateLimit'
 import { userController } from '../controllers/userController'
 import { userLifecycleController } from '../controllers/userLifecycleController'
@@ -24,6 +25,8 @@ router.delete('/:id', authenticate, userLifecycleController.deactivate)
 // legacy User.role=ADMIN is intentionally insufficient.
 const platformResetRateLimit = createRedisRateLimiter({ name: 'platform_password_reset', limit: 10, windowSeconds: 900, key: req => req.user!.userId })
 router.post('/:id/reset-password', authenticate, platformResetRateLimit, platformAccountController.resetPassword)
+const trainingManagementRateLimit = createRedisRateLimiter({ name: 'training_teacher_management', limit: 20, windowSeconds: 900, key: req => req.user!.userId })
+router.post('/:id/training-management', authenticate, requireAdmin, trainingManagementRateLimit, trainingTeacherManagement)
 router.post('/:id/approve-teacher', authenticate, requireAdmin, userController.approveTeacher)
 
 export default router

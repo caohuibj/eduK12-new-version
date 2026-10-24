@@ -160,7 +160,7 @@ export const authController = {
         return error(res, '教师邀请码已失效')
       }
 
-      if (teacherCode.expiresAt && teacherCode.expiresAt < new Date()) {
+      if (teacherCode.expiresAt && teacherCode.expiresAt <= new Date()) {
         return error(res, '教师邀请码已过期')
       }
 
@@ -197,7 +197,7 @@ export const authController = {
         return error(res, '教师邀请码无效或已失效')
       }
 
-      if (teacherCode.expiresAt && teacherCode.expiresAt < new Date()) {
+      if (teacherCode.expiresAt && teacherCode.expiresAt <= new Date()) {
         return error(res, '教师邀请码已过期')
       }
 
@@ -214,10 +214,6 @@ export const authController = {
       if (existingUser) {
         return error(res, '用户名已被使用，请更换')
       }
-
-      // 创建教师账号，有效期1年
-      const expiresAt = new Date()
-      expiresAt.setFullYear(expiresAt.getFullYear() + 1)
 
       const hashedPassword = await hashPassword(password)
       // 注册账号和教师码占用必须是一个事务。先用条件更新抢占注册码，
@@ -237,6 +233,15 @@ export const authController = {
         `
 
         if (Number(claimed) !== 1) return null
+
+        // The administrator-owned code sets the term; it starts at registration,
+        // independently of the deadline for redeeming the code. Legacy codes keep one calendar year.
+        const expiresAt = new Date()
+        if (teacherCode.accountValidityDays != null) {
+          expiresAt.setTime(expiresAt.getTime() + teacherCode.accountValidityDays * 86400000)
+        } else {
+          expiresAt.setFullYear(expiresAt.getFullYear() + 1)
+        }
 
         return tx.user.create({
           data: {
