@@ -46,13 +46,37 @@ describe('product entry only imports the selected application', () => {
 
 
 describe('Training synchronous startup identity and colors',()=>{
- function bootstrap(pathname:string,mode:string|null='dark',hostname='localhost',search='',storageBlocked=false){
+ function bootstrap(pathname:string,mode:string|null='dark',hostname='localhost',search='',storageBlocked=false,development='true',hour=8){
   const icon={setAttribute:vi.fn()},dataset:Record<string,string>={}
-  const doc={title:'',currentScript:{dataset:{development:'true'}},head:{querySelector:()=>icon},documentElement:{dataset}}
-  class LocalClock extends Date{getHours(){return 8}}
+  const doc={title:'',currentScript:{dataset:{development}},head:{querySelector:()=>icon},documentElement:{dataset}}
+  class LocalClock extends Date{getHours(){return hour}}
   runInNewContext(readFileSync('public/entry-brand.js','utf8'),{window:{location:{hostname,pathname,search}},document:doc,URLSearchParams,Date:LocalClock,localStorage:{getItem:()=>{if(storageBlocked)throw Error('blocked');return mode}}})
   return {doc,icon,dataset}
  }
+
+ it.each(['/dashboard','/toolkit','/student','/student/courses/example','/login','/student/composite/attempts/example/report'])('primes ordinary Training first paint on %s',path=>{
+  const {doc,dataset}=bootstrap(path,'dark','training.localhost')
+  expect(doc.title).toBe('Training');expect(dataset).toEqual({trainingEntry:'true',trainingTheme:'dark'})
+ })
+ it.each([[6,'dark'],[7,'light'],[18,'light'],[19,'dark']] as const)('resolves cached auto at %i before React as %s',(hour,expected)=>{
+  expect(bootstrap('/dashboard','auto','training.localhost','',false,'true',hour).dataset.trainingTheme).toBe(expected)
+ })
+ it('honors an explicit light mode at night and uses the clock when local storage is blocked',()=>{
+  expect(bootstrap('/toolkit','light','training.localhost','',false,'true',20).dataset.trainingTheme).toBe('light')
+  expect(bootstrap('/student',null,'training.localhost','',true,'true',20).dataset.trainingTheme).toBe('dark')
+ })
+ it('keeps development aliases out of production and rejects lookalike hosts',()=>{
+  expect(bootstrap('/dashboard','dark','training.localhost','',false,'false').dataset).toEqual({})
+  expect(bootstrap('/dashboard','dark','training.eduk12.top.evil.example').dataset).toEqual({})
+  expect(bootstrap('/dashboard','dark','training.eduk12.top','',false,'false').dataset.trainingTheme).toBe('dark')
+ })
+ it.each(['survey.localhost','survey.eduk12.top','school.eduk12.top','teacher.eduk12.top','localhost'])('does not prime a regular workspace on %s',host=>{
+  expect(bootstrap('/dashboard','dark',host).dataset).toEqual({})
+ })
+ it('keeps an explicit Survey login return outside Training startup colors even on the Training host',()=>{
+  const {doc,dataset}=bootstrap('/admin/login','dark','training.localhost','?returnTo=%2Fadmin%2Fsurvey-researchers')
+  expect(doc.title).toBe('Research');expect(dataset).toEqual({})
+ })
  it.each(['/admin/training','/admin/training/accounts','/admin/training/courses','/admin/training/resources','/admin/training/profile/'])('uses Training before React loads on %s',path=>{
   const {doc,icon,dataset}=bootstrap(path)
   expect(doc.title).toBe('Training');expect(dataset).toEqual({trainingEntry:'true',trainingTheme:'dark'})

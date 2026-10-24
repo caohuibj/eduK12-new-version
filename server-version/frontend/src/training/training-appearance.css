@@ -1,3 +1,8 @@
+/* Pending states belong to the Training palette, including route-level loaders. */
+.hui-training:not(:has([data-cognitive-task-root])) {
+ --hui-ds-status-pending-bg:color-mix(in srgb,var(--training-bamboo) 6%,var(--training-surface));
+ --hui-ds-status-pending-border:var(--training-border);--hui-ds-status-pending-text:var(--training-muted);
+}
 /* Training only. No global .dark class, image inversion or layout overrides. */
 .hui-training .training-appearance-control { position:relative;display:inline-flex;align-items:center;flex:none; }
 .hui-training .training-appearance-trigger {
@@ -93,7 +98,7 @@
  --hui-ds-status-success-bg:#23382c;--hui-ds-status-success-border:#4c6c56;--hui-ds-status-success-text:#bddbb4;
  --hui-ds-status-warning-bg:#393322;--hui-ds-status-warning-border:#7b693e;--hui-ds-status-warning-text:#e7cc92;
  --hui-ds-status-error-bg:#3b2825;--hui-ds-status-error-border:#87574b;--hui-ds-status-error-text:#f0b3a5;
- --hui-ds-status-pending-bg:#26323c;--hui-ds-status-pending-border:#506a7e;--hui-ds-status-pending-text:#b4d1e9;
+ --hui-ds-status-pending-bg:var(--training-raised);--hui-ds-status-pending-border:var(--training-border);--hui-ds-status-pending-text:var(--training-muted);
  --hui-ds-role-staff-ink:var(--training-ink);--hui-ds-role-staff-muted:var(--training-muted);--hui-ds-role-staff-line:var(--training-border);--hui-ds-role-staff-page:var(--training-paper);--hui-ds-role-staff-accent:var(--training-bamboo);
  --hui-ds-role-runner-line:var(--training-border);
  --staff-ink:var(--training-ink);--staff-muted:var(--training-muted);--staff-line:var(--training-border);--staff-accent:var(--training-bamboo);--staff-accent-hover:#cdddb9;--staff-surface:var(--training-surface);--staff-bg:var(--training-paper);

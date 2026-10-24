@@ -269,3 +269,15 @@
   outline-offset: 4px;
   border-radius: 2px;
 }
+
+/* PR350's question-first hierarchy, adapted to Training tokens. */
+.hui-training.hui-app.training-assessment-visual [data-assessment-shell-header][data-assessment-shell-compact] {
+  padding: 0 0 14px; margin-bottom: 18px; border: 0; border-bottom: 1px solid var(--runner-line); border-radius: 0; background: transparent;
+}
+.hui-training.hui-app.training-assessment-visual [data-assessment-shell-compact] h1 {
+  font-size: clamp(21px, 2vw, 26px); line-height: 1.4;
+}
+.hui-training.hui-app.training-assessment-visual .assessment-instructions { font-size: 13px; line-height: 1.7; color: var(--runner-muted); }
+.hui-training.hui-app.training-assessment-visual .assessment-instructions summary { display: list-item; width: fit-content; min-height: 32px; padding-block: 4px; color: var(--runner-blue); cursor: pointer; }
+.hui-training.hui-app.training-assessment-visual .assessment-instructions > div { padding: 10px 14px; margin-top: 6px; border: 1px solid var(--runner-line); border-radius: 8px; background: var(--runner-soft); }
+.hui-training.hui-app.training-assessment-visual [data-sjt-answer-status="partial"] { color: var(--runner-muted); }

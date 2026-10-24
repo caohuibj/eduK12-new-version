@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { render, screen } from '@testing-library/react'
 import { AssessmentShell } from '..'
+import userEvent from '@testing-library/user-event'
 
 describe('AssessmentShell presentation contract', () => {
   it('renders fixed-count progress without owning domain interaction state', () => {
@@ -86,4 +87,22 @@ describe('AssessmentShell presentation contract', () => {
     expect(screen.getByText('提交内容已封存')).toBeInTheDocument()
     expect(screen.getByText('保持同一 submissionId')).toBeInTheDocument()
   })
+})
+
+it('keeps optional instructions collapsed without hiding errors or domain controls', async () => {
+  render(<AssessmentShell title="问卷" instructionsSummary="作答说明" instructions="未提交内容保存在当前浏览器。" recoveryState={{state:'blocked',message:'请先处理已过期草稿'}}><button>开始情境判断</button></AssessmentShell>)
+  const summary = screen.getByText('作答说明', {selector:'summary'})
+  expect(summary.closest('details')).not.toHaveAttribute('open')
+  expect(screen.getByText('未提交内容保存在当前浏览器。')).not.toBeVisible()
+  expect(screen.getByText('请先处理已过期草稿')).toBeVisible()
+  expect(screen.getByRole('button',{name:'开始情境判断'})).toBeVisible()
+  await userEvent.click(summary)
+  expect(summary.closest('details')).toHaveAttribute('open')
+  expect(screen.getByText('未提交内容保存在当前浏览器。')).toBeVisible()
+})
+
+it('describes an open path as viewed when visiting does not prove an answer', () => {
+  render(<AssessmentShell title="情境判断" progress={{kind:'open-path',visited:1,visitedLabel:'已查看',current:'选填情境'}}><p>未作答</p></AssessmentShell>)
+  expect(screen.getByText('已查看 1 个步骤')).toBeVisible()
+  expect(screen.queryByText(/已完成/)).not.toBeInTheDocument()
 })

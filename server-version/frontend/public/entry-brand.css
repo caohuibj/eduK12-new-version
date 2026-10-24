@@ -1,6 +1,16 @@
-/* Training admin startup only; no global theme or authorization changes. */
-html[data-training-entry="true"] { color-scheme:light;background:#f5f3ed;color:#263d32; }
-html[data-training-entry="true"][data-training-theme="dark"] { color-scheme:dark;background:#15231f;color:#e9eee2; }
+/* Training first paint and auth recovery; exact product selection is set by entry-brand.js. */
+html[data-training-entry="true"] {
+  --training-boot-paper:#f8f5ee;--training-boot-ink:#1f403b;
+  color-scheme:light;background:var(--training-boot-paper);color:var(--training-boot-ink);
+}
+html[data-training-entry="true"][data-training-theme="dark"] {
+  --training-boot-paper:#141a17;--training-boot-ink:#e5e9df;
+  color-scheme:dark;
+}
 html[data-training-entry="true"] body { margin:0;background:inherit;color:inherit; }
 html[data-training-entry="true"] #root { min-height:100dvh;background:inherit;color:inherit; }
+html[data-training-entry="true"] .training-pending-frame {
+  min-height:100dvh;background:var(--training-boot-paper);color:var(--training-boot-ink);
+}
 .training-entry-loading { margin:0;padding:32px;font:14px/1.8 system-ui,sans-serif;color:inherit;background:transparent; }
+.training-pending-main { min-width:0;outline:none; }

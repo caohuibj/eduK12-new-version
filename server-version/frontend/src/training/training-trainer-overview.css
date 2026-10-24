@@ -1,0 +1,63 @@
+/* Training homepage overview: theme tokens preserve both light and dark palettes. */
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-overview{margin-bottom:24px;min-width:0;color:var(--training-ink)}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcuts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut{display:grid;grid-template-columns:34px minmax(0,1fr) 18px;grid-template-rows:auto auto;align-items:center;column-gap:12px;row-gap:4px;min-width:0;padding:15px 18px;border:1px solid var(--training-border);border-radius:11px;text-align:left;background:var(--training-surface);color:var(--training-ink);font:inherit;cursor:pointer;transition:background-color .15s,border-color .15s}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut--review{background:color-mix(in srgb,var(--training-bamboo) 8%,var(--training-surface))}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut:hover,.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut[aria-expanded=true]{border-color:var(--training-bamboo);background:color-mix(in srgb,var(--training-bamboo) 12%,var(--training-surface))}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut-top{display:contents;color:var(--training-muted)}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut-icon{grid-column:1;grid-row:1 / 3;display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:color-mix(in srgb,var(--training-bamboo) 13%,var(--training-surface));color:var(--training-bamboo)}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut-title{grid-column:2;grid-row:1;display:flex;align-items:baseline;justify-content:space-between;gap:12px;min-width:0;font:600 17px/1.5 var(--training-serif)}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut-count{flex:none;font:500 24px/1.2 var(--training-serif);color:var(--training-bamboo);white-space:nowrap}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut-count small{margin-left:7px;font:400 12px/1.5 'PingFang SC',sans-serif;color:var(--training-muted)}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut-description{grid-column:2;grid-row:2;min-width:0;font-size:12px;line-height:1.6;color:color-mix(in srgb,var(--training-muted) 90%,var(--training-ink));overflow-wrap:anywhere}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review{margin-top:24px;border:1px solid var(--training-border);border-radius:14px;background:var(--training-surface);overflow:hidden;min-width:0}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-header{display:flex;align-items:start;justify-content:space-between;gap:18px;padding:24px}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-header h2{margin:0 0 7px;font:600 22px/1.5 var(--training-serif);color:var(--training-ink);outline:none}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-header p{margin:0;color:var(--training-muted);font-size:12px;line-height:1.8}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-actions{display:flex;flex:none;gap:8px}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-actions button{display:grid;place-items:center;min-width:40px;min-height:40px;padding:0;border:1px solid var(--training-border);border-radius:8px;background:transparent;color:var(--training-muted)}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-empty{display:grid;justify-items:center;gap:10px;padding:32px 24px;text-align:center;border-top:1px solid var(--training-border);color:var(--training-muted);font-size:13px;line-height:1.8}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-empty h3{margin:0;color:var(--training-ink);font-size:16px}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-empty p{margin:0}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-list{list-style:none;margin:0;padding:0}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-list>li{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:20px 24px;border-top:1px solid var(--training-border)}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-copy{min-width:0}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-count{display:inline-flex;padding:3px 7px;border-radius:5px;background:color-mix(in srgb,var(--training-bamboo) 10%,var(--training-surface));color:var(--training-bamboo);font-size:11px}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-list h3{margin:8px 0 5px;color:var(--training-ink);font:600 16px/1.7 'PingFang SC',sans-serif;overflow-wrap:anywhere}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-copy p,.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-copy small{display:block;margin:4px 0 0;color:var(--training-muted);font-size:12px;line-height:1.7;overflow-wrap:anywhere}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-list a{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:none;min-height:42px;padding:9px 13px;border:1px solid var(--training-border);border-radius:8px;color:var(--training-bamboo);font-size:12px;white-space:nowrap}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-list a:hover{background:color-mix(in srgb,var(--training-bamboo) 10%,var(--training-surface))}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-pagination{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:18px 24px;border-top:1px solid var(--training-border);color:var(--training-muted);font-size:12px}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-pagination>div{display:flex;gap:8px}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home :is(.trainer-review-pagination,.trainer-review-empty,.trainer-overview-error) button{min-height:38px;padding:8px 12px;border:1px solid var(--training-border);border-radius:7px;background:transparent;color:var(--training-bamboo);font:inherit}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-overview-error{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:14px;padding:12px 16px;border:1px solid var(--training-border);border-radius:9px;color:var(--training-muted);font-size:12px}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-overview-error p{margin:0;line-height:1.8}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-overview :is(a,button):focus-visible{outline:3px solid var(--training-bamboo);outline-offset:3px}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-overview button:disabled{opacity:.5;cursor:not-allowed}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-home-heading{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:18px}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-home-heading h1{margin:0;font:600 28px/1.5 var(--training-serif);color:var(--training-ink)}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .training-home-header h2{margin:0;font:600 25px/1.5 var(--training-serif);color:var(--training-ink);scroll-margin-top:24px;outline:none}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .training-workspace-heading{grid-template-columns:minmax(0,1fr) minmax(260px,340px)}
+@media(max-width:700px){
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-overview{margin-bottom:22px}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcuts{grid-template-columns:minmax(0,1fr);gap:8px}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut{grid-template-columns:32px minmax(0,1fr) 16px;column-gap:10px;row-gap:3px;padding:12px 14px;border-radius:10px}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut-title{gap:8px;font-size:16px}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut-count{font-size:22px}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut-count small{font-size:11px;margin-left:5px}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut-description{font-size:11px}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-header{padding:18px 16px;gap:12px}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-header h2{font-size:20px}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-header p{font-size:11px}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-list>li{flex-direction:column;align-items:flex-start;gap:12px;padding:18px 16px}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-list a{align-self:flex-end}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-pagination{padding:16px;flex-direction:column;align-items:flex-start}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-review-pagination>div{align-self:flex-end}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .training-workspace-heading{grid-template-columns:minmax(0,1fr)}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .training-workspace-search{grid-column:1;grid-row:2;max-width:none}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-home-heading h1{font-size:25px}
+}
+@media(prefers-reduced-motion:reduce){.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut{transition:none}}
+
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut-top > svg{grid-column:3;grid-row:1 / 3;align-self:center;width:18px;height:18px}
+@media(max-width:700px){.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut-icon{width:32px;height:32px}.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-home .trainer-shortcut-top > svg{width:16px;height:16px}}

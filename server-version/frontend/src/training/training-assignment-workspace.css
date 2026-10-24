@@ -1,18 +1,18 @@
 .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace { padding: 24px; min-width: 0; }
 .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-toolbar { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; margin-bottom: 18px; }
 .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-toolbar > div { display: flex; gap: 10px; }
-.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-toolbar p { margin: 0; font-size: 14px; color: #71816e; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-toolbar p { margin: 0; font-size: 14px; color: var(--training-muted); }
 .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace > .training-catalog-disclosure { margin: 0 0 18px; }
 .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace > .training-catalog-pagination { margin-top: 20px; padding-top: 16px; border-top: 1px solid #e1e8dc; }
 .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-title { display: block; text-align: left; color: inherit; font: inherit; overflow-wrap: anywhere; padding: 0; }
-.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-title:hover { color: #527646; text-decoration: underline; text-underline-offset: 4px; }
-.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-facts { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 12px; margin: 0; padding: 12px 14px; border-radius: 10px; background: #f5f8f1; }
-.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-facts dt { font-size: 12px; color: #73836f; margin-bottom: 6px; }
-.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-facts dd { margin: 0; font-size: 14px; color: #405b3f; line-height: 1.6; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-title:hover { color: var(--training-bamboo); text-decoration: underline; text-underline-offset: 4px; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-facts { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 12px; margin: 0; padding: 12px 14px; border-radius: 10px; background: color-mix(in srgb,var(--training-bamboo) 5%,var(--training-surface)); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-facts dt { font-size: 12px; color: color-mix(in srgb,var(--training-muted) 90%,var(--training-ink)); margin-bottom: 6px; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-facts dd { margin: 0; font-size: 14px; color: var(--training-ink); line-height: 1.6; }
 .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-task-card > footer.training-assignment-card-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) auto; gap: 8px; margin-top: auto; align-items: center; }
 .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-task-card > footer.training-assignment-card-actions > .hui-button { min-height: 40px; justify-content: center; padding: 9px 6px; font-size: 14px; white-space: nowrap; }
-.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-focused { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border: 1px solid #dbe4d4; background: #f5f8ef; border-radius: 10px; margin-bottom: 18px; font-size: 14px; color: #59724e; }
-.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace :is(.training-assignment-title, .training-course-task-card):focus-visible { outline: 2px solid #658655; outline-offset: 4px; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-focused { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 16px; border: 1px solid var(--training-border); background: color-mix(in srgb,var(--training-bamboo) 5%,var(--training-surface)); border-radius: 10px; margin-bottom: 18px; font-size: 14px; color: var(--training-muted); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace :is(.training-assignment-title, .training-course-task-card):focus-visible { outline: 2px solid var(--training-bamboo); outline-offset: 4px; }
 @media (max-width: 700px) {
   .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace { padding: 16px; }
   .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-toolbar > div { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); width: 100%; }
@@ -25,4 +25,48 @@
 @media (min-width: 701px) and (max-width: 1000px) {
   .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-task-card > footer.training-assignment-card-actions { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-course-task-card > footer.training-assignment-card-actions .staff-more-actions { justify-self: end; }
+}
+
+/* The embedded exercise card uses the same palette as its Training workspace. */
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace .training-course-task-card {
+  background:var(--training-surface);color:var(--training-ink);border-color:var(--training-border);box-shadow:none;
+}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace .training-course-task-card-top { color:var(--training-muted); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace .training-course-task-status {
+  background:color-mix(in srgb,var(--training-bamboo) 9%,var(--training-surface));color:var(--training-bamboo);
+}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace .training-course-task-card h2 { color:var(--training-ink);min-width:0; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace .training-assignment-title {
+  width:100%;min-width:0;border:0;background:transparent;
+}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace .training-card-description-text { color:var(--training-muted); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace .training-card-description-toggle {
+  border:0;background:transparent;color:var(--training-bamboo);
+}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace .staff-inline-tags>span {
+  background:color-mix(in srgb,var(--training-bamboo) 9%,var(--training-surface));color:var(--training-bamboo);overflow-wrap:anywhere;
+}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace .training-assignment-facts>div { min-width:0; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace .training-assignment-facts dd { overflow-wrap:anywhere; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace .training-assignment-card-actions { border-color:var(--training-border); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace .staff-more-actions__trigger {
+  background:var(--training-surface);color:var(--training-bamboo);border-color:var(--training-border);
+}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace .staff-more-actions__trigger:is(:hover,[aria-expanded=true]) {
+  background:color-mix(in srgb,var(--training-bamboo) 9%,var(--training-surface));
+}
+/* MoreActions is portaled to body; constrain its adapter to this workspace. */
+html[data-training-entry="true"]:has(.training-assignment-workspace) .staff-more-actions__menu[data-training-teacher="true"] {
+  background:var(--training-boot-paper);color:var(--training-boot-ink);
+  border-color:color-mix(in srgb,var(--training-boot-ink) 20%,var(--training-boot-paper));
+}
+html[data-training-entry="true"]:has(.training-assignment-workspace) .staff-more-actions__menu[data-training-teacher="true"] :is(button,a):not(.staff-danger-action) { color:inherit; }
+html[data-training-entry="true"]:has(.training-assignment-workspace) .staff-more-actions__menu[data-training-teacher="true"] :is(button,a):hover {
+  background:color-mix(in srgb,var(--training-boot-ink) 8%,var(--training-boot-paper));
+}
+html[data-training-entry="true"][data-training-theme="dark"]:has(.training-assignment-workspace) .staff-more-actions__menu[data-training-teacher="true"] .staff-danger-action { color:#f0b3a5; }
+@media(max-width:700px){
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .training-assignment-workspace .training-course-task-card>footer.training-assignment-card-actions>.hui-button {
+  min-width:0;min-height:44px;white-space:normal;overflow-wrap:anywhere;
+ }
 }

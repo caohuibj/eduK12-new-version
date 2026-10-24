@@ -3,12 +3,12 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import TrainingAppearanceSettings, { TrainingAppearanceProvider } from './TrainingAppearance'
 import { useTrainingAppearance } from './appearanceContext'
 import { appearanceKey, appearanceTheme, nextAppearanceBoundary, parseAppearance } from './appearance'
-const env = vi.hoisted(() => ({ training: true, user: { id: 'learner1' } as { id: string } | null }))
+const env = vi.hoisted(() => ({ training: true, loading: false, user: { id: 'learner1' } as { id: string } | null }))
 vi.mock('./context', () => ({ isTrainingHost: () => env.training }))
-vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ user: env.user }) }))
+vi.mock('../contexts/AuthContext', () => ({ useAuth: () => ({ user: env.user, isLoading: env.loading }) }))
 function View() { const appearance = useTrainingAppearance(); return <div data-testid="theme" data-theme={appearance.theme}><TrainingAppearanceSettings /></div> }
 function Example() { return <TrainingAppearanceProvider><View /></TrainingAppearanceProvider> }
-beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date(2026,9,23,8)); env.training = true; env.user = { id: 'learner1' }; localStorage.clear() })
+beforeEach(() => { vi.useFakeTimers(); vi.setSystemTime(new Date(2026,9,23,8)); env.training = true; env.loading = false; env.user = { id: 'learner1' }; localStorage.clear() })
 afterEach(() => { cleanup(); vi.useRealTimers(); vi.restoreAllMocks() })
 describe('Training appearance', () => {
  it('uses auto by default and preserves each valid stored preference', () => {
@@ -58,5 +58,64 @@ describe('Training appearance', () => {
  })
  it('does not expose settings or read Training preferences outside the Training host', () => {
   env.training=false;const read=vi.spyOn(Storage.prototype,'getItem');localStorage.setItem(appearanceKey('learner1'),'dark');render(<Example />);expect(screen.queryByRole('radio')).not.toBeInTheDocument();expect(screen.getByTestId('theme')).toHaveAttribute('data-theme','light');expect(read).not.toHaveBeenCalled()
+ })
+})
+
+
+describe('Training first-paint theme handoff',()=>{
+ it('keeps the cached theme during identity recovery, then adopts the resolved account preference before paint',()=>{
+  env.user=null;env.loading=true
+  localStorage.setItem('training:appearance:boot:v1','dark')
+  localStorage.setItem(appearanceKey('resolved'),'light')
+  localStorage.setItem(appearanceKey(),'light')
+  const write=vi.spyOn(Storage.prototype,'setItem')
+  const view=render(<Example/>)
+  expect(screen.getByTestId('theme')).toHaveAttribute('data-theme','dark')
+  expect(document.documentElement).toHaveAttribute('data-training-entry','true')
+  expect(document.documentElement).toHaveAttribute('data-training-theme','dark')
+  expect(write).not.toHaveBeenCalled()
+  env.user={id:'resolved'};env.loading=false;view.rerender(<Example/>)
+  expect(screen.getByTestId('theme')).toHaveAttribute('data-theme','light')
+  expect(document.documentElement).toHaveAttribute('data-training-theme','light')
+  expect(localStorage.getItem('training:appearance:boot:v1')).toBe('light')
+  expect(localStorage.getItem(appearanceKey())).toBe('light')
+ })
+ it('updates the first-paint cache on selection and restores the document theme after a normal remount',()=>{
+  const view=render(<Example/>)
+  fireEvent.click(screen.getByRole('radio',{name:/暗色 月夜/}))
+  expect(localStorage.getItem('training:appearance:boot:v1')).toBe('dark')
+  expect(localStorage.getItem(appearanceKey('learner1'))).toBe('dark')
+  expect(document.documentElement).toHaveAttribute('data-training-theme','dark')
+  view.unmount();expect(document.documentElement).not.toHaveAttribute('data-training-entry')
+  render(<Example/>);expect(document.documentElement).toHaveAttribute('data-training-theme','dark')
+ })
+ it('reacts to the presentation cache while recovering but isolates it once an account is known',()=>{
+  env.user=null;env.loading=true
+  localStorage.setItem('training:appearance:boot:v1','light')
+  localStorage.setItem(appearanceKey('resolved'),'light')
+  const view=render(<Example/>)
+  localStorage.setItem('training:appearance:boot:v1','dark')
+  fireEvent(window,new StorageEvent('storage',{key:'training:appearance:boot:v1'}))
+  expect(document.documentElement).toHaveAttribute('data-training-theme','dark')
+  env.user={id:'resolved'};env.loading=false;view.rerender(<Example/>)
+  localStorage.setItem('training:appearance:boot:v1','dark')
+  fireEvent(window,new StorageEvent('storage',{key:'training:appearance:boot:v1'}))
+  expect(document.documentElement).toHaveAttribute('data-training-theme','light')
+ })
+ it('uses the guest preference after recovery resolves without an account',()=>{
+  env.user=null;env.loading=true
+  localStorage.setItem('training:appearance:boot:v1','dark')
+  localStorage.setItem(appearanceKey(),'light')
+  const view=render(<Example/>)
+  env.loading=false;view.rerender(<Example/>)
+  expect(document.documentElement).toHaveAttribute('data-training-theme','light')
+  expect(localStorage.getItem('training:appearance:boot:v1')).toBe('light')
+ })
+ it('suspends Training document colors and storage access for an explicit other-product entry',()=>{
+  const read=vi.spyOn(Storage.prototype,'getItem')
+  render(<TrainingAppearanceProvider suspended><View/></TrainingAppearanceProvider>)
+  expect(document.documentElement).not.toHaveAttribute('data-training-entry')
+  expect(read).not.toHaveBeenCalled()
+  expect(screen.queryByRole('radio')).not.toBeInTheDocument()
  })
 })

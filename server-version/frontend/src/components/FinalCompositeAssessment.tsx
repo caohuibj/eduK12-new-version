@@ -1,3 +1,4 @@
+import { compositeItemLabel } from '../modules/composite/item-label'
 import {TrainingMaterials} from '../modules/assessment-media/TrainingMaterials'
 import { TrainingCheckpointPanel } from '../modules/composite/TrainingCheckpointPanel'
 import {TrainingTimingBoundary,restoreTrainingTiming} from '../modules/scale/TrainingTimingBoundary'
@@ -495,7 +496,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
 
   const units = state.units || state.items
   const currentUnit = units[state.currentIndex]
-  const contextText = state.context?.status === 'frozen' ? '上下文已冻结，后续模块共享同一快照。' : '答案只保存在本地草稿中，完成单元时一次提交。'
+  const contextText = state.context?.status === 'frozen' ? '已确认的背景信息将沿用于后续部分。' : '未提交的答案保存在当前浏览器，完成本部分后再提交。'
   const submissionStatus = submitting
     ? { state: 'submitting' as const, message: '答案已锁定，正在提交当前单元的同一份 FINAL。' }
     : meta?.status === 'SUBMITTING'
@@ -522,10 +523,11 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
       className={isTrainingHost() && !campusMode && !publicMode && isSection ? 'training-form-surface' : undefined}
       title={state.name}
       eyebrow={state.productKind === 'QUESTIONNAIRE' ? '问卷' : '综合测评'}
+      instructionsSummary={isTrainingHost() && !campusMode ? '作答说明' : undefined}
       instructions={(
         <div className="space-y-2">
           {state.instruction ? <p>{state.instruction}</p> : null}
-          <p>当前单元：{currentUnit?.label || item?.type || '—'}</p>
+          {!(isTrainingHost() && !campusMode) ? <p>当前单元：{currentUnit ? compositeItemLabel(currentUnit) : item ? compositeItemLabel(item) : '—'}</p> : null}
           {expiredCognitive ? <p>请先处理本机认知试次过期状态，已接受的单元记录不受影响。</p>
             : <p>{contextText} {publicMode?'仅可恢复此浏览器中仍有效的本机草稿；换设备需要已启用并成功保存的临时进度。参与链接本身不包含未提交答案。':'浏览器重开后可以继续恢复。'}</p>}
         </div>
@@ -547,7 +549,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
                 key={`${unit.type}-${unit.id}`}
                 className={`rounded px-3 py-1 text-sm ${unit.completed ? 'bg-green-100 text-green-700' : unit.index === state.currentIndex ? 'bg-blue-700 text-white' : 'bg-slate-100 text-slate-600'}`}
               >
-                {unit.index + 1}. {unit.label || unit.type}
+                {unit.index + 1}. {compositeItemLabel(unit)}
               </span>
             ))}
           </div>
@@ -614,9 +616,9 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
 
       {item?.type === 'SITUATIONAL' ? (
         <div className="card p-8 text-center">
-          <h2 className="mb-3 text-xl font-semibold">{currentUnit?.label || '文字情境测评'}</h2>
-          <p className="mb-6 text-gray-600">进入文字情境测评后，答案只在本地保留，完成时一次提交冻结结果。</p>
-          <button type="button" onClick={() => onEnterSituational(item)} className="btn-primary min-h-11">开始/继续文字情境测评</button>
+          <h2 className="mb-3 text-xl font-semibold">{currentUnit ? compositeItemLabel(currentUnit) : '情境判断'}</h2>
+          <p className="mb-6 text-gray-600">进入情境判断测评后，答案只在本地保留，完成时一次提交冻结结果。</p>
+          <button type="button" onClick={() => onEnterSituational(item)} className="btn-primary min-h-11">开始/继续情境判断测评</button>
         </div>
       ) : null}
 

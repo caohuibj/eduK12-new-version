@@ -1,5 +1,5 @@
 import type { ComponentType } from 'react'
-import { act, fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, render, screen, waitFor, within } from '@testing-library/react'
 import { MemoryRouter, Route, Routes } from 'react-router-dom'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -103,6 +103,82 @@ describe('course-first training workspaces', () => {
     expect(loadAssessments).toHaveBeenCalledWith('course-1', false)
   })
 
+  it('shows a satisfied assessment once and preserves its course-scoped feedback link', async () => {
+    loadAssessments.mockResolvedValue({ errors: [], items: [{
+      key: 'composite:complete', name: '已完成测评', typeLabel: '组合测评', description: '保留原测评说明',
+      status: '任务已达成', taskSatisfactionLabel: '任务已达成',
+      href: '/student/composite/attempts/done/report', action: '查看反馈',
+    }] })
+    mount('/student/courses/course-1?section=assessments', '/student/courses/:courseId', TrainingLearnerCourse)
+    const link = await screen.findByRole('link', { name: /查看反馈/ })
+    expect(screen.getAllByText('任务已达成')).toHaveLength(1)
+    expect(link).toHaveAttribute('href', '/student/composite/attempts/done/report?courseId=course-1&courseSection=assessments')
+    expect(post).not.toHaveBeenCalled()
+    expect(put).not.toHaveBeenCalled()
+  })
+
+
+  it('filters completed submissions separately from drafts and expired unfinished exercises without refetching', async () => {
+    const original = get.getMockImplementation()!
+    get.mockImplementation((url: string) => url === '/courses/course-1/assignments' ? Promise.resolve({ code: 0, data: { list: [
+      { id: 'submitted', title: '已提交练习', mySubmission: { status: 'SUBMITTED' } },
+      { id: 'graded', title: '已批阅练习', mySubmission: { status: 'GRADED' } },
+      { id: 'draft', title: '草稿练习', submitted: true, mySubmission: { status: 'DRAFT' } },
+      { id: 'expired', title: '截止未交练习', deadline: '2020-01-01', submitted: false },
+    ] } }) : original(url))
+    mount('/student/courses/course-1?keep=value', '/student/courses/:courseId', TrainingLearnerCourse)
+    await screen.findByRole('heading', { name: '已提交练习' })
+    const filters = screen.getByRole('group', { name: '完成状态筛选' })
+    fireEvent.click(within(filters).getByRole('button', { name: /^已完成/ }))
+    expect(screen.getAllByRole('article')).toHaveLength(2)
+    expect(screen.queryByRole('heading', { name: '草稿练习' })).toBeNull()
+    expect(screen.getAllByRole('article').every(card => card.dataset.completion === 'complete')).toBe(true)
+    fireEvent.click(within(filters).getByRole('button', { name: /^未完成/ }))
+    expect(screen.getByRole('heading', { name: '草稿练习' })).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: '截止未交练习' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /继续练习/ })).toHaveAttribute('href', '/student/assignments/draft?courseId=course-1&courseSection=assignments')
+    expect(get.mock.calls.filter(([url]) => url === '/courses/course-1/assignments')).toHaveLength(1)
+    expect(post).not.toHaveBeenCalled()
+  })
+
+  it('separates submitted check-ins from expired unfinished ones and resets the filter on category change', async () => {
+    const original = get.getMockImplementation()!
+    get.mockImplementation((url: string) => url === '/courses/course-1/checkins' ? Promise.resolve({ code: 0, data: { list: [
+      { id: 'done', title: '已打卡任务', submission: { id: 'entry' } },
+      { id: 'expired', title: '截止未打卡', endTime: '2020-01-01', submitted: false },
+    ] } }) : original(url))
+    mount('/student/courses/course-1?completion=complete', '/student/courses/:courseId', TrainingLearnerCourse)
+    await screen.findByRole('button', { name: /^已完成/ })
+    fireEvent.click(screen.getByRole('button', { name: '打卡' }))
+    await screen.findByRole('heading', { name: '已打卡任务' })
+    expect(screen.getByRole('button', { name: /^全部/ })).toHaveAttribute('aria-pressed', 'true')
+    fireEvent.click(screen.getByRole('button', { name: /^已完成/ }))
+    expect(screen.getByRole('link', { name: /查看记录/ })).toHaveAttribute('href', '/student/checkins/done?courseId=course-1&courseSection=checkins')
+    expect(screen.queryByRole('heading', { name: '截止未打卡' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: /^未完成/ }))
+    expect(screen.getByRole('heading', { name: '截止未打卡' })).toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /去打卡/ })).toBeNull()
+  })
+
+  it('uses explicit assessment completion metadata, preserves unsatisfied reports and distinguishes an empty filter', async () => {
+    loadAssessments.mockResolvedValue({ errors: [], items: [
+      { key: 'complete', name: '历史已达成', typeLabel: '组合测评', status: '任务已达成', completed: true, href: '/student/composite/attempts/done/report', action: '查看反馈' },
+      { key: 'unsatisfied', name: '已交卷未达成', typeLabel: '组合测评', status: '已交卷，任务未达成', completed: false, href: '/student/composite/attempts/unsatisfied/report', action: '查看反馈' },
+    ] })
+    mount('/student/courses/course-1?section=assessments&completion=incomplete', '/student/courses/:courseId', TrainingLearnerCourse)
+    await screen.findByRole('heading', { name: '已交卷未达成' })
+    expect(screen.queryByRole('heading', { name: '历史已达成' })).toBeNull()
+    expect(screen.getByRole('link', { name: /查看反馈/ })).toHaveAttribute('href', '/student/composite/attempts/unsatisfied/report?courseId=course-1&courseSection=assessments')
+    fireEvent.click(screen.getByRole('button', { name: /^已完成/ }))
+    expect(screen.getByRole('heading', { name: '历史已达成' })).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: '已交卷未达成' })).toBeNull()
+    fireEvent.click(screen.getByRole('button', { name: '练习' }))
+    await screen.findByRole('heading', { name: '课程练习' })
+    fireEvent.click(screen.getByRole('button', { name: /^已完成/ }))
+    expect(screen.getByText('当前没有已完成的练习。')).toBeInTheDocument()
+    expect(post).not.toHaveBeenCalled()
+    expect(put).not.toHaveBeenCalled()
+  })
   it('settles a failed assessment load and lets the learner retry', async () => {
     loadAssessments.mockRejectedValueOnce(new Error('测评查询超时'))
     mount('/student/courses/course-1', '/student/courses/:courseId', TrainingLearnerCourse)

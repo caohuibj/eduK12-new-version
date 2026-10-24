@@ -6,6 +6,7 @@ import { ProductButton } from '../components/product-ui'
 import ManagementDialog from '../components/staff-ui/ManagementDialog'
 import { useAuth } from '../contexts/AuthContext'
 import TrainingCardDescription from './TrainingCardDescription'
+import TrainingToolCard, { type TrainingToolRow } from './TrainingToolCard'
 import './training-workspace.css'
 import './training-workspace-heading.css'
 import './training-workspace-cards.css'
@@ -14,7 +15,7 @@ import './training-media-dialogs.css'
 const MediaSelector = lazy(() => import('../components/MediaSelector'))
 const FormalReferenceStudio = lazy(() => import('./FormalReferenceStudio'))
 
-type Row = { canUpdateVersion?:boolean; id:string; name:string; kind:string; description?:string; source:'owned'|'granted'; status?:string; version?:string; size?:number; url?:string; updatedAt?:string; href?:string }
+type Row = TrainingToolRow & { size?:number; url?:string }
 const labels:Record<string,string> = {image:'图片',video:'视频',document:'文档',scale:'量表',form:'表单','form-composition':'表单内容','form-template':'表单',situational:'情境判断', 'sjt-draft':'情境判断',cognitive:'认知测验',composition:'普通组合问卷',bundle:'打包组合问卷 · 综合报告'}
 const statuses:Record<string,string> = {DRAFT:'草稿',PUBLISHED:'已发布',IN_REVIEW:'审核中',REJECTED:'待修订',DEPRECATED:'已停用',RETIRED:'已停用'}
 const mediaKinds = [['all','全部'],['video','视频'],['image','图片'],['document','文档']]
@@ -63,7 +64,7 @@ export default function TrainingLibrary({ area }:{area:'media'|'tools'}) {
     }catch(cause){setError(cause instanceof Error?cause.message:'无法创建新版本')}finally{setBusy(false)}
   }
   const pages=Math.max(1,Math.ceil(total/LIBRARY_PAGE_SIZE))
-  return <div className="training-library">
+  return <div className={'training-library'+(media?'':' training-tools-library')}>
     <header className="training-library-heading training-workspace-heading"><div><h1>{media?'媒体':'工具'}</h1><p>{media?'统一管理上传的素材，查找已获授权的教学资源。':'创建与编辑表单、量表和普通组合问卷，按授权使用固定测评包。'}</p></div>
       <form className="training-workspace-search" role="search" onSubmit={event=>{event.preventDefault();update('keyword',search.trim())}}><Search size={18} aria-hidden="true"/><input aria-label={media?'检索媒体':'检索工具'} placeholder={media?'搜索媒体名称':'搜索工具名称或介绍'} value={search} onChange={event=>setSearch(event.target.value)}/>{search&&<button type="button" aria-label="清除检索" onClick={()=>{setSearch('');update('keyword','')}}><X size={16}/></button>}<button type="submit">检索</button></form>
       <details className="training-library-create"><summary><Plus size={18}/>{media?'上传媒体':'编制工具'}</summary><div>{media?(['video','image','document'] as const).map(type=><button key={type} onClick={()=>{setUpload(type);document.querySelector<HTMLDetailsElement>('.training-library-create')?.removeAttribute('open')}}><Upload size={16}/>上传{labels[type]}</button>):<><Link to="/scales/new">编制量表</Link><Link to="/toolkit/forms/new">编制表单</Link><Link to="/questionnaire-products/new">创建普通组合问卷</Link></>}</div></details>
@@ -71,9 +72,8 @@ export default function TrainingLibrary({ area }:{area:'media'|'tools'}) {
     <div className="training-library-filter training-workspace-filter-bar"><div className="training-workspace-filters" role="group" aria-label="资源类型">{(media?mediaKinds:toolKinds).map(([value,label])=><button key={value} aria-pressed={kind===value} onClick={()=>update('kind',value)}>{label}</button>)}</div><div className="training-library-filter-meta"><label>来源<select aria-label="资源来源" value={source} onChange={event=>update('source',event.target.value)}><option value="all">全部来源</option><option value="owned">{media?'我上传的':'我编制的'}</option><option value="granted">已获授权</option></select></label><span>{loading?'正在读取…':`共 ${total} 项`}</span></div></div>
     {error&&!rename&&<div role="alert" className="training-library-error">{error}<button onClick={()=>setRevision(value=>value+1)}>重新读取</button></div>}{notice&&<div role="status" className="training-library-notice"><span>{notice}</span><button type="button" aria-label="关闭提示" onClick={()=>setNotice('')}><X size={16}/></button></div>}
     {loading?<p role="status" className="training-library-empty">正在读取{media?'媒体':'工具'}…</p>:!error&&!rows.length?<div className="training-library-empty"><Wrench size={28}/><h2>暂无符合条件的{media?'媒体':'工具'}</h2><p>调整检索和筛选条件，或{media?'上传新的素材':'编制你的第一个工具'}。</p></div>:<div className="training-library-grid training-workspace-grid">{rows.map(row=>{
-      const Icon=row.kind==='image'?Image:row.kind==='video'?Video:media?FileText:Wrench
-      const versionable=row.canUpdateVersion===true&&row.source==='owned'&&row.status==='PUBLISHED'&&['scale','form','composition','form-composition'].includes(row.kind)
-      const unavailable=['situational','sjt-draft','cognitive'].includes(row.kind)
+      if(!media)return <TrainingToolCard key={row.kind+':'+row.id} row={row} busy={busy} onUpdateVersion={()=>void updateVersion(row)}/>
+      const Icon=row.kind==='image'?Image:row.kind==='video'?Video:FileText
       return <article key={row.kind+':'+row.id} className="training-library-card training-workspace-card" aria-labelledby={`resource-${row.kind}-${row.id}`}>
         <div className="training-workspace-card-top">
           <span className="training-workspace-card-kind"><Icon size={18} aria-hidden="true"/>{labels[row.kind]}</span>
@@ -81,27 +81,21 @@ export default function TrainingLibrary({ area }:{area:'media'|'tools'}) {
         </div>
         <h2 id={`resource-${row.kind}-${row.id}`} className="training-workspace-card-title" title={row.name}>{row.name}</h2>
         {row.status&&<span className={`training-workspace-card-status is-${row.status.toLowerCase()}`}>{statuses[row.status]||row.status}</span>}
-        {row.kind==='composition'&&<p className="training-workspace-card-meta">各测评单独出报告</p>}
-        {row.kind==='bundle'&&<p className="training-workspace-card-meta">综合报告 · 测评内容与分析规则固定</p>}
         {row.description&&<TrainingCardDescription id={`resource-description-${row.kind}-${row.id}`} description={row.description}/>}
         <footer className="training-workspace-card-footer">
           <div className="training-workspace-card-meta">
             {row.version?<span>{['composition','form-composition','form-template'].includes(row.kind)?'修订':'版本'} {row.version}</span>:row.size!=null?<span>{(row.size/1024/1024).toFixed(1)} MB</span>:null}
             {row.updatedAt&&<time dateTime={row.updatedAt}>更新于 {new Date(row.updatedAt).toLocaleDateString('zh-CN')}</time>}
           </div>
-          <div className="training-workspace-card-actions">{media?<>
+          <div className="training-workspace-card-actions">
             <button className="training-workspace-card-primary" onClick={()=>setPreview(row)}>预览<ArrowRight size={16} aria-hidden="true"/></button>
             {row.source==='owned'&&<button onClick={()=>{setRename(row);setName(row.name)}}><Pencil size={15} aria-hidden="true"/>改名</button>}
-          </>:row.kind==='bundle'?<Link className="training-workspace-card-primary" to={row.href?.startsWith('/bundle-products/')?row.href:'/bundle-products'}>查看与使用<ArrowRight size={16} aria-hidden="true"/></Link>:unavailable?<span className="training-workspace-card-meta">{row.kind==='sjt-draft'?'暂不开放编辑':'仅供组合问卷选用'}</span>:<>
-            {['form','form-composition'].includes(row.kind)?<button className="training-workspace-card-primary" disabled={busy} onClick={()=>void updateVersion(row)}>存为独立表单<ArrowRight size={16} aria-hidden="true"/></button>:<Link className="training-workspace-card-primary" to={row.kind==='composition'?'/questionnaire-products/'+row.id:row.href||'/toolkit'}>{row.kind==='composition'?(row.status==='DRAFT'?'编辑组合问卷':'查看组合问卷'):row.source==='owned'&&row.status==='DRAFT'?'编辑':row.source==='granted'?'查看与使用':'查看'}<ArrowRight size={16} aria-hidden="true"/></Link>}
-            {row.kind==='composition'&&row.href&&<Link to={row.href}>配置与报告</Link>}
-            {versionable&&!['form','form-composition'].includes(row.kind)&&<button disabled={busy} onClick={()=>void updateVersion(row)}>更新版本</button>}
-          </>}</div>
+          </div>
         </footer>
       </article>
     })}</div>}
     {pages>1&&<nav className="training-library-pagination" aria-label="资源分页"><button disabled={page<=1||loading} onClick={()=>{const next=new URLSearchParams(params);next.set('page',String(page-1));setParams(next)}}>上一页</button><span>{page} / {pages}</span><button disabled={page>=pages||loading} onClick={()=>{const next=new URLSearchParams(params);next.set('page',String(page+1));setParams(next)}}>下一页</button></nav>}
-    {!media&&<><p className="training-library-footnote">普通组合问卷可创建与编辑，各测评单独出报告。打包组合问卷生成综合报告，内容、顺序与分析规则固定，不提供编辑或复制更新。SJT 和认知测验仍仅按授权选用；已发布的普通问卷需新建版本草稿后修订。</p><details className="training-library-governance" onToggle={event=>setGovernanceOpen(event.currentTarget.open)}><summary>参考、阈值与报告管理</summary><p>课程私有配置请进入上方组合测评的“配置与报告”；下方管理可复用的参考内容。</p>{governanceOpen&&user?.id&&<Suspense fallback={<p role="status">正在加载参考管理…</p>}><FormalReferenceStudio key={user.id} actorId={user.id}/></Suspense>}</details></>}
+    {!media&&<><details className="training-tool-policy"><summary>工具使用说明</summary><p className="training-library-footnote">普通组合问卷可创建与编辑，各测评单独出报告。打包组合问卷生成综合报告，内容、顺序与分析规则固定，不提供编辑或复制更新。SJT 和认知测验仍仅按授权选用；已发布的普通问卷需新建版本草稿后修订。</p></details><details className="training-library-governance" onToggle={event=>setGovernanceOpen(event.currentTarget.open)}><summary>参考、阈值与报告管理</summary><p>课程私有配置请进入上方组合测评的“配置与报告”；下方管理可复用的参考内容。</p>{governanceOpen&&user?.id&&<Suspense fallback={<p role="status">正在加载参考管理…</p>}><FormalReferenceStudio key={user.id} actorId={user.id}/></Suspense>}</details></>}
     {rename&&<ManagementDialog open width="compact" className="training-media-rename-dialog" title="修改媒体名称" description="只更新显示名称，原文件与已有引用保持不变。" closeDisabled={busy} onClose={()=>{if(!busy)setRename(null)}} actions={<><ProductButton disabled={busy} onClick={()=>setRename(null)}>取消</ProductButton><ProductButton variant="primary" disabled={busy||!name.trim()} onClick={()=>void saveName()}>{busy?'正在保存…':'保存名称'}</ProductButton></>}><label className="training-library-rename">显示名称<input maxLength={160} autoFocus value={name} onChange={event=>setName(event.target.value)} onKeyDown={event=>{if(event.key==='Enter')void saveName()}}/></label>{error&&<p role="alert">{error}</p>}</ManagementDialog>}
     {preview&&<ManagementDialog open width="wide" className="training-media-preview-dialog" title={preview.name} description={[labels[preview.kind],preview.source==='owned'?'我上传的':'已获授权',preview.size!=null?`${(preview.size/1024/1024).toFixed(1)} MB`:null].filter(Boolean).join(' · ')} onClose={()=>setPreview(null)} actions={<ProductButton onClick={()=>setPreview(null)}>关闭预览</ProductButton>}><div className={`training-media-preview-stage is-${preview.kind}`}>{preview.kind==='image'?<img className="training-library-preview" src={preview.url} alt={preview.name}/>:preview.kind==='video'?<video className="training-library-preview" controls preload="metadata" src={preview.url}/>:<iframe className="training-library-document" title={preview.name} src={preview.url}/>}</div></ManagementDialog>}
     {upload&&<Suspense fallback={<p role="status">正在加载素材选择器…</p>}><MediaSelector isOpen type={upload} initialTab="upload" onClose={()=>{setUpload(null);setRevision(value=>value+1)}} onSelect={()=>{setUpload(null);setRevision(value=>value+1);setNotice('媒体已上传。')}}/></Suspense>}

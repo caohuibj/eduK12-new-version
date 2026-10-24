@@ -250,7 +250,7 @@ function WholeCompositeQuestionnaireRunner({ state, api, publicMode = false, rec
   }, [unitPath, publicMode, recoveryToken])
   if (useFallback) return <>{fallback}</>
   if (loading) return <p role="status" className="p-6 text-slate-600">正在恢复整卷本机草稿…</p>
-  return <AssessmentShell title={state.name} eyebrow="问卷"
+  return <AssessmentShell title={state.name} eyebrow="问卷" instructionsSummary={isTrainingHost() ? '作答说明' : undefined}
     instructions={<div className="space-y-2">{state.instruction ? <p>{state.instruction}</p> : null}<p>整卷答案保存在当前浏览器，最后一次提交。请使用同一浏览器继续未提交的草稿。</p></div>}
     progress={definition ? { kind: 'count', completed: Object.keys(answers).length, total: questions.length, label: '整卷作答进度' } : undefined}
     saveStatus={local.status}

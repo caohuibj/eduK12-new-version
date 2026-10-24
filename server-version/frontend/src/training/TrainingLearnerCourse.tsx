@@ -6,11 +6,26 @@ import { useCognitiveEnabled } from '../contexts/CapabilitiesContext'
 import type { ApiResponse, Assignment, Checkin, Course } from '../types'
 import { loadCourseAssessments, type CourseAssessmentResult } from './courseAssessments'
 import { learnerSection, withLearnerCourse } from './learnerNavigation'
+import './training-learner-course.css'
 
 type Section = 'assignments' | 'checkins' | 'assessments'
 type SectionState<T> = { loading: boolean; error: string | null; rows: T[] }
 const waiting = <T,>(): SectionState<T> => ({ loading: true, error: null, rows: [] })
 const message = (error: unknown) => error instanceof Error ? error.message : '无法读取内容'
+type CompletionFilter = 'all' | 'incomplete' | 'complete'
+const assignmentDone = (task: Assignment) => task.mySubmission?.status === 'SUBMITTED'
+  || task.mySubmission?.status === 'GRADED' || Boolean(task.submitted && !task.mySubmission)
+const checkinDone = (task: Checkin) => Boolean(task.submission || task.submitted)
+const matchesCompletion = (done: boolean, value: CompletionFilter) => value === 'all' || done === (value === 'complete')
+function CompletionFilters({ value, total, completed, onChange }: {
+  value: CompletionFilter; total: number; completed: number; onChange: (value: CompletionFilter) => void
+}) {
+  return <div className="training-completion-filter" role="group" aria-label="完成状态筛选">
+    {([['all', '全部', total], ['incomplete', '未完成', total - completed], ['complete', '已完成', completed]] as const).map(([key, label, count]) =>
+      <button type="button" key={key} aria-pressed={value === key} onClick={() => onChange(key)}>{label}<span>{count}</span></button>)}
+  </div>
+}
+
 type CourseRequests = {
   key: string
   course?: Promise<ApiResponse<Course>>
@@ -26,6 +41,13 @@ export default function TrainingLearnerCourse() {
   const setSection = (value: Section) => setSearch(previous => {
     const next = new URLSearchParams(previous)
     next.set('section', value)
+    next.delete('completion')
+    return next
+  }, { replace: true })
+  const completion: CompletionFilter = search.get('completion') === 'complete' ? 'complete' : search.get('completion') === 'incomplete' ? 'incomplete' : 'all'
+  const setCompletion = (value: CompletionFilter) => setSearch(previous => {
+    const next = new URLSearchParams(previous)
+    if (value === 'all') next.delete('completion'); else next.set('completion', value)
     return next
   }, { replace: true })
   const taskHref = (target: string, taskSection: Section = 'assessments') =>
@@ -121,7 +143,12 @@ export default function TrainingLearnerCourse() {
   const retry = () => { setEpoch(value => value + 1) }
   const retryAssessments = () => { setAssessments(null); setAssessmentRevision(value => value + 1) }
 
-  return <div className="training-detail">
+  const assignmentRows = assignments.rows.filter(task => matchesCompletion(assignmentDone(task), completion))
+  const checkinRows = checkins.rows.filter(task => matchesCompletion(checkinDone(task), completion))
+  const assessmentRows = assessments?.items.filter(task => matchesCompletion(task.completed === true, completion)) ?? []
+  const filteredEmpty = (label: string) => `当前没有${completion === 'complete' ? '已完成' : '未完成'}的${label}。`
+
+  return <div className="training-detail training-learner-course">
     <Link className="training-back" to="/student"><ArrowLeft size={16} aria-hidden="true" />我的课程</Link>
     {courseLoading || (course && course.id !== courseId) ? <p className="training-status" role="status">正在读取课程…</p>
       : courseError || !course ? <div className="training-message" role="alert">课程暂时不可用：{courseError || '无权访问这门课程'}<button type="button" onClick={retry}>重试</button></div>
@@ -138,34 +165,36 @@ export default function TrainingLearnerCourse() {
           </nav>
 
           {section === 'assignments' && <section className="training-detail-content" aria-label="课程练习">
+            {!assignments.loading && !assignments.error && <CompletionFilters value={completion} total={assignments.rows.length} completed={assignments.rows.filter(assignmentDone).length} onChange={setCompletion} />}
             {assignments.loading ? <p role="status">正在读取练习…</p>
               : assignments.error ? <div role="alert">练习读取失败：{assignments.error}<button type="button" onClick={retry}>重试</button></div>
                 : assignments.rows.length === 0 ? <p className="training-empty-small">目前没有布置练习。</p>
-                  : <div className="training-item-list">{assignments.rows.map(task => {
+                  : assignmentRows.length === 0 ? <p className="training-empty-small">{filteredEmpty('练习')}</p>
+                  : <div className="training-item-list">{assignmentRows.map(task => {
                     const draft = task.mySubmission?.status === 'DRAFT'
-                    const done = task.mySubmission?.status === 'SUBMITTED'
-                      || task.mySubmission?.status === 'GRADED'
-                      || Boolean(task.submitted && !task.mySubmission)
+                    const done = assignmentDone(task)
                     const expired = Boolean(task.deadline && Date.parse(task.deadline) < Date.now())
                     const state = done ? '已提交' : expired ? '已截止'
                       : draft ? '已保存草稿' : '待完成'
                     const action = done ? '查看提交' : expired ? '查看练习'
                       : draft ? '继续练习' : '完成练习'
-                    return <article className="training-task-item" key={task.id}>
-                      <div><h2>{task.title}</h2><p>{task.description || '请阅读练习要求后提交。'}</p><span>{state}</span></div>
+                    return <article className="training-task-item" data-completion={done ? 'complete' : 'incomplete'} key={task.id}>
+                      <div><h2>{task.title}</h2><p>{task.description || '请阅读练习要求后提交。'}</p><span className="training-task-state">{state}</span></div>
                       <Link to={taskHref('/student/assignments/' + encodeURIComponent(task.id), 'assignments')} className="training-row-action">{action}<ArrowRight size={16} aria-hidden="true" /></Link>
                     </article>
                   })}</div>}
           </section>}
           {section === 'checkins' && <section className="training-detail-content" aria-label="课程打卡">
+            {!checkins.loading && !checkins.error && <CompletionFilters value={completion} total={checkins.rows.length} completed={checkins.rows.filter(checkinDone).length} onChange={setCompletion} />}
             {checkins.loading ? <p role="status">正在读取打卡…</p>
               : checkins.error ? <div role="alert">打卡读取失败：{checkins.error}<button type="button" onClick={retry}>重试</button></div>
                 : checkins.rows.length === 0 ? <p className="training-empty-small">目前没有布置打卡。</p>
-                  : <div className="training-item-list">{checkins.rows.map(task => {
-                    const done = Boolean(task.submission || task.submitted)
+                  : checkinRows.length === 0 ? <p className="training-empty-small">{filteredEmpty('打卡')}</p>
+                  : <div className="training-item-list">{checkinRows.map(task => {
+                    const done = checkinDone(task)
                     const expired = Boolean(task.endTime && Date.parse(task.endTime) < Date.now())
-                    return <article className="training-task-item" key={task.id}>
-                      <div><h2>{task.title}</h2><p>{task.description || '按要求完成本次打卡。'}</p><span>{done ? '已打卡' : expired ? '已截止' : '待完成'}</span></div>
+                    return <article className="training-task-item" data-completion={done ? 'complete' : 'incomplete'} key={task.id}>
+                      <div><h2>{task.title}</h2><p>{task.description || '按要求完成本次打卡。'}</p><span className="training-task-state">{done ? '已打卡' : expired ? '已截止' : '待完成'}</span></div>
                       <Link to={taskHref('/student/checkins/' + encodeURIComponent(task.id), 'checkins')} className="training-row-action">{done ? '查看记录' : expired ? '查看打卡' : '去打卡'}<ArrowRight size={16} aria-hidden="true" /></Link>
                     </article>
                   })}</div>}
@@ -173,15 +202,17 @@ export default function TrainingLearnerCourse() {
           {section === 'assessments' && <section className="training-detail-content" aria-label="课程测评">
             {assessmentsLoading || !assessments ? <p role="status">正在核对本课程的可用测评…</p>
               : <>
+                  <CompletionFilters value={completion} total={assessments.items.length} completed={assessments.items.filter(task => task.completed === true).length} onChange={setCompletion} />
                   {assessments.errors.length > 0 && <div className="training-message training-message--compact" role="alert">
                     <p>部分测评暂时无法读取，已加载的内容仍可使用。</p>
                     {assessments.errors.map(error => <p key={error}>{error}</p>)}
                     <button type="button" onClick={retryAssessments}>重新加载测评</button>
                   </div>}
                   {assessments.items.length === 0 && assessments.errors.length === 0 && <p className="training-empty-small">培训师还没有向这门课程发布测评。</p>}
-                  {assessments.items.length > 0 && <div className="training-item-list">{assessments.items.map(task =>
-                    <article className="training-task-item" key={task.key}>
-                      <div><span className="training-task-type">{task.typeLabel}</span><h2>{task.name}</h2><p>{task.description || '进入后可查看作答要求。'}</p><span>{task.status}</span>{task.taskSatisfactionLabel && <p>{task.taskSatisfactionLabel}</p>}</div>
+                  {assessments.items.length > 0 && assessmentRows.length === 0 && <p className="training-empty-small">{filteredEmpty('测评')}</p>}
+                  {assessmentRows.length > 0 && <div className="training-item-list">{assessmentRows.map(task =>
+                    <article className="training-task-item" data-completion={task.completed === true ? 'complete' : 'incomplete'} key={task.key}>
+                      <div><span className="training-task-type">{task.typeLabel}</span><h2>{task.name}</h2><p>{task.description || '进入后可查看作答要求。'}</p><span className="training-task-state">{task.status}</span>{task.taskSatisfactionLabel && task.taskSatisfactionLabel !== task.status && <p className="training-task-satisfaction">{task.taskSatisfactionLabel}</p>}</div>
                       <div className="training-task-actions">
                         {task.href ? <Link className="training-row-action" to={taskHref(task.href)}>{task.action}<ArrowRight size={16} aria-hidden="true" /></Link>
                           : <span className="training-task-disabled">{task.action}</span>}

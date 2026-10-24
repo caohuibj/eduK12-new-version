@@ -69,3 +69,23 @@
 }
 
 .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-card > header > div { flex: 1; width: 100%; }
+
+/* Course assessment colours follow the current Training appearance. */
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-workspace { color:var(--training-ink); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-card { background:var(--training-surface);border-color:var(--training-border);color:var(--training-ink);box-shadow:none; }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-workspace :is(.tca-card>header p,.tca-description,.tca-note,.tca-boundary,.training-empty-small,.training-task-disabled) { color:var(--training-muted); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-title > span { background:color-mix(in srgb,var(--training-bamboo) 9%,var(--training-surface));color:var(--training-bamboo); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-title > span.is-draft { background:var(--hui-ds-status-warning-bg,#f5ecd7);color:var(--hui-ds-status-warning-text,#765d27); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-workspace :is(.tca-card-actions,.training-catalog-tags,.tca-boundary) { border-color:var(--training-border); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-workspace :is(.tql-primary,.tql-secondary) { border-color:var(--training-border);background:var(--training-surface);color:var(--training-bamboo); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-workspace.tql-page .tql-primary { background:var(--training-bamboo);border-color:var(--training-bamboo);color:var(--training-on-accent,#fffdf9); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-workspace .tql-secondary:hover:not(:disabled),.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-workspace .tql-secondary[aria-expanded=true] { background:color-mix(in srgb,var(--training-bamboo) 9%,var(--training-surface)); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-progress { background:color-mix(in srgb,var(--training-bamboo) 5%,var(--training-surface));border-color:var(--training-border);color:var(--training-ink); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-progress :is(dt,p) { color:color-mix(in srgb,var(--training-muted) 90%,var(--training-ink)); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-progress dd { color:var(--training-ink); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-progress a { color:var(--training-bamboo); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-workspace :is(.tca-progress button,.training-catalog-tags button) { background:var(--training-surface);color:var(--training-bamboo);border-color:var(--training-border); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-workspace .training-catalog-tags { color:var(--training-muted); }
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-workspace :is(a,button,summary,input):focus-visible { outline-color:var(--training-bamboo); }
+
+@media(max-width:700px){.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-trainer-course .tca-workspace>.training-course-actions .training-action { padding:10px 8px;font-size:14px; }}

@@ -6,6 +6,9 @@ import type { CompositeAttemptState, CompositeCurrentItem } from '../../modules/
 import FinalCompositeAssessment from '../FinalCompositeAssessment'
 import { createFinalDraftMeta, finalDraftStore } from '../../services/persistence/finalDraftStore'
 
+const trainingPresentation = vi.hoisted(() => ({enabled:false}))
+vi.mock('../../training/context', async original => ({...await original<typeof import('../../training/context')>(), isTrainingHost:()=>trainingPresentation.enabled}))
+
 const { mockCapture, mockResolve, mockRetry } = vi.hoisted(() => ({
   mockCapture: vi.fn(),
   mockResolve: vi.fn(),
@@ -129,6 +132,7 @@ const resolveProvenance = ({
 )
 
 beforeEach(() => {
+  trainingPresentation.enabled = false
   vi.clearAllMocks()
   mockCapture.mockReturnValue(provenance)
   mockResolve.mockImplementation(resolveProvenance)
@@ -457,4 +461,23 @@ it('focuses the missing anonymous form field without changing required validatio
  await waitFor(()=>expect(document.getElementById('training-anonymous-required:composite-attempt-1:form-item-1')).toHaveFocus())
  expect(screen.getByRole('alert')).toHaveTextContent('还有 1 个必填字段未完成')
  expect(submit).not.toHaveBeenCalled()
+})
+it('uses a compact Training header and Chinese SJT labels without changing the child action', async () => {
+  trainingPresentation.enabled = true
+  const item: CompositeCurrentItem = {id:'sjt-item',type:'SITUATIONAL',position:0,required:true}
+  const state = {...makeState(item),instruction:'教师提供的测试作答说明',items:[{id:item.id,type:item.type,position:0,label:'SITUATIONAL',completed:false,index:0}]}
+  const submitFormSection=vi.fn(),submitScale=vi.fn(),onEnterSituational=vi.fn()
+  const view=render(<FinalCompositeAssessment state={state} submitFormSection={submitFormSection} submitScale={submitScale} {...sharedProps} onEnterSituational={onEnterSituational}/>)
+  const button=await screen.findByRole('button',{name:'开始/继续情境判断测评'})
+  const summary=screen.getByText('作答说明',{selector:'summary'})
+  expect(summary.closest('details')).not.toHaveAttribute('open')
+  expect(screen.getByText('教师提供的测试作答说明')).not.toBeVisible()
+  expect(view.container).not.toHaveTextContent('SITUATIONAL')
+  expect(screen.getByText('1. 情境判断')).toBeVisible()
+  await userEvent.click(summary)
+  expect(screen.getByText('教师提供的测试作答说明')).toBeVisible()
+  await userEvent.click(button)
+  expect(onEnterSituational).toHaveBeenCalledWith(item)
+  expect(submitFormSection).not.toHaveBeenCalled()
+  expect(submitScale).not.toHaveBeenCalled()
 })

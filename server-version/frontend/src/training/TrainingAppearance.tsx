@@ -10,25 +10,27 @@ function read(key: string, enabled: boolean): TrainingAppearance {
   if (!enabled) return 'light'
   try { return parseAppearance(localStorage.getItem(key)) } catch { return 'auto' }
 }
-export function TrainingAppearanceProvider({ children, management=false }: { children: ReactNode; management?:boolean }) {
-  const enabled = isTrainingHost() || management
+export function TrainingAppearanceProvider({ children, management=false, suspended=false }: { children: ReactNode; management?:boolean; suspended?:boolean }) {
+  const enabled = !suspended && (isTrainingHost() || management)
   const { user, isLoading } = useAuth()
   const key = appearanceKey(user?.id)
   const [choice, setChoice] = useState(() => ({ key, enabled, mode: read(key, enabled), storageError: false }))
   // A new account must never render the previous account's preference, even
   // during the frame before effects resubscribe to its storage key.
   const current = choice.key === key && choice.enabled === enabled ? choice : { key, enabled, mode: read(key, enabled), storageError: false }
-  const mode = enabled ? (management && isLoading && !user ? read('training:appearance:boot:v1',true) : current.mode) : 'light'
+  // The cached mode is presentation only while identity is unknown. Once resolved,
+  // the current account (or guest) key wins before painting. No identity is cached.
+  const mode = enabled ? (isLoading && !user ? read('training:appearance:boot:v1',true) : current.mode) : 'light'
   const [now, setNow] = useState(() => new Date())
   useEffect(() => {
     if (!enabled) return
     const update = (event: StorageEvent) => {
       if (event.storageArea && event.storageArea !== localStorage) return
-      if (event.key === key || event.key === null) setChoice({ key, enabled:true, mode: read(key, true), storageError: false })
+      if (event.key === key || event.key === null || (isLoading && event.key === 'training:appearance:boot:v1')) setChoice({ key, enabled:true, mode: read(key, true), storageError: false })
     }
     window.addEventListener('storage', update)
     return () => window.removeEventListener('storage', update)
-  }, [enabled, key])
+  }, [enabled, key, isLoading])
   useEffect(() => {
     if (!enabled || mode !== 'auto') return
     let timer: ReturnType<typeof setTimeout>
@@ -52,12 +54,12 @@ export function TrainingAppearanceProvider({ children, management=false }: { chi
   }, [enabled, key])
   const value = useMemo(() => ({ enabled, mode, theme: appearanceTheme(mode, now), storageError: current.storageError, select }), [enabled, mode, now, current.storageError, select])
   useLayoutEffect(()=>{
-    if(!management)return
+    if(!enabled)return
     const root=document.documentElement
     root.dataset.trainingEntry='true';root.dataset.trainingTheme=value.theme
-    if(user&&!isLoading){try{localStorage.setItem('training:appearance:boot:v1',mode)}catch{/* Theme still applies when storage is unavailable. */}}
+    if(!isLoading){try{localStorage.setItem('training:appearance:boot:v1',mode)}catch{/* Theme still applies when storage is unavailable. */}}
     return()=>{delete root.dataset.trainingEntry;delete root.dataset.trainingTheme}
-  },[management,user,isLoading,mode,value.theme])
+  },[enabled,isLoading,mode,value.theme])
   return <Appearance.Provider value={value}>{children}</Appearance.Provider>
 }
 export default function TrainingAppearanceSettings() {

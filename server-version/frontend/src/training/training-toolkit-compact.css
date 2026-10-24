@@ -1,0 +1,38 @@
+/* Tools only: compact rows share Training palette without changing media/course cards. */
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-library-grid.training-workspace-grid{grid-template-columns:minmax(0,1fr);gap:10px;align-items:start}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-card{min-width:0;min-height:0;padding:0;border:1px solid var(--training-border);border-radius:11px;background:var(--training-surface);color:var(--training-ink);box-shadow:none}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-card:hover{border-color:color-mix(in srgb,var(--training-bamboo) 45%,var(--training-border))}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-row{display:grid;grid-template-columns:34px minmax(0,1fr) auto;gap:14px;align-items:center;padding:15px 18px}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-icon{display:grid;place-items:center;width:34px;height:34px;border-radius:9px;background:color-mix(in srgb,var(--training-bamboo) 9%,var(--training-surface));color:var(--training-bamboo)}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-copy{min-width:0}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-copy h2{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;overflow-wrap:anywhere;margin:0 0 5px;color:var(--training-ink);font:600 16px/1.6 'PingFang SC','Microsoft YaHei',sans-serif}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-card.is-expanded h2{display:block;-webkit-line-clamp:unset}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-meta{display:flex;align-items:center;flex-wrap:wrap;gap:5px 12px;color:var(--training-muted);font-size:11px;line-height:1.7}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-status{padding:1px 6px;border-radius:4px;background:color-mix(in srgb,var(--training-bamboo) 7%,var(--training-surface));color:var(--training-muted)}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-status.is-published{color:var(--training-bamboo)}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap;justify-content:flex-end}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library :is(.training-tool-actions,.training-tool-secondary-actions)>:is(a,button){display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:8px 11px;margin:0;border:1px solid var(--training-border);border-radius:7px;background:transparent;color:var(--training-bamboo);font:500 12px/1.5 'PingFang SC',sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-actions>.training-tool-primary{background:color-mix(in srgb,var(--training-bamboo) 9%,var(--training-surface));border-color:transparent}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-actions>.training-tool-toggle{border-color:transparent;color:var(--training-muted);padding-inline:7px}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-toggle[aria-expanded=true]>svg{transform:rotate(180deg)}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library :is(.training-tool-actions,.training-tool-secondary-actions)>:is(a,button):hover:not(:disabled){background:color-mix(in srgb,var(--training-bamboo) 13%,var(--training-surface));color:var(--training-bamboo)}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-card :is(a,button):focus-visible{outline:3px solid var(--training-bamboo);outline-offset:3px}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-card button:disabled{opacity:.5;cursor:not-allowed}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-details{margin:0 18px 0 66px;padding:15px 0 17px;border-top:1px solid var(--training-border);color:var(--training-muted);font-size:12px;line-height:1.85;overflow-wrap:anywhere}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-details>p{margin:0 0 10px;white-space:pre-line}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-facts{display:flex;gap:8px 24px;flex-wrap:wrap;margin:10px 0 0}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-facts>div{display:flex;gap:8px;min-width:0}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-facts dt{color:var(--training-muted)}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-facts dd{margin:0;color:var(--training-ink);overflow-wrap:anywhere}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-secondary-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:13px}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-policy{margin-top:22px;padding-top:16px;border-top:1px solid var(--training-border);color:var(--training-muted);font-size:12px;line-height:1.85}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-policy>summary{display:list-item;min-height:32px;cursor:pointer;color:var(--training-muted);font-weight:500}
+.hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-policy .training-library-footnote{margin:9px 0 0;color:var(--training-muted);font-size:12px;line-height:1.85}
+@media(max-width:700px){
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-row{grid-template-columns:28px minmax(0,1fr);gap:10px 12px;padding:14px}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-icon{width:28px;height:28px;border-radius:7px;align-self:start;margin-top:2px}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-copy h2{font-size:15px}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-actions{grid-column:2;gap:6px;justify-content:flex-start}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-meta{gap:4px 9px}
+ .hui-training.hui-app.hui-app--standard.training-workspace-shell .training-tools-library .training-tool-details{margin:0 14px;padding:13px 0 15px}
+}

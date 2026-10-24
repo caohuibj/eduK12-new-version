@@ -27,18 +27,21 @@ it('keeps SJT and cognitive descriptors without authoring or version actions',as
   {...grant,id:'cognitive',name:'已授权认知',kind:'cognitive',href:'/cognitive-assignments'}]
  mocks.get.mockResolvedValue({code:0,data:{list:rows,total:rows.length}});show()
  await screen.findByRole('article',{name:'已授权认知'})
- for(const row of rows){const card=within(screen.getByRole('article',{name:row.name}));expect(card.queryByRole('link')).not.toBeInTheDocument();expect(card.queryByRole('button',{name:'更新版本'})).not.toBeInTheDocument()}
+ for(const row of rows){const card=within(screen.getByRole('article',{name:row.name}));fireEvent.click(card.getByRole('button',{name:'展开详情：'+row.name}));expect(card.queryByRole('link')).not.toBeInTheDocument();expect(card.queryByRole('button',{name:'更新版本'})).not.toBeInTheDocument()}
  expect(mocks.post).not.toHaveBeenCalled()
 })
 it('opens existing composition content for editing and retains its report configuration',async()=>{
  mocks.get.mockResolvedValue({code:0,data:{list:[{...own,id:'composition',name:'组合问卷',kind:'composition',status:'DRAFT',href:'/toolkit/compositions/composition'}],total:1}});show()
  expect(await screen.findByRole('link',{name:'编辑组合问卷'})).toHaveAttribute('href','/questionnaire-products/composition')
+ expect(screen.queryByRole('link',{name:'配置与报告'})).not.toBeInTheDocument()
+ fireEvent.click(screen.getByRole('button',{name:'展开详情：组合问卷'}))
  expect(screen.getByRole('link',{name:'配置与报告'})).toHaveAttribute('href','/toolkit/compositions/composition')
 })
 it.each(['DRAFT','PUBLISHED'])('keeps a %s integrated-report bundle out of all editing and version actions',async status=>{
  mocks.get.mockResolvedValue({code:0,data:{list:[{...own,id:'fixed',name:'综合报告包',kind:'bundle',status,href:'/questionnaire-products/fixed'}],total:1}});show()
  const card=within(await screen.findByRole('article',{name:'综合报告包'}))
  expect(card.getByText('打包组合问卷 · 综合报告')).toBeInTheDocument()
+ fireEvent.click(card.getByRole('button',{name:'展开详情：综合报告包'}))
  expect(card.getByText('综合报告 · 测评内容与分析规则固定')).toBeInTheDocument()
  expect(card.getByRole('link',{name:'查看与使用'})).toHaveAttribute('href','/bundle-products')
  expect(card.queryByRole('link',{name:/编辑|配置与报告/})).not.toBeInTheDocument()
@@ -51,6 +54,14 @@ it.each(['media','tools'] as const)('expands and collapses a truncated %s descri
  const description='完整说明文字，需要在卡片中展开查看。'.repeat(6)
  mocks.get.mockResolvedValue({code:0,data:{list:[{...own,kind:area==='media'?'image':'scale',description}],total:1}})
  show(area)
+ if(area==='tools'){
+  const expand=await screen.findByRole('button',{name:'展开详情：我的工具'})
+  expect(expand).toHaveAttribute('aria-expanded','false');expect(screen.queryByText(description)).not.toBeInTheDocument()
+  fireEvent.click(expand)
+  expect(screen.getByRole('region',{name:'我的工具的详情'})).toHaveTextContent(description)
+  fireEvent.click(screen.getByRole('button',{name:'收起详情：我的工具'}))
+  expect(screen.queryByText(description)).not.toBeInTheDocument();expect(mocks.post).not.toHaveBeenCalled()
+ }else{
  const expand=await screen.findByRole('button',{name:'显示更多'})
  const text=document.getElementById(expand.getAttribute('aria-controls')!)!
  expect(expand).toHaveAttribute('aria-expanded','false');expect(text).not.toHaveClass('is-expanded')
@@ -60,12 +71,14 @@ it.each(['media','tools'] as const)('expands and collapses a truncated %s descri
  fireEvent.click(screen.getByRole('button',{name:'收起'}))
  expect(screen.getByRole('button',{name:'显示更多'})).toHaveAttribute('aria-expanded','false')
  expect(text).not.toHaveClass('is-expanded');expect(mocks.post).not.toHaveBeenCalled()
+ }
+
 })
-it('omits the expand button when the complete description already fits',async()=>{
+it('omits the media description expand button when the complete description already fits',async()=>{
  vi.spyOn(HTMLElement.prototype,'scrollHeight','get').mockReturnValue(40)
  vi.spyOn(HTMLElement.prototype,'clientHeight','get').mockReturnValue(40)
- mocks.get.mockResolvedValue({code:0,data:{list:[{...own,description:'简短说明'}],total:1}})
- show();await screen.findByText('简短说明')
+ mocks.get.mockResolvedValue({code:0,data:{list:[{...own,kind:'image',description:'简短说明'}],total:1}})
+ show('media');await screen.findByText('简短说明')
  expect(screen.queryByRole('button',{name:'显示更多'})).not.toBeInTheDocument()
 })
 it.each(['media','tools'] as const)('pages %s in groups of nine and resets to page one after filtering',async area=>{
@@ -92,7 +105,9 @@ it('clamps an old out-of-range page to the final nine-item page',async()=>{
 })
 it('offers version updates only for own published tools and creates a draft through the existing copy API',async()=>{
  mocks.get.mockResolvedValue({code:0,data:{list:[own,grant],total:2}});mocks.post.mockResolvedValue({code:0,data:{id:'next'}});show()
- expect(await screen.findByText('授权工具')).toBeInTheDocument();expect(screen.getAllByRole('button',{name:'更新版本'})).toHaveLength(1)
+ expect(await screen.findByText('授权工具')).toBeInTheDocument()
+ fireEvent.click(screen.getByRole('button',{name:'展开详情：我的工具'}));fireEvent.click(screen.getByRole('button',{name:'展开详情：授权工具'}))
+ expect(screen.getAllByRole('button',{name:'更新版本'})).toHaveLength(1)
  fireEvent.click(screen.getByRole('button',{name:'更新版本'}));expect(await screen.findByText('量表编辑页')).toBeInTheDocument();expect(mocks.post).toHaveBeenCalledWith('/scales/own/copy',{})
 })
 it('searches and filters through the server, resets paging and does not mount governance until requested',async()=>{
@@ -116,6 +131,7 @@ it('does not present a failed request as an empty library',async()=>{
 it('routes an independent form to its form editor without report controls',async()=>{
  mocks.get.mockResolvedValue({code:0,data:{list:[{...own,kind:'form-template',status:'DRAFT',href:'/toolkit/forms/own'}],total:1}});show()
  expect(await screen.findByRole('link',{name:'编辑'})).toHaveAttribute('href','/toolkit/forms/own')
+ fireEvent.click(screen.getByRole('button',{name:'展开详情：我的工具'}))
  expect(screen.queryByRole('link',{name:'配置与报告'})).not.toBeInTheDocument()
 })
 it('copies existing form content into an independent form without changing its original questionnaire',async()=>{
@@ -145,4 +161,37 @@ it('clears the success notice when changing resource tabs and workspace areas, i
  await screen.findByText('我的工具');fireEvent.click(screen.getByRole('button',{name:'改名'}));fireEvent.click(screen.getByRole('button',{name:'保存名称'}));await screen.findByText('名称已更新，已有引用保持有效。')
  fireEvent.click(screen.getByRole('link',{name:'切到工具包'}));await screen.findByRole('heading',{name:'工具',level:1});expect(screen.queryByText('名称已更新，已有引用保持有效。')).not.toBeInTheDocument()
  fireEvent.click(screen.getByRole('link',{name:'回到媒体库'}));await screen.findByRole('heading',{name:'媒体',level:1});expect(screen.queryByText('名称已更新，已有引用保持有效。')).not.toBeInTheDocument()
+})
+
+
+it('keeps each tool compact until requested, with independent details and no extra requests',async()=>{
+ const description='完整工具说明，展开后应完整保留。'.repeat(20)
+ mocks.get.mockResolvedValue({code:0,data:{list:[{...own,description,updatedAt:'2026-10-24T00:00:00Z'},{...grant,description:'授权工具说明'}],total:2}})
+ show()
+ const card=within(await screen.findByRole('article',{name:'我的工具'}))
+ expect(card.getByRole('link',{name:'查看'})).toHaveAttribute('href','/scales/own')
+ expect(card.getByText('已发布')).toBeInTheDocument()
+ expect(card.queryByText('1.0.0')).not.toBeInTheDocument()
+ expect(screen.queryByText(description)).not.toBeInTheDocument()
+ fireEvent.click(card.getByRole('button',{name:'展开详情：我的工具'}))
+ expect(card.getByText(description)).toBeInTheDocument()
+ expect(card.getByText('1.0.0')).toBeInTheDocument()
+ expect(card.getByText('2026/10/24').closest('time')).toHaveAttribute('datetime','2026-10-24T00:00:00Z')
+ expect(screen.getByRole('button',{name:'展开详情：授权工具'})).toHaveAttribute('aria-expanded','false')
+ expect(screen.queryByText('授权工具说明')).not.toBeInTheDocument()
+ fireEvent.click(card.getByRole('button',{name:'收起详情：我的工具'}))
+ expect(card.queryByText(description)).not.toBeInTheDocument()
+ expect(mocks.get).toHaveBeenCalledTimes(1);expect(mocks.post).not.toHaveBeenCalled()
+})
+
+it('keeps published composition report and version controls inside details while retaining the primary view link',async()=>{
+ mocks.get.mockResolvedValue({code:0,data:{list:[{...own,id:'comp',name:'已发布组合',kind:'composition',href:'/toolkit/compositions/comp'}],total:1}})
+ show()
+ expect(await screen.findByRole('link',{name:'查看组合问卷'})).toHaveAttribute('href','/questionnaire-products/comp')
+ expect(screen.queryByRole('button',{name:'更新版本'})).not.toBeInTheDocument()
+ fireEvent.click(screen.getByRole('button',{name:'展开详情：已发布组合'}))
+ expect(screen.getByRole('link',{name:'配置与报告'})).toHaveAttribute('href','/toolkit/compositions/comp')
+ expect(screen.getByRole('button',{name:'更新版本'})).toBeEnabled()
+ expect(screen.getByText('各测评单独出报告')).toBeInTheDocument()
+ expect(mocks.post).not.toHaveBeenCalled()
 })

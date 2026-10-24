@@ -164,7 +164,7 @@ it.each([false, true])('preserves report and historical qualification in Trainin
     attempt: { id: 'new', status: 'COMPLETED', progress: 100 },
     latestCompletedAttempt: { id: 'new', status: 'COMPLETED', progress: 100, taskSatisfied: false },
   }])
-  expect(row).toMatchObject({ status: hasSatisfiedAttempt ? '任务已达成' : '已交卷，任务未达成', href: '/student/composite/attempts/new/report', action: '查看反馈' })
+  expect(row).toMatchObject({ completed: hasSatisfiedAttempt, status: hasSatisfiedAttempt ? '任务已达成' : '已交卷，任务未达成', href: '/student/composite/attempts/new/report', action: '查看反馈' })
   expect(row.taskSatisfactionLabel).toBe(hasSatisfiedAttempt ? '本次未达成，历史达成仍保留' : '本次作答已保存并计入次数，可查看报告。')
 })
 
@@ -173,5 +173,19 @@ it('uses the authorized retry allowance and never presents a submitted attempt a
     hasSatisfiedAttempt: false, canStartNewAttempt: true,
     latestCompletedAttempt: { id: 'submitted', status: 'COMPLETED', progress: 100, taskSatisfied: false },
   }])
-  expect(row).toMatchObject({ status: '已交卷，任务未达成', href: '/student/composite/q', action: '再次测评', reportHref: '/student/composite/attempts/submitted/report' })
+  expect(row).toMatchObject({ completed: false, status: '已交卷，任务未达成', href: '/student/composite/q', action: '再次测评', reportHref: '/student/composite/attempts/submitted/report' })
+})
+
+it('uses completion metadata independently from availability, exhausted attempts and active work', () => {
+  const question = { id: 'q', name: '问卷', description: null, completed: true, inProgress: false, assessmentId: 'qa', courses: [{ id: course, title: '课' }] }
+  const scale = { id: 's', name: '量表', description: null, completed: true, inProgress: false, assessmentId: 'sa', retakeAllowed: true, course: { id: course, title: '课' } }
+  const rows = projectCourseAssessments(course, [question], [scale], [
+    { id: 'exhausted', courseId: course, title: '次数用尽', status: 'PUBLISHED', remainingAttempts: 0 },
+    { id: 'finished', courseId: course, title: '已完成认知', status: 'PUBLISHED', latestCompletedSessionId: 'result' },
+    { id: 'active', courseId: course, title: '继续认知', status: 'PUBLISHED', latestCompletedSessionId: 'old', continueHref: '/student/cognitive/sessions/active' },
+  ] as any, [])
+  expect(rows.map(row => [row.key, row.completed])).toEqual([
+    ['questionnaire:q', true], ['scale:s', true], ['cognitive:exhausted', false], ['cognitive:finished', true], ['cognitive:active', false],
+  ])
+  expect(rows.find(row => row.key === 'scale:s')?.href).toBe('/student/scales/result/sa')
 })
