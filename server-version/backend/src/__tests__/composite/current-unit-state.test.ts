@@ -1,9 +1,10 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 const mocks = vi.hoisted(() => ({
   prisma: { compositeAssessmentAttempt: { findUnique: vi.fn() }, assessmentUnitSnapshot: { findMany: vi.fn() } },
-  admission: vi.fn(),
+  admission: vi.fn(), finalize: vi.fn(),
 }))
 vi.mock('../../config/database', () => ({ prisma: mocks.prisma }))
+vi.mock('../../modules/assessment-runtime/unified-aggregate-finalizer.service', () => ({ finalizeCompositeAttemptUnifiedIfReady: mocks.finalize }))
 vi.mock('../../modules/assessment-runtime/form-admission.service', () => ({ ensureCompositeFormAdmissionAtDelivery: mocks.admission }))
 import { getAttemptState } from '../../modules/composite/composite.service'
 import { createFrozenActiveSlotSet, encryptFrozenActiveSlotSet } from '../../modules/assessment-runtime/slot-set'
@@ -62,5 +63,29 @@ describe('explicit current-unit attempt view', () => {
     const state = await getAttemptState(parent.id, context, undefined, 'current-unit')
     expect(state.currentItem?.id).toBe('section-1')
     await expect(getAttemptState(parent.id, { recoveryTokenHash: 'wrong' }, undefined, 'current-unit')).rejects.toMatchObject({ statusCode: 403 })
+  })
+})
+
+
+afterEach(() => vi.unstubAllEnvs())
+describe('terminal GET snapshot read hint', () => {
+  it.each([false, true])('only requests payload batching for synchronous ordinary questionnaire (async=%s)', async enabled => {
+    vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED', String(enabled))
+    const { parent, context } = fixture(2)
+    parent.status = 'IN_PROGRESS'
+    Object.assign(parent, { assignmentRef: null, asyncReportEpoch: null })
+    Object.assign(parent.compositeAssessment, { productKind: 'QUESTIONNAIRE', reportPackageKey: null, analysisProtocolKey: null })
+    mocks.finalize.mockResolvedValue({ status: 'COMPLETED', progress: 100, completedAt: new Date('2026-10-24T00:00:00Z') })
+    expect((await getAttemptState(parent.id, context, undefined, 'current-unit')).status).toBe('COMPLETED')
+    expect(mocks.finalize).toHaveBeenCalledExactlyOnceWith(parent.id, expect.objectContaining({ id: parent.id }), undefined, undefined, !enabled)
+  })
+  it('does not request a terminal read for incomplete state or an unauthorized caller', async () => {
+    vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED', 'false')
+    const { parent, context } = fixture(1)
+    Object.assign(parent, { assignmentRef: null, asyncReportEpoch: null })
+    Object.assign(parent.compositeAssessment, { productKind: 'QUESTIONNAIRE', reportPackageKey: null, analysisProtocolKey: null })
+    await getAttemptState(parent.id, context)
+    await expect(getAttemptState(parent.id, { userId: 'outsider' })).rejects.toMatchObject({ statusCode: 403 })
+    expect(mocks.finalize).not.toHaveBeenCalled()
   })
 })

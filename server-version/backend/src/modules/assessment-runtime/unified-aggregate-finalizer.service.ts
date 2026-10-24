@@ -1,3 +1,4 @@
+import { trainingVariantMarkerState } from '../composite/training-variant-markers'
 import {prepareTrainingFinalReceipt} from '../composite/training-content-final'
 import { applyTrainingAttemptScope } from '../composite/training-variant-scope'
 import { resolveTrainingFlowScope } from '../composite/training-flow-scope'
@@ -298,6 +299,7 @@ const probeUnifiedParent = async (input: {
   composite: boolean
   preloadedParent?: UnifiedParentHeader
   reportJob?: ReportJobIdentity
+  terminalSnapshotRead?: boolean
 }): Promise<TerminalProbe> => {
   const parent = input.preloadedParent ?? await measureRequestPhase('aggregate.parent_probe_db', async () => (
     input.composite
@@ -315,9 +317,9 @@ const probeUnifiedParent = async (input: {
   if (parent.status !== 'IN_PROGRESS') return { kind: 'terminal', result: terminalFromParent(parent) }
 
   const frozenSlots = await measureRequestPhase('aggregate.decrypt_parse', () => readFrozenSlotSet(parent))
-  // Only background finalization, after canonical readiness, eagerly loads
-  // payloads. One invocation-local read serves both completeness and scoring.
-  const snapshotRows = input.reportJob && process.env.ASSESSMENT_REPORT_SNAPSHOT_BATCH_ENABLED === 'true'
+  // Background jobs or an ordinary synchronous terminal candidate may read
+  // payloads once. The hint never substitutes for completeness or fact validation.
+  const snapshotRows = input.terminalSnapshotRead || (input.reportJob && process.env.ASSESSMENT_REPORT_SNAPSHOT_BATCH_ENABLED === 'true')
     ? await loadSnapshotPayloads({ parentId: input.parentId, attemptEpoch: parent.attemptEpoch, composite: input.composite })
     : undefined
   const headers = snapshotRows ? snapshotRows.map(headerFromRow) : await loadSnapshotHeaders({
@@ -1107,7 +1109,7 @@ const finalizeTrainingFlowCompositeUnified = async (attemptId: string, expected:
   }, { isolationLevel: 'ReadCommitted' }))
 )
 
-const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?: UnifiedParentHeader, reportJob?: ReportJobIdentity, preloadedGraph?: any): Promise<CompletionResult | null> => {
+const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?: UnifiedParentHeader, reportJob?: ReportJobIdentity, preloadedGraph?: any, terminalSnapshotRead = false): Promise<CompletionResult | null> => {
   const route = preloadedParent ?? await measureRequestPhase('aggregate.parent_probe_db', () => prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId }, select: compositeParentHeaderSelect,
   }))
@@ -1117,7 +1119,14 @@ const finalizeCompositeUnifiedImpl = async (attemptId: string, preloadedParent?:
     return finalizeTrainingFlowCompositeUnified(attemptId, reportJob ?? { attemptEpoch: route.attemptEpoch,
       slotSetHash: route.frozenActiveSlotSetHash as string, contextHash: route.contextSnapshotHash })
   }
-  const probe = await probeUnifiedParent({ parentId: attemptId, composite: true, preloadedParent: route, reportJob })
+  const candidate = route as any
+  const readTogether = terminalSnapshotRead && !reportJob && candidate.asyncReportEpoch === null
+    && candidate.runtimeGeneration === 'UNIFIED_V1' && candidate.deliveryMode === 'FINAL_ONLY'
+    && candidate.compositeAssessment?.productKind === 'QUESTIONNAIRE'
+    && candidate.assignmentRef === null && candidate.compositeAssessment.reportPackageKey === null
+    && candidate.compositeAssessment.analysisProtocolKey === null && trainingVariantMarkerState(candidate) === 'LEGACY'
+  const probe = await probeUnifiedParent({ parentId: attemptId, composite: true, preloadedParent: route, reportJob,
+    terminalSnapshotRead: readTogether })
   if (probe.kind === 'missing') return null
   if (probe.kind === 'terminal') return probe.result
   if (probe.kind === 'incomplete') return updateIncompleteComposite(probe.parent, probe.completeness)
@@ -1555,10 +1564,10 @@ const persistQuestionnaireCompletion = async (input: {
   }
 }
 
-export const finalizeCompositeAttemptUnifiedIfReady = async (attemptId: string, preloadedParent?: UnifiedParentHeader, reportJob?: ReportJobIdentity, preloadedGraph?: any) => (
+export const finalizeCompositeAttemptUnifiedIfReady = async (attemptId: string, preloadedParent?: UnifiedParentHeader, reportJob?: ReportJobIdentity, preloadedGraph?: any, terminalSnapshotRead = false) => (
   withAggregateFinalizationAdmission(async () => {
     try {
-      return await finalizeCompositeUnifiedImpl(attemptId, preloadedParent, reportJob, preloadedGraph)
+      return await finalizeCompositeUnifiedImpl(attemptId, preloadedParent, reportJob, preloadedGraph, terminalSnapshotRead)
     } catch (error) {
       if (error instanceof InstrumentFinalSubmitError) throw error
       if (isTransientCompletionDatabaseError(error)) throw toCompletionAdmissionBusyError(error, 1, 'aggregate_finalization')
