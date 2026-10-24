@@ -1,3 +1,4 @@
+import { createFrozenActiveSlotSet, encryptFrozenActiveSlotSet } from '../../modules/assessment-runtime/slot-set'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { UserRole } from '@prisma/client'
 
@@ -7,6 +8,11 @@ process.env.COGNITIVE_MODULE_ENABLED = 'true'
 
 const { mockPrisma } = vi.hoisted(() => ({
   mockPrisma: {
+    cognitiveSession: { findMany: vi.fn() },
+    situationalAttempt: { findMany: vi.fn() },
+    compositeFormAnswer: { findMany: vi.fn() },
+    compositeFormSectionAttempt: { findMany: vi.fn() },
+
     compositeAssessment: {
       findMany: vi.fn(),
       findUnique: vi.fn(),
@@ -199,6 +205,10 @@ const completedAttemptForReport = (overrides: Record<string, unknown> = {}) => (
 
 beforeEach(() => {
   vi.clearAllMocks()
+  mockPrisma.cognitiveSession.findMany.mockImplementation(async () => (await mockPrisma.compositeAssessmentAttempt.findUnique.mock.results.at(-1)?.value)?.cognitiveSessions ?? [])
+  mockPrisma.situationalAttempt.findMany.mockImplementation(async () => (await mockPrisma.compositeAssessmentAttempt.findUnique.mock.results.at(-1)?.value)?.situationalAttempts ?? [])
+  mockPrisma.compositeFormAnswer.findMany.mockImplementation(async () => (await mockPrisma.compositeAssessmentAttempt.findUnique.mock.results.at(-1)?.value)?.formAnswers ?? [])
+  mockPrisma.compositeFormSectionAttempt.findMany.mockImplementation(async () => (await mockPrisma.compositeAssessmentAttempt.findUnique.mock.results.at(-1)?.value)?.formSectionAttempts ?? [])
   mockPrisma.compositeAssessmentAttempt.groupBy.mockResolvedValue([])
   mockPrisma.compositeAssessmentAttempt.findMany.mockResolvedValue([])
   mockPrisma.compositeAssessmentAttempt.count.mockResolvedValue(0)
@@ -861,7 +871,8 @@ const selectedRow = (row: any, query: any): any => {
   if (!fields) return row
   const result: any = query.select ? {} : { ...row }
   for (const [key, selection] of Object.entries(fields)) {
-    if (selection === true) result[key] = row[key]
+    if (selection === false) delete result[key]
+    else if (selection === true) result[key] = row[key]
     else if (selection && typeof selection === 'object') result[key] = selectedRow(row[key], selection)
   }
   return result
@@ -890,6 +901,10 @@ describe('participant report-only database projection', () => {
       })) }]
     mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue(full)
     const expected = JSON.stringify(await getReport('attempt-1', { userId: 'student-1' }))
+    mockPrisma.cognitiveSession.findMany.mockImplementation(async (query: any) => selectedRow(full.cognitiveSessions ?? [], query))
+    mockPrisma.situationalAttempt.findMany.mockImplementation(async (query: any) => selectedRow(full.situationalAttempts ?? [], query))
+    mockPrisma.compositeFormAnswer.findMany.mockImplementation(async (query: any) => selectedRow(full.formAnswers ?? [], query))
+    mockPrisma.compositeFormSectionAttempt.findMany.mockImplementation(async (query: any) => selectedRow(full.formSectionAttempts ?? [], query))
     let loaded: any
     mockPrisma.compositeAssessmentAttempt.findUnique.mockImplementation(async (query: any) => {
       loaded = selectedRow(full, query)
@@ -901,8 +916,40 @@ describe('participant report-only database projection', () => {
     expect(loaded.scaleAssessments[0]).not.toHaveProperty('answers')
     expect(loaded.scaleAssessments[0].scale).not.toHaveProperty('definition')
     expect(loaded.compositeAssessment.items[1].scale).not.toHaveProperty('definition')
-    expect(loaded.cognitiveSessions[0]).not.toHaveProperty('trials')
-    expect(loaded.situationalAttempts[0]).not.toHaveProperty('resultEncrypted')
+    expect(mockPrisma.cognitiveSession.findMany.mock.calls.at(-1)?.[0].select).not.toHaveProperty('trials')
+    expect(mockPrisma.situationalAttempt.findMany.mock.calls.at(-1)?.[0].select).not.toHaveProperty('resultEncrypted')
     expect(JSON.stringify(actual)).not.toContain('PRIVATE_')
+  })
+})
+
+
+describe('participant report empty module query elimination', () => {
+  it('skips exactly four empty relation reads without changing scale-only report JSON; positive counts and corrupt manifests read fully', async () => {
+    const full: any = completedAttemptForReport({ runtimeGeneration: 'UNIFIED_V1', deliveryMode: 'FINAL_ONLY', attemptEpoch: 1 })
+    full.compositeAssessment.productKind = 'QUESTIONNAIRE'
+    full.compositeAssessment.items = full.compositeAssessment.items.filter((item: any) => item.type === 'SCALE')
+    full.compositeAssessment.formSections = []
+    full.cognitiveSessions = []; full.situationalAttempts = []; full.formAnswers = []; full.formSectionAttempts = []
+    const slots = createFrozenActiveSlotSet({ schemaVersion: 1, runtimeGeneration: 'UNIFIED_V1', attemptEpoch: 1,
+      slots: [{ slotKey: 'scale:item-scale', unitType: 'SCALE', required: true,
+        sourceDefinitionIdentity: { key: 'adexi_v1', version: '2.0.0', hash: 'a'.repeat(64) }, sourceBinding: {} }] })
+    full.frozenActiveSlotSetEncrypted = encryptFrozenActiveSlotSet(slots); full.frozenActiveSlotSetHash = slots.snapshotHash
+    mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue(full)
+    const expected = JSON.stringify(await getReport('attempt-1', { userId: 'student-1' }))
+    const delegates = [mockPrisma.cognitiveSession, mockPrisma.situationalAttempt, mockPrisma.compositeFormAnswer, mockPrisma.compositeFormSectionAttempt]
+    for (const delegate of delegates) delegate.findMany.mockClear()
+    full._count = { cognitiveSessions: 0, situationalAttempts: 0, formAnswers: 0, formSectionAttempts: 0 }
+    expect(JSON.stringify(await getReport('attempt-1', { userId: 'student-1' }))).toBe(expected)
+    for (const delegate of delegates) expect(delegate.findMany).not.toHaveBeenCalled()
+    expect(mockPrisma.compositeAssessmentAttempt.findUnique.mock.calls.at(-1)?.[0].include._count.select).toEqual({
+      cognitiveSessions: true, situationalAttempts: true, formAnswers: true, formSectionAttempts: true,
+    })
+    full._count.cognitiveSessions = 1
+    await getReport('attempt-1', { userId: 'student-1' })
+    expect(mockPrisma.cognitiveSession.findMany).toHaveBeenCalledExactlyOnceWith(expect.objectContaining({ where: { compositeAttemptId: 'attempt-1' } }))
+    for (const delegate of delegates) delegate.findMany.mockClear()
+    full._count.cognitiveSessions = 0; full.frozenActiveSlotSetEncrypted = 'corrupt'
+    expect(JSON.stringify(await getReport('attempt-1', { userId: 'student-1' }))).toBe(expected)
+    for (const delegate of delegates) expect(delegate.findMany).toHaveBeenCalledTimes(1)
   })
 })

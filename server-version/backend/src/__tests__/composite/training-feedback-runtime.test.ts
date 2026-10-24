@@ -1,7 +1,12 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { UserRole } from '@prisma/client'
 const { db, state, bundle } = vi.hoisted(() => ({
-  db: { $queryRaw: vi.fn(), compositeAssessmentAttempt: { findUnique: vi.fn() }, compositeAssessment: { findUnique: vi.fn() },
+  db: {
+    cognitiveSession: { findMany: vi.fn() },
+    situationalAttempt: { findMany: vi.fn() },
+    compositeFormAnswer: { findMany: vi.fn() },
+    compositeFormSectionAttempt: { findMany: vi.fn() },
+ $queryRaw: vi.fn(), compositeAssessmentAttempt: { findUnique: vi.fn() }, compositeAssessment: { findUnique: vi.fn() },
     compositeReportJob: { findUnique: vi.fn() }, compositeAnalysisSnapshot: { findFirst: vi.fn() } },
   state: { parent: null as any, job: null as any }, bundle: { readReport: vi.fn(), processAnalysis: vi.fn() },
 }))
@@ -23,6 +28,11 @@ beforeEach(() => {
   vi.stubEnv('ASSESSMENT_REPORT_ASYNC_ENABLED', 'false'); vi.stubEnv('ASSESSMENT_REPORT_COMPACT_READ_ENABLED', 'false')
   vi.stubEnv('ASSESSMENT_COMPACT_FACTS_ENABLED', 'false'); vi.stubEnv('ASSESSMENT_SHARED_CONTROL_ENABLED', 'false')
   state.parent = feedbackAttempt(); state.job = null
+  db.cognitiveSession.findMany.mockImplementation(async () => state.parent.cognitiveSessions ?? [])
+  db.situationalAttempt.findMany.mockImplementation(async () => state.parent.situationalAttempts ?? [])
+  db.compositeFormAnswer.findMany.mockImplementation(async () => state.parent.formAnswers ?? [])
+  db.compositeFormSectionAttempt.findMany.mockImplementation(async () => state.parent.formSectionAttempts ?? [])
+
   db.compositeAssessmentAttempt.findUnique.mockImplementation(() => Promise.resolve(state.parent))
   db.compositeAssessment.findUnique.mockImplementation(() => Promise.resolve({ ...state.parent.compositeAssessment, createdBy: 'teacher-1' }))
   db.compositeReportJob.findUnique.mockImplementation(() => Promise.resolve(state.job))

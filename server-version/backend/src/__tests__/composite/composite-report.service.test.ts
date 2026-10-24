@@ -6,6 +6,11 @@ process.env.COGNITIVE_MODULE_ENABLED = 'true'
 
 const { mockPrisma, state } = vi.hoisted(() => ({
   mockPrisma: {
+    cognitiveSession: { findMany: vi.fn() },
+    situationalAttempt: { findMany: vi.fn() },
+    compositeFormAnswer: { findMany: vi.fn() },
+    compositeFormSectionAttempt: { findMany: vi.fn() },
+
     compositeAssessment: { findUnique: vi.fn() },
     compositeAssessmentAttempt: { findUnique: vi.fn() },
     compositeAnalysisSnapshot: { findFirst: vi.fn(), findMany: vi.fn() },
@@ -128,6 +133,11 @@ describe('PR9 package report service', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     state.attempt = attempt()
+  mockPrisma.cognitiveSession.findMany.mockImplementation(async () => state.attempt.cognitiveSessions ?? [])
+  mockPrisma.situationalAttempt.findMany.mockImplementation(async () => state.attempt.situationalAttempts ?? [])
+  mockPrisma.compositeFormAnswer.findMany.mockImplementation(async () => state.attempt.formAnswers ?? [])
+  mockPrisma.compositeFormSectionAttempt.findMany.mockImplementation(async () => state.attempt.formSectionAttempts ?? [])
+
     mockPrisma.compositeAssessment.findUnique.mockResolvedValue({ id: 'composite-1', createdBy: 'teacher-a' })
     mockPrisma.compositeAssessmentAttempt.findUnique.mockResolvedValue(state.attempt)
     mockPrisma.compositeAnalysisSnapshot.findFirst.mockImplementation(async (args: any) => {

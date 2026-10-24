@@ -1,3 +1,4 @@
+import { emptyOptionalReportRelations, OPTIONAL_REPORT_RELATION_COUNTS } from './composite-report-read-plan'
 import { lockAuthenticatedAdmission } from './authenticated-admission-lock'
 import {publicTrainingFormDefinition} from '../assessment-runtime/typed-form'
 import {assertTrainingMaterialsUsable,trainingFormMaterials,inspectTrainingMaterials} from '../assessment-media/training-materials'
@@ -3460,9 +3461,10 @@ const reportSituationalChildSelect = {
 } as const
 
 const loadAttemptWithChildren = async (attemptId: string, reportOnly = false) => {
-  const attempt = await prisma.compositeAssessmentAttempt.findUnique({
+  const attempt: any = await prisma.compositeAssessmentAttempt.findUnique({
     where: { id: attemptId },
     include: {
+      _count: reportOnly ? { select: OPTIONAL_REPORT_RELATION_COUNTS } : false,
       compositeAssessment: {
         include: {
           items: {
@@ -3490,7 +3492,7 @@ const loadAttemptWithChildren = async (attemptId: string, reportOnly = false) =>
         },
       },
       scaleAssessments: reportOnly ? { select: reportScaleChildSelect } : { include: { scale: true } },
-      cognitiveSessions: reportOnly ? { select: reportCognitiveChildSelect } : {
+      cognitiveSessions: reportOnly ? false : {
         include: {
           trials: {
             orderBy: { trialIndex: 'desc' },
@@ -3499,12 +3501,23 @@ const loadAttemptWithChildren = async (attemptId: string, reportOnly = false) =>
           },
         },
       },
-      formAnswers: true,
-      formSectionAttempts: true,
-      situationalAttempts: reportOnly ? { select: reportSituationalChildSelect } : true,
+      formAnswers: !reportOnly,
+      formSectionAttempts: !reportOnly,
+      situationalAttempts: !reportOnly,
     },
   })
   if (!attempt) throw compositeNotFound('综合测评记录不存在')
+  if (reportOnly) {
+    const empty = await emptyOptionalReportRelations(attempt)
+    const [cognitiveSessions, situationalAttempts, formAnswers, formSectionAttempts] = await Promise.all([
+      empty.has('cognitiveSessions') ? [] : prisma.cognitiveSession.findMany({ where: { compositeAttemptId: attemptId }, select: reportCognitiveChildSelect }),
+      empty.has('situationalAttempts') ? [] : prisma.situationalAttempt.findMany({ where: { compositeAttemptId: attemptId }, select: reportSituationalChildSelect }),
+      empty.has('formAnswers') ? [] : prisma.compositeFormAnswer.findMany({ where: { attemptId } }),
+      empty.has('formSectionAttempts') ? [] : prisma.compositeFormSectionAttempt.findMany({ where: { attemptId } }),
+    ])
+    const { _count, ...parent } = attempt
+    return applyTrainingAttemptScope({ ...parent, cognitiveSessions, situationalAttempts, formAnswers, formSectionAttempts })
+  }
   return applyTrainingAttemptScope(attempt)
 }
 
