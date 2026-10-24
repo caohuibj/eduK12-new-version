@@ -45,3 +45,17 @@ describe('public Cognitive entry authority', () => {
     expect(mocks.hook).not.toHaveBeenCalled()
   })
 })
+
+it('accepts only the Cognitive fragment namespace before mounting public domain hooks',async()=>{
+ const key='a'.repeat(43)
+ renderAt(`/public/cognitive/sessions/s1#resume=training-cognitive&key=${key}`)
+ await waitFor(()=>expect(mocks.publicFactory).toHaveBeenCalledWith(key))
+ expect(sessionStorage.getItem('cognitive:recovery:s1')).toBe(key)
+ expect(mocks.authGet).not.toHaveBeenCalled()
+})
+it('does not import a Survey or Training study fragment into a single Cognitive session',()=>{
+ renderAt(`/public/cognitive/sessions/s1#resume=training-study&key=${'a'.repeat(43)}`)
+ expect(screen.getByText('需要恢复凭证')).toBeInTheDocument()
+ expect(mocks.hook).not.toHaveBeenCalled()
+ expect(sessionStorage.getItem('cognitive:recovery:s1')).toBeNull()
+})

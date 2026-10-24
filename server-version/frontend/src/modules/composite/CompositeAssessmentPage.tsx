@@ -1,3 +1,5 @@
+import {PersonalParticipationLink} from '../../components/participation/PersonalParticipationLink'
+import {trainingAttemptLink} from '../../components/participation/training-participation-link'
 import { learnerCourseContext, withLearnerCourse, useTrainingLearnerNavigation } from '../../training/learnerNavigation'
 import { runWithCompletionRetry } from '../../services/completionRetry'
 import { usePageSignal } from '../../hooks/usePageSignal'
@@ -326,11 +328,12 @@ const CompositeAssessmentContent: React.FC = () => {
         if (cancelled) return
         const id = params.attemptId
         const saved = id
-          ? readStored(attemptKey(id))
+          ? trainingAttemptLink.read(location.hash)?.key || readStored(attemptKey(id))
           : token
             ? readStored(tokenKey(token))
             : ''
         if (saved) {
+          if(id)store(attemptKey(id),saved)
           setRecoveryToken(saved)
           if (id) await loadAttempt(id, saved)
           else await start(saved)
@@ -352,7 +355,7 @@ const CompositeAssessmentContent: React.FC = () => {
     return () => {
       cancelled = true
     }
-  }, [publicMode, token, params.attemptId, params.assessmentId])
+  }, [publicMode, token, params.attemptId, params.assessmentId, location.hash])
 
   const saveAndExit = async () => {
     const signal = pageSignal()
@@ -526,6 +529,10 @@ const CompositeAssessmentContent: React.FC = () => {
     )
   }
 
+  const anonymousRecovery = publicMode && recoveryToken ? <details className="mb-4 rounded border p-3" open={!!newRecoveryToken}>
+    <summary>保存本次匿名作答的恢复链接</summary>
+    <PersonalParticipationLink url={trainingAttemptLink.link(window.location.origin,state.id,{key:recoveryToken})} firstTime={!!newRecoveryToken} fileLabel="本次培训测评" scopeNotice="仅恢复本次作答及按权限开放的报告，不建立账号，也不自动关联其他培训或波次。未提交的本机草稿不会随链接自动转移。" onSaved={()=>setNewRecoveryToken(null)}/>
+  </details>:null
   if (state.deliveryMode === 'FINAL_ONLY' || state.trainingFlow) {
     const unitAssessment = (
       <FinalCompositeAssessment
@@ -544,10 +551,10 @@ const CompositeAssessmentContent: React.FC = () => {
       />
     )
     if (!state.trainingFlow && state.productKind === 'QUESTIONNAIRE' && !relationalMode && state.currentItem?.type === 'SCALE') {
-      return <WholeCompositeQuestionnaire state={state} api={api} publicMode={publicMode} recoveryToken={recoveryToken}
-        fallback={unitAssessment} onExit={() => void saveAndExit()} onCompleted={() => goReport(state.id)} />
+      return <>{anonymousRecovery}<WholeCompositeQuestionnaire state={state} api={api} publicMode={publicMode} recoveryToken={recoveryToken}
+        fallback={unitAssessment} onExit={() => void saveAndExit()} onCompleted={() => goReport(state.id)} /></>
     }
-    return unitAssessment
+    return <>{anonymousRecovery}{unitAssessment}</>
   }
 
   const current = state.currentItem
@@ -557,6 +564,7 @@ const CompositeAssessmentContent: React.FC = () => {
 
   return (
     <div className="max-w-3xl mx-auto">
+      {anonymousRecovery}
       <div className="flex items-center justify-between mb-4">
         <div><h1 className="text-2xl font-bold text-gray-800">{state.name}</h1><p className="text-sm text-gray-500">整体进度：{state.completedItems} / {state.totalItems}（{state.progress}%）</p><p className="text-sm text-gray-500">完成整份测评后，按权限查看单项反馈。</p></div>
         <button onClick={() => void saveAndExit()} className="btn-secondary"><Save className="w-4 h-4 inline mr-1" />保存并退出</button>

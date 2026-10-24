@@ -1,3 +1,5 @@
+import {PersonalParticipationLink} from '../../../components/participation/PersonalParticipationLink'
+import {trainingAttemptLink} from '../../../components/participation/training-participation-link'
 import { useTrainingLearnerNavigation } from '../../../training/learnerNavigation'
 import { TrainingCheckpointPanel } from '../../composite/TrainingCheckpointPanel'
 import { situationalCheckpointAnswers, situationalCheckpointUnsupported } from '../training-checkpoint-adapter'
@@ -766,6 +768,7 @@ const SituationalRunner: React.FC<{campus?:SchoolEmbeddedSituationalProps}> = ({
       actions={actions}
       navigation={navigation}
     >
+      {publicMode&&compositeAttemptId&&recoveryToken&&<details className="mb-4 rounded border p-3"><summary>保存本次匿名测评恢复链接</summary><PersonalParticipationLink url={trainingAttemptLink.link(window.location.origin,compositeAttemptId,{key:recoveryToken})} firstTime={false} fileLabel="本次情境测评" scopeNotice="恢复所属测评的当前任务，不新建身份或关联其他波次；未提交的本机情境记录请在原设备继续。" onSaved={()=>{}}/></details>}
       {!campus && embedded && data.trainingPersistence?.checkpoint ? situationalCheckpointUnsupported(data)
         ? <p role="status" className="mb-4 rounded border p-3">此情境任务依赖本机研究阶段记录或视频观看凭据，暂不支持服务器答案草稿恢复。请在原浏览器继续；不会生成或代替这些记录。</p>
         : <TrainingCheckpointPanel policy={data.trainingPersistence} definitionHash={data.checkpointDefinitionHash} publicMode={publicMode} recoveryToken={recoveryToken} disabled={saving||submitting||submissionLocked} onBusy={setCheckpointBusy} activeSlotKeys={[`situational:${compositeItemId}`]} preserveOtherDrafts

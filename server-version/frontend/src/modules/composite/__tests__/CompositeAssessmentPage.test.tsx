@@ -314,3 +314,22 @@ describe('C20 anonymous restart credential rotation', () => {
     expect(sessionStorage.getItem('composite:recovery:token:entry')).toBe('old-secret')
   })
 })
+
+it('recovers the exact single attempt from its scoped fragment without starting or linking another identity',async()=>{
+ const key='a'.repeat(43)
+ mockPublicApi.getAttempt.mockResolvedValue({code:-1,message:'Synthetic authority response'})
+ render(<MemoryRouter initialEntries={[`/public/composite/attempts/attempt-one#resume=training-attempt&key=${key}`]}><Routes>
+  <Route path="/public/composite/attempts/:attemptId" element={<CompositeAssessmentPage/>}/>
+ </Routes></MemoryRouter>)
+ await waitFor(()=>expect(mockPublicApi.getAttempt).toHaveBeenCalledWith('attempt-one','current-unit'))
+ expect(sessionStorage.getItem('composite:recovery:attempt:attempt-one')).toBe(key)
+ expect(mockPublicApi.start).not.toHaveBeenCalled()
+})
+it('does not accept a study or Survey fragment as a single attempt credential',async()=>{
+ render(<MemoryRouter initialEntries={[`/public/composite/attempts/attempt-one#resume=training-study&key=${'a'.repeat(43)}`]}><Routes>
+  <Route path="/public/composite/attempts/:attemptId" element={<CompositeAssessmentPage/>}/>
+ </Routes></MemoryRouter>)
+ expect(await screen.findByText('请输入恢复凭证后继续匿名测评')).toBeInTheDocument()
+ expect(mockPublicApi.getAttempt).not.toHaveBeenCalled()
+ expect(mockPublicApi.start).not.toHaveBeenCalled()
+})
