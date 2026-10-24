@@ -1,3 +1,4 @@
+import {assertCurrentStudyPrincipal} from '../anonymous-study/admission-principal'
 import { lockTrainingFlowFinalAdmission, requiresTrainingFlowFinalLock } from '../composite/training-variant-child-scope'
 import { onlineSituationalTaskSatisfied, SJT_ONLINE_PROTOCOL_FLAG, SJT_ONLINE_UNSATISFIED_FLAG } from './situational-task-satisfaction'
 import { normalizeSjtOnlineResponses } from './authoring/online'
@@ -273,8 +274,9 @@ const persistSituationalAttemptFinal = async (
 
   if (row.status === 'COMPLETED') {
     if (assertSubmissionReplay(row, submissionId, payloadHash) === 'replay') {
-      if (requiresTrainingFlowFinalLock(row.compositeAttemptId, row.compositeAttempt)) {
+      if (requiresTrainingFlowFinalLock(row.compositeAttemptId, row.compositeAttempt) || await assertCurrentStudyPrincipal(prisma,{attemptId:row.compositeAttemptId,userId:embedded?.userId,recoveryTokenHash:embedded?.recoveryTokenHash,attemptEpoch:input.attemptEpoch})) {
         await withFinalOnlyCompletionTransaction(async tx => {
+          await assertCurrentStudyPrincipal(tx,{attemptId:row.compositeAttemptId,userId:embedded?.userId,recoveryTokenHash:embedded?.recoveryTokenHash,attemptEpoch:input.attemptEpoch},true)
           const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: row.compositeAttemptId, parent: row.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: row.compositeItemId, sourceAttemptId: row.id, submissionId })
           assertFlowFinal(true)
         })
@@ -332,6 +334,7 @@ const persistSituationalAttemptFinal = async (
   const totalTime = Math.max(0, completedAt.getTime() - row.startedAt.getTime())
 
   const committed = await withFinalOnlyCompletionTransaction(async (tx) => {
+    await assertCurrentStudyPrincipal(tx,{attemptId:row.compositeAttemptId,userId:embedded?.userId,recoveryTokenHash:embedded?.recoveryTokenHash,attemptEpoch:input.attemptEpoch},true)
     if (embedded) await lockEmbeddedCompositeAttempt(tx, embedded.compositeAttemptId)
     const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: row.compositeAttemptId, parent: row.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: row.compositeItemId, sourceAttemptId: row.id, submissionId, parentLocked: Boolean(embedded) })
     await lockSituationalAttempt(tx, input.attemptId)

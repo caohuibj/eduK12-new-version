@@ -1,3 +1,4 @@
+import {acceptedStudyReceipt,assertCurrentStudyPrincipal,type AcceptedStudyReceipt} from '../anonymous-study/admission-principal'
 import { applyTrainingAttemptScope, hasTrainingVariantMetadata } from './training-variant-scope'
 import {readTrainingTimingSnapshot,normalizeTrainingScaleTiming,type TrainingTimingSnapshot} from '../assessment-runtime/training-scale-timing'
 import { withSharedControlContext, storeSharedWholeValidation, loadSharedWholeValidation } from '../assessment-runtime/shared-control-records'
@@ -33,7 +34,7 @@ export const wholeQuestionnaireSubmitSchema = z.object({
 }).strict()
 export type WholeQuestionnaireSubmitInput = z.infer<typeof wholeQuestionnaireSubmitSchema>
 type Principal = { userId?: string; recoveryTokenHash?: string }
-export type WholeReceiptExecution = { submissionId: string; leaseToken: string; acceptedAtMs: number }
+export type WholeReceiptExecution = { submissionId: string; leaseToken: string; acceptedAtMs: number; studyReceipt?:AcceptedStudyReceipt }
 /** Invocation-scoped verified scientific data; never an authorization cache. */
 export type WholeQuestionnaireReportContext = {
   attemptId: string; attemptEpoch: number; slotSetHash: string; contextHash: string | null;
@@ -92,13 +93,14 @@ export const copyWholeCommittedReportParent = (parent: WholeReportParent,
 })
 
 const failure = (message: string, status = 409) => new InstrumentFinalSubmitError('STALE_ATTEMPT', message, status)
-const loadParent = async (attemptId: string, principal: Principal, preloaded?: WholeReportParent) => {
+const loadParent = async (attemptId: string, principal: Principal, preloaded?: WholeReportParent, receipt?:AcceptedStudyReceipt) => {
   const loaded = preloaded ?? await prisma.compositeAssessmentAttempt.findUnique({ where: { id: attemptId }, select: wholeParentSelect })
   if (!loaded) throw failure('问卷作答不存在', 404)
   let parent = loaded
   const owned = principal.userId ? parent.userId === principal.userId
     : parent.userId === null && Boolean(principal.recoveryTokenHash && parent.recoveryTokenHash === principal.recoveryTokenHash)
-  if (!owned) throw failure('无权限操作此问卷', 403)
+  const accepted=receipt && await assertCurrentStudyPrincipal(prisma,{attemptId,userId:principal.userId,recoveryTokenHash:principal.recoveryTokenHash,attemptEpoch:parent.attemptEpoch,receipt})
+  if (!accepted && !owned) throw failure('无权限操作此问卷', 403)
   if(parent.trainingFlowSnapshotHash!=null||parent.compositeAssessment.trainingFlowFrozen!=null)throw failure('条件流程必须按当前工具逐项提交')
   parent = await applyTrainingAttemptScope(parent) as typeof loaded
   if (parent.asyncReportEpoch !== parent.attemptEpoch && !acceptsAsyncCompositeReport(parent)) throw failure('此问卷尚未启用整份交卷')
@@ -182,7 +184,7 @@ export const getWholeQuestionnaireDefinition = async (attemptId: string, princip
   for (const { child, runtime } of children) {
     if (child.status !== 'IN_PROGRESS') throw failure('已分量表交卷，不能改为整份交卷')
     const admission = await ensureScaleAdmissionAtDelivery(child.id, parent, child)
-    assertUnifiedScaleDelivery({ assessmentId: child.id, compositeAttemptId: attemptId, submissionId: 'whole-delivery-validation',
+    await assertUnifiedScaleDelivery({ assessmentId: child.id, compositeAttemptId: attemptId, submissionId: 'whole-delivery-validation',
       attemptEpoch: parent.attemptEpoch, definitionHash: runtime.legacyDefinitionHash, contextSnapshotHash: parent.contextSnapshotHash, answers: [], ...principal }, child, admission, runtime)
     const sets = new Map(runtime.definition.responseSets.map(set => [set.key, set.options.map(option => option.value)]))
     const ruleItems = runtime.definition.items.map(item => ({ itemCode: item.itemCode, required: Boolean(item.required), values: sets.get(item.responseSetKey)! }))
@@ -369,13 +371,14 @@ export const processWholeQuestionnaireAnswers = async (job: CompositeReportJob,
       units: envelope.units.map(unit => ({ itemId: unit.itemId, definitionHash: unit.definitionHash, answers: unit.answers,
         ...(unit.itemTimings!==undefined ? {itemTimings:unit.itemTimings} : {}),
         ...(unit.deviceInputProvenance ? { deviceInputProvenance: unit.deviceInputProvenance } : {}) })) },envelope.timingSnapshotHash)).hash !== receipt.wholePayloadHash) throw failure('整份答案封存内容无法验证')
+  execution.studyReceipt=await acceptedStudyReceipt(job,envelope)
   const principal = envelope.units[0]?.userId ? { userId: envelope.units[0].userId } : { recoveryTokenHash: envelope.units[0]?.recoveryTokenHash }
   const reuseCommitted = process.env.ASSESSMENT_REPORT_COMMITTED_CONTEXT_ENABLED === 'true'
   const { parent, children, frozen, reportParent } = await traceAssessmentPhase('report.frozen_context_load', async () => {
     const reportParent = reuseCommitted ? await prisma.compositeAssessmentAttempt.findUnique({
       where: { id: job.attemptId }, select: wholeReportParentSelect,
     }) : undefined
-    const loaded = await loadParent(job.attemptId, principal, reportParent ?? undefined)
+    const loaded = await loadParent(job.attemptId, principal, reportParent ?? undefined, execution.studyReceipt)
     return { ...loaded, reportParent: reportParent ?? undefined }
   })
   assertReportJobIdentity(parent, { attemptEpoch: job.attemptEpoch, slotSetHash: job.slotSetHash, contextHash: job.contextHash })

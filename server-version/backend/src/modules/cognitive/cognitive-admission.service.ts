@@ -1,3 +1,4 @@
+import {stableStudyAdmissionHash} from '../anonymous-study/admission-principal'
 import { assertTrainingChildSelected, loadTrainingChildAdmissionParent, TRAINING_VARIANT_PARENT_MARKER_SELECT } from '../composite/training-variant-child-scope'
 import { isCognitiveNewAdmissionEnabled } from './product-eligibility'
 import { loadStoredUnitAdmission } from '../assessment-runtime/unit-admission'
@@ -222,7 +223,7 @@ export const activateCognitiveAdmission = async (
       cognitive,
       principal: {
         userId: row.userId ?? loaded.userId,
-        recoveryTokenHash: loaded.recoveryTokenHash,
+        recoveryTokenHash: await stableStudyAdmissionHash(prisma,loaded.id,loaded.recoveryTokenHash,row.userId ?? loaded.userId),
       },
       parent: {
         kind: 'composite',

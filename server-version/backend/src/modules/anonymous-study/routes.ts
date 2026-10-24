@@ -38,13 +38,26 @@ anonymousStudyRouter.get('/:studyId/waves/:waveId/export.csv',wrap(async(req,res
 export const publicAnonymousStudyRouter=Router()
 publicAnonymousStudyRouter.use(noStore,rateLimit({windowMs:15*60*1000,limit:150,standardHeaders:'draft-7',legacyHeaders:false,
   validate:{keyGeneratorIpFallback:false},keyGenerator:req=>hashRecoveryToken(credential(req) || req.ip || 'unknown')}))
+// Always retain an IP budget for code guesses, independently of attacker-supplied
+// bearer headers. The shared scrypt admission gate separately bounds CPU work.
+publicAnonymousStudyRouter.use(['/waves/:waveId/join','/:studyId/code/recover','/:studyId/code/reset'],
+ rateLimit({windowMs:15*60*1000,limit:30,standardHeaders:'draft-7',legacyHeaders:false}))
 publicAnonymousStudyRouter.post('/waves/:waveId/info',wrap(async(req,res)=>{
   const body=z.object({token:z.string().min(20).max(200)}).strict().parse(req.body)
   return success(res,await service.publicWaveInfo(id.parse(req.params.waveId),body.token))
 }))
 publicAnonymousStudyRouter.post('/waves/:waveId/join',wrap(async(req,res)=>{
-  const body=z.object({token:z.string().min(20).max(200),consent:z.literal(true)}).strict().parse(req.body)
-  return success(res,await service.joinStudy(id.parse(req.params.waveId),body.token,body.consent))
+  const body=z.object({token:z.string().min(20).max(200),consent:z.literal(true),prefix:z.string().max(40).optional(),suffix:z.string().max(40).optional(),generatedCode:z.literal(true).optional()}).strict().parse(req.body)
+  return success(res,await service.joinStudy(id.parse(req.params.waveId),body.token,body.consent,body))
+}))
+publicAnonymousStudyRouter.get('/:studyId/participation-info',wrap(async(req,res)=>success(res,await service.publicParticipationInfo(id.parse(req.params.studyId)))))
+publicAnonymousStudyRouter.post('/:studyId/code/recover',wrap(async(req,res)=>{
+ const body=z.object({code:z.string().max(64)}).strict().parse(req.body)
+ return success(res,await service.recoverParticipationCode(id.parse(req.params.studyId),body.code))
+}))
+publicAnonymousStudyRouter.post('/:studyId/code/reset',wrap(async(req,res)=>{
+ const body=z.object({resetCode:z.string().max(64),suffix:z.string().max(40)}).strict().parse(req.body)
+ return success(res,await service.completeParticipationReset(id.parse(req.params.studyId),body.resetCode,body.suffix))
 }))
 publicAnonymousStudyRouter.get('/:studyId',wrap(async(req,res)=>success(res,await service.participantHome(id.parse(req.params.studyId),credential(req)))))
 publicAnonymousStudyRouter.post('/:studyId/waves/:waveId/start',wrap(async(req,res)=>success(res,await service.startStudyWave(id.parse(req.params.studyId),id.parse(req.params.waveId),credential(req)))))
@@ -59,3 +72,17 @@ publicAnonymousStudyRouter.post('/:studyId/research-consent/accept',wrap(async(r
 publicAnonymousStudyRouter.post('/:studyId/research-withdrawal',wrap(async(req,res)=>success(res,await governance.withdrawStudyResearch(id.parse(req.params.studyId),credential(req),z.object({requestId:id,expectedRevision:z.number().int().nonnegative()}).strict().parse(req.body)))))
 
 anonymousStudyRouter.get('/:studyId/research-withdrawals',wrap(async(req,res)=>success(res,await governance.listStudyWithdrawals(req.user!.userId,id.parse(req.params.studyId),z.coerce.number().int().min(1).max(240).default(1).parse(req.query.page)))))
+
+anonymousStudyRouter.get('/:studyId/participation',wrap(async(req,res)=>success(res,await service.readParticipationSettings(req.user!.userId,id.parse(req.params.studyId),z.coerce.number().int().min(1).max(50).default(1).parse(req.query.page)))))
+anonymousStudyRouter.put('/:studyId/participation',wrap(async(req,res)=>{
+ const body=z.object({revision:z.number().int().nonnegative(),mode:z.enum(['PERSONAL_LINK','MEMORABLE_CODE','SELF_CODE']),label:z.string().trim().min(1).max(40),instructions:z.string().max(500),shortCodes:z.array(z.string().max(40)).max(5000)}).strict().parse(req.body)
+ return success(res,await service.configureParticipation(req.user!.userId,id.parse(req.params.studyId),body))
+}))
+// Training owner approval is the product boundary; Survey MFA/cookies are never
+// accepted as a substitute. Global CSRF and Training authentication still apply.
+anonymousStudyRouter.post('/:studyId/participation/reset',
+ rateLimit({windowMs:15*60*1000,limit:30,standardHeaders:'draft-7',legacyHeaders:false}),
+ wrap(async(req,res)=>{
+  const body=z.object({prefix:z.string().min(1).max(40),confirmed:z.literal(true)}).strict().parse(req.body)
+  return success(res,await service.resetParticipationCode(req.user!.userId,id.parse(req.params.studyId),body.prefix))
+ }))
