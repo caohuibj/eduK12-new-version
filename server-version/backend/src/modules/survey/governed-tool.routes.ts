@@ -19,7 +19,7 @@ import * as packages from './governed-package.service'
 import {readGovernedPackageReports,listGovernedPackageReports} from './governed-package.reports'
 const uuid=z.string().uuid(),hash=z.string().regex(/^[a-f0-9]{64}$/),text=z.string().trim().min(1).max(200),version=z.string().trim().min(1).max(120),reason=z.string().trim().min(1).max(2000),page=z.coerce.number().int().min(1).max(10000).default(1)
 const ref=z.object({kind:z.enum(['SCALE','COGNITIVE','SJT','FORM']),sourceId:z.string().min(1).max(200),sourceVersion:z.string().min(1).max(120),organizationId:uuid.optional()}).strict()
-const metadata=z.record(z.unknown()).refine(v=>Buffer.byteLength(JSON.stringify(v),'utf8')<=65536,'Reference 超过保存预算')
+const metadata=z.record(z.string(),z.unknown()).refine(v=>Buffer.byteLength(JSON.stringify(v),'utf8')<=65536,'Reference 超过保存预算')
 const handle=(work:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{try{return success(res,await work(req))}catch(e){if(e instanceof z.ZodError)return error(res,'请检查版本、组件与报告字段',-1,400);if(e instanceof AdminPermissionError||e instanceof CatalogSourceError||e instanceof SurveyBuilderError)return error(res,e.message,-1,e.statusCode);if(e instanceof SurveyDraftError)return error(res,'内容无法由当前 Survey 播放器运行：'+e.issues.map(i=>i.message).join('；'),-1,409);next(e)}}
 export const surveyGovernedToolsRouter=Router()
 surveyGovernedToolsRouter.use(authenticate,createRedisRateLimiter({name:'survey-governed-tools',limit:120,windowSeconds:300,key:req=>req.user?.userId??req.ip??'unknown'}),async(req,res,next)=>{try{await serviceCheck(req,'SYSTEM');res.setHeader('Cache-Control','no-store');next()}catch(e){next(e)}})
@@ -30,7 +30,7 @@ surveyGovernedToolsRouter.get('/catalog',handle(req=>service.governedCatalog(req
 surveyGovernedToolsRouter.get('/components',handle(req=>service.governedComponentOptions(req.user!.userId)))
 surveyGovernedToolsRouter.get('/versions/:id',handle(req=>service.governedDetail(req.user!.userId,uuid.parse(req.params.id))))
 surveyGovernedToolsRouter.use(requireRecentAdminKey)
-const originalSjt=z.object({requestId:uuid,toolKey:z.string().regex(/^[a-z][a-z0-9_-]{0,100}$/),version,title:text,definition:z.record(z.unknown()),statement:reason,parameterReleaseId:uuid.nullable().optional(),report:z.object({version,template:reportTemplateSchema}).strict().nullable(),reference:metadata}).strict()
+const originalSjt=z.object({requestId:uuid,toolKey:z.string().regex(/^[a-z][a-z0-9_-]{0,100}$/),version,title:text,definition:z.record(z.string(),z.unknown()),statement:reason,parameterReleaseId:uuid.nullable().optional(),report:z.object({version,template:reportTemplateSchema}).strict().nullable(),reference:metadata}).strict()
 surveyGovernedToolsRouter.post('/original-sjt/preview',handle(req=>service.previewOriginalSjt(req.user!.userId,originalSjt.parse(req.body),req.user!)))
 surveyGovernedToolsRouter.post('/submissions/original-sjt',handle(req=>service.submitOriginalSjt(req.user!.userId,originalSjt.parse(req.body),req.user!)))
 surveyGovernedToolsRouter.post('/submissions/source',handle(req=>service.submitGovernedSource(req.user!.userId,z.object({requestId:uuid,source:ref,version,title:text,parameterReleaseId:uuid.nullable().optional(),report:z.object({version,template:reportTemplateSchema}).strict().nullable(),reference:metadata}).strict().parse(req.body),req.user!)))
