@@ -13,7 +13,7 @@ export function surveyReviewPlan(entries,base,head,read=git,env=process.env){
  assert.notEqual(env.CI_FORCE_FULL,'true','No full-platform fallback');assert.notEqual(env.CI_FULL_ACCEPTANCE,'true','No full acceptance');
  assert.equal(base,binding.base,'Frozen main changed');assert.match(head,/^[a-f0-9]{40}$/);
  assert.equal(binding.base,'3ee60da761bf777da833f77e81565c5b3d5898a1');
- assert.equal(binding.product,'5598672038f7eea6f6a089502d9ba85c6d2d732c');
+ assert.equal(binding.product,'9441748a57cf8af1de300170247beeef95dee3c6');
  if(env.CI_EVENT==='pull_request'){
   assert.equal(ref,branch);assert.equal(env.CI_PR_REPOSITORY||env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');
   assert.equal(String(env.CI_PR_NUMBER),'350','Exact PR required');assert.match(env.CI_SOURCE_HEAD||'',/^[a-f0-9]{40}$/);

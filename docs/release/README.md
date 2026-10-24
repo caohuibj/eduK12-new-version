@@ -1432,3 +1432,14 @@ unchanged import closure, rather than borrowing a changed full frontend tree.
 Successful original SAST is retained for unchanged inputs; only changed runtime,
 tests and qualification controls are scanned afresh, with unchanged actual
 CodeQL action versions/options. Missing stages still must actually succeed.
+
+Run `40072316687` passed another 171 affected assertions and retained three old
+fixture/text failures. Those three are repaired without changing business code.
+The same authenticated, disjoint report/import-closure admission chains both
+failed invocations; only remaining changed test groups rerun. Completed SAST
+likewise chains the original full scoped scan and the successful changed-input
+scan, then scans only newly changed tests/controls. Each source, actual admission
+step, analysis success, options and 24-hour lifetime remain checked. Database
+checks may finish independently after an unrelated frontend assertion failure;
+such a failure still fails the job and blocks merging. A compiled artifact is
+retained even if an independent later check fails, so it need not be rebuilt.

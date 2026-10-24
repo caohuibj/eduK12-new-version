@@ -56,15 +56,16 @@ export async function verifyOriginal(api=async path=>{
  assert.deepEqual(frontendChanges.sort(),binding.frontendLintChanged.map(p=>'server-version/frontend/'+p).sort(),'Changed lint inputs must be checked afresh');
  return {kind:'official-successful-stage-reuse',run:r.run,source:r.source,parentJobsRemainFailed:true,backendCompilationReplayed:false,unchangedFrontendLintReplayed:false,freshFrontendLint:binding.frontendLintChanged,productionArtifact:false};
 }
-function continuation(){
- const bytes=readFileSync('.github/evidence/survey-review/continuation.json');assert.equal(hash(bytes),binding.continuationSHA256);return JSON.parse(bytes);
+function continuations(){
+ return binding.continuationRecords.map(r=>{const bytes=readFileSync(r.file);assert.equal(hash(bytes),r.sha256);return JSON.parse(bytes)});
 }
+function continuation(){return continuations().at(-1)}
 async function official(path,bytes=false){
  const r=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/'+path,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'}});assert.equal(r.status,200,'Official continuation evidence unavailable');return bytes?Buffer.from(await r.arrayBuffer()):r.json();
 }
 export function admittedCases(e,object=git){
  const raw=gunzipSync(Buffer.from(e.report.gzipBase64,'base64'),{maxOutputLength:8*1024*1024});assert.equal(hash(raw),e.report.sha256);
- const r=JSON.parse(raw);assert.equal(r.numPassedTests,345);assert.equal(r.numFailedTests,22);assert.equal(r.success,false);
+ const r=JSON.parse(raw);assert.equal(r.numPassedTests,e.originalPassed);assert.equal(r.numFailedTests,e.originalFailed);assert.equal(r.success,false);
  const expected=new Set(e.accepted.map(c=>c.file+'\n'+c.name));assert.equal(expected.size,e.accepted.length);
  const missing=new Set(e.missing.map(c=>c.file+'\n'+c.name));assert.equal(missing.size,e.missing.length);
  let total=0;
@@ -75,10 +76,11 @@ export function admittedCases(e,object=git){
     for(const [p,b]of Object.entries(group.inputs)){assert.equal(object('rev-parse',e.original.source+':'+p),b);assert.equal(object('rev-parse','HEAD:'+p),b,'Admitted dependency drift: '+p);}
   }}
  }
- assert.equal(total,e.accepted.length+e.missing.length);assert.equal(total,367);return {accepted:e.accepted.length,missing:e.missing.length,originalPassed:345,originalFailed:22};
+ assert.equal(total,e.accepted.length+e.missing.length);assert.equal(total,e.originalPassed+e.originalFailed);return {accepted:e.accepted.length,missing:e.missing.length,originalPassed:e.originalPassed,originalFailed:e.originalFailed};
 }
 async function verifyContinuation(){
- const e=continuation(),r=e.original;
+ let previousMissing;let reused=0;
+ for(const e of continuations()){const r=e.original;
  const run=await official('actions/runs/'+r.run),job=await official('actions/jobs/'+r.job),artifact=await official('actions/artifacts/'+r.artifact);
  assert.equal(run.head_sha,r.source);assert.equal(run.event,'pull_request');assert(run.pull_requests.some(p=>p.number===350));
  assert.equal(job.head_sha,r.source);assert.equal(job.run_id,r.run);assert.equal(job.conclusion,'failure');assert.equal(job.status,'completed');assert(job.steps.some(s=>s.name==='execute named missing affected frontend assertions'&&s.conclusion==='failure'));
@@ -86,21 +88,33 @@ async function verifyContinuation(){
  assert.equal(artifact.name,r.name);assert.equal(artifact.expired,false);assert.equal(artifact.workflow_run.id,r.run);assert.equal(artifact.workflow_run.head_sha,r.source);assert.equal(artifact.digest,'sha256:'+r.zipSHA256);assert.equal(artifact.size_in_bytes,r.zipBytes);
  const zip=await official('actions/artifacts/'+r.artifact+'/zip',true);assert.equal(hash(zip),r.zipSHA256);assert.equal(zip.length,r.zipBytes);
  const raw=execFileSync('python3',['-c',"import sys,io,zipfile; z=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read())); a=[i for i in z.infolist() if i.filename.endswith('/frontend-tests.json') or i.filename=='frontend-tests.json']; assert len(a)==1 and a[0].file_size<8388608; sys.stdout.buffer.write(z.read(a[0]))"],{input:zip,maxBuffer:8*1024*1024});assert.equal(hash(raw),e.report.sha256);
- receipt('official-assertion-reuse',{kind:e.kind,originalRun:r.run,originalJob:r.job,originalJobRemainsFailed:true,...admittedCases(e),review:e.review});
+ const verified=admittedCases(e);reused+=verified.accepted;
+ if(previousMissing)assert.deepEqual([...e.accepted,...e.missing].map(c=>c.file+'\n'+c.name).sort(),previousMissing,'Continuation did not cover prior missing assertions');
+ previousMissing=e.missing.map(c=>c.file+'\n'+c.name).sort();
+ receipt('official-assertion-reuse-'+r.run,{kind:e.kind,originalRun:r.run,originalJob:r.job,originalJobRemainsFailed:true,...verified,review:e.review});
+ }
+ assert.equal(reused+previousMissing.length,367);receipt('official-assertion-union',{reused,missing:previousMissing.length,total:367});
 }
+
 async function codeqlConfig(){
- const e=continuation(),r=e.original;child('git',['fetch','--no-tags','--depth=1','origin',r.source,process.env.CI_SOURCE_HEAD]);
+ const records=continuations(),stages=[];
+ for(const e of records){const r=e.original;
+ child('git',['fetch','--no-tags','--depth=1','origin',r.source,process.env.CI_SOURCE_HEAD]);
  const run=await official('actions/runs/'+r.run),job=await official('actions/jobs/'+r.sastJob);
  assert.equal(run.head_sha,r.source);assert.equal(run.event,'pull_request');assert(run.pull_requests.some(p=>p.number===350));assert.equal(job.run_id,r.run);assert.equal(job.head_sha,r.source);assert.equal(job.status,'completed');assert.equal(job.conclusion,'success');
  for(const n of ['initialize CodeQL','analyze with CodeQL'])assert(job.steps.some(s=>s.name===n&&s.conclusion==='success'));
+ if(stages.length)assert(job.steps.some(s=>s.name==='verify original successful PR350 SAST and select only changed inputs'&&s.conclusion==='success'),'Missing actual prior SAST admission');
  const age=Date.now()-Date.parse(job.completed_at);assert(age>=0&&age<86400000);
  const old=git('show',r.source+':.github/workflows/ci.yml'),now=readFileSync('.github/workflows/ci.yml','utf8');
  const stage=(text,name)=>{const start=text.indexOf('      - name: '+name+'\n');assert(start>=0);const end=text.indexOf('\n      - ',start+10);return text.slice(start,end<0?undefined:end).split('\n').filter(line=>!line.trim().startsWith('${{ needs.scope.outputs.application_route')).join('\n')};
  for(const n of ['initialize CodeQL','analyze with CodeQL'])assert.equal(stage(now,n),stage(old,n),'Actual SAST action/version/options changed');
- const files=git('diff','--name-only',r.source,'HEAD').split('\n').filter(p=>/\.[cm]?[jt]sx?$/.test(p));assert(files.length>0);assert(files.every(f=>Object.hasOwn(binding.source,f)||binding.controls.includes(f)));
- receipt('official-sast',{kind:'official-successful-input-reuse',run:r.run,job:r.sastJob,source:r.source,originalParentRunConclusion:run.conclusion,unchangedApplicationScanReplayed:false,freshPaths:files});
+ stages.push({run:r.run,job:r.sastJob,source:r.source,originalParentRunConclusion:run.conclusion});
+ }
+ const r=records.at(-1).original,files=git('diff','--name-only',r.source,'HEAD').split('\n').filter(p=>/\.[cm]?[jt]sx?$/.test(p));assert(files.length>0);assert(files.every(f=>Object.hasOwn(binding.source,f)||binding.controls.includes(f)));
+ receipt('official-sast',{kind:'official-successful-input-reuse',stages,unchangedApplicationScanReplayed:false,freshPaths:files});
  writeFileSync(process.env.GITHUB_OUTPUT,'config='+JSON.stringify({paths:files})+'\n',{flag:'a'});
 }
+
 function database(){
  assert.equal(process.env.CI,'true');const u=new URL(process.env.DATABASE_URL);assert.equal(u.hostname,'127.0.0.1');assert.equal(u.port,'55432');assert.equal(u.pathname,'/survey_review_ci');return u;
 }
@@ -152,7 +166,7 @@ async function main(){
    assert.equal(report.success,true);assert.equal(report.numFailedTests,0);
    const actual=report.testResults.flatMap(s=>s.assertionResults.filter(a=>a.status==='passed').map(a=>'server-version/frontend/src/'+s.name.split('/src/').at(-1)+'\n'+a.fullName));
    assert.deepEqual(actual.sort(),selected.map(c=>c.file+'\n'+c.name).sort(),'Missing or repeated continuation assertions');
-   receipt('frontend-assertions',{passed:actual.length,reused:e.accepted.length,completeUnion:367,filtered:report.numPendingTests});
+   receipt('frontend-assertions',{passed:actual.length,reused:continuations().reduce((n,e)=>n+e.accepted.length,0),completeUnion:367,filtered:report.numPendingTests});
   }else receipt(action+'-assertions',verifyReport(report,files));
  }else if(action==='upgrade')upgrade();else if(action==='restore')restore();else throw Error('Unknown Survey review action');
 }

@@ -1,7 +1,7 @@
 {
   "schema": 1,
   "base": "3ee60da761bf777da833f77e81565c5b3d5898a1",
-  "product": "5598672038f7eea6f6a089502d9ba85c6d2d732c",
+  "product": "9441748a57cf8af1de300170247beeef95dee3c6",
   "source": {
     "server-version/backend/prisma/migrations/20261024020000_survey_memorable_participation/migration.sql": {
       "status": "A",
@@ -274,7 +274,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "4dd5920257b53832b865f85839af8ffbec823a4a",
-      "after": "ddb09d02d9c501482026b5f747b08c7fe5010340"
+      "after": "c88d318656db84c1994ddf50a1a4a6a5476295d6"
     },
     "server-version/frontend/src/survey/SurveyMemorableCode.tsx": {
       "status": "A",
@@ -351,7 +351,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "38d133ea5ffccacb5d09d0b28a2d605506abd47e",
-      "after": "7d84599044134fe7d07cd24c95a903780bb656f1"
+      "after": "0e71b4d1a8b445c8a51fad3a8ee105f5c0dcd818"
     },
     "server-version/frontend/src/survey/SurveyRandomCodeEntry.tsx": {
       "status": "A",
@@ -393,7 +393,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "910714f3b545c30823b488f482df3efc91811f25",
-      "after": "0319340d234c50f165db9ffec0f21606f551f65b"
+      "after": "7db59377867acbeaa64abf76e62e85cde355f630"
     },
     "server-version/frontend/src/survey/SurveyToolLibrary.test.tsx": {
       "status": "M",
@@ -567,7 +567,8 @@
     ".github/scripts/merge-gate.mjs",
     ".github/workflows/ci.yml",
     "docs/release/README.md",
-    ".github/evidence/survey-review/continuation.json"
+    ".github/evidence/survey-review/continuation.json",
+    ".github/evidence/survey-review/continuation2.json"
   ],
   "controlBefore": {
     ".github/scripts/content-scope.mjs": "4b2a9c947fcd67b25b2a4f13b84ee385353afcc0",
@@ -576,7 +577,7 @@
     "docs/release/README.md": "563b99298f5869fcdc3d1e1ce5a72c986dfc06bb"
   },
   "components": {
-    "frontend": "aae919ec26f6219018468cdfa7cbbacb2fe0470f",
+    "frontend": "daad986559086baedb473fd7a79338b3537bdabd",
     "backend": "f9799a5560fc0c01fd9af8fde67599dba2a4d614"
   },
   "protectedInputs": {
@@ -832,5 +833,15 @@
     "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
     "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
   },
-  "continuationSHA256": "5285dc6e7f5b82f0777bc4af04acdf7752c636f0ec4ddec73373b98d56d59d8f"
+  "continuationSHA256": "5285dc6e7f5b82f0777bc4af04acdf7752c636f0ec4ddec73373b98d56d59d8f",
+  "continuationRecords": [
+    {
+      "file": ".github/evidence/survey-review/continuation.json",
+      "sha256": "5285dc6e7f5b82f0777bc4af04acdf7752c636f0ec4ddec73373b98d56d59d8f"
+    },
+    {
+      "file": ".github/evidence/survey-review/continuation2.json",
+      "sha256": "4e75885b959399213c308b2506e758ae45f30e75fce3bd52707cffbc40a7f8e3"
+    }
+  ]
 }

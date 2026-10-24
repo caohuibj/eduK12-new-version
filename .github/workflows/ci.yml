@@ -731,6 +731,7 @@ jobs:
         with:
           node-version: '24.21.0'
       - name: verify PR350 scope, reviewed FINAL results and original successful CI stages
+        id: survey-admission
         env:
           GH_TOKEN: ${{ github.token }}
         run: node .github/scripts/survey-review-checks.mjs admission
@@ -747,24 +748,36 @@ jobs:
         working-directory: server-version/backend
         run: npm ci --ignore-scripts --no-audit --no-fund
       - name: generate Prisma declarations without modifying running services
+        id: survey-prisma
         working-directory: server-version/backend
         run: node node_modules/prisma/build/index.js generate
       - name: check current integrated frontend application types
+        id: survey-types
         working-directory: server-version/frontend
         run: node node_modules/typescript/bin/tsc -p tsconfig.app.json --noEmit
       - name: lint only inputs changed since original successful full lint
+        id: survey-lint
         run: node .github/scripts/survey-review-checks.mjs lint
       - name: execute named missing affected frontend assertions
+        id: survey-frontend-tests
         run: node .github/scripts/survey-review-checks.mjs frontend
       - name: upgrade isolated main database and preserve existing anonymous identity
+        id: survey-upgrade
+        if: ${{ !cancelled() && steps.survey-admission.outcome == 'success' && steps.survey-prisma.outcome == 'success' }}
         run: node .github/scripts/survey-review-checks.mjs upgrade
       - name: execute affected authority, FINAL and native PostgreSQL linkage assertions
+        id: survey-backend-tests
+        if: ${{ !cancelled() && steps.survey-upgrade.outcome == 'success' }}
         run: node .github/scripts/survey-review-checks.mjs backend
       - name: prove restore preserves participant links, registry and immutable finals
+        id: survey-restore
+        if: ${{ !cancelled() && steps.survey-backend-tests.outcome == 'success' }}
         env:
           CI_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
         run: node .github/scripts/survey-review-checks.mjs restore
       - name: compile the frontend candidate once
+        id: survey-build
+        if: ${{ !cancelled() && steps.survey-types.outcome == 'success' && steps.survey-lint.outcome == 'success' && steps.survey-frontend-tests.outcome == 'success' }}
         working-directory: server-version/frontend
         run: node node_modules/vite/bin/vite.js build
       - name: retain exact qualification evidence
@@ -778,6 +791,7 @@ jobs:
           if-no-files-found: error
           retention-days: 3
       - name: retain the single frontend artifact
+        if: ${{ !cancelled() && steps.survey-build.outcome == 'success' }}
         uses: actions/upload-artifact@v4
         with:
           name: survey-review-frontend-${{ github.sha }}
