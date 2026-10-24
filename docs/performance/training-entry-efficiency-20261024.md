@@ -638,3 +638,57 @@ phase is a reused, not freshly reset, baseline. Background maintenance and
 allocation differ; one new complex WAL sample reached 983,424 bytes. The strongest
 result is the verified per-scale SQL removal with unchanged outputs/durable data;
 CPU/time directions remain bounded observations. API/PostgreSQL stopped afterward.
+
+## Stage 1: type-aware completed-report loading (2026-10-24)
+
+Candidate `d01f77b5f54f605fde97b1285fc9d46e9f3d7186` (tree
+`f61888c101828e9ff0f8924d0eea8e42611cb9b9`) is compared with the immediately
+preceding `4bb8825e` five samples/type, reused without a baseline rerun. The same
+unchanged execution harness, three warmups, five interleaved sequential rounds,
+compact-query protocol and frozen source/hash manifests were used. The local
+artifact set is retained as `training-repeat-type-aware-evidence-20261024` outside
+the repository. Local focused checks and backend types passed before measurement;
+this is not CI/build/deployment qualification.
+
+The report loader validates the frozen slot manifest and epoch, adds four
+relation-count subqueries to its existing parent SELECT, and skips only absent
+type relations whose counts are zero. It does not remove transaction, admission,
+feedback policy or finalization checks. Fewer SQL events therefore do not mean
+proportionately less database work: the count subqueries themselves have a cost.
+
+Means of five, with observed min–max in brackets:
+
+| Case | Total POST→report ms, previous→new | API CPU ms, previous→new | SQL events, previous→new |
+|---|---|---|---:|
+| 40 questions | 128.1 [116.4–148.8] →150.3 [124.4–172.2] | 80.9 [75.8–88.8] →86.2 [76.5–96.9] | 84→80 |
+| 300 questions | 378.4 [357.9–412.2] →368.8 [345.5–393.7] | 249.0 [233.2–263.3] →222.2 [214.5–231.1] | 212→208 |
+| Mixed317 | 570.7 [543.0–591.8] →580.3 [534.5–683.8] | 365.2 [341.4–385.6] →340.8 [326.2–355.4] | 346→345 |
+
+Every sample matches the expected report-GET SQL change: 11→7 /11→7 /12→11.
+Mixed retains form/SJT reads and skips only the absent cognitive relation.
+Report-GET wall means were 15.55→16.33 /25.73→24.93 /31.14→32.13 ms; API CPU
+means were 9.41→9.36 /21.43→20.03 /25.45→23.35 ms. Whole-flow mean wall time
+worsened 17.3% for simple and 1.7% for mixed, while complex improved 2.5%.
+Whole-flow CPU changed +6.6% /−10.8% /−6.7%. The direct SQL reduction is verified;
+a general speedup is not established, and unrelated stage variation cannot be
+attributed to this report-only change. No favorable-result reruns were performed.
+
+All reused/new reports pass the same explicit semantic normalization/equivalence
+checks above. HTTP JSON remains 14,040 /105,342 bytes for scale-only cases;
+mixed mean 169,731.6→169,732.4 bytes varies with recorded time. Logical durable
+row growth is unchanged at 29,522 /166,490 /196,883 bytes. Actual DB→API protocol
+means were 195,735→204,739 /1,136,387→1,136,927 /1,544,844→1,549,507 bytes.
+New protocol totals vary across repetitions despite stable query counts; protocol
+setup/preparation overhead is included and its cause was not isolated. Do not
+claim a DB bandwidth reduction from removing these empty-relation queries.
+
+Mean API peak RSS was 383.4→392.1 /384.6→393.2 /385.9→395.0 MiB; scoped PG PSS
+peaks were 73.9→85.3 /74.5→85.5 /74.1→86.2 MiB. Coarse per-PID observed PG CPU
+means were 12→20 /40→42 /62→58 ms. Memory/CPU sampling limitations above remain;
+this is not a demonstrated memory improvement. Physical relation growth means
+were 39,322→34,406 /190,054→194,970 /235,930→255,590 bytes; WAL means were
+45,752→48,602 /362,488→211,203 /261,965→305,107 bytes. These allocation and
+maintenance-sensitive figures are observations, not storage optimization claims.
+The preserved database grew from 2,777 rows before fixture creation to 3,275
+before warmups and 3,497 afterward. Growing database/process history and enabled
+autovacuum remain comparison confounds. API and PostgreSQL stopped after the run.
