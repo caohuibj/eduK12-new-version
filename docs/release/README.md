@@ -1270,3 +1270,46 @@ classify the merged diff; they do not repeat the PR application checks.
 ### Training / Survey 4C4G 容量修订（2026-10-24）
 
 `work/training-survey-capacity-20261024` 从 `902144e636905ab372ff4a0c7cbfd1b88bffba47` 冻结独立云端容量候选。仅修改认证学员准入锁、Survey 团体 IP 豁免查询繁忙时的普通限流路径，以及公共静态文件传输；不更改题目、计分、冻结版本或生产配置。`participant-capacity` 精确路线绑定完整差异，接纳同一输入已完成的云端后端编译；Actions 只执行受影响限流/持久化契约、真实隔离 PostgreSQL 并发与归档边界、Nginx HTTP 契约和当前 SAST。依赖、前端 JS 和数据库结构不变，不重复应用构建、全量回归或服务器验收。压测是独立合成负载观察，不能代替正式合并门禁或生产容量承诺。
+
+## Training management PR347 bounded integration (2026-10-24)
+
+The user approved this exact CI configuration and merge after success. Only PR347,
+`work/survey-training-branding-20261023`, base `67d0c77034aea3c3cf1ee118eb65ab3aafe7b6eb`
+and product `83510bae28a8bd54d1c05dc0fb951b4e346b898d` enter
+`training-admin-integration`. Complete raw paths/modes/blobs, component trees,
+protected dependency/schema/config inputs and actual source/checkout trees are
+pinned. Unknown changes, base drift, missing marker and manual/full/probe requests
+fail without a platform fallback. Other candidates retain their existing rules.
+
+Sixteen unchanged course assertions and matching per-file lint are admitted from
+original retained local reports, checked against their recorded SHA256 and the
+complete relative JS/TS import closure, setup and locked configuration. These are
+reviewed-local-evidence, ciExecuted=false, originalExecutionSigned=false; Git
+input reconstruction is reviewed after execution and complete historical
+node_modules bytes were not recorded. Prior type failure and its successful
+repair remain historical, not current integrated qualification. Changed test
+locators, renamed user headings and merged shared login/shell inputs invalidate
+those prior assertions; only their named direct consumers run in Actions.
+
+Actions performs new refusal/admission/gate contracts, current app types, missing
+changed-file lint, named affected frontend consumers, one Vite compile, current
+backend types and the two small management-query test modules, plus current
+changed application/control JS/TS CodeQL. Dependencies and schema are unchanged;
+no dependency re-audit, backend business build, DB/Redis, migration/restore,
+whole-platform suite, media/load, image or deployment job is selected. Original
+Mac responsive/dark-mode observations are retained as local UI evidence, not
+compiled-browser or real-account CI claims. This lane qualifies merging only.
+
+The stable gate recomputes the full plan and requires actual scope, every nested
+qualification job and CodeQL success; draft, missing, skipped, failed or cancelled
+stages block merging. Exact main push only classifies without repeating checks.
+At about five minutes report the actual waiting stage and retry affected failures
+only, admitting successful current official artifacts on unchanged stage inputs.
+
+Control preparation retained a local 23-pass/1-fail result. The failed synthetic
+report fixture lacked its suite status; only that fixture is repaired. Twenty-one
+unchanged scope/gate assertions are admitted from the explicit observed tool
+result and frozen test-body/scope/gate/binding inputs; the original nonzero exit
+is preserved and is not called a successful invocation or a reporter file.
+Actions runs the failed report case and two cases consuming changed evidence or
+workflow inputs. This does not repeat the 21 unchanged control assertions.
