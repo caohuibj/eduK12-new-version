@@ -329,7 +329,7 @@ it('does not accept a study or Survey fragment as a single attempt credential',a
  render(<MemoryRouter initialEntries={[`/public/composite/attempts/attempt-one#resume=training-study&key=${'a'.repeat(43)}`]}><Routes>
   <Route path="/public/composite/attempts/:attemptId" element={<CompositeAssessmentPage/>}/>
  </Routes></MemoryRouter>)
- expect(await screen.findByText('请输入恢复凭证后继续匿名测评')).toBeInTheDocument()
+ expect(await screen.findByRole('alert')).toHaveTextContent('请输入恢复凭证后继续匿名测评。请保留原恢复凭据，未能读取不代表原答案已丢失。')
  expect(mockPublicApi.getAttempt).not.toHaveBeenCalled()
  expect(mockPublicApi.start).not.toHaveBeenCalled()
 })
