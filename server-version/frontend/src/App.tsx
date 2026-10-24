@@ -44,8 +44,6 @@ const CheckinList = React.lazy(() => import('./pages/CheckinList'))
 const VideoLibrary = React.lazy(() => import('./pages/VideoLibrary'))
 const ImageLibrary = React.lazy(() => import('./pages/ImageLibrary'))
 const DocumentLibrary = React.lazy(() => import('./pages/DocumentLibrary'))
-const UserList = React.lazy(() => import('./pages/UserList'))
-const TeacherCodeList = React.lazy(() => import('./pages/TeacherCodeList'))
 const LegacyArchive = React.lazy(() => import('./pages/admin/LegacyArchive'))
 const ReportingContent = React.lazy(() => import('./pages/admin/ReportingContent'))
 const MaterialGrants = React.lazy(() => import('./pages/admin/MaterialGrants'))
@@ -558,7 +556,7 @@ function AppRoutes() {
             path="/users"
             element={
               <ProtectedRoute roles={['ADMIN']}>
-                <UserList />
+                <Navigate to="/admin/training/accounts" replace />
               </ProtectedRoute>
             }
           />
@@ -566,11 +564,15 @@ function AppRoutes() {
             path="/teacher-codes"
             element={
               <ProtectedRoute roles={['ADMIN']}>
-                <TeacherCodeList />
+                <Navigate to="/admin/training/accounts#training-registration-codes" replace />
               </ProtectedRoute>
             }
           />
           <Route path="/admin/training" element={<AdminAccess entries={['TRAINING']}><AdminTrainingWorkspace /></AdminAccess>} />
+          <Route path="/admin/training/accounts" element={<AdminAccess entries={['TRAINING']}><AdminTrainingWorkspace /></AdminAccess>} />
+          <Route path="/admin/training/courses" element={<AdminAccess entries={['TRAINING']}><AdminTrainingWorkspace /></AdminAccess>} />
+          <Route path="/admin/training/resources" element={<AdminAccess entries={['TRAINING']}><AdminTrainingWorkspace /></AdminAccess>} />
+          <Route path="/admin/training/profile" element={<AdminAccess entries={['TRAINING']}><StudentProfile trainingAdmin /></AdminAccess>} />
           <Route path="/admin/education-products"
             element={<AdminAccess entries={['HUISCHOOL','HUITEACHER']}>
               <EducationProductGovernance/>

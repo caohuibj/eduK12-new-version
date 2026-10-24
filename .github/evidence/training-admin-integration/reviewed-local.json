@@ -1,0 +1,105 @@
+{
+  "kind": "reviewed-local-evidence",
+  "source": "4e03fb8ef035a43a805b9b4d6aec410a06ceb79c",
+  "ciExecuted": false,
+  "originalExecutionSigned": false,
+  "reports": {
+    "course": {
+      "bytes": 6575,
+      "sha256": "cc6ce4af91986742300cfe7ad497b9d4a8d412a290cd18c8431c0ba02acbf4ee",
+      "gzipBase64": "H4sIAAAAAAAC/81YS2/bOBD+K4TPjqy3rNy6C/SyD+x201OQAy3RNtcUqSWppN4i/31nSMlSmsBpt3UgAwakkTTD+WbmmyE/L2TX3ChLxQ0z9q+OW2YW1/ESxX9QY1j9XP6ecvFUHvr3may53D1/cNIPkij/QvcoG/W+pHKirVajwEjamr2yi+vPC1rXrHbSLajqNFtcb6kwDO5Bs3k3PsbbD6xR9y8IfuUGtN3e9dKPsqG22k9f/NjW1PaC6UOLfrqrToKwOvTy090v7Gh+Or4HHd5A90R3N1Fb89pb6V14BE8t1faGNyCKijJeh2lYROskgSddVTEDeFjdgbOAvP3ATCcQoluABaDWliv5RCjhE6v0DbcCI3W7uNGUSwCbcCm4ZKRSnTaMmK5l+p4b+H6BmHRC/E5xEV/xAVxvGm4NgQXcM31leA3PGdXVfkkE37LqWAlGqKzhbqOpPhIA2DJtnEwzw+Bjq0hLd4woyRYOBtvBghetSyGQWHQBBBcwVneaInIAeZkG8TpJs3XoftEpyX4D6OEL40PaMEshFyFelu6c7HH5Vmh3hhmyoZBp4I9LRu8aOOQ/NJbRmqht7zgKlRRHYvcMRNpY5/tZkH+cjRHbJA+yPF0XmYc2TGaILd9JBSlC1MYowSzDfGmVRDQe9kyeUqnaU/kKhN+saoJUFhRxkswaKWDjB0O2jsyh0iDgmv3TIWETagjTWvUVR4XANzWz+ni+sP+nxhG3eA3F21fuXKu35qYV9AiegANUENa09kgQFSgcpUF8TwWvyb9MqyvtqJwACq9g9z1aJ/hFQZTG8ZB2UZjOEEBMCo6FVSkJTNO4tS9JhdaBpR643avOkgfNLSpyrKXZPZOQR3XXCl4hKC3tnF7oJQbVmrPwXs7mpPVkebDOwyRJSv8r5tp7kOMxhxp8RVpNKzu47JoylCbWJ90Cv/VtGt7/m1XO0Vfbzveqn+RzEcRpfmrmYZHNENI+pczwDDsuJhSBuZBe9U47h8iu4zUuysFRAQ2asemyT8CYaAm/h3+ruLRnwb6w4TEMaRQU6ziZJfq1gnySysIos3V5VGnY1DRQuY43/QjJsY1rdA46k1dilk5S88H18cl5or6IvekAG2RZXEZ5n/JlPkPQD4y1xjlDag11jNk0NH5DscL9qG4dEgO7ukEJFQ8aXXcDVBrWbGCS2vP2LPSXtDqZ3dIgjLMsjYcAzBD/VisLdGlIJ9Hx2oHSj6WVUGboYcJtlaDGgZe1I2MuO+c8zBsV1fVZvH+klRHfLArSchyNZ4mvULQ+0SqXUNh+YnDuuvamDDYvr2HpWdfnk59q3YtSATQ7Wh2BFeThPK1cyuKExIsgz9dllPnhZJ3NcTZ0hye+dnHkBeFGnF50Wwq3fwCJELQ1WPj9yYFLRAciomXRFMMEBIKGVR99u3Opq1om2fnMf9NlTEKUBkVeFmk/P5Zz3DaezmKEGPoX2RwHT5cnSDwAHpZ+1KNtK46g3aPk2dwfN6BKuNSq2+2JURp75NkAveUqJr05ioM8DqN4iFA8y+1VqzB5n+dev9SxNW6Eqg6oDf2fZjdQt4VtqBtVWigFDjtS1SIIbitfqabFE5FXtlxvuY5JfymDpCjHU6p1OtsB6gW6H7jmYQ9jDWmohPW64ZJWvduaTWing14LFQD708MrlHYpi0+AL8qsKKO+wXxDY797+dg8ccGDWfkLeRpmGdjKX/K38bZABDfSB2T1EQYTs/qTwyS4gqkGt5pmxeruEMVXDQTrKg7jPAqj9ao/lIY/xmm11TDNwAJWRlcr28d1NQT4Xd1w+bOnnwCP8wNrPi0e7x7/A5zdjgivGQAA"
+    },
+    "courseExit": {
+      "bytes": 33,
+      "sha256": "0118fb4574fda97afbcceed7d159d11788c8cce7482804aa4e78325eacea501c",
+      "gzipBase64": "H4sIAAAAAAAC/6tWSq3ILHHOT0lVslIw0FFQKk5Nzs9LKQbyTPRMTGu5AOZYpRkhAAAA"
+    },
+    "courseLint": {
+      "bytes": 33,
+      "sha256": "fd99d6126a61d3c584674fdc0b2c1a5d540a94928cde87603d993d6addb8b092",
+      "gzipBase64": "H4sIAAAAAAAC/6tWSq3ILHHOT0lVslIw0FFQKk5Nzs9LKQbyjPTMzWu5AHvAzd4hAAAA"
+    },
+    "resourceChecks": {
+      "bytes": 227,
+      "sha256": "62514718b3dcd94b912946b86043935ac24744e19864ab0114dd8c40dec3b1a0",
+      "gzipBase64": "H4sIAAAAAAAC/4vmUlCoBmIFBaW8xNxUJSsFpaLU4vzSouRU3ZLU4pJiJR2IbGpFZolzfgpIhQFUqDg1OT8vpRgoYqJnZg4Uq9XBNC0nM6+EKDMM9QxMcZiRVpSfV5Kal6JbUlmQis1FRhimGZvqGRmCjOOKBQD5wDeb4wAAAA=="
+    }
+  },
+  "courseInputs": {
+    "server-version/frontend/src/training/TrainingAdminCourses.test.tsx": "5b03f96573b072b14c0ac73add3bf193ce3490ec",
+    "server-version/frontend/src/training/TrainingAdminCourses.tsx": "c4d0709dbe07d0d39ca7c5e450b929c3bd8520ab",
+    "server-version/frontend/src/api/client.ts": "77ac3361e546972920e80dab4b44c53f5e00abc5",
+    "server-version/frontend/src/types/index.ts": "757793744bb5170f66517169ad21d4495fa9c10b",
+    "server-version/frontend/src/utils/normalizeApiError.ts": "f826c5c45c4db534242f83c615710aca7c1c7197",
+    "server-version/frontend/src/admin/accountView.ts": "d51996301996575fc62b46897ab4e8489ce90883",
+    "server-version/frontend/src/api/materialGrants.ts": "661a71baee62b375fb8cb0570e576cad9278f4ba",
+    "server-version/frontend/src/components/staff-ui/ManagementDialog.tsx": "8eaedd3870c8c79019d9346d75fc40c453ca08bb",
+    "server-version/frontend/src/components/shared-ui/ModalSurface.tsx": "be09f7798a4e76af363fea7b666cec1b1a23b209",
+    "server-version/frontend/src/components/staff-ui/useStaffFeedback.tsx": "8f8685b091ea95eda86c4e2bc75dbb1adf752e52",
+    "server-version/frontend/src/components/product-ui/index.ts": "1c873ee2665047fbedda329ec17f8fc4154e6218",
+    "server-version/frontend/src/components/product-ui/ProductPage.tsx": "082001fe4d65a5faccd5f7f38abdcd9a100dc1a0",
+    "server-version/frontend/src/components/product-ui/PageHeader.tsx": "9016e532378ff8234069f32d2ede9a77187ce8c8",
+    "server-version/frontend/src/components/product-ui/ActionBar.tsx": "5b6d00e821eea2e080674d9a673cc360af8a9951",
+    "server-version/frontend/src/components/product-ui/ProductButton.tsx": "ad9fafb2900073804f036cba75a30f982d084e58",
+    "server-version/frontend/src/components/product-ui/ProductStatus.tsx": "bc0c5e9a50bd61c753147c64baad85425e60c1ad",
+    "server-version/frontend/src/components/product-ui/DiscoveryCard.tsx": "62356dbb03105b9f06e1ebc3d62fbe957716f113",
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7",
+    "server-version/frontend/src/test/setup.ts": "3217d9d84ea1285cf3495e27669a88e3fe7d2cf3",
+    "server-version/frontend/eslint.config.js": "4e89832bf4d92a5e1ba1815aad2ade6c9a65c3a1"
+  },
+  "testedSourceSHA256": {
+    "server-version/frontend/src/training/TrainingAdminCourses.tsx": "b662a25bc37a55a0c82e0cadccb9e6176c19b3982ba6047749c6bd573ca6a1ec",
+    "server-version/frontend/src/training/TrainingAdminCourses.test.tsx": "d07a09a3eb2c6a3796b2d2d1a6851599519a0617bdbfeac12abb9f917c7bc018"
+  },
+  "lintInputs": {
+    "server-version/frontend/src/training/TrainingAdminCourses.tsx": "b662a25bc37a55a0c82e0cadccb9e6176c19b3982ba6047749c6bd573ca6a1ec",
+    "server-version/frontend/src/training/TrainingAdminCourses.test.tsx": "d07a09a3eb2c6a3796b2d2d1a6851599519a0617bdbfeac12abb9f917c7bc018",
+    "server-version/frontend/src/training/TrainingResourceTools.tsx": "5fe15ebb4c506248f95552e24bc6d2f24a925302a6745191fc8a45bae19ee650",
+    "server-version/frontend/src/pages/admin/MaterialGrants.tsx": "975b245eb629c1ccf9650e879a142110f749f784db7a9028089e8e3d1afefbcf",
+    "server-version/frontend/src/pages/admin/InstrumentAuthorization.tsx": "fee24859a331538e27e33f372f8422e4035fcf1d3a66a0697719fffb3820327f"
+  },
+  "lintConfigInputs": {
+    "server-version/frontend/eslint.config.js": "4e89832bf4d92a5e1ba1815aad2ade6c9a65c3a1",
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0"
+  },
+  "controlSHA256": {
+    ".github/scripts/training-admin-integration-scope.mjs": "2fcfa63c881781f0540b56b73fa1cc5d143ec3855cec7435c18353c2a22a686c",
+    ".github/scripts/training-admin-integration-checks.mjs": "d1a0b6c558075b36017ad9361af12459d61adb504bd8e64a0a613e4ab891d619",
+    ".github/scripts/training-admin-integration.test.mjs": "9edcc71cd32256373331aa020a9812edfc4175501e46470058ae17cbdbe06711",
+    ".github/scripts/content-scope.mjs": "55f9bfc7a9105b06c8c41869656bb4989b1517d48e724b7995a127cd30925131",
+    ".github/scripts/merge-gate.mjs": "e16a420de96fd27cebd867034f8d55f487625923548f2d6b4a07eb70528dbeeb",
+    ".github/workflows/ci.yml": "11f993a42cfb76dfb800bb92f1a45c935ec7cb0d4ecd79121cfd3ed3a835f903",
+    "docs/release/README.md": "ed7589a1abb659c085d3cd4a8e7f7fd843c1f9ba8683bf8c563e59f9f3b764ac"
+  },
+  "limits": [
+    "Original reports are unsigned local execution, not CI execution.",
+    "The source Git mapping was reconstructed and reviewed after execution; full historical node_modules bytes were not recorded.",
+    "CSS is not consumed by these jsdom assertions; layout observations remain local evidence.",
+    "Prior frontend type failure is retained; integrated current types must run in Actions."
+  ],
+  "controlObservation": {
+    "kind": "tool-result-copied-from-observed-local-execution",
+    "exitCode": 1,
+    "total": 24,
+    "passed": 23,
+    "failed": [
+      "requires every selected assertion with no filtered or missing files"
+    ],
+    "acceptedUnchangedCases": 0,
+    "invalidatedCases": [
+      "requires every selected assertion with no filtered or missing files",
+      "admits only original unchanged course assertions and lint, rejecting tampering",
+      "bounded workflow excludes full suites, images, databases and deployment"
+    ],
+    "testSourceGzipBase64": "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",
+    "testSourceSHA256": "9a4f96f1b8ef1521942e517953be9a01800a28c5f06003081a2175b8fc711e3b",
+    "scopeSHA256": "2fcfa63c881781f0540b56b73fa1cc5d143ec3855cec7435c18353c2a22a686c",
+    "gateSHA256": "e16a420de96fd27cebd867034f8d55f487625923548f2d6b4a07eb70528dbeeb",
+    "bindingWithoutEvidenceSHA256": "9569dabc15e85c96f5deb25533e5008e443f97141258d6bb9954d950f528c081",
+    "provenanceLimit": "Original observed tool result had 23 passed / 1 failed. This explicit copied observation is unsigned, not a reporter file or CI result. Three affected cases run in Actions; 21 unchanged cases are retained.",
+    "invalidation": "GitHub rejected the 51st reusable workflow before jobs. Inlining removes one control path and changes the control binding; all 24 current control assertions execute in Actions. No prior invocation is relabeled as successful."
+  }
+}

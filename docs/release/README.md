@@ -1324,3 +1324,60 @@ Training entry browser failure isolation: the frontend producer uploads its one-
 Training entry initialization repair: GitHub expands the complete reusable-workflow graph before job conditions. The candidate added the 51st distinct referenced workflow (66 call edges), exceeding the 50-workflow limit before any job ran. Only the existing single-job `probe-cognitive` diagnostic is inlined in `ci.yml`, preserving its full refusal/selection condition, contents-read-only permission, environment, runner, timeout and steps. Its standalone dispatch workflow remains unchanged. The graph returns to 50; Training admission, backend, frontend producer, independent browser consumer, current CodeQL and aggregate gates remain unchanged. A static reference-count contract guards future additions. This local topology repair does not authorize a CI restart or establish the future main base after PR 347.
 
 Backup-only state after product increment `6add6cdc`: this topology fix is statically validated, but the existing product/base bindings and historical evidence deliberately remain frozen to the earlier candidate. The new product delta is not qualified by those records. PR 347 alignment, affected-input review and fresh exact bindings are required before any CI restart; this backup commit does not authorize CI or merge.
+
+## Training management PR347 bounded integration (2026-10-24)
+
+The user approved this exact CI configuration and merge after success. Only PR347,
+`work/survey-training-branding-20261023`, base `67d0c77034aea3c3cf1ee118eb65ab3aafe7b6eb`
+and product `83510bae28a8bd54d1c05dc0fb951b4e346b898d` enter
+`training-admin-integration`. Complete raw paths/modes/blobs, component trees,
+protected dependency/schema/config inputs and actual source/checkout trees are
+pinned. Unknown changes, base drift, missing marker and manual/full/probe requests
+fail without a platform fallback. Other candidates retain their existing rules.
+
+Sixteen unchanged course assertions and matching per-file lint are admitted from
+original retained local reports, checked against their recorded SHA256 and the
+complete relative JS/TS import closure, setup and locked configuration. These are
+reviewed-local-evidence, ciExecuted=false, originalExecutionSigned=false; Git
+input reconstruction is reviewed after execution and complete historical
+node_modules bytes were not recorded. Prior type failure and its successful
+repair remain historical, not current integrated qualification. Changed test
+locators, renamed user headings and merged shared login/shell inputs invalidate
+those prior assertions; only their named direct consumers run in Actions.
+
+Actions performs new refusal/admission/gate contracts, current app types, missing
+changed-file lint, named affected frontend consumers, one Vite compile, current
+backend types and the two small management-query test modules, plus current
+changed application/control JS/TS CodeQL. Dependencies and schema are unchanged;
+no dependency re-audit, backend business build, DB/Redis, migration/restore,
+whole-platform suite, media/load, image or deployment job is selected. Original
+Mac responsive/dark-mode observations are retained as local UI evidence, not
+compiled-browser or real-account CI claims. This lane qualifies merging only.
+
+The stable gate recomputes the full plan and requires actual scope, every nested
+qualification job and CodeQL success; draft, missing, skipped, failed or cancelled
+stages block merging. Exact main push only classifies without repeating checks.
+At about five minutes report the actual waiting stage and retry affected failures
+only, admitting successful current official artifacts on unchanged stage inputs.
+
+Control preparation retained a local 23-pass/1-fail result; the failed synthetic
+report fixture lacked its suite status. GitHub runs 40051388967/40051428914 then
+rejected the 51st reusable workflow before any job ran. The bounded jobs are now
+inlined in the existing CI, retaining the 50-reference limit. This changes the
+control inventory, so all 24 current control assertions execute in Actions; none
+of that earlier control invocation is admitted as current success. The 16 course
+assertions and five input-matching lint files remain independently valid. No
+application checks or builds were executed in those rejected workflow runs.
+
+Run 40051675495 completed current CodeQL successfully and retained another
+23-pass/1-fail control result; only the synthetic report count was missing.
+The continuation verifies the exact official run/job/source identities, completed
+steps and 24-hour lifetime. It hashes the original failed control log and checks
+the 21 unchanged passing assertion bodies plus scope/gate/binding inputs. Only
+the failed report case and two evidence/workflow consumers rerun. The original
+job remains failed. Original successful application SAST is verified by its exact
+successful official job and unchanged component trees; only the two changed
+qualification JS files receive fresh CodeQL. No application tests/build ran in
+the failed admission invocation; those missing stages still must succeed.
+
+Local alignment with merged main `4d95a5b11c3b2261c96d7161eea66ebf8d6f0626` preserves both bounded Training routes and the 50-reference topology. Existing Training-entry base/product/control evidence bindings remain historical and intentionally stale after this integration; no CI qualification, new evidence admission, CI restart or merge is authorized by this alignment. Reconcile affected inputs and freeze a new exact candidate separately before execution.

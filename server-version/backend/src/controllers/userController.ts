@@ -1,3 +1,4 @@
+import {listTrainingParticipants} from '../services/trainingParticipantList'
 import { changePasswordHandler } from './changePasswordController'
 import { Request, Response } from 'express'
 import { prisma } from '../config/database'
@@ -39,6 +40,13 @@ export const userController = {
     try {
       const { role, keyword } = req.query
       const { page, pageSize, skip } = getPaginationParams(req)
+      if(req.query.scope!==undefined){
+        if(req.query.scope!=='training-participants'||(role!=='STUDENT'&&role!=='TEACHER')||(keyword!==undefined&&typeof keyword!=='string')){
+          return error(res,'培训账号筛选参数无效',-1,400)
+        }
+        const result=await listTrainingParticipants(role,typeof keyword==='string'?keyword.trim().slice(0,200):'',page,Math.max(1,pageSize))
+        return success(res,result)
+      }
 
       // Legacy user management must not enumerate SCHOOL identities.
       let where: any = { accountDomain: { in: ['LEGACY','TRAINING'] } }

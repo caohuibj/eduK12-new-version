@@ -1,16 +1,19 @@
+import {Navigate} from 'react-router-dom'
+import {hasAdminEntry} from '../../admin/authority'
+import {trainingAdminProfilePath} from '../../admin/trainingPages'
 import TrainingAppearanceSettings from '../../training/TrainingAppearance'
 import { isTrainingHost } from '../../training/context'
 import React, { useEffect, useState } from 'react'
-import { CheckCircle, Eye, EyeOff, Loader2, Lock, Save, User } from 'lucide-react'
+import { CheckCircle, Eye, EyeOff, Loader2, Lock, Save, User, KeyRound } from 'lucide-react'
 import { useAuth } from '../../contexts/AuthContext'
 import apiClient from '../../api/client'
 import { isValidPassword, passwordPolicyMessage } from '../../utils/password'
 import { PageHeader } from '../../components/product-ui/PageHeader'
 import { ProductPage } from '../../components/product-ui/ProductPage'
 
-const StudentProfile: React.FC = () => {
+const StudentProfileContent: React.FC<{trainingAdmin?:boolean}> = ({trainingAdmin=false}) => {
   const { user, setUser } = useAuth()
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [loadError, setLoadError] = useState<string | null>(null)
   const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null)
@@ -58,6 +61,7 @@ const StudentProfile: React.FC = () => {
 
   const handleUpdateProfile = async (event: React.FormEvent) => {
     event.preventDefault()
+    if(saving||loading||loadError||!user?.id)return
 
     const validationError = validateNickname(nickname)
     if (validationError) {
@@ -85,6 +89,7 @@ const StudentProfile: React.FC = () => {
 
   const handleChangePassword = async (event: React.FormEvent) => {
     event.preventDefault()
+    if(saving||loading||loadError||!user?.id)return
 
     const errors: Record<string, string> = {}
     if (!oldPassword) errors.oldPassword = '请输入原密码'
@@ -117,6 +122,37 @@ const StudentProfile: React.FC = () => {
     } finally {
       setSaving(false)
     }
+  }
+
+  if(trainingAdmin){
+    const cancelPassword=()=>{setShowPasswordForm(false);setOldPassword('');setNewPassword('');setConfirmPassword('');setPasswordErrors({});setShowOldPassword(false);setShowNewPassword(false)}
+    return <div className="training-management-home training-admin-profile">
+      <header className="training-profile-heading"><h1>个人信息</h1></header>
+      {loadError&&<div role="alert" className="training-profile-notice is-error"><span>{loadError}</span><button type="button" className="training-accounts-secondary" onClick={()=>void fetchUserInfo()}>重新加载资料</button></div>}
+      {loading?<p className="training-accounts-empty" role="status">正在读取个人信息…</p>:<>
+        {message&&<div role={message.type==='error'?'alert':'status'} className={'training-profile-notice '+(message.type==='error'?'is-error':'is-success')}>{message.type==='success'&&<CheckCircle size={18} aria-hidden="true"/>}{message.text}</div>}
+        <div className="training-profile-settings">
+          <section className="training-profile-details" aria-label="账号资料">
+            <dl className="training-profile-account-line"><dt>登录账号</dt><dd><code>{user?.username}</code></dd></dl>
+            <form className="training-profile-form training-profile-name-form" onSubmit={handleUpdateProfile}>
+              <div><label htmlFor="training-profile-name">显示姓名<input id="training-profile-name" value={nickname} disabled={saving||Boolean(loadError)} onChange={event=>{setNickname(event.target.value);setNicknameError('')}} aria-invalid={Boolean(nicknameError)} aria-describedby="training-profile-name-help" placeholder="填写显示姓名" autoComplete="nickname"/></label>
+              <p id="training-profile-name-help" className="training-profile-help">中文 2–10 字，或英文 2–20 个字母。</p>{nicknameError&&<p role="alert" className="training-profile-field-error">{nicknameError}</p>}</div>
+              <button type="submit" className="training-accounts-primary" disabled={saving||Boolean(loadError)||!nickname.trim()||nickname===(user?.nickname||'')}>{saving?'保存中…':'保存姓名'}</button>
+            </form>
+          </section>
+          <section className="training-profile-security" aria-labelledby="training-profile-security-title">
+            <header><div><h2 id="training-profile-security-title"><KeyRound size={18} aria-hidden="true"/>登录安全</h2><p>密码 + Authenticator 动态验证码</p></div>{!showPasswordForm&&<button type="button" className="training-accounts-secondary" disabled={saving||Boolean(loadError)} onClick={()=>setShowPasswordForm(true)} aria-expanded={false} aria-controls="training-profile-password-form">修改密码</button>}</header>
+          {showPasswordForm&&<form id="training-profile-password-form" className="training-profile-form training-profile-password-form" onSubmit={handleChangePassword}>
+            <div className="training-profile-password-grid">
+              <div><label htmlFor="training-profile-old-password">原密码</label><div className="training-profile-password-input"><input id="training-profile-old-password" type={showOldPassword?'text':'password'} value={oldPassword} disabled={saving} autoComplete="current-password" onChange={event=>{setOldPassword(event.target.value);setPasswordErrors({...passwordErrors,oldPassword:''})}} aria-invalid={Boolean(passwordErrors.oldPassword)} aria-describedby={passwordErrors.oldPassword?'training-profile-old-error':undefined}/><button type="button" disabled={saving} aria-label={showOldPassword?'隐藏原密码':'显示原密码'} onClick={()=>setShowOldPassword(value=>!value)}>{showOldPassword?<EyeOff size={18}/>:<Eye size={18}/>}</button></div>{passwordErrors.oldPassword&&<p role="alert" id="training-profile-old-error" className="training-profile-field-error">{passwordErrors.oldPassword}</p>}</div>
+              <div><label htmlFor="training-profile-new-password">新密码</label><div className="training-profile-password-input"><input id="training-profile-new-password" type={showNewPassword?'text':'password'} value={newPassword} disabled={saving} autoComplete="new-password" maxLength={128} onChange={event=>{setNewPassword(event.target.value);setPasswordErrors({...passwordErrors,newPassword:''})}} aria-invalid={Boolean(passwordErrors.newPassword)} aria-describedby="training-profile-password-help"/><button type="button" disabled={saving} aria-label={showNewPassword?'隐藏新密码':'显示新密码'} onClick={()=>setShowNewPassword(value=>!value)}>{showNewPassword?<EyeOff size={18}/>:<Eye size={18}/>}</button></div>{passwordErrors.newPassword&&<p role="alert" className="training-profile-field-error">{passwordErrors.newPassword}</p>}</div>
+              <div><label htmlFor="training-profile-confirm-password">确认新密码<input id="training-profile-confirm-password" type="password" value={confirmPassword} disabled={saving} autoComplete="new-password" maxLength={128} onChange={event=>{setConfirmPassword(event.target.value);setPasswordErrors({...passwordErrors,confirmPassword:''})}} aria-invalid={Boolean(passwordErrors.confirmPassword)}/></label>{passwordErrors.confirmPassword&&<p role="alert" className="training-profile-field-error">{passwordErrors.confirmPassword}</p>}</div>
+            </div><p id="training-profile-password-help" className="training-profile-help">{passwordPolicyMessage}。修改后请按系统提示重新登录。</p><div className="training-profile-password-actions"><button type="button" className="training-accounts-secondary" disabled={saving} onClick={cancelPassword}>取消修改</button><button type="submit" className="training-accounts-primary" disabled={saving||Boolean(loadError)}>{saving?'处理中…':'确认修改密码'}</button></div>
+          </form>}
+          </section>
+        </div>
+      </>}
+    </div>
   }
 
   return (
@@ -289,4 +325,8 @@ const StudentProfile: React.FC = () => {
   )
 }
 
-export default StudentProfile
+export default function StudentProfile({trainingAdmin=false}:{trainingAdmin?:boolean}){
+ const {user}=useAuth()
+ if(!trainingAdmin&&!isTrainingHost()&&hasAdminEntry(user,'TRAINING'))return <Navigate replace to={trainingAdminProfilePath}/>
+ return <StudentProfileContent trainingAdmin={trainingAdmin}/>
+}

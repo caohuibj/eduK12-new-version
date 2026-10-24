@@ -6,8 +6,9 @@ import { useStaffFeedback } from '../components/staff-ui/useStaffFeedback'
 import { ProductPage } from '../components/product-ui/ProductPage'
 import type { TeacherCode } from '../types'
 
-const TeacherCodeList: React.FC = () => {
-  const { feedback, confirm, info } = useStaffFeedback()
+const TeacherCodeList: React.FC<{training?:boolean}> = ({training=false}) => {
+  const codeName=training?'培训师注册码':'教师码'
+  const { feedback, confirm, info } = useStaffFeedback({dialogClassName:training?'training-accounts-dialog':undefined})
   const showMessage = (message: unknown) => info('操作提示', String(message || '操作完成'))
   const ask = (message: string) => confirm({ title: '确认操作', body: message, confirmLabel: '确认' })
   const [codes, setCodes] = useState<TeacherCode[]>([])
@@ -56,7 +57,7 @@ const TeacherCodeList: React.FC = () => {
   }
 
   const handleDelete = async (teacherCode: TeacherCode) => {
-    if (!await ask(`确定要删除教师码 ${teacherCode.code} 吗？`)) return
+    if (!await ask(`确定要删除${codeName} ${teacherCode.code} 吗？`)) return
 
     try {
       setDeletingId(teacherCode.id)
@@ -87,12 +88,12 @@ const TeacherCodeList: React.FC = () => {
     <ProductPage width="management" className="space-y-6">
       {feedback}
       <PageHeader
-        title="教师码管理"
-        description="生成一次性教师注册码，并撤销不再需要的注册码。"
+        title={training?'培训师注册码':'教师码管理'} headingLevel={training?2:1}
+        description={training?'生成培训师注册码，并撤销不再需要的注册码。':'生成一次性教师注册码，并撤销不再需要的注册码。'}
         actions={(
           <button type="button" onClick={() => void handleCreate()} disabled={creating} className="hui-button hui-button--primary inline-flex items-center gap-2">
             <Plus className="h-4 w-4" aria-hidden="true" />
-            {creating ? '生成中...' : '生成教师码'}
+            {creating ? '生成中...' : training?'生成培训师注册码':'生成教师码'}
           </button>
         )}
       />
@@ -109,19 +110,19 @@ const TeacherCodeList: React.FC = () => {
       {loading ? (
         <div className="flex h-64 items-center justify-center" role="status" aria-live="polite">
           <div className="h-12 w-12 animate-spin rounded-full border-b-2 border-action" />
-          <span className="sr-only">正在加载教师码</span>
+          <span className="sr-only">正在加载{codeName}</span>
         </div>
       ) : codes.length === 0 ? (
         <div className="py-12 text-center">
           <Key className="mx-auto mb-4 h-16 w-16 text-gray-300" aria-hidden="true" />
-          <p className="text-gray-500">暂无教师码</p>
+          <p className="text-gray-500">暂无{codeName}</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
           {codes.map(code => {
             const valid = code.isActive && code.usedCount < code.maxUses
             return (
-              <article key={code.id} className="staff-panel staff-panel--padded transition-shadow hover:shadow-lg" aria-label={`教师码 ${code.code}`}>
+              <article key={code.id} className="staff-panel staff-panel--padded transition-shadow hover:shadow-lg" aria-label={`${codeName} ${code.code}`}>
                 <div className="mb-4 flex items-center justify-between gap-3">
                   <div className="flex min-w-0 items-center gap-2">
                     <Key className="h-5 w-5 flex-none text-action" aria-hidden="true" />
@@ -131,8 +132,8 @@ const TeacherCodeList: React.FC = () => {
                     type="button"
                     onClick={() => void copyCode(code.code)}
                     className="rounded p-2 text-gray-400 hover:bg-blue-50 hover:text-action"
-                    aria-label={`复制教师码 ${code.code}`}
-                    title="复制教师码"
+                    aria-label={`复制${codeName} ${code.code}`}
+                    title={`复制${codeName}`}
                   >
                     <Copy className="h-4 w-4" aria-hidden="true" />
                   </button>
@@ -164,8 +165,8 @@ const TeacherCodeList: React.FC = () => {
                     onClick={() => void handleDelete(code)}
                     disabled={deletingId === code.id}
                     className="rounded p-2 text-gray-400 hover:bg-red-50 hover:text-red-500 disabled:opacity-50"
-                    aria-label={`删除教师码 ${code.code}`}
-                    title="删除教师码"
+                    aria-label={`删除${codeName} ${code.code}`}
+                    title={`删除${codeName}`}
                   >
                     <Trash2 className="h-4 w-4" aria-hidden="true" />
                   </button>
