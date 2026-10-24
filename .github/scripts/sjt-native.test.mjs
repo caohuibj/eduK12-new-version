@@ -56,3 +56,10 @@ test('service container identity is evaluated only at supported step environment
  assert(!jobEnvironment.includes('job.services'),'Job context is unavailable at job-level env');
  assert(job.includes('      - name: upgrade nonempty exact main and verify isolated database restore\n        env:\n          PG_CONTAINER: ${{ job.services.postgres.id }}\n        run: node .github/scripts/sjt-native-migration.mjs'));
 });
+test('shallow scope explicitly fetches the exact SJT PR source before comparing trees',()=>{
+ const text=readFileSync('.github/workflows/ci.yml','utf8');
+ const step=text.split('      - name: fetch exact two-candidate PR source for checkout-tree comparison\n')[1].split('      - name:')[0];
+ assert(step.includes('"backup/shared-sjt-native-20261024"'));
+ assert(step.includes('EXACT_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}'));
+ assert(step.includes("['fetch','--no-tags','--depth=1','origin',source]"));
+});

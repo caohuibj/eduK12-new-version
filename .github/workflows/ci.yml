@@ -359,7 +359,7 @@ jobs:
           node .github/scripts/runner-preflight.mjs --control
           node .github/scripts/fetch-ci-base.mjs
       - name: fetch exact two-candidate PR source for checkout-tree comparison
-        if: github.event_name == 'pull_request' && contains(fromJSON('["work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023","work/survey-training-branding-20261023"]'), github.event.pull_request.head.ref)
+        if: github.event_name == 'pull_request' && contains(fromJSON('["backup/shared-sjt-native-20261024","work/measurement-version-final-20261020","work/training-mac-ui-final-20261020","work/scale-authoring-feedback-20261021","work/composite-csv-memory-20261021","work/scale-library-governance-20261021","work/survey-experience-20261022","work/admin-authenticator-main-20261022","work/training-student-20261022","survey-cloud-flow-visual-20261022","work/training-appearance-20261022","work/survey-visual-20261022","work/shared-assessment-authoring-20261023","work/school-teacher-review-20261022","work/school-teacher-visual-20261023","work/survey-training-branding-20261023"]'), github.event.pull_request.head.ref)
         env:
           EXACT_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
         run: |
