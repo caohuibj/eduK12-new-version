@@ -346,7 +346,7 @@ export const submitUnifiedScaleAssessmentFinal = async (
     const assertFlowFinal = await lockTrainingFlowFinalAdmission(tx, { attemptId: child.compositeAttemptId, parent: child.compositeAttempt, attemptEpoch: input.attemptEpoch, itemId: child.compositeItemId, sourceAttemptId: child.id, submissionId })
     const current = await tx.assessment.findUnique({
       where: { id: input.assessmentId },
-      select: { ...txAdmissionSelect, runtimeSnapshotEncrypted: !wholeReceipt },
+      select: { ...txAdmissionSelect, runtimeSnapshotEncrypted: !(wholeReceipt || receiptOnly) },
     })
     if (!current) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
     assertFinalOnly(current.deliveryMode)
