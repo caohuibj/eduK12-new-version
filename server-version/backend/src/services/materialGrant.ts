@@ -207,7 +207,7 @@ const assertGrantableResource = async (resourceType: MaterialResourceType, resou
   throw grantBadRequest('不支持的材料类型')
 }
 
-const attachResource = async (grant: {
+type GrantForResource = {
   id: string
   teacherId: string
   resourceType: MaterialResourceType
@@ -216,7 +216,10 @@ const attachResource = async (grant: {
   createdAt: Date
   teacher?: { id: string; username: string; nickname: string | null; role: UserRole }
   granter?: { id: string; username: string; nickname: string | null }
-}) => {
+}
+type GrantResource = { id: string; name: string; status?: string } | null
+
+const attachResource = async (grant: GrantForResource) => {
   let resourceMissing = false
   let resource: { id: string; name: string; status?: string } | null = null
   if (grant.resourceType === MaterialResourceType.FORM_TEMPLATE) {
@@ -249,6 +252,10 @@ const attachResource = async (grant: {
       : null
     resourceMissing = !definition
   }
+  return grantResourceResponse(grant, resource, resourceMissing)
+}
+
+function grantResourceResponse(grant: GrantForResource, resource: GrantResource, resourceMissing = !resource) {
   return {
     id: grant.id,
     teacherId: grant.teacherId,
@@ -261,6 +268,55 @@ const attachResource = async (grant: {
     resource,
     resourceMissing,
   }
+}
+
+// Metadata only: this request-local map is not an authorization cache. Keep
+// database batches bounded and sequential rather than opening one read per grant.
+const RESOURCE_METADATA_BATCH_SIZE = 250
+async function attachResources(grants: GrantForResource[]) {
+  const groups = new Map<MaterialResourceType, Set<string>>()
+  for (const grant of grants) {
+    if (!groups.has(grant.resourceType)) groups.set(grant.resourceType, new Set())
+    groups.get(grant.resourceType)!.add(grant.resourceId)
+  }
+  const resources = new Map<MaterialResourceType, Map<string, Exclude<GrantResource, null>>>()
+  for (const [type, uniqueIds] of groups) {
+    const byId = new Map<string, Exclude<GrantResource, null>>()
+    resources.set(type, byId)
+    const ids = [...uniqueIds]
+    if (type === MaterialResourceType.ASSESSMENT_BUNDLE) {
+      const { bundleDefinitionProvider } = await import('../modules/bundle-product/service')
+      // Preserve the old first-match behavior should a registry contain duplicates.
+      for (const { definition } of bundleDefinitionProvider.list()) {
+        const id = definition.bundleKey + '@' + definition.bundleVersion
+        if (uniqueIds.has(id) && !byId.has(id)) byId.set(id, { id, name: definition.name, status: definition.status })
+      }
+      continue
+    }
+    if (type === MaterialResourceType.REPORT_PACKAGE) {
+      for (const id of ids) {
+        const definition = getReportPackageByResourceId(id)
+        if (definition) byId.set(id, { id, name: definition.name, status: definition.status })
+      }
+      continue
+    }
+    for (let offset = 0; offset < ids.length; offset += RESOURCE_METADATA_BATCH_SIZE) {
+      const where = { id: { in: ids.slice(offset, offset + RESOURCE_METADATA_BATCH_SIZE) } }
+      const select = { id: true, name: true, status: true } as const
+      if (type === MaterialResourceType.MEDIA_ASSET) {
+        const rows = await prisma.storedAsset.findMany({ where, select: { id: true, originalName: true, deletedAt: true } })
+        for (const row of rows) if (!row.deletedAt) byId.set(row.id, { id: row.id, name: row.originalName || '未命名媒体' })
+      } else {
+        const rows = type === MaterialResourceType.FORM_TEMPLATE
+          ? await prisma.questionnaire.findMany({ where, select })
+          : type === MaterialResourceType.SCALE
+            ? await prisma.scale.findMany({ where, select })
+            : await prisma.cognitiveTestConfig.findMany({ where, select })
+        for (const row of rows) byId.set(row.id, row)
+      }
+    }
+  }
+  return grants.map(grant => grantResourceResponse(grant, resources.get(grant.resourceType)?.get(grant.resourceId) ?? null))
 }
 
 export const listGrants = async (query: {
@@ -280,7 +336,7 @@ export const listGrants = async (query: {
       granter: { select: { id: true, username: true, nickname: true } },
     },
   })
-  return Promise.all(rows.map((row) => attachResource(row)))
+  return attachResources(rows)
 }
 
 export const createGrant = async (input: {
@@ -362,7 +418,7 @@ export const batchCreateGrants = async (input: {
       granter: { select: { id: true, username: true, nickname: true } },
     },
   })
-  return Promise.all(rows.map((row) => attachResource(row)))
+  return attachResources(rows)
 }
 
 const grantInclude = {
@@ -419,5 +475,5 @@ export const setGrants = async (input: {
     orderBy: { createdAt: 'desc' },
     include: grantInclude,
   })
-  return Promise.all(rows.map((row) => attachResource(row)))
+  return attachResources(rows)
 }

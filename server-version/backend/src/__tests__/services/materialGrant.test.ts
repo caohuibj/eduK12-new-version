@@ -1,5 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { MaterialResourceType, UserRole } from '@prisma/client'
+import { listReportPackageDefinitions, reportPackageResourceId } from '../../modules/cognitive-analysis/report-package.registry'
+
+const bundles = vi.hoisted(() => ({ list: vi.fn() }))
+vi.mock('../../modules/bundle-product/service', () => ({ bundleDefinitionProvider: bundles }))
 
 const flags = vi.hoisted(() => ({ materialGrantsEnabled: true }))
 const { mockPrisma } = vi.hoisted(() => ({
@@ -16,8 +20,10 @@ const { mockPrisma } = vi.hoisted(() => ({
     user: { findUnique: vi.fn(), findMany: vi.fn() },
     $transaction: vi.fn(),
     $queryRaw: vi.fn(),
-    scale: { findUnique: vi.fn() },
-    cognitiveTestConfig: { findUnique: vi.fn() },
+    scale: { findUnique: vi.fn(), findMany: vi.fn() },
+    questionnaire: { findMany: vi.fn() },
+    storedAsset: { findMany: vi.fn() },
+    cognitiveTestConfig: { findUnique: vi.fn(), findMany: vi.fn() },
   },
 }))
 
@@ -52,6 +58,10 @@ const otherDraft = { id: 'scale-draft', creatorId: 'admin-1', status: 'DRAFT' }
 beforeEach(() => {
   vi.clearAllMocks()
   flags.materialGrantsEnabled = true
+  mockPrisma.scale.findMany.mockResolvedValue([{ id: 'scale-1', name: '焦虑', status: 'PUBLISHED' }])
+  mockPrisma.questionnaire.findMany.mockResolvedValue([])
+  mockPrisma.storedAsset.findMany.mockResolvedValue([])
+  mockPrisma.cognitiveTestConfig.findMany.mockResolvedValue([])
   mockPrisma.$queryRaw.mockResolvedValue([])
   mockPrisma.materialGrant.findUnique.mockResolvedValue(null)
   mockPrisma.materialGrant.findMany.mockResolvedValue([])
@@ -220,7 +230,7 @@ describe('createGrant / listGrants / deleteGrant', () => {
       teacher: { id: 'teacher-1', username: 't', nickname: null, role: TEACHER },
       granter: { id: 'admin-1', username: 'a', nickname: null },
     }])
-    mockPrisma.scale.findUnique.mockResolvedValue(null)
+    mockPrisma.scale.findMany.mockResolvedValue([])
     const list = await listGrants({})
     expect(list[0].resourceMissing).toBe(true)
   })
@@ -427,5 +437,89 @@ describe('setGrants', () => {
     })).rejects.toThrow('db down')
     expect(mockPrisma.$transaction).toHaveBeenCalledTimes(1)
     expect(mockPrisma.materialGrant.createMany).toHaveBeenCalled()
+  })
+})
+
+describe('request-local resource metadata batches', () => {
+  const grant = (resourceType: MaterialResourceType, resourceId: string, id = resourceType + resourceId) => ({
+    id, resourceType, resourceId, teacherId: 'teacher-1', grantedBy: 'admin-1', createdAt: new Date('2026-10-24'),
+    teacher: { id: 'teacher-1', username: 't', nickname: null, role: TEACHER },
+    granter: { id: 'admin-1', username: 'a', nickname: null },
+  })
+  it('deduplicates 100 grants of one resource into one metadata read and preserves every row', async () => {
+    const rows = Array.from({ length: 100 }, (_, i) => grant(MaterialResourceType.SCALE, 'scale-1', String(i)))
+    mockPrisma.materialGrant.findMany.mockResolvedValue(rows)
+    const result = await listGrants({ resourceType: MaterialResourceType.SCALE })
+    expect(mockPrisma.materialGrant.findMany).toHaveBeenCalledExactlyOnceWith({
+      where: { resourceType: MaterialResourceType.SCALE }, orderBy: { createdAt: 'desc' },
+      include: { teacher: { select: { id: true, username: true, nickname: true, role: true } }, granter: { select: { id: true, username: true, nickname: true } } },
+    })
+    expect(mockPrisma.scale.findMany).toHaveBeenCalledExactlyOnceWith({ where: { id: { in: ['scale-1'] } }, select: { id: true, name: true, status: true } })
+    expect(mockPrisma.scale.findUnique).not.toHaveBeenCalled()
+    expect(result).toEqual(rows.map(row => ({ ...row, resource: { id: 'scale-1', name: '焦虑', status: 'PUBLISHED' }, resourceMissing: false })))
+  })
+  it('keeps same IDs isolated by resource type, deleted media missing, and input order', async () => {
+    const rows = [grant(MaterialResourceType.COGNITIVE_CONFIG, 'same'), grant(MaterialResourceType.SCALE, 'same'),
+      grant(MaterialResourceType.FORM_TEMPLATE, 'same'), grant(MaterialResourceType.MEDIA_ASSET, 'same'),
+      grant(MaterialResourceType.MEDIA_ASSET, 'deleted'), grant(MaterialResourceType.SCALE, 'missing')]
+    mockPrisma.materialGrant.findMany.mockResolvedValue(rows)
+    mockPrisma.scale.findMany.mockResolvedValue([{ id: 'same', name: 'Scale', status: 'DRAFT' }])
+    mockPrisma.cognitiveTestConfig.findMany.mockResolvedValue([{ id: 'same', name: 'Task', status: 'PUBLISHED' }])
+    mockPrisma.questionnaire.findMany.mockResolvedValue([{ id: 'same', name: 'Form', status: 'DRAFT' }])
+    mockPrisma.storedAsset.findMany.mockResolvedValue([{ id: 'same', originalName: '', deletedAt: null }, { id: 'deleted', originalName: 'Deleted', deletedAt: new Date() }])
+    const result = await listGrants({})
+    expect(result.map(row => row.id)).toEqual(rows.map(row => row.id))
+    expect(result.map(row => row.resource?.name ?? null)).toEqual(['Task', 'Scale', 'Form', '未命名媒体', null, null])
+    expect(result.map(row => row.resourceMissing)).toEqual([false, false, false, false, true, true])
+    for (const model of [mockPrisma.scale, mockPrisma.cognitiveTestConfig, mockPrisma.questionnaire, mockPrisma.storedAsset]) expect(model.findMany).toHaveBeenCalledTimes(1)
+  })
+  it('caps each metadata batch at 250 distinct IDs without truncating results', async () => {
+    const rows = Array.from({ length: 501 }, (_, i) => grant(MaterialResourceType.SCALE, String(i)))
+    mockPrisma.materialGrant.findMany.mockResolvedValue([...rows, rows[0]])
+    mockPrisma.scale.findMany.mockImplementation(async ({ where }) => [...where.id.in].reverse().map((id: string) => ({ id, name: id, status: 'PUBLISHED' })))
+    const result = await listGrants({})
+    expect(mockPrisma.scale.findMany.mock.calls.map(([args]) => args.where.id.in.length)).toEqual([250, 250, 1])
+    expect(result.map(row => row.resource?.id)).toEqual([...rows, rows[0]].map(row => row.resourceId))
+  })
+  it('rereads metadata on the next request and propagates lookup errors rather than returning partial success', async () => {
+    mockPrisma.materialGrant.findMany.mockResolvedValue([grant(MaterialResourceType.SCALE, 'scale-1')])
+    expect((await listGrants({}))[0].resourceMissing).toBe(false)
+    mockPrisma.scale.findMany.mockResolvedValueOnce([])
+    expect((await listGrants({}))[0].resourceMissing).toBe(true)
+    mockPrisma.scale.findMany.mockRejectedValueOnce(new Error('metadata unavailable'))
+    await expect(listGrants({})).rejects.toThrow('metadata unavailable')
+    expect(mockPrisma.scale.findMany).toHaveBeenCalledTimes(3)
+  })
+  it('maps bundle and report registries with missing flags and one bundle catalog read', async () => {
+    const report = listReportPackageDefinitions()[0]
+    expect(report).toBeDefined()
+    const reportId = reportPackageResourceId(report.key, report.version)
+    bundles.list.mockReturnValue([
+      { definition: { bundleKey: 'bundle', bundleVersion: 'v1', name: 'First', status: 'PUBLISHED' } },
+      { definition: { bundleKey: 'bundle', bundleVersion: 'v1', name: 'Duplicate', status: 'DRAFT' } },
+    ])
+    mockPrisma.materialGrant.findMany.mockResolvedValue([
+      grant(MaterialResourceType.ASSESSMENT_BUNDLE, 'bundle@v1', 'a'),
+      grant(MaterialResourceType.ASSESSMENT_BUNDLE, 'bundle@v1', 'b'),
+      grant(MaterialResourceType.ASSESSMENT_BUNDLE, 'missing'),
+      grant(MaterialResourceType.REPORT_PACKAGE, reportId),
+      grant(MaterialResourceType.REPORT_PACKAGE, 'missing'),
+    ])
+    const result = await listGrants({})
+    expect(bundles.list).toHaveBeenCalledTimes(1)
+    expect(result.map(row => row.resource)).toEqual([
+      { id: 'bundle@v1', name: 'First', status: 'PUBLISHED' },
+      { id: 'bundle@v1', name: 'First', status: 'PUBLISHED' }, null,
+      { id: reportId, name: report.name, status: report.status }, null,
+    ])
+    expect(result.map(row => row.resourceMissing)).toEqual([false, false, true, false, true])
+    expect(mockPrisma.scale.findMany).not.toHaveBeenCalled()
+  })
+  it('does not fetch metadata for an empty grant list', async () => {
+    await expect(listGrants({})).resolves.toEqual([])
+    expect(mockPrisma.scale.findMany).not.toHaveBeenCalled()
+    expect(mockPrisma.cognitiveTestConfig.findMany).not.toHaveBeenCalled()
+    expect(mockPrisma.questionnaire.findMany).not.toHaveBeenCalled()
+    expect(mockPrisma.storedAsset.findMany).not.toHaveBeenCalled()
   })
 })
