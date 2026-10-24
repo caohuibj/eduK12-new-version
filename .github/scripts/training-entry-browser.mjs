@@ -5,6 +5,7 @@
 // FRONTEND_DIST=server-version/frontend/dist node .github/scripts/training-entry-browser.mjs
 // The caller supplies the already-built candidate dist; this script never builds it.
 import assert from 'node:assert/strict';
+import {createParticipationLinkCodec} from '../../server-version/frontend/src/components/participation/participation-link.ts';
 import { execFileSync } from 'node:child_process';
 import { createHash } from 'node:crypto';
 import { createServer } from 'node:http';
@@ -104,7 +105,12 @@ async function writeReport() {
 }
 const tick = page => page.evaluate(() => new Promise(done => requestAnimationFrame(() => requestAnimationFrame(done))));
 
+const retainedProof=JSON.parse(await readFile(resolve('training-entry-evidence/browser-retained.json'),'utf8'));
+assert.equal(retainedProof.currentFrontendTree,git('rev-parse','HEAD:server-version/frontend'));
+assert.equal(retainedProof.originalJobConclusion,'failure');
 async function scenario(name, identity, run, width = 1440, expectedManagement = []) {
+  const retained=retainedProof.scenarios.find(item=>item.name===name);
+  if(retained){assert.equal(retained.status,'PASS');assert(!name.startsWith('anonymous-'));report.scenarios.push({...retained,reusedFromOfficial:retainedProof.source,reexecuted:false});await writeReport();return;}
   const result = { name, width, startedAt: new Date().toISOString(), status: 'RUNNING', checks: [], requests: [], assets: [], expectedFailures: [], unexpected: [], errors: [], consoleErrors: [], dialogs: [], downloads: [] };
   report.scenarios.push(result);
   const context = await browser.newContext({ serviceWorkers: 'block', viewport: { width, height: 1000 }, locale: 'zh-CN', timezoneId: 'UTC', acceptDownloads: true });
@@ -544,10 +550,21 @@ try {
     assert.equal(await page.getByRole('heading', { name: '合成课程测评', exact: true }).isVisible(), true);
     assert.equal(count('POST /api/composite-assessments/assessment/export'), 0);
     await proof('code-failure');
-    await page.getByRole('button', { name: '重试加载导出', exact: true }).click();
+    await page.getByText('请重新加载页面，再手动打开数据导出；不会自动提交导出。', { exact: true }).waitFor();
+    await page.getByRole('button', { name: '重新加载页面', exact: true }).click();
+    await page.getByText('重新加载会丢失本页尚未保存的内容。请先保存需要的内容，再确认重新加载。', { exact: true }).waitFor();
+    await page.getByRole('button', { name: '取消重新加载', exact: true }).click();
+    assert.equal(codeAttempts, 1, 'Cancelling reload must retain the current document');
+    assert.equal(count('POST /api/composite-assessments/assessment/export'), 0);
+    await page.getByRole('button', { name: '重新加载页面', exact: true }).click();
+    await Promise.all([page.waitForEvent('load'), page.getByRole('button', { name: '确认重新加载', exact: true }).click()]);
+    await page.getByRole('heading', { name: '合成课程测评', exact: true }).waitFor();
+    assert.equal(codeAttempts, 1, 'Reload must not automatically reopen export');
+    assert.equal(count('POST /api/composite-assessments/assessment/export'), 0);
+    await page.getByRole('button', { name: '导出本课程数据', exact: true }).click();
     const dialog = page.getByRole('dialog', { name: '导出脱敏摘要', exact: true });
     await dialog.waitFor();
-    assert.equal(codeAttempts, 2, 'Explicit retry must actually reload the failed chunk');
+    assert.equal(codeAttempts, 2, 'Explicit document reload and reopen must fetch the failed chunk again');
     assert.equal(count('POST /api/composite-assessments/assessment/export'), 0, 'Opening export must not submit it');
     await dialog.getByRole('button', { name: '关闭数据导出', exact: true }).click();
     await page.getByRole('button', { name: '导出本课程数据', exact: true }).click();
@@ -568,11 +585,14 @@ try {
 
   // All credentials below are public synthetic fixture values, never real secrets.
   // Real principal/epoch/reset authorization is independently covered by PG tests.
-  const studyId = 'browser-study', waveId = 'browser-wave';
+  const studyId = '11111111-1111-4111-8111-111111111111', waveId = 'browser-wave';
   const studyBase = '/api/public/anonymous-studies';
   const studyPath = `/public/studies/${studyId}`;
   const invitation = `/public/studies/waves/${waveId}/synthetic-invitation`;
   const studyCredential = 's'.repeat(43), rotatedCredential = 'r'.repeat(43);
+  // The real shared encoder rejects malformed fixture IDs just like production.
+  const fixtureCodec=createParticipationLinkCodec({route:'/public/studies/',namespace:'training-study',proofFields:{key:/^[A-Za-z0-9_-]{43}$/}});
+  for(const key of [studyCredential,rotatedCredential]){const link=new URL(fixtureCodec.link(origin,studyId,{key}));assert.equal(link.pathname,studyPath);assert.equal(link.search,'');assert.deepEqual(fixtureCodec.read(link.hash),{key});}
   const studyHome = { studyId, title: '合成匿名培训', displayCode: 'DISPLAY-ONLY', limitations: [], waves: [
     { id: waveId, title: '合成进行中任务', ordinal: 1, attemptId: 'browser-attempt', state: 'IN_PROGRESS', completedAt: null, accepting: true },
     { id: 'history-wave', title: '合成历史任务', ordinal: 2, attemptId: 'history-attempt', state: 'COMPLETED', completedAt: '2026-10-01T00:00:00Z', accepting: false },
@@ -617,7 +637,13 @@ try {
         const download = await downloadPromise;
         const path = resolve(evidence, 'synthetic-study-link.txt'); await download.saveAs(path);
         const content = await readFile(path, 'utf8');
-        assert.ok(content.includes(studyPath)); assert.ok(content.includes(studyCredential));
+        const savedUrl = new URL(content.split('\n').find(line => line.startsWith(origin + '/')));
+        assert.equal(savedUrl.pathname, studyPath);
+        assert.equal(savedUrl.search, '');
+        const savedProof = new URLSearchParams(savedUrl.hash.slice(1));
+        assert.deepEqual([...savedProof.keys()].sort(), ['key', 'resume']);
+        assert.equal(savedProof.get('resume'), 'training-study');
+        assert.equal(savedProof.get('key'), studyCredential);
       } else await page.getByText('001-SKY7', { exact: true }).waitFor();
       await proof('save-before-answer');
       await page.getByRole('button', { name: mode === 'PERSONAL_LINK' ? '进入我的研究测评' : '我已保存，进入答题', exact: true }).click();

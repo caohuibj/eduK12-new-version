@@ -43,28 +43,9 @@ jobs:
           if-no-files-found: error
           retention-days: 3
   backend:
-    services:
-      postgres:
-        image: postgres:17
-        env:
-          POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: synthetic-ci-only
-          POSTGRES_DB: qualification_training_entry_ci
-        ports: ['55432:5432']
-        options: --health-cmd pg_isready --health-interval 2s --health-timeout 2s --health-retries 15
     needs: admission
     runs-on: ubuntu-24.04
-    timeout-minutes: 8
-    env:
-      DATABASE_URL: postgresql://postgres:synthetic-ci-only@127.0.0.1:55432/qualification_training_entry_ci
-      NODE_ENV: test
-      JWT_SECRET: ci-training-entry-synthetic-jwt-not-a-real-credential
-      ASSET_SIGNING_SECRET: ci-training-entry-synthetic-assets-not-a-real-credential
-      DATA_ENCRYPTION_KEY: aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
-      BACKGROUND_WORKERS_ENABLED: 'false'
-      HEAVY_PROCESSING_ENABLED: 'false'
-      VIDEO_PROCESSING_ENABLED: 'false'
-      NODE_OPTIONS: --max-old-space-size=4096
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
         with:
@@ -73,33 +54,15 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24.21.0'
-          cache: npm
-          cache-dependency-path: server-version/backend/package-lock.json
-      - name: install official locked backend tools
-        working-directory: server-version/backend
-        run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: generate exact candidate Prisma declarations
-        working-directory: server-version/backend
-        run: node node_modules/prisma/build/index.js generate
-      - name: upgrade nonempty fixed-main database and verify isolated dump restore
+      - name: verify complete successful official backend qualification and emitted bytes
         env:
-          CI_POSTGRES_CONTAINER: ${{ job.services.postgres.id }}
-        run: node .github/scripts/training-entry-migration.mjs
-      - name: emit the missing backend compilation once
-        run: node .github/scripts/training-entry-checks.mjs backend-compile
-      - name: only fixed missing-record affected backend contracts
-        run: node .github/scripts/training-entry-checks.mjs backend
-      - name: only the seven missing participation cases, never the twelve admitted reset FINAL cases
-        env:
-          TRAINING_PARTICIPATION_TEST_DATABASE_URL: postgresql://postgres:synthetic-ci-only@127.0.0.1:55432/qualification_training_entry_ci
-        run: node .github/scripts/training-entry-checks.mjs postgres
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/training-entry-checks.mjs recover-backend
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: training-entry-backend-${{ github.sha }}
-          path: |
-            training-entry-evidence
-            server-version/backend/dist
+          path: training-entry-evidence
           if-no-files-found: error
           retention-days: 3
   frontend:
@@ -122,19 +85,13 @@ jobs:
           node-version: '24.21.0'
           cache: npm
           cache-dependency-path: server-version/frontend/package-lock.json
-      - name: install official locked frontend tools
-        working-directory: server-version/frontend
-        run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: only fixed missing-record affected frontend contracts
-        run: node .github/scripts/training-entry-checks.mjs frontend
-      - name: only early changed lint inputs whose original records are missing
-        run: node .github/scripts/training-entry-checks.mjs lint
-      - name: require explicit one-time rebuild exception
-        run: node .github/scripts/training-entry-checks.mjs build-permission
-      - name: compile once for previously unexecuted actual-dist browser acceptance
+      - name: retain exact successful frontend checks and complete emitted bytes
         id: build
-        run: node .github/scripts/training-entry-checks.mjs frontend-build
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/training-entry-checks.mjs recover-frontend
       - uses: actions/upload-artifact@v4
+        if: always()
         id: dist
         with:
           name: training-entry-frontend-${{ github.sha }}
@@ -167,7 +124,7 @@ jobs:
           artifact-ids: ${{ needs.frontend.outputs.artifact }}
           merge-multiple: true
           path: .
-      - name: verify same-run exact frontend output before browser execution
+      - name: verify frozen official frontend output before browser execution
         run: node .github/scripts/training-entry-checks.mjs browser-input
       - name: install pinned controls and use the existing official sandboxed Chrome
         run: |

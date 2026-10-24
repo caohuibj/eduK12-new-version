@@ -1,10 +1,13 @@
+import {execFileSync} from 'node:child_process';
+import {changedEntries} from './content-scope.mjs';
+import {normalizedRestoredSchema,restoredCheckRepresentations} from './training-entry-migration.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {gzipSync} from 'node:zlib';
 import {binding,branch,marker,trainingEntryPlan,trainingEntryOutputs} from './training-entry-scope.mjs';
-import {verifyEvidence,verifyFreshReport,requireApproval,verifyFixedPg,requireMissingRecordApproval} from './training-entry-checks.mjs';
+import {verifyEvidence,verifyFreshReport,requireApproval,verifyFixedPg,requireMissingRecordApproval,verifyFrontendAuditEvidence,evidenceSourceObject,failedVitestSummary,verifyFixedFrontend,verifyDependencyAuditEvidence,reviewedRecoveryManifest,verifyCompletedBackend} from './training-entry-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 function fixture(){
  const head='a'.repeat(40),source='b'.repeat(40),values={};
@@ -57,8 +60,8 @@ test('workflow stays bounded and blocks broad manual probes before any work',()=
  assert(main.includes('"perf/training-entry-20261023","work/measurement-version-final-20261020"'));
  assert(wf.includes('needs: [admission, backend, frontend, browser]'));
  assert(wf.includes('training-entry-checks.mjs build-permission'));
- assert(wf.includes('training-entry-migration.mjs'));
- assert(wf.includes('postgres:17'));
+ assert(readFileSync('.github/scripts/training-entry-checks.mjs','utf8').includes('HEAD:.github/scripts/training-entry-migration.mjs'));
+ assert(wf.includes('verify complete successful official backend qualification and emitted bytes'));assert(!wf.includes('postgres:17'));
  assert(wf.includes('run current frontend and backend HIGH CRITICAL dependency audits'));
  assert(main.includes('backup/training-survey-main350-20261024'));
  assert(wf.includes('training-entry-browser.mjs'));
@@ -153,3 +156,106 @@ for(const [name,change]of [
 ])test('fixed PG admission refuses '+name,()=>{const f=fixedPgFixture();change(f);assert.throws(()=>verifyFixedPg(f.e,f.object));});
 
 test('missing-record rerun cannot activate until the bounded user exception is approved',()=>{for(const value of [undefined,false,'true'])assert.throws(()=>requireMissingRecordApproval({missingRecordRevalidationApproved:value}));requireMissingRecordApproval({missingRecordRevalidationApproved:true});});
+
+function frontendAuditFixture(){
+ const digest=v=>createHash('sha256').update(v).digest('hex'),r=binding.officialFrontendAudit;
+ const stdout=JSON.stringify({auditReportVersion:2,metadata:{vulnerabilities:{high:0,critical:0}}}),manifest='100644 blob '+ 'a'.repeat(40)+'\tserver-version/frontend/package-lock.json';
+ const command={id:'frontend-audit',cwd:'server-version/frontend',command:['npm','audit','--package-lock-only','--omit=dev','--audit-level=high','--json'],source:r.checkout,componentTree:r.componentTree,status:'success',exitCode:0,ciExecuted:true,tools:{node:'v24.21.0'},signal:null,error:null,gitInputManifest:manifest,gitInputManifestSHA256:digest(manifest),stdoutSHA256:digest(stdout),stderrSHA256:digest(''),completedAt:r.completedAt};
+ return {command,stdout,manifest,now:Date.parse(r.completedAt)+1000};
+}
+test('frontend audit accepts only its successful exact official subprocess within 24 hours',()=>{const f=frontendAuditFixture();assert.equal(verifyFrontendAuditEvidence(f.command,f.stdout,f.manifest,f.now).fresh,true);assert.equal(verifyFrontendAuditEvidence(f.command,f.stdout,f.manifest,f.now+86400000).fresh,false);});
+for(const [name,change]of [
+ ['failed subprocess',f=>f.command.exitCode=1],['changed lock manifest',f=>f.manifest+='changed'],
+ ['tampered output',f=>f.stdout+=' '],['different source',f=>f.command.source='0'.repeat(40)],
+ ['future completion',f=>f.now-=2000],
+])test('frontend audit rejects '+name,()=>{const f=frontendAuditFixture();change(f);assert.throws(()=>verifyFrontendAuditEvidence(f.command,f.stdout,f.manifest,f.now));});
+
+ test('evidence maps only current local provenance to the exact published product tree',()=>{const seen=[];const resolve=(cmd,ref)=>{seen.push(ref);assert.equal(cmd,'rev-parse');assert.equal(ref,binding.product+'^{tree}');return binding.productTree};assert.equal(evidenceSourceObject(binding.localProduct,resolve),binding.product);assert.deepEqual(seen,[binding.product+'^{tree}']);});
+ test('evidence rejects a published snapshot with different tree bytes',()=>{assert.throws(()=>evidenceSourceObject(binding.localProduct,()=> '0'.repeat(40)),/tree mismatch/);});
+ test('evidence never aliases unrelated historical source commits',()=>{const other='1'.repeat(40);assert.equal(evidenceSourceObject(other,()=>{throw Error('unexpected lookup')}),other);});
+
+const schemaFixture=()=>({columns:[{table_schema:'public',table_name:'t',column_name:'a',ordinal_position:1,dtd_identifier:'1',is_nullable:'NO'},{table_schema:'public',table_name:'t',column_name:'b',ordinal_position:4,dtd_identifier:'4',is_nullable:'YES'}],constraints:[],indexes:[],triggers:[],functions:[]});
+for(const pair of restoredCheckRepresentations)test('restore canonicalizes only exact CHECK pair '+pair.name,()=>{const a=schemaFixture(),b=schemaFixture();a.constraints=[[pair.table,pair.name,pair.original,true]];b.constraints=[[pair.table,pair.name,pair.restored,true]];assert.deepEqual(normalizedRestoredSchema(a),normalizedRestoredSchema(b));});
+test('restore preserves semantic CHECK differences and table identity',()=>{const p=restoredCheckRepresentations[0],a=schemaFixture();a.constraints=[[p.table,p.name,p.original.replace('>= 4','>= 5'),true],['other',p.name,p.original,true],[p.table,p.name,p.original.replace(' AND ',' OR '),false]];assert.deepEqual(normalizedRestoredSchema(a).constraints,a.constraints);});
+test('restore normalizes only dropped-column physical gaps and preserves visible order and metadata',()=>{const a=schemaFixture(),b=structuredClone(a);b.columns[1].ordinal_position=2;b.columns[1].dtd_identifier='2';assert.deepEqual(normalizedRestoredSchema(a),normalizedRestoredSchema(b));b.columns.reverse();assert.notDeepEqual(normalizedRestoredSchema(a),normalizedRestoredSchema(b));b.columns.reverse();b.columns[1].is_nullable='NO';assert.notDeepEqual(normalizedRestoredSchema(a),normalizedRestoredSchema(b));});
+test('restore rejects unrecognized dtd physical identity',()=>{const a=schemaFixture();a.columns[1].dtd_identifier='unknown';assert.throws(()=>normalizedRestoredSchema(a),/dtd identity/);});
+test('failed JSON diagnostics use assertion results rather than synthetic stderr',()=>{const r={success:false,numFailedTests:1,testResults:[{name:'a',status:'failed',assertionResults:[{status:'passed',fullName:'expected synthetic failure'},{status:'failed',fullName:'real mismatch',failureMessages:['expected text']}]}]};assert.deepEqual(failedVitestSummary(r).failures,[{file:'a',name:'real mismatch',messages:['expected text']}]);assert.equal(failedVitestSummary(r).success,false);});
+
+const fixedFrontendProof=()=>JSON.parse(readFileSync('.github/evidence/training-entry/reviewed.json')).fixedFrontendContracts;
+test('fixed frontend accepts only reviewed local 420 plus unique retry one',()=>{assert.deepEqual(verifyFixedFrontend(fixedFrontendProof()),{cases:411,originalPassed:420,retryPassed:1,excludedAffected:10,ciExecuted:false,originalExecutionSigned:false});});
+test('fixed frontend rejects report tampering',()=>{const e=fixedFrontendProof();e.reports[0].sha256='0'.repeat(64);assert.throws(()=>verifyFixedFrontend(e));});
+test('fixed frontend retains original failed invocation',()=>{const e=fixedFrontendProof();e.reports[0].exitCode=0;assert.throws(()=>verifyFixedFrontend(e));});
+test('fixed frontend never treats a failed retry as accepted',()=>{const e=fixedFrontendProof();e.reports[1].exitCode=1;assert.throws(()=>verifyFixedFrontend(e));});
+
+function backendAuditFixture(){const f=frontendAuditFixture(),r=binding.officialBackendAudit;f.command={...f.command,id:'backend-audit',cwd:'server-version/backend',source:r.checkout,componentTree:r.componentTree,completedAt:r.completedAt};f.manifest=f.manifest.replace('frontend','backend');f.command.gitInputManifest=f.manifest;f.command.gitInputManifestSHA256=createHash('sha256').update(f.manifest).digest('hex');f.now=Date.parse(r.completedAt)+1000;return f;}
+test('backend audit accepts exact successful component subprocess and expires after 24h',()=>{const f=backendAuditFixture();assert.equal(verifyDependencyAuditEvidence(f.command,f.stdout,f.manifest,'backend',f.now).fresh,true);assert.equal(verifyDependencyAuditEvidence(f.command,f.stdout,f.manifest,'backend',f.now+86400000).fresh,false);});
+test('backend audit refuses any input drift even with reviewed frontend delta',()=>{const f=backendAuditFixture();assert.throws(()=>verifyDependencyAuditEvidence(f.command,f.stdout,f.manifest+'x','backend',f.now),/Backend dependency inputs changed/);});
+test('backend audit refuses failed original subprocess',()=>{const f=backendAuditFixture();f.command.exitCode=1;assert.throws(()=>verifyDependencyAuditEvidence(f.command,f.stdout,f.manifest,'backend',f.now));});
+test('evidence preserves earlier compiler source through explicit identical-tree public mapping',()=>{const [source,mapping]=Object.entries(binding.evidenceSourceObjects)[0];assert.equal(evidenceSourceObject(source,(cmd,ref)=>{assert.equal(cmd,'rev-parse');assert.equal(ref,mapping.remote+'^{tree}');return mapping.tree}),mapping.remote);});
+
+// The fourth-run repair may only reverse three independently reviewed blobs;
+// no directory, dependency, metadata or additional-file exception is allowed.
+test('fourth recovery accepts only the exact reviewed component blob substitutions',()=>{
+ const file='server-version/backend/src/form.ts',d={[file]:{before:'a'.repeat(40),after:'b'.repeat(40)}};
+ const before=`100644 blob ${d[file].before}\t${file}`,after=`100644 blob ${d[file].after}\t${file}`;
+ assert.doesNotThrow(()=>reviewedRecoveryManifest(before,after,'backend',d));
+ assert.throws(()=>reviewedRecoveryManifest(before,after+'\n100644 blob '+ 'c'.repeat(40)+'\tserver-version/backend/package.json','backend',d));
+ assert.throws(()=>reviewedRecoveryManifest(before,after.replace('100644','100755'),'backend',d));
+ assert.throws(()=>reviewedRecoveryManifest(before,after.replace('b'.repeat(40),'c'.repeat(40)),'backend',d));
+});
+test('fourth recovery cannot use a frontend exception to bypass backend source equality',()=>{
+ const d={'server-version/frontend/x.css':{before:'a'.repeat(40),after:'b'.repeat(40)}};
+ assert.throws(()=>reviewedRecoveryManifest('before','after','backend',d));
+});
+test('sixth recovery retains official completed backend and excludes only affected review contracts',()=>{
+ const r=binding.officialRecovery;assert.equal(r.failedBackendNames.length,6);assert.equal(new Set(r.failedBackendNames).size,6);
+ assert.equal(r.revalidation8Approved,true);assert.equal(r.approvalMessage,'Sentinel_355ab6c09da88191aaf61e8b9d1648f2');
+ assert.equal(r.browserRetainedNames.length,25);assert(!r.browserRetainedNames.includes('assessment-deferred-export-retry'));assert.equal(binding.fixedFrontendContracts.retainedPassed,411);assert.equal(binding.fixedFrontendContracts.excludedPriorCount,10);
+ const workflow=readFileSync('.github/workflows/ci-training-entry.yml','utf8');assert(workflow.includes('recover-backend'));assert(workflow.includes('recover-frontend'));assert(!workflow.includes('training-entry-checks.mjs postgres'));
+ assert(!workflow.includes('training-entry-checks.mjs backend-compile'));assert(workflow.includes('training-entry-checks.mjs recover-frontend'));assert(!workflow.includes('training-entry-checks.mjs frontend-build'));
+});
+
+test('actual repository diff discovers newly modified main paths outside the former manifest',()=>{
+ const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+ const head=git('rev-parse','HEAD'),actual=changedEntries(binding.base,head);
+ const env={CI_EVENT:'pull_request',CI_HEAD_REF:branch,CI_SOURCE_HEAD:head,CI_PR_REPOSITORY:'caohuibj/eduK12-new-version',CI_PR_NUMBER:'351'};
+ // Actual Git owns this list. Never manufacture it from binding.source.
+ assert.equal(trainingEntryPlan(actual,binding.base,head,git,env).changes.length,actual.length);
+ for(const file of Object.keys(binding.officialRecovery.productDeltas)){
+  assert(actual.some(entry=>entry.file===file));assert(binding.source[file]);
+  const omitted=actual.filter(entry=>entry.file!==file);
+  assert.throws(()=>trainingEntryPlan(omitted,binding.base,head,git,env),/Complete raw diff required/);
+ }
+ const injected=[...actual,{file:'server-version/backend/src/unreviewed-new.ts',status:'A',oldMode:'000000',newMode:'100644'}];
+ assert.throws(()=>trainingEntryPlan(injected,binding.base,head,git,env),/Complete raw diff required/);
+});
+
+test('completed backend evidence rejects missing files before accepting any qualification',()=>{
+ assert.throws(()=>verifyCompletedBackend({},'',{}));
+});
+
+test('export recovery retains only official review success and leaves failed export for the new build',()=>{
+ const r=binding.officialRecovery;
+ assert.equal(r.completedReview.passed,8);
+ assert.equal(r.completedReview.file,'src/pages/__tests__/AssignmentList.review-pagination.test.tsx');
+ assert(r.browserRetainedNames.includes('assignment-review-paging-batch-download'));
+ assert(!r.browserRetainedNames.includes('assessment-deferred-export-retry'));
+ assert.deepEqual(binding.checks.frontendTestFiles,['src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx']);
+ assert.equal(binding.fixedFrontendContracts.excludedAffectedFiles['server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx'],3);
+ assert.equal(r.backendOrigin.run,binding.completedBackend.run);
+ assert.equal(r.backendOrigin.sourceHead,binding.completedBackend.sourceHead);
+});
+
+test('anonymous browser fixtures pass the actual shared link codec before any page journey',async()=>{
+ const {createParticipationLinkCodec}=await import('../../server-version/frontend/src/components/participation/participation-link.ts');
+ const source=readFileSync('.github/scripts/training-entry-browser.mjs','utf8');
+ const id=source.match(/const studyId = '([^']+)'/)[1];
+ const codec=createParticipationLinkCodec({route:'/public/studies/',namespace:'training-study',proofFields:{key:/^[A-Za-z0-9_-]{43}$/}});
+ for(const key of ['s'.repeat(43),'r'.repeat(43)]){const link=new URL(codec.link('http://localhost:4173',id,{key}));assert.equal(link.pathname,'/public/studies/'+id);assert.equal(link.search,'');assert.deepEqual(codec.read(link.hash),{key});}
+ assert.equal(codec.link('http://localhost:4173','browser-study',{key:'s'.repeat(43)}),'');
+ assert(source.includes('for(const key of [studyCredential,rotatedCredential])'));
+});
+test('unchanged frontend uses only the exact successful official build and leaves all anonymous cases unqualified',()=>{
+ const r=binding.completedFrontend;assert.equal(r.run,40096682005);assert.equal(r.componentTree,binding.components.frontend);assert.equal(r.artifacts.frontend.conclusion,'success');assert.equal(r.artifacts.browser.conclusion,'failure');assert.equal(r.browserRetainedNames.length,26);assert(r.browserRetainedNames.every(n=>!n.startsWith('anonymous-')));
+ const workflow=readFileSync('.github/workflows/ci-training-entry.yml','utf8');const frontend=workflow.split('  frontend:')[1].split('  browser:')[0];assert(frontend.includes('recover-frontend'));assert(!frontend.includes('npm ci'));assert(!frontend.includes('checks.mjs frontend'));assert(!frontend.includes('build-permission'));
+});

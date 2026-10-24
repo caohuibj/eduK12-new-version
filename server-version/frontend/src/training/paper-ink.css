@@ -584,9 +584,8 @@
   outline-offset: 3px;
 }
 
-/* TrainingContextBack supplies a stable course return on every task page,
-   including a refreshed deep link with no in-app browser history. */
-.hui-training.hui-app--standard .student-submit-back { display: none; }
+/* Learner assignment/check-in pages own their course return action.
+   TrainingContextBack intentionally omits its duplicate on those routes. */
 
 .hui-training.hui-app--standard .staff-dialog__description { color: var(--training-muted); }
 .hui-training.hui-app--standard .text-green-600 { color: var(--training-bamboo); }

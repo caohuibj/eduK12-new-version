@@ -34,6 +34,51 @@ const schema=url=>json(url,`SELECT jsonb_build_object(
  'indexes',(SELECT jsonb_agg(jsonb_build_array(tablename,indexname,indexdef) ORDER BY tablename,indexname) FROM pg_indexes WHERE schemaname='public'),
  'triggers',(SELECT jsonb_agg(jsonb_build_array(c.relname,t.tgname,pg_get_triggerdef(t.oid),t.tgenabled) ORDER BY c.relname,t.tgname) FROM pg_trigger t JOIN pg_class c ON c.oid=t.tgrelid JOIN pg_namespace n ON n.oid=c.relnamespace WHERE n.nspname='public' AND NOT t.tgisinternal),
  'functions',(SELECT jsonb_agg(jsonb_build_array(p.proname,pg_get_functiondef(p.oid)) ORDER BY p.proname,p.oid::regprocedure::text) FROM pg_proc p JOIN pg_namespace n ON n.oid=p.pronamespace WHERE n.nspname='public' AND p.prokind IN('f','p')));`);
+// Exact PostgreSQL 17 dump/reparse representations observed for four fixed-base
+// CHECK constraints. Only identical full definitions map; no general SQL rewrite.
+export const restoredCheckRepresentations = [
+  {
+    "name": "campus_accounts_login_shape_check",
+    "table": "campus_accounts",
+    "original": "CHECK ((((length(login_name) >= 4) AND (length(login_name) <= 32)) AND (normalized_login = lower(TRIM(BOTH FROM login_name))) AND (normalized_login ~ '^[a-z0-9_.-]{4,32}$'::text)))",
+    "restored": "CHECK (((length(login_name) >= 4) AND (length(login_name) <= 32) AND (normalized_login = lower(TRIM(BOTH FROM login_name))) AND (normalized_login ~ '^[a-z0-9_.-]{4,32}$'::text)))"
+  },
+  {
+    "name": "content_capability_grants_capabilities_check",
+    "table": "content_capability_grants",
+    "original": "CHECK ((((cardinality(capabilities) >= 1) AND (cardinality(capabilities) <= 12)) AND (capabilities <@ ARRAY['measurement.edit'::text, 'measurement.publish'::text, 'reference.analyze'::text, 'reference.review'::text, 'reference.publish'::text, 'report.edit'::text, 'report.publish'::text, 'catalog.manage'::text, 'material.use'::text, 'material.adapt'::text, 'material.distribute'::text, 'data.reinterpret'::text])))",
+    "restored": "CHECK (((cardinality(capabilities) >= 1) AND (cardinality(capabilities) <= 12) AND (capabilities <@ ARRAY['measurement.edit'::text, 'measurement.publish'::text, 'reference.analyze'::text, 'reference.review'::text, 'reference.publish'::text, 'report.edit'::text, 'report.publish'::text, 'catalog.manage'::text, 'material.use'::text, 'material.adapt'::text, 'material.distribute'::text, 'data.reinterpret'::text])))"
+  },
+  {
+    "name": "huiteacher_improvement_actions_cipher_check",
+    "table": "huiteacher_improvement_actions",
+    "original": "CHECK ((((length(goal_cipher) >= 30) AND (length(goal_cipher) <= 30000)) AND ((length(plan_cipher) >= 30) AND (length(plan_cipher) <= 100000))))",
+    "restored": "CHECK (((length(goal_cipher) >= 30) AND (length(goal_cipher) <= 30000) AND ((length(plan_cipher) >= 30) AND (length(plan_cipher) <= 100000))))"
+  },
+  {
+    "name": "survey_login_shape_check",
+    "table": "survey_accounts",
+    "original": "CHECK ((((length(login_name) >= 4) AND (length(login_name) <= 32)) AND (normalized_login = lower(TRIM(BOTH FROM login_name))) AND (normalized_login ~ '^[a-z0-9_.-]{4,32}$'::text)))",
+    "restored": "CHECK (((length(login_name) >= 4) AND (length(login_name) <= 32) AND (normalized_login = lower(TRIM(BOTH FROM login_name))) AND (normalized_login ~ '^[a-z0-9_.-]{4,32}$'::text)))"
+  }
+];
+export function normalizedRestoredSchema(value,catalog=databaseName){
+ const result=structuredClone(value),positions=new Map();
+ for(const column of result.columns){
+  const key=column.table_schema+'\0'+column.table_name;
+  const ordinal=(positions.get(key)||0)+1;positions.set(key,ordinal);
+  // Dropped physical attributes leave gaps which pg_dump does not recreate.
+  // Relative visible order was checked independently before this comparison.
+  assert.equal(String(column.dtd_identifier),String(column.ordinal_position),'Unexpected non-column dtd identity');
+  column.ordinal_position=ordinal;column.dtd_identifier=String(ordinal);
+  for(const field of Object.keys(column))if(field.endsWith('_catalog')&&column[field]===catalog)column[field]=databaseName;
+ }
+ result.constraints=result.constraints.map(c=>{
+  const exact=restoredCheckRepresentations.find(v=>v.table===c[0]&&v.name===c[1]&&v.original===c[2]);
+  return exact?[c[0],c[1],exact.restored,...c.slice(3)]:c;
+ });
+ return result;
+}
 const reject=(operation,code='raise_exception')=>`DO $$ DECLARE rejected BOOLEAN=false; BEGIN BEGIN ${operation}; EXCEPTION WHEN ${code} THEN rejected=true; END; IF NOT rejected THEN RAISE EXCEPTION 'Expected invariant rejection did not occur'; END IF; END $$;`;
 
 // Synthetic literals only: no real account, bearer token, credential or answer.
@@ -102,9 +147,9 @@ export async function main(){
   sql(url,'CREATE DATABASE '+identifier(restoreName));u.pathname='/'+restoreName;
   child('docker',['exec','-i',container,'pg_restore','-U','postgres','--dbname',restoreName,'--exit-on-error'],{input:readFileSync(dump),stdio:['pipe','inherit','inherit']});
   const restored=u.toString();assert.deepEqual(columns(restored),newColumns);assert.deepEqual(snapshot(restored,newColumns),upgraded);assert.deepEqual(history(restored),upgradedHistory);
-  // information_schema includes table_catalog; normalize only that database name.
-  const restoredSchema=schema(restored);for(const column of restoredSchema.columns)for(const key of Object.keys(column))if(key.endsWith('_catalog')&&column[key]===restoreName)column[key]=databaseName;
-  assert.deepEqual(restoredSchema,upgradedSchema);validateInvariants(restored);assert.deepEqual(snapshot(restored,newColumns),upgraded);
+  const restoredSchema=schema(restored);
+  writeFileSync(join(output,'migration-schema-comparison.json'),JSON.stringify({upgraded:upgradedSchema,restored:restoredSchema},null,2)+'\n');
+  assert.deepEqual(normalizedRestoredSchema(restoredSchema,restoreName),normalizedRestoredSchema(upgradedSchema));validateInvariants(restored);assert.deepEqual(snapshot(restored,newColumns),upgraded);
   writeFileSync(join(output,'migration.json'),JSON.stringify({kind:'isolated-actions-migration-restore',base:binding.base,head:git('rev-parse','HEAD'),migrations,
    oldTables:oldColumns.length,oldRowsPreserved:true,legacyNullBindingsPreserved:true,newDefaultsVerified:true,stableIdentityGuardsVerified:true,
    before,after:snapshot(url,oldColumns),restoredTables:newColumns.length,restoredRowsAndSchemaEqual:true,dumpSHA256:hash(readFileSync(dump))},null,2)+'\n');

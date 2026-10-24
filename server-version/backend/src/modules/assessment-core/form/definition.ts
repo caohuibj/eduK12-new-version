@@ -104,6 +104,42 @@ const requireText=(value:string,path:string,issues:Issue[])=>{
 }
 const err=(issues:Issue[],path:string,message:string)=>issues.push({path,message,severity:'error'})
 
+/** Public issue presentation only. Zod 4 still owns validation and issue order;
+ * unrecognized issue kinds retain their native diagnostic. */
+const formIssueMessage: z.core.$ZodErrorMap = issue => {
+  const received = (value: unknown): string => value === null ? 'null'
+    : Array.isArray(value) ? 'array'
+    : typeof value === 'number' && Number.isNaN(value) ? 'nan' : typeof value
+  if (issue.code === 'invalid_type') {
+    if (issue.input === undefined) return 'Required'
+    return `Expected ${issue.expected === 'int' ? 'integer' : issue.expected}, received ${
+      issue.expected === 'int' && typeof issue.input === 'number' ? 'float' : received(issue.input)}`
+  }
+  if (issue.code === 'invalid_value' && issue.values.length > 1 && issue.values.every(value => typeof value === 'string')) {
+    const expected = issue.values.map(value => `'${value}'`).join(' | ')
+    if (typeof issue.input !== 'string') return issue.input === undefined ? 'Required' : `Expected ${expected}, received ${received(issue.input)}`
+    return `Invalid enum value. Expected ${expected}, received '${issue.input}'`
+  }
+  if (issue.code === 'invalid_format' && issue.format === 'regex') return 'Invalid'
+  if (issue.code === 'unrecognized_keys') return `Unrecognized key(s) in object: ${issue.keys.map(key => `'${key}'`).join(', ')}`
+  if (issue.code === 'too_small' || issue.code === 'too_big') {
+    const small = issue.code === 'too_small'
+    const limit = issue.code === 'too_small' ? issue.minimum : issue.maximum
+    if (issue.origin === 'number' || issue.origin === 'int')
+      return `Number must be ${issue.exact ? 'exactly equal to ' : small
+        ? issue.inclusive ? 'greater than or equal to ' : 'greater than '
+        : issue.inclusive ? 'less than or equal to ' : 'less than '}${limit}`
+    if (issue.origin === 'string' || issue.origin === 'array') {
+      const subject = issue.origin === 'string' ? 'String' : 'Array'
+      const unit = issue.origin === 'string' ? 'character(s)' : 'element(s)'
+      return `${subject} must contain ${issue.exact ? 'exactly' : small
+        ? issue.inclusive ? 'at least' : 'over'
+        : issue.inclusive ? 'at most' : 'under'} ${limit} ${unit}`
+    }
+  }
+  return undefined
+}
+
 /** Shared Form definition validation. Options are supplied by an entry adapter;
  * legacyFrozen preserves historical immutable publications, never new authoring.
  * The digest namespace remains {kind:'FORM',definition} for stored compatibility.
@@ -112,7 +148,7 @@ export const validateFormDefinition=(input:unknown,options:{
   forPreview?:boolean;allowLegacyFrozenConditionOperators?:boolean;includeDigest?:boolean
 }={}):{definition?:FormDraft;issues:FormDefinitionIssue[];digest?:string}=>{
   const {forPreview=false,allowLegacyFrozenConditionOperators=false,includeDigest=true}=options
-  const parsed=formDraftSchema.safeParse(input)
+  const parsed=formDraftSchema.safeParse(input,{error:formIssueMessage})
   if(!parsed.success)return {issues:parsed.error.issues.map(x=>({
     path:x.path.join('.')||'definition',message:x.message,severity:'error' as const,
   }))}

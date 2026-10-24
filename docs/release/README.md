@@ -1505,8 +1505,8 @@ retained even if an independent later check fails, so it need not be rebuilt.
 
 The previously unmerged Training-entry slot is superseded, not added to: current
 base is `44c1e502acaed5524c5b1e233d1bfb1f0c6f7b40`, product snapshot is
-`4a4756d133e5da75345da7f7af75091b0b3f41fb`, source tree is
-`6c9b70e26ae5d23f412e819d453673639fce5f6a`, and the only PR branch is
+`faee762e9b14f38acaeec2a730d7b17db57fb550`, source tree is
+`accc9951701ebe33c3899a1a2159b4f376de380e`, and the only PR branch is
 `backup/training-survey-main350-20261024`. Exact source blobs, modes, complete
 changed-path inventory and current control hashes are frozen by the existing
 binding/admission mechanism. The old 67d0/a1369 qualification is not inherited.
@@ -1540,3 +1540,94 @@ for a production runtime-image scan when a later release requires one. A draft,
 missing, skipped, failed or cancelled selected job remains blocking; no fallback
 route may bypass these requirements. Report the actual waiting stage after five
 minutes rather than widening or repeating completed work.
+
+#### PR351 security dependency correction
+
+The first qualification run `40083811762` failed the backend dependency audit;
+that failure remains recorded. The frontend audit subprocess alone succeeded.
+Its official run/job/artifact identity, original failure, ZIP digest, complete
+frontend input manifest, output bytes and successful subprocess exit are verified
+before reuse, with a 24-hour maximum age. A stale result causes a fresh frontend
+audit; missing or corrupt evidence stops admission. The initial backend audit executes against the new locked dependencies. Later
+unchanged backend inputs may reuse their own exact successful official artifact
+subprocess within the same 24-hour bound; HIGH/CRITICAL thresholds never change.
+
+The repair uses actual Zod 4.6.7, body-parser 1.20.9, multer 2.5.0 and ip-address
+10.7.4. It does not import Zod's vulnerable v3 compatibility entry. Old UUID-like
+acceptance uses the official guid validator; record/error APIs and strict schema
+composition are adapted without changing frozen scientific definitions. Five old
+payload outputs/hashes, the bounded-array rejection and a strict-grant regression
+were checked locally. This is bounded compatibility evidence, not exhaustive
+coverage of every schema or authorization path.
+
+Because parser and dependency inputs changed, old Zod3 backend/PG/type evidence
+is historical only. Twelve affected PostgreSQL cases were executed on a new
+isolated clone under the new dependencies, with original setup failures and their
+two-case retry preserved separately. Both component type checks were refreshed.
+The unchanged 71 frontend assertions retain their exact input review. Four added
+pure contracts cover Bundle schema composition, catalog/localization error
+behavior and shared FORM defaults; the remaining affected CI checks and builds
+still execute. No production-image or deployment qualification is claimed.
+
+
+The next PR351 recovery retains two local, unsigned Vitest JSON reports: the
+34-file reproduction's 420 passes and one failure, followed by only that failed
+case passing (16 others unselected). The single test-only recovery-text assertion
+change retains both cross-namespace no-API-call assertions. Exact report hashes,
+case identity and current imported input closure are checked; this does not turn
+the original official failed frontend job into a success. Failed JSON/exit records
+are always uploaded before the job remains failed.
+
+PostgreSQL restore comparison retains visible column order and all metadata,
+while mapping dropped-column physical ordinal/dtd gaps to dense visible positions.
+Only four fixed table/constraint/full-definition pairs with equivalent AND
+association are normalized; unknown changes, values, operators, flags, indexes,
+triggers and functions stay strict. Raw before/after schema comparison is retained
+on failure. A bounded real PostgreSQL dump/restore reproduction and negative
+control contracts verified this correction, not a production migration.
+
+The fourth PR351 run retains its failed backend/browser conclusions. Recovery
+accepts only 465 successful backend assertions from the exact official JSON,
+with the six failed Form contracts excluded. The six repaired contracts and two
+new diagnostic-boundary contracts execute once under explicit user approval;
+their local reports are not published. Form compatibility is limited to public
+issue presentation; Zod 4 validation, immutable golden facts and issue ordering
+remain unchanged. The precise media leaf import guard still excludes adapters.
+
+The successful official nonempty upgrade/restore result and exact dump are reused
+only while the migration script, schema and full migration inputs match. The dump
+seeds a new empty local CI database for the seven not-yet-executed cases; it is
+not presented as a second qualification. Official successful lint and thirteen
+unaffected entry/management browser scenarios are retained. Learner scenarios,
+including previously passing assignment detail cases, execute against the new
+CSS build because restoring the actual return button affects those pages. Every
+remaining required browser scenario and build must succeed; failed/skipped jobs
+remain blocking. No additional original logs are published in this repair.
+
+The sixth run completed backend qualification and frontend build successfully.
+The next recovery keeps the complete official backend job, its exact dependency/
+source manifest and all 5,941 emitted file hashes; it does not start PostgreSQL,
+regenerate Prisma, compile or repeat its 473 contracts/seven remaining PG cases.
+The original migration qualification and the twelve prior reset cases remain
+separately identified rather than counted as new executions.
+
+AssignmentList's current successful batch now clears its own busy state before
+advancing list-refresh generation; stale or failed operations retain their guards.
+The affected file's seven old assertions are removed from the 421-case receipt,
+leaving 414. Its eight current assertions execute with explicit approval. The
+frontend rebuilds for this actual runtime change and lints the two changed files.
+Twenty-four already passing browser scenarios retain exact official provenance;
+the failed batch-review scenario and seven never-executed scenarios still run.
+No new original logs are published, and no failed job is re-labelled successful.
+
+### PR351 explicit export document recovery
+
+The seventh official browser run passed batch grading but proved that the failed ES module URL remains cached after clearing the loader promise. Export recovery now warns about unsaved page state and requires an explicit confirmable document reload; cancel preserves the page, and export must be reopened manually. No second build entry, arbitrary import URL, automatic reload or automatic export is added.
+
+The unchanged backend keeps its exact official completed qualification and emitted bytes. The original local frontend 421 set excludes the old review seven and export three (411 retained); the seventh official successful review eight are verified against their exact report, command, source and dependency manifest. Only the current three export contracts execute under the separate user approval. A new frontend build executes the failed export recovery plus the six unexecuted anonymous journeys; the 25 previously successful browser scenarios are retained with their original provenance. Failed runs remain failed, and no deployment or production image qualification is implied.
+
+### PR351 valid anonymous fixture and unchanged frontend reuse
+
+The eighth run completed export reload recovery. Its next anonymous-link journey exposed a malformed synthetic study ID, not a product authorization defect. The harness now uses a valid synthetic UUID, prechecks both original and rotated proofs through the actual shared codec, and verifies the downloaded link's exact path, empty query, namespace and proof fields. Production validation is unchanged.
+
+All frontend source and dependency bytes remain identical to the eighth successful frontend job. Its fixed official artifact, source manifest, three export contracts, prior eight review receipt, lint records and all 727 emitted files are checked and transferred unchanged; no repeat install, test or build is needed. Browser consumption explicitly names that original producer rather than claiming a new build. The 26 original successful scenarios are retained; all six anonymous scenarios still execute against the exact artifact. Missing, expired, corrupted or mismatched artifacts fail closed.

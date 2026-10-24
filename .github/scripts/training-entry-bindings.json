@@ -1,9 +1,9 @@
 {
   "schema": 1,
   "base": "44c1e502acaed5524c5b1e233d1bfb1f0c6f7b40",
-  "product": "4a4756d133e5da75345da7f7af75091b0b3f41fb",
-  "localProduct": "1a96d2014a3841c30f92967e971d9d3cea173b47",
-  "productTree": "6c9b70e26ae5d23f412e819d453673639fce5f6a",
+  "product": "3ecd238229828a9667a8430c7b2b9909cd30feb7",
+  "localProduct": "b433bea05d7038b68a9badf8f6dad117c55d4064",
+  "productTree": "ad90465552f0f0db26c3cb73533944c3d0413237",
   "source": {
     "docs/performance/20261024-training-ordinary-submit-fact-protocol.md": {
       "status": "A",
@@ -25,6 +25,20 @@
       "newMode": "100644",
       "before": null,
       "after": "987e836f06799da48a3b610d323075e3793822c0"
+    },
+    "server-version/backend/package-lock.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "73607721290dd28f1c6f85d5e12d5d517926ede3",
+      "after": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6"
+    },
+    "server-version/backend/package.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "033398f6361b0e4217226ae00f2edc2ed3380ecd",
+      "after": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf"
     },
     "server-version/backend/prisma/migrations/20261024080000_training_participation_codes/migration.sql": {
       "status": "A",
@@ -67,6 +81,13 @@
       "newMode": "100644",
       "before": null,
       "after": "7844a5e7cb38affdc878a3201f3d98e66bb42a54"
+    },
+    "server-version/backend/src/__tests__/assessment-core/form-foundation.contract.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b88a9b111a2be8384fb43a6338f2069ae8e9da09",
+      "after": "5309c7e1aca89d09428b741c7702e33c17e18438"
     },
     "server-version/backend/src/__tests__/composite/composite-report.service.test.ts": {
       "status": "M",
@@ -236,6 +257,13 @@
       "before": null,
       "after": "f4dfb4e2406904adb2d55e4ea6b76bc20e4ffa22"
     },
+    "server-version/backend/src/__tests__/measurement-content/admin-authority.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "57127d9f95fe18d72ee5affdc2abe98862b1a0f9",
+      "after": "84bb25775aa8008b0298cf8e59e1e800d4cd0f7c"
+    },
     "server-version/backend/src/__tests__/measurement-content/survey-participant-feedback.test.ts": {
       "status": "M",
       "oldMode": "100644",
@@ -355,6 +383,20 @@
       "before": "3a7a6b4b70db19468f20b644314fc8a34d64ccc7",
       "after": "47124b2a319543e8c107510cd486b2ccb59a9a68"
     },
+    "server-version/backend/src/__tests__/validation/fixtures/zod3-contracts.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9611ae69ffcfc14be6dddb1699eb33dfc146a5c5"
+    },
+    "server-version/backend/src/__tests__/validation/zod4-contracts.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a30d3d80099e551b02cbb2378dd58be61f558bae"
+    },
     "server-version/backend/src/config/checkinUploadCleanup.ts": {
       "status": "A",
       "oldMode": "000000",
@@ -362,61 +404,117 @@
       "before": null,
       "after": "c746520ba0969bd4402ba25df951275f99721b48"
     },
+    "server-version/backend/src/config/index.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "17965b9d34764157e099938a111c3fca566ad9d5",
+      "after": "a445eaeae7515b42af432733a5a0e0f73b512b13"
+    },
     "server-version/backend/src/controllers/assignmentController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "3da77c9677f87d95cbb5888df9b6c0a7a30731c3",
-      "after": "e64353e2dd6d075d23f4f0f84d748169c8d18fa2"
+      "after": "49674087e8d6b608123a3e811009804a5bf99b9e"
     },
     "server-version/backend/src/controllers/authController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "f037edaccb2fe4c10ad245870dd7e4cde0b454d3",
-      "after": "3942742ac364bf0dcedfaa8fbfc45f972658fec7"
+      "after": "203d5ba91e7c5808758b000e76ed31ac69d35ded"
     },
     "server-version/backend/src/controllers/checkinController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "e8f0bd67be843f301f86d72c2d1e1eada101be2b",
-      "after": "b3c7691c2318c5bb938a8330b730faf18fbaf156"
+      "after": "9c71bf27106358d13e2e22bb2099b8eeef68bbea"
+    },
+    "server-version/backend/src/controllers/checkinScheduleController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d125552c75cd7c76fda05fd3a0bcb614065cbef4",
+      "after": "241ee5820daac2d436694587ec5788530e2d0d35"
+    },
+    "server-version/backend/src/controllers/classroomController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "923af7d8cfa0de8a41c54d306f0d358d061d2b0b",
+      "after": "5268c051ff12a6df333d1504240b21651f6ade81"
     },
     "server-version/backend/src/controllers/courseController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "0b87467992fa3a2712c97b6bab746d9e73e7cb2f",
-      "after": "35126ee218e62dc87180174d44d70fc9314d1ba8"
+      "after": "e37e1faa0d5a6a14cfa978b0a218a32aa908a22b"
+    },
+    "server-version/backend/src/controllers/generalQuestionnaireController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "69a416ffb9f94e034aee597f71224d1e4d50c8cb",
+      "after": "84cec812826539805d1ee356d209e88c9adb49f3"
     },
     "server-version/backend/src/controllers/publicQuestionnaireController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "2f81d100038f22600267a4815de72b78dcca576b",
-      "after": "748f0a33d9a27adb9a3baedfd1390562c306bc18"
+      "after": "19dc85021812c42c17e5560bfead6ae591e46856"
     },
     "server-version/backend/src/controllers/questionnaireController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "fd9a176248e586e727ccbab5cc298d1fb22ca403",
-      "after": "7a205bcceac7f35515fd0140f9e2425cfb4bdb55"
+      "after": "ae96977617ced60417060fbdf67ff018cfa7e80a"
     },
     "server-version/backend/src/controllers/scaleController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "7d41dbabadb6505fe4c4f8ce5a948452f660ec3f",
-      "after": "15e0f082e6d3e61cd48bc4759fca3486b993c0b1"
+      "after": "07db06465b5370204f25d37b811668451f324f2b"
+    },
+    "server-version/backend/src/controllers/situationalController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "330695291f8251701f75a915083e882f38303972",
+      "after": "459b66b22324cb02f5d02eb84005ecbd85d46ae2"
     },
     "server-version/backend/src/controllers/teacherCodeController.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "661d91ad9a655ad87b2fb42eb09afff6669caa92",
-      "after": "623c4b84d67d041b06fb2fb5adaa5bccd987b412"
+      "after": "15dbe1828a3c6690cf63d0be90eac9cd04ddbc9d"
+    },
+    "server-version/backend/src/controllers/trainingAnalysisController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "787cfc9ebe128504934f7a09699a8dfe38301ebd",
+      "after": "c5d1ef2f38d1ad72447a676ed895e4c55e25ccb4"
+    },
+    "server-version/backend/src/controllers/userController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "418d934deffba06e33bf565913b5c122182fe270",
+      "after": "8a7564a748d6d568c583fafcb3af54e4a079a1e9"
+    },
+    "server-version/backend/src/controllers/videoController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c92560dfea9d22ebb6843a047080dba7bc88622c",
+      "after": "9a4fbda486d0137c5741dff416308ea972c210a3"
     },
     "server-version/backend/src/index.ts": {
       "status": "M",
@@ -424,6 +522,13 @@
       "newMode": "100644",
       "before": "bd9d674c51532cbb0a0191d60640d182a5ea9042",
       "after": "84c4f9f89dba0a47577fc11e64679a277448bf7b"
+    },
+    "server-version/backend/src/modules/admin-permissions/routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "62b112bfcb9e28a531058a039976afec0d485b8f",
+      "after": "f6a5baab7dc372ddf4b787fc61d5e905abb8d5ef"
     },
     "server-version/backend/src/modules/anonymous-study/admission-principal.ts": {
       "status": "A",
@@ -444,7 +549,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "ba6e2b9b297570c6f6cdb814dd787723eccb7d57",
-      "after": "0a3d1ccc7033bb4f44c8b2b6b3de82dee7a1d9a9"
+      "after": "323a19a2a84a67ba16109f0422b43598f85b8659"
     },
     "server-version/backend/src/modules/anonymous-study/service.ts": {
       "status": "M",
@@ -453,12 +558,117 @@
       "before": "acbf71c5bc80e7778d5713bbad3fa26cd4c7ab4a",
       "after": "a6ae47192c4c171c3e27086a70227646e4424f5f"
     },
+    "server-version/backend/src/modules/assessment-authorization/records-schema.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "091bcfac82eff18aceb71e1d13fc952414637cb9",
+      "after": "b10a5e6b7089f6ccf8c7c82a9568bddcd4794164"
+    },
+    "server-version/backend/src/modules/assessment-bundle/onboarding/contract.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "37543675704f7d3803bea480f1775bc4cba6c41a",
+      "after": "171719b67d754dfbbdaaec71bd3ebf323287b090"
+    },
+    "server-version/backend/src/modules/assessment-core/flow/training.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3941449d9d8175501a248c08dc4d57cc7e4b15ab",
+      "after": "5c840c671da69ea934c00578c41b7ccf967c7f2e"
+    },
+    "server-version/backend/src/modules/assessment-core/form/definition.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "74fc2209982527d3599962234dd6f5f3b7a60e0a",
+      "after": "269514b731b6caa3cea0b2cf17fd18d46d918cc8"
+    },
+    "server-version/backend/src/modules/assessment-media/material.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c23760fa63af5d3d5aac509150bd9fc8e0e3b267",
+      "after": "ebd9bf3abec79efd12d8993e40d3b030d7c38571"
+    },
+    "server-version/backend/src/modules/assessment-run/run.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1ae6368250347bcb83be47b24900ecb7a65b5b11",
+      "after": "a5c0929145a98a61c17ef27889aafce40b08ab63"
+    },
+    "server-version/backend/src/modules/assessment-runtime/admission-snapshot-v2.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "77d9a0d6fdb973af1fb6ec4516dcd97608aa809e",
+      "after": "078f6ccb7ea0fc6fdf6b7fb707f9ae1279cd3220"
+    },
+    "server-version/backend/src/modules/assessment-runtime/admission-snapshot.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a75a25a51ea7ce3da77bf411726b7638cc5394ea",
+      "after": "ab60fdb9de1791e39679462af92223d70fcd9ad0"
+    },
+    "server-version/backend/src/modules/assessment-runtime/compiler.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "97841e4be7163fa28f456bdc60e041617c6dddce",
+      "after": "dc5774b6b6e9dc1a375379056253d552f51e8786"
+    },
     "server-version/backend/src/modules/assessment-runtime/form-admission.service.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "43dd0b80fc8bb004407283743465898db5ce1828",
       "after": "c6636e760ae096de4aec45b33a7dda557a98befe"
+    },
+    "server-version/backend/src/modules/assessment-runtime/form-facts.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6b837321d34c013a4974f0bf627e98c97cb84eda",
+      "after": "fa510f00f3ee792694c18e447eddcf051702db24"
+    },
+    "server-version/backend/src/modules/assessment-runtime/runtime-snapshot-v2.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "24b3f92227e691e436cbd687a76c16ad353837aa",
+      "after": "3e971112a976ddbdbd690b138c07bdb16f75faca"
+    },
+    "server-version/backend/src/modules/assessment-runtime/runtime-snapshot.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7696a4eb15f1990e56d73ad108eb95d987496a69",
+      "after": "fdb7d81dbe121186db796b6bc4aa3826bcddf177"
+    },
+    "server-version/backend/src/modules/assessment-runtime/situational-runtime-snapshot.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "607da3c243a9a5e7a71b3c5cc8372b9cb8174f91",
+      "after": "22b00783e53777d5bf3a8a2c10f71babb0910f01"
+    },
+    "server-version/backend/src/modules/assessment-runtime/slot-set.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9d27d4661f7c2565df00796185da3d85cc4126e3",
+      "after": "67aa56ef3bc7b0fee2c7a9ba5d1a853579b78579"
+    },
+    "server-version/backend/src/modules/assessment-runtime/training-scale-timing.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0eeb13b5a06aaefc8a993c18149b4bff26206885",
+      "after": "04e5d65932dae8ab38447ed2cfd37c290b356f6a"
     },
     "server-version/backend/src/modules/assessment-runtime/unified-form-section-final-submit.service.ts": {
       "status": "M",
@@ -467,12 +677,103 @@
       "before": "ee442cf51e9b0cf84364eaa9fc7f5c5c80cc188c",
       "after": "b5fa9eae152dae648a75d3d30aa3cc894be85cb6"
     },
+    "server-version/backend/src/modules/assessment-runtime/unit-result.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ee7dbc191330ec075b467c60b20e3baf6210432a",
+      "after": "dc78e9a79edb179d1bcd608f08e898c9c9ade28d"
+    },
     "server-version/backend/src/modules/assignment-review/selection.ts": {
       "status": "A",
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "cd26668b8aec06c950f51417c1c1fc7bdae158f7"
+      "after": "e1f1caf0d1ee504541cda80052fde30fa46c4235"
+    },
+    "server-version/backend/src/modules/bundle-product/analysis.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7f3a825587815d0f6b06f93882492c796e69ef47",
+      "after": "584587187b17024fddcf2a1a50e5793a5c909bba"
+    },
+    "server-version/backend/src/modules/bundle-product/routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f5bcaaf123ca42d62dac89853dc2c9c4f3996a8b",
+      "after": "f00d92d4e111948ffa92478d00dbc512426f0944"
+    },
+    "server-version/backend/src/modules/bundle-product/service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d40970beb14d784d100a1f3d5df506c96a5fdd3e",
+      "after": "417534c345595a31c97c1e16576b6265ddce0d5b"
+    },
+    "server-version/backend/src/modules/campus/activity.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b4d416271d98a4c6d3a933edba449c36b9ce3746",
+      "after": "327d99495370c721998a9e886369662226180731"
+    },
+    "server-version/backend/src/modules/campus/activity.run.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ea51a4af67479acc6e3b9bc7a723921da5152efa",
+      "after": "a0a0ad28be8574247ac78741340ac00a87b14d9d"
+    },
+    "server-version/backend/src/modules/campus/admission.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e793f4737b9772df9e5747b63370adb251f1b506",
+      "after": "b8eca4d33095736488cdb7e0b97e2ce1fa9f2359"
+    },
+    "server-version/backend/src/modules/campus/organization.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "164ca23bada857d92795fd6819290eb7eda28115",
+      "after": "7133afc1fb15ed403271e8452c004824fce3269c"
+    },
+    "server-version/backend/src/modules/campus/parent.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "49d7a04c7cf3f8ec2a7bc2021612bd7e7382be37",
+      "after": "fb11d4be91c2bc5845cfbf3cab2f786c63f76626"
+    },
+    "server-version/backend/src/modules/campus/peer.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5fde291c89c9cf21d59a6f9493836b1fea9718ec",
+      "after": "9728d9fafb050cc8554fe52cd22fe0d81bb45358"
+    },
+    "server-version/backend/src/modules/campus/recovery.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e7aed110103567764f50deb8a7e76b24004e583b",
+      "after": "d9ff4fecf85929a5068e642176ee212e82a3a362"
+    },
+    "server-version/backend/src/modules/campus/report.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7ab42470c6b8fe55bea1f8cf5b54b8cce703dee3",
+      "after": "18cee67f75742711e1642b612f65250986165206"
+    },
+    "server-version/backend/src/modules/campus/staff.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9bd9be5a8b77ae9acafc9ca1958213ec69feb310",
+      "after": "c6d9babe0902abfd86636451db50aa14020a941e"
     },
     "server-version/backend/src/modules/cognitive/cognitive-admission.service.ts": {
       "status": "M",
@@ -481,12 +782,40 @@
       "before": "d46ebdf364eba1f4f4fff438ecd342e5dca47f16",
       "after": "bdcafe663a7f0f72a57a9b314ce7bd4493f0e8b0"
     },
+    "server-version/backend/src/modules/cognitive/cognitive.schema.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1cbb7f93ac721781f30c92521b0f75ad9c121796",
+      "after": "41a1c4b129550687f0ec87590a52d6d9b2f49ba6"
+    },
+    "server-version/backend/src/modules/cognitive/onboarding/decision.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8081830312786947b6c565b7b85ff526cc9fb175",
+      "after": "23b517b38c04597450ba99c7fc4302780bdde3af"
+    },
     "server-version/backend/src/modules/cognitive/unified-final-submit.service.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "f0903eafda5a62e7a97ae988d9f0c470d0275ac2",
       "after": "4b944e96a41b24cadf22eabb39ed1be4a00024f1"
+    },
+    "server-version/backend/src/modules/cognitive/v2/result-snapshot.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8c70f06ccce5cf2c7595ab59e33a207db4a33c05",
+      "after": "54aab4bd75b24bb94dcdb5a217ec37463f03442c"
+    },
+    "server-version/backend/src/modules/cognitive/v2/session-snapshot.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "75ba96dc57426cf90d8114faff07b8f744d06502",
+      "after": "92bed80104cf3c4541888d031be13572c580198d"
     },
     "server-version/backend/src/modules/composite/composite-report-read-plan.ts": {
       "status": "A",
@@ -502,6 +831,13 @@
       "before": "5acf61efa78ae19200511dbdb24f8c8a1e98c6c5",
       "after": "1be0af38de9b39f262c97a1d4fea69101c08f2ea"
     },
+    "server-version/backend/src/modules/composite/composite.schema.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "47f1284f6eee03ef5ed809ec56d9539d93a34109",
+      "after": "f166628c2409435d742e454a733691e7d37ad58b"
+    },
     "server-version/backend/src/modules/composite/composite.service.ts": {
       "status": "M",
       "oldMode": "100644",
@@ -514,7 +850,14 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "87b1c7c08b399f9016906a529b2d86559a2cee11",
-      "after": "dd8ee6139293dc8b09a2d14d7ba30a26bc6e6bee"
+      "after": "c87b7302822a51f540982d9343ad197e1daa5d42"
+    },
+    "server-version/backend/src/modules/composite/training-content-binding.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7a45f3b35d64cd6d8d0afcab4e0f3a66a8c52729",
+      "after": "9244d2297efa62ca56841a020fed82c5f0c82df0"
     },
     "server-version/backend/src/modules/composite/training-content-final.ts": {
       "status": "M",
@@ -523,6 +866,27 @@
       "before": "150ec1a2d9aa44c7d593cfc6dc7eda75cd41299c",
       "after": "9664b7016436e9bf2a7f90cdd422e9f4d6bbbf9e"
     },
+    "server-version/backend/src/modules/composite/training-reference-binding.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f03c52d45814062cf376a20a503388bfb008074c",
+      "after": "a4fd9833df9268f826d11588f7df4dab780a5111"
+    },
+    "server-version/backend/src/modules/composite/training-reference-selection.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2711c35a5d78ef3ad15db5538e3a4a37497ec569",
+      "after": "10c23237204ace6647508dfcee2bbb036b9304b4"
+    },
+    "server-version/backend/src/modules/composite/training-report-selection.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "be3cbbf705eeec37870a3073b61ee022932ca35a",
+      "after": "5e2382ef083a5281e32ce213b68908c1b7194e3e"
+    },
     "server-version/backend/src/modules/composite/whole-questionnaire.service.ts": {
       "status": "M",
       "oldMode": "100644",
@@ -530,12 +894,432 @@
       "before": "67969b9ae05375c03e2c316f62ed6cc21059e7ed",
       "after": "95b053332a2bf7aba6abfa146e882ee0336ad649"
     },
+    "server-version/backend/src/modules/education-tools/capabilities.handler.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4628964d7d852163e0876ff2178bc37601fb50df",
+      "after": "bd3d825010640c4c397bbdfc1d8db9cc4ad00717"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.contracts.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5b3b05e67d6b92a0dab6e196bfc828b97750596d",
+      "after": "aa47bc4e3620f699fbaa71ab104897e45a53ba60"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.form-runtime-contracts.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "bd20811e4227e2a2ba2a4d743e1eb88565d63241",
+      "after": "412a2d42bcf631b8f26f0c1dfcb1f25e6dbfa4fd"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.run-contract.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "91d77121e8cdbe2161ce9b5d5278148424edd9ef",
+      "after": "0204031a90b93e424b270689ee334e6e5cb79c58"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.runtime-origin.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1f36e4f4e29642c1e9c6aa1ec4c03d9cbe642af7",
+      "after": "fd83509f9860b2223eacbd3fe407fe874614d957"
+    },
+    "server-version/backend/src/modules/education-tools/private-tool.sharing.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5009e6ea333337f48b67dab1f211d8580a607411",
+      "after": "cf1f2e49a4be5a1857136a5fb4c69a819bb842a7"
+    },
+    "server-version/backend/src/modules/huiteacher/admission.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "dc74a4da63b355abc0e0fd07274c47dae0edacb1",
+      "after": "a378323348479ba142a4565cabe06af1170e4324"
+    },
+    "server-version/backend/src/modules/huiteacher/consensus.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d155a1befb91e76cf9c8384173c33725051762b5",
+      "after": "e43d5e06b22d4569f456c4feaf2140f81c9780ab"
+    },
+    "server-version/backend/src/modules/huiteacher/evaluation.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "20e6ac8da308ce35289a525011c4bff07359f5f0",
+      "after": "465695672f7bcce484c3b771868577192b692470"
+    },
+    "server-version/backend/src/modules/huiteacher/expertRegistration.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "38882f0f56c788ba5c54fd66dba5b016e627ea36",
+      "after": "688ec136e70df87bb8d165f88577fd6426df02f8"
+    },
+    "server-version/backend/src/modules/huiteacher/fieldFeedback.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "76cb62554b45fa8d1dc588a595bb0ba1361db4ce",
+      "after": "59c0d95e536ad22c10c0e3b23273fd65719c4406"
+    },
+    "server-version/backend/src/modules/huiteacher/fieldForm.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c6baab97377d7e4a294138e4f98d5594523e4cd5",
+      "after": "b258bd549abed149f2a444a2916dc977c78850d0"
+    },
+    "server-version/backend/src/modules/huiteacher/formRuntime.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "604d9b2dd614596a0356d681e9c6d00ce150dbc9",
+      "after": "e52b0467a4eeeb02c8728108ac59caef33bc864a"
+    },
+    "server-version/backend/src/modules/huiteacher/forms.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3eb2c53b765453944ff84d017c7d0d9bc95882d7",
+      "after": "7145f737e284621676ccfe0b0b146b5be23fc990"
+    },
+    "server-version/backend/src/modules/huiteacher/groupReport.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4a3f50eae86c22e1d6b09072b9d547ba0726340b",
+      "after": "1f803ef942c672536c2b5eca2f2e10a2f4d9d126"
+    },
+    "server-version/backend/src/modules/huiteacher/improvement.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a8ca81831cb9f2b70b3dac685b93b38b006735c6",
+      "after": "c6017092d5df947c743a3cc524c9952fa378d4be"
+    },
+    "server-version/backend/src/modules/huiteacher/observer.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8326c10bfd3d1b17f2fa626f55e5c468cde3a8e0",
+      "after": "f450fc68b3c15daf5fa5bc2af4b93ca3785b942b"
+    },
+    "server-version/backend/src/modules/huiteacher/organization.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2d43d4af4488ee6aa9f09d781c92acd65e6b4484",
+      "after": "22d259fe9f6939e916c4ddeb3fd1c79e146ca140"
+    },
+    "server-version/backend/src/modules/huiteacher/personalScale.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e51f175b656b92c539c3e336937d6f6c6006c383",
+      "after": "27253cff6ed6df47656e8b2cf59f554d3c8196ff"
+    },
+    "server-version/backend/src/modules/huiteacher/platform.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "205e567e059e7d6307960eca9640b5e319958297",
+      "after": "5d8001473152516e8e8a8e7acddd7b29af30a9d2"
+    },
+    "server-version/backend/src/modules/huiteacher/privateFormRuntime.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "fa02fd5e57c41888fece80dd9c86139467f9e24d",
+      "after": "1f74ab2e05d1e49f51f5f11b0ddeb83038628bde"
+    },
+    "server-version/backend/src/modules/huiteacher/run.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f26cfe9c8e51993145f6f84238142ce8b395a8f1",
+      "after": "e35b4fc82c2311fc7de1c79e3a106285bb718cf0"
+    },
+    "server-version/backend/src/modules/huiteacher/scaleRuntime.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "32043ce6522270661b2ca1f8bf4e6fee36c4bc14",
+      "after": "f7c1a4ed2d468ba349d21d6fa05d7132e4294517"
+    },
+    "server-version/backend/src/modules/huiteacher/staffInvitation.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3f0d43b49fe0730a8195f67ad01ed0dcbcc07569",
+      "after": "dedf2104b30f6a79fc444811db6fc9dfaad31c37"
+    },
+    "server-version/backend/src/modules/huiteacher/studentEvaluation.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "88f81e4b47208d0db97a1bc0736fb3e9808f3617",
+      "after": "124ac38cc3868a8144a44d108b7848c413da0753"
+    },
+    "server-version/backend/src/modules/measurement-content/admin-authority.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "104bb08e03af139549eed7ea23794efb65bebff9",
+      "after": "e3aff00ad16840cfcb97e680be27030d0ee5f7a2"
+    },
+    "server-version/backend/src/modules/measurement-content/formal-reference.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "06827e6025852438c90c5a77284787056e20d28d",
+      "after": "996078e92a92a7eb0ba6b53f192a4a7e1adecd38"
+    },
+    "server-version/backend/src/modules/measurement-content/reference-candidate.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c58eb806dd19bbd02fee8b7e1f4a8cc175927338",
+      "after": "59b90d2be9e596e5939f0abc0a500e4ba8c4adb8"
+    },
+    "server-version/backend/src/modules/measurement-content/release.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a46b5f9df681d37da30a36c542dea2968cd4d5c5",
+      "after": "39b97614d3b3686be510ea1be2f75fc6d0214763"
+    },
+    "server-version/backend/src/modules/organization/organization.admin.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2acf6ea15d512beb8371734c7e65f1c9043ce3e5",
+      "after": "aad63969b3a255d5f3c9187da83396c522632c0e"
+    },
+    "server-version/backend/src/modules/organization/organization.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "219c0b83fd50fce726fb27e5c2e50018fe445962",
+      "after": "614f2ff24075f6623c65685c6d1f2f3bd756b770"
+    },
+    "server-version/backend/src/modules/parent-portal/accounts.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c9c5a073db934cd53b6c08cf007eed504baae68d",
+      "after": "6b37ccf37c6a62ebee7ca4fdf74f1e763e8d6860"
+    },
+    "server-version/backend/src/modules/parent-portal/tool-policy.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1245739053c61b40b630e5fac664739a278b4a10",
+      "after": "91897093f07bed99dfb402384a51ea13f7c3271b"
+    },
     "server-version/backend/src/modules/participation/code-crypto.ts": {
       "status": "A",
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
       "after": "420da31c100ccdfc27e0a2f994e6c0a11a34a91d"
+    },
+    "server-version/backend/src/modules/questionnaire-product/content-report.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c4c5dd68ab678c19fd06edf5786716efa10c2a53",
+      "after": "ad83ab73ff8e01d382ce3026801daab56ed32a51"
+    },
+    "server-version/backend/src/modules/questionnaire-product/content-report.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a452bd3f6e80c0daaa8048fd68d1ae13edf7a2f3",
+      "after": "1783230539c541cd9249107e1f8fbc83c8517a3a"
+    },
+    "server-version/backend/src/modules/questionnaire-product/reinterpretation-source.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ed8c05bd3dbc1fcc76bdf86433b3b93df7ab0181",
+      "after": "19a373afe9182477a085810f7c1195ed758f8675"
+    },
+    "server-version/backend/src/modules/questionnaire-product/reinterpretation.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6e84130055eb1e2121580e1fdb2ab82d72396a49",
+      "after": "3eda432b5d4adf717be17667e4ab6fb2b45b5184"
+    },
+    "server-version/backend/src/modules/questionnaire-product/reinterpretation.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9a60b98bf2333619322e588c670c1fa3f3363ad3",
+      "after": "65cc8212a7490428d76060a3313e9a9006edb0c3"
+    },
+    "server-version/backend/src/modules/questionnaire-product/service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "846efc0c171748a31634fe79597cb8f71bce9664",
+      "after": "c0dff760878cb568584c6305321662e39eee493c"
+    },
+    "server-version/backend/src/modules/questionnaire-product/workbench.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8c6635d12caa250823b656f1d9db5d7b66599b3a",
+      "after": "514be94c5e7e82c089e62582ebe76395a5a23d9e"
+    },
+    "server-version/backend/src/modules/report-privacy/routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "45ec84cc57e9f52ea6b469b51c3fcb0dd190bf7a",
+      "after": "cfeabd028536d6f349a9315c1caaef31990b2e07"
+    },
+    "server-version/backend/src/modules/report-privacy/schema.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ee04ec410516230c447657feabdbec1e7c81d26d",
+      "after": "d2813c499407856c9803a27939e3b7a946c05c95"
+    },
+    "server-version/backend/src/modules/reporting/cohort-selector.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "752a6dd58c9fb3f2ac131aaa9403c99eea5a7a2f",
+      "after": "6c69776c58dae63273a5bd24d6d0f87d1258c514"
+    },
+    "server-version/backend/src/modules/reporting/content.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d770f1173c3f3997c24651260cd209dadceef148",
+      "after": "d93307d9dd6244155a3e06594b515447d603013f"
+    },
+    "server-version/backend/src/modules/reporting/discovery.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8d5bb4675973d0e6816460683db21e89fa217f9e",
+      "after": "8e25aa613e57d9c4be81af836b4f592296a7ad23"
+    },
+    "server-version/backend/src/modules/reporting/education-scale-report.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "eeb005152a5e090b6c8650a1663836be6eaaa011",
+      "after": "0941dab0505aea63ba71c0ed36c4feab3fdb4630"
+    },
+    "server-version/backend/src/modules/reporting/reporting.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a151f5836498350fa742b0fa759e76cb6fc379b2",
+      "after": "c896c8144f48ea91acf10bb3e7cd9e7f3150b64b"
+    },
+    "server-version/backend/src/modules/reporting/spec.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "865ca2028d95ae196b231d9b6e3d3e217657f483",
+      "after": "d2e2ec218d70d01d275eb1c07c5c0c69e6964aff"
+    },
+    "server-version/backend/src/modules/scale-library-governance/contracts.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "de39e835f354b6f101aff3942df9b6533b1e5f7f",
+      "after": "7e9f38597a7800718f054e1b5a82ea072844b87f"
+    },
+    "server-version/backend/src/modules/scale-library-governance/distribution.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "db94b567ba66aa5fbf6a836e3fb0a25f39830f81",
+      "after": "37c809a9715d13a4b782a5d14b4e4a6debeca2cb"
+    },
+    "server-version/backend/src/modules/scale-library-governance/education-distribution-public-contracts.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5a643ba33c703a50169c80840547df59ae5001d6",
+      "after": "9403cf468666f930b3382e8bb64a1ded6e4208d6"
+    },
+    "server-version/backend/src/modules/scale-library-governance/education-runtime-entry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4403a47e617e4fab9c25dfc7148b4eb023818446",
+      "after": "a17803757b832fa2324f3527a04180a7678313c6"
+    },
+    "server-version/backend/src/modules/scale-library-governance/education-runtime-resources.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "14edde3e810fe0172e68907f72996fe4ad584613",
+      "after": "d85232b4daa534a928d2f6b721988a550fd1d949"
+    },
+    "server-version/backend/src/modules/scale-library-governance/education-use.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "310b1ba3209712bcdff7f62ed64d47c1353ebf64",
+      "after": "d2a8fe73b511e78068ed72a36bc005859783e234"
+    },
+    "server-version/backend/src/modules/scale-library-governance/media.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "45924c8b631fc9677acbd8a13e853f8a249bf2e7",
+      "after": "370f46225c1c2372085fe7b6d419bcece21ec088"
+    },
+    "server-version/backend/src/modules/scale-library-governance/routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "21bc02243dcef06670f30bf54207d057b5d4e1c8",
+      "after": "6b267e78b85d67e153b094f672179c69aa9ff155"
+    },
+    "server-version/backend/src/modules/scale/library/catalog-manifest.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "76e2ad7f51e7d495030900978f715701b912e6d4",
+      "after": "f5140497ff0f2dd08e55444584242baca3dcd2c3"
+    },
+    "server-version/backend/src/modules/scale/library/localization-manifest.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "37c1da116fa77a5d97d1b2640d0d87da164f1da9",
+      "after": "05d92b765fc00d9a5c2a732559585a1f3aeb9c6c"
+    },
+    "server-version/backend/src/modules/scale/onboarding/measurement-conversion.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0fb08771fc457d8bb3f0d85af4cc89725b10028f",
+      "after": "c1933b14abe5eb86eb7605e821a7904d74749dd2"
+    },
+    "server-version/backend/src/modules/scale/onboarding/schema.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "eea578d4fbddeb0254688c196d2a618c8b27d66e",
+      "after": "45121ba51dd694ad003873278dac476cd989d29e"
     },
     "server-version/backend/src/modules/scale/scale-admission.service.ts": {
       "status": "M",
@@ -551,12 +1335,54 @@
       "before": "0666e62b08758c0c406769533a3e3a826dca148e",
       "after": "a50e9acacce157d4591d04ee7936b98d5ec08e92"
     },
+    "server-version/backend/src/modules/scale/scale-restart.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "67032d7f194a9e4908eb4d9c00899d6f59e1f661",
+      "after": "6757125b9f3d1077bca8a61e7c9e51f15bec3126"
+    },
+    "server-version/backend/src/modules/scale/scale-result.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f7114f4040176df66b5101007571b221caea1a37",
+      "after": "9f59bde7913ef0696389713e7f8db7d4b9921b9a"
+    },
+    "server-version/backend/src/modules/scale/scale-start.controller.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6527efab0ae1e93c6e0fb0b68832ede42bd48c79",
+      "after": "4b4184ea0376b262539b351dd4d1e930d92567cc"
+    },
     "server-version/backend/src/modules/scale/unified-final-submit.service.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "dcb094951e44b4876f6fcaabcf457f14dbcf5557",
       "after": "fbf3b4a768f102d9c709c624fcac332a37543be3"
+    },
+    "server-version/backend/src/modules/situational/authoring/online.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1b6be2fe04a9e97c94eecc240cdf64f3b700ff64",
+      "after": "7d6e2e7f9bdc9fa5af216954c2191fc0e3910b14"
+    },
+    "server-version/backend/src/modules/situational/authoring/template.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "55435fe80b4b3f2f88622dc4ad841e2646865530",
+      "after": "45122a5bdc4945fcae9e0fc6281011239381ddb6"
+    },
+    "server-version/backend/src/modules/situational/onboarding/schema.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "07923cc58bd7391e7ab6e19a67062bf4c83a5f0c",
+      "after": "5dc43474c66cf126d1ae1c2eb26d10075ffd73a8"
     },
     "server-version/backend/src/modules/situational/situational-final-submit.service.ts": {
       "status": "M",
@@ -565,12 +1391,54 @@
       "before": "73b06d35071faff9c9ef4f2ccac4a563bb37fc60",
       "after": "3cc20eb8fd9bafd1b6f306b3677472c064e31a34"
     },
+    "server-version/backend/src/modules/situational/static-measurement-admin.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3502d3d1b0ddc0f16cefe79cf13e01c49dcdf265",
+      "after": "218b84429b73f8de63365203f5ce49da514f2dff"
+    },
+    "server-version/backend/src/modules/situational/static-measurement-release.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "80a8d6346b75bc67fe5cbce738feed763293d283",
+      "after": "3dd9eba36c572c7b7348d3b4131b7848a368f287"
+    },
     "server-version/backend/src/modules/survey/admission.service.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "a9547a31d1974927317e21b6b30899863a66ca24",
       "after": "cca365729d39cc2032c90f4d7624c4ce8b367a8f"
+    },
+    "server-version/backend/src/modules/survey/analytics.export.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4d1144ff0e457130206305eb75ba0b79e595d37b",
+      "after": "daf6fa02f9ceecbb5b60ff430bfb646b94c1955e"
+    },
+    "server-version/backend/src/modules/survey/analytics.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b9517bb28860eeb0a5c531623799e144f91b99d8",
+      "after": "bde06c2f90dde8eaa23a41077452c701cbad31ea"
+    },
+    "server-version/backend/src/modules/survey/builder.import.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "79f346bbea3bd337891e4cc143f32725f00de06b",
+      "after": "c9ef131fb8d191aceb7027676ff4f452844e0317"
+    },
+    "server-version/backend/src/modules/survey/builder.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "695eecd488f6399a14219b471f11d3a10123f0ad",
+      "after": "470c3ac03a74432816141f6d76bba7caf62f37d3"
     },
     "server-version/backend/src/modules/survey/catalog-sjt-media.authorization.ts": {
       "status": "A",
@@ -593,12 +1461,47 @@
       "before": "34069e3e756d028b9d18fec772ef869771ff8839",
       "after": "bb962442b64c5a08fcb8744c4619d690eaf7fdd7"
     },
+    "server-version/backend/src/modules/survey/cognitive.definition.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6efb855488e980dbf70bf2c84c2317b361495341",
+      "after": "1199da5276d4ca73bd5cf5b9c9410563b82e4c1c"
+    },
+    "server-version/backend/src/modules/survey/cognitive.public.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "391cb68a870d8157fc1f754822c75e0e5d0b7dc6",
+      "after": "282eafb9fcdda42c37df41d6b0b15e1283ce4c15"
+    },
+    "server-version/backend/src/modules/survey/content-options.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d29762bc4554a58ffcd327d8d402d60a95c0ee1f",
+      "after": "aa82678fce07ef2430efa0ef3ed7e91e4eba94b2"
+    },
+    "server-version/backend/src/modules/survey/content-selection.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c59ff815f9b16bc69db8c96b0098720954bfc651",
+      "after": "8feaabd457ce689b2bc89ccfa0ee967c2f0e2a30"
+    },
     "server-version/backend/src/modules/survey/final.service.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "883b4fcad070a9b2b74f0f4e583294ceaa6c39be",
       "after": "a5b1042c74b9f09dbbf8f9f2a8795b28fcccba66"
+    },
+    "server-version/backend/src/modules/survey/material-library.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ccea1a7fc78da202a5ebe2e93d3d8887910f9e78",
+      "after": "d6992241958ef1d01617639e07e591c24c1eb63f"
     },
     "server-version/backend/src/modules/survey/media.references.ts": {
       "status": "M",
@@ -607,12 +1510,40 @@
       "before": "d6a56ccbd7d53d876f95025512063366e318dab1",
       "after": "74e08c3e6bd5f16302b2a5aba2ce23078b629cb9"
     },
+    "server-version/backend/src/modules/survey/media.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ddfb45b51c5939a3a4f031b76b7e17118a5d9c63",
+      "after": "cfd1faa8e57db11e4fe35f3f7585458ce98c3704"
+    },
     "server-version/backend/src/modules/survey/memorable-code.crypto.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "002ae2ad3a9632700701ce57ccd30df9ca2dece1",
       "after": "83f69b2479bb81e1c2956bf49d3c1db3349800ee"
+    },
+    "server-version/backend/src/modules/survey/participant-feedback.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ba2b1c10cfe9ad4bb303c523630541b4099560f1",
+      "after": "fb910f9a196dab3e59ce264b4c13222dd8dee17e"
+    },
+    "server-version/backend/src/modules/survey/platform.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3e851a14b8ffee7b791c0568b6a24afba4c0f438",
+      "after": "5c110054fc597538f8da7596f279368d728fef62"
+    },
+    "server-version/backend/src/modules/survey/projects.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9e5718ea266e6a40223ed6efcac838c9a75ae7ff",
+      "after": "73bad2b8a06b7236d38dc6dfa3a662f6ee3cb628"
     },
     "server-version/backend/src/modules/survey/public-scale-media.ts": {
       "status": "M",
@@ -626,7 +1557,35 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "091b123e7491143190a35b63f3d31f2a11b0a83b",
-      "after": "3283139d8776b7600cb315c16dd4cefc3155afb6"
+      "after": "b3f02e91be80429d4139c356b7adbcc11eb3ff8a"
+    },
+    "server-version/backend/src/modules/survey/reference-candidates.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "baa06c290afc69c1ef4117e52eba71b9ce7a96b5",
+      "after": "0a22a3e8b37fb6443abe7b99d2f4a6a729c99dc3"
+    },
+    "server-version/backend/src/modules/survey/reinterpretation.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5c68403fd858ca8fe3572bc0826e39e56552f1da",
+      "after": "a3657587d680993938e5802122735c5d2a50cc9f"
+    },
+    "server-version/backend/src/modules/survey/report-drafts.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ed3072e70cb2a7f953b2eacc44fb97a9e7e39244",
+      "after": "38f04ade9213900ee4ebc452d392f057cf7e51b9"
+    },
+    "server-version/backend/src/modules/survey/report-drafts.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d00497d67e736d1c78f5f1d852f62297faf5399f",
+      "after": "5d709e693833ec5bd7d1db51799c34fe6c91d5b1"
     },
     "server-version/backend/src/modules/survey/task.public.ts": {
       "status": "M",
@@ -635,12 +1594,89 @@
       "before": "4624e94c8e522ac0a926599b2a7d7edd8f4b712d",
       "after": "121830f4c0c8a214437c2f9a836cfd3d31be2579"
     },
+    "server-version/backend/src/modules/survey/tool-library.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cf8afc4716a6980f1fe795c73a061260a99bdeae",
+      "after": "be25aaaa8dc52e26e4b7bd1947dacd668d20d2c7"
+    },
+    "server-version/backend/src/modules/survey/tool-library.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b56fca8824c985ba5326652bb3c178f84b5fefd1",
+      "after": "5808dea96e077bd648b3e641f0d18f1b77c8fe52"
+    },
+    "server-version/backend/src/modules/survey/waves.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5b00c3534553ce045bc0a2ee629c0625f5009065",
+      "after": "e550fe964443779cadea2fae92bf325fd3685ed7"
+    },
+    "server-version/backend/src/modules/training-analysis/export.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4660efe914c153fa460e02353b9916db1bbff8fe",
+      "after": "c9e20315a5dd5cd66e916568b389748d81e4fbf2"
+    },
+    "server-version/backend/src/modules/training-analysis/manifest.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4ffc17d792831aff143c579ced162808d4459620",
+      "after": "ebe7430e022dbe8feca6925333c5e34484204f28"
+    },
+    "server-version/backend/src/modules/training-analysis/reference-candidates.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cd169e2943754ed7f06cc56d3cb0210744b70f7c",
+      "after": "5c0f2adff5571c936f0ea572ce7f2d814b991ac4"
+    },
+    "server-version/backend/src/modules/training-analysis/reference-source.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "698ed9e73e010799678bf87e4906791ff50762af",
+      "after": "12ae26c45896144a09d4e10e9cd35fb177417158"
+    },
+    "server-version/backend/src/modules/training-analysis/reference.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2dbcf8a6b7c35baf298514add08b28e10fd8ffee",
+      "after": "4c45ba126f103572114c68864534fa14583e3fde"
+    },
     "server-version/backend/src/routes/assignments.ts": {
       "status": "M",
       "oldMode": "100644",
       "newMode": "100644",
       "before": "afa3f10634b08f8a044f77c1a49c6a6d13c9f144",
       "after": "dda912d3da9880fd82160f301f1c5ae0dcea9bfe"
+    },
+    "server-version/backend/src/routes/sjtAuthoring.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "da83f23d578327c5e079fef00e5d94373e9a0478",
+      "after": "6d553bb59f00ed241fdc40ec63050b2ec2e68dee"
+    },
+    "server-version/backend/src/routes/trainingWorkspace.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7746a9ec7c9736a60c6bea4c41348173489581d4",
+      "after": "1f595e357bccf606fb42874df86ac3f72ba39882"
+    },
+    "server-version/backend/src/services/assessmentExportArtifact.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5b289a0510c8a7cd55a644360f8f8fd9437681d2",
+      "after": "f466ef9c7cb05ae20c8935590446f27979587014"
     },
     "server-version/backend/src/services/checkinTokenService.ts": {
       "status": "M",
@@ -669,6 +1705,13 @@
       "newMode": "100644",
       "before": "d1f0a103d21dec80363bb6672a933662ba440aba",
       "after": "c214de17d3ba939bbc07d6998473082578a271ad"
+    },
+    "server-version/backend/src/services/scale-final-submit.schema.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b682e7c47ae2cedeb0876cffc13d570ae0162557",
+      "after": "7988d283b802c48ecccfd686c9ea7dde375c9501"
     },
     "server-version/backend/src/utils/streamingTaskExport.ts": {
       "status": "A",
@@ -892,7 +1935,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "7ecbe7e59c2d8b2dfbd422fe10cd1e3e9873a5f5",
-      "after": "3adca6205b00394520307a2542a0b3688a1e9005"
+      "after": "7e019198f935f0db9fbaeef09bffcace5d54558e"
     },
     "server-version/frontend/src/modules/composite/__tests__/library-api.test.ts": {
       "status": "M",
@@ -941,7 +1984,7 @@
       "oldMode": "100644",
       "newMode": "100644",
       "before": "59c654c529db4901456a70091dd14e603969745f",
-      "after": "e3cbc1dc34f9b29aa1eda4fb243b6aa523e2c8b5"
+      "after": "8444738d6c74784be2fa985c7ecc1822bd8cc4f6"
     },
     "server-version/frontend/src/pages/CheckinList.tsx": {
       "status": "M",
@@ -969,7 +2012,7 @@
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "c4cc93208a873628438d32603b38c411c1cf6e97"
+      "after": "611c23c6683557d5fcab311363e8586fd38dc07f"
     },
     "server-version/frontend/src/pages/__tests__/TeacherCodeList.test.tsx": {
       "status": "M",
@@ -1081,7 +2124,7 @@
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "07f88b1dd7ba559834e23694b827e3b197e86095"
+      "after": "90fddb0bdabe6f72ab118c0a868317c3c72ce90f"
     },
     "server-version/frontend/src/pages/questionnaire/__tests__/TrainingQuestionnaireList.test.tsx": {
       "status": "M",
@@ -1095,7 +2138,7 @@
       "oldMode": "000000",
       "newMode": "100644",
       "before": null,
-      "after": "e9eaccaac07dace5c85ec4f2581228d762371f69"
+      "after": "d72bd98d1050124838c43c233bff38d339e468e0"
     },
     "server-version/frontend/src/pages/student/AssignmentSubmit.tsx": {
       "status": "M",
@@ -1363,6 +2406,13 @@
       "before": "456e2082dd6974c7df7bcd29bedd13c513071d1e",
       "after": "0fa8563f08a031528f1a2d39713e94ccc12d82be"
     },
+    "server-version/frontend/src/training/paper-ink.css": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "35f21f103cdbdfea55dea6443ce09a092a2c81b0",
+      "after": "9b37c865d67f7b1bf7f5230dee9743eb2f5868f3"
+    },
     "server-version/frontend/src/training/trainingResourceCatalog.ts": {
       "status": "M",
       "oldMode": "100644",
@@ -1394,22 +2444,22 @@
     "docs/release/README.md": "c2ad42f95180d91f4603fbe83235b938a7c4d159"
   },
   "components": {
-    "frontend": "8c324cd0303e21d5687cf14ced22fbe85b7b0be0",
-    "backend": "d95ff138882a669f046c4a5799b49a2b3601ecd5"
+    "frontend": "a766f0717dfae221c11a460059c198739d1e3293",
+    "backend": "876e7a5477d0801a1d75b88d6159342850ac1a5d"
   },
   "protectedInputs": {
     "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
     "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
     "server-version/frontend/tsconfig.json": "1ffef600d959ec9e396d5a260bd3f5b927b2cef8",
-    "server-version/backend/package.json": "033398f6361b0e4217226ae00f2edc2ed3380ecd",
-    "server-version/backend/package-lock.json": "73607721290dd28f1c6f85d5e12d5d517926ede3",
+    "server-version/backend/package.json": "3157b4edaaecd9c495458434ab4cfd1bd5fcdfaf",
+    "server-version/backend/package-lock.json": "1a6e0ace51fb0fc65f2aa04371d0aa3a8d8903c6",
     "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
     "server-version/backend/prisma/schema.prisma": "b0556f0f6d93606ec7bee89e69b48749a33c7a4f",
     "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
     "server-version/frontend/tsconfig.cognitive.json": "910e97700f25652bc1d80ada47e176cbd51c2fbe",
     "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22"
   },
-  "evidenceSHA256": "e42813ab656f33e676732ab084e9deafd20cac42504eefb9235b6e8a9b01328a",
+  "evidenceSHA256": "840b2ea028c8c5ee938d8aa28979acb0e3cfe6c36284223bcf2355f6be52795a",
   "requiredGroups": [
     "learner-frontend",
     "export-hook",
@@ -1449,43 +2499,14 @@
       "src/__tests__/survey/checkpoint-query.contract.test.ts",
       "src/__tests__/survey/public-scale-media.test.ts",
       "src/__tests__/survey/research-request-local-final.contract.test.ts",
-      "src/__tests__/survey/task-options-performance.test.ts"
+      "src/__tests__/survey/task-options-performance.test.ts",
+      "src/__tests__/bundle-onboarding/contract.test.ts",
+      "src/__tests__/scale/scale-library-catalog-evidence.test.ts",
+      "src/__tests__/scale/scale-library-localization-manifest.test.ts",
+      "src/__tests__/assessment-core/form-foundation.contract.test.ts"
     ],
     "frontendTestFiles": [
-      "src/api/__tests__/materialGrants.test.ts",
-      "src/components/__tests__/AnonymousStudyManager.test.tsx",
-      "src/components/__tests__/FinalCompositeAssessment.test.tsx",
-      "src/components/__tests__/MaterialGrantModal.test.tsx",
-      "src/components/__tests__/TrainingParticipationSettings.test.tsx",
-      "src/components/__tests__/WholeCompositeQuestionnaire.test.tsx",
-      "src/components/app-shell/__tests__/management-frame-loading.test.tsx",
-      "src/components/app-shell/__tests__/shell.test.tsx",
-      "src/components/participation/participation-link.test.ts",
-      "src/components/shared-ui/__tests__/RetryableLazy.test.tsx",
-      "src/modules/cognitive/__tests__/CognitivePublicEntry.test.tsx",
-      "src/modules/composite/__tests__/CompositeAssessmentPage.test.tsx",
-      "src/modules/situational/__tests__/vnext-history.test.ts",
-      "src/pages/__tests__/AssignmentList.course-workspace.test.tsx",
-      "src/pages/__tests__/AssignmentList.review-pagination.test.tsx",
-      "src/pages/__tests__/AssignmentList.states.test.tsx",
-      "src/pages/__tests__/TeacherCodeList.test.tsx",
-      "src/pages/__tests__/TeacherTasks.loading.test.tsx",
-      "src/pages/__tests__/UserList.training.test.tsx",
-      "src/pages/admin/AdminTrainingWorkspace.test.tsx",
-      "src/pages/public/__tests__/AnonymousStudyPage.test.tsx",
-      "src/pages/public/__tests__/PublicCheckin.performance.test.tsx",
-      "src/pages/public/__tests__/PublicCheckin.protected-media.test.tsx",
-      "src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx",
-      "src/pages/questionnaire/__tests__/TrainingQuestionnaireList.test.tsx",
-      "src/survey/ResearchCatalog.requests.test.tsx",
-      "src/survey/SurveyPublicApp.final.test.tsx",
-      "src/survey/SurveyToolTemplateEditor.loading.test.tsx",
-      "src/survey/SurveyWaveStudio.preview.test.tsx",
-      "src/survey/survey-cognitive-deferred.test.ts",
-      "src/training/TrainingAdminResources.efficiency.test.tsx",
-      "src/training/TrainingCourseAssessments.loading.test.tsx",
-      "src/training/TrainingCourseAssessments.test.tsx",
-      "src/training/TrainingLearnerCourse.loading.test.tsx"
+      "src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx"
     ],
     "earlyLintFiles": [
       "src/api/__tests__/materialGrants.test.ts",
@@ -1590,8 +2611,12 @@
         "expectedPassed": 7
       }
     ],
-    "selectionRationale": "Only directly changed Training/Survey contracts and their shared identity/media/report consumers. No full platform or performance benchmark. Twelve independently reviewed reset/FINAL PostgreSQL cases and the admitted whole-file groups must not repeat.",
-    "missingRecordRevalidationApproved": true
+    "selectionRationale": "Only directly changed Training/Survey contracts and their shared identity/media/report consumers. No full platform or performance benchmark. Twelve independently reviewed reset/FINAL PostgreSQL cases and the admitted whole-file groups must not repeat. Security dependency repair uses genuine Zod4.6.7; four additional directly affected Bundle, error-message and FORM foundation contracts run in CI. Twenty local frozen-schema/array-bound contracts and one strict-grant case already passed locally; no claim of exhaustive Zod compatibility. Twelve PostgreSQL cases and cross-schema types were freshly revalidated on new dependencies, not inherited from Zod3.",
+    "missingRecordRevalidationApproved": true,
+    "frontendRetry8Approved": true,
+    "frontendRetry8Approval": "Sentinel_ea16694e14708191b121c5db5ebd1528",
+    "frontendRetry3Approved": true,
+    "frontendRetry3Approval": "Sentinel_18b67969843c8191897da31d857ca6ac"
   },
   "reviewedGroupFiles": {
     "learner-frontend": [
@@ -1687,7 +2712,280 @@
         "reviewEvidence": "Independent audit_report_state_optimizations review at 2026-10-24 09:08 UTC against this exact mixed candidate."
       }
     },
-    "retained-lint": {}
+    "retained-lint": {
+      "server-version/frontend/src/pages/AssignmentList.tsx": {
+        "before": "e3cbc1dc34f9b29aa1eda4fb243b6aa523e2c8b5",
+        "after": "8444738d6c74784be2fa985c7ecc1822bd8cc4f6",
+        "changedSymbols": [
+          "AssignmentList completed batch busy cleanup and regression"
+        ],
+        "unchangedExecutedPaths": [
+          "all paths not executing a successful batch-grade completion",
+          "backend and immutable scientific/schema paths",
+          "TypeScript public types and component signatures"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The successful current-generation batch-grade branch now clears its own busy flag before advancing list refresh. Prior seven review assertions are excluded from fixed frontend acceptance and the full affected eight-case file reexecutes; other retained tests do not execute that changed branch.",
+        "reviewEvidence": "Independent exact two-file review and owner 8 focused passes; user separately approved the eight-case CI revalidation."
+      },
+      "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": {
+        "before": "c4cc93208a873628438d32603b38c411c1cf6e97",
+        "after": "611c23c6683557d5fcab311363e8586fd38dc07f",
+        "changedSymbols": [
+          "AssignmentList completed batch busy cleanup and regression"
+        ],
+        "unchangedExecutedPaths": [
+          "all paths not executing a successful batch-grade completion",
+          "backend and immutable scientific/schema paths",
+          "TypeScript public types and component signatures"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The successful current-generation batch-grade branch now clears its own busy flag before advancing list refresh. Prior seven review assertions are excluded from fixed frontend acceptance and the full affected eight-case file reexecutes; other retained tests do not execute that changed branch.",
+        "reviewEvidence": "Independent exact two-file review and owner 8 focused passes; user separately approved the eight-case CI revalidation."
+      }
+    },
+    "final-frontend-types": {
+      "server-version/frontend/src/modules/composite/__tests__/CompositeAssessmentPage.test.tsx": {
+        "before": "3adca6205b00394520307a2542a0b3688a1e9005",
+        "after": "7e019198f935f0db9fbaeef09bffcace5d54558e",
+        "executedPathUnchanged": true,
+        "changedSymbols": [
+          "namespace rejection test text query"
+        ],
+        "unchangedExecutedPaths": [
+          "all production imports and API guards",
+          "compiler-compatible existing expect/toHaveTextContent APIs"
+        ],
+        "reason": "Only one existing test assertion replaces exact old text query with alert role plus complete current text. No product, import, interface or inferred data type changed; targeted case passed.",
+        "reviewEvidence": "Independent source review plus actual single-case exit0; existing getAttempt/start-not-called assertions remain."
+      },
+      "server-version/backend/src/__tests__/assessment-core/form-foundation.contract.test.ts": {
+        "before": "b88a9b111a2be8384fb43a6338f2069ae8e9da09",
+        "after": "5309c7e1aca89d09428b741c7702e33c17e18438",
+        "changedSymbols": [
+          "Form error presentation / exact pure-import contract / Training return-button CSS only"
+        ],
+        "unchangedExecutedPaths": [
+          "successful parsed scientific facts and hashes",
+          "runtime authorization and immutable evidence",
+          "Vitest JavaScript behavior (CSS not rendered)"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Reviewed recovery changes only Form invalid-input issue presentation, test assertions and a CSS display rule. Successful scientific parse, identity and submitted data paths remain unchanged; CSS is not rendered by retained unit tests.",
+        "reviewEvidence": "Independent review of exact three-file PR351 fourth-run repair; original failures remain failed and eight affected assertions are explicitly revalidated."
+      },
+      "server-version/backend/src/modules/assessment-core/form/definition.ts": {
+        "before": "74fc2209982527d3599962234dd6f5f3b7a60e0a",
+        "after": "269514b731b6caa3cea0b2cf17fd18d46d918cc8",
+        "changedSymbols": [
+          "Form error presentation / exact pure-import contract / Training return-button CSS only"
+        ],
+        "unchangedExecutedPaths": [
+          "successful parsed scientific facts and hashes",
+          "runtime authorization and immutable evidence",
+          "Vitest JavaScript behavior (CSS not rendered)"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Reviewed recovery changes only Form invalid-input issue presentation, test assertions and a CSS display rule. Successful scientific parse, identity and submitted data paths remain unchanged; CSS is not rendered by retained unit tests.",
+        "reviewEvidence": "Independent review of exact three-file PR351 fourth-run repair; original failures remain failed and eight affected assertions are explicitly revalidated."
+      },
+      "server-version/frontend/src/training/paper-ink.css": {
+        "before": "35f21f103cdbdfea55dea6443ce09a092a2c81b0",
+        "after": "9b37c865d67f7b1bf7f5230dee9743eb2f5868f3",
+        "changedSymbols": [
+          "Form error presentation / exact pure-import contract / Training return-button CSS only"
+        ],
+        "unchangedExecutedPaths": [
+          "successful parsed scientific facts and hashes",
+          "runtime authorization and immutable evidence",
+          "Vitest JavaScript behavior (CSS not rendered)"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Reviewed recovery changes only Form invalid-input issue presentation, test assertions and a CSS display rule. Successful scientific parse, identity and submitted data paths remain unchanged; CSS is not rendered by retained unit tests.",
+        "reviewEvidence": "Independent review of exact three-file PR351 fourth-run repair; original failures remain failed and eight affected assertions are explicitly revalidated."
+      },
+      "server-version/frontend/src/pages/AssignmentList.tsx": {
+        "before": "e3cbc1dc34f9b29aa1eda4fb243b6aa523e2c8b5",
+        "after": "8444738d6c74784be2fa985c7ecc1822bd8cc4f6",
+        "changedSymbols": [
+          "AssignmentList completed batch busy cleanup and regression"
+        ],
+        "unchangedExecutedPaths": [
+          "all paths not executing a successful batch-grade completion",
+          "backend and immutable scientific/schema paths",
+          "TypeScript public types and component signatures"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The successful current-generation batch-grade branch now clears its own busy flag before advancing list refresh. Prior seven review assertions are excluded from fixed frontend acceptance and the full affected eight-case file reexecutes; other retained tests do not execute that changed branch.",
+        "reviewEvidence": "Independent exact two-file review and owner 8 focused passes; user separately approved the eight-case CI revalidation."
+      },
+      "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": {
+        "before": "c4cc93208a873628438d32603b38c411c1cf6e97",
+        "after": "611c23c6683557d5fcab311363e8586fd38dc07f",
+        "changedSymbols": [
+          "AssignmentList completed batch busy cleanup and regression"
+        ],
+        "unchangedExecutedPaths": [
+          "all paths not executing a successful batch-grade completion",
+          "backend and immutable scientific/schema paths",
+          "TypeScript public types and component signatures"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The successful current-generation batch-grade branch now clears its own busy flag before advancing list refresh. Prior seven review assertions are excluded from fixed frontend acceptance and the full affected eight-case file reexecutes; other retained tests do not execute that changed branch.",
+        "reviewEvidence": "Independent exact two-file review and owner 8 focused passes; user separately approved the eight-case CI revalidation."
+      },
+      "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": {
+        "before": "07f88b1dd7ba559834e23694b827e3b197e86095",
+        "after": "90fddb0bdabe6f72ab118c0a868317c3c72ce90f",
+        "changedSymbols": [
+          "Deferred export explicit confirmed document reload and regression"
+        ],
+        "unchangedExecutedPaths": [
+          "all paths not exercising the failed deferred export recovery panel",
+          "backend and immutable scientific/schema paths",
+          "existing one-argument loader calls remain valid; optional reload callback returns void"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Only failed export module recovery changes to explicit confirmed document reload. The old three export contracts are excluded; the current three execute with user permission. Other retained contracts do not exercise that changed recovery panel. The additional reload callback is optional with a void default; existing callers remain type-compatible.",
+        "reviewEvidence": "Independent exact two-file review and owner 3 focused passes; CI revalidation approval is recorded separately."
+      },
+      "server-version/frontend/src/pages/questionnaire/deferredAssessmentExport.tsx": {
+        "before": "e9eaccaac07dace5c85ec4f2581228d762371f69",
+        "after": "d72bd98d1050124838c43c233bff38d339e468e0",
+        "changedSymbols": [
+          "Deferred export explicit confirmed document reload and regression"
+        ],
+        "unchangedExecutedPaths": [
+          "all paths not exercising the failed deferred export recovery panel",
+          "backend and immutable scientific/schema paths",
+          "existing one-argument loader calls remain valid; optional reload callback returns void"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Only failed export module recovery changes to explicit confirmed document reload. The old three export contracts are excluded; the current three execute with user permission. Other retained contracts do not exercise that changed recovery panel. The additional reload callback is optional with a void default; existing callers remain type-compatible.",
+        "reviewEvidence": "Independent exact two-file review and owner 3 focused passes; CI revalidation approval is recorded separately."
+      }
+    },
+    "final-backend-types": {
+      "server-version/frontend/src/modules/composite/__tests__/CompositeAssessmentPage.test.tsx": {
+        "before": "3adca6205b00394520307a2542a0b3688a1e9005",
+        "after": "7e019198f935f0db9fbaeef09bffcace5d54558e",
+        "executedPathUnchanged": true,
+        "changedSymbols": [
+          "namespace rejection test text query"
+        ],
+        "unchangedExecutedPaths": [
+          "all production imports and API guards",
+          "compiler-compatible existing expect/toHaveTextContent APIs"
+        ],
+        "reason": "Only one existing test assertion replaces exact old text query with alert role plus complete current text. No product, import, interface or inferred data type changed; targeted case passed.",
+        "reviewEvidence": "Independent source review plus actual single-case exit0; existing getAttempt/start-not-called assertions remain."
+      },
+      "server-version/backend/src/__tests__/assessment-core/form-foundation.contract.test.ts": {
+        "before": "b88a9b111a2be8384fb43a6338f2069ae8e9da09",
+        "after": "5309c7e1aca89d09428b741c7702e33c17e18438",
+        "changedSymbols": [
+          "Form error presentation / exact pure-import contract / Training return-button CSS only"
+        ],
+        "unchangedExecutedPaths": [
+          "successful parsed scientific facts and hashes",
+          "runtime authorization and immutable evidence",
+          "Vitest JavaScript behavior (CSS not rendered)"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Reviewed recovery changes only Form invalid-input issue presentation, test assertions and a CSS display rule. Successful scientific parse, identity and submitted data paths remain unchanged; CSS is not rendered by retained unit tests.",
+        "reviewEvidence": "Independent review of exact three-file PR351 fourth-run repair; original failures remain failed and eight affected assertions are explicitly revalidated."
+      },
+      "server-version/backend/src/modules/assessment-core/form/definition.ts": {
+        "before": "74fc2209982527d3599962234dd6f5f3b7a60e0a",
+        "after": "269514b731b6caa3cea0b2cf17fd18d46d918cc8",
+        "changedSymbols": [
+          "Form error presentation / exact pure-import contract / Training return-button CSS only"
+        ],
+        "unchangedExecutedPaths": [
+          "successful parsed scientific facts and hashes",
+          "runtime authorization and immutable evidence",
+          "Vitest JavaScript behavior (CSS not rendered)"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Reviewed recovery changes only Form invalid-input issue presentation, test assertions and a CSS display rule. Successful scientific parse, identity and submitted data paths remain unchanged; CSS is not rendered by retained unit tests.",
+        "reviewEvidence": "Independent review of exact three-file PR351 fourth-run repair; original failures remain failed and eight affected assertions are explicitly revalidated."
+      },
+      "server-version/frontend/src/training/paper-ink.css": {
+        "before": "35f21f103cdbdfea55dea6443ce09a092a2c81b0",
+        "after": "9b37c865d67f7b1bf7f5230dee9743eb2f5868f3",
+        "changedSymbols": [
+          "Form error presentation / exact pure-import contract / Training return-button CSS only"
+        ],
+        "unchangedExecutedPaths": [
+          "successful parsed scientific facts and hashes",
+          "runtime authorization and immutable evidence",
+          "Vitest JavaScript behavior (CSS not rendered)"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Reviewed recovery changes only Form invalid-input issue presentation, test assertions and a CSS display rule. Successful scientific parse, identity and submitted data paths remain unchanged; CSS is not rendered by retained unit tests.",
+        "reviewEvidence": "Independent review of exact three-file PR351 fourth-run repair; original failures remain failed and eight affected assertions are explicitly revalidated."
+      },
+      "server-version/frontend/src/pages/AssignmentList.tsx": {
+        "before": "e3cbc1dc34f9b29aa1eda4fb243b6aa523e2c8b5",
+        "after": "8444738d6c74784be2fa985c7ecc1822bd8cc4f6",
+        "changedSymbols": [
+          "AssignmentList completed batch busy cleanup and regression"
+        ],
+        "unchangedExecutedPaths": [
+          "all paths not executing a successful batch-grade completion",
+          "backend and immutable scientific/schema paths",
+          "TypeScript public types and component signatures"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The successful current-generation batch-grade branch now clears its own busy flag before advancing list refresh. Prior seven review assertions are excluded from fixed frontend acceptance and the full affected eight-case file reexecutes; other retained tests do not execute that changed branch.",
+        "reviewEvidence": "Independent exact two-file review and owner 8 focused passes; user separately approved the eight-case CI revalidation."
+      },
+      "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": {
+        "before": "c4cc93208a873628438d32603b38c411c1cf6e97",
+        "after": "611c23c6683557d5fcab311363e8586fd38dc07f",
+        "changedSymbols": [
+          "AssignmentList completed batch busy cleanup and regression"
+        ],
+        "unchangedExecutedPaths": [
+          "all paths not executing a successful batch-grade completion",
+          "backend and immutable scientific/schema paths",
+          "TypeScript public types and component signatures"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "The successful current-generation batch-grade branch now clears its own busy flag before advancing list refresh. Prior seven review assertions are excluded from fixed frontend acceptance and the full affected eight-case file reexecutes; other retained tests do not execute that changed branch.",
+        "reviewEvidence": "Independent exact two-file review and owner 8 focused passes; user separately approved the eight-case CI revalidation."
+      },
+      "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": {
+        "before": "07f88b1dd7ba559834e23694b827e3b197e86095",
+        "after": "90fddb0bdabe6f72ab118c0a868317c3c72ce90f",
+        "changedSymbols": [
+          "Deferred export explicit confirmed document reload and regression"
+        ],
+        "unchangedExecutedPaths": [
+          "all paths not exercising the failed deferred export recovery panel",
+          "backend and immutable scientific/schema paths",
+          "existing one-argument loader calls remain valid; optional reload callback returns void"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Only failed export module recovery changes to explicit confirmed document reload. The old three export contracts are excluded; the current three execute with user permission. Other retained contracts do not exercise that changed recovery panel. The additional reload callback is optional with a void default; existing callers remain type-compatible.",
+        "reviewEvidence": "Independent exact two-file review and owner 3 focused passes; CI revalidation approval is recorded separately."
+      },
+      "server-version/frontend/src/pages/questionnaire/deferredAssessmentExport.tsx": {
+        "before": "e9eaccaac07dace5c85ec4f2581228d762371f69",
+        "after": "d72bd98d1050124838c43c233bff38d339e468e0",
+        "changedSymbols": [
+          "Deferred export explicit confirmed document reload and regression"
+        ],
+        "unchangedExecutedPaths": [
+          "all paths not exercising the failed deferred export recovery panel",
+          "backend and immutable scientific/schema paths",
+          "existing one-argument loader calls remain valid; optional reload callback returns void"
+        ],
+        "executedPathUnchanged": true,
+        "reason": "Only failed export module recovery changes to explicit confirmed document reload. The old three export contracts are excluded; the current three execute with user permission. Other retained contracts do not exercise that changed recovery panel. The additional reload callback is optional with a void default; existing callers remain type-compatible.",
+        "reviewEvidence": "Independent exact two-file review and owner 3 focused passes; CI revalidation approval is recorded separately."
+      }
+    }
   },
   "executionPolicy": "missing-only-current-mixed-candidate",
   "fixedPgCases": [
@@ -1739,5 +3037,351 @@
       "file": "server-version/backend/src/__tests__/integration/trainingStableAdmission.postgres.integration.test.ts",
       "caseName": "serializes identity revocation behind a Cognitive FINAL parent lock without child-parent inversion"
     }
-  ]
+  ],
+  "officialFrontendAudit": {
+    "run": 40083811762,
+    "job": 120842648294,
+    "artifact": 12555908081,
+    "sourceHead": "dbadf6de8a472bf7cce06b7dadd62d1d1264c54d",
+    "checkout": "516abc8e9f95208d09b259f2e54deb6601ff26ef",
+    "name": "training-entry-admission-516abc8e9f95208d09b259f2e54deb6601ff26ef",
+    "bytes": 163365,
+    "sha256": "72330867c2f65a986c40bf45d17522ad9d3cc2194e4cb1dc960f071c6a406575",
+    "componentTree": "8c324cd0303e21d5687cf14ced22fbe85b7b0be0",
+    "completedAt": "2026-10-24T09:55:44.522Z"
+  },
+  "fixedFrontendContracts": {
+    "files": [
+      "server-version/frontend/src/api/__tests__/materialGrants.test.ts",
+      "server-version/frontend/src/components/__tests__/AnonymousStudyManager.test.tsx",
+      "server-version/frontend/src/components/__tests__/FinalCompositeAssessment.test.tsx",
+      "server-version/frontend/src/components/__tests__/MaterialGrantModal.test.tsx",
+      "server-version/frontend/src/components/__tests__/TrainingParticipationSettings.test.tsx",
+      "server-version/frontend/src/components/__tests__/WholeCompositeQuestionnaire.test.tsx",
+      "server-version/frontend/src/components/app-shell/__tests__/management-frame-loading.test.tsx",
+      "server-version/frontend/src/components/app-shell/__tests__/shell.test.tsx",
+      "server-version/frontend/src/components/participation/participation-link.test.ts",
+      "server-version/frontend/src/components/shared-ui/__tests__/RetryableLazy.test.tsx",
+      "server-version/frontend/src/modules/cognitive/__tests__/CognitivePublicEntry.test.tsx",
+      "server-version/frontend/src/modules/composite/__tests__/CompositeAssessmentPage.test.tsx",
+      "server-version/frontend/src/modules/situational/__tests__/vnext-history.test.ts",
+      "server-version/frontend/src/pages/__tests__/AssignmentList.course-workspace.test.tsx",
+      "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx",
+      "server-version/frontend/src/pages/__tests__/AssignmentList.states.test.tsx",
+      "server-version/frontend/src/pages/__tests__/TeacherCodeList.test.tsx",
+      "server-version/frontend/src/pages/__tests__/TeacherTasks.loading.test.tsx",
+      "server-version/frontend/src/pages/__tests__/UserList.training.test.tsx",
+      "server-version/frontend/src/pages/admin/AdminTrainingWorkspace.test.tsx",
+      "server-version/frontend/src/pages/public/__tests__/AnonymousStudyPage.test.tsx",
+      "server-version/frontend/src/pages/public/__tests__/PublicCheckin.performance.test.tsx",
+      "server-version/frontend/src/pages/public/__tests__/PublicCheckin.protected-media.test.tsx",
+      "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx",
+      "server-version/frontend/src/pages/questionnaire/__tests__/TrainingQuestionnaireList.test.tsx",
+      "server-version/frontend/src/survey/ResearchCatalog.requests.test.tsx",
+      "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx",
+      "server-version/frontend/src/survey/SurveyToolTemplateEditor.loading.test.tsx",
+      "server-version/frontend/src/survey/SurveyWaveStudio.preview.test.tsx",
+      "server-version/frontend/src/survey/survey-cognitive-deferred.test.ts",
+      "server-version/frontend/src/training/TrainingAdminResources.efficiency.test.tsx",
+      "server-version/frontend/src/training/TrainingCourseAssessments.loading.test.tsx",
+      "server-version/frontend/src/training/TrainingCourseAssessments.test.tsx",
+      "server-version/frontend/src/training/TrainingLearnerCourse.loading.test.tsx"
+    ],
+    "expectedPassed": 421,
+    "retryFile": "server-version/frontend/src/modules/composite/__tests__/CompositeAssessmentPage.test.tsx",
+    "retryName": "does not accept a study or Survey fragment as a single attempt credential",
+    "priorTestBlob": "3adca6205b00394520307a2542a0b3688a1e9005",
+    "finalTestBlob": "7e019198f935f0db9fbaeef09bffcace5d54558e",
+    "inputClosureGroup": "final-frontend-types",
+    "excludedPriorCount": 10,
+    "retainedPassed": 411,
+    "excludedAffectedFiles": {
+      "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": 7,
+      "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": 3
+    }
+  },
+  "evidenceSourceObjects": {
+    "848f4c1014060f949ae6263418be25787f6f907c": {
+      "remote": "95c793998a9bd2047c1da48747bf406fe1ca353a",
+      "tree": "69e6b659f503e856a478f04918665f16f031c2ea"
+    }
+  },
+  "officialBackendAudit": {
+    "run": 40089648347,
+    "job": 120859592632,
+    "artifact": 12558885203,
+    "bytes": 104921,
+    "sha256": "d885e0cef27eca8d49dfbee9411d212b9b5b6cb22f40293a94984c6ea5f27b14",
+    "name": "training-entry-admission-d921c8a70f730be7407006e4ec443917ac5ae6e6",
+    "sourceHead": "b01155eb11c5b8d2c106bebe34f6520f3861a2e0",
+    "checkout": "d921c8a70f730be7407006e4ec443917ac5ae6e6",
+    "componentTree": "69824f4813204569d3c7554670ad06bee8c83986",
+    "completedAt": "2026-10-24T11:23:47.451Z",
+    "admissionConclusion": "success",
+    "auditStepConclusion": "success"
+  },
+  "officialRecovery": {
+    "run": 40094830671,
+    "sourceHead": "7d253468d1af142123bb61d01e616160adf39bf7",
+    "checkout": "c5536f7d396cebacbb9739aedacb18d235371d24",
+    "revalidation8Approved": true,
+    "approvalMessage": "Sentinel_355ab6c09da88191aaf61e8b9d1648f2",
+    "productDeltas": {
+      "server-version/frontend/src/pages/questionnaire/deferredAssessmentExport.tsx": {
+        "before": "e9eaccaac07dace5c85ec4f2581228d762371f69",
+        "after": "d72bd98d1050124838c43c233bff38d339e468e0"
+      },
+      "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": {
+        "before": "07f88b1dd7ba559834e23694b827e3b197e86095",
+        "after": "90fddb0bdabe6f72ab118c0a868317c3c72ce90f"
+      }
+    },
+    "artifacts": {
+      "backend": {
+        "id": 12559931721,
+        "name": "training-entry-backend-c02fbc52c2e9b6cc711dfcdf6e85b72def7d460c",
+        "bytes": 8741883,
+        "sha256": "b8e621950e6ef3c337ec5c50d00c39aa3bcb8c7077810d894d4c6dec2f6c87f4",
+        "job": 120871361314,
+        "jobName": "training-entry / backend",
+        "conclusion": "success"
+      },
+      "browser": {
+        "id": 12560780510,
+        "name": "training-entry-browser-c5536f7d396cebacbb9739aedacb18d235371d24-1",
+        "bytes": 1033340,
+        "sha256": "fcbc4e2a300abb312204e27857cbd06cf3dd2a7841a18430fa16a7efdb7e8bc6",
+        "job": 120875202355,
+        "jobName": "training-entry / browser",
+        "conclusion": "failure"
+      }
+    },
+    "backendReportSHA256": "5aea1ce59adc63ce4c7d5eb157f1bdbbdc082d666cd3514b0b5fb2ed5664d32d",
+    "backendCommandSHA256": "651b9ace5fe5a36f31f294fdc7ee108cd779059499f87ae62d5856f075010ba9",
+    "migrationSHA256": "6710a2cb29b966ea0dcd677d6ac86a0a9a48a0fcc88e410a4b68fd4bf24ca00a",
+    "migrationScriptBlob": "d7c8cb77506fcf17714f4fc1ca008799e3cbf5a5",
+    "migrationInputs": "100644 blob 8321927f82166ee513a949debfcca3662b308c19\tserver-version/backend/prisma/migrations/20260203162242_init/migration.sql\n100644 blob 0ed4c79f5b59f3119b357b85cac7d1a4a75b0d4d\tserver-version/backend/prisma/migrations/20260203171249_add_teacher_code_relation/migration.sql\n100644 blob bd22a4d60f1a4941188a02cfcab251fe778ba772\tserver-version/backend/prisma/migrations/20260204000229_add_user_expires_at/migration.sql\n100644 blob d0e1152cce3494969bb6e8dbfa738c1e00cc2e95\tserver-version/backend/prisma/migrations/20260204003550_add_student_account_features/migration.sql\n100644 blob 13693e511705ff2d13cba7fe9d85d0469f494cf3\tserver-version/backend/prisma/migrations/20260205044439_add_is_recruiting/migration.sql\n100644 blob 3d1967f8128019983b4540d27b400609d05f3a74\tserver-version/backend/prisma/migrations/20260205053441_add_video_tags_and_checkin_content/migration.sql\n100644 blob e55bc85905b9636380ab01013d1e1dd41988de41\tserver-version/backend/prisma/migrations/20260205133259_add_assignment_content_images/migration.sql\n100644 blob 59eb1a01c6af9d0be9566bc8da9e6089088a0926\tserver-version/backend/prisma/migrations/20260206034044_add_checkin_fields/migration.sql\n100644 blob 06181abc3a11ae70fdb3542430f693a9871a1d93\tserver-version/backend/prisma/migrations/20260227092513_add_submission_history/migration.sql\n100644 blob aa0da25cfb1282eb882dc7b8073afe75085c2da1\tserver-version/backend/prisma/migrations/20260818000000_fix_missing_module_tables/migration.sql\n100644 blob 2590f189cdc1b990eb34ba7c6f3b1f4d6ac66884\tserver-version/backend/prisma/migrations/20260818010000_sync_schema_drift/migration.sql\n100644 blob 362031256ed13a84db09fdd58a37a413d86dfa3f\tserver-version/backend/prisma/migrations/20260819132001_add_cognitive_core_foundation/migration.sql\n100644 blob d8826981a9c3eb0f523dd2ab2b82bc6a4caea32d\tserver-version/backend/prisma/migrations/20260819134700_cognitive_session_constraints/migration.sql\n100644 blob 2db586cfe3ed9e753ecce1124fd7d4774be165ea\tserver-version/backend/prisma/migrations/20260821090000_add_composite_assessment/migration.sql\n100644 blob be8c7738541753bc66a846ba1a906b838cd2189b\tserver-version/backend/prisma/migrations/20260821120000_fix_composite_draft_answers_and_attempt_uniqueness/migration.sql\n100644 blob c66aa50190cf71b8133c603dd9af8e03751f00db\tserver-version/backend/prisma/migrations/20260822090000_add_teacher_approved/migration.sql\n100644 blob c1b1abe088c01031572b5593100b26551e121e0a\tserver-version/backend/prisma/migrations/20260822100000_add_library_copy_and_wrappers/migration.sql\n100644 blob 76f0f0cad6eaf263f8e8e6229b3d334afa2969cf\tserver-version/backend/prisma/migrations/20260823100000_add_material_grants/migration.sql\n100644 blob 10619e1154e3ad0a7137f959c40f00341a91245b\tserver-version/backend/prisma/migrations/20260823120000_add_assignment_profile_freeze/migration.sql\n100644 blob 1d2db490b60f5bfd19ed4d42fc0a00b36a5a67a0\tserver-version/backend/prisma/migrations/20260823130000_add_assignment_report_freeze/migration.sql\n100644 blob cfac0c5f7e0ed8525d6f34e493a571bdbd5873a6\tserver-version/backend/prisma/migrations/20260824070000_add_composite_analysis_protocol_freeze/migration.sql\n100644 blob e59124b19548e9dacd81ed45f1abcd857ab25c05\tserver-version/backend/prisma/migrations/20260824120000_add_report_package_resources/migration.sql\n100644 blob b73deeedc3173dcb23b0caae63cd21636bc78ab6\tserver-version/backend/prisma/migrations/20260824130000_add_composite_analysis_snapshots/migration.sql\n100644 blob 48972e1c5ed209c17792ffdd37b71ef2a04ca7f1\tserver-version/backend/prisma/migrations/20260826100000_add_security_credentials/migration.sql\n100644 blob 0659655e17f2b5c84792538bb07b62ec79875f7f\tserver-version/backend/prisma/migrations/20260826110000_add_password_reset_state/migration.sql\n100644 blob 701cd818669e1462f5b5034d6de10ccb525c166a\tserver-version/backend/prisma/migrations/20260826120000_add_stored_assets/migration.sql\n100644 blob 735a9b85dc6abb0fcff9901720a8587052b18f5e\tserver-version/backend/prisma/migrations/20260826130000_allow_asset_dedup/migration.sql\n100644 blob add2507aa5803ad16836680d045fb6bc7c69824d\tserver-version/backend/prisma/migrations/20260827100000_scale_assessment_v2_foundation/migration.sql\n100644 blob 479725756a6b3007bd6f0e5433474ec774f18349\tserver-version/backend/prisma/migrations/20260827110000_add_assessment_context/migration.sql\n100644 blob 90e0e36ca2f035652bae122d08763a589d67010d\tserver-version/backend/prisma/migrations/20260827120000_cognitive_v2_result_snapshot/migration.sql\n100644 blob e1a5d4dd4283c7db4dfa5fa70e137ee4403f6a42\tserver-version/backend/prisma/migrations/20260828100000_pr24_security_boundaries/migration.sql\n100644 blob d74755e4fc34626200e5caa2cba1ad86922cda32\tserver-version/backend/prisma/migrations/20260828200000_pr25_runtime_consistency/migration.sql\n100644 blob f7152efec6eee6ab9132abf9a2bff050f24cadc1\tserver-version/backend/prisma/migrations/20260828210000_video_processing_recovery/migration.sql\n100644 blob f1c2aaee7a9703e9e21d236e692eda2ae11ed454\tserver-version/backend/prisma/migrations/20260828220000_checkin_token_protection/migration.sql\n100644 blob 12a6689c98b9982957734d4bad961e09ccbe5fd9\tserver-version/backend/prisma/migrations/20260829100000_submission_history_version_unique/migration.sql\n100644 blob e47d247f7c24f0326d06604ee2b6dcddb443e538\tserver-version/backend/prisma/migrations/20260829110000_submission_idempotency_keys/migration.sql\n100644 blob 03b06962027d1079e565337e14d69f75746054f0\tserver-version/backend/prisma/migrations/20260829120000_forbid_plaintext_checkin_tokens/migration.sql\n100644 blob fe08c81a12274a3b8a9ea1a51baffe776221b1c3\tserver-version/backend/prisma/migrations/20260829130000_submission_idempotency_payload_hashes/migration.sql\n100644 blob a3be810d5131b8ffe6578fe06c64eca83434588b\tserver-version/backend/prisma/migrations/20260829140000_checkin_token_integrity/migration.sql\n100644 blob 6bffbafbb24121b0c25b01e20e4af64dcfc96c80\tserver-version/backend/prisma/migrations/20260829150000_submission_idempotency_receipts/migration.sql\n100644 blob 3b8ec8389d4479e25280fd2e6878e9c3fb670fee\tserver-version/backend/prisma/migrations/20260829160000_submission_revision/migration.sql\n100644 blob bc2db94d944b2533e266dca7e548b02194a49d92\tserver-version/backend/prisma/migrations/20260830100000_protect_public_access_tokens/migration.sql\n100644 blob a63c6069be439d0d5dcce1ede9c1796b20006be9\tserver-version/backend/prisma/migrations/20260830120000_persistence_checkpoint_occ/migration.sql\n100644 blob 7ea5fc03121ebe6669043aa97d44462f5894241c\tserver-version/backend/prisma/migrations/20260831150000_instrument_final_submit_indexeddb/migration.sql\n100644 blob 2b937bb7c8d14d43f0dcf0533de41ef1c3fb8d69\tserver-version/backend/prisma/migrations/20260901090000_unified_runtime_v32_unit/migration.sql\n100644 blob ee37691e9a02cfffacdaec58ca7dfac0ded597ce\tserver-version/backend/prisma/migrations/20260901100000_unified_runtime_v32_aggregate/migration.sql\n100644 blob e3ec28998b901ff11e3baac3e36cf2103147ae0c\tserver-version/backend/prisma/migrations/20260902120000_unified_runtime_v32_admission/migration.sql\n100644 blob 602ec0e13b35bef28e5831c52ee33756f739154b\tserver-version/backend/prisma/migrations/20260902130000_unified_runtime_v32_unit_admission/migration.sql\n100644 blob b28414e45752e62a501b7f53b53354a0f103291e\tserver-version/backend/prisma/migrations/20260903210000_instrument_authorization_overlay/migration.sql\n100644 blob e6e7b516302d01a75b9c32f9e55d8a180f1dac6e\tserver-version/backend/prisma/migrations/20260903220000_episode_parent_invite_consent/migration.sql\n100644 blob 5d6dd252d72b21bc6c71dc7d659c16a8a18aa26c\tserver-version/backend/prisma/migrations/20260903230000_identity_restrict_fks/migration.sql\n100644 blob 917219381305d18ea3bbfe01437605e5d20cae2f\tserver-version/backend/prisma/migrations/20260903240000_safety_case/migration.sql\n100644 blob c0e8a0282a732b965e741256754bc6fd6154c44f\tserver-version/backend/prisma/migrations/20260903250000_safety_case_prep_151/migration.sql\n100644 blob da4585d84e4d76c67fab751a271e3137f622b5f3\tserver-version/backend/prisma/migrations/20260904010000_safety_wakeup_prep_171/migration.sql\n100644 blob e9c61289e1041277fe33697dbf6b930a8ad23b0f\tserver-version/backend/prisma/migrations/20260908100000_situational_standalone_runtime/migration.sql\n100644 blob 4e0c332009d02a5ef78139d4dc67777e786818b7\tserver-version/backend/prisma/migrations/20260909100000_situational_bundle_integration/migration.sql\n100644 blob 19e67e353a2323f805bcec8883604010b6181c9c\tserver-version/backend/prisma/migrations/20260917020000_relational_assignment_persistence/migration.sql\n100644 blob febb8a62c4dccf89418667efc0502d0a09045ed4\tserver-version/backend/prisma/migrations/20260917030000_relational_analysis_snapshots/migration.sql\n100644 blob da1f584945a24dafa4b2599e34237fee16bf8067\tserver-version/backend/prisma/migrations/20260917040000_relational_contract_hardening/migration.sql\n100644 blob 06586ed8e94cf913e55fc4a59450493963f0d445\tserver-version/backend/prisma/migrations/20260919000100_platform_role/migration.sql\n100644 blob a7a63067a0da63af472826296dd38a826863eb3f\tserver-version/backend/prisma/migrations/20260919000200_organization_membership/migration.sql\n100644 blob bf232d1f9716a2e82f3ea8094cb5cba23709cf70\tserver-version/backend/prisma/migrations/20260919000300_org_grants_audit/migration.sql\n100644 blob d181ac23142c839a2b9b80b6145db36e94b0b797\tserver-version/backend/prisma/migrations/20260919000400_org_unit_hierarchy/migration.sql\n100644 blob c041bdf9dea870ef4dc64288fbf63455d3c0a8d2\tserver-version/backend/prisma/migrations/20260919000500_org_class_relationships/migration.sql\n100644 blob 04de9e49cfebbfafdefe132fc11836d9d3c48e22\tserver-version/backend/prisma/migrations/20260919000600_org_classification_professional/migration.sql\n100644 blob 2f650de272991e5878bbf3313734c7ff93cba348\tserver-version/backend/prisma/migrations/20260919000700_assessment_run_graph/migration.sql\n100644 blob b108238d206e4fa21a80cffeae48ad0cfe3f3e50\tserver-version/backend/prisma/migrations/20260919000800_organization_episode_allocation/migration.sql\n100644 blob 64bb584c15679ae85784aaaadfd7965f4e0eeda4\tserver-version/backend/prisma/migrations/20260919000900_relational_organization_domains/migration.sql\n100644 blob 70139eb04350c7b38f43f4493e3fedf10c0bb9a8\tserver-version/backend/prisma/migrations/20260919001000_run_start_claims/migration.sql\n100644 blob a3e53278b39850a9bddd431d701c18bf7fab2820\tserver-version/backend/prisma/migrations/20260919001100_run_scientific_provenance/migration.sql\n100644 blob 1078bfb04ca00b1f642b9592514079b43d57976e\tserver-version/backend/prisma/migrations/20260919001200_run_lifecycle_arbitration/migration.sql\n100644 blob cb2d55e964704ddaacbafd4fd61b27c89f1f7788\tserver-version/backend/prisma/migrations/20260919115500_freeze_run_start_attempt_identity/migration.sql\n100644 blob c6b2793dd988ef018aa6ec1a58a213a94f30c0cc\tserver-version/backend/prisma/migrations/20260919121000_reporting_core/migration.sql\n100644 blob 0f1fad746fd8565e64886cd2a69dad4fcf756a3c\tserver-version/backend/prisma/migrations/20260919155500_reporting_series_wave_bindings/migration.sql\n100644 blob 1f3bb72507e3ade092a00b2538bb42578eea6b33\tserver-version/backend/prisma/migrations/20260919161000_reporting_pr4_artifact_bindings/migration.sql\n100644 blob b709857623de3770b7c885cc7b2cb42d4b2ced5d\tserver-version/backend/prisma/migrations/20260919190000_reporting_export_tickets/migration.sql\n100644 blob aa8bd7c68e26c02819402a1d060e6796e64be3b8\tserver-version/backend/prisma/migrations/20260921145500_add_scale_deployment_policy/migration.sql\n100644 blob 2fc1378333e047b25fb0a7c4a7e3c7edce4e6077\tserver-version/backend/prisma/migrations/20260922010000_scale_publication_audit/migration.sql\n100644 blob 058009fa4d38858c1a49306ea93ab60ac6d9252a\tserver-version/backend/prisma/migrations/20260922120000_questionnaire_products/migration.sql\n100644 blob b8782eab7c606fb35885e129aad2223033b71db3\tserver-version/backend/prisma/migrations/20260922140000_bundle_v3_production/migration.sql\n100644 blob c49611bcee44eb29ab5bc391d569695f8dd8ee1c\tserver-version/backend/prisma/migrations/20260923010000_bundle_package_releases/migration.sql\n100644 blob 7850dc23f40789e0070c6a31e1ee3f333f634f2e\tserver-version/backend/prisma/migrations/20260926010000_reporting_cohort_selection/migration.sql\n100644 blob 9edd0d9ce841a08cadd383c8552213fc54613798\tserver-version/backend/prisma/migrations/20260926093000_reporting_individual_longitudinal/migration.sql\n100644 blob dcf7a07287a84676d57b0e04f7bf89088b3691a7\tserver-version/backend/prisma/migrations/20260927210000_export_batch_recovery/migration.sql\n100644 blob 79f87eed689909eb2e065d0d82508a234593e739\tserver-version/backend/prisma/migrations/20260927223000_video_processing_generation/migration.sql\n100644 blob 04f93a6585e6ed04ee309f32556a7b6a96e0cbee\tserver-version/backend/prisma/migrations/20260930000000_export_artifact_provenance/migration.sql\n100644 blob cdb042744488e4f066f66c2e335fe20dd23e0685\tserver-version/backend/prisma/migrations/20260930000100_assessment_delivery_grants/migration.sql\n100644 blob beda4f7ccc67ca23f8b8f1f1615e666bed1604c3\tserver-version/backend/prisma/migrations/20260930000200_delivery_policy_windows/migration.sql\n100644 blob d77308dbf0e02b5a13d557fb49753568af3bc3d3\tserver-version/backend/prisma/migrations/20261001000100_anonymous_study_waves/migration.sql\n100644 blob c1fd096f8dbc1cd0241846c675838d61139430d4\tserver-version/backend/prisma/migrations/20261001030000_scale_reference_lifecycle/migration.sql\n100644 blob fec561b58473352cbd5d4f255adb0b704645796b\tserver-version/backend/prisma/migrations/20261001040000_scale_axis_snapshots/migration.sql\n100644 blob 3a70be68013a32f820d1ed7ac4fa1c3ec34e4d24\tserver-version/backend/prisma/migrations/20261001090000_sjt_author_uploads/migration.sql\n100644 blob ce35a7e411b2358106e403d87459b22efab6b152\tserver-version/backend/prisma/migrations/20261002120000_parent_portal_disclosure/migration.sql\n100644 blob f9db765424afe17a5759b84004cf0b7230c9f8ed\tserver-version/backend/prisma/migrations/20261002121000_parent_portal_binding_guards/migration.sql\n100644 blob a6d9079b0742e5b544883194d6deae6ecb18711e\tserver-version/backend/prisma/migrations/20261002140000_parent_tool_disclosure_ceiling/migration.sql\n100644 blob 404348d13f289b82e5157e2f4221fa7a2c1aa78a\tserver-version/backend/prisma/migrations/20261002150000_legacy_import_tables/migration.sql\n100644 blob 982bc095f0aac2fd3679d1359cbf47676f3490b5\tserver-version/backend/prisma/migrations/20261002160000_parent_report_publications/migration.sql\n100644 blob 8a49a97dc70f743809c8036c040f1634ef011236\tserver-version/backend/prisma/migrations/20261004000100_parent_relationship_episodes/migration.sql\n100644 blob 0077acdb6890fd251737d988265cfa42544e38d3\tserver-version/backend/prisma/migrations/20261004000200_organization_member_invitations/migration.sql\n100644 blob f9171b5f157975c644828deb69eaef3b2d1e3a6d\tserver-version/backend/prisma/migrations/20261005000100_registered_descriptive_resources/migration.sql\n100644 blob ddf133c6de0bc1f7a6224e596d9ddcdb8bac59dd\tserver-version/backend/prisma/migrations/20261007010000_cognitive_quota_lineage/migration.sql\n100644 blob 16ce4e07b837aeb7b9fb0f535cc29d98be0e5099\tserver-version/backend/prisma/migrations/20261007020000_assessment_workbench/migration.sql\n100644 blob b4a3eca5d8a48a9efff7465c131372372079a2ed\tserver-version/backend/prisma/migrations/20261010010000_campus_account_domains/migration.sql\n100644 blob 1c86770d9d666a2c1bc89ddd82b06d1bbb2344e9\tserver-version/backend/prisma/migrations/20261010020000_campus_class_admission/migration.sql\n100644 blob 8b69b709af427eaeee952ddedeff6d832d049a9e\tserver-version/backend/prisma/migrations/20261010030000_campus_totp/migration.sql\n100644 blob e465a66ea0ef2fdb911d40fc46e759c4923398fc\tserver-version/backend/prisma/migrations/20261010040000_campus_staff_invitations/migration.sql\n100644 blob 6cbe8cb035e33a94e0b0f9216a7ddeee6408c164\tserver-version/backend/prisma/migrations/20261010050000_campus_recovery/migration.sql\n100644 blob 052d9b7278b8fe857bab6d648545113a5778d294\tserver-version/backend/prisma/migrations/20261010060000_campus_scope_constraints/migration.sql\n100644 blob e0c8c071b8bce5cb8e7134ca2a23340dad77f64a\tserver-version/backend/prisma/migrations/20261010070000_campus_realm_immutability/migration.sql\n100644 blob ad4fa97e1c0772caab44458a2ded1ccde66943b2\tserver-version/backend/prisma/migrations/20261010080000_campus_quarantine_readmission/migration.sql\n100644 blob 12a40c84b3bba86c0b1e4e1993f2457bd2549de2\tserver-version/backend/prisma/migrations/20261010100000_campus_activity_course_type/migration.sql\n100644 blob 27ce58be37a5684daf1c5bd3bfc062891a232d7e\tserver-version/backend/prisma/migrations/20261010110000_campus_activity_lifecycle/migration.sql\n100644 blob 80190ff0b50d0a316fdc0204ba1040945b517c06\tserver-version/backend/prisma/migrations/20261010120000_campus_task_submission_guard/migration.sql\n100644 blob ad2dc23184c021547e61205b6039254d2e56e358\tserver-version/backend/prisma/migrations/20261010130000_campus_parent_registration/migration.sql\n100644 blob f0d8db1dd2878c596ae89f863803d9f24f55ea63\tserver-version/backend/prisma/migrations/20261010140000_campus_peer_consent_allocation/migration.sql\n100644 blob 99d23df23cf4733b29d5d6b37b593f2b661aba1e\tserver-version/backend/prisma/migrations/20261010150000_campus_peer_relationship_kind/migration.sql\n100644 blob 71d5b9d4ae203a4b30c2bd5c3860a6f540e74528\tserver-version/backend/prisma/migrations/20261011110000_survey_researcher_realm/migration.sql\n100644 blob 788e63b028aee0bfacb55cddc004666f800d26af\tserver-version/backend/prisma/migrations/20261011120000_survey_research_instruments/migration.sql\n100644 blob 4740004b08c55ac208c8880dc83496f90c2390f8\tserver-version/backend/prisma/migrations/20261011130000_survey_research_waves/migration.sql\n100644 blob 70321afe16678626dc638cfc71f6d2e2053a5bb8\tserver-version/backend/prisma/migrations/20261011131000_survey_final_adapter/migration.sql\n100644 blob 8e082be199d2599de872f3282987960ce7b36ac5\tserver-version/backend/prisma/migrations/20261011132000_survey_scoped_exports/migration.sql\n100644 blob 5b506e120d90d611961026cf42909da59bacad45\tserver-version/backend/prisma/migrations/20261011133000_survey_linkage_disclosure/migration.sql\n100644 blob 76a1829d394f879013b16f692772541fc8881d94\tserver-version/backend/prisma/migrations/20261011193000_survey_sample_quality/migration.sql\n100644 blob b832f0cf5c66e90367bfb357fa128eadc57c5635\tserver-version/backend/prisma/migrations/20261011233000_survey_flow_experiment/migration.sql\n100644 blob 54771cc1f90aeab15440ca605ebc5844bf78e292\tserver-version/backend/prisma/migrations/20261011234000_survey_research_operations/migration.sql\n100644 blob cc148ab74eaa798c061d37e5ff93c3903df709e0\tserver-version/backend/prisma/migrations/20261012000000_education_product_entitlements/migration.sql\n100644 blob d6a761a1f5db9044e7c012bab193fa289f83382f\tserver-version/backend/prisma/migrations/20261012000100_education_teacher_staff_invitations/migration.sql\n100644 blob 4be04a38efac72b633fbf16f4e64022ce4cd0b5a\tserver-version/backend/prisma/migrations/20261012000200_education_teacher_student_invitations/migration.sql\n100644 blob 50ac6561fa4e87099f430c470424a2c32dfcbe33\tserver-version/backend/prisma/migrations/20261012000300_huiteacher_evaluation_targets_events/migration.sql\n100644 blob 19b399e3d2782564044c838ef50b39100ad41ed1\tserver-version/backend/prisma/migrations/20261012000400_huiteacher_form_instruments/migration.sql\n100644 blob 9c42e2650f2b9e1a1cd927dbe3419887325061cf\tserver-version/backend/prisma/migrations/20261012000500_huischool_admin_product_grant_backfill/migration.sql\n100644 blob 87b18f48fb1166a4c98698262361e01030331b69\tserver-version/backend/prisma/migrations/20261012000600_huiteacher_run_binding/migration.sql\n100644 blob f47c07fe4cef16d4181ee423d207b3b36825dc5f\tserver-version/backend/prisma/migrations/20261012000700_huiteacher_form_runtime_final/migration.sql\n100644 blob de28a28f21c22fb5f1460a5ef52275225c151a46\tserver-version/backend/prisma/migrations/20261012000800_education_teacher_scale_licenses/migration.sql\n100644 blob 4db6e796dd7af0bc5ec5388166c9ded872885024\tserver-version/backend/prisma/migrations/20261012000900_huiteacher_personal_scale_entitlement/migration.sql\n100644 blob f88f6bcf2e47ae82c01f85cbd2ce931ce4ffb42f\tserver-version/backend/prisma/migrations/20261012001000_huiteacher_group_disclosure_ledger/migration.sql\n100644 blob ad6a9ba18617093e83a47517dc8fc8ddfcb4d441\tserver-version/backend/prisma/migrations/20261012001100_huiteacher_observer_evidence/migration.sql\n100644 blob d552a0007b36acdbf2ac8418d591a94e6952d04d\tserver-version/backend/prisma/migrations/20261012001200_huiteacher_field_consensus/migration.sql\n100644 blob 0581ecc30676a7fd47ba600dbea401409fb1d032\tserver-version/backend/prisma/migrations/20261012001300_huiteacher_consensus_approvals/migration.sql\n100644 blob deec0ca935d7c293f109197b682c66e5ff396c83\tserver-version/backend/prisma/migrations/20261012001400_huiteacher_structured_field_form/migration.sql\n100644 blob 59323f29b010f26459f3f7969014dca146060853\tserver-version/backend/prisma/migrations/20261012001500_huiteacher_field_form_binding_guard/migration.sql\n100644 blob ea0240d358cd018131d9bda0dd9918254b096d6d\tserver-version/backend/prisma/migrations/20261012001600_huiteacher_external_expert_identity/migration.sql\n100644 blob 29dc8f7dabc3a3bd6aa6126e66a160c9dbbe9319\tserver-version/backend/prisma/migrations/20261012001700_huiteacher_field_feedback_disclosure/migration.sql\n100644 blob fc527f1adb7e417424c9111ebd21d050327757d6\tserver-version/backend/prisma/migrations/20261012001800_huiteacher_student_eval_config/migration.sql\n100644 blob e119e328cb2ec6fb6753e55a1d0a24b6cf2c5404\tserver-version/backend/prisma/migrations/20261012001900_huiteacher_student_feedback_disclosure/migration.sql\n100644 blob 852b49bf64b89e271e9679025dff283c77f594ed\tserver-version/backend/prisma/migrations/20261012002000_huiteacher_cross_class_disclosure/migration.sql\n100644 blob bf3dd9eed56c0c45d82ac9a04132b55506df5042\tserver-version/backend/prisma/migrations/20261012002100_huiteacher_improvement_actions/migration.sql\n100644 blob ad6de4f0a9ed7fe2059b5940a4863084c8b56285\tserver-version/backend/prisma/migrations/20261012002200_huiteacher_improvement_reassessment/migration.sql\n100644 blob 76644b7dbe1898523cfccc1934fd15dcce3c8e13\tserver-version/backend/prisma/migrations/20261012002300_huiteacher_improvement_source_guard/migration.sql\n100644 blob 69da36dd2135ca3db1b264074511f70156a9e9fb\tserver-version/backend/prisma/migrations/20261012190000_report_privacy_preferences/migration.sql\n100644 blob 42dde4f301e83b601a26e8572de53d818eb3692a\tserver-version/backend/prisma/migrations/20261012203000_teacher_privacy_v2_release_projection/migration.sql\n100644 blob 022aa499aa4ecc214622b21fd7b64caff94afde3\tserver-version/backend/prisma/migrations/20261015010000_composite_report_outbox/migration.sql\n100644 blob dd3215f1c64a49f1122eada22c9900230e03603a\tserver-version/backend/prisma/migrations/20261015020000_whole_questionnaire_receipt/migration.sql\n100644 blob eb2fb5deb4d6c90eedc0be873daf41306a7afa84\tserver-version/backend/prisma/migrations/20261015030000_whole_validation_manifest/migration.sql\n100644 blob 822e48b0aa7a42d1e474c40ca8f99828e6cf81b5\tserver-version/backend/prisma/migrations/20261016010000_detached_whole_receipt_budget/migration.sql\n100644 blob bd383dac59fad311c92f49b087cf581e8bd47ebb\tserver-version/backend/prisma/migrations/20261016090000_shared_scale_runtime_artifacts/migration.sql\n100644 blob 598ab43fd25bee7400824a3e0c927aa9c04fed22\tserver-version/backend/prisma/migrations/20261016130000_compact_assessment_public_templates/migration.sql\n100644 blob 857a8aa7ddf56d19799a6d82388edca319e603a7\tserver-version/backend/prisma/migrations/20261016143000_index_compact_raw_receipts/migration.sql\n100644 blob 12ea4f2b01baa5139d1a99ce785e438efc932cce\tserver-version/backend/prisma/migrations/20261016160000_shared_control_bindings/migration.sql\n100644 blob 9104dcad9caef450e50602e15c548142fa98880a\tserver-version/backend/prisma/migrations/20261016170000_shared_cognitive_runtime/migration.sql\n100644 blob 54eb4b62ffa1b8880191a5a5011a11ac9e7320df\tserver-version/backend/prisma/migrations/20261017010000_shared_asset_storage/migration.sql\n100644 blob 2a748c7774b13aeb576b51e354fe393f544c816b\tserver-version/backend/prisma/migrations/20261017020000_asset_upload_deduplication/migration.sql\n100644 blob 6c8afaa38d8a083c3bb2f53c824295de052b1286\tserver-version/backend/prisma/migrations/20261017050000_survey_cognitive_units/migration.sql\n100644 blob 56223bf3437cfd1ff2463d0c97450c80fd9804af\tserver-version/backend/prisma/migrations/20261017060000_survey_tool_grants/migration.sql\n100644 blob b28a894d84e5f5c02f80e0f0dcb0904baf75352a\tserver-version/backend/prisma/migrations/20261017070000_survey_group_ip_window/migration.sql\n100644 blob 03f018175a0070790aa68aadf75492288a2738ba\tserver-version/backend/prisma/migrations/20261018020000_scale_copy_source/migration.sql\n100644 blob c7c8e283d52a2998be2b48030f95627822b73a62\tserver-version/backend/prisma/migrations/20261018080000_composite_typed_form_definition/migration.sql\n100644 blob a3ad9cc9bf158e79b2de082a01a9cc139332600b\tserver-version/backend/prisma/migrations/20261018090000_training_form_v3_policy/migration.sql\n100644 blob 91ac2b7467b819f5944aa0c1b4de075628b00d05\tserver-version/backend/prisma/migrations/20261018094700_training_scale_timing/migration.sql\n100644 blob 2a8d169127c994c0cf557ac2b8ac7f0e4ac95d41\tserver-version/backend/prisma/migrations/20261018110000_sjt_course_grants/migration.sql\n100644 blob ef5e360bdd0345e4ca1ea49d02a3ca69133a4cd6\tserver-version/backend/prisma/migrations/20261018120000_training_weighted_variants/migration.sql\n100644 blob 834c945c3ca7982a5c12d622df487c107d49b1a5\tserver-version/backend/prisma/migrations/20261018130000_training_analysis_quality/migration.sql\n100644 blob 6d04dbc6b01beecb7259f01a584407187babb79f\tserver-version/backend/prisma/migrations/20261018143000_anonymous_study_governance/migration.sql\n100644 blob 1826c94f2122574af49c24d40ec1e944671e2a92\tserver-version/backend/prisma/migrations/20261018153000_training_conditional_flow/migration.sql\n100644 blob e59f81811899661ec89ffec10fcdf83568874ab9\tserver-version/backend/prisma/migrations/20261018160000_training_material_allocation/migration.sql\n100644 blob cc7ec855da04da516a5877e06e9717e3c55a2695\tserver-version/backend/prisma/migrations/20261019040000_training_public_rounds/migration.sql\n100644 blob f3cf289735e45a0b3b812dbbee8ff1b43654c250\tserver-version/backend/prisma/migrations/20261019050000_training_persistence/migration.sql\n100644 blob cbba30ff0a1500c2ba1a65871cd5e74e3433ded1\tserver-version/backend/prisma/migrations/20261019060000_training_feedback_release/migration.sql\n100644 blob 2ac4cdf767d94a7d354b6d20a042736c2d534cbc\tserver-version/backend/prisma/migrations/20261020020000_measurement_content_releases/migration.sql\n100644 blob b7cb535dc7c26d469c26eb9f164416b5523eb541\tserver-version/backend/prisma/migrations/20261020021000_scale_measurement_release/migration.sql\n100644 blob a5d47c76675ce6d5625bf40cf53f11374638169f\tserver-version/backend/prisma/migrations/20261020023000_cognitive_sjt_measurement_release/migration.sql\n100644 blob e2a96b529b6d8c151472bb4e3f8babadbcea2131\tserver-version/backend/prisma/migrations/20261020025000_reference_candidate_reviews/migration.sql\n100644 blob db7f9865ba1237c1fe339bf268261690819ff833\tserver-version/backend/prisma/migrations/20261020030000_content_capability_authority/migration.sql\n100644 blob c8a3ad3da2c59fd581cc2840b8dc53e8abcc9008\tserver-version/backend/prisma/migrations/20261020031000_survey_private_report_drafts/migration.sql\n100644 blob 95005f1e9cd99ab552f51b50b5b264171333e62e\tserver-version/backend/prisma/migrations/20261020040000_survey_attempt_content_binding/migration.sql\n100644 blob a25f0bf7d498d8e04c6c80d0c57a159bee62b3b1\tserver-version/backend/prisma/migrations/20261020041000_survey_interpretation_exports/migration.sql\n100644 blob 21380d839b155e72a2d49264f27a40913015afd1\tserver-version/backend/prisma/migrations/20261020042000_data_reinterpret_authority/migration.sql\n100644 blob 738efe23fa6452804be5b81b13ab75efd984e52d\tserver-version/backend/prisma/migrations/20261020043000_survey_interpretation_artifacts/migration.sql\n100644 blob 7004a333bd83591348e7f7af31c14204e36dbda5\tserver-version/backend/prisma/migrations/20261020100000_admin_entry_authority/migration.sql\n100644 blob 6293b9e2d3e522bc9d0b49f979bfcafe50c6d545\tserver-version/backend/prisma/migrations/20261020110000_admin_security_keys/migration.sql\n100644 blob e417e298d245a992a818b9e729e6dc45f00d9d11\tserver-version/backend/prisma/migrations/20261020120000_training_entry_authority/migration.sql\n100644 blob a85dcc1650f489a206f0090c9657315ed17735e0\tserver-version/backend/prisma/migrations/20261020131000_survey_reference_requests/migration.sql\n100644 blob ca09812d1a63d0116d2e3f9995f7c5843a78923b\tserver-version/backend/prisma/migrations/20261020132000_training_content_binding/migration.sql\n100644 blob d1701ee788ffc59c7f352e2c34cc05669284678d\tserver-version/backend/prisma/migrations/20261020133000_training_private_report_drafts/migration.sql\n100644 blob 99950e34cf47dc40e0d247c24e46a7ee2071e833\tserver-version/backend/prisma/migrations/20261020134000_training_assignment_measurement/migration.sql\n100644 blob 4a06372253003d56f7f794f1dbecae167ca774c3\tserver-version/backend/prisma/migrations/20261020135000_training_report_final_binding/migration.sql\n100644 blob aa7fe006f8a37970829fad0e9519edf82d575053\tserver-version/backend/prisma/migrations/20261020136000_static_sjt_measurement_mapping/migration.sql\n100644 blob 64b1941a2102dca8fafd3e0c2b59e85a193c5cb3\tserver-version/backend/prisma/migrations/20261020137000_formal_reference_review_grant/migration.sql\n100644 blob 9b127df5e7f7282acac8b864fc5d98ba658dcfea\tserver-version/backend/prisma/migrations/20261020139000_training_reference_requests/migration.sql\n100644 blob 31d516250eef77b6372f6eb6099b007d205f1039\tserver-version/backend/prisma/migrations/20261020140000_training_reinterpretation_artifacts/migration.sql\n100644 blob 7f8240ba0955c5429a121e05be21efb99aae5a04\tserver-version/backend/prisma/migrations/20261020142000_training_reference_selection/migration.sql\n100644 blob 315c0f6be9fa59f578fb76d18103119aad8875ed\tserver-version/backend/prisma/migrations/20261021000000_training_catalog_discovery/migration.sql\n100644 blob 7a3bc3e53488269cb8e847c3a17172c87106f766\tserver-version/backend/prisma/migrations/20261021123000_scale_library_governance/migration.sql\n100644 blob 786b9886de84a116df1067368bd14da35a64cc11\tserver-version/backend/prisma/migrations/20261021160000_checkin_schedules/migration.sql\n100644 blob 89e8ec9eef873fc052b2f66d421988be02d79ed1\tserver-version/backend/prisma/migrations/20261021190000_workspace_media_grants/migration.sql\n100644 blob e12b63366456c0f3b47a1f5609cd8efebac4aab4\tserver-version/backend/prisma/migrations/20261021194500_workspace_form_grants/migration.sql\n100644 blob 4c1054cb0c11962409ccac4fd525cae687d75993\tserver-version/backend/prisma/migrations/20261022040000_admin_authenticator_totp/migration.sql\n100644 blob a98e9a16978ea513ca5fb66e92ec94ea1be0c05a\tserver-version/backend/prisma/migrations/20261022041000_education_library_scope_foundation/migration.sql\n100644 blob a8fff607973071be5d6a50379bb7ca6c7e6a30d3\tserver-version/backend/prisma/migrations/20261022051000_education_private_tools/migration.sql\n100644 blob d301be9a5cda82a08875d116d630ac5965c14f6b\tserver-version/backend/prisma/migrations/20261022090000_private_form_templates/migration.sql\n100644 blob 5c7aae110145b8a83fb1e5179a6139948c6fd146\tserver-version/backend/prisma/migrations/20261022090000_survey_tool_library/migration.sql\n100644 blob 69e40cd26708871ef4c10addd3d9acd2e13a2758\tserver-version/backend/prisma/migrations/20261022120000_education_library_registered_identity/migration.sql\n100644 blob eb34e395c62148ae03074630d283eef1bd4ef3b1\tserver-version/backend/prisma/migrations/20261022150000_education_private_scale_runtime/migration.sql\n100644 blob d8dd87840d5593acf381da6b55e29000a3f6ee66\tserver-version/backend/prisma/migrations/20261022170000_education_private_form_runtime/migration.sql\n100644 blob e5d13aa1f9b3d7516ec22631babb3f4f3bc8d82c\tserver-version/backend/prisma/migrations/20261022183000_education_scale_library_source/migration.sql\n100644 blob d8b2f0f0f20f94a00cc27deb00dd3fcc4d67f81e\tserver-version/backend/prisma/migrations/20261022200000_education_private_form_publication/migration.sql\n100644 blob 17c6b7c5c5ebc4691337993579b03350da50683a\tserver-version/backend/prisma/migrations/20261023010000_survey_tool_completion/migration.sql\n100644 blob c95c520ed9d5d047e204f8581164e573946995f5\tserver-version/backend/prisma/migrations/20261023070000_education_private_form_media_projection/migration.sql\n100644 blob a6afbc5998c0fc6c8a83567c9d64e8a233b6eab7\tserver-version/backend/prisma/migrations/20261024020000_survey_memorable_participation/migration.sql\n100644 blob ab439b2a77c9ec693ba92c187948a01927785463\tserver-version/backend/prisma/migrations/20261024021000_teacher_code_account_validity/migration.sql\n100644 blob 9886eaba66687b267419fc4c3ca060d43143b225\tserver-version/backend/prisma/migrations/20261024023000_survey_self_assigned_code/migration.sql\n100644 blob 64e447d0ff1f257efde4be4010f98d970fc04c6b\tserver-version/backend/prisma/migrations/20261024024500_survey_code_registry_guard/migration.sql\n100644 blob 05906585f16668ab4a8726bbc918516a51abe946\tserver-version/backend/prisma/migrations/20261024080000_training_participation_codes/migration.sql\n100644 blob 3f08aacfa0991852e25b2c775f0292b059d13995\tserver-version/backend/prisma/migrations/20261024083000_training_stable_admission_identity/migration.sql\n100644 blob fbffa92c2bb7c748d6fc78f9f9dcac604dabb87d\tserver-version/backend/prisma/migrations/migration_lock.toml\n100644 blob b0556f0f6d93606ec7bee89e69b48749a33c7a4f\tserver-version/backend/prisma/schema.prisma\n100644 blob dfe86ad46e55e0b4587ebb1bb883f6565276b1d3\tserver-version/backend/prisma/seed.ts\n100644 blob f130547e10d8816c65a454f7743eccafc8526e46\tserver-version/backend/prisma/seeds/cognitive-timing-pilot.ts\n100644 blob 4b5238f400ddf9c71dc7d88e7398b5782b656e0d\tserver-version/backend/prisma/seeds/cognitive.ts\n100644 blob 68982022ed2fed1ed29cc3ad5ca098b66159b82e\tserver-version/backend/prisma/seeds/scale-legacy-migrations.ts\n100644 blob 693da39ca3784f57969255ad3660e0338804ca6d\tserver-version/backend/prisma/seeds/scales.ts\n100644 blob 57c1e5a387d78df656d4f6bb65609a25cea2d54a\tserver-version/backend/prisma/seeds/users.ts",
+    "backendFiles": [
+      "src/__tests__/anonymous-study/admission-principal.test.ts",
+      "src/__tests__/anonymous-study/participation-crypto.test.ts",
+      "src/__tests__/anonymous-study/reset-route-boundary.test.ts",
+      "src/__tests__/anonymous-study/sjt-stable-replay.test.ts",
+      "src/__tests__/assessment-core/form-foundation.contract.test.ts",
+      "src/__tests__/bundle-onboarding/contract.test.ts",
+      "src/__tests__/composite/current-unit-state.test.ts",
+      "src/__tests__/composite/report-read-plan.test.ts",
+      "src/__tests__/composite/training-checkpoint.contract.test.ts",
+      "src/__tests__/controllers/assignmentExport.test.ts",
+      "src/__tests__/controllers/authLibrary.test.ts",
+      "src/__tests__/controllers/checkinExport.test.ts",
+      "src/__tests__/controllers/checkinPublicSecurity.test.ts",
+      "src/__tests__/controllers/login-admission.test.ts",
+      "src/__tests__/controllers/scaleListSource.test.ts",
+      "src/__tests__/controllers/streamingTaskExport.import-deferral.test.ts",
+      "src/__tests__/controllers/streamingTaskExport.test.ts",
+      "src/__tests__/controllers/teacherCode-list.test.ts",
+      "src/__tests__/controllers/training-admin-query-efficiency.test.ts",
+      "src/__tests__/measurement-content/survey-participant-feedback.test.ts",
+      "src/__tests__/measurement-content/training-content-final.test.ts",
+      "src/__tests__/measurement-content/training-reference-consumption.test.ts",
+      "src/__tests__/scale/composite-final-locator.test.ts",
+      "src/__tests__/scale/scale-library-catalog-evidence.test.ts",
+      "src/__tests__/scale/scale-library-localization-manifest.test.ts",
+      "src/__tests__/services/checkinTokenProjection.test.ts",
+      "src/__tests__/services/checkinUploadCleanup.test.ts",
+      "src/__tests__/services/checkinUploadCleanupScheduler.test.ts",
+      "src/__tests__/survey/catalog-sjt-media.authorization.test.ts",
+      "src/__tests__/survey/catalog-sjt-online.contract.test.ts",
+      "src/__tests__/survey/checkpoint-query.contract.test.ts",
+      "src/__tests__/survey/public-scale-media.test.ts",
+      "src/__tests__/survey/research-request-local-final.contract.test.ts",
+      "src/__tests__/survey/task-options-performance.test.ts"
+    ],
+    "failedBackendNames": [
+      "shared Form foundation immutable baseline oracle schema-type",
+      "shared Form foundation immutable baseline oracle schema-itemKey",
+      "shared Form foundation immutable baseline oracle schema-required",
+      "shared Form foundation immutable baseline oracle schema-minSelections",
+      "shared Form foundation immutable baseline oracle schema-unknown",
+      "shared Form foundation immutable baseline oracle keeps all shared runtime imports away from entry adapters, database and HTTP"
+    ],
+    "retryPattern": "schema-|keeps all shared runtime imports|preserves missing|preserves multiple",
+    "retryFile": "src/__tests__/assessment-core/form-foundation.contract.test.ts",
+    "browserReportSHA256": "b2396a1ef1a7efdb2fb5ef3961d52cf0b2ba9c40dd774f9ba6e01ff96ddc5c0b",
+    "lintCommandSHA256": "6d05de6e7379a490ca8ea13e6c2f5046a46fa0523bc7a108f0bbe2d85ad60ef5",
+    "browserRetainedNames": [
+      "management-survey-granted",
+      "management-survey-no-grant",
+      "management-survey-anonymous",
+      "management-huischool-granted",
+      "management-huischool-no-grant",
+      "management-huischool-anonymous",
+      "management-huiteacher-granted",
+      "management-huiteacher-no-grant",
+      "management-huiteacher-anonymous",
+      "organization-entry-authenticated",
+      "organization-entry-anonymous",
+      "entry-login-1440",
+      "entry-login-390",
+      "learner-assignments-detail-success",
+      "learner-assignments-detail-failure",
+      "learner-assignments-submit-success",
+      "learner-assignments-submit-failure",
+      "learner-checkins-detail-success",
+      "learner-checkins-detail-failure",
+      "learner-checkins-submit-success",
+      "learner-checkins-submit-failure",
+      "checkin-late-upload",
+      "teacher-assignments-lazy-courses",
+      "teacher-checkins-lazy-courses",
+      "assignment-review-paging-batch-download"
+    ],
+    "browserHarnessSHA256": "e9c468e53d2a2bc926be903fe0524eb1ae79becd48a2062b8de233e41ea93fce",
+    "browserSourceManifestSHA256": "91c5b1c0edc311f01dd3141f038a39db06dac9f30026e2492879020daa2edd1c",
+    "backendParsedSHA256": "5aea1ce59adc63ce4c7d5eb157f1bdbbdc082d666cd3514b0b5fb2ed5664d32d",
+    "lintRetainedSHA256": "4ba657aa34734e41b4e626b58228d6fd4b91fc2396dee198f043cb7b79716b49",
+    "frontendJob": 120875073656,
+    "backendOrigin": {
+      "run": 40093589291,
+      "sourceHead": "96351b9579c1be217abf761bcfa6cd62263c2430"
+    },
+    "completedReview": {
+      "fileHashes": {
+        "frontend-fresh.json": "442b95a5df7028030aa2bcb1095a995b0e77affe618d185a7a7b700c2ac77386",
+        "frontend-fresh-command.json": "ec6592b65f427ece50ec2a34151d9d9baad8c0d17ef7676fe92938cf20b85c69",
+        "frontend-fresh-checked.json": "8c1a48d9b66e09e30386e6948f5a05ad0ec2fadfbb93983164dac3b37a4cd596",
+        "batch-grade-lint-command.json": "6ccb92e58aeac4a14378a2251fde1a7251070917af3021080c12d2b9376bf2ff"
+      },
+      "file": "src/pages/__tests__/AssignmentList.review-pagination.test.tsx",
+      "passed": 8
+    }
+  },
+  "auditSourceDeltas": {
+    "server-version/backend/src/modules/assessment-core/form/definition.ts": {
+      "before": "74fc2209982527d3599962234dd6f5f3b7a60e0a",
+      "after": "269514b731b6caa3cea0b2cf17fd18d46d918cc8"
+    },
+    "server-version/backend/src/__tests__/assessment-core/form-foundation.contract.test.ts": {
+      "before": "b88a9b111a2be8384fb43a6338f2069ae8e9da09",
+      "after": "5309c7e1aca89d09428b741c7702e33c17e18438"
+    },
+    "server-version/frontend/src/training/paper-ink.css": {
+      "before": "35f21f103cdbdfea55dea6443ce09a092a2c81b0",
+      "after": "9b37c865d67f7b1bf7f5230dee9743eb2f5868f3"
+    },
+    "server-version/frontend/src/pages/AssignmentList.tsx": {
+      "before": "e3cbc1dc34f9b29aa1eda4fb243b6aa523e2c8b5",
+      "after": "8444738d6c74784be2fa985c7ecc1822bd8cc4f6"
+    },
+    "server-version/frontend/src/pages/__tests__/AssignmentList.review-pagination.test.tsx": {
+      "before": "c4cc93208a873628438d32603b38c411c1cf6e97",
+      "after": "611c23c6683557d5fcab311363e8586fd38dc07f"
+    },
+    "server-version/frontend/src/pages/questionnaire/deferredAssessmentExport.tsx": {
+      "before": "e9eaccaac07dace5c85ec4f2581228d762371f69",
+      "after": "d72bd98d1050124838c43c233bff38d339e468e0"
+    },
+    "server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx": {
+      "before": "07f88b1dd7ba559834e23694b827e3b197e86095",
+      "after": "90fddb0bdabe6f72ab118c0a868317c3c72ce90f"
+    }
+  },
+  "completedBackend": {
+    "componentTree": "876e7a5477d0801a1d75b88d6159342850ac1a5d",
+    "artifact": {
+      "id": 12559931721,
+      "name": "training-entry-backend-c02fbc52c2e9b6cc711dfcdf6e85b72def7d460c",
+      "bytes": 8741883,
+      "sha256": "b8e621950e6ef3c337ec5c50d00c39aa3bcb8c7077810d894d4c6dec2f6c87f4",
+      "job": 120871361314,
+      "jobName": "training-entry / backend",
+      "conclusion": "success"
+    },
+    "sourceHead": "96351b9579c1be217abf761bcfa6cd62263c2430",
+    "checkout": "c02fbc52c2e9b6cc711dfcdf6e85b72def7d460c",
+    "run": 40093589291,
+    "fileHashes": {
+      "backend-compile-command.json": "fad62de472f049c63f49c2b40d52ffe018e8e58e577736df2cfaf78f583ad454",
+      "backend-build-manifest.json": "99593fcae69f66d6a9506f9ab4ae3118898db54cc3abd5940856932391ac1d2c",
+      "backend-eight-checked.json": "5eff31d968f28eccc09c44cfdc948324d1bd292e206ebaf2d81716a07c77a24a",
+      "backend-eight-command.json": "a7a3a403ff11bc980634f2222f261b0c848b87f4fbd87c391cf5e588fb7621fa",
+      "postgres-missing-checked.json": "686e660feccfcc1b150d96deb8382e7da26e229b2077591248b15130ed860d72",
+      "postgres-missing-command.json": "6351ae3e2a09ebbfcfaef5f185a55d1f935b4a1f8913c537b654b700a23f227d",
+      "migration-reused.json": "de45502a69f174827fe86da3ba9b65f77fff3db6a24a618eab2a40601ef78bc0",
+      "backend-465-retained.json": "bc07c3dbdb3296e3df286c36c8dd05ee74fd5586f12346bf431d0063d21f105e"
+    },
+    "prismaInputs": "100644 blob 8321927f82166ee513a949debfcca3662b308c19\tserver-version/backend/prisma/migrations/20260203162242_init/migration.sql\n100644 blob 0ed4c79f5b59f3119b357b85cac7d1a4a75b0d4d\tserver-version/backend/prisma/migrations/20260203171249_add_teacher_code_relation/migration.sql\n100644 blob bd22a4d60f1a4941188a02cfcab251fe778ba772\tserver-version/backend/prisma/migrations/20260204000229_add_user_expires_at/migration.sql\n100644 blob d0e1152cce3494969bb6e8dbfa738c1e00cc2e95\tserver-version/backend/prisma/migrations/20260204003550_add_student_account_features/migration.sql\n100644 blob 13693e511705ff2d13cba7fe9d85d0469f494cf3\tserver-version/backend/prisma/migrations/20260205044439_add_is_recruiting/migration.sql\n100644 blob 3d1967f8128019983b4540d27b400609d05f3a74\tserver-version/backend/prisma/migrations/20260205053441_add_video_tags_and_checkin_content/migration.sql\n100644 blob e55bc85905b9636380ab01013d1e1dd41988de41\tserver-version/backend/prisma/migrations/20260205133259_add_assignment_content_images/migration.sql\n100644 blob 59eb1a01c6af9d0be9566bc8da9e6089088a0926\tserver-version/backend/prisma/migrations/20260206034044_add_checkin_fields/migration.sql\n100644 blob 06181abc3a11ae70fdb3542430f693a9871a1d93\tserver-version/backend/prisma/migrations/20260227092513_add_submission_history/migration.sql\n100644 blob aa0da25cfb1282eb882dc7b8073afe75085c2da1\tserver-version/backend/prisma/migrations/20260818000000_fix_missing_module_tables/migration.sql\n100644 blob 2590f189cdc1b990eb34ba7c6f3b1f4d6ac66884\tserver-version/backend/prisma/migrations/20260818010000_sync_schema_drift/migration.sql\n100644 blob 362031256ed13a84db09fdd58a37a413d86dfa3f\tserver-version/backend/prisma/migrations/20260819132001_add_cognitive_core_foundation/migration.sql\n100644 blob d8826981a9c3eb0f523dd2ab2b82bc6a4caea32d\tserver-version/backend/prisma/migrations/20260819134700_cognitive_session_constraints/migration.sql\n100644 blob 2db586cfe3ed9e753ecce1124fd7d4774be165ea\tserver-version/backend/prisma/migrations/20260821090000_add_composite_assessment/migration.sql\n100644 blob be8c7738541753bc66a846ba1a906b838cd2189b\tserver-version/backend/prisma/migrations/20260821120000_fix_composite_draft_answers_and_attempt_uniqueness/migration.sql\n100644 blob c66aa50190cf71b8133c603dd9af8e03751f00db\tserver-version/backend/prisma/migrations/20260822090000_add_teacher_approved/migration.sql\n100644 blob c1b1abe088c01031572b5593100b26551e121e0a\tserver-version/backend/prisma/migrations/20260822100000_add_library_copy_and_wrappers/migration.sql\n100644 blob 76f0f0cad6eaf263f8e8e6229b3d334afa2969cf\tserver-version/backend/prisma/migrations/20260823100000_add_material_grants/migration.sql\n100644 blob 10619e1154e3ad0a7137f959c40f00341a91245b\tserver-version/backend/prisma/migrations/20260823120000_add_assignment_profile_freeze/migration.sql\n100644 blob 1d2db490b60f5bfd19ed4d42fc0a00b36a5a67a0\tserver-version/backend/prisma/migrations/20260823130000_add_assignment_report_freeze/migration.sql\n100644 blob cfac0c5f7e0ed8525d6f34e493a571bdbd5873a6\tserver-version/backend/prisma/migrations/20260824070000_add_composite_analysis_protocol_freeze/migration.sql\n100644 blob e59124b19548e9dacd81ed45f1abcd857ab25c05\tserver-version/backend/prisma/migrations/20260824120000_add_report_package_resources/migration.sql\n100644 blob b73deeedc3173dcb23b0caae63cd21636bc78ab6\tserver-version/backend/prisma/migrations/20260824130000_add_composite_analysis_snapshots/migration.sql\n100644 blob 48972e1c5ed209c17792ffdd37b71ef2a04ca7f1\tserver-version/backend/prisma/migrations/20260826100000_add_security_credentials/migration.sql\n100644 blob 0659655e17f2b5c84792538bb07b62ec79875f7f\tserver-version/backend/prisma/migrations/20260826110000_add_password_reset_state/migration.sql\n100644 blob 701cd818669e1462f5b5034d6de10ccb525c166a\tserver-version/backend/prisma/migrations/20260826120000_add_stored_assets/migration.sql\n100644 blob 735a9b85dc6abb0fcff9901720a8587052b18f5e\tserver-version/backend/prisma/migrations/20260826130000_allow_asset_dedup/migration.sql\n100644 blob add2507aa5803ad16836680d045fb6bc7c69824d\tserver-version/backend/prisma/migrations/20260827100000_scale_assessment_v2_foundation/migration.sql\n100644 blob 479725756a6b3007bd6f0e5433474ec774f18349\tserver-version/backend/prisma/migrations/20260827110000_add_assessment_context/migration.sql\n100644 blob 90e0e36ca2f035652bae122d08763a589d67010d\tserver-version/backend/prisma/migrations/20260827120000_cognitive_v2_result_snapshot/migration.sql\n100644 blob e1a5d4dd4283c7db4dfa5fa70e137ee4403f6a42\tserver-version/backend/prisma/migrations/20260828100000_pr24_security_boundaries/migration.sql\n100644 blob d74755e4fc34626200e5caa2cba1ad86922cda32\tserver-version/backend/prisma/migrations/20260828200000_pr25_runtime_consistency/migration.sql\n100644 blob f7152efec6eee6ab9132abf9a2bff050f24cadc1\tserver-version/backend/prisma/migrations/20260828210000_video_processing_recovery/migration.sql\n100644 blob f1c2aaee7a9703e9e21d236e692eda2ae11ed454\tserver-version/backend/prisma/migrations/20260828220000_checkin_token_protection/migration.sql\n100644 blob 12a6689c98b9982957734d4bad961e09ccbe5fd9\tserver-version/backend/prisma/migrations/20260829100000_submission_history_version_unique/migration.sql\n100644 blob e47d247f7c24f0326d06604ee2b6dcddb443e538\tserver-version/backend/prisma/migrations/20260829110000_submission_idempotency_keys/migration.sql\n100644 blob 03b06962027d1079e565337e14d69f75746054f0\tserver-version/backend/prisma/migrations/20260829120000_forbid_plaintext_checkin_tokens/migration.sql\n100644 blob fe08c81a12274a3b8a9ea1a51baffe776221b1c3\tserver-version/backend/prisma/migrations/20260829130000_submission_idempotency_payload_hashes/migration.sql\n100644 blob a3be810d5131b8ffe6578fe06c64eca83434588b\tserver-version/backend/prisma/migrations/20260829140000_checkin_token_integrity/migration.sql\n100644 blob 6bffbafbb24121b0c25b01e20e4af64dcfc96c80\tserver-version/backend/prisma/migrations/20260829150000_submission_idempotency_receipts/migration.sql\n100644 blob 3b8ec8389d4479e25280fd2e6878e9c3fb670fee\tserver-version/backend/prisma/migrations/20260829160000_submission_revision/migration.sql\n100644 blob bc2db94d944b2533e266dca7e548b02194a49d92\tserver-version/backend/prisma/migrations/20260830100000_protect_public_access_tokens/migration.sql\n100644 blob a63c6069be439d0d5dcce1ede9c1796b20006be9\tserver-version/backend/prisma/migrations/20260830120000_persistence_checkpoint_occ/migration.sql\n100644 blob 7ea5fc03121ebe6669043aa97d44462f5894241c\tserver-version/backend/prisma/migrations/20260831150000_instrument_final_submit_indexeddb/migration.sql\n100644 blob 2b937bb7c8d14d43f0dcf0533de41ef1c3fb8d69\tserver-version/backend/prisma/migrations/20260901090000_unified_runtime_v32_unit/migration.sql\n100644 blob ee37691e9a02cfffacdaec58ca7dfac0ded597ce\tserver-version/backend/prisma/migrations/20260901100000_unified_runtime_v32_aggregate/migration.sql\n100644 blob e3ec28998b901ff11e3baac3e36cf2103147ae0c\tserver-version/backend/prisma/migrations/20260902120000_unified_runtime_v32_admission/migration.sql\n100644 blob 602ec0e13b35bef28e5831c52ee33756f739154b\tserver-version/backend/prisma/migrations/20260902130000_unified_runtime_v32_unit_admission/migration.sql\n100644 blob b28414e45752e62a501b7f53b53354a0f103291e\tserver-version/backend/prisma/migrations/20260903210000_instrument_authorization_overlay/migration.sql\n100644 blob e6e7b516302d01a75b9c32f9e55d8a180f1dac6e\tserver-version/backend/prisma/migrations/20260903220000_episode_parent_invite_consent/migration.sql\n100644 blob 5d6dd252d72b21bc6c71dc7d659c16a8a18aa26c\tserver-version/backend/prisma/migrations/20260903230000_identity_restrict_fks/migration.sql\n100644 blob 917219381305d18ea3bbfe01437605e5d20cae2f\tserver-version/backend/prisma/migrations/20260903240000_safety_case/migration.sql\n100644 blob c0e8a0282a732b965e741256754bc6fd6154c44f\tserver-version/backend/prisma/migrations/20260903250000_safety_case_prep_151/migration.sql\n100644 blob da4585d84e4d76c67fab751a271e3137f622b5f3\tserver-version/backend/prisma/migrations/20260904010000_safety_wakeup_prep_171/migration.sql\n100644 blob e9c61289e1041277fe33697dbf6b930a8ad23b0f\tserver-version/backend/prisma/migrations/20260908100000_situational_standalone_runtime/migration.sql\n100644 blob 4e0c332009d02a5ef78139d4dc67777e786818b7\tserver-version/backend/prisma/migrations/20260909100000_situational_bundle_integration/migration.sql\n100644 blob 19e67e353a2323f805bcec8883604010b6181c9c\tserver-version/backend/prisma/migrations/20260917020000_relational_assignment_persistence/migration.sql\n100644 blob febb8a62c4dccf89418667efc0502d0a09045ed4\tserver-version/backend/prisma/migrations/20260917030000_relational_analysis_snapshots/migration.sql\n100644 blob da1f584945a24dafa4b2599e34237fee16bf8067\tserver-version/backend/prisma/migrations/20260917040000_relational_contract_hardening/migration.sql\n100644 blob 06586ed8e94cf913e55fc4a59450493963f0d445\tserver-version/backend/prisma/migrations/20260919000100_platform_role/migration.sql\n100644 blob a7a63067a0da63af472826296dd38a826863eb3f\tserver-version/backend/prisma/migrations/20260919000200_organization_membership/migration.sql\n100644 blob bf232d1f9716a2e82f3ea8094cb5cba23709cf70\tserver-version/backend/prisma/migrations/20260919000300_org_grants_audit/migration.sql\n100644 blob d181ac23142c839a2b9b80b6145db36e94b0b797\tserver-version/backend/prisma/migrations/20260919000400_org_unit_hierarchy/migration.sql\n100644 blob c041bdf9dea870ef4dc64288fbf63455d3c0a8d2\tserver-version/backend/prisma/migrations/20260919000500_org_class_relationships/migration.sql\n100644 blob 04de9e49cfebbfafdefe132fc11836d9d3c48e22\tserver-version/backend/prisma/migrations/20260919000600_org_classification_professional/migration.sql\n100644 blob 2f650de272991e5878bbf3313734c7ff93cba348\tserver-version/backend/prisma/migrations/20260919000700_assessment_run_graph/migration.sql\n100644 blob b108238d206e4fa21a80cffeae48ad0cfe3f3e50\tserver-version/backend/prisma/migrations/20260919000800_organization_episode_allocation/migration.sql\n100644 blob 64bb584c15679ae85784aaaadfd7965f4e0eeda4\tserver-version/backend/prisma/migrations/20260919000900_relational_organization_domains/migration.sql\n100644 blob 70139eb04350c7b38f43f4493e3fedf10c0bb9a8\tserver-version/backend/prisma/migrations/20260919001000_run_start_claims/migration.sql\n100644 blob a3e53278b39850a9bddd431d701c18bf7fab2820\tserver-version/backend/prisma/migrations/20260919001100_run_scientific_provenance/migration.sql\n100644 blob 1078bfb04ca00b1f642b9592514079b43d57976e\tserver-version/backend/prisma/migrations/20260919001200_run_lifecycle_arbitration/migration.sql\n100644 blob cb2d55e964704ddaacbafd4fd61b27c89f1f7788\tserver-version/backend/prisma/migrations/20260919115500_freeze_run_start_attempt_identity/migration.sql\n100644 blob c6b2793dd988ef018aa6ec1a58a213a94f30c0cc\tserver-version/backend/prisma/migrations/20260919121000_reporting_core/migration.sql\n100644 blob 0f1fad746fd8565e64886cd2a69dad4fcf756a3c\tserver-version/backend/prisma/migrations/20260919155500_reporting_series_wave_bindings/migration.sql\n100644 blob 1f3bb72507e3ade092a00b2538bb42578eea6b33\tserver-version/backend/prisma/migrations/20260919161000_reporting_pr4_artifact_bindings/migration.sql\n100644 blob b709857623de3770b7c885cc7b2cb42d4b2ced5d\tserver-version/backend/prisma/migrations/20260919190000_reporting_export_tickets/migration.sql\n100644 blob aa8bd7c68e26c02819402a1d060e6796e64be3b8\tserver-version/backend/prisma/migrations/20260921145500_add_scale_deployment_policy/migration.sql\n100644 blob 2fc1378333e047b25fb0a7c4a7e3c7edce4e6077\tserver-version/backend/prisma/migrations/20260922010000_scale_publication_audit/migration.sql\n100644 blob 058009fa4d38858c1a49306ea93ab60ac6d9252a\tserver-version/backend/prisma/migrations/20260922120000_questionnaire_products/migration.sql\n100644 blob b8782eab7c606fb35885e129aad2223033b71db3\tserver-version/backend/prisma/migrations/20260922140000_bundle_v3_production/migration.sql\n100644 blob c49611bcee44eb29ab5bc391d569695f8dd8ee1c\tserver-version/backend/prisma/migrations/20260923010000_bundle_package_releases/migration.sql\n100644 blob 7850dc23f40789e0070c6a31e1ee3f333f634f2e\tserver-version/backend/prisma/migrations/20260926010000_reporting_cohort_selection/migration.sql\n100644 blob 9edd0d9ce841a08cadd383c8552213fc54613798\tserver-version/backend/prisma/migrations/20260926093000_reporting_individual_longitudinal/migration.sql\n100644 blob dcf7a07287a84676d57b0e04f7bf89088b3691a7\tserver-version/backend/prisma/migrations/20260927210000_export_batch_recovery/migration.sql\n100644 blob 79f87eed689909eb2e065d0d82508a234593e739\tserver-version/backend/prisma/migrations/20260927223000_video_processing_generation/migration.sql\n100644 blob 04f93a6585e6ed04ee309f32556a7b6a96e0cbee\tserver-version/backend/prisma/migrations/20260930000000_export_artifact_provenance/migration.sql\n100644 blob cdb042744488e4f066f66c2e335fe20dd23e0685\tserver-version/backend/prisma/migrations/20260930000100_assessment_delivery_grants/migration.sql\n100644 blob beda4f7ccc67ca23f8b8f1f1615e666bed1604c3\tserver-version/backend/prisma/migrations/20260930000200_delivery_policy_windows/migration.sql\n100644 blob d77308dbf0e02b5a13d557fb49753568af3bc3d3\tserver-version/backend/prisma/migrations/20261001000100_anonymous_study_waves/migration.sql\n100644 blob c1fd096f8dbc1cd0241846c675838d61139430d4\tserver-version/backend/prisma/migrations/20261001030000_scale_reference_lifecycle/migration.sql\n100644 blob fec561b58473352cbd5d4f255adb0b704645796b\tserver-version/backend/prisma/migrations/20261001040000_scale_axis_snapshots/migration.sql\n100644 blob 3a70be68013a32f820d1ed7ac4fa1c3ec34e4d24\tserver-version/backend/prisma/migrations/20261001090000_sjt_author_uploads/migration.sql\n100644 blob ce35a7e411b2358106e403d87459b22efab6b152\tserver-version/backend/prisma/migrations/20261002120000_parent_portal_disclosure/migration.sql\n100644 blob f9db765424afe17a5759b84004cf0b7230c9f8ed\tserver-version/backend/prisma/migrations/20261002121000_parent_portal_binding_guards/migration.sql\n100644 blob a6d9079b0742e5b544883194d6deae6ecb18711e\tserver-version/backend/prisma/migrations/20261002140000_parent_tool_disclosure_ceiling/migration.sql\n100644 blob 404348d13f289b82e5157e2f4221fa7a2c1aa78a\tserver-version/backend/prisma/migrations/20261002150000_legacy_import_tables/migration.sql\n100644 blob 982bc095f0aac2fd3679d1359cbf47676f3490b5\tserver-version/backend/prisma/migrations/20261002160000_parent_report_publications/migration.sql\n100644 blob 8a49a97dc70f743809c8036c040f1634ef011236\tserver-version/backend/prisma/migrations/20261004000100_parent_relationship_episodes/migration.sql\n100644 blob 0077acdb6890fd251737d988265cfa42544e38d3\tserver-version/backend/prisma/migrations/20261004000200_organization_member_invitations/migration.sql\n100644 blob f9171b5f157975c644828deb69eaef3b2d1e3a6d\tserver-version/backend/prisma/migrations/20261005000100_registered_descriptive_resources/migration.sql\n100644 blob ddf133c6de0bc1f7a6224e596d9ddcdb8bac59dd\tserver-version/backend/prisma/migrations/20261007010000_cognitive_quota_lineage/migration.sql\n100644 blob 16ce4e07b837aeb7b9fb0f535cc29d98be0e5099\tserver-version/backend/prisma/migrations/20261007020000_assessment_workbench/migration.sql\n100644 blob b4a3eca5d8a48a9efff7465c131372372079a2ed\tserver-version/backend/prisma/migrations/20261010010000_campus_account_domains/migration.sql\n100644 blob 1c86770d9d666a2c1bc89ddd82b06d1bbb2344e9\tserver-version/backend/prisma/migrations/20261010020000_campus_class_admission/migration.sql\n100644 blob 8b69b709af427eaeee952ddedeff6d832d049a9e\tserver-version/backend/prisma/migrations/20261010030000_campus_totp/migration.sql\n100644 blob e465a66ea0ef2fdb911d40fc46e759c4923398fc\tserver-version/backend/prisma/migrations/20261010040000_campus_staff_invitations/migration.sql\n100644 blob 6cbe8cb035e33a94e0b0f9216a7ddeee6408c164\tserver-version/backend/prisma/migrations/20261010050000_campus_recovery/migration.sql\n100644 blob 052d9b7278b8fe857bab6d648545113a5778d294\tserver-version/backend/prisma/migrations/20261010060000_campus_scope_constraints/migration.sql\n100644 blob e0c8c071b8bce5cb8e7134ca2a23340dad77f64a\tserver-version/backend/prisma/migrations/20261010070000_campus_realm_immutability/migration.sql\n100644 blob ad4fa97e1c0772caab44458a2ded1ccde66943b2\tserver-version/backend/prisma/migrations/20261010080000_campus_quarantine_readmission/migration.sql\n100644 blob 12a40c84b3bba86c0b1e4e1993f2457bd2549de2\tserver-version/backend/prisma/migrations/20261010100000_campus_activity_course_type/migration.sql\n100644 blob 27ce58be37a5684daf1c5bd3bfc062891a232d7e\tserver-version/backend/prisma/migrations/20261010110000_campus_activity_lifecycle/migration.sql\n100644 blob 80190ff0b50d0a316fdc0204ba1040945b517c06\tserver-version/backend/prisma/migrations/20261010120000_campus_task_submission_guard/migration.sql\n100644 blob ad2dc23184c021547e61205b6039254d2e56e358\tserver-version/backend/prisma/migrations/20261010130000_campus_parent_registration/migration.sql\n100644 blob f0d8db1dd2878c596ae89f863803d9f24f55ea63\tserver-version/backend/prisma/migrations/20261010140000_campus_peer_consent_allocation/migration.sql\n100644 blob 99d23df23cf4733b29d5d6b37b593f2b661aba1e\tserver-version/backend/prisma/migrations/20261010150000_campus_peer_relationship_kind/migration.sql\n100644 blob 71d5b9d4ae203a4b30c2bd5c3860a6f540e74528\tserver-version/backend/prisma/migrations/20261011110000_survey_researcher_realm/migration.sql\n100644 blob 788e63b028aee0bfacb55cddc004666f800d26af\tserver-version/backend/prisma/migrations/20261011120000_survey_research_instruments/migration.sql\n100644 blob 4740004b08c55ac208c8880dc83496f90c2390f8\tserver-version/backend/prisma/migrations/20261011130000_survey_research_waves/migration.sql\n100644 blob 70321afe16678626dc638cfc71f6d2e2053a5bb8\tserver-version/backend/prisma/migrations/20261011131000_survey_final_adapter/migration.sql\n100644 blob 8e082be199d2599de872f3282987960ce7b36ac5\tserver-version/backend/prisma/migrations/20261011132000_survey_scoped_exports/migration.sql\n100644 blob 5b506e120d90d611961026cf42909da59bacad45\tserver-version/backend/prisma/migrations/20261011133000_survey_linkage_disclosure/migration.sql\n100644 blob 76a1829d394f879013b16f692772541fc8881d94\tserver-version/backend/prisma/migrations/20261011193000_survey_sample_quality/migration.sql\n100644 blob b832f0cf5c66e90367bfb357fa128eadc57c5635\tserver-version/backend/prisma/migrations/20261011233000_survey_flow_experiment/migration.sql\n100644 blob 54771cc1f90aeab15440ca605ebc5844bf78e292\tserver-version/backend/prisma/migrations/20261011234000_survey_research_operations/migration.sql\n100644 blob cc148ab74eaa798c061d37e5ff93c3903df709e0\tserver-version/backend/prisma/migrations/20261012000000_education_product_entitlements/migration.sql\n100644 blob d6a761a1f5db9044e7c012bab193fa289f83382f\tserver-version/backend/prisma/migrations/20261012000100_education_teacher_staff_invitations/migration.sql\n100644 blob 4be04a38efac72b633fbf16f4e64022ce4cd0b5a\tserver-version/backend/prisma/migrations/20261012000200_education_teacher_student_invitations/migration.sql\n100644 blob 50ac6561fa4e87099f430c470424a2c32dfcbe33\tserver-version/backend/prisma/migrations/20261012000300_huiteacher_evaluation_targets_events/migration.sql\n100644 blob 19b399e3d2782564044c838ef50b39100ad41ed1\tserver-version/backend/prisma/migrations/20261012000400_huiteacher_form_instruments/migration.sql\n100644 blob 9c42e2650f2b9e1a1cd927dbe3419887325061cf\tserver-version/backend/prisma/migrations/20261012000500_huischool_admin_product_grant_backfill/migration.sql\n100644 blob 87b18f48fb1166a4c98698262361e01030331b69\tserver-version/backend/prisma/migrations/20261012000600_huiteacher_run_binding/migration.sql\n100644 blob f47c07fe4cef16d4181ee423d207b3b36825dc5f\tserver-version/backend/prisma/migrations/20261012000700_huiteacher_form_runtime_final/migration.sql\n100644 blob de28a28f21c22fb5f1460a5ef52275225c151a46\tserver-version/backend/prisma/migrations/20261012000800_education_teacher_scale_licenses/migration.sql\n100644 blob 4db6e796dd7af0bc5ec5388166c9ded872885024\tserver-version/backend/prisma/migrations/20261012000900_huiteacher_personal_scale_entitlement/migration.sql\n100644 blob f88f6bcf2e47ae82c01f85cbd2ce931ce4ffb42f\tserver-version/backend/prisma/migrations/20261012001000_huiteacher_group_disclosure_ledger/migration.sql\n100644 blob ad6a9ba18617093e83a47517dc8fc8ddfcb4d441\tserver-version/backend/prisma/migrations/20261012001100_huiteacher_observer_evidence/migration.sql\n100644 blob d552a0007b36acdbf2ac8418d591a94e6952d04d\tserver-version/backend/prisma/migrations/20261012001200_huiteacher_field_consensus/migration.sql\n100644 blob 0581ecc30676a7fd47ba600dbea401409fb1d032\tserver-version/backend/prisma/migrations/20261012001300_huiteacher_consensus_approvals/migration.sql\n100644 blob deec0ca935d7c293f109197b682c66e5ff396c83\tserver-version/backend/prisma/migrations/20261012001400_huiteacher_structured_field_form/migration.sql\n100644 blob 59323f29b010f26459f3f7969014dca146060853\tserver-version/backend/prisma/migrations/20261012001500_huiteacher_field_form_binding_guard/migration.sql\n100644 blob ea0240d358cd018131d9bda0dd9918254b096d6d\tserver-version/backend/prisma/migrations/20261012001600_huiteacher_external_expert_identity/migration.sql\n100644 blob 29dc8f7dabc3a3bd6aa6126e66a160c9dbbe9319\tserver-version/backend/prisma/migrations/20261012001700_huiteacher_field_feedback_disclosure/migration.sql\n100644 blob fc527f1adb7e417424c9111ebd21d050327757d6\tserver-version/backend/prisma/migrations/20261012001800_huiteacher_student_eval_config/migration.sql\n100644 blob e119e328cb2ec6fb6753e55a1d0a24b6cf2c5404\tserver-version/backend/prisma/migrations/20261012001900_huiteacher_student_feedback_disclosure/migration.sql\n100644 blob 852b49bf64b89e271e9679025dff283c77f594ed\tserver-version/backend/prisma/migrations/20261012002000_huiteacher_cross_class_disclosure/migration.sql\n100644 blob bf3dd9eed56c0c45d82ac9a04132b55506df5042\tserver-version/backend/prisma/migrations/20261012002100_huiteacher_improvement_actions/migration.sql\n100644 blob ad6de4f0a9ed7fe2059b5940a4863084c8b56285\tserver-version/backend/prisma/migrations/20261012002200_huiteacher_improvement_reassessment/migration.sql\n100644 blob 76644b7dbe1898523cfccc1934fd15dcce3c8e13\tserver-version/backend/prisma/migrations/20261012002300_huiteacher_improvement_source_guard/migration.sql\n100644 blob 69da36dd2135ca3db1b264074511f70156a9e9fb\tserver-version/backend/prisma/migrations/20261012190000_report_privacy_preferences/migration.sql\n100644 blob 42dde4f301e83b601a26e8572de53d818eb3692a\tserver-version/backend/prisma/migrations/20261012203000_teacher_privacy_v2_release_projection/migration.sql\n100644 blob 022aa499aa4ecc214622b21fd7b64caff94afde3\tserver-version/backend/prisma/migrations/20261015010000_composite_report_outbox/migration.sql\n100644 blob dd3215f1c64a49f1122eada22c9900230e03603a\tserver-version/backend/prisma/migrations/20261015020000_whole_questionnaire_receipt/migration.sql\n100644 blob eb2fb5deb4d6c90eedc0be873daf41306a7afa84\tserver-version/backend/prisma/migrations/20261015030000_whole_validation_manifest/migration.sql\n100644 blob 822e48b0aa7a42d1e474c40ca8f99828e6cf81b5\tserver-version/backend/prisma/migrations/20261016010000_detached_whole_receipt_budget/migration.sql\n100644 blob bd383dac59fad311c92f49b087cf581e8bd47ebb\tserver-version/backend/prisma/migrations/20261016090000_shared_scale_runtime_artifacts/migration.sql\n100644 blob 598ab43fd25bee7400824a3e0c927aa9c04fed22\tserver-version/backend/prisma/migrations/20261016130000_compact_assessment_public_templates/migration.sql\n100644 blob 857a8aa7ddf56d19799a6d82388edca319e603a7\tserver-version/backend/prisma/migrations/20261016143000_index_compact_raw_receipts/migration.sql\n100644 blob 12ea4f2b01baa5139d1a99ce785e438efc932cce\tserver-version/backend/prisma/migrations/20261016160000_shared_control_bindings/migration.sql\n100644 blob 9104dcad9caef450e50602e15c548142fa98880a\tserver-version/backend/prisma/migrations/20261016170000_shared_cognitive_runtime/migration.sql\n100644 blob 54eb4b62ffa1b8880191a5a5011a11ac9e7320df\tserver-version/backend/prisma/migrations/20261017010000_shared_asset_storage/migration.sql\n100644 blob 2a748c7774b13aeb576b51e354fe393f544c816b\tserver-version/backend/prisma/migrations/20261017020000_asset_upload_deduplication/migration.sql\n100644 blob 6c8afaa38d8a083c3bb2f53c824295de052b1286\tserver-version/backend/prisma/migrations/20261017050000_survey_cognitive_units/migration.sql\n100644 blob 56223bf3437cfd1ff2463d0c97450c80fd9804af\tserver-version/backend/prisma/migrations/20261017060000_survey_tool_grants/migration.sql\n100644 blob b28a894d84e5f5c02f80e0f0dcb0904baf75352a\tserver-version/backend/prisma/migrations/20261017070000_survey_group_ip_window/migration.sql\n100644 blob 03f018175a0070790aa68aadf75492288a2738ba\tserver-version/backend/prisma/migrations/20261018020000_scale_copy_source/migration.sql\n100644 blob c7c8e283d52a2998be2b48030f95627822b73a62\tserver-version/backend/prisma/migrations/20261018080000_composite_typed_form_definition/migration.sql\n100644 blob a3ad9cc9bf158e79b2de082a01a9cc139332600b\tserver-version/backend/prisma/migrations/20261018090000_training_form_v3_policy/migration.sql\n100644 blob 91ac2b7467b819f5944aa0c1b4de075628b00d05\tserver-version/backend/prisma/migrations/20261018094700_training_scale_timing/migration.sql\n100644 blob 2a8d169127c994c0cf557ac2b8ac7f0e4ac95d41\tserver-version/backend/prisma/migrations/20261018110000_sjt_course_grants/migration.sql\n100644 blob ef5e360bdd0345e4ca1ea49d02a3ca69133a4cd6\tserver-version/backend/prisma/migrations/20261018120000_training_weighted_variants/migration.sql\n100644 blob 834c945c3ca7982a5c12d622df487c107d49b1a5\tserver-version/backend/prisma/migrations/20261018130000_training_analysis_quality/migration.sql\n100644 blob 6d04dbc6b01beecb7259f01a584407187babb79f\tserver-version/backend/prisma/migrations/20261018143000_anonymous_study_governance/migration.sql\n100644 blob 1826c94f2122574af49c24d40ec1e944671e2a92\tserver-version/backend/prisma/migrations/20261018153000_training_conditional_flow/migration.sql\n100644 blob e59f81811899661ec89ffec10fcdf83568874ab9\tserver-version/backend/prisma/migrations/20261018160000_training_material_allocation/migration.sql\n100644 blob cc7ec855da04da516a5877e06e9717e3c55a2695\tserver-version/backend/prisma/migrations/20261019040000_training_public_rounds/migration.sql\n100644 blob f3cf289735e45a0b3b812dbbee8ff1b43654c250\tserver-version/backend/prisma/migrations/20261019050000_training_persistence/migration.sql\n100644 blob cbba30ff0a1500c2ba1a65871cd5e74e3433ded1\tserver-version/backend/prisma/migrations/20261019060000_training_feedback_release/migration.sql\n100644 blob 2ac4cdf767d94a7d354b6d20a042736c2d534cbc\tserver-version/backend/prisma/migrations/20261020020000_measurement_content_releases/migration.sql\n100644 blob b7cb535dc7c26d469c26eb9f164416b5523eb541\tserver-version/backend/prisma/migrations/20261020021000_scale_measurement_release/migration.sql\n100644 blob a5d47c76675ce6d5625bf40cf53f11374638169f\tserver-version/backend/prisma/migrations/20261020023000_cognitive_sjt_measurement_release/migration.sql\n100644 blob e2a96b529b6d8c151472bb4e3f8babadbcea2131\tserver-version/backend/prisma/migrations/20261020025000_reference_candidate_reviews/migration.sql\n100644 blob db7f9865ba1237c1fe339bf268261690819ff833\tserver-version/backend/prisma/migrations/20261020030000_content_capability_authority/migration.sql\n100644 blob c8a3ad3da2c59fd581cc2840b8dc53e8abcc9008\tserver-version/backend/prisma/migrations/20261020031000_survey_private_report_drafts/migration.sql\n100644 blob 95005f1e9cd99ab552f51b50b5b264171333e62e\tserver-version/backend/prisma/migrations/20261020040000_survey_attempt_content_binding/migration.sql\n100644 blob a25f0bf7d498d8e04c6c80d0c57a159bee62b3b1\tserver-version/backend/prisma/migrations/20261020041000_survey_interpretation_exports/migration.sql\n100644 blob 21380d839b155e72a2d49264f27a40913015afd1\tserver-version/backend/prisma/migrations/20261020042000_data_reinterpret_authority/migration.sql\n100644 blob 738efe23fa6452804be5b81b13ab75efd984e52d\tserver-version/backend/prisma/migrations/20261020043000_survey_interpretation_artifacts/migration.sql\n100644 blob 7004a333bd83591348e7f7af31c14204e36dbda5\tserver-version/backend/prisma/migrations/20261020100000_admin_entry_authority/migration.sql\n100644 blob 6293b9e2d3e522bc9d0b49f979bfcafe50c6d545\tserver-version/backend/prisma/migrations/20261020110000_admin_security_keys/migration.sql\n100644 blob e417e298d245a992a818b9e729e6dc45f00d9d11\tserver-version/backend/prisma/migrations/20261020120000_training_entry_authority/migration.sql\n100644 blob a85dcc1650f489a206f0090c9657315ed17735e0\tserver-version/backend/prisma/migrations/20261020131000_survey_reference_requests/migration.sql\n100644 blob ca09812d1a63d0116d2e3f9995f7c5843a78923b\tserver-version/backend/prisma/migrations/20261020132000_training_content_binding/migration.sql\n100644 blob d1701ee788ffc59c7f352e2c34cc05669284678d\tserver-version/backend/prisma/migrations/20261020133000_training_private_report_drafts/migration.sql\n100644 blob 99950e34cf47dc40e0d247c24e46a7ee2071e833\tserver-version/backend/prisma/migrations/20261020134000_training_assignment_measurement/migration.sql\n100644 blob 4a06372253003d56f7f794f1dbecae167ca774c3\tserver-version/backend/prisma/migrations/20261020135000_training_report_final_binding/migration.sql\n100644 blob aa7fe006f8a37970829fad0e9519edf82d575053\tserver-version/backend/prisma/migrations/20261020136000_static_sjt_measurement_mapping/migration.sql\n100644 blob 64b1941a2102dca8fafd3e0c2b59e85a193c5cb3\tserver-version/backend/prisma/migrations/20261020137000_formal_reference_review_grant/migration.sql\n100644 blob 9b127df5e7f7282acac8b864fc5d98ba658dcfea\tserver-version/backend/prisma/migrations/20261020139000_training_reference_requests/migration.sql\n100644 blob 31d516250eef77b6372f6eb6099b007d205f1039\tserver-version/backend/prisma/migrations/20261020140000_training_reinterpretation_artifacts/migration.sql\n100644 blob 7f8240ba0955c5429a121e05be21efb99aae5a04\tserver-version/backend/prisma/migrations/20261020142000_training_reference_selection/migration.sql\n100644 blob 315c0f6be9fa59f578fb76d18103119aad8875ed\tserver-version/backend/prisma/migrations/20261021000000_training_catalog_discovery/migration.sql\n100644 blob 7a3bc3e53488269cb8e847c3a17172c87106f766\tserver-version/backend/prisma/migrations/20261021123000_scale_library_governance/migration.sql\n100644 blob 786b9886de84a116df1067368bd14da35a64cc11\tserver-version/backend/prisma/migrations/20261021160000_checkin_schedules/migration.sql\n100644 blob 89e8ec9eef873fc052b2f66d421988be02d79ed1\tserver-version/backend/prisma/migrations/20261021190000_workspace_media_grants/migration.sql\n100644 blob e12b63366456c0f3b47a1f5609cd8efebac4aab4\tserver-version/backend/prisma/migrations/20261021194500_workspace_form_grants/migration.sql\n100644 blob 4c1054cb0c11962409ccac4fd525cae687d75993\tserver-version/backend/prisma/migrations/20261022040000_admin_authenticator_totp/migration.sql\n100644 blob a98e9a16978ea513ca5fb66e92ec94ea1be0c05a\tserver-version/backend/prisma/migrations/20261022041000_education_library_scope_foundation/migration.sql\n100644 blob a8fff607973071be5d6a50379bb7ca6c7e6a30d3\tserver-version/backend/prisma/migrations/20261022051000_education_private_tools/migration.sql\n100644 blob d301be9a5cda82a08875d116d630ac5965c14f6b\tserver-version/backend/prisma/migrations/20261022090000_private_form_templates/migration.sql\n100644 blob 5c7aae110145b8a83fb1e5179a6139948c6fd146\tserver-version/backend/prisma/migrations/20261022090000_survey_tool_library/migration.sql\n100644 blob 69e40cd26708871ef4c10addd3d9acd2e13a2758\tserver-version/backend/prisma/migrations/20261022120000_education_library_registered_identity/migration.sql\n100644 blob eb34e395c62148ae03074630d283eef1bd4ef3b1\tserver-version/backend/prisma/migrations/20261022150000_education_private_scale_runtime/migration.sql\n100644 blob d8dd87840d5593acf381da6b55e29000a3f6ee66\tserver-version/backend/prisma/migrations/20261022170000_education_private_form_runtime/migration.sql\n100644 blob e5d13aa1f9b3d7516ec22631babb3f4f3bc8d82c\tserver-version/backend/prisma/migrations/20261022183000_education_scale_library_source/migration.sql\n100644 blob d8b2f0f0f20f94a00cc27deb00dd3fcc4d67f81e\tserver-version/backend/prisma/migrations/20261022200000_education_private_form_publication/migration.sql\n100644 blob 17c6b7c5c5ebc4691337993579b03350da50683a\tserver-version/backend/prisma/migrations/20261023010000_survey_tool_completion/migration.sql\n100644 blob c95c520ed9d5d047e204f8581164e573946995f5\tserver-version/backend/prisma/migrations/20261023070000_education_private_form_media_projection/migration.sql\n100644 blob a6afbc5998c0fc6c8a83567c9d64e8a233b6eab7\tserver-version/backend/prisma/migrations/20261024020000_survey_memorable_participation/migration.sql\n100644 blob ab439b2a77c9ec693ba92c187948a01927785463\tserver-version/backend/prisma/migrations/20261024021000_teacher_code_account_validity/migration.sql\n100644 blob 9886eaba66687b267419fc4c3ca060d43143b225\tserver-version/backend/prisma/migrations/20261024023000_survey_self_assigned_code/migration.sql\n100644 blob 64e447d0ff1f257efde4be4010f98d970fc04c6b\tserver-version/backend/prisma/migrations/20261024024500_survey_code_registry_guard/migration.sql\n100644 blob 05906585f16668ab4a8726bbc918516a51abe946\tserver-version/backend/prisma/migrations/20261024080000_training_participation_codes/migration.sql\n100644 blob 3f08aacfa0991852e25b2c775f0292b059d13995\tserver-version/backend/prisma/migrations/20261024083000_training_stable_admission_identity/migration.sql\n100644 blob fbffa92c2bb7c748d6fc78f9f9dcac604dabb87d\tserver-version/backend/prisma/migrations/migration_lock.toml\n100644 blob b0556f0f6d93606ec7bee89e69b48749a33c7a4f\tserver-version/backend/prisma/schema.prisma\n100644 blob dfe86ad46e55e0b4587ebb1bb883f6565276b1d3\tserver-version/backend/prisma/seed.ts\n100644 blob f130547e10d8816c65a454f7743eccafc8526e46\tserver-version/backend/prisma/seeds/cognitive-timing-pilot.ts\n100644 blob 4b5238f400ddf9c71dc7d88e7398b5782b656e0d\tserver-version/backend/prisma/seeds/cognitive.ts\n100644 blob 68982022ed2fed1ed29cc3ad5ca098b66159b82e\tserver-version/backend/prisma/seeds/scale-legacy-migrations.ts\n100644 blob 693da39ca3784f57969255ad3660e0338804ca6d\tserver-version/backend/prisma/seeds/scales.ts\n100644 blob 57c1e5a387d78df656d4f6bb65609a25cea2d54a\tserver-version/backend/prisma/seeds/users.ts",
+    "migrationScriptBlob": "d7c8cb77506fcf17714f4fc1ca008799e3cbf5a5"
+  },
+  "completedFrontend": {
+    "run": 40096682005,
+    "sourceHead": "e70481d2acd0fe0a275910509ac7bf8d79764ded",
+    "checkout": "8659d759b97000409bc3a8f7019a08b81ad1cdf4",
+    "componentTree": "a766f0717dfae221c11a460059c198739d1e3293",
+    "attempt": "1",
+    "frontendJob": 120880592393,
+    "artifacts": {
+      "frontend": {
+        "id": 12561515944,
+        "job": 120880592393,
+        "jobName": "training-entry / frontend",
+        "conclusion": "success",
+        "name": "training-entry-frontend-8659d759b97000409bc3a8f7019a08b81ad1cdf4",
+        "bytes": 22172987,
+        "sha256": "5fdebefc79490859cfd623cb9893f218ce0e765c499cbc1d96bec155aa967f60"
+      },
+      "browser": {
+        "id": 12561446283,
+        "job": 120880756549,
+        "jobName": "training-entry / browser",
+        "conclusion": "failure",
+        "name": "training-entry-browser-8659d759b97000409bc3a8f7019a08b81ad1cdf4-1",
+        "bytes": 1014457,
+        "sha256": "56606ea4efd696aba73622704e55a2597e863bb3e0dcd01fc29ec5d6b42a3252"
+      }
+    },
+    "fileHashes": {
+      "frontend-build-manifest.json": "ba629747eae7a41a7a0add38dd523c710545eb9c55c3cf1b61f88a19c8da9f4b",
+      "frontend-build-command.json": "51e76b85c3b9aec79df858bece4fa3504561ece7e514b1d1241068fc6d69de18",
+      "frontend-fresh.json": "36d08b261d5f020fda3ac9e80ffed66d7de3b92375136cdbf1fc630cf9d0570f",
+      "frontend-fresh-command.json": "40ac4dd9facfb0396648da30f0cab01474da597448e6a1ff30862b77fc2035ef",
+      "frontend-fresh-checked.json": "e52b58f526f5672700a322cc507c1de22644898583bbc6860ab3ebc83853d4c3",
+      "export-reload-lint-command.json": "0d6ddf8c5f6164a83ba73488f999e2e665247c9638aca280591c5c9a70efdc76",
+      "review-contracts-retained.json": "f62fd0b73569048c74aed82fed2e0a10daea16d1aeebd6668b2fa517178db911",
+      "lint-retained.json": "2606e2e331821a75332dba62c8708b1ef1592c8efcb5d4450a4ca245be0ab4a9"
+    },
+    "browserFileHashes": {
+      "browser.json": "9481cda17f1e04c42458a2992405c7a71b4382afe6357d2768e6bfe9fde2b97e",
+      "component-source-manifest.json": "30059ec4d30aa14efe572c58a0f4c09d52fc6bcb9f35c046d5fe4884465f0a50"
+    },
+    "browserRetainedNames": [
+      "management-survey-granted",
+      "management-survey-no-grant",
+      "management-survey-anonymous",
+      "management-huischool-granted",
+      "management-huischool-no-grant",
+      "management-huischool-anonymous",
+      "management-huiteacher-granted",
+      "management-huiteacher-no-grant",
+      "management-huiteacher-anonymous",
+      "organization-entry-authenticated",
+      "organization-entry-anonymous",
+      "entry-login-1440",
+      "entry-login-390",
+      "learner-assignments-detail-success",
+      "learner-assignments-detail-failure",
+      "learner-assignments-submit-success",
+      "learner-assignments-submit-failure",
+      "learner-checkins-detail-success",
+      "learner-checkins-detail-failure",
+      "learner-checkins-submit-success",
+      "learner-checkins-submit-failure",
+      "checkin-late-upload",
+      "teacher-assignments-lazy-courses",
+      "teacher-checkins-lazy-courses",
+      "assignment-review-paging-batch-download",
+      "assessment-deferred-export-retry"
+    ],
+    "browserHarnessSHA256": "7f8a7a35289757f8498b929ce0e24ba42251b9f8356835273b0f2e70ba427581"
+  }
 }
