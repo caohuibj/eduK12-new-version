@@ -109,3 +109,28 @@ failures. Independent static review found and resolved the terminal-state reset
 omission. No new build, browser, PostgreSQL run or CI was executed in this round.
 The earlier bundle figures describe the earlier built candidate, not this new
 source snapshot. Alignment with the eventual Training/main merge is still pending.
+
+## Post-main integration verification
+
+Both local branches now include official main
+`4d95a5b11c3b2261c96d7161eea66ebf8d6f0626` and the subsequent local Training
+management efficiency fixes. At the first alignment, all 27 paths across six
+Survey optimization commits were byte-identical to the prealignment candidate;
+the complete Survey backend subtree was also unchanged. Shared entry/bootstrap
+and administration inputs did change, so prior bundle figures are not a current
+merged-candidate measurement.
+
+The newly revised shared scale-governance screen previously constructed hidden
+legacy/submission/grant panels and serialized frozen details even when another
+Survey tab was visible. Construction now follows the existing visibility rules.
+Loaded state, approval checks, actions and visible markup remain; switching tabs
+does not discard inspected details or reasons. Two new and eight affected existing
+cases passed; lint passed with three pre-existing cleanup-ref warnings.
+
+The final combined source at `958f2e450b7bf62ad1a5fc98f100e1865b37fd81` passed
+backend TypeScript noEmit and frontend application TypeScript noEmit, serially
+with a 2048 MiB Node heap limit and actual process exits recorded. This single
+combined typecheck includes the new Training and Survey changes, not a repeat
+qualification of the previous source. No new build, runtime browser test, GitHub
+CI, remote PR merge or production deployment was performed. Final CI input
+bindings remain to be refreshed before any future authorized CI run.
