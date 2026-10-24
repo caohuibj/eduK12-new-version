@@ -1,4 +1,4 @@
-import ExcelJS from 'exceljs'
+import type * as ExcelJS from 'exceljs'
 import { createReadStream, createWriteStream } from 'node:fs'
 import { mkdtemp, open, rm, stat } from 'node:fs/promises'
 import { tmpdir } from 'node:os'
@@ -162,6 +162,10 @@ export async function writeSnapshotWorkbook(input: string, output: string | Writ
   let source: ReturnType<typeof createReadStream> | undefined
   let lines: ReturnType<typeof createInterface> | undefined
   try {
+    // Keep ExcelJS off API startup, but observe load failures and cancellation
+    // through the same cleanup path as workbook generation.
+    const { default: ExcelJS } = await guard(import('exceljs'))
+    checkConnected()
     const workbook = new ExcelJS.stream.xlsx.WorkbookWriter({ stream: destination, useSharedStrings: false, useStyles: true })
     zip = (workbook as unknown as { zip: NonNullable<typeof zip> }).zip
     zip.on('error', fail)
