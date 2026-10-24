@@ -22,7 +22,7 @@ beforeEach(()=>{added=false;savedBody=null;window.history.replaceState(null,'','
  if(url.endsWith('/instruments/copyB'))return reply(draft('copyB','第一份表单'))
  if(url.includes('/waves?page='))return reply({list:[]})
  if(url.endsWith('/waves')&&init?.method==='POST'){savedBody=JSON.parse(String(init.body));return reply({...savedBody,id:'w',projectId:'p',ordinal:1,revision:0,status:'DRAFT',publicationId:null})}
- if(url.includes('/tool-library?'))return reply({list:[{id:'composition',kind:'COMPOSITION',title:'普通组合问卷',revision:2,completedRevision:2,status:'DRAFT'}],total:1})
+ if(url.includes('/tool-library?'))return reply({list:[{id:'composition',kind:'COMPOSITION',title:'普通组合问卷',revision:2,completedRevision:2,readiness:'READY',status:'DRAFT'}],total:1})
  if(url.includes('/tool-library/select/')){added=true;return reply({instrumentIds:['copyB','copyA']})}
  throw new Error('Unexpected '+url)
 }))})
