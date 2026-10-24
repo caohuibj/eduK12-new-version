@@ -467,5 +467,5 @@
     "src/__tests__/controllers/course-list-pagination.test.ts",
     "src/__tests__/controllers/userController.lifecycle.test.ts"
   ],
-  "evidenceSHA256": "fe719a569b6408f47f509c1355c595c8fd73562189b16653c4c0f6250ee230bc"
+  "evidenceSHA256": "8f1a965661ab6d434d6ad2676b598832a28fdb3a6ca3d5f688f51c61ac930c52"
 }

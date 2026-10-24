@@ -1425,15 +1425,6 @@ jobs:
     steps:
       - name: every selected stage must actually succeed
         env:
-      NPM_CONFIG_REGISTRY: https://registry.npmjs.org
-      NPM_CONFIG_REPLACE_REGISTRY_HOST: always
-      NODE_OPTIONS: --max-old-space-size=4096
-      CI_EVENT: pull_request
-      CI_HEAD_REF: work/survey-training-branding-20261023
-      CI_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}
-      CI_PR_REPOSITORY: ${{ github.event.pull_request.head.repo.full_name }}
-      CI_PR_NUMBER: ${{ github.event.pull_request.number }}
-      PLAN: ${{ needs.scope.outputs.training_admin_integration_plan }}
           NEEDS: ${{ toJSON(needs) }}
         run: node -e 'const n=JSON.parse(process.env.NEEDS);for(const k of ["training-admin-admission","training-admin-frontend","training-admin-query"])if(n[k]?.result!=="success")throw Error(k+" did not succeed")'
 
