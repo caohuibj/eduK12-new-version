@@ -785,7 +785,8 @@ export default function SurveyPublicApp(){
   const priorAnswersFor=(key:string)=>{
     const order=currentFlow?.visibleUnitKeys??task?.units.map(u=>u.instrumentKey)??[]
     const index=order.indexOf(key),prior=new Set(order.slice(0,index))
-    return Object.fromEntries((task?.units??[]).filter(u=>u.kind!=='COGNITIVE'&&prior.has(u.instrumentKey)).map(u=>{
+    // Native task prerequisites are verified from server receipts, not ordinary answer locks.
+    return Object.fromEntries((task?.units??[]).filter(u=>u.kind!=='COGNITIVE'&&u.executionProtocol!=='SITUATIONAL_NATIVE_V1'&&prior.has(u.instrumentKey)).map(u=>{
       const raw=own(answers,u.instrumentKey)??{}
       return [u.instrumentKey,u.kind==='FORM'?sanitizeFormAnswers(u.pages?.flatMap(p=>p.questions)??[],raw):raw]
     }))

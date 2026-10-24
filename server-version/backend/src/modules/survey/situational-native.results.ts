@@ -196,3 +196,31 @@ export async function loadSurveySituationalResults(tx: Prisma.TransactionClient,
     return decodeResult(row, reference, unit, input)
   })
 }
+
+/** Admission-only reader for server-derived earlier slots. It does not accept
+ * participant completion claims or duplicate raw/results into ordinary locks.
+ * Parent/slot/epoch bindings and completed facts are immutable; FINAL will
+ * independently verify the participant's explicit receipt set again. */
+export async function loadCompletedSurveySituationalPrefix(tx:Prisma.TransactionClient,input:{
+  surveyAttemptId:string;surveyPublicationId:string;snapshot:ResearchFrozenPublication;slotKeys:readonly string[];
+}):Promise<Map<string,LoadedSurveySituationalResult>>{
+  if(!input.slotKeys.length)return new Map()
+  const keys=new Set(input.slotKeys)
+  if(keys.size!==input.slotKeys.length||input.slotKeys.some(key=>!input.snapshot.units.some(unit=>
+    unit.instrumentKey===key&&unit.kind==='SJT'&&unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)))
+    fail('SURVEY_SJT_RECEIPT_SLOT_NOT_SELECTED')
+  const rows=await tx.situationalAttempt.findMany({where:{surveyAttemptId:input.surveyAttemptId,
+    surveyPublicationId:input.surveyPublicationId,surveySlotKey:{in:[...keys]}},orderBy:{attemptEpoch:'desc'},
+    select:{id:true,surveySlotKey:true,attemptEpoch:true,status:true,submissionId:true,submissionPayloadHash:true}})
+  // Native protocol V1 freezes epoch 1 and permits exactly one durable child
+  // per slot. Do not silently pick an old completion after a future replacement.
+  if(rows.length!==keys.size||new Set(rows.map(row=>row.surveySlotKey)).size!==keys.size
+    ||rows.some(row=>row.attemptEpoch!==1||row.status!=='COMPLETED'||!row.submissionId||!row.submissionPayloadHash))
+    fail('SURVEY_SJT_RECEIPT_NOT_COMPLETED')
+  const loaded=await loadSurveySituationalResults(tx,{...input,references:rows.map(row=>({
+    protocol:SURVEY_NATIVE_SJT_PROTOCOL,attemptId:row.id,submissionId:row.submissionId!,payloadHash:row.submissionPayloadHash!,
+  }))})
+  const results=new Map(loaded.map(result=>[result.slotKey,result]))
+  if(results.size!==keys.size||[...keys].some(key=>!results.has(key)))fail('SURVEY_SJT_RECEIPT_SCOPE_MISMATCH')
+  return results
+}

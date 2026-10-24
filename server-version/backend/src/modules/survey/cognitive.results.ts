@@ -215,3 +215,16 @@ export async function listSurveyCognitiveSessions(tx:Prisma.TransactionClient,at
     resultReference:s.result?surveyCognitiveResultReference(s.result):null,
   }))
 }
+
+/** The caller holds the fresh parent Attempt lock. Only the latest epoch of
+ * every earlier cognitive slot can satisfy task sequencing; an old completion
+ * cannot authorize a task after an unfinished replacement. */
+export async function assertSurveyPriorCognitiveCompleted(tx:Prisma.TransactionClient,input:Scope,slotKeys:readonly string[]){
+  if(!slotKeys.length)return
+  const sessions=await tx.surveyCognitiveSession.findMany({where:{...input,slotKey:{in:[...slotKeys]}},
+    orderBy:{epoch:'desc'},select:{slotKey:true,status:true,epoch:true,result:{select:{id:true}}}})
+  const current=new Map<string,(typeof sessions)[number]>()
+  for(const session of sessions)if(!current.has(session.slotKey))current.set(session.slotKey,session)
+  if(slotKeys.some(key=>current.get(key)?.status!=='COMPLETED'||!current.get(key)?.result))
+    cognitiveFail(409,'请先完成前一个认知工具')
+}

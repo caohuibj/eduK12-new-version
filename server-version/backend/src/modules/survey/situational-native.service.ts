@@ -1,3 +1,4 @@
+import {assertSurveyPriorCognitiveCompleted,SurveyCognitiveError} from './cognitive.results'
 import { situationalImageAssetReferences } from '../situational/situation-definition'
 import { ASSESSMENT_FROZEN_RUNTIME_REFERENCE_TYPE,ASSESSMENT_FROZEN_RUNTIME_MEDIA_FIELD } from '../assessment-media/assessment-asset'
 import { SJT_AUTHOR_MEDIA_SCOPE,SJT_AUTHOR_MAX_IMAGE_BYTES } from '../situational/authoring/media'
@@ -44,7 +45,7 @@ async function access(tx:Tx,proof:SurveyTaskProof,known:VerifiedSurveyTask,slotK
   const staged=surveyNativeSituationalRequiresStageNotice(runtime.snapshot.definition)
   if(staged?!hasSurveyStagedSituationalNotice(publication.measurementNotice):!hasSurveyLinearSituationalNotice(publication.measurementNotice))
     fail(409,'冻结研究缺少该情境化工具实际作答记录说明')
-  return {attempt,unit:unit!,...runtime}
+  return {attempt,publication,unit:unit!,...runtime}
 }
 function assertChild(row:SituationalAttemptRow|SituationalAttemptCommitRow,known:VerifiedSurveyTask,
   slotKey:string,runtime:Awaited<ReturnType<typeof access>>){
@@ -70,6 +71,11 @@ export async function startSurveySituational(proof:SurveyTaskProof,slotKey:strin
     const runtime=await access(tx,proof,known,slotKey,false)
     let row=await findChild(tx,known,slotKey)
     if(row){assertChild(row,known,slotKey,runtime);return view(row,runtime)}
+    const index=runtime.publication.units.findIndex(unit=>unit.instrumentKey===slotKey)
+    try{await assertSurveyPriorCognitiveCompleted(tx,{projectId:known.projectId,waveId:known.waveId,
+      attemptId:known.attemptId,publicationId:known.publicationId},runtime.publication.units.slice(0,index)
+        .filter(unit=>unit.kind==='COGNITIVE').map(unit=>unit.instrumentKey))}
+    catch(error){if(error instanceof SurveyCognitiveError)fail(error.statusCode,error.message);throw error}
     if(getAssessmentOperationalHold({family:'SITUATIONAL',key:runtime.header.instrumentKey,version:runtime.header.instrumentVersion}))
       fail(403,'情境化工具已暂停新作答')
     row=await tx.situationalAttempt.create({data:{id:randomUUID(),

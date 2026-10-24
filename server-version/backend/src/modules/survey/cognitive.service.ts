@@ -1,3 +1,5 @@
+import {SURVEY_NATIVE_SJT_PROTOCOL,SurveySituationalProtocolError} from './situational-native.contract'
+import {loadCompletedSurveySituationalPrefix} from './situational-native.results'
 import { randomBytes,randomUUID } from 'node:crypto'
 import type { Prisma,SurveyCognitiveSession } from '@prisma/client'
 import { prisma } from '../../config/database'
@@ -17,7 +19,7 @@ import { validateSurveyUnitAnswers } from './final.compute'
 import { evaluateFlowCondition,staticFlowValues } from './flow.definition'
 import type { ResearchFrozenPublication } from './publication.service'
 import { parseFrozenSurveyCognitive,surveyCognitiveTaskDefinition,type FrozenSurveyCognitive } from './cognitive.definition'
-import { cognitiveFail,assertSurveyCognitiveLockedAnswers,surveyCognitiveResultReference,
+import { cognitiveFail,assertSurveyCognitiveLockedAnswers,assertSurveyPriorCognitiveCompleted,surveyCognitiveResultReference,
   listSurveyCognitiveSessions,readSurveyCognitiveLockedAnswers,surveyCognitiveReceiptSelect,
   type SurveyCognitiveReceipt,type SurveyCognitiveStoredResult } from './cognitive.results'
 export { SurveyCognitiveError } from './cognitive.results'
@@ -107,7 +109,7 @@ async function prefixAnswers(tx:Tx,known:Known,snapshot:ResearchFrozenPublicatio
     cognitiveFail(400,'认知前置答案不属于当前问卷子版本')
   const blocks=snapshot.flow?.blocks??snapshot.units.map(u=>({kind:'INSTRUMENT',instrumentKey:u.instrumentKey,when:undefined}))
   const vars=snapshot.flow?staticFlowValues(snapshot.flow):{}
-  const priorCognitive:string[]=[]
+  const priorCognitive:string[]=[],priorSituational:string[]=[]
   for(const block of blocks){
     if(block.when&&!evaluateFlowCondition(block.when,verified,vars))continue
     if(block.kind==='END')break
@@ -115,20 +117,20 @@ async function prefixAnswers(tx:Tx,known:Known,snapshot:ResearchFrozenPublicatio
     const unit=units.get(block.instrumentKey!)
     if(!unit)cognitiveFail(409,'冻结认知路径含有不存在的工具')
     if(unit!.instrumentKey===slotKey){
-      if(priorCognitive.length){
-        const sessions=await tx.surveyCognitiveSession.findMany({where:{...scope(known,slotKey),
-          slotKey:{in:priorCognitive}},orderBy:{epoch:'desc'},
-          select:{slotKey:true,status:true,epoch:true,result:{select:{id:true}}}})
-        const current=new Map<string,(typeof sessions)[number]>()
-        for(const session of sessions)if(!current.has(session.slotKey))current.set(session.slotKey,session)
-        if(priorCognitive.some(key=>current.get(key)?.status!=='COMPLETED'||!current.get(key)?.result))
-          cognitiveFail(409,'请先完成前一个认知工具')
-      }
+      await assertSurveyPriorCognitiveCompleted(tx,{projectId:known.projectId,waveId:known.waveId,
+        attemptId:known.attemptId,publicationId:known.publicationId},priorCognitive)
+      try{await loadCompletedSurveySituationalPrefix(tx,{surveyAttemptId:known.attemptId,
+        surveyPublicationId:known.publicationId,snapshot,slotKeys:priorSituational})}
+      catch(error){if(error instanceof SurveySituationalProtocolError)cognitiveFail(409,error.code);throw error}
       await assertSurveyCognitiveLockedAnswers(tx,known.attemptId,answers)
       return jsonCopy(locked)
     }
     if(unit!.kind==='COGNITIVE'){
       priorCognitive.push(unit!.instrumentKey)
+    }else if(unit!.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL){
+      if(Object.prototype.hasOwnProperty.call(answers,unit!.instrumentKey))
+        cognitiveFail(400,'原生情境化前置事实必须使用服务器已保存回执，不能作为普通答案传入')
+      priorSituational.push(unit!.instrumentKey)
     }else{
       if(!Object.prototype.hasOwnProperty.call(answers,unit!.instrumentKey))cognitiveFail(400,'请先完成认知任务之前的研究工具')
       const result=validateSurveyUnitAnswers(unit!,answers[unit!.instrumentKey])

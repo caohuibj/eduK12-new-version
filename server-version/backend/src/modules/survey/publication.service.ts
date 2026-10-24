@@ -207,8 +207,6 @@ export async function freezeResearchWaveDraft(input:{
       const unit=draft!.catalogGrantId?compileCatalogUnit(draft!,sources.get(draft!.catalogGrantId)!):compileFrozenResearchUnit(draft!)
       return unit.nativeSituational?{...unit,nativeSituational:{...unit.nativeSituational,attemptEpoch:1 as const,frozenAt:frozenAt.toISOString()}}:unit
     })
-    if(units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)&&units.some(unit=>unit.kind==='COGNITIVE'))
-      stop('原生情境化试点暂不能与需要锁定前置答案的认知任务合并，请使用独立波次')
     const feedbackMetrics=new Map<string,string[]>()
     for (const unit of units) {
       if (unit.kind === 'FORM') continue
