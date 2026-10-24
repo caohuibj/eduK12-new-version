@@ -1766,3 +1766,8 @@ Missing/skipped/failed/cancelled selected checks and drafts block merge. Main
 push only classifies the same exact diff; it does not replay PR application
 checks. At five minutes report the specific waiting stage, then repair/recheck
 only affected inputs. This lane qualifies merging only, not deployment.
+
+The first PR354 candidate run `40143579966` stopped before application work
+because the new classifier variable duplicated an existing governance variable.
+Only that identifier is repaired. No dependency install, type check, test, DB,
+compilation or SAST success is claimed from the failed invocation.
