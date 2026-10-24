@@ -47,6 +47,21 @@ it('defaults to this page and sends observed revisions, not one grade request pe
   await waitFor(() => expect(api.post).toHaveBeenCalledWith('/assignments/task/batch-grade', expect.objectContaining({ selectionToken: 'page-proof' })))
   expect(api.post.mock.calls.some(([url]) => url.includes('/submissions/'))).toBe(false)
 })
+it('releases a completed batch before refreshing so a reopened dialog can select the next batch', async () => {
+  await openReview()
+  fireEvent.click(screen.getByRole('button', { name: '一键批量批复' }))
+  fireEvent.click(screen.getByRole('button', { name: '确认批复 (1份)' }))
+  await waitFor(() => expect(screen.queryByRole('dialog', { name: '一键批量批复' })).not.toBeInTheDocument())
+  await waitFor(() => expect(api.get.mock.calls.filter(([url]) => url === '/assignments/task/submissions')).toHaveLength(2))
+  fireEvent.click(screen.getByRole('button', { name: '一键批量批复' }))
+  const dialog = screen.getByRole('dialog', { name: '一键批量批复' })
+  const all = within(dialog).getByRole('button', { name: '选择全部未批改' })
+  expect(all).toBeEnabled()
+  expect(within(dialog).getByRole('button', { name: '确认批复 (1份)' })).toBeEnabled()
+  fireEvent.click(all)
+  await within(dialog).findByText('已冻结选择 50 份；批改时跳过已变化或已处理记录。')
+  expect(api.post).toHaveBeenCalledWith('/assignments/task/review-selection', { scope: 'all-ungraded' })
+})
 it('explicit all-ungraded selection uses frozen count and retries only the failed chunk', async () => {
   let failed = false
   api.post.mockImplementation(async (url: string, body: any) => {

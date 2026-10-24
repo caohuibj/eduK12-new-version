@@ -386,6 +386,9 @@ const AssignmentListContent: React.FC<AssignmentListProps> = ({ embeddedCourse }
       const { applied, skipped } = reviewProgress.current
       showMessage(`本次确认批复 ${applied} 份；${skipped} 份已变化或已处理，未重复批改。请以刷新后的列表为准。`)
       setShowBatchGradeModal(false)
+      // Refresh advances the list generation, so release this completed batch
+      // before its finally guard intentionally stops owning that generation.
+      setIsBatchGrading(false)
       void fetchSubmissions(assignmentId)
     } catch (error) {
       if (mounted.current && sequence === submissionsSequence.current) showMessage(`${error instanceof Error ? error.message : '批量批复失败'}。已确认 ${reviewProgress.current.applied} 份，可重试未完成批次；网络异常的批次结果请刷新确认。`)
