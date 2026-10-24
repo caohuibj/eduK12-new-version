@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-const state = vi.hoisted(() => ({ runtime: null as any, rawCreate: vi.fn(), update: vi.fn(), transaction: vi.fn(), envelope: vi.fn() }))
+const state = vi.hoisted(() => ({ runtime: null as any, rawCreate: vi.fn(), update: vi.fn(), transaction: vi.fn(), envelope: vi.fn(), events: [] as string[] }))
 vi.mock('../../config/database', () => ({ prisma: {} }))
+vi.mock('../../modules/composite/training-variant-child-scope', () => ({ requiresTrainingFlowFinalLock: () => false, lockTrainingFlowFinalAdmission: async () => { state.events.push('host-lock'); return () => { state.events.push('host-admission') } } }))
 vi.mock('../../services/unitSubmitAdmission', () => ({ withUnitSubmitAdmission: (run: () => unknown) => run() }))
 vi.mock('../../services/questionnaireProgressService', () => ({ withFinalOnlyCompletionTransaction: (run: (tx: any) => unknown) => state.transaction(run) }))
 vi.mock('../../modules/situational/situational-runtime.service', () => ({
@@ -10,11 +11,12 @@ vi.mock('../../modules/situational/situational-runtime.service', () => ({
   SITUATIONAL_ATTEMPT_COMMIT_SELECT: {},
   situationalAttemptForResponse: (row: any, snapshot: any, options: any) => ({ attemptId: row.id, status: row.status, ...options }),
 }))
+import { assertSituationalAttemptOwner } from '../../modules/situational/situational-runtime.service'
 import fixture from '../../modules/situational/authoring/examples/online-hand-calculated.json'
 import { compileSjtOnlineDocument } from '../../modules/situational/authoring/online'
 import { freezeSituationalRuntimeAtAttemptStart } from '../../modules/assessment-runtime/situational-runtime-snapshot'
 import { decryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
-import { submitSituationalAttemptFinal } from '../../modules/situational/situational-final-submit.service'
+import { submitSituationalAttemptFinal, prepareSituationalFinalSubmission } from '../../modules/situational/situational-final-submit.service'
 import { parseSituationalRawSubmissionPayload } from '../../modules/situational/situational-raw-submission'
 import { SJT_ONLINE_UNSATISFIED_FLAG } from '../../modules/situational/situational-task-satisfaction'
 
@@ -31,11 +33,12 @@ function setup(required = false) {
 
 beforeEach(() => {
   vi.clearAllMocks()
+  state.events.length = 0
   process.env.DATA_ENCRYPTION_KEY = 'a'.repeat(64)
   state.update.mockImplementation(async ({ data }: any) => { Object.assign(state.runtime.row, data); return { count: 1 } })
   state.rawCreate.mockResolvedValue({})
   state.transaction.mockImplementation((run: (tx: any) => unknown) => run({
-    $queryRaw: async () => [{ id: 'attempt' }],
+    $queryRaw: async () => { state.events.push('child-lock'); return [{ id: 'attempt' }] },
     situationalAttempt: { findUnique: async () => state.runtime.row, updateMany: state.update },
     situationalRawSubmission: { create: state.rawCreate },
   }))
@@ -86,5 +89,52 @@ describe('online FINAL persistence through the shared service', () => {
     delete state.runtime.snapshot.online
     await expect(submitSituationalAttemptFinal(body)).rejects.toThrow('提交协议')
     expect(state.rawCreate).not.toHaveBeenCalled()
+  })
+})
+
+
+describe('shared FINAL transaction boundary', () => {
+  it('keeps the mandatory host lock before child lock and admission before writes', async () => {
+    const { body } = setup()
+    state.rawCreate.mockImplementation(async () => { state.events.push('raw-write'); return {} })
+    await submitSituationalAttemptFinal(body)
+    expect(state.events).toEqual(['host-lock', 'child-lock', 'host-admission', 'raw-write'])
+  })
+  it('rejects a Survey child even if a legacy runtime loader returned it', async () => {
+    const { body } = setup()
+    state.runtime.row.surveyAttemptId = 'survey-parent'
+    await expect(submitSituationalAttemptFinal(body)).rejects.toThrow('宿主不匹配')
+    expect(state.update).not.toHaveBeenCalled(); expect(state.rawCreate).not.toHaveBeenCalled()
+  })
+  it('rechecks epoch after entering the transaction and never writes stale preparation', async () => {
+    const { body } = setup()
+    state.transaction.mockImplementation(async run => {
+      state.runtime.row.attemptEpoch = 2
+      return run({$queryRaw: async () => [{id: 'attempt'}], situationalAttempt: {findUnique: async () => state.runtime.row, updateMany: state.update}, situationalRawSubmission: {create: state.rawCreate}})
+    })
+    await expect(submitSituationalAttemptFinal(body)).rejects.toThrow()
+    expect(state.update).not.toHaveBeenCalled(); expect(state.rawCreate).not.toHaveBeenCalled()
+  })
+  it('returns the locked winning replay without overwriting its facts', async () => {
+    const { body } = setup()
+    const prepared = prepareSituationalFinalSubmission(body, state.runtime)
+    state.transaction.mockImplementation(async run => {
+      Object.assign(state.runtime.row, {status: 'COMPLETED', submissionId: body.submissionId, submissionPayloadHash: prepared.payloadHash})
+      return run({$queryRaw: async () => [{id: 'attempt'}], situationalAttempt: {findUnique: async () => state.runtime.row, updateMany: state.update}, situationalRawSubmission: {create: state.rawCreate}})
+    })
+    expect(await submitSituationalAttemptFinal(body)).toMatchObject({replayed: true})
+    expect(state.update).not.toHaveBeenCalled(); expect(state.rawCreate).not.toHaveBeenCalled()
+  })
+  it('awaits an asynchronous mandatory authority failure before writing any fact', async () => {
+    const { body } = setup()
+    vi.mocked(assertSituationalAttemptOwner).mockImplementation(async () => { throw new Error('authority denied') })
+    try {
+      await expect(submitSituationalAttemptFinal(body)).rejects.toThrow('authority denied')
+      expect(state.update).not.toHaveBeenCalled(); expect(state.rawCreate).not.toHaveBeenCalled()
+    } finally { vi.mocked(assertSituationalAttemptOwner).mockImplementation(() => {}) }
+  })
+  it('rejects preparation from another attempt despite matching scientific hashes', () => {
+    const { body } = setup()
+    expect(() => prepareSituationalFinalSubmission({...body, attemptId: 'other'}, state.runtime)).toThrow('提交身份不一致')
   })
 })
