@@ -8,15 +8,17 @@ import {tmpdir} from 'node:os';
 import {pathToFileURL} from 'node:url';
 import {binding,surveyReviewPlan} from './survey-review-scope.mjs';
 const hash=b=>createHash('sha256').update(b).digest('hex');
-const git=(...args)=>execFileSync('git',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim();
+const gitCache=new Map();
+const git=(...args)=>{const key=JSON.stringify(args);if(!gitCache.has(key))gitCache.set(key,execFileSync('git',args,{encoding:'utf8',stdio:['ignore','pipe','pipe']}).trim());return gitCache.get(key)};
 const dir='survey-review-evidence';
 const receipt=(name,data)=>{mkdirSync(dir,{recursive:true});writeFileSync(`${dir}/${name}.json`,JSON.stringify(data,null,2)+'\n');};
 const child=(cmd,args,options={})=>execFileSync(cmd,args,{timeout:240000,stdio:'inherit',...options});
 export function verifyLocal(read=readFileSync,object=git){
  const bytes=read('.github/evidence/survey-review/final-local.json');assert.equal(hash(bytes),binding.evidenceSHA256);
  const e=JSON.parse(bytes);assert.equal(e.kind,'reviewed-local-evidence');assert.equal(e.ciExecuted,false);assert.equal(e.originalExecutionSigned,false);
- assert.equal(e.product,binding.product);assert.equal(e.base,binding.base);
- assert.equal(object('rev-parse','HEAD:server-version/frontend'),e.frontendTree);
+ assert.equal(e.product,binding.localProduct??binding.product);assert.equal(e.base,binding.base);
+ assert.equal(object('rev-parse',e.product+':server-version/frontend'),e.frontendTree);
+ for(const [file,blob]of Object.entries(binding.localInputs??{}))assert.equal(object('rev-parse','HEAD:'+file),blob,'Local FINAL imported input drift: '+file);
  const current=read(e.testFile).toString();assert.equal(current.split(e.addedCaseText).length,2);
  assert.equal(hash(current.replace(e.addedCaseText,'')),e.firstInvocationTestSHA256,'Existing test/fixture changed between local runs');
  const passed=new Set();
@@ -54,6 +56,51 @@ export async function verifyOriginal(api=async path=>{
  assert.deepEqual(frontendChanges.sort(),binding.frontendLintChanged.map(p=>'server-version/frontend/'+p).sort(),'Changed lint inputs must be checked afresh');
  return {kind:'official-successful-stage-reuse',run:r.run,source:r.source,parentJobsRemainFailed:true,backendCompilationReplayed:false,unchangedFrontendLintReplayed:false,freshFrontendLint:binding.frontendLintChanged,productionArtifact:false};
 }
+function continuation(){
+ const bytes=readFileSync('.github/evidence/survey-review/continuation.json');assert.equal(hash(bytes),binding.continuationSHA256);return JSON.parse(bytes);
+}
+async function official(path,bytes=false){
+ const r=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/'+path,{headers:{Authorization:'Bearer '+process.env.GH_TOKEN,Accept:'application/vnd.github+json'}});assert.equal(r.status,200,'Official continuation evidence unavailable');return bytes?Buffer.from(await r.arrayBuffer()):r.json();
+}
+export function admittedCases(e,object=git){
+ const raw=gunzipSync(Buffer.from(e.report.gzipBase64,'base64'),{maxOutputLength:8*1024*1024});assert.equal(hash(raw),e.report.sha256);
+ const r=JSON.parse(raw);assert.equal(r.numPassedTests,345);assert.equal(r.numFailedTests,22);assert.equal(r.success,false);
+ const expected=new Set(e.accepted.map(c=>c.file+'\n'+c.name));assert.equal(expected.size,e.accepted.length);
+ const missing=new Set(e.missing.map(c=>c.file+'\n'+c.name));assert.equal(missing.size,e.missing.length);
+ let total=0;
+ for(const suite of r.testResults){
+  const file='server-version/frontend/src/'+suite.name.split('/src/').at(-1),group=e.groups[file];assert(group&&Object.keys(group.inputs).length>4);
+  for(const a of suite.assertionResults){const k=file+'\n'+a.fullName;total++;assert.notEqual(expected.has(k),missing.has(k),'Complete disjoint union required');if(expected.has(k)){
+    assert.equal(a.status,'passed');assert.equal(group.unchanged,true);
+    for(const [p,b]of Object.entries(group.inputs)){assert.equal(object('rev-parse',e.original.source+':'+p),b);assert.equal(object('rev-parse','HEAD:'+p),b,'Admitted dependency drift: '+p);}
+  }}
+ }
+ assert.equal(total,e.accepted.length+e.missing.length);assert.equal(total,367);return {accepted:e.accepted.length,missing:e.missing.length,originalPassed:345,originalFailed:22};
+}
+async function verifyContinuation(){
+ const e=continuation(),r=e.original;
+ const run=await official('actions/runs/'+r.run),job=await official('actions/jobs/'+r.job),artifact=await official('actions/artifacts/'+r.artifact);
+ assert.equal(run.head_sha,r.source);assert.equal(run.event,'pull_request');assert(run.pull_requests.some(p=>p.number===350));
+ assert.equal(job.head_sha,r.source);assert.equal(job.run_id,r.run);assert.equal(job.conclusion,'failure');assert.equal(job.status,'completed');assert(job.steps.some(s=>s.name==='execute named missing affected frontend assertions'&&s.conclusion==='failure'));
+ const age=Date.now()-Date.parse(job.completed_at);assert(age>=0&&age<86400000);
+ assert.equal(artifact.name,r.name);assert.equal(artifact.expired,false);assert.equal(artifact.workflow_run.id,r.run);assert.equal(artifact.workflow_run.head_sha,r.source);assert.equal(artifact.digest,'sha256:'+r.zipSHA256);assert.equal(artifact.size_in_bytes,r.zipBytes);
+ const zip=await official('actions/artifacts/'+r.artifact+'/zip',true);assert.equal(hash(zip),r.zipSHA256);assert.equal(zip.length,r.zipBytes);
+ const raw=execFileSync('python3',['-c',"import sys,io,zipfile; z=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read())); a=[i for i in z.infolist() if i.filename.endswith('/frontend-tests.json') or i.filename=='frontend-tests.json']; assert len(a)==1 and a[0].file_size<8388608; sys.stdout.buffer.write(z.read(a[0]))"],{input:zip,maxBuffer:8*1024*1024});assert.equal(hash(raw),e.report.sha256);
+ receipt('official-assertion-reuse',{kind:e.kind,originalRun:r.run,originalJob:r.job,originalJobRemainsFailed:true,...admittedCases(e),review:e.review});
+}
+async function codeqlConfig(){
+ const e=continuation(),r=e.original;child('git',['fetch','--no-tags','--depth=1','origin',r.source,process.env.CI_SOURCE_HEAD]);
+ const run=await official('actions/runs/'+r.run),job=await official('actions/jobs/'+r.sastJob);
+ assert.equal(run.head_sha,r.source);assert.equal(run.event,'pull_request');assert(run.pull_requests.some(p=>p.number===350));assert.equal(job.run_id,r.run);assert.equal(job.head_sha,r.source);assert.equal(job.status,'completed');assert.equal(job.conclusion,'success');
+ for(const n of ['initialize CodeQL','analyze with CodeQL'])assert(job.steps.some(s=>s.name===n&&s.conclusion==='success'));
+ const age=Date.now()-Date.parse(job.completed_at);assert(age>=0&&age<86400000);
+ const old=git('show',r.source+':.github/workflows/ci.yml'),now=readFileSync('.github/workflows/ci.yml','utf8');
+ const stage=(text,name)=>{const start=text.indexOf('      - name: '+name+'\n');assert(start>=0);const end=text.indexOf('\n      - ',start+10);return text.slice(start,end<0?undefined:end).split('\n').filter(line=>!line.trim().startsWith('${{ needs.scope.outputs.application_route')).join('\n')};
+ for(const n of ['initialize CodeQL','analyze with CodeQL'])assert.equal(stage(now,n),stage(old,n),'Actual SAST action/version/options changed');
+ const files=git('diff','--name-only',r.source,'HEAD').split('\n').filter(p=>/\.[cm]?[jt]sx?$/.test(p));assert(files.length>0);assert(files.every(f=>Object.hasOwn(binding.source,f)||binding.controls.includes(f)));
+ receipt('official-sast',{kind:'official-successful-input-reuse',run:r.run,job:r.sastJob,source:r.source,originalParentRunConclusion:run.conclusion,unchangedApplicationScanReplayed:false,freshPaths:files});
+ writeFileSync(process.env.GITHUB_OUTPUT,'config='+JSON.stringify({paths:files})+'\n',{flag:'a'});
+}
 function database(){
  assert.equal(process.env.CI,'true');const u=new URL(process.env.DATABASE_URL);assert.equal(u.hostname,'127.0.0.1');assert.equal(u.port,'55432');assert.equal(u.pathname,'/survey_review_ci');return u;
 }
@@ -90,12 +137,23 @@ function restore(){
 }
 async function main(){
  assert.equal(process.version,'v24.21.0');const action=process.argv[2];
+ if(action==='codeql-config'){await codeqlConfig();return}
  const {changedEntries}=await import('./content-scope.mjs');const head=git('rev-parse','HEAD');assert.deepEqual(surveyReviewPlan(changedEntries(binding.base,head),binding.base,head),JSON.parse(process.env.PLAN));
- if(action==='admission'){receipt('local-final',verifyLocal());receipt('official-stages',await verifyOriginal());}
+ if(action==='admission'){receipt('local-final',verifyLocal());receipt('official-stages',await verifyOriginal());await verifyContinuation();}
+ else if(action==='lint'){child(process.execPath,['node_modules/eslint/bin/eslint.js',...binding.frontendLintChanged],{cwd:'server-version/frontend'});}
  else if(action==='frontend'||action==='backend'){
-  const files=binding.checks[action+'TestFiles'];mkdirSync(dir,{recursive:true});const target=resolve(dir,action+'-tests.json');
-  child(process.execPath,['node_modules/vitest/vitest.mjs','run',...files,'--maxWorkers=2','--reporter=json','--outputFile='+target],{cwd:'server-version/'+action});
-  receipt(action+'-assertions',verifyReport(JSON.parse(readFileSync(target)),files));
+  const e=action==='frontend'?continuation():null;
+  const selected=e?.missing,files=selected?[...new Set(selected.map(c=>c.file.replace('server-version/frontend/','')))]:binding.checks[action+'TestFiles'];mkdirSync(dir,{recursive:true});const target=resolve(dir,action+'-tests.json');
+  const args=['node_modules/vitest/vitest.mjs','run',...files,'--maxWorkers=2','--reporter=json','--outputFile='+target];
+  if(selected)args.push('-t','^(?:'+selected.map(c=>Array.from(c.name,char=>'.+*?^$()[]{}|'.includes(char)||char.charCodeAt(0)===92?String.fromCharCode(92)+char:char).join('')).join('|')+')$');
+  child(process.execPath,args,{cwd:'server-version/'+action});
+  const report=JSON.parse(readFileSync(target));
+  if(selected){
+   assert.equal(report.success,true);assert.equal(report.numFailedTests,0);
+   const actual=report.testResults.flatMap(s=>s.assertionResults.filter(a=>a.status==='passed').map(a=>'server-version/frontend/src/'+s.name.split('/src/').at(-1)+'\n'+a.fullName));
+   assert.deepEqual(actual.sort(),selected.map(c=>c.file+'\n'+c.name).sort(),'Missing or repeated continuation assertions');
+   receipt('frontend-assertions',{passed:actual.length,reused:e.accepted.length,completeUnion:367,filtered:report.numPendingTests});
+  }else receipt(action+'-assertions',verifyReport(report,files));
  }else if(action==='upgrade')upgrade();else if(action==='restore')restore();else throw Error('Unknown Survey review action');
 }
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href)main().catch(e=>{console.error(e);process.exitCode=1});

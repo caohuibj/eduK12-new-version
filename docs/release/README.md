@@ -1418,3 +1418,17 @@ The first PR350 qualification run `40071391876` stopped during classification:
 the shallow merge checkout lacked the PR source object required for independent
 tree comparison. No application check or build executed. A PR350-only exact-source
 fetch supplies that object; identity/tree checks remain mandatory.
+
+Run `40071489539` retains 345 passed and 22 failed frontend assertions, plus
+actual successful integrated types/lint and application CodeQL. It did not reach
+backend integration or build. The continuation repairs the preview's deferred
+runner preparation and old editor/picker/paging test entry assumptions. Official
+report bytes, ZIP digest and exact run/job/source identities are verified. Passed
+cases are admitted only when their reviewed TypeScript-parsed relative import
+closure, complete test/fixtures, setup, locks and schema remain unchanged; changed
+or failed groups execute once. The original failed job remains failed. The 49
+local FINAL assertions retain their original product and separately reviewed
+unchanged import closure, rather than borrowing a changed full frontend tree.
+Successful original SAST is retained for unchanged inputs; only changed runtime,
+tests and qualification controls are scanned afresh, with unchanged actual
+CodeQL action versions/options. Missing stages still must actually succeed.

@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import {readFileSync} from 'node:fs';
 import {binding,branch,marker,surveyReviewPlan,surveyReviewOutputs} from './survey-review-scope.mjs';
-import {verifyLocal,verifyReport,verifyOriginal} from './survey-review-checks.mjs';
+import {verifyLocal,verifyReport,verifyOriginal,admittedCases} from './survey-review-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 function fixture(){
  const head='a'.repeat(40),source='b'.repeat(40),values={};
@@ -65,4 +65,9 @@ for(const [name,mutate]of [
 test('workflow isolates PR350, prepares backend types and executes migration protection without platform suites',()=>{
  const y=readFileSync('.github/workflows/ci.yml','utf8');const job=y.slice(y.indexOf('  survey-review:\n'),y.indexOf('  pr-light-backend:\n'));
  assert(job.includes("application_route == 'survey-review'"));assert(job.includes('survey-review-checks.mjs upgrade'));assert(job.includes('survey-review-checks.mjs restore'));assert(job.includes('prisma/build/index.js generate'));assert(!job.includes('npm test'));assert(!job.includes('npm run build'));assert.equal((job.match(/vite\/bin\/vite.js build/g)||[]).length,1);assert(!job.includes('miniprogram'));assert(y.includes('needs: [scope, survey-review,'));
+});
+
+test('official continuation requires every accepted dependency and retains the complete disjoint union',()=>{
+ const e=JSON.parse(readFileSync('.github/evidence/survey-review/continuation.json'));const r=admittedCases(e);assert.equal(r.accepted+r.missing,367);assert.equal(r.originalFailed,22);
+ assert.throws(()=>admittedCases(e,()=> '0'.repeat(40)));const tampered=structuredClone(e);tampered.missing.push(tampered.accepted[0]);assert.throws(()=>admittedCases(tampered));
 });
