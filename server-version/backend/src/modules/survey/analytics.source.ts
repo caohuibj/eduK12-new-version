@@ -1,3 +1,5 @@
+import { situationalResponseHistoryIdentities } from '../situational/situation-research-capture'
+import { deriveAuthoritativeSituationalTrajectory } from '../situational/situation-trajectory'
 import { SURVEY_NATIVE_SJT_PROTOCOL,SurveySituationalProtocolError } from './situational-native.contract'
 import { frozenSurveyNativeSituationalRuntime } from './situational-native.definition'
 import { loadSurveySituationalResults } from './situational-native.results'
@@ -26,7 +28,9 @@ import { isResearchFreeTextType } from './analytics.response-privacy'
 import {validateSurveyScaleTimings,SurveyScaleTimingError,
   type SurveyScaleItemTimingV1} from './timing.definition'
 
+const nativeMissingMeanings={NOT_SHOWN:'根据冻结科学路径未呈现',SHOWN_MISSING:'已核实呈现但未作答',EXPOSURE_UNVERIFIED:'正式原件未能核实该题呈现，不能推断未呈现或漏答',REFUSED:'明确选择不回答',UNABLE_TO_JUDGE:'明确表示无法判断，不作为零分'} as const
 export interface ResearchRawCodebook {
+  missingMeanings?:Readonly<Partial<Record<MissingReason,string>>>
   /** Author-only metadata; raw export remains under existing owner/MFA scope. */
   purpose?: 'CONTENT' | 'ATTENTION_CHECK' | 'SOCIAL_DESIRABILITY'
   attentionTarget?: string
@@ -855,6 +859,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
             ...(variantConfiguration?{variantConfiguration}:{}),
             ...frozenSourceMetadata(frozen),
             instrumentKey:frozen.instrumentKey,itemKey:item.itemKey,kind:frozen.kind,
+            ...(frozen.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL?{missingMeanings:nativeMissingMeanings}:{}),
             responseType:item.responseType,title:frozen.title,prompt:item.prompt,options:item.options.map(option=>({...option})),
             definitionDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,
             publicationVersion:publication.version,instrumentRevision:frozen.draftRevision,
@@ -1012,6 +1017,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
         }:{}
         for(let i=0;i<snapshot.units.length;i++){
           const frozen=snapshot.units[i];let unit=result.units[i]
+          const nativeMissing=new Map<string,MissingReason>()
           if(!unit||unit.instrumentKey!==frozen.instrumentKey||unit.kind!==frozen.kind
             ||unit.sourceDigest!==frozen.sourceDigest||unit.scoringDigest!==frozen.scoringDigest)
             invalid('研究 FINAL 组件来源与冻结定义不一致')
@@ -1022,8 +1028,30 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
             if(input.selectRaw!==false){
               if(!child.raw)invalid('研究情境化正式原件缺失')
               const raw=child.raw!
-              unit={...unit,rawAnswers:{...Object.fromEntries(raw.responses.map(response=>[
-                response.sceneKey+':'+response.channelKey,response.responseValue])),__native_raw:JSON.stringify(raw)}}
+              const {snapshot:nativeSnapshot}=frozenSurveyNativeSituationalRuntime(frozen)
+              const reached=new Set(deriveAuthoritativeSituationalTrajectory(nativeSnapshot.definition,raw.responses).sceneKeys)
+              const values=new Map(raw.responses.map(response=>[response.sceneKey+':'+response.channelKey,response.responseValue]))
+              // Projection only: never rewrite accepted child facts or count an
+              // unadministered branch as a missing participant response/zero.
+              const histories=situationalResponseHistoryIdentities(nativeSnapshot.definition,raw.responses)
+              for(const scene of nativeSnapshot.definition.scenes)for(const channel of scene.channels){
+                const itemKey=scene.sceneKey+':'+channel.channelKey
+                if(!reached.has(scene.sceneKey)){nativeMissing.set(itemKey,'NOT_SHOWN');continue}
+                if(!values.has(itemKey)){
+                  const node=nativeSnapshot.definition.schemaVersion===2?nativeSnapshot.definition.flow.nodes.find(n=>n.nodeType==='SCENE'&&n.sceneKey===scene.sceneKey):undefined
+                  const stage=node?.nodeType==='SCENE'?node.responseStages?.find(stage=>stage.channelKeys.includes(channel.channelKey)):undefined
+                  const exposureVerified=!stage||stage.kind==='CHOICE'||raw.researchCapture?.events.some(event=>event.type==='PROBE_EXPOSED'&&event.nodeKey===node?.nodeKey&&event.stageKey===stage.stageKey&&event.historyIdentity===histories.get(scene.sceneKey))
+                  nativeMissing.set(itemKey,exposureVerified?'SHOWN_MISSING':'EXPOSURE_UNVERIFIED');continue
+                }
+                const reason=channel.responseType==='SINGLE_CHOICE'
+                  ?channel.options.find(option=>option.optionKey===values.get(itemKey))?.nonanswerReason:undefined
+                if(reason==='DECLINED'||reason==='UNABLE_TO_JUDGE')
+                  nativeMissing.set(itemKey,reason==='DECLINED'?'REFUSED':'UNABLE_TO_JUDGE')
+              }
+              // Combined UNAVAILABLE_OR_DECLINED is an explicit selection, not
+              // an unanswered item. Keep its exact option/codebook meaning;
+              // scientific score missingness remains the shared scorer's fact.
+              unit={...unit,rawAnswers:{...Object.fromEntries(values),__native_raw:JSON.stringify(raw)}}
             }
           }
           if(frozen.kind==='COGNITIVE'&&(Object.keys(unit.rawAnswers).length
@@ -1056,7 +1084,8 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
           if(input.selectRaw!==false&&(!input.selectRaw||
             frozen.instrumentKey===input.selectRaw.instrumentKey)){
             const items=rawSchemaFor(snapshot,wave.ordinal).itemsByUnit.get(frozen)!
-            for(const {item:r,value,missingReason,scorerOptionKey} of projectRawItems(items,unit,input.selectRaw?input.selectRaw.itemKey:undefined)){
+            for(const {item:r,value,missingReason:baseMissingReason,scorerOptionKey} of projectRawItems(items,unit,input.selectRaw?input.selectRaw.itemKey:undefined)){
+            const missingReason=nativeMissing.get(r.itemKey)??baseMissingReason
             const columnKey=columnKeyFor(snapshot,wave.ordinal,frozen,r.itemKey)
             if(raw.length>=25000)
               throw new SurveyAnalyticsError(413,'逐题投影超过 25000 行上限，请缩小波次范围')
@@ -1076,6 +1105,7 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
                 ...frozenSourceMetadata(frozen),
                 instrumentKey:frozen.instrumentKey,itemKey:r.itemKey,kind:frozen.kind,
                 responseType:r.responseType,
+                ...(frozen.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL?{missingMeanings:nativeMissingMeanings}:{}),
                 title:frozen.title,prompt:r.prompt,options:r.options.map(option=>({...option})),
                 definitionDigest:frozen.sourceDigest,scoringDigest:frozen.scoringDigest,
                 publicationVersion:publication.version,

@@ -38,7 +38,7 @@ export interface BoundedResearchExport {
   codebook:ResearchExportCodebookRow[]
   manifest:ResearchExportManifest
 }
-const missingMeanings:Record<Exclude<MissingReason,'UNABLE_TO_JUDGE'>,string>={
+const missingMeanings:Record<Exclude<MissingReason,'UNABLE_TO_JUDGE'|'EXPOSURE_UNVERIFIED'>,string>={
   NOT_SHOWN:'根据冻结显示条件未呈现',
   SHOWN_MISSING:'呈现但未作答',
   REFUSED:'明确选择不回答',

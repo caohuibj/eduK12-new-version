@@ -1,3 +1,4 @@
+import {sjtNativeBranchTemplate,createSjtNativeBranchFinalFixture,createSjtNativeBranchInvalidFinalFixtures} from '../fixtures/sjt-native-branch.fixture'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
 import { decryptUnifiedRuntimePayload } from '../../modules/assessment-runtime/security'
 import { parseFrozenSituationalRuntimeSnapshot } from '../../modules/assessment-runtime/situational-runtime-snapshot'
@@ -28,7 +29,7 @@ const url=integrationDatabaseUrl('SURVEY_NATIVE_SJT_TEST_DATABASE_URL')
 const suite=url?describe:describe.skip
 suite('Survey native staged actual author release and shared scientific lifecycle',()=>{
   let db:PrismaClient,admin:string,author:string,owner:string,projectId:string,publicId:string,grantId:string,draftId:string,ordinal=0
-  let compiled:ReturnType<typeof compileSjtNativeStagedFixture>
+  let compiled:ReturnType<typeof compileSjtNativeStagedFixture>,branchCompiled:ReturnType<typeof compileSjtNativeStagedFixture>,branchDraftId:string
   const runStarted=new Date()
   const oldFlags={workspace:process.env.SURVEY_WORKSPACE_ENABLED,publication:process.env.SURVEY_PUBLICATION_ENABLED}
   beforeAll(async()=>{
@@ -57,18 +58,26 @@ suite('Survey native staged actual author release and shared scientific lifecycl
     await db.surveyProject.create({data:{id:projectId,publicId,ownerUserId:owner,title:'Synthetic staged SJT',status:'ACTIVE',collectionMode:'SINGLE_UNLINKED'}})
     const imported=await importCatalogDraft(owner,projectId,grantId,{requestId:randomUUID(),instrumentKey:'staged',title:'Synthetic staged tool'})
     draftId=imported.id
+    const branchTemplate={...structuredClone(sjtNativeBranchTemplate),instrumentKey:'synthetic-branch-'+randomUUID()}
+    branchCompiled=compileSjtTemplate(branchTemplate) as ReturnType<typeof compileSjtNativeStagedFixture>
+    const branchDraft=await createSjtDraft({userId:author,admin:false},branchTemplate,{authorizationPolicy:null})
+    await requestSjtReview({userId:author,admin:false},branchDraft.id,branchDraft.revision,branchDraft.contentDigest)
+    await reviewSjtDraft({userId:admin,admin:true},branchDraft.id,branchDraft.revision,branchDraft.contentDigest,true,'Synthetic authored branching coverage')
+    const branchRelease=await db.sjtAuthorRelease.findFirstOrThrow({where:{instrumentKey:branchTemplate.instrumentKey}})
+    const branchGrant=await grantCatalogSource(admin,owner,{kind:'SJT',sourceId:branchRelease.id,sourceVersion:branchTemplate.instrumentVersion})
+    branchDraftId=(await importCatalogDraft(owner,projectId,branchGrant.id,{requestId:randomUUID(),instrumentKey:'branch',title:'Synthetic branch tool'})).id
   })
   afterAll(async()=>{
     if(oldFlags.workspace===undefined)delete process.env.SURVEY_WORKSPACE_ENABLED;else process.env.SURVEY_WORKSPACE_ENABLED=oldFlags.workspace
     if(oldFlags.publication===undefined)delete process.env.SURVEY_PUBLICATION_ENABLED;else process.env.SURVEY_PUBLICATION_ENABLED=oldFlags.publication
     await db?.$disconnect();vi.unstubAllEnvs()
   })
-  async function fixture(){
+  async function fixture(selectedDraftId=draftId){
     const waveId=randomUUID()
-    await db.surveyWave.create({data:{id:waveId,projectId,ordinal:++ordinal,title:'Synthetic wave',instrumentIds:[draftId],
+    await db.surveyWave.create({data:{id:waveId,projectId,ordinal:++ordinal,title:'Synthetic wave',instrumentIds:[selectedDraftId],
       consentText:'Synthetic research participation consent; no real human information is collected in this test.'}})
     const published=await freezeResearchWaveDraft({actorUserId:owner,projectId,waveId,revision:0,
-      participantFeedback:[{instrumentId:draftId,feedback:{policyVersion:'SURVEY_RAW_METRICS_V1',mode:'DESCRIPTIVE',metricKeys:['coordination'],release:'AFTER_FINAL'}}]})
+      participantFeedback:[{instrumentId:selectedDraftId,feedback:{policyVersion:'SURVEY_RAW_METRICS_V1',mode:'DESCRIPTIVE',metricKeys:['coordination'],release:'AFTER_FINAL'}}]})
     await db.surveyWave.update({where:{id:waveId},data:{status:'OPEN',opensAt:new Date(Date.now()-60000),
       closesAt:new Date(Date.now()+3600000),finishUntil:new Date(Date.now()+7200000)}})
     const accessCredential=randomBytes(32).toString('base64url'),attemptId=randomUUID()
@@ -105,6 +114,48 @@ suite('Survey native staged actual author release and shared scientific lifecycl
     const raw=source.raw.find(row=>row.itemKey==='__native_raw')!
     expect(JSON.parse(raw.value as string).researchCapture.events.length).toBeGreaterThan(0)
     expect((await readSurveySituational(f.proof,'staged',child.attempt.id)).receipt).toEqual(results[0].receipt)
+  })
+  it.each(['path-A-A','path-A-B','path-B-A','path-B-B','path-U','optional-probes-skipped','optional-probes-unverified'])('shares actual branch %s facts, replay, score and report without unreachable answers',async caseName=>{
+    const f=await fixture(branchDraftId),child=await startSurveySituational(f.proof,'branch')
+    const goldenCase=caseName==='optional-probes-unverified'?'optional-probes-skipped':caseName
+    const fixtureInput=createSjtNativeBranchFinalFixture(child.attempt.id,goldenCase,branchCompiled)
+    if(caseName==='optional-probes-unverified')fixtureInput.finalInput.researchCapture!.events=fixtureInput.finalInput.researchCapture!.events.filter(event=>event.type!=='PROBE_EXPOSED')
+    const payload=situationalLegacyFinalSubmitSchema.parse({...fixtureInput.finalInput,submissionId:randomUUID()})
+    const accepted=await submitSurveySituationalFinal(f.proof,'branch',child.attempt.id,payload)
+    expect((await submitSurveySituationalFinal(f.proof,'branch',child.attempt.id,payload)).receipt).toEqual(accepted.receipt)
+    expect(await db.situationalRawSubmission.count({where:{attemptId:child.attempt.id}})).toBe(1)
+    const training=await startSituationalAttempt(author,{instrumentKey:branchCompiled.package.key,instrumentVersion:branchCompiled.package.instrumentVersion})
+    const trainingInput=createSjtNativeBranchFinalFixture(training.attempt.id,goldenCase,branchCompiled)
+    if(caseName==='optional-probes-unverified')trainingInput.finalInput.researchCapture!.events=trainingInput.finalInput.researchCapture!.events.filter(event=>event.type!=='PROBE_EXPOSED')
+    const trainingResult=await submitSituationalAttemptFinal({attemptId:training.attempt.id,userId:author,...trainingInput.finalInput,submissionId:randomUUID()})
+    await submitResearchFinal({...f.proof,submissionId:randomUUID(),answers:{branch:{}},situationalReferences:[accepted.receipt!]})
+    const report=await readGeneralForOwnAttempt(f.proof)
+    expect(report.kind).toBe(fixtureInput.expected.quality==='invalid'?'GENERAL_ONLY':'DESCRIPTIVE')
+    const source=await loadSurveySource({actorUserId:owner,projectId,waveIds:[f.waveId],includeAttendance:false})
+    expect(source.scores[0].value).toBe(fixtureInput.expected.metrics!.coordination)
+    expect(source.scores[0].value).toBe(trainingResult.result!.metrics.find(metric=>metric.key==='coordination')!.value)
+    const raw=JSON.parse(source.raw.find(row=>row.itemKey==='__native_raw')!.value as string)
+    expect(raw.responses).toEqual(fixtureInput.responses)
+    const reached=new Set(fixtureInput.trajectory.sceneKeys)
+    for(const row of source.raw.filter(row=>row.itemKey!=='__native_raw')){
+      if(!reached.has(row.itemKey.split(':')[0]))expect(row).toMatchObject({value:null,missingReason:'NOT_SHOWN'})
+    }
+    if(caseName==='path-U')expect(source.raw.find(row=>row.itemKey.endsWith(':PLAN_CHOICE'))).toMatchObject({value:'U',missingReason:'REFUSED'})
+    if(caseName==='optional-probes-unverified'){
+      expect(source.raw.filter(row=>reached.has(row.itemKey.split(':')[0])&&row.itemKey.endsWith('_PROBE')).every(row=>row.value===null&&row.missingReason==='EXPOSURE_UNVERIFIED')).toBe(true)
+      expect(source.codebook.find(row=>row.itemKey.endsWith('_PROBE'))?.missingMeanings?.EXPOSURE_UNVERIFIED).toContain('未能核实')
+    }
+    if(caseName==='optional-probes-skipped')expect(source.raw.filter(row=>reached.has(row.itemKey.split(':')[0])&&row.itemKey.endsWith('_PROBE')).every(row=>row.value===null&&row.missingReason==='SHOWN_MISSING')).toBe(true)
+  })
+  it('rejects mixed-branch answers and missing exposure evidence atomically without a child receipt',async()=>{
+    const f=await fixture(branchDraftId),child=await startSurveySituational(f.proof,'branch')
+    const bad=createSjtNativeBranchInvalidFinalFixtures(child.attempt.id,branchCompiled)
+    for(const submission of [bad.offPath,bad.missingProbeExposure]){
+      await expect(submitSurveySituationalFinal(f.proof,'branch',child.attempt.id,
+        situationalLegacyFinalSubmitSchema.parse({...submission,submissionId:randomUUID()}))).rejects.toThrow()
+      expect(await db.situationalRawSubmission.count({where:{attemptId:child.attempt.id}})).toBe(0)
+      expect((await readSurveySituational(f.proof,'branch',child.attempt.id)).receipt).toBeUndefined()
+    }
   })
   it.skipIf(process.env.SURVEY_NATIVE_SJT_REQUIRE_PREUPGRADE!=='true')('preserves previously accepted frozen payload hashes and scientific results after dependency upgrade',async()=>{
     // Explicit evidence cutoff, not merely before this test: later Zod4 runs

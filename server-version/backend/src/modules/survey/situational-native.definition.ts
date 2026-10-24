@@ -26,7 +26,7 @@ export const frozenSurveyNativeSituationalHeaderSchema=surveyNativeSituationalHe
 export type FrozenSurveyNativeSituationalHeader=z.infer<typeof frozenSurveyNativeSituationalHeaderSchema>
 const fail=():never=>{throw new SurveySituationalProtocolError('SURVEY_SJT_NATIVE_STAGED_PROTOCOL_INVALID')}
 
-/** Initial native vertical slice: actual upload V2 staged, linear paths, no
+/** Initial native vertical slice: actual upload V2 staged, shared DAG traversal, no
  * experiment allocation or stimulus variants. Unsupported science stays closed. */
 export function assertSurveyStagedSituationalDefinition(definition:SituationRuntimeDefinition):void {
   if(definition.schemaVersion!==2||definition.researchAssignment)fail()
@@ -35,7 +35,6 @@ export function assertSurveyStagedSituationalDefinition(definition:SituationRunt
   for(const node of d.flow.nodes){
     if(node.nodeType==='TERMINAL')continue
     if(node.stimulusVariants?.length)fail()
-    if(node.transition.type==='DECISION'&&new Set(node.transition.branches.map(branch=>branch.nextNodeKey)).size!==1)fail()
     if(node.responseStages?.length)staged=true
   }
   if(!staged||d.scenes.some(scene=>scene.stimulus.type!=='TEXT_V1'))fail()

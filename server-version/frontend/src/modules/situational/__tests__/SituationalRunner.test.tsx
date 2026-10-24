@@ -706,3 +706,53 @@ describe('Training SJT page confirmation and choice focus', () => {
   })
 
 })
+
+// Same renderer and stage journal for Training and Survey host adapters. The
+// synthetic API exercises UI protocol only, not backend authorization.
+describe('shared staged branch runner across hosts',()=>{
+  it.each([['training','A','left'],['training','B','right'],['survey','A','left'],['survey','B','right']] as const)('%s host follows %s / %s and sends only its stage evidence',async(host,choice,selected)=>{
+    await finalDraftStore.delete('situational:ui-attempt')
+    const source=stagedStartData()
+    if(source.instrument.definition.schemaVersion!==2)throw new Error('fixture')
+    const d=source.instrument.definition,root=d.flow.nodes[0]!
+    if(root.nodeType!=='SCENE')throw new Error('fixture')
+    d.scenes[0]!.channels=[d.scenes[0]!.channels[0]!]
+    root.responseStages=[{stageKey:'choice',kind:'CHOICE',channelKeys:['choice']}]
+    root.transition={type:'DECISION',channelKey:'choice',branches:[{optionKey:'A',nextNodeKey:'left'},{optionKey:'B',nextNodeKey:'right'}]}
+    for(const [index,key] of ['left','right'].entries()){
+      d.scenes.push({sceneKey:key,title:key,sortOrder:index+1,stimulus:{type:'TEXT_V1',text:key+' branch only'},
+        channels:[{channelKey:'choice',responseType:'SINGLE_CHOICE',prompt:key+' action',options:[{optionKey:'A',label:key+' option'}]}]})
+      d.flow.nodes.splice(d.flow.nodes.length-1,0,{nodeType:'SCENE',nodeKey:key,sceneKey:key,motherSceneKey:key,roundKey:'R',stepKey:key,
+        responseStages:[{stageKey:'choice',kind:'CHOICE',channelKeys:['choice']}],transition:{type:'NEXT',nextNodeKey:'terminal'}})
+    }
+    const submit=vi.fn().mockResolvedValue({code:0,message:'ok',data:completedData(source)}),onCompleted=vi.fn()
+    if(host==='survey'){
+      const client={start:vi.fn(),resume:vi.fn().mockResolvedValue({code:0,message:'ok',data:source}),submit,
+        result:vi.fn(),loadAsset:vi.fn(),loadVideoSources:vi.fn()}
+      render(<MemoryRouter><SituationalRunner host={{attemptId:'ui-attempt',parentAttemptId:'survey-parent',compositeItemId:'native',client,onCompleted}}/></MemoryRouter>)
+    }else{
+      vi.mocked(situationalApi.start).mockResolvedValue({code:0,message:'ok',data:source})
+      vi.mocked(situationalApi.submit).mockImplementation(submit)
+      renderRunner()
+    }
+    fireEvent.click(await screen.findByLabelText('选择 '+choice))
+    await waitFor(()=>expect(screen.getByLabelText('选择 '+choice)).toBeChecked())
+    fireEvent.click(screen.getByRole('button',{name:'确认行动选择'}))
+    await waitFor(()=>expect(screen.getByRole('button',{name:'下一题'})).toBeEnabled())
+    fireEvent.click(screen.getByRole('button',{name:'下一题'}))
+    expect(await screen.findByText(selected+' branch only')).toBeInTheDocument()
+    expect(screen.queryByText((selected==='left'?'right':'left')+' branch only')).toBeNull()
+    fireEvent.click(screen.getByLabelText(selected+' option'))
+    await waitFor(()=>expect(screen.getByLabelText(selected+' option')).toBeChecked())
+    fireEvent.click(screen.getByRole('button',{name:'确认行动选择'}))
+    await waitFor(()=>expect(screen.getByRole('button',{name:'提交测评'})).toBeEnabled())
+    fireEvent.click(screen.getByRole('button',{name:'提交测评'}))
+    await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1))
+    const payload=submit.mock.calls[0]![1]
+    expect(payload.responses.map((response:{sceneKey:string})=>response.sceneKey)).toEqual(['S1',selected])
+    const events=payload.researchCapture.events as SituationalResearchEvent[]
+    expect(events.filter(event=>event.type==='NODE_CONFIRMED').map(event=>event.nodeKey)).toEqual(['node',selected])
+    expect(events.some(event=>event.nodeKey===(selected==='left'?'right':'left'))).toBe(false)
+    if(host==='survey')await waitFor(()=>expect(onCompleted).toHaveBeenCalledTimes(1))
+  })
+})
