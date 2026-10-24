@@ -384,7 +384,8 @@ export const assignmentController = {
           id: true,
           courseId: true,
           tags: true,
-          _count: { select: { submissions: true } },
+          // Learners never receive roster counts; avoid aggregating every submission.
+          _count: userRole !== UserRole.STUDENT ? { select: { submissions: true } } : false,
           title: true,
           description: true,
           content: true,
