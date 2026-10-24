@@ -11,6 +11,7 @@ import { startSurveySituational,readSurveySituational,submitSurveySituationalFin
 export const surveySituationalRouter=Router({mergeParams:true})
 const id=z.string().guid(),slot=z.string().regex(/^[a-z][a-z0-9_-]{0,79}$/)
 const proof=z.object({accessCredential:z.string().regex(/^[A-Za-z0-9_-]{43}$/),researchCode:z.string().regex(/^R-[A-Z0-9]{8,32}$/).optional()}).strict()
+const start=proof.extend({priorAnswers:z.record(z.string(),z.unknown()).optional()}).strict()
 const final=proof.extend({submission:situationalLegacyFinalSubmitSchema}).strict()
 const identity=(req:Request,body:z.infer<typeof proof>)=>({publicId:id.parse(req.params.publicId),
   attemptId:id.parse(req.params.attemptId),accessCredential:body.accessCredential,researchCode:body.researchCode})
@@ -24,7 +25,7 @@ const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Res
   }
 }
 surveySituationalRouter.post('/:slotKey/start',handle(req=>{
-  const body=proof.parse(req.body);return startSurveySituational(identity(req,body),slot.parse(req.params.slotKey))
+  const body=start.parse(req.body);return startSurveySituational(identity(req,body),slot.parse(req.params.slotKey),body.priorAnswers)
 }))
 surveySituationalRouter.post('/:slotKey/:childId/read',handle(req=>{
   const body=proof.parse(req.body);return readSurveySituational(identity(req,body),slot.parse(req.params.slotKey),id.parse(req.params.childId))

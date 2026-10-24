@@ -118,7 +118,7 @@ export async function getOwnResearchTask(input:{
       orderPolicy:'FIXED',scenes}
 
   })
-  const cognitiveProgress=own.status==='STARTED'&&selected.units.some(unit=>unit.kind==='COGNITIVE')
+  const cognitiveProgress=own.status==='STARTED'&&selected.units.some(unit=>unit.kind==='COGNITIVE'||unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)
     ?await readSurveyCognitiveProgressFromVerifiedAttempt(input,own):null
   return {attemptId:own.attemptId,waveId:own.waveId,status:own.status,
     ...(cognitiveProgress??{}),

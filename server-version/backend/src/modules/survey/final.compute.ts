@@ -208,7 +208,9 @@ function computeSurveyFinalFromSnapshot(snapshot:ResearchFrozenPublication,input
      snapshot.runtimeStatus!=='SURVEY_FINAL_V1'||!snapshot.units.length)
     invalid('publication','尚未提供可执行的 Survey 专用冻结定义')
   if(snapshot.flow){
-    if(snapshot.units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL))invalid('publication','原生情境化试点不支持研究级条件流程')
+    if(snapshot.units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)
+      &&(snapshot.flow.experiment||snapshot.flow.blocks.some(block=>block.kind==='END')))
+      invalid('publication','原生情境化父流程尚不支持实验分配或提前终止')
     if(!assignment)invalid('flow.assignment','冻结流程缺少已持久化的实验分配')
     let result
     try{
@@ -220,7 +222,7 @@ function computeSurveyFinalFromSnapshot(snapshot:ResearchFrozenPublication,input
             if(unit.kind==='FORM')return formResult(unit,raw)
             if(unit.kind==='SCALE')return scaleResult(unit,raw)
             if(unit.kind==='COGNITIVE')return cognitiveResult(unit,raw)
-            return sjtResult(unit,raw)
+            return unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL?nativeSituationalResult(unit,raw):sjtResult(unit,raw)
           }catch(e){
             if(e instanceof SurveyFinalValidationError&&e.path.startsWith('answers.'))
               invalid('answers.'+unit.instrumentKey+'.'+e.path.slice(8),e.message)

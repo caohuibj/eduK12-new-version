@@ -3,19 +3,25 @@ import type { SituationalRunnerClient } from '../modules/situational/api'
 import type { SituationalAttemptResponse } from '../modules/situational/types'
 import { isSurveySituationalReference,type SurveySituationalReference } from './survey-situational-api'
 const Runner=lazy(()=>import('../modules/situational/pages/SituationalRunner'))
-type Response=SituationalAttemptResponse&{receipt?:SurveySituationalReference}
+type PriorAnswers=Record<string,Record<string,unknown>>
+type Response=SituationalAttemptResponse&{receipt?:SurveySituationalReference;lockedPriorAnswers?:PriorAnswers}
 export function SurveySituationalUnit(props:{publicId:string;attemptId:string;slotKey:string;title:string;
-  accessCredential:string;researchCode?:string;onStarted?:(id:string)=>void;onCommitted:(receipt:SurveySituationalReference)=>void}){
+  accessCredential:string;researchCode?:string;priorAnswers?:PriorAnswers;
+  onStarted?:(id:string,lockedPriorAnswers?:PriorAnswers)=>void;onCommitted:(receipt:SurveySituationalReference)=>void}){
   const [child,setChild]=useState<string|null>(null),[done,setDone]=useState(false),[error,setError]=useState(''),[retry,setRetry]=useState(0)
   const generation=useRef(0)
   const onStarted=useRef(props.onStarted);onStarted.current=props.onStarted
   const onCommitted=useRef(props.onCommitted);onCommitted.current=props.onCommitted
+  // Parent renders must not restart the shared runner when its answer object is rebuilt.
+  const priorAnswers=useRef(props.priorAnswers);priorAnswers.current=props.priorAnswers
   const base=`/api/public/survey/r/${encodeURIComponent(props.publicId)}/attempts/${encodeURIComponent(props.attemptId)}/situational/${encodeURIComponent(props.slotKey)}`
   const client=useMemo(()=>{
     const proof={accessCredential:props.accessCredential,...(props.researchCode?{researchCode:props.researchCode}:{})}
     const call=async(path:string,submission?:unknown)=>{
       const response=await fetch(base+path,{method:'POST',credentials:'omit',cache:'no-store',
-        headers:{'Content-Type':'application/json'},body:JSON.stringify({...proof,...(submission?{submission}:{})})})
+        headers:{'Content-Type':'application/json'},body:JSON.stringify({...proof,
+          ...(path==='/start'&&priorAnswers.current!==undefined?{priorAnswers:priorAnswers.current}:{}),
+          ...(submission?{submission}:{})})})
       const body=await response.json() as {code:number;message:string;data:Response}
       if(!response.ok||body.code!==0||!body.data)throw Object.assign(new Error(body.message||'情境化任务访问失败'),{status:response.status})
       return body
@@ -37,7 +43,7 @@ export function SurveySituationalUnit(props:{publicId:string;attemptId:string;sl
     const epoch=++generation.current;let active=true;setChild(null);setDone(false);setError('')
     void client.call('/start').then(({data})=>{
       if(!active)return
-      onStarted.current?.(data.attempt.id)
+      onStarted.current?.(data.attempt.id,data.lockedPriorAnswers)
       if(isSurveySituationalReference(data.receipt)){onCommitted.current(data.receipt);setDone(true)}
       else setChild(data.attempt.id)
     }).catch(e=>{if(active)setError(e instanceof Error?e.message:'情境化任务访问失败')})

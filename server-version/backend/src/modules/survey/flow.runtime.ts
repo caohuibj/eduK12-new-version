@@ -1,3 +1,5 @@
+import {SURVEY_NATIVE_SJT_PROTOCOL} from './situational-native.contract'
+import {frozenSurveyNativeSituationalRuntime} from './situational-native.definition'
 import { assignedMaterial } from '../assessment-core/materials/definition'
 import { surveySjtQuestions } from './sjt-structure'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -32,7 +34,7 @@ export type FlowPlanResult={
   units:FrozenUnitResult[]
   presentation:FlowPresentationBlock[]
 }
-const missingUnit=(unit:ResearchFrozenUnit):FrozenUnitResult=>{
+export const missingSurveyFlowUnit=(unit:ResearchFrozenUnit):FrozenUnitResult=>{
   const missing:MissingItem[]=[]
   if(unit.kind==='FORM'){
     const d=unit.displayDefinition as import('./builder.definition').FormDraft
@@ -45,6 +47,10 @@ const missingUnit=(unit:ResearchFrozenUnit):FrozenUnitResult=>{
   }else if(unit.kind==='SCALE'){
     const d=unit.displayDefinition as import('./builder.definition').ScaleDraft
     for(const q of d.items)missing.push({itemKey:q.itemKey,reason:'NOT_SHOWN'})
+  }else if(unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL){
+    const {snapshot}=frozenSurveyNativeSituationalRuntime(unit)
+    for(const scene of snapshot.definition.scenes)for(const channel of scene.channels)
+      missing.push({itemKey:scene.sceneKey+':'+channel.channelKey,reason:'NOT_SHOWN'})
   }else if(unit.kind==='SJT'){
     const d=unit.displayDefinition as import('./builder.definition').AnySjtDraft
     for(const q of surveySjtQuestions(d))missing.push({itemKey:q.questionKey,reason:'NOT_SHOWN'})
@@ -118,7 +124,7 @@ export function executeSurveyFlow(input:{
     ||shown.some((name,i)=>input.clientObservedBlocks[i]!==name)
     ||new Set(input.clientObservedBlocks).size!==shown.length)
     fail('presentation','浏览器确认的展示路径与权威研究路径不匹配，请复核问卷后提交')
-  const ordered=input.snapshot.units.map(u=>results.get(u.instrumentKey)??missingUnit(u))
+  const ordered=input.snapshot.units.map(u=>results.get(u.instrumentKey)??missingSurveyFlowUnit(u))
   const trace:SurveyExecutionTrace={
     schemaVersion:1,flowDigest:flow.flowDigest,
     assignmentDigest:canonicalHash(input.assignment),algorithm:input.assignment.algorithm,

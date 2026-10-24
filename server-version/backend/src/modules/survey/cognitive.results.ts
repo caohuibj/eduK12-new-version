@@ -1,3 +1,4 @@
+import {readSurveyTaskLockedAnswers,assertSurveyTaskLockedAnswers} from './task-answer-locks'
 import { Prisma,type SurveyCognitiveResult } from '@prisma/client'
 import { z } from 'zod'
 import { canonicalHash } from '../assessment-runtime/canonical'
@@ -174,37 +175,12 @@ export async function loadSurveyCognitiveResults(tx:Prisma.TransactionClient,inp
 }
 /** Caller has authenticated this attempt and holds its lock. Recover only original answer locks. */
 export async function readSurveyCognitiveLockedAnswers(tx:Prisma.TransactionClient,input:Scope){
-  const rows=await tx.surveyCognitiveSession.findMany({where:{...input,epoch:1},
-    select:{lockedAnswersCipher:true,lockedAnswersHash:true}})
-  const lockedPriorAnswers:Record<string,unknown>={}
-  for(const row of rows){
-    let locked:Record<string,unknown>
-    try{locked=decryptUnifiedRuntimePayload<Record<string,unknown>>(row.lockedAnswersCipher)}
-    catch{return cognitiveFail(409,'认知前置答案锁校验失败')}
-    if(!locked||typeof locked!=='object'||Array.isArray(locked)||canonicalHash(locked)!==row.lockedAnswersHash)
-      cognitiveFail(409,'认知前置答案锁校验失败')
-    for(const [key,value] of Object.entries(locked)){
-      if(Object.prototype.hasOwnProperty.call(lockedPriorAnswers,key)
-        &&canonicalHash(lockedPriorAnswers[key])!==canonicalHash(value))
-        cognitiveFail(409,'认知前置答案锁来源不一致')
-      lockedPriorAnswers[key]=value
-    }
-  }
-  return lockedPriorAnswers
+  return readSurveyTaskLockedAnswers(tx,input,cognitiveFail)
 }
-/** Caller holds the parent Attempt lock so a new start cannot race an answer change. */
+/** Compatibility exports: both scientific child kinds share one host lock codec. */
 export async function assertSurveyCognitiveLockedAnswers(tx:Prisma.TransactionClient,attemptId:string,
   answers:Record<string,unknown>):Promise<void>{
-  const sessions=await tx.surveyCognitiveSession.findMany({where:{attemptId,epoch:1},
-    select:{lockedAnswersCipher:true,lockedAnswersHash:true}})
-  for(const session of sessions){
-    const locked=decryptUnifiedRuntimePayload<Record<string,unknown>>(session.lockedAnswersCipher)
-    if(canonicalHash(locked)!==session.lockedAnswersHash)cognitiveFail(409,'认知前置答案锁校验失败')
-    for(const [key,value] of Object.entries(locked)){
-      if(!Object.prototype.hasOwnProperty.call(answers,key)||canonicalHash(answers[key])!==canonicalHash(value))
-        cognitiveFail(409,'进入认知任务后不能修改影响测量路径的前置答案')
-    }
-  }
+  return assertSurveyTaskLockedAnswers(tx,attemptId,answers,cognitiveFail)
 }
 export async function listSurveyCognitiveSessions(tx:Prisma.TransactionClient,attemptId:string){
   const sessions=await tx.surveyCognitiveSession.findMany({where:{attemptId},orderBy:{epoch:'desc'},

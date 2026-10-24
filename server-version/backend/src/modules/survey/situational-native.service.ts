@@ -1,3 +1,7 @@
+import {freezeSurveyTaskPrefix} from './task-prefix'
+import {readSurveyTaskLockedAnswers} from './task-answer-locks'
+import {encryptUnifiedRuntimePayload} from '../assessment-runtime/security'
+import {ensureSurveyFlowAssignment} from './flow.assignment'
 import {assertSurveyPriorCognitiveCompleted,SurveyCognitiveError} from './cognitive.results'
 import { situationalImageAssetReferences } from '../situational/situation-definition'
 import { ASSESSMENT_FROZEN_RUNTIME_REFERENCE_TYPE,ASSESSMENT_FROZEN_RUNTIME_MEDIA_FIELD } from '../assessment-media/assessment-asset'
@@ -33,7 +37,8 @@ async function access(tx:Tx,proof:SurveyTaskProof,known:VerifiedSurveyTask,slotK
     {kind:'SITUATIONAL',allowCompleted,fail})
   // Parent conditional reachability/experimental allocation is a separate
   // protocol. Do not mistake a staged tool's native flow for parent Survey flow.
-  if(publication.flow)fail(409,'当前原生情境化试点尚不支持研究级条件流程')
+  if(publication.flow?.experiment||publication.flow?.blocks.some(block=>block.kind==='END'))
+    fail(409,'原生情境化父流程尚不支持实验分配或提前终止')
   const unit=publication.units.find(unit=>unit.kind==='SJT'&&unit.instrumentKey===slotKey)
   if(!unit)fail(404,'当前冻结研究中没有这个情境化工具')
   const binding=decodeSurveyAttemptContentBinding({projectId:known.projectId,waveId:known.waveId,
@@ -65,17 +70,41 @@ function view(row:SituationalAttemptRow|SituationalAttemptCommitRow,runtime:Awai
     ...(row.status==='COMPLETED'?{receipt:{protocol:SURVEY_NATIVE_SJT_PROTOCOL,attemptId:row.id,
       submissionId:row.submissionId,payloadHash:row.submissionPayloadHash}}:{})}
 }
-export async function startSurveySituational(proof:SurveyTaskProof,slotKey:string){
+/** The host lock is independent of the immutable scientific runtime. */
+async function flowView(tx:Tx,known:VerifiedSurveyTask,slotKey:string,
+  row:SituationalAttemptRow|SituationalAttemptCommitRow,runtime:Awaited<ReturnType<typeof access>>,replayed?:boolean){
+  if(!runtime.publication.flow)return view(row,runtime,replayed)
+  const own=await tx.situationalAttempt.findUnique({where:{id:row.id},
+    select:{surveyLockedAnswersCipher:true,surveyLockedAnswersHash:true}})
+  if(!own?.surveyLockedAnswersCipher||!own.surveyLockedAnswersHash)fail(409,'条件流程情境化任务缺少冻结前置答案')
+  const lockedPriorAnswers=await readSurveyTaskLockedAnswers(tx,{projectId:known.projectId,waveId:known.waveId,
+    attemptId:known.attemptId,publicationId:known.publicationId},fail)
+  try{
+    const prefix=await freezeSurveyTaskPrefix(tx,known,runtime.publication,slotKey,lockedPriorAnswers)
+    if(canonicalHash(prefix)!==own!.surveyLockedAnswersHash)fail(409,'情境化前置答案与冻结路径不一致')
+  }catch(error){if(error instanceof SurveyCognitiveError)fail(error.statusCode,error.message);throw error}
+  return {...view(row,runtime,replayed),lockedPriorAnswers}
+}
+export async function startSurveySituational(proof:SurveyTaskProof,slotKey:string,priorAnswers?:unknown){
   const known=await verifiedSurveyAttempt(proof)
   return withFinalOnlyCompletionTransaction(async tx=>{
     const runtime=await access(tx,proof,known,slotKey,false)
     let row=await findChild(tx,known,slotKey)
-    if(row){assertChild(row,known,slotKey,runtime);return view(row,runtime)}
-    const index=runtime.publication.units.findIndex(unit=>unit.instrumentKey===slotKey)
-    try{await assertSurveyPriorCognitiveCompleted(tx,{projectId:known.projectId,waveId:known.waveId,
-      attemptId:known.attemptId,publicationId:known.publicationId},runtime.publication.units.slice(0,index)
-        .filter(unit=>unit.kind==='COGNITIVE').map(unit=>unit.instrumentKey))}
-    catch(error){if(error instanceof SurveyCognitiveError)fail(error.statusCode,error.message);throw error}
+    if(row){assertChild(row,known,slotKey,runtime);return flowView(tx,known,slotKey,row,runtime)}
+    let locked:Record<string,unknown>|undefined
+    try{
+      if(runtime.publication.flow){
+        await ensureSurveyFlowAssignment(tx,{projectId:known.projectId,waveId:known.waveId,
+          attemptId:known.attemptId,participantId:known.participantId,researchCode:proof.researchCode,
+          accessCredential:proof.accessCredential,snapshot:runtime.publication})
+        locked=await freezeSurveyTaskPrefix(tx,known,runtime.publication,slotKey,priorAnswers)
+      }else{
+        const index=runtime.publication.units.findIndex(unit=>unit.instrumentKey===slotKey)
+        await assertSurveyPriorCognitiveCompleted(tx,{projectId:known.projectId,waveId:known.waveId,
+          attemptId:known.attemptId,publicationId:known.publicationId},runtime.publication.units.slice(0,index)
+            .filter(unit=>unit.kind==='COGNITIVE').map(unit=>unit.instrumentKey))
+      }
+    }catch(error){if(error instanceof SurveyCognitiveError)fail(error.statusCode,error.message);throw error}
     if(getAssessmentOperationalHold({family:'SITUATIONAL',key:runtime.header.instrumentKey,version:runtime.header.instrumentVersion}))
       fail(403,'情境化工具已暂停新作答')
     row=await tx.situationalAttempt.create({data:{id:randomUUID(),
@@ -87,9 +116,10 @@ export async function startSurveySituational(proof:SurveyTaskProof,slotKey:strin
       compiledRuntimeHash:runtime.header.compiledRuntimeHash,scorerKey:runtime.header.scorerKey,
       scoringVersion:runtime.header.scoringVersion,frozenAt:new Date(runtime.header.frozenAt),
       runtimeSnapshotEncrypted:encryptFrozenSituationalRuntimeSnapshot(runtime.snapshot),progress:0,
+      ...(locked?{surveyLockedAnswersCipher:encryptUnifiedRuntimePayload(locked),surveyLockedAnswersHash:canonicalHash(locked)}:{}),
     },select:SITUATIONAL_ATTEMPT_SELECT})
     await retainFrozenSituationalAssets(tx,row.id,runtime.snapshot)
-    return view(row,runtime)
+    return flowView(tx,known,slotKey,row,runtime)
   })
 }
 async function readLocked(tx:Tx,proof:SurveyTaskProof,known:VerifiedSurveyTask,slotKey:string,childId:string){
@@ -99,13 +129,14 @@ async function readLocked(tx:Tx,proof:SurveyTaskProof,known:VerifiedSurveyTask,s
   assertChild(row!,known,slotKey,runtime)
   const stored=decryptFrozenSituationalRuntimeSnapshot(row!.runtimeSnapshotEncrypted)
   if(canonicalHash(stored)!==canonicalHash(runtime.snapshot))fail(409,'情境化冻结运行时已变化')
-  return {row:row!,snapshot:stored,runtime}
+  const response=await flowView(tx,known,slotKey,row!,runtime)
+  return {row:row!,snapshot:stored,runtime,response}
 }
 export async function readSurveySituational(proof:SurveyTaskProof,slotKey:string,childId:string){
   const known=await verifiedSurveyAttempt(proof)
   return withFinalOnlyCompletionTransaction(async tx=>{
     const loaded=await readLocked(tx,proof,known,slotKey,childId)
-    return view(loaded.row,loaded.runtime)
+    return loaded.response
   })
 }
 export async function submitSurveySituationalFinal(proof:SurveyTaskProof,slotKey:string,childId:string,
@@ -119,7 +150,7 @@ export async function submitSurveySituationalFinal(proof:SurveyTaskProof,slotKey
     if(loaded.row.status==='COMPLETED'){
       if(assertSubmissionReplay(loaded.row,prepared.submissionId,prepared.payloadHash)!=='replay')
         throw new InstrumentFinalSubmitError('SUBMISSION_PAYLOAD_CONFLICT','已提交内容不一致',409)
-      return {replay:view(loaded.row,loaded.runtime,true)}
+      return {replay:{...loaded.response,replayed:true}}
     }
     return {prepared}
   })
@@ -138,7 +169,7 @@ export async function submitSurveySituationalFinal(proof:SurveyTaskProof,slotKey
       // raw/result store and no fake Training unit snapshot are written.
       persistProjection:async()=>{},
     })
-    return view(committed.row,runtime,committed.kind==='replay')
+    return flowView(tx,known,slotKey,committed.row,runtime,committed.kind==='replay')
   })
 }
 

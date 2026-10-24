@@ -791,6 +791,15 @@ export default function SurveyPublicApp(){
       return [u.instrumentKey,u.kind==='FORM'?sanitizeFormAnswers(u.pages?.flatMap(p=>p.questions)??[],raw):raw]
     }))
   }
+  const lockPriorAnswers=(canonical:Record<string,Record<string,unknown>>)=>{
+    const locked=canonical as Record<string,Record<string,Answer>>
+    // A later child may add prerequisites, never replace an earlier server lock.
+    if(Object.entries(locked).some(([key,value])=>serverLockedKeys.current.has(key)&&
+      !sameSurveyCheckpointAnswers(own(lockedAnswers,key),value)))
+      throw new Error('服务器已锁定的前置答案不一致，请重新读取任务')
+    for(const key of Object.keys(locked))serverLockedKeys.current.add(key)
+    setLockedAnswers(old=>({...old,...locked}));if(!finalRequest.current)setAnswers(old=>({...old,...locked}))
+  }
   const videoKey=(unit:Unit,itemKey:string)=>[attemptId,task?.definitionDigest,unit.instrumentKey,itemKey].join(':')
   const imageReadyFor=(unit:Unit,item:Question)=>!item.images?.length||imageReadiness[videoKey(unit,item.itemKey)]===true
   // Gate mounted stimuli, not an invented historical browser-viewing record.
@@ -810,7 +819,11 @@ export default function SurveyPublicApp(){
     if(unit.executionProtocol==='SITUATIONAL_NATIVE_V1')return <SurveySituationalUnit key={attemptId+':'+unit.instrumentKey}
       publicId={publicId} attemptId={attemptId} slotKey={unit.instrumentKey} title={unit.title}
       accessCredential={accessCredential.trim()} researchCode={info?.project.collectionMode==='LINKED_WAVES'?researchCode.trim().toUpperCase():undefined}
-      onStarted={id=>{knownSituationalSessions.current.set(id,{attemptId,researchCode});rememberSurveySituationalSession(publicId,attemptId,id,researchCode||undefined)}}
+      priorAnswers={currentFlow?priorAnswersFor(unit.instrumentKey):undefined}
+      onStarted={(id,canonical)=>{
+        knownSituationalSessions.current.set(id,{attemptId,researchCode});rememberSurveySituationalSession(publicId,attemptId,id,researchCode||undefined)
+        if(canonical)lockPriorAnswers(canonical)
+      }}
       onCommitted={receipt=>setSituationalReferences(old=>({...old,[unit.instrumentKey]:receipt}))}/>
     if(unit.kind==='COGNITIVE')return <Suspense key={unit.instrumentKey} fallback={<p role="status">正在加载认知测评…</p>}><SurveyCognitiveUnit publicId={publicId} attemptId={attemptId}
       instrumentKey={unit.instrumentKey} title={unit.title} request={publicApi}
@@ -818,9 +831,7 @@ export default function SurveyPublicApp(){
       priorAnswers={priorAnswersFor(unit.instrumentKey)} existing={cognitiveSessions.find(s=>s.slotKey===unit.instrumentKey)}
       onStarted={(session,canonical)=>{
         rememberCognitive(attemptId,session.sessionId)
-        const locked=(canonical??priorAnswersFor(unit.instrumentKey)) as Record<string,Record<string,Answer>>
-        for(const key of Object.keys(locked))serverLockedKeys.current.add(key)
-        setLockedAnswers(old=>({...old,...locked}));if(!finalRequest.current)setAnswers(old=>({...old,...locked}))
+        lockPriorAnswers(canonical??priorAnswersFor(unit.instrumentKey))
         setCognitiveSessions(old=>[...old.filter(s=>s.slotKey!==session.slotKey),session])
       }}
       onCommitted={reference=>{setCognitiveReferences(old=>[...old.filter(r=>r.slotKey!==reference.slotKey),reference]);setCognitiveRunning(false)}}
@@ -860,7 +871,7 @@ export default function SurveyPublicApp(){
     {renderSurveyTaskBody(unit)}
   </div>
   const submit=(e:FormEvent)=>{e.preventDefault();if(!task||!attemptId||finalInFlight.current||cognitiveRunning)return;
-    if(!finalSealed&&task.units.some(unit=>unit.executionProtocol==='SITUATIONAL_NATIVE_V1'&&!situationalReferences[unit.instrumentKey])){setNotice('请先完成情境化任务并核实保存回执');return}
+    if(!finalSealed&&task.units.some(unit=>unit.executionProtocol==='SITUATIONAL_NATIVE_V1'&&(!currentFlow||currentFlow.visibleUnitKeys.includes(unit.instrumentKey))&&!situationalReferences[unit.instrumentKey])){setNotice('请先完成情境化任务并核实保存回执');return}
     if(!finalRequest.current&&(currentFlow||timedSequence)&&!finalFlowStep){
       setError('请按顺序完成当前研究步骤');return
     }
@@ -904,7 +915,7 @@ export default function SurveyPublicApp(){
       ...(info?.project.collectionMode==='LINKED_WAVES'?{researchCode:researchCode.trim().toUpperCase()}:{}),
       accessCredential:accessCredential.trim(),submissionId,answers:payload,
       ...(timedUnits.length?{itemTimings:sealedTimings}:{}),
-      ...(task.units.some(u=>u.executionProtocol==='SITUATIONAL_NATIVE_V1')?{situationalReferences:task.units.filter(u=>u.executionProtocol==='SITUATIONAL_NATIVE_V1').flatMap(u=>situationalReferences[u.instrumentKey]?[situationalReferences[u.instrumentKey]]:[])}:{}),
+      ...(task.units.some(u=>u.executionProtocol==='SITUATIONAL_NATIVE_V1')?{situationalReferences:task.units.filter(u=>u.executionProtocol==='SITUATIONAL_NATIVE_V1'&&(eligible===null||eligible.has(u.instrumentKey))).flatMap(u=>situationalReferences[u.instrumentKey]?[situationalReferences[u.instrumentKey]]:[])}:{}),
       ...(task.units.some(u=>u.kind==='COGNITIVE')?{cognitiveReferences:cognitiveReferences.filter(ref=>eligible===null||eligible.has(ref.slotKey))}:{}),
       ...(currentFlow?{presentation:{shownBlocks:currentFlow.shownBlocks}}:{}),
       }}

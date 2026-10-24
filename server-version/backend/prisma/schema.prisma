@@ -2103,6 +2103,8 @@ model SituationalAttempt {
   surveyAttemptId       String?                @map("survey_attempt_id")
   surveyPublicationId   String?                @map("survey_publication_id")
   surveySlotKey         String?                @map("survey_slot_key")
+  surveyLockedAnswersCipher String?             @map("survey_locked_answers_cipher")
+  surveyLockedAnswersHash String?               @map("survey_locked_answers_hash")
   participantKey         String                 @map("participant_key")
   instrumentKey          String                 @map("instrument_key")
   instrumentVersion      String                 @map("instrument_version")

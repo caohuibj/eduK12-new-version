@@ -157,9 +157,10 @@ export async function submitResearchFinal(input:FinalInput){
       accepted:true,consentVersion:wave.consentVersion,
     },select:{id:true}})
     if(!consent)blocked('当前研究缺少有效的知情同意记录')
+    if(snapshot.units.some(unit=>unit.kind==='COGNITIVE'||unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL))
+      await assertSurveyCognitiveLockedAnswers(tx,attempt.id,input.answers)
     const cognitiveResults=new Map<string,FrozenUnitResult>()
     if(snapshot.units.some(unit=>unit.kind==='COGNITIVE')||input.cognitiveReferences?.length){
-      await assertSurveyCognitiveLockedAnswers(tx,attempt.id,input.answers)
       const references=await verifySurveyCognitiveReferences(tx,{projectId:known.projectId,waveId:wave.id,
         attemptId:attempt.id,publicationId:publication.id,snapshot:selectedSnapshot,references:input.cognitiveReferences??[]})
       const results=await loadSurveyCognitiveResults(tx,{projectId:known.projectId,waveId:wave.id,

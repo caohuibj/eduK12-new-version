@@ -1,3 +1,4 @@
+import {missingSurveyFlowUnit} from './flow.runtime'
 import { situationalResponseHistoryIdentities } from '../situational/situation-research-capture'
 import { deriveAuthoritativeSituationalTrajectory } from '../situational/situation-trajectory'
 import { SURVEY_NATIVE_SJT_PROTOCOL,SurveySituationalProtocolError } from './situational-native.contract'
@@ -1023,11 +1024,17 @@ async function readSurveySourceMaterial(input: SurveySourceInput) {
             invalid('研究 FINAL 组件来源与冻结定义不一致')
           if(frozen.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL){
             const child=nativeBySlot.get(frozen.instrumentKey)
-            if(!child||Object.keys(unit.rawAnswers).length||unit.notExecuted
+            if(unit.notExecuted){
+              if(child||unit.nativeReference||canonicalHash(unit)!==canonicalHash(missingSurveyFlowUnit(frozen)))
+                invalid('未执行情境化槽位不得包含子结果或伪造缺失值')
+              // The export-only raw envelope column has no accepted original
+              // for a task that was never reached; do not label it unknown.
+              nativeMissing.set('__native_raw','NOT_SHOWN')
+            }else if(!child||Object.keys(unit.rawAnswers).length
               ||canonicalHash(unit)!==canonicalHash(child.unitResult))invalid('研究情境化 FINAL 与权威子结果不一致')
-            if(input.selectRaw!==false){
-              if(!child.raw)invalid('研究情境化正式原件缺失')
-              const raw=child.raw!
+            if(!unit.notExecuted&&input.selectRaw!==false){
+              if(!child!.raw)invalid('研究情境化正式原件缺失')
+              const raw=child!.raw!
               const {snapshot:nativeSnapshot}=frozenSurveyNativeSituationalRuntime(frozen)
               const reached=new Set(deriveAuthoritativeSituationalTrajectory(nativeSnapshot.definition,raw.responses).sceneKeys)
               const values=new Map(raw.responses.map(response=>[response.sceneKey+':'+response.channelKey,response.responseValue]))

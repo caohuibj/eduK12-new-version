@@ -281,12 +281,13 @@ export async function freezeResearchWaveDraft(input:{
         stop('量表逐题计时与其他工具组合的最大 FINAL 超过 900 KB 发布预算，请缩短内容或拆分波次')
     }
     let frozenFlow:FrozenSurveyFlow|undefined
-    if(wave.flowDefinition&&units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL))
-      stop('原生分阶段情境化工具暂不支持研究级条件流程')
     if(wave.flowDefinition){
       try{
         frozenFlow=compileSurveyFlow(wave.flowDefinition,units,
           project.collectionMode as ResearchFrozenPublication['collectionMode'])
+        if(units.some(unit=>unit.executionProtocol===SURVEY_NATIVE_SJT_PROTOCOL)
+          &&(frozenFlow.experiment||frozenFlow.blocks.some(block=>block.kind==='END')))
+          stop('原生情境化父流程尚不支持实验分配或提前终止')
       }catch(e){
         if(e instanceof SurveyFlowError)stop('冻结 Flow 结构未通过校验：'+
           e.issues.slice(0,5).map(i=>i.path+': '+i.message).join('；'))
