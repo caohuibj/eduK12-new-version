@@ -35,7 +35,7 @@ describe('Training inline resources and authorization',()=>{
   expect(within(screen.getByText(custom.name).closest('tr')!).getByRole('button',{name:'管理授权'})).toBeDisabled()
   expect(screen.getByText('精确版本共用库审批')).toBeVisible()
   expect(document.querySelector('a[href^="/scales"]')).toBeNull()
-  expect(api.get).toHaveBeenCalledExactlyOnceWith('/scales',{params:{page:1,pageSize:100}})
+  expect(api.get).toHaveBeenCalledExactlyOnceWith('/scales',{params:{page:1,pageSize:100,view:'training-catalog'}})
  })
  it('reads all catalog pages before global search and displays local paging without truncation',async()=>{
   const rows=Array.from({length:101},(_,index)=>({...standard,id:'s'+index,name:'量表 '+index}))

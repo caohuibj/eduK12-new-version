@@ -8,7 +8,7 @@ export async function trainingResourceCatalog(type:CatalogType,active:()=>boolea
  if(type==='SCALE'){
   const rows:Scale[]=[];let page=1,total:number|undefined
   while(active()){
-   const response=await api.get<{list:Scale[];total:number}>('/scales',{params:{page,pageSize:100}})
+   const response=await api.get<{list:Scale[];total:number}>('/scales',{params:{page,pageSize:100,view:'training-catalog'}})
    if(!active())return []
    if(response.code!==0)throw Error(response.message||'无法读取量表')
    if(!Array.isArray(response.data?.list)||!Number.isInteger(response.data.total)||response.data.total<0)throw Error('量表目录不完整，请重新加载')

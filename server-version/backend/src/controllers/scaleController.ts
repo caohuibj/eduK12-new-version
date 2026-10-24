@@ -150,6 +150,25 @@ export const scaleController = {
 
       const where = await scaleWhereForViewer(userId as string, userRole as UserRole, extra)
 
+      // Opt-in directory DTO; default authoring/list clients retain their full
+      // contract. Resolve current visibility above for both paths, unchanged.
+      if (req.query.view === 'training-catalog') {
+        const [list, total] = await Promise.all([
+          prisma.scale.findMany({
+            where,
+            select: {
+              id: true, name: true, code: true, instrumentVersion: true,
+              instrumentClass: true, libraryEntryId: true, status: true, description: true,
+            },
+            orderBy: { createdAt: 'desc' },
+            skip: pagination.skip,
+            take: pagination.take,
+          }),
+          prisma.scale.count({ where }),
+        ])
+        return success(res, buildPaginatedResult(list, total, pagination))
+      }
+
       // 并行查询量表列表和总数
       const [scales, total] = await Promise.all([
         prisma.scale.findMany({

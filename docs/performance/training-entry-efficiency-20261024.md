@@ -397,3 +397,61 @@ database or deploying. Old CI bindings are not valid for this expanded candidate
 Raw command/exits, source hashes, initial failures and selective follow-up results
 are retained in dedicated evidence directories. No new production build, native
 browser acceptance, PostgreSQL run, GitHub CI, PR merge or deployment is claimed.
+
+## Administrator access follow-up
+
+The workspace now loads only the selected account/course/resource component, and
+registration-code code only after disclosure. The account lifecycle modal loads
+only after a management selection. A small code-only loader shares pending/resolved
+module imports, clears failed imports for retry, ignores unmounted completions,
+and preserves parent search/drafts. Child render exceptions still reach the real
+application error boundary. Existing route grants, MFA, redirects, lifecycle busy
+and one-time-password handoff behavior remain. Thirty-eight distinct focused cases
+passed (37 first run, one additional cancellation/reopen case separately); scoped
+lint passed. These are code-loading contracts, not a measured emitted-bundle or
+first-load latency reduction; extra lazy chunk waterfalls need browser measurement.
+
+Grant list/batch/set response metadata now groups resource IDs by type, deduplicates
+within the request and reads database types in sequential batches of at most 250.
+Output order, duplicates, teacher/granter fields, missing/deleted resources, report
+ID interpretation and first-match Bundle metadata remain. Authorization and mutation
+transactions are unchanged. A 100-grant/same-resource fixture needs one resource
+metadata ORM call. Actual SQL savings are not asserted because Prisma may batch
+old findUnique operations internally; no metadata survives across requests.
+
+The Training resource directory explicitly requests /scales?view=training-catalog.
+After the original current-rights visibility/filter evaluation, it selects eight
+fields: id, name, code, instrumentVersion, instrumentClass, libraryEntryId, status,
+and description. Definition JSON, instructions, creator/course relations and
+assessment counts are not fetched for this DTO. Default full-list/editor callers
+retain their original contract. Pagination, total, filters and incomplete-directory
+checks remain; this change does not truncate authorization choices or introduce
+server-side search/full-catalog paging semantics. Forty-four backend and twelve
+resource-catalog frontend assertions passed on first invocation, with independent
+read-only review of source and raw test logs.
+
+Password-reset preflight and post-hash authoritative checks are intentionally not
+merged. Full selected authorization sets are preserved to avoid revoking off-page
+grants. No schema, dependency, production deployment or GitHub CI change is made
+by this administrator follow-up; existing CI bindings remain historical.
+
+The final bounded gap review adds cancellation to the two teacher-directory
+consumers: course creator filters and the authorization modal. Optional AbortSignal
+propagates to Axios GETs and is checked before/after every directory page. Closing,
+changing context or unmounting prevents further pages and late state updates;
+failed or malformed modal prerequisites abort the sibling read. Reopening uses a
+fresh controller. Cancellation never returns a partial teacher list, changes the
+complete selected authorization set, or cancels a mutation. Each prerequisite is
+validated once, not again after Promise.all. Twenty-three affected cancellation,
+completeness and selection cases passed, with unrelated cases filtered out; changed
+file lint passed. No metadata/API response cache was added.
+
+Grant admission now reads only role, teacherApproved, isActive and isFrozen where
+those are the sole eligibility inputs; scale admission reads status/instrumentClass,
+cognitive admission status, and deletion existence id. Every existing current
+check remains in its original order. Full-set differences reuse Set.has rather
+than scanning desiredIds for each existing grant. The affected grant suite passed
+45 cases on its new input; scale/catalog tests with unchanged inputs were not rerun.
+This reduces unused field materialization and collection work, not the number of
+mandatory authorization checks. Large-scale server-side directory pagination,
+partial-set grant protocols and cross-request permission caching remain excluded.
