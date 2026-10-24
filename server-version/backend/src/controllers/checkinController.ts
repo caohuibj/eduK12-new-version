@@ -1,3 +1,4 @@
+import { EXPORT_BATCH_SIZE, sendTaskExport, TaskExportBusyError, TaskExportLimitError, TaskExportPermissionError, TaskExportAuthenticationError, refreshTaskExportAuthentication } from '../utils/streamingTaskExport'
 import { managementTaskList } from '../modules/training-catalog/tasks'
 import { listPage, cursorWhere, listPageResult, ListCursorError } from '../utils/listCursor'
 import { checkinExportImages } from '../utils/checkinExportImages'
@@ -1370,11 +1371,11 @@ export const checkinController = {
   // 导出打卡数据
   async export(req: Request, res: Response) {
     try {
-      const userId = req.user?.userId
-      const userRole = req.user?.role
+      let userId = req.user?.userId
+      let userRole = req.user?.role
       const { id } = req.params
 
-      const checkin = await prisma.checkin.findUnique({
+      let checkin = await prisma.checkin.findUnique({
         where: { id },
         select: {
           title: true,
@@ -1396,47 +1397,83 @@ export const checkinController = {
         return forbidden(res, '无权限导出此打卡')
       }
 
-      // Read submission payloads only after the existing ownership check.
-      const submissions = await prisma.checkinSubmission.findMany({
-        where: { checkinId: id },
-        select: {
-          content: true,
-          images: true,
-          isAnonymous: true,
-          createdAt: true,
-          student: { select: { username: true, nickname: true } },
-        },
-        orderBy: { createdAt: 'desc' },
-      })
-
-      // 准备导出数据
-      const exportData = submissions.map((sub, index) => {
-        const images = checkinExportImages(sub.images)
-        return {
-          '序号': index + 1,
-          '学生姓名': sub.student?.nickname || sub.student?.username || (sub.isAnonymous ? '匿名用户' : '未知'),
-          '学号': sub.student?.username || (sub.isAnonymous ? '匿名' : ''),
-          '提交内容': sub.content || '',
-          '图片数量': images.count,
-          '图片链接': images.references,
-          '提交时间': sub.createdAt ? new Date(sub.createdAt).toLocaleString('zh-CN') : '',
+      const authorize = async (db: Pick<typeof prisma, 'checkin'>) => {
+        const current = await db.checkin.findUnique({ where: { id }, select: { course: { select: { creatorId: true } } } })
+        if (!current || (current.course.creatorId !== userId && userRole !== UserRole.ADMIN)) {
+          throw new TaskExportPermissionError('无权限导出数据')
         }
+      }
+      await sendTaskExport(res, () => `${checkin!.course.title}_${checkin!.title}_打卡数据.xlsx`, '打卡提交数据', async (append, checkConnected) => {
+        // One bounded MVCC snapshot: concurrent edits/inserts never move or duplicate rows.
+        // Spool only within the transaction; compression and download happen after release.
+        await prisma.$transaction(async tx => {
+          const snapshotMetadata = await tx.checkin.findUnique({ where: { id }, select: { title: true, course: { select: { title: true, creatorId: true } } } })
+          if (!snapshotMetadata || (snapshotMetadata.course.creatorId !== userId && userRole !== UserRole.ADMIN)) throw new TaskExportPermissionError('无权限导出数据')
+          checkin = snapshotMetadata
+          let cursor: { time: Date; id: string } | undefined
+          let rowCount = 0
+          while (true) {
+            checkConnected()
+            const submissions = await tx.checkinSubmission.findMany({
+              where: { checkinId: id, ...(cursor ? { OR: [
+                  { createdAt: { lt: cursor.time } },
+                  { createdAt: cursor.time, id: { lt: cursor.id } },
+                ] } : {}) },
+              take: EXPORT_BATCH_SIZE,
+              select: {
+                id: true,
+                content: true,
+                images: true,
+                isAnonymous: true,
+                createdAt: true,
+                student: { select: { username: true, nickname: true } },
+              },
+              orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+            })
+            if (!submissions.length) break
+
+
+            // 准备导出数据
+            const exportData = submissions.map((sub, index) => {
+              const images = checkinExportImages(sub.images)
+              return {
+                '序号': rowCount + index + 1,
+                '学生姓名': sub.student?.nickname || sub.student?.username || (sub.isAnonymous ? '匿名用户' : '未知'),
+                '学号': sub.student?.username || (sub.isAnonymous ? '匿名' : ''),
+                '提交内容': sub.content || '',
+                '图片数量': images.count,
+                '图片链接': images.references,
+                '提交时间': sub.createdAt ? new Date(sub.createdAt).toLocaleString('zh-CN') : '',
+              }
+            })
+
+
+            await append(exportData)
+            rowCount += submissions.length
+            const last = submissions[submissions.length - 1]
+            cursor = { time: last.createdAt, id: last.id }
+            if (submissions.length < EXPORT_BATCH_SIZE) break
+          }
+        }, { isolationLevel: 'RepeatableRead', timeout: 5000, maxWait: 2000 })
+      }, async () => {
+        await refreshTaskExportAuthentication(req, res)
+        userId = req.user?.userId
+        userRole = req.user?.role
+        await authorize(prisma)
       })
-
-      // 创建 Excel（ExcelJS，避免旧版 xlsx 解析器漏洞）
-
-      // Build before setting download headers so failures remain JSON errors.
-      const buffer = await (await import('../utils/excelWorkbook')).workbookBuffer({ '打卡提交数据': exportData })
-
-      // 设置响应头
-      const fileName = `${checkin.course.title}_${checkin.title}_打卡数据.xlsx`
-      res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
-      res.setHeader('Content-Disposition', `attachment; filename="${encodeURIComponent(fileName)}"`)
-
-      // 发送文件
-      res.send(buffer)
     } catch (err) {
+      if (err instanceof TaskExportAuthenticationError) return
       logger.error('导出打卡错误', err)
+      if (res.headersSent || res.destroyed) {
+        if (!res.destroyed) res.destroy()
+        return
+      }
+      res.removeHeader('Content-Type')
+      res.removeHeader('Content-Disposition')
+      res.removeHeader('Content-Length')
+      if (err instanceof TaskExportPermissionError) return forbidden(res, err.message)
+      if (err instanceof TaskExportBusyError) return error(res, err.message, -1, 503)
+      if (err instanceof TaskExportLimitError) return error(res, err.message, -1, 413)
       return error(res, Messages.COMMON.FAILED)
     }
   },

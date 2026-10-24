@@ -66,6 +66,7 @@ router.get('/:id/submissions', authenticate, requireTeacher, assignmentControlle
 
 // 批改
 router.post('/:id/submissions/:submissionId/grade', authenticate, requireTeacher, assignmentController.grade)
+router.post('/:id/review-selection', authenticate, requireTeacher, assignmentController.reviewSelection)
 router.post('/:id/batch-grade', authenticate, requireTeacher, assignmentController.batchGrade)
 
 // 导出

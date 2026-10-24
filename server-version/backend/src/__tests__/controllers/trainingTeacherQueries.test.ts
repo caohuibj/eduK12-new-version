@@ -9,12 +9,12 @@ const db = vi.hoisted(() => ({
 const mocks = vi.hoisted(() => ({ hydrate: vi.fn(), workbook: vi.fn() }))
 vi.mock('../../config/database', () => ({ prisma: db }))
 vi.mock('../../services/assetStorage', () => ({ hydrateAssetReferenceBatch: mocks.hydrate }))
-vi.mock('../../utils/excelWorkbook', () => ({ workbookBuffer: mocks.workbook }))
+vi.mock('../../utils/streamingTaskExport', async importOriginal => ({ ...(await importOriginal<typeof import('../../utils/streamingTaskExport')>()), sendTaskExport: mocks.workbook }))
 import { assignmentController } from '../../controllers/assignmentController'
 import { checkinController } from '../../controllers/checkinController'
 const response = () => {
   const res: any = {}
-  res.status = vi.fn(() => res); res.json = vi.fn(); res.setHeader = vi.fn(); res.send = vi.fn()
+  res.status = vi.fn(() => res); res.json = vi.fn(); res.setHeader = vi.fn(); res.removeHeader = vi.fn(); res.send = vi.fn()
   return res
 }
 const request = (query = {}, role = 'TEACHER') => ({ user: { userId: 'teacher', role }, params: { id: 'task' }, query }) as any
