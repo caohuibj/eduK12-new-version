@@ -24,7 +24,7 @@ const codePattern=/^R-[A-Z0-9]{8,32}$/
 async function projectPublic(tx:Tx,publicId:string){
   if(!publicIdFormat.test(publicId))blocked('研究入口无效')
   const project=await tx.surveyProject.findFirst({where:{publicId},
-    select:{id:true,title:true,description:true,collectionMode:true,status:true}})
+    select:{id:true,title:true,description:true,collectionMode:true,status:true,participantIdentityMode:true,participantCodeLabel:true,participantCodeInstructions:true}})
   if(!project)blocked('研究入口无效')
   return project!
 }
@@ -110,7 +110,8 @@ export async function getPublicResearchInfo(publicId:string,entryToken?:string){
         ${scopeWaveId?Prisma.sql`AND w.id=${scopeWaveId}`:Prisma.empty}
       ORDER BY w.ordinal ASC LIMIT 100`:[]
     return {scopeWaveId:scopeWaveId??null,project:{name:project.title,description:project.description,
-      collectionMode:project.collectionMode,status:project.status},
+      collectionMode:project.collectionMode,status:project.status,participantIdentityMode:project.participantIdentityMode,
+      participantCodeLabel:project.participantCodeLabel,participantCodeInstructions:project.participantCodeInstructions},
       waves:waves.map(({measurementNotice,...wave})=>({...wave,
         consentText:disclosedSurveyConsent(wave.consentText,{measurementNotice})}))}
   })

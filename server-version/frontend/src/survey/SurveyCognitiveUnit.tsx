@@ -150,7 +150,7 @@ export function SurveyCognitiveUnit({publicId,attemptId,instrumentKey,title,proo
     }catch(e){if(isCurrent(token))setError(e instanceof Error?e.message:'无法重做任务')}
     finally{if(isCurrent(token)){if(!runnerMounted){releaseDraft();callbacks.current.onRunningChange(false)};inFlight.current=false;setBusy(false)}}
   }
-  return <section className="border rounded-xl p-4 bg-white space-y-3" aria-label={'认知任务 '+title}>
+  return <section className="cognitive-surface survey-cognitive-unit border rounded-xl p-4 bg-white space-y-3" aria-label={'认知任务 '+title}>
     <h3 className="font-semibold text-lg">{title}</h3>
     {error&&<p role="alert">{error}</p>}
     {committed?<div role="status" className="space-y-2"><h4 className="font-semibold">此任务已提交</h4>

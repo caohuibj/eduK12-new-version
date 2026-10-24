@@ -1,8 +1,10 @@
+import {SurveyRandomCodeEntry} from './SurveyRandomCodeEntry'
+import {SurveyMemorableCodeSetup,SurveyMemorableCodeSaved,SurveyMemorableCodeRecovery,type MemorableEnrollment} from './SurveyMemorableCode'
 import {SurveyMaterialDisplay} from './SurveyMaterialDisplay'
 import type {PublicMaterial} from '../modules/assessment-media/material'
 import {SurveyCatalogScaleMedia,type SurveyScaleMedia} from './SurveyCatalogScaleMedia'
 import { BasicFormAnswer } from '../modules/assessment-core/form/BasicFormAnswer'
-import { cleanupExpiredSurveyCognitiveDrafts } from './survey-cognitive-retention'
+import {loadSurveyCognitiveUnit,loadSurveyPersonalLink,prepareSurveyCognitive,scheduleParticipantIdle} from './participant-loading'
 import { clearSurveyCognitiveSessions,rememberSurveyCognitiveSession } from './survey-cognitive-local'
 import { lazy, Suspense, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import type { SurveyCognitiveReference,SurveyCognitiveSessionInfo } from './survey-cognitive-api'
@@ -18,17 +20,22 @@ import { SurveyParticipantImage,type SurveyImageProof } from './SurveyParticipan
 import { resolveClientSurveyFlow,type PublicFlow } from './flow.client'
 import { resolveSurveyCheckpointDraft,sameSurveyCheckpointAnswers } from './checkpoint-recovery'
 import { readRecruitmentEntry, rememberRecruitmentEntry, clearRecruitmentEntry, isRecruitmentEntryToken } from './recruitment-entry'
+import {readPersonalParticipationProof,personalParticipationLink} from './personal-participation-link'
 import './survey-participant.css'
+import './survey-participant-polish.css'
 
 // Load before the cognitive unit's own admission/instructions, never during trials.
 // Form/Scale/SJT participants do not need its router, registry or task runners.
-const SurveyCognitiveUnit = lazy(() => import('./SurveyCognitiveUnit').then(module => ({ default: module.SurveyCognitiveUnit })))
+const singleResumeNotice='已恢复本标签页暂存的未提交答案。请复核后再提交。'
+const singleStartNotice='本设备此标签页可在两小时内尝试恢复；离开或关闭标签前仍建议完成作答。它不会产生跨波次研究编号。'
+const SurveyCognitiveUnit = lazy(() => loadSurveyCognitiveUnit().then(module => ({ default: module.SurveyCognitiveUnit })))
+const SurveyPersonalLink = lazy(() => loadSurveyPersonalLink().then(module => ({default:module.SurveyPersonalLink})))
 
 type ApiResult<T>={code:number|string;message:string;data:T|null}
 type Wave={id:string;title:string;ordinal:number;status:string;consentText:string;consentVersion:number;
   opensAt:string|null;closesAt:string|null;allowNewParticipants:boolean;attempt?:{id:string;status:string}|null;
   groupIpPolicy?:{schemaVersion:1;timeZone:string;activationDate?:string}|null;groupIpActivatedAt?:string|null}
-type StudyInfo={project:{name:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:string};waves:Wave[];scopeWaveId?:string|null}
+type StudyInfo={project:{name:string;description:string;collectionMode:'SINGLE_UNLINKED'|'LINKED_WAVES';status:string;participantIdentityMode?:'PERSONAL_LINK'|'MEMORABLE_CODE'|'SELF_CODE';participantCodeLabel?:string;participantCodeInstructions?:string};waves:Wave[];scopeWaveId?:string|null}
 type Choice={optionKey:string;label:string;nonanswerReason?:'DECLINED'|'UNABLE_TO_JUDGE'}
 type Question=SurveyScaleMedia&{materials?:PublicMaterial[];responseOptions?:Choice[];itemKey:string;questionKey?:string;type:string;prompt:string;image?:SurveyPublicImage;required:boolean;
   options:Choice[];rows?:{rowKey:string;label:string}[];allowRefusal?:boolean;displayIf?:{itemKey:string;operator:'EQUALS'|'INCLUDES';optionKey:string};
@@ -114,14 +121,19 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
   pageIndex:number;onPageChange:(next:number)=>void;
   purpose?:'SURVEY'|'HUITEACHER';readOnly?:boolean;videoComplete?:Record<string,boolean>;onVideoComplete?:(itemKey:string)=>void;imageReady?:Record<string,boolean>;onImageReadyChange?:(itemKey:string,ready:boolean)=>void}){
   const [pageError,setPageError]=useState('')
+  const surveyForm=purpose==='SURVEY'&&unit.kind==='FORM'
 
-  const shownFormKeys=unit.kind==='FORM'
-    ?visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],answer)
-    :null
-  const visiblePages=unit.kind==='FORM'?(unit.pages||[])
-    .filter(p=>p.questions.some(q=>shownFormKeys?.has(q.itemKey))):[]
+  const formQuestions=useMemo(()=>unit.pages?.flatMap(p=>p.questions)??[],[unit])
+  const shownFormKeys=useMemo(()=>unit.kind==='FORM'
+    ?visibleFormKeys(formQuestions,answer):null,[unit,formQuestions,answer])
+  const visiblePages=useMemo(()=>unit.kind==='FORM'?(unit.pages??[])
+    .filter(p=>p.questions.some(q=>shownFormKeys?.has(q.itemKey))):[],[unit,shownFormKeys])
   const currentIndex=Math.min(pageIndex,Math.max(0,visiblePages.length-1))
   const activePage=visiblePages[currentIndex]
+  // A one-page form often repeats the tool name with only a generic suffix.
+  const headingKey=(title:string)=>title.trim().replace(/\s+/g,'').replace(/(?:表单|问卷|表)$/u,'')
+  const repeatedPageHeading=surveyForm&&visiblePages.length===1&&!!activePage
+    &&!!headingKey(unit.title)&&headingKey(activePage.title)===headingKey(unit.title)
   const nextPage=()=>{
     if(!activePage||currentIndex>=visiblePages.length-1)return
     for(const q of activePage.questions){
@@ -161,21 +173,21 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
   const choice=(q:Question,options:Choice[],kind:'SINGLE'|'MULTIPLE'|'MATRIX'|'LIKERT')=>
     kind==='MULTIPLE'?options.map(o=>{
       const selected=Array.isArray(answer[q.itemKey])?answer[q.itemKey] as string[]:[]
-      return <label className="block my-2 text-sm" key={o.optionKey}>
+      return <label className={surveyForm?'survey-form-choice':'block my-2 text-sm'} key={o.optionKey}>
         <input type="checkbox" checked={selected.includes(o.optionKey)}
           disabled={!selected.includes(o.optionKey)&&q.maxSelections!==undefined
             &&selected.length>=q.maxSelections&&!q.exclusiveOptionKeys?.includes(o.optionKey)}
           onChange={e=>onChange(q.itemKey,toggleFormMultiple(
-            selected,o.optionKey,e.target.checked,q.exclusiveOptionKeys))}/> {o.label}</label>
-    }):options.map(o=><label className="block my-2 text-sm" key={o.optionKey}>
+            selected,o.optionKey,e.target.checked,q.exclusiveOptionKeys))}/><span>{o.label}</span></label>
+    }):options.map(o=><label className={surveyForm?'survey-form-choice':'block my-2 text-sm'} key={o.optionKey}>
       <input type="radio" name={unit.instrumentKey+'-'+q.itemKey}
         checked={answer[q.itemKey]===o.optionKey} disabled={unit.kind==='SCALE'&&!!q.images?.length&&imageReady?.[q.itemKey]!==true}
-        onChange={()=>onChange(q.itemKey,o.optionKey)}/> {o.label}</label>)
-  const item=(q:Question)=>{
+        onChange={()=>onChange(q.itemKey,o.optionKey)}/><span>{o.label}</span></label>)
+  const item=(q:Question,index?:number)=>{
     if(shownFormKeys&&!shownFormKeys.has(q.itemKey))return null
-    return <fieldset disabled={readOnly} className="border rounded-lg p-4 my-4 bg-white scroll-mt-4"
+    return <fieldset disabled={readOnly} className={'border rounded-lg p-4 my-4 bg-white scroll-mt-4'+(surveyForm?' survey-form-item survey-form-item--'+q.type.toLowerCase():'')}
       id={'survey-answer-'+unit.instrumentKey+'-'+q.itemKey} tabIndex={-1} key={q.itemKey}>
-      <legend className="font-medium text-sm">{q.prompt}{q.required?' *':''}</legend>
+      <legend className="font-medium text-sm">{surveyForm?<><span className="survey-form-number" aria-hidden="true">{String((index??0)+1).padStart(2,'0')}</span><span className="survey-form-prompt">{q.prompt}</span><span className="survey-form-requirement">{q.required?'必答':'选填'}</span></>:<>{q.prompt}{q.required?' *':''}</>}</legend>
       {unit.kind==='SCALE'&&proof&&<SurveyCatalogScaleMedia item={q} proof={proof} instrumentKey={unit.instrumentKey} itemKey={q.itemKey} complete={videoComplete?.[q.itemKey]} onComplete={()=>onVideoComplete?.(q.itemKey)} onImagesReadyChange={ready=>onImageReadyChange?.(q.itemKey,ready)} readOnly={readOnly}/>}
       {q.materials?.map(item=><SurveyMaterialDisplay key={item.asset.assetId} item={item} proof={proof}/>)}
       {q.image&&proof&&<SurveyParticipantImage image={q.image} proof={proof}/>}
@@ -209,30 +221,29 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
       {['SHORT_TEXT','LONG_TEXT'].includes(q.type)&&<BasicFormAnswer question={{...q,prompt:q.prompt||'文本回答'}} value={typeof answer[q.itemKey]==='string'?answer[q.itemKey] as string:null} disabled={isRefusal(answer[q.itemKey])} onChange={value=>onChange(q.itemKey,value)}/>}
     </fieldset>
   }
-  return <section className={'border rounded-xl bg-slate-50 p-4 my-5'+(purpose==='SURVEY'?' survey-answer-panel':'')}>
+  return <section className={'border rounded-xl bg-slate-50 p-4 my-5'+(purpose==='SURVEY'?' survey-answer-panel'+(surveyForm?' survey-form-experience':''):'')}>
     <h3 className="text-lg font-semibold">{unit.title}</h3>
-    {purpose==='SURVEY'&&<p className="survey-answer-guide">{unit.kind==='SJT'
-      ?'请先阅读情境，再选择你的回答。标有 * 的内容为必答；如提供“不愿回答”，可按自身意愿选择。'
-      :'请按实际情况作答。标有 * 的内容为必答；矩阵题请逐行检查。翻页不代表正式提交。'}</p>}
+    {purpose==='SURVEY'&&unit.kind==='SJT'&&<p className="survey-answer-guide">请先阅读情境，再选择你的回答。* 为必答。</p>}
     {unit.kind==='FORM'&&<div>
-      <p className="text-sm mt-3" role="status">第 {activePage?currentIndex+1:0} / {visiblePages.length} 页
-        （{purpose==='HUITEACHER'?'所有页面完成后一次性提交正式评价':'本研究所有页面完成后只提交一次正式答卷'}）</p>
+      {(!surveyForm||visiblePages.length>1)&&<div className="survey-form-page-progress"><p className="text-sm mt-3" role="status">第 {activePage?currentIndex+1:0} / {visiblePages.length} 页
+        {purpose==='HUITEACHER'&&'（所有页面完成后一次性提交正式评价）'}</p>
       <progress className="w-full" max={Math.max(1,visiblePages.length)}
-        value={activePage?currentIndex+1:0} aria-label="本工具作答进度"/>
-      {activePage&&<div key={activePage.pageKey}>
-        <h4 className="mt-4 font-medium scroll-mt-5" id={'survey-page-'+unit.instrumentKey}
+        value={activePage?currentIndex+1:0} aria-label="本工具作答进度"/></div>}
+      {activePage&&<div key={activePage.pageKey} className={surveyForm?'survey-form-page':undefined}>
+        <h4 className={'mt-4 font-medium scroll-mt-5'+(repeatedPageHeading?' sr-only':'')} id={'survey-page-'+unit.instrumentKey}
           tabIndex={-1}>{activePage.title}</h4>{activePage.description&&<p className="whitespace-pre-wrap text-sm">{activePage.description}</p>}
-        {activePage.questions.map(item)}
+        {activePage.questions.filter(q=>shownFormKeys?.has(q.itemKey)).map((q,index)=>item(q,index))}
       </div>}
       {pageError&&<p role="alert" className="text-sm text-red-700 my-2">{pageError}</p>}
-      <nav aria-label="问卷分页" className="flex justify-between gap-3 mt-4">
+      {(purpose!=='SURVEY'||visiblePages.length>1)&&<nav aria-label="问卷分页" className={purpose==='SURVEY'?'survey-question-navigation':'flex justify-between gap-3 mt-4'}>
         <button type="button" className="btn-secondary" disabled={currentIndex===0}
           onClick={()=>{setPageError('');onPageChange(Math.max(0,currentIndex-1));window.requestAnimationFrame(()=>document.getElementById('survey-page-'+unit.instrumentKey)?.focus())}}>上一页</button>
         <button type="button" className="btn-secondary"
           disabled={!activePage||currentIndex>=visiblePages.length-1} onClick={nextPage}>下一页</button>
-      </nav>
+      </nav>}
     </div>}
     {unit.kind==='SCALE'&&unit.items?.map(q=>item({...q,type:'LIKERT',options:q.responseOptions??unit.responseOptions??[]}))}
+    {purpose==='SURVEY'&&unit.kind!=='SJT'&&!surveyForm&&<p className="survey-answer-guide">* 为必答。</p>}
     {unit.kind==='SJT'&&(unit.scenes??[{sceneKey:'legacy',title:unit.scenarioTitle,stimulus:unit.stimulus,image:unit.image,questions:unit.questions??[]}]).map(scene=><section key={scene.sceneKey} aria-label={'情境 '+scene.title} className="mt-4 space-y-3">
       <h4 className="font-medium">{scene.title}</h4><p className="whitespace-pre-wrap text-sm">{scene.stimulus}</p>
       {scene.image&&proof&&<SurveyParticipantImage image={scene.image} proof={proof}/>}
@@ -247,18 +258,30 @@ export function TaskForm({unit,answer,onChange,proof,pageIndex,onPageChange,purp
  * This UI contains no researcher or management cookie-based fallbacks.
  */
 export default function SurveyPublicApp(){
-  useEffect(()=>{void cleanupExpiredSurveyCognitiveDrafts()},[])
+  useEffect(()=>scheduleParticipantIdle(()=>{
+    void import('./survey-cognitive-retention').then(module=>module.cleanupExpiredSurveyCognitiveDrafts()).catch(()=>{/* optional maintenance retries on a later Survey open */})
+  }),[])
   const publicId=useMemo(()=>window.location.pathname.match(/^\/r\/([a-f0-9-]{36})$/i)?.[1]||'',[])
+  const [personalProof]=useState(()=>readPersonalParticipationProof(window.location.hash))
   const [entryToken,setEntryToken]=useState(()=>{
+    if(personalProof)return ''
     try{return readRecruitmentEntry(publicId,window.location.hash,sessionStorage)}
     catch{return readRecruitmentEntry(publicId,window.location.hash,null)}
   })
   const [info,setInfo]=useState<StudyInfo|null>(null),[loading,setLoading]=useState(true)
   const [error,setError]=useState(''),[busy,setBusy]=useState(false)
   const [busyLabel,setBusyLabel]=useState('')
-  const [researchCode,setResearchCode]=useState(''),[accessCredential,setAccessCredential]=useState('')
+  const [researchCode,setResearchCode]=useState(personalProof?.researchCode??''),[accessCredential,setAccessCredential]=useState(personalProof?.accessCredential??'')
   const [proofReceived,setProofReceived]=useState(false),[home,setHome]=useState<Wave[]|null>(null)
+  const [linkedIdentityReady,setLinkedIdentityReady]=useState(false)
+  const [legacyRecoveryOpen,setLegacyRecoveryOpen]=useState(false)
+  const [codeSetup,setCodeSetup]=useState(false),[fullMemorableCode,setFullMemorableCode]=useState('')
+  const generatedCodeMode=info?.project.participantIdentityMode==='SELF_CODE'
+  const codeMode=generatedCodeMode||info?.project.participantIdentityMode==='MEMORABLE_CODE'
   const [selectedWave,setSelectedWave]=useState<Wave|null>(null),[agreed,setAgreed]=useState(false)
+  const [receiptsOpen,setReceiptsOpen]=useState(false)
+  const [personalLinkOpen,setPersonalLinkOpen]=useState(false)
+  const [completionOptionsOpen,setCompletionOptionsOpen]=useState(false)
   const [task,setTask]=useState<Task|null>(null),[answers,setAnswers]=useState<Record<string,Record<string,Answer>>>({})
   const [formPages,setFormPages]=useState<Record<string,number>>({})
   const [scalePages,setScalePages]=useState<Record<string,number>>({})
@@ -272,6 +295,11 @@ export default function SurveyPublicApp(){
   const [checkpointOverwritePending,setCheckpointOverwritePending]=useState(false)
   const [attemptId,setAttemptId]=useState(''),[submissionId,setSubmissionId]=useState('')
   const [general,setGeneral]=useState<General|null>(null),[notice,setNotice]=useState('')
+  useEffect(()=>{
+    if(notice!==singleResumeNotice)return
+    const timer=window.setTimeout(()=>setNotice(current=>current===singleResumeNotice?'':current),4000)
+    return()=>window.clearTimeout(timer)
+  },[notice])
   const [finalSealed,setFinalSealed]=useState(false)
   const [cognitiveRunning,setCognitiveRunning]=useState(false)
   const cognitiveRunningRef=useRef(false)
@@ -284,6 +312,15 @@ export default function SurveyPublicApp(){
     return clearSurveyCognitiveSessions(publicId,parentId,known,researchCode||undefined)
   }
   const [cognitiveReferences,setCognitiveReferences]=useState<SurveyCognitiveReference[]>([])
+  useEffect(()=>{
+    if(!task||task.status!=='STARTED'||cognitiveRunning||!task.units.some(unit=>unit.kind==='COGNITIVE'))return
+    return scheduleParticipantIdle(()=>{void prepareSurveyCognitive().catch(()=>{/* the task retains its normal loading/error path */})})
+  },[task,cognitiveRunning])
+  useEffect(()=>{
+    if(info?.project.collectionMode!=='LINKED_WAVES'||['SELF_CODE','MEMORABLE_CODE'].includes(info.project.participantIdentityMode??''))return
+    return scheduleParticipantIdle(()=>{void loadSurveyPersonalLink().catch(()=>{/* preserve normal on-demand loading */})})
+  },[info?.project.collectionMode,info?.project.participantIdentityMode])
+
   const [lockedAnswers,setLockedAnswers]=useState<Record<string,Record<string,Answer>>>({})
   const finalRequest=useRef<{attemptId:string;path:string;
     body:{accessCredential:string;researchCode?:string;submissionId:string;answers:Record<string,Record<string,Answer>>;
@@ -348,7 +385,8 @@ export default function SurveyPublicApp(){
   },[publicId,attemptId,task,answers,itemTimings])
   useEffect(()=>{
     document.title='Huisurvey · 研究参与'
-    // Recruitment capability stays in memory, not browser history/Referrer.
+    // Both invitation and personal capabilities leave history before any fetch.
+    // The participant deliberately saves the generated link; never persist it here.
     window.history.replaceState(null,'',window.location.pathname)
     if(!safePattern.test(publicId)){setError('研究链接格式不正确');setLoading(false);return}
     // Token-scoped discovery avoids a shared-network request revealing or
@@ -361,16 +399,31 @@ export default function SurveyPublicApp(){
     setLoading(true);setError('');setInfo(null);setHome(null);setSelectedWave(null);setAgreed(false)
     void publicApi<StudyInfo>(base+'/info',infoEntryToken?'POST':'GET',
       infoEntryToken?{entryToken:infoEntryToken}:undefined)
-      .then(data=>{if(current&&request===requests.current)setInfo(data)})
+      .then(async data=>{
+        if(!current||request!==requests.current)return
+        setInfo(data)
+        if(!personalProof)return
+        if(['MEMORABLE_CODE','SELF_CODE'].includes(data.project.participantIdentityMode??''))throw new Error('本研究使用研究编码，请输入完整编码继续参加。')
+        if(data.project.collectionMode!=='LINKED_WAVES')throw new Error('此问卷不支持专属链接，请使用原邀请参加。')
+        const own=await publicApi<{waves:Wave[]}>(base+'/enter','POST',personalProof)
+        if(!current||request!==requests.current)return
+        setHome(own.waves);setLinkedIdentityReady(true)
+        const next=own.waves.filter(wave=>wave.status==='OPEN'&&
+          !['COMPLETED','SCREENED_OUT'].includes(wave.attempt?.status??''))
+          .sort((a,b)=>a.ordinal-b.ordinal)[0]
+        setSelectedWave(next??null);setAgreed(false)
+      })
       .catch(e=>{if(current&&request===requests.current)setError(parseError(e))})
       .finally(()=>{if(current&&request===requests.current)setLoading(false)})
     return()=>{current=false;requests.current++}
-  },[base,publicId,infoEntryToken])
+  },[base,publicId,infoEntryToken,personalProof])
   const focusStep=()=>window.requestAnimationFrame(()=>{if(!cognitiveRunningRef.current)document.getElementById('survey-task-step')?.focus()})
   const revealAnswer=(unit:Unit,itemKey?:string)=>{
     if(cognitiveRunningRef.current)return
     const activeTask=taskState.current
     if(!activeTask)return
+    // Completed sections cannot be reopened by a validation-focus fallback.
+    if(Object.prototype.hasOwnProperty.call(lockedAnswers,unit.instrumentKey)&&flowUnit?.instrumentKey!==unit.instrumentKey)return
     if(unit.kind==='FORM'){
       const visible=visibleFormKeys(unit.pages?.flatMap(page=>page.questions)??[],own(answers,unit.instrumentKey)??{})
       const pages=unit.pages?.filter(page=>page.questions.some(q=>visible.has(q.itemKey)))??[]
@@ -425,19 +478,67 @@ export default function SurveyPublicApp(){
       ...(info?.scopeWaveId?{waveId:info.scopeWaveId}:{}),
     })
     setResearchCode(x=>x.trim().toUpperCase());setAccessCredential(x=>x.trim())
-    setHome(data.waves);setProofReceived(false)
+    setHome(data.waves);setProofReceived(false);setLinkedIdentityReady(true)
   },'正在读取你的波次任务…')}
   const join=(wave:Wave)=>void run(async()=>{
     const result=await publicApi<{researchCode:string;accessCredential:string}>(
       base+'/waves/'+wave.id+'/join','POST',{entryToken,consent:true,consentVersion:wave.consentVersion})
-    setResearchCode(result.researchCode);setAccessCredential(result.accessCredential)
+    setResearchCode(result.researchCode);setAccessCredential(result.accessCredential);setLinkedIdentityReady(true)
     discardEntry()
-    setProofReceived(true);setNotice('此研究编号与私密恢复凭证只显示在当前设备页面，请分别妥善保存。')
+    setProofReceived(true);setNotice('')
   },'正在领取研究编号，请勿重复操作…')
-  const chooseWave=(wave:Wave)=>{setSelectedWave(wave);setAgreed(false);setTask(null);setGeneral(null);setCompletion(null);setWithdrawn(false);setRevoked(false)}
+  const joinCode=(value:MemorableEnrollment)=>{if(!consentWave||!consentAccepted)return;void run(async()=>{
+    const result=await publicApi<{researchCode:string;accessCredential:string}>(base+'/waves/'+consentWave.id+'/join-code','POST',{
+      entryToken,consent:true,consentVersion:consentWave.consentVersion,...value,
+    })
+    setResearchCode(result.researchCode);setAccessCredential(result.accessCredential);setLinkedIdentityReady(true)
+    setFullMemorableCode(value.prefix+'-'+value.suffix);setProofReceived(true);setCodeSetup(false);discardEntry()
+  })}
+  const randomEnrollmentInFlight=useRef(false)
+  const joinRandomCode=()=>{
+    if(!consentWave||!generatedCodeMode||!validEntry||busy||linkedIdentityReady||randomEnrollmentInFlight.current)return
+    randomEnrollmentInFlight.current=true
+    setSelectedWave(consentWave);setAgreed(true);setAgreementIdentity(consentIdentity)
+    void run(async()=>{try{
+    const result=await publicApi<{researchCode:string;accessCredential:string;fullCode:string}>(base+'/waves/'+consentWave.id+'/join-random-code','POST',{
+      entryToken,consent:true,consentVersion:consentWave.consentVersion,
+    })
+    setResearchCode(result.researchCode);setAccessCredential(result.accessCredential);setLinkedIdentityReady(true)
+    setFullMemorableCode(result.fullCode);setProofReceived(true);setCodeSetup(false);discardEntry()
+    }finally{randomEnrollmentInFlight.current=false}
+  },'正在生成你的研究编码…')}
+  const codeHome=(waves:Wave[])=>{
+    setReceiptsOpen(false)
+    setHome(waves);setSelectedWave(waves.filter(wave=>wave.status==='OPEN'&&!['COMPLETED','SCREENED_OUT'].includes(wave.attempt?.status??''))
+      .sort((a,b)=>a.ordinal-b.ordinal)[0]??null);setAgreed(false)
+  }
+  const enterCode=(fullCode:string)=>void run(async()=>{
+    const result=await publicApi<{researchCode:string;accessCredential:string;waves:Wave[];revoked?:boolean}>(base+'/enter-code','POST',{
+      fullCode,...(info?.scopeWaveId?{waveId:info.scopeWaveId}:{}),
+    })
+    setResearchCode(result.researchCode);setAccessCredential(result.accessCredential);setLinkedIdentityReady(true);setRevoked(!!result.revoked)
+    setFullMemorableCode('');setProofReceived(false);codeHome(result.waves)
+  },'正在核对研究编码…')
+  const resetCode=(resetCode:string,suffix:string)=>void run(async()=>{
+    const identity=await publicApi<{researchCode:string;accessCredential:string}>(base+'/reset-code','POST',{resetCode,suffix})
+    const prefix=resetCode.normalize('NFKC').trim().toUpperCase().split('-')[0]
+    const fullCode=prefix+'-'+suffix.normalize('NFKC').trim().toUpperCase()
+    setFullMemorableCode(fullCode)
+    setResearchCode(identity.researchCode);setAccessCredential(identity.accessCredential);setLinkedIdentityReady(true);setProofReceived(true)
+    const result=await publicApi<{waves:Wave[]}>(base+'/enter','POST',identity)
+    codeHome(result.waves)
+  })
+  const chooseWave=(wave:Wave)=>{
+    setSelectedWave(wave);setAgreed(false);setTask(null);setGeneral(null);setCompletion(null);setWithdrawn(false);setRevoked(false)
+    window.requestAnimationFrame(()=>{
+      const consent=document.getElementById('survey-participant-consent')
+      consent?.scrollIntoView?.({block:'start',behavior:window.matchMedia?.('(prefers-reduced-motion: reduce)')?.matches?'auto':'smooth'})
+      consent?.focus({preventScroll:true})
+    })
+  }
   const readCompletion=async(id:string,proof:{accessCredential:string;researchCode?:string})=>{
     const result=await publicApi<General>(base+'/attempts/'+id+'/general','POST',proof)
-    setGeneral(result);setNotice('提交成功。系统不会提供未经验证的诊断或常模等级。')
+    setCompletionOptionsOpen(false);setGeneral(result);setNotice('')
   }
   const markCompleted=(id:string,proof:{accessCredential:string;researchCode?:string})=>{
     completedAttempts.current.add(id)
@@ -473,7 +574,7 @@ export default function SurveyPublicApp(){
     let restoredTimings=(saved?.itemTimings??{}) as SurveyWaveScaleTimings
     let restoredRevision=0,overwritePending=false
     if(data.status==='COMPLETED')clearLocalSurveyDraft(publicId,id)
-    else if(saved)setNotice('已恢复本标签页暂存的未提交答案。请复核后再提交。')
+    else if(saved)setNotice(singleResumeNotice)
     if(data.status==='STARTED'&&data.checkpointPolicy?.enabled&&!saved?.finalSubmission){
       try{
         const remote=await publicApi<{revision:number;checkpoint:{
@@ -528,14 +629,20 @@ export default function SurveyPublicApp(){
     setNotice('正在恢复本设备尚在有效期内的单次匿名研究作答。')
     await loadTask(singleResume.attemptId,'',singleResume.accessCredential)
   },'正在恢复本次作答，请稍候…')}
-  const start=()=>{if(!selectedWave||!agreed)return;void run(async()=>{
-    const wave=selectedWave
+  const startInFlight=useRef(false)
+  const beginAnswering=(saved:boolean)=>{
+    if(!consentWave||!consentAccepted||(proofReceived&&!saved)||busy||startInFlight.current)return
+    startInFlight.current=true
+    if(saved)setProofReceived(false)
+    void run(async()=>{
+    const wave=consentWave
+    if(info?.project.collectionMode==='LINKED_WAVES'&&!linkedIdentityReady)throw new Error('请先获取专属链接，或验证已有参与凭证。')
     if(info?.project.collectionMode==='LINKED_WAVES'&&wave.attempt){
       await loadTask(wave.attempt.id,researchCode.trim().toUpperCase(),accessCredential.trim())
       return
     }
     if(info?.project.collectionMode==='LINKED_WAVES'){
-      if(!researchCode||!accessCredential)throw new Error('请先获取或输入研究编号及私密恢复凭证')
+      if(!researchCode||!accessCredential)throw new Error('请先使用你的专属链接进入，或首次参加。')
       const started=await publicApi<{attemptId:string}>(base+'/waves/'+wave.id+'/start','POST',{
         researchCode:researchCode.trim().toUpperCase(),accessCredential:accessCredential.trim(),
         consent:true,consentVersion:wave.consentVersion,
@@ -553,11 +660,17 @@ export default function SurveyPublicApp(){
       setSingleResume(temp)
       try{sessionStorage.setItem(singleStorageKey(publicId),JSON.stringify(temp))}
       catch{/* private-storage disabled: valid credentials remain in this tab memory */}
-      setNotice('本设备此标签页可在两小时内尝试恢复；离开或关闭标签前仍建议完成作答。它不会产生跨波次研究编号。')
+      setNotice(singleStartNotice)
       await loadTask(started.attemptId,'',started.accessCredential)
     }
-  },'正在读取本轮作答，请勿重复开始…')}
-  const currentFlow=task?.flow?resolveClientSurveyFlow(task.flow,task.units,answers):null
+  },'正在读取本轮作答，请勿重复开始…').finally(()=>{startInFlight.current=false})}
+  const start=()=>beginAnswering(false)
+  const confirmSavedAndStart=()=>beginAnswering(true)
+  const currentFlow=useMemo(()=>task?.flow?resolveClientSurveyFlow(task.flow,task.units,answers):null,[task,answers])
+  const timedScaleUnits=useMemo(()=>new Map((task?.units??[]).filter(unit=>unit.kind==='SCALE').map(unit=>[
+    unit.instrumentKey,{instrumentKey:unit.instrumentKey,title:unit.title,
+      items:unit.items??[],responseOptions:unit.responseOptions??[]},
+  ])),[task])
   const flowBlock=currentFlow?.blocks[Math.min(flowStep,Math.max(0,currentFlow.blocks.length-1))]
   // One-by-one studies must not render multiple Scale timers simultaneously.
   // Keep historical all-at-once Waves on their original multi-tool layout.
@@ -569,6 +682,8 @@ export default function SurveyPublicApp(){
   const finalFlowStep=currentFlow
     ?flowStep>=currentFlow.blocks.length-1
     :!timedSequence||toolStep>=task!.units.length-1
+  const finalSubmitVisible=finalSealed||finalFlowStep&&!cognitiveRunning&&
+    (flowUnit?.kind!=='COGNITIVE'||cognitiveReferences.some(ref=>ref.slotKey===flowUnit.instrumentKey))
   const canAdvanceFlow=(focusMissing=false):boolean=>{
     const incomplete=(itemKey?:string)=>{if(focusMissing&&flowUnit)revealAnswer(flowUnit,itemKey);return false}
     if(cognitiveRunning)return false
@@ -615,6 +730,7 @@ export default function SurveyPublicApp(){
   const advanceFlow=()=>{
     if(!canAdvanceFlow(true)){setError('请完成当前工具的必答内容和全部页，再进入下一步骤');return}
     setError('')
+    if(flowUnit&&flowUnit.kind!=='COGNITIVE')setLockedAnswers(previous=>({...previous,[flowUnit.instrumentKey]:{...(own(answers,flowUnit.instrumentKey)??{})}}))
     if(currentFlow)setFlowStep(i=>Math.min(i+1,currentFlow.blocks.length-1))
     else if(timedSequence)setToolStep(i=>Math.min(i+1,task!.units.length-1))
     focusStep()
@@ -675,9 +791,7 @@ export default function SurveyPublicApp(){
       onRunningChange={setCognitiveRunning}/></Suspense>
     if(unit.kind==='SCALE'&&unit.presentationMode==='ONE_BY_ONE')
       return <fieldset key={unit.instrumentKey} className="border-0 p-0 min-w-0"><SurveyTimedScale
-        unit={{instrumentKey:unit.instrumentKey,title:unit.title,
-          items:(unit.items??[]).map(q=>({itemKey:q.itemKey,prompt:q.prompt,required:q.required,responseOptions:q.responseOptions})),
-          responseOptions:unit.responseOptions??[]}}
+        unit={timedScaleUnits.get(unit.instrumentKey)!}
         imagesReady={mountedScaleImagesReady(unit)}
         autoAdvanceReady={(()=>{
           const item=unit.items?.[Math.min(own(scalePages,unit.instrumentKey)??0,Math.max(0,(unit.items?.length??0)-1))]
@@ -795,8 +909,8 @@ export default function SurveyPublicApp(){
     const receipt=firstRequest?firstFinalGeneral(final,attemptId):null
     if(receipt&&task.reportMode!=='DESCRIPTIVE'&&!task.units.some(u=>u.kind==='COGNITIVE'&&u.feedback?.mode==='DESCRIPTIVE')){
       // In-memory display only. Refresh/reopen and explicit reads reauthorize.
-      setGeneral(receipt)
-      setNotice('提交成功。以下为本次提交时确认的完成回执。')
+      setCompletionOptionsOpen(false);setGeneral(receipt)
+      setNotice('')
     }else await readCompletion(attemptId,proof)
   },'正在提交，请勿刷新或重复操作…').finally(()=>{finalInFlight.current=false})}
   const saveCheckpoint=()=>{if(!task?.checkpointPolicy?.enabled||!attemptId)return
@@ -882,30 +996,55 @@ export default function SurveyPublicApp(){
       researchCode:researchCode.trim().toUpperCase(),accessCredential:accessCredential.trim(),
       ...(info?.scopeWaveId?{waveId:info.scopeWaveId}:{}),
     })
-    setHome(data.waves);setSelectedWave(null);setGeneral(null);setCompletion(null);setTask(null)
+    setHome(data.waves);setSelectedWave(null);setGeneral(null);setCompletion(null);setTask(null);setReceiptsOpen(false)
   })
   // Timed cognitive administration retains the exact existing ancestor layout.
   // Only peripheral siblings opt in, and that opt-in stops while a runner is active.
   const panel=(base:string)=>cognitiveRunning?base:base+' survey-participant-panel'
   const message=(base:string)=>cognitiveRunning?base:base+' survey-participant-message'
   const action=(base:string)=>cognitiveRunning?base:base+' survey-participant-action'
-  return <div className="min-h-screen bg-slate-50 text-slate-800">
+  const personalUrl=!codeMode&&info?.project.collectionMode==='LINKED_WAVES'&&linkedIdentityReady&&!revoked&&!withdrawn
+    ?personalParticipationLink(window.location.origin,publicId,{researchCode,accessCredential}):''
+  const participantEntry=!!info&&!task&&!general&&!completion&&!revoked&&!withdrawn
+  const identityStarting=participantEntry&&busy&&busyLabel==='正在读取本轮作答，请勿重复开始…'
+  const identitySavePending=participantEntry&&(proofReceived||identityStarting)
+  const visibleWaves=home||info?.waves||[]
+  const completedWaves=visibleWaves.filter(wave=>wave.attempt?.status==='COMPLETED')
+  const participationWaves=visibleWaves.filter(wave=>wave.attempt?.status!=='COMPLETED')
+  const automaticConsentWave=info?.project.collectionMode==='SINGLE_UNLINKED'&&visibleWaves.length===1&&!singleResume
+    &&visibleWaves[0].attempt?.status!=='SCREENED_OUT'
+    &&(visibleWaves[0].status==='OPEN'||!!visibleWaves[0].attempt)
+    ?visibleWaves[0]:null
+  const automaticGeneratedConsentWave=generatedCodeMode&&!home&&(validEntry||!!fullMemorableCode&&linkedIdentityReady)
+    ?visibleWaves.filter(wave=>wave.status==='OPEN'&&wave.allowNewParticipants!==false&&!wave.attempt).sort((a,b)=>a.ordinal-b.ordinal)[0]??null:null
+  const consentWave=selectedWave||automaticConsentWave||automaticGeneratedConsentWave
+  const [agreementIdentity,setAgreementIdentity]=useState('')
+  const consentIdentity=consentWave?JSON.stringify([consentWave.id,consentWave.consentVersion,consentWave.consentText]):''
+  const consentAccepted=agreed&&agreementIdentity===consentIdentity
+  const directConsentEntry=participantEntry&&!!automaticConsentWave
+  const codeReturnEntry=participantEntry&&codeMode&&!validEntry&&!linkedIdentityReady
+  const streamlinedRandomEntry=participantEntry&&generatedCodeMode&&!home&&!!consentWave&&(validEntry||!!fullMemorableCode&&linkedIdentityReady)
+  return <div className={'min-h-screen bg-slate-50 text-slate-800'+(!cognitiveRunning?' survey-participant-shell'+(task&&!general&&!completion?' survey-active-answer':''):'')}>
     {!cognitiveRunning&&<a className="survey-participant-skip" href="#survey-participant-content">跳至研究内容</a>}
-    <header className="border-b bg-white"><div className={'max-w-3xl mx-auto p-5'+(!cognitiveRunning?' survey-participant-brand':'')}>
-      {!cognitiveRunning&&<img src="/survey/huisurvey-w2-emblem.svg" alt="" width="58" height="50"/>}
-      <h1 className="text-2xl font-semibold">Huisurvey</h1>
-      <p className="text-sm text-slate-500">观风知微 · 研究参与</p></div></header>
+    <header className={'border-b bg-white'+(!cognitiveRunning?' survey-participant-header':'')}>
+      {cognitiveRunning?<div className="max-w-3xl mx-auto p-5"><h1 className="text-2xl font-semibold">Huisurvey</h1><p className="text-sm text-slate-500">问卷作答</p></div>
+        :<div className="max-w-3xl mx-auto p-5 survey-participant-brand survey-participant-vector-brand">
+          <img src="/survey/huisurvey-w2-emblem.svg" alt="" width="216" height="184"/>
+          <img className="survey-participant-wordmark" src="/survey/research-wordmark.svg" alt="Research @EduK12.top" width="517" height="190"/>
+          <h1 className="sr-only">问卷作答</h1>
+        </div>}
+    </header>
     <main id={cognitiveRunning?undefined:'survey-participant-content'} tabIndex={cognitiveRunning?undefined:-1}
       className="max-w-3xl mx-auto p-4 sm:p-7 space-y-5">
-      {!cognitiveRunning&&<ol className="survey-participant-steps" aria-label="研究参与步骤">
-        {['了解研究','确认同意','完成作答','提交回执'].map((label,index)=><li key={label}
-          aria-current={index===(general||completion?3:task?2:selectedWave?1:0)?'step':undefined}>
+      {!cognitiveRunning&&!task&&!codeReturnEntry&&!identitySavePending&&!streamlinedRandomEntry&&<ol className="survey-participant-steps" aria-label="研究参与步骤">
+        {['阅读并同意','填写问卷','提交完成'].map((label,index)=><li key={label}
+          aria-current={index===(general||completion?2:task?1:0)?'step':undefined}>
           <span aria-hidden="true">0{index+1}</span>{label}</li>)}
       </ol>}
       {busy&&<p role="status" aria-live="polite" aria-atomic="true">{busyLabel}</p>}
       {loading&&<p role="status">正在读取研究说明…</p>}
       {error&&<p role="alert" className={message('border-l-4 border-red-600 bg-red-50 p-3')}>{error}</p>}
-      {notice&&<p role="status" className={message('border-l-4 border-teal-600 bg-teal-50 p-3')}>{notice}</p>}
+      {notice&&notice!==singleStartNotice&&(notice!==singleResumeNotice||!cognitiveRunning)&&<p role="status" className={message('border-l-4 border-teal-600 bg-teal-50 p-3')}>{notice}</p>}
       {revoked&&!withdrawn&&<section className={panel('border p-4 rounded-lg bg-white')}>
         <p role="status">访问已撤销；仍可申请撤回研究数据。</p>
         <button type="button" className={action('btn-secondary')} disabled={busy} onClick={withdraw}>申请排除历史研究数据</button>
@@ -919,44 +1058,32 @@ export default function SurveyPublicApp(){
           onChange={event=>setEntryToken(event.target.value.trim())}/>
       </label><button type="button" className={action('btn-secondary')} disabled={busy||!safePattern.test(publicId)}
         onClick={recoverWithoutInvitation}>已有私密凭据 · 恢复作答或撤回数据</button></section>}
-      {info&&<><section className={panel('bg-white rounded-xl border p-5')}>
+      {info&&<>{participantEntry&&!screenedOut&&!directConsentEntry&&!streamlinedRandomEntry&&!codeReturnEntry&&!identitySavePending&&<section className={panel('bg-white rounded-xl border p-5')+(participantEntry?' survey-entry-intro':'')}>
+        {participantEntry&&<p className="survey-entry-eyebrow">邀请你填写一份问卷</p>}
         <h2 className="text-xl font-semibold">{info.project.name}</h2>
-        <p className="my-3 whitespace-pre-wrap">{info.project.description}</p>
-        <p className="text-sm">{info.project.collectionMode==='LINKED_WAVES'
-          ?'多波次研究：同一研究编号的回答将在本研究内关联。无需登录或提供真实姓名。'
-          :'独立匿名研究：本次作答不与其他波次关联，无需登录或提供真实姓名。'}</p>
+        {participantEntry?<>
+          <p className="survey-entry-lead">先阅读参与说明，再决定是否开始。</p>
+          <div className="survey-entry-facts" aria-label="参与方式">
+            <span>无需登录</span><span>{info.project.collectionMode==='LINKED_WAVES'?'分次参与':'独立作答'}</span>
+          </div>
+          {info.project.collectionMode==='LINKED_WAVES'&&<p className="survey-entry-privacy">{codeMode?(generatedCodeMode?'使用系统生成的随机编码关联多次回答，无需提供个人信息。请保存编码，丢失后无法找回。':'使用同一研究编码，关联你在本研究中的多次回答。短编号可能对应研究者已有的报名或班级名单。'):'无需提供真实身份信息。使用同一专属链接，可关联你在本研究中的多次回答。'}</p>}
+          {info.project.description&&<details className="survey-entry-about"><summary>查看研究介绍</summary>
+            <p className="whitespace-pre-wrap">{info.project.description}</p></details>}
+        </>:<p className="my-3 whitespace-pre-wrap">{info.project.description}</p>}
         {groupWave?.groupIpPolicy&&groupWave.closesAt&&<p className="mt-3 text-sm text-amber-800">
           同 IP 集体作答截止：{new Date(groupWave.closesAt).toLocaleString('zh-CN',{
             timeZone:groupWave.groupIpPolicy.timeZone,year:'numeric',month:'2-digit',day:'2-digit',
             hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,
           })}（{groupWave.groupIpPolicy.timeZone}）。请在截止前完成提交；到期无宽限，暂停不延长窗口。
         </p>}
-      </section>
-      {info.project.collectionMode==='LINKED_WAVES'&&!home&&!task&&!general&&!completion&&!revoked&&<section className={panel('bg-white rounded-xl border p-5')}>
-        <h3 className="font-semibold text-lg">已有研究编号 · 继续参加后续波次</h3>
-        <p className="text-sm my-2">公开研究编号不是登录密码，必须同时提供本人私密恢复凭证。</p>
-        <form onSubmit={recover} className="grid gap-3">
-          <label>研究编号<input className="input block w-full" value={researchCode}
-            onChange={e=>setResearchCode(e.target.value)} autoComplete="off" placeholder="R-…"/></label>
-          <label>私密恢复凭证<input className="input block w-full" type="password" autoComplete="off"
-            value={accessCredential} onChange={e=>setAccessCredential(e.target.value)}/></label>
-          <button className={action('btn-primary')} disabled={busy||!researchCode||!accessCredential}>{busyLabel==='正在读取你的波次任务…'?'正在读取…':'读取我的波次任务'}</button>
-        </form>
-        <button type="button" className={action('btn-secondary mt-3')} disabled={busy||!researchCode||!accessCredential}
-          onClick={withdraw}>持原有研究凭证申请数据撤回（包括已撤销访问者）</button>
       </section>}
-      {info.project.collectionMode==='LINKED_WAVES'&&proofReceived&&<section className={panel('bg-white rounded-xl border-2 border-teal-600 p-5')}>
-        <h3 className="font-semibold text-lg">请保存研究身份</h3>
-        <p className="text-sm">研究编号可供本项目数据匹配；<strong>私密恢复凭证不可交给研究者或其他人</strong>。页面关闭后不再显示原始密钥。</p>
-        <p className="mt-3">研究编号</p><code className="block bg-slate-100 p-3 break-all">{researchCode}</code>
-        <p className="mt-3">私密恢复凭证</p><code className="block bg-slate-100 p-3 break-all">{accessCredential}</code>
-        <button className={action('btn-secondary mt-3')} type="button" onClick={()=>setProofReceived(false)}>
-          我已分别保存这两个凭证</button>
-      </section>}
+      {codeMode&&proofReceived&&!task&&!revoked&&!withdrawn&&!streamlinedRandomEntry&&<SurveyMemorableCodeSaved generated={generatedCodeMode} fullCode={fullMemorableCode} busy={busy} onSaved={confirmSavedAndStart}/>}
+      {personalUrl&&!task&&!identityStarting&&(proofReceived?<Suspense fallback={<p role="status">正在准备参与链接…</p>}><SurveyPersonalLink url={personalUrl} firstTime busy={busy} onSaved={confirmSavedAndStart}/></Suspense>
+        :<details className="survey-returning-link" open={personalLinkOpen} onToggle={event=>setPersonalLinkOpen(event.currentTarget.open)}><summary onClick={event=>{event.preventDefault();setPersonalLinkOpen(open=>!open)}}>查看原有链接与二维码</summary>{personalLinkOpen&&<Suspense fallback={<p role="status">正在准备参与链接…</p>}><SurveyPersonalLink url={personalUrl} firstTime={false} busy={busy} onSaved={()=>{}}/></Suspense>}</details>)}
       {info.project.collectionMode==='SINGLE_UNLINKED'&&singleResume&&!task&&!general&&!completion&&
         <section className={panel('bg-white border rounded-xl p-4')}>
           <h3 className="font-semibold">恢复本次单次匿名作答</h3>
-          <p className="text-sm my-2">仅此浏览器标签可尝试恢复短期作答；不建立跨波次身份。公共设备请在完成后关闭标签。</p>
+          <p className="text-sm my-2">请在原浏览器标签页继续作答。公共设备使用完毕后，请关闭页面。</p>
           <button className={action('btn-secondary')} type="button" disabled={busy} onClick={resumeSingle}>
             {busyLabel==='正在恢复本次作答，请稍候…'?'正在恢复…':'恢复本次作答／查看已完成回执'}</button>
         </section>}
@@ -964,51 +1091,88 @@ export default function SurveyPublicApp(){
         <button type="button" className={action('btn-secondary')} disabled={busy} onClick={revokeAccess}>
           停止后续研究参与并撤销未来访问权限（已收集数据不自动删除）
         </button>}
-      {!task&&!general&&!completion&&!revoked&&<section className={panel('bg-white rounded-xl border p-5')}>
-        <h3 className="font-semibold text-lg">研究波次</h3>
-        {!validEntry&&<label className="block text-sm my-3">缺少有效邀请凭证？从原研究邀请中复制 43 位凭证到这里。
+      {streamlinedRandomEntry&&consentWave&&<SurveyRandomCodeEntry name={info.project.name} consentText={consentWave.consentText}
+        fullCode={fullMemorableCode} copied={linkedIdentityReady&&!proofReceived} busy={busy}
+        deadline={groupWave?.groupIpPolicy&&groupWave.closesAt?'请在 '+new Date(groupWave.closesAt).toLocaleString('zh-CN',{timeZone:groupWave.groupIpPolicy.timeZone})+' 前完成提交。':undefined}
+        onConsent={joinRandomCode} onCopied={()=>setProofReceived(false)} onStart={start}
+        recovery={<SurveyMemorableCodeRecovery busy={busy} generated onEnter={enterCode} onReset={resetCode}/>}/>}
+      {!task&&!general&&!completion&&!revoked&&!streamlinedRandomEntry&&!codeReturnEntry&&!identitySavePending&&<section className={panel('bg-white rounded-xl border p-5')+' survey-entry-options'}>
+        {directConsentEntry?<div className="survey-consent-intro">
+          <div className="survey-consent-anonymity" aria-label="匿名参与方式">
+            <strong>完全匿名：</strong><span>无需登录，不记录个人信息，放心作答</span>
+          </div>
+          <p className="survey-entry-eyebrow">诚邀你参与</p>
+          <h2>{info.project.name}</h2>
+          {groupWave?.groupIpPolicy&&groupWave.closesAt&&<p className="mt-3 text-sm text-amber-800">
+            同 IP 集体作答截止：{new Date(groupWave.closesAt).toLocaleString('zh-CN',{
+              timeZone:groupWave.groupIpPolicy.timeZone,year:'numeric',month:'2-digit',day:'2-digit',
+              hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false,
+            })}（{groupWave.groupIpPolicy.timeZone}）。请在截止前完成提交；到期无宽限，暂停不延长窗口。
+          </p>}
+          <p className="survey-consent-invitation">请先阅读下方说明，是否参加由你决定。</p>
+        </div>:<>
+          <h3 className="font-semibold text-lg">{consentWave?'阅读参与说明':home&&completedWaves.length>0&&participationWaves.length===0?'本次问卷已完成':participationWaves.length>1?'请选择本次要填写的问卷':'准备开始'}</h3>
+          {!consentWave&&participationWaves.length>1&&<p className="survey-entry-next">选择对应问卷，先阅读说明，再确认参加。</p>}
+        </>}
+        {!validEntry&&!researchCode&&!codeMode&&<label className="block text-sm my-3">需要原邀请链接中的访问凭证。请重新打开邀请链接，或在下方粘贴凭证。
           <input className="input block w-full mt-2" autoComplete="off"
             aria-label="重新输入研究邀请凭证" value={entryToken}
             onChange={event=>setEntryToken(event.target.value.trim())}
             placeholder="输入研究邀请凭证"/>
         </label>}
-        {(home||info.waves).map(wave=><div key={wave.id} className="survey-wave-row border-b py-3 flex items-center justify-between gap-3">
+        {home&&visibleWaves.every(wave=>wave.status!=='OPEN'||['COMPLETED','SCREENED_OUT'].includes(wave.attempt?.status??''))&&
+          <p className="survey-entry-next">目前没有待填写的问卷。请保存专属链接，下次开放后再来。</p>}
+        {!directConsentEntry&&participationWaves.map(wave=><div key={wave.id} className="survey-wave-row border-b py-3 flex items-center justify-between gap-3">
           <div><strong>第 {wave.ordinal} 轮 · {wave.title}</strong>
-            <p className="text-sm text-slate-500">{wave.status==='OPEN'?'开放采集中':wave.status==='CLOSED'?'已结束':'尚未开放'}
+            <p className="text-sm text-slate-500">{wave.status==='OPEN'?'现在可以填写':wave.status==='CLOSED'?'已结束':'尚未开放'}
               {wave.attempt?' · '+(wave.attempt.status==='COMPLETED'?'已完成':wave.attempt.status==='SCREENED_OUT'?'已筛除':'进行中'):''}</p>
           </div>
-          <button className={action('btn-secondary')} disabled={busy||wave.attempt?.status==='SCREENED_OUT'||(wave.status!=='OPEN'&&!wave.attempt)}
-            onClick={()=>chooseWave(wave)}>{wave.attempt?.status==='COMPLETED'?'查看回执':'选择本轮'}</button>
+          <button className={action('btn-primary')+' survey-entry-action'} aria-expanded={selectedWave?.id===wave.id}
+            aria-controls={selectedWave?.id===wave.id?'survey-participant-consent':undefined}
+            disabled={busy||wave.attempt?.status==='SCREENED_OUT'||(wave.status!=='OPEN'&&!wave.attempt)}
+            onClick={()=>chooseWave(wave)}>{wave.attempt?.status==='COMPLETED'?'查看回执':'查看参与说明'}<span aria-hidden="true"> →</span></button>
         </div>)}
-        {selectedWave&&<div className="bg-slate-50 border rounded-lg p-4 mt-4 space-y-3">
-          <h4 className="font-semibold">本轮知情同意 · {selectedWave.title}</h4>
-          <p className="whitespace-pre-wrap text-sm">{selectedWave.consentText}</p>
+        {consentWave&&<div id="survey-participant-consent" role="region" aria-label="参与说明" tabIndex={-1} className="survey-entry-consent bg-slate-50 border rounded-lg p-4 mt-4 space-y-3">
+          <h3 className="font-semibold">知情同意书</h3>
+          <p className="whitespace-pre-wrap text-sm survey-consent-text">{consentWave.consentText}</p>
           {info.project.collectionMode==='LINKED_WAVES'&&<p className="text-sm text-sky-800">
-            本研究以随机编号关联该研究内的多次回答；它是研究内假名化，不是完全不可关联的匿名。</p>}
-          <label className="flex items-start gap-2 text-sm"><input type="checkbox" checked={agreed}
-            onChange={e=>setAgreed(e.target.checked)}/>
-            我已阅读并同意本轮研究说明及相应的数据关联范围。</label>
-          {info.project.collectionMode==='LINKED_WAVES'&&!researchCode&&<button
-            className={action('btn-secondary')} disabled={busy||!agreed||!validEntry}
-            onClick={()=>join(selectedWave)}>首次参加 · 领取随机研究编号</button>}
-          <button className={action('btn-primary')} disabled={busy||!agreed||
-            (info.project.collectionMode==='LINKED_WAVES'?(!researchCode||!accessCredential):!validEntry)}
-            onClick={start}>{busyLabel==='正在读取本轮作答，请勿重复开始…'?'正在读取本轮…':selectedWave.attempt?.status==='COMPLETED'?'查看完成情况':'开始或恢复本轮作答'}</button>
+            {codeMode?(generatedCodeMode?'系统将为你生成一个随机研究编码，用于关联本研究内的回答。请自行保存，不要转发；丢失后无法找回。':'完整研究编码用于关联本研究内的多次回答。私人后缀不要交给研究者或他人；短编号可能对应报名或班级名单。'):'无需姓名或账号。我们会通过专属链接，关联你在本研究中的多次回答。'}</p>}
+          <label className="flex items-start gap-2 text-sm"><input type="checkbox" checked={consentAccepted}
+            onChange={e=>{setAgreed(e.target.checked);setAgreementIdentity(e.target.checked?consentIdentity:'')}}/>
+            {info.project.collectionMode==='LINKED_WAVES'?'我已阅读并同意本轮研究说明及相应的数据关联范围。':'我已阅读以上说明，自愿参加本次问卷。'}</label>
+          <p className="survey-consent-choice">若不愿参加，可直接关闭本页。未确认同意前，不会开始作答。</p>
+          {!codeMode&&info.project.collectionMode==='LINKED_WAVES'&&!linkedIdentityReady&&!personalProof&&<button
+            className={action('btn-secondary')} disabled={busy||!consentAccepted||!validEntry}
+            onClick={()=>join(consentWave)}>首次参加 · 获取专属链接</button>}
+          {codeMode&&!linkedIdentityReady&&!codeSetup&&<button type="button" className={action('btn-primary')}
+            disabled={busy||!consentAccepted||!validEntry} onClick={()=>generatedCodeMode?joinRandomCode():setCodeSetup(true)}>{generatedCodeMode?'首次参加 · 领取研究编码':'首次参加 · 设置研究编码'}</button>}
+          {codeMode&&!generatedCodeMode&&codeSetup&&consentAccepted&&!linkedIdentityReady&&<SurveyMemorableCodeSetup busy={busy}
+            label={info.project.participantCodeLabel||'报名序号'} instructions={info.project.participantCodeInstructions||''} onSubmit={joinCode}/>}
+          <button className={action('btn-primary')} disabled={busy||!consentAccepted||
+            (info.project.collectionMode==='LINKED_WAVES'?(!linkedIdentityReady||!researchCode||!accessCredential||proofReceived):!validEntry)}
+            onClick={start}>{busyLabel==='正在读取本轮作答，请勿重复开始…'?'正在读取本轮…':consentWave.attempt?.status==='COMPLETED'?'查看完成情况':'开始填写问卷'}</button>
         </div>}
       </section>}
+      {!codeMode&&info.project.collectionMode==='LINKED_WAVES'&&!home&&!task&&!general&&!completion&&!revoked&&!linkedIdentityReady&&<section className={panel('bg-white rounded-xl border p-5 survey-entry-recovery')}>
+        <h3 className="font-semibold text-lg">继续参加</h3>
+        <p className="text-sm my-2">已参加过？打开你保存的专属链接即可继续。</p>
+        <details open={legacyRecoveryOpen} onToggle={event=>setLegacyRecoveryOpen(event.currentTarget.open)}>
+          <summary className="survey-legacy-summary" onClick={event=>{event.preventDefault();setLegacyRecoveryOpen(value=>!value)}}>使用旧编号和恢复凭证</summary>
+        {legacyRecoveryOpen&&<><form onSubmit={recover} className="grid gap-3">
+          <label>研究编号<input className="input block w-full" value={researchCode}
+            onChange={e=>setResearchCode(e.target.value)} autoComplete="off" placeholder="R-…"/></label>
+          <label>私密恢复凭证<input className="input block w-full" type="password" autoComplete="off"
+            value={accessCredential} onChange={e=>setAccessCredential(e.target.value)}/></label>
+          <button className={action('btn-primary')} disabled={busy||!researchCode||!accessCredential}>{busyLabel==='正在读取你的波次任务…'?'正在读取…':'读取我的波次任务'}</button>
+        </form>
+        <button type="button" className={action('btn-secondary mt-3')} disabled={busy||!researchCode||!accessCredential}
+          onClick={withdraw}>持原有研究凭证申请数据撤回（包括已撤销访问者）</button></>}
+        </details>
+      </section>}
+      {codeMode&&!linkedIdentityReady&&!revoked&&!withdrawn&&!streamlinedRandomEntry&&<SurveyMemorableCodeRecovery busy={busy} generated={generatedCodeMode} entryTitle={codeReturnEntry?info.project.name:undefined} onEnter={enterCode} onReset={resetCode}/>}
       {task&&!general&&<form className="space-y-5" onSubmit={submit}>
         <fieldset disabled={busy||finalSealed} className="space-y-5 min-w-0 border-0 p-0">
-        <div className={panel('bg-white border rounded-xl p-4')}><h3 id="survey-task-step" tabIndex={-1} className="font-semibold">本轮研究作答</h3>
-          <p className="text-sm text-slate-500">请按实际情况回答。研究内部计分不作为个人诊断反馈。</p>
-          <p className="text-xs text-slate-500 mt-2">{task.checkpointPolicy?.enabled&&!cognitiveRunning
-            ?'本标签页会短期暂存未提交答案。若需在其他设备恢复，请先主动保存加密临时进度，并保管原有私密凭证。公共电脑建议完成后立即退出。'
-            :<>未提交答案仅在当前浏览器标签页暂存，至多两小时；
-              关闭标签、使用其他设备或清理浏览器数据后无法恢复。公共电脑建议完成后立即退出。</>}</p></div>
-        {!cognitiveRunning&&task.units.some(unit=>unit.kind==='COGNITIVE')&&<aside className="survey-submit-guide" aria-label="本轮认知任务设备提示">
-          <h3>本轮包含认知任务</h3>
-          <p>现有任务需要桌面／笔记本电脑和实体键盘，正式进入时仍须完成设备与本机暂存检查。此处只是提前提醒，不代表已通过检查。</p>
-          <p>请先核对本研究的恢复方式，再决定是否更换设备；单次匿名作答只能在原浏览器标签页恢复，不能保证跨设备继续。</p>
-        </aside>}
+        <h3 id="survey-task-step" tabIndex={-1} className="sr-only">填写问卷</h3>
         {task.checkpointPolicy?.enabled&&<section className={panel('bg-white border rounded-xl p-4 space-y-2')}>
           <p className="text-sm">此研究启用了可选服务器加密暂存：您可主动保存尚未完成的内容。
             每次最多 64KB，保存期 {task.checkpointPolicy.ttlHours} 小时；不计入正式研究答卷（FINAL）。</p>
@@ -1017,7 +1181,7 @@ export default function SurveyPublicApp(){
           <p className="text-xs text-slate-500">研究者不会通过此按钮获得正式作答，取消、撤回或最终提交后将按策略清理。
             仅拥有本研究合法私密凭证的当前参与者可以恢复。</p>
         </section>}
-        {Object.keys(lockedAnswers).length>0&&<p role="status" className="text-sm text-amber-800">认知任务已经开始，前置工具答案已锁定。此任务已提交与本轮研究已提交分别确认。</p>}
+        {cognitiveSessions.length>0&&Object.keys(lockedAnswers).length>0&&<p role="status" className="text-sm text-amber-800">认知任务已经开始，前置工具答案已锁定。此任务已提交与本轮研究已提交分别确认。</p>}
         {cognitiveRunning&&<p role="status" className="text-sm">认知任务运行／提交期间不能切换外层研究步骤。请勿刷新或离开页面。</p>}
         {task.flow&&currentFlow?<>
           <p className="text-xs text-slate-500">研究流程 · 步骤 {Math.min(flowStep+1,currentFlow.blocks.length)} / {currentFlow.blocks.length}</p>
@@ -1035,31 +1199,28 @@ export default function SurveyPublicApp(){
           {!finalFlowStep&&<button type="button" className={action('btn-secondary')} disabled={busy||cognitiveRunning}
             onClick={advanceFlow}>确认当前步骤，继续研究</button>}
         </>:timedSequence&&flowUnit?<section className="space-y-3">
-          <p className="text-xs text-slate-600" role="status">研究工具 {toolStep+1} / {task.units.length}</p>
+          <p className="text-xs text-slate-600" role="status">第 {toolStep+1} / {task.units.length} 部分</p>
           {renderSurveyTask(flowUnit)}
-          <nav aria-label="研究工具导航" className="flex flex-wrap gap-3">
-            <button type="button" className={action('btn-secondary')} disabled={toolStep===0||cognitiveRunning}
-              onClick={()=>{setError('');setToolStep(i=>Math.max(0,i-1));focusStep()}}>上一工具</button>
-            {!finalFlowStep&&<button type="button" className={action('btn-secondary')} disabled={cognitiveRunning}
-              onClick={advanceFlow}>确认当前工具，继续</button>}
+          <nav aria-label="问卷部分导航" className={cognitiveRunning?'flex flex-wrap gap-3':'survey-section-navigation'}>
+            {!finalFlowStep&&<button type="button" className={action('btn-primary')} disabled={cognitiveRunning}
+              onClick={advanceFlow}>下一部分</button>}
           </nav>
         </section>:task.units.map(renderSurveyTask)}
         </fieldset>
-        {!cognitiveRunning&&!finalSealed&&<aside className="survey-submit-guide" aria-label="提交前检查">
-          <h3>提交前请检查</h3>
-          <p>{(currentFlow||timedSequence)&&!canAdvanceFlow()
-            ?'当前工具还有待完成的内容。请检查必答题、全部页面及任务提交状态，再继续。'
-            :'请检查所有必答题、矩阵每一行及全部页面。只有服务器确认整轮提交后，才会显示完成回执。'}</p>
-          <p>工具完成、临时暂存与整轮正式提交分别确认；这份提示不代替提交时的完整检查。</p>
-        </aside>}
         {finalSealed&&<p role="status" className={message('')}>本次答案已封存，尚未确认提交结果。请使用下方按钮重试原提交，不会创建另一份答卷；暂不能修改答案，请勿刷新或关闭页面。</p>}
-        {(finalSealed||finalFlowStep)&&<button className={action('btn-primary')} disabled={busy||cognitiveRunning||(!finalSealed&&task.units.some(unit=>unit.kind==='SCALE'&&!mountedScaleImagesReady(unit)))||(!finalSealed&&!task.flow&&!task.units.every(unit=>{
+        {finalSubmitVisible&&<button className={action('btn-primary')} disabled={busy||cognitiveRunning||(!finalSealed&&task.units.some(unit=>unit.kind==='SCALE'&&!mountedScaleImagesReady(unit)))||(!finalSealed&&!task.flow&&!task.units.every(unit=>{
           if(unit.kind!=='FORM')return true
           const vis=visibleFormKeys(unit.pages?.flatMap(p=>p.questions)||[],
             own(answers,unit.instrumentKey)??{})
           const pages=(unit.pages||[]).filter(p=>p.questions.some(q=>vis.has(q.itemKey)))
           return (own(formPages,unit.instrumentKey)??0)>=pages.length-1
         }))}>{busy&&finalInFlight.current?'正在提交…':finalSealed?'重试原提交':currentFlow?.termination==='SCREEN_OUT'?'完成资格筛选':'提交本轮正式回答'}</button>}
+        {!cognitiveRunning&&!finalSealed&&<div className="text-xs text-slate-500 space-y-1" aria-label="作答提醒">
+          <p>{task.checkpointPolicy?.enabled
+            ?'离开前请保存加密临时进度，并保管好私密凭证。'
+            :'答案仅在此标签页暂存，最长两小时；关闭页面或更换设备后无法恢复，请尽量一次完成。'}</p>
+          {finalSubmitVisible&&<p>检查完成后点击提交，看到完成提示即表示已保存。</p>}
+        </div>}
       </form>}
       {screenedOut&&!task&&<section className={panel('bg-white border rounded-xl p-5 space-y-3')}>
         <h2 className="text-lg font-semibold">本轮资格筛选已结束</h2>
@@ -1071,20 +1232,19 @@ export default function SurveyPublicApp(){
               onClick={withdraw}>撤回本轮筛选记录</button>}
       </section>}
       {completion&&!general&&<section className={panel('bg-white border rounded-xl p-5 space-y-3')}>
-        <h2 className="text-xl font-semibold">本轮研究已提交</h2>
-        <p className="survey-completion-state">整轮正式回答已由服务器确认保存</p>
-        <p>正式回答已保存，完成回执尚未读取。</p>
+        <h2 className="text-xl font-semibold">感谢参与，问卷已提交</h2>
+        <p className="survey-completion-state">你已完成问卷，可以关闭此页面。</p>
+        <p>你的回答已保存。暂时无法显示后续信息，你可以稍后重试。</p>
         <button type="button" className={action('btn-secondary')} disabled={busy}
-          onClick={()=>void run(()=>readCompletion(completion.attemptId,completion.proof))}>重试读取完成回执</button>
+          onClick={()=>void run(()=>readCompletion(completion.attemptId,completion.proof))}>重新查看</button>
       </section>}
-      {general&&<section className={panel('bg-white border rounded-xl p-5 space-y-3')}>
-        <h2 className="text-xl font-semibold">本轮研究已提交</h2>
-        <p className="survey-completion-state">整轮正式回答已由服务器确认保存</p>
-        <p className="whitespace-pre-wrap">{general.text}</p>
-        <p className="text-sm text-slate-600">{general.disclaimer}</p>
+      {general&&<section className={panel('survey-completion-card bg-white border rounded-xl p-5 space-y-3')}>
+        <div className="survey-completion-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="m6 12 4 4 8-8" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg></div>
+        <h2 className="text-xl font-semibold">感谢参与，问卷已提交</h2>
+        <p className="survey-completion-copy whitespace-pre-wrap">{general.text||'你已完成问卷，可以关闭此页面。'}</p>
         {general.kind==='DESCRIPTIVE'&&<section className="border rounded-lg p-3 space-y-3" aria-label="本次表现描述性反馈">
           <h3 className="font-semibold">本次表现反馈</h3>
-          {general.pending&&<p role="status">本轮已经提交；部分反馈将在统一收集结束后开放。</p>}
+          {general.pending&&<p role="status">部分反馈将在问卷收集结束后开放。</p>}
           {general.measurements?.map(measurement=><article key={measurement.instrumentKey} className="space-y-2">
             <h4 className="font-medium">{measurement.title}</h4>
             <p className="text-xs">{measurement.feedbackKind==='RAW_METRICS'?'受控原始指标':'试点测量'} · 质量状态：{measurement.quality}。仅反映本次条件下的表现。</p>
@@ -1096,17 +1256,39 @@ export default function SurveyPublicApp(){
             </section>)}
           </article>)}
         </section>}
-        <p className="text-xs">完成时间：{new Date(general.completedAt).toLocaleString('zh-CN')}</p>
-        <div className="flex flex-wrap gap-3">
-          {info.project.collectionMode==='LINKED_WAVES'&&<>
-            <button className={action('btn-secondary')} disabled={busy} onClick={returnHome}>返回我的研究波次</button>
-            <button type="button" className={action('btn-secondary')} disabled={busy} onClick={revokeAccess}>
-              只撤销未来访问（保留研究数据）</button>
-          </>}
-          <button className={action('btn-secondary')} type="button" disabled={busy} onClick={withdraw}>
-            申请撤回本研究数据（排除未来统计）</button>
-        </div>
+        <p className="survey-completion-time">完成时间：{new Date(general.completedAt).toLocaleString('zh-CN')}</p>
+        {info.project.collectionMode==='LINKED_WAVES'&&<div className="survey-completion-primary">
+          <button type="button" className={action('btn-secondary')} disabled={busy} onClick={returnHome}>返回我的研究波次</button>
+        </div>}
+        {general.disclaimer&&<p className="survey-completion-disclaimer">{general.disclaimer}</p>}
+        <details className="survey-completion-options" open={completionOptionsOpen}
+          onToggle={event=>setCompletionOptionsOpen(event.currentTarget.open)}>
+          <summary onClick={event=>{event.preventDefault();setCompletionOptionsOpen(open=>!open)}}>参与与数据管理</summary>
+          {completionOptionsOpen&&<div className="survey-completion-option-list">
+            {info.project.collectionMode==='LINKED_WAVES'&&<div className="survey-completion-option">
+              <p>如不再参加后续问卷，可停止此编码的后续访问；已提交的回答会保留。</p>
+              <button type="button" className="survey-completion-management-action" disabled={busy} onClick={revokeAccess}>
+                只撤销未来访问（保留研究数据）</button>
+            </div>}
+            <div className="survey-completion-option">
+              <p>如希望退出研究，可申请将已提交的回答排除在后续统计之外。</p>
+              <button type="button" className="survey-completion-management-action" disabled={busy} onClick={withdraw}>
+                申请撤回本研究数据（排除未来统计）</button>
+            </div>
+          </div>}
+        </details>
       </section>}
+      {participantEntry&&!identitySavePending&&home&&completedWaves.length>0&&<details className="survey-completed-receipts" open={receiptsOpen}
+        onToggle={event=>setReceiptsOpen(event.currentTarget.open)}>
+        <summary onClick={event=>{event.preventDefault();setReceiptsOpen(open=>!open)}}>已完成问卷<span>{completedWaves.length} 份</span></summary>
+        {receiptsOpen&&<div className="survey-receipt-list">
+          <p>这里可查看已提交问卷的回执。</p>
+          {completedWaves.map(wave=><div key={wave.id} className="survey-receipt-row">
+            <div><strong>第 {wave.ordinal} 轮 · {wave.title}</strong><span>已完成</span></div>
+            <button type="button" className="survey-receipt-link" disabled={busy} onClick={()=>chooseWave(wave)}>查看回执</button>
+          </div>)}
+        </div>}
+      </details>}
       </>}
     </main></div>
 }

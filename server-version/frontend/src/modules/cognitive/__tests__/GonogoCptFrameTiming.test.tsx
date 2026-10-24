@@ -5,7 +5,8 @@ import { resolveRunner } from '../registry'
 let nextFrameId = 1
 let frameCallbacks: Map<number, FrameRequestCallback>
 
-beforeEach(() => {
+beforeEach(async () => {
+  await Promise.all(['gonogo','cpt'].map(testType => resolveRunner(testType, '1.0.0')!.prepareRunner!()))
   vi.useFakeTimers()
   nextFrameId = 1
   frameCallbacks = new Map()
@@ -100,6 +101,29 @@ describe('FE-07B Go/No-Go and CPT frame timing routing', () => {
     expect(screen.getByLabelText('respond').className).toContain('bg-green-500')
     act(() => vi.advanceTimersByTime(1))
     expect(screen.getByLabelText('respond').className).toContain('bg-gray-200')
+  })
+
+  it('shows the full rules again before each repeated frame-timed practice without recording formal trials',async()=>{
+    const Runner=requireRunner('gonogo'),onTrialComplete=vi.fn(async()=>{})
+    render(<Runner taskContext={{...baseContext,testType:'gonogo',configVersion:'1.1.0',requiredInput:'KEYBOARD',
+      config:{totalTrials:8,nogoRatio:0.25,stimulusMs:50,isiMs:20,validRtFloorMs:100}}}
+      trialIndex={0} onTrialComplete={onTrialComplete}/>)
+    expect(screen.getByText('尽快按一次空格键或 Enter 键。')).toBeInTheDocument()
+    fireEvent.click(screen.getByText('开始练习'))
+    for(let i=0;i<4;i++){
+      act(()=>vi.advanceTimersByTime(20));flushFrame(100+i*1000)
+      await act(async()=>{vi.advanceTimersByTime(650)})
+    }
+    fireEvent.click(screen.getByText('重新练习'))
+    expect(screen.getByText('Go/No-Go · 操作说明')).toBeInTheDocument()
+    expect(screen.getByText('红色圆形：不要反应')).toBeInTheDocument()
+    expect(screen.queryByLabelText('respond')).toBeNull()
+    act(()=>vi.advanceTimersByTime(2000))
+    expect(screen.queryByLabelText('respond')).toBeNull()
+    expect(onTrialComplete).not.toHaveBeenCalled()
+    fireEvent.click(screen.getByText('开始练习'))
+    expect(screen.getByText(/练习 1/)).toBeInTheDocument()
+    expect(onTrialComplete).not.toHaveBeenCalled()
   })
 
   it('waits for the animation frame for the CPT timing-pilot config', () => {

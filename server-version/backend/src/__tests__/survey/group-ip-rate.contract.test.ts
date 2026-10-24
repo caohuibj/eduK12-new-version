@@ -55,11 +55,11 @@ describe('Group IP request eligibility is scoped, bounded and never mutation aut
   it('holds timed-out live SQL slots and expires queued work before execution',async()=>{
     const gate=new BoundedAdmissionGate({name:'group_contract_timeout',maxConcurrent:2,maxQueue:2,maxWaitMs:15})
     const releases:Array<(v:boolean)=>void>=[],lookup=vi.fn(()=>new Promise<boolean>(resolve=>releases.push(resolve)))
-    const middleware=createSurveyPublicRateLimiter({lookup,gate,responseTimeoutMs:60,standard:vi.fn()})
+    const middleware=createSurveyPublicRateLimiter({lookup,gate,responseTimeoutMs:60,standard:vi.fn((_req,res)=>res.status(429).json({limited:true}))})
     const replies=[response(),response(),response(),response()],next=vi.fn()
     await Promise.all(replies.map(res=>middleware(request(),res,next)))
     expect(lookup).toHaveBeenCalledTimes(2);expect(gate.getStats()).toMatchObject({active:2,queued:0})
-    for(const res of replies){expect(res.status).toHaveBeenCalledWith(503);expect(res.json).toHaveBeenCalledTimes(1)}
+    for(const res of replies){expect(res.status).toHaveBeenCalledWith(429);expect(res.json).toHaveBeenCalledTimes(1)}
     expect(next).not.toHaveBeenCalled()
     releases.forEach(release=>release(true));await new Promise(r=>setTimeout(r,0))
     expect(gate.getStats()).toMatchObject({active:0,queued:0});expect(lookup).toHaveBeenCalledTimes(2)
@@ -72,21 +72,27 @@ describe('Group IP request eligibility is scoped, bounded and never mutation aut
     const res=response(),next=vi.fn(),unhandled=vi.fn()
     process.on('unhandledRejection',unhandled)
     try{
-      await createSurveyPublicRateLimiter({lookup,gate,responseTimeoutMs:10,standard:vi.fn()})(request(),res,next)
-      expect(res.status).toHaveBeenCalledWith(503);expect(gate.getStats().active).toBe(1)
+      await createSurveyPublicRateLimiter({lookup,gate,responseTimeoutMs:10,standard:vi.fn((_req,res)=>res.status(429).json({limited:true}))})(request(),res,next)
+      expect(res.status).toHaveBeenCalledWith(429);expect(gate.getStats().active).toBe(1)
       rejectQuery(new Error('late database rejection'));await new Promise(resolve=>setTimeout(resolve,5))
       expect(gate.getStats().active).toBe(0);expect(unhandled).not.toHaveBeenCalled()
       expect(res.json).toHaveBeenCalledTimes(1);expect(next).not.toHaveBeenCalled()
     }finally{process.removeListener('unhandledRejection',unhandled)}
   })
-  it('does not write after disconnect, rejects lookup failure closed',async()=>{
+  it('does not write after disconnect, applies the ordinary limit without granting an unproven exemption',async()=>{
     const closed=response();closed.destroyed=true
     const closedNext=vi.fn()
     await createSurveyPublicRateLimiter({lookup:async()=>true,standard:vi.fn()})(request(),closed,closedNext)
     expect(closed.json).not.toHaveBeenCalled();expect(closedNext).not.toHaveBeenCalled()
-    const failed=response(),next=vi.fn(),standard=vi.fn()
+    const failed=response(),next=vi.fn(),standard=vi.fn((_req,res)=>res.status(429).json({limited:true}))
     await createSurveyPublicRateLimiter({lookup:async()=>{throw new Error('offline')},standard})(request(),failed,next)
-    expect(failed.status).toHaveBeenCalledWith(503);expect(failed.setHeader).toHaveBeenCalledWith('Retry-After','1')
-    expect(standard).not.toHaveBeenCalled();expect(next).not.toHaveBeenCalled()
+    expect(failed.status).toHaveBeenCalledWith(429)
+    expect(standard).toHaveBeenCalledTimes(1);expect(next).not.toHaveBeenCalled()
+  })
+  it('does not bypass or repeat a failed ordinary Redis decision',async()=>{
+    const standard=vi.fn((_req,res)=>res.status(503).json({code:-1})),next=vi.fn(),res=response()
+    await createSurveyPublicRateLimiter({lookup:async()=>{throw new Error('policy unavailable')},standard})(request(),res,next)
+    expect(standard).toHaveBeenCalledTimes(1);expect(res.status).toHaveBeenCalledWith(503)
+    expect(next).not.toHaveBeenCalled()
   })
 })

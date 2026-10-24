@@ -1,3 +1,4 @@
+import '../cognitive-surface.css'
 import { useTrainingLearnerNavigation } from '../../../training/learnerNavigation'
 import CognitiveCredentialReset from './CognitiveCredentialReset'
 import CognitiveSessionEntry from './CognitiveSessionEntry'
@@ -11,6 +12,7 @@ import { cognitiveInputNotice, resolveCognitiveReadinessProfile } from '../core/
 import { useCognitiveSession } from '../core/useCognitiveSession'
 import { useAdministrationProvenance } from '../core/useAdministrationProvenance'
 import { resolveRunner } from '../registry'
+import { useRunnerPreparation } from '../core/useRunnerPreparation'
 import AssessmentImagePresentation from '../../assessment-media/AssessmentImagePresentation'
 import AssessmentVideoPlayer from '../../assessment-media/AssessmentVideoPlayer'
 import { useAssessmentImageAssets } from '../../assessment-media/useAssessmentImageAssets'
@@ -59,7 +61,13 @@ export type CampusCognitiveRunnerBinding = {
 /** Reuse the unchanged frozen trial runner while injecting a SCHOOL-only,
  * parent-slot-scoped transport. Campus never navigates to legacy auth/routes.
  */
-export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; embedded?: CampusCognitiveRunnerBinding }> = ({ campus: legacyCampus, embedded }) => {
+type CognitiveRunnerProps={campus?: CampusCognitiveRunnerBinding;embedded?: CampusCognitiveRunnerBinding}
+
+export const CognitiveRunner: React.FC<CognitiveRunnerProps> = props => (
+  <div className="cognitive-surface"><CognitiveRunnerContent {...props}/></div>
+)
+
+const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacyCampus, embedded }) => {
   const campus = embedded ?? legacyCampus
   const params = useParams<{ sessionId: string }>()
   const sessionId = campus?.sessionId ?? params.sessionId
@@ -85,6 +93,7 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
   const resolvedEntry = useMemo(() => (
     state.session ? resolveRunner(state.session.testType, state.session.engineVersion) : undefined
   ), [state.session])
+  const runnerCode = useRunnerPreparation(resolvedEntry)
   const readinessProfile = useMemo(() => (
     state.session
       ? resolveCognitiveReadinessProfile(state.session.testType, state.session.engineVersion)
@@ -305,7 +314,11 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
     }
 
     let interactionReadiness: AssessmentInteractionReadiness = { state: 'ready' }
-    if (imageState.status === 'error') {
+    if (runnerCode.error) {
+      interactionReadiness = { state: 'blocked', message: runnerCode.error }
+    } else if (!runnerCode.ready) {
+      interactionReadiness = { state: 'preparing', message: '正在准备本次测验程序。' }
+    } else if (imageState.status === 'error') {
       interactionReadiness = { state: 'blocked', message: '视觉内容加载失败，当前不能开始测评。' }
     } else if (videoState.status === 'error') {
       interactionReadiness = { state: 'blocked', message: '视频内容加载失败，当前不能开始测评。' }
@@ -325,7 +338,7 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
     const instructions = (
       <div className="space-y-1">
         <p>本次测评共 {total || '若干'} 个试次，请按任务提示完成。</p>
-        <p>本次为第 {state.session?.attemptNo} 次作答</p>
+        {state.session?.testType==='gonogo'&&<p>先阅读操作说明并完成练习，练习通过后再进入正式任务。</p>}
         {cognitiveInputNotice(state.session!.testType, state.session!.engineVersion) ? (
           <p>{cognitiveInputNotice(state.session!.testType, state.session!.engineVersion)}</p>
         ) : null}
@@ -340,13 +353,14 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
         interactionReadiness={interactionReadiness}
         actions={(
           <div className="text-center">
-            <button type="button" onClick={controller.start} disabled={!mediaReady} className="btn-primary">
+            <button type="button" onClick={controller.start} disabled={!mediaReady || !runnerCode.ready} className="btn-primary">
               开始测评
             </button>
           </div>
         )}
       >
         {publicCredentialNotice}
+        {runnerCode.error ? <div role="alert"><p>{runnerCode.error}</p><button type="button" onClick={runnerCode.retry} className="btn-secondary">重试测验程序</button></div> : null}
         {imageState.status === 'error' ? (
           <div role="alert" className="mb-4 rounded border border-red-200 bg-red-50 p-3 text-sm text-red-700">
             <p>视觉内容加载失败，当前不能开始测评。</p>
@@ -451,6 +465,12 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
           <p className="text-center text-slate-600">请联系老师处理。</p>
         </AssessmentShell>
       )
+    }
+
+    if (!runnerCode.ready) {
+      return <AssessmentShell title={entry.name} interactionReadiness={{ state: runnerCode.error ? 'blocked' : 'preparing', message: runnerCode.error || '正在准备本次测验程序。' }}>
+        {runnerCode.error ? <div role="alert"><p>{runnerCode.error}</p><button type="button" onClick={runnerCode.retry} className="btn-secondary">重试测验程序</button></div> : <LoadingContent message="正在准备本次测验程序…" />}
+      </AssessmentShell>
     }
 
     if (!imagesReady || !videoCapabilitiesReady) {

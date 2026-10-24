@@ -31,6 +31,15 @@ describe('administrator Authenticator binding and sensitive actions',()=>{
     expect(screen.queryByRole('heading',{name:'扫描二维码'})).toBeNull()
     expect(screen.getByRole('link',{name:'前往管理员登录'})).toBeInTheDocument()
   })
+  it('submits browser-autofilled controls in the Survey enrollment context',async()=>{
+    render(<MemoryRouter initialEntries={['/admin/security/enroll?returnTo=%2Fadmin%2Fsurvey-researchers']}><AdminKeyEnrollment/></MemoryRouter>)
+    const values=[['管理账号','synthetic-autofill'],['当前密码','Synthetic1!autofill'],['一次性绑定码','synthetic-autofill-ticket']]
+    for(const [label,value] of values)(screen.getByLabelText(label) as HTMLInputElement).value=value
+    fireEvent.click(screen.getByRole('button',{name:'生成绑定二维码'}))
+    await screen.findByRole('heading',{name:'扫描二维码'})
+    expect(begin).toHaveBeenCalledExactlyOnceWith('synthetic-autofill','Synthetic1!autofill','synthetic-autofill-ticket')
+    expect(screen.getByRole('link',{name:'前往管理员登录'})).toHaveAttribute('href',expect.stringContaining('returnTo=%2Fadmin%2Fsurvey-researchers'))
+  })
   it('restarts a consumed binding challenge after a rejected code and clears the QR',async()=>{
     confirm.mockRejectedValueOnce(new Error('动态码错误，请重新开始'))
     await setup()

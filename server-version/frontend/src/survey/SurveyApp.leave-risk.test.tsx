@@ -38,8 +38,8 @@ afterEach(()=>{vi.restoreAllMocks();vi.unstubAllGlobals()})
 async function openTool(){
   await screen.findByRole('heading',{name:'研究工作台'})
   selectStudy(0)
-  fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}))
-  fireEvent.change(screen.getByLabelText('合成草稿'),{target:{value:'不能丢失'}})
+  fireEvent.click(await screen.findByRole('tab',{name:'发布与采集'}))
+  fireEvent.change(await screen.findByLabelText('合成草稿'),{target:{value:'不能丢失'}})
 }
 describe('researcher workspace leave protection',()=>{
   it('preserves tool edits when cancelling project switch, new project or logout',async()=>{

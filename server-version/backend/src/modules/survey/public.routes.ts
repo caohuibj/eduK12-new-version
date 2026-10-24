@@ -1,3 +1,6 @@
+import {joinMemorableStudy,recoverMemorableIdentity,completeMemorableReset,joinGeneratedCodeStudy} from './memorable-code.service'
+import {memorableCodeRateLimit} from './memorable-code.rate'
+import {BoundedAdmissionBusyError} from '../../services/boundedAdmissionGate'
 import {authorizeSurveyMaterial} from './material.authorization'
 import {serveSurveyMaterial} from './material.delivery'
 import {SurveyMediaError} from './media.references'
@@ -54,6 +57,7 @@ const submission=proof.extend({submissionId:z.string().min(16).max(200),
 const handle=(action:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Response,next:NextFunction)=>{
   try{return success(res,await action(req))}
   catch(e){
+    if(e instanceof BoundedAdmissionBusyError)return error(res,'编码验证繁忙，请稍后再试',-1,503)
     if(e instanceof z.ZodError)return error(res,'输入不合法',-1,400)
     if(e instanceof SurveyWaveError||e instanceof SurveyFinalError||e instanceof ResearchIdentityError||e instanceof SurveyCognitiveError)
       return error(res,e.message,-1,e.statusCode)
@@ -209,3 +213,26 @@ publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/report-images/:assetId
     next(e)
   }
 })
+
+publicSurveyRouter.post('/r/:publicId/waves/:waveId/join-code',memorableCodeRateLimit,handle(req=>joinMemorableStudy({
+ publicId:id.parse(req.params.publicId),waveId:id.parse(req.params.waveId),...entry.extend({prefix:z.string().max(40),suffix:z.string().max(20)}).strict().parse(req.body),
+})))
+publicSurveyRouter.post('/r/:publicId/enter-code',memorableCodeRateLimit,handle(async req=>{
+ const input=z.object({fullCode:z.string().max(64),waveId:id.optional()}).strict().parse(req.body),publicId=id.parse(req.params.publicId)
+ const identity=await recoverMemorableIdentity(publicId,input.fullCode)
+ if(identity.revoked)return {...identity,waves:[]}
+ return {...identity,...await admission.listOwnLinkedWaves({publicId,...identity,...(input.waveId?{waveId:input.waveId}:{})})}
+}))
+publicSurveyRouter.post('/r/:publicId/reset-code',memorableCodeRateLimit,handle(req=>{
+ const input=z.object({resetCode:z.string().max(64),suffix:z.string().max(20)}).strict().parse(req.body)
+ return completeMemorableReset(id.parse(req.params.publicId),input.resetCode,input.suffix)
+}))
+
+// Old clients may not turn an arbitrary chosen string into an authentication secret.
+publicSurveyRouter.post('/r/:publicId/waves/:waveId/join-self-code',(_req,res)=>{
+ return error(res,'自拟编码已停用，请刷新页面领取随机研究编码。',-1,410)
+})
+// Ordinary public-IP admission applies; there is no credential to guess at enrollment.
+publicSurveyRouter.post('/r/:publicId/waves/:waveId/join-random-code',handle(req=>joinGeneratedCodeStudy({
+ publicId:id.parse(req.params.publicId),waveId:id.parse(req.params.waveId),...entry.parse(req.body),
+})))

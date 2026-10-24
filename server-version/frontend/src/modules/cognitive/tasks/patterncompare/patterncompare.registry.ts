@@ -1,4 +1,5 @@
-import { PatterncompareTask } from './PatterncompareTask'
+import { deferredCognitiveRunner } from '../../core/deferred-runner'
+const PatterncompareTask = deferredCognitiveRunner(() => import('./PatterncompareTask').then(module => module.PatterncompareTask))
 import type { CognitiveFrontendRegistryEntry } from '../../registry'
 
 export const patterncompareRegistryEntry: CognitiveFrontendRegistryEntry = {
@@ -6,7 +7,7 @@ export const patterncompareRegistryEntry: CognitiveFrontendRegistryEntry = {
   name: '图形模式比较',
   engineVersion: '1.0.0',
   scoringVersion: '1.0.0',
-  RunnerComponent: PatterncompareTask,
+  RunnerComponent: PatterncompareTask, prepareRunner: PatterncompareTask.prepare,
   completionMode: 'task',
   metricDefinitions: [
     { key: 'correctPerMinute', label: '每分钟正确数', displayType: 'number' },

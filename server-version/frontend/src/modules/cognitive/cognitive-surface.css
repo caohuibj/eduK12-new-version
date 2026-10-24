@@ -1,0 +1,49 @@
+/* Cognitive chrome has one palette across entry products. Timed stimuli are excluded. */
+.cognitive-surface {
+  --runner-ink:#252a30; --runner-muted:#626b74; --runner-line:#dfe3e7;
+  --runner-page:#f8f9fa; --runner-soft:#f3f4f5; --runner-blue:#303840;
+  --runner-blue-hover:#1f252b; --runner-action:#303840; --runner-surface:#fff;
+  color:#252a30; background:#fff; color-scheme:light;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-size:15px; line-height:1.7;
+}
+.cognitive-surface .hui-product {
+  --hui-color-text:#252a30!important; --hui-color-muted:#626b74!important;
+  --hui-color-surface:#fff!important; --hui-color-background:#fff!important;
+  --hui-color-border:#dfe3e7!important; --hui-color-action:#303840!important;
+  --hui-color-action-hover:#1f252b!important; --hui-color-focus:#626b74!important;
+}
+.cognitive-surface .hui-page { padding:24px!important; background:#fff!important; box-shadow:none!important; }
+.cognitive-surface [data-assessment-shell-header] { margin-bottom:24px!important; padding:0 0 20px!important; border:0!important; border-bottom:1px solid #e5e7eb!important; border-radius:0!important; background:#fff!important; box-shadow:none!important; }
+.cognitive-surface [data-assessment-shell-header] h1 { color:#252a30!important; font:600 24px/1.5 system-ui,sans-serif!important; letter-spacing:0!important; }
+.cognitive-surface [data-assessment-shell-header] p { color:#626b74!important; font-family:inherit!important; font-size:13px!important; line-height:1.8!important; }
+.cognitive-surface :is(.cognitive-task-panel,.cognitive-task-cue) { border-color:#dfe3e7!important; border-radius:10px!important; background:#fff!important; color:#252a30!important; box-shadow:none!important; }
+.cognitive-surface .cognitive-task-title { color:#252a30!important; font-family:inherit!important; font-size:23px!important; font-weight:600!important; letter-spacing:0!important; }
+.cognitive-surface .cognitive-task-eyebrow { color:#626b74!important; font-size:12px!important; font-weight:500!important; letter-spacing:0!important; }
+.cognitive-surface :is(.cognitive-task-description,.cognitive-task-result-score,.cognitive-task-result-detail) { color:#454f59!important; }
+.cognitive-surface :is(.cognitive-task-hint,.cognitive-task-transition-meta) { color:#626b74!important; border-color:#e5e7eb!important; border-radius:8px!important; background:#f8f9fa!important; font-weight:400!important; }
+.cognitive-surface :is(.btn-primary,.btn-secondary,.hui-button) { min-height:44px!important; padding:10px 20px!important; border:1px solid #d7dce1!important; border-radius:8px!important; box-shadow:none!important; font-family:inherit!important; font-size:14px!important; font-weight:500!important; line-height:1.7!important; letter-spacing:0!important; transform:none!important; }
+.cognitive-surface :is(.btn-primary,.hui-button--primary) { color:#fff!important; border-color:#303840!important; background:#303840!important; }
+.cognitive-surface :is(.btn-primary,.hui-button--primary):hover:not(:disabled) { border-color:#1f252b!important; background:#1f252b!important; }
+.cognitive-surface :is(.btn-secondary,.hui-button--secondary) { color:#454f59!important; background:#fff!important; }
+.cognitive-surface :is(.btn-primary,.btn-secondary,.hui-button):focus-visible { outline:2px solid #737d87!important; outline-offset:3px!important; }
+.cognitive-surface :is(.btn-primary,.btn-secondary,.hui-button):disabled { opacity:.45!important; cursor:not-allowed; }
+.cognitive-surface [role=progressbar] { background:#e5e7eb!important; }
+.cognitive-surface [role=progressbar]>div,.cognitive-surface .cognitive-task-progress__value { background:#555f69!important; }
+.cognitive-surface [data-cognitive-focus-stage] { background:#f8f9fa!important; }
+.cognitive-surface.survey-cognitive-unit { padding:24px!important; border-color:#dfe3e7!important; border-radius:12px!important; box-shadow:none!important; }
+.cognitive-surface.survey-cognitive-unit>h3 { color:#252a30!important; font-family:inherit!important; font-size:18px!important; font-weight:600!important; }
+.cognitive-surface [aria-label="认知任务设备检查"] { border-color:#dfe3e7!important; background:#fff!important; color:#454f59!important; }
+.cognitive-gonogo-rules { display:grid; gap:16px; padding:0; margin:24px 0; list-style:none; text-align:left; }
+.cognitive-gonogo-rules>li { display:flex; align-items:center; gap:16px; }
+.cognitive-gonogo-rules strong { color:#252a30; font-size:15px; font-weight:600; }
+.cognitive-gonogo-rules p { margin:3px 0 0; font-size:13px; line-height:1.8; }
+.cognitive-gonogo-example { flex:none; width:32px; height:32px; border-radius:50%; }
+.cognitive-gonogo-example--go { background:#22c55e; }
+.cognitive-gonogo-example--stop { background:#ef4444; }
+.cognitive-gonogo-example--wait { background:#e5e7eb; }
+@media(max-width:600px){.cognitive-surface .hui-page,.cognitive-surface.survey-cognitive-unit{padding:20px 16px!important}.cognitive-gonogo-rules>li{gap:12px}.cognitive-gonogo-example{width:28px;height:28px}}
+
+/* Product shells may also theme the non-timed progress card. */
+.cognitive-surface section[aria-label="测评进度"] { background:#fff!important; border-color:#dfe3e7!important; }
+.cognitive-surface section[aria-label="测评进度"] .text-slate-500 { color:#626b74!important; }

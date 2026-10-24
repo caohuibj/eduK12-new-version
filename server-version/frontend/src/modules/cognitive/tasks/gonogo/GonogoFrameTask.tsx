@@ -1,3 +1,4 @@
+import {GonogoInstructions} from './GonogoInstructions'
 import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { captureFrameTimingOnset, resolveEventResponseTimestamp, type CognitiveTimingOnset } from '../../core/response-timing'
 import type { CognitiveTaskProps } from '../../core/runner.types'
@@ -8,8 +9,6 @@ import { PRACTICE_FEEDBACK_MS, PRACTICE_PASS_CORRECT, PRACTICE_TRIAL_COUNT } fro
 import {
   CognitivePracticeResult,
   CognitiveTaskCompletionNotice,
-  CognitiveTaskIntro,
-  CognitiveTaskTransition,
 } from '../shared/CognitiveTaskPresentation'
 
 type Phase = 'instruction' | 'practice' | 'practice-result' | 'formal'
@@ -136,14 +135,7 @@ export const GonogoFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
   }
 
   if (phase === 'instruction') {
-    return (
-      <CognitiveTaskIntro
-        title="Go/No-Go"
-        description="绿色出现时尽快按下；红色出现时不要按。"
-        hint={taskContext.requiredInput==='KEYBOARD'?'本研究仅接受实体键盘：按空格或 Enter。练习不计入正式成绩。':'电脑可按空格或 Enter；触屏点击中央圆形。练习不计入正式成绩。'}
-        onAction={startPractice}
-      />
-    )
+    return <GonogoInstructions keyboardOnly={taskContext.requiredInput==='KEYBOARD'} onStart={startPractice}/>
   }
   if (phase === 'practice-result') {
     const passed = practiceCorrect >= PRACTICE_PASS_CORRECT
@@ -153,7 +145,7 @@ export const GonogoFrameTask: React.FC<CognitiveTaskProps> = ({ taskContext, tri
         total={PRACTICE_TRIAL_COUNT}
         passed={passed}
         onContinue={startFormal}
-        onRetry={startPractice}
+        onRetry={()=>setPhase('instruction')}
       />
     )
   }

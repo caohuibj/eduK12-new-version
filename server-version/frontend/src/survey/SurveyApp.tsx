@@ -1,3 +1,4 @@
+import {SurveyParticipationSettings} from './SurveyParticipationSettings'
 import { SurveyAppearance, SurveyAppearanceControl } from './SurveyAppearance'
 import './survey-sections.css'
 import { surveyAdminLoginUrl } from '../products/origins'
@@ -10,6 +11,8 @@ import { createInstrumentLibrary } from './instrument-library'
 import { SurveyWorkspaceNav,type WorkspaceSection } from './SurveyWorkspaceNav'
 import './survey-workspace.css'
 import './survey-directory.css'
+import './survey-workspace-polish.css'
+import {Settings2} from 'lucide-react'
 import { SurveyBrand } from './SurveyBrand'
 import { SurveyLanding, SurveyPublicHeader } from './SurveyLanding'
 import { SurveyEntryPanel } from './SurveyEntryPanel'
@@ -97,13 +100,32 @@ function SurveyApplication(){
   const reportRiskChanged=useCallback((risk:ReportLeaveRisk)=>{reportLeaveRisk.current=risk},[])
   const [projectPage,setProjectPage]=useState(1)
   const [projectsLoading,setProjectsLoading]=useState(false),[projectsError,setProjectsError]=useState('')
-  const [projectQuery,setProjectQuery]=useState(''),[projectFilter,setProjectFilter]=useState('')
+  const [directoryOptions,setDirectoryOptions]=useState({q:'',status:'',pageSize:25,sort:'created_desc'})
+  const directoryOptionsRef=useRef(directoryOptions)
+  const projectListEpoch=useRef(0),projectSearchTimer=useRef<ReturnType<typeof setTimeout>>()
+  const [projectTotal,setProjectTotal]=useState<number>(),[projectHasNext,setProjectHasNext]=useState(false)
+  useEffect(()=>()=>{clearTimeout(projectSearchTimer.current);projectListEpoch.current++},[])
   const [workspaceSection,setWorkspaceSection]=useState<WorkspaceSection>('settings')
   const builderLeaveRisk=useRef<BuilderLeaveRisk>({dirty:false,busy:false})
   const builderRiskChanged=useCallback((risk:BuilderLeaveRisk)=>{builderLeaveRisk.current=risk},[])
   const [capabilitiesState,setCapabilitiesState]=useState<'loading'|'ready'|'error'>('loading')
   const [available,setAvailable]=useState<{analytics:boolean;publication:boolean}|null>(null)
   const selectedProjectId=selected?.id
+  // Retain visited editors (including unsaved drafts), but do not mount other
+  // project panels merely because their tab is hidden. Never carry visits into
+  // another project or let an old project's panels issue new reads.
+  const [visitedPanels,setVisitedPanels]=useState<{projectId:string;sections:WorkspaceSection[]}>({projectId:'',sections:[]})
+  useEffect(()=>{
+    const active=editorOpen&&researchArea==='studies'&&workspaceSection!=='settings'
+    setVisitedPanels(previous=>{
+      const sections=previous.projectId===selectedProjectId?previous.sections:[]
+      if(previous.projectId===(selectedProjectId??'')&&(!active||sections.includes(workspaceSection)))return previous
+      return {projectId:selectedProjectId??'',sections:active?[...sections,workspaceSection]:sections}
+    })
+  },[selectedProjectId,editorOpen,researchArea,workspaceSection])
+  const panelVisited=(section:WorkspaceSection)=>
+    editorOpen&&researchArea==='studies'&&workspaceSection===section
+    ||visitedPanels.projectId===selectedProjectId&&visitedPanels.sections.includes(section)
   const instrumentLibrary=useMemo(()=>selectedProjectId?createInstrumentLibrary(selectedProjectId):undefined,[selectedProjectId])
   const projectChanged=useCallback((project:Pick<Project,'id'|'status'|'revision'|'collectionMode'>)=>{
     setSelected(current=>current?.id===project.id?{...current,...project}:current)
@@ -140,14 +162,32 @@ function SurveyApplication(){
       setBusy(workInFlight.current.total>0);setWriteBusy(workInFlight.current.writes>0)
     }
   }
-  const loadProjects=useCallback(async(page=1)=>{
+  const loadProjects=useCallback(async(page=1,options=directoryOptionsRef.current)=>{
+    const epoch=++projectListEpoch.current
     setProjectsLoading(true);setProjectsError('')
+    const params=new URLSearchParams({page:String(page)})
+    if(options.pageSize!==25)params.set('pageSize',String(options.pageSize))
+    if(options.sort!=='created_desc')params.set('sort',options.sort)
+    if(options.status)params.set('status',options.status)
+    if(options.q.trim())params.set('q',options.q.trim())
     try{
-      const r=await api<{list:Project[]}>('/projects?page='+page)
-      setProjects(r.list);setProjectPage(page)
-    }catch(error){setProjectsError(error instanceof Error?error.message:'请求失败');throw error}
-    finally{setProjectsLoading(false)}
+      const r=await api<{list:Project[];page?:number;total?:number;hasNext?:boolean}>('/projects?'+params)
+      if(epoch!==projectListEpoch.current)return
+      setProjects(r.list);setProjectPage(r.page??page);setProjectTotal(r.total)
+      setProjectHasNext(r.hasNext??r.list.length>=options.pageSize)
+    }catch(error){if(epoch!==projectListEpoch.current)return;setProjectsError(error instanceof Error?error.message:'请求失败');throw error}
+    finally{if(epoch===projectListEpoch.current)setProjectsLoading(false)}
   },[])
+  const updateDirectory=(patch:Partial<typeof directoryOptions>)=>{
+    const options={...directoryOptionsRef.current,...patch}
+    directoryOptionsRef.current=options;setDirectoryOptions(options)
+    clearTimeout(projectSearchTimer.current)
+    // Invalidate a prior read as soon as the visible filters change, including
+    // during the search debounce, so late responses cannot replace newer results.
+    projectListEpoch.current++;setProjectsLoading(true);setProjectsError('')
+    if('q' in patch&&patch.q)projectSearchTimer.current=setTimeout(()=>void loadProjects(1,options).catch(()=>{}),250)
+    else void loadProjects(1,options).catch(()=>{})
+  }
   const refresh=useCallback(async(openWorkspace=false)=>{
     const restoreEpoch=++studyRestoreEpoch.current
     try{
@@ -234,7 +274,7 @@ function SurveyApplication(){
   const applyProject=(p:Project)=>{projectCreationRequestId.current=null;setCreating(false);setEditorOpen(true);setSelected(p);setTitle(p.title);setDescription(p.description);setMode(p.collectionMode)}
   const focusSection=useCallback((id:string)=>window.requestAnimationFrame(()=>{
     const element=document.getElementById(id);element?.focus({preventScroll:true})
-    if(id==='survey-current-project-heading'||id==='survey-projects-heading'){
+    if(id==='survey-current-project-heading'||id==='survey-projects-heading'||id==='survey-tools-heading'||id==='survey-media-heading'){
       document.documentElement.scrollTop=0;document.body.scrollTop=0
     }else element?.scrollIntoView?.({block:'start'})
   }),[])
@@ -269,7 +309,7 @@ function SurveyApplication(){
     if(researchArea==='studies'&&editorOpen&&selectedProjectId){
       if(url.searchParams.get('section')==='tools')url.hash='survey-wave-content'
       url.searchParams.set('project',selectedProjectId);url.searchParams.set('section',workspaceSection)
-    }else{url.searchParams.delete('project');url.searchParams.delete('section')}
+    }else{url.searchParams.delete('project');url.searchParams.delete('section');if(researchArea==='studies'&&!editorOpen&&/^#survey-(?:data|report|wave|publish|project-)/.test(url.hash))url.hash=''}
     if(url.href!==window.location.href)window.history.replaceState(null,'',url.pathname+url.search+url.hash)
   },[loading,screen,user,researchArea,editorOpen,selectedProjectId,workspaceSection])
   const choose=(p:Project)=>{
@@ -370,24 +410,26 @@ function SurveyApplication(){
       {!loading&&user&&screen==='work'&&!user.mustChangePassword&&<div className="survey-workspace">
         <div hidden={researchArea!=='studies'}>
         <div hidden={editorOpen}><SurveyProjectDirectory projects={projects} selectedId={selected?.id} page={projectPage}
-          busy={busy} loading={projectsLoading} error={projectsError} query={projectQuery} status={projectFilter}
-          onQuery={setProjectQuery} onStatus={setProjectFilter} onChoose={choose} onArchive={toggle}
+          busy={busy} loading={projectsLoading} error={projectsError} query={directoryOptions.q} status={directoryOptions.status}
+          pageSize={directoryOptions.pageSize} sort={directoryOptions.sort} total={projectTotal} hasNext={projectHasNext}
+          onPageSize={pageSize=>updateDirectory({pageSize})} onSort={sort=>updateDirectory({sort})} onClear={()=>updateDirectory({q:'',status:''})}
+          onQuery={q=>updateDirectory({q})} onStatus={status=>updateDirectory({status})} onChoose={choose} onArchive={toggle}
           onPage={page=>void work(()=>loadProjects(page),false)} onRefresh={()=>void work(()=>loadProjects(projectPage),false)} onCreate={newProject}/></div>
       <div className="survey-project-editor" hidden={!editorOpen}>
       {editorOpen&&projectsError&&<div role="alert" className="survey-workspace-message survey-workspace-message--error"><p>研究列表未能更新：{projectsError}。当前研究及修改会保留。</p><button type="button" className="btn-secondary" disabled={busy} onClick={()=>void work(()=>loadProjects(projectPage),false)}>重试研究列表</button></div>}
       {selected&&<SurveyWorkspaceNav active={workspaceSection} onChange={setWorkspaceSection} title={selected.title}
         onReturn={showProjectList}/>}
       {selected&&<section className="survey-project-settings bg-white rounded-xl border p-6 my-4"
-        id="survey-workspace-settings" role={selected?'tabpanel':undefined}
+        data-readonly={selected.status!=='DRAFT'} id="survey-workspace-settings" role={selected?'tabpanel':undefined}
         aria-labelledby={selected?'survey-workspace-tab-settings':undefined}
         hidden={!!selected&&workspaceSection!=='settings'}>
-        <header className="survey-settings-heading"><div><h2 id="survey-project-settings-heading" tabIndex={-1}>{selected.status==='DRAFT'?'编辑研究草稿':'研究设置'}</h2><p>{selected.status==='DRAFT'?'完善基本信息，保存后配置问卷与采集。':'当前研究设置只读；工具、采集与数据仍按研究状态管理。'}</p></div>
+        <header className="survey-settings-heading"><div className="survey-settings-title"><span className="survey-settings-icon"><Settings2 size={22} aria-hidden="true"/></span><div><h2 id="survey-project-settings-heading" tabIndex={-1}>{selected.status==='DRAFT'?'编辑研究草稿':'研究设置'}</h2><p>{selected.status==='DRAFT'?'完善基本信息，保存后配置问卷与采集。':'当前研究设置只读；工具、采集与数据仍按研究状态管理。'}</p></div></div>
           <span className="survey-settings-status" data-status={selected.status}>{{DRAFT:'草稿 · 可编辑',ACTIVE:'采集中',PAUSED:'已暂停',CLOSED:'已结束',ARCHIVED:'已归档'}[selected.status]}</span></header>
         <form id="survey-project-basics" tabIndex={-1} onSubmit={save} aria-busy={busy} className="survey-settings-form">
           <fieldset disabled={busy||selected.status!=='DRAFT'} className="survey-settings-fields">
-            <div className="survey-settings-basics">{field('研究名称',title,setTitle)}
+            <div className="survey-settings-basics"><h3 className="survey-settings-group-title"><span>01</span>基本信息</h3>{field('研究名称',title,setTitle)}
               <label>研究说明<textarea className="input" rows={4} value={description} onChange={e=>setDescription(e.target.value)} placeholder="说明研究目的、参与方式或适用范围"/></label></div>
-            <div id="survey-project-collection" tabIndex={-1} className="survey-settings-collection">
+            <div id="survey-project-collection" tabIndex={-1} className="survey-settings-collection"><h3 className="survey-settings-group-title"><span>02</span>采集方式</h3>
               <label>采集方式<select className="input" value={mode} onChange={e=>setMode(e.target.value as Project['collectionMode'])}>
                 <option value="SINGLE_UNLINKED">单次独立匿名</option><option value="LINKED_WAVES">同一研究编号的多波次采集</option>
               </select></label>
@@ -396,20 +438,22 @@ function SurveyApplication(){
           </fieldset>
           <div id="survey-project-save" tabIndex={-1} className="survey-settings-actions">
             <div className="survey-settings-save"><button type="submit" className="btn-primary" disabled={busy||selected.status!=='DRAFT'}>保存修改</button>{notice==='研究草稿已保存'&&<p role="status" className="survey-settings-feedback">{notice}</p>}</div>
-            <div className="survey-settings-secondary"><button type="button" className="btn-secondary" onClick={()=>setWorkspaceSection('publish')}>{selected.status==='DRAFT'?'配置问卷与采集 →':'查看问卷与采集 →'}</button><button type="button" className="survey-settings-new" disabled={busy} onClick={newProject}>新建其他项目</button></div>
+            <div className="survey-settings-secondary"><button type="button" className={selected.status==='DRAFT'?'btn-secondary':'btn-primary'} onClick={()=>setWorkspaceSection('publish')}>{selected.status==='DRAFT'?'配置问卷与采集 →':'查看问卷与采集 →'}</button><button type="button" className="survey-settings-new" disabled={busy} onClick={newProject}>新建其他项目</button></div>
           </div>
         </form>
-        <p className="survey-settings-help">保存仅更新草稿，不会开放招募。请在「发布与采集」检查工具与知情同意，冻结后再开放。</p>
-      </section>}{selected&&<><div id="survey-workspace-publish" role="tabpanel" aria-labelledby="survey-workspace-tab-publish" hidden={workspaceSection!=='publish'}><SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary} onProjectChanged={projectChanged} onLeaveRiskChange={builderRiskChanged} onNavigateLibrary={()=>navigateResearchArea('tools','/workspace/tools')}/></div>
-        <div id="survey-workspace-reports" role="tabpanel" aria-labelledby="survey-workspace-tab-reports" hidden={workspaceSection!=='reports'}><SurveyReportStudio key={'reports-'+selected.id} projectId={selected.id} projectStatus={selected.status} active={workspaceSection==='reports'} onLeaveRiskChange={reportRiskChanged}/></div>
+        {selected.collectionMode==='LINKED_WAVES'&&<SurveyParticipationSettings key={selected.id} projectId={selected.id} revision={selected.revision} request={api}
+          onRevision={revision=>projectChanged({id:selected.id,status:selected.status,revision,collectionMode:selected.collectionMode})}/>}
+        <p className="survey-settings-help">{selected.status==='DRAFT'?'保存仅更新草稿。完成设置后，前往“发布与采集”配置问卷。':'研究设置已固定。可前往“发布与采集”管理波次，在“数据”页查看答卷。'}</p>
+      </section>}{selected&&<><div id="survey-workspace-publish" role="tabpanel" aria-labelledby="survey-workspace-tab-publish" hidden={workspaceSection!=='publish'}>{panelVisited('publish')&&<SurveyWaveStudio key={'waves-'+selected.id} projectId={selected.id} instrumentLibrary={instrumentLibrary} onProjectChanged={projectChanged} onLeaveRiskChange={builderRiskChanged} onNavigateLibrary={()=>navigateResearchArea('tools','/workspace/tools')}/>}</div>
+        <div id="survey-workspace-reports" role="tabpanel" aria-labelledby="survey-workspace-tab-reports" hidden={workspaceSection!=='reports'}>{panelVisited('reports')&&<SurveyReportStudio instrumentTitles={instrumentLibrary?.snapshot(1).list??[]} key={'reports-'+selected.id} projectId={selected.id} projectStatus={selected.status} active={workspaceSection==='reports'} onLeaveRiskChange={reportRiskChanged}/>}</div>
         <div id="survey-workspace-data" role="tabpanel" aria-labelledby="survey-workspace-tab-data" hidden={workspaceSection!=='data'}>
-          {capabilitiesState==='loading'?<section className="rounded-xl border bg-white p-4" role="status">正在确认研究数据功能…</section>
+          {panelVisited('data')&&(capabilitiesState==='loading'?<section className="rounded-xl border bg-white p-4" role="status">正在确认研究数据功能…</section>
             :capabilitiesState==='error'?<section className="rounded-xl border bg-white p-4" aria-label="研究数据状态"><p role="alert">无法确认研究数据功能，请重试；这不代表功能未开通。</p><button type="button" className="btn-secondary" onClick={()=>void loadCapabilities()}>重试功能状态</button></section>
             :available?.analytics
             ?<SurveyAnalyticsWorkspace actorId={user?.id} key={'analysis-'+selected.id} projectId={selected.id}/>
             :<section className="rounded-xl border bg-white p-4" aria-label="研究数据状态">
               研究数据分析暂未在当前环境启用；项目和研究工具仍可使用。
-            </section>}</div></>}</div></div>
+            </section>)}</div></>}</div></div>
         {toolLibraryVisited&&<div hidden={researchArea!=='tools'}><SurveyToolLibrary visible={researchArea==='tools'} onLeaveRiskChange={toolLibraryRiskChanged}/></div>}
         {materialLibraryVisited&&<div hidden={researchArea!=='media'}><SurveyMaterialLibrary visible={researchArea==='media'} onLeaveRiskChange={materialLibraryRiskChanged}/></div>}
         <SurveyCreateProjectDialog open={creating} busy={busy} title={title} description={description} mode={mode} error={error}

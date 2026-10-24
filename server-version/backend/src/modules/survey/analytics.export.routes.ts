@@ -8,6 +8,7 @@ import { SurveyAnalyticsError } from './analytics.read'
 
 export const surveyExportsRouter=Router()
 const pid=z.string().uuid(), eid=z.string().uuid()
+const downloadSelection=z.object({part:z.enum(['csv','codebook','manifest']).optional()}).strict()
 const create=z.object({
   format:z.enum(['INTERPRETATION_LONG','RAW_WAVE','RAW_LONG','RAW_WIDE','SCORE_LONG','SCORE_WIDE','COGNITIVE_TRIAL_LONG']),
   waveId:pid.optional(),includeFreeText:z.boolean().optional(),cursor:z.string().max(1300).optional(),
@@ -51,5 +52,11 @@ surveyExportsRouter.post('/:projectId/exports',
   wrap(req=>createSurveyExport(req,{projectId:pid.parse(req.params.projectId),...create.parse(req.body)})))
 surveyExportsRouter.get('/:projectId/exports/:exportId/download',
   downloadLimit,
-  wrap(req=>downloadSurveyExport(req,{projectId:pid.parse(req.params.projectId),
-    exportId:eid.parse(req.params.exportId)})))
+  wrap(async req=>{
+    const {part}=downloadSelection.parse(req.query)
+    // Authorize, decrypt, verify and audit every read using the existing service.
+    // Only serialize the requested file; old clients can still read the bundle.
+    const artifact=await downloadSurveyExport(req,{projectId:pid.parse(req.params.projectId),
+      exportId:eid.parse(req.params.exportId)})
+    return part?{id:artifact.id,format:artifact.format,[part]:artifact[part]}:artifact
+  }))

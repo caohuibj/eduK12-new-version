@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest'
-import { render, screen } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { MemoryRouter, Routes, Route } from 'react-router-dom'
 import CognitiveRunner from '../pages/CognitiveRunner'
 
@@ -36,7 +36,7 @@ describe('CognitiveRunner page', () => {
     expect(screen.getByText('加载中...')).toBeTruthy()
   })
 
-  it('renders READY with start button', () => {
+  it('renders READY with start button', async () => {
     mockController.state = {
       status: 'READY',
       session: {
@@ -52,7 +52,8 @@ describe('CognitiveRunner page', () => {
       result: null,
     }
     renderAt('/student/cognitive/sessions/s1')
-    expect(screen.getByText('开始测评')).toBeTruthy()
+    expect(screen.getByRole('button', { name: '开始测评' })).toBeDisabled()
+    await waitFor(() => expect(screen.getByRole('button', { name: '开始测评' })).toBeEnabled())
   })
 
   it('renders UNSUPPORTED with friendly message and no start path', () => {

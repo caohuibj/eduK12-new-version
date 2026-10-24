@@ -13,6 +13,33 @@ beforeEach(() => {
   api.capabilities.mockResolvedValue({ systemAdmin: false, canReview: false, reviewGrants: [], distributionGrants: [{ grantId: 'distribute', product: 'TRAINING', releaseIds: ['release'] }] })
 })
 describe('Scale library system review versus entrance distribution', () => {
+  it('filters only the current Survey catalog page and keeps approval controls in their own view', async () => {
+    api.capabilities.mockResolvedValue({ systemAdmin: false, canReview: true, reviewGrants: [{grantId:'review',releaseIds:['release']}], distributionGrants: [] })
+    render(<MemoryRouter initialEntries={['/admin/scale-library-governance?workspace=survey']}><ScaleLibraryGovernance /></MemoryRouter>)
+    expect(await screen.findByRole('heading',{name:'范围内量表'})).toBeVisible()
+    expect(screen.queryByRole('button',{name:'批准精确版本入库'})).not.toBeInTheDocument()
+    fireEvent.change(screen.getByRole('searchbox',{name:'搜索本页量表'}),{target:{value:'不存在的名称'}})
+    expect(screen.getByText('本页没有匹配的量表')).toBeVisible()
+    expect(api.catalog).toHaveBeenCalledTimes(1)
+    fireEvent.click(screen.getByRole('button',{name:'清除本页筛选'}))
+    expect(screen.getByRole('heading',{name:'范围内量表'})).toBeVisible()
+    fireEvent.change(screen.getByRole('combobox',{name:'来源'}),{target:{value:'STANDARD_REGISTRY'}})
+    expect(screen.queryByRole('heading',{name:'范围内量表'})).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button',{name:/入库审批/}))
+    expect(screen.getByRole('button',{name:'批准精确版本入库'})).toBeDisabled()
+    expect(screen.getByLabelText('审核、下架或撤权说明')).toBeVisible()
+  })
+  it('shows readable Survey version details while keeping the complete record available on demand', async () => {
+    const record={catalogId:'custom',origin:'AUTHORED',title:metadata.title,exactVersion:{origin:'AUTHORED',releaseId:entry.releaseId},authored:entry}
+    api.catalogDetail.mockResolvedValue({entry:record})
+    render(<MemoryRouter initialEntries={['/admin/scale-library-governance?workspace=survey']}><ScaleLibraryGovernance /></MemoryRouter>)
+    fireEvent.click(await screen.findByRole('button',{name:'查看自编精确版本详情'}))
+    expect(await screen.findByRole('region',{name:'公共量表精确版本详情'})).toHaveTextContent('作者 / 来源')
+    expect(screen.getByText('完整版本记录').closest('details')).not.toHaveAttribute('open')
+    fireEvent.click(screen.getByRole('button',{name:'收起详情'}))
+    expect(screen.queryByRole('region',{name:'公共量表精确版本详情'})).not.toBeInTheDocument()
+  })
+
   it('keeps Survey management recipients in Survey even when the source supports both entrances',async()=>{
     api.capabilities.mockResolvedValue({systemAdmin:false,canReview:false,reviewGrants:[],distributionGrants:[{grantId:'survey-distribution',product:'SURVEY',releaseIds:['release']}]})
     api.grants.mockResolvedValue({list:[]});api.recipients.mockResolvedValue({list:[{id:'researcher',username:'verified-researcher'}],page:1,hasMore:false})

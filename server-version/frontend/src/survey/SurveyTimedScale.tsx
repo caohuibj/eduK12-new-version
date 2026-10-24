@@ -1,4 +1,4 @@
-import {useLayoutEffect,useRef,type ReactNode} from 'react'
+import {useId,useLayoutEffect,useRef,useState,type ReactNode} from 'react'
 import {useScaleTimingLifecycle} from '../modules/scale/useScaleTimingLifecycle'
 import {SurveyScaleTimingTracker,type SurveyScaleTimings} from './survey-scale-timing'
 
@@ -22,35 +22,83 @@ export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,on
   renderMedia?:(itemKey:string)=>ReactNode
   onIndexChange:(index:number)=>void
 }){
+  const navigationId=useId()
+  const [navigationOpen,setNavigationOpen]=useState(false)
+  const [feedback,setFeedback]=useState<{from:number;to:number;label:string}|null>(null)
   const current=unit.items[Math.min(index,unit.items.length-1)]
   const currentKey=current?.itemKey
   const arrowSelection=useRef(false)
   const focusAfterAdvance=useRef(false)
   const itemElement=useRef<HTMLFieldSetElement>(null)
+  const navigationButton=useRef<HTMLButtonElement>(null)
   useScaleTimingLifecycle(tracker,currentKey,paused,readOnly,onTiming)
   useLayoutEffect(()=>{
     if(focusAfterAdvance.current){
       focusAfterAdvance.current=false
-      itemElement.current?.focus()
+      itemElement.current?.focus({preventScroll:true})
     }
     arrowSelection.current=false
   },[currentKey])
   if(!current)return <section className="rounded border p-4">
     <h3>{unit.title}</h3><p role="alert">此量表没有可作答的冻结题目。</p>
   </section>
-  const selected=Object.prototype.hasOwnProperty.call(answer,current.itemKey)
-    ?answer[current.itemKey]:undefined
-  return <section className="rounded-xl border bg-slate-50 p-4 my-5 space-y-4 survey-answer-panel"
+  const hasAnswer=(itemKey:string)=>Object.prototype.hasOwnProperty.call(answer,itemKey)&&
+    typeof answer[itemKey]==='string'&&answer[itemKey]!==''
+  const answeredCount=unit.items.filter(item=>hasAnswer(item.itemKey)).length
+  const selected=hasAnswer(current.itemKey)?String(answer[current.itemKey]):undefined
+  const nextUnanswered=unit.items.map((_,offset)=>(index+offset+1)%unit.items.length)
+    .find(candidate=>candidate!==index&&!hasAnswer(unit.items[candidate].itemKey))
+  const moveTo=(next:number)=>{
+    setNavigationOpen(false)
+    if(next===index){itemElement.current?.focus({preventScroll:true});return}
+    focusAfterAdvance.current=true
+    onIndexChange(next)
+  }
+  const continueUnanswered=()=>{
+    if(paused||readOnly||!imagesReady||!autoAdvanceReady||!selected||nextUnanswered===undefined)return
+    setFeedback({from:index,to:nextUnanswered,label:String(selected)})
+    moveTo(nextUnanswered)
+  }
+  const choose=(optionKey:string)=>{
+    if(paused||readOnly||!imagesReady)return
+    tracker.answer(current.itemKey,selected,optionKey)
+    onAnswer(current.itemKey,optionKey)
+    onTiming(tracker.snapshot())
+    if(autoAdvanceReady&&!arrowSelection.current&&nextUnanswered!==undefined){
+      setFeedback({from:index,to:nextUnanswered,label:optionKey})
+      moveTo(nextUnanswered)
+    }else setFeedback({from:index,to:index,label:optionKey})
+  }
+  return <section className="rounded-xl border p-4 my-5 space-y-4 survey-answer-panel survey-scale-experience"
     aria-label={'逐题施测：'+unit.title}>
-    <h3 className="text-lg font-semibold">{unit.title}</h3>
-    <p className="text-sm text-slate-600" role="status">
-      第 {index+1} / {unit.items.length} 题 · 本量表逐题呈现，并记录本次作答的浏览器时间
-    </p>
-    <p className="survey-answer-guide">选择新选项后自动进入下一题，最后一题保留检查与提交入口。键盘方向键仅调整当前选择，请按“下一题”继续；回看时可用“上一题”和“下一题”检查，切换不代表正式提交。</p>
-    {!autoAdvanceReady&&<p role="status" className="text-sm">本题视频尚未完整播放，选择会保留在当前题。{index<unit.items.length-1?'请看完视频后按“下一题”继续。':'请看完视频后检查答案，再使用本工具后方的继续或正式提交按钮。'}</p>}
-    <progress className="w-full" max={Math.max(1,unit.items.length)}
-      value={index+1} aria-label="量表施测进度"/>
-    <fieldset key={currentKey} ref={itemElement} id={'survey-answer-'+unit.instrumentKey+'-'+current.itemKey} tabIndex={-1} className="rounded-lg border bg-white p-4 space-y-2"
+    <div className="survey-scale-heading"><div>
+      <h3>{unit.title}</h3>
+    </div><span className="survey-scale-count"><strong>{String(index+1).padStart(2,'0')}</strong> / {String(unit.items.length).padStart(2,'0')}</span></div>
+    <div className="survey-scale-progress-row">
+      <div className="survey-scale-progress"><div><span>作答进度</span><span>已答 {answeredCount} / {unit.items.length}</span></div>
+        <progress max={Math.max(1,unit.items.length)} value={answeredCount} aria-label="量表作答进度"/>
+      </div>
+      <button type="button" ref={navigationButton} className="survey-scale-navigator" aria-expanded={navigationOpen} aria-controls={navigationId}
+        disabled={paused} onClick={()=>setNavigationOpen(open=>!open)}>
+        <svg width="16" height="16" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3 3h5v5H3zM12 3h5v5h-5zM3 12h5v5H3zM12 12h5v5h-5z" stroke="currentColor" strokeWidth="1.5"/></svg>
+        题目导航
+      </button>
+    </div>
+    {navigationOpen&&<nav id={navigationId} className="survey-scale-question-map" aria-label="本量表已答题导航" onKeyDown={event=>{if(event.key==='Escape'){setNavigationOpen(false);navigationButton.current?.focus()}}}>
+      <div className="survey-scale-map-heading"><span>回看已答题目</span><button type="button" aria-label="关闭题目导航" onClick={()=>{setNavigationOpen(false);navigationButton.current?.focus()}}>收起</button></div>
+      <div className="survey-scale-question-grid">{unit.items.map((item,itemIndex)=><button key={item.itemKey} type="button"
+        aria-label={'第 '+(itemIndex+1)+' 题'+(hasAnswer(item.itemKey)?'，已作答':'，未作答')}
+        aria-current={itemIndex===index?'step':undefined} disabled={paused||!hasAnswer(item.itemKey)}
+        onClick={()=>{setFeedback(null);moveTo(itemIndex)}}>{String(itemIndex+1).padStart(2,'0')}{hasAnswer(item.itemKey)&&<span aria-hidden="true">✓</span>}</button>)}</div>
+      <p>仅可回看本量表已作答的题目。</p>
+    </nav>}
+    <div className="survey-scale-feedback" role="status" aria-label="作答反馈" aria-live="polite" aria-atomic="true">
+      {feedback&&feedback.to===index
+        ?<span key={feedback.from+':'+feedback.to+':'+feedback.label} className="survey-scale-feedback-confirmed"><span aria-hidden="true">✓</span> 第 {feedback.from+1} 题已作答{feedback.to!==feedback.from?' · 已切换至第 '+(index+1)+' 题':answeredCount===unit.items.length?' · 本部分已全部作答':''}</span>
+        :<span>选择后自动进入下一道未答题</span>}
+    </div>
+    {!autoAdvanceReady&&<p role="status" className="text-sm">请先看完本题视频，完成后可继续未答题；全部作答后请使用下方的继续或提交按钮。</p>}
+    <fieldset key={currentKey} ref={itemElement} id={'survey-answer-'+unit.instrumentKey+'-'+current.itemKey} tabIndex={-1} className="survey-scale-question"
       onPointerDownCapture={()=>{arrowSelection.current=false}}
       onMouseDownCapture={()=>{arrowSelection.current=false}}
       onClickCapture={event=>{if(event.detail>0)arrowSelection.current=false}}
@@ -62,32 +110,22 @@ export function SurveyTimedScale({unit,answer,onAnswer,tracker,onTiming,index,on
         if(target!==event.currentTarget&&!(target instanceof HTMLInputElement&&target.type==='radio'))return
         arrowSelection.current=['ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key)
         if(event.repeat&&(arrowSelection.current||event.key===' '))event.preventDefault()
+        if(event.key==='Enter'){event.preventDefault();continueUnanswered()}
       }}>
-      <legend className="font-medium">{current.prompt}{current.required?' *':''}</legend>
+      <legend><span className="survey-scale-question-label">第 {index+1} 题{current.required?' · 必答':''}</span><span>{current.prompt}</span></legend>
       {renderMedia?.(current.itemKey)}
       {(current.responseOptions??unit.responseOptions).map(option=><label key={option.optionKey}
-        className="flex items-start gap-3 rounded border p-3 text-sm min-h-11">
+        className={'survey-scale-option'+(selected===option.optionKey?' is-selected':'')}>
         <input type="radio" name={unit.instrumentKey+'-'+current.itemKey}
           checked={selected===option.optionKey} disabled={paused||readOnly||!imagesReady}
-          onChange={()=>{
-            if(paused||readOnly||!imagesReady)return
-            tracker.answer(current.itemKey,selected,option.optionKey)
-            onAnswer(current.itemKey,option.optionKey)
-            onTiming(tracker.snapshot())
-            if(autoAdvanceReady&&!arrowSelection.current&&index<unit.items.length-1){
-              focusAfterAdvance.current=true
-              onIndexChange(index+1)
-            }
-          }}/>
-        <span>{option.label}</span>
+          onClick={event=>{
+            if(event.detail>0&&selected===option.optionKey)continueUnanswered()
+          }}
+          onChange={()=>choose(option.optionKey)}/>
+        <span>{option.label}</span><span className="survey-scale-option-mark" aria-hidden="true">{selected===option.optionKey?'✓':''}</span>
       </label>)}
     </fieldset>
-    <nav aria-label="量表题目导航" className="flex justify-between gap-3">
-      <button type="button" className="btn-secondary" disabled={paused||index===0}
-        onClick={()=>onIndexChange(Math.max(0,index-1))}>上一题</button>
-      <button type="button" className="btn-secondary" disabled={paused||(!readOnly&&!imagesReady)||index>=unit.items.length-1}
-        onClick={()=>onIndexChange(Math.min(unit.items.length-1,index+1))}>下一题</button>
-    </nav>
-    <p className="text-xs text-slate-600">返回修改答案会独立记录修改次数与重访时间；切换后台会标记计时中断。逐题时间不会用于诊断或自动评分。</p>
+    {selected&&nextUnanswered!==undefined&&!readOnly&&<button type="button" className="survey-scale-resume"
+      disabled={paused||!imagesReady||!autoAdvanceReady} onClick={continueUnanswered}>继续未答题 <span aria-hidden="true">→</span></button>}
   </section>
 }

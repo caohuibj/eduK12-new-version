@@ -1,3 +1,4 @@
+import {memorableCredential,generateStudyCode,generatedCodeLookup} from './memorable-code.crypto'
 import {bindSurveyAttemptContent} from './content-binding.service'
 import { createHash, randomBytes, randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
@@ -20,11 +21,11 @@ const code=()=>('R-'+randomBytes(8).toString('hex').toUpperCase())
 /** Project -> Wave -> owner/token guards are ordered consistently with
  * public START, PAUSE/CLOSE and the finalization lifecycle.
  */
-async function activePublicWave(tx:Tx,projectId:string,waveId:string,rawEntry:string){
+async function activePublicWave(tx:Tx,projectId:string,waveId:string,rawEntry:string,identityMode:string){
   if(!/^[A-Za-z0-9_-]{43}$/.test(rawEntry))return fail()
   const projects=await tx.$queryRaw<Array<{id:string;collectionMode:string}>>`
     SELECT id,collection_mode AS "collectionMode" FROM "survey_projects"
-    WHERE id=${projectId} AND status='ACTIVE' FOR SHARE
+    WHERE id=${projectId} AND status='ACTIVE' AND participant_identity_mode=${identityMode} FOR SHARE
   `
   if(!projects.length||projects[0].collectionMode!=='LINKED_WAVES')
     return fail('研究项目当前不接受新的多波次参与者')
@@ -74,14 +75,34 @@ async function activePublicWave(tx:Tx,projectId:string,waveId:string,rawEntry:st
  * prohibited. This follows the contract that quota counts parent Attempts.
  */
 export async function createLinkedResearchIdentity(input:{
-  projectId:string;waveId:string;entryToken:string;consentVersion:number;consent:boolean
-}):Promise<{researchCode:string;accessCredential:string;attemptId:string}>{
+  projectId:string;waveId:string;entryToken:string;consentVersion:number;consent:boolean;
+  memorable?:{prefix:string;suffix:string};generatedCode?:true
+}):Promise<{researchCode:string;accessCredential:string;attemptId:string;fullCode?:string}>{
   if(!input.consent)return fail('需要先同意研究内跨波次关联说明')
-  const secret=opaque(),participantId=randomUUID(),researchCode=code(),attemptId=randomUUID()
+  if(input.generatedCode&&input.memorable)throw new ResearchIdentityError(400,'不能同时使用两种编码方式')
+  const fullCode=input.generatedCode?generateStudyCode():undefined
+  const memorable=fullCode?{prefix:generatedCodeLookup(input.projectId,fullCode),suffix:fullCode}:input.memorable
+  let secret=opaque()
+  const participantId=randomUUID(),researchCode=code(),attemptId=randomUUID()
   await prisma.$transaction(async tx=>{
-    const wave=await activePublicWave(tx,input.projectId,input.waveId,input.entryToken)
+    const wave=await activePublicWave(tx,input.projectId,input.waveId,input.entryToken,input.generatedCode?'SELF_CODE':memorable?'MEMORABLE_CODE':'PERSONAL_LINK')
     if(input.consentVersion!==wave.consentVersion)
       return fail('研究说明已经更新，请重新确认')
+    let codeRowId:string|undefined
+    if(memorable){
+      if(input.generatedCode){
+        const existing=await tx.surveyParticipantCode.findUnique({where:{projectId_prefix:{projectId:input.projectId,prefix:memorable.prefix}}})
+        if(existing)throw new ResearchIdentityError(503,'编码领取暂未完成，请重试。')
+        await tx.surveyParticipantCode.create({data:{id:randomUUID(),projectId:input.projectId,prefix:memorable.prefix}})
+      }
+      const rows=await tx.$queryRaw<Array<{id:string;participantId:string|null;credentialVersion:number}>>`
+        SELECT id,participant_id AS "participantId",credential_version AS "credentialVersion"
+        FROM survey_participant_codes WHERE project_id=${input.projectId} AND prefix=${memorable.prefix} FOR UPDATE`
+      const row=rows[0]
+      if(!row||row.participantId)throw new ResearchIdentityError(409,'编号不可用于首次参加，请核对编号或使用已有完整编码继续。')
+      codeRowId=row.id
+      secret=await memorableCredential(input.projectId,memorable.prefix,memorable.suffix,row.credentialVersion)
+    }
     const claimed=await tx.surveyWave.updateMany({
       where:{id:input.waveId,projectId:input.projectId,status:'OPEN',
         startsCount:wave.startsCount},
@@ -93,6 +114,7 @@ export async function createLinkedResearchIdentity(input:{
       credentialHash:sha256(secret),consentVersion:input.consentVersion,
       status:'ACTIVE',
     }})
+    if(codeRowId)await tx.surveyParticipantCode.update({where:{id:codeRowId},data:{participantId,updatedAt:new Date()}})
     await tx.surveyWaveAttempt.create({data:{
       id:attemptId,projectId:input.projectId,waveId:input.waveId,
       participantId,status:'STARTED',
@@ -108,7 +130,7 @@ export async function createLinkedResearchIdentity(input:{
     await bindSurveyAttemptContent(tx,{projectId:input.projectId,waveId:input.waveId,attemptId,
       publicationId:wave.publicationId!,newAttempt:true})
   })
-  return {researchCode,accessCredential:secret,attemptId}
+  return {researchCode,accessCredential:secret,attemptId,...(fullCode?{fullCode}:{})}
 }
 
 /** Recovery never accepts the publicly displayable research code alone. */
