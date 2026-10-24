@@ -1,6 +1,6 @@
 # Training / Survey 核心提交精简：下一阶段执行设计
 
-基准：main `31d9e4cb`；行为不变优化候选截至 `79609915`。本文是后续执行设计，不表示新命令已经实现，也不授权合并、CI 或部署。
+基准：main `31d9e4cb`；已实施候选截至 `3e903730`，portable 诊断为 `4cf3799d`。显式 receipt-only 已实现并经过定点真实 HTTP 验证；下文父图 read model 与 continuation 仍是后续执行设计，不表示新命令已经实现，也不授权合并、CI 或部署。
 
 ## 事实与目标边界
 
@@ -16,6 +16,18 @@
 UNIFIED receipt-only 在原事务/回放校验后不构造 assessment，服务层只返回 submissionId、payloadHash、replayed、completed，controller 仍执行一次原有 fresh 关系/反馈投影来给准确 feedbackDeferred。既有 legacy 仍保原构造过程，仅缩小 wire 响应。无需捕获 callback、lazy factory、第二次披露读取或新状态管理。
 
 第五片 ebf6 的 callback 预判是探索历史，不作为长期方案；显式 receipt-only 后续提交替代它，旧提交与测量记录保留。保存、断线后同编号重试、草稿清理及原 GET 恢复不变。只有允许展示详情不代表当前页面需要详情；API 默认详情仍在原时点新鲜判定，不以减少披露扩大权限。
+
+## 曾评估的父图读取实验（本轮不采纳）
+
+曾评估替换 Training `getAttemptState` 的父图读取：现有 Prisma 将同一父记录、定义、条目/分区与子记录摘要拆为多个 SELECT。私有、参数化的 read model 以父主键限定每个相关子查询，各集合分别聚合，避免集合交叉相乘。首片保留 Scale 与 Cognitive 的原 Prisma relation 查询：前者 startedAt 可能并列，后者允许同 item 历史多行且原消费者取首行，不能因聚合计划改变选择。目标因此由约 8 次减为约 4 次，而非强追单 SQL。该既有 child 选择歧义另列后续 correctness 问题，本轮不指定新 winner。字段仍为原显式投影，不新增完整科学载荷，也不建立跨请求缓存。
+
+首片只合并父图，不提前读取快照 headers。原授权、冻结版本/slot 校验之后的 headers 查询、当前子任务的 fresh admission、FLOW ensure 后重新读取整图、终态修复全部保持。所有历史子记录继续可见，不能按最新 epoch、已选 variant 或 DISTINCT 隐藏异常注入；legacy 仍走原路径。
+
+合并的父定义图采用 statement 级一致读取，两个保留 child 集合仍沿原读取方式；这不是将读取结果提升为提交授权：后续锁内新鲜检查不省略。先在同一 PostgreSQL 快照下与原 Prisma 投影深等，覆盖日期、JSON null、空集合、关联与排序；再核带无关背景行的 EXPLAIN ANALYZE/BUFFERS、每个相关子查询行数与索引条件。当时计划通过后再评估接入，实际决定见下文。查询数下降不能自动当性能改善，必须分别观察数据库 CPU/返回字节和 API CPU，防止把 Node 工作转成更贵的数据库聚合。
+
+实验结论（2026-10-24）：6 个 PostgreSQL 投影合同及三型既有父图严格深等通过。300/mixed 固定 5 对、每方案每对 20 次读的实验中，Node CPU 分别 4.642→3.311、5.356→3.266 ms/read，五批均下降；但 DB 接收字节分别 10,390→12,938（+24.5%）、21,143→29,754（+40.7%）。PG CPU 的 100 Hz 量化结果不足判断小差异。只有局部读层收益，未验完整 GET/并发，不是无收益，也不是总体提速。
+
+本轮综合不采纳：原生产 `getAttemptState` 没有接入此 reader。保留独立实验分支及深等方法，避免为了少几次查询而承担额外带宽、手写字段映射和维护层。无额外压缩/decoder 框架，不追加测量。下述 continuation 暂列后续候选，不因实验改变 POST/GET、服务器保存粒度或 ACK 时机。
 
 ## 随后评估的命令收敛
 
@@ -55,4 +67,4 @@ D. 同场景配对：固定原 Training 40/300/mixed，观察每单元 POST+GET 
 
 E. 只有确认仍有实质重复工作，才共享内部已验证事实或 writer。每片独立提交、备份，不扩大到整份最终交、不改变中间保存粒度。报告读取/新工作台优化随后按实际热点推进。
 
-当前四片已消除部分重复派生/解析及冗余子记录摘要。第三片确定减少查询与传输，但端到端时间有正有负；不能宣称整条主链已加速。新的 continuation 方案也必须以实际执行和配对结果验收。
+当前已消除部分重复派生/解析、冗余子记录摘要及页面不消费的详情构造。第三片确定减少查询与传输，第七片 receipt-only 首交省去事务内 cipher 列；端到端计时仍有正有负，不能宣称整条主链已加速。新的 continuation 方案也必须以实际执行和配对结果验收。
