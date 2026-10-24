@@ -2983,6 +2983,10 @@ model SurveyMfaRecoveryCode {
   @@map("survey_mfa_recovery_codes")
 }
 model SurveyProject {
+  participantCodes SurveyParticipantCode[]
+  participantIdentityMode String @default("PERSONAL_LINK") @map("participant_identity_mode")
+  participantCodeLabel String @default("报名序号") @map("participant_code_label")
+  participantCodeInstructions String @default("请输入研究者分配给你的编号。") @map("participant_code_instructions")
   toolSelections SurveyToolSelection[]
   referenceRequests SurveyReferenceRequest[]
   reportDrafts SurveyReportDraft[]
@@ -3111,6 +3115,7 @@ model SurveyWave {
   @@map("survey_waves")
 }
 model SurveyParticipant {
+  memorableCode SurveyParticipantCode?
   id                String        @id
   projectId         String        @map("project_id")
   project           SurveyProject @relation(fields:[projectId],references:[id],onDelete:Restrict)
@@ -3122,6 +3127,7 @@ model SurveyParticipant {
   createdAt         DateTime      @default(now()) @map("created_at") @db.Timestamptz(6)
   attempts          SurveyWaveAttempt[]
   consents          SurveyConsent[]
+  @@unique([id,projectId],map:"survey_participants_id_project_uniq")
   @@unique([projectId,researchCode],map:"survey_participants_project_code_key")
   @@unique([projectId,credentialHash],map:"survey_participants_project_credential_key")
   @@map("survey_participants")
@@ -4461,4 +4467,21 @@ model SurveyToolSelection {
   instrumentIds Json @map("instrument_ids")
   createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
   @@map("survey_tool_selections")
+}
+
+model SurveyParticipantCode {
+  id String @id
+  projectId String @map("project_id")
+  project SurveyProject @relation(fields:[projectId],references:[id],onDelete:Restrict)
+  prefix String
+  participantId String? @unique @map("participant_id")
+  participant SurveyParticipant? @relation(fields:[participantId,projectId],references:[id,projectId],onDelete:Restrict)
+  credentialVersion Int @default(0) @map("credential_version")
+  resetHash String? @map("reset_hash")
+  resetExpiresAt DateTime? @map("reset_expires_at") @db.Timestamptz(6)
+  previousCredentialHash String? @map("previous_credential_hash")
+  updatedAt DateTime @default(now()) @map("updated_at") @db.Timestamptz(6)
+  @@unique([participantId,projectId])
+  @@unique([projectId,prefix])
+  @@map("survey_participant_codes")
 }

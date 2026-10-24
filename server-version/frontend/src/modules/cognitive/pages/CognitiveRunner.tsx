@@ -1,3 +1,4 @@
+import '../cognitive-surface.css'
 import { useTrainingLearnerNavigation } from '../../../training/learnerNavigation'
 import CognitiveCredentialReset from './CognitiveCredentialReset'
 import CognitiveSessionEntry from './CognitiveSessionEntry'
@@ -60,7 +61,13 @@ export type CampusCognitiveRunnerBinding = {
 /** Reuse the unchanged frozen trial runner while injecting a SCHOOL-only,
  * parent-slot-scoped transport. Campus never navigates to legacy auth/routes.
  */
-export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; embedded?: CampusCognitiveRunnerBinding }> = ({ campus: legacyCampus, embedded }) => {
+type CognitiveRunnerProps={campus?: CampusCognitiveRunnerBinding;embedded?: CampusCognitiveRunnerBinding}
+
+export const CognitiveRunner: React.FC<CognitiveRunnerProps> = props => (
+  <div className="cognitive-surface"><CognitiveRunnerContent {...props}/></div>
+)
+
+const CognitiveRunnerContent: React.FC<CognitiveRunnerProps> = ({ campus: legacyCampus, embedded }) => {
   const campus = embedded ?? legacyCampus
   const params = useParams<{ sessionId: string }>()
   const sessionId = campus?.sessionId ?? params.sessionId
@@ -331,7 +338,7 @@ export const CognitiveRunner: React.FC<{ campus?: CampusCognitiveRunnerBinding; 
     const instructions = (
       <div className="space-y-1">
         <p>本次测评共 {total || '若干'} 个试次，请按任务提示完成。</p>
-        <p>本次为第 {state.session?.attemptNo} 次作答</p>
+        {state.session?.testType==='gonogo'&&<p>先阅读操作说明并完成练习，练习通过后再进入正式任务。</p>}
         {cognitiveInputNotice(state.session!.testType, state.session!.engineVersion) ? (
           <p>{cognitiveInputNotice(state.session!.testType, state.session!.engineVersion)}</p>
         ) : null}

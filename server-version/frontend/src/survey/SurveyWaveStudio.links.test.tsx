@@ -39,6 +39,27 @@ async function mount(){
 }
 afterEach(()=>vi.unstubAllGlobals())
 describe('recruitment capability display, clipboard and QR share one trusted URL',()=>{
+  it('opens an existing study on its wave overview without an empty creation form or issuing capabilities',async()=>{
+    const api=fixture('http://survey.localhost:5174');render(<SurveyWaveStudio projectId="p1"/> )
+    await screen.findByRole('region',{name:'研究采集概览'})
+    expect(screen.queryByLabelText('波次标题')).toBeNull()
+    expect(screen.queryByText('当前阶段：尚未保存草稿')).toBeNull()
+    expect(api.fetcher.mock.calls.filter(([,init])=>init?.method==='POST')).toHaveLength(0)
+    fireEvent.click(screen.getByRole('button',{name:'查看第 1 次问卷'}))
+    await screen.findByRole('heading',{name:'T1 · 链接测试'})
+    expect(screen.getByRole('button',{name:'正式开放本轮'})).toBeEnabled()
+    expect(screen.queryByRole('region',{name:'研究采集概览'})).toBeNull()
+    expect(api.fetcher.mock.calls.filter(([,init])=>init?.method==='POST')).toHaveLength(0)
+  })
+  it('enters a new draft only after explicit New wave selection, preserving existing frozen waves',async()=>{
+    const api=fixture('http://survey.localhost:5174');render(<SurveyWaveStudio projectId="p1"/> )
+    await screen.findByRole('region',{name:'研究采集概览'})
+    fireEvent.click(screen.getByRole('button',{name:'新建波次'}))
+    expect(screen.getByLabelText('波次标题')).toHaveValue('')
+    expect(screen.getByRole('button',{name:'创建波次'})).toBeDisabled()
+    expect(screen.getByRole('button',{name:/T1 · 链接测试/})).toBeInTheDocument()
+    expect(api.fetcher.mock.calls.filter(([,init])=>init?.method==='POST')).toHaveLength(0)
+  })
   it('keeps the issued link and supports manual copying after clipboard refusal without reissuing it',async()=>{
     const api=fixture('http://survey.localhost:5173');api.writeText.mockRejectedValueOnce(new Error('clipboard denied'))
     await mount();fireEvent.click(screen.getByRole('button',{name:'正式开放本轮'}))

@@ -212,3 +212,53 @@ it('keeps compatibility tools read-only and directs self-authoring back to the i
  expect(screen.getByRole('button',{name:'存入独立工具集'})).toBeVisible()
  expect(screen.getByText('查看选用内容（只读）').closest('details')).not.toHaveAttribute('open')
 })
+
+
+describe('toolkit browsing controls',()=>{
+ it('uses server-backed type and keyword filters and clears both without writing',async()=>{
+  const original=vi.mocked(fetch).getMockImplementation()!
+  vi.mocked(fetch).mockImplementation((url,init)=>{
+   if(String(url).includes('/tool-library?')){
+    const params=new URL(String(url),'http://test.local').searchParams
+    return reply({list:params.get('query')==='不存在'?[]:[form],total:params.get('query')==='不存在'?0:1})
+   }
+   return original(url,init)
+  })
+  render(<SurveyToolLibrary/>);await screen.findByRole('article',{name:form.title})
+  const filters=screen.getByRole('group',{name:'筛选工具类型'})
+  expect(within(filters).getAllByRole('button').map(b=>b.textContent)).toEqual(['全部','量表','表单','组合问卷'])
+  fireEvent.click(within(filters).getByRole('button',{name:'量表'}))
+  await waitFor(()=>expect(vi.mocked(fetch).mock.calls.some(([url])=>String(url).includes('page=1&kind=SCALE&query='))).toBe(true))
+  fireEvent.change(screen.getByRole('searchbox',{name:'检索工具'}),{target:{value:'不存在'}})
+  fireEvent.submit(screen.getByRole('search',{name:'检索自建工具'}))
+  expect(await screen.findByRole('heading',{name:'没有符合条件的工具'})).toBeVisible()
+  expect(screen.getByText('关键词：不存在')).toBeVisible()
+  fireEvent.click(screen.getByRole('button',{name:'显示全部自建工具'}))
+  expect(await screen.findByRole('article',{name:form.title})).toBeVisible()
+  expect(screen.getByRole('searchbox',{name:'检索工具'})).toHaveValue('')
+  expect(within(filters).getByRole('button',{name:'全部'})).toHaveAttribute('aria-pressed','true')
+  expect(vi.mocked(fetch).mock.calls.some(([,init])=>init?.method&&init.method!=='GET')).toBe(false)
+ })
+ it('keeps the original version read-only and labels a granted page count honestly',async()=>{
+  render(<SurveyToolLibrary/>);await screen.findByRole('article',{name:form.title})
+  fireEvent.click(screen.getByRole('button',{name:'已获授权'}))
+  const card=await screen.findByRole('article',{name:'原版认知测验'})
+  expect(screen.getByText('本页 1 项授权工具')).toBeVisible()
+  expect(screen.queryByRole('searchbox',{name:'检索工具'})).not.toBeInTheDocument()
+  expect(within(card).queryByRole('button',{name:'编辑'})).not.toBeInTheDocument()
+  expect(within(card).getByText('来源与使用限制').closest('details')).not.toHaveAttribute('open')
+  expect(vi.mocked(fetch).mock.calls.some(([,init])=>init?.method&&init.method!=='GET')).toBe(false)
+ })
+ it('opens and cancels a card rename while preserving other controls and making no write',async()=>{
+  render(<SurveyToolLibrary/>);await screen.findByRole('article',{name:form.title})
+  fireEvent.click(screen.getByRole('button',{name:'修改名称：'+form.title}))
+  fireEvent.change(screen.getByLabelText('工具名称'),{target:{value:'仅本地待改名称'}})
+  expect(screen.getByRole('button',{name:'编辑'})).toBeDisabled()
+  expect(screen.getByRole('button',{name:'已获授权'})).toBeDisabled()
+  fireEvent.keyDown(screen.getByRole('form',{name:'修改工具名称'}),{key:'Escape'})
+  expect(screen.queryByRole('form',{name:'修改工具名称'})).not.toBeInTheDocument()
+  expect(screen.getByRole('heading',{name:form.title})).toBeVisible()
+  expect(screen.getByRole('button',{name:'编辑'})).toBeEnabled()
+  expect(vi.mocked(fetch).mock.calls.some(([,init])=>init?.method&&init.method!=='GET')).toBe(false)
+ })
+})

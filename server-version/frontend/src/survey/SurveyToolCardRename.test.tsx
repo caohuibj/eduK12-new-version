@@ -9,7 +9,7 @@ const scaleDefinition={schemaVersion:1,responseOptions:[{optionKey:'a',label:'�
 let records:LibraryTool[],failWrite=false,failAfterWrite=false
 beforeEach(()=>{
  window.history.replaceState(null,'','/workspace/tools');failWrite=false;failAfterWrite=false
- records=[{id:'form',title:'学习背景表单',kind:'FORM',revision:2,status:'DRAFT',updatedAt:'',definition:structuredClone(formDefinition)},{id:'scale',title:'学习投入量表',kind:'SCALE',revision:4,status:'DRAFT',updatedAt:'',definition:structuredClone(scaleDefinition)},{id:'group',title:'组合问卷',kind:'COMPOSITION',revision:0,status:'DRAFT',updatedAt:'',definition:{schemaVersion:1,items:[]}}]
+ records=[{id:'form',title:'学习背景表单',kind:'FORM',revision:2,completedRevision:2,readiness:'READY',status:'DRAFT',updatedAt:'',definition:structuredClone(formDefinition)},{id:'scale',title:'学习投入量表',kind:'SCALE',revision:4,status:'DRAFT',updatedAt:'',definition:structuredClone(scaleDefinition)},{id:'group',title:'组合问卷',kind:'COMPOSITION',revision:0,status:'DRAFT',updatedAt:'',definition:{schemaVersion:1,items:[]}}]
  mocks.api.mockReset();mocks.api.mockImplementation(async(path:string,method='GET',body?:any)=>{
   if(path.startsWith('/tool-library?'))return {list:records.map(({definition:_,...row})=>row),total:records.length}
   if(path.startsWith('/tool-library/catalog'))return {list:[{id:'grant',title:'已授权表单',kind:'FORM',sourceRef:{sourceVersion:'1',kind:'FORM',sourceId:'source'}}]}

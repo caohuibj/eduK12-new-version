@@ -1375,3 +1375,71 @@ Run 40057566877 was rejected before jobs because the service-container context
 was placed at job environment scope. The container id is now supplied only to
 the migration step, where that context is available. No checks/build ran in the
 rejected invocation; original SAST remains independently running.
+
+## Survey local review PR350 qualification (2026-10-24)
+
+The user explicitly approved a bounded CI route for PR350 only, on
+`work/survey-review-20261024`, main base `3ee60da761bf777da833f77e81565c5b3d5898a1`
+and application product `9bcc2fdaa33068fb267e426158a2b1407d528db2`. The binding checks
+complete raw paths/modes/blobs, both component trees, protected inputs and actual
+PR source/checkout trees. Unknown content, moved base, other PRs and manual/full
+requests stop without a platform fallback. Other candidates retain their rules.
+
+Forty-nine FINAL assertions are admitted from the original two local JSON reports:
+48 after the correction fix and one independent server-lock test added afterwards.
+The first test source is reconstructed by removing only that exact added test;
+application inputs, fixtures and the existing test bodies are unchanged. Reports,
+observed exit receipts, failures and provenance limits remain explicit. This is
+reviewed-local-evidence, ciExecuted=false, originalExecutionSigned=false; the
+record and Git bindings were prepared after execution and do not claim complete
+historical node_modules byte identity or a general signed local runner.
+
+Original CI40070223303 has failed jobs: its actually successful backend compile
+and full frontend lint steps are independently checked through official metadata,
+exact run/PR/job/source identities, 24-hour lifetime and unchanged compiler/lint
+inputs. The two modified frontend lint files execute afresh; excluded backend
+test fixtures do not invalidate compilation. The failed parent-router fixture is
+fixed and runs once. Prior partial local notes without complete current assertion
+and input evidence remain historical, not qualified current pass receipts.
+
+Actions runs the named affected frontend consumers, current application types,
+only changed lint, real isolated main-to-candidate schema upgrade, code/MFA/entry
+and cross-wave linkage tests, native dump/restore preserving identity/final rows,
+one frontend compilation and current application/control SAST. Matching official
+HIGH/CRITICAL lock audits retain their existing authenticated verifier and
+24-hour lifetime; unavailable evidence stops. Small-program and unrelated Training
+checks are excluded for this exact candidate as requested, without claiming they
+passed or changing branch protection. No platform full suite, production images,
+heavy load/media jobs, deployment or production access is authorized. The stable
+gate recomputes the entire plan and requires actual qualification and SAST success;
+drafts, missing/skipped/failed/cancelled selected checks cannot qualify for merge.
+
+The first PR350 qualification run `40071391876` stopped during classification:
+the shallow merge checkout lacked the PR source object required for independent
+tree comparison. No application check or build executed. A PR350-only exact-source
+fetch supplies that object; identity/tree checks remain mandatory.
+
+Run `40071489539` retains 345 passed and 22 failed frontend assertions, plus
+actual successful integrated types/lint and application CodeQL. It did not reach
+backend integration or build. The continuation repairs the preview's deferred
+runner preparation and old editor/picker/paging test entry assumptions. Official
+report bytes, ZIP digest and exact run/job/source identities are verified. Passed
+cases are admitted only when their reviewed TypeScript-parsed relative import
+closure, complete test/fixtures, setup, locks and schema remain unchanged; changed
+or failed groups execute once. The original failed job remains failed. The 49
+local FINAL assertions retain their original product and separately reviewed
+unchanged import closure, rather than borrowing a changed full frontend tree.
+Successful original SAST is retained for unchanged inputs; only changed runtime,
+tests and qualification controls are scanned afresh, with unchanged actual
+CodeQL action versions/options. Missing stages still must actually succeed.
+
+Run `40072316687` passed another 171 affected assertions and retained three old
+fixture/text failures. Those three are repaired without changing business code.
+The same authenticated, disjoint report/import-closure admission chains both
+failed invocations; only remaining changed test groups rerun. Completed SAST
+likewise chains the original full scoped scan and the successful changed-input
+scan, then scans only newly changed tests/controls. Each source, actual admission
+step, analysis success, options and 24-hour lifetime remain checked. Database
+checks may finish independently after an unrelated frontend assertion failure;
+such a failure still fails the job and blocks merging. A compiled artifact is
+retained even if an independent later check fails, so it need not be rebuilt.

@@ -92,14 +92,15 @@ function fixture({many=false,empty=false,waveCount=1}={}){
   }
 }
 const base='/api/survey/projects/p1'
-const builder=()=>{fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}));return within(screen.getByRole('region',{name:'Survey Research Builder'}))}
-const studio=()=>{const tab=screen.queryByRole('tab',{name:'发布与采集'});if(tab)fireEvent.click(tab);const region=screen.getByRole('region',{name:'研究波次'});const existing=within(region).queryByText('选用本研究已加入的工具');if(existing&&!existing.closest('details')?.open)fireEvent.click(existing);return within(region)}
+const builder=()=>{fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}));if(!screen.queryByRole('region',{name:'Survey Research Builder'}))fireEvent.click(screen.getByRole('button',{name:'新建波次'}));return within(screen.getByRole('region',{name:'Survey Research Builder'}))}
+const studio=()=>{const tab=screen.queryByRole('tab',{name:'发布与采集'});if(tab)fireEvent.click(tab);const region=screen.getByRole('region',{name:'研究波次'});if(!within(region).queryByLabelText('波次标题'))fireEvent.click(within(region).getByRole('button',{name:'新建波次'}));const existing=within(region).queryByText('选用本研究已加入的工具');if(existing&&!existing.closest('details')?.open)fireEvent.click(existing);return within(region)}
 async function openWorkspace(strict=false){
   window.history.replaceState(null,'','/workspace')
   render(strict?<StrictMode><SurveyApp/></StrictMode>:<SurveyApp/>)
   fireEvent.click((await screen.findAllByRole('button',{name:'查看/编辑'}))[0])
   fireEvent.click(screen.getByRole('tab',{name:'发布与采集'}))
   await screen.findByRole('region',{name:'研究波次'})
+  fireEvent.click(screen.getByRole('button',{name:'新建波次'}))
 }
 afterEach(()=>{vi.unstubAllGlobals();window.history.replaceState(null,'','/')})
 
@@ -202,7 +203,7 @@ describe('shared Survey workspace instruments requests',()=>{
   })
 
   it('does not restore an old wave selection or its details after New wave',async()=>{
-    const api=fixture();render(<SurveyWaveStudio projectId="p1"/>)
+    const api=fixture();render(<SurveyWaveStudio projectId="p1"/>);fireEvent.click(screen.getByRole('button',{name:'新建波次'}))
     const pending=api.defer(base+'/instruments/tool1')
     fireEvent.click(await screen.findByRole('button',{name:/T1 · 波次 1/}))
     await waitFor(()=>expect(api.count(base+'/instruments/tool1')).toBe(1))
@@ -214,7 +215,7 @@ describe('shared Survey workspace instruments requests',()=>{
 
   it('rejects old project wave/project responses even when the component is reused without a key',async()=>{
     const api=fixture(),oldWaves=api.defer(base+'/waves?page=1'),oldProject=api.defer(base)
-    const view=render(<SurveyWaveStudio projectId="p1"/>)
+    const view=render(<SurveyWaveStudio projectId="p1"/>);fireEvent.click(screen.getByRole('button',{name:'新建波次'}))
     view.rerender(<SurveyWaveStudio projectId="p2"/>)
     await screen.findByRole('button',{name:/T1 · 波次 1/})
     await act(async()=>{
@@ -255,7 +256,7 @@ describe('shared Survey workspace instruments requests',()=>{
   })
 
   it('refreshes only waves after saving a draft and ignores a save selection interrupted by New wave',async()=>{
-    const api=fixture();render(<SurveyWaveStudio projectId="p1"/>)
+    const api=fixture();render(<SurveyWaveStudio projectId="p1"/>);fireEvent.click(screen.getByRole('button',{name:'新建波次'}))
     await screen.findByRole('button',{name:/T1 · 波次 1/})
     fireEvent.change(screen.getByLabelText('波次标题'),{target:{value:'新波次'}})
     fireEvent.change(screen.getByLabelText('参与说明与知情同意'),{target:{value:wave().consentText}})
@@ -342,7 +343,7 @@ describe('shared Survey workspace instruments requests',()=>{
   })
 
   it('retains a saved wave identity when its list refresh fails and retries only the list',async()=>{
-    const api=fixture();render(<SurveyWaveStudio projectId="p1"/>)
+    const api=fixture();render(<SurveyWaveStudio projectId="p1"/>);fireEvent.click(screen.getByRole('button',{name:'新建波次'}))
     await screen.findByRole('button',{name:/T1 · 波次 1/})
     fireEvent.change(screen.getByLabelText('波次标题'),{target:{value:'已保存的波次'}})
     fireEvent.change(screen.getByLabelText('参与说明与知情同意'),{target:{value:wave().consentText}})
@@ -360,7 +361,7 @@ describe('shared Survey workspace instruments requests',()=>{
 
   it.each(['preflight','open','rotate'] as const)('does not attach an old %s response to a New wave',async operation=>{
     const api=fixture(),initial=api.defer(base+'/waves/w1')
-    render(<SurveyWaveStudio projectId="p1"/>)
+    render(<SurveyWaveStudio projectId="p1"/>);fireEvent.click(screen.getByRole('button',{name:'新建波次'}))
     fireEvent.click(await screen.findByRole('button',{name:/T1 · 波次 1/}))
     const selected={...wave(),status:operation==='rotate'?'OPEN':'DRAFT',publicationId:operation==='preflight'?null:'publication'}
     await act(async()=>initial.resolve(response(selected)))

@@ -227,7 +227,8 @@
 .survey-entry-intro { margin: 0 0 24px; color: var(--survey-body); }
 .survey-entry .survey-back { margin-bottom: 16px; }
 .survey-entry label { margin: 0 0 20px; font-size: 16px; line-height: 1.65; }
-.survey-entry .input { min-height: 44px; margin-top: 8px; padding: 10px 12px; border-color: var(--survey-field-line); border-radius: 8px; color: var(--survey-ink); font-size: 16px; line-height: 1.5; }
+/* Entry routes load before the workspace design tokens: keep field surfaces self-contained. */
+.survey-entry .input { display: block; width: 100%; box-sizing: border-box; min-height: 44px; margin-top: 8px; padding: 10px 12px; border: 1px solid var(--survey-field-line, #718895); border-radius: 8px; background: var(--survey-ui-surface, #fff); color: var(--survey-ink); font-size: 16px; line-height: 1.5; }
 .survey-entry .input:focus { border-color: var(--survey-focus); box-shadow: none; }
 .survey-entry .btn-primary { width: 100%; min-height: 44px; padding: 12px 16px; background: var(--survey-action); color: var(--survey-ui-on-action, #fff); font-size: 16px; line-height: 1.5; border-radius: 8px; }
 .survey-entry .btn-primary:hover:not(:disabled) { background: var(--survey-ui-action, #18394f); }

@@ -1,6 +1,8 @@
 import { SurveySectionHeader } from './SurveySectionHeader'
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react'
 import { publishSurveyMeasurement } from './measurement-publication'
+import {FileText,ArrowDownRight} from 'lucide-react'
+import './survey-workspace-polish.css'
 
 export interface ReportLeaveRisk {dirty:boolean;pending:boolean;busy:boolean}
 type ReferenceKind='normative_distribution'|'criterion_threshold'|'descriptive_sample'|'theoretical_range'
@@ -58,7 +60,7 @@ function ReportBlockPanel({plain,plainTitle,expanded,onExpand,heading,children}:
 }
 
 export type ReportTransport=<T>(path:string,method?:string,body?:unknown)=>Promise<T>
-export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,onLeaveRiskChange,transport=reportApi,basePath,nativePublishing=true,audiences=['researcher','student','parent','teacher'],recoveryKey}:{projectId:string;projectStatus?:string;active?:boolean;onLeaveRiskChange?:(risk:ReportLeaveRisk)=>void;transport?:ReportTransport;basePath?:string;nativePublishing?:boolean;audiences?:Payload['audience'][];recoveryKey?:string}){
+export function SurveyReportStudio({instrumentTitles=[],projectId,projectStatus='DRAFT',active=true,onLeaveRiskChange,transport=reportApi,basePath,nativePublishing=true,audiences=['researcher','student','parent','teacher'],recoveryKey}:{projectId:string;projectStatus?:string;active?:boolean;onLeaveRiskChange?:(risk:ReportLeaveRisk)=>void;transport?:ReportTransport;basePath?:string;nativePublishing?:boolean;audiences?:Payload['audience'][];recoveryKey?:string;instrumentTitles?:{id:string;title:string}[]}){
   const base=basePath??('/projects/'+encodeURIComponent(projectId)+'/report-drafts')
   const reportApi=transport
   const [measurements,setMeasurements]=useState<Measurement[]>([]),[list,setList]=useState<Summary[]>([])
@@ -162,15 +164,17 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
     const result=await reportApi<{releaseId:string}>(base+'/'+selected.id+'/publish','POST',{revision:selected.revision,publicationNote:publicationNote.trim()})
     setSelected({...selected,state:'PUBLISHED',published_release_id:result.releaseId});setNotice('报告版本已发布。已有报告与原始分数未被改写。');await afterWrite()
   })}
+  const measurementName=(m:Measurement,index:number)=>instrumentTitles.find(tool=>m.key.endsWith(':'+tool.id))?.title||(m.key.length>60?({SCALE:'量表测量',SJT:'情境测验',COGNITIVE:'认知测验'}[m.family]||'测量版本')+' '+(index+1):m.key)
+  const measurementStatus=(status:string)=>({PUBLISHED:'已发布',SUPERSEDED:'历史版本',RETIRED:'已停用'}[status]||status)
   const refreshAction=<button type="button" className="btn-secondary" disabled={busy} onClick={()=>void load()}>刷新报告与测量列表</button>
-  return <section className="survey-report-surface survey-studio-surface bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5" aria-label="项目私有报告">
-    <SurveySectionHeader compact={!basePath} section="reports" title="项目私有报告" goal={!basePath?'可选：编制本研究专用的结果报告模板，供研究者查看与解释测量结果。':undefined} actions={!basePath?refreshAction:undefined} policyLabel="用途与操作说明">{basePath?<p>参考区块只引用已有参考类型与分段标识，不创建阈值或常模。</p>:<div className="survey-report-guide">
+  return <section className={"survey-report-surface survey-studio-surface bg-white border rounded-xl p-4 sm:p-6 my-5 space-y-5"+(!basePath?" survey-report-workspace":"")} aria-label="项目私有报告">
+    <SurveySectionHeader compact={!basePath} section="reports" title="项目私有报告" goal={!basePath?'选定测量版本，编写报告，再预览并发布。':undefined} actions={!basePath?refreshAction:undefined} policyLabel="用途与操作说明">{basePath?<p>参考区块只引用已有参考类型与分段标识，不创建阈值或常模。</p>:<div className="survey-report-guide">
       <p><strong>什么时候需要？</strong>需要把量表等测量的指标、解释文字和局限说明组织成统一报告时使用。只收集问卷或导出原始数据时，可以跳过。</p>
       <ol><li>先点击“发布或更新测量版本”，为研究内支持的量表保存测量版本；这一步不会开放招募。</li><li>选择测量版本创建报告草稿，编写文字与指标，保存后用合成情境预览。</li><li>填写发布说明并发布报告版本，再到“发布与采集 → 研究者报告与参考版本”读取、选用该精确版本；随研究定义冻结。</li></ol>
       <p><strong>谁能看到？</strong>当前仅供研究者读取；模板中的“受众”是用途标注，不授予其他角色访问权，也不会自动把报告发给被试。被试原始指标反馈在“发布与采集”中单独配置。</p>
       <p><strong>功能边界：</strong>合成预览不读取真实答卷、不生成正式个人报告；参考解释只引用已批准的参考分段，不在这里建立阈值、常模或修改计分规则。普通 Form 不绑定测量报告。</p>
     </div>}</SurveySectionHeader>
-    {!basePath&&<p className="survey-report-purpose">报告是可选的结果展示模板，不是问卷本身；不设置报告也可以采集与导出数据。展开“用途与操作说明”查看完整流程。</p>}
+    {!basePath&&<div className="survey-report-purpose"><FileText size={18} aria-hidden="true"/><p><strong>按需设置，只供研究者使用</strong><span>不设置报告，也可以正常收集问卷和导出答卷。</span></p></div>}
     {error&&<p role="alert" className="border-l-4 border-red-600 bg-red-50 p-3">{error}</p>}
     {notice&&<p role="status" className="border-l-4 border-teal-600 bg-teal-50 p-3">{notice}</p>}
     {listError&&<p role="alert">列表加载失败：{listError}。已成功的写入无需重做。</p>}
@@ -178,14 +182,14 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
     {basePath&&refreshAction}
     <fieldset id="survey-report-create" tabIndex={-1} disabled={busy||!!pendingCreate} className="survey-report-create survey-task-card space-y-3"><legend>创建报告草稿</legend>
       <label className="block">测量发布版本<select className="input block w-full" value={measurementId} onChange={e=>setMeasurementId(e.target.value)}>
-        <option value="">请选择</option>{measurements.map(m=><option key={m.id} value={m.id}>{m.key} · {m.version} · {m.family} · {m.status}</option>)}</select></label>
+        <option value="">请选择</option>{measurements.map((m,index)=><option key={m.id} value={m.id}>{basePath?m.key+' · '+m.version+' · '+m.family+' · '+m.status:measurementName(m,index)+' · '+m.version+' · '+measurementStatus(m.status)}</option>)}</select></label>
       {measurementsLoaded&&!loadingLists&&!error&&!measurements.length&&<p>暂无本项目获准的测量发布版本。{nativePublishing?'可在下方显式发布自编测量或获准的只读量表；目录原版内容不会改写。':'请先在测量编制入口完成发布并核对内容授权。'}</p>}
-      <label>报告系列标识<input className="input block" maxLength={168} value={reportKey} onChange={e=>setReportKey(e.target.value)}/></label>
+      <label>报告系列标识<input className="input block" maxLength={168} placeholder={basePath?undefined:"例如：学习体验报告"} value={reportKey} onChange={e=>setReportKey(e.target.value)}/></label>
       <label>报告版本<input className="input block" maxLength={240} value={version} onChange={e=>setVersion(e.target.value)}/></label>
       <button type="button" className="btn-primary" disabled={!measurementId||!reportKey.trim()||!version.trim()} onClick={startCreate}>创建报告草稿</button>
     </fieldset>
-    {nativePublishing&&<button type="button" className="btn-secondary" disabled={busy} onClick={()=>{if(showNative)setShowNative(false);else void run(async()=>{await loadNative(1);setShowNative(true)})}}>{showNative?'收起测量发布':'发布或更新测量版本'}</button>}
-    {nativePublishing&&showNative&&<fieldset disabled={busy||!measurementWritable||!!pendingCreate} className="border rounded p-3 space-y-2"><legend>发布本项目测量版本</legend>
+    {nativePublishing&&<button type="button" className="btn-secondary survey-report-native-toggle" disabled={busy} onClick={()=>{if(showNative)setShowNative(false);else void run(async()=>{await loadNative(1);setShowNative(true)})}}>{showNative?'收起测量发布':'发布或更新测量版本'}</button>}
+    {nativePublishing&&showNative&&<fieldset disabled={busy||!measurementWritable||!!pendingCreate} className="survey-report-native-panel border rounded p-3 space-y-2"><legend>发布本项目测量版本</legend>
       {!measurementWritable&&<p>项目采集已关闭或归档，不能发布新的测量；仍可修订历史报告。</p>}
       <p>仅发布测量版本，不创建波次或启动真实采集。授权只读量表保持原版内容，发布前仍须核验来源版本及当前许可；其他目录工具和 Form 不在此发布。</p>
       <label>可发布测量<select className="input block w-full" value={nativeId} onChange={e=>setNativeId(e.target.value)}><option value="">请选择</option>{nativeInstruments.map(row=><option key={row.id} value={row.id}>{row.title} · {row.kind} · 修订 {row.revision}{row.catalogGrantId?' · 授权只读原版':''}</option>)}</select></label>
@@ -203,9 +207,10 @@ export function SurveyReportStudio({projectId,projectStatus='DRAFT',active=true,
         <div className="survey-rail-pagination"><button type="button" className="btn-secondary" disabled={busy||page<=1} onClick={()=>void run(()=>loadList(page-1))}>上一页</button>
           <span>第 {page} 页</span><button type="button" className="btn-secondary" disabled={busy||list.length<25} onClick={()=>void run(()=>loadList(page+1))}>下一页</button></div>
       </nav>
-      {!selected&&<div className="survey-task-empty"><h3>选择一个报告版本，继续编制</h3><p>从左侧打开草稿或已发布版本；没有草稿时，先在上方选择测量版本创建。</p><p>已发布内容保持只读，修订需明确复制为新版本。</p></div>}
+      {!selected&&<div className="survey-task-empty">{!basePath&&<span className="survey-report-empty-icon"><FileText size={27} strokeWidth={1.4} aria-hidden="true"/></span>}<h3>{!basePath&&listLoaded&&!list.length?'从第一份报告开始':'选择一个报告版本，继续编制'}</h3><p>从版本列表打开已有报告，或在上方创建一份新草稿。</p>{!basePath&&<a className="survey-report-empty-link" href="#survey-report-create">前往创建报告<ArrowDownRight size={16} aria-hidden="true"/></a>}<p>已发布内容保持只读，修订需明确复制为新版本。</p></div>}
       {selected&&<div className="survey-report-editor space-y-4 min-w-0">{basePath?<h3 className="font-semibold">{selected.report_key} · {selected.version} · 修订 {selected.revision}</h3>:<header className="survey-report-editor-heading"><h3>{selected.report_key} · {selected.version} · 修订 {selected.revision}</h3><span className="survey-workflow-status">{dirty?'未保存':selected.state==='PUBLISHED'?'已发布 · 只读':'草稿'}</span></header>}
-        <p style={{overflowWrap:'anywhere'}}>测量：{measurement?.key||selected.payload.measurementReleaseId} {measurement?.version||''}</p>
+        <p style={{overflowWrap:'anywhere'}}>测量：{basePath?measurement?.key||selected.payload.measurementReleaseId:measurement?measurementName(measurement,measurements.indexOf(measurement)):'已绑定的测量版本'} {measurement?.version||''}</p>
+        {!basePath&&<details className="survey-report-identifiers"><summary>测量版本标识</summary><code>{selected.payload.measurementReleaseId}</code>{measurement&&<p>{measurement.key}</p>}</details>}
         {selected.state==='PUBLISHED'&&<p>已发布版本只读。修改内容请明确复制为新版本。</p>}
         <div className="survey-report-composer"><fieldset disabled={busy||readOnly||!!pendingCreate} className="survey-report-content space-y-3 min-w-0"><legend>报告内容</legend>
           <label className="block">报告标题<input className="input block w-full" value={selected.payload.template.title||''} onChange={e=>change({...selected.payload,template:{...selected.payload.template,title:e.target.value||undefined}})}/></label>

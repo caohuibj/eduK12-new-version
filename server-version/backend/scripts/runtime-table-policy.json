@@ -245,6 +245,7 @@
     "scale_library_emergency_stops": "RUNTIME_RW",
     "scale_library_media": "RUNTIME_RW",
     "survey_tool_templates": "RUNTIME_RW",
-    "survey_tool_selections": "RUNTIME_RW"
+    "survey_tool_selections": "RUNTIME_RW",
+    "survey_participant_codes": "RUNTIME_RW"
   }
 }

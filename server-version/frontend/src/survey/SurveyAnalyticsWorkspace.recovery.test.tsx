@@ -36,7 +36,7 @@ async function mount(configure?:()=>void){
   await act(async()=>{})
   fireEvent.change(screen.getByLabelText('数据格式'),{target:{value:'COGNITIVE_TRIAL_LONG'}})
   configure?.()
-  await click('创建受控导出')
+  await click('生成导出文件')
   return view
 }
 async function secondPage(){await mount();await collect();await click('生成下一批（请先核对本批文件）')}
@@ -92,11 +92,11 @@ describe('bounded export recovery contracts (component simulation, not real Redi
     expect(screen.queryByRole('region',{name:'当前导出批次'})).toBeNull()
     expect(screen.getByText(/旧票据 .*第 1 批.*CSV、Codebook、Manifest 曾发起/)).toBeInTheDocument()
     vi.mocked(window.confirm).mockReturnValue(false)
-    await click('创建受控导出')
+    await click('生成导出文件')
     expect(window.confirm).toHaveBeenCalledWith(expect.stringContaining('旧的部分文件不能与新导出混作同一批'))
     expect(posts()).toHaveLength(2);expect(reads()).toHaveLength(3);expect(files).toHaveLength(3)
     vi.mocked(window.confirm).mockReturnValue(true)
-    await click('创建受控导出')
+    await click('生成导出文件')
     expect(posts()).toHaveLength(3)
     expect(last(posts())?.body).toMatchObject({format:'COGNITIVE_TRIAL_LONG',waveId:wave})
     expect(last(posts())?.body).not.toHaveProperty('cursor')
@@ -194,8 +194,8 @@ describe('bounded export recovery contracts (component simulation, not real Redi
     postReply=()=>reject(403,'需要最近五分钟的 TOTP 二次验证')
     await click('重新生成当前第 2 批')
     expect(posts()).toHaveLength(3)
-    fireEvent.change(screen.getByLabelText('最新 TOTP 动态验证码'),{target:{value:'123456'}})
-    await click('完成五分钟内二次认证')
+    fireEvent.change(screen.getByLabelText('动态验证码'),{target:{value:'123456'}})
+    await click('验证身份')
     expect(posts()).toHaveLength(3);expect(reads()).toHaveLength(3)
     postReply=undefined
     await click('重新生成当前第 2 批')
@@ -245,7 +245,7 @@ describe('bounded export recovery contracts (component simulation, not real Redi
     expect(files).toHaveLength(0);expect(screen.queryByRole('region',{name:'当前导出批次'})).toBeNull()
     expect(screen.queryByRole('alert')).toBeNull()
     readReply=undefined
-    await click('创建受控导出')
+    await click('生成导出文件')
     expect(last(posts())?.body).toMatchObject({format:'COGNITIVE_TRIAL_LONG',completedFrom:expect.any(String)})
     expect(last(posts())?.body).not.toHaveProperty('cursor')
   })
@@ -260,7 +260,7 @@ describe('bounded export recovery contracts (component simulation, not real Redi
     expect(reads()).toHaveLength(3)
     expect(screen.queryByRole('region',{name:'当前导出批次'})).toBeNull()
     postReply=undefined
-    await click('创建受控导出')
+    await click('生成导出文件')
     expect(last(posts())?.url).toBe('/api/survey/projects/'+newer+'/exports')
     expect(last(posts())?.body).not.toHaveProperty('cursor')
   })

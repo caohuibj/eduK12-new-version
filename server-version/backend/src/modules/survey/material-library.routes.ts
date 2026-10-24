@@ -15,7 +15,7 @@ import {listSurveyMaterials,ownSurveyMaterial,renameSurveyMaterial,materialKinds
 export const surveyMaterialLibraryRouter=Router()
 surveyMaterialLibraryRouter.use(authenticateSurvey,(_req,res,next)=>{res.setHeader('Cache-Control','private, no-store');res.setHeader('Referrer-Policy','no-referrer');next()})
 const wrap=(fn:(req:Request,res:Response)=>Promise<unknown>,pass=false)=>async(req:Request,res:Response,next:NextFunction)=>{
-  try{const result=await fn(req,res);if(pass){next();return}if(!res.headersSent)success(res,result)}catch(cause){
+  try{const result=await fn(req,res);if(pass){next();return}if(result!==res&&!res.headersSent)success(res,result)}catch(cause){
     if(cause instanceof z.ZodError)return error(res,'素材参数不合法',-1,400)
     if(cause instanceof SurveyBuilderError||cause instanceof SurveyMediaError||cause instanceof ScaleLibraryError)return error(res,cause.message,-1,cause.statusCode)
     if(cause instanceof ContentAuthorityError)return error(res,'素材授权已失效，请联系管理员',-1,403)

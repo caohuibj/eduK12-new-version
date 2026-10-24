@@ -1,3 +1,8 @@
+import {projectDirectoryQuery,readProjectDirectory} from './project-directory.service'
+import {readParticipationSettings,configureParticipation,resetMemorableIdentity} from './memorable-code.service'
+import {SurveyBuilderError} from './builder.service'
+import {ResearchIdentityError} from './identity.service'
+import {assertRecentSurveyMfa} from './analytics.export.service'
 import { randomUUID } from 'node:crypto'
 import { Prisma } from '@prisma/client'
 import { Router, type Request, type Response, type NextFunction } from 'express'
@@ -28,6 +33,8 @@ const handler=(fn:(req:Request)=>Promise<unknown>)=>async(req:Request,res:Respon
   try {return success(res,await fn(req))}
   catch(e) {
     if(e instanceof z.ZodError)return error(res,'项目字段不合法',-1,400)
+    if(e instanceof SurveyBuilderError)return error(res,e.message,-1,e.statusCode)
+    if(e instanceof ResearchIdentityError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof ProjectError)return error(res,e.message,-1,e.statusCode)
     if(e instanceof SurveyWaveError)return error(res,e.message,-1,e.statusCode)
     next(e)
@@ -53,15 +60,11 @@ const audit=async(tx:Tx,uid:string,id:string,action:string)=>tx.surveyEvent.crea
 })
 surveyProjectsRouter.use(authenticateSurvey)
 surveyProjectsRouter.get('/',handler(async(req)=>{
-  const page=Math.min(1000,Math.max(1,Number(req.query.page)||1))
+  const input=projectDirectoryQuery.parse(req.query)
   return prisma.$transaction(async tx=>{
     await usable(tx,req.user!.userId)
-    const list=await tx.surveyProject.findMany({
-      where:{ownerUserId:req.user!.userId},take:25,skip:(page-1)*25,
-      orderBy:[{updatedAt:'desc'},{id:'desc'}],
-    })
-    return {page,pageSize:25,list}
-  })
+    return readProjectDirectory(tx,req.user!.userId,input)
+  },{isolationLevel:Prisma.TransactionIsolationLevel.RepeatableRead})
 }))
 surveyProjectsRouter.post('/',handler(async(req)=>{
   const input=create.parse(req.body),uid=req.user!.userId
@@ -90,7 +93,10 @@ surveyProjectsRouter.patch('/:id',handler(async(req)=>{
   const uid=req.user!.userId,id=projectId.parse(req.params.id),input=patch.parse(req.body)
   return prisma.$transaction(async tx=>{
     await usable(tx,uid)
+    await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${id} AND owner_user_id=${uid} FOR UPDATE`
     const previous=await own(tx,uid,id)
+    if(previous.firstPublishedAt&&input.collectionMode!==undefined&&input.collectionMode!==previous.collectionMode)throw new ProjectError(409,'冻结发布后不能更改采集方式')
+    if(previous.participantIdentityMode!=='PERSONAL_LINK'&&input.collectionMode==='SINGLE_UNLINKED')throw new ProjectError(409,'请先改为专属链接方式，再修改采集方式')
     if(previous.status!=='DRAFT'||previous.revision!==input.revision)
       throw new ProjectError(409,'草稿已变化，请刷新后重新编辑')
     const result=await tx.surveyProject.updateMany({
@@ -147,3 +153,12 @@ for(const [endpoint,action] of [['pause','PAUSE'],['resume','RESUME'],['close','
       revision:rev.parse(req.body).revision,action,
     })))
 }
+
+surveyProjectsRouter.get('/:id/participation',handler(req=>readParticipationSettings(req.user!.userId,projectId.parse(req.params.id),z.coerce.number().int().min(1).max(1000).default(1).parse(req.query.page))))
+surveyProjectsRouter.patch('/:id/participation',handler(req=>configureParticipation(req.user!.userId,projectId.parse(req.params.id),z.object({
+ revision:z.number().int().nonnegative(),mode:z.enum(['PERSONAL_LINK','MEMORABLE_CODE','SELF_CODE']),label:z.string().trim().min(1).max(40),instructions:z.string().max(500),shortCodes:z.array(z.string().max(40)).max(5000),
+}).strict().parse(req.body))))
+surveyProjectsRouter.post('/:id/participation/reset',handler(req=>{
+ try{assertRecentSurveyMfa(req)}catch{throw new ResearchIdentityError(403,'请先在数据页面完成动态验证码验证，再重置研究编码。')}
+ return resetMemorableIdentity(req.user!.userId,projectId.parse(req.params.id),z.object({prefix:z.string().max(40)}).strict().parse(req.body).prefix)
+}))

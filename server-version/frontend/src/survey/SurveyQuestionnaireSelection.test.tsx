@@ -22,7 +22,7 @@ beforeEach(()=>{added=false;savedBody=null;window.history.replaceState(null,'','
  if(url.endsWith('/instruments/copyB'))return reply(draft('copyB','第一份表单'))
  if(url.includes('/waves?page='))return reply({list:[]})
  if(url.endsWith('/waves')&&init?.method==='POST'){savedBody=JSON.parse(String(init.body));return reply({...savedBody,id:'w',projectId:'p',ordinal:1,revision:0,status:'DRAFT',publicationId:null})}
- if(url.includes('/tool-library?'))return reply({list:[{id:'composition',kind:'COMPOSITION',title:'普通组合问卷',revision:2,status:'DRAFT'}],total:1})
+ if(url.includes('/tool-library?'))return reply({list:[{id:'composition',kind:'COMPOSITION',title:'普通组合问卷',revision:2,completedRevision:2,readiness:'READY',status:'DRAFT'}],total:1})
  if(url.includes('/tool-library/select/')){added=true;return reply({instrumentIds:['copyB','copyA']})}
  throw new Error('Unexpected '+url)
 }))})
@@ -47,7 +47,7 @@ it('exposes four study tabs and restores legacy tools links inside publication',
  window.history.replaceState(null,'','/workspace?project=p&section=tools#survey-tool-create')
  render(<SurveyApp/>);expect(await screen.findByRole('heading',{name:'合成研究'})).toBeVisible()
  const tabs=within(screen.getByRole('tablist',{name:'研究工作分区'}))
- expect(tabs.getAllByRole('tab').map(tab=>tab.textContent)).toEqual(['研究设置','私有报告','发布与采集','研究数据'])
+ expect(tabs.getAllByRole('tab').map(tab=>tab.textContent)).toEqual(['研究设置','发布与采集','私有报告','数据'])
  expect(tabs.getByRole('tab',{name:'发布与采集'})).toHaveAttribute('aria-selected','true')
  expect(new URLSearchParams(window.location.search).get('section')).toBe('publish')
  expect(window.location.hash).toBe('#survey-wave-content')

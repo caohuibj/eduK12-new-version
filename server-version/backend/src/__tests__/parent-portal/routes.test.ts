@@ -1,7 +1,7 @@
 import express from 'express'
 import type {Server} from 'node:http'
 import {afterAll,beforeAll,beforeEach,describe,it,expect,vi} from 'vitest'
-const state=vi.hoisted(()=>({config:{parentPortalEnabled:true},service:{links:vi.fn(),consentText:vi.fn(),claim:vi.fn(),approve:vi.fn(),readReport:vi.fn(),reportConsentPreview:vi.fn()}}))
+const state=vi.hoisted(()=>({config:{parentPortalEnabled:true,uploadDir:'./unused-parent-router-fixture',assetSigningSecret:'parent-router-fixture-signing-secret'},service:{links:vi.fn(),consentText:vi.fn(),claim:vi.fn(),approve:vi.fn(),readReport:vi.fn(),reportConsentPreview:vi.fn()}}))
 vi.mock('../../config',()=>({config:state.config}))
 vi.mock('../../modules/parent-portal/service',()=>({parentPortalService:state.service}))
 // Existing authenticate middleware has its own DB/cookie tests; isolate router input boundaries here.
