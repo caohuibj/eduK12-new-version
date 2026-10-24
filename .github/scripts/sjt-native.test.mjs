@@ -1,7 +1,7 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
 import {readFileSync} from 'node:fs';
-import {sjtNativePlan,sjtNativeOutputs,binding,branch,marker,publicationBoundary} from './sjt-native-scope.mjs';
+import {sjtNativePlan,sjtNativeOutputs,binding,branch,marker,publicationBoundary,verifyBuiltInputs} from './sjt-native-scope.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 function fixture(){
  const head='a'.repeat(40),source='b'.repeat(40),values={};
@@ -45,7 +45,7 @@ test('publication boundary checks every declared input and fixed imported class'
 test('SJT executor does not add a reusable workflow or select full-platform tests',()=>{
  const text=readFileSync('.github/workflows/ci.yml','utf8');
  const job=text.split('  sjt-native:\n')[1].split('\n  training-entry:')[0];
- for(const required of ['postgres:17','sjt-native-migration.mjs','sjt-native-browser.mjs','if: always()','node node_modules/typescript/bin/tsc -p tsconfig.json','npm run build'])assert(job.includes(required),required);
+ for(const required of ['postgres:17','sjt-native-migration.mjs','sjt-native-browser.mjs','if: always()','sjt-native-scope.mjs restore-build'])assert(job.includes(required),required);
  for(const forbidden of ['uses: ./.github/workflows/','npm test','--all','--passWithNoTests','continue-on-error'])assert(!job.includes(forbidden),forbidden);
  assert(text.includes('needs: [scope, sjt-native,'));
 });
@@ -62,4 +62,19 @@ test('shallow scope explicitly fetches the exact SJT PR source before comparing 
  assert(step.includes('"backup/shared-sjt-native-20261024"'));
  assert(step.includes('EXACT_SOURCE_HEAD: ${{ github.event.pull_request.head.sha }}'));
  assert(step.includes("['fetch','--no-tags','--depth=1','origin',source]"));
+});
+
+test('official build reuse rejects changed input or unrelated checkout',()=>{
+ const source=binding.officialBuild.checkout;
+ verifyBuiltInputs(source+'\n','exact manifest\n','exact manifest');
+ assert.throws(()=>verifyBuiltInputs('a'.repeat(40),'same','same'));
+ assert.throws(()=>verifyBuiltInputs(source,'before','after'));
+});
+test('migration probes keep disclosure admission separate from published immutability',()=>{
+ const text=readFileSync('.github/scripts/sjt-native-migration.mjs','utf8');
+ assert(text.includes("Published Survey wave consent and definition are immutable"));
+ assert(text.includes("Linked Wave requires explicit linkage disclosure confirmation"));
+ assert(text.includes("UPDATE survey_waves SET linkage_notice_confirmed=true,publication_id='ci_sjt_linked_publication'"));
+ assert(!text.includes('DISABLE TRIGGER'));
+ assert(text.includes("SQLSTATE '${state}'"));
 });

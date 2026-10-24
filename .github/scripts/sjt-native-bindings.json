@@ -791,15 +791,30 @@
     "priorFailures": "Preserved in local source records; local socket EPERM browser attempt is not passed. Prior FE type failure was corrected and the final type check passed."
   },
   "controlSHA256": {
-    ".github/scripts/sjt-native-scope.mjs": "7393bd8b8d40280b8107f1d1fb7346832b4f466aded28e1caacc0c5967c83627",
-    ".github/scripts/sjt-native.test.mjs": "7b7ca26606f03f07ae4c194f6ae10170cb96e5f590e37efa168d1951d2bdcbb8",
-    ".github/scripts/sjt-native-migration.mjs": "e7498e656a0d97b4e158778e8aca21eaeba15db6bbc17d66f856aaf356e8a91d",
+    ".github/scripts/sjt-native-scope.mjs": "f373a29742f6d9d58d803cadb6d3ea63a92edc3449ee1ac29d627f7e87745c41",
+    ".github/scripts/sjt-native.test.mjs": "12b844566b3be9f9ff1e44eab98eae958737d145299034422c2eaabe4289314b",
+    ".github/scripts/sjt-native-migration.mjs": "ae100c035dd10674f04f1e0d8b8752f602a7ef3eacde0ea79d7a59ff35b4574f",
     ".github/scripts/sjt-native-browser.mjs": "1da96f08bf0b7f0f9e6fbbbd266a975446a79534ab7fe068d07a462b5231d03f",
     ".github/scripts/content-scope.mjs": "e65006067859ca6b5ca969cc3a9337280001c5b1bb5662a7a99b0f994be403b6",
     ".github/scripts/merge-gate.mjs": "46f5722169a9c7e3b7d67408e605bd05e3224d98eb3b1e31e1f78c891bfa987a",
-    ".github/workflows/ci.yml": "ba3cab95a5a001bd97e1868ee8fabb084914adb671a9bfa3ec3263bb7c7f7b2e",
+    ".github/workflows/ci.yml": "db06f6fe2c646d046dc168853e4e51401f1db3dae2c49ede3fc7d534353dc1d3",
     ".github/workflows/situational-publication.yml": "5c93c3b1a08ab210fff3ff4e43cd4d23e385c72a6eaa44611d4e28a190c37187",
-    "docs/release/README.md": "712d39aee123eb65876a5472987df0bf92279deaed94d800e5cb4b6f4d303451"
+    "docs/release/README.md": "6bd71ae59cd41967ea707814f2d38dcc30de3e098a53ab00a6ad0bc4396db658"
   },
-  "product": "684b2bc9362e103d0f3cf8f29935aeaa88803fba"
+  "product": "684b2bc9362e103d0f3cf8f29935aeaa88803fba",
+  "officialBuild": {
+    "run": 40102230878,
+    "job": 120896620975,
+    "head": "56cf600e484a7c1115ed2ad6cdeb76ad0ce538a0",
+    "checkout": "af5a59c99e0547cd37e84844626ebfe4e0277e6f",
+    "artifact": 12562419854,
+    "name": "sjt-native-af5a59c99e0547cd37e84844626ebfe4e0277e6f-1",
+    "bytes": 30398991,
+    "sha256": "a5cf184aa93982b6187e9cc5659dbf6e557020f514611b57df8a029c9ba657b2",
+    "steps": [
+      "compile changed backend once without broad onboarding replay",
+      "build changed frontend once",
+      "record exact built source and emitted bytes"
+    ]
+  }
 }

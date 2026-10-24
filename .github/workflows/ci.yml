@@ -1524,18 +1524,10 @@ jobs:
           npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/backend
           npm ci --ignore-scripts --no-audit --no-fund --prefix server-version/frontend
           node server-version/backend/node_modules/prisma/build/index.js generate --schema server-version/backend/prisma/schema.prisma
-      - name: compile changed backend once without broad onboarding replay
-        working-directory: server-version/backend
-        run: node node_modules/typescript/bin/tsc -p tsconfig.json
-      - name: build changed frontend once
-        working-directory: server-version/frontend
-        run: npm run build
-      - name: record exact built source and emitted bytes
-        run: |
-          mkdir -p sjt-native-evidence
-          git rev-parse HEAD > sjt-native-evidence/source.txt
-          git ls-tree -r HEAD -- server-version/backend server-version/frontend .github/release-tools > sjt-native-evidence/build-inputs.txt
-          find server-version/backend/dist server-version/frontend/dist -type f -print0 | sort -z | xargs -0 sha256sum > sjt-native-evidence/build-sha256.txt
+      - name: restore unchanged exact official backend and frontend builds
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node .github/scripts/sjt-native-scope.mjs restore-build
       - name: upgrade nonempty exact main and verify isolated database restore
         env:
           PG_CONTAINER: ${{ job.services.postgres.id }}

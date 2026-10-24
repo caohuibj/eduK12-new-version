@@ -83,10 +83,59 @@ async function dependencyAuditProof(component){
  save(component+'-audit-original-proof',{...proof,run:r.run,job:r.job,artifact:r.artifact,artifactSHA256:r.sha256,originalAdmissionConclusion:r.admissionConclusion||'failure',onlyExactAuditSubprocessAccepted:true});
  return proof;
 }
+// Fixed successful build substeps only; the original qualification remains failed.
+export function verifyBuiltInputs(source, inputs, current) {
+ assert.equal(source.trim(),binding.officialBuild.checkout);
+ assert.equal(inputs.trim(),current.trim(),'Build source/dependency/tool inputs changed');
+}
+async function restoreOfficialBuild(){
+ const r=binding.officialBuild;
+ assert.equal(process.env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');
+ const api=async path=>{const response=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/'+path,{headers:{Authorization:`Bearer ${process.env.GH_TOKEN}`,Accept:'application/vnd.github+json'}});assert.equal(response.status,200,'Official build unavailable');return response;};
+ const [run,job,artifact]=await Promise.all([api(`actions/runs/${r.run}`).then(x=>x.json()),api(`actions/jobs/${r.job}`).then(x=>x.json()),api(`actions/artifacts/${r.artifact}`).then(x=>x.json())]);
+ assert.equal(run.head_sha,r.head);assert.equal(run.event,'pull_request');assert.equal(run.path,'.github/workflows/ci.yml');assert.equal(run.head_branch,branch);
+ assert.equal(job.run_id,r.run);assert.equal(job.head_sha,r.head);assert.equal(job.name,'shared SJT bounded qualification');assert.equal(job.status,'completed');assert.equal(job.conclusion,'failure');
+ for(const name of r.steps)assert(job.steps.some(s=>s.name===name&&s.conclusion==='success'),'Original build substep did not pass: '+name);
+ assert.equal(artifact.id,r.artifact);assert.equal(artifact.workflow_run.id,r.run);assert.equal(artifact.workflow_run.head_sha,r.head);assert.equal(artifact.expired,false);assert.equal(artifact.name,r.name);assert.equal(artifact.size_in_bytes,r.bytes);assert.equal(artifact.digest,'sha256:'+r.sha256);
+ const zip=Buffer.from(await(await api(`actions/artifacts/${r.artifact}/zip`)).arrayBuffer());assert.equal(zip.length,r.bytes);assert.equal(sha(zip),r.sha256);
+ const script=`import sys,io,zipfile,pathlib,hashlib,json,stat
+z=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read()))
+items=z.infolist()
+assert len({i.filename for i in items})==len(items)
+assert sum(i.file_size for i in items)<300000000
+for i in items:
+ p=pathlib.PurePosixPath(i.filename)
+ assert not p.is_absolute() and '..' not in p.parts and not stat.S_ISLNK(i.external_attr>>16)
+ assert i.filename.startswith(('server-version/backend/dist/','server-version/frontend/dist/','sjt-native-evidence/'))
+prefix='sjt-native-evidence/'
+inputs=z.read(prefix+'build-inputs.txt').decode()
+source=z.read(prefix+'source.txt').decode()
+manifest=z.read(prefix+'build-sha256.txt').decode()
+expected={}
+for line in manifest.splitlines():
+ digest,name=line.split('  ',1)
+ assert name.startswith(('server-version/backend/dist/','server-version/frontend/dist/')) and name not in expected
+ expected[name]=digest
+actual={i.filename for i in items if not i.is_dir() and i.filename.startswith(('server-version/backend/dist/','server-version/frontend/dist/'))}
+assert actual==set(expected) and expected
+for name,digest in expected.items(): assert hashlib.sha256(z.read(name)).hexdigest()==digest
+print(json.dumps({'source':source,'inputs':inputs,'files':len(expected)}))
+if sys.argv[1]=='extract':
+ for name in list(expected)+[prefix+'build-inputs.txt',prefix+'source.txt',prefix+'build-sha256.txt']:
+  p=pathlib.Path(name)
+  assert not p.exists(), 'Refuse overwrite of existing build output: '+name
+  p.parent.mkdir(parents=True,exist_ok=True);p.write_bytes(z.read(name))
+`;
+ const inspect=JSON.parse(execFileSync('python3',['-c',script,'inspect'],{input:zip,encoding:'utf8',maxBuffer:4*1024*1024}));
+ verifyBuiltInputs(inspect.source,inspect.inputs,git('ls-tree','-r','HEAD','--','server-version/backend','server-version/frontend','.github/release-tools'));
+ execFileSync('python3',['-c',script,'extract'],{input:zip,encoding:'utf8',maxBuffer:4*1024*1024});
+ save('build-original-proof',{run:r.run,job:r.job,artifact:r.artifact,sha256:r.sha256,checkout:r.checkout,originalConclusion:'failure',accepted:'successful build substeps only',files:inspect.files,migrationRestoreAccepted:false,browserAccepted:false});
+}
 if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
- assert.equal(process.argv[2],'dependency-audits');
+ if(process.argv[2]==='restore-build')await restoreOfficialBuild();
+ else{assert.equal(process.argv[2],'dependency-audits');
  for(const component of ['backend','frontend']){
   const proof=await dependencyAuditProof(component);
   assert.equal(proof.fresh,true,'Prior audit expired; explicitly refresh the affected audit before activation');
- }
+ }}
 }

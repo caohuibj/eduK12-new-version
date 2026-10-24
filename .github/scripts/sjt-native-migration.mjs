@@ -75,6 +75,8 @@ const reject=(operation,state,message)=>`DO $$ DECLARE rejected BOOLEAN=false; d
  EXCEPTION WHEN SQLSTATE '${state}' THEN GET STACKED DIAGNOSTICS detail=MESSAGE_TEXT;
  IF position(${literal(message)} in detail)=0 THEN RAISE; END IF; rejected=true; END;
  IF NOT rejected THEN RAISE EXCEPTION 'Expected SJT invariant rejection did not occur: %',${literal(message)}; END IF; END $$;`;
+// 20261011133000 replaces the earlier function/message, not a second guard.
+const publishedWaveMessage='Published Survey wave consent and definition are immutable';
 function validateInvariants(url){
  assert.equal(sql(url,`SELECT count(*)=2 AND bool_and(survey_attempt_id IS NULL AND survey_publication_id IS NULL AND survey_slot_key IS NULL
  AND survey_locked_answers_cipher IS NULL AND survey_locked_answers_hash IS NULL) FROM situational_attempts WHERE id IN('ci_sjt_legacy','ci_sjt_active');`),'t','Legacy rows must not be adopted or backfilled');
@@ -97,17 +99,31 @@ function validateInvariants(url){
   reject("UPDATE situational_attempts SET survey_attempt_id='ci_sjt_parent',survey_publication_id='ci_sjt_publication',survey_slot_key='adopted' WHERE id='ci_sjt_legacy'",'23514','SITUATIONAL_SURVEY_HOST_IMMUTABLE'),
   reject("UPDATE situational_attempts SET survey_locked_answers_cipher='synthetic',survey_locked_answers_hash=repeat('f',64) WHERE id='ci_sjt_legacy'",'23514','SITUATIONAL_SURVEY_ANSWER_LOCK_IMMUTABLE'),
   reject("UPDATE survey_wave_attempts SET wave_id='changed' WHERE id='ci_sjt_parent'",'P0001','SURVEY_ATTEMPT_CONTENT_BINDING_IMMUTABLE'),
-  reject("UPDATE survey_waves SET publication_id=NULL WHERE id='ci_sjt_wave'",'23514','Published Survey wave definition is immutable'),
+  reject("UPDATE survey_waves SET publication_id=NULL WHERE id='ci_sjt_wave'",'23514',publishedWaveMessage),
   reject("DELETE FROM survey_wave_attempts WHERE id='ci_sjt_parent'",'23503','situational_attempts_survey_attempt_id_fkey'),
+ ];
+ const publicationGuards=[
+  reject("UPDATE survey_waves SET publication_id='ci_sjt_linked_publication' WHERE id='ci_sjt_linked_draft'",'23514','Linked Wave requires explicit linkage disclosure confirmation'),
+  reject("UPDATE survey_waves SET consent_text='changed' WHERE id='ci_sjt_linked_draft'",'23514',publishedWaveMessage),
  ];
  // All positive and negative mutations are rolled back; rerun after restore to
  // verify active guards, not merely catalog text. Progress remains mutable.
  sql(url,`BEGIN; ${guards.join('\n')}
+ -- Isolate disclosure admission from already-published immutability: OLD has
+ -- no publication for the first probe; the later consent update cannot invoke
+ -- the disclosure trigger, which only listens to publication/notice changes.
+ INSERT INTO survey_projects(id,owner_user_id,title,collection_mode) VALUES('ci_sjt_linked_project','ci_sjt_owner','Synthetic disclosure boundary','LINKED_WAVES');
+ INSERT INTO survey_publications(id,project_id,definition_digest,compiled_snapshot,consent_version,version) VALUES('ci_sjt_linked_publication','ci_sjt_linked_project',repeat('e',64),'{}',1,1);
+ INSERT INTO survey_waves(id,project_id,ordinal,title,consent_text) VALUES('ci_sjt_linked_draft','ci_sjt_linked_project',1,'Synthetic draft boundary','Synthetic fixture only');
+ ${publicationGuards[0]}
+ UPDATE survey_waves SET linkage_notice_confirmed=true,publication_id='ci_sjt_linked_publication' WHERE id='ci_sjt_linked_draft';
+ DO $$ BEGIN IF NOT EXISTS(SELECT 1 FROM survey_waves WHERE id='ci_sjt_linked_draft' AND publication_id='ci_sjt_linked_publication' AND linkage_notice_confirmed) THEN RAISE EXCEPTION 'Confirmed draft publication failed'; END IF; END $$;
+ ${publicationGuards[1]}
  UPDATE situational_attempts SET progress=1 WHERE id='ci_sjt_native';
  DO $$ BEGIN IF NOT EXISTS(SELECT 1 FROM situational_attempts WHERE id='ci_sjt_native' AND progress=1) THEN RAISE EXCEPTION 'Ordinary progress update failed'; END IF; END $$;
  ${attempt({...native,id:"'ci_sjt_other_slot'",survey_slot_key:"'other'"})};
  ROLLBACK;`);
- return guards.length;
+ return guards.length+publicationGuards.length;
 }
 
 export async function main(){
