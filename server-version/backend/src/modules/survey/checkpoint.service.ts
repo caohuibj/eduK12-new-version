@@ -7,7 +7,7 @@ import { prisma } from '../../config/database'
 import { canonicalHash } from '../assessment-runtime/canonical'
 import { encryptUnifiedRuntimePayload,decryptUnifiedRuntimePayload } from '../assessment-runtime/security'
 import { hashResearchCredential } from './identity.service'
-import { verifiedSurveyAttempt } from './admission.service'
+import { verifiedSurveyFinalLocator } from './admission.service'
 import {ensureSurveyFlowAssignment,assignedSurveySnapshot} from './flow.assignment'
 import type { ResearchFrozenPublication } from './publication.service'
 import type { FormDraft,ScaleDraft,AnySjtDraft } from './builder.definition'
@@ -77,7 +77,7 @@ const validCheckpointAnswers=(snapshot:ResearchFrozenPublication,raw:unknown):Ch
   return JSON.parse(encoded) as CheckpointAnswers
 }
 type AuthContext={projectId:string;waveId:string;attemptId:string;
-  definitionDigest:string;compiledSnapshot:ResearchFrozenPublication;
+  publicationId:string;definitionDigest:string;
   participantId:string|null;status:string}
 const access=async(tx:Prisma.TransactionClient,proof:Proof,known:AuthContext)=>{
   await tx.$queryRaw`SELECT id FROM survey_projects WHERE id=${known.projectId} FOR SHARE`
@@ -88,7 +88,8 @@ const access=async(tx:Prisma.TransactionClient,proof:Proof,known:AuthContext)=>{
       AND wave_id=${known.waveId} FOR UPDATE`
   const attempt=await tx.surveyWaveAttempt.findFirst({where:{
     id:known.attemptId,projectId:known.projectId,waveId:known.waveId,
-  },include:{wave:true}})
+  },select:{participantId:true,status:true,excludedAt:true,sessionHash:true,
+    wave:{select:{publicationId:true,hardStopAt:true,finishUntil:true,closesAt:true}}}})
   if(!attempt||attempt.participantId!==known.participantId||attempt.status!=='STARTED'||
     attempt.excludedAt!==null||attempt.wave.hardStopAt)
     fail(403,'此研究作答已经结束或撤回，不允许访问临时草稿')
@@ -98,12 +99,14 @@ const access=async(tx:Prisma.TransactionClient,proof:Proof,known:AuthContext)=>{
   const publication=await tx.surveyPublication.findFirst({where:{
     id:attempt.wave.publicationId!,projectId:known.projectId,
   },select:{definitionDigest:true,compiledSnapshot:true}})
-  if(!publication||publication.definitionDigest!==known.definitionDigest||
+  const frozen=publication?.compiledSnapshot as unknown as ResearchFrozenPublication|undefined
+  if(attempt.wave.publicationId!==known.publicationId||!publication||
+    frozen?.runtimeStatus!=='SURVEY_FINAL_V1'||publication.definitionDigest!==known.definitionDigest||
     canonicalHash(JSON.parse(JSON.stringify(publication.compiledSnapshot)))!==publication.definitionDigest)
     fail(409,'临时作答与冻结发布内容不一致')
   const hash=hashResearchCredential(proof.accessCredential)
   if(attempt.participantId){
-    if(known.compiledSnapshot.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS')
+    if(frozen!.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS')
       await tx.$queryRaw`SELECT id FROM survey_participants
         WHERE id=${attempt.participantId} AND project_id=${known.projectId} FOR UPDATE`
     else await tx.$queryRaw`SELECT id FROM survey_participants
@@ -115,15 +118,15 @@ const access=async(tx:Prisma.TransactionClient,proof:Proof,known:AuthContext)=>{
     },select:{id:true}})
     if(!person)fail(403,'研究参与者凭证已失效')
   }else if(attempt.sessionHash!==hash)fail(403,'匿名恢复凭证已失效')
-  const policy=known.compiledSnapshot.checkpointPolicy
+  const policy=frozen!.checkpointPolicy
   if(!policy?.enabled)fail(404,'本研究未开启服务器临时存档')
-  const assignment=known.compiledSnapshot.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'
+  const assignment=frozen!.flow?.experiment?.mode==='QUESTIONNAIRE_VARIANTS'
     ?await ensureSurveyFlowAssignment(tx,{...known,researchCode:proof.researchCode,
-      accessCredential:proof.accessCredential,snapshot:known.compiledSnapshot}):null
-  const snapshot=assignment?assignedSurveySnapshot(known.compiledSnapshot,assignment):known.compiledSnapshot
-  return {policy,wave:attempt.wave,snapshot}
+      accessCredential:proof.accessCredential,snapshot:frozen!}):null
+  const snapshot=assignment?assignedSurveySnapshot(frozen!,assignment):frozen!
+  return {policy,wave:attempt.wave,snapshot,hasCognitive:frozen!.units.some(unit=>unit.kind==='COGNITIVE')}
 }
-const context=async(proof:Proof):Promise<AuthContext>=>verifiedSurveyAttempt(proof)
+const context=async(proof:Proof):Promise<AuthContext>=>verifiedSurveyFinalLocator(proof)
 export async function readSurveyCheckpoint(proof:Proof){
   const known=await context(proof)
   return prisma.$transaction(async tx=>{
@@ -160,7 +163,7 @@ export async function saveSurveyCheckpoint(proof:Proof,input:{
 }){
   const known=await context(proof)
   return prisma.$transaction(async tx=>{
-    const {policy,wave,snapshot}=await access(tx,proof,known)
+    const {policy,wave,snapshot,hasCognitive}=await access(tx,proof,known)
     await assertSurveyScaleCollectionAllowed(tx,snapshot)
     const answers=validCheckpointAnswers(snapshot,input.answers)
     let itemTimings:SurveyScaleTimings|undefined
@@ -176,14 +179,15 @@ export async function saveSurveyCheckpoint(proof:Proof,input:{
     }:answers
     if(Buffer.byteLength(JSON.stringify(content),'utf8')>MAX_CHECKPOINT_BYTES)
       fail(413,'临时作答和计时记录合计超过 64KB，无法安全暂存')
-    if(known.compiledSnapshot.units.some(unit=>unit.kind==='COGNITIVE'))
+    if(hasCognitive)
       await assertSurveyCognitiveLockedAnswers(tx,known.attemptId,answers)
     const now=new Date()
     const end=wave.finishUntil??wave.closesAt
     const expiresAt=new Date(Math.min(now.getTime()+policy.ttlHours*3600000,
       end?.getTime()??Number.POSITIVE_INFINITY))
     if(expiresAt<=now)fail(409,'临时存档时间窗口已截止')
-    const prior=await tx.surveyAttemptCheckpoint.findUnique({where:{attemptId:known.attemptId}})
+    const prior=await tx.surveyAttemptCheckpoint.findUnique({where:{attemptId:known.attemptId},
+      select:{id:true,version:true,expiresAt:true}})
     if(prior&&prior.expiresAt<=now)await tx.surveyAttemptCheckpoint.delete({where:{id:prior.id}})
     const live=prior&&prior.expiresAt>now?prior:null
     if(input.revision!==(live?.version??0))

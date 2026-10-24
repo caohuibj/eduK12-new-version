@@ -18,6 +18,7 @@ export function rememberSurveyCognitiveSession(publicId:string,attemptId:string,
 }
 export async function clearSurveyCognitiveSessions(publicId:string,attemptId?:string,knownIds:string[]=[],researchCode?:string):Promise<boolean>{
   const rows=read(publicId),ids=new Set([...knownIds,...rows.filter(r=>attemptId?r.attemptId===attemptId:!!researchCode&&r.researchCode===researchCode).map(r=>r.sessionId)])
+  // Text-only attempts have no cognitive drafts and do not need IndexedDB code.
   if(!ids.size)return true
   let finalDraftStore:typeof import('../services/persistence/finalDraftStore')['finalDraftStore']
   try{({finalDraftStore}=await import('../services/persistence/finalDraftStore'))}catch{return false}

@@ -9,8 +9,9 @@ import {getOwnResearchTask} from '../../modules/survey/task.public'
 import {screenOutResearchAttempt} from '../../modules/survey/flow.screen-out.service'
 import type {ResearchFrozenPublication} from '../../modules/survey/publication.service'
 import {compileFrozenResearchUnit} from '../../modules/survey/publication.service'
-import {compileSurveyFlow} from '../../modules/survey/flow.definition'
+import {compileSurveyFlow,surveyVariantProvenance} from '../../modules/survey/flow.definition'
 import type {SurveyFlowAssignment} from '../../modules/survey/flow.assignment'
+import * as flowAssignment from '../../modules/survey/flow.assignment'
 
 const mocks=vi.hoisted(()=>({verified:vi.fn(),transaction:vi.fn(),assignment:vi.fn(),
   attempt:vi.fn(),person:vi.fn(),final:vi.fn(),readFinal:vi.fn(),lock:vi.fn(),encrypt:vi.fn(),
@@ -384,5 +385,75 @@ describe('Survey FINAL interpretation commit boundary',()=>{
     const interpret=vi.spyOn(interpretationService,'interpretSurveyFinal')
     await expect(submitResearchFinal(input())).resolves.toMatchObject({idempotent:true})
     expect(interpret).not.toHaveBeenCalled();expect(mocks.createFinal).not.toHaveBeenCalled()
+  })
+})
+
+
+describe('Survey FINAL bounded transaction reads and selected definition reuse',()=>{
+  // Honor the actual Prisma projection, so missing consumed fields fail the
+  // service instead of being masked by an over-generous mock return object.
+  const project=(row:any,select:any):any=>!select?row:Object.fromEntries(Object.entries(select)
+    .filter(([,value])=>!!value).map(([key,value])=>[key,value===true?row[key]:project(row[key],(value as any).select)]))
+  it('does not transfer unused attempt ciphers or wave authoring data on first commit',async()=>{
+    known.status=current.status='STARTED';mocks.final.mockResolvedValue(null)
+    current.contentBindingCipher='private-binding';current.flowAssignmentCipher='private-assignment'
+    current.wave.flowDefinition={private:'draft'};current.wave.consentText='private-consent'
+    mocks.attempt.mockImplementation(async(args:any)=>project(current,args.select))
+    const selected=vi.spyOn(flowAssignment,'assignedSurveySnapshot')
+    const result=await submitResearchFinal(input())
+    expect(result).toMatchObject({status:'COMPLETED',idempotent:false})
+    expect(selected).toHaveBeenCalledTimes(1)
+    expect(mocks.attempt.mock.calls[0][0]).toEqual({where:{id:'attempt',projectId:'project',waveId:'wave'},select:{
+      id:true,participantId:true,status:true,excludedAt:true,sessionHash:true,wave:{select:{
+        id:true,consentVersion:true,generalText:true,finishUntil:true,closesAt:true,hardStopAt:true,
+        publication:{select:{id:true,definitionDigest:true,compiledSnapshot:true}},
+      }},
+    }})
+    expect(JSON.stringify(result)).not.toContain('private-')
+  })
+  it('does not build the selected projection for an unchanged FINAL replay',async()=>{
+    mocks.attempt.mockImplementation(async(args:any)=>project(current,args.select))
+    const selected=vi.spyOn(flowAssignment,'assignedSurveySnapshot')
+    expect(await submitResearchFinal(input())).toMatchObject({idempotent:true})
+    expect(selected).not.toHaveBeenCalled()
+  })
+})
+
+
+describe('Survey FINAL reused selected variant boundary',()=>{
+  function setupVariant(){
+    const source=snapshot()
+    source.units.push({...source.units[0],draftId:'other',instrumentKey:'other'})
+    source.flow=compileSurveyFlow({schemaVersion:1,embeddedData:[],experiment:{
+      experimentKey:'arms',mode:'QUESTIONNAIRE_VARIANTS',linkedPolicy:'RERANDOMIZE',groups:[
+        {groupKey:'a',variantLabel:'A',weight:1,instrumentKeys:['form'],materialTitle:'',materialBody:''},
+        {groupKey:'b',variantLabel:'B',weight:1,instrumentKeys:['other'],materialTitle:'',materialBody:''},
+      ]},blocks:[{blockKey:'form',kind:'INSTRUMENT',instrumentKey:'form'},
+        {blockKey:'other',kind:'INSTRUMENT',instrumentKey:'other'}]},source.units,'SINGLE_UNLINKED')
+    const assignment:SurveyFlowAssignment={schemaVersion:1,flowDigest:source.flow.flowDigest,
+      experimentKey:'arms',groupKey:'a',algorithm:'CRYPTO_RANDOM_INT_V1',assignedAt:'2026-10-17T00:00:00Z',
+      variant:surveyVariantProvenance(source.flow,'a')}
+    known.status=current.status='STARTED';mocks.final.mockResolvedValue(null)
+    known.definitionDigest=current.wave.publication.definitionDigest=canonicalHash(source)
+    known.compiledSnapshot=current.wave.publication.compiledSnapshot=source
+    mocks.assignment.mockResolvedValue(assignment)
+    return {source,assignment}
+  }
+  it('projects assigned units once but computes and persists the unchanged frozen union',async()=>{
+    const {source,assignment}=setupVariant(),before=structuredClone(assignment)
+    const selected=vi.spyOn(flowAssignment,'assignedSurveySnapshot')
+    const interpret=vi.spyOn(interpretationService,'interpretSurveyFinal').mockResolvedValue(undefined)
+    await submitResearchFinal({...input(),presentation:{shownBlocks:['form']}})
+    expect(selected).toHaveBeenCalledTimes(1)
+    expect(interpret.mock.calls[0][1].selectedSnapshot.units.map(unit=>unit.instrumentKey)).toEqual(['form'])
+    expect(mocks.encrypt.mock.calls[0][0]).toEqual(computeSurveyFinal(source,answers(),assignment,['form']))
+    expect(mocks.encrypt.mock.calls[0][0].units[1]).toMatchObject({instrumentKey:'other',notExecuted:true})
+    expect(assignment).toEqual(before)
+  })
+  it('continues rejecting unassigned answers after the selected projection is reused',async()=>{
+    setupVariant()
+    await expect(submitResearchFinal({...input(),answers:{...answers(),other:{choice:'yes'}},
+      presentation:{shownBlocks:['form']}})).rejects.toMatchObject({statusCode:400})
+    expect(mocks.createFinal).not.toHaveBeenCalled()
   })
 })

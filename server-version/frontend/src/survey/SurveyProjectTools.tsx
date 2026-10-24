@@ -1,9 +1,13 @@
+import {deferredResearcherComponent} from './deferred-researcher-component'
 import {useCallback,useRef,useState} from 'react'
 import {Plus,ArrowRight} from 'lucide-react'
-import {SurveyToolLibrary} from './SurveyToolLibrary'
-import {SurveyBuilder,type BuilderLeaveRisk} from './SurveyBuilder'
+import type {BuilderLeaveRisk} from './SurveyBuilder'
 import {useInstrumentLibrary,type InstrumentLibrary} from './instrument-library'
 import {libraryKindLabel} from './tool-library-api'
+
+// Load researcher authoring/preview code only when its existing control is opened.
+const SurveyToolLibrary=deferredResearcherComponent(()=>import('./SurveyToolLibrary').then(module=>module.SurveyToolLibrary),'工具集')
+const SurveyBuilder=deferredResearcherComponent(()=>import('./SurveyBuilder').then(module=>module.SurveyBuilder),'兼容管理')
 export function SurveyProjectTools({projectId,projectStatus,instrumentLibrary,onLeaveRiskChange,onNavigateLibrary,onSelected,onBeforeSelect,selectedTools,onReorder}:{projectId:string;projectStatus:string;instrumentLibrary:InstrumentLibrary;onLeaveRiskChange:(risk:BuilderLeaveRisk)=>void;onNavigateLibrary:()=>void;onSelected?:(ids:string[])=>Promise<void>;onBeforeSelect?:()=>boolean;onReorder?:(ids:string[])=>void;selectedTools?:{id:string;title:string;kind:string;revision?:number;status:string}[]}){
   const [legacy,setLegacy]=useState(false),[picker,setPicker]=useState(false)
   const {list,page,loading,error,refresh}=useInstrumentLibrary(projectId,instrumentLibrary)

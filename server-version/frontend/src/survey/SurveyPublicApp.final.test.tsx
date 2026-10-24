@@ -2,6 +2,10 @@ import {act,fireEvent,render,screen,waitFor} from '@testing-library/react'
 import {afterEach,beforeEach,describe,expect,it,vi} from 'vitest'
 import SurveyPublicApp from './SurveyPublicApp'
 import {saveLocalSurveyDraft} from './local-answer-draft'
+import * as formVisibility from './form-visibility'
+import * as scaleTiming from './survey-scale-timing'
+import * as cognitiveLocal from './survey-cognitive-local'
+import * as localDraft from './local-answer-draft'
 
 const publicId='11111111-1111-4111-8111-111111111111'
 const attemptId='22222222-2222-4222-8222-222222222222'
@@ -360,6 +364,48 @@ describe('Survey authoritative FINAL and timing lifecycle',()=>{
     await openTask();submit()
     await screen.findByText('感谢参与')
     expect(finalCalls).toHaveLength(1)
+  })
+  it('prepares answers and timings only for the first FINAL, not its immutable retry',async()=>{
+    const sanitize=vi.spyOn(formVisibility,'sanitizeFormAnswers')
+    const seal=vi.spyOn(scaleTiming,'sealSurveyScaleTimings')
+    taskOverrides={units:[task.units[0],{kind:'FORM',instrumentKey:'form',title:'补充表单',pages:[{
+      pageKey:'page',title:'补充',questions:[{itemKey:'text',type:'SHORT_TEXT',prompt:'补充回答',required:false,options:[]}],
+    }]}]}
+    finalReply=()=>Promise.reject(new Error('结果未知'))
+    render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+    fireEvent.click(await screen.findByRole('radio',{name:'同意'}))
+    fireEvent.click(screen.getByRole('button',{name:'下一部分'}))
+    fireEvent.change(screen.getByRole('textbox',{name:'补充回答'}),{target:{value:'保留原回答'}})
+    sanitize.mockClear();seal.mockClear()
+    submit();await screen.findByRole('alert')
+    expect(sanitize).toHaveBeenCalledTimes(1)
+    expect(seal).toHaveBeenCalledTimes(1)
+    expect(finalCalls[0].answers).toEqual({scale:{q1:'yes'},form:{text:'保留原回答'}})
+    expect(finalCalls[0].itemTimings).toHaveProperty('scale')
+    sanitize.mockClear();seal.mockClear()
+    now=9000;submit()
+    await waitFor(()=>expect(finalCalls).toHaveLength(2))
+    expect(sanitize).not.toHaveBeenCalled()
+    expect(seal).not.toHaveBeenCalled()
+    expect(finalCalls[1]).toEqual(finalCalls[0])
+  })
+  it('restores a completed projection without draft parsing, fresh submission identity, or duplicate cleanup',async()=>{
+    const cleanup=vi.spyOn(cognitiveLocal,'clearSurveyCognitiveSessions')
+    const restore=vi.spyOn(localDraft,'restoreLocalSurveyDraftEnvelope')
+    const identity=vi.spyOn(crypto,'randomUUID')
+    taskOverrides={status:'COMPLETED',units:[]}
+    sessionStorage.setItem(draftKey,'invalid obsolete local draft')
+    render(<SurveyPublicApp/>)
+    fireEvent.click(await screen.findByRole('button',{name:'恢复本次作答／查看已完成回执'}))
+    await screen.findByText('感谢参与')
+    expect(cleanup).toHaveBeenCalledTimes(1)
+    expect(cleanup).toHaveBeenCalledWith(publicId,attemptId,[],undefined)
+    expect(restore).not.toHaveBeenCalled()
+    expect(identity).not.toHaveBeenCalled()
+    expect(sessionStorage.getItem(draftKey)).toBeNull()
+    expect(generalCalls()).toHaveLength(1)
+    expect(finalCalls).toHaveLength(0)
   })
   it('retries exact sealed answers and timing after an uncertain response',async()=>{
     finalReply=()=>Promise.reject(new Error('网络中断'))

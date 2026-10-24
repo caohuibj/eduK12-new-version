@@ -164,3 +164,19 @@ it('freezes matched text and images at FINAL rather than rerendering a later dra
  authored.rawScoreFeedback.rules[0].ranges[0].text='Edited later'
  expect(rawParticipantFeedback(frozen,calculated.units[0],true)).toMatchObject({rawScoreFeedback:[{scoreKey:'total',rangeKey:'upper',text:'Original report',images:[image]}]})
 })
+
+
+it('reads only required disclosure fields while retaining current identity and result checks',async()=>{
+  const project=(row:any,select:any):any=>!select?row:Object.fromEntries(Object.entries(select)
+    .filter(([,value])=>!!value).map(([key,value])=>[key,value===true?row[key]:project(row[key],(value as any).select)]))
+  attempt.contentBindingCipher='private-binding';attempt.flowAssignmentCipher='private-assignment'
+  attempt.wave.flowDefinition={private:'draft'};final.payloadHash='private-payload'
+  mocks.attempt.mockImplementation(async(args:any)=>project(attempt,args.select))
+  mocks.final.mockImplementation(async(args:any)=>project(final,args.select))
+  const response=await readGeneralForOwnAttempt(proof)
+  expect(response).toMatchObject({kind:'DESCRIPTIVE'})
+  expect(mocks.attempt.mock.calls[0][0].select).toEqual({status:true,excludedAt:true,participantId:true,sessionHash:true,
+    wave:{select:{consentVersion:true,generalText:true,finishUntil:true,closesAt:true,hardStopAt:true}}})
+  expect(mocks.final.mock.calls[0][0].select).toEqual({definitionDigest:true,resultsCipher:true,resultsHash:true,completedAt:true})
+  expect(JSON.stringify(response)).not.toContain('private-')
+})

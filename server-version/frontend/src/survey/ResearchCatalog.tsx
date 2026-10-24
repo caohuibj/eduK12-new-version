@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import type { Kind } from './builder.types'
 export type CatalogSourceRef={kind:Kind;sourceId:string;sourceVersion:string|number;organizationId?:string}
 export type CatalogProvenance={source:CatalogSourceRef;definitionDigest:string;adapterVersion:string;license?:unknown;[key:string]:unknown}
@@ -15,14 +15,39 @@ export function SourceProvenance({source,provenance}:{source?:CatalogSourceRef;p
   </div>
 }
 export function ResearchCatalog({projectId,api,busy,onImport}:{projectId:string;api:CatalogApi;busy:boolean;onImport:(grant:CatalogGrant)=>Promise<void>}){
-  const [list,setList]=useState<CatalogGrant[]>([]),[page,setPage]=useState(1),[error,setError]=useState(''),[loading,setLoading]=useState(false)
+  const [catalog,setCatalog]=useState<{projectId:string;api:CatalogApi;list:CatalogGrant[]}|null>(null)
+  const list=catalog?.projectId===projectId&&catalog.api===api?catalog.list:[]
+  const [page,setPage]=useState(1),[error,setError]=useState(''),[loading,setLoading]=useState(false)
   const [query,setQuery]=useState('')
   const filtered=list.filter(grant=>grant.title.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()))
-  const load=async(next=1)=>{setLoading(true);setError('');try{
-    const data=await api<{list:CatalogGrant[]}>('/projects/'+encodeURIComponent(projectId)+'/catalog?page='+next)
-    setList(data.list);setPage(next);setQuery('')
-  }catch(e){setError(e instanceof Error?e.message:'授权目录无法加载')}finally{setLoading(false)}}
-  useEffect(()=>{setList([]);setPage(1);void load()},[projectId])
+  const readEpoch=useRef(0)
+  const pending=useRef<{projectId:string;api:CatalogApi;page:number;promise:Promise<{list:CatalogGrant[]}>}|null>(null)
+  const load=useCallback(async(next=1)=>{
+    const epoch=++readEpoch.current
+    setLoading(true);setError('')
+    let request:typeof pending.current=null
+    try{
+      // Join only a live read of this exact scope/page. Never cache a completed
+      // grant list or reuse an earlier project's authorization response.
+      request=pending.current
+      if(!request||request.projectId!==projectId||request.api!==api||request.page!==next){
+        request={projectId,api,page:next,promise:api<{list:CatalogGrant[]}>('/projects/'+encodeURIComponent(projectId)+'/catalog?page='+next)}
+        pending.current=request
+      }
+      const data=await request.promise
+      if(epoch!==readEpoch.current)return
+      setCatalog({projectId,api,list:data.list});setPage(next);setQuery('')
+    }catch(e){if(epoch===readEpoch.current)setError(e instanceof Error?e.message:'授权目录无法加载')}
+    finally{
+      if(request&&pending.current===request)pending.current=null
+      if(epoch===readEpoch.current)setLoading(false)
+    }
+  },[projectId,api])
+  useEffect(()=>{
+    const epoch=readEpoch
+    setCatalog(null);setPage(1);setQuery('');void load()
+    return()=>{epoch.current++}
+  },[load])
   return <section id="survey-authorized-catalog" tabIndex={-1} className="survey-catalog border rounded-xl p-4 space-y-3" aria-label="授权原版工具目录">
     <h3 className="font-semibold">导入已授权的原版工具</h3>
     <p className="text-sm text-slate-600">仅列出系统管理员授予您的明确版本；导入后不能编辑原版内容或计分。撤销授权后不能再次导入或冻结发布，既有已发布研究不受影响。</p>
