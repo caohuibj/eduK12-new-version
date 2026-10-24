@@ -77,7 +77,9 @@ export async function submitResearchFinal(input:FinalInput){
         AND wave_id=${known.waveId} FOR UPDATE`
     const attempt=await tx.surveyWaveAttempt.findFirst({where:{
       id:input.attemptId,projectId:known.projectId,waveId:known.waveId,
-    },include:{wave:{include:{publication:true}}}})
+    },select:{id:true,participantId:true,status:true,excludedAt:true,sessionHash:true,
+      wave:{select:{id:true,consentVersion:true,generalText:true,finishUntil:true,closesAt:true,hardStopAt:true,
+        publication:{select:{id:true,definitionDigest:true,compiledSnapshot:true}}}}}})
     if(!attempt||!attempt.wave.publication||attempt.participantId!==known.participantId)
       blocked('作答记录不属于此研究入口')
     const wave=attempt.wave
@@ -110,7 +112,7 @@ export async function submitResearchFinal(input:FinalInput){
         id:attempt.participantId,projectId:known.projectId,
         researchCode:input.researchCode,status:'ACTIVE',
         credentialHash:hashResearchCredential(input.accessCredential),credentialRevokedAt:null,
-      }})
+      },select:{id:true}})
       if(!person)blocked('研究身份已失效')
     }else if(!snapshot.flow&&attempt.sessionHash!==hashResearchCredential(input.accessCredential))
       blocked('单次研究作答凭证已失效')
@@ -137,7 +139,10 @@ export async function submitResearchFinal(input:FinalInput){
         status:'COMPLETED' as const,idempotent:true,
         generalText:wave.generalText||defaultGeneralText}
     }
-    await assertSurveyScaleCollectionAllowed(tx,assignedSurveySnapshot(snapshot,assignment))
+    // Reuse only this transaction's selected immutable definition. Current
+    // authority was checked above; computation still consumes the frozen union.
+    const selectedSnapshot=assignedSurveySnapshot(snapshot,assignment)
+    await assertSurveyScaleCollectionAllowed(tx,selectedSnapshot)
     if(attempt.status!=='STARTED')invalid('这份作答已经关闭或终止')
     const now=new Date()
     const finishUntil=wave.finishUntil||wave.closesAt
@@ -152,7 +157,7 @@ export async function submitResearchFinal(input:FinalInput){
     if(snapshot.units.some(unit=>unit.kind==='COGNITIVE')||input.cognitiveReferences?.length){
       await assertSurveyCognitiveLockedAnswers(tx,attempt.id,input.answers)
       const references=await verifySurveyCognitiveReferences(tx,{projectId:known.projectId,waveId:wave.id,
-        attemptId:attempt.id,publicationId:publication.id,snapshot:assignedSurveySnapshot(snapshot,assignment),references:input.cognitiveReferences??[]})
+        attemptId:attempt.id,publicationId:publication.id,snapshot:selectedSnapshot,references:input.cognitiveReferences??[]})
       const results=await loadSurveyCognitiveResults(tx,{projectId:known.projectId,waveId:wave.id,
         attemptId:attempt.id,publicationId:publication.id,references})
       for(const loaded of results){
@@ -176,7 +181,7 @@ export async function submitResearchFinal(input:FinalInput){
     if(calculated.definitionDigest!==publication.definitionDigest)
       blocked('所提交作答与冻结内容不一致')
     const interpretation=await interpretSurveyFinal(tx,{projectId:known.projectId,waveId:wave.id,attemptId:attempt.id,
-      publicationId:publication.id,definitionDigest:publication.definitionDigest,selectedSnapshot:assignedSurveySnapshot(snapshot,assignment),calculated})
+      publicationId:publication.id,definitionDigest:publication.definitionDigest,selectedSnapshot,calculated})
     if(interpretation)calculated.interpretation=interpretation
     const resultsHash=canonicalHash(JSON.parse(JSON.stringify(calculated)))
     const resultsCipher=encryptUnifiedRuntimePayload(calculated)
@@ -214,7 +219,8 @@ export async function readGeneralForOwnAttempt(input:{
     await tx.$queryRaw`SELECT id FROM survey_wave_attempts WHERE id=${valid.attemptId}
       AND project_id=${valid.projectId} FOR SHARE`
     const attempt=await tx.surveyWaveAttempt.findFirst({where:{id:valid.attemptId,projectId:valid.projectId,
-      waveId:valid.waveId},include:{wave:true}})
+      waveId:valid.waveId},select:{status:true,excludedAt:true,participantId:true,sessionHash:true,
+        wave:{select:{consentVersion:true,generalText:true,finishUntil:true,closesAt:true,hardStopAt:true}}}})
     if(!attempt||attempt.status!=='COMPLETED'||attempt.excludedAt!==null||
       attempt.participantId!==valid.participantId)blocked('研究反馈不可访问')
     if(attempt.participantId){
@@ -222,13 +228,14 @@ export async function readGeneralForOwnAttempt(input:{
         AND project_id=${valid.projectId} FOR SHARE`
       const person=await tx.surveyParticipant.findFirst({where:{id:attempt.participantId,
         projectId:valid.projectId,researchCode:input.researchCode,status:'ACTIVE',credentialRevokedAt:null,
-        credentialHash:hashResearchCredential(input.accessCredential)}})
+        credentialHash:hashResearchCredential(input.accessCredential)},select:{id:true}})
       if(!person)blocked('研究身份已失效')
     }else if(attempt.sessionHash!==hashResearchCredential(input.accessCredential))blocked('研究凭证已失效')
     const consent=await tx.surveyConsent.findFirst({where:{projectId:valid.projectId,waveId:valid.waveId,
       attemptId:valid.attemptId,accepted:true,consentVersion:attempt.wave.consentVersion},select:{id:true}})
     if(!consent)blocked('当前研究缺少有效的知情同意记录')
-    const final=await tx.surveyWaveFinal.findUnique({where:{attemptId:valid.attemptId}})
+    const final=await tx.surveyWaveFinal.findUnique({where:{attemptId:valid.attemptId},
+      select:{definitionDigest:true,resultsCipher:true,resultsHash:true,completedAt:true}})
     if(!final||final.definitionDigest!==valid.definitionDigest)blocked('研究反馈来源校验失败')
     const result=decryptUnifiedRuntimePayload<SurveyComputedFinal>(final.resultsCipher)
     if(canonicalHash(result)!==final.resultsHash||result.definitionDigest!==valid.definitionDigest)
