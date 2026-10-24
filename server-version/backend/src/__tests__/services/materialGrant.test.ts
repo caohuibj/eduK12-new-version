@@ -523,3 +523,66 @@ describe('request-local resource metadata batches', () => {
     expect(mockPrisma.storedAsset.findMany).not.toHaveBeenCalled()
   })
 })
+
+describe('minimal current grant admission projections', () => {
+  const select = { role: true, teacherApproved: true, isActive: true, isFrozen: true }
+  const eligible = { role: TEACHER, teacherApproved: true, isActive: true, isFrozen: false }
+  const input = { resourceType: MaterialResourceType.SCALE, resourceId: 'scale-1', grantedBy: 'admin-1' }
+  const run = (mode: 'single' | 'batch' | 'set') => mode === 'single'
+    ? createGrant({ ...input, teacherId: 'teacher-1' })
+    : mode === 'batch' ? batchCreateGrants({ ...input, teacherIds: ['teacher-1', 'teacher-1'] })
+      : setGrants({ ...input, teacherIds: ['teacher-1', 'teacher-1'] })
+  beforeEach(() => {
+    // Admission mocks return exactly the selected fields, without IDs or profile.
+    mockPrisma.user.findUnique.mockResolvedValue(eligible)
+    mockPrisma.user.findMany.mockResolvedValue([eligible])
+    mockPrisma.scale.findUnique.mockResolvedValue({ status: 'PUBLISHED', instrumentClass: 'STANDARDIZED' })
+    mockPrisma.materialGrant.upsert.mockResolvedValue({ id: 'g', teacherId: 'teacher-1', ...input, createdAt: new Date() })
+    mockPrisma.materialGrant.deleteMany.mockResolvedValue({ count: 1 })
+  })
+  it.each(['single', 'batch', 'set'] as const)('%s validates successfully using only the four eligibility fields', async mode => {
+    await run(mode)
+    const args = mode === 'single' ? mockPrisma.user.findUnique.mock.calls[0][0] : mockPrisma.user.findMany.mock.calls[0][0]
+    expect(args).toEqual({ where: { id: mode === 'single' ? 'teacher-1' : { in: ['teacher-1'] } }, select })
+    expect(mockPrisma.scale.findUnique.mock.calls[0][0]).toEqual({ where: { id: 'scale-1' }, select: { status: true, instrumentClass: true } })
+  })
+  it.each([
+    { role: UserRole.STUDENT }, { teacherApproved: false }, { isActive: false }, { isFrozen: true },
+  ])('retains rejection of ineligible minimal rows: %j', async patch => {
+    mockPrisma.user.findMany.mockResolvedValue([{ ...eligible, ...patch }])
+    await expect(run('set')).rejects.toMatchObject({ statusCode: 400 })
+    expect(mockPrisma.materialGrant.createMany).not.toHaveBeenCalled()
+    expect(mockPrisma.materialGrant.deleteMany).not.toHaveBeenCalled()
+  })
+  it('keeps exact missing-teacher and custom-scale rejections before writes', async () => {
+    mockPrisma.user.findMany.mockResolvedValueOnce([])
+    await expect(run('batch')).rejects.toMatchObject({ statusCode: 404, message: '教师不存在' })
+    mockPrisma.scale.findUnique.mockResolvedValueOnce({ status: 'PUBLISHED', instrumentClass: 'CUSTOM_DESCRIPTIVE' })
+    await expect(run('set')).rejects.toMatchObject({ statusCode: 400, message: '自编量表新授权必须通过精确版本共用库审批与分配，旧授权不得扩大' })
+    expect(mockPrisma.materialGrant.createMany).not.toHaveBeenCalled()
+    expect(mockPrisma.materialGrant.deleteMany).not.toHaveBeenCalled()
+  })
+  it('checks cognitive publication with status only and deletion existence with id only', async () => {
+    mockPrisma.cognitiveTestConfig.findUnique.mockResolvedValue({ status: 'PUBLISHED' })
+    await batchCreateGrants({ ...input, resourceType: MaterialResourceType.COGNITIVE_CONFIG, teacherIds: ['teacher-1'] })
+    expect(mockPrisma.cognitiveTestConfig.findUnique).toHaveBeenCalledExactlyOnceWith({ where: { id: 'scale-1' }, select: { status: true } })
+    mockPrisma.materialGrant.findUnique.mockResolvedValueOnce({ id: 'g' })
+    expect(await deleteGrant('g')).toEqual({ id: 'g' })
+    expect(mockPrisma.materialGrant.findUnique).toHaveBeenCalledExactlyOnceWith({ where: { id: 'g' }, select: { id: true } })
+    mockPrisma.materialGrant.findUnique.mockResolvedValueOnce(null)
+    await expect(deleteGrant('gone')).rejects.toMatchObject({ statusCode: 404 })
+    expect(mockPrisma.materialGrant.delete).toHaveBeenCalledTimes(1)
+  })
+  it('preserves the full desired set, first occurrence order and existing-only removals at scale', async () => {
+    const existing = Array.from({ length: 1000 }, (_, i) => ({ id: `g-${i}`, teacherId: `t-${i}` }))
+    const desired = existing.slice(500).map(row => row.teacherId)
+    desired.push('new-second', 'new-first', 'new-second', ...desired.slice(0, 50))
+    mockPrisma.materialGrant.findMany.mockResolvedValueOnce(existing).mockResolvedValueOnce([])
+    mockPrisma.user.findMany.mockResolvedValue([eligible, eligible])
+    await setGrants({ ...input, teacherIds: desired })
+    expect(mockPrisma.user.findMany).toHaveBeenCalledExactlyOnceWith({ where: { id: { in: ['new-second', 'new-first'] } }, select })
+    expect(mockPrisma.materialGrant.createMany).toHaveBeenCalledExactlyOnceWith({ data: ['new-second', 'new-first'].map(teacherId => ({ teacherId, ...input })), skipDuplicates: true })
+    expect(mockPrisma.materialGrant.deleteMany).toHaveBeenCalledExactlyOnceWith({ where: { id: { in: existing.slice(0, 500).map(row => row.id) } } })
+    expect(mockPrisma.$transaction).toHaveBeenCalledTimes(1)
+  })
+})

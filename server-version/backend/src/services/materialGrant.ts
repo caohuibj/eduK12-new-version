@@ -159,8 +159,12 @@ export const canUseReportPackage = async (
   return Boolean(grant)
 }
 
+const TEACHER_ELIGIBILITY_SELECT = {
+  role: true, teacherApproved: true, isActive: true, isFrozen: true,
+} as const
+
 const assertEligibleTeacher = async (teacherId: string) => {
-  const teacher = await prisma.user.findUnique({ where: { id: teacherId } })
+  const teacher = await prisma.user.findUnique({ where: { id: teacherId }, select: TEACHER_ELIGIBILITY_SELECT })
   if (!teacher) throw grantNotFound('教师不存在')
   if (!isEligibleTeacher(teacher)) throw grantBadRequest('只能授权给已审核且未冻结的在职教师')
   return teacher
@@ -180,14 +184,14 @@ const assertGrantableResource = async (resourceType: MaterialResourceType, resou
     return
   }
   if (resourceType === MaterialResourceType.SCALE) {
-    const scale = await prisma.scale.findUnique({ where: { id: resourceId } })
+    const scale = await prisma.scale.findUnique({ where: { id: resourceId }, select: { status: true, instrumentClass: true } })
     if (!scale) throw grantNotFound('量表不存在')
     if (scale.status !== 'PUBLISHED') throw grantBadRequest('只能授权已发布量表')
     if(scale.instrumentClass==='CUSTOM_DESCRIPTIVE')throw grantBadRequest('自编量表新授权必须通过精确版本共用库审批与分配，旧授权不得扩大')
     return
   }
   if (resourceType === MaterialResourceType.COGNITIVE_CONFIG) {
-    const testConfig = await prisma.cognitiveTestConfig.findUnique({ where: { id: resourceId } })
+    const testConfig = await prisma.cognitiveTestConfig.findUnique({ where: { id: resourceId }, select: { status: true } })
     if (!testConfig) throw grantNotFound('认知任务类型不存在')
     if (testConfig.status !== 'PUBLISHED') throw grantBadRequest('只能授权已发布的认知任务类型')
     return
@@ -372,7 +376,7 @@ export const createGrant = async (input: {
 }
 
 export const deleteGrant = async (id: string) => {
-  const existing = await prisma.materialGrant.findUnique({ where: { id } })
+  const existing = await prisma.materialGrant.findUnique({ where: { id }, select: { id: true } })
   if (!existing) throw grantNotFound()
   await prisma.materialGrant.delete({ where: { id } })
   return { id }
@@ -389,7 +393,7 @@ export const batchCreateGrants = async (input: {
   }
   await assertGrantableResource(input.resourceType, input.resourceId)
   const uniqueIds = [...new Set(input.teacherIds)]
-  const teachers = await prisma.user.findMany({ where: { id: { in: uniqueIds } } })
+  const teachers = await prisma.user.findMany({ where: { id: { in: uniqueIds } }, select: TEACHER_ELIGIBILITY_SELECT })
   if (teachers.length !== uniqueIds.length) throw grantNotFound('教师不存在')
   if (teachers.some((teacher) => !isEligibleTeacher(teacher))) {
     throw grantBadRequest('只能授权给已审核且未冻结的在职教师')
@@ -438,7 +442,8 @@ export const setGrants = async (input: {
     throw grantBadRequest('teacherIds 必须是数组')
   }
   await assertGrantableResource(input.resourceType, input.resourceId)
-  const desiredIds = [...new Set(input.teacherIds)]
+  const desiredSet = new Set(input.teacherIds)
+  const desiredIds = [...desiredSet]
 
   await prisma.$transaction(async (tx) => {
     const existing = await tx.materialGrant.findMany({
@@ -447,10 +452,10 @@ export const setGrants = async (input: {
     })
     const existingIds = new Set(existing.map((row) => row.teacherId))
     const toAdd = desiredIds.filter((id) => !existingIds.has(id))
-    const toRemoveIds = existing.filter((row) => !desiredIds.includes(row.teacherId)).map((row) => row.id)
+    const toRemoveIds = existing.filter((row) => !desiredSet.has(row.teacherId)).map((row) => row.id)
 
     if (toAdd.length) {
-      const teachers = await tx.user.findMany({ where: { id: { in: toAdd } } })
+      const teachers = await tx.user.findMany({ where: { id: { in: toAdd } }, select: TEACHER_ELIGIBILITY_SELECT })
       if (teachers.length !== toAdd.length) throw grantNotFound('教师不存在')
       if (teachers.some((teacher) => !isEligibleTeacher(teacher))) {
         throw grantBadRequest('只能授权给已审核且未冻结的在职教师')
