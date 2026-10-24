@@ -1,3 +1,5 @@
+import {execFileSync} from 'node:child_process';
+import {changedEntries} from './content-scope.mjs';
 import {normalizedRestoredSchema,restoredCheckRepresentations} from './training-entry-migration.mjs';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -211,4 +213,19 @@ test('fourth recovery keeps eight explicit failed or new contracts and thirteen 
  assert.equal(r.browserRetainedNames.length,13);assert(r.browserRetainedNames.every(n=>!n.startsWith('learner-')));
  const workflow=readFileSync('.github/workflows/ci-training-entry.yml','utf8');assert(workflow.includes('recover-backend'));assert(workflow.includes('recover-browser'));assert(workflow.includes('training-entry-checks.mjs postgres'));
  assert(workflow.includes('training-entry-checks.mjs backend-compile'));assert(workflow.includes('training-entry-checks.mjs frontend-build'));
+});
+
+test('actual repository diff discovers newly modified main paths outside the former manifest',()=>{
+ const git=(...args)=>execFileSync('git',args,{encoding:'utf8'}).trim();
+ const head=git('rev-parse','HEAD'),actual=changedEntries(binding.base,head);
+ const env={CI_EVENT:'pull_request',CI_HEAD_REF:branch,CI_SOURCE_HEAD:head,CI_PR_REPOSITORY:'caohuibj/eduK12-new-version',CI_PR_NUMBER:'351'};
+ // Actual Git owns this list. Never manufacture it from binding.source.
+ assert.equal(trainingEntryPlan(actual,binding.base,head,git,env).changes.length,actual.length);
+ for(const file of Object.keys(binding.officialRecovery.productDeltas)){
+  assert(actual.some(entry=>entry.file===file));assert(binding.source[file]);
+  const omitted=actual.filter(entry=>entry.file!==file);
+  assert.throws(()=>trainingEntryPlan(omitted,binding.base,head,git,env),/Complete raw diff required/);
+ }
+ const injected=[...actual,{file:'server-version/backend/src/unreviewed-new.ts',status:'A',oldMode:'000000',newMode:'100644'}];
+ assert.throws(()=>trainingEntryPlan(injected,binding.base,head,git,env),/Complete raw diff required/);
 });

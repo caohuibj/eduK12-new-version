@@ -2398,6 +2398,27 @@
       "newMode": "100644",
       "before": "fa4ee5bf5b8e06cef066aae3d12e4d02c10b015b",
       "after": "320482b131d1f172727405c16b5ebc3abca4fca1"
+    },
+    "server-version/backend/src/__tests__/assessment-core/form-foundation.contract.test.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "before": "b88a9b111a2be8384fb43a6338f2069ae8e9da09",
+      "after": "5309c7e1aca89d09428b741c7702e33c17e18438"
+    },
+    "server-version/backend/src/modules/assessment-core/form/definition.ts": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "before": "74fc2209982527d3599962234dd6f5f3b7a60e0a",
+      "after": "269514b731b6caa3cea0b2cf17fd18d46d918cc8"
+    },
+    "server-version/frontend/src/training/paper-ink.css": {
+      "oldMode": "100644",
+      "newMode": "100644",
+      "status": "M",
+      "before": "35f21f103cdbdfea55dea6443ce09a092a2c81b0",
+      "after": "9b37c865d67f7b1bf7f5230dee9743eb2f5868f3"
     }
   },
   "controls": [
@@ -2438,7 +2459,7 @@
     "server-version/frontend/tsconfig.cognitive.json": "910e97700f25652bc1d80ada47e176cbd51c2fbe",
     "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22"
   },
-  "evidenceSHA256": "5c60f65d0152659a98e03a6215324bc2385e75a021dbb1d990818fdea7c8bc71",
+  "evidenceSHA256": "7b1c2f05032b7c39587b1e8af2816f41dd9e1bee4c0c508c3b651b8861b64a4d",
   "requiredGroups": [
     "learner-frontend",
     "export-hook",

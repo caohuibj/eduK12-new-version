@@ -12,7 +12,7 @@
   "controlSHA256": {
     ".github/scripts/training-entry-scope.mjs": "ca5d68d35faa3d4402b672ec90165daf2d90ee7443aece1334d7e9c91b9a347c",
     ".github/scripts/training-entry-checks.mjs": "83fb6778ce4098068a8da8059af9ac1c4c6fdd143bf78168c5965134a2ac3d70",
-    ".github/scripts/training-entry.test.mjs": "b3b45aaff06b6f00d0522303a7011bc68cefa44643f4aea8a5d30cb5ad0a6fde",
+    ".github/scripts/training-entry.test.mjs": "ee80f96a40f026abaf1546990d2f24f724fce456055528bd488139653be659ce",
     ".github/scripts/training-entry-browser.mjs": "c73b3c620e48afc6d60f794f4081421df9f00d2e6e6cfbad81fe410568403715",
     ".github/workflows/ci-training-entry.yml": "d1efdf6ae5c553df6d2ddb7593be8ccd5e3869ed03dc3b518a759ac17fc6eedb",
     ".github/scripts/content-scope.mjs": "c78db2f6b4384701b9547e9df88e3de5453008a459a18d3108817b143e1ea762",
@@ -22886,6 +22886,13 @@
       "exitCode": 0,
       "command": "node --test --test-name-pattern=fourth recovery .github/scripts/training-entry.test.mjs",
       "logSHA256": "f05bbcce7e00a2c076a27df55308f4b09f2ff75382820d54348aaca91edfe381"
+    },
+    "actualGitDiffRegression": {
+      "exitCode": 0,
+      "passed": 1,
+      "logSHA256": "745c336dd543ed6647c43d503ee402c96be217477da096d211e440ff8fe00867",
+      "command": "node --test --test-name-pattern=actual repository diff discovers .github/scripts/training-entry.test.mjs",
+      "remoteOnlyCli": "Official shallow-fetched main44c1 and PR6a5d objects; actual content-scope CLI with corrected binding file returned training-entry/358. No locally mirrored source commit existed in the bare object database."
     }
   },
   "previousDependencyFixedPg": {
