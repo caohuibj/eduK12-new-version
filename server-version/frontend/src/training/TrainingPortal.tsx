@@ -4,6 +4,7 @@ import TrainingPublicHeader from './TrainingPublicHeader'
 import { trainingFeatures } from './featureContent'
 import { trainingWelcomeCopy } from './welcomeCopy'
 import { useAuthLinks } from '../components/app-shell/useAuthLinks'
+import { productOrigins } from '../products/origins'
 import './training-portal-refresh.css'
 
 const learningSteps = [
@@ -16,6 +17,7 @@ const learningSteps = [
 /** Public product overview; existing authentication and course access stay authoritative. */
 export default function TrainingPortal() {
   const authLink = useAuthLinks()
+  const adminOrigin = productOrigins()?.admin
   return <div className="training-portal" id="training-top">
     <div className="training-portal-intro">
       <TrainingPublicHeader />
@@ -62,7 +64,13 @@ export default function TrainingPortal() {
           <Link className="training-portal-start-register" to={authLink('/register')}>使用注册码注册<ArrowRight size={15} aria-hidden="true" /></Link>
         </div>
       </section>
-      <footer className="training-portal-footer"><span>© {new Date().getFullYear()} Huitraining</span><a href="#training-top">回到顶部<ArrowDown size={14} aria-hidden="true" /></a></footer>
+      <footer className="training-portal-footer">
+        <span>© {new Date().getFullYear()} Huitraining</span>
+        <nav className="training-portal-footer-links" aria-label="Training 页脚导航">
+          {adminOrigin && <a href={`${adminOrigin}/admin/login?returnTo=%2Fadmin%2Ftraining`}>Training 管理员入口<ArrowRight size={14} aria-hidden="true" /></a>}
+          <a href="#training-top">回到顶部<ArrowDown size={14} aria-hidden="true" /></a>
+        </nav>
+      </footer>
     </div>
   </div>
 }

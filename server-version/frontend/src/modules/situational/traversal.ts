@@ -83,11 +83,12 @@ export const deriveReachableTrajectory = (
 export const reachableSituationalScenes = (
   definition: SituationalRunnerDefinition,
   responses: Record<string, SituationalDraftAnswer>,
+  trajectory?: SituationalReachableTrajectory,
 ): SituationalRunnerScene[] => {
   if (definition.schemaVersion === 1) return definition.scenes
-  const trajectory = deriveReachableTrajectory(definition, responses)
+  const currentTrajectory = trajectory ?? deriveReachableTrajectory(definition, responses)
   const sceneByKey = new Map(definition.scenes.map((scene) => [scene.sceneKey, scene] as const))
-  return trajectory.sceneKeys.flatMap((sceneKey) => {
+  return currentTrajectory.sceneKeys.flatMap((sceneKey) => {
     const scene = sceneByKey.get(sceneKey)
     return scene ? [scene] : []
   })

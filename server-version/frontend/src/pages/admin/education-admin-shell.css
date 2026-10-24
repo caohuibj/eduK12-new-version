@@ -1,0 +1,64 @@
+.education-admin-shell{--ea-bg:#f4f7ec;--ea-paper:#fffffc;--ea-ink:#183f30;--ea-muted:#526d55;--ea-line:#cdddc6;--ea-action:#356957;--hs-brand-ink:var(--ea-action);--ht-brand-ink:var(--ea-action);min-height:100vh;background:var(--ea-bg);color:var(--ea-ink);color-scheme:light}
+.education-admin-shell[data-product=Teacher]{--ea-bg:#fbf4ed;--ea-paper:#fffdf9;--ea-ink:#362925;--ea-muted:#76665e;--ea-line:#e5d5ca;--ea-action:#944638}
+.education-admin-shell[data-theme=dark]{--ea-bg:#18251f;--ea-paper:#22352b;--ea-ink:#e8f1df;--ea-muted:#b9cdb6;--ea-line:#526b57;--ea-action:#b1d39a;color-scheme:dark}
+.education-admin-shell[data-product=Teacher][data-theme=dark]{--ea-bg:#211c1a;--ea-paper:#2d2521;--ea-ink:#f4eae2;--ea-muted:#d2bfb1;--ea-line:#655045;--ea-action:#e5ad8d}
+.education-admin-shell *{box-sizing:border-box}
+.education-admin-topbar{display:flex;align-items:center;flex-wrap:wrap;gap:16px;padding:16px max(24px,calc((100vw - 1200px)/2));border-bottom:1px solid var(--ea-line);background:var(--ea-paper)}
+.education-admin-brand{display:block;flex:none;text-decoration:none}
+.education-admin-brand :is(.hs-brand,.ht-brand){display:flex;align-items:center;gap:8px}
+.education-admin-brand :is(.hs-brand-icon,.ht-brand-b3){width:48px;height:48px;object-fit:contain;background:transparent;border-radius:0}
+.education-admin-brand :is(.hs-brand-wordmark,.ht-brand-wordmark){width:126px;height:auto}
+.education-admin-caption{font-size:13px;color:var(--ea-muted);padding-left:16px;border-left:1px solid var(--ea-line)}
+.education-admin-account{margin-left:auto;display:flex;align-items:center;gap:16px;min-width:0;flex-wrap:wrap}
+.education-admin-identity{display:grid;gap:3px;max-width:220px;overflow-wrap:anywhere;font-size:13px}
+.education-admin-identity>span{font-size:12px;color:var(--ea-muted)}
+.education-admin-shell button{font:inherit;cursor:pointer;min-height:44px;padding:8px 14px;border:1px solid var(--ea-line);border-radius:9px;background:var(--ea-paper);color:var(--ea-ink)}
+.education-admin-shell button:disabled{opacity:.55;cursor:not-allowed}
+.education-admin-shell :is(a,button,input,select,summary):focus-visible{outline:3px solid var(--ea-action);outline-offset:3px}
+.education-admin-shell>main{max-width:1120px;margin:auto;padding:24px}
+.education-admin-shell>main:focus{outline:none}
+.education-admin-shell>footer{text-align:center;font-size:12px;color:var(--ea-muted);padding:24px}
+.education-admin-skip{position:absolute;top:8px;left:16px;z-index:100;transform:translateY(-200%);background:var(--ea-paper);color:var(--ea-action);padding:12px}
+.education-admin-skip:focus{transform:none}
+.education-admin-shell .epg-main{padding:0;color:var(--ea-ink)}
+.education-admin-shell :is(.epg-panel,.epg-verification,.epg-grid article,.epg-grant){background:var(--ea-paper);border-color:var(--ea-line)}
+.education-admin-shell :is(.epg-main header>span,.epg-grant span,.epg-verification>summary span){color:var(--ea-muted)}
+.education-admin-shell .epg-main :is(input,select){font:inherit;min-height:44px;max-width:100%;padding:8px 12px;border:1px solid var(--ea-line);border-radius:8px;background:var(--ea-bg);color:var(--ea-ink)}
+.education-admin-shell .epg-main :is(button,.epg-actions a){border-color:var(--ea-line);background:var(--ea-bg);color:var(--ea-ink)}
+.education-admin-shell .epg-main a{color:var(--ea-action)}
+.education-admin-shell[data-theme=dark] .epg-error{background:#432b28;color:#ffd2c6;border-color:#e99e89}
+.education-admin-shell[data-theme=dark] .epg-notice{background:#263d30;color:#cdeacb;border-color:#8bbb85}
+.education-admin-shell .product-theme-control{color:var(--ea-ink)}
+.education-admin-shell .product-theme-control label{background:var(--ea-paper);border-color:var(--ea-line)}
+.education-admin-shell .product-theme-control select{background:var(--ea-paper);color:var(--ea-ink)}
+@media(max-width:640px){
+ .education-admin-topbar{padding:12px 16px;gap:10px}
+ .education-admin-caption{margin-left:auto;font-size:12px;padding-left:10px}
+ .education-admin-account{width:100%;justify-content:space-between;gap:10px;border-top:1px solid var(--ea-line);padding-top:10px}
+ .education-admin-identity{max-width:120px}
+ .education-admin-shell>main{padding:20px 16px}
+}
+.education-admin-shell{--hs-ink:var(--ea-ink);--hs-surface:var(--ea-paper);--hs-accent:var(--ea-action)}
+.education-admin-entry-card{max-width:520px;margin:24px auto;padding:32px;border:1px solid var(--ea-line);border-radius:18px;background:var(--ea-paper)}
+.education-admin-entry-card h1{font-size:clamp(24px,3vw,30px);margin:8px 0 12px;line-height:1.4}
+.education-admin-entry-card>p{color:var(--ea-muted);font-size:14px;line-height:1.8}
+.education-admin-entry-card .education-admin-entry-kicker{font-size:12px;letter-spacing:.08em;color:var(--ea-action)}
+.education-admin-entry-card :is(input,select){width:100%;min-height:48px;font:inherit;padding:10px 12px;border:1px solid var(--ea-line);border-radius:9px;background:var(--ea-bg);color:var(--ea-ink)}
+.education-admin-entry-card label{color:var(--ea-ink)}
+.education-admin-entry-card :is(.hui-auth-note,.hui-auth-status){background:var(--ea-bg);color:var(--ea-muted);border-color:var(--ea-line);font-size:13px;line-height:1.8}
+.education-admin-entry-card a{color:var(--ea-action)}
+.education-admin-entry-card form>button[type=submit]{width:100%;background:var(--ea-action);color:#fff;border-color:var(--ea-action);min-height:48px}
+.education-admin-entry[data-theme=dark] form>button[type=submit]{color:var(--ea-bg)}
+.education-admin-entry-card .education-admin-entry-back{display:inline-flex;align-items:center;min-height:44px;margin-top:16px;font-size:13px}
+.education-admin-entry-card [role=alert]{padding:12px;border-radius:8px;background:#fff0ec;color:#8b3428}
+.education-admin-entry[data-theme=dark] [role=alert]{background:#432b28;color:#ffd2c6}
+@media(max-width:640px){.education-admin-entry-card{margin:4px auto;padding:24px 18px}.education-admin-entry .education-admin-account{width:auto;margin-left:auto;border:0;padding:0}}
+.education-admin-shell .product-theme-warning,.education-admin-shell .product-theme-control option{background:var(--ea-paper);color:var(--ea-ink)}
+.education-admin-entry-card .survey-admin-key-note{color:var(--ea-muted)}
+/* Education login recovery uses this entry's palette, including dark mode. */
+.education-admin-entry-card .hui-product .hui-status--info{background:var(--ea-bg);border-color:var(--ea-line);color:var(--ea-ink)}
+.education-admin-entry-card .hui-status--info .hui-status__symbol{color:var(--ea-action)}
+.education-admin-entry-card>a:not(.education-admin-entry-back){display:inline-flex;align-items:center;min-height:44px;margin-top:16px;font-size:13px}
+/* Hide only a second adjacent link with exactly the same known safe destination. */
+.education-admin-entry-card>a[href="/admin/login?returnTo=%2Fadmin%2Fhuischool"]+.education-admin-entry-back[href="/admin/login?returnTo=%2Fadmin%2Fhuischool"],
+.education-admin-entry-card>a[href="/admin/login?returnTo=%2Fadmin%2Fhuiteacher"]+.education-admin-entry-back[href="/admin/login?returnTo=%2Fadmin%2Fhuiteacher"]{display:none}

@@ -1,3 +1,4 @@
+import {isTrainingAdminPath} from '../admin/trainingPages'
 import SurveyAdminOrigin from '../components/app-shell/SurveyAdminOrigin'
 import { productOrigins, SURVEY_ADMIN_PATH } from '../products/origins'
 import SurveyAdminEntryShell from '../survey/SurveyAdminEntryShell'
@@ -7,6 +8,8 @@ import { surveyAppearanceHref } from '../survey/survey-appearance-links'
 import '../survey/survey-admin-auth.css'
 import LoginRecoveryNotice from '../components/app-shell/LoginRecoveryNotice'
 import AuthShell from '../components/auth/AuthShell'
+import EducationAdminEntryShell from './admin/EducationAdminEntryShell'
+import {educationEntry} from './admin/education-entry'
 import React, { useState } from 'react'
 import { Loader2 } from 'lucide-react'
 import { useNavigate, useLocation } from 'react-router-dom'
@@ -14,6 +17,8 @@ import { adminReturnTo } from '../admin/authority'
 import { useAuth } from '../contexts/AuthContext'
 import { Link } from 'react-router-dom'
 import TrainingBrand from '../training/TrainingBrand'
+import TrainingAdminLoginShell from '../training/TrainingAdminLoginShell'
+import { readReauthReturn } from '../components/app-shell/access'
 import '../training/training-admin-auth.css'
 
 const AdminLogin: React.FC = () => {
@@ -23,11 +28,13 @@ const AdminLogin: React.FC = () => {
   const { mode } = useSurveyAppearance()
   const origins=productOrigins()
   const surveyEntry=Boolean(origins&&new URLSearchParams(location.search).get('returnTo')===SURVEY_ADMIN_PATH)
-  const trainingEntry=new URLSearchParams(location.search).get('returnTo')==='/admin/training'
+  const trainingEntry=isTrainingAdminPath(new URLSearchParams(location.search).get('returnTo')??'')
   const homeOrigin=new URL(origins?.admin??window.location.origin)
   if(import.meta.env.DEV&&['localhost','127.0.0.1'].includes(homeOrigin.hostname))homeOrigin.hostname='training.localhost'
   const trainingHome=homeOrigin.origin+'/'
-  const Shell = surveyEntry ? SurveyAdminEntryShell : AuthShell
+  const educationProduct=educationEntry(location.search)
+  const Shell = trainingEntry ? TrainingAdminLoginShell : educationProduct ? EducationAdminEntryShell : surveyEntry ? SurveyAdminEntryShell : AuthShell
+  const trainingRecovery = trainingEntry && readReauthReturn()?.target === new URLSearchParams(location.search).get('returnTo')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [method, setMethod] = useState<'TOTP' | 'SECURITY_KEY'>('TOTP')
@@ -54,7 +61,7 @@ const AdminLogin: React.FC = () => {
   }
 
   return (
-    <Shell tone="admin" title={trainingEntry?'培训管理员登录':'管理员登录'} description={trainingEntry?'账号审核、课程监管与资源授权，从这里开始。':surveyEntry?'Survey · 研究者资格、邀请与工具授权':'密码与 Authenticator 动态码验证，按入口授权管理'}
+    <Shell tone="admin" title={educationProduct?`${educationProduct} 管理员登录`:trainingEntry?'培训管理员登录':'管理员登录'} description={educationProduct?'使用已获本产品管理授权的账号登录，管理学校开通与授权。':trainingEntry?'使用管理员账号与手机验证器动态码登录。':surveyEntry?'Survey · 研究者资格、邀请与工具授权':'密码与 Authenticator 动态码验证，按入口授权管理'}
       {...(trainingEntry?{
         brand:<a className="hui-auth-brand" href={trainingHome} aria-label="Training 首页"><TrainingBrand /></a>,
         className:'training-admin-auth',backTo:trainingHome,backLabel:'返回 Training 首页',
@@ -62,19 +69,19 @@ const AdminLogin: React.FC = () => {
         heroBullets:['培训师审核与账号管理','培训课程监管与查询','教学素材与测评资源授权'],
         heroLabel:'Training 培训管理介绍',tagline:'仅限已获 Training 管理授权的账号',
       }:{})}>
-      {!surveyEntry&&<div className="hui-auth-note mt-0 mb-5">
+      {!surveyEntry&&!trainingEntry&&<div className="hui-auth-note mt-0 mb-5">
         <strong>{trainingEntry?'Training 管理身份':'管理员身份'}</strong>
         <div>{trainingEntry?'使用已获培训管理授权的账号、密码与手机验证器动态码登录。系统治理和其他产品管理分别授权。':'使用密码与手机验证器的六位动态码登录。微软 Authenticator 等兼容验证器均可使用；每个入口分别授权。'}</div>
       </div>}
 
-      <LoginRecoveryNotice />
+      {(!trainingEntry || trainingRecovery) && <LoginRecoveryNotice />}
       {error && (
         <div role="alert" id="auth-error" className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-600 text-sm">
           {error}
         </div>
       )}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className={trainingEntry ? "training-admin-login-form" : "space-y-4"}>
         <div>
           <label htmlFor="auth-username" className="block text-sm font-medium text-gray-700 mb-1">
             管理员账号
@@ -113,9 +120,10 @@ const AdminLogin: React.FC = () => {
           </select>
         </label>
         {method==='TOTP'&&<label className="block" htmlFor="admin-totp-code">Authenticator 六位动态码
-          <input id="admin-totp-code" className="input" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6}
+          <input aria-describedby={trainingEntry ? "training-login-totp-help" : undefined} id="admin-totp-code" className="input" inputMode="numeric" autoComplete="one-time-code" pattern="[0-9]{6}" maxLength={6}
             value={code} required disabled={loading} onChange={e=>setCode(e.target.value.replace(/\D/g,''))}/>
         </label>}
+        {trainingEntry && method==='TOTP' && <p id="training-login-totp-help" className="training-login-field-help">打开已绑定的 Authenticator，输入当前显示的 6 位数字。</p>}
         {method==='SECURITY_KEY'&&<p id="admin-security-key-help" className="survey-admin-key-note">连接已绑定的实体安全密钥，按提示输入密钥 PIN 或验证指纹。没有密钥时，可选 Authenticator 动态码。</p>}
 
         <button
@@ -135,7 +143,21 @@ const AdminLogin: React.FC = () => {
       </form>
       {surveyEntry?<div className="survey-admin-auth-tools">
         <Link to={surveyAppearanceHref('/admin/security/enroll?returnTo='+encodeURIComponent(SURVEY_ADMIN_PATH),mode)}>首次绑定 Authenticator</Link>
-      </div>:<p className="mt-4"><Link to={trainingEntry?'/admin/security/enroll?returnTo=%2Fadmin%2Ftraining':'/admin/security/enroll'}>首次绑定 Authenticator</Link></p>}
+      </div>:trainingEntry?<>
+        <div className="training-login-enroll"><span>第一次使用？</span><Link to="/admin/security/enroll?returnTo=%2Fadmin%2Ftraining">首次绑定 Authenticator</Link></div>
+        <details className="training-login-help">
+          <summary>登录方法说明</summary>
+          <div className="training-login-instructions">
+            <p><strong>首次使用</strong>：准备管理员账号、密码和有效的一次性绑定码，点击「首次绑定 Authenticator」，按提示扫码并完成绑定。</p>
+            <ol>
+              <li><strong>输入账号和密码</strong>：使用已获 Training 管理授权的账号。</li>
+              <li><strong>完成身份验证</strong>：打开 Microsoft Authenticator、Google Authenticator 等验证器，找到已绑定的管理账号，输入当前显示的 6 位动态码。若倒计时即将结束，请等待下一组数字。</li>
+              <li><strong>进入管理页面</strong>：点击「管理员登录」，进入培训管理或继续原来的操作。</li>
+            </ol>
+            <p>已绑定实体安全密钥时，可在「验证方式」中切换为硬件安全密钥，再按提示连接密钥并验证。尚未绑定时，请使用 Authenticator。</p>
+          </div>
+        </details>
+      </>:<p className="mt-4"><Link to={educationProduct?`/admin/security/enroll?returnTo=${encodeURIComponent(educationProduct==='School'?'/admin/huischool':'/admin/huiteacher')}`:'/admin/security/enroll'}>首次绑定 Authenticator</Link></p>}
     </Shell>
   )
 }

@@ -1135,3 +1135,243 @@ classifies the same frozen diff without repeating application work. This route
 authorizes merge qualification only: no production deployment or production
 artifact/security certification is claimed. Report the actual waiting phase at
 about five minutes; do not append unrelated checks.
+
+## Training assessment performance exact qualification (2026-10-23)
+
+`work/training-assessment-performance-20261023` is based on main
+`54ed73fdbef60b3b8d4998984c624c98c6bc99cb`. Its new exact binding freezes
+all application/test/report blobs, both component trees, unchanged dependency and
+schema inputs, the actual PR source and checkout tree. Only the enumerated
+qualification controls can accompany that product. Unknown paths, modes, base or
+source drift, manual/full/probe requests fail without a platform fallback.
+
+Affected runner/media/persistence/selector tests, frontend types/lint and backend
+compilation execute once in Actions. The local default and cognitive-enabled
+Vite builds, real synthetic browser journeys and bounded CPU/query observations
+are retained as `reviewed-local-build-and-browser-observation`, `ciExecuted=false`,
+`originalExecutionSigned=false`. Input Git objects are reconstructed and reviewed
+at candidate freeze; complete historical node_modules bytes were not captured.
+Test-only preparation adjustments after compilation do not change compiled inputs;
+the manifest binds the non-test frontend inputs separately from the qualified full
+tree. This is not a generic signed execution framework or production image.
+
+The unchanged official HIGH/CRITICAL lock audits reuse the existing authenticated
+participant-access verifier, exact Actions run/job/artifact identities, matching
+package/lock/audit-program inputs, ZIP SHA-256 and 24-hour lifetime. New scope and
+refusal contracts and current application/control CodeQL remain required. The
+stable merge gate recomputes the complete plan and requires actual scope,
+Training assessment qualification and CodeQL success. Draft, missing, skipped,
+failed and cancelled selected results cannot qualify. Main merge only classifies
+the same diff. No full platform suite, image build, DB/migration/restore, media
+worker test, heavy load repetition or production deployment is selected. Report
+concrete waiting items at the five-minute threshold; do not add unrelated checks.
+
+The first Training assessment run (`39975935257`, source `4144a1d3`) retains its
+failed history: an overly broad workflow condition also selected the previous
+participant route, and frontend types lacked backend Zod/Prisma declarations used
+by the existing cross-tree examples. No frontend tests ran in that failed stage.
+The exact backend job completed compilation and all three selector assertions;
+the affected frontend lint stage also actually passed.
+
+The follow-up fixes only qualification wiring and supplies those missing type
+dependencies. It admits the exact successful backend job/artifact (ZIP digest,
+original report, complete same component, command program, PR/source identities
+and 24-hour lifetime) and the successful lint stage separately, retaining the
+parent and type failure. It does not recompile or rerun those successful inputs.
+The completed full application CodeQL job is verified by exact official metadata,
+source trees, original configuration and successful init/analyze steps; only the
+three new/changed qualification-control JavaScript files are then scanned anew.
+Types and the previously unexecuted affected assertions must still actually pass.
+No missing, failed or expired evidence triggers a full-check fallback.
+
+Run `39977819707` retains 230 actually passed frontend Node assertions, three
+failed assertions and three native-IDB-only jsdom skips. Successful assertions
+are reused only when the complete relative import closure, source blobs, locked
+tools, shared setup and configuration still match; affected/failed assertions run
+once in the follow-up. A native Chromium check ports the three abort/quota/commit
+assertions and adds two new answer/timing/seal assertions, all actually passed.
+The unsigned local record binds the store, original tests and retained harness;
+it is not relabeled as CI execution and does not turn the original skips green.
+Current qualification requires the complete 233 Node-assertion union plus those
+explicit native checks. Only the two affected application files and changed
+qualification controls receive fresh CodeQL; other inputs retain the original
+actual application scan. The failed history is preserved without a full rerun.
+## School / Teacher visual frontend qualification (2026-10-23)
+
+For `work/school-teacher-visual-20261023` only, the user explicitly approved a
+one-time repeat of necessary frontend checks in GitHub CI because the previous
+local results have no general trusted admission mechanism. This does not change
+the standing no-repeat rule or accept unsigned local logs as passing evidence.
+The exact product blobs, complete raw diff, unchanged frontend/backend trees,
+protected dependency/configuration inputs and PR source/checkout tree must match
+`school-teacher-visual-bindings.json`. Unknown changes fail closed, without a
+platform/manual/full fallback. The small frontend workflow runs changed lint,
+complete frontend types, named consumer tests, one production build and browser
+checks against those exact dist bytes. Locked backend dependencies and Prisma
+client generation only prepare transitive frontend type imports; no backend
+business build/test, database, migration or schema change is authorized.
+
+Browser acceptance uses the real compiled App and all production CSS at 320,
+390, 768, 1100 and 1440 pixels in light/dark themes. Strict synthetic APIs cover
+School editing, Teacher draft/navigation/history/focus and both admin branded
+login/enrollment/workspaces, with a negative entry-grant case. Unknown requests,
+page errors, overflow and selected accessibility failures reject the run.
+Screenshots and machine-readable checks are retained with the production dist.
+This is synthetic frontend acceptance, not real-account/backend/deployment
+acceptance. Scope, the actual frontend job and bounded frontend/control CodeQL
+must all succeed; drafts and missing/skipped/failed/cancelled checks cannot merge.
+The stable gate recomputes the complete scope. Exact main pushes only classify
+and do not repeat application checks. No deployment is authorized by this lane.
+
+The same visual candidate was subsequently aligned with main PR #343 at
+`e3ebf626c39f57604362c7e4ce8d6a9d74e29c2f`. Its changed shared frontend inputs
+invalidate the earlier frontend semantic/build/SAST qualification. The active
+visual workflow therefore performs fresh integrated frontend types, named
+consumers (including shared draft/deferred-loader integration), one production
+build, full current frontend/control CodeQL and the real-dist browser matrix.
+The earlier official reuse helper remains historical only and is not called by
+this workflow or browser. PR #343 business files and its independent CI route
+are preserved unchanged; no backend business checks or database are added.
+
+## Survey assessment access exact qualification (2026-10-24 Asia/Tokyo)
+
+Only `work/survey-assessment-performance-20261024`, integrated main
+`d33b70b14c4788b9d2c8f24914e7eee2458ee4c6` and product
+`ea7380ad06abfe54c78565a4206273d7e954c079` use `survey-assessment`.
+The complete raw diff, paths/modes/blobs, both component trees, protected inputs,
+actual PR source and checkout tree must match the frozen binding. Unknown or
+manual/full/probe scope and main-base drift stop without a platform fallback.
+
+The final integrated Vite artifact was actually built once locally. Its original
+log, complete artifact hashes, reconstructed non-test input Git manifest and
+reviewed controls are admitted as unsigned local build evidence, not CI execution
+or a general signed mechanism. Earlier synthetic browser performance observations
+use the same Survey business code before the unrelated School/Teacher integration;
+the report explicitly separates these observations from final integrated build
+qualification. No complete historical node_modules byte identity is claimed.
+
+Actions runs current app types, changed frontend lint, the named Survey consumer
+assertions, affected backend compilation and projection/export authority tests,
+new exact-scope/evidence/refusal contracts and current JS/TS SAST. Unchanged
+cognitive-only types, production lock audits, and unrelated business suites do
+not rerun. Audits retain the exact original official verifier/source/run/job/ZIP
+identity, unchanged inputs and 24-hour lifetime; expired or missing proof stops.
+No full regression, database migration/restore, load/media worker test, image
+build or production deployment is selected. Each affected failure is repaired
+and rechecked only where its inputs changed; successful unchanged inputs must
+be admitted rather than repeated. About five minutes triggers a progress report,
+not an unrelated test expansion.
+
+The stable ready gate independently recomputes the complete scope and requires
+actual scope, all nested Survey qualification jobs and CodeQL success. Draft,
+missing/skipped/failed/cancelled jobs cannot merge. Exact main pushes only
+classify the merged diff; they do not repeat the PR application checks.
+
+### Training / Survey 4C4G 容量修订（2026-10-24）
+
+`work/training-survey-capacity-20261024` 从 `902144e636905ab372ff4a0c7cbfd1b88bffba47` 冻结独立云端容量候选。仅修改认证学员准入锁、Survey 团体 IP 豁免查询繁忙时的普通限流路径，以及公共静态文件传输；不更改题目、计分、冻结版本或生产配置。`participant-capacity` 精确路线绑定完整差异，接纳同一输入已完成的云端后端编译；Actions 只执行受影响限流/持久化契约、真实隔离 PostgreSQL 并发与归档边界、Nginx HTTP 契约和当前 SAST。依赖、前端 JS 和数据库结构不变，不重复应用构建、全量回归或服务器验收。压测是独立合成负载观察，不能代替正式合并门禁或生产容量承诺。
+
+## Training management PR347 bounded integration (2026-10-24)
+
+The user approved this exact CI configuration and merge after success. Only PR347,
+`work/survey-training-branding-20261023`, base `67d0c77034aea3c3cf1ee118eb65ab3aafe7b6eb`
+and product `83510bae28a8bd54d1c05dc0fb951b4e346b898d` enter
+`training-admin-integration`. Complete raw paths/modes/blobs, component trees,
+protected dependency/schema/config inputs and actual source/checkout trees are
+pinned. Unknown changes, base drift, missing marker and manual/full/probe requests
+fail without a platform fallback. Other candidates retain their existing rules.
+
+Sixteen unchanged course assertions and matching per-file lint are admitted from
+original retained local reports, checked against their recorded SHA256 and the
+complete relative JS/TS import closure, setup and locked configuration. These are
+reviewed-local-evidence, ciExecuted=false, originalExecutionSigned=false; Git
+input reconstruction is reviewed after execution and complete historical
+node_modules bytes were not recorded. Prior type failure and its successful
+repair remain historical, not current integrated qualification. Changed test
+locators, renamed user headings and merged shared login/shell inputs invalidate
+those prior assertions; only their named direct consumers run in Actions.
+
+Actions performs new refusal/admission/gate contracts, current app types, missing
+changed-file lint, named affected frontend consumers, one Vite compile, current
+backend types and the two small management-query test modules, plus current
+changed application/control JS/TS CodeQL. Dependencies and schema are unchanged;
+no dependency re-audit, backend business build, DB/Redis, migration/restore,
+whole-platform suite, media/load, image or deployment job is selected. Original
+Mac responsive/dark-mode observations are retained as local UI evidence, not
+compiled-browser or real-account CI claims. This lane qualifies merging only.
+
+The stable gate recomputes the full plan and requires actual scope, every nested
+qualification job and CodeQL success; draft, missing, skipped, failed or cancelled
+stages block merging. Exact main push only classifies without repeating checks.
+At about five minutes report the actual waiting stage and retry affected failures
+only, admitting successful current official artifacts on unchanged stage inputs.
+
+Control preparation retained a local 23-pass/1-fail result; the failed synthetic
+report fixture lacked its suite status. GitHub runs 40051388967/40051428914 then
+rejected the 51st reusable workflow before any job ran. The bounded jobs are now
+inlined in the existing CI, retaining the 50-reference limit. This changes the
+control inventory, so all 24 current control assertions execute in Actions; none
+of that earlier control invocation is admitted as current success. The 16 course
+assertions and five input-matching lint files remain independently valid. No
+application checks or builds were executed in those rejected workflow runs.
+
+Run 40051675495 completed current CodeQL successfully and retained another
+23-pass/1-fail control result; only the synthetic report count was missing.
+The continuation verifies the exact official run/job/source identities, completed
+steps and 24-hour lifetime. It hashes the original failed control log and checks
+the 21 unchanged passing assertion bodies plus scope/gate/binding inputs. Only
+the failed report case and two evidence/workflow consumers rerun. The original
+job remains failed. Original successful application SAST is verified by its exact
+successful official job and unchanged component trees; only the two changed
+qualification JS files receive fresh CodeQL. No application tests/build ran in
+the failed admission invocation; those missing stages still must succeed.
+
+
+## Training trainer account management qualification (2026-10-24)
+
+The authorized candidate on `work/survey-training-branding-20261023` binds the
+complete twenty-file product diff, main base and component trees in
+`training-teacher-bindings.json`. It includes nullable registration-code account
+terms, trainer renewal/freeze/recovery and their compact UI. Survey entry CSS,
+dependencies, existing authority/CSRF/session controls and production remain
+outside this candidate. Unknown paths/modes/blobs, moved base, mismatched PR
+source/merge trees, manual/full requests and failed/missing stages fail closed.
+
+The bounded job admits the reviewed original local reporter/stdout and actual
+tool-completion observations for 78 affected assertions, current backend/app
+types and changed lint. These are reviewed-local-evidence, ciExecuted=false and
+originalExecutionSigned=false. Source/runtime/type input bindings are reviewed
+retrospectively; complete historical node_modules bytes were not recorded. The
+original type/fixture failures are retained, not relabeled successful. Erased
+type-only additions and subsequent CSS-only adjustments do not claim that old
+browser observations validated new styles; final Mac UI checks are separately
+recorded. This narrowly reviewed admission is not a generic signed local runner.
+
+Actions executes new scope/refusal/gate contracts, an isolated old-schema to
+new-schema upgrade and dump/restore with retained synthetic rows, actual HTTP
+CSRF/MFA/entry/target/version boundaries and credential recovery, one frontend
+compile, and current frontend/backend/changed-control CodeQL. Existing local
+unit/rollback flows and types/lint are not replayed. No full platform, scientific,
+media, load, image, deployment or server job is selected. The inlined job retains
+the current reusable-workflow reference limit. This route qualifies merging,
+not deployment. Exact main push classifies without repeating application work.
+
+
+The first PR349 run 40056841527 failed during Redis service creation because
+single-quoted health-command arguments were passed literally by the runner.
+No application admission, dependency installation, migration, HTTP test or build
+ran in that job. Only that quoting is repaired. Its independently successful
+CodeQL job may be admitted only by exact run/job/source/PR, completed successful
+analysis step, 24-hour lifetime and unchanged application/stable-control Git
+inputs; the two changed verifier/test scripts receive current CodeQL. The
+original run remains failed. Mock refusal tests never publish official receipts.
+
+The one repair run uses a candidate-only concurrency suffix so the original
+independent SAST can finish while missing qualification work proceeds. Its
+original-job verifier waits at most six minutes for actual completed success;
+failure/timeout still blocks merging, and no pending result is accepted.
+
+Run 40057566877 was rejected before jobs because the service-container context
+was placed at job environment scope. The container id is now supplied only to
+the migration step, where that context is available. No checks/build ran in the
+rejected invocation; original SAST remains independently running.

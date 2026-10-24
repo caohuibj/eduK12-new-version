@@ -12,6 +12,7 @@ import type {
   SituationalDraftAnswer,
   SituationalResponse,
   SituationalRunnerDefinition,
+  SituationalRunnerScene,
 } from './types'
 
 export const situationalDraftKey = (attemptId: string): string => `situational:${attemptId}`
@@ -39,6 +40,14 @@ export const sceneIsComplete = (
   responses: Record<string, SituationalDraftAnswer>,
 ): boolean => {
   const scene = reachableSituationalScenes(definition, responses)[sceneIndex]
+  return situationalSceneIsComplete(scene, responses)
+}
+
+/** Check a scene already projected from the current frozen path. */
+export const situationalSceneIsComplete = (
+  scene: SituationalRunnerScene | undefined,
+  responses: Record<string, SituationalDraftAnswer>,
+): boolean => {
   return Boolean(scene && scene.channels.every((channel) => (
     channel.online ? onlineAnswerComplete(channel,responses[responseKey(scene.sceneKey, channel.channelKey)]) : channel.required === false
     || responses[responseKey(scene.sceneKey, channel.channelKey)] !== undefined

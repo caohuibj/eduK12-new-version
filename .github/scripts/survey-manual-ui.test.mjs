@@ -1,9 +1,15 @@
+import {execFileSync} from 'node:child_process';
 import assert from 'node:assert/strict';
 import {test} from 'node:test';
 import {readFileSync} from 'node:fs';
 import {binding,branch,marker,surveyManualUIPlan,surveyManualUIOutputs} from './survey-manual-ui-scope.mjs';
 import {verifyReviewedEvidence} from './survey-manual-ui-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
+// Historical acceptance stays bound to its original controls, never the current tree.
+function historicalEvidenceRead(file){
+ const record=JSON.parse(readFileSync('.github/evidence/survey-manual-ui/reviewed-local.json','utf8'));
+ return Object.hasOwn(record.controlSHA256,file)?execFileSync('git',['show','dd41e47cfea797fa03a31062a268e2357ea5f70e:'+file]):readFileSync(file);
+}
 function fixture(){
  const head='a'.repeat(40),source='b'.repeat(40),env={CI_EVENT:'pull_request',CI_HEAD_REF:branch,CI_SOURCE_HEAD:source,CI_PR_NUMBER:'340',CI_PR_REPOSITORY:'caohuibj/eduK12-new-version'};
  const entries=[...Object.entries(binding.source).map(([file,s])=>({file,status:s.status,oldMode:s.oldMode,newMode:s.newMode})),...binding.controls.map(file=>({file,status:binding.controlBefore[file]?'M':'A',oldMode:binding.controlBefore[file]?'100644':'000000',newMode:'100644'}))];
@@ -40,9 +46,9 @@ for(const [name,change]of [
 test('refuses changed frozen main',()=>{const f=fixture();assert.throws(()=>surveyManualUIPlan(f.entries,'c'.repeat(40),f.head,f.read,f.env))});
 test('exact main merge only classifies and never replays checks',()=>{const f=fixture();Object.assign(f.env,{CI_EVENT:'push',CI_HEAD_REF:'main',GITHUB_REF_NAME:'main'});const p=f.plan();assert.equal(p.postMerge,true);assert.equal(surveyManualUIOutputs(p).codeql,false)});
 test('only main may use push classification',()=>{const f=fixture();f.env.CI_EVENT='push';f.env.GITHUB_REF_NAME=branch;assert.throws(()=>f.plan())});
-test('admission verifies original reports and retains failed invocations',()=>{const r=verifyReviewedEvidence();assert.ok(r.acceptedUniqueCases>=80);assert.equal(r.ciExecuted,false);assert.equal(r.originalExecutionSigned,false);assert.equal(r.originalFailuresRetained,true)});
-test('rejects changed evidence bytes',()=>{assert.throws(()=>verifyReviewedEvidence(file=>file.endsWith('reviewed-local.json')?Buffer.from('{}'):readFileSync(file)))});
-test('rejects changed admission controls',()=>{assert.throws(()=>verifyReviewedEvidence(file=>file.endsWith('ci-survey-manual-ui.yml')?Buffer.from('tampered'):readFileSync(file)))});
+test('admission verifies original reports and retains failed invocations',()=>{const r=verifyReviewedEvidence(historicalEvidenceRead);assert.ok(r.acceptedUniqueCases>=80);assert.equal(r.ciExecuted,false);assert.equal(r.originalExecutionSigned,false);assert.equal(r.originalFailuresRetained,true)});
+test('rejects changed evidence bytes',()=>{assert.throws(()=>verifyReviewedEvidence(file=>file.endsWith('reviewed-local.json')?Buffer.from('{}'):historicalEvidenceRead(file)))});
+test('rejects changed admission controls',()=>{assert.throws(()=>verifyReviewedEvidence(file=>file.endsWith('ci-survey-manual-ui.yml')?Buffer.from('tampered'):historicalEvidenceRead(file)),/Control drift: .*ci-survey-manual-ui\.yml/ )});
 test('ready gate requires all selected actual successes and refuses draft or forged scope',()=>{
  const p=fixture().plan(),o=Object.fromEntries(Object.entries(surveyManualUIOutputs(p)).map(([k,v])=>[k,String(v)]));
  const n={scope:{result:'success',outputs:o},'survey-manual-ui':{result:'success'},codeql:{result:'success'}};
@@ -53,3 +59,5 @@ test('ready gate requires all selected actual successes and refuses draft or for
 });
 
 test('workflow fetches the exact PR source before classification and selects bounded SAST',()=>{const text=readFileSync('.github/workflows/ci.yml','utf8');const start=text.indexOf('      - name: fetch exact Survey manual UI PR source');const classify=text.indexOf('      - id: documentation-scope');assert.ok(start>0&&start<classify);assert.ok(text.slice(start,classify).includes("['fetch','--no-tags','--depth=1','origin',source]"));const codeql=text.slice(text.indexOf('  codeql:\n'),text.indexOf('  miniprogram:\n'));assert.ok(codeql.split('    runs-on:')[0].includes("application_route == 'survey-manual-ui'"));assert.ok(codeql.includes('server-version/frontend/public/entry-brand.js'));});
+
+test('current controls cannot admit frozen historical evidence',()=>{assert.throws(()=>verifyReviewedEvidence(),/Control drift:/)});

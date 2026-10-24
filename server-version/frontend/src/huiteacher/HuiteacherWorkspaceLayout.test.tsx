@@ -26,7 +26,7 @@ function session(organizations:ReturnType<typeof organization>[],role='TEACHER')
  vi.stubGlobal('fetch',fetch)
  return fetch
 }
-afterEach(()=>{cleanup();vi.restoreAllMocks();vi.unstubAllGlobals();vi.unstubAllEnvs()})
+afterEach(()=>{window.history.replaceState(null,'','/');cleanup();vi.restoreAllMocks();vi.unstubAllGlobals();vi.unstubAllEnvs()})
 
 describe('Teacher compact workspace',()=>{
  it('starts account details closed for members and keeps edited password and invitation inputs mounted across school changes',async()=>{
@@ -60,9 +60,13 @@ describe('Teacher compact workspace',()=>{
   render(<HuiteacherApp/>)
   const nav=await screen.findByRole('navigation',{name:'个人任务分区'})
   expect(screen.getByText(/显示本人各学校的任务与个人测评，不按上方学校筛选/)).toBeInTheDocument()
+  fireEvent.click(within(nav).getByRole('link',{name:'表单任务'}))
   fireEvent.change(screen.getByLabelText('未提交答案'),{target:{value:'尚未提交的回答'}})
   fireEvent.click(within(nav).getByRole('link',{name:'量表任务'}))
   expect(screen.getByRole('region',{name:'量表任务'})).toHaveFocus()
+  expect(screen.queryByRole('region',{name:'表单任务'})).not.toBeInTheDocument()
+  expect(screen.getByLabelText('未提交答案')).not.toBeVisible()
+  expect(within(nav).getByRole('link',{name:'量表任务'})).toHaveAttribute('aria-current','location')
   fireEvent.click(within(nav).getByRole('link',{name:'表单任务'}))
   expect(screen.getByRole('region',{name:'表单任务'})).toHaveFocus()
   fireEvent.change(screen.getByLabelText('当前学校管理范围'),{target:{value:'b'}})
@@ -79,6 +83,7 @@ describe('Teacher compact workspace',()=>{
   const nav=await screen.findByRole('navigation',{name:'个人任务分区'})
   for(const name of ['学生反馈','我的成长']){
    const link=within(nav).getByRole('link',{name})
+   fireEvent.click(link)
    expect(link).toHaveAttribute('href',`#${screen.getByRole('region',{name}).id}`)
   }
  })
@@ -88,9 +93,9 @@ describe('Teacher compact workspace',()=>{
   fireEvent.click(await screen.findByRole('button',{name:'学校改进'}))
   const nav=screen.getByRole('navigation',{name:'学校管理分区'})
   for(const link of within(nav).getAllByRole('link')){
+   fireEvent.click(link)
    const target=screen.getByRole('region',{name:link.textContent!})
    expect(link).toHaveAttribute('href',`#${target.id}`)
-   fireEvent.click(link)
    expect(target).toHaveFocus()
   }
   fireEvent.change(screen.getByLabelText('当前学校管理范围'),{target:{value:'b'}})
@@ -105,4 +110,28 @@ describe('Teacher compact workspace',()=>{
   expect(screen.queryByRole('navigation',{name:'学校管理分区'})).not.toBeInTheDocument()
   expect(screen.getByLabelText('未提交答案')).toBeInTheDocument()
  })
+ it('restores authorized sections from fragments and browser history without remounting answers',async()=>{
+  window.history.replaceState(null,'','/#ht-personal-forms')
+  session([organization('a')])
+  render(<HuiteacherApp/>)
+  await screen.findByRole('region',{name:'表单任务'})
+  fireEvent.change(screen.getByLabelText('未提交答案'),{target:{value:'保留回答'}})
+  const nav=screen.getByRole('navigation',{name:'个人任务分区'})
+  fireEvent.click(within(nav).getByRole('link',{name:'量表任务'}))
+  expect(window.location.hash).toBe('#ht-personal-scales')
+  window.history.replaceState(null,'','/#ht-personal-forms')
+  fireEvent(window,new PopStateEvent('popstate'))
+  expect(screen.getByRole('region',{name:'表单任务'})).toBeVisible()
+  expect(screen.getByRole('region',{name:'表单任务'})).toHaveFocus()
+  expect(screen.getByLabelText('未提交答案')).toHaveValue('保留回答')
+  window.history.replaceState(null,'','/#ht-school-settings')
+  fireEvent(window,new PopStateEvent('popstate'))
+  expect(screen.queryByRole('region',{name:'学校设置与成员'})).not.toBeInTheDocument()
+  expect(screen.getByRole('region',{name:'表单任务'})).toBeVisible()
+  window.history.replaceState(null,'','/')
+  fireEvent(window,new PopStateEvent('popstate'))
+  expect(screen.getByRole('region',{name:'自主测评'})).toBeVisible()
+  expect(screen.getByRole('region',{name:'自主测评'})).toHaveFocus()
+ })
+
 })

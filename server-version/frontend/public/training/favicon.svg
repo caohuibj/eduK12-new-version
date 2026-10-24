@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">Training</title>
+  <style>
+    .mountain { fill: #315f49; }
+    @media (prefers-color-scheme: dark) { .mountain { fill: #accbb4; } }
+  </style>
+  <circle cx="49" cy="15" r="8" fill="#e49a72"/>
+  <!-- The H is a transparent cutout; no background tile or embedded bitmap. -->
+  <path class="mountain" fill-rule="evenodd" d="M3 55 16 30Q18 26 21 30L24 35 31 14Q33 10 35 14L44 34 48 27Q50 23 53 28L61 55Q47 61 33 57 18 61 3 55ZM23 54 28 29Q29 25 31 27L30 38H36L35 28Q35 25 38 27L43 54H36L34 44H30L28 54Z"/>
+</svg>

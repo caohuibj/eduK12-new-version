@@ -1,3 +1,4 @@
+import type { Prisma } from '@prisma/client'
 import { listPage, cursorWhere, listPageResult, ListCursorError } from '../utils/listCursor'
 import { Request, Response } from 'express'
 import { canReadLegacyContent } from '../utils/legacyContentRoles'
@@ -124,9 +125,23 @@ export const courseController = {
       const excludeLibrary = req.query.excludeLibrary === 'true'
       const keyword = typeof req.query.keyword === 'string' ? req.query.keyword.trim().slice(0,200) : ''
       const { page, pageSize, skip } = getPaginationParams(req)
+      const sortBy = req.query.sortBy ?? 'createdAt'
+      const sortOrder = req.query.sortOrder ?? 'desc'
+      if (!['createdAt', 'creator'].includes(String(sortBy)) || typeof sortBy !== 'string'
+        || !['asc', 'desc'].includes(String(sortOrder)) || typeof sortOrder !== 'string') {
+        return error(res, '课程排序参数无效', -1, 400)
+      }
+      if (req.query.creatorId !== undefined && (typeof req.query.creatorId !== 'string' || !req.query.creatorId.trim() || req.query.creatorId.length > 100)) {
+        return error(res, '创建者筛选参数无效', -1, 400)
+      }
+      const creatorId = typeof req.query.creatorId === 'string' ? req.query.creatorId.trim() : ''
+      const direction = sortOrder as Prisma.SortOrder
+      const orderBy: Prisma.CourseOrderByWithRelationInput[] = sortBy === 'creator'
+        ? [{ creator: { username: direction } }, { createdAt: 'desc' }, { id: 'desc' }]
+        : [{ createdAt: direction }, { id: direction }]
 
       // 构建缓存键
-      const cacheKey = `courses:list:${userRole}:${userId}:${status}:${page}:${pageSize}:${excludeLibrary ? 'courses' : 'all'}:${encodeURIComponent(keyword)}`
+      const cacheKey = `courses:list:${userRole}:${userId}:${status}:${page}:${pageSize}:${excludeLibrary ? 'courses' : 'all'}:${encodeURIComponent(keyword)}:${encodeURIComponent(creatorId)}:${sortBy}:${sortOrder}`
       
       // 尝试从缓存获取
       const cached = cache.get(cacheKey)
@@ -146,6 +161,9 @@ export const courseController = {
       // 教师只能看到自己创建的课程，管理员可以看到所有
       if (userRole === UserRole.TEACHER) {
         where.creatorId = userId
+        if (creatorId && creatorId !== userId) where.AND = [{ creatorId }]
+      } else if (creatorId) {
+        where.creatorId = creatorId
       }
 
       // 学生只能看到自己已加入（ACTIVE/APPROVED）的课程，避免列出全站课程
@@ -184,7 +202,7 @@ export const courseController = {
               }
             }
           },
-          orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+          orderBy,
           skip,
           take: pageSize,
         }),

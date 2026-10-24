@@ -1,0 +1,192 @@
+{
+  "schema": 1,
+  "base": "4d95a5b11c3b2261c96d7161eea66ebf8d6f0626",
+  "product": "19a57810e4bc7f501990bb84b206b9361d17315b",
+  "source": {
+    "server-version/backend/prisma/migrations/20261024021000_teacher_code_account_validity/migration.sql": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ab439b2a77c9ec693ba92c187948a01927785463"
+    },
+    "server-version/backend/prisma/schema.prisma": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "aca635e128f3327a71064f575795f1835a40fea9",
+      "after": "7f891d008ccb417f69f179bae763a29f26920589"
+    },
+    "server-version/backend/src/__tests__/controllers/teacherCode-validity.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "968677a01abc906d51dd4c6cec8c8d3a499791fe"
+    },
+    "server-version/backend/src/__tests__/controllers/teacherCode-validity.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "13283a75cebd6feb50140a2944adc6596b3094d1"
+    },
+    "server-version/backend/src/__tests__/controllers/trainingTeacherManagement.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7c68c3f0bb3fd6dd2c432c480416d78ea95209d6"
+    },
+    "server-version/backend/src/__tests__/controllers/trainingTeacherManagement.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "545041251fa5328c58da713d355d7014f4cd29ce"
+    },
+    "server-version/backend/src/controllers/authController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1b59d04ec26990bdff739278727285ce328b9f05",
+      "after": "f037edaccb2fe4c10ad245870dd7e4cde0b454d3"
+    },
+    "server-version/backend/src/controllers/teacherCodeController.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "36ef28ab566957386e2e1e42737051699c4aa30c",
+      "after": "661d91ad9a655ad87b2fb42eb09afff6669caa92"
+    },
+    "server-version/backend/src/controllers/trainingTeacherManagementController.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "dbaedece98d1f6c14eac3dae234d2f55c6535525"
+    },
+    "server-version/backend/src/routes/users.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "55356d3c3c4119e9427099dc2aff521ff5e7801b",
+      "after": "91c55def614622c3e60b43b9ed9f4ec6798f44b3"
+    },
+    "server-version/backend/src/services/trainingParticipantList.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "13c881bac64b164e31d628db1ab888de07bd690d",
+      "after": "9232e25a63958a285ab1f5f7b2422ddc72ac6fd9"
+    },
+    "server-version/backend/src/services/trainingTeacherManagement.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6698d2e4f89f52daa2f749602ed09709cfa93b4b"
+    },
+    "server-version/frontend/src/components/staff-ui/TemporaryPasswordHandoff.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ddec1189fa7e6433f5556f55520571d94b641314",
+      "after": "22125401fbb7886479e612947bdf47dce9c90f4f"
+    },
+    "server-version/frontend/src/pages/TeacherCodeList.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "1ab45563757177d4d11e92d5882ee467ff948e89",
+      "after": "1463e727827bee2b3b2e483564fb1a56714860ab"
+    },
+    "server-version/frontend/src/pages/UserList.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "fc5172f8873aa9a035fb4cba8185fda4f3309f05",
+      "after": "8781b734476b388437d621a8b4683c041bb653d7"
+    },
+    "server-version/frontend/src/pages/__tests__/TeacherCodeList.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "97c5f6d781411018f71ecbe04bde0f28a8a061e2",
+      "after": "cc0990e07db7f11eda58e9ce2119ee3c6ffdbef7"
+    },
+    "server-version/frontend/src/pages/__tests__/UserList.training.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7f12025a6517f61c0360b320a4d50f0dab1c128d",
+      "after": "bfe3f48ab636ee4f6adc4c48ae92ad60d8d15c18"
+    },
+    "server-version/frontend/src/training/TrainingTeacherManagement.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6c6fd9a934674b1431cf7622a4bbece78bf3f363"
+    },
+    "server-version/frontend/src/training/training-admin-workspace.css": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "82f2802cc57bca70460c174eb19179e69fa9f8ca",
+      "after": "5e320a03effb6634f250f5e9e2738fbf789a6cbc"
+    },
+    "server-version/frontend/src/types/index.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "757793744bb5170f66517169ad21d4495fa9c10b",
+      "after": "132e9193400c0bd894e1dccf4bf64270d23c20b4"
+    }
+  },
+  "controls": [
+    ".github/scripts/training-teacher-scope.mjs",
+    ".github/scripts/training-teacher-bindings.json",
+    ".github/scripts/training-teacher-checks.mjs",
+    ".github/scripts/training-teacher.test.mjs",
+    ".github/scripts/training-teacher-http.cjs",
+    ".github/evidence/training-teacher/reviewed-local.json",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    ".github/workflows/ci.yml",
+    "docs/release/README.md"
+  ],
+  "controlBefore": {
+    ".github/scripts/training-teacher-scope.mjs": null,
+    ".github/scripts/training-teacher-bindings.json": null,
+    ".github/scripts/training-teacher-checks.mjs": null,
+    ".github/scripts/training-teacher.test.mjs": null,
+    ".github/scripts/training-teacher-http.cjs": null,
+    ".github/evidence/training-teacher/reviewed-local.json": null,
+    ".github/scripts/content-scope.mjs": "fd558e9de94e7049ad07f189c477c56493a0f382",
+    ".github/scripts/merge-gate.mjs": "3f19320b5cfa8e5c9fb13892c5fc7fab222dfbde",
+    ".github/workflows/ci.yml": "44e2d2caee0cc881265a21e4e54a94de744f126d",
+    "docs/release/README.md": "838160f5416342223668388295c4454c4265212e"
+  },
+  "components": {
+    "backend": "b569703d099e06fb141364db2f5e710f1c1f2a97",
+    "frontend": "3dca0525b642953b41ddffedabc491b18219a150"
+  },
+  "protectedInputs": {
+    "server-version/backend/package.json": "033398f6361b0e4217226ae00f2edc2ed3380ecd",
+    "server-version/backend/package-lock.json": "73607721290dd28f1c6f85d5e12d5d517926ede3",
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "server-version/backend/src/middleware/auth.ts": "77bcfc977c6824b72fc4c736ee9cc0bc3b530a63",
+    "server-version/backend/src/modules/admin-permissions/service.ts": "ddefa4ff1431601f5cec7311af4dd3703d18197c",
+    "server-version/backend/src/modules/admin-permissions/proof.ts": "95215659e43e4463cbd545a34e1e4981352ce8a6",
+    "server-version/backend/scripts/runtime-table-policy.json": "ace85218711a03301aef8b4626f0cf9951cb7b4e"
+  },
+  "evidenceSHA256": "8ec99d7925a21b8378bc911643653a1346f93050a85e2a6881fee0d22383a043",
+  "officialSast": {
+    "run": 40056841527,
+    "job": 120761623429,
+    "source": "b12697ac255ab845fc8567f6df2b1694e8e3082d",
+    "requireActualSuccessBeforeAdmission": true
+  }
+}

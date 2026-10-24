@@ -3,7 +3,8 @@ import {SCHOOL_HOST} from '../school/context'
 import {EducationPrivateToolStudio} from '../components/education-tools/EducationPrivateToolStudio'
 import {usePrivateToolCapability,type PrivateDraftState} from '../components/education-tools/privateToolClient'
 import {HuiteacherMyGrowth} from './HuiteacherMyGrowth'
-import React, { useCallback, useEffect, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { flushSync } from 'react-dom'
 import { QRCodeSVG } from 'qrcode.react'
 import './huiteacher.css'
 import { HuiteacherFormStudio } from './HuiteacherFormStudio'
@@ -24,6 +25,7 @@ import { useProductTheme } from '../components/product-theme/useProductTheme'
 import { ProductThemeControl } from '../components/product-theme/ProductThemeControl'
 import './huiteacher-theme.css'
 import './huiteacher-workspace-layout.css'
+import '../components/education-tools/education-entry-layout.css'
 
 type Envelope<T>={code:string|number;message:string;data:T}
 type Scope={organizationId:string;organizationName:string;membershipId:string;orgRole:string;productAdmin:boolean}
@@ -76,12 +78,15 @@ function WorkspaceAccount({initialOpen,children}:{initialOpen:boolean;children:R
     <summary>账号与学校邀请</summary>{children}
   </details>
 }
-function WorkspaceJump({id,children}:{id:string;children:React.ReactNode}){
-  return <a href={`#${id}`} onClick={event=>{
+function WorkspaceJump({id,children,selected,onSelect}:{id:string;children:React.ReactNode;selected:string;onSelect:(id:string)=>void}){
+  return <a href={`#${id}`} aria-current={selected===id?'location':undefined} onClick={event=>{
     if(event.button!==0||event.metaKey||event.ctrlKey||event.shiftKey||event.altKey)return
+    flushSync(()=>onSelect(id))
     const target=document.getElementById(id)
     if(!target)return
-    event.preventDefault();target.focus({preventScroll:true});target.scrollIntoView?.({block:'start'})
+    event.preventDefault();
+    if(window.location.hash!==`#${id}`)window.history.pushState(null,'',`#${id}`)
+    target.focus({preventScroll:true});target.scrollIntoView?.({block:'start'})
   }}>{children}</a>
 }
 
@@ -89,6 +94,14 @@ function WorkspaceJump({id,children}:{id:string;children:React.ReactNode}){
 export default function HuiteacherApp(){
   const appRoot=useRef<HTMLElement>(null)
   const [workspaceTab,setWorkspaceTab]=useState<WorkspaceTab>('teacher')
+  const [personalSection,setPersonalSection]=useState('ht-personal-self')
+  const [schoolSection,setSchoolSection]=useState('ht-school-settings')
+  const historySectionFocus=useRef<string|null>(null)
+  useLayoutEffect(()=>{
+    if(!historySectionFocus.current)return
+    document.getElementById(historySectionFocus.current)?.focus({preventScroll:true})
+    historySectionFocus.current=null
+  },[personalSection,schoolSection])
   const [formDraftState,setFormDraftState]=useState({dirty:false,writing:false})
   const privateDraft=useRef<PrivateDraftState>({dirty:false,writing:false})
   const setPrivateDraftState=useCallback((state:PrivateDraftState)=>{privateDraft.current=state},[])
@@ -280,9 +293,28 @@ export default function HuiteacherApp(){
     setMe(null);setSelectedOrg('');setScreen('home');setMessage('')
     })
   }
+  useEffect(()=>{
+    const restoreSection=(event?:Event)=>{
+      const id=window.location.hash.slice(1)||(workspaceTab==='school'?'ht-school-settings':'ht-personal-self')
+      // A fragment can only select an already-authorized, mounted section.
+      const target=document.getElementById(id)
+      if(!target?.classList.contains('ht-workspace-section'))return
+      if(event){
+        if(target.hidden)historySectionFocus.current=id
+        else target.focus({preventScroll:true})
+      }
+      if(id.startsWith('ht-personal-'))setPersonalSection(id)
+      if(id.startsWith('ht-school-'))setSchoolSection(id)
+    }
+    restoreSection()
+    window.addEventListener('popstate',restoreSection)
+    window.addEventListener('hashchange',restoreSection)
+    return ()=>{window.removeEventListener('popstate',restoreSection);window.removeEventListener('hashchange',restoreSection)}
+  },[workspaceTab,loading,me?.id,selectedOrg])
   const publicHome=!me&&screen==='home'
   const publicAuth=!me&&screen!=='home'
   return <main ref={appRoot} className={`ht-app${!me?' ht-app-public':''}${publicHome?' ht-app-landing':''}`} data-theme={appearance.theme}>
+    <a className="ht-skip-link" href="#ht-main-content">跳到主要内容</a>
     <header className="ht-topbar">
       {me?<TeacherBrand/>:<button type="button" className="ht-brand-home" aria-label="Teacher 首页"
         onClick={()=>changeScreen('home')}><TeacherBrand/></button>}
@@ -298,7 +330,7 @@ export default function HuiteacherApp(){
       </nav>
     </header>
     {message&&<p role="status" className="ht-notice">{message}</p>}
-    <div className={publicAuth?'ht-auth-surface':'ht-page-content'}>
+    <div id="ht-main-content" tabIndex={-1} className={publicAuth?'ht-auth-surface':'ht-page-content'}>
     {loading?<section className="ht-panel ht-session-loading" aria-live="polite"><p>正在检查教育账号登录状态…</p></section>:
     publicHome?<HuiteacherLanding theme={appearance.theme} onEnter={()=>changeScreen('login')}/>:
     !me&&screen==='join'?<section className="ht-panel ht-form-panel">
@@ -402,37 +434,42 @@ export default function HuiteacherApp(){
       {workspaceTab==='private-tools'&&(canAuthorPrivateTools?<><aside className="ht-panel" aria-label="学生测评编制入口提示"><p className="ht-muted">此处自编工具用于 Teacher 教师测评。心理教师为学生编制量表、表单及发布活动，请前往 School 的“我的工具”和活动管理。学校须已开通 School，并授予本人对应权限；使用同一教育账号单独登录，两个入口的私有草稿与固定版本不会自动互通。</p><a href={`https://${SCHOOL_HOST}/login`} target="_blank" rel="noopener noreferrer">前往 School 编制学生测评</a></aside><EducationPrivateToolStudio key={`TEACHER:${me.id}:${selectedOrg}`} api={teacherApi} organizationId={selectedOrg} entry="TEACHER" actorId={me.id} onDraftStateChange={setPrivateDraftState}/></>:<section className="ht-panel"><h2>我的工具</h2><p>当前账号或学校暂无私有量表与表单编制权限。</p></section>)}
       {workspaceTab==='teacher'&&<>
         <p className="ht-notice">个人空间 · 显示本人各学校的任务与个人测评，不按上方学校筛选。</p>
+        <div className="ht-workspace-body">
         <nav className="ht-workspace-jumps" aria-label="个人任务分区">
-          <WorkspaceJump id="ht-personal-self">自主测评</WorkspaceJump>
-          <WorkspaceJump id="ht-personal-forms">表单任务</WorkspaceJump>
-          <WorkspaceJump id="ht-personal-private-forms">私有表单任务</WorkspaceJump>
-          <WorkspaceJump id="ht-personal-scales">量表任务</WorkspaceJump>
-          {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'&&<WorkspaceJump id="ht-personal-feedback">学生反馈</WorkspaceJump>}
-          {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'&&<WorkspaceJump id="ht-personal-growth">我的成长</WorkspaceJump>}
+          <WorkspaceJump id="ht-personal-self" selected={personalSection} onSelect={setPersonalSection}>自主测评</WorkspaceJump>
+          <WorkspaceJump id="ht-personal-forms" selected={personalSection} onSelect={setPersonalSection}>表单任务</WorkspaceJump>
+          <WorkspaceJump id="ht-personal-private-forms" selected={personalSection} onSelect={setPersonalSection}>私有表单任务</WorkspaceJump>
+          <WorkspaceJump id="ht-personal-scales" selected={personalSection} onSelect={setPersonalSection}>量表任务</WorkspaceJump>
+          {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'&&<WorkspaceJump id="ht-personal-feedback" selected={personalSection} onSelect={setPersonalSection}>学生反馈</WorkspaceJump>}
+          {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'&&<WorkspaceJump id="ht-personal-growth" selected={personalSection} onSelect={setPersonalSection}>我的成长</WorkspaceJump>}
         </nav>
-        <section id="ht-personal-self" className="ht-workspace-section" tabIndex={-1} aria-label="自主测评"><HuiteacherPersonalSelf api={teacherApi}/></section>
-        <section id="ht-personal-forms" className="ht-workspace-section" tabIndex={-1} aria-label="表单任务"><HuiteacherMyFormTasks api={teacherApi}/></section>
-        <section id="ht-personal-private-forms" className="ht-workspace-section" tabIndex={-1} aria-label="私有表单任务"><HuiteacherMyPrivateFormTasks key={`private-form:${me.id}`} actorKey={me.id} api={teacherApi}/></section>
-        <section id="ht-personal-scales" className="ht-workspace-section" tabIndex={-1} aria-label="量表任务"><HuiteacherMyScaleTasks key={me.id} api={teacherApi}/></section>
+        <div className="ht-workspace-sections">
+        <section id="ht-personal-self" hidden={personalSection!=='ht-personal-self'} className="ht-workspace-section" tabIndex={-1} aria-label="自主测评"><HuiteacherPersonalSelf api={teacherApi}/></section>
+        <section id="ht-personal-forms" hidden={personalSection!=='ht-personal-forms'} className="ht-workspace-section" tabIndex={-1} aria-label="表单任务"><HuiteacherMyFormTasks api={teacherApi}/></section>
+        <section id="ht-personal-private-forms" hidden={personalSection!=='ht-personal-private-forms'} className="ht-workspace-section" tabIndex={-1} aria-label="私有表单任务"><HuiteacherMyPrivateFormTasks key={`private-form:${me.id}`} actorKey={me.id} api={teacherApi}/></section>
+        <section id="ht-personal-scales" hidden={personalSection!=='ht-personal-scales'} className="ht-workspace-section" tabIndex={-1} aria-label="量表任务"><HuiteacherMyScaleTasks key={me.id} api={teacherApi}/></section>
         {import.meta.env.VITE_HUITEACHER_STUDENT_FEEDBACK_ENABLED==='true'
-          &&<section id="ht-personal-feedback" className="ht-workspace-section" tabIndex={-1} aria-label="学生反馈"><HuiteacherMyStudentFeedback api={teacherApi}/></section>}
+          &&<section id="ht-personal-feedback" hidden={personalSection!=='ht-personal-feedback'} className="ht-workspace-section" tabIndex={-1} aria-label="学生反馈"><HuiteacherMyStudentFeedback api={teacherApi}/></section>}
         {import.meta.env.VITE_HUITEACHER_IMPROVEMENT_ENABLED==='true'
-          &&<section id="ht-personal-growth" className="ht-workspace-section" tabIndex={-1} aria-label="我的成长"><HuiteacherMyGrowth api={teacherApi}/></section>}
+          &&<section id="ht-personal-growth" hidden={personalSection!=='ht-personal-growth'} className="ht-workspace-section" tabIndex={-1} aria-label="我的成长"><HuiteacherMyGrowth api={teacherApi}/></section>}
+        </div></div>
       </>}
       {workspaceTab==='school'&&org?.productAdmin&&<>
       <p className="ht-notice">当前学校管理范围：{org.organizationName}。此处仅管理本校已授权的成员、工具与活动。</p>
+      <div className="ht-workspace-body">
       <nav className="ht-workspace-jumps" aria-label="学校管理分区">
-        <WorkspaceJump id="ht-school-settings">学校设置与成员</WorkspaceJump>
-        <WorkspaceJump id="ht-school-relationships">班级关系</WorkspaceJump>
-        <WorkspaceJump id="ht-school-evaluations">评价活动</WorkspaceJump>
-        <WorkspaceJump id="ht-school-forms">学校表单</WorkspaceJump>
+        <WorkspaceJump id="ht-school-settings" selected={schoolSection} onSelect={setSchoolSection}>学校设置与成员</WorkspaceJump>
+        <WorkspaceJump id="ht-school-relationships" selected={schoolSection} onSelect={setSchoolSection}>班级关系</WorkspaceJump>
+        <WorkspaceJump id="ht-school-evaluations" selected={schoolSection} onSelect={setSchoolSection}>评价活动</WorkspaceJump>
+        <WorkspaceJump id="ht-school-forms" selected={schoolSection} onSelect={setSchoolSection}>学校表单</WorkspaceJump>
       </nav>
+      <div className="ht-workspace-sections">
       {import.meta.env.VITE_REPORT_PRIVACY_PREFERENCES_V1_ENABLED==='true'&&<details className="ht-panel">
         <summary>评价与报告隐私偏好（只需设置一次）</summary>
         <ReportPrivacyPreferences key={org.organizationId} organizationId={org.organizationId}
           scenarios={['TEACHER_STUDENT_EVALUATION','TEACHER_ADULT_FORM_GROUP']} api={teacherApi}/>
       </details>}
-      {org&&<section id="ht-school-settings" className="ht-panel ht-workspace-section" tabIndex={-1} aria-label="学校设置与成员">
+      {org&&<section id="ht-school-settings" hidden={schoolSection!=='ht-school-settings'} className="ht-panel ht-workspace-section" tabIndex={-1} aria-label="学校设置与成员">
         <h2>{org.organizationName}</h2><p>{org.productAdmin?'已获得本校 Teacher 管理权限':'已获得本校 Teacher 参与权限'}</p>
         {me.role!=='STUDENT'&&<><h3>年级与班级</h3><div className="ht-units">{units.map(u=><span key={u.id} className="ht-tag">{u.unitKind==='GRADE'?'年级':'班级'} · {u.name}</span>)}</div></>}
         {me.role!=='STUDENT'&&org.productAdmin&&<div className="ht-admin">
@@ -465,12 +502,13 @@ export default function HuiteacherApp(){
           <button onClick={refreshOrg} disabled={working}>刷新学校信息</button>
         </div>}
       </section>}
-        <section id="ht-school-relationships" className="ht-workspace-section" tabIndex={-1} aria-label="班级关系"><HuiteacherClassRelationships key={'relations:'+org.organizationId}
+        <section id="ht-school-relationships" hidden={schoolSection!=='ht-school-relationships'} className="ht-workspace-section" tabIndex={-1} aria-label="班级关系"><HuiteacherClassRelationships key={'relations:'+org.organizationId}
           organizationId={org.organizationId} members={members} units={units} api={teacherApi}/></section>
-        <section id="ht-school-evaluations" className="ht-workspace-section" tabIndex={-1} aria-label="评价活动"><HuiteacherEvaluationStudio key={'targets:'+me.id+':'+org.organizationId}
+        <section id="ht-school-evaluations" hidden={schoolSection!=='ht-school-evaluations'} className="ht-workspace-section" tabIndex={-1} aria-label="评价活动"><HuiteacherEvaluationStudio key={'targets:'+me.id+':'+org.organizationId}
           organizationId={org.organizationId} api={teacherApi} canAuthorPrivateTools={canAuthorPrivateTools} actorKey={me.id}/></section>
-        <section id="ht-school-forms" className="ht-workspace-section" tabIndex={-1} aria-label="学校表单"><HuiteacherFormStudio key={'forms:'+org.organizationId}
+        <section id="ht-school-forms" hidden={schoolSection!=='ht-school-forms'} className="ht-workspace-section" tabIndex={-1} aria-label="学校表单"><HuiteacherFormStudio key={'forms:'+org.organizationId}
           organizationId={org.organizationId} api={teacherApi} onDraftStateChange={setFormDraftState}/></section>
+      </div></div>
       </>}
       {workspaceTab==='expert'&&<>
         <HuiteacherFieldWorkspace api={teacherApi}/>

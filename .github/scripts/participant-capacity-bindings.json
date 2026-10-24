@@ -1,0 +1,187 @@
+{
+  "schema": 1,
+  "base": "902144e636905ab372ff4a0c7cbfd1b88bffba47",
+  "product": "4c02bf250b2266c097b2641a14dcfb34941589ac",
+  "source": {
+    "server-version/backend/src/__tests__/composite/authenticated-admission.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "5c604115f8421bfe067ae00d2de0c38135af26b5"
+    },
+    "server-version/backend/src/__tests__/composite/training-persistence-admission-source.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ae4443f85ed07bb47e25a31199f24e9dd0492095",
+      "after": "b50410930d0fe47d6a7db9f93127046cd04e03c3"
+    },
+    "server-version/backend/src/__tests__/survey/group-ip-rate.contract.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "66b7639e3fa4a5e08a168b88f34b44a3349c023a",
+      "after": "187992a254d3d67330a91213444593b9c100b36d"
+    },
+    "server-version/backend/src/modules/composite/authenticated-admission-lock.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "2d33a39fca431d9c92d32dde6ef6057b600f893d"
+    },
+    "server-version/backend/src/modules/composite/composite.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "459b3d093eacfb47184b45ffb1e8561b8872cf4f",
+      "after": "72252bc07a2eefaf556e36704d065920f0066fe5"
+    },
+    "server-version/backend/src/modules/survey/public-rate.middleware.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a653164163ae6896b9efd72ceef7d8db6308c8fe",
+      "after": "fbc48046be134f6bd44f466fc5bf382596f2126b"
+    },
+    "server-version/frontend/nginx.conf": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "855a9c0c46e73a000bc086f71ce4d124b09815ab",
+      "after": "8d24ece56129c7aedca32deb28f162686952440c"
+    },
+    "server-version/perf/training-survey-capacity-20261024/README.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7dc54c22ce9a366455ab1cbb9df97a0bc648273b"
+    },
+    "server-version/perf/training-survey-capacity-20261024/analyze.py": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "757bd9003f63d1573e62eb4449f450a78573ce7f"
+    },
+    "server-version/perf/training-survey-capacity-20261024/bench.py": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "96536bd35f0a7e97b6d242cbeda7a455ef69d642"
+    },
+    "server-version/perf/training-survey-capacity-20261024/browser.py": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a2cb5cd1822b3128f20a113e3e2e267eb027f1bd"
+    },
+    "server-version/perf/training-survey-capacity-20261024/client.py": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "4f42f8d9f4aad70abb0fbc4083f53ed2abc578aa"
+    },
+    "server-version/perf/training-survey-capacity-20261024/journeys.py": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "bec98b183d6368642635faef0b35526f4c1c9344"
+    },
+    "server-version/perf/training-survey-capacity-20261024/login-burst.py": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c77bb822f26974f5c7490985a23894c2b54bdb90"
+    },
+    "server-version/perf/training-survey-capacity-20261024/monitor.py": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6f33a8b673de6847bd07900a620094802c3e0c8a"
+    },
+    "server-version/perf/training-survey-capacity-20261024/seed.py": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c5b5c047cdb0b1fa66cfe92f3a4e232152ea271a"
+    },
+    "server-version/perf/training-survey-capacity-20261024/soak.py": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ac3f41dd9429cc41c061061a4f9482b321f48262"
+    }
+  },
+  "controls": [
+    ".github/scripts/participant-capacity-scope.mjs",
+    ".github/scripts/participant-capacity-checks.mjs",
+    ".github/scripts/participant-capacity.test.mjs",
+    ".github/scripts/participant-capacity-bindings.json",
+    ".github/evidence/participant-capacity/build.json",
+    ".github/workflows/ci-participant-capacity.yml",
+    ".github/scripts/participant-capacity-nginx.py",
+    ".github/workflows/ci.yml",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    "docs/release/README.md"
+  ],
+  "controlBefore": {
+    ".github/workflows/ci.yml": "c06c8cdbb5bc7f7a9069e429905989406ed0d384",
+    ".github/scripts/content-scope.mjs": "b1e9e1aa6a0511dce75704f52ed93812f4e76c13",
+    ".github/scripts/merge-gate.mjs": "c12e6d674843390bfc49837f41d584677f312b21",
+    "docs/release/README.md": "6d377a769acfbee9ecec5f1be9d29da0f762e105"
+  },
+  "components": {
+    "frontend": "cfbb6a4f8769665711e7c308d1841f3c3681fbc2",
+    "backend": "58c0833af31051a67d8cb0be1edb37e9432650d9"
+  },
+  "protectedInputs": {
+    ".github/config/acceptance-scopes.json": "3e712ad61188aac0ec9af4cc4ca99496bde186df",
+    ".github/scripts/participant-access-bindings.json": "a989b6534437f0a6c047d2f3c27f6af6f07d7292",
+    ".github/scripts/participant-access-checks.mjs": "5fc0de30cf1e52313978991bd80615ec46d81b00",
+    ".github/scripts/participant-access-scope.mjs": "40b0933fd4b60fceeab55c04aa3c329551cc5135",
+    ".github/scripts/school-teacher-checks.mjs": "b9fd6a6b09cdd8f02a87d4120b4d467c313b4a3d",
+    ".github/workflows/ci-school-teacher.yml": "6b7a50b397c207c25c3762e49cf658ccc19e57d3",
+    "AGENTS.md": "592945af44a0bf72761f2ceb34386c87adc08fb3",
+    "server-version/backend/package-lock.json": "73607721290dd28f1c6f85d5e12d5d517926ede3",
+    "server-version/backend/package.json": "033398f6361b0e4217226ae00f2edc2ed3380ecd",
+    "server-version/backend/prisma/schema.prisma": "aca635e128f3327a71064f575795f1835a40fea9",
+    "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
+    "server-version/backend/vitest.config.ts": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406",
+    "server-version/frontend/eslint.config.js": "4e89832bf4d92a5e1ba1815aad2ade6c9a65c3a1",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/src/test/setup.ts": "3217d9d84ea1285cf3495e27669a88e3fe7d2cf3",
+    "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
+    "server-version/frontend/tsconfig.cognitive.json": "910e97700f25652bc1d80ada47e176cbd51c2fbe",
+    "server-version/frontend/tsconfig.json": "1ffef600d959ec9e396d5a260bd3f5b927b2cef8",
+    "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22",
+    "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+  },
+  "buildEvidenceSHA256": "65401d726920f1caa43763c6ef7d272ffe07c3389f73056d72ca8af3dee79b2b",
+  "backendBuildInputCount": 1882,
+  "checks": {
+    "primary": "Cloud primary: one backend compilation and before/after capacity/browser observations. Actions primary: fresh selected unit/PostgreSQL assertions, static HTTP contracts and current SAST. No duplicate app builds or full suite.",
+    "unitTestFiles": [
+      "src/__tests__/survey/group-ip-rate.contract.test.ts",
+      "src/__tests__/survey/public-rate.contract.test.ts",
+      "src/__tests__/composite/training-persistence-admission-source.test.ts"
+    ],
+    "postgresTestFiles": [
+      "src/__tests__/composite/authenticated-admission.postgres.integration.test.ts",
+      "src/__tests__/composite/student-archived-availability.postgres.integration.test.ts"
+    ]
+  },
+  "auditReuse": "Exact unchanged official dependency audit verifier with a 24-hour lifetime."
+}

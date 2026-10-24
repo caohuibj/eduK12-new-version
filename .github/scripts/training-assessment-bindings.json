@@ -1,0 +1,523 @@
+{
+  "schema": 1,
+  "base": "54ed73fdbef60b3b8d4998984c624c98c6bc99cb",
+  "product": "bba59b4ae55735bb9134986c57e9685773cf3ced",
+  "source": {
+    "docs/performance/training-assessment-20261023.json": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d9e3f94f82ebb20e2f7dab182badb7b91edd9a8c"
+    },
+    "docs/performance/training-assessment-20261023.md": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "767f150e4fd9302e6e5acd6a86447a97c9bf9a54"
+    },
+    "server-version/backend/src/__tests__/questionnaire/scale-resources.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "3a11a418a2c16d2dfbf7c0d3e31ebbcb2c4427d2"
+    },
+    "server-version/backend/src/modules/questionnaire-product/scale-resources.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7dac6335107dee8e87cc84bb2a101cad429438ec"
+    },
+    "server-version/backend/src/modules/questionnaire-product/service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "64640a2664645f35be8712984bf6eae0a96897da",
+      "after": "846efc0c171748a31634fe79597cb8f71bce9664"
+    },
+    "server-version/frontend/src/components/FinalCompositeAssessment.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c3aa56afbc4a44ae378ea5e3478fbd7232a7b9ae",
+      "after": "77a9814dacddef65196b85017f2ec1ad6b1a4a7f"
+    },
+    "server-version/frontend/src/components/FinalQuestionnaireAssessment.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9ecedae248c91b5974af13e18802c9c7136c31c3",
+      "after": "a3e37e0b4eaaab4bdee241c93d1262a2163741b6"
+    },
+    "server-version/frontend/src/components/WholeCompositeQuestionnaire.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2ddd1fad2a0f1213f1065b974c8ded36b7351328",
+      "after": "956553cf68d4551b7d68765b93584fea758c980e"
+    },
+    "server-version/frontend/src/modules/assessment-media/AssessmentImageGate.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "24b9f161ac77527b28c41727fa3e7120447c6a3d",
+      "after": "786c4ce150b0b724cf4b660b42c8e8f18af7f66e"
+    },
+    "server-version/frontend/src/modules/assessment-media/AssessmentImageGateContent.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "24b9f161ac77527b28c41727fa3e7120447c6a3d"
+    },
+    "server-version/frontend/src/modules/assessment-media/ScaleFormVideoGate.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d83cc3a624c00fc5e1824265c05bc76e4e71e93c",
+      "after": "ca99e78d1814c52f5b15d5102192e643f37dba94"
+    },
+    "server-version/frontend/src/modules/assessment-media/ScaleFormVideoGateContent.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "d83cc3a624c00fc5e1824265c05bc76e4e71e93c"
+    },
+    "server-version/frontend/src/modules/assessment-media/TrainingMaterialPicker.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "74f6ba6daa349e1904977aada23ee6304a300dc4",
+      "after": "6d092e55e07c049a6cf3beeeceba84566c752252"
+    },
+    "server-version/frontend/src/modules/assessment-media/TrainingMaterials.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "b6cba7e3c180e902cbd2da4d166e7ad0e0d5a89b"
+    },
+    "server-version/frontend/src/modules/assessment-media/__tests__/deferred-media.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9bc7e3657a06680421bef0acb50a4bc9df73582f"
+    },
+    "server-version/frontend/src/modules/assessment-media/__tests__/media-2.adapter.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ce24a47c70291d443ca6f5c7dff2f2623a3d977b",
+      "after": "30547ebbf29ece52725a8c77158c03c06b3ed07d"
+    },
+    "server-version/frontend/src/modules/assessment-media/deferred-media.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "fee0098f57d93f6b620d0d6eb75ba962007d76f0"
+    },
+    "server-version/frontend/src/modules/cognitive/__tests__/CognitiveRunner.fe07a.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4c3f5cd9c254474cde12ea0a0ae6c0ee75d1012a",
+      "after": "44e59eae10193be27053932c39b68f6dcb773317"
+    },
+    "server-version/frontend/src/modules/cognitive/__tests__/CognitiveRunner.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "45896658ae2f21d30d630ce0194d2052eeaa00ff",
+      "after": "af2b1a55774984c89c33c877ef6ac45354a93a4c"
+    },
+    "server-version/frontend/src/modules/cognitive/__tests__/FrameInputTiming.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f187b32cc2b0505e1fd1c3fdf152c3ce3e7c08c4",
+      "after": "48dd2e30ca2dd05c770d52cb7bbffc0a998e3483"
+    },
+    "server-version/frontend/src/modules/cognitive/__tests__/GonogoCptFrameTiming.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3cca0ecd5ebd3607c27dcec3f288ec0dbcf58cb3",
+      "after": "220f8bd4c64d53a816735c7b99915fedf1a0ecf9"
+    },
+    "server-version/frontend/src/modules/cognitive/__tests__/registry.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5f3dbc7e3396ff6c17cd48776256d0d85dcef45e",
+      "after": "7cd4615791ce7e9e46885ad835739e10e2d31057"
+    },
+    "server-version/frontend/src/modules/cognitive/core/__tests__/runner-preparation.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "b4177e9be1c9933f1555dbc535321a2ea3e8032c"
+    },
+    "server-version/frontend/src/modules/cognitive/core/deferred-runner.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "7cd8f0161b1196859e0a821610ba2a145e401921"
+    },
+    "server-version/frontend/src/modules/cognitive/core/useRunnerPreparation.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "3153a9d8bd3dc4801cb802da8a61c1dd486ea353"
+    },
+    "server-version/frontend/src/modules/cognitive/pages/CognitiveRunner.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "426e1a91a915dc7a12acfeed2c85f4a38f8ed4c7",
+      "after": "92b12e1004e9cd8f68f9a19bff813a11fb007259"
+    },
+    "server-version/frontend/src/modules/cognitive/registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "aec0f548072d3c66e3e76d94fc836c468cd07b66",
+      "after": "38e2a95de6871033dfcb3f323babea01b6fe54b9"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/bart/bart.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a11a6465c3ef32b5f340b17cd8a5ac02e9316b2e",
+      "after": "ffafae00a902680f8585e5be4cfd16526a82071e"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/cardsort/cardsort.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "558502152818c391aea18830db18e99b4fbd7c39",
+      "after": "5df6fbe4c8101fb2927da814f55717f63184d9e6"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/corsi/corsi.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "87aea20f2188b34979752f0f3ba1823612faac0c",
+      "after": "e362a704018a7133afd01b84b642ddbba4c4d6c1"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/cpt/cpt.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9f9e7cbd4c5c9ef5e0134632b05d9b2823bd92d7",
+      "after": "e2438b9daad2276b758204428e62cacb18857884"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/digitbackward/digitbackward.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2c0f04aeb3beb25311ba67192914cba89e3334e0",
+      "after": "5e3e2ee404720a8d6d208df4fa2c156ff1f35ba5"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/emotionrecognition/emotionrecognition.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "80ffa1494adbbd266b93de70ee283278e6bff0f7",
+      "after": "731e767a82fe31e52e9180e89854e577cd60477e"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/fake/fake.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5b42451e03be03d6129cdd941f68c1eceff7bf9f",
+      "after": "ec18c9a680b025ed70e4a6cdfa5c79e11d2a1aec"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/flanker/flanker.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "972baac741f63e089c4613a6b45468f69f2051ba",
+      "after": "3df2eeb9959a463c41e71540fa3622e487bd3f2c"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/gonogo/gonogo.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9200bd7ee3c6d991f606bb281ff3c72cee7b3317",
+      "after": "9e5ca5db1483aa00d584231ec2ef75a0afcb1250"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/lexicaldecision/lexicaldecision.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2e01c0b150309c422e591fd92b3e2c097aabd54a",
+      "after": "3badc054d821d34ff0d427bf5211c22dba0d9a8c"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/matrix/matrix.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8d57c1dc71ed738b368fe45adc2174d7d63e3cdf",
+      "after": "14a5f844e85026d235fe42df005b54879c775b97"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/memory/memory.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f217b846ac35e88139b809e2e98a103f28471013",
+      "after": "d4fe6f6410242c29d7dede37f4b4722edf15eb28"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/mentalrotation/mentalrotation.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "21f1e2d8e5ba7da5d092f505b863d5abfbf81c19",
+      "after": "7d317d5bd8b99ac2a77e6ff52b05f5fc988f9803"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/nback/nback.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d529cff758bdd77002100b10d9f587ba3b777762",
+      "after": "eb898355d17994265934b677f86befc251ec4f3a"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/pairedassociate/pairedassociate.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "60f9fcf2cc846022bc527b1d2a9e90c4b33c2b09",
+      "after": "89484ed1b106c4d3788d9236f4813a69d9a4c55a"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/patterncompare/patterncompare.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9ef5889a4c2e0c262c69e05133cfc470c754f85f",
+      "after": "ce6e5aafa18ad19b03e53ad3288a55e5b60dece7"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/picturesequence/picturesequence.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cb0ccb0dc8ebf0ebe2ffe669a864e4f6a7740d1d",
+      "after": "97589c7954692906d8b6696505dbcb1f3c39a3bc"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/reaction/reaction.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3e4857095db151e54274a54ab78ac2cd4e07eae1",
+      "after": "81e3ad7fa0d5442ea9132f2edd7ae7d6db7bb80c"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/reversallearning/reversallearning.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ac6cdc553bfd5aeab16704bb4d2e728b4eafd493",
+      "after": "9a9150fa9c7ef780f80cea880a3ee5019f1e559b"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/sst/sst.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2845faee8b98e7254f7350ecaf3c024d39139ce7",
+      "after": "0d4db2d89a4fdbcab3d09d14ce7a859c3aed2af7"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/stroop/stroop.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7fe8062bbf63b523bd49b95b9263ada605d194c7",
+      "after": "3dd8e9f419886491c0cab847e1941a0fe1b69b91"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/taskswitch/taskswitch.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "11d0bd6495320ca751163b5fb7483601cdcb704c",
+      "after": "c86904428f390d1bd91162d9c60b14ed47674a80"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/tower/tower.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ae5b47a88b2c15bf0ac3f9ea1a05b702fafab4e4",
+      "after": "68361f437045b12ecb173e916a58a364a645a866"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/trailmaking/trailmaking.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6560762226acb8e29ac194e79780a812392fa8aa",
+      "after": "016ce4cae1e9f215f2fe913c1170e97aaf68aea1"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/wordlist/wordlist.registry.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "33e0e023696df0296e87b5cce81e8701c154ddb2",
+      "after": "f5bd40097aff3699f7596a072484e38c818fc3bd"
+    },
+    "server-version/frontend/src/modules/reporting/TrainingRawScoreFeedback.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "626bc786889812a6024f118a58e3cd3079fe815a",
+      "after": "30de2206aec6c78bd3508f6b9e8042c0c16d64cf"
+    },
+    "server-version/frontend/src/modules/situational/draft.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3f857c6b4d6384c56f821e9004bc39f6c72eb271",
+      "after": "6fb890f35a6a6d1fe5bb90a66f97a2f16c10f28f"
+    },
+    "server-version/frontend/src/modules/situational/pages/SituationalRunner.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6a6fb7b95ee42365e7976e6ef1f1847cdb16ced9",
+      "after": "71090f84f62c182767940ab7844fe3e96c19ea59"
+    },
+    "server-version/frontend/src/modules/situational/traversal.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c4b3770bc5a89cf7a5c9d7eda50785ddb74cb51c",
+      "after": "4d62839aeab332cd864a1484e2f3a5e40d246e5b"
+    },
+    "server-version/frontend/src/pages/student/ScaleAssessment.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "fceb068caf330cffeb74c1c5bff3b089ffb40b02",
+      "after": "0b5f68cdf56eb8b27f01e33289dba9177c83046c"
+    },
+    "server-version/frontend/src/services/persistence/__tests__/finalDraftStore.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "572435b69a54f202bcd82a356d0e685f9a465458",
+      "after": "88924133fee5d81f4ea223c36f31bb91dc7cc556"
+    },
+    "server-version/frontend/src/services/persistence/finalDraftStore.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d8f2797f6b97281c9f75960bb4bb9e22d4710b54",
+      "after": "0e2ec6f9a84cf91791aa6f8ab203b976e963d0d8"
+    },
+    "server-version/frontend/src/survey/SurveyCognitiveRunner.integration.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8f0846ce0b965277a75e67e65982e0a32cbb29bf",
+      "after": "117aa4b4988c941b8fd67eb41911edffd848857d"
+    }
+  },
+  "controls": [
+    ".github/scripts/training-assessment-native-idb.js",
+    ".github/evidence/training-assessment/native-idb.json",
+    ".github/scripts/training-assessment-reuse.mjs",
+    ".github/scripts/training-assessment-reuse.test.mjs",
+    ".github/scripts/training-assessment-scope.mjs",
+    ".github/scripts/training-assessment-checks.mjs",
+    ".github/scripts/training-assessment.test.mjs",
+    ".github/scripts/training-assessment-bindings.json",
+    ".github/evidence/training-assessment/build.json",
+    ".github/workflows/ci-training-assessment.yml",
+    ".github/workflows/ci.yml",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    "docs/release/README.md"
+  ],
+  "controlBefore": {
+    ".github/workflows/ci.yml": "a5c9edf31852ececb0e42f2fc3a0c236daa3a231",
+    ".github/scripts/content-scope.mjs": "5d4e36de9972cd6979d3243be198888954c68449",
+    ".github/scripts/merge-gate.mjs": "2895a9a92b95f4593f6cdc83e2be061a73f5a5dc",
+    "docs/release/README.md": "e788796cfdaa6c9208c3df51f87cec8c3769785a"
+  },
+  "components": {
+    "frontend": "6d624c2386f96b881cf0d1060656940a5f68b4af",
+    "backend": "6ef1ba477c85aaeb40bbe7ad02b38e6df5cdd66a"
+  },
+  "protectedInputs": {
+    ".github/config/acceptance-scopes.json": "3e712ad61188aac0ec9af4cc4ca99496bde186df",
+    ".github/scripts/participant-access-bindings.json": "a989b6534437f0a6c047d2f3c27f6af6f07d7292",
+    ".github/scripts/participant-access-checks.mjs": "5fc0de30cf1e52313978991bd80615ec46d81b00",
+    ".github/scripts/participant-access-scope.mjs": "40b0933fd4b60fceeab55c04aa3c329551cc5135",
+    ".github/scripts/school-teacher-checks.mjs": "b9fd6a6b09cdd8f02a87d4120b4d467c313b4a3d",
+    ".github/workflows/ci-school-teacher.yml": "6b7a50b397c207c25c3762e49cf658ccc19e57d3",
+    "AGENTS.md": "592945af44a0bf72761f2ceb34386c87adc08fb3",
+    "server-version/backend/package-lock.json": "73607721290dd28f1c6f85d5e12d5d517926ede3",
+    "server-version/backend/package.json": "033398f6361b0e4217226ae00f2edc2ed3380ecd",
+    "server-version/backend/prisma/schema.prisma": "aca635e128f3327a71064f575795f1835a40fea9",
+    "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
+    "server-version/backend/vitest.config.ts": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406",
+    "server-version/frontend/eslint.config.js": "4e89832bf4d92a5e1ba1815aad2ade6c9a65c3a1",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/src/test/setup.ts": "3217d9d84ea1285cf3495e27669a88e3fe7d2cf3",
+    "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
+    "server-version/frontend/tsconfig.cognitive.json": "910e97700f25652bc1d80ada47e176cbd51c2fbe",
+    "server-version/frontend/tsconfig.json": "1ffef600d959ec9e396d5a260bd3f5b927b2cef8",
+    "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22",
+    "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7"
+  },
+  "buildEvidenceSHA256": "3f8b887d9b1bc7c51b0fdc0f6755612d8e3daf5f1ec10489ae4789e969e7b89f",
+  "frontendBuildInputCount": 1061,
+  "nativeIdbSHA256": "ee4eedcb1535f2339d62a74b286a136a40eab519811a3505360843aa1de4a553",
+  "checks": {
+    "primary": "GitHub Actions; none of these tests/types/lint/backend-emitting compilation ran locally in this round",
+    "frontendTestFiles": [
+      "src/services/persistence/__tests__/finalDraftStore.test.ts",
+      "src/services/persistence/__tests__/answerReplacement.test.ts",
+      "src/services/persistence/__tests__/situationalReplacement.test.ts",
+      "src/services/persistence/__tests__/finalDraftTrainingRetention.test.ts",
+      "src/services/persistence/__tests__/finalDraftSurveyRetention.test.ts",
+      "src/components/__tests__/FinalCompositeAssessment.test.tsx",
+      "src/components/__tests__/FinalCompositeShell.test.tsx",
+      "src/components/__tests__/FinalCompositePresentationReuse.test.tsx",
+      "src/components/__tests__/WholeCompositeQuestionnaire.test.tsx",
+      "src/components/__tests__/FinalQuestionnaireAssessment.test.tsx",
+      "src/pages/student/__tests__/ScaleAssessment.test.tsx",
+      "src/pages/student/__tests__/ScaleAssessment.provenance.test.tsx",
+      "src/pages/student/__tests__/ScaleAssessment.reference-journey.test.tsx",
+      "src/pages/public/__tests__/PublicQuestionnaireAssessment.test.tsx",
+      "src/modules/composite/__tests__/CompositeAssessmentPage.test.tsx",
+      "src/modules/cognitive/core/__tests__/runner-preparation.test.tsx",
+      "src/modules/cognitive/core/__tests__/useCognitiveSession.test.tsx",
+      "src/modules/cognitive/__tests__/registry.test.ts",
+      "src/modules/cognitive/__tests__/CognitiveRunner.test.tsx",
+      "src/modules/cognitive/__tests__/CognitiveRunner.fe07a.test.tsx",
+      "src/modules/cognitive/__tests__/CognitiveRunner.training-expiry.test.tsx",
+      "src/modules/cognitive/__tests__/FrameInputTiming.test.tsx",
+      "src/modules/cognitive/__tests__/GonogoCptFrameTiming.test.tsx",
+      "src/modules/cognitive/__tests__/CognitiveImagePresentation.test.tsx",
+      "src/modules/cognitive/__tests__/CognitiveVideoPresentation.test.tsx",
+      "src/survey/SurveyCognitiveRunner.integration.test.tsx",
+      "src/modules/assessment-media/__tests__/media-2.adapter.test.tsx",
+      "src/modules/assessment-media/__tests__/ScaleFormVideoGate.test.tsx",
+      "src/modules/assessment-media/__tests__/TrainingMaterialPicker.test.tsx",
+      "src/modules/assessment-media/__tests__/deferred-media.test.tsx",
+      "src/modules/situational/__tests__/draft.test.ts",
+      "src/modules/situational/__tests__/traversal.test.ts",
+      "src/modules/situational/__tests__/SituationalRunner.test.tsx",
+      "src/modules/situational/__tests__/vnext-history.test.ts",
+      "src/modules/situational/__tests__/diagnostic-multiround.test.ts"
+    ],
+    "backendTestFiles": [
+      "src/__tests__/questionnaire/scale-resources.test.ts"
+    ]
+  },
+  "auditReuse": "Unchanged official participant-access audit verifier and source identities; no new audit execution"
+}

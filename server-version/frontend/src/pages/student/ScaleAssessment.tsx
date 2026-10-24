@@ -1,4 +1,4 @@
-import {TrainingMaterials} from '../../modules/assessment-media/TrainingMaterialPicker'
+import {TrainingMaterials} from '../../modules/assessment-media/TrainingMaterials'
 import type {PublicMaterial} from '../../modules/assessment-media/material'
 import { useTrainingLearnerNavigation } from '../../training/learnerNavigation'
 import { isTrainingHost } from '../../training/context'

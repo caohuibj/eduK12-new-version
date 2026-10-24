@@ -7,7 +7,7 @@ vi.mock('../../api/scaleLibraryGovernance',()=>({governanceApi:()=>api,submissio
 const ready={status:'READY' as const,canDistribute:true,contentCompatible:true,reason:null}
 const closed={status:'NOT_READY' as const,canDistribute:false,contentCompatible:true,reason:'EDUCATION_LIBRARY_ADAPTER_NOT_READY'}
 const entry={id:'entry',releaseId:'release',contentHash:'hash',status:'ACTIVE',metadata:{title:'分配量表'},supportedEntrypoints:['SCHOOL','TEACHER'],educationDistribution:{...ready,products:{SCHOOL:ready,TEACHER:ready}}}
-const catalog=(authored:unknown)=>({list:[{catalogId:'authored',origin:'AUTHORED',authored}],page:1,pageSize:25,hasMore:false})
+const catalog=(authored:unknown)=>({list:[{catalogId:'authored',origin:'AUTHORED',title:entry.metadata.title,exactVersion:{origin:'AUTHORED',releaseId:entry.releaseId},availability:{status:'RESTRICTED',reasons:[]},authored}],page:1,pageSize:25,hasMore:false})
 beforeEach(()=>{vi.resetAllMocks();api.capabilities.mockResolvedValue({systemAdmin:true,reviewGrants:[],distributionGrants:[]});api.submissions.mockResolvedValue({list:[]});api.catalog.mockResolvedValue(catalog(entry));api.grants.mockResolvedValue({list:[]})})
 afterEach(cleanup)
 async function inspect(){render(<MemoryRouter><ScaleLibraryGovernance/></MemoryRouter>);fireEvent.click(await screen.findByRole('button',{name:'查看 / 分配只读使用权限'}));await waitFor(()=>expect(api.grants).toHaveBeenCalledWith('entry'));await waitFor(()=>expect(screen.queryByText('尚未确认现有授权，请重新读取该版本授权后再分配。')).not.toBeInTheDocument())}
