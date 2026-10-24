@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import TrainingTeacherManagement, {type TeacherAction} from '../training/TrainingTeacherManagement'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { AlertCircle, Calendar, CheckCircle, Clock, Search, Users, SlidersHorizontal, ChevronDown, RefreshCw } from 'lucide-react'
 import apiClient from '../api/client'
@@ -27,6 +28,8 @@ const UserList: React.FC<{training?:boolean;trainingTitle?:string}> = ({training
     return()=>document.removeEventListener('pointerdown',outside)
   },[training,filtersOpen])
   const [extendingUser, setExtendingUser] = useState<string | null>(null)
+  const [management,setManagement]=useState<{user:User;action:TeacherAction}|null>(null)
+  const [managing,setManaging]=useState(false)
   const [approvingUser,setApprovingUser]=useState<string|null>(null)
   const [query,setQuery]=useState(''),[page,setPage]=useState(1),[total,setTotal]=useState(0)
   const requestId=useRef(0)
@@ -122,8 +125,8 @@ const UserList: React.FC<{training?:boolean;trainingTitle?:string}> = ({training
   const parentCount = users.filter(user => user.role === 'PARENT').length
 
   if(training){
-    const status=(user:User)=>user.role==='TEACHER'&&user.teacherApproved===false?{label:'待审核',tone:'pending'}:user.isFrozen?{label:'已冻结',tone:'muted'}:user.isActive?{label:'正常',tone:'active'}:{label:'已禁用',tone:'muted'}
-    const pages=Math.max(1,Math.ceil(total/20)),busy=Boolean(approvingUser||extendingUser)
+    const status=(user:User)=>!user.isActive?{label:'已禁用',tone:'muted'}:user.isFrozen?{label:'已冻结',tone:'muted'}:isExpired(user.expiresAt)?{label:'已到期',tone:'pending'}:user.role==='TEACHER'&&user.teacherApproved===false?{label:'待审核',tone:'pending'}:{label:'正常',tone:'active'}
+    const pages=Math.max(1,Math.ceil(total/20)),busy=Boolean(approvingUser||extendingUser||managing)
     const tools=<div className="training-account-list-tools">
           <div className="training-account-filter-anchor" ref={filterAnchor}
             onKeyDown={event=>{if(event.key==='Escape'&&filtersOpen){event.preventDefault();setFiltersOpen(false);filterButton.current?.focus()}}}
@@ -138,6 +141,7 @@ const UserList: React.FC<{training?:boolean;trainingTitle?:string}> = ({training
           <button type="button" className="training-accounts-secondary" aria-label="刷新列表" disabled={loading||busy} onClick={()=>void fetchUsers()}><RefreshCw size={15} aria-hidden="true"/>刷新</button>
         </div>
     return <>
+      <TrainingTeacherManagement selection={management} onClose={()=>setManagement(null)} onChanged={fetchUsers} onBusyChange={setManaging}/>
       {trainingTitle&&<header className="training-management-page-heading training-course-page-heading training-account-page-heading"><h1>{trainingTitle}</h1>{tools}</header>}
       <section className="training-accounts training-account-list" aria-label="账号列表与审核">
       {feedback}
@@ -159,12 +163,15 @@ const UserList: React.FC<{training?:boolean;trainingTitle?:string}> = ({training
             <div className="training-account-card-details">
               <dl>
                 {activeTab==='TEACHER'&&<div data-label="有效期"><dt>有效期</dt><dd className={isExpired(user.expiresAt)?'training-accounts-expired':undefined}>{formatDate(user.expiresAt)}{isExpired(user.expiresAt)&&' · 已过期'}</dd></div>}
+                {activeTab==='TEACHER'&&user.mustChangePassword&&<div data-label="登录安全"><dt>登录安全</dt><dd>下次登录须修改密码</dd></div>}
                 <div data-label="注册时间"><dt>注册时间</dt><dd>{user.createdAt?new Date(user.createdAt).toLocaleDateString('zh-CN'):'—'}</dd></div>
                 <div data-label="账号 ID" className="training-account-card-id"><dt>账号 ID</dt><dd className="training-account-id-value"><code>{user.id}</code><button type="button" onClick={()=>void copyUserId(user.id)} aria-label={`复制 ${name} 的用户 ID`}>复制 ID</button></dd></div>
               </dl>
               {activeTab==='TEACHER'&&<details className="training-account-actions"><summary>管理操作<ChevronDown size={15} aria-hidden="true"/></summary><div className="training-account-actions-buttons">
                 {user.teacherApproved===false&&<button type="button" className="training-accounts-primary" disabled={busy} aria-label={`通过培训师 ${name} 的注册审核`} onClick={()=>void handleApprove(user.id)}>{approvingUser===user.id?'正在审核…':'通过审核'}</button>}
-                {user.expiresAt?<button type="button" className="training-accounts-secondary" disabled={busy} aria-label={`将培训师 ${name} 的账号延期 1 年`} onClick={()=>void handleExtend(user.id,12)}>{extendingUser===user.id?'正在延期…':'延期 1 年'}</button>:<span className="training-accounts-permanent">永久有效，无需延期</span>}
+                {user.expiresAt?<button type="button" className="training-accounts-secondary" disabled={busy||!user.isActive} aria-label={`延长培训师 ${name} 的账号有效期`} onClick={()=>setManagement({user,action:'EXTEND'})}>账号延期</button>:<span className="training-accounts-permanent">永久有效，无需延期</span>}
+                <button type="button" className="training-accounts-secondary" disabled={busy||!user.isActive} aria-label={`${user.isFrozen?'解冻':'冻结'}培训师 ${name} 的账号`} onClick={()=>setManagement({user,action:user.isFrozen?'UNFREEZE':'FREEZE'})}>{user.isFrozen?'解除冻结':'临时冻结'}</button>
+                <button type="button" className="training-accounts-secondary" disabled={busy||!user.isActive} aria-label={`重置培训师 ${name} 的密码`} onClick={()=>setManagement({user,action:'RESET_PASSWORD'})}>重置密码</button>
               </div></details>}
             </div>
           </details></li>})}
