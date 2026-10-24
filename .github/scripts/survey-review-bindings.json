@@ -1,0 +1,617 @@
+{
+  "schema": 1,
+  "base": "3ee60da761bf777da833f77e81565c5b3d5898a1",
+  "product": "9bcc2fdaa33068fb267e426158a2b1407d528db2",
+  "source": {
+    "server-version/backend/prisma/migrations/20261024020000_survey_memorable_participation/migration.sql": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a6afbc5998c0fc6c8a83567c9d64e8a233b6eab7"
+    },
+    "server-version/backend/prisma/migrations/20261024023000_survey_self_assigned_code/migration.sql": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "9886eaba66687b267419fc4c3ca060d43143b225"
+    },
+    "server-version/backend/prisma/migrations/20261024024500_survey_code_registry_guard/migration.sql": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "64e447d0ff1f257efde4be4010f98d970fc04c6b"
+    },
+    "server-version/backend/prisma/schema.prisma": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7f891d008ccb417f69f179bae763a29f26920589",
+      "after": "b0556f0f6d93606ec7bee89e69b48749a33c7a4f"
+    },
+    "server-version/backend/scripts/runtime-table-policy.json": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "ace85218711a03301aef8b4626f0cf9951cb7b4e",
+      "after": "ea7d59004aacc51c31799e9c0a79e1a80d400b45"
+    },
+    "server-version/backend/src/__tests__/parent-portal/routes.test.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "84ffa73b325a46d704b49b71ac6d39c2f66c27af",
+      "after": "3500433b0498c9e4802fadea7d8f9e653f81928f"
+    },
+    "server-version/backend/src/__tests__/survey/material-library-content.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "1df39caa1676c78099ad82ee25b6ecd096b658f7"
+    },
+    "server-version/backend/src/__tests__/survey/memorable-code.contract.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "424c082719bc3137576c4009d99ffe1eee6d0a39"
+    },
+    "server-version/backend/src/__tests__/survey/memorable-code.mfa.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f7697356fe1c7ab3ad212754b1b47884ec161acf"
+    },
+    "server-version/backend/src/__tests__/survey/memorable-code.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a8cdb813d3a02ad62b33056e273e80320222bbd9"
+    },
+    "server-version/backend/src/__tests__/survey/project-directory.postgres.integration.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "82b37fbefcd4980a03549338e0d1166c8a0f735d"
+    },
+    "server-version/backend/src/modules/survey/admission.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "275f14608e44e8e7b7aa4facbb4907f2b1ffaac6",
+      "after": "a9547a31d1974927317e21b6b30899863a66ca24"
+    },
+    "server-version/backend/src/modules/survey/identity.service.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5259c9a1d341224b0461a6000a9a1f3869aff529",
+      "after": "f94c37ac94326b27bb3334d359f8d4c4a2389ca6"
+    },
+    "server-version/backend/src/modules/survey/material-library.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "3dcfde9c8b477eacc20b37be9ccaa204327bb37b",
+      "after": "ccea1a7fc78da202a5ebe2e93d3d8887910f9e78"
+    },
+    "server-version/backend/src/modules/survey/memorable-code.crypto.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "002ae2ad3a9632700701ce57ccd30df9ca2dece1"
+    },
+    "server-version/backend/src/modules/survey/memorable-code.rate.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "248c03d1fc9f2c53c218142ba2034da66eb92aff"
+    },
+    "server-version/backend/src/modules/survey/memorable-code.service.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e87c48e49f797a4674972b9900dcc23bc3099c0f"
+    },
+    "server-version/backend/src/modules/survey/project-directory.service.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "c95b19bcd385033d6641740cf2e969485bc14983"
+    },
+    "server-version/backend/src/modules/survey/projects.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cc1d519befdb5ef924fb8537463a3f948c3afe11",
+      "after": "9e5718ea266e6a40223ed6efcac838c9a75ae7ff"
+    },
+    "server-version/backend/src/modules/survey/public.routes.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e096aae18f4f4550e56caf6f69ef3d564675ac48",
+      "after": "091b123e7491143190a35b63f3d31f2a11b0a83b"
+    },
+    "server-version/frontend/src/admin/AdminAuthenticator.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "386dcdd5cab6026270e7c7329a3782f59b4dc802",
+      "after": "01b78742523a4d130b266885d766848eff731533"
+    },
+    "server-version/frontend/src/modules/cognitive/__tests__/GonogoCptFrameTiming.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "220f8bd4c64d53a816735c7b99915fedf1a0ecf9",
+      "after": "7eb711ba0e9f23d0ffb32329a306c429340481a5"
+    },
+    "server-version/frontend/src/modules/cognitive/__tests__/GonogoCptTask.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0a30bd36d3bf5e08688bb52e05a6aa803ba47ac1",
+      "after": "6c97266834e3734db6fb558121e1ae470f2372ff"
+    },
+    "server-version/frontend/src/modules/cognitive/cognitive-surface.css": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "51f4595ddaabd5078219e47998f3ef3111c3b2fc"
+    },
+    "server-version/frontend/src/modules/cognitive/pages/CognitiveRunner.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "92b12e1004e9cd8f68f9a19bff813a11fb007259",
+      "after": "3902c9c6692d85760cca40217ba3b6b3d9a35df0"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/gonogo/GonogoFrameTask.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "7d011726915d477d23f68e1c0fa6236563342203",
+      "after": "b4a692e931fdc70557387c9e6793e87588a71dc4"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/gonogo/GonogoInstructions.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "36865ab8f07bc25451fd25817e1e72710f9668e3"
+    },
+    "server-version/frontend/src/modules/cognitive/tasks/gonogo/GonogoTask.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "727f8068e950bce2774c548d04d5fe58b06d193f",
+      "after": "315a633c53748f865353d596232185cf6a650bd1"
+    },
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.download.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "996056f6ee7a58fc3555ea3c3055643302f782d6",
+      "after": "f3d412713f092055f6293b2e97d9a7ed2d88e99e"
+    },
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.recovery.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b578a8aeddbcf51d5e26558df0f0000d71829e21",
+      "after": "dd2b4e54ff883e28144a6698d1b27903e2ff1423"
+    },
+    "server-version/frontend/src/survey/SurveyAnalyticsWorkspace.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9dbb5c1903b3ace8748ba5e09cf92ac2334ccb83",
+      "after": "a4416e96afb6b285de0f076f6f69be4e7922ca26"
+    },
+    "server-version/frontend/src/survey/SurveyApp.leave-risk.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "2e66caae7e24e0e9eaef67e42460d53b51d4ddda",
+      "after": "592b0584e28586c532906d3fb6e99a3b7c38e3fd"
+    },
+    "server-version/frontend/src/survey/SurveyApp.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a5f041f688c20e08aadf5a2824241e8ff07edd69",
+      "after": "7e309807aabf3d72b6c6fc2eef90c92744cd62a1"
+    },
+    "server-version/frontend/src/survey/SurveyCognitiveUnit.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "9bdb6140371e0b09a2a20d23f31e6baa82e8cbf4",
+      "after": "76eaa56690d61f06cd5b0f8aa2317b4e34c0aefb"
+    },
+    "server-version/frontend/src/survey/SurveyMaterialLibrary.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "8a529a63eeea03fc3e2574f308facab7baf21940",
+      "after": "473cb0c1b4f8e026d43f59fb7687313f8c9e525a"
+    },
+    "server-version/frontend/src/survey/SurveyMaterialLibrary.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "064c70a8fe545efc36ffd34ed271ef251ab104db",
+      "after": "0ff4d98879342f67c2384cbc745fc904ab2598ec"
+    },
+    "server-version/frontend/src/survey/SurveyMemorableCode.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "8014ca68cb9045a95d7b64c805f572555ca3ef0d"
+    },
+    "server-version/frontend/src/survey/SurveyParticipationSettings.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "4443775fd5d9d1ddd67dcaea3e79c71ec0254b12"
+    },
+    "server-version/frontend/src/survey/SurveyPersonalLink.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "231ff084b54d9ab803a883cee04decd1c6dae266"
+    },
+    "server-version/frontend/src/survey/SurveyProjectDirectory.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "e153128258659677da3f6026469aaa62a6d1b858",
+      "after": "129ef9ba9585c4d67061c330d9570632e62927db"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.cognitive.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "304e60de1a596d76fc6c7aabaef94b8c8c725093",
+      "after": "09c2c3106cf2c5aa579f517ce718e1bb98862942"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.final.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "cb59e4ac10453054ad905afebec9d5cd010bff4e",
+      "after": "aba2071c2d24066200d447a947899a124c24b203"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.group-ip.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "5cf3fce83661b3f2506ecf84c26830d396872486",
+      "after": "058f067481f53e56a653d486583128aadc6cbe56"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.memorable.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "1ea9a81f5535244e49e51c78725933567071caee"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.personal-link.test.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "dd84f6fecef0593924c04ea0790621ad33f21aae"
+    },
+    "server-version/frontend/src/survey/SurveyPublicApp.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c8cdf06fe7a8102a63d17115ff0fa6915a640758",
+      "after": "cd1b267b7ea862b4628540854f455775a8a0f967"
+    },
+    "server-version/frontend/src/survey/SurveyRandomCodeEntry.tsx": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "014be7a1a42a1e84ff1a57bac4c0613dd052cc83"
+    },
+    "server-version/frontend/src/survey/SurveyReportStudio.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "6f71e7b4697d6aa76bdeb95121ddd9f7555062fa",
+      "after": "1f81576749febc0a9a854f7daa8d4f4c6fb8f559"
+    },
+    "server-version/frontend/src/survey/SurveyReportStudio.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b0a5037157a24f9776d44e5ccf953561444729c6",
+      "after": "511b2317daebb95e82dd0e9bd6fee321e46c6bc7"
+    },
+    "server-version/frontend/src/survey/SurveyTimedScale.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "4e56188ef78068d54ac2e1dfd4fa0332c4b9ba18",
+      "after": "defb8bc3fb911cdfcb9ff9a4d16f6a05307d655c"
+    },
+    "server-version/frontend/src/survey/SurveyTimedScale.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "99a98c4fd6c0316c362db261b985d16cb857f9e8",
+      "after": "aa219d53091998f6406217384952914c6475f744"
+    },
+    "server-version/frontend/src/survey/SurveyToolLibrary.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "d0efbc75df35b7f10e9f3315171bcfde8a964b6a",
+      "after": "d77b52181025abb0bac98898f316d970182ff649"
+    },
+    "server-version/frontend/src/survey/SurveyToolLibrary.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "af83dbff455ab5fd958e0dbca7a0e72c096468fb",
+      "after": "adaa5f5d984d1095864c2538e091d0cbaa688f8d"
+    },
+    "server-version/frontend/src/survey/SurveyWaveStudio.links.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "80639dbc659b1045b3f9328a0e4d8228d7c54c91",
+      "after": "84ea5d5c35bd8d8eef44b686675c627e3ef96893"
+    },
+    "server-version/frontend/src/survey/SurveyWaveStudio.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f6e2d3cb1b8f022121d7b2878a28a41d645be13b",
+      "after": "a3016dcdc36f3038c49262f57ad5c56fad23f11a"
+    },
+    "server-version/frontend/src/survey/SurveyWorkspace.directory.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "b8a951a448b524e4b2c343d5c3302b3b0b9dee85",
+      "after": "b69f53e1e06f5bcc5a6649fd93737b95a0856b1d"
+    },
+    "server-version/frontend/src/survey/SurveyWorkspace.lifecycle.test.tsx": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "c5428724598fb424826573ee1cd8ddbf28f0a046",
+      "after": "46fd56d94e8997cdc42916d63ed2e7735d45873e"
+    },
+    "server-version/frontend/src/survey/participant-loading.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e0bd0045d3d12a390de961473f0a21d6a48ddce5"
+    },
+    "server-version/frontend/src/survey/participant-loading.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "a6ca93a5e6cc321d954e181333e208b1130a968a"
+    },
+    "server-version/frontend/src/survey/personal-participation-link.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "860fdb11e080f81df848d037c95b417025a6652b"
+    },
+    "server-version/frontend/src/survey/personal-participation-link.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "8834067b136d8d91f5afeb0d6e4f5a95724ca9e1"
+    },
+    "server-version/frontend/src/survey/readable-answer-export.test.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f90e5faab7bddcc6803eb90057de548e3c889538"
+    },
+    "server-version/frontend/src/survey/readable-answer-export.ts": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "ea7eaedf95710a9d6dce8926adf548629f124e80"
+    },
+    "server-version/frontend/src/survey/survey-cognitive-local.ts": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "0afc414c457c75d1bc6c9604821071f76221a880",
+      "after": "e8b7d1d75aa7a54a3afdd4757b9cce6859a8863a"
+    },
+    "server-version/frontend/src/survey/survey-landing.css": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "fe472f80d4fb8450dc18bd7e19eabadcac179ecb",
+      "after": "cf054ea1d335ac9fde29a0a6942ee122385e2c7f"
+    },
+    "server-version/frontend/src/survey/survey-material-library-polish.css": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "6d7ce02fa040c67aaa56e53b06b40e127eb4e279"
+    },
+    "server-version/frontend/src/survey/survey-participant-polish.css": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "1de320386a4fa7cc908593f92566457a9c7e2979"
+    },
+    "server-version/frontend/src/survey/survey-participant.css": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "f0263d1b9be2092ac894281dcae4ed648c11687a",
+      "after": "02f5586a2f48a575748f66201a4bc04370da2a2c"
+    },
+    "server-version/frontend/src/survey/survey-project-directory.css": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "79328d4cb1511946adf43fd9d30f7535d1db82bd"
+    },
+    "server-version/frontend/src/survey/survey-publish.css": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "f9b3bae9313c6a4f8fe781cb42383e309b64cf9f"
+    },
+    "server-version/frontend/src/survey/survey-study-workflows.css": {
+      "status": "M",
+      "oldMode": "100644",
+      "newMode": "100644",
+      "before": "a4718ded4e037e04b3854461a206ffff6a227abd",
+      "after": "bc3365b2c5f1587404751cceb08abd52e75e5f07"
+    },
+    "server-version/frontend/src/survey/survey-tool-library-polish.css": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "470c7736529d6c599f47d21c09f20b5ff9c31f7f"
+    },
+    "server-version/frontend/src/survey/survey-workspace-polish.css": {
+      "status": "A",
+      "oldMode": "000000",
+      "newMode": "100644",
+      "before": null,
+      "after": "e2a8f297daaee20ffd38c0bce08a7ed512f1d9f8"
+    }
+  },
+  "controls": [
+    ".github/scripts/survey-review-bindings.json",
+    ".github/scripts/survey-review-scope.mjs",
+    ".github/scripts/survey-review-checks.mjs",
+    ".github/scripts/survey-review.test.mjs",
+    ".github/evidence/survey-review/final-local.json",
+    ".github/scripts/content-scope.mjs",
+    ".github/scripts/merge-gate.mjs",
+    ".github/workflows/ci.yml",
+    "docs/release/README.md"
+  ],
+  "controlBefore": {
+    ".github/scripts/content-scope.mjs": "4b2a9c947fcd67b25b2a4f13b84ee385353afcc0",
+    ".github/scripts/merge-gate.mjs": "81f84169349c175c032478f3b711caf24762bdfb",
+    ".github/workflows/ci.yml": "44a500ee296077392d1c630a784379b076b6d276",
+    "docs/release/README.md": "563b99298f5869fcdc3d1e1ce5a72c986dfc06bb"
+  },
+  "components": {
+    "frontend": "526c5bb7e82f238e20b5fc0bdd5dc469f248be89",
+    "backend": "f9799a5560fc0c01fd9af8fde67599dba2a4d614"
+  },
+  "protectedInputs": {
+    "server-version/frontend/package.json": "41eaa68acf3f387f2e6ecbdfa697947232fe1fda",
+    "server-version/frontend/package-lock.json": "38d624d2dd610673f9392a89af7290682862e2b0",
+    "server-version/backend/package.json": "033398f6361b0e4217226ae00f2edc2ed3380ecd",
+    "server-version/backend/package-lock.json": "73607721290dd28f1c6f85d5e12d5d517926ede3",
+    "server-version/frontend/tsconfig.app.json": "990a9f4222f2330106b8141fe5658283326e49df",
+    "server-version/frontend/tsconfig.cognitive.json": "910e97700f25652bc1d80ada47e176cbd51c2fbe",
+    "server-version/frontend/vitest.config.ts": "ade584b75aa5ea3755ccb38e3b33fc8607e87ec7",
+    "server-version/backend/tsconfig.json": "246383a71a5c4c979ffd01fdf011ebeb21e71a1d",
+    "server-version/backend/vitest.config.ts": "619cca9b71a3046d22f1e8bcbcf59eaea5f0b406"
+  },
+  "evidenceSHA256": "c29bd1f52c401437e81e4e6cec10bded530432c60dcd32697a5f29ef12b3b568",
+  "checks": {
+    "frontendTestFiles": [
+      "src/modules/cognitive/__tests__/GonogoCptFrameTiming.test.tsx",
+      "src/modules/cognitive/__tests__/GonogoCptTask.test.tsx",
+      "src/survey/SurveyAnalyticsWorkspace.download.test.tsx",
+      "src/survey/SurveyAnalyticsWorkspace.recovery.test.tsx",
+      "src/survey/SurveyApp.admin-entry.test.tsx",
+      "src/survey/SurveyApp.entry.test.tsx",
+      "src/survey/SurveyApp.leave-risk.test.tsx",
+      "src/survey/SurveyCognitiveRunner.integration.test.tsx",
+      "src/survey/SurveyCognitiveUnit.test.tsx",
+      "src/survey/SurveyFormPagination.test.tsx",
+      "src/survey/SurveyMaterialLibrary.test.tsx",
+      "src/survey/SurveyMatrixNames.test.tsx",
+      "src/survey/SurveyMeasurement.extension.test.tsx",
+      "src/survey/SurveyPublicApp.cognitive.test.tsx",
+      "src/survey/SurveyPublicApp.group-ip.test.tsx",
+      "src/survey/SurveyPublicApp.memorable.test.tsx",
+      "src/survey/SurveyPublicApp.personal-link.test.tsx",
+      "src/survey/SurveyQuestionnaireSelection.test.tsx",
+      "src/survey/SurveyReportStudio.test.tsx",
+      "src/survey/SurveyTimedScale.test.tsx",
+      "src/survey/SurveyToolCardRename.test.tsx",
+      "src/survey/SurveyToolLibrary.test.tsx",
+      "src/survey/SurveyWaveStudio.content.test.tsx",
+      "src/survey/SurveyWaveStudio.feedback.test.tsx",
+      "src/survey/SurveyWaveStudio.group-ip.test.tsx",
+      "src/survey/SurveyWaveStudio.links.test.tsx",
+      "src/survey/SurveyWaveStudio.preview.test.tsx",
+      "src/survey/SurveyWorkspace.directory.test.tsx",
+      "src/survey/SurveyWorkspace.lifecycle.test.tsx",
+      "src/survey/SurveyWorkspace.loading.test.tsx",
+      "src/survey/SurveyWorkspace.performance.test.tsx",
+      "src/survey/SurveyWorkspace.requests.test.tsx",
+      "src/survey/participant-loading.test.ts",
+      "src/survey/personal-participation-link.test.ts",
+      "src/survey/readable-answer-export.test.ts"
+    ],
+    "backendTestFiles": [
+      "src/__tests__/parent-portal/routes.test.ts",
+      "src/__tests__/survey/group-ip-rate.contract.test.ts",
+      "src/__tests__/survey/material-authorization.test.ts",
+      "src/__tests__/survey/material-library-content.test.ts",
+      "src/__tests__/survey/material-library-grants.test.ts",
+      "src/__tests__/survey/material-library-upload.test.ts",
+      "src/__tests__/survey/memorable-code.contract.test.ts",
+      "src/__tests__/survey/memorable-code.mfa.test.ts",
+      "src/__tests__/survey/memorable-code.postgres.integration.test.ts",
+      "src/__tests__/survey/project-directory.postgres.integration.test.ts",
+      "src/__tests__/survey/public-scale-media.test.ts",
+      "src/__tests__/survey/research-cognitive-lifecycle-query.contract.test.ts",
+      "src/__tests__/survey/research-final-locator.contract.test.ts",
+      "src/__tests__/survey/research-request-local-final.contract.test.ts",
+      "src/__tests__/survey/task-options-performance.test.ts"
+    ]
+  },
+  "original": {
+    "run": 40070223303,
+    "source": "a70ce6a9927d3de4c092494b9739f04ec15724f1",
+    "backendJob": 120801920747,
+    "frontendJob": 120801921018
+  },
+  "frontendLintChanged": [
+    "src/survey/SurveyPublicApp.tsx",
+    "src/survey/SurveyPublicApp.final.test.tsx"
+  ]
+}
