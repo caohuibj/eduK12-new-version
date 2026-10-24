@@ -469,20 +469,28 @@ const CompositeAssessmentContent: React.FC = () => {
     navigate(result.context.target)
   }
 
+  if (loading && publicMode) return <section className="mx-auto max-w-xl rounded-xl border bg-white p-8" aria-label="正在恢复匿名测评"><p role="status">正在核对本次作答与恢复凭据，请稍候…</p><p className="mt-2 text-sm text-gray-600">无需学员账号登录；这不会自动创建另一份作答。</p></section>
   if (loading) return <div className="flex items-center justify-center h-64 text-gray-500">加载中...</div>
 
   if (publicMode && !state) {
     return (
-      <div className="max-w-xl mx-auto card p-8">
+      <div className="max-w-xl mx-auto card space-y-4 p-6 sm:p-8" aria-busy={submitting}>
+        <p className="text-sm font-medium text-action">培训匿名测评 · 无需学员账号登录</p>
         <LockKeyhole className="w-10 h-10 text-action mx-auto mb-4" />
         <h1 className="text-2xl font-bold text-center text-gray-800 mb-2">{publicInfo?.name || '公开综合测评'}</h1>
-        <p className="text-gray-600 whitespace-pre-wrap mb-6">{publicInfo?.instruction || publicInfo?.description || '完成后可分别查看量表反馈和认知任务结果。'}</p>
-        <label className="block text-sm text-gray-600 mb-2">已有恢复凭证？</label>
-        <input value={recoveryInput} onChange={(event) => setRecoveryInput(event.target.value)} className="w-full border rounded px-3 py-2 mb-4" placeholder="粘贴保存时获得的恢复凭证（可选）" />
-        {error && <p role="alert" className="text-red-500 text-sm mb-4">{error}</p>}
+        <p className="text-gray-600 whitespace-pre-wrap mb-6">{publicInfo?.instruction || publicInfo?.description || '请按页面提示完成作答。报告将按本测评的生成状态和开放权限显示。'}</p>
+        <section aria-label="恢复本次匿名作答" className="space-y-2 rounded-xl border bg-gray-50 p-4">
+          <h2 className="font-semibold">已经参加过？继续原作答</h2>
+          <label htmlFor="training-anonymous-recovery" className="block text-sm text-gray-600">已有恢复凭证？</label>
+          <input id="training-anonymous-recovery" type="password" autoComplete="off" spellCheck={false} aria-describedby="training-anonymous-recovery-help" disabled={submitting} value={recoveryInput} onChange={(event) => setRecoveryInput(event.target.value)} className="w-full border rounded px-3 py-2" placeholder="粘贴保存时获得的恢复凭证（可选）" />
+          <p id="training-anonymous-recovery-help" className="text-sm text-gray-600">仅恢复本次作答及按权限开放的报告，不建立账号，也不会自动关联其他培训或问卷。请使用原凭据，不要重新开始来寻找旧记录。</p>
+        </section>
+        {error && <p role="alert" className="rounded-lg border border-red-200 bg-red-50 p-3 text-red-700 text-sm">{error}。请保留原恢复凭据，未能读取不代表原答案已丢失。</p>}
+        {submitting && <p role="status" className="text-sm text-gray-600">正在确认本次进入请求，请勿重复点击或重新领取。</p>}
         {!params.attemptId && !publicInfo && <p className="mb-4 text-sm">当前入口不能开始新作答。已有恢复凭证可继续尝试恢复原记录。</p>}
         {publicInfo?.groupIpWindow && <p className="mb-4 text-sm">同 IP 集体作答窗口：{new Date(publicInfo.groupIpWindow.opensAt).toLocaleString()} 至 {new Date(publicInfo.groupIpWindow.closesAt).toLocaleString()}（{Intl.DateTimeFormat().resolvedOptions().timeZone}），最长 48 小时。到期不再接受新参与者；已有恢复凭证仍按原作答规则恢复。轮次提示不能代替凭证。</p>}
         {publicInfo?.studyEntryPath && <Link className="block mb-4 text-action" to={publicInfo.studyEntryPath}>选择单次访客或保存研究内身份码</Link>}
+        {!params.attemptId && publicInfo && !recoveryInput.trim() && <p className="text-sm text-gray-600">首次参加可点击下方按钮开始。进入后请先保存专属恢复链接。</p>}
         <button
           onClick={() => {
             const credential = recoveryInput.trim()
@@ -570,7 +578,7 @@ const CompositeAssessmentContent: React.FC = () => {
         <button onClick={() => void saveAndExit()} className="btn-secondary"><Save className="w-4 h-4 inline mr-1" />保存并退出</button>
       </div>
       <div className="w-full bg-gray-200 rounded-full h-2 mb-5"><div className="bg-action h-2 rounded-full" style={{ width: `${state.progress}%` }} /></div>
-      {publicMode && (newRecoveryToken || recoveryToken) && <div className="bg-amber-50 border border-amber-200 rounded p-3 mb-5 text-sm text-amber-800">匿名编号：<strong>{state.anonymousCode || '匿名参与者'}</strong>。请保存恢复凭证：<code className="break-all">{newRecoveryToken || recoveryToken}</code></div>}
+      {publicMode && (newRecoveryToken || recoveryToken) && <div className="bg-amber-50 border border-amber-200 rounded p-3 mb-5 text-sm text-amber-800">匿名编号：<strong>{state.anonymousCode || '匿名参与者'}</strong>。请通过上方“保存本次匿名作答的恢复链接”保管本人凭据；未提交草稿仍受本机保存规则限制。</div>}
       {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
       {current?.type === 'COGNITIVE' && <div className="card p-8 text-center"><h2 className="text-xl font-semibold mb-3">{state.items[state.currentIndex]?.label || '认知任务'}</h2><p className="text-gray-600 mb-6">完成该认知任务后会自动回到综合测评。</p><button onClick={() => enterChild(current)} className="btn-primary">开始/继续认知任务</button></div>}

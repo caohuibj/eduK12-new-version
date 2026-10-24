@@ -318,6 +318,16 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     } finally { setExiting(false) }
   }
 
+  // Presentation-only guidance; validation and sealed submission remain unchanged.
+  const focusAnonymousRequired = (key: string) => {
+    if (!publicMode) return
+    window.requestAnimationFrame(() => {
+      const target = document.getElementById(`training-anonymous-required:${state.id}:${key}`)
+      target?.focus({ preventScroll: true })
+      target?.scrollIntoView?.({ block: 'center' })
+    })
+  }
+
   const submitSection = async () => {
     if (!item || item.type !== 'FORM_SECTION' || !sectionId || !draftKey || !meta || submitting || checkpointBusy) return
     const formAnswers = item.formAnswers || (item.answers || []).filter((answer) => Boolean(answer.formItemId)).map((answer) => ({
@@ -335,6 +345,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     const missing = visibleAnswers.filter((answer) => answer.required && emptyValue(formValues[answer.formItemId]))
     if (missing.length > 0) {
       setSectionIndex(Math.max(0, visibleAnswers.findIndex((answer) => answer.required && emptyValue(formValues[answer.formItemId]))))
+      focusAnonymousRequired(missing[0].formItemId)
       setError(`还有 ${missing.length} 个必填字段未完成`)
       return
     }
@@ -405,6 +416,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     const missing = items.filter((question) => question.required && scaleValues[question.itemCode] === undefined)
     if (missing.length > 0) {
       setScaleIndex(Math.max(0, items.findIndex((question) => question.required && scaleValues[question.itemCode] === undefined)))
+      focusAnonymousRequired(missing[0].itemCode)
       setError(`还有 ${missing.length} 道必答题未作答`)
       return
     }
@@ -477,6 +489,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     }
   }
 
+  if (loadingDraft && publicMode) return <p role="status" className="p-6 text-gray-600">正在恢复此浏览器中仍有效的匿名作答草稿，请稍候…</p>
   if (loadingDraft) return <div className="flex h-64 items-center justify-center text-gray-500">正在恢复本地草稿...</div>
   if (state.status === 'COMPLETED') return null
 
@@ -514,7 +527,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
           {state.instruction ? <p>{state.instruction}</p> : null}
           <p>当前单元：{currentUnit?.label || item?.type || '—'}</p>
           {expiredCognitive ? <p>请先处理本机认知试次过期状态，已接受的单元记录不受影响。</p>
-            : <p>{contextText} 浏览器重开后可以继续恢复。</p>}
+            : <p>{contextText} {publicMode?'仅可恢复此浏览器中仍有效的本机草稿；换设备需要已启用并成功保存的临时进度。参与链接本身不包含未提交答案。':'浏览器重开后可以继续恢复。'}</p>}
         </div>
       )}
       progress={{ kind: 'count', completed: state.completedItems, total: state.totalItems, label: '综合测评单元进度' }}
@@ -624,7 +637,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
             const imageItems = assessmentOptionImageItems(options)
             const videoEntries = formOptionVideoPresentations(options)
             return (
-              <div key={field.formItemId}><TrainingMaterials items={field.formDefinition?.materials} loadAsset={loadAssessmentImage}/><AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${field.label} 选项视觉内容`}>
+              <div key={field.formItemId} id={publicMode ? `training-anonymous-required:${state.id}:${field.formItemId}` : undefined} tabIndex={publicMode ? -1 : undefined}><TrainingMaterials items={field.formDefinition?.materials} loadAsset={loadAssessmentImage}/><AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${field.label} 选项视觉内容`}>
                 <FormOptionVideoGroupGate
                   entries={videoEntries}
                   loadSources={(entry) => loadCompositeVideoCapability(`${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/form-sections/${encodeURIComponent(sectionId || item.id)}/items/${encodeURIComponent(field.formItemId)}/options/${entry.optionIndex}/video-capability`)}
@@ -678,7 +691,7 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
             const imageItems = assessmentImageItems(question.images)
             const videoPresentation = scaleItemVideoPresentation(question)
             return (
-              <div key={question.itemCode}><TrainingMaterials items={question.materials} loadAsset={loadAssessmentImage}/><AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${question.content} 视觉内容`}>
+              <div key={question.itemCode} id={publicMode ? `training-anonymous-required:${state.id}:${question.itemCode}` : undefined} tabIndex={publicMode ? -1 : undefined}><TrainingMaterials items={question.materials} loadAsset={loadAssessmentImage}/><AssessmentImageGate items={imageItems} loadAsset={loadAssessmentImage} disabled={submitting} ariaLabel={`${question.content} 视觉内容`}>
                 <ScaleFormVideoGate
                   presentation={videoPresentation}
                   loadSources={() => loadCompositeVideoCapability(`${publicMode ? '/api/public/composite-assessments' : '/api/composite-assessments'}/attempts/${encodeURIComponent(state.id)}/items/${encodeURIComponent(item.id)}/scale/items/${encodeURIComponent(question.itemCode)}/video-capability`)}

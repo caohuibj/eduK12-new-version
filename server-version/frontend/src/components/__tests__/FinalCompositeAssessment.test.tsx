@@ -437,3 +437,24 @@ it('clears hidden selected Other and late same-frame text when a source changes'
  await waitFor(async()=>{const rows=await finalDraftStore.listAnswers('composite-form-section:composite-attempt-1:composite-form-section-1');expect(rows.some(r=>r.itemKey==='other-frame'||r.itemKey==='other-frame:other')).toBe(false);expect(rows.find(r=>r.itemKey==='source-frame')?.value).toBe('no')})
  await userEvent.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1));expect(submit.mock.calls[0][2].answers).toEqual([{formItemId:'source-frame',value:'no'}])
 })
+
+it('focuses the first missing anonymous whole-page scale answer without sending a FINAL',async()=>{
+ const first=scaleItem.scale!.definition!.items[0]
+ const current:CompositeCurrentItem={...scaleItem,presentationMode:'ALL_AT_ONCE',scale:{...scaleItem.scale!,definition:{...scaleItem.scale!.definition!,items:[first,{...first,itemCode:'item-2',content:'第二道必答题',sortOrder:1}]}}}
+ const submit=vi.fn()
+ render(<FinalCompositeAssessment {...sharedProps} state={makeState(current)} publicMode recoveryToken="synthetic-recovery" submitScale={submit} submitFormSection={vi.fn()}/>);
+ await userEvent.click(await screen.findByRole('button',{name:'提交整份量表'}))
+ await waitFor(()=>expect(document.getElementById('training-anonymous-required:composite-attempt-1:item-1')).toHaveFocus())
+ expect(screen.getByRole('alert')).toHaveTextContent('还有 2 道必答题未作答')
+ expect(submit).not.toHaveBeenCalled()
+ expect(screen.getByText(/仅可恢复此浏览器中仍有效的本机草稿/)).toBeInTheDocument()
+})
+it('focuses the missing anonymous form field without changing required validation or submitting',async()=>{
+ const current:CompositeCurrentItem={...formItem,formAnswers:[{...formItem.formAnswers![0],required:true}]}
+ const submit=vi.fn()
+ render(<FinalCompositeAssessment {...sharedProps} state={makeState(current)} publicMode recoveryToken="synthetic-recovery" submitScale={vi.fn()} submitFormSection={submit}/>);
+ await userEvent.click(await screen.findByRole('button',{name:'提交整个区段'}))
+ await waitFor(()=>expect(document.getElementById('training-anonymous-required:composite-attempt-1:form-item-1')).toHaveFocus())
+ expect(screen.getByRole('alert')).toHaveTextContent('还有 1 个必填字段未完成')
+ expect(submit).not.toHaveBeenCalled()
+})

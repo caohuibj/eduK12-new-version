@@ -133,3 +133,22 @@ describe('whole questionnaire durable browser submission', () => {
   })
 
 })
+
+it('returns focus to the first missing anonymous whole-questionnaire answer without submitting',async()=>{
+ const client=api();client.wholeDefinition.mockResolvedValue({code:0,data:definition([2])})
+ render(<WholeCompositeQuestionnaire state={state} api={client} publicMode recoveryToken="synthetic-recovery" fallback={<p>fallback</p>} onCompleted={vi.fn()} onExit={vi.fn()}/>);
+ fireEvent.click(await screen.findByRole('button',{name:'下一题'}))
+ fireEvent.click(screen.getByRole('button',{name:'提交整份问卷'}))
+ await waitFor(()=>expect(document.getElementById('training-anonymous-whole-required:whole-attempt')).toHaveFocus())
+ expect(screen.getByText('整卷第 1 / 2 题')).toBeInTheDocument()
+ expect(client.submitWhole).not.toHaveBeenCalled()
+})
+it('keeps anonymous receipt success distinct from report release and does not repeat the raw credential',async()=>{
+ const d=definition([1]),client=api();client.wholeDefinition.mockResolvedValue({code:0,data:d});await seed(d)
+ render(<WholeCompositeQuestionnaire state={state} api={client} publicMode recoveryToken="do-not-repeat-recovery" fallback={<p>fallback</p>} onCompleted={vi.fn()} onExit={vi.fn()}/>);
+ fireEvent.click(await screen.findByRole('button',{name:'提交整份问卷'}))
+ expect(await screen.findByText(/报告按生成状态和开放权限显示/)).toBeInTheDocument()
+ expect(screen.queryByText('do-not-repeat-recovery',{exact:true})).not.toBeInTheDocument()
+ expect(screen.getByRole('button',{name:'查看报告进度'})).toBeEnabled()
+ expect(client.submitWhole).toHaveBeenCalledTimes(1)
+})
