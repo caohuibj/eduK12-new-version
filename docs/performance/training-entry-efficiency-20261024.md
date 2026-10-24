@@ -263,3 +263,25 @@ No real browser timing, production capacity, CI qualification, merge or deployme
 is claimed. Mini-program teacher compatibility changes were excluded at the user's
 request; this batch qualifies the web workflow only. Larger future changes to
 limits or ordering require their own evidence, not weakening these guards.
+# Additional local round while PR #348 is paused
+
+Student assignment/check-in detail queries no longer request the submission-count
+aggregate that their responses already omit. Teacher/admin queries and existing
+count-disclosure rules are unchanged; membership and foreign-course checks remain.
+This removes an unused aggregate, not necessarily a whole SQL round trip.
+
+Public check-in instructions are sanitized only when content changes, and immutable
+media presentation components are memoized with source/token/title props. Twenty
+typing events produced zero additional sanitizer or media-parser calls in focused
+tests; task changes still update instructions and media. Media authorization and
+the existing eager signed-asset blob download behavior are unchanged.
+
+Twelve new backend cases and two new frontend cases passed. The initial frontend
+label-locator failure is retained; only its affected case was rerun after correction.
+Lint passed with one verified existing hook-dependency warning. A final React memo
+typing-only adjustment was statically checked against installed types, not reported
+as a fresh runtime test. No new build, full typecheck, browser or CI was run.
+
+These additions are backup-only pending PR #347 integration and final input
+qualification. Prior fixed CI bindings do not qualify this expanded source delta;
+the earlier performance/build figures remain tied to their original candidates.
