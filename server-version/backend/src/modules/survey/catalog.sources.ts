@@ -257,7 +257,9 @@ async function readCatalogSourceSnapshot(input:{actorUserId:string;ref:CatalogSo
     if(ref.sourceId.startsWith('registry:'))pkg=getSituationPackage(ref.sourceId.slice(9),ref.sourceVersion)
     else{
       const row=await db.sjtAuthorRelease.findFirst({where:{id:ref.sourceId,instrumentVersion:ref.sourceVersion,status:'PUBLISHED'}})
-      if(row){pkg=row.package as unknown as SituationPackage
+      if(row){
+        if(row.authorizationPolicy!==null)fail('SOURCE_SJT_AUTHORIZATION_POLICY_UNSUPPORTED')
+        pkg=row.package as unknown as SituationPackage
         const checked=validateSituationPackage(pkg)
         if(!checked.valid||checked.definitionHash!==row.definitionHash||pkg.key!==row.instrumentKey||pkg.instrumentVersion!==row.instrumentVersion)fail('SOURCE_SJT_RELEASE_DIGEST_MISMATCH')}
     }

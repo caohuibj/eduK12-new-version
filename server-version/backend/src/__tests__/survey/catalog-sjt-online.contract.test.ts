@@ -5,11 +5,11 @@ import { normalizeSituationalResponses } from '../../modules/situational/situati
 import { projectReachableSituationDefinitionForScoring, deriveAuthoritativeSituationalTrajectory } from '../../modules/situational/situation-trajectory'
 import { scoreSituationalModel } from '../../modules/situational/situation-model-resolver'
 import { canonicalHash } from '../../modules/assessment-runtime/canonical'
-import { adaptCatalogSjt, catalogAdapterForRecheck, ONLINE_SJT_ADAPTER_VERSION, CATALOG_ADAPTER_VERSION } from '../../modules/survey/catalog.sources'
+import { adaptCatalogSjt, getCatalogSourceSnapshot, catalogAdapterForRecheck, ONLINE_SJT_ADAPTER_VERSION, CATALOG_ADAPTER_VERSION } from '../../modules/survey/catalog.sources'
 import { compileCatalogUnit } from '../../modules/survey/catalog.service'
 import { computeSurveyFinal } from '../../modules/survey/final.compute'
 import type { ResearchFrozenPublication } from '../../modules/survey/publication.service'
-import type { SituationPackage } from '../../modules/situational/situation-package'
+import { validateSituationPackage, type SituationPackage } from '../../modules/situational/situation-package'
 import { getOwnResearchTask } from '../../modules/survey/task.public'
 const h = vi.hoisted(() => ({ own: vi.fn() }))
 vi.mock('../../modules/survey/admission.service', () => ({ verifiedSurveyAttempt: h.own }))
@@ -90,5 +90,26 @@ describe('authorized online SJT uses the shared Training protocol core', () => {
     expect(old.adapterVersion).toBe(CATALOG_ADAPTER_VERSION)
     expect(current.adapterVersion).toBe(ONLINE_SJT_ADAPTER_VERSION)
     expect(catalogAdapterForRecheck(current, old)).toEqual(old)
+  })
+})
+
+
+describe('Survey catalog does not widen Training course-scoped authorization', () => {
+  const sourceDatabase = (authorizationPolicy: unknown) => {
+    const pkg = published()
+    return { $queryRaw: vi.fn().mockResolvedValue([]), sjtAuthorRelease: { findFirst: vi.fn().mockResolvedValue({
+      id: ref.sourceId, package: pkg, status: 'PUBLISHED', instrumentKey: pkg.key, instrumentVersion: pkg.instrumentVersion,
+      definitionHash: validateSituationPackage(pkg).definitionHash, authorizationPolicy,
+    }) } }
+  }
+  it.each(['COURSE_GRANT_V1', 'FUTURE_POLICY', undefined])('rejects restricted or unknown policy %s before catalog adaptation', async policy => {
+    const db = sourceDatabase(policy)
+    await expect(getCatalogSourceSnapshot({ actorUserId: 'survey-admin', ref }, db as never)).rejects.toThrow('SOURCE_SJT_AUTHORIZATION_POLICY_UNSUPPORTED')
+  })
+  it('accepts an explicitly unrestricted published release while preserving exact source identity', async () => {
+    const db = sourceDatabase(null)
+    const result = await getCatalogSourceSnapshot({ actorUserId: 'survey-admin', ref }, db as never)
+    expect(result.adapterVersion).toBe(ONLINE_SJT_ADAPTER_VERSION)
+    expect(db.sjtAuthorRelease.findFirst).toHaveBeenCalledWith({ where: { id: ref.sourceId, instrumentVersion: ref.sourceVersion, status: 'PUBLISHED' } })
   })
 })
