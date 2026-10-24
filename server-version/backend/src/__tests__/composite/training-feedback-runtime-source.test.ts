@@ -24,7 +24,7 @@ describe('C22 runtime wiring source contracts (not concurrency/HTTP evidence)', 
     for (const [file, methods] of [
       ['controllers/scaleController.ts', ['submitFinalAssessment']],
       ['controllers/situationalController.ts', ['submitFinal']],
-      ['modules/composite/composite.controller.ts', ['submitEmbeddedSituational', 'publicSubmitEmbeddedSituational', 'submitFinalScale', 'publicSubmitFinalScale']],
+      ['modules/composite/composite.controller.ts', ['submitEmbeddedSituational', 'publicSubmitEmbeddedSituational']],
       ['modules/cognitive/cognitive.controller.ts', ['submitSessionFinal']],
     ] as const) {
       const source = read(file)
@@ -34,6 +34,16 @@ describe('C22 runtime wiring source contracts (not concurrency/HTTP evidence)', 
         expect(source.slice(start, source.indexOf('\n  },', start))).toContain('projectRelationalUnitFinalResponse(')
       }
     }
+    const controller = read('modules/composite/composite.controller.ts')
+    for (const method of ['submitFinalScale', 'publicSubmitFinalScale']) {
+      const start = controller.indexOf(`async ${method}(`)
+      const route = controller.slice(start, controller.indexOf('\n  },', start))
+      expect(route).toContain('submitCompositeScaleFinal(')
+      expect(route).toContain('{ participantProjection: true }')
+    }
+    const scale = read('modules/scale/scale-final-submit.service.ts')
+    const handler = scale.slice(scale.indexOf('export const submitCompositeScaleFinal ='))
+    expect(handler.indexOf('finalizeParentAfterUnitSubmit(result)')).toBeLessThan(handler.indexOf('projectRelationalUnitFinalResponse(attemptId, data'))
     const publicCognitive = read('modules/cognitive/public.service.ts')
     expect(publicCognitive).toContain('return projectRelationalUnitFinalResponse(internalContext.compositeAttemptId, data)')
   })

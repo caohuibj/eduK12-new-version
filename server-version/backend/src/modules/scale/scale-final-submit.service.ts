@@ -1,3 +1,4 @@
+import { projectRelationalUnitFinalResponse } from '../assessment-relational/result-authority'
 import { canStartLibraryCourseScale } from './scale-access'
 import { assertTrainingScaleCollectionAllowed } from './scale-collection-guard'
 import { assertTrainingChildSelected } from '../composite/training-variant-child-scope'
@@ -236,7 +237,8 @@ const finalizeLinkedParent = async (assessment: any): Promise<void> => {
   }
 }
 
-const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, locatedChild?: ScaleAdmissionChildRow) => {
+const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, locatedChild?: ScaleAdmissionChildRow,
+  deferAssessmentResponse?: (build: () => Promise<any>) => void) => {
   const submissionId = validateSubmissionId(input.submissionId)
   // Only the private Composite parent/item lookup supplies this request-local row.
   // Unified submission still performs its normal admission checks and locked reread.
@@ -249,7 +251,9 @@ const submitScaleAssessmentFinalImpl = async (input: FinalScaleSubmitInput, loca
   }))
   if (!child) throw new InstrumentFinalSubmitError('STALE_ATTEMPT', '量表测评记录不存在', 404)
   if (child.runtimeGeneration === 'UNIFIED_V1') {
-    const data = await submitUnifiedScaleAssessmentFinal(input, child)
+    const data = deferAssessmentResponse
+      ? await submitUnifiedScaleAssessmentFinal(input, child, undefined, undefined, deferAssessmentResponse)
+      : await submitUnifiedScaleAssessmentFinal(input, child)
     return {
       ...data,
       internalContext: {
@@ -589,7 +593,10 @@ export const submitCompositeScaleFinal = async (
   itemId: string,
   input: Omit<FinalScaleSubmitInput, 'assessmentId' | 'userId' | 'compositeAttemptId' | 'questionnaireSessionId'>,
   context: { userId?: string | null; recoveryTokenHash?: string },
+  responseOptions?: { participantProjection: true },
 ) => {
+  // Request-local only: never attach this capability to the wire response.
+  let buildAssessment: (() => Promise<any>) | undefined
   const result = await withUnitSubmitAdmission(async () => {
     const child = await measureRequestPhase('final_submit_admission', () => prisma.assessment.findFirst({
       where: { compositeAttemptId: attemptId, compositeItemId: itemId },
@@ -605,9 +612,12 @@ export const submitCompositeScaleFinal = async (
       userId: context.userId,
       compositeAttemptId: attemptId,
       recoveryTokenHash: context.recoveryTokenHash,
-    }, child)
+    }, child, responseOptions?.participantProjection ? build => { buildAssessment = build } : undefined)
   })
-  return stripScaleFinalContext(await finalizeParentAfterUnitSubmit(result))
+  const data = stripScaleFinalContext(await finalizeParentAfterUnitSubmit(result))
+  if (!responseOptions?.participantProjection) return data
+  return projectRelationalUnitFinalResponse(attemptId, data, prisma, buildAssessment
+    ? async () => ({ ...data, assessment: await buildAssessment!() }) : undefined)
 }
 
 /**

@@ -567,9 +567,9 @@ export const compositeController = {
         req.params.itemId,
         input,
         { userId: req.user.userId },
+        { participantProjection: true },
       )
-      const responseData = await projectRelationalUnitFinalResponse(req.params.attemptId, data)
-      return success(res, responseData, data.replayed ? '量表提交已确认' : '量表提交成功')
+      return success(res, data, data.replayed ? '量表提交已确认' : '量表提交成功')
     } catch (err) {
       if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)
@@ -863,9 +863,9 @@ export const compositeController = {
         req.params.itemId,
         input,
         { userId: null, recoveryTokenHash: hashRecoveryToken(recoveryFromRequest(req)) },
+        { participantProjection: true },
       )
-      const responseData = await projectRelationalUnitFinalResponse(req.params.attemptId, data)
-      return success(res, responseData, data.replayed ? '匿名量表提交已确认' : '匿名量表提交成功')
+      return success(res, data, data.replayed ? '匿名量表提交已确认' : '匿名量表提交成功')
     } catch (err) {
       if (isUnitSubmitAdmissionBusyError(err)) return assessmentSubmitBusy(res, err.retryAfterSeconds)
       if (isQuestionnaireCompletionAdmissionBusyError(err)) return completionBusy(res, err.retryAfterSeconds)

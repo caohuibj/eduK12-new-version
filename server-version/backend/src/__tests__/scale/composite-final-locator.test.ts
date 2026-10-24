@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 const { db, unified, selected } = vi.hoisted(() => ({
-  db: { assessment: { findFirst: vi.fn(), findUnique: vi.fn() } }, unified: vi.fn(), selected: vi.fn(),
+  db: { assessment: { findFirst: vi.fn(), findUnique: vi.fn() }, $queryRaw: vi.fn() }, unified: vi.fn(), selected: vi.fn(),
 }))
 vi.mock('../../config/database', () => ({ prisma: db }))
 vi.mock('../../modules/scale/unified-final-submit.service', () => ({ submitUnifiedScaleAssessmentFinal: unified }))
@@ -67,5 +67,28 @@ describe('Composite FINAL request-local child locator', () => {
     await submitScaleAssessmentFinal({ ...input, assessmentId: 'child-1', userId: 'student-1' })
     expect(db.assessment.findFirst).not.toHaveBeenCalled()
     expect(db.assessment.findUnique).toHaveBeenCalledExactlyOnceWith({ where: { id: 'child-1' }, select: UNIFIED_SCALE_CHILD_ADMISSION_SELECT })
+  })
+})
+
+describe('Composite request-local deferred detail capture', () => {
+  it.each(['IN_PROGRESS', 'COMPLETED'])('projects only after durable submission using fresh parent %s', async status => {
+    const detail = vi.fn().mockResolvedValue({ id: 'child-1', result: 'persisted' })
+    unified.mockImplementation(async (_input, _child, _whole, _db, capture) => {
+      expect(db.$queryRaw).not.toHaveBeenCalled()
+      capture(detail)
+      return { submissionId: input.submissionId, payloadHash: 'hash', replayed: true, assessment: null, parent: null }
+    })
+    db.$queryRaw.mockResolvedValue([{ parent: { status, assignmentRef: null }, job: null }])
+    const output = await submitCompositeScaleFinal('parent-1', 'item-1', input, { userId: 'student-1' }, { participantProjection: true })
+    expect(db.$queryRaw).toHaveBeenCalledTimes(status === 'IN_PROGRESS' ? 1 : 2)
+    if (status === 'IN_PROGRESS') {
+      expect(detail).not.toHaveBeenCalled()
+      expect(output).toEqual({ submissionId: input.submissionId, payloadHash: 'hash', replayed: true, completed: true, feedbackDeferred: true })
+    } else {
+      expect(detail).toHaveBeenCalledTimes(1)
+      expect(output.assessment).toEqual({ id: 'child-1', result: 'persisted' })
+    }
+    expect(JSON.stringify(output)).not.toContain('internalContext')
+    expect(Object.values(output).some(value => typeof value === 'function')).toBe(false)
   })
 })
