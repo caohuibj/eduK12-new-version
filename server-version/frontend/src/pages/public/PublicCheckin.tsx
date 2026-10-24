@@ -3,7 +3,7 @@
  * 学生通过令牌访问，无需登录即可打卡
  */
 
-import React, { useEffect, useMemo, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { useParams } from 'react-router-dom'
 import { Image, Upload } from 'antd'
 import type { UploadFile } from 'antd/es/upload/interface'
@@ -126,30 +126,119 @@ const PublicAssetImage = React.memo<{ source: PublicAssetSource; token?: string;
   )
 })
 
-const PublicAssetVideo = React.memo<{ source: PublicAssetSource; token?: string; title: string }>(({ source, token, title }) => {
-  const url = usePublicAssetUrl(source, token)
-  if (!url) return <div className="hui-public-checkin__asset-error">{title}：视频暂不可用</div>
+// Unlike images, protected videos and documents are fetched only after an
+// explicit action. The keyed owner below confines a blob and request to one
+// token/source identity; it is not an authorization or cross-page cache.
+const useActivatedPublicAsset = (directUrl: string, token: string | undefined, expectedAssetId?: string) => {
+  const [state, setState] = useState<{ status: 'idle' | 'loading' | 'ready' | 'error'; url: string }>({ status: 'idle', url: '' })
+  const pending = useRef<AbortController | null>(null)
+  const objectUrl = useRef('')
+  const mounted = useRef(false)
 
+  useEffect(() => {
+    mounted.current = true
+    return () => {
+      mounted.current = false
+      pending.current?.abort()
+      pending.current = null
+      if (objectUrl.current) URL.revokeObjectURL(objectUrl.current)
+      objectUrl.current = ''
+    }
+  }, [])
+
+  const activate = async () => {
+    if (pending.current || objectUrl.current) return
+    const controller = new AbortController()
+    pending.current = controller
+    const isCurrent = () => mounted.current && pending.current === controller && !controller.signal.aborted
+    setState({ status: 'loading', url: '' })
+    try {
+      const parsed = new URL(directUrl, window.location.origin)
+      const assetId = parsed.pathname.split('/')[4]
+      if (!token || !isSafeSignedPublicAssetUrl(directUrl) || (expectedAssetId && expectedAssetId !== assetId)) throw new Error('asset unavailable')
+      const headers = { 'X-Checkin-Token': token }
+      let contentUrl = parsed.pathname + parsed.search
+      // Renew only this attachment, never the detail endpoint: detail creates a
+      // new upload session and must not disturb the current submission session.
+      if (Number(parsed.searchParams.get('expires')) <= Math.floor(Date.now() / 1000)) {
+        const response = await fetch(`/api/public/assets/${assetId}/url`, { headers, signal: controller.signal })
+        if (!response.ok) throw new Error('asset unavailable')
+        const result = await response.json()
+        if (!isCurrent()) return
+        const renewedUrl: unknown = result?.data?.url
+        if (result?.data?.assetId !== assetId || typeof renewedUrl !== 'string' || !isSafeSignedPublicAssetUrl(renewedUrl)) throw new Error('asset unavailable')
+        const renewed = new URL(renewedUrl, window.location.origin)
+        if (renewed.pathname !== parsed.pathname || Number(renewed.searchParams.get('expires')) <= Math.floor(Date.now() / 1000)) throw new Error('asset unavailable')
+        contentUrl = renewed.pathname + renewed.search
+      }
+      if (!isCurrent()) return
+      const response = await fetch(contentUrl, { headers, signal: controller.signal })
+      if (!isCurrent()) return
+      if (!response.ok) throw new Error('asset unavailable')
+      const blob = await response.blob()
+      if (!isCurrent()) return
+      objectUrl.current = URL.createObjectURL(blob)
+      setState({ status: 'ready', url: objectUrl.current })
+    } catch {
+      if (isCurrent()) setState({ status: 'error', url: '' })
+    } finally {
+      if (pending.current === controller) pending.current = null
+    }
+  }
+
+  const cancel = () => {
+    pending.current?.abort()
+    pending.current = null
+    setState({ status: 'idle', url: '' })
+  }
+  return { ...state, activate, cancel }
+}
+
+const PublicVideoPlayer: React.FC<{ url: string; title: string }> = ({ url, title }) => (
+  <div onContextMenu={event => event.preventDefault()}>
+    <video src={url} controls controlsList="nodownload" disablePictureInPicture preload="metadata"
+      onContextMenu={event => event.preventDefault()} poster="/video-error.png" aria-label={title}>
+      您的浏览器不支持视频播放
+    </video>
+  </div>
+)
+
+const ActivatedPublicAsset: React.FC<{ directUrl: string; token?: string; assetId?: string; title: string; kind: 'video' | 'document' }> = ({ directUrl, token, assetId, title, kind }) => {
+  const asset = useActivatedPublicAsset(directUrl, token, assetId)
+  if (asset.status === 'ready') return kind === 'video' ? <PublicVideoPlayer url={asset.url} title={title} /> : (
+    <ProductButton onClick={() => window.open(asset.url, '_blank', 'noopener,noreferrer')} aria-label={`在线查看 ${title}`}>打开文档</ProductButton>
+  )
+  return (
+    <div>
+      {asset.status === 'loading' ? (
+        <>
+          <span role="status">{kind === 'video' ? '视频加载中' : '文档准备中'}…</span>
+          <ProductButton onClick={asset.cancel} aria-label={`取消加载 ${title}`}>取消</ProductButton>
+        </>
+      ) : (
+        <>
+          {asset.status === 'error' && <div role="alert">{title}：加载失败或访问权限已失效，请重试。</div>}
+          <ProductButton onClick={() => void asset.activate()} aria-label={`${asset.status === 'error' ? '重试加载' : kind === 'video' ? '加载视频' : '准备文档'} ${title}`}>
+            {asset.status === 'error' ? '重试' : kind === 'video' ? '加载视频' : '准备文档'}
+          </ProductButton>
+        </>
+      )}
+    </div>
+  )
+}
+
+const protectedAssetKey = (source: PublicAssetSource, url: string, token?: string) => JSON.stringify([token, typeof source === 'string' ? undefined : source.assetId, url])
+
+const PublicAssetVideo = React.memo<{ source: PublicAssetSource; token?: string; title: string }>(({ source, token, title }) => {
+  const url = sourceUrl(source)
+  if (!url) return <div className="hui-public-checkin__asset-error">{title}：视频暂不可用</div>
   return (
     <div className="hui-public-checkin__video">
-      <div className="hui-public-checkin__asset-heading">
-        <Video size={17} aria-hidden="true" />
-        <span>{title}</span>
-      </div>
-      <div onContextMenu={event => event.preventDefault()}>
-        <video
-          src={url}
-          controls
-          controlsList="nodownload"
-          disablePictureInPicture
-          preload="metadata"
-          onContextMenu={event => event.preventDefault()}
-          poster="/video-error.png"
-          aria-label={title}
-        >
-          您的浏览器不支持视频播放
-        </video>
-      </div>
+      <div className="hui-public-checkin__asset-heading"><Video size={17} aria-hidden="true" /><span>{title}</span></div>
+      {isSafeSignedPublicAssetUrl(url) ? (
+        <ActivatedPublicAsset key={protectedAssetKey(source, url, token)} directUrl={url} token={token}
+          assetId={typeof source === 'string' ? undefined : source.assetId} title={title} kind="video" />
+      ) : <PublicVideoPlayer url={url} title={title} />}
     </div>
   )
 })
@@ -168,7 +257,7 @@ const DocumentBody: React.FC<{ title: string; size?: string; available: boolean 
 )
 
 const PublicAssetDocument = React.memo<{ source: PublicAssetSource; token?: string; title: string; size?: string }>(({ source, token, title, size }) => {
-  const url = usePublicAssetUrl(source, token)
+  const url = sourceUrl(source)
   if (!url) {
     return (
       <div className="hui-public-checkin__document hui-public-checkin__document--disabled" aria-disabled="true">
@@ -176,6 +265,14 @@ const PublicAssetDocument = React.memo<{ source: PublicAssetSource; token?: stri
       </div>
     )
   }
+
+  if (isSafeSignedPublicAssetUrl(url)) return (
+    <div className="hui-public-checkin__document">
+      <div className="hui-public-checkin__document-copy"><FileText size={20} aria-hidden="true" /><div><strong>{title}</strong>{size && <small>{size}</small>}</div></div>
+      <ActivatedPublicAsset key={protectedAssetKey(source, url, token)} directUrl={url} token={token}
+        assetId={typeof source === 'string' ? undefined : source.assetId} title={title} kind="document" />
+    </div>
+  )
 
   return (
     <button
