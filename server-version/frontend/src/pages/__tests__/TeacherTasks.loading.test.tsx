@@ -34,7 +34,7 @@ describe('Teacher task loading cost and request isolation', () => {
   })
 
   it('measures same-turn submission opens and status work while typing a batch comment', async () => {
-    const request = pending<{ code: number; data: { list: unknown[] } }>()
+    const request = pending<{ code: number; data: { list: unknown[]; total?: number; gradedCount?: number; ungradedCount?: number; nextCursor?: null } }>()
     let statusReads = 0
     const submissions = Array.from({ length: 10 }, (_, index) => ({
       id: `submission-${index}`, studentId: `student-${index}`, student: { id: `student-${index}`, username: `Student ${index}`, nickname: '' },
@@ -46,7 +46,7 @@ describe('Teacher task loading cost and request isolation', () => {
     const open = await screen.findByRole('button', { name: '查看提交' })
     act(() => { fireEvent.click(open); fireEvent.click(open) })
     const reads = api.get.mock.calls.filter(([url]) => url.endsWith('/submissions')).length
-    await act(async () => request.resolve({ code: 0, data: { list: submissions } }))
+    await act(async () => request.resolve({ code: 0, data: { list: submissions, total: 10, gradedCount: 5, ungradedCount: 5, nextCursor: null } }))
     fireEvent.click(await screen.findByRole('button', { name: '一键批量批复' }))
     const comment = screen.getByPlaceholderText('请输入评语...')
     statusReads = 0
@@ -109,8 +109,8 @@ describe('Teacher task loading cost and request isolation', () => {
   })
 
   it.each(['task', 'other'])('ignores the late response after closing and reopening %s, including its selection', async (nextId) => {
-    const stale = pending<{ code: number; data: { list: unknown[] } }>()
-    const fresh = pending<{ code: number; data: { list: unknown[] } }>()
+    const stale = pending<{ code: number; data: { list: unknown[]; total?: number; gradedCount?: number; ungradedCount?: number; nextCursor?: null } }>()
+    const fresh = pending<{ code: number; data: { list: unknown[]; total?: number; gradedCount?: number; ungradedCount?: number; nextCursor?: null } }>()
     let requests = 0
     api.get.mockImplementation(async (url: string) => url.endsWith('/submissions')
       ? (++requests === 1 ? stale.promise : fresh.promise)
@@ -120,15 +120,16 @@ describe('Teacher task loading cost and request isolation', () => {
     fireEvent.click(opens[0])
     fireEvent.click(await screen.findByRole('button', { name: '关闭练习提交列表' }))
     fireEvent.click(opens[nextId === 'task' ? 0 : 1])
-    const submission = (id: string, username: string) => ({ id, studentId: id, student: { id, username }, status: 'SUBMITTED', submittedAt: '2026-10-01T00:00:00.000Z' })
-    await act(async () => fresh.resolve({ code: 0, data: { list: [submission('fresh', '当前学生')] } }))
+    const submission = (id: string, username: string) => ({ id, revision: 2, studentId: id, student: { id, username }, status: 'SUBMITTED', submittedAt: '2026-10-01T00:00:00.000Z' })
+    await act(async () => fresh.resolve({ code: 0, data: { list: [submission('fresh', '当前学生')], total: 1, gradedCount: 0, ungradedCount: 1, nextCursor: null } }))
     expect(await screen.findByText('当前学生')).toBeInTheDocument()
     await act(async () => stale.resolve({ code: 0, data: { list: [submission('stale', '旧学生')] } }))
     expect(screen.queryByText('旧学生')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: '一键批量批复' }))
-    api.post.mockResolvedValue({ code: 0 })
+    api.post.mockImplementation(async (url: string) => ({ code: 0, data: url.endsWith('/review-selection') ? { count: 1, chunks: ['proof'], selectionId: 's', expiresAt: '' } : { gradedCount: 1, skippedCount: 0 } }))
     fireEvent.click(screen.getByRole('button', { name: '确认批复 (1份)' }))
-    await waitFor(() => expect(api.post).toHaveBeenCalledExactlyOnceWith(`/assignments/${nextId}/submissions/fresh/grade`, expect.any(Object)))
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith(`/assignments/${nextId}/review-selection`, { scope: 'page', items: [{ id: 'fresh', revision: 2 }] }))
+    await waitFor(() => expect(api.post).toHaveBeenCalledWith(`/assignments/${nextId}/batch-grade`, expect.objectContaining({ selectionToken: 'proof' })))
   })
 
   it('shows a nonzero submission read as retryable failure, not an empty list', async () => {
@@ -148,11 +149,11 @@ describe('Teacher task loading cost and request isolation', () => {
 
   it('recomputes grading counts and selection after the post-grade refresh', async () => {
     let graded = false
-    const submission = { id: 'submission', studentId: 'student', student: { id: 'student', username: '学生' }, submittedAt: '2026-10-01T00:00:00.000Z' }
+    const submission = { id: 'submission', revision: 2, studentId: 'student', student: { id: 'student', username: '学生' }, submittedAt: '2026-10-01T00:00:00.000Z' }
     api.get.mockImplementation(async (url: string) => ({ code: 0, data: url.endsWith('/submissions')
-      ? { list: [{ ...submission, status: graded ? 'GRADED' : 'SUBMITTED' }] }
+      ? { list: [{ ...submission, status: graded ? 'GRADED' : 'SUBMITTED' }], total: 1, gradedCount: graded ? 1 : 0, ungradedCount: graded ? 0 : 1, nextCursor: null }
       : { list: [task], total: 1 } }))
-    api.post.mockImplementation(async () => { graded = true; return { code: 0 } })
+    api.post.mockImplementation(async (url: string) => { if (url.endsWith('/review-selection')) return { code: 0, data: { count: 1, chunks: ['proof'], selectionId: 's', expiresAt: '' } }; graded = true; return { code: 0, data: { gradedCount: 1, skippedCount: 0 } } })
     render(<MemoryRouter><AssignmentList embeddedCourse={course}/></MemoryRouter>)
     fireEvent.click(await screen.findByRole('button', { name: '查看提交' }))
     fireEvent.click(await screen.findByRole('button', { name: '一键批量批复' }))
@@ -167,7 +168,7 @@ describe('Teacher task loading cost and request isolation', () => {
   it('ignores an old failure while the replacement request is pending and retries a current network error', async () => {
     let rejectOld!: (error: Error) => void
     const old = new Promise<never>((_resolve, reject) => { rejectOld = reject })
-    const next = pending<{ code: number; data: { list: unknown[] } }>()
+    const next = pending<{ code: number; data: { list: unknown[]; total?: number; gradedCount?: number; ungradedCount?: number; nextCursor?: null } }>()
     let calls = 0
     api.get.mockImplementation(async (url: string) => url.endsWith('/submissions')
       ? ++calls === 1 ? old : calls === 2 ? next.promise : Promise.reject(new Error('网络断开'))
@@ -191,7 +192,7 @@ describe('Teacher task loading cost and request isolation', () => {
 
 
   it('isolates an unmounted review from a new StrictMode mount of the same course', async () => {
-    const old = pending<{ code: number; data: { list: unknown[] } }>()
+    const old = pending<{ code: number; data: { list: unknown[]; total?: number; gradedCount?: number; ungradedCount?: number; nextCursor?: null } }>()
     let calls = 0
     api.get.mockImplementation(async (url: string) => url.endsWith('/submissions')
       ? ++calls === 1 ? old.promise : { code: 0, data: { list: [] } }

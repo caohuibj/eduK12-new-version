@@ -190,3 +190,76 @@ materialize full workbook buffers. Cursor paging must preserve explicit batch
 selection semantics; streaming exports need completeness and failure tests. These
 larger changes are not silently included. Real browser/DB capacity measurements,
 CI qualification, PR merge and deployment remain outside this batch.
+
+## Implemented follow-up: paged review and bounded XLSX exports
+
+This supersedes the earlier deferred-pagination/export note for the web workflow.
+
+### Review and grading
+
+- Submission review defaults to 25 rows (maximum 100) with an immutable ID keyset.
+  The UI describes stable ordering and refresh; it does not claim chronological
+  ordering or a cross-request database snapshot. Counts within each response use
+  the same RepeatableRead transaction.
+- Page selection and all-ungraded selection are separate actions. All-ungraded
+  means the existing status-not-GRADED predicate, including its legacy DRAFT case.
+  Selection captures at most 5,000 IDs and observed revisions in one read; overflow
+  rejects the operation rather than selecting a prefix.
+- Fifteen-minute, actor/assignment-bound HMAC proofs contain at most 100 entries
+  per chunk, with explicit domain separation from session tokens. No answers or
+  persistent access credentials are included. Later arrivals are not members.
+- Grading shares student submission advisory locks and conditionally updates the
+  observed revision/status, incrementing revision. Changed records are skipped,
+  not overwritten. UI reports confirmed applied versus changed/already-processed
+  counts, preserves comments, and retries the uncertain chunk without claiming an
+  identical idempotent response. Single-grade callers can send expectedRevision;
+  older callers omitting it retain weaker stale-UI protection. The independent
+  historical snapshot version sequence is unchanged.
+
+### Export resource and failure contract
+
+- 250-row timestamp/ID keysets capture rows and mapping metadata in a bounded
+  RepeatableRead transaction (5 seconds, 2 seconds maximum acquisition wait).
+  NDJSON is written to a private temporary file. The database connection is
+  released before workbook compression or client download.
+- An isolated ExcelJS 4.4.0 adapter commits rows with checked backpressure, guards
+  pending writes/footer completion, and fails closed on an incompatible library.
+  Shared strings are disabled. A stalled-output test limits producer advancement
+  and queued output rather than treating eventual round-trip success as proof.
+- Existing limits apply: default 10,000 records, 50 MiB, and 2,000 fields (also
+  bounded by Excel limits). One active export per process and a 120-second overall
+  deadline bound concurrent work. Oversized, busy or failed exports return errors;
+  they never silently return a successful partial workbook.
+- Only a completed XLSX receives download headers. Immediately before delivery,
+  the existing authentication and teacher-role policies run again, followed by
+  current ownership checks. Authentication next(error), revoked role/ownership,
+  deletion and expiry all fail closed. Initial route authentication is not repeated
+  unnecessarily at controller entry.
+- Generation, stream, disk, timeout and unfinished-response disconnect paths
+  release temporary resources. Successful response closure is not an abort.
+  Error responses are shown as bounded plain-text JSON messages by the existing
+  frontend export hook; successful downloads still finish after navigation.
+- Columns and visible cell values are retained. Inline empty strings read back as
+  blank/null in ExcelJS rather than its old shared-string empty value; tests record
+  that distinction. Binary-identical workbooks are not claimed.
+
+### Validation boundaries
+
+Backend review unit tests, scoped permission/export consumers, real ExcelJS output,
+slow/stalled/error sinks, cleanup, concurrency admission, caps and authorization
+revocation tests passed. Web paging/selection/retry tests and 18 export-hook tests
+passed; backend and frontend application types and one new-input frontend build
+passed. Changed review-page lint retains four verified pre-existing warnings, with
+no new warnings or rule suppression.
+
+Five isolated PostgreSQL 17.11 tests passed. They execute the actual grading service
+with competing advisory locks, revision conflicts, retries and ownership change,
+and verify frozen selection membership. The export case proves the SQL MVCC
+keyset premise under concurrent mutation; it does not represent full controller
+or production-runtime verification. The student writer is a SQL-equivalent test
+operation, not the complete HTTP submit handler. The server stopped afterward.
+
+No real browser timing, production capacity, CI qualification, merge or deployment
+is claimed. Mini-program teacher compatibility changes were excluded at the user's
+request; this batch qualifies the web workflow only. Larger future changes to
+limits or ordering require their own evidence, not weakening these guards.
