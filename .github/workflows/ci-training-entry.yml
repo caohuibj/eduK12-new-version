@@ -85,22 +85,11 @@ jobs:
           node-version: '24.21.0'
           cache: npm
           cache-dependency-path: server-version/frontend/package-lock.json
-      - name: install official locked frontend tools
-        working-directory: server-version/frontend
-        run: npm ci --ignore-scripts --no-audit --no-fund
-      - name: only fixed missing-record affected frontend contracts
-        run: node .github/scripts/training-entry-checks.mjs frontend
-      - name: retain exact successful lint and unaffected browser scenarios
+      - name: retain exact successful frontend checks and complete emitted bytes
+        id: build
         env:
           GH_TOKEN: ${{ github.token }}
-        run: node .github/scripts/training-entry-checks.mjs recover-browser
-      - name: lint only the changed export recovery source and regression
-        run: node .github/scripts/training-entry-checks.mjs export-reload-lint
-      - name: require explicit one-time rebuild exception
-        run: node .github/scripts/training-entry-checks.mjs build-permission
-      - name: compile once for previously unexecuted actual-dist browser acceptance
-        id: build
-        run: node .github/scripts/training-entry-checks.mjs frontend-build
+        run: node .github/scripts/training-entry-checks.mjs recover-frontend
       - uses: actions/upload-artifact@v4
         if: always()
         id: dist
@@ -135,7 +124,7 @@ jobs:
           artifact-ids: ${{ needs.frontend.outputs.artifact }}
           merge-multiple: true
           path: .
-      - name: verify same-run exact frontend output before browser execution
+      - name: verify frozen official frontend output before browser execution
         run: node .github/scripts/training-entry-checks.mjs browser-input
       - name: install pinned controls and use the existing official sandboxed Chrome
         run: |

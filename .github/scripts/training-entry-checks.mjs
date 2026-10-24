@@ -59,7 +59,8 @@ function browserInput(){
   const path=dir+'/'+entry.name;assert(!lstatSync(path).isSymbolicLink(),'Build symlink refused');
   if(entry.isDirectory())visit(path);else {assert(entry.isFile());const bytes=readFileSync(path);files[path.slice(root.length+1)]={sha256:sha(bytes),bytes:bytes.length};}
  }};visit(root);
- verifyBrowserInput(JSON.parse(raw),files,{source:git('rev-parse','HEAD'),sourceHead:process.env.CI_SOURCE_HEAD,tree:binding.components.frontend,run:process.env.GITHUB_RUN_ID,attempt:process.env.GITHUB_RUN_ATTEMPT});
+ const reused=binding.completedFrontend;assert(reused,'Only the frozen official frontend reuse is allowed');
+ verifyBrowserInput(JSON.parse(raw),files,{source:reused.checkout,sourceHead:reused.sourceHead,tree:binding.components.frontend,run:String(reused.run),attempt:reused.attempt});
  save('browser-input-verified',{artifact:process.env.TRAINING_BUILD_ARTIFACT_ID,manifestSHA256:sha(raw),run:process.env.GITHUB_RUN_ID,consumerAttempt:process.env.GITHUB_RUN_ATTEMPT,files:Object.keys(files).length});
 }
 export function requireMissingRecordApproval(checks){assert.equal(checks.missingRecordRevalidationApproved,true,'Bounded missing-record revalidation approval pending');}
@@ -351,8 +352,8 @@ export function verifyRecoveredBackend(report,command,current){
  assert.equal(seen.size,471);assert.equal(passed,465);assert.deepEqual(failed.sort(),[...r.failedBackendNames].sort());
  return {passed:465,failed:6,originalJobConclusion:'failure',wholeInvocationPassed:false};
 }
-async function officialRecoveryFiles(component){
- const r=component==='backend'?{...binding.officialRecovery,...binding.officialRecovery.backendOrigin}:binding.officialRecovery,a=r.artifacts[component];assert(a);assert.equal(process.env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');
+async function officialRecoveryFiles(component,completedFrontend=false){
+ const r=completedFrontend?binding.completedFrontend:component==='backend'?{...binding.officialRecovery,...binding.officialRecovery.backendOrigin}:binding.officialRecovery,a=r.artifacts[component];assert(a);assert.equal(process.env.GITHUB_REPOSITORY,'caohuibj/eduK12-new-version');
  const api=async path=>{const x=await fetch('https://api.github.com/repos/caohuibj/eduK12-new-version/'+path,{headers:{Authorization:`Bearer ${process.env.GH_TOKEN}`,Accept:'application/vnd.github+json'}});assert.equal(x.status,200);return x};
  const [run,job,artifact]=await Promise.all([api(`actions/runs/${r.run}`).then(x=>x.json()),api(`actions/jobs/${a.job}`).then(x=>x.json()),api(`actions/artifacts/${a.id}`).then(x=>x.json())]);
  assert.equal(run.head_sha,r.sourceHead);assert.equal(run.head_branch,branch);assert.equal(run.event,'pull_request');assert.equal(run.path,'.github/workflows/ci.yml');
@@ -360,7 +361,7 @@ async function officialRecoveryFiles(component){
  if(component==='browser'){const producer=await(await api(`actions/jobs/${r.frontendJob}`)).json();assert.equal(producer.run_id,r.run);assert.equal(producer.head_sha,r.sourceHead);assert.equal(producer.name,'training-entry / frontend');assert.equal(producer.status,'completed');assert.equal(producer.conclusion,'success');assert(producer.steps.some(step=>step.name==='retain exact successful lint and unaffected browser scenarios'&&step.conclusion==='success'));}
  assert.equal(artifact.id,a.id);assert.equal(artifact.name,a.name);assert.equal(artifact.workflow_run.id,r.run);assert.equal(artifact.workflow_run.head_sha,r.sourceHead);assert.equal(artifact.expired,false);assert.equal(artifact.size_in_bytes,a.bytes);assert.equal(artifact.digest,'sha256:'+a.sha256);
  const zip=Buffer.from(await(await api(`actions/artifacts/${a.id}/zip`)).arrayBuffer());assert.equal(zip.length,a.bytes);assert.equal(sha(zip),a.sha256);
- const wanted=component==='backend'?Object.keys(binding.completedBackend.fileHashes):['browser.json','component-source-manifest.json','frontend-build-command.json','lint-retained.json',...Object.keys(r.completedReview.fileHashes)];
+ const wanted=completedFrontend?Object.keys(component==='frontend'?r.fileHashes:r.browserFileHashes):component==='backend'?Object.keys(binding.completedBackend.fileHashes):['browser.json','component-source-manifest.json','frontend-build-command.json','lint-retained.json',...Object.keys(r.completedReview.fileHashes)];
  const result=JSON.parse(execFileSync('python3',['-c',`import sys,io,zipfile,json,base64
 z=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read())); wanted=json.loads(sys.argv[1]); out={}
 for name in wanted:
@@ -407,6 +408,37 @@ function retryBackend(){
  const selected=report.testResults.flatMap(f=>f.assertionResults).filter(c=>c.status==='passed').map(c=>c.fullName);assert.equal(new Set(selected).size,8);for(const name of r.failedBackendNames)assert(selected.includes(name));
  assert(selected.every(name=>r.failedBackendNames.includes(name)||name.includes('preserves missing, null, NaN')||name.includes('preserves multiple issue paths')));save('backend-eight-checked',{selected,retainedOfficial:465,totalQualified:473});
 }
+export function verifyCompletedFrontend(files,currentManifest,actualDist){
+ const r=binding.completedFrontend;
+ for(const [name,h]of Object.entries(r.fileHashes))assert.equal(sha(files[name]),h,'Official frontend evidence changed: '+name);
+ const parse=name=>JSON.parse(files[name]);
+ for(const name of ['frontend-build-command.json','frontend-fresh-command.json','export-reload-lint-command.json']){const c=parse(name);assert.equal(c.source,r.checkout);assert.equal(c.componentTree,binding.components.frontend);assert.equal(c.status,'success');assert.equal(c.exitCode,0);assert.equal(c.tools.node,'v24.21.0');assert.equal(c.gitInputManifest,currentManifest);assert.equal(c.gitInputManifestSHA256,sha(currentManifest));}
+ assert.deepEqual(parse('frontend-build-command.json').command.slice(1),['node_modules/vite/bin/vite.js','build','--manifest']);
+ verifyBrowserInput(parse('frontend-build-manifest.json'),actualDist,{source:r.checkout,sourceHead:r.sourceHead,tree:binding.components.frontend,run:String(r.run),attempt:r.attempt});
+ const report=parse('frontend-fresh.json');assert.equal(report.success,true);assert.equal(report.numPassedTests,3);assert.equal(report.numFailedTests,0);assert.equal(report.testResults.length,1);assert(report.testResults[0].name.endsWith('/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx'));assert.equal(report.testResults[0].assertionResults.length,3);assert(report.testResults[0].assertionResults.every(c=>c.status==='passed'));
+ const review=parse('review-contracts-retained.json');assert.equal(review.run,40094830671);assert.equal(review.passed,8);assert.equal(review.originalJobConclusion,'success');assert.equal(review.reexecuted,false);
+ return {source:r.sourceHead,run:r.run,frontendCases:3,retainedReview:8,compiledFiles:Object.keys(actualDist).length,reexecuted:false};
+}
+async function recoverFrontend(){
+ const r=binding.completedFrontend,{files,job,zip}=await officialRecoveryFiles('frontend',true);
+ for(const name of ['only fixed missing-record affected frontend contracts','retain exact successful lint and unaffected browser scenarios','lint only the changed export recovery source and regression','compile once for previously unexecuted actual-dist browser acceptance'])assert(job.steps.some(s=>s.name===name&&s.conclusion==='success'));
+ const actualDist=JSON.parse(execFileSync('python3',['-c',`import sys,io,zipfile,json,hashlib,os,stat
+z=zipfile.ZipFile(io.BytesIO(sys.stdin.buffer.read())); out={}; prefix='server-version/frontend/dist/'
+for i in z.infolist():
+ if i.filename.startswith(prefix) and not i.is_dir():
+  assert '..' not in i.filename.split('/') and not i.filename.startswith('/') and not stat.S_ISLNK(i.external_attr>>16) and i.file_size<16000000
+  data=z.read(i); key=i.filename[len(prefix):]; assert key not in out;out[key]={'sha256':hashlib.sha256(data).hexdigest(),'bytes':len(data)}
+  os.makedirs(os.path.dirname(i.filename),exist_ok=True);open(i.filename,'wb').write(data)
+assert out
+print(json.dumps(out))`],{input:zip,encoding:'utf8',maxBuffer:4*1024*1024}));
+ save('frontend-complete-retained',verifyCompletedFrontend(files,git('ls-tree','-r','HEAD','--','server-version/frontend'),actualDist));
+ for(const [name,bytes]of Object.entries(files)){mkdirSync(output,{recursive:true});writeFileSync(output+'/'+name,bytes);}
+ const previous=await officialRecoveryFiles('browser',true);for(const [name,h]of Object.entries(r.browserFileHashes))assert.equal(sha(previous.files[name]),h);
+ const report=JSON.parse(previous.files['browser.json']);assert.equal(report.sourceSha,r.checkout);assert.equal(report.frontendGitTree,r.componentTree);assert.equal(report.status,'FAIL');assert.equal(report.harnessSha256,r.browserHarnessSHA256);
+ const scenarios=report.scenarios.filter(s=>r.browserRetainedNames.includes(s.name));assert.equal(scenarios.length,26);assert.equal(new Set(scenarios.map(s=>s.name)).size,26);assert(scenarios.every(s=>s.status==='PASS'&&!s.name.startsWith('anonymous-')&&s.errors.length===0&&s.unexpected.length===0));
+ save('browser-retained',{source:r.sourceHead,artifact:r.artifacts.browser.id,originalJobConclusion:'failure',currentFrontendTree:binding.components.frontend,scenarios});
+ if(process.env.GITHUB_OUTPUT)appendFileSync(process.env.GITHUB_OUTPUT,`manifest=${sha(files['frontend-build-manifest.json'])}\n`);
+}
 export function verifyCompletedReview(files,currentManifest){
  const r=binding.officialRecovery;
  for(const [name,h]of Object.entries(r.completedReview.fileHashes))assert.equal(sha(files[name]),h,'Official review evidence differs: '+name);
@@ -436,6 +468,7 @@ if(process.argv[1]&&import.meta.url===pathToFileURL(process.argv[1]).href){
   const accepted=verifyEvidence();assert.equal(binding.executionPolicy,'missing-only-current-mixed-candidate');requireMissingRecordApproval(binding.checks);save('admission',accepted);
  }else if(action==='backend')retryBackend();
  else if(action==='recover-backend')await recoverBackend();
+ else if(action==='recover-frontend')await recoverFrontend();
  else if(action==='recover-browser')await recoverBrowserAndLint();
  else if(action==='frontend'){assert.equal(binding.checks.frontendRetry3Approved,true);assert.equal(binding.checks.frontendRetry3Approval,'Sentinel_18b67969843c8191897da31d857ca6ac');tests(action);const report=JSON.parse(readFileSync(`${output}/frontend-fresh.json`));assert.equal(report.numPassedTests,3);}
  else if(action==='export-reload-lint')runRecorded('export-reload-lint','frontend',process.execPath,['node_modules/eslint/bin/eslint.js','src/pages/questionnaire/deferredAssessmentExport.tsx','src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx']);

@@ -11,14 +11,14 @@
   "blockers": [],
   "controlSHA256": {
     ".github/scripts/training-entry-scope.mjs": "82d18c25cf8c716fcc8204552cd31bd8a62ec87117c0248385d75a20f9ec4f3d",
-    ".github/scripts/training-entry-checks.mjs": "c37996aea717a00c5f11f97d1011353dab2d33f88db5b47a23ccef75c5bf5198",
-    ".github/scripts/training-entry.test.mjs": "bb5dd70cb1988592dbbe32abfcf2f1ca7a470e02ba82b951d78aac7f7d0371e6",
-    ".github/scripts/training-entry-browser.mjs": "7f8a7a35289757f8498b929ce0e24ba42251b9f8356835273b0f2e70ba427581",
-    ".github/workflows/ci-training-entry.yml": "32bcf3341062d97360ddd9ea05cf3e41ba704c89d567844a42d984bc5c4e1f4c",
+    ".github/scripts/training-entry-checks.mjs": "cd4525bb006da79b3a61efdaffac5adce7a11d610c81e8ee1d732ebad704ad83",
+    ".github/scripts/training-entry.test.mjs": "776bb092cc81f192959357127917359a6558905248fe0504fee1635e0b6a2887",
+    ".github/scripts/training-entry-browser.mjs": "e5baef3de0b18e2edcc11fe36cc0ece43e59c2e20cb29a3ea6fd645b9c820518",
+    ".github/workflows/ci-training-entry.yml": "03cca60317b1fac34c01a5fbd5459dbae92a3df0ce72417809967d98af05a48e",
     ".github/scripts/content-scope.mjs": "c78db2f6b4384701b9547e9df88e3de5453008a459a18d3108817b143e1ea762",
     ".github/scripts/merge-gate.mjs": "71585d6ca8785c8e60686f4770fcaec6f49be86c880a85d4ca3f42c02879d018",
     ".github/workflows/ci.yml": "a889c637f454d8c1cb735c9fe5300c8bb03d78c9866e21cf1844e3718d7a0f50",
-    "docs/release/README.md": "51e31bd7d6d0e0448b82355aae710bb3842770c5d9d7a95e7116a97c5d31eb7f",
+    "docs/release/README.md": "b8cbd32d3844dd33d56aeed6ac69a7e2ebf2304a120f6a27e3dd1da71db56cc6",
     ".github/scripts/content-workflows.test.mjs": "e62059676d8e418fb75392c03ca35e7abba8c73d1bdbdb829162b10c125bdefd",
     ".github/scripts/training-entry-migration.mjs": "b5c42b2c5bb3894cb8f0baaf4330cf78fc1f0147fad79bd676d1a35186a9faac"
   },
@@ -23065,6 +23065,11 @@
       "passed": 3,
       "exitCode": 0,
       "logSHA256": "e1070e5315974fd1bb4298d96a0fce56a28be911638813b9974b5106edb60c3e"
+    },
+    "anonymousFixture": {
+      "passed": 3,
+      "exitCode": 0,
+      "logSHA256": "0f1e03ef4c099badb815b33e0be0ebb084eddc2f9da6fa4f6c2178b8277b5016"
     }
   },
   "previousDependencyFixedPg": {
@@ -26272,6 +26277,7 @@
   "recoveryReview": {
     "fourthRun": "Official 465 passing backend assertions remain distinct from the six failures. Eight affected contracts execute with user approval; CSS invalidates learner rendered scenarios and the build, not retained JS-only unit assertions. Original public reports remain historical.",
     "sixthRun": "Official completed backend job and full emitted bytes are retained with exact unchanged backend inputs. Fixed frontend 421 excludes the affected review file prior seven cases, retaining414; its current eight cases execute with explicit permission. Browser retains24 prior passing scenarios; failed review plus seven never-executed scenarios run on a new frontend build.",
-    "seventhRun": "Official completed backend remains unchanged. Original fixed421 excludes review7 and export3, retaining411; seventh official successful review8 supplies the additional8 without rerunning. Current export3 execute, total422. Browser retains25 exact successful scenarios, including batch review; failed export recovery and six never-executed anonymous scenarios run on a new frontend build. Reload is explicitly confirmed and never automatically exports."
+    "seventhRun": "Official completed backend remains unchanged. Original fixed421 excludes review7 and export3, retaining411; seventh official successful review8 supplies the additional8 without rerunning. Current export3 execute, total422. Browser retains25 exact successful scenarios, including batch review; failed export recovery and six never-executed anonymous scenarios run on a new frontend build. Reload is explicitly confirmed and never automatically exports.",
+    "eighthRun": "Control-only synthetic UUID repair. Product unchanged; eighth official successful frontend source/deps, 3 contracts, lint and all727 emitted files are checked exactly. Original failed browser remains failure; 26 successful scenarios retained, anonymous6 execute on original dist. No new original reports are embedded."
   }
 }

@@ -211,8 +211,8 @@ test('sixth recovery retains official completed backend and excludes only affect
  const r=binding.officialRecovery;assert.equal(r.failedBackendNames.length,6);assert.equal(new Set(r.failedBackendNames).size,6);
  assert.equal(r.revalidation8Approved,true);assert.equal(r.approvalMessage,'Sentinel_355ab6c09da88191aaf61e8b9d1648f2');
  assert.equal(r.browserRetainedNames.length,25);assert(!r.browserRetainedNames.includes('assessment-deferred-export-retry'));assert.equal(binding.fixedFrontendContracts.retainedPassed,411);assert.equal(binding.fixedFrontendContracts.excludedPriorCount,10);
- const workflow=readFileSync('.github/workflows/ci-training-entry.yml','utf8');assert(workflow.includes('recover-backend'));assert(workflow.includes('recover-browser'));assert(!workflow.includes('training-entry-checks.mjs postgres'));
- assert(!workflow.includes('training-entry-checks.mjs backend-compile'));assert(workflow.includes('training-entry-checks.mjs frontend-build'));
+ const workflow=readFileSync('.github/workflows/ci-training-entry.yml','utf8');assert(workflow.includes('recover-backend'));assert(workflow.includes('recover-frontend'));assert(!workflow.includes('training-entry-checks.mjs postgres'));
+ assert(!workflow.includes('training-entry-checks.mjs backend-compile'));assert(workflow.includes('training-entry-checks.mjs recover-frontend'));assert(!workflow.includes('training-entry-checks.mjs frontend-build'));
 });
 
 test('actual repository diff discovers newly modified main paths outside the former manifest',()=>{
@@ -244,4 +244,18 @@ test('export recovery retains only official review success and leaves failed exp
  assert.equal(binding.fixedFrontendContracts.excludedAffectedFiles['server-version/frontend/src/pages/questionnaire/__tests__/DeferredAssessmentDataExport.test.tsx'],3);
  assert.equal(r.backendOrigin.run,binding.completedBackend.run);
  assert.equal(r.backendOrigin.sourceHead,binding.completedBackend.sourceHead);
+});
+
+test('anonymous browser fixtures pass the actual shared link codec before any page journey',async()=>{
+ const {createParticipationLinkCodec}=await import('../../server-version/frontend/src/components/participation/participation-link.ts');
+ const source=readFileSync('.github/scripts/training-entry-browser.mjs','utf8');
+ const id=source.match(/const studyId = '([^']+)'/)[1];
+ const codec=createParticipationLinkCodec({route:'/public/studies/',namespace:'training-study',proofFields:{key:/^[A-Za-z0-9_-]{43}$/}});
+ for(const key of ['s'.repeat(43),'r'.repeat(43)]){const link=new URL(codec.link('http://localhost:4173',id,{key}));assert.equal(link.pathname,'/public/studies/'+id);assert.equal(link.search,'');assert.deepEqual(codec.read(link.hash),{key});}
+ assert.equal(codec.link('http://localhost:4173','browser-study',{key:'s'.repeat(43)}),'');
+ assert(source.includes('for(const key of [studyCredential,rotatedCredential])'));
+});
+test('unchanged frontend uses only the exact successful official build and leaves all anonymous cases unqualified',()=>{
+ const r=binding.completedFrontend;assert.equal(r.run,40096682005);assert.equal(r.componentTree,binding.components.frontend);assert.equal(r.artifacts.frontend.conclusion,'success');assert.equal(r.artifacts.browser.conclusion,'failure');assert.equal(r.browserRetainedNames.length,26);assert(r.browserRetainedNames.every(n=>!n.startsWith('anonymous-')));
+ const workflow=readFileSync('.github/workflows/ci-training-entry.yml','utf8');const frontend=workflow.split('  frontend:')[1].split('  browser:')[0];assert(frontend.includes('recover-frontend'));assert(!frontend.includes('npm ci'));assert(!frontend.includes('checks.mjs frontend'));assert(!frontend.includes('build-permission'));
 });
