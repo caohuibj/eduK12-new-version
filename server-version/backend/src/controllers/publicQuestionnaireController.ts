@@ -799,6 +799,24 @@ export const publicQuestionnaireController = {
     try {
       const { sessionId } = req.params
 
+      // Resume capability/session/expiry checks remain in the route middleware.
+      // FINAL-only state does not consume the legacy answers and definitions.
+      const header = await prisma.questionnaireAssessment.findUnique({
+        where: { sessionId },
+        select: { id: true, deliveryMode: true },
+      })
+      if (!header) return notFound(res, '测评不存在')
+      if (header.deliveryMode === 'FINAL_ONLY') {
+        let finalState = await formSectionService.getQuestionnaireFinalAttemptState(header.id)
+        if (finalState.questionnaireAssessment.currentIndex >= finalState.totalItems && finalState.questionnaireAssessment.status !== 'COMPLETED') {
+          await formSectionService.finalizeQuestionnaireAttemptIfReady(header.id)
+          finalState = await formSectionService.getQuestionnaireFinalAttemptState(header.id)
+        }
+        return success(res, { ...finalState, sessionId })
+      }
+
+      // Legacy compatibility keeps the fresh full projection below; only this
+      // path pays for the additional dispatch header query.
       // 优化：只查询必要的数据，不加载题目详情
       const questionnaireAssessment = await prisma.questionnaireAssessment.findUnique({
         where: { sessionId },

@@ -2629,6 +2629,26 @@ export const questionnaireController = {
       const userId = req.user?.userId
       const { id } = req.params
 
+      // Route FINAL-only reads before loading the legacy answer graph. The
+      // runtime service retains its current authoritative reads and admission
+      // checks; this header is only an ownership and delivery-mode dispatch.
+      const header = await prisma.questionnaireAssessment.findUnique({
+        where: { id },
+        select: { id: true, userId: true, deliveryMode: true },
+      })
+      if (!header) return notFound(res, '问卷测评不存在')
+      if (header.userId !== userId) return forbidden(res, '无权限查看此测评')
+      if (header.deliveryMode === 'FINAL_ONLY') {
+        const finalState = await formSectionService.getQuestionnaireFinalAttemptState(header.id)
+        if (finalState.questionnaireAssessment.currentIndex >= finalState.totalItems && finalState.questionnaireAssessment.status !== 'COMPLETED') {
+          await formSectionService.finalizeQuestionnaireAttemptIfReady(header.id)
+          return success(res, await formSectionService.getQuestionnaireFinalAttemptState(header.id))
+        }
+        return success(res, finalState)
+      }
+
+      // Legacy resume keeps its existing full projection and rechecks ownership
+      // after the fresh read. Only this compatibility path adds a header query.
       const qa = await prisma.questionnaireAssessment.findUnique({
         where: { id },
         include: {

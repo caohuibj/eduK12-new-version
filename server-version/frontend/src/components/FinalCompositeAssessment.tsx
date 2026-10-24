@@ -289,7 +289,8 @@ const FinalCompositeAssessment: React.FC<FinalCompositeAssessmentProps> = ({ sta
     setSectionIndex(index=>Math.min(index,Math.max(0,trainingVisibleFields(fields,nextValues).length-1)))
     await scheduleLocalSave(`form:${itemId}`, async () => {
       await finalDraftStore.putAnswer({ draftKey, itemKey: itemId, value, updatedAt: Date.now() })
-      await finalDraftStore.deleteAnswers(draftKey,Object.keys(pendingValues).filter(key=>!(key in nextValues)))
+      const staleKeys = Object.keys(pendingValues).filter(key => !(key in nextValues))
+      if (staleKeys.length > 0) await finalDraftStore.deleteAnswers(draftKey, staleKeys)
     })
   }
 

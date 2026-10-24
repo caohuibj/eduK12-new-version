@@ -375,6 +375,18 @@ describe('C05 structured FINAL persistence', () => {
 })
 
 describe('C06 visibility and durable answer cleanup',()=>{
+ it('saves each ordinary form edit without an empty cleanup transaction', async () => {
+  render(<FinalCompositeAssessment {...sharedProps} state={makeState(formItem)} submitFormSection={vi.fn()} submitScale={vi.fn()}/>)
+  const input = await screen.findByRole('textbox')
+  await waitFor(() => expect(input).toBeEnabled())
+  const save = vi.spyOn(finalDraftStore, 'putAnswer')
+  const prune = vi.spyOn(finalDraftStore, 'deleteAnswers')
+  await userEvent.type(input, 'abc')
+  await screen.findByText('已保存到本机。')
+  expect(save.mock.calls.map(([answer]) => answer.value)).toEqual(['a', 'ab', 'abc'])
+  expect(prune).not.toHaveBeenCalled()
+  expect((await finalDraftStore.listAnswers('composite-form-section:composite-attempt-1:composite-form-section-1'))[0].value).toBe('abc')
+ })
  it('clears a previously saved hidden answer and seals only visible fields',async()=>{
   const policy={version:3 as const,requiredRefusal:'BLOCK_SUBMIT' as const,hiddenRequired:'EXEMPT' as const}
   const first={...formItem.formAnswers![0],formItemId:'source',type:'single_choice',label:'是否显示',required:true,options:[{value:'yes',label:'显示'},{value:'no',label:'隐藏'}],formPolicy:policy,formDefinition:{itemKey:'q_source',type:'SINGLE' as const,prompt:'是否显示',required:true,options:[{optionKey:'yes',label:'显示'},{optionKey:'no',label:'隐藏'}],rows:[]}}
@@ -383,8 +395,10 @@ describe('C06 visibility and durable answer cleanup',()=>{
   render(<FinalCompositeAssessment {...sharedProps} state={makeState({...formItem,formAnswers:[first,second]})} submitFormSection={submit} submitScale={vi.fn()}/>)
   const user=userEvent.setup();await waitFor(()=>expect(screen.getByRole('radio',{name:'显示'})).toBeEnabled())
   await user.click(screen.getByRole('radio',{name:'显示'}));await user.click(screen.getByRole('button',{name:'下一字段'}));await user.type(screen.getByLabelText('条件内容'),'应被清除')
+  const prune = vi.spyOn(finalDraftStore, 'deleteAnswers')
   await user.click(screen.getByRole('button',{name:'上一字段'}));await user.click(screen.getByRole('radio',{name:'隐藏'}))
   await waitFor(async()=>expect((await finalDraftStore.listAnswers('composite-form-section:composite-attempt-1:composite-form-section-1')).some(a=>a.itemKey==='conditional')).toBe(false))
+  expect(prune.mock.calls).toEqual([['composite-form-section:composite-attempt-1:composite-form-section-1', ['conditional']]])
   await user.click(screen.getByRole('button',{name:'提交整个区段'}));await waitFor(()=>expect(submit).toHaveBeenCalledTimes(1))
   expect(submit.mock.calls[0][2].answers).toEqual([{formItemId:'source',value:'no'}])
  })
