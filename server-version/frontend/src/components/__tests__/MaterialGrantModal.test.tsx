@@ -237,4 +237,37 @@ describe('MaterialGrantModal save', () => {
     expect(await screen.findByText('网络中断')).toBeInTheDocument()
     expect(onClose).not.toHaveBeenCalled()
   })
+  it('cancels both reads on unmount and ignores late selection before a fresh reopen', async () => {
+    let resolve!: (value: unknown) => void
+    mockListTeachers.mockImplementationOnce(() => new Promise(done => {resolve = done}))
+    const first = render(<MaterialGrantModal resourceType="SCALE" resourceId="old" resourceName="旧资源" onClose={vi.fn()}/>)
+    const signal = mockListTeachers.mock.calls[0][0] as AbortSignal
+    expect(mockList.mock.calls[0][1]).toBe(signal)
+    first.unmount(); expect(signal.aborted).toBe(true)
+    await act(async () => resolve({code: 0, data: {list: [teacher('old', 'old', '旧培训师')], total: 1}}))
+    render(<MaterialGrantModal resourceType="SCALE" resourceId="new" resourceName="新资源" onClose={vi.fn()}/>)
+    expect(await screen.findByLabelText('甲（tea1）')).toBeChecked()
+    expect(screen.queryByLabelText('旧培训师（old）')).not.toBeInTheDocument()
+    expect(mockListTeachers.mock.calls[1][0]).not.toBe(signal)
+    expect(mockListTeachers.mock.calls[1][0].aborted).toBe(false)
+    expect(mockSet).not.toHaveBeenCalled()
+  })
+  it('aborts the sibling directory on a failed grant read and retries with all selections', async () => {
+    mockListTeachers.mockImplementationOnce(() => new Promise(() => {}))
+    mockList.mockResolvedValueOnce({code: 503, message: '原始授权读取错误'})
+    const user = userEvent.setup()
+    render(<MaterialGrantModal resourceType="SCALE" resourceId="scale-1" resourceName="量表" onClose={vi.fn()}/>)
+    expect(await screen.findByRole('alert')).toHaveTextContent('原始授权读取错误')
+    const signal = mockListTeachers.mock.calls[0][0] as AbortSignal
+    expect(signal.aborted).toBe(true)
+    expect(screen.getByRole('button', {name: '保存'})).toBeDisabled()
+    await user.click(screen.getByRole('button', {name: '重新加载'}))
+    expect(await screen.findByLabelText('甲（tea1）')).toBeChecked()
+    expect(screen.getByLabelText('乙（tea2）')).not.toBeChecked()
+    expect(mockListTeachers.mock.calls[1][0]).not.toBe(signal)
+    expect(mockListTeachers.mock.calls[1][0].aborted).toBe(false)
+    await user.click(screen.getByRole('button', {name: '保存'}))
+    expect(mockSet).toHaveBeenCalledWith({resourceType: 'SCALE', resourceId: 'scale-1', teacherIds: ['t1']})
+  })
+
 })

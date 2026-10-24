@@ -52,26 +52,27 @@ const MaterialGrantEditor: React.FC<MaterialGrantModalProps> = ({
 
   useEffect(() => {
     let active = true
+    const controller = new AbortController()
     const load = async () => {
       try {
         setLoading(true)
         setLoaded(false)
         setLoadError(null)
         const [teachersRes, grantsRes] = await Promise.all([
-          materialGrantApi.listTeachers(),
-          materialGrantApi.list({ resourceType, resourceId }),
+          materialGrantApi.listTeachers(controller.signal).then(response => {
+            if (response.code !== 0) throw new Error(response.message || '加载教师名单失败')
+            if (!Array.isArray(response.data?.list) || response.data.list.some(user => !user || typeof user.id !== 'string' || !user.id) || (response.data.total != null && response.data.total !== response.data.list.length)) throw new Error('授权名单不完整，请重新加载')
+            return response
+          }),
+          materialGrantApi.list({ resourceType, resourceId }, controller.signal).then(response => {
+            if (response.code !== 0) throw new Error(response.message || '加载已有授权失败')
+            if (!Array.isArray(response.data?.list) || response.data.list.some(grant => !grant || typeof grant.teacherId !== 'string' || !grant.teacherId)) throw new Error('授权名单不完整，请重新加载')
+            return response
+          }),
         ])
         if (!active) return
-        if (teachersRes.code !== 0) throw new Error(teachersRes.message || '加载教师名单失败')
-        if (grantsRes.code !== 0) throw new Error(grantsRes.message || '加载已有授权失败')
-        const users = teachersRes.data?.list
-        const grantList = grantsRes.data?.list
-        if (!Array.isArray(users) || !Array.isArray(grantList)
-          || users.some(user => !user || typeof user.id !== 'string' || !user.id)
-          || grantList.some(grant => !grant || typeof grant.teacherId !== 'string' || !grant.teacherId)
-          || (teachersRes.data?.total != null && teachersRes.data.total !== users.length)) {
-          throw new Error('授权名单不完整，请重新加载')
-        }
+        const users = teachersRes.data.list
+        const grantList = grantsRes.data.list
         const teacherList = eligibleGrantTeachers(users)
         setTeachers(teacherList)
         const next: Record<string, boolean> = {}
@@ -79,13 +80,14 @@ const MaterialGrantEditor: React.FC<MaterialGrantModalProps> = ({
         setSelected(next)
         setLoaded(true)
       } catch (err) {
+        controller.abort()
         if (active) setLoadError((err as { message?: string })?.message || '加载授权名单失败')
       } finally {
         if (active) setLoading(false)
       }
     }
     void load()
-    return () => { active = false }
+    return () => { active = false; controller.abort() }
   }, [resourceType, resourceId, attempt])
 
   const close = () => {

@@ -50,12 +50,13 @@ export default function TrainingAdminCourses({pageTitle}:{pageTitle?:string}={})
  const teachersLoaded=useRef(false)
  useEffect(()=>{
   if(!filtersOpen||teachersLoaded.current)return
+  const controller=new AbortController()
   let active=true;setTeacherLoading(true);setTeacherError('')
-  void materialGrantApi.listTeachers().then(response=>{
+  void materialGrantApi.listTeachers(controller.signal).then(response=>{
    if(response.code!==0||!response.data)throw Error(response.message||'无法读取培训师选项')
    if(active){setTeachers(response.data.list.filter(user=>user.role==='TEACHER').sort((a,b)=>a.username.localeCompare(b.username)));teachersLoaded.current=true}
   }).catch(cause=>{if(active)setTeacherError(message(cause))}).finally(()=>{if(active)setTeacherLoading(false)})
-  return()=>{active=false}
+  return()=>{active=false;controller.abort()}
  },[filtersOpen,teacherRevision])
  const [loading,setLoading]=useState(true),[error,setError]=useState(''),[busy,setBusy]=useState(false)
  const [details,setDetails]=useState<Course|null>(null),[editing,setEditing]=useState<Course|null>(null)

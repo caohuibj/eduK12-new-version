@@ -148,4 +148,21 @@ describe('Training inline course supervision',()=>{
   expect(screen.getByText(course.title)).toBeVisible();expect(api.post).not.toHaveBeenCalled();expect(api.put).not.toHaveBeenCalled()
  })
 
+ it('cancels the teacher directory when filters close and reopens with a fresh signal',async()=>{
+  let resolve!:(value:unknown)=>void
+  directory.listTeachers.mockImplementationOnce(()=>new Promise(done=>{resolve=done}))
+  render(<TrainingAdminCourses/>);await screen.findByText(course.title)
+  fireEvent.click(screen.getByRole('button',{name:'课程检索'}))
+  const first=directory.listTeachers.mock.calls[0][0] as AbortSignal
+  expect(first.aborted).toBe(false)
+  fireEvent.click(screen.getByRole('button',{name:'收起检索'}));expect(first.aborted).toBe(true)
+  await act(async()=>resolve({code:0,data:{list:[{id:'old',username:'过时培训师',role:'TEACHER'}],total:1}}))
+  expect(screen.queryByRole('alert')).not.toBeInTheDocument()
+  fireEvent.click(screen.getByRole('button',{name:'课程检索'}))
+  const second=directory.listTeachers.mock.calls[1][0] as AbortSignal
+  expect(second).not.toBe(first);expect(second.aborted).toBe(false)
+  expect(await screen.findByRole('option',{name:'测试培训师（trainer_test）'})).toBeInTheDocument()
+  expect(screen.queryByRole('option',{name:'过时培训师'})).not.toBeInTheDocument()
+ })
+
 })
