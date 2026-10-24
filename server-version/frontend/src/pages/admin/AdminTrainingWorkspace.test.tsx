@@ -11,8 +11,8 @@ import {returnAfterLogin} from '../../components/app-shell/access'
 const auth=vi.hoisted(()=>({user:null as User|null,isLoading:false}))
 vi.mock('../../contexts/AuthContext',()=>({useAuth:()=>auth}))
 vi.mock('../UserList',()=>({default:()=> <section aria-label="账号列表与审核"><p>实际账号管理</p></section>}))
-vi.mock('../../training/TrainingAdminResources',()=>({default:()=> <section aria-label="资源目录与授权管理"><p>实际资源管理</p></section>}))
-vi.mock('../../training/TrainingAdminCourses',()=>({default:()=> <section aria-label="课程列表与监管"><p>实际课程监管</p></section>}))
+vi.mock('../../training/TrainingAdminResources',()=>({default:({pageTitle='资源与授权'}:{pageTitle?:string})=> <><h1>{pageTitle}</h1><section aria-label="资源目录与授权管理"><p>实际资源管理</p></section></>}))
+vi.mock('../../training/TrainingAdminCourses',()=>({default:({pageTitle}:{pageTitle?:string})=> <><h1>{pageTitle}</h1><section aria-label="课程列表与监管"><p>实际课程监管</p></section></>}))
 vi.mock('../TeacherCodeList',()=>({default:()=> <p>实际注册码管理</p>}))
 const manager={id:'training-admin',username:'training-admin',role:'STUDENT',platformRole:'STANDARD',entryGrants:[{entry:'TRAINING',version:1}]} as User
 function Location(){const location=useLocation();return <output aria-label="当前路由">{location.pathname}{location.search}</output>}

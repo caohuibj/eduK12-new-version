@@ -44,9 +44,10 @@ import '../../survey/survey-admin-shell.css'
 import SurveyAdminShell from '../../survey/SurveyAdminShell'
 import TrainingAdminShell from '../../training/TrainingAdminShell'
 
-const trainingFavicon='/training/favicon.svg?v=20261023-compact'
 import EducationAdminShell from '../../pages/admin/EducationAdminShell'
 import {educationEntry} from '../../pages/admin/education-entry'
+
+const trainingFavicon='/training/favicon.svg?v=20261023-compact'
 
 // Organization reports and charts are only needed on organization routes.
 const OrganizationProductRoutes = lazy(() => import('../../pages/organization/OrganizationProductRoutes'))
