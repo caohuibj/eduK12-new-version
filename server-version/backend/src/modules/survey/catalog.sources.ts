@@ -113,7 +113,7 @@ export function adaptCatalogSjt(ref:CatalogSourceRef,title:string,pkg:SituationP
     // validateSituationPackage above verifies displayHash AND recompiles the
     // shared online protocol against this exact definitionHash. Do not flatten
     // MULTIPLE/refusal/mother-scene semantics back into raw scorer options.
-    if(pkg.online.display.scenes.some(scene=>scene.image))fail('SOURCE_SJT_ONLINE_MEDIA_REQUIRES_AUTHORIZED_DELIVERY')
+    if(pkg.online.display.scenes.some(scene=>scene.image)&&ref.sourceId.startsWith('registry:'))fail('SOURCE_SJT_ONLINE_MEDIA_REQUIRES_AUTHORIZED_DELIVERY')
     return {...snapshot(ref,title,d,pkg.online.display,d,canonicalHash(d.scoring),
       {source:d.source,license:d.license,definitionHash:validation.definitionHash}),
       adapterVersion:ONLINE_SJT_ADAPTER_VERSION}

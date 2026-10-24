@@ -4,7 +4,7 @@ import {BoundedAdmissionBusyError} from '../../services/boundedAdmissionGate'
 import {authorizeSurveyMaterial} from './material.authorization'
 import {serveSurveyMaterial} from './material.delivery'
 import {SurveyMediaError} from './media.references'
-import {authorizedSurveyMediaSnapshot,frozenSurveyScaleImage,issueOwnSurveyScaleVideo} from './public-scale-media'
+import {authorizeOwnSurveyImage,issueOwnSurveyScaleVideo} from './public-scale-media'
 import {AssessmentMediaCapabilityError} from '../assessment-media/assessment-media-capability'
 import {AssessmentAssetValidationError} from '../assessment-media/assessment-asset'
 import { ScaleLibraryError } from '../scale-library-governance/contracts'
@@ -23,7 +23,6 @@ import { SurveyFinalValidationError } from './final.compute'
 import { getOwnResearchTask } from './task.public'
 import { resolveSurveyPublicId } from './public-project'
 import * as admission from './admission.service'
-import { surveyImageRefs } from './media.references'
 import { serveAssessmentImageContent,AssessmentImageDeliveryError } from '../assessment-media/assessment-image-delivery'
 import { surveyCognitiveRouter } from './cognitive.public.routes'
 import { SurveyCognitiveError } from './cognitive.results'
@@ -151,18 +150,9 @@ publicSurveyRouter.post('/r/:publicId/attempts/:attemptId/images/:assetId',
   async(req,res,next)=>{
     try{
       const params=proof.parse(req.body)
-      const {own,selected}=await authorizedSurveyMediaSnapshot({
+      const reference=await authorizeOwnSurveyImage({
         publicId:id.parse(req.params.publicId),attemptId:id.parse(req.params.attemptId),...params,
-      })
-      const assetId=id.parse(req.params.assetId)
-      const refs=surveyImageRefs(selected.units.map(u=>({
-        kind:u.kind,definition:u.displayDefinition,
-      })))
-      const scaleReference=frozenSurveyScaleImage(selected,assetId)
-      const reference=refs.find(x=>x.asset.assetId===assetId)?.asset??scaleReference
-      if(!reference)return res.status(404).end()
-      if(scaleReference&&!await prisma.assetReference.findFirst({where:{assetId,
-        entityType:'SurveyResearchPublication',entityId:own.publicationId,field:'media'},select:{id:true}}))return res.status(404).end()
+      },id.parse(req.params.assetId))
       res.setHeader('Cache-Control','private, no-store, max-age=0')
       res.setHeader('X-Content-Type-Options','nosniff')
       return await serveAssessmentImageContent({
