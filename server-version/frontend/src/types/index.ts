@@ -14,6 +14,7 @@ export interface User {
   teacherApproved?: boolean
   expiresAt?: string
   createdAt?: string
+  updatedAt?: string
   mustChangePassword?: boolean
 }
 
@@ -193,6 +194,7 @@ export interface Document {
 }
 
 export interface TeacherCode {
+  accountValidityDays?: number | null
   id: string
   code: string
   createdBy: string

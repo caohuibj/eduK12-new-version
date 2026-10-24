@@ -11,7 +11,7 @@ export async function listTrainingParticipants(role:'STUDENT'|'TEACHER',keyword:
  const [list,counts]=await Promise.all([
   prisma.$queryRaw<Array<Record<string,unknown>>>(Prisma.sql`SELECT u."id",u."username",u."role",u."nickname",u."avatar_url" AS "avatarUrl",u."phone",
    u."is_active" AS "isActive",u."is_frozen" AS "isFrozen",u."teacher_approved" AS "teacherApproved",u."expires_at" AS "expiresAt",
-   u."created_at" AS "createdAt",u."must_change_password" AS "mustChangePassword"
+   u."created_at" AS "createdAt",u."updated_at" AS "updatedAt",u."must_change_password" AS "mustChangePassword"
    FROM "users" u WHERE ${where} ORDER BY u."created_at" DESC,u."id" DESC LIMIT ${pageSize} OFFSET ${(page-1)*pageSize}`),
   prisma.$queryRaw<Array<{total:bigint}>>(Prisma.sql`SELECT COUNT(*) AS "total" FROM "users" u WHERE ${where}`),
  ])
