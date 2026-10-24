@@ -11,8 +11,8 @@
   "blockers": [],
   "controlSHA256": {
     ".github/scripts/training-entry-scope.mjs": "bd84df94032f26c913b4b5b221a45a86543a3255281f030eed17be433c93c59b",
-    ".github/scripts/training-entry-checks.mjs": "44302e580777ad50e34be092fd67606112aa578854ef694b22ac9efe36bc35d8",
-    ".github/scripts/training-entry.test.mjs": "f28eb0bae66634868dbebc2b4adecce5f71d2fc4d324a8bab334d86a67a5e880",
+    ".github/scripts/training-entry-checks.mjs": "d59c1d3e580a63b914abcb2a6a9a45daf79b886e5d94bf2a4843c85145e92511",
+    ".github/scripts/training-entry.test.mjs": "63ec7c20c4a6d4f7282a3d351f6f066de6269ef6761b1e37f82912a8de532d5c",
     ".github/scripts/training-entry-browser.mjs": "38a9e306a260de7a483d74a4ba57a02778b1f11fae8c0bee12831bc6284016fe",
     ".github/workflows/ci-training-entry.yml": "30cfca5d253c6a39f3e3ada211b2b854f1d770e6b0489e5609fe61bb39f5de66",
     ".github/scripts/content-scope.mjs": "c78db2f6b4384701b9547e9df88e3de5453008a459a18d3108817b143e1ea762",
@@ -13530,7 +13530,27 @@
     "ciExecuted": false,
     "originalExecutionSigned": false,
     "provenance": "Locally observed command exit and retained reporter; final exact control files are independently reviewed and hash-bound. No claim of signed original execution.",
-    "finalAnchorDelta": "Only the immutable product anchor literal and corresponding evidence/binding hashes changed after the 52 passing control tests. No executor/selection semantics changed."
+    "finalAnchorDelta": "Only the immutable product anchor literal and corresponding evidence/binding hashes changed after the 52 passing control tests. No executor/selection semantics changed.",
+    "sourceMappingDelta": {
+      "command": "node --test --test-name-pattern='evidence maps|evidence rejects a published|evidence never aliases' .github/scripts/training-entry.test.mjs",
+      "exitCode": 0,
+      "passed": 3,
+      "logSHA256": "1dd4fd77f91e869f0f0d4011059b81e66e75d61412b88ad110cea66416d7920a",
+      "priorControlSHA256": {
+        ".github/scripts/training-entry-scope.mjs": "bd84df94032f26c913b4b5b221a45a86543a3255281f030eed17be433c93c59b",
+        ".github/scripts/training-entry-checks.mjs": "44302e580777ad50e34be092fd67606112aa578854ef694b22ac9efe36bc35d8",
+        ".github/scripts/training-entry.test.mjs": "f28eb0bae66634868dbebc2b4adecce5f71d2fc4d324a8bab334d86a67a5e880",
+        ".github/scripts/training-entry-browser.mjs": "38a9e306a260de7a483d74a4ba57a02778b1f11fae8c0bee12831bc6284016fe",
+        ".github/workflows/ci-training-entry.yml": "30cfca5d253c6a39f3e3ada211b2b854f1d770e6b0489e5609fe61bb39f5de66",
+        ".github/scripts/content-scope.mjs": "c78db2f6b4384701b9547e9df88e3de5453008a459a18d3108817b143e1ea762",
+        ".github/scripts/merge-gate.mjs": "71585d6ca8785c8e60686f4770fcaec6f49be86c880a85d4ca3f42c02879d018",
+        ".github/workflows/ci.yml": "a889c637f454d8c1cb735c9fe5300c8bb03d78c9866e21cf1844e3718d7a0f50",
+        "docs/release/README.md": "a4358f3887def78cd51a5c286aa16cc85695739de976ae74872a856ea638c6c8",
+        ".github/scripts/content-workflows.test.mjs": "e62059676d8e418fb75392c03ca35e7abba8c73d1bdbdb829162b10c125bdefd",
+        ".github/scripts/training-entry-migration.mjs": "dd0feca9cd90ed6580c65a8c441ab78794659598aa436fd4c3f98fd9c1dbdd3b"
+      },
+      "scope": "Only exact local execution provenance to published identical-tree resolution; current and historical per-blob checks unchanged. Previous 52 checks not repeated."
+    }
   },
   "previousDependencyFixedPg": {
     "schema": 1,

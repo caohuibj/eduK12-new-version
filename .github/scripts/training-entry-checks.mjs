@@ -102,6 +102,15 @@ export function verifyFixedPg(e,object=git){
  for(const [id,count]of mapped)assert.equal(count,runs.get(id).passedCount,'Do not manufacture unreported passes');
  return {cases:12,kind:e.kind,ciExecuted:false,wholeFileQualification:false};
 }
+// Local execution commits are provenance, not necessarily published Git objects.
+// Only the frozen current product has an explicit, byte-identical remote mapping.
+export function evidenceSourceObject(source,resolve=git){
+ if(source!==binding.localProduct)return source;
+ assert.match(binding.product,/^[a-f0-9]{40}$/);
+ assert.notEqual(binding.product,binding.localProduct,'Published snapshot identity required');
+ assert.equal(resolve('rev-parse',binding.product+'^{tree}'),binding.productTree,'Published evidence product tree mismatch');
+ return binding.product;
+}
 export function verifyEvidence(read=readFileSync,resolve=git){
  const raw=read('.github/evidence/training-entry/reviewed.json');
  assert.equal(sha(raw),binding.evidenceSHA256,'Evidence bytes are not independently frozen');
@@ -144,13 +153,15 @@ export function verifyEvidence(read=readFileSync,resolve=git){
    assert(Array.isArray(x.files)&&x.files.length>0);assert.equal(new Set(x.files).size,x.files.length);
    const acceptedFiles=x.admittedFiles||x.files;assert(acceptedFiles.length>0);
    for(const f of acceptedFiles){assert(x.files.includes(f));assert(f in x.inputs,'Missing admitted file input '+f);}
-   const originalInputs=x.originalInputs||x.inputs;for(const f of acceptedFiles)assert(f in originalInputs,'Missing original admitted file identity');
+   const originalInputs=x.originalInputs||x.inputs;
+   const sourceObject=x.sourceObjectMode==='reachable-original'?evidenceSourceObject(x.source,resolve):null;
+   for(const f of acceptedFiles)assert(f in originalInputs,'Missing original admitted file identity');
    if(acceptedFiles.length!==x.files.length)assert.equal(x.sourceAppliesTo,'admitted-closure-only','Do not assign reconstructed original snapshots to discarded files');
    for(const[f,b]of Object.entries(x.inputs)){
     assert.match(f,/^(server-version\/|\.github\/)/);assert(!f.split('/').includes('..'));assert.match(b,/^[a-f0-9]{40}$/);
     assert.equal(resolve('rev-parse','HEAD:'+f),b,'Current imported input drift: '+f);
     const old=originalInputs[f]??null;if(old!==null)assert.match(old,/^[a-f0-9]{40}$/,'Invalid original import input');
-    if(x.sourceObjectMode==='reachable-original'&&old!==null)assert.equal(resolve('rev-parse',x.source+':'+f),old,'Original imported input mismatch: '+f);
+    if(x.sourceObjectMode==='reachable-original'&&old!==null)assert.equal(resolve('rev-parse',sourceObject+':'+f),old,'Original imported input mismatch: '+f);
     if(old!==b){const d=x.inputDeltaReview?.[f];assert.deepEqual(d,binding.reviewedDeltas?.[g.id]?.[f],'No frozen candidate-specific delta authorization');assert(Array.isArray(d?.changedSymbols)&&d.changedSymbols.length>0);assert(Array.isArray(d?.unchangedExecutedPaths)&&d.unchangedExecutedPaths.length>0);assert.equal(d?.before,old);assert.equal(d?.after,b);assert.equal(d?.executedPathUnchanged,true);assert.match(d?.reason||'',/\S.{30,}/);assert.match(d?.reviewEvidence||'',/\S.{10,}/);}
 
    }

@@ -4,7 +4,7 @@ import {readFileSync} from 'node:fs';
 import {createHash} from 'node:crypto';
 import {gzipSync} from 'node:zlib';
 import {binding,branch,marker,trainingEntryPlan,trainingEntryOutputs} from './training-entry-scope.mjs';
-import {verifyEvidence,verifyFreshReport,requireApproval,verifyFixedPg,requireMissingRecordApproval,verifyFrontendAuditEvidence} from './training-entry-checks.mjs';
+import {verifyEvidence,verifyFreshReport,requireApproval,verifyFixedPg,requireMissingRecordApproval,verifyFrontendAuditEvidence,evidenceSourceObject} from './training-entry-checks.mjs';
 import {requiredChecks,failedChecks} from './merge-gate.mjs';
 function fixture(){
  const head='a'.repeat(40),source='b'.repeat(40),values={};
@@ -166,3 +166,7 @@ for(const [name,change]of [
  ['tampered output',f=>f.stdout+=' '],['different source',f=>f.command.source='0'.repeat(40)],
  ['future completion',f=>f.now-=2000],
 ])test('frontend audit rejects '+name,()=>{const f=frontendAuditFixture();change(f);assert.throws(()=>verifyFrontendAuditEvidence(f.command,f.stdout,f.manifest,f.now));});
+
+ test('evidence maps only current local provenance to the exact published product tree',()=>{const seen=[];const resolve=(cmd,ref)=>{seen.push(ref);assert.equal(cmd,'rev-parse');assert.equal(ref,binding.product+'^{tree}');return binding.productTree};assert.equal(evidenceSourceObject(binding.localProduct,resolve),binding.product);assert.deepEqual(seen,[binding.product+'^{tree}']);});
+ test('evidence rejects a published snapshot with different tree bytes',()=>{assert.throws(()=>evidenceSourceObject(binding.localProduct,()=> '0'.repeat(40)),/tree mismatch/);});
+ test('evidence never aliases unrelated historical source commits',()=>{const other='1'.repeat(40);assert.equal(evidenceSourceObject(other,()=>{throw Error('unexpected lookup')}),other);});

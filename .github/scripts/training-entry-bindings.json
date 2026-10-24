@@ -2438,7 +2438,7 @@
     "server-version/frontend/tsconfig.cognitive.json": "910e97700f25652bc1d80ada47e176cbd51c2fbe",
     "server-version/frontend/vite.config.ts": "07ae0e602c0938352829a55397189baa0c0e0f22"
   },
-  "evidenceSHA256": "6376fa8b307508a8dfb11467b12e8e4a9e642e9942b0c05518486d3481e2450d",
+  "evidenceSHA256": "7e59f4fd5c251c6806679f5770139ff6c091b885ebed5dea91aca94a1f718e51",
   "requiredGroups": [
     "learner-frontend",
     "export-hook",
